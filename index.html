@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Travel Planner">
 <title>Travel Planner</title>
 <link rel="manifest" href="./manifest.json">
@@ -217,26 +217,6 @@ body.read-only-mode .drop-zone { border-color: transparent !important; }
 /* ── CONTROLS & PRINTING ── */
 .controls-container { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 1rem;}
 
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1a1a2e;
-    --card: #16213e;
-    --text: #e8e8e8;
-    --muted: #999;
-    --border: #2a2a4a;
-  }
-  .app-menu-bar { background: #0f0f23; }
-  .leg-nav, .detail-block { background: var(--card); }
-  .data-table th { background: #1e1e3e; }
-  .guide-details { background: var(--card); }
-  .guide-summary { background: #1e1e3e; color: #e8e8e8; }
-  .packing-card { background: var(--card); }
-  .ai-container { background: var(--card); }
-  .day-bar:hover { background: #1e1e3e; }
-  .budget-kpi { background: var(--card); }
-}
-
 @media print {
   @page { margin: 8mm; }
   body { font-size: 8pt; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; line-height: 1.3;}
@@ -325,7 +305,7 @@ body.read-only-mode .drop-zone { border-color: transparent !important; }
       <nav class="leg-nav" id="legNav"></nav>
       <div class="top-controls">
         <button id="expandAll" class="action-btn" onclick="toggleAll()">▼ Expand all days</button>
-        <button class="action-btn" onclick="addLeg()" style="border-style:dashed; color: var(--muted);">+ Add New Leg</button>
+        <button class="action-btn" onclick="addLeg()" style="border-style:dashed; color:var(--muted);">+ Add New Leg</button>
       </div>
       <div id="itinerary"></div>
   </div>
@@ -559,6 +539,36 @@ function exportJSON() {
     downloadAnchorNode.remove();
 }
 
+
+function migratePacking(data) {
+    // Detect old flat format: array of {title, items} without areaName/categories
+    if (!Array.isArray(data) || data.length === 0) return null;
+    const isOldFormat = data[0].hasOwnProperty('title') && !data[0].hasOwnProperty('areaName');
+    if (!isOldFormat) return data; // already new format
+
+    // Group old flat categories into the 3 area buckets by title prefix
+    const areas = [
+        { areaName: '🚶 Walk-on Gear (Wear onto plane)', areaColor: '#E67E22', categories: [] },
+        { areaName: '🧳 Carry-on Packed Bag (Main Luggage)', areaColor: '#2980B9', categories: [] },
+        { areaName: '🎒 Personal Item Bag (Under Seat)', areaColor: '#8E44AD', categories: [] }
+    ];
+    const liquid = { areaName: '🧳 Carry-on Packed Bag (Main Luggage)', areaColor: '#2980B9' };
+
+    data.forEach(cat => {
+        const t = cat.title || '';
+        const entry = { title: t.replace(/^(🧳|🎒|🚶|💧)\s*/,'').replace(/^(Carry-On: |Personal Item: )/,''), items: cat.items || [] };
+        if (t.includes('Walk-on') || t.includes('Plane Outfit')) {
+            areas[0].categories.push(entry);
+        } else if (t.includes('Personal Item') || t.includes('Flight Items') || t.includes('Tech') || t.includes('Essentials')) {
+            areas[2].categories.push(entry);
+        } else {
+            // Carry-on or liquids — all go to area 1
+            areas[1].categories.push(entry);
+        }
+    });
+    return areas.filter(a => a.categories.length > 0);
+}
+
 function importJSON(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -568,7 +578,10 @@ function importJSON(event) {
             const importedData = JSON.parse(e.target.result);
             if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
                 appData = importedData.itinerary;
-                if (importedData.packing) packingData = importedData.packing;
+                if (importedData.packing) {
+                    const migrated = migratePacking(importedData.packing);
+                    packingData = migrated || packingData;
+                }
                 if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
                 if (importedData.meta) {
                     titleData = importedData.meta;
@@ -906,10 +919,10 @@ function deleteDayItem(legIdx, dayIdx, category, itemIdx) {
 function addFood(legIdx) { appData[legIdx].cityFood.push({ text: "New food item...", done: false }); saveData(); buildItinerary(); }
 function addRun(legIdx) { appData[legIdx].cityRun.push("New run..."); saveData(); buildItinerary(); }
 function addSight(legIdx) { appData[legIdx].suggestedSights.push({ title: "New sight...", estTime: "1 hr", estCost: "0", assignedDayIdx: null }); saveData(); buildItinerary(); }
-function addDayItem(legIdx, dayIdx, category) { 
+function addDayItem(legIdx, dayIdx, category) {
     if (category === 'tips') { appData[legIdx].days[dayIdx].tips.push("New tip..."); }
     else { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", done: false }); }
-    saveData(); buildItinerary(); 
+    saveData(); buildItinerary();
 }
 
 function updateFoodText(legIdx, foodIdx, text) { appData[legIdx].cityFood[foodIdx].text = text; saveData(); }
@@ -1026,7 +1039,7 @@ function buildItinerary() {
 
     section.innerHTML = html; container.appendChild(section);
   });
-  if (typeof reObservLegs === 'function') reObservLegs();
+  if (typeof reObserveLegs === "function") reObserveLegs();
 }
 
 function buildNav() {
@@ -1048,16 +1061,11 @@ function toggleAll() {
 }
 
 function printPage(mode) {
-    if (mode === 'detailed') {
-        document.querySelectorAll('.day-card').forEach(c => c.classList.add('open'));
-    }
-    document.body.className = isFunMode ? 'fun-mode' : ''; 
+    if (mode === 'detailed') document.querySelectorAll('.day-card').forEach(c => c.classList.add('open'));
+    document.body.className = isFunMode ? 'fun-mode' : '';
     document.body.classList.add('print-' + mode);
     window.print();
-    setTimeout(() => { 
-        document.body.className = isFunMode ? 'fun-mode' : ''; 
-        if(!isEditMode) document.body.classList.add('read-only-mode'); 
-    }, 1000); 
+    setTimeout(() => { document.body.className = isFunMode ? 'fun-mode' : ''; if(!isEditMode) document.body.classList.add('read-only-mode'); }, 1000);
 }
 
 document.getElementById('mainTitle').addEventListener('blur', function() { titleData.title = this.innerText; saveData(); });
@@ -1088,9 +1096,6 @@ function addLeg() {
     saveData(); buildNav(); buildItinerary();
 }
 
-initData();
-buildNav();
-buildItinerary();
 
 // Scroll-active nav highlighting
 const navObserver = new IntersectionObserver(entries => {
@@ -1098,20 +1103,24 @@ const navObserver = new IntersectionObserver(entries => {
         if (entry.isIntersecting) {
             const id = entry.target.id.replace('leg-', '');
             document.querySelectorAll('.nav-btn').forEach(b => {
+                const leg = appData.find(l => l.id === id);
                 const isActive = b.dataset.leg === id;
                 b.classList.toggle('active', isActive);
-                const leg = appData.find(l => l.id === id);
                 b.style.borderBottomColor = isActive && leg ? leg.colour : 'transparent';
             });
         }
     });
 }, { threshold: 0.15 });
 
-function reObservLegs() {
+function reObserveLegs() {
     navObserver.disconnect();
     document.querySelectorAll('.leg').forEach(el => navObserver.observe(el));
 }
-reObservLegs();
+
+initData();
+buildNav();
+buildItinerary();
+reObserveLegs();
 </script>
 </body>
 </html>
