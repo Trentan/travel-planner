@@ -87,12 +87,15 @@ main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
 /* ── ITINERARY TAB STYLES ── */
 .top-controls { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;}
 .leg { margin-bottom: 2.5rem; }
-.leg-header { padding: 0.75rem 1.25rem; border-radius: var(--radius) var(--radius) 0 0; color: white; position: relative;}
+.leg-header { padding: 0.75rem 1.25rem; border-radius: var(--radius) var(--radius) 0 0; color: white; position: relative; cursor: pointer; user-select: none;}
 .leg-header-top { display: flex; align-items: center; justify-content: space-between; }
-.leg-header h2 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 600; margin: 0; outline: none;}
+.leg-header h2 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 600; margin: 0; outline: none; cursor: text;}
 .leg-subtitle { font-size: 0.8rem; opacity: 0.85; margin-top: 4px; font-style: italic; font-weight: 300;}
 .leg-night-count { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 3px 10px; font-size: 0.75rem; font-family: 'DM Mono', monospace; font-weight: 500;}
 .badge-transit { background: #E67E22; color: white; border: 1px solid #D35400;}
+.leg-chevron { transition: transform 0.25s; display: inline-block; font-size: 0.8rem; opacity: 0.8;}
+.leg.collapsed .leg-chevron { transform: rotate(-90deg); }
+.leg.collapsed .leg-content { display: none; }
 
 .city-dashboard { background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 1rem 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
 .city-block h4 { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;}
@@ -226,6 +229,7 @@ body.read-only-mode .drop-zone { border-color: transparent !important; }
   .tab-pane { display: block !important; page-break-before: always; }
   .tab-pane:first-child { page-break-before: avoid; }
   .guides-container { display: none !important; }
+  .leg.collapsed .leg-content { display: block !important; } /* Force expand for print */
   
   /* SUMMARY MODE */
   body.print-summary .city-dashboard, body.print-summary .leg-subtitle, body.print-summary .day-desc,
@@ -402,7 +406,7 @@ const DEFAULT_DATA = [
         completed: false, desc:'Travel and arrival day',
         transportItems: [{ text: "Flight AA123 08:00", cost: "250" }],
         accomItems: [{ text: "Grand Hotel", cost: "120" }],
-        activityItems: [{ text: "Check-in and explore local area", cost: "0", done: false }],
+        activityItems: [{ text: "Check-in and explore local area", cost: "0", time: "1 hr", done: false }],
         tips: ['Download local transit app'] 
       }
     ]
@@ -472,10 +476,21 @@ let currentFileName = "Default Template";
 
 function initData() {
     const saved = localStorage.getItem('travelApp_v2026_template');
-    if (saved) { appData = JSON.parse(saved); } 
+    if (saved) { 
+        appData = JSON.parse(saved); 
+        // Migrate to support 'time' field in activities
+        appData.forEach(leg => {
+            leg.days.forEach(day => {
+                if(day.activityItems) {
+                    day.activityItems.forEach(act => {
+                        if (act.time === undefined) act.time = "1 hr";
+                    });
+                }
+            });
+        });
+    } 
     else { appData = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
 
-    // v3 enforces the new 3-area layout schema
     const savedPacking = localStorage.getItem('travelApp_packing_v3');
     if (savedPacking) { packingData = JSON.parse(savedPacking); }
     else { packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING)); }
@@ -539,32 +554,21 @@ function exportJSON() {
     downloadAnchorNode.remove();
 }
 
-
 function migratePacking(data) {
-    // Detect old flat format: array of {title, items} without areaName/categories
     if (!Array.isArray(data) || data.length === 0) return null;
     const isOldFormat = data[0].hasOwnProperty('title') && !data[0].hasOwnProperty('areaName');
-    if (!isOldFormat) return data; // already new format
-
-    // Group old flat categories into the 3 area buckets by title prefix
+    if (!isOldFormat) return data; 
     const areas = [
         { areaName: '🚶 Walk-on Gear (Wear onto plane)', areaColor: '#E67E22', categories: [] },
         { areaName: '🧳 Carry-on Packed Bag (Main Luggage)', areaColor: '#2980B9', categories: [] },
         { areaName: '🎒 Personal Item Bag (Under Seat)', areaColor: '#8E44AD', categories: [] }
     ];
-    const liquid = { areaName: '🧳 Carry-on Packed Bag (Main Luggage)', areaColor: '#2980B9' };
-
     data.forEach(cat => {
         const t = cat.title || '';
         const entry = { title: t.replace(/^(🧳|🎒|🚶|💧)\s*/,'').replace(/^(Carry-On: |Personal Item: )/,''), items: cat.items || [] };
-        if (t.includes('Walk-on') || t.includes('Plane Outfit')) {
-            areas[0].categories.push(entry);
-        } else if (t.includes('Personal Item') || t.includes('Flight Items') || t.includes('Tech') || t.includes('Essentials')) {
-            areas[2].categories.push(entry);
-        } else {
-            // Carry-on or liquids — all go to area 1
-            areas[1].categories.push(entry);
-        }
+        if (t.includes('Walk-on') || t.includes('Plane Outfit')) { areas[0].categories.push(entry); } 
+        else if (t.includes('Personal Item') || t.includes('Flight Items') || t.includes('Tech') || t.includes('Essentials')) { areas[2].categories.push(entry); } 
+        else { areas[1].categories.push(entry); }
     });
     return areas.filter(a => a.categories.length > 0);
 }
@@ -685,7 +689,7 @@ EXPECTED JSON SCHEMA:
           "desc": "Short day description",
           "transportItems": [ {"text": "Flight/Train details", "cost": "0"} ],
           "accomItems": [ {"text": "Hotel name/address", "cost": "0"} ],
-          "activityItems": [ {"text": "Main planned activity", "cost": "0", "done": false} ],
+          "activityItems": [ {"text": "Main planned activity", "cost": "0", "time": "1 hr", "done": false} ],
           "tips": [ "Daily tip 1", "Daily tip 2" ]
         }
       ]
@@ -900,7 +904,7 @@ function handleDrop(e, targetLegIdx, targetDayIdx) {
 
     sight.assignedDayIdx = targetDayIdx;
     if (appData[targetLegIdx].days[targetDayIdx].activityItems.length === 1 && appData[targetLegIdx].days[targetDayIdx].activityItems[0].text === "—") { appData[targetLegIdx].days[targetDayIdx].activityItems = []; }
-    appData[targetLegIdx].days[targetDayIdx].activityItems.push({ text: sight.title, cost: sight.estCost || "0", done: false });
+    appData[targetLegIdx].days[targetDayIdx].activityItems.push({ text: sight.title, cost: sight.estCost || "0", time: sight.estTime || "1 hr", done: false });
     saveData(); buildItinerary();
 }
 
@@ -921,6 +925,7 @@ function addRun(legIdx) { appData[legIdx].cityRun.push("New run..."); saveData()
 function addSight(legIdx) { appData[legIdx].suggestedSights.push({ title: "New sight...", estTime: "1 hr", estCost: "0", assignedDayIdx: null }); saveData(); buildItinerary(); }
 function addDayItem(legIdx, dayIdx, category) {
     if (category === 'tips') { appData[legIdx].days[dayIdx].tips.push("New tip..."); }
+    else if (category === 'activityItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", time: "1 hr", done: false }); }
     else { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", done: false }); }
     saveData(); buildItinerary();
 }
@@ -937,6 +942,9 @@ function updateDayItemCost(legIdx, dayIdx, category, itemIdx, cost, fromTabs = f
     if(fromTabs) { if(category === 'transportItems') buildTransportTab(); if(category === 'accomItems') buildAccomTab(); }
     else buildItinerary(); 
 }
+function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
+    appData[legIdx].days[dayIdx][category][itemIdx].time = time; saveData();
+}
 function updateDayTips(legIdx, dayIdx, tipIdx, val) { appData[legIdx].days[dayIdx].tips[tipIdx] = val; saveData(); }
 
 function toggleFoodCompleted(e, legIdx, foodIdx) { appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); buildItinerary(); }
@@ -946,24 +954,40 @@ function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) { appData[legIdx].d
 function parseCost(val) { const num = parseFloat(String(val).replace(/[^0-9.-]+/g, "")); return isNaN(num) ? 0 : num; }
 function getDayTotal(day) { let total = 0; ['transportItems', 'accomItems', 'activityItems'].forEach(cat => { (day[cat] || []).forEach(item => { total += parseCost(item.cost); }); }); return total > 0 ? '$' + total.toFixed(0) : ''; }
 
+function toggleLeg(headerEl) { headerEl.parentElement.classList.toggle('collapsed'); }
+
 function buildItinerary() {
   const container = document.getElementById('itinerary'); container.innerHTML = '';
   
   appData.forEach((leg, legIndex) => {
     const section = document.createElement('div'); section.className = 'leg'; section.id = 'leg-' + leg.id;
 
-    const firstAccom = leg.days.length > 0 && leg.days[0].accomItems && leg.days[0].accomItems.length > 0 ? leg.days[0].accomItems[0].text : "";
-    const isTransit = leg.days.length === 1 && firstAccom.toLowerCase().includes('transit');
-    const nightLabel = isTransit ? '✈ Transit Stop' : (leg.days.length === 1 ? '1 night' : leg.days.length + ' nights');
+    const daysCount = leg.days.length;
+    const isTransit = daysCount === 1;
+    const nightLabel = isTransit ? '✈ Day Transit / Stop' : `${daysCount - 1} night${daysCount - 1 !== 1 ? 's' : ''}`;
     const badgeClass = isTransit ? 'leg-night-count badge-transit' : 'leg-night-count';
+    const firstDate = daysCount > 0 ? leg.days[0].date : '';
+    const lastDate = daysCount > 0 ? leg.days[daysCount - 1].date : '';
+    const dateRange = (firstDate && lastDate && firstDate !== lastDate) ? `${firstDate} – ${lastDate}` : firstDate;
+
     const unassigned = (leg.suggestedSights||[]).filter(s => s.assignedDayIdx === null || s.assignedDayIdx === undefined);
     const subtitle = unassigned.length === 0 ? "All suggested sights assigned! 🎉" : `Remaining Ideas: ${unassigned.slice(0, 3).map(s => s.title.split('—')[0].trim()).join(', ')}${unassigned.length > 3 ? '...' : ''}`;
 
     let html = `
-      <div class="leg-header" style="background:${leg.colour}">
-        <div class="leg-header-top"><h2 contenteditable="${isEditMode}" onblur="updateData(${legIndex}, 'label', this.innerText)">${leg.label}</h2><span class="${badgeClass}">${nightLabel}</span></div>
+      <div class="leg-header" style="background:${leg.colour}" onclick="toggleLeg(this)">
+        <div class="leg-header-top">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <h2 contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateData(${legIndex}, 'label', this.innerText)">${leg.label}</h2>
+                <span style="opacity:0.8; font-size:0.9rem; font-family:'DM Mono', monospace;">${dateRange}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span class="${badgeClass}">${nightLabel}</span>
+                <span class="leg-chevron">▼</span>
+            </div>
+        </div>
         <div class="leg-subtitle">${subtitle}</div>
       </div>
+      <div class="leg-content">
     `;
 
     html += `<div class="city-dashboard">
@@ -1022,7 +1046,7 @@ function buildItinerary() {
 
               <div class="detail-block block-activities drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
                 <h4>Planned Activities</h4><div class="item-list">
-                    ${(day.activityItems || []).map((item, i) => `<div class="cost-item"><button class="del-btn" title="Remove Activity" onclick="deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button><input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})"><span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.text}</span><span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.cost}</span></span></div>`).join('')}
+                    ${(day.activityItems || []).map((item, i) => `<div class="cost-item"><button class="del-btn" title="Remove Activity" onclick="deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button><input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})"><span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.text}</span><span class="budget-field" style="color:#666;">⏱ <span contenteditable="${isEditMode}" onblur="updateDayItemTime(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.time || '1 hr'}</span></span><span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.cost}</span></span></div>`).join('')}
                 </div><button class="add-btn" onclick="addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>
               </div>
 
@@ -1037,6 +1061,7 @@ function buildItinerary() {
       `;
     });
 
+    html += `</div>`; // Close leg-content
     section.innerHTML = html; container.appendChild(section);
   });
   if (typeof reObserveLegs === "function") reObserveLegs();
@@ -1047,7 +1072,11 @@ function buildNav() {
   appData.forEach(leg => {
     const btn = document.createElement('button');
     btn.className = 'nav-btn'; btn.textContent = leg.label;
-    btn.onclick = () => document.getElementById('leg-' + leg.id).scrollIntoView({behavior:'smooth', block:'start'});
+    btn.onclick = () => {
+        const el = document.getElementById('leg-' + leg.id);
+        el.classList.remove('collapsed'); // Auto-expand when navigating
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+    };
     btn.dataset.leg = leg.id; nav.appendChild(btn);
   });
 }
@@ -1057,11 +1086,15 @@ let allExpanded = false;
 function toggleAll() {
   allExpanded = !allExpanded;
   document.querySelectorAll('.day-card').forEach(c => c.classList.toggle('open', allExpanded));
+  if (allExpanded) document.querySelectorAll('.leg').forEach(l => l.classList.remove('collapsed'));
   document.getElementById('expandAll').textContent = allExpanded ? '▲ Collapse all days' : '▼ Expand all days';
 }
 
 function printPage(mode) {
-    if (mode === 'detailed') document.querySelectorAll('.day-card').forEach(c => c.classList.add('open'));
+    if (mode === 'detailed') {
+        document.querySelectorAll('.day-card').forEach(c => c.classList.add('open'));
+        document.querySelectorAll('.leg').forEach(l => l.classList.remove('collapsed'));
+    }
     document.body.className = isFunMode ? 'fun-mode' : '';
     document.body.classList.add('print-' + mode);
     window.print();
@@ -1088,7 +1121,7 @@ function addLeg() {
             completed: false, desc: 'Travel and arrival day',
             transportItems: [{ text: "Add transport...", cost: "0" }],
             accomItems: [{ text: "Add accommodation...", cost: "0" }],
-            activityItems: [{ text: "Explore local area", cost: "0", done: false }],
+            activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false }],
             tips: ["Add tip..."]
         }]
     };
