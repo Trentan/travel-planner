@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Travel Planner">
 <title>Travel Planner</title>
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#1A242F">
@@ -214,6 +217,26 @@ body.read-only-mode .drop-zone { border-color: transparent !important; }
 /* ── CONTROLS & PRINTING ── */
 .controls-container { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 1rem;}
 
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a2e;
+    --card: #16213e;
+    --text: #e8e8e8;
+    --muted: #999;
+    --border: #2a2a4a;
+  }
+  .app-menu-bar { background: #0f0f23; }
+  .leg-nav, .detail-block { background: var(--card); }
+  .data-table th { background: #1e1e3e; }
+  .guide-details { background: var(--card); }
+  .guide-summary { background: #1e1e3e; color: #e8e8e8; }
+  .packing-card { background: var(--card); }
+  .ai-container { background: var(--card); }
+  .day-bar:hover { background: #1e1e3e; }
+  .budget-kpi { background: var(--card); }
+}
+
 @media print {
   @page { margin: 8mm; }
   body { font-size: 8pt; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; line-height: 1.3;}
@@ -302,6 +325,7 @@ body.read-only-mode .drop-zone { border-color: transparent !important; }
       <nav class="leg-nav" id="legNav"></nav>
       <div class="top-controls">
         <button id="expandAll" class="action-btn" onclick="toggleAll()">▼ Expand all days</button>
+        <button class="action-btn" onclick="addLeg()" style="border-style:dashed; color: var(--muted);">+ Add New Leg</button>
       </div>
       <div id="itinerary"></div>
   </div>
@@ -882,7 +906,11 @@ function deleteDayItem(legIdx, dayIdx, category, itemIdx) {
 function addFood(legIdx) { appData[legIdx].cityFood.push({ text: "New food item...", done: false }); saveData(); buildItinerary(); }
 function addRun(legIdx) { appData[legIdx].cityRun.push("New run..."); saveData(); buildItinerary(); }
 function addSight(legIdx) { appData[legIdx].suggestedSights.push({ title: "New sight...", estTime: "1 hr", estCost: "0", assignedDayIdx: null }); saveData(); buildItinerary(); }
-function addDayItem(legIdx, dayIdx, category) { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", done: false }); saveData(); buildItinerary(); }
+function addDayItem(legIdx, dayIdx, category) { 
+    if (category === 'tips') { appData[legIdx].days[dayIdx].tips.push("New tip..."); }
+    else { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", done: false }); }
+    saveData(); buildItinerary(); 
+}
 
 function updateFoodText(legIdx, foodIdx, text) { appData[legIdx].cityFood[foodIdx].text = text; saveData(); }
 function updateArrayData(legIdx, arrayKey, itemIdx, val) { appData[legIdx][arrayKey][itemIdx] = val; saveData(); }
@@ -903,7 +931,7 @@ function toggleDayCompleted(e, legIdx, dayIdx) { e.stopPropagation(); appData[le
 function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) { appData[legIdx].days[dayIdx].activityItems[itemIdx].done = e.target.checked; saveData(); buildItinerary(); }
 
 function parseCost(val) { const num = parseFloat(String(val).replace(/[^0-9.-]+/g, "")); return isNaN(num) ? 0 : num; }
-function getDayTotal(day) { let total = 0; ['transportItems', 'accomItems', 'activityItems'].forEach(cat => { (day[cat] || []).forEach(item => { total += parseCost(item.cost); }); }); return total; }
+function getDayTotal(day) { let total = 0; ['transportItems', 'accomItems', 'activityItems'].forEach(cat => { (day[cat] || []).forEach(item => { total += parseCost(item.cost); }); }); return total > 0 ? '$' + total.toFixed(0) : ''; }
 
 function buildItinerary() {
   const container = document.getElementById('itinerary'); container.innerHTML = '';
@@ -963,7 +991,7 @@ function buildItinerary() {
             <input type="checkbox" class="day-checkbox" ${day.completed ? 'checked' : ''} onclick="toggleDayCompleted(event, ${legIndex}, ${dayIndex})">
             <div class="day-date"><span class="day-num">${day.date}</span><span class="day-name">${day.day}</span></div>
             <div class="day-title"><div class="day-cities">${cityHTML}</div><div class="day-desc" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
-            <div class="day-total-cost" title="Total estimated cost for the day">Total: ${dayTotal}</div><span class="day-chevron">▼</span>
+            ${dayTotal ? `<div class="day-total-cost" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron">▼</span>
           </div>
           <div class="day-detail"><div class="detail-grid">
               
@@ -998,6 +1026,7 @@ function buildItinerary() {
 
     section.innerHTML = html; container.appendChild(section);
   });
+  if (typeof reObservLegs === 'function') reObservLegs();
 }
 
 function buildNav() {
@@ -1019,18 +1048,70 @@ function toggleAll() {
 }
 
 function printPage(mode) {
+    if (mode === 'detailed') {
+        document.querySelectorAll('.day-card').forEach(c => c.classList.add('open'));
+    }
     document.body.className = isFunMode ? 'fun-mode' : ''; 
     document.body.classList.add('print-' + mode);
     window.print();
-    setTimeout(() => { document.body.className = isFunMode ? 'fun-mode' : ''; if(!isEditMode) document.body.classList.add('read-only-mode'); }, 1000); 
+    setTimeout(() => { 
+        document.body.className = isFunMode ? 'fun-mode' : ''; 
+        if(!isEditMode) document.body.classList.add('read-only-mode'); 
+    }, 1000); 
 }
 
 document.getElementById('mainTitle').addEventListener('blur', function() { titleData.title = this.innerText; saveData(); });
 document.getElementById('mainSubtitle').addEventListener('blur', function() { titleData.subtitle = this.innerText; saveData(); });
 
+
+function updateData(legIdx, key, val) { appData[legIdx][key] = val; saveData(); }
+function updateDayData(legIdx, dayIdx, key, val) { appData[legIdx].days[dayIdx][key] = val; saveData(); }
+
+function addLeg() {
+    const newLeg = {
+        id: 'leg_' + Date.now(),
+        label: '📍 New City',
+        colour: '#2C3E50',
+        cityFood: [{ text: "Local dish to try", done: false }],
+        cityRun: ["5km park loop"],
+        suggestedSights: [],
+        days: [{
+            date: 'DD Mon', day: 'Mon', from: 'City', to: 'City',
+            completed: false, desc: 'Travel and arrival day',
+            transportItems: [{ text: "Add transport...", cost: "0" }],
+            accomItems: [{ text: "Add accommodation...", cost: "0" }],
+            activityItems: [{ text: "Explore local area", cost: "0", done: false }],
+            tips: ["Add tip..."]
+        }]
+    };
+    appData.push(newLeg);
+    saveData(); buildNav(); buildItinerary();
+}
+
 initData();
 buildNav();
 buildItinerary();
+
+// Scroll-active nav highlighting
+const navObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const id = entry.target.id.replace('leg-', '');
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                const isActive = b.dataset.leg === id;
+                b.classList.toggle('active', isActive);
+                const leg = appData.find(l => l.id === id);
+                b.style.borderBottomColor = isActive && leg ? leg.colour : 'transparent';
+            });
+        }
+    });
+}, { threshold: 0.15 });
+
+function reObservLegs() {
+    navObserver.disconnect();
+    document.querySelectorAll('.leg').forEach(el => navObserver.observe(el));
+}
+reObservLegs();
 </script>
 </body>
 </html>
