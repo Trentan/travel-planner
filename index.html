@@ -1,389 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Travel Planner">
-<title>Travel Planner</title>
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#1A242F">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #F7F5F0;
-  --card: #FFFFFF;
-  --text: #1a1a1a;
-  --muted: #666;
-  --border: #E5E0D8;
-  --radius: 12px;
-  --shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.3s; }
-
-/* ── TOP APP MENU BAR ── */
-.app-menu-bar {
-  background: #1A242F;
-  color: white;
-  padding: 0.6rem 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  font-size: 0.85rem;
-}
-.app-menu-left, .app-menu-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;}
-.file-badge { background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 4px; font-family: 'DM Mono', monospace; color: #AAB7C4; border: 1px solid rgba(255,255,255,0.1); }
-.save-status { color: #2ECC71; font-weight: 600; min-width: 60px;}
-
-.app-menu-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; font-family: inherit;}
-.app-menu-btn:hover { background: rgba(255,255,255,0.2); }
-.app-menu-btn.active-mode { background: #27AE60; border-color: #2ECC71; }
-.app-menu-btn.edit-mode { background: #F39C12; border-color: #F1C40F; color: #fff; }
-.app-menu-btn.danger { background: rgba(231,76,60,0.2); border-color: rgba(231,76,60,0.5); color: #F5B7B1;}
-.app-menu-btn.danger:hover { background: rgba(231,76,60,0.4); }
-
-/* ── HEADER & WIDGETS ── */
-header { background: #2C3E50; color: white; padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden; }
-header::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(255,255,255,0.02) 40px, rgba(255,255,255,0.02) 80px); }
-.header-inner { position: relative; max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2rem;}
-.header-text h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; margin-bottom: 0.5rem; outline: none;}
-.header-text p { font-size: 0.9rem; opacity: 0.8; font-weight: 300; outline: none;}
-
-.header-widgets { display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; }
-.clock-widget { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.75rem 1rem; min-width: 260px; }
-.clock-row { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 4px; font-size: 0.85rem; font-family: 'DM Mono', monospace;}
-.clock-label { color: #AAB7C4; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'DM Sans', sans-serif;}
-
-/* ── NAV ── */
-.leg-nav { background: white; border-bottom: 1px solid var(--border); padding: 0 1rem; display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; position: sticky; top: 0; z-index: 100; }
-.leg-nav::-webkit-scrollbar { display: none; }
-.nav-btn { padding: 0.75rem 1rem; border: none; background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 500; color: var(--muted); white-space: nowrap; border-bottom: 3px solid transparent; }
-.nav-btn.active { color: var(--text); font-weight: 600; }
-
-/* ── MAIN APP STRUCTURE & TABS ── */
-main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
-.app-tabs { display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border); margin-bottom: 2rem; flex-wrap: wrap;}
-.app-tab-btn { padding: 0.75rem 1.25rem; border: none; background: none; font-size: 0.95rem; font-family: 'DM Sans', sans-serif; cursor: pointer; font-weight: 500; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s;}
-.app-tab-btn:hover { color: var(--text); }
-.app-tab-btn.active { color: #2C3E50; border-bottom-color: #2C3E50; font-weight: 700; }
-
-.tab-pane { display: none; animation: fadeIn 0.3s ease; }
-.tab-pane.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ── BUTTONS ── */
-.action-btn { background: white; border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;}
-.action-btn:hover { background: #f0f0f0; }
-.add-btn { background: none; border: 1px dashed #AAB7C4; color: #AAB7C4; cursor: pointer; padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; margin-top: 8px; width: 100%; transition: all 0.2s;}
-.add-btn:hover { background: #F7F5F0; border-color: #2C3E50; color: #2C3E50; }
-.del-btn { background: none; border: none; color: #E74C3C; cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0 6px 0 0; opacity: 0.2; transition: opacity 0.2s; user-select: none; }
-.del-btn:hover { opacity: 1 !important; color: #C0392B; }
-.header-del-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; transition: 0.2s; opacity: 0.6; color: white; display:flex; align-items:center; justify-content:center;}
-.header-del-btn:hover { opacity: 1; transform: scale(1.1); }
-
-/* ── ITINERARY TAB STYLES ── */
-.top-controls { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;}
-.leg { margin-bottom: 2.5rem; }
-.leg-header { padding: 0.75rem 1.25rem; border-radius: var(--radius) var(--radius) 0 0; color: white; position: relative; cursor: pointer; user-select: none;}
-.leg-header-top { display: flex; align-items: center; justify-content: space-between; }
-.leg-header h2 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 600; margin: 0; outline: none; cursor: text;}
-.leg-subtitle { font-size: 0.8rem; opacity: 0.85; margin-top: 4px; font-style: italic; font-weight: 300;}
-.leg-night-count { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 3px 10px; font-size: 0.75rem; font-family: 'DM Mono', monospace; font-weight: 500;}
-.badge-transit { background: #E67E22; color: white; border: 1px solid #D35400;}
-.leg-chevron { transition: transform 0.25s; display: inline-block; font-size: 0.8rem; opacity: 0.8;}
-.leg.collapsed .leg-chevron { transform: rotate(-90deg); }
-.leg.collapsed .leg-content { display: none; }
-
-.city-dashboard { background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 1rem 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
-.city-block h4 { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;}
-.city-block ul { list-style: none; padding: 0; font-size: 0.85rem; }
-.city-block li { margin-bottom: 0.4rem; padding-left: 1.2rem; text-indent: -1.2rem; }
-
-.quest-item { display: flex; align-items: flex-start; gap: 4px; text-indent: 0 !important; padding-left: 0 !important; margin-bottom: 6px !important; }
-.quest-item:hover .del-btn { opacity: 0.6; }
-.quest-item input[type="checkbox"] { margin-top: 5px; flex-shrink: 0; width: 16px; height: 16px; cursor: pointer; accent-color: #27AE60; }
-.quest-item span { flex-grow: 1; outline: none; }
-
-/* Drag & Drop */
-.draggable-sight { padding: 6px 0; border-radius: 4px; transition: background 0.2s; display: flex; align-items: flex-start; text-indent: 0 !important; padding-left: 0 !important;}
-.draggable-sight:hover { background: #FAFAF8; }
-.draggable-sight:hover .del-btn { opacity: 0.6; }
-.drag-handle { cursor: grab; color: #aaa; margin-right: 4px; user-select: none; font-size: 1.1rem; line-height: 1.2;}
-.sight-meta { display: flex; gap: 6px; margin-top: 4px; align-items: center; }
-.sight-tag { display: inline-flex; align-items: center; background: #EFF6FF; color: #1A5276; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; border: 1px solid #D6EAF8; white-space: nowrap;}
-.assigned-sight { padding: 6px 0; display: flex; align-items: flex-start; text-indent: 0 !important; padding-left: 0 !important; opacity: 0.7; }
-.assigned-badge { font-size: 0.65rem; color: white; padding: 2px 6px; border-radius: 12px; margin-right: 8px; white-space: nowrap; font-weight: 600; display: inline-block; transform: translateY(2px);}
-.drop-zone { border: 2px dashed transparent; transition: all 0.2s; position: relative;}
-.drop-zone.drag-over { border-color: #27AE60; background: #E9F7EF; }
-
-/* Day Card Styles */
-.day-card { background: var(--card); border: 1px solid var(--border); border-top: none; transition: opacity 0.3s; }
-.day-card:last-child { border-radius: 0 0 var(--radius) var(--radius); }
-.day-card.is-completed { opacity: 0.6; background: #fdfdfd; }
-.day-card.is-completed .day-cities { text-decoration: line-through; opacity: 0.7; }
-.day-bar { display: grid; grid-template-columns: 24px 70px 1fr auto auto; align-items: center; gap: 0.75rem; padding: 0.75rem 1.25rem 0.75rem 0.75rem; cursor: pointer; border-left: 4px solid var(--leg-colour, #ccc); transition: background 0.2s;}
-.day-bar:hover { background: #FAFAF8; }
-.day-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: #27AE60; }
-.day-date .day-name { font-size: 0.7rem; opacity: 0.7; display: block; font-family: 'DM Mono', monospace;}
-.day-date .day-num { font-size: 1rem; font-weight: 500; display: block; font-family: 'DM Mono', monospace;}
-.day-cities { font-size: 0.95rem; font-weight: 500; transition: all 0.2s;}
-.day-desc { font-size: 0.8rem; color: var(--muted); }
-.day-total-cost { font-size: 0.85rem; font-family: 'DM Mono', monospace; background: #eee; padding: 2px 8px; border-radius: 12px; color: #444; font-weight: 600;}
-.day-chevron { font-size: 0.8rem; color: var(--muted); transition: transform 0.25s; }
-.day-card.open .day-chevron { transform: rotate(180deg); }
-
-.day-detail { display: none; padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--border); }
-.day-card.open .day-detail { display: block; }
-.detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-.detail-block { background: var(--bg); border-radius: 8px; padding: 0.85rem 1rem; }
-.detail-block h4 { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;}
-
-.item-list { display: flex; flex-direction: column; gap: 6px; }
-.cost-item { display: flex; gap: 4px; align-items: flex-start; }
-.cost-item:hover .del-btn { opacity: 0.6; }
-.cost-item-text { flex-grow: 1; font-size: 0.85rem; line-height: 1.3; padding-top: 2px;}
-.block-accom .cost-item-text { font-weight: bold; }
-.block-activities .cost-item-text { font-weight: 500; font-size: 0.9rem; }
-.activity-checkbox { margin-top: 4px; margin-right: 4px; width: 14px; height: 14px; cursor: pointer; accent-color: #27AE60; }
-.budget-field { flex-shrink: 0; font-family: 'DM Mono', monospace; font-size: 0.75rem; color: #2C3E50; background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid #ccc; font-weight: 400; text-transform: none; display: flex; align-items: center;}
-
-[contenteditable="true"] { outline: 1px dashed transparent; transition: outline 0.2s; border-radius: 2px; }
-[contenteditable="true"]:hover { outline-color: #4A90D9; }
-[contenteditable="true"]:focus { outline: 2px solid #4A90D9; background: #EFF6FF; }
-
-/* ── DATA TABLES (FOR EXTRA TABS) ── */
-.data-table-wrapper { background: white; border: 1px solid var(--border); border-radius: 8px; overflow-x: auto; box-shadow: var(--shadow);}
-.data-table { width: 100%; border-collapse: collapse; min-width: 600px;}
-.data-table th, .data-table td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-.data-table th { background: #FAFAF8; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em;}
-.data-table tbody tr { transition: background 0.2s; border-left: 4px solid transparent;}
-.data-table tbody tr:hover { background: #FAFAF8; }
-.data-table .date-col { font-family: 'DM Mono', monospace; font-size: 0.85rem; white-space: nowrap;}
-.data-table .route-col { font-weight: 500; font-size: 0.9rem;}
-.empty-placeholder { padding: 3rem; text-align: center; color: var(--muted); font-style: italic; background: white; border: 1px dashed var(--border); border-radius: 8px;}
-
-/* ── PACKING LIST & GUIDES ── */
-.guides-container { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
-.guide-details { background: white; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
-.guide-summary { padding: 1rem 1.25rem; font-weight: 600; cursor: pointer; user-select: none; background: #FAFAF8; color: #2C3E50; }
-.guide-summary:hover { background: #f0f0f0; }
-.guide-summary.red-alert { background: #E74C3C; color: white; }
-.guide-summary.red-alert:hover { background: #C0392B; }
-.guide-content { padding: 1.25rem; font-size: 0.85rem; border-top: 1px solid var(--border); background: white;}
-.guide-content h4 { margin-top: 1rem; margin-bottom: 0.5rem; color: #2C3E50; font-family: 'Playfair Display', serif; font-size: 1.05rem;}
-.guide-content h4:first-child { margin-top: 0; }
-.guide-content p, .guide-content li { margin-bottom: 0.5rem; }
-.guide-content ul, .guide-content ol { padding-left: 1.5rem; margin-bottom: 1rem; }
-.guide-tip { background: #FFF9C4; padding: 6px 10px; border-left: 3px solid #F1C40F; margin-top: 8px; border-radius: 0 4px 4px 0; }
-
-.packing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
-.packing-card { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; }
-.packing-card h3 { font-family: 'Playfair Display', serif; margin-bottom: 1rem; font-size: 1.1rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 0.5rem; color: #2C3E50;}
-.packing-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; font-size: 0.85rem;}
-.packing-item:hover .del-btn { opacity: 0.6; }
-.packing-item input[type="checkbox"] { margin-top: 3px; accent-color: #27AE60; cursor: pointer; width: 15px; height: 15px; flex-shrink: 0;}
-.packing-item span { flex-grow: 1; padding-top: 1px; outline: none; }
-
-/* ── BUDGET SUMMARY STYLES ── */
-.budget-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-.budget-kpi { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow);}
-.budget-kpi h3 { font-size: 0.8rem; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 0.5rem;}
-.budget-kpi .amount { font-family: 'DM Mono', monospace; font-size: 1.8rem; font-weight: 700; color: #2C3E50;}
-.budget-kpi.grand-total { background: #2C3E50; color: white; border: none; }
-.budget-kpi.grand-total h3 { color: #AAB7C4; }
-.budget-kpi.grand-total .amount { color: white; }
-
-/* ── AI BUILDER TAB ── */
-.ai-container { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 2rem; box-shadow: var(--shadow);}
-.ai-form-group { margin-bottom: 1.5rem; }
-.ai-form-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #2C3E50;}
-.ai-form-group input, .ai-form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; font-size: 0.95rem; }
-.ai-form-group textarea { height: 80px; resize: vertical;}
-.ai-generate-btn { background: #8E44AD; color: white; border: none; padding: 12px 24px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s;}
-.ai-generate-btn:hover { background: #732D91; }
-.ai-output-box { margin-top: 2rem; background: #FAFAF8; border: 1px solid #E5E0D8; border-radius: 8px; padding: 1.5rem; display: none;}
-.ai-output-box h3 { margin-bottom: 1rem; color: #2C3E50;}
-#aiPromptOutput { width: 100%; height: 250px; font-family: 'DM Mono', monospace; font-size: 0.85rem; padding: 1rem; background: white; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 1rem;}
-
-/* ── MODES ── */
-body.fun-mode .block-transport, body.fun-mode .block-accom, body.fun-mode .budget-field, body.fun-mode .day-total-cost { display: none !important; }
-body.fun-mode .detail-grid { grid-template-columns: 1fr; }
-body.fun-mode .day-desc, body.fun-mode .leg-night-count { display: none; }
-
-body.read-only-mode .add-btn, body.read-only-mode .del-btn, body.read-only-mode .drag-handle, body.read-only-mode .header-del-btn { display: none !important; }
-body.read-only-mode [contenteditable="true"] { pointer-events: none; outline: none !important; }
-body.read-only-mode .drop-zone { border-color: transparent !important; }
-
-/* ── CONTROLS & PRINTING ── */
-.controls-container { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 1rem;}
-
-@media print {
-  @page { margin: 8mm; }
-  body { font-size: 8pt; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; line-height: 1.3;}
-  header { padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
-  .header-widgets, .app-tabs, .app-menu-bar, .leg-nav, .controls-container, .day-chevron, .top-controls, .drag-handle, .day-checkbox, .add-btn, .assigned-sight, .del-btn, .header-del-btn, #tab-ai { display: none !important; }
-  main { padding: 0; max-width: 100%; }
-  .tab-pane { display: block !important; page-break-before: always; }
-  .tab-pane:first-child { page-break-before: avoid; }
-  .guides-container { display: none !important; }
-  .leg.collapsed .leg-content { display: block !important; } 
-  
-  /* SUMMARY MODE */
-  body.print-summary .city-dashboard, body.print-summary .leg-subtitle, body.print-summary .day-desc,
-  body.print-summary .block-tips, body.print-summary .block-accom, body.print-summary .budget-field, body.print-summary .day-total-cost, body.print-summary input[type="checkbox"] { display: none !important; }
-  body.print-summary .block-transport h4, body.print-summary .block-activities h4 { display: none !important; }
-  body.print-summary .leg { margin-bottom: 0.5rem; break-inside: avoid; }
-  body.print-summary .leg-header { padding: 0.2rem 0.5rem; border-radius: 4px 4px 0 0 !important; }
-  body.print-summary .leg-header h2 { font-size: 0.85rem; margin: 0; }
-  body.print-summary .day-card { border: none; border-bottom: 1px solid #eee; }
-  body.print-summary .day-bar { padding: 0.15rem 0.5rem; gap: 0.5rem; border-left-width: 3px; grid-template-columns: 70px 1fr; }
-  body.print-summary .day-date .day-num { font-size: 0.75rem; }
-  body.print-summary .day-cities { font-size: 0.75rem; font-weight: 600; }
-  body.print-summary .day-detail { display: block !important; padding: 0 0.5rem 0.2rem 60px; border: none;}
-  body.print-summary .detail-grid { display: block; margin: 0; gap: 0; }
-  body.print-summary .detail-block { padding: 0; background: none; border: none; display: block; }
-  body.print-summary .cost-item { display: block; margin-bottom: 1px; }
-  body.print-summary .block-activities .cost-item-text { font-size: 0.75rem !important; font-weight: 500 !important; color: #111; display: block;}
-  body.print-summary .block-transport .cost-item-text { font-size: 0.65rem !important; color: #666; font-style: italic; display: block;}
-
-  /* DETAILED MODE */
-  body.print-detailed .leg { margin-bottom: 1.5rem; }
-  body.print-detailed .leg-header { padding: 0.5rem 1rem; border-radius: 6px 6px 0 0 !important; break-after: avoid; }
-  body.print-detailed .day-card { break-inside: avoid; border: 1px solid var(--border); border-top: none; }
-  body.print-detailed .day-bar { padding: 0.35rem 1rem; grid-template-columns: 70px 1fr auto; }
-  body.print-detailed .day-detail { display: block !important; padding: 0.5rem 1rem 0.75rem; border-top: 1px solid var(--border); }
-  body.print-detailed .detail-grid { grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-top: 0.5rem; }
-  body.print-detailed .detail-block { padding: 0.5rem; background: var(--bg); border-radius: 4px; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Travel Planner">
+  <title>Travel Planner</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#1A242F">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
 <div class="app-menu-bar">
-    <div class="app-menu-left">
-        <span class="file-badge" id="activeFileDisplay">📂 Default Template</span>
-        <span class="save-status" id="saveStatus"></span>
-    </div>
-    <div class="app-menu-right">
-        <button id="modeToggleBtn" class="app-menu-btn" onclick="toggleMode()">📋 Fun Mode</button>
-        <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
-        <span style="color: rgba(255,255,255,0.2);">|</span>
-        <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
-        <button class="app-menu-btn" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
-        <button class="app-menu-btn" onclick="exportJSON()">📤 Export Backup</button>
-        <button class="app-menu-btn danger" onclick="resetData()">Reset App</button>
-    </div>
+  <div class="app-menu-left">
+    <span class="file-badge" id="activeFileDisplay">📂 Default Template</span>
+    <span class="save-status" id="saveStatus"></span>
+  </div>
+  <div class="app-menu-right">
+    <button id="modeToggleBtn" class="app-menu-btn" onclick="toggleMode()">📋 Fun Mode</button>
+    <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
+    <button id="compactToggleBtn" class="app-menu-btn" onclick="toggleCompactView()">📄 Compact View</button>
+    <span style="color: rgba(255,255,255,0.2);">|</span>
+    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
+    <button class="app-menu-btn" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
+    <button class="app-menu-btn" onclick="exportJSON()">📤 Export Backup</button>
+    <button class="app-menu-btn danger" onclick="resetData()">Reset App</button>
+  </div>
 </div>
 
 <header>
   <div class="header-inner">
     <div class="header-text">
-      <h1 id="mainTitle" contenteditable="true">✈ New Trip Plan</h1>
-      <p id="mainSubtitle" contenteditable="true">Click here to add your trip subtitle/description</p>
+      <h1 contenteditable="true" id="mainTitle"></h1>
+      <p contenteditable="true" id="mainSubtitle"></p>
     </div>
     <div class="header-widgets">
-        <div class="clock-widget">
-            <div class="clock-label" style="margin-bottom: 8px;">Timezones</div>
-            <div class="clock-row"><span>Home:</span> <span id="time-joy">--:--</span></div>
-            <div class="clock-row"><span>Dest 1:</span> <span id="time-eur">--:--</span></div>
-            <div class="clock-row"><span>Dest 2:</span> <span id="time-tha">--:--</span></div>
-        </div>
+      <div class="clock-widget">
+        <div class="clock-row"><span class="clock-label">🏠 Home</span><span id="time-joy">--:--</span></div>
+        <div class="clock-row"><span class="clock-label">🌍 Destination 1</span><span id="time-eur">--:--</span></div>
+        <div class="clock-row"><span class="clock-label">🌏 Destination 2</span><span id="time-tha">--:--</span></div>
+      </div>
     </div>
   </div>
 </header>
 
+<nav class="leg-nav" id="legNav"></nav>
+
 <main>
   <div class="app-tabs">
-      <button class="app-tab-btn active" onclick="switchTab('itinerary', this)">🗺 Itinerary</button>
-      <button class="app-tab-btn" onclick="switchTab('transport', this)">🚆 Transport</button>
-      <button class="app-tab-btn" onclick="switchTab('accom', this)">🏨 Accommodation</button>
-      <button class="app-tab-btn" onclick="switchTab('packing', this)">🎒 Packing List</button>
-      <button class="app-tab-btn" onclick="switchTab('budget', this)">💰 Budget</button>
-      <button class="app-tab-btn" onclick="switchTab('ai', this)" style="margin-left: auto; color: #8E44AD;">🤖 AI Builder</button>
+    <button class="app-tab-btn active" onclick="switchTab('itinerary', this)">🗺️ Itinerary</button>
+    <button class="app-tab-btn" onclick="switchTab('transport', this)">✈️ Transport</button>
+    <button class="app-tab-btn" onclick="switchTab('accom', this)">🏨 Accommodation</button>
+    <button class="app-tab-btn" onclick="switchTab('budget', this)">💰 Budget</button>
+    <button class="app-tab-btn" onclick="switchTab('packing', this)">🧳 Packing</button>
+    <button class="app-tab-btn" onclick="switchTab('ai', this)">🤖 AI Builder</button>
   </div>
 
   <div id="tab-itinerary" class="tab-pane active">
-      <nav class="leg-nav" id="legNav"></nav>
-      <div class="top-controls">
-        <button id="expandAll" class="action-btn" onclick="toggleAllDays()">▼ Expand all days</button>
-        <button id="expandAllLegs" class="action-btn" onclick="toggleAllLegs()">▼ Expand all legs</button>
-        <button class="action-btn" onclick="addLeg()" style="border-style:dashed; color:var(--muted);">+ Add New Leg</button>
-        <button class="action-btn" onclick="sortLegs()" style="border-style:dashed; color:var(--muted);">↕ Sort Legs by Date</button>
+    <div class="top-controls">
+      <button class="action-btn" onclick="addLeg()">+ Add New Leg</button>
+      <button class="action-btn" onclick="toggleAllDays()" id="expandAll">▼ Expand all days</button>
+      <button class="action-btn" onclick="toggleAllLegs()" id="expandAllLegs">▲ Collapse all legs</button>
+    </div>
+    <div id="itinerary"></div>
+    <div class="controls-container">
+      <div class="print-group">
+        <button class="action-btn" onclick="printPage('summary')">🖨 Print Summary View</button>
+        <button class="action-btn" onclick="printPage('detailed')">🖨 Print Detailed View</button>
       </div>
-      <div id="itinerary"></div>
+    </div>
   </div>
 
   <div id="tab-transport" class="tab-pane">
-      <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 1rem;">Transit Hub</h2>
-      <p style="color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem;">Overview of all flights, trains, and major movements. Editing here updates the main itinerary.</p>
-      <div id="transport-table-container"></div>
+    <div id="transport-table-container"></div>
   </div>
 
   <div id="tab-accom" class="tab-pane">
-      <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 1rem;">Accommodation Log</h2>
-      <p style="color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem;">A master list of where you are sleeping every night. Editing here updates the main itinerary.</p>
-      <div id="accom-table-container"></div>
-  </div>
-
-  <div id="tab-packing" class="tab-pane">
-      <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 1rem;">Packing List & Guides</h2>
-      <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.9rem;">Check items off as they go into the bag. Expand the guides below for packing and washing tips.</p>
-      <div class="guides-container" id="guides-container"></div>
-      <div id="packing-areas-container"></div>
+    <div id="accom-table-container"></div>
   </div>
 
   <div id="tab-budget" class="tab-pane">
-      <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 1rem;">Budget Summary</h2>
-      <p style="color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem;">Calculated automatically from the estimated costs on your daily cards.</p>
-      <div id="budget-kpi-container" class="budget-kpi-grid"></div>
-      <div id="budget-table-container"></div>
+    <div id="budget-kpi-container" class="budget-kpi-grid"></div>
+    <div id="budget-table-container"></div>
+  </div>
+
+  <div id="tab-packing" class="tab-pane">
+    <div id="guides-container" class="guides-container"></div>
+    <div id="packing-areas-container"></div>
   </div>
 
   <div id="tab-ai" class="tab-pane">
-      <div class="ai-container">
-          <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 0.5rem; color: #8E44AD;">🤖 AI Itinerary Engine</h2>
-          <p style="color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem;">Fill in the details for your next trip. Generate the prompt, paste it into an AI, save the output as a .json file, and import it via the top menu.</p>
-          
-          <div class="ai-form-group">
-              <label>Trip Title & Description</label>
-              <input type="text" id="aiTripTitle" placeholder="e.g., Japan 2027 — Family Ski Trip">
-          </div>
-          <div class="ai-form-group">
-              <label>Dates & Flights</label>
-              <input type="text" id="aiTripDates" placeholder="e.g., Jan 10 to Jan 24. Flying Qantas BNE to NRT.">
-          </div>
-          <div class="ai-form-group">
-              <label>Target Cities / Regions</label>
-              <input type="text" id="aiTripCities" placeholder="e.g., Tokyo (4 nights), Kyoto (3 nights), Niseko (7 nights)">
-          </div>
-          <div class="ai-form-group">
-              <label>Travel Vibe & Preferences</label>
-              <textarea id="aiTripVibe" placeholder="e.g., We love hidden food alleys, craft beer, and easy walking. No museums. Keep logistics simple for the kids."></textarea>
-          </div>
-          
-          <button class="ai-generate-btn" onclick="generatePrompt()">🪄 Generate AI Prompt</button>
-
-          <div id="aiOutputBox" class="ai-output-box">
-              <h3>Copy this prompt into your AI:</h3>
-              <textarea id="aiPromptOutput" readonly></textarea>
-              <button class="action-btn" onclick="copyPrompt()">📋 Copy Prompt to Clipboard</button>
-          </div>
+    <div class="ai-container">
+      <div class="ai-form-group">
+        <label for="aiTripTitle">Trip Title</label>
+        <input type="text" id="aiTripTitle" placeholder="e.g., Europe Summer Getaway">
       </div>
-  </div>
-
-  <div class="controls-container">
-      <div class="print-group">
-          <button class="action-btn" onclick="printPage('summary')">🖨 Print Summary View</button>
-          <button class="action-btn" onclick="printPage('detailed')">🖨 Print Detailed View</button>
+      <div class="ai-form-group">
+        <label for="aiTripDates">Dates & Flights</label>
+        <input type="text" id="aiTripDates" placeholder="e.g., June 10-24, 2026. BNE-LHR outbound, FCO-BNE return">
       </div>
+      <div class="ai-form-group">
+        <label for="aiTripCities">Cities to Visit</label>
+        <input type="text" id="aiTripCities" placeholder="e.g., London, Paris, Rome">
+      </div>
+      <div class="ai-form-group">
+        <label for="aiTripVibe">Travel Vibe & Preferences</label>
+        <textarea id="aiTripVibe" placeholder="e.g., Relaxed pacing, great food, no early mornings. Enjoy walking and photography."></textarea>
+      </div>
+
+      <button class="ai-generate-btn" onclick="generatePrompt()">🪄 Generate AI Prompt</button>
+
+      <div id="aiOutputBox" class="ai-output-box">
+        <h3>Copy this prompt into your AI:</h3>
+        <textarea id="aiPromptOutput" readonly></textarea>
+        <button class="action-btn" onclick="copyPrompt()">📋 Copy Prompt to Clipboard</button>
+      </div>
+    </div>
   </div>
 </main>
 
+<script src="./js/utils.js"></script>
+<script src="./js/data.js"></script>
+<script src="./js/packing.js"></script>
+<script src="./js/dragdrop.js"></script>
+<script src="./js/crud.js"></script>
+<script src="./js/tabs.js"></script>
+<script src="./js/ai.js"></script>
+<script src="./js/ui.js"></script>
+<script src="./js/itinerary.js"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -391,862 +138,8 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// BARE BONES TEMPLATE DATA
-// ═══════════════════════════════════════════════════════════════════════
-const DEFAULT_DATA = [
-  {
-    id: 'leg-1', label: '📍 Example City', colour: '#2C3E50',
-    cityFood: [{ text: "Example local dish to try", done: false }], 
-    cityRun: [{ title: "Example 5km park loop", estTime: "1 hr", estCost: "0", assignedDayIdx: null }],
-    suggestedSights: [{ title: 'Example Museum', estTime: '2 hrs', estCost: '15', assignedDayIdx: null }],
-    legTips: ['Download local transit app'],
-    days: [
-      { 
-        date:'1 Jan', day:'Mon', from:'Home', to:'Example City', 
-        completed: false, desc:'Travel and arrival day',
-        transportItems: [{ text: "Flight AA123 08:00", cost: "250" }],
-        accomItems: [{ text: "Grand Hotel", cost: "120" }],
-        activityItems: [{ text: "Check-in and explore local area", cost: "0", time: "1 hr", done: false }]
-      }
-    ]
-  }
-];
-
-const DEFAULT_LEAVE_HOME = [
-    {text: "Lock all doors and windows", done:false},
-    {text: "Pause gym membership", done:false},
-    {text: "Setup camera for fish and security", done:false},
-    {text: "Store/remove fridge & pantry perishables", done:false},
-    {text: "Turn off taps, PowerPoints", done:false},
-    {text: "Wrap garage door opener and unplug power", done:false}
-];
-
-const DEFAULT_PACKING = [
-  {
-    areaName: "🚶 Walk-on Gear (Wear onto plane)",
-    areaColor: "#E67E22",
-    categories: [
-      { title: "Plane Outfit", items: [{text: "Underwear", done:false}, {text: "Jeans", done:false}, {text: "Belt", done:false}, {text: "Sports shoes", done:false}, {text: "Socks", done:false}, {text: "Activewear shirt", done:false}, {text: "Hoodie", done:false}, {text: "Sunglasses", done:false}] }
-    ]
-  },
-  {
-    areaName: "🧳 Carry-on Packed Bag (Main Luggage)",
-    areaColor: "#2980B9",
-    categories: [
-      { title: "Clothes", items: [{text: "T-shirts, Tank Tops", done:false}, {text: "Shorts, Skirts", done:false}, {text: "Pants", done:false}, {text: "Layers (hoodie, sweater)", done:false}, {text: "Swim suit", done:false}, {text: "Dress", done:false}, {text: "Socks", done:false}, {text: "Underwear", done:false}, {text: "Bras", done:false}, {text: "Pyjamas, Sleepwear", done:false}, {text: "Formal Wear", done:false}, {text: "Hat", done:false}, {text: "Workout outfit", done:false}, {text: "Other accessories / Earrings", done:false}] },
-      { title: "Shoes & Misc", items: [{text: "Dress shoes", done:false}, {text: "Sandals/Crocs", done:false}, {text: "Presents / Card", done:false}, {text: "Reusable tote bag", done:false}, {text: "Pillowcase for used clothes", done:false}, {text: "Laundry Sheets for washing", done:false}, {text: "Raincoat/Umbrella", done:false}] },
-      { title: "Dry Toiletries", items: [{text: "Floss", done:false}, {text: "Toothbrush", done:false}, {text: "Razor (Cartidge), Shaving", done:false}, {text: "Bar of Soap", done:false}, {text: "Cotton pad, q-tips", done:false}, {text: "Nail clippers/tweezers", done:false}, {text: "Personal Hygiene items (Pads)", done:false}, {text: "Makeup", done:false}, {text: "Hair clips, hair ties", done:false}, {text: "Hair Brush/comb", done:false}, {text: "Bandaids, Electrolyte packs", done:false}, {text: "Body wipes", done:false}, {text: "Panadol / Nurofen", done:false}, {text: "Vitamins / Tablets", done:false}] },
-      { title: "💧 1L Clear Bag (Liquids <100ml)", items: [{text: "Clear 1 litre bag", done:false}, {text: "Cologne/Perfume", done:false}, {text: "Toothpaste", done:false}, {text: "Face wash", done:false}, {text: "Shampoo & Conditioner", done:false}, {text: "Leave-in conditioner", done:false}, {text: "Micellar Water/Makeup Remover", done:false}, {text: "Sunscreen", done:false}, {text: "Deodorant", done:false}, {text: "Moisturiser", done:false}] }
-    ]
-  },
-  {
-    areaName: "🎒 Personal Item Bag (Under Seat)",
-    areaColor: "#8E44AD",
-    categories: [
-      { title: "Essentials", items: [{text: "TRS Claim + Items", done:false}, {text: "Passport + [Copy + Tracker]", done:false}, {text: "Reservations + Itineraries + Insurance", done:false}, {text: "Wallet/Purse + Local cash + Cards", done:false}, {text: "Phone", done:false}, {text: "Crossbody/Sling Bag", done:false}] },
-      { title: "Flight Items", items: [{text: "Travel pillow / Foot sling", done:false}, {text: "Phone holder (watch movies)", done:false}, {text: "Compression socks, Slippers", done:false}, {text: "Disposable Toothbrush kit", done:false}, {text: "Eye mask, Eye Drops", done:false}, {text: "Ear plugs, Breath Fresheners", done:false}, {text: "Snacks, TravelCalm", done:false}, {text: "Headphones/Airpods", done:false}, {text: "Airfly/Bluetooth Adapter", done:false}, {text: "Book/Kindle", done:false}, {text: "Water bottle", done:false}] },
-      { title: "Tech", items: [{text: "eSIM (Installed)", done:false}, {text: "Mobile downloads (Movies, Shows)", done:false}, {text: "Phone charger", done:false}, {text: "Power cables, Cords", done:false}, {text: "Power Adapter", done:false}, {text: "Power bank", done:false}, {text: "Pen", done:false}, {text: "Laptop", done:false}, {text: "Luggage Trackers", done:false}] }
-    ]
-  }
-];
-
-function updateClocks() {
-    const now = new Date();
-    const options = { hour: '2-digit', minute:'2-digit', timeZoneName: 'short' };
-    document.getElementById('time-joy').textContent = now.toLocaleTimeString('en-AU', {timeZone: 'Australia/Brisbane', ...options});
-    document.getElementById('time-eur').textContent = now.toLocaleTimeString('en-AU', {timeZone: 'Europe/Berlin', ...options});
-    document.getElementById('time-tha').textContent = now.toLocaleTimeString('en-AU', {timeZone: 'Asia/Bangkok', ...options});
-}
-setInterval(updateClocks, 1000); updateClocks();
-
-let appData = [];
-let packingData = [];
-let leaveHomeData = [];
-let titleData = { title: "✈ New Trip Plan", subtitle: "Click here to add your trip subtitle/description" };
-let isFunMode = false;
-let isEditMode = true;
-let currentFileName = "Default Template";
-
-function initData() {
-    const saved = localStorage.getItem('travelApp_v2026_template');
-    if (saved) { 
-        appData = JSON.parse(saved); 
-        appData.forEach(leg => {
-            if (!leg.legTips) {
-                leg.legTips = [];
-                leg.days.forEach(day => {
-                    if (day.tips && day.tips.length > 0) leg.legTips.push(...day.tips);
-                    delete day.tips;
-                });
-            }
-            if (leg.cityRun && leg.cityRun.length > 0 && typeof leg.cityRun[0] === 'string') {
-                leg.cityRun = leg.cityRun.map(r => ({ title: r, estTime: '1 hr', estCost: '0', assignedDayIdx: null }));
-            }
-            leg.days.forEach(day => {
-                if(day.activityItems) {
-                    day.activityItems.forEach(act => {
-                        if (act.time === undefined) act.time = "1 hr";
-                    });
-                }
-            });
-        });
-    } 
-    else { appData = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
-
-    const savedPacking = localStorage.getItem('travelApp_packing_v3');
-    if (savedPacking) { packingData = JSON.parse(savedPacking); }
-    else { packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING)); }
-    
-    const savedLeaveHome = localStorage.getItem('travelApp_leavehome_v3');
-    if (savedLeaveHome) { leaveHomeData = JSON.parse(savedLeaveHome); }
-    else { leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME)); }
-    
-    const savedMeta = localStorage.getItem('travelApp_meta_template');
-    if (savedMeta) { titleData = JSON.parse(savedMeta); }
-    
-    const savedFile = localStorage.getItem('travelApp_filename_v2026');
-    if (savedFile) { currentFileName = savedFile; }
-    
-    document.getElementById('mainTitle').innerText = titleData.title;
-    document.getElementById('mainSubtitle').innerText = titleData.subtitle;
-    document.getElementById('activeFileDisplay').innerText = "📂 " + currentFileName;
-
-    saveData(false); 
-}
-
-function saveData(showTick = true) {
-    titleData.title = document.getElementById('mainTitle').innerText;
-    titleData.subtitle = document.getElementById('mainSubtitle').innerText;
-    localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
-    localStorage.setItem('travelApp_v2026_template', JSON.stringify(appData));
-    localStorage.setItem('travelApp_packing_v3', JSON.stringify(packingData));
-    localStorage.setItem('travelApp_leavehome_v3', JSON.stringify(leaveHomeData));
-    
-    if(showTick) {
-        const status = document.getElementById('saveStatus');
-        status.textContent = "✓ Saved";
-        setTimeout(() => status.textContent = "", 2000);
-    }
-}
-
-function resetData() {
-    if(confirm("Reset all edits back to the default template? This will wipe current data.")) {
-        localStorage.removeItem('travelApp_v2026_template');
-        localStorage.removeItem('travelApp_packing_v3');
-        localStorage.removeItem('travelApp_leavehome_v3');
-        localStorage.removeItem('travelApp_meta_template');
-        localStorage.removeItem('travelApp_filename_v2026');
-        location.reload();
-    }
-}
-
-function exportJSON() {
-    saveData(false);
-    const exportObj = { meta: titleData, itinerary: appData, packing: packingData, leaveHome: leaveHomeData };
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    
-    let dlName = currentFileName;
-    if(dlName === "Default Template") dlName = "travel_planner_backup.json";
-    
-    downloadAnchorNode.setAttribute("download", dlName);
-    document.body.appendChild(downloadAnchorNode); 
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-}
-
-function migratePacking(data) {
-    if (!Array.isArray(data) || data.length === 0) return null;
-    const isOldFormat = data[0].hasOwnProperty('title') && !data[0].hasOwnProperty('areaName');
-    if (!isOldFormat) return data; 
-    const areas = [
-        { areaName: '🚶 Walk-on Gear (Wear onto plane)', areaColor: '#E67E22', categories: [] },
-        { areaName: '🧳 Carry-on Packed Bag (Main Luggage)', areaColor: '#2980B9', categories: [] },
-        { areaName: '🎒 Personal Item Bag (Under Seat)', areaColor: '#8E44AD', categories: [] }
-    ];
-    data.forEach(cat => {
-        const t = cat.title || '';
-        const entry = { title: t.replace(/^(🧳|🎒|🚶|💧)\s*/,'').replace(/^(Carry-On: |Personal Item: )/,''), items: cat.items || [] };
-        if (t.includes('Walk-on') || t.includes('Plane Outfit')) { areas[0].categories.push(entry); } 
-        else if (t.includes('Personal Item') || t.includes('Flight Items') || t.includes('Tech') || t.includes('Essentials')) { areas[2].categories.push(entry); } 
-        else { areas[1].categories.push(entry); }
-    });
-    return areas.filter(a => a.categories.length > 0);
-}
-
-function importJSON(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const importedData = JSON.parse(e.target.result);
-            if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
-                appData = importedData.itinerary;
-                
-                appData.forEach(leg => {
-                    if (!leg.legTips) {
-                        leg.legTips = [];
-                        leg.days.forEach(day => {
-                            if (day.tips && day.tips.length > 0) leg.legTips.push(...day.tips);
-                            delete day.tips;
-                        });
-                    }
-                    if (leg.cityRun && leg.cityRun.length > 0 && typeof leg.cityRun[0] === 'string') {
-                        leg.cityRun = leg.cityRun.map(r => ({ title: r, estTime: '1 hr', estCost: '0', assignedDayIdx: null }));
-                    }
-                });
-
-                if (importedData.packing) {
-                    const migrated = migratePacking(importedData.packing);
-                    packingData = migrated || packingData;
-                }
-                if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
-                if (importedData.meta) {
-                    titleData = importedData.meta;
-                }
-                
-                currentFileName = file.name;
-                localStorage.setItem('travelApp_filename_v2026', currentFileName);
-                
-                saveData(false);
-                location.reload(); 
-            } else { alert("Invalid JSON format."); }
-        } catch (err) { alert("Error parsing JSON file: " + err.message); }
-    };
-    reader.readAsText(file);
-}
-
-function switchTab(tabId, btnElement) {
-    document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.app-tab-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById('tab-' + tabId).classList.add('active');
-    btnElement.classList.add('active');
-    
-    if (tabId === 'transport') buildTransportTab();
-    if (tabId === 'accom') buildAccomTab();
-    if (tabId === 'budget') buildBudgetTab();
-    if (tabId === 'packing') buildPackingTab();
-}
-
-function toggleMode() {
-    isFunMode = !isFunMode;
-    document.body.classList.toggle('fun-mode', isFunMode);
-    const btn = document.getElementById('modeToggleBtn');
-    if(isFunMode) { btn.innerHTML = "🎭 Logistics Mode"; btn.classList.add('active-mode'); } 
-    else { btn.innerHTML = "📋 Fun Mode"; btn.classList.remove('active-mode'); }
-}
-
-function toggleEditMode() {
-    isEditMode = !isEditMode;
-    document.body.classList.toggle('read-only-mode', !isEditMode);
-    const btn = document.getElementById('editToggleBtn');
-    document.getElementById('mainTitle').contentEditable = isEditMode;
-    document.getElementById('mainSubtitle').contentEditable = isEditMode;
-    
-    if(isEditMode) { btn.innerHTML = "🔒 Lock"; btn.classList.remove('edit-mode'); } 
-    else { btn.innerHTML = "✏️ Unlock"; btn.classList.add('edit-mode'); saveData(); }
-    
-    const activeTab = document.querySelector('.app-tab-btn.active').innerText;
-    if(activeTab.includes('Transport')) buildTransportTab();
-    if(activeTab.includes('Accommodation')) buildAccomTab();
-    if(activeTab.includes('Packing')) buildPackingTab();
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// AI PROMPT GENERATOR
-// ═══════════════════════════════════════════════════════════════════════
-function generatePrompt() {
-    const title = document.getElementById('aiTripTitle').value || "Europe Summer Trip";
-    const dates = document.getElementById('aiTripDates').value || "14 days";
-    const cities = document.getElementById('aiTripCities').value || "London, Paris, Rome";
-    const vibe = document.getElementById('aiTripVibe').value || "Relaxed pacing, great food, no early mornings.";
-
-    const promptText = `I am building a travel itinerary app and need a complete JSON dataset for an upcoming trip.
-
-TRIP DETAILS:
-- Title: ${title}
-- Dates & Flights: ${dates}
-- Cities/Locations: ${cities}
-- Travel Vibe & Preferences: ${vibe}
-
-YOUR TASK:
-Generate a detailed, daily itinerary tailored to my preferences. Then, output the ENTIRE itinerary as a single JSON object. 
-
-The JSON must exactly match this structure. Do not use markdown blocks around the JSON. Output raw JSON only.
-
-EXPECTED JSON SCHEMA:
-{
-  "meta": {
-    "title": "${title}",
-    "subtitle": "Generated Itinerary"
-  },
-  "packing": [], 
-  "leaveHome": [],
-  "itinerary": [
-    {
-      "id": "leg_id_string",
-      "label": "City Name/Label",
-      "colour": "#HEXCODE",
-      "cityFood": [ {"text": "Food Idea", "done": false} ],
-      "cityRun": [ {"title": "5km route idea", "estTime": "1 hr", "estCost": "0", "assignedDayIdx": null} ],
-      "suggestedSights": [ 
-         {"title": "Sight Name", "estTime": "2 hrs", "estCost": "50", "assignedDayIdx": null} 
-      ],
-      "legTips": [ "General city tip 1", "General city tip 2" ],
-      "days": [
-        {
-          "date": "DD Mmm",
-          "day": "Mon",
-          "from": "Start City",
-          "to": "End City",
-          "completed": false,
-          "desc": "Short day description",
-          "transportItems": [ {"text": "Flight/Train details", "cost": "0"} ],
-          "accomItems": [ {"text": "Hotel name/address", "cost": "0"} ],
-          "activityItems": [ {"text": "Main planned activity", "cost": "0", "time": "1 hr", "done": false} ]
-        }
-      ]
-    }
-  ]
-}`;
-
-    document.getElementById('aiOutputBox').style.display = 'block';
-    document.getElementById('aiPromptOutput').value = promptText;
-}
-
-function copyPrompt() {
-    const promptArea = document.getElementById('aiPromptOutput');
-    promptArea.select(); document.execCommand('copy');
-    alert("Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.");
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// EXTRA TAB BUILDERS
-// ═══════════════════════════════════════════════════════════════════════
-function buildTransportTab() {
-    const container = document.getElementById('transport-table-container');
-    let html = `<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>Date</th><th>Route</th><th>Provider / Details</th><th>Est. Cost</th></tr></thead><tbody>`;
-    let hasItems = false;
-    appData.forEach((leg, lIdx) => {
-        leg.days.forEach((day, dIdx) => {
-            if (day.transportItems) {
-                day.transportItems.forEach((item, iIdx) => {
-                    if (item.text === "—" || item.text.trim() === "") return;
-                    hasItems = true;
-                    html += `<tr style="border-left-color: ${leg.colour}"><td class="date-col">${day.day} ${day.date}</td><td class="route-col">${day.from} → ${day.to}</td><td><span contenteditable="${isEditMode}" onblur="updateDayItemText(${lIdx}, ${dIdx}, 'transportItems', ${iIdx}, this.innerText, true)">${item.text}</span></td><td class="budget-field" style="width:100px; display:table-cell;">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${lIdx}, ${dIdx}, 'transportItems', ${iIdx}, this.innerText, true)">${item.cost}</span></td></tr>`;
-                });
-            }
-        });
-    });
-    html += `</tbody></table></div>`;
-    if (!hasItems) html = `<div class="empty-placeholder">No transport details found in the itinerary yet.</div>`;
-    container.innerHTML = html;
-}
-
-function buildAccomTab() {
-    const container = document.getElementById('accom-table-container');
-    let html = `<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>Date</th><th>City</th><th>Accommodation Details</th><th>Est. Cost</th></tr></thead><tbody>`;
-    let hasItems = false;
-    appData.forEach((leg, lIdx) => {
-        leg.days.forEach((day, dIdx) => {
-            if (day.accomItems) {
-                day.accomItems.forEach((item, iIdx) => {
-                    if (item.text === "—" || item.text.trim() === "") return;
-                    hasItems = true;
-                    html += `<tr style="border-left-color: ${leg.colour}"><td class="date-col">${day.day} ${day.date}</td><td class="route-col">${day.to}</td><td><span style="font-weight:600;" contenteditable="${isEditMode}" onblur="updateDayItemText(${lIdx}, ${dIdx}, 'accomItems', ${iIdx}, this.innerText, true)">${item.text}</span></td><td class="budget-field" style="width:100px; display:table-cell;">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${lIdx}, ${dIdx}, 'accomItems', ${iIdx}, this.innerText, true)">${item.cost}</span></td></tr>`;
-                });
-            }
-        });
-    });
-    html += `</tbody></table></div>`;
-    if (!hasItems) html = `<div class="empty-placeholder">No accommodation details found in the itinerary yet.</div>`;
-    container.innerHTML = html;
-}
-
-function buildPackingTab() {
-    const guidesContainer = document.getElementById('guides-container');
-    const listsContainer = document.getElementById('packing-areas-container');
-    
-    let guidesHTML = `
-        <details class="guide-details" open>
-            <summary class="guide-summary red-alert">🏠 Before Leaving Home</summary>
-            <div class="guide-content">
-                ${leaveHomeData.map((item, iIdx) => `
-                    <div class="packing-item">
-                        <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">×</button>
-                        <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
-                        <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}">${item.text}</span>
-                    </div>
-                `).join('')}
-                <button class="add-btn" style="width:auto; margin-top:10px; border-color:#E74C3C; color:#C0392B;" onclick="addLeaveHomeItem()">+ Add Home Task</button>
-            </div>
-        </details>
-        
-        <details class="guide-details">
-            <summary class="guide-summary">🧼 Hotel Sink Washing Guide</summary>
-            <div class="guide-content">
-                <h4>How to Do Laundry in Your Hotel Room:</h4>
-                <ol>
-                    <li><strong>Clean Your Sink:</strong> Start fresh by giving your sink a quick wash with soap and water.</li>
-                    <li><strong>Fill With Water:</strong> Plug the drain and fill the sink with lukewarm water.</li>
-                    <li><strong>Add Detergent:</strong> Drop in a laundry detergent sheet. Swish it around until it dissolves.</li>
-                    <li><strong>Wash Your Clothes:</strong> Add your clothes to the sink and give them a quick swish to soak (5 to 15 minutes).</li>
-                    <li><strong>Agitate:</strong> Gently agitate and move the clothes around to release dirt and sweat.</li>
-                    <li><strong>Drain & Rinse:</strong> Squeeze out the soapy water, drain, refill with clean water, swish again.</li>
-                    <li><strong>Remove Excess Water:</strong> Fold clothes into a compact "brick" and press gently to release water (don't wring).</li>
-                    <li><strong>The Towel Burrito Method:</strong> Lay a clean towel on the floor, place clothing flat on top, roll it up, and step on the towel to squeeze out extra moisture.</li>
-                    <li><strong>Hang to Dry:</strong> Drape over clothes hangers or the shower rod.</li>
-                </ol>
-                <div class="guide-tip"><strong>👉 Pro Tip:</strong> Rolling clothes in a microfiber towel works even better than hotel towels.</div>
-            </div>
-        </details>
-
-        <details class="guide-details">
-            <summary class="guide-summary">💡 Example Capsule Wardrobe Prompt</summary>
-            <div class="guide-content">
-                <p style="font-style: italic; background: #f9f9f9; padding: 10px; border-left: 3px solid #ccc;">
-                "I'm going on a 14-day trip to Europe in June and want to pack carry-on only. I want to create a minimalist capsule wardrobe with as few pieces as possible that will give me 14 different outfits (can be achieved with a 3x3 method - 3 shirts, 3 bottoms, 3 layers). Please build me a packing list by telling me the number of tops, bottoms and layering pieces that can be mixed and matched. My style is classic and practical with neutral colors. I want outfits that are comfortable and stylish for activities like sightseeing, casual dinners, and lots of walking. No more than 2 shoes (formal and sports). I need outfits for touring ports, lounging, and a couple of dressy dinners + I will need swimmers for asia or any hotel pools."
-                </p>
-                <h4>Example Output Breakdown:</h4>
-                <ul>
-                    <li><strong>Main bag:</strong> Hoodie, Business long sleeve thin wool shirt, Nice dress shirt, Plain everday wool short sleeve shirt, Business short sleeve shirt, Dress Work style pants, Dress shorts, 2 activewear shirts, 2 activewear shorts, Underwear x 3, Socks 2 x sports, 2 x black, Swimmers x 2, Thongs/Sandals, Toiletry bag.</li>
-                    <li><strong>Wear onto plane:</strong> Underwear, Jeans, Belt, Sports shoes, Socks, Activewear shirt, Hoodie, Sunglasses.</li>
-                    <li><strong>Personal bag:</strong> Fanny pack/cross body bag, Charging cables, Wireless mouse/keyboard, Travel phone holder, Travel kit, Med Kit, Formal shoes, Broad Rim Hat, Microfibre towel, Pillow case.</li>
-                </ul>
-            </div>
-        </details>
-    `;
-    guidesContainer.innerHTML = guidesHTML;
-
-    let areasHTML = '';
-    packingData.forEach((area, aIdx) => {
-        areasHTML += `
-        <div style="margin-bottom: 3.5rem;">
-            <h2 style="font-family:'Playfair Display', serif; color:${area.areaColor}; border-bottom: 2px solid ${area.areaColor}; padding-bottom:0.5rem; margin-bottom:1.5rem;">
-                <span contenteditable="${isEditMode}" onblur="updatePackingAreaName(${aIdx}, this.innerText)">${area.areaName}</span>
-            </h2>
-            <div class="packing-grid">
-                ${area.categories.map((cat, cIdx) => `
-                    <div class="packing-card">
-                        <h3><span contenteditable="${isEditMode}" onblur="updatePackingCat(${aIdx}, ${cIdx}, this.innerText)">${cat.title}</span></h3>
-                        ${cat.items.map((item, iIdx) => `
-                            <div class="packing-item">
-                                <button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">×</button>
-                                <input type="checkbox" ${item.done ? 'checked' : ''} onchange="togglePackingItem(event, ${aIdx}, ${cIdx}, ${iIdx})">
-                                <span contenteditable="${isEditMode}" onblur="updatePackingItem(${aIdx}, ${cIdx}, ${iIdx}, this.innerText)" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}">${item.text}</span>
-                            </div>
-                        `).join('')}
-                        <button class="add-btn" onclick="addPackingItem(${aIdx}, ${cIdx})">+ Add Item</button>
-                    </div>
-                `).join('')}
-                <div class="packing-card" style="border: 2px dashed var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="addPackingCat(${aIdx})">
-                    <span style="color:var(--muted); font-weight:500;">+ Add New Category Block</span>
-                </div>
-            </div>
-        </div>`;
-    });
-    
-    listsContainer.innerHTML = areasHTML;
-}
-
-function buildBudgetTab() {
-    const container = document.getElementById('budget-table-container');
-    const kpiContainer = document.getElementById('budget-kpi-container');
-    let totalTrans = 0, totalAccom = 0, totalAct = 0; let legBreakdown = [];
-
-    appData.forEach(leg => {
-        let legTrans = 0, legAccom = 0, legAct = 0;
-        leg.days.forEach(day => {
-            (day.transportItems || []).forEach(i => legTrans += parseCost(i.cost));
-            (day.accomItems || []).forEach(i => legAccom += parseCost(i.cost));
-            (day.activityItems || []).forEach(i => legAct += parseCost(i.cost));
-        });
-        const legTotal = legTrans + legAccom + legAct;
-        if (legTotal > 0) {
-            legBreakdown.push({ label: leg.label, colour: leg.colour, trans: legTrans, accom: legAccom, act: legAct, total: legTotal });
-            totalTrans += legTrans; totalAccom += legAccom; totalAct += legAct;
-        }
-    });
-    const grandTotal = totalTrans + totalAccom + totalAct;
-
-    kpiContainer.innerHTML = `
-        <div class="budget-kpi"><h3>Transport</h3><div class="amount">$${totalTrans}</div></div>
-        <div class="budget-kpi"><h3>Accommodation</h3><div class="amount">$${totalAccom}</div></div>
-        <div class="budget-kpi"><h3>Activities</h3><div class="amount">$${totalAct}</div></div>
-        <div class="budget-kpi grand-total"><h3>Grand Total</h3><div class="amount">$${grandTotal}</div></div>
-    `;
-
-    let html = `<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>Trip Leg</th><th>Transport</th><th>Accommodation</th><th>Activities</th><th>Leg Total</th></tr></thead><tbody>`;
-    legBreakdown.forEach(l => {
-        html += `<tr style="border-left-color: ${l.colour}"><td style="font-weight:600;">${l.label}</td><td>$${l.trans}</td><td>$${l.accom}</td><td>$${l.act}</td><td style="font-family:'DM Mono',monospace; font-weight:600;">$${l.total}</td></tr>`;
-    });
-    html += `</tbody></table></div>`;
-    container.innerHTML = html;
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// NEW PACKING LOGIC (V3 - Areas & Leave Home)
-// ═══════════════════════════════════════════════════════════════════════
-function toggleLeaveHomeItem(e, iIdx) { leaveHomeData[iIdx].done = e.target.checked; saveData(); buildPackingTab(); }
-function updateLeaveHomeItem(iIdx, text) { if(!text.trim()) { leaveHomeData.splice(iIdx, 1); } else { leaveHomeData[iIdx].text = text; } saveData(); buildPackingTab(); }
-function deleteLeaveHomeItem(iIdx) { leaveHomeData.splice(iIdx, 1); saveData(); buildPackingTab(); }
-function addLeaveHomeItem() { leaveHomeData.push({text:"New task...", done:false}); saveData(); buildPackingTab(); }
-
-function togglePackingItem(e, aIdx, cIdx, iIdx) { packingData[aIdx].categories[cIdx].items[iIdx].done = e.target.checked; saveData(); buildPackingTab(); }
-function updatePackingItem(aIdx, cIdx, iIdx, text) { if(!text.trim()) { packingData[aIdx].categories[cIdx].items.splice(iIdx, 1); } else { packingData[aIdx].categories[cIdx].items[iIdx].text = text; } saveData(); buildPackingTab(); }
-function updatePackingCat(aIdx, cIdx, text) { packingData[aIdx].categories[cIdx].title = text; saveData(); }
-function updatePackingAreaName(aIdx, text) { packingData[aIdx].areaName = text; saveData(); }
-function deletePackingItem(aIdx, cIdx, iIdx) { packingData[aIdx].categories[cIdx].items.splice(iIdx, 1); saveData(); buildPackingTab(); }
-function addPackingItem(aIdx, cIdx) { packingData[aIdx].categories[cIdx].items.push({text:"New item...", done:false}); saveData(); buildPackingTab(); }
-function addPackingCat(aIdx) { packingData[aIdx].categories.push({title:"New Category Block", items:[{text:"New item...", done:false}]}); saveData(); buildPackingTab(); }
-
-// ═══════════════════════════════════════════════════════════════════════
-// ITINERARY DRAG/DROP & CRUD LOGIC
-// ═══════════════════════════════════════════════════════════════════════
-function handleDragStart(e, legIdx, type, itemIdx) { 
-    if (!isEditMode) { e.preventDefault(); return; } 
-    e.dataTransfer.setData('text/plain', JSON.stringify({legIdx, type, itemIdx})); 
-    e.dataTransfer.effectAllowed = 'move'; 
-}
-function handleDragOver(e) { if (!isEditMode) return; e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
-function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
-function handleDrop(e, targetLegIdx, targetDayIdx) {
-    if (!isEditMode) return;
-    e.preventDefault(); e.currentTarget.classList.remove('drag-over');
-    const data = e.dataTransfer.getData('text/plain'); if (!data) return;
-    const { legIdx: srcLegIdx, type, itemIdx } = JSON.parse(data);
-    
-    const pool = type === 'run' ? appData[srcLegIdx].cityRun : appData[srcLegIdx].suggestedSights;
-    const item = pool[itemIdx];
-
-    item.assignedDayIdx = targetDayIdx;
-    if (appData[targetLegIdx].days[targetDayIdx].activityItems.length === 1 && appData[targetLegIdx].days[targetDayIdx].activityItems[0].text === "—") { 
-        appData[targetLegIdx].days[targetDayIdx].activityItems = []; 
-    }
-    appData[targetLegIdx].days[targetDayIdx].activityItems.push({ text: item.title, cost: item.estCost || "0", time: item.estTime || "1 hr", done: false });
-    saveData(); buildItinerary();
-}
-
-function deleteLeg(idx) {
-    if(confirm("Are you sure you want to delete this entire leg and all its days?")) {
-        appData.splice(idx, 1);
-        saveData(); buildNav(); buildItinerary();
-    }
-}
-function deleteFood(legIdx, foodIdx) { appData[legIdx].cityFood.splice(foodIdx, 1); saveData(); buildItinerary(); }
-function deleteRun(legIdx, runIdx) { appData[legIdx].cityRun.splice(runIdx, 1); saveData(); buildItinerary(); }
-function deleteSight(legIdx, sightIdx) { appData[legIdx].suggestedSights.splice(sightIdx, 1); saveData(); buildItinerary(); }
-function deleteLegTip(legIdx, tipIdx) { appData[legIdx].legTips.splice(tipIdx, 1); saveData(); buildItinerary(); }
-
-function deleteDayItem(legIdx, dayIdx, category, itemIdx) {
-    const itemText = appData[legIdx].days[dayIdx][category][itemIdx].text;
-    if (category === 'activityItems') {
-        const poolSight = appData[legIdx].suggestedSights.find(s => s.title === itemText && s.assignedDayIdx === dayIdx);
-        if (poolSight) poolSight.assignedDayIdx = null; 
-        const poolRun = appData[legIdx].cityRun.find(s => s.title === itemText && s.assignedDayIdx === dayIdx);
-        if (poolRun) poolRun.assignedDayIdx = null; 
-    }
-    appData[legIdx].days[dayIdx][category].splice(itemIdx, 1); saveData(); buildItinerary();
-}
-
-function addFood(legIdx) { appData[legIdx].cityFood.push({ text: "New food item...", done: false }); saveData(); buildItinerary(); }
-function addRun(legIdx) { appData[legIdx].cityRun.push({ title: "New run...", estTime: "1 hr", estCost: "0", assignedDayIdx: null }); saveData(); buildItinerary(); }
-function addSight(legIdx) { appData[legIdx].suggestedSights.push({ title: "New sight...", estTime: "1 hr", estCost: "0", assignedDayIdx: null }); saveData(); buildItinerary(); }
-function addLegTip(legIdx) { appData[legIdx].legTips.push("New tip..."); saveData(); buildItinerary(); }
-
-function addDayItem(legIdx, dayIdx, category) {
-    if (category === 'activityItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", time: "1 hr", done: false }); }
-    else { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", done: false }); }
-    saveData(); buildItinerary();
-}
-
-function updateFoodText(legIdx, foodIdx, text) { appData[legIdx].cityFood[foodIdx].text = text; saveData(); }
-function updateRunPool(legIdx, runIdx, key, val) {
-    if (!val.trim() && key === 'title') { appData[legIdx].cityRun.splice(runIdx, 1); saveData(); buildItinerary(); } 
-    else { appData[legIdx].cityRun[runIdx][key] = val; saveData(); }
-}
-function updateSightPool(legIdx, sightIdx, key, val) { 
-    if (!val.trim() && key === 'title') { appData[legIdx].suggestedSights.splice(sightIdx, 1); saveData(); buildItinerary(); }
-    else { appData[legIdx].suggestedSights[sightIdx][key] = val; saveData(); }
-}
-function updateLegTip(legIdx, tipIdx, val) {
-    if (!val.trim()) { appData[legIdx].legTips.splice(tipIdx, 1); saveData(); buildItinerary(); } 
-    else { appData[legIdx].legTips[tipIdx] = val; saveData(); }
-}
-
-function updateDayItemText(legIdx, dayIdx, category, itemIdx, text, fromTabs = false) { 
-    appData[legIdx].days[dayIdx][category][itemIdx].text = text; saveData(); 
-    if(!fromTabs) buildItinerary(); 
-}
-function updateDayItemCost(legIdx, dayIdx, category, itemIdx, cost, fromTabs = false) {
-    appData[legIdx].days[dayIdx][category][itemIdx].cost = cost; saveData(); 
-    if(fromTabs) { if(category === 'transportItems') buildTransportTab(); if(category === 'accomItems') buildAccomTab(); }
-    else buildItinerary(); 
-}
-function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
-    appData[legIdx].days[dayIdx][category][itemIdx].time = time; saveData();
-}
-
-function toggleFoodCompleted(e, legIdx, foodIdx) { appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); buildItinerary(); }
-function toggleDayCompleted(e, legIdx, dayIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].completed = e.target.checked; saveData(); buildItinerary(); }
-function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) { appData[legIdx].days[dayIdx].activityItems[itemIdx].done = e.target.checked; saveData(); buildItinerary(); }
-
-function parseCost(val) { const num = parseFloat(String(val).replace(/[^0-9.-]+/g, "")); return isNaN(num) ? 0 : num; }
-function getDayTotal(day) { let total = 0; ['transportItems', 'accomItems', 'activityItems'].forEach(cat => { (day[cat] || []).forEach(item => { total += parseCost(item.cost); }); }); return total > 0 ? '$' + total.toFixed(0) : ''; }
-
-function toggleLeg(headerEl) { headerEl.parentElement.classList.toggle('collapsed'); }
-
-function sortLegs() {
-    appData.sort((a, b) => {
-        if (!a.days || a.days.length === 0) return 1;
-        if (!b.days || b.days.length === 0) return -1;
-        let dA = new Date(a.days[0].date + " 2026").getTime();
-        let dB = new Date(b.days[0].date + " 2026").getTime();
-        if(isNaN(dA)) dA = 0;
-        if(isNaN(dB)) dB = 0;
-        return dA - dB;
-    });
-    saveData(false);
-    buildNav();
-    buildItinerary();
-}
-
-function buildItinerary() {
-  const container = document.getElementById('itinerary'); container.innerHTML = '';
-  
-  appData.forEach((leg, legIndex) => {
-    const section = document.createElement('div'); section.className = 'leg'; section.id = 'leg-' + leg.id;
-
-    const daysCount = leg.days.length;
-    const firstAccom = daysCount > 0 && leg.days[0].accomItems && leg.days[0].accomItems.length > 0 ? leg.days[0].accomItems[0].text : "";
-    
-    let isTransit = false;
-    if (firstAccom.toLowerCase().includes('transit') || firstAccom === '—') {
-        isTransit = true;
-    } else if (daysCount === 1) {
-        const toCity = leg.days[0].to;
-        if (!leg.label.includes(toCity) && leg.days[0].from !== toCity) {
-            isTransit = true;
-        }
-    }
-    
-    const nightLabel = isTransit ? '✈ Day Transit / Stop' : `${daysCount} night${daysCount !== 1 ? 's' : ''}`;
-    const badgeClass = isTransit ? 'leg-night-count badge-transit' : 'leg-night-count';
-    
-    const firstDateObj = daysCount > 0 ? leg.days[0] : null;
-    const lastDateObj = daysCount > 0 ? leg.days[daysCount - 1] : null;
-    const firstDateStr = firstDateObj ? `${firstDateObj.day} ${firstDateObj.date}` : '';
-    const lastDateStr = lastDateObj ? `${lastDateObj.day} ${lastDateObj.date}` : '';
-    const dateRange = (firstDateStr && lastDateStr && firstDateStr !== lastDateStr) ? `${firstDateStr} – ${lastDateStr}` : firstDateStr;
-
-    const unassigned = (leg.suggestedSights||[]).filter(s => s.assignedDayIdx === null || s.assignedDayIdx === undefined);
-    const subtitle = unassigned.length === 0 ? "All suggested sights assigned! 🎉" : `Remaining Ideas: ${unassigned.slice(0, 3).map(s => s.title.split('—')[0].trim()).join(', ')}${unassigned.length > 3 ? '...' : ''}`;
-
-    let html = `
-      <div class="leg-header" style="background:${leg.colour}" onclick="toggleLeg(this)">
-        <div class="leg-header-top">
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <h2 contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateData(${legIndex}, 'label', this.innerText)">${leg.label}</h2>
-                <span style="opacity:0.8; font-size:0.9rem; font-family:'DM Mono', monospace;">${dateRange}</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-                <span class="${badgeClass}">${nightLabel}</span>
-                ${isEditMode ? `<button class="header-del-btn" title="Delete Leg" onclick="event.stopPropagation(); deleteLeg(${legIndex})">🗑</button>` : ''}
-                <span class="leg-chevron">▼</span>
-            </div>
-        </div>
-        <div class="leg-subtitle">${subtitle}</div>
-      </div>
-      <div class="leg-content">
-    `;
-
-    html += `<div class="city-dashboard">
-                <div class="city-block">
-                    <h4>🍔 City Food Quests</h4>
-                    <ul>${(leg.cityFood || []).map((f, i) => `<li class="quest-item"><button class="del-btn" title="Delete Food" onclick="deleteFood(${legIndex}, ${i})">×</button><input type="checkbox" ${f.done ? 'checked' : ''} onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"><span contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span></li>`).join('')}</ul>
-                    <button class="add-btn" onclick="addFood(${legIndex})">+ Add Food</button>
-                </div>
-                <div class="city-block">
-                    <h4>🏃 City Running/Fitness</h4>
-                    <ul>${(leg.cityRun || []).map((r, i) => {
-                        const isAssigned = r.assignedDayIdx !== null && r.assignedDayIdx !== undefined;
-                        let isCompleted = false; let dayLabel = '';
-                        if (isAssigned) {
-                            dayLabel = leg.days[r.assignedDayIdx].date;
-                            const matchedActivity = leg.days[r.assignedDayIdx].activityItems.find(a => a.text === r.title);
-                            if (matchedActivity && matchedActivity.done) isCompleted = true;
-                        }
-                        const badgeColor = isCompleted ? '#27AE60' : '#E67E22'; const badgeIcon = isCompleted ? '✓' : '⏳'; const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : `Scheduled for ${dayLabel}`;
-                        return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'}" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'run', ${i})"` : ''}><button class="del-btn" title="Delete Run" onclick="deleteRun(${legIndex}, ${i})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to a day">⠿</span>` : `<span class="assigned-badge" style="background: ${badgeColor};" title="${badgeHoverText}">${badgeIcon} ${dayLabel}</span>`}<div style="flex-grow:1; ${!isAssigned && isEditMode ? 'cursor:grab;' : ''}"><span contenteditable="${!isAssigned && isEditMode}" onblur="updateRunPool(${legIndex}, ${i}, 'title', this.innerText)" style="${isCompleted ? 'text-decoration:line-through;' : ''}">${r.title}</span><div class="sight-meta"><span class="sight-tag" title="Estimated Time">⏱ <span contenteditable="${!isAssigned && isEditMode}" onblur="updateRunPool(${legIndex}, ${i}, 'estTime', this.innerText)">${r.estTime}</span></span><span class="sight-tag" title="Estimated Cost">💰 $<span contenteditable="${!isAssigned && isEditMode}" onblur="updateRunPool(${legIndex}, ${i}, 'estCost', this.innerText)">${r.estCost}</span></span></div></div></li>`
-                    }).join('')}</ul>
-                    <button class="add-btn" onclick="addRun(${legIndex})">+ Add Run</button>
-                </div>
-                <div class="city-block">
-                    <h4>📌 Suggested Sights Pool</h4>
-                    <ul>${(leg.suggestedSights || []).map((s, i) => {
-                        const isAssigned = s.assignedDayIdx !== null && s.assignedDayIdx !== undefined;
-                        let isCompleted = false; let dayLabel = '';
-                        if (isAssigned) {
-                            dayLabel = leg.days[s.assignedDayIdx].date;
-                            const matchedActivity = leg.days[s.assignedDayIdx].activityItems.find(a => a.text === s.title);
-                            if (matchedActivity && matchedActivity.done) isCompleted = true;
-                        }
-                        const badgeColor = isCompleted ? '#27AE60' : '#E67E22'; const badgeIcon = isCompleted ? '✓' : '⏳'; const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : `Scheduled for ${dayLabel}`;
-                        return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'}" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'sight', ${i})"` : ''}><button class="del-btn" title="Delete Sight" onclick="deleteSight(${legIndex}, ${i})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to a day">⠿</span>` : `<span class="assigned-badge" style="background: ${badgeColor};" title="${badgeHoverText}">${badgeIcon} ${dayLabel}</span>`}<div style="flex-grow:1; ${!isAssigned && isEditMode ? 'cursor:grab;' : ''}"><span contenteditable="${!isAssigned && isEditMode}" onblur="updateSightPool(${legIndex}, ${i}, 'title', this.innerText)" style="${isCompleted ? 'text-decoration:line-through;' : ''}">${s.title}</span><div class="sight-meta"><span class="sight-tag" title="Estimated Time">⏱ <span contenteditable="${!isAssigned && isEditMode}" onblur="updateSightPool(${legIndex}, ${i}, 'estTime', this.innerText)">${s.estTime}</span></span><span class="sight-tag" title="Estimated Cost">💰 $<span contenteditable="${!isAssigned && isEditMode}" onblur="updateSightPool(${legIndex}, ${i}, 'estCost', this.innerText)">${s.estCost}</span></span></div></div></li>`
-                    }).join('')}</ul>
-                    <button class="add-btn" onclick="addSight(${legIndex})">+ Add Sight</button>
-                </div>
-                <div class="city-block">
-                    <h4>💡 General City Tips</h4>
-                    <ul>${(leg.legTips || []).map((t, i) => `<li class="quest-item"><button class="del-btn" title="Delete Tip" onclick="deleteLegTip(${legIndex}, ${i})">×</button><span contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t}</span></li>`).join('')}</ul>
-                    <button class="add-btn" onclick="addLegTip(${legIndex})">+ Add Tip</button>
-                </div>
-             </div>`;
-
-    leg.days.forEach((day, dayIndex) => {
-      const cityHTML = day.from === day.to ? `<span class="city-same">${day.from}</span>` : `${day.from} <span style="opacity:0.4">→</span> ${day.to}`;
-      const completedClass = day.completed ? 'is-completed' : ''; const dayTotal = getDayTotal(day);
-      
-      html += `
-        <div class="day-card ${completedClass}">
-          <div class="day-bar" style="--leg-colour:${leg.colour}" onclick="toggleCard(this)">
-            <input type="checkbox" class="day-checkbox" ${day.completed ? 'checked' : ''} onclick="toggleDayCompleted(event, ${legIndex}, ${dayIndex})">
-            <div class="day-date"><span class="day-num">${day.date}</span><span class="day-name">${day.day}</span></div>
-            <div class="day-title"><div class="day-cities">${cityHTML}</div><div class="day-desc" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
-            ${dayTotal ? `<div class="day-total-cost" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron">▼</span>
-          </div>
-          <div class="day-detail"><div class="detail-grid">
-              
-              <div class="detail-block block-transport">
-                <h4>Transport</h4><div class="item-list">
-                    ${(day.transportItems || []).map((item, i) => `<div class="cost-item"><button class="del-btn" title="Remove Transport" onclick="deleteDayItem(${legIndex}, ${dayIndex}, 'transportItems', ${i})">×</button><span class="cost-item-text" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'transportItems', ${i}, this.innerText)">${item.text}</span><span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'transportItems', ${i}, this.innerText)">${item.cost}</span></span></div>`).join('')}
-                </div><button class="add-btn" onclick="addDayItem(${legIndex}, ${dayIndex}, 'transportItems')">+ Add Transport</button>
-              </div>
-
-              <div class="detail-block block-accom">
-                <h4>Accommodation</h4><div class="item-list">
-                    ${(day.accomItems || []).map((item, i) => `<div class="cost-item"><button class="del-btn" title="Remove Accommodation" onclick="deleteDayItem(${legIndex}, ${dayIndex}, 'accomItems', ${i})">×</button><span class="cost-item-text" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'accomItems', ${i}, this.innerText)">${item.text}</span><span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'accomItems', ${i}, this.innerText)">${item.cost}</span></span></div>`).join('')}
-                </div><button class="add-btn" onclick="addDayItem(${legIndex}, ${dayIndex}, 'accomItems')">+ Add Accom</button>
-              </div>
-
-              <div class="detail-block block-activities drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
-                <h4>Planned Activities</h4><div class="item-list">
-                    ${(day.activityItems || []).map((item, i) => `<div class="cost-item"><button class="del-btn" title="Remove Activity" onclick="deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button><input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})"><span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.text}</span><span class="budget-field" style="color:#666;">⏱ <span contenteditable="${isEditMode}" onblur="updateDayItemTime(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.time || '1 hr'}</span></span><span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.cost}</span></span></div>`).join('')}
-                </div><button class="add-btn" onclick="addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>
-              </div>
-
-          </div></div>
-        </div>
-      `;
-    });
-
-    html += `</div>`; 
-    section.innerHTML = html; container.appendChild(section);
-  });
-  if (typeof reObserveLegs === "function") reObserveLegs();
-}
-
-function buildNav() {
-  const nav = document.getElementById('legNav'); nav.innerHTML = '';
-  appData.forEach(leg => {
-    const btn = document.createElement('button');
-    btn.className = 'nav-btn'; btn.textContent = leg.label;
-    btn.onclick = () => {
-        const el = document.getElementById('leg-' + leg.id);
-        el.classList.remove('collapsed'); 
-        el.scrollIntoView({behavior:'smooth', block:'start'});
-    };
-    btn.dataset.leg = leg.id; nav.appendChild(btn);
-  });
-}
-
-function toggleCard(bar) { bar.parentElement.classList.toggle('open'); }
-let allExpanded = false;
-let allLegsExpanded = true;
-
-function toggleAllDays() {
-  allExpanded = !allExpanded;
-  document.querySelectorAll('.day-card').forEach(c => c.classList.toggle('open', allExpanded));
-  if (allExpanded) {
-      allLegsExpanded = true;
-      document.querySelectorAll('.leg').forEach(l => l.classList.remove('collapsed'));
-      document.getElementById('expandAllLegs').textContent = '▲ Collapse all legs';
-  }
-  document.getElementById('expandAll').textContent = allExpanded ? '▲ Collapse all days' : '▼ Expand all days';
-}
-
-function toggleAllLegs() {
-    allLegsExpanded = !allLegsExpanded;
-    document.querySelectorAll('.leg').forEach(l => l.classList.toggle('collapsed', !allLegsExpanded));
-    document.getElementById('expandAllLegs').textContent = allLegsExpanded ? '▲ Collapse all legs' : '▼ Expand all legs';
-}
-
-function printPage(mode) {
-    if (mode === 'detailed') {
-        document.querySelectorAll('.day-card').forEach(c => c.classList.add('open'));
-        document.querySelectorAll('.leg').forEach(l => l.classList.remove('collapsed'));
-    }
-    document.body.className = isFunMode ? 'fun-mode' : '';
-    document.body.classList.add('print-' + mode);
-    window.print();
-    setTimeout(() => { document.body.className = isFunMode ? 'fun-mode' : ''; if(!isEditMode) document.body.classList.add('read-only-mode'); }, 1000);
-}
-
-document.getElementById('mainTitle').addEventListener('blur', function() { titleData.title = this.innerText; saveData(); });
-document.getElementById('mainSubtitle').addEventListener('blur', function() { titleData.subtitle = this.innerText; saveData(); });
-
-
-function updateData(legIdx, key, val) { appData[legIdx][key] = val; saveData(); }
-
-function updateDayData(legIdx, dayIdx, key, val) { 
-    appData[legIdx].days[dayIdx][key] = val; 
-    saveData(); 
-    if (key === 'date') { sortLegs(); } // Auto-sort if date is changed
-}
-
-function addLeg() {
-    const newLeg = {
-        id: 'leg_' + Date.now(),
-        label: '📍 New City',
-        colour: '#2C3E50',
-        cityFood: [{ text: "Local dish to try", done: false }],
-        cityRun: [{ title: "5km park loop", estTime: "1 hr", estCost: "0", assignedDayIdx: null }],
-        suggestedSights: [],
-        legTips: ["Add tip..."],
-        days: [{
-            date: 'DD Mon', day: 'Mon', from: 'City', to: 'City',
-            completed: false, desc: 'Travel and arrival day',
-            transportItems: [{ text: "Add transport...", cost: "0" }],
-            accomItems: [{ text: "Add accommodation...", cost: "0" }],
-            activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false }]
-        }]
-    };
-    appData.push(newLeg);
-    sortLegs();
-}
-
-
-const navObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const id = entry.target.id.replace('leg-', '');
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                const leg = appData.find(l => l.id === id);
-                const isActive = b.dataset.leg === id;
-                b.classList.toggle('active', isActive);
-                b.style.borderBottomColor = isActive && leg ? leg.colour : 'transparent';
-            });
-        }
-    });
-}, { threshold: 0.15 });
-
-function reObserveLegs() {
-    navObserver.disconnect();
-    document.querySelectorAll('.leg').forEach(el => navObserver.observe(el));
-}
+setInterval(updateClocks, 1000);
+updateClocks();
 
 initData();
 buildNav();
