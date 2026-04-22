@@ -15,9 +15,20 @@ Travel Planner PWA is a completely offline, JSON-driven Progressive Web App for 
 
 ## File Structure
 
-- `index.html` - Complete application (HTML, CSS, and JavaScript in one file)
+- `index.html` - Main HTML structure, loads external modules
+- `style.css` - Complete application styles
 - `manifest.json` - PWA configuration for mobile installation
 - `sw.js` - Service Worker for offline caching
+- `js/` - JavaScript modules:
+  - `utils.js` - Helper functions (clocks, cost parsing, constants)
+  - `data.js` - Data management (init, save, import/export)
+  - `packing.js` - Packing list CRUD operations
+  - `dragdrop.js` - Drag-and-drop handlers
+  - `crud.js` - Itinerary CRUD operations
+  - `tabs.js` - Tab builders (transport, accom, budget, packing)
+  - `ai.js` - AI prompt generator
+  - `ui.js` - UI state and navigation
+  - `itinerary.js` - Main itinerary builder
 - `backups/` - Directory for exported trip JSON files
 
 ## Development Commands
@@ -150,21 +161,44 @@ Ultra-dense layout toggle for efficient viewing.
 - [x] Compact CSS styling
 - [x] `buildCompactItinerary()` function
 
-### Phase 2: Code Refactoring [NEXT]
-Split single-file architecture into modules for maintainability:
-- Extract CSS to `style.css`
-- Extract JS to modules: `app.js`, `ui.js`, `utils.js`, `print.js`
-- Update sw.js to cache new files
+### Phase 2: Code Refactoring [DONE]
+Split 1400-line single-file into modules for maintainability:
+- [x] Extract CSS to `style.css`
+- [x] Extract JS to 9 modules: `utils.js`, `data.js`, `packing.js`, `dragdrop.js`, `crud.js`, `tabs.js`, `ai.js`, `ui.js`, `itinerary.js`
+- [x] Update `sw.js` to cache all new files
 
-### Phase 3: Enhanced Print Features
-- Date range selection for printing
-- Smart page breaking
-- Print preview modal
+### Phase 3: Enhanced Print Features [DONE]
+- [x] Date range selection for printing
+- [x] Print preview modal with live preview
+- [x] Configurable print options (transport, accom, activities, costs)
 
-### Phase 4: Bug Fixes & Polish
-- JSON import error handling
-- "Last exported" timestamp
-- Auto-save confirmations
+### Phase 4: Bug Fixes & Polish [DONE]
+- [x] JSON import error handling with graceful fallback
+- [x] "Last exported/imported" timestamp display
+- [x] Auto-save confirmations (already implemented)
+
+### Phase 5: Map Integration [PENDING]
+
+### Phase 6: Interactive How-To Guide [DONE]
+- [x] Guide tab with expandable step cards
+- [x] Mini demos within each step (buttons, inputs, checkboxes)
+- [x] Interactive spotlight tutorial with navigation
+- [x] Progress tracking across sessions
+- [x] Keyboard navigation (arrows, escape)
+- [ ] Global map showing all trip legs with color-coded routes
+- [ ] Interactive markers for each city/destination
+- [ ] Per-leg local map views
+- [ ] Click-to-open in Google Maps
+
+### Phase 7: Fix visuals, layout and compatibility [PENDING]
+- [x] Clicking the confirmed or pending on the accommodation and transport tabs does not do anything on those tabs when in view
+- [ ] Improve the readability and interactivity making the screen space more functional and user-friendly
+- [ ] Ensure sights and running activities are consolidated into one list and make the money amount and time and fit on a single line
+- [ ] Use the full width of the page to fit the multiple areas per leg
+- [ ] Make the city tips more like help text and one row/column directly under the dropdown.collapsible city heading
+- [ ] fix the layout, make it all 3 columns in the itinerary nice and wide again !_? - City Food Quests, City Running/Fitness, Suggested Sights Pool - including the below to line up in 3 columns, accomodation, transport, sights -
+- [ ] click action on confirmed/pending in the main itinerary is collapsing the dropdown and not updating the other tabs (and vice versa)
+- [ ] combine City Running/Fitness and Suggested Sights Pool into ONE GROUP - Suggested Activities
 
 ## Testing Checklist
 
@@ -195,9 +229,3 @@ Before considering work complete:
 - Activity duration tracking
 - Flight miles tracking
 - Budget categories breakdown
-
----
-
-## Cleanup Notes
-
-- Delete `TODO.md` and `COMPACT_MODE_IMPLEMENTATION.txt` after Phase 2 complete

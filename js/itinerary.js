@@ -39,13 +39,21 @@ function buildCompactItinerary() {
 
       if ((day.transportItems?.length || 0) > 0) {
         html += '<div style="flex:1;"><strong>Bus</strong> ';
-        html += day.transportItems.map(item => `${item.text}${item.cost ? ` ($${item.cost})` : ''}`).join(', ');
+        html += day.transportItems.map(item => {
+          const status = item.status || 'pending';
+          const statusIcon = status === 'confirmed' ? '✓' : '⏳';
+          return `${item.text}${item.cost ? ` ($${item.cost})` : ''} <span style="color:${status === 'confirmed' ? '#27AE60' : '#E67E22'}">${statusIcon}</span>`;
+        }).join(', ');
         html += '</div>';
       }
 
       if ((day.accomItems?.length || 0) > 0) {
         html += '<div style="flex:1;"><strong>Hotel</strong> ';
-        html += day.accomItems.map(item => `${item.text}${item.cost ? ` ($${item.cost})` : ''}`).join(', ');
+        html += day.accomItems.map(item => {
+          const status = item.status || 'pending';
+          const statusIcon = status === 'confirmed' ? '✓' : '⏳';
+          return `${item.text}${item.cost ? ` ($${item.cost})` : ''} <span style="color:${status === 'confirmed' ? '#27AE60' : '#E67E22'}">${statusIcon}</span>`;
+        }).join(', ');
         html += '</div>';
       }
 
@@ -175,35 +183,63 @@ function buildItinerary() {
       const completedClass = day.completed ? 'is-completed' : ''; const dayTotal = getDayTotal(day);
 
       html += `
-        <div class="day-card ${completedClass}">
-          <div class="day-bar" style="--leg-colour:${leg.colour}" onclick="toggleCard(this)">
-            <input type="checkbox" class="day-checkbox" ${day.completed ? 'checked' : ''} onclick="toggleDayCompleted(event, ${legIndex}, ${dayIndex})">
-            <div class="day-date"><span class="day-num">${day.date}</span><span class="day-name">${day.day}</span></div>
-            <div class="day-title"><div class="day-cities">${cityHTML}</div><div class="day-desc" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
-            ${dayTotal ? `<div class="day-total-cost" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron">▼</span>
-          </div>
-          <div class="day-detail"><div class="detail-grid">
-
-            <div class="detail-block block-transport">
-              <h4>Transport</h4><div class="item-list">
-              ${(day.transportItems || []).map((item, i) => `<div class="cost-item"><button class="del-btn" title="Remove Transport" onclick="deleteDayItem(${legIndex}, ${dayIndex}, 'transportItems', ${i})">×</button><span class="cost-item-text" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'transportItems', ${i}, this.innerText)">${item.text}</span><span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'transportItems', ${i}, this.innerText)">${item.cost}</span></span></div>`).join('')}
-              </div><button class="add-btn" onclick="addDayItem(${legIndex}, ${dayIndex}, 'transportItems')">+ Add Transport</button>
-            </div>
-
-            <div class="detail-block block-accom">
-              <h4>Accommodation</h4><div class="item-list">
-              ${(day.accomItems || []).map((item, i) => `<div class="cost-item"><button class="del-btn" title="Remove Accommodation" onclick="deleteDayItem(${legIndex}, ${dayIndex}, 'accomItems', ${i})">×</button><span class="cost-item-text" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'accomItems', ${i}, this.innerText)">${item.text}</span><span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'accomItems', ${i}, this.innerText)">${item.cost}</span></span></div>`).join('')}
-              </div><button class="add-btn" onclick="addDayItem(${legIndex}, ${dayIndex}, 'accomItems')">+ Add Accom</button>
-            </div>
-
-            <div class="detail-block block-activities drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
-              <h4>Planned Activities</h4><div class="item-list">
-              ${(day.activityItems || []).map((item, i) => `<div class="cost-item"><button class="del-btn" title="Remove Activity" onclick="deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button><input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})"><span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.text}</span><span class="budget-field" style="color:#666;">⏱ <span contenteditable="${isEditMode}" onblur="updateDayItemTime(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.time || '1 hr'}</span></span><span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.cost}</span></span></div>`).join('')}
-              </div><button class="add-btn" onclick="addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>
-            </div>
-
-          </div></div>
+      <div class="day-card ${completedClass}">
+        <div class="day-bar" style="--leg-colour:${leg.colour}" onclick="toggleCard(this)">
+          <input type="checkbox" class="day-checkbox" ${day.completed ? 'checked' : ''} onclick="toggleDayCompleted(event, ${legIndex}, ${dayIndex})">
+          <div class="day-date"><span class="day-num">${day.date}</span><span class="day-name">${day.day}</span></div>
+          <div class="day-title"><div class="day-cities">${cityHTML}</div><div class="day-desc" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
+          ${dayTotal ? `<div class="day-total-cost" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron">▼</span>
         </div>
+        <div class="day-detail"><div class="detail-grid">
+
+          <div class="detail-block block-transport">
+            <h4>Transport</h4><div class="item-list">
+            ${(day.transportItems || []).map((item, i) => {
+              const status = item.status || 'pending';
+              const statusColor = status === 'confirmed' ? '#27AE60' : '#E67E22';
+              const statusIcon = status === 'confirmed' ? '✓' : '⏳';
+              const showRef = status === 'confirmed';
+              return `<div class="cost-item">
+                <button class="del-btn" title="Remove Transport" onclick="deleteDayItem(${legIndex}, ${dayIndex}, 'transportItems', ${i})">×</button>
+                <span class="cost-item-text" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'transportItems', ${i}, this.innerText)">${item.text}</span>
+                <div class="cost-item-actions">
+                  <span class="status-badge" style="background:${statusColor}; ${isEditMode ? 'cursor:pointer;' : ''}" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" ${isEditMode ? 'onclick="event.stopPropagation(); event.preventDefault(); toggleBookingStatus(event, ' + legIndex + ', ' + dayIndex + ', \'transportItems\', ' + i + '); return false;"' : ''}>${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                  ${showRef ? `<input type="text" class="booking-ref-input ${status === 'confirmed' ? 'confirmed' : ''}" value="${item.bookingRef || ''}" placeholder="Ref #" onchange="updateBookingRef(${legIndex}, ${dayIndex}, 'transportItems', ${i}, this.value)" ${isEditMode ? '' : 'readonly'}/>` : ''}
+                  <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'transportItems', ${i}, this.innerText)">${item.cost}</span></span>
+                </div>
+              </div>`;
+            }).join('')}
+            </div><button class="add-btn" onclick="addDayItem(${legIndex}, ${dayIndex}, 'transportItems')">+ Add Transport</button>
+          </div>
+
+          <div class="detail-block block-accom">
+            <h4>Accommodation</h4><div class="item-list">
+            ${(day.accomItems || []).map((item, i) => {
+              const status = item.status || 'pending';
+              const statusColor = status === 'confirmed' ? '#27AE60' : '#E67E22';
+              const statusIcon = status === 'confirmed' ? '✓' : '⏳';
+              const showRef = status === 'confirmed';
+              return `<div class="cost-item">
+                <button class="del-btn" title="Remove Accommodation" onclick="deleteDayItem(${legIndex}, ${dayIndex}, 'accomItems', ${i})">×</button>
+                <span class="cost-item-text" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'accomItems', ${i}, this.innerText)">${item.text}</span>
+                <div class="cost-item-actions">
+                  <span class="status-badge" style="background:${statusColor}; ${isEditMode ? 'cursor:pointer;' : ''}" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" ${isEditMode ? 'onmousedown="event.stopPropagation();" onclick="toggleBookingStatus(event, ' + legIndex + ', ' + dayIndex + ', \'accomItems\', ' + i + ')"' : ''}>${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                  ${showRef ? `<input type="text" class="booking-ref-input ${status === 'confirmed' ? 'confirmed' : ''}" value="${item.bookingRef || ''}" placeholder="Ref #" onchange="updateBookingRef(${legIndex}, ${dayIndex}, 'accomItems', ${i}, this.value)" ${isEditMode ? '' : 'readonly'}/>` : ''}
+                  <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'accomItems', ${i}, this.innerText)">${item.cost}</span></span>
+                </div>
+              </div>`;
+            }).join('')}
+            </div><button class="add-btn" onclick="addDayItem(${legIndex}, ${dayIndex}, 'accomItems')">+ Add Accom</button>
+          </div>
+
+          <div class="detail-block block-activities drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
+            <h4>Planned Activities</h4><div class="item-list">
+            ${(day.activityItems || []).map((item, i) => `<div class="cost-item"><button class="del-btn" title="Remove Activity" onclick="deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button><input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})"><span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.text}</span><span class="budget-field" style="color:#666;">⏱ <span contenteditable="${isEditMode}" onblur="updateDayItemTime(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.time || '1 hr'}</span></span><span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.cost}</span></span></div>`).join('')}
+            </div><button class="add-btn" onclick="addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>
+          </div>
+
+        </div></div>
+      </div>
       `;
     });
 

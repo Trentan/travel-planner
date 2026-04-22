@@ -1,6 +1,6 @@
 function buildTransportTab() {
   const container = document.getElementById('transport-table-container');
-  let html = `<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>Date</th><th>Route</th><th>Provider / Details</th><th>Est. Cost</th></tr></thead><tbody>`;
+  let html = `<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>Date</th><th>Route</th><th>Provider / Details</th><th>Status</th><th>Est. Cost</th></tr></thead><tbody>`;
   let hasItems = false;
   appData.forEach((leg, lIdx) => {
     leg.days.forEach((day, dIdx) => {
@@ -8,7 +8,11 @@ function buildTransportTab() {
         day.transportItems.forEach((item, iIdx) => {
           if (item.text === "—" || item.text.trim() === "") return;
           hasItems = true;
-          html += `<tr style="border-left-color: ${leg.colour}"><td class="date-col">${day.day} ${day.date}</td><td class="route-col">${day.from} → ${day.to}</td><td><span contenteditable="${isEditMode}" onblur="updateDayItemText(${lIdx}, ${dIdx}, 'transportItems', ${iIdx}, this.innerText, true)">${item.text}</span></td><td class="budget-field" style="width:100px; display:table-cell;">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${lIdx}, ${dIdx}, 'transportItems', ${iIdx}, this.innerText, true)">${item.cost}</span></td></tr>`;
+          const status = item.status || 'pending';
+          const statusColor = status === 'confirmed' ? '#27AE60' : '#E67E22';
+          const statusIcon = status === 'confirmed' ? '✓' : '⏳';
+          const bookingRefInput = status === 'confirmed' ? `<br><input type="text" value="${item.bookingRef || ''}" placeholder="Ref #" onchange="updateBookingRef(${lIdx}, ${dIdx}, 'transportItems', ${iIdx}, this.value)" style="font-family:monospace; font-size:0.75rem; padding:2px 4px; border:1px solid #ccc; border-radius:3px; width:80px; margin-top:4px;">` : '';
+          html += `<tr style="border-left-color: ${leg.colour}"><td class="date-col">${day.day} ${day.date}</td><td class="route-col">${day.from} → ${day.to}</td><td><span contenteditable="${isEditMode}" onblur="updateDayItemText(${lIdx}, ${dIdx}, 'transportItems', ${iIdx}, this.innerText, true)">${item.text}</span></td><td><span class="status-badge" style="background:${statusColor}; cursor:pointer;" onclick="toggleBookingStatus(event, ${lIdx}, ${dIdx}, 'transportItems', ${iIdx})">${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}</span>${bookingRefInput}</td><td class="budget-field" style="width:100px; display:table-cell;">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${lIdx}, ${dIdx}, 'transportItems', ${iIdx}, this.innerText, true)">${item.cost}</span></td></tr>`;
         });
       }
     });
@@ -20,7 +24,7 @@ function buildTransportTab() {
 
 function buildAccomTab() {
   const container = document.getElementById('accom-table-container');
-  let html = `<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>Date</th><th>City</th><th>Accommodation Details</th><th>Est. Cost</th></tr></thead><tbody>`;
+  let html = `<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>Date</th><th>City</th><th>Accommodation</th><th>Status / Ref</th><th>Est. Cost</th></tr></thead><tbody>`;
   let hasItems = false;
   appData.forEach((leg, lIdx) => {
     leg.days.forEach((day, dIdx) => {
@@ -28,7 +32,11 @@ function buildAccomTab() {
         day.accomItems.forEach((item, iIdx) => {
           if (item.text === "—" || item.text.trim() === "") return;
           hasItems = true;
-          html += `<tr style="border-left-color: ${leg.colour}"><td class="date-col">${day.day} ${day.date}</td><td class="route-col">${day.to}</td><td><span style="font-weight:600;" contenteditable="${isEditMode}" onblur="updateDayItemText(${lIdx}, ${dIdx}, 'accomItems', ${iIdx}, this.innerText, true)">${item.text}</span></td><td class="budget-field" style="width:100px; display:table-cell;">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${lIdx}, ${dIdx}, 'accomItems', ${iIdx}, this.innerText, true)">${item.cost}</span></td></tr>`;
+          const status = item.status || 'pending';
+          const statusColor = status === 'confirmed' ? '#27AE60' : '#E67E22';
+          const statusIcon = status === 'confirmed' ? '✓' : '⏳';
+          const accomBookingRef = status === 'confirmed' ? `<br><input type="text" value="${item.bookingRef || ''}" placeholder="Ref #" onchange="updateBookingRef(${lIdx}, ${dIdx}, 'accomItems', ${iIdx}, this.value)" style="font-family:monospace; font-size:0.75rem; padding:2px 4px; border:1px solid #ccc; border-radius:3px; width:80px; margin-top:4px;">` : '';
+          html += `<tr style="border-left-color: ${leg.colour}"><td class="date-col">${day.day} ${day.date}</td><td class="route-col">${day.to}</td><td><span style="font-weight:600;" contenteditable="${isEditMode}" onblur="updateDayItemText(${lIdx}, ${dIdx}, 'accomItems', ${iIdx}, this.innerText, true)">${item.text}</span></td><td><span class="status-badge" style="background:${statusColor}; cursor:pointer;" onclick="toggleBookingStatus(event, ${lIdx}, ${dIdx}, 'accomItems', ${iIdx})">${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}</span>${accomBookingRef}</td><td class="budget-field" style="width:100px; display:table-cell;">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${lIdx}, ${dIdx}, 'accomItems', ${iIdx}, this.innerText, true)">${item.cost}</span></td></tr>`;
         });
       }
     });

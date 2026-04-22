@@ -48,7 +48,35 @@ function initData() {
   document.getElementById('mainSubtitle').innerText = titleData.subtitle;
   document.getElementById('activeFileDisplay').innerText = "📂 " + currentFileName;
 
+  // Display last export/import timestamp
+  displayTimestampStatus();
+
   saveData(false);
+}
+
+function displayTimestampStatus() {
+  const lastExport = localStorage.getItem('travelApp_last_export_v2026');
+  const lastImport = localStorage.getItem('travelApp_last_import_v2026');
+  const timestampEl = document.getElementById('timestampStatus');
+
+  if (!timestampEl) return;
+
+  let message = '';
+
+  if (lastExport || lastImport) {
+    let latest = lastExport || lastImport;
+    let label = lastExport && lastImport
+      ? (new Date(lastExport) > new Date(lastImport) ? 'Exported' : 'Imported')
+      : (lastExport ? 'Exported' : 'Imported');
+
+    const date = new Date(latest);
+    const formatted = date.toLocaleDateString('en-AU', { month: 'short', day: 'numeric' });
+    const time = date.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+
+    message = `${label}: ${formatted} ${time}`;
+  }
+
+  timestampEl.textContent = message;
 }
 
 function saveData(showTick = true) {
@@ -110,47 +138,102 @@ function exportJSON() {
   document.body.appendChild(downloadAnchorNode);
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
+
+  // Record export timestamp
+  localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
 }
 
 function importJSON(event) {
   const file = event.target.files[0];
-  if (!file) return;
+  if (!file) {
+    console.log('No file selected');
+    return;
+  }
+
+  if (!file.name.endsWith('.json')) {
+    alert('Please select a .json file. The file you selected is not valid JSON.');
+    event.target.value = '';
+    return;
+  }
+
   const reader = new FileReader();
+
+  reader.onerror = function() {
+    alert('Error reading file. Please try again with a valid JSON file.');
+    event.target.value = '';
+  };
+
   reader.onload = function(e) {
     try {
-      const importedData = JSON.parse(e.target.result);
-      if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
-        appData = importedData.itinerary;
+      const content = e.target.result;
 
-        appData.forEach(leg => {
-          if (!leg.legTips) {
-            leg.legTips = [];
-            leg.days.forEach(day => {
-              if (day.tips && day.tips.length > 0) leg.legTips.push(...day.tips);
-              delete day.tips;
-            });
-          }
-          if (leg.cityRun && leg.cityRun.length > 0 && typeof leg.cityRun[0] === 'string') {
-            leg.cityRun = leg.cityRun.map(r => ({ title: r, estTime: '1 hr', estCost: '0', assignedDayIdx: null }));
-          }
-        });
+      if (!content || content.trim() === '') {
+        alert('The file is empty. Please select a file with data.');
+        event.target.value = '';
+        return;
+      }
 
-        if (importedData.packing) {
-          const migrated = migratePacking(importedData.packing);
-          packingData = migrated || packingData;
+      let importedData;
+      try {
+        importedData = JSON.parse(content);
+      } catch (parseErr) {
+        const errorMsg = parseErr.message || 'Invalid JSON format';
+        alert(`Failed to parse JSON: ${errorMsg}\n\nPlease ensure your file is valid JSON. Common issues:\n• Missing quotes around keys\n• Trailing commas\n• Unmatched brackets`);
+        event.target.value = '';
+        return;
+      }
+
+      if (!importedData || typeof importedData !== 'object') {
+        alert('Invalid file format. Please select a JSON file exported from Travel Planner.');
+        event.target.value = '';
+        return;
+      }
+
+      if (!importedData.itinerary) {
+        console.warn('Missing itinerary data in import, using default');
+        importedData.itinerary = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      } else if (!Array.isArray(importedData.itinerary)) {
+        alert('Invalid itinerary format. Expected an array of trip legs.');
+        event.target.value = '';
+        return;
+      }
+
+      appData = importedData.itinerary;
+
+      appData.forEach(leg => {
+        if (!leg.legTips) {
+          leg.legTips = [];
+          leg.days.forEach(day => {
+            if (day.tips && day.tips.length > 0) leg.legTips.push(...day.tips);
+            delete day.tips;
+          });
         }
-        if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
-        if (importedData.meta) {
-          titleData = importedData.meta;
+        if (leg.cityRun && leg.cityRun.length > 0 && typeof leg.cityRun[0] === 'string') {
+          leg.cityRun = leg.cityRun.map(r => ({ title: r, estTime: '1 hr', estCost: '0', assignedDayIdx: null }));
         }
+      });
 
-        currentFileName = file.name;
-        localStorage.setItem('travelApp_filename_v2026', currentFileName);
+      if (importedData.packing) {
+        const migrated = migratePacking(importedData.packing);
+        packingData = migrated || packingData;
+      }
+      if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
+      if (importedData.meta) {
+        titleData = importedData.meta;
+      }
 
-        saveData(false);
-        location.reload();
-      } else { alert("Invalid JSON format."); }
-    } catch (err) { alert("Error parsing JSON file: " + err.message); }
+      currentFileName = file.name;
+      localStorage.setItem('travelApp_filename_v2026', currentFileName);
+      localStorage.setItem('travelApp_last_import_v2026', new Date().toISOString());
+
+      saveData(false);
+      location.reload();
+    } catch (err) {
+      console.error('Import error:', err);
+      alert(`Import failed: ${err.message || 'Unknown error'}. Your current data remains safe.`);
+      event.target.value = '';
+    }
   };
+
   reader.readAsText(file);
 }

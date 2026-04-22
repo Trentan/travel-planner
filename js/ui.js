@@ -53,9 +53,38 @@ function switchTab(tabId, btnElement) {
   if (tabId === 'accom') buildAccomTab();
   if (tabId === 'budget') buildBudgetTab();
   if (tabId === 'packing') buildPackingTab();
+  if (tabId === 'map') buildJourneyMap();
+  if (tabId === 'guide') buildGuideSteps();
 }
 
 function toggleLeg(headerEl) { headerEl.parentElement.classList.toggle('collapsed'); }
+
+// Dialog functions for top menu buttons
+function openAIDialog() {
+  const modal = document.getElementById('ai-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.getElementById('aiOutputBox').style.display = 'none';
+  }
+}
+
+function closeAIDialog() {
+  const modal = document.getElementById('ai-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function openGuideDialog() {
+  const modal = document.getElementById('guide-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    if (typeof buildGuideSteps === 'function') buildGuideSteps();
+  }
+}
+
+function closeGuideDialog() {
+  const modal = document.getElementById('guide-modal');
+  if (modal) modal.style.display = 'none';
+}
 
 function toggleCard(bar) { bar.parentElement.classList.toggle('open'); }
 
@@ -89,6 +118,124 @@ function printPage(mode) {
   window.print();
   setTimeout(() => { document.body.className = isFunMode ? 'fun-mode' : ''; if(!isEditMode) document.body.classList.add('read-only-mode'); }, 1000);
 }
+
+// Print Preview Modal
+let printPreviewData = { style: 'summary', dateRange: 'all', showTransport: true, showAccom: true, showActivities: true, showCosts: false };
+
+function openPrintPreview() {
+  populateDateRangeOptions();
+  document.getElementById('print-preview-modal').style.display = 'flex';
+  updatePrintPreview();
+}
+
+function closePrintPreview() {
+  document.getElementById('print-preview-modal').style.display = 'none';
+}
+
+function populateDateRangeOptions() {
+  const select = document.getElementById('printDateRange');
+  select.innerHTML = '<option value="all">All Dates</option>';
+
+  const dates = [];
+  appData.forEach(leg => {
+    leg.days.forEach(day => {
+      const dateKey = `${day.day} ${day.date}`;
+      if (!dates.find(d => d.key === dateKey)) {
+        dates.push({ key: dateKey, leg: leg.label });
+      }
+    });
+  });
+
+  dates.forEach(d => {
+    const option = document.createElement('option');
+    option.value = d.key;
+    option.textContent = `${d.key} (${d.leg})`;
+    select.appendChild(option);
+  });
+}
+
+function updatePrintPreview() {
+  const style = document.querySelector('input[name="printStyle"]:checked').value;
+  const dateRange = document.getElementById('printDateRange').value;
+  const showTransport = document.getElementById('showTransport').checked;
+  const showAccom = document.getElementById('showAccom').checked;
+  const showActivities = document.getElementById('showActivities').checked;
+  const showCosts = document.getElementById('showCosts').checked;
+
+  const preview = document.getElementById('printPreviewContent');
+  let html = '<h3>Preview</h3>';
+
+  let filteredData = JSON.parse(JSON.stringify(appData));
+
+  if (dateRange !== 'all') {
+    filteredData = filteredData.filter(leg =>
+      leg.days.some(day => `${day.day} ${day.date}` === dateRange)
+    );
+  }
+
+  if (filteredData.length === 0) {
+    preview.innerHTML = html + '<p style="color: #666; font-style: italic;">No items match the selected filters.</p>';
+    return;
+  }
+
+  filteredData.forEach(leg => {
+    html += `<div style="margin-bottom: 1rem; border-left: 3px solid ${leg.colour}; padding-left: 0.75rem;">`;
+    html += `<strong style="font-size: 0.9rem;">${leg.label}</strong>`;
+
+    leg.days.forEach(day => {
+      if (dateRange !== 'all' && `${day.day} ${day.date}` !== dateRange) return;
+
+      html += `<div style="margin: 0.5rem 0; font-size: 0.85rem;">`;
+      html += `<span style="color: #666;">${day.day} ${day.date}:</span> ${day.from} → ${day.to}`;
+
+      let items = [];
+      if (showTransport && day.transportItems?.length) items.push(...day.transportItems.map(i => '🚌 ' + i.text));
+      if (showAccom && day.accomItems?.length) items.push(...day.accomItems.map(i => '🏨 ' + i.text));
+      if (showActivities && day.activityItems?.length) items.push(...day.activityItems.map(i => '🎯 ' + i.text));
+
+      if (items.length) {
+        html += `<div style="margin-left: 1rem; color: #444;">`;
+        if (style === 'summary') {
+          html += items.slice(0, 3).join(', ');
+          if (items.length > 3) html += '...';
+        } else {
+          html += items.join(', ');
+        }
+        html += '</div>';
+      }
+
+      if (showCosts) {
+        const dayCost = ['transportItems', 'accomItems', 'activityItems']
+          .reduce((sum, cat) => sum + (day[cat] || []).reduce((s, i) => s + parseCost(i.cost), 0), 0);
+        if (dayCost > 0) {
+          html += `<div style="margin-left: 1rem; font-family: monospace; color: #27AE60;">Day total: $${dayCost}</div>`;
+        }
+      }
+
+      html += '</div>';
+    });
+
+    html += '</div>';
+  });
+
+  preview.innerHTML = html;
+}
+
+function executePrint() {
+  const style = document.querySelector('input[name="printStyle"]:checked').value;
+  closePrintPreview();
+  printPage(style);
+}
+
+document.addEventListener('change', function(e) {
+  if (e.target.closest('.print-options')) {
+    updatePrintPreview();
+  }
+});
+
+document.addEventListener('keyup', function(e) {
+  if (e.key === 'Escape') closePrintPreview();
+});
 
 document.getElementById('mainTitle').addEventListener('blur', function() { titleData.title = this.innerText; saveData(); });
 document.getElementById('mainSubtitle').addEventListener('blur', function() { titleData.subtitle = this.innerText; saveData(); });

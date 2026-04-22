@@ -27,8 +27,44 @@ function addLegTip(legIdx) { appData[legIdx].legTips.push("New tip..."); saveDat
 
 function addDayItem(legIdx, dayIdx, category) {
   if (category === 'activityItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", time: "1 hr", done: false }); }
+  else if (category === 'transportItems' || category === 'accomItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", status: "pending", bookingRef: "", done: false }); }
   else { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", done: false }); }
   saveData(); buildItinerary();
+}
+
+function toggleBookingStatus(e, legIdx, dayIdx, category, itemIdx) {
+  e.stopPropagation();
+  e.preventDefault();
+  const item = appData[legIdx].days[dayIdx][category][itemIdx];
+  item.status = item.status === 'confirmed' ? 'pending' : 'confirmed';
+  if (item.status === 'pending') item.bookingRef = '';
+  saveData();
+  // Check which tab is active and only rebuild relevant views
+  const activeTab = document.querySelector('.tab-pane.active');
+  const tabId = activeTab ? activeTab.id : '';
+  if (tabId === 'tab-itinerary') {
+    buildItinerary();
+  } else if (tabId === 'tab-transport') {
+    if (typeof buildTransportTab === 'function') buildTransportTab();
+  } else if (tabId === 'tab-accom') {
+    if (typeof buildAccomTab === 'function') buildAccomTab();
+  } else {
+    // Default: rebuild itinerary for other tabs
+    buildItinerary();
+  }
+}
+
+function updateBookingRef(legIdx, dayIdx, category, itemIdx, value) {
+  appData[legIdx].days[dayIdx][category][itemIdx].bookingRef = value;
+  saveData();
+  // Check which tab is active and only rebuild relevant views
+  const activeTab = document.querySelector('.tab-pane.active');
+  const tabId = activeTab ? activeTab.id : '';
+  if (tabId === 'tab-transport') {
+    if (typeof buildTransportTab === 'function') buildTransportTab();
+  } else if (tabId === 'tab-accom') {
+    if (typeof buildAccomTab === 'function') buildAccomTab();
+  }
 }
 
 function addLeg() {

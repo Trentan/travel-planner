@@ -9,8 +9,8 @@ const DEFAULT_DATA = [
       {
         date:'1 Jan', day:'Mon', from:'Home', to:'Example City',
         completed: false, desc:'Travel and arrival day',
-        transportItems: [{ text: "Flight AA123 08:00", cost: "250" }],
-        accomItems: [{ text: "Grand Hotel", cost: "120" }],
+        transportItems: [{ text: "Flight AA123 08:00", cost: "250", status: "pending", bookingRef: "" }],
+        accomItems: [{ text: "Grand Hotel", cost: "120", status: "pending", bookingRef: "" }],
         activityItems: [{ text: "Check-in and explore local area", cost: "0", time: "1 hr", done: false }]
       }
     ]
