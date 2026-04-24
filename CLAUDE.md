@@ -190,13 +190,13 @@ Split 1400-line single-file into modules for maintainability:
 
 ### Phase 6: Fix visuals, layout and compatibility [PENDING]
 - [x] Clicking the confirmed or pending on the accommodation and transport tabs does not do anything on those tabs when in view
-- [ ] Improve the readability and interactivity making the screen space more functional and user-friendly
-- [ ] Ensure sights and running activities are consolidated into one list and make the money amount and time and fit on a single line
-- [ ] Use the full width of the page to fit the multiple areas per leg
-- [ ] Make the city tips more like help text and one row/column directly under the dropdown.collapsible city heading
-- [ ] fix the layout, make it all 3 columns in the itinerary nice and wide again !_? - City Food Quests, City Running/Fitness, Suggested Sights Pool - including the below to line up in 3 columns, accomodation, transport, sights -
-- [ ] click action on confirmed/pending in the main itinerary is collapsing the dropdown and not updating the other tabs (and vice versa)
-- [ ] combine City Running/Fitness and Suggested Sights Pool into ONE GROUP - Suggested Activities
+- [x] Improve the readability and interactivity making the screen space more functional and user-friendly
+- [x] Ensure sights and running activities are consolidated into one list and make the money amount and time fit on a single line
+- [x] Use the full width of the page to fit the multiple areas per leg
+- [x] Make the city tips more like help text and one row/column directly under the collapsible city heading
+- [x] fix the layout, make it all 3 columns in the itinerary nice and wide again
+- [x] click action on confirmed/pending in the main itinerary is collapsing the dropdown and not updating the other tabs (and vice versa)
+- [x] combine City Running/Fitness and Suggested Sights Pool into ONE GROUP - Suggested Activities
 
 ## Testing Checklist
 
