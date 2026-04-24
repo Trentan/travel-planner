@@ -105,8 +105,105 @@ main {
 @media (max-width: 1200px) { .city-dashboard { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 700px) { .city-dashboard { grid-template-columns: 1fr; } }
 .city-block h4 { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;}
+.city-block h5 { font-size: 0.7rem; text-transform: uppercase; color: var(--muted); margin: 1rem 0 0.4rem 0; letter-spacing: 0.05em; font-weight: 600; }
+.city-block h5:first-child { margin-top: 0; }
 .city-block ul { list-style: none; padding: 0; font-size: 0.85rem; }
 .city-block li { margin-bottom: 0.4rem; padding-left: 1.2rem; text-indent: -1.2rem; }
+
+/* Combined Activities Layout */
+.city-block-activities {
+  grid-column: span 2;
+}
+
+.activities-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.activity-col {
+  min-width: 0;
+}
+
+.activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.sight-inline-meta {
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+  margin-left: auto;
+  padding-left: 8px;
+}
+
+.assigned-badge {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  padding: 0;
+}
+
+/* Tips as help text */
+.city-block-tips .tips-list {
+  list-style: none;
+  padding: 0;
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: 0.85rem;
+  border-bottom: 1px dotted #eee;
+}
+
+.tip-item:last-child {
+  border-bottom: none;
+}
+
+.tip-bulb {
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.tip-item span:nth-child(2) {
+  flex: 1;
+}
+
+/* Responsive: stack activities columns on smaller screens */
+@media (max-width: 1200px) {
+  .city-block-activities {
+    grid-column: span 1;
+  }
+  .activities-columns {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .activities-columns {
+    grid-template-columns: 1fr;
+  }
+}
 
 .quest-item { display: flex; align-items: flex-start; gap: 4px; text-indent: 0 !important; padding-left: 0 !important; margin-bottom: 6px !important; }
 .quest-item:hover .del-btn { opacity: 0.6; }

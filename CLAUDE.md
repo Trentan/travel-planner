@@ -177,9 +177,7 @@ Split 1400-line single-file into modules for maintainability:
 - [x] "Last exported/imported" timestamp display
 - [x] Auto-save confirmations (already implemented)
 
-### Phase 5: Map Integration [PENDING]
-
-### Phase 6: Interactive How-To Guide [DONE]
+### Phase 5: Interactive How-To Guide [PENDING]
 - [x] Guide tab with expandable step cards
 - [x] Mini demos within each step (buttons, inputs, checkboxes)
 - [x] Interactive spotlight tutorial with navigation
@@ -190,7 +188,7 @@ Split 1400-line single-file into modules for maintainability:
 - [ ] Per-leg local map views
 - [ ] Click-to-open in Google Maps
 
-### Phase 7: Fix visuals, layout and compatibility [PENDING]
+### Phase 6: Fix visuals, layout and compatibility [PENDING]
 - [x] Clicking the confirmed or pending on the accommodation and transport tabs does not do anything on those tabs when in view
 - [ ] Improve the readability and interactivity making the screen space more functional and user-friendly
 - [ ] Ensure sights and running activities are consolidated into one list and make the money amount and time and fit on a single line

@@ -1,0 +1,2161 @@
+{
+  "meta": {
+    "title": "✈ Europe & Asia 2026",
+    "subtitle": "Trentan solo · Europe → Bangkok → Koh Samui with family → Home"
+  },
+  "itinerary": [
+    {
+      "id": "departure",
+      "label": "🛫 Departure",
+      "colour": "#2C3E50",
+      "cityFood": [
+        {
+          "text": "🍗 Last Aussie meal: Roll'd or your local favourite before the airport",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Kangaroo Point Cliffs path — last Brisbane run if time allows"
+      ],
+      "suggestedSights": [],
+      "days": [
+        {
+          "date": "8 Jun",
+          "day": "Mon",
+          "from": "Brisbane",
+          "to": "In transit",
+          "transport": "✈ EVA Air BNE→TPE 22:15",
+          "accom": "—",
+          "desc": "Depart Brisbane",
+          "headline": "🌙 Late departure — check-in online, arrive airport 3hrs early",
+          "tips": [
+            "EVA Air economy is comfortable",
+            "Duty-free AUD before boarding"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "✈ EVA Air BNE→TPE 22:15",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "—",
+              "cost": "0"
+            }
+          ],
+          "activityItems": []
+        }
+      ]
+    },
+    {
+      "id": "taipei",
+      "label": "🇹🇼 Taipei",
+      "colour": "#C0392B",
+      "cityFood": [
+        {
+          "text": "🥟 MUST EAT: Din Tai Fung soup dumplings (xiaolongbao)",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Elephant Mountain trail"
+      ],
+      "suggestedSights": [
+        {
+          "title": "Din Tai Fung lunch — queue early",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Shilin Night Market evening",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "9 Jun",
+          "day": "Tue",
+          "from": "Taipei",
+          "to": "Taipei",
+          "transport": "✈ EVA Air TPE→VIE 22:40",
+          "accom": "— (transit, no hotel)",
+          "desc": "Free EVA stopover — apply for tourist voucher",
+          "headline": "🎧 RS-style: Ximending → CKS Memorial",
+          "tips": [
+            "EVA free stopover voucher"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "✈ EVA Air TPE→VIE 22:40",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "— (transit, no hotel)",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🎧 RS-style: Ximending → CKS Memorial",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vienna",
+      "label": "🇦🇹 Vienna",
+      "colour": "#8E44AD",
+      "cityFood": [
+        {
+          "text": "🥩 MUST EAT: Wiener Schnitzel at Figlmüller Bäckerstrasse",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Prater Hauptallee — 4.5km straight tree-lined boulevard"
+      ],
+      "suggestedSights": [
+        {
+          "title": "Belvedere Palace & Klimt's The Kiss",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Naschmarkt food stalls afternoon",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "10 Jun",
+          "day": "Wed",
+          "from": "Vienna",
+          "to": "Vienna",
+          "transport": "✈ Arrive VIE 08:40 · U-Bahn to centre",
+          "accom": "TBC — Vienna city centre",
+          "desc": "Arrive Vienna — settle into Europe",
+          "headline": "🎧 RS Vienna City Walk: Stephansdom → Hofburg",
+          "tips": [
+            "Vienna City Card"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "✈ Arrive VIE 08:40 · U-Bahn to centre",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Vienna city centre",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🎧 RS Vienna City Walk: Stephansdom → Hofburg",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bratislava",
+      "label": "🇸🇰 Bratislava",
+      "colour": "#6C5CE7",
+      "cityFood": [
+        {
+          "text": "🥩 MUST EAT: Bryndzové halušky — Slovak sheep-cheese dumplings",
+          "done": false
+        },
+        {
+          "text": "🧀 Try Parenica smoked string cheese",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Danube Promenade",
+        "🏃 Devín Castle loop"
+      ],
+      "suggestedSights": [
+        {
+          "title": "Blue Church",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Kozlovna Beer Knuckle dinner",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Danube river cruise",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "UFO Observation Deck",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "11 Jun",
+          "day": "Thu",
+          "from": "Vienna",
+          "to": "Bratislava",
+          "transport": "🚂 RegioJet ~1h",
+          "accom": "TBC — Bratislava old town",
+          "desc": "Day into Bratislava",
+          "headline": "🎧 RS-style: Hlavné Nám → Michael's Gate",
+          "tips": [
+            "Buy RegioJet ticket online from Wien Hauptbahnhof"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "🚂 RegioJet ~1h",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Bratislava old town",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🎧 RS-style: Hlavné Nám → Michael's Gate",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "12 Jun",
+          "day": "Fri",
+          "from": "Bratislava",
+          "to": "Bratislava",
+          "transport": "— (Bus 29 for Devín)",
+          "accom": "TBC — Bratislava old town",
+          "desc": "Full day Bratislava",
+          "headline": "🏯 Devín Castle ruins",
+          "tips": [
+            "Bus 29 to Devín from Most SNP"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "— (Bus 29 for Devín)",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Bratislava old town",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🏯 Devín Castle ruins",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prague",
+      "label": "🇨🇿 Prague",
+      "colour": "#E67E22",
+      "cityFood": [
+        {
+          "text": "🍺 MUST EAT: Svíčková with bread dumplings",
+          "done": false
+        },
+        {
+          "text": "🥩 Guláš with bread dumplings",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Malá Strana → Prague Castle steps",
+        "🏃 Vyšehrad 5km loop"
+      ],
+      "suggestedSights": [
+        {
+          "title": "Prague Castle district at dusk",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Josefov Jewish Quarter",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Vyšehrad 5km loop",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "13 Jun",
+          "day": "Sat",
+          "from": "Bratislava",
+          "to": "Prague",
+          "transport": "🚂 RegioJet ~4.5h",
+          "accom": "TBC — Prague old town",
+          "desc": "Travel to Prague — arrive afternoon",
+          "headline": "🎧 RS Prague Old Town Walk",
+          "tips": [
+            "Book RegioJet in advance"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "🚂 RegioJet ~4.5h",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Prague old town",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🎧 RS Prague Old Town Walk",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "14 Jun",
+          "day": "Sun",
+          "from": "Prague",
+          "to": "Prague",
+          "transport": "— (metro / tram)",
+          "accom": "TBC — Prague old town",
+          "desc": "Full day Prague",
+          "headline": "🎧 RS Prague Castle Walk",
+          "tips": [
+            "Charles Bridge: arrive before 7am"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "— (metro / tram)",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Prague old town",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🎧 RS Prague Castle Walk",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nuremberg",
+      "label": "🇩🇪 Nuremberg",
+      "colour": "#B7440A",
+      "cityFood": [
+        {
+          "text": "🌭 MUST EAT: Nuremberg Bratwurst at Bratwursthäusle",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Stadtpark Nuremberg"
+      ],
+      "suggestedSights": [
+        {
+          "title": "City walls walk",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Bratwursthäusle for dinner",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "15 Jun",
+          "day": "Mon",
+          "from": "Prague",
+          "to": "Nuremberg",
+          "transport": "🚂 RegioJet ~3.5h",
+          "accom": "TBC — Nuremberg old town",
+          "desc": "Stopover en route to Munich",
+          "headline": "🎧 RS-style: Hauptmarkt → Kaiserburg",
+          "tips": [
+            "Kaiserburg tower ~€7"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "🚂 RegioJet ~3.5h",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Nuremberg old town",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🎧 RS-style: Hauptmarkt → Kaiserburg",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "munich",
+      "label": "🇩🇪 Munich",
+      "colour": "#1A5276",
+      "cityFood": [
+        {
+          "text": "🥨 MUST EAT: Weisswurst + sweet mustard",
+          "done": false
+        },
+        {
+          "text": "🍖 Schweinshaxe at Augustiner-Keller",
+          "done": false
+        },
+        {
+          "text": "🍰 Käsespätzle",
+          "done": false
+        },
+        {
+          "text": "🧀 Obatzda",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 English Garden Eisbach circuit",
+        "🏃 Nymphenburg Palace canal path",
+        "🏃 Isar riverside path"
+      ],
+      "suggestedSights": [
+        {
+          "title": "Marienplatz Glockenspiel",
+          "estTime": "30 mins",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Hofbräuhaus evening",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Chinesischer Turm beer garden",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Viktualienmarkt lunch",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Dallmayr gourmet deli",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Nymphenburg Palace & grounds",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Allianz Arena tour",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "16 Jun",
+          "day": "Tue",
+          "from": "Nuremberg",
+          "to": "Munich",
+          "transport": "🚂 ICE ~1h",
+          "accom": "TBC — Munich conference hotel",
+          "desc": "SoftwareAG Conference begins",
+          "headline": "💼 Conference check-in & afternoon sessions",
+          "tips": [
+            "Confirm conference venue"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "10",
+          "transportItems": [
+            {
+              "text": "🚂 ICE ~1h",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Munich conference hotel",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "💼 Conference check-in & afternoon sessions",
+              "cost": "",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "17 Jun",
+          "day": "Wed",
+          "from": "Munich",
+          "to": "Munich",
+          "transport": "—",
+          "accom": "TBC — Munich conference hotel",
+          "desc": "Conference day 2",
+          "headline": "💼 Full conference day",
+          "tips": [
+            "English Garden: Eisbach surfer wave"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "—",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Munich conference hotel",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "💼 Full conference day",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "18 Jun",
+          "day": "Thu",
+          "from": "Munich",
+          "to": "Munich",
+          "transport": "—",
+          "accom": "TBC — Munich conference hotel",
+          "desc": "Conference day 3 — last",
+          "headline": "💼 Final conference sessions",
+          "tips": [
+            "Dallmayr: mustard, sausages"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "—",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Munich conference hotel",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "💼 Final conference sessions",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "19 Jun",
+          "day": "Fri",
+          "from": "Munich",
+          "to": "Munich",
+          "transport": "—",
+          "accom": "TBC — Munich personal accommodation",
+          "desc": "Free day — explore beyond conference",
+          "headline": "🎧 RS Munich Walk",
+          "tips": [
+            "Day trip alternative: Salzburg"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "—",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Munich personal accommodation",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🎧 RS Munich Walk",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "innsbruck",
+      "label": "🇦🇹 Innsbruck",
+      "colour": "#1A8A6F",
+      "cityFood": [
+        {
+          "text": "🥘 MUST EAT: Tiroler Gröstl",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Parkrun done! Afternoon: Inn riverside stroll"
+      ],
+      "suggestedSights": [
+        {
+          "title": "Nordkette cable car to 2,300m",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Golden Roof old town walk",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "20 Jun",
+          "day": "Sat",
+          "from": "Munich",
+          "to": "Innsbruck",
+          "transport": "🚂 ÖBB ~1h 45m",
+          "accom": "TBC — Innsbruck old town",
+          "desc": "Into the Austrian Alps",
+          "headline": "🏃 Innpromenade parkrun 8:45am SAT",
+          "tips": [
+            "Nordkette: buy combo ticket"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "🚂 ÖBB ~1h 45m",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Innsbruck old town",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🏃 Innpromenade parkrun 8:45am SAT",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bolzano",
+      "label": "🇮🇹 Bolzano",
+      "colour": "#5B4A9C",
+      "cityFood": [
+        {
+          "text": "🍷 MUST EAT: Schlutzkrapfen",
+          "done": false
+        },
+        {
+          "text": "🍺 Post-hike: cold Forst beer",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Adige riverside path",
+        "🏃 Trail run between cable car stations"
+      ],
+      "suggestedSights": [
+        {
+          "title": "Renon cable car",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Wine trail along the Adige",
+          "estTime": "2.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Alpe di Siusi",
+          "estTime": "4 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "21 Jun",
+          "day": "Sun",
+          "from": "Innsbruck",
+          "to": "Bolzano",
+          "transport": "🚂 Brenner Pass ~2h",
+          "accom": "TBC — Bolzano city centre",
+          "desc": "Bolzano via dramatic Brenner Pass crossing",
+          "headline": "🎧 RS-style: Lauben arcades → Ötzi the Iceman Museum",
+          "tips": [
+            "Ötzi Museum: ~€13"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "🚂 Brenner Pass ~2h",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Bolzano city centre",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🎧 RS-style: Lauben arcades → Ötzi the Iceman Museum",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "22 Jun",
+          "day": "Mon",
+          "from": "Bolzano",
+          "to": "Bolzano",
+          "transport": "— (cable car / local bus)",
+          "accom": "TBC — Bolzano city centre",
+          "desc": "Dolomites day trip",
+          "headline": "🏔 Seceda cable car — soaring rocky spires",
+          "tips": [
+            "Go early — fills with day-trippers"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "— (cable car / local bus)",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Bolzano city centre",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🏔 Seceda cable car — soaring rocky spires",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "verona",
+      "label": "🇮🇹 Verona",
+      "colour": "#A93226",
+      "cityFood": [
+        {
+          "text": "🍝 Verona: Bigoli con ragù d'asino",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Adige riverside path"
+      ],
+      "suggestedSights": [
+        {
+          "title": "Adige riverside walk",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Milan arrival: Navigli canals aperitivo",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "23 Jun",
+          "day": "Tue",
+          "from": "Bolzano",
+          "to": "Milan",
+          "transport": "🚂 Bolzano→Verona ~1.5h · Verona→Milan ~1.5h",
+          "accom": "TBC — Milan city centre",
+          "desc": "Verona stopover en route",
+          "headline": "🎧 RS Verona self-walk: Arena di Verona",
+          "tips": [
+            "Book The Last Supper TONIGHT"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "🚂 Bolzano→Verona ~1.5h · Verona→Milan ~1.5h",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Milan city centre",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🎧 RS Verona self-walk: Arena di Verona",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "milan",
+      "label": "🇮🇹 Milan",
+      "colour": "#27AE60",
+      "cityFood": [
+        {
+          "text": "🍚 MUST EAT: Risotto alla Milanese",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Parco Sempione morning jog"
+      ],
+      "suggestedSights": [
+        {
+          "title": "The Last Supper (Cenacolo Vinciano)",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Brera neighbourhood lunch",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "24 Jun",
+          "day": "Wed",
+          "from": "Milan",
+          "to": "Milan",
+          "transport": "—",
+          "accom": "TBC — Milan city centre",
+          "desc": "Full day Milan",
+          "headline": "🎧 RS Milan walk: Duomo rooftop → Galleria",
+          "tips": [
+            "Duomo rooftop: book timed entry online"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "—",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Milan city centre",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🎧 RS Milan walk: Duomo rooftop → Galleria",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zurich",
+      "label": "🇨🇭 Zurich",
+      "colour": "#B7770D",
+      "cityFood": [
+        {
+          "text": "🧀 MUST EAT: Cheese fondue",
+          "done": false
+        },
+        {
+          "text": "🍖 Zürcher Geschnetzeltes",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Lake Zurich Seepromenade",
+        "🏃 Limmat River path"
+      ],
+      "suggestedSights": [
+        {
+          "title": "Confiserie Sprüngli",
+          "estTime": "45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Dinner in Old Town",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Rhine Falls day trip",
+          "estTime": "4 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Uetliberg hill",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "25 Jun",
+          "day": "Thu",
+          "from": "Milan",
+          "to": "Zurich",
+          "transport": "🚂 SBB Eurocity ~3.5h",
+          "accom": "TBC — Zurich city centre",
+          "desc": "Morning Milan → arrive Zurich evening",
+          "headline": "🏘 Zurich Altstadt evening",
+          "tips": [
+            "SBB Eurocity: scenic Alpine crossing"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "🚂 SBB Eurocity ~3.5h",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Zurich city centre",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🏘 Zurich Altstadt evening",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "26 Jun",
+          "day": "Fri",
+          "from": "Zurich",
+          "to": "In transit",
+          "transport": "✈ Swiss LX ZRH→LHR 18:30 · ✈ EVA BR LHR→BKK 21:35",
+          "accom": "— (in transit)",
+          "desc": "Full day Zurich — fly evening",
+          "headline": "🎧 RS-style Zurich walk: Lindenhügel viewpoint",
+          "tips": [
+            "Be back by 3pm — flight 18:30"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "✈ Swiss LX ZRH→LHR 18:30 · ✈ EVA BR LHR→BKK 21:35",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "— (in transit)",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🎧 RS-style Zurich walk: Lindenhügel viewpoint",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bangkok",
+      "label": "🇹🇭 Bangkok",
+      "colour": "#B7860B",
+      "cityFood": [
+        {
+          "text": "🍜 MUST EAT: Pad Thai at Thip Samai",
+          "done": false
+        },
+        {
+          "text": "🥭 MUST EAT: Mango sticky rice",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Lumphini Park 5km loop",
+        "🏃 Benchakitti Park loop"
+      ],
+      "suggestedSights": [
+        {
+          "title": "Khao San Road evening",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Grand Palace",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "27 Jun",
+          "day": "Sat",
+          "from": "In transit",
+          "to": "Bangkok",
+          "transport": "✈ Arrive BKK Suvarnabhumi 15:30",
+          "accom": "TBC — Bangkok city",
+          "desc": "Arrive Bangkok — settle in solo",
+          "headline": "🛕 Wat Pho → Chao Phraya Express boat",
+          "tips": [
+            "Sky Bar dress code enforced"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "✈ Arrive BKK Suvarnabhumi 15:30",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Bangkok city",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🛕 Wat Pho → Chao Phraya Express boat",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "28 Jun",
+          "day": "Sun",
+          "from": "Bangkok",
+          "to": "Bangkok",
+          "transport": "✈ Family arr 10:05",
+          "accom": "TBC — Bangkok city",
+          "desc": "Family arrives! ⚠️ EARLY FLIGHT TOMORROW",
+          "headline": "🛍 Chatuchak Weekend Market",
+          "tips": [
+            "Pre-order Grab taxi for 04:30 pickup"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "✈ Family arr 10:05",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "TBC — Bangkok city",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🛍 Chatuchak Weekend Market",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "samui",
+      "label": "🌴 Koh Samui",
+      "colour": "#0E6655",
+      "cityFood": [
+        {
+          "text": "🌴 MUST EAT: Som Tam Thai",
+          "done": false
+        },
+        {
+          "text": "🐟 MUST EAT: Whole grilled fish",
+          "done": false
+        },
+        {
+          "text": "🦑 MUST EAT: Grilled squid",
+          "done": false
+        },
+        {
+          "text": "🍲 MUST EAT: Cook your own Massaman curry",
+          "done": false
+        },
+        {
+          "text": "🥘 MUST EAT: Khao Pad",
+          "done": false
+        },
+        {
+          "text": "🍛 MUST EAT: Gaeng Keow Wan",
+          "done": false
+        },
+        {
+          "text": "🦞 MUST EAT: Whole lobster",
+          "done": false
+        },
+        {
+          "text": "🍜 MUST EAT: Khao Tom",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 Chaweng Beach early morning run",
+        "🏃 Ang Thong island hiking",
+        "🏃 Koh Tao: hike to Mango Viewpoint",
+        "🏃 Hin Lad Waterfall trail",
+        "🏃 Lamai Beach early morning run",
+        "🏃 Chaweng Lake mangrove loop",
+        "🏃 Silver Beach headland trail",
+        "🏃 Sunrise run: Hin Ta & Hin Yai"
+      ],
+      "suggestedSights": [
+        {
+          "title": "Grab local SIM at USM",
+          "estTime": "30 mins",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Sunset drinks on the beach",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Kayaking through sea caves",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Thale Nai crater lake hike",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Na Muang Waterfall 2",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Turtle spotting",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Wat Plai Laem Temple",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Fisherman's Village Bo Phut",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Lamai Beach morning",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Hin Ta & Hin Yai",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Resort pool + Thai massage",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Chaweng Lake kayak tour",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Nikki Beach club afternoon",
+          "estTime": "4 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "West coast sunset cocktails",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Chaweng Night Bazaar",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Farewell dinner",
+          "estTime": "2.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "29 Jun",
+          "day": "Mon",
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "transport": "✈ Bangkok Air BKK→USM 06:05",
+          "accom": "🏨 Homm Hotel",
+          "desc": "Arrive Koh Samui",
+          "headline": "🏖 Chaweng Beach afternoon → Big Buddha Temple",
+          "tips": [
+            "Request early check-in"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "✈ Bangkok Air BKK→USM 06:05",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "🏨 Homm Hotel",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🏖 Chaweng Beach afternoon → Big Buddha Temple",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "30 Jun",
+          "day": "Tue",
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "transport": "— (tour boat)",
+          "accom": "🏨 Homm Hotel",
+          "desc": "Day trip: Ang Thong",
+          "headline": "⛵ Ang Thong Marine Park full day",
+          "tips": [
+            "Book via Blue Star Sailing"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "— (tour boat)",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "🏨 Homm Hotel",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "⛵ Ang Thong Marine Park full day",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "1 Jul",
+          "day": "Wed",
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "transport": "— (speedboat)",
+          "accom": "🏨 Homm Hotel",
+          "desc": "Koh Tao snorkelling",
+          "headline": "🐠 Koh Tao snorkelling — Shark Bay",
+          "tips": [
+            "Na Muang 2: more dramatic than #1"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "— (speedboat)",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "🏨 Homm Hotel",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🐠 Koh Tao snorkelling — Shark Bay",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "2 Jul",
+          "day": "Thu",
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "transport": "—",
+          "accom": "🏨 Homm Hotel",
+          "desc": "Culture & wildlife day",
+          "headline": "🍳 Thai cooking class then 🐘 Elephant Sanctuary",
+          "tips": [
+            "Elephant sanctuary: ~฿2,500pp"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "—",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "🏨 Homm Hotel",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🍳 Thai cooking class then 🐘 Elephant Sanctuary",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "3 Jul",
+          "day": "Fri",
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "transport": "—",
+          "accom": "🏨 Homm Hotel",
+          "desc": "Beach day + Night Market",
+          "headline": "🛍 Fisherman's Village Friday Night Market",
+          "tips": [
+            "Friday Market: arrive 5pm"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "—",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "🏨 Homm Hotel",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🛍 Fisherman's Village Friday Night Market",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "4 Jul",
+          "day": "Sat",
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "transport": "—",
+          "accom": "🏨 Homm Hotel",
+          "desc": "Adventure day",
+          "headline": "🚣 Kayak Chaweng Lake mangroves",
+          "tips": [
+            "Secret Garden: ~30min drive inland"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "—",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "🏨 Homm Hotel",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🚣 Kayak Chaweng Lake mangroves",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "5 Jul",
+          "day": "Sun",
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "transport": "—",
+          "accom": "🏨 Homm Hotel",
+          "desc": "Relaxed beach day",
+          "headline": "🌊 Silver Beach morning",
+          "tips": [
+            "Silver Beach: calm clear water"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "—",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "🏨 Homm Hotel",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🌊 Silver Beach morning",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "6 Jul",
+          "day": "Mon",
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "transport": "—",
+          "accom": "🏨 Homm Hotel",
+          "desc": "Last full day on Samui",
+          "headline": "🌅 Sunrise at Hin Ta & Hin Yai Rocks",
+          "tips": [
+            "Book Grab for 06:30 airport pickup tomorrow"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "—",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "🏨 Homm Hotel",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🌅 Sunrise at Hin Ta & Hin Yai Rocks",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "return",
+      "label": "🛫 Return",
+      "colour": "#2C3E50",
+      "cityFood": [
+        {
+          "text": "🍜 Last Thai meal: Khao Pad at BKK",
+          "done": false
+        },
+        {
+          "text": "🥑 Welcome home: smashed avo",
+          "done": false
+        }
+      ],
+      "cityRun": [
+        "🏃 CentralFestival gym Level 7",
+        "☕ Your own coffee machine"
+      ],
+      "suggestedSights": [
+        {
+          "title": "BKK layover: CentralFestival mall",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Col. Germ lounge",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null
+        },
+        {
+          "title": "Download & back up all photos",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null
+        }
+      ],
+      "days": [
+        {
+          "date": "7 Jul",
+          "day": "Tue",
+          "from": "Koh Samui",
+          "to": "Bangkok",
+          "transport": "✈ Bangkok Air USM→BKK 07:50 · ✈ Jetstar BKK→BNE 21:40",
+          "accom": "— (transit)",
+          "desc": "Fly home via Bangkok",
+          "headline": "🛫 USM 07:50 → BKK 08:55",
+          "tips": [
+            "Jetstar baggage: very strict"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "✈ Bangkok Air USM→BKK 07:50 · ✈ Jetstar BKK→BNE 21:40",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "— (transit)",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🛫 USM 07:50 → BKK 08:55",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        },
+        {
+          "date": "8 Jul",
+          "day": "Wed",
+          "from": "Brisbane",
+          "to": "Brisbane",
+          "transport": "✈ Arrive BNE ~09:30",
+          "accom": "— (home!)",
+          "desc": "Home! 🏠",
+          "headline": "🏠 Welcome back to Brisbane!",
+          "tips": [
+            "Duty-free allowance: 2.25L alcohol"
+          ],
+          "completed": false,
+          "transportCost": "0",
+          "accomCost": "0",
+          "activityCost": "0",
+          "transportItems": [
+            {
+              "text": "✈ Arrive BNE ~09:30",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "— (home!)",
+              "cost": "0"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "🏠 Welcome back to Brisbane!",
+              "cost": "0",
+              "done": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "packing": [
+    {
+      "title": "🏠 Before Leaving Home",
+      "items": [
+        {
+          "text": "Lock all doors and windows",
+          "done": false
+        },
+        {
+          "text": "Pause gym membership",
+          "done": false
+        },
+        {
+          "text": "Setup camera for fish and security",
+          "done": false
+        },
+        {
+          "text": "Store/remove fridge & pantry perishables",
+          "done": false
+        },
+        {
+          "text": "Turn off taps, PowerPoints",
+          "done": false
+        },
+        {
+          "text": "Wrap garage door opener and unplug power",
+          "done": false
+        }
+      ]
+    },
+    {
+      "title": "🧳 Carry-On: Clothes",
+      "items": [
+        {
+          "text": "Travel day outfit: Long pants, Shirt, Hoodie, Socks, Shoes",
+          "done": false
+        },
+        {
+          "text": "T-shirts, Tank Tops",
+          "done": false
+        },
+        {
+          "text": "Shorts, Skirts",
+          "done": false
+        },
+        {
+          "text": "Pants",
+          "done": false
+        },
+        {
+          "text": "Layers (hoodie, sweater, cardigan)",
+          "done": false
+        },
+        {
+          "text": "Swim suit",
+          "done": false
+        },
+        {
+          "text": "Dress",
+          "done": false
+        },
+        {
+          "text": "Socks",
+          "done": false
+        },
+        {
+          "text": "Underwear",
+          "done": false
+        },
+        {
+          "text": "Bras",
+          "done": false
+        },
+        {
+          "text": "Pyjamas, Sleepwear",
+          "done": false
+        },
+        {
+          "text": "Formal Wear",
+          "done": false
+        },
+        {
+          "text": "Hat",
+          "done": false
+        },
+        {
+          "text": "Workout outfit",
+          "done": false
+        },
+        {
+          "text": "Belt",
+          "done": false
+        },
+        {
+          "text": "Other accessories / Earrings",
+          "done": false
+        }
+      ]
+    },
+    {
+      "title": "🧳 Carry-On: Shoes & Misc",
+      "items": [
+        {
+          "text": "Dress shoes",
+          "done": false
+        },
+        {
+          "text": "Sandals/Crocs",
+          "done": false
+        },
+        {
+          "text": "Presents / Card",
+          "done": false
+        },
+        {
+          "text": "Crossbody/Sling Bag/Purse",
+          "done": false
+        },
+        {
+          "text": "Reusable tote bag",
+          "done": false
+        },
+        {
+          "text": "Pillowcase for used clothes",
+          "done": false
+        },
+        {
+          "text": "Laundry Sheets for washing",
+          "done": false
+        },
+        {
+          "text": "Raincoat/Umbrella",
+          "done": false
+        }
+      ]
+    },
+    {
+      "title": "🧳 Carry-On: Dry Toiletries",
+      "items": [
+        {
+          "text": "Floss",
+          "done": false
+        },
+        {
+          "text": "Toothbrush",
+          "done": false
+        },
+        {
+          "text": "Razor (Cartidge), Shaving",
+          "done": false
+        },
+        {
+          "text": "Bar of Soap",
+          "done": false
+        },
+        {
+          "text": "Cotton pad, q-tips",
+          "done": false
+        },
+        {
+          "text": "Nail clippers/tweezers",
+          "done": false
+        },
+        {
+          "text": "Personal Hygiene items (Pads)",
+          "done": false
+        },
+        {
+          "text": "Makeup",
+          "done": false
+        },
+        {
+          "text": "Hair clips, hair ties, bobby pins",
+          "done": false
+        },
+        {
+          "text": "Hair Brush/comb/tools",
+          "done": false
+        },
+        {
+          "text": "Bandaids, Electrolyte packs",
+          "done": false
+        },
+        {
+          "text": "Body wipes",
+          "done": false
+        },
+        {
+          "text": "Panadol / Nurofen",
+          "done": false
+        },
+        {
+          "text": "Vitamins / Tablets",
+          "done": false
+        }
+      ]
+    },
+    {
+      "title": "🎒 Personal Item: Essentials",
+      "items": [
+        {
+          "text": "TRS Claim + Items",
+          "done": false
+        },
+        {
+          "text": "Passport + [Copy + Tracker]",
+          "done": false
+        },
+        {
+          "text": "Reservations + Itineraries + Insurance",
+          "done": false
+        },
+        {
+          "text": "Wallet/Purse + Local cash + Cards",
+          "done": false
+        },
+        {
+          "text": "Phone",
+          "done": false
+        },
+        {
+          "text": "Sunglasses & Case",
+          "done": false
+        }
+      ]
+    },
+    {
+      "title": "🎒 Personal Item: Flight Items",
+      "items": [
+        {
+          "text": "Travel pillow / Foot sling",
+          "done": false
+        },
+        {
+          "text": "Phone holder (watch movies)",
+          "done": false
+        },
+        {
+          "text": "Compression socks, Slippers",
+          "done": false
+        },
+        {
+          "text": "Disposable Toothbrush kit",
+          "done": false
+        },
+        {
+          "text": "Eye mask, Eye Drops",
+          "done": false
+        },
+        {
+          "text": "Ear plugs, Breath Fresheners",
+          "done": false
+        },
+        {
+          "text": "Snacks, TravelCalm",
+          "done": false
+        },
+        {
+          "text": "Headphones/Airpods",
+          "done": false
+        },
+        {
+          "text": "Airfly/Bluetooth Adapter",
+          "done": false
+        },
+        {
+          "text": "Book/Kindle",
+          "done": false
+        },
+        {
+          "text": "Water bottle",
+          "done": false
+        }
+      ]
+    },
+    {
+      "title": "🎒 Personal Item: Tech",
+      "items": [
+        {
+          "text": "eSIM (Installed)",
+          "done": false
+        },
+        {
+          "text": "Mobile downloads (Movies, Shows)",
+          "done": false
+        },
+        {
+          "text": "Phone charger",
+          "done": false
+        },
+        {
+          "text": "Power cables, Cords",
+          "done": false
+        },
+        {
+          "text": "Power Adapter",
+          "done": false
+        },
+        {
+          "text": "Power bank",
+          "done": false
+        },
+        {
+          "text": "Pen",
+          "done": false
+        },
+        {
+          "text": "Laptop",
+          "done": false
+        },
+        {
+          "text": "Luggage Trackers",
+          "done": false
+        }
+      ]
+    },
+    {
+      "title": "💧 1 Litre Clear Bag (Liquids <100ml)",
+      "items": [
+        {
+          "text": "Clear 1 litre bag",
+          "done": false
+        },
+        {
+          "text": "Cologne/Perfume",
+          "done": false
+        },
+        {
+          "text": "Toothpaste",
+          "done": false
+        },
+        {
+          "text": "Face wash",
+          "done": false
+        },
+        {
+          "text": "Shampoo & Conditioner",
+          "done": false
+        },
+        {
+          "text": "Leave-in conditioner",
+          "done": false
+        },
+        {
+          "text": "Micellar Water or Makeup Remover",
+          "done": false
+        },
+        {
+          "text": "Sunscreen",
+          "done": false
+        },
+        {
+          "text": "Deodorant (Wrap cloth-tape repairs)",
+          "done": false
+        },
+        {
+          "text": "Moisturiser",
+          "done": false
+        },
+        {
+          "text": "Liquids pouches (for above liquids)",
+          "done": false
+        },
+        {
+          "text": "Toiletry skins (for liquid no spill)",
+          "done": false
+        }
+      ]
+    }
+  ]
+}

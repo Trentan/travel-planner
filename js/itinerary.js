@@ -135,15 +135,18 @@ function buildItinerary() {
       <div class="leg-content">
     `;
 
-    html += `<div class="city-dashboard">
-      <div class="city-block">
-        <h4>🍔 City Food Quests</h4>
-        <ul>${(leg.cityFood || []).map((f, i) => `<li class="quest-item"><button class="del-btn" title="Delete Food" onclick="deleteFood(${legIndex}, ${i})">×</button><input type="checkbox" ${f.done ? 'checked' : ''} onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"><span contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span></li>`).join('')}</ul>
-        <button class="add-btn" onclick="addFood(${legIndex})">+ Add Food</button>
-      </div>
-      <div class="city-block">
-        <h4>🏃 City Running/Fitness</h4>
-        <ul>${(leg.cityRun || []).map((r, i) => {
+  html += `<div class="city-dashboard">
+  <div class="city-block city-block-food">
+    <h4>🍔 City Food Quests</h4>
+    <ul class="food-list">${(leg.cityFood || []).map((f, i) => `<li class="quest-item"><button class="del-btn" title="Delete Food" onclick="deleteFood(${legIndex}, ${i})">×</button><input type="checkbox" ${f.done ? 'checked' : ''} onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"><span contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span></li>`).join('')}</ul>
+    <button class="add-btn" onclick="addFood(${legIndex})">+ Add Food</button>
+  </div>
+  <div class="city-block city-block-activities">
+    <h4>📌 Suggested Activities</h4>
+    <div class="activities-columns">
+      <div class="activity-col">
+        <h5>🏃 Running/Fitness</h5>
+        <ul class="activity-list">${(leg.cityRun || []).map((r, i) => {
           const isAssigned = r.assignedDayIdx !== null && r.assignedDayIdx !== undefined;
           let isCompleted = false; let dayLabel = '';
           if (isAssigned) {
@@ -152,13 +155,13 @@ function buildItinerary() {
             if (matchedActivity && matchedActivity.done) isCompleted = true;
           }
           const badgeColor = isCompleted ? '#27AE60' : '#E67E22'; const badgeIcon = isCompleted ? '✓' : '⏳'; const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : `Scheduled for ${dayLabel}`;
-          return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'}" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'run', ${i})"` : ''}><button class="del-btn" title="Delete Run" onclick="deleteRun(${legIndex}, ${i})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to a day">⠿</span>` : `<span class="assigned-badge" style="background: ${badgeColor};" title="${badgeHoverText}">${badgeIcon} ${dayLabel}</span>`}<div style="flex-grow:1; ${!isAssigned && isEditMode ? 'cursor:grab;' : ''}"><span contenteditable="${!isAssigned && isEditMode}" onblur="updateRunPool(${legIndex}, ${i}, 'title', this.innerText)" style="${isCompleted ? 'text-decoration:line-through;' : ''}">${r.title}</span><div class="sight-meta"><span class="sight-tag" title="Estimated Time">⏱ <span contenteditable="${!isAssigned && isEditMode}" onblur="updateRunPool(${legIndex}, ${i}, 'estTime', this.innerText)">${r.estTime}</span></span><span class="sight-tag" title="Estimated Cost">💰 $<span contenteditable="${!isAssigned && isEditMode}" onblur="updateRunPool(${legIndex}, ${i}, 'estCost', this.innerText)">${r.estCost}</span></span></div></div></li>`;
+          return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'run', ${i})"` : ''}><button class="del-btn" title="Delete" onclick="deleteRun(${legIndex}, ${i})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge" style="background: ${badgeColor};" title="${badgeHoverText}">${badgeIcon}</span>`}<span contenteditable="${!isAssigned && isEditMode}" onblur="updateRunPool(${legIndex}, ${i}, 'title', this.innerText)" style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${r.title}</span><span class="sight-inline-meta">⏱ ${r.estTime} · $${r.estCost}</span></li>`;
         }).join('')}</ul>
         <button class="add-btn" onclick="addRun(${legIndex})">+ Add Run</button>
       </div>
-      <div class="city-block">
-        <h4>📌 Suggested Sights Pool</h4>
-        <ul>${(leg.suggestedSights || []).map((s, i) => {
+      <div class="activity-col">
+        <h5>🏛️ Sights</h5>
+        <ul class="activity-list">${(leg.suggestedSights || []).map((s, i) => {
           const isAssigned = s.assignedDayIdx !== null && s.assignedDayIdx !== undefined;
           let isCompleted = false; let dayLabel = '';
           if (isAssigned) {
@@ -167,16 +170,18 @@ function buildItinerary() {
             if (matchedActivity && matchedActivity.done) isCompleted = true;
           }
           const badgeColor = isCompleted ? '#27AE60' : '#E67E22'; const badgeIcon = isCompleted ? '✓' : '⏳'; const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : `Scheduled for ${dayLabel}`;
-          return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'}" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'sight', ${i})"` : ''}><button class="del-btn" title="Delete Sight" onclick="deleteSight(${legIndex}, ${i})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to a day">⠿</span>` : `<span class="assigned-badge" style="background: ${badgeColor};" title="${badgeHoverText}">${badgeIcon} ${dayLabel}</span>`}<div style="flex-grow:1; ${!isAssigned && isEditMode ? 'cursor:grab;' : ''}"><span contenteditable="${!isAssigned && isEditMode}" onblur="updateSightPool(${legIndex}, ${i}, 'title', this.innerText)" style="${isCompleted ? 'text-decoration:line-through;' : ''}">${s.title}</span><div class="sight-meta"><span class="sight-tag" title="Estimated Time">⏱ <span contenteditable="${!isAssigned && isEditMode}" onblur="updateSightPool(${legIndex}, ${i}, 'estTime', this.innerText)">${s.estTime}</span></span><span class="sight-tag" title="Estimated Cost">💰 $<span contenteditable="${!isAssigned && isEditMode}" onblur="updateSightPool(${legIndex}, ${i}, 'estCost', this.innerText)">${s.estCost}</span></span></div></div></li>`;
+          return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'sight', ${i})"` : ''}><button class="del-btn" title="Delete" onclick="deleteSight(${legIndex}, ${i})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge" style="background: ${badgeColor};" title="${badgeHoverText}">${badgeIcon}</span>`}<span contenteditable="${!isAssigned && isEditMode}" onblur="updateSightPool(${legIndex}, ${i}, 'title', this.innerText)" style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${s.title}</span><span class="sight-inline-meta">⏱ ${s.estTime} · $${s.estCost}</span></li>`;
         }).join('')}</ul>
         <button class="add-btn" onclick="addSight(${legIndex})">+ Add Sight</button>
       </div>
-      <div class="city-block">
-        <h4>💡 General City Tips</h4>
-        <ul>${(leg.legTips || []).map((t, i) => `<li class="quest-item"><button class="del-btn" title="Delete Tip" onclick="deleteLegTip(${legIndex}, ${i})">×</button><span contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t}</span></li>`).join('')}</ul>
-        <button class="add-btn" onclick="addLegTip(${legIndex})">+ Add Tip</button>
-      </div>
-    </div>`;
+    </div>
+  </div>
+  <div class="city-block city-block-tips">
+    <h4>💡 City Tips</h4>
+    <ul class="tips-list">${(leg.legTips || []).map((t, i) => `<li class="tip-item"><span class="tip-bulb">💡</span><span contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t}</span><button class="del-btn" title="Delete Tip" onclick="deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
+    <button class="add-btn" onclick="addLegTip(${legIndex})">+ Add Tip</button>
+  </div>
+  </div>`;
 
     leg.days.forEach((day, dayIndex) => {
       const cityHTML = day.from === day.to ? `<span class="city-same">${day.from}</span>` : `${day.from} <span style="opacity:0.4">→</span> ${day.to}`;

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk *)",
+      "Bash(git checkout *)",
+      "Bash(set -e)"
+    ]
+  }
+}
