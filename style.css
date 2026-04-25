@@ -203,12 +203,32 @@ main {
   grid-column: span 1;
   margin-top: -1px;
   padding-top: 0;
+  /* Align to parent grid */
+}
+  grid-column: span 1;
+  margin-top: -1px;
+  padding-top: 0;
+  /* Align to parent grid */
+}
+  grid-column: span 1;
+  margin-top: -1px;
+  padding-top: 0;
 }
   grid-column: span 2;
 }
 
 @media (max-width: 900px) {
   .city-block-activities {
+  grid-column: span 1;
+  margin-top: -1px;
+  padding-top: 0;
+  /* Align to parent grid */
+}
+  grid-column: span 1;
+  margin-top: -1px;
+  padding-top: 0;
+  /* Align to parent grid */
+}
   grid-column: span 1;
   margin-top: -1px;
   padding-top: 0;
@@ -219,6 +239,16 @@ main {
 
 @media (max-width: 600px) {
   .city-block-activities {
+  grid-column: span 1;
+  margin-top: -1px;
+  padding-top: 0;
+  /* Align to parent grid */
+}
+  grid-column: span 1;
+  margin-top: -1px;
+  padding-top: 0;
+  /* Align to parent grid */
+}
   grid-column: span 1;
   margin-top: -1px;
   padding-top: 0;
