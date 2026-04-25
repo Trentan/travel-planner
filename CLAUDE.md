@@ -182,6 +182,11 @@ All active work items live in **`TODO.md`**. Live session state lives in **`todo
   - What the next concrete step is (from SESSION.md if resuming)
   - What files will be touched
   - An estimated commit count for this sub-task
+  
+    Immediately write that status report to `todo/SESSION.md` before touching any code —
+    even before the first commit exists. This ensures a dropout at any point after
+    orientation leaves a recoverable state.
+
 7. If you cannot confidently determine where things left off — **ask, don't guess**
 8. Wait for user confirmation before writing any code
 
@@ -212,7 +217,7 @@ All active work items live in **`TODO.md`**. Live session state lives in **`todo
 
 ---
 
-**SESSION.md format — write this after every single commit:**
+**SESSION.md format — write this after orientation AND after every commit:**
 
 ```markdown
 ## Session State
