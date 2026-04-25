@@ -273,21 +273,7 @@ function sortLegs() {
   buildItinerary();
 }
 
-const navObserver = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const id = entry.target.id.replace('leg-', '');
-      document.querySelectorAll('.nav-btn').forEach(b => {
-        const leg = appData.find(l => l.id === id);
-        const isActive = b.dataset.leg === id;
-        b.classList.toggle('active', isActive);
-        b.style.borderBottomColor = isActive && leg ? leg.colour : 'transparent';
-      });
-    }
-  });
-}, { threshold: 0.15 });
-
+// Navigation observer removed - leg-nav was deprecated in favor of city filter
 function reObserveLegs() {
-  navObserver.disconnect();
-  document.querySelectorAll('.leg').forEach(el => navObserver.observe(el));
+  // No-op - kept for backwards compatibility
 }

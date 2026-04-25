@@ -320,7 +320,8 @@ function buildCityNav() {
     const btn = document.createElement('button');
     btn.className = 'city-nav-btn' + (filter === city.id ? ' active' : '');
     btn.setAttribute('data-city', city.id);
-    btn.innerHTML = `<span>📍 ${city.name}</span>`;
+    const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '📍';
+    btn.innerHTML = `<span>${flag} ${city.name}</span>`;
     btn.onclick = () => selectCityFilter(city.id, btn);
     navList.appendChild(btn);
   });

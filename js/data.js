@@ -59,11 +59,183 @@ function getCityIdByName(cityName) {
   return city ? city.id : '';
 }
 
+// Add or update a city
+function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '') {
+  if (!cityName) return null;
+
+  // Check if city already exists
+  const existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase().trim());
+  if (existing) {
+    // Update existing city
+    if (country) existing.country = country;
+    if (dateFrom && dateFrom < existing.dateFrom) existing.dateFrom = dateFrom;
+    if (dateTo && dateTo > existing.dateTo) existing.dateTo = dateTo;
+    return existing;
+  }
+
+  // Create new city
+  const newCity = {
+    id: 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+    name: cityName,
+    country: country,
+    dateFrom: dateFrom,
+    dateTo: dateTo
+  };
+  citiesData.push(newCity);
+  return newCity;
+}
+
+// Delete a city by ID
+function deleteCity(cityId) {
+  if (!cityId) return false;
+
+  const index = citiesData.findIndex(c => c.id === cityId);
+  if (index === -1) return false;
+
+  // Remove from cities array
+  citiesData.splice(index, 1);
+
+  // Clear cityId references from all entities
+  appData.forEach(leg => {
+    // Clear legTips cityId
+    (leg.legTips || []).forEach(tip => {
+      if (tip.cityId === cityId) tip.cityId = '';
+    });
+    // Clear cityFood cityId
+    (leg.cityFood || []).forEach(item => {
+      if (item.cityId === cityId) item.cityId = '';
+    });
+    // Clear suggestedActivities cityId
+    (leg.suggestedActivities || []).forEach(act => {
+      if (act.cityId === cityId) act.cityId = '';
+    });
+    // Clear day items cityId
+    leg.days.forEach(day => {
+      (day.accomItems || []).forEach(item => {
+        if (item.cityId === cityId) item.cityId = '';
+      });
+      (day.activityItems || []).forEach(item => {
+        if (item.cityId === cityId) item.cityId = '';
+      });
+      // Clear transport items (accomItems array check above)
+    });
+  });
+
+  // Clear from journeys
+  (journeys || []).forEach(j => {
+    if (j.fromCityId === cityId) j.fromCityId = '';
+    if (j.toCityId === cityId) j.toCityId = '';
+  });
+
+  return true;
+}
+
+// Get home location (departure/arrival city)
+function getHomeLocation() {
+  // Find first day with 'Home' in from location
+  let homeDeparture = null;
+  let homeReturn = null;
+
+  // Check all legs for Home references
+  appData.forEach(leg => {
+    leg.days.forEach(day => {
+      if (day.from === 'Home') {
+        homeDeparture = day.to;
+      }
+      if (day.to === 'Home') {
+        homeReturn = day.from;
+      }
+    });
+  });
+
+  return {
+    departure: homeDeparture,
+    return: homeReturn
+  };
+}
+
+// Check if a city is the home location (first departure or last return)
+function isHomeCity(cityName) {
+  const home = getHomeLocation();
+  return cityName === home.departure || cityName === home.return;
+}
+
 // Get city name by ID
 function getCityNameById(cityId) {
   if (!cityId) return '';
   const city = citiesData.find(c => c.id === cityId);
   return city ? city.name : '';
+}
+
+// Country flag emoji mapping (common travel destinations)
+const COUNTRY_FLAGS = {
+  'Australia': '🇦🇺',
+  'Austria': '🇦🇹',
+  'Bangkok': '🇹🇭',  // Thailand
+  'Thailand': '🇹🇭',
+  'Bratislava': '🇸🇰', // Slovakia
+  'Slovakia': '🇸🇰',
+  'Brisbane': '🇦🇺',
+  'Czech Republic': '🇨🇿',
+  'Czechia': '🇨🇿',
+  'Prague': '🇨🇿',
+  'Germany': '🇩🇪',
+  'Munich': '🇩🇪',
+  'Nuremberg': '🇩🇪',
+  'Italy': '🇮🇹',
+  'Milan': '🇮🇹',
+  'Innsbruck': '🇦🇹',
+  'Bolzano': '🇮🇹',
+  'Switzerland': '🇨🇭',
+  'Zurich': '🇨🇭',
+  'Taiwan': '🇹🇼',
+  'Taipei': '🇹🇼',
+  'Vienna': '🇦🇹',
+  'Austria': '🇦🇹',
+  'Koh Samui': '🇹🇭',
+  'Samui': '🇹🇭',
+  'UK': '🇬🇧',
+  'United Kingdom': '🇬🇧',
+  'London': '🇬🇧',
+  'England': '🇬🇧',
+  'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  'France': '🇫🇷',
+  'Paris': '🇫🇷',
+  'Spain': '🇪🇸',
+  'Barcelona': '🇪🇸',
+  'Netherlands': '🇳🇱',
+  'Amsterdam': '🇳🇱',
+  'Greece': '🇬🇷',
+  'Athens': '🇬🇷',
+  'Japan': '🇯🇵',
+  'Tokyo': '🇯🇵',
+  'USA': '🇺🇸',
+  'United States': '🇺🇸',
+  'New York': '🇺🇸',
+  'Home': '🏠'
+};
+
+// Get flag emoji for a city (based on city name or country)
+function getCityFlag(cityName) {
+  if (!cityName) return '📍';
+  // Direct city match
+  if (COUNTRY_FLAGS[cityName]) return COUNTRY_FLAGS[cityName];
+  // Check citiesData for country
+  const city = citiesData.find(c => c.name === cityName);
+  if (city && city.country && COUNTRY_FLAGS[city.country]) {
+    return COUNTRY_FLAGS[city.country];
+  }
+  return '📍';
+}
+
+// Set country for a city
+function setCityCountry(cityId, country) {
+  const city = citiesData.find(c => c.id === cityId);
+  if (city) {
+    city.country = country;
+    return true;
+  }
+  return false;
 }
 
 // Migrate leg-level entities to include cityId
