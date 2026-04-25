@@ -67,12 +67,18 @@ function saveJourneys() {
 
 // Create a new journey from transport item data
 function createJourneyFromTransportItem(item, legId, dayDate, fromLoc, toLoc) {
+  // Lookup city IDs from citiesData
+  const fromCity = citiesData.find(c => c.name === fromLoc);
+  const toCity = citiesData.find(c => c.name === toLoc);
+
   const journey = {
     id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
     legId: legId,
     dayDate: dayDate,
     fromLocation: fromLoc,
     toLocation: toLoc,
+    fromCityId: fromCity ? fromCity.id : '',
+    toCityId: toCity ? toCity.id : '',
     departureDate: '',
     departureTime: '',
     arrivalDate: '',
@@ -581,6 +587,24 @@ function saveJourneyForm(editId = '') {
 // Initialize on load
 if (typeof appData !== 'undefined') {
   initJourneys();
+}
+
+// Migrate journeys to link cities (call once on app init)
+function migrateJourneyCityIds() {
+  let updated = 0;
+  journeys.forEach(j => {
+    if (!j.fromCityId || !j.toCityId) {
+      const fromCity = citiesData.find(c => c.name === j.fromLocation);
+      const toCity = citiesData.find(c => c.name === j.toLocation);
+      if (fromCity) j.fromCityId = fromCity.id;
+      if (toCity) j.toCityId = toCity.id;
+      updated++;
+    }
+  });
+  if (updated > 0) {
+    saveJourneys();
+    console.log(`[Journeys] Migrated ${updated} journeys with city IDs`);
+  }
 }
 
 // Format date for input

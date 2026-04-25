@@ -1,12 +1,133 @@
 let appData = [];
 let packingData = [];
 let leaveHomeData = [];
+let citiesData = []; // City entities for filtering/grouping - { id, name, country, dateFrom, dateTo }
 let titleData = { title: "✈ New Trip Plan", subtitle: "Click here to add your trip subtitle/description" };
 let currentFileName = "Default Template";
 
 // Journeys data - make global so all modules can access
 var journeys = [];
 window.journeys = journeys;
+
+// Extract unique cities from itinerary data
+function extractCitiesFromItinerary() {
+  const cityMap = new Map();
+
+  appData.forEach(leg => {
+    leg.days.forEach(day => {
+      const from = day.from?.trim() || '';
+      const to = day.to?.trim() || '';
+      const date = day.date;
+
+      // Skip generic/placeholder values
+      const skipList = ['Home', 'In transit', 'Between cities', 'TBC', ''];
+
+      [from, to].forEach(cityName => {
+        if (!skipList.includes(cityName) && !cityMap.has(cityName)) {
+          cityMap.set(cityName, {
+            id: 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+            name: cityName,
+            country: '',
+            dateFrom: date,
+            dateTo: date
+          });
+        }
+      });
+
+      // Update date ranges for existing cities
+      [from, to].forEach(cityName => {
+        if (cityMap.has(cityName)) {
+          const city = cityMap.get(cityName);
+          if (date < city.dateFrom) city.dateFrom = date;
+          if (date > city.dateTo) city.dateTo = date;
+        }
+      });
+    });
+  });
+
+  return Array.from(cityMap.values());
+}
+
+// Get city ID by name (case insensitive)
+function getCityIdByName(cityName) {
+  if (!cityName) return '';
+  const city = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase().trim());
+  return city ? city.id : '';
+}
+
+// Get city name by ID
+function getCityNameById(cityId) {
+  if (!cityId) return '';
+  const city = citiesData.find(c => c.id === cityId);
+  return city ? city.name : '';
+}
+
+// Migrate leg-level entities to include cityId
+function migrateLegCityIds() {
+  appData.forEach(leg => {
+    // Determine the primary city for this leg from the days
+    let primaryCityId = '';
+    const cityNames = new Set();
+    leg.days.forEach(day => {
+      if (day.to && !['Home', 'In transit', 'Between cities', 'TBC', ''].includes(day.to)) {
+        cityNames.add(day.to);
+      }
+      if (day.from && !['Home', 'In transit', 'Between cities', 'TBC', ''].includes(day.from)) {
+        cityNames.add(day.from);
+      }
+    });
+    // Use the first city name found
+    if (cityNames.size > 0) {
+      primaryCityId = getCityIdByName(Array.from(cityNames)[0]);
+    }
+
+    // Migrate legTips - add cityId if not present
+    if (leg.legTips) {
+      leg.legTips = leg.legTips.map(tip => {
+        if (typeof tip === 'string') {
+          return { text: tip, cityId: primaryCityId };
+        }
+        if (!tip.cityId) tip.cityId = primaryCityId;
+        return tip;
+      });
+    }
+
+    // Migrate cityFood - add cityId if not present
+    if (leg.cityFood) {
+      leg.cityFood = leg.cityFood.map(item => {
+        if (!item.cityId) item.cityId = primaryCityId;
+        return item;
+      });
+    }
+
+    // Migrate suggestedActivities - add cityId if not present
+    if (leg.suggestedActivities) {
+      leg.suggestedActivities = leg.suggestedActivities.map(act => {
+        if (!act.cityId) act.cityId = primaryCityId;
+        return act;
+      });
+    }
+
+    // Migrate day-level items (accomItems, activityItems)
+    if (leg.days) {
+      leg.days.forEach(day => {
+        const dayCityId = getCityIdByName(day.to) || primaryCityId;
+
+        if (day.accomItems) {
+          day.accomItems.forEach(item => {
+            if (!item.cityId) item.cityId = dayCityId;
+          });
+        }
+
+        if (day.activityItems) {
+          day.activityItems.forEach(item => {
+            if (!item.cityId) item.cityId = dayCityId;
+          });
+        }
+      });
+    }
+  });
+}
 
 function initData() {
   // Load journeys first, before any rendering happens
@@ -101,6 +222,16 @@ function initData() {
   if (savedLeaveHome) { leaveHomeData = JSON.parse(savedLeaveHome); }
   else { leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME)); }
 
+  const savedCities = localStorage.getItem('travelApp_cities_v1');
+  if (savedCities) {
+    try {
+      citiesData = JSON.parse(savedCities);
+    } catch (e) {
+      console.error('[Cities] Failed to parse saved cities:', e);
+      citiesData = [];
+    }
+  }
+
   const savedMeta = localStorage.getItem('travelApp_meta_template');
   if (savedMeta) { titleData = JSON.parse(savedMeta); }
 
@@ -113,6 +244,20 @@ function initData() {
 
   // Display last export/import timestamp
   displayTimestampStatus();
+
+  // Auto-extract cities if none exist
+  if (!citiesData || citiesData.length === 0) {
+    citiesData = extractCitiesFromItinerary();
+    console.log(`[Cities] Auto-extracted ${citiesData.length} cities from itinerary`);
+  }
+
+  // Migrate journeys to link city IDs (if migration function exists)
+  if (typeof migrateJourneyCityIds === 'function') {
+    migrateJourneyCityIds();
+  }
+
+  // Migrate leg-level entities with city IDs
+  migrateLegCityIds();
 
   saveData(false);
 
