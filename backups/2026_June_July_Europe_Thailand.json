@@ -41,7 +41,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Kangaroo Point Cliffs path — last Brisbane run if time allows",
+          "title": "Kangaroo Point Cliffs path — last Brisbane run if time allows",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -105,7 +105,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Elephant Mountain trail",
+          "title": "Elephant Mountain trail",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -181,7 +181,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Prater Hauptallee — 4.5km straight tree-lined boulevard",
+          "title": "Prater Hauptallee — 4.5km straight tree-lined boulevard",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -292,7 +292,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Danube Promenade",
+          "title": "Danube Promenade",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -300,7 +300,7 @@
           "cityId": "city-bratislava"
         },
         {
-          "title": "🏃 Devín Castle loop",
+          "title": "Devín Castle loop",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -431,7 +431,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Malá Strana → Prague Castle steps",
+          "title": "Malá Strana → Prague Castle steps",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -439,7 +439,7 @@
           "cityId": "city-prague"
         },
         {
-          "title": "🏃 Vyšehrad 5km loop",
+          "title": "Vyšehrad 5km loop",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -527,7 +527,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Stadtpark Nuremberg",
+          "title": "Stadtpark Nuremberg",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -708,7 +708,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 English Garden Eisbach circuit",
+          "title": "English Garden Eisbach circuit",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -716,7 +716,7 @@
           "cityId": "city-munich"
         },
         {
-          "title": "🏃 Nymphenburg Palace canal path",
+          "title": "Nymphenburg Palace canal path",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -724,7 +724,7 @@
           "cityId": "city-munich"
         },
         {
-          "title": "🏃 Isar riverside path",
+          "title": "Isar riverside path",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -826,7 +826,7 @@
           "to": "Innsbruck",
           "accom": "TBC — Innsbruck old town",
           "desc": "Into the Austrian Alps",
-          "headline": "🏃 Innpromenade parkrun 8:45am SAT",
+          "headline": "Innpromenade parkrun 8:45am SAT",
           "completed": false,
           "accomCost": "0",
           "activityCost": "0",
@@ -841,7 +841,7 @@
           ],
           "activityItems": [
             {
-              "text": "🏃 Innpromenade parkrun 8:45am SAT",
+              "text": "Innpromenade parkrun 8:45am SAT",
               "cost": "0",
               "done": false,
               "time": "1 hr",
@@ -852,7 +852,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Parkrun done! Afternoon: Inn riverside stroll",
+          "title": "Parkrun done! Afternoon: Inn riverside stroll",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -963,7 +963,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Adige riverside path",
+          "title": "Adige riverside path",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -971,7 +971,7 @@
           "cityId": "city-bolzano"
         },
         {
-          "title": "🏃 Trail run between cable car stations",
+          "title": "Trail run between cable car stations",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1059,7 +1059,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Adige riverside path",
+          "title": "Adige riverside path",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1135,7 +1135,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Parco Sempione morning jog",
+          "title": "Parco Sempione morning jog",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1246,7 +1246,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Lake Zurich Seepromenade",
+          "title": "Lake Zurich Seepromenade",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1254,7 +1254,7 @@
           "cityId": "city-zurich"
         },
         {
-          "title": "🏃 Limmat River path",
+          "title": "Limmat River path",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1385,7 +1385,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Lumphini Park 5km loop",
+          "title": "Lumphini Park 5km loop",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1393,7 +1393,7 @@
           "cityId": "city-bangkok"
         },
         {
-          "title": "🏃 Benchakitti Park loop",
+          "title": "Benchakitti Park loop",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1718,7 +1718,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 Chaweng Beach early morning run",
+          "title": "Chaweng Beach early morning run",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1726,7 +1726,7 @@
           "cityId": "city-koh-samui"
         },
         {
-          "title": "🏃 Ang Thong island hiking",
+          "title": "Ang Thong island hiking",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1734,7 +1734,7 @@
           "cityId": "city-koh-samui"
         },
         {
-          "title": "🏃 Koh Tao: hike to Mango Viewpoint",
+          "title": "Koh Tao: hike to Mango Viewpoint",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1742,7 +1742,7 @@
           "cityId": "city-koh-samui"
         },
         {
-          "title": "🏃 Hin Lad Waterfall trail",
+          "title": "Hin Lad Waterfall trail",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1750,7 +1750,7 @@
           "cityId": "city-koh-samui"
         },
         {
-          "title": "🏃 Lamai Beach early morning run",
+          "title": "Lamai Beach early morning run",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1758,7 +1758,7 @@
           "cityId": "city-koh-samui"
         },
         {
-          "title": "🏃 Chaweng Lake mangrove loop",
+          "title": "Chaweng Lake mangrove loop",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1766,7 +1766,7 @@
           "cityId": "city-koh-samui"
         },
         {
-          "title": "🏃 Silver Beach headland trail",
+          "title": "Silver Beach headland trail",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1774,7 +1774,7 @@
           "cityId": "city-koh-samui"
         },
         {
-          "title": "🏃 Sunrise run: Hin Ta & Hin Yai",
+          "title": "Sunrise run: Hin Ta & Hin Yai",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
@@ -2025,7 +2025,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🏃 CentralFestival gym Level 7",
+          "title": "CentralFestival gym Level 7",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",

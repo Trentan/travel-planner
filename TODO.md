@@ -38,6 +38,7 @@ Read this file at the start of every session. Update status blocks and checkboxe
 **Next:** `item-3a`
 
 - [ ] a) style.css has errors displaying, fix and tidy and confirm look and layout good
+- [ ] b) The title and subtitile from .json is not being applied and it is not easy to edit / readable (white on white) when editing
 
 ---
 
@@ -78,7 +79,7 @@ Read this file at the start of every session. Update status blocks and checkboxe
 - [x] j) The city selection in itinerary view is scrolling just a bit to far, the day and city name should still be in view (not just the city tips etc)
 - [ ] k) City color randomization - assign random color for new cities, maybe make submenu and map match city color scheme
 - [ ] l) You can perhaps also - rename the departure leg to start - perhaps make an option to handle it better. Eg make it like a city (so you can select Start or Return options - they are the only special ones which are not city specific (but represent an actual leg not a city). 
-- [ ] m) I don't know how to handle adding days in legs etc, perhaps add legs should have the multiple cities and days handled when adding (eg city from, to, days / dates from to). 
+- [ ] m) I don't know how to handle adding days in legs etc., perhaps add legs should have the multiple cities and days handled when adding (eg city from, to, days / dates from to). Also maybe warn about conflict if a day already help - this might need more questions to work out a logical solution
 
 ---
 

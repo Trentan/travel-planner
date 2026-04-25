@@ -315,11 +315,14 @@ function buildCityNav() {
     </button>
   `;
 
-  // Add city buttons
+  // Add city buttons with color indicators
   citiesData.forEach(city => {
     const btn = document.createElement('button');
     btn.className = 'city-nav-btn' + (filter === city.id ? ' active' : '');
     btn.setAttribute('data-city', city.id);
+    // Add vertical color bar to button
+    const color = city.colour || '#2C3E50';
+    btn.style.borderLeft = `4px solid ${color}`;
     const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '📍';
     btn.innerHTML = `<span>${flag} ${city.name}</span>`;
     btn.onclick = () => selectCityFilter(city.id, btn);

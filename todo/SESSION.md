@@ -1,10 +1,10 @@
 ## Session State
 
-- **Item/sub-task:** 6g follow-up (end date + duplicate warning)
+- **Item/sub-task:** 6k
 - **Branch:** item-6a
-- **Last commit:** `Item 6g: Add Add New Leg dialog with existing city dropdown or new city creation` (758717b)
-- **What was done:** Added end date field to Add Leg dialog, added duplicate city check with warning/confirmation dialog
-- **Next step:** Commit these improvements, then proceed to 6k/l/m
-- **Files touched:** js/crud.js, index.html
+- **Last commit:** `Item 6k: Add city color randomization and color theming`
+- **What was done:** Added CITY_COLORS palette with 20 distinctive colors, implemented getRandomCityColor() that avoids reuse, store colour in city data, new legs/CRUD get their city color, city nav buttons show color bar, city dialog shows color borders
+- **Next step:** Commit changes, proceed to 6l
+- **Files touched:** js/data.js (color palette, random function, city color assignment in populateCityList), js/crud.js (leg creation uses city color), js/itinerary.js (city nav color borders)
 - **Known blockers / risks:** None
 - **Noticed (unscheduled):**

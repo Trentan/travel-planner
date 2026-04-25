@@ -240,6 +240,15 @@ function confirmAddLeg() {
 function createNewLeg(cityName, cityId, startDate, endDate) {
   const flag = typeof getCityFlag === 'function' ? getCityFlag(cityName) : '';
 
+  // Get city color from cities data
+  let cityColor = '#2C3E50';
+  if (typeof citiesData !== 'undefined' && cityId) {
+    const city = citiesData.find(c => c.id === cityId);
+    if (city && city.colour) {
+      cityColor = city.colour;
+    }
+  }
+
   // Create days array based on date range or single day
   let days = [];
   if (endDate && endDate !== startDate) {
@@ -269,7 +278,7 @@ function createNewLeg(cityName, cityId, startDate, endDate) {
   const newLeg = {
     id: 'leg_' + Date.now(),
     label: `${flag} ${cityName}`,
-    colour: '#2C3E50',
+    colour: cityColor,
     cityFood: [{ text: "Local dish to try", done: false, cityId: cityId }],
     suggestedActivities: [],
     legTips: [{ text: "Add tip...", cityId: cityId }],

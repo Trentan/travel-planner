@@ -1,7 +1,31 @@
 let appData = [];
 let packingData = [];
 let leaveHomeData = [];
-let citiesData = []; // City entities for filtering/grouping - { id, name, country, dateFrom, dateTo }
+let citiesData = []; // City entities for filtering/grouping - { id, name, country, dateFrom, dateTo, colour }
+
+// City color palette - warm, distinctive travel colors
+const CITY_COLORS = [
+  '#2C3E50', // Midnight blue (default)
+  '#E74C3C', // Coral red
+  '#3498DB', // Ocean blue
+  '#27AE60', // Emerald
+  '#F39C12', // Amber
+  '#9B59B6', // Amethyst
+  '#1ABC9C', // Turquoise
+  '#E91E63', // Pink
+  '#795548', // Brown
+  '#607D8B', // Blue grey
+  '#FF5722', // Deep orange
+  '#8BC34A', // Light green
+  '#3F51B5', // Indigo
+  '#009688', // Teal
+  '#FF9800', // Orange
+  '#CDDC39', // Lime
+  '#9C27B0', // Purple
+  '#00BCD4', // Cyan
+  '#FFC107', // Gold
+  '#FF4081'  // Hot pink
+];
 let titleData = { title: "✈ New Trip Plan", subtitle: "Click here to add your trip subtitle/description" };
 let currentFileName = "Default Template";
 
@@ -59,6 +83,18 @@ function getCityIdByName(cityName) {
   return city ? city.id : '';
 }
 
+// Get a random city color from the palette (avoids using the same color as recently used)
+function getRandomCityColor() {
+  // Check which colors are already in use
+  const usedColors = new Set(citiesData.map(c => c.colour));
+  const availableColors = CITY_COLORS.filter(c => !usedColors.has(c));
+
+  // Use available colors first, fall back to any color if all are used
+  const palette = availableColors.length > 0 ? availableColors : CITY_COLORS;
+  const randomIndex = Math.floor(Math.random() * palette.length);
+  return palette[randomIndex];
+}
+
 // Add or update a city
 function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '') {
   if (!cityName) return null;
@@ -73,13 +109,14 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '') {
     return existing;
   }
 
-  // Create new city
+  // Create new city with random color
   const newCity = {
     id: 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
     name: cityName,
     country: country,
     dateFrom: dateFrom,
-    dateTo: dateTo
+    dateTo: dateTo,
+    colour: getRandomCityColor()
   };
   citiesData.push(newCity);
   return newCity;
@@ -270,8 +307,18 @@ function populateCityList() {
     const isHome = isHomeCity(city.name);
     const homeBadge = isHome ? ' <span style="background: #27AE60; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">🏠 Home</span>' : '';
 
+    // Get city color from matching leg, or use city's stored color
+    let cityColor = city.colour || '#2C3E50';
+    if (!city.colour) {
+      // Find matching leg for color
+      const matchingLeg = appData.find(leg => leg.days.some(day => day.to === city.name || day.from === city.name));
+      if (matchingLeg) {
+        cityColor = matchingLeg.colour || '#2C3E50';
+      }
+    }
+
     const row = document.createElement('div');
-    row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; border-bottom: 1px solid #eee;';
+    row.style.cssText = `display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; border-bottom: 1px solid #eee; border-left: 4px solid ${cityColor};`;
     row.innerHTML = `
       <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
         <span style="font-size: 1.5rem;">${flag}</span>
