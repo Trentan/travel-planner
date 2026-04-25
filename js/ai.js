@@ -31,9 +31,11 @@ EXPECTED JSON SCHEMA:
       "label": "City Name/Label",
       "colour": "#HEXCODE",
       "cityFood": [ {"text": "Food Idea", "done": false} ],
-      "cityRun": [ {"title": "5km route idea", "estTime": "1 hr", "estCost": "0", "assignedDayIdx": null} ],
-      "suggestedSights": [
-        {"title": "Sight Name", "estTime": "2 hrs", "estCost": "50", "assignedDayIdx": null}
+      "suggestedActivities": [
+        {"title": "5km run in Central Park", "category": "fitness", "estTime": "1 hr", "estCost": "0", "assignedDayIdx": null},
+        {"title": "Visit the Louvre Museum", "category": "sight", "estTime": "3 hrs", "estCost": "17", "assignedDayIdx": null},
+        {"title": "Taste authentic Italian gelato", "category": "food", "estTime": "1 hr", "estCost": "10", "assignedDayIdx": null},
+        {"title": "Spa treatment at hotel", "category": "wellness", "estTime": "2 hrs", "estCost": "80", "assignedDayIdx": null}
       ],
       "legTips": [ "General city tip 1", "General city tip 2" ],
       "days": [
@@ -51,7 +53,14 @@ EXPECTED JSON SCHEMA:
       ]
     }
   ]
-}`;
+}
+
+CATEGORY OPTIONS for suggestedActivities:
+- "fitness" (running, gym, hiking, sports)
+- "sight" (museums, landmarks, monuments)
+- "attraction" (theme parks, tours, shows)
+- "wellness" (spa, yoga, meditation, relax)
+- "food" (restaurants, food tours, markets)`;
 
   document.getElementById('aiOutputBox').style.display = 'block';
   document.getElementById('aiPromptOutput').value = promptText;

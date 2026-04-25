@@ -16,8 +16,48 @@ function initData() {
           delete day.tips;
         });
       }
-      if (leg.cityRun && leg.cityRun.length > 0 && typeof leg.cityRun[0] === 'string') {
-        leg.cityRun = leg.cityRun.map(r => ({ title: r, estTime: '1 hr', estCost: '0', assignedDayIdx: null }));
+      // Migrate legacy cityRun and suggestedSights to unified suggestedActivities
+      if (!leg.suggestedActivities) {
+        leg.suggestedActivities = [];
+        // Migrate cityRun items to fitness category
+        if (leg.cityRun && leg.cityRun.length > 0) {
+          if (typeof leg.cityRun[0] === 'string') {
+            leg.cityRun.forEach(r => {
+              leg.suggestedActivities.push({
+                title: r,
+                category: 'fitness',
+                estTime: '1 hr',
+                estCost: '0',
+                assignedDayIdx: null
+              });
+            });
+          } else {
+            leg.cityRun.forEach(r => {
+              leg.suggestedActivities.push({
+                title: r.title,
+                category: 'fitness',
+                estTime: r.estTime || '1 hr',
+                estCost: r.estCost || '0',
+                assignedDayIdx: r.assignedDayIdx !== undefined ? r.assignedDayIdx : null
+              });
+            });
+          }
+        }
+        // Migrate suggestedSights items to sight category
+        if (leg.suggestedSights && leg.suggestedSights.length > 0) {
+          leg.suggestedSights.forEach(s => {
+            leg.suggestedActivities.push({
+              title: s.title,
+              category: 'sight',
+              estTime: s.estTime || '1 hr',
+              estCost: s.estCost || '0',
+              assignedDayIdx: s.assignedDayIdx !== undefined ? s.assignedDayIdx : null
+            });
+          });
+        }
+        // Clean up legacy properties
+        delete leg.cityRun;
+        delete leg.suggestedSights;
       }
       leg.days.forEach(day => {
         if(day.activityItems) {
@@ -52,6 +92,9 @@ function initData() {
   displayTimestampStatus();
 
   saveData(false);
+
+  // Initialize journeys from transport data after appData is loaded
+  if (typeof initJourneys === 'function') initJourneys();
 }
 
 function displayTimestampStatus() {
@@ -101,6 +144,9 @@ function resetData() {
     localStorage.removeItem('travelApp_leavehome_v3');
     localStorage.removeItem('travelApp_meta_template');
     localStorage.removeItem('travelApp_filename_v2026');
+    localStorage.removeItem('travelApp_journeys_v1');
+    localStorage.removeItem('travelApp_last_export_v2026');
+    localStorage.removeItem('travelApp_last_import_v2026');
     location.reload();
   }
 }
@@ -126,7 +172,10 @@ function migratePacking(data) {
 
 function exportJSON() {
   saveData(false);
-  const exportObj = { meta: titleData, itinerary: appData, packing: packingData, leaveHome: leaveHomeData };
+  // Get journeys if they exist
+  let journeysData = [];
+  if (typeof journeys !== 'undefined') journeysData = journeys;
+  const exportObj = { meta: titleData, itinerary: appData, packing: packingData, leaveHome: leaveHomeData, journeys: journeysData };
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute("href", dataStr);
@@ -211,6 +260,34 @@ function importJSON(event) {
         if (leg.cityRun && leg.cityRun.length > 0 && typeof leg.cityRun[0] === 'string') {
           leg.cityRun = leg.cityRun.map(r => ({ title: r, estTime: '1 hr', estCost: '0', assignedDayIdx: null }));
         }
+        // Migrate legacy cityRun and suggestedSights to unified suggestedActivities
+        if (!leg.suggestedActivities) {
+          leg.suggestedActivities = [];
+          if (leg.cityRun && leg.cityRun.length > 0) {
+            leg.cityRun.forEach(r => {
+              leg.suggestedActivities.push({
+                title: r.title,
+                category: 'fitness',
+                estTime: r.estTime || '1 hr',
+                estCost: r.estCost || '0',
+                assignedDayIdx: r.assignedDayIdx !== undefined ? r.assignedDayIdx : null
+              });
+            });
+          }
+          if (leg.suggestedSights && leg.suggestedSights.length > 0) {
+            leg.suggestedSights.forEach(s => {
+              leg.suggestedActivities.push({
+                title: s.title,
+                category: 'sight',
+                estTime: s.estTime || '1 hr',
+                estCost: s.estCost || '0',
+                assignedDayIdx: s.assignedDayIdx !== undefined ? s.assignedDayIdx : null
+              });
+            });
+          }
+          delete leg.cityRun;
+          delete leg.suggestedSights;
+        }
       });
 
       if (importedData.packing) {
@@ -220,6 +297,11 @@ function importJSON(event) {
       if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
       if (importedData.meta) {
         titleData = importedData.meta;
+      }
+
+      // Import journeys if present
+      if (importedData.journeys) {
+        localStorage.setItem('travelApp_journeys_v1', JSON.stringify(importedData.journeys));
       }
 
       currentFileName = file.name;

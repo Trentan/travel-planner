@@ -1,6 +1,6 @@
-function handleDragStart(e, legIdx, type, itemIdx) {
+function handleDragStart(e, legIdx, itemIdx) {
   if (!isEditMode) { e.preventDefault(); return; }
-  e.dataTransfer.setData('text/plain', JSON.stringify({legIdx, type, itemIdx}));
+  e.dataTransfer.setData('text/plain', JSON.stringify({legIdx, itemIdx}));
   e.dataTransfer.effectAllowed = 'move';
 }
 function handleDragOver(e) { if (!isEditMode) return; e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
@@ -9,15 +9,19 @@ function handleDrop(e, targetLegIdx, targetDayIdx) {
   if (!isEditMode) return;
   e.preventDefault(); e.currentTarget.classList.remove('drag-over');
   const data = e.dataTransfer.getData('text/plain'); if (!data) return;
-  const { legIdx: srcLegIdx, type, itemIdx } = JSON.parse(data);
+  const { legIdx: srcLegIdx, itemIdx } = JSON.parse(data);
 
-  const pool = type === 'run' ? appData[srcLegIdx].cityRun : appData[srcLegIdx].suggestedSights;
-  const item = pool[itemIdx];
+  const activity = appData[srcLegIdx].suggestedActivities[itemIdx];
 
-  item.assignedDayIdx = targetDayIdx;
+  activity.assignedDayIdx = targetDayIdx;
   if (appData[targetLegIdx].days[targetDayIdx].activityItems.length === 1 && appData[targetLegIdx].days[targetDayIdx].activityItems[0].text === "—") {
     appData[targetLegIdx].days[targetDayIdx].activityItems = [];
   }
-  appData[targetLegIdx].days[targetDayIdx].activityItems.push({ text: item.title, cost: item.estCost || "0", time: item.estTime || "1 hr", done: false });
+  appData[targetLegIdx].days[targetDayIdx].activityItems.push({
+    text: activity.title,
+    cost: activity.estCost || "0",
+    time: activity.estTime || "1 hr",
+    done: false
+  });
   saveData(); buildItinerary();
 }

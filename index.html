@@ -55,14 +55,36 @@
 <nav class="leg-nav" id="legNav"></nav>
 
 <main>
-  <div class="app-tabs">
-    <button class="app-tab-btn active" onclick="switchTab('itinerary', this)">🗺️ Itinerary</button>
-    <button class="app-tab-btn" onclick="switchTab('transport', this)">✈️ Transport</button>
-    <button class="app-tab-btn" onclick="switchTab('accom', this)">🏨 Accommodation</button>
-    <button class="app-tab-btn" onclick="switchTab('budget', this)">💰 Budget</button>
-    <button class="app-tab-btn" onclick="switchTab('packing', this)">🧳 Packing</button>
-    <button class="app-tab-btn" onclick="switchTab('map', this)">🗺️ Map</button>
+  <div class="app-tabs-nav">
+    <div class="app-tabs-list">
+      <button class="app-tab-btn active" data-tab="itinerary" onclick="switchTab('itinerary', this)">
+        <span class="tab-icon">🗺️</span>
+        <span class="tab-label">Itinerary</span>
+      </button>
+      <button class="app-tab-btn" data-tab="transport" onclick="switchTab('transport', this)">
+        <span class="tab-icon">✈️</span>
+        <span class="tab-label">Transport</span>
+      </button>
+      <button class="app-tab-btn" data-tab="accom" onclick="switchTab('accom', this)">
+        <span class="tab-icon">🏨</span>
+        <span class="tab-label">Accommodation</span>
+      </button>
+      <button class="app-tab-btn" data-tab="budget" onclick="switchTab('budget', this)">
+        <span class="tab-icon">💰</span>
+        <span class="tab-label">Budget</span>
+      </button>
+      <button class="app-tab-btn" data-tab="packing" onclick="switchTab('packing', this)">
+        <span class="tab-icon">🧳</span>
+        <span class="tab-label">Packing</span>
+      </button>
+      <button class="app-tab-btn" data-tab="map" onclick="switchTab('map', this)">
+        <span class="tab-icon">🗺️</span>
+        <span class="tab-label">Map</span>
+      </button>
+    </div>
+  </div>
 
+  <div class="app-tabs-content">
     <div id="tab-itinerary" class="tab-pane active">
       <div class="top-controls">
         <button class="action-btn" onclick="addLeg()">+ Add New Leg</button>
@@ -225,6 +247,7 @@
 <script src="./js/map.js"></script>
 <script src="./js/ui.js"></script>
 <script src="./js/itinerary.js"></script>
+  <script src="./js/transport.js"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {

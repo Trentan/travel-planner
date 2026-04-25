@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-planner-v4';
+const CACHE_NAME = 'travel-planner-v5';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -12,7 +12,9 @@ const ASSETS = [
   './js/ai.js',
   './js/guide.js',
   './js/ui.js',
-  './js/itinerary.js'
+  './js/itinerary.js',
+  './js/transport.js',
+  './js/map.js'
 ];
 
 self.addEventListener('install', (e) => {

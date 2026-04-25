@@ -2,8 +2,11 @@ const DEFAULT_DATA = [
   {
     id: 'leg-1', label: '📍 Example City', colour: '#2C3E50',
     cityFood: [{ text: "Example local dish to try", done: false }],
-    cityRun: [{ title: "Example 5km park loop", estTime: "1 hr", estCost: "0", assignedDayIdx: null }],
-    suggestedSights: [{ title: 'Example Museum', estTime: '2 hrs', estCost: '15', assignedDayIdx: null }],
+    suggestedActivities: [
+      { title: 'Morning run in the park', category: 'fitness', estTime: '1 hr', estCost: '0', assignedDayIdx: null },
+      { title: 'City History Museum', category: 'sight', estTime: '2 hrs', estCost: '15', assignedDayIdx: null },
+      { title: 'Local food market tour', category: 'food', estTime: '2 hrs', estCost: '30', assignedDayIdx: null }
+    ],
     legTips: ['Download local transit app'],
     days: [
       {
@@ -16,6 +19,23 @@ const DEFAULT_DATA = [
     ]
   }
 ];
+
+const ACTIVITY_CATEGORIES = {
+  fitness: { emoji: '🏃', label: 'Fitness' },
+  sight: { emoji: '🏛️', label: 'Sights' },
+  attraction: { emoji: '🎢', label: 'Attractions' },
+  wellness: { emoji: '🧘', label: 'Wellness' },
+  food: { emoji: '🍽️', label: 'Food' },
+  tour: { emoji: '🚌', label: 'Tour' }
+};
+
+function getActivityEmoji(category) {
+  return ACTIVITY_CATEGORIES[category]?.emoji || '📍';
+}
+
+function getActivityLabel(category) {
+  return ACTIVITY_CATEGORIES[category]?.label || 'Activity';
+}
 
 const DEFAULT_LEAVE_HOME = [
   {text: "Lock all doors and windows", done:false},

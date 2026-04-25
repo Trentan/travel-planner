@@ -49,6 +49,11 @@ function switchTab(tabId, btnElement) {
   document.getElementById('tab-' + tabId).classList.add('active');
   btnElement.classList.add('active');
 
+  // Scroll selected tab into view on mobile
+  if (window.innerWidth <= 768) {
+    btnElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+
   if (tabId === 'transport') buildTransportTab();
   if (tabId === 'accom') buildAccomTab();
   if (tabId === 'budget') buildBudgetTab();

@@ -137,9 +137,15 @@ function buildItinerary() {
 
   html += `<div class="city-dashboard">
   <div class="city-block city-block-food">
+  <div class="city-block city-block-food">
     <h4>🍔 City Food Quests</h4>
     <ul class="food-list">${(leg.cityFood || []).map((f, i) => `<li class="quest-item"><button class="del-btn" title="Delete Food" onclick="deleteFood(${legIndex}, ${i})">×</button><input type="checkbox" ${f.done ? 'checked' : ''} onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"><span contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span></li>`).join('')}</ul>
     <button class="add-btn" onclick="addFood(${legIndex})">+ Add Food</button>
+  </div>
+  <div class="city-block city-block-tips">
+    <h4>💡 City Tips</h4>
+    <ul class="tips-list">${(leg.legTips || []).map((t, i) => `<li class="tip-item"><span class="tip-bulb">💡</span><span contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t}</span><button class="del-btn" title="Delete Tip" onclick="deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
+    <button class="add-btn" onclick="addLegTip(${legIndex})">+ Add Tip</button>
   </div>
   <div class="city-block city-block-activities">
     <h4>📌 Suggested Activities</h4>
@@ -175,11 +181,6 @@ function buildItinerary() {
         <button class="add-btn" onclick="addSight(${legIndex})">+ Add Sight</button>
       </div>
     </div>
-  </div>
-  <div class="city-block city-block-tips">
-    <h4>💡 City Tips</h4>
-    <ul class="tips-list">${(leg.legTips || []).map((t, i) => `<li class="tip-item"><span class="tip-bulb">💡</span><span contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t}</span><button class="del-btn" title="Delete Tip" onclick="deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
-    <button class="add-btn" onclick="addLegTip(${legIndex})">+ Add Tip</button>
   </div>
   </div>`;
 

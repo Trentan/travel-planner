@@ -198,6 +198,8 @@ Split 1400-line single-file into modules for maintainability:
 - [x] click action on confirmed/pending in the main itinerary is collapsing the dropdown and not updating the other tabs (and vice versa)
 - [x] combine City Running/Fitness and Suggested Sights Pool into ONE GROUP - Suggested Activities
 
+### Phase 7: Export to google calendar [NOT STARTED]
+- [ ] Export to google calendar - allow filter for just flights, just transport, just cities, just accomodation (or a mix) and generate the gcal for the information
 ## Testing Checklist
 
 Before considering work complete:
