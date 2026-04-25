@@ -318,12 +318,14 @@ function buildTransportTab(cityFilter = null) {
               <th>Type</th>
               <th>Date</th>
               <th>Route</th>
-              <th>Time</th>
+              <th>Departure</th>
+              <th>Arrival</th>
               <th>Provider</th>
               <th>Route #</th>
               <th>Cost</th>
               <th>Status</th>
-              <th>Booking Ref</th>
+              <th>Ref</th>
+              <th>Notes</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -336,16 +338,18 @@ function buildTransportTab(cityFilter = null) {
       const statusText = journey.status === 'booked' ? 'Booked' : 'Planned';
       const depDate = formatJourneyDate(journey.departureDate) || journey.dayDate || '—';
       const depTime = journey.departureTime || '—';
-      const arrTime = journey.arrivalTime || '';
-      const timeDisplay = arrTime ? `${depTime} → ${arrTime}` : depTime;
+      const arrDate = formatJourneyDate(journey.arrivalDate) || '—';
+      const arrTime = journey.arrivalTime || '—';
       const route = `${journey.fromLocation} → ${journey.toLocation}`;
+      const notesDisplay = journey.notes ? (journey.notes.length > 25 ? journey.notes.substring(0, 25) + '...' : journey.notes) : '—';
 
       html += `
         <tr data-journey-id="${journey.id}">
           <td>${icon}</td>
           <td class="date-col">${depDate}</td>
           <td class="route-col">${route}</td>
-          <td>${timeDisplay}</td>
+          <td>${depTime}</td>
+          <td>${arrDate} ${arrTime}</td>
           <td>${journey.provider || '—'}</td>
           <td>${journey.routeCode || '—'}</td>
           <td class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${journey.id}', this.innerText); buildTransportTab();">${journey.cost || '0'}</span></td>
@@ -358,9 +362,10 @@ function buildTransportTab(cityFilter = null) {
           <td>
             <input type="text" value="${journey.bookingReference || ''}" placeholder="Ref #"
               onchange="updateJourneyBookingRef('${journey.id}', this.value); buildTransportTab();"
-              style="width: 90px; padding: 2px 6px; font-size: 0.85rem; border: 1px solid #ddd; border-radius: 3px; font-family: monospace;"
+              style="width: 70px; padding: 2px 4px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 3px; font-family: monospace;"
               ${isEditMode ? '' : 'readonly'}>
           </td>
+          <td title="${journey.notes || ''}">${notesDisplay}</td>
           <td>
             <button class="del-btn" onclick="deleteJourney('${journey.id}'); buildTransportTab();" title="Delete">×</button>
           </td>
@@ -388,9 +393,113 @@ function toggleJourneyStatus(journeyId) {
   }
 }
 
-// Stub for add journey modal
+// Open journey modal and populate city dropdowns
 function openAddJourneyModal() {
-  alert('Add Journey modal coming soon. For now, add transport items in the itinerary days.');
+  const modal = document.getElementById('journey-modal');
+  if (!modal) {
+    alert('Journey modal not found');
+    return;
+  }
+
+  // Populate city dropdowns
+  const fromSelect = document.getElementById('journeyFromCity');
+  const toSelect = document.getElementById('journeyToCity');
+
+  if (fromSelect) {
+    fromSelect.innerHTML = '<option value="Home">🏠 Home</option>';
+    if (typeof citiesData !== 'undefined') {
+      citiesData.forEach(city => {
+        const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
+        const option = document.createElement('option');
+        option.value = city.name;
+        option.textContent = `${flag} ${city.name}`;
+        fromSelect.appendChild(option);
+      });
+    }
+  }
+
+  if (toSelect) {
+    toSelect.innerHTML = '<option value="">-- Select destination --</option>';
+    if (typeof citiesData !== 'undefined') {
+      citiesData.forEach(city => {
+        const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
+        const option = document.createElement('option');
+        option.value = city.name;
+        option.textContent = `${flag} ${city.name}`;
+        toSelect.appendChild(option);
+      });
+    }
+  }
+
+  // Reset form
+  document.getElementById('journeyType').value = 'flight';
+  document.getElementById('journeyDepDate').value = '';
+  document.getElementById('journeyDepTime').value = '';
+  document.getElementById('journeyArrDate').value = '';
+  document.getElementById('journeyArrTime').value = '';
+  document.getElementById('journeyProvider').value = '';
+  document.getElementById('journeyRouteCode').value = '';
+  document.getElementById('journeyCost').value = '';
+  document.getElementById('journeyNotes').value = '';
+
+  modal.style.display = 'flex';
+}
+
+function closeJourneyModal() {
+  const modal = document.getElementById('journey-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function saveJourneyFromModal() {
+  const fromLocation = document.getElementById('journeyFromCity').value;
+  const toLocation = document.getElementById('journeyToCity').value;
+  const transportType = document.getElementById('journeyType').value;
+  const depDate = document.getElementById('journeyDepDate').value;
+  const depTime = document.getElementById('journeyDepTime').value;
+  const arrDate = document.getElementById('journeyArrDate').value;
+  const arrTime = document.getElementById('journeyArrTime').value;
+  const provider = document.getElementById('journeyProvider').value.trim();
+  const routeCode = document.getElementById('journeyRouteCode').value.trim();
+  const cost = document.getElementById('journeyCost').value.trim() || '0';
+  const notes = document.getElementById('journeyNotes').value.trim();
+
+  if (!toLocation) {
+    alert('Please select a destination');
+    return;
+  }
+
+  // Lookup city IDs
+  const fromCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === fromLocation) : null;
+  const toCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === toLocation) : null;
+
+  const journey = {
+    id: 'journey_' + Date.now(),
+    legId: '',
+    dayDate: depDate,
+    fromLocation: fromLocation,
+    toLocation: toLocation,
+    fromCityId: fromCity ? fromCity.id : '',
+    toCityId: toCity ? toCity.id : '',
+    departureDate: depDate,
+    departureTime: depTime,
+    arrivalDate: arrDate,
+    arrivalTime: arrTime,
+    transportType: transportType,
+    provider: provider,
+    routeCode: routeCode,
+    status: 'planned',
+    cost: cost,
+    bookingReference: '',
+    isMultiLeg: false,
+    notes: notes,
+    legs: []
+  };
+
+  journeys.push(journey);
+  window.journeys = journeys;
+  saveJourneys();
+  closeJourneyModal();
+  buildTransportTab();
 }
 
 // Rebuild current view helper

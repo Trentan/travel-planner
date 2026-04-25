@@ -333,6 +333,84 @@
 </div>
 </div>
 
+<!-- Add Journey Modal -->
+<div id="journey-modal" class="modal-overlay" style="display: none;">
+<div class="modal-content" style="max-width: 600px;">
+<div class="modal-header">
+<h2>✈️ Add Journey</h2>
+<button class="modal-close" onclick="closeJourneyModal()">&times;</button>
+</div>
+<div class="modal-body">
+<div class="ai-form-group">
+<label>From</label>
+<select id="journeyFromCity" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+<option value="Home">🏠 Home</option>
+</select>
+</div>
+<div class="ai-form-group">
+<label>To</label>
+<select id="journeyToCity" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+<option value="">-- Select destination --</option>
+</select>
+</div>
+<div class="ai-form-group">
+<label>Transport Type</label>
+<select id="journeyType" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+<option value="flight">✈️ Flight</option>
+<option value="train">🚂 Train</option>
+<option value="bus">🚌 Bus</option>
+<option value="ferry">⛴️ Ferry</option>
+<option value="car">🚗 Car</option>
+<option value="walk">🚶 Walk</option>
+<option value="other">🚌 Other</option>
+</select>
+</div>
+<div style="display: flex; gap: 1rem;">
+<div class="ai-form-group" style="flex: 1;">
+<label>Departure Date</label>
+<input type="text" id="journeyDepDate" placeholder="e.g., 15 Jun" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+</div>
+<div class="ai-form-group" style="flex: 1;">
+<label>Departure Time</label>
+<input type="text" id="journeyDepTime" placeholder="e.g., 14:30" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+</div>
+</div>
+<div style="display: flex; gap: 1rem;">
+<div class="ai-form-group" style="flex: 1;">
+<label>Arrival Date</label>
+<input type="text" id="journeyArrDate" placeholder="e.g., 15 Jun" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+</div>
+<div class="ai-form-group" style="flex: 1;">
+<label>Arrival Time</label>
+<input type="text" id="journeyArrTime" placeholder="e.g., 18:45" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+</div>
+</div>
+<div class="ai-form-group">
+<label>Provider (Airline/Carrier)</label>
+<input type="text" id="journeyProvider" placeholder="e.g., EVA Air" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+</div>
+<div style="display: flex; gap: 1rem;">
+<div class="ai-form-group" style="flex: 1;">
+<label>Route Code (Flight #, etc.)</label>
+<input type="text" id="journeyRouteCode" placeholder="e.g., BR315" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+</div>
+<div class="ai-form-group" style="flex: 1;">
+<label>Cost</label>
+<input type="text" id="journeyCost" placeholder="0" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+</div>
+</div>
+<div class="ai-form-group">
+<label>Notes</label>
+<textarea id="journeyNotes" placeholder="Any additional notes..." style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif; min-height: 60px;"></textarea>
+</div>
+</div>
+<div class="modal-footer">
+<button class="action-btn" onclick="closeJourneyModal()">Cancel</button>
+<button class="action-btn" style="background: #2C3E50; color: white;" onclick="saveJourneyFromModal()">Save Journey</button>
+</div>
+</div>
+</div>
+
 </main>
 
 <script src="./js/utils.js"></script>
