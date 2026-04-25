@@ -115,10 +115,18 @@ function buildBudgetTab() {
   const kpiContainer = document.getElementById('budget-kpi-container');
   let totalTrans = 0, totalAccom = 0, totalAct = 0; let legBreakdown = [];
 
+  // Get journeys array (global from transport.js) or fallback to empty
+  const journeysData = (typeof journeys !== 'undefined') ? journeys : [];
+
   appData.forEach(leg => {
     let legTrans = 0, legAccom = 0, legAct = 0;
     leg.days.forEach(day => {
-      (day.transportItems || []).forEach(i => legTrans += parseCost(i.cost));
+      // Calculate transport costs from journeys array
+      const dayJourneys = journeysData.filter(j =>
+        j.dayDate === day.date && j.fromLocation === day.from && j.toLocation === day.to
+      );
+      dayJourneys.forEach(j => legTrans += parseCost(j.cost));
+
       (day.accomItems || []).forEach(i => legAccom += parseCost(i.cost));
       (day.activityItems || []).forEach(i => legAct += parseCost(i.cost));
     });
