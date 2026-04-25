@@ -38,8 +38,9 @@ function toggleEditMode() {
   else { btn.innerHTML = "✏️ Unlock"; btn.classList.add('edit-mode'); saveData(); }
 
   const activeTab = document.querySelector('.app-tab-btn.active').innerText;
-  if(activeTab.includes('Transport')) buildTransportTab();
-  if(activeTab.includes('Accommodation')) buildAccomTab();
+  const cityFilter = typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all';
+  if(activeTab.includes('Transport')) buildTransportTab(cityFilter);
+  if(activeTab.includes('Accommodation')) buildAccomTab(cityFilter);
   if(activeTab.includes('Packing')) buildPackingTab();
 }
 
@@ -54,9 +55,12 @@ function switchTab(tabId, btnElement) {
     btnElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   }
 
+  // Check for current city filter and pass to tab builders
+  const cityFilter = typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all';
+
   if (tabId === 'itinerary') buildItinerary();
-  if (tabId === 'transport') buildTransportTab();
-  if (tabId === 'accom') buildAccomTab();
+  if (tabId === 'transport') buildTransportTab(cityFilter);
+  if (tabId === 'accom') buildAccomTab(cityFilter);
   if (tabId === 'budget') buildBudgetTab();
   if (tabId === 'packing') buildPackingTab();
   if (tabId === 'map') buildJourneyMap();
