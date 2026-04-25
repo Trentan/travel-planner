@@ -54,6 +54,7 @@ function switchTab(tabId, btnElement) {
     btnElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   }
 
+  if (tabId === 'itinerary') buildItinerary();
   if (tabId === 'transport') buildTransportTab();
   if (tabId === 'accom') buildAccomTab();
   if (tabId === 'budget') buildBudgetTab();
