@@ -4,7 +4,25 @@ let leaveHomeData = [];
 let titleData = { title: "✈ New Trip Plan", subtitle: "Click here to add your trip subtitle/description" };
 let currentFileName = "Default Template";
 
+// Journeys data - defined here to ensure loading order works
+// transport.js will use this same variable
+let journeys = [];
+
 function initData() {
+  // Load journeys first, before any rendering happens
+  const savedJourneys = localStorage.getItem('travelApp_journeys_v1');
+  if (savedJourneys) {
+    try {
+      const parsed = JSON.parse(savedJourneys);
+      if (Array.isArray(parsed)) {
+        journeys = parsed;
+        console.log(`[Journeys] Loaded ${journeys.length} journeys from localStorage`);
+      }
+    } catch (e) {
+      console.error('[Journeys] Failed to parse:', e);
+      journeys = [];
+    }
+  }
   const saved = localStorage.getItem('travelApp_v2026_template');
   if (saved) {
     appData = JSON.parse(saved);
@@ -93,8 +111,7 @@ function initData() {
 
   saveData(false);
 
-  // Initialize journeys from transport data after appData is loaded
-  if (typeof initJourneys === 'function') initJourneys();
+  // Journeys loaded at start of initData(), no additional init needed
 }
 
 function displayTimestampStatus() {
@@ -300,8 +317,11 @@ function importJSON(event) {
       }
 
       // Import journeys if present
-      if (importedData.journeys) {
+      if (importedData.journeys && Array.isArray(importedData.journeys)) {
         localStorage.setItem('travelApp_journeys_v1', JSON.stringify(importedData.journeys));
+        console.log(`[Import] Saved ${importedData.journeys.length} journeys to localStorage`);
+      } else {
+        console.log('[Import] No journeys found in imported data');
       }
 
       currentFileName = file.name;

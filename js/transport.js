@@ -1,7 +1,6 @@
 // Transport/Journey management module
 // Supports rich journey display with times, providers, booking refs
-
-let journeys = [];
+// Note: journeys variable is declared in data.js for proper loading order
 
 // Transport type icons
 const TRANSPORT_ICONS = {
@@ -18,11 +17,33 @@ function getTransportIcon(type) {
   return TRANSPORT_ICONS[type] || TRANSPORT_ICONS.other;
 }
 
-// Initialize journeys from localStorage or from imported data
+// Initialize journeys from localStorage - called by data.js
+// Note: data.js now loads journeys before initData() completes
+// This function is kept for backwards compatibility
 function initJourneys() {
+  // Only load from localStorage if journeys is empty (prevents overwriting already loaded data)
+  if (Array.isArray(journeys) && journeys.length > 0) {
+    console.log(`[Journeys] Already loaded ${journeys.length} journeys, skipping initJourneys()`);
+    return;
+  }
   const saved = localStorage.getItem('travelApp_journeys_v1');
   if (saved) {
-    journeys = JSON.parse(saved);
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        journeys = parsed;
+        console.log(`[Journeys] Loaded ${journeys.length} journeys from localStorage`);
+      } else {
+        journeys = [];
+        console.log('[Journeys] No journeys found in localStorage');
+      }
+    } catch (e) {
+      console.error('[Journeys] Failed to parse journeys:', e);
+      journeys = [];
+    }
+  } else {
+    journeys = [];
+    console.log('[Journeys] No journeys in localStorage (key: travelApp_journeys_v1)');
   }
 }
 
@@ -80,7 +101,15 @@ function detectTransportType(text) {
 
 // Get journeys for a specific day
 function getDayJourneys(dayDate, fromLoc, toLoc) {
-  return journeys.filter(j => j.dayDate === dayDate && j.fromLocation === fromLoc && j.toLocation === toLoc);
+  if (!Array.isArray(journeys)) {
+    console.warn('[Journeys] journeys array not initialized, returning empty');
+    return [];
+  }
+  const matches = journeys.filter(j => j.dayDate === dayDate && j.fromLocation === fromLoc && j.toLocation === toLoc);
+  if (matches.length === 0) {
+    console.log(`[Journeys] No match for dayDate="${dayDate}", from="${fromLoc}", to="${toLoc}". Total journeys: ${journeys.length}`);
+  }
+  return matches;
 }
 
 // Find journey by id
