@@ -30,6 +30,8 @@ Travel Planner PWA is a completely offline, JSON-driven Progressive Web App for 
   - `ui.js` - UI state and navigation
   - `itinerary.js` - Main itinerary builder
 - `backups/` - Directory for exported trip JSON files
+- `TODO.md` - Active task list (read this on every session start)
+- `todo/` - Per-item spec files (e.g. `todo/item-3-accommodation.md`)
 
 ## Development Commands
 
@@ -110,7 +112,7 @@ Trip title, subtitle, and current file name for display.
 
 **Toggle modes:**
 - **Fun Mode** (📋 button) - Hides logistics/budget fields, shows activities only
-- **Read Only Mode** (🔒 button) - Disables editing, hides all delete buttons  
+- **Read Only Mode** (🔒 button) - Disables editing, hides all delete buttons
 - **Print Views** - Summary (condensed) or Detailed (full) print layouts
 
 **AI Builder:**
@@ -123,7 +125,7 @@ Trip title, subtitle, and current file name for display.
 
 ## Working with the Code
 
-**Making changes1:**
+**Making changes:**
 1. All CSS is embedded in `<style>` tag at the top of index.html
 2. All JavaScript is in the `<script>` tag at the bottom
 3. No external libraries - vanilla JS only
@@ -153,66 +155,79 @@ Trip title, subtitle, and current file name for display.
 - **Sorting**: `sortLegs()` sorts by first day's date, called after date changes
 - **Auto-save**: `saveData(false)` for silent saves, `saveData(true)` shows ✓ indicator
 
-## Development Roadmap / TODO List
+---
 
-#### When resolving items
-When addressing each item, do one at a time and confirm changes, commit the code with the commit message 
-describing the item resolved and the fixes applied. Ensure a new branch created (with a branch name of the incremented item number), 
-committed and push - request review, once done ensure the items are checked as completed in this list and remove from this list 
-when confirmed completed.
+## Development Workflow
 
-### Item 1: Layout issue
-- [ ] For itinerary entities: There should be three clear columns in this order (currently busted tips and suggested activities are one column)
-  Tips, Food Quests, Suggested Activities
-- [ ] The itinerary collapsible is still closing an action button in a column within (eg transport or accomodation - planning/confirmed) when pressed in itinerary. Additonally, when interacted with and changed / edited, this is not reflected in the - Transport or accomodation tab (when switching to it) (and same when editing in those tabs and switching back and viewing in itinerary- )
-  e.g ✈ EVA Air BNE→TPE 22:15
-  ✓ Confirmed
-  Ref #
-  $
-  0
+> **Re-entering a session?** Read `CLAUDE.md` → read `TODO.md` → check git log for last `item-*` branch → declare status → wait for go-ahead.
 
-### Item 2: Resolve Journey/Transport integration
-- [ ] Transport used to work flawlessly in itinerary and displaying in the Transport tab - they have all transitioned to Journey's - They are not being handled or displayed correctly - resolve
-
-### Item 3: Convert Accommodation
-- [ ] Accommodation needs fixing now see and work through - see todo/accomodation-spec-conversion.md
-
-### Item 4: Database alignment (can group by cities any option)
-- [ ] All the tips, suggested activities, food quests, accommodation and transport can all align to cities - perhaps make another options citie(S) for all of those options which are stored along each entity (in the json) and could be used in other options one day / displayed in their individual tabs when not in itinerary mode.
-- [ ] Convert the current json file to handle this change 2026_June_July_Europe_Thailand.json
-- [ ] The subheadings for the trip (cities) which are currently above the main tabs (itinerary, transport, accommodation etc) dissapear when scrolling down. They should stay viewable and interactable still when scrolling - also this subheading should now appear below the main tabs listing.
-- [ ] Add an all (which is the default) to the cities subheading filter
-- [ ] Depending on the subheading filter select - filter by that city group and display only those in the accommodation and transport tabs for only that selected city or {jump to that city in itinerary view (already done)}
-
-### Item 5: Interactive How-To Guide
-- [ ] The interactive guide on how to use the app is not working + can be improved with the latest changes
-- 
-## Testing Checklist
-
-Before considering work complete:
-- [ ] Open index.html in browser - app loads without errors
-- [ ] Create/edit/delete items in all tabs
-- [ ] Drag sights/runs from pool to day cards
-- [ ] Toggle Fun Mode and Read Only Mode - UI updates correctly
-- [ ] Toggle Compact View - layout switches, checkboxes work
-- [ ] Export JSON - file downloads with correct data
-- [ ] Import JSON - data loads and renders properly
-- [ ] Budget calculations update when costs change
-- [ ] Packing items check/uncheck and persist after refresh
-- [ ] Service Worker registers (check browser DevTools)
-- [ ] Print views render correctly (test both Summary and Detailed)
+All active work items live in **`TODO.md`**. Always read that file on session start. Spec files for individual items live in `todo/`.
 
 ---
 
-## Future Enhancements (Unscheduled)
+#### When resolving items
 
-- Dark mode toggle
-- Search/filter functionality
-- Undo/redo system
-- Image upload for receipts
-- Cloud sync (Firebase/Dropbox)
-- Multi-user collaboration
-- Trip sharing/export formats (PDF, Google Docs)
-- Activity duration tracking
-- Flight miles tracking
-- Budget categories breakdown
+**On session start / re-entry:**
+1. Read this entire `CLAUDE.md` before doing anything else
+2. Read `TODO.md` — note the target item's status block, active branch, and next sub-task
+3. If a spec file exists for the item (`todo/item-{N}-*.md`), read that too
+4. Check git log for the last `item-{N}` branch to confirm what has already landed
+5. Declare your status report out loud:
+  - Which item/sub-task you are starting or resuming
+  - What the last completed commit was (if resuming)
+  - What files will be touched
+  - An estimated commit count for this sub-task (e.g. "expect 2–3 commits")
+6. If you cannot confidently determine where things left off — **ask, don't guess**
+7. Wait for user confirmation before writing any code
+
+---
+
+**Scope rules (strictly enforced):**
+- Work ONLY on the requested item/sub-task — nothing else
+- If you notice a related bug or improvement while working, add it to the `## Noticed (unscheduled)` section in `TODO.md` — do not fix it
+- If the requested change requires touching something outside stated scope, **flag it and ask** before proceeding
+
+---
+
+**Working through sub-tasks (a, b, c…):**
+- Do ONE sub-task at a time — no bundling unless explicitly instructed
+- Before starting, verify the app loads without errors in its current state
+- Keep each commit small and focused — one logical change per commit
+- After completing a sub-task:
+  1. Run through the relevant items in the **Testing Checklist** below
+  2. Summarise exactly what changed, what files were touched, and why
+  3. Create a branch: `item-{N}{letter}` (e.g. `item-2a`)
+  4. Commit with message: `Item {N}{letter} [X of Y]: {what was fixed and how}`
+  5. Push and open a PR for review
+  6. Update `TODO.md`: check `[x]` on that sub-task and update the item's **Status** block
+  7. **Stop and wait** — do not continue to the next sub-task until the user confirms
+
+---
+
+**If you hit a blocker mid-task:**
+- Stop immediately — do not attempt workarounds without flagging
+- Describe exactly what the blocker is and what options exist
+- State which option you recommend and why
+- Wait for the user to choose before continuing
+
+---
+
+**If a sub-task looks too large for one session:**
+- Say so before starting: "This sub-task may exceed one session — recommend splitting into: a-i) X, a-ii) Y"
+- Only proceed once the user has agreed on the split
+- At the end of each session chunk, leave a `// RESUME: next step is X` comment in the relevant file so the next session can orient from code, not just git log
+
+---
+
+**Adding new items:**
+- Increment the item number (never reuse numbers)
+- Break into lettered sub-tasks upfront before starting any work
+- Add the full item to `TODO.md` under `## Active` before touching code
+- If the user describes something vague, ask clarifying questions and confirm the sub-task breakdown before writing it down
+
+---
+
+**Completing items:**
+- Only check `[x]` on a sub-task in `TODO.md` after explicit user confirmation
+- Only move an item to `## Completed` in `TODO.md` after ALL sub-tasks are confirmed done
+- Completed items are fully deleted from `TODO.md` on next scheduled cleanup
