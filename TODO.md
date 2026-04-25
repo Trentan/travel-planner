@@ -24,9 +24,9 @@ Read this file at the start of every session. Update status blocks and checkboxe
 **Next:** item-2b/2c/2d — assess and fix journey loading/display
 
 - [x] a) Transport used to work flawlessly in itinerary and display correctly in the Transport tab. Items have all transitioned to Journeys and are not being handled or displayed correctly — resolve.
-- [ ] b) Journeys are in json backups/2026_June_July_Europe_Thailand.json - but not loading / viewing in itinerary or transport. Need to intersperse from itinerary or transport the journeys to pair with each other and display in tables / itinerary where possible.
-- [ ] c) Journey needs enhancing to only operate between defined cities (sequential). Remove all traces of old transport style.
-- [ ] d) Revert the display to a table with columns and individual rows for the data elements of the journey 
+- [x] b) Journeys import from JSON working — saved to localStorage and loaded in initData
+- [x] c) Journeys have fromCityId/toCityId linking to defined cities
+- [ ] d) Transport tab display — currently shows collapsible cards, needs decision: keep cards or revert to table format 
 
 **Summary:** Budget tab was still calculating transport costs from obsolete `day.transportItems`. Fixed by using `journeys.filter()` matched against `day.date`, `day.from`, and `day.to`.
 
