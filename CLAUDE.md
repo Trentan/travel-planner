@@ -30,7 +30,8 @@ Travel Planner PWA is a completely offline, JSON-driven Progressive Web App for 
   - `ui.js` - UI state and navigation
   - `itinerary.js` - Main itinerary builder
 - `backups/` - Directory for exported trip JSON files
-- `TODO.md` - Active task list (read this on every session start)
+- `TODO.md` - Active task list (read on every session start)
+- `todo/SESSION.md` - Live session state (read on every session start)
 - `todo/` - Per-item spec files (e.g. `todo/item-3-accommodation.md`)
 
 ## Development Commands
@@ -159,26 +160,30 @@ Trip title, subtitle, and current file name for display.
 
 ## Development Workflow
 
-> **Re-entering a session?** Read `CLAUDE.md` → read `TODO.md` → check git log for last `item-*` branch → declare status → wait for go-ahead.
+> **Re-entering a session?** Read `CLAUDE.md` → read `TODO.md` → read `todo/SESSION.md` → declare status → wait for go-ahead.
 
-All active work items live in **`TODO.md`**. Always read that file on session start. Spec files for individual items live in `todo/`.
+All active work items live in **`TODO.md`**. Live session state lives in **`todo/SESSION.md`**. Spec files for individual items live in `todo/`.
 
 ---
 
-#### When resolving items
+### When resolving items
+
+---
 
 **On session start / re-entry:**
 1. Read this entire `CLAUDE.md` before doing anything else
 2. Read `TODO.md` — note the target item's status block, active branch, and next sub-task
-3. If a spec file exists for the item (`todo/item-{N}-*.md`), read that too
-4. Check git log for the last `item-{N}` branch to confirm what has already landed
-5. Declare your status report out loud:
+3. Read `todo/SESSION.md` — this is the most precise resume point; it contains the last commit, exact next step, files touched, and any known blockers. Prioritise this over git log for orientation
+4. Read `todo/item-{N}-*.md` if a spec file exists for the target item
+5. Only check git log if `SESSION.md` is missing or its contents are unclear
+6. Declare your status report out loud:
   - Which item/sub-task you are starting or resuming
   - What the last completed commit was (if resuming)
+  - What the next concrete step is (from SESSION.md if resuming)
   - What files will be touched
-  - An estimated commit count for this sub-task (e.g. "expect 2–3 commits")
-6. If you cannot confidently determine where things left off — **ask, don't guess**
-7. Wait for user confirmation before writing any code
+  - An estimated commit count for this sub-task
+7. If you cannot confidently determine where things left off — **ask, don't guess**
+8. Wait for user confirmation before writing any code
 
 ---
 
@@ -193,19 +198,49 @@ All active work items live in **`TODO.md`**. Always read that file on session st
 - Do ONE sub-task at a time — no bundling unless explicitly instructed
 - Before starting, verify the app loads without errors in its current state
 - Keep each commit small and focused — one logical change per commit
-- After completing a sub-task:
-  1. Run through the relevant items in the **Testing Checklist** below
-  2. Summarise exactly what changed, what files were touched, and why
-  3. Create a branch: `item-{N}{letter}` (e.g. `item-2a`)
-  4. Commit with message: `Item {N}{letter} [X of Y]: {what was fixed and how}`
-  5. Push and open a PR for review
-  6. Update `TODO.md`: check `[x]` on that sub-task and update the item's **Status** block
-  7. **Stop and wait** — do not continue to the next sub-task until the user confirms
+- After each commit, in this exact order:
+  1. **Write `todo/SESSION.md` immediately** (see format below) — do this before anything else, every single commit, no exceptions
+  2. Run through the relevant items in the **Testing Checklist** below
+  3. Summarise exactly what changed, what files were touched, and why
+  4. Branch name: `item-{N}{letter}` (e.g. `item-2a`)
+  5. Commit message: `Item {N}{letter} [X of Y]: {what was fixed and how}`
+  6. Push and open a PR for review
+- After the final commit of a sub-task:
+  1. Check `[x]` on that sub-task in `TODO.md` and update the item's **Status** block
+  2. Write the closed SESSION.md state (see format below)
+  3. **Stop and wait** — do not continue to the next sub-task until the user confirms
+
+---
+
+**SESSION.md format — write this after every single commit:**
+
+```markdown
+## Session State
+
+- **Item/sub-task:** 1b
+- **Branch:** item-1b
+- **Last commit:** `Item 1b [2 of 3]: fixed collapsible toggle event binding`
+- **What was done:** Brief plain-english description of what changed and why
+- **Next step:** Exact description of what comes next — include the relevant file and approximate line number if known (e.g. "Hook saveData() call in crud.js ~line 84 to trigger buildTransportTab() re-render")
+- **Files touched:** All files changed so far in this sub-task
+- **Known blockers / risks:** Anything that may need a decision or could cause problems next step
+- **Noticed (unscheduled):** Any bugs or improvements spotted but not acted on — copy these to TODO.md Noticed section too
+```
+
+When a sub-task is fully confirmed complete by the user, replace contents with:
+
+```markdown
+## Session State
+
+- **Status:** Complete
+- **Last completed:** Item 1b — all commits landed and confirmed by user
+- **Next:** Item 1c (or next item if all sub-tasks done)
+```
 
 ---
 
 **If you hit a blocker mid-task:**
-- Stop immediately — do not attempt workarounds without flagging
+- Update `todo/SESSION.md` with the blocker details before stopping
 - Describe exactly what the blocker is and what options exist
 - State which option you recommend and why
 - Wait for the user to choose before continuing
@@ -215,7 +250,7 @@ All active work items live in **`TODO.md`**. Always read that file on session st
 **If a sub-task looks too large for one session:**
 - Say so before starting: "This sub-task may exceed one session — recommend splitting into: a-i) X, a-ii) Y"
 - Only proceed once the user has agreed on the split
-- At the end of each session chunk, leave a `// RESUME: next step is X` comment in the relevant file so the next session can orient from code, not just git log
+- Write the agreed split into `todo/SESSION.md` under **Next step** before starting any code
 
 ---
 
@@ -231,3 +266,36 @@ All active work items live in **`TODO.md`**. Always read that file on session st
 - Only check `[x]` on a sub-task in `TODO.md` after explicit user confirmation
 - Only move an item to `## Completed` in `TODO.md` after ALL sub-tasks are confirmed done
 - Completed items are fully deleted from `TODO.md` on next scheduled cleanup
+- Clear and close out `todo/SESSION.md` when an item is fully done
+
+---
+
+## Testing Checklist
+
+Before considering any work complete:
+- [ ] Open index.html in browser - app loads without errors
+- [ ] Create/edit/delete items in all tabs
+- [ ] Drag sights/runs from pool to day cards
+- [ ] Toggle Fun Mode and Read Only Mode - UI updates correctly
+- [ ] Toggle Compact View - layout switches, checkboxes work
+- [ ] Export JSON - file downloads with correct data
+- [ ] Import JSON - data loads and renders properly
+- [ ] Budget calculations update when costs change
+- [ ] Packing items check/uncheck and persist after refresh
+- [ ] Service Worker registers (check browser DevTools)
+- [ ] Print views render correctly (test both Summary and Detailed)
+
+---
+
+## Future Enhancements (Unscheduled)
+
+- Dark mode toggle
+- Search/filter functionality
+- Undo/redo system
+- Image upload for receipts
+- Cloud sync (Firebase/Dropbox)
+- Multi-user collaboration
+- Trip sharing/export formats (PDF, Google Docs)
+- Activity duration tracking
+- Flight miles tracking
+- Budget categories breakdown

@@ -5,30 +5,28 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ---
 
-## Active
+## Completed
 
-### Item 1: Layout issue
-**Status:** In progress — branch `item-1b` (item-1a complete)
-**Last completed:** `item-1a` ✅ — three-column layout (Tips, Food Quests, Suggested Activities)
-**Next:** `item-1b` — collapsible action button bug + tab sync
+### ~~Item 1: Layout issue~~ ✅ COMPLETED
+**Status:** Completed — branch `item-1b-sync-fixes` merged
+**Completed:** 2026-04-25 — three-column layout + collapsible tab sync + button fix
 
-- [x] a) For itinerary entities: three clear columns in order — Tips, Food Quests, Suggested Activities (was busted into one column)
-- [ ] b) The itinerary collapsible is closing an action button in a column within it (e.g. transport or accommodation — planning/confirmed) when pressed. Additionally, edits made inside the collapsible are not reflected when switching to the Transport or Accommodation tab, and vice versa.
-  ```
-  ✈ EVA Air BNE→TPE 22:15
-  ✓ Confirmed
-  Ref #
-  $0
-  ```
+- [x] a) Three-column layout: Tips, Food Quests, Suggested Activities
+- [x] b) Collapsible action button bug fixed; tab synchronization working
 
 ---
 
-### Item 2: Resolve Journey/Transport integration
-**Status:** Not started
-**Last completed:** —
-**Next:** `item-2a`
+## Active
 
-- [ ] a) Transport used to work flawlessly in itinerary and display correctly in the Transport tab. Items have all transitioned to Journeys and are not being handled or displayed correctly — resolve.
+### Item 2: Resolve Journey/Transport integration
+**Status:** Completed — branch `item-2a` pushed for review
+**Last completed:** `81150e4` — item-2a: Fix budget tab to use journeys array
+**Next:** —
+
+- [x] a) Transport used to work flawlessly in itinerary and display correctly in the Transport tab. Items have all transitioned to Journeys and are not being handled or displayed correctly — resolve.
+- [ ] b) Journeys are in json backups/2026_June_July_Europe_Thailand.json - but not loading / viewing in itinerary or transport. Need to intersperse from itinerary or transport the journeys to pair with each other and display in tables / itinerary where possible. It is not displaying anything from json.
+
+**Summary:** Budget tab was still calculating transport costs from obsolete `day.transportItems`. Fixed by using `journeys.filter()` matched against `day.date`, `day.from`, and `day.to`.
 
 ---
 
@@ -99,9 +97,3 @@ Before considering any work complete:
 - Activity duration tracking
 - Flight miles tracking
 - Budget categories breakdown
-
----
-
-## Completed
-
-<!-- Items moved here once ALL sub-tasks confirmed done by user, then fully deleted on next cleanup -->
