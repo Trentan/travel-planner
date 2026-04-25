@@ -19,14 +19,14 @@ Read this file at the start of every session. Update status blocks and checkboxe
 ## Active
 
 ### Item 2: Resolve Journey/Transport integration
-**Status:** Completed — branch `item-2a` pushed for review
-**Last completed:** `81150e4` — item-2a: Fix budget tab to use journeys array
-**Next:** —
+**Status:** In progress — branch `item-2a`
+**Last completed:** item-6 — cities now have proper IDs for journey linking
+**Next:** item-2b/2c/2d — assess and fix journey loading/display
 
 - [x] a) Transport used to work flawlessly in itinerary and display correctly in the Transport tab. Items have all transitioned to Journeys and are not being handled or displayed correctly — resolve.
-- [ ] b) Journeys are in json backups/2026_June_July_Europe_Thailand.json - but not loading / viewing in itinerary or transport. Need to intersperse from itinerary or transport the journeys to pair with each other and display in tables / itinerary where possible. It is not displaying anything from json. **[ON HOLD - pending Item 6 - should resolve after]**
-- [ ] c) I think the merging transition from transport to journeys has corrupted everything. We want the original functionality of trasport - but it is now a journey. Perhaps journey needs enhancing to, only operate between defined cities. We may need to do Item 6 first so journeys only exists between sequential cities - then can remove all traces of the old transport style as journeys will work. **[ON HOLD - pending Item 6 - should resolve after]**
-- [ ] d) Rather than have it as a table with rows of collapsible's for each entry in the transport tab, revert the display to a table with columns and individual rows for the data elements of the journey 
+- [ ] b) Journeys are in json backups/2026_June_July_Europe_Thailand.json - but not loading / viewing in itinerary or transport. Need to intersperse from itinerary or transport the journeys to pair with each other and display in tables / itinerary where possible.
+- [ ] c) Journey needs enhancing to only operate between defined cities (sequential). Remove all traces of old transport style.
+- [ ] d) Revert the display to a table with columns and individual rows for the data elements of the journey 
 
 **Summary:** Budget tab was still calculating transport costs from obsolete `day.transportItems`. Fixed by using `journeys.filter()` matched against `day.date`, `day.from`, and `day.to`.
 
@@ -62,8 +62,8 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ---
 
-### Item 6: Database alignment (city grouping + city option)
-**Status:** In progress — branch `item-6b`
+### ~~Item 6: Database alignment~~ ✅ COMPLETED
+**Status:** Completed — branch `item-6a`
 **Last completed:** `item-6f` — Cities selection
 **Next:** `item-6g` — Add cityId to journeys (done), tips, food, activities, accommodation
 
