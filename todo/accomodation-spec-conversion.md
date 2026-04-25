@@ -1,153 +1,98 @@
-# Transport Feature Spec (Step-by-Step Build)
+# Accommodation Feature Spec (Step-by-Step)
 
 ## Goal
-Change the current transport options to the following
+Manage accommodation as date-range stays (not per-day rows)
 
 ---
 
-# ✅ PHASE 1 — Data Model (Start Here)
+# ✅ PHASE 1 — Data Model
 
 ## Tasks
-- [ ] Update Transport model/table and add transport with fields:
-    - id
-    - from_location
-    - to_location
-    - departure_date + departure_time
-    - arrival_date + departure_time
-    - transport_type (flight, train, car, ferry, bus)
-    - provider
-    - route_code (optional)
-    - status (planned, booked)
-    - cost
-    - booking_reference
-    - is_multi_leg (boolean, default false)
-    - notes
+- [ ] Create Stay table:
+  - id
+  - city
+  - property_name
+  - check_in_date
+  - check_out_date
+  - status (planned, booked)
+  - provider
+  - booking_reference
+  - total_cost
+  - cost_per_night (optional)
+  - notes
 
 ## Validation
-- [ ] Can create a Journey record
-- [ ] Can read/display a Journey
+- [ ] Can create/read a stay record
+- [ ] No UI yet
 
 ---
 
-# ✅ PHASE 2 — Basic Dialog (Single Journey Only)
+# ✅ PHASE 2 — Dialog UI
 
 ## Tasks
-- [ ] Build "Add Journey" modal/dialog
+- [ ] Build "Add Stay" dialog
+
+Fields:
+- City
+- Accommodation Name
+- Check-in Date
+- Check-out Date
+- Status
+- Provider
+- Booking Reference
+- Total Cost
+- Notes
+
+## UX Rules
+- [ ] Auto-calc nights
+- [ ] Keep form minimal
+- [ ] Fast to complete
 
 ## Validation
-- [ ] Transition current trasnport to new mode
-- [ ] Data persists correctly
-- [ ] Form is clean and fast (no clutter)
-
-🚫 Do NOT build multi-leg yet
+- [ ] User can create stay via UI
+- [ ] Dates save correctly
 
 ---
 
-# ✅ PHASE 3 — Itinerary Display (Basic)
+# ✅ PHASE 3 — Display
 
 ## Tasks
-- [ ] Render list of journeys sorted by date + departure_time
+- [ ] Show stays sorted by check-in date
 - [ ] Display:
-    - From → To
-    - Departure → Arrival
-    - Transport Type + Provider
+  - City
+  - Property
+  - Date range
+  - Nights
+  - Status
 
 ## Validation
-- [ ] Journeys appear in correct order
-- [ ] Output is readable as a simple itinerary
+- [ ] Reads clean like an itinerary
 
 ---
 
-# ✅ PHASE 4 — Multi-leg Data Support
+# ✅ PHASE 4 — Itinerary Integration
 
 ## Tasks
-- [ ] Create JourneyLeg table:
-    - id
-    - journey_id
-    - leg_order
-    - from_location
-    - to_location
-    - departure_time
-    - arrival_time
-    - provider
-    - route_code
-
-- [ ] Add relationship: Journey → JourneyLeg[]
+- [ ] On each day:
+  - Show check-in on start date
+  - Show stay for in-between days
+  - Show check-out on final day
 
 ## Validation
-- [ ] Can attach multiple legs to a journey
-- [ ] leg_order is preserved
-
-🚫 Still no UI for legs yet
+- [ ] Matches real travel flow
 
 ---
 
-# ✅ PHASE 5 — Multi-leg UI
+# 🚫 Rules
 
-## Tasks
-- [ ] Add checkbox:
-  "This journey has stopovers"
-
-- [ ] When checked:
-    - Show dynamic list of legs
-    - Each leg has:
-        - From / To
-        - Departure / Arrival
-        - Provider
-        - Route code
-
-- [ ] Add:
-    - "Add Leg" button
-    - Remove leg option
-
-## Validation
-- [ ] User can add/remove legs
-- [ ] Legs save correctly to DB
-- [ ] First leg starts at journey.from_location
-- [ ] Last leg ends at journey.to_location
+- [ ] 1 row = 1 stay (not per day)
+- [ ] Do NOT create "transit" rows unless needed
+- [ ] Do NOT duplicate dates
 
 ---
 
-# ✅ PHASE 6 — Itinerary (Multi-leg Display)
+# 🎯 Done When
 
-## Tasks
-- [ ] If single journey:
-    - Show simple A → B
-
-- [ ] If multi-leg:
-    - Collapsed view:
-      "A → B (via X)"
-
-    - Expanded view:
-      Show each leg with times
-
-## Validation
-- [ ] Multi-leg journeys render correctly
-- [ ] Layout is easy to read
-
----
-
-# ✅ PHASE 7 — UX Improvements (Optional)
-
-## Tasks
-- [ ] Auto-fill:
-    - First leg "from" = journey origin
-    - Last leg "to" = journey destination
-
-- [ ] Optional:
-    - Calculate layover durations
-    - Auto-calc duration from times
-- [ ] Incorporate into the full itinerary
-
----
-
-# 🚫 Rules (Always Enforce)
-
----
-
-# 🎯 Definition of Done
-
-- [ ] User can create journeys easily
-- [ ] Multi-leg journeys supported
-- [ ] Itinerary view is clean and readable
-- [ ] No hacks (no fake rows, no messy text parsing)
+- [ ] Stays are easy to enter
+- [ ] No duplicate rows
+- [ ] Itinerary reads cleanly

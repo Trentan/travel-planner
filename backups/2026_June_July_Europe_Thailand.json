@@ -24,7 +24,6 @@
           "day": "Mon",
           "from": "Brisbane",
           "to": "In transit",
-          "transport": "✈ EVA Air BNE→TPE 22:15",
           "accom": "—",
           "desc": "Depart Brisbane",
           "headline": "🌙 Late departure — check-in online, arrive airport 3hrs early",
@@ -33,19 +32,14 @@
             "Duty-free AUD before boarding"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "✈ EVA Air BNE→TPE 22:15",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "—",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": []
@@ -85,7 +79,6 @@
           "day": "Tue",
           "from": "Taipei",
           "to": "Taipei",
-          "transport": "✈ EVA Air TPE→VIE 22:40",
           "accom": "— (transit, no hotel)",
           "desc": "Free EVA stopover — apply for tourist voucher",
           "headline": "🎧 RS-style: Ximending → CKS Memorial",
@@ -93,19 +86,14 @@
             "EVA free stopover voucher"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "✈ EVA Air TPE→VIE 22:40",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "— (transit, no hotel)",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -151,7 +139,6 @@
           "day": "Wed",
           "from": "Vienna",
           "to": "Vienna",
-          "transport": "✈ Arrive VIE 08:40 · U-Bahn to centre",
           "accom": "TBC — Vienna city centre",
           "desc": "Arrive Vienna — settle into Europe",
           "headline": "🎧 RS Vienna City Walk: Stephansdom → Hofburg",
@@ -159,19 +146,14 @@
             "Vienna City Card"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "✈ Arrive VIE 08:40 · U-Bahn to centre",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Vienna city centre",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -234,7 +216,6 @@
           "day": "Thu",
           "from": "Vienna",
           "to": "Bratislava",
-          "transport": "🚂 RegioJet ~1h",
           "accom": "TBC — Bratislava old town",
           "desc": "Day into Bratislava",
           "headline": "🎧 RS-style: Hlavné Nám → Michael's Gate",
@@ -242,19 +223,14 @@
             "Buy RegioJet ticket online from Wien Hauptbahnhof"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "🚂 RegioJet ~1h",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Bratislava old town",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -270,7 +246,6 @@
           "day": "Fri",
           "from": "Bratislava",
           "to": "Bratislava",
-          "transport": "— (Bus 29 for Devín)",
           "accom": "TBC — Bratislava old town",
           "desc": "Full day Bratislava",
           "headline": "🏯 Devín Castle ruins",
@@ -278,19 +253,14 @@
             "Bus 29 to Devín from Most SNP"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "— (Bus 29 for Devín)",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Bratislava old town",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -347,7 +317,6 @@
           "day": "Sat",
           "from": "Bratislava",
           "to": "Prague",
-          "transport": "🚂 RegioJet ~4.5h",
           "accom": "TBC — Prague old town",
           "desc": "Travel to Prague — arrive afternoon",
           "headline": "🎧 RS Prague Old Town Walk",
@@ -355,19 +324,14 @@
             "Book RegioJet in advance"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "🚂 RegioJet ~4.5h",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Prague old town",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -383,7 +347,6 @@
           "day": "Sun",
           "from": "Prague",
           "to": "Prague",
-          "transport": "— (metro / tram)",
           "accom": "TBC — Prague old town",
           "desc": "Full day Prague",
           "headline": "🎧 RS Prague Castle Walk",
@@ -391,19 +354,14 @@
             "Charles Bridge: arrive before 7am"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "— (metro / tram)",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Prague old town",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -449,7 +407,6 @@
           "day": "Mon",
           "from": "Prague",
           "to": "Nuremberg",
-          "transport": "🚂 RegioJet ~3.5h",
           "accom": "TBC — Nuremberg old town",
           "desc": "Stopover en route to Munich",
           "headline": "🎧 RS-style: Hauptmarkt → Kaiserburg",
@@ -457,19 +414,14 @@
             "Kaiserburg tower ~€7"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "🚂 RegioJet ~3.5h",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Nuremberg old town",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -559,7 +511,6 @@
           "day": "Tue",
           "from": "Nuremberg",
           "to": "Munich",
-          "transport": "🚂 ICE ~1h",
           "accom": "TBC — Munich conference hotel",
           "desc": "SoftwareAG Conference begins",
           "headline": "💼 Conference check-in & afternoon sessions",
@@ -567,19 +518,14 @@
             "Confirm conference venue"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "10",
-          "transportItems": [
-            {
-              "text": "🚂 ICE ~1h",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Munich conference hotel",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -595,7 +541,6 @@
           "day": "Wed",
           "from": "Munich",
           "to": "Munich",
-          "transport": "—",
           "accom": "TBC — Munich conference hotel",
           "desc": "Conference day 2",
           "headline": "💼 Full conference day",
@@ -603,19 +548,14 @@
             "English Garden: Eisbach surfer wave"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "—",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Munich conference hotel",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -631,7 +571,6 @@
           "day": "Thu",
           "from": "Munich",
           "to": "Munich",
-          "transport": "—",
           "accom": "TBC — Munich conference hotel",
           "desc": "Conference day 3 — last",
           "headline": "💼 Final conference sessions",
@@ -639,19 +578,14 @@
             "Dallmayr: mustard, sausages"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "—",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Munich conference hotel",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -667,7 +601,6 @@
           "day": "Fri",
           "from": "Munich",
           "to": "Munich",
-          "transport": "—",
           "accom": "TBC — Munich personal accommodation",
           "desc": "Free day — explore beyond conference",
           "headline": "🎧 RS Munich Walk",
@@ -675,19 +608,14 @@
             "Day trip alternative: Salzburg"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "—",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Munich personal accommodation",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -733,7 +661,6 @@
           "day": "Sat",
           "from": "Munich",
           "to": "Innsbruck",
-          "transport": "🚂 ÖBB ~1h 45m",
           "accom": "TBC — Innsbruck old town",
           "desc": "Into the Austrian Alps",
           "headline": "🏃 Innpromenade parkrun 8:45am SAT",
@@ -741,19 +668,14 @@
             "Nordkette: buy combo ticket"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "🚂 ÖBB ~1h 45m",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Innsbruck old town",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -810,7 +732,6 @@
           "day": "Sun",
           "from": "Innsbruck",
           "to": "Bolzano",
-          "transport": "🚂 Brenner Pass ~2h",
           "accom": "TBC — Bolzano city centre",
           "desc": "Bolzano via dramatic Brenner Pass crossing",
           "headline": "🎧 RS-style: Lauben arcades → Ötzi the Iceman Museum",
@@ -818,19 +739,14 @@
             "Ötzi Museum: ~€13"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "🚂 Brenner Pass ~2h",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Bolzano city centre",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -846,7 +762,6 @@
           "day": "Mon",
           "from": "Bolzano",
           "to": "Bolzano",
-          "transport": "— (cable car / local bus)",
           "accom": "TBC — Bolzano city centre",
           "desc": "Dolomites day trip",
           "headline": "🏔 Seceda cable car — soaring rocky spires",
@@ -854,19 +769,14 @@
             "Go early — fills with day-trippers"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "— (cable car / local bus)",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Bolzano city centre",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -912,7 +822,6 @@
           "day": "Tue",
           "from": "Bolzano",
           "to": "Milan",
-          "transport": "🚂 Bolzano→Verona ~1.5h · Verona→Milan ~1.5h",
           "accom": "TBC — Milan city centre",
           "desc": "Verona stopover en route",
           "headline": "🎧 RS Verona self-walk: Arena di Verona",
@@ -920,19 +829,14 @@
             "Book The Last Supper TONIGHT"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "🚂 Bolzano→Verona ~1.5h · Verona→Milan ~1.5h",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Milan city centre",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -978,7 +882,6 @@
           "day": "Wed",
           "from": "Milan",
           "to": "Milan",
-          "transport": "—",
           "accom": "TBC — Milan city centre",
           "desc": "Full day Milan",
           "headline": "🎧 RS Milan walk: Duomo rooftop → Galleria",
@@ -986,19 +889,14 @@
             "Duomo rooftop: book timed entry online"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "—",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Milan city centre",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1061,7 +959,6 @@
           "day": "Thu",
           "from": "Milan",
           "to": "Zurich",
-          "transport": "🚂 SBB Eurocity ~3.5h",
           "accom": "TBC — Zurich city centre",
           "desc": "Morning Milan → arrive Zurich evening",
           "headline": "🏘 Zurich Altstadt evening",
@@ -1069,19 +966,14 @@
             "SBB Eurocity: scenic Alpine crossing"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "🚂 SBB Eurocity ~3.5h",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Zurich city centre",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1097,7 +989,6 @@
           "day": "Fri",
           "from": "Zurich",
           "to": "In transit",
-          "transport": "✈ Swiss LX ZRH→LHR 18:30 · ✈ EVA BR LHR→BKK 21:35",
           "accom": "— (in transit)",
           "desc": "Full day Zurich — fly evening",
           "headline": "🎧 RS-style Zurich walk: Lindenhügel viewpoint",
@@ -1105,19 +996,14 @@
             "Be back by 3pm — flight 18:30"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "✈ Swiss LX ZRH→LHR 18:30 · ✈ EVA BR LHR→BKK 21:35",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "— (in transit)",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1168,7 +1054,6 @@
           "day": "Sat",
           "from": "In transit",
           "to": "Bangkok",
-          "transport": "✈ Arrive BKK Suvarnabhumi 15:30",
           "accom": "TBC — Bangkok city",
           "desc": "Arrive Bangkok — settle in solo",
           "headline": "🛕 Wat Pho → Chao Phraya Express boat",
@@ -1176,19 +1061,14 @@
             "Sky Bar dress code enforced"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "✈ Arrive BKK Suvarnabhumi 15:30",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Bangkok city",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1204,7 +1084,6 @@
           "day": "Sun",
           "from": "Bangkok",
           "to": "Bangkok",
-          "transport": "✈ Family arr 10:05",
           "accom": "TBC — Bangkok city",
           "desc": "Family arrives! ⚠️ EARLY FLIGHT TOMORROW",
           "headline": "🛍 Chatuchak Weekend Market",
@@ -1212,19 +1091,14 @@
             "Pre-order Grab taxi for 04:30 pickup"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "✈ Family arr 10:05",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "TBC — Bangkok city",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1389,7 +1263,6 @@
           "day": "Mon",
           "from": "Koh Samui",
           "to": "Koh Samui",
-          "transport": "✈ Bangkok Air BKK→USM 06:05",
           "accom": "🏨 Homm Hotel",
           "desc": "Arrive Koh Samui",
           "headline": "🏖 Chaweng Beach afternoon → Big Buddha Temple",
@@ -1397,19 +1270,14 @@
             "Request early check-in"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "✈ Bangkok Air BKK→USM 06:05",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1425,7 +1293,6 @@
           "day": "Tue",
           "from": "Koh Samui",
           "to": "Koh Samui",
-          "transport": "— (tour boat)",
           "accom": "🏨 Homm Hotel",
           "desc": "Day trip: Ang Thong",
           "headline": "⛵ Ang Thong Marine Park full day",
@@ -1433,19 +1300,14 @@
             "Book via Blue Star Sailing"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "— (tour boat)",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1461,7 +1323,6 @@
           "day": "Wed",
           "from": "Koh Samui",
           "to": "Koh Samui",
-          "transport": "— (speedboat)",
           "accom": "🏨 Homm Hotel",
           "desc": "Koh Tao snorkelling",
           "headline": "🐠 Koh Tao snorkelling — Shark Bay",
@@ -1469,19 +1330,14 @@
             "Na Muang 2: more dramatic than #1"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "— (speedboat)",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1497,7 +1353,6 @@
           "day": "Thu",
           "from": "Koh Samui",
           "to": "Koh Samui",
-          "transport": "—",
           "accom": "🏨 Homm Hotel",
           "desc": "Culture & wildlife day",
           "headline": "🍳 Thai cooking class then 🐘 Elephant Sanctuary",
@@ -1505,19 +1360,14 @@
             "Elephant sanctuary: ~฿2,500pp"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "—",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1533,7 +1383,6 @@
           "day": "Fri",
           "from": "Koh Samui",
           "to": "Koh Samui",
-          "transport": "—",
           "accom": "🏨 Homm Hotel",
           "desc": "Beach day + Night Market",
           "headline": "🛍 Fisherman's Village Friday Night Market",
@@ -1541,19 +1390,14 @@
             "Friday Market: arrive 5pm"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "—",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1569,7 +1413,6 @@
           "day": "Sat",
           "from": "Koh Samui",
           "to": "Koh Samui",
-          "transport": "—",
           "accom": "🏨 Homm Hotel",
           "desc": "Adventure day",
           "headline": "🚣 Kayak Chaweng Lake mangroves",
@@ -1577,19 +1420,14 @@
             "Secret Garden: ~30min drive inland"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "—",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1605,7 +1443,6 @@
           "day": "Sun",
           "from": "Koh Samui",
           "to": "Koh Samui",
-          "transport": "—",
           "accom": "🏨 Homm Hotel",
           "desc": "Relaxed beach day",
           "headline": "🌊 Silver Beach morning",
@@ -1613,19 +1450,14 @@
             "Silver Beach: calm clear water"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "—",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1641,7 +1473,6 @@
           "day": "Mon",
           "from": "Koh Samui",
           "to": "Koh Samui",
-          "transport": "—",
           "accom": "🏨 Homm Hotel",
           "desc": "Last full day on Samui",
           "headline": "🌅 Sunrise at Hin Ta & Hin Yai Rocks",
@@ -1649,19 +1480,14 @@
             "Book Grab for 06:30 airport pickup tomorrow"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "—",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1718,7 +1544,6 @@
           "day": "Tue",
           "from": "Koh Samui",
           "to": "Bangkok",
-          "transport": "✈ Bangkok Air USM→BKK 07:50 · ✈ Jetstar BKK→BNE 21:40",
           "accom": "— (transit)",
           "desc": "Fly home via Bangkok",
           "headline": "🛫 USM 07:50 → BKK 08:55",
@@ -1726,19 +1551,14 @@
             "Jetstar baggage: very strict"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "✈ Bangkok Air USM→BKK 07:50 · ✈ Jetstar BKK→BNE 21:40",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "— (transit)",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -1754,7 +1574,6 @@
           "day": "Wed",
           "from": "Brisbane",
           "to": "Brisbane",
-          "transport": "✈ Arrive BNE ~09:30",
           "accom": "— (home!)",
           "desc": "Home! 🏠",
           "headline": "🏠 Welcome back to Brisbane!",
@@ -1762,19 +1581,14 @@
             "Duty-free allowance: 2.25L alcohol"
           ],
           "completed": false,
-          "transportCost": "0",
           "accomCost": "0",
           "activityCost": "0",
-          "transportItems": [
-            {
-              "text": "✈ Arrive BNE ~09:30",
-              "cost": "0"
-            }
-          ],
           "accomItems": [
             {
               "text": "— (home!)",
-              "cost": "0"
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": ""
             }
           ],
           "activityItems": [
@@ -2156,6 +1970,448 @@
           "done": false
         }
       ]
+    }
+  ],
+  "journeys": [
+    {
+      "id": "journey_0",
+      "legId": "departure",
+      "dayDate": "8 Jun",
+      "fromLocation": "Brisbane",
+      "toLocation": "In transit",
+      "departureDate": "2026-06-08",
+      "departureTime": "22:15",
+      "arrivalDate": "2026-06-08",
+      "arrivalTime": "",
+      "transportType": "flight",
+      "provider": "EVA Air",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "✈ EVA Air BNE→TPE 22:15",
+      "legs": []
+    },
+    {
+      "id": "journey_1",
+      "legId": "taipei",
+      "dayDate": "9 Jun",
+      "fromLocation": "Taipei",
+      "toLocation": "Taipei",
+      "departureDate": "2026-06-09",
+      "departureTime": "22:40",
+      "arrivalDate": "2026-06-09",
+      "arrivalTime": "",
+      "transportType": "flight",
+      "provider": "EVA Air",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "✈ EVA Air TPE→VIE 22:40",
+      "legs": []
+    },
+    {
+      "id": "journey_2",
+      "legId": "vienna",
+      "dayDate": "10 Jun",
+      "fromLocation": "Vienna",
+      "toLocation": "Vienna",
+      "departureDate": "2026-06-10",
+      "departureTime": "08:40",
+      "arrivalDate": "2026-06-10",
+      "arrivalTime": "",
+      "transportType": "flight",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "✈ Arrive VIE 08:40 · U-Bahn to centre",
+      "legs": []
+    },
+    {
+      "id": "journey_3",
+      "legId": "bratislava",
+      "dayDate": "11 Jun",
+      "fromLocation": "Vienna",
+      "toLocation": "Bratislava",
+      "departureDate": "2026-06-11",
+      "departureTime": "",
+      "arrivalDate": "2026-06-11",
+      "arrivalTime": "",
+      "transportType": "train",
+      "provider": "RegioJet",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "🚂 RegioJet ~1h",
+      "legs": []
+    },
+    {
+      "id": "journey_4",
+      "legId": "bratislava",
+      "dayDate": "12 Jun",
+      "fromLocation": "Bratislava",
+      "toLocation": "Bratislava",
+      "departureDate": "2026-06-12",
+      "departureTime": "",
+      "arrivalDate": "2026-06-12",
+      "arrivalTime": "",
+      "transportType": "bus",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "— (Bus 29 for Devín)",
+      "legs": []
+    },
+    {
+      "id": "journey_5",
+      "legId": "prague",
+      "dayDate": "13 Jun",
+      "fromLocation": "Bratislava",
+      "toLocation": "Prague",
+      "departureDate": "2026-06-13",
+      "departureTime": "",
+      "arrivalDate": "2026-06-13",
+      "arrivalTime": "",
+      "transportType": "train",
+      "provider": "RegioJet",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "🚂 RegioJet ~4.5h",
+      "legs": []
+    },
+    {
+      "id": "journey_6",
+      "legId": "prague",
+      "dayDate": "14 Jun",
+      "fromLocation": "Prague",
+      "toLocation": "Prague",
+      "departureDate": "2026-06-14",
+      "departureTime": "",
+      "arrivalDate": "2026-06-14",
+      "arrivalTime": "",
+      "transportType": "other",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "— (metro / tram)",
+      "legs": []
+    },
+    {
+      "id": "journey_7",
+      "legId": "nuremberg",
+      "dayDate": "15 Jun",
+      "fromLocation": "Prague",
+      "toLocation": "Nuremberg",
+      "departureDate": "2026-06-15",
+      "departureTime": "",
+      "arrivalDate": "2026-06-15",
+      "arrivalTime": "",
+      "transportType": "train",
+      "provider": "RegioJet",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "🚂 RegioJet ~3.5h",
+      "legs": []
+    },
+    {
+      "id": "journey_8",
+      "legId": "munich",
+      "dayDate": "16 Jun",
+      "fromLocation": "Nuremberg",
+      "toLocation": "Munich",
+      "departureDate": "2026-06-16",
+      "departureTime": "",
+      "arrivalDate": "2026-06-16",
+      "arrivalTime": "",
+      "transportType": "train",
+      "provider": "DB ICE",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "🚂 ICE ~1h",
+      "legs": []
+    },
+    {
+      "id": "journey_9",
+      "legId": "innsbruck",
+      "dayDate": "20 Jun",
+      "fromLocation": "Munich",
+      "toLocation": "Innsbruck",
+      "departureDate": "2026-06-20",
+      "departureTime": "",
+      "arrivalDate": "2026-06-20",
+      "arrivalTime": "",
+      "transportType": "train",
+      "provider": "ÖBB",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "🚂 ÖBB ~1h 45m",
+      "legs": []
+    },
+    {
+      "id": "journey_10",
+      "legId": "bolzano",
+      "dayDate": "21 Jun",
+      "fromLocation": "Innsbruck",
+      "toLocation": "Bolzano",
+      "departureDate": "2026-06-21",
+      "departureTime": "",
+      "arrivalDate": "2026-06-21",
+      "arrivalTime": "",
+      "transportType": "train",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "🚂 Brenner Pass ~2h",
+      "legs": []
+    },
+    {
+      "id": "journey_11",
+      "legId": "bolzano",
+      "dayDate": "22 Jun",
+      "fromLocation": "Bolzano",
+      "toLocation": "Bolzano",
+      "departureDate": "2026-06-22",
+      "departureTime": "",
+      "arrivalDate": "2026-06-22",
+      "arrivalTime": "",
+      "transportType": "bus",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "— (cable car / local bus)",
+      "legs": []
+    },
+    {
+      "id": "journey_12",
+      "legId": "verona",
+      "dayDate": "23 Jun",
+      "fromLocation": "Bolzano",
+      "toLocation": "Milan",
+      "departureDate": "2026-06-23",
+      "departureTime": "",
+      "arrivalDate": "2026-06-23",
+      "arrivalTime": "",
+      "transportType": "train",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "🚂 Bolzano→Verona ~1.5h · Verona→Milan ~1.5h",
+      "legs": []
+    },
+    {
+      "id": "journey_13",
+      "legId": "zurich",
+      "dayDate": "25 Jun",
+      "fromLocation": "Milan",
+      "toLocation": "Zurich",
+      "departureDate": "2026-06-25",
+      "departureTime": "",
+      "arrivalDate": "2026-06-25",
+      "arrivalTime": "",
+      "transportType": "train",
+      "provider": "SBB",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "🚂 SBB Eurocity ~3.5h",
+      "legs": []
+    },
+    {
+      "id": "journey_14",
+      "legId": "zurich",
+      "dayDate": "26 Jun",
+      "fromLocation": "Zurich",
+      "toLocation": "In transit",
+      "departureDate": "2026-06-26",
+      "departureTime": "18:30",
+      "arrivalDate": "2026-06-26",
+      "arrivalTime": "",
+      "transportType": "flight",
+      "provider": "Swiss",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "✈ Swiss LX ZRH→LHR 18:30 · ✈ EVA BR LHR→BKK 21:35",
+      "legs": []
+    },
+    {
+      "id": "journey_15",
+      "legId": "bangkok",
+      "dayDate": "27 Jun",
+      "fromLocation": "In transit",
+      "toLocation": "Bangkok",
+      "departureDate": "2026-06-27",
+      "departureTime": "15:30",
+      "arrivalDate": "2026-06-27",
+      "arrivalTime": "",
+      "transportType": "flight",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "✈ Arrive BKK Suvarnabhumi 15:30",
+      "legs": []
+    },
+    {
+      "id": "journey_16",
+      "legId": "bangkok",
+      "dayDate": "28 Jun",
+      "fromLocation": "Bangkok",
+      "toLocation": "Bangkok",
+      "departureDate": "2026-06-28",
+      "departureTime": "10:05",
+      "arrivalDate": "2026-06-28",
+      "arrivalTime": "",
+      "transportType": "other",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "✈ Family arr 10:05",
+      "legs": []
+    },
+    {
+      "id": "journey_17",
+      "legId": "samui",
+      "dayDate": "29 Jun",
+      "fromLocation": "Koh Samui",
+      "toLocation": "Koh Samui",
+      "departureDate": "2026-06-29",
+      "departureTime": "06:05",
+      "arrivalDate": "2026-06-29",
+      "arrivalTime": "",
+      "transportType": "flight",
+      "provider": "Bangkok Airways",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "✈ Bangkok Air BKK→USM 06:05",
+      "legs": []
+    },
+    {
+      "id": "journey_18",
+      "legId": "samui",
+      "dayDate": "30 Jun",
+      "fromLocation": "Koh Samui",
+      "toLocation": "Koh Samui",
+      "departureDate": "2026-06-30",
+      "departureTime": "",
+      "arrivalDate": "2026-06-30",
+      "arrivalTime": "",
+      "transportType": "ferry",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "— (tour boat)",
+      "legs": []
+    },
+    {
+      "id": "journey_19",
+      "legId": "samui",
+      "dayDate": "1 Jul",
+      "fromLocation": "Koh Samui",
+      "toLocation": "Koh Samui",
+      "departureDate": "2026-07-01",
+      "departureTime": "",
+      "arrivalDate": "2026-07-01",
+      "arrivalTime": "",
+      "transportType": "ferry",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "— (speedboat)",
+      "legs": []
+    },
+    {
+      "id": "journey_20",
+      "legId": "return",
+      "dayDate": "7 Jul",
+      "fromLocation": "Koh Samui",
+      "toLocation": "Bangkok",
+      "departureDate": "2026-07-07",
+      "departureTime": "07:50",
+      "arrivalDate": "2026-07-07",
+      "arrivalTime": "",
+      "transportType": "flight",
+      "provider": "Bangkok Airways",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "✈ Bangkok Air USM→BKK 07:50 · ✈ Jetstar BKK→BNE 21:40",
+      "legs": []
+    },
+    {
+      "id": "journey_21",
+      "legId": "return",
+      "dayDate": "8 Jul",
+      "fromLocation": "Brisbane",
+      "toLocation": "Brisbane",
+      "departureDate": "2026-07-08",
+      "departureTime": "09:30",
+      "arrivalDate": "2026-07-08",
+      "arrivalTime": "",
+      "transportType": "flight",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "✈ Arrive BNE ~09:30",
+      "legs": []
     }
   ]
 }

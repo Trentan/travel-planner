@@ -153,53 +153,40 @@ Trip title, subtitle, and current file name for display.
 - **Sorting**: `sortLegs()` sorts by first day's date, called after date changes
 - **Auto-save**: `saveData(false)` for silent saves, `saveData(true)` shows ✓ indicator
 
-## Development Roadmap
+## Development Roadmap / TODO List
 
-### Phase 1: Compact View Mode [DONE]
-Ultra-dense layout toggle for efficient viewing.
-- [x] Compact View button and toggle
-- [x] Compact CSS styling
-- [x] `buildCompactItinerary()` function
+#### When resolving items
+When addressing each item, do one at a time and confirm changes, commit the code with the commit message 
+describing the item resolved and the fixes applied. Ensure a new branch created (with a branch name of the incremented item number), 
+committed and push - request review, once done ensure the items are checked as completed in this list and remove from this list 
+when confirmed completed.
 
-### Phase 2: Code Refactoring [DONE]
-Split 1400-line single-file into modules for maintainability:
-- [x] Extract CSS to `style.css`
-- [x] Extract JS to 9 modules: `utils.js`, `data.js`, `packing.js`, `dragdrop.js`, `crud.js`, `tabs.js`, `ai.js`, `ui.js`, `itinerary.js`
-- [x] Update `sw.js` to cache all new files
+### Item 1: Layout issue
+- [ ] For itinerary entities: There should be three clear columns in this order (currently busted tips and suggested activities are one column)
+  Tips, Food Quests, Suggested Activities
+- [ ] The itinerary collapsible is still closing an action button in a column within (eg transport or accomodation - planning/confirmed) when pressed in itinerary. Additonally, when interacted with and changed / edited, this is not reflected in the - Transport or accomodation tab (when switching to it) (and same when editing in those tabs and switching back and viewing in itinerary- )
+  e.g ✈ EVA Air BNE→TPE 22:15
+  ✓ Confirmed
+  Ref #
+  $
+  0
 
-### Phase 3: Enhanced Print Features [DONE]
-- [x] Date range selection for printing
-- [x] Print preview modal with live preview
-- [x] Configurable print options (transport, accom, activities, costs)
+### Item 2: Resolve Journey/Transport integration
+- [ ] Transport used to work flawlessly in itinerary and displaying in the Transport tab - they have all transitioned to Journey's - They are not being handled or displayed correctly - resolve
 
-### Phase 4: Bug Fixes & Polish [DONE]
-- [x] JSON import error handling with graceful fallback
-- [x] "Last exported/imported" timestamp display
-- [x] Auto-save confirmations (already implemented)
+### Item 3: Convert Accommodation
+- [ ] Accommodation needs fixing now see and work through - see todo/accomodation-spec-conversion.md
 
-### Phase 5: Interactive How-To Guide [PENDING]
-- [x] Guide tab with expandable step cards
-- [x] Mini demos within each step (buttons, inputs, checkboxes)
-- [x] Interactive spotlight tutorial with navigation
-- [x] Progress tracking across sessions
-- [x] Keyboard navigation (arrows, escape)
-- [ ] Global map showing all trip legs with color-coded routes
-- [ ] Interactive markers for each city/destination
-- [ ] Per-leg local map views
-- [ ] Click-to-open in Google Maps
+### Item 4: Database alignment (can group by cities any option)
+- [ ] All the tips, suggested activities, food quests, accommodation and transport can all align to cities - perhaps make another options citie(S) for all of those options which are stored along each entity (in the json) and could be used in other options one day / displayed in their individual tabs when not in itinerary mode.
+- [ ] Convert the current json file to handle this change 2026_June_July_Europe_Thailand.json
+- [ ] The subheadings for the trip (cities) which are currently above the main tabs (itinerary, transport, accommodation etc) dissapear when scrolling down. They should stay viewable and interactable still when scrolling - also this subheading should now appear below the main tabs listing.
+- [ ] Add an all (which is the default) to the cities subheading filter
+- [ ] Depending on the subheading filter select - filter by that city group and display only those in the accommodation and transport tabs for only that selected city or {jump to that city in itinerary view (already done)}
 
-### Phase 6: Fix visuals, layout and compatibility [PENDING]
-- [x] Clicking the confirmed or pending on the accommodation and transport tabs does not do anything on those tabs when in view
-- [x] Improve the readability and interactivity making the screen space more functional and user-friendly
-- [x] Ensure sights and running activities are consolidated into one list and make the money amount and time fit on a single line
-- [x] Use the full width of the page to fit the multiple areas per leg
-- [x] Make the city tips more like help text and one row/column directly under the collapsible city heading
-- [x] fix the layout, make it all 3 columns in the itinerary nice and wide again
-- [x] click action on confirmed/pending in the main itinerary is collapsing the dropdown and not updating the other tabs (and vice versa)
-- [x] combine City Running/Fitness and Suggested Sights Pool into ONE GROUP - Suggested Activities
-
-### Phase 7: Export to google calendar [NOT STARTED]
-- [ ] Export to google calendar - allow filter for just flights, just transport, just cities, just accomodation (or a mix) and generate the gcal for the information
+### Item 5: Interactive How-To Guide
+- [ ] The interactive guide on how to use the app is not working + can be improved with the latest changes
+- 
 ## Testing Checklist
 
 Before considering work complete:
