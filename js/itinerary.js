@@ -378,7 +378,15 @@ function scrollToCity(cityId) {
       const el = document.getElementById('leg-' + leg.id);
       if (el) {
         el.classList.remove('collapsed');
-        el.scrollIntoView({behavior: 'smooth', block: 'start'});
+        // Scroll with offset to account for sticky nav bars
+        const navHeight = document.querySelector('.app-tabs-nav')?.offsetHeight || 56;
+        const cityNavHeight = document.querySelector('.city-nav')?.offsetHeight || 56;
+        const offset = navHeight + cityNavHeight + 20; // +20px padding
+        const elTop = el.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({
+          top: elTop - offset,
+          behavior: 'smooth'
+        });
         break;
       }
     }
