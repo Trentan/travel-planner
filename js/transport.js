@@ -395,6 +395,7 @@ function toggleJourneyStatus(journeyId) {
 
 // Open journey modal and populate city dropdowns
 function openAddJourneyModal() {
+  console.log('[openAddJourneyModal] Called');
   try {
     console.log('[openAddJourneyModal] Starting...');
     const modal = document.getElementById('journey-modal');
@@ -518,6 +519,11 @@ function saveJourneyFromModal() {
     alert('Error saving journey: ' + e.message);
   }
 }
+
+// Expose modal functions to window scope for HTML onclick handlers
+window.openAddJourneyModal = openAddJourneyModal;
+window.closeJourneyModal = closeJourneyModal;
+window.saveJourneyFromModal = saveJourneyFromModal;
 
 // Rebuild current view helper
 function rebuildCurrentView() {

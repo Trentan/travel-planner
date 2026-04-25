@@ -693,6 +693,14 @@ function exportJSON() {
   localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
 }
 
+// Expose city dialog functions to window scope
+window.openCityDialog = openCityDialog;
+window.closeCityDialog = closeCityDialog;
+window.addNewCityFromDialog = addNewCityFromDialog;
+window.updateCityCountry = updateCityCountry;
+window.deleteCityFromDialog = deleteCityFromDialog;
+window.populateCityList = populateCityList;
+
 function importJSON(event) {
   const file = event.target.files[0];
   if (!file) {

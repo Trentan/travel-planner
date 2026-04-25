@@ -16,6 +16,27 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ---
 
+### ~~Item 6: Database alignment~~ ✅ COMPLETED
+**Status:** Completed — branch `item-6a`
+**Last completed:** `item-6f` — Cities selection
+**Next:** `item-6g` — Add cityId to journeys (done), tips, food, activities, accommodation
+
+- [x] a) Tips, suggested activities, food quests, accommodation, and transport should all be alignable to cities — add a `cities` field stored on each entity in the JSON, usable for filtering and future display in individual tabs outside itinerary mode. Perhaps each city defined should have the country, name, date from, date to, duration.
+- [x] b) Convert the current trip file `2026_June_July_Europe_Thailand.json` to handle this new structure
+- [X] c) moved
+- [x] d) For add cityId - I mean add a VARIABLE `cities` to each object class (eg tips, food, accom, journey, sights) - not just rename the variables in the json structure fix it (`2026_June_July_Europe_Thailand.json` to handle this new structure)
+- [x] e) Add an "All" option (default) to the cities subheading filter
+- [x] f) When a city is selected in the subheading filter: show only that city's entries in the Accommodation and Transport tabs; (like the jump to that city in the Itinerary view (already implemented))
+- [x] g) Need a way to edit and manage cities (perhaps from the add new leg button - make this a dialog now with either new city or select preexisting) - also if there is a start and return city (eg first and last legs) maybe make that 'home' - or some way to handle the initial departure and last arrival (eg day 1 Departure - Last day Return).
+- [x] h) City subheadings (currently above the main tabs) disappear on scroll — they should remain visible and interactive when scrolling, and appear below the main tab bar throughout the entire app. The city selections are working great - BUT - implement the nice labeling of the flag/country prior to the city name in the selection menu (like it used to be).
+- [x] i) Tips look broken, they just display "[object Object]"
+- [x] j) The city selection in itinerary view is scrolling just a bit to far, the day and city name should still be in view (not just the city tips etc)
+- [x] k) City color randomization - assign random color for new cities, maybe make submenu and map match city color scheme
+- [x] l) You can perhaps also - rename the departure leg to start - perhaps make an option to handle it better. Eg make it like a city (so you can select Start or Return options - they are the only special ones which are not city specific (but represent an actual leg not a city).
+- [x] m) I don't know how to handle adding days in legs etc., perhaps add legs should have the multiple cities and days handled when adding (eg city from, to, days / dates from to). Also maybe warn about conflict if a day already help - this might need more questions to work out a logical solution
+
+---
+
 ## Active
 
 ### Item 2: Resolve Journey/Transport integration
@@ -27,7 +48,7 @@ Read this file at the start of every session. Update status blocks and checkboxe
 - [x] b) Journeys import from JSON working — saved to localStorage and loaded in initData
 - [x] c) Journeys have fromCityId/toCityId linking to defined cities
 - [x] d) Transport tab reverted to table format with columns: Type, Date, Route, Time, Provider, Route #, Cost, Status, Booking Ref, Actions 
-- [ ] e) Journey/transport needs a refactor (as a journey can comprise multiple transport options and days spans) - Perhaps introduce a journeyName (*user defined - similar to the notes field or auto generated from the input ports/cities), journeyId (*unique system generated) for each journey - and add to the table - when viewing in the transport tab - the journeyId can be the same for multiple, it will also help when displaying the transport info in the itinerary tab. Also, if the journey is edited makes it easier to display that info. 
+- [ ] e) Journey/transport needs a refactor (as a journey can comprise multiple transport options and days spans) - Perhaps introduce a journeyName (*user defined - similar to the notes field or auto generated from the input ports/cities - needs to be unique like the uniqueId), journeyId (*unique system generated) for each journey - and add to the table - when viewing in the transport tab - the journeyId can be the same for multiple, it will also help when displaying the transport info in the itinerary tab. Also, if the journey is edited makes it easier to display that info. 
 - [ ] f) The add journey dialog not displaying, same as add trip leg, add activity, add food etc. the dialogs broken not displaying
 
 **Summary:** Budget tab was still calculating transport costs from obsolete `day.transportItems`. Fixed by using `journeys.filter()` matched against `day.date`, `day.from`, and `day.to`.
@@ -61,27 +82,6 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 - [ ] a) Carry-on Packed Bag (Main Luggage) - REMOVE "Before leaving home" from the default
 - [ ] b) The collapsible Before leaving home, hotel sink washing, Example capsule - can be setup in a row 1 x 3 col - grid style so they take up less space. By default / on tab open (packing) they should all be collapsed.
-
----
-
-### ~~Item 6: Database alignment~~ ✅ COMPLETED
-**Status:** Completed — branch `item-6a`
-**Last completed:** `item-6f` — Cities selection
-**Next:** `item-6g` — Add cityId to journeys (done), tips, food, activities, accommodation
-
-- [x] a) Tips, suggested activities, food quests, accommodation, and transport should all be alignable to cities — add a `cities` field stored on each entity in the JSON, usable for filtering and future display in individual tabs outside itinerary mode. Perhaps each city defined should have the country, name, date from, date to, duration. 
-- [x] b) Convert the current trip file `2026_June_July_Europe_Thailand.json` to handle this new structure
-- [X] c) moved
-- [x] d) For add cityId - I mean add a VARIABLE `cities` to each object class (eg tips, food, accom, journey, sights) - not just rename the variables in the json structure fix it (`2026_June_July_Europe_Thailand.json` to handle this new structure)
-- [x] e) Add an "All" option (default) to the cities subheading filter
-- [x] f) When a city is selected in the subheading filter: show only that city's entries in the Accommodation and Transport tabs; (like the jump to that city in the Itinerary view (already implemented))
-- [x] g) Need a way to edit and manage cities (perhaps from the add new leg button - make this a dialog now with either new city or select preexisting) - also if there is a start and return city (eg first and last legs) maybe make that 'home' - or some way to handle the initial departure and last arrival (eg day 1 Departure - Last day Return).
-- [x] h) City subheadings (currently above the main tabs) disappear on scroll — they should remain visible and interactive when scrolling, and appear below the main tab bar throughout the entire app. The city selections are working great - BUT - implement the nice labeling of the flag/country prior to the city name in the selection menu (like it used to be).
-- [x] i) Tips look broken, they just display "[object Object]"
-- [x] j) The city selection in itinerary view is scrolling just a bit to far, the day and city name should still be in view (not just the city tips etc)
-- [x] k) City color randomization - assign random color for new cities, maybe make submenu and map match city color scheme
-- [x] l) You can perhaps also - rename the departure leg to start - perhaps make an option to handle it better. Eg make it like a city (so you can select Start or Return options - they are the only special ones which are not city specific (but represent an actual leg not a city). 
-- [x] m) I don't know how to handle adding days in legs etc., perhaps add legs should have the multiple cities and days handled when adding (eg city from, to, days / dates from to). Also maybe warn about conflict if a day already help - this might need more questions to work out a logical solution
 
 ---
 

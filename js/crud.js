@@ -565,3 +565,9 @@ function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
 function toggleFoodCompleted(e, legIdx, foodIdx) { appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); buildItinerary(); }
 function toggleDayCompleted(e, legIdx, dayIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].completed = e.target.checked; saveData(); buildItinerary(); }
 function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) { appData[legIdx].days[dayIdx].activityItems[itemIdx].done = e.target.checked; saveData(); buildItinerary(); }
+
+// Expose dialog functions to window scope for HTML onclick handlers
+window.openAddLegDialog = openAddLegDialog;
+window.closeAddLegDialog = closeAddLegDialog;
+window.confirmAddLeg = confirmAddLeg;
+window.onLegTypeChange = onLegTypeChange;
