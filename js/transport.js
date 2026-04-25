@@ -106,6 +106,10 @@ function updateJourneyBookingRef(id, ref) {
   if (journey) {
     journey.bookingReference = ref;
     saveJourneys();
+    // Rebuild current view to reflect changes
+    if (typeof rebuildCurrentView === 'function') {
+      rebuildCurrentView();
+    }
     return journey;
   }
   return null;
@@ -117,6 +121,10 @@ function updateJourneyCost(id, cost) {
   if (journey) {
     journey.cost = cost;
     saveJourneys();
+    // Rebuild current view to reflect changes
+    if (typeof rebuildCurrentView === 'function') {
+      rebuildCurrentView();
+    }
     return journey;
   }
   return null;
@@ -126,6 +134,10 @@ function updateJourneyCost(id, cost) {
 function deleteJourney(id) {
   journeys = journeys.filter(j => j.id !== id);
   saveJourneys();
+  // Rebuild current view to reflect changes
+  if (typeof rebuildCurrentView === 'function') {
+    rebuildCurrentView();
+  }
 }
 
 // Get sorted journeys (by departure date then time)
@@ -320,7 +332,11 @@ function toggleJourneyStatus(journeyId) {
   if (journey) {
     const newStatus = journey.status === 'booked' ? 'planned' : 'booked';
     updateJourneyStatus(journeyId, newStatus);
-    buildTransportTab();
+    if (typeof rebuildCurrentView === 'function') {
+      rebuildCurrentView();
+    } else {
+      buildTransportTab();
+    }
   }
 }
 
@@ -482,7 +498,12 @@ function saveJourneyForm(editId = '') {
   }
 
   closeAddJourneyModal();
-  buildTransportTab();
+  // Rebuild current view to reflect changes
+  if (typeof rebuildCurrentView === 'function') {
+    rebuildCurrentView();
+  } else {
+    buildTransportTab();
+  }
 }
 
 // Initialize on load

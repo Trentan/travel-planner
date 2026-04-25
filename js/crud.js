@@ -131,17 +131,10 @@ function toggleBookingStatus(e, legIdx, dayIdx, category, itemIdx) {
   item.status = item.status === 'confirmed' ? 'pending' : 'confirmed';
   if (item.status === 'pending') item.bookingRef = '';
   saveData();
-  // Check which tab is active and only rebuild relevant views
-  const activeTab = document.querySelector('.tab-pane.active');
-  const tabId = activeTab ? activeTab.id : '';
-  if (tabId === 'tab-itinerary') {
-    buildItinerary();
-  } else if (tabId === 'tab-transport') {
-    if (typeof buildTransportTab === 'function') buildTransportTab();
-  } else if (tabId === 'tab-accom') {
-    if (typeof buildAccomTab === 'function') buildAccomTab();
+  // Rebuild the current active view
+  if (typeof rebuildCurrentView === 'function') {
+    rebuildCurrentView();
   } else {
-    // Default: rebuild itinerary for other tabs
     buildItinerary();
   }
 }
@@ -149,13 +142,9 @@ function toggleBookingStatus(e, legIdx, dayIdx, category, itemIdx) {
 function updateBookingRef(legIdx, dayIdx, category, itemIdx, value) {
   appData[legIdx].days[dayIdx][category][itemIdx].bookingRef = value;
   saveData();
-  // Check which tab is active and only rebuild relevant views
-  const activeTab = document.querySelector('.tab-pane.active');
-  const tabId = activeTab ? activeTab.id : '';
-  if (tabId === 'tab-transport') {
-    if (typeof buildTransportTab === 'function') buildTransportTab();
-  } else if (tabId === 'tab-accom') {
-    if (typeof buildAccomTab === 'function') buildAccomTab();
+  // Rebuild the current active view
+  if (typeof rebuildCurrentView === 'function') {
+    rebuildCurrentView();
   }
 }
 
@@ -208,16 +197,22 @@ function updateLegTip(legIdx, tipIdx, val) {
 function updateDayItemText(legIdx, dayIdx, category, itemIdx, text, fromTabs = false) {
   appData[legIdx].days[dayIdx][category][itemIdx].text = text;
   saveData();
-  if(!fromTabs) buildItinerary();
+  // Rebuild current view to reflect changes
+  if (typeof rebuildCurrentView === 'function') {
+    rebuildCurrentView();
+  } else {
+    buildItinerary();
+  }
 }
 function updateDayItemCost(legIdx, dayIdx, category, itemIdx, cost, fromTabs = false) {
   appData[legIdx].days[dayIdx][category][itemIdx].cost = cost;
   saveData();
-  if(fromTabs) {
-    if(category === 'transportItems') buildTransportTab();
-    if(category === 'accomItems') buildAccomTab();
+  // Rebuild current view to reflect changes
+  if (typeof rebuildCurrentView === 'function') {
+    rebuildCurrentView();
+  } else {
+    buildItinerary();
   }
-  else buildItinerary();
 }
 function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
   appData[legIdx].days[dayIdx][category][itemIdx].time = time;
