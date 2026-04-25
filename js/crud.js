@@ -160,6 +160,36 @@ function openAddLegDialog() {
   const select = document.getElementById('existingCitySelect');
   select.innerHTML = '<option value="">-- Choose a city --</option>';
 
+  // Populate route selectors (from/to)
+  const fromSelect = document.getElementById('fromCitySelect');
+  const toSelect = document.getElementById('toCitySelect');
+
+  if (fromSelect) {
+    fromSelect.innerHTML = '<option value="Home">Home</option>';
+    if (typeof citiesData !== 'undefined' && citiesData.length > 0) {
+      citiesData.forEach(city => {
+        const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
+        const option = document.createElement('option');
+        option.value = city.name;
+        option.textContent = `${flag} ${city.name}`;
+        fromSelect.appendChild(option);
+      });
+    }
+  }
+
+  if (toSelect) {
+    toSelect.innerHTML = '<option value="">-- Choose destination --</option>';
+    if (typeof citiesData !== 'undefined' && citiesData.length > 0) {
+      citiesData.forEach(city => {
+        const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
+        const option = document.createElement('option');
+        option.value = city.name;
+        option.textContent = `${flag} ${city.name}`;
+        toSelect.appendChild(option);
+      });
+    }
+  }
+
   if (typeof citiesData !== 'undefined' && citiesData.length > 0) {
     citiesData.forEach(city => {
       const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
@@ -192,26 +222,55 @@ function closeAddLegDialog() {
 function onLegTypeChange() {
   const legType = document.getElementById('legTypeSelect').value;
   const cityGroup = document.getElementById('citySelectionGroup');
+  const routeGroup = document.getElementById('routeSelectionGroup');
   const datesLabel = document.getElementById('datesLabel');
   const endDateInput = document.getElementById('newLegEndDate');
 
   if (legType === 'start') {
     datesLabel.textContent = 'Departure Date';
     endDateInput.placeholder = 'End (optional)';
-    endDateInput.style.display = 'block';
+    endDateInput.style.display = 'none';
     cityGroup.style.display = 'block';
+    routeGroup.style.display = 'none';
   } else if (legType === 'return') {
     datesLabel.textContent = 'Return Date';
     endDateInput.placeholder = 'End (optional)';
-    endDateInput.style.display = 'block';
+    endDateInput.style.display = 'none';
     cityGroup.style.display = 'block';
+    routeGroup.style.display = 'none';
+  } else if (legType === 'travel') {
+    datesLabel.textContent = 'Travel Date';
+    endDateInput.placeholder = 'End (optional)';
+    endDateInput.style.display = 'none';
+    cityGroup.style.display = 'none';
+    routeGroup.style.display = 'block';
   } else {
     // Normal city
     datesLabel.textContent = 'Dates in City';
     endDateInput.placeholder = 'To (e.g., 18 Jun)';
     endDateInput.style.display = 'block';
     cityGroup.style.display = 'block';
+    routeGroup.style.display = 'none';
   }
+}
+
+function checkDateConflict(date, fromCity, toCity) {
+  if (!date || date === 'DD Mon') return false;
+
+  // Check all existing days in all legs
+  let conflicts = [];
+  appData.forEach(leg => {
+    leg.days.forEach(day => {
+      if (day.date === date) {
+        conflicts.push({
+          legLabel: leg.label,
+          day: day
+        });
+      }
+    });
+  });
+
+  return conflicts.length > 0 ? conflicts : false;
 }
 
 function confirmAddLeg() {
@@ -224,26 +283,70 @@ function confirmAddLeg() {
 
   let cityName = existingCity;
   let cityId = '';
+  let fromCity = 'Home';
+  let toCity = '';
 
   // Handle leg type specifics
+  if (legType === 'travel') {
+    // Travel leg: from one city to another
+    fromCity = document.getElementById('fromCitySelect').value;
+    toCity = document.getElementById('toCitySelect').value;
+
+    if (!fromCity) {
+      alert('Please select a departure city.');
+      return;
+    }
+    if (!toCity) {
+      alert('Please select a destination city.');
+      return;
+    }
+
+    // Check for date conflict
+    const conflicts = checkDateConflict(startDate, fromCity, toCity);
+    if (conflicts) {
+      const conflictList = conflicts.map(c => `  • ${c.legLabel}: ${c.day.from} → ${c.day.to}`).join('\n');
+      const proceed = confirm(`Warning: Date "${startDate}" already exists:\n${conflictList}\n\nAdd this leg anyway?`);
+      if (!proceed) return;
+    }
+
+    // Create travel leg
+    createTravelLeg(fromCity, toCity, startDate);
+    closeAddLegDialog();
+    return;
+  }
+
   if (legType === 'start') {
     // Start leg: from Home to selected city
     if (!existingCity && !newCityName) {
       alert('Please select or create a destination city.');
       return;
     }
+    fromCity = 'Home';
+    toCity = existingCity || newCityName;
   } else if (legType === 'return') {
     // Return leg: from selected city to Home
     if (!existingCity && !newCityName) {
       alert('Please select or create a departure city.');
       return;
     }
+    fromCity = existingCity || newCityName;
+    toCity = 'Home';
   } else {
     // Normal city leg
     if (!existingCity && !newCityName) {
       alert('Please select an existing city or enter a new city name.');
       return;
     }
+    fromCity = 'Home';
+    toCity = existingCity || newCityName;
+  }
+
+  // Check for date conflict
+  const conflicts = checkDateConflict(startDate, fromCity, toCity);
+  if (conflicts) {
+    const conflictList = conflicts.map(c => `  • ${c.legLabel}: ${c.day.from} → ${c.day.to}`).join('\n');
+    const proceed = confirm(`Warning: Date "${startDate}" already exists:\n${conflictList}\n\nAdd this leg anyway?`);
+    if (!proceed) return;
   }
 
   if (existingCity) {
@@ -347,29 +450,38 @@ function createNewLeg(cityName, cityId, startDate, endDate, legType = 'city') {
     legLabel = `${flag} ${cityName}`;
   }
 
-  const newLeg = {
-    id: 'leg_' + Date.now(),
-    label: legLabel,
-    colour: cityColor,
-    legType: legType, // Store the leg type
-    cityFood: legType === 'city' ? [{ text: "Local dish to try", done: false, cityId: cityId }] : [],
-    suggestedActivities: [],
-    legTips: legType === 'city' ? [{ text: "Add tip...", cityId: cityId }] : [],
-    days: days
-  };
-  appData.push(newLeg);
+  function createTravelLeg(fromCity, toCity, date) {
+  const fromFlag = typeof getCityFlag === 'function' ? getCityFlag(fromCity) : '';
+  const toFlag = typeof getCityFlag === 'function' ? getCityFlag(toCity) : '';
 
-  // Rebuild city nav and itinerary
-  if (typeof extractCitiesFromItinerary === 'function' &&
-      typeof citiesData !== 'undefined') {
-    citiesData = extractCitiesFromItinerary();
-    // Merge with existing to preserve countries
-    const existingCity = citiesData.find(c => c.name === cityName);
-    if (existingCity && cityId) existingCity.id = cityId;
-  }
+  const travelLeg = {
+    id: 'leg_' + Date.now(),
+    label: `${fromFlag} ${fromCity} → ${toFlag} ${toCity}`,
+    colour: '#607D8B', // Blue-grey for travel legs
+    legType: 'travel',
+    cityFood: [],
+    suggestedActivities: [],
+    legTips: [{ text: "Travel tip..." }],
+    days: [{
+      date: date,
+      day: 'Day',
+      from: fromCity,
+      to: toCity,
+      completed: false,
+      desc: 'Travel day',
+      transportItems: [
+        { text: "Add transport details...", cost: "0", status: "pending", bookingRef: "" }
+      ],
+      accomItems: [],
+      activityItems: []
+    }]
+  };
+
+  appData.push(travelLeg);
 
   if (typeof saveData === 'function') saveData();
   if (typeof sortLegs === 'function') sortLegs();
+  if (typeof buildItinerary === 'function') buildItinerary();
   if (typeof buildCityNav === 'function') buildCityNav();
 }
 

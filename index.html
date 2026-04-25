@@ -256,9 +256,24 @@
 <label>Leg Type</label>
 <select id="legTypeSelect" onchange="onLegTypeChange()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
 <option value="start">🏠 Start (Departure from Home)</option>
+<option value="travel">✈️ Travel (City to City)</option>
 <option value="city" selected>📍 City (Destination)</option>
 <option value="return">🏡 Return (Arrival at Home)</option>
 </select>
+</div>
+<div id="routeSelectionGroup" style="display: none;">
+<div class="ai-form-group">
+<label>From City</label>
+<select id="fromCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+<option value="Home">🏠 Home</option>
+</select>
+</div>
+<div class="ai-form-group">
+<label>To City</label>
+<select id="toCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+<option value="">-- Choose destination --</option>
+</select>
+</div>
 </div>
 <div id="citySelectionGroup">
 <div class="ai-form-group">

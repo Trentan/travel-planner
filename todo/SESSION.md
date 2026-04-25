@@ -1,10 +1,10 @@
 ## Session State
 
-- **Item/sub-task:** 6l
+- **Item/sub-task:** 6m
 - **Branch:** item-6a
-- **Last commit:** `Item 6l: Add leg type selector (Start/City/Return) to Add New Leg dialog`
-- **What was done:** Added leg type dropdown Start/City/Return, updated dialog UI labels based on leg type, modified createNewLeg to handle different leg types with appropriate day structure (Start: Home→City, Return: City→Home, City: normal), labels show directional arrows (Start → City, City → Return)
-- **Next step:** Commit changes
-- **Files touched:** index.html (leg type dropdown), js/crud.js (onLegTypeChange, confirmAddLeg, createNewLeg, openAddLegDialog)
+- **Last commit:** `Item 6m: Add travel leg type and date conflict warning`
+- **What was done:** Added "travel" leg type for City-to-City legs, added From/To city selectors, implemented date conflict checking with warning dialog, removed orphaned code
+- **Next step:** Commit changes, all Item 6 subtasks complete
+- **Files touched:** index.html (route selectors), js/crud.js (travel leg logic, conflict check, UI updates)
 - **Known blockers / risks:** None
 - **Noticed (unscheduled):**

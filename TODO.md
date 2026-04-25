@@ -38,7 +38,7 @@ Read this file at the start of every session. Update status blocks and checkboxe
 **Next:** `item-3a`
 
 - [ ] a) style.css has errors displaying, fix and tidy and confirm look and layout good
-- [ ] b) The title and subtitile from .json is not being applied and it is not easy to edit / readable (white on white) when editing
+- [ ] b) The title and subtitle from .json is not being applied and it is not easy to edit / readable (white on white) when editing
 
 ---
 
@@ -77,8 +77,8 @@ Read this file at the start of every session. Update status blocks and checkboxe
 - [x] h) City subheadings (currently above the main tabs) disappear on scroll — they should remain visible and interactive when scrolling, and appear below the main tab bar throughout the entire app. The city selections are working great - BUT - implement the nice labeling of the flag/country prior to the city name in the selection menu (like it used to be).
 - [x] i) Tips look broken, they just display "[object Object]"
 - [x] j) The city selection in itinerary view is scrolling just a bit to far, the day and city name should still be in view (not just the city tips etc)
-- [ ] k) City color randomization - assign random color for new cities, maybe make submenu and map match city color scheme
-- [ ] l) You can perhaps also - rename the departure leg to start - perhaps make an option to handle it better. Eg make it like a city (so you can select Start or Return options - they are the only special ones which are not city specific (but represent an actual leg not a city). 
+- [x] k) City color randomization - assign random color for new cities, maybe make submenu and map match city color scheme
+- [x] l) You can perhaps also - rename the departure leg to start - perhaps make an option to handle it better. Eg make it like a city (so you can select Start or Return options - they are the only special ones which are not city specific (but represent an actual leg not a city). 
 - [ ] m) I don't know how to handle adding days in legs etc., perhaps add legs should have the multiple cities and days handled when adding (eg city from, to, days / dates from to). Also maybe warn about conflict if a day already help - this might need more questions to work out a logical solution
 
 ---
@@ -129,3 +129,6 @@ Before considering any work complete:
 - Activity duration tracking
 - Flight miles tracking
 - Budget categories breakdown
+- Change colors for cities
+- Add multiple cities to a leg
+- Add or subtract a day to an existing leg
