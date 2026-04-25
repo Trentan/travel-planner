@@ -1,10 +1,10 @@
 ## Session State
 
-- **Item/sub-task:** 6b
-- **Branch:** item-6b
-- **Last commit:** `00aa5ca` — Item 6a-6b: Add cities data structure and city associations for journeys, tips, food, activities, accommodation
-- **What was done:** Added cities variable with auto-extraction from itinerary. Added extractCitiesFromItinerary(), getCityIdByName(), getCityNameById(), migrateLegCityIds() functions. Updated journeys to store fromCityId/toCityId. Added cityId to tips, food, activities, accommodation. Journey creation now links cities. Export/import includes cities.
-- **Next step:** Test the implementation - open index.html, verify cities are extracted, check that entities have cityIds
-- **Files touched:** js/data.js, js/transport.js
-- **Known blockers / risks:** Need to verify the migration works correctly on existing data
+- **Item/sub-task:** 6e
+- **Branch:** item-6a
+- **Last commit:** — (in progress)
+- **What was done:** Fixed city filter state synchronization across modules. Made currentCityFilter a global variable in data.js and updated itinerary.js to sync with window.currentCityFilter. switchTab already passes cityFilter to buildTransportTab and buildAccomTab functions which already contain filtering logic.
+- **Next step:** Test the implementation - click on Transport/Accommodation tabs, select different cities in the filter, verify only matching entries are shown
+- **Files touched:** js/data.js (added global currentCityFilter), js/itinerary.js (updated buildCityNav and selectCityFilter to use window.currentCityFilter)
+- **Known blockers / risks:** Need to test on actual data with journeys and accommodation entries
 - **Noticed (unscheduled):** None

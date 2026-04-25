@@ -317,16 +317,15 @@ function buildNav() {
   buildCityNav();
 }
 
-// Active city filter - 'all' or city ID
-let currentCityFilter = 'all';
-
+// Active city filter - 'all' or city ID (access via window.currentCityFilter for cross-module access)
 function buildCityNav() {
   const nav = document.getElementById('cityNav');
   const navList = nav.querySelector('.city-nav-list');
+  const filter = window.currentCityFilter || 'all';
 
   // Keep the "All" button
   navList.innerHTML = `
-    <button class="city-nav-btn ${currentCityFilter === 'all' ? 'active' : ''}" data-city="all" onclick="selectCityFilter('all', this)">
+    <button class="city-nav-btn ${filter === 'all' ? 'active' : ''}" data-city="all" onclick="selectCityFilter('all', this)">
       <span>🏙️ All</span>
     </button>
   `;
@@ -334,7 +333,7 @@ function buildCityNav() {
   // Add city buttons
   citiesData.forEach(city => {
     const btn = document.createElement('button');
-    btn.className = 'city-nav-btn' + (currentCityFilter === city.id ? ' active' : '');
+    btn.className = 'city-nav-btn' + (filter === city.id ? ' active' : '');
     btn.setAttribute('data-city', city.id);
     btn.innerHTML = `<span>📍 ${city.name}</span>`;
     btn.onclick = () => selectCityFilter(city.id, btn);
@@ -343,7 +342,7 @@ function buildCityNav() {
 }
 
 function selectCityFilter(cityId, btn) {
-  currentCityFilter = cityId;
+  window.currentCityFilter = cityId;
 
   // Update button states
   const nav = document.getElementById('cityNav');

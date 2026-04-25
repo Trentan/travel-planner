@@ -9,6 +9,10 @@ let currentFileName = "Default Template";
 var journeys = [];
 window.journeys = journeys;
 
+// Current city filter - 'all' or city ID (global for cross-module access)
+var currentCityFilter = 'all';
+window.currentCityFilter = currentCityFilter;
+
 // Extract unique cities from itinerary data
 function extractCitiesFromItinerary() {
   const cityMap = new Map();

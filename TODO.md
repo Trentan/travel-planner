@@ -64,14 +64,17 @@ Read this file at the start of every session. Update status blocks and checkboxe
 ### Item 6: Database alignment (city grouping + city option)
 **Status:** In progress — branch `item-6b`
 **Last completed:** `item-6a` — Cities data structure with auto-extraction from itinerary
-**Next:** `item-6b` — Add cityId to journeys (done), tips, food, activities, accommodation
+**Next:** `item-6g` — Add cityId to journeys (done), tips, food, activities, accommodation
 
-- [ ] a) Tips, suggested activities, food quests, accommodation, and transport should all be alignable to cities — add a `cities` field stored on each entity in the JSON, usable for filtering and future display in individual tabs outside itinerary mode. Perhaps each city defined should have the country, name, date from, date to, duration. 
-- [ ] b) Convert the current trip file `2026_June_July_Europe_Thailand.json` to handle this new structure
-- [ ] c) City subheadings (currently above the main tabs) disappear on scroll — they should remain visible and interactive when scrolling, and appear below the main tab bar
-- [ ] d) For add cityId - I mean add a VARIABLE `cities` to each object class (eg tips, food, accom, journey, sights) - not just rename the variables in the json structure fix it (`2026_June_July_Europe_Thailand.json` to handle this new structure)
-- [ ] d) Add an "All" option (default) to the cities subheading filter
-- [ ] e) When a city is selected in the subheading filter: show only that city's entries in the Accommodation and Transport tabs; (like the jump to that city in the Itinerary view (already implemented))
+- [x] a) Tips, suggested activities, food quests, accommodation, and transport should all be alignable to cities — add a `cities` field stored on each entity in the JSON, usable for filtering and future display in individual tabs outside itinerary mode. Perhaps each city defined should have the country, name, date from, date to, duration. 
+- [x] b) Convert the current trip file `2026_June_July_Europe_Thailand.json` to handle this new structure
+- [x] c) City subheadings (currently above the main tabs) disappear on scroll — they should remain visible and interactive when scrolling, and appear below the main tab bar
+- [x] d) For add cityId - I mean add a VARIABLE `cities` to each object class (eg tips, food, accom, journey, sights) - not just rename the variables in the json structure fix it (`2026_June_July_Europe_Thailand.json` to handle this new structure)
+- [x] e) Add an "All" option (default) to the cities subheading filter
+- [x] f) When a city is selected in the subheading filter: show only that city's entries in the Accommodation and Transport tabs; (like the jump to that city in the Itinerary view (already implemented))
+- [ ] g) Need a way to edit and manage cities - also if there is a start and return city (eg first and last legs) maybe make that 'home' - or some way to handle the initial departure and last arrival.
+- [ ] h) The city selections are working great - BUT - we can now remove the old city sub menu - and when doing this, implement the nice labeling of the flag/country prior to the city name in the selection menu.
+- [ ] i) Tips look broken, they just display [object Object]
 
 ---
 
@@ -81,6 +84,8 @@ Read this file at the start of every session. Update status blocks and checkboxe
 **Next:** `item-7a`
 
 - [ ] a) The interactive guide on how to use the app is not working — fix and improve it to reflect the latest changes
+- [ ] b) The default json example for the app can be updated for all the changes and the logic improved
+- [ ] c) The AI script generator can be updated now, include the cities options as a multi add option and all the other functionalities
 
 ---
 
