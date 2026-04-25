@@ -312,4 +312,90 @@ function buildNav() {
     btn.dataset.leg = leg.id;
     nav.appendChild(btn);
   });
+
+  // Build city filter nav as well
+  buildCityNav();
+}
+
+// Active city filter - 'all' or city ID
+let currentCityFilter = 'all';
+
+function buildCityNav() {
+  const nav = document.getElementById('cityNav');
+  const navList = nav.querySelector('.city-nav-list');
+
+  // Keep the "All" button
+  navList.innerHTML = `
+    <button class="city-nav-btn ${currentCityFilter === 'all' ? 'active' : ''}" data-city="all" onclick="selectCityFilter('all', this)">
+      <span>🏙️ All</span>
+    </button>
+  `;
+
+  // Add city buttons
+  citiesData.forEach(city => {
+    const btn = document.createElement('button');
+    btn.className = 'city-nav-btn' + (currentCityFilter === city.id ? ' active' : '');
+    btn.setAttribute('data-city', city.id);
+    btn.innerHTML = `<span>📍 ${city.name}</span>`;
+    btn.onclick = () => selectCityFilter(city.id, btn);
+    navList.appendChild(btn);
+  });
+}
+
+function selectCityFilter(cityId, btn) {
+  currentCityFilter = cityId;
+
+  // Update button states
+  const nav = document.getElementById('cityNav');
+  nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Rebuild tabs that have city filtering
+  const activeTab = document.querySelector('.app-tab-btn.active');
+  const tabType = activeTab ? activeTab.getAttribute('data-tab') : 'itinerary';
+
+  if (cityId === 'all') {
+    // Show all - rebuild normally
+    if (tabType === 'transport' && typeof buildTransportTab === 'function') {
+      buildTransportTab();
+    } else if (tabType === 'accom' && typeof buildAccomTab === 'function') {
+      buildAccomTab();
+    } else if (tabType === 'itinerary') {
+      buildItinerary();
+    }
+  } else {
+    // Filter by city
+    const cityName = getCityNameById ? getCityNameById(cityId) : cityId;
+    console.log(`[CityFilter] Selected: ${cityName} (${cityId})`);
+
+    // Rebuild with filtering
+    if (tabType === 'transport' && typeof buildTransportTab === 'function') {
+      buildTransportTab(cityId);
+    } else if (tabType === 'accom' && typeof buildAccomTab === 'function') {
+      buildAccomTab(cityId);
+    } else if (tabType === 'itinerary') {
+      // Scroll to first leg with this city
+      scrollToCity(cityId);
+    }
+  }
+}
+
+function scrollToCity(cityId) {
+  const cityName = getCityNameById(cityId);
+  if (!cityName) return;
+
+  // Find first leg containing this city
+  for (let i = 0; i < appData.length; i++) {
+    const leg = appData[i];
+    const hasCity = leg.days.some(day => day.from === cityName || day.to === cityName);
+
+    if (hasCity) {
+      const el = document.getElementById('leg-' + leg.id);
+      if (el) {
+        el.classList.remove('collapsed');
+        el.scrollIntoView({behavior: 'smooth', block: 'start'});
+        break;
+      }
+    }
+  }
 }

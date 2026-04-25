@@ -24,8 +24,9 @@ Read this file at the start of every session. Update status blocks and checkboxe
 **Next:** —
 
 - [x] a) Transport used to work flawlessly in itinerary and display correctly in the Transport tab. Items have all transitioned to Journeys and are not being handled or displayed correctly — resolve.
-- [ ] b) Journeys are in json backups/2026_June_July_Europe_Thailand.json - but not loading / viewing in itinerary or transport. Need to intersperse from itinerary or transport the journeys to pair with each other and display in tables / itinerary where possible. It is not displaying anything from json.
+- [ ] b) Journeys are in json backups/2026_June_July_Europe_Thailand.json - but not loading / viewing in itinerary or transport. Need to intersperse from itinerary or transport the journeys to pair with each other and display in tables / itinerary where possible. It is not displaying anything from json. **[ON HOLD - pending Item 6]**
 - [ ] c) I think the merging transition from transport to journeys has corrupted everything. We want the original functionality of trasport - but it is now a journey. Perhaps journey needs enhancing to, only operate between defined cities. We may need to do Item 6 first so journeys only exists between sequential cities - then can remove all traces of the old transport style as journeys will work.
+- [ ] d) Rather than have it as a table with rows of collapsible in the transport tab, revert the display to a table with columns for the data elements of the journey 
 
 **Summary:** Budget tab was still calculating transport costs from obsolete `day.transportItems`. Fixed by using `journeys.filter()` matched against `day.date`, `day.from`, and `day.to`.
 
@@ -61,15 +62,16 @@ Read this file at the start of every session. Update status blocks and checkboxe
 ---
 
 ### Item 6: Database alignment (city grouping + city option)
-**Status:** Not started
-**Last completed:** —
-**Next:** `item-6a`
+**Status:** In progress — branch `item-6b`
+**Last completed:** `item-6a` — Cities data structure with auto-extraction from itinerary
+**Next:** `item-6b` — Add cityId to journeys (done), tips, food, activities, accommodation
 
 - [ ] a) Tips, suggested activities, food quests, accommodation, and transport should all be alignable to cities — add a `cities` field stored on each entity in the JSON, usable for filtering and future display in individual tabs outside itinerary mode. Perhaps each city defined should have the country, name, date from, date to, duration. 
 - [ ] b) Convert the current trip file `2026_June_July_Europe_Thailand.json` to handle this new structure
 - [ ] c) City subheadings (currently above the main tabs) disappear on scroll — they should remain visible and interactive when scrolling, and appear below the main tab bar
+- [ ] d) For add cityId - I mean add a VARIABLE `cities` to each object class (eg tips, food, accom, journey, sights) - not just rename the variables in the json structure fix it (`2026_June_July_Europe_Thailand.json` to handle this new structure)
 - [ ] d) Add an "All" option (default) to the cities subheading filter
-- [ ] e) When a city is selected in the subheading filter: show only that city's entries in the Accommodation and Transport tabs; jump to that city in the Itinerary view (already implemented)
+- [ ] e) When a city is selected in the subheading filter: show only that city's entries in the Accommodation and Transport tabs; (like the jump to that city in the Itinerary view (already implemented))
 
 ---
 

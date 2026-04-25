@@ -234,7 +234,8 @@ function calculateDuration(depDate, depTime, arrDate, arrTime) {
 }
 
 // Build Transport Tab - displays journeys
-function buildTransportTab() {
+// Accepts optional cityFilter parameter to show only items for that city
+function buildTransportTab(cityFilter = null) {
   // Ensure journeys exists (for backwards compatibility)
   if (typeof journeys === 'undefined' || journeys === null) {
     if (typeof window !== 'undefined' && window.journeys) {
@@ -243,7 +244,7 @@ function buildTransportTab() {
       journeys = [];
     }
   }
-  console.log('[buildTransportTab] Called. journeys:', typeof journeys, journeys?.length);
+  console.log('[buildTransportTab] Called. journeys:', typeof journeys, journeys?.length, 'cityFilter:', cityFilter);
   const container = document.getElementById('transport-table-container');
   if (!container) {
     console.error('[buildTransportTab] No container found!');
@@ -268,7 +269,16 @@ function buildTransportTab() {
     }
   }
 
-  const sorted = getSortedJourneys();
+  // Filter by city if specified
+  let journeysToShow = getSortedJourneys();
+  if (cityFilter && cityFilter !== 'all') {
+    journeysToShow = journeysToShow.filter(j =>
+      j.fromCityId === cityFilter || j.toCityId === cityFilter
+    );
+    console.log(`[buildTransportTab] Filtered to ${journeysToShow.length} journeys for city ${cityFilter}`);
+  }
+
+  const sorted = journeysToShow;
   console.log('[buildTransportTab] Sorted journeys:', sorted.length);
 
   let html = `

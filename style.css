@@ -47,11 +47,22 @@ header::before { content: ''; position: absolute; inset: 0; background: repeatin
 .clock-row { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 4px; font-size: 0.85rem; font-family: 'DM Mono', monospace;}
 .clock-label { color: #AAB7C4; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'DM Sans', sans-serif;}
 
-/* NAV */
+/* NAV - Trip Legs */
 .leg-nav { background: white; border-bottom: 1px solid var(--border); padding: 0 1rem; display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; position: sticky; top: 0; z-index: 100; }
 .leg-nav::-webkit-scrollbar { display: none; }
 .nav-btn { padding: 0.75rem 1rem; border: none; background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 500; color: var(--muted); white-space: nowrap; border-bottom: 3px solid transparent; }
 .nav-btn.active { color: var(--text); font-weight: 600; }
+
+/* NAV - City Filter */
+.city-nav { background: #f8fafc; border-bottom: 1px solid var(--border); padding: 0.5rem 2rem; position: sticky; top: 50px; z-index: 150; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.city-nav-list { display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; padding: 0.25rem 0; }
+.city-nav-list::-webkit-scrollbar { display: none; }
+.city-nav-btn { padding: 0.5rem 1rem; border: 1px solid transparent; background: white; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; color: var(--muted); white-space: nowrap; border-radius: 20px; transition: all 0.2s; }
+.city-nav-btn:hover { background: #e2e8f0; color: var(--text); }
+.city-nav-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+@media (max-width: 768px) {
+  .city-nav { padding: 0.5rem 1rem; top: 48px; }
+}
 
 /* MAIN APP STRUCTURE & TABS */
 main {

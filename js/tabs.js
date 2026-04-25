@@ -1,11 +1,20 @@
 // buildTransportTab is now defined in transport.js
 
-function buildAccomTab() {
+function buildAccomTab(cityFilter = null) {
+  // Determine city name if filtering
+  const cityFilterName = cityFilter && cityFilter !== 'all' && typeof getCityNameById === 'function'
+    ? getCityNameById(cityFilter)
+    : '';
+
   const container = document.getElementById('accom-table-container');
   let html = `<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>Date</th><th>City</th><th>Accommodation</th><th>Status / Ref</th><th>Est. Cost</th></tr></thead><tbody>`;
   let hasItems = false;
   appData.forEach((leg, lIdx) => {
     leg.days.forEach((day, dIdx) => {
+      // Filter by city if specified
+      if (cityFilterName && cityFilterName !== 'all') {
+        if (day.to !== cityFilterName && !cityFilterName.includes(day.to)) return;
+      }
       if (day.accomItems) {
         day.accomItems.forEach((item, iIdx) => {
           if (item.text === "—" || item.text.trim() === "") return;
