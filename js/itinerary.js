@@ -168,7 +168,7 @@ function buildItinerary() {
     html += `<div class="city-dashboard">
       <div class="city-block city-block-tips">
         <h4>💡 Tips</h4>
-        <ul class="tips-list">${(leg.legTips || []).map((t, i) => `<li class="tip-item"><span contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t}</span><button class="del-btn" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
+        <ul class="tips-list">${(leg.legTips || []).map((t, i) => `<li class="tip-item"><span contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span><button class="del-btn" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
         <button class="add-btn" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>
       </div>
       <div class="city-block city-block-food">
@@ -298,22 +298,7 @@ function rebuildCurrentView() {
 }
 
 function buildNav() {
-  const nav = document.getElementById('legNav');
-  nav.innerHTML = '';
-  appData.forEach(leg => {
-    const btn = document.createElement('button');
-    btn.className = 'nav-btn';
-    btn.textContent = leg.label;
-    btn.onclick = () => {
-      const el = document.getElementById('leg-' + leg.id);
-      el.classList.remove('collapsed');
-      el.scrollIntoView({behavior:'smooth', block:'start'});
-    };
-    btn.dataset.leg = leg.id;
-    nav.appendChild(btn);
-  });
-
-  // Build city filter nav as well
+  // Build city filter nav only (leg-nav removed per 6h)
   buildCityNav();
 }
 
