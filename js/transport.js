@@ -395,11 +395,15 @@ function toggleJourneyStatus(journeyId) {
 
 // Open journey modal and populate city dropdowns
 function openAddJourneyModal() {
-  const modal = document.getElementById('journey-modal');
-  if (!modal) {
-    alert('Journey modal not found');
-    return;
-  }
+  try {
+    console.log('[openAddJourneyModal] Starting...');
+    const modal = document.getElementById('journey-modal');
+    if (!modal) {
+      console.error('[openAddJourneyModal] Modal element not found!');
+      alert('Journey modal HTML not found. Please check that the modal is defined in index.html');
+      return;
+    }
+    console.log('[openAddJourneyModal] Modal found:', modal);
 
   // Populate city dropdowns
   const fromSelect = document.getElementById('journeyFromCity');
@@ -443,6 +447,11 @@ function openAddJourneyModal() {
   document.getElementById('journeyNotes').value = '';
 
   modal.style.display = 'flex';
+    console.log('[openAddJourneyModal] Modal opened successfully');
+  } catch (e) {
+    console.error('[openAddJourneyModal] Error:', e);
+    alert('Error opening journey modal: ' + e.message);
+  }
 }
 
 function closeJourneyModal() {
@@ -451,22 +460,24 @@ function closeJourneyModal() {
 }
 
 function saveJourneyFromModal() {
-  const fromLocation = document.getElementById('journeyFromCity').value;
-  const toLocation = document.getElementById('journeyToCity').value;
-  const transportType = document.getElementById('journeyType').value;
-  const dateFrom = document.getElementById('journeyDateFrom').value;
-  const timeFrom = document.getElementById('journeyTimeFrom').value;
-  const dateTo = document.getElementById('journeyDateTo').value;
-  const timeTo = document.getElementById('journeyTimeTo').value;
-  const provider = document.getElementById('journeyProvider').value.trim();
-  const routeCode = document.getElementById('journeyRouteCode').value.trim();
-  const cost = document.getElementById('journeyCost').value.trim() || '0';
-  const notes = document.getElementById('journeyNotes').value.trim();
+  try {
+    console.log('[saveJourneyFromModal] Starting...');
+    const fromLocation = document.getElementById('journeyFromCity').value;
+    const toLocation = document.getElementById('journeyToCity').value;
+    const transportType = document.getElementById('journeyType').value;
+    const dateFrom = document.getElementById('journeyDateFrom').value;
+    const timeFrom = document.getElementById('journeyTimeFrom').value;
+    const dateTo = document.getElementById('journeyDateTo').value;
+    const timeTo = document.getElementById('journeyTimeTo').value;
+    const provider = document.getElementById('journeyProvider').value.trim();
+    const routeCode = document.getElementById('journeyRouteCode').value.trim();
+    const cost = document.getElementById('journeyCost').value.trim() || '0';
+    const notes = document.getElementById('journeyNotes').value.trim();
 
-  if (!toLocation) {
-    alert('Please select a destination');
-    return;
-  }
+    if (!toLocation) {
+      alert('Please select a destination');
+      return;
+    }
 
   // Lookup city IDs
   const fromCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === fromLocation) : null;
@@ -502,6 +513,10 @@ function saveJourneyFromModal() {
   saveJourneys();
   closeJourneyModal();
   buildTransportTab();
+  } catch (e) {
+    console.error('[saveJourneyFromModal] Error:', e);
+    alert('Error saving journey: ' + e.message);
+  }
 }
 
 // Rebuild current view helper
