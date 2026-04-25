@@ -433,10 +433,10 @@ function openAddJourneyModal() {
 
   // Reset form
   document.getElementById('journeyType').value = 'flight';
-  document.getElementById('journeyDepDate').value = '';
-  document.getElementById('journeyDepTime').value = '';
-  document.getElementById('journeyArrDate').value = '';
-  document.getElementById('journeyArrTime').value = '';
+  document.getElementById('journeyDateFrom').value = '';
+  document.getElementById('journeyTimeFrom').value = '';
+  document.getElementById('journeyDateTo').value = '';
+  document.getElementById('journeyTimeTo').value = '';
   document.getElementById('journeyProvider').value = '';
   document.getElementById('journeyRouteCode').value = '';
   document.getElementById('journeyCost').value = '';
@@ -454,10 +454,10 @@ function saveJourneyFromModal() {
   const fromLocation = document.getElementById('journeyFromCity').value;
   const toLocation = document.getElementById('journeyToCity').value;
   const transportType = document.getElementById('journeyType').value;
-  const depDate = document.getElementById('journeyDepDate').value;
-  const depTime = document.getElementById('journeyDepTime').value;
-  const arrDate = document.getElementById('journeyArrDate').value;
-  const arrTime = document.getElementById('journeyArrTime').value;
+  const dateFrom = document.getElementById('journeyDateFrom').value;
+  const timeFrom = document.getElementById('journeyTimeFrom').value;
+  const dateTo = document.getElementById('journeyDateTo').value;
+  const timeTo = document.getElementById('journeyTimeTo').value;
   const provider = document.getElementById('journeyProvider').value.trim();
   const routeCode = document.getElementById('journeyRouteCode').value.trim();
   const cost = document.getElementById('journeyCost').value.trim() || '0';
@@ -475,15 +475,17 @@ function saveJourneyFromModal() {
   const journey = {
     id: 'journey_' + Date.now(),
     legId: '',
-    dayDate: depDate,
+    // Use dateFrom as the primary dayDate reference
+    dayDate: dateFrom,
     fromLocation: fromLocation,
     toLocation: toLocation,
     fromCityId: fromCity ? fromCity.id : '',
     toCityId: toCity ? toCity.id : '',
-    departureDate: depDate,
-    departureTime: depTime,
-    arrivalDate: arrDate,
-    arrivalTime: arrTime,
+    // Actual journey fields matching JSON structure
+    departureDate: dateFrom,
+    departureTime: timeFrom,
+    arrivalDate: dateTo,
+    arrivalTime: timeTo,
     transportType: transportType,
     provider: provider,
     routeCode: routeCode,

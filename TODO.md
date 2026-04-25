@@ -27,7 +27,7 @@ Read this file at the start of every session. Update status blocks and checkboxe
 - [x] b) Journeys import from JSON working — saved to localStorage and loaded in initData
 - [x] c) Journeys have fromCityId/toCityId linking to defined cities
 - [x] d) Transport tab reverted to table format with columns: Type, Date, Route, Time, Provider, Route #, Cost, Status, Booking Ref, Actions 
-
+ 
 **Summary:** Budget tab was still calculating transport costs from obsolete `day.transportItems`. Fixed by using `journeys.filter()` matched against `day.date`, `day.from`, and `day.to`.
 
 ---
