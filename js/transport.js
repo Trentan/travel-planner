@@ -32,17 +32,21 @@ function initJourneys() {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
         journeys = parsed;
+        window.journeys = journeys; // sync to window
         console.log(`[Journeys] Loaded ${journeys.length} journeys from localStorage`);
       } else {
         journeys = [];
+        window.journeys = journeys;
         console.log('[Journeys] No journeys found in localStorage');
       }
     } catch (e) {
       console.error('[Journeys] Failed to parse journeys:', e);
       journeys = [];
+      window.journeys = journeys;
     }
   } else {
     journeys = [];
+    window.journeys = journeys;
     console.log('[Journeys] No journeys in localStorage (key: travelApp_journeys_v1)');
   }
 }
@@ -51,12 +55,14 @@ function initJourneys() {
 function importJourneys(journeysData) {
   if (journeysData && Array.isArray(journeysData)) {
     journeys = journeysData;
+    window.journeys = journeys; // sync to window
     saveJourneys();
   }
 }
 
 function saveJourneys() {
   localStorage.setItem('travelApp_journeys_v1', JSON.stringify(journeys));
+  window.journeys = journeys; // sync to window
 }
 
 // Create a new journey from transport item data
@@ -82,6 +88,7 @@ function createJourneyFromTransportItem(item, legId, dayDate, fromLoc, toLoc) {
     legs: []
   };
   journeys.push(journey);
+  window.journeys = journeys; // sync to window
   saveJourneys();
   return journey;
 }
@@ -101,6 +108,10 @@ function detectTransportType(text) {
 
 // Get journeys for a specific day
 function getDayJourneys(dayDate, fromLoc, toLoc) {
+  // Ensure journeys exists
+  if (typeof journeys === 'undefined' && typeof window !== 'undefined' && window.journeys) {
+    journeys = window.journeys;
+  }
   if (!Array.isArray(journeys)) {
     console.warn('[Journeys] journeys array not initialized, returning empty');
     return [];
@@ -162,6 +173,7 @@ function updateJourneyCost(id, cost) {
 // Delete journey
 function deleteJourney(id) {
   journeys = journeys.filter(j => j.id !== id);
+  window.journeys = journeys; // sync to window
   saveJourneys();
   // Rebuild current view to reflect changes
   if (typeof rebuildCurrentView === 'function') {
@@ -217,10 +229,41 @@ function calculateDuration(depDate, depTime, arrDate, arrTime) {
 
 // Build Transport Tab - displays journeys
 function buildTransportTab() {
+  // Ensure journeys exists (for backwards compatibility)
+  if (typeof journeys === 'undefined' || journeys === null) {
+    if (typeof window !== 'undefined' && window.journeys) {
+      journeys = window.journeys;
+    } else {
+      journeys = [];
+    }
+  }
+  console.log('[buildTransportTab] Called. journeys:', typeof journeys, journeys?.length);
   const container = document.getElementById('transport-table-container');
-  if (!container) return;
+  if (!container) {
+    console.error('[buildTransportTab] No container found!');
+    return;
+  }
+
+  // Ensure journeys is initialized from localStorage if empty
+  if (!Array.isArray(journeys) || journeys.length === 0) {
+    console.log('[buildTransportTab] journeys empty, attempting to load from localStorage...');
+    const saved = localStorage.getItem('travelApp_journeys_v1');
+    if (saved) {
+      try {
+        journeys = JSON.parse(saved);
+        window.journeys = journeys; // sync to window
+        console.log('[buildTransportTab] Loaded', journeys.length, 'journeys from localStorage');
+      } catch (e) {
+        console.error('[buildTransportTab] Failed to parse journeys:', e);
+        journeys = [];
+      }
+    } else {
+      journeys = [];
+    }
+  }
 
   const sorted = getSortedJourneys();
+  console.log('[buildTransportTab] Sorted journeys:', sorted.length);
 
   let html = `
   <div class="transport-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">

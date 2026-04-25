@@ -4,9 +4,9 @@ let leaveHomeData = [];
 let titleData = { title: "✈ New Trip Plan", subtitle: "Click here to add your trip subtitle/description" };
 let currentFileName = "Default Template";
 
-// Journeys data - defined here to ensure loading order works
-// transport.js will use this same variable
-let journeys = [];
+// Journeys data - make global so all modules can access
+var journeys = [];
+window.journeys = journeys;
 
 function initData() {
   // Load journeys first, before any rendering happens
@@ -16,12 +16,17 @@ function initData() {
       const parsed = JSON.parse(savedJourneys);
       if (Array.isArray(parsed)) {
         journeys = parsed;
+        window.journeys = journeys; // sync to window for other modules
         console.log(`[Journeys] Loaded ${journeys.length} journeys from localStorage`);
       }
     } catch (e) {
       console.error('[Journeys] Failed to parse:', e);
       journeys = [];
+      window.journeys = journeys;
     }
+  } else {
+    journeys = [];
+    window.journeys = journeys;
   }
   const saved = localStorage.getItem('travelApp_v2026_template');
   if (saved) {
