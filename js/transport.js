@@ -201,10 +201,18 @@ function getSortedJourneys() {
 
 // Format date for display
 function formatJourneyDate(dateStr) {
-  if (!dateStr) return '—';
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return dateStr;
-  return date.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+  if (!dateStr) return '';
+  // If already in DD MMM format (e.g., "15 Jun"), return as-is
+  if (typeof dateStr === 'string' && dateStr.match(/^\d+\s+[A-Za-z]{3}$/)) {
+    return dateStr;
+  }
+  // Otherwise try to parse and format
+  try {
+    const d = new Date(dateStr);
+    return `${d.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]}`;
+  } catch (e) {
+    return dateStr;
+  }
 }
 
 // Format time for display
@@ -216,25 +224,31 @@ function formatJourneyTime(timeStr) {
 // Calculate duration between departure and arrival
 function calculateDuration(depDate, depTime, arrDate, arrTime) {
   if (!depDate || !arrDate) return '';
-
-  const dep = new Date(`${depDate} ${depTime || '00:00'}`);
-  const arr = new Date(`${arrDate} ${arrTime || '00:00'}`);
-
-  if (isNaN(dep.getTime()) || isNaN(arr.getTime())) return '';
-
-  const diffMs = arr - dep;
-  if (diffMs < 0) return '';
-
-  const hours = Math.floor(diffMs / (1000 * 60 * 60));
-  const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-  if (hours === 0) return `${mins}m`;
-  if (mins === 0) return `${hours}h`;
-  return `${hours}h ${mins}m`;
+  // Simplified - just return the hours/minutes if we can parse them
+  if (depTime && arrTime) {
+    const dep = parseTime(depTime);
+    const arr = parseTime(arrTime);
+    if (dep && arr) {
+      let diff = arr - dep;
+      if (diff < 0) diff += 24 * 60; // next day
+      const hrs = Math.floor(diff / 60);
+      const mins = diff % 60;
+      return `${hrs}h${mins > 0 ? ` ${mins}m` : ''}`;
+    }
+  }
+  return '';
 }
 
-// Build Transport Tab - displays journeys
-// Accepts optional cityFilter parameter to show only items for that city
+function parseTime(timeStr) {
+  if (!timeStr) return null;
+  const match = timeStr.match(/(\d{1,2}):(\d{2})/);
+  if (match) {
+    return parseInt(match[1]) * 60 + parseInt(match[2]);
+  }
+  return null;
+}
+
+// Build Transport Tab - Table format with columns
 function buildTransportTab(cityFilter = null) {
   // Ensure journeys exists (for backwards compatibility)
   if (typeof journeys === 'undefined' || journeys === null) {
@@ -282,133 +296,79 @@ function buildTransportTab(cityFilter = null) {
   console.log('[buildTransportTab] Sorted journeys:', sorted.length);
 
   let html = `
-  <div class="transport-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-    <h3 style="margin: 0; font-family: 'Playfair Display', serif; color: #2C3E50;">✈️ Transport Itinerary</h3>
-    <button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>
-  </div>
+    <div class="transport-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3 style="margin: 0; font-family: 'Playfair Display', serif; color: #2C3E50;">✈️ Transport Itinerary</h3>
+      <button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>
+    </div>
   `;
 
   if (sorted.length === 0) {
     html += `
-    <div class="empty-placeholder">
-      <p>No journeys planned yet.</p>
-      <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">Click "+ Add Journey" to add your first transport booking.</p>
-    </div>
+      <div class="empty-placeholder">
+        <p>No journeys planned yet.</p>
+        <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">Click "+ Add Journey" to add your first transport booking.</p>
+      </div>
     `;
   } else {
-    html += '<div class="journey-list">';
+    html += `
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Route</th>
+              <th>Time</th>
+              <th>Provider</th>
+              <th>Route #</th>
+              <th>Cost</th>
+              <th>Status</th>
+              <th>Booking Ref</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
 
     sorted.forEach(journey => {
       const icon = getTransportIcon(journey.transportType);
       const statusColor = journey.status === 'booked' ? '#27AE60' : '#E67E22';
-      const statusIcon = journey.status === 'booked' ? '✓' : '📝';
-      const duration = calculateDuration(
-        journey.departureDate, journey.departureTime,
-        journey.arrivalDate, journey.arrivalTime
-      );
+      const statusText = journey.status === 'booked' ? 'Booked' : 'Planned';
+      const depDate = formatJourneyDate(journey.departureDate) || journey.dayDate || '—';
+      const depTime = journey.departureTime || '—';
+      const arrTime = journey.arrivalTime || '';
+      const timeDisplay = arrTime ? `${depTime} → ${arrTime}` : depTime;
+      const route = `${journey.fromLocation} → ${journey.toLocation}`;
 
       html += `
-      <div class="journey-card" data-journey-id="${journey.id}" style="border-left-color: ${statusColor};">
-        <div class="journey-card-header" onclick="toggleJourneyCard(this)">
-          <div class="journey-route">
-            <span class="journey-icon">${icon}</span>
-            <span class="journey-locations">${journey.fromLocation} → ${journey.toLocation}</span>
-          </div>
-          <div class="journey-meta">
-            ${journey.departureDate ? `<span class="journey-date">${formatJourneyDate(journey.departureDate)}</span>` : ''}
-            ${journey.departureTime ? `<span class="journey-time">${formatJourneyTime(journey.departureTime)}</span>` : ''}
-            ${duration ? `<span class="journey-duration">${duration}</span>` : ''}
-            <span class="journey-status-badge" style="background: ${statusColor}; cursor: pointer;"
-              onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}')">
-              ${statusIcon} ${journey.status === 'booked' ? 'Booked' : 'Planned'}
+        <tr data-journey-id="${journey.id}">
+          <td>${icon}</td>
+          <td class="date-col">${depDate}</td>
+          <td class="route-col">${route}</td>
+          <td>${timeDisplay}</td>
+          <td>${journey.provider || '—'}</td>
+          <td>${journey.routeCode || '—'}</td>
+          <td class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${journey.id}', this.innerText); buildTransportTab();">${journey.cost || '0'}</span></td>
+          <td>
+            <span class="status-badge" style="background: ${statusColor}; cursor: pointer;"
+              onclick="toggleJourneyStatus('${journey.id}')">
+              ${statusText}
             </span>
-            <span class="journey-chevron">▼</span>
-          </div>
-        </div>
-        <div class="journey-card-details">
-          <div class="journey-detail-grid">
-            <div class="journey-detail-item">
-              <label>From</label>
-              <div>${journey.fromLocation}</div>
-            </div>
-            <div class="journey-detail-item">
-              <label>To</label>
-              <div>${journey.toLocation}</div>
-            </div>
-            <div class="journey-detail-item">
-              <label>Departure</label>
-              <div>${formatJourneyDate(journey.departureDate)} ${journey.departureTime || ''}</div>
-            </div>
-            <div class="journey-detail-item">
-              <label>Arrival</label>
-              <div>${formatJourneyDate(journey.arrivalDate)} ${journey.arrivalTime || ''}</div>
-            </div>
-            <div class="journey-detail-item">
-              <label>Provider</label>
-              <div>${journey.provider || '—'}</div>
-            </div>
-            <div class="journey-detail-item">
-              <label>Route #</label>
-              <div>${journey.routeCode || '—'}</div>
-            </div>
-            <div class="journey-detail-item">
-              <label>Status</label>
-              <div><span class="status-badge" style="background: ${statusColor}; cursor: pointer;"
-                onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}')">${statusIcon} ${journey.status === 'booked' ? 'Booked' : 'Planned'}</span></div>
-            </div>
-            <div class="journey-detail-item">
-              <label>Cost</label>
-              <div class="journey-cost">$
-                <span contenteditable="${isEditMode}" onblur="updateJourneyCost('${journey.id}', this.innerText); buildTransportTab();">${journey.cost || '0'}</span>
-              </div>
-            </div>
-          </div>
-
-          ${journey.bookingReference || journey.status === 'booked' ? `
-          <div class="journey-booking-ref">
-            <label>Booking Reference:</label>
-            <input type="text" class="booking-ref-input ${journey.status === 'booked' ? 'confirmed' : ''}"
-              value="${journey.bookingReference || ''}" placeholder="Ref #"
+          </td>
+          <td>
+            <input type="text" value="${journey.bookingReference || ''}" placeholder="Ref #"
               onchange="updateJourneyBookingRef('${journey.id}', this.value); buildTransportTab();"
+              style="width: 90px; padding: 2px 6px; font-size: 0.85rem; border: 1px solid #ddd; border-radius: 3px; font-family: monospace;"
               ${isEditMode ? '' : 'readonly'}>
-          </div>
-          ` : ''}
-
-          ${journey.notes ? `
-          <div class="journey-notes">
-            <label>Notes:</label>
-            <p>${journey.notes}</p>
-          </div>
-          ` : ''}
-
-          ${journey.isMultiLeg && journey.legs && journey.legs.length > 0 ? `
-          <div class="journey-legs-section">
-            <h5>Journey Legs</h5>
-            <div class="journey-legs-list">
-              ${journey.legs.map((leg, idx) => `
-                <div class="journey-leg-item">
-                  <span class="leg-sequence">${idx + 1}</span>
-                  <div class="leg-route">
-                    <strong>${leg.fromLocation} → ${leg.toLocation}</strong>
-                    <span class="leg-times">${leg.departureTime || '??:??'} → ${leg.arrivalTime || '??:??'}</span>
-                  </div>
-                  <div class="leg-provider">${leg.provider || '—'} ${leg.routeCode ? `(${leg.routeCode})` : ''}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-
-          <div class="journey-actions">
-            <button class="action-btn small" onclick="event.stopPropagation();">Edit (coming soon)</button>
-            <button class="action-btn small danger" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); buildTransportTab();">Delete</button>
-          </div>
-        </div>
-      </div>
+          </td>
+          <td>
+            <button class="del-btn" onclick="deleteJourney('${journey.id}'); buildTransportTab();" title="Delete">×</button>
+          </td>
+        </tr>
       `;
     });
 
-    html += '</div>';
+    html += '</tbody></table></div>';
   }
 
   container.innerHTML = html;
@@ -428,199 +388,26 @@ function toggleJourneyStatus(journeyId) {
   }
 }
 
-// Journey card toggle
-function toggleJourneyCard(header) {
-  const card = header.closest('.journey-card');
-  card.classList.toggle('expanded');
+// Stub for add journey modal
+function openAddJourneyModal() {
+  alert('Add Journey modal coming soon. For now, add transport items in the itinerary days.');
 }
 
-// Open Add Journey Modal
-function openAddJourneyModal(editJourneyId = null) {
-  const isEdit = editJourneyId !== null;
-  const journey = isEdit ? findJourney(editJourneyId) : null;
-
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.style.display = 'flex';
-  modal.id = 'addJourneyModal';
-
-  modal.innerHTML = `
-    <div class="modal-content" style="max-width: 550px; max-height: 90vh; overflow-y: auto;">
-      <div class="modal-header">
-        <h2>${isEdit ? '✏️ Edit Journey' : '✈️ Add New Journey'}</h2>
-        <button class="modal-close" onclick="closeAddJourneyModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <form id="journeyForm" class="journey-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="jFrom">From</label>
-              <input type="text" id="jFrom" placeholder="e.g., Brisbane" value="${journey ? journey.fromLocation : ''}" required>
-            </div>
-            <div class="form-group">
-              <label for="jTo">To</label>
-              <input type="text" id="jTo" placeholder="e.g., London" value="${journey ? journey.toLocation : ''}" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="jType">Transport Type</label>
-            <select id="jType">
-              <option value="flight" ${journey?.transportType === 'flight' ? 'selected' : ''}>✈️ Flight</option>
-              <option value="train" ${journey?.transportType === 'train' ? 'selected' : ''}>🚂 Train</option>
-              <option value="bus" ${journey?.transportType === 'bus' ? 'selected' : ''}>🚌 Bus</option>
-              <option value="ferry" ${journey?.transportType === 'ferry' ? 'selected' : ''}>⛴️ Ferry</option>
-              <option value="car" ${journey?.transportType === 'car' ? 'selected' : ''}>🚗 Car</option>
-              <option value="walk" ${journey?.transportType === 'walk' ? 'selected' : ''}>🚶 Walk</option>
-            </select>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="jDepDate">Departure Date</label>
-              <input type="date" id="jDepDate" value="${journey ? journey.departureDate : ''}">
-            </div>
-            <div class="form-group">
-              <label for="jDepTime">Departure Time</label>
-              <input type="time" id="jDepTime" value="${journey ? journey.departureTime : ''}">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="jArrDate">Arrival Date</label>
-              <input type="date" id="jArrDate" value="${journey ? journey.arrivalDate : ''}">
-            </div>
-            <div class="form-group">
-              <label for="jArrTime">Arrival Time</label>
-              <input type="time" id="jArrTime" value="${journey ? journey.arrivalTime : ''}">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="jProvider">Provider / Airline</label>
-              <input type="text" id="jProvider" placeholder="e.g., Qantas" value="${journey ? journey.provider : ''}">
-            </div>
-            <div class="form-group">
-              <label for="jRouteCode">Flight # / Route Code</label>
-              <input type="text" id="jRouteCode" placeholder="e.g., QF9" value="${journey ? journey.routeCode : ''}">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="jCost">Cost ($)</label>
-              <input type="text" id="jCost" placeholder="0" value="${journey ? journey.cost : '0'}">
-            </div>
-            <div class="form-group">
-              <label for="jStatus">Status</label>
-              <select id="jStatus">
-                <option value="planned" ${!journey || journey.status === 'planned' ? 'selected' : ''}>📝 Planned</option>
-                <option value="booked" ${journey?.status === 'booked' ? 'selected' : ''}>✓ Booked</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group" id="bookingRefGroup" style="${journey?.status === 'booked' ? '' : 'display: none;'}">
-            <label for="jBookingRef">Booking Reference</label>
-            <input type="text" id="jBookingRef" placeholder="e.g., ABC123" value="${journey ? journey.bookingReference : ''}">
-          </div>
-          <div class="form-group">
-            <label for="jNotes">Notes</label>
-            <textarea id="jNotes" rows="2" placeholder="Any additional details...">${journey ? journey.notes : ''}</textarea>
-          </div>
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="jIsMultiLeg" ${journey?.isMultiLeg ? 'checked' : ''}>
-              <span>This journey has stopovers / multiple legs</span>
-            </label>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="action-btn" onclick="closeAddJourneyModal()">Cancel</button>
-        ${isEdit ? `<button class="action-btn danger" onclick="deleteJourney('${editJourneyId}'); closeAddJourneyModal(); buildTransportTab();">Delete</button>` : ''}
-        <button class="action-btn" style="background: #2C3E50; color: white;" onclick="saveJourneyForm('${editJourneyId || ''}')">${isEdit ? 'Update' : 'Save'} Journey</button>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-  // Setup status toggle for booking ref visibility
-  document.getElementById('jStatus').addEventListener('change', function() {
-    document.getElementById('bookingRefGroup').style.display = this.value === 'booked' ? 'block' : 'none';
-  });
-}
-
-function closeAddJourneyModal() {
-  const modal = document.getElementById('addJourneyModal');
-  if (modal) modal.remove();
-}
-
-function saveJourneyForm(editId = '') {
-  const formData = {
-    fromLocation: document.getElementById('jFrom').value.trim(),
-    toLocation: document.getElementById('jTo').value.trim(),
-    departureDate: document.getElementById('jDepDate').value,
-    departureTime: document.getElementById('jDepTime').value,
-    arrivalDate: document.getElementById('jArrDate').value,
-    arrivalTime: document.getElementById('jArrTime').value,
-    transportType: document.getElementById('jType').value,
-    provider: document.getElementById('jProvider').value.trim(),
-    routeCode: document.getElementById('jRouteCode').value.trim(),
-    cost: document.getElementById('jCost').value.trim() || '0',
-    status: document.getElementById('jStatus').value,
-    bookingReference: document.getElementById('jBookingRef').value.trim(),
-    isMultiLeg: document.getElementById('jIsMultiLeg').checked,
-    notes: document.getElementById('jNotes').value.trim()
-  };
-
-  if (editId) {
-    const journey = findJourney(editId);
-    if (journey) {
-      Object.assign(journey, formData);
-      saveJourneys();
+// Rebuild current view helper
+function rebuildCurrentView() {
+  const activeTab = document.querySelector('.app-tab-btn.active');
+  if (activeTab) {
+    const tabType = activeTab.getAttribute('data-tab');
+    if (tabType === 'transport') {
+      buildTransportTab(currentCityFilter);
+    } else if (tabType === 'accom') {
+      buildAccomTab(currentCityFilter);
+    } else if (tabType === 'budget') {
+      buildBudgetTab();
+    } else if (tabType === 'packing') {
+      buildPackingTab();
+    } else if (tabType === 'itinerary') {
+      buildItinerary();
     }
-  } else {
-    journeys.push({
-      id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-      ...formData
-    });
-    saveJourneys();
   }
-
-  closeAddJourneyModal();
-  // Rebuild current view to reflect changes
-  if (typeof rebuildCurrentView === 'function') {
-    rebuildCurrentView();
-  } else {
-    buildTransportTab();
-  }
-}
-
-// Initialize on load
-if (typeof appData !== 'undefined') {
-  initJourneys();
-}
-
-// Migrate journeys to link cities (call once on app init)
-function migrateJourneyCityIds() {
-  let updated = 0;
-  journeys.forEach(j => {
-    if (!j.fromCityId || !j.toCityId) {
-      const fromCity = citiesData.find(c => c.name === j.fromLocation);
-      const toCity = citiesData.find(c => c.name === j.toLocation);
-      if (fromCity) j.fromCityId = fromCity.id;
-      if (toCity) j.toCityId = toCity.id;
-      updated++;
-    }
-  });
-  if (updated > 0) {
-    saveJourneys();
-    console.log(`[Journeys] Migrated ${updated} journeys with city IDs`);
-  }
-}
-
-// Format date for input
-function formatDateForInput(dateStr) {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return '';
-  return date.toISOString().split('T')[0];
 }
