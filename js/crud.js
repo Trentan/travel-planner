@@ -148,14 +148,121 @@ function updateBookingRef(legIdx, dayIdx, category, itemIdx, value) {
   }
 }
 
-function addLeg() {
+function openAddLegDialog() {
+  const modal = document.getElementById('add-leg-modal');
+  if (!modal) {
+    // Fallback to direct add if modal doesn't exist
+    addLegBasic();
+    return;
+  }
+
+  // Populate existing cities dropdown
+  const select = document.getElementById('existingCitySelect');
+  select.innerHTML = '<option value="">-- Choose a city --</option>';
+
+  if (typeof citiesData !== 'undefined' && citiesData.length > 0) {
+    citiesData.forEach(city => {
+      const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
+      const option = document.createElement('option');
+      option.value = city.name;
+      option.textContent = `${flag} ${city.name}`;
+      select.appendChild(option);
+    });
+  }
+
+  // Reset form
+  document.getElementById('newLegCityName').value = '';
+  document.getElementById('newLegCityCountry').value = '';
+  document.getElementById('newLegStartDate').value = '';
+
+  modal.style.display = 'flex';
+
+  // Focus on city name input
+  setTimeout(() => document.getElementById('newLegCityName').focus(), 100);
+}
+
+function closeAddLegDialog() {
+  const modal = document.getElementById('add-leg-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function confirmAddLeg() {
+  const existingCity = document.getElementById('existingCitySelect').value;
+  const newCityName = document.getElementById('newLegCityName').value.trim();
+  const newCityCountry = document.getElementById('newLegCityCountry').value.trim();
+  const startDate = document.getElementById('newLegStartDate').value.trim() || 'DD Mon';
+
+  let cityName = existingCity;
+  let cityId = '';
+
+  if (existingCity) {
+    // Use existing city
+    cityName = existingCity;
+    if (typeof citiesData !== 'undefined') {
+      const city = citiesData.find(c => c.name === cityName);
+      cityId = city ? city.id : '';
+    }
+  } else if (newCityName) {
+    // Create new city
+    cityName = newCityName;
+    // Add to cities data
+    if (typeof addOrUpdateCity === 'function') {
+      const newCity = addOrUpdateCity(newCityName, newCityCountry);
+      if (newCity) cityId = newCity.id;
+    }
+  } else {
+    alert('Please select an existing city or enter a new city name.');
+    return;
+  }
+
+  // Create the new leg
+  createNewLeg(cityName, cityId, startDate);
+
+  closeAddLegDialog();
+}
+
+function createNewLeg(cityName, cityId, startDate) {
+  const flag = typeof getCityFlag === 'function' ? getCityFlag(cityName) : '';
   const newLeg = {
     id: 'leg_' + Date.now(),
-    label: '📍 New City',
+    label: `${flag} ${cityName}`,
+    colour: '#2C3E50',
+    cityFood: [{ text: "Local dish to try", done: false, cityId: cityId }],
+    suggestedActivities: [],
+    legTips: [{ text: "Add tip...", cityId: cityId }],
+    days: [{
+      date: startDate, day: 'Day', from: 'Home', to: cityName,
+      completed: false, desc: 'Arrival day',
+      transportItems: [{ text: "Add transport...", cost: "0", cityId: cityId }],
+      accomItems: [{ text: "Add accommodation...", cost: "0", cityId: cityId }],
+      activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false, cityId: cityId }]
+    }]
+  };
+  appData.push(newLeg);
+
+  // Rebuild city nav and itinerary
+  if (typeof extractCitiesFromItinerary === 'function' &&
+      typeof citiesData !== 'undefined') {
+    citiesData = extractCitiesFromItinerary();
+    // Merge with existing to preserve countries
+    const existingCity = citiesData.find(c => c.name === cityName);
+    if (existingCity && cityId) existingCity.id = cityId;
+  }
+
+  if (typeof saveData === 'function') saveData();
+  if (typeof sortLegs === 'function') sortLegs();
+  if (typeof buildCityNav === 'function') buildCityNav();
+}
+
+function addLegBasic() {
+  // Basic add without dialog (fallback)
+  const newLeg = {
+    id: 'leg_' + Date.now(),
+    label: '',
     colour: '#2C3E50',
     cityFood: [{ text: "Local dish to try", done: false }],
     suggestedActivities: [],
-    legTips: ["Add tip..."],
+    legTips: [{ text: "Add tip..." }],
     days: [{
       date: 'DD Mon', day: 'Mon', from: 'City', to: 'City',
       completed: false, desc: 'Travel and arrival day',
@@ -166,6 +273,11 @@ function addLeg() {
   };
   appData.push(newLeg);
   sortLegs();
+}
+
+// Legacy function - now opens dialog
+function addLeg() {
+  openAddLegDialog();
 }
 
 function updateFoodText(legIdx, foodIdx, text) { appData[legIdx].cityFood[foodIdx].text = text; saveData(); }

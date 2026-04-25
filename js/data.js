@@ -238,6 +238,117 @@ function setCityCountry(cityId, country) {
   return false;
 }
 
+// City Management Dialog Functions
+function openCityDialog() {
+  const modal = document.getElementById('city-modal');
+  if (modal) {
+    populateCityList();
+    modal.style.display = 'flex';
+  }
+}
+
+function closeCityDialog() {
+  const modal = document.getElementById('city-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+function populateCityList() {
+  const container = document.getElementById('cityListContainer');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  if (citiesData.length === 0) {
+    container.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No cities defined yet.</p>';
+    return;
+  }
+
+  citiesData.forEach(city => {
+    const flag = getCityFlag(city.name);
+    const isHome = isHomeCity(city.name);
+    const homeBadge = isHome ? ' <span style="background: #27AE60; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">🏠 Home</span>' : '';
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; border-bottom: 1px solid #eee;';
+    row.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
+        <span style="font-size: 1.5rem;">${flag}</span>
+        <div style="flex: 1;">
+          <div style="font-weight: 500;">${city.name}${homeBadge}</div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 4px;">
+            <input type="text" value="${city.country}" placeholder="Country"
+              onchange="updateCityCountry('${city.id}', this.value)"
+              style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; width: 120px;">
+          </div>
+        </div>
+      </div>
+      <button class="del-btn" title="Delete City" onclick="deleteCityFromDialog('${city.id}')">×</button>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function updateCityCountry(cityId, country) {
+  if (setCityCountry(cityId, country)) {
+    saveData(false);
+    // Rebuild city nav to reflect changes
+    if (typeof buildCityNav === 'function') {
+      buildCityNav();
+    }
+  }
+}
+
+function deleteCityFromDialog(cityId) {
+  const cityName = getCityNameById(cityId);
+  if (!confirm(`Delete city "${cityName}"? Items associated with this city will lose their city assignment.`)) {
+    return;
+  }
+
+  if (deleteCity(cityId)) {
+    saveData(false);
+    populateCityList(); // Refresh dialog
+    if (typeof buildCityNav === 'function') {
+      buildCityNav();
+    }
+    if (typeof buildItinerary === 'function') {
+      buildItinerary();
+    }
+  }
+}
+
+function addNewCityFromDialog() {
+  const nameInput = document.getElementById('newCityName');
+  const countryInput = document.getElementById('newCityCountry');
+
+  const name = nameInput?.value?.trim();
+  const country = countryInput?.value?.trim();
+
+  if (!name) {
+    alert('Please enter a city name.');
+    return;
+  }
+
+  // Check if city already exists
+  const existing = citiesData.find(c => c.name.toLowerCase() === name.toLowerCase());
+  if (existing) {
+    alert(`City "${name}" already exists.`);
+    return;
+  }
+
+  const newCity = addOrUpdateCity(name, country);
+  if (newCity) {
+    saveData(false);
+    nameInput.value = '';
+    countryInput.value = '';
+    populateCityList();
+    if (typeof buildCityNav === 'function') {
+      buildCityNav();
+    }
+  }
+}
+
 // Migrate leg-level entities to include cityId
 function migrateLegCityIds() {
   appData.forEach(leg => {

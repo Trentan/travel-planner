@@ -1,10 +1,10 @@
 ## Session State
 
-- **Item/sub-task:** 6e
-- **Branch:** item-6a
-- **Last commit:** — (in progress)
-- **What was done:** Fixed city filter state synchronization across modules. Made currentCityFilter a global variable in data.js and updated itinerary.js to sync with window.currentCityFilter. switchTab already passes cityFilter to buildTransportTab and buildAccomTab functions which already contain filtering logic.
-- **Next step:** Test the implementation - click on Transport/Accommodation tabs, select different cities in the filter, verify only matching entries are shown
-- **Files touched:** js/data.js (added global currentCityFilter), js/itinerary.js (updated buildCityNav and selectCityFilter to use window.currentCityFilter)
-- **Known blockers / risks:** Need to test on actual data with journeys and accommodation entries
-- **Noticed (unscheduled):** None
+- **Item/sub-task:** 6g
+- **Branch:** item-6b
+- **Last commit:** `Item 6g: Create Add New Leg dialog with city selection`
+- **What was done:** Replaced the generic addLeg() function with a dialog-based approach. Users can now select an existing city from a dropdown or create a new city by entering name/country. Also added start date field.
+- **Next step:** Update TODO.md to mark 6g complete
+- **Files touched:** index.html (added modal HTML, changed button label), js/crud.js (replaced addLeg with dialog functions)
+- **Known blockers / risks:** None
+- **Noticed (unscheduled):**
