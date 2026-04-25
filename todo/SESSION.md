@@ -1,10 +1,10 @@
 ## Session State
 
-- **Item/sub-task:** 6g
-- **Branch:** item-6b
-- **Last commit:** `Item 6g: Create Add New Leg dialog with city selection`
-- **What was done:** Replaced the generic addLeg() function with a dialog-based approach. Users can now select an existing city from a dropdown or create a new city by entering name/country. Also added start date field.
-- **Next step:** Update TODO.md to mark 6g complete
-- **Files touched:** index.html (added modal HTML, changed button label), js/crud.js (replaced addLeg with dialog functions)
+- **Item/sub-task:** 6g follow-up (end date + duplicate warning)
+- **Branch:** item-6a
+- **Last commit:** `Item 6g: Add Add New Leg dialog with existing city dropdown or new city creation` (758717b)
+- **What was done:** Added end date field to Add Leg dialog, added duplicate city check with warning/confirmation dialog
+- **Next step:** Commit these improvements, then proceed to 6k/l/m
+- **Files touched:** js/crud.js, index.html
 - **Known blockers / risks:** None
 - **Noticed (unscheduled):**

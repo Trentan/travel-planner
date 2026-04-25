@@ -174,6 +174,7 @@ function openAddLegDialog() {
   document.getElementById('newLegCityName').value = '';
   document.getElementById('newLegCityCountry').value = '';
   document.getElementById('newLegStartDate').value = '';
+  document.getElementById('newLegEndDate').value = '';
 
   modal.style.display = 'flex';
 
@@ -191,6 +192,7 @@ function confirmAddLeg() {
   const newCityName = document.getElementById('newLegCityName').value.trim();
   const newCityCountry = document.getElementById('newLegCityCountry').value.trim();
   const startDate = document.getElementById('newLegStartDate').value.trim() || 'DD Mon';
+  const endDate = document.getElementById('newLegEndDate').value.trim() || '';
 
   let cityName = existingCity;
   let cityId = '';
@@ -203,12 +205,26 @@ function confirmAddLeg() {
       cityId = city ? city.id : '';
     }
   } else if (newCityName) {
-    // Create new city
-    cityName = newCityName;
-    // Add to cities data
-    if (typeof addOrUpdateCity === 'function') {
-      const newCity = addOrUpdateCity(newCityName, newCityCountry);
-      if (newCity) cityId = newCity.id;
+    // Check if city already exists (case-insensitive)
+    const existingCityCheck = citiesData.find(c =>
+      c.name.toLowerCase() === newCityName.toLowerCase()
+    );
+    if (existingCityCheck) {
+      const useExisting = confirm(`City "${newCityName}" already exists. Use the existing city?`);
+      if (useExisting) {
+        cityName = existingCityCheck.name;
+        cityId = existingCityCheck.id;
+      } else {
+        return;
+      }
+    } else {
+      // Create new city
+      cityName = newCityName;
+      // Add to cities data
+      if (typeof addOrUpdateCity === 'function') {
+        const newCity = addOrUpdateCity(newCityName, newCityCountry, startDate, endDate);
+        if (newCity) cityId = newCity.id;
+      }
     }
   } else {
     alert('Please select an existing city or enter a new city name.');
@@ -216,13 +232,40 @@ function confirmAddLeg() {
   }
 
   // Create the new leg
-  createNewLeg(cityName, cityId, startDate);
+  createNewLeg(cityName, cityId, startDate, endDate);
 
   closeAddLegDialog();
 }
 
-function createNewLeg(cityName, cityId, startDate) {
+function createNewLeg(cityName, cityId, startDate, endDate) {
   const flag = typeof getCityFlag === 'function' ? getCityFlag(cityName) : '';
+
+  // Create days array based on date range or single day
+  let days = [];
+  if (endDate && endDate !== startDate) {
+    // Multi-day leg - create arrival day
+    days.push({
+      date: startDate, day: 'Day', from: 'Home', to: cityName,
+      completed: false, desc: 'Arrival day',
+      transportItems: [{ text: "Add transport...", cost: "0", cityId: cityId }],
+      accomItems: [{ text: "Add accommodation...", cost: "0", cityId: cityId }],
+      activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false, cityId: cityId }]
+    });
+    // Add departure/to leg for next city
+    if (typeof addOrUpdateCity === 'function') {
+      addOrUpdateCity(cityName, '', startDate, endDate);
+    }
+  } else {
+    // Single day
+    days.push({
+      date: startDate, day: 'Day', from: 'Home', to: cityName,
+      completed: false, desc: 'Arrival day',
+      transportItems: [{ text: "Add transport...", cost: "0", cityId: cityId }],
+      accomItems: [{ text: "Add accommodation...", cost: "0", cityId: cityId }],
+      activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false, cityId: cityId }]
+    });
+  }
+
   const newLeg = {
     id: 'leg_' + Date.now(),
     label: `${flag} ${cityName}`,
@@ -230,13 +273,7 @@ function createNewLeg(cityName, cityId, startDate) {
     cityFood: [{ text: "Local dish to try", done: false, cityId: cityId }],
     suggestedActivities: [],
     legTips: [{ text: "Add tip...", cityId: cityId }],
-    days: [{
-      date: startDate, day: 'Day', from: 'Home', to: cityName,
-      completed: false, desc: 'Arrival day',
-      transportItems: [{ text: "Add transport...", cost: "0", cityId: cityId }],
-      accomItems: [{ text: "Add accommodation...", cost: "0", cityId: cityId }],
-      activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false, cityId: cityId }]
-    }]
+    days: days
   };
   appData.push(newLeg);
 
