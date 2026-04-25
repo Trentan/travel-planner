@@ -171,10 +171,12 @@ function openAddLegDialog() {
   }
 
   // Reset form
+  document.getElementById('legTypeSelect').value = 'city';
   document.getElementById('newLegCityName').value = '';
   document.getElementById('newLegCityCountry').value = '';
   document.getElementById('newLegStartDate').value = '';
   document.getElementById('newLegEndDate').value = '';
+  onLegTypeChange(); // Ensure UI is updated
 
   modal.style.display = 'flex';
 
@@ -187,7 +189,33 @@ function closeAddLegDialog() {
   if (modal) modal.style.display = 'none';
 }
 
+function onLegTypeChange() {
+  const legType = document.getElementById('legTypeSelect').value;
+  const cityGroup = document.getElementById('citySelectionGroup');
+  const datesLabel = document.getElementById('datesLabel');
+  const endDateInput = document.getElementById('newLegEndDate');
+
+  if (legType === 'start') {
+    datesLabel.textContent = 'Departure Date';
+    endDateInput.placeholder = 'End (optional)';
+    endDateInput.style.display = 'block';
+    cityGroup.style.display = 'block';
+  } else if (legType === 'return') {
+    datesLabel.textContent = 'Return Date';
+    endDateInput.placeholder = 'End (optional)';
+    endDateInput.style.display = 'block';
+    cityGroup.style.display = 'block';
+  } else {
+    // Normal city
+    datesLabel.textContent = 'Dates in City';
+    endDateInput.placeholder = 'To (e.g., 18 Jun)';
+    endDateInput.style.display = 'block';
+    cityGroup.style.display = 'block';
+  }
+}
+
 function confirmAddLeg() {
+  const legType = document.getElementById('legTypeSelect').value;
   const existingCity = document.getElementById('existingCitySelect').value;
   const newCityName = document.getElementById('newLegCityName').value.trim();
   const newCityCountry = document.getElementById('newLegCityCountry').value.trim();
@@ -196,6 +224,27 @@ function confirmAddLeg() {
 
   let cityName = existingCity;
   let cityId = '';
+
+  // Handle leg type specifics
+  if (legType === 'start') {
+    // Start leg: from Home to selected city
+    if (!existingCity && !newCityName) {
+      alert('Please select or create a destination city.');
+      return;
+    }
+  } else if (legType === 'return') {
+    // Return leg: from selected city to Home
+    if (!existingCity && !newCityName) {
+      alert('Please select or create a departure city.');
+      return;
+    }
+  } else {
+    // Normal city leg
+    if (!existingCity && !newCityName) {
+      alert('Please select an existing city or enter a new city name.');
+      return;
+    }
+  }
 
   if (existingCity) {
     // Use existing city
@@ -226,18 +275,15 @@ function confirmAddLeg() {
         if (newCity) cityId = newCity.id;
       }
     }
-  } else {
-    alert('Please select an existing city or enter a new city name.');
-    return;
   }
 
-  // Create the new leg
-  createNewLeg(cityName, cityId, startDate, endDate);
+  // Create the new leg with leg type
+  createNewLeg(cityName, cityId, startDate, endDate, legType);
 
   closeAddLegDialog();
 }
 
-function createNewLeg(cityName, cityId, startDate, endDate) {
+function createNewLeg(cityName, cityId, startDate, endDate, legType = 'city') {
   const flag = typeof getCityFlag === 'function' ? getCityFlag(cityName) : '';
 
   // Get city color from cities data
@@ -249,39 +295,66 @@ function createNewLeg(cityName, cityId, startDate, endDate) {
     }
   }
 
-  // Create days array based on date range or single day
+  // Create days array based on leg type
   let days = [];
-  if (endDate && endDate !== startDate) {
-    // Multi-day leg - create arrival day
+  let legLabel = '';
+
+  if (legType === 'start') {
+    // Start leg: from Home to City
     days.push({
       date: startDate, day: 'Day', from: 'Home', to: cityName,
-      completed: false, desc: 'Arrival day',
-      transportItems: [{ text: "Add transport...", cost: "0", cityId: cityId }],
-      accomItems: [{ text: "Add accommodation...", cost: "0", cityId: cityId }],
-      activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false, cityId: cityId }]
+      completed: false, desc: 'Departure from home',
+      transportItems: [{ text: "Add outbound transport...", cost: "0", cityId: cityId }],
+      accomItems: [],
+      activityItems: []
     });
-    // Add departure/to leg for next city
-    if (typeof addOrUpdateCity === 'function') {
-      addOrUpdateCity(cityName, '', startDate, endDate);
-    }
+    legLabel = `🏠 Start → ${flag} ${cityName}`;
+  } else if (legType === 'return') {
+    // Return leg: from City to Home
+    days.push({
+      date: startDate, day: 'Day', from: cityName, to: 'Home',
+      completed: false, desc: 'Return home',
+      transportItems: [{ text: "Add return transport...", cost: "0", cityId: cityId }],
+      accomItems: [],
+      activityItems: []
+    });
+    legLabel = `${flag} ${cityName} → 🏠 Return`;
   } else {
-    // Single day
-    days.push({
-      date: startDate, day: 'Day', from: 'Home', to: cityName,
-      completed: false, desc: 'Arrival day',
-      transportItems: [{ text: "Add transport...", cost: "0", cityId: cityId }],
-      accomItems: [{ text: "Add accommodation...", cost: "0", cityId: cityId }],
-      activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false, cityId: cityId }]
-    });
+    // Normal city leg
+    if (endDate && endDate !== startDate) {
+      // Multi-day leg - create arrival day
+      days.push({
+        date: startDate, day: 'Day', from: 'Home', to: cityName,
+        completed: false, desc: 'Arrival day',
+        transportItems: [{ text: "Add transport...", cost: "0", cityId: cityId }],
+        accomItems: [{ text: "Add accommodation...", cost: "0", cityId: cityId }],
+        activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false, cityId: cityId }]
+      });
+      // Add departure/to leg for next city
+      if (typeof addOrUpdateCity === 'function') {
+        addOrUpdateCity(cityName, '', startDate, endDate);
+      }
+    } else {
+      // Single day
+      days.push({
+        date: startDate, day: 'Day', from: 'Home', to: cityName,
+        completed: false, desc: 'Arrival day',
+        transportItems: [{ text: "Add transport...", cost: "0", cityId: cityId }],
+        accomItems: [{ text: "Add accommodation...", cost: "0", cityId: cityId }],
+        activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false, cityId: cityId }]
+      });
+    }
+    legLabel = `${flag} ${cityName}`;
   }
 
   const newLeg = {
     id: 'leg_' + Date.now(),
-    label: `${flag} ${cityName}`,
+    label: legLabel,
     colour: cityColor,
-    cityFood: [{ text: "Local dish to try", done: false, cityId: cityId }],
+    legType: legType, // Store the leg type
+    cityFood: legType === 'city' ? [{ text: "Local dish to try", done: false, cityId: cityId }] : [],
     suggestedActivities: [],
-    legTips: [{ text: "Add tip...", cityId: cityId }],
+    legTips: legType === 'city' ? [{ text: "Add tip...", cityId: cityId }] : [],
     days: days
   };
   appData.push(newLeg);

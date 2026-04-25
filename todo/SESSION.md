@@ -1,10 +1,10 @@
 ## Session State
 
-- **Item/sub-task:** 6k
+- **Item/sub-task:** 6l
 - **Branch:** item-6a
-- **Last commit:** `Item 6k: Add city color randomization and color theming`
-- **What was done:** Added CITY_COLORS palette with 20 distinctive colors, implemented getRandomCityColor() that avoids reuse, store colour in city data, new legs/CRUD get their city color, city nav buttons show color bar, city dialog shows color borders
-- **Next step:** Commit changes, proceed to 6l
-- **Files touched:** js/data.js (color palette, random function, city color assignment in populateCityList), js/crud.js (leg creation uses city color), js/itinerary.js (city nav color borders)
+- **Last commit:** `Item 6l: Add leg type selector (Start/City/Return) to Add New Leg dialog`
+- **What was done:** Added leg type dropdown Start/City/Return, updated dialog UI labels based on leg type, modified createNewLeg to handle different leg types with appropriate day structure (Start: Home→City, Return: City→Home, City: normal), labels show directional arrows (Start → City, City → Return)
+- **Next step:** Commit changes
+- **Files touched:** index.html (leg type dropdown), js/crud.js (onLegTypeChange, confirmAddLeg, createNewLeg, openAddLegDialog)
 - **Known blockers / risks:** None
 - **Noticed (unscheduled):**

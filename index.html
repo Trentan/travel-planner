@@ -253,6 +253,15 @@
 <div class="modal-body">
 <div style="display: flex; flex-direction: column; gap: 1rem;">
 <div class="ai-form-group">
+<label>Leg Type</label>
+<select id="legTypeSelect" onchange="onLegTypeChange()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+<option value="start">🏠 Start (Departure from Home)</option>
+<option value="city" selected>📍 City (Destination)</option>
+<option value="return">🏡 Return (Arrival at Home)</option>
+</select>
+</div>
+<div id="citySelectionGroup">
+<div class="ai-form-group">
 <label>Option 1: Select Existing City</label>
 <select id="existingCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
 <option value="">-- Choose a city --</option>
@@ -268,9 +277,9 @@
 <input type="text" id="newLegCityCountry" placeholder="Country (e.g., Czech Republic)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
 </div>
 <div class="ai-form-group">
-<label>Dates in City</label>
+<label id="datesLabel">Dates in City</label>
 <div style="display: flex; gap: 0.5rem;">
-<input type="text" id="newLegStartDate" placeholder="From (e.g., 15 Jun)" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+<input type="text" id="newLegStartDate" placeholder="Date (e.g., 15 Jun)" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
 <input type="text" id="newLegEndDate" placeholder="To (e.g., 18 Jun)" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
 </div>
 </div>
