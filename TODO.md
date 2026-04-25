@@ -25,27 +25,47 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 - [x] a) Transport used to work flawlessly in itinerary and display correctly in the Transport tab. Items have all transitioned to Journeys and are not being handled or displayed correctly — resolve.
 - [ ] b) Journeys are in json backups/2026_June_July_Europe_Thailand.json - but not loading / viewing in itinerary or transport. Need to intersperse from itinerary or transport the journeys to pair with each other and display in tables / itinerary where possible. It is not displaying anything from json.
+- [ ] c) I think the merging transition from transport to journeys has corrupted everything. We want the original functionality of trasport - but it is now a journey. Perhaps journey needs enhancing to, only operate between defined cities. We may need to do Item 6 first so journeys only exists between sequential cities - then can remove all traces of the old transport style as journeys will work.
 
 **Summary:** Budget tab was still calculating transport costs from obsolete `day.transportItems`. Fixed by using `journeys.filter()` matched against `day.date`, `day.from`, and `day.to`.
 
 ---
 
-### Item 3: Convert Accommodation
+### Item 3: Style.css issues
 **Status:** Not started
 **Last completed:** —
 **Next:** `item-3a`
+
+- [ ] a) style.css has errors displaying, fix and tidy and confirm look and layout good
+
+---
+
+### Item 4: Convert Accommodation
+**Status:** Not started
+**Last completed:** —
+**Next:** `item-4a`
 **Spec:** `todo/accomodation-spec-conversion.md`
 
 - [ ] a) Accommodation needs fixing — read and work through `todo/accomodation-spec-conversion.md` before starting
 
 ---
 
-### Item 4: Database alignment (city grouping)
+### Item 5: Packing fixes
 **Status:** Not started
 **Last completed:** —
-**Next:** `item-4a`
+**Next:** `item-5a`
 
-- [ ] a) Tips, suggested activities, food quests, accommodation, and transport should all be alignable to cities — add a `cities` field stored on each entity in the JSON, usable for filtering and future display in individual tabs outside itinerary mode
+- [ ] a) Carry-on Packed Bag (Main Luggage) - REMOVE "Before leaving home" from the default
+- [ ] b) The collapsible Before leaving home, hotel sink washing, Example capsule - can be setup in a row 1 x 3 col - grid style so they take up less space. By default / on tab open (packing) they should all be collapsed.
+
+---
+
+### Item 6: Database alignment (city grouping + city option)
+**Status:** Not started
+**Last completed:** —
+**Next:** `item-6a`
+
+- [ ] a) Tips, suggested activities, food quests, accommodation, and transport should all be alignable to cities — add a `cities` field stored on each entity in the JSON, usable for filtering and future display in individual tabs outside itinerary mode. Perhaps each city defined should have the country, name, date from, date to, duration. 
 - [ ] b) Convert the current trip file `2026_June_July_Europe_Thailand.json` to handle this new structure
 - [ ] c) City subheadings (currently above the main tabs) disappear on scroll — they should remain visible and interactive when scrolling, and appear below the main tab bar
 - [ ] d) Add an "All" option (default) to the cities subheading filter
@@ -53,10 +73,10 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ---
 
-### Item 5: Interactive How-To Guide
+### Item 7: Interactive How-To Guide
 **Status:** Not started
 **Last completed:** —
-**Next:** `item-5a`
+**Next:** `item-7a`
 
 - [ ] a) The interactive guide on how to use the app is not working — fix and improve it to reflect the latest changes
 
