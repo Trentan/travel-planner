@@ -205,12 +205,32 @@ function deleteJourneyGroup(journeyId) {
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
 }
 
+// Sort journeys: by first segment departure date then time
+// For multi-leg, find the earliest segment for that journeyId
 function getSortedJourneys() {
+  // Build a map of journeyId -> earliest departure timestamp
   const earliestByJourneyId = {};
+
   journeys.forEach(j => {
     const jid = j.journeyId || j.id;
     const dateStr = j.departureDate || j.dayDate || '';
-    const ts = dateStr ? (new Date(dateStr + ' 2026').getTime() || 0) : 0;
+    const timeStr = j.departureTime || '00:00';
+    let ts = 0;
+
+    if (dateStr) {
+      // Check if it's new YYYY-MM-DD format from the date picker
+      if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // Build ISO string: YYYY-MM-DDT00:00:00
+        ts = new Date(`${dateStr}T${timeStr}:00`).getTime();
+      } else {
+        // Fallback for legacy format like "15 Jun"
+        ts = new Date(`${dateStr} 2026 ${timeStr}`).getTime();
+      }
+    }
+
+    // Fallback if date is somehow still invalid
+    if (isNaN(ts)) ts = 0;
+
     if (!earliestByJourneyId[jid] || ts < earliestByJourneyId[jid]) {
       earliestByJourneyId[jid] = ts;
     }
@@ -221,7 +241,11 @@ function getSortedJourneys() {
     const jidB = b.journeyId || b.id;
     const tsA = earliestByJourneyId[jidA] || 0;
     const tsB = earliestByJourneyId[jidB] || 0;
+
+    // Sort journeys chronologically by start date/time
     if (tsA !== tsB) return tsA - tsB;
+
+    // Within same group, sort sequentially by segmentOrder
     return (a.segmentOrder || 1) - (b.segmentOrder || 1);
   });
 }
