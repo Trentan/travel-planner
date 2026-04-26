@@ -7,6 +7,33 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ## Completed
 
+### ~~Item 2: Resolve Journey/Transport integration~~ ✅ COMPLETED
+**Status:** Completed — integrated journeys with transport tab
+**Completed:** 2026-04-26
+
+- [x] a) Transport used to work flawlessly in itinerary and display correctly in the Transport tab. Items have all transitioned to Journeys and are not being handled or displayed correctly — resolve.
+- [x] b) Journeys import from JSON working — saved to localStorage and loaded in initData
+- [x] c) Journeys have fromCityId/toCityId linking to defined cities
+- [x] d) Transport tab reverted to table format with columns: Type, Date, Route, Time, Provider, Route #, Cost, Status, Booking Ref, Actions
+- [x] e) Journey/transport needs a refactor with journeyName and journeyId for multi-segment trips
+- [x] f) The add journey dialog not displaying — fixed
+
+---
+
+### ~~Item 3: Multi-leg Journey Object & Table Redesign~~ ✅ COMPLETED
+**Status:** Completed — multi-leg journey structure implemented
+**Completed:** 2026-04-26
+
+- [x] a) Extend journey object to support multi-leg trips — add legs: [] array, isMultiLeg: boolean, journeyName, journeyId
+- [x] b) Update saveJourneyFromModal() in transport.js — allow adding multiple segments before saving
+- [x] c) Update buildTransportTab() table render — group rows by journeyId with expand toggle
+- [x] d) Update getDayJourneys() in transport.js — match multi-leg journeys by departureDate
+- [x] e) Update itinerary.js transport block render — display journey.journeyName and full route chain
+- [x] f) Update getSortedJourneys() — sort by first segment's departureDate/Time
+- [x] g) Update openAddJourneyModal() — pre-populate journeyId for segments
+
+---
+
 ### ~~Item 1: Layout issue~~ ✅ COMPLETED
 **Status:** Completed — branch `item-1b-sync-fixes` merged
 **Completed:** 2026-04-25 — three-column layout + collapsible tab sync + button fix
@@ -39,7 +66,7 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ## Active
 
-### Item 2: Resolve Journey/Transport integration
+### Item 4: Resolve Journey/Transport integration
 **Status:** In progress — branch `item-2a`
 **Last completed:** item-6 — cities now have proper IDs for journey linking
 **Next:** item-2b/2c/2d — assess and fix journey loading/display
@@ -71,7 +98,6 @@ Read this file at the start of every session. Update status blocks and checkboxe
 **Summary:** The journey object already has isMultiLeg and legs[] scaffolded but unused. This item activates that structure — grouping N port-to-port transport records under a shared journeyId and journeyName, updating the transport tab to render them as expandable grouped rows, and updating the itinerary day view to display the journey name rather than raw from/to text. Single-leg journeys require zero migration.
 
 ___
-
 
 ### Item 4: Style.css issues
 **Status:** Not started
@@ -114,6 +140,14 @@ ___
 - [ ] c) The AI script generator can be updated now, include the cities options as a multi add option and all the other functionalities. Make sure it assignKs the city when generating the content for each thing, eg tips, food quests, suggested activities.
 
 ---
+
+### Item 8: Improve Country and City standards
+**Status:** Not started
+**Last completed:** —
+**Next:** `item-7a`
+
+- [ ] a) Should the table layout for journeys be improved to display the fields better? 
+- [ ] b) ALso I noticed when adding new cities they are not appearing in the second submenu (like I just did for verona, italy) - that dialog should provide country dropdowns and if not existing, add one too (but try to use built in icao/iso standards - maybe use the 3 char port codes and short dscriptions for ports eg BNE Brisbane). Also, the country and cities should really be fixed selections / options ... I know not perfect - but mainstream and perhaps icao / iso standards for them. Have a quick built in list, but any outside that can be added in json by the user. eg <datalist id="iso-countries"> AU, Australia, <datalist id="icaoCities"> BNE, Brisbane. The cities should be stored with their matching ISO 2 char code (eg, BNE, Brisbane, AU)
 
 ## Noticed (unscheduled)
 
