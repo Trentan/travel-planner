@@ -227,9 +227,28 @@ function buildItinerary() {
               const statusIcon = status === 'booked' ? '✓' : '⏳';
               const icon = getTransportIcon(journey.transportType);
               const showRef = status === 'booked';
+
+              // For multi-leg journeys, show the full route chain; otherwise show name or route
+              let label = '';
+              if (journey.isMultiLeg && journey.journeyId) {
+                // Find all segments and build chain
+                const allSegs = (window.journeys || [])
+                  .filter(j => j.journeyId === journey.journeyId)
+                  .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+                const stops = allSegs.length > 0
+                  ? [allSegs[0].fromLocation, ...allSegs.map(s => s.toLocation)].join(' → ')
+                  : (journey.journeyName || journey.fromLocation + ' → ' + journey.toLocation);
+                label = `${icon} ${journey.journeyName ? journey.journeyName + ' · ' : ''}${stops}`;
+              } else {
+                label = `${icon} ${journey.journeyName || journey.notes || journey.fromLocation + ' → ' + journey.toLocation}`;
+              }
+
+              // Show departure time if available
+              const timeHint = journey.departureTime ? ` <span style="color:#999;font-size:0.75rem;font-family:monospace;">${journey.departureTime}</span>` : '';
+
               return `<div class="cost-item journey-item">
                 <button class="del-btn" title="Remove Journey" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); rebuildCurrentView();">×</button>
-                <span class="cost-item-text">${icon} ${journey.notes || journey.fromLocation + ' → ' + journey.toLocation}</span>
+                <span class="cost-item-text">${label}${timeHint}</span>
                 <div class="cost-item-actions">
                   <span class="status-badge" style="background:${statusColor}; ${isEditMode ? 'cursor:pointer;' : ''}" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}');">${statusIcon} ${status === 'booked' ? 'Booked' : 'Planned'}</span>
                   ${showRef ? `<input type="text" class="booking-ref-input confirmed" value="${journey.bookingReference || ''}" placeholder="Ref #" onchange="event.stopPropagation(); updateJourneyBookingRef('${journey.id}', this.value);" ${isEditMode ? '' : 'readonly'}/>` : ''}

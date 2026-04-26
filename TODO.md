@@ -16,7 +16,7 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ---
 
-### ~~Item 6: Database alignment~~ ✅ COMPLETED
+### ~~Item 1: Database alignment~~ ✅ COMPLETED
 **Status:** Completed — branch `item-6a`
 **Last completed:** `item-6f` — Cities selection
 **Next:** `item-6g` — Add cityId to journeys (done), tips, food, activities, accommodation
@@ -55,17 +55,36 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ---
 
-### Item 3: Style.css issues
+### Item 3: Multi-leg Journey Object & Table Redesign
+**Status:** Planned — not started
+**Last completed:** item-2f — journey modal display fixed
+**Next:** item-3a — update journey data model to support multi-segment trips
+
+- [ ] a) Extend journey object to support multi-leg trips — add legs: [] array (already exists but always empty), isMultiLeg: boolean, journeyName (user-defined or auto-generated as BNE → TPE → BKK → VIE), journeyId (system-generated, shared across all segments of the same trip). Single-segment journeys stay flat as now with legs: [] — no migration needed.
+- [ ] b) Update saveJourneyFromModal() in transport.js — modal currently saves one segment only. Extend to allow adding multiple segments before saving (e.g. an "+ Add Segment" button within the modal). Each segment shares the parent journeyId. On save, either push one flat journey (single leg) or push N segment journeys all with the same journeyId and sequential segmentOrder field.
+- [ ] c) Update buildTransportTab() table render — group rows by journeyId. Parent summary row shows: journey name, first departure → last arrival date/time, full route chain (BNE → TPE → BKK → VIE), total cost, status, booking ref, and a ▶ toggle. Child segment rows (indented, shown on expand) show individual legs: type icon, date, port-to-port route, depart/arrive times, provider, route code. Cost/status/ref live on parent row only.
+- [ ] d) Update getDayJourneys() in transport.js — currently matches on dayDate + fromLocation + toLocation. With multi-leg journeys, a Brisbane → Vienna flight touches multiple days and cities. Update to match if departureDate === day.date OR if any leg.departureDate === day.date within a multi-leg journey. Return the parent journey object (not individual segments) so the itinerary view can display the full journey name.
+- [ ] e) Update itinerary.js transport block render (line 224–238) — currently renders journey.notes || journey.fromLocation → journey.toLocation. Update to render journey.journeyName as the primary label when set, and for multi-leg journeys display the full route chain (from legs[]) rather than just a single from/to. The status badge and booking ref logic stays the same — they live on the parent journey.
+- [ ] f) Update getSortedJourneys() — ensure multi-leg journeys sort by their first segment's departureDate/Time, not the parent's departureDate (which may be empty if only legs have dates).
+- [ ] g) Update openAddJourneyModal() — pre-populate a journeyId on open so all segments added in one session share the same ID. Add UI affordance to indicate when a journey has multiple segments (e.g. show segment count in the form).
+
+**Summary:** The journey object already has isMultiLeg and legs[] scaffolded but unused. This item activates that structure — grouping N port-to-port transport records under a shared journeyId and journeyName, updating the transport tab to render them as expandable grouped rows, and updating the itinerary day view to display the journey name rather than raw from/to text. Single-leg journeys require zero migration.
+
+___
+
+
+### Item 4: Style.css issues
 **Status:** Not started
 **Last completed:** —
 **Next:** `item-3a`
 
 - [ ] a) style.css has errors displaying, fix and tidy and confirm look and layout good
 - [ ] b) The title and subtitle from .json is not being applied and it is not easy to edit / readable (white on white) when editing
+- [ ] c) Country flags are displaying perfectly in mobile but not a pc based web browser (for the city submenu)
 
 ---
 
-### Item 4: Convert Accommodation
+### Item 5: Convert Accommodation
 **Status:** Not started
 **Last completed:** —
 **Next:** `item-4a`
@@ -75,7 +94,7 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ---
 
-### Item 5: Packing fixes
+### Item 6: Packing fixes
 **Status:** Not started
 **Last completed:** —
 **Next:** `item-5a`
