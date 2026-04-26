@@ -252,17 +252,109 @@ const COUNTRY_FLAGS = {
   'Home': '🏠'
 };
 
+// Flag letter mapping for Windows fallback (A-Z -> regional indicator symbols)
+const FLAG_LETTERS = {
+  'A': '🇦', 'B': '🇧', 'C': '🇨', 'D': '🇩', 'E': '🇪', 'F': '🇫', 'G': '🇬',
+  'H': '🇭', 'I': '🇮', 'J': '🇯', 'K': '🇰', 'L': '🇱', 'M': '🇲', 'N': '🇳',
+  'O': '🇴', 'P': '🇵', 'Q': '🇶', 'R': '🇷', 'S': '🇸', 'T': '🇹', 'U': '🇺',
+  'V': '🇻', 'W': '🇼', 'X': '🇽', 'Y': '🇾', 'Z': '🇿'
+};
+
+// Country code to flag emoji (using regional indicators)
+function getFlagFromCode(countryCode) {
+  if (!countryCode || countryCode.length !== 2) return '📍';
+  const code = countryCode.toUpperCase();
+  return (FLAG_LETTERS[code[0]] || '') + (FLAG_LETTERS[code[1]] || '');
+}
+
+// Detect if system supports flag emojis
+function supportsFlagEmoji() {
+  // Windows typically doesn't render flag emojis properly
+  if (typeof navigator !== 'undefined' && navigator.userAgent) {
+    const ua = navigator.userAgent.toLowerCase();
+    // Windows 10/11 don't support flag emojis natively
+    if (ua.includes('windows')) return false;
+  }
+  return true;
+}
+
+// Country name to ISO code mapping
+const COUNTRY_TO_CODE = {
+  'Australia': 'AU',
+  'Austria': 'AT',
+  'Thailand': 'TH',
+  'Slovakia': 'SK',
+  'Czech Republic': 'CZ',
+  'Czechia': 'CZ',
+  'Germany': 'DE',
+  'Italy': 'IT',
+  'Switzerland': 'CH',
+  'Taiwan': 'TW',
+  'UK': 'GB',
+  'United Kingdom': 'GB',
+  'Scotland': 'GB',
+  'France': 'FR',
+  'Spain': 'ES',
+  'Netherlands': 'NL',
+  'Greece': 'GR',
+  'Japan': 'JP',
+  'USA': 'US',
+  'United States': 'US'
+};
+
 // Get flag emoji for a city (based on city name or country)
 function getCityFlag(cityName) {
   if (!cityName) return '📍';
-  // Direct city match
-  if (COUNTRY_FLAGS[cityName]) return COUNTRY_FLAGS[cityName];
+
+  // Get country from city mapping or direct match
+  let country = null;
+  if (COUNTRY_FLAGS[cityName]) {
+    // Direct city match - reverse lookup country
+    const flag = COUNTRY_FLAGS[cityName];
+    // Find which country this flag belongs to
+    for (const [cName, cFlag] of Object.entries(COUNTRY_FLAGS)) {
+      if (cFlag === flag && COUNTRY_TO_CODE[cName]) {
+        country = cName;
+        break;
+      }
+    }
+    // Return original emoji
+    return flag;
+  }
+
   // Check citiesData for country
   const city = citiesData.find(c => c.name === cityName);
-  if (city && city.country && COUNTRY_FLAGS[city.country]) {
-    return COUNTRY_FLAGS[city.country];
+  if (city && city.country) {
+    country = city.country;
+    if (COUNTRY_FLAGS[country]) {
+      return COUNTRY_FLAGS[country];
+    }
   }
+
   return '📍';
+}
+
+// Get flag HTML with fallback for Windows
+function getCityFlagHTML(cityName) {
+  if (!cityName) return '<span class="city-flag">📍</span>';
+
+  const flag = getCityFlag(cityName);
+  const isWindows = typeof navigator !== 'undefined' &&
+                    navigator.userAgent &&
+                    navigator.userAgent.toLowerCase().includes('windows');
+
+  if (isWindows && flag.length === 2) {
+    // Windows: use styled letter codes instead
+    const city = citiesData.find(c => c.name === cityName);
+    const country = city?.country || cityName;
+    const code = COUNTRY_TO_CODE[country] || '';
+
+    if (code) {
+      return `<span class="city-flag windows-flag" title="${country}">${code}</span>`;
+    }
+  }
+
+  return `<span class="city-flag">${flag}</span>`;
 }
 
 // Set country for a city

@@ -342,8 +342,8 @@ function buildCityNav() {
     // Add vertical color bar to button
     const color = city.colour || '#2C3E50';
     btn.style.borderLeft = `4px solid ${color}`;
-    const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '📍';
-    btn.innerHTML = `<span>${flag} ${city.name}</span>`;
+    const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">📍</span>';
+    btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
     btn.onclick = () => selectCityFilter(city.id, btn);
     navList.appendChild(btn);
   });

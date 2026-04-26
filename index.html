@@ -314,8 +314,8 @@
         <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
           <h4 style="margin-bottom: 1rem;">➕ Add New City</h4>
           <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <input type="text" id="newCityName" placeholder="City name (e.g., Bangkok)" style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px;">
-            <input type="text" id="newCityCountry" placeholder="Country (e.g., Thailand)" style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px;">
+            <input type="text" id="newCityName" list="major-cities" placeholder="City name (e.g., Bangkok)" ...>
+            <input type="text" id="newCityCountry" list="iso-countries" placeholder="Country (e.g., Thailand)" ...>
             <button class="action-btn" onclick="addNewCityFromDialog()">Add City</button>
           </div>
         </div>
