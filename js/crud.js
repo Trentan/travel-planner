@@ -5,116 +5,24 @@ function deleteLeg(idx) {
   }
 }
 function deleteFood(legIdx, foodIdx) { appData[legIdx].cityFood.splice(foodIdx, 1); saveData(); buildItinerary(); }
-function deleteActivity(legIdx, activityIdx) {
-  const activity = appData[legIdx].suggestedActivities[activityIdx];
-  // If activity is assigned to a day, remove it from that day's activity items
-  if (activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined) {
-    const day = appData[legIdx].days[activity.assignedDayIdx];
-    if (day && day.activityItems) {
-      day.activityItems = day.activityItems.filter(item => item.text !== activity.title);
-    }
-  }
-  appData[legIdx].suggestedActivities.splice(activityIdx, 1);
-  saveData(); buildItinerary();
-}
+function deleteRun(legIdx, runIdx) { appData[legIdx].cityRun.splice(runIdx, 1); saveData(); buildItinerary(); }
+function deleteSight(legIdx, sightIdx) { appData[legIdx].suggestedSights.splice(sightIdx, 1); saveData(); buildItinerary(); }
 function deleteLegTip(legIdx, tipIdx) { appData[legIdx].legTips.splice(tipIdx, 1); saveData(); buildItinerary(); }
 
 function deleteDayItem(legIdx, dayIdx, category, itemIdx) {
   const itemText = appData[legIdx].days[dayIdx][category][itemIdx].text;
   if (category === 'activityItems') {
-    const poolActivity = appData[legIdx].suggestedActivities.find(a => a.title === itemText && a.assignedDayIdx === dayIdx);
-    if (poolActivity) poolActivity.assignedDayIdx = null;
+    const poolSight = appData[legIdx].suggestedSights.find(s => s.title === itemText && s.assignedDayIdx === dayIdx);
+    if (poolSight) poolSight.assignedDayIdx = null;
+    const poolRun = appData[legIdx].cityRun.find(s => s.title === itemText && s.assignedDayIdx === dayIdx);
+    if (poolRun) poolRun.assignedDayIdx = null;
   }
   appData[legIdx].days[dayIdx][category].splice(itemIdx, 1); saveData(); buildItinerary();
 }
 
 function addFood(legIdx) { appData[legIdx].cityFood.push({ text: "New food item...", done: false }); saveData(); buildItinerary(); }
-
-function addActivity(legIdx) {
-  // Create modal for adding new activity
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.style.display = 'flex';
-  modal.innerHTML = `
-    <div class="modal-content" style="max-width: 400px;">
-      <div class="modal-header">
-        <h2>➕ Add Suggested Activity</h2>
-        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="ai-form-group">
-          <label>Category</label>
-          <select id="activityCategory" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-            <option value="fitness">🏃 Fitness</option>
-            <option value="sight" selected>🏛️ Sight</option>
-            <option value="attraction">🎢 Attraction</option>
-            <option value="wellness">🧘 Wellness</option>
-            <option value="food">🍽️ Food</option>
-        <option value="tour">🚌 Tour</option>
-          </select>
-        </div>
-        <div class="ai-form-group">
-          <label>Description</label>
-          <input type="text" id="activityTitle" placeholder="e.g., Morning yoga in the park" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-        </div>
-        <div class="ai-form-group">
-          <label>Location</label>
-          <input type="text" id="activityLocation" placeholder="e.g., Central Park" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-        </div>
-        <div class="ai-form-group">
-          <label>Estimated Time</label>
-          <input type="text" id="activityTime" placeholder="e.g., 1 hr" value="1 hr" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-        </div>
-        <div class="ai-form-group">
-          <label>Estimated Cost ($)</label>
-          <input type="text" id="activityCost" placeholder="0" value="0" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="action-btn" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
-        <button class="action-btn" style="background: #2C3E50; color: white;" id="saveActivityBtn">Save Activity</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-
-  // Focus on title input
-  setTimeout(() => document.getElementById('activityTitle').focus(), 100);
-
-  // Handle save
-  document.getElementById('saveActivityBtn').onclick = () => {
-    const category = document.getElementById('activityCategory').value;
-    const title = document.getElementById('activityTitle').value.trim();
-    const location = document.getElementById('activityLocation').value.trim();
-    const estTime = document.getElementById('activityTime').value.trim() || '1 hr';
-    const estCost = document.getElementById('activityCost').value.trim() || '0';
-
-    if (!title) {
-      alert('Please enter a description');
-      return;
-    }
-
-    const fullTitle = location ? `${title} — ${location}` : title;
-    appData[legIdx].suggestedActivities.push({
-      title: fullTitle,
-      category: category,
-      estTime: estTime,
-      estCost: estCost,
-      assignedDayIdx: null
-    });
-    modal.remove();
-    saveData(); buildItinerary();
-  };
-
-  // Allow Enter key to save
-  modal.querySelectorAll('input').forEach(input => {
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        document.getElementById('saveActivityBtn').click();
-      }
-    });
-  });
-}
+function addRun(legIdx) { appData[legIdx].cityRun.push({ title: "New run...", estTime: "1 hr", estCost: "0", assignedDayIdx: null }); saveData(); buildItinerary(); }
+function addSight(legIdx) { appData[legIdx].suggestedSights.push({ title: "New sight...", estTime: "1 hr", estCost: "0", assignedDayIdx: null }); saveData(); buildItinerary(); }
 function addLegTip(legIdx) { appData[legIdx].legTips.push("New tip..."); saveData(); buildItinerary(); }
 
 function addDayItem(legIdx, dayIdx, category) {
@@ -131,10 +39,17 @@ function toggleBookingStatus(e, legIdx, dayIdx, category, itemIdx) {
   item.status = item.status === 'confirmed' ? 'pending' : 'confirmed';
   if (item.status === 'pending') item.bookingRef = '';
   saveData();
-  // Rebuild the current active view
-  if (typeof rebuildCurrentView === 'function') {
-    rebuildCurrentView();
+  // Check which tab is active and only rebuild relevant views
+  const activeTab = document.querySelector('.tab-pane.active');
+  const tabId = activeTab ? activeTab.id : '';
+  if (tabId === 'tab-itinerary') {
+    buildItinerary();
+  } else if (tabId === 'tab-transport') {
+    if (typeof buildTransportTab === 'function') buildTransportTab();
+  } else if (tabId === 'tab-accom') {
+    if (typeof buildAccomTab === 'function') buildAccomTab();
   } else {
+    // Default: rebuild itinerary for other tabs
     buildItinerary();
   }
 }
@@ -142,358 +57,25 @@ function toggleBookingStatus(e, legIdx, dayIdx, category, itemIdx) {
 function updateBookingRef(legIdx, dayIdx, category, itemIdx, value) {
   appData[legIdx].days[dayIdx][category][itemIdx].bookingRef = value;
   saveData();
-  // Rebuild the current active view
-  if (typeof rebuildCurrentView === 'function') {
-    rebuildCurrentView();
+  // Check which tab is active and only rebuild relevant views
+  const activeTab = document.querySelector('.tab-pane.active');
+  const tabId = activeTab ? activeTab.id : '';
+  if (tabId === 'tab-transport') {
+    if (typeof buildTransportTab === 'function') buildTransportTab();
+  } else if (tabId === 'tab-accom') {
+    if (typeof buildAccomTab === 'function') buildAccomTab();
   }
 }
 
-function openAddLegDialog() {
-  const modal = document.getElementById('add-leg-modal');
-  if (!modal) {
-    // Fallback to direct add if modal doesn't exist
-    addLegBasic();
-    return;
-  }
-
-  // Populate existing cities dropdown
-  const select = document.getElementById('existingCitySelect');
-  select.innerHTML = '<option value="">-- Choose a city --</option>';
-
-  // Populate route selectors (from/to)
-  const fromSelect = document.getElementById('fromCitySelect');
-  const toSelect = document.getElementById('toCitySelect');
-
-  if (fromSelect) {
-    fromSelect.innerHTML = '<option value="Home">Home</option>';
-    if (typeof citiesData !== 'undefined' && citiesData.length > 0) {
-      citiesData.forEach(city => {
-        const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
-        const option = document.createElement('option');
-        option.value = city.name;
-        option.textContent = `${flag} ${city.name}`;
-        fromSelect.appendChild(option);
-      });
-    }
-  }
-
-  if (toSelect) {
-    toSelect.innerHTML = '<option value="">-- Choose destination --</option>';
-    if (typeof citiesData !== 'undefined' && citiesData.length > 0) {
-      citiesData.forEach(city => {
-        const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
-        const option = document.createElement('option');
-        option.value = city.name;
-        option.textContent = `${flag} ${city.name}`;
-        toSelect.appendChild(option);
-      });
-    }
-  }
-
-  if (typeof citiesData !== 'undefined' && citiesData.length > 0) {
-    citiesData.forEach(city => {
-      const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
-      const option = document.createElement('option');
-      option.value = city.name;
-      option.textContent = `${flag} ${city.name}`;
-      select.appendChild(option);
-    });
-  }
-
-  // Reset form
-  document.getElementById('legTypeSelect').value = 'city';
-  document.getElementById('newLegCityName').value = '';
-  document.getElementById('newLegCityCountry').value = '';
-  document.getElementById('newLegStartDate').value = '';
-  document.getElementById('newLegEndDate').value = '';
-  onLegTypeChange(); // Ensure UI is updated
-
-  modal.style.display = 'flex';
-
-  // Focus on city name input
-  setTimeout(() => document.getElementById('newLegCityName').focus(), 100);
-}
-
-function closeAddLegDialog() {
-  const modal = document.getElementById('add-leg-modal');
-  if (modal) modal.style.display = 'none';
-}
-
-function onLegTypeChange() {
-  const legType = document.getElementById('legTypeSelect').value;
-  const cityGroup = document.getElementById('citySelectionGroup');
-  const routeGroup = document.getElementById('routeSelectionGroup');
-  const datesLabel = document.getElementById('datesLabel');
-  const endDateInput = document.getElementById('newLegEndDate');
-
-  if (legType === 'start') {
-    datesLabel.textContent = 'Departure Date';
-    endDateInput.placeholder = 'End (optional)';
-    endDateInput.style.display = 'none';
-    cityGroup.style.display = 'block';
-    routeGroup.style.display = 'none';
-  } else if (legType === 'return') {
-    datesLabel.textContent = 'Return Date';
-    endDateInput.placeholder = 'End (optional)';
-    endDateInput.style.display = 'none';
-    cityGroup.style.display = 'block';
-    routeGroup.style.display = 'none';
-  } else if (legType === 'travel') {
-    datesLabel.textContent = 'Travel Date';
-    endDateInput.placeholder = 'End (optional)';
-    endDateInput.style.display = 'none';
-    cityGroup.style.display = 'none';
-    routeGroup.style.display = 'block';
-  } else {
-    // Normal city
-    datesLabel.textContent = 'Dates in City';
-    endDateInput.placeholder = 'To (e.g., 18 Jun)';
-    endDateInput.style.display = 'block';
-    cityGroup.style.display = 'block';
-    routeGroup.style.display = 'none';
-  }
-}
-
-function checkDateConflict(date, fromCity, toCity) {
-  if (!date || date === 'DD Mon') return false;
-
-  // Check all existing days in all legs
-  let conflicts = [];
-  appData.forEach(leg => {
-    leg.days.forEach(day => {
-      if (day.date === date) {
-        conflicts.push({
-          legLabel: leg.label,
-          day: day
-        });
-      }
-    });
-  });
-
-  return conflicts.length > 0 ? conflicts : false;
-}
-
-function confirmAddLeg() {
-  const legType = document.getElementById('legTypeSelect').value;
-  const existingCity = document.getElementById('existingCitySelect').value;
-  const newCityName = document.getElementById('newLegCityName').value.trim();
-  const newCityCountry = document.getElementById('newLegCityCountry').value.trim();
-  const startDate = document.getElementById('newLegStartDate').value.trim() || 'DD Mon';
-  const endDate = document.getElementById('newLegEndDate').value.trim() || '';
-
-  let cityName = existingCity;
-  let cityId = '';
-  let fromCity = 'Home';
-  let toCity = '';
-
-  // Handle leg type specifics
-  if (legType === 'travel') {
-    // Travel leg: from one city to another
-    fromCity = document.getElementById('fromCitySelect').value;
-    toCity = document.getElementById('toCitySelect').value;
-
-    if (!fromCity) {
-      alert('Please select a departure city.');
-      return;
-    }
-    if (!toCity) {
-      alert('Please select a destination city.');
-      return;
-    }
-
-    // Check for date conflict
-    const conflicts = checkDateConflict(startDate, fromCity, toCity);
-    if (conflicts) {
-      const conflictList = conflicts.map(c => `  • ${c.legLabel}: ${c.day.from} → ${c.day.to}`).join('\n');
-      const proceed = confirm(`Warning: Date "${startDate}" already exists:\n${conflictList}\n\nAdd this leg anyway?`);
-      if (!proceed) return;
-    }
-
-    // Create travel leg
-    createTravelLeg(fromCity, toCity, startDate);
-    closeAddLegDialog();
-    return;
-  }
-
-  if (legType === 'start') {
-    // Start leg: from Home to selected city
-    if (!existingCity && !newCityName) {
-      alert('Please select or create a destination city.');
-      return;
-    }
-    fromCity = 'Home';
-    toCity = existingCity || newCityName;
-  } else if (legType === 'return') {
-    // Return leg: from selected city to Home
-    if (!existingCity && !newCityName) {
-      alert('Please select or create a departure city.');
-      return;
-    }
-    fromCity = existingCity || newCityName;
-    toCity = 'Home';
-  } else {
-    // Normal city leg
-    if (!existingCity && !newCityName) {
-      alert('Please select an existing city or enter a new city name.');
-      return;
-    }
-    fromCity = 'Home';
-    toCity = existingCity || newCityName;
-  }
-
-  // Check for date conflict
-  const conflicts = checkDateConflict(startDate, fromCity, toCity);
-  if (conflicts) {
-    const conflictList = conflicts.map(c => `  • ${c.legLabel}: ${c.day.from} → ${c.day.to}`).join('\n');
-    const proceed = confirm(`Warning: Date "${startDate}" already exists:\n${conflictList}\n\nAdd this leg anyway?`);
-    if (!proceed) return;
-  }
-
-  if (existingCity) {
-    // Use existing city
-    cityName = existingCity;
-    if (typeof citiesData !== 'undefined') {
-      const city = citiesData.find(c => c.name === cityName);
-      cityId = city ? city.id : '';
-    }
-  } else if (newCityName) {
-    // Check if city already exists (case-insensitive)
-    const existingCityCheck = citiesData.find(c =>
-      c.name.toLowerCase() === newCityName.toLowerCase()
-    );
-    if (existingCityCheck) {
-      const useExisting = confirm(`City "${newCityName}" already exists. Use the existing city?`);
-      if (useExisting) {
-        cityName = existingCityCheck.name;
-        cityId = existingCityCheck.id;
-      } else {
-        return;
-      }
-    } else {
-      // Create new city
-      cityName = newCityName;
-      // Add to cities data
-      if (typeof addOrUpdateCity === 'function') {
-        const newCity = addOrUpdateCity(newCityName, newCityCountry, startDate, endDate);
-        if (newCity) cityId = newCity.id;
-      }
-    }
-  }
-
-  // Create the new leg with leg type
-  createNewLeg(cityName, cityId, startDate, endDate, legType);
-
-  closeAddLegDialog();
-}
-
-function createNewLeg(cityName, cityId, startDate, endDate, legType = 'city') {
-  const flag = typeof getCityFlag === 'function' ? getCityFlag(cityName) : '';
-
-  // Get city color from cities data
-  let cityColor = '#2C3E50';
-  if (typeof citiesData !== 'undefined' && cityId) {
-    const city = citiesData.find(c => c.id === cityId);
-    if (city && city.colour) {
-      cityColor = city.colour;
-    }
-  }
-
-  // Create days array based on leg type
-  let days = [];
-  let legLabel = '';
-
-  if (legType === 'start') {
-    // Start leg: from Home to City
-    days.push({
-      date: startDate, day: 'Day', from: 'Home', to: cityName,
-      completed: false, desc: 'Departure from home',
-      transportItems: [{ text: "Add outbound transport...", cost: "0", cityId: cityId }],
-      accomItems: [],
-      activityItems: []
-    });
-    legLabel = `🏠 Start → ${flag} ${cityName}`;
-  } else if (legType === 'return') {
-    // Return leg: from City to Home
-    days.push({
-      date: startDate, day: 'Day', from: cityName, to: 'Home',
-      completed: false, desc: 'Return home',
-      transportItems: [{ text: "Add return transport...", cost: "0", cityId: cityId }],
-      accomItems: [],
-      activityItems: []
-    });
-    legLabel = `${flag} ${cityName} → 🏠 Return`;
-  } else {
-    // Normal city leg
-    if (endDate && endDate !== startDate) {
-      // Multi-day leg - create arrival day
-      days.push({
-        date: startDate, day: 'Day', from: 'Home', to: cityName,
-        completed: false, desc: 'Arrival day',
-        transportItems: [{ text: "Add transport...", cost: "0", cityId: cityId }],
-        accomItems: [{ text: "Add accommodation...", cost: "0", cityId: cityId }],
-        activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false, cityId: cityId }]
-      });
-      // Add departure/to leg for next city
-      if (typeof addOrUpdateCity === 'function') {
-        addOrUpdateCity(cityName, '', startDate, endDate);
-      }
-    } else {
-      // Single day
-      days.push({
-        date: startDate, day: 'Day', from: 'Home', to: cityName,
-        completed: false, desc: 'Arrival day',
-        transportItems: [{ text: "Add transport...", cost: "0", cityId: cityId }],
-        accomItems: [{ text: "Add accommodation...", cost: "0", cityId: cityId }],
-        activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false, cityId: cityId }]
-      });
-    }
-    legLabel = `${flag} ${cityName}`;
-  }
-
-  function createTravelLeg(fromCity, toCity, date) {
-  const fromFlag = typeof getCityFlag === 'function' ? getCityFlag(fromCity) : '';
-  const toFlag = typeof getCityFlag === 'function' ? getCityFlag(toCity) : '';
-
-  const travelLeg = {
-    id: 'leg_' + Date.now(),
-    label: `${fromFlag} ${fromCity} → ${toFlag} ${toCity}`,
-    colour: '#607D8B', // Blue-grey for travel legs
-    legType: 'travel',
-    cityFood: [],
-    suggestedActivities: [],
-    legTips: [{ text: "Travel tip..." }],
-    days: [{
-      date: date,
-      day: 'Day',
-      from: fromCity,
-      to: toCity,
-      completed: false,
-      desc: 'Travel day',
-      transportItems: [
-        { text: "Add transport details...", cost: "0", status: "pending", bookingRef: "" }
-      ],
-      accomItems: [],
-      activityItems: []
-    }]
-  };
-
-  appData.push(travelLeg);
-
-  if (typeof saveData === 'function') saveData();
-  if (typeof sortLegs === 'function') sortLegs();
-  if (typeof buildItinerary === 'function') buildItinerary();
-  if (typeof buildCityNav === 'function') buildCityNav();
-}
-
-function addLegBasic() {
-  // Basic add without dialog (fallback)
+function addLeg() {
   const newLeg = {
     id: 'leg_' + Date.now(),
-    label: '',
+    label: '📍 New City',
     colour: '#2C3E50',
     cityFood: [{ text: "Local dish to try", done: false }],
-    suggestedActivities: [],
-    legTips: [{ text: "Add tip..." }],
+    cityRun: [{ title: "5km park loop", estTime: "1 hr", estCost: "0", assignedDayIdx: null }],
+    suggestedSights: [],
+    legTips: ["Add tip..."],
     days: [{
       date: 'DD Mon', day: 'Mon', from: 'City', to: 'City',
       completed: false, desc: 'Travel and arrival day',
@@ -506,68 +88,36 @@ function addLegBasic() {
   sortLegs();
 }
 
-// Legacy function - now opens dialog
-function addLeg() {
-  openAddLegDialog();
-}
-
 function updateFoodText(legIdx, foodIdx, text) { appData[legIdx].cityFood[foodIdx].text = text; saveData(); }
-
-function updateActivity(legIdx, activityIdx, key, val) {
-  if (!val.trim() && key === 'title') {
-    deleteActivity(legIdx, activityIdx);
-  } else {
-    appData[legIdx].suggestedActivities[activityIdx][key] = val;
-    saveData();
-  }
+function updateRunPool(legIdx, runIdx, key, val) {
+  if (!val.trim() && key === 'title') { appData[legIdx].cityRun.splice(runIdx, 1); saveData(); buildItinerary(); }
+  else { appData[legIdx].cityRun[runIdx][key] = val; saveData(); }
 }
-
-function updateActivityCategory(legIdx, activityIdx, newCategory) {
-  appData[legIdx].suggestedActivities[activityIdx].category = newCategory;
-  saveData(); buildItinerary();
+function updateSightPool(legIdx, sightIdx, key, val) {
+  if (!val.trim() && key === 'title') { appData[legIdx].suggestedSights.splice(sightIdx, 1); saveData(); buildItinerary(); }
+  else { appData[legIdx].suggestedSights[sightIdx][key] = val; saveData(); }
 }
-
 function updateLegTip(legIdx, tipIdx, val) {
-  if (!val.trim()) {
-    appData[legIdx].legTips.splice(tipIdx, 1);
-    saveData(); buildItinerary();
-  } else {
-    appData[legIdx].legTips[tipIdx] = val;
-    saveData();
-  }
+  if (!val.trim()) { appData[legIdx].legTips.splice(tipIdx, 1); saveData(); buildItinerary(); }
+  else { appData[legIdx].legTips[tipIdx] = val; saveData(); }
 }
 
 function updateDayItemText(legIdx, dayIdx, category, itemIdx, text, fromTabs = false) {
-  appData[legIdx].days[dayIdx][category][itemIdx].text = text;
-  saveData();
-  // Rebuild current view to reflect changes
-  if (typeof rebuildCurrentView === 'function') {
-    rebuildCurrentView();
-  } else {
-    buildItinerary();
-  }
+  appData[legIdx].days[dayIdx][category][itemIdx].text = text; saveData();
+  if(!fromTabs) buildItinerary();
 }
 function updateDayItemCost(legIdx, dayIdx, category, itemIdx, cost, fromTabs = false) {
-  appData[legIdx].days[dayIdx][category][itemIdx].cost = cost;
-  saveData();
-  // Rebuild current view to reflect changes
-  if (typeof rebuildCurrentView === 'function') {
-    rebuildCurrentView();
-  } else {
-    buildItinerary();
+  appData[legIdx].days[dayIdx][category][itemIdx].cost = cost; saveData();
+  if(fromTabs) {
+    if(category === 'transportItems') buildTransportTab();
+    if(category === 'accomItems') buildAccomTab();
   }
+  else buildItinerary();
 }
 function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
-  appData[legIdx].days[dayIdx][category][itemIdx].time = time;
-  saveData();
+  appData[legIdx].days[dayIdx][category][itemIdx].time = time; saveData();
 }
 
 function toggleFoodCompleted(e, legIdx, foodIdx) { appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); buildItinerary(); }
 function toggleDayCompleted(e, legIdx, dayIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].completed = e.target.checked; saveData(); buildItinerary(); }
 function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) { appData[legIdx].days[dayIdx].activityItems[itemIdx].done = e.target.checked; saveData(); buildItinerary(); }
-
-// Expose dialog functions to window scope for HTML onclick handlers
-window.openAddLegDialog = openAddLegDialog;
-window.closeAddLegDialog = closeAddLegDialog;
-window.confirmAddLeg = confirmAddLeg;
-window.onLegTypeChange = onLegTypeChange;
