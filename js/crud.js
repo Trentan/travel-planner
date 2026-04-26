@@ -110,7 +110,7 @@ function addActivity(legIdx) {
   `;
   document.body.appendChild(modal);
   setTimeout(() => document.getElementById('activityTitle').focus(), 100);
-  document.getElementById('saveActivityBtn').onclick = () => {
+  function saveActivityHandler() {
     const category = document.getElementById('activityCategory').value;
     const title = document.getElementById('activityTitle').value.trim();
     const location = document.getElementById('activityLocation').value.trim();
@@ -118,12 +118,13 @@ function addActivity(legIdx) {
     const estCost = document.getElementById('activityCost').value.trim() || '0';
     if (!title) { alert('Please enter a description'); return; }
     const fullTitle = location ? `${title} — ${location}` : title;
-    appData[legIdx].suggestedSights.push({ title: fullTitle, category: category, estTime: estTime, estCost: estCost, assignedDayIdx: null });
+    appData[legIdx].suggestedActivities.push({ title: fullTitle, category: category, estTime: estTime, estCost: estCost, assignedDayIdx: null });
     modal.remove();
     saveData(); buildItinerary();
-  };
+  }
+  document.getElementById('saveActivityBtn').onclick = (e) => { e.stopPropagation(); saveActivityHandler(); };
   modal.querySelectorAll('input').forEach(input => {
-    input.addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('saveActivityBtn').click(); });
+    input.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveActivityHandler(); });
   });
 }
 
