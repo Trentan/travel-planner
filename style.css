@@ -1408,3 +1408,87 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   margin-bottom: 0.5rem;
 }
 
+/* --- Add Journey Modal Specific Styles --- */
+
+/* Transport Type Button Row */
+.transport-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-family: 'DM Sans', sans-serif;
+  min-width: 70px;
+  transition: all 0.2s;
+}
+
+.transport-type-btn:hover {
+  background: #f5f5f5;
+}
+
+.transport-type-btn.active {
+  border-color: #2980B9;
+  background: #EBF5FB;
+  color: #2C3E50;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(41, 128, 185, 0.1);
+}
+
+/* Segment Pill Tracker */
+.segment-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.segment-pill.completed {
+  background: #EBF5FB;
+  color: #2980B9;
+  border-color: #D6EAF8;
+}
+
+.segment-pill.active {
+  background: #2980B9;
+  color: white;
+  box-shadow: 0 2px 6px rgba(41, 128, 185, 0.3);
+}
+
+.segment-pill .pill-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.segment-pill.completed .pill-num {
+  background: white;
+  color: #2980B9;
+}
+
+.segment-pill.active .pill-num {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+.segment-arrow {
+  color: #BDC3C7;
+  font-size: 0.8rem;
+}
+

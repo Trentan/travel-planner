@@ -836,3 +836,5 @@ function importJSON(event) {
 window.exportJSON = exportJSON;
 window.resetData = resetData;
 window.importJSON = importJSON;
+window.addOrUpdateCity = addOrUpdateCity;
+window.saveData = saveData;

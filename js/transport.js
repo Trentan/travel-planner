@@ -113,8 +113,6 @@ function detectTransportType(text) {
 }
 
 // Get journeys for a specific day (for itinerary view)
-// Returns the PARENT journey (unique journeyId) when a segment departs on this date,
-// or any single-segment journey whose dayDate/departureDate matches.
 function getDayJourneys(dayDate, fromLoc, toLoc) {
   if (typeof journeys === 'undefined' && typeof window !== 'undefined' && window.journeys) {
     journeys = window.journeys;
@@ -125,15 +123,12 @@ function getDayJourneys(dayDate, fromLoc, toLoc) {
   const results = [];
 
   journeys.forEach(j => {
-    // Match: segment departs on this day, OR legacy dayDate match
     const depMatch = j.departureDate === dayDate || j.dayDate === dayDate;
-    // Also match from/to if provided (loose — multi-leg may not match exactly)
     const routeMatch = !fromLoc || !toLoc ||
-      j.fromLocation === fromLoc ||
-      j.toLocation === toLoc;
+        j.fromLocation === fromLoc ||
+        j.toLocation === toLoc;
 
     if (depMatch && routeMatch) {
-      // Deduplicate by journeyId so multi-leg trips show once per day
       const key = j.journeyId || j.id;
       if (!seen.has(key)) {
         seen.add(key);
@@ -145,19 +140,16 @@ function getDayJourneys(dayDate, fromLoc, toLoc) {
   return results;
 }
 
-// Find journey by id
 function findJourney(id) {
   return journeys.find(j => j.id === id);
 }
 
-// Find all segments sharing a journeyId
 function findJourneySegments(journeyId) {
   return journeys
-    .filter(j => j.journeyId === journeyId)
-    .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+      .filter(j => j.journeyId === journeyId)
+      .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
 }
 
-// Build a human-readable route chain for multi-leg: BNE → TPE → BKK → VIE
 function buildRouteChain(segments) {
   if (!segments || segments.length === 0) return '';
   if (segments.length === 1) return segments[0].fromLocation + ' → ' + segments[0].toLocation;
@@ -206,7 +198,6 @@ function deleteJourney(id) {
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
 }
 
-// Delete all segments of a multi-leg journey
 function deleteJourneyGroup(journeyId) {
   journeys = journeys.filter(j => j.journeyId !== journeyId);
   window.journeys = journeys;
@@ -214,15 +205,11 @@ function deleteJourneyGroup(journeyId) {
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
 }
 
-// Sort journeys: by first segment departure date then time
-// For multi-leg, find the earliest segment for that journeyId
 function getSortedJourneys() {
-  // Build a map of journeyId -> earliest departure time
   const earliestByJourneyId = {};
   journeys.forEach(j => {
     const jid = j.journeyId || j.id;
     const dateStr = j.departureDate || j.dayDate || '';
-    const timeStr = j.departureTime || '';
     const ts = dateStr ? (new Date(dateStr + ' 2026').getTime() || 0) : 0;
     if (!earliestByJourneyId[jid] || ts < earliestByJourneyId[jid]) {
       earliestByJourneyId[jid] = ts;
@@ -235,7 +222,6 @@ function getSortedJourneys() {
     const tsA = earliestByJourneyId[jidA] || 0;
     const tsB = earliestByJourneyId[jidB] || 0;
     if (tsA !== tsB) return tsA - tsB;
-    // Within same group, sort by segmentOrder
     return (a.segmentOrder || 1) - (b.segmentOrder || 1);
   });
 }
@@ -287,7 +273,6 @@ function buildTransportTab(cityFilter = null) {
   const container = document.getElementById('transport-table-container');
   if (!container) return;
 
-  // Load from localStorage if empty
   if (!Array.isArray(journeys) || journeys.length === 0) {
     const saved = localStorage.getItem('travelApp_journeys_v1');
     if (saved) {
@@ -296,11 +281,10 @@ function buildTransportTab(cityFilter = null) {
     } else { journeys = []; }
   }
 
-  // Filter by city if specified
   let toShow = getSortedJourneys();
   if (cityFilter && cityFilter !== 'all') {
     toShow = toShow.filter(j =>
-      j.fromCityId === cityFilter || j.toCityId === cityFilter
+        j.fromCityId === cityFilter || j.toCityId === cityFilter
     );
   }
 
@@ -320,7 +304,6 @@ function buildTransportTab(cityFilter = null) {
     return;
   }
 
-  // Group segments by journeyId
   const groups = {};
   const groupOrder = [];
   toShow.forEach(j => {
@@ -356,13 +339,11 @@ function buildTransportTab(cityFilter = null) {
   groupOrder.forEach(gid => {
     const segs = groups[gid].sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
     const isMultiLeg = segs.length > 1;
-    // Use the first segment as representative for single-leg display
     const rep = segs[0];
 
     const statusColor = rep.status === 'booked' ? '#27AE60' : '#E67E22';
     const statusText = rep.status === 'booked' ? 'Booked' : 'Planned';
 
-    // For display: show full route chain across segments
     const route = isMultiLeg ? buildRouteChain(segs) : `${rep.fromLocation} → ${rep.toLocation}`;
     const firstDep = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
     const firstTime = rep.departureTime || '—';
@@ -370,22 +351,18 @@ function buildTransportTab(cityFilter = null) {
     const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
     const lastArrTime = lastSeg.arrivalTime || '—';
 
-    // Total cost across all segments
     const totalCost = segs.reduce((sum, s) => sum + (parseFloat(s.cost) || 0), 0);
 
-    // Icon: show flight icon for multi-leg (most common), otherwise segment icon
     const icon = isMultiLeg ? '✈️' : getTransportIcon(rep.transportType);
 
-    // Journey name display
     const nameDisplay = rep.journeyName
-      ? (rep.journeyName.length > 22 ? rep.journeyName.substring(0, 22) + '…' : rep.journeyName)
-      : '—';
+        ? (rep.journeyName.length > 22 ? rep.journeyName.substring(0, 22) + '…' : rep.journeyName)
+        : '—';
 
     const expandBtn = isMultiLeg
-      ? `<button class="journey-expand-btn" onclick="toggleJourneySegments('${gid}')" title="Show/hide segments" style="background:none;border:none;cursor:pointer;font-size:0.85rem;padding:2px 4px;">▶</button>`
-      : '';
+        ? `<button class="journey-expand-btn" onclick="toggleJourneySegments('${gid}')" title="Show/hide segments" style="background:none;border:none;cursor:pointer;font-size:0.85rem;padding:2px 4px;">▶</button>`
+        : '';
 
-    // Parent row
     html += `
       <tr class="journey-parent-row" data-group="${gid}" style="border-left:3px solid ${statusColor};">
         <td>${expandBtn}</td>
@@ -410,14 +387,13 @@ function buildTransportTab(cityFilter = null) {
             ${isEditMode ? '' : 'readonly'}>
         </td>
         <td>
+          <button class="action-btn small" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; font-size: 0.8rem; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
           ${isMultiLeg
-            ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
-            : `<button class="del-btn" onclick="deleteJourney('${rep.id}'); buildTransportTab();" title="Delete">×</button>`
-          }
+        ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
+        : `<button class="del-btn" onclick="deleteJourney('${rep.id}'); buildTransportTab();" title="Delete">×</button>`}
         </td>
       </tr>`;
 
-    // Segment sub-rows (hidden by default for multi-leg)
     if (isMultiLeg) {
       segs.forEach((seg, i) => {
         const segIcon = getTransportIcon(seg.transportType);
@@ -447,7 +423,6 @@ function buildTransportTab(cityFilter = null) {
   container.innerHTML = html;
 }
 
-// Toggle visibility of segment sub-rows for a journey group
 function toggleJourneySegments(journeyId) {
   const rows = document.querySelectorAll(`.journey-segment-row[data-group="${journeyId}"]`);
   const btn = document.querySelector(`.journey-parent-row[data-group="${journeyId}"] .journey-expand-btn`);
@@ -456,7 +431,6 @@ function toggleJourneySegments(journeyId) {
   if (btn) btn.textContent = isHidden ? '▼' : '▶';
 }
 
-// Toggle journey status
 function toggleJourneyStatus(journeyId) {
   const journey = findJourney(journeyId);
   if (journey) {
@@ -468,90 +442,224 @@ function toggleJourneyStatus(journeyId) {
 }
 
 // ─── ADD JOURNEY MODAL ──────────────────────────────────────────────────────
-// Holds segments being built before final save
 let _pendingSegments = [];
 let _pendingJourneyId = null;
+let _pendingJourneyName = ''; // Track the name when editing
 
-function openAddJourneyModal() {
-  console.log('[openAddJourneyModal] Called');
-  try {
-    const modal = document.getElementById('journey-modal');
-    if (!modal) {
-      console.error('[openAddJourneyModal] Modal element not found!');
-      alert('Journey modal HTML not found. Please check the modal is defined in index.html');
-      return;
-    }
+// Load an existing journey into the modal
+function editJourney(journeyId) {
+  const segs = findJourneySegments(journeyId);
+  if (!segs || segs.length === 0) return;
 
-    // Fresh session: new journeyId, clear pending segments
-    _pendingJourneyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  const modal = document.getElementById('journey-modal');
+  if (!modal) return;
+
+  // Deep copy to prevent mutating active data until saved
+  const segmentsCopy = JSON.parse(JSON.stringify(segs));
+
+  _pendingJourneyId = journeyId;
+  _pendingJourneyName = segmentsCopy[0].journeyName || '';
+  _populateJourneyCityDropdowns();
+
+  if (segmentsCopy.length === 1) {
+    // Single leg: load directly into form
     _pendingSegments = [];
-    _updateSegmentList();
-
-    // Populate city dropdowns
-    const fromSelect = document.getElementById('journeyFromCity');
-    const toSelect = document.getElementById('journeyToCity');
-
-    if (fromSelect) {
-      fromSelect.innerHTML = '<option value="Home">🏠 Home</option>';
-      if (typeof citiesData !== 'undefined') {
-        citiesData.forEach(city => {
-          const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
-          const opt = document.createElement('option');
-          opt.value = city.name;
-          opt.textContent = `${flag} ${city.name}`;
-          fromSelect.appendChild(opt);
-        });
-      }
-    }
-
-    if (toSelect) {
-      toSelect.innerHTML = '<option value="">-- Select destination --</option>';
-      if (typeof citiesData !== 'undefined') {
-        citiesData.forEach(city => {
-          const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
-          const opt = document.createElement('option');
-          opt.value = city.name;
-          opt.textContent = `${flag} ${city.name}`;
-          toSelect.appendChild(opt);
-        });
-      }
-    }
-
-    // Reset form fields
-    ['journeyType','journeyDateFrom','journeyTimeFrom','journeyDateTo','journeyTimeTo',
-     'journeyProvider','journeyRouteCode','journeyCost','journeyNotes','journeyName']
-      .forEach(id => {
-        const el = document.getElementById(id);
-        if (el) { el.tagName === 'SELECT' ? (el.value = 'flight') : (el.value = ''); }
-      });
-
-    modal.style.display = 'flex';
-    console.log('[openAddJourneyModal] Modal opened, journeyId:', _pendingJourneyId);
-  } catch (e) {
-    console.error('[openAddJourneyModal] Error:', e);
-    alert('Error opening journey modal: ' + e.message);
+    _loadSegmentIntoForm(segmentsCopy[0]);
+  } else {
+    // Multi-leg: put all but last into pending, load last into form
+    const lastSeg = segmentsCopy.pop();
+    _pendingSegments = segmentsCopy;
+    _loadSegmentIntoForm(lastSeg);
   }
+
+  _updateSegmentList();
+
+  const header = modal.querySelector('.modal-header h2');
+  if (header) header.textContent = '✈️ Edit journey';
+
+  modal.style.display = 'flex';
 }
 
-// Render the pending segments list inside the modal
-function _updateSegmentList() {
-  let container = document.getElementById('pendingSegmentsList');
-  if (!container) return; // modal may not have this element yet; it's injected below
+// Helper to fill the form inputs
+function _loadSegmentIntoForm(seg) {
+  selectJourneyType(seg.transportType || 'flight');
 
-  if (_pendingSegments.length === 0) {
-    container.innerHTML = '<p style="color:#999;font-size:0.85rem;font-style:italic;">No segments added yet.</p>';
+  document.getElementById('journeyFromCity').value = seg.fromLocation || '';
+  document.getElementById('journeyToCity').value = seg.toLocation || '';
+  document.getElementById('journeyDateFrom').value = seg.departureDate || '';
+  document.getElementById('journeyTimeFrom').value = seg.departureTime || '';
+  document.getElementById('journeyDateTo').value = seg.arrivalDate || '';
+  document.getElementById('journeyTimeTo').value = seg.arrivalTime || '';
+  document.getElementById('journeyProvider').value = seg.provider || '';
+  document.getElementById('journeyRouteCode').value = seg.routeCode || '';
+  document.getElementById('journeyCost').value = seg.cost || '0';
+  document.getElementById('journeyNotes').value = seg.notes || '';
+}
+
+// Allow clicking a pending segment to load it back into the active form
+function editPendingSegment(index) {
+  const toLoc = document.getElementById('journeyToCity')?.value;
+  if (toLoc) {
+    // Save current form to pending before swapping
+    addSegmentToJourney();
+  }
+
+  const seg = _pendingSegments.splice(index, 1)[0];
+  _loadSegmentIntoForm(seg);
+  _updateSegmentList();
+}
+
+function selectJourneyType(type) {
+  document.querySelectorAll('.transport-type-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.querySelector(`.transport-type-btn[data-type="${type}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  const hiddenInput = document.getElementById('journeyType');
+  if (hiddenInput) hiddenInput.value = type;
+}
+
+function promptAddNewCity() {
+  const cityName = prompt("Enter new city name:");
+  if (!cityName) return;
+
+  const exists = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase()) : null;
+  if (exists) {
+    alert("City already exists!");
+    const toSelect = document.getElementById('journeyToCity');
+    if (toSelect) toSelect.value = exists.name;
     return;
   }
 
-  container.innerHTML = _pendingSegments.map((s, i) => `
-    <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:#f0f4f8;border-radius:6px;margin-bottom:6px;">
-      <span style="font-size:0.75rem;font-weight:600;color:#2C3E50;">Leg ${i + 1}</span>
-      <span style="font-size:0.75rem;">${getTransportIcon(s.transportType)}</span>
-      <span style="flex:1;font-size:0.85rem;">${s.fromLocation} → ${s.toLocation}</span>
-      <span style="font-size:0.75rem;color:#888;font-family:monospace;">${s.departureDate} ${s.departureTime}</span>
-      <button onclick="removePendingSegment(${i})" style="background:none;border:none;color:#E74C3C;cursor:pointer;font-size:1rem;opacity:0.5;" title="Remove">×</button>
-    </div>
-  `).join('');
+  const countryName = prompt(`Enter country for ${cityName} (optional):`) || '';
+
+  if (typeof addOrUpdateCity === 'function') {
+    const newCity = addOrUpdateCity(cityName, countryName);
+    if (newCity) {
+      if (typeof saveData === 'function') saveData(false);
+      if (typeof buildCityNav === 'function') buildCityNav();
+      if (typeof populateCityList === 'function') populateCityList();
+
+      _populateJourneyCityDropdowns();
+
+      const toSelect = document.getElementById('journeyToCity');
+      if (toSelect) toSelect.value = newCity.name;
+    }
+  }
+}
+
+function _populateJourneyCityDropdowns() {
+  const fromSelect = document.getElementById('journeyFromCity');
+  const toSelect = document.getElementById('journeyToCity');
+  const currentFrom = fromSelect?.value;
+  const currentTo = toSelect?.value;
+
+  let optionsHtml = '<option value="Home">🏠 Home</option>';
+  if (typeof citiesData !== 'undefined') {
+    [...citiesData].sort((a, b) => a.name.localeCompare(b.name)).forEach(city => {
+      const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
+      optionsHtml += `<option value="${city.name}">${flag} ${city.name}</option>`;
+    });
+  }
+
+  if (fromSelect) {
+    fromSelect.innerHTML = optionsHtml;
+    if (currentFrom) fromSelect.value = currentFrom;
+  }
+  if (toSelect) {
+    toSelect.innerHTML = '<option value="">-- Select city --</option>' + optionsHtml;
+    if (currentTo) toSelect.value = currentTo;
+  }
+}
+
+function openAddJourneyModal() {
+  try {
+    const modal = document.getElementById('journey-modal');
+    if (!modal) return;
+
+    _pendingJourneyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    _pendingSegments = [];
+    _pendingJourneyName = ''; // Reset name
+
+    _populateJourneyCityDropdowns();
+    _updateSegmentList();
+    selectJourneyType('flight');
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('journeyDateFrom').value = today;
+    document.getElementById('journeyDateTo').value = today;
+
+    ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode','journeyCost','journeyNotes']
+        .forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+
+    const header = modal.querySelector('.modal-header h2');
+    if (header) header.textContent = '✈️ Add journey';
+
+    modal.style.display = 'flex';
+  } catch (e) {
+    console.error('[openAddJourneyModal] Error:', e);
+  }
+}
+
+function _updateSegmentList() {
+  const trackerContainer = document.getElementById('segmentTracker');
+  const summaryContainer = document.getElementById('pendingSegmentsList');
+  const labelEl = document.getElementById('currentSegmentLabel');
+
+  const currentLegNum = _pendingSegments.length + 1;
+
+  if (labelEl) {
+    labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; margin-right: 6px;">${currentLegNum}</span> Segment ${currentLegNum} — entering details`;
+  }
+
+  // Build the Pill Tracker at the top
+  if (trackerContainer) {
+    let trackerHtml = '';
+
+    _pendingSegments.forEach((seg, i) => {
+      trackerHtml += `
+        <div class="segment-pill completed" title="${seg.transportType}: ${seg.fromLocation} to ${seg.toLocation}">
+          <span class="pill-num">${i + 1}</span> ${seg.fromLocation} ➔ ${seg.toLocation}
+        </div>
+        <div class="segment-arrow">➔</div>
+      `;
+    });
+
+    const fromLoc = _pendingSegments.length > 0 ? _pendingSegments[_pendingSegments.length-1].toLocation : '...';
+    trackerHtml += `
+      <div class="segment-pill active">
+        <span class="pill-num">${currentLegNum}</span> ${fromLoc} ➔ ...
+      </div>
+    `;
+
+    trackerContainer.innerHTML = trackerHtml;
+  }
+
+  // Build the Summary Lines at the bottom
+  if (summaryContainer) {
+    if (_pendingSegments.length === 0) {
+      summaryContainer.innerHTML = '';
+      return;
+    }
+
+    summaryContainer.innerHTML = _pendingSegments.map((s, i) => {
+      const depString = `${formatJourneyDate(s.departureDate)} ${s.departureTime || ''}`.trim();
+      const arrString = `${formatJourneyDate(s.arrivalDate)} ${s.arrivalTime || ''}`.trim();
+      const providerStr = `${s.provider} ${s.routeCode}`.trim();
+
+      return `
+      <div style="font-size: 0.85rem; color: #666; text-align: center; margin-bottom: 4px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+        <span>✓ Segment ${i + 1}: ${s.fromLocation} ➔ ${s.toLocation}</span>
+        <span style="color: #ccc;">•</span>
+        <span>${depString} ➔ ${arrString}</span>
+        ${providerStr ? `<span style="color: #ccc;">•</span><span>${providerStr}</span>` : ''}
+        <button onclick="editPendingSegment(${i})" style="background:none; border:none; color:#3498DB; cursor:pointer; font-size:1rem; opacity:0.8; padding:0 4px;" title="Edit leg">✎</button>
+        <button onclick="removePendingSegment(${i})" style="background:none; border:none; color:#E74C3C; cursor:pointer; font-size:1rem; opacity:0.6; padding:0 4px;" title="Remove leg">×</button>
+      </div>`;
+    }).join('');
+  }
 }
 
 function removePendingSegment(index) {
@@ -559,7 +667,6 @@ function removePendingSegment(index) {
   _updateSegmentList();
 }
 
-// Add current form values as a segment (without saving yet)
 function addSegmentToJourney() {
   const fromLocation = document.getElementById('journeyFromCity')?.value;
   const toLocation = document.getElementById('journeyToCity')?.value;
@@ -569,18 +676,16 @@ function addSegmentToJourney() {
   _pendingSegments.push(seg);
   _updateSegmentList();
 
-  // Auto-advance: set From to the just-added To city for next segment
   const fromSelect = document.getElementById('journeyFromCity');
   if (fromSelect && toLocation) fromSelect.value = toLocation;
   const toSelect = document.getElementById('journeyToCity');
   if (toSelect) toSelect.value = '';
 
-  // Clear time/date/provider/route fields but keep dates as starting point
   ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
-  // Shift dates: arrival date becomes next departure date
+
   const arrDate = document.getElementById('journeyDateTo')?.value;
   if (arrDate) {
     const depEl = document.getElementById('journeyDateFrom');
@@ -606,7 +711,7 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
   return {
     id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
     journeyId: _pendingJourneyId,
-    journeyName: '', // set on final save
+    journeyName: '',
     legId: '',
     dayDate: dateFrom,
     fromLocation: fromLocation,
@@ -623,7 +728,7 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
     status: 'planned',
     cost: cost,
     bookingReference: '',
-    isMultiLeg: false, // set on final save
+    isMultiLeg: false,
     segmentOrder: segmentOrder,
     notes: notes,
     legs: []
@@ -635,6 +740,7 @@ function closeJourneyModal() {
   if (modal) modal.style.display = 'none';
   _pendingSegments = [];
   _pendingJourneyId = null;
+  _pendingJourneyName = '';
 }
 
 function saveJourneyFromModal() {
@@ -642,13 +748,10 @@ function saveJourneyFromModal() {
     const fromLocation = document.getElementById('journeyFromCity')?.value;
     const toLocation = document.getElementById('journeyToCity')?.value;
 
-    // If form still has unsaved fields (to/from filled), treat as an implicit single segment
     const hasFormData = toLocation && toLocation !== '';
 
-    // Determine final segments array
     let finalSegments = [..._pendingSegments];
     if (hasFormData) {
-      // Add the current form as the last (or only) segment
       finalSegments.push(_buildJourneyObject(fromLocation, toLocation, finalSegments.length + 1));
     }
 
@@ -657,34 +760,31 @@ function saveJourneyFromModal() {
       return;
     }
 
-    // Journey name: user-defined or auto-generated from route chain
-    let journeyName = document.getElementById('journeyName')?.value.trim() || '';
-    if (!journeyName) {
-      journeyName = buildRouteChain(finalSegments);
-    }
+    let journeyName = _pendingJourneyName || buildRouteChain(finalSegments);
 
     const isMultiLeg = finalSegments.length > 1;
 
-    // Stamp journeyName and isMultiLeg onto all segments
-    finalSegments.forEach(seg => {
+    finalSegments.forEach((seg, i) => {
       seg.journeyName = journeyName;
       seg.isMultiLeg = isMultiLeg;
       seg.journeyId = _pendingJourneyId;
+      seg.segmentOrder = i + 1; // Ensure correct ordering
     });
+
+    // EDIT FIX: Remove the old segments for this journeyId before saving
+    journeys = journeys.filter(j => j.journeyId !== _pendingJourneyId);
 
     journeys.push(...finalSegments);
     window.journeys = journeys;
     saveJourneys();
     closeJourneyModal();
     buildTransportTab();
-    console.log(`[saveJourneyFromModal] Saved ${finalSegments.length} segment(s) for journey "${journeyName}"`);
   } catch (e) {
     console.error('[saveJourneyFromModal] Error:', e);
     alert('Error saving journey: ' + e.message);
   }
 }
 
-// Rebuild current view helper
 function rebuildCurrentView() {
   const activeTab = document.querySelector('.app-tab-btn.active');
   if (activeTab) {
@@ -715,3 +815,7 @@ window.getTransportIcon = getTransportIcon;
 window.createJourneyFromTransportItem = createJourneyFromTransportItem;
 window.importJourneys = importJourneys;
 window.rebuildCurrentView = rebuildCurrentView;
+window.selectJourneyType = selectJourneyType;
+window.promptAddNewCity = promptAddNewCity;
+window.editJourney = editJourney;
+window.editPendingSegment = editPendingSegment;
