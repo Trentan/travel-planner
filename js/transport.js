@@ -315,7 +315,9 @@ function buildTransportTab(cityFilter = null) {
         <table class="data-table">
           <thead>
             <tr>
-              <th>Type</th>
+              <th>Journey</th>
+            <th>ID</th>
+            <th>Type</th>
               <th>Date</th>
               <th>Route</th>
               <th>Departure</th>
@@ -345,6 +347,8 @@ function buildTransportTab(cityFilter = null) {
 
       html += `
         <tr data-journey-id="${journey.id}">
+          <td class="journey-name-col" title="${journey.journeyName || ''}">${journey.journeyName ? (journey.journeyName.length > 15 ? journey.journeyName.substring(0, 15) + '...' : journey.journeyName) : '—'}</td>
+          <td class="journey-id-col"><code style="font-size: 0.7rem; background: #f5f5f5; padding: 2px 4px; border-radius: 3px;">${journey.journeyId ? (journey.journeyId.length > 8 ? journey.journeyId.substring(0, 8) + '...' : journey.journeyId) : (journey.id ? journey.id.substring(0, 8) + '...' : '—')}</code></td>
           <td>${icon}</td>
           <td class="date-col">${depDate}</td>
           <td class="route-col">${route}</td>
@@ -446,6 +450,7 @@ function openAddJourneyModal() {
   document.getElementById('journeyRouteCode').value = '';
   document.getElementById('journeyCost').value = '';
   document.getElementById('journeyNotes').value = '';
+    document.getElementById('journeyName').value = '';
 
   modal.style.display = 'flex';
     console.log('[openAddJourneyModal] Modal opened successfully');
@@ -474,19 +479,30 @@ function saveJourneyFromModal() {
     const routeCode = document.getElementById('journeyRouteCode').value.trim();
     const cost = document.getElementById('journeyCost').value.trim() || '0';
     const notes = document.getElementById('journeyNotes').value.trim();
+    let journeyName = document.getElementById('journeyName').value.trim();
 
     if (!toLocation) {
       alert('Please select a destination');
       return;
     }
 
-  // Lookup city IDs
-  const fromCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === fromLocation) : null;
-  const toCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === toLocation) : null;
+    // Auto-generate journeyName if empty
+    if (!journeyName) {
+      journeyName = `${fromLocation} → ${toLocation}`;
+    }
 
-  const journey = {
-    id: 'journey_' + Date.now(),
-    legId: '',
+    // Generate unique journeyId (system-generated, allows multi-leg trips)
+    const journeyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+
+    // Lookup city IDs
+    const fromCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === fromLocation) : null;
+    const toCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === toLocation) : null;
+
+    const journey = {
+      id: 'journey_' + Date.now(),
+      journeyId: journeyId,
+      journeyName: journeyName,
+      legId: '',
     // Use dateFrom as the primary dayDate reference
     dayDate: dateFrom,
     fromLocation: fromLocation,
