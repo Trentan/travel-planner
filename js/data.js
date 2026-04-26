@@ -831,3 +831,8 @@ function importJSON(event) {
 
   reader.readAsText(file);
 }
+
+// Expose data functions to window scope for HTML onclick handlers
+window.exportJSON = exportJSON;
+window.resetData = resetData;
+window.importJSON = importJSON;

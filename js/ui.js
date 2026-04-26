@@ -277,3 +277,24 @@ function sortLegs() {
 function reObserveLegs() {
   // No-op - kept for backwards compatibility
 }
+
+// Expose UI functions to window scope for HTML onclick handlers
+window.toggleLeg = toggleLeg;
+window.toggleCard = toggleCard;
+window.updateData = updateData;
+window.updateDayData = updateDayData;
+window.sortLegs = sortLegs;
+window.openAIDialog = openAIDialog;
+window.closeAIDialog = closeAIDialog;
+window.openGuideDialog = openGuideDialog;
+window.closeGuideDialog = closeGuideDialog;
+window.startTutorial = startTutorial;
+window.updateLegTip = updateLegTip;
+window.deleteLegTip = deleteLegTip;
+window.toggleMode = toggleMode;
+window.toggleEditMode = toggleEditMode;
+window.toggleCompactView = toggleCompactView;
+window.switchTab = switchTab;
+window.openPrintPreview = openPrintPreview;
+window.executePrint = executePrint;
+window.addLeg = addLeg;

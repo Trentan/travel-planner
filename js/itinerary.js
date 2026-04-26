@@ -395,3 +395,8 @@ function scrollToCity(cityId) {
     }
   }
 }
+
+// Expose itinerary functions to window scope for HTML onclick handlers
+window.rebuildCurrentView = rebuildCurrentView;
+window.selectCityFilter = selectCityFilter;
+window.expandToCity = expandToCity;
