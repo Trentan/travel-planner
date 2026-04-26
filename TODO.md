@@ -48,8 +48,8 @@ Read this file at the start of every session. Update status blocks and checkboxe
 - [x] b) Journeys import from JSON working — saved to localStorage and loaded in initData
 - [x] c) Journeys have fromCityId/toCityId linking to defined cities
 - [x] d) Transport tab reverted to table format with columns: Type, Date, Route, Time, Provider, Route #, Cost, Status, Booking Ref, Actions 
-- [ ] e) Journey/transport needs a refactor (as a journey can comprise multiple transport options and days spans) - Perhaps introduce a journeyName (*user defined - similar to the notes field or auto generated from the input ports/cities - needs to be unique like the uniqueId), journeyId (*unique system generated) for each journey - and add to the table - when viewing in the transport tab - the journeyId can be the same for multiple, it will also help when displaying the transport info in the itinerary tab. Also, if the journey is edited makes it easier to display that info. 
-- [ ] f) The add journey dialog not displaying, same as add trip leg, add activity, add food etc. the dialogs broken not displaying
+- [x] e) Journey/transport needs a refactor (as a journey can comprise multiple transport options and days spans) - Perhaps introduce a journeyName (*user defined - similar to the notes field or auto generated from the input ports/cities - needs to be unique like the uniqueId), journeyId (*unique system generated) for each journey - and add to the table - when viewing in the transport tab - the journeyId can be the same for multiple, it will also help when displaying the transport info in the itinerary tab. Also, if the journey is edited makes it easier to display that info. 
+- [x] f) The add journey dialog not displaying, same as add trip leg, add activity, add food etc. the dialogs broken not displaying
 
 **Summary:** Budget tab was still calculating transport costs from obsolete `day.transportItems`. Fixed by using `journeys.filter()` matched against `day.date`, `day.from`, and `day.to`.
 
