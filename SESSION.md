@@ -1,14 +1,10 @@
 ## Session State
 
-- **Item/sub-task:** 4a
-- **Branch:** item-4a
-- **Last commit:** —
-- **What was done:** Created branch item-4a, identified CSS errors in style.css
-- **Next step:** Fix orphaned CSS declarations in .city-dashboard and media queries (lines 165-283)
+- **Item/sub-task:** 4b
+- **Branch:** item-4a  
+- **Last commit:** `Item 4a [1 of 3]: Fix CSS syntax errors - removed orphaned property blocks`
+- **What was done:** Fixed title/subtitle editing - added visible white text color and focus styles for contenteditable elements in header
+- **Next step:** Commit 4b, then fix 4c (country flags on PC browsers)
 - **Files touched:** style.css
 - **Known blockers / risks:** None
 - **Noticed (unscheduled):**
-  - Lines 165-182: Duplicate background declarations in .city-dashboard
-  - Lines 216-231: Orphaned property blocks without selectors
-  - Lines 241-256: Orphaned property blocks inside media query
-  - Lines 267-281: Orphaned property blocks inside media query
