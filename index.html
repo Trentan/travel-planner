@@ -342,10 +342,23 @@
 </div>
 <div class="modal-body">
 <div class="ai-form-group">
+<label>Journey Name (optional)</label>
+<input type="text" id="journeyName" placeholder="e.g., Outbound to Asia" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+<p style="font-size: 0.8rem; color: #666; margin-top: 4px;">Leave blank to auto-generate from cities</p>
+</div>
+<div style="display: flex; gap: 1rem;">
+<div class="ai-form-group" style="flex: 1;">
 <label>From</label>
 <select id="journeyFromCity" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
 <option value="Home">🏠 Home</option>
 </select>
+</div>
+<div class="ai-form-group" style="flex: 1;">
+<label>To</label>
+<select id="journeyToCity" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+<option value="">-- Select destination --</option>
+</select>
+</div>
 </div>
 <div class="ai-form-group">
 <label>To</label>
