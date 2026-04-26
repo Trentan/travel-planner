@@ -7,6 +7,7 @@ function deleteLeg(idx) {
 function deleteFood(legIdx, foodIdx) { appData[legIdx].cityFood.splice(foodIdx, 1); saveData(); buildItinerary(); }
 function deleteRun(legIdx, runIdx) { appData[legIdx].cityRun.splice(runIdx, 1); saveData(); buildItinerary(); }
 function deleteSight(legIdx, sightIdx) { appData[legIdx].suggestedSights.splice(sightIdx, 1); saveData(); buildItinerary(); }
+function deleteActivity(legIdx, activityIdx) { appData[legIdx].suggestedActivities.splice(activityIdx, 1); saveData(); buildItinerary(); }
 function deleteLegTip(legIdx, tipIdx) { appData[legIdx].legTips.splice(tipIdx, 1); saveData(); buildItinerary(); }
 
 function deleteDayItem(legIdx, dayIdx, category, itemIdx) {
@@ -371,3 +372,4 @@ window.closeAddLegDialog = closeAddLegDialog;
 window.onLegTypeChange = onLegTypeChange;
 window.checkDateConflict = checkDateConflict;
 window.confirmAddLeg = confirmAddLeg;
+window.deleteActivity = deleteActivity;
