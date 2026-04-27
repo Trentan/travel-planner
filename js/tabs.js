@@ -17,9 +17,13 @@ function buildAccomTab(cityFilter = null) {
 
   if (sortedStays.length === 0) {
     container.innerHTML = `
-      <div class="empty-placeholder">No stays found.</div>
-      <div style="margin-top: 1rem; text-align: center;">
-        <button class="add-btn" onclick="openAddStayModal()">+ Add Stay</button>
+      <div class="accom-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h3 style="margin:0; font-family:'Playfair Display',serif; color:#2C3E50;">🏨 Accommodation</h3>
+        <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
+      </div>
+      <div class="empty-placeholder">
+        <p>No stays found.</p>
+        <p style="font-size:0.9rem;color:#666;margin-top:0.5rem;">Click "+ Add Stay" to add your first accommodation.</p>
       </div>
     `;
     return;
@@ -89,12 +93,15 @@ function buildAccomTab(cityFilter = null) {
 
   html += `</tbody></table></div>`;
 
-  // Add "Add Stay" button below the table
-  html += `<div style="margin-top: 1rem; text-align: center;">
-    <button class="add-btn" onclick="openAddStayModal()">+ Add Stay</button>
-  </div>`;
+  // Header with title and Add Stay button at the top
+  const headerHtml = `
+    <div class="accom-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <h3 style="margin:0; font-family:'Playfair Display',serif; color:#2C3E50;">🏨 Accommodation</h3>
+      <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
+    </div>
+  `;
 
-  container.innerHTML = html;
+  container.innerHTML = headerHtml + html;
 }
 
 // Helper to calculate nights between dates

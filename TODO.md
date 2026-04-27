@@ -77,18 +77,20 @@ Read this file at the start of every session. Update status blocks and checkboxe
 ## Active
 
 ### Item 5: Convert Accommodation
-**Status:** In progress — 5b complete
-**Last completed:** 5b
-**Next:** `item-5c`
+**Status:** In progress — 5f complete
+**Last completed:** 5f
+**Next:** `item-5g`
 **Note:** No migration of old accomItems — new stays model only going forward. Old accomItems stay in data until a separate JSON conversion is done later.
 
 - [x] a) Phase 1 — Data model: add top-level `stays []` global in `data.js`; load/save with key `travelApp_stays_v1`; add `stays` to `exportJSON()` and `importJSON()`; add `stays` cityId cleanup in `deleteCity()`
 - [x] b) Phase 2 — Add Stay dialog: build "Add Stay" modal in `index.html` (fields: city, property name, check-in date, check-out date, status, provider, booking ref, total cost, notes; auto-calc nights); add `openAddStayModal()`, `saveStayFromModal()`, `deleteStay()`, `toggleStayStatus()` in `js/crud.js`; replace "Add Accom" button in `itinerary.js` (~line 279) to call `openAddStayModal()` instead
   - **⚠️ Carry-forward (next session):** A partial implementation was applied (branch `item-4a`) but targets the wrong data model — pushes to `day.accomItems` instead of `stays[]`, uses `openStayModal` not `openAddStayModal`, missing fields (city, dates, provider, notes), missing `deleteStay()`/`toggleStayStatus()`. Revert or overwrite those changes and implement correctly against `stays[]`.
-- [ ] c) Phase 3 — Accommodation tab: rewrite `buildAccomTab()` in `tabs.js` to render from `stays[]` sorted by check-in date (columns: City, Property, Check-in → Check-out, Nights, Status, Cost); city filter uses `stay.city` field directly; update `buildBudgetTab()` to sum `stays[].total_cost` by leg instead of `day.accomItems`
-- [ ] d) Phase 4 — Itinerary day card: replace `accomItems` block render in `itinerary.js` (~lines 54–58 compact, ~lines 262–280 full card) with derived stay display: check-in on start date, "Staying at X" for middle days, check-out on final day; update transit detection at ~line 120
-- [ ] e) Phase 5 — Accommodation needs an add accommodation button to launch an add accommodation dialog and be able to save
-- [ ] f) Phase 6 — Add ability to accommodation tab table to edit (with accommodation dialog ) and delete existing entries 
+- [x] c) Phase 3 — Accommodation tab: rewrite `buildAccomTab()` in `tabs.js` to render from `stays[]` sorted by check-in date (columns: City, Property, Check-in → Check-out, Nights, Status, Cost); city filter uses `stay.city` field directly; update `buildBudgetTab()` to sum `stays[].total_cost` by leg instead of `day.accomItems`
+- [x] d) Phase 4 — Itinerary day card: replace `accomItems` block render in `itinerary.js` (~lines 54–58 compact, ~lines 262–280 full card) with derived stay display: check-in on start date, "Staying at X" for middle days, check-out on final day; update transit detection at ~line 120
+- [x] e) Phase 5 — Accommodation needs an add accommodation button to launch an add accommodation dialog and be able to save
+- [x] f) Phase 6 — The accommodation/stays options in the itinerary and table needs the ability to edit stays and launch dialog and save
+- [ ] g) Phase 7 — The add stay button should not be at the bottom, but in the same with a heading of Accommodation just like the transport page and similar (up the top)
+- [ ] h) Phase 8 — Convert all the old accommodation in my json file (backups/2026_June_July_Europe_Thailand.json) to the new format for stays
 
 ---
 
@@ -97,8 +99,9 @@ Read this file at the start of every session. Update status blocks and checkboxe
 **Last completed:** —
 **Next:** `item-5a`
 
-- [ ] a) Carry-on Packed Bag (Main Luggage) - REMOVE "Before leaving home" from the default
-- [ ] b) The collapsible Before leaving home, hotel sink washing, Example capsule - can be setup in a row 1 x 3 col - grid style so they take up less space. By default / on tab open (packing) they should all be collapsed.
+- [ ] a) The collapsible Before leaving home, hotel sink washing, Example capsule - can be setup in a row 1 x 3 col - grid style so they take up less space. By default / on tab open (packing) they should all be collapsed.
+- [ ] b) Before leaving home should have a default checklist 
+- [ ] c) For the Carry-on Packed Bag (Main Luggage) - REMOVE "Before leaving home" from the default
 
 ---
 
