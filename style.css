@@ -66,7 +66,6 @@ header::before { content: ''; position: absolute; inset: 0; background: repeatin
 .clock-row { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 4px; font-size: 0.85rem; font-family: 'DM Mono', monospace;}
 .clock-label { color: #AAB7C4; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'DM Sans', sans-serif;}
 
-/* Windows flag fallback styling */
 .city-flag {
   display: inline-flex;
   align-items: center;
@@ -75,23 +74,17 @@ header::before { content: ''; position: absolute; inset: 0; background: repeatin
   line-height: 1;
 }
 
+.city-flag img.emoji {
+  width: 1.2em;
+  height: 1.2em;
+  margin: 0 0.05em 0 0.1em;
+  vertical-align: -0.1em;
+}
+
 .city-nav-content {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-}
-
-.city-flag.windows-flag {
-  background: rgba(0,0,0,0.1);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  min-width: 28px;
-  font-family: 'DM Mono', monospace;
 }
 
 /* NAV - City Filter */

@@ -334,27 +334,10 @@ function getCityFlag(cityName) {
   return '📍';
 }
 
-// Get flag HTML with fallback for Windows
+// Get flag HTML — Twemoji converts emoji to images cross-platform
 function getCityFlagHTML(cityName) {
   if (!cityName) return '<span class="city-flag">📍</span>';
-
   const flag = getCityFlag(cityName);
-  const isWindows = typeof navigator !== 'undefined' &&
-                    navigator.userAgent &&
-                    navigator.userAgent.toLowerCase().includes('windows');
-
-  // Regional indicator flag emojis (🇦🇺 etc) start at U+1F1E6 and have JS length 4
-  if (isWindows && flag.codePointAt(0) >= 0x1F1E6 && flag.codePointAt(0) <= 0x1F1FF) {
-    // Windows: use styled letter codes instead
-    const city = citiesData.find(c => c.name === cityName);
-    const country = city?.country || cityName;
-    const code = COUNTRY_TO_CODE[country] || '';
-
-    if (code) {
-      return `<span class="city-flag windows-flag" title="${country}">${code}</span>`;
-    }
-  }
-
   return `<span class="city-flag">${flag}</span>`;
 }
 

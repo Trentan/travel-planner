@@ -344,6 +344,7 @@ function buildCityNav() {
     btn.style.borderLeft = `4px solid ${color}`;
     const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">📍</span>';
     btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
+    if (typeof twemoji !== 'undefined') twemoji.parse(btn);
     btn.onclick = () => selectCityFilter(city.id, btn);
     navList.appendChild(btn);
   });
