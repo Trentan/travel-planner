@@ -97,11 +97,11 @@ Read this file at the start of every session. Update status blocks and checkboxe
 ### Item 6: Packing fixes
 **Status:** Not started
 **Last completed:** —
-**Next:** `item-5a`
+**Next:** `item-6a`
 
-- [ ] a) The collapsible Before leaving home, hotel sink washing, Example capsule - can be setup in a row 1 x 3 col - grid style so they take up less space. By default / on tab open (packing) they should all be collapsed.
-- [ ] b) Before leaving home should have a default checklist 
-- [ ] c) For the Carry-on Packed Bag (Main Luggage) - REMOVE "Before leaving home" from the default
+- [ ] a) The collapsible Before leaving home, hotel sink washing, Example capsule - This should be setup be setup in a single row 1 with 3 columns - grid style so they take up less space. By default / on tab open (packing) they should always be collapsed untl opened.
+- [x] b) Before leaving home should have a default checklist 
+- [x] c) For the Carry-on Packed Bag (Main Luggage) - REMOVE "Before leaving home" from the default
 
 ---
 
