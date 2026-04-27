@@ -16,7 +16,12 @@ function buildAccomTab(cityFilter = null) {
   });
 
   if (sortedStays.length === 0) {
-    container.innerHTML = `<div class="empty-placeholder">No stays found. Add your first stay from the itinerary or Accom tab.</div>`;
+    container.innerHTML = `
+      <div class="empty-placeholder">No stays found.</div>
+      <div style="margin-top: 1rem; text-align: center;">
+        <button class="add-btn" onclick="openAddStayModal()">+ Add Stay</button>
+      </div>
+    `;
     return;
   }
 
@@ -82,6 +87,12 @@ function buildAccomTab(cityFilter = null) {
   });
 
   html += `</tbody></table></div>`;
+
+  // Add "Add Stay" button below the table
+  html += `<div style="margin-top: 1rem; text-align: center;">
+    <button class="add-btn" onclick="openAddStayModal()">+ Add Stay</button>
+  </div>`;
+
   container.innerHTML = html;
 }
 
