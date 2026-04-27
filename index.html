@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Travel Planner">
-<title>Travel Planner</title>
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#1A242F">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Travel Planner">
+  <title>Travel Planner</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#1A242F">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
@@ -26,7 +26,7 @@
     <button id="compactToggleBtn" class="app-menu-btn" onclick="toggleCompactView()">📄 Compact View</button>
     <span style="color: rgba(255,255,255,0.2);">|</span>
     <button class="app-menu-btn" onclick="openCityDialog()">🌍 Cities</button>
-<button class="app-menu-btn" onclick="openAIDialog()">🤖 AI Builder</button>
+    <button class="app-menu-btn" onclick="openAIDialog()">🤖 AI Builder</button>
     <button class="app-menu-btn" onclick="openGuideDialog()">📖 Guide</button>
     <button class="app-menu-btn" onclick="openPrintPreview()">🖨 Print Itinerary</button>
     <span style="color: rgba(255,255,255,0.2);">|</span>
@@ -83,20 +83,21 @@
     </div>
   </div>
 
-  <!-- City Filter Subheading -->
   <nav class="city-nav" id="cityNav">
     <div class="city-nav-list">
       <button class="city-nav-btn active" data-city="all" onclick="selectCityFilter('all', this)">
         <span>🏙️ All</span>
       </button>
-      <!-- City buttons will be dynamically inserted here -->
     </div>
   </nav>
 
   <div class="app-tabs-content">
     <div id="tab-itinerary" class="tab-pane active">
-      <div class="top-controls">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; gap:1rem;">
+        <h3 style="margin:0; font-family:'Playfair Display',serif; color:#2C3E50; font-size:1.2rem;">🗓️ Itinerary</h3>
         <button class="action-btn" onclick="addLeg()">+ Add Trip Leg</button>
+      </div>
+      <div class="top-controls">
         <button class="action-btn" onclick="toggleAllDays()" id="expandAll">▼ Expand all days</button>
         <button class="action-btn" onclick="toggleAllLegs()" id="expandAllLegs">▲ Collapse all legs</button>
       </div>
@@ -147,7 +148,6 @@
     </div>
   </div>
 
-  <!-- Print Preview Modal -->
   <div id="print-preview-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
       <div class="modal-header">
@@ -188,7 +188,6 @@
     </div>
   </div>
 
-  <!-- AI Builder Modal -->
   <div id="ai-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content" style="max-width: 600px;">
       <div class="modal-header">
@@ -224,7 +223,6 @@
     </div>
   </div>
 
-  <!-- Guide Modal -->
   <div id="guide-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content" style="max-width: 700px; max-height: 90vh;">
       <div class="modal-header">
@@ -243,179 +241,288 @@
     </div>
   </div>
 
-<!-- Add New Leg Dialog -->
-<div id="add-leg-modal" class="modal-overlay" style="display: none;">
-<div class="modal-content" style="max-width: 500px;">
-<div class="modal-header">
-<h2>➕ Add New Leg</h2>
-<button class="modal-close" onclick="closeAddLegDialog()">&times;</button>
-</div>
-<div class="modal-body">
-<div style="display: flex; flex-direction: column; gap: 1rem;">
-<div class="ai-form-group">
-<label>Leg Type</label>
-<select id="legTypeSelect" onchange="onLegTypeChange()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-<option value="start">🏠 Start (Departure from Home)</option>
-<option value="travel">✈️ Travel (City to City)</option>
-<option value="city" selected>📍 City (Destination)</option>
-<option value="return">🏡 Return (Arrival at Home)</option>
-</select>
-</div>
-<div id="routeSelectionGroup" style="display: none;">
-<div class="ai-form-group">
-<label>From City</label>
-<select id="fromCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-<option value="Home">🏠 Home</option>
-</select>
-</div>
-<div class="ai-form-group">
-<label>To City</label>
-<select id="toCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-<option value="">-- Choose destination --</option>
-</select>
-</div>
-</div>
-<div id="citySelectionGroup">
-<div class="ai-form-group">
-<label>Option 1: Select Existing City</label>
-<select id="existingCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-<option value="">-- Choose a city --</option>
-</select>
-</div>
-<div style="text-align: center; color: #666; font-size: 0.9rem; position: relative;">
-<span style="background: #f5f5f5; padding: 0 1rem; position: relative; z-index: 1;">or</span>
-<div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #ddd; z-index: 0;"></div>
-</div>
-<div class="ai-form-group">
-<label>Option 2: Create New City</label>
-<input type="text" id="newLegCityName" placeholder="City name (e.g., Prague)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif; margin-bottom: 0.5rem;">
-<input type="text" id="newLegCityCountry" placeholder="Country (e.g., Czech Republic)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-</div>
-<div class="ai-form-group">
-<label id="datesLabel">Dates in City</label>
-<div style="display: flex; gap: 0.5rem;">
-<input type="text" id="newLegStartDate" placeholder="Date (e.g., 15 Jun)" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-<input type="text" id="newLegEndDate" placeholder="To (e.g., 18 Jun)" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-</div>
-</div>
-</div>
-</div>
-<div class="modal-footer">
-<button class="action-btn" onclick="closeAddLegDialog()">Cancel</button>
-<button class="action-btn" style="background: #2C3E50; color: white;" onclick="confirmAddLeg()">Add Leg</button>
-</div>
-</div>
-</div>
+  <div id="add-leg-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2>➕ Add New Leg</h2>
+        <button class="modal-close" onclick="closeAddLegDialog()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="ai-form-group">
+            <label>Leg Type</label>
+            <select id="legTypeSelect" onchange="onLegTypeChange()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+              <option value="start">🏠 Start (Departure from Home)</option>
+              <option value="travel">✈️ Travel (City to City)</option>
+              <option value="city" selected>📍 City (Destination)</option>
+              <option value="return">🏡 Return (Arrival at Home)</option>
+            </select>
+          </div>
+          <div id="routeSelectionGroup" style="display: none;">
+            <div class="ai-form-group">
+              <label>From City</label>
+              <select id="fromCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+                <option value="Home">🏠 Home</option>
+              </select>
+            </div>
+            <div class="ai-form-group">
+              <label>To City</label>
+              <select id="toCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+                <option value="">-- Choose destination --</option>
+              </select>
+            </div>
+          </div>
+          <div id="citySelectionGroup">
+            <div class="ai-form-group">
+              <label>Option 1: Select Existing City</label>
+              <select id="existingCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+                <option value="">-- Choose a city --</option>
+              </select>
+            </div>
+            <div style="text-align: center; color: #666; font-size: 0.9rem; position: relative;">
+              <span style="background: #f5f5f5; padding: 0 1rem; position: relative; z-index: 1;">or</span>
+              <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #ddd; z-index: 0;"></div>
+            </div>
+            <div class="ai-form-group">
+              <label>Option 2: Create New City</label>
+              <input type="text" id="newLegCityName" placeholder="City name (e.g., Prague)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif; margin-bottom: 0.5rem;">
+              <input type="text" id="newLegCityCountry" placeholder="Country (e.g., Czech Republic)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+            </div>
+            <div class="ai-form-group">
+              <label id="datesLabel">Dates in City</label>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="newLegStartDate" placeholder="Date (e.g., 15 Jun)" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+                <input type="text" id="newLegEndDate" placeholder="To (e.g., 18 Jun)" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="action-btn" onclick="closeAddLegDialog()">Cancel</button>
+          <button class="action-btn" style="background: #2C3E50; color: white;" onclick="confirmAddLeg()">Add Leg</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<!-- City Management Modal -->
-<div id="city-modal" class="modal-overlay" style="display: none;">
-<div class="modal-content" style="max-width: 500px;">
-<div class="modal-header">
-<h2>🌍 Manage Cities</h2>
-<button class="modal-close" onclick="closeCityDialog()">&times;</button>
-</div>
-<div class="modal-body">
-<div id="cityListContainer" style="max-height: 400px; overflow-y: auto;">
-<!-- City list will be populated here -->
-</div>
-<div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
-<h4 style="margin-bottom: 1rem;">➕ Add New City</h4>
-<div style="display: flex; flex-direction: column; gap: 0.75rem;">
-<input type="text" id="newCityName" placeholder="City name (e.g., Bangkok)" style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px;">
-<input type="text" id="newCityCountry" placeholder="Country (e.g., Thailand)" style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px;">
-<button class="action-btn" onclick="addNewCityFromDialog()">Add City</button>
-</div>
-</div>
-</div>
-<div class="modal-footer">
-<button class="action-btn" onclick="closeCityDialog()">Close</button>
-</div>
-</div>
-</div>
+  <div id="city-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2>🌍 Manage Cities</h2>
+        <button class="modal-close" onclick="closeCityDialog()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="cityListContainer" style="max-height: 400px; overflow-y: auto;">
+        </div>
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+          <h4 style="margin-bottom: 1rem;">➕ Add New City</h4>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <input type="text" id="newCityName" list="major-cities" placeholder="City name (e.g., Bangkok)" ...>
+            <input type="text" id="newCityCountry" list="iso-countries" placeholder="Country (e.g., Thailand)" ...>
+            <button class="action-btn" onclick="addNewCityFromDialog()">Add City</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn" onclick="closeCityDialog()">Close</button>
+      </div>
+    </div>
+  </div>
+  </div>
 
-<!-- Add Journey Modal -->
-<div id="journey-modal" class="modal-overlay" style="display: none;">
-<div class="modal-content" style="max-width: 600px;">
-<div class="modal-header">
-<h2>✈️ Add Journey</h2>
-<button class="modal-close" onclick="closeJourneyModal()">&times;</button>
-</div>
-<div class="modal-body">
-<div class="ai-form-group">
-<label>Journey Name (optional)</label>
-<input type="text" id="journeyName" placeholder="e.g., Outbound to Asia" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-<p style="font-size: 0.8rem; color: #666; margin-top: 4px;">Leave blank to auto-generate from cities</p>
-</div>
-<div style="display: flex; gap: 1rem;">
-<div class="ai-form-group" style="flex: 1;">
-<label>From</label>
-<select id="journeyFromCity" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-<option value="Home">🏠 Home</option>
-</select>
-</div>
-<div class="ai-form-group" style="flex: 1;">
-<label>To</label>
-<select id="journeyToCity" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-<option value="">-- Select destination --</option>
-</select>
-</div>
-</div>
-<div class="ai-form-group">
-<label>Transport Type</label>
-<select id="journeyType" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-<option value="flight">✈️ Flight</option>
-<option value="train">🚂 Train</option>
-<option value="bus">🚌 Bus</option>
-<option value="ferry">⛴️ Ferry</option>
-<option value="car">🚗 Car</option>
-<option value="walk">🚶 Walk</option>
-<option value="other">🚌 Other</option>
-</select>
-</div>
-<div style="display: flex; gap: 1rem;">
-<div class="ai-form-group" style="flex: 1;">
-<label>Date From</label>
-<input type="text" id="journeyDateFrom" placeholder="e.g., 15 Jun" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-</div>
-<div class="ai-form-group" style="flex: 1;">
-<label>Time From</label>
-<input type="text" id="journeyTimeFrom" placeholder="e.g., 14:30" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-</div>
-</div>
-<div style="display: flex; gap: 1rem;">
-<div class="ai-form-group" style="flex: 1;">
-<label>Date To</label>
-<input type="text" id="journeyDateTo" placeholder="e.g., 15 Jun" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-</div>
-<div class="ai-form-group" style="flex: 1;">
-<label>Time To</label>
-<input type="text" id="journeyTimeTo" placeholder="e.g., 18:45" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-</div>
-</div>
-<div class="ai-form-group">
-<label>Provider (Airline/Carrier)</label>
-<input type="text" id="journeyProvider" placeholder="e.g., EVA Air" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-</div>
-<div style="display: flex; gap: 1rem;">
-<div class="ai-form-group" style="flex: 1;">
-<label>Route Code (Flight #, etc.)</label>
-<input type="text" id="journeyRouteCode" placeholder="e.g., BR315" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-</div>
-<div class="ai-form-group" style="flex: 1;">
-<label>Cost</label>
-<input type="text" id="journeyCost" placeholder="0" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-</div>
-</div>
-<div class="ai-form-group">
-<label>Notes</label>
-<textarea id="journeyNotes" placeholder="Any additional notes..." style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif; min-height: 60px;"></textarea>
-</div>
-</div>
-<div class="modal-footer">
-<button class="action-btn" onclick="closeJourneyModal()">Cancel</button>
-<button class="action-btn" style="background: #2C3E50; color: white;" onclick="saveJourneyFromModal()">Save Journey</button>
-</div>
-</div>
+  <div id="journey-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 600px; background: #f9f9f9;">
+
+      <div class="modal-header" style="background: white;">
+        <h2>✈️ Add journey</h2>
+        <button class="modal-close" onclick="closeJourneyModal()">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 0;">
+
+        <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: white;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 0.5rem; letter-spacing: 0.05em;">Segments</div>
+          <div id="segmentTracker" style="display: flex; gap: 0.5rem; align-items: center; overflow-x: auto; padding-bottom: 4px;">
+          </div>
+        </div>
+
+        <div style="padding: 1.5rem; background: white; margin: 1rem 1.5rem 0.5rem; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <span id="currentSegmentLabel" style="color: #2980B9; font-weight: 600; font-size: 0.95rem;">Segment 1 — entering details</span>
+          </div>
+
+          <input type="hidden" id="journeyType" value="flight">
+          <div class="transport-type-group" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 4px;">
+            <button class="transport-type-btn active" data-type="flight" onclick="selectJourneyType('flight')"><span style="font-size:1.2rem;">✈️</span> Flight</button>
+            <button class="transport-type-btn" data-type="train" onclick="selectJourneyType('train')"><span style="font-size:1.2rem;">🚂</span> Train</button>
+            <button class="transport-type-btn" data-type="ferry" onclick="selectJourneyType('ferry')"><span style="font-size:1.2rem;">⛴️</span> Ferry</button>
+            <button class="transport-type-btn" data-type="bus" onclick="selectJourneyType('bus')"><span style="font-size:1.2rem;">🚌</span> Bus</button>
+            <button class="transport-type-btn" data-type="car" onclick="selectJourneyType('car')"><span style="font-size:1.2rem;">🚗</span> Car</button>
+          </div>
+
+          <div style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 0.25rem;">
+            <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
+              <label>From</label>
+              <select id="journeyFromCity" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"></select>
+            </div>
+            <div style="padding-bottom: 0.6rem; color: #AAB7C4; font-weight: bold;">➔</div>
+            <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
+              <label>To</label>
+              <select id="journeyToCity" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"></select>
+            </div>
+          </div>
+          <div style="text-align: right; margin-bottom: 1.5rem;">
+            <a href="#" onclick="promptAddNewCity(); return false;" style="font-size: 0.8rem; color: #3498DB; text-decoration: none;">+ New city not listed?</a>
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
+              <label>Departure</label>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="date" id="journeyDateFrom" style="flex: 3; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
+                <input type="time" id="journeyTimeFrom" style="flex: 2; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
+              <label>Arrival</label>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="date" id="journeyDateTo" style="flex: 3; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
+                <input type="time" id="journeyTimeTo" style="flex: 2; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <div class="ai-form-group" style="flex: 2; margin-bottom: 0;">
+              <label>Provider</label>
+              <input type="text" id="journeyProvider" placeholder="e.g. EVA Air" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;">
+            </div>
+            <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
+              <label>Route #</label>
+              <input type="text" id="journeyRouteCode" placeholder="BR067" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;">
+            </div>
+            <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
+              <label>Cost ($)</label>
+              <input type="number" id="journeyCost" placeholder="0" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;">
+            </div>
+          </div>
+
+          <div class="ai-form-group" style="margin-bottom: 0;">
+            <label>Notes</label>
+            <input type="text" id="journeyNotes" placeholder="Optional notes for this segment" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; background: #fafafa;">
+          </div>
+        </div>
+
+        <div id="pendingSegmentsList" style="padding: 0.5rem 1.5rem 1rem;">
+        </div>
+
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; background: transparent; border-top: none; padding-top: 0;">
+        <button class="action-btn" onclick="closeJourneyModal()" style="background: transparent;">Cancel</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="action-btn" onclick="addSegmentToJourney()" style="background: #2C3E50; color: white;">+ Add segment</button>
+          <button class="action-btn" onclick="saveJourneyFromModal()" style="background: #27AE60; color: white; border-color: #27AE60;">✓ Save journey</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="stay-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2>🏨 Add Accommodation</h2>
+        <button class="modal-close" onclick="closeStayModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="ai-form-group">
+            <label for="stayName">Name</label>
+            <input id="stayName" placeholder="Hotel / Airbnb name">
+          </div>
+          <div class="ai-form-group">
+            <label for="stayCost">Cost</label>
+            <input id="stayCost" placeholder="0">
+          </div>
+          <div class="ai-form-group">
+            <label for="stayRef">Booking Ref</label>
+            <input id="stayRef" placeholder="Optional — marks as confirmed">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn" onclick="closeStayModal()">Cancel</button>
+        <button class="action-btn" style="background: #2C3E50; color: white;" onclick="saveStayFromModal()">Save</button>
+      </div>
+    </div>
+  </div>
+
+<div id="add-stay-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-header">
+      <h2>🏨 Add Stay</h2>
+      <button class="modal-close" onclick="closeAddStayModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="ai-form-group">
+          <label for="stayCitySelect">City</label>
+          <select id="stayCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+            <option value="">-- Select city --</option>
+          </select>
+        </div>
+        <div class="ai-form-group">
+          <label for="stayPropertyName">Property Name</label>
+          <input type="text" id="stayPropertyName" placeholder="e.g. Grand Hotel or Cozy Airbnb" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <div class="ai-form-group" style="flex: 1;">
+            <label for="stayCheckIn">Check-in</label>
+            <input type="date" id="stayCheckIn" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          </div>
+          <div class="ai-form-group" style="flex: 1;">
+            <label for="stayCheckOut">Check-out</label>
+            <input type="date" id="stayCheckOut" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          </div>
+        </div>
+        <div class="ai-form-group">
+          <label for="stayNights">Nights</label>
+          <input type="text" id="stayNights" readonly style="width: 100px; padding: 0.5rem; border: 1px solid #eee; border-radius: 4px; background: #f5f5f5; font-family: 'DM Mono', monospace; font-weight: 500;" placeholder="Auto">
+        </div>
+        <div class="ai-form-group">
+          <label for="stayStatus">Booking Status</label>
+          <select id="stayStatus" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+            <option value="pending">⏳ Pending</option>
+            <option value="confirmed">✓ Confirmed</option>
+            <option value="cancelled">✗ Cancelled</option>
+          </select>
+        </div>
+        <div class="ai-form-group">
+          <label for="stayProvider">Booking Provider</label>
+          <input type="text" id="stayProvider" placeholder="e.g. Booking.com, Airbnb, Direct" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+        </div>
+        <div class="ai-form-group">
+          <label for="stayBookingRef">Booking Reference</label>
+          <input type="text" id="stayBookingRef" placeholder="e.g. ABC123XYZ" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+        </div>
+        <div class="ai-form-group">
+          <label for="stayTotalCost">Total Cost ($)</label>
+          <input type="number" id="stayTotalCost" placeholder="0" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+        </div>
+        <div class="ai-form-group">
+          <label for="stayNotes">Notes</label>
+          <textarea id="stayNotes" placeholder="Optional: address, phone, check-in instructions..." style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif; resize: vertical; min-height: 60px;"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="action-btn" onclick="closeAddStayModal()">Cancel</button>
+      <button class="action-btn" style="background: #2C3E50; color: white;" onclick="saveStayFromModal()">Save Stay</button>
+    </div>
+  </div>
 </div>
 
 </main>
@@ -431,21 +538,21 @@
 <script src="./js/map.js"></script>
 <script src="./js/ui.js"></script>
 <script src="./js/itinerary.js"></script>
-  <script src="./js/transport.js"></script>
+<script src="./js/transport.js"></script>
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
-  });
-}
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+    });
+  }
 
-setInterval(updateClocks, 1000);
-updateClocks();
+  setInterval(updateClocks, 1000);
+  updateClocks();
 
-initData();
-buildNav();
-buildItinerary();
-reObserveLegs();
+  initData();
+  buildNav();
+  buildItinerary();
+  reObserveLegs();
 </script>
 </body>
 </html>

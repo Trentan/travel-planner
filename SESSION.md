@@ -1,10 +1,10 @@
 ## Session State
 
-- **Item/sub-task:** 6l
-- **Branch:** item-6a
-- **Last commit:** `Item 6l: Add leg type selector (Start/City/Return) to Add New Leg dialog`
-- **What was done:** Added leg type dropdown Start/City/Return, updated dialog UI labels based on leg type, modified createNewLeg to handle different leg types with appropriate day structure (Start: Home→City, Return: City→Home, City: normal), labels show directional arrows (Start → City, City → Return)
-- **Next step:** Commit changes
-- **Files touched:** index.html (leg type dropdown), js/crud.js (onLegTypeChange, confirmAddLeg, createNewLeg, openAddLegDialog)
+- **Item/sub-task:** 5g
+- **Branch:** item-5g
+- **Last commit:** —
+- **What was done:** Starting item 5g - moved "Add Stay" button to top of Accommodation tab with proper heading
+- **Next step:** Test in browser, commit
+- **Files touched:** `js/tabs.js`
 - **Known blockers / risks:** None
 - **Noticed (unscheduled):**

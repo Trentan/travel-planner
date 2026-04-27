@@ -1,0 +1,17 @@
+{
+  "env": {
+    "GEMINI_CLI_TRUST_WORKSPACE": "true"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(awk *)",
+      "Bash(git checkout *)",
+      "Bash(set -e)",
+      "mcp__gemini__gemini_prompt",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --title 'Item 4: Fix style.css errors, header title visibility, Windows flag emojis' --body ' *)"
+    ]
+  }
+}
