@@ -375,9 +375,17 @@ window.confirmAddLeg = confirmAddLeg;
 window.deleteActivity = deleteActivity;
 
 // Add Stay Modal Functions
+let editingStayId = null; // Track if we're editing an existing stay
+
 function openAddStayModal() {
   const modal = document.getElementById('add-stay-modal');
   if (!modal) return;
+
+  editingStayId = null; // Reset editing state
+
+  // Update modal title
+  const title = modal.querySelector('h2');
+  if (title) title.textContent = '🏨 Add Stay';
 
   // Populate city dropdown
   const citySelect = document.getElementById('stayCitySelect');
@@ -422,6 +430,63 @@ function openAddStayModal() {
   modal.style.display = 'flex';
 }
 
+function openEditStayModal(stayId) {
+  const modal = document.getElementById('add-stay-modal');
+  if (!modal) return;
+
+  const stay = stays.find(s => s.id === stayId);
+  if (!stay) return;
+
+  editingStayId = stayId; // Set editing state
+
+  // Update modal title
+  const title = modal.querySelector('h2');
+  if (title) title.textContent = '🏨 Edit Stay';
+
+  // Populate city dropdown and select current
+  const citySelect = document.getElementById('stayCitySelect');
+  if (citySelect) {
+    citySelect.innerHTML = '<option value="">-- Select city --</option>';
+    (citiesData || []).forEach(city => {
+      const option = document.createElement('option');
+      option.value = city.id;
+      option.textContent = city.name + (city.country ? ` (${city.country})` : '');
+      if (city.id === stay.cityId) option.selected = true;
+      citySelect.appendChild(option);
+    });
+  }
+
+  // Populate form fields
+  document.getElementById('stayPropertyName').value = stay.propertyName || '';
+  document.getElementById('stayCheckIn').value = stay.checkIn || '';
+  document.getElementById('stayCheckOut').value = stay.checkOut || '';
+  document.getElementById('stayNights').value = stay.nights || '';
+  document.getElementById('stayStatus').value = stay.status || 'pending';
+  document.getElementById('stayProvider').value = stay.provider || '';
+  document.getElementById('stayBookingRef').value = stay.bookingRef || '';
+  document.getElementById('stayTotalCost').value = stay.totalCost || '';
+  document.getElementById('stayNotes').value = stay.notes || '';
+
+  // Set up auto-calc for nights
+  const checkIn = document.getElementById('stayCheckIn');
+  const checkOut = document.getElementById('stayCheckOut');
+  const nights = document.getElementById('stayNights');
+
+  function calcNights() {
+    if (checkIn.value && checkOut.value) {
+      const start = new Date(checkIn.value);
+      const end = new Date(checkOut.value);
+      const diff = Math.round((end - start) / (1000 * 60 * 60 * 24));
+      nights.value = diff > 0 ? diff : 0;
+    }
+  }
+
+  checkIn.onchange = calcNights;
+  checkOut.onchange = calcNights;
+
+  modal.style.display = 'flex';
+}
+
 function closeAddStayModal() {
   const modal = document.getElementById('add-stay-modal');
   if (modal) modal.style.display = 'none';
@@ -443,21 +508,40 @@ function saveStayFromModal() {
   if (!propertyName) return alert('Please enter a property name');
   if (!checkIn || !checkOut) return alert('Please enter check-in and check-out dates');
 
-  const stay = {
-    id: 'stay_' + Date.now(),
-    cityId: cityId,
-    propertyName: propertyName,
-    checkIn: checkIn,
-    checkOut: checkOut,
-    nights: nights,
-    status: status,
-    provider: provider,
-    bookingRef: bookingRef,
-    totalCost: totalCost,
-    notes: notes
-  };
+  if (editingStayId) {
+    // Editing existing stay
+    const stay = stays.find(s => s.id === editingStayId);
+    if (stay) {
+      stay.cityId = cityId;
+      stay.propertyName = propertyName;
+      stay.checkIn = checkIn;
+      stay.checkOut = checkOut;
+      stay.nights = nights;
+      stay.status = status;
+      stay.provider = provider;
+      stay.bookingRef = bookingRef;
+      stay.totalCost = totalCost;
+      stay.notes = notes;
+    }
+    editingStayId = null; // Reset editing state
+  } else {
+    // Creating new stay
+    const stay = {
+      id: 'stay_' + Date.now(),
+      cityId: cityId,
+      propertyName: propertyName,
+      checkIn: checkIn,
+      checkOut: checkOut,
+      nights: nights,
+      status: status,
+      provider: provider,
+      bookingRef: bookingRef,
+      totalCost: totalCost,
+      notes: notes
+    };
+    stays.push(stay);
+  }
 
-  stays.push(stay);
   closeAddStayModal();
   saveData();
 
@@ -512,7 +596,7 @@ function openStayModal(l, d) { openAddStayModal(); }
 function closeStayModal() { closeAddStayModal(); }
 
 Object.assign(window, {
-  openAddStayModal, closeAddStayModal, saveStayFromModal,
+  openAddStayModal, closeAddStayModal, saveStayFromModal, openEditStayModal,
   deleteStay, toggleStayStatus, updateStayField,
   openStayModal, closeStayModal  // backward compat
 });
