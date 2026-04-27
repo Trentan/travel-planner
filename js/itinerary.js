@@ -51,9 +51,10 @@ function buildCompactItinerary() {
       }
 
       // Display accommodation
-      if ((day.accomItems?.length || 0) > 0) {
+      const dayStays = stays.filter(s => s.legId === leg.id && s.date === day.date);
+      if (dayStays.length > 0) {
         html += '<div style="flex:1;"><strong>🏨</strong> ';
-        html += day.accomItems.map(item => {
+        html += dayStays.map(item => {
           const status = item.status || 'pending';
           const statusIcon = status === 'confirmed' ? '✓' : '⏳';
           return `${item.text}${item.cost ? ` ($${item.cost})` : ''} <span style="color:${status === 'confirmed' ? '#27AE60' : '#E67E22'}">${statusIcon}</span>`;
@@ -276,7 +277,7 @@ function buildItinerary() {
                 </div>
               </div>`;
             }).join('')}
-            </div><button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'accomItems')">+ Add Accom</button>
+            </div><button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Add Accom</button>
           </div>
 
           <div class="detail-block block-activities drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
