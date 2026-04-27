@@ -1,10 +1,10 @@
 ## Session State
 
-- **Item/sub-task:** 6l
+- **Item/sub-task:** 6b
 - **Branch:** item-6a
-- **Last commit:** `Item 6l: Add leg type selector (Start/City/Return) to Add New Leg dialog`
-- **What was done:** Added leg type dropdown Start/City/Return, updated dialog UI labels based on leg type, modified createNewLeg to handle different leg types with appropriate day structure (Start: Home→City, Return: City→Home, City: normal), labels show directional arrows (Start → City, City → Return)
-- **Next step:** Commit changes
-- **Files touched:** index.html (leg type dropdown), js/crud.js (onLegTypeChange, confirmAddLeg, createNewLeg, openAddLegDialog)
+- **Last commit:** `Item 6a [1 of 1]: Grid layout for packing collapsibles`
+- **What was done:** Added comprehensive 18-item default checklist for "Before Leaving Home" covering security, utilities, food, deliveries, devices, and home preparation
+- **Next step:** Await user confirmation for 6b, then start 6c (remove "Before leaving home" from Carry-on Packed Bag default)
+- **Files touched:** js/utils.js
 - **Known blockers / risks:** None
 - **Noticed (unscheduled):**
