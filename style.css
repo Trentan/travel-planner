@@ -74,11 +74,13 @@ header::before { content: ''; position: absolute; inset: 0; background: repeatin
   line-height: 1;
 }
 
-.city-flag img.emoji {
-  width: 1.2em;
-  height: 1.2em;
-  margin: 0 0.05em 0 0.1em;
-  vertical-align: -0.1em;
+img.city-flag-img {
+  width: 20px;
+  height: auto;
+  vertical-align: middle;
+  display: inline-block;
+  border-radius: 2px;
+  box-shadow: 0 0 1px rgba(0,0,0,0.3);
 }
 
 .city-nav-content {

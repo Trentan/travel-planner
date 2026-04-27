@@ -252,31 +252,26 @@ const COUNTRY_FLAGS = {
   'Home': '🏠'
 };
 
-// Flag letter mapping for Windows fallback (A-Z -> regional indicator symbols)
-const FLAG_LETTERS = {
-  'A': '🇦', 'B': '🇧', 'C': '🇨', 'D': '🇩', 'E': '🇪', 'F': '🇫', 'G': '🇬',
-  'H': '🇭', 'I': '🇮', 'J': '🇯', 'K': '🇰', 'L': '🇱', 'M': '🇲', 'N': '🇳',
-  'O': '🇴', 'P': '🇵', 'Q': '🇶', 'R': '🇷', 'S': '🇸', 'T': '🇹', 'U': '🇺',
-  'V': '🇻', 'W': '🇼', 'X': '🇽', 'Y': '🇾', 'Z': '🇿'
+// City/country name -> ISO-2 code for flagcdn.com images
+const CITY_TO_CODE = {
+  'australia': 'au', 'brisbane': 'au',
+  'austria': 'at', 'vienna': 'at', 'innsbruck': 'at',
+  'thailand': 'th', 'bangkok': 'th', 'kohsamui': 'th', 'samui': 'th',
+  'slovakia': 'sk', 'bratislava': 'sk',
+  'czechrepublic': 'cz', 'czechia': 'cz', 'prague': 'cz',
+  'germany': 'de', 'munich': 'de', 'nuremberg': 'de',
+  'italy': 'it', 'milan': 'it', 'bolzano': 'it',
+  'switzerland': 'ch', 'zurich': 'ch',
+  'taiwan': 'tw', 'taipei': 'tw',
+  'uk': 'gb', 'unitedkingdom': 'gb', 'london': 'gb', 'england': 'gb', 'scotland': 'gb',
+  'france': 'fr', 'paris': 'fr',
+  'spain': 'es', 'barcelona': 'es',
+  'netherlands': 'nl', 'amsterdam': 'nl',
+  'greece': 'gr', 'athens': 'gr',
+  'japan': 'jp', 'tokyo': 'jp',
+  'usa': 'us', 'unitedstates': 'us', 'newyork': 'us',
+  'verona': 'it'
 };
-
-// Country code to flag emoji (using regional indicators)
-function getFlagFromCode(countryCode) {
-  if (!countryCode || countryCode.length !== 2) return '📍';
-  const code = countryCode.toUpperCase();
-  return (FLAG_LETTERS[code[0]] || '') + (FLAG_LETTERS[code[1]] || '');
-}
-
-// Detect if system supports flag emojis
-function supportsFlagEmoji() {
-  // Windows typically doesn't render flag emojis properly
-  if (typeof navigator !== 'undefined' && navigator.userAgent) {
-    const ua = navigator.userAgent.toLowerCase();
-    // Windows 10/11 don't support flag emojis natively
-    if (ua.includes('windows')) return false;
-  }
-  return true;
-}
 
 // Country name to ISO code mapping
 const COUNTRY_TO_CODE = {
@@ -334,11 +329,20 @@ function getCityFlag(cityName) {
   return '📍';
 }
 
-// Get flag HTML — Twemoji converts emoji to images cross-platform
+// Get flag as flagcdn.com img tag (works on Windows Chrome/Edge)
 function getCityFlagHTML(cityName) {
   if (!cityName) return '<span class="city-flag">📍</span>';
-  const flag = getCityFlag(cityName);
-  return `<span class="city-flag">${flag}</span>`;
+
+  const cityEntry = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === cityName) : null;
+  const lookupCity = cityName.replace(/\s+/g, '').toLowerCase();
+  const lookupCountry = cityEntry?.country?.replace(/\s+/g, '').toLowerCase();
+  const code = CITY_TO_CODE[lookupCity] || CITY_TO_CODE[lookupCountry];
+
+  if (code) {
+    return `<img src="https://flagcdn.com/w20/${code}.png" srcset="https://flagcdn.com/w40/${code}.png 2x" class="city-flag-img" alt="${cityName} flag" onerror="this.style.display='none'">`;
+  }
+
+  return '<span class="city-flag">📍</span>';
 }
 
 // Set country for a city
