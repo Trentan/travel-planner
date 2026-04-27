@@ -97,6 +97,24 @@ function buildItinerary() {
     return;
   }
 
+// Parse "8 Jun" style date to ISO format for comparison
+// year parameter allows specifying the trip year (default 2026)
+function normalizeDate(dateStr, year = 2026) {
+  if (!dateStr) return '';
+  // Already ISO format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  // Parse "8 Jun" or "10 Jun" format
+  const match = dateStr.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$/);
+  if (match) {
+    const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06',
+                       Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
+    const day = match[1].padStart(2, '0');
+    const month = monthMap[match[2]];
+    return `${year}-${month}-${day}`;
+  }
+  return dateStr;
+}
+
 // Helper to determine stay display info for a given date
 function getStayDisplayForDay(dayDate, dayCity) {
   if (!stays || !Array.isArray(stays)) return [];
@@ -105,6 +123,9 @@ function getStayDisplayForDay(dayDate, dayCity) {
   const cityObj = citiesData.find(c => c.name === dayCity);
   const cityId = cityObj ? cityObj.id : null;
 
+  // Normalize the day date for comparison
+  const normalizedDayDate = normalizeDate(dayDate);
+
   stays.forEach(stay => {
     if (!stay.cityId) return;
 
@@ -112,11 +133,11 @@ function getStayDisplayForDay(dayDate, dayCity) {
     const stayCityName = stayCity ? stayCity.name : '';
 
     // Normalize dates to compare
-    const checkInDate = stay.checkIn || '';
-    const checkOutDate = stay.checkOut || '';
+    const checkInDate = normalizeDate(stay.checkIn) || '';
+    const checkOutDate = normalizeDate(stay.checkOut) || '';
 
     // Check if this day matches check-in, check-out, or is in between
-    if (dayDate === checkInDate) {
+    if (normalizedDayDate === checkInDate) {
       // Check-in day
       result.push({
         type: 'checkin',
@@ -126,7 +147,7 @@ function getStayDisplayForDay(dayDate, dayCity) {
         bookingRef: stay.bookingRef,
         cost: stay.totalCost
       });
-    } else if (dayDate === checkOutDate) {
+    } else if (normalizedDayDate === checkOutDate) {
       // Check-out day
       result.push({
         type: 'checkout',
@@ -136,7 +157,7 @@ function getStayDisplayForDay(dayDate, dayCity) {
         bookingRef: stay.bookingRef,
         cost: stay.totalCost
       });
-    } else if (dayDate > checkInDate && dayDate < checkOutDate) {
+    } else if (normalizedDayDate > checkInDate && normalizedDayDate < checkOutDate) {
       // Middle day - just show "Staying at"
       result.push({
         type: 'staying',
