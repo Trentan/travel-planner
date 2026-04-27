@@ -33,6 +33,9 @@ let currentFileName = "Default Template";
 var journeys = [];
 window.journeys = journeys;
 
+var stays = [];
+window.stays = stays;
+
 // Current city filter - 'all' or city ID (global for cross-module access)
 var currentCityFilter = 'all';
 window.currentCityFilter = currentCityFilter;
@@ -162,6 +165,10 @@ function deleteCity(cityId) {
   (journeys || []).forEach(j => {
     if (j.fromCityId === cityId) j.fromCityId = '';
     if (j.toCityId === cityId) j.toCityId = '';
+  });
+
+  (stays || []).forEach(s => {
+    if (s.cityId === cityId) s.cityId = '';
   });
 
   return true;
@@ -563,6 +570,24 @@ function initData() {
     journeys = [];
     window.journeys = journeys;
   }
+
+  const savedStays = localStorage.getItem('travelApp_stays_v1');
+  if (savedStays) {
+    try {
+      const parsed = JSON.parse(savedStays);
+      if (Array.isArray(parsed)) {
+        stays = parsed;
+        window.stays = stays;
+      }
+    } catch (e) {
+      stays = [];
+      window.stays = stays;
+    }
+  } else {
+    stays = [];
+    window.stays = stays;
+  }
+
   const saved = localStorage.getItem('travelApp_v2026_template');
   if (saved) {
     appData = JSON.parse(saved);
@@ -710,6 +735,7 @@ function saveData(showTick = true) {
   localStorage.setItem('travelApp_v2026_template', JSON.stringify(appData));
   localStorage.setItem('travelApp_packing_v3', JSON.stringify(packingData));
   localStorage.setItem('travelApp_leavehome_v3', JSON.stringify(leaveHomeData));
+  localStorage.setItem('travelApp_stays_v1', JSON.stringify(stays));
 
   if(showTick) {
     const status = document.getElementById('saveStatus');
@@ -726,6 +752,7 @@ function resetData() {
     localStorage.removeItem('travelApp_meta_template');
     localStorage.removeItem('travelApp_filename_v2026');
     localStorage.removeItem('travelApp_journeys_v1');
+    localStorage.removeItem('travelApp_stays_v1');
     localStorage.removeItem('travelApp_last_export_v2026');
     localStorage.removeItem('travelApp_last_import_v2026');
     location.reload();
@@ -756,7 +783,9 @@ function exportJSON() {
   // Get journeys if they exist
   let journeysData = [];
   if (typeof journeys !== 'undefined') journeysData = journeys;
-  const exportObj = { meta: titleData, itinerary: appData, packing: packingData, leaveHome: leaveHomeData, journeys: journeysData };
+  let staysData = [];
+  if (typeof stays !== 'undefined') staysData = stays;
+  const exportObj = { meta: titleData, itinerary: appData, packing: packingData, leaveHome: leaveHomeData, journeys: journeysData, stays: staysData };
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute("href", dataStr);
@@ -894,6 +923,11 @@ function importJSON(event) {
         console.log(`[Import] Saved ${importedData.journeys.length} journeys to localStorage`);
       } else {
         console.log('[Import] No journeys found in imported data');
+      }
+
+      if (importedData.stays && Array.isArray(importedData.stays)) {
+        stays = importedData.stays;
+        window.stays = stays;
       }
 
       currentFileName = file.name;

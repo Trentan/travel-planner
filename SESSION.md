@@ -1,5 +1,5 @@
 ## Session State
 
 - **Status:** Complete
-- **Last completed:** Item 4 — all three sub-tasks confirmed via Gemini review, pushed and closed
-- **Next:** Item 5 (Convert Accommodation) — read `todo/accomodation-spec-conversion.md` before starting
+- **Last completed:** Item 5a — all commits landed and confirmed by user
+- **Next:** Item 5b — Add Stay modal (index.html + js/crud.js + wire itinerary.js button)

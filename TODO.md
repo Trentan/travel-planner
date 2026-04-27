@@ -77,12 +77,15 @@ Read this file at the start of every session. Update status blocks and checkboxe
 ## Active
 
 ### Item 5: Convert Accommodation
-**Status:** Not started
-**Last completed:** —
-**Next:** `item-4a`
-**Spec:** `todo/accomodation-spec-conversion.md`
+**Status:** In progress — 5a complete
+**Last completed:** 5a
+**Next:** `item-5b`
+**Note:** No migration of old accomItems — new stays model only going forward. Old accomItems stay in data until a separate JSON conversion is done later.
 
-- [ ] a) Accommodation needs fixing — read and work through `todo/accomodation-spec-conversion.md` before starting - perhaps consolidate that information into this todolist under item 4 - if you have questions regarding the changes and when adding to the todo list: ask
+- [x] a) Phase 1 — Data model: add top-level `stays []` global in `data.js`; load/save with key `travelApp_stays_v1`; add `stays` to `exportJSON()` and `importJSON()`; add `stays` cityId cleanup in `deleteCity()`
+- [ ] b) Phase 2 — Add Stay dialog: build "Add Stay" modal in `index.html` (fields: city, property name, check-in date, check-out date, status, provider, booking ref, total cost, notes; auto-calc nights); add `openAddStayModal()`, `saveStayFromModal()`, `deleteStay()`, `toggleStayStatus()` in `js/crud.js`; replace "Add Accom" button in `itinerary.js` (~line 279) to call `openAddStayModal()` instead
+- [ ] c) Phase 3 — Accommodation tab: rewrite `buildAccomTab()` in `tabs.js` to render from `stays[]` sorted by check-in date (columns: City, Property, Check-in → Check-out, Nights, Status, Cost); city filter uses `stay.city` field directly; update `buildBudgetTab()` to sum `stays[].total_cost` by leg instead of `day.accomItems`
+- [ ] d) Phase 4 — Itinerary day card: replace `accomItems` block render in `itinerary.js` (~lines 54–58 compact, ~lines 262–280 full card) with derived stay display: check-in on start date, "Staying at X" for middle days, check-out on final day; update transit detection at ~line 120
 
 ---
 
