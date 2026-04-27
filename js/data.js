@@ -343,7 +343,8 @@ function getCityFlagHTML(cityName) {
                     navigator.userAgent &&
                     navigator.userAgent.toLowerCase().includes('windows');
 
-  if (isWindows && flag.length === 2) {
+  // Regional indicator flag emojis (🇦🇺 etc) start at U+1F1E6 and have JS length 4
+  if (isWindows && flag.codePointAt(0) >= 0x1F1E6 && flag.codePointAt(0) <= 0x1F1FF) {
     // Windows: use styled letter codes instead
     const city = citiesData.find(c => c.name === cityName);
     const country = city?.country || cityName;
