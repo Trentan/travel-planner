@@ -43,6 +43,16 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ---
 
+### ~~Item 4: Style.css issues~~ ✅ COMPLETED
+**Status:** Completed — branch `item-4a`
+**Completed:** 2026-04-27
+
+- [x] a) style.css has errors displaying, fix and tidy and confirm look and layout good
+- [x] b) The title and subtitle from .json is not being applied and it is not easy to edit / readable (white on white) when editing
+- [x] c) Country flags are displaying perfectly in mobile but not a pc based web browser (for the city submenu)
+
+---
+
 ### ~~Item 1: Database alignment~~ ✅ COMPLETED
 **Status:** Completed — branch `item-6a`
 **Last completed:** `item-6f` — Cities selection
@@ -65,50 +75,6 @@ Read this file at the start of every session. Update status blocks and checkboxe
 ---
 
 ## Active
-
-### Item 4: Resolve Journey/Transport integration
-**Status:** In progress — branch `item-2a`
-**Last completed:** item-6 — cities now have proper IDs for journey linking
-**Next:** item-2b/2c/2d — assess and fix journey loading/display
-
-- [x] a) Transport used to work flawlessly in itinerary and display correctly in the Transport tab. Items have all transitioned to Journeys and are not being handled or displayed correctly — resolve.
-- [x] b) Journeys import from JSON working — saved to localStorage and loaded in initData
-- [x] c) Journeys have fromCityId/toCityId linking to defined cities
-- [x] d) Transport tab reverted to table format with columns: Type, Date, Route, Time, Provider, Route #, Cost, Status, Booking Ref, Actions 
-- [x] e) Journey/transport needs a refactor (as a journey can comprise multiple transport options and days spans) - Perhaps introduce a journeyName (*user defined - similar to the notes field or auto generated from the input ports/cities - needs to be unique like the uniqueId), journeyId (*unique system generated) for each journey - and add to the table - when viewing in the transport tab - the journeyId can be the same for multiple, it will also help when displaying the transport info in the itinerary tab. Also, if the journey is edited makes it easier to display that info. 
-- [x] f) The add journey dialog not displaying, same as add trip leg, add activity, add food etc. the dialogs broken not displaying
-
-**Summary:** Budget tab was still calculating transport costs from obsolete `day.transportItems`. Fixed by using `journeys.filter()` matched against `day.date`, `day.from`, and `day.to`.
-
----
-
-### Item 3: Multi-leg Journey Object & Table Redesign
-**Status:** Planned — not started
-**Last completed:** item-2f — journey modal display fixed
-**Next:** item-3a — update journey data model to support multi-segment trips
-
-- [x] a) Extend journey object to support multi-leg trips — add legs: [] array (already exists but always empty), isMultiLeg: boolean, journeyName (user-defined or auto-generated as BNE → TPE → BKK → VIE), journeyId (system-generated, shared across all segments of the same trip). Single-segment journeys stay flat as now with legs: [] — no migration needed.
-- [x] b) Update saveJourneyFromModal() in transport.js — modal currently saves one segment only. Extend to allow adding multiple segments before saving (e.g. an "+ Add Segment" button within the modal). Each segment shares the parent journeyId. On save, either push one flat journey (single leg) or push N segment journeys all with the same journeyId and sequential segmentOrder field.
-- [x] c) Update buildTransportTab() table render — group rows by journeyId. Parent summary row shows: journey name, first departure → last arrival date/time, full route chain (BNE → TPE → BKK → VIE), total cost, status, booking ref, and a ▶ toggle. Child segment rows (indented, shown on expand) show individual legs: type icon, date, port-to-port route, depart/arrive times, provider, route code. Cost/status/ref live on parent row only.
-- [x] d) Update getDayJourneys() in transport.js — currently matches on dayDate + fromLocation + toLocation. With multi-leg journeys, a Brisbane → Vienna flight touches multiple days and cities. Update to match if departureDate === day.date OR if any leg.departureDate === day.date within a multi-leg journey. Return the parent journey object (not individual segments) so the itinerary view can display the full journey name.
-- [x] e) Update itinerary.js transport block render (line 224–238) — currently renders journey.notes || journey.fromLocation → journey.toLocation. Update to render journey.journeyName as the primary label when set, and for multi-leg journeys display the full route chain (from legs[]) rather than just a single from/to. The status badge and booking ref logic stays the same — they live on the parent journey.
-- [x] f) Update getSortedJourneys() — ensure multi-leg journeys sort by their first segment's departureDate/Time, not the parent's departureDate (which may be empty if only legs have dates).
-- [x] g) Update openAddJourneyModal() — pre-populate a journeyId on open so all segments added in one session share the same ID. Add UI affordance to indicate when a journey has multiple segments (e.g. show segment count in the form).
-
-**Summary:** The journey object already has isMultiLeg and legs[] scaffolded but unused. This item activates that structure — grouping N port-to-port transport records under a shared journeyId and journeyName, updating the transport tab to render them as expandable grouped rows, and updating the itinerary day view to display the journey name rather than raw from/to text. Single-leg journeys require zero migration.
-
-___
-
-### Item 4: Style.css issues
-**Status:** Not started
-**Last completed:** —
-**Next:** `item-3a`
-
-- [ ] a) style.css has errors displaying, fix and tidy and confirm look and layout good
-- [ ] b) The title and subtitle from .json is not being applied and it is not easy to edit / readable (white on white) when editing
-- [ ] c) Country flags are displaying perfectly in mobile but not a pc based web browser (for the city submenu)
-
----
 
 ### Item 5: Convert Accommodation
 **Status:** Not started
