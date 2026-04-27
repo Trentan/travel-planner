@@ -38,12 +38,24 @@ function getActivityLabel(category) {
 }
 
 const DEFAULT_LEAVE_HOME = [
-  {text: "Lock all doors and windows", done:false},
-  {text: "Pause gym membership", done:false},
-  {text: "Setup camera for fish and security", done:false},
-  {text: "Store/remove fridge & pantry perishables", done:false},
-  {text: "Turn off taps, PowerPoints", done:false},
-  {text: "Wrap garage door opener and unplug power", done:false}
+  {text: "Lock all doors and windows", done: false},
+  {text: "Set security alarm / notify security company", done: false},
+  {text: "Turn off all taps and check for leaks", done: false},
+  {text: "Switch off PowerPoints at the wall (except fridge)", done: false},
+  {text: "Turn off gas supply if applicable", done: false},
+  {text: "Adjust thermostat to away/saver mode", done: false},
+  {text: "Remove or use up perishables from fridge", done: false},
+  {text: "Check pantry for items that may expire", done: false},
+  {text: "Take out all rubbish and recycling", done: false},
+  {text: "Check mailbox is empty / hold mail service", done: false},
+  {text: "Pause or reschedule any regular deliveries", done: false},
+  {text: "Pause gym membership or group activities", done: false},
+  {text: "Charge all devices (phones, tablets, power banks)", done: false},
+  {text: "Download offline maps and confirmations", done: false},
+  {text: "Notify emergency contact of travel plans", done: false},
+  {text: "Water plants or arrange plant care", done: false},
+  {text: "Set up lights on timers (if away long)", done: false},
+  {text: "Close blinds/curtains and secure loose outdoor items", done: false}
 ];
 
 const DEFAULT_PACKING = [
