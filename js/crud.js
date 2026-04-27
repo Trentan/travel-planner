@@ -373,3 +373,146 @@ window.onLegTypeChange = onLegTypeChange;
 window.checkDateConflict = checkDateConflict;
 window.confirmAddLeg = confirmAddLeg;
 window.deleteActivity = deleteActivity;
+
+// Add Stay Modal Functions
+function openAddStayModal() {
+  const modal = document.getElementById('add-stay-modal');
+  if (!modal) return;
+
+  // Populate city dropdown
+  const citySelect = document.getElementById('stayCitySelect');
+  if (citySelect) {
+    citySelect.innerHTML = '<option value="">-- Select city --</option>';
+    (citiesData || []).forEach(city => {
+      const option = document.createElement('option');
+      option.value = city.id;
+      option.textContent = city.name + (city.country ? ` (${city.country})` : '');
+      citySelect.appendChild(option);
+    });
+  }
+
+  // Clear form fields
+  document.getElementById('stayPropertyName').value = '';
+  document.getElementById('stayCheckIn').value = '';
+  document.getElementById('stayCheckOut').value = '';
+  document.getElementById('stayNights').value = '';
+  document.getElementById('stayStatus').value = 'pending';
+  document.getElementById('stayProvider').value = '';
+  document.getElementById('stayBookingRef').value = '';
+  document.getElementById('stayTotalCost').value = '';
+  document.getElementById('stayNotes').value = '';
+
+  // Set up auto-calc for nights
+  const checkIn = document.getElementById('stayCheckIn');
+  const checkOut = document.getElementById('stayCheckOut');
+  const nights = document.getElementById('stayNights');
+
+  function calcNights() {
+    if (checkIn.value && checkOut.value) {
+      const start = new Date(checkIn.value);
+      const end = new Date(checkOut.value);
+      const diff = Math.round((end - start) / (1000 * 60 * 60 * 24));
+      nights.value = diff > 0 ? diff : 0;
+    }
+  }
+
+  checkIn.onchange = calcNights;
+  checkOut.onchange = calcNights;
+
+  modal.style.display = 'flex';
+}
+
+function closeAddStayModal() {
+  const modal = document.getElementById('add-stay-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function saveStayFromModal() {
+  const cityId = document.getElementById('stayCitySelect').value;
+  const propertyName = document.getElementById('stayPropertyName').value.trim();
+  const checkIn = document.getElementById('stayCheckIn').value;
+  const checkOut = document.getElementById('stayCheckOut').value;
+  const nights = parseInt(document.getElementById('stayNights').value) || 0;
+  const status = document.getElementById('stayStatus').value;
+  const provider = document.getElementById('stayProvider').value.trim();
+  const bookingRef = document.getElementById('stayBookingRef').value.trim();
+  const totalCost = document.getElementById('stayTotalCost').value.trim() || '0';
+  const notes = document.getElementById('stayNotes').value.trim();
+
+  if (!cityId) return alert('Please select a city');
+  if (!propertyName) return alert('Please enter a property name');
+  if (!checkIn || !checkOut) return alert('Please enter check-in and check-out dates');
+
+  const stay = {
+    id: 'stay_' + Date.now(),
+    cityId: cityId,
+    propertyName: propertyName,
+    checkIn: checkIn,
+    checkOut: checkOut,
+    nights: nights,
+    status: status,
+    provider: provider,
+    bookingRef: bookingRef,
+    totalCost: totalCost,
+    notes: notes
+  };
+
+  stays.push(stay);
+  closeAddStayModal();
+  saveData();
+
+  // Rebuild current view
+  if (typeof rebuildCurrentView === 'function') {
+    rebuildCurrentView();
+  } else {
+    buildItinerary();
+  }
+}
+
+function deleteStay(id) {
+  if (!confirm('Delete this stay?')) return;
+  const idx = stays.findIndex(s => s.id === id);
+  if (idx > -1) {
+    stays.splice(idx, 1);
+    saveData();
+    if (typeof rebuildCurrentView === 'function') {
+      rebuildCurrentView();
+    } else {
+      buildItinerary();
+    }
+  }
+}
+
+function toggleStayStatus(e, id) {
+  if (e) e.stopPropagation();
+  const s = stays.find(s => s.id === id);
+  if (s) {
+    const states = ['pending', 'confirmed', 'cancelled'];
+    const currentIdx = states.indexOf(s.status);
+    s.status = states[(currentIdx + 1) % states.length];
+    saveData();
+    if (typeof rebuildCurrentView === 'function') {
+      rebuildCurrentView();
+    } else {
+      buildItinerary();
+    }
+  }
+}
+
+function updateStayField(id, field, value) {
+  const s = stays.find(s => s.id === id);
+  if (s) {
+    s[field] = value;
+    saveData();
+  }
+}
+
+// Backward compatibility - old function names for existing code
+function openStayModal(l, d) { openAddStayModal(); }
+function closeStayModal() { closeAddStayModal(); }
+
+Object.assign(window, {
+  openAddStayModal, closeAddStayModal, saveStayFromModal,
+  deleteStay, toggleStayStatus, updateStayField,
+  openStayModal, closeStayModal  // backward compat
+});
