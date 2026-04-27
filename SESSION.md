@@ -1,10 +1,10 @@
 ## Session State
 
-- **Item/sub-task:** 6b
+- **Item/sub-task:** 6c
 - **Branch:** item-6a
-- **Last commit:** `Item 6a [1 of 1]: Grid layout for packing collapsibles`
-- **What was done:** Added comprehensive 18-item default checklist for "Before Leaving Home" covering security, utilities, food, deliveries, devices, and home preparation
-- **Next step:** Await user confirmation for 6b, then start 6c (remove "Before leaving home" from Carry-on Packed Bag default)
+- **Last commit:** `Item 6b [1 of 1]: Add comprehensive default checklist for Before Leaving Home`
+- **What was done:** 6c confirmed complete - Carry-on Packed Bag default categories are: Clothes, Shoes & Misc, Dry Toiletries, 1L Clear Bag (no "Before leaving home")
+- **Next step:** Push commits to remote
 - **Files touched:** js/utils.js
 - **Known blockers / risks:** None
 - **Noticed (unscheduled):**
