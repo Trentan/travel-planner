@@ -77,13 +77,13 @@ Read this file at the start of every session. Update status blocks and checkboxe
 ## Active
 
 ### Item 5: Convert Accommodation
-**Status:** In progress — 5a complete
-**Last completed:** 5a
-**Next:** `item-5b`
+**Status:** In progress — 5b complete
+**Last completed:** 5b
+**Next:** `item-5c`
 **Note:** No migration of old accomItems — new stays model only going forward. Old accomItems stay in data until a separate JSON conversion is done later.
 
 - [x] a) Phase 1 — Data model: add top-level `stays []` global in `data.js`; load/save with key `travelApp_stays_v1`; add `stays` to `exportJSON()` and `importJSON()`; add `stays` cityId cleanup in `deleteCity()`
-- [ ] b) Phase 2 — Add Stay dialog: build "Add Stay" modal in `index.html` (fields: city, property name, check-in date, check-out date, status, provider, booking ref, total cost, notes; auto-calc nights); add `openAddStayModal()`, `saveStayFromModal()`, `deleteStay()`, `toggleStayStatus()` in `js/crud.js`; replace "Add Accom" button in `itinerary.js` (~line 279) to call `openAddStayModal()` instead
+- [x] b) Phase 2 — Add Stay dialog: build "Add Stay" modal in `index.html` (fields: city, property name, check-in date, check-out date, status, provider, booking ref, total cost, notes; auto-calc nights); add `openAddStayModal()`, `saveStayFromModal()`, `deleteStay()`, `toggleStayStatus()` in `js/crud.js`; replace "Add Accom" button in `itinerary.js` (~line 279) to call `openAddStayModal()` instead
   - **⚠️ Carry-forward (next session):** A partial implementation was applied (branch `item-4a`) but targets the wrong data model — pushes to `day.accomItems` instead of `stays[]`, uses `openStayModal` not `openAddStayModal`, missing fields (city, dates, provider, notes), missing `deleteStay()`/`toggleStayStatus()`. Revert or overwrite those changes and implement correctly against `stays[]`.
 - [ ] c) Phase 3 — Accommodation tab: rewrite `buildAccomTab()` in `tabs.js` to render from `stays[]` sorted by check-in date (columns: City, Property, Check-in → Check-out, Nights, Status, Cost); city filter uses `stay.city` field directly; update `buildBudgetTab()` to sum `stays[].total_cost` by leg instead of `day.accomItems`
 - [ ] d) Phase 4 — Itinerary day card: replace `accomItems` block render in `itinerary.js` (~lines 54–58 compact, ~lines 262–280 full card) with derived stay display: check-in on start date, "Staying at X" for middle days, check-out on final day; update transit detection at ~line 120
