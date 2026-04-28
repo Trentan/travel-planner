@@ -449,18 +449,19 @@ main {
 
 /* 3-column grid for guide collapsibles (Item 6d) */
 .guides-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
   gap: 1rem;
   margin-bottom: 2rem;
 }
 
 @media (max-width: 900px) {
-  .guides-grid { grid-template-columns: 1fr; }
+  .guides-grid { grid-template-columns: 1fr !important; }
 }
 
 .guides-grid .guide-details {
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
+  width: 100%;
 }
 .guide-details { background: white; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
 .guide-summary { padding: 1rem 1.25rem; font-weight: 600; cursor: pointer; user-select: none; background: #FAFAF8; color: #2C3E50; }
