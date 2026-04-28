@@ -222,7 +222,7 @@ Trip title, subtitle, and current file name for display.
     1. **Update `UNFINISHED.md` immediately** (see format below) — do this before anything else, every single commit, no exceptions
     2. Run through the relevant items in the **Testing Checklist** in TODO.md
     3. Summarise exactly what changed, what files were touched, and why
-    4. Branch name: `item-{N}{letter}-{short-desc}` (e.g. `item-8a-country-city`)
+    4. Branch name: `item-{N}{short-desc}` (e.g. `item-8-country-city-iso-fixes`)
     5. Commit message: `Item {N}{letter} [X of Y]: {what was fixed and how}`
     6. `git push origin {branch}` immediately after every commit — no exceptions
     7. Report back to user: branch name, commit message, one-line summary
