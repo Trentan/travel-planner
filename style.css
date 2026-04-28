@@ -446,6 +446,22 @@ main {
 
 /* PACKING LIST & GUIDES */
 .guides-container { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+
+/* 3-column grid for guide collapsibles (Item 6d) */
+.guides-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+  .guides-grid { grid-template-columns: 1fr; }
+}
+
+.guides-grid .guide-details {
+  margin-bottom: 0;
+}
 .guide-details { background: white; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
 .guide-summary { padding: 1rem 1.25rem; font-weight: 600; cursor: pointer; user-select: none; background: #FAFAF8; color: #2C3E50; }
 .guide-summary:hover { background: #f0f0f0; }
