@@ -1080,6 +1080,166 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 }
 
 /* ==================== */
+/* JOURNEY TABLE LAYOUT (Item 8a) */
+/* ==================== */
+
+.journey-table {
+  table-layout: auto;
+}
+
+.journey-table th {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.journey-table .col-expand {
+  width: 28px;
+  text-align: center;
+}
+
+.journey-table .col-route {
+  min-width: 200px;
+}
+
+.journey-table .col-when {
+  min-width: 140px;
+}
+
+.journey-table .col-details {
+  min-width: 120px;
+}
+
+.journey-table .col-cost {
+  width: 80px;
+  text-align: right;
+}
+
+.journey-table .col-status {
+  width: 90px;
+  text-align: center;
+}
+
+.journey-table .col-actions {
+  width: 80px;
+  text-align: center;
+}
+
+/* Route column styling */
+.journey-table .route-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.journey-table .journey-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.journey-table .route-text {
+  font-weight: 500;
+  color: #2C3E50;
+}
+
+.journey-table .leg-count-badge {
+  font-size: 0.7rem;
+  background: #e8f0fe;
+  color: #3c5a99;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.journey-table .journey-name {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
+  font-style: italic;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* When column styling */
+.journey-table .journey-time-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.journey-table .journey-time-row.multi-leg {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed #ddd;
+}
+
+.journey-table .time-label {
+  font-size: 0.75rem;
+  color: #888;
+  font-weight: 500;
+  min-width: 32px;
+}
+
+/* Details column styling */
+.journey-table .journey-detail-row {
+  font-size: 0.85rem;
+  color: #444;
+  line-height: 1.4;
+}
+
+.journey-table .journey-detail-row.route-code {
+  font-family: 'DM Mono', monospace;
+  color: #666;
+}
+
+.journey-table .journey-detail-row.booking-ref {
+  font-family: 'DM Mono', monospace;
+  background: #f0f7f0;
+  color: #27AE60;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.journey-table .detail-placeholder {
+  color: #aaa;
+}
+
+/* Segment rows */
+.journey-table .journey-segment-row {
+  border-left: 3px solid #ddd;
+}
+
+.journey-table .journey-segment-row .segment-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.journey-table .journey-segment-row .segment-indicator {
+  font-size: 0.75rem;
+  color: #888;
+  font-weight: 500;
+}
+
+/* Expand button */
+.journey-table .journey-expand-btn {
+  transition: transform 0.2s;
+}
+
+/* Status badge in table */
+.journey-table .status-badge {
+  display: inline-block;
+  min-width: 70px;
+  text-align: center;
+}
+
+/* ==================== */
 /* TRANSPORT/JOURNEY STYLES */
 /* ==================== */
 
