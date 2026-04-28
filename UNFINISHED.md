@@ -1,10 +1,13 @@
-## Session State
+# UNFINISHED.md
 
-- **Status:** Complete
-- **Last completed:** Item 7d, 7e, 7f — all sub-tasks done
-- **Next:** Item 8 (City/Country standards) or review for merge
+## 🔄 Active
+none
 
-## Summary of Changes (Item 7d, 7e, 7f)
+## 👀 Awaiting Review / Merge
+- **Item:** 7d, 7e, 7f — branch `item-7a` — all sub-tasks done, ready for merge
+- **Next after merge:** Item 8 (City/Country standards)
+
+## ✅ Recently Completed (pre-merge summary)
 
 ### Item 7d: Fix Guide Button
 **File:** `js/guide.js`

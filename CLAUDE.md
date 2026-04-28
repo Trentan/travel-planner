@@ -30,8 +30,9 @@ Travel Planner PWA is a completely offline, JSON-driven Progressive Web App for 
     - `ui.js` - UI state and navigation
     - `itinerary.js` - Main itinerary builder
 - `backups/` - Directory for exported trip JSON files
-- `TODO.md` - Active task list (read on every session start)
-- `SESSION.md` - Live session state (read on every session start)
+- `TODO.md` - Active task queue — read from main branch, owned by user
+- `UNFINISHED.md` - Live session state — owned by Claude Code, lives on feature branch
+- `VERIFIED.md` - Completed and confirmed items — owned by user, append-only archive
 - `todo/` - Per-item spec files (e.g. `todo/item-3-accommodation.md`)
 
 ## Development Commands
@@ -160,35 +161,49 @@ Trip title, subtitle, and current file name for display.
 
 ## Development Workflow
 
-> **Re-entering a session?** Read `CLAUDE.md` → read `TODO.md` → read `SESSION.md` → declare status → wait for go-ahead.
+> **Re-entering a session?** Read `CLAUDE.md` → read `TODO.md` → read `UNFINISHED.md` → declare status → wait for go-ahead.
 
-All active work items live in **`TODO.md`**. Live session state lives in **`SESSION.md`**. Spec files for individual items live in `todo/`.
-
----
-
-### When resolving items
+### Three-file system
+- `TODO.md` — Read from main branch to compare to current branch
+- `UNFINISHED.md` — Claude Code owns this, lives on feature branch, active + awaiting review
+- `VERIFIED.md` — archive of confirmed completed items
 
 ---
 
 **On session start / re-entry:**
 1. Read this entire `CLAUDE.md` before doing anything else
-2. Read `TODO.md` — note the target item's status block, active branch, and next sub-task
-3. Read `SESSION.md` — this is the most precise resume point; it contains the last commit, exact next step, files touched, and any known blockers. Prioritise this over git log for orientation
-4. Read `todo/item-{N}-*.md` if a spec file exists for the target item
-5. Only check git log if `SESSION.md` is missing or its contents are unclear
-6. Declare your status report out loud:
-- Which item/sub-task you are starting or resuming
-- What the last completed commit was (if resuming)
-- What the next concrete step is (from SESSION.md if resuming)
-- What files will be touched
-- An estimated commit count for this sub-task
+2. Sync and orient:
+   a. `git fetch origin main`
+   b. `git show origin/main:CLAUDE.md` — read latest instructions from main
+   c. `git diff origin/main -- TODO.md` — check if TODO.md differs from main
+   d. If different: `git checkout origin/main -- TODO.md` to sync it, then read it
+   e. If same: read local TODO.md as-is
+   f. Determine target branch — in order:
+    - TODO.md active item `**Branch:**` field — use this first
+    - UNFINISHED.md `**Branch:**` field — confirms it
+    - `git branch -a` — verify it exists on remote
+    - If branch doesn't exist yet (new item): create from main
+      `git checkout main && git pull origin main && git checkout -b item-{N}{letter}-{short-desc}`
+    - If still unclear: ask the user, don't guess
+      g. `git checkout {target-branch}` and `git pull origin {target-branch}`
+      h. Read `UNFINISHED.md` — most precise resume point; contains active item,
+      awaiting-review items, last commit, next step, files touched, blockers.
+      Prioritise over git log for orientation.
+      i. Read `todo/item-{N}-*.md` if a spec file exists for the target item
+      j. Only check git log if UNFINISHED.md is missing or unclear
+3. Declare your status report:
+    - Which item/sub-task you are starting or resuming
+    - What the last completed commit was (if resuming)
+    - What the next concrete step is (from UNFINISHED.md if resuming)
+    - What files will be touched
+    - An estimated commit count for this sub-task
+    - Any items currently awaiting review in UNFINISHED.md
 
-  Immediately write that status report to `SESSION.md` before touching any code —
-  even before the first commit exists. This ensures a dropout at any point after
-  orientation leaves a recoverable state.
+   Immediately update UNFINISHED.md with this status before touching any code —
+   even before the first commit exists. This ensures a dropout at any point leaves
+   a recoverable state.
 
-7. If you cannot confidently determine where things left off — **ask, don't guess**
-8. Wait for user confirmation before writing any code
+4. Wait for user confirmation before writing any code.
 
 ---
 
@@ -204,48 +219,55 @@ All active work items live in **`TODO.md`**. Live session state lives in **`SESS
 - Before starting, verify the app loads without errors in its current state
 - Keep each commit small and focused — one logical change per commit
 - After each commit, in this exact order:
-    1. **Write `SESSION.md` immediately** (see format below) — do this before anything else, every single commit, no exceptions
-    2. Run through the relevant items in the **Testing Checklist** below
+    1. **Update `UNFINISHED.md` immediately** (see format below) — do this before anything else, every single commit, no exceptions
+    2. Run through the relevant items in the **Testing Checklist** in TODO.md
     3. Summarise exactly what changed, what files were touched, and why
-    4. Branch name: `item-{N}{letter}` (e.g. `item-2a`)
+    4. Branch name: `item-{N}{letter}-{short-desc}` (e.g. `item-8a-country-city`)
     5. Commit message: `Item {N}{letter} [X of Y]: {what was fixed and how}`
-    6. Push and open a PR for review
+    6. `git push origin {branch}` immediately after every commit — no exceptions
+    7. Report back to user: branch name, commit message, one-line summary
 - After the final commit of a sub-task:
-    1. Check `[x]` on that sub-task in `TODO.md` and update the item's **Status** block
-    2. Write the closed SESSION.md state (see format below)
-    3. **Stop and wait** — do not continue to the next sub-task until the user confirms
+    1. Push and open a PR for review
+    2. Check `[x]` on that sub-task in `TODO.md` and update the item's **Status** block
+    3. Move active item to `## Awaiting Review` in UNFINISHED.md with change summary
+    4. **Stop and wait** — do not continue to the next sub-task until the user confirms
 
 ---
 
-**SESSION.md format — write this after orientation AND after every commit:**
+**UNFINISHED.md format — update after orientation AND after every commit:**
 
 ```markdown
-## Session State
+# UNFINISHED.md
 
-- **Item/sub-task:** 1b
-- **Branch:** item-1b
-- **Last commit:** `Item 1b [2 of 3]: fixed collapsible toggle event binding`
+## 🔄 Active
+- **Item/sub-task:** 8a
+- **Branch:** item-8a-country-city
+- **Last commit:** `Item 8a [1 of 3]: added ISO country datalist`
 - **What was done:** Brief plain-english description of what changed and why
-- **Next step:** Exact description of what comes next — include the relevant file and approximate line number if known (e.g. "Hook saveData() call in crud.js ~line 84 to trigger buildTransportTab() re-render")
+- **Next step:** Exact next step — include file and approximate line if known
 - **Files touched:** All files changed so far in this sub-task
-- **Known blockers / risks:** Anything that may need a decision or could cause problems next step
-- **Noticed (unscheduled):** Any bugs or improvements spotted but not acted on — copy these to TODO.md Noticed section too
+- **Known blockers / risks:** Anything needing a decision or that could cause problems
+- **Noticed (unscheduled):** Bugs or improvements spotted — copy to TODO.md Noticed too
+
+## 👀 Awaiting Review / Merge
+- **Item:** 7f — branch `item-7f-packing` — PR open, waiting merge
+  - Summary of what changed (brief, one line per significant change)
 ```
 
-When a sub-task is fully confirmed complete by the user, replace contents with:
+When active item is confirmed complete by user, clear the Active block:
 
 ```markdown
-## Session State
-
-- **Status:** Complete
-- **Last completed:** Item 1b — all commits landed and confirmed by user
-- **Next:** Item 1c (or next item if all sub-tasks done)
+## 🔄 Active
+none
 ```
+
+When item is merged and verified by user, remove it from Awaiting Review entirely.
+User will archive the summary to VERIFIED.md.
 
 ---
 
 **If you hit a blocker mid-task:**
-- Update `SESSION.md` with the blocker details before stopping
+- Update `UNFINISHED.md` with the blocker details before stopping
 - Describe exactly what the blocker is and what options exist
 - State which option you recommend and why
 - Wait for the user to choose before continuing
@@ -255,7 +277,7 @@ When a sub-task is fully confirmed complete by the user, replace contents with:
 **If a sub-task looks too large for one session:**
 - Say so before starting: "This sub-task may exceed one session — recommend splitting into: a-i) X, a-ii) Y"
 - Only proceed once the user has agreed on the split
-- Write the agreed split into `SESSION.md` under **Next step** before starting any code
+- Write the agreed split into `UNFINISHED.md` under **Next step** before starting any code
 
 ---
 
@@ -269,6 +291,15 @@ When a sub-task is fully confirmed complete by the user, replace contents with:
 
 **Completing items:**
 - Only check `[x]` on a sub-task in `TODO.md` after explicit user confirmation
-- Only move an item to `## Completed` in `TODO.md` after ALL sub-tasks are confirmed done
-- Completed items are fully deleted from `TODO.md` on next scheduled cleanup
-- Clear and close out `SESSION.md` when an item is fully done
+- Only move an item out of TODO.md after ALL sub-tasks are confirmed done
+- Claude Code does NOT write to VERIFIED.md — user archives completed items there
+- Clear the Active block in UNFINISHED.md when an item is fully confirmed done
+
+---
+
+## Quick Prompts (for user reference)
+- **Start item:** `Do item 8a. Read CLAUDE.md → TODO.md → UNFINISHED.md, declare status, wait.`
+- **Confirm:** `Confirmed, proceed.`
+- **Resume:** `Resume. Read UNFINISHED.md and git log, tell me where you're up to, wait.`
+- **Complete item:** `Item 8a confirmed done. Mark it and stop.`
+- **Status report:** `Read -> UNFINISHED.md, declare status, wait.`
