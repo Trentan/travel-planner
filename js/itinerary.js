@@ -50,16 +50,18 @@ function buildCompactItinerary() {
         html += '</div>';
       }
 
-      // Display accommodation
-      if ((day.accomItems?.length || 0) > 0) {
-        html += '<div style="flex:1;"><strong>🏨</strong> ';
-        html += day.accomItems.map(item => {
-          const status = item.status || 'pending';
-          const statusIcon = status === 'confirmed' ? '✓' : '⏳';
-          return `${item.text}${item.cost ? ` ($${item.cost})` : ''} <span style="color:${status === 'confirmed' ? '#27AE60' : '#E67E22'}">${statusIcon}</span>`;
-        }).join(', ');
-        html += '</div>';
-      }
+
+  // Display stay info derived from stays[] based on date matching
+  const dayStayInfo = getStayDisplayForDay(day.date, day.to);
+  if (dayStayInfo.length > 0) {
+    html += '<div style="flex:1;">';
+    html += dayStayInfo.map(info => {
+      const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
+      const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
+      return `<span style="margin-right:12px;">${icon} <strong>${label}:</strong> ${info.propertyName}${info.cost ? ` ($${info.cost})` : ''}</span>`;
+    }).join('');
+    html += '</div>';
+  }
 
       html += '</div>';
 
@@ -95,6 +97,83 @@ function buildItinerary() {
     return;
   }
 
+// Parse "8 Jun" style date to ISO format for comparison
+// year parameter allows specifying the trip year (default 2026)
+function normalizeDate(dateStr, year = 2026) {
+  if (!dateStr) return '';
+  // Already ISO format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  // Parse "8 Jun" or "10 Jun" format
+  const match = dateStr.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$/);
+  if (match) {
+    const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06',
+                       Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
+    const day = match[1].padStart(2, '0');
+    const month = monthMap[match[2]];
+    return `${year}-${month}-${day}`;
+  }
+  return dateStr;
+}
+
+// Helper to determine stay display info for a given date
+function getStayDisplayForDay(dayDate, dayCity) {
+  if (!stays || !Array.isArray(stays)) return [];
+
+  const result = [];
+  const cityObj = citiesData.find(c => c.name === dayCity);
+  const cityId = cityObj ? cityObj.id : null;
+
+  // Normalize the day date for comparison
+  const normalizedDayDate = normalizeDate(dayDate);
+
+  stays.forEach(stay => {
+    if (!stay.cityId) return;
+
+    const stayCity = citiesData.find(c => c.id === stay.cityId);
+    const stayCityName = stayCity ? stayCity.name : '';
+
+    // Normalize dates to compare
+    const checkInDate = normalizeDate(stay.checkIn) || '';
+    const checkOutDate = normalizeDate(stay.checkOut) || '';
+
+    // Check if this day matches check-in, check-out, or is in between
+    if (normalizedDayDate === checkInDate) {
+      // Check-in day
+      result.push({
+        type: 'checkin',
+        propertyName: stay.propertyName,
+        provider: stay.provider,
+        status: stay.status,
+        bookingRef: stay.bookingRef,
+        cost: stay.totalCost
+      });
+    } else if (normalizedDayDate === checkOutDate) {
+      // Check-out day
+      result.push({
+        type: 'checkout',
+        propertyName: stay.propertyName,
+        provider: stay.provider,
+        status: stay.status,
+        bookingRef: stay.bookingRef,
+        cost: stay.totalCost
+      });
+    } else if (normalizedDayDate > checkInDate && normalizedDayDate < checkOutDate) {
+      // Middle day - just show "Staying at"
+      result.push({
+        type: 'staying',
+        propertyName: stay.propertyName,
+        provider: stay.provider,
+        status: stay.status,
+        bookingRef: null,
+        cost: null
+      });
+    }
+  });
+
+  return result;
+}
+
+
   // Save open state of day cards before rebuilding
   openDayCardIds.clear();
   document.querySelectorAll('.day-card.open').forEach(card => {
@@ -116,18 +195,33 @@ function buildItinerary() {
     section.className = 'leg';
     section.id = 'leg-' + leg.id;
 
-    const daysCount = leg.days.length;
-    const firstAccom = daysCount > 0 && leg.days[0].accomItems && leg.days[0].accomItems.length > 0 ? leg.days[0].accomItems[0].text : "";
+  const daysCount = leg.days.length;
 
-    let isTransit = false;
-    if (firstAccom.toLowerCase().includes('transit') || firstAccom === '—') {
+  // Detect transit legs based on whether there are any stays overlapping with this leg
+  let isTransit = false;
+  if (daysCount > 0) {
+    const firstDay = leg.days[0].date;
+    const lastDay = leg.days[leg.days.length - 1].date;
+
+    // Check if any stays overlap with this legs dates
+    const hasStays = (typeof stays !== 'undefined' && Array.isArray(stays)) ? stays.some(s => {
+      return s.checkIn && s.checkOut && s.checkIn <= lastDay && s.checkOut >= firstDay;
+    }) : false;
+
+    // Also check old accomItems for backward compatibility
+    const hasOldAccom = leg.days.some(d => d.accomItems && d.accomItems.length > 0);
+
+    // If no accommodation at all, its likely a transit leg
+    if (!hasStays && !hasOldAccom) {
       isTransit = true;
     } else if (daysCount === 1) {
+      // For single-day legs, check if its a city mismatch
       const toCity = leg.days[0].to;
       if (!leg.label.includes(toCity) && leg.days[0].from !== toCity) {
         isTransit = true;
       }
     }
+  }
 
     const nightLabel = isTransit ? '✈ Day Transit / Stop' : `${daysCount} night${daysCount !== 1 ? 's' : ''}`;
     const badgeClass = isTransit ? 'leg-night-count badge-transit' : 'leg-night-count';
@@ -259,25 +353,25 @@ function buildItinerary() {
             </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); openAddJourneyModal();">+ Add Journey</button>` : ''}
           </div>
 
-          <div class="detail-block block-accom">
-            <h4>Accommodation</h4><div class="item-list">
-            ${(day.accomItems || []).map((item, i) => {
-              const status = item.status || 'pending';
-              const statusColor = status === 'confirmed' ? '#27AE60' : '#E67E22';
-              const statusIcon = status === 'confirmed' ? '✓' : '⏳';
-              const showRef = status === 'confirmed';
-              return `<div class="cost-item">
-                <button class="del-btn" title="Remove Accommodation" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'accomItems', ${i})">×</button>
-                <span class="cost-item-text" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'accomItems', ${i}, this.innerText)">${item.text}</span>
-                <div class="cost-item-actions">
-                  <span class="status-badge" style="background:${statusColor}; ${isEditMode ? 'cursor:pointer;' : ''}" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" onclick="event.stopPropagation(); toggleBookingStatus(event, ${legIndex}, ${dayIndex}, 'accomItems', ${i})">${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}</span>
-                  ${showRef ? `<input type="text" class="booking-ref-input ${status === 'confirmed' ? 'confirmed' : ''}" value="${item.bookingRef || ''}" placeholder="Ref #" onchange="event.stopPropagation(); updateBookingRef(${legIndex}, ${dayIndex}, 'accomItems', ${i}, this.value)" ${isEditMode ? '' : 'readonly'}/>` : ''}
-                  <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'accomItems', ${i}, this.innerText)">${item.cost}</span></span>
-                </div>
-              </div>`;
-            }).join('')}
-            </div><button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'accomItems')">+ Add Accom</button>
-          </div>
+
+<div class="detail-block block-accom">
+<h4>Accommodation</h4><div class="item-list">
+${(() => {
+    const dayStayInfo = getStayDisplayForDay(day.date, day.to);
+    return dayStayInfo.map(info => {
+      const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
+      const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
+      return `<div class="cost-item">
+        <span class="cost-item-text">${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` via ${info.provider}` : ''}${info.cost ? ` ($${info.cost})` : ''}</span>
+        <div class="cost-item-actions">
+          <span class="status-badge" style="background:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✕ Cancelled' : '⏳ Pending'}</span>
+          ${info.bookingRef ? `<span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${info.bookingRef}</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  })()}
+</div><button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Add Stay</button>
+</div>
 
           <div class="detail-block block-activities drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
             <h4>Planned Activities</h4><div class="item-list">
@@ -342,8 +436,8 @@ function buildCityNav() {
     // Add vertical color bar to button
     const color = city.colour || '#2C3E50';
     btn.style.borderLeft = `4px solid ${color}`;
-    const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '📍';
-    btn.innerHTML = `<span>${flag} ${city.name}</span>`;
+    const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">📍</span>';
+    btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
     btn.onclick = () => selectCityFilter(city.id, btn);
     navList.appendChild(btn);
   });

@@ -75,7 +75,7 @@ function createJourneyFromTransportItem(item, legId, dayDate, fromLoc, toLoc) {
     dayDate: dayDate,
     fromLocation: fromLoc,
     toLocation: toLoc,
-    fromCityId: fromCity ? fromCity.id : '',
+    fromCityId: fromCity ? fromCity.id : '📍',
     toCityId: toCity ? toCity.id : '',
     departureDate: '',
     departureTime: '',
@@ -580,7 +580,7 @@ function _populateJourneyCityDropdowns() {
   let optionsHtml = '<option value="Home">🏠 Home</option>';
   if (typeof citiesData !== 'undefined') {
     [...citiesData].sort((a, b) => a.name.localeCompare(b.name)).forEach(city => {
-      const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '';
+      const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '📍';
       optionsHtml += `<option value="${city.name}">${flag} ${city.name}</option>`;
     });
   }

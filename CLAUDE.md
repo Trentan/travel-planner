@@ -20,15 +20,15 @@ Travel Planner PWA is a completely offline, JSON-driven Progressive Web App for 
 - `manifest.json` - PWA configuration for mobile installation
 - `sw.js` - Service Worker for offline caching
 - `js/` - JavaScript modules:
-  - `utils.js` - Helper functions (clocks, cost parsing, constants)
-  - `data.js` - Data management (init, save, import/export)
-  - `packing.js` - Packing list CRUD operations
-  - `dragdrop.js` - Drag-and-drop handlers
-  - `crud.js` - Itinerary CRUD operations
-  - `tabs.js` - Tab builders (transport, accom, budget, packing)
-  - `ai.js` - AI prompt generator
-  - `ui.js` - UI state and navigation
-  - `itinerary.js` - Main itinerary builder
+    - `utils.js` - Helper functions (clocks, cost parsing, constants)
+    - `data.js` - Data management (init, save, import/export)
+    - `packing.js` - Packing list CRUD operations
+    - `dragdrop.js` - Drag-and-drop handlers
+    - `crud.js` - Itinerary CRUD operations
+    - `tabs.js` - Tab builders (transport, accom, budget, packing)
+    - `ai.js` - AI prompt generator
+    - `ui.js` - UI state and navigation
+    - `itinerary.js` - Main itinerary builder
 - `backups/` - Directory for exported trip JSON files
 - `TODO.md` - Active task list (read on every session start)
 - `SESSION.md` - Live session state (read on every session start)
@@ -177,15 +177,15 @@ All active work items live in **`TODO.md`**. Live session state lives in **`SESS
 4. Read `todo/item-{N}-*.md` if a spec file exists for the target item
 5. Only check git log if `SESSION.md` is missing or its contents are unclear
 6. Declare your status report out loud:
-  - Which item/sub-task you are starting or resuming
-  - What the last completed commit was (if resuming)
-  - What the next concrete step is (from SESSION.md if resuming)
-  - What files will be touched
-  - An estimated commit count for this sub-task
-  
-    Immediately write that status report to `SESSION.md` before touching any code —
-    even before the first commit exists. This ensures a dropout at any point after
-    orientation leaves a recoverable state.
+- Which item/sub-task you are starting or resuming
+- What the last completed commit was (if resuming)
+- What the next concrete step is (from SESSION.md if resuming)
+- What files will be touched
+- An estimated commit count for this sub-task
+
+  Immediately write that status report to `SESSION.md` before touching any code —
+  even before the first commit exists. This ensures a dropout at any point after
+  orientation leaves a recoverable state.
 
 7. If you cannot confidently determine where things left off — **ask, don't guess**
 8. Wait for user confirmation before writing any code
@@ -204,16 +204,16 @@ All active work items live in **`TODO.md`**. Live session state lives in **`SESS
 - Before starting, verify the app loads without errors in its current state
 - Keep each commit small and focused — one logical change per commit
 - After each commit, in this exact order:
-  1. **Write `SESSION.md` immediately** (see format below) — do this before anything else, every single commit, no exceptions
-  2. Run through the relevant items in the **Testing Checklist** below
-  3. Summarise exactly what changed, what files were touched, and why
-  4. Branch name: `item-{N}{letter}` (e.g. `item-2a`)
-  5. Commit message: `Item {N}{letter} [X of Y]: {what was fixed and how}`
-  6. Push and open a PR for review
+    1. **Write `SESSION.md` immediately** (see format below) — do this before anything else, every single commit, no exceptions
+    2. Run through the relevant items in the **Testing Checklist** below
+    3. Summarise exactly what changed, what files were touched, and why
+    4. Branch name: `item-{N}{letter}` (e.g. `item-2a`)
+    5. Commit message: `Item {N}{letter} [X of Y]: {what was fixed and how}`
+    6. Push and open a PR for review
 - After the final commit of a sub-task:
-  1. Check `[x]` on that sub-task in `TODO.md` and update the item's **Status** block
-  2. Write the closed SESSION.md state (see format below)
-  3. **Stop and wait** — do not continue to the next sub-task until the user confirms
+    1. Check `[x]` on that sub-task in `TODO.md` and update the item's **Status** block
+    2. Write the closed SESSION.md state (see format below)
+    3. **Stop and wait** — do not continue to the next sub-task until the user confirms
 
 ---
 
@@ -272,35 +272,3 @@ When a sub-task is fully confirmed complete by the user, replace contents with:
 - Only move an item to `## Completed` in `TODO.md` after ALL sub-tasks are confirmed done
 - Completed items are fully deleted from `TODO.md` on next scheduled cleanup
 - Clear and close out `SESSION.md` when an item is fully done
-
----
-
-## Testing Checklist
-
-Before considering any work complete:
-- [ ] Open index.html in browser - app loads without errors
-- [ ] Create/edit/delete items in all tabs
-- [ ] Drag sights/runs from pool to day cards
-- [ ] Toggle Fun Mode and Read Only Mode - UI updates correctly
-- [ ] Toggle Compact View - layout switches, checkboxes work
-- [ ] Export JSON - file downloads with correct data
-- [ ] Import JSON - data loads and renders properly
-- [ ] Budget calculations update when costs change
-- [ ] Packing items check/uncheck and persist after refresh
-- [ ] Service Worker registers (check browser DevTools)
-- [ ] Print views render correctly (test both Summary and Detailed)
-
----
-
-## Future Enhancements (Unscheduled)
-
-- Dark mode toggle
-- Search/filter functionality
-- Undo/redo system
-- Image upload for receipts
-- Cloud sync (Firebase/Dropbox)
-- Multi-user collaboration
-- Trip sharing/export formats (PDF, Google Docs)
-- Activity duration tracking
-- Flight miles tracking
-- Budget categories breakdown

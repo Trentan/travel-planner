@@ -33,6 +33,9 @@ let currentFileName = "Default Template";
 var journeys = [];
 window.journeys = journeys;
 
+var stays = [];
+window.stays = stays;
+
 // Current city filter - 'all' or city ID (global for cross-module access)
 var currentCityFilter = 'all';
 window.currentCityFilter = currentCityFilter;
@@ -164,6 +167,10 @@ function deleteCity(cityId) {
     if (j.toCityId === cityId) j.toCityId = '';
   });
 
+  (stays || []).forEach(s => {
+    if (s.cityId === cityId) s.cityId = '';
+  });
+
   return true;
 }
 
@@ -252,17 +259,97 @@ const COUNTRY_FLAGS = {
   'Home': '🏠'
 };
 
+// City/country name -> ISO-2 code for flagcdn.com images
+const CITY_TO_CODE = {
+  'australia': 'au', 'brisbane': 'au',
+  'austria': 'at', 'vienna': 'at', 'innsbruck': 'at',
+  'thailand': 'th', 'bangkok': 'th', 'kohsamui': 'th', 'samui': 'th',
+  'slovakia': 'sk', 'bratislava': 'sk',
+  'czechrepublic': 'cz', 'czechia': 'cz', 'prague': 'cz',
+  'germany': 'de', 'munich': 'de', 'nuremberg': 'de',
+  'italy': 'it', 'milan': 'it', 'bolzano': 'it',
+  'switzerland': 'ch', 'zurich': 'ch',
+  'taiwan': 'tw', 'taipei': 'tw',
+  'uk': 'gb', 'unitedkingdom': 'gb', 'london': 'gb', 'england': 'gb', 'scotland': 'gb',
+  'france': 'fr', 'paris': 'fr',
+  'spain': 'es', 'barcelona': 'es',
+  'netherlands': 'nl', 'amsterdam': 'nl',
+  'greece': 'gr', 'athens': 'gr',
+  'japan': 'jp', 'tokyo': 'jp',
+  'usa': 'us', 'unitedstates': 'us', 'newyork': 'us',
+  'verona': 'it'
+};
+
+// Country name to ISO code mapping
+const COUNTRY_TO_CODE = {
+  'Australia': 'AU',
+  'Austria': 'AT',
+  'Thailand': 'TH',
+  'Slovakia': 'SK',
+  'Czech Republic': 'CZ',
+  'Czechia': 'CZ',
+  'Germany': 'DE',
+  'Italy': 'IT',
+  'Switzerland': 'CH',
+  'Taiwan': 'TW',
+  'UK': 'GB',
+  'United Kingdom': 'GB',
+  'Scotland': 'GB',
+  'France': 'FR',
+  'Spain': 'ES',
+  'Netherlands': 'NL',
+  'Greece': 'GR',
+  'Japan': 'JP',
+  'USA': 'US',
+  'United States': 'US'
+};
+
 // Get flag emoji for a city (based on city name or country)
 function getCityFlag(cityName) {
   if (!cityName) return '📍';
-  // Direct city match
-  if (COUNTRY_FLAGS[cityName]) return COUNTRY_FLAGS[cityName];
+
+  // Get country from city mapping or direct match
+  let country = null;
+  if (COUNTRY_FLAGS[cityName]) {
+    // Direct city match - reverse lookup country
+    const flag = COUNTRY_FLAGS[cityName];
+    // Find which country this flag belongs to
+    for (const [cName, cFlag] of Object.entries(COUNTRY_FLAGS)) {
+      if (cFlag === flag && COUNTRY_TO_CODE[cName]) {
+        country = cName;
+        break;
+      }
+    }
+    // Return original emoji
+    return flag;
+  }
+
   // Check citiesData for country
   const city = citiesData.find(c => c.name === cityName);
-  if (city && city.country && COUNTRY_FLAGS[city.country]) {
-    return COUNTRY_FLAGS[city.country];
+  if (city && city.country) {
+    country = city.country;
+    if (COUNTRY_FLAGS[country]) {
+      return COUNTRY_FLAGS[country];
+    }
   }
+
   return '📍';
+}
+
+// Get flag as flagcdn.com img tag (works on Windows Chrome/Edge)
+function getCityFlagHTML(cityName) {
+  if (!cityName) return '<span class="city-flag">📍</span>';
+
+  const cityEntry = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === cityName) : null;
+  const lookupCity = cityName.replace(/\s+/g, '').toLowerCase();
+  const lookupCountry = cityEntry?.country?.replace(/\s+/g, '').toLowerCase();
+  const code = CITY_TO_CODE[lookupCity] || CITY_TO_CODE[lookupCountry];
+
+  if (code) {
+    return `<img src="https://flagcdn.com/w20/${code}.png" srcset="https://flagcdn.com/w40/${code}.png 2x" class="city-flag-img" alt="${cityName} flag" onerror="this.style.display='none'">`;
+  }
+
+  return '<span class="city-flag">📍</span>';
 }
 
 // Set country for a city
@@ -483,6 +570,24 @@ function initData() {
     journeys = [];
     window.journeys = journeys;
   }
+
+  const savedStays = localStorage.getItem('travelApp_stays_v1');
+  if (savedStays) {
+    try {
+      const parsed = JSON.parse(savedStays);
+      if (Array.isArray(parsed)) {
+        stays = parsed;
+        window.stays = stays;
+      }
+    } catch (e) {
+      stays = [];
+      window.stays = stays;
+    }
+  } else {
+    stays = [];
+    window.stays = stays;
+  }
+
   const saved = localStorage.getItem('travelApp_v2026_template');
   if (saved) {
     appData = JSON.parse(saved);
@@ -630,6 +735,7 @@ function saveData(showTick = true) {
   localStorage.setItem('travelApp_v2026_template', JSON.stringify(appData));
   localStorage.setItem('travelApp_packing_v3', JSON.stringify(packingData));
   localStorage.setItem('travelApp_leavehome_v3', JSON.stringify(leaveHomeData));
+  localStorage.setItem('travelApp_stays_v1', JSON.stringify(stays));
 
   if(showTick) {
     const status = document.getElementById('saveStatus');
@@ -646,6 +752,7 @@ function resetData() {
     localStorage.removeItem('travelApp_meta_template');
     localStorage.removeItem('travelApp_filename_v2026');
     localStorage.removeItem('travelApp_journeys_v1');
+    localStorage.removeItem('travelApp_stays_v1');
     localStorage.removeItem('travelApp_last_export_v2026');
     localStorage.removeItem('travelApp_last_import_v2026');
     location.reload();
@@ -676,7 +783,9 @@ function exportJSON() {
   // Get journeys if they exist
   let journeysData = [];
   if (typeof journeys !== 'undefined') journeysData = journeys;
-  const exportObj = { meta: titleData, itinerary: appData, packing: packingData, leaveHome: leaveHomeData, journeys: journeysData };
+  let staysData = [];
+  if (typeof stays !== 'undefined') staysData = stays;
+  const exportObj = { meta: titleData, itinerary: appData, packing: packingData, leaveHome: leaveHomeData, journeys: journeysData, stays: staysData };
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute("href", dataStr);
@@ -814,6 +923,11 @@ function importJSON(event) {
         console.log(`[Import] Saved ${importedData.journeys.length} journeys to localStorage`);
       } else {
         console.log('[Import] No journeys found in imported data');
+      }
+
+      if (importedData.stays && Array.isArray(importedData.stays)) {
+        stays = importedData.stays;
+        window.stays = stays;
       }
 
       currentFileName = file.name;
