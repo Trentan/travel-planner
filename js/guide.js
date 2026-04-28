@@ -1,4 +1,4 @@
-II // Guide and Tutorial System
+// Guide and Tutorial System
 const GUIDE_STEPS = [
   {
     id: 'welcome',
@@ -15,53 +15,77 @@ const GUIDE_STEPS = [
     hint: 'The header is fully editable - just click and type!'
   },
   {
+    id: 'cities',
+    title: '🌍 Manage Cities',
+    description: 'Click "Cities" to add and manage destinations. Each city gets a color and can be filtered across all tabs. Tips, food, activities, and accommodation can all be assigned to cities.',
+    demo: 'button',
+    demoText: '🌍 Cities',
+    hint: 'Cities appear in the navigation bar below the tabs for quick filtering.'
+  },
+  {
     id: 'add-leg',
     title: 'Add Trip Legs',
-    description: 'A "leg" is a segment of your trip (e.g., "London", "Paris"). Click "+ Add New Leg" to create your first destination.',
+    description: 'A "leg" is a segment of your trip (start, travel between cities, or city stays). Click "+ Add Trip Leg" to create destinations.',
     demo: 'button',
-    demoText: '+ Add New Leg',
-    hint: 'Each leg can have multiple days, food quests, and sights.'
+    demoText: '+ Add Trip Leg',
+    hint: 'Legs can be Start (departure home), Travel (city-to-city), City (destination), or Return (arrival home).'
   },
   {
     id: 'days',
     title: 'Plan Your Days',
     description: 'Each day shows your route (From → To) and can hold transport, accommodation, and activities.',
     demo: 'day-card',
-    hint: 'Click on any day bar to expand/collapse the details.'
+    hint: 'Click on any day bar to expand/collapse the details. Use the expand/collapse buttons for bulk control.'
+  },
+  {
+    id: 'journeys',
+    title: '✈️ Multi-Leg Journeys',
+    description: 'Transport is now organized as Journeys with multiple segments. Use the Transport tab to add flights, trains, buses, and more.',
+    demo: 'button',
+    demoText: '+ Add Journey',
+    hint: 'Multi-leg trips (like flights with connections) are grouped together in the Transport tab.'
+  },
+  {
+    id: 'accommodation',
+    title: '🏨 Stays & Accommodation',
+    description: 'Add stays with check-in/check-out dates in the Accommodation tab. The itinerary automatically shows where you\'re staying each night.',
+    demo: 'button',
+    demoText: '+ Add Stay',
+    hint: 'Stays include provider (Booking.com, Airbnb), status, and booking references.'
   },
   {
     id: 'drag-drop',
     title: 'Drag & Drop Activities',
-    description: 'In the City Dashboard, you can plan "Suggested Sights" and "Running Routes". Drag them to any day to schedule!',
+    description: 'In each leg, you can plan "Suggested Activities", "Food Quests", and "Tips". Drag them to any day to schedule!',
     demo: 'drag',
-    hint: 'Look for the ⠿ handle - that\'s your drag grabber.'
+    hint: 'Look for the ⠿ handle - that\'s your drag grabber. These can be assigned to cities too.'
   },
   {
     id: 'budget',
     title: 'Track Your Budget',
     description: 'Click the "💰 Budget" tab to see a complete cost breakdown by category and trip leg.',
     demo: 'tabs',
-    hint: 'Costs are automatically calculated from transport, accommodation, and activities.'
+    hint: 'Costs are automatically calculated from journeys, stays, and activities.'
   },
   {
     id: 'packing',
-    title: 'Master Your Packing',
-    description: 'The "🧳 Packing" tab has pre-loaded lists for Walk-on Gear, Carry-on, and Personal Item bags.',
+    title: '🧳 Master Your Packing',
+    description: 'The Packing tab has pre-loaded lists for Walk-on Gear, Carry-on, and Personal Item bags. Use the guides for tips!',
     demo: 'check',
-    hint: 'Check items off as you pack them. Add custom categories too!'
+    hint: 'Check items off as you pack. Add custom categories and use the collapsible packing guides.'
   },
   {
     id: 'modes',
     title: 'Toggle View Modes',
     description: 'Use the top bar buttons to change how you view your trip:',
     demo: 'modes',
-    modes: ['📋 Fun Mode - hides logistics', '🔒 Read Only - disables editing', '📄 Compact View - ultra-dense layout'],
+    modes: ['📋 Fun Mode - hides logistics/budget', '🔒 Lock - disables editing (Read Only)'],
     hint: 'Each mode helps you focus on what matters at that moment.'
   },
   {
     id: 'print',
     title: 'Print Your Itinerary',
-    description: 'Click "🖨 Print Preview" for options: date ranges, what to include, and style (Summary vs Detailed).',
+    description: 'Click "🖨 Print Itinerary" for options: date ranges, what to include, and style (Summary vs Detailed).',
     demo: 'print',
     hint: 'The print view is optimized for saving to PDF or taking on your trip!'
   },
@@ -77,7 +101,7 @@ const GUIDE_STEPS = [
     title: '🤖 AI Assistant',
     description: 'Stuck for ideas? Go to AI Builder, enter your trip details, and generate a prompt for ChatGPT/Gemini.',
     demo: 'ai',
-    hint: 'The AI can build a complete JSON itinerary you can import!'
+    hint: 'The AI can build a complete JSON itinerary including cities, stays, and journeys for import!'
   }
 ];
 
@@ -246,26 +270,26 @@ const TUTORIAL_STEPS = [
   {
     target: '.app-menu-right',
     title: 'View Modes & Tools',
-    text: 'Toggle between Fun Mode, Read Only, Compact View. Access AI Builder, Guide, and Print from the top menu.',
+    text: 'Toggle Fun Mode, Read Only, access Cities, AI Builder, Guide, and Print from the top menu.',
     position: 'bottom'
   },
   {
-    target: '#expandAll',
-    title: 'Expand/Collapse Days',
-    text: 'Quickly show or hide all day details to get an overview of your trip.',
-    position: 'top'
+    target: '#cityNav',
+    title: 'City Filter Navigator',
+    text: 'Filter your view by city across all tabs. "All" shows everything, or select a specific city to see only its items.',
+    position: 'bottom'
   },
   {
-    target: '.app-tabs',
+    target: '.app-tabs-nav',
     title: 'Navigation Tabs',
     text: 'Switch between Itinerary, Transport, Accommodation, Budget, Packing, and Map views.',
     position: 'bottom'
   },
   {
-    target: '#legNav',
-    title: 'Trip Leg Navigator',
-    text: 'Click any leg to jump directly to it in the itinerary.',
-    position: 'bottom'
+    target: '#expandAll',
+    title: 'Expand/Collapse Days',
+    text: 'Quickly show or hide all day details to get an overview of your trip. The Leg button controls the trip leg sections.',
+    position: 'top'
   }
 ];
 
