@@ -464,3 +464,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
   }
 });
+
+// Expose guide functions to window scope for HTML onclick handlers
+window.buildGuideSteps = buildGuideSteps;
+window.toggleGuideStep = toggleGuideStep;
+window.markStepComplete = markStepComplete;
+window.resetTutorialSeen = resetTutorialSeen;
+window.startTutorial = startTutorial;
+window.skipTutorial = skipTutorial;
+window.nextTutorialStep = nextTutorialStep;
+window.prevTutorialStep = prevTutorialStep;

@@ -1,28 +1,10 @@
 ## Session State
 
-- **Status:** Complete
-- **Last completed:** Item 6d — 3-column grid layout for packing guides implemented and pushed
-- **Next:** Item 5g (Accommodation tab Add Stay button positioning)
-
----
-
-## Session State
-
-- **Item/sub-task:** 6d
-- **Branch:** item-6d
-- **Last commit:** `Item 6d: Implement 3-column grid layout for packing guides`
-- **What was done:**
-  - Wrapped guide collapsibles in `.guides-grid` container for 3-column layout
-  - Set guides to collapsed by default (removed 'open' attribute from `<details>`)
-  - Added CSS for `.guides-grid` with responsive breakpoint at 900px
-  - Verified Carry-on Packed Bag default categories:
-    * Clothes
-    * Shoes & Misc
-    * Dry Toiletries
-    * 1L Clear Bag (Liquids <100ml)
-  * No "Before Leaving Home" in Carry-on (correct per 6c)
-- **Files touched:**
-  - js/tabs.js - wrapped guides in grid container, removed open attribute
-  - style.css - added .guides-grid and responsive styles
-- **Known blockers / risks:** None
-- **Noticed (unscheduled):**
+- **Item/sub-task:** 7d
+- **Branch:** item-7d
+- **Last commit:** `Not yet committed`
+- **What was done:** Fixed the guide button not working by adding missing `window.*` exports for guide functions at the end of `js/guide.js`. The functions `buildGuideSteps`, `toggleGuideStep`, `markStepComplete`, `resetTutorialSeen`, `startTutorial`, `skipTutorial`, `nextTutorialStep`, `prevTutorialStep` are now exposed to global scope so HTML onclick handlers can find them.
+- **Next step:** Open index.html in browser and test that the 📖 Guide button opens the dialog. If working, commit and move to 7e.
+- **Files touched:** `js/guide.js`
+- **Known blockers / risks:** None — this fix should restore guide functionality
+- **Noticed (unscheduled):** None
