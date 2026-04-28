@@ -8,8 +8,8 @@ Read this file at the start of every session. Claude Code: read from main branch
 ## Active
 
 ### Item 5: Convert Accommodation
-**Status:** In progress — 5f complete
-**Next:** `item-5g`
+**Status:** In progress — 5h complete - need to request review
+**Next:** `none`
 **Note:** No migration of old accomItems — new stays model only going forward.
 
 - [x] a) Data model: add top-level `stays []` global in `data.js`
