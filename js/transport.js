@@ -125,8 +125,8 @@ function getDayJourneys(dayDate, fromLoc, toLoc) {
   journeys.forEach(j => {
     const depMatch = j.departureDate === dayDate || j.dayDate === dayDate;
     const routeMatch = !fromLoc || !toLoc ||
-      j.fromLocation === fromLoc ||
-      j.toLocation === toLoc;
+        j.fromLocation === fromLoc ||
+        j.toLocation === toLoc;
 
     if (depMatch && routeMatch) {
       const key = j.journeyId || j.id;
@@ -146,8 +146,8 @@ function findJourney(id) {
 
 function findJourneySegments(journeyId) {
   return journeys
-    .filter(j => j.journeyId === journeyId)
-    .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+      .filter(j => j.journeyId === journeyId)
+      .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
 }
 
 function buildRouteChain(segments) {
@@ -308,7 +308,7 @@ function buildTransportTab(cityFilter = null) {
   let toShow = getSortedJourneys();
   if (cityFilter && cityFilter !== 'all') {
     toShow = toShow.filter(j =>
-      j.fromCityId === cityFilter || j.toCityId === cityFilter
+        j.fromCityId === cityFilter || j.toCityId === cityFilter
     );
   }
 
@@ -340,16 +340,22 @@ function buildTransportTab(cityFilter = null) {
   });
 
   html += `<div class="data-table-wrapper">
-    <table class="data-table journey-table">
+    <table class="data-table">
       <thead>
         <tr>
-          <th class="col-expand"></th>
-          <th class="col-route">Route</th>
-          <th class="col-when">When</th>
-          <th class="col-details">Details</th>
-          <th class="col-cost">Cost</th>
-          <th class="col-status">Status</th>
-          <th class="col-actions">Actions</th>
+          <th style="width:28px;"></th>
+          <th>Journey</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Route</th>
+          <th>Departs</th>
+          <th>Arrives</th>
+          <th>Provider</th>
+          <th>Route #</th>
+          <th>Cost</th>
+          <th>Status</th>
+          <th>Ref</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>`;
@@ -364,74 +370,51 @@ function buildTransportTab(cityFilter = null) {
 
     const route = isMultiLeg ? buildRouteChain(segs) : `${rep.fromLocation} → ${rep.toLocation}`;
     const firstDep = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
-    const firstTime = rep.departureTime || '';
+    const firstTime = rep.departureTime || '—';
     const lastSeg = segs[segs.length - 1];
     const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
-    const lastArrTime = lastSeg.arrivalTime || '';
+    const lastArrTime = lastSeg.arrivalTime || '—';
 
     const totalCost = segs.reduce((sum, s) => sum + (parseFloat(s.cost) || 0), 0);
 
     const icon = isMultiLeg ? '✈️' : getTransportIcon(rep.transportType);
 
-    // Build "When" column content
-    let whenContent = '';
-    if (firstTime) {
-      whenContent += `<div class="journey-time-row"><span class="time-label">Dep:</span> ${firstDep} ${firstTime}</div>`;
-    } else {
-      whenContent += `<div class="journey-time-row">${firstDep}</div>`;
-    }
-    if (isMultiLeg) {
-      whenContent += `<div class="journey-time-row multi-leg"><span class="time-label">Arr:</span> ${lastArr} ${lastArrTime}</div>`;
-    } else if (rep.arrivalTime) {
-      whenContent += `<div class="journey-time-row"><span class="time-label">Arr:</span> ${rep.arrivalTime}</div>`;
-    }
-
-    // Build "Details" column content
-    let detailsContent = '';
-    if (rep.provider) {
-      detailsContent += `<div class="journey-detail-row">${rep.provider}</div>`;
-    }
-    if (rep.routeCode) {
-      const routeLabel = isMultiLeg ? 'Route codes' : 'Route #';
-      detailsContent += `<div class="journey-detail-row route-code">Route #${rep.routeCode}</div>`;
-    }
-    if (rep.bookingReference) {
-      detailsContent += `<div class="journey-detail-row booking-ref">Ref: ${rep.bookingReference}</div>`;
-    }
-    if (!detailsContent) {
-      detailsContent = '<span class="detail-placeholder">—</span>';
-    }
+    const nameDisplay = rep.journeyName
+        ? (rep.journeyName.length > 22 ? rep.journeyName.substring(0, 22) + '…' : rep.journeyName)
+        : '—';
 
     const expandBtn = isMultiLeg
-      ? `<button class="journey-expand-btn" onclick="toggleJourneySegments('${gid}')" title="Show/hide segments" style="background:none;border:none;cursor:pointer;font-size:0.85rem;padding:2px 4px;">▶</button>`
-      : '';
-
-    const legBadge = isMultiLeg ? `<span class="leg-count-badge">${segs.length} legs</span>` : '';
+        ? `<button class="journey-expand-btn" onclick="toggleJourneySegments('${gid}')" title="Show/hide segments" style="background:none;border:none;cursor:pointer;font-size:0.85rem;padding:2px 4px;">▶</button>`
+        : '';
 
     html += `
       <tr class="journey-parent-row" data-group="${gid}" style="border-left:3px solid ${statusColor};">
-        <td class="col-expand">${expandBtn}</td>
-        <td class="col-route">
-          <div class="route-main">
-            <span class="journey-icon">${icon}</span>
-            <span class="route-text">${route}</span>
-            ${legBadge}
-          </div>
-          ${rep.journeyName && rep.journeyName !== route ? `<div class="journey-name" title="${rep.journeyName}">${rep.journeyName}</div>` : ''}
+        <td>${expandBtn}</td>
+        <td class="journey-name-col" title="${rep.journeyName || ''}">${nameDisplay}${isMultiLeg ? ` <span style="font-size:0.7rem;background:#e8f0fe;color:#3c5a99;padding:1px 5px;border-radius:8px;">${segs.length} legs</span>` : ''}</td>
+        <td>${icon}</td>
+        <td class="date-col">${firstDep}</td>
+        <td class="route-col">${route}</td>
+        <td>${firstTime}</td>
+        <td>${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
+        <td>${rep.provider || '—'}</td>
+        <td>${isMultiLeg ? '—' : (rep.routeCode || '—')}</td>
+        <td class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
+        <td>
+          <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="toggleJourneyStatus('${rep.id}')">
+            ${statusText}
+          </span>
         </td>
-        <td class="col-when">${whenContent}</td>
-        <td class="col-details">${detailsContent}</td>
-        <td class="col-cost budget-field">
-          $<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span>
+        <td>
+          <input type="text" value="${rep.bookingReference || ''}" placeholder="Ref #"
+            onchange="updateJourneyBookingRef('${rep.id}', this.value); buildTransportTab();"
+            style="width:70px;padding:2px 4px;font-size:0.8rem;border:1px solid #ddd;border-radius:3px;font-family:monospace;"
+            ${isEditMode ? '' : 'readonly'}>
         </td>
-        <td class="col-status">
-          <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="toggleJourneyStatus('${rep.id}')">${statusText}</span>
-        </td>
-        <td class="col-actions">
-          <button class="action-btn small" onclick="editJourney('${gid}')" title="Edit journey">✎</button>
+        <td>
+          <button class="action-btn small" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; font-size: 0.8rem; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
           ${isMultiLeg
-            ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
-            : `<button class="del-btn" onclick="deleteJourney('${rep.id}'); buildTransportTab();" title="Delete">×</button>`}
+        ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
+        : `<button class="del-btn" onclick="deleteJourney('${rep.id}'); buildTransportTab();" title="Delete">×</button>`}
         </td>
       </tr>`;
 
@@ -440,47 +423,21 @@ function buildTransportTab(cityFilter = null) {
         const segIcon = getTransportIcon(seg.transportType);
         const segDep = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
         const segArr = formatJourneyDate(seg.arrivalDate) || '—';
-
-        let segWhenContent = '';
-        if (seg.departureTime) {
-          segWhenContent += `<div class="journey-time-row"><span class="time-label">Dep:</span> ${segDep} ${seg.departureTime}</div>`;
-        } else {
-          segWhenContent += `<div class="journey-time-row">${segDep}</div>`;
-        }
-        if (seg.arrivalTime) {
-          segWhenContent += `<div class="journey-time-row"><span class="time-label">Arr:</span> ${segArr} ${seg.arrivalTime}</div>`;
-        }
-
-        let segDetailsContent = '';
-        if (seg.provider) {
-          segDetailsContent += `<div class="journey-detail-row">${seg.provider}</div>`;
-        }
-        if (seg.routeCode) {
-          segDetailsContent += `<div class="journey-detail-row route-code">#${seg.routeCode}</div>`;
-        }
-        if (!segDetailsContent) {
-          segDetailsContent = '<span class="detail-placeholder">—</span>';
-        }
-
         html += `
-          <tr class="journey-segment-row" data-group="${gid}" style="display:none;background:#fafaf8;font-size:0.9rem;">
-            <td class="col-expand"></td>
-            <td class="col-route">
-              <div class="route-main segment-label">
-                <span class="journey-icon">${segIcon}</span>
-                <span class="segment-indicator">↳ Leg ${i + 1}</span>
-                <span class="route-text">${seg.fromLocation} → ${seg.toLocation}</span>
-              </div>
-            </td>
-            <td class="col-when">${segWhenContent}</td>
-            <td class="col-details">${segDetailsContent}</td>
-            <td class="col-cost budget-field" style="color:#888;">
-              $<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${seg.id}', this.innerText); buildTransportTab();">${seg.cost || '0'}</span>
-            </td>
-            <td class="col-status">—</td>
-            <td class="col-actions">
-              <button class="del-btn" onclick="deleteJourney('${seg.id}'); buildTransportTab();" title="Delete segment">×</button>
-            </td>
+          <tr class="journey-segment-row" data-group="${gid}" style="display:none;background:#fafaf8;font-size:0.85rem;">
+            <td></td>
+            <td style="padding-left:2rem;color:#888;">↳ Leg ${i + 1}</td>
+            <td>${segIcon}</td>
+            <td class="date-col">${segDep}</td>
+            <td class="route-col" style="color:#555;">${seg.fromLocation} → ${seg.toLocation}</td>
+            <td>${seg.departureTime || '—'}</td>
+            <td>${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
+            <td>${seg.provider || '—'}</td>
+            <td>${seg.routeCode || '—'}</td>
+            <td class="budget-field" style="color:#888;">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${seg.id}', this.innerText); buildTransportTab();">${seg.cost || '0'}</span></td>
+            <td>—</td>
+            <td>—</td>
+            <td><button class="del-btn" onclick="deleteJourney('${seg.id}'); buildTransportTab();" title="Delete segment">×</button></td>
           </tr>`;
       });
     }
@@ -656,10 +613,10 @@ function openAddJourneyModal() {
     document.getElementById('journeyDateTo').value = today;
 
     ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode','journeyCost','journeyNotes']
-    .forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
+        .forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
 
     const header = modal.querySelector('.modal-header h2');
     if (header) header.textContent = '✈️ Add journey';
@@ -717,14 +674,14 @@ function _updateSegmentList() {
       const providerStr = `${s.provider} ${s.routeCode}`.trim();
 
       return `
-        <div style="font-size: 0.85rem; color: #666; text-align: center; margin-bottom: 4px; display: flex; justify-content: center; align-items: center; gap: 8px;">
-          <span>✓ Segment ${i + 1}: ${s.fromLocation} ➔ ${s.toLocation}</span>
-          <span style="color: #ccc;">•</span>
-          <span>${depString} ➔ ${arrString}</span>
-          ${providerStr ? `<span style="color: #ccc;">•</span><span>${providerStr}</span>` : ''}
-          <button onclick="editPendingSegment(${i})" style="background:none; border:none; color:#3498DB; cursor:pointer; font-size:1rem; opacity:0.8; padding:0 4px;" title="Edit leg">✎</button>
-          <button onclick="removePendingSegment(${i})" style="background:none; border:none; color:#E74C3C; cursor:pointer; font-size:1rem; opacity:0.6; padding:0 4px;" title="Remove leg">×</button>
-        </div>`;
+      <div style="font-size: 0.85rem; color: #666; text-align: center; margin-bottom: 4px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+        <span>✓ Segment ${i + 1}: ${s.fromLocation} ➔ ${s.toLocation}</span>
+        <span style="color: #ccc;">•</span>
+        <span>${depString} ➔ ${arrString}</span>
+        ${providerStr ? `<span style="color: #ccc;">•</span><span>${providerStr}</span>` : ''}
+        <button onclick="editPendingSegment(${i})" style="background:none; border:none; color:#3498DB; cursor:pointer; font-size:1rem; opacity:0.8; padding:0 4px;" title="Edit leg">✎</button>
+        <button onclick="removePendingSegment(${i})" style="background:none; border:none; color:#E74C3C; cursor:pointer; font-size:1rem; opacity:0.6; padding:0 4px;" title="Remove leg">×</button>
+      </div>`;
     }).join('');
   }
 }
