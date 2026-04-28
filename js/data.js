@@ -1,7 +1,115 @@
 let appData = [];
 let packingData = [];
 let leaveHomeData = [];
-let citiesData = []; // City entities for filtering/grouping - { id, name, country, dateFrom, dateTo, colour }
+let citiesData = []; // City entities for filtering/grouping - { id, name, code, countryCode, country, dateFrom, dateTo, colour }
+
+// ISO Country codes for travel destinations
+const COUNTRY_DATA = [
+  { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+  { code: 'AT', name: 'Austria', flag: '🇦🇹' },
+  { code: 'BE', name: 'Belgium', flag: '🇧🇪' },
+  { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
+  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+  { code: 'CN', name: 'China', flag: '🇨🇳' },
+  { code: 'HR', name: 'Croatia', flag: '🇭🇷' },
+  { code: 'CZ', name: 'Czech Republic', flag: '🇨🇿' },
+  { code: 'DK', name: 'Denmark', flag: '🇩🇰' },
+  { code: 'EG', name: 'Egypt', flag: '🇪🇬' },
+  { code: 'FI', name: 'Finland', flag: '🇫🇮' },
+  { code: 'FR', name: 'France', flag: '🇫🇷' },
+  { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+  { code: 'GR', name: 'Greece', flag: '🇬🇷' },
+  { code: 'HK', name: 'Hong Kong', flag: '🇭🇰' },
+  { code: 'HU', name: 'Hungary', flag: '🇭🇺' },
+  { code: 'IS', name: 'Iceland', flag: '🇮🇸' },
+  { code: 'IN', name: 'India', flag: '🇮🇳' },
+  { code: 'ID', name: 'Indonesia', flag: '🇮🇩' },
+  { code: 'IE', name: 'Ireland', flag: '🇮🇪' },
+  { code: 'IT', name: 'Italy', flag: '🇮🇹' },
+  { code: 'JP', name: 'Japan', flag: '🇯🇵' },
+  { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
+  { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
+  { code: 'NL', name: 'Netherlands', flag: '🇳🇱' },
+  { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
+  { code: 'NO', name: 'Norway', flag: '🇳🇴' },
+  { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
+  { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
+  { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
+  { code: 'ES', name: 'Spain', flag: '🇪🇸' },
+  { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
+  { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
+  { code: 'TH', name: 'Thailand', flag: '🇹🇭' },
+  { code: 'TR', name: 'Turkey', flag: '🇹🇷' },
+  { code: 'AE', name: 'UAE', flag: '🇦🇪' },
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: 'US', name: 'United States', flag: '🇺🇸' },
+  { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
+  { code: 'ZZ', name: 'Other', flag: '🌐' }
+];
+
+// Built-in city database with IATA codes
+const CITY_DATABASE = [
+  { code: 'ADL', name: 'Adelaide', countryCode: 'AU' },
+  { code: 'AMS', name: 'Amsterdam', countryCode: 'NL' },
+  { code: 'ATH', name: 'Athens', countryCode: 'GR' },
+  { code: 'BCN', name: 'Barcelona', countryCode: 'ES' },
+  { code: 'BKK', name: 'Bangkok', countryCode: 'TH' },
+  { code: 'BNE', name: 'Brisbane', countryCode: 'AU' },
+  { code: 'BRU', name: 'Brussels', countryCode: 'BE' },
+  { code: 'BUD', name: 'Budapest', countryCode: 'HU' },
+  { code: 'CAI', name: 'Cairo', countryCode: 'EG' },
+  { code: 'CAN', name: 'Guangzhou', countryCode: 'CN' },
+  { code: 'CDG', name: 'Paris', countryCode: 'FR' },
+  { code: 'CGN', name: 'Cologne', countryCode: 'DE' },
+  { code: 'CPH', name: 'Copenhagen', countryCode: 'DK' },
+  { code: 'DRS', name: 'Dresden', countryCode: 'DE' },
+  { code: 'DUB', name: 'Dublin', countryCode: 'IE' },
+  { code: 'DUS', name: 'Dusseldorf', countryCode: 'DE' },
+  { code: 'FCO', name: 'Rome', countryCode: 'IT' },
+  { code: 'FRA', name: 'Frankfurt', countryCode: 'DE' },
+  { code: 'GVA', name: 'Geneva', countryCode: 'CH' },
+  { code: 'HAM', name: 'Hamburg', countryCode: 'DE' },
+  { code: 'HEL', name: 'Helsinki', countryCode: 'FI' },
+  { code: 'HKG', name: 'Hong Kong', countryCode: 'HK' },
+  { code: 'HKT', name: 'Phuket', countryCode: 'TH' },
+  { code: 'HND', name: 'Tokyo', countryCode: 'JP' },
+  { code: 'IST', name: 'Istanbul', countryCode: 'TR' },
+  { code: 'JFK', name: 'New York', countryCode: 'US' },
+  { code: 'KUL', name: 'Kuala Lumpur', countryCode: 'MY' },
+  { code: 'LAS', name: 'Las Vegas', countryCode: 'US' },
+  { code: 'LAX', name: 'Los Angeles', countryCode: 'US' },
+  { code: 'LHR', name: 'London', countryCode: 'GB' },
+  { code: 'LIS', name: 'Lisbon', countryCode: 'PT' },
+  { code: 'MAD', name: 'Madrid', countryCode: 'ES' },
+  { code: 'MAN', name: 'Manchester', countryCode: 'GB' },
+  { code: 'MEL', name: 'Melbourne', countryCode: 'AU' },
+  { code: 'MEX', name: 'Mexico City', countryCode: 'MX' },
+  { code: 'MIL', name: 'Milan', countryCode: 'IT' },
+  { code: 'MUC', name: 'Munich', countryCode: 'DE' },
+  { code: 'MXP', name: 'Milan', countryCode: 'IT' },
+  { code: 'NCE', name: 'Nice', countryCode: 'FR' },
+  { code: 'NRT', name: 'Tokyo Narita', countryCode: 'JP' },
+  { code: 'OSL', name: 'Oslo', countryCode: 'NO' },
+  { code: 'OSL', name: 'Oslo', countryCode: 'NO' },
+  { code: 'PER', name: 'Perth', countryCode: 'AU' },
+  { code: 'PRG', name: 'Prague', countryCode: 'CZ' },
+  { code: 'PVG', name: 'Shanghai', countryCode: 'CN' },
+  { code: 'REK', name: 'Reykjavik', countryCode: 'IS' },
+  { code: 'RIO', name: 'Rio de Janeiro', countryCode: 'BR' },
+  { code: 'SFO', name: 'San Francisco', countryCode: 'US' },
+  { code: 'SIN', name: 'Singapore', countryCode: 'SG' },
+  { code: 'STO', name: 'Stockholm', countryCode: 'SE' },
+  { code: 'STR', name: 'Stuttgart', countryCode: 'DE' },
+  { code: 'SYD', name: 'Sydney', countryCode: 'AU' },
+  { code: 'TPE', name: 'Taipei', countryCode: 'TW' },
+  { code: 'VCE', name: 'Venice', countryCode: 'IT' },
+  { code: 'VIE', name: 'Vienna', countryCode: 'AT' },
+  { code: 'YVR', name: 'Vancouver', countryCode: 'CA' },
+  { code: 'ZRH', name: 'Zurich', countryCode: 'CH' }
+];
+
+// User-extensible cities (persisted to localStorage)
+let userCities = []; // { code, name, countryCode }
 
 // City color palette - warm, distinctive travel colors
 const CITY_COLORS = [
@@ -98,30 +206,139 @@ function getRandomCityColor() {
   return palette[randomIndex];
 }
 
-// Add or update a city
-function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '') {
+// Add or update a city with ISO/ICAO standards
+function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cityCode = '', countryCode = '') {
   if (!cityName) return null;
 
+  const normalizedName = cityName.trim();
+
   // Check if city already exists
-  const existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase().trim());
+  const existing = citiesData.find(c => c.name.toLowerCase() === normalizedName.toLowerCase());
   if (existing) {
     // Update existing city
     if (country) existing.country = country;
+    if (countryCode) existing.countryCode = countryCode;
+    if (cityCode) existing.code = cityCode;
     if (dateFrom && dateFrom < existing.dateFrom) existing.dateFrom = dateFrom;
     if (dateTo && dateTo > existing.dateTo) existing.dateTo = dateTo;
     return existing;
   }
 
-  // Create new city with random color
+  // Look up code from built-in database or user cities
+  let code = cityCode;
+  let cCode = countryCode;
+
+  if (!code) {
+    const dbMatch = [...CITY_DATABASE, ...userCities].find(c =>
+      c.name.toLowerCase() === normalizedName.toLowerCase()
+    );
+    if (dbMatch) {
+      code = dbMatch.code;
+      cCode = dbMatch.countryCode;
+    }
+  }
+
+  // Infer country code from built-in country database
+  if (!cCode && country) {
+    const countryMatch = COUNTRY_DATA.find(c =>
+      c.name.toLowerCase() === country.toLowerCase() ||
+      c.code.toLowerCase() === country.toLowerCase()
+    );
+    if (countryMatch) cCode = countryMatch.code;
+  }
+
+  // Create new city with ISO structure
   const newCity = {
-    id: 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-    name: cityName,
+    id: 'city-' + normalizedName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+    name: normalizedName,
+    code: code || '',
+    countryCode: cCode || '',
     country: country,
     dateFrom: dateFrom,
     dateTo: dateTo,
     colour: getRandomCityColor()
   };
   citiesData.push(newCity);
+  return newCity;
+}
+
+// Create datalists for city and country selection
+function createCityDatalists() {
+  // Remove existing datalists if present
+  ['cities-datalist', 'countries-datalist'].forEach(id => {
+    const existing = document.getElementById(id);
+    if (existing) existing.remove();
+  });
+
+  // Create combined city datalist (built-in + user cities)
+  const citiesList = document.createElement('datalist');
+  citiesList.id = 'cities-datalist';
+
+  const combinedCities = [...CITY_DATABASE, ...userCities];
+  // Remove duplicates by name
+  const uniqueCities = combinedCities.filter((c, i, arr) =>
+    arr.findIndex(t => t.name.toLowerCase() === c.name.toLowerCase()) === i
+  );
+
+  uniqueCities
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .forEach(city => {
+      const option = document.createElement('option');
+      option.value = city.name;
+      option.textContent = `${city.code} - ${getCountryName(city.countryCode)}`;
+      citiesList.appendChild(option);
+    });
+
+  // Create country datalist
+  const countriesList = document.createElement('datalist');
+  countriesList.id = 'countries-datalist';
+  COUNTRY_DATA.forEach(country => {
+    const option = document.createElement('option');
+    option.value = country.name;
+    option.textContent = `${country.flag} ${country.code}`;
+    countriesList.appendChild(option);
+  });
+
+  document.body.appendChild(citiesList);
+  document.body.appendChild(countriesList);
+}
+
+// Get country name by code
+function getCountryName(countryCode) {
+  if (!countryCode) return '';
+  const country = COUNTRY_DATA.find(c => c.code === countryCode.toUpperCase());
+  return country ? country.name : countryCode;
+}
+
+// Get country flag by code
+function getCountryFlag(countryCode) {
+  if (!countryCode) return '';
+  const country = COUNTRY_DATA.find(c => c.code === countryCode.toUpperCase());
+  return country ? country.flag : '';
+}
+
+// Add a user-defined city to the extensible database
+function addUserCity(cityCode, cityName, countryCode) {
+  if (!cityCode || !cityName) return null;
+
+  // Check for duplicate code or name
+  const existing = userCities.find(c =>
+    c.code.toUpperCase() === cityCode.toUpperCase() ||
+    c.name.toLowerCase() === cityName.toLowerCase()
+  );
+  if (existing) return existing;
+
+  const newCity = {
+    code: cityCode.toUpperCase(),
+    name: cityName.trim(),
+    countryCode: countryCode.toUpperCase()
+  };
+  userCities.push(newCity);
+  localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
+
+  // Refresh datalists
+  createCityDatalists();
+
   return newCity;
 }
 
@@ -366,9 +583,66 @@ function setCityCountry(cityId, country) {
 function openCityDialog() {
   const modal = document.getElementById('city-modal');
   if (modal) {
+    createCityDatalists(); // Ensure datalists exist
     populateCityList();
+    populateCountrySelect();
+    setupCityAutocomplete();
     modal.style.display = 'flex';
   }
+}
+
+// Setup autocomplete behavior for city name input
+function setupCityAutocomplete() {
+  const nameInput = document.getElementById('newCityName');
+  const countrySelect = document.getElementById('newCityCountrySelect');
+  const codeDisplay = document.getElementById('cityCodeDisplay');
+  const codeInfo = document.getElementById('cityCodeInfo');
+
+  if (!nameInput) return;
+
+  nameInput.addEventListener('input', function() {
+    const value = this.value.trim();
+    if (!value) {
+      if (codeDisplay) codeDisplay.style.display = 'none';
+      return;
+    }
+
+    // Look up city in databases
+    const match = [...CITY_DATABASE, ...userCities].find(c =>
+      c.name.toLowerCase() === value.toLowerCase()
+    );
+
+    if (match && codeDisplay && codeInfo) {
+      const country = COUNTRY_DATA.find(c => c.code === match.countryCode);
+      codeInfo.textContent = `${match.code} — ${getCountryName(match.countryCode)}`;
+      codeDisplay.style.display = 'block';
+
+      // Auto-select country if not already selected
+      if (countrySelect && !countrySelect.value) {
+        countrySelect.value = match.countryCode;
+      }
+    } else if (codeDisplay) {
+      codeDisplay.style.display = 'none';
+    }
+  });
+
+  // Also handle selection from datalist
+  nameInput.addEventListener('change', function() {
+    const value = this.value.trim();
+    if (!value) return;
+
+    const match = [...CITY_DATABASE, ...userCities].find(c =>
+      c.name.toLowerCase() === value.toLowerCase()
+    );
+
+    if (match && countrySelect) {
+      countrySelect.value = match.countryCode;
+      if (codeDisplay && codeInfo) {
+        codeInfo.textContent = `${match.code} — ${getCountryName(match.countryCode)}`;
+        codeDisplay.style.display = 'block';
+      }
+    }
+  });
 }
 
 function closeCityDialog() {
@@ -389,38 +663,61 @@ function populateCityList() {
     return;
   }
 
-  citiesData.forEach(city => {
+  // Sort cities alphabetically by name
+  const sortedCities = [...citiesData].sort((a, b) => a.name.localeCompare(b.name));
+
+  sortedCities.forEach(city => {
     const flag = getCityFlag(city.name);
+    const countryFlag = city.countryCode ? getCountryFlag(city.countryCode) : '';
     const isHome = isHomeCity(city.name);
     const homeBadge = isHome ? ' <span style="background: #27AE60; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">🏠 Home</span>' : '';
 
     // Get city color from matching leg, or use city's stored color
     let cityColor = city.colour || '#2C3E50';
     if (!city.colour) {
-      // Find matching leg for color
       const matchingLeg = appData.find(leg => leg.days.some(day => day.to === city.name || day.from === city.name));
       if (matchingLeg) {
         cityColor = matchingLeg.colour || '#2C3E50';
       }
     }
 
+    // Build code display
+    const codeDisplay = city.code ? `<span class="city-code">${city.code}</span>` : '';
+    const countryLabel = city.countryCode ? `${countryFlag} ${city.countryCode}` : (city.country || '—');
+
     const row = document.createElement('div');
-    row.style.cssText = `display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; border-bottom: 1px solid #eee; border-left: 4px solid ${cityColor};`;
+    row.className = 'city-list-item';
+    row.style.cssText = `display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid #eee; border-left: 4px solid ${cityColor}; background: white;`;
     row.innerHTML = `
       <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
         <span style="font-size: 1.5rem;">${flag}</span>
-        <div style="flex: 1;">
-          <div style="font-weight: 500;">${city.name}${homeBadge}</div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 4px;">
-            <input type="text" value="${city.country}" placeholder="Country"
-              onchange="updateCityCountry('${city.id}', this.value)"
-              style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; width: 120px;">
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-weight: 500; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            ${city.name}${homeBadge}
+            ${codeDisplay}
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 6px;">
+            <select class="country-select" data-city-id="${city.id}"
+              style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; min-width: 140px;">
+              <option value="">Select country...</option>
+              ${COUNTRY_DATA.map(c => `<option value="${c.code}" ${c.code === city.countryCode ? 'selected' : ''}>${c.flag} ${c.name}</option>`).join('')}
+            </select>
+            ${city.code ? `<span style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #666; background: #f5f5f5; padding: 2px 6px; border-radius: 4px;">IATA: ${city.code}</span>` : ''}
           </div>
         </div>
       </div>
       <button class="del-btn" title="Delete City" onclick="deleteCityFromDialog('${city.id}')">×</button>
     `;
     container.appendChild(row);
+  });
+
+  // Attach change handlers to country selects
+  container.querySelectorAll('.country-select').forEach(select => {
+    select.addEventListener('change', function() {
+      const cityId = this.dataset.cityId;
+      const countryCode = this.value;
+      updateCityCountryCode(cityId, countryCode);
+    });
   });
 }
 
@@ -454,10 +751,29 @@ function deleteCityFromDialog(cityId) {
 
 function addNewCityFromDialog() {
   const nameInput = document.getElementById('newCityName');
+  const countrySelect = document.getElementById('newCityCountrySelect');
   const countryInput = document.getElementById('newCityCountry');
+  const codeInfo = document.getElementById('cityCodeInfo');
 
   const name = nameInput?.value?.trim();
-  const country = countryInput?.value?.trim();
+  let countryCode = countrySelect?.value;
+  let countryName = '';
+
+  // Fallback to manual input if no selection
+  if (!countryCode && countryInput?.value?.trim()) {
+    const match = COUNTRY_DATA.find(c =>
+      c.name.toLowerCase() === countryInput.value.trim().toLowerCase()
+    );
+    if (match) {
+      countryCode = match.code;
+      countryName = match.name;
+    } else {
+      countryName = countryInput.value.trim();
+    }
+  } else if (countryCode) {
+    const match = COUNTRY_DATA.find(c => c.code === countryCode);
+    countryName = match ? match.name : '';
+  }
 
   if (!name) {
     alert('Please enter a city name.');
@@ -471,16 +787,72 @@ function addNewCityFromDialog() {
     return;
   }
 
-  const newCity = addOrUpdateCity(name, country);
+  // Look up city code from databases
+  let cityCode = '';
+  const dbMatch = [...CITY_DATABASE, ...userCities].find(c =>
+    c.name.toLowerCase() === name.toLowerCase()
+  );
+  if (dbMatch) {
+    cityCode = dbMatch.code;
+    // Verify country matches
+    if (!countryCode && dbMatch.countryCode) {
+      countryCode = dbMatch.countryCode;
+      const countryMatch = COUNTRY_DATA.find(c => c.code === countryCode);
+      countryName = countryMatch ? countryMatch.name : '';
+    }
+  }
+
+  // If city not in database and it looks like an IATA code (3 uppercase letters), add to user cities
+  if (!cityCode && name.length === 3 && /^[A-Z]{3}$/.test(name)) {
+    cityCode = name;
+    if (name && countryCode) {
+      addUserCity(cityCode, name, countryCode);
+    }
+  }
+
+  const newCity = addOrUpdateCity(name, countryName, '', '', cityCode, countryCode);
   if (newCity) {
     saveData(false);
     nameInput.value = '';
-    countryInput.value = '';
+    if (countryInput) countryInput.value = '';
+    if (countrySelect) countrySelect.value = '';
+    if (codeInfo) codeInfo.parentElement.style.display = 'none';
     populateCityList();
     if (typeof buildCityNav === 'function') {
       buildCityNav();
     }
   }
+}
+
+// Update city country code from dropdown
+function updateCityCountryCode(cityId, countryCode) {
+  const city = citiesData.find(c => c.id === cityId);
+  if (!city) return;
+
+  city.countryCode = countryCode;
+  const countryMatch = COUNTRY_DATA.find(c => c.code === countryCode);
+  if (countryMatch) {
+    city.country = countryMatch.name;
+  }
+
+  saveData(false);
+  populateCityList();
+  if (typeof buildCityNav === 'function') {
+    buildCityNav();
+  }
+}
+
+// Populate country dropdown in the add city form
+function populateCountrySelect() {
+  const select = document.getElementById('newCityCountrySelect');
+  if (!select) return;
+
+  select.innerHTML = '<option value="">Select country...</option>' +
+    COUNTRY_DATA
+      .filter(c => c.code !== 'ZZ')
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(c => `<option value="${c.code}">${c.flag} ${c.name}</option>`)
+      .join('');
 }
 
 // Migrate leg-level entities to include cityId
@@ -671,11 +1043,39 @@ function initData() {
   if (savedCities) {
     try {
       citiesData = JSON.parse(savedCities);
+      // Migrate existing cities to include code if missing
+      citiesData.forEach(city => {
+        if (!city.code) {
+          const match = CITY_DATABASE.find(c => c.name.toLowerCase() === city.name.toLowerCase());
+          city.code = match ? match.code : '';
+        }
+        if (!city.countryCode && city.country) {
+          const countryMatch = COUNTRY_DATA.find(c =>
+            c.name.toLowerCase() === city.country.toLowerCase()
+          );
+          city.countryCode = countryMatch ? countryMatch.code : '';
+        }
+      });
+      saveData(false);
     } catch (e) {
       console.error('[Cities] Failed to parse saved cities:', e);
       citiesData = [];
     }
   }
+
+  // Load user-extensible city database
+  const savedUserCities = localStorage.getItem('travelApp_userCities_v1');
+  if (savedUserCities) {
+    try {
+      userCities = JSON.parse(savedUserCities);
+    } catch (e) {
+      console.error('[Cities] Failed to parse user cities:', e);
+      userCities = [];
+    }
+  }
+
+  // Create datalists for city and country selection
+  createCityDatalists();
 
   const savedMeta = localStorage.getItem('travelApp_meta_template');
   if (savedMeta) { titleData = JSON.parse(savedMeta); }
@@ -958,3 +1358,10 @@ window.resetData = resetData;
 window.importJSON = importJSON;
 window.addOrUpdateCity = addOrUpdateCity;
 window.saveData = saveData;
+window.createCityDatalists = createCityDatalists;
+window.getCountryName = getCountryName;
+window.getCountryFlag = getCountryFlag;
+window.addUserCity = addUserCity;
+window.updateCityCountryCode = updateCityCountryCode;
+window.populateCountrySelect = populateCountrySelect;
+window.setupCityAutocomplete = setupCityAutocomplete;

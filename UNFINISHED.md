@@ -1,29 +1,28 @@
 # UNFINISHED.md
 
 ## 🔄 Active
-none
+- **Item/sub-task:** 8b
+- **Branch:** item-8b-city-iso-standards
+- **Last commit:** none
+- **What was done:** Complete city dialog overhaul with ISO/ICAO standards:
+  - Added COUNTRY_DATA array with 43 countries (ISO codes + flags)
+  - Added CITY_DATABASE with 60 major cities (IATA codes like BNE, CDG, JFK)
+  - Added userCities for user-extensible city database (persisted to localStorage)
+  - Updated addOrUpdateCity() to handle {code, name, countryCode} structure
+  - City list now shows country dropdowns and IATA codes with flags
+  - Auto-populate country when known city is entered
+  - Auto-detect IATA codes for new cities
+  - Migration in initData() to add codes to existing cities
+- **Next step:** Commit and push for review
+- **Files touched:** js/data.js, index.html, style.css
+- **Known blockers / risks:** none
 
 ## 👀 Awaiting Review / Merge
 none
 
-## ✅ Recently Completed (pre-merge summary)
-
-### Item 7d: Fix Guide Button
-**File:** `js/guide.js`
-- Added missing `window.*` exports for guide functions: `buildGuideSteps`, `toggleGuideStep`, `markStepComplete`, `resetTutorialSeen`, `startTutorial`, `skipTutorial`, `nextTutorialStep`, `prevTutorialStep`
-- Guide button now opens the interactive tutorial dialog
-
-### Item 7e: DEFAULT_LEAVE_HOME on Empty
-**File:** `js/data.js`
-- Extended logic to apply defaults when saved array is empty (not just when localStorage key is missing)
-- Users who delete all tasks will now get defaults back on reload
-
-### Item 7f: Packing Guides
-**Files:** `js/tabs.js`
-- Restored working buildPackingTab() from backup after corruption during edit
-- Uses collapsible guide sections (<details>) with packing list grid below
-- All three guides functional: Pre-Departure, Sink Washing, Capsule Wardrobe
+## ✅ Recently Completed
+none
 
 ---
 
-*Last updated: 2026-04-28 — all items merged and verified per VERIFIED.md*
+*Last updated: 2026-04-28 — Item 8b ready for commit*

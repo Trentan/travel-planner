@@ -317,8 +317,16 @@
         <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
           <h4 style="margin-bottom: 1rem;">➕ Add New City</h4>
           <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <input type="text" id="newCityName" list="major-cities" placeholder="City name (e.g., Bangkok)" ...>
-            <input type="text" id="newCityCountry" list="iso-countries" placeholder="Country (e.g., Thailand)" ...>
+            <input type="text" id="newCityName" list="cities-datalist" placeholder="City name (e.g., Bangkok)" style="padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem;">
+            <div style="display: flex; gap: 0.5rem;">
+              <select id="newCityCountrySelect" style="flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem;">
+                <option value="">Select country...</option>
+              </select>
+              <input type="text" id="newCityCountry" list="countries-datalist" placeholder="Or type country..." style="flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem;">
+            </div>
+            <div id="cityCodeDisplay" style="display: none; background: #f5f5f5; padding: 8px 12px; border-radius: 4px; font-size: 0.85rem; color: #666;">
+              <span id="cityCodeInfo"></span>
+            </div>
             <button class="action-btn" onclick="addNewCityFromDialog()">Add City</button>
           </div>
         </div>

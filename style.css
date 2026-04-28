@@ -1201,6 +1201,38 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   transform: rotate(180deg);
 }
 
+/* CITY DIALOG STYLES (Item 8b) */
+.city-list-item {
+  transition: background 0.2s;
+}
+
+.city-list-item:hover {
+  background: #fafafa;
+}
+
+.city-list-item .city-code {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: #666;
+  background: #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.city-list-item .country-select {
+  cursor: pointer;
+}
+
+.city-list-item .country-select option {
+  padding: 4px;
+}
+
+/* City code display in add form */
+#cityCodeDisplay {
+  border-left: 3px solid #27AE60;
+}
+
 /* Journey Card Details */
 .journey-card-details {
   display: none;
