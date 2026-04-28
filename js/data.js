@@ -658,8 +658,14 @@ function initData() {
   else { packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING)); }
 
   const savedLeaveHome = localStorage.getItem('travelApp_leavehome_v3');
-  if (savedLeaveHome) { leaveHomeData = JSON.parse(savedLeaveHome); }
-  else { leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME)); }
+  if (savedLeaveHome) {
+    leaveHomeData = JSON.parse(savedLeaveHome);
+    if (!leaveHomeData || leaveHomeData.length === 0) {
+      leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
+    }
+  } else {
+    leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
+  }
 
   const savedCities = localStorage.getItem('travelApp_cities_v1');
   if (savedCities) {
