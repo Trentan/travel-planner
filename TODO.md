@@ -76,7 +76,7 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ## Active
 
-### Item 5: Convert Accommodation
+### Item 5: Convert Accommodation ✅ COMPLETED
 **Status:** In progress — 5f complete
 **Last completed:** 5f
 **Next:** `item-5g`
@@ -94,7 +94,7 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ---
 
-### Item 6: Packing fixes
+### Item 6: Packing fixes ✅ COMPLETED
 **Status:** Complete - all sub-tasks done
 **Status:** Not started
 **Last completed:** —
@@ -107,14 +107,16 @@ Read this file at the start of every session. Update status blocks and checkboxe
 
 ---
 
-### Item 7: Interactive How-To Guide
-**Status:** Not started
-**Last completed:** —
-**Next:** `item-7a`
+### ~~Item 7: Interactive How-To Guide~~ ✅ COMPLETED
+**Status:** Completed — branch `item-7a`
+**Completed:** 2026-04-28
 
-- [ ] a) The interactive guide on how to use the app is not working — fix and improve it to reflect the latest changes
-- [ ] b) The default json example for the app can be updated for all the changes and the logic improved
-- [ ] c) The AI script generator can be updated now, include the cities options as a multi add option and all the other functionalities. Make sure it assignKs the city when generating the content for each thing, eg tips, food quests, suggested activities.
+- [x] a) The interactive guide on how to use the app is not working — fix and improve it to reflect the latest changes
+- [x] b) The default json example for the app can be updated for all the changes and the logic improved
+- [x] c) The AI script generator can be updated now, include the cities options as a multi add option and all the other functionalities. Make sure it assigns the city when generating the content for each thing, eg tips, food quests, suggested activities.
+- [x] d) The interactive guide is not working - the button press does nothing
+- [x] e) For before leaving home, this default list should be applied DEFAULT_LEAVE_HOME - if the content is blank or on initial load
+- [x] f) The collapsibles of "Before leaving home", "hotel sink washing", "Example capsule" look strange, there could be a better layout/idea (kind of hidden until needed, there might be better design options)
 
 ---
 
