@@ -859,6 +859,91 @@ function populateCountrySelect() {
       .join('');
 }
 
+// Migration: Convert old city format to new ISO/ICAO/IATA standard format
+// Old: { id, name, country, dateFrom, dateTo }
+// New: { id, name, code, countryCode, country, dateFrom, dateTo, colour }
+function migrateCitiesToISOFormat() {
+  if (!citiesData || !Array.isArray(citiesData)) return;
+
+  const citiesNeedingMigration = citiesData.filter(city => !city.code || !city.countryCode);
+  if (citiesNeedingMigration.length === 0) return;
+
+  console.log(`[Migration] Converting ${citiesNeedingMigration.length} cities to ISO format...`);
+
+  citiesNeedingMigration.forEach(city => {
+    const normalizedName = city.name?.trim();
+    if (!normalizedName) return;
+
+    // Look up city in built-in database
+    const dbMatch = CITY_DATABASE.find(c =>
+      c.name.toLowerCase() === normalizedName.toLowerCase()
+    );
+
+    if (dbMatch) {
+      city.code = dbMatch.code;
+      city.countryCode = dbMatch.countryCode;
+      const countryMatch = COUNTRY_DATA.find(c => c.code === dbMatch.countryCode);
+      if (countryMatch) {
+        city.country = countryMatch.name;
+      }
+    } else {
+      // For cities not in database, try to infer country from city name or existing country field
+      const cityNameLower = normalizedName.toLowerCase().replace(/\s+/g, '');
+      const inferredCode = CITY_TO_CODE[cityNameLower];
+
+      if (inferredCode) {
+        const countryMatch = COUNTRY_DATA.find(c =>
+          c.code.toLowerCase() === inferredCode.toLowerCase()
+        );
+        if (countryMatch) {
+          city.countryCode = countryMatch.code;
+          city.country = countryMatch.name;
+          // Generate a code from city name (first 3 letters or first letters of words)
+          const words = normalizedName.split(/\s+/);
+          if (words.length === 1) {
+            city.code = words[0].substring(0, 3).toUpperCase();
+          } else {
+            city.code = words.map(w => w[0]).join('').toUpperCase();
+            if (city.code.length < 3) {
+              city.code = normalizedName.substring(0, 3).toUpperCase();
+            }
+          }
+        }
+      }
+
+      // If we have a country string but no code, try to match it
+      if (!city.countryCode && city.country) {
+        const countryMatch = COUNTRY_DATA.find(c =>
+          c.name.toLowerCase() === city.country.toLowerCase()
+        );
+        if (countryMatch) {
+          city.countryCode = countryMatch.code;
+        }
+      }
+    }
+
+    // Assign a color if missing
+    if (!city.colour) {
+      city.colour = getRandomCityColor();
+    }
+
+    console.log(`[Migration] City "${city.name}" → code: ${city.code || 'none'}, country: ${city.country || 'none'} (${city.countryCode || 'none'})`);
+  });
+
+  // Update any cities that have custom codes in userCities
+  userCities.forEach(userCity => {
+    const existingCity = citiesData.find(c =>
+      c.name.toLowerCase() === userCity.name.toLowerCase()
+    );
+    if (existingCity) {
+      existingCity.code = userCity.code;
+      existingCity.countryCode = userCity.countryCode;
+    }
+  });
+
+  console.log('[Migration] City ISO format migration complete');
+}
+
 // Migrate leg-level entities to include cityId
 function migrateLegCityIds() {
   appData.forEach(leg => {
@@ -1099,6 +1184,9 @@ function initData() {
     citiesData = extractCitiesFromItinerary();
     console.log(`[Cities] Auto-extracted ${citiesData.length} cities from itinerary`);
   }
+
+  // Migrate cities to ISO format (8b-v)
+  migrateCitiesToISOFormat();
 
   // Migrate journeys to link city IDs (if migration function exists)
   if (typeof migrateJourneyCityIds === 'function') {
