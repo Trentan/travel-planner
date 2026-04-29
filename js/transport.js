@@ -124,7 +124,7 @@ function createJourneyFromTransportItem(item, legId, dayDate, fromLoc, toLoc) {
   const journey = {
     id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
     journeyId: journeyId,
-    journeyName: fromLoc + ' → ' + toLoc,
+    journeyName: fromLoc + ' to ' + toLoc,
     legId: legId,
     dayDate: dayDate,
     fromLocation: fromLoc,
@@ -164,6 +164,46 @@ function detectTransportType(text) {
   if (t.includes('🚲') || t.includes('bike') || t.includes('bicycle')) return 'bike';
   if (t.includes('🚶') || t.includes('walk')) return 'walk';
   return 'other';
+}
+
+// Build journey name with via notation for multi-leg journeys
+// e.g., "Zurich to Bangkok (via London)" or "Brisbane to Vienna (via Taipei, Bangkok)"
+function buildJourneyName(segments) {
+  if (!segments || segments.length === 0) return '';
+  if (segments.length === 1) {
+    return `${segments[0].fromLocation} to ${segments[0].toLocation}`;
+  }
+
+  const startCity = segments[0].fromLocation;
+  const endCity = segments[segments.length - 1].toLocation;
+
+  // Collect intermediate cities (excluding start and end)
+  const intermediateCities = [];
+  segments.forEach((seg, index) => {
+    if (index === 0) {
+      // First segment: add toCity if it's not the final destination
+      if (seg.toLocation !== endCity) {
+        intermediateCities.push(seg.toLocation);
+      }
+    } else if (index < segments.length - 1) {
+      // Middle segments: add toCity
+      if (seg.toLocation !== endCity) {
+        intermediateCities.push(seg.toLocation);
+      }
+    }
+  });
+
+  // Remove duplicates while preserving order
+  const uniqueViaCities = intermediateCities.filter((city, idx, arr) =>
+    arr.indexOf(city) === idx
+  );
+
+  if (uniqueViaCities.length === 0) {
+    return `${startCity} to ${endCity}`;
+  }
+
+  const viaText = uniqueViaCities.join(', ');
+  return `${startCity} to ${endCity} (via ${viaText})`;
 }
 
 // Get journeys for a specific day (for itinerary view)
@@ -851,7 +891,7 @@ function saveJourneyFromModal() {
       return;
     }
 
-    let journeyName = _pendingJourneyName || buildRouteChain(finalSegments);
+    const journeyName = buildJourneyName(finalSegments);
 
     const isMultiLeg = finalSegments.length > 1;
 
@@ -892,6 +932,7 @@ function rebuildCurrentView() {
 window.getLocationDisplayWithCode = getLocationDisplayWithCode;
 window.getLocationCodeDisplay = getLocationCodeDisplay;
 window.buildRouteChainWithCodes = buildRouteChainWithCodes;
+window.buildJourneyName = buildJourneyName;
 window.openAddJourneyModal = openAddJourneyModal;
 window.closeJourneyModal = closeJourneyModal;
 window.saveJourneyFromModal = saveJourneyFromModal;
