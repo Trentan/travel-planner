@@ -1415,13 +1415,29 @@ function importJSON(event) {
         titleData = importedData.meta;
       }
 
-      // Import journeys if present
-      if (importedData.journeys && Array.isArray(importedData.journeys)) {
-        localStorage.setItem('travelApp_journeys_v1', JSON.stringify(importedData.journeys));
-        console.log(`[Import] Saved ${importedData.journeys.length} journeys to localStorage`);
-      } else {
-        console.log('[Import] No journeys found in imported data');
-      }
+  // Import journeys if present - also create cities from journey references
+  if (importedData.journeys && Array.isArray(importedData.journeys)) {
+    // Extract cities from journey data that might not be in itinerary days
+    importedData.journeys.forEach(journey => {
+      [journey.fromLocation, journey.toLocation].forEach(cityName => {
+        if (cityName && cityName !== 'Home' && cityName !== 'In transit' && cityName !== 'TBC' && cityName !== '') {
+          const cityId = 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+          const existing = citiesData.find(c => c.id === cityId || c.name.toLowerCase() === cityName.toLowerCase());
+          if (!existing) {
+            addOrUpdateCity(cityName);
+            const newCity = citiesData.find(c => c.name === cityName);
+            if (newCity) { newCity.id = cityId; }
+            console.log("[Import] Created city from journey: " + cityName);
+          }
+        }
+      });
+    });
+
+    localStorage.setItem("travelApp_journeys_v1", JSON.stringify(importedData.journeys));
+    console.log("[Import] Saved " + importedData.journeys.length + " journeys to localStorage");
+  } else {
+    console.log("[Import] No journeys found in imported data");
+  }
 
       if (importedData.stays && Array.isArray(importedData.stays)) {
         stays = importedData.stays;
