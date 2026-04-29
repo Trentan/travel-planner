@@ -35,6 +35,7 @@ const COUNTRY_DATA = [
   { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
   { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
   { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
+  { code: 'SK', name: 'Slovakia', flag: '🇸🇰' },
   { code: 'ES', name: 'Spain', flag: '🇪🇸' },
   { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
   { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
@@ -45,6 +46,90 @@ const COUNTRY_DATA = [
   { code: 'US', name: 'United States', flag: '🇺🇸' },
   { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
   { code: 'ZZ', name: 'Other', flag: '🌐' }
+];
+
+// Extended city database with IATA codes for Eastern Europe and additional destinations
+// Users can still add their own cities via the city dialog
+const EXTENDED_CITY_DATABASE = [
+{ code: 'BTS', name: 'Bratislava', countryCode: 'SK' },
+{ code: 'SKP', name: 'Skopje', countryCode: 'MK' },
+{ code: 'TIA', name: 'Tirana', countryCode: 'AL' },
+{ code: 'TGD', name: 'Podgorica', countryCode: 'ME' },
+{ code: 'PRN', name: 'Pristina', countryCode: 'XK' },
+{ code: 'SJJ', name: 'Sarajevo', countryCode: 'BA' },
+{ code: 'SPU', name: 'Split', countryCode: 'HR' },
+{ code: 'DBV', name: 'Dubrovnik', countryCode: 'HR' },
+{ code: 'ZAG', name: 'Zagreb', countryCode: 'HR' },
+{ code: 'LJU', name: 'Ljubljana', countryCode: 'SI' },
+{ code: 'OTP', name: 'Bucharest', countryCode: 'RO' },
+{ code: 'CLJ', name: 'Cluj-Napoca', countryCode: 'RO' },
+{ code: 'TSR', name: 'Timisoara', countryCode: 'RO' },
+{ code: 'SOF', name: 'Sofia', countryCode: 'BG' },
+{ code: 'VAR', name: 'Varna', countryCode: 'BG' },
+{ code: 'TLL', name: 'Tallinn', countryCode: 'EE' },
+{ code: 'RIX', name: 'Riga', countryCode: 'LV' },
+{ code: 'VNO', name: 'Vilnius', countryCode: 'LT' },
+{ code: 'KRK', name: 'Krakow', countryCode: 'PL' },
+{ code: 'POZ', name: 'Poznan', countryCode: 'PL' },
+{ code: 'WAW', name: 'Warsaw', countryCode: 'PL' },
+{ code: 'BEG', name: 'Belgrade', countryCode: 'RS' },
+{ code: 'SKG', name: 'Thessaloniki', countryCode: 'GR' },
+{ code: 'HER', name: 'Heraklion', countryCode: 'GR' },
+{ code: 'SIP', name: 'Istanbul Sabiha', countryCode: 'TR' },
+{ code: 'SAW', name: 'Istanbul Sabiha', countryCode: 'TR' },
+{ code: 'IZM', name: 'Izmir', countryCode: 'TR' },
+{ code: 'HTY', name: 'Antalya', countryCode: 'TR' },
+{ code: 'BOJ', name: 'Burgas', countryCode: 'BG' },
+{ code: 'TBS', name: 'Tbilisi', countryCode: 'GE' },
+{ code: 'EVN', name: 'Yerevan', countryCode: 'AM' },
+{ code: 'KIV', name: 'Chisinau', countryCode: 'MD' },
+{ code: 'MOW', name: 'Moscow', countryCode: 'RU' },
+{ code: 'LED', name: 'St Petersburg', countryCode: 'RU' },
+{ code: 'IEV', name: 'Kyiv', countryCode: 'UA' },
+{ code: 'ODS', name: 'Odessa', countryCode: 'UA' },
+{ code: 'CAI', name: 'Cairo', countryCode: 'EG' },
+{ code: 'HRG', name: 'Hurghada', countryCode: 'EG' },
+{ code: 'SSH', name: 'Sharm El-Sheikh', countryCode: 'EG' },
+{ code: 'AMM', name: 'Amman', countryCode: 'JO' },
+{ code: 'AQJ', name: 'Aqaba', countryCode: 'JO' },
+{ code: 'TLV', name: 'Tel Aviv', countryCode: 'IL' },
+{ code: 'BEY', name: 'Beirut', countryCode: 'LB' },
+{ code: 'BAH', name: 'Manama', countryCode: 'BH' },
+{ code: 'DOH', name: 'Doha', countryCode: 'QA' },
+{ code: 'KWI', name: 'Kuwait City', countryCode: 'KW' },
+{ code: 'MCT', name: 'Muscat', countryCode: 'OM' },
+{ code: 'DMM', name: 'Dammam', countryCode: 'SA' },
+{ code: 'JED', name: 'Jeddah', countryCode: 'SA' },
+{ code: 'RUH', name: 'Riyadh', countryCode: 'SA' },
+{ code: 'ALG', name: 'Algiers', countryCode: 'DZ' },
+{ code: 'TUN', name: 'Tunis', countryCode: 'TN' },
+{ code: 'CMN', name: 'Casablanca', countryCode: 'MA' },
+{ code: 'RAK', name: 'Marrakech', countryCode: 'MA' },
+{ code: 'FIH', name: 'Kinshasa', countryCode: 'CD' },
+{ code: 'LOS', name: 'Lagos', countryCode: 'NG' },
+{ code: 'NBO', name: 'Nairobi', countryCode: 'KE' },
+{ code: 'JNB', name: 'Johannesburg', countryCode: 'ZA' },
+{ code: 'CPT', name: 'Cape Town', countryCode: 'ZA' },
+{ code: 'DPS', name: 'Denpasar Bali', countryCode: 'ID' },
+{ code: 'CGK', name: 'Jakarta', countryCode: 'ID' },
+{ code: 'SUB', name: 'Surabaya', countryCode: 'ID' },
+{ code: 'RGN', name: 'Yangon', countryCode: 'MM' },
+{ code: 'PNH', name: 'Phnom Penh', countryCode: 'KH' },
+{ code: 'REP', name: 'Siem Reap', countryCode: 'KH' },
+{ code: 'VTE', name: 'Vientiane', countryCode: 'LA' },
+{ code: 'LPQ', name: 'Luang Prabang', countryCode: 'LA' },
+{ code: 'HAN', name: 'Hanoi', countryCode: 'VN' },
+{ code: 'SGN', name: 'Ho Chi Minh City', countryCode: 'VN' },
+{ code: 'DAD', name: 'Da Nang', countryCode: 'VN' },
+{ code: 'CXR', name: 'Nha Trang', countryCode: 'VN' },
+{ code: 'CEB', name: 'Cebu', countryCode: 'PH' },
+{ code: 'MNL', name: 'Manila', countryCode: 'PH' },
+{ code: 'DMK', name: 'Bangkok Don Mueang', countryCode: 'TH' },
+{ code: 'CNX', name: 'Chiang Mai', countryCode: 'TH' },
+{ code: 'KBV', name: 'Krabi', countryCode: 'TH' },
+{ code: 'USM', name: 'Koh Samui', countryCode: 'TH' },
+{ code: 'IST', name: 'Istanbul', countryCode: 'TR' },
+{ code: 'TPE', name: 'Taipei', countryCode: 'TW' },
 ];
 
 // Built-in city database with IATA codes
@@ -107,6 +192,9 @@ const CITY_DATABASE = [
   { code: 'YVR', name: 'Vancouver', countryCode: 'CA' },
   { code: 'ZRH', name: 'Zurich', countryCode: 'CH' }
 ];
+
+// Combine all city databases for lookups (built-in + extended + user-extensible)
+const ALL_CITIES = [...CITY_DATABASE, ...EXTENDED_CITY_DATABASE];
 
 // User-extensible cities (persisted to localStorage)
 let userCities = []; // { code, name, countryCode }
@@ -224,27 +312,50 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     return existing;
   }
 
-  // Look up code from built-in database or user cities
+  // Look up city in databases (IATA lookup) - this works even for "Other" country
   let code = cityCode;
   let cCode = countryCode;
+  let cName = country;
 
-  if (!code) {
-    const dbMatch = [...CITY_DATABASE, ...userCities].find(c =>
-      c.name.toLowerCase() === normalizedName.toLowerCase()
+  // First: look up city code from built-in database or user cities
+  const dbMatch = ALL_CITIES.find(c =>
+    c.name.toLowerCase() === normalizedName.toLowerCase()
+  );
+
+  if (dbMatch) {
+    // City found in database - use its IATA code and country
+    code = dbMatch.code;
+    cCode = dbMatch.countryCode;
+    // Look up the full country name from the country code
+    const countryMatch = COUNTRY_DATA.find(c => c.code === dbMatch.countryCode);
+    if (countryMatch) {
+      cName = countryMatch.name;
+    }
+  } else if (!code) {
+    // City not in database but cityCode provided (e.g., user entered 3-letter code)
+    // Try to match by cityCode to find country
+    const codeMatch = ALL_CITIES.find(c =>
+      c.code.toUpperCase() === cityCode.toUpperCase()
     );
-    if (dbMatch) {
-      code = dbMatch.code;
-      cCode = dbMatch.countryCode;
+    if (codeMatch) {
+      cCode = codeMatch.countryCode;
+      const countryMatch = COUNTRY_DATA.find(c => c.code === codeMatch.countryCode);
+      if (countryMatch) {
+        cName = countryMatch.name;
+      }
     }
   }
 
-  // Infer country code from built-in country database
+  // If still no country code, try to infer from the provided country name
   if (!cCode && country) {
     const countryMatch = COUNTRY_DATA.find(c =>
       c.name.toLowerCase() === country.toLowerCase() ||
       c.code.toLowerCase() === country.toLowerCase()
     );
-    if (countryMatch) cCode = countryMatch.code;
+    if (countryMatch) {
+      cCode = countryMatch.code;
+      cName = countryMatch.name;
+    }
   }
 
   // Create new city with ISO structure
@@ -253,7 +364,7 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     name: normalizedName,
     code: code || '',
     countryCode: cCode || '',
-    country: country,
+    country: cName || country,
     dateFrom: dateFrom,
     dateTo: dateTo,
     colour: getRandomCityColor()
@@ -274,7 +385,7 @@ function createCityDatalists() {
   const citiesList = document.createElement('datalist');
   citiesList.id = 'cities-datalist';
 
-  const combinedCities = [...CITY_DATABASE, ...userCities];
+  const combinedCities = [...ALL_CITIES, ...userCities];
   // Remove duplicates by name
   const uniqueCities = combinedCities.filter((c, i, arr) =>
     arr.findIndex(t => t.name.toLowerCase() === c.name.toLowerCase()) === i
@@ -608,7 +719,7 @@ function setupCityAutocomplete() {
     }
 
     // Look up city in databases
-    const match = [...CITY_DATABASE, ...userCities].find(c =>
+    const match = ALL_CITIES.find(c =>
       c.name.toLowerCase() === value.toLowerCase()
     );
 
@@ -631,7 +742,7 @@ function setupCityAutocomplete() {
     const value = this.value.trim();
     if (!value) return;
 
-    const match = [...CITY_DATABASE, ...userCities].find(c =>
+    const match = ALL_CITIES.find(c =>
       c.name.toLowerCase() === value.toLowerCase()
     );
 
@@ -793,7 +904,7 @@ function addNewCityFromDialog() {
 
   // Look up city code from databases
   let cityCode = '';
-  const dbMatch = [...CITY_DATABASE, ...userCities].find(c =>
+  const dbMatch = ALL_CITIES.find(c =>
     c.name.toLowerCase() === name.toLowerCase()
   );
   if (dbMatch) {
@@ -874,8 +985,8 @@ function migrateCitiesToISOFormat() {
     const normalizedName = city.name?.trim();
     if (!normalizedName) return;
 
-    // Look up city in built-in database
-    const dbMatch = CITY_DATABASE.find(c =>
+    // Look up city in ALL city databases (built-in + extended)
+    const dbMatch = ALL_CITIES.find(c =>
       c.name.toLowerCase() === normalizedName.toLowerCase()
     );
 
@@ -1135,7 +1246,7 @@ function initData() {
       // Migrate existing cities to include code if missing
       citiesData.forEach(city => {
         if (!city.code) {
-          const match = CITY_DATABASE.find(c => c.name.toLowerCase() === city.name.toLowerCase());
+          const match = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
           city.code = match ? match.code : '';
         }
         if (!city.countryCode && city.country) {
