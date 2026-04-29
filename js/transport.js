@@ -30,17 +30,30 @@ function getLocationCodeDisplay(locationName) {
     return locationName || '—';
   }
 
+  // First check trip cities (citiesData)
   const city = typeof citiesData !== 'undefined'
     ? citiesData.find(c => c.name === locationName)
     : null;
 
-  if (city) {
-    const code = city.code || city.name.substring(0, 3).toUpperCase();
+  if (city && city.code) {
     const countryFlag = city.countryCode ? getCountryFlag(city.countryCode) : '';
     const tooltip = `${city.name}${city.country ? ', ' + city.country : ''}${countryFlag ? ' ' + countryFlag : ''}`;
-    return `<span class="city-code-compact" title="${tooltip}">${code}</span>`;
+    return `<span class="city-code-compact" title="${tooltip}">${city.code}</span>`;
   }
 
+  // Fall back to CITY_DATABASE lookup (for transit cities like London)
+  const dbCity = typeof CITY_DATABASE !== 'undefined'
+    ? CITY_DATABASE.find(c => c.name.toLowerCase() === locationName.toLowerCase())
+    : null;
+
+  if (dbCity) {
+    const countryFlag = dbCity.countryCode ? getCountryFlag(dbCity.countryCode) : '';
+    const countryName = typeof getCountryName === 'function' ? getCountryName(dbCity.countryCode) : dbCity.countryCode;
+    const tooltip = `${dbCity.name}, ${countryName}${countryFlag ? ' ' + countryFlag : ''}`;
+    return `<span class="city-code-compact" title="${tooltip}">${dbCity.code}</span>`;
+  }
+
+  // Last resort: generate 3-letter code
   return locationName.substring(0, 3).toUpperCase();
 }
 
