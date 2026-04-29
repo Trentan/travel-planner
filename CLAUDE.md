@@ -166,20 +166,30 @@ Trip title, subtitle, and current file name for display.
 
 ## Command Dictionary
 
-Claude Code: when the user sends one of these commands, look it up here and execute exactly.
+Claude Code: when the user sends a short command, look it up here and execute exactly.
+`{N}` = item number, `{a}` = sub-task letter, `{i}` = sub-item roman numeral. Examples: `8`, `8a`, `8b-ii`
 
+### Session Commands
 | Command | Action |
 |---|---|
-| `Start {N}` | Read CLAUDE.md → TODO.md → UNFINISHED.md. Reply to user with: item name, branch, what you plan to do, files you'll touch, estimated commits. Wait for go-ahead. |
-| `Confirm {Na}` | Proceed with that sub-task. No further confirmation needed. |
-| `Resume` | Read UNFINISHED.md and git log. Reply to user with: current branch, last commit, what was done, exact next step in one paragraph. Wait for go-ahead. |
-| `Where up to` | Read UNFINISHED.md. Reply to user with one line only: item, sub-task, last commit message. Nothing else. |
+| `Start {N}` | Read CLAUDE.md → TODO.md → UNFINISHED.md. Reply to user with: item name, branch, full sub-task/sub-item breakdown, files to touch, estimated commits. Wait for go-ahead. |
+| `Confirm {Nai}` | Proceed with stated sub-task or sub-item. No further confirmation needed. |
+| `Resume` | Read UNFINISHED.md + git log. Reply to user with: branch, last commit, what was done, exact next step. Wait for go-ahead. |
+| `Park` | Update UNFINISHED.md with current state and exact next step. Push branch. Reply to user with branch name and next step. Stop all work. |
+
+### Status Commands
+| Command | Action |
+|---|---|
+| `Where up to` | Read UNFINISHED.md. Reply to user with one line only: item+sub-task, branch, last commit message. Nothing else. |
 | `Status` | Read UNFINISHED.md. Reply to user with: active item+sub-task, branch, last commit, next step, anything awaiting review. Do not start work. |
-| `Park` | Update UNFINISHED.md with current state and next step. Push branch. Reply to user with branch name and next step. Stop. |
-| `Done {Na}` | Mark sub-task confirmed in TODO.md. Move to Awaiting Review in UNFINISHED.md with change summary. Push and open PR. Reply to user with branch and PR link. Stop. |
 | `Pending` | Read UNFINISHED.md. Reply to user listing all Awaiting Review items — item, branch, one-line summary. Do not start work. |
-| `New Item` | Ask user to describe the item. Write it to TODO.md with next available item number, break into sub-tasks. Reply to user with exactly what was written for approval. Do not touch code. |
-| `Add to {N}` | Ask user to describe the new sub-task. Append to item {N} in TODO.md with next available letter. Reply to user with exactly what was written for approval. Do not touch code. |
+
+### TODO Commands
+| Command | Action |
+|---|---|
+| `New Item` | Ask user to describe the item. Auto-increment item number from TODO.md. Write to TODO.md with sub-task breakdown. Reply to user with exactly what was written. Wait for approval. Do not touch code. |
+| `Add to {Na}` | Ask user to describe the new sub-task or sub-item. Append to correct item in TODO.md with next available letter or roman numeral. Reply to user with exactly what was written. Wait for approval. Do not touch code. |
+| `Done {Nai}` | Mark sub-task/sub-item `[x]` in TODO.md. Move to Awaiting Review in UNFINISHED.md with change summary. Push branch and open PR. Reply to user with branch and PR link. Stop. |
 
 ### Three-file system
 - `TODO.md` — Read from main branch to compare to current branch
@@ -232,6 +242,24 @@ Claude Code: when the user sends one of these commands, look it up here and exec
 
 ---
 
+### Item format in TODO.md
+Items use lettered sub-tasks (a, b, c...). Sub-tasks can have numbered sub-items (i, ii, iii...):
+
+- [ ] a) Top level sub-task
+- [ ] b) Another sub-task
+    - [ ] i) Sub-item of b
+    - [ ] ii) Another sub-item of b
+
+Branch naming follows the same pattern:
+- `item-8a` — top level sub-task
+- `item-8b-i` — sub-item
+- `item-8b-ii` — next sub-item
+
+Commit message follows same pattern:
+- `Item 8a [1 of 2]: what changed`
+- `Item 8b-i [1 of 3]: what changed`
+
+---
 **Working through sub-tasks (a, b, c…):**
 - Do ONE sub-task at a time — no bundling unless explicitly instructed
 - Before starting, verify the app loads without errors in its current state
