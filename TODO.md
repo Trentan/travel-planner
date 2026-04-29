@@ -33,10 +33,14 @@ Read this file at the start of every session. Claude Code: read from main branch
   - [x] ii) City selection dropdowns should populate to their pre-selected countries by default (currently not populating)
   - [x] iii) Select Existing City: populate dropdown with user-entered/created cities from itinerary (currently empty)
   - [x] iv) Create New City: country should be dropdown select (with "enter your own" option), and should default to selected city's country when editing
-  - [ ] v) do all the cities in my json need converting now to new standards(iso/icao/iata)
-  - [ ] vi) here is no real display benefits yet - implement (eg perhaps the transport tab should have the iso codes displayed for from and to (and a hover text of the full city name and country) + all the drop downs etc could have the city or country code additionally in brackets
-- [ ] c) The heading when entered (New Trip Plan) and Click here to add your trip subtitle - are not loading from json / saving correctly?
-- [ ] d) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab?
+  - [x] v) do all the cities in my json need converting now to new standards(iso/icao/iata)
+  - [x] vi) here is no real display benefits yet - implement (eg perhaps the transport tab should have the iso codes displayed for from and to (and a hover text of the full city name and country) + all the drop downs etc could have the city or country code additionally in brackets
+
+### Item 9: Trip plan name not saving & packing tab fix & other minor fixes
+**Status:** Not started
+**Next:** `item-9a`
+- [ ] a) The heading when entered (New Trip Plan) and Click here to add your trip subtitle - are not loading from json / saving correctly?
+- [ ] b) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab?
 - [ ] e) Need a way to enable the user to force a complete site refresh on mobile app / website on the app
 - [ ] f) Go through and convert the testing checklist into new items and sub items in this todo list
 - [ ] g) Go through and convert the Future Enhancements checklist into new items and sub items in this todo list (some may already be resolved)
