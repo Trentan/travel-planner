@@ -1,4 +1,4 @@
-# TODO.md
+﻿# TODO.md
 
 All active work items for Travel Planner PWA.
 Read this file at the start of every session. Claude Code: read from main branch before local copy.
@@ -8,16 +8,16 @@ Read this file at the start of every session. Claude Code: read from main branch
 ## Active
 
 ### Item 5: Convert Accommodation
-**Status:** In progress — 5h complete - need to request review
+**Status:** In progress â€” 5h complete - need to request review
 **Next:** `none`
-**Note:** No migration of old accomItems — new stays model only going forward.
+**Note:** No migration of old accomItems â€” new stays model only going forward.
 
 - [x] a) Data model: add top-level `stays []` global in `data.js`
 - [x] b) Add Stay dialog: build modal, `openAddStayModal()`, `saveStayFromModal()`, `deleteStay()`, `toggleStayStatus()`
 - [x] c) Accommodation tab: rewrite `buildAccomTab()` to render from `stays[]`
 - [x] d) Itinerary day card: replace `accomItems` block with derived stay display
 - [x] e) Add accommodation button to launch add dialog
-- [x] f) Edit stays from itinerary and table — launch dialog and save
+- [x] f) Edit stays from itinerary and table â€” launch dialog and save
 - [x] g) Move add stay button to top with heading, like transport page
 - [x] h) Convert old accommodation in `backups/2026_June_July_Europe_Thailand.json` to new stays format
 
@@ -29,10 +29,12 @@ Read this file at the start of every session. Claude Code: read from main branch
 
 - [ ] a) Improve journey table layout to display fields better
 - [x] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
-      - [x] i) Add trip leg dialog not showing - loads new leg straight into itinerary instead of opening dialog
-      - [x] ii) City selection dropdowns should populate to their pre-selected countries by default (currently not populating)
+  - [x] i) Add trip leg dialog not showing - loads new leg straight into itinerary instead of opening dialog
+  - [x] ii) City selection dropdowns should populate to their pre-selected countries by default (currently not populating)
+  - [x] iii) Select Existing City: populate dropdown with user-entered/created cities from itinerary (currently empty)
+  - [x] iv) Create New City: country should be dropdown select (with "enter your own" option), and should default to selected city's country when editing
 - [ ] c) The heading when entered (New Trip Plan) and Click here to add your trip subtitle - are not loading from json / saving correctly?
-- [ ] d) areaName: "🚶 Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab?
+- [ ] d) areaName: "ðŸš¶ Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab?
 - [ ] e) Need a way to enable the user to force a complete site refresh on mobile app / website on the app
 - [ ] f) Go through and convert the testing checklist into new items and sub items in this todo list
 - [ ] g) Go through and convert the Future Enhancements checklist into new items and sub items in this todo list (some may already be resolved)
@@ -41,20 +43,20 @@ Read this file at the start of every session. Claude Code: read from main branch
 
 ## Noticed (unscheduled)
 
-<!-- Claude: add bugs or improvements spotted during work here. Do not fix — flag only. -->
+<!-- Claude: add bugs or improvements spotted during work here. Do not fix â€” flag only. -->
 
 ---
 
 ## Testing Checklist
 
 Before considering any work complete:
-- [ ] Open index.html in browser — app loads without errors
+- [ ] Open index.html in browser â€” app loads without errors
 - [ ] Create/edit/delete items in all tabs
 - [ ] Drag sights/runs from pool to day cards
-- [ ] Toggle Fun Mode and Read Only Mode — UI updates correctly
-- [ ] Toggle Compact View — layout switches, checkboxes work
-- [ ] Export JSON — file downloads with correct data
-- [ ] Import JSON — data loads and renders properly
+- [ ] Toggle Fun Mode and Read Only Mode â€” UI updates correctly
+- [ ] Toggle Compact View â€” layout switches, checkboxes work
+- [ ] Export JSON â€” file downloads with correct data
+- [ ] Import JSON â€” data loads and renders properly
 - [ ] Budget calculations update when costs change
 - [ ] Packing items check/uncheck and persist after refresh
 - [ ] Service Worker registers (check browser DevTools)
