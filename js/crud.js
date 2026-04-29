@@ -234,8 +234,45 @@ function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) { appData[legIdx].d
 function openAddLegDialog() {
   const modal = document.getElementById('add-leg-modal');
   if (modal) {
+    _populateAddLegCityDropdowns();
     modal.style.display = 'flex';
     onLegTypeChange();
+  }
+}
+
+function _populateAddLegCityDropdowns() {
+  const existingSelect = document.getElementById('existingCitySelect');
+  const fromSelect = document.getElementById('fromCitySelect');
+  const toSelect = document.getElementById('toCitySelect');
+
+  // Build options HTML with Home + cities
+  let cityOptionsHtml = '';
+  if (typeof citiesData !== 'undefined') {
+    [...citiesData].sort((a, b) => a.name.localeCompare(b.name)).forEach(city => {
+      const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '📍';
+      cityOptionsHtml += `<option value="${city.name}">${flag} ${city.name}</option>`;
+    });
+  }
+
+  // Populate existingCitySelect: Home + cities
+  if (existingSelect) {
+    const currentValue = existingSelect.value;
+    existingSelect.innerHTML = '<option value="">-- Choose a city --</option><option value="Home">🏠 Home</option>' + cityOptionsHtml;
+    if (currentValue) existingSelect.value = currentValue;
+  }
+
+  // Populate fromCitySelect: Home + cities (for travel legs)
+  if (fromSelect) {
+    const currentValue = fromSelect.value;
+    fromSelect.innerHTML = '<option value="Home">🏠 Home</option>' + cityOptionsHtml;
+    if (currentValue) fromSelect.value = currentValue;
+  }
+
+  // Populate toCitySelect: cities only (for travel legs)
+  if (toSelect) {
+    const currentValue = toSelect.value;
+    toSelect.innerHTML = '<option value="">-- Choose destination --</option>' + cityOptionsHtml;
+    if (currentValue) toSelect.value = currentValue;
   }
 }
 
@@ -373,6 +410,7 @@ window.onLegTypeChange = onLegTypeChange;
 window.checkDateConflict = checkDateConflict;
 window.confirmAddLeg = confirmAddLeg;
 window.deleteActivity = deleteActivity;
+window._populateAddLegCityDropdowns = _populateAddLegCityDropdowns;
 
 // Add Stay Modal Functions
 let editingStayId = null; // Track if we're editing an existing stay
