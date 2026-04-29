@@ -1,25 +1,28 @@
 # UNFINISHED.md
 
 ## 🔄 Active
-- **Item/sub-task:** 8a
-- **Branch:** item-8a-transport-table-layout
-- **Last commit:** `none yet`
-- **What was done:** Starting work on transport table layout improvements
-- **Next step:** Analyze current transport table layout and design improved column structure
-- **Files to touch:** js/transport.js, style.css
-- **Known blockers / risks:** None
-- **Noticed (unscheduled):**
+none
 
 ---
 
 ## 👀 Awaiting Review / Merge
-- **Item:** **Item 8b** — branch `item-8b-city-iso-standards` — pushed, ready for review
-- Sub-items i-ix complete
-- Commit `111ecf7`: Migration function for city ISO standards
-- Commit `b79f08f`: Display ISO codes in transport tab with hover tooltips
-- Commit `9e9c9e8`: Mark sub-items complete in TODO
-- Commit `8d57785`: Fix London transit city to get LHR code instead of LON
-- Commit `e5acadb`: Add Slovakia and IATA lookup for Other country selection
-- Commit `9d112cc`: Update journey names to use arrow notation (→) instead of "to"
+- **Item 8a** — branch `item-8a-transport-table-layout` — pushed, ready for review
+  - Redesigned transport table from 13 columns to 9 columns
+  - Combined Provider/Route # into Service column
+  - Stacked Date/Departs into Departure column
+  - Added duration display per journey
+  - Improved segment rows with cleaner layout
+  - Better responsive breakpoints
 
-*Last updated: 2026-04-30 — Starting item 8a*
+---
+
+## Archived (moved from Awaiting Review after merge)
+- **Item 8b** — branch `item-8b-city-iso-standards` — merged
+  - Sub-items i-ix complete
+  - Migration function for city ISO standards
+  - Display ISO codes in transport tab with hover tooltips
+  - Journey names using arrow notation
+  - Slovakia added to country data
+  - IATA lookup for Other country selection
+
+*Last updated: 2026-04-30 — Item 8a complete, awaiting review*
