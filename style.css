@@ -83,6 +83,38 @@ img.city-flag-img {
   box-shadow: 0 0 1px rgba(0,0,0,0.3);
 }
 
+/* City Code Display Styles (8b-vi) */
+.city-code-display {
+  cursor: help;
+  position: relative;
+}
+
+.city-iso-code {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85em;
+  color: #666;
+  font-weight: 600;
+}
+
+.city-code-compact {
+  font-family: 'DM Mono', monospace;
+  font-weight: 600;
+  color: #2C3E50;
+  cursor: help;
+}
+
+.city-code-compact:hover {
+  color: #3498DB;
+}
+
+/* Route display in transport table */
+.route-col .city-code-compact {
+  background: #f0f4f8;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
 .city-nav-content {
   display: inline-flex;
   align-items: center;

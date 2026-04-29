@@ -3,6 +3,47 @@
 // Multi-leg journeys: N segments share a journeyId and journeyName
 // Note: journeys variable is declared in data.js for proper loading order
 
+// Helper: Get formatted location display with ISO code and hover tooltip
+// Returns HTML string: "CityName (CODE)" with title attribute for full details
+function getLocationDisplayWithCode(locationName) {
+  if (!locationName || locationName === 'Home' || locationName === 'In transit') {
+    return locationName || '—';
+  }
+
+  const city = typeof citiesData !== 'undefined'
+    ? citiesData.find(c => c.name === locationName)
+    : null;
+
+  if (city && city.code) {
+    const countryName = city.country || '';
+    const tooltip = `${city.name}${countryName ? ', ' + countryName : ''} (${city.code})`;
+    return `<span class="city-code-display" title="${tooltip}">${locationName} <span class="city-iso-code">(${city.code})</span></span>`;
+  }
+
+  return locationName;
+}
+
+// Helper: Get compact code display for table cells
+// Returns just the code with full name as tooltip
+function getLocationCodeDisplay(locationName) {
+  if (!locationName || locationName === 'Home' || locationName === 'In transit') {
+    return locationName || '—';
+  }
+
+  const city = typeof citiesData !== 'undefined'
+    ? citiesData.find(c => c.name === locationName)
+    : null;
+
+  if (city) {
+    const code = city.code || city.name.substring(0, 3).toUpperCase();
+    const countryFlag = city.countryCode ? getCountryFlag(city.countryCode) : '';
+    const tooltip = `${city.name}${city.country ? ', ' + city.country : ''}${countryFlag ? ' ' + countryFlag : ''}`;
+    return `<span class="city-code-compact" title="${tooltip}">${code}</span>`;
+  }
+
+  return locationName.substring(0, 3).toUpperCase();
+}
+
 // Transport type icons
 const TRANSPORT_ICONS = {
   flight: '✈️',
@@ -155,6 +196,17 @@ function buildRouteChain(segments) {
   if (segments.length === 1) return segments[0].fromLocation + ' → ' + segments[0].toLocation;
   const stops = [segments[0].fromLocation];
   segments.forEach(s => stops.push(s.toLocation));
+  return stops.join(' → ');
+}
+
+// Build route chain using ISO codes instead of full names
+function buildRouteChainWithCodes(segments) {
+  if (!segments || segments.length === 0) return '';
+  if (segments.length === 1) {
+    return getLocationCodeDisplay(segments[0].fromLocation) + ' → ' + getLocationCodeDisplay(segments[0].toLocation);
+  }
+  const stops = [getLocationCodeDisplay(segments[0].fromLocation)];
+  segments.forEach(s => stops.push(getLocationCodeDisplay(s.toLocation)));
   return stops.join(' → ');
 }
 
@@ -368,7 +420,9 @@ function buildTransportTab(cityFilter = null) {
     const statusColor = rep.status === 'booked' ? '#27AE60' : '#E67E22';
     const statusText = rep.status === 'booked' ? 'Booked' : 'Planned';
 
-    const route = isMultiLeg ? buildRouteChain(segs) : `${rep.fromLocation} → ${rep.toLocation}`;
+    const route = isMultiLeg
+    ? buildRouteChainWithCodes(segs)
+    : `${getLocationCodeDisplay(rep.fromLocation)} → ${getLocationCodeDisplay(rep.toLocation)}`;
     const firstDep = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
     const firstTime = rep.departureTime || '—';
     const lastSeg = segs[segs.length - 1];
@@ -429,7 +483,7 @@ function buildTransportTab(cityFilter = null) {
             <td style="padding-left:2rem;color:#888;">↳ Leg ${i + 1}</td>
             <td>${segIcon}</td>
             <td class="date-col">${segDep}</td>
-            <td class="route-col" style="color:#555;">${seg.fromLocation} → ${seg.toLocation}</td>
+            <td class="route-col" style="color:#555;">${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</td>
             <td>${seg.departureTime || '—'}</td>
             <td>${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
             <td>${seg.provider || '—'}</td>
@@ -822,6 +876,9 @@ function rebuildCurrentView() {
 }
 
 // Expose to window
+window.getLocationDisplayWithCode = getLocationDisplayWithCode;
+window.getLocationCodeDisplay = getLocationCodeDisplay;
+window.buildRouteChainWithCodes = buildRouteChainWithCodes;
 window.openAddJourneyModal = openAddJourneyModal;
 window.closeJourneyModal = closeJourneyModal;
 window.saveJourneyFromModal = saveJourneyFromModal;
