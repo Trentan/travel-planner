@@ -29,10 +29,13 @@ Read this file at the start of every session. Claude Code: read from main branch
 
 - [ ] a) Improve journey table layout to display fields better
 - [ ] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
+    - [ ] i) Add trip leg dialog not showing - loads new leg straight into itinerary instead of opening dialog
+    - [ ] ii) City selection dropdowns should populate to their pre-selected countries by default (currently not populating)
 - [ ] c) The heading when entered (New Trip Plan) and Click here to add your trip subtitle - are not loading from json / saving correctly?
 - [ ] d) areaName: "🚶 Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab?
-- [ ] e) Go through and convert the testing checklist into new items and sub items in this todo list
-- [ ] f) Go through and convert the Future Enhancements checklist into new items and sub items in this todo list (some may already be resolved)
+- [ ] e) Need a way to enable the user to force a complete site refresh on mobile app / website on the app
+- [ ] f) Go through and convert the testing checklist into new items and sub items in this todo list
+- [ ] g) Go through and convert the Future Enhancements checklist into new items and sub items in this todo list (some may already be resolved)
 
 ---
 

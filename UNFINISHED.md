@@ -13,6 +13,9 @@
   - Auto-populate country when known city is entered
   - Auto-detect IATA codes for new cities
   - Migration in initData() to add codes to existing cities
+  - **Known issues to fix:**
+    - Add trip leg dialog not showing - loads new leg straight into itinerary instead of opening dialog
+    - City selection dropdowns not populating to their pre-selected countries by default
 - **Next step:** Commit and push for review
 - **Files touched:** js/data.js, index.html, style.css
 - **Known blockers / risks:** none

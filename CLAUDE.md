@@ -1,6 +1,7 @@
 # CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> **Command reference:** All user commands are single phrases defined in the
+> Command Dictionary in the Development Workflow section below.
+> When a message matches a command, execute it — do not ask for clarification.
 
 ## Project Overview
 
@@ -163,6 +164,23 @@ Trip title, subtitle, and current file name for display.
 
 > **Re-entering a session?** Read `CLAUDE.md` → read `TODO.md` → read `UNFINISHED.md` → declare status → wait for go-ahead.
 
+## Command Dictionary
+
+Claude Code: when the user sends one of these commands, look it up here and execute exactly.
+
+| Command | Action |
+|---|---|
+| `Start {N}` | Read CLAUDE.md → TODO.md → UNFINISHED.md. Reply to user with: item name, branch, what you plan to do, files you'll touch, estimated commits. Wait for go-ahead. |
+| `Confirm {Na}` | Proceed with that sub-task. No further confirmation needed. |
+| `Resume` | Read UNFINISHED.md and git log. Reply to user with: current branch, last commit, what was done, exact next step in one paragraph. Wait for go-ahead. |
+| `Where up to` | Read UNFINISHED.md. Reply to user with one line only: item, sub-task, last commit message. Nothing else. |
+| `Status` | Read UNFINISHED.md. Reply to user with: active item+sub-task, branch, last commit, next step, anything awaiting review. Do not start work. |
+| `Park` | Update UNFINISHED.md with current state and next step. Push branch. Reply to user with branch name and next step. Stop. |
+| `Done {Na}` | Mark sub-task confirmed in TODO.md. Move to Awaiting Review in UNFINISHED.md with change summary. Push and open PR. Reply to user with branch and PR link. Stop. |
+| `Pending` | Read UNFINISHED.md. Reply to user listing all Awaiting Review items — item, branch, one-line summary. Do not start work. |
+| `New Item` | Ask user to describe the item. Write it to TODO.md with next available item number, break into sub-tasks. Reply to user with exactly what was written for approval. Do not touch code. |
+| `Add to {N}` | Ask user to describe the new sub-task. Append to item {N} in TODO.md with next available letter. Reply to user with exactly what was written for approval. Do not touch code. |
+
 ### Three-file system
 - `TODO.md` — Read from main branch to compare to current branch
 - `UNFINISHED.md` — Claude Code owns this, lives on feature branch, active + awaiting review
@@ -295,11 +313,3 @@ User will archive the summary to VERIFIED.md.
 - Claude Code does NOT write to VERIFIED.md — user archives completed items there
 - Clear the Active block in UNFINISHED.md when an item is fully confirmed done
 
----
-
-## Quick Prompts (for user reference)
-- **Start item:** `Do item 8a. Read CLAUDE.md → TODO.md → UNFINISHED.md, declare status, wait.`
-- **Confirm:** `Confirmed, proceed.`
-- **Resume:** `Resume. Read UNFINISHED.md and git log, tell me where you're up to, wait.`
-- **Complete item:** `Item 8a confirmed done. Mark it and stop.`
-- **Status report:** `Read -> UNFINISHED.md, declare status, wait.`
