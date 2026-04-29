@@ -1655,3 +1655,226 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   font-size: 0.8rem;
 }
 
+/* ==================== */
+/* IMPROVED TRANSPORT TABLE (Item 8a) */
+/* ==================== */
+
+/* Transport table specific styles */
+.transport-table-wrapper {
+  overflow-x: auto;
+}
+
+.transport-table {
+  font-size: 0.95rem;
+}
+
+/* Journey parent row styling */
+.transport-table .journey-parent-row {
+  transition: background 0.2s;
+}
+
+.transport-table .journey-parent-row:hover {
+  background: #f9f9f7;
+}
+
+/* Journey name column */
+.transport-table .journey-name-col {
+  padding: 0.75rem 0.5rem;
+}
+
+.journey-name-main {
+  font-weight: 500;
+  color: #2C3E50;
+  line-height: 1.3;
+}
+
+.duration-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #666;
+  background: #f0f0f0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Type column */
+.transport-table .journey-type-col {
+  text-align: center;
+  font-size: 1.2rem;
+  vertical-align: middle;
+}
+
+/* Departure column - date stacked with time */
+.transport-table .journey-departure-col {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.transport-table .journey-departure-col .dep-date {
+  font-weight: 500;
+  color: #2C3E50;
+}
+
+.transport-table .journey-departure-col .time-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* Status column with booking ref */
+.transport-table .journey-status-col {
+  text-align: center;
+}
+
+.booking-ref-small {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* Route column - city codes */
+.transport-table .journey-route-col {
+  font-weight: 500;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.9rem;
+}
+
+/* Service column - provider + route code */
+.transport-table .journey-service-col {
+  font-size: 0.9rem;
+}
+
+.service-provider {
+  display: block;
+  font-weight: 500;
+  color: #2C3E50;
+}
+
+.service-route {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: #666;
+  background: #f0f0f0;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-top: 2px;
+}
+
+.service-multi {
+  color: #666;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+/* Cost column */
+.transport-table .journey-cost-col {
+  font-family: 'DM Mono', monospace;
+  text-align: right;
+}
+
+.transport-table .journey-cost-col span {
+  display: inline-block;
+  min-width: 30px;
+  text-align: right;
+}
+
+/* Actions column */
+.transport-table .journey-actions-col {
+  white-space: nowrap;
+  text-align: center;
+}
+
+.transport-table .journey-actions-col .action-btn {
+  margin-right: 4px;
+}
+
+.transport-table .journey-actions-col .del-btn {
+  padding: 2px 6px;
+  font-size: 0.9rem;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+/* Segment rows (multi-leg details) */
+.transport-table .journey-segment-row {
+  border-left: 3px solid #ddd;
+}
+
+.transport-table .journey-segment-row td {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.segment-badge {
+  display: inline-block;
+  background: #ddd;
+  color: #666;
+  font-size: 0.75rem;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-right: 6px;
+}
+
+.duration-small {
+  font-size: 0.75rem;
+  color: #888;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Journey expand button */
+.journey-expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 2px 4px;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.journey-expand-btn:hover {
+  color: #2C3E50;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .transport-table-wrapper {
+    margin: 0 -1rem;
+    padding: 0 1rem;
+    width: calc(100% + 2rem);
+  }
+
+  .transport-table {
+    font-size: 0.9rem;
+  }
+
+  .transport-table th,
+  .transport-table td {
+    padding: 0.6rem 0.4rem;
+  }
+
+  .journey-name-main {
+    max-width: 150px;
+  }
+
+  .transport-table .journey-service-col .service-provider {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .transport-table th[data-col="service"],
+  .transport-table td.journey-service-col {
+    display: none;
+  }
+}
+
