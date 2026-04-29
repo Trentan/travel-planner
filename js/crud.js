@@ -244,6 +244,7 @@ function _populateAddLegCityDropdowns() {
   const existingSelect = document.getElementById('existingCitySelect');
   const fromSelect = document.getElementById('fromCitySelect');
   const toSelect = document.getElementById('toCitySelect');
+  const countrySelect = document.getElementById('newLegCityCountrySelect');
 
   // Build options HTML with Home + cities
   let cityOptionsHtml = '';
@@ -274,11 +275,56 @@ function _populateAddLegCityDropdowns() {
     toSelect.innerHTML = '<option value="">-- Choose destination --</option>' + cityOptionsHtml;
     if (currentValue) toSelect.value = currentValue;
   }
+
+  // Populate country dropdown for new city creation
+  if (countrySelect && typeof COUNTRY_DATA !== 'undefined') {
+    const currentValue = countrySelect.value;
+    countrySelect.innerHTML = '<option value="">Select country...</option>' +
+      COUNTRY_DATA
+        .filter(c => c.code !== 'ZZ')
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(c => `<option value="${c.code}">${c.flag} ${c.name}</option>`)
+        .join('') +
+      '<option value="OTHER">✏️ Other...</option>';
+    if (currentValue) countrySelect.value = currentValue;
+  }
+}
+
+function onNewLegCountryChange() {
+  const countrySelect = document.getElementById('newLegCityCountrySelect');
+  const otherInput = document.getElementById('newLegCityCountryOther');
+  if (!countrySelect || !otherInput) return;
+
+  if (countrySelect.value === 'OTHER') {
+    otherInput.style.display = 'block';
+    otherInput.focus();
+  } else {
+    otherInput.style.display = 'none';
+    otherInput.value = '';
+  }
 }
 
 function closeAddLegDialog() {
   const modal = document.getElementById('add-leg-modal');
   if (modal) modal.style.display = 'none';
+
+  // Clear form inputs
+  const existingCitySelect = document.getElementById('existingCitySelect');
+  const newCityName = document.getElementById('newLegCityName');
+  const countrySelect = document.getElementById('newLegCityCountrySelect');
+  const countryOther = document.getElementById('newLegCityCountryOther');
+  const fromDate = document.getElementById('legDateFrom');
+  const toDate = document.getElementById('legDateTo');
+
+  if (existingCitySelect) existingCitySelect.value = '';
+  if (newCityName) newCityName.value = '';
+  if (countrySelect) countrySelect.value = '';
+  if (countryOther) {
+    countryOther.value = '';
+    countryOther.style.display = 'none';
+  }
+  if (fromDate) fromDate.value = '';
+  if (toDate) toDate.value = '';
 }
 
 function onLegTypeChange() {
@@ -331,11 +377,45 @@ function confirmAddLeg() {
     toCity = 'Home';
   } else {
     // Regular city leg
-    const existingCity = document.getElementById('fromCitySelect')?.value;
-    const toCitySelect = document.getElementById('toCitySelect')?.value;
-    label = existingCity ? ('📍 ' + existingCity) : '📍 New City';
-    fromCity = existingCity || 'Home';
-    toCity = toCitySelect || existingCity || 'Home';
+    const existingCity = document.getElementById('existingCitySelect')?.value;
+    const newCityName = document.getElementById('newLegCityName')?.value?.trim();
+
+    if (existingCity && existingCity !== 'Home') {
+      // Using existing city
+      label = '📍 ' + existingCity;
+      fromCity = existingCity;
+      toCity = existingCity;
+    } else if (newCityName) {
+      // Creating new city - get country from dropdown or other input
+      const countrySelect = document.getElementById('newLegCityCountrySelect')?.value;
+      const countryOther = document.getElementById('newLegCityCountryOther')?.value?.trim();
+      let countryName = '';
+      let countryCode = '';
+
+      if (countrySelect && countrySelect !== 'OTHER') {
+        const countryMatch = COUNTRY_DATA.find(c => c.code === countrySelect);
+        if (countryMatch) {
+          countryName = countryMatch.name;
+          countryCode = countryMatch.code;
+        }
+      } else if (countryOther) {
+        countryName = countryOther;
+      }
+
+      // Add the new city
+      const newCity = addOrUpdateCity(newCityName, countryName, '', '', '', countryCode);
+      if (newCity && typeof buildCityNav === 'function') {
+        buildCityNav();
+      }
+
+      label = '📍 ' + newCityName;
+      fromCity = newCityName;
+      toCity = newCityName;
+    } else {
+      label = '📍 New City';
+      fromCity = 'Home';
+      toCity = 'Home';
+    }
   }
 
   const newLeg = {
@@ -411,6 +491,7 @@ window.checkDateConflict = checkDateConflict;
 window.confirmAddLeg = confirmAddLeg;
 window.deleteActivity = deleteActivity;
 window._populateAddLegCityDropdowns = _populateAddLegCityDropdowns;
+window.onNewLegCountryChange = onNewLegCountryChange;
 
 // Add Stay Modal Functions
 let editingStayId = null; // Track if we're editing an existing stay

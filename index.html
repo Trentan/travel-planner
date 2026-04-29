@@ -286,7 +286,10 @@
             <div class="ai-form-group">
               <label>Option 2: Create New City</label>
               <input type="text" id="newLegCityName" placeholder="City name (e.g., Prague)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif; margin-bottom: 0.5rem;">
-              <input type="text" id="newLegCityCountry" placeholder="Country (e.g., Czech Republic)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+              <select id="newLegCityCountrySelect" onchange="onNewLegCountryChange()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif; margin-bottom: 0.5rem;">
+<option value="">Select country...</option>
+</select>
+<input type="text" id="newLegCityCountryOther" placeholder="Enter country name..." style="display: none; width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
             </div>
             <div class="ai-form-group">
               <label id="datesLabel">Dates in City</label>
