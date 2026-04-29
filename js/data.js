@@ -700,7 +700,11 @@ function populateCityList() {
             <select class="country-select" data-city-id="${city.id}"
               style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; min-width: 140px;">
               <option value="">Select country...</option>
-              ${COUNTRY_DATA.map(c => `<option value="${c.code}" ${c.code === city.countryCode ? 'selected' : ''}>${c.flag} ${c.name}</option>`).join('')}
+              ${COUNTRY_DATA.map(c => {
+              const cityCode = (city.countryCode || '').toUpperCase();
+              const isSelected = c.code === cityCode;
+              return `<option value="${c.code}"${isSelected ? ' selected' : ''}>${c.flag} ${c.name}</option>`;
+            }).join('')}
             </select>
             ${city.code ? `<span style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #666; background: #f5f5f5; padding: 2px 6px; border-radius: 4px;">IATA: ${city.code}</span>` : ''}
           </div>
