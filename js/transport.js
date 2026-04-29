@@ -124,7 +124,7 @@ function createJourneyFromTransportItem(item, legId, dayDate, fromLoc, toLoc) {
   const journey = {
     id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
     journeyId: journeyId,
-    journeyName: fromLoc + ' to ' + toLoc,
+    journeyName: fromLoc + ' → ' + toLoc,
     legId: legId,
     dayDate: dayDate,
     fromLocation: fromLoc,
@@ -171,7 +171,7 @@ function detectTransportType(text) {
 function buildJourneyName(segments) {
   if (!segments || segments.length === 0) return '';
   if (segments.length === 1) {
-    return `${segments[0].fromLocation} to ${segments[0].toLocation}`;
+    return `${segments[0].fromLocation} → ${segments[0].toLocation}`;
   }
 
   const startCity = segments[0].fromLocation;
@@ -199,11 +199,11 @@ function buildJourneyName(segments) {
   );
 
   if (uniqueViaCities.length === 0) {
-    return `${startCity} to ${endCity}`;
+    return `${startCity} → ${endCity}`;
   }
 
   const viaText = uniqueViaCities.join(', ');
-  return `${startCity} to ${endCity} (via ${viaText})`;
+  return `${startCity} → ${endCity} (via ${viaText})`;
 }
 
 // Get journeys for a specific day (for itinerary view)

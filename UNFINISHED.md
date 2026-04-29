@@ -1,39 +1,30 @@
 # UNFINISHED.md
 
 ## 🔄 Active
-none
-
-## 👀 Awaiting Review / Merge
-- **Item 8b** — branch `item-8b-city-iso-standards`
-  - Commit `142631f`: City dialog with ISO/ICAO standards and IATA codes
-  - Commit `0c76ed3`: 8b-i - Fix Add Trip Leg button to open dialog
-  - Commit `8c1bf3`: 8b-ii - Fix city country dropdown pre-selection
-  - Commit `a44caea`: 8b-iii - Populate existing city dropdown in Add Leg dialog
-  - Commit `b98f98b`: 8b-iv - Convert Add Leg country field to dropdown with "Other..." option
-
-## Summary of Changes (Item 8b - complete)
-
-### 8b-i: Add Trip Leg dialog fix
-- Fixed `openAddLegDialog()` call in index.html:98
-- Was calling `addLeg()` directly instead of opening dialog
-
-### 8b-ii: Country dropdown pre-selection
-- Fixed `populateCountrySelect()` in data.js:850
-- Added null/undefined handling for country matching
-
-### 8b-iii: Existing city dropdown population
-- Added `_populateAddLegCityDropdowns()` in crud.js:243
-- Populates `existingCitySelect`, `fromCitySelect`, `toCitySelect`
-- Uses Home + cities from citiesData with flags
-
-### 8b-iv: Country dropdown in Add Leg dialog
-- Replaced text input `newLegCityCountry` with select dropdown
-- Added `newLegCityCountrySelect` with COUNTRY_DATA options + "Other..."
-- Added `newLegCityCountryOther` text input shown when "Other..." selected
-- Updated `confirmAddLeg()` to handle new city creation with dropdown
-- Added `onNewLegCountryChange()` toggle handler
-- Clear form inputs in `closeAddLegDialog()`
+- **Item/sub-task:** 8b-ix
+- **Branch:** item-8b-city-iso-standards
+- **Last commit:** `e5acadb` — Item 8b-viii: Add Slovakia to country data and IATA lookup
+- **What was done:** Added IATA lookup for cities when "Other" country selected; city dialog now auto-assigns proper country info from database
+- **Next step:** Implement ability to create new country from "Other" selection in city management dialog
+- **Files to touch:** `js/data.js`, `index.html`
+- **Estimated commits:** 2
 
 ---
 
-*Last updated: 2026-04-29 — Item 8b complete, awaiting review*
+## 🤔 Open Questions
+- For item 8b-ix, need UI to allow entering country name, ISO code when "Other" is selected
+- Should prompt for flag or use generic flag?
+
+---
+
+## 👀 Awaiting Review / Merge
+- **Item 8b** — branch `item-8b-city-iso-standards`
+- Sub-items i-viii complete
+- Additional fix for transit cities (London LHR) in import
+- Commit `111ecf7`: Migration function for city ISO standards
+- Commit `b79f08f`: Display ISO codes in transport tab with hover tooltips
+- Commit `9e9c9e8`: Mark sub-items complete in TODO
+- Commit `8d57785`: Fix London transit city to get LHR code instead of LON
+- Commit `e5acadb`: Add Slovakia and IATA lookup for Other country selection
+
+*Last updated: 2026-04-29 — Item 8b sub-items i-viii complete*
