@@ -1,31 +1,23 @@
 # UNFINISHED.md
 
 ## 🔄 Active
-- **Item/sub-task:** 8b
+- **Item/sub-task:** Complete Item 8b — awaiting review
 - **Branch:** item-8b-city-iso-standards
-- **Last commit:** none
-- **What was done:** Complete city dialog overhaul with ISO/ICAO standards:
-  - Added COUNTRY_DATA array with 43 countries (ISO codes + flags)
-  - Added CITY_DATABASE with 60 major cities (IATA codes like BNE, CDG, JFK)
-  - Added userCities for user-extensible city database (persisted to localStorage)
-  - Updated addOrUpdateCity() to handle {code, name, countryCode} structure
-  - City list now shows country dropdowns and IATA codes with flags
-  - Auto-populate country when known city is entered
-  - Auto-detect IATA codes for new cities
-  - Migration in initData() to add codes to existing cities
-  - **Known issues to fix:**
-    - Add trip leg dialog not showing - loads new leg straight into itinerary instead of opening dialog
-    - City selection dropdowns not populating to their pre-selected countries by default
-- **Next step:** Commit and push for review
-- **Files touched:** js/data.js, index.html, style.css
+- **Last commit:** `Item 8b-ii [2 of 2]: Fix city country dropdown pre-selection`
+- **What was done:** Sub-items 8b-i and 8b-ii completed and committed
+- **Files touched:** index.html, js/data.js
 - **Known blockers / risks:** none
 
 ## 👀 Awaiting Review / Merge
-none
+- **Item 8b** — branch `item-8b-city-iso-standards`
+  - Commit `142631f`: City dialog with ISO/ICAO standards and IATA codes
+  - Commit `0c76ed3`: 8b-i - Fix Add Trip Leg button to open dialog
+  - Commit `8c1bf3`: 8b-ii - Fix city country dropdown pre-selection
 
 ## ✅ Recently Completed
-none
+- 8b-i: Fixed Add Trip Leg button calling addLeg() directly instead of openAddLegDialog()
+- 8b-ii: Fixed country dropdown pre-selection with proper null/undefined handling
 
 ---
 
-*Last updated: 2026-04-28 — Item 8b ready for commit*
+*Last updated: 2026-04-29 — Item 8b complete, awaiting PR*
