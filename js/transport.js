@@ -537,7 +537,6 @@ ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monos
             <td>${seg.routeCode || '—'}</td>
             <td class="budget-field" style="color:#888;">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${seg.id}', this.innerText); buildTransportTab();">${seg.cost || '0'}</span></td>
             <td>—</td>
-            <td>—</td>
             <td><button class="del-btn" onclick="deleteJourney('${seg.id}'); buildTransportTab();" title="Delete segment">×</button></td>
           </tr>`;
       });

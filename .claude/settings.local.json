@@ -11,7 +11,9 @@
       "Read(//tmp/**)",
       "Bash(perl -i -pe 's|\\(\\\\</span\\\\>\\\\s*\\\\</td\\\\>\\)\\\\s*\\(\\\\<td\\\\>\\)|${1}\\\\n\\\\${rep.bookingReference ? `<br><span class=\"booking-ref\" style=\"font-family:monospace; font-size:0.75rem; color:#666;\">\\\\${rep.bookingReference}</span>` : \\\\\"\\\\\"}\\\\n${2}|' js/transport.js)",
       "Bash(sed -i '512 s|</span>|</span>\\\\n${rep.bookingReference ? `<br><span class=\"booking-ref\" style=\"font-family:monospace; font-size:0.75rem; color:#666;\">${rep.bookingReference}</span>` : \"\"}|' js/transport.js)",
-      "Bash(sed -n '510,516p' js/transport.js)"
+      "Bash(sed -n '510,516p' js/transport.js)",
+      "Bash(sed -i '540d' js/transport.js)",
+      "Bash(sed -n '538,542p' js/transport.js)"
     ]
   }
 }
