@@ -2,11 +2,11 @@
 
 ## 🔄 Active
 
-- **Item/sub-task:** 8a-iii
+- **Item/sub-task:** 8a-iv
 - **Branch:** item-8a-transport-table-layout
-- **Last commit:** `Item 8a-iii [1 of 1]: Combined date and time in Departs column for journey and segment rows`
-- **What was done:** Updated the Departs column to combine date and time (e.g., "15 Jun 14:30") to match the Arrives column format. Applied to both main journey rows and segment rows.
-- **Next step:** Test in browser and move to awaiting review
+- **Last commit:** `Item 8a-iii [2 of 2]: Updated UNFINISHED.md with new sub-task status`
+- **What was done:** Completed 8a-iii - combined date and time in Departs column
+- **Next step:** Replace "to" with "→" arrow in journey names in `transport.js`
 - **Files touched:** `js/transport.js`
 - **Known blockers / risks:** None
 
