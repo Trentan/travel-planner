@@ -2,18 +2,20 @@
 
 ## 🔄 Active
 
-- **Item/sub-task:** 8a-i
+- **Item/sub-task:** 8a-i (REVERTED)
 - **Branch:** item-8a-transport-table-layout
-- **Last commit:** `Item 8a-i [1 of 1]: Match accommodation table status style with booking reference below badge`
-- **What was done:** Updated the Status column in transport table to match accommodation table styling - booking reference now uses `<br><span class="booking-ref">` format to stack it directly under the Pending/Confirmed status badge (matching the pattern in buildAccomTab)
-- **Next step:** Push branch and move to awaiting review
-- **Files touched:** `js/transport.js`
+- **Last commit:** `Revert 8a-i changes - restore original 8a transport table code`
+- **What was done:** Reverted the 8a-i changes that attempted to match accommodation table status style. The original 8a work appears to have issues that need investigation.
+- **Next step:** Investigate original 8a issues - user reports "fields are all mucked up and look terrible plus all the hover text gone"
+- **Files touched:** `js/transport.js` (reverted)
 
 ---
 
 ## 👀 Awaiting Review / Merge
 
-- **Item 8a** — branch `item-8a-transport-table-layout` — pushed, ready for review
+- **Item 8a** — branch `item-8a-transport-table-layout` — HAS ISSUES - DO NOT REVIEW
+  - User reports: "fields are all mucked up and look terrible plus all the hover text gone"
+  - Need to investigate what's wrong with the original 8a transport table layout work
   - Redesigned transport table from 13 columns to 9 columns
   - Combined Provider/Route # into Service column
   - Stacked Date/Departs into Departure column
@@ -33,4 +35,4 @@
   - Slovakia added to country data
   - IATA lookup for Other country selection
 
-*Last updated: 2026-04-30 — Item 8a-i complete, awaiting review*
+*Last updated: 2026-04-30 — Item 8a-i reverted, investigating original 8a issues*
