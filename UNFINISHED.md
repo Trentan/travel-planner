@@ -2,17 +2,14 @@
 
 ## 🔄 Active
 
-- **Item/sub-task:** 8a-iv
-- **Branch:** item-8a-transport-table-layout
-- **Last commit:** `Item 8a-iv [1 of 1]: Replaced "to" with arrow (→) in journey names`
-- **What was done:** Updated journey names to use "→" arrow instead of "to" in: createJourneyFromTransportItem(), buildJourneyName() function, and comment examples
-- **Next step:** Test in browser - journey names should display "City A → City B" format, then mark as complete and move to awaiting review
-- **Files touched:** `js/transport.js`
-- **Known blockers / risks:** None
+none
 
 ---
 
 ## 👀 Awaiting Review / Merge
+
+- **Item:** 8a-iv — branch `item-8a-transport-table-layout` — replaced "to" with "→" arrow in journey names
+- Summary: Journey names now use arrow notation (e.g., "Brisbane → Vienna" instead of "Brisbane to Vienna") including multi-leg journeys with via cities
 
 - **Item:** 8a-iii — branch `item-8a-transport-table-layout` — combined date and time in Departs column
 - Summary: Departs column now shows "15 Jun 14:30" format matching Arrives column for both journey and segment rows
@@ -32,4 +29,4 @@
 - Slovakia added to country data
 - IATA lookup for Other country selection
 
-*Last updated: 2026-05-01 — Item 8a-iv in progress, 8a-iii and 8a-i awaiting user review*
+*Last updated: 2026-05-01 — Items 8a-iv, 8a-iii, and 8a-i awaiting user review*
