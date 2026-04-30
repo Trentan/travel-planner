@@ -510,6 +510,7 @@ function buildTransportTab(cityFilter = null) {
           <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="toggleJourneyStatus('${rep.id}')">
             ${statusText}
           </span>
+${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${rep.bookingReference}</span>` : ""}
         </td>
         <td>
           <input type="text" value="${rep.bookingReference || ''}" placeholder="Ref #"
