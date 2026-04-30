@@ -28,7 +28,7 @@ Read this file at the start of every session. Claude Code: read from main branch
 **Next:** `item-8a`
 
 - [ ] a) Improve journey table layout to display fields better
-  - [ ] i) Make Status like the one in Accommodation table where the booking id (reference) is under the pending / confirmed - nice touch
+  - [ ] i) Make Status like the one in Accommodation table where the booking id (reference) is nicely under the pending / confirmed - nice touch
   - [ ] ii) Departs should have the date and time combined like arrives
   - [ ] iii) Bug where I cannot edit segment one on existing segment for the koh / bkk / bne journey when in edit mode
 - [x] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
