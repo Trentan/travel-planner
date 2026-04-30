@@ -2,11 +2,16 @@
 
 ## 🔄 Active
 
-none
+- **Item/sub-task:** 8a-ii
+- **Branch:** item-8a-transport-table-layout
+- **Last commit:** none
+- **What was done:** Starting fresh on adding reference field to journey dialog
+- **Next step:** Open index.html, find the journey add/edit dialog, add reference field input
+- **Files touched:** none yet
+- **Known blockers / risks:** none
+- **Noticed (unscheduled):** Bugs or improvements spotted — copy to TODO.md Noticed too
 
----
-
-## 👀 Awaiting Review / Merge
+## 👀 Awaiting Review
 
 - **Item:** 8a-iv — branch `item-8a-transport-table-layout` — replaced "to" with "→" arrow in journey names
 - Summary: Journey names now use arrow notation (e.g., "Brisbane → Vienna" instead of "Brisbane to Vienna") including multi-leg journeys with via cities
@@ -17,7 +22,7 @@ none
 - **Item:** 8a-i — branch `item-8a-transport-table-layout` — booking reference now displays under status badge
 - Summary: Removed separate Ref column, booking reference displays under status badge in transport table
 
----
+## Completed (to be merged to main)
 
 ## Archived (moved from Awaiting Review after merge)
 

@@ -170,12 +170,12 @@ Claude Code: when the user sends a short command, look it up here and execute ex
 `{N}` = item number, `{a}` = sub-task letter, `{i}` = sub-item roman numeral. Examples: `8`, `8a`, `8b-ii`
 
 ### Session Commands
-| Command         | Action                                                                                                                                                                                                                                                                                             |
-|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `Start {Nai}`   | Read CLAUDE.md → TODO.md → UNFINISHED.md. Record this information in UNFINISHED.md: item name, branch, full sub-task/sub-item breakdown, expected files to touch, estimated commits. Reply to the user with this information and remind the user to commence work with the `Confirm {Nai}` prompt. |
-| `Confirm {Nai}` | Proceed with stated sub-task or sub-item using infromation from UNFINISHED.md. No further confirmation needed unless clarification or information from UNIFINISHED.md is missing.                                                                                                                  |
-| `Resume`        | Read UNFINISHED.md + git log. Reply to user with: branch, last commit, what was done, exact next step. Wait for go-ahead.                                                                                                                                                                          |
-| `Park`          | Update UNFINISHED.md with current state and exact next step. Push branch. Reply to user with branch name and next step. Stop all work.                                                                                                                                                             |
+| Command         | Action                                                                                                                                                                                                                                                                                                                                 |
+|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Start {Nai}`   | Read CLAUDE.md → TODO.md → UNFINISHED.md. Record and commit this information in UNFINISHED.md: item name, branch, full sub-task/sub-item breakdown, expected files to touch, estimated commits. Reply to the user with this information and remind the user to commence work with the `Confirm {Nai}` prompt.                          |
+| `Confirm {Nai}` | Proceed with stated sub-task or sub-item using infromation from UNFINISHED.md. No further confirmation needed unless clarification or information from UNIFINISHED.md is missing. Update UNFINISHED.md with changes and on completion Move to Awaiting Review in UNFINISHED.md with change summary. Commit the changes and push branch |
+| `Resume`        | Read UNFINISHED.md + git log. Reply to user with: branch, last commit, what was done, exact next step. Wait for go-ahead.                                                                                                                                                                                                              |
+| `Park`          | Update UNFINISHED.md with current state and exact next step. Push branch. Reply to user with branch name and next step. Stop all work.                                                                                                                                                                                                 |
 
 ### Status Commands
 | Command | Action |
@@ -185,11 +185,12 @@ Claude Code: when the user sends a short command, look it up here and execute ex
 | `Pending` | Read UNFINISHED.md. Reply to user listing all Awaiting Review items — item, branch, one-line summary. Do not start work. |
 
 ### TODO Commands
-| Command | Action |
-|---|---|
-| `New Item` | Ask user to describe the item. Auto-increment item number from TODO.md. Write to TODO.md with sub-task breakdown. Reply to user with exactly what was written. Wait for approval. Do not touch code. |
-| `Add to {Na}` | Ask user to describe the new sub-task or sub-item. Append to correct item in TODO.md with next available letter or roman numeral. Reply to user with exactly what was written. Wait for approval. Do not touch code. |
-| `Done {Nai}` | Mark sub-task/sub-item `[x]` in TODO.md. Move to Awaiting Review in UNFINISHED.md with change summary. Push branch and open PR. Reply to user with branch and PR link. Stop. |
+| Command          | Action                                                                                                                                                                                                                                       |
+|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `New Item`       | Ask user to describe the item. Auto-increment item number from TODO.md. Write to TODO.md with sub-task breakdown. Reply to user with exactly what was written. Wait for approval. Do not touch code.                                         |
+| `Add to {Na}`    | Ask user to describe the new sub-task or sub-item. Append to correct item in TODO.md with next available letter or roman numeral. Reply to user with exactly what was written. Wait for approval. Do not touch code.                         |
+| `Complete {Nai}` | Mark sub-task/sub-item `[x]` in TODO.md. Move from awaiting review to completed in UNFINISHED.md, commit changes, push branch and open PR to main. Reply to user with branch and PR link. Stop.                                              |
+| `Finish {Nai}`   | Complete the Pull Request for the item referenced in UNFINISHED.md in completed. Move the item from completed in UNFINISHED.md to VERIFIED.md, commit changes, push branch. Reply to the user with the outcomes |
 
 ### Three-file system
 - `TODO.md` — Read from main branch to compare to current branch
@@ -267,8 +268,8 @@ Commit message follows same pattern:
     1. **Update `UNFINISHED.md` immediately** (see format below) — do this before anything else, every single commit, no exceptions
     2. Run through the relevant items in the **Testing Checklist** in TODO.md
     3. Summarise exactly what changed, what files were touched, and why
-    4. Branch name: `item-{N}{short-desc}` (e.g. `item-8-country-city-iso-fixes`)
-    5. Commit message: `Item {N}{letter} [X of Y]: {what was fixed and how}`
+    4. Branch name: `item-{Na}{short-desc}` (e.g. `item-8-country-city-iso-fixes`)
+    5. Commit message: `Item-{Na} [X of Y]: {what was fixed and how}`
     6. `git push origin {branch}` immediately after every commit — no exceptions
     7. Report back to user: branch name, commit message, one-line summary
 - After the final commit of a sub-task:
