@@ -475,11 +475,12 @@ function buildTransportTab(cityFilter = null) {
     const route = isMultiLeg
     ? buildRouteChainWithCodes(segs)
     : `${getLocationCodeDisplay(rep.fromLocation)} → ${getLocationCodeDisplay(rep.toLocation)}`;
-    const firstDep = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
-    const firstTime = rep.departureTime || '—';
+    const firstDepDate = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
+    const firstDepTime = rep.departureTime || '';
+  const firstDepDisplay = firstDepDate + (firstDepTime ? ' ' + firstDepTime : '');
     const lastSeg = segs[segs.length - 1];
     const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
-    const lastArrTime = lastSeg.arrivalTime || '—';
+    const lastArrTime = lastSeg.arrivalTime || '';
 
     const totalCost = segs.reduce((sum, s) => sum + (parseFloat(s.cost) || 0), 0);
 
@@ -498,9 +499,9 @@ function buildTransportTab(cityFilter = null) {
         <td>${expandBtn}</td>
         <td class="journey-name-col" title="${rep.journeyName || ''}">${nameDisplay}${isMultiLeg ? ` <span style="font-size:0.7rem;background:#e8f0fe;color:#3c5a99;padding:1px 5px;border-radius:8px;">${segs.length} legs</span>` : ''}</td>
         <td>${icon}</td>
-        <td class="date-col">${firstDep}</td>
+        <td class="date-col">${firstDepDate}</td>
         <td class="route-col">${route}</td>
-        <td>${firstTime}</td>
+        <td>${firstDepDisplay}</td>
         <td>${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
         <td>${rep.provider || '—'}</td>
         <td>${isMultiLeg ? '—' : (rep.routeCode || '—')}</td>
@@ -522,16 +523,18 @@ ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monos
     if (isMultiLeg) {
       segs.forEach((seg, i) => {
         const segIcon = getTransportIcon(seg.transportType);
-        const segDep = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
+        const segDepDate = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
+  const segDepTime = seg.departureTime || '';
+  const segDepDisplay = segDepDate + (segDepTime ? ' ' + segDepTime : '');
         const segArr = formatJourneyDate(seg.arrivalDate) || '—';
         html += `
           <tr class="journey-segment-row" data-group="${gid}" style="display:none;background:#fafaf8;font-size:0.85rem;">
             <td></td>
             <td style="padding-left:2rem;color:#888;">↳ Leg ${i + 1}</td>
             <td>${segIcon}</td>
-            <td class="date-col">${segDep}</td>
+            <td class="date-col">${segDepDate}</td>
             <td class="route-col" style="color:#555;">${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</td>
-            <td>${seg.departureTime || '—'}</td>
+            <td>${segDepDisplay}</td>
             <td>${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
             <td>${seg.provider || '—'}</td>
             <td>${seg.routeCode || '—'}</td>
