@@ -170,12 +170,12 @@ Claude Code: when the user sends a short command, look it up here and execute ex
 `{N}` = item number, `{a}` = sub-task letter, `{i}` = sub-item roman numeral. Examples: `8`, `8a`, `8b-ii`
 
 ### Session Commands
-| Command | Action |
-|---|---|
-| `Start {N}` | Read CLAUDE.md → TODO.md → UNFINISHED.md. Reply to user with: item name, branch, full sub-task/sub-item breakdown, files to touch, estimated commits. Wait for go-ahead. |
-| `Confirm {Nai}` | Proceed with stated sub-task or sub-item. No further confirmation needed. |
-| `Resume` | Read UNFINISHED.md + git log. Reply to user with: branch, last commit, what was done, exact next step. Wait for go-ahead. |
-| `Park` | Update UNFINISHED.md with current state and exact next step. Push branch. Reply to user with branch name and next step. Stop all work. |
+| Command         | Action                                                                                                                                                                                                                                                                                             |
+|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Start {Nai}`   | Read CLAUDE.md → TODO.md → UNFINISHED.md. Record this information in UNFINISHED.md: item name, branch, full sub-task/sub-item breakdown, expected files to touch, estimated commits. Reply to the user with this information and remind the user to commence work with the `Confirm {Nai}` prompt. |
+| `Confirm {Nai}` | Proceed with stated sub-task or sub-item using infromation from UNFINISHED.md. No further confirmation needed unless clarification or information from UNIFINISHED.md is missing.                                                                                                                  |
+| `Resume`        | Read UNFINISHED.md + git log. Reply to user with: branch, last commit, what was done, exact next step. Wait for go-ahead.                                                                                                                                                                          |
+| `Park`          | Update UNFINISHED.md with current state and exact next step. Push branch. Reply to user with branch name and next step. Stop all work.                                                                                                                                                             |
 
 ### Status Commands
 | Command | Action |
@@ -217,8 +217,7 @@ Claude Code: when the user sends a short command, look it up here and execute ex
       h. Read `UNFINISHED.md` — most precise resume point; contains active item,
       awaiting-review items, last commit, next step, files touched, blockers.
       Prioritise over git log for orientation.
-      i. Read `todo/item-{N}-*.md` if a spec file exists for the target item
-      j. Only check git log if UNFINISHED.md is missing or unclear
+      h. Only check git log if UNFINISHED.md is missing or unclear
 3. Declare your status report:
     - Which item/sub-task you are starting or resuming
     - What the last completed commit was (if resuming)
