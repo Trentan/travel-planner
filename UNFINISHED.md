@@ -2,12 +2,12 @@
 
 ## 🔄 Active
 
-- **Item/sub-task:** 8a
+- **Item/sub-task:** 8a-i
 - **Branch:** item-8a-transport-table-layout
-- **Last commit:** `Item 8a: Restore original 13-column transport table layout`
-- **What was done:** Completely restored the original transport table layout (before the attempted 9-column redesign). The 13-column layout with Date, Route, Departs, Arrives, Provider, Route # columns is back.
-- **Next step:** Verify the original 8a work is now displaying correctly in the browser
-- **Files touched:** `js/transport.js` (restored from commit ab06c1a^)
+- **Last commit:** `Item 8a-i [1 of 2]: Added booking reference display under status badge`
+- **What was done:** Added booking reference to display under the status badge (using same pattern as accommodation table: `<br><span class="booking-ref">`)
+- **Next step:** Commit and push, then ask user if the Ref column should be removed now that booking reference shows under status
+- **Files touched:** `js/transport.js`
 
 ---
 
@@ -27,4 +27,4 @@ none
   - Slovakia added to country data
   - IATA lookup for Other country selection
 
-*Last updated: 2026-04-30 — Item 8a restored to original 13-column layout*
+*Last updated: 2026-04-30 — Item 8a-i in progress*

@@ -459,7 +459,6 @@ function buildTransportTab(cityFilter = null) {
           <th>Route #</th>
           <th>Cost</th>
           <th>Status</th>
-          <th>Ref</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -511,12 +510,6 @@ function buildTransportTab(cityFilter = null) {
             ${statusText}
           </span>
 ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${rep.bookingReference}</span>` : ""}
-        </td>
-        <td>
-          <input type="text" value="${rep.bookingReference || ''}" placeholder="Ref #"
-            onchange="updateJourneyBookingRef('${rep.id}', this.value); buildTransportTab();"
-            style="width:70px;padding:2px 4px;font-size:0.8rem;border:1px solid #ddd;border-radius:3px;font-family:monospace;"
-            ${isEditMode ? '' : 'readonly'}>
         </td>
         <td>
           <button class="action-btn small" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; font-size: 0.8rem; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>

@@ -29,10 +29,11 @@ Read this file at the start of every session. Claude Code: read from main branch
 
 - [ ] a) Improve journey table layout to display fields better
   - [ ] i) Make Status like the one in Accommodation table where the booking id (reference) is nicely under the pending / confirmed - nice touch
-  - [ ] ii) Departs should have the date and time combined like arrives
-  - [ ] iii) Make sure instead of 'to' it is an '→' arrow
-  - [ ] iii) You can calculate total travel time and display under the journey description in a smaller italic font (eg 11hrs)
-  - [ ] iii) Bug where I cannot edit segment one on existing segment for the koh / bkk / bne journey when in edit mode
+  - [ ] ii) Reference field needs to be in the add/edit dialog for journey 
+  - [ ] iii) Departs should have the date and time combined like arrives
+  - [ ] iv) Make sure instead of 'to' it is an '→' arrow
+  - [ ] v) You can calculate total travel time and display under the journey description in a smaller italic font (eg 11hrs)
+  - [ ] vi) Bug where I cannot edit segment one on existing segment for the koh / bkk / bne journey when in edit mode
 - [x] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
   - [x] i) Add trip leg dialog not showing - loads new leg straight into itinerary instead of opening dialog
   - [x] ii) City selection dropdowns should populate to their pre-selected countries by default (currently not populating)
