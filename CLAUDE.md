@@ -204,7 +204,7 @@ Claude Code: when the user sends a short command, look it up here and execute ex
    a. `git fetch origin main`
    b. `git show origin/main:CLAUDE.md` — read latest instructions from main
    c. `git diff origin/main -- TODO.md` — check if TODO.md differs from main
-   d. If different: `git checkout origin/main -- TODO.md` to sync it, then read it
+   d. If the main TODO.md is ahead of local: `git checkout origin/main -- TODO.md` to sync it, then read it
    e. If same: read local TODO.md as-is
    f. Determine target branch — in order:
     - TODO.md active item `**Branch:**` field — use this first
