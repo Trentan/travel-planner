@@ -2,26 +2,18 @@
 
 ## 🔄 Active
 
-- **Item/sub-task:** 8a-i (REVERTED)
+- **Item/sub-task:** 8a
 - **Branch:** item-8a-transport-table-layout
-- **Last commit:** `Revert 8a-i changes - restore original 8a transport table code`
-- **What was done:** Reverted the 8a-i changes that attempted to match accommodation table status style. The original 8a work appears to have issues that need investigation.
-- **Next step:** Investigate original 8a issues - user reports "fields are all mucked up and look terrible plus all the hover text gone"
-- **Files touched:** `js/transport.js` (reverted)
+- **Last commit:** `Item 8a: Restore original 13-column transport table layout`
+- **What was done:** Completely restored the original transport table layout (before the attempted 9-column redesign). The 13-column layout with Date, Route, Departs, Arrives, Provider, Route # columns is back.
+- **Next step:** Verify the original 8a work is now displaying correctly in the browser
+- **Files touched:** `js/transport.js` (restored from commit ab06c1a^)
 
 ---
 
 ## 👀 Awaiting Review / Merge
 
-- **Item 8a** — branch `item-8a-transport-table-layout` — HAS ISSUES - DO NOT REVIEW
-  - User reports: "fields are all mucked up and look terrible plus all the hover text gone"
-  - Need to investigate what's wrong with the original 8a transport table layout work
-  - Redesigned transport table from 13 columns to 9 columns
-  - Combined Provider/Route # into Service column
-  - Stacked Date/Departs into Departure column
-  - Added duration display per journey
-  - Improved segment rows with cleaner layout
-  - Better responsive breakpoints
+none
 
 ---
 
@@ -35,4 +27,4 @@
   - Slovakia added to country data
   - IATA lookup for Other country selection
 
-*Last updated: 2026-04-30 — Item 8a-i reverted, investigating original 8a issues*
+*Last updated: 2026-04-30 — Item 8a restored to original 13-column layout*
