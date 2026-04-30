@@ -517,10 +517,6 @@ function buildTransportTab(cityFilter = null) {
       ? `<button class="journey-expand-btn" onclick="toggleJourneySegments('${gid}')" title="Show/hide ${segs.length} segments">▶</button>`
       : '';
 
-    // Booking reference as small tag below status, or inline
-    const bookingRefDisplay = rep.bookingReference
-      ? `<div class="booking-ref-small">${rep.bookingReference}</div>`
-      : '';
 
     // Duration calculation for display
     const duration = calculateDuration(rep.departureDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
@@ -540,7 +536,7 @@ function buildTransportTab(cityFilter = null) {
     </td>
     <td class="journey-status-col">
       <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="toggleJourneyStatus('${rep.id}')">${statusText}</span>
-      ${bookingRefDisplay}
+      ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${rep.bookingReference}</span>` : ''}
     </td>
     <td class="journey-route-col">${route}</td>
     <td class="journey-service-col">${serviceDisplay}</td>

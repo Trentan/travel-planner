@@ -3,7 +3,9 @@
     "allow": [
       "Bash(awk *)",
       "Bash(git checkout *)",
-      "Bash(set -e)"
+      "Bash(set -e)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   }
 }
