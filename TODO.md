@@ -24,10 +24,10 @@ Read this file at the start of every session. Claude Code: read from main branch
 ---
 
 ### Item 8: Improve Country and City Standards
-**Status:** Not started
-**Next:** `item-8a`
+**Status:** 8a complete, 8b merged — remaining sub-tasks pending
+**Next:** `item-8a-v`
 
-- [ ] a) Improve journey table layout to display fields better
+- [x] a) Improve journey table layout to display fields better
   - [ ] i) Make Status like the one in Accommodation table where the booking id (reference) is nicely under the pending / confirmed - nice touch
   - [ ] ii) Reference field needs to be in the add/edit dialog for journey 
   - [ ] iii) Departs should have the date and time combined like arrives
