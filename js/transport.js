@@ -527,9 +527,7 @@ const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + f
 
     const icon = isMultiLeg ? '✈️' : getTransportIcon(rep.transportType);
 
-    const nameDisplay = rep.journeyName
-        ? (rep.journeyName.length > 22 ? rep.journeyName.substring(0, 22) + '…' : rep.journeyName)
-        : '—';
+const nameDisplay = rep.journeyName || '—';
 
 // Calculate and display total travel time for multi-leg journeys
 const durationHours = isMultiLeg ? calculateJourneyDuration(segs) : null;
