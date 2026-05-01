@@ -475,8 +475,9 @@ function buildTransportTab(cityFilter = null) {
     const route = isMultiLeg
     ? buildRouteChainWithCodes(segs)
     : `${getLocationCodeDisplay(rep.fromLocation)} → ${getLocationCodeDisplay(rep.toLocation)}`;
-    const firstDep = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
-    const firstTime = rep.departureTime || '—';
+    const firstDepDate = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
+const firstDepTime = rep.departureTime || '';
+const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + firstDepTime : firstDepDate;
     const lastSeg = segs[segs.length - 1];
     const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
     const lastArrTime = lastSeg.arrivalTime || '—';
@@ -500,7 +501,7 @@ function buildTransportTab(cityFilter = null) {
         <td>${icon}</td>
         <td class="date-col">${firstDep}</td>
         <td class="route-col">${route}</td>
-        <td>${firstTime}</td>
+        <td class="date-col">${firstDep}</td>
         <td>${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
         <td>${rep.provider || '—'}</td>
         <td>${isMultiLeg ? '—' : (rep.routeCode || '—')}</td>
@@ -528,7 +529,9 @@ function buildTransportTab(cityFilter = null) {
     if (isMultiLeg) {
       segs.forEach((seg, i) => {
         const segIcon = getTransportIcon(seg.transportType);
-        const segDep = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
+        const segDepDate = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
+const segDepTime = seg.departureTime || '';
+const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTime : segDepDate;
         const segArr = formatJourneyDate(seg.arrivalDate) || '—';
         html += `
           <tr class="journey-segment-row" data-group="${gid}" style="display:none;background:#fafaf8;font-size:0.85rem;">
@@ -537,7 +540,7 @@ function buildTransportTab(cityFilter = null) {
             <td>${segIcon}</td>
             <td class="date-col">${segDep}</td>
             <td class="route-col" style="color:#555;">${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</td>
-            <td>${seg.departureTime || '—'}</td>
+            <td class="date-col">${segDep}</td>
             <td>${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
             <td>${seg.provider || '—'}</td>
             <td>${seg.routeCode || '—'}</td>
