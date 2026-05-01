@@ -660,8 +660,12 @@ function editJourney(journeyId) {
   modal.style.display = 'flex';
 }
 
+// Track if form is "dirty" (has unsaved user changes)
+let _journeyFormDirty = false;
+
 // Helper to fill the form inputs
 function _loadSegmentIntoForm(seg) {
+  _journeyFormDirty = false; // Reset dirty flag when loading form
   selectJourneyType(seg.transportType || 'flight');
 
   document.getElementById('journeyFromCity').value = seg.fromLocation || '';
@@ -679,10 +683,10 @@ function _loadSegmentIntoForm(seg) {
 
 // Allow clicking a pending segment to load it back into the active form
 function editPendingSegment(index) {
-  const toLoc = document.getElementById('journeyToCity')?.value;
-  if (toLoc) {
-    // Save current form to pending before swapping
+  // Only save current form if it has unsaved changes
+  if (_journeyFormDirty) {
     addSegmentToJourney();
+    _journeyFormDirty = false;
   }
 
   const seg = _pendingSegments.splice(index, 1)[0];
@@ -923,6 +927,7 @@ function closeJourneyModal() {
   _pendingSegments = [];
   _pendingJourneyId = null;
   _pendingJourneyName = '';
+  _journeyFormDirty = false;
 }
 
 function saveJourneyFromModal() {
