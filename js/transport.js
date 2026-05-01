@@ -720,31 +720,9 @@ function selectJourneyType(type) {
 }
 
 function promptAddNewCity() {
-  const cityName = prompt("Enter new city name:");
-  if (!cityName) return;
-
-  const exists = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase()) : null;
-  if (exists) {
-    alert("City already exists!");
-    const toSelect = document.getElementById('journeyToCity');
-    if (toSelect) toSelect.value = exists.name;
-    return;
-  }
-
-  const countryName = prompt(`Enter country for ${cityName} (optional):`) || '';
-
-  if (typeof addOrUpdateCity === 'function') {
-    const newCity = addOrUpdateCity(cityName, countryName);
-    if (newCity) {
-      if (typeof saveData === 'function') saveData(false);
-      if (typeof buildCityNav === 'function') buildCityNav();
-      if (typeof populateCityList === 'function') populateCityList();
-
-      _populateJourneyCityDropdowns();
-
-      const toSelect = document.getElementById('journeyToCity');
-      if (toSelect) toSelect.value = newCity.name;
-    }
+  // Open the Manage Cities dialog instead of using browser prompts
+  if (typeof openCityDialog === 'function') {
+    openCityDialog();
   }
 }
 
