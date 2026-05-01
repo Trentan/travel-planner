@@ -1345,6 +1345,7 @@ function saveData(showTick = true) {
   localStorage.setItem('travelApp_packing_v3', JSON.stringify(packingData));
   localStorage.setItem('travelApp_leavehome_v3', JSON.stringify(leaveHomeData));
   localStorage.setItem('travelApp_stays_v1', JSON.stringify(stays));
+  localStorage.setItem('travelApp_cities_v1', JSON.stringify(citiesData));
 
   if(showTick) {
     const status = document.getElementById('saveStatus');
