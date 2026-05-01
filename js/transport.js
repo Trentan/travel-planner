@@ -650,6 +650,12 @@ if (segmentsCopy.length > 0) {
 
 _updateSegmentList();
 
+  // Update journey title display
+  const titleEl = document.getElementById('journeyTitleDisplay');
+  if (titleEl) {
+    titleEl.textContent = _pendingJourneyName || 'New Journey';
+  }
+
   const header = modal.querySelector('.modal-header h2');
   if (header) header.textContent = '✈️ Edit journey';
 
@@ -775,8 +781,16 @@ function openAddJourneyModal() {
     _pendingJourneyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
     _pendingSegments = [];
     _pendingJourneyName = ''; // Reset name
+    _activeSegmentIndex = -1;
 
     _populateJourneyCityDropdowns();
+
+    // Clear journey title display for new journey
+    const titleEl = document.getElementById('journeyTitleDisplay');
+    if (titleEl) {
+      titleEl.textContent = 'New Journey';
+    }
+
     _updateSegmentList();
     selectJourneyType('flight');
 
@@ -816,11 +830,9 @@ function _updateSegmentList() {
     }
   }
 
-  // Build the Pill Tracker at the top - ALL segments are clickable
+  // Build the Pill Tracker at the top - ONLY show actual segments, NOT form segment
   if (trackerContainer) {
     let trackerHtml = '';
-    const formFrom = document.getElementById('journeyFromCity')?.value || '...';
-    const formTo = document.getElementById('journeyToCity')?.value || '...';
 
     _pendingSegments.forEach((seg, i) => {
       const isActive = _activeSegmentIndex === i;
@@ -829,14 +841,6 @@ function _updateSegmentList() {
         trackerHtml += '<div class="segment-arrow">➔</div>';
       }
     });
-
-    // Show the form segment (what will be added next) if there's data in form
-    if (formTo && formTo !== '') {
-      if (totalSegments > 0) {
-        trackerHtml += '<div class="segment-arrow">➔</div>';
-      }
-      trackerHtml += `<div class="segment-pill ${_activeSegmentIndex < 0 || _activeSegmentIndex >= totalSegments ? 'active' : ''}" style="cursor: default;"><span class="pill-num">${totalSegments + 1}</span> ${formFrom} → ${formTo}</div>`;
-    }
 
     trackerContainer.innerHTML = trackerHtml;
   }
