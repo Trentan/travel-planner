@@ -33,7 +33,7 @@ Read this file at the start of every session. Claude Code: read from main branch
   - [x] iii) Departs should have the date and time combined like arrives
   - [x] iv) Make sure instead of 'to' it is an '→' arrow
   - [x] v) You can calculate total travel time and display under the journey description in a smaller italic font (eg 11hrs)
-  - [ ] vi) Bug where I cannot edit segment one on existing segment for the koh / bkk / bne journey when in edit mode
+  - [ ] vi) Edit journey dialog: segments now clickable in pill tracker at top, all segments show in summary below with Edit/Remove buttons. STILL NEEDS TESTING: Verify segments persist when switching, deleted segments removed from JSON, and journey name display at top of dialog shows correctly.
   - [ ] vii) In Manage cities for countries, you can only select "other" - you should be able to enter a country / create a new country when other selected (and it can be loaded in somehow...) - needs to flag def and country code and country name
   - [ ] viii) When a leg or segment is changed and affects a journey - the description should change (if the start and end cities differ) to the new start and end. Also if there are legs in the middle, they should be in bracket e.g. Zurich to Bangkok (via London) || Brisbane to Vienna (via Taipei, Bangkok)
 - [x] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
@@ -54,6 +54,7 @@ Read this file at the start of every session. Claude Code: read from main branch
 - [ ] f) Go through and convert the testing checklist into new items and sub items in this todo list
 - [ ] g) Go through and convert the Future Enhancements checklist into new items and sub items in this todo list (some may already be resolved)
 - [ ] h) Add a new notes tab - where you can add a generic checklist (eg get gifts for wife, don;t forget to take photo of x, important things to consider on your trip, unresolved items)
+- [ ] i) Improve leaving home checklist, I have a notion checklist to merge/compare - https://www.notion.so/trentan/afd1a6b4feb14fa38065515dbacbd676?v=d157c05db95048cbaffc6eb2645367a4&p=d4d390afce8b45fabdd8782b55fb3971&pm=s
 ---
 
 ## Noticed (unscheduled)

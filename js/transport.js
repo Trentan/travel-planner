@@ -641,18 +641,14 @@ function editJourney(journeyId) {
   _pendingJourneyName = segmentsCopy[0].journeyName || '';
   _populateJourneyCityDropdowns();
 
-  if (segmentsCopy.length === 1) {
-    // Single leg: load directly into form
-    _pendingSegments = [];
-    _loadSegmentIntoForm(segmentsCopy[0]);
-  } else {
-    // Multi-leg: put all but last into pending, load last into form
-    const lastSeg = segmentsCopy.pop();
-    _pendingSegments = segmentsCopy;
-    _loadSegmentIntoForm(lastSeg);
-  }
+  // Multi-leg: all segments go into array, first one loaded into form for editing
+_pendingSegments = segmentsCopy;
+_activeSegmentIndex = segmentsCopy.length > 0 ? 0 : -1;
+if (segmentsCopy.length > 0) {
+  _loadSegmentIntoForm(segmentsCopy[0]);
+}
 
-  _updateSegmentList();
+_updateSegmentList();
 
   const header = modal.querySelector('.modal-header h2');
   if (header) header.textContent = '✈️ Edit journey';
@@ -681,16 +677,31 @@ function _loadSegmentIntoForm(seg) {
   document.getElementById('journeyBookingRef').value = seg.bookingReference || '';
 }
 
-// Allow clicking a pending segment to load it back into the active form
+// Track which segment is currently active (0-based index for segments in pending, -1 if form is new)
+let _activeSegmentIndex = -1;
+
+// Allow clicking any segment pill to switch between segments
 function editPendingSegment(index) {
-  // Only save current form if it has unsaved changes
-  if (_journeyFormDirty) {
-    addSegmentToJourney();
-    _journeyFormDirty = false;
+  // If clicking the same segment, do nothing
+  if (_activeSegmentIndex === index) return;
+
+  // First, save the current form data back to its position
+  const currentFrom = document.getElementById('journeyFromCity')?.value;
+  const currentTo = document.getElementById('journeyToCity')?.value;
+
+  if (currentTo && currentTo !== '' && _activeSegmentIndex >= 0 && _activeSegmentIndex < _pendingSegments.length) {
+    const currentSeg = _buildJourneyObject(currentFrom, currentTo, _activeSegmentIndex + 1);
+    _pendingSegments[_activeSegmentIndex] = currentSeg;
   }
 
-  const seg = _pendingSegments.splice(index, 1)[0];
-  _loadSegmentIntoForm(seg);
+  // Load the clicked segment into the form (don't remove it from array!)
+  const clickedSeg = _pendingSegments[index];
+  if (clickedSeg) {
+    _loadSegmentIntoForm(clickedSeg);
+    _activeSegmentIndex = index;
+  }
+
+  _journeyFormDirty = false;
   _updateSegmentList();
 }
 
@@ -793,31 +804,39 @@ function _updateSegmentList() {
   const summaryContainer = document.getElementById('pendingSegmentsList');
   const labelEl = document.getElementById('currentSegmentLabel');
 
-  const currentLegNum = _pendingSegments.length + 1;
+  const totalSegments = _pendingSegments.length;
 
+  // Update label to show current status
   if (labelEl) {
-    labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; margin-right: 6px;">${currentLegNum}</span> Segment ${currentLegNum} — entering details`;
+    if (_activeSegmentIndex >= 0 && _activeSegmentIndex < totalSegments) {
+      const seg = _pendingSegments[_activeSegmentIndex];
+      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; margin-right: 6px;">${_activeSegmentIndex + 1}</span> Editing: ${seg.fromLocation} → ${seg.toLocation}`;
+    } else {
+      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; margin-right: 6px;">${totalSegments + 1}</span> Segment ${totalSegments + 1} — entering details`;
+    }
   }
 
-  // Build the Pill Tracker at the top
+  // Build the Pill Tracker at the top - ALL segments are clickable
   if (trackerContainer) {
     let trackerHtml = '';
+    const formFrom = document.getElementById('journeyFromCity')?.value || '...';
+    const formTo = document.getElementById('journeyToCity')?.value || '...';
 
     _pendingSegments.forEach((seg, i) => {
-      trackerHtml += `
-        <div class="segment-pill completed" title="${seg.transportType}: ${seg.fromLocation} to ${seg.toLocation}">
-          <span class="pill-num">${i + 1}</span> ${seg.fromLocation} ➔ ${seg.toLocation}
-        </div>
-        <div class="segment-arrow">➔</div>
-      `;
+      const isActive = _activeSegmentIndex === i;
+      trackerHtml += `<div class="segment-pill ${isActive ? 'active' : 'completed'}" onclick="editPendingSegment(${i})" title="${isActive ? 'Currently editing' : 'Click to edit'}" style="cursor: pointer;"><span class="pill-num">${i + 1}</span> ${seg.fromLocation} → ${seg.toLocation}</div>`;
+      if (i < totalSegments - 1) {
+        trackerHtml += '<div class="segment-arrow">➔</div>';
+      }
     });
 
-    const fromLoc = _pendingSegments.length > 0 ? _pendingSegments[_pendingSegments.length-1].toLocation : '...';
-    trackerHtml += `
-      <div class="segment-pill active">
-        <span class="pill-num">${currentLegNum}</span> ${fromLoc} ➔ ...
-      </div>
-    `;
+    // Show the form segment (what will be added next) if there's data in form
+    if (formTo && formTo !== '') {
+      if (totalSegments > 0) {
+        trackerHtml += '<div class="segment-arrow">➔</div>';
+      }
+      trackerHtml += `<div class="segment-pill ${_activeSegmentIndex < 0 || _activeSegmentIndex >= totalSegments ? 'active' : ''}" style="cursor: default;"><span class="pill-num">${totalSegments + 1}</span> ${formFrom} → ${formTo}</div>`;
+    }
 
     trackerContainer.innerHTML = trackerHtml;
   }
@@ -830,12 +849,14 @@ function _updateSegmentList() {
     }
 
     summaryContainer.innerHTML = _pendingSegments.map((s, i) => {
+  const isCurrent = _activeSegmentIndex === i;
+  const bgStyle = isCurrent ? 'background: #e8f0fe; border: 1px solid #3c5a99; padding: 6px; border-radius: 6px;' : '';
       const depString = `${formatJourneyDate(s.departureDate)} ${s.departureTime || ''}`.trim();
       const arrString = `${formatJourneyDate(s.arrivalDate)} ${s.arrivalTime || ''}`.trim();
       const providerStr = `${s.provider} ${s.routeCode}`.trim();
 
       return `
-      <div style="font-size: 0.85rem; color: #666; text-align: center; margin-bottom: 4px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+      <div style="font-size: 0.85rem; color: #666; text-align: center; margin-bottom: 8px; ${bgStyle}">
         <span>✓ Segment ${i + 1}: ${s.fromLocation} ➔ ${s.toLocation}</span>
         <span style="color: #ccc;">•</span>
         <span>${depString} ➔ ${arrString}</span>
@@ -849,6 +870,10 @@ function _updateSegmentList() {
 
 function removePendingSegment(index) {
   _pendingSegments.splice(index, 1);
+  // Adjust active segment index if needed
+  if (_activeSegmentIndex >= _pendingSegments.length) {
+    _activeSegmentIndex = _pendingSegments.length - 1;
+  }
   _updateSegmentList();
 }
 
@@ -937,8 +962,13 @@ function saveJourneyFromModal() {
 
     const hasFormData = toLocation && toLocation !== '';
 
+    // If form is dirty and there's an active segment, save the current form data first
     let finalSegments = [..._pendingSegments];
-    if (hasFormData) {
+    if (hasFormData && _activeSegmentIndex >= 0 && _activeSegmentIndex < finalSegments.length) {
+      // Replace the active segment with current form data
+      finalSegments[_activeSegmentIndex] = _buildJourneyObject(fromLocation, toLocation, _activeSegmentIndex + 1);
+    } else if (hasFormData) {
+      // Add new segment if no active segment
       finalSegments.push(_buildJourneyObject(fromLocation, toLocation, finalSegments.length + 1));
     }
 
