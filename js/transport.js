@@ -23,6 +23,47 @@ function getLocationDisplayWithCode(locationName) {
   return locationName;
 }
 
+// Calculate total journey duration in hours
+function calculateJourneyDuration(segments) {
+  if (!segments || segments.length === 0) return null;
+
+  const firstSeg = segments[0];
+  const lastSeg = segments[segments.length - 1];
+
+  const depDate = firstSeg.departureDate || firstSeg.dayDate;
+  const depTime = firstSeg.departureTime;
+  const arrDate = lastSeg.arrivalDate;
+  const arrTime = lastSeg.arrivalTime;
+
+  if (!depDate || !arrDate) return null;
+
+  // Parse dates - handle both YYYY-MM-DD and legacy formats
+  let depTs = 0, arrTs = 0;
+
+  if (depDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    depTs = new Date(`${depDate}T${depTime || '00:00'}:00`).getTime();
+  } else {
+    depTs = new Date(`${depDate} 2026 ${depTime || '00:00'}`).getTime();
+  }
+
+  if (arrDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    arrTs = new Date(`${arrDate}T${arrTime || '00:00'}:00`).getTime();
+  } else {
+    arrTs = new Date(`${arrDate} 2026 ${arrTime || '00:00'}`).getTime();
+  }
+
+  if (isNaN(depTs) || isNaN(arrTs)) return null;
+
+  let diffMs = arrTs - depTs;
+  if (diffMs < 0) {
+    // Arrival next day - add 24 hours
+    diffMs += 24 * 60 * 60 * 1000;
+  }
+
+  const totalHours = Math.floor(diffMs / (60 * 60 * 1000));
+  return totalHours;
+}
+
 // Helper: Get compact code display for table cells
 // Returns just the code with full name as tooltip
 function getLocationCodeDisplay(locationName) {
@@ -497,7 +538,7 @@ const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + f
     html += `
       <tr class="journey-parent-row" data-group="${gid}" style="border-left:3px solid ${statusColor};">
         <td>${expandBtn}</td>
-        <td class="journey-name-col" title="${rep.journeyName || ''}">${nameDisplay}${isMultiLeg ? ` <span style="font-size:0.7rem;background:#e8f0fe;color:#3c5a99;padding:1px 5px;border-radius:8px;">${segs.length} legs</span>` : ''}</td>
+        <td class="journey-name-col" title="${rep.journeyName || ''}">${nameDisplay}${durationDisplay}${isMultiLeg ? ` <span style="font-size:0.7rem;background:#e8f0fe;color:#3c5a99;padding:1px 5px;border-radius:8px;">${segs.length} legs</span>` : ''}</td>
         <td>${icon}</td>
         <td class="date-col">${firstDep}</td>
         <td class="route-col">${route}</td>
