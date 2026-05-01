@@ -415,6 +415,44 @@ function buildNav() {
   buildCityNav();
 }
 
+// Get cities in travel order based on trip legs
+function getCitiesInTravelOrder() {
+  if (!Array.isArray(appData) || appData.length === 0) {
+    // Fall back to citiesData order if no legs
+    return citiesData;
+  }
+
+  // Collect city IDs in order they appear in legs
+  const cityIdOrder = [];
+  const seenCityIds = new Set();
+
+  appData.forEach(leg => {
+    // Get city from leg.id
+    if (leg.id && !seenCityIds.has(leg.id)) {
+      cityIdOrder.push(leg.id);
+      seenCityIds.add(leg.id);
+    }
+  });
+
+  // Map city IDs to city objects, preserving order
+  const orderedCities = [];
+  cityIdOrder.forEach(cityId => {
+    const city = citiesData.find(c => c.id === cityId);
+    if (city) {
+      orderedCities.push(city);
+    }
+  });
+
+  // Add any cities not in legs (in their original order)
+  citiesData.forEach(city => {
+    if (!seenCityIds.has(city.id)) {
+      orderedCities.push(city);
+    }
+  });
+
+  return orderedCities;
+}
+
 // Active city filter - 'all' or city ID (access via window.currentCityFilter for cross-module access)
 function buildCityNav() {
   const nav = document.getElementById('cityNav');
@@ -428,8 +466,11 @@ function buildCityNav() {
     </button>
   `;
 
-  // Add city buttons with color indicators
-  citiesData.forEach(city => {
+  // Get cities in travel order (by leg appearance)
+  const citiesInOrder = getCitiesInTravelOrder();
+
+  // Add city buttons with color indicators in travel order
+  citiesInOrder.forEach(city => {
     const btn = document.createElement('button');
     btn.className = 'city-nav-btn' + (filter === city.id ? ' active' : '');
     btn.setAttribute('data-city', city.id);
