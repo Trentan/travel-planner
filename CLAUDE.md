@@ -1,7 +1,41 @@
 # CLAUDE.md
-> **Command reference:** All user commands are single phrases defined in the
-> Command Dictionary in the Development Workflow section below.
-> When a message matches a command, execute it — do not ask for clarification.
+
+> ⚡ **If the user's message matches a command below, execute it immediately and stop reading. Do not read further unless the command explicitly requires project context.**
+
+---
+
+## Command Dictionary
+
+> **Key:** `{N}` = item number · `{a}` = sub-task letter · `{i}` = sub-item roman numeral · e.g. `Start 3b` or `Confirm 3b-ii`
+
+### Session Commands
+| Command | Action |
+|---|---|
+| `Start {Nai}` | Read `TODO.md` → `UNFINISHED.md`. Record and commit to `UNFINISHED.md`: item name, branch, full sub-task/sub-item breakdown, expected files to touch, estimated commits. Reply with this information and remind the user to proceed with `Confirm {Nai}`. |
+| `Confirm {Nai}` | Proceed with the stated sub-task or sub-item using information from `UNFINISHED.md`. No further confirmation needed unless information is missing or clarification is required. Update `UNFINISHED.md` with recent changes; move `Item-{Nai}` to Awaiting Review with a change summary and matching commit IDs. Commit and push branch. Reply notifying the user to review changes for `Item-{Nai}`. |
+| `Resume` | Read `UNFINISHED.md` + `git log`. Reply with: branch, last commit, what was done, exact next step. Wait for go-ahead before doing anything. |
+| `Park` | Update `UNFINISHED.md` with current state and exact next step. Push branch. Reply with branch name and next step. Stop all work immediately. |
+
+### Status Commands
+| Command | Action |
+|---|---|
+| `Where up to` | Read `UNFINISHED.md`. Reply with one line only: item + sub-task, branch, last commit message. Nothing else. |
+| `Status` | Read `UNFINISHED.md`. Reply with: active item + sub-task, branch, last commit, next step, anything awaiting review. Do not start work. |
+| `Pending` | Read `UNFINISHED.md`. List all Awaiting Review items — item, branch, one-line summary. Do not start work. |
+
+### TODO Commands
+| Command | Action |
+|---|---|
+| `New Item` | Ask the user to describe the item. Auto-increment item number from `TODO.md`. Write to `TODO.md` with task and sub-task breakdown. Commit and push. Reply with exactly what was written. |
+| `Add to {Na}` | Ask the user to describe the new sub-task or sub-item. Append to the correct item in `TODO.md` using the next available letter or roman numeral. Commit and push. Reply with exactly what was written. |
+| `Complete {Nai}` | The user is declaring this item done — do not verify, read code, grep, or check implementation. Trust the user. Immediately: mark `[x]` in `TODO.md` for the stated sub-task/sub-item. Cascade upward: if all sub-items under a sub-task are done, mark the sub-task `[x]`; if all sub-tasks under a task are done, mark the task `[x]`. Move the item from Awaiting Review to Completed in `UNFINISHED.md`. Commit, push branch, and open PR to main. Reply with branch and PR link. |
+| `Finish {Nai}` | Merge the PR for the item referenced in `UNFINISHED.md` Completed section. Move the item from Completed in `UNFINISHED.md` to `VERIFIED.md`. Commit and push. Reply with outcome. |
+
+---
+
+> 📄 **Commands above require no further context. Only read below if starting a new session, resuming work, or beginning a `Start` / `Confirm` command.**
+
+---
 
 ## Project Overview
 
@@ -153,7 +187,7 @@ Trip title, subtitle, and current file name for display.
 
 - **Contenteditable elements**: Use `onblur="updateX()"`, check if empty to delete items
 - **Drag-and-drop**: Only enabled in edit mode, tracks `assignedDayIdx` property
-- **Checkbox state**: Toggles `done` property and re-rends for strikethrough effect
+- **Checkbox state**: Toggles `done` property and re-renders for strikethrough effect
 - **Cost parsing**: Use `parseCost()` helper to extract numbers from strings
 - **Sorting**: `sortLegs()` sorts by first day's date, called after date changes
 - **Auto-save**: `saveData(false)` for silent saves, `saveData(true)` shows ✓ indicator
@@ -162,133 +196,98 @@ Trip title, subtitle, and current file name for display.
 
 ## Development Workflow
 
-> **Re-entering a session?** Read `CLAUDE.md` → read `TODO.md` → read `UNFINISHED.md` → declare status → wait for go-ahead.
-
-## Command Dictionary
-
-Claude Code: when the user sends a short command, look it up here and execute exactly.
-`{N}` = item number, `{a}` = sub-task letter, `{i}` = sub-item roman numeral. Examples: `8`, `8a`, `8b-ii`
-
-> **Key:** `{N}` = item number · `{a}` = sub-task letter · `{i}` = sub-item roman numeral · e.g. `Start 3b` or `Confirm 3bi`
-
----
-
-### Session Commands
-| Command | Action |
-|---|---|
-| `Start {Nai}` | Read `CLAUDE.md` → `TODO.md` → `UNFINISHED.md`. Record and commit to `UNFINISHED.md`: item name, branch, full sub-task/sub-item breakdown, expected files to touch, estimated commits. Reply with this information and remind the user to proceed with `Confirm {Nai}`. |
-| `Confirm {Nai}` | Proceed with the stated sub-task or sub-item using information from `UNFINISHED.md`. No further confirmation needed unless information is missing or clarification is required. Update `UNFINISHED.md` with recent changes; move `Item-{Nai}` to Awaiting Review with a change summary and matching commit IDs. Commit and push branch. Reply notifying the user to review changes for `Item-{Nai}`. |
-| `Resume` | Read `UNFINISHED.md` + `git log`. Reply with: branch, last commit, what was done, exact next step. Wait for go-ahead before doing anything. |
-| `Park` | Update `UNFINISHED.md` with current state and exact next step. Push branch. Reply with branch name and next step. Stop all work immediately. |
-
----
-
-### Status Commands
-| Command | Action |
-|---|---|
-| `Where up to` | Read `UNFINISHED.md`. Reply with one line only: item + sub-task, branch, last commit message. Nothing else. |
-| `Status` | Read `UNFINISHED.md`. Reply with: active item + sub-task, branch, last commit, next step, anything awaiting review. Do not start work. |
-| `Pending` | Read `UNFINISHED.md`. List all Awaiting Review items — item, branch, one-line summary. Do not start work. |
-
----
-
-### TODO Commands
-| Command | Action |
-|---|---|
-| `New Item` | Ask the user to describe the item. Auto-increment item number from `TODO.md`. Write to `TODO.md` with task and sub-task breakdown. Commit and push. Reply with exactly what was written. |
-| `Add to {Na}` | Ask the user to describe the new sub-task or sub-item. Append to the correct item in `TODO.md` using the next available letter or roman numeral. Commit and push. Reply with exactly what was written. |
-| `Complete {Nai}` | Mark the sub-task/sub-item `[x]` in `TODO.md`. Cascade upward: if all sub-items under a sub-task are done, mark the sub-task `[x]`; if all sub-tasks under a task are done, mark the task `[x]`. Move the item from Awaiting Review to Completed in `UNFINISHED.md`. Commit, push branch, and open PR to main. Reply with branch and PR link. |
-| `Finish {Nai}` | Merge the PR for the item referenced in `UNFINISHED.md` Completed section. Move the item from Completed in `UNFINISHED.md` to `VERIFIED.md`. Commit and push. Reply with outcome. |
-
 ### Three-file system
-- `TODO.md` — Read from main branch to compare to current branch
-- `UNFINISHED.md` — Claude Code owns this, lives on feature branch, active + awaiting review
-- `VERIFIED.md` — archive of confirmed completed items
+- `TODO.md` — Read from main branch to compare to current branch; owned by user
+- `UNFINISHED.md` — Claude Code owns this; lives on feature branch; tracks active + awaiting review
+- `VERIFIED.md` — Append-only archive of confirmed completed items; owned by user
 
 ---
 
-**On session start / re-entry:**
+### On session start / re-entry
+
+> **Re-entering a session?** Read `CLAUDE.md` → `TODO.md` → `UNFINISHED.md` → declare status → wait for go-ahead.
+
 1. Read this entire `CLAUDE.md` before doing anything else
 2. Sync and orient:
-   a. `git fetch origin main`
-   b. `git show origin/main:CLAUDE.md` — read latest instructions from main
-   c. `git diff origin/main -- TODO.md` — check if TODO.md differs from main
-   d. If the main TODO.md is ahead of local: `git checkout origin/main -- TODO.md` to sync it, then read it
-   e. If same: read local TODO.md as-is
-   f. Determine target branch — in order:
-    - TODO.md active item `**Branch:**` field — use this first
-    - UNFINISHED.md `**Branch:**` field — confirms it
-    - `git branch -a` — verify it exists on remote
-    - If branch doesn't exist yet (new item): create from main
-      `git checkout main && git pull origin main && git checkout -b item-{N}{letter}-{short-desc}`
-    - If still unclear: ask the user, don't guess
-      g. `git checkout {target-branch}` and `git pull origin {target-branch}`
-      h. Read `UNFINISHED.md` — most precise resume point; contains active item,
-      awaiting-review items, last commit, next step, files touched, blockers.
-      Prioritise over git log for orientation.
-      h. Only check git log if UNFINISHED.md is missing or unclear
+    - `git fetch origin main`
+    - `git show origin/main:CLAUDE.md` — read latest instructions from main
+    - `git diff origin/main -- TODO.md` — check if TODO.md differs from main
+    - If main TODO.md is ahead of local: `git checkout origin/main -- TODO.md` to sync it, then read it
+    - If same: read local TODO.md as-is
+    - Determine target branch — in order:
+        1. TODO.md active item `**Branch:**` field — use this first
+        2. UNFINISHED.md `**Branch:**` field — confirms it
+        3. `git branch -a` — verify it exists on remote
+        4. If branch doesn't exist yet: create from main — `git checkout main && git pull origin main && git checkout -b item-{N}{letter}-{short-desc}`
+        5. If still unclear: ask the user, don't guess
+    - `git checkout {target-branch}` and `git pull origin {target-branch}`
+    - Read `UNFINISHED.md` — most precise resume point. Prioritise over git log for orientation. Only check git log if UNFINISHED.md is missing or unclear.
+
 3. Declare your status report:
     - Which item/sub-task you are starting or resuming
     - What the last completed commit was (if resuming)
     - What the next concrete step is (from UNFINISHED.md if resuming)
     - What files will be touched
-    - An estimated commit count for this sub-task
+    - Estimated commit count for this sub-task
     - Any items currently awaiting review in UNFINISHED.md
 
-   Immediately update UNFINISHED.md with this status before touching any code —
-   even before the first commit exists. This ensures a dropout at any point leaves
-   a recoverable state.
+   Immediately update `UNFINISHED.md` with this status before touching any code — even before the first commit exists.
 
 4. Wait for user confirmation before writing any code.
 
 ---
 
-**Scope rules (strictly enforced):**
+### Scope rules (strictly enforced)
 - Work ONLY on the requested item/sub-task — nothing else
-- If you notice a related bug or improvement while working, add it to the `## Noticed (unscheduled)` section in `TODO.md` — do not fix it
+- If you notice a related bug or improvement while working, add it to `## Noticed (unscheduled)` in `TODO.md` — do not fix it
 - If the requested change requires touching something outside stated scope, **flag it and ask** before proceeding
 
 ---
 
 ### Item format in TODO.md
-Items use lettered sub-tasks (a, b, c...). Sub-tasks can have numbered sub-items (i, ii, iii...):
 
+Items use lettered sub-tasks (a, b, c...). Sub-tasks can have roman numeral sub-items (i, ii, iii...):
+
+```
 - [ ] a) Top level sub-task
 - [ ] b) Another sub-task
     - [ ] i) Sub-item of b
     - [ ] ii) Another sub-item of b
+```
 
-Branch naming follows the same pattern:
+**Branch naming:**
 - `item-8a` — top level sub-task
 - `item-8b-i` — sub-item
 - `item-8b-ii` — next sub-item
 
-Commit message follows same pattern:
+**Commit message format:**
 - `Item 8a [1 of 2]: what changed`
 - `Item 8b-i [1 of 3]: what changed`
 
 ---
-**Working through sub-tasks (a, b, c…):**
+
+### Working through sub-tasks
+
 - Do ONE sub-task at a time — no bundling unless explicitly instructed
 - Before starting, verify the app loads without errors in its current state
 - Keep each commit small and focused — one logical change per commit
 - After each commit, in this exact order:
-    1. **Update `UNFINISHED.md` immediately** (see format below) — do this before anything else, every single commit, no exceptions
-    2. Run through the relevant items in the **Testing Checklist** in TODO.md
+    1. **Update `UNFINISHED.md` immediately** — before anything else, every commit, no exceptions
+    2. Run through relevant items in the **Testing Checklist** in TODO.md
     3. Summarise exactly what changed, what files were touched, and why
-    4. Branch name: `item-{Nai}{short-desc}` (e.g. `item-8-country-city-iso-fixes`)
-    5. Commit message: `Item-{Nai} [X of Y]: {what was fixed and how}`
-    6. `git push origin {branch}` immediately after every commit — no exceptions
-    7. Report back to user: branch name, commit message, one-line summary
+    4. `git push origin {branch}` immediately after every commit — no exceptions
+    5. Report back to user: branch name, commit message, one-line summary
 - After the final commit of a sub-task:
     1. Push and open a PR for review
     2. Check `[x]` on that sub-task in `TODO.md` and update the item's **Status** block
-    3. Move active item to `## Awaiting Review` in UNFINISHED.md with change summary
+    3. Move active item to `## Awaiting Review` in `UNFINISHED.md` with change summary
     4. **Stop and wait** — do not continue to the next sub-task until the user confirms
 
 ---
 
-**UNFINISHED.md format — update after orientation AND after every commit:**
+### UNFINISHED.md format
+
+Update after orientation AND after every commit:
 
 ```markdown
 # UNFINISHED.md
@@ -308,19 +307,20 @@ Commit message follows same pattern:
   - Summary of what changed (brief, one line per significant change)
 ```
 
-When active item is confirmed complete by user, clear the Active block:
+When active item is confirmed complete, clear the Active block:
 
 ```markdown
 ## 🔄 Active
 none
 ```
 
-When item is merged and verified by user, remove it from Awaiting Review entirely.
-User will archive the summary to VERIFIED.md.
+When item is merged and verified, remove it from Awaiting Review entirely. User archives to `VERIFIED.md`.
 
 ---
 
-**If you hit a blocker mid-task:**
+### Blockers
+
+If you hit a blocker mid-task:
 - Update `UNFINISHED.md` with the blocker details before stopping
 - Describe exactly what the blocker is and what options exist
 - State which option you recommend and why
@@ -328,14 +328,16 @@ User will archive the summary to VERIFIED.md.
 
 ---
 
-**If a sub-task looks too large for one session:**
+### Oversized sub-tasks
+
+If a sub-task looks too large for one session:
 - Say so before starting: "This sub-task may exceed one session — recommend splitting into: a-i) X, a-ii) Y"
 - Only proceed once the user has agreed on the split
 - Write the agreed split into `UNFINISHED.md` under **Next step** before starting any code
 
 ---
 
-**Adding new items:**
+### Adding new items
 - Increment the item number (never reuse numbers)
 - Break into lettered sub-tasks upfront before starting any work
 - Add the full item to `TODO.md` under `## Active` before touching code
@@ -343,9 +345,8 @@ User will archive the summary to VERIFIED.md.
 
 ---
 
-**Completing items:**
+### Completing items
 - Only check `[x]` on a sub-task in `TODO.md` after explicit user confirmation
 - Only move an item out of TODO.md after ALL sub-tasks are confirmed done
-- Claude Code does NOT write to VERIFIED.md — user archives completed items there
-- Clear the Active block in UNFINISHED.md when an item is fully confirmed done
-
+- Claude Code does NOT write to `VERIFIED.md` — user archives completed items there
+- Clear the Active block in `UNFINISHED.md` when an item is fully confirmed done
