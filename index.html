@@ -375,12 +375,12 @@
           <div style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 0.25rem;">
             <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
               <label>From</label>
-              <select id="journeyFromCity" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"></select>
+              <select id="journeyFromCity" onchange="_journeyFormDirty=true" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"></select>
             </div>
             <div style="padding-bottom: 0.6rem; color: #AAB7C4; font-weight: bold;">➔</div>
             <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
               <label>To</label>
-              <select id="journeyToCity" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"></select>
+              <select id="journeyToCity" onchange="_journeyFormDirty=true" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"></select>
             </div>
           </div>
           <div style="text-align: right; margin-bottom: 1.5rem;">
@@ -391,8 +391,8 @@
             <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
               <label>Departure</label>
               <div style="display: flex; gap: 0.5rem;">
-                <input type="date" id="journeyDateFrom" style="flex: 3; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
-                <input type="time" id="journeyTimeFrom" style="flex: 2; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
+                <input type="date" id="journeyDateFrom" onchange="_journeyFormDirty=true" style="flex: 3; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
+                <input type="time" id="journeyTimeFrom" onchange="_journeyFormDirty=true" style="flex: 2; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
               </div>
             </div>
           </div>
@@ -400,8 +400,8 @@
             <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
               <label>Arrival</label>
               <div style="display: flex; gap: 0.5rem;">
-                <input type="date" id="journeyDateTo" style="flex: 3; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
-                <input type="time" id="journeyTimeTo" style="flex: 2; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
+                <input type="date" id="journeyDateTo" onchange="_journeyFormDirty=true" style="flex: 3; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
+                <input type="time" id="journeyTimeTo" onchange="_journeyFormDirty=true" style="flex: 2; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
               </div>
             </div>
           </div>
@@ -409,27 +409,27 @@
 <div style="display: flex; gap: 1rem; margin-bottom: 1rem;"> 
  <div class="ai-form-group" style="flex: 2; margin-bottom: 0;"> 
  <label>Provider</label> 
- <input type="text" id="journeyProvider" placeholder="e.g. EVA Air" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
+ <input type="text" id="journeyProvider" onchange="_journeyFormDirty=true" placeholder="e.g. EVA Air" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
  </div> 
  <div class="ai-form-group" style="flex: 1; margin-bottom: 0;"> 
  <label>Route #</label> 
- <input type="text" id="journeyRouteCode" placeholder="BR067" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
+ <input type="text" id="journeyRouteCode" onchange="_journeyFormDirty=true" placeholder="BR067" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
  </div> 
 </div> 
 <div style="display: flex; gap: 1rem; margin-bottom: 0;"> 
  <div class="ai-form-group" style="flex: 1; margin-bottom: 0;"> 
  <label>Booking Ref</label> 
- <input type="text" id="journeyBookingRef" placeholder="e.g. ABC123" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
+ <input type="text" id="journeyBookingRef" onchange="_journeyFormDirty=true" placeholder="e.g. ABC123" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
  </div> 
  <div class="ai-form-group" style="flex: 1; margin-bottom: 0;"> 
  <label>Cost ($)</label> 
- <input type="number" id="journeyCost" placeholder="0" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
+ <input type="number" id="journeyCost" onchange="_journeyFormDirty=true" placeholder="0" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
  </div> 
 </div>
 
           <div class="ai-form-group" style="margin-bottom: 0;">
             <label>Notes</label>
-            <input type="text" id="journeyNotes" placeholder="Optional notes for this segment" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; background: #fafafa;">
+            <input type="text" id="journeyNotes" onchange="_journeyFormDirty=true" placeholder="Optional notes for this segment" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; background: #fafafa;">
           </div>
         </div>
 

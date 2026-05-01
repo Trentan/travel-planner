@@ -2,12 +2,15 @@
 
 ## 🔄 Active
 
+- **Item/sub-task:** 8a-vi
+- **Branch:** item-8a-vi-edit-segment-bug
+- **What is being done:** Fix bug where segment one cannot be edited in multi-leg journey edit dialog
+- **Expected files to touch:** js/transport.js (editPendingSegment function, lines 681-691)
+- **Estimated commits:** 1
+
+## 👀 Awaiting Review / Merge
+
 none
-
-## 👀 Awaiting Review
-
-- **Item:** 8a — branch `item-8a-transport-table-layout` — all sub-tasks i through v complete
-  - 8a-v: Total journey travel time calculated and displayed under journey name in italic (e.g., "11hrs") for multi-leg journeys
 
 ## Completed (to be merged to main)
 
@@ -15,20 +18,12 @@ none
 
 ## Archived (moved from Awaiting Review after merge)
 
-- **Item:** 8a — branch `item-8a-transport-table-layout` — ALL sub-tasks i-v complete and merged
-  - 8a-i: Booking reference displays under status badge (removed separate Ref column)
-  - 8a-ii: Journey dialog captures and saves booking reference values
-  - 8a-iii: Departs column combined date and time (e.g., "15 Jun 14:30")
-  - 8a-iv: Journey names use arrow notation (→ instead of "to"), including multi-leg journeys
-  - 8a-v: Total journey travel time calculated and displayed under journey name (e.g., "11hrs")
-  - **Merged to main via PR #9 on 2026-05-01**
-
 - **Item 8b** — branch `item-8b-city-iso-standards` — merged
   - Sub-items i-viii complete
   - Migration function for city ISO standards
   - Display ISO codes in transport tab with hover tooltips
-  - Journey names using arrow notation (before 8a-iv enhanced this)
+  - Journey names using arrow notation
   - Slovakia added to country data
   - IATA lookup for Other country selection
 
-*Last updated: 2026-05-01 — Item 8a merged to main, ready for verification*
+*Last updated: 2026-05-01 — Starting 8a-vi: edit segment one bug*
