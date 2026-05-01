@@ -8,7 +8,7 @@ Read this file at the start of every session. Claude Code: read from main branch
 ## Active
 
 ### Item 5: Convert Accommodation
-**Status:** In progress â€” 5h complete - need to request review
+**Status:** Complete - awaiting merge
 **Next:** `none`
 **Note:** No migration of old accomItems â€” new stays model only going forward.
 
