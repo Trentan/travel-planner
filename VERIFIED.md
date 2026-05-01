@@ -80,3 +80,14 @@ Confirmed completed items. Append-only archive — do not edit existing entries.
 - Guide button fixed (was doing nothing — missing `window.*` exports in `guide.js`)
 - DEFAULT_LEAVE_HOME applied when content blank or on initial load
 - Packing guides redesigned: tab-style pill navigation, badge on Pre-Departure, hidden by default with close buttons
+---
+
+### Item 8a: Improve Journey Table Layout ✅
+**Completed:** 2026-05-01 — branch `item-8a-transport-table-layout` merged via PR #9
+
+- 8a-i: Booking reference displays under status badge (removed separate Ref column)
+- 8a-ii: Journey dialog captures and saves booking reference values
+- 8a-iii: Departs column combined date and time (e.g., "15 Jun 14:30")
+- 8a-iv: Journey names use arrow notation (→ instead of "to"), including multi-leg journeys
+- 8a-v: Total journey travel time calculated and displayed under journey name (e.g., "11hrs")
+
