@@ -1687,9 +1687,22 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   background: #f9f9f7;
 }
 
-/* Journey name column */
+/* Journey name column - wider to fit longer journey names with wrapping */
 .transport-table .journey-name-col {
   padding: 0.75rem 0.5rem;
+  width: 260px;
+  min-width: 240px;
+  max-width: 320px;
+  vertical-align: middle;
+}
+
+.transport-table .journey-name-col .journey-name-main {
+  min-height: 48px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+  display: inline-block;
+  width: 100%;
 }
 
 .journey-name-main {

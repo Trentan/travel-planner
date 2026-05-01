@@ -878,6 +878,11 @@ function removePendingSegment(index) {
   if (_activeSegmentIndex >= _pendingSegments.length) {
     _activeSegmentIndex = _pendingSegments.length - 1;
   }
+  // Update journey title if segments changed
+  const titleEl = document.getElementById('journeyTitleDisplay');
+  if (titleEl && _pendingSegments.length > 0) {
+    titleEl.textContent = buildJourneyName(_pendingSegments);
+  }
   _updateSegmentList();
 }
 
@@ -888,6 +893,11 @@ function addSegmentToJourney() {
 
   const seg = _buildJourneyObject(fromLocation, toLocation, _pendingSegments.length + 1);
   _pendingSegments.push(seg);
+  // Update journey title when segments added
+  const titleEl = document.getElementById('journeyTitleDisplay');
+  if (titleEl) {
+    titleEl.textContent = buildJourneyName(_pendingSegments);
+  }
   _updateSegmentList();
 
   const fromSelect = document.getElementById('journeyFromCity');

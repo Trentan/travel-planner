@@ -33,7 +33,10 @@ Read this file at the start of every session. Claude Code: read from main branch
   - [x] iii) Departs should have the date and time combined like arrives
   - [x] iv) Make sure instead of 'to' it is an '→' arrow
   - [x] v) You can calculate total travel time and display under the journey description in a smaller italic font (eg 11hrs)
-  - [ ] vi) Edit journey dialog: segments now clickable in pill tracker at top, all segments show in summary below with Edit/Remove buttons. STILL NEEDS TESTING: Verify segments persist when switching, deleted segments removed from JSON, and journey name display at top of dialog shows correctly.
+  - [ ] vi) Edit journey dialog: segments clickable, journey title shows. TODO items remaining:
+  - Transport table journey column: expand width further or enable text wrap for long journey names
+  - Add city from journey dialog: improve UX to match "Manage Cities" flow (add to trips cities first)
+  - City submenu order: should be sorted by first arrival date in trip, not alphabetically (e.g., London should appear before Bangkok if arrived in London first)
   - [ ] vii) In Manage cities for countries, you can only select "other" - you should be able to enter a country / create a new country when other selected (and it can be loaded in somehow...) - needs to flag def and country code and country name
   - [ ] viii) When a leg or segment is changed and affects a journey - the description should change (if the start and end cities differ) to the new start and end. Also if there are legs in the middle, they should be in bracket e.g. Zurich to Bangkok (via London) || Brisbane to Vienna (via Taipei, Bangkok)
 - [x] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
