@@ -2,15 +2,16 @@
 
 ## 🔄 Active
 
-- **Item/sub-task:** 8a-vi
-- **Branch:** item-8a-vi-edit-segment-bug
-- **What is being done:** Fix bug where segment one cannot be edited in multi-leg journey edit dialog
-- **Expected files to touch:** js/transport.js (editPendingSegment function, lines 681-691)
-- **Estimated commits:** 1
+none
 
 ## 👀 Awaiting Review / Merge
 
-none
+- **Item:** 8a-vi — branch `item-8a-vi-edit-segment-bug`
+  - Fixed bug where segment one could not be edited in multi-leg journey edit dialog
+  - Added `_journeyFormDirty` flag to track user changes
+  - Form only saves when switching segments if user has made actual changes
+
+**Commit:** `7466382` - Item 8a-vi [1 of 1]: Fix segment one edit bug in multi-leg journey
 
 ## Completed (to be merged to main)
 
@@ -26,4 +27,4 @@ none
   - Slovakia added to country data
   - IATA lookup for Other country selection
 
-*Last updated: 2026-05-01 — Starting 8a-vi: edit segment one bug*
+*Last updated: 2026-05-01 — 8a-vi complete awaiting review*
