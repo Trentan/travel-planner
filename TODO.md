@@ -24,14 +24,14 @@ Read this file at the start of every session. Claude Code: read from main branch
 ---
 
 ### Item 8: Improve Country and City Standards
-**Status:** 8a complete, 8b merged — remaining sub-tasks pending
+**Status:** 8a ongoing, 8b merged — remaining sub-tasks pending
 **Next:** `item-8a-v`
 
-- [x] a) Improve journey table layout to display fields better
-  - [ ] i) Make Status like the one in Accommodation table where the booking id (reference) is nicely under the pending / confirmed - nice touch
-  - [ ] ii) Reference field needs to be in the add/edit dialog for journey 
-  - [ ] iii) Departs should have the date and time combined like arrives
-  - [ ] iv) Make sure instead of 'to' it is an '→' arrow
+- [ ] a) Improve journey table layout to display fields better
+  - [x] i) Make Status like the one in Accommodation table where the booking id (reference) is nicely under the pending / confirmed - nice touch
+  - [x] ii) Reference field needs to be in the add/edit dialog for journey 
+  - [x] iii) Departs should have the date and time combined like arrives
+  - [x] iv) Make sure instead of 'to' it is an '→' arrow
   - [ ] v) You can calculate total travel time and display under the journey description in a smaller italic font (eg 11hrs)
   - [ ] vi) Bug where I cannot edit segment one on existing segment for the koh / bkk / bne journey when in edit mode
   - [ ] vii) In Manage cities for countries, you can only select "other" - you should be able to enter a country / create a new country when other selected (and it can be loaded in somehow...) - needs to flag def and country code and country name
