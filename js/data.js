@@ -694,11 +694,13 @@ function setCityCountry(cityId, country) {
 function openCityDialog() {
   const modal = document.getElementById('city-modal');
   if (modal) {
+    // Give the city modal a higher z-index than journey modal (which uses default 1000 from CSS)
+    modal.style.zIndex = '1100';
+    modal.style.display = 'flex';
     createCityDatalists(); // Ensure datalists exist
     populateCityList();
     populateCountrySelect();
     setupCityAutocomplete();
-    modal.style.display = 'flex';
   }
 }
 
