@@ -679,6 +679,7 @@ function _loadSegmentIntoForm(seg) {
   document.getElementById('journeyCost').value = seg.cost || '0';
   document.getElementById('journeyNotes').value = seg.notes || '';
   document.getElementById('journeyBookingRef').value = seg.bookingReference || '';
+  document.getElementById('journeyStatus').value = seg.status || 'booked';
 }
 
 // Track which segment is currently active (0-based index for segments in pending, -1 if form is new)
@@ -926,6 +927,7 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
   const routeCode = document.getElementById('journeyRouteCode')?.value.trim() || '';
   const bookingRef = document.getElementById('journeyBookingRef')?.value.trim() || '';
   const cost = document.getElementById('journeyCost')?.value.trim() || '0';
+  const status = document.getElementById('journeyStatus')?.value || 'planned';
   const notes = document.getElementById('journeyNotes')?.value.trim() || '';
 
   const fromCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === fromLocation) : null;
@@ -948,7 +950,7 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
     transportType: transportType,
     provider: provider,
     routeCode: routeCode,
-    status: 'planned',
+    status: status || 'booked',
     cost: cost,
     bookingReference: bookingRef,
     isMultiLeg: false,
