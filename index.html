@@ -428,6 +428,15 @@
  <label>Booking Ref</label> 
  <input type="text" id="journeyBookingRef" onchange="_journeyFormDirty=true" placeholder="e.g. ABC123" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
  </div> 
+<div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
+<label>Status</label>
+<select id="journeyStatus" onchange="_journeyFormDirty=true" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;">
+<option value="planned">Planned</option>
+<option value="booked">Booked</option>
+<option value="confirmed">Confirmed</option>
+<option value="cancelled">Cancelled</option>
+</select>
+</div>
  <div class="ai-form-group" style="flex: 1; margin-bottom: 0;"> 
  <label>Cost ($)</label> 
  <input type="number" id="journeyCost" onchange="_journeyFormDirty=true" placeholder="0" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
