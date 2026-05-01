@@ -6,15 +6,21 @@ none
 
 ## 👀 Awaiting Review
 
-none (items 8a-i through 8a-iv marked complete below)
+- **Item:** 8a — branch `item-8a-transport-table-layout` — all sub-tasks i through v complete
+  - 8a-v: Total journey travel time calculated and displayed under journey name in italic (e.g., "11hrs") for multi-leg journeys
 
 ## Completed (to be merged to main)
+
+none
+
+## Archived (moved from Awaiting Review after merge)
 
 - **Item:** 8a — branch `item-8a-transport-table-layout` — all sub-tasks complete
   - 8a-i: Booking reference displays under status badge (removed separate Ref column)
   - 8a-ii: Journey dialog captures and saves booking reference values
   - 8a-iii: Departs column combined date and time (e.g., "15 Jun 14:30")
   - 8a-iv: Journey names use arrow notation (→ instead of "to"), including multi-leg journeys
+  - 8a-v: Total journey travel time calculated and displayed under journey name (e.g., "11hrs")
 
 ## Archived (moved from Awaiting Review after merge)
 
@@ -26,4 +32,4 @@ none (items 8a-i through 8a-iv marked complete below)
 - Slovakia added to country data
 - IATA lookup for Other country selection
 
-*Last updated: 2026-05-01 — Item 8a complete, ready for merge to main*
+*Last updated: 2026-05-01 — Item 8a-v complete, awaiting review*

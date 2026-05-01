@@ -531,6 +531,11 @@ const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + f
         ? (rep.journeyName.length > 22 ? rep.journeyName.substring(0, 22) + '…' : rep.journeyName)
         : '—';
 
+// Calculate and display total travel time for multi-leg journeys
+const durationHours = isMultiLeg ? calculateJourneyDuration(segs) : null;
+const durationDisplay = durationHours !== null ? `<br><small style="color:#888; font-style:italic;">${durationHours}hrs</small>` : '';
+
+
     const expandBtn = isMultiLeg
         ? `<button class="journey-expand-btn" onclick="toggleJourneySegments('${gid}')" title="Show/hide segments" style="background:none;border:none;cursor:pointer;font-size:0.85rem;padding:2px 4px;">▶</button>`
         : '';
