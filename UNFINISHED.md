@@ -4,8 +4,11 @@
 
 - **Item/sub-task:** 8a-vi
 - **Branch:** item-8a-vi-edit-segment-refactor
-- **Last commit:** `2c33780` - Item 8a-vi [6 of 6]: Add status dropdown to journey modal HTML
+- **Last commit:** `ba3f285` - Item 8a-vi [8 of 8]: Open Cities dialog from journey link
 - **What was done:**
+- Clicking "Add new city" from journey dialog now opens the full Manage Cities modal
+- Users can add cities with country dropdown, city code display in one place
+- Consistent UX across journey dialog and Cities tab
 - Added status dropdown (Planned/Booked/Confirmed/Cancelled) to journey dialog
 - Status now persists when saving journeys instead of defaulting to 'planned'
 - Cities now persist to localStorage when added
@@ -18,7 +21,7 @@
 ## 👀 Awaiting Review / Merge
 
 - **Item/Feature:** 8a-vi — Branch `item-8a-vi-edit-segment-refactor` — PR ready
-- Summary: Multi-leg journey edit dialog refactor with status dropdown, cities persistence, journey name fixes
+- Summary: Multi-leg journey edit dialog refactor with status dropdown, cities persistence, journey name fixes, and improved city add UX
 
 ## Completed (to be merged to main)
 
@@ -30,4 +33,4 @@ none
 
 ---
 
-*Last updated: 2026-05-01 — 6 commits pushed, awaiting review*
+*Last updated: 2026-05-01 — 8 commits pushed, awaiting review*
