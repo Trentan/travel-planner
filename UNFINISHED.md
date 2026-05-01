@@ -6,19 +6,15 @@ none
 
 ## 👀 Awaiting Review
 
-- **Item:** 8a-ii — branch `item-8a-transport-table-layout` — booking reference capture and save fixed
-- Summary: Journey dialog now properly captures and saves booking reference values
-
-- **Item:** 8a-iv — branch `item-8a-transport-table-layout` — replaced "to" with "→" arrow in journey names
-- Summary: Journey names now use arrow notation (e.g., "Brisbane → Vienna" instead of "Brisbane to Vienna") including multi-leg journeys with via cities
-
-- **Item:** 8a-iii — branch `item-8a-transport-table-layout` — combined date and time in Departs column
-- Summary: Departs column now shows "15 Jun 14:30" format matching Arrives column for both journey and segment rows
-
-- **Item:** 8a-i — branch `item-8a-transport-table-layout` — booking reference now displays under status badge
-- Summary: Removed separate Ref column, booking reference displays under status badge in transport table
+none (items 8a-i through 8a-iv marked complete below)
 
 ## Completed (to be merged to main)
+
+- **Item:** 8a — branch `item-8a-transport-table-layout` — all sub-tasks complete
+  - 8a-i: Booking reference displays under status badge (removed separate Ref column)
+  - 8a-ii: Journey dialog captures and saves booking reference values
+  - 8a-iii: Departs column combined date and time (e.g., "15 Jun 14:30")
+  - 8a-iv: Journey names use arrow notation (→ instead of "to"), including multi-leg journeys
 
 ## Archived (moved from Awaiting Review after merge)
 
@@ -30,4 +26,4 @@ none
 - Slovakia added to country data
 - IATA lookup for Other country selection
 
-*Last updated: 2026-05-01 — Items 8a-iv, 8a-iii, and 8a-i awaiting user review*
+*Last updated: 2026-05-01 — Item 8a complete, ready for merge to main*

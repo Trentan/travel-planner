@@ -185,12 +185,12 @@ Claude Code: when the user sends a short command, look it up here and execute ex
 | `Pending` | Read UNFINISHED.md. Reply to user listing all Awaiting Review items — item, branch, one-line summary. Do not start work. |
 
 ### TODO Commands
-| Command          | Action                                                                                                                                                                                                                                       |
-|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `New Item`       | Ask user to describe the item. Auto-increment item number from TODO.md. Write to TODO.md with sub-task breakdown. Reply to user with exactly what was written. Wait for approval. Do not touch code.                                         |
-| `Add to {Na}`    | Ask user to describe the new sub-task or sub-item. Append to correct item in TODO.md with next available letter or roman numeral. Reply to user with exactly what was written. Wait for approval. Do not touch code.                         |
-| `Complete {Nai}` | Mark sub-task/sub-item `[x]` in TODO.md. Move from awaiting review to completed in UNFINISHED.md, commit changes, push branch and open PR to main. Reply to user with branch and PR link. Stop.                                              |
-| `Finish {Nai}`   | Complete the Pull Request for the item referenced in UNFINISHED.md in completed. Move the item from completed in UNFINISHED.md to VERIFIED.md, commit changes, push branch. Reply to the user with the outcomes |
+| Command          | Action                                                                                                                                                                                                         |
+|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `New Item`       | Ask user to describe the item. Auto-increment item number from TODO.md. Write to TODO.md with task and sub-task breakdown. Commit and push. Reply to user with exactly what was written.|
+| `Add to {Na}`    | Ask user to describe the new sub-task or sub-item. Append to correct item in TODO.md with next available letter or roman numeral. Commit and push. Reply to user with exactly what was written.                |
+| `Complete {Nai}` | Mark sub-task/sub-item `[x]` in TODO.md. Move from awaiting review to completed in UNFINISHED.md, commit changes, push branch and open PR to main. Reply to user with branch and PR link.                |
+| `Finish {Nai}`   | Complete the Pull Request for the item referenced in UNFINISHED.md in completed. Move the item from completed in UNFINISHED.md to VERIFIED.md, commit changes, push branch. Reply to the user with the outcome |
 
 ### Three-file system
 - `TODO.md` — Read from main branch to compare to current branch
