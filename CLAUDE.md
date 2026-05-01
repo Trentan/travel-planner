@@ -268,8 +268,8 @@ Commit message follows same pattern:
     1. **Update `UNFINISHED.md` immediately** (see format below) — do this before anything else, every single commit, no exceptions
     2. Run through the relevant items in the **Testing Checklist** in TODO.md
     3. Summarise exactly what changed, what files were touched, and why
-    4. Branch name: `item-{Na}{short-desc}` (e.g. `item-8-country-city-iso-fixes`)
-    5. Commit message: `Item-{Na} [X of Y]: {what was fixed and how}`
+    4. Branch name: `item-{Nai}{short-desc}` (e.g. `item-8-country-city-iso-fixes`)
+    5. Commit message: `Item-{Nai} [X of Y]: {what was fixed and how}`
     6. `git push origin {branch}` immediately after every commit — no exceptions
     7. Report back to user: branch name, commit message, one-line summary
 - After the final commit of a sub-task:
