@@ -509,6 +509,7 @@ function buildTransportTab(cityFilter = null) {
           <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="toggleJourneyStatus('${rep.id}')">
             ${statusText}
           </span>
+          ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${rep.bookingReference}</span>` : ""}
         </td>
         <td>
           <input type="text" value="${rep.bookingReference || ''}" placeholder="Ref #"
@@ -624,6 +625,7 @@ function _loadSegmentIntoForm(seg) {
   document.getElementById('journeyRouteCode').value = seg.routeCode || '';
   document.getElementById('journeyCost').value = seg.cost || '0';
   document.getElementById('journeyNotes').value = seg.notes || '';
+  document.getElementById('journeyBookingRef').value = seg.bookingReference || '';
 }
 
 // Allow clicking a pending segment to load it back into the active form
@@ -718,7 +720,7 @@ function openAddJourneyModal() {
     document.getElementById('journeyDateFrom').value = today;
     document.getElementById('journeyDateTo').value = today;
 
-    ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode','journeyCost','journeyNotes']
+    ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode','journeyBookingRef','journeyCost','journeyNotes']
         .forEach(id => {
           const el = document.getElementById(id);
           if (el) el.value = '';
@@ -832,6 +834,7 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
   const timeTo = document.getElementById('journeyTimeTo')?.value || '';
   const provider = document.getElementById('journeyProvider')?.value.trim() || '';
   const routeCode = document.getElementById('journeyRouteCode')?.value.trim() || '';
+  const bookingRef = document.getElementById('journeyBookingRef')?.value.trim() || '';
   const cost = document.getElementById('journeyCost')?.value.trim() || '0';
   const notes = document.getElementById('journeyNotes')?.value.trim() || '';
 
@@ -857,7 +860,7 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
     routeCode: routeCode,
     status: 'planned',
     cost: cost,
-    bookingReference: '',
+    bookingReference: bookingRef,
     isMultiLeg: false,
     segmentOrder: segmentOrder,
     notes: notes,

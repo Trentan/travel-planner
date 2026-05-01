@@ -4,10 +4,10 @@
 
 - **Item/sub-task:** 8a-ii
 - **Branch:** item-8a-transport-table-layout
-- **Last commit:** none
-- **What was done:** Starting fresh on adding reference field to journey dialog
-- **Next step:** Open index.html, find the journey add/edit dialog, add reference field input
-- **Files touched:** none yet
+- **Last commit:** Item 8a-ii [1 of 1]: Added booking reference field to journey dialog
+- **What was done:** The journey dialog already had the Booking Ref input field in the HTML. Fixed the JavaScript to actually capture and save the value by: (1) reading the journeyBookingRef input value in _buildJourneyObject(), (2) using that variable instead of empty string for bookingReference, (3) clearing the field when opening the add dialog, (4) loading the bookingReference when editing a journey.
+- **Next step:** Update UNFINISHED.md to mark this complete, commit and push
+- **Files touched:** js/transport.js
 - **Known blockers / risks:** none
 - **Noticed (unscheduled):** Bugs or improvements spotted — copy to TODO.md Noticed too
 
