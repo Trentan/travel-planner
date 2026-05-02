@@ -308,7 +308,6 @@ function updateJourneyStatus(id, newStatus) {
   const journey = findJourney(id);
   if (journey) {
     journey.status = newStatus;
-    if (newStatus === 'planned') journey.bookingReference = '';
     saveJourneys();
     return journey;
   }

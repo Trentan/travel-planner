@@ -34,11 +34,9 @@ Read this file at the start of every session. Claude Code: read from main branch
   - [x] iv) Make sure instead of 'to' it is an '→' arrow
   - [x] v) You can calculate total travel time and display under the journey description in a smaller italic font (eg 11hrs)
   - [ ] vi) Edit journey dialog: segments clickable, journey title shows. DONE:
-    - Transport table journey column widened with text wrap (260px min, 320px max)
-    - Add city from journey dialog UX could be improved to match "Manage Cities" flow
-    - REMAINING:
-      - Reference disappeared when clicking status in the transport table (reference should remain until overwritten
-      - City submenu should be sorted by travel order (leg appearance) instead of alphabetically
+  - Transport table journey column widened with text wrap (260px min, 320px max)
+  - City submenu now sorted by travel order (leg appearance) instead of alphabetically
+  REMAINING: Add city from journey dialog UX could be improved to match "Manage Cities" flow
   - [ ] vii) In Manage cities for countries, you can only select "other" - you should be able to enter a country / create a new country when other selected (and it can be loaded in somehow...) - needs to flag def and country code and country name
   - [ ] viii) When a leg or segment is changed and affects a journey - the description should change (if the start and end cities differ) to the new start and end. Also if there are legs in the middle, they should be in bracket e.g. Zurich to Bangkok (via London) || Brisbane to Vienna (via Taipei, Bangkok)
 - [x] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
@@ -53,7 +51,7 @@ Read this file at the start of every session. Claude Code: read from main branch
 ### Item 9: Trip plan name not saving & packing tab fix & other minor fixes
 **Status:** Not started
 **Next:** `item-9a`
-- [ ] a) The heading and subheading is completely missing - also previously, when data entered (New Trip Plan) and Click here to add your trip subtitle - it was not loading from json / saving correctly?
+- [ ] a) The heading when entered (New Trip Plan) and Click here to add your trip subtitle - are not loading from json / saving correctly?
 - [ ] b) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab?
 - [ ] e) Need a way to enable the user to force a complete site refresh on mobile app / website on the app
 - [ ] f) Go through and convert the testing checklist into new items and sub items in this todo list
