@@ -199,6 +199,9 @@ const ALL_CITIES = [...CITY_DATABASE, ...EXTENDED_CITY_DATABASE];
 // User-extensible cities (persisted to localStorage)
 let userCities = []; // { code, name, countryCode }
 
+// User-extensible countries (persisted to localStorage)
+let userCountries = []; // { code, name, flag }
+
 // City color palette - warm, distinctive travel colors
 const CITY_COLORS = [
   '#2C3E50', // Midnight blue (default)
@@ -373,6 +376,17 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
   return newCity;
 }
 
+// Load user-extensible country database
+const savedUserCountries = localStorage.getItem('travelApp_userCountries_v1');
+if (savedUserCountries) {
+  try {
+    userCountries = JSON.parse(savedUserCountries);
+  } catch (e) {
+    console.error('[Countries] Failed to parse user countries:', e);
+    userCountries = [];
+  }
+}
+
 // Create datalists for city and country selection
 function createCityDatalists() {
   // Remove existing datalists if present
@@ -403,7 +417,7 @@ function createCityDatalists() {
   // Create country datalist
   const countriesList = document.createElement('datalist');
   countriesList.id = 'countries-datalist';
-  COUNTRY_DATA.forEach(country => {
+  getAllCountries().forEach(country => {
     const option = document.createElement('option');
     option.value = country.name;
     option.textContent = `${country.flag} ${country.code}`;
@@ -414,18 +428,60 @@ function createCityDatalists() {
   document.body.appendChild(countriesList);
 }
 
+// Set up country select change handler for custom country entry
+setupCountrySelectHandler();
+
+// Set up change handler for country select to show custom country inputs when "Other" selected
+function setupCountrySelectHandler() {
+  const select = document.getElementById('newCityCountrySelect');
+  if (!select) return;
+
+  // Remove existing handler to avoid duplicates
+  const clone = select.cloneNode(true);
+  select.parentNode.replaceChild(clone, select);
+
+  clone.addEventListener('change', function() {
+    const customDiv = document.getElementById('customCountryDiv');
+    if (this.value === 'ZZ') {
+      if (customDiv) customDiv.style.display = 'block';
+      // Focus on the custom country name input
+      const nameInput = document.getElementById('customCountryName');
+      if (nameInput) nameInput.focus();
+    } else {
+      if (customDiv) customDiv.style.display = 'none';
+    }
+  });
+}
+
 // Get country name by code
 function getCountryName(countryCode) {
   if (!countryCode) return '';
+  // First check built-in countries
   const country = COUNTRY_DATA.find(c => c.code === countryCode.toUpperCase());
-  return country ? country.name : countryCode;
+  if (country) return country.name;
+  // Then check user countries
+  const userCountry = userCountries.find(c => c.code === countryCode.toUpperCase());
+  if (userCountry) return userCountry.name;
+  return countryCode;
 }
 
 // Get country flag by code
 function getCountryFlag(countryCode) {
   if (!countryCode) return '';
+  // First check built-in countries
   const country = COUNTRY_DATA.find(c => c.code === countryCode.toUpperCase());
-  return country ? country.flag : '';
+  if (country) return country.flag;
+  // Then check user countries
+  const userCountry = userCountries.find(c => c.code === countryCode.toUpperCase());
+  if (userCountry) return userCountry.flag;
+  return '🌐';
+}
+
+// Get all countries (built-in + user countries)
+function getAllCountries() {
+  // Filter out "Other" from built-in countries since we're adding custom ones
+  const builtinCountries = COUNTRY_DATA.filter(c => c.code !== 'ZZ');
+  return [...builtinCountries, ...userCountries];
 }
 
 // Add a user-defined city to the extensible database
@@ -451,6 +507,31 @@ function addUserCity(cityCode, cityName, countryCode) {
   createCityDatalists();
 
   return newCity;
+}
+
+// Add a user-defined country
+function addUserCountry(countryCode, countryName, flag = '??') {
+  if (!countryCode || !countryName) return null;
+
+  // Check for duplicate code
+  const existing = userCountries.find(c => c.code.toUpperCase() === countryCode.toUpperCase());
+  if (existing) return existing;
+
+  const newCountry = {
+    code: countryCode.toUpperCase(),
+    name: countryName.trim(),
+    flag: flag
+  };
+  userCountries.push(newCountry);
+  localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
+
+  // Refresh country datalist and dropdown
+  createCityDatalists();
+  if (typeof populateCountrySelect === 'function') {
+    populateCountrySelect();
+  }
+
+  return newCountry;
 }
 
 // Delete a city by ID
@@ -871,13 +952,36 @@ function addNewCityFromDialog() {
   const countrySelect = document.getElementById('newCityCountrySelect');
   const countryInput = document.getElementById('newCityCountry');
   const codeInfo = document.getElementById('cityCodeInfo');
+  const customCountryDiv = document.getElementById('customCountryDiv');
+  const customCountryName = document.getElementById('customCountryName');
+  const customCountryCode = document.getElementById('customCountryCode');
 
   const name = nameInput?.value?.trim();
   let countryCode = countrySelect?.value;
   let countryName = '';
 
-  // Fallback to manual input if no selection
-  if (!countryCode && countryInput?.value?.trim()) {
+  // Handle custom country entry when "Other" is selected
+  if (countryCode === 'ZZ' && customCountryDiv?.style.display === 'block') {
+    const enteredCountryName = customCountryName?.value?.trim();
+    const enteredCountryCode = customCountryCode?.value?.trim().toUpperCase();
+
+    if (!enteredCountryName) {
+      alert('Please enter a country name.');
+      return;
+    }
+
+    // If no code entered, generate a simple code from the name
+    let codeFromName = enteredCountryName.toUpperCase().slice(0, 2);
+    if (!enteredCountryCode) {
+      countryCode = codeFromName;
+    } else {
+      countryCode = enteredCountryCode;
+    }
+    countryName = enteredCountryName;
+
+    // Add the custom country to user countries
+    addUserCountry(enteredCountryCode || codeFromName, enteredCountryName);
+  } else if (!countryCode && countryInput?.value?.trim()) {
     const match = COUNTRY_DATA.find(c =>
       c.name.toLowerCase() === countryInput.value.trim().toLowerCase()
     );
@@ -965,11 +1069,14 @@ function populateCountrySelect() {
   if (!select) return;
 
   select.innerHTML = '<option value="">Select country...</option>' +
-    COUNTRY_DATA
-      .filter(c => c.code !== 'ZZ')
+    getAllCountries()
       .sort((a, b) => a.name.localeCompare(b.name))
       .map(c => `<option value="${c.code}">${c.flag} ${c.name}</option>`)
-      .join('');
+      .join('') +
+    '<option value="ZZ">🌐 Other (enter custom)</option>';
+
+  // Set up the change handler for custom country input
+  setupCountrySelectHandler();
 }
 
 // Migration: Convert old city format to new ISO/ICAO/IATA standard format
