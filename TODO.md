@@ -39,6 +39,7 @@ Read this file at the start of every session. Claude Code: read from main branch
   REMAINING: Add city from journey dialog UX could be improved to match "Manage Cities" flow
   - [x] vii) In Manage cities for countries, you can only select "other" - you should be able to enter a country / create a new country when other selected (and it can be loaded in somehow...) - needs to flag def and country code and country name
   - [ ] viii) When a leg or segment is changed and affects a journey - the description should change (if the start and end cities differ) to the new start and end. Also if there are legs in the middle, they should be in bracket e.g. Zurich to Bangkok (via London) || Brisbane to Vienna (via Taipei, Bangkok)
+  - There is a date and departs column in the transport table, don;t need both just one 
 - [x] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
   - [x] i) Add trip leg dialog not showing - loads new leg straight into itinerary instead of opening dialog
   - [x] ii) City selection dropdowns should populate to their pre-selected countries by default (currently not populating)

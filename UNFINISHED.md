@@ -2,17 +2,25 @@
 
 ## 🔄 Active
 
-- **Item/sub-task:** 8a-viii
-- **Branch:** item-8a-viii-journey-desc
-- **What will be done:** Implement auto-updating journey descriptions when legs/segments change. When a journey's start/end cities change (or intermediate legs are added), the description should update to show "City A to City B (via City C, City D)".
-- **Next step:** Find where journey descriptions are generated and add auto-update logic
-- **Files to touch:** js/crud.js (journey/leg update handlers), js/transport.js (description display)
-- **Estimated commits:** 2-3 commits
+none
 
 ## 👀 Awaiting Review / Merge
 
+- **Item/Feature:** 8a-viii — Branch `item-8a-viii-journey-desc` 
+- **Summary:** Journey description auto-update feature
+
+**What was done for 8a-viii:**
+- Analysis found this feature is already implemented
+- `buildJourneyName()` at `js/transport.js:212` generates journey names with "via" notation
+- When segments are edited and saved, the journey name is automatically recalculated
+- Multi-leg journeys show format: "Zurich → Bangkok (via London)"
+- Single-leg journeys show: "Zurich → Bangkok"
+- PR link: To be created
+
+## Awaiting Review / Merge
+
 - **Item/Feature:** 8a-vii — Branch `item-8a-vii-country-entry` — PR #12 open
-- **Summary:** Custom country entry feature - users can type any country name when adding cities
+- **Summary:** Custom country entry feature
 
 **What was done for 8a-vii:**
 - Users can now type any country name directly in the country input field
@@ -31,4 +39,4 @@ none
 
 ---
 
-*Last updated: 2026-05-04 — Starting 8a-viii: Auto-update journey descriptions*
+*Last updated: 2026-05-04 — 8a-viii already implemented, 8a-vii awaiting review*
