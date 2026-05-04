@@ -2,26 +2,24 @@
 
 ## 🔄 Active
 
-- **Item/sub-task:** 8a-vi
-- **Branch:** item-8a-vi-edit-segment-refactor
-- **Last commit:** `ba3f285` - Item 8a-vi [8 of 8]: Open Cities dialog from journey link
-- **What was done:**
-- Clicking "Add new city" from journey dialog now opens the full Manage Cities modal
-- Users can add cities with country dropdown, city code display in one place
-- Consistent UX across journey dialog and Cities tab
-- Added status dropdown (Planned/Booked/Confirmed/Cancelled) to journey dialog
-- Status now persists when saving journeys instead of defaulting to 'planned'
-- Cities now persist to localStorage when added
-- Journey names no longer truncated in transport table
-- Segment pills clickable to switch between segments when editing
-- Cities sorted by travel order in navigation submenu
-- Journey description/title displays at top of edit dialog
-- **Next step:** MANUALLY TEST the complete 8a-vi feature set
+- **Item/sub-task:** 8a-viii
+- **Branch:** item-8a-viii-journey-desc
+- **What will be done:** Implement auto-updating journey descriptions when legs/segments change. When a journey's start/end cities change (or intermediate legs are added), the description should update to show "City A to City B (via City C, City D)".
+- **Next step:** Find where journey descriptions are generated and add auto-update logic
+- **Files to touch:** js/crud.js (journey/leg update handlers), js/transport.js (description display)
+- **Estimated commits:** 2-3 commits
 
 ## 👀 Awaiting Review / Merge
 
-- **Item/Feature:** 8a-vi — Branch `item-8a-vi-edit-segment-refactor` — PR ready
-- Summary: Multi-leg journey edit dialog refactor with status dropdown, cities persistence, journey name fixes, and improved city add UX
+- **Item/Feature:** 8a-vii — Branch `item-8a-vii-country-entry` — PR #12 open
+- **Summary:** Custom country entry feature - users can type any country name when adding cities
+
+**What was done for 8a-vii:**
+- Users can now type any country name directly in the country input field  
+- If country doesn't exist in built-in list, it's automatically created
+- Generates a 2-letter country code from the name
+- New country saved to localStorage and immediately available in dropdowns
+- PR #12: https://github.com/Trentan/travel-planner/pull/12
 
 ## Completed (to be merged to main)
 
@@ -33,4 +31,4 @@ none
 
 ---
 
-*Last updated: 2026-05-01 — 8 commits pushed, awaiting review*
+*Last updated: 2026-05-04 — Starting 8a-viii: Auto-update journey descriptions*
