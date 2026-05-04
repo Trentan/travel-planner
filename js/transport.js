@@ -549,7 +549,7 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
         <td>${isMultiLeg ? '—' : (rep.routeCode || '—')}</td>
         <td class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
         <td>
-          <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="toggleJourneyStatus('${rep.id}')">
+          <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
             ${statusIcon} ${statusText}
           </span>
           ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${rep.bookingReference}</span>` : ""}
@@ -600,7 +600,7 @@ function toggleJourneySegments(journeyId) {
   if (btn) btn.textContent = isHidden ? '▼' : '▶';
 }
 
-function toggleJourneyStatus(journeyId) {
+function toggleJourneyStatus(journeyId) { if (!window.isEditMode) return; 
   const journey = findJourney(journeyId);
   if (journey) {
     const statusCycle = { 'planned': 'booked', 'booked': 'confirmed', 'confirmed': 'cancelled', 'cancelled': 'planned' }; const newStatus = statusCycle[journey.status] || 'planned';
