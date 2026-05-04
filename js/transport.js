@@ -544,7 +544,6 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
         <td>${icon}</td>
         <td class="date-col">${firstDep}</td>
         <td class="route-col">${route}</td>
-        <td class="date-col">${firstDep}</td>
         <td>${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
         <td>${rep.provider || '—'}</td>
         <td>${isMultiLeg ? '—' : (rep.routeCode || '—')}</td>
@@ -553,16 +552,16 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
           <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="toggleJourneyStatus('${rep.id}')">
             ${statusText}
           </span>
-          ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${rep.bookingReference}</span>` : ""}
+          ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; color:#666;">${rep.bookingReference}</span>` : ""}
         </td>
         <td>
           <input type="text" value="${rep.bookingReference || ''}" placeholder="Ref #"
             onchange="updateJourneyBookingRef('${rep.id}', this.value); buildTransportTab();"
-            style="width:70px;padding:2px 4px;font-size:0.8rem;border:1px solid #ddd;border-radius:3px;font-family:monospace;"
+            style="width:70px;padding:2px 4px;font-family:inherit;border:1px solid #ddd;border-radius:3px;font-family:monospace;"
             ${isEditMode ? '' : 'readonly'}>
         </td>
         <td>
-          <button class="action-btn small" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; font-size: 0.8rem; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
+          <button class="action-btn small" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
           ${isMultiLeg
         ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
         : `<button class="del-btn" onclick="deleteJourney('${rep.id}'); buildTransportTab();" title="Delete">×</button>`}
@@ -579,11 +578,10 @@ const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTim
         html += `
           <tr class="journey-segment-row" data-group="${gid}" style="display:none;background:#fafaf8;font-size:0.85rem;">
             <td></td>
-            <td style="padding-left:2rem;color:#888;">↳ Leg ${i + 1}</td>
+            <td style="padding-left:2rem;color:#888;font-weight:600;">↳ Leg ${i + 1}: ${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</td>
             <td>${segIcon}</td>
             <td class="date-col">${segDep}</td>
             <td class="route-col" style="color:#555;">${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</td>
-            <td class="date-col">${segDep}</td>
             <td>${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
             <td>${seg.provider || '—'}</td>
             <td>${seg.routeCode || '—'}</td>
@@ -800,9 +798,9 @@ function _updateSegmentList() {
   if (labelEl) {
     if (_activeSegmentIndex >= 0 && _activeSegmentIndex < totalSegments) {
       const seg = _pendingSegments[_activeSegmentIndex];
-      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; margin-right: 6px;">${_activeSegmentIndex + 1}</span> Editing: ${seg.fromLocation} → ${seg.toLocation}`;
+      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; margin-right: 6px;">${_activeSegmentIndex + 1}</span> Editing: ${seg.fromLocation} → ${seg.toLocation}`;
     } else {
-      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; margin-right: 6px;">${totalSegments + 1}</span> Segment ${totalSegments + 1} — entering details`;
+      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; margin-right: 6px;">${totalSegments + 1}</span> Segment ${totalSegments + 1} — entering details`;
     }
   }
 
