@@ -508,9 +508,9 @@ function buildTransportTab(cityFilter = null) {
     const isMultiLeg = segs.length > 1;
     const rep = segs[0];
 
-    const statusColor = rep.status === 'booked' ? '#27AE60' : '#E67E22';
-    const statusIcon = rep.status === 'booked' ? '✓' : '⏳';
-const statusText = rep.status === 'booked' ? 'Booked' : 'Planned';
+    const statusColor = rep.status === 'booked' || rep.status === 'confirmed' ? '#27AE60' : rep.status === 'cancelled' ? '#E74C3C' : '#E67E22';
+    const statusIcon = rep.status === 'booked' ? '✓' : rep.status === 'confirmed' ? '🎫' : rep.status === 'cancelled' ? '❌' : '⏳';
+const statusText = rep.status === 'booked' ? 'Booked' : rep.status === 'confirmed' ? 'Confirmed' : rep.status === 'cancelled' ? 'Cancelled' : 'Planned';
 
     const route = isMultiLeg
     ? buildRouteChainWithCodes(segs)
@@ -603,7 +603,7 @@ function toggleJourneySegments(journeyId) {
 function toggleJourneyStatus(journeyId) {
   const journey = findJourney(journeyId);
   if (journey) {
-    const newStatus = journey.status === 'booked' ? 'planned' : 'booked';
+    const statusCycle = { 'planned': 'booked', 'booked': 'confirmed', 'confirmed': 'cancelled', 'cancelled': 'planned' }; const newStatus = statusCycle[journey.status] || 'planned';
     updateJourneyStatus(journeyId, newStatus);
     if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
     else buildTransportTab();
