@@ -6,7 +6,7 @@ none
 
 ## 👀 Awaiting Review / Merge
 
-- **Item/Feature:** 8a-viii — Branch `item-8a-viii-journey-desc`
+- **Item/Feature:** 8a-viii — Branch `item-8a-viii-journey-desc` — **COMPLETE** (viii, ix, x all done)
 - **Summary:** Transport table refinements complete
 
 **What was done for 8a-viii:**

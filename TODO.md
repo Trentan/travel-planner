@@ -24,8 +24,8 @@ Read this file at the start of every session. Claude Code: read from main branch
 ---
 
 ### Item 8: Improve Country and City Standards
-**Status:** 8a complete (merged), 8b merged — viii pending refinements
-**Next:** `item-8a-viii-ix`
+**Status:** 8a complete (merged), 8b merged — viii, ix, x complete
+**Next:** `item-8a-xi`
 
 - [x] a) Improve journey table layout to display fields better
   - [x] i) Make Status like the one in Accommodation table where the booking id (reference) is nicely under the pending / confirmed - nice touch
@@ -35,9 +35,11 @@ Read this file at the start of every session. Claude Code: read from main branch
   - [x] v) You can calculate total travel time and display under the journey description in a smaller italic font (eg 11hrs)
   - [x] vi) Edit journey dialog: segments clickable, journey title shows
   - [x] vii) In Manage cities for countries - can enter/create custom countries when "other" selected
-  - [ ] viii) Transport table refinement: Remove duplicate date column (keep departs only)
-  - [ ] ix) Transport table refinement: Expanded leg rows show "Leg X: City A → City B"
-  - [ ] x) Transport table refinement: Standardize fonts across transport table
+  - [x] viii) Transport table refinement: Remove duplicate date column (keep departs only)
+  - [x] ix) Transport table refinement: Expanded leg rows show "Leg X: City A → City B"
+  - [x] x) Transport table refinement: Standardize fonts across transport table
+  - [ ] xi) Transport reference field should appear under the planned/booking status exactly like the accommodation tab
+  - [ ] xii) Read only mode should ensure the transport tab table fields cannot be adjusted (all fields read only)
 - [x] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
   - [x] i) Add trip leg dialog not showing - loads new leg straight into itinerary instead of opening dialog
   - [x] ii) City selection dropdowns should populate to their pre-selected countries by default (currently not populating)
@@ -49,17 +51,19 @@ Read this file at the start of every session. Claude Code: read from main branch
 
 ---
 
-### Item 9: Trip plan name not saving & packing tab fix & other minor fixes
+### Item 9: Minor fixes for stable release
 **Status:** Not started
 **Next:** `item-9a`
 - [ ] a) The heading when entered (New Trip Plan) and Click here to add your trip subtitle - are not loading from json / saving correctly?
-- [ ] b) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab?
-- [ ] e) Need a way to enable the user to force a complete site refresh on mobile app / website on the app
+- [ ] b) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab? (it should always be displayed and with the default checklist for walk on gear)
+- [ ] e) Need a way to enable the user to force a complete site refresh on mobile app / website on the app easily 
 - [ ] f) Go through and convert the testing checklist into new items and sub items in this todo list
 - [ ] g) Go through and convert the Future Enhancements checklist into new items and sub items in this todo list (some may already be resolved)
 - [ ] h) Add a new notes tab - where you can add a generic checklist (eg get gifts for wife, don;t forget to take photo of x, important things to consider on your trip, unresolved items)
 - [ ] i) Improve leaving home checklist, I have a notion checklist to merge/compare - https://www.notion.so/trentan/afd1a6b4feb14fa38065515dbacbd676?v=d157c05db95048cbaffc6eb2645367a4&p=d4d390afce8b45fabdd8782b55fb3971&pm=s
-
+- [ ] j) You cannot delete category blocks in packing - you should be able to
+- [ ] k) The single dropdowns in the packing tab for the constant hints/guides are a bit clunky / could be better (eg only open one at a time) - they are in a row 1 with 3 column formation, but there might be a better design for this? (or potentially just make handy buttons in the packing tab and they just launch dialogs???)
+- [ ] l) The cities submenu should list the cities in ORDER of the journey timeline (eg London should not be last, based on my current json, it should be before Bangkok)
 ---
 
 ## Noticed (unscheduled)
