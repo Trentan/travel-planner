@@ -546,7 +546,7 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
 <td class="date-col" ">${firstDep}</td>
         <td>${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
         <td>${rep.provider || '—'}</td>
-        <td>${isMultiLeg ? '—' : (rep.routeCode || '—')}</td>
+        <td>${rep.routeCode || '—'}</td>
         <td class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
         <td>
           <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
