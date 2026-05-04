@@ -982,14 +982,21 @@ function addNewCityFromDialog() {
     // Add the custom country to user countries
     addUserCountry(enteredCountryCode || codeFromName, enteredCountryName);
   } else if (!countryCode && countryInput?.value?.trim()) {
+    const typedCountry = countryInput.value.trim();
     const match = COUNTRY_DATA.find(c =>
-      c.name.toLowerCase() === countryInput.value.trim().toLowerCase()
+      c.name.toLowerCase() === typedCountry.toLowerCase()
     );
     if (match) {
       countryCode = match.code;
       countryName = match.name;
     } else {
-      countryName = countryInput.value.trim();
+      // Country not found - automatically create it!
+      countryName = typedCountry;
+      // Generate a 2-letter code from the country name
+      const generatedCode = typedCountry.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
+      countryCode = generatedCode || 'XX';
+      // Add the new country to user countries
+      addUserCountry(countryCode, countryName);
     }
   } else if (countryCode) {
     const match = COUNTRY_DATA.find(c => c.code === countryCode);
