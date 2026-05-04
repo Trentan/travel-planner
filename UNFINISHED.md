@@ -2,27 +2,20 @@
 
 ## 🔄 Active
 
-- **Item/sub-task:** 8a-vi
-- **Branch:** item-8a-vi-edit-segment-refactor
-- **Last commit:** `ba3f285` - Item 8a-vi [8 of 8]: Open Cities dialog from journey link
-- **What was done:**
-- Clicking "Add new city" from journey dialog now opens the full Manage Cities modal
-- Users can add cities with country dropdown, city code display in one place
-- Consistent UX across journey dialog and Cities tab
-- Added status dropdown (Planned/Booked/Confirmed/Cancelled) to journey dialog
-- Status now persists when saving journeys instead of defaulting to 'planned'
-- Cities now persist to localStorage when added
-- Journey names no longer truncated in transport table
-- Segment pills clickable to switch between segments when editing
-- Cities sorted by travel order in navigation submenu
-- Journey description/title displays at top of edit dialog
-- Fixed z-index so city modal appears above journey dialog
-- **Next step:** MANUALLY TEST the complete 8a-vi feature set
+none
 
 ## 👀 Awaiting Review / Merge
 
-- **Item/Feature:** 8a-vi — Branch `item-8a-vi-edit-segment-refactor` — PR ready
-- Summary: Multi-leg journey edit dialog refactor with status dropdown, cities persistence, journey name fixes, and improved city add UX
+- **Item/Feature:** 8a-vii — Branch `item-8a-vii-country-entry` — PR #12 open
+- **Summary:** Custom country entry feature - users can type any country name when adding cities, with auto-creation of non-existent countries
+
+**What was done:**
+- Users can now type any country name directly in the country input field
+- If country doesn't exist in built-in list, it's automatically created
+- Generates a 2-letter country code from the name (e.g., "Myanmar" → "MM")
+- New country saved to localStorage and immediately available in dropdowns
+- No need to select "Other" first - seamless typing experience
+- PR #12: https://github.com/Trentan/travel-planner/pull/12
 
 ## Completed (to be merged to main)
 
@@ -34,4 +27,4 @@ none
 
 ---
 
-*Last updated: 2026-05-01 — 8 commits pushed, awaiting review*
+*Last updated: 2026-05-04 — Item 8a-vii complete, awaiting review*
