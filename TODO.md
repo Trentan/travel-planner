@@ -39,9 +39,9 @@ Read this file at the start of every session. Claude Code: read from main branch
   - [x] ix) Transport table refinement: Expanded leg rows show "Leg X: City A → City B"
   - [x] x) Transport table refinement: Standardize fonts across transport table
   - [x] xi) Transport reference field should appear under the planned/booking status exactly like the accommodation tab and the button options and emojis the same
-  - [x] xii) Read only mode should ensure the transport tab table fields cannot be adjusted (all fields read only)
-  - [ ] xiii) Route # not appearing in the transport table though in the json
-  - [x] xiv) Status icons for transport (✓ booked, ⏳ planned) in table and edit dialog
+  - [x] xii) Read only mode ensures ALL transport tab fields cannot be adjusted (cost, status, booking ref)
+  - [ ] xiii) Route # column exists - displays routeCode when populated (currently all routeCode values are empty in JSON)
+  - [x] xiv) Status icons for transport (✓ booked, ⏳ planned, 🎫 confirmed, ❌ cancelled ) in table and also edit dialog
 - [x] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
   - [x] i) Add trip leg dialog not showing - loads new leg straight into itinerary instead of opening dialog
   - [x] ii) City selection dropdowns should populate to their pre-selected countries by default (currently not populating)
