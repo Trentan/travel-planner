@@ -24,8 +24,8 @@ Read this file at the start of every session. Claude Code: read from main branch
 ---
 
 ### Item 8: Improve Country and City Standards
-**Status:** 8a complete (merged), 8b merged — viii, ix, x complete
-**Next:** `item-8a-xi`
+**Status:** 8a complete (merged), 8b merged — viii, ix, x, xi, xii, xiv complete
+**Next:** `item-8a-xiii`
 
 - [x] a) Improve journey table layout to display fields better
   - [x] i) Make Status like the one in Accommodation table where the booking id (reference) is nicely under the pending / confirmed - nice touch
@@ -38,8 +38,10 @@ Read this file at the start of every session. Claude Code: read from main branch
   - [x] viii) Transport table refinement: Remove duplicate date column (keep departs only)
   - [x] ix) Transport table refinement: Expanded leg rows show "Leg X: City A → City B"
   - [x] x) Transport table refinement: Standardize fonts across transport table
-  - [ ] xi) Transport reference field should appear under the planned/booking status exactly like the accommodation tab
-  - [ ] xii) Read only mode should ensure the transport tab table fields cannot be adjusted (all fields read only)
+  - [x] xi) Transport reference field should appear under the planned/booking status exactly like the accommodation tab and the button options and emojis the same
+  - [x] xii) Read only mode should ensure the transport tab table fields cannot be adjusted (all fields read only)
+  - [ ] xiii) Route # not appearing in the transport table though in the json
+  - [x] xiv) Status icons for transport (✓ booked, ⏳ planned) in table and edit dialog
 - [x] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
   - [x] i) Add trip leg dialog not showing - loads new leg straight into itinerary instead of opening dialog
   - [x] ii) City selection dropdowns should populate to their pre-selected countries by default (currently not populating)
