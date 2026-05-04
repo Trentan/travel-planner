@@ -11,12 +11,13 @@ none
 
 **What was done for 8a-viii:**
 1. Journey description auto-update - already implemented (buildJourneyName function)
-2. Removed duplicate date column (kept departs column only)
-3. Standardized fonts across transport table (removed inconsistent font-size declarations)
-4. Updated expanded leg rows to show "Leg X: City A → City B"
+2. Removed duplicate Date column - kept only Departs column
+3. Standardized fonts - removed monospace 'DM Mono' font from date columns
+4. Expanded leg rows now show "Leg X: City A → City B" format
 
 **Files changed:**
-- js/transport.js - Removed duplicate date column, standardized fonts, added leg info with cities
+- js/transport.js - Column layout and data alignment
+- style.css - Removed font-family override from .date-col
 
 ## Awaiting Review / Merge
 
