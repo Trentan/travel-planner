@@ -557,7 +557,7 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
           <input type="text" value="${rep.bookingReference || ''}" placeholder="Ref #"
             onchange="updateJourneyBookingRef('${rep.id}', this.value); buildTransportTab();"
             style="width:70px;padding:2px 4px;font-family:inherit;border:1px solid #ddd;border-radius:3px;font-family:monospace;"
-            ${isEditMode ? '' : 'readonly'}>
+            ${isEditMode ? '' : 'disabled'}>
         </td>
         <td>
           <button class="action-btn small" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
