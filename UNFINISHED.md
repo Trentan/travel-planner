@@ -6,16 +6,17 @@ none
 
 ## 👀 Awaiting Review / Merge
 
-- **Item/Feature:** 8a-viii — Branch `item-8a-viii-journey-desc` 
-- **Summary:** Journey description auto-update feature
+- **Item/Feature:** 8a-viii — Branch `item-8a-viii-journey-desc`
+- **Summary:** Transport table refinements complete
 
 **What was done for 8a-viii:**
-- Analysis found this feature is already implemented
-- `buildJourneyName()` at `js/transport.js:212` generates journey names with "via" notation
-- When segments are edited and saved, the journey name is automatically recalculated
-- Multi-leg journeys show format: "Zurich → Bangkok (via London)"
-- Single-leg journeys show: "Zurich → Bangkok"
-- PR link: To be created
+1. Journey description auto-update - already implemented (buildJourneyName function)
+2. Removed duplicate date column (kept departs column only)
+3. Standardized fonts across transport table (removed inconsistent font-size declarations)
+4. Updated expanded leg rows to show "Leg X: City A → City B"
+
+**Files changed:**
+- js/transport.js - Removed duplicate date column, standardized fonts, added leg info with cities
 
 ## Awaiting Review / Merge
 
@@ -39,4 +40,4 @@ none
 
 ---
 
-*Last updated: 2026-05-04 — 8a-viii already implemented, 8a-vii awaiting review*
+*Last updated: 2026-05-04 — 8a-vii and 8a-viii complete, awaiting review*
