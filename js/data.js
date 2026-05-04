@@ -1394,7 +1394,7 @@ function initData() {
   createCityDatalists();
 
   const savedMeta = localStorage.getItem('travelApp_meta_template');
-  if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title && parsed.title.trim()) titleData.title = parsed.title; if (parsed.subtitle && parsed.subtitle.trim()) titleData.subtitle = parsed.subtitle; } catch(e) { console.error('Meta parse error:', e); } if (!titleData.title || !titleData.title.trim()) { console.log('[Migration] Resetting empty titleData to defaults'); titleData = { title: "✈ New Trip Plan", subtitle: "Click here to add your trip subtitle/description" }; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); } }
+  if (savedMeta) { titleData = JSON.parse(savedMeta); }
 
   const savedFile = localStorage.getItem('travelApp_filename_v2026');
   if (savedFile) { currentFileName = savedFile; }
@@ -1403,25 +1403,7 @@ function initData() {
   document.getElementById('mainSubtitle').innerText = titleData.subtitle;
   document.getElementById('activeFileDisplay').innerText = "📂 " + currentFileName;
 
-  // Add blur event listeners to save title/subtitle when edited
-const mainTitleEl = document.getElementById('mainTitle');
-const mainSubtitleEl = document.getElementById('mainSubtitle');
-if (mainTitleEl) {
-mainTitleEl.addEventListener('blur', function() {
-const newTitle = this.innerText.trim();
-if (newTitle) titleData.title = newTitle;
-localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
-});
-}
-if (mainSubtitleEl) {
-mainSubtitleEl.addEventListener('blur', function() {
-const newSubtitle = this.innerText.trim();
-if (newSubtitle) titleData.subtitle = newSubtitle;
-localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
-});
-}
-
-// Display last export/import timestamp
+  // Display last export/import timestamp
   displayTimestampStatus();
 
   // Auto-extract cities if none exist
@@ -1658,7 +1640,8 @@ function importJSON(event) {
       }
       if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
       if (importedData.meta) {
-titleData = { ...titleData, ...importedData.meta }; if (!titleData.title || !titleData.title.trim()) titleData.title = "✈ New Trip Plan"; if (!titleData.subtitle || !titleData.subtitle.trim()) titleData.subtitle = "Click here to add your trip subtitle/description"; const titleEl = document.getElementById('mainTitle'); const subtitleEl = document.getElementById('mainSubtitle'); if (titleEl) titleEl.innerText = titleData.title; if (subtitleEl) subtitleEl.innerText = titleData.subtitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
+        titleData = importedData.meta;
+      }
 
   // Import journeys if present - also create cities from journey references
   if (importedData.journeys && Array.isArray(importedData.journeys)) {
@@ -1718,4 +1701,3 @@ window.addUserCity = addUserCity;
 window.updateCityCountryCode = updateCityCountryCode;
 window.populateCountrySelect = populateCountrySelect;
 window.setupCityAutocomplete = setupCityAutocomplete;
-

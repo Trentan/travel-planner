@@ -14,7 +14,9 @@ Read this file at the start of every session. Claude Code: read from main branch
 **Status:** Not started
 **Next:** `item-9a`
 - [ ] a) The heading when entered (New Trip Plan) and Click here to add your trip subtitle - are not loading from json / saving correctly?
-- [ ] b) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab? (it should always be displayed and with the default checklist for walk on gear)
+- [ ] b) ALL of the content needs to AUTO SAVE to the loaded json file, everything that can be entered MUST be loaded and saved in json - NOT BROWSER CACHE (sure it can load from the json to browser cache and back again, but I lost a lot of stuff when clearing cache etc - it should have all been saved and backed up in the json!!! whole point of the app)
+- [ ] c) In the accomodation tab, if the stays have gaps for the nights and itinteray length, Add an auto-populate stays feature button action - scan itinerary and automatically create missing accommodation entries for each city based on nights stayed. This button should only appear when nights are missing in the accomodation tab compared to the itinerary.
+- [ ] d) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab? (it should always be displayed and with the default checklist for walk on gear)
 - [ ] e) Need a way to enable the user to force a complete site refresh on mobile app / website on the app easily 
 - [ ] f) Go through and convert the testing checklist into new items and sub items in this todo list
 - [ ] g) Go through and convert the Future Enhancements checklist into new items and sub items in this todo list (some may already be resolved)
@@ -23,6 +25,7 @@ Read this file at the start of every session. Claude Code: read from main branch
 - [ ] j) You cannot delete category blocks in packing - you should be able to
 - [ ] k) The single dropdowns in the packing tab for the constant hints/guides are a bit clunky / could be better (eg only open one at a time) - they are in a row 1 with 3 column formation, but there might be a better design for this? (or potentially just make handy buttons in the packing tab and they just launch dialogs???)
 - [ ] l) The cities submenu should list the cities in ORDER of the journey timeline (eg London should not be last, based on my current json, it should be before Bangkok)
+- [ ] m) The cities submenu / cities should only apply to what is saved in the json, not in browser memory (eg on intial load london and paris load, this stays in subsequent trips / import json where those cities are not listed)
 ---
 
 ## Noticed (unscheduled)

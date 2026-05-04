@@ -7,12 +7,18 @@ none
 ## 👀 Awaiting Review / Merge
 
 - **Item/Feature:** 9a — Branch `item-9a-title-subtitle-fix` — PR open, awaiting review
-- **Summary:** Title/subtitle now save when edited
+- **Summary:** Fixed title/subtitle not loading from JSON
 
 **What was done for 9a:**
-- Added blur event listeners to mainTitle and mainSubtitle elements
-- When either field loses focus, the value is immediately saved to localStorage
-- This ensures title/subtitle changes persist and load correctly on next visit
+
+1. Added blur event listeners to save title/subtitle when edited
+2. Fixed bug where empty title/subtitle from localStorage override defaults
+3. Added validation to prevent saving empty title/subtitle
+4. Added validation when importing JSON to preserve defaults if imported values are empty
+5. Added migration that auto-fixes corrupted empty titleData on startup
+
+**Files changed:**
+- `js/data.js` - Blur handlers, validation, and migration for title/subtitle
 
 - **Item/Feature:** 8a-viii — Branch `item-8a-viii-journey-desc` — **COMPLETE** (viii, ix, x all done)
 - **Summary:** Transport table refinements complete
@@ -22,7 +28,7 @@ none
 1. Journey description auto-update - already implemented (buildJourneyName function)
 2. Removed duplicate Date column - kept only Departs column
 3. Standardized fonts - removed monospace 'DM Mono' font from date columns
-4. Expanded leg row now shows "Leg X: City A → City B" format
+4. Expanded leg rows now show "Leg X: City A → City B" format
 
 **Files changed:**
 - js/transport.js - Column layout and data alignment
@@ -50,4 +56,4 @@ none
 
 ---
 
-*Last updated: 2026-05-04 — Starting Item 9a*
+*Last updated: 2026-05-04 — Item 9a complete, awaiting review*

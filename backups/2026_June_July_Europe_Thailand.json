@@ -2077,97 +2077,460 @@
       ]
     }
   ],
-  "cities": [
+  "packing": [
     {
-      "id": "city-brisbane",
-      "name": "Brisbane",
-      "country": "",
-      "dateFrom": "8 Jul",
-      "dateTo": "8 Jun"
+      "areaName": "🧳 Carry-on Packed Bag (Main Luggage)",
+      "areaColor": "#2980B9",
+      "categories": [
+        {
+          "title": "🏠 Before Leaving Home",
+          "items": [
+            {
+              "text": "Lock all doors and windows",
+              "done": false
+            },
+            {
+              "text": "Pause gym membership",
+              "done": false
+            },
+            {
+              "text": "Setup camera for fish and security",
+              "done": false
+            },
+            {
+              "text": "Store/remove fridge & pantry perishables",
+              "done": false
+            },
+            {
+              "text": "Turn off taps, PowerPoints",
+              "done": false
+            },
+            {
+              "text": "Wrap garage door opener and unplug power",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Clothes",
+          "items": [
+            {
+              "text": "Travel day outfit: Long pants, Shirt, Hoodie, Socks, Shoes",
+              "done": false
+            },
+            {
+              "text": "T-shirts, Tank Tops",
+              "done": false
+            },
+            {
+              "text": "Shorts, Skirts",
+              "done": false
+            },
+            {
+              "text": "Pants",
+              "done": false
+            },
+            {
+              "text": "Layers (hoodie, sweater, cardigan)",
+              "done": false
+            },
+            {
+              "text": "Swim suit",
+              "done": false
+            },
+            {
+              "text": "Dress",
+              "done": false
+            },
+            {
+              "text": "Socks",
+              "done": false
+            },
+            {
+              "text": "Underwear",
+              "done": false
+            },
+            {
+              "text": "Bras",
+              "done": false
+            },
+            {
+              "text": "Pyjamas, Sleepwear",
+              "done": false
+            },
+            {
+              "text": "Formal Wear",
+              "done": false
+            },
+            {
+              "text": "Hat",
+              "done": false
+            },
+            {
+              "text": "Workout outfit",
+              "done": false
+            },
+            {
+              "text": "Belt",
+              "done": false
+            },
+            {
+              "text": "Other accessories / Earrings",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Shoes & Misc",
+          "items": [
+            {
+              "text": "Dress shoes",
+              "done": false
+            },
+            {
+              "text": "Sandals/Crocs",
+              "done": false
+            },
+            {
+              "text": "Presents / Card",
+              "done": false
+            },
+            {
+              "text": "Crossbody/Sling Bag/Purse",
+              "done": false
+            },
+            {
+              "text": "Reusable tote bag",
+              "done": false
+            },
+            {
+              "text": "Pillowcase for used clothes",
+              "done": false
+            },
+            {
+              "text": "Laundry Sheets for washing",
+              "done": false
+            },
+            {
+              "text": "Raincoat/Umbrella",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Dry Toiletries",
+          "items": [
+            {
+              "text": "Floss",
+              "done": false
+            },
+            {
+              "text": "Toothbrush",
+              "done": false
+            },
+            {
+              "text": "Razor (Cartidge), Shaving",
+              "done": false
+            },
+            {
+              "text": "Bar of Soap",
+              "done": false
+            },
+            {
+              "text": "Cotton pad, q-tips",
+              "done": false
+            },
+            {
+              "text": "Nail clippers/tweezers",
+              "done": false
+            },
+            {
+              "text": "Personal Hygiene items (Pads)",
+              "done": false
+            },
+            {
+              "text": "Makeup",
+              "done": false
+            },
+            {
+              "text": "Hair clips, hair ties, bobby pins",
+              "done": false
+            },
+            {
+              "text": "Hair Brush/comb/tools",
+              "done": false
+            },
+            {
+              "text": "Bandaids, Electrolyte packs",
+              "done": false
+            },
+            {
+              "text": "Body wipes",
+              "done": false
+            },
+            {
+              "text": "Panadol / Nurofen",
+              "done": false
+            },
+            {
+              "text": "Vitamins / Tablets",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "1 Litre Clear Bag (Liquids <100ml)",
+          "items": [
+            {
+              "text": "Clear 1 litre bag",
+              "done": false
+            },
+            {
+              "text": "Cologne/Perfume",
+              "done": false
+            },
+            {
+              "text": "Toothpaste",
+              "done": false
+            },
+            {
+              "text": "Face wash",
+              "done": false
+            },
+            {
+              "text": "Shampoo & Conditioner",
+              "done": false
+            },
+            {
+              "text": "Leave-in conditioner",
+              "done": false
+            },
+            {
+              "text": "Micellar Water or Makeup Remover",
+              "done": false
+            },
+            {
+              "text": "Sunscreen",
+              "done": false
+            },
+            {
+              "text": "Deodorant (Wrap cloth-tape repairs)",
+              "done": false
+            },
+            {
+              "text": "Moisturiser",
+              "done": false
+            },
+            {
+              "text": "Liquids pouches (for above liquids)",
+              "done": false
+            },
+            {
+              "text": "Toiletry skins (for liquid no spill)",
+              "done": false
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "city-taipei",
-      "name": "Taipei",
-      "country": "",
-      "dateFrom": "9 Jun",
-      "dateTo": "9 Jun"
+      "areaName": "🎒 Personal Item Bag (Under Seat)",
+      "areaColor": "#8E44AD",
+      "categories": [
+        {
+          "title": "Essentials",
+          "items": [
+            {
+              "text": "TRS Claim + Items",
+              "done": false
+            },
+            {
+              "text": "Passport + [Copy + Tracker]",
+              "done": false
+            },
+            {
+              "text": "Reservations + Itineraries + Insurance",
+              "done": false
+            },
+            {
+              "text": "Wallet/Purse + Local cash + Cards",
+              "done": false
+            },
+            {
+              "text": "Phone",
+              "done": false
+            },
+            {
+              "text": "Sunglasses & Case",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Flight Items",
+          "items": [
+            {
+              "text": "Travel pillow / Foot sling",
+              "done": false
+            },
+            {
+              "text": "Phone holder (watch movies)",
+              "done": false
+            },
+            {
+              "text": "Compression socks, Slippers",
+              "done": false
+            },
+            {
+              "text": "Disposable Toothbrush kit",
+              "done": false
+            },
+            {
+              "text": "Eye mask, Eye Drops",
+              "done": false
+            },
+            {
+              "text": "Ear plugs, Breath Fresheners",
+              "done": false
+            },
+            {
+              "text": "Snacks, TravelCalm",
+              "done": false
+            },
+            {
+              "text": "Headphones/Airpods",
+              "done": false
+            },
+            {
+              "text": "Airfly/Bluetooth Adapter",
+              "done": false
+            },
+            {
+              "text": "Book/Kindle",
+              "done": false
+            },
+            {
+              "text": "Water bottle",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Tech",
+          "items": [
+            {
+              "text": "eSIM (Installed)",
+              "done": false
+            },
+            {
+              "text": "Mobile downloads (Movies, Shows)",
+              "done": false
+            },
+            {
+              "text": "Phone charger",
+              "done": false
+            },
+            {
+              "text": "Power cables, Cords",
+              "done": false
+            },
+            {
+              "text": "Power Adapter",
+              "done": false
+            },
+            {
+              "text": "Power bank",
+              "done": false
+            },
+            {
+              "text": "Pen",
+              "done": false
+            },
+            {
+              "text": "Laptop",
+              "done": false
+            },
+            {
+              "text": "Luggage Trackers",
+              "done": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "leaveHome": [
+    {
+      "text": "Lock all doors and windows",
+      "done": false
     },
     {
-      "id": "city-vienna",
-      "name": "Vienna",
-      "country": "",
-      "dateFrom": "10 Jun",
-      "dateTo": "11 Jun"
+      "text": "Set security alarm / notify security company",
+      "done": false
     },
     {
-      "id": "city-bratislava",
-      "name": "Bratislava",
-      "country": "",
-      "dateFrom": "11 Jun",
-      "dateTo": "13 Jun"
+      "text": "Turn off all taps and check for leaks",
+      "done": false
     },
     {
-      "id": "city-prague",
-      "name": "Prague",
-      "country": "",
-      "dateFrom": "13 Jun",
-      "dateTo": "15 Jun"
+      "text": "Switch off PowerPoints at the wall (except fridge)",
+      "done": false
     },
     {
-      "id": "city-nuremberg",
-      "name": "Nuremberg",
-      "country": "",
-      "dateFrom": "15 Jun",
-      "dateTo": "16 Jun"
+      "text": "Turn off gas supply if applicable",
+      "done": false
     },
     {
-      "id": "city-munich",
-      "name": "Munich",
-      "country": "",
-      "dateFrom": "16 Jun",
-      "dateTo": "20 Jun"
+      "text": "Adjust thermostat to away/saver mode",
+      "done": false
     },
     {
-      "id": "city-innsbruck",
-      "name": "Innsbruck",
-      "country": "",
-      "dateFrom": "20 Jun",
-      "dateTo": "21 Jun"
+      "text": "Remove or use up perishables from fridge",
+      "done": false
     },
     {
-      "id": "city-bolzano",
-      "name": "Bolzano",
-      "country": "",
-      "dateFrom": "21 Jun",
-      "dateTo": "23 Jun"
+      "text": "Check pantry for items that may expire",
+      "done": false
     },
     {
-      "id": "city-milan",
-      "name": "Milan",
-      "country": "",
-      "dateFrom": "23 Jun",
-      "dateTo": "25 Jun"
+      "text": "Take out all rubbish and recycling",
+      "done": false
     },
     {
-      "id": "city-zurich",
-      "name": "Zurich",
-      "country": "",
-      "dateFrom": "25 Jun",
-      "dateTo": "26 Jun"
+      "text": "Check mailbox is empty / hold mail service",
+      "done": false
     },
     {
-      "id": "city-bangkok",
-      "name": "Bangkok",
-      "country": "",
-      "dateFrom": "27 Jun",
-      "dateTo": "7 Jul"
+      "text": "Pause or reschedule any regular deliveries",
+      "done": false
     },
     {
-      "id": "city-koh-samui",
-      "name": "Koh Samui",
-      "country": "",
-      "dateFrom": "1 Jul",
-      "dateTo": "7 Jul"
+      "text": "Pause gym membership or group activities",
+      "done": false
+    },
+    {
+      "text": "Charge all devices (phones, tablets, power banks)",
+      "done": false
+    },
+    {
+      "text": "Download offline maps and confirmations",
+      "done": false
+    },
+    {
+      "text": "Notify emergency contact of travel plans",
+      "done": false
+    },
+    {
+      "text": "Water plants or arrange plant care",
+      "done": false
+    },
+    {
+      "text": "Set up lights on timers (if away long)",
+      "done": false
+    },
+    {
+      "text": "Close blinds/curtains and secure loose outdoor items",
+      "done": false
     }
   ],
   "journeys": [
@@ -2697,375 +3060,175 @@
       "segmentOrder": 2
     }
   ],
-  "packing": [
+  "stays": [
     {
-      "title": "🏠 Before Leaving Home",
-      "items": [
-        {
-          "text": "Lock all doors and windows",
-          "done": false
-        },
-        {
-          "text": "Pause gym membership",
-          "done": false
-        },
-        {
-          "text": "Setup camera for fish and security",
-          "done": false
-        },
-        {
-          "text": "Store/remove fridge & pantry perishables",
-          "done": false
-        },
-        {
-          "text": "Turn off taps, PowerPoints",
-          "done": false
-        },
-        {
-          "text": "Wrap garage door opener and unplug power",
-          "done": false
-        }
-      ]
+      "id": "stay_0_1777289776",
+      "cityId": "city-vienna",
+      "propertyName": "tbc — vienna city centre",
+      "checkIn": "2026-06-10",
+      "checkOut": "2026-06-11",
+      "nights": 1,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
     },
     {
-      "title": "🧳 Carry-On: Clothes",
-      "items": [
-        {
-          "text": "Travel day outfit: Long pants, Shirt, Hoodie, Socks, Shoes",
-          "done": false
-        },
-        {
-          "text": "T-shirts, Tank Tops",
-          "done": false
-        },
-        {
-          "text": "Shorts, Skirts",
-          "done": false
-        },
-        {
-          "text": "Pants",
-          "done": false
-        },
-        {
-          "text": "Layers (hoodie, sweater, cardigan)",
-          "done": false
-        },
-        {
-          "text": "Swim suit",
-          "done": false
-        },
-        {
-          "text": "Dress",
-          "done": false
-        },
-        {
-          "text": "Socks",
-          "done": false
-        },
-        {
-          "text": "Underwear",
-          "done": false
-        },
-        {
-          "text": "Bras",
-          "done": false
-        },
-        {
-          "text": "Pyjamas, Sleepwear",
-          "done": false
-        },
-        {
-          "text": "Formal Wear",
-          "done": false
-        },
-        {
-          "text": "Hat",
-          "done": false
-        },
-        {
-          "text": "Workout outfit",
-          "done": false
-        },
-        {
-          "text": "Belt",
-          "done": false
-        },
-        {
-          "text": "Other accessories / Earrings",
-          "done": false
-        }
-      ]
+      "id": "stay_1_1777289776",
+      "cityId": "city-bratislava",
+      "propertyName": "tbc — bratislava old town",
+      "checkIn": "2026-06-11",
+      "checkOut": "2026-06-13",
+      "nights": 2,
+      "status": "confirmed",
+      "provider": "Airbnb",
+      "bookingRef": "123456789",
+      "totalCost": "0",
+      "notes": ""
     },
     {
-      "title": "🧳 Carry-On: Shoes & Misc",
-      "items": [
-        {
-          "text": "Dress shoes",
-          "done": false
-        },
-        {
-          "text": "Sandals/Crocs",
-          "done": false
-        },
-        {
-          "text": "Presents / Card",
-          "done": false
-        },
-        {
-          "text": "Crossbody/Sling Bag/Purse",
-          "done": false
-        },
-        {
-          "text": "Reusable tote bag",
-          "done": false
-        },
-        {
-          "text": "Pillowcase for used clothes",
-          "done": false
-        },
-        {
-          "text": "Laundry Sheets for washing",
-          "done": false
-        },
-        {
-          "text": "Raincoat/Umbrella",
-          "done": false
-        }
-      ]
+      "id": "stay_2_1777289776",
+      "cityId": "city-prague",
+      "propertyName": "tbc — prague old town",
+      "checkIn": "2026-06-13",
+      "checkOut": "2026-06-15",
+      "nights": 2,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
     },
     {
-      "title": "🧳 Carry-On: Dry Toiletries",
-      "items": [
-        {
-          "text": "Floss",
-          "done": false
-        },
-        {
-          "text": "Toothbrush",
-          "done": false
-        },
-        {
-          "text": "Razor (Cartidge), Shaving",
-          "done": false
-        },
-        {
-          "text": "Bar of Soap",
-          "done": false
-        },
-        {
-          "text": "Cotton pad, q-tips",
-          "done": false
-        },
-        {
-          "text": "Nail clippers/tweezers",
-          "done": false
-        },
-        {
-          "text": "Personal Hygiene items (Pads)",
-          "done": false
-        },
-        {
-          "text": "Makeup",
-          "done": false
-        },
-        {
-          "text": "Hair clips, hair ties, bobby pins",
-          "done": false
-        },
-        {
-          "text": "Hair Brush/comb/tools",
-          "done": false
-        },
-        {
-          "text": "Bandaids, Electrolyte packs",
-          "done": false
-        },
-        {
-          "text": "Body wipes",
-          "done": false
-        },
-        {
-          "text": "Panadol / Nurofen",
-          "done": false
-        },
-        {
-          "text": "Vitamins / Tablets",
-          "done": false
-        }
-      ]
+      "id": "stay_3_1777289776",
+      "cityId": "city-nuremberg",
+      "propertyName": "tbc — nuremberg old town",
+      "checkIn": "2026-06-15",
+      "checkOut": "2026-06-16",
+      "nights": 1,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
     },
     {
-      "title": "🎒 Personal Item: Essentials",
-      "items": [
-        {
-          "text": "TRS Claim + Items",
-          "done": false
-        },
-        {
-          "text": "Passport + [Copy + Tracker]",
-          "done": false
-        },
-        {
-          "text": "Reservations + Itineraries + Insurance",
-          "done": false
-        },
-        {
-          "text": "Wallet/Purse + Local cash + Cards",
-          "done": false
-        },
-        {
-          "text": "Phone",
-          "done": false
-        },
-        {
-          "text": "Sunglasses & Case",
-          "done": false
-        }
-      ]
+      "id": "stay_4_1777289776",
+      "cityId": "city-munich",
+      "propertyName": "tbc — munich conference hotel",
+      "checkIn": "2026-06-16",
+      "checkOut": "2026-06-19",
+      "nights": 3,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
     },
     {
-      "title": "🎒 Personal Item: Flight Items",
-      "items": [
-        {
-          "text": "Travel pillow / Foot sling",
-          "done": false
-        },
-        {
-          "text": "Phone holder (watch movies)",
-          "done": false
-        },
-        {
-          "text": "Compression socks, Slippers",
-          "done": false
-        },
-        {
-          "text": "Disposable Toothbrush kit",
-          "done": false
-        },
-        {
-          "text": "Eye mask, Eye Drops",
-          "done": false
-        },
-        {
-          "text": "Ear plugs, Breath Fresheners",
-          "done": false
-        },
-        {
-          "text": "Snacks, TravelCalm",
-          "done": false
-        },
-        {
-          "text": "Headphones/Airpods",
-          "done": false
-        },
-        {
-          "text": "Airfly/Bluetooth Adapter",
-          "done": false
-        },
-        {
-          "text": "Book/Kindle",
-          "done": false
-        },
-        {
-          "text": "Water bottle",
-          "done": false
-        }
-      ]
+      "id": "stay_5_1777289776",
+      "cityId": "city-munich",
+      "propertyName": "tbc — munich personal accommodation",
+      "checkIn": "2026-06-19",
+      "checkOut": "2026-06-20",
+      "nights": 1,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
     },
     {
-      "title": "🎒 Personal Item: Tech",
-      "items": [
-        {
-          "text": "eSIM (Installed)",
-          "done": false
-        },
-        {
-          "text": "Mobile downloads (Movies, Shows)",
-          "done": false
-        },
-        {
-          "text": "Phone charger",
-          "done": false
-        },
-        {
-          "text": "Power cables, Cords",
-          "done": false
-        },
-        {
-          "text": "Power Adapter",
-          "done": false
-        },
-        {
-          "text": "Power bank",
-          "done": false
-        },
-        {
-          "text": "Pen",
-          "done": false
-        },
-        {
-          "text": "Laptop",
-          "done": false
-        },
-        {
-          "text": "Luggage Trackers",
-          "done": false
-        }
-      ]
+      "id": "stay_6_1777289776",
+      "cityId": "city-innsbruck",
+      "propertyName": "tbc — innsbruck old town",
+      "checkIn": "2026-06-20",
+      "checkOut": "2026-06-21",
+      "nights": 1,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
     },
     {
-      "title": "💧 1 Litre Clear Bag (Liquids <100ml)",
-      "items": [
-        {
-          "text": "Clear 1 litre bag",
-          "done": false
-        },
-        {
-          "text": "Cologne/Perfume",
-          "done": false
-        },
-        {
-          "text": "Toothpaste",
-          "done": false
-        },
-        {
-          "text": "Face wash",
-          "done": false
-        },
-        {
-          "text": "Shampoo & Conditioner",
-          "done": false
-        },
-        {
-          "text": "Leave-in conditioner",
-          "done": false
-        },
-        {
-          "text": "Micellar Water or Makeup Remover",
-          "done": false
-        },
-        {
-          "text": "Sunscreen",
-          "done": false
-        },
-        {
-          "text": "Deodorant (Wrap cloth-tape repairs)",
-          "done": false
-        },
-        {
-          "text": "Moisturiser",
-          "done": false
-        },
-        {
-          "text": "Liquids pouches (for above liquids)",
-          "done": false
-        },
-        {
-          "text": "Toiletry skins (for liquid no spill)",
-          "done": false
-        }
-      ]
+      "id": "stay_7_1777289776",
+      "cityId": "city-bolzano",
+      "propertyName": "tbc — bolzano city centre",
+      "checkIn": "2026-06-21",
+      "checkOut": "2026-06-23",
+      "nights": 2,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
+    },
+    {
+      "id": "stay_8_1777289776",
+      "cityId": "city-milan",
+      "propertyName": "tbc — milan city centre",
+      "checkIn": "2026-06-23",
+      "checkOut": "2026-06-24",
+      "nights": 1,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
+    },
+    {
+      "id": "stay_9_1777289776",
+      "cityId": "city-milan",
+      "propertyName": "tbc — milan city centre",
+      "checkIn": "2026-06-24",
+      "checkOut": "2026-06-25",
+      "nights": 1,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
+    },
+    {
+      "id": "stay_10_1777289776",
+      "cityId": "city-zurich",
+      "propertyName": "tbc — zurich city centre",
+      "checkIn": "2026-06-25",
+      "checkOut": "2026-06-26",
+      "nights": 1,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
+    },
+    {
+      "id": "stay_11_1777289776",
+      "cityId": "city-bangkok",
+      "propertyName": "tbc — bangkok city",
+      "checkIn": "2026-06-27",
+      "checkOut": "2026-06-29",
+      "nights": 2,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
+    },
+    {
+      "id": "stay_12_1777289776",
+      "cityId": "city-koh-samui",
+      "propertyName": "homm hotel",
+      "checkIn": "2026-06-29",
+      "checkOut": "2026-07-07",
+      "nights": 8,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": ""
     }
-  ],
-  "leaveHome": []
+  ]
 }

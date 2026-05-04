@@ -553,4 +553,20 @@ function scrollToCity(cityId) {
 // Expose itinerary functions to window scope for HTML onclick handlers
 window.rebuildCurrentView = rebuildCurrentView;
 window.selectCityFilter = selectCityFilter;
+
+// Expand to show a city in the itinerary
+function expandToCity(cityId) {
+if (!cityId) return;
+// Find the leg that contains this city
+const leg = appData.find(l => l.days.some(d => d.to === getCityNameById(cityId) || d.from === getCityNameById(cityId)));
+if (leg) {
+// Expand the leg if collapsed
+const legEl = document.querySelector(`[data-leg-id="${leg.id}"]`);
+if (legEl) {
+legEl.classList.add('expanded');
+// Scroll to the leg
+smoothScrollTo(legEl);
+}
+}
+}
 window.expandToCity = expandToCity;
