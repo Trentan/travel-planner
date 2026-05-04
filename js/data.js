@@ -1658,9 +1658,7 @@ function importJSON(event) {
       }
       if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
       if (importedData.meta) {
-/* Handle meta merge below */
-        titleData = { ...titleData, ...importedData.meta }; if (!titleData.title || !titleData.title.trim()) titleData.title = "✈ New Trip Plan"; if (!titleData.subtitle || !titleData.subtitle.trim()) titleData.subtitle = "Click here to add your trip subtitle/description";
-      }
+titleData = { ...titleData, ...importedData.meta }; if (!titleData.title || !titleData.title.trim()) titleData.title = "✈ New Trip Plan"; if (!titleData.subtitle || !titleData.subtitle.trim()) titleData.subtitle = "Click here to add your trip subtitle/description"; const titleEl = document.getElementById('mainTitle'); const subtitleEl = document.getElementById('mainSubtitle'); if (titleEl) titleEl.innerText = titleData.title; if (subtitleEl) subtitleEl.innerText = titleData.subtitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
 
   // Import journeys if present - also create cities from journey references
   if (importedData.journeys && Array.isArray(importedData.journeys)) {
@@ -1720,3 +1718,4 @@ window.addUserCity = addUserCity;
 window.updateCityCountryCode = updateCityCountryCode;
 window.populateCountrySelect = populateCountrySelect;
 window.setupCityAutocomplete = setupCityAutocomplete;
+
