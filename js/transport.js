@@ -308,7 +308,6 @@ function updateJourneyStatus(id, newStatus) {
   const journey = findJourney(id);
   if (journey) {
     journey.status = newStatus;
-    if (newStatus === 'planned') journey.bookingReference = '';
     saveJourneys();
     return journey;
   }
@@ -492,7 +491,6 @@ function buildTransportTab(cityFilter = null) {
           <th style="width:28px;"></th>
           <th>Journey</th>
           <th>Type</th>
-          <th>Date</th>
           <th>Route</th>
           <th>Departs</th>
           <th>Arrives</th>
@@ -510,8 +508,9 @@ function buildTransportTab(cityFilter = null) {
     const isMultiLeg = segs.length > 1;
     const rep = segs[0];
 
-    const statusColor = rep.status === 'booked' ? '#27AE60' : '#E67E22';
-    const statusText = rep.status === 'booked' ? 'Booked' : 'Planned';
+    const statusColor = rep.status === 'booked' || rep.status === 'confirmed' ? '#27AE60' : rep.status === 'cancelled' ? '#E74C3C' : '#E67E22';
+    const statusIcon = rep.status === 'booked' ? '✓' : rep.status === 'confirmed' ? '🎫' : rep.status === 'cancelled' ? '❌' : '⏳';
+const statusText = rep.status === 'booked' ? 'Booked' : rep.status === 'confirmed' ? 'Confirmed' : rep.status === 'cancelled' ? 'Cancelled' : 'Planned';
 
     const route = isMultiLeg
     ? buildRouteChainWithCodes(segs)
@@ -543,27 +542,20 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
         <td>${expandBtn}</td>
         <td class="journey-name-col" title="${rep.journeyName || ''}">${nameDisplay}${durationDisplay}${isMultiLeg ? ` <span style="font-size:0.7rem;background:#e8f0fe;color:#3c5a99;padding:1px 5px;border-radius:8px;">${segs.length} legs</span>` : ''}</td>
         <td>${icon}</td>
-        <td class="date-col">${firstDep}</td>
-        <td class="route-col">${route}</td>
-        <td class="date-col">${firstDep}</td>
+<td class="route-col">${route}</td>
+<td class="date-col" ">${firstDep}</td>
         <td>${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
         <td>${rep.provider || '—'}</td>
-        <td>${isMultiLeg ? '—' : (rep.routeCode || '—')}</td>
+        <td>${rep.routeCode || '—'}</td>
         <td class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
         <td>
-          <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="toggleJourneyStatus('${rep.id}')">
-            ${statusText}
+          <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
+            ${statusIcon} ${statusText}
           </span>
           ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${rep.bookingReference}</span>` : ""}
         </td>
         <td>
-          <input type="text" value="${rep.bookingReference || ''}" placeholder="Ref #"
-            onchange="updateJourneyBookingRef('${rep.id}', this.value); buildTransportTab();"
-            style="width:70px;padding:2px 4px;font-size:0.8rem;border:1px solid #ddd;border-radius:3px;font-family:monospace;"
-            ${isEditMode ? '' : 'readonly'}>
-        </td>
-        <td>
-          <button class="action-btn small" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; font-size: 0.8rem; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
+          <button class="edit-btn" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
           ${isMultiLeg
         ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
         : `<button class="del-btn" onclick="deleteJourney('${rep.id}'); buildTransportTab();" title="Delete">×</button>`}
@@ -578,13 +570,12 @@ const segDepTime = seg.departureTime || '';
 const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTime : segDepDate;
         const segArr = formatJourneyDate(seg.arrivalDate) || '—';
         html += `
-          <tr class="journey-segment-row" data-group="${gid}" style="display:none;background:#fafaf8;font-size:0.85rem;">
+          <tr class="journey-segment-row" data-group="${gid}" style="display:none;background:#fafaf8;">
             <td></td>
-            <td style="padding-left:2rem;color:#888;">↳ Leg ${i + 1}</td>
+            <td style="padding-left:2rem;color:#888;font-weight:600;">↳ Leg ${i + 1}: ${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</td>
             <td>${segIcon}</td>
-            <td class="date-col">${segDep}</td>
+            <td class="date-col" ">${segDep}</td>
             <td class="route-col" style="color:#555;">${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</td>
-            <td class="date-col">${segDep}</td>
             <td>${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
             <td>${seg.provider || '—'}</td>
             <td>${seg.routeCode || '—'}</td>
@@ -609,10 +600,10 @@ function toggleJourneySegments(journeyId) {
   if (btn) btn.textContent = isHidden ? '▼' : '▶';
 }
 
-function toggleJourneyStatus(journeyId) {
+function toggleJourneyStatus(journeyId) { if (!window.isEditMode) return; 
   const journey = findJourney(journeyId);
   if (journey) {
-    const newStatus = journey.status === 'booked' ? 'planned' : 'booked';
+    const statusCycle = { 'planned': 'booked', 'booked': 'confirmed', 'confirmed': 'cancelled', 'cancelled': 'planned' }; const newStatus = statusCycle[journey.status] || 'planned';
     updateJourneyStatus(journeyId, newStatus);
     if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
     else buildTransportTab();
@@ -801,9 +792,9 @@ function _updateSegmentList() {
   if (labelEl) {
     if (_activeSegmentIndex >= 0 && _activeSegmentIndex < totalSegments) {
       const seg = _pendingSegments[_activeSegmentIndex];
-      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; margin-right: 6px;">${_activeSegmentIndex + 1}</span> Editing: ${seg.fromLocation} → ${seg.toLocation}`;
+      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; margin-right: 6px;">${_activeSegmentIndex + 1}</span> Editing: ${seg.fromLocation} → ${seg.toLocation}`;
     } else {
-      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; margin-right: 6px;">${totalSegments + 1}</span> Segment ${totalSegments + 1} — entering details`;
+      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; margin-right: 6px;">${totalSegments + 1}</span> Segment ${totalSegments + 1} — entering details`;
     }
   }
 
