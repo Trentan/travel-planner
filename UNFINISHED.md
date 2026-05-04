@@ -6,14 +6,23 @@ none
 
 ## 👀 Awaiting Review / Merge
 
+- **Item/Feature:** 9a — Branch `item-9a-title-subtitle-fix` — PR open, awaiting review
+- **Summary:** Title/subtitle now save when edited
+
+**What was done for 9a:**
+- Added blur event listeners to mainTitle and mainSubtitle elements
+- When either field loses focus, the value is immediately saved to localStorage
+- This ensures title/subtitle changes persist and load correctly on next visit
+
 - **Item/Feature:** 8a-viii — Branch `item-8a-viii-journey-desc` — **COMPLETE** (viii, ix, x all done)
 - **Summary:** Transport table refinements complete
 
 **What was done for 8a-viii:**
+
 1. Journey description auto-update - already implemented (buildJourneyName function)
 2. Removed duplicate Date column - kept only Departs column
 3. Standardized fonts - removed monospace 'DM Mono' font from date columns
-4. Expanded leg rows now show "Leg X: City A → City B" format
+4. Expanded leg row now shows "Leg X: City A → City B" format
 
 **Files changed:**
 - js/transport.js - Column layout and data alignment
@@ -41,4 +50,4 @@ none
 
 ---
 
-*Last updated: 2026-05-04 — 8a-vii and 8a-viii complete, awaiting review*
+*Last updated: 2026-05-04 — Starting Item 9a*

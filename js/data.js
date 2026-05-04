@@ -1403,7 +1403,23 @@ function initData() {
   document.getElementById('mainSubtitle').innerText = titleData.subtitle;
   document.getElementById('activeFileDisplay').innerText = "📂 " + currentFileName;
 
-  // Display last export/import timestamp
+  // Add blur event listeners to save title/subtitle when edited
+const mainTitleEl = document.getElementById('mainTitle');
+const mainSubtitleEl = document.getElementById('mainSubtitle');
+if (mainTitleEl) {
+mainTitleEl.addEventListener('blur', function() {
+titleData.title = this.innerText;
+localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
+});
+}
+if (mainSubtitleEl) {
+mainSubtitleEl.addEventListener('blur', function() {
+titleData.subtitle = this.innerText;
+localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
+});
+}
+
+// Display last export/import timestamp
   displayTimestampStatus();
 
   // Auto-extract cities if none exist
