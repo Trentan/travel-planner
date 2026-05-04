@@ -509,7 +509,8 @@ function buildTransportTab(cityFilter = null) {
     const rep = segs[0];
 
     const statusColor = rep.status === 'booked' ? '#27AE60' : '#E67E22';
-    const statusText = rep.status === 'booked' ? 'Booked' : 'Planned';
+    const statusIcon = rep.status === 'booked' ? '✓' : '⏳';
+const statusText = rep.status === 'booked' ? 'Booked' : 'Planned';
 
     const route = isMultiLeg
     ? buildRouteChainWithCodes(segs)
@@ -549,18 +550,12 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
         <td class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
         <td>
           <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="toggleJourneyStatus('${rep.id}')">
-            ${statusText}
+            ${statusIcon} ${statusText}
           </span>
-          ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; color:#666;">${rep.bookingReference}</span>` : ""}
+          ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${rep.bookingReference}</span>` : ""}
         </td>
         <td>
-          <input type="text" value="${rep.bookingReference || ''}" placeholder="Ref #"
-            onchange="updateJourneyBookingRef('${rep.id}', this.value); buildTransportTab();"
-            style="width:70px;padding:2px 4px;font-family:inherit;border:1px solid #ddd;border-radius:3px;font-family:monospace;"
-            ${isEditMode ? '' : 'disabled'}>
-        </td>
-        <td>
-          <button class="action-btn small" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
+          <button class="edit-btn" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
           ${isMultiLeg
         ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
         : `<button class="del-btn" onclick="deleteJourney('${rep.id}'); buildTransportTab();" title="Delete">×</button>`}
