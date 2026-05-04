@@ -15,7 +15,7 @@
 - **Summary:** Custom country entry feature - users can type any country name when adding cities
 
 **What was done for 8a-vii:**
-- Users can now type any country name directly in the country input field  
+- Users can now type any country name directly in the country input field
 - If country doesn't exist in built-in list, it's automatically created
 - Generates a 2-letter country code from the name
 - New country saved to localStorage and immediately available in dropdowns
