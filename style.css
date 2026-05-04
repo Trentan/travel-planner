@@ -472,7 +472,7 @@ main {
 .data-table th { background: #FAFAF8; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em;}
 .data-table tbody tr { transition: background 0.2s; border-left: 4px solid transparent;}
 .data-table tbody tr:hover { background: #FAFAF8; }
-.data-table .date-col { font-family: 'DM Mono', monospace; font-size: 0.85rem; white-space: nowrap;}
+.data-table .date-col { white-space: nowrap;}
 .data-table .route-col { font-weight: 500; font-size: 0.9rem;}
 .empty-placeholder { padding: 3rem; text-align: center; color: var(--muted); font-style: italic; background: white; border: 1px dashed var(--border); border-radius: 8px;}
 

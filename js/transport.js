@@ -491,7 +491,6 @@ function buildTransportTab(cityFilter = null) {
           <th style="width:28px;"></th>
           <th>Journey</th>
           <th>Type</th>
-          <th>Date</th>
           <th>Route</th>
           <th>Departs</th>
           <th>Arrives</th>
@@ -542,8 +541,8 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
         <td>${expandBtn}</td>
         <td class="journey-name-col" title="${rep.journeyName || ''}">${nameDisplay}${durationDisplay}${isMultiLeg ? ` <span style="font-size:0.7rem;background:#e8f0fe;color:#3c5a99;padding:1px 5px;border-radius:8px;">${segs.length} legs</span>` : ''}</td>
         <td>${icon}</td>
-        <td class="date-col">${firstDep}</td>
-        <td class="route-col">${route}</td>
+<td class="route-col">${route}</td>
+<td class="date-col" ">${firstDep}</td>
         <td>${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
         <td>${rep.provider || '—'}</td>
         <td>${isMultiLeg ? '—' : (rep.routeCode || '—')}</td>
@@ -576,11 +575,11 @@ const segDepTime = seg.departureTime || '';
 const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTime : segDepDate;
         const segArr = formatJourneyDate(seg.arrivalDate) || '—';
         html += `
-          <tr class="journey-segment-row" data-group="${gid}" style="display:none;background:#fafaf8;font-size:0.85rem;">
+          <tr class="journey-segment-row" data-group="${gid}" style="display:none;background:#fafaf8;">
             <td></td>
             <td style="padding-left:2rem;color:#888;font-weight:600;">↳ Leg ${i + 1}: ${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</td>
             <td>${segIcon}</td>
-            <td class="date-col">${segDep}</td>
+            <td class="date-col" ">${segDep}</td>
             <td class="route-col" style="color:#555;">${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</td>
             <td>${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
             <td>${seg.provider || '—'}</td>
