@@ -7,49 +7,6 @@ Read this file at the start of every session. Claude Code: read from main branch
 
 ## Active
 
-### Item 5: Convert Accommodation
-**Status:** Complete - awaiting merge
-**Next:** `none`
-**Note:** No migration of old accomItems — new stays model only going forward.
-
-- [x] a) Data model: add top-level `stays []` global in `data.js`
-- [x] b) Add Stay dialog: build modal, `openAddStayModal()`, `saveStayFromModal()`, `deleteStay()`, `toggleStayStatus()`
-- [x] c) Accommodation tab: rewrite `buildAccomTab()` to render from `stays[]`
-- [x] d) Itinerary day card: replace `accomItems` block with derived stay display
-- [x] e) Add accommodation button to launch add dialog
-- [x] f) Edit stays from itinerary and table — launch dialog and save
-- [x] g) Move add stay button to top with heading, like transport page
-- [x] h) Convert old accommodation in `backups/2026_June_July_Europe_Thailand.json` to new stays format
-
----
-
-### Item 8: Improve Country and City Standards
-**Status:** 8a complete (merged), 8b merged — viii, ix, x, xi, xii, xiv complete
-**Next:** `item-8a-xiii`
-
-- [x] a) Improve journey table layout to display fields better
-  - [x] i) Make Status like the one in Accommodation table where the booking id (reference) is nicely under the pending / confirmed - nice touch
-  - [x] ii) Reference field needs to be in the add/edit dialog for journey
-  - [x] iii) Departs should have the date and time combined like arrives
-  - [x] iv) Make sure instead of 'to' it is an '→' arrow
-  - [x] v) You can calculate total travel time and display under the journey description in a smaller italic font (eg 11hrs)
-  - [x] vi) Edit journey dialog: segments clickable, journey title shows
-  - [x] vii) In Manage cities for countries - can enter/create custom countries when "other" selected
-  - [x] viii) Transport table refinement: Remove duplicate date column (keep departs only)
-  - [x] ix) Transport table refinement: Expanded leg rows show "Leg X: City A → City B"
-  - [x] x) Transport table refinement: Standardize fonts across transport table
-  - [x] xi) Transport reference field should appear under the planned/booking status exactly like the accommodation tab and the button options and emojis the same
-  - [x] xii) Read only mode ensures ALL transport tab fields cannot be adjusted (cost, status, booking ref)
-  - [ ] xiii) Route # column exists - displays routeCode when populated (currently all routeCode values are empty in JSON)
-  - [x] xiv) Status icons for transport (✓ booked, ⏳ planned, 🎫 confirmed, ❌ cancelled ) in table and also edit dialog
-- [x] b) New city dialog: country dropdowns, ISO/ICAO standards, built-in list with user-extensible JSON. Cities stored as `{code, name, countryCode}` eg `BNE, Brisbane, AU`
-  - [x] i) Add trip leg dialog not showing - loads new leg straight into itinerary instead of opening dialog
-  - [x] ii) City selection dropdowns should populate to their pre-selected countries by default (currently not populating)
-  - [x] iii) Select Existing City: populate dropdown with user-entered/created cities from itinerary (currently empty)
-  - [x] iv) Create New City: country should be dropdown select (with "enter your own" option), and should default to selected city's country when editing
-  - [x] v) do all the cities in my json need converting now to new standards(iso/icao/iata)
-  - [x] vi) here is no real display benefits yet - implement (eg perhaps the transport tab should have the iso codes displayed for from and to (and a hover text of the full city name and country) + all the drop downs etc could have the city or country code additionally in brackets
-  - [x] vii) Make a way to check IATA for the country name when other is selected in cities and allocate that to the city when fetched (eg Bratislava should be Solvakia) - this will also resolve it so in all the other displays the city info is fixed (because Bratislava for me is currently busted / no hover text, no 3 char etc)
 
 ---
 
