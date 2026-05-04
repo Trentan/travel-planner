@@ -1394,7 +1394,7 @@ function initData() {
   createCityDatalists();
 
   const savedMeta = localStorage.getItem('travelApp_meta_template');
-  if (savedMeta) { titleData = JSON.parse(savedMeta); }
+  if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title && parsed.title.trim()) titleData.title = parsed.title; if (parsed.subtitle && parsed.subtitle.trim()) titleData.subtitle = parsed.subtitle; } catch(e) { console.error('Meta parse error:', e); } if (!titleData.title || !titleData.title.trim()) { console.log('[Migration] Resetting empty titleData to defaults'); titleData = { title: "✈ New Trip Plan", subtitle: "Click here to add your trip subtitle/description" }; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); } }
 
   const savedFile = localStorage.getItem('travelApp_filename_v2026');
   if (savedFile) { currentFileName = savedFile; }
@@ -1408,13 +1408,15 @@ const mainTitleEl = document.getElementById('mainTitle');
 const mainSubtitleEl = document.getElementById('mainSubtitle');
 if (mainTitleEl) {
 mainTitleEl.addEventListener('blur', function() {
-titleData.title = this.innerText;
+const newTitle = this.innerText.trim();
+if (newTitle) titleData.title = newTitle;
 localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
 });
 }
 if (mainSubtitleEl) {
 mainSubtitleEl.addEventListener('blur', function() {
-titleData.subtitle = this.innerText;
+const newSubtitle = this.innerText.trim();
+if (newSubtitle) titleData.subtitle = newSubtitle;
 localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
 });
 }
@@ -1656,7 +1658,8 @@ function importJSON(event) {
       }
       if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
       if (importedData.meta) {
-        titleData = importedData.meta;
+/* Handle meta merge below */
+        titleData = { ...titleData, ...importedData.meta }; if (!titleData.title || !titleData.title.trim()) titleData.title = "✈ New Trip Plan"; if (!titleData.subtitle || !titleData.subtitle.trim()) titleData.subtitle = "Click here to add your trip subtitle/description";
       }
 
   // Import journeys if present - also create cities from journey references
