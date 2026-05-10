@@ -660,7 +660,7 @@ function getAllCountries() {
 }
 
 // Add a user-defined city to the extensible database
-async function addUserCity(cityCode, cityName, countryCode) {
+function addUserCity(cityCode, cityName, countryCode) {
   if (!cityCode || !cityName) return null;
 
   // Check for duplicate code or name
@@ -676,11 +676,6 @@ async function addUserCity(cityCode, cityName, countryCode) {
     countryCode: countryCode.toUpperCase()
   };
   userCities.push(newCity);
-
-  const useIndexedDB = await shouldUseIndexedDB();
-  if (useIndexedDB) {
-    await saveToIndexedDB('userCities', userCities);
-  }
   localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
 
   // Refresh datalists
@@ -690,7 +685,7 @@ async function addUserCity(cityCode, cityName, countryCode) {
 }
 
 // Add a user-defined country
-async function addUserCountry(countryCode, countryName, flag = '??') {
+function addUserCountry(countryCode, countryName, flag = '??') {
   if (!countryCode || !countryName) return null;
 
   // Check for duplicate code
@@ -703,11 +698,6 @@ async function addUserCountry(countryCode, countryName, flag = '??') {
     flag: flag
   };
   userCountries.push(newCountry);
-
-  const useIndexedDB = await shouldUseIndexedDB();
-  if (useIndexedDB) {
-    await saveToIndexedDB('userCountries', userCountries);
-  }
   localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
 
   // Refresh country datalist and dropdown
@@ -1579,7 +1569,7 @@ function initData() {
   createCityDatalists();
 
   const savedMeta = localStorage.getItem('travelApp_meta_template');
-  if (savedMeta) { titleData = JSON.parse(savedMeta); }
+if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title && parsed.title.trim()) titleData.title = parsed.title; if (parsed.subtitle && parsed.subtitle.trim()) titleData.subtitle = parsed.subtitle; } catch(e) { console.error('Meta load error:', e); } }
 
   const savedFile = localStorage.getItem('travelApp_filename_v2026');
   if (savedFile) { currentFileName = savedFile; }
@@ -1613,19 +1603,11 @@ function initData() {
   // Journeys loaded at start of initData(), no additional init needed
 }
 
-async function displayTimestampStatus() {
-  const useIndexedDB = await shouldUseIndexedDB();
-  let lastExport, lastImport;
-
-  if (useIndexedDB) {
-    lastExport = await loadFromIndexedDB('lastExport');
-    lastImport = await loadFromIndexedDB('lastImport');
-  } else {
-    lastExport = localStorage.getItem('travelApp_last_export_v2026');
-    lastImport = localStorage.getItem('travelApp_last_import_v2026');
-  }
-
+function displayTimestampStatus() {
+  const lastExport = localStorage.getItem('travelApp_last_export_v2026');
+  const lastImport = localStorage.getItem('travelApp_last_import_v2026');
   const timestampEl = document.getElementById('timestampStatus');
+
   if (!timestampEl) return;
 
   let message = '';
@@ -1647,10 +1629,12 @@ async function displayTimestampStatus() {
 }
 
 async function saveData(showTick = true) {
-  titleData.title = document.getElementById('mainTitle').innerText;
-  titleData.subtitle = document.getElementById('mainSubtitle').innerText;
+    const t = document.getElementById('mainTitle');
+    const s = document.getElementById('mainSubtitle');
+    if (t && t.innerText.trim()) titleData.title = t.innerText;
+    if (s && s.innerText.trim()) titleData.subtitle = s.innerText;
 
-  const useIndexedDB = await shouldUseIndexedDB();
+    const useIndexedDB = await shouldUseIndexedDB();
 
   if (useIndexedDB) {
     try {
@@ -1862,9 +1846,15 @@ function importJSON(event) {
         packingData = migrated || packingData;
       }
       if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
-      if (importedData.meta) {
-        titleData = importedData.meta;
-      }
+if (importedData.meta) {
+  if (importedData.meta.title) titleData.title = importedData.meta.title;
+  if (importedData.meta.subtitle) titleData.subtitle = importedData.meta.subtitle;
+  const titleEl = document.getElementById('mainTitle');
+  const subtitleEl = document.getElementById('mainSubtitle');
+  if (titleEl) titleEl.innerText = titleData.title;
+  if (subtitleEl) subtitleEl.innerText = titleData.subtitle;
+  localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
+}
 
   // Import journeys if present - also create cities from journey references
   if (importedData.journeys && Array.isArray(importedData.journeys)) {
@@ -1895,12 +1885,17 @@ function importJSON(event) {
         window.stays = stays;
       }
 
-      currentFileName = file.name;
-      localStorage.setItem('travelApp_filename_v2026', currentFileName);
-      localStorage.setItem('travelApp_last_import_v2026', new Date().toISOString());
 
-      saveData(false);
-      location.reload();
+currentFileName = file.name;
+localStorage.setItem('travelApp_filename_v2026', currentFileName);
+localStorage.setItem('travelApp_last_import_v2026', new Date().toISOString());
+
+// Preserve titleData before saveData() runs, then restore after
+const savedTitle = titleData.title;
+const savedSubtitle = titleData.subtitle;
+saveData(false);
+if (savedTitle) { titleData.title = savedTitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
+if (savedSubtitle) { titleData.subtitle = savedSubtitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
     } catch (err) {
       console.error('Import error:', err);
       alert(`Import failed: ${err.message || 'Unknown error'}. Your current data remains safe.`);
