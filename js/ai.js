@@ -201,10 +201,10 @@ INSTRUCTIONS FOR GENERATION:
 
   document.getElementById('aiOutputBox').style.display = 'block';
   document.getElementById('aiPromptOutput').value = promptText;
-}
+}`
 
 function copyPrompt() {
   const promptArea = document.getElementById('aiPromptOutput');
   promptArea.select(); document.execCommand('copy');
   alert("Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.");
-}
+}}

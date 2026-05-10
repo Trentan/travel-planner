@@ -14,16 +14,41 @@ Read this file at the start of every session. Claude Code: read from main branch
 **Status:** Not started
 **Next:** `item-9a`
 - [ ] a) The heading when entered (New Trip Plan) and Click here to add your trip subtitle - are not loading from json / saving correctly?
-- [ ] b) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab? (it should always be displayed and with the default checklist for walk on gear)
-- [ ] e) Need a way to enable the user to force a complete site refresh on mobile app / website on the app easily 
-- [ ] f) Go through and convert the testing checklist into new items and sub items in this todo list
-- [ ] g) Go through and convert the Future Enhancements checklist into new items and sub items in this todo list (some may already be resolved)
-- [ ] h) Add a new notes tab - where you can add a generic checklist (eg get gifts for wife, don;t forget to take photo of x, important things to consider on your trip, unresolved items)
-- [ ] i) Improve leaving home checklist, I have a notion checklist to merge/compare - https://www.notion.so/trentan/afd1a6b4feb14fa38065515dbacbd676?v=d157c05db95048cbaffc6eb2645367a4&p=d4d390afce8b45fabdd8782b55fb3971&pm=s
-- [ ] j) You cannot delete category blocks in packing - you should be able to
-- [ ] k) The single dropdowns in the packing tab for the constant hints/guides are a bit clunky / could be better (eg only open one at a time) - they are in a row 1 with 3 column formation, but there might be a better design for this? (or potentially just make handy buttons in the packing tab and they just launch dialogs???)
-- [ ] l) The cities submenu should list the cities in ORDER of the journey timeline (eg London should not be last, based on my current json, it should be before Bangkok)
+- [ ] b) In the accommodation tab, if the stays have gaps for the nights and itinerary length, Add an auto-populate stays feature button action - scan itinerary and automatically create missing accommodation entries for each city based on nights stayed. This button should only appear when nights are missing in the accomodation tab compared to the itinerary.
+- [ ] c) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab? (it should always be displayed and with the default checklist for walk on gear)
+- [ ] d) Need a way to enable the user to force a complete site refresh on mobile app / website on the app easily 
+- [ ] e) Go through and convert the testing checklist into new items and sub items in this todo list
+- [ ] f) Go through and convert the Future Enhancements checklist into new items and sub items in this todo list (some may already be resolved)
+- [ ] g) Add a new notes tab - where you can add a generic checklist (eg get gifts for wife, don;t forget to take photo of x, important things to consider on your trip, unresolved items)
+- [ ] h) Improve leaving home checklist, I have a notion checklist to merge/compare - https://www.notion.so/trentan/afd1a6b4feb14fa38065515dbacbd676?v=d157c05db95048cbaffc6eb2645367a4&p=d4d390afce8b45fabdd8782b55fb3971&pm=s
+- [ ] i) You cannot delete category blocks in packing - you should be able to
+- [ ] i) The single dropdowns in the packing tab for the constant hints/guides are a bit clunky / could be better (eg only open one at a time) - they are in a row 1 with 3 column formation, but there might be a better design for this? (or potentially just make handy buttons in the packing tab and they just launch dialogs???)
+- [ ] k) The cities submenu should list the cities in ORDER of the journey timeline (eg London should not be last, based on my current json, it should be before Bangkok)
+- [ ] l) The cities submenu / cities should only apply to what is saved in the json, not in browser memory (eg on intial load london and paris load, this stays in subsequent trips / import json where those cities are not listed)
+- [ ] m) Generate AI prompt button broken not working
 ---
+
+### Item 10: Minor fixes for stable release 
+**Status:** Not started
+**Next:** `item-10a`
+**Summary** Need better/automated file management - ALL of the content needs to AUTO SAVE to the loaded json file, everything that can be entered MUST be loaded and saved in json - NOT BROWSER CACHE (sure it can load from the json to browser cache and back again, but I lost a lot of stuff when clearing cache etc - it should have all been saved and backed up in the json!!! whole point of the app)
+
+- [ ] a) Implement IndexedDB storage layer (replaces localStorage as primary)
+Create IndexedDB wrapper functions (open DB, save, load, delete)
+Migrate existing localStorage data to IndexedDB on first run
+
+- [ ] b) Auto-save system
+Add debounced auto-save after edits (300ms delay to avoid excessive writes)
+Hook into all data mutations (itinerary, packing, journeys, stays, meta)
+
+- [ ] c) Backup reminder system
+Track last export timestamp
+Show subtle reminder after X days without export (configurable, e.g., 7 days)
+One-click export from reminder
+
+- [ ] d) Reset/fallback handling
+If IndexedDB fails/corrupts, fallback to localStorage
+Clear "clearing cache" warning since data is now in IndexedDB
 
 ## Noticed (unscheduled)
 

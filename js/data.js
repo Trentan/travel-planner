@@ -1,4 +1,4 @@
-let appData = [];
+﻿let appData = [];
 let packingData = [];
 let leaveHomeData = [];
 let citiesData = []; // City entities for filtering/grouping - { id, name, code, countryCode, country, dateFrom, dateTo, colour }
@@ -1394,7 +1394,7 @@ function initData() {
   createCityDatalists();
 
   const savedMeta = localStorage.getItem('travelApp_meta_template');
-  if (savedMeta) { titleData = JSON.parse(savedMeta); }
+if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title && parsed.title.trim()) titleData.title = parsed.title; if (parsed.subtitle && parsed.subtitle.trim()) titleData.subtitle = parsed.subtitle; } catch(e) { console.error('Meta load error:', e); } }
 
   const savedFile = localStorage.getItem('travelApp_filename_v2026');
   if (savedFile) { currentFileName = savedFile; }
@@ -1454,8 +1454,10 @@ function displayTimestampStatus() {
 }
 
 function saveData(showTick = true) {
-  titleData.title = document.getElementById('mainTitle').innerText;
-  titleData.subtitle = document.getElementById('mainSubtitle').innerText;
+  const t = document.getElementById('mainTitle');
+  const s = document.getElementById('mainSubtitle');
+  if (t && t.innerText.trim()) titleData.title = t.innerText;
+  if (s && s.innerText.trim()) titleData.subtitle = s.innerText;
   localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
   localStorage.setItem('travelApp_v2026_template', JSON.stringify(appData));
   localStorage.setItem('travelApp_packing_v3', JSON.stringify(packingData));
@@ -1639,9 +1641,15 @@ function importJSON(event) {
         packingData = migrated || packingData;
       }
       if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
-      if (importedData.meta) {
-        titleData = importedData.meta;
-      }
+if (importedData.meta) {
+  if (importedData.meta.title) titleData.title = importedData.meta.title;
+  if (importedData.meta.subtitle) titleData.subtitle = importedData.meta.subtitle;
+  const titleEl = document.getElementById('mainTitle');
+  const subtitleEl = document.getElementById('mainSubtitle');
+  if (titleEl) titleEl.innerText = titleData.title;
+  if (subtitleEl) subtitleEl.innerText = titleData.subtitle;
+  localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
+}
 
   // Import journeys if present - also create cities from journey references
   if (importedData.journeys && Array.isArray(importedData.journeys)) {
@@ -1672,12 +1680,17 @@ function importJSON(event) {
         window.stays = stays;
       }
 
-      currentFileName = file.name;
-      localStorage.setItem('travelApp_filename_v2026', currentFileName);
-      localStorage.setItem('travelApp_last_import_v2026', new Date().toISOString());
 
-      saveData(false);
-      location.reload();
+currentFileName = file.name;
+localStorage.setItem('travelApp_filename_v2026', currentFileName);
+localStorage.setItem('travelApp_last_import_v2026', new Date().toISOString());
+
+// Preserve titleData before saveData() runs, then restore after
+const savedTitle = titleData.title;
+const savedSubtitle = titleData.subtitle;
+saveData(false);
+if (savedTitle) { titleData.title = savedTitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
+if (savedSubtitle) { titleData.subtitle = savedSubtitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
     } catch (err) {
       console.error('Import error:', err);
       alert(`Import failed: ${err.message || 'Unknown error'}. Your current data remains safe.`);
