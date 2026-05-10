@@ -1699,18 +1699,23 @@ if (importedData.meta) {
         window.stays = stays;
       }
 
-
-currentFileName = file.name;
 localStorage.setItem('travelApp_filename_v2026', currentFileName);
 localStorage.setItem('travelApp_last_import_v2026', new Date().toISOString());
 
-// Preserve titleData before saveData() runs, then restore after
-const savedTitle = titleData.title;
-const savedSubtitle = titleData.subtitle;
 saveData(false);
-if (savedTitle) { titleData.title = savedTitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
-if (savedSubtitle) { titleData.subtitle = savedSubtitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
-    } catch (err) {
+
+// Apply imported meta data to UI
+if (importedData.meta) {
+if (importedData.meta.title) titleData.title = importedData.meta.title;
+if (importedData.meta.subtitle) titleData.subtitle = importedData.meta.subtitle;
+
+const titleEl = document.getElementById('mainTitle');
+const subtitleEl = document.getElementById('mainSubtitle');
+if (titleEl) titleEl.innerText = titleData.title;
+if (subtitleEl) subtitleEl.innerText = titleData.subtitle;
+localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
+}
+location.reload();
       console.error('Import error:', err);
       alert(`Import failed: ${err.message || 'Unknown error'}. Your current data remains safe.`);
       event.target.value = '';
