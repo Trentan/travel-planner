@@ -1,0 +1,36 @@
+### Item 10: Backup reminder and export improvements (REVISED)
+**Status:** In progress
+**Next:** `item-10a`
+**Summary:** Simplified approach - Keep localStorage, add user-friendly backup reminders and clear messaging about the need to export for backups.
+
+**Decision:** Reverted to simple localStorage (was over-engineering with IndexedDB). Focus on making the export process more prominent and user-friendly.
+
+**Sub-tasks:**
+
+- [ ] a) **Backup reminder system**
+Track last export timestamp
+Show subtle reminder after X days without export (configurable, e.g., 7 days)
+One-click export from reminder
+Make the reminder friendly and non-intrusive
+
+- [ ] b) **Enhanced export UI**
+Make export button more prominent (e.g., move to header or nav)
+Add visual indicator showing time since last export
+Show edit count or change summary since last export
+Make it clear what's being saved (localStorage vs JSON file)
+
+- [ ] c) **Clear cache warning**
+Update the "clearing cache" warning to be accurate
+Remove warning if data is in localStorage (not at risk)
+Add help text explaining that cache clearing doesn't affect localStorage
+
+- [ ] d) **Improve export/import workflow**
+Remember last filename for exports
+Add export confirmation with details
+Better import error handling with user-friendly messages
+Make the workflow intuitive for non-technical users
+
+- [ ] e) **Documentation**
+Add in-app help text about the backup workflow
+Document that "Save" goes to browser → use Export to back up to file
+Test across browser restarts to confirm data persists
