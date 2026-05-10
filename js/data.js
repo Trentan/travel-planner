@@ -1526,8 +1526,27 @@ function exportJSON() {
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
 
-  // Record export timestamp
-  localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
+  // Record export timestamp and update tracking
+  const exportTime = new Date().toISOString();
+  localStorage.setItem('travelApp_last_export_v2026', exportTime);
+  localStorage.setItem('travelApp_last_export_filename', dlName);
+
+  // Reset tracking
+  if (typeof resetEditTracking === 'function') {
+    resetEditTracking();
+  }
+
+  // Show confirmation
+  const status = document.getElementById('saveStatus');
+  if (status) {
+    status.textContent = "✓ Exported " + dlName;
+    setTimeout(() => status.textContent = "", 3000);
+  }
+
+  // Hide any backup reminder
+  if (typeof hideBackupReminder === 'function') {
+    hideBackupReminder();
+  }
 }
 
 // Expose city dialog functions to window scope
