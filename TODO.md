@@ -28,28 +28,36 @@ Read this file at the start of every session. Claude Code: read from main branch
 - [ ] m) Generate AI prompt button broken not working
 ---
 
-### Item 10: Minor fixes for stable release 
-**Status:** Not started
+### Item 10: Backup reminder and export improvements (REVISED)
+**Status:** In progress
 **Next:** `item-10a`
-**Summary** Need better/automated file management - ALL of the content needs to AUTO SAVE to the loaded json file, everything that can be entered MUST be loaded and saved in json - NOT BROWSER CACHE (sure it can load from the json to browser cache and back again, but I lost a lot of stuff when clearing cache etc - it should have all been saved and backed up in the json!!! whole point of the app)
+**Summary:** Simplified approach - Keep localStorage, add user-friendly backup reminders and clear messaging about the need to export for backups.
 
-- [ ] a) Implement IndexedDB storage layer (replaces localStorage as primary)
-Create IndexedDB wrapper functions (open DB, save, load, delete)
-Migrate existing localStorage data to IndexedDB on first run
+**Decision:** Reverted to simple localStorage (was over-engineering with IndexedDB). Focus on making the export process more prominent and user-friendly.
 
-- [ ] b) Auto-save system
-Add debounced auto-save after edits (300ms delay to avoid excessive writes)
-Hook into all data mutations (itinerary, packing, journeys, stays, meta)
+**Sub-tasks:**
 
-- [ ] c) Backup reminder system
+- [ ] a) **Backup reminder system**
 Track last export timestamp
 Show subtle reminder after X days without export (configurable, e.g., 7 days)
 One-click export from reminder
 
-- [ ] d) Reset/fallback handling
-If IndexedDB fails/corrupts, fallback to localStorage
-Clear "clearing cache" warning since data is now in IndexedDB
+- [ ] b) **Enhanced export UI**
+Make export button more prominent (e.g., move to header or nav)
+Add visual indicator showing time since last export
 
+- [ ] c) **Clear cache warning**
+Update the "clearing cache" warning to be accurate
+Remove warning if data is in localStorage (not at risk)
+
+- [ ] d) **Improve export/import workflow**
+Remember last filename for exports
+Add export confirmation with details
+Better import error handling with user-friendly messages
+
+- [ ] e) **Testing**
+Verify data persists in browser storage across sessions
+Test export/import functionality
 ## Noticed (unscheduled)
 
 <!-- Claude: add bugs or improvements spotted during work here. Do not fix — flag only. -->
