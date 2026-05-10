@@ -1,4 +1,179 @@
-﻿let appData = [];
+// IndexedDB Storage Implementation
+let db = null;
+const DB_NAME = 'travelApp_v2026';
+const DB_VERSION = 1;
+const STORE_NAME = 'appData';
+
+// Open IndexedDB
+function openDB() {
+  return new Promise((resolve, reject) => {
+    if (db) {
+      resolve(db);
+      return;
+    }
+
+    const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+
+    request.onerror = () => {
+      console.error('IndexedDB error:', request.error);
+      reject(request.error);
+    };
+
+    request.onsuccess = () => {
+      db = request.result;
+      console.log('IndexedDB opened successfully');
+      resolve(db);
+    };
+
+    request.onupgradeneeded = (event) => {
+      db = event.target.result;
+      console.log('Creating IndexedDB object store...');
+
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        const store = db.createObjectStore(STORE_NAME, { keyPath: 'key' });
+        store.createIndex('key', 'key', { unique: true });
+      }
+    };
+  });
+}
+
+// Save data to IndexedDB
+function saveToIndexedDB(key, data) {
+  return openDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+
+      const request = store.put({
+        key: key,
+        data: data,
+        timestamp: new Date().toISOString()
+      });
+
+      request.onsuccess = () => {
+        resolve();
+      };
+
+      request.onerror = () => {
+        console.error(`Failed to save ${key} to IndexedDB:`, request.error);
+        reject(request.error);
+      };
+    });
+  });
+}
+
+// Load data from IndexedDB
+function loadFromIndexedDB(key) {
+  return openDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get(key);
+
+      request.onsuccess = () => {
+        if (request.result) {
+          resolve(request.result.data);
+        } else {
+          resolve(null); // Key not found
+        }
+      };
+
+      request.onerror = () => {
+        console.error(`Failed to load ${key} from IndexedDB:`, request.error);
+        reject(request.error);
+      };
+    });
+  });
+}
+
+// Delete data from IndexedDB
+function deleteFromIndexedDB(key) {
+  return openDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.delete(key);
+
+      request.onsuccess = () => {
+        resolve();
+      };
+
+      request.onerror = () => {
+        console.error(`Failed to delete ${key} from IndexedDB:`, request.error);
+        reject(request.error);
+      };
+    });
+  });
+}
+
+// Migrate data from localStorage to IndexedDB
+async function migrateFromLocalStorage() {
+  console.log('Checking for localStorage data to migrate...');
+
+  const migrations = [
+    { lsKey: 'travelApp_v2026_template', dbKey: 'itinerary' },
+    { lsKey: 'travelApp_packing_v3', dbKey: 'packing' },
+    { lsKey: 'travelApp_leavehome_v3', dbKey: 'leaveHome' },
+    { lsKey: 'travelApp_cities_v1', dbKey: 'cities' },
+    { lsKey: 'travelApp_meta_template', dbKey: 'meta' },
+    { lsKey: 'travelApp_filename_v2026', dbKey: 'filename' },
+    { lsKey: 'travelApp_journeys_v1', dbKey: 'journeys' },
+    { lsKey: 'travelApp_stays_v1', dbKey: 'stays' },
+    { lsKey: 'travelApp_userCities_v1', dbKey: 'userCities' },
+    { lsKey: 'travelApp_userCountries_v1', dbKey: 'userCountries' },
+    { lsKey: 'travelApp_last_export_v2026', dbKey: 'lastExport' },
+    { lsKey: 'travelApp_last_import_v2026', dbKey: 'lastImport' }
+  ];
+
+  let migratedCount = 0;
+
+  for (const { lsKey, dbKey } of migrations) {
+    const lsData = localStorage.getItem(lsKey);
+    if (lsData !== null) {
+      try {
+        const parsedData = JSON.parse(lsData);
+        await saveToIndexedDB(dbKey, parsedData);
+        console.log(`Migrated ${dbKey} from localStorage to IndexedDB`);
+        migratedCount++;
+        // Don't remove from localStorage yet - keep as fallback
+      } catch (e) {
+        console.error(`Failed to migrate ${dbKey}:`, e);
+      }
+    }
+  }
+
+  if (migratedCount > 0) {
+    console.log(`Successfully migrated ${migratedCount} data stores to IndexedDB`);
+    // Mark migration as complete
+    await saveToIndexedDB('_migration_complete', { version: DB_VERSION, date: new Date().toISOString() });
+  }
+
+  return migratedCount;
+}
+
+// Check if we should use IndexedDB (migration complete and DB available)
+async function shouldUseIndexedDB() {
+  try {
+    if (!window.indexedDB) {
+      console.log('IndexedDB not supported, falling back to localStorage');
+      return false;
+    }
+
+    const migrationStatus = await loadFromIndexedDB('_migration_complete');
+    return migrationStatus !== null;
+  } catch (e) {
+    console.error('Error checking IndexedDB status:', e);
+    return false;
+  }
+}
+
+// Fallback to localStorage if IndexedDB fails
+function fallbackToLocalStorage() {
+  console.warn('IndexedDB not available, falling back to localStorage');
+  // localStorage functions will be used automatically in the updated code
+}
+
+let appData = [];
 let packingData = [];
 let leaveHomeData = [];
 let citiesData = []; // City entities for filtering/grouping - { id, name, code, countryCode, country, dateFrom, dateTo, colour }
@@ -1453,17 +1628,47 @@ function displayTimestampStatus() {
   timestampEl.textContent = message;
 }
 
-function saveData(showTick = true) {
-  const t = document.getElementById('mainTitle');
-  const s = document.getElementById('mainSubtitle');
-  if (t && t.innerText.trim()) titleData.title = t.innerText;
-  if (s && s.innerText.trim()) titleData.subtitle = s.innerText;
+async function saveData(showTick = true) {
+    const t = document.getElementById('mainTitle');
+    const s = document.getElementById('mainSubtitle');
+    if (t && t.innerText.trim()) titleData.title = t.innerText;
+    if (s && s.innerText.trim()) titleData.subtitle = s.innerText;
+
+    const useIndexedDB = await shouldUseIndexedDB();
+
+  if (useIndexedDB) {
+    try {
+      await Promise.all([
+        saveToIndexedDB('meta', titleData),
+        saveToIndexedDB('itinerary', appData),
+        saveToIndexedDB('packing', packingData),
+        saveToIndexedDB('leaveHome', leaveHomeData),
+        saveToIndexedDB('cities', citiesData),
+        saveToIndexedDB('journeys', journeys),
+        saveToIndexedDB('stays', stays),
+        saveToIndexedDB('userCities', userCities),
+        saveToIndexedDB('userCountries', userCountries),
+        saveToIndexedDB('filename', currentFileName)
+      ]);
+      console.log('Data saved to IndexedDB');
+    } catch (e) {
+      console.error('Failed to save to IndexedDB, falling back to localStorage:', e);
+      fallbackToLocalStorage();
+      // Continue with localStorage save below
+    }
+  }
+
+  // Always also save to localStorage as fallback
   localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
   localStorage.setItem('travelApp_v2026_template', JSON.stringify(appData));
   localStorage.setItem('travelApp_packing_v3', JSON.stringify(packingData));
   localStorage.setItem('travelApp_leavehome_v3', JSON.stringify(leaveHomeData));
   localStorage.setItem('travelApp_stays_v1', JSON.stringify(stays));
   localStorage.setItem('travelApp_cities_v1', JSON.stringify(citiesData));
+  localStorage.setItem('travelApp_journeys_v1', JSON.stringify(journeys));
+  localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
+  localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
+  localStorage.setItem('travelApp_filename_v2026', currentFileName);
 
   if(showTick) {
     const status = document.getElementById('saveStatus');
@@ -1526,27 +1731,8 @@ function exportJSON() {
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
 
-  // Record export timestamp and update tracking
-  const exportTime = new Date().toISOString();
-  localStorage.setItem('travelApp_last_export_v2026', exportTime);
-  localStorage.setItem('travelApp_last_export_filename', dlName);
-
-  // Reset tracking
-  if (typeof resetEditTracking === 'function') {
-    resetEditTracking();
-  }
-
-  // Show confirmation
-  const status = document.getElementById('saveStatus');
-  if (status) {
-    status.textContent = "✓ Exported " + dlName;
-    setTimeout(() => status.textContent = "", 3000);
-  }
-
-  // Hide any backup reminder
-  if (typeof hideBackupReminder === 'function') {
-    hideBackupReminder();
-  }
+  // Record export timestamp
+  localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
 }
 
 // Expose city dialog functions to window scope
@@ -1699,23 +1885,18 @@ if (importedData.meta) {
         window.stays = stays;
       }
 
+
+currentFileName = file.name;
 localStorage.setItem('travelApp_filename_v2026', currentFileName);
 localStorage.setItem('travelApp_last_import_v2026', new Date().toISOString());
 
+// Preserve titleData before saveData() runs, then restore after
+const savedTitle = titleData.title;
+const savedSubtitle = titleData.subtitle;
 saveData(false);
-
-// Apply imported meta data to UI
-if (importedData.meta) {
-if (importedData.meta.title) titleData.title = importedData.meta.title;
-if (importedData.meta.subtitle) titleData.subtitle = importedData.meta.subtitle;
-
-const titleEl = document.getElementById('mainTitle');
-const subtitleEl = document.getElementById('mainSubtitle');
-if (titleEl) titleEl.innerText = titleData.title;
-if (subtitleEl) subtitleEl.innerText = titleData.subtitle;
-localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
-}
-location.reload();
+if (savedTitle) { titleData.title = savedTitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
+if (savedSubtitle) { titleData.subtitle = savedSubtitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
+    } catch (err) {
       console.error('Import error:', err);
       alert(`Import failed: ${err.message || 'Unknown error'}. Your current data remains safe.`);
       event.target.value = '';
