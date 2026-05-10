@@ -2,9 +2,17 @@
 
 ## 🔄 Active
 
-none
+- **Item/Feature:** 10a — Branch `item-10a-indexeddb-storage` — starting implementation
+- **Summary:** Implement IndexedDB storage layer
+
+**Next step:** Create IndexedDB wrapper functions and integrate with save/load system
 
 ## 👀 Awaiting Review / Merge
+
+- **Item/Feature:** 9a — Branch `item-9a-title-subtitle-fix` — PR #14 open
+- **Summary:** Fixed title/subtitle not loading from JSON
+
+## Completed
 
 - **Item/Feature:** 8a-viii — Branch `item-8a-viii-journey-desc` — **COMPLETE** (viii, ix, x all done)
 - **Summary:** Transport table refinements complete
@@ -19,26 +27,10 @@ none
 - js/transport.js - Column layout and data alignment
 - style.css - Removed font-family override from .date-col
 
-## Awaiting Review / Merge
-
-- **Item/Feature:** 8a-vii — Branch `item-8a-vii-country-entry` — PR #12 open
-- **Summary:** Custom country entry feature
-
-**What was done for 8a-vii:**
-- Users can now type any country name directly in the country input field
-- If country doesn't exist in built-in list, it's automatically created
-- Generates a 2-letter country code from the name
-- New country saved to localStorage and immediately available in dropdowns
-- PR #12: https://github.com/Trentan/travel-planner/pull/12
-
-## Completed (to be merged to main)
-
-none
-
-## Archived (merged to main, awaiting user verification)
+## Archived
 
 none
 
 ---
 
-*Last updated: 2026-05-04 — 8a-vii and 8a-viii complete, awaiting review*
+*Last updated: 2026-05-10 — Item 10a starting, Item 9a complete awaiting PR review*
