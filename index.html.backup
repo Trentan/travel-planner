@@ -19,7 +19,6 @@
     <span class="file-badge" id="activeFileDisplay">📂 Default Template</span>
     <span class="save-status" id="saveStatus"></span>
     <span class="timestamp-status" id="timestampStatus"></span>
-    <span class="file-badge" id="exportIndicator" style="display: none; margin-left: 1rem; font-size: 0.8rem; opacity: 0.8;"></span>
   </div>
   <div class="app-menu-right">
     <button id="modeToggleBtn" class="app-menu-btn" onclick="toggleMode()">📋 Fun Mode</button>
@@ -573,8 +572,8 @@
 <script src="./js/map.js"></script>
 <script src="./js/ui.js"></script>
 <script src="./js/itinerary.js"></script>
-  <script src="./js/backup.js"></script>
 <script src="./js/transport.js"></script>
+  <script src="./js/backup.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

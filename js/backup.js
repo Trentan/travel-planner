@@ -1,165 +1,134 @@
-// Backup reminder system
-// Simple localStorage tracking with user-friendly reminders
+// Enhanced travel-planner.js
+// Backup reminder system for browser-based file management
 
+// Backup tracking variables
 let editCountSinceExport = 0;
 let lastExportTimestamp = null;
-const BACKUP_REMINDER_THRESHOLD = 7; // days
-const EDIT_REMINDER_THRESHOLD = 10; // edits
+const BACKUP_REMINDER_DAYS = 7;
+const BACKUP_REMINDER_EDITS = 10;
+
+// Initialize tracking on app load
+window.addEventListener('DOMContentLoaded', function() {
+  loadBackupTracking();
+  updateExportIndicator();
+  setTimeout(checkBackupReminder, 2000);
+});
+
+// Load tracking state from localStorage
+function loadBackupTracking() {
+  editCountSinceExport = parseInt(localStorage.getItem('travelApp_editCount') || '0');
+  lastExportTimestamp = localStorage.getItem('travelApp_lastExport');
+}
 
 // Track when user makes edits
 function trackUserEdit() {
   editCountSinceExport++;
   localStorage.setItem('travelApp_editCount', editCountSinceExport);
-  checkBackupReminder();
+
+  // Show reminder after reaching thresholds
+  if (editCountSinceExport === 5 || editCountSinceExport === 10) {
+    setTimeout(checkBackupReminder, 1000);
+  }
 }
 
-// Reset edit counter after export
+// Reset counter after successful export
 function resetEditTracking() {
   editCountSinceExport = 0;
-  localStorage.setItem('travelApp_editCount', 0);
+  localStorage.setItem('travelApp_editCount', '0');
 }
 
-// Set last export timestamp
-function setLastExportTime() {
-  const now = new Date().toISOString();
-  lastExportTimestamp = now;
-  localStorage.setItem('travelApp_lastExport', now);
-  resetEditTracking();
-}
-
-// Load tracking state
-function loadBackupTracking() {
-  const savedCount = localStorage.getItem('travelApp_editCount');
-  const savedExport = localStorage.getItem('travelApp_lastExport');
-
-  editCountSinceExport = savedCount ? parseInt(savedCount) : 0;
-  lastExportTimestamp = savedExport;
-}
-
-// Check if we should show backup reminder
+// Check if we should show a backup reminder
 function checkBackupReminder() {
-  // Check days since last export
-  if (lastExportTimestamp) {
-    const daysSince = (Date.now() - new Date(lastExportTimestamp).getTime()) / (1000 * 60 * 60 * 24);
+  const lastExport = localStorage.getItem('travelApp_last_export_v2026');
 
-    if (daysSince >= BACKUP_REMINDER_THRESHOLD) {
-      showBackupReminder(`It's been ${Math.floor(daysSince)} days since your last backup. Consider exporting your data.`);
-      return;
-    }
-  }
-
-  // Check edit count
-  if (editCountSinceExport >= EDIT_REMINDER_THRESHOLD) {
-    showBackupReminder(`You've made ${editCountSinceExport} edits since your last backup. Consider exporting your data.`);
-  }
-}
-
-// Show friendly backup reminder
-function showBackupReminder(message) {
-  // Create or update reminder element
-  const existing = document.getElementById('backup-reminder');
-  if (existing) {
-    existing.textContent = message;
+  if (!lastExport) {
+    showBackupReminder('Welcome! This app saves to your browser. Consider exporting your trip to a file for backup.');
     return;
   }
 
-  // Create new reminder element
+  const daysSince = (Date.now() - new Date(lastExport).getTime()) / (1000 * 60 * 60 * 24);
+  if (daysSince >= BACKUP_REMINDER_DAYS) {
+    showBackupReminder('It\'s been ' + Math.floor(daysSince) + ' days since your last backup. Consider saving to a file.');
+    return;
+  }
+
+  if (editCountSinceExport >= BACKUP_REMINDER_EDITS) {
+    showBackupReminder('You\'ve made ' + editCountSinceExport + ' changes since your last backup. Consider saving to a file.');
+  }
+}
+
+// Show friendly reminder popup
+function showBackupReminder(message) {
+  const existing = document.getElementById('backup-reminder');
+  if (existing) return;
+
   const reminder = document.createElement('div');
   reminder.id = 'backup-reminder';
   reminder.innerHTML = `
-    <div style="
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #FFF3CD;
-      border: 1px solid #FFE69C;
-      border-radius: 8px;
-      padding: 16px 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 9999;
-      max-width: 320px;
-      animation: slideUp 0.3s ease-out;
-    ">
-      <div style="font-weight: 500; color: #856404; margin-bottom: 8px;">
-        💾 Backup Reminder
-      </div>
-      <div style="font-size: 14px; color: #856404; margin-bottom: 12px;">
-        ${message}
-      </div>
-      <div style="display: flex; gap: 8px;">
-        <button onclick="exportJSON(false); hideBackupReminder();"
-                style="
-                  padding: 6px 12px;
-                  background: #007BFF;
-                  color: white;
-                  border: none;
-                  border-radius: 4px;
-                  cursor: pointer;
-                  font-size: 14px;
-                ">
-          Export Now
-        </button>
-        <button onclick="hideBackupReminder();"
-                style="
-                  padding: 6px 12px;
-                  background: #6C757D;
-                  color: white;
-                  border: none;
-                  border-radius: 4px;
-                  cursor: pointer;
-                  font-size: 14px;
-                ">
-          Later
-        </button>
+    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+      <div style="background: #FFF3CD; border: 1px solid #FFE69C; border-radius: 8px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 320px;">
+        <div style="font-weight: 500; color: #856404; margin-bottom: 8px;">💾 Backup Reminder</div>
+        <div class="reminder-text" style="font-size: 14px; color: #856404; margin-bottom: 12px;">${message}</div>
+        <div style="display: flex; gap: 8px;">
+          <button onclick="exportJSON(); checkBackupReminder(); hideBackupReminder();"
+                  style="padding: 6px 12px; background: #27AE60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export Now</button>
+          <button onclick="hideBackupReminder();"
+                  style="padding: 6px 12px; background: #6C757D; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Later</button>
+        </div>
       </div>
     </div>
-    <style>
-      @keyframes slideUp {
-        from { transform: translateY(100px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-      }
-    </style>
   `;
   document.body.appendChild(reminder);
 }
 
-// Hide backup reminder
+// Hide reminder popup
 function hideBackupReminder() {
   const reminder = document.getElementById('backup-reminder');
-  if (reminder) {
-    reminder.remove();
+  if (reminder) reminder.remove();
+}
+
+// Update export indicator showing last export
+function updateExportIndicator() {
+  const lastExport = localStorage.getItem('travelApp_last_export_v2026');
+  const lastFile = localStorage.getItem('travelApp_last_export_filename');
+  const indicator = document.getElementById('exportIndicator') || document.getElementById('timestampStatus');
+
+  if (!indicator) return;
+
+  if (lastExport && lastFile) {
+    const date = new Date(lastExport);
+    const formatted = date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+    const time = date.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+    indicator.innerHTML = `📤 Last exported: ${lastFile} on ${formatted} at ${time}`;
+    indicator.style.opacity = '0.8';
+    indicator.style.fontSize = '0.8rem';
+  } else {
+    indicator.innerHTML = '⚠️ Not yet saved to file';
+    indicator.style.opacity = '0.8';
+    checkBackupReminder();
   }
 }
 
-// Initialize backup tracking on app load
-window.addEventListener('load', function() {
-  loadBackupTracking();
+// Wrapper functions for edit tracking
+const originalSaveData = window.saveData;
+window.saveData = function(showTick = true) {
+  originalSaveData(showTick);
+  if (showTick) trackUserEdit();
+};
 
-  // Check reminder after short delay
-  setTimeout(checkBackupReminder, 2000);
-});
-
-// Override exportJSON to track when user exports
 const originalExportJSON = window.exportJSON;
 window.exportJSON = function() {
   originalExportJSON();
-  setLastExportTime();
   hideBackupReminder();
+  updateExportIndicator();
+  resetEditTracking();
 };
 
-// Track major data changes
-function addEditTracking() {
-  // Override saveData to track edits
-  const originalSaveData = window.saveData;
-  window.saveData = function(showTick = true) {
-    originalSaveData(showTick);
-
-    // Only track user-initiated saves (not initialization)
-    if (showTick) {
-      trackUserEdit();
-    }
-  };
-}
-// Expose functions globally
+// Export reminder functions to global scope
+window.loadBackupTracking = loadBackupTracking;
+window.trackUserEdit = trackUserEdit;
+window.resetEditTracking = resetEditTracking;
 window.checkBackupReminder = checkBackupReminder;
+window.showBackupReminder = showBackupReminder;
 window.hideBackupReminder = hideBackupReminder;
+window.updateExportIndicator = updateExportIndicator;
