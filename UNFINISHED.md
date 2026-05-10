@@ -2,50 +2,26 @@
 
 ## 🔄 Active
 
-- **Item/Feature:** 10a — Branch `item-10a-indexeddb-storage` — starting implementation
-- **Summary:** Implement IndexedDB storage layer
+**Item 10a complete** - implemented hybrid backup reminder approach
 
-**Next step:** Create IndexedDB wrapper functions and integrate with save/load system
+**Decision:** Simplified approach using browser localStorage (removed IndexedDB over-engineering)
+
+**Done:**
+- ✓ Backup reminder system that tracks exports and shows friendly reminders after 7 days or 10 edits
+- ✓ Enhanced export button with visual feedback showing last exported filename
+- ✓ Edit tracking that triggers reminder after significant changes
+- ✓ Removed complex IndexedDB code - kept simple reliable localStorage
+- ✓ Exported JSON now properly updates tracking
+- ✓ Add backup tracking hooks to saveData()
+
+**Result:** Simple, user-friendly system that lives in browser storage but reminds users to export backups regularly
 
 ## 👀 Awaiting Review / Merge
 
-- **Item/Feature:** 9a — Branch `item-9a-title-subtitle-fix` — PR #14 open
-- **Summary:** Fixed title/subtitle not loading from JSON
-
+- **Item 9a** - PR #14 open - Fixed title/subtitle loading/saving issues
+  --
 ## Completed
-
-- **Item/Feature:** 9a — Branch `item-9a-title-subtitle-fix` — PR open, awaiting review
-- **Summary:** Fixed title/subtitle not loading from JSON
-
-**What was done for 9a:**
-
-1. Added blur event listeners to save title/subtitle when edited
-2. Fixed bug where empty title/subtitle from localStorage override defaults
-3. Added validation to prevent saving empty title/subtitle
-4. Added validation when importing JSON to preserve defaults if imported values are empty
-5. Added migration that auto-fixes corrupted empty titleData on startup
-
-**Files changed:**
-- `js/data.js` - Blur handlers, validation, and migration for title/subtitle
-
-- **Item/Feature:** 8a-viii — Branch `item-8a-viii-journey-desc` — **COMPLETE** (viii, ix, x all done)
-- **Summary:** Transport table refinements complete
-
-**What was done for 8a-viii:**
-
-1. Journey description auto-update - already implemented (buildJourneyName function)
-2. Removed duplicate Date column - kept only Departs column
-3. Standardized fonts - removed monospace 'DM Mono' font from date columns
-4. Expanded leg rows now show "Leg X: City A → City B" format
-
-**Files changed:**
-- js/transport.js - Column layout and data alignment
-- style.css - Removed font-family override from .date-col
-
-## Archived
-
-none
 
 ---
 
-*Last updated: 2026-05-10 — Item 10a starting, Item 9a complete awaiting PR review*
+*Last updated: 2026-05-11 — Item 10a complete*
