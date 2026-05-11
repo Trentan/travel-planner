@@ -3,21 +3,34 @@
 
 /**
  * Calculate expected nights per city from itinerary
- * For each day in itinerary, counts nights by destination city
+ * Counts nights at destination cities (where you sleep)
+ * Excludes transit days and placeholder destinations
  * Returns: {cityName: nightsCount}
  */
 function calculateExpectedStays() {
   const expectedStays = {};
 
+  // Skip list for destinations that don't represent actual stays
+  const skipList = ['Home', 'In transit', 'Between cities', 'TBC', ''];
+
   appData.forEach(leg => {
     leg.days.forEach((day, dayIndex) => {
-      // Count nights by destination city (where they're staying)
-      // For travel days, look at the 'to' location
-      // For multi-day stays, count each day
       const city = day.to;
 
-      // Skip "Home" entries
-      if (city && city !== 'Home') {
+      // Skip placeholder/transit destinations
+      if (!city || skipList.includes(city)) {
+        return;
+      }
+
+      // Count a night for each day you're at a city, except the day you leave
+      // Night count = number of days at destination where you don't leave
+
+      // Check if next day is leaving this city (different destination or skip list item)
+      const nextDay = leg.days[dayIndex + 1];
+      const isLastDay = !nextDay || skipList.includes(nextDay.to) || nextDay.to !== city;
+
+      if (!isLastDay) {
+        // Next day is same city, so tonight is a night here
         if (!expectedStays[city]) {
           expectedStays[city] = 0;
         }
@@ -127,8 +140,8 @@ function autopopulateStays() {
   let createdCount = 0;
   const createdStays = [];
 
-  // Group days by city and leg
-  const citySegments = {};
+  // Skip list for destinations that don't represent actual stays
+  const skipList = ['Home', 'In transit', 'Between cities', 'TBC', ''];
 
   appData.forEach((leg, legIndex) => {
     let currentCity = null;
@@ -136,10 +149,16 @@ function autopopulateStays() {
     let segmentNights = 0;
 
     leg.days.forEach((day, dayIndex) => {
-      if (day.to !== currentCity && day.to !== 'Home') {
-        // New city starts here - save previous segment if exists
+      const city = day.to;
+
+      // Skip placeholder destinations
+      if (!city || skipList.includes(city)) {
+        return;
+      }
+
+      if (city !== currentCity) {
+        // City changed - save previous segment if exists
         if (segmentNights > 0 && currentCity && missing.missing[currentCity]) {
-          // Create stay for the previous segment
           const stay = createStayFromItinerary(currentCity, leg.id, segmentStartDate, segmentNights);
           if (stay) {
             createdStays.push(stay);
@@ -148,14 +167,13 @@ function autopopulateStays() {
         }
 
         // Start new segment
-        currentCity = day.to;
+        currentCity = city;
         segmentStartDate = day.date;
         segmentNights = 1;
-      } else if (day.to === currentCity) {
-        // Continue current segment
+      } else {
+        // Same city - add another night
         segmentNights++;
       }
-      // Note: "Home" entries are ignored (don't break segments, just don't count)
     });
 
     // Handle end of leg
