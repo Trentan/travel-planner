@@ -67,9 +67,10 @@ function showBackupReminder(message) {
   reminder.id = 'backup-reminder';
   reminder.innerHTML = `
     <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
-      <div style="background: #FFF3CD; border: 1px solid #FFE69C; border-radius: 8px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 320px;">
+      <div style="background: #FFF3CD; border: 1px solid #FFE69C; border-radius: 8px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 380px;">
         <div style="font-weight: 500; color: #856404; margin-bottom: 8px;">💾 Backup Reminder</div>
-        <div class="reminder-text" style="font-size: 14px; color: #856404; margin-bottom: 12px;">${message}</div>
+        <div class="reminder-text" style="font-size: 14px; color: #856404; margin-bottom: 8px;">${message}</div>
+        <div style="font-size: 12px; color: #6C757D; margin-bottom: 12px; font-style: italic;">💡 Tip: After exporting, find the downloaded file and copy it to overwrite your previous backup.</div>
         <div style="display: flex; gap: 8px;">
           <button onclick="exportJSON(); checkBackupReminder(); hideBackupReminder();"
                   style="padding: 6px 12px; background: #27AE60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export Now</button>
