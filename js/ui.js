@@ -247,8 +247,8 @@ document.addEventListener('keyup', function(e) {
   if (e.key === 'Escape') closePrintPreview();
 });
 
-document.getElementById('mainTitle').addEventListener('blur', function() { titleData.title = this.innerText; saveData(); });
-document.getElementById('mainSubtitle').addEventListener('blur', function() { titleData.subtitle = this.innerText; saveData(); });
+document.getElementById('mainTitle').addEventListener('blur', function() { titleData.title = this.innerText; saveData(); trackUserEdit(); });
+document.getElementById('mainSubtitle').addEventListener('blur', function() { titleData.subtitle = this.innerText; saveData(); trackUserEdit(); });
 
 function updateData(legIdx, key, val) { appData[legIdx][key] = val; saveData(); }
 
