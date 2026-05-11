@@ -2,24 +2,54 @@
 
 ## 🔄 Active
 
-**Item 10a complete** - implemented hybrid backup reminder approach
-
-**Decision:** Simplified approach using browser localStorage (removed IndexedDB over-engineering)
-
-**Done:**
-- ✓ Backup reminder system that tracks exports and shows friendly reminders after 7 days or 10 edits
-- ✓ Enhanced export button with visual feedback showing last exported filename
-- ✓ Edit tracking that triggers reminder after significant changes
-- ✓ Removed complex IndexedDB code - kept simple reliable localStorage
-- ✓ Exported JSON now properly updates tracking
-- ✓ Add backup tracking hooks to saveData()
-
-**Result:** Simple, user-friendly system that lives in browser storage but reminds users to export backups regularly
+none
 
 ## 👀 Awaiting Review / Merge
 
+- **Item 10a** - `item-10a-indexeddb-storage` - PR pending - Hybrid backup reminder system
+- Backup reminder system that tracks exports and shows reminders after 7 days or 10 edits
+- Enhanced export button with visual feedback (filename display)
+- Edit tracking hooks integrated into saveData()
+- Cleaned up development files and finalized UI integration
+- **Added tip in reminder messages** to guide users to overwrite backup files manually
+- Files modified: js/backup.js, js/data.js, js/ui.js, index.html
+
 - **Item 9a** - PR #14 open - Fixed title/subtitle loading/saving issues
-  --
+
+## 👀 Awaiting Review / Merge
+
+- **Item 10a** - `item-10a-indexeddb-storage` - PR pending - Hybrid backup reminder system
+- Backup reminder system that tracks exports and shows reminders after 7 days or 10 edits
+- Enhanced export button with visual feedback (filename display)
+- Edit tracking hooks integrated into saveData()
+- Cleaned up development files and finalized UI integration
+- Files modified: js/data.js, js/ui.js, index.html
+
+- **Item 9a** - PR #14 open - Fixed title/subtitle loading/saving issues
+
+## 👀 Awaiting Review / Merge
+
+- **Item 10a** - `item-10a-indexeddb-storage` - PR pending - Hybrid backup reminder system
+- Backup reminder system that tracks exports and shows reminders after 7 days or 10 edits
+- Enhanced export button with visual feedback (filename display)
+- Edit tracking hooks integrated into saveData()
+- Cleaned up development files and finalized UI integration
+- Files modified: js/data.js, js/ui.js, index.html
+
+- **Item 9a** - PR #14 open - Fixed title/subtitle loading/saving issues
+
+## 👀 Awaiting Review / Merge
+
+- **Item 10a** - `item-10a-indexeddb-storage` - PR pending - Hybrid backup reminder system
+  - Backup reminder system that tracks exports and shows reminders after 7 days or 10 edits
+  - Enhanced export button with visual feedback (filename display)
+  - Edit tracking hooks integrated into saveData()
+  - Cleaned up development files and finalized UI integration
+  - Files modified: js/data.js, js/ui.js, index.html
+
+- **Item 9a** - PR #14 open - Fixed title/subtitle loading/saving issues
+--
+
 ## Completed
 
 ---

@@ -40,20 +40,21 @@ function resetEditTracking() {
 // Check if we should show a backup reminder
 function checkBackupReminder() {
   const lastExport = localStorage.getItem('travelApp_last_export_v2026');
+  const lastFileName = localStorage.getItem('travelApp_last_export_filename') || 'your trip file';
 
   if (!lastExport) {
-    showBackupReminder('Welcome! This app saves to your browser. Consider exporting your trip to a file for backup.');
+    showBackupReminder('Welcome! This app saves to your browser. Consider exporting your trip to a file for backup. 💡 Tip: Use the same filename each time to keep one master backup file.');
     return;
   }
 
   const daysSince = (Date.now() - new Date(lastExport).getTime()) / (1000 * 60 * 60 * 24);
   if (daysSince >= BACKUP_REMINDER_DAYS) {
-    showBackupReminder('It\'s been ' + Math.floor(daysSince) + ' days since your last backup. Consider saving to a file.');
+    showBackupReminder('It\'s been ' + Math.floor(daysSince) + ' days since your last backup. Consider saving to a file. 💡 Tip: Use the same filename each time to keep one master backup file.');
     return;
   }
 
   if (editCountSinceExport >= BACKUP_REMINDER_EDITS) {
-    showBackupReminder('You\'ve made ' + editCountSinceExport + ' changes since your last backup. Consider saving to a file.');
+    showBackupReminder('You\'ve made ' + editCountSinceExport + ' changes since your last backup. Consider saving to a file. 💡 Tip: Use the same filename each time to keep one master backup file.');
   }
 }
 
