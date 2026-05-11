@@ -25,8 +25,8 @@ function trackUserEdit() {
   editCountSinceExport++;
   localStorage.setItem('travelApp_editCount', editCountSinceExport);
 
-  // Show reminder every 5 edits
-  if (editCountSinceExport % 5 === 0) {
+  // Show reminder every 10 edits
+  if (editCountSinceExport % 10 === 0) {
     setTimeout(checkBackupReminder, 1000);
   }
 }
