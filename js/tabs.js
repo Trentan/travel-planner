@@ -93,6 +93,9 @@ function buildAccomTab(cityFilter = null) {
 
   html += `</tbody></table></div>`;
 
+  // Add autopopulate button if there are missing stays
+  const autopopulateHTML = (typeof initAutopopulateButton === 'function') ? initAutopopulateButton() : '';
+
   // Header with title and Add Stay button at the top
   const headerHtml = `
     <div class="accom-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
@@ -101,7 +104,7 @@ function buildAccomTab(cityFilter = null) {
     </div>
   `;
 
-  container.innerHTML = headerHtml + html;
+  container.innerHTML = headerHtml + autopopulateHTML + html;
 }
 
 // Helper to calculate nights between dates
