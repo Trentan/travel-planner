@@ -11,11 +11,11 @@ Read this file at the start of every session. Claude Code: read from main branch
 ---
 
 ### Item 9: Minor fixes for stable release
-**Status:** In progress
-**Next:** `item-9b`
+**Status:** Done ✅
+**Next:** `item-9d`
 - [x] a) The heading when entered (New Trip Plan) and Click here to add your trip subtitle - are not loading from json / saving correctly? ✅ **COMPLETE - PR #14 merged**
-- [ ] b) In the accommodation tab, if the stays have gaps for the nights and itinerary length, Add an autopopulate stays feature button action - scan itinerary and automatically create missing accommodation entries for each city based on nights stayed. This button should only appear when nights are missing in the accomodation tab compared to the itinerary.
-- [ ] c) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab? (it should always be displayed and with the default checklist for walk on gear)
+- [x] b) In the accommodation tab, if the stays have gaps for the nights and itinerary length, Add an autopopulate stays feature button action - scan itinerary and automatically create missing accommodation entries for each city based on nights stayed. This button should only appear when nights are missing in the accomodation tab compared to the itinerary. ✅ **COMPLETE - PR #16 merged**
+- [x] c) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab? (it should always be displayed and with the default checklist for walk on gear) ✅ **COMPLETE - PR #17 merged**
 - [ ] d) Need a way to enable the user to force a complete site refresh on mobile app / website on the app easily 
 - [ ] e) Go through and convert the testing checklist into new items and sub items in this todo list
 - [ ] f) Go through and convert the Future Enhancements checklist into new items and sub items in this todo list (some may already be resolved)
@@ -29,8 +29,8 @@ Read this file at the start of every session. Claude Code: read from main branch
 ---
 
 ### Item 10: Backup reminder and export improvements (REVISED - HYBRID APPROACH)
-**Status:** Done ✓
-**Next:** `item-10a-complete`
+**Status:** Done ✅
+**Next:** none
 **Decision:** **Hybrid approach** - Stay in browser, improve UX. Reverted IndexedDB as it was over-engineering.
 
 **What we're doing:**

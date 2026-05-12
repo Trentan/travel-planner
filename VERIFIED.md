@@ -91,3 +91,47 @@ Confirmed completed items. Append-only archive — do not edit existing entries.
 - 8a-iv: Journey names use arrow notation (→ instead of "to"), including multi-leg journeys
 - 8a-v: Total journey travel time calculated and displayed under journey name (e.g., "11hrs")
 
+---
+
+### Item 9a: Title/Subtitle JSON Loading ✅
+**Completed:** 2026-05-12 — branch `item-9a-title-subtitle-fix` merged via PR #14
+
+- Added blur handlers to save title/subtitle on edit
+- Fixed empty title/subtitle validation on save
+- Fixed title/subtitle loading from imported JSON meta
+- Pre-empted blank title/subtitle saves to preserve existing values
+
+---
+
+### Item 9b: Autopopulate Accommodation Stays ✅
+**Completed:** 2026-05-12 — branch `item-9b-autopopulate-stays` merged via PR #16
+
+- Auto-populate stays feature: scans itinerary for missing accommodation entries
+- Creates missing accommodation slots for each city based on nights stayed
+- Button only appears when gaps are detected between accommodation and itinerary length
+- Fixed: Excludes 'In transit' nights from accommodation night calculation
+- Fixed config issues for proper integration
+
+---
+
+### Item 9c: Packing Tab Walk-on Gear Fix ✅
+**Completed:** 2026-05-12 — branch `item-9c-packing-defaults` merged via PR #17
+
+- Restored "Walk-on Gear (Wear onto plane)" area in packing tab
+- Walk-on gear now always displays with default checklist on load
+- Fixed missing rendering of primary packing category
+
+---
+
+### Item 10a: Backup Reminder & Export Improvements ✅
+**Completed:** 2026-05-12 — branch `item-10a-indexeddb-storage` merged via PR #15
+
+- Added backup reminder system tracking exports
+- Shows reminder after 7 days or 10 edits since last export
+- Enhanced export button with filename memory
+- Visual export confirmation showing filename
+- Enhanced export in data.js with user feedback
+- Added edit tracking hooks in ui.js
+- Export indicator UI added to index.html
+- Reverted to localStorage approach (IndexedDB over-engineering)
+- Clean, user-friendly backup workflow
