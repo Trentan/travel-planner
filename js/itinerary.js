@@ -427,10 +427,23 @@ function getCitiesInTravelOrder() {
   const seenCityIds = new Set();
 
   appData.forEach(leg => {
-    // Get city from leg.id
-    if (leg.id && !seenCityIds.has(leg.id)) {
-      cityIdOrder.push(leg.id);
-      seenCityIds.add(leg.id);
+    // Try to match leg.id to city.id (leg.id = "verona", city.id = "city-verona")
+    if (leg.id) {
+      // First try direct match
+      let cityMatch = citiesData.find(c => c.id === leg.id);
+      // Then try with "city-" prefix
+      if (!cityMatch) {
+        cityMatch = citiesData.find(c => c.id === 'city-' + leg.id);
+      }
+      // Then try by matching leg label to city name
+      if (!cityMatch && leg.label) {
+        let cityName = leg.label.replace(/[\p{Emoji}]+/gu, '').trim();
+        cityMatch = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+      }
+      if (cityMatch && !seenCityIds.has(cityMatch.id)) {
+        cityIdOrder.push(cityMatch.id);
+        seenCityIds.add(cityMatch.id);
+      }
     }
   });
 
@@ -443,7 +456,7 @@ function getCitiesInTravelOrder() {
     }
   });
 
-  // Add any cities not in legs (in their original order)
+  // Add any cities not in legs (transit cities and others)
   citiesData.forEach(city => {
     if (!seenCityIds.has(city.id)) {
       orderedCities.push(city);
