@@ -138,6 +138,26 @@ function buildPackingTab() {
   const guidesContainer = document.getElementById('guides-container');
   const listsContainer = document.getElementById('packing-areas-container');
 
+  // Ensure default packing areas exist - add missing ones with defaults
+  const defaultAreaNames = {
+    "🚶 Walk-on Gear (Wear onto plane)": "#E67E22",
+    "🧳 Carry-on Packed Bag (Main Luggage)": "#2980B9",
+    "🎒 Personal Item Bag (Under Seat)": "#8E44AD"
+  };
+
+  Object.entries(defaultAreaNames).forEach(([areaName, areaColor]) => {
+    const existing = packingData.find(a => a.areaName === areaName);
+    if (!existing) {
+      // Find the default template for this area
+      const defaultArea = DEFAULT_PACKING.find(a => a.areaName === areaName);
+      if (defaultArea) {
+        // Deep copy and add to packingData
+        packingData.push(JSON.parse(JSON.stringify(defaultArea)));
+        saveData(false);
+      }
+    }
+  });
+
   let guidesHTML = `
     <div class="guides-grid">
       <details class="guide-details">
