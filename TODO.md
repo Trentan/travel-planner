@@ -11,9 +11,9 @@ Read this file at the start of every session. Claude Code: read from main branch
 ---
 
 ### Item 9: Minor fixes for stable release
-**Status:** Not started
-**Next:** `item-9a`
-- [x] a) The heading when entered (New Trip Plan) and Click here to add your trip subtitle - are not loading from json / saving correctly?
+**Status:** In progress
+**Next:** `item-9b`
+- [x] a) The heading when entered (New Trip Plan) and Click here to add your trip subtitle - are not loading from json / saving correctly? ✅ **COMPLETE - PR #14 merged**
 - [ ] b) In the accommodation tab, if the stays have gaps for the nights and itinerary length, Add an autopopulate stays feature button action - scan itinerary and automatically create missing accommodation entries for each city based on nights stayed. This button should only appear when nights are missing in the accomodation tab compared to the itinerary.
 - [ ] c) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab? (it should always be displayed and with the default checklist for walk on gear)
 - [ ] d) Need a way to enable the user to force a complete site refresh on mobile app / website on the app easily 

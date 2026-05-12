@@ -4,8 +4,8 @@
 // Backup tracking variables
 let editCountSinceExport = 0;
 let lastExportTimestamp = null;
-const BACKUP_REMINDER_DAYS = 7;
-const BACKUP_REMINDER_EDITS = 10;
+const BACKUP_REMINDER_DAYS = 3;
+const BACKUP_REMINDER_EDITS = 20;
 
 // Initialize tracking on app load
 window.addEventListener('DOMContentLoaded', function() {
@@ -25,8 +25,8 @@ function trackUserEdit() {
   editCountSinceExport++;
   localStorage.setItem('travelApp_editCount', editCountSinceExport);
 
-  // Show reminder every 10 edits
-  if (editCountSinceExport % 10 === 0) {
+  // Show reminder every 20 edits
+  if (editCountSinceExport % 20 === 0) {
     setTimeout(checkBackupReminder, 1000);
   }
 }
