@@ -8,6 +8,7 @@ none
   - Added Force Refresh button and dialog to clear caches and reload
   - Implemented resilient service worker unregistration with error handling
   - Cache clearing, IndexedDB deletion, localStorage wipe implemented
-  - Added manual clear instructions for different platforms
+  - Added manual clear instructions for different platforms (iOS, Android, Desktop)
   - Updated service worker cache version v7->v8
-  - Commits: 0b4943a, cdfc9cd
+  - **Also fixed:** Import issues - cities extraction and UI rebuild after import
+  - All commits verified, app loads correctly
