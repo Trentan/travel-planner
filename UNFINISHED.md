@@ -10,9 +10,13 @@ none
   - Cache clearing, IndexedDB deletion, localStorage wipe implemented
   - Added manual clear instructions for different platforms (iOS, Android, Desktop)
   - Updated service worker cache version v7->v8
-  - **Also fixed:** Import issues:
-    - Cities extraction and UI rebuild after import
-    - Budget calculation not working (journeys/stays not syncing to window)
+  - **Also fixed - Import Issues:**
+    - Import not displaying until manual refresh
+    - Cities not mapping/extracting correctly
+    - Custom cities and transit cities missing
+    - Budget calculation not working (journeys/stays not syncing)
   - **Commits:**
     - `17327` - Import: cities extraction and UI rebuild
     - `58dc5d3` - Budget: imported journeys and stays variables
+    - `c52decd` - Fix indentation in import code  
+    - `bdbe40f` - Enhance cities extraction (journeys, stays, country lookup)
