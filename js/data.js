@@ -1857,50 +1857,50 @@ if (importedData.meta) {
 }
 
   // Import journeys if present - also create cities from journey references
-  if (importedData.journeys && Array.isArray(importedData.journeys)) {
-    // Extract cities from journey data that might not be in itinerary days
-    importedData.journeys.forEach(journey => {
-      [journey.fromLocation, journey.toLocation].forEach(cityName => {
-        if (cityName && cityName !== 'Home' && cityName !== 'In transit' && cityName !== 'TBC' && cityName !== '') {
-          const cityId = 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-');
-          const existing = citiesData.find(c => c.id === cityId || c.name.toLowerCase() === cityName.toLowerCase());
-          if (!existing) {
-            addOrUpdateCity(cityName);
-            const newCity = citiesData.find(c => c.name === cityName);
-            if (newCity) { newCity.id = cityId; }
-            console.log("[Import] Created city from journey: " + cityName);
-          }
+if (importedData.journeys && Array.isArray(importedData.journeys)) {
+  // Extract cities from journey data that might not be in itinerary days
+  importedData.journeys.forEach(journey => {
+    [journey.fromLocation, journey.toLocation].forEach(cityName => {
+      if (cityName && cityName !== 'Home' && cityName !== 'In transit' && cityName !== 'TBC' && cityName !== '') {
+        const cityId = 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        const existing = citiesData.find(c => c.id === cityId || c.name.toLowerCase() === cityName.toLowerCase());
+        if (!existing) {
+          addOrUpdateCity(cityName);
+          const newCity = citiesData.find(c => c.name === cityName);
+          if (newCity) { newCity.id = cityId; }
+          console.log("[Import] Created city from journey: " + cityName);
         }
-      });
+      }
     });
+  });
 
-    // Set journeys variable and window scope for budget calculation
-    journeys = importedData.journeys;
-    window.journeys = journeys;
-    localStorage.setItem("travelApp_journeys_v1", JSON.stringify(importedData.journeys));
-    console.log("[Import] Saved " + importedData.journeys.length + " journeys to localStorage");
-  } else {
-    console.log("[Import] No journeys found in imported data");
-  }
+  // Set journeys variable and window scope for budget calculation
+  journeys = importedData.journeys;
+  window.journeys = journeys;
+  localStorage.setItem("travelApp_journeys_v1", JSON.stringify(importedData.journeys));
+  console.log("[Import] Saved " + importedData.journeys.length + " journeys to localStorage");
+} else {
+  console.log("[Import] No journeys found in imported data");
+}
 
 
 // Import cities if present in the JSON, otherwise extract from itinerary
-  if (importedData.cities && Array.isArray(importedData.cities)) {
-    citiesData = importedData.cities;
-    console.log(`[Import] Loaded ${citiesData.length} cities from JSON`);
-  } else {
-    // Extract cities from itinerary if not in JSON
-    citiesData = extractCitiesFromItinerary();
-    console.log(`[Import] Extracted ${citiesData.length} cities from itinerary`);
-  }
+if (importedData.cities && Array.isArray(importedData.cities)) {
+  citiesData = importedData.cities;
+  console.log(`[Import] Loaded ${citiesData.length} cities from JSON`);
+} else {
+  // Extract cities from itinerary if not in JSON
+  citiesData = extractCitiesFromItinerary();
+  console.log(`[Import] Extracted ${citiesData.length} cities from itinerary`);
+}
 
-  // Import stays if present
-  if (importedData.stays && Array.isArray(importedData.stays)) {
-    stays = importedData.stays;
-    window.stays = stays;
-    localStorage.setItem('travelApp_stays_v1', JSON.stringify(importedData.stays));
-    console.log(`[Import] Loaded ${stays.length} stays from JSON`);
-  }
+// Import stays if present
+if (importedData.stays && Array.isArray(importedData.stays)) {
+  stays = importedData.stays;
+  window.stays = stays;
+  localStorage.setItem('travelApp_stays_v1', JSON.stringify(importedData.stays));
+  console.log(`[Import] Loaded ${stays.length} stays from JSON`);
+}
 
 currentFileName = file.name;
 localStorage.setItem('travelApp_filename_v2026', currentFileName);
