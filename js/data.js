@@ -414,43 +414,166 @@ window.stays = stays;
 var currentCityFilter = 'all';
 window.currentCityFilter = currentCityFilter;
 
-// Extract unique cities from itinerary data
+// Extract unique cities from itinerary data (including journeys, stays, and cityId references)
 function extractCitiesFromItinerary() {
   const cityMap = new Map();
 
+  // Helper to add/update city
+  const addCity = (cityName, sourceDate = null, source = 'itinerary') => {
+    if (!cityName) return;
+    const skipList = ['Home', 'In transit', 'Between cities', 'TBC', ''];
+    if (skipList.includes(cityName)) return;
+
+    // Normalize city name - remove trailing descriptions, keep main city name
+    let normalized = cityName.trim();
+
+    // Try to look up the city to get country info
+    let existing = cityMap.get(normalized);
+
+    if (!existing) {
+      const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === normalized.toLowerCase());
+      let country = '';
+      let cityCode = '';
+      let countryCode = '';
+
+      if (dbMatch) {
+        country = getCountryName(dbMatch.countryCode);
+        cityCode = dbMatch.code;
+        countryCode = dbMatch.countryCode;
+      }
+
+      existing = {
+        id: 'city-' + normalized.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        name: normalized,
+        country: country,
+        code: cityCode,
+        countryCode: countryCode,
+        dateFrom: sourceDate || '',
+        dateTo: sourceDate || '',
+        colour: getRandomCityColor()
+      };
+      cityMap.set(normalized, existing);
+    } else if (sourceDate) {
+      if (!existing.dateFrom || sourceDate < existing.dateFrom) existing.dateFrom = sourceDate;
+      if (!existing.dateTo || sourceDate > existing.dateTo) existing.dateTo = sourceDate;
+    }
+  };
+
+  // Helper to add city by ID only (used when stay has only cityId)
+  const addCityById = (cityId, sourceDate = null) => {
+    if (!cityId) return;
+    // Extract city slug from ID like city-vienna for cities not in built-in database
+    const slug = cityId.replace('city-', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    // Check if this city exists in ALL_CITIES database
+    const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase().replace(/-/g, '') === slug.toLowerCase().replace(/-/g, '') ||
+                                         c.name.toLowerCase() === slug.toLowerCase());
+    if (dbMatch) {
+      addCity(dbMatch.name, sourceDate);
+    } else {
+      // Also check userCities
+      const userMatch = userCities.find(c => c.name.toLowerCase() === slug.toLowerCase());
+      if (userMatch) {
+        // For user cities, try to look up the city for country info
+        const countryMatch = COUNTRY_DATA.find(c => c.code === userMatch.countryCode);
+        addCity(cityId, sourceDate);
+      } else {
+        // Parse from stays propertyName which often has full city info like "ibis Styles Bangkok Sukhumvit..."
+        citiesData.forEach(c => {
+          if (c.id === cityId) {
+            addCity(c.name, sourceDate);
+          }
+        });
+      }
+    }
+  };
+
+  // 1. Extract from itinerary days (day.from/to) with date information
   appData.forEach(leg => {
     leg.days.forEach(day => {
-      const from = day.from?.trim() || '';
-      const to = day.to?.trim() || '';
-      const date = day.date;
+      addCity(day.from, day.date);
+      addCity(day.to, day.date);
+    });
+  });
 
-      // Skip generic/placeholder values
-      const skipList = ['Home', 'In transit', 'Between cities', 'TBC', ''];
+  // 2. Extract from journeys
+  if (Array.isArray(journeys)) {
+    journeys.forEach(j => {
+      addCity(j.fromLocation);
+      addCity(j.toLocation);
+    });
+  }
 
-      [from, to].forEach(cityName => {
-        if (!skipList.includes(cityName) && !cityMap.has(cityName)) {
-          cityMap.set(cityName, {
-            id: 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-            name: cityName,
-            country: '',
-            dateFrom: date,
-            dateTo: date
+  // 3. Extract from stays - use cityId to get city info
+  if (Array.isArray(stays)) {
+    stays.forEach(s => {
+      if (s.cityId) {
+        // First try to find existing city by ID
+        let cityFound = false;
+        // Check in ALL_CITIES (built-in + extended)
+        ALL_CITIES.forEach(dbCity => {
+          const idFromDb = 'city-' + dbCity.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+          if (idFromDb === s.cityId) {
+            addCity(dbCity.name, s.checkIn);
+            cityFound = true;
+          }
+        });
+        // Check in userCities
+        if (!cityFound) {
+          userCities.forEach(uCity => {
+            const idFromUser = 'city-' + uCity.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            if (idFromUser === s.cityId) {
+              addCity(uCity.name, s.checkIn);
+              cityFound = true;
+            }
           });
         }
-      });
-
-      // Update date ranges for existing cities
-      [from, to].forEach(cityName => {
-        if (cityMap.has(cityName)) {
-          const city = cityMap.get(cityName);
-          if (date < city.dateFrom) city.dateFrom = date;
-          if (date > city.dateTo) city.dateTo = date;
+        // Last resort: parse from cityId slug
+        if (!cityFound) {
+          addCityById(s.cityId, s.checkIn);
         }
+      } else if (s.city) {
+        // Legacy format with city name directly
+        addCity(s.city, s.checkIn);
+      }
+    });
+  }
+
+  // 4. Extract from cityId references in trip data
+  appData.forEach(leg => {
+    (leg.cityFood || []).forEach(item => {
+      if (item.cityId) addCityById(item.cityId);
+    });
+    (leg.suggestedActivities || []).forEach(act => {
+      if (act.cityId) addCityById(act.cityId);
+    });
+    (leg.legTips || []).forEach(tip => {
+      if (tip.cityId) addCityById(tip.cityId);
+    });
+    leg.days.forEach(day => {
+      (day.accomItems || []).forEach(item => {
+        if (item.cityId) addCityById(item.cityId);
+      });
+      (day.activityItems || []).forEach(item => {
+        if (item.cityId) addCityById(item.cityId);
       });
     });
   });
 
-  return Array.from(cityMap.values());
+  const result = Array.from(cityMap.values());
+
+  // Final pass: look up country data for any remaining unknown cities
+  result.forEach(city => {
+    if (!city.country && !city.countryCode) {
+      const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
+      if (dbMatch) {
+        city.countryCode = dbMatch.countryCode;
+        city.country = getCountryName(dbMatch.countryCode);
+        if (!city.code) city.code = dbMatch.code;
+      }
+    }
+  });
+
+  return result;
 }
 
 // Get city ID by name (case insensitive)
