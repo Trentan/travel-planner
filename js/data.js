@@ -1988,19 +1988,14 @@ if (importedData.meta) {
 }
 
   // Import journeys if present - also create cities from journey references
+var transitCitiesToAdd = []; // Collect transit city names before we load citiesData
 if (importedData.journeys && Array.isArray(importedData.journeys)) {
   // Extract cities from journey data that might not be in itinerary days
   importedData.journeys.forEach(journey => {
     [journey.fromLocation, journey.toLocation].forEach(cityName => {
       if (cityName && cityName !== 'Home' && cityName !== 'In transit' && cityName !== 'TBC' && cityName !== '') {
-        const cityId = 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-');
-        const existing = citiesData.find(c => c.id === cityId || c.name.toLowerCase() === cityName.toLowerCase());
-        if (!existing) {
-          addOrUpdateCity(cityName);
-          const newCity = citiesData.find(c => c.name === cityName);
-          if (newCity) { newCity.id = cityId; }
-          console.log("[Import] Created city from journey: " + cityName);
-        }
+        // Store for later merging after cities are loaded
+        transitCitiesToAdd.push(cityName);
       }
     });
   });
@@ -2014,6 +2009,15 @@ if (importedData.journeys && Array.isArray(importedData.journeys)) {
   console.log("[Import] No journeys found in imported data");
 }
 
+// Import stays - collect city references
+var stayCitiesToAdd = [];
+if (importedData.stays && Array.isArray(importedData.stays)) {
+  importedData.stays.forEach(stay => {
+    if (stay.city) {
+      stayCitiesToAdd.push(stay.city);
+    }
+  });
+}
 
 // Import cities if present in the JSON, otherwise extract from itinerary
 if (importedData.cities && Array.isArray(importedData.cities)) {
@@ -2031,6 +2035,18 @@ if (importedData.cities && Array.isArray(importedData.cities)) {
     userCountries = importedData.userCountries;
     localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
     console.log(`[Import] Loaded ${userCountries.length} user custom countries`);
+  }
+
+  // NOW merge in transit cities from journeys and stays
+  [...transitCitiesToAdd, ...stayCitiesToAdd].forEach(cityName => {
+    const exists = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+    if (!exists) {
+      addOrUpdateCity(cityName);
+      console.log(`[Import] Added transit city from journey/stay: ${cityName}`);
+    }
+  });
+  if (transitCitiesToAdd.length > 0 || stayCitiesToAdd.length > 0) {
+    console.log(`[Import] Merged ${transitCitiesToAdd.length + stayCitiesToAdd.length} transit cities into cities array`);
   }
 } else {
   // Extract cities from itinerary if not in JSON
