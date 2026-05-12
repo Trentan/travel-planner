@@ -1880,6 +1880,16 @@ if (importedData.meta) {
     console.log("[Import] No journeys found in imported data");
   }
 
+      // Import cities if present in the JSON, otherwise extract from itinerary
+      if (importedData.cities && Array.isArray(importedData.cities)) {
+        citiesData = importedData.cities;
+        console.log(`[Import] Loaded ${citiesData.length} cities from JSON`);
+      } else {
+        // Extract cities from itinerary if not in JSON
+        citiesData = extractCitiesFromItinerary();
+        console.log(`[Import] Extracted ${citiesData.length} cities from itinerary`);
+      }
+
       if (importedData.stays && Array.isArray(importedData.stays)) {
         stays = importedData.stays;
         window.stays = stays;
@@ -1896,6 +1906,20 @@ const savedSubtitle = titleData.subtitle;
 saveData(false);
 if (savedTitle) { titleData.title = savedTitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
 if (savedSubtitle) { titleData.subtitle = savedSubtitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
+
+// Rebuild all UI components to reflect imported data
+if (typeof buildNav === 'function') buildNav();
+if (typeof buildItinerary === 'function') buildItinerary();
+if (typeof buildAccomTab === 'function') buildAccomTab();
+if (typeof buildTransportTab === 'function') buildTransportTab();
+if (typeof buildBudgetTab === 'function') buildBudgetTab();
+if (typeof buildPackingTab === 'function') buildPackingTab();
+if (typeof buildCityNav === 'function') buildCityNav();
+if (typeof buildJourneyMap === 'function') buildJourneyMap();
+if (typeof populateCityList === 'function') populateCityList();
+
+// Notify user of successful import
+alert('Import successful! ' + appData.length + ' trip legs loaded.');
     } catch (err) {
       console.error('Import error:', err);
       alert(`Import failed: ${err.message || 'Unknown error'}. Your current data remains safe.`);
