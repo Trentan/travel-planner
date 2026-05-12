@@ -482,46 +482,27 @@ function buildCityNav() {
   // Get cities in travel order (by leg appearance)
   const citiesInOrder = getCitiesInTravelOrder();
 
-  // Separate main destinations from transit cities
-  const mainDestinations = citiesInOrder.filter(c => !c.isTransit);
-  const transitCities = citiesInOrder.filter(c => c.isTransit);
-
-  // Add main destinations first
-  mainDestinations.forEach(city => {
+  // Add all city buttons - transit cities get different styling
+  citiesInOrder.forEach(city => {
     const btn = document.createElement('button');
-    btn.className = 'city-nav-btn' + (filter === city.id ? ' active' : '');
     btn.setAttribute('data-city', city.id);
-    // Add vertical color bar to button
-    const color = city.colour || '#2C3E50';
-    btn.style.borderLeft = `4px solid ${color}`;
+
+    // Transit cities get different styling (gray, dashed)
+    if (city.isTransit) {
+      btn.className = 'city-nav-btn transit' + (filter === city.id ? ' active' : '');
+      const color = city.colour || '#95a5a6';
+      btn.style.borderLeft = `4px dashed ${color}`;
+    } else {
+      btn.className = 'city-nav-btn' + (filter === city.id ? ' active' : '');
+      const color = city.colour || '#2C3E50';
+      btn.style.borderLeft = `4px solid ${color}`;
+    }
+
     const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">📍</span>';
     btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
     btn.onclick = () => selectCityFilter(city.id, btn);
     navList.appendChild(btn);
   });
-
-  // Add separator and transit cities if any exist
-  if (transitCities.length > 0) {
-    // Add a visual separator
-    const separator = document.createElement('div');
-    separator.className = 'city-nav-separator';
-    separator.innerHTML = '<span class="city-nav-separator-text">✈ Transit</span>';
-    navList.appendChild(separator);
-
-    // Add transit cities with different styling
-    transitCities.forEach(city => {
-      const btn = document.createElement('button');
-      btn.className = 'city-nav-btn transit' + (filter === city.id ? ' active' : '');
-      btn.setAttribute('data-city', city.id);
-      // Transit cities get a different border style (dashed gray)
-      const color = city.colour || '#95a5a6';
-      btn.style.borderLeft = `4px dashed ${color}`;
-      const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">📍</span>';
-      btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
-      btn.onclick = () => selectCityFilter(city.id, btn);
-      navList.appendChild(btn);
-    });
-  }
 }
 
 function selectCityFilter(cityId, btn) {
