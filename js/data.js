@@ -809,15 +809,22 @@ function addUserCity(cityCode, cityName, countryCode) {
 }
 
 // Add a user-defined country
-function addUserCountry(countryCode, countryName, flag = '??') {
+function addUserCountry(countryCode, countryName, flag = '🌐') {
   if (!countryCode || !countryName) return null;
 
+  // Generate a short code if none provided
+  let code = countryCode.toUpperCase();
+  if (!code || code.length < 2) {
+    // Generate code from country name (first 2-3 letters)
+    code = countryName.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2) || 'XX';
+  }
+
   // Check for duplicate code
-  const existing = userCountries.find(c => c.code.toUpperCase() === countryCode.toUpperCase());
+  const existing = userCountries.find(c => c.code.toUpperCase() === code);
   if (existing) return existing;
 
   const newCountry = {
-    code: countryCode.toUpperCase(),
+    code: code,
     name: countryName.trim(),
     flag: flag
   };
@@ -2027,8 +2034,8 @@ if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
   importedData.itinerary.forEach(leg => {
     // Try to extract city name from leg label (e.g., "🇮🇹 Verona" -> "Verona")
     let label = leg.label || '';
-    // Remove emoji flags and extract text
-    let cityFromLabel = label.replace(/[\p{Emoji}\p{Emoji_Modifier}\p{Emoji_Component}\p{Emoji_Modifier_Base}\p{Emoji_Emoji_Picture}]+/gu, '').trim();
+    // Remove emoji flags and extract text - simple approach removing common flag emojis
+    let cityFromLabel = label.replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '').trim();
     if (cityFromLabel && cityFromLabel !== 'Departure' && cityFromLabel !== 'Arrival' && cityFromLabel !== 'In transit') {
       // Check if this leg's days don't actually reference this city
       let cityInDays = false;
@@ -2066,12 +2073,21 @@ if (importedData.cities && Array.isArray(importedData.cities)) {
   allTransitCities.forEach(cityName => {
     let existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
     if (!existing) {
-      addOrUpdateCity(cityName);
+      addOrUpdateCity(cityName, '', '', '', '', '');
       existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
     }
     if (existing && !existing.isTransit) {
       existing.isTransit = true; // Mark as transit city for styling
-      console.log(`[Import] Added transit city: ${cityName}`);
+      // Try to look up country if not already set
+      if (!existing.countryCode && existing.country) {
+        const countryMatch = COUNTRY_DATA.find(c =>
+          c.name.toLowerCase() === existing.country.toLowerCase()
+        );
+        if (countryMatch) {
+          existing.countryCode = countryMatch.code;
+        }
+      }
+      console.log(`[Import] Added transit city: ${cityName}${existing.country ? ' (' + existing.country + ')' : ''}`);
     }
   });
   if (allTransitCities.length > 0) {
