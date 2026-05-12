@@ -12,11 +12,15 @@ none
   - Updated service worker cache version v7->v8
   - **Also fixed - Import Issues:**
     - Import not displaying until manual refresh
-    - Cities not mapping/extracting correctly
-    - Custom cities and transit cities missing
     - Budget calculation not working (journeys/stays not syncing)
+    - Cities mapping with country lookup from database
+    - Custom cities and transit cities support
+  - **Also fixed - Export Issues:**
+    - Custom cities not persisted in export
+    - userCities and userCountries now included in JSON
   - **Commits:**
     - `17327` - Import: cities extraction and UI rebuild
     - `58dc5d3` - Budget: imported journeys and stays variables
     - `c52decd` - Fix indentation in import code  
     - `bdbe40f` - Enhance cities extraction (journeys, stays, country lookup)
+    - `5054ac` - Export/import: include cities, userCities, userCountries
