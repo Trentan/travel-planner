@@ -220,6 +220,7 @@ const COUNTRY_DATA = [
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
   { code: 'US', name: 'United States', flag: '🇺🇸' },
   { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
+  { code: 'TW', name: 'Taiwan', flag: '🇹🇼' },
   { code: 'ZZ', name: 'Other', flag: '🌐' }
 ];
 
@@ -2019,6 +2020,29 @@ if (importedData.stays && Array.isArray(importedData.stays)) {
   });
 }
 
+// Extract cities from leg labels (for legs without proper cityId references)
+// This catches transit cities like "Verona" that appear as leg labels but not in day.from/to
+var legLabelCities = [];
+if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
+  importedData.itinerary.forEach(leg => {
+    // Try to extract city name from leg label (e.g., "🇮🇹 Verona" -> "Verona")
+    let label = leg.label || '';
+    // Remove emoji flags and extract text
+    let cityFromLabel = label.replace(/[\p{Emoji}\p{Emoji_Modifier}\p{Emoji_Component}\p{Emoji_Modifier_Base}\p{Emoji_Emoji_Picture}]+/gu, '').trim();
+    if (cityFromLabel && cityFromLabel !== 'Departure' && cityFromLabel !== 'Arrival' && cityFromLabel !== 'In transit') {
+      // Check if this leg's days don't actually reference this city
+      let cityInDays = false;
+      (leg.days || []).forEach(day => {
+        if (day.from === cityFromLabel || day.to === cityFromLabel) cityInDays = true;
+      });
+      if (!cityInDays) {
+        legLabelCities.push(cityFromLabel);
+        console.log("[Import] Found transit city from leg label: " + cityFromLabel);
+      }
+    }
+  });
+}
+
 // Import cities if present in the JSON, otherwise extract from itinerary
 if (importedData.cities && Array.isArray(importedData.cities)) {
   citiesData = importedData.cities;
@@ -2037,16 +2061,21 @@ if (importedData.cities && Array.isArray(importedData.cities)) {
     console.log(`[Import] Loaded ${userCountries.length} user custom countries`);
   }
 
-  // NOW merge in transit cities from journeys and stays
-  [...transitCitiesToAdd, ...stayCitiesToAdd].forEach(cityName => {
-    const exists = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
-    if (!exists) {
+  // NOW merge in transit cities from journeys, stays, and leg labels
+  var allTransitCities = [...new Set([...transitCitiesToAdd, ...stayCitiesToAdd, ...legLabelCities])];
+  allTransitCities.forEach(cityName => {
+    let existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+    if (!existing) {
       addOrUpdateCity(cityName);
-      console.log(`[Import] Added transit city from journey/stay: ${cityName}`);
+      existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+    }
+    if (existing && !existing.isTransit) {
+      existing.isTransit = true; // Mark as transit city for styling
+      console.log(`[Import] Added transit city: ${cityName}`);
     }
   });
-  if (transitCitiesToAdd.length > 0 || stayCitiesToAdd.length > 0) {
-    console.log(`[Import] Merged ${transitCitiesToAdd.length + stayCitiesToAdd.length} transit cities into cities array`);
+  if (allTransitCities.length > 0) {
+    console.log(`[Import] Merged ${allTransitCities.length} transit cities into cities array`);
   }
 } else {
   // Extract cities from itinerary if not in JSON
