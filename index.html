@@ -579,6 +579,7 @@
             <li>Your current trip data will be <strong>deleted</strong></li>
             <li>All caches (including offline assets) will be cleared</li>
             <li>You will need to re-import your trip JSON file</li>
+            <li>On mobile: you may need to uninstall/reinstall the app to fully clear</li>
           </ul>
         </div>
 
@@ -591,6 +592,16 @@
             <li>Need a completely fresh start</li>
           </ul>
         </div>
+
+        <details style="margin-bottom: 1.5rem;">
+          <summary style="cursor: pointer; color: #333; font-weight: 500;">Manual clear instructions (if automatic fails)</summary>
+          <div style="margin-top: 0.75rem; font-size: 0.85rem; color: #666;">
+            <p><strong>Desktop browser:</strong> Settings → Privacy → Clear browsing data → Cached images and files</p>
+            <p><strong>iPhone Safari:</strong> Scroll down to Travel Planner under Websites → Erase data</p>
+            <p><strong>Android Chrome:</strong> Settings → Privacy → Clear browsing data → Cached images and files</p>
+            <p><strong>Android PWA:</strong> Settings → Apps → Travel Planner → Storage → Clear data & Clear cache</p>
+          </div>
+        </details>
 
         <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
           <label class="check-label" style="font-size: 0.9rem;">
@@ -664,57 +675,99 @@
       return;
     }
 
+    let messages = [];
+    let errors = [];
+
+    // Try to unregister service worker (may fail on file:// protocol)
     try {
-      // Unregister service worker
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
         for (const registration of registrations) {
-          await registration.unregister();
+          try {
+            await registration.unregister();
+            messages.push('Service worker unregistered');
+          } catch (err) {
+            // SW unregistration may fail on file:// or other protocols
+            console.warn('SW unregister failed:', err.message);
+            errors.push('Could not unregister service worker (may require HTTPS/localhost)');
+          }
+        }
+        if (registrations.length === 0) {
+          messages.push('No service workers to unregister');
         }
       }
+    } catch (err) {
+      errors.push('Service worker access not available');
+    }
 
-      // Clear all caches
+    // Clear all caches (this often works even when SW unregister doesn't)
+    try {
       if ('caches' in window) {
         const cacheNames = await caches.keys();
+        let cleared = 0;
         for (const cacheName of cacheNames) {
-          await caches.delete(cacheName);
+          if (await caches.delete(cacheName)) {
+            cleared++;
+          }
         }
+        messages.push(`Cleared ${cleared} cache(s)`);
       }
+    } catch (err) {
+      errors.push('Could not clear cache storage');
+    }
 
-      // Clear localStorage
-      const keysToKeep = [];
-      const keysToClear = [];
-
+    // Clear localStorage travel data
+    try {
+      let cleared = 0;
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith('travelApp_')) {
-          keysToClear.push(key);
+          localStorage.removeItem(key);
+          cleared++;
         }
       }
+      messages.push(`Cleared ${cleared} localStorage entries`);
+    } catch (err) {
+      errors.push('Could not clear localStorage');
+    }
 
-      for (const key of keysToClear) {
-        localStorage.removeItem(key);
-      }
-
-      // Also clear IndexedDB if it exists
+    // Try to clear IndexedDB
+    try {
       if ('indexedDB' in window) {
         const dbNames = await window.indexedDB.databases();
+        let cleared = 0;
         for (const db of dbNames) {
           if (db.name && db.name.includes('travelApp')) {
             window.indexedDB.deleteDatabase(db.name);
+            cleared++;
           }
         }
+        messages.push(`Queued ${cleared} IndexedDB database(s) for deletion`);
       }
-
-      // Close modal before reload
-      closeForceRefreshDialog();
-
-      // Force reload the page
-      window.location.reload(true);
-    } catch (error) {
-      console.error('Force refresh error:', error);
-      alert('Error during force refresh: ' + error.message + '. Please try manually clearing your browser cache and reloading.');
+    } catch (err) {
+      errors.push('Could not access IndexedDB');
     }
+
+    // Close modal before reload
+    closeForceRefreshDialog();
+
+    // Show status message
+    const statusMsg = messages.join(', ');
+    const errorMsg = errors.length > 0 ? ' (Some operations may require manual: Settings > Apps > Travel Planner > Storage > Clear' : '';
+
+    // Force reload the page (hard reload)
+    setTimeout(() => {
+      // Try hard reload first
+      try {
+        window.location.reload(true);
+      } catch (e) {
+        // Fallback for browsers that don't support force reload
+        window.location.href = window.location.href + '?t=' + Date.now();
+      }
+    }, 100);
+
+    // Also show a message before reload
+    alert('Data cleared: ' + statusMsg + errorMsg + '). The page will now reload.');
   }
 
   // Listen for checkbox changes
