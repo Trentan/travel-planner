@@ -1841,7 +1841,15 @@ function exportJSON() {
   if (typeof journeys !== 'undefined') journeysData = journeys;
   let staysData = [];
   if (typeof stays !== 'undefined') staysData = stays;
-  const exportObj = { meta: titleData, itinerary: appData, packing: packingData, leaveHome: leaveHomeData, journeys: journeysData, stays: staysData };
+  // Get cities - include all cities from citiesData
+  let citiesDataToExport = [];
+  if (typeof citiesData !== 'undefined') citiesDataToExport = citiesData;
+  // Get user customizations
+  let userCitiesData = [];
+  if (typeof userCities !== 'undefined') userCitiesData = userCities;
+  let userCountriesData = [];
+  if (typeof userCountries !== 'undefined') userCountriesData = userCountries;
+  const exportObj = { meta: titleData, itinerary: appData, packing: packingData, leaveHome: leaveHomeData, journeys: journeysData, stays: staysData, cities: citiesDataToExport, userCities: userCitiesData, userCountries: userCountriesData };
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute("href", dataStr);
@@ -2011,6 +2019,19 @@ if (importedData.journeys && Array.isArray(importedData.journeys)) {
 if (importedData.cities && Array.isArray(importedData.cities)) {
   citiesData = importedData.cities;
   console.log(`[Import] Loaded ${citiesData.length} cities from JSON`);
+
+  // Also import userCities and userCountries if present
+  if (importedData.userCities && Array.isArray(importedData.userCities)) {
+    userCities = importedData.userCities;
+    localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
+    console.log(`[Import] Loaded ${userCities.length} user custom cities`);
+  }
+
+  if (importedData.userCountries && Array.isArray(importedData.userCountries)) {
+    userCountries = importedData.userCountries;
+    localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
+    console.log(`[Import] Loaded ${userCountries.length} user custom countries`);
+  }
 } else {
   // Extract cities from itinerary if not in JSON
   citiesData = extractCitiesFromItinerary();
