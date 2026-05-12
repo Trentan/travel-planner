@@ -1874,27 +1874,33 @@ if (importedData.meta) {
       });
     });
 
+    // Set journeys variable and window scope for budget calculation
+    journeys = importedData.journeys;
+    window.journeys = journeys;
     localStorage.setItem("travelApp_journeys_v1", JSON.stringify(importedData.journeys));
     console.log("[Import] Saved " + importedData.journeys.length + " journeys to localStorage");
   } else {
     console.log("[Import] No journeys found in imported data");
   }
 
-      // Import cities if present in the JSON, otherwise extract from itinerary
-      if (importedData.cities && Array.isArray(importedData.cities)) {
-        citiesData = importedData.cities;
-        console.log(`[Import] Loaded ${citiesData.length} cities from JSON`);
-      } else {
-        // Extract cities from itinerary if not in JSON
-        citiesData = extractCitiesFromItinerary();
-        console.log(`[Import] Extracted ${citiesData.length} cities from itinerary`);
-      }
 
-      if (importedData.stays && Array.isArray(importedData.stays)) {
-        stays = importedData.stays;
-        window.stays = stays;
-      }
+// Import cities if present in the JSON, otherwise extract from itinerary
+  if (importedData.cities && Array.isArray(importedData.cities)) {
+    citiesData = importedData.cities;
+    console.log(`[Import] Loaded ${citiesData.length} cities from JSON`);
+  } else {
+    // Extract cities from itinerary if not in JSON
+    citiesData = extractCitiesFromItinerary();
+    console.log(`[Import] Extracted ${citiesData.length} cities from itinerary`);
+  }
 
+  // Import stays if present
+  if (importedData.stays && Array.isArray(importedData.stays)) {
+    stays = importedData.stays;
+    window.stays = stays;
+    localStorage.setItem('travelApp_stays_v1', JSON.stringify(importedData.stays));
+    console.log(`[Import] Loaded ${stays.length} stays from JSON`);
+  }
 
 currentFileName = file.name;
 localStorage.setItem('travelApp_filename_v2026', currentFileName);
