@@ -34,6 +34,7 @@
     <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
     <button class="app-menu-btn" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
     <button class="app-menu-btn" onclick="exportJSON()">📤 Export Backup</button>
+    <button class="app-menu-btn" onclick="openForceRefreshDialog()">🔄 Force Refresh</button>
     <button class="app-menu-btn danger" onclick="resetData()">Reset App</button>
   </div>
 </div>
@@ -495,7 +496,7 @@
     </div>
   </div>
 
-<div id="add-stay-modal" class="modal-overlay" style="display: none;">
+<div id="journey-modal" class="modal-overlay" style="display: none;">
   <div class="modal-content" style="max-width: 500px;">
     <div class="modal-header">
       <h2>🏨 Add Stay</h2>
@@ -560,6 +561,52 @@
   </div>
 </div>
 
+<div id="force-refresh-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-header">
+      <h2>🔄 Force Refresh App</h2>
+      <button class="modal-close" onclick="closeForceRefreshDialog()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="padding: 1rem 0;">
+        <p style="color: #666; margin-bottom: 1.5rem;">
+          This will completely clear the app and reload fresh assets from the server.
+        </p>
+
+        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+          <strong style="color: #856404;">⚠ Warning:</strong>
+          <ul style="margin: 0.5rem 0 0 1.2rem; color: #856404;">
+            <li>Your current trip data will be <strong>deleted</strong></li>
+            <li>All caches (including offline assets) will be cleared</li>
+            <li>You will need to re-import your trip JSON file</li>
+          </ul>
+        </div>
+
+        <div style="background: #d4edda; border: 1px solid #28a745; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+          <strong style="color: #155724;">✓ When to use this:</strong>
+          <ul style="margin: 0.5rem 0 0 1.2rem; color: #155724;">
+            <li>App showing old/buggy behavior after an update</li>
+            <li>Changes not appearing on your device</li>
+            <li>Corrupted cache causing issues</li>
+            <li>Need a completely fresh start</li>
+          </ul>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
+          <label class="check-label" style="font-size: 0.9rem;">
+            <input type="checkbox" id="refreshConfirmCheckbox" style="margin-right: 0.5rem;">
+            I understand my data will be deleted - refresh anyway
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="action-btn" onclick="closeForceRefreshDialog()">Cancel</button>
+      <button class="action-btn danger" id="confirmRefreshBtn" onclick="performForceRefresh()" disabled style="opacity: 0.5;">Yes, Force Refresh</button>
+    </div>
+  </div>
+</div>
+
 </main>
 
 <script src="./js/utils.js"></script>
@@ -585,6 +632,98 @@
 
   setInterval(updateClocks, 1000);
   updateClocks();
+
+  // Force refresh dialog handling
+  function openForceRefreshDialog() {
+    const modal = document.getElementById('force-refresh-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+      document.getElementById('refreshConfirmCheckbox').checked = false;
+      updateRefreshButtonState();
+    }
+  }
+
+  function closeForceRefreshDialog() {
+    const modal = document.getElementById('force-refresh-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  function updateRefreshButtonState() {
+    const checkbox = document.getElementById('refreshConfirmCheckbox');
+    const btn = document.getElementById('confirmRefreshBtn');
+    if (checkbox && btn) {
+      btn.disabled = !checkbox.checked;
+      btn.style.opacity = checkbox.checked ? '1' : '0.5';
+    }
+  }
+
+  async function performForceRefresh() {
+    if (!confirm('Are you sure? This will delete all your trip data and clear all caches. You will need to re-import your trip JSON.')) {
+      return;
+    }
+
+    try {
+      // Unregister service worker
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const registration of registrations) {
+          await registration.unregister();
+        }
+      }
+
+      // Clear all caches
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        for (const cacheName of cacheNames) {
+          await caches.delete(cacheName);
+        }
+      }
+
+      // Clear localStorage
+      const keysToKeep = [];
+      const keysToClear = [];
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('travelApp_')) {
+          keysToClear.push(key);
+        }
+      }
+
+      for (const key of keysToClear) {
+        localStorage.removeItem(key);
+      }
+
+      // Also clear IndexedDB if it exists
+      if ('indexedDB' in window) {
+        const dbNames = await window.indexedDB.databases();
+        for (const db of dbNames) {
+          if (db.name && db.name.includes('travelApp')) {
+            window.indexedDB.deleteDatabase(db.name);
+          }
+        }
+      }
+
+      // Close modal before reload
+      closeForceRefreshDialog();
+
+      // Force reload the page
+      window.location.reload(true);
+    } catch (error) {
+      console.error('Force refresh error:', error);
+      alert('Error during force refresh: ' + error.message + '. Please try manually clearing your browser cache and reloading.');
+    }
+  }
+
+  // Listen for checkbox changes
+  document.addEventListener('DOMContentLoaded', () => {
+    const checkbox = document.getElementById('refreshConfirmCheckbox');
+    if (checkbox) {
+      checkbox.addEventListener('change', updateRefreshButtonState);
+    }
+  });
 
   initData();
   buildNav();
