@@ -424,9 +424,18 @@ function getCitiesInTravelOrder() {
   const orderedCities = [];
   const seenCityIds = new Set();
 
+  // Skip list for leg labels that are not cities
+  const skipLegLabels = ['Departure', 'Arrival', 'In transit', 'Return', 'Home'];
+
   // First pass: add cities from legs in travel order
   appData.forEach(leg => {
     if (!leg.id) return;
+
+    // Skip this leg if its label is in the skip list
+    if (leg.label) {
+      let labelOnly = leg.label.replace(/[\p{Emoji}]+/gu, '').trim();
+      if (skipLegLabels.includes(labelOnly)) return;
+    }
 
     // Try multiple ways to match leg to city
     let cityMatch = null;
@@ -438,7 +447,9 @@ function getCitiesInTravelOrder() {
     // Try matching leg label to city name
     if (!cityMatch && leg.label) {
       let cityName = leg.label.replace(/[\p{Emoji}]+/gu, '').trim();
-      cityMatch = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+      if (!skipLegLabels.includes(cityName)) {
+        cityMatch = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+      }
     }
     // Try matching days' from/to to city names
     if (!cityMatch && leg.days) {
@@ -549,9 +560,25 @@ function selectCityFilter(cityId, btn) {
 
 function scrollToCity(cityId) {
   const cityName = getCityNameById(cityId);
+
+  // First try to find leg by leg.id (matches city id)
+  const legEl = document.getElementById('leg-' + cityId);
+  if (legEl) {
+    legEl.classList.remove('collapsed');
+    const navHeight = document.querySelector('.app-tabs-nav')?.offsetHeight || 56;
+    const cityNavHeight = document.querySelector('.city-nav')?.offsetHeight || 56;
+    const offset = navHeight + cityNavHeight + 20;
+    const elTop = legEl.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({
+      top: elTop - offset,
+      behavior: 'smooth'
+    });
+    return;
+  }
+
   if (!cityName) return;
 
-  // Find first leg containing this city
+  // Fallback: Find first leg containing this city in day.from/to
   for (let i = 0; i < appData.length; i++) {
     const leg = appData[i];
     const hasCity = leg.days.some(day => day.from === cityName || day.to === cityName);
@@ -560,10 +587,9 @@ function scrollToCity(cityId) {
       const el = document.getElementById('leg-' + leg.id);
       if (el) {
         el.classList.remove('collapsed');
-        // Scroll with offset to account for sticky nav bars
         const navHeight = document.querySelector('.app-tabs-nav')?.offsetHeight || 56;
         const cityNavHeight = document.querySelector('.city-nav')?.offsetHeight || 56;
-        const offset = navHeight + cityNavHeight + 20; // +20px padding
+        const offset = navHeight + cityNavHeight + 20;
         const elTop = el.getBoundingClientRect().top + window.scrollY;
         window.scrollTo({
           top: elTop - offset,
