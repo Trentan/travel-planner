@@ -651,22 +651,22 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
 
     html += `
       <tr class="journey-parent-row" data-group="${gid}" style="border-left:3px solid ${statusColor};">
-        <td>${expandBtn}</td>
-        <td class="journey-name-col" title="${rep.journeyName || ''}">${nameDisplay}${durationDisplay}${isMultiLeg ? ` <span style="font-size:0.7rem;background:#e8f0fe;color:#3c5a99;padding:1px 5px;border-radius:8px;">${segs.length} legs</span>` : ''}</td>
-        <td>${icon}</td>
-<td class="route-col">${route}</td>
-<td class="date-col" ">${firstDep}</td>
+        <td data-label="Expand">${expandBtn}</td>
+        <td class="journey-name-col" data-label="Journey" title="${rep.journeyName || ''}">${nameDisplay}${durationDisplay}${isMultiLeg ? ` <span style="font-size:0.7rem;background:#e8f0fe;color:#3c5a99;padding:1px 5px;border-radius:8px;">${segs.length} legs</span>` : ''}</td>
+        <td data-label="Type">${icon}</td>
+<td class="route-col" data-label="Route">${route}</td>
+<td class="date-col" data-label="Departs">${firstDep}</td>
         <td>${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
         <td>${rep.provider || '—'}</td>
         <td>${rep.routeCode || '—'}</td>
-        <td class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
-        <td>
+        <td class="budget-field" data-label="Cost">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
+        <td data-label="Status">
           <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
             ${statusIcon} ${statusText}
           </span>
           ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${rep.bookingReference}</span>` : ""}
         </td>
-        <td>
+        <td data-label="Actions">
           <button class="edit-btn" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
           ${isMultiLeg
         ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
@@ -683,15 +683,15 @@ const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTim
         const segArr = formatJourneyDate(seg.arrivalDate) || '—';
         html += `
           <tr class="journey-segment-row" data-group="${gid}" style="display:none;background:#fafaf8;">
-            <td></td>
+            <td data-label="Expand"></td>
             <td style="padding-left:2rem;color:#888;font-weight:600;">↳ Leg ${i + 1}: ${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</td>
-            <td>${segIcon}</td>
-            <td class="date-col" ">${segDep}</td>
+            <td data-label="Type">${segIcon}</td>
+            <td class="date-col" data-label="Departs">${segDep}</td>
             <td class="route-col" style="color:#555;">${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</td>
             <td>${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
             <td>${seg.provider || '—'}</td>
             <td>${seg.routeCode || '—'}</td>
-            <td class="budget-field" style="color:#888;">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${seg.id}', this.innerText); buildTransportTab();">${seg.cost || '0'}</span></td>
+            <td class="budget-field" data-label="Cost" style="color:#888;">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${seg.id}', this.innerText); buildTransportTab();">${seg.cost || '0'}</span></td>
             <td>—</td>
             <td>—</td>
             <td><button class="del-btn" onclick="deleteJourney('${seg.id}'); buildTransportTab();" title="Delete segment">×</button></td>

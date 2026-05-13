@@ -9,9 +9,10 @@ Read this file at the start of every session. When using Claude Code, read from 
 ## Active Work
 
 ### Item 13: Other improvements
-- [ ] 13a. Compact view is busted
-- [ ] 13b. All dates handling from json / to json need to be in yyyy-mm-dd format so they cannot be mixed up (and ensure items loading dates can handle that format)
-- [ ] 13c. Fun mode can be removed and force refresh can be removed (reset app should handle it)
+- [x] 13a. Compact view is busted
+- [x] 13b. All dates handling from json / to json need to be in yyyy-mm-dd format so they cannot be mixed up (and ensure items loading dates can handle that format)
+- [x] 13c. Fun mode can be removed and force refresh can be removed (reset app should handle it)
+- [ ] 13d. Calculation in budget is wrong (has accommodation as $4816.4) and looks to have included a rogue trip leg 'return' flight in that total of $1700 (which anyway should be in the flight totals)
 - [ ] 13e. Fix the broken "Generate AI prompt" button.
 - [ ] 13f. Convert the testing checklist into structured TODO items and add actual smoke tests for core functionality.
 - [ ] 13g. Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.

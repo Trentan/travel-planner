@@ -17,7 +17,7 @@
       ],
       "days": [
         {
-          "date": "8 Jun",
+          "date": "2026-06-08",
           "day": "Mon",
           "from": "Brisbane",
           "to": "In transit",
@@ -73,7 +73,7 @@
       ],
       "days": [
         {
-          "date": "9 Jun",
+          "date": "2026-06-09",
           "day": "Tue",
           "from": "Taipei",
           "to": "Taipei",
@@ -149,7 +149,7 @@
       ],
       "days": [
         {
-          "date": "10 Jun",
+          "date": "2026-06-10",
           "day": "Wed",
           "from": "Vienna",
           "to": "Vienna",
@@ -238,7 +238,7 @@
       ],
       "days": [
         {
-          "date": "11 Jun",
+          "date": "2026-06-11",
           "day": "Thu",
           "from": "Vienna",
           "to": "Bratislava",
@@ -268,7 +268,7 @@
           ]
         },
         {
-          "date": "12 Jun",
+          "date": "2026-06-12",
           "day": "Fri",
           "from": "Bratislava",
           "to": "Bratislava",
@@ -381,7 +381,7 @@
       ],
       "days": [
         {
-          "date": "13 Jun",
+          "date": "2026-06-13",
           "day": "Sat",
           "from": "Bratislava",
           "to": "Prague",
@@ -411,7 +411,7 @@
           ]
         },
         {
-          "date": "14 Jun",
+          "date": "2026-06-14",
           "day": "Sun",
           "from": "Prague",
           "to": "Prague",
@@ -511,7 +511,7 @@
       ],
       "days": [
         {
-          "date": "15 Jun",
+          "date": "2026-06-15",
           "day": "Mon",
           "from": "Prague",
           "to": "Nuremberg",
@@ -618,7 +618,7 @@
       ],
       "days": [
         {
-          "date": "16 Jun",
+          "date": "2026-06-16",
           "day": "Tue",
           "from": "Nuremberg",
           "to": "Munich",
@@ -648,7 +648,7 @@
           ]
         },
         {
-          "date": "17 Jun",
+          "date": "2026-06-17",
           "day": "Wed",
           "from": "Munich",
           "to": "Munich",
@@ -678,7 +678,7 @@
           ]
         },
         {
-          "date": "18 Jun",
+          "date": "2026-06-18",
           "day": "Thu",
           "from": "Munich",
           "to": "Munich",
@@ -708,7 +708,7 @@
           ]
         },
         {
-          "date": "19 Jun",
+          "date": "2026-06-19",
           "day": "Fri",
           "from": "Munich",
           "to": "Munich",
@@ -868,7 +868,7 @@
       ],
       "days": [
         {
-          "date": "20 Jun",
+          "date": "2026-06-20",
           "day": "Sat",
           "from": "Munich",
           "to": "Innsbruck",
@@ -961,7 +961,7 @@
       ],
       "days": [
         {
-          "date": "21 Jun",
+          "date": "2026-06-21",
           "day": "Sun",
           "from": "Innsbruck",
           "to": "Bolzano",
@@ -991,7 +991,7 @@
           ]
         },
         {
-          "date": "22 Jun",
+          "date": "2026-06-22",
           "day": "Mon",
           "from": "Bolzano",
           "to": "Bolzano",
@@ -1091,7 +1091,7 @@
       ],
       "days": [
         {
-          "date": "23 Jun",
+          "date": "2026-06-23",
           "day": "Tue",
           "from": "Bolzano",
           "to": "Milan",
@@ -1159,7 +1159,7 @@
       ],
       "days": [
         {
-          "date": "24 Jun",
+          "date": "2026-06-24",
           "day": "Wed",
           "from": "Milan",
           "to": "Milan",
@@ -1252,7 +1252,7 @@
       ],
       "days": [
         {
-          "date": "25 Jun",
+          "date": "2026-06-25",
           "day": "Thu",
           "from": "Milan",
           "to": "Zurich",
@@ -1282,7 +1282,7 @@
           ]
         },
         {
-          "date": "26 Jun",
+          "date": "2026-06-26",
           "day": "Fri",
           "from": "Zurich",
           "to": "In transit",
@@ -1399,7 +1399,7 @@
       ],
       "days": [
         {
-          "date": "27 Jun",
+          "date": "2026-06-27",
           "day": "Sat",
           "from": "In transit",
           "to": "Bangkok",
@@ -1429,7 +1429,7 @@
           ]
         },
         {
-          "date": "28 Jun",
+          "date": "2026-06-28",
           "day": "Sun",
           "from": "Bangkok",
           "to": "Bangkok",
@@ -1552,7 +1552,7 @@
       ],
       "days": [
         {
-          "date": "29 Jun",
+          "date": "2026-06-29",
           "day": "Mon",
           "from": "Koh Samui",
           "to": "Koh Samui",
@@ -1582,7 +1582,7 @@
           ]
         },
         {
-          "date": "30 Jun",
+          "date": "2026-06-30",
           "day": "Tue",
           "from": "Koh Samui",
           "to": "Koh Samui",
@@ -1612,7 +1612,7 @@
           ]
         },
         {
-          "date": "1 Jul",
+          "date": "2026-07-01",
           "day": "Wed",
           "from": "Koh Samui",
           "to": "Koh Samui",
@@ -1642,7 +1642,7 @@
           ]
         },
         {
-          "date": "2 Jul",
+          "date": "2026-07-02",
           "day": "Thu",
           "from": "Koh Samui",
           "to": "Koh Samui",
@@ -1672,7 +1672,7 @@
           ]
         },
         {
-          "date": "3 Jul",
+          "date": "2026-07-03",
           "day": "Fri",
           "from": "Koh Samui",
           "to": "Koh Samui",
@@ -1702,7 +1702,7 @@
           ]
         },
         {
-          "date": "4 Jul",
+          "date": "2026-07-04",
           "day": "Sat",
           "from": "Koh Samui",
           "to": "Koh Samui",
@@ -1732,7 +1732,7 @@
           ]
         },
         {
-          "date": "5 Jul",
+          "date": "2026-07-05",
           "day": "Sun",
           "from": "Koh Samui",
           "to": "Koh Samui",
@@ -1762,7 +1762,7 @@
           ]
         },
         {
-          "date": "6 Jul",
+          "date": "2026-07-06",
           "day": "Mon",
           "from": "Koh Samui",
           "to": "Koh Samui",
@@ -2039,7 +2039,7 @@
       ],
       "days": [
         {
-          "date": "7 Jul",
+          "date": "2026-07-07",
           "day": "Tue",
           "from": "Koh Samui",
           "to": "Bangkok",
@@ -2069,7 +2069,7 @@
           ]
         },
         {
-          "date": "8 Jul",
+          "date": "2026-07-08",
           "day": "Wed",
           "from": "Brisbane",
           "to": "Brisbane",
@@ -2251,11 +2251,7 @@
               "done": false
             },
             {
-              "text": "Pillowcase for used clothes",
-              "done": false
-            },
-            {
-              "text": "Micro-fibre Towel",
+              "text": "Pillowcase for used clothes\n",
               "done": false
             },
             {
@@ -2264,6 +2260,10 @@
             },
             {
               "text": "Raincoat/Umbrella",
+              "done": false
+            },
+            {
+              "text": "Microfibre towel",
               "done": false
             }
           ]
@@ -2555,19 +2555,11 @@
   ],
   "leaveHome": [
     {
+      "text": "Kitchen and bins",
+      "kind": "section"
+    },
+    {
       "text": "Empty fridge and pantry perishables",
-      "done": false
-    },
-    {
-      "text": "Turn power off everywhere not needed",
-      "done": false
-    },
-    {
-      "text": "Check all lights and fans off",
-      "done": false
-    },
-    {
-      "text": "Check CCTV on",
       "done": false
     },
     {
@@ -2575,19 +2567,71 @@
       "done": false
     },
     {
-      "text": "Close and check all windows",
+      "text": "Empty bins",
+      "done": false,
+      "mergeKeys": [
+        "take out all rubbish and recycling"
+      ]
+    },
+    {
+      "text": "Pause or reschedule any regular deliveries",
       "done": false
+    },
+    {
+      "text": "Check mailbox is empty or hold mail service",
+      "done": false
+    },
+    {
+      "text": "Home shutdown",
+      "kind": "section"
+    },
+    {
+      "text": "Turn power off everywhere not needed",
+      "done": false,
+      "mergeKeys": [
+        "switch off power points at the wall except fridge"
+      ]
+    },
+    {
+      "text": "Check all lights and fans off",
+      "done": false
+    },
+    {
+      "text": "Close and check all windows",
+      "done": false,
+      "mergeKeys": [
+        "lock all doors and windows"
+      ]
     },
     {
       "text": "Blinds partial down",
+      "done": false,
+      "mergeKeys": [
+        "close blinds or curtains and secure loose outdoor items"
+      ]
+    },
+    {
+      "text": "Water off (including outdoor taps)",
+      "done": false,
+      "mergeKeys": [
+        "water off, including outdoor taps",
+        "turn off all taps and check for leaks"
+      ]
+    },
+    {
+      "text": "Turn off gas supply if applicable",
       "done": false
     },
     {
-      "text": "Empty bins",
+      "text": "Adjust thermostat to away or saver mode",
       "done": false
     },
     {
-      "text": "Water off, including outdoor taps",
+      "text": "Security and pets",
+      "kind": "section"
+    },
+    {
+      "text": "Check CCTV on",
       "done": false
     },
     {
@@ -2596,11 +2640,91 @@
     },
     {
       "text": "Automatic fish feeder",
-      "done": false
+      "done": false,
+      "mergeKeys": [
+        "automatic fish feeder"
+      ]
     },
     {
       "text": "Security system on",
+      "done": false,
+      "mergeKeys": [
+        "set security alarm / notify security company"
+      ]
+    },
+    {
+      "text": "Water plants or arrange plant care",
       "done": false
+    },
+    {
+      "text": "Set up lights on timers if away long",
+      "done": false
+    },
+    {
+      "text": "Travel ready",
+      "kind": "section"
+    },
+    {
+      "text": "Charge all devices including phones, tablets, and power banks",
+      "done": false
+    },
+    {
+      "text": "Download offline maps and confirmations",
+      "done": false
+    },
+    {
+      "text": "Notify emergency contact of travel plans",
+      "done": false
+    },
+    {
+      "text": "Pause gym membership or group activities",
+      "done": false
+    },
+    {
+      "text": "If taking dog",
+      "kind": "section"
+    },
+    {
+      "text": "Waste bags",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: waste bags"
+      ]
+    },
+    {
+      "text": "Water bowl",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: water bowl"
+      ]
+    },
+    {
+      "text": "Food",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: food"
+      ]
+    },
+    {
+      "text": "Toys",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: toys"
+      ]
+    },
+    {
+      "text": "Leash",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: leash"
+      ]
+    },
+    {
+      "text": "Treats",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: treats"
+      ]
     },
     {
       "text": "Lock all doors and windows",
@@ -2619,75 +2743,11 @@
       "done": false
     },
     {
-      "text": "Turn off gas supply if applicable",
-      "done": false
-    },
-    {
-      "text": "Adjust thermostat to away or saver mode",
-      "done": false
-    },
-    {
       "text": "Take out all rubbish and recycling",
       "done": false
     },
     {
-      "text": "Check mailbox is empty or hold mail service",
-      "done": false
-    },
-    {
-      "text": "Pause or reschedule any regular deliveries",
-      "done": false
-    },
-    {
-      "text": "Pause gym membership or group activities",
-      "done": false
-    },
-    {
-      "text": "Charge all devices including phones, tablets, and power banks",
-      "done": false
-    },
-    {
-      "text": "Download offline maps and confirmations",
-      "done": false
-    },
-    {
-      "text": "Notify emergency contact of travel plans",
-      "done": false
-    },
-    {
-      "text": "Water plants or arrange plant care",
-      "done": false
-    },
-    {
-      "text": "Set up lights on timers if away long",
-      "done": false
-    },
-    {
       "text": "Close blinds or curtains and secure loose outdoor items",
-      "done": false
-    },
-    {
-      "text": "If taking dog: waste bags",
-      "done": false
-    },
-    {
-      "text": "If taking dog: water bowl",
-      "done": false
-    },
-    {
-      "text": "If taking dog: food",
-      "done": false
-    },
-    {
-      "text": "If taking dog: toys",
-      "done": false
-    },
-    {
-      "text": "If taking dog: leash",
-      "done": false
-    },
-    {
-      "text": "If taking dog: treats",
       "done": false
     },
     {
@@ -2727,7 +2787,7 @@
     {
       "id": "journey_3",
       "legId": "bratislava",
-      "dayDate": "11 Jun",
+      "dayDate": "2026-06-11",
       "fromLocation": "Vienna",
       "toLocation": "Bratislava",
       "departureDate": "2026-06-11",
@@ -2752,7 +2812,7 @@
     {
       "id": "journey_4",
       "legId": "bratislava",
-      "dayDate": "12 Jun",
+      "dayDate": "2026-06-12",
       "fromLocation": "Bratislava",
       "toLocation": "Bratislava",
       "departureDate": "2026-06-12",
@@ -2777,7 +2837,7 @@
     {
       "id": "journey_5",
       "legId": "prague",
-      "dayDate": "13 Jun",
+      "dayDate": "2026-06-13",
       "fromLocation": "Bratislava",
       "toLocation": "Prague",
       "departureDate": "2026-06-13",
@@ -2802,7 +2862,7 @@
     {
       "id": "journey_6",
       "legId": "prague",
-      "dayDate": "14 Jun",
+      "dayDate": "2026-06-14",
       "fromLocation": "Prague",
       "toLocation": "Prague",
       "departureDate": "2026-06-14",
@@ -2827,7 +2887,7 @@
     {
       "id": "journey_7",
       "legId": "nuremberg",
-      "dayDate": "15 Jun",
+      "dayDate": "2026-06-15",
       "fromLocation": "Prague",
       "toLocation": "Nuremberg",
       "departureDate": "2026-06-15",
@@ -2852,7 +2912,7 @@
     {
       "id": "journey_8",
       "legId": "munich",
-      "dayDate": "16 Jun",
+      "dayDate": "2026-06-16",
       "fromLocation": "Nuremberg",
       "toLocation": "Munich",
       "departureDate": "2026-06-16",
@@ -2877,7 +2937,7 @@
     {
       "id": "journey_9",
       "legId": "innsbruck",
-      "dayDate": "20 Jun",
+      "dayDate": "2026-06-20",
       "fromLocation": "Munich",
       "toLocation": "Innsbruck",
       "departureDate": "2026-06-20",
@@ -2902,7 +2962,7 @@
     {
       "id": "journey_10",
       "legId": "bolzano",
-      "dayDate": "21 Jun",
+      "dayDate": "2026-06-21",
       "fromLocation": "Innsbruck",
       "toLocation": "Bolzano",
       "departureDate": "2026-06-21",
@@ -2927,7 +2987,7 @@
     {
       "id": "journey_11",
       "legId": "bolzano",
-      "dayDate": "22 Jun",
+      "dayDate": "2026-06-22",
       "fromLocation": "Bolzano",
       "toLocation": "Bolzano",
       "departureDate": "2026-06-22",
@@ -2952,7 +3012,7 @@
     {
       "id": "journey_12",
       "legId": "verona",
-      "dayDate": "23 Jun",
+      "dayDate": "2026-06-23",
       "fromLocation": "Bolzano",
       "toLocation": "Milan",
       "departureDate": "2026-06-23",
@@ -2977,7 +3037,7 @@
     {
       "id": "journey_13",
       "legId": "zurich",
-      "dayDate": "25 Jun",
+      "dayDate": "2026-06-25",
       "fromLocation": "Milan",
       "toLocation": "Zurich",
       "departureDate": "2026-06-25",
@@ -3002,7 +3062,7 @@
     {
       "id": "journey_16",
       "legId": "bangkok",
-      "dayDate": "28 Jun",
+      "dayDate": "2026-06-28",
       "fromLocation": "Bangkok",
       "toLocation": "Bangkok",
       "departureDate": "2026-06-28",
@@ -3027,7 +3087,7 @@
     {
       "id": "journey_18",
       "legId": "samui",
-      "dayDate": "30 Jun",
+      "dayDate": "2026-06-30",
       "fromLocation": "Koh Samui",
       "toLocation": "Koh Samui",
       "departureDate": "2026-06-30",
@@ -3052,7 +3112,7 @@
     {
       "id": "journey_19",
       "legId": "samui",
-      "dayDate": "1 Jul",
+      "dayDate": "2026-07-01",
       "fromLocation": "Koh Samui",
       "toLocation": "Koh Samui",
       "departureDate": "2026-07-01",
@@ -3079,7 +3139,7 @@
       "journeyId": "jid_single_journey_17",
       "journeyName": "Bangkok → Koh Samui",
       "legId": "samui",
-      "dayDate": "29 Jun",
+      "dayDate": "2026-06-29",
       "fromLocation": "Bangkok",
       "toLocation": "Koh Samui",
       "fromCityId": "city-bangkok",
@@ -3104,7 +3164,7 @@
       "journeyId": "jid_zrh_bkk_456",
       "journeyName": "Zurich → Bangkok (via London)",
       "legId": "zurich",
-      "dayDate": "26 Jun",
+      "dayDate": "2026-06-26",
       "fromLocation": "Zurich",
       "toLocation": "London",
       "fromCityId": "city-zurich",
@@ -3129,7 +3189,7 @@
       "journeyId": "jid_zrh_bkk_456",
       "journeyName": "Zurich → Bangkok (via London)",
       "legId": "bangkok",
-      "dayDate": "26 Jun",
+      "dayDate": "2026-06-26",
       "fromLocation": "London",
       "toLocation": "Bangkok",
       "fromCityId": "city-london",
@@ -3154,7 +3214,7 @@
       "journeyId": "jid_outbound_123",
       "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
       "legId": "departure",
-      "dayDate": "8 Jun",
+      "dayDate": "2026-06-08",
       "fromLocation": "Brisbane",
       "toLocation": "Taipei",
       "fromCityId": "city-brisbane",
@@ -3179,7 +3239,7 @@
       "journeyId": "jid_outbound_123",
       "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
       "legId": "taipei",
-      "dayDate": "9 Jun",
+      "dayDate": "2026-06-09",
       "fromLocation": "Taipei",
       "toLocation": "Bangkok",
       "fromCityId": "city-taipei",
@@ -3204,7 +3264,7 @@
       "journeyId": "jid_outbound_123",
       "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
       "legId": "vienna",
-      "dayDate": "10 Jun",
+      "dayDate": "2026-06-10",
       "fromLocation": "Bangkok",
       "toLocation": "Vienna",
       "fromCityId": "city-bangkok",
@@ -3229,7 +3289,7 @@
       "journeyId": "jid_return_789",
       "journeyName": "Koh Samui → Brisbane (via Bangkok)",
       "legId": "return",
-      "dayDate": "7 Jul",
+      "dayDate": "2026-07-07",
       "fromLocation": "Koh Samui",
       "toLocation": "Bangkok",
       "fromCityId": "city-koh-samui",
@@ -3254,7 +3314,7 @@
       "journeyId": "jid_return_789",
       "journeyName": "Koh Samui → Brisbane (via Bangkok)",
       "legId": "return",
-      "dayDate": "7 Jul",
+      "dayDate": "2026-07-07",
       "fromLocation": "Bangkok",
       "toLocation": "Brisbane",
       "fromCityId": "city-bangkok",
@@ -3440,8 +3500,8 @@
       "country": "Australia",
       "code": "BNE",
       "countryCode": "AU",
-      "dateFrom": "8 Jul",
-      "dateTo": "8 Jun",
+      "dateFrom": "2026-07-08",
+      "dateTo": "2026-06-08",
       "colour": "#3498DB"
     },
     {
@@ -3450,8 +3510,8 @@
       "country": "Taiwan",
       "code": "TPE",
       "countryCode": "TW",
-      "dateFrom": "9 Jun",
-      "dateTo": "9 Jun",
+      "dateFrom": "2026-06-09",
+      "dateTo": "2026-06-09",
       "colour": "#3498DB"
     },
     {
@@ -3460,7 +3520,7 @@
       "country": "Austria",
       "code": "VIE",
       "countryCode": "AT",
-      "dateFrom": "10 Jun",
+      "dateFrom": "2026-06-10",
       "dateTo": "2026-06-10",
       "colour": "#2C3E50"
     },
@@ -3470,7 +3530,7 @@
       "country": "Slovakia",
       "code": "BTS",
       "countryCode": "SK",
-      "dateFrom": "11 Jun",
+      "dateFrom": "2026-06-11",
       "dateTo": "2026-06-11",
       "colour": "#FF5722"
     },
@@ -3480,7 +3540,7 @@
       "country": "Czech Republic",
       "code": "PRG",
       "countryCode": "CZ",
-      "dateFrom": "13 Jun",
+      "dateFrom": "2026-06-13",
       "dateTo": "2026-06-13",
       "colour": "#E91E63"
     },
@@ -3490,7 +3550,7 @@
       "country": "Germany",
       "code": "NUR",
       "countryCode": "DE",
-      "dateFrom": "15 Jun",
+      "dateFrom": "2026-06-15",
       "dateTo": "2026-06-15",
       "colour": "#8BC34A"
     },
@@ -3500,7 +3560,7 @@
       "country": "Germany",
       "code": "MUC",
       "countryCode": "DE",
-      "dateFrom": "16 Jun",
+      "dateFrom": "2026-06-16",
       "dateTo": "2026-06-19",
       "colour": "#CDDC39"
     },
@@ -3510,8 +3570,8 @@
       "country": "Austria",
       "code": "INN",
       "countryCode": "AT",
-      "dateFrom": "20 Jun",
-      "dateTo": "21 Jun",
+      "dateFrom": "2026-06-20",
+      "dateTo": "2026-06-21",
       "colour": "#E74C3C"
     },
     {
@@ -3521,7 +3581,7 @@
       "code": "BOL",
       "countryCode": "IT",
       "dateFrom": "2026-06-21",
-      "dateTo": "23 Jun",
+      "dateTo": "2026-06-23",
       "colour": "#E91E63"
     },
     {
@@ -3531,7 +3591,7 @@
       "code": "MIL",
       "countryCode": "IT",
       "dateFrom": "2026-06-23",
-      "dateTo": "25 Jun",
+      "dateTo": "2026-06-25",
       "colour": "#2C3E50"
     },
     {
@@ -3541,7 +3601,7 @@
       "code": "ZRH",
       "countryCode": "CH",
       "dateFrom": "2026-06-25",
-      "dateTo": "26 Jun",
+      "dateTo": "2026-06-26",
       "colour": "#795548"
     },
     {
@@ -3551,7 +3611,7 @@
       "code": "BKK",
       "countryCode": "TH",
       "dateFrom": "2026-06-27",
-      "dateTo": "7 Jul",
+      "dateTo": "2026-07-07",
       "colour": "#8BC34A"
     },
     {
@@ -3560,8 +3620,8 @@
       "country": "Thailand",
       "code": "USM",
       "countryCode": "TH",
-      "dateFrom": "1 Jul",
-      "dateTo": "7 Jul",
+      "dateFrom": "2026-07-01",
+      "dateTo": "2026-07-07",
       "colour": "#F39C12"
     },
     {

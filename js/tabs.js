@@ -60,22 +60,22 @@ function buildAccomTab(cityFilter = null) {
     const provider = stay.provider ? `<br><span style="font-size:0.8rem; color:#888;">${stay.provider}</span>` : '';
 
     html += `<tr style="border-left-color: ${cityColor}">
-      <td class="city-col">${getCityFlagHTML(cityName)} ${cityName}</td>
-      <td class="property-col">
+      <td class="city-col" data-label="City">${getCityFlagHTML(cityName)} ${cityName}</td>
+      <td class="property-col" data-label="Property">
         <span style="font-weight:600;" contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)">${escapeHtml(stay.propertyName)}</span>
         ${provider}
       </td>
-      <td class="date-col">${formatDateShort(stay.checkIn)}</td>
-      <td class="date-col">${formatDateShort(stay.checkOut)}</td>
-      <td class="nights-col">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
-      <td>
+      <td class="date-col" data-label="Check-in">${formatDateShort(stay.checkIn)}</td>
+      <td class="date-col" data-label="Check-out">${formatDateShort(stay.checkOut)}</td>
+      <td class="nights-col" data-label="Nights">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
+      <td data-label="Status">
         <span class="status-badge" style="background:${statusColor}; cursor:pointer;" onclick="event.stopPropagation(); toggleStayStatus(event, '${stay.id}')">${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}</span>
         ${bookingRef}
       </td>
-      <td class="budget-field" style="width:100px;">
+      <td class="budget-field" data-label="Cost" style="width:100px;">
         $<span contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'totalCost', this.innerText)">${stay.totalCost || '0'}</span>
       </td>
-      <td class="actions-col">
+      <td class="actions-col" data-label="Actions">
         <button class="edit-btn" title="Edit Stay" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')">✎</button>
         <button class="del-btn" title="Delete Stay" onclick="event.stopPropagation(); deleteStay('${stay.id}')">×</button>
       </td>
@@ -84,7 +84,7 @@ function buildAccomTab(cityFilter = null) {
     // Add notes row if exists
     if (stay.notes) {
       html += `<tr style="border-left-color: ${cityColor}">
-        <td colspan="8" style="padding: 8px 16px; background: #f9f9f9; font-size: 0.85rem; color: #666; border-top: none;">
+        <td colspan="8" data-label="Notes" style="padding: 8px 16px; background: #f9f9f9; font-size: 0.85rem; color: #666; border-top: none;">
           <em>${escapeHtml(stay.notes)}</em>
         </td>
       </tr>`;
@@ -319,7 +319,7 @@ function buildBudgetTab() {
 
   let html = `<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>Trip Leg</th><th>Transport</th><th>Accommodation</th><th>Activities</th><th>Leg Total</th></tr></thead><tbody>`;
   legBreakdown.forEach(l => {
-    html += `<tr style="border-left-color: ${l.colour}"><td style="font-weight:600;">${l.label}</td><td>$${l.trans}</td><td>$${l.accom}</td><td>$${l.act}</td><td style="font-family:'DM Mono',monospace; font-weight:600;">$${l.total}</td></tr>`;
+    html += `<tr style="border-left-color: ${l.colour}"><td data-label="Trip Leg" style="font-weight:600;">${l.label}</td><td data-label="Transport">$${l.trans}</td><td data-label="Accommodation">$${l.accom}</td><td data-label="Activities">$${l.act}</td><td data-label="Leg Total" style="font-family:'DM Mono',monospace; font-weight:600;">$${l.total}</td></tr>`;
   });
   html += `</tbody></table></div>`;
   container.innerHTML = html;
