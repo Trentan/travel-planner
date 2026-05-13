@@ -1653,8 +1653,11 @@ function initData() {
 
   const savedLeaveHome = localStorage.getItem('travelApp_leavehome_v3');
   if (savedLeaveHome) {
-    leaveHomeData = JSON.parse(savedLeaveHome);
-    if (!leaveHomeData || leaveHomeData.length === 0) {
+    try {
+      const parsedLeaveHome = JSON.parse(savedLeaveHome);
+      leaveHomeData = mergeChecklistWithDefaults(parsedLeaveHome);
+    } catch (e) {
+      console.error('[LeaveHome] Failed to parse saved checklist:', e);
       leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
     }
   } else {
@@ -2115,7 +2118,7 @@ function importJSON(event) {
         const migrated = migratePacking(importedData.packing);
         packingData = migrated || packingData;
       }
-      if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
+      if (importedData.leaveHome) leaveHomeData = mergeChecklistWithDefaults(importedData.leaveHome);
 if (importedData.meta) {
   if (importedData.meta.title) titleData.title = importedData.meta.title;
   if (importedData.meta.subtitle) titleData.subtitle = importedData.meta.subtitle;

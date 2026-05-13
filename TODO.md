@@ -22,7 +22,7 @@ Read this file at the start of every session. When using Claude Code, read from 
 - [x] 9d. Add an easy way for users to force a complete site refresh on mobile app and website.
 
 ### Item 12: Packing improvements
-- [ ] 12a. Improve the default Before Leaving Home checklist by merging/comparing the user's checklist below.
+- [x] 12a. Improve the default Before Leaving Home checklist by merging/comparing the user's checklist below.
   - [ ]  Empty fridge and pantry perishables
   - [ ]  Turn power off everywhere not needed
   - [ ]  Check all lights and fans off
@@ -41,7 +41,7 @@ Read this file at the start of every session. When using Claude Code, read from 
       - [ ]  Food
       - [ ]  Toys
       - [ ]  Leash
-      - [ ]  Treats
+  - [ ]  Treats
 - [ ] 12b. Allow deleting sub category blocks in Packing.
 - [ ] 12c. Add "Restore Packing to Default" to wipe ALL packing changes and reload defaults.
 - [ ] 12d. Improve the packing hints/guides UI.

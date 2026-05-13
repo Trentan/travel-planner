@@ -134,25 +134,77 @@ function getActivityLabel(category) {
 }
 
 const DEFAULT_LEAVE_HOME = [
+  {text: "Empty fridge and pantry perishables", done: false},
+  {text: "Turn power off everywhere not needed", done: false},
+  {text: "Check all lights and fans off", done: false},
+  {text: "Check CCTV on", done: false},
+  {text: "Empty coffee and compost bins and leave outside", done: false},
+  {text: "Close and check all windows", done: false},
+  {text: "Blinds partial down", done: false},
+  {text: "Empty bins", done: false},
+  {text: "Water off, including outdoor taps", done: false},
+  {text: "Dog door panel / lock", done: false},
+  {text: "Automatic fish feeder", done: false},
+  {text: "Security system on", done: false},
   {text: "Lock all doors and windows", done: false},
   {text: "Set security alarm / notify security company", done: false},
   {text: "Turn off all taps and check for leaks", done: false},
-  {text: "Switch off PowerPoints at the wall (except fridge)", done: false},
+  {text: "Switch off power points at the wall except fridge", done: false},
   {text: "Turn off gas supply if applicable", done: false},
-  {text: "Adjust thermostat to away/saver mode", done: false},
-  {text: "Remove or use up perishables from fridge", done: false},
-  {text: "Check pantry for items that may expire", done: false},
+  {text: "Adjust thermostat to away or saver mode", done: false},
   {text: "Take out all rubbish and recycling", done: false},
-  {text: "Check mailbox is empty / hold mail service", done: false},
+  {text: "Check mailbox is empty or hold mail service", done: false},
   {text: "Pause or reschedule any regular deliveries", done: false},
   {text: "Pause gym membership or group activities", done: false},
-  {text: "Charge all devices (phones, tablets, power banks)", done: false},
+  {text: "Charge all devices including phones, tablets, and power banks", done: false},
   {text: "Download offline maps and confirmations", done: false},
   {text: "Notify emergency contact of travel plans", done: false},
   {text: "Water plants or arrange plant care", done: false},
-  {text: "Set up lights on timers (if away long)", done: false},
-  {text: "Close blinds/curtains and secure loose outdoor items", done: false}
+  {text: "Set up lights on timers if away long", done: false},
+  {text: "Close blinds or curtains and secure loose outdoor items", done: false},
+  {text: "If taking dog: waste bags", done: false},
+  {text: "If taking dog: water bowl", done: false},
+  {text: "If taking dog: food", done: false},
+  {text: "If taking dog: toys", done: false},
+  {text: "If taking dog: leash", done: false},
+  {text: "If taking dog: treats", done: false}
 ];
+
+function normalizeChecklistText(text) {
+  return String(text || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
+function mergeChecklistWithDefaults(savedItems, defaultItems = DEFAULT_LEAVE_HOME) {
+  const savedList = Array.isArray(savedItems) ? savedItems : [];
+  const defaults = Array.isArray(defaultItems) ? defaultItems : [];
+  const savedMap = new Map();
+
+  savedList.forEach(item => {
+    if (!item || !item.text) return;
+    const key = normalizeChecklistText(item.text);
+    if (!key || savedMap.has(key)) return;
+    savedMap.set(key, { ...item });
+  });
+
+  const merged = defaults.map(def => {
+    const key = normalizeChecklistText(def.text);
+    const saved = savedMap.get(key);
+    return saved ? { ...def, ...saved, text: saved.text || def.text } : JSON.parse(JSON.stringify(def));
+  });
+
+  savedList.forEach(item => {
+    if (!item || !item.text) return;
+    const key = normalizeChecklistText(item.text);
+    if (!key) return;
+    const existsInDefaults = defaults.some(def => normalizeChecklistText(def.text) === key);
+    if (!existsInDefaults) merged.push({ ...item });
+  });
+
+  return merged;
+}
 
 const DEFAULT_PACKING = [
   {
