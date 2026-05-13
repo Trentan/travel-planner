@@ -20,7 +20,7 @@ const GUIDE_STEPS = [
     description: 'Click "Cities" to add and manage destinations. Each city gets a color and can be filtered across all tabs. Tips, food, activities, and accommodation can all be assigned to cities.',
     demo: 'button',
     demoText: '🌍 Cities',
-    hint: 'Cities appear in the navigation bar below the tabs for quick filtering.'
+    hint: 'On mobile, use the Menu button for quick access to Cities and other tools.'
   },
   {
     id: 'add-leg',

@@ -35,6 +35,7 @@
     <button class="app-menu-btn" onclick="exportJSON()">📤 Export Backup</button>
     <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="promptInstallApp()">⬇ Install App</button>
     <button class="app-menu-btn danger" onclick="resetData()">Reset App</button>
+    <button class="app-menu-btn mobile-menu-btn" onclick="toggleMobileMenu()">☰ Menu</button>
   </div>
 </div>
 
@@ -43,13 +44,6 @@
     <div class="header-text">
       <h1 contenteditable="true" id="mainTitle"></h1>
       <p contenteditable="true" id="mainSubtitle"></p>
-    </div>
-    <div class="header-widgets">
-      <div class="clock-widget">
-        <div class="clock-row"><span class="clock-label">🏠 Home</span><span id="time-joy">--:--</span></div>
-        <div class="clock-row"><span class="clock-label">🌍 Destination 1</span><span id="time-eur">--:--</span></div>
-        <div class="clock-row"><span class="clock-label">🌏 Destination 2</span><span id="time-tha">--:--</span></div>
-      </div>
     </div>
   </div>
 </header>
@@ -145,6 +139,27 @@
           <div style="display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.85rem;" id="map-legend-container"></div>
         </div>
         <div class="journey-stats" id="journey-stats" style="margin-top: 1.5rem; padding: 1rem; background: #FAFAF8; border-radius: 8px;"></div>
+      </div>
+    </div>
+  </div>
+  <div id="mobileMenuSheet" class="mobile-menu-sheet" aria-hidden="true" onclick="closeMobileMenu(event)">
+    <div class="mobile-menu-sheet-panel" role="dialog" aria-modal="true" aria-label="App actions" onclick="event.stopPropagation()">
+      <div class="mobile-menu-sheet-header">
+        <div>
+          <h2>Actions</h2>
+          <p>Quick app controls for mobile</p>
+        </div>
+        <button class="modal-close" onclick="closeMobileMenu()">&times;</button>
+      </div>
+      <div class="mobile-menu-sheet-grid">
+        <button class="app-menu-btn" onclick="closeMobileMenu(); openCityDialog()">🌍 Cities</button>
+        <button class="app-menu-btn" onclick="closeMobileMenu(); openAIDialog()">🤖 AI Builder</button>
+        <button class="app-menu-btn" onclick="closeMobileMenu(); openGuideDialog()">📖 Guide</button>
+        <button class="app-menu-btn" onclick="closeMobileMenu(); openPrintPreview()">🖨 Print Itinerary</button>
+        <button class="app-menu-btn" onclick="document.getElementById('importFile').click(); closeMobileMenu()">📥 Import JSON</button>
+        <button class="app-menu-btn" onclick="exportJSON(); closeMobileMenu()">📤 Export Backup</button>
+        <button id="mobileInstallAppBtn" class="app-menu-btn install-btn" hidden onclick="closeMobileMenu(); promptInstallApp()">⬇ Install App</button>
+        <button class="app-menu-btn danger" onclick="closeMobileMenu(); resetData()">Reset App</button>
       </div>
     </div>
   </div>
@@ -558,8 +573,11 @@
 
   function syncInstallButton() {
     const btn = document.getElementById('installAppBtn');
+    const mobileBtn = document.getElementById('mobileInstallAppBtn');
     if (!btn) return;
     btn.hidden = isStandaloneDisplayMode() || !deferredInstallPrompt;
+    if (mobileBtn) mobileBtn.hidden = btn.hidden;
+    if (typeof syncResponsiveUi === 'function') syncResponsiveUi();
   }
 
   async function promptInstallApp() {
@@ -589,9 +607,6 @@
     deferredInstallPrompt = null;
     syncInstallButton();
   });
-
-  setInterval(updateClocks, 1000);
-  updateClocks();
 
   document.addEventListener('DOMContentLoaded', () => {
     syncInstallButton();
