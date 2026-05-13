@@ -2027,38 +2027,6 @@ if (importedData.stays && Array.isArray(importedData.stays)) {
   });
 }
 
-// Extract cities from leg labels (for legs without proper cityId references)
-// This catches transit cities like "Verona" that appear as leg labels but not in day.from/to
-var legLabelCities = [];
-if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
-  importedData.itinerary.forEach(leg => {
-    // Try to extract city name from leg label (e.g., "🇮🇹 Verona" -> "Verona")
-    let label = leg.label || '';
-    // Remove emoji patterns - flags, symbols, any emoji character
-    let cityFromLabel = label
-      .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
-      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
-      .replace(/[\u{2600}-\u{26FF}]/gu, '')
-      .replace(/[\u{2700}-\u{27BF}]/gu, '')
-      .replace(/\p{Emoji}/gu, '')
-      .replace(/[^\w\s-]/gu, '')  // Remove any remaining non-letter/dash chars
-      .trim();
-    if (cityFromLabel && cityFromLabel !== 'Departure' && cityFromLabel !== 'Arrival' && cityFromLabel !== 'In transit') {
-      // Check if this leg's days don't actually reference this city
-      let cityInDays = false;
-      (leg.days || []).forEach(day => {
-        if (day.from === cityFromLabel || day.to === cityFromLabel) cityInDays = true;
-      });
-      if (!cityInDays) {
-        legLabelCities.push(cityFromLabel);
-        console.log("[Import] Found transit city from leg label: '" + cityFromLabel + "' (from label: '" + label + "')");
-      } else {
-        console.log("[Import] City '" + cityFromLabel + "' already in day.from/to, not adding as transit");
-      }
-    }
-  });
-}
-
 // Import cities if present in the JSON, otherwise extract from itinerary
 if (importedData.cities && Array.isArray(importedData.cities)) {
   citiesData = importedData.cities;
