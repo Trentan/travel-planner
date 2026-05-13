@@ -34,6 +34,7 @@
     <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
     <button class="app-menu-btn" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
     <button class="app-menu-btn" onclick="exportJSON()">📤 Export Backup</button>
+    <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="promptInstallApp()">⬇ Install App</button>
     <button class="app-menu-btn" onclick="openForceRefreshDialog()">🔄 Force Refresh</button>
     <button class="app-menu-btn danger" onclick="resetData()">Reset App</button>
   </div>
@@ -635,11 +636,45 @@
 <script src="./js/auto-stays.js"></script>
 <script src="./js/transport.js"></script>
 <script>
+  let deferredInstallPrompt = null;
+
+  function isStandaloneDisplayMode() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  function syncInstallButton() {
+    const btn = document.getElementById('installAppBtn');
+    if (!btn) return;
+    btn.hidden = isStandaloneDisplayMode() || !deferredInstallPrompt;
+  }
+
+  async function promptInstallApp() {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    try {
+      await deferredInstallPrompt.userChoice;
+    } finally {
+      deferredInstallPrompt = null;
+      syncInstallButton();
+    }
+  }
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+      navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(err => console.log('SW registration failed:', err));
     });
   }
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    syncInstallButton();
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    syncInstallButton();
+  });
 
   setInterval(updateClocks, 1000);
   updateClocks();
@@ -775,6 +810,7 @@
     if (checkbox) {
       checkbox.addEventListener('change', updateRefreshButtonState);
     }
+    syncInstallButton();
   });
 
   initData();
