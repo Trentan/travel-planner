@@ -10,6 +10,7 @@ none
   - Expanded "Restore Packing to Default" so it resets packing lists and the Before Leaving Home checklist together.
   - Replaced the old 3-column packing guide experience with a single-open guide shell and cleaner leave-home layout.
   - Follow-up refinement applied: removed the packing guide summary banner and removed explicit close-guide buttons so the guide pills are the only show/hide control.
+  - Follow-up refinement applied: removed the empty-state guide panel so no placeholder shows when all guide pills are collapsed.
   - Verification run: `node --check js/utils.js`, `node --check js/packing.js`
   - Pending: browser smoke test and user review
 - **Item:** 9e — branch `item-9e-import-transit-cities` — PR needs to be created

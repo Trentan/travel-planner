@@ -214,16 +214,7 @@ function renderPackingGuidePanel() {
     `;
   }
 
-  return `
-    <div class="packing-guide-panel guide-panel">
-      <div class="guide-panel-header">
-        <h4>Packing Guides</h4>
-      </div>
-      <div class="guide-panel-content">
-        <p class="guide-empty">Choose a guide above to view the details.</p>
-      </div>
-    </div>
-  `;
+  return '';
 }
 
 function renderPackingGuidesShell() {
