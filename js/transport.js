@@ -507,6 +507,7 @@ function getSortedJourneys() {
 }
 
 function formatJourneyDate(dateStr) {
+  if (typeof formatTripDateForDisplay === 'function') return formatTripDateForDisplay(dateStr);
   if (!dateStr) return '';
   if (typeof dateStr === 'string' && dateStr.match(/^\d+\s+[A-Za-z]{3}$/)) return dateStr;
   try {

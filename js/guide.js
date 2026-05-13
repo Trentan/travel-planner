@@ -79,8 +79,8 @@ const GUIDE_STEPS = [
     title: 'Toggle View Modes',
     description: 'Use the top bar buttons to change how you view your trip:',
     demo: 'modes',
-    modes: ['📋 Fun Mode - hides logistics/budget', '🔒 Lock - disables editing (Read Only)'],
-    hint: 'Each mode helps you focus on what matters at that moment.'
+    modes: ['🔒 Lock - disables editing (Read Only)', '📄 Compact View - condenses the itinerary layout'],
+    hint: 'Use Read Only to avoid accidental edits and Compact View for a denser trip overview.'
   },
   {
     id: 'print',
@@ -270,7 +270,7 @@ const TUTORIAL_STEPS = [
   {
     target: '.app-menu-right',
     title: 'View Modes & Tools',
-    text: 'Toggle Fun Mode, Read Only, access Cities, AI Builder, Guide, and Print from the top menu.',
+    text: 'Use Read Only, Compact View, Cities, AI Builder, Guide, and Print from the top menu.',
     position: 'bottom'
   },
   {

@@ -24,12 +24,13 @@ function buildCompactItinerary() {
     html += '<div style="padding:8px;">';
     leg.days.forEach((day, dayIdx) => {
       const dayTotal = getDayTotal(day);
+      const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
       html += `<div style="border-left:4px solid ${leg.colour}; margin:6px 0; padding:6px; background:#fafafa;">
       <div style="display:flex; gap:6px; align-items:center; font-size:11px;">
         <input type="checkbox" ${day.completed ? 'checked' : ''}
           onchange="toggleDayCompleted(event, ${legIndex}, ${dayIdx})"
           style="width:14px; height:14px; accent-color:#27AE60;">
-        <span style="font-weight:600;">${day.day} ${day.date}</span>
+        <span style="font-weight:600;">${day.day} ${dayDateLabel}</span>
         <span style="font-size:10px;">${day.from} → ${day.to}</span>
         <span style="font-size:9px; color:#666; flex:1;">${day.desc || ''}</span>
         ${dayTotal ? `<span style="font-weight:600; font-family:monospace;">${dayTotal}</span>` : ''}
@@ -102,6 +103,7 @@ function buildItinerary() {
 // Parse "8 Jun" style date to ISO format for comparison
 // year parameter allows specifying the trip year (default 2026)
 function normalizeDate(dateStr, year = 2026) {
+  if (typeof normalizeTripDateValue === 'function') return normalizeTripDateValue(dateStr, year);
   if (!dateStr) return '';
   // Already ISO format
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
@@ -336,12 +338,13 @@ function getStayDisplayForDay(dayDate, dayCity) {
       const dayKey = `${day.day}-${day.date}`;
       const shouldBeOpen = openDayCardIds.has(dayKey);
       const openClass = shouldBeOpen ? 'open' : '';
+      const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
 
       html += `
       <div class="day-card ${completedClass} ${openClass}">
         <div class="day-bar" style="--leg-colour:${leg.colour}" onclick="toggleCard(this)">
           <input type="checkbox" class="day-checkbox" ${day.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleDayCompleted(event, ${legIndex}, ${dayIndex})">
-          <div class="day-date"><span class="day-num">${day.date}</span><span class="day-name">${day.day}</span></div>
+          <div class="day-date"><span class="day-num">${dayDateLabel}</span><span class="day-name">${day.day}</span></div>
           <div class="day-title"><div class="day-cities">${cityHTML}</div><div class="day-desc" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
           ${dayTotal ? `<div class="day-total-cost" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron">▼</span>
         </div>

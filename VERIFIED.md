@@ -159,3 +159,13 @@ Confirmed completed items. Append-only archive — do not edit existing entries.
 - Added category-block deletion in Packing.
 - Added a Restore Packing to Default action for both packing lists and the leave-home checklist.
 - Reworked the packing guide UI into a single-panel picker with one guide open at a time.
+
+---
+
+### Item 9: Stable Release Polish
+**Completed:** 2026-05-13 - confirmed complete by user
+
+- 9a: Fixed trip title and subtitle persistence.
+- 9b: Added accommodation auto-populate for missing nights.
+- 9c: Restored the "Walk-on Gear (Wear onto plane)" packing area.
+- 9d: Added an easy way to force a complete site refresh on mobile app and website.

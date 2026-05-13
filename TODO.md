@@ -8,24 +8,10 @@ Read this file at the start of every session. When using Claude Code, read from 
 
 ## Active Work
 
-### Item 9: Stable Release Polish
-
-**Status:** In progress  
-**Next:** 9d
-
-- [x] 9a. Fix trip title and subtitle persistence.
-  - Complete: PR #14 merged.
-- [x] 9b. Add accommodation auto-populate for missing nights.
-  - Complete: PR #16 merged.
-- [x] 9c. Restore "Walk-on Gear (Wear onto plane)" packing area.
-  - Complete: PR #17 merged.
-- [x] 9d. Add an easy way for users to force a complete site refresh on mobile app and website.
-
 ### Item 13: Other improvements
 - [ ] 13a. Compact view is busted
 - [ ] 13b. All dates handling from json / to json need to be in yyyy-mm-dd format so they cannot be mixed up (and ensure items loading dates can handle that format)
 - [ ] 13c. Fun mode can be removed and force refresh can be removed (reset app should handle it)
-- [ ] 13d. For the guides in packing - These could be contained in a Helpful hints style dropdown (and then each clicked to load) so it takes up less screen space : Before Leaving Home, Hotel Sink Washing, Capsule Wardrobe Prompt - and close guide. 
 - [ ] 13e. Fix the broken "Generate AI prompt" button.
 - [ ] 13f. Convert the testing checklist into structured TODO items and add actual smoke tests for core functionality.
 - [ ] 13g. Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.
