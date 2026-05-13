@@ -202,6 +202,26 @@ function getStayDisplayForDay(dayDate, dayCity) {
   if (daysCount > 0) {
     const firstDay = leg.days[0].date;
     const lastDay = leg.days[leg.days.length - 1].date;
+    const skipCityNames = ['Home', 'In transit', 'Between cities', 'TBC', '', 'Return', 'Departure', 'Arrival'];
+    const cleanLabel = (leg.label || '')
+      .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')
+      .replace(/\p{Emoji}/gu, '')
+      .replace(/[^\w\s-]/gu, '')
+      .trim();
+    const labelLooksTransit = /(\bto\b|via|transit|travel|flight|train|bus|→|->)/i.test(leg.label || '');
+    const hasDestinationDay = leg.days.some(day =>
+      day.from &&
+      day.to &&
+      day.from === day.to &&
+      !skipCityNames.includes(day.to)
+    );
+    const labelMatchesDayCity = cleanLabel && leg.days.some(day =>
+      (day.to && cleanLabel.toLowerCase() === day.to.toLowerCase()) ||
+      (day.from && cleanLabel.toLowerCase() === day.from.toLowerCase())
+    );
 
     // Check if any stays overlap with this legs dates
     const hasStays = (typeof stays !== 'undefined' && Array.isArray(stays)) ? stays.some(s => {
@@ -213,11 +233,11 @@ function getStayDisplayForDay(dayDate, dayCity) {
 
     // If no accommodation at all, its likely a transit leg
     if (!hasStays && !hasOldAccom) {
-      isTransit = true;
+      isTransit = labelLooksTransit || (!hasDestinationDay && !labelMatchesDayCity);
     } else if (daysCount === 1) {
       // For single-day legs, check if its a city mismatch
       const toCity = leg.days[0].to;
-      if (!leg.label.includes(toCity) && leg.days[0].from !== toCity) {
+      if (!labelMatchesDayCity && !hasDestinationDay && !(leg.label || '').includes(toCity) && leg.days[0].from !== toCity) {
         isTransit = true;
       }
     }
@@ -415,69 +435,209 @@ function buildNav() {
   buildCityNav();
 }
 
+const CITY_NAV_SKIP_NAMES = ['departure', 'arrival', 'in transit', 'between cities', 'tbc', 'return', 'home', ''];
+
+function cleanCityNavLabel(value) {
+  if (!value || typeof value !== 'string') return '';
+  return value
+    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+    .replace(/[\u{2600}-\u{26FF}]/gu, '')
+    .replace(/[\u{2700}-\u{27BF}]/gu, '')
+    .replace(/\p{Emoji}/gu, '')
+    .replace(/[^\w\s-]/gu, '')
+    .trim();
+}
+
+function shouldSkipCityNavName(cityName) {
+  return CITY_NAV_SKIP_NAMES.includes((cityName || '').trim().toLowerCase());
+}
+
+function getCityByName(cityName) {
+  if (!cityName || !Array.isArray(citiesData)) return null;
+  return citiesData.find(c => (c.name || '').toLowerCase() === cityName.trim().toLowerCase()) || null;
+}
+
+function getTripTimelineYear() {
+  if (Array.isArray(journeys)) {
+    const datedJourney = journeys.find(j => /^\d{4}-\d{2}-\d{2}$/.test(j.departureDate || j.arrivalDate || j.dayDate || ''));
+    if (datedJourney) return Number((datedJourney.departureDate || datedJourney.arrivalDate || datedJourney.dayDate).slice(0, 4));
+  }
+  return new Date().getFullYear();
+}
+
+function getTimelineScore(dateValue, timeValue = '', fallback = Number.MAX_SAFE_INTEGER) {
+  if (!dateValue || typeof dateValue !== 'string') return fallback;
+
+  const trimmedDate = dateValue.trim();
+  let year;
+  let month;
+  let day;
+
+  const isoMatch = trimmedDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    year = Number(isoMatch[1]);
+    month = Number(isoMatch[2]) - 1;
+    day = Number(isoMatch[3]);
+  } else {
+    const shortMatch = trimmedDate.match(/^(\d{1,2})\s+([A-Za-z]{3,})$/);
+    if (!shortMatch) return fallback;
+
+    const months = {
+      jan: 0, january: 0,
+      feb: 1, february: 1,
+      mar: 2, march: 2,
+      apr: 3, april: 3,
+      may: 4,
+      jun: 5, june: 5,
+      jul: 6, july: 6,
+      aug: 7, august: 7,
+      sep: 8, sept: 8, september: 8,
+      oct: 9, october: 9,
+      nov: 10, november: 10,
+      dec: 11, december: 11
+    };
+
+    const monthKey = shortMatch[2].toLowerCase();
+    if (!Object.prototype.hasOwnProperty.call(months, monthKey)) return fallback;
+
+    year = getTripTimelineYear();
+    month = months[monthKey];
+    day = Number(shortMatch[1]);
+  }
+
+  const timeMatch = (timeValue || '').match(/^(\d{1,2}):(\d{2})$/);
+  const hours = timeMatch ? Number(timeMatch[1]) : 12;
+  const minutes = timeMatch ? Number(timeMatch[2]) : 0;
+  return Date.UTC(year, month, day, hours, minutes) / 60000;
+}
+
+function getLegDateScore(leg, legIndex) {
+  const firstDay = leg?.days?.[0];
+  return getTimelineScore(firstDay?.date, '', legIndex * 10000);
+}
+
+function addCityOrderCandidate(orderMap, cityName, score, sourceRank = 0) {
+  if (shouldSkipCityNavName(cityName)) return;
+  const city = getCityByName(cityName);
+  if (!city) return;
+
+  const existing = orderMap.get(city.id);
+  const candidate = { score, sourceRank };
+  if (!existing || score < existing.score || (score === existing.score && sourceRank < existing.sourceRank)) {
+    orderMap.set(city.id, candidate);
+  }
+}
+
 // Get cities in travel order based on trip legs
 function getCitiesInTravelOrder() {
   if (!Array.isArray(appData) || appData.length === 0) {
     return citiesData;
   }
 
-  const orderedCities = [];
-  const seenCityIds = new Set();
+  const orderMap = new Map();
 
-  // Skip list for leg labels that are not cities
-  const skipLegLabels = ['Departure', 'Arrival', 'In transit', 'Return', 'Home'];
-
-  // First pass: add cities from legs in travel order
-  appData.forEach(leg => {
-    if (!leg.id) return;
-
-    // Skip this leg if its label is in the skip list
-    if (leg.label) {
-      let labelOnly = leg.label.replace(/[\p{Emoji}]+/gu, '').trim();
-      if (skipLegLabels.includes(labelOnly)) return;
+  appData.forEach((leg, legIndex) => {
+    const legBaseScore = getLegDateScore(leg, legIndex);
+    const labelCity = cleanCityNavLabel(leg.label);
+    const labelAlreadyInDayRoute = labelCity && (leg.days || []).some(day =>
+      (day.from && day.from.toLowerCase() === labelCity.toLowerCase()) ||
+      (day.to && day.to.toLowerCase() === labelCity.toLowerCase())
+    );
+    if (labelCity && !shouldSkipCityNavName(labelCity) && !labelAlreadyInDayRoute) {
+      addCityOrderCandidate(orderMap, labelCity, legBaseScore - 0.5, 1);
     }
 
-    // Try multiple ways to match leg to city
-    let cityMatch = null;
-
-    // Try leg.id with "city-" prefix
-    if (!cityMatch) cityMatch = citiesData.find(c => c.id === 'city-' + leg.id);
-    // Try direct leg.id match
-    if (!cityMatch) cityMatch = citiesData.find(c => c.id === leg.id);
-    // Try matching leg label to city name
-    if (!cityMatch && leg.label) {
-      let cityName = leg.label.replace(/[\p{Emoji}]+/gu, '').trim();
-      if (!skipLegLabels.includes(cityName)) {
-        cityMatch = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
-      }
-    }
-    // Try matching days' from/to to city names
-    if (!cityMatch && leg.days) {
-      leg.days.forEach(day => {
-        if (!cityMatch && day.to && day.to !== 'Home' && day.to !== 'In transit') {
-          cityMatch = citiesData.find(c => c.name === day.to);
-        }
-        if (!cityMatch && day.from && day.from !== 'Home' && day.from !== 'In transit') {
-          cityMatch = citiesData.find(c => c.name === day.from);
-        }
-      });
-    }
-
-    if (cityMatch && !seenCityIds.has(cityMatch.id)) {
-      orderedCities.push(cityMatch);
-      seenCityIds.add(cityMatch.id);
-    }
+    (leg.days || []).forEach((day, dayIndex) => {
+      const dayScore = getTimelineScore(day.date, '', legBaseScore + dayIndex * 10);
+      addCityOrderCandidate(orderMap, day.from, dayScore, 2);
+      addCityOrderCandidate(orderMap, day.to, dayScore + 1, 3);
+    });
   });
 
-  // Second pass: add any remaining cities (transit cities not in legs)
-  citiesData.forEach(city => {
-    if (!seenCityIds.has(city.id)) {
-      orderedCities.push(city);
-      seenCityIds.add(city.id);
-    }
-  });
+  if (Array.isArray(journeys)) {
+    journeys.forEach((journey, journeyIndex) => {
+      const departureScore = getTimelineScore(journey.departureDate || journey.dayDate, journey.departureTime, Number.MAX_SAFE_INTEGER - 10000 + journeyIndex);
+      const arrivalScore = getTimelineScore(journey.arrivalDate || journey.dayDate || journey.departureDate, journey.arrivalTime, departureScore + 1);
 
-  return orderedCities;
+      addCityOrderCandidate(orderMap, journey.fromLocation, departureScore, 4);
+      addCityOrderCandidate(orderMap, journey.toLocation, arrivalScore, 5);
+    });
+  }
+
+  return citiesData
+    .filter(city => !shouldSkipCityNavName(city.name))
+    .map((city, fallbackIndex) => ({
+      city,
+      order: orderMap.get(city.id) || { score: Number.MAX_SAFE_INTEGER - 1000 + fallbackIndex, sourceRank: 99 }
+    }))
+    .sort((a, b) => {
+      if (a.order.score !== b.order.score) return a.order.score - b.order.score;
+      if (a.order.sourceRank !== b.order.sourceRank) return a.order.sourceRank - b.order.sourceRank;
+      return a.city.name.localeCompare(b.city.name);
+    })
+    .map(entry => entry.city);
+}
+
+function scrollToElementWithNavOffset(el) {
+  if (!el) return false;
+  el.classList.remove('collapsed');
+  const navHeight = document.querySelector('.app-tabs-nav')?.offsetHeight || 56;
+  const cityNavHeight = document.querySelector('.city-nav')?.offsetHeight || 56;
+  const offset = navHeight + cityNavHeight + 20;
+  const elTop = el.getBoundingClientRect().top + window.scrollY;
+  window.scrollTo({
+    top: elTop - offset,
+    behavior: 'smooth'
+  });
+  return true;
+}
+
+function getLegElement(leg) {
+  if (!leg) return null;
+  return document.getElementById('leg-' + leg.id);
+}
+
+function sameTimelineDay(dayDate, targetDate) {
+  if (!dayDate || !targetDate) return false;
+  const dayScore = getTimelineScore(dayDate, '', null);
+  const targetScore = getTimelineScore(targetDate, '', null);
+  if (dayScore === null || targetScore === null) return false;
+  return Math.floor(dayScore / 1440) === Math.floor(targetScore / 1440);
+}
+
+function findLegForJourneyCity(cityId, cityName) {
+  if (!Array.isArray(journeys)) return null;
+
+  const matchingJourneys = journeys
+    .filter(j =>
+      j.fromCityId === cityId ||
+      j.toCityId === cityId ||
+      (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
+    )
+    .sort((a, b) => {
+      const aScore = getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime, Number.MAX_SAFE_INTEGER);
+      const bScore = getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime, Number.MAX_SAFE_INTEGER);
+      return aScore - bScore;
+    });
+
+  for (const journey of matchingJourneys) {
+    if (journey.legId) {
+      const directLeg = appData.find(leg => leg.id === journey.legId);
+      if (directLeg) return directLeg;
+    }
+
+    const targetDate = journey.toCityId === cityId || journey.toLocation === cityName
+      ? (journey.arrivalDate || journey.dayDate || journey.departureDate)
+      : (journey.departureDate || journey.dayDate || journey.arrivalDate);
+
+    const dateMatchedLeg = appData.find(leg =>
+      (leg.days || []).some(day => sameTimelineDay(day.date, targetDate))
+    );
+    if (dateMatchedLeg) return dateMatchedLeg;
+  }
+
+  return null;
 }
 
 // Active city filter - 'all' or city ID (access via window.currentCityFilter for cross-module access)
@@ -561,44 +721,39 @@ function selectCityFilter(cityId, btn) {
 function scrollToCity(cityId) {
   const cityName = getCityNameById(cityId);
 
-  // First try to find leg by leg.id (matches city id)
-  const legEl = document.getElementById('leg-' + cityId);
-  if (legEl) {
-    legEl.classList.remove('collapsed');
-    const navHeight = document.querySelector('.app-tabs-nav')?.offsetHeight || 56;
-    const cityNavHeight = document.querySelector('.city-nav')?.offsetHeight || 56;
-    const offset = navHeight + cityNavHeight + 20;
-    const elTop = legEl.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({
-      top: elTop - offset,
-      behavior: 'smooth'
-    });
-    return;
+  const candidateElementIds = [
+    'leg-' + cityId,
+    'leg-' + cityId.replace(/^city-/, '')
+  ];
+
+  for (const elementId of candidateElementIds) {
+    const legEl = document.getElementById(elementId);
+    if (scrollToElementWithNavOffset(legEl)) return;
   }
 
   if (!cityName) return;
 
-  // Fallback: Find first leg containing this city in day.from/to
+  // Match stopover legs where the city is the leg label but not the day destination.
   for (let i = 0; i < appData.length; i++) {
     const leg = appData[i];
-    const hasCity = leg.days.some(day => day.from === cityName || day.to === cityName);
-
-    if (hasCity) {
-      const el = document.getElementById('leg-' + leg.id);
-      if (el) {
-        el.classList.remove('collapsed');
-        const navHeight = document.querySelector('.app-tabs-nav')?.offsetHeight || 56;
-        const cityNavHeight = document.querySelector('.city-nav')?.offsetHeight || 56;
-        const offset = navHeight + cityNavHeight + 20;
-        const elTop = el.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({
-          top: elTop - offset,
-          behavior: 'smooth'
-        });
-        break;
-      }
+    if (cleanCityNavLabel(leg.label).toLowerCase() === cityName.toLowerCase()) {
+      if (scrollToElementWithNavOffset(getLegElement(leg))) return;
     }
   }
+
+  // Match itinerary day from/to references.
+  for (let i = 0; i < appData.length; i++) {
+    const leg = appData[i];
+    const hasCity = (leg.days || []).some(day => day.from === cityName || day.to === cityName);
+
+    if (hasCity) {
+      if (scrollToElementWithNavOffset(getLegElement(leg))) return;
+    }
+  }
+
+  // Match transport-only transit cities, such as London in a Zurich to Bangkok via London journey.
+  const journeyLeg = findLegForJourneyCity(cityId, cityName);
+  if (journeyLeg) scrollToElementWithNavOffset(getLegElement(journeyLeg));
 }
 
 // Expose itinerary functions to window scope for HTML onclick handlers
