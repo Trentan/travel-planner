@@ -2118,31 +2118,37 @@ if (importedData.cities && Array.isArray(importedData.cities)) {
 // This must happen AFTER citiesData is set (whether loaded or extracted)
 var allTransitCities = [...new Set([...transitCitiesToAdd, ...stayCitiesToAdd, ...legLabelCities])];
 console.log("[Import] Transit cities to process:", allTransitCities);
+
 allTransitCities.forEach(cityName => {
+  // Check if city exists in citiesData
   let existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+
   if (!existing) {
+    // City doesn't exist - add it
     console.log("[Import] Creating new transit city: " + cityName);
-    addOrUpdateCity(cityName, '', '', '', '', '');
-    existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
-  }
-  if (existing) {
-    existing.isTransit = true; // Mark as transit city for styling
-    // Try to look up country if not already set
-    if (!existing.countryCode && existing.country) {
-      const countryMatch = COUNTRY_DATA.find(c =>
-        c.name.toLowerCase() === existing.country.toLowerCase()
-      );
-      if (countryMatch) {
-        existing.countryCode = countryMatch.code;
-      }
-    }
-    console.log(`[Import] Transit city marked: ${cityName} (id: ${existing.id})`);
+    const newCity = {
+      id: 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+      name: cityName,
+      country: '',
+      code: '',
+      countryCode: '',
+      dateFrom: '',
+      dateTo: '',
+      colour: '#95a5a6',
+      isTransit: true
+    };
+    citiesData.push(newCity);
+    console.log("[Import] Created and added city: " + cityName + " with isTransit=true");
   } else {
-    console.log(`[Import] WARNING: Could not find city ${cityName} after addOrUpdateCity`);
+    // City exists - mark it as transit
+    existing.isTransit = true;
+    console.log("[Import] Marked existing city as transit: " + cityName);
   }
 });
+
 console.log(`[Import] Total cities in citiesData: ${citiesData.length}`);
 console.log(`[Import] Cities with isTransit flag: ${citiesData.filter(c => c.isTransit).length}`);
+console.log(`[Import] Transit cities:`, citiesData.filter(c => c.isTransit).map(c => c.name));
 
 // Import stays if present
 if (importedData.stays && Array.isArray(importedData.stays)) {
