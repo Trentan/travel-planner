@@ -20,54 +20,150 @@ function collapseAllGuides() {
 }
 
 function restorePackingToDefault() {
-  if (!confirm('Restore all packing data back to the default template? This will wipe packing checklist changes.')) return;
+  if (!confirm('Restore all packing data back to the default template? This will wipe all packing categories, checklist edits, and Before Leaving Home changes.')) return;
 
   packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING));
   leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
   activeGuidePanel = 'leaveHome';
-  saveData(false);
+  saveData();
   buildPackingTab();
 }
 
-function toggleLeaveHomeItem(e, iIdx) { leaveHomeData[iIdx].done = e.target.checked; saveData(); buildPackingTab(); }
-function updateLeaveHomeItem(iIdx, text) { if(!text.trim()) { leaveHomeData.splice(iIdx, 1); } else { leaveHomeData[iIdx].text = text; } saveData(); buildPackingTab(); }
-function deleteLeaveHomeItem(iIdx) { leaveHomeData.splice(iIdx, 1); saveData(); buildPackingTab(); }
-function addLeaveHomeItem() { leaveHomeData.push({text:"New task...", done:false}); saveData(); buildPackingTab(); }
+function isLeaveHomeSection(item) {
+  return item && item.kind === 'section';
+}
 
-function togglePackingItem(e, aIdx, cIdx, iIdx) { packingData[aIdx].categories[cIdx].items[iIdx].done = e.target.checked; saveData(); buildPackingTab(); }
-function updatePackingItem(aIdx, cIdx, iIdx, text) { if(!text.trim()) { packingData[aIdx].categories[cIdx].items.splice(iIdx, 1); } else { packingData[aIdx].categories[cIdx].items[iIdx].text = text; } saveData(); buildPackingTab(); }
-function updatePackingCat(aIdx, cIdx, text) { packingData[aIdx].categories[cIdx].title = text; saveData(); }
-function updatePackingAreaName(aIdx, text) { packingData[aIdx].areaName = text; saveData(); }
-function deletePackingItem(aIdx, cIdx, iIdx) { packingData[aIdx].categories[cIdx].items.splice(iIdx, 1); saveData(); buildPackingTab(); }
-function addPackingItem(aIdx, cIdx) { packingData[aIdx].categories[cIdx].items.push({text:"New item...", done:false}); saveData(); buildPackingTab(); }
-function addPackingCat(aIdx) { packingData[aIdx].categories.push({title:"New Category Block", items:[{text:"New item...", done:false}]}); saveData(); buildPackingTab(); }
-function deletePackingCat(aIdx, cIdx) {
-  if (!confirm('Delete this category block?')) return;
-  packingData[aIdx].categories.splice(cIdx, 1);
-  if (packingData[aIdx].categories.length === 0) {
-    packingData[aIdx].categories.push({ title: "New Category Block", items: [{ text: "New item...", done: false }] });
+function countLeaveHomeTasks() {
+  return leaveHomeData.filter(item => !isLeaveHomeSection(item)).length;
+}
+
+function countCompletedLeaveHomeTasks() {
+  return leaveHomeData.filter(item => !isLeaveHomeSection(item) && item.done).length;
+}
+
+function toggleLeaveHomeItem(e, iIdx) {
+  if (isLeaveHomeSection(leaveHomeData[iIdx])) return;
+  leaveHomeData[iIdx].done = e.target.checked;
+  saveData();
+  buildPackingTab();
+}
+
+function updateLeaveHomeItem(iIdx, text) {
+  const item = leaveHomeData[iIdx];
+  if (isLeaveHomeSection(item)) return;
+  if (!text.trim()) {
+    leaveHomeData.splice(iIdx, 1);
+  } else {
+    leaveHomeData[iIdx].text = text;
   }
   saveData();
   buildPackingTab();
 }
 
+function deleteLeaveHomeItem(iIdx) {
+  leaveHomeData.splice(iIdx, 1);
+  saveData();
+  buildPackingTab();
+}
+
+function addLeaveHomeItem() {
+  leaveHomeData.push({ text: 'New task...', done: false });
+  saveData();
+  buildPackingTab();
+}
+
+function togglePackingItem(e, aIdx, cIdx, iIdx) {
+  packingData[aIdx].categories[cIdx].items[iIdx].done = e.target.checked;
+  saveData();
+  buildPackingTab();
+}
+
+function updatePackingItem(aIdx, cIdx, iIdx, text) {
+  if (!text.trim()) {
+    packingData[aIdx].categories[cIdx].items.splice(iIdx, 1);
+  } else {
+    packingData[aIdx].categories[cIdx].items[iIdx].text = text;
+  }
+  saveData();
+  buildPackingTab();
+}
+
+function updatePackingCat(aIdx, cIdx, text) {
+  packingData[aIdx].categories[cIdx].title = text;
+  saveData();
+}
+
+function updatePackingAreaName(aIdx, text) {
+  packingData[aIdx].areaName = text;
+  saveData();
+}
+
+function deletePackingItem(aIdx, cIdx, iIdx) {
+  packingData[aIdx].categories[cIdx].items.splice(iIdx, 1);
+  saveData();
+  buildPackingTab();
+}
+
+function addPackingItem(aIdx, cIdx) {
+  packingData[aIdx].categories[cIdx].items.push({ text: 'New item...', done: false });
+  saveData();
+  buildPackingTab();
+}
+
+function addPackingCat(aIdx) {
+  packingData[aIdx].categories.push({ title: 'New Category Block', items: [{ text: 'New item...', done: false }] });
+  saveData();
+  buildPackingTab();
+}
+
+function deletePackingCat(aIdx, cIdx) {
+  if (!confirm('Delete this category block?')) return;
+  packingData[aIdx].categories.splice(cIdx, 1);
+  saveData();
+  buildPackingTab();
+}
+
+function renderLeaveHomeItems() {
+  return leaveHomeData.map((item, iIdx) => {
+    if (isLeaveHomeSection(item)) {
+      return `<div class="leave-home-section-heading">${item.text}</div>`;
+    }
+
+    return `
+      <div class="packing-item leave-home-item">
+        <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">×</button>
+        <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
+        <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}">${item.text}</span>
+      </div>
+    `;
+  }).join('');
+}
+
 function renderPackingGuidePanel() {
   if (activeGuidePanel === 'leaveHome') {
+    const totalTasks = countLeaveHomeTasks();
+    const completedTasks = countCompletedLeaveHomeTasks();
+    const progressWidth = totalTasks ? (completedTasks / totalTasks) * 100 : 0;
+
     return `
       <div class="packing-guide-panel guide-panel">
         <div class="guide-panel-header">
-          <h4>Before Leaving Home</h4>
+          <div>
+            <h4>Before Leaving Home</h4>
+            <p class="guide-panel-subtitle">${completedTasks} of ${totalTasks} tasks checked off</p>
+          </div>
           <button class="guide-close-btn" type="button" onclick="collapseAllGuides()" title="Close guide">×</button>
         </div>
-        <div class="guide-panel-content">
-          ${leaveHomeData.map((item, iIdx) => `
-            <div class="packing-item">
-              <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">×</button>
-              <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
-              <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}">${item.text}</span>
+        <div class="guide-panel-content leave-home-guide-content">
+          <div class="leave-home-progress">
+            <div class="leave-home-progress-bar">
+              <span style="width:${progressWidth}%"></span>
             </div>
-          `).join('')}
-          <button class="add-btn" style="width:auto; margin-top:10px; border-color:#E74C3C; color:#C0392B;" onclick="addLeaveHomeItem()">+ Add Home Task</button>
+          </div>
+          <div class="leave-home-list">
+            ${renderLeaveHomeItems()}
+          </div>
+          <button class="add-btn leave-home-add-btn" onclick="addLeaveHomeItem()">+ Add Home Task</button>
         </div>
       </div>
     `;
@@ -134,8 +230,20 @@ function renderPackingGuidePanel() {
 }
 
 function renderPackingGuidesShell() {
+  const totalTasks = countLeaveHomeTasks();
+  const completedTasks = countCompletedLeaveHomeTasks();
+
   return `
     <div class="packing-guides-shell">
+      <div class="packing-guides-summary">
+        <div>
+          <p class="packing-guides-eyebrow">Helpful packing guides</p>
+          <h3>One guide open at a time, with the leave-home checklist front and center.</h3>
+        </div>
+        <div class="packing-guides-stats">
+          <span class="packing-guides-stat">${completedTasks}/${totalTasks} home tasks done</span>
+        </div>
+      </div>
       <div class="packing-guides-toolbar">
         <div class="packing-guides-buttons">
           <button type="button" class="packing-guide-btn ${isActiveGuide('leaveHome') ? 'active' : ''}" onclick="toggleGuidePanel('leaveHome')">Before Leaving Home</button>
@@ -157,6 +265,7 @@ window.isActiveGuide = isActiveGuide;
 window.toggleGuidePanel = toggleGuidePanel;
 window.collapseAllGuides = collapseAllGuides;
 window.restorePackingToDefault = restorePackingToDefault;
+window.isLeaveHomeSection = isLeaveHomeSection;
 window.toggleLeaveHomeItem = toggleLeaveHomeItem;
 window.updateLeaveHomeItem = updateLeaveHomeItem;
 window.deleteLeaveHomeItem = deleteLeaveHomeItem;

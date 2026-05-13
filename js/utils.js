@@ -134,40 +134,43 @@ function getActivityLabel(category) {
 }
 
 const DEFAULT_LEAVE_HOME = [
-  {text: "Empty fridge and pantry perishables", done: false},
-  {text: "Turn power off everywhere not needed", done: false},
-  {text: "Check all lights and fans off", done: false},
-  {text: "Check CCTV on", done: false},
-  {text: "Empty coffee and compost bins and leave outside", done: false},
-  {text: "Close and check all windows", done: false},
-  {text: "Blinds partial down", done: false},
-  {text: "Empty bins", done: false},
-  {text: "Water off, including outdoor taps", done: false},
-  {text: "Dog door panel / lock", done: false},
-  {text: "Automatic fish feeder", done: false},
-  {text: "Security system on", done: false},
-  {text: "Lock all doors and windows", done: false},
-  {text: "Set security alarm / notify security company", done: false},
-  {text: "Turn off all taps and check for leaks", done: false},
-  {text: "Switch off power points at the wall except fridge", done: false},
-  {text: "Turn off gas supply if applicable", done: false},
-  {text: "Adjust thermostat to away or saver mode", done: false},
-  {text: "Take out all rubbish and recycling", done: false},
-  {text: "Check mailbox is empty or hold mail service", done: false},
-  {text: "Pause or reschedule any regular deliveries", done: false},
-  {text: "Pause gym membership or group activities", done: false},
-  {text: "Charge all devices including phones, tablets, and power banks", done: false},
-  {text: "Download offline maps and confirmations", done: false},
-  {text: "Notify emergency contact of travel plans", done: false},
-  {text: "Water plants or arrange plant care", done: false},
-  {text: "Set up lights on timers if away long", done: false},
-  {text: "Close blinds or curtains and secure loose outdoor items", done: false},
-  {text: "If taking dog: waste bags", done: false},
-  {text: "If taking dog: water bowl", done: false},
-  {text: "If taking dog: food", done: false},
-  {text: "If taking dog: toys", done: false},
-  {text: "If taking dog: leash", done: false},
-  {text: "If taking dog: treats", done: false}
+  { text: "Kitchen and bins", kind: "section" },
+  { text: "Empty fridge and pantry perishables", done: false },
+  { text: "Empty coffee and compost bins and leave outside", done: false },
+  { text: "Empty bins", done: false, mergeKeys: ["take out all rubbish and recycling"] },
+  { text: "Pause or reschedule any regular deliveries", done: false },
+  { text: "Check mailbox is empty or hold mail service", done: false },
+
+  { text: "Home shutdown", kind: "section" },
+  { text: "Turn power off everywhere not needed", done: false, mergeKeys: ["switch off power points at the wall except fridge"] },
+  { text: "Check all lights and fans off", done: false },
+  { text: "Close and check all windows", done: false, mergeKeys: ["lock all doors and windows"] },
+  { text: "Blinds partial down", done: false, mergeKeys: ["close blinds or curtains and secure loose outdoor items"] },
+  { text: "Water off (including outdoor taps)", done: false, mergeKeys: ["water off, including outdoor taps", "turn off all taps and check for leaks"] },
+  { text: "Turn off gas supply if applicable", done: false },
+  { text: "Adjust thermostat to away or saver mode", done: false },
+
+  { text: "Security and pets", kind: "section" },
+  { text: "Check CCTV on", done: false },
+  { text: "Dog door panel / lock", done: false },
+  { text: "Automatic fish feeder", done: false, mergeKeys: ["automatic fish feeder"] },
+  { text: "Security system on", done: false, mergeKeys: ["set security alarm / notify security company"] },
+  { text: "Water plants or arrange plant care", done: false },
+  { text: "Set up lights on timers if away long", done: false },
+
+  { text: "Travel ready", kind: "section" },
+  { text: "Charge all devices including phones, tablets, and power banks", done: false },
+  { text: "Download offline maps and confirmations", done: false },
+  { text: "Notify emergency contact of travel plans", done: false },
+  { text: "Pause gym membership or group activities", done: false },
+
+  { text: "If taking dog", kind: "section" },
+  { text: "Waste bags", done: false, mergeKeys: ["if taking dog: waste bags"] },
+  { text: "Water bowl", done: false, mergeKeys: ["if taking dog: water bowl"] },
+  { text: "Food", done: false, mergeKeys: ["if taking dog: food"] },
+  { text: "Toys", done: false, mergeKeys: ["if taking dog: toys"] },
+  { text: "Leash", done: false, mergeKeys: ["if taking dog: leash"] },
+  { text: "Treats", done: false, mergeKeys: ["if taking dog: treats"] }
 ];
 
 function normalizeChecklistText(text) {
@@ -177,30 +180,67 @@ function normalizeChecklistText(text) {
     .replace(/\s+/g, ' ');
 }
 
+function getChecklistItemKeys(item) {
+  if (!item) return [];
+
+  const keys = [];
+  const primary = normalizeChecklistText(item.text);
+  if (primary) keys.push(primary);
+
+  if (Array.isArray(item.mergeKeys)) {
+    item.mergeKeys.forEach(key => {
+      const normalized = normalizeChecklistText(key);
+      if (normalized && !keys.includes(normalized)) {
+        keys.push(normalized);
+      }
+    });
+  }
+
+  return keys;
+}
+
 function mergeChecklistWithDefaults(savedItems, defaultItems = DEFAULT_LEAVE_HOME) {
   const savedList = Array.isArray(savedItems) ? savedItems : [];
   const defaults = Array.isArray(defaultItems) ? defaultItems : [];
-  const savedMap = new Map();
-
-  savedList.forEach(item => {
-    if (!item || !item.text) return;
-    const key = normalizeChecklistText(item.text);
-    if (!key || savedMap.has(key)) return;
-    savedMap.set(key, { ...item });
-  });
+  const savedEntries = savedList
+    .map((item, index) => ({ item, index, keys: getChecklistItemKeys(item), matched: false }))
+    .filter(entry => entry.keys.length > 0);
 
   const merged = defaults.map(def => {
-    const key = normalizeChecklistText(def.text);
-    const saved = savedMap.get(key);
-    return saved ? { ...def, ...saved, text: saved.text || def.text } : JSON.parse(JSON.stringify(def));
+    const defaultCopy = JSON.parse(JSON.stringify(def));
+    const defaultKeys = getChecklistItemKeys(def);
+    const savedEntry = savedEntries.find(entry =>
+      !entry.matched && entry.keys.some(key => defaultKeys.includes(key))
+    );
+
+    if (!savedEntry) {
+      if (defaultCopy.kind !== 'section' && typeof defaultCopy.done !== 'boolean') {
+        defaultCopy.done = false;
+      }
+      return defaultCopy;
+    }
+
+    savedEntry.matched = true;
+
+    if (defaultCopy.kind === 'section') {
+      return defaultCopy;
+    }
+
+    return {
+      ...defaultCopy,
+      ...savedEntry.item,
+      text: defaultCopy.text,
+      done: Boolean(savedEntry.item.done)
+    };
   });
 
-  savedList.forEach(item => {
-    if (!item || !item.text) return;
-    const key = normalizeChecklistText(item.text);
-    if (!key) return;
-    const existsInDefaults = defaults.some(def => normalizeChecklistText(def.text) === key);
-    if (!existsInDefaults) merged.push({ ...item });
+  savedEntries.forEach(entry => {
+    if (entry.matched) return;
+    const item = { ...entry.item };
+    if (!item.kind && typeof item.done !== 'boolean') {
+      item.done = false;
+    }
+    merged.push(item);
   });
 
   return merged;
