@@ -55,18 +55,19 @@ return normalizeImportedCities(importedData);`
   )(importedData, () => '#123456');
 }
 
-function getFixtureCityNav(appData, citiesData, journeys) {
+function getFixtureCityNav(appData, citiesData, journeys, stays) {
   return new Function(
     'appData',
     'citiesData',
     'journeys',
+    'stays',
     `${cityNavBlock}
 return {
   order: getCitiesInTravelOrder(),
   londonLeg: findLegForJourneyCity('city-london', 'London')?.id,
   veronaLeg: appData.find(l => cleanCityNavLabel(l.label).toLowerCase() === 'verona')?.id
 };`
-  )(appData, citiesData, journeys);
+  )(appData, citiesData, journeys, stays);
 }
 
 function getFixtureJourneyMapping(appData, citiesData, journeys) {
@@ -104,10 +105,10 @@ assert(
 assert(importedCities.find(city => city.name === 'Verona')?.isTransit === true, 'Verona should remain a transit city');
 assert(importedCities.find(city => city.name === 'London')?.isTransit === true, 'London should remain a transit city');
 
-const cityNav = getFixtureCityNav(fixture.itinerary, importedCities, fixture.journeys);
+const cityNav = getFixtureCityNav(fixture.itinerary, importedCities, fixture.journeys, fixture.stays);
 const navNames = cityNav.order.map(city => city.name);
 
-assert(navNames.slice(0, 4).join(' > ') === 'Brisbane > Taipei > Bangkok > Vienna', 'City nav should start in first-arrival order');
+assert(navNames.slice(0, 3).join(' > ') === 'Brisbane > Taipei > Vienna', 'City nav should favor real stay blocks over early transit stops');
 assert(navNames.includes('Verona'), 'City nav should include Verona');
 assert(navNames.includes('London'), 'City nav should include London');
 assert(!navNames.includes('Return'), 'City nav should exclude Return');
@@ -117,6 +118,14 @@ assert(
 );
 assert(cityNav.londonLeg === 'zurich', 'London city nav click target should map to Zurich leg');
 assert(cityNav.veronaLeg === 'verona', 'Verona city nav click target should map to Verona leg');
+assert(
+  navNames.indexOf('Bangkok') > navNames.indexOf('Zurich') && navNames.indexOf('Bangkok') < navNames.indexOf('Koh Samui'),
+  'Bangkok should map to the longer Bangkok stay, not the early outbound transit stop'
+);
+assert(
+  navNames.filter(name => name === 'Bangkok').length === 1,
+  'Repeated city visits should map to one best/longest-stay city nav entry'
+);
 
 const journeyMapping = getFixtureJourneyMapping(
   fixture.itinerary,
@@ -144,6 +153,7 @@ console.log(JSON.stringify({
   cityCount: importedCities.length,
   firstFour: navNames.slice(0, 4),
   aroundVerona: navNames.slice(navNames.indexOf('Bolzano'), navNames.indexOf('Zurich') + 1),
+  bangkokIndex: navNames.indexOf('Bangkok'),
   londonLeg: cityNav.londonLeg,
   veronaLeg: cityNav.veronaLeg,
   blankJourneyLegIds: journeyMapping.blankLegIds

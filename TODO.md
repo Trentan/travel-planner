@@ -36,8 +36,8 @@ Read this file at the start of every session. When using Claude Code, read from 
 
 ### Item 11: City Submenu Navigation and Timeline Mapping
 
-**Status:** In progress  
-**Next:** 11f
+**Status:** Done  
+**Next:** none
 
 Use `backups/2026_June_July_Europe_Thailand.json` as the primary regression fixture.
 
@@ -58,8 +58,9 @@ Use `backups/2026_June_July_Europe_Thailand.json` as the primary regression fixt
   - Verify Verona and London appear as transit cities when applicable.
   - Verify Return is excluded from the city submenu.
   - Verify clicking each city nav item scrolls to a relevant itinerary leg/day.
-- [ ] 11f. Clarify and implement repeated-city submenu behavior.
-  - If a city is visited twice, make sure it appears in the submenu twice (eg one as a transit on the way and then secondly as an actual city visit - based on the itinerary and the transport - the city submenu should clearly map the journey path) - this might need further clarification - perhaps more important the city resides in the submenu where the MOST time in the city is spent as the best result
+- [x] 11f. Clarify and implement repeated-city submenu behavior.
+  - If a city is visited twice, place the single city submenu entry where the most time is spent in that city.
+  - Decision: keep one submenu entry per city and map it to the best/longest stay when accommodation stay data exists; otherwise use the earliest journey/itinerary position.
 
 ---
 

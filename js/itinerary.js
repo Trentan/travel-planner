@@ -458,6 +458,12 @@ function getCityByName(cityName) {
   return citiesData.find(c => (c.name || '').toLowerCase() === cityName.trim().toLowerCase()) || null;
 }
 
+function getCityNameForNavId(cityId) {
+  if (!cityId || !Array.isArray(citiesData)) return '';
+  const city = citiesData.find(c => c.id === cityId);
+  return city ? city.name : '';
+}
+
 function getTripTimelineYear() {
   if (Array.isArray(journeys)) {
     const datedJourney = journeys.find(j => /^\d{4}-\d{2}-\d{2}$/.test(j.departureDate || j.arrivalDate || j.dayDate || ''));
@@ -517,16 +523,85 @@ function getLegDateScore(leg, legIndex) {
   return getTimelineScore(firstDay?.date, '', legIndex * 10000);
 }
 
-function addCityOrderCandidate(orderMap, cityName, score, sourceRank = 0) {
+function addCityOrderCandidate(orderMap, cityName, score, sourceRank = 0, stayWeight = 0) {
   if (shouldSkipCityNavName(cityName)) return;
   const city = getCityByName(cityName);
   if (!city) return;
 
   const existing = orderMap.get(city.id);
-  const candidate = { score, sourceRank };
-  if (!existing || score < existing.score || (score === existing.score && sourceRank < existing.sourceRank)) {
+  const candidate = { score, sourceRank, stayWeight };
+  if (
+    !existing ||
+    stayWeight > existing.stayWeight ||
+    (stayWeight === existing.stayWeight && score < existing.score) ||
+    (stayWeight === existing.stayWeight && score === existing.score && sourceRank < existing.sourceRank)
+  ) {
     orderMap.set(city.id, candidate);
   }
+}
+
+function getCityStayCandidates() {
+  const candidates = [];
+
+  if (Array.isArray(stays)) {
+    stays.forEach(stay => {
+      const cityName = stay.city || getCityNameForNavId(stay.cityId);
+      if (!cityName) return;
+
+      const startScore = getTimelineScore(stay.checkIn, '', Number.MAX_SAFE_INTEGER);
+      const endScore = getTimelineScore(stay.checkOut, '', startScore);
+      const nights = Number(stay.nights) || Math.max(1, Math.round((endScore - startScore) / 1440)) || 1;
+      candidates.push({
+        cityName,
+        score: startScore,
+        weight: 1000 + nights,
+        sourceRank: 0
+      });
+    });
+  }
+
+  if (Array.isArray(appData)) {
+    appData.forEach((leg, legIndex) => {
+      let activeCity = '';
+      let activeStartScore = 0;
+      let activeCount = 0;
+
+      const flush = () => {
+        if (!activeCity) return;
+        candidates.push({
+          cityName: activeCity,
+          score: activeStartScore,
+          weight: 1,
+          sourceRank: 1
+        });
+      };
+
+      (leg.days || []).forEach((day, dayIndex) => {
+        const sameCityStay = day.from && day.to && day.from === day.to && !shouldSkipCityNavName(day.to);
+        const dayScore = getTimelineScore(day.date, '', getLegDateScore(leg, legIndex) + dayIndex * 10);
+
+        if (!sameCityStay) {
+          flush();
+          activeCity = '';
+          activeCount = 0;
+          return;
+        }
+
+        if (activeCity.toLowerCase() !== day.to.toLowerCase()) {
+          flush();
+          activeCity = day.to;
+          activeStartScore = dayScore;
+          activeCount = 1;
+        } else {
+          activeCount++;
+        }
+      });
+
+      flush();
+    });
+  }
+
+  return candidates;
 }
 
 // Get cities in travel order based on trip legs
@@ -537,6 +612,10 @@ function getCitiesInTravelOrder() {
 
   const orderMap = new Map();
 
+  getCityStayCandidates().forEach(candidate => {
+    addCityOrderCandidate(orderMap, candidate.cityName, candidate.score, candidate.sourceRank, candidate.weight);
+  });
+
   appData.forEach((leg, legIndex) => {
     const legBaseScore = getLegDateScore(leg, legIndex);
     const labelCity = cleanCityNavLabel(leg.label);
@@ -545,13 +624,13 @@ function getCitiesInTravelOrder() {
       (day.to && day.to.toLowerCase() === labelCity.toLowerCase())
     );
     if (labelCity && !shouldSkipCityNavName(labelCity) && !labelAlreadyInDayRoute) {
-      addCityOrderCandidate(orderMap, labelCity, legBaseScore - 0.5, 1);
+      addCityOrderCandidate(orderMap, labelCity, legBaseScore - 0.5, 2, 10);
     }
 
     (leg.days || []).forEach((day, dayIndex) => {
       const dayScore = getTimelineScore(day.date, '', legBaseScore + dayIndex * 10);
-      addCityOrderCandidate(orderMap, day.from, dayScore, 2);
-      addCityOrderCandidate(orderMap, day.to, dayScore + 1, 3);
+      addCityOrderCandidate(orderMap, day.from, dayScore, 3, 1);
+      addCityOrderCandidate(orderMap, day.to, dayScore + 1, 4, 1);
     });
   });
 
@@ -560,8 +639,8 @@ function getCitiesInTravelOrder() {
       const departureScore = getTimelineScore(journey.departureDate || journey.dayDate, journey.departureTime, Number.MAX_SAFE_INTEGER - 10000 + journeyIndex);
       const arrivalScore = getTimelineScore(journey.arrivalDate || journey.dayDate || journey.departureDate, journey.arrivalTime, departureScore + 1);
 
-      addCityOrderCandidate(orderMap, journey.fromLocation, departureScore, 4);
-      addCityOrderCandidate(orderMap, journey.toLocation, arrivalScore, 5);
+      addCityOrderCandidate(orderMap, journey.fromLocation, departureScore, 5, 1);
+      addCityOrderCandidate(orderMap, journey.toLocation, arrivalScore, 6, 1);
     });
   }
 
