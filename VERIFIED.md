@@ -169,3 +169,14 @@ Confirmed completed items. Append-only archive — do not edit existing entries.
 - 9b: Added accommodation auto-populate for missing nights.
 - 9c: Restored the "Walk-on Gear (Wear onto plane)" packing area.
 - 9d: Added an easy way to force a complete site refresh on mobile app and website.
+
+---
+
+### Item 13: Other improvements
+**Completed:** 2026-05-14 - branch `item-13a-13c-core-fixes`
+
+- 13a: Fixed compact view.
+- 13b: Normalized date handling to ISO-style JSON paths and display logic.
+- 13c: Removed Fun Mode and Force Refresh from the top-level UI.
+- Reset App now handles the full clear path for browser data and cache state.
+- User-tested after mobile theme tweaks and confirmed working.

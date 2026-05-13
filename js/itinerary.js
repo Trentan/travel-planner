@@ -89,72 +89,47 @@ function buildCompactItinerary() {
   });
 }
 
-// Track open day cards across rebuilds
-let openDayCardIds = new Set();
-
-function buildItinerary() {
-  // Check window.isCompactView for cross-module access
-  const isCompact = typeof window !== 'undefined' && window.isCompactView;
-  if (isCompact) {
-    buildCompactItinerary();
-    return;
-  }
-
-// Parse "8 Jun" style date to ISO format for comparison
-// year parameter allows specifying the trip year (default 2026)
+// Parse "8 Jun" style dates to ISO for comparisons.
 function normalizeDate(dateStr, year = 2026) {
   if (typeof normalizeTripDateValue === 'function') return normalizeTripDateValue(dateStr, year);
   if (!dateStr) return '';
-  // Already ISO format
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
-  // Parse "8 Jun" or "10 Jun" format
+
   const match = dateStr.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$/);
-  if (match) {
-    const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06',
-                       Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
-    const day = match[1].padStart(2, '0');
-    const month = monthMap[match[2]];
-    return `${year}-${month}-${day}`;
-  }
-  return dateStr;
+  if (!match) return dateStr;
+
+  const monthMap = {
+    Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
+    Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
+  };
+  const day = match[1].padStart(2, '0');
+  const month = monthMap[match[2]];
+  return `${year}-${month}-${day}`;
 }
 
-// Helper to determine stay display info for a given date
+// Derive stay display rows for both full and compact itinerary builders.
 function getStayDisplayForDay(dayDate, dayCity) {
-  // Check window.stays as fallback if local stays is undefined
-  if (typeof stays === 'undefined') {
-    if (typeof window !== 'undefined' && Array.isArray(window.stays)) {
-      var stays = window.stays;
-    } else {
-      return [];
-    }
-  }
-  if (!Array.isArray(stays)) return [];
+  const staysData = Array.isArray(stays)
+    ? stays
+    : (typeof window !== 'undefined' && Array.isArray(window.stays) ? window.stays : []);
 
-  const result = [];
-  const cityObj = typeof citiesData !== 'undefined'
+  if (!Array.isArray(staysData) || staysData.length === 0) return [];
+
+  const normalizedDayDate = normalizeDate(dayDate);
+  const matchedCity = typeof citiesData !== 'undefined'
     ? citiesData.find(c => c.name === dayCity)
     : null;
-  const cityId = cityObj ? cityObj.id : null;
+  const matchedCityId = matchedCity ? matchedCity.id : null;
+  const result = [];
 
-  // Normalize the day date for comparison
-  const normalizedDayDate = normalizeDate(dayDate);
+  staysData.forEach(stay => {
+    if (!stay) return;
+    if (matchedCityId && stay.cityId && stay.cityId !== matchedCityId) return;
 
-  stays.forEach(stay => {
-    if (!stay.cityId) return;
-
-    const stayCity = typeof citiesData !== 'undefined'
-      ? citiesData.find(c => c.id === stay.cityId)
-      : null;
-    const stayCityName = stayCity ? stayCity.name : '';
-
-    // Normalize dates to compare
     const checkInDate = normalizeDate(stay.checkIn) || '';
     const checkOutDate = normalizeDate(stay.checkOut) || '';
 
-    // Check if this day matches check-in, check-out, or is in between
     if (normalizedDayDate === checkInDate) {
-      // Check-in day
       result.push({
         type: 'checkin',
         propertyName: stay.propertyName,
@@ -163,8 +138,10 @@ function getStayDisplayForDay(dayDate, dayCity) {
         bookingRef: stay.bookingRef,
         cost: stay.totalCost
       });
-    } else if (normalizedDayDate === checkOutDate) {
-      // Check-out day
+      return;
+    }
+
+    if (normalizedDayDate === checkOutDate) {
       result.push({
         type: 'checkout',
         propertyName: stay.propertyName,
@@ -173,8 +150,10 @@ function getStayDisplayForDay(dayDate, dayCity) {
         bookingRef: stay.bookingRef,
         cost: stay.totalCost
       });
-    } else if (normalizedDayDate > checkInDate && normalizedDayDate < checkOutDate) {
-      // Middle day - just show "Staying at"
+      return;
+    }
+
+    if (normalizedDayDate > checkInDate && normalizedDayDate < checkOutDate) {
       result.push({
         type: 'staying',
         propertyName: stay.propertyName,
@@ -188,6 +167,17 @@ function getStayDisplayForDay(dayDate, dayCity) {
 
   return result;
 }
+
+// Track open day cards across rebuilds
+let openDayCardIds = new Set();
+
+function buildItinerary() {
+  // Check window.isCompactView for cross-module access
+  const isCompact = typeof window !== 'undefined' && window.isCompactView;
+  if (isCompact) {
+    buildCompactItinerary();
+    return;
+  }
 
 
   // Save open state of day cards before rebuilding
