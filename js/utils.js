@@ -200,3 +200,5 @@ function getDayTotal(day) {
   });
   return total > 0 ? '$' + total.toFixed(0) : '';
 }
+
+window.getDayTotal = getDayTotal;

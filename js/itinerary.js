@@ -838,6 +838,7 @@ function scrollToCity(cityId) {
 // Expose itinerary functions to window scope for HTML onclick handlers
 window.rebuildCurrentView = rebuildCurrentView;
 window.selectCityFilter = selectCityFilter;
+window.getStayDisplayForDay = getStayDisplayForDay;
 
 // Expand to show a city in the itinerary
 function expandToCity(cityId) {
