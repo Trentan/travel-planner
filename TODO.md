@@ -17,7 +17,7 @@ Read this file at the start of every session. Claude Code: read from main branch
 - [x] b) In the accommodation tab, if the stays have gaps for the nights and itinerary length, Add an autopopulate stays feature button action - scan itinerary and automatically create missing accommodation entries for each city based on nights stayed. This button should only appear when nights are missing in the accomodation tab compared to the itinerary. ✅ **COMPLETE - PR #16 merged**
 - [x] c) areaName: "Walk-on Gear (Wear onto plane)" - this area is not appearing anymore in the packing tab? (it should always be displayed and with the default checklist for walk on gear) ✅ **COMPLETE - PR #17 merged**
 - [ ] d) Need a way to enable the user to force a complete site refresh on mobile app / website on the app easily 
-- [ ] e) Go through and convert the testing checklist into new items and sub items in this todo list
+- [ ] e) Go through and convert the testing checklist into new items and sub items in this todo list + create actual smoke tests and tests for all the functionality
 - [ ] f) Go through and convert the Future Enhancements checklist into new items and sub items in this todo list (some may already be resolved)
 - [ ] g) Add a new notes tab - where you can add a generic checklist (eg get gifts for wife, don;t forget to take photo of x, important things to consider on your trip, unresolved items)
 - [ ] h) Improve leaving home checklist, I have a notion checklist to merge/compare (ask for this if needed) - https://www.notion.so/trentan/afd1a6b4feb14fa38065515dbacbd676?v=d157c05db95048cbaffc6eb2645367a4&p=d4d390afce8b45fabdd8782b55fb3971&pm=s

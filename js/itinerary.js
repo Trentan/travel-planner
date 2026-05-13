@@ -418,48 +418,51 @@ function buildNav() {
 // Get cities in travel order based on trip legs
 function getCitiesInTravelOrder() {
   if (!Array.isArray(appData) || appData.length === 0) {
-    // Fall back to citiesData order if no legs
     return citiesData;
   }
 
-  // Collect city IDs in order they appear in legs
-  const cityIdOrder = [];
+  const orderedCities = [];
   const seenCityIds = new Set();
 
+  // First pass: add cities from legs in travel order
   appData.forEach(leg => {
-    // Try to match leg.id to city.id (leg.id = "verona", city.id = "city-verona")
-    if (leg.id) {
-      // First try direct match
-      let cityMatch = citiesData.find(c => c.id === leg.id);
-      // Then try with "city-" prefix
-      if (!cityMatch) {
-        cityMatch = citiesData.find(c => c.id === 'city-' + leg.id);
-      }
-      // Then try by matching leg label to city name
-      if (!cityMatch && leg.label) {
-        let cityName = leg.label.replace(/[\p{Emoji}]+/gu, '').trim();
-        cityMatch = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
-      }
-      if (cityMatch && !seenCityIds.has(cityMatch.id)) {
-        cityIdOrder.push(cityMatch.id);
-        seenCityIds.add(cityMatch.id);
-      }
+    if (!leg.id) return;
+
+    // Try multiple ways to match leg to city
+    let cityMatch = null;
+
+    // Try leg.id with "city-" prefix
+    if (!cityMatch) cityMatch = citiesData.find(c => c.id === 'city-' + leg.id);
+    // Try direct leg.id match
+    if (!cityMatch) cityMatch = citiesData.find(c => c.id === leg.id);
+    // Try matching leg label to city name
+    if (!cityMatch && leg.label) {
+      let cityName = leg.label.replace(/[\p{Emoji}]+/gu, '').trim();
+      cityMatch = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+    }
+    // Try matching days' from/to to city names
+    if (!cityMatch && leg.days) {
+      leg.days.forEach(day => {
+        if (!cityMatch && day.to && day.to !== 'Home' && day.to !== 'In transit') {
+          cityMatch = citiesData.find(c => c.name === day.to);
+        }
+        if (!cityMatch && day.from && day.from !== 'Home' && day.from !== 'In transit') {
+          cityMatch = citiesData.find(c => c.name === day.from);
+        }
+      });
+    }
+
+    if (cityMatch && !seenCityIds.has(cityMatch.id)) {
+      orderedCities.push(cityMatch);
+      seenCityIds.add(cityMatch.id);
     }
   });
 
-  // Map city IDs to city objects, preserving order
-  const orderedCities = [];
-  cityIdOrder.forEach(cityId => {
-    const city = citiesData.find(c => c.id === cityId);
-    if (city) {
-      orderedCities.push(city);
-    }
-  });
-
-  // Add any cities not in legs (transit cities and others)
+  // Second pass: add any remaining cities (transit cities not in legs)
   citiesData.forEach(city => {
     if (!seenCityIds.has(city.id)) {
       orderedCities.push(city);
+      seenCityIds.add(city.id);
     }
   });
 
@@ -486,21 +489,22 @@ function buildCityNav() {
   citiesInOrder.forEach(city => {
     const btn = document.createElement('button');
     btn.setAttribute('data-city', city.id);
+    btn.onclick = () => selectCityFilter(city.id, btn);
 
     // Transit cities get different styling (gray, dashed)
-    if (city.isTransit) {
-      btn.className = 'city-nav-btn transit' + (filter === city.id ? ' active' : '');
-      const color = city.colour || '#95a5a6';
+    const isTransit = city.isTransit === true; // Explicit check
+    const color = city.colour || (isTransit ? '#95a5a6' : '#2C3E50');
+
+    if (isTransit) {
+      btn.className = 'city-nav-btn city-nav-btn-transit' + (filter === city.id ? ' active' : '');
       btn.style.borderLeft = `4px dashed ${color}`;
     } else {
       btn.className = 'city-nav-btn' + (filter === city.id ? ' active' : '');
-      const color = city.colour || '#2C3E50';
       btn.style.borderLeft = `4px solid ${color}`;
     }
 
     const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">📍</span>';
     btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
-    btn.onclick = () => selectCityFilter(city.id, btn);
     navList.appendChild(btn);
   });
 }

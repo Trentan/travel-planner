@@ -1995,38 +1995,6 @@ if (importedData.meta) {
   localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
 }
 
-  // Extract cities from leg labels (for legs without proper cityId references)
-// This catches transit cities like "Verona" that appear as leg labels but not in day.from/to
-var legLabelCities = [];
-if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
-  importedData.itinerary.forEach(leg => {
-    // Try to extract city name from leg label (e.g., "🇮🇹 Verona" -> "Verona")
-    let label = leg.label || '';
-    // Remove emoji patterns - flags, symbols, any emoji character
-    let cityFromLabel = label
-      .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
-      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
-      .replace(/[\u{2600}-\u{26FF}]/gu, '')
-      .replace(/[\u{2700}-\u{27BF}]/gu, '')
-      .replace(/\p{Emoji}/gu, '')
-      .replace(/[^\w\s-]/gu, '')  // Remove any remaining non-letter/dash chars
-      .trim();
-    if (cityFromLabel && cityFromLabel !== 'Departure' && cityFromLabel !== 'Arrival' && cityFromLabel !== 'In transit') {
-      // Check if this leg's days don't actually reference this city
-      let cityInDays = false;
-      (leg.days || []).forEach(day => {
-        if (day.from === cityFromLabel || day.to === cityFromLabel) cityInDays = true;
-      });
-      if (!cityInDays) {
-        legLabelCities.push(cityFromLabel);
-        console.log("[Import] Found transit city from leg label: '" + cityFromLabel + "' (from label: '" + label + "')");
-      } else {
-        console.log("[Import] City '" + cityFromLabel + "' already in day.from/to, not adding as transit");
-      }
-    }
-  });
-}
-
 // Import journeys if present - also create cities from journey references
 var transitCitiesToAdd = []; // Collect transit city names before we load citiesData
 if (importedData.journeys && Array.isArray(importedData.journeys)) {
@@ -2116,15 +2084,44 @@ if (importedData.cities && Array.isArray(importedData.cities)) {
 
 // NOW process transit cities from journeys, stays, and leg labels
 // This must happen AFTER citiesData is set (whether loaded or extracted)
+
+// Define skip list for transit city detection
+var transitSkipList = ['Departure', 'Arrival', 'In transit', 'Return', 'Home'];
+
+// Extract transit cities from leg labels only if they're not in the skip list or already in day.from/to
+var legLabelCities = [];
+if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
+  importedData.itinerary.forEach(leg => {
+    let label = leg.label || '';
+    let cityFromLabel = label
+      .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')
+      .replace(/\p{Emoji}/gu, '')
+      .replace(/[^\w\s-]/gu, '')
+      .trim();
+
+    if (cityFromLabel && !transitSkipList.includes(cityFromLabel)) {
+      let cityInDays = false;
+      (leg.days || []).forEach(day => {
+        if (day.from === cityFromLabel || day.to === cityFromLabel) cityInDays = true;
+      });
+      if (!cityInDays) {
+        legLabelCities.push(cityFromLabel);
+        console.log("[Import] Found transit city from leg label: '" + cityFromLabel + "'");
+      }
+    }
+  });
+}
+
 var allTransitCities = [...new Set([...transitCitiesToAdd, ...stayCitiesToAdd, ...legLabelCities])];
 console.log("[Import] Transit cities to process:", allTransitCities);
 
 allTransitCities.forEach(cityName => {
-  // Check if city exists in citiesData
   let existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
 
   if (!existing) {
-    // City doesn't exist - add it
     console.log("[Import] Creating new transit city: " + cityName);
     const newCity = {
       id: 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
@@ -2140,7 +2137,6 @@ allTransitCities.forEach(cityName => {
     citiesData.push(newCity);
     console.log("[Import] Created and added city: " + cityName + " with isTransit=true");
   } else {
-    // City exists - mark it as transit
     existing.isTransit = true;
     console.log("[Import] Marked existing city as transit: " + cityName);
   }
