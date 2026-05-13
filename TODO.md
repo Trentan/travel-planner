@@ -22,29 +22,29 @@ Read this file at the start of every session. When using Claude Code, read from 
 - [x] 9d. Add an easy way for users to force a complete site refresh on mobile app and website.
 
 ### Item 12: Packing improvements
-- [ ] 12a. Improve the default Before Leaving Home checklist by merging/comparing the user's checklist below.
-  - [ ]  Empty fridge and pantry perishables
-  - [ ]  Turn power off everywhere not needed
-  - [ ]  Check all lights and fans off
-  - [ ]  Check CCTV on
-  - [ ]  Empty coffee and compost bins and leave outside
-  - [ ]  Close and check all windows
-  - [ ]  Blinds partial down
-  - [ ]  Empty Bins
-  - [ ]  Water Off (including outdoor taps)
-  - [ ]  Dog door panel / lock
-  - [ ]  Automatic Fish feeder
-  - [ ]  Security System On
-  - [ ]  If Taking Dog
-    - [ ]  Waste bags
-      - [ ]  Water Bowl
-      - [ ]  Food
-      - [ ]  Toys
-      - [ ]  Leash
-      - [ ]  Treats
-- [ ] 12b. Allow deleting sub category blocks in Packing.
-- [ ] 12c. Add "Restore Packing to Default" to wipe ALL packing changes and reload defaults.
-- [ ] 12d. Improve the packing hints/guides UI.
+- [x] 12a. Improve the default Before Leaving Home checklist by merging/comparing the user's checklist below.
+  - [x]  Empty fridge and pantry perishables
+  - [x]  Turn power off everywhere not needed
+  - [x]  Check all lights and fans off
+  - [x]  Check CCTV on
+  - [x]  Empty coffee and compost bins and leave outside
+  - [x]  Close and check all windows
+  - [x]  Blinds partial down
+  - [x]  Empty Bins
+  - [x]  Water Off (including outdoor taps)
+  - [x]  Dog door panel / lock
+  - [x]  Automatic Fish feeder
+  - [x]  Security System On
+  - [x]  If Taking Dog
+    - [x]  Waste bags
+      - [x]  Water Bowl
+      - [x]  Food
+      - [x]  Toys
+      - [x]  Leash
+      - [x]  Treats
+- [x] 12b. Allow deleting sub category blocks in Packing.
+- [x] 12c. Add "Restore Packing to Default" to wipe ALL packing changes and reload defaults.
+- [x] 12d. Improve the packing hints/guides UI.
   - Current issue: single dropdowns are clunky in the 3-column row.
   - Possible approach: only one open at a time, or replace with buttons that launch dialogs.
 
