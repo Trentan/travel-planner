@@ -129,36 +129,6 @@ img.city-flag-img {
 .city-nav-btn:hover { background: #e2e8f0; color: var(--text); }
 .city-nav-btn.active { background: #2C3E50; color: white; border-color: #2C3E50; box-shadow: 0 2px 8px rgba(44,62,80,0.3); }
 .city-nav-btn { border: 1px solid #d1d5db; }
-
-/* Transit city styling */
-.city-nav-btn-transit {
-  font-style: italic !important;
-  font-size: 0.85rem !important;
-  opacity: 0.85;
-}
-.city-nav-btn-transit:hover {
-  background: #f0f4f8;
-  opacity: 1;
-}
-.city-nav-btn-transit.active {
-  background: #7f8c8d !important;
-  font-style: normal !important;
-}
-.city-nav-separator {
-  display: flex;
-  align-items: center;
-  margin: 0.5rem 0 0.25rem 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid #e2e8f0;
-}
-.city-nav-separator-text {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #7f8c8d;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-left: 0.5rem;
-}
 @media (max-width: 768px) {
   .city-nav { padding: 0.5rem 1rem; top: 48px; }
 }

@@ -422,7 +422,7 @@ function extractCitiesFromItinerary() {
   // Helper to add/update city
   const addCity = (cityName, sourceDate = null, source = 'itinerary') => {
     if (!cityName) return;
-    const skipList = ['Home', 'In transit', 'Between cities', 'TBC', ''];
+    const skipList = ['Home', 'In transit', 'Between cities', 'TBC', '', 'Return', 'Departure', 'Arrival'];
     if (skipList.includes(cityName)) return;
 
     // Normalize city name - remove trailing descriptions, keep main city name
