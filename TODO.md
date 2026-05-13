@@ -23,7 +23,7 @@ Read this file at the start of every session. When using Claude Code, read from 
 - [ ] 14d. Improve the reset experience on mobile.
 - [ ] 14e. Remove the home / destination clocks from the mobile shell.
 
-### Item 15: Convert the testing checklist into structured TODO items and add actual smoke tests for core functionality.
+### Item 15: Convert the testing checklist into structured TODO items and add an actual testing suite for actual smoke / unit tests to be used between changes for core functionality.
 - [ ] 15a. Open `index.html` in a browser and confirm the app loads without errors.
 - [ ] 15b. Create, edit, and delete items in all tabs.
 - [ ] 15c. Drag sights/runs from the pool to day cards.
@@ -38,21 +38,21 @@ Read this file at the start of every session. When using Claude Code, read from 
 - [ ] 15l. Run `node scripts/smoke-core.js` to cover date normalization, transport display dates, and AI prompt generation.
 
 ### Item 16: Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.
-- [ ] 16a. Dark mode toggle.
+- [ ] 16a. Cloud file management and autosave or backup instead of keeping everything in browser memory. - Cloud sync, for example Firebase or Dropbox or Google Drive?
 - [ ] 16b. Search/filter functionality.
 - [ ] 16c. Undo/redo system.
 - [ ] 16d. Trip sharing/export formats such as PDF or Google Docs.
 - [ ] 16e. Change colors for cities.
-- [ ] 16f. Add multiple cities to a leg.
-- [ ] 16g. Add or subtract a day to an existing leg.
+- [ ] 16g. Add or subtract a day to an existing leg. (but maybe warn if conflict)
 - [ ] 16h. Add a Notes tab with a generic checklist.
-- [ ] 16i. Cloud file management and autosave or backup instead of keeping everything in browser memory.
-- [ ] 16j. Activity duration tracking.
-- [ ] 16k. Flight miles tracking.
+- [ ] 16i. Dark mode toggle.
+- [ ] 16j. Activity time planning / schedule (when added to doing can set the time to start eg 9am and make sure no overlaps other activities) .
+- [ ] 16k. Flight miles tracking / estimates (in budget)
 - [ ] 16l. Budget category breakdown.
 - [ ] 16m. Image upload for receipts.
-- [ ] 16n. Cloud sync, for example Firebase or Dropbox.
-- [ ] 16o. Multi-user collaboration.
+- [ ] 16n. Multi-user collaboration.
+- [ ] 16o. Ability to export trip, hide private data like booking references and share with other people to view
+- [ ] 16p. The map / legs are kinda useless, the map is not that clear to see / realistic and can't really move through it - needs improvement
 ## Noticed
 
 Add bugs or improvements spotted during work here. Do not fix unless they are part of the active task.
