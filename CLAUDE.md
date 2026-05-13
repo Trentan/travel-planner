@@ -266,6 +266,27 @@ Items use lettered sub-tasks (a, b, c...). Sub-tasks can have roman numeral sub-
 - `Item 8a [1 of 2]: what changed`
 - `Item 8b-i [1 of 3]: what changed`
 
+Commit messages must include a useful body, not just a subject line. Use this structure:
+
+```text
+Item 8a [1 of 2]: short outcome
+
+Summary:
+- What changed and why.
+- Files or behavior affected.
+- TODO/UNFINISHED status updates made.
+
+Verification:
+- Commands run.
+- Fixture/manual checks run.
+- Any relevant result, such as mapped city/leg IDs or regression outcome.
+
+Remaining:
+- Any known limitation, follow-up, or "None".
+```
+
+The post-push reply to the user should include the same outcome summary: branch, commit hash, changed files, summary, verification, and remaining risk.
+
 ---
 
 ### Working through sub-tasks
@@ -278,7 +299,7 @@ Items use lettered sub-tasks (a, b, c...). Sub-tasks can have roman numeral sub-
     2. Run through relevant items in the **Testing Checklist** in TODO.md
     3. Summarise exactly what changed, what files were touched, and why
     4. `git push origin {branch}` immediately after every commit — no exceptions
-    5. Report back to user: branch name, commit message, one-line summary
+    5. Report back to user: branch name, commit hash, changed files, summary, verification, and remaining risk
 - After the final commit of a sub-task:
     1. Push and open a PR for review
     2. Check `[x]` on that sub-task in `TODO.md` and update the item's **Status** block
