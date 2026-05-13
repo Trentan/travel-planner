@@ -92,7 +92,9 @@ function buildCompactItinerary() {
 let openDayCardIds = new Set();
 
 function buildItinerary() {
-  if (isCompactView) {
+  // Check window.isCompactView for cross-module access
+  const isCompact = typeof window !== 'undefined' && window.isCompactView;
+  if (isCompact) {
     buildCompactItinerary();
     return;
   }
