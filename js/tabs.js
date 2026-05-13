@@ -110,8 +110,8 @@ function buildAccomTab(cityFilter = null) {
 // Helper to calculate nights between dates
 function calculateNights(checkIn, checkOut) {
   if (!checkIn || !checkOut) return 0;
-  const start = new Date(checkIn);
-  const end = new Date(checkOut);
+  const start = new Date(`${checkIn}T00:00:00`);
+  const end = new Date(`${checkOut}T00:00:00`);
   const diffTime = end - start;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return Math.max(0, diffDays);
@@ -119,8 +119,9 @@ function calculateNights(checkIn, checkOut) {
 
 // Helper to format date as DD MMM
 function formatDateShort(dateStr) {
+  if (typeof formatTripDateForDisplay === 'function') return formatTripDateForDisplay(dateStr);
   if (!dateStr) return '—';
-  const date = new Date(dateStr + 'T00:00:00'); // Force local time
+  const date = new Date(`${dateStr}T00:00:00`);
   const day = date.getDate();
   const month = date.toLocaleDateString('en-AU', { month: 'short', timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
   return `${day} ${month}`;

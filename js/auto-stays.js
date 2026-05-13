@@ -122,8 +122,8 @@ function createStayFromItinerary(cityName, legId, startDate, nights) {
     id: stayId,
     cityId: city.id,
     propertyName: '', // User will need to fill this in
-    checkIn: checkInDate.toISOString().split('T')[0],
-    checkOut: checkOutDate.toISOString().split('T')[0],
+    checkIn: typeof toLocalIsoDate === 'function' ? toLocalIsoDate(checkInDate) : checkInDate.toISOString().split('T')[0],
+    checkOut: typeof toLocalIsoDate === 'function' ? toLocalIsoDate(checkOutDate) : checkOutDate.toISOString().split('T')[0],
     nights: nights,
     status: 'pending',
     totalCost: '0',

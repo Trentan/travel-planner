@@ -4,7 +4,6 @@ let isEditMode = true;
 
 function saveUiSettings() {
   localStorage.setItem('travelApp_uiSettings_v1', JSON.stringify({
-    isFunMode,
     isCompactView,
     isEditMode
   }));
@@ -19,7 +18,7 @@ function applyUiSettings() {
   }
 
   if (savedSettings) {
-    isFunMode = !!savedSettings.isFunMode;
+    isFunMode = false;
     isCompactView = !!savedSettings.isCompactView;
     isEditMode = savedSettings.isEditMode !== false;
   }
@@ -37,12 +36,6 @@ function applyUiSettings() {
   if (compactBtn) {
     compactBtn.innerHTML = isCompactView ? "Exit Compact" : "Compact View";
     compactBtn.classList.toggle('active-mode', isCompactView);
-  }
-
-  const modeBtn = document.getElementById('modeToggleBtn');
-  if (modeBtn) {
-    modeBtn.innerHTML = isFunMode ? "Logistics Mode" : "Fun Mode";
-    modeBtn.classList.toggle('active-mode', isFunMode);
   }
 
   const editBtn = document.getElementById('editToggleBtn');
@@ -76,8 +69,13 @@ function toggleCompactView() {
   }
 
   applyUiSettings();
-  buildItinerary();
-  buildPackingTab();
+  const activeTabBtn = document.querySelector('.app-tab-btn.active');
+  if (activeTabBtn && activeTabBtn.dataset.tab) {
+    switchTab(activeTabBtn.dataset.tab, activeTabBtn);
+  } else {
+    buildItinerary();
+    buildPackingTab();
+  }
 }
 
 function toggleMode() {
@@ -192,14 +190,15 @@ function toggleAllLegs() {
 }
 
 function printPage(mode) {
+  const previousClasses = document.body.className;
   if (mode === 'detailed') {
     document.querySelectorAll('.day-card').forEach(c => c.classList.add('open'));
     document.querySelectorAll('.leg').forEach(l => l.classList.remove('collapsed'));
   }
-  document.body.className = isFunMode ? 'fun-mode' : '';
+  document.body.className = '';
   document.body.classList.add('print-' + mode);
   window.print();
-  setTimeout(() => { document.body.className = isFunMode ? 'fun-mode' : ''; if(!isEditMode) document.body.classList.add('read-only-mode'); }, 1000);
+  setTimeout(() => { document.body.className = previousClasses; }, 1000);
 }
 
 // Print Preview Modal
@@ -222,7 +221,8 @@ function populateDateRangeOptions() {
   const dates = [];
   appData.forEach(leg => {
     leg.days.forEach(day => {
-      const dateKey = `${day.day} ${day.date}`;
+      const displayDate = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
+      const dateKey = `${day.day} ${displayDate}`;
       if (!dates.find(d => d.key === dateKey)) {
         dates.push({ key: dateKey, leg: leg.label });
       }
@@ -252,7 +252,7 @@ function updatePrintPreview() {
 
   if (dateRange !== 'all') {
     filteredData = filteredData.filter(leg =>
-      leg.days.some(day => `${day.day} ${day.date}` === dateRange)
+      leg.days.some(day => `${day.day} ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date}` === dateRange)
     );
   }
 
@@ -266,10 +266,11 @@ function updatePrintPreview() {
     html += `<strong style="font-size: 0.9rem;">${leg.label}</strong>`;
 
     leg.days.forEach(day => {
-      if (dateRange !== 'all' && `${day.day} ${day.date}` !== dateRange) return;
+      const displayDate = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
+      if (dateRange !== 'all' && `${day.day} ${displayDate}` !== dateRange) return;
 
       html += `<div style="margin: 0.5rem 0; font-size: 0.85rem;">`;
-      html += `<span style="color: #666;">${day.day} ${day.date}:</span> ${day.from} → ${day.to}`;
+      html += `<span style="color: #666;">${day.day} ${displayDate}:</span> ${day.from} → ${day.to}`;
 
       let items = [];
       if (showTransport && day.transportItems?.length) items.push(...day.transportItems.map(i => '🚌 ' + i.text));
@@ -335,8 +336,10 @@ function sortLegs() {
   appData.sort((a, b) => {
     if (!a.days || a.days.length === 0) return 1;
     if (!b.days || b.days.length === 0) return -1;
-    let dA = new Date(a.days[0].date + " 2026").getTime();
-    let dB = new Date(b.days[0].date + " 2026").getTime();
+    const aDate = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(a.days[0].date) : a.days[0].date;
+    const bDate = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(b.days[0].date) : b.days[0].date;
+    let dA = new Date(`${aDate}T00:00:00`).getTime();
+    let dB = new Date(`${bDate}T00:00:00`).getTime();
     if(isNaN(dA)) dA = 0;
     if(isNaN(dB)) dB = 0;
     return dA - dB;

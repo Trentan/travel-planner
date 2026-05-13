@@ -1551,7 +1551,7 @@ function initData() {
     try {
       const parsed = JSON.parse(savedJourneys);
       if (Array.isArray(parsed)) {
-        journeys = parsed;
+        journeys = normalizeTripJourneysData(parsed);
         window.journeys = journeys; // sync to window for other modules
         console.log(`[Journeys] Loaded ${journeys.length} journeys from localStorage`);
       }
@@ -1570,7 +1570,7 @@ function initData() {
     try {
       const parsed = JSON.parse(savedStays);
       if (Array.isArray(parsed)) {
-        stays = parsed;
+        stays = normalizeTripStaysData(parsed);
         window.stays = stays;
       }
     } catch (e) {
@@ -1584,7 +1584,7 @@ function initData() {
 
   const saved = localStorage.getItem('travelApp_v2026_template');
   if (saved) {
-    appData = JSON.parse(saved);
+    appData = normalizeTripLegsData(JSON.parse(saved));
     appData.forEach(leg => {
       if (!leg.legTips) {
         leg.legTips = [];
@@ -1647,6 +1647,8 @@ function initData() {
   }
   else { appData = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
 
+  appData = normalizeTripLegsData(appData);
+
   const savedPacking = localStorage.getItem('travelApp_packing_v3');
   if (savedPacking) { packingData = JSON.parse(savedPacking); }
   else { packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING)); }
@@ -1668,6 +1670,7 @@ function initData() {
   if (savedCities) {
     try {
       citiesData = JSON.parse(savedCities);
+      normalizeTripCitiesDateData(citiesData);
       // Migrate existing cities to include code if missing
       citiesData.forEach(city => {
         if (!city.code) {
@@ -1811,16 +1814,137 @@ async function saveData(showTick = true) {
   }
 }
 
-function resetData() {
-  if(confirm("Reset all edits back to the default template? This will wipe current data.")) {
-    const keysToClear = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('travelApp_')) keysToClear.push(key);
-    }
-    keysToClear.forEach(key => localStorage.removeItem(key));
-    location.reload();
+const TRIP_DATE_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function normalizeTripDateValue(dateStr, fallbackYear = 2026) {
+  if (!dateStr || typeof dateStr !== 'string') return '';
+
+  const trimmed = dateStr.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+
+  const shortMatch = trimmed.match(/^(\d{1,2})\s+([A-Za-z]{3,})$/);
+  if (!shortMatch) return trimmed;
+
+  const months = {
+    jan: '01', january: '01',
+    feb: '02', february: '02',
+    mar: '03', march: '03',
+    apr: '04', april: '04',
+    may: '05',
+    jun: '06', june: '06',
+    jul: '07', july: '07',
+    aug: '08', august: '08',
+    sep: '09', sept: '09', september: '09',
+    oct: '10', october: '10',
+    nov: '11', november: '11',
+    dec: '12', december: '12'
+  };
+
+  const monthKey = shortMatch[2].toLowerCase();
+  if (!Object.prototype.hasOwnProperty.call(months, monthKey)) return trimmed;
+
+  const day = shortMatch[1].padStart(2, '0');
+  return `${fallbackYear}-${months[monthKey]}-${day}`;
+}
+
+function formatTripDateForDisplay(dateStr) {
+  const normalized = normalizeTripDateValue(dateStr);
+  if (!normalized || !/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return dateStr || '—';
+
+  const date = new Date(`${normalized}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return dateStr || '—';
+  return `${date.getDate()} ${TRIP_DATE_MONTHS[date.getMonth()]}`;
+}
+
+function toLocalIsoDate(dateValue) {
+  const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function normalizeTripLegsData(legs) {
+  if (!Array.isArray(legs)) return [];
+  legs.forEach(leg => {
+    (leg.days || []).forEach(day => {
+      day.date = normalizeTripDateValue(day.date);
+    });
+  });
+  return legs;
+}
+
+function normalizeTripJourneysData(items) {
+  if (!Array.isArray(items)) return [];
+  items.forEach(item => {
+    item.dayDate = normalizeTripDateValue(item.dayDate);
+    item.departureDate = normalizeTripDateValue(item.departureDate);
+    item.arrivalDate = normalizeTripDateValue(item.arrivalDate);
+  });
+  return items;
+}
+
+function normalizeTripStaysData(items) {
+  if (!Array.isArray(items)) return [];
+  items.forEach(item => {
+    item.checkIn = normalizeTripDateValue(item.checkIn);
+    item.checkOut = normalizeTripDateValue(item.checkOut);
+  });
+  return items;
+}
+
+function normalizeTripCitiesDateData(items) {
+  if (!Array.isArray(items)) return [];
+  items.forEach(item => {
+    item.dateFrom = normalizeTripDateValue(item.dateFrom);
+    item.dateTo = normalizeTripDateValue(item.dateTo);
+  });
+  return items;
+}
+
+async function resetData() {
+  if(!confirm("Reset all edits back to the default template? This will wipe current data, clear caches, and reload the app.")) {
+    return;
   }
+
+  const keysToClear = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('travelApp_')) keysToClear.push(key);
+  }
+  keysToClear.forEach(key => localStorage.removeItem(key));
+
+  try {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(registration => registration.unregister().catch(() => false)));
+    }
+  } catch (e) {
+    console.warn('Reset app: service worker cleanup skipped', e);
+  }
+
+  try {
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+    }
+  } catch (e) {
+    console.warn('Reset app: cache cleanup skipped', e);
+  }
+
+  try {
+    if (window.indexedDB && DB_NAME) {
+      await new Promise(resolve => {
+        const request = window.indexedDB.deleteDatabase(DB_NAME);
+        request.onsuccess = request.onerror = request.onblocked = () => resolve();
+      });
+    }
+  } catch (e) {
+    console.warn('Reset app: IndexedDB cleanup skipped', e);
+  }
+
+  location.reload();
 }
 
 function migratePacking(data) {
@@ -1979,18 +2103,19 @@ function exportJSON() {
   saveData(false);
   // Get journeys if they exist
   let journeysData = [];
-  if (typeof journeys !== 'undefined') journeysData = journeys;
+  if (typeof journeys !== 'undefined') journeysData = normalizeTripJourneysData(JSON.parse(JSON.stringify(journeys)));
   let staysData = [];
-  if (typeof stays !== 'undefined') staysData = stays;
+  if (typeof stays !== 'undefined') staysData = normalizeTripStaysData(JSON.parse(JSON.stringify(stays)));
   // Get cities - include all cities from citiesData
   let citiesDataToExport = [];
-  if (typeof citiesData !== 'undefined') citiesDataToExport = citiesData;
+  if (typeof citiesData !== 'undefined') citiesDataToExport = normalizeTripCitiesDateData(JSON.parse(JSON.stringify(citiesData)));
   // Get user customizations
   let userCitiesData = [];
   if (typeof userCities !== 'undefined') userCitiesData = userCities;
   let userCountriesData = [];
   if (typeof userCountries !== 'undefined') userCountriesData = userCountries;
-  const exportObj = { meta: titleData, itinerary: appData, packing: packingData, leaveHome: leaveHomeData, journeys: journeysData, stays: staysData, cities: citiesDataToExport, userCities: userCitiesData, userCountries: userCountriesData };
+  const itineraryData = normalizeTripLegsData(JSON.parse(JSON.stringify(appData)));
+  const exportObj = { meta: titleData, itinerary: itineraryData, packing: packingData, leaveHome: leaveHomeData, journeys: journeysData, stays: staysData, cities: citiesDataToExport, userCities: userCitiesData, userCountries: userCountriesData };
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute("href", dataStr);
@@ -2071,7 +2196,7 @@ function importJSON(event) {
         return;
       }
 
-      appData = importedData.itinerary;
+      appData = normalizeTripLegsData(importedData.itinerary);
 
       appData.forEach(leg => {
         if (!leg.legTips) {
@@ -2136,10 +2261,10 @@ if (importedData.journeys && Array.isArray(importedData.journeys)) {
   transitCitiesToAdd = getIntermediateJourneyCities(importedData.journeys);
 
   // Set journeys variable and window scope for budget calculation
-  journeys = importedData.journeys;
+  journeys = normalizeTripJourneysData(importedData.journeys);
   window.journeys = journeys;
-  localStorage.setItem("travelApp_journeys_v1", JSON.stringify(importedData.journeys));
-  console.log("[Import] Saved " + importedData.journeys.length + " journeys to localStorage");
+  localStorage.setItem("travelApp_journeys_v1", JSON.stringify(journeys));
+  console.log("[Import] Saved " + journeys.length + " journeys to localStorage");
 } else {
   console.log("[Import] No journeys found in imported data");
 }
@@ -2147,6 +2272,8 @@ if (importedData.journeys && Array.isArray(importedData.journeys)) {
 // Import stays - collect destination city references
 var stayCitiesToAdd = [];
 if (importedData.stays && Array.isArray(importedData.stays)) {
+  stays = normalizeTripStaysData(importedData.stays);
+  window.stays = stays;
   importedData.stays.forEach(stay => {
     if (stay.city) {
       stayCitiesToAdd.push(stay.city);
@@ -2164,6 +2291,7 @@ localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries)
 // Import cities if present in the JSON, otherwise extract from itinerary
 if (importedData.cities && Array.isArray(importedData.cities)) {
   citiesData = normalizeImportedCities(importedData);
+  normalizeTripCitiesDateData(citiesData);
   console.log(`[Import] Loaded ${citiesData.length} cities from JSON`);
 
   // Also import userCities and userCountries if present
@@ -2189,6 +2317,7 @@ if (importedData.cities && Array.isArray(importedData.cities)) {
   // addCityById cannot resolve stale browser cities from a previous trip.
   citiesData = [];
   citiesData = extractCitiesFromItinerary();
+  normalizeTripCitiesDateData(citiesData);
   console.log(`[Import] Extracted ${citiesData.length} cities from itinerary`);
 
   if (importedData.userCities && Array.isArray(importedData.userCities)) {

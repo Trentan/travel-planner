@@ -22,7 +22,6 @@
     <span class="file-badge" id="exportIndicator" style="display: none; margin-left: 1rem; font-size: 0.8rem; opacity: 0.8;"></span>
   </div>
   <div class="app-menu-right">
-    <button id="modeToggleBtn" class="app-menu-btn" onclick="toggleMode()">📋 Fun Mode</button>
     <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
     <button id="compactToggleBtn" class="app-menu-btn" onclick="toggleCompactView()">📄 Compact View</button>
     <span style="color: rgba(255,255,255,0.2);">|</span>
@@ -35,7 +34,6 @@
     <button class="app-menu-btn" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
     <button class="app-menu-btn" onclick="exportJSON()">📤 Export Backup</button>
     <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="promptInstallApp()">⬇ Install App</button>
-    <button class="app-menu-btn" onclick="openForceRefreshDialog()">🔄 Force Refresh</button>
     <button class="app-menu-btn danger" onclick="resetData()">Reset App</button>
   </div>
 </div>
@@ -535,63 +533,6 @@
 
 </div>
 
-<div id="force-refresh-modal" class="modal-overlay" style="display: none;">
-  <div class="modal-content" style="max-width: 500px;">
-    <div class="modal-header">
-      <h2>🔄 Force Refresh App</h2>
-      <button class="modal-close" onclick="closeForceRefreshDialog()">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div style="padding: 1rem 0;">
-        <p style="color: #666; margin-bottom: 1.5rem;">
-          This will completely clear the app and reload fresh assets from the server.
-        </p>
-
-        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
-          <strong style="color: #856404;">⚠ Warning:</strong>
-          <ul style="margin: 0.5rem 0 0 1.2rem; color: #856404;">
-            <li>Your current trip data will be <strong>deleted</strong></li>
-            <li>All caches (including offline assets) will be cleared</li>
-            <li>You will need to re-import your trip JSON file</li>
-            <li>On mobile: you may need to uninstall/reinstall the app to fully clear</li>
-          </ul>
-        </div>
-
-        <div style="background: #d4edda; border: 1px solid #28a745; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
-          <strong style="color: #155724;">✓ When to use this:</strong>
-          <ul style="margin: 0.5rem 0 0 1.2rem; color: #155724;">
-            <li>App showing old/buggy behavior after an update</li>
-            <li>Changes not appearing on your device</li>
-            <li>Corrupted cache causing issues</li>
-            <li>Need a completely fresh start</li>
-          </ul>
-        </div>
-
-        <details style="margin-bottom: 1.5rem;">
-          <summary style="cursor: pointer; color: #333; font-weight: 500;">Manual clear instructions (if automatic fails)</summary>
-          <div style="margin-top: 0.75rem; font-size: 0.85rem; color: #666;">
-            <p><strong>Desktop browser:</strong> Settings → Privacy → Clear browsing data → Cached images and files</p>
-            <p><strong>iPhone Safari:</strong> Scroll down to Travel Planner under Websites → Erase data</p>
-            <p><strong>Android Chrome:</strong> Settings → Privacy → Clear browsing data → Cached images and files</p>
-            <p><strong>Android PWA:</strong> Settings → Apps → Travel Planner → Storage → Clear data & Clear cache</p>
-          </div>
-        </details>
-
-        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
-          <label class="check-label" style="font-size: 0.9rem;">
-            <input type="checkbox" id="refreshConfirmCheckbox" style="margin-right: 0.5rem;">
-            I understand my data will be deleted - refresh anyway
-          </label>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="action-btn" onclick="closeForceRefreshDialog()">Cancel</button>
-      <button class="action-btn danger" id="confirmRefreshBtn" onclick="performForceRefresh()" disabled style="opacity: 0.5;">Yes, Force Refresh</button>
-    </div>
-  </div>
-</div>
-
 </main>
 
 <script src="./js/utils.js"></script>
@@ -652,137 +593,7 @@
   setInterval(updateClocks, 1000);
   updateClocks();
 
-  // Force refresh dialog handling
-  function openForceRefreshDialog() {
-    const modal = document.getElementById('force-refresh-modal');
-    if (modal) {
-      modal.style.display = 'flex';
-      document.getElementById('refreshConfirmCheckbox').checked = false;
-      updateRefreshButtonState();
-    }
-  }
-
-  function closeForceRefreshDialog() {
-    const modal = document.getElementById('force-refresh-modal');
-    if (modal) {
-      modal.style.display = 'none';
-    }
-  }
-
-  function updateRefreshButtonState() {
-    const checkbox = document.getElementById('refreshConfirmCheckbox');
-    const btn = document.getElementById('confirmRefreshBtn');
-    if (checkbox && btn) {
-      btn.disabled = !checkbox.checked;
-      btn.style.opacity = checkbox.checked ? '1' : '0.5';
-    }
-  }
-
-  async function performForceRefresh() {
-    if (!confirm('Are you sure? This will delete all your trip data and clear all caches. You will need to re-import your trip JSON.')) {
-      return;
-    }
-
-    let messages = [];
-    let errors = [];
-
-    // Try to unregister service worker (may fail on file:// protocol)
-    try {
-      if ('serviceWorker' in navigator) {
-        const registrations = await navigator.serviceWorker.getRegistrations();
-        for (const registration of registrations) {
-          try {
-            await registration.unregister();
-            messages.push('Service worker unregistered');
-          } catch (err) {
-            // SW unregistration may fail on file:// or other protocols
-            console.warn('SW unregister failed:', err.message);
-            errors.push('Could not unregister service worker (may require HTTPS/localhost)');
-          }
-        }
-        if (registrations.length === 0) {
-          messages.push('No service workers to unregister');
-        }
-      }
-    } catch (err) {
-      errors.push('Service worker access not available');
-    }
-
-    // Clear all caches (this often works even when SW unregister doesn't)
-    try {
-      if ('caches' in window) {
-        const cacheNames = await caches.keys();
-        let cleared = 0;
-        for (const cacheName of cacheNames) {
-          if (await caches.delete(cacheName)) {
-            cleared++;
-          }
-        }
-        messages.push(`Cleared ${cleared} cache(s)`);
-      }
-    } catch (err) {
-      errors.push('Could not clear cache storage');
-    }
-
-    // Clear localStorage travel data
-    try {
-      const keysToClear = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('travelApp_')) keysToClear.push(key);
-      }
-      keysToClear.forEach(key => localStorage.removeItem(key));
-      const cleared = keysToClear.length;
-      messages.push(`Cleared ${cleared} localStorage entries`);
-    } catch (err) {
-      errors.push('Could not clear localStorage');
-    }
-
-    // Try to clear IndexedDB
-    try {
-      if ('indexedDB' in window) {
-        const dbNames = await window.indexedDB.databases();
-        let cleared = 0;
-        for (const db of dbNames) {
-          if (db.name && db.name.includes('travelApp')) {
-            window.indexedDB.deleteDatabase(db.name);
-            cleared++;
-          }
-        }
-        messages.push(`Queued ${cleared} IndexedDB database(s) for deletion`);
-      }
-    } catch (err) {
-      errors.push('Could not access IndexedDB');
-    }
-
-    // Close modal before reload
-    closeForceRefreshDialog();
-
-    // Show status message
-    const statusMsg = messages.join(', ');
-    const errorMsg = errors.length > 0 ? ' (Some operations may require manual: Settings > Apps > Travel Planner > Storage > Clear' : '';
-
-    // Force reload the page (hard reload)
-    setTimeout(() => {
-      // Try hard reload first
-      try {
-        window.location.reload(true);
-      } catch (e) {
-        // Fallback for browsers that don't support force reload
-        window.location.href = window.location.href + '?t=' + Date.now();
-      }
-    }, 100);
-
-    // Also show a message before reload
-    alert('Data cleared: ' + statusMsg + errorMsg + '). The page will now reload.');
-  }
-
-  // Listen for checkbox changes
   document.addEventListener('DOMContentLoaded', () => {
-    const checkbox = document.getElementById('refreshConfirmCheckbox');
-    if (checkbox) {
-      checkbox.addEventListener('change', updateRefreshButtonState);
-    }
     syncInstallButton();
   });
 
