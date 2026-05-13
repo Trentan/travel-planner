@@ -34,7 +34,7 @@
     <button class="app-menu-btn" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
     <button class="app-menu-btn" onclick="exportJSON()">📤 Export Backup</button>
     <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="promptInstallApp()">⬇ Install App</button>
-    <button class="app-menu-btn danger" onclick="resetData()">Reset App</button>
+    <button class="app-menu-btn danger" onclick="promptResetData()">Reset App</button>
     <button class="app-menu-btn mobile-menu-btn" onclick="toggleMobileMenu()">☰ Menu</button>
   </div>
 </div>
@@ -152,6 +152,8 @@
         <button class="modal-close" onclick="closeMobileMenu()">&times;</button>
       </div>
       <div class="mobile-menu-sheet-grid">
+        <button id="mobileEditToggleBtn" class="app-menu-btn" onclick="closeMobileMenu(); toggleEditMode()">🔒 Lock: Read Only</button>
+        <button id="mobileCompactToggleBtn" class="app-menu-btn" onclick="closeMobileMenu(); toggleCompactView()">📄 Compact View</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openCityDialog()">🌍 Cities</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openAIDialog()">🤖 AI Builder</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openGuideDialog()">📖 Guide</button>
@@ -159,7 +161,7 @@
         <button class="app-menu-btn" onclick="document.getElementById('importFile').click(); closeMobileMenu()">📥 Import JSON</button>
         <button class="app-menu-btn" onclick="exportJSON(); closeMobileMenu()">📤 Export Backup</button>
         <button id="mobileInstallAppBtn" class="app-menu-btn install-btn" hidden onclick="closeMobileMenu(); promptInstallApp()">⬇ Install App</button>
-        <button class="app-menu-btn danger" onclick="closeMobileMenu(); resetData()">Reset App</button>
+        <button class="app-menu-btn danger" onclick="closeMobileMenu(); promptResetData()">Reset App</button>
       </div>
     </div>
   </div>

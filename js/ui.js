@@ -53,6 +53,32 @@ function closeMobileMenu(event) {
   document.body.classList.remove('mobile-menu-open');
 }
 
+function syncModeToggleButtons() {
+  const buttonSets = [
+    {
+      ids: ['editToggleBtn', 'mobileEditToggleBtn'],
+      label: isEditMode ? '🔒 Lock: Read Only' : '✏️ Unlock Editing',
+      activeClass: 'edit-mode',
+      isActive: !isEditMode
+    },
+    {
+      ids: ['compactToggleBtn', 'mobileCompactToggleBtn'],
+      label: isCompactView ? '📄 Exit Compact' : '📄 Compact View',
+      activeClass: 'active-mode',
+      isActive: isCompactView
+    }
+  ];
+
+  buttonSets.forEach(({ ids, label, activeClass, isActive }) => {
+    ids.forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.innerHTML = label;
+      btn.classList.toggle(activeClass, isActive);
+    });
+  });
+}
+
 function saveUiSettings() {
   localStorage.setItem('travelApp_uiSettings_v1', JSON.stringify({
     isCompactView,
@@ -83,18 +109,7 @@ function applyUiSettings() {
   document.body.classList.toggle('compact-view-mode', isCompactView);
   document.body.classList.toggle('read-only-mode', !isEditMode);
   syncResponsiveUi();
-
-  const compactBtn = document.getElementById('compactToggleBtn');
-  if (compactBtn) {
-    compactBtn.innerHTML = isCompactView ? "Exit Compact" : "Compact View";
-    compactBtn.classList.toggle('active-mode', isCompactView);
-  }
-
-  const editBtn = document.getElementById('editToggleBtn');
-  if (editBtn) {
-    editBtn.innerHTML = isEditMode ? "Lock: Read Only" : "Unlock Editing";
-    editBtn.classList.toggle('edit-mode', !isEditMode);
-  }
+  syncModeToggleButtons();
 
   const title = document.getElementById('mainTitle');
   const subtitle = document.getElementById('mainSubtitle');
@@ -218,6 +233,51 @@ function openGuideDialog() {
 function closeGuideDialog() {
   const modal = document.getElementById('guide-modal');
   if (modal) modal.style.display = 'none';
+}
+
+function toggleCompactView() {
+  isCompactView = !isCompactView;
+  saveUiSettings();
+  window.isCompactView = isCompactView;
+  document.body.classList.toggle('compact-view-mode', isCompactView);
+  applyUiSettings();
+  const activeTabBtn = document.querySelector('.app-tab-btn.active');
+  if (activeTabBtn && activeTabBtn.dataset.tab) {
+    switchTab(activeTabBtn.dataset.tab, activeTabBtn);
+  } else {
+    buildItinerary();
+    buildPackingTab();
+  }
+}
+
+function toggleEditMode() {
+  isEditMode = !isEditMode;
+  saveUiSettings();
+  window.isEditMode = isEditMode;
+  document.body.classList.toggle('read-only-mode', !isEditMode);
+  const title = document.getElementById('mainTitle');
+  const subtitle = document.getElementById('mainSubtitle');
+  if (title) title.contentEditable = isEditMode;
+  if (subtitle) subtitle.contentEditable = isEditMode;
+  if (!isEditMode) saveData();
+  applyUiSettings();
+  const activeTab = document.querySelector('.app-tab-btn.active')?.innerText || '';
+  const cityFilter = typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all';
+  if (activeTab.includes('Transport')) buildTransportTab(cityFilter);
+  if (activeTab.includes('Accommodation')) buildAccomTab(cityFilter);
+  if (activeTab.includes('Packing')) buildPackingTab();
+}
+
+function promptResetData() {
+  closeMobileMenu();
+  const mobileResetMessage = [
+    'Reset this app on mobile?',
+    '',
+    'This will clear your trip data, saved settings, offline cache, and local backups, then reload the planner.'
+  ].join('\n');
+  return resetData({
+    confirmMessage: isMobileViewport() ? mobileResetMessage : undefined
+  });
 }
 
 function toggleCard(bar) { bar.parentElement.classList.toggle('open'); }
@@ -435,4 +495,5 @@ window.executePrint = executePrint;
 window.toggleMobileMenu = toggleMobileMenu;
 window.closeMobileMenu = closeMobileMenu;
 window.syncResponsiveUi = syncResponsiveUi;
+window.promptResetData = promptResetData;
 window.addLeg = addLeg;

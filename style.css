@@ -539,6 +539,10 @@ main {
   .app-menu-right::-webkit-scrollbar { display: none; }
   .app-menu-right > span,
   .app-menu-right .app-menu-btn:not(.mobile-menu-btn):not(#editToggleBtn):not(#compactToggleBtn) { display: none; }
+  #editToggleBtn,
+  #compactToggleBtn {
+    display: none;
+  }
   .mobile-menu-btn { display: inline-flex; }
   .app-menu-btn {
     flex: 0 0 auto;
@@ -644,11 +648,12 @@ body.mobile-app-mode.compact-view-mode .tab-label {
 }
 
 body.mobile-app-mode.compact-view-mode .app-menu-bar {
-  padding: 0.5rem 0.75rem;
+  padding: 0.4rem 0.65rem;
+  gap: 0.45rem;
 }
 
 body.mobile-app-mode.compact-view-mode header {
-  padding: 0.85rem 0.75rem 0.75rem;
+  display: none;
 }
 
 body.mobile-app-mode.compact-view-mode .header-text h1 {
@@ -660,23 +665,47 @@ body.mobile-app-mode.compact-view-mode .header-text p {
 }
 
 body.mobile-app-mode.compact-view-mode .app-tabs-nav {
-  padding: 0 0.5rem;
+  padding: 0 0.35rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
 }
 
 body.mobile-app-mode.compact-view-mode .city-nav {
-  padding: 0.35rem 0.5rem;
+  padding: 0.3rem 0.35rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+
+body.mobile-app-mode.compact-view-mode .app-tabs-content {
+  margin-top: 0.65rem;
+}
+
+body.mobile-app-mode.compact-view-mode .top-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
 }
 
 body.mobile-app-mode.compact-view-mode .top-controls .action-btn {
-  padding: 0.45rem 0.7rem;
-  font-size: 0.78rem;
+  width: 100%;
+  min-height: 36px;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.74rem;
+}
+
+body.mobile-app-mode.compact-view-mode .day-card {
+  box-shadow: none;
 }
 
 body.mobile-app-mode.compact-view-mode .day-bar {
-  grid-template-columns: 22px 1fr auto;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  padding: 0.55rem 0.65rem;
 }
 
 body.mobile-app-mode.compact-view-mode .day-date {
+  display: none;
+}
+
+body.mobile-app-mode.compact-view-mode .day-desc {
   display: none;
 }
 
@@ -689,7 +718,24 @@ body.mobile-app-mode.compact-view-mode .budget-kpi .amount {
 }
 
 body.mobile-app-mode.compact-view-mode .budget-kpi {
-  padding: 0.85rem;
+  padding: 0.75rem;
+}
+
+body.mobile-app-mode.compact-view-mode .day-detail {
+  padding: 0 0.7rem 0.7rem;
+}
+
+body.mobile-app-mode.compact-view-mode .detail-grid {
+  gap: 0.65rem;
+}
+
+body.mobile-app-mode.compact-view-mode .detail-block {
+  padding: 0.7rem 0.75rem;
+}
+
+body.mobile-app-mode.compact-view-mode .map-header,
+body.mobile-app-mode.compact-view-mode .journey-stats {
+  display: none;
 }
 
 body.mobile-menu-open {

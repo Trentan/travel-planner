@@ -1903,8 +1903,9 @@ function normalizeTripCitiesDateData(items) {
   return items;
 }
 
-async function resetData() {
-  if(!confirm("Reset all edits back to the default template? This will wipe current data, clear caches, and reload the app.")) {
+async function resetData(options = {}) {
+  const confirmMessage = options.confirmMessage || "Reset all edits back to the default template? This will wipe current data, clear caches, and reload the app.";
+  if(!confirm(confirmMessage)) {
     return;
   }
 
