@@ -423,7 +423,7 @@ function extractCitiesFromItinerary() {
   const addCity = (cityName, sourceDate = null, source = 'itinerary') => {
     if (!cityName) return;
     const skipList = ['Home', 'In transit', 'Between cities', 'TBC', '', 'Return', 'Departure', 'Arrival'];
-    if (skipList.includes(cityName)) return;
+    if (skipList.some(skipName => skipName.toLowerCase() === cityName.trim().toLowerCase())) return;
 
     // Normalize city name - remove trailing descriptions, keep main city name
     let normalized = cityName.trim();
@@ -1810,15 +1810,12 @@ async function saveData(showTick = true) {
 
 function resetData() {
   if(confirm("Reset all edits back to the default template? This will wipe current data.")) {
-    localStorage.removeItem('travelApp_v2026_template');
-    localStorage.removeItem('travelApp_packing_v3');
-    localStorage.removeItem('travelApp_leavehome_v3');
-    localStorage.removeItem('travelApp_meta_template');
-    localStorage.removeItem('travelApp_filename_v2026');
-    localStorage.removeItem('travelApp_journeys_v1');
-    localStorage.removeItem('travelApp_stays_v1');
-    localStorage.removeItem('travelApp_last_export_v2026');
-    localStorage.removeItem('travelApp_last_import_v2026');
+    const keysToClear = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('travelApp_')) keysToClear.push(key);
+    }
+    keysToClear.forEach(key => localStorage.removeItem(key));
     location.reload();
   }
 }
@@ -1840,6 +1837,130 @@ function migratePacking(data) {
     else { areas[1].categories.push(entry); }
   });
   return areas.filter(a => a.categories.length > 0);
+}
+
+function getImportedDestinationCityNames(importedData) {
+  const destinationNames = new Set();
+  const cityIdToName = new Map();
+  const skipNames = new Set(['home', 'in transit', 'between cities', 'tbc', '', 'return', 'departure', 'arrival']);
+
+  const addName = (name) => {
+    if (!name || typeof name !== 'string') return;
+    const normalized = name.trim();
+    if (!normalized || skipNames.has(normalized.toLowerCase())) return;
+    destinationNames.add(normalized.toLowerCase());
+  };
+
+  const cleanLegLabel = (label) => {
+    if (!label || typeof label !== 'string') return '';
+    return label
+      .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')
+      .replace(/\p{Emoji}/gu, '')
+      .replace(/[^\w\s-]/gu, '')
+      .trim();
+  };
+
+  if (Array.isArray(importedData.cities)) {
+    importedData.cities.forEach(city => {
+      if (city && city.id && city.name) cityIdToName.set(city.id, city.name);
+    });
+  }
+
+  if (Array.isArray(importedData.itinerary)) {
+    importedData.itinerary.forEach(leg => {
+      const labelName = cleanLegLabel(leg.label);
+      let labelMatchesDayCity = false;
+
+      if (leg.id) {
+        const directCityName = cityIdToName.get(leg.id) || cityIdToName.get('city-' + leg.id);
+        if (directCityName && labelName && directCityName.toLowerCase() === labelName.toLowerCase()) {
+          labelMatchesDayCity = (leg.days || []).some(day =>
+            (day.to && labelName.toLowerCase() === day.to.toLowerCase()) ||
+            (day.from && labelName.toLowerCase() === day.from.toLowerCase())
+          );
+          if (labelMatchesDayCity) addName(directCityName);
+        }
+      }
+
+      (leg.days || []).forEach(day => {
+        if (day.from && day.to && day.from === day.to) addName(day.to);
+        if (labelName && day.to && labelName.toLowerCase() === day.to.toLowerCase()) addName(day.to);
+        if (labelName && day.from && labelName.toLowerCase() === day.from.toLowerCase()) addName(day.from);
+
+        (day.accomItems || []).forEach(item => {
+          if (item.cityId && cityIdToName.has(item.cityId)) addName(cityIdToName.get(item.cityId));
+        });
+      });
+    });
+  }
+
+  if (Array.isArray(importedData.stays)) {
+    importedData.stays.forEach(stay => {
+      if (stay.city) addName(stay.city);
+      if (stay.cityId && cityIdToName.has(stay.cityId)) addName(cityIdToName.get(stay.cityId));
+    });
+  }
+
+  return destinationNames;
+}
+
+function normalizeImportedCities(importedData) {
+  if (!Array.isArray(importedData.cities)) return [];
+
+  const destinationNames = getImportedDestinationCityNames(importedData);
+  const allCitiesMarkedTransit = importedData.cities.length > 0 && importedData.cities.every(city => city && city.isTransit === true);
+  const skipNames = new Set(['home', 'in transit', 'between cities', 'tbc', '', 'return', 'departure', 'arrival']);
+
+  return importedData.cities.filter(city => {
+    const cityName = city && city.name ? city.name.trim().toLowerCase() : '';
+    return !skipNames.has(cityName);
+  }).map(city => {
+    const normalizedCity = { ...city };
+    const isDestination = normalizedCity.name && destinationNames.has(normalizedCity.name.trim().toLowerCase());
+
+    if ((allCitiesMarkedTransit && isDestination) || isDestination) {
+      delete normalizedCity.isTransit;
+      if (normalizedCity.colour === '#95a5a6') normalizedCity.colour = getRandomCityColor();
+    } else if (normalizedCity.isTransit === true && !normalizedCity.colour) {
+      normalizedCity.colour = '#95a5a6';
+    }
+
+    return normalizedCity;
+  });
+}
+
+function getIntermediateJourneyCities(journeysData) {
+  if (!Array.isArray(journeysData)) return [];
+
+  const grouped = new Map();
+  journeysData.forEach((journey, index) => {
+    const groupId = journey.journeyId || journey.id || `journey-${index}`;
+    if (!grouped.has(groupId)) grouped.set(groupId, []);
+    grouped.get(groupId).push(journey);
+  });
+
+  const transitCities = [];
+  grouped.forEach(segments => {
+    const sortedSegments = [...segments].sort((a, b) => {
+      const aOrder = Number.isFinite(Number(a.segmentOrder)) ? Number(a.segmentOrder) : 0;
+      const bOrder = Number.isFinite(Number(b.segmentOrder)) ? Number(b.segmentOrder) : 0;
+      return aOrder - bOrder;
+    });
+
+    if (sortedSegments.length <= 1) return;
+
+    const finalDestination = sortedSegments[sortedSegments.length - 1].toLocation;
+    sortedSegments.slice(0, -1).forEach(segment => {
+      if (segment.toLocation && segment.toLocation !== finalDestination) {
+        transitCities.push(segment.toLocation);
+      }
+    });
+  });
+
+  return [...new Set(transitCities)];
 }
 
 function exportJSON() {
@@ -1872,6 +1993,7 @@ function exportJSON() {
 
   // Record export timestamp
   localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
+  localStorage.setItem('travelApp_last_export_filename', dlName);
 }
 
 // Expose city dialog functions to window scope
@@ -1998,15 +2120,8 @@ if (importedData.meta) {
 // Import journeys if present - also create cities from journey references
 var transitCitiesToAdd = []; // Collect transit city names before we load citiesData
 if (importedData.journeys && Array.isArray(importedData.journeys)) {
-  // Extract cities from journey data that might not be in itinerary days
-  importedData.journeys.forEach(journey => {
-    [journey.fromLocation, journey.toLocation].forEach(cityName => {
-      if (cityName && cityName !== 'Home' && cityName !== 'In transit' && cityName !== 'TBC' && cityName !== '') {
-        // Store for later merging after cities are loaded
-        transitCitiesToAdd.push(cityName);
-      }
-    });
-  });
+  // Only intermediate stops in multi-segment journeys should be created as transit cities.
+  transitCitiesToAdd = getIntermediateJourneyCities(importedData.journeys);
 
   // Set journeys variable and window scope for budget calculation
   journeys = importedData.journeys;
@@ -2017,7 +2132,7 @@ if (importedData.journeys && Array.isArray(importedData.journeys)) {
   console.log("[Import] No journeys found in imported data");
 }
 
-// Import stays - collect city references
+// Import stays - collect destination city references
 var stayCitiesToAdd = [];
 if (importedData.stays && Array.isArray(importedData.stays)) {
   importedData.stays.forEach(stay => {
@@ -2029,7 +2144,7 @@ if (importedData.stays && Array.isArray(importedData.stays)) {
 
 // Import cities if present in the JSON, otherwise extract from itinerary
 if (importedData.cities && Array.isArray(importedData.cities)) {
-  citiesData = importedData.cities;
+  citiesData = normalizeImportedCities(importedData);
   console.log(`[Import] Loaded ${citiesData.length} cities from JSON`);
 
   // Also import userCities and userCountries if present
@@ -2050,11 +2165,24 @@ if (importedData.cities && Array.isArray(importedData.cities)) {
   console.log(`[Import] Extracted ${citiesData.length} cities from itinerary`);
 }
 
+// Stays are destination accommodation records, not transit stops.
+stayCitiesToAdd.forEach(cityName => {
+  const existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+  if (!existing) {
+    addOrUpdateCity(cityName);
+    console.log("[Import] Added stay destination city: " + cityName);
+  } else if (existing.isTransit === true) {
+    delete existing.isTransit;
+    if (existing.colour === '#95a5a6') existing.colour = getRandomCityColor();
+    console.log("[Import] Converted stay city to destination: " + cityName);
+  }
+});
+
 // NOW process transit cities from journeys, stays, and leg labels
 // This must happen AFTER citiesData is set (whether loaded or extracted)
 
 // Define skip list for transit city detection
-var transitSkipList = ['Departure', 'Arrival', 'In transit', 'Return', 'Home'];
+var transitSkipList = ['departure', 'arrival', 'in transit', 'return', 'home'];
 
 // Extract transit cities from leg labels only if they're not in the skip list or already in day.from/to
 var legLabelCities = [];
@@ -2070,7 +2198,7 @@ if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
       .replace(/[^\w\s-]/gu, '')
       .trim();
 
-    if (cityFromLabel && !transitSkipList.includes(cityFromLabel)) {
+    if (cityFromLabel && !transitSkipList.includes(cityFromLabel.toLowerCase())) {
       let cityInDays = false;
       (leg.days || []).forEach(day => {
         if (day.from === cityFromLabel || day.to === cityFromLabel) cityInDays = true;
@@ -2083,7 +2211,7 @@ if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
   });
 }
 
-var allTransitCities = [...new Set([...transitCitiesToAdd, ...stayCitiesToAdd, ...legLabelCities])];
+var allTransitCities = [...new Set([...transitCitiesToAdd, ...legLabelCities])];
 console.log("[Import] Transit cities to process:", allTransitCities);
 
 allTransitCities.forEach(cityName => {

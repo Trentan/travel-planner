@@ -2,8 +2,59 @@ let isFunMode = false;
 let isCompactView = false;
 let isEditMode = true;
 
+function saveUiSettings() {
+  localStorage.setItem('travelApp_uiSettings_v1', JSON.stringify({
+    isFunMode,
+    isCompactView,
+    isEditMode
+  }));
+}
+
+function applyUiSettings() {
+  let savedSettings = null;
+  try {
+    savedSettings = JSON.parse(localStorage.getItem('travelApp_uiSettings_v1') || 'null');
+  } catch (e) {
+    savedSettings = null;
+  }
+
+  if (savedSettings) {
+    isFunMode = !!savedSettings.isFunMode;
+    isCompactView = !!savedSettings.isCompactView;
+    isEditMode = savedSettings.isEditMode !== false;
+  }
+
+  document.body.classList.toggle('fun-mode', isFunMode);
+  document.body.classList.toggle('compact-view-mode', isCompactView);
+  document.body.classList.toggle('read-only-mode', !isEditMode);
+
+  const compactBtn = document.getElementById('compactToggleBtn');
+  if (compactBtn) {
+    compactBtn.innerHTML = isCompactView ? "Exit Compact" : "Compact View";
+    compactBtn.classList.toggle('active-mode', isCompactView);
+  }
+
+  const modeBtn = document.getElementById('modeToggleBtn');
+  if (modeBtn) {
+    modeBtn.innerHTML = isFunMode ? "Logistics Mode" : "Fun Mode";
+    modeBtn.classList.toggle('active-mode', isFunMode);
+  }
+
+  const editBtn = document.getElementById('editToggleBtn');
+  if (editBtn) {
+    editBtn.innerHTML = isEditMode ? "Lock: Read Only" : "Unlock Editing";
+    editBtn.classList.toggle('edit-mode', !isEditMode);
+  }
+
+  const title = document.getElementById('mainTitle');
+  const subtitle = document.getElementById('mainSubtitle');
+  if (title) title.contentEditable = isEditMode;
+  if (subtitle) subtitle.contentEditable = isEditMode;
+}
+
 function toggleCompactView() {
   isCompactView = !isCompactView;
+  saveUiSettings();
   document.body.classList.toggle('compact-view-mode', isCompactView);
 
   const btn = document.getElementById('compactToggleBtn');
@@ -15,20 +66,24 @@ function toggleCompactView() {
     btn.classList.remove('active-mode');
   }
 
+  applyUiSettings();
   buildItinerary();
   buildPackingTab();
 }
 
 function toggleMode() {
   isFunMode = !isFunMode;
+  saveUiSettings();
   document.body.classList.toggle('fun-mode', isFunMode);
   const btn = document.getElementById('modeToggleBtn');
   if(isFunMode) { btn.innerHTML = "🎭 Logistics Mode"; btn.classList.add('active-mode'); }
   else { btn.innerHTML = "📋 Fun Mode"; btn.classList.remove('active-mode'); }
+  applyUiSettings();
 }
 
 function toggleEditMode() {
   isEditMode = !isEditMode;
+  saveUiSettings();
   document.body.classList.toggle('read-only-mode', !isEditMode);
   const btn = document.getElementById('editToggleBtn');
   document.getElementById('mainTitle').contentEditable = isEditMode;
@@ -37,6 +92,7 @@ function toggleEditMode() {
   if(isEditMode) { btn.innerHTML = "🔒 Lock"; btn.classList.remove('edit-mode'); }
   else { btn.innerHTML = "✏️ Unlock"; btn.classList.add('edit-mode'); saveData(); }
 
+  applyUiSettings();
   const activeTab = document.querySelector('.app-tab-btn.active').innerText;
   const cityFilter = typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all';
   if(activeTab.includes('Transport')) buildTransportTab(cityFilter);
@@ -294,6 +350,7 @@ window.deleteLegTip = deleteLegTip;
 window.toggleMode = toggleMode;
 window.toggleEditMode = toggleEditMode;
 window.toggleCompactView = toggleCompactView;
+window.applyUiSettings = applyUiSettings;
 window.switchTab = switchTab;
 window.openPrintPreview = openPrintPreview;
 window.executePrint = executePrint;

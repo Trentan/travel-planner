@@ -8,6 +8,8 @@
 
 > **Key:** `{N}` = item number · `{a}` = sub-task letter · `{i}` = sub-item roman numeral · e.g. `Start 3b` or `Confirm 3b-ii`
 
+> **Codex users:** see `CODEX.md` for shorter prompt templates such as "Work through TODO item 9m..." and branch/push workflow prompts.
+
 ### Session Commands
 | Command | Action |
 |---|---|

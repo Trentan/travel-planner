@@ -3285,5 +3285,185 @@
       "totalCost": "1700",
       "notes": "99, 9, Bo Put, Ko Samui District, Surat Thani 84320, Thailand. Breakfast included"
     }
-  ]
+  ],
+  "cities": [
+    {
+      "id": "city-brisbane",
+      "name": "Brisbane",
+      "country": "Australia",
+      "code": "BNE",
+      "countryCode": "AU",
+      "dateFrom": "8 Jul",
+      "dateTo": "8 Jun",
+      "colour": "#3498DB",
+      "isTransit": true
+    },
+    {
+      "id": "city-taipei",
+      "name": "Taipei",
+      "country": "Taiwan",
+      "code": "TPE",
+      "countryCode": "TW",
+      "dateFrom": "9 Jun",
+      "dateTo": "9 Jun",
+      "colour": "#3498DB",
+      "isTransit": true
+    },
+    {
+      "id": "city-vienna",
+      "name": "Vienna",
+      "country": "Austria",
+      "code": "VIE",
+      "countryCode": "AT",
+      "dateFrom": "10 Jun",
+      "dateTo": "2026-06-10",
+      "colour": "#2C3E50",
+      "isTransit": true
+    },
+    {
+      "id": "city-bratislava",
+      "name": "Bratislava",
+      "country": "Slovakia",
+      "code": "BTS",
+      "countryCode": "SK",
+      "dateFrom": "11 Jun",
+      "dateTo": "2026-06-11",
+      "colour": "#FF5722",
+      "isTransit": true
+    },
+    {
+      "id": "city-prague",
+      "name": "Prague",
+      "country": "Czech Republic",
+      "code": "PRG",
+      "countryCode": "CZ",
+      "dateFrom": "13 Jun",
+      "dateTo": "2026-06-13",
+      "colour": "#E91E63",
+      "isTransit": true
+    },
+    {
+      "id": "city-nuremberg",
+      "name": "Nuremberg",
+      "country": "Germany",
+      "code": "NUR",
+      "countryCode": "DE",
+      "dateFrom": "15 Jun",
+      "dateTo": "2026-06-15",
+      "colour": "#8BC34A",
+      "isTransit": true
+    },
+    {
+      "id": "city-munich",
+      "name": "Munich",
+      "country": "Germany",
+      "code": "MUC",
+      "countryCode": "DE",
+      "dateFrom": "16 Jun",
+      "dateTo": "2026-06-19",
+      "colour": "#CDDC39",
+      "isTransit": true
+    },
+    {
+      "id": "city-innsbruck",
+      "name": "Innsbruck",
+      "country": "Austria",
+      "code": "INN",
+      "countryCode": "AT",
+      "dateFrom": "20 Jun",
+      "dateTo": "21 Jun",
+      "colour": "#E74C3C",
+      "isTransit": true
+    },
+    {
+      "id": "city-bolzano",
+      "name": "Bolzano",
+      "country": "Italy",
+      "code": "BOL",
+      "countryCode": "IT",
+      "dateFrom": "2026-06-21",
+      "dateTo": "23 Jun",
+      "colour": "#E91E63",
+      "isTransit": true
+    },
+    {
+      "id": "city-milan",
+      "name": "Milan",
+      "country": "Italy",
+      "code": "MIL",
+      "countryCode": "IT",
+      "dateFrom": "2026-06-23",
+      "dateTo": "25 Jun",
+      "colour": "#2C3E50",
+      "isTransit": true
+    },
+    {
+      "id": "city-zurich",
+      "name": "Zurich",
+      "country": "Switzerland",
+      "code": "ZRH",
+      "countryCode": "CH",
+      "dateFrom": "2026-06-25",
+      "dateTo": "26 Jun",
+      "colour": "#795548",
+      "isTransit": true
+    },
+    {
+      "id": "city-bangkok",
+      "name": "Bangkok",
+      "country": "Thailand",
+      "code": "BKK",
+      "countryCode": "TH",
+      "dateFrom": "2026-06-27",
+      "dateTo": "7 Jul",
+      "colour": "#8BC34A",
+      "isTransit": true
+    },
+    {
+      "id": "city-koh-samui",
+      "name": "Koh Samui",
+      "country": "Thailand",
+      "code": "USM",
+      "countryCode": "TH",
+      "dateFrom": "1 Jul",
+      "dateTo": "7 Jul",
+      "colour": "#F39C12",
+      "isTransit": true
+    },
+    {
+      "id": "city-london",
+      "name": "London",
+      "country": "United Kingdom",
+      "code": "LHR",
+      "countryCode": "GB",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#FF9800",
+      "isTransit": true
+    },
+    {
+      "id": "city-verona",
+      "name": "Verona",
+      "code": "VER",
+      "countryCode": "IT",
+      "country": "Italy",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#9B59B6",
+      "isTransit": true
+    },
+    {
+      "id": "city-return",
+      "name": "Return",
+      "code": "",
+      "countryCode": "",
+      "country": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#9C27B0",
+      "isTransit": true
+    }
+  ],
+  "userCities": [],
+  "userCountries": []
 }

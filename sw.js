@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-planner-v8';
+const CACHE_NAME = 'travel-planner-v9';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -13,6 +13,8 @@ const ASSETS = [
   './js/guide.js',
   './js/ui.js',
   './js/itinerary.js',
+  './js/backup.js',
+  './js/auto-stays.js',
   './js/transport.js',
   './js/map.js'
 ];
