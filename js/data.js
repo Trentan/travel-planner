@@ -1903,11 +1903,34 @@ function normalizeTripCitiesDateData(items) {
   return items;
 }
 
+function resetAppStateToDefaults() {
+  appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING));
+  leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
+  citiesData = [];
+  userCities = [];
+  userCountries = [];
+  journeys = [];
+  stays = [];
+  titleData = {
+    title: "✈ New Trip Plan",
+    subtitle: "Click here to add your trip subtitle/description"
+  };
+  currentFileName = "Default Template";
+  currentCityFilter = 'all';
+
+  window.journeys = journeys;
+  window.stays = stays;
+  window.currentCityFilter = currentCityFilter;
+}
+
 async function resetData(options = {}) {
   const confirmMessage = options.confirmMessage || "Reset all edits back to the default template? This will wipe current data, clear caches, and reload the app.";
   if(!confirm(confirmMessage)) {
     return;
   }
+
+  resetAppStateToDefaults();
 
   const keysToClear = [];
   for (let i = 0; i < localStorage.length; i++) {
@@ -1915,6 +1938,7 @@ async function resetData(options = {}) {
     if (key && key.startsWith('travelApp_')) keysToClear.push(key);
   }
   keysToClear.forEach(key => localStorage.removeItem(key));
+  try { sessionStorage.clear(); } catch (e) { console.warn('Reset app: sessionStorage cleanup skipped', e); }
 
   try {
     if ('serviceWorker' in navigator) {
@@ -2188,6 +2212,8 @@ function importJSON(event) {
         return;
       }
 
+      resetAppStateToDefaults();
+
       if (!importedData.itinerary) {
         console.warn('Missing itinerary data in import, using default');
         importedData.itinerary = JSON.parse(JSON.stringify(DEFAULT_DATA));
@@ -2240,124 +2266,135 @@ function importJSON(event) {
         }
       });
 
-      if (importedData.packing) {
+      if (importedData.packing && Array.isArray(importedData.packing)) {
         const migrated = migratePacking(importedData.packing);
-        packingData = migrated || packingData;
+        packingData = migrated || JSON.parse(JSON.stringify(DEFAULT_PACKING));
+      } else {
+        packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING));
       }
-      if (importedData.leaveHome) leaveHomeData = mergeChecklistWithDefaults(importedData.leaveHome);
-if (importedData.meta) {
-  if (importedData.meta.title) titleData.title = importedData.meta.title;
-  if (importedData.meta.subtitle) titleData.subtitle = importedData.meta.subtitle;
-  const titleEl = document.getElementById('mainTitle');
-  const subtitleEl = document.getElementById('mainSubtitle');
-  if (titleEl) titleEl.innerText = titleData.title;
-  if (subtitleEl) subtitleEl.innerText = titleData.subtitle;
-  localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
-}
+      if (importedData.leaveHome && Array.isArray(importedData.leaveHome)) {
+        leaveHomeData = mergeChecklistWithDefaults(importedData.leaveHome);
+      } else {
+        leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
+      }
+      if (importedData.meta) {
+        if (importedData.meta.title) titleData.title = importedData.meta.title;
+        if (importedData.meta.subtitle) titleData.subtitle = importedData.meta.subtitle;
+      }
+      const titleEl = document.getElementById('mainTitle');
+      const subtitleEl = document.getElementById('mainSubtitle');
+      if (titleEl) titleEl.innerText = titleData.title;
+      if (subtitleEl) subtitleEl.innerText = titleData.subtitle;
+      localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
 
-// Import journeys if present - also create cities from journey references
-var transitCitiesToAdd = []; // Collect transit city names before we load citiesData
-if (importedData.journeys && Array.isArray(importedData.journeys)) {
-  // Only intermediate stops in multi-segment journeys should be created as transit cities.
-  transitCitiesToAdd = getIntermediateJourneyCities(importedData.journeys);
+      // Import journeys if present - also create cities from journey references
+      let transitCitiesToAdd = []; // Collect transit city names before we load citiesData
+      if (importedData.journeys && Array.isArray(importedData.journeys)) {
+        // Only intermediate stops in multi-segment journeys should be created as transit cities.
+        transitCitiesToAdd = getIntermediateJourneyCities(importedData.journeys);
 
-  // Set journeys variable and window scope for budget calculation
-  journeys = normalizeTripJourneysData(importedData.journeys);
-  window.journeys = journeys;
-  localStorage.setItem("travelApp_journeys_v1", JSON.stringify(journeys));
-  console.log("[Import] Saved " + journeys.length + " journeys to localStorage");
-} else {
-  console.log("[Import] No journeys found in imported data");
-}
+        // Set journeys variable and window scope for budget calculation
+        journeys = normalizeTripJourneysData(importedData.journeys);
+        window.journeys = journeys;
+        localStorage.setItem("travelApp_journeys_v1", JSON.stringify(journeys));
+        console.log("[Import] Saved " + journeys.length + " journeys to localStorage");
+      } else {
+        journeys = [];
+        window.journeys = journeys;
+        console.log("[Import] No journeys found in imported data");
+      }
 
-// Import stays - collect destination city references
-var stayCitiesToAdd = [];
-if (importedData.stays && Array.isArray(importedData.stays)) {
-  stays = normalizeTripStaysData(importedData.stays);
-  window.stays = stays;
-  importedData.stays.forEach(stay => {
-    if (stay.city) {
-      stayCitiesToAdd.push(stay.city);
-    }
-  });
-}
+      // Import stays - collect destination city references
+      let stayCitiesToAdd = [];
+      if (importedData.stays && Array.isArray(importedData.stays)) {
+        stays = normalizeTripStaysData(importedData.stays);
+        window.stays = stays;
+        importedData.stays.forEach(stay => {
+          if (stay.city) {
+            stayCitiesToAdd.push(stay.city);
+          }
+        });
+      } else {
+        stays = [];
+        window.stays = stays;
+      }
 
-// Custom city/country databases are part of the imported trip scope. Clear
-// previous browser state when the JSON does not provide them.
-userCities = Array.isArray(importedData.userCities) ? importedData.userCities : [];
-userCountries = Array.isArray(importedData.userCountries) ? importedData.userCountries : [];
-localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
-localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
+      // Custom city/country databases are part of the imported trip scope. Clear
+      // previous browser state when the JSON does not provide them.
+      userCities = Array.isArray(importedData.userCities) ? importedData.userCities : [];
+      userCountries = Array.isArray(importedData.userCountries) ? importedData.userCountries : [];
+      localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
+      localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
 
-// Import cities if present in the JSON, otherwise extract from itinerary
-if (importedData.cities && Array.isArray(importedData.cities)) {
-  citiesData = normalizeImportedCities(importedData);
-  normalizeTripCitiesDateData(citiesData);
-  console.log(`[Import] Loaded ${citiesData.length} cities from JSON`);
+      // Import cities if present in the JSON, otherwise extract from itinerary
+      if (importedData.cities && Array.isArray(importedData.cities)) {
+        citiesData = normalizeImportedCities(importedData);
+        normalizeTripCitiesDateData(citiesData);
+        console.log(`[Import] Loaded ${citiesData.length} cities from JSON`);
 
-  // Also import userCities and userCountries if present
-  if (importedData.userCities && Array.isArray(importedData.userCities)) {
-    userCities = importedData.userCities;
-    console.log(`[Import] Loaded ${userCities.length} user custom cities`);
-  } else {
-    userCities = [];
-    console.log('[Import] No user custom cities found in JSON; cleared previous user cities');
-  }
-  localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
+        // Also import userCities and userCountries if present
+        if (importedData.userCities && Array.isArray(importedData.userCities)) {
+          userCities = importedData.userCities;
+          console.log(`[Import] Loaded ${userCities.length} user custom cities`);
+        } else {
+          userCities = [];
+          console.log('[Import] No user custom cities found in JSON; cleared previous user cities');
+        }
+        localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
 
-  if (importedData.userCountries && Array.isArray(importedData.userCountries)) {
-    userCountries = importedData.userCountries;
-    console.log(`[Import] Loaded ${userCountries.length} user custom countries`);
-  } else {
-    userCountries = [];
-    console.log('[Import] No user custom countries found in JSON; cleared previous user countries');
-  }
-  localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
-} else {
-  // Extract cities from the imported itinerary only. Clear old cities first so
-  // addCityById cannot resolve stale browser cities from a previous trip.
-  citiesData = [];
-  citiesData = extractCitiesFromItinerary();
-  normalizeTripCitiesDateData(citiesData);
-  console.log(`[Import] Extracted ${citiesData.length} cities from itinerary`);
+        if (importedData.userCountries && Array.isArray(importedData.userCountries)) {
+          userCountries = importedData.userCountries;
+          console.log(`[Import] Loaded ${userCountries.length} user custom countries`);
+        } else {
+          userCountries = [];
+          console.log('[Import] No user custom countries found in JSON; cleared previous user countries');
+        }
+        localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
+      } else {
+        // Extract cities from the imported itinerary only. Clear old cities first so
+        // addCityById cannot resolve stale browser cities from a previous trip.
+        citiesData = [];
+        citiesData = extractCitiesFromItinerary();
+        normalizeTripCitiesDateData(citiesData);
+        console.log(`[Import] Extracted ${citiesData.length} cities from itinerary`);
 
-  if (importedData.userCities && Array.isArray(importedData.userCities)) {
-    userCities = importedData.userCities;
-  } else {
-    userCities = [];
-  }
-  localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
+        if (importedData.userCities && Array.isArray(importedData.userCities)) {
+          userCities = importedData.userCities;
+        } else {
+          userCities = [];
+        }
+        localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
 
-  if (importedData.userCountries && Array.isArray(importedData.userCountries)) {
-    userCountries = importedData.userCountries;
-  } else {
-    userCountries = [];
-  }
-  localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
-}
+        if (importedData.userCountries && Array.isArray(importedData.userCountries)) {
+          userCountries = importedData.userCountries;
+        } else {
+          userCountries = [];
+        }
+        localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
+      }
 
-if (typeof createCityDatalists === 'function') {
-  createCityDatalists();
-}
+      if (typeof createCityDatalists === 'function') {
+        createCityDatalists();
+      }
 
-// Stays are destination accommodation records, not transit stops.
-stayCitiesToAdd.forEach(cityName => {
-  const existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
-  if (!existing) {
-    addOrUpdateCity(cityName);
-    console.log("[Import] Added stay destination city: " + cityName);
-  } else if (existing.isTransit === true) {
-    delete existing.isTransit;
-    if (existing.colour === '#95a5a6') existing.colour = getRandomCityColor();
-    console.log("[Import] Converted stay city to destination: " + cityName);
-  }
-});
+      // Stays are destination accommodation records, not transit stops.
+      stayCitiesToAdd.forEach(cityName => {
+        const existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+        if (!existing) {
+          addOrUpdateCity(cityName);
+          console.log("[Import] Added stay destination city: " + cityName);
+        } else if (existing.isTransit === true) {
+          delete existing.isTransit;
+          if (existing.colour === '#95a5a6') existing.colour = getRandomCityColor();
+          console.log("[Import] Converted stay city to destination: " + cityName);
+        }
+      });
 
-// NOW process transit cities from journeys, stays, and leg labels
-// This must happen AFTER citiesData is set (whether loaded or extracted)
+      // NOW process transit cities from journeys, stays, and leg labels
+      // This must happen AFTER citiesData is set (whether loaded or extracted)
 
-// Define skip list for transit city detection
-var transitSkipList = ['departure', 'arrival', 'in transit', 'return', 'home'];
+      // Define skip list for transit city detection
+      var transitSkipList = ['departure', 'arrival', 'in transit', 'return', 'home'];
 
 // Extract transit cities from leg labels only if they're not in the skip list or already in day.from/to
 var legLabelCities = [];
@@ -2430,12 +2467,13 @@ if (importedData.stays && Array.isArray(importedData.stays)) {
   console.log(`[Import] Loaded ${stays.length} stays from JSON`);
 }
 
-currentFileName = file.name;
-localStorage.setItem('travelApp_filename_v2026', currentFileName);
-localStorage.setItem('travelApp_last_import_v2026', new Date().toISOString());
+      currentFileName = file.name;
+      localStorage.setItem('travelApp_filename_v2026', currentFileName);
+      localStorage.setItem('travelApp_last_import_v2026', new Date().toISOString());
+      if (typeof displayTimestampStatus === 'function') displayTimestampStatus();
 
-// Preserve titleData before saveData() runs, then restore after
-const savedTitle = titleData.title;
+      // Preserve titleData before saveData() runs, then restore after
+      const savedTitle = titleData.title;
 const savedSubtitle = titleData.subtitle;
 saveData(false);
 if (savedTitle) { titleData.title = savedTitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
