@@ -135,3 +135,16 @@ Confirmed completed items. Append-only archive — do not edit existing entries.
 - Export indicator UI added to index.html
 - Reverted to localStorage approach (IndexedDB over-engineering)
 - Clean, user-friendly backup workflow
+
+---
+
+### Item 11: City Submenu Navigation and Timeline Mapping
+**Completed:** 2026-05-13 - branch `item-11-city-nav-timeline`
+
+- Fixed city submenu clicks for transit/stopover cities such as Verona and London.
+- Sorted the city submenu using itinerary and transport timeline data.
+- Improved journey-to-leg mapping by filling city IDs, leg IDs, and normalized day dates.
+- Isolated imported city state so stale browser cities do not leak into new imports.
+- Added `scripts/regression-city-nav.js` using `backups/2026_June_July_Europe_Thailand.json`.
+- Repeated cities now keep one submenu entry mapped to the best/longest accommodation stay when available.
+- Verification covered: Return excluded, Verona/London transit handling, city order, click targets, journey leg IDs, and Bangkok longest-stay placement.

@@ -337,7 +337,7 @@ When active item is confirmed complete, clear the Active block:
 none
 ```
 
-When item is merged and verified, remove it from Awaiting Review entirely. User archives to `VERIFIED.md`.
+When item is merged and verified, remove it from Awaiting Review entirely and archive it in `VERIFIED.md`.
 
 ---
 
@@ -370,6 +370,8 @@ If a sub-task looks too large for one session:
 
 ### Completing items
 - Only check `[x]` on a sub-task in `TODO.md` after explicit user confirmation
-- Only move an item out of TODO.md after ALL sub-tasks are confirmed done
-- Claude Code does NOT write to `VERIFIED.md` — user archives completed items there
+- When all sub-tasks for an item are confirmed done, archive the full item in `VERIFIED.md` immediately
+- Remove the completed item from `TODO.md`; `TODO.md` should contain active/backlog work, not completed items
+- Remove the item from `UNFINISHED.md` Active / Awaiting Review / Completed sections if present
 - Clear the Active block in `UNFINISHED.md` when an item is fully confirmed done
+- Commit and push the `TODO.md`, `UNFINISHED.md`, and `VERIFIED.md` archival changes with a structured summary

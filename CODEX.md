@@ -275,6 +275,8 @@ If a sub-task is too large for one session:
 ### Completing Items
 
 - Only check `[x]` in `TODO.md` after explicit user confirmation.
-- Only move an item out of `TODO.md` after all sub-tasks are confirmed done.
-- Do not write to `VERIFIED.md` unless the command explicitly requires it.
+- When all sub-tasks for an item are confirmed done, archive the full item in `VERIFIED.md` immediately.
+- Remove the completed item from `TODO.md`; `TODO.md` should contain active/backlog work, not completed items.
+- Remove the item from `UNFINISHED.md` Active / Awaiting Review / Completed sections if present.
 - Clear the Active block in `UNFINISHED.md` when an item is fully confirmed done.
+- Commit and push the `TODO.md`, `UNFINISHED.md`, and `VERIFIED.md` archival changes with a structured summary.
