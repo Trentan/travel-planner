@@ -1913,10 +1913,19 @@ function normalizeImportedCities(importedData) {
   const destinationNames = getImportedDestinationCityNames(importedData);
   const allCitiesMarkedTransit = importedData.cities.length > 0 && importedData.cities.every(city => city && city.isTransit === true);
   const skipNames = new Set(['home', 'in transit', 'between cities', 'tbc', '', 'return', 'departure', 'arrival']);
+  const seenCityIds = new Set();
+  const seenCityNames = new Set();
 
   return importedData.cities.filter(city => {
     const cityName = city && city.name ? city.name.trim().toLowerCase() : '';
-    return !skipNames.has(cityName);
+    if (!city || !city.name || skipNames.has(cityName)) return false;
+
+    const cityId = city.id || 'city-' + cityName.replace(/[^a-z0-9]/g, '-');
+    if (seenCityIds.has(cityId) || seenCityNames.has(cityName)) return false;
+
+    seenCityIds.add(cityId);
+    seenCityNames.add(cityName);
+    return true;
   }).map(city => {
     const normalizedCity = { ...city };
     const isDestination = normalizedCity.name && destinationNames.has(normalizedCity.name.trim().toLowerCase());
@@ -2142,6 +2151,13 @@ if (importedData.stays && Array.isArray(importedData.stays)) {
   });
 }
 
+// Custom city/country databases are part of the imported trip scope. Clear
+// previous browser state when the JSON does not provide them.
+userCities = Array.isArray(importedData.userCities) ? importedData.userCities : [];
+userCountries = Array.isArray(importedData.userCountries) ? importedData.userCountries : [];
+localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
+localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
+
 // Import cities if present in the JSON, otherwise extract from itinerary
 if (importedData.cities && Array.isArray(importedData.cities)) {
   citiesData = normalizeImportedCities(importedData);
@@ -2150,19 +2166,45 @@ if (importedData.cities && Array.isArray(importedData.cities)) {
   // Also import userCities and userCountries if present
   if (importedData.userCities && Array.isArray(importedData.userCities)) {
     userCities = importedData.userCities;
-    localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
     console.log(`[Import] Loaded ${userCities.length} user custom cities`);
+  } else {
+    userCities = [];
+    console.log('[Import] No user custom cities found in JSON; cleared previous user cities');
   }
+  localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
 
   if (importedData.userCountries && Array.isArray(importedData.userCountries)) {
     userCountries = importedData.userCountries;
-    localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
     console.log(`[Import] Loaded ${userCountries.length} user custom countries`);
+  } else {
+    userCountries = [];
+    console.log('[Import] No user custom countries found in JSON; cleared previous user countries');
   }
+  localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
 } else {
-  // Extract cities from itinerary if not in JSON
+  // Extract cities from the imported itinerary only. Clear old cities first so
+  // addCityById cannot resolve stale browser cities from a previous trip.
+  citiesData = [];
   citiesData = extractCitiesFromItinerary();
   console.log(`[Import] Extracted ${citiesData.length} cities from itinerary`);
+
+  if (importedData.userCities && Array.isArray(importedData.userCities)) {
+    userCities = importedData.userCities;
+  } else {
+    userCities = [];
+  }
+  localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
+
+  if (importedData.userCountries && Array.isArray(importedData.userCountries)) {
+    userCountries = importedData.userCountries;
+  } else {
+    userCountries = [];
+  }
+  localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
+}
+
+if (typeof createCityDatalists === 'function') {
+  createCityDatalists();
 }
 
 // Stays are destination accommodation records, not transit stops.

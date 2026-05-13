@@ -37,7 +37,7 @@ Read this file at the start of every session. When using Claude Code, read from 
 ### Item 11: City Submenu Navigation and Timeline Mapping
 
 **Status:** In progress  
-**Next:** 11d
+**Next:** 11e
 
 Use `backups/2026_June_July_Europe_Thailand.json` as the primary regression fixture.
 
@@ -51,7 +51,7 @@ Use `backups/2026_June_July_Europe_Thailand.json` as the primary regression fixt
   - Use transport data to fill itinerary timeline blanks where useful.
   - Use itinerary legs to infer missing transport context where useful.
   - Avoid creating fake destination cities from labels such as Return, Departure, or generic travel labels.
-- [ ] 11d. Ensure the city submenu only uses cities from the imported/current JSON.
+- [x] 11d. Ensure the city submenu only uses cities from the imported/current JSON.
   - Current issue: default/browser-memory cities such as London and Paris can persist into later trips.
   - Imported cities, inferred itinerary cities, and transport-only transit cities should be merged without leaking stale browser state.
 - [ ] 11e. Add import/navigation regression checks for the Europe/Thailand backup.
