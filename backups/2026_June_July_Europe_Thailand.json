@@ -2159,35 +2159,6 @@
       "areaColor": "#2980B9",
       "categories": [
         {
-          "title": "🏠 Before Leaving Home",
-          "items": [
-            {
-              "text": "Lock all doors and windows",
-              "done": false
-            },
-            {
-              "text": "Pause gym membership",
-              "done": false
-            },
-            {
-              "text": "Setup camera for fish and security",
-              "done": false
-            },
-            {
-              "text": "Store/remove fridge & pantry perishables",
-              "done": false
-            },
-            {
-              "text": "Turn off taps, PowerPoints",
-              "done": false
-            },
-            {
-              "text": "Wrap garage door opener and unplug power",
-              "done": false
-            }
-          ]
-        },
-        {
           "title": "Clothes",
           "items": [
             {
@@ -2281,6 +2252,10 @@
             },
             {
               "text": "Pillowcase for used clothes",
+              "done": false
+            },
+            {
+              "text": "Micro-fibre Towel",
               "done": false
             },
             {
@@ -2580,6 +2555,54 @@
   ],
   "leaveHome": [
     {
+      "text": "Empty fridge and pantry perishables",
+      "done": false
+    },
+    {
+      "text": "Turn power off everywhere not needed",
+      "done": false
+    },
+    {
+      "text": "Check all lights and fans off",
+      "done": false
+    },
+    {
+      "text": "Check CCTV on",
+      "done": false
+    },
+    {
+      "text": "Empty coffee and compost bins and leave outside",
+      "done": false
+    },
+    {
+      "text": "Close and check all windows",
+      "done": false
+    },
+    {
+      "text": "Blinds partial down",
+      "done": false
+    },
+    {
+      "text": "Empty bins",
+      "done": false
+    },
+    {
+      "text": "Water off, including outdoor taps",
+      "done": false
+    },
+    {
+      "text": "Dog door panel / lock",
+      "done": false
+    },
+    {
+      "text": "Automatic fish feeder",
+      "done": false
+    },
+    {
+      "text": "Security system on",
+      "done": false
+    },
+    {
       "text": "Lock all doors and windows",
       "done": false
     },
@@ -2592,11 +2615,83 @@
       "done": false
     },
     {
-      "text": "Switch off PowerPoints at the wall (except fridge)",
+      "text": "Switch off power points at the wall except fridge",
       "done": false
     },
     {
       "text": "Turn off gas supply if applicable",
+      "done": false
+    },
+    {
+      "text": "Adjust thermostat to away or saver mode",
+      "done": false
+    },
+    {
+      "text": "Take out all rubbish and recycling",
+      "done": false
+    },
+    {
+      "text": "Check mailbox is empty or hold mail service",
+      "done": false
+    },
+    {
+      "text": "Pause or reschedule any regular deliveries",
+      "done": false
+    },
+    {
+      "text": "Pause gym membership or group activities",
+      "done": false
+    },
+    {
+      "text": "Charge all devices including phones, tablets, and power banks",
+      "done": false
+    },
+    {
+      "text": "Download offline maps and confirmations",
+      "done": false
+    },
+    {
+      "text": "Notify emergency contact of travel plans",
+      "done": false
+    },
+    {
+      "text": "Water plants or arrange plant care",
+      "done": false
+    },
+    {
+      "text": "Set up lights on timers if away long",
+      "done": false
+    },
+    {
+      "text": "Close blinds or curtains and secure loose outdoor items",
+      "done": false
+    },
+    {
+      "text": "If taking dog: waste bags",
+      "done": false
+    },
+    {
+      "text": "If taking dog: water bowl",
+      "done": false
+    },
+    {
+      "text": "If taking dog: food",
+      "done": false
+    },
+    {
+      "text": "If taking dog: toys",
+      "done": false
+    },
+    {
+      "text": "If taking dog: leash",
+      "done": false
+    },
+    {
+      "text": "If taking dog: treats",
+      "done": false
+    },
+    {
+      "text": "Switch off PowerPoints at the wall (except fridge)",
       "done": false
     },
     {
@@ -2612,35 +2707,11 @@
       "done": false
     },
     {
-      "text": "Take out all rubbish and recycling",
-      "done": false
-    },
-    {
       "text": "Check mailbox is empty / hold mail service",
       "done": false
     },
     {
-      "text": "Pause or reschedule any regular deliveries",
-      "done": false
-    },
-    {
-      "text": "Pause gym membership or group activities",
-      "done": false
-    },
-    {
       "text": "Charge all devices (phones, tablets, power banks)",
-      "done": false
-    },
-    {
-      "text": "Download offline maps and confirmations",
-      "done": false
-    },
-    {
-      "text": "Notify emergency contact of travel plans",
-      "done": false
-    },
-    {
-      "text": "Water plants or arrange plant care",
       "done": false
     },
     {
