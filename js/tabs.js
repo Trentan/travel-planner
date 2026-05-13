@@ -127,6 +127,52 @@ function formatDateShort(dateStr) {
   return `${day} ${month}`;
 }
 
+function parseBudgetDate(dateStr) {
+  if (!dateStr) return null;
+  const date = new Date(`${dateStr}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function getExclusiveDateRangeEnd(dateStr) {
+  const date = parseBudgetDate(dateStr);
+  if (!date) return null;
+  return new Date(date.getTime() + 24 * 60 * 60 * 1000);
+}
+
+function getStayOverlapDays(stay, leg) {
+  if (!stay || !leg || !Array.isArray(leg.days) || leg.days.length === 0) return 0;
+
+  const stayStart = parseBudgetDate(stay.checkIn);
+  const stayEnd = parseBudgetDate(stay.checkOut);
+  const legStart = parseBudgetDate(leg.days[0].date);
+  const legEnd = getExclusiveDateRangeEnd(leg.days[leg.days.length - 1].date);
+
+  if (!stayStart || !stayEnd || !legStart || !legEnd) return 0;
+
+  const overlapStart = Math.max(stayStart.getTime(), legStart.getTime());
+  const overlapEnd = Math.min(stayEnd.getTime(), legEnd.getTime());
+  const overlapMs = overlapEnd - overlapStart;
+
+  return overlapMs > 0 ? overlapMs / (24 * 60 * 60 * 1000) : 0;
+}
+
+function findBestStayLegIndex(stay, legs) {
+  if (!stay || !Array.isArray(legs) || legs.length === 0) return -1;
+
+  let bestIndex = -1;
+  let bestOverlap = 0;
+
+  legs.forEach((leg, index) => {
+    const overlap = getStayOverlapDays(stay, leg);
+    if (overlap > bestOverlap) {
+      bestOverlap = overlap;
+      bestIndex = index;
+    }
+  });
+
+  return bestIndex;
+}
+
 // Escape HTML to prevent XSS
 function escapeHtml(text) {
   if (!text) return '';
@@ -256,7 +302,22 @@ function buildBudgetTab() {
   // Get stays array (global from data.js) or fallback to empty
   const staysData = (typeof stays !== 'undefined') ? stays : [];
 
-  appData.forEach(leg => {
+  const stayCostsByLeg = new Array(appData.length).fill(0);
+  let unallocatedStayCost = 0;
+
+  staysData.forEach(stay => {
+    const stayCost = parseCost(stay.totalCost);
+    if (stayCost <= 0) return;
+
+    const bestLegIndex = findBestStayLegIndex(stay, appData);
+    if (bestLegIndex >= 0) {
+      stayCostsByLeg[bestLegIndex] += stayCost;
+    } else {
+      unallocatedStayCost += stayCost;
+    }
+  });
+
+  appData.forEach((leg, legIndex) => {
     let legTrans = 0, legAccom = 0, legAct = 0;
     leg.days.forEach(day => {
       // Calculate transport costs from journeys array
@@ -270,19 +331,7 @@ function buildBudgetTab() {
       (day.activityItems || []).forEach(i => legAct += parseCost(i.cost));
     });
 
-    // Add stays costs for this leg based on overlapping dates
-    // Get leg date range
-    const legStartDate = leg.days.length > 0 ? leg.days[0].date : null;
-    const legEndDate = leg.days.length > 0 ? leg.days[leg.days.length - 1].date : null;
-
-    if (legStartDate && legEndDate) {
-      staysData.forEach(stay => {
-        // Check if stay overlaps with this leg's date range
-        if (stay.checkIn <= legEndDate && stay.checkOut >= legStartDate) {
-          legAccom += parseCost(stay.totalCost);
-        }
-      });
-    }
+    legAccom += stayCostsByLeg[legIndex] || 0;
 
     const legTotal = legTrans + legAccom + legAct;
     if (legTotal > 0) {
@@ -291,22 +340,7 @@ function buildBudgetTab() {
     }
   });
 
-  // Also add stays that don't match any leg (orphaned stays)
-  staysData.forEach(stay => {
-    const stayCost = parseCost(stay.totalCost);
-    let matched = false;
-    for (const leg of appData) {
-      const legStartDate = leg.days.length > 0 ? leg.days[0].date : null;
-      const legEndDate = leg.days.length > 0 ? leg.days[leg.days.length - 1].date : null;
-      if (legStartDate && legEndDate && stay.checkIn <= legEndDate && stay.checkOut >= legStartDate) {
-        matched = true;
-        break;
-      }
-    }
-    if (!matched && stayCost > 0) {
-      totalAccom += stayCost;
-    }
-  });
+  totalAccom += unallocatedStayCost;
 
   const grandTotal = totalTrans + totalAccom + totalAct;
 

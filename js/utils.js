@@ -275,13 +275,7 @@ const DEFAULT_PACKING = [
   }
 ];
 
-function updateClocks() {
-  const now = new Date();
-  const options = { hour: '2-digit', minute:'2-digit', timeZoneName: 'short' };
-  document.getElementById('time-joy').textContent = now.toLocaleTimeString('en-AU', {timeZone: 'Australia/Brisbane', ...options});
-  document.getElementById('time-eur').textContent = now.toLocaleTimeString('en-AU', {timeZone: 'Europe/Berlin', ...options});
-  document.getElementById('time-tha').textContent = now.toLocaleTimeString('en-AU', {timeZone: 'Asia/Bangkok', ...options});
-}
+function updateClocks() {}
 
 function parseCost(val) { const num = parseFloat(String(val).replace(/[^0-9.-]+/g, "")); return isNaN(num) ? 0 : num; }
 

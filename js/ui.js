@@ -1,6 +1,57 @@
 let isFunMode = false;
 let isCompactView = false;
 let isEditMode = true;
+let isMobileMenuOpen = false;
+
+function isMobileViewport() {
+  return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+}
+
+function updateStickyOffsets() {
+  const menuBar = document.querySelector('.app-menu-bar');
+  const tabsNav = document.querySelector('.app-tabs-nav');
+  if (!tabsNav) return;
+
+  const menuHeight = isMobileViewport() && menuBar ? Math.ceil(menuBar.getBoundingClientRect().height || 0) : 0;
+  const tabsHeight = Math.ceil(tabsNav.getBoundingClientRect().height || 0);
+  document.documentElement.style.setProperty('--tabs-nav-sticky-top', `${menuHeight}px`);
+  document.documentElement.style.setProperty('--city-nav-sticky-top', `${tabsHeight}px`);
+  if (isMobileViewport()) {
+    document.documentElement.style.setProperty('--city-nav-sticky-top', `${menuHeight + tabsHeight}px`);
+  }
+}
+
+function syncResponsiveUi() {
+  document.body.classList.toggle('mobile-app-mode', isMobileViewport());
+  updateStickyOffsets();
+
+  if (!isMobileViewport()) {
+    closeMobileMenu();
+  }
+}
+
+function toggleMobileMenu() {
+  isMobileMenuOpen = !isMobileMenuOpen;
+  const sheet = document.getElementById('mobileMenuSheet');
+  if (sheet) {
+    sheet.classList.toggle('open', isMobileMenuOpen);
+    sheet.setAttribute('aria-hidden', String(!isMobileMenuOpen));
+  }
+  document.body.classList.toggle('mobile-menu-open', isMobileMenuOpen);
+}
+
+function closeMobileMenu(event) {
+  if (event && typeof event.stopPropagation === 'function') {
+    event.stopPropagation();
+  }
+  isMobileMenuOpen = false;
+  const sheet = document.getElementById('mobileMenuSheet');
+  if (sheet) {
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+  }
+  document.body.classList.remove('mobile-menu-open');
+}
 
 function saveUiSettings() {
   localStorage.setItem('travelApp_uiSettings_v1', JSON.stringify({
@@ -31,6 +82,7 @@ function applyUiSettings() {
   document.body.classList.toggle('fun-mode', isFunMode);
   document.body.classList.toggle('compact-view-mode', isCompactView);
   document.body.classList.toggle('read-only-mode', !isEditMode);
+  syncResponsiveUi();
 
   const compactBtn = document.getElementById('compactToggleBtn');
   if (compactBtn) {
@@ -120,6 +172,7 @@ function switchTab(tabId, btnElement) {
   document.querySelectorAll('.app-tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + tabId).classList.add('active');
   btnElement.classList.add('active');
+  closeMobileMenu();
 
   // Scroll selected tab into view on mobile
   if (window.innerWidth <= 768) {
@@ -200,6 +253,11 @@ function printPage(mode) {
   window.print();
   setTimeout(() => { document.body.className = previousClasses; }, 1000);
 }
+
+window.addEventListener('resize', syncResponsiveUi);
+window.addEventListener('orientationchange', syncResponsiveUi);
+document.addEventListener('DOMContentLoaded', syncResponsiveUi);
+window.addEventListener('load', syncResponsiveUi);
 
 // Print Preview Modal
 let printPreviewData = { style: 'summary', dateRange: 'all', showTransport: true, showAccom: true, showActivities: true, showCosts: false };
@@ -374,4 +432,7 @@ window.applyUiSettings = applyUiSettings;
 window.switchTab = switchTab;
 window.openPrintPreview = openPrintPreview;
 window.executePrint = executePrint;
+window.toggleMobileMenu = toggleMobileMenu;
+window.closeMobileMenu = closeMobileMenu;
+window.syncResponsiveUi = syncResponsiveUi;
 window.addLeg = addLeg;
