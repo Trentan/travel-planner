@@ -11,7 +11,7 @@ Read this file at the start of every session. When using Claude Code, read from 
 ### Item 9: Stable Release Polish
 
 **Status:** In progress  
-**Next:** 9d
+**Next:** 9e
 
 - [x] 9a. Fix trip title and subtitle persistence.
   - Complete: PR #14 merged.
@@ -19,7 +19,7 @@ Read this file at the start of every session. When using Claude Code, read from 
   - Complete: PR #16 merged.
 - [x] 9c. Restore "Walk-on Gear (Wear onto plane)" packing area.
   - Complete: PR #17 merged.
-- [ ] 9d. Add an easy way for users to force a complete site refresh on mobile app and website.
+- [x] 9d. Add an easy way for users to force a complete site refresh on mobile app and website.
 - [ ] 9e. Convert the testing checklist into structured TODO items and add actual smoke tests for core functionality.
 - [ ] 9f. Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.
 - [ ] 9g. Add a Notes tab with a generic checklist.
