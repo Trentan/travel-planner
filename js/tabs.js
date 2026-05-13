@@ -1,5 +1,29 @@
 // buildTransportTab is now defined in transport.js
 
+let expandedStayRows = new Set();
+
+function isStayRowExpanded(stayId) {
+  return expandedStayRows.has(stayId);
+}
+
+function toggleStayRowDetails(stayId) {
+  if (expandedStayRows.has(stayId)) {
+    expandedStayRows.delete(stayId);
+  } else {
+    expandedStayRows.add(stayId);
+  }
+  buildAccomTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
+}
+
+function renderStayDetailBlock(title, value, extraClass = '') {
+  return `
+    <div class="stay-detail-block ${extraClass}">
+      <span class="stay-detail-label">${title}</span>
+      <span class="stay-detail-value">${value || '—'}</span>
+    </div>
+  `;
+}
+
 function buildAccomTab(cityFilter = null) {
   const container = document.getElementById('accom-table-container');
   const staysData = (typeof stays !== 'undefined') ? stays : [];
@@ -31,6 +55,7 @@ function buildAccomTab(cityFilter = null) {
 
   let html = `<div class="data-table-wrapper accom-table-wrapper mobile-table-wrapper"><table class="data-table accom-table mobile-table"><thead>
     <tr>
+      <th style="width:28px;"></th>
       <th>City</th>
       <th>Property</th>
       <th>Check-in</th>
@@ -58,8 +83,11 @@ function buildAccomTab(cityFilter = null) {
 
     const bookingRef = stay.bookingRef ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${stay.bookingRef}</span>` : '';
     const provider = stay.provider ? `<br><span style="font-size:0.8rem; color:#888;">${stay.provider}</span>` : '';
+    const isExpanded = isStayRowExpanded(stay.id);
+    const expandBtn = `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleStayRowDetails('${stay.id}')" title="Show stay details" aria-expanded="${isExpanded}">${isExpanded ? '▼' : '▶'}</button>`;
 
     html += `<tr style="border-left-color: ${cityColor}">
+      <td class="stay-expand-col" data-label="Expand">${expandBtn}</td>
       <td class="city-col" data-label="City">${getCityFlagHTML(cityName)} ${cityName}</td>
       <td class="property-col" data-label="Property">
         <span style="font-weight:600;" contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)">${escapeHtml(stay.propertyName)}</span>
@@ -68,27 +96,39 @@ function buildAccomTab(cityFilter = null) {
       <td class="date-col" data-label="Check-in">${formatDateShort(stay.checkIn)}</td>
       <td class="date-col" data-label="Check-out">${formatDateShort(stay.checkOut)}</td>
       <td class="nights-col" data-label="Nights">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
-      <td data-label="Status">
+      <td class="stay-status-col" data-label="Status">
         <span class="status-badge" style="background:${statusColor}; cursor:pointer;" onclick="event.stopPropagation(); toggleStayStatus(event, '${stay.id}')">${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}</span>
         ${bookingRef}
       </td>
       <td class="budget-field" data-label="Cost" style="width:100px;">
         $<span contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'totalCost', this.innerText)">${stay.totalCost || '0'}</span>
       </td>
-      <td class="actions-col" data-label="Actions">
+      <td class="stay-actions-col" data-label="Actions">
         <button class="edit-btn" title="Edit Stay" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')">✎</button>
         <button class="del-btn" title="Delete Stay" onclick="event.stopPropagation(); deleteStay('${stay.id}')">×</button>
       </td>
     </tr>`;
 
-    // Add notes row if exists
-    if (stay.notes) {
-      html += `<tr style="border-left-color: ${cityColor}">
-        <td colspan="8" data-label="Notes" style="padding: 8px 16px; background: #f9f9f9; font-size: 0.85rem; color: #666; border-top: none;">
-          <em>${escapeHtml(stay.notes)}</em>
+    html += `
+      <tr class="stay-detail-row ${isExpanded ? 'expanded' : ''}" data-stay-id="${stay.id}" style="display:${isExpanded ? 'table-row' : 'none'}; border-left-color: ${cityColor}">
+        <td colspan="9">
+          <div class="stay-detail-grid">
+            ${renderStayDetailBlock('Status', `${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}`)}
+            ${renderStayDetailBlock('Booking Ref', stay.bookingRef)}
+            ${renderStayDetailBlock('Provider', stay.provider)}
+            ${renderStayDetailBlock('Nights', String(stay.nights || calculateNights(stay.checkIn, stay.checkOut)))}
+            ${renderStayDetailBlock('Cost', `$${stay.totalCost || '0'}`)}
+            ${stay.notes ? renderStayDetailBlock('Notes', escapeHtml(stay.notes), 'full-width') : ''}
+            <div class="stay-detail-block full-width">
+              <span class="stay-detail-label">Actions</span>
+              <span class="stay-detail-actions">
+                <button class="edit-btn" title="Edit Stay" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')">✎</button>
+                <button class="del-btn" title="Delete Stay" onclick="event.stopPropagation(); deleteStay('${stay.id}')">×</button>
+              </span>
+            </div>
+          </div>
         </td>
       </tr>`;
-    }
   });
 
   html += `</tbody></table></div>`;
