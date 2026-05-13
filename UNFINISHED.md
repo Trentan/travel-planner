@@ -11,6 +11,15 @@
 - **Sub-task breakdown:** 12a checklist/default leave-home merge, 12b delete sub-category blocks, 12c restore all packing defaults, 12d packing hints/guides UI improvements
 - **Noticed (unscheduled):** None
 
+## Active
+- **Item/sub-task:** 13a
+- **Branch:** item-13a-compact-view
+- **Last commit:** `Item 13a [2 of 2]: fixed compact view variable references`
+- **What was done:** Fixed `getDayJourneys` and `getStayDisplayForDay` to safely handle undefined variables; exposed `getDayTotal` and `getStayDisplayForDay` to window
+- **Next step:** Test in browser to verify compact view works
+- **Files touched:** js/utils.js, js/itinerary.js, js/transport.js
+- **Noticed (unscheduled):** None
+
 ## Awaiting Review / Merge
 - **Item:** 9e — branch `item-9e-import-transit-cities` — PR needs to be created
   - Import now extracts cities from leg labels (e.g., Verona when not in day.from/to)

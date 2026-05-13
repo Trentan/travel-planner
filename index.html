@@ -469,97 +469,70 @@
   </div>
 
   <div id="stay-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-content" style="max-width: 600px;">
       <div class="modal-header">
-        <h2>🏨 Add Accommodation</h2>
-        <button class="modal-close" onclick="closeStayModal()">&times;</button>
+        <h2>🏨 Add Stay</h2>
+        <button class="modal-close" onclick="closeAddStayModal()">&times;</button>
       </div>
       <div class="modal-body">
         <div style="display: flex; flex-direction: column; gap: 1rem;">
           <div class="ai-form-group">
-            <label for="stayName">Name</label>
-            <input id="stayName" placeholder="Hotel / Airbnb name">
+            <label for="stayCitySelect">City</label>
+            <select id="stayCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+              <option value="">-- Select city --</option>
+            </select>
           </div>
           <div class="ai-form-group">
-            <label for="stayCost">Cost</label>
-            <input id="stayCost" placeholder="0">
+            <label for="stayPropertyName">Property Name</label>
+            <input type="text" id="stayPropertyName" placeholder="e.g. Grand Hotel or Cozy Airbnb" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          </div>
+          <div style="display: flex; gap: 1rem;">
+            <div class="ai-form-group" style="flex: 1;">
+              <label for="stayCheckIn">Check-in</label>
+              <input type="date" id="stayCheckIn" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+            </div>
+            <div class="ai-form-group" style="flex: 1;">
+              <label for="stayCheckOut">Check-out</label>
+              <input type="date" id="stayCheckOut" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+            </div>
           </div>
           <div class="ai-form-group">
-            <label for="stayRef">Booking Ref</label>
-            <input id="stayRef" placeholder="Optional — marks as confirmed">
+            <label for="stayNights">Nights</label>
+            <input type="text" id="stayNights" readonly style="width: 100px; padding: 0.5rem; border: 1px solid #eee; border-radius: 4px; background: #f5f5f5; font-family: 'DM Mono', monospace; font-weight: 500;" placeholder="Auto">
+          </div>
+          <div class="ai-form-group">
+            <label for="stayStatus">Booking Status</label>
+            <select id="stayStatus" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+              <option value="pending">⏳ Pending</option>
+              <option value="confirmed">✓ Confirmed</option>
+              <option value="cancelled">✗ Cancelled</option>
+            </select>
+          </div>
+          <div class="ai-form-group">
+            <label for="stayProvider">Booking Provider</label>
+            <input type="text" id="stayProvider" placeholder="e.g. Booking.com, Airbnb, Direct" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          </div>
+          <div class="ai-form-group">
+            <label for="stayBookingRef">Booking Reference</label>
+            <input type="text" id="stayBookingRef" placeholder="e.g. ABC123XYZ" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          </div>
+          <div class="ai-form-group">
+            <label for="stayTotalCost">Total Cost ($)</label>
+            <input type="number" id="stayTotalCost" placeholder="0" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          </div>
+          <div class="ai-form-group">
+            <label for="stayNotes">Notes</label>
+            <textarea id="stayNotes" placeholder="Optional: address, phone, check-in instructions..." style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif; resize: vertical; min-height: 60px;"></textarea>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="action-btn" onclick="closeStayModal()">Cancel</button>
-        <button class="action-btn" style="background: #2C3E50; color: white;" onclick="saveStayFromModal()">Save</button>
+        <button class="action-btn" onclick="closeAddStayModal()">Cancel</button>
+        <button class="action-btn" style="background: #2C3E50; color: white;" onclick="saveStayFromModal()">Save Stay</button>
       </div>
     </div>
   </div>
 
-<div id="journey-modal" class="modal-overlay" style="display: none;">
-  <div class="modal-content" style="max-width: 500px;">
-    <div class="modal-header">
-      <h2>🏨 Add Stay</h2>
-      <button class="modal-close" onclick="closeAddStayModal()">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div style="display: flex; flex-direction: column; gap: 1rem;">
-        <div class="ai-form-group">
-          <label for="stayCitySelect">City</label>
-          <select id="stayCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-            <option value="">-- Select city --</option>
-          </select>
-        </div>
-        <div class="ai-form-group">
-          <label for="stayPropertyName">Property Name</label>
-          <input type="text" id="stayPropertyName" placeholder="e.g. Grand Hotel or Cozy Airbnb" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-        </div>
-        <div style="display: flex; gap: 1rem;">
-          <div class="ai-form-group" style="flex: 1;">
-            <label for="stayCheckIn">Check-in</label>
-            <input type="date" id="stayCheckIn" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-          </div>
-          <div class="ai-form-group" style="flex: 1;">
-            <label for="stayCheckOut">Check-out</label>
-            <input type="date" id="stayCheckOut" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-          </div>
-        </div>
-        <div class="ai-form-group">
-          <label for="stayNights">Nights</label>
-          <input type="text" id="stayNights" readonly style="width: 100px; padding: 0.5rem; border: 1px solid #eee; border-radius: 4px; background: #f5f5f5; font-family: 'DM Mono', monospace; font-weight: 500;" placeholder="Auto">
-        </div>
-        <div class="ai-form-group">
-          <label for="stayStatus">Booking Status</label>
-          <select id="stayStatus" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-            <option value="pending">⏳ Pending</option>
-            <option value="confirmed">✓ Confirmed</option>
-            <option value="cancelled">✗ Cancelled</option>
-          </select>
-        </div>
-        <div class="ai-form-group">
-          <label for="stayProvider">Booking Provider</label>
-          <input type="text" id="stayProvider" placeholder="e.g. Booking.com, Airbnb, Direct" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-        </div>
-        <div class="ai-form-group">
-          <label for="stayBookingRef">Booking Reference</label>
-          <input type="text" id="stayBookingRef" placeholder="e.g. ABC123XYZ" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-        </div>
-        <div class="ai-form-group">
-          <label for="stayTotalCost">Total Cost ($)</label>
-          <input type="number" id="stayTotalCost" placeholder="0" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-        </div>
-        <div class="ai-form-group">
-          <label for="stayNotes">Notes</label>
-          <textarea id="stayNotes" placeholder="Optional: address, phone, check-in instructions..." style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif; resize: vertical; min-height: 60px;"></textarea>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="action-btn" onclick="closeAddStayModal()">Cancel</button>
-      <button class="action-btn" style="background: #2C3E50; color: white;" onclick="saveStayFromModal()">Save Stay</button>
-    </div>
-  </div>
 </div>
 
 <div id="force-refresh-modal" class="modal-overlay" style="display: none;">

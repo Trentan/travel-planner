@@ -24,6 +24,11 @@ function applyUiSettings() {
     isEditMode = savedSettings.isEditMode !== false;
   }
 
+  // Sync to window for cross-module access
+  window.isFunMode = isFunMode;
+  window.isCompactView = isCompactView;
+  window.isEditMode = isEditMode;
+
   document.body.classList.toggle('fun-mode', isFunMode);
   document.body.classList.toggle('compact-view-mode', isCompactView);
   document.body.classList.toggle('read-only-mode', !isEditMode);
@@ -55,6 +60,10 @@ function applyUiSettings() {
 function toggleCompactView() {
   isCompactView = !isCompactView;
   saveUiSettings();
+
+  // Sync to window for cross-module access
+  window.isCompactView = isCompactView;
+
   document.body.classList.toggle('compact-view-mode', isCompactView);
 
   const btn = document.getElementById('compactToggleBtn');
@@ -74,6 +83,10 @@ function toggleCompactView() {
 function toggleMode() {
   isFunMode = !isFunMode;
   saveUiSettings();
+
+  // Sync to window for cross-module access
+  window.isFunMode = isFunMode;
+
   document.body.classList.toggle('fun-mode', isFunMode);
   const btn = document.getElementById('modeToggleBtn');
   if(isFunMode) { btn.innerHTML = "🎭 Logistics Mode"; btn.classList.add('active-mode'); }
@@ -84,6 +97,10 @@ function toggleMode() {
 function toggleEditMode() {
   isEditMode = !isEditMode;
   saveUiSettings();
+
+  // Sync to window for cross-module access
+  window.isEditMode = isEditMode;
+
   document.body.classList.toggle('read-only-mode', !isEditMode);
   const btn = document.getElementById('editToggleBtn');
   document.getElementById('mainTitle').contentEditable = isEditMode;

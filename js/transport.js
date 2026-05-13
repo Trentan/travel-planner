@@ -353,8 +353,13 @@ function buildJourneyName(segments) {
 
 // Get journeys for a specific day (for itinerary view)
 function getDayJourneys(dayDate, fromLoc, toLoc, legId = '') {
-  if (typeof journeys === 'undefined' && typeof window !== 'undefined' && window.journeys) {
-    journeys = window.journeys;
+  // Check window.journeys as fallback if local journeys is undefined
+  if (typeof journeys === 'undefined') {
+    if (typeof window !== 'undefined' && Array.isArray(window.journeys)) {
+      var journeys = window.journeys;
+    } else {
+      return [];
+    }
   }
   if (!Array.isArray(journeys)) return [];
 
