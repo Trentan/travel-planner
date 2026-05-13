@@ -1,5 +1,5 @@
 // Active guide panel state (stored globally)
-let activeGuidePanel = 'leaveHome';
+let activeGuidePanel = null;
 
 function isActiveGuide(panel) {
   return activeGuidePanel === panel;
@@ -24,7 +24,7 @@ function restorePackingToDefault() {
 
   packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING));
   leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
-  activeGuidePanel = 'leaveHome';
+  activeGuidePanel = null;
   saveData();
   buildPackingTab();
 }
