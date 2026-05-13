@@ -152,7 +152,6 @@ function renderPackingGuidePanel() {
             <h4>Before Leaving Home</h4>
             <p class="guide-panel-subtitle">${completedTasks} of ${totalTasks} tasks checked off</p>
           </div>
-          <button class="guide-close-btn" type="button" onclick="collapseAllGuides()" title="Close guide">×</button>
         </div>
         <div class="guide-panel-content leave-home-guide-content">
           <div class="leave-home-progress">
@@ -174,7 +173,6 @@ function renderPackingGuidePanel() {
       <div class="packing-guide-panel guide-panel">
         <div class="guide-panel-header">
           <h4>Hotel Sink Washing Guide</h4>
-          <button class="guide-close-btn" type="button" onclick="collapseAllGuides()" title="Close guide">×</button>
         </div>
         <div class="guide-panel-content">
           <h4>How to Do Laundry in Your Hotel Room:</h4>
@@ -200,7 +198,6 @@ function renderPackingGuidePanel() {
       <div class="packing-guide-panel guide-panel">
         <div class="guide-panel-header">
           <h4>Example Capsule Prompt</h4>
-          <button class="guide-close-btn" type="button" onclick="collapseAllGuides()" title="Close guide">×</button>
         </div>
         <div class="guide-panel-content">
           <p style="font-style: italic; background: #f8f6f1; padding: 12px; border-left: 3px solid #cfc6b8;">
@@ -230,20 +227,8 @@ function renderPackingGuidePanel() {
 }
 
 function renderPackingGuidesShell() {
-  const totalTasks = countLeaveHomeTasks();
-  const completedTasks = countCompletedLeaveHomeTasks();
-
   return `
     <div class="packing-guides-shell">
-      <div class="packing-guides-summary">
-        <div>
-          <p class="packing-guides-eyebrow">Helpful packing guides</p>
-          <h3>One guide open at a time, with the leave-home checklist front and center.</h3>
-        </div>
-        <div class="packing-guides-stats">
-          <span class="packing-guides-stat">${completedTasks}/${totalTasks} home tasks done</span>
-        </div>
-      </div>
       <div class="packing-guides-toolbar">
         <div class="packing-guides-buttons">
           <button type="button" class="packing-guide-btn ${isActiveGuide('leaveHome') ? 'active' : ''}" onclick="toggleGuidePanel('leaveHome')">Before Leaving Home</button>
@@ -252,7 +237,6 @@ function renderPackingGuidesShell() {
         </div>
         <div class="packing-guides-actions">
           <button class="action-btn" type="button" onclick="restorePackingToDefault()">Restore Packing to Default</button>
-          <button class="action-btn" type="button" onclick="collapseAllGuides()">Close Guide</button>
         </div>
       </div>
       ${renderPackingGuidePanel()}

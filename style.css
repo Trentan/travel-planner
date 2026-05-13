@@ -578,51 +578,6 @@ main {
   margin-bottom: 1.5rem;
 }
 
-.packing-guides-summary {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.1rem;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: linear-gradient(135deg, #fcfaf4 0%, #f4efe4 100%);
-}
-
-.packing-guides-summary h3 {
-  margin: 0.2rem 0 0;
-  font-family: 'Playfair Display', serif;
-  font-size: 1.15rem;
-  color: var(--accent-strong);
-}
-
-.packing-guides-eyebrow {
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #8a7456;
-}
-
-.packing-guides-stats {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.packing-guides-stat {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 0.55rem 0.85rem;
-  border-radius: 999px;
-  background: rgba(44, 62, 80, 0.08);
-  color: var(--accent-strong);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
 .packing-guides-toolbar {
   display: flex;
   justify-content: space-between;
@@ -1785,19 +1740,6 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
 /* Responsive */
 @media (max-width: 600px) {
-  .packing-guides-summary {
-    align-items: flex-start;
-  }
-
-  .packing-guides-stats {
-    width: 100%;
-  }
-
-  .packing-guides-stat {
-    width: 100%;
-    justify-content: center;
-  }
-
   .journey-card-header {
     flex-direction: column;
     align-items: flex-start;
