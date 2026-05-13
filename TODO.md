@@ -24,9 +24,10 @@ Read this file at the start of every session. When using Claude Code, read from 
 ### Item 13: Other improvements
 - [ ] 13a. Compact view is busted
 - [ ] 13b. Fun mode can be removed and force refresh can be removed (reset app should handle it)
-- Fix the broken "Generate AI prompt" button.
-- [ ] 13b. Convert the testing checklist into structured TODO items and add actual smoke tests for core functionality.
-- [ ] 13c. Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.
+- [ ] 13c. For the guides in packing - These could be contained in a Helpful hints style dropdown (and then each clicked to load) so it takes up less screen space : Before Leaving Home, Hotel Sink Washing, Capsule Wardrobe Prompt - and close guide. 
+- [ ] 13d. Fix the broken "Generate AI prompt" button.
+- [ ] 13e. Convert the testing checklist into structured TODO items and add actual smoke tests for core functionality.
+- [ ] 13f. Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.
 
 
 ## Noticed
