@@ -20,20 +20,40 @@ Read this file at the start of every session. When using Claude Code, read from 
 - [x] 9c. Restore "Walk-on Gear (Wear onto plane)" packing area.
   - Complete: PR #17 merged.
 - [x] 9d. Add an easy way for users to force a complete site refresh on mobile app and website.
-- [ ] 9e. IS there a better way for file management/link to a cloud file and autosave / backup to that instead of keeping in browser memory and exporting the json?
-- [ ] 9f. Convert the testing checklist into structured TODO items and add actual smoke tests for core functionality.
-- [ ] 9g. Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.
-- [ ] 9h. Add a Notes tab with a generic checklist.
-  - Example uses: gifts, photo reminders, important trip considerations, unresolved items.
-- [ ] 9i. Improve the Leaving Home checklist by merging/comparing the user's Notion checklist.
-  - Ask the user for access or content if needed.
-  - Source: https://www.notion.so/trentan/afd1a6b4feb14fa38065515dbacbd676?v=d157c05db95048cbaffc6eb2645367a4&p=d4d390afce8b45fabdd8782b55fb3971&pm=s
-- [ ] 9j. Allow deleting category blocks in Packing.
-- [ ] 9k. Add "Restore Packing to Default" to wipe packing changes and reload defaults.
-- [ ] 9l. Improve the packing hints/guides UI.
+
+### Item 12: Packing improvements
+- [ ] 12a. Improve the default Before Leaving Home checklist by merging/comparing the user's checklist below.
+  - [ ]  Empty fridge and pantry perishables
+  - [ ]  Turn power off everywhere not needed
+  - [ ]  Check all lights and fans off
+  - [ ]  Check CCTV on
+  - [ ]  Empty coffee and compost bins and leave outside
+  - [ ]  Close and check all windows
+  - [ ]  Blinds partial down
+  - [ ]  Empty Bins
+  - [ ]  Water Off (including outdoor taps)
+  - [ ]  Dog door panel / lock
+  - [ ]  Automatic Fish feeder
+  - [ ]  Security System On
+  - [ ]  If Taking Dog
+    - [ ]  Waste bags
+      - [ ]  Water Bowl
+      - [ ]  Food
+      - [ ]  Toys
+      - [ ]  Leash
+      - [ ]  Treats
+- [ ] 12b. Allow deleting sub category blocks in Packing.
+- [ ] 12c. Add "Restore Packing to Default" to wipe ALL packing changes and reload defaults.
+- [ ] 12d. Improve the packing hints/guides UI.
   - Current issue: single dropdowns are clunky in the 3-column row.
   - Possible approach: only one open at a time, or replace with buttons that launch dialogs.
-- [ ] 9m. Fix the broken "Generate AI prompt" button.
+
+
+### Item 13: Other improvements
+- [ ] 13a. Fix the broken "Generate AI prompt" button.
+- [ ] 13b. Convert the testing checklist into structured TODO items and add actual smoke tests for core functionality.
+- [ ] 13c. Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.
+
 
 ## Noticed
 
@@ -72,6 +92,10 @@ Run before considering implementation work complete:
 - [ ] Change colors for cities.
 - [ ] Add multiple cities to a leg.
 - [ ] Add or subtract a day to an existing leg.
+- [ ] Add a Notes tab with a generic checklist
+  - Example uses: gifts, photo reminders, important trip considerations, unresolved items.
+- [ ] IS there a better way for file management/link to a cloud file and autosave / backup to that instead of keeping in browser memory and exporting the json?
+
 
 ### Travel Data
 
