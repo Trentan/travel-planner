@@ -2122,6 +2122,7 @@ allTransitCities.forEach(cityName => {
   let existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
 
   if (!existing) {
+    // Only NEWLY CREATED cities are transit cities
     console.log("[Import] Creating new transit city: " + cityName);
     const newCity = {
       id: 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
@@ -2137,8 +2138,8 @@ allTransitCities.forEach(cityName => {
     citiesData.push(newCity);
     console.log("[Import] Created and added city: " + cityName + " with isTransit=true");
   } else {
-    existing.isTransit = true;
-    console.log("[Import] Marked existing city as transit: " + cityName);
+    // City already exists in citiesData - leave it alone, it's a real destination
+    console.log("[Import] City already exists (not transit): " + cityName);
   }
 });
 
