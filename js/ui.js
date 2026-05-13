@@ -98,6 +98,8 @@ function applyUiSettings() {
     isFunMode = false;
     isCompactView = !!savedSettings.isCompactView;
     isEditMode = savedSettings.isEditMode !== false;
+  } else if (isMobileViewport()) {
+    isCompactView = true;
   }
 
   // Sync to window for cross-module access

@@ -573,9 +573,10 @@ main {
     box-shadow: var(--shadow-soft);
   }
   .mobile-table {
-    min-width: 680px;
+    min-width: 0;
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
   }
   .mobile-table thead { display: table-header-group; }
   .mobile-table tbody { display: table-row-group; }
@@ -590,11 +591,17 @@ main {
   .mobile-table td::before { content: none; }
   .mobile-table .budget-field { width: auto !important; justify-content: flex-start; }
   .mobile-table .property-col {
-    max-width: 220px;
+    max-width: none;
     white-space: normal;
   }
   .mobile-table .city-col {
     min-width: 110px;
+  }
+  .mobile-table .journey-name-col,
+  .mobile-table .route-col,
+  .mobile-table .property-col {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .mobile-table .journey-actions-col,
   .mobile-table .journey-service-col {
@@ -613,6 +620,9 @@ main {
   .transport-table th:nth-child(11) {
     display: none;
   }
+  .transport-table th:nth-child(10) {
+    display: none;
+  }
   .accom-table th:nth-child(9) {
     display: none;
   }
@@ -620,21 +630,27 @@ main {
   .transport-table .transport-arrives-col,
   .transport-table .transport-provider-col,
   .transport-table .transport-routecode-col,
+  .transport-table .transport-status-col,
   .transport-table .transport-actions-col {
     display: none;
   }
+  .accom-table th:nth-child(5),
+  .accom-table th:nth-child(6),
+  .accom-table th:nth-child(7),
+  .accom-table .date-col:nth-child(5),
+  .accom-table .nights-col,
+  .accom-table .stay-status-col,
   .accom-table .stay-actions-col {
     display: none;
   }
   .transport-table .journey-name-col {
-    min-width: 180px;
-    max-width: 220px;
+    width: 40%;
   }
   .transport-table .journey-route-col {
-    min-width: 120px;
+    width: 30%;
   }
   .transport-table .journey-departure-col {
-    min-width: 110px;
+    width: 18%;
   }
   .transport-detail-row,
   .stay-detail-row {
@@ -762,14 +778,17 @@ main {
   .stay-expand-col {
     width: 32px;
   }
-  .accom-table .stay-status-col {
-    display: none;
-  }
   .accom-table .city-col {
-    min-width: 90px;
+    width: 16%;
   }
   .accom-table .property-col {
-    max-width: 220px;
+    width: 42%;
+  }
+  .accom-table .date-col {
+    width: 16%;
+  }
+  .accom-table .budget-field {
+    width: 12%;
   }
   .budget-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
   .budget-kpi { padding: 1rem 0.85rem; }
