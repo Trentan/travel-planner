@@ -117,10 +117,20 @@ function normalizeDate(dateStr, year = 2026) {
 
 // Helper to determine stay display info for a given date
 function getStayDisplayForDay(dayDate, dayCity) {
-  if (!stays || !Array.isArray(stays)) return [];
+  // Check window.stays as fallback if local stays is undefined
+  if (typeof stays === 'undefined') {
+    if (typeof window !== 'undefined' && Array.isArray(window.stays)) {
+      var stays = window.stays;
+    } else {
+      return [];
+    }
+  }
+  if (!Array.isArray(stays)) return [];
 
   const result = [];
-  const cityObj = citiesData.find(c => c.name === dayCity);
+  const cityObj = typeof citiesData !== 'undefined'
+    ? citiesData.find(c => c.name === dayCity)
+    : null;
   const cityId = cityObj ? cityObj.id : null;
 
   // Normalize the day date for comparison
@@ -129,7 +139,9 @@ function getStayDisplayForDay(dayDate, dayCity) {
   stays.forEach(stay => {
     if (!stay.cityId) return;
 
-    const stayCity = citiesData.find(c => c.id === stay.cityId);
+    const stayCity = typeof citiesData !== 'undefined'
+      ? citiesData.find(c => c.id === stay.cityId)
+      : null;
     const stayCityName = stayCity ? stayCity.name : '';
 
     // Normalize dates to compare
