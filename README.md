@@ -67,3 +67,15 @@ Ready for the next adventure? Use the built-in AI Builder tab:
 * `index.html`: The core application layout, styling, and logic.
 * `manifest.json`: The configuration file that dictates the app's icon, name, and display colors for mobile installation.
 * `sw.js`: The Service Worker that forces the browser to cache the assets, enabling true offline functionality.
+
+---
+
+## Regression Checks
+
+Run the city import/navigation regression check after changing import, city submenu, transport, or itinerary mapping logic:
+
+```powershell
+node scripts\regression-city-nav.js
+```
+
+The check uses `backups/2026_June_July_Europe_Thailand.json` and verifies city filtering, timeline order, transit city handling, journey-to-leg mapping, and key city nav scroll targets.

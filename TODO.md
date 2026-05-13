@@ -37,7 +37,7 @@ Read this file at the start of every session. When using Claude Code, read from 
 ### Item 11: City Submenu Navigation and Timeline Mapping
 
 **Status:** In progress  
-**Next:** 11e
+**Next:** 11f
 
 Use `backups/2026_June_July_Europe_Thailand.json` as the primary regression fixture.
 
@@ -54,10 +54,12 @@ Use `backups/2026_June_July_Europe_Thailand.json` as the primary regression fixt
 - [x] 11d. Ensure the city submenu only uses cities from the imported/current JSON.
   - Current issue: default/browser-memory cities such as London and Paris can persist into later trips.
   - Imported cities, inferred itinerary cities, and transport-only transit cities should be merged without leaking stale browser state.
-- [ ] 11e. Add import/navigation regression checks for the Europe/Thailand backup.
+- [x] 11e. Add import/navigation regression checks for the Europe/Thailand backup.
   - Verify Verona and London appear as transit cities when applicable.
   - Verify Return is excluded from the city submenu.
   - Verify clicking each city nav item scrolls to a relevant itinerary leg/day.
+- [ ] 11f. Clarify and implement repeated-city submenu behavior.
+  - If a city is visited twice, make sure it appears in the submenu twice (eg one as a transit on the way and then secondly as an actual city visit - based on the itinerary and the transport - the city submenu should clearly map the journey path) - this might need further clarification - perhaps more important the city resides in the submenu where the MOST time in the city is spent as the best result
 
 ---
 
