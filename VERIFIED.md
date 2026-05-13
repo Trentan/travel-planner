@@ -148,3 +148,14 @@ Confirmed completed items. Append-only archive — do not edit existing entries.
 - Added `scripts/regression-city-nav.js` using `backups/2026_June_July_Europe_Thailand.json`.
 - Repeated cities now keep one submenu entry mapped to the best/longest accommodation stay when available.
 - Verification covered: Return excluded, Verona/London transit handling, city order, click targets, journey leg IDs, and Bangkok longest-stay placement.
+
+---
+
+### Item 12: Packing Improvements
+**Completed:** 2026-05-13 - branch `item-11-city-nav-timeline`
+
+- Expanded the default Before Leaving Home checklist to include the user's house-leaving tasks.
+- Added checklist merging so saved/imported packing data picks up new defaults without losing custom or checked items.
+- Added category-block deletion in Packing.
+- Added a Restore Packing to Default action for both packing lists and the leave-home checklist.
+- Reworked the packing guide UI into a single-panel picker with one guide open at a time.

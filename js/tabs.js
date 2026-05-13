@@ -209,7 +209,7 @@ function buildPackingTab() {
       </details>
     </div>
   `;
-  guidesContainer.innerHTML = guidesHTML;
+  guidesContainer.innerHTML = typeof renderPackingGuidesShell === 'function' ? renderPackingGuidesShell() : guidesHTML;
 
   let areasHTML = '';
   packingData.forEach((area, aIdx) => {
@@ -221,7 +221,10 @@ function buildPackingTab() {
         <div class="packing-grid">
           ${area.categories.map((cat, cIdx) => `
             <div class="packing-card">
-              <h3><span contenteditable="${isEditMode}" onblur="updatePackingCat(${aIdx}, ${cIdx}, this.innerText)">${cat.title}</span></h3>
+              <div class="packing-card-header">
+                <h3><span contenteditable="${isEditMode}" onblur="updatePackingCat(${aIdx}, ${cIdx}, this.innerText)">${cat.title}</span></h3>
+                <button class="del-btn" title="Delete Category Block" onclick="deletePackingCat(${aIdx}, ${cIdx})">×</button>
+              </div>
               ${cat.items.map((item, iIdx) => `
                 <div class="packing-item">
                   <button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">×</button>

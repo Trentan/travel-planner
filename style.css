@@ -571,6 +571,131 @@ main {
 /* PACKING LIST & GUIDES */
 .guides-container { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
 
+.packing-guides-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.packing-guides-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.packing-guides-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.packing-guide-btn {
+  border: 1px solid var(--border);
+  background: var(--card-strong);
+  color: var(--accent-strong);
+  padding: 0.65rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  box-shadow: var(--shadow-soft);
+}
+
+.packing-guide-btn.active {
+  background: var(--accent-strong);
+  color: white;
+  border-color: var(--accent-strong);
+}
+
+.packing-guides-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.packing-guide-panel {
+  margin-bottom: 0;
+}
+
+.guide-panel-subtitle {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.leave-home-guide-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.leave-home-progress-bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #ece6da;
+  overflow: hidden;
+}
+
+.leave-home-progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d76b5f 0%, #e39b55 100%);
+}
+
+.leave-home-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.leave-home-section-heading {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e7dece;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a7456;
+}
+
+.leave-home-list .leave-home-section-heading:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.leave-home-item {
+  padding: 0.2rem 0;
+}
+
+.leave-home-add-btn {
+  width: auto;
+  margin-top: 0.25rem;
+  align-self: flex-start;
+  border-color: #E74C3C;
+  color: #C0392B;
+}
+
+.packing-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.packing-card-header h3 {
+  margin: 0;
+  min-width: 0;
+  flex: 1;
+}
+
 /* 3-column grid for guide collapsibles (Item 6d) */
 .guides-grid {
   display: grid !important;
