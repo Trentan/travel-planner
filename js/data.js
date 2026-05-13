@@ -1995,7 +1995,39 @@ if (importedData.meta) {
   localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
 }
 
-  // Import journeys if present - also create cities from journey references
+  // Extract cities from leg labels (for legs without proper cityId references)
+// This catches transit cities like "Verona" that appear as leg labels but not in day.from/to
+var legLabelCities = [];
+if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
+  importedData.itinerary.forEach(leg => {
+    // Try to extract city name from leg label (e.g., "🇮🇹 Verona" -> "Verona")
+    let label = leg.label || '';
+    // Remove emoji patterns - flags, symbols, any emoji character
+    let cityFromLabel = label
+      .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')
+      .replace(/\p{Emoji}/gu, '')
+      .replace(/[^\w\s-]/gu, '')  // Remove any remaining non-letter/dash chars
+      .trim();
+    if (cityFromLabel && cityFromLabel !== 'Departure' && cityFromLabel !== 'Arrival' && cityFromLabel !== 'In transit') {
+      // Check if this leg's days don't actually reference this city
+      let cityInDays = false;
+      (leg.days || []).forEach(day => {
+        if (day.from === cityFromLabel || day.to === cityFromLabel) cityInDays = true;
+      });
+      if (!cityInDays) {
+        legLabelCities.push(cityFromLabel);
+        console.log("[Import] Found transit city from leg label: '" + cityFromLabel + "' (from label: '" + label + "')");
+      } else {
+        console.log("[Import] City '" + cityFromLabel + "' already in day.from/to, not adding as transit");
+      }
+    }
+  });
+}
+
+// Import journeys if present - also create cities from journey references
 var transitCitiesToAdd = []; // Collect transit city names before we load citiesData
 if (importedData.journeys && Array.isArray(importedData.journeys)) {
   // Extract cities from journey data that might not be in itinerary days
@@ -2076,40 +2108,41 @@ if (importedData.cities && Array.isArray(importedData.cities)) {
     localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
     console.log(`[Import] Loaded ${userCountries.length} user custom countries`);
   }
-
-  // NOW merge in transit cities from journeys, stays, and leg labels
-  var allTransitCities = [...new Set([...transitCitiesToAdd, ...stayCitiesToAdd, ...legLabelCities])];
-  console.log("[Import] Transit cities to process:", allTransitCities);
-  allTransitCities.forEach(cityName => {
-    let existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
-    if (!existing) {
-      console.log("[Import] Creating new transit city: " + cityName);
-      addOrUpdateCity(cityName, '', '', '', '', '');
-      existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
-    }
-    if (existing) {
-      existing.isTransit = true; // Mark as transit city for styling
-      // Try to look up country if not already set
-      if (!existing.countryCode && existing.country) {
-        const countryMatch = COUNTRY_DATA.find(c =>
-          c.name.toLowerCase() === existing.country.toLowerCase()
-        );
-        if (countryMatch) {
-          existing.countryCode = countryMatch.code;
-        }
-      }
-      console.log(`[Import] Transit city marked: ${cityName} (id: ${existing.id}, in citiesData: ${citiesData.includes(existing)})`);
-    } else {
-      console.log(`[Import] WARNING: Could not find city ${cityName} after addOrUpdateCity`);
-    }
-  });
-  console.log(`[Import] Total cities in citiesData: ${citiesData.length}`);
-  console.log(`[Import] Cities with isTransit flag: ${citiesData.filter(c => c.isTransit).length}`);
 } else {
   // Extract cities from itinerary if not in JSON
   citiesData = extractCitiesFromItinerary();
   console.log(`[Import] Extracted ${citiesData.length} cities from itinerary`);
 }
+
+// NOW process transit cities from journeys, stays, and leg labels
+// This must happen AFTER citiesData is set (whether loaded or extracted)
+var allTransitCities = [...new Set([...transitCitiesToAdd, ...stayCitiesToAdd, ...legLabelCities])];
+console.log("[Import] Transit cities to process:", allTransitCities);
+allTransitCities.forEach(cityName => {
+  let existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+  if (!existing) {
+    console.log("[Import] Creating new transit city: " + cityName);
+    addOrUpdateCity(cityName, '', '', '', '', '');
+    existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+  }
+  if (existing) {
+    existing.isTransit = true; // Mark as transit city for styling
+    // Try to look up country if not already set
+    if (!existing.countryCode && existing.country) {
+      const countryMatch = COUNTRY_DATA.find(c =>
+        c.name.toLowerCase() === existing.country.toLowerCase()
+      );
+      if (countryMatch) {
+        existing.countryCode = countryMatch.code;
+      }
+    }
+    console.log(`[Import] Transit city marked: ${cityName} (id: ${existing.id})`);
+  } else {
+    console.log(`[Import] WARNING: Could not find city ${cityName} after addOrUpdateCity`);
+  }
+});
+console.log(`[Import] Total cities in citiesData: ${citiesData.length}`);
+console.log(`[Import] Cities with isTransit flag: ${citiesData.filter(c => c.isTransit).length}`);
 
 // Import stays if present
 if (importedData.stays && Array.isArray(importedData.stays)) {
