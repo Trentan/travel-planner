@@ -497,7 +497,7 @@ window.onNewLegCountryChange = onNewLegCountryChange;
 let editingStayId = null; // Track if we're editing an existing stay
 
 function openAddStayModal() {
-  const modal = document.getElementById('add-stay-modal');
+  const modal = document.getElementById('stay-modal');
   if (!modal) return;
 
   editingStayId = null; // Reset editing state
@@ -550,7 +550,7 @@ function openAddStayModal() {
 }
 
 function openEditStayModal(stayId) {
-  const modal = document.getElementById('add-stay-modal');
+  const modal = document.getElementById('stay-modal');
   if (!modal) return;
 
   const stay = stays.find(s => s.id === stayId);
@@ -607,7 +607,7 @@ function openEditStayModal(stayId) {
 }
 
 function closeAddStayModal() {
-  const modal = document.getElementById('add-stay-modal');
+  const modal = document.getElementById('stay-modal');
   if (modal) modal.style.display = 'none';
 }
 

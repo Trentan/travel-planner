@@ -2083,35 +2083,6 @@
       "areaColor": "#2980B9",
       "categories": [
         {
-          "title": "🏠 Before Leaving Home",
-          "items": [
-            {
-              "text": "Lock all doors and windows",
-              "done": false
-            },
-            {
-              "text": "Pause gym membership",
-              "done": false
-            },
-            {
-              "text": "Setup camera for fish and security",
-              "done": false
-            },
-            {
-              "text": "Store/remove fridge & pantry perishables",
-              "done": false
-            },
-            {
-              "text": "Turn off taps, PowerPoints",
-              "done": false
-            },
-            {
-              "text": "Wrap garage door opener and unplug power",
-              "done": false
-            }
-          ]
-        },
-        {
           "title": "Clothes",
           "items": [
             {
@@ -2504,6 +2475,54 @@
   ],
   "leaveHome": [
     {
+      "text": "Empty fridge and pantry perishables",
+      "done": false
+    },
+    {
+      "text": "Turn power off everywhere not needed",
+      "done": false
+    },
+    {
+      "text": "Check all lights and fans off",
+      "done": false
+    },
+    {
+      "text": "Check CCTV on",
+      "done": false
+    },
+    {
+      "text": "Empty coffee and compost bins and leave outside",
+      "done": false
+    },
+    {
+      "text": "Close and check all windows",
+      "done": false
+    },
+    {
+      "text": "Blinds partial down",
+      "done": false
+    },
+    {
+      "text": "Empty bins",
+      "done": false
+    },
+    {
+      "text": "Water off, including outdoor taps",
+      "done": false
+    },
+    {
+      "text": "Dog door panel / lock",
+      "done": false
+    },
+    {
+      "text": "Automatic fish feeder",
+      "done": false
+    },
+    {
+      "text": "Security system on",
+      "done": false
+    },
+    {
       "text": "Lock all doors and windows",
       "done": false
     },
@@ -2516,11 +2535,83 @@
       "done": false
     },
     {
-      "text": "Switch off PowerPoints at the wall (except fridge)",
+      "text": "Switch off power points at the wall except fridge",
       "done": false
     },
     {
       "text": "Turn off gas supply if applicable",
+      "done": false
+    },
+    {
+      "text": "Adjust thermostat to away or saver mode",
+      "done": false
+    },
+    {
+      "text": "Take out all rubbish and recycling",
+      "done": false
+    },
+    {
+      "text": "Check mailbox is empty or hold mail service",
+      "done": false
+    },
+    {
+      "text": "Pause or reschedule any regular deliveries",
+      "done": false
+    },
+    {
+      "text": "Pause gym membership or group activities",
+      "done": false
+    },
+    {
+      "text": "Charge all devices including phones, tablets, and power banks",
+      "done": false
+    },
+    {
+      "text": "Download offline maps and confirmations",
+      "done": false
+    },
+    {
+      "text": "Notify emergency contact of travel plans",
+      "done": false
+    },
+    {
+      "text": "Water plants or arrange plant care",
+      "done": false
+    },
+    {
+      "text": "Set up lights on timers if away long",
+      "done": false
+    },
+    {
+      "text": "Close blinds or curtains and secure loose outdoor items",
+      "done": false
+    },
+    {
+      "text": "If taking dog: waste bags",
+      "done": false
+    },
+    {
+      "text": "If taking dog: water bowl",
+      "done": false
+    },
+    {
+      "text": "If taking dog: food",
+      "done": false
+    },
+    {
+      "text": "If taking dog: toys",
+      "done": false
+    },
+    {
+      "text": "If taking dog: leash",
+      "done": false
+    },
+    {
+      "text": "If taking dog: treats",
+      "done": false
+    },
+    {
+      "text": "Switch off PowerPoints at the wall (except fridge)",
       "done": false
     },
     {
@@ -2536,35 +2627,11 @@
       "done": false
     },
     {
-      "text": "Take out all rubbish and recycling",
-      "done": false
-    },
-    {
       "text": "Check mailbox is empty / hold mail service",
       "done": false
     },
     {
-      "text": "Pause or reschedule any regular deliveries",
-      "done": false
-    },
-    {
-      "text": "Pause gym membership or group activities",
-      "done": false
-    },
-    {
       "text": "Charge all devices (phones, tablets, power banks)",
-      "done": false
-    },
-    {
-      "text": "Download offline maps and confirmations",
-      "done": false
-    },
-    {
-      "text": "Notify emergency contact of travel plans",
-      "done": false
-    },
-    {
-      "text": "Water plants or arrange plant care",
       "done": false
     },
     {
@@ -2931,8 +2998,8 @@
       "id": "journey_1778473166253_06fhe3",
       "journeyId": "jid_single_journey_17",
       "journeyName": "Bangkok → Koh Samui",
-      "legId": "",
-      "dayDate": "2026-06-29",
+      "legId": "samui",
+      "dayDate": "29 Jun",
       "fromLocation": "Bangkok",
       "toLocation": "Koh Samui",
       "fromCityId": "city-bangkok",
@@ -2956,8 +3023,8 @@
       "id": "journey_1778474231627_8kwf23",
       "journeyId": "jid_zrh_bkk_456",
       "journeyName": "Zurich → Bangkok (via London)",
-      "legId": "",
-      "dayDate": "2026-06-26",
+      "legId": "zurich",
+      "dayDate": "26 Jun",
       "fromLocation": "Zurich",
       "toLocation": "London",
       "fromCityId": "city-zurich",
@@ -2981,8 +3048,8 @@
       "id": "journey_1778474236720_qwd9zd",
       "journeyId": "jid_zrh_bkk_456",
       "journeyName": "Zurich → Bangkok (via London)",
-      "legId": "",
-      "dayDate": "2026-06-26",
+      "legId": "bangkok",
+      "dayDate": "26 Jun",
       "fromLocation": "London",
       "toLocation": "Bangkok",
       "fromCityId": "city-london",
@@ -3006,8 +3073,8 @@
       "id": "journey_1778474416279_xl8dgk",
       "journeyId": "jid_outbound_123",
       "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
-      "legId": "",
-      "dayDate": "2026-06-08",
+      "legId": "departure",
+      "dayDate": "8 Jun",
       "fromLocation": "Brisbane",
       "toLocation": "Taipei",
       "fromCityId": "city-brisbane",
@@ -3031,8 +3098,8 @@
       "id": "journey_1778474341607_iobkbm",
       "journeyId": "jid_outbound_123",
       "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
-      "legId": "",
-      "dayDate": "2026-06-09",
+      "legId": "taipei",
+      "dayDate": "9 Jun",
       "fromLocation": "Taipei",
       "toLocation": "Bangkok",
       "fromCityId": "city-taipei",
@@ -3056,8 +3123,8 @@
       "id": "journey_1778474359483_dqz7rz",
       "journeyId": "jid_outbound_123",
       "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
-      "legId": "",
-      "dayDate": "2026-06-10",
+      "legId": "vienna",
+      "dayDate": "10 Jun",
       "fromLocation": "Bangkok",
       "toLocation": "Vienna",
       "fromCityId": "city-bangkok",
@@ -3081,8 +3148,8 @@
       "id": "journey_1778499151878_zq1fwu",
       "journeyId": "jid_return_789",
       "journeyName": "Koh Samui → Brisbane (via Bangkok)",
-      "legId": "",
-      "dayDate": "2026-07-07",
+      "legId": "return",
+      "dayDate": "7 Jul",
       "fromLocation": "Koh Samui",
       "toLocation": "Bangkok",
       "fromCityId": "city-koh-samui",
@@ -3106,8 +3173,8 @@
       "id": "journey_1778499154064_j0arhf",
       "journeyId": "jid_return_789",
       "journeyName": "Koh Samui → Brisbane (via Bangkok)",
-      "legId": "",
-      "dayDate": "2026-07-07",
+      "legId": "return",
+      "dayDate": "7 Jul",
       "fromLocation": "Bangkok",
       "toLocation": "Brisbane",
       "fromCityId": "city-bangkok",
@@ -3132,7 +3199,7 @@
     {
       "id": "stay_0_1777289776",
       "cityId": "city-vienna",
-      "propertyName": "tbc — vienna city centre",
+      "propertyName": "ibis Wien City",
       "checkIn": "2026-06-10",
       "checkOut": "2026-06-11",
       "nights": 1,
@@ -3295,8 +3362,7 @@
       "countryCode": "AU",
       "dateFrom": "8 Jul",
       "dateTo": "8 Jun",
-      "colour": "#3498DB",
-      "isTransit": true
+      "colour": "#3498DB"
     },
     {
       "id": "city-taipei",
@@ -3306,8 +3372,7 @@
       "countryCode": "TW",
       "dateFrom": "9 Jun",
       "dateTo": "9 Jun",
-      "colour": "#3498DB",
-      "isTransit": true
+      "colour": "#3498DB"
     },
     {
       "id": "city-vienna",
@@ -3317,8 +3382,7 @@
       "countryCode": "AT",
       "dateFrom": "10 Jun",
       "dateTo": "2026-06-10",
-      "colour": "#2C3E50",
-      "isTransit": true
+      "colour": "#2C3E50"
     },
     {
       "id": "city-bratislava",
@@ -3328,8 +3392,7 @@
       "countryCode": "SK",
       "dateFrom": "11 Jun",
       "dateTo": "2026-06-11",
-      "colour": "#FF5722",
-      "isTransit": true
+      "colour": "#FF5722"
     },
     {
       "id": "city-prague",
@@ -3339,8 +3402,7 @@
       "countryCode": "CZ",
       "dateFrom": "13 Jun",
       "dateTo": "2026-06-13",
-      "colour": "#E91E63",
-      "isTransit": true
+      "colour": "#E91E63"
     },
     {
       "id": "city-nuremberg",
@@ -3350,8 +3412,7 @@
       "countryCode": "DE",
       "dateFrom": "15 Jun",
       "dateTo": "2026-06-15",
-      "colour": "#8BC34A",
-      "isTransit": true
+      "colour": "#8BC34A"
     },
     {
       "id": "city-munich",
@@ -3361,8 +3422,7 @@
       "countryCode": "DE",
       "dateFrom": "16 Jun",
       "dateTo": "2026-06-19",
-      "colour": "#CDDC39",
-      "isTransit": true
+      "colour": "#CDDC39"
     },
     {
       "id": "city-innsbruck",
@@ -3372,8 +3432,7 @@
       "countryCode": "AT",
       "dateFrom": "20 Jun",
       "dateTo": "21 Jun",
-      "colour": "#E74C3C",
-      "isTransit": true
+      "colour": "#E74C3C"
     },
     {
       "id": "city-bolzano",
@@ -3383,8 +3442,7 @@
       "countryCode": "IT",
       "dateFrom": "2026-06-21",
       "dateTo": "23 Jun",
-      "colour": "#E91E63",
-      "isTransit": true
+      "colour": "#E91E63"
     },
     {
       "id": "city-milan",
@@ -3394,8 +3452,7 @@
       "countryCode": "IT",
       "dateFrom": "2026-06-23",
       "dateTo": "25 Jun",
-      "colour": "#2C3E50",
-      "isTransit": true
+      "colour": "#2C3E50"
     },
     {
       "id": "city-zurich",
@@ -3405,8 +3462,7 @@
       "countryCode": "CH",
       "dateFrom": "2026-06-25",
       "dateTo": "26 Jun",
-      "colour": "#795548",
-      "isTransit": true
+      "colour": "#795548"
     },
     {
       "id": "city-bangkok",
@@ -3416,8 +3472,7 @@
       "countryCode": "TH",
       "dateFrom": "2026-06-27",
       "dateTo": "7 Jul",
-      "colour": "#8BC34A",
-      "isTransit": true
+      "colour": "#8BC34A"
     },
     {
       "id": "city-koh-samui",
@@ -3427,8 +3482,7 @@
       "countryCode": "TH",
       "dateFrom": "1 Jul",
       "dateTo": "7 Jul",
-      "colour": "#F39C12",
-      "isTransit": true
+      "colour": "#F39C12"
     },
     {
       "id": "city-london",
@@ -3450,17 +3504,6 @@
       "dateFrom": "",
       "dateTo": "",
       "colour": "#9B59B6",
-      "isTransit": true
-    },
-    {
-      "id": "city-return",
-      "name": "Return",
-      "code": "",
-      "countryCode": "",
-      "country": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#9C27B0",
       "isTransit": true
     }
   ],

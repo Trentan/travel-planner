@@ -22,7 +22,9 @@ Read this file at the start of every session. When using Claude Code, read from 
 - [x] 9d. Add an easy way for users to force a complete site refresh on mobile app and website.
 
 ### Item 13: Other improvements
-- [ ] 13a. Fix the broken "Generate AI prompt" button.
+- [ ] 13a. Compact view is busted
+- [ ] 13b. Fun mode can be removed and force refresh can be removed (reset app should handle it)
+- Fix the broken "Generate AI prompt" button.
 - [ ] 13b. Convert the testing checklist into structured TODO items and add actual smoke tests for core functionality.
 - [ ] 13c. Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.
 
