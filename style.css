@@ -564,20 +564,74 @@ main {
   .map-controls .action-btn { width: 100%; justify-content: center; }
   .day-bar { grid-template-columns: 24px 62px minmax(0, 1fr) auto; }
   .day-total-cost { display: none; }
-  .data-table { min-width: 0; }
-  .data-table thead { display: none; }
-  .data-table,
-  .data-table tbody,
-  .data-table tr,
-  .data-table td { display: block; width: 100%; }
-  .data-table-wrapper {
+  .mobile-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: var(--card-strong);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-soft);
+  }
+  .mobile-table {
+    min-width: 760px;
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .mobile-table thead { display: table-header-group; }
+  .mobile-table tbody { display: table-row-group; }
+  .mobile-table tr { display: table-row; }
+  .mobile-table th,
+  .mobile-table td {
+    display: table-cell;
+    width: auto;
+    padding: 0.65rem 0.7rem;
+    text-align: left;
+  }
+  .mobile-table td::before { content: none; }
+  .mobile-table .budget-field { width: auto !important; justify-content: flex-start; }
+  .mobile-table .property-col {
+    max-width: 220px;
+    white-space: normal;
+  }
+  .mobile-table .city-col {
+    min-width: 110px;
+  }
+  .mobile-table .journey-actions-col,
+  .mobile-table .journey-service-col {
+    white-space: nowrap;
+  }
+  .transport-table th,
+  .transport-table td,
+  .accom-table th,
+  .accom-table td {
+    font-size: 0.82rem;
+  }
+  .transport-table .journey-name-col {
+    min-width: 180px;
+    max-width: 220px;
+  }
+  .transport-table .journey-route-col {
+    min-width: 120px;
+  }
+  .transport-table .journey-departure-col {
+    min-width: 110px;
+  }
+  .budget-table-wrapper {
     overflow: visible;
     background: transparent;
     border: none;
     box-shadow: none;
   }
-  .data-table tbody { display: grid; gap: 0.85rem; }
-  .data-table tr {
+  .budget-table {
+    min-width: 0;
+  }
+  .budget-table thead { display: none; }
+  .budget-table,
+  .budget-table tbody,
+  .budget-table tr,
+  .budget-table td { display: block; width: 100%; }
+  .budget-table tbody { display: grid; gap: 0.85rem; }
+  .budget-table tr {
     background: var(--card-strong);
     border: 1px solid var(--border);
     border-left: 4px solid var(--accent);
@@ -585,13 +639,13 @@ main {
     box-shadow: var(--shadow-soft);
     padding: 0.4rem 0;
   }
-  .data-table td {
+  .budget-table td {
     border-bottom: 1px solid rgba(221, 211, 198, 0.65);
     padding: 0.65rem 0.9rem;
     text-align: left;
   }
-  .data-table td:last-child { border-bottom: none; }
-  .data-table td::before {
+  .budget-table td:last-child { border-bottom: none; }
+  .budget-table td::before {
     content: attr(data-label);
     display: block;
     margin-bottom: 0.25rem;
@@ -601,7 +655,6 @@ main {
     text-transform: uppercase;
     color: var(--muted);
   }
-  .data-table .budget-field { width: auto !important; justify-content: flex-start; }
   .accom-header { flex-direction: column; align-items: stretch !important; }
   .budget-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
   .budget-kpi { padding: 1rem 0.85rem; }

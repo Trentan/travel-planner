@@ -596,8 +596,8 @@ function buildTransportTab(cityFilter = null) {
     groups[gid].push(j);
   });
 
-  html += `<div class="data-table-wrapper">
-    <table class="data-table">
+  html += `<div class="data-table-wrapper transport-table-wrapper mobile-table-wrapper">
+    <table class="data-table transport-table mobile-table">
       <thead>
         <tr>
           <th style="width:28px;"></th>

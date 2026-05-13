@@ -29,7 +29,7 @@ function buildAccomTab(cityFilter = null) {
     return;
   }
 
-  let html = `<div class="data-table-wrapper"><table class="data-table"><thead>
+  let html = `<div class="data-table-wrapper accom-table-wrapper mobile-table-wrapper"><table class="data-table accom-table mobile-table"><thead>
     <tr>
       <th>City</th>
       <th>Property</th>
@@ -351,7 +351,7 @@ function buildBudgetTab() {
     <div class="budget-kpi grand-total"><h3>Grand Total</h3><div class="amount">$${grandTotal}</div></div>
   `;
 
-  let html = `<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>Trip Leg</th><th>Transport</th><th>Accommodation</th><th>Activities</th><th>Leg Total</th></tr></thead><tbody>`;
+  let html = `<div class="data-table-wrapper budget-table-wrapper"><table class="data-table budget-table"><thead><tr><th>Trip Leg</th><th>Transport</th><th>Accommodation</th><th>Activities</th><th>Leg Total</th></tr></thead><tbody>`;
   legBreakdown.forEach(l => {
     html += `<tr style="border-left-color: ${l.colour}"><td data-label="Trip Leg" style="font-weight:600;">${l.label}</td><td data-label="Transport">$${l.trans}</td><td data-label="Accommodation">$${l.accom}</td><td data-label="Activities">$${l.act}</td><td data-label="Leg Total" style="font-family:'DM Mono',monospace; font-weight:600;">$${l.total}</td></tr>`;
   });

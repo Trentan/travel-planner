@@ -9,8 +9,8 @@
 - **Item:** Item 14: Mobile app shell polish
 - **Branch:** `item-14-mobile-shell-polish`
 - **Status:** ready for review
-- **What changed:** Consolidated the mobile top-menu controls into the action sheet, added mobile-specific mode toggles, made compact mode hide the mobile header and tighten the phone layout, improved the mobile reset confirmation flow, kept the city filter sticky through the responsive shell offsets, and left the "Before Leaving Home" packing guide collapsed by default.
-- **Commits:** `3ce59c9` start handoff, `7ca4fb8` implementation, follow-on packing-state tweak pending.
+- **What changed:** Consolidated the mobile top-menu controls into the action sheet, added mobile-specific mode toggles, made compact mode hide the mobile header and tighten the phone layout, improved the mobile reset confirmation flow, kept the city filter sticky through the responsive shell offsets, left the "Before Leaving Home" packing guide collapsed by default, and restored transport/accommodation to table-style mobile layouts with horizontal fit improvements.
+- **Commits:** `3ce59c9` start handoff, `7ca4fb8` implementation, `2b6feb0` packing-state tweak, follow-on table-layout tweak pending.
 
 ## Active
 - none
