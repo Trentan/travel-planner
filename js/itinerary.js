@@ -38,7 +38,7 @@ function buildCompactItinerary() {
       <div style="display:flex; gap:8px; margin-top:4px; font-size:10px;">`;
 
       // Display transport from journeys
-      const dayJourneys = getDayJourneys(day.date, day.from, day.to);
+      const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
       if (dayJourneys.length > 0) {
         html += '<div style="flex:1;"><strong>🚌</strong> ';
         html += dayJourneys.map(j => {
@@ -316,7 +316,7 @@ function getStayDisplayForDay(dayDate, dayCity) {
       const dayTotal = getDayTotal(day);
 
       // Get journeys for this day
-      const dayJourneys = getDayJourneys(day.date, day.from, day.to);
+      const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
 
       // Check if this day should be open
       const dayKey = `${day.day}-${day.date}`;

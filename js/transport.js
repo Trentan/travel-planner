@@ -156,6 +156,110 @@ function saveJourneys() {
   window.journeys = journeys;
 }
 
+function normalizeJourneyLocation(value) {
+  return (value || '').trim().toLowerCase();
+}
+
+function getCityIdForJourneyLocation(locationName) {
+  if (!locationName || locationName === 'Home' || locationName === 'In transit') return '';
+  const city = Array.isArray(citiesData)
+    ? citiesData.find(c => normalizeJourneyLocation(c.name) === normalizeJourneyLocation(locationName))
+    : null;
+  return city ? city.id : '';
+}
+
+function getJourneyDisplayDate(dateStr) {
+  if (!dateStr) return '';
+  if (typeof dateStr === 'string' && /^\d+\s+[A-Za-z]{3}$/.test(dateStr.trim())) return dateStr.trim();
+  return formatJourneyDate(dateStr);
+}
+
+function journeyDatesMatch(leftDate, rightDate) {
+  if (!leftDate || !rightDate) return false;
+  return leftDate === rightDate || getJourneyDisplayDate(leftDate) === getJourneyDisplayDate(rightDate);
+}
+
+function journeyRouteMatchesDay(journey, fromLoc, toLoc) {
+  if (!fromLoc && !toLoc) return true;
+
+  const journeyFrom = normalizeJourneyLocation(journey.fromLocation);
+  const journeyTo = normalizeJourneyLocation(journey.toLocation);
+  const dayFrom = normalizeJourneyLocation(fromLoc);
+  const dayTo = normalizeJourneyLocation(toLoc);
+
+  if (dayFrom && dayTo && journeyFrom === dayFrom && journeyTo === dayTo) return true;
+  if (dayFrom && journeyFrom === dayFrom) return true;
+  if (dayTo && journeyTo === dayTo) return true;
+  if (dayFrom && dayTo && dayFrom !== dayTo && (journeyFrom === dayTo || journeyTo === dayFrom)) return true;
+
+  return false;
+}
+
+function findBestLegForJourney(journey) {
+  if (!Array.isArray(appData)) return null;
+
+  if (journey.legId) {
+    const existingLeg = appData.find(leg => leg.id === journey.legId);
+    if (existingLeg) return existingLeg;
+  }
+
+  const routeAndDateMatch = appData.find(leg =>
+    (leg.days || []).some(day => {
+      const depDateMatches = journeyDatesMatch(journey.departureDate || journey.dayDate, day.date);
+      const arrDateMatches = journeyDatesMatch(journey.arrivalDate, day.date);
+      return (depDateMatches || arrDateMatches) && journeyRouteMatchesDay(journey, day.from, day.to);
+    })
+  );
+  if (routeAndDateMatch) return routeAndDateMatch;
+
+  const dateOnlyMatch = appData.find(leg =>
+    (leg.days || []).some(day =>
+      journeyDatesMatch(journey.departureDate || journey.dayDate, day.date) ||
+      journeyDatesMatch(journey.arrivalDate, day.date)
+    )
+  );
+  if (dateOnlyMatch) return dateOnlyMatch;
+
+  const routeOnlyMatch = appData.find(leg =>
+    (leg.days || []).some(day => journeyRouteMatchesDay(journey, day.from, day.to))
+  );
+  return routeOnlyMatch || null;
+}
+
+function migrateJourneyCityIds() {
+  if (!Array.isArray(journeys)) return false;
+
+  let changed = false;
+  journeys.forEach(journey => {
+    const fromCityId = getCityIdForJourneyLocation(journey.fromLocation);
+    const toCityId = getCityIdForJourneyLocation(journey.toLocation);
+
+    if (fromCityId && journey.fromCityId !== fromCityId) {
+      journey.fromCityId = fromCityId;
+      changed = true;
+    }
+    if (toCityId && journey.toCityId !== toCityId) {
+      journey.toCityId = toCityId;
+      changed = true;
+    }
+
+    const bestLeg = findBestLegForJourney(journey);
+    if (bestLeg && journey.legId !== bestLeg.id) {
+      journey.legId = bestLeg.id;
+      changed = true;
+    }
+
+    const displayDate = getJourneyDisplayDate(journey.departureDate || journey.dayDate || journey.arrivalDate);
+    if (displayDate && journey.dayDate !== displayDate) {
+      journey.dayDate = displayDate;
+      changed = true;
+    }
+  });
+
+  if (changed) saveJourneys();
+  return changed;
+}
+
 // Create a new journey from transport item data (legacy helper)
 function createJourneyFromTransportItem(item, legId, dayDate, fromLoc, toLoc) {
   const fromCity = citiesData.find(c => c.name === fromLoc);
@@ -248,7 +352,7 @@ function buildJourneyName(segments) {
 }
 
 // Get journeys for a specific day (for itinerary view)
-function getDayJourneys(dayDate, fromLoc, toLoc) {
+function getDayJourneys(dayDate, fromLoc, toLoc, legId = '') {
   if (typeof journeys === 'undefined' && typeof window !== 'undefined' && window.journeys) {
     journeys = window.journeys;
   }
@@ -258,12 +362,14 @@ function getDayJourneys(dayDate, fromLoc, toLoc) {
   const results = [];
 
   journeys.forEach(j => {
-    const depMatch = j.departureDate === dayDate || j.dayDate === dayDate;
-    const routeMatch = !fromLoc || !toLoc ||
-        j.fromLocation === fromLoc ||
-        j.toLocation === toLoc;
+    const legMatch = legId && j.legId === legId;
+    const depMatch = journeyDatesMatch(j.departureDate || j.dayDate, dayDate);
+    const arrMatch = journeyDatesMatch(j.arrivalDate, dayDate);
+    const hasJourneyDate = Boolean(j.departureDate || j.arrivalDate || j.dayDate);
+    const dateMatch = depMatch || arrMatch || (!hasJourneyDate && legMatch);
+    const routeMatch = journeyRouteMatchesDay(j, fromLoc, toLoc);
 
-    if (depMatch && routeMatch) {
+    if (dateMatch && (routeMatch || legMatch)) {
       const key = j.journeyId || j.id;
       if (!seen.has(key)) {
         seen.add(key);
@@ -1018,6 +1124,7 @@ window.getDayJourneys = getDayJourneys;
 window.getTransportIcon = getTransportIcon;
 window.createJourneyFromTransportItem = createJourneyFromTransportItem;
 window.importJourneys = importJourneys;
+window.migrateJourneyCityIds = migrateJourneyCityIds;
 window.rebuildCurrentView = rebuildCurrentView;
 window.selectJourneyType = selectJourneyType;
 window.promptAddNewCity = promptAddNewCity;

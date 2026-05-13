@@ -2239,6 +2239,10 @@ allTransitCities.forEach(cityName => {
   }
 });
 
+if (typeof migrateJourneyCityIds === 'function') {
+  migrateJourneyCityIds();
+}
+
 console.log(`[Import] Total cities in citiesData: ${citiesData.length}`);
 console.log(`[Import] Cities with isTransit flag: ${citiesData.filter(c => c.isTransit).length}`);
 console.log(`[Import] Transit cities:`, citiesData.filter(c => c.isTransit).map(c => c.name));

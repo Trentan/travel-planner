@@ -37,7 +37,7 @@ Read this file at the start of every session. When using Claude Code, read from 
 ### Item 11: City Submenu Navigation and Timeline Mapping
 
 **Status:** In progress  
-**Next:** 11c
+**Next:** 11d
 
 Use `backups/2026_June_July_Europe_Thailand.json` as the primary regression fixture.
 
@@ -47,7 +47,7 @@ Use `backups/2026_June_July_Europe_Thailand.json` as the primary regression fixt
 - [x] 11b. Sort the city submenu by first arrival / first itinerary appearance.
   - Expected order should start with the actual journey sequence, for example Brisbane, Taipei (transit), Bangkok (short stop), then onward cities.
   - Transit cities should remain visibly distinct but still appear in the correct timeline position.
-- [ ] 11c. Improve mapping between transport journeys and itinerary legs.
+- [x] 11c. Improve mapping between transport journeys and itinerary legs.
   - Use transport data to fill itinerary timeline blanks where useful.
   - Use itinerary legs to infer missing transport context where useful.
   - Avoid creating fake destination cities from labels such as Return, Departure, or generic travel labels.
