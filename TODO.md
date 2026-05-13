@@ -21,13 +21,42 @@ Read this file at the start of every session. When using Claude Code, read from 
   - Complete: PR #17 merged.
 - [x] 9d. Add an easy way for users to force a complete site refresh on mobile app and website.
 
+### Item 12: Packing improvements
+- [ ] 12a. Improve the default Before Leaving Home checklist by merging/comparing the user's checklist below.
+  - [ ]  Empty fridge and pantry perishables
+  - [ ]  Turn power off everywhere not needed
+  - [ ]  Check all lights and fans off
+  - [ ]  Check CCTV on
+  - [ ]  Empty coffee and compost bins and leave outside
+  - [ ]  Close and check all windows
+  - [ ]  Blinds partial down
+  - [ ]  Empty Bins
+  - [ ]  Water Off (including outdoor taps)
+  - [ ]  Dog door panel / lock
+  - [ ]  Automatic Fish feeder
+  - [ ]  Security System On
+  - [ ]  If Taking Dog
+    - [ ]  Waste bags
+      - [ ]  Water Bowl
+      - [ ]  Food
+      - [ ]  Toys
+      - [ ]  Leash
+      - [ ]  Treats
+- [ ] 12b. Allow deleting sub category blocks in Packing.
+- [ ] 12c. Add "Restore Packing to Default" to wipe ALL packing changes and reload defaults.
+- [ ] 12d. Improve the packing hints/guides UI.
+  - Current issue: single dropdowns are clunky in the 3-column row.
+  - Possible approach: only one open at a time, or replace with buttons that launch dialogs.
+
+
 ### Item 13: Other improvements
 - [ ] 13a. Compact view is busted
-- [ ] 13b. Fun mode can be removed and force refresh can be removed (reset app should handle it)
-- [ ] 13c. For the guides in packing - These could be contained in a Helpful hints style dropdown (and then each clicked to load) so it takes up less screen space : Before Leaving Home, Hotel Sink Washing, Capsule Wardrobe Prompt - and close guide. 
-- [ ] 13d. Fix the broken "Generate AI prompt" button.
-- [ ] 13e. Convert the testing checklist into structured TODO items and add actual smoke tests for core functionality.
-- [ ] 13f. Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.
+- [ ] 13b. All dates handling from json / to json need to be in yyyy-mm-dd format so they cannot be mixed up (and ensure items loading dates can handle that format)
+- [ ] 13c. Fun mode can be removed and force refresh can be removed (reset app should handle it)
+- [ ] 13d. For the guides in packing - These could be contained in a Helpful hints style dropdown (and then each clicked to load) so it takes up less screen space : Before Leaving Home, Hotel Sink Washing, Capsule Wardrobe Prompt - and close guide. 
+- [ ] 13e. Fix the broken "Generate AI prompt" button.
+- [ ] 13f. Convert the testing checklist into structured TODO items and add actual smoke tests for core functionality.
+- [ ] 13g. Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.
 
 
 ## Noticed
