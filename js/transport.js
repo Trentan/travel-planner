@@ -568,6 +568,49 @@ function renderTransportDetailBlock(title, value, extraClass = '') {
   `;
 }
 
+function renderJourneyMobileSummary(rep, legCountText, durationText) {
+  const parts = [
+    rep.provider || '',
+    rep.routeCode || '',
+    durationText || ''
+  ].filter(Boolean);
+  const legsText = legCountText ? `(${legCountText})` : '';
+
+  return `
+    <div class="mobile-table-meta transport-mobile-meta">
+      <span class="transport-mobile-provider">${parts.join(' &bull; ')}${legsText ? ` ${legsText}` : ''}</span>
+    </div>
+  `;
+}
+
+function renderTransportScheduleMobile(icon, firstDep, lastArr, lastArrTime) {
+  const arrivalText = lastArr !== '�' ? `${lastArr} ${lastArrTime || ''}`.trim() : '�';
+
+  return `
+    <div class="mobile-table-meta transport-schedule-meta">
+      <span class="transport-schedule-type">${icon}</span>
+      <span><strong>D:</strong> ${firstDep || '�'}</span>
+      <span><strong>A:</strong> ${arrivalText}</span>
+    </div>
+  `;
+}
+
+function renderTransportStatusCostMobile(statusText, statusIcon, statusColor, costValue, bookingReference, journeyId, isEditable) {
+  if (typeof renderMobileStatusCostMeta === 'function') {
+    return renderMobileStatusCostMeta({
+      status: statusText.toLowerCase(),
+      costValue,
+      bookingReference,
+      statusOnClick: isEditable ? `toggleJourneyStatus('${journeyId}')` : '',
+      costOnBlur: `updateJourneyCost('${journeyId}', this.innerText); buildTransportTab();`,
+      statusButtonTitle: 'Change status',
+      metaClass: 'transport-status-cost-meta',
+      editableCost: isEditable
+    });
+  }
+  return '';
+}
+
 // ─── BUILD TRANSPORT TAB ────────────────────────────────────────────────────
 
 function buildTransportTab(cityFilter = null) {
@@ -595,7 +638,7 @@ function buildTransportTab(cityFilter = null) {
 
   let html = `
     <div class="transport-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-      <h3 style="margin:0; font-family:'Playfair Display',serif; color:#2C3E50;">✈️ Transport Itinerary</h3>
+      <h3 style="margin:0; font-family:'Playfair Display',serif; color:#2C3E50;"><span class="transport-title-desktop">Transport Itinerary</span><span class="transport-title-mobile">Transport</span></h3>
       <button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>
     </div>
   `;
@@ -619,7 +662,6 @@ function buildTransportTab(cityFilter = null) {
     }
     groups[gid].push(j);
   });
-
   html += `<div class="data-table-wrapper transport-table-wrapper mobile-table-wrapper">
     <table class="data-table transport-table mobile-table">
       <thead>
@@ -631,13 +673,20 @@ function buildTransportTab(cityFilter = null) {
           <th>Departs</th>
           <th>Arrives</th>
           <th>Provider</th>
-          <th>Route #</th>
+          <th>Code</th>
           <th>Cost</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
+        <tr class="transport-mobile-head-row" aria-hidden="true">
+          <th>Destination / Leg</th>
+          <th>Schedule</th>
+          <th>Status & Cost/PNR</th>
+          <th aria-hidden="true"></th>
+        </tr>
       </thead>
-      <tbody>`;
+      <tbody>
+      `;
 
   groupOrder.forEach(gid => {
     const segs = groups[gid].sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
@@ -670,81 +719,101 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
 
 
     const isExpanded = isTransportGroupExpanded(gid);
-    const expandBtn = `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" title="Show journey details" aria-expanded="${isExpanded}">${isExpanded ? '▼' : '▶'}</button>`;
+    const expandBtn = isMultiLeg ? `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" title="Show journey details" aria-expanded="${isExpanded}">${isExpanded ? '▼' : '▶'}</button>` : '';
 
     html += `
       <tr class="journey-parent-row" data-group="${gid}" style="border-left:3px solid ${statusColor};">
         <td data-label="Expand">${expandBtn}</td>
-        <td class="journey-name-col" data-label="Journey" title="${rep.journeyName || ''}">${nameDisplay}${durationDisplay}${isMultiLeg ? ` <span style="font-size:0.7rem;background:#e8f0fe;color:#3c5a99;padding:1px 5px;border-radius:8px;">${segs.length} legs</span>` : ''}</td>
+        <td class="journey-name-col" data-label="Journey" title="${rep.journeyName || ''}">
+          ${expandBtn ? `<span class="transport-mobile-expand">${expandBtn}</span>` : ''}
+          <div class="journey-name-main">${nameDisplay}${durationDisplay}${isMultiLeg ? ` <span class="journey-leg-badge">${segs.length} legs</span>` : ''}</div>
+          ${renderJourneyMobileSummary(rep, isMultiLeg ? `${segs.length} legs` : ``, durationHours !== null ? `${durationHours}h` : ``)}
+        </td>
         <td class="transport-type-col" data-label="Type">${icon}</td>
         <td class="route-col" data-label="Route">${route}</td>
-        <td class="date-col transport-departs-col" data-label="Departs">${firstDep}</td>
-        <td class="transport-arrives-col" data-label="Arrives">${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
+        <td class="date-col transport-departs-col" data-label="Departs">
+          <span class="transport-departs-desktop">${firstDep}</span>
+          ${renderTransportScheduleMobile(icon, firstDep, lastArr, lastArrTime)}
+        </td>
+        <td class="transport-arrives-col" data-label="Arrives">${lastArr !== '�' ? lastArr + ' ' + lastArrTime : '�'}</td>
         <td class="transport-provider-col" data-label="Provider">${rep.provider || '—'}</td>
-        <td class="transport-routecode-col" data-label="Route #">${rep.routeCode || '—'}</td>
+        <td class="transport-routecode-col" data-label="Code">${rep.routeCode || '—'}</td>
         <td class="budget-field" data-label="Cost">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
         <td class="transport-status-col" data-label="Status">
           <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
             ${statusIcon} ${statusText}
           </span>
-          ${rep.bookingReference ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${rep.bookingReference}</span>` : ""}
+          ${renderTransportStatusCostMobile(statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.bookingReference, rep.id, isEditMode)}
         </td>
         <td class="transport-actions-col" data-label="Actions">
-          <button class="edit-btn" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
+          <button class="edit-btn" onclick="editJourney('${gid}')" title="Edit journey">✎</button>
           ${isMultiLeg
         ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
         : `<button class="del-btn" onclick="deleteJourney('${rep.id}'); buildTransportTab();" title="Delete">×</button>`}
         </td>
       </tr>`;
 
-    const detailRows = segs.map((seg, i) => {
-      const segIcon = getTransportIcon(seg.transportType);
-      const segDepDate = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
-      const segDepTime = seg.departureTime || '';
-      const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTime : segDepDate;
-      const segArr = formatJourneyDate(seg.arrivalDate) || '—';
-      return `
-        <div class="transport-segment-chip">
-          <div class="transport-segment-chip-title">${segIcon} Leg ${i + 1}: ${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}</div>
-          <div class="transport-segment-chip-meta">${segDep} → ${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</div>
-          <div class="transport-segment-chip-meta">${seg.provider || '—'}${seg.routeCode ? ` · ${seg.routeCode}` : ''}${seg.cost ? ` · $${seg.cost}` : ''}</div>
-        </div>
-      `;
-    }).join('');
+    if (isMultiLeg) {
+      const detailRows = segs.map((seg, i) => {
+        const segDepDate = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
+        const segDepTime = seg.departureTime || '';
+        const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTime : segDepDate;
+        const segArr = formatJourneyDate(seg.arrivalDate) || '—';
+        const segRoute = `${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}`;
+        return `
+          <tr class="transport-segment-row">
+            <td class="transport-segment-journey">${seg.fromLocation || '—'} → ${seg.toLocation || '—'}</td>
+            <td class="transport-segment-leg">Leg ${i + 1}</td>
+            <td class="transport-segment-route">${segRoute}</td>
+            <td class="transport-segment-departs">${segDep}</td>
+            <td class="transport-segment-arrives">${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
+            <td class="transport-segment-provider">${seg.provider || '—'}</td>
+            <td class="transport-segment-code">${seg.routeCode || '—'}</td>
+            <td class="transport-segment-cost">${seg.cost ? `$${seg.cost}` : '—'}</td>
+          </tr>
+        `;
+      }).join('');
 
-    const detailRowContent = `
-      <div class="transport-detail-grid">
-        ${renderTransportDetailBlock('Type', icon)}
-        ${renderTransportDetailBlock('Arrives', lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—')}
-        ${renderTransportDetailBlock('Provider', rep.provider)}
-        ${renderTransportDetailBlock('Route #', rep.routeCode)}
-        ${renderTransportDetailBlock('Booking Ref', rep.bookingReference, 'full-width')}
-        ${renderTransportDetailBlock('Status', `${statusIcon} ${statusText}`)}
-        <div class="transport-detail-block full-width">
-          <span class="transport-detail-label">Actions</span>
-          <span class="transport-detail-actions">
-            <button class="edit-btn" onclick="editJourney('${gid}')" title="Edit journey">✎</button>
-            ${isMultiLeg
-              ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
-              : `<button class="del-btn" onclick="deleteJourney('${rep.id}'); buildTransportTab();" title="Delete">×</button>`}
-          </span>
-        </div>
-        ${rep.notes ? renderTransportDetailBlock('Notes', rep.notes, 'full-width') : ''}
-      </div>
-      ${isMultiLeg ? `
+      const detailRowContent = `
         <div class="transport-segments-list">
           <div class="transport-segments-title">Journey Segments</div>
-          ${detailRows}
+          <table class="transport-segment-table">
+            <colgroup>
+              <col class="transport-segment-col-journey">
+              <col class="transport-segment-col-leg">
+              <col class="transport-segment-col-route">
+              <col class="transport-segment-col-departs">
+              <col class="transport-segment-col-arrives">
+              <col class="transport-segment-col-provider">
+              <col class="transport-segment-col-code">
+              <col class="transport-segment-col-cost">
+            </colgroup>
+            <thead>
+              <tr class="transport-segment-head">
+                <th>Journey</th>
+                <th>Leg</th>
+                <th>Route</th>
+                <th>Departs</th>
+                <th>Arrives</th>
+                <th>Provider</th>
+                <th>Code</th>
+                <th>Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${detailRows}
+            </tbody>
+          </table>
         </div>
-      ` : ''}
-    `;
+      `;
 
-    html += `
-      <tr class="journey-detail-row ${isExpanded ? 'expanded' : ''}" data-group="${gid}" style="display:${isExpanded ? 'table-row' : 'none'};">
-        <td colspan="11">
-          ${detailRowContent}
-        </td>
-      </tr>`;
+      html += `
+        <tr class="journey-detail-row ${isExpanded ? 'expanded' : ''}" data-group="${gid}" style="display:${isExpanded ? 'table-row' : 'none'};">
+          <td colspan="10">
+            ${detailRowContent}
+          </td>
+        </tr>`;
+    }
   });
 
   html += '</tbody></table></div>';
@@ -774,6 +843,12 @@ let _pendingSegments = [];
 let _pendingJourneyId = null;
 let _pendingJourneyName = ''; // Track the name when editing
 
+function _syncJourneyModalActions() {
+  const deleteBtn = document.getElementById('journeyDeleteBtn');
+  const isExistingJourney = _pendingJourneyId ? journeys.some(j => j.journeyId === _pendingJourneyId) : false;
+  if (deleteBtn) deleteBtn.style.display = isExistingJourney ? 'inline-flex' : 'none';
+}
+
 // Load an existing journey into the modal
 function editJourney(journeyId) {
   const segs = findJourneySegments(journeyId);
@@ -796,7 +871,8 @@ if (segmentsCopy.length > 0) {
   _loadSegmentIntoForm(segmentsCopy[0]);
 }
 
-_updateSegmentList();
+  _updateSegmentList();
+  _syncJourneyModalActions();
 
   // Update journey title display
   const titleEl = document.getElementById('journeyTitleDisplay');
@@ -920,6 +996,7 @@ function openAddJourneyModal() {
 
     _updateSegmentList();
     selectJourneyType('flight');
+    _syncJourneyModalActions();
 
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('journeyDateFrom').value = today;
@@ -989,9 +1066,9 @@ function _updateSegmentList() {
       return `
       <div style="font-size: 0.85rem; color: #666; text-align: center; margin-bottom: 8px; ${bgStyle}">
         <span>✓ Segment ${i + 1}: ${s.fromLocation} ➔ ${s.toLocation}</span>
-        <span style="color: #ccc;">•</span>
+        <span style="color: #ccc;">&bull;</span>
         <span>${depString} ➔ ${arrString}</span>
-        ${providerStr ? `<span style="color: #ccc;">•</span><span>${providerStr}</span>` : ''}
+        ${providerStr ? `<span style="color: #ccc;">&bull;</span><span>${providerStr}</span>` : ''}
         <button onclick="editPendingSegment(${i})" style="background:none; border:none; color:#3498DB; cursor:pointer; font-size:1rem; opacity:0.8; padding:0 4px;" title="Edit leg">✎</button>
         <button onclick="removePendingSegment(${i})" style="background:none; border:none; color:#E74C3C; cursor:pointer; font-size:1rem; opacity:0.6; padding:0 4px;" title="Remove leg">×</button>
       </div>`;
@@ -1095,6 +1172,24 @@ function closeJourneyModal() {
   _pendingJourneyId = null;
   _pendingJourneyName = '';
   _journeyFormDirty = false;
+  _syncJourneyModalActions();
+}
+
+function deleteJourneyFromModal() {
+  if (!_pendingJourneyId) return;
+  if (!confirm('Delete this journey?')) return;
+  const journeyId = _pendingJourneyId;
+  const hasGroup = journeys.some(j => j.journeyId === journeyId);
+  if (hasGroup) {
+    deleteJourneyGroup(journeyId);
+  } else {
+    const pendingIds = new Set(_pendingSegments.map(seg => seg.id).filter(Boolean));
+    journeys = journeys.filter(j => !pendingIds.has(j.id));
+    window.journeys = journeys;
+    saveJourneys();
+    if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+  }
+  closeJourneyModal();
 }
 
 function saveJourneyFromModal() {
@@ -1164,6 +1259,7 @@ window.buildJourneyName = buildJourneyName;
 window.openAddJourneyModal = openAddJourneyModal;
 window.closeJourneyModal = closeJourneyModal;
 window.saveJourneyFromModal = saveJourneyFromModal;
+window.deleteJourneyFromModal = deleteJourneyFromModal;
 window.addSegmentToJourney = addSegmentToJourney;
 window.removePendingSegment = removePendingSegment;
 window.toggleJourneySegments = toggleJourneySegments;
@@ -1184,3 +1280,4 @@ window.selectJourneyType = selectJourneyType;
 window.promptAddNewCity = promptAddNewCity;
 window.editJourney = editJourney;
 window.editPendingSegment = editPendingSegment;
+

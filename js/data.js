@@ -1710,6 +1710,7 @@ if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title &&
 
   const savedFile = localStorage.getItem('travelApp_filename_v2026');
   if (savedFile) { currentFileName = savedFile; }
+  seedDefaultDerivedTravelData();
 
   document.getElementById('mainTitle').innerText = titleData.title;
   document.getElementById('mainSubtitle').innerText = titleData.subtitle;
@@ -1901,6 +1902,153 @@ function normalizeTripCitiesDateData(items) {
     item.dateTo = normalizeTripDateValue(item.dateTo);
   });
   return items;
+}
+
+function addDaysToIsoDate(dateStr, days) {
+  if (!dateStr) return '';
+  const date = new Date(`${dateStr}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return '';
+  date.setDate(date.getDate() + days);
+  return toLocalIsoDate(date);
+}
+
+function inferTransportTypeFromText(text) {
+  const value = (text || '').toLowerCase();
+  if (value.includes('flight') || value.includes('depart') || value.includes('arrive') || value.includes('✈')) return 'flight';
+  if (value.includes('train') || value.includes('rail') || value.includes('🚂')) return 'train';
+  if (value.includes('bus') || value.includes('🚌')) return 'bus';
+  if (value.includes('ferry') || value.includes('boat') || value.includes('⛴')) return 'ferry';
+  if (value.includes('car') || value.includes('drive') || value.includes('🚗')) return 'car';
+  if (value.includes('bike') || value.includes('bicycle') || value.includes('🚲')) return 'bike';
+  if (value.includes('walk') || value.includes('🚶')) return 'walk';
+  return 'other';
+}
+
+function buildDefaultJourneysFromItinerary(legs) {
+  if (!Array.isArray(legs)) return [];
+
+  const journeysData = [];
+  legs.forEach((leg, legIndex) => {
+    (leg.days || []).forEach((day, dayIndex) => {
+      const dayDate = normalizeTripDateValue(day.date);
+      (day.transportItems || []).forEach((item, itemIndex) => {
+        const fromLocation = day.from || '';
+        const toLocation = day.to || '';
+        journeysData.push({
+          id: `journey_default_${leg.id || legIndex}_${dayIndex}_${itemIndex}`,
+          journeyId: `journey_default_group_${leg.id || legIndex}_${dayIndex}_${itemIndex}`,
+          journeyName: `${fromLocation} → ${toLocation}`,
+          legId: leg.id || `leg-${legIndex}`,
+          dayDate,
+          fromLocation,
+          toLocation,
+          fromCityId: typeof getCityIdByName === 'function' ? getCityIdByName(fromLocation) : '',
+          toCityId: typeof getCityIdByName === 'function' ? getCityIdByName(toLocation) : '',
+          departureDate: dayDate,
+          departureTime: '',
+          arrivalDate: dayDate,
+          arrivalTime: '',
+          transportType: inferTransportTypeFromText(item.text),
+          provider: item.provider || '',
+          routeCode: item.routeCode || '',
+          status: item.status === 'confirmed' ? 'booked' : 'planned',
+          cost: item.cost || '0',
+          bookingReference: item.bookingRef || '',
+          isMultiLeg: false,
+          segmentOrder: 1,
+          notes: item.text || '',
+          legs: []
+        });
+      });
+    });
+  });
+
+  return journeysData;
+}
+
+function calculateNightsBetween(checkIn, checkOut) {
+  if (!checkIn || !checkOut) return 0;
+  const start = new Date(`${checkIn}T00:00:00`);
+  const end = new Date(`${checkOut}T00:00:00`);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
+  const diffDays = Math.round((end - start) / (1000 * 60 * 60 * 24));
+  return Math.max(0, diffDays);
+}
+
+function buildDefaultStaysFromItinerary(legs) {
+  if (!Array.isArray(legs)) return [];
+
+  const staysByKey = new Map();
+
+  legs.forEach((leg, legIndex) => {
+    (leg.days || []).forEach((day, dayIndex) => {
+      const dayDate = normalizeTripDateValue(day.date);
+      const nextDate = addDaysToIsoDate(dayDate, 1);
+
+      (day.accomItems || []).forEach((item, itemIndex) => {
+        const propertyName = (item.text || '').trim();
+        if (!propertyName) return;
+
+        const cityId = item.cityId || (typeof getCityIdByName === 'function' ? getCityIdByName(day.to || day.from || '') : '');
+        const key = `${cityId}||${propertyName}||${item.provider || ''}||${item.bookingRef || ''}`;
+        const existing = staysByKey.get(key);
+        const itemCost = Number.parseFloat(item.cost) || 0;
+
+        if (!existing) {
+          staysByKey.set(key, {
+            id: `stay_default_${leg.id || legIndex}_${dayIndex}_${itemIndex}`,
+            cityId,
+            propertyName,
+            checkIn: dayDate,
+            checkOut: nextDate || dayDate,
+            nights: 0,
+            status: item.status || 'pending',
+            provider: item.provider || '',
+            bookingRef: item.bookingRef || '',
+            totalCost: itemCost.toString(),
+            notes: item.text || ''
+          });
+          return;
+        }
+
+        if (dayDate && (!existing.checkIn || dayDate < existing.checkIn)) existing.checkIn = dayDate;
+        if (nextDate && (!existing.checkOut || nextDate > existing.checkOut)) existing.checkOut = nextDate;
+        if (item.status === 'confirmed') existing.status = 'confirmed';
+        if (!existing.provider && item.provider) existing.provider = item.provider;
+        if (!existing.bookingRef && item.bookingRef) existing.bookingRef = item.bookingRef;
+        existing.totalCost = ((Number.parseFloat(existing.totalCost) || 0) + itemCost).toString();
+      });
+    });
+  });
+
+  return [...staysByKey.values()]
+    .map(stay => ({
+      ...stay,
+      nights: calculateNightsBetween(stay.checkIn, stay.checkOut)
+    }))
+    .sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
+}
+
+function seedDefaultDerivedTravelData() {
+  if (currentFileName !== 'Default Template') return false;
+
+  let seeded = false;
+  const hasTransportSource = Array.isArray(appData) && appData.some(leg => (leg.days || []).some(day => (day.transportItems || []).length > 0));
+  const hasStaySource = Array.isArray(appData) && appData.some(leg => (leg.days || []).some(day => (day.accomItems || []).length > 0));
+
+  if ((!Array.isArray(journeys) || journeys.length === 0) && hasTransportSource) {
+    journeys = buildDefaultJourneysFromItinerary(appData);
+    window.journeys = journeys;
+    seeded = true;
+  }
+
+  if ((!Array.isArray(stays) || stays.length === 0) && hasStaySource) {
+    stays = buildDefaultStaysFromItinerary(appData);
+    window.stays = stays;
+    seeded = true;
+  }
+
+  return seeded;
 }
 
 function resetAppStateToDefaults() {
