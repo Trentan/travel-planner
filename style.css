@@ -3197,5 +3197,37 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   .stay-date-meta {
     display: none !important;
   }
+  .accom-table .stay-status-badge {
+    display: inline-flex;
+  }
+  .accom-table .stay-status-cost-meta {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .accom-table .stay-status-badge {
+    display: none !important;
+  }
+  .accom-table .stay-status-cost-meta {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.12rem;
+    margin-top: 0;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .accom-table .stay-status-cost-meta .transport-mobile-status-btn {
+    width: auto;
+    max-width: 100%;
+    justify-content: flex-start;
+  }
+  .accom-table .stay-status-cost-meta .transport-mobile-cost-line {
+    width: auto;
+    justify-content: flex-start;
+  }
+  .accom-table .stay-status-cost-meta .transport-mobile-booking {
+    display: block;
+  }
 }
 

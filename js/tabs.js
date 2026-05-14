@@ -46,7 +46,22 @@ function renderStayDateSummary(stay, status, statusIcon) {
 
 function renderStayStatusCostSummary(stay, status, statusIcon) {
   const normalizedStatus = (status === 'pending' ? 'planned' : status) || 'planned';
-  return typeof renderMobileStatusCostMeta === 'function'
+  const statusColors = {
+    planned: '#E67E22',
+    booked: '#27AE60',
+    confirmed: '#27AE60',
+    cancelled: '#E74C3C'
+  };
+  const statusIcons = {
+    planned: '⏳',
+    booked: '✓',
+    confirmed: '🎫',
+    cancelled: '❌'
+  };
+  const statusText = normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
+  const statusColor = statusColors[normalizedStatus] || statusColors.planned;
+  const statusIconGlyph = statusIcons[normalizedStatus] || '⏳';
+  const mobileMeta = typeof renderMobileStatusCostMeta === 'function'
     ? renderMobileStatusCostMeta({
         status: normalizedStatus,
         costValue: stay.totalCost || '0',
@@ -54,10 +69,17 @@ function renderStayStatusCostSummary(stay, status, statusIcon) {
         statusOnClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
         costOnBlur: `updateStayField('${stay.id}', 'totalCost', this.innerText)`,
         statusButtonTitle: 'Change status',
-        metaClass: 'transport-status-cost-meta',
+        metaClass: 'stay-status-cost-meta',
         editableCost: isEditMode
       })
     : '';
+
+  return `
+    <span class="status-badge stay-status-badge" style="background:${statusColor};cursor:pointer;" onclick="if(${isEditMode})toggleStayStatus(event, '${stay.id}')">
+      ${statusIconGlyph} ${statusText}
+    </span>
+    ${mobileMeta}
+  `;
 }
 
 function buildAccomTab(cityFilter = null) {
