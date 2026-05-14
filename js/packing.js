@@ -226,9 +226,6 @@ function renderPackingGuidesShell() {
           <button type="button" class="packing-guide-btn ${isActiveGuide('sink') ? 'active' : ''}" onclick="toggleGuidePanel('sink')">Hotel Sink Washing</button>
           <button type="button" class="packing-guide-btn ${isActiveGuide('capsule') ? 'active' : ''}" onclick="toggleGuidePanel('capsule')">Capsule Wardrobe Prompt</button>
         </div>
-        <div class="packing-guides-actions">
-          <button class="action-btn" type="button" onclick="restorePackingToDefault()">Restore Packing to Default</button>
-        </div>
       </div>
       ${renderPackingGuidePanel()}
     </div>

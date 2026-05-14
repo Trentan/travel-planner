@@ -402,7 +402,13 @@ function buildPackingTab() {
       </div>`;
   });
 
-  listsContainer.innerHTML = areasHTML;
+  const restoreFooterHTML = `
+    <div class="packing-guides-actions packing-page-footer">
+      <button class="action-btn packing-restore-btn" type="button" onclick="restorePackingToDefault()">Restore Packing to Default</button>
+    </div>
+  `;
+
+  listsContainer.innerHTML = areasHTML + restoreFooterHTML;
 }
 
 function buildBudgetTab() {

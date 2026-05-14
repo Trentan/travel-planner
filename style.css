@@ -1269,10 +1269,62 @@ main {
   }
 }
 
+body.mobile-app-mode .app-menu-left {
+  width: 100%;
+  order: 1;
+  gap: 0.35rem 0.45rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 body.mobile-app-mode .file-badge,
 body.mobile-app-mode .save-status,
 body.mobile-app-mode .timestamp-status {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+}
+
+body.mobile-app-mode .file-badge {
+  flex: 1 1 100%;
+  max-width: 100%;
+  font-size: 0.72rem;
+  padding: 0.38rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.14);
+}
+
+body.mobile-app-mode .save-status {
+  min-width: 0;
+  font-size: 0.78rem;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.04);
+}
+
+body.mobile-app-mode .timestamp-status {
+  font-size: 0.69rem;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.04);
+  white-space: nowrap;
+}
+
+body.mobile-app-mode .app-menu-right {
+  width: 100%;
+  order: 2;
+  gap: 0.45rem;
+}
+
+body.mobile-app-mode .app-menu-right > span {
   display: none;
+}
+
+body.mobile-app-mode .app-menu-right .app-menu-btn:not(.mobile-menu-btn) {
+  font-size: 0.76rem;
+  min-height: 38px;
+  padding: 0.5rem 0.75rem;
 }
 
 body.mobile-app-mode.compact-view-mode .tab-label {
@@ -1506,12 +1558,15 @@ body.mobile-menu-open {
   border: 1px solid var(--border);
   background: var(--card-strong);
   color: var(--accent-strong);
-  padding: 0.65rem 0.9rem;
-  border-radius: 999px;
+  padding: 0.72rem 1rem;
+  border-radius: 14px;
   cursor: pointer;
   font: inherit;
-  font-weight: 600;
+  font-weight: 500;
   box-shadow: var(--shadow-soft);
+  line-height: 1.2;
+  min-height: 44px;
+  font-size: 0.85rem;
 }
 
 .packing-guide-btn.active {
@@ -1524,6 +1579,26 @@ body.mobile-menu-open {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+}
+
+.packing-guides-footer {
+  justify-content: flex-end;
+}
+
+.packing-page-footer {
+  margin-top: 1.25rem;
+  justify-content: flex-end;
+}
+
+.packing-restore-btn {
+  background: #E74C3C;
+  color: white;
+  border-color: #C0392B;
+}
+
+.packing-restore-btn:hover {
+  background: #C0392B;
+  border-color: #A93226;
 }
 
 .packing-guide-panel {
@@ -1726,6 +1801,48 @@ body.mobile-menu-open {
   margin-bottom: 1rem;
 }
 .guide-steps-list li { margin-bottom: 0.5rem; }
+
+@media (max-width: 768px) {
+  .packing-guides-toolbar {
+    gap: 0.6rem;
+  }
+
+  .packing-guides-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+    width: 100%;
+  }
+
+  .packing-guide-btn {
+    width: 100%;
+    min-height: 72px;
+    padding: 0.5rem 0.45rem;
+    border-radius: 14px;
+    font-size: 0.78rem;
+    text-align: center;
+    white-space: normal;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .packing-guides-footer {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .packing-page-footer {
+    margin-top: 1rem;
+  }
+
+  .packing-restore-btn {
+    min-height: 38px;
+    padding: 0.48rem 0.8rem;
+    font-size: 0.74rem;
+    border-radius: 12px;
+  }
+}
 .guide-example-box {
   background: #f8f6f1;
   padding: 1rem;
