@@ -407,6 +407,7 @@ let activeFileHandle = null;
 let activeFileHandleName = null;
 let pendingFileHandle = null;
 let fileWriteFailed = false;
+const ACTIVE_FILE_HANDLE_DB_KEY = 'activeFileHandle';
 
 // Journeys data - make global so all modules can access
 var journeys = [];
@@ -431,13 +432,18 @@ function hasFileWriteFailed() {
   return !!fileWriteFailed;
 }
 
+function isSavingToFile() {
+  return hasActiveFileHandle() || (!!localStorage.getItem('travelApp_file_handle_name') && !fileWriteFailed);
+}
+
 function getActiveFileHandleName() {
   return activeFileHandleName || currentFileName || 'Default Template';
 }
 
 function getFileConnectionStatusLabel() {
   if (hasActiveFileHandle()) return 'Connected';
-  if (fileWriteFailed) return 'Offline';
+  if (fileWriteFailed) return 'No access';
+  if (localStorage.getItem('travelApp_file_handle_name')) return 'Disconnected';
   return '';
 }
 
@@ -464,6 +470,8 @@ function setActiveFileHandle(handle) {
     fileWriteFailed = false;
     syncCurrentFileName(activeFileHandleName);
     localStorage.setItem('travelApp_file_handle_name', activeFileHandleName);
+    persistActiveFileHandle(handle);
+    if (typeof window.resetEditTracking === 'function') window.resetEditTracking();
     if (typeof window.hideBackupReminder === 'function') window.hideBackupReminder();
     syncActiveFileDisplay();
     if (typeof window.updateExportIndicator === 'function') window.updateExportIndicator();
@@ -481,8 +489,41 @@ function clearActiveFileHandle() {
   activeFileHandleName = null;
   fileWriteFailed = false;
   localStorage.removeItem('travelApp_file_handle_name');
+  deleteFromIndexedDB(ACTIVE_FILE_HANDLE_DB_KEY).catch(e => {
+    console.warn('Failed to clear persisted file handle:', e);
+  });
   syncActiveFileDisplay();
   configureFileActionButtons();
+}
+
+function persistActiveFileHandle(handle) {
+  if (!handle || !isFSASupported()) return Promise.resolve();
+  return saveToIndexedDB(ACTIVE_FILE_HANDLE_DB_KEY, handle).catch(e => {
+    console.warn('Failed to persist file handle:', e);
+  });
+}
+
+async function restorePersistedActiveFileHandle() {
+  if (!isFSASupported()) return null;
+
+  try {
+    const handle = await loadFromIndexedDB(ACTIVE_FILE_HANDLE_DB_KEY);
+    if (!handle) return null;
+    setActiveFileHandle(handle);
+    return handle;
+  } catch (e) {
+    console.warn('Failed to restore persisted file handle:', e);
+    return null;
+  }
+}
+
+async function ensureActiveFileHandle() {
+  if (activeFileHandle) return true;
+  if (!isFSASupported()) return false;
+  if (!localStorage.getItem('travelApp_file_handle_name')) return false;
+
+  const handle = await restorePersistedActiveFileHandle();
+  return !!handle;
 }
 
 function configureFileActionButtons() {
@@ -531,7 +572,7 @@ function getCurrentAppData() {
 }
 
 async function saveFileToDisk() {
-  if (!activeFileHandle) return false;
+  if (!await ensureActiveFileHandle()) return false;
 
   try {
     const writable = await activeFileHandle.createWritable();
@@ -1747,7 +1788,9 @@ function migrateLegCityIds() {
   });
 }
 
-function initData() {
+async function initData() {
+  const previousSuppress = window.__suppressBackupTracking;
+  window.__suppressBackupTracking = true;
   // Load journeys first, before any rendering happens
   const savedJourneys = localStorage.getItem('travelApp_journeys_v1');
   if (savedJourneys) {
@@ -1919,6 +1962,7 @@ if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title &&
   document.getElementById('mainSubtitle').innerText = titleData.subtitle;
   syncActiveFileDisplay();
   configureFileActionButtons();
+  restorePersistedActiveFileHandle();
 
   // Display last export/import timestamp
   displayTimestampStatus();
@@ -1940,7 +1984,11 @@ if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title &&
   // Migrate leg-level entities with city IDs
   migrateLegCityIds();
 
-  saveData(false);
+  try {
+    await saveData(false);
+  } finally {
+    window.__suppressBackupTracking = previousSuppress;
+  }
 
   // Journeys loaded at start of initData(), no additional init needed
 }
@@ -2016,7 +2064,7 @@ async function saveData(showTick = true) {
   if(showTick) {
     const status = document.getElementById('saveStatus');
     if (status) {
-      status.textContent = savedToFile ? "✓ Saved" : "✓ Saved locally";
+      status.textContent = savedToFile ? "✓ Saved to file" : "✓ Saved locally";
       setTimeout(() => status.textContent = "", 2000);
     }
   }
@@ -2024,6 +2072,8 @@ async function saveData(showTick = true) {
   if (!hasActiveFileHandle() && !localStorage.getItem('travelApp_file_handle_name') && typeof window.checkBackupReminder === 'function') {
     setTimeout(() => window.checkBackupReminder(), 250);
   }
+
+  return savedToFile;
 }
 
 const TRIP_DATE_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -2483,8 +2533,14 @@ function getIntermediateJourneyCities(journeysData) {
   return [...new Set(transitCities)];
 }
 
-function exportJSON() {
-  saveData(false);
+async function exportJSON() {
+  const previousSuppress = window.__suppressBackupTracking;
+  window.__suppressBackupTracking = true;
+  try {
+    await saveData(false);
+  } finally {
+    window.__suppressBackupTracking = previousSuppress;
+  }
   // Get journeys if they exist
   let journeysData = [];
   if (typeof journeys !== 'undefined') journeysData = normalizeTripJourneysData(JSON.parse(JSON.stringify(journeys)));
@@ -2552,8 +2608,14 @@ function formatSummaryMoney(value) {
   return `$${parsed.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')}`;
 }
 
-function exportItineraryText() {
-  saveData(false);
+async function exportItineraryText() {
+  const previousSuppress = window.__suppressBackupTracking;
+  window.__suppressBackupTracking = true;
+  try {
+    await saveData(false);
+  } finally {
+    window.__suppressBackupTracking = previousSuppress;
+  }
 
   const journeysData = typeof journeys !== 'undefined'
     ? normalizeTripJourneysData(JSON.parse(JSON.stringify(journeys)))
@@ -2717,8 +2779,14 @@ function exportItineraryText() {
   downloadAnchorNode.remove();
 }
 
-function exportItinerarySummaryText() {
-  saveData(false);
+async function exportItinerarySummaryText() {
+  const previousSuppress = window.__suppressBackupTracking;
+  window.__suppressBackupTracking = true;
+  try {
+    await saveData(false);
+  } finally {
+    window.__suppressBackupTracking = previousSuppress;
+  }
 
   const journeysData = typeof journeys !== 'undefined'
     ? normalizeTripJourneysData(JSON.parse(JSON.stringify(journeys)))
@@ -2853,7 +2921,7 @@ window.updateCityCountry = updateCityCountry;
 window.deleteCityFromDialog = deleteCityFromDialog;
 window.populateCityList = populateCityList;
 
-function importJSON(event) {
+async function importJSON(event) {
   const file = event.target.files[0];
   if (!file) {
     console.log('No file selected');
@@ -2878,7 +2946,7 @@ function importJSON(event) {
     pendingFileHandle = null;
   };
 
-  reader.onload = function(e) {
+  reader.onload = async function(e) {
     try {
       const content = e.target.result;
 
@@ -3172,24 +3240,30 @@ if (importedData.stays && Array.isArray(importedData.stays)) {
 
       // Preserve titleData before saveData() runs, then restore after
       const savedTitle = titleData.title;
-const savedSubtitle = titleData.subtitle;
-saveData(false);
-if (savedTitle) { titleData.title = savedTitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
-if (savedSubtitle) { titleData.subtitle = savedSubtitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
+      const savedSubtitle = titleData.subtitle;
+      const previousSuppress = window.__suppressBackupTracking;
+      window.__suppressBackupTracking = true;
+      try {
+        await saveData(false);
+      } finally {
+        window.__suppressBackupTracking = previousSuppress;
+      }
+      if (savedTitle) { titleData.title = savedTitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
+      if (savedSubtitle) { titleData.subtitle = savedSubtitle; localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData)); }
 
-// Rebuild all UI components to reflect imported data
-if (typeof buildNav === 'function') buildNav();
-if (typeof buildItinerary === 'function') buildItinerary();
-if (typeof buildAccomTab === 'function') buildAccomTab();
-if (typeof buildTransportTab === 'function') buildTransportTab();
-if (typeof buildBudgetTab === 'function') buildBudgetTab();
-if (typeof buildPackingTab === 'function') buildPackingTab();
-if (typeof buildCityNav === 'function') buildCityNav();
-if (typeof buildJourneyMap === 'function') buildJourneyMap();
-if (typeof populateCityList === 'function') populateCityList();
+      // Rebuild all UI components to reflect imported data
+      if (typeof buildNav === 'function') buildNav();
+      if (typeof buildItinerary === 'function') buildItinerary();
+      if (typeof buildAccomTab === 'function') buildAccomTab();
+      if (typeof buildTransportTab === 'function') buildTransportTab();
+      if (typeof buildBudgetTab === 'function') buildBudgetTab();
+      if (typeof buildPackingTab === 'function') buildPackingTab();
+      if (typeof buildCityNav === 'function') buildCityNav();
+      if (typeof buildJourneyMap === 'function') buildJourneyMap();
+      if (typeof populateCityList === 'function') populateCityList();
 
-// Notify user of successful import
-alert('Import successful! ' + appData.length + ' trip legs loaded.');
+      // Notify user of successful import
+      alert('Import successful! ' + appData.length + ' trip legs loaded.');
     } catch (err) {
       console.error('Import error:', err);
       alert(`Import failed: ${err.message || 'Unknown error'}. Your current data remains safe.`);
@@ -3212,6 +3286,7 @@ window.saveFileToDisk = saveFileToDisk;
 window.getCurrentAppData = getCurrentAppData;
 window.hasActiveFileHandle = hasActiveFileHandle;
 window.hasFileWriteFailed = hasFileWriteFailed;
+window.isSavingToFile = isSavingToFile;
 window.getActiveFileHandleName = getActiveFileHandleName;
 window.setActiveFileHandle = setActiveFileHandle;
 window.clearActiveFileHandle = clearActiveFileHandle;
