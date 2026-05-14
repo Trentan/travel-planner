@@ -44,6 +44,7 @@ Read this file at the start of every session. When using Claude Code, read from 
 - [ ] 16b. Search/filter functionality.
 - [ ] 16c. Cannot change the cost or duration of an activity In itinerary tab)?
 - [ ] 16c. I want a way to export all the content into an easily interpreted itinerary from all the selections so I can ask ai for review, similar to the json but more text based, is there an action that could be created for this and added to menu. It could be nice text based / aasci art too so could be emailed to friends etc. make sure it has an option to hide important info (eg pnr, booking numbers, costs etc). On that note the json export could have similar options too so it can be shared.
+- [ ] 16c. There should be a way to email some with a filtered json - saying "hey check out my cool itinerary, just launch the site and load my attached file" with a link to the github hosted site and the filtered json file (depending on how you want to filter it)
 - [ ] 16c. Undo/redo system.
 - [ ] 16d. Trip sharing/export formats such as PDF or Google Docs.
 - [ ] 16e. Change colors for cities.

@@ -92,7 +92,7 @@ const GUIDE_STEPS = [
   {
     id: 'export',
     title: 'Export & Share',
-    description: 'Use "Open File" on supported browsers to autosave into one JSON file. On mobile fallback, use "Export Backup" to save a copy.',
+    description: 'Use "Open File" on supported browsers to autosave into one JSON file. On mobile fallback, use the download option to save a copy.',
     demo: 'import-export',
     hint: 'You can also import someone else\'s trip and modify it for your needs!'
   },
@@ -212,7 +212,7 @@ function buildStepDemo(step) {
         <div class="guide-step-demo">
           <div style="display:flex;gap:8px;">
             <span style="padding:6px 12px; background:#eee; border-radius:4px; font-size:0.8rem;">Open File</span>
-            <span style="padding:6px 12px; background:#eee; border-radius:4px; font-size:0.8rem;">Export Backup</span>
+            <span style="padding:6px 12px; background:#eee; border-radius:4px; font-size:0.8rem;">Download JSON Copy</span>
           </div>
         </div>
       `;

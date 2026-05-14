@@ -45,7 +45,7 @@ To keep the app blazing fast and fully offline, it saves your active edits to br
 * You can safely tick off packing items, log train ticket costs, or drag-and-drop sights while totally offline (e.g., on a flight). The app will auto-save as you edit.
 
 ### 3. Manual Backup on Mobile
-* On browsers that cannot keep a writable file handle, tap **Export Backup** when you want a fresh `.json` copy.
+* On browsers that cannot keep a writable file handle, use the download option when you want a fresh `.json` copy.
 * Save that file over the old one in your Google Drive `Backups` folder. This locks in your progress.
 
 ---

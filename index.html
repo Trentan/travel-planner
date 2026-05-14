@@ -29,15 +29,15 @@
     <button class="app-menu-btn" onclick="openAIDialog()">🤖 AI Builder</button>
     <button class="app-menu-btn" onclick="openGuideDialog()">📖 Guide</button>
     <button class="app-menu-btn" onclick="openPrintPreview()">🖨 Print Itinerary</button>
-    <span style="color: rgba(255,255,255,0.2);">|</span>
+    <span class="app-menu-divider" aria-hidden="true"></span>
+    <button class="app-menu-btn" onclick="exportItinerarySummaryText()">🧾 Export AI Summary</button>
+    <button class="app-menu-btn" onclick="exportItineraryText()">📝 Export Itinerary Text</button>
+    <span class="app-menu-divider" aria-hidden="true"></span>
     <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
     <button id="saveAsBtn" class="app-menu-btn" onclick="openTripFile()">Save As</button>
     <button id="openFileBtn" class="app-menu-btn" onclick="openExistingTripFile()">Open File</button>
-    <button id="exportBackupBtn" class="app-menu-btn" onclick="exportJSON()">Export Backup</button>
-    <button class="app-menu-btn" onclick="exportItinerarySummaryText()">🧾 Export AI Summary</button>
-    <button class="app-menu-btn" onclick="exportItineraryText()">📝 Export Itinerary Text</button>
-    <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="promptInstallApp()">⬇ Install App</button>
     <button class="app-menu-btn danger" onclick="promptResetData()">Reset App</button>
+    <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="promptInstallApp()">⬇ Install App</button>
     <button class="app-menu-btn mobile-menu-btn" onclick="toggleMobileMenu()">☰ Menu</button>
   </div>
 </div>
@@ -161,13 +161,14 @@
         <button class="app-menu-btn" onclick="closeMobileMenu(); openAIDialog()">🤖 AI Builder</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openGuideDialog()">📖 Guide</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openPrintPreview()">🖨 Print Itinerary</button>
-        <button id="mobileSaveAsBtn" class="app-menu-btn" onclick="openTripFile(); closeMobileMenu()">Save As</button>
-        <button id="mobileOpenFileBtn" class="app-menu-btn" onclick="openExistingTripFile(); closeMobileMenu()">Open File</button>
-        <button id="mobileExportBackupBtn" class="app-menu-btn" onclick="exportJSON(); closeMobileMenu()">Export Backup</button>
+        <div class="mobile-menu-divider" aria-hidden="true"></div>
         <button class="app-menu-btn" onclick="exportItinerarySummaryText(); closeMobileMenu()">🧾 Export AI Summary</button>
         <button class="app-menu-btn" onclick="exportItineraryText(); closeMobileMenu()">📝 Export Itinerary Text</button>
-        <button id="mobileInstallAppBtn" class="app-menu-btn install-btn" hidden onclick="closeMobileMenu(); promptInstallApp()">⬇ Install App</button>
+        <div class="mobile-menu-divider" aria-hidden="true"></div>
+        <button id="mobileSaveAsBtn" class="app-menu-btn" onclick="openTripFile(); closeMobileMenu()">Save As</button>
+        <button id="mobileOpenFileBtn" class="app-menu-btn" onclick="openExistingTripFile(); closeMobileMenu()">Open File</button>
         <button class="app-menu-btn danger" onclick="closeMobileMenu(); promptResetData()">Reset App</button>
+        <button id="mobileInstallAppBtn" class="app-menu-btn install-btn" hidden onclick="closeMobileMenu(); promptInstallApp()">⬇ Install App</button>
       </div>
     </div>
   </div>

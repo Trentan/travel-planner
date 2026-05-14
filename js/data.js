@@ -527,12 +527,6 @@ async function ensureActiveFileHandle() {
 }
 
 function configureFileActionButtons() {
-  const shouldShowExport = !isFSASupported() || fileWriteFailed;
-  ['exportBackupBtn', 'mobileExportBackupBtn'].forEach(id => {
-    const button = document.getElementById(id);
-    if (button) button.style.display = shouldShowExport ? '' : 'none';
-  });
-
   const saveAsVisible = isFSASupported();
   ['saveAsBtn', 'mobileSaveAsBtn'].forEach(id => {
     const button = document.getElementById(id);
@@ -655,7 +649,7 @@ async function createFileOnDisk() {
   } catch (e) {
     if (e && e.name === 'AbortError') return;
     console.error('Failed to create file:', e);
-    alert('Could not create a file location. You can still use Export Backup.');
+    alert('Could not create a file location. You can still download a JSON copy.');
   }
 }
 

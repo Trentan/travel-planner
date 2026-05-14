@@ -56,10 +56,10 @@ function checkBackupReminder() {
   const fsSupported = typeof window.isFSASupported === 'function' && window.isFSASupported();
   const localMessage = fsSupported
     ? 'This trip is saving locally right now. Tap Save As to connect a file for autosave.'
-    : 'This trip is saving locally right now. Tap Export Backup to download a fresh JSON copy.';
+    : 'This trip is saving locally right now. Tap the download option to save a fresh JSON copy.';
   const refreshMessage = fsSupported
     ? 'Tap Save As if you want to reconnect file-based autosave.'
-    : 'Tap Export Backup whenever you want a fresh copy.';
+    : 'Tap the download option whenever you want a fresh copy.';
 
   if (!lastExport) {
     showBackupReminder(`You have made ${editCountSinceExport} local edits. ${localMessage}`);
