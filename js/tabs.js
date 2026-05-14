@@ -36,14 +36,28 @@ function renderStayMobileSummary(stay, status, statusIcon, cityName) {
 
 function renderStayDateSummary(stay, status, statusIcon) {
   const checkOut = formatDateShort(stay.checkOut);
-  const statusText = status.charAt(0).toUpperCase() + status.slice(1);
 
   return `
     <div class="mobile-table-meta stay-date-meta">
       <span class="stay-meta-checkout"><strong>Out:</strong> ${checkOut}</span>
-      <span class="stay-meta-status"><strong>Status:</strong> ${statusIcon} ${statusText}</span>
     </div>
   `;
+}
+
+function renderStayStatusCostSummary(stay, status, statusIcon) {
+  const normalizedStatus = (status === 'pending' ? 'planned' : status) || 'planned';
+  return typeof renderMobileStatusCostMeta === 'function'
+    ? renderMobileStatusCostMeta({
+        status: normalizedStatus,
+        costValue: stay.totalCost || '0',
+        bookingReference: stay.bookingRef || '',
+        statusOnClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
+        costOnBlur: `updateStayField('${stay.id}', 'totalCost', this.innerText)`,
+        statusButtonTitle: 'Change status',
+        metaClass: 'transport-status-cost-meta',
+        editableCost: isEditMode
+      })
+    : '';
 }
 
 function buildAccomTab(cityFilter = null) {
@@ -88,12 +102,10 @@ function buildAccomTab(cityFilter = null) {
       <th>Actions</th>
     </tr>
     <tr class="stay-mobile-head-row" aria-hidden="true">
-      <th>City</th>
-      <th>Property</th>
-      <th>Check-in</th>
-      <th>Status</th>
-      <th>Cost</th>
-      <th>Action</th>
+      <th>Stay</th>
+      <th>Schedule</th>
+      <th>Status & Cost</th>
+      <th aria-hidden="true"></th>
     </tr>
   </thead><tbody>`;
 
@@ -102,26 +114,33 @@ function buildAccomTab(cityFilter = null) {
     const cityName = city ? city.name : 'Unknown';
     const cityColor = city?.colour || '#2C3E50';
 
-    const status = stay.status || 'pending';
+    const status = stay.status === 'pending' ? 'planned' : (stay.status || 'planned');
     const statusColors = {
+      planned: '#E67E22',
+      booked: '#27AE60',
       confirmed: '#27AE60',
-      pending: '#E67E22',
       cancelled: '#E74C3C'
     };
-    const statusColor = statusColors[status] || statusColors.pending;
-    const statusIcon = status === 'confirmed' ? '✓' : status === 'cancelled' ? '✕' : '⏳';
+    const statusIcons = {
+      planned: '⏳',
+      booked: '✓',
+      confirmed: '🎫',
+      cancelled: '❌'
+    };
+    const statusColor = statusColors[status] || statusColors.planned;
+    const statusIcon = statusIcons[status] || '⏳';
 
     const bookingRef = stay.bookingRef ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${stay.bookingRef}</span>` : '';
     const provider = stay.provider ? `<br><span style="font-size:0.8rem; color:#888;">${stay.provider}</span>` : '';
     const isExpanded = isStayRowExpanded(stay.id);
     const expandBtn = `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleStayRowDetails('${stay.id}')" title="Show stay details" aria-expanded="${isExpanded}">${isExpanded ? '▼' : '▶'}</button>`;
 
-    html += `<tr style="border-left-color: ${cityColor}">
+    html += `<tr class="stay-parent-row" style="border-left-color: ${cityColor}">
       <td class="stay-expand-col" data-label="Expand">${expandBtn}</td>
       <td class="city-col" data-label="City">${getCityFlagHTML(cityName)} ${cityName}</td>
       <td class="property-col" data-label="Property">
-        <span style="font-weight:600;" contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)">${escapeHtml(stay.propertyName)}</span>
-        ${provider}
+        <span class="stay-property-name" contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)">${escapeHtml(stay.propertyName)}</span>
+        ${stay.provider ? `<span class="stay-provider">${escapeHtml(stay.provider)}</span>` : ''}
       </td>
       <td class="date-col stay-dates-col" data-label="Stay">
         ${formatDateShort(stay.checkIn)}
@@ -130,8 +149,7 @@ function buildAccomTab(cityFilter = null) {
       <td class="date-col stay-out-col" data-label="Check-out">${formatDateShort(stay.checkOut)}</td>
       <td class="nights-col" data-label="Nights">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
       <td class="stay-status-col" data-label="Status">
-        <span class="status-badge" style="background:${statusColor}; cursor:pointer;" onclick="event.stopPropagation(); toggleStayStatus(event, '${stay.id}')">${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}</span>
-        ${bookingRef}
+        ${renderStayStatusCostSummary(stay, status, statusIcon)}
       </td>
       <td class="budget-field" data-label="Cost" style="width:100px;">
         $<span contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'totalCost', this.innerText)">${stay.totalCost || '0'}</span>

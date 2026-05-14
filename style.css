@@ -578,6 +578,13 @@ main {
     table-layout: fixed;
   }
   .mobile-table thead { display: table-header-group; }
+  .mobile-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    background: var(--card-strong);
+    box-shadow: 0 1px 0 rgba(36, 72, 93, 0.12);
+  }
   .mobile-table tbody { display: table-row-group; }
   .mobile-table tr { display: table-row; }
   .mobile-table th,
@@ -622,26 +629,33 @@ main {
     padding: 0.68rem 0.3rem 0.6rem;
     border: 0;
     background: var(--card-strong);
+    border-bottom: 1px solid rgba(36, 72, 93, 0.12);
     line-height: 1.15;
     vertical-align: middle;
+    position: sticky;
+    top: 0;
+    z-index: 5;
   }
   .transport-mobile-head-row th:nth-child(1) {
     padding-left: 0.72rem;
-    width: 42%;
+    width: 43%;
     text-align: left;
+    border-right: 1px solid rgba(36, 72, 93, 0.12);
   }
   .transport-mobile-head-row th:nth-child(2) {
-    width: 21%;
+    width: 24%;
     text-align: left;
+    border-right: 1px solid rgba(36, 72, 93, 0.12);
   }
   .transport-mobile-head-row th:nth-child(3) {
-    width: 27%;
+    width: 26%;
     text-align: left;
+    border-right: 1px solid rgba(36, 72, 93, 0.12);
   }
   .transport-mobile-head-row th:nth-child(4) {
-    width: 10%;
+    width: 7%;
     text-align: right;
-    padding-right: 0.72rem;
+    padding-right: 0.4rem;
   }
   .transport-title-desktop {
     display: none;
@@ -675,22 +689,26 @@ main {
   .transport-table .journey-parent-row > td.journey-name-col {
     padding-left: 0.72rem;
     border-right: 1px solid rgba(36, 72, 93, 0.12);
-    width: 42%;
+    border-top: 1px solid rgba(36, 72, 93, 0.12);
+    width: 43%;
   }
   .transport-table .journey-parent-row > td.date-col.transport-departs-col {
-    width: 21%;
+    width: 24%;
     border-right: 1px solid rgba(36, 72, 93, 0.12);
+    border-top: 1px solid rgba(36, 72, 93, 0.12);
   }
   .transport-table .journey-parent-row > td.transport-status-col {
-    width: 27%;
+    width: 26%;
     text-align: center;
     border-right: 1px solid rgba(36, 72, 93, 0.12);
+    border-top: 1px solid rgba(36, 72, 93, 0.12);
   }
   .transport-table .journey-parent-row > td.transport-actions-col {
-    width: 10%;
+    width: 7%;
     text-align: center;
     vertical-align: middle;
-    padding-right: 0.72rem;
+    padding-right: 0.4rem;
+    border-top: 1px solid rgba(36, 72, 93, 0.12);
   }
   .transport-table .transport-type-col,
   .transport-table .route-col,
@@ -705,6 +723,13 @@ main {
     font-size: 0.76rem;
     line-height: 1.25;
     font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  .accom-table .property-col .stay-property-name {
+    display: block;
+    font-size: 0.76rem;
+    line-height: 1.25;
+    font-weight: 700 !important;
     overflow-wrap: anywhere;
   }
   .transport-table .journey-name-col .journey-name-main small,
@@ -722,6 +747,13 @@ main {
   .transport-table .journey-name-col .transport-mobile-meta {
     gap: 0.04rem;
     margin-top: 0;
+  }
+  .transport-table .transport-departs-col .transport-departs-desktop {
+    display: none;
+    font-size: 0.74rem;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 0.1rem;
   }
   .transport-table .journey-name-col .transport-mobile-meta span,
   .transport-table .date-col.transport-departs-col .transport-schedule-meta span,
@@ -764,6 +796,13 @@ main {
     line-height: 1.2;
     white-space: normal;
   }
+  .accom-table .property-col .stay-provider {
+    color: var(--text);
+    font-size: 0.64rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: normal;
+  }
   .transport-table .journey-name-col .transport-mobile-extra {
     color: var(--muted);
     font-size: 0.58rem;
@@ -781,12 +820,12 @@ main {
   .transport-table .transport-status-col > .status-badge {
     display: none;
   }
-  .transport-table .transport-status-col .transport-status-cost-meta {
+  .transport-status-cost-meta {
     margin-top: 0;
     align-items: center;
     text-align: center;
   }
-  .transport-table .transport-status-col .transport-mobile-status-btn {
+  .transport-mobile-status-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -800,39 +839,58 @@ main {
     line-height: 1.1;
     white-space: nowrap;
     cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    box-shadow: none;
+    background-clip: padding-box;
+    font-family: inherit;
   }
-  .transport-table .transport-status-col .transport-mobile-cost-line {
+  .transport-mobile-cost-line {
     display: inline-flex;
     align-items: baseline;
     justify-content: center;
     gap: 0.08rem;
     white-space: nowrap;
     line-height: 1;
+    width: 100%;
   }
-  .transport-table .transport-status-col .transport-mobile-cost-currency {
+  .transport-mobile-cost-currency {
     font-size: 0.72rem;
     font-weight: 700;
     color: var(--accent-strong);
     line-height: 1;
   }
-  .transport-table .transport-status-col .transport-mobile-cost-value {
+  .transport-mobile-cost-value {
     font-family: 'DM Mono', monospace;
     font-weight: 700;
     font-size: 0.74rem;
     color: var(--accent-strong);
     white-space: nowrap;
   }
-  .transport-table .transport-actions-col {
+  .transport-mobile-booking {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+  .transport-table .transport-actions-col,
+  .accom-table .stay-actions-col {
     display: flex;
     justify-content: center;
-    align-items: start;
-    gap: 0.15rem;
-    padding-left: 0.15rem;
+    align-items: center;
+    gap: 0;
+    width: 7%;
+    text-align: center;
+    vertical-align: middle;
+    padding-left: 0;
+    padding-right: 0.4rem;
   }
-  .transport-table .transport-actions-col .del-btn {
+  .transport-table .transport-actions-col .del-btn,
+  .accom-table .stay-actions-col .del-btn {
     display: none;
   }
-  .transport-table .transport-actions-col .edit-btn {
+  .transport-table .transport-actions-col .edit-btn,
+  .accom-table .stay-actions-col .edit-btn {
     width: 28px;
     height: 28px;
     min-height: 28px;
@@ -844,7 +902,8 @@ main {
     position: relative;
     font-size: 0;
   }
-  .transport-table .transport-actions-col .edit-btn::before {
+  .transport-table .transport-actions-col .edit-btn::before,
+  .accom-table .stay-actions-col .edit-btn::before {
     content: '\22EE';
     position: absolute;
     inset: 0;
@@ -908,34 +967,37 @@ main {
   .accom-table .stay-detail-row.expanded {
     display: none !important;
   }
-  .accom-table .stay-expand-col {
-    width: 6%;
-  }
-  .accom-table .city-col {
-    width: 18%;
-    padding-left: 0.72rem;
+  .accom-table .stay-expand-col,
+  .accom-table .city-col,
+  .accom-table .stay-out-col,
+  .accom-table .nights-col {
+    display: none !important;
   }
   .accom-table .property-col {
-    width: 34%;
+    width: 42%;
+    padding-left: 0.72rem;
+    border-right: 1px solid rgba(36, 72, 93, 0.12);
+    border-top: 1px solid rgba(36, 72, 93, 0.12);
   }
   .accom-table .stay-dates-col {
-    width: 16%;
+    width: 24%;
+    border-right: 1px solid rgba(36, 72, 93, 0.12);
+    border-top: 1px solid rgba(36, 72, 93, 0.12);
   }
   .accom-table .stay-status-col {
-    width: 14%;
+    width: 26%;
     text-align: left;
-  }
-  .accom-table .stay-out-col {
-    display: none;
+    border-right: 1px solid rgba(36, 72, 93, 0.12);
+    border-top: 1px solid rgba(36, 72, 93, 0.12);
   }
   .accom-table .budget-field {
-    width: 10%;
-    text-align: right;
+    display: none !important;
   }
   .accom-table .stay-actions-col {
-    width: 8%;
+    width: 7%;
     text-align: right;
-    padding-right: 0.72rem;
+    padding-right: 0.4rem;
+    border-top: 1px solid rgba(36, 72, 93, 0.12);
   }
   .accom-table thead tr:not(.stay-mobile-head-row) {
     display: none;
@@ -953,34 +1015,47 @@ main {
     padding: 0.68rem 0.3rem 0.6rem;
     border: 0;
     background: var(--card-strong);
+    border-bottom: 1px solid rgba(36, 72, 93, 0.12);
     line-height: 1.15;
     vertical-align: middle;
+    position: sticky;
+    top: 0;
+    z-index: 5;
   }
   .stay-mobile-head-row th:nth-child(1) {
     padding-left: 0.72rem;
-    width: 18%;
+    width: 43%;
     text-align: left;
+    border-right: 1px solid rgba(36, 72, 93, 0.12);
   }
   .stay-mobile-head-row th:nth-child(2) {
-    width: 34%;
+    width: 24%;
     text-align: left;
+    border-right: 1px solid rgba(36, 72, 93, 0.12);
   }
   .stay-mobile-head-row th:nth-child(3) {
-    width: 16%;
+    width: 26%;
     text-align: left;
+    border-right: 1px solid rgba(36, 72, 93, 0.12);
   }
   .stay-mobile-head-row th:nth-child(4) {
-    width: 14%;
-    text-align: left;
-  }
-  .stay-mobile-head-row th:nth-child(5) {
-    width: 10%;
+    width: 7%;
     text-align: right;
+    padding-right: 0.4rem;
   }
-  .stay-mobile-head-row th:nth-child(6) {
-    width: 8%;
-    text-align: right;
-    padding-right: 0.72rem;
+  .accom-table .stay-mobile-head-row,
+  .accom-table .stay-parent-row {
+    border-bottom: 1px solid rgba(36, 72, 93, 0.12);
+  }
+  .accom-table .stay-parent-row {
+    background: var(--card-strong);
+  }
+  .accom-table .stay-parent-row > td {
+    border-top: 0;
+    background: var(--card-strong);
+  }
+  .accom-table .stay-date-meta {
+    margin-top: 0;
   }
   .journey-detail-row td,
   .stay-detail-row td {
@@ -3095,6 +3170,12 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     display: none;
   }
   .transport-title-desktop {
+    display: inline;
+  }
+  .stay-mobile-head-row {
+    display: none !important;
+  }
+  .transport-table .transport-departs-col .transport-departs-desktop {
     display: inline;
   }
   .accom-table thead th:first-child {

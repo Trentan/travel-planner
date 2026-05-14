@@ -477,6 +477,7 @@
       <div class="modal-footer" style="display: flex; justify-content: space-between; background: transparent; border-top: none; padding-top: 0;">
         <button class="action-btn" onclick="closeJourneyModal()" style="background: transparent;">Cancel</button>
         <div style="display: flex; gap: 0.5rem;">
+          <button id="journeyDeleteBtn" class="action-btn" onclick="deleteJourneyFromModal()" style="background: #E74C3C; color: white; border-color: #E74C3C; display: none;">Delete</button>
           <button class="action-btn" onclick="addSegmentToJourney()" style="background: #2C3E50; color: white;">+ Add segment</button>
           <button class="action-btn" onclick="saveJourneyFromModal()" style="background: #27AE60; color: white; border-color: #27AE60;">✓ Save journey</button>
         </div>
@@ -518,9 +519,10 @@
           </div>
           <div class="ai-form-group">
             <label for="stayStatus">Booking Status</label>
-            <select id="stayStatus" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-              <option value="pending">⏳ Pending</option>
-              <option value="confirmed">✓ Confirmed</option>
+                        <select id="stayStatus" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+              <option value="planned">⏳ Planned</option>
+              <option value="booked">✓ Booked</option>
+              <option value="confirmed">🎫 Confirmed</option>
               <option value="cancelled">✗ Cancelled</option>
             </select>
           </div>
@@ -544,6 +546,7 @@
       </div>
       <div class="modal-footer">
         <button class="action-btn" onclick="closeAddStayModal()">Cancel</button>
+        <button id="stayDeleteBtn" class="action-btn" onclick="deleteStayFromModal()" style="background: #E74C3C; color: white; border-color: #E74C3C; display: none;">Delete</button>
         <button class="action-btn" style="background: #2C3E50; color: white;" onclick="saveStayFromModal()">Save Stay</button>
       </div>
     </div>

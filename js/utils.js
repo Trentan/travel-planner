@@ -133,6 +133,51 @@ function getActivityLabel(category) {
   return ACTIVITY_CATEGORIES[category]?.label || 'Activity';
 }
 
+function renderMobileStatusCostMeta({
+  status,
+  costValue,
+  bookingReference = '',
+  statusOnClick = '',
+  costOnBlur = '',
+  statusButtonTitle = 'Change status',
+  metaClass = 'transport-status-cost-meta',
+  editableCost = false
+}) {
+  const normalizedStatus = (status === 'pending' ? 'planned' : status) || 'planned';
+  const statusColors = {
+    planned: '#E67E22',
+    booked: '#27AE60',
+    confirmed: '#27AE60',
+    cancelled: '#E74C3C'
+  };
+  const statusIcons = {
+    planned: '⏳',
+    booked: '✓',
+    confirmed: '🎫',
+    cancelled: '❌'
+  };
+  const statusText = normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
+  const statusColor = statusColors[normalizedStatus] || statusColors.planned;
+  const statusGlyph = statusIcons[normalizedStatus] || '⏳';
+  const safeCost = costValue ?? '0';
+  const costNode = editableCost
+    ? `<span class="transport-mobile-cost-value" contenteditable="true" onblur="${costOnBlur}">${safeCost}</span>`
+    : `<span class="transport-mobile-cost-value">${safeCost}</span>`;
+  const statusNode = statusOnClick
+    ? `<button type="button" class="status-badge transport-mobile-status-btn" style="background:${statusColor};" onclick="${statusOnClick}" title="${statusButtonTitle}">${statusGlyph} ${statusText}</button>`
+    : `<span class="status-badge transport-mobile-status-btn" style="background:${statusColor};">${statusGlyph} ${statusText}</span>`;
+
+  return `
+    <div class="mobile-table-meta ${metaClass}">
+      ${statusNode}
+      <div class="transport-mobile-cost-line">
+        <span class="transport-mobile-cost-currency">$</span>${costNode}
+      </div>
+      ${bookingReference ? `<span class="transport-mobile-booking">${bookingReference}</span>` : ''}
+    </div>
+  `;
+}
+
 const DEFAULT_LEAVE_HOME = [
   { text: "Kitchen and bins", kind: "section" },
   { text: "Empty fridge and pantry perishables", done: false },
@@ -288,3 +333,4 @@ function getDayTotal(day) {
 }
 
 window.getDayTotal = getDayTotal;
+window.renderMobileStatusCostMeta = renderMobileStatusCostMeta;

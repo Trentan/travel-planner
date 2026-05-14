@@ -496,6 +496,11 @@ window.onNewLegCountryChange = onNewLegCountryChange;
 // Add Stay Modal Functions
 let editingStayId = null; // Track if we're editing an existing stay
 
+function _syncStayModalActions() {
+  const deleteBtn = document.getElementById('stayDeleteBtn');
+  if (deleteBtn) deleteBtn.style.display = editingStayId ? 'inline-flex' : 'none';
+}
+
 function openAddStayModal() {
   const modal = document.getElementById('stay-modal');
   if (!modal) return;
@@ -523,7 +528,7 @@ function openAddStayModal() {
   document.getElementById('stayCheckIn').value = '';
   document.getElementById('stayCheckOut').value = '';
   document.getElementById('stayNights').value = '';
-  document.getElementById('stayStatus').value = 'pending';
+  document.getElementById('stayStatus').value = 'planned';
   document.getElementById('stayProvider').value = '';
   document.getElementById('stayBookingRef').value = '';
   document.getElementById('stayTotalCost').value = '';
@@ -546,6 +551,7 @@ function openAddStayModal() {
   checkIn.onchange = calcNights;
   checkOut.onchange = calcNights;
 
+  _syncStayModalActions();
   modal.style.display = 'flex';
 }
 
@@ -580,7 +586,7 @@ function openEditStayModal(stayId) {
   document.getElementById('stayCheckIn').value = stay.checkIn || '';
   document.getElementById('stayCheckOut').value = stay.checkOut || '';
   document.getElementById('stayNights').value = stay.nights || '';
-  document.getElementById('stayStatus').value = stay.status || 'pending';
+  document.getElementById('stayStatus').value = stay.status === 'pending' ? 'planned' : (stay.status || 'planned');
   document.getElementById('stayProvider').value = stay.provider || '';
   document.getElementById('stayBookingRef').value = stay.bookingRef || '';
   document.getElementById('stayTotalCost').value = stay.totalCost || '';
@@ -603,12 +609,15 @@ function openEditStayModal(stayId) {
   checkIn.onchange = calcNights;
   checkOut.onchange = calcNights;
 
+  _syncStayModalActions();
   modal.style.display = 'flex';
 }
 
 function closeAddStayModal() {
   const modal = document.getElementById('stay-modal');
   if (modal) modal.style.display = 'none';
+  editingStayId = null;
+  _syncStayModalActions();
 }
 
 function saveStayFromModal() {
@@ -617,7 +626,7 @@ function saveStayFromModal() {
   const checkIn = document.getElementById('stayCheckIn').value;
   const checkOut = document.getElementById('stayCheckOut').value;
   const nights = parseInt(document.getElementById('stayNights').value) || 0;
-  const status = document.getElementById('stayStatus').value;
+  const status = document.getElementById('stayStatus').value || 'planned';
   const provider = document.getElementById('stayProvider').value.trim();
   const bookingRef = document.getElementById('stayBookingRef').value.trim();
   const totalCost = document.getElementById('stayTotalCost').value.trim() || '0';
@@ -686,11 +695,21 @@ function deleteStay(id) {
   }
 }
 
+function deleteStayFromModal() {
+  if (!editingStayId) return;
+  if (!confirm('Delete this stay?')) return;
+  const id = editingStayId;
+  editingStayId = null;
+  deleteStay(id);
+  closeAddStayModal();
+}
+
 function toggleStayStatus(e, id) {
   if (e) e.stopPropagation();
   const s = stays.find(s => s.id === id);
   if (s) {
-    const states = ['pending', 'confirmed', 'cancelled'];
+    const states = ['planned', 'booked', 'confirmed', 'cancelled'];
+    if (s.status === 'pending') s.status = 'planned';
     const currentIdx = states.indexOf(s.status);
     s.status = states[(currentIdx + 1) % states.length];
     saveData();
@@ -716,6 +735,6 @@ function closeStayModal() { closeAddStayModal(); }
 
 Object.assign(window, {
   openAddStayModal, closeAddStayModal, saveStayFromModal, openEditStayModal,
-  deleteStay, toggleStayStatus, updateStayField,
+  deleteStay, deleteStayFromModal, toggleStayStatus, updateStayField,
   openStayModal, closeStayModal  // backward compat
 });

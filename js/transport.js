@@ -584,35 +584,31 @@ function renderJourneyMobileSummary(rep, legCountText, durationText) {
 }
 
 function renderTransportScheduleMobile(icon, firstDep, lastArr, lastArrTime) {
-  const arrivalText = lastArr !== '�' ? `${lastArr} ${lastArrTime || ''}`.trim() : '�';
+  const arrivalText = lastArr !== '�' ? `${lastArr} ${lastArrTime || ''}`.trim() : '�';
 
   return `
     <div class="mobile-table-meta transport-schedule-meta">
       <span class="transport-schedule-type">${icon}</span>
-      <span><strong>D:</strong> ${firstDep || '�'}</span>
+      <span><strong>D:</strong> ${firstDep || '�'}</span>
       <span><strong>A:</strong> ${arrivalText}</span>
     </div>
   `;
 }
 
 function renderTransportStatusCostMobile(statusText, statusIcon, statusColor, costValue, bookingReference, journeyId, isEditable) {
-  const editableCost = isEditable
-    ? `<span class="transport-mobile-cost-value" contenteditable="true" onblur="updateJourneyCost('${journeyId}', this.innerText); buildTransportTab();">${costValue}</span>`
-    : `<span class="transport-mobile-cost-value">${costValue}</span>`;
-
-  const statusButton = isEditable
-    ? `<button type="button" class="status-badge transport-mobile-status-btn" style="background:${statusColor};" onclick="toggleJourneyStatus('${journeyId}')" title="Change status">${statusIcon} ${statusText}</button>`
-    : `<span class="status-badge transport-mobile-status-btn" style="background:${statusColor};">${statusIcon} ${statusText}</span>`;
-
-  return `
-    <div class="mobile-table-meta transport-status-cost-meta">
-      ${statusButton}
-      <div class="transport-mobile-cost-line">
-        <span class="transport-mobile-cost-currency">$</span>${editableCost}
-      </div>
-      ${bookingReference ? `<span class="transport-mobile-booking">${bookingReference}</span>` : ''}
-    </div>
-  `;
+  if (typeof renderMobileStatusCostMeta === 'function') {
+    return renderMobileStatusCostMeta({
+      status: statusText.toLowerCase(),
+      costValue,
+      bookingReference,
+      statusOnClick: isEditable ? `toggleJourneyStatus('${journeyId}')` : '',
+      costOnBlur: `updateJourneyCost('${journeyId}', this.innerText); buildTransportTab();`,
+      statusButtonTitle: 'Change status',
+      metaClass: 'transport-status-cost-meta',
+      editableCost: isEditable
+    });
+  }
+  return '';
 }
 
 // ─── BUILD TRANSPORT TAB ────────────────────────────────────────────────────
@@ -686,7 +682,7 @@ function buildTransportTab(cityFilter = null) {
           <th>Destination / Leg</th>
           <th>Schedule</th>
           <th>Status & Cost/PNR</th>
-          <th>Action</th>
+          <th aria-hidden="true"></th>
         </tr>
       </thead>
       <tbody>
@@ -736,9 +732,10 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
         <td class="transport-type-col" data-label="Type">${icon}</td>
         <td class="route-col" data-label="Route">${route}</td>
         <td class="date-col transport-departs-col" data-label="Departs">
+          <span class="transport-departs-desktop">${firstDep}</span>
           ${renderTransportScheduleMobile(icon, firstDep, lastArr, lastArrTime)}
         </td>
-        <td class="transport-arrives-col" data-label="Arrives">${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
+        <td class="transport-arrives-col" data-label="Arrives">${lastArr !== '�' ? lastArr + ' ' + lastArrTime : '�'}</td>
         <td class="transport-provider-col" data-label="Provider">${rep.provider || '—'}</td>
         <td class="transport-routecode-col" data-label="Code">${rep.routeCode || '—'}</td>
         <td class="budget-field" data-label="Cost">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
@@ -749,7 +746,7 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
           ${renderTransportStatusCostMobile(statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.bookingReference, rep.id, isEditMode)}
         </td>
         <td class="transport-actions-col" data-label="Actions">
-          <button class="edit-btn" onclick="editJourney('${gid}')" title="Edit journey" style="padding: 2px 6px; margin-right: 4px; background: #e8f0fe; border-color: #3c5a99; color: #3c5a99;">✎</button>
+          <button class="edit-btn" onclick="editJourney('${gid}')" title="Edit journey">✎</button>
           ${isMultiLeg
         ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
         : `<button class="del-btn" onclick="deleteJourney('${rep.id}'); buildTransportTab();" title="Delete">×</button>`}
@@ -846,6 +843,12 @@ let _pendingSegments = [];
 let _pendingJourneyId = null;
 let _pendingJourneyName = ''; // Track the name when editing
 
+function _syncJourneyModalActions() {
+  const deleteBtn = document.getElementById('journeyDeleteBtn');
+  const isExistingJourney = _pendingJourneyId ? journeys.some(j => j.journeyId === _pendingJourneyId) : false;
+  if (deleteBtn) deleteBtn.style.display = isExistingJourney ? 'inline-flex' : 'none';
+}
+
 // Load an existing journey into the modal
 function editJourney(journeyId) {
   const segs = findJourneySegments(journeyId);
@@ -868,7 +871,8 @@ if (segmentsCopy.length > 0) {
   _loadSegmentIntoForm(segmentsCopy[0]);
 }
 
-_updateSegmentList();
+  _updateSegmentList();
+  _syncJourneyModalActions();
 
   // Update journey title display
   const titleEl = document.getElementById('journeyTitleDisplay');
@@ -992,6 +996,7 @@ function openAddJourneyModal() {
 
     _updateSegmentList();
     selectJourneyType('flight');
+    _syncJourneyModalActions();
 
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('journeyDateFrom').value = today;
@@ -1167,6 +1172,24 @@ function closeJourneyModal() {
   _pendingJourneyId = null;
   _pendingJourneyName = '';
   _journeyFormDirty = false;
+  _syncJourneyModalActions();
+}
+
+function deleteJourneyFromModal() {
+  if (!_pendingJourneyId) return;
+  if (!confirm('Delete this journey?')) return;
+  const journeyId = _pendingJourneyId;
+  const hasGroup = journeys.some(j => j.journeyId === journeyId);
+  if (hasGroup) {
+    deleteJourneyGroup(journeyId);
+  } else {
+    const pendingIds = new Set(_pendingSegments.map(seg => seg.id).filter(Boolean));
+    journeys = journeys.filter(j => !pendingIds.has(j.id));
+    window.journeys = journeys;
+    saveJourneys();
+    if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+  }
+  closeJourneyModal();
 }
 
 function saveJourneyFromModal() {
@@ -1236,6 +1259,7 @@ window.buildJourneyName = buildJourneyName;
 window.openAddJourneyModal = openAddJourneyModal;
 window.closeJourneyModal = closeJourneyModal;
 window.saveJourneyFromModal = saveJourneyFromModal;
+window.deleteJourneyFromModal = deleteJourneyFromModal;
 window.addSegmentToJourney = addSegmentToJourney;
 window.removePendingSegment = removePendingSegment;
 window.toggleJourneySegments = toggleJourneySegments;
