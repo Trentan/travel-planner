@@ -17,11 +17,13 @@ Read this file at the start of every session. When using Claude Code, read from 
 
 
 ### Item 14: Mobile app shell polish
-- [ ] 14a. Consolidate the top menu into a mobile action sheet.
-- [ ] 14b. Make compact view meaningfully reduce chrome on phones.
-- [ ] 14c. Keep the city filter sticky on mobile.
-- [ ] 14d. Improve the reset experience on mobile.
-- [ ] 14e. Remove the home / destination clocks from the mobile shell.
+- [x] 14a. Consolidate the top menu into a mobile action sheet.
+- [x] 14b. Make compact view meaningfully reduce chrome on phones.
+- [x] 14c. Keep the city filter sticky on mobile.
+- [x] 14d. Improve the reset experience on mobile.
+- [x] 14e. Remove the home / destination clocks from the mobile shell.
+- [x] 14f. Unify transport and accommodation mobile table rendering, shared action buttons, and modal delete actions.
+- [ ] 14g. Final mobile visual review for the table parity work.
 
 ### Item 15: Convert the testing checklist into structured TODO items and add an actual testing suite for actual smoke / unit tests to be used between changes for core functionality.
 - [ ] 15a. Open `index.html` in a browser and confirm the app loads without errors.
