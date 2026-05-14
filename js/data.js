@@ -2306,6 +2306,334 @@ function exportJSON() {
   localStorage.setItem('travelApp_last_export_filename', dlName);
 }
 
+function escapeTextValue(value) {
+  return String(value ?? '')
+    .replace(/\r?\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function formatTextValue(value, fallback = '—') {
+  const text = escapeTextValue(value);
+  return text || fallback;
+}
+
+function truncateText(value, maxLength = 180) {
+  const text = escapeTextValue(value);
+  if (!text) return '';
+  return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
+}
+
+function buildTextList(items, mapper) {
+  if (!Array.isArray(items) || items.length === 0) return '';
+  return items.map((item, idx) => mapper(item, idx)).filter(Boolean).join('\n');
+}
+
+function parseSummaryCost(value) {
+  const normalized = String(value ?? '').replace(/[^0-9.-]/g, '').trim();
+  const parsed = Number.parseFloat(normalized);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function formatSummaryMoney(value) {
+  const parsed = parseSummaryCost(value);
+  if (Number.isInteger(parsed)) return `$${parsed.toFixed(0)}`;
+  return `$${parsed.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')}`;
+}
+
+function exportItineraryText() {
+  saveData(false);
+
+  const journeysData = typeof journeys !== 'undefined'
+    ? normalizeTripJourneysData(JSON.parse(JSON.stringify(journeys)))
+    : [];
+  const staysData = typeof stays !== 'undefined'
+    ? normalizeTripStaysData(JSON.parse(JSON.stringify(stays)))
+    : [];
+  const itineraryData = normalizeTripLegsData(JSON.parse(JSON.stringify(appData || [])));
+  const packing = Array.isArray(packingData) ? packingData : [];
+  const leaveHome = Array.isArray(leaveHomeData) ? leaveHomeData : [];
+
+  const tripTitle = formatTextValue(titleData?.title, 'Untitled Trip');
+  const tripSubtitle = formatTextValue(titleData?.subtitle, '');
+  const generatedAt = new Date().toLocaleString('en-AU', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  const sections = [];
+  sections.push(`TRIP ITINERARY EXPORT`);
+  sections.push(`Title: ${tripTitle}`);
+  if (tripSubtitle) sections.push(`Subtitle: ${tripSubtitle}`);
+  sections.push(`Generated: ${generatedAt}`);
+  sections.push(`File: ${formatTextValue(currentFileName, 'Default Template')}`);
+  sections.push('');
+
+  if (Array.isArray(itineraryData) && itineraryData.length > 0) {
+    sections.push(`LEG BREAKDOWN`);
+    itineraryData.forEach((leg, legIdx) => {
+      const legName = formatTextValue(leg.label, `Leg ${legIdx + 1}`);
+      sections.push(`\n[Leg ${legIdx + 1}] ${legName}`);
+      if (Array.isArray(leg.days) && leg.days.length > 0) {
+        leg.days.forEach((day, dayIdx) => {
+          const dayTitle = [day.date, day.day].filter(Boolean).join(' ');
+          const dayParts = [
+            `Day ${dayIdx + 1}: ${formatTextValue(dayTitle, '—')}`,
+            `${formatTextValue(day.from)} -> ${formatTextValue(day.to)}`
+          ];
+          if (day.desc) dayParts.push(`Desc: ${truncateText(day.desc, 90)}`);
+          sections.push(`  - ${dayParts.join(' | ')}`);
+          if (Array.isArray(day.transportItems) && day.transportItems.length > 0) {
+            day.transportItems.forEach(item => {
+              const transportParts = [
+                formatTextValue(item.text),
+                `D ${formatTextValue(item.departureDate || day.date, '—')}${item.departureTime ? ` ${item.departureTime}` : ''}`,
+                `A ${formatTextValue(item.arrivalDate || day.date, '—')}${item.arrivalTime ? ` ${item.arrivalTime}` : ''}`,
+                `$${formatTextValue(item.cost, '0')}`,
+                formatTextValue(item.status, 'planned')
+              ];
+              if (item.bookingRef) transportParts.push(`Ref ${formatTextValue(item.bookingRef)}`);
+              sections.push(`    • ${transportParts.join(' | ')}`);
+            });
+          }
+          if (Array.isArray(day.accomItems) && day.accomItems.length > 0) {
+            day.accomItems.forEach(item => {
+              const accomParts = [
+                formatTextValue(item.text),
+                `Check-in ${formatTextValue(day.date, '—')}`,
+                `$${formatTextValue(item.cost, '0')}`,
+                formatTextValue(item.status, 'planned')
+              ];
+              if (item.bookingRef) accomParts.push(`Ref ${formatTextValue(item.bookingRef)}`);
+              sections.push(`    • ${accomParts.join(' | ')}`);
+            });
+          }
+          if (Array.isArray(day.activityItems) && day.activityItems.length > 0) {
+            day.activityItems.forEach(item => {
+              sections.push(`    • ${formatTextValue(item.text)} | ${formatTextValue(item.time, '—')} | $${formatTextValue(item.cost, '0')}`);
+            });
+          }
+        });
+      }
+    });
+  }
+
+  if (journeysData.length > 0) {
+    sections.push(`\nTRANSPORT BOOKINGS`);
+    journeysData.forEach((journey, idx) => {
+      const route = [journey.fromLocation, journey.toLocation].filter(Boolean).join(' -> ');
+      const dep = [journey.departureDate, journey.departureTime].filter(Boolean).join(' ');
+      const arr = [journey.arrivalDate, journey.arrivalTime].filter(Boolean).join(' ');
+      const journeyParts = [
+        `${idx + 1}. ${formatTextValue(journey.journeyName || route, 'Journey')}`,
+        formatTextValue(journey.transportType, '—'),
+        formatTextValue(route),
+        `D ${formatTextValue(dep)}`,
+        `A ${formatTextValue(arr)}`,
+        formatTextValue(journey.provider),
+        formatTextValue(journey.routeCode),
+        formatTextValue(journey.status, 'planned'),
+        `$${formatTextValue(journey.cost, '0')}`
+      ];
+      if (journey.bookingReference) journeyParts.push(`Ref ${formatTextValue(journey.bookingReference)}`);
+      if (journey.notes) journeyParts.push(`Notes ${truncateText(journey.notes, 80)}`);
+      sections.push(`  - ${journeyParts.join(' | ')}`);
+    });
+  }
+
+  if (staysData.length > 0) {
+    sections.push(`\nACCOMMODATION BOOKINGS`);
+    staysData.forEach((stay, idx) => {
+      const stayParts = [
+        `${idx + 1}. ${formatTextValue(stay.propertyName, 'Stay')}`,
+        formatTextValue(stay.cityName || stay.city || stay.cityId),
+        `In ${formatTextValue(stay.checkIn)}`,
+        `Out ${formatTextValue(stay.checkOut)}`,
+        `${formatTextValue(stay.nights, '0')} nights`,
+        formatTextValue(stay.status, 'planned'),
+        `$${formatTextValue(stay.totalCost, '0')}`
+      ];
+      if (stay.provider) stayParts.push(formatTextValue(stay.provider));
+      if (stay.bookingRef) stayParts.push(`Ref ${formatTextValue(stay.bookingRef)}`);
+      if (stay.notes) stayParts.push(`Notes ${truncateText(stay.notes, 80)}`);
+      sections.push(`  - ${stayParts.join(' | ')}`);
+    });
+  }
+
+  if (packing.length > 0) {
+    sections.push(`\nPACKING`);
+    packing.forEach((area, idx) => {
+      const areaName = formatTextValue(area.areaName || area.label, `Packing Area ${idx + 1}`);
+      sections.push(`  - ${areaName}`);
+      (area.categories || []).forEach(category => {
+        const itemNames = (category.items || [])
+          .map(item => `${formatTextValue(item.text || item.title)}${item.done ? ' [done]' : ''}`)
+          .filter(Boolean)
+          .join(', ');
+        if (itemNames) sections.push(`    ${formatTextValue(category.title, 'Category')}: ${itemNames}`);
+      });
+    });
+  }
+
+  if (leaveHome.length > 0) {
+    sections.push(`\nBEFORE LEAVING HOME`);
+    leaveHome.forEach((item, idx) => {
+      if (item.kind === 'section') {
+        sections.push(`  [${formatTextValue(item.text, `Section ${idx + 1}`)}]`);
+      } else {
+        sections.push(`  - ${formatTextValue(item.text)}${item.done ? ' [done]' : ''}`);
+      }
+    });
+  }
+
+  sections.push('');
+  sections.push('END OF EXPORT');
+
+  const dataStr = 'data:text/plain;charset=utf-8,' + encodeURIComponent(sections.join('\n'));
+  const downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute('href', dataStr);
+
+  let dlName = currentFileName;
+  if (dlName === 'Default Template') dlName = 'travel_planner_itinerary.txt';
+  else dlName = dlName.replace(/\.json$/i, '') + '_itinerary.txt';
+
+  downloadAnchorNode.setAttribute('download', dlName);
+  document.body.appendChild(downloadAnchorNode);
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
+}
+
+function exportItinerarySummaryText() {
+  saveData(false);
+
+  const journeysData = typeof journeys !== 'undefined'
+    ? normalizeTripJourneysData(JSON.parse(JSON.stringify(journeys)))
+    : [];
+  const staysData = typeof stays !== 'undefined'
+    ? normalizeTripStaysData(JSON.parse(JSON.stringify(stays)))
+    : [];
+  const itineraryData = normalizeTripLegsData(JSON.parse(JSON.stringify(appData || [])));
+
+  const tripTitle = formatTextValue(titleData?.title, 'Untitled Trip');
+  const tripSubtitle = formatTextValue(titleData?.subtitle, '');
+  const generatedAt = new Date().toLocaleString('en-AU', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  let transportTotal = 0;
+  let accomTotal = 0;
+  let activityTotal = 0;
+
+  itineraryData.forEach(leg => {
+    (leg.days || []).forEach(day => {
+      (day.activityItems || []).forEach(item => { activityTotal += parseSummaryCost(item.cost); });
+    });
+  });
+  journeysData.forEach(journey => { transportTotal += parseSummaryCost(journey.cost); });
+  staysData.forEach(stay => { accomTotal += parseSummaryCost(stay.totalCost); });
+
+  const lines = [];
+  lines.push('AI ITINERARY SUMMARY');
+  lines.push(`Title: ${tripTitle}`);
+  if (tripSubtitle) lines.push(`Subtitle: ${tripSubtitle}`);
+  lines.push(`Generated: ${generatedAt}`);
+  lines.push(`File: ${formatTextValue(currentFileName, 'Default Template')}`);
+  lines.push(`Budget: Transport ${formatSummaryMoney(transportTotal)} | Accommodation ${formatSummaryMoney(accomTotal)} | Activities ${formatSummaryMoney(activityTotal)} | Total ${formatSummaryMoney(transportTotal + accomTotal + activityTotal)}`);
+  lines.push('');
+
+  if (Array.isArray(itineraryData) && itineraryData.length > 0) {
+    lines.push('ITINERARY');
+    itineraryData.forEach((leg, legIdx) => {
+      const legName = formatTextValue(leg.label, `Leg ${legIdx + 1}`);
+      const dateList = (leg.days || []).map(day => formatTextValue(day.date)).filter(Boolean);
+      const daySpan = dateList.length > 0 ? `${dateList[0]} -> ${dateList[dateList.length - 1]}` : '—';
+      lines.push(`- ${legName} | ${daySpan}`);
+      (leg.days || []).forEach(day => {
+        const dayLabel = [day.date, day.day].filter(Boolean).join(' ');
+        const summaryBits = [];
+        if (day.from || day.to) summaryBits.push(`${formatTextValue(day.from)} -> ${formatTextValue(day.to)}`);
+        if (Array.isArray(day.transportItems) && day.transportItems.length > 0) summaryBits.push(`Transport ${day.transportItems.length}`);
+        if (Array.isArray(day.accomItems) && day.accomItems.length > 0) summaryBits.push(`Stay ${day.accomItems.length}`);
+        if (Array.isArray(day.activityItems) && day.activityItems.length > 0) summaryBits.push(`Activities ${day.activityItems.length}`);
+        if (day.desc) summaryBits.push(`Note ${truncateText(day.desc, 60)}`);
+        lines.push(`  ${formatTextValue(dayLabel)} | ${summaryBits.join(' | ') || 'No details'}`);
+      });
+    });
+  }
+
+  if (journeysData.length > 0) {
+    lines.push('');
+    lines.push('TRANSPORT BOOKINGS');
+    journeysData.forEach((journey, idx) => {
+      const route = [journey.fromLocation, journey.toLocation].filter(Boolean).join(' -> ');
+      const dep = [journey.departureDate, journey.departureTime].filter(Boolean).join(' ');
+      const arr = [journey.arrivalDate, journey.arrivalTime].filter(Boolean).join(' ');
+      const journeyParts = [
+        `${idx + 1}. ${formatTextValue(journey.journeyName || route, 'Journey')}`,
+        formatTextValue(journey.transportType, '—'),
+        formatTextValue(route, '—'),
+        `D ${formatTextValue(dep)}`,
+        `A ${formatTextValue(arr)}`,
+        formatTextValue(journey.provider, '—'),
+        formatTextValue(journey.routeCode, '—'),
+        formatTextValue(journey.status, 'planned'),
+        formatSummaryMoney(journey.cost)
+      ];
+      if (journey.bookingReference) journeyParts.push(`Ref ${formatTextValue(journey.bookingReference)}`);
+      lines.push(`- ${journeyParts.join(' | ')}`);
+    });
+  }
+
+  if (staysData.length > 0) {
+    lines.push('');
+    lines.push('ACCOMMODATION BOOKINGS');
+    staysData.forEach((stay, idx) => {
+      const stayParts = [
+        `${idx + 1}. ${formatTextValue(stay.propertyName, 'Stay')}`,
+        formatTextValue(stay.cityName || stay.city || stay.cityId, '—'),
+        `In ${formatTextValue(stay.checkIn)}`,
+        `Out ${formatTextValue(stay.checkOut)}`,
+        `${formatTextValue(stay.nights, '0')} nights`,
+        formatTextValue(stay.status, 'planned'),
+        formatSummaryMoney(stay.totalCost)
+      ];
+      if (stay.provider) stayParts.push(formatTextValue(stay.provider));
+      if (stay.bookingRef) stayParts.push(`Ref ${formatTextValue(stay.bookingRef)}`);
+      lines.push(`- ${stayParts.join(' | ')}`);
+    });
+  }
+
+  lines.push('');
+  lines.push('NOTES FOR AI REVIEW');
+  lines.push('- This summary excludes packing and before-leaving-home checklists to keep the file compact.');
+  lines.push('- Use this for a concise itinerary review prompt.');
+  lines.push('');
+  lines.push('END OF SUMMARY');
+
+  const dataStr = 'data:text/plain;charset=utf-8,' + encodeURIComponent(lines.join('\n'));
+  const downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute('href', dataStr);
+
+  let dlName = currentFileName;
+  if (dlName === 'Default Template') dlName = 'travel_planner_ai_summary.txt';
+  else dlName = dlName.replace(/\.json$/i, '') + '_ai_summary.txt';
+
+  downloadAnchorNode.setAttribute('download', dlName);
+  document.body.appendChild(downloadAnchorNode);
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
+
+  localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
+  localStorage.setItem('travelApp_last_export_filename', dlName);
+}
+
 // Expose city dialog functions to window scope
 window.openCityDialog = openCityDialog;
 window.closeCityDialog = closeCityDialog;
@@ -2652,6 +2980,8 @@ alert('Import successful! ' + appData.length + ' trip legs loaded.');
 
 // Expose data functions to window scope for HTML onclick handlers
 window.exportJSON = exportJSON;
+window.exportItineraryText = exportItineraryText;
+window.exportItinerarySummaryText = exportItinerarySummaryText;
 window.resetData = resetData;
 window.importJSON = importJSON;
 window.addOrUpdateCity = addOrUpdateCity;

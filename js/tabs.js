@@ -392,6 +392,7 @@ function buildBudgetTab() {
   const journeysData = (typeof journeys !== 'undefined') ? journeys : [];
   // Get stays array (global from data.js) or fallback to empty
   const staysData = (typeof stays !== 'undefined') ? stays : [];
+  const matchedJourneyIds = new Set();
 
   const stayCostsByLeg = new Array(appData.length).fill(0);
   let unallocatedStayCost = 0;
@@ -410,12 +411,17 @@ function buildBudgetTab() {
 
   appData.forEach((leg, legIndex) => {
     let legTrans = 0, legAccom = 0, legAct = 0;
+    const legDestinations = [];
     leg.days.forEach(day => {
       // Calculate transport costs from journeys array
       const dayJourneys = journeysData.filter(j =>
         j.dayDate === day.date && j.fromLocation === day.from && j.toLocation === day.to
       );
-      dayJourneys.forEach(j => legTrans += parseCost(j.cost));
+      dayJourneys.forEach((j) => {
+        legTrans += parseCost(j.cost);
+        if (j.journeyId) matchedJourneyIds.add(j.journeyId);
+        if (j.toLocation && !legDestinations.includes(j.toLocation)) legDestinations.push(j.toLocation);
+      });
 
       // Legacy: still count old accomItems for backward compatibility
       (day.accomItems || []).forEach(i => legAccom += parseCost(i.cost));
@@ -426,9 +432,39 @@ function buildBudgetTab() {
 
     const legTotal = legTrans + legAccom + legAct;
     if (legTotal > 0) {
-      legBreakdown.push({ label: leg.label, colour: leg.colour, trans: legTrans, accom: legAccom, act: legAct, total: legTotal });
+      const displayLabel = legDestinations.length > 0 ? legDestinations[legDestinations.length - 1] : leg.label;
+      legBreakdown.push({ label: displayLabel, colour: leg.colour, trans: legTrans, accom: legAccom, act: legAct, total: legTotal });
       totalTrans += legTrans; totalAccom += legAccom; totalAct += legAct;
     }
+  });
+
+  const journeyGroups = journeysData.reduce((groups, journey) => {
+    const key = journey.journeyId || journey.id || `${journey.dayDate || ''}|${journey.fromLocation || ''}|${journey.toLocation || ''}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(journey);
+    return groups;
+  }, {});
+
+  Object.values(journeyGroups).forEach(group => {
+    const sortedGroup = group.slice().sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+    const groupId = sortedGroup[0]?.journeyId || sortedGroup[0]?.id || '';
+    if (groupId && matchedJourneyIds.has(groupId)) return;
+
+    const label = sortedGroup.length > 0
+      ? (sortedGroup[sortedGroup.length - 1].toLocation || sortedGroup[sortedGroup.length - 1].journeyName || sortedGroup[0].journeyName || 'Transport')
+      : 'Transport';
+    const cost = sortedGroup.reduce((sum, journey) => sum + parseCost(journey.cost), 0);
+    if (cost <= 0) return;
+
+    legBreakdown.push({
+      label,
+      colour: '#2C3E50',
+      trans: cost,
+      accom: 0,
+      act: 0,
+      total: cost
+    });
+    totalTrans += cost;
   });
 
   totalAccom += unallocatedStayCost;

@@ -34,6 +34,8 @@
     <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
     <button class="app-menu-btn" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
     <button class="app-menu-btn" onclick="exportJSON()">📤 Export Backup</button>
+    <button class="app-menu-btn" onclick="exportItinerarySummaryText()">🧾 Export AI Summary</button>
+    <button class="app-menu-btn" onclick="exportItineraryText()">📝 Export Itinerary Text</button>
     <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="promptInstallApp()">⬇ Install App</button>
     <button class="app-menu-btn danger" onclick="promptResetData()">Reset App</button>
     <button class="app-menu-btn mobile-menu-btn" onclick="toggleMobileMenu()">☰ Menu</button>
@@ -161,6 +163,8 @@
         <button class="app-menu-btn" onclick="closeMobileMenu(); openPrintPreview()">🖨 Print Itinerary</button>
         <button class="app-menu-btn" onclick="document.getElementById('importFile').click(); closeMobileMenu()">📥 Import JSON</button>
         <button class="app-menu-btn" onclick="exportJSON(); closeMobileMenu()">📤 Export Backup</button>
+        <button class="app-menu-btn" onclick="exportItinerarySummaryText(); closeMobileMenu()">🧾 Export AI Summary</button>
+        <button class="app-menu-btn" onclick="exportItineraryText(); closeMobileMenu()">📝 Export Itinerary Text</button>
         <button id="mobileInstallAppBtn" class="app-menu-btn install-btn" hidden onclick="closeMobileMenu(); promptInstallApp()">⬇ Install App</button>
         <button class="app-menu-btn danger" onclick="closeMobileMenu(); promptResetData()">Reset App</button>
       </div>
