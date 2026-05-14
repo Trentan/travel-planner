@@ -33,21 +33,20 @@ Because this is a PWA, you do not download it from the App Store. You install it
 
 ## 💾 The Workflow: Saving & Google Drive
 
-To keep the app blazing fast and fully offline, **it saves your active edits to your browser's temporary local storage.** However, browsers can occasionally clear this memory. To keep your data safe across multiple devices, follow the Import/Export workflow.
+To keep the app blazing fast and fully offline, it saves your active edits to browser storage. On browsers that support the File System Access API, you can open a JSON file once and the app will keep saving back to that same file. On iPhone/Safari, it falls back to localStorage and the manual export flow.
 
-### 1. Starting a Trip (Import)
+### 1. Starting a Trip
 * Open the app.
-* Tap **📥 Import JSON**.
-* Select your `master_itinerary.json` file from your phone's file picker (you can pull this straight from Google Drive or iCloud).
+* Tap **Open File**.
+* Select your `master_itinerary.json` file from your file picker.
 * The app will instantly populate with your trip data.
 
 ### 2. Making Edits on the Go
-* You can safely tick off packing items, log train ticket costs, or drag-and-drop sights while totally offline (e.g., on a flight). The app will auto-save to your device's local memory.
+* You can safely tick off packing items, log train ticket costs, or drag-and-drop sights while totally offline (e.g., on a flight). The app will auto-save as you edit.
 
-### 3. Hard Saving (Export) - *Crucial Step*
-* Whenever you are back on Wi-Fi and have finished making major updates, tap **📤 Export Backup**.
-* The app will generate a fresh `.json` file containing all your new data. 
-* Save this file directly over the old one in your Google Drive `Backups` folder. This locks in your progress.
+### 3. Manual Backup on Mobile
+* On browsers that cannot keep a writable file handle, tap **Export Backup** when you want a fresh `.json` copy.
+* Save that file over the old one in your Google Drive `Backups` folder. This locks in your progress.
 
 ---
 
@@ -58,7 +57,7 @@ Ready for the next adventure? Use the built-in AI Builder tab:
 2. Fill in the rough details of your next trip (Dates, Vibe, Target Cities).
 3. Click **🪄 Generate AI Prompt** and copy the output.
 4. Paste the prompt into an AI (like ChatGPT or Gemini). It will generate a raw JSON file formatted specifically for this app.
-5. Save that output as a `.json` file, tap **📥 Import JSON**, and your new trip is instantly ready to go.
+5. Save that output as a `.json` file, tap **Open File**, and your new trip is instantly ready to go.
 
 ---
 

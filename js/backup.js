@@ -7,6 +7,10 @@ let lastExportTimestamp = null;
 const BACKUP_REMINDER_DAYS = 3;
 const BACKUP_REMINDER_EDITS = 20;
 
+function hasConnectedFileHandle() {
+  return typeof window.hasActiveFileHandle === 'function' && window.hasActiveFileHandle();
+}
+
 // Initialize tracking on app load
 window.addEventListener('DOMContentLoaded', function() {
   loadBackupTracking();
@@ -39,22 +43,34 @@ function resetEditTracking() {
 
 // Check if we should show a backup reminder
 function checkBackupReminder() {
+  if (hasConnectedFileHandle()) {
+    hideBackupReminder();
+    return;
+  }
+
   const lastExport = localStorage.getItem('travelApp_last_export_v2026');
   const lastFileName = localStorage.getItem('travelApp_last_export_filename') || 'your trip file';
+  const fsSupported = typeof window.isFSASupported === 'function' && window.isFSASupported();
+  const firstTimeMessage = fsSupported
+    ? 'You have not connected a file yet. Tap Save As to create the JSON file you want the app to keep updating.'
+    : 'You have not connected a file yet. Tap Export Backup to download your first JSON file.';
+  const refreshMessage = fsSupported
+    ? 'Tap Save As to create a file, or Open File later if you want to switch to a different JSON file.'
+    : 'Tap Export Backup whenever you want a fresh copy.';
 
   if (!lastExport) {
-    showBackupReminder('Welcome! This app saves to your browser. Consider exporting your trip to a file for backup. 💡 Tip: Use the same filename each time to keep one master backup file.');
+    showBackupReminder(`Welcome! This app saves to your browser. ${firstTimeMessage} 💡 Tip: Use one filename for the master copy and keep using it for autosave.`);
     return;
   }
 
   const daysSince = (Date.now() - new Date(lastExport).getTime()) / (1000 * 60 * 60 * 24);
   if (daysSince >= BACKUP_REMINDER_DAYS) {
-    showBackupReminder('It\'s been ' + Math.floor(daysSince) + ' days since your last backup. Consider saving to a file. 💡 Tip: Use the same filename each time to keep one master backup file.');
+    showBackupReminder(`It's been ${Math.floor(daysSince)} days since your last backup (${lastFileName}). ${refreshMessage} 💡 Tip: Use the same filename each time to keep one master backup file.`);
     return;
   }
 
   if (editCountSinceExport >= BACKUP_REMINDER_EDITS) {
-    showBackupReminder('You\'ve made ' + editCountSinceExport + ' changes since your last backup. Consider saving to a file. 💡 Tip: Use the same filename each time to keep one master backup file.');
+    showBackupReminder(`You've made ${editCountSinceExport} changes since your last backup (${lastFileName}). ${refreshMessage} 💡 Tip: Use the same filename each time to keep one master backup file.`);
   }
 }
 
@@ -72,8 +88,8 @@ function showBackupReminder(message) {
         <div class="reminder-text" style="font-size: 14px; color: #856404; margin-bottom: 8px;">${message}</div>
         <div style="font-size: 12px; color: #6C757D; margin-bottom: 12px; font-style: italic;">💡 Tip: After exporting, find the downloaded file and copy it to overwrite your previous backup.</div>
         <div style="display: flex; gap: 8px;">
-          <button onclick="exportJSON(); checkBackupReminder(); hideBackupReminder();"
-                  style="padding: 6px 12px; background: #27AE60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Export Now</button>
+          <button onclick="${typeof window.isFSASupported === 'function' && window.isFSASupported() ? 'hideBackupReminder(); openTripFile();' : 'exportJSON(); checkBackupReminder(); hideBackupReminder();'}"
+                  style="padding: 6px 12px; background: #27AE60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">${typeof window.isFSASupported === 'function' && window.isFSASupported() ? 'Open File' : 'Export Now'}</button>
           <button onclick="hideBackupReminder();"
                   style="padding: 6px 12px; background: #6C757D; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Later</button>
         </div>
@@ -96,6 +112,16 @@ function updateExportIndicator() {
   const indicator = document.getElementById('exportIndicator') || document.getElementById('timestampStatus');
 
   if (!indicator) return;
+
+  if (hasConnectedFileHandle()) {
+    const connectedName = typeof window.getActiveFileHandleName === 'function'
+      ? window.getActiveFileHandleName()
+      : lastFile;
+    indicator.innerHTML = `📁 Connected file: ${connectedName || 'selected file'}`;
+    indicator.style.opacity = '0.8';
+    indicator.style.fontSize = '0.8rem';
+    return;
+  }
 
   if (lastExport && lastFile) {
     const date = new Date(lastExport);
@@ -134,3 +160,4 @@ window.checkBackupReminder = checkBackupReminder;
 window.showBackupReminder = showBackupReminder;
 window.hideBackupReminder = hideBackupReminder;
 window.updateExportIndicator = updateExportIndicator;
+

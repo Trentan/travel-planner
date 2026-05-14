@@ -403,6 +403,10 @@ const CITY_COLORS = [
 ];
 let titleData = { title: "✈ New Trip Plan", subtitle: "Click here to add your trip subtitle/description" };
 let currentFileName = "Default Template";
+let activeFileHandle = null;
+let activeFileHandleName = null;
+let pendingFileHandle = null;
+let fileWriteFailed = false;
 
 // Journeys data - make global so all modules can access
 var journeys = [];
@@ -414,6 +418,189 @@ window.stays = stays;
 // Current city filter - 'all' or city ID (global for cross-module access)
 var currentCityFilter = 'all';
 window.currentCityFilter = currentCityFilter;
+
+function isFSASupported() {
+  return !!(window.isSecureContext && 'showOpenFilePicker' in window);
+}
+
+function hasActiveFileHandle() {
+  return !!activeFileHandle;
+}
+
+function getActiveFileHandleName() {
+  return activeFileHandleName || currentFileName || 'Default Template';
+}
+
+function syncActiveFileDisplay() {
+  const fileDisplay = document.getElementById('activeFileDisplay');
+  if (fileDisplay) {
+    fileDisplay.innerText = '📂 ' + getActiveFileHandleName();
+  }
+}
+
+function syncCurrentFileName(fileName) {
+  currentFileName = fileName || 'Default Template';
+  localStorage.setItem('travelApp_filename_v2026', currentFileName);
+  syncActiveFileDisplay();
+}
+
+function setActiveFileHandle(handle) {
+  activeFileHandle = handle || null;
+  activeFileHandleName = handle ? handle.name : null;
+  if (activeFileHandleName) {
+    fileWriteFailed = false;
+    syncCurrentFileName(activeFileHandleName);
+    localStorage.setItem('travelApp_file_handle_name', activeFileHandleName);
+    if (typeof window.hideBackupReminder === 'function') window.hideBackupReminder();
+    if (typeof window.updateExportIndicator === 'function') window.updateExportIndicator();
+    configureFileActionButtons();
+  } else {
+    localStorage.removeItem('travelApp_file_handle_name');
+    syncActiveFileDisplay();
+    if (typeof window.updateExportIndicator === 'function') window.updateExportIndicator();
+    configureFileActionButtons();
+  }
+}
+
+function clearActiveFileHandle() {
+  activeFileHandle = null;
+  activeFileHandleName = null;
+  fileWriteFailed = false;
+  localStorage.removeItem('travelApp_file_handle_name');
+  syncActiveFileDisplay();
+  configureFileActionButtons();
+}
+
+function configureFileActionButtons() {
+  const shouldShowExport = !isFSASupported() || fileWriteFailed;
+  ['exportBackupBtn', 'mobileExportBackupBtn'].forEach(id => {
+    const button = document.getElementById(id);
+    if (button) button.style.display = shouldShowExport ? '' : 'none';
+  });
+
+  const primaryLabel = isFSASupported()
+    ? (hasActiveFileHandle() ? 'Open File' : 'Save As')
+    : 'Open File';
+  ['openFileBtn', 'mobileOpenFileBtn'].forEach(id => {
+    const button = document.getElementById(id);
+    if (button) button.textContent = primaryLabel;
+  });
+}
+
+function getCurrentAppData() {
+  let journeysData = [];
+  if (typeof journeys !== 'undefined') journeysData = normalizeTripJourneysData(JSON.parse(JSON.stringify(journeys)));
+  let staysData = [];
+  if (typeof stays !== 'undefined') staysData = normalizeTripStaysData(JSON.parse(JSON.stringify(stays)));
+  let citiesDataToExport = [];
+  if (typeof citiesData !== 'undefined') citiesDataToExport = normalizeTripCitiesDateData(JSON.parse(JSON.stringify(citiesData)));
+  let userCitiesData = [];
+  if (typeof userCities !== 'undefined') userCitiesData = userCities;
+  let userCountriesData = [];
+  if (typeof userCountries !== 'undefined') userCountriesData = userCountries;
+  const itineraryData = normalizeTripLegsData(JSON.parse(JSON.stringify(appData)));
+  return {
+    meta: titleData,
+    itinerary: itineraryData,
+    packing: packingData,
+    leaveHome: leaveHomeData,
+    journeys: journeysData,
+    stays: staysData,
+    cities: citiesDataToExport,
+    userCities: userCitiesData,
+    userCountries: userCountriesData
+  };
+}
+
+async function saveFileToDisk() {
+  if (!activeFileHandle) return false;
+
+  try {
+    const writable = await activeFileHandle.createWritable();
+    await writable.write(JSON.stringify(getCurrentAppData(), null, 2));
+    await writable.close();
+    fileWriteFailed = false;
+    localStorage.setItem('travelApp_file_handle_name', getActiveFileHandleName());
+    configureFileActionButtons();
+    const status = document.getElementById('saveStatus');
+    if (status) status.textContent = '✓ Saved to file';
+    return true;
+  } catch (e) {
+    console.error('Failed to save to selected file:', e);
+    fileWriteFailed = true;
+    configureFileActionButtons();
+    return false;
+  }
+}
+
+function openTripFile() {
+  if (isFSASupported()) {
+    if (hasActiveFileHandle() || fileWriteFailed) {
+      openFileFromDisk();
+    } else {
+      createFileOnDisk();
+    }
+    return;
+  }
+
+  const input = document.getElementById('importFile');
+  if (input) input.click();
+}
+
+async function createFileOnDisk() {
+  if (!isFSASupported()) return;
+
+  try {
+    const suggestedName = currentFileName && currentFileName !== 'Default Template'
+      ? currentFileName.replace(/\.json$/i, '') + '.json'
+      : 'travel_planner_backup.json';
+
+    const fileHandle = await window.showSaveFilePicker({
+      suggestedName,
+      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+    });
+
+    if (!fileHandle) return;
+
+    setActiveFileHandle(fileHandle);
+    await saveData(false);
+    if (typeof window.updateExportIndicator === 'function') window.updateExportIndicator();
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    console.error('Failed to create file:', e);
+    alert('Could not create a file location. You can still use Export Backup.');
+  }
+}
+
+async function openFileFromDisk() {
+  if (!isFSASupported()) {
+    const input = document.getElementById('importFile');
+    if (input) input.click();
+    return;
+  }
+
+  try {
+    const [fileHandle] = await window.showOpenFilePicker({
+      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+    });
+
+    if (!fileHandle) return;
+
+    pendingFileHandle = fileHandle;
+    const file = await fileHandle.getFile();
+    importJSON({
+      target: {
+        files: [file],
+        value: ''
+      }
+    });
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    console.error('Failed to open file picker:', e);
+    alert('Could not open that file. Please try again or use Import JSON.');
+    pendingFileHandle = null;
+  }
+}
 
 // Extract unique cities from itinerary data (including journeys, stays, and cityId references)
 function extractCitiesFromItinerary() {
@@ -1714,7 +1901,8 @@ if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title &&
 
   document.getElementById('mainTitle').innerText = titleData.title;
   document.getElementById('mainSubtitle').innerText = titleData.subtitle;
-  document.getElementById('activeFileDisplay').innerText = "📂 " + currentFileName;
+  syncActiveFileDisplay();
+  configureFileActionButtons();
 
   // Display last export/import timestamp
   displayTimestampStatus();
@@ -1807,11 +1995,14 @@ async function saveData(showTick = true) {
   localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
   localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
   localStorage.setItem('travelApp_filename_v2026', currentFileName);
+  const savedToFile = await saveFileToDisk();
 
   if(showTick) {
     const status = document.getElementById('saveStatus');
-    status.textContent = "✓ Saved";
-    setTimeout(() => status.textContent = "", 2000);
+    if (status) {
+      status.textContent = savedToFile ? "✓ Saved" : "✓ Saved locally";
+      setTimeout(() => status.textContent = "", 2000);
+    }
   }
 }
 
@@ -2652,14 +2843,19 @@ function importJSON(event) {
   if (!file.name.endsWith('.json')) {
     alert('Please select a .json file. The file you selected is not valid JSON.');
     event.target.value = '';
+    pendingFileHandle = null;
     return;
   }
+
+  const fileHandleForThisImport = pendingFileHandle;
+  pendingFileHandle = null;
 
   const reader = new FileReader();
 
   reader.onerror = function() {
     alert('Error reading file. Please try again with a valid JSON file.');
     event.target.value = '';
+    pendingFileHandle = null;
   };
 
   reader.onload = function(e) {
@@ -2669,6 +2865,7 @@ function importJSON(event) {
       if (!content || content.trim() === '') {
         alert('The file is empty. Please select a file with data.');
         event.target.value = '';
+        pendingFileHandle = null;
         return;
       }
 
@@ -2946,6 +3143,11 @@ if (importedData.stays && Array.isArray(importedData.stays)) {
       currentFileName = file.name;
       localStorage.setItem('travelApp_filename_v2026', currentFileName);
       localStorage.setItem('travelApp_last_import_v2026', new Date().toISOString());
+      if (fileHandleForThisImport) {
+        setActiveFileHandle(fileHandleForThisImport);
+      } else {
+        clearActiveFileHandle();
+      }
       if (typeof displayTimestampStatus === 'function') displayTimestampStatus();
 
       // Preserve titleData before saveData() runs, then restore after
@@ -2984,6 +3186,15 @@ window.exportItineraryText = exportItineraryText;
 window.exportItinerarySummaryText = exportItinerarySummaryText;
 window.resetData = resetData;
 window.importJSON = importJSON;
+window.openTripFile = openTripFile;
+window.openFileFromDisk = openFileFromDisk;
+window.saveFileToDisk = saveFileToDisk;
+window.getCurrentAppData = getCurrentAppData;
+window.hasActiveFileHandle = hasActiveFileHandle;
+window.getActiveFileHandleName = getActiveFileHandleName;
+window.setActiveFileHandle = setActiveFileHandle;
+window.clearActiveFileHandle = clearActiveFileHandle;
+window.isFSASupported = isFSASupported;
 window.addOrUpdateCity = addOrUpdateCity;
 window.saveData = saveData;
 window.createCityDatalists = createCityDatalists;
