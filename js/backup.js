@@ -50,16 +50,22 @@ function checkBackupReminder() {
 
   const lastExport = localStorage.getItem('travelApp_last_export_v2026');
   const lastFileName = localStorage.getItem('travelApp_last_export_filename') || 'your trip file';
+  const rememberedFileName = localStorage.getItem('travelApp_file_handle_name') || '';
   const fsSupported = typeof window.isFSASupported === 'function' && window.isFSASupported();
   const firstTimeMessage = fsSupported
-    ? 'You have not connected a file yet. Tap Save As to create the JSON file you want the app to keep updating.'
+    ? 'You have not connected a file yet. Tap Save As to choose where the JSON file should live.'
     : 'You have not connected a file yet. Tap Export Backup to download your first JSON file.';
   const refreshMessage = fsSupported
-    ? 'Tap Save As to create a file, or Open File later if you want to switch to a different JSON file.'
+    ? 'Tap Save As again if you want to change the file location.'
     : 'Tap Export Backup whenever you want a fresh copy.';
 
+  if (rememberedFileName) {
+    hideBackupReminder();
+    return;
+  }
+
   if (!lastExport) {
-    showBackupReminder(`Welcome! This app saves to your browser. ${firstTimeMessage} 💡 Tip: Use one filename for the master copy and keep using it for autosave.`);
+    showBackupReminder(`Welcome! This is a local save. ${firstTimeMessage} 💡 Tip: Use one filename for the master copy and keep using it for autosave.`);
     return;
   }
 
@@ -89,7 +95,7 @@ function showBackupReminder(message) {
         <div style="font-size: 12px; color: #6C757D; margin-bottom: 12px; font-style: italic;">💡 Tip: After exporting, find the downloaded file and copy it to overwrite your previous backup.</div>
         <div style="display: flex; gap: 8px;">
           <button onclick="${typeof window.isFSASupported === 'function' && window.isFSASupported() ? 'hideBackupReminder(); openTripFile();' : 'exportJSON(); checkBackupReminder(); hideBackupReminder();'}"
-                  style="padding: 6px 12px; background: #27AE60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">${typeof window.isFSASupported === 'function' && window.isFSASupported() ? 'Open File' : 'Export Now'}</button>
+                  style="padding: 6px 12px; background: #27AE60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">${typeof window.isFSASupported === 'function' && window.isFSASupported() ? 'Save As' : 'Export Now'}</button>
           <button onclick="hideBackupReminder();"
                   style="padding: 6px 12px; background: #6C757D; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Later</button>
         </div>
@@ -107,33 +113,8 @@ function hideBackupReminder() {
 
 // Update export indicator showing last export
 function updateExportIndicator() {
-  const lastExport = localStorage.getItem('travelApp_last_export_v2026');
-  const lastFile = localStorage.getItem('travelApp_last_export_filename');
-  const indicator = document.getElementById('exportIndicator') || document.getElementById('timestampStatus');
-
-  if (!indicator) return;
-
-  if (hasConnectedFileHandle()) {
-    const connectedName = typeof window.getActiveFileHandleName === 'function'
-      ? window.getActiveFileHandleName()
-      : lastFile;
-    indicator.innerHTML = `📁 Connected file: ${connectedName || 'selected file'}`;
-    indicator.style.opacity = '0.8';
-    indicator.style.fontSize = '0.8rem';
-    return;
-  }
-
-  if (lastExport && lastFile) {
-    const date = new Date(lastExport);
-    const formatted = date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
-    const time = date.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
-    indicator.innerHTML = `📤 Last exported: ${lastFile} on ${formatted} at ${time}`;
-    indicator.style.opacity = '0.8';
-    indicator.style.fontSize = '0.8rem';
-  } else {
-    indicator.innerHTML = '⚠️ Not yet saved to file';
-    indicator.style.opacity = '0.8';
-    checkBackupReminder();
+  if (typeof window.syncActiveFileDisplay === 'function') {
+    window.syncActiveFileDisplay();
   }
 }
 

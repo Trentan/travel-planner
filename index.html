@@ -20,7 +20,6 @@
     <span class="file-badge" id="activeFileDisplay">📂 Default Template</span>
     <span class="save-status" id="saveStatus"></span>
     <span class="timestamp-status" id="timestampStatus"></span>
-    <span class="file-badge" id="exportIndicator" style="margin-left: 1rem; font-size: 0.8rem; opacity: 0.8;"></span>
   </div>
   <div class="app-menu-right">
     <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
@@ -32,7 +31,8 @@
     <button class="app-menu-btn" onclick="openPrintPreview()">🖨 Print Itinerary</button>
     <span style="color: rgba(255,255,255,0.2);">|</span>
     <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
-    <button id="openFileBtn" class="app-menu-btn" onclick="openTripFile()">Open File</button>
+    <button id="saveAsBtn" class="app-menu-btn" onclick="openTripFile()">Save As</button>
+    <button id="openFileBtn" class="app-menu-btn" onclick="openExistingTripFile()">Open File</button>
     <button id="exportBackupBtn" class="app-menu-btn" onclick="exportJSON()">Export Backup</button>
     <button class="app-menu-btn" onclick="exportItinerarySummaryText()">🧾 Export AI Summary</button>
     <button class="app-menu-btn" onclick="exportItineraryText()">📝 Export Itinerary Text</button>
@@ -161,7 +161,8 @@
         <button class="app-menu-btn" onclick="closeMobileMenu(); openAIDialog()">🤖 AI Builder</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openGuideDialog()">📖 Guide</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openPrintPreview()">🖨 Print Itinerary</button>
-        <button id="mobileOpenFileBtn" class="app-menu-btn" onclick="openTripFile(); closeMobileMenu()">Open File</button>
+        <button id="mobileSaveAsBtn" class="app-menu-btn" onclick="openTripFile(); closeMobileMenu()">Save As</button>
+        <button id="mobileOpenFileBtn" class="app-menu-btn" onclick="openExistingTripFile(); closeMobileMenu()">Open File</button>
         <button id="mobileExportBackupBtn" class="app-menu-btn" onclick="exportJSON(); closeMobileMenu()">Export Backup</button>
         <button class="app-menu-btn" onclick="exportItinerarySummaryText(); closeMobileMenu()">🧾 Export AI Summary</button>
         <button class="app-menu-btn" onclick="exportItineraryText(); closeMobileMenu()">📝 Export Itinerary Text</button>

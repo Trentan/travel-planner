@@ -427,14 +427,27 @@ function hasActiveFileHandle() {
   return !!activeFileHandle;
 }
 
+function hasFileWriteFailed() {
+  return !!fileWriteFailed;
+}
+
 function getActiveFileHandleName() {
   return activeFileHandleName || currentFileName || 'Default Template';
+}
+
+function getFileConnectionStatusLabel() {
+  if (hasActiveFileHandle()) return 'Connected';
+  if (fileWriteFailed) return 'Offline';
+  return '';
 }
 
 function syncActiveFileDisplay() {
   const fileDisplay = document.getElementById('activeFileDisplay');
   if (fileDisplay) {
-    fileDisplay.innerText = '📂 ' + getActiveFileHandleName();
+    const status = getFileConnectionStatusLabel();
+    fileDisplay.innerText = status
+      ? `📂 ${getActiveFileHandleName()} · ${status}`
+      : `📂 ${getActiveFileHandleName()}`;
   }
 }
 
@@ -452,6 +465,7 @@ function setActiveFileHandle(handle) {
     syncCurrentFileName(activeFileHandleName);
     localStorage.setItem('travelApp_file_handle_name', activeFileHandleName);
     if (typeof window.hideBackupReminder === 'function') window.hideBackupReminder();
+    syncActiveFileDisplay();
     if (typeof window.updateExportIndicator === 'function') window.updateExportIndicator();
     configureFileActionButtons();
   } else {
@@ -478,12 +492,16 @@ function configureFileActionButtons() {
     if (button) button.style.display = shouldShowExport ? '' : 'none';
   });
 
-  const primaryLabel = isFSASupported()
-    ? (hasActiveFileHandle() ? 'Open File' : 'Save As')
-    : 'Open File';
+  const saveAsVisible = isFSASupported();
+  ['saveAsBtn', 'mobileSaveAsBtn'].forEach(id => {
+    const button = document.getElementById(id);
+    if (button) button.style.display = saveAsVisible ? '' : 'none';
+  });
+
+  const openFileVisible = true;
   ['openFileBtn', 'mobileOpenFileBtn'].forEach(id => {
     const button = document.getElementById(id);
-    if (button) button.textContent = primaryLabel;
+    if (button) button.style.display = openFileVisible ? '' : 'none';
   });
 }
 
@@ -524,21 +542,49 @@ async function saveFileToDisk() {
     configureFileActionButtons();
     const status = document.getElementById('saveStatus');
     if (status) status.textContent = '✓ Saved to file';
+    syncActiveFileDisplay();
     return true;
   } catch (e) {
     console.error('Failed to save to selected file:', e);
     fileWriteFailed = true;
     configureFileActionButtons();
+    syncActiveFileDisplay();
     return false;
   }
 }
 
 function openTripFile() {
   if (isFSASupported()) {
-    if (hasActiveFileHandle() || fileWriteFailed) {
-      openFileFromDisk();
-    } else {
-      createFileOnDisk();
+    createFileOnDisk();
+    return;
+  }
+
+  const input = document.getElementById('importFile');
+  if (input) input.click();
+}
+
+async function openExistingTripFile() {
+  if (isFSASupported()) {
+    try {
+      const [fileHandle] = await window.showOpenFilePicker({
+        types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+      });
+
+      if (!fileHandle) return;
+
+      pendingFileHandle = fileHandle;
+      const file = await fileHandle.getFile();
+      importJSON({
+        target: {
+          files: [file],
+          value: ''
+        }
+      });
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+      console.error('Failed to open file picker:', e);
+      alert('Could not open that file. Please try again or use Import JSON.');
+      pendingFileHandle = null;
     }
     return;
   }
@@ -569,36 +615,6 @@ async function createFileOnDisk() {
     if (e && e.name === 'AbortError') return;
     console.error('Failed to create file:', e);
     alert('Could not create a file location. You can still use Export Backup.');
-  }
-}
-
-async function openFileFromDisk() {
-  if (!isFSASupported()) {
-    const input = document.getElementById('importFile');
-    if (input) input.click();
-    return;
-  }
-
-  try {
-    const [fileHandle] = await window.showOpenFilePicker({
-      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
-    });
-
-    if (!fileHandle) return;
-
-    pendingFileHandle = fileHandle;
-    const file = await fileHandle.getFile();
-    importJSON({
-      target: {
-        files: [file],
-        value: ''
-      }
-    });
-  } catch (e) {
-    if (e && e.name === 'AbortError') return;
-    console.error('Failed to open file picker:', e);
-    alert('Could not open that file. Please try again or use Import JSON.');
-    pendingFileHandle = null;
   }
 }
 
@@ -2004,6 +2020,10 @@ async function saveData(showTick = true) {
       setTimeout(() => status.textContent = "", 2000);
     }
   }
+
+  if (!hasActiveFileHandle() && !localStorage.getItem('travelApp_file_handle_name') && typeof window.checkBackupReminder === 'function') {
+    setTimeout(() => window.checkBackupReminder(), 250);
+  }
 }
 
 const TRIP_DATE_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -3187,10 +3207,11 @@ window.exportItinerarySummaryText = exportItinerarySummaryText;
 window.resetData = resetData;
 window.importJSON = importJSON;
 window.openTripFile = openTripFile;
-window.openFileFromDisk = openFileFromDisk;
+window.openExistingTripFile = openExistingTripFile;
 window.saveFileToDisk = saveFileToDisk;
 window.getCurrentAppData = getCurrentAppData;
 window.hasActiveFileHandle = hasActiveFileHandle;
+window.hasFileWriteFailed = hasFileWriteFailed;
 window.getActiveFileHandleName = getActiveFileHandleName;
 window.setActiveFileHandle = setActiveFileHandle;
 window.clearActiveFileHandle = clearActiveFileHandle;
