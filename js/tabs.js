@@ -24,6 +24,28 @@ function renderStayDetailBlock(title, value, extraClass = '') {
   `;
 }
 
+function renderStayMobileSummary(stay, status, statusIcon, cityName) {
+  const providerText = [stay.provider || '—', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' ');
+
+  return `
+    <div class="mobile-table-meta stay-mobile-meta">
+      <span><strong>Details:</strong> ${cityName}${providerText !== '—' ? ` · ${providerText}` : ''}</span>
+    </div>
+  `;
+}
+
+function renderStayDateSummary(stay, status, statusIcon) {
+  const checkOut = formatDateShort(stay.checkOut);
+  const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+
+  return `
+    <div class="mobile-table-meta stay-date-meta">
+      <span class="stay-meta-checkout"><strong>Out:</strong> ${checkOut}</span>
+      <span class="stay-meta-status"><strong>Status:</strong> ${statusIcon} ${statusText}</span>
+    </div>
+  `;
+}
+
 function buildAccomTab(cityFilter = null) {
   const container = document.getElementById('accom-table-container');
   const staysData = (typeof stays !== 'undefined') ? stays : [];
@@ -65,6 +87,14 @@ function buildAccomTab(cityFilter = null) {
       <th>Cost</th>
       <th>Actions</th>
     </tr>
+    <tr class="stay-mobile-head-row" aria-hidden="true">
+      <th>City</th>
+      <th>Property</th>
+      <th>Check-in</th>
+      <th>Status</th>
+      <th>Cost</th>
+      <th>Action</th>
+    </tr>
   </thead><tbody>`;
 
   sortedStays.forEach(stay => {
@@ -93,8 +123,11 @@ function buildAccomTab(cityFilter = null) {
         <span style="font-weight:600;" contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)">${escapeHtml(stay.propertyName)}</span>
         ${provider}
       </td>
-      <td class="date-col" data-label="Check-in">${formatDateShort(stay.checkIn)}</td>
-      <td class="date-col" data-label="Check-out">${formatDateShort(stay.checkOut)}</td>
+      <td class="date-col stay-dates-col" data-label="Stay">
+        ${formatDateShort(stay.checkIn)}
+        ${renderStayDateSummary(stay, status, statusIcon)}
+      </td>
+      <td class="date-col stay-out-col" data-label="Check-out">${formatDateShort(stay.checkOut)}</td>
       <td class="nights-col" data-label="Nights">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
       <td class="stay-status-col" data-label="Status">
         <span class="status-badge" style="background:${statusColor}; cursor:pointer;" onclick="event.stopPropagation(); toggleStayStatus(event, '${stay.id}')">${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}</span>
@@ -111,7 +144,7 @@ function buildAccomTab(cityFilter = null) {
 
     html += `
       <tr class="stay-detail-row ${isExpanded ? 'expanded' : ''}" data-stay-id="${stay.id}" style="display:${isExpanded ? 'table-row' : 'none'}; border-left-color: ${cityColor}">
-        <td colspan="9">
+        <td colspan="8">
           <div class="stay-detail-grid">
             ${renderStayDetailBlock('Status', `${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}`)}
             ${renderStayDetailBlock('Booking Ref', stay.bookingRef)}
