@@ -63,7 +63,148 @@ function addFood(legIdx) {
   });
 }
 
+function _splitActivityTitle(title) {
+  const raw = (title || '').trim();
+  if (!raw) return { title: '', location: '' };
+  const separator = ' — ';
+  const separatorIdx = raw.indexOf(separator);
+  if (separatorIdx === -1) return { title: raw, location: '' };
+  return {
+    title: raw.slice(0, separatorIdx).trim(),
+    location: raw.slice(separatorIdx + separator.length).trim()
+  };
+}
+
+function _openActivityModal(legIdx, activityIdx = null) {
+  const isEditing = activityIdx !== null && activityIdx !== undefined;
+  const activity = isEditing ? appData[legIdx]?.suggestedActivities?.[activityIdx] : null;
+  if (isEditing && !activity) return;
+
+  const existingModal = document.getElementById('activity-modal');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'activity-modal';
+  modal.className = 'modal-overlay';
+  modal.style.display = 'flex';
+  const defaults = _splitActivityTitle(activity?.title || '');
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width: 420px;">
+      <div class="modal-header">
+        <h2>${isEditing ? '✎ Edit Suggested Activity' : '➕ Add Suggested Activity'}</h2>
+        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="ai-form-group">
+          <label>Category</label>
+          <select id="activityCategory" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+            <option value="fitness">🏃 Fitness</option>
+            <option value="sight" selected>🏛️ Sight</option>
+            <option value="attraction">🎢 Attraction</option>
+            <option value="wellness">🧘 Wellness</option>
+            <option value="food">🍽️ Food</option>
+            <option value="tour">🚌 Tour</option>
+          </select>
+        </div>
+        <div class="ai-form-group">
+          <label>Description</label>
+          <input type="text" id="activityTitle" placeholder="e.g., Morning yoga in the park" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+        </div>
+        <div class="ai-form-group">
+          <label>Location</label>
+          <input type="text" id="activityLocation" placeholder="e.g., Central Park" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+        </div>
+        <div class="ai-form-group">
+          <label>Estimated Time</label>
+          <input type="text" id="activityTime" placeholder="e.g., 1 hr" value="1 hr" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+        </div>
+        <div class="ai-form-group">
+          <label>Estimated Cost ($)</label>
+          <input type="text" id="activityCost" placeholder="0" value="0" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+        <button class="action-btn" style="background: #2C3E50; color: white;" id="saveActivityBtn">${isEditing ? 'Save Changes' : 'Save Activity'}</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const categoryEl = document.getElementById('activityCategory');
+  const titleEl = document.getElementById('activityTitle');
+  const locationEl = document.getElementById('activityLocation');
+  const timeEl = document.getElementById('activityTime');
+  const costEl = document.getElementById('activityCost');
+
+  if (isEditing && activity) {
+    if (categoryEl) categoryEl.value = activity.category || 'sight';
+    if (titleEl) titleEl.value = defaults.title || activity.title || '';
+    if (locationEl) locationEl.value = defaults.location || '';
+    if (timeEl) timeEl.value = activity.estTime || '1 hr';
+    if (costEl) costEl.value = activity.estCost || '0';
+  }
+
+  setTimeout(() => titleEl?.focus(), 100);
+
+  function saveActivityHandler() {
+    const category = document.getElementById('activityCategory').value;
+    const title = document.getElementById('activityTitle').value.trim();
+    const location = document.getElementById('activityLocation').value.trim();
+    const estTime = document.getElementById('activityTime').value.trim() || '1 hr';
+    const estCost = document.getElementById('activityCost').value.trim() || '0';
+    if (!title) { alert('Please enter a description'); return; }
+
+    const fullTitle = location ? `${title} — ${location}` : title;
+
+    if (isEditing) {
+      const target = appData[legIdx]?.suggestedActivities?.[activityIdx];
+      if (!target) {
+        modal.remove();
+        return;
+      }
+
+      const previousTitle = target.title;
+      target.title = fullTitle;
+      target.category = category;
+      target.estTime = estTime;
+      target.estCost = estCost;
+
+      if (target.assignedDayIdx !== null && target.assignedDayIdx !== undefined) {
+        const day = appData[legIdx]?.days?.[target.assignedDayIdx];
+        if (day?.activityItems?.length) {
+          day.activityItems.forEach(item => {
+            if (item.text === previousTitle) item.text = fullTitle;
+          });
+        }
+      }
+    } else {
+      appData[legIdx].suggestedActivities.push({
+        title: fullTitle,
+        category: category,
+        estTime: estTime,
+        estCost: estCost,
+        assignedDayIdx: null
+      });
+    }
+
+    modal.remove();
+    saveData();
+    buildItinerary();
+  }
+
+  document.getElementById('saveActivityBtn').onclick = (e) => { e.stopPropagation(); saveActivityHandler(); };
+  modal.querySelectorAll('input').forEach(input => {
+    input.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveActivityHandler(); });
+  });
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+}
+
 function addActivity(legIdx) {
+  return _openActivityModal(legIdx);
   // Create modal for adding new activity
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
@@ -127,6 +268,10 @@ function addActivity(legIdx) {
   modal.querySelectorAll('input').forEach(input => {
     input.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveActivityHandler(); });
   });
+}
+
+function openEditActivityModal(legIdx, activityIdx) {
+  return _openActivityModal(legIdx, activityIdx);
 }
 
 function addRun(legIdx) { appData[legIdx].cityRun.push({ title: "New run...", estTime: "1 hr", estCost: "0", assignedDayIdx: null }); saveData(); buildItinerary(); }
@@ -352,6 +497,94 @@ function checkDateConflict(dateStr, excludeLegIdx) {
   return null;
 }
 
+const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function getWeekdayLabelForTripDate(dateStr) {
+  const normalized = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(dateStr) : dateStr;
+  if (!normalized || !/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return 'Mon';
+
+  const date = new Date(`${normalized}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return 'Mon';
+  return WEEKDAY_LABELS[date.getDay()];
+}
+
+function cloneDayItems(items) {
+  return Array.isArray(items) ? JSON.parse(JSON.stringify(items)) : [];
+}
+
+function createLegDayTemplate(sourceDay, dateStr) {
+  const anchorCity = sourceDay?.to || sourceDay?.from || 'Home';
+  const isStayDay = sourceDay?.from === sourceDay?.to;
+  const day = {
+    date: dateStr,
+    day: getWeekdayLabelForTripDate(dateStr),
+    from: anchorCity,
+    to: anchorCity,
+    completed: false,
+    desc: isStayDay
+      ? `Additional day in ${anchorCity}`
+      : `Additional day in ${anchorCity}`,
+    transportItems: [],
+    accomItems: cloneDayItems(sourceDay?.accomItems),
+    activityItems: []
+  };
+
+  if (day.accomItems.length === 0) {
+    day.accomItems = [{ text: 'Add accommodation...', cost: '0', status: 'pending', bookingRef: '', done: false }];
+  }
+
+  if (isStayDay && Array.isArray(sourceDay?.activityItems) && sourceDay.activityItems.length > 0) {
+    day.activityItems = cloneDayItems(sourceDay.activityItems);
+  } else {
+    day.activityItems = [{ text: 'Explore local area', cost: '0', time: '1 hr', done: false }];
+  }
+
+  return day;
+}
+
+function adjustLegDays(legIdx, delta) {
+  const leg = appData[legIdx];
+  if (!leg || !Array.isArray(leg.days) || leg.days.length === 0) return;
+
+  if (delta === 0) return;
+
+  if (delta > 0) {
+    const lastDay = leg.days[leg.days.length - 1];
+    const lastDate = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(lastDay.date) : lastDay.date;
+    const nextDate = typeof addDaysToIsoDate === 'function' ? addDaysToIsoDate(lastDate, delta) : '';
+
+    if (!nextDate) {
+      alert('Could not calculate the next day for this leg.');
+      return;
+    }
+
+    const conflict = checkDateConflict(nextDate, legIdx);
+    if (conflict) {
+      const conflictDate = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(nextDate) : nextDate;
+      const proceed = confirm(
+        `Adding a day to ${leg.label} creates a date overlap on ${conflictDate} with ${conflict.legLabel}. Continue anyway?`
+      );
+      if (!proceed) return;
+    }
+
+    leg.days.push(createLegDayTemplate(lastDay, nextDate));
+    saveData();
+    sortLegs();
+    return;
+  }
+
+  if (leg.days.length === 1) {
+    const proceed = confirm(`Removing the only day from ${leg.label} will delete the entire leg. Continue?`);
+    if (!proceed) return;
+    deleteLeg(legIdx);
+    return;
+  }
+
+  leg.days.pop();
+  saveData();
+  buildItinerary();
+}
+
 function confirmAddLeg() {
   const legType = document.getElementById('legTypeSelect')?.value || 'city';
   const dateFrom = document.getElementById('newLegStartDate')?.value;
@@ -486,8 +719,10 @@ window.toggleDayCompleted = toggleDayCompleted;
 window.toggleActivityCompleted = toggleActivityCompleted;
 window.openAddLegDialog = openAddLegDialog;
 window.closeAddLegDialog = closeAddLegDialog;
+window.openEditActivityModal = openEditActivityModal;
 window.onLegTypeChange = onLegTypeChange;
 window.checkDateConflict = checkDateConflict;
+window.adjustLegDays = adjustLegDays;
 window.confirmAddLeg = confirmAddLeg;
 window.deleteActivity = deleteActivity;
 window._populateAddLegCityDropdowns = _populateAddLegCityDropdowns;

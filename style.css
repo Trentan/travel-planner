@@ -79,6 +79,11 @@ body {
 }
 .app-menu-btn:hover { background: rgba(255,255,255,0.18); transform: translateY(-1px); }
 .app-menu-btn:active { transform: translateY(0); }
+.app-menu-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
 .app-menu-btn.active-mode { background: var(--success); border-color: rgba(255,255,255,0.15); }
 .app-menu-btn.edit-mode { background: var(--warning); border-color: rgba(255,255,255,0.15); color: #fff; }
 .app-menu-btn.danger { background: rgba(231,76,60,0.18); border-color: rgba(231,76,60,0.4); color: #ffd8d4;}

@@ -675,8 +675,8 @@ function createBrowserHarness({
 
   const baseIds = [
     'activeFileDisplay', 'saveStatus', 'timestampStatus', 'editToggleBtn', 'compactToggleBtn',
-    'modeToggleBtn', 'saveAsBtn', 'openFileBtn', 'installAppBtn', 'mobileEditToggleBtn',
-    'mobileCompactToggleBtn', 'mobileSaveAsBtn', 'mobileOpenFileBtn', 'mobileInstallAppBtn',
+    'undoBtn', 'redoBtn', 'modeToggleBtn', 'saveAsBtn', 'openFileBtn', 'installAppBtn', 'mobileEditToggleBtn',
+    'mobileCompactToggleBtn', 'mobileUndoBtn', 'mobileRedoBtn', 'mobileSaveAsBtn', 'mobileOpenFileBtn', 'mobileInstallAppBtn',
     'mainTitle', 'mainSubtitle', 'cityNav', 'itinerary', 'transport-table-container',
     'accom-table-container', 'budget-kpi-container', 'budget-table-container',
     'guides-container', 'packing-areas-container', 'mapContainer', 'journey-map-view',
@@ -793,7 +793,7 @@ function createBrowserHarness({
     el.tagName = 'SELECT';
   });
 
-  const accentIds = ['saveAsBtn', 'openFileBtn', 'installAppBtn', 'mobileSaveAsBtn', 'mobileOpenFileBtn', 'mobileInstallAppBtn', 'editToggleBtn', 'compactToggleBtn', 'mobileEditToggleBtn', 'mobileCompactToggleBtn'];
+  const accentIds = ['saveAsBtn', 'openFileBtn', 'installAppBtn', 'mobileSaveAsBtn', 'mobileOpenFileBtn', 'mobileInstallAppBtn', 'editToggleBtn', 'compactToggleBtn', 'undoBtn', 'redoBtn', 'mobileEditToggleBtn', 'mobileCompactToggleBtn', 'mobileUndoBtn', 'mobileRedoBtn'];
   accentIds.forEach(id => document.getElementById(id).className = 'app-menu-btn');
 
   document.body.appendChild(document.getElementById('mainTitle'));
@@ -947,7 +947,7 @@ document.addEventListener('DOMContentLoaded', () => {
   syncInstallButton();
 });
 
-initData();
+window.appInitPromise = initData();
 applyUiSettings();
 buildNav();
 buildItinerary();

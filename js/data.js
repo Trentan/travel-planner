@@ -177,6 +177,13 @@ let appData = [];
 let packingData = [];
 let leaveHomeData = [];
 let citiesData = []; // City entities for filtering/grouping - { id, name, code, countryCode, country, dateFrom, dateTo, colour }
+let historyBaselineSnapshot = null;
+let historyBaselineSignature = '';
+let historyUndoStack = [];
+let historyRedoStack = [];
+const HISTORY_STACK_LIMIT = 50;
+let historyTrackingSuspended = false;
+let historyRestoreInProgress = false;
 
 // ISO Country codes for travel destinations
 const COUNTRY_DATA = [
@@ -565,6 +572,151 @@ function getCurrentAppData() {
   };
 }
 
+function cloneHistorySnapshot() {
+  return JSON.parse(JSON.stringify(getCurrentAppData()));
+}
+
+function getHistorySnapshotSignature(snapshot) {
+  return JSON.stringify(snapshot);
+}
+
+function syncHistoryControls() {
+  const canUndo = historyUndoStack.length > 0;
+  const canRedo = historyRedoStack.length > 0;
+  const controlIds = [
+    ['undoBtn', canUndo],
+    ['redoBtn', canRedo],
+    ['mobileUndoBtn', canUndo],
+    ['mobileRedoBtn', canRedo]
+  ];
+
+  controlIds.forEach(([id, enabled]) => {
+    const button = document.getElementById(id);
+    if (!button) return;
+    button.disabled = !enabled;
+    button.setAttribute('aria-disabled', String(!enabled));
+  });
+}
+
+function resetHistoryState(snapshot = cloneHistorySnapshot()) {
+  historyBaselineSnapshot = snapshot;
+  historyBaselineSignature = getHistorySnapshotSignature(snapshot);
+  historyUndoStack = [];
+  historyRedoStack = [];
+  syncHistoryControls();
+}
+
+function captureHistoryBeforeSave() {
+  if (historyTrackingSuspended) {
+    return;
+  }
+
+  if (historyRestoreInProgress) {
+    const currentSnapshot = cloneHistorySnapshot();
+    historyBaselineSnapshot = currentSnapshot;
+    historyBaselineSignature = getHistorySnapshotSignature(currentSnapshot);
+    syncHistoryControls();
+    return;
+  }
+
+  const currentSnapshot = cloneHistorySnapshot();
+  const currentSignature = getHistorySnapshotSignature(currentSnapshot);
+
+  if (!historyBaselineSnapshot) {
+    historyBaselineSnapshot = currentSnapshot;
+    historyBaselineSignature = currentSignature;
+    syncHistoryControls();
+    return;
+  }
+
+  if (currentSignature === historyBaselineSignature) {
+    syncHistoryControls();
+    return;
+  }
+
+  historyUndoStack.push(historyBaselineSnapshot);
+  if (historyUndoStack.length > HISTORY_STACK_LIMIT) {
+    historyUndoStack.shift();
+  }
+
+  historyBaselineSnapshot = currentSnapshot;
+  historyBaselineSignature = currentSignature;
+  historyRedoStack = [];
+  syncHistoryControls();
+}
+
+function restoreHistorySnapshot(snapshot) {
+  if (!snapshot) return false;
+  historyRestoreInProgress = true;
+
+  try {
+    titleData = JSON.parse(JSON.stringify(snapshot.meta || titleData));
+    appData = normalizeTripLegsData(JSON.parse(JSON.stringify(snapshot.itinerary || [])));
+    packingData = ensureDefaultPackingAreas(snapshot.packing || []);
+    leaveHomeData = JSON.parse(JSON.stringify(snapshot.leaveHome || []));
+    journeys = normalizeTripJourneysData(JSON.parse(JSON.stringify(snapshot.journeys || [])));
+    stays = normalizeTripStaysData(JSON.parse(JSON.stringify(snapshot.stays || [])));
+    citiesData = normalizeTripCitiesDateData(JSON.parse(JSON.stringify(snapshot.cities || [])));
+    userCities = JSON.parse(JSON.stringify(snapshot.userCities || []));
+    userCountries = JSON.parse(JSON.stringify(snapshot.userCountries || []));
+
+    window.journeys = journeys;
+    window.stays = stays;
+
+    const title = document.getElementById('mainTitle');
+    const subtitle = document.getElementById('mainSubtitle');
+    if (title) title.innerText = titleData.title || '';
+    if (subtitle) subtitle.innerText = titleData.subtitle || '';
+
+    if (typeof syncActiveFileDisplay === 'function') syncActiveFileDisplay();
+    if (typeof buildNav === 'function') buildNav();
+    if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+    else if (typeof buildItinerary === 'function') buildItinerary();
+    if (typeof buildTransportTab === 'function') buildTransportTab();
+    if (typeof buildAccomTab === 'function') buildAccomTab();
+    if (typeof buildBudgetTab === 'function') buildBudgetTab();
+    if (typeof buildPackingTab === 'function') buildPackingTab();
+    if (typeof buildJourneyMap === 'function') buildJourneyMap();
+    if (typeof populateCityList === 'function') populateCityList();
+  } finally {}
+
+  return true;
+}
+
+async function undoTripChange() {
+  if (historyUndoStack.length === 0) return false;
+
+  const snapshot = historyUndoStack.pop();
+  historyRedoStack.push(cloneHistorySnapshot());
+  try {
+    const restored = restoreHistorySnapshot(snapshot);
+    if (!restored) return false;
+
+    await saveData(false);
+  } finally {
+    historyRestoreInProgress = false;
+    syncHistoryControls();
+  }
+  return true;
+}
+
+async function redoTripChange() {
+  if (historyRedoStack.length === 0) return false;
+
+  const snapshot = historyRedoStack.pop();
+  historyUndoStack.push(cloneHistorySnapshot());
+  try {
+    const restored = restoreHistorySnapshot(snapshot);
+    if (!restored) return false;
+
+    await saveData(false);
+  } finally {
+    historyRestoreInProgress = false;
+    syncHistoryControls();
+  }
+  return true;
+}
+
 async function saveFileToDisk() {
   if (!await ensureActiveFileHandle()) return false;
 
@@ -728,6 +880,7 @@ function extractCitiesFromItinerary() {
 
   // 1. Extract from itinerary days (day.from/to) with date information
   appData.forEach(leg => {
+    if (!leg || !Array.isArray(leg.days)) return;
     leg.days.forEach(day => {
       addCity(day.from, day.date);
       addCity(day.to, day.date);
@@ -779,6 +932,7 @@ function extractCitiesFromItinerary() {
 
   // 4. Extract from cityId references in trip data
   appData.forEach(leg => {
+    if (!leg || !Array.isArray(leg.days)) return;
     (leg.cityFood || []).forEach(item => {
       if (item.cityId) addCityById(item.cityId);
     });
@@ -1718,6 +1872,7 @@ function migrateCitiesToISOFormat() {
 // Migrate leg-level entities to include cityId
 function migrateLegCityIds() {
   appData.forEach(leg => {
+    if (!leg || !Array.isArray(leg.days)) return;
     // Determine the primary city for this leg from the days
     let primaryCityId = '';
     const cityNames = new Set();
@@ -1785,6 +1940,7 @@ function migrateLegCityIds() {
 async function initData() {
   const previousSuppress = window.__suppressBackupTracking;
   window.__suppressBackupTracking = true;
+  historyTrackingSuspended = true;
   // Load journeys first, before any rendering happens
   const savedJourneys = localStorage.getItem('travelApp_journeys_v1');
   if (savedJourneys) {
@@ -1890,7 +2046,7 @@ async function initData() {
   appData = normalizeTripLegsData(appData);
 
   const savedPacking = localStorage.getItem('travelApp_packing_v3');
-  if (savedPacking) { packingData = JSON.parse(savedPacking); }
+  if (savedPacking) { packingData = ensureDefaultPackingAreas(JSON.parse(savedPacking)); }
   else { packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING)); }
 
   const savedLeaveHome = localStorage.getItem('travelApp_leavehome_v3');
@@ -1982,7 +2138,9 @@ if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title &&
     await saveData(false);
   } finally {
     window.__suppressBackupTracking = previousSuppress;
+    historyTrackingSuspended = false;
   }
+  resetHistoryState(cloneHistorySnapshot());
 
   // Journeys loaded at start of initData(), no additional init needed
 }
@@ -2017,6 +2175,8 @@ async function saveData(showTick = true) {
     const s = document.getElementById('mainSubtitle');
     if (t && t.innerText.trim()) titleData.title = t.innerText;
     if (s && s.innerText.trim()) titleData.subtitle = s.innerText;
+
+    captureHistoryBeforeSave();
 
     const useIndexedDB = await shouldUseIndexedDB();
 
@@ -2124,6 +2284,8 @@ function toLocalIsoDate(dateValue) {
 function normalizeTripLegsData(legs) {
   if (!Array.isArray(legs)) return [];
   legs.forEach(leg => {
+    if (!leg || typeof leg !== 'object') return;
+    if (!Array.isArray(leg.days)) leg.days = [];
     (leg.days || []).forEach(day => {
       day.date = normalizeTripDateValue(day.date);
     });
@@ -2392,6 +2554,25 @@ function migratePacking(data) {
     else { areas[1].categories.push(entry); }
   });
   return areas.filter(a => a.categories.length > 0);
+}
+
+function ensureDefaultPackingAreas(data) {
+  const areas = Array.isArray(data) ? JSON.parse(JSON.stringify(data)) : [];
+  const hasArea = (areaName) => areas.some(area => {
+    const currentName = String(area?.areaName || '').trim();
+    const targetName = String(areaName || '').trim();
+    if (!currentName || !targetName) return false;
+    if (currentName === targetName) return true;
+    return currentName.includes('Trip Notes') && targetName.includes('Trip Notes');
+  });
+
+  DEFAULT_PACKING.forEach(defaultArea => {
+    if (!hasArea(defaultArea.areaName)) {
+      areas.push(JSON.parse(JSON.stringify(defaultArea)));
+    }
+  });
+
+  return areas;
 }
 
 function getImportedDestinationCityNames(importedData) {
@@ -3349,7 +3530,7 @@ async function importJSON(event) {
 
       if (importedData.packing && Array.isArray(importedData.packing)) {
         const migrated = migratePacking(importedData.packing);
-        packingData = migrated || JSON.parse(JSON.stringify(DEFAULT_PACKING));
+        packingData = ensureDefaultPackingAreas(migrated || DEFAULT_PACKING);
       } else {
         packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING));
       }
@@ -3610,6 +3791,8 @@ window.openTripFile = openTripFile;
 window.openExistingTripFile = openExistingTripFile;
 window.saveFileToDisk = saveFileToDisk;
 window.getCurrentAppData = getCurrentAppData;
+window.undoTripChange = undoTripChange;
+window.redoTripChange = redoTripChange;
 window.hasActiveFileHandle = hasActiveFileHandle;
 window.hasFileWriteFailed = hasFileWriteFailed;
 window.isSavingToFile = isSavingToFile;
