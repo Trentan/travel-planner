@@ -74,7 +74,36 @@ Ready for the next adventure? Use the built-in AI Builder tab:
 Run the city import/navigation regression check after changing import, city submenu, transport, or itinerary mapping logic:
 
 ```powershell
-node scripts\regression-city-nav.js
+node tests\city-nav-regression.js
 ```
 
 The check uses `backups/2026_June_July_Europe_Thailand.json` and verifies city filtering, timeline order, transit city handling, journey-to-leg mapping, and key city nav scroll targets.
+
+## Automated Tests
+
+Run the full smoke/unit suite from the dedicated `tests/` folder before you push changes:
+
+```powershell
+npm test
+```
+
+That suite covers date normalization, transport date display, AI prompt generation, checklist merging, city navigation regression coverage, item 15 automation, and a real Chromium desktop/mobile browser pass.
+
+To run only the browser layer with the verbose coverage summary:
+
+```powershell
+npm run test:browser
+```
+
+To open Chromium and watch the interactions live:
+
+```powershell
+npm run test:browser:headed
+```
+
+You can also double-click [run-tests.bat](/C:/Apps/Projects/travel-planner/run-tests.bat) for the full suite or [run-browser-tests.bat](/C:/Apps/Projects/travel-planner/run-browser-tests.bat) for the visible browser run.
+
+Recommended workflow:
+1. Run `npm test` or double-click `run-tests.bat`.
+2. If you want to watch the UI, run `npm run test:browser:headed` or double-click `run-browser-tests.bat`.
+3. Confirm everything passes before committing or pushing branch changes.

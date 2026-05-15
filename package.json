@@ -1,0 +1,14 @@
+{
+  "name": "travel-planner",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "test:browser": "node tests/browser-suite.js",
+    "test:browser:headed": "node tests/browser-suite.js --headed --slowmo=400"
+  },
+  "devDependencies": {
+    "playwright": "^1.54.0"
+  }
+}

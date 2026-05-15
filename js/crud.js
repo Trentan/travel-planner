@@ -313,8 +313,8 @@ function closeAddLegDialog() {
   const newCityName = document.getElementById('newLegCityName');
   const countrySelect = document.getElementById('newLegCityCountrySelect');
   const countryOther = document.getElementById('newLegCityCountryOther');
-  const fromDate = document.getElementById('legDateFrom');
-  const toDate = document.getElementById('legDateTo');
+  const fromDate = document.getElementById('newLegStartDate');
+  const toDate = document.getElementById('newLegEndDate');
 
   if (existingCitySelect) existingCitySelect.value = '';
   if (newCityName) newCityName.value = '';
@@ -354,8 +354,8 @@ function checkDateConflict(dateStr, excludeLegIdx) {
 
 function confirmAddLeg() {
   const legType = document.getElementById('legTypeSelect')?.value || 'city';
-  const dateFrom = document.getElementById('legDateFrom')?.value;
-  const dateTo = document.getElementById('legDateTo')?.value;
+  const dateFrom = document.getElementById('newLegStartDate')?.value;
+  const dateTo = document.getElementById('newLegEndDate')?.value;
 
   // Check for date conflicts
   if (dateFrom && dateTo) {

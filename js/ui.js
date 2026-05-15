@@ -82,7 +82,8 @@ function syncModeToggleButtons() {
 function saveUiSettings() {
   localStorage.setItem('travelApp_uiSettings_v1', JSON.stringify({
     isCompactView,
-    isEditMode
+    isEditMode,
+    isFunMode
   }));
 }
 
@@ -95,7 +96,7 @@ function applyUiSettings() {
   }
 
   if (savedSettings) {
-    isFunMode = false;
+    isFunMode = savedSettings.isFunMode === true;
     isCompactView = !!savedSettings.isCompactView;
     isEditMode = savedSettings.isEditMode !== false;
   } else if (isMobileViewport()) {
