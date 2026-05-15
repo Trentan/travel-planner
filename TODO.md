@@ -27,6 +27,7 @@ Read this file at the start of every session. When using Claude Code, read from 
 
 ### Item 15: Convert the testing checklist into structured TODO items and add an actual testing suite for actual smoke / unit tests to be used between changes for core functionality.
 - [ ] 15a. Open `index.html` in a browser and confirm the app loads without errors.
+- [ ] 15a. Open `index.html` in a browser, launcher developer tools and mobile mode - check no errors and all tabs load and confirm the app loads without errors.
 - [ ] 15b. Create, edit, and delete items in all tabs.
 - [ ] 15c. Drag sights/runs from the pool to day cards.
 - [ ] 15d. Toggle Fun Mode and Read Only Mode; confirm the UI updates correctly.
@@ -38,30 +39,37 @@ Read this file at the start of every session. When using Claude Code, read from 
 - [ ] 15j. Confirm the Service Worker registers in browser DevTools.
 - [ ] 15k. Test print views for both Summary and Detailed modes.
 - [ ] 15l. Run `node scripts/smoke-core.js` to cover date normalization, transport display dates, and AI prompt generation.
+- [ ] 15m. File save and load functionality testing, saving locally, backup prompt checking
 
-### Item 16: Convert the Future Enhancements checklist into structured backlog items, checking whether any are already resolved.
-- [ ] 16a. Cloud file management and autosave or backup instead of keeping everything in browser memory. - Cloud sync, for example Firebase or Dropbox or Google Drive?
-- [ ] 16b. Search/filter functionality.
-- [ ] 16c. Cannot change the cost or duration of an activity In itinerary tab)?
-- [ ] 16c. I want a way to export all the content into an easily interpreted itinerary from all the selections so I can ask ai for review, similar to the json but more text based, is there an action that could be created for this and added to menu. It could be nice text based / aasci art too so could be emailed to friends etc. make sure it has an option to hide important info (eg pnr, booking numbers, costs etc). On that note the json export could have similar options too so it can be shared.
-- [ ] 16c. There should be a way to email some with a filtered json - saying "hey check out my cool itinerary, just launch the site and load my attached file" with a link to the github hosted site and the filtered json file (depending on how you want to filter it)
-- [ ] 16c. Undo/redo system.
-- [ ] 16d. Trip sharing/export formats such as PDF or Google Docs.
-- [ ] 16e. Change colors for cities.
-- [ ] 16g. Add or subtract a day to an existing leg. (but maybe warn if conflict)
-- [ ] 16h. Add a Notes tab with a generic checklist.
-- [ ] 16i. Dark mode toggle.
-- [ ] 16j. Activity time planning / schedule (when added to doing can set the time to start eg 9am and make sure no overlaps other activities) .
-- [ ] 16k. Flight miles tracking / estimates (in budget)
-- [ ] 16l. Budget category breakdown.
-- [ ] 16m. Image upload for receipts.
-- [ ] 16n. Multi-user collaboration.
-- [ ] 16o. Ability to export trip, hide private data like booking references and share with other people to view
-- [ ] 16p. The map / legs are kinda useless, the map is not that clear to see / realistic and can't really move through it - needs improvement
+### Item 16: File storage, sharing, and export
+- [ ] 16a. Trip sharing/export formats such as PDF or Google Docs / Excel. 
+- [x] 16b. Export all content into an easily interpreted text itinerary for AI review or sharing, including a nice text-based / ASCII-art version.
+- [ ] 16c. Printing the itinerary needs BIG clean up (perhaps can be removed now the file share and text export options)
+- [ ] 16c. Maybe create a share button? - Export a filtered JSON file share file with private data hidden, so someone can load it into the site. Perhaps have a dialog with options ofwhat you want to hide (eg costs, pnr/booking numbers). You could either save it or have the option to email There should be a way to email some with a filtered json - saying "hey check out my cool itinerary, just launch the site and load my attached file" with a link to the github hosted site and the filtered json file (depending on how you want to filter it)
+
+### Item 17: Trip editing and planning workflow
+- [ ] 17a. Search/filter functionality.
+- [ ] 17b. Change the cost or duration of an activity in the itinerary tab.
+- [ ] 17c. Add or subtract a day to an existing leg, with a warning if it causes conflicts.
+- [ ] 17d. Undo/redo system.
+- [ ] 17e. Add a Notes tab with a generic checklist.
+- [ ] 17f. Activity time planning / schedule, so added items can start at a chosen time and avoid overlaps.
+
+### Item 18: Presentation, maps, and trip analytics
+- [ ] 18a. Change colors for cities.
+- [ ] 18b. Dark mode toggle.
+- [ ] 18c. Flight miles tracking / estimates in the budget.
+- [ ] 18d. Budget category breakdown.
+- [ ] 18e. Image upload for receipts.
+- [ ] 18f. Improve the map icon and the map view so it is clearer and more usable.
+
 ## Noticed
 
 Add bugs or improvements spotted during work here. Do not fix unless they are part of the active task.
 
 - [ ] None currently.
 
+
+## Future
+- [ ] If a proper hosted app - -Multi-user collaboration potential? + file backups etc
 ---
