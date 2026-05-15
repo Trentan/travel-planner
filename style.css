@@ -1401,6 +1401,7 @@ body.mobile-app-mode .timestamp-status {
 body.mobile-app-mode .app-menu-right {
   width: 100%;
   order: 2;
+  justify-content: flex-end;
   gap: 0.45rem;
 }
 
@@ -1412,6 +1413,16 @@ body.mobile-app-mode .app-menu-right .app-menu-btn:not(.mobile-menu-btn) {
   font-size: 0.76rem;
   min-height: 38px;
   padding: 0.5rem 0.75rem;
+}
+
+body.mobile-app-mode .app-menu-right .app-menu-switch {
+  flex: 0 0 auto;
+  max-width: calc(100% - 72px);
+}
+
+body.mobile-app-mode .app-menu-right .mobile-menu-btn {
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 body.mobile-app-mode.compact-view-mode .tab-label {
