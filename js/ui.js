@@ -63,7 +63,7 @@ function syncModeToggleButtons() {
     },
     {
       ids: ['compactToggleBtn', 'mobileCompactToggleBtn'],
-      label: isCompactView ? '📄 Exit Compact' : '📄 Compact View',
+      label: isCompactView ? '📄 Compact mode' : '📄 Detailed mode',
       activeClass: 'active-mode',
       isActive: isCompactView
     }
@@ -74,6 +74,7 @@ function syncModeToggleButtons() {
       const btn = document.getElementById(id);
       if (!btn) return;
       btn.innerHTML = label;
+      btn.setAttribute('aria-pressed', String(isActive));
       btn.classList.toggle(activeClass, isActive);
     });
   });
@@ -118,34 +119,6 @@ function applyUiSettings() {
   const subtitle = document.getElementById('mainSubtitle');
   if (title) title.contentEditable = isEditMode;
   if (subtitle) subtitle.contentEditable = isEditMode;
-}
-
-function toggleCompactView() {
-  isCompactView = !isCompactView;
-  saveUiSettings();
-
-  // Sync to window for cross-module access
-  window.isCompactView = isCompactView;
-
-  document.body.classList.toggle('compact-view-mode', isCompactView);
-
-  const btn = document.getElementById('compactToggleBtn');
-  if(isCompactView) {
-    btn.innerHTML = "📄 Exit Compact";
-    btn.classList.add('active-mode');
-  } else {
-    btn.innerHTML = "📄 Compact View";
-    btn.classList.remove('active-mode');
-  }
-
-  applyUiSettings();
-  const activeTabBtn = document.querySelector('.app-tab-btn.active');
-  if (activeTabBtn && activeTabBtn.dataset.tab) {
-    switchTab(activeTabBtn.dataset.tab, activeTabBtn);
-  } else {
-    buildItinerary();
-    buildPackingTab();
-  }
 }
 
 function toggleMode() {

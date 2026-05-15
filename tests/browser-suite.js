@@ -203,7 +203,7 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     assert(await page.locator('#itinerary .activity-item').count() > 0, 'Desktop: drag/drop should add an activity item to a day');
     reporter.add('desktop', 'drag drop', 'dragged a sight into a day card');
 
-    await page.getByRole('button', { name: /Compact View/i }).click();
+    await page.locator('#compactToggleBtn').click();
     await page.waitForFunction(() => document.body.classList.contains('compact-view-mode'));
     reporter.add('desktop', 'compact toggle', 'compact mode applied');
 
@@ -254,6 +254,11 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     assert(errors.length === 0, `Mobile page errors: ${errors.join(' | ')}`);
     assert(await page.locator('body.mobile-app-mode').count() === 1, 'Mobile: body should be in mobile mode');
     assert(await page.locator('body.compact-view-mode').count() === 1, 'Mobile: compact view should be enabled');
+    assert(await page.locator('#compactToggleBtn').count() === 1, 'Mobile: compact toggle should be visible in the top bar');
+    await page.locator('#compactToggleBtn').click();
+    await page.waitForFunction(() => !document.body.classList.contains('compact-view-mode'));
+    await humanPause(page, 350);
+    reporter.add('mobile', 'compact top-bar toggle', 'compact mode toggled from the top bar');
     await humanPause(page, 400);
 
     for (const tabId of ['transport', 'accom', 'budget', 'packing']) {
@@ -270,6 +275,11 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await page.waitForFunction(() => document.body.classList.contains('read-only-mode'));
     await humanPause(page, 350);
     reporter.add('mobile', 'read-only toggle', 'read-only mode toggled');
+
+    await page.locator('#compactToggleBtn').click();
+    await page.waitForFunction(() => document.body.classList.contains('compact-view-mode'));
+    await humanPause(page, 350);
+    reporter.add('mobile', 'compact top-bar toggle', 'compact mode toggled back on from the top bar');
 
     await page.locator('.mobile-menu-btn').click();
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));

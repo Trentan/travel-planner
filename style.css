@@ -552,10 +552,8 @@ main {
   .app-menu-right::-webkit-scrollbar { display: none; }
   .app-menu-right > span,
   .app-menu-right .app-menu-btn:not(.mobile-menu-btn):not(#editToggleBtn):not(#compactToggleBtn) { display: none; }
-  #editToggleBtn,
-  #compactToggleBtn {
-    display: none;
-  }
+  #editToggleBtn { display: none; }
+  #compactToggleBtn { display: inline-flex; }
   .mobile-menu-btn { display: inline-flex; }
   .app-menu-btn {
     flex: 0 0 auto;

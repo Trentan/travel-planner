@@ -24,6 +24,7 @@ Read this file at the start of every session. When using Claude Code, read from 
 - [x] 14e. Remove the home / destination clocks from the mobile shell.
 - [x] 14f. Unify transport and accommodation mobile table rendering, shared action buttons, and modal delete actions.
 - [ ] 14g. Final mobile visual review for the table parity work.
+- [ ] 14h. Make compact view a persistent toggle called Detailed mode / Compact mode, always visible on desktop and mobile.
 
 ### Item 16: File storage, sharing, and export
 ~~- [ ] 16a. Trip sharing/export formats such as PDF or Google Docs / Excel.~~ Abandoned
@@ -43,8 +44,8 @@ Read this file at the start of every session. When using Claude Code, read from 
   - Conflict handling: warn and confirm if proceeding would overwrite the current leg; the user can adjust it or abort.
 - [x] 17d. Undo/redo system.
   - Resolution: should cover anything in case of accidental changes, not just itinerary edits.
-- [ ] 17e. Add a Notes tab with a generic checklist.
-  - Resolution: make it similar to Packing, but still editable to personal needs.
+- [x] 17e. Add a Notes option into the Packing tab with a generic checklist.
+  - Resolution: integrate notes into Packing as a dedicated notes area that stays editable to personal needs.
 - [ ] 17f. Activity time planning / schedule, so added items can start at a chosen time and avoid overlaps.
   - Resolution: suggested scheduling only, with warnings rather than hard overlap blocking.
 
