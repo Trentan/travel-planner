@@ -25,27 +25,13 @@ Read this file at the start of every session. When using Claude Code, read from 
 - [x] 14f. Unify transport and accommodation mobile table rendering, shared action buttons, and modal delete actions.
 - [ ] 14g. Final mobile visual review for the table parity work.
 
-### Item 15: Convert the testing checklist into structured TODO items and add an actual testing suite for actual smoke / unit tests to be used between changes for core functionality.
-- [x] 15a. Desktop browser smoke: open `index.html` and confirm the app loads without console errors.
-- [x] 15b. Mobile browser smoke: open `index.html` with DevTools mobile emulation and confirm all tabs render without errors.
-- [x] 15c. CRUD smoke: create, edit, and delete items in all tabs.
-- [x] 15d. Drag-and-drop smoke: drag sights/runs from the pool to day cards.
-- [x] 15e. Mode toggles: toggle Fun Mode and Read Only Mode; confirm the UI updates correctly.
-- [x] 15f. Compact view smoke: toggle Compact View; confirm layout switches and checkboxes still work.
-- [x] 15g. Export smoke: export JSON and confirm the file downloads with correct data.
-- [x] 15h. Import smoke: import JSON and confirm data loads and renders properly.
-- [x] 15i. Budget smoke: change budget costs and confirm calculations update.
-- [x] 15j. Packing smoke: check and uncheck packing items; confirm state persists after refresh.
-- [x] 15k. Service worker smoke: confirm the Service Worker registers in browser DevTools.
-- [x] 15l. Print smoke: test print views for both Summary and Detailed modes.
-- [x] 15m. Automated core checks: run `node tests/run-tests.js` to cover date normalization, transport display dates, AI prompt generation, and city navigation regression coverage.
-- [x] 15n. File save/load smoke: test local save/load and backup prompt handling.
-
 ### Item 16: File storage, sharing, and export
-- [ ] 16a. Trip sharing/export formats such as PDF or Google Docs / Excel. 
+~~- [ ] 16a. Trip sharing/export formats such as PDF or Google Docs / Excel.~~ Abandoned
 - [x] 16b. Export all content into an easily interpreted text itinerary for AI review or sharing, including a nice text-based / ASCII-art version.
-- [ ] 16c. Printing the itinerary needs BIG clean up (perhaps can be removed now the file share and text export options)
-- [ ] 16c. Maybe create a share button? - Export a filtered JSON file share file with private data hidden, so someone can load it into the site. Perhaps have a dialog with options ofwhat you want to hide (eg costs, pnr/booking numbers). You could either save it or have the option to email There should be a way to email some with a filtered json - saying "hey check out my cool itinerary, just launch the site and load my attached file" with a link to the github hosted site and the filtered json file (depending on how you want to filter it)
+- [x] 16c. Printing the itinerary needs BIG clean up (perhaps can be removed now the file share and text export options)
+- [x] 16c. Maybe create a share button? - Export a filtered JSON file share file with private data hidden, so someone can load it into the site. Perhaps have a dialog with options ofwhat you want to hide (eg costs, pnr/booking numbers). You could either save it or have the option to email There should be a way to email some with a filtered json - saying "hey check out my cool itinerary, just launch the site and load my attached file" with a link to the github hosted site and the filtered json file (depending on how you want to filter it)
+- [x] 16d. Ensure the AI Builder /  Generate AI prompt is now handling the new json formatting for EVERYTHING
+- [x] 16e Share Export should have the ability to email people directly from the app, and it send a link to the app location (https://trentan.github.io/travel-planner/) with the json attached and check out my cool app / itinerary and load the attached file from your friend etc.
 
 ### Item 17: Trip editing and planning workflow
 - [ ] 17a. Search/filter functionality.
@@ -73,3 +59,4 @@ Add bugs or improvements spotted during work here. Do not fix unless they are pa
 ## Future
 - [ ] If a proper hosted app - -Multi-user collaboration potential? + file backups etc
 ---
+

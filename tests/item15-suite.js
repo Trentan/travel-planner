@@ -31,11 +31,6 @@ function state(context) {
   return context.getCurrentAppData();
 }
 
-function setPrintMode(app, mode) {
-  app.document.getElementById('printStyleSummary').checked = mode === 'summary';
-  app.document.getElementById('printStyleDetailed').checked = mode === 'detailed';
-}
-
 async function testDesktopSmoke() {
   const app = createBootedApp();
   assertBootClean(app, 'Desktop smoke');
@@ -260,6 +255,85 @@ async function testExportImport() {
   assert(state(context).meta.title === 'Export Test', 'Import: should reload title');
 }
 
+async function testShareExport() {
+  const app = createBootedApp();
+  const { context } = app;
+  assertBootClean(app, 'Share export');
+
+  context.addDayItem(0, 0, 'activityItems');
+  context.updateDayItemText(0, 0, 'activityItems', 0, 'Secret dinner');
+  context.updateDayItemCost(0, 0, 'activityItems', 0, '88');
+  const journey = context.createJourneyFromTransportItem(
+    { text: 'Secret flight', cost: '900', status: 'booked', bookingRef: 'PNR-123' },
+    state(context).itinerary[0].id,
+    state(context).itinerary[0].days[0].date,
+    state(context).itinerary[0].days[0].from,
+    'Tokyo'
+  );
+  context.updateJourneyBookingRef(journey.id, 'PNR-123');
+  context.updateJourneyCost(journey.id, '910');
+
+  context.openShareExportDialog();
+  app.document.getElementById('shareHideCosts').checked = true;
+  app.document.getElementById('shareHideRefs').checked = true;
+  app.document.getElementById('shareHideNotes').checked = false;
+
+  await context.exportShareJSON();
+  const exported = JSON.parse(decodeDownloadUri(app.document.lastDownload.href));
+
+  assert(app.document.lastDownload.download.endsWith('_share.json'), 'Share export: download should use the share suffix');
+  assert(exported.meta.redactions.costs === true, 'Share export: export should record cost redaction');
+  assert(exported.meta.redactions.bookingRefs === true, 'Share export: export should record booking ref redaction');
+  assert(exported.itinerary[0].days[0].activityItems[0].cost === '', 'Share export: itinerary item cost should be hidden');
+  assert(exported.journeys[0].bookingReference === '', 'Share export: booking reference should be hidden');
+}
+
+async function testShareEmail() {
+  const app = createBootedApp();
+  const { context } = app;
+  assertBootClean(app, 'Share email');
+
+  context.openShareExportDialog();
+  app.document.getElementById('shareHideCosts').checked = true;
+  app.document.getElementById('shareHideRefs').checked = true;
+  app.document.getElementById('shareHideNotes').checked = true;
+
+  await context.exportShareEmail();
+
+  const downloadEntry = app.downloads.find(entry => entry.download && entry.download.endsWith('_share.json'));
+  const mailtoEntry = [...app.downloads].reverse().find(entry => String(entry.href || '').startsWith('mailto:'));
+
+  assert(downloadEntry, 'Share email: should still download a JSON attachment');
+  assert(mailtoEntry, 'Share email: should open a mailto link');
+  assert(String(mailtoEntry.href).startsWith('mailto:?'), 'Share email: should open a blank draft');
+
+  const mailtoQuery = String(mailtoEntry.href).split('?')[1] || '';
+  const mailtoText = decodeURIComponent(mailtoQuery.replace(/\+/g, '%20'));
+  assert(mailtoText.includes('https://trentan.github.io/travel-planner/'), 'Share email: body should include the app link');
+  assert(mailtoText.includes('attached JSON file'), 'Share email: body should mention the JSON attachment');
+  assert(mailtoText.includes('subject='), 'Share email: should include a subject line');
+}
+
+async function testShareEmailDraft() {
+  const app = createBootedApp();
+  const { context } = app;
+  assertBootClean(app, 'Share email draft');
+
+  context.openShareExportDialog();
+  app.document.getElementById('shareHideCosts').checked = true;
+  app.document.getElementById('shareHideRefs').checked = true;
+  app.document.getElementById('shareHideNotes').checked = false;
+  context.refreshShareEmailDraft();
+
+  const draft = app.document.getElementById('shareEmailDraft').value;
+  assert(draft.includes('Subject: Travel Planner itinerary:'), 'Share email draft: should include a subject line');
+  assert(draft.includes('https://trentan.github.io/travel-planner/'), 'Share email draft: should include the app link');
+  assert(draft.includes('attached JSON file'), 'Share email draft: should mention the attachment');
+
+  await context.copyShareEmailDraft();
+  assert(app.context.navigator.lastClipboardText === draft, 'Share email draft: copy should write the draft to clipboard');
+}
+
 async function testBudgetUpdates() {
   const app = createBootedApp();
   const { context } = app;
@@ -299,29 +373,6 @@ async function testServiceWorkerRegistration() {
   assert(app.serviceWorkerRegistrations[0].scriptURL === './sw.js', 'Service worker: should register sw.js');
 }
 
-async function testPrintViews() {
-  const app = createBootedApp();
-  const { context } = app;
-  assertBootClean(app, 'Print views');
-
-  context.openPrintPreview();
-  setPrintMode(app, 'summary');
-  context.updatePrintPreview();
-  const summary = app.document.getElementById('printPreviewContent').innerHTML;
-  assert(summary.includes('Preview'), 'Print views: summary preview should render');
-
-  setPrintMode(app, 'detailed');
-  context.updatePrintPreview();
-  const detailed = app.document.getElementById('printPreviewContent').innerHTML;
-  assert(detailed.length >= summary.length, 'Print views: detailed preview should be at least as verbose');
-
-  context.printPage('summary');
-  assert(app.printCalled(), 'Print views: print should be called');
-  assert(app.document.body.classList.contains('print-summary'), 'Print views: summary class should apply');
-  app.flushTimers();
-  assert(!app.document.body.classList.contains('print-summary'), 'Print views: summary class should restore');
-}
-
 async function testFileSaveLoadAndBackup() {
   const sharedLocalStorage = createBrowserHarness().localStorage;
   const first = createBootedApp({ sharedLocalStorage });
@@ -358,10 +409,12 @@ async function run() {
   await testModeToggles();
   await testCompactView();
   await testExportImport();
+  await testShareExport();
+  await testShareEmail();
+  await testShareEmailDraft();
   await testBudgetUpdates();
   await testPackingPersistence();
   await testServiceWorkerRegistration();
-  await testPrintViews();
   await testFileSaveLoadAndBackup();
   console.log('Item 15 automated suite passed');
 }

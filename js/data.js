@@ -2527,6 +2527,116 @@ function getIntermediateJourneyCities(journeysData) {
   return [...new Set(transitCities)];
 }
 
+const SHARE_APP_URL = 'https://trentan.github.io/travel-planner/';
+
+function cloneExportValue(value) {
+  return JSON.parse(JSON.stringify(value ?? null));
+}
+
+function getDownloadName(baseName, fallbackName, suffix, extension) {
+  if (!baseName || baseName === 'Default Template') {
+    return fallbackName.endsWith(extension) ? fallbackName : `${fallbackName}${extension}`;
+  }
+  const stripped = String(baseName).replace(/\.json$/i, '');
+  return `${stripped}${suffix}${extension}`;
+}
+
+function buildExportPayload() {
+  let journeysData = [];
+  if (typeof journeys !== 'undefined') journeysData = normalizeTripJourneysData(cloneExportValue(journeys));
+  let staysData = [];
+  if (typeof stays !== 'undefined') staysData = normalizeTripStaysData(cloneExportValue(stays));
+  let citiesDataToExport = [];
+  if (typeof citiesData !== 'undefined') citiesDataToExport = normalizeTripCitiesDateData(cloneExportValue(citiesData));
+  let userCitiesData = [];
+  if (typeof userCities !== 'undefined') userCitiesData = cloneExportValue(userCities);
+  let userCountriesData = [];
+  if (typeof userCountries !== 'undefined') userCountriesData = cloneExportValue(userCountries);
+  const itineraryData = normalizeTripLegsData(cloneExportValue(appData));
+
+  return {
+    meta: cloneExportValue(titleData),
+    itinerary: itineraryData,
+    packing: cloneExportValue(packingData),
+    leaveHome: cloneExportValue(leaveHomeData),
+    journeys: journeysData,
+    stays: staysData,
+    cities: citiesDataToExport,
+    userCities: userCitiesData,
+    userCountries: userCountriesData
+  };
+}
+
+function redactShareExportPayload(exportObj, options = {}) {
+  const payload = cloneExportValue(exportObj) || {};
+  const redactCosts = !!options.redactCosts;
+  const redactRefs = !!options.redactRefs;
+  const redactNotes = !!options.redactNotes;
+
+  const redactBookingFields = item => {
+    if (!item || typeof item !== 'object') return;
+    if (redactCosts && 'cost' in item) item.cost = '';
+    if (redactCosts && 'totalCost' in item) item.totalCost = '';
+    if (redactRefs) {
+      if ('bookingRef' in item) item.bookingRef = '';
+      if ('bookingReference' in item) item.bookingReference = '';
+      if ('pnr' in item) item.pnr = '';
+      if ('confirmationNumber' in item) item.confirmationNumber = '';
+    }
+    if (redactNotes && 'notes' in item) item.notes = '';
+  };
+
+  if (Array.isArray(payload.itinerary)) {
+    payload.itinerary.forEach(leg => {
+      if (!leg || typeof leg !== 'object') return;
+      if (redactNotes) {
+        if ('notes' in leg) leg.notes = '';
+        if (Array.isArray(leg.legTips)) {
+          leg.legTips = leg.legTips.map(() => '').filter(Boolean);
+        }
+        (leg.days || []).forEach(day => {
+          if (day && typeof day === 'object' && 'desc' in day) day.desc = '';
+        });
+      }
+
+      (leg.days || []).forEach(day => {
+        (day.transportItems || []).forEach(redactBookingFields);
+        (day.accomItems || []).forEach(redactBookingFields);
+        (day.activityItems || []).forEach(redactBookingFields);
+      });
+    });
+  }
+
+  if (Array.isArray(payload.journeys)) {
+    payload.journeys.forEach(redactBookingFields);
+  }
+
+  if (Array.isArray(payload.stays)) {
+    payload.stays.forEach(redactBookingFields);
+  }
+
+  payload.meta = payload.meta || {};
+  payload.meta.exportKind = 'share';
+  payload.meta.redactions = {
+    costs: redactCosts,
+    bookingRefs: redactRefs,
+    notes: redactNotes
+  };
+
+  return payload;
+}
+
+function downloadTextFile(content, downloadName, mimeType = 'text/plain') {
+  const dataStr = `data:${mimeType};charset=utf-8,` + encodeURIComponent(content);
+  const downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute('href', dataStr);
+  downloadAnchorNode.setAttribute('download', downloadName);
+  document.body.appendChild(downloadAnchorNode);
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
+  return downloadAnchorNode;
+}
+
 async function exportJSON() {
   const previousSuppress = window.__suppressBackupTracking;
   window.__suppressBackupTracking = true;
@@ -2535,36 +2645,225 @@ async function exportJSON() {
   } finally {
     window.__suppressBackupTracking = previousSuppress;
   }
-  // Get journeys if they exist
-  let journeysData = [];
-  if (typeof journeys !== 'undefined') journeysData = normalizeTripJourneysData(JSON.parse(JSON.stringify(journeys)));
-  let staysData = [];
-  if (typeof stays !== 'undefined') staysData = normalizeTripStaysData(JSON.parse(JSON.stringify(stays)));
-  // Get cities - include all cities from citiesData
-  let citiesDataToExport = [];
-  if (typeof citiesData !== 'undefined') citiesDataToExport = normalizeTripCitiesDateData(JSON.parse(JSON.stringify(citiesData)));
-  // Get user customizations
-  let userCitiesData = [];
-  if (typeof userCities !== 'undefined') userCitiesData = userCities;
-  let userCountriesData = [];
-  if (typeof userCountries !== 'undefined') userCountriesData = userCountries;
-  const itineraryData = normalizeTripLegsData(JSON.parse(JSON.stringify(appData)));
-  const exportObj = { meta: titleData, itinerary: itineraryData, packing: packingData, leaveHome: leaveHomeData, journeys: journeysData, stays: staysData, cities: citiesDataToExport, userCities: userCitiesData, userCountries: userCountriesData };
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
-  const downloadAnchorNode = document.createElement('a');
-  downloadAnchorNode.setAttribute("href", dataStr);
-
-  let dlName = currentFileName;
-  if(dlName === "Default Template") dlName = "travel_planner_backup.json";
-
-  downloadAnchorNode.setAttribute("download", dlName);
-  document.body.appendChild(downloadAnchorNode);
-  downloadAnchorNode.click();
-  downloadAnchorNode.remove();
+  const exportObj = buildExportPayload();
+  const dlName = currentFileName === 'Default Template' ? 'travel_planner_backup.json' : currentFileName;
+  downloadTextFile(JSON.stringify(exportObj, null, 2), dlName, 'application/json');
 
   // Record export timestamp
   localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
   localStorage.setItem('travelApp_last_export_filename', dlName);
+}
+
+function getShareExportOptions() {
+  return {
+    redactCosts: document.getElementById('shareHideCosts')?.checked ?? false,
+    redactRefs: document.getElementById('shareHideRefs')?.checked ?? true,
+    redactNotes: document.getElementById('shareHideNotes')?.checked ?? false
+  };
+}
+
+function openShareExportDialog() {
+  const modal = document.getElementById('share-export-modal');
+  if (modal) modal.style.display = 'flex';
+  if (typeof refreshShareEmailDraft === 'function') refreshShareEmailDraft();
+}
+
+function closeShareExportDialog() {
+  const modal = document.getElementById('share-export-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function buildShareEmailSubject(tripTitle) {
+  return `Travel Planner itinerary: ${formatTextValue(tripTitle, 'Travel Planner')}`;
+}
+
+function buildShareEmailBody({ tripTitle, downloadName, redactions = {}, includeAttachmentNote = false }) {
+  const lines = [
+    `Check out my Travel Planner itinerary: ${formatTextValue(tripTitle, 'Travel Planner')}.`,
+    SHARE_APP_URL,
+    '',
+    `Open the app above and load the attached JSON file (${formatTextValue(downloadName, 'travel_planner_share.json')}).`
+  ];
+
+  if (redactions.costs || redactions.bookingRefs || redactions.notes) {
+    const parts = [];
+    if (redactions.costs) parts.push('costs');
+    if (redactions.bookingRefs) parts.push('booking refs / PNRs');
+    if (redactions.notes) parts.push('notes');
+    lines.push('', `This share export hides: ${parts.join(', ')}.`);
+  }
+
+  if (includeAttachmentNote) {
+    lines.push('', 'If your mail app does not attach the JSON automatically, use the downloaded file and attach it before sending.');
+  }
+
+  return lines.join('\n');
+}
+
+function buildShareMailtoHref(recipient, subject, body) {
+  const safeRecipient = escapeTextValue(recipient);
+  const params = [
+    `subject=${encodeURIComponent(subject)}`,
+    `body=${encodeURIComponent(body)}`
+  ].join('&');
+  return `mailto:${safeRecipient}?${params}`;
+}
+
+function openMailtoLink(mailtoHref) {
+  const link = document.createElement('a');
+  link.setAttribute('href', mailtoHref);
+  link.setAttribute('rel', 'noreferrer');
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+function buildShareEmailDraft() {
+  const exportObj = redactShareExportPayload(buildExportPayload(), getShareExportOptions());
+  const dlName = getDownloadName(currentFileName, 'travel_planner_share', '_share', '.json');
+  const tripTitle = formatTextValue(titleData?.title, 'Travel Planner');
+  const subject = buildShareEmailSubject(tripTitle);
+  const body = buildShareEmailBody({
+    tripTitle,
+    downloadName: dlName,
+    redactions: exportObj.meta?.redactions || {},
+    includeAttachmentNote: false
+  });
+
+  return `Subject: ${subject}\n\n${body}`;
+}
+
+function refreshShareEmailDraft() {
+  const draftArea = document.getElementById('shareEmailDraft');
+  if (!draftArea) return '';
+  const draft = buildShareEmailDraft();
+  draftArea.value = draft;
+  return draft;
+}
+
+async function copyShareEmailDraft() {
+  const draftArea = document.getElementById('shareEmailDraft');
+  const draft = draftArea && typeof draftArea.value === 'string' ? draftArea.value : refreshShareEmailDraft();
+
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(draft);
+    } else if (draftArea && typeof draftArea.select === 'function' && typeof document.execCommand === 'function') {
+      draftArea.select();
+      document.execCommand('copy');
+    } else {
+      throw new Error('Clipboard API unavailable');
+    }
+
+    alert('Email draft copied to clipboard.');
+    return true;
+  } catch (error) {
+    if (draftArea && typeof draftArea.select === 'function' && typeof document.execCommand === 'function') {
+      draftArea.select();
+      const copied = document.execCommand('copy');
+      if (copied) {
+        alert('Email draft copied to clipboard.');
+        return true;
+      }
+    }
+
+    alert('Could not copy automatically. Select the draft and copy it manually.');
+    return false;
+  }
+}
+
+async function exportShareJSON() {
+  const previousSuppress = window.__suppressBackupTracking;
+  window.__suppressBackupTracking = true;
+  try {
+    await saveData(false);
+  } finally {
+    window.__suppressBackupTracking = previousSuppress;
+  }
+
+  const exportObj = redactShareExportPayload(buildExportPayload(), getShareExportOptions());
+  const dlName = getDownloadName(currentFileName, 'travel_planner_share', '_share', '.json');
+  const content = JSON.stringify(exportObj, null, 2);
+  const title = formatTextValue(titleData?.title, 'Travel Planner');
+
+  if (typeof navigator !== 'undefined' && navigator && typeof navigator.share === 'function' && typeof File === 'function') {
+    try {
+      const file = new File([content], dlName, { type: 'application/json' });
+      if (typeof navigator.canShare !== 'function' || navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title,
+          text: 'Shared Travel Planner itinerary',
+          files: [file]
+        });
+        localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
+        localStorage.setItem('travelApp_last_export_filename', dlName);
+        closeShareExportDialog();
+        return true;
+      }
+    } catch (error) {
+      console.warn('Native share failed, falling back to download:', error);
+    }
+  }
+
+  downloadTextFile(content, dlName, 'application/json');
+  localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
+  localStorage.setItem('travelApp_last_export_filename', dlName);
+  closeShareExportDialog();
+  return true;
+}
+
+async function exportShareEmail() {
+  const previousSuppress = window.__suppressBackupTracking;
+  window.__suppressBackupTracking = true;
+  try {
+    await saveData(false);
+  } finally {
+    window.__suppressBackupTracking = previousSuppress;
+  }
+
+  const exportObj = redactShareExportPayload(buildExportPayload(), getShareExportOptions());
+  const dlName = getDownloadName(currentFileName, 'travel_planner_share', '_share', '.json');
+  const content = JSON.stringify(exportObj, null, 2);
+  const title = formatTextValue(titleData?.title, 'Travel Planner');
+  const subject = buildShareEmailSubject(title);
+  const body = buildShareEmailBody({
+    tripTitle: title,
+    downloadName: dlName,
+    redactions: exportObj.meta?.redactions || {},
+    includeAttachmentNote: true
+  });
+  const mailtoHref = buildShareMailtoHref('', subject, body);
+
+  if (typeof navigator !== 'undefined' && navigator && typeof navigator.share === 'function' && typeof File === 'function') {
+    try {
+      const file = new File([content], dlName, { type: 'application/json' });
+      if (typeof navigator.canShare !== 'function' || navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: subject,
+          text: buildShareEmailBody({
+            tripTitle: title,
+            downloadName: dlName,
+            redactions: exportObj.meta?.redactions || {},
+            includeAttachmentNote: false
+          }),
+          files: [file]
+        });
+        localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
+        localStorage.setItem('travelApp_last_export_filename', dlName);
+        closeShareExportDialog();
+        return true;
+      }
+    } catch (error) {
+      console.warn('Native email share failed, falling back to mailto:', error);
+    }
+  }
+
+  downloadTextFile(content, dlName, 'application/json');
+  openMailtoLink(mailtoHref);
+  localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
+  localStorage.setItem('travelApp_last_export_filename', dlName);
+  closeShareExportDialog();
+  return true;
 }
 
 function escapeTextValue(value) {
@@ -2600,6 +2899,33 @@ function formatSummaryMoney(value) {
   const parsed = parseSummaryCost(value);
   if (Number.isInteger(parsed)) return `$${parsed.toFixed(0)}`;
   return `$${parsed.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')}`;
+}
+
+function buildExportDivider(label = '', width = 72) {
+  const clean = String(label || '').trim();
+  if (!clean) return '='.repeat(width);
+  const padded = ` ${clean} `;
+  if (padded.length >= width) return padded;
+  const left = Math.floor((width - padded.length) / 2);
+  const right = width - padded.length - left;
+  return `${'='.repeat(left)}${padded}${'='.repeat(right)}`;
+}
+
+function buildExportItemLine(item, fallbackLabel = 'Item') {
+  const title = formatTextValue(item?.text || item?.title, fallbackLabel);
+  const parts = [title];
+  const date = item?.date ? formatTextValue(item.date) : '';
+  const time = item?.time ? formatTextValue(item.time) : '';
+  const cost = item?.cost !== undefined && item?.cost !== null ? formatSummaryMoney(item.cost) : '';
+  const status = formatTextValue(item?.status, '');
+  if (date) parts.push(`Date ${date}`);
+  if (time) parts.push(`Time ${time}`);
+  if (cost) parts.push(`Cost ${cost}`);
+  if (status) parts.push(`Status ${status}`);
+  if (item?.bookingRef) parts.push(`Ref ${formatTextValue(item.bookingRef)}`);
+  if (item?.bookingReference) parts.push(`Ref ${formatTextValue(item.bookingReference)}`);
+  if (item?.notes) parts.push(`Notes ${truncateText(item.notes, 60)}`);
+  return `- ${parts.join(' | ')}`;
 }
 
 async function exportItineraryText() {
@@ -3270,8 +3596,14 @@ if (importedData.stays && Array.isArray(importedData.stays)) {
 
 // Expose data functions to window scope for HTML onclick handlers
 window.exportJSON = exportJSON;
+window.exportShareJSON = exportShareJSON;
+window.exportShareEmail = exportShareEmail;
+window.copyShareEmailDraft = copyShareEmailDraft;
+window.refreshShareEmailDraft = refreshShareEmailDraft;
 window.exportItineraryText = exportItineraryText;
 window.exportItinerarySummaryText = exportItinerarySummaryText;
+window.openShareExportDialog = openShareExportDialog;
+window.closeShareExportDialog = closeShareExportDialog;
 window.resetData = resetData;
 window.importJSON = importJSON;
 window.openTripFile = openTripFile;
