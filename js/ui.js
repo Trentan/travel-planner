@@ -211,6 +211,28 @@ function switchTab(tabId, btnElement) {
 
 function toggleLeg(headerEl) { headerEl.parentElement.classList.toggle('collapsed'); }
 
+function isHistoryEditableTarget(target) {
+  if (!target) return false;
+  const tagName = String(target.tagName || '').toLowerCase();
+  return !!target.isContentEditable || tagName === 'input' || tagName === 'textarea' || tagName === 'select';
+}
+
+document.addEventListener('keydown', event => {
+  const key = String(event.key || '').toLowerCase();
+  if (!(event.ctrlKey || event.metaKey) || isHistoryEditableTarget(event.target)) return;
+
+  if (key === 'z' && !event.shiftKey) {
+    if (typeof undoTripChange === 'function') undoTripChange();
+    event.preventDefault();
+    return;
+  }
+
+  if (key === 'y' || (key === 'z' && event.shiftKey)) {
+    if (typeof redoTripChange === 'function') redoTripChange();
+    event.preventDefault();
+  }
+});
+
 // Dialog functions for top menu buttons
 function openAIDialog() {
   const modal = document.getElementById('ai-modal');

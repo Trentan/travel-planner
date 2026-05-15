@@ -24,6 +24,8 @@
   <div class="app-menu-right">
     <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
     <button id="compactToggleBtn" class="app-menu-btn" onclick="toggleCompactView()">📄 Compact View</button>
+    <button id="undoBtn" class="app-menu-btn" onclick="undoTripChange()" disabled>↶ Undo</button>
+    <button id="redoBtn" class="app-menu-btn" onclick="redoTripChange()" disabled>↷ Redo</button>
     <span style="color: rgba(255,255,255,0.2);">|</span>
     <button class="app-menu-btn" onclick="openCityDialog()">🌍 Cities</button>
     <button class="app-menu-btn" onclick="openAIDialog()">🤖 AI Builder</button>
@@ -157,6 +159,8 @@
       <div class="mobile-menu-sheet-grid">
         <button id="mobileEditToggleBtn" class="app-menu-btn" onclick="closeMobileMenu(); toggleEditMode()">🔒 Lock: Read Only</button>
         <button id="mobileCompactToggleBtn" class="app-menu-btn" onclick="closeMobileMenu(); toggleCompactView()">📄 Compact View</button>
+        <button id="mobileUndoBtn" class="app-menu-btn" onclick="closeMobileMenu(); undoTripChange()" disabled>↶ Undo</button>
+        <button id="mobileRedoBtn" class="app-menu-btn" onclick="closeMobileMenu(); redoTripChange()" disabled>↷ Redo</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openCityDialog()">🌍 Cities</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openAIDialog()">🤖 AI Builder</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openGuideDialog()">📖 Guide</button>
@@ -621,7 +625,7 @@
     syncInstallButton();
   });
 
-  initData();
+  window.appInitPromise = initData();
   applyUiSettings();
   buildNav();
   buildItinerary();

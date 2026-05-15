@@ -34,12 +34,19 @@ Read this file at the start of every session. When using Claude Code, read from 
 - [x] 16e Share Export should have the ability to email people directly from the app, and it send a link to the app location (https://trentan.github.io/travel-planner/) with the json attached and check out my cool app / itinerary and load the attached file from your friend etc.
 
 ### Item 17: Trip editing and planning workflow
-- [ ] 17a. Search/filter functionality.
-- [ ] 17b. Change the cost or duration of an activity in the itinerary tab.
-- [ ] 17c. Add or subtract a day to an existing leg, with a warning if it causes conflicts.
-- [ ] 17d. Undo/redo system.
+- [x] 17a. Search/filter functionality.
+  - Resolved: generic search is probably not required right now; the existing city filters and quick actions cover most of the workflow.
+- [x] 17b. Change the cost or duration of an activity in the itinerary tab.
+  - Resolved: use an edit dialog from the itinerary item instead of cramped inline fields.
+- [x] 17c. Add or subtract a day to an existing leg, with a warning if it causes conflicts.
+  - Resolution: any leg should be able to add or subtract days from itself.
+  - Conflict handling: warn and confirm if proceeding would overwrite the current leg; the user can adjust it or abort.
+- [x] 17d. Undo/redo system.
+  - Resolution: should cover anything in case of accidental changes, not just itinerary edits.
 - [ ] 17e. Add a Notes tab with a generic checklist.
+  - Resolution: make it similar to Packing, but still editable to personal needs.
 - [ ] 17f. Activity time planning / schedule, so added items can start at a chosen time and avoid overlaps.
+  - Resolution: suggested scheduling only, with warnings rather than hard overlap blocking.
 
 ### Item 18: Presentation, maps, and trip analytics
 - [ ] 18a. Change colors for cities.

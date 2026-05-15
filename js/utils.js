@@ -113,7 +113,7 @@ const DEFAULT_DATA = [
         activityItems: []
       }
     ]
-  }
+  },
 ];
 
 const ACTIVITY_CATEGORIES = {
@@ -316,6 +316,13 @@ const DEFAULT_PACKING = [
       { title: "Essentials", items: [{text: "TRS Claim + Items", done:false}, {text: "Passport + [Copy + Tracker]", done:false}, {text: "Reservations + Itineraries + Insurance", done:false}, {text: "Wallet/Purse + Local cash + Cards", done:false}, {text: "Phone", done:false}, {text: "Crossbody/Sling Bag", done:false}] },
       { title: "Flight Items", items: [{text: "Travel pillow / Foot sling", done:false}, {text: "Phone holder (watch movies)", done:false}, {text: "Compression socks, Slippers", done:false}, {text: "Disposable Toothbrush kit", done:false}, {text: "Eye mask, Eye Drops", done:false}, {text: "Ear plugs, Breath Fresheners", done:false}, {text: "Snacks, TravelCalm", done:false}, {text: "Headphones/Airpods", done:false}, {text: "Airfly/Bluetooth Adapter", done:false}, {text: "Book/Kindle", done:false}, {text: "Water bottle", done:false}] },
       { title: "Tech", items: [{text: "eSIM (Installed)", done:false}, {text: "Mobile downloads (Movies, Shows)", done:false}, {text: "Phone charger", done:false}, {text: "Power cables, Cords", done:false}, {text: "Power Adapter", done:false}, {text: "Power bank", done:false}, {text: "Pen", done:false}, {text: "Laptop", done:false}, {text: "Luggage Trackers", done:false}] }
+    ]
+  },
+  {
+    areaName: "📝 Trip Notes",
+    areaColor: "#6C5CE7",
+    categories: [
+      { title: "Notes", items: [{text: "Booking reminders", done:false}, {text: "Places to book", done:false}, {text: "Trip ideas to follow up", done:false}] }
     ]
   }
 ];

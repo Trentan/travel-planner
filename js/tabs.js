@@ -305,6 +305,8 @@ function buildPackingTab() {
     "🎒 Personal Item Bag (Under Seat)": "#8E44AD"
   };
 
+  defaultAreaNames["📝 Trip Notes"] = "#6C5CE7";
+
   Object.entries(defaultAreaNames).forEach(([areaName, areaColor]) => {
     const existing = packingData.find(a => a.areaName === areaName);
     if (!existing) {

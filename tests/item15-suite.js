@@ -16,10 +16,13 @@ async function settle(harness) {
   await Promise.resolve();
 }
 
-function createBootedApp(options = {}) {
+async function createBootedApp(options = {}) {
   const harness = createBrowserHarness(options);
   loadAppScripts(harness);
   bootstrapApp(harness);
+  if (harness.context.appInitPromise && typeof harness.context.appInitPromise.then === 'function') {
+    await harness.context.appInitPromise;
+  }
   return harness;
 }
 
@@ -32,10 +35,12 @@ function state(context) {
 }
 
 async function testDesktopSmoke() {
-  const app = createBootedApp();
+  const app = await createBootedApp();
   assertBootClean(app, 'Desktop smoke');
   assert(app.document.getElementById('cityNav').children.length > 0, 'Desktop smoke: city nav should render buttons');
   assert(app.document.getElementById('itinerary').children.length > 0, 'Desktop smoke: itinerary should render legs');
+  app.context.buildPackingTab();
+  assert(state(app.context).packing.some(area => String(area.areaName || '').includes('Trip Notes')), 'Desktop smoke: packing should include trip notes');
   assert(app.document.getElementById('transport-table-container').innerHTML.length >= 0, 'Desktop smoke: transport container should exist');
   assert(app.document.getElementById('accom-table-container').innerHTML.length >= 0, 'Desktop smoke: accom container should exist');
   assert(app.document.getElementById('budget-table-container').innerHTML.length >= 0, 'Desktop smoke: budget container should exist');
@@ -43,7 +48,7 @@ async function testDesktopSmoke() {
 }
 
 async function testMobileSmoke() {
-  const app = createBootedApp({ mobile: true });
+  const app = await createBootedApp({ mobile: true });
   assertBootClean(app, 'Mobile smoke');
   assert(app.context.isCompactView === true, 'Mobile smoke: compact view should default on mobile');
   assert(app.document.body.classList.contains('mobile-app-mode'), 'Mobile smoke: body should have mobile app mode');
@@ -65,7 +70,7 @@ async function testMobileSmoke() {
 }
 
 async function testCrudSmoke() {
-  const app = createBootedApp();
+  const app = await createBootedApp();
   const { context } = app;
   assertBootClean(app, 'CRUD smoke');
 
@@ -113,6 +118,77 @@ async function testCrudSmoke() {
   assert(state(context).itinerary[testLegIdx].days[0].activityItems[0].cost === '15', 'CRUD smoke: updateDayItemCost should edit day item cost');
   context.deleteDayItem(testLegIdx, 0, 'activityItems', 0);
   assert(!state(context).itinerary[testLegIdx].days[0].activityItems.some(item => item.text === 'Walk the city'), 'CRUD smoke: deleteDayItem should remove day item');
+
+  const targetLegIdx = state(context).itinerary.findIndex(leg => leg.id === 'leg-1' || leg.days?.[0]?.date === '2026-01-01');
+  assert(targetLegIdx >= 0, 'CRUD smoke: should find the original start leg');
+
+  context.addLeg();
+  const newlyAddedLegIdx = state(context).itinerary.findIndex(leg => leg.label === '📍 New City' || leg.days?.[0]?.date === 'DD Mon');
+  assert(newlyAddedLegIdx >= 0, 'CRUD smoke: should find the temporary leg used for conflict testing');
+  context.updateDayData(newlyAddedLegIdx, 0, 'date', '2026-01-02');
+  context.updateDayData(newlyAddedLegIdx, 0, 'day', 'Tue');
+
+  const legZeroStartLength = state(context).itinerary[targetLegIdx].days.length;
+  let conflictWarning = '';
+  const originalConfirm = context.confirm;
+  context.confirm = message => {
+    conflictWarning = message;
+    return true;
+  };
+  context.adjustLegDays(targetLegIdx, 1);
+  context.confirm = originalConfirm;
+  assert(
+    state(context).itinerary[targetLegIdx].days.length === legZeroStartLength + 1,
+    'CRUD smoke: adjustLegDays should add a day to the leg'
+  );
+  assert(
+    state(context).itinerary[targetLegIdx].days[1].date === '2026-01-02',
+    'CRUD smoke: added day should advance to the next calendar date'
+  );
+  assert(
+    state(context).itinerary[targetLegIdx].days[1].day === 'Fri',
+    'CRUD smoke: added day should refresh the weekday label'
+  );
+  assert(
+    conflictWarning.includes('overlap'),
+    'CRUD smoke: adding an overlapping day should warn before proceeding'
+  );
+  context.adjustLegDays(targetLegIdx, -1);
+  assert(
+    state(context).itinerary[targetLegIdx].days.length === legZeroStartLength,
+    'CRUD smoke: adjustLegDays should remove the last day from the leg'
+  );
+
+  const packingOriginal = state(context).packing[0].categories[0].items[0].done;
+  context.togglePackingItem({ target: { checked: !packingOriginal } }, 0, 0, 0);
+  await settle(app);
+  assert(
+    state(context).packing[0].categories[0].items[0].done === !packingOriginal,
+    'CRUD smoke: packing edit should apply before undo'
+  );
+
+  const undoResult = await context.undoTripChange();
+  await settle(app);
+  assert(undoResult === true, 'CRUD smoke: undoTripChange should succeed');
+  assert(
+    state(context).packing[0].categories[0].items[0].done === packingOriginal,
+    'CRUD smoke: undoTripChange should restore the previous packing state'
+  );
+
+  const redoResult = await context.redoTripChange();
+  await settle(app);
+  assert(redoResult === true, 'CRUD smoke: redoTripChange should succeed');
+  assert(
+    state(context).packing[0].categories[0].items[0].done === !packingOriginal,
+    'CRUD smoke: redoTripChange should restore the forward packing state'
+  );
+
+  await context.undoTripChange();
+  await settle(app);
+  assert(
+    state(context).packing[0].categories[0].items[0].done === packingOriginal,
+    'CRUD smoke: final undo should leave packing where it started'
+  );
 
   const city = context.addOrUpdateCity('Tokyo');
   const journey = context.createJourneyFromTransportItem(
@@ -170,7 +246,7 @@ async function testCrudSmoke() {
 }
 
 async function testDragDropSmoke() {
-  const app = createBootedApp();
+  const app = await createBootedApp();
   const { context } = app;
   assertBootClean(app, 'Drag/drop smoke');
 
@@ -196,7 +272,7 @@ async function testDragDropSmoke() {
 }
 
 async function testModeToggles() {
-  const app = createBootedApp();
+  const app = await createBootedApp();
   const { context } = app;
   assertBootClean(app, 'Mode toggles');
 
@@ -213,7 +289,7 @@ async function testModeToggles() {
 }
 
 async function testCompactView() {
-  const app = createBootedApp();
+  const app = await createBootedApp();
   const { context } = app;
   assertBootClean(app, 'Compact view');
 
@@ -227,7 +303,7 @@ async function testCompactView() {
 }
 
 async function testExportImport() {
-  const app = createBootedApp();
+  const app = await createBootedApp();
   const { context } = app;
   assertBootClean(app, 'Export/import');
 
@@ -256,7 +332,7 @@ async function testExportImport() {
 }
 
 async function testShareExport() {
-  const app = createBootedApp();
+  const app = await createBootedApp();
   const { context } = app;
   assertBootClean(app, 'Share export');
 
@@ -289,7 +365,7 @@ async function testShareExport() {
 }
 
 async function testShareEmail() {
-  const app = createBootedApp();
+  const app = await createBootedApp();
   const { context } = app;
   assertBootClean(app, 'Share email');
 
@@ -315,7 +391,7 @@ async function testShareEmail() {
 }
 
 async function testShareEmailDraft() {
-  const app = createBootedApp();
+  const app = await createBootedApp();
   const { context } = app;
   assertBootClean(app, 'Share email draft');
 
@@ -335,7 +411,7 @@ async function testShareEmailDraft() {
 }
 
 async function testBudgetUpdates() {
-  const app = createBootedApp();
+  const app = await createBootedApp();
   const { context } = app;
   assertBootClean(app, 'Budget updates');
 
@@ -351,7 +427,7 @@ async function testBudgetUpdates() {
 
 async function testPackingPersistence() {
   const sharedLocalStorage = createBrowserHarness().localStorage;
-  const first = createBootedApp({ sharedLocalStorage });
+  const first = await createBootedApp({ sharedLocalStorage });
   const firstContext = first.context;
   assertBootClean(first, 'Packing persistence first load');
 
@@ -360,14 +436,14 @@ async function testPackingPersistence() {
   await firstContext.saveData(false);
   await settle(first);
 
-  const second = createBootedApp({ sharedLocalStorage });
+  const second = await createBootedApp({ sharedLocalStorage });
   assertBootClean(second, 'Packing persistence reload');
   assert(state(second.context).packing[0].categories[0].items[0].done === true, 'Packing persistence: packing checkbox should persist');
   assert(state(second.context).leaveHome[1].done === true, 'Packing persistence: leave-home checkbox should persist');
 }
 
 async function testServiceWorkerRegistration() {
-  const app = createBootedApp();
+  const app = await createBootedApp();
   assertBootClean(app, 'Service worker');
   assert(app.serviceWorkerRegistrations.length === 1, 'Service worker: should register once');
   assert(app.serviceWorkerRegistrations[0].scriptURL === './sw.js', 'Service worker: should register sw.js');
@@ -375,7 +451,7 @@ async function testServiceWorkerRegistration() {
 
 async function testFileSaveLoadAndBackup() {
   const sharedLocalStorage = createBrowserHarness().localStorage;
-  const first = createBootedApp({ sharedLocalStorage });
+  const first = await createBootedApp({ sharedLocalStorage });
   const firstContext = first.context;
   assertBootClean(first, 'File save/load first');
 
@@ -384,7 +460,7 @@ async function testFileSaveLoadAndBackup() {
   await settle(first);
   assert(JSON.parse(sharedLocalStorage.getItem('travelApp_meta_template')).title === 'Local Save Test', 'File save/load: should persist to localStorage');
 
-  const reload = createBootedApp({ sharedLocalStorage });
+  const reload = await createBootedApp({ sharedLocalStorage });
   assertBootClean(reload, 'File save/load reload');
   assert(state(reload.context).meta.title === 'Local Save Test', 'File save/load: should restore from localStorage');
 
