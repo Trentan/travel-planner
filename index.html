@@ -23,7 +23,11 @@
   </div>
   <div class="app-menu-right">
     <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
-    <button id="compactToggleBtn" class="app-menu-btn" onclick="toggleCompactView()" aria-pressed="false">📄 Detailed mode</button>
+    <label id="compactToggleBtn" class="app-menu-switch" role="switch" aria-checked="false" title="Toggle detailed or compact mode">
+      <input id="compactToggleInput" type="checkbox" onchange="toggleCompactView(this.checked)" aria-label="Toggle detailed or compact mode">
+      <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
+      <span id="compactToggleLabel" class="app-menu-switch-label">Detailed mode</span>
+    </label>
     <button id="undoBtn" class="app-menu-btn" onclick="undoTripChange()" disabled>↶ Undo</button>
     <button id="redoBtn" class="app-menu-btn" onclick="redoTripChange()" disabled>↷ Redo</button>
     <span style="color: rgba(255,255,255,0.2);">|</span>
@@ -158,7 +162,11 @@
       </div>
       <div class="mobile-menu-sheet-grid">
         <button id="mobileEditToggleBtn" class="app-menu-btn" onclick="closeMobileMenu(); toggleEditMode()">🔒 Lock: Read Only</button>
-        <button id="mobileCompactToggleBtn" class="app-menu-btn" onclick="closeMobileMenu(); toggleCompactView()" aria-pressed="false">📄 Detailed mode</button>
+        <label id="mobileCompactToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="false" title="Toggle detailed or compact mode">
+          <input id="mobileCompactToggleInput" type="checkbox" onchange="closeMobileMenu(); toggleCompactView(this.checked)" aria-label="Toggle detailed or compact mode">
+          <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
+          <span id="mobileCompactToggleLabel" class="app-menu-switch-label">Detailed mode</span>
+        </label>
         <button id="mobileUndoBtn" class="app-menu-btn" onclick="closeMobileMenu(); undoTripChange()" disabled>↶ Undo</button>
         <button id="mobileRedoBtn" class="app-menu-btn" onclick="closeMobileMenu(); redoTripChange()" disabled>↷ Redo</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openCityDialog()">🌍 Cities</button>

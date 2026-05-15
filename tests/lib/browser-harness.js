@@ -676,7 +676,8 @@ function createBrowserHarness({
   const baseIds = [
     'activeFileDisplay', 'saveStatus', 'timestampStatus', 'editToggleBtn', 'compactToggleBtn',
     'undoBtn', 'redoBtn', 'modeToggleBtn', 'saveAsBtn', 'openFileBtn', 'installAppBtn', 'mobileEditToggleBtn',
-    'mobileCompactToggleBtn', 'mobileUndoBtn', 'mobileRedoBtn', 'mobileSaveAsBtn', 'mobileOpenFileBtn', 'mobileInstallAppBtn',
+    'compactToggleInput', 'compactToggleLabel', 'mobileCompactToggleBtn', 'mobileCompactToggleInput',
+    'mobileCompactToggleLabel', 'mobileUndoBtn', 'mobileRedoBtn', 'mobileSaveAsBtn', 'mobileOpenFileBtn', 'mobileInstallAppBtn',
     'mainTitle', 'mainSubtitle', 'cityNav', 'itinerary', 'transport-table-container',
     'accom-table-container', 'budget-kpi-container', 'budget-table-container',
     'guides-container', 'packing-areas-container', 'mapContainer', 'journey-map-view',
@@ -702,6 +703,38 @@ function createBrowserHarness({
   const mobileMenuSheet = document.getElementById('mobileMenuSheet');
   mobileMenuSheet.className = 'mobile-menu-sheet';
   mobileMenuSheet.setAttribute('aria-hidden', 'true');
+
+  const createCompactSwitch = (wrapId, inputId, labelId) => {
+    const wrap = document.getElementById(wrapId);
+    wrap.tagName = 'LABEL';
+    wrap.className = 'app-menu-switch';
+    wrap.setAttribute('role', 'switch');
+    wrap.setAttribute('aria-checked', 'false');
+
+    const input = document.getElementById(inputId);
+    input.tagName = 'INPUT';
+    input.type = 'checkbox';
+    input.checked = false;
+
+    const track = document.createElement('span');
+    track.className = 'app-menu-switch-track';
+    const thumb = document.createElement('span');
+    thumb.className = 'app-menu-switch-thumb';
+    track.appendChild(thumb);
+
+    const label = document.getElementById(labelId);
+    label.tagName = 'SPAN';
+    label.className = 'app-menu-switch-label';
+    label.textContent = 'Detailed mode';
+
+    wrap.appendChild(input);
+    wrap.appendChild(track);
+    wrap.appendChild(label);
+    return { wrap, input, label };
+  };
+
+  createCompactSwitch('compactToggleBtn', 'compactToggleInput', 'compactToggleLabel');
+  createCompactSwitch('mobileCompactToggleBtn', 'mobileCompactToggleInput', 'mobileCompactToggleLabel');
 
   const appMenuBar = document.createElement('div');
   appMenuBar.className = 'app-menu-bar';
@@ -794,7 +827,7 @@ function createBrowserHarness({
   });
 
   const accentIds = ['saveAsBtn', 'openFileBtn', 'installAppBtn', 'mobileSaveAsBtn', 'mobileOpenFileBtn', 'mobileInstallAppBtn', 'editToggleBtn', 'compactToggleBtn', 'undoBtn', 'redoBtn', 'mobileEditToggleBtn', 'mobileCompactToggleBtn', 'mobileUndoBtn', 'mobileRedoBtn'];
-  accentIds.forEach(id => document.getElementById(id).className = 'app-menu-btn');
+  accentIds.filter(id => id !== 'compactToggleBtn' && id !== 'mobileCompactToggleBtn').forEach(id => document.getElementById(id).className = 'app-menu-btn');
 
   document.body.appendChild(document.getElementById('mainTitle'));
   document.body.appendChild(document.getElementById('mainSubtitle'));

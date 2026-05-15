@@ -296,7 +296,7 @@ async function testCompactView() {
     context.toggleCompactView();
   }
   assert(
-    app.document.getElementById('compactToggleBtn').innerHTML.includes('Detailed mode'),
+    app.document.getElementById('compactToggleLabel').textContent.includes('Detailed mode'),
     'Compact view: top-bar toggle should start in detailed mode'
   );
 
@@ -304,7 +304,7 @@ async function testCompactView() {
   assert(context.isCompactView === true, 'Compact view: should enable compact mode');
   assert(app.document.body.classList.contains('compact-view-mode'), 'Compact view: body class should toggle');
   assert(
-    app.document.getElementById('compactToggleBtn').innerHTML.includes('Compact mode'),
+    app.document.getElementById('compactToggleLabel').textContent.includes('Compact mode'),
     'Compact view: top-bar toggle should relabel to compact mode'
   );
   context.buildItinerary();

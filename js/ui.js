@@ -73,8 +73,15 @@ function syncModeToggleButtons() {
     ids.forEach(id => {
       const btn = document.getElementById(id);
       if (!btn) return;
-      btn.innerHTML = label;
-      btn.setAttribute('aria-pressed', String(isActive));
+      const switchInput = btn.querySelector('input[type="checkbox"]');
+      const labelNode = btn.querySelector('.app-menu-switch-label');
+      if (switchInput) {
+        switchInput.checked = isActive;
+      }
+      if (labelNode) {
+        labelNode.textContent = isActive ? 'Compact mode' : 'Detailed mode';
+      }
+      btn.setAttribute('aria-checked', String(isActive));
       btn.classList.toggle(activeClass, isActive);
     });
   });
@@ -233,8 +240,8 @@ function closeGuideDialog() {
   if (modal) modal.style.display = 'none';
 }
 
-function toggleCompactView() {
-  isCompactView = !isCompactView;
+function toggleCompactView(nextValue = null) {
+  isCompactView = typeof nextValue === 'boolean' ? nextValue : !isCompactView;
   saveUiSettings();
   window.isCompactView = isCompactView;
   document.body.classList.toggle('compact-view-mode', isCompactView);
