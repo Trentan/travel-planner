@@ -63,7 +63,7 @@ function syncModeToggleButtons() {
     },
     {
       ids: ['compactToggleBtn', 'mobileCompactToggleBtn'],
-      label: isCompactView ? '📄 Exit Compact' : '📄 Compact View',
+      label: isCompactView ? '📄 Compact mode' : '📄 Detailed mode',
       activeClass: 'active-mode',
       isActive: isCompactView
     }
@@ -73,7 +73,15 @@ function syncModeToggleButtons() {
     ids.forEach(id => {
       const btn = document.getElementById(id);
       if (!btn) return;
-      btn.innerHTML = label;
+      const switchInput = btn.querySelector('input[type="checkbox"]');
+      const labelNode = btn.querySelector('.app-menu-switch-label');
+      if (switchInput) {
+        switchInput.checked = isActive;
+      }
+      if (labelNode) {
+        labelNode.textContent = isActive ? 'Compact mode' : 'Detailed mode';
+      }
+      btn.setAttribute('aria-checked', String(isActive));
       btn.classList.toggle(activeClass, isActive);
     });
   });
@@ -118,34 +126,6 @@ function applyUiSettings() {
   const subtitle = document.getElementById('mainSubtitle');
   if (title) title.contentEditable = isEditMode;
   if (subtitle) subtitle.contentEditable = isEditMode;
-}
-
-function toggleCompactView() {
-  isCompactView = !isCompactView;
-  saveUiSettings();
-
-  // Sync to window for cross-module access
-  window.isCompactView = isCompactView;
-
-  document.body.classList.toggle('compact-view-mode', isCompactView);
-
-  const btn = document.getElementById('compactToggleBtn');
-  if(isCompactView) {
-    btn.innerHTML = "📄 Exit Compact";
-    btn.classList.add('active-mode');
-  } else {
-    btn.innerHTML = "📄 Compact View";
-    btn.classList.remove('active-mode');
-  }
-
-  applyUiSettings();
-  const activeTabBtn = document.querySelector('.app-tab-btn.active');
-  if (activeTabBtn && activeTabBtn.dataset.tab) {
-    switchTab(activeTabBtn.dataset.tab, activeTabBtn);
-  } else {
-    buildItinerary();
-    buildPackingTab();
-  }
 }
 
 function toggleMode() {
@@ -260,8 +240,8 @@ function closeGuideDialog() {
   if (modal) modal.style.display = 'none';
 }
 
-function toggleCompactView() {
-  isCompactView = !isCompactView;
+function toggleCompactView(nextValue = null) {
+  isCompactView = typeof nextValue === 'boolean' ? nextValue : !isCompactView;
   saveUiSettings();
   window.isCompactView = isCompactView;
   document.body.classList.toggle('compact-view-mode', isCompactView);
