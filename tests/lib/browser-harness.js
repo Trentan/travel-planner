@@ -680,9 +680,8 @@ function createBrowserHarness({
     'mainTitle', 'mainSubtitle', 'cityNav', 'itinerary', 'transport-table-container',
     'accom-table-container', 'budget-kpi-container', 'budget-table-container',
     'guides-container', 'packing-areas-container', 'mapContainer', 'journey-map-view',
-    'map-legend-container', 'journey-stats', 'mobileMenuSheet', 'print-preview-modal',
-    'printDateRange', 'showTransport', 'showAccom', 'showActivities', 'showCosts',
-    'printPreviewContent', 'ai-modal', 'aiTripTitle', 'aiTripDates', 'aiTripCities',
+    'map-legend-container', 'journey-stats', 'mobileMenuSheet',
+    'ai-modal', 'aiTripTitle', 'aiTripDates', 'aiTripCities',
     'aiTripVibe', 'aiOutputBox', 'aiPromptOutput', 'guide-modal', 'guideContainer',
     'add-leg-modal', 'city-modal', 'journey-modal', 'stay-modal', 'importFile',
     'newCityCountrySelect', 'customCountryDiv', 'customCountryName', 'customCountryCode',
@@ -698,12 +697,6 @@ function createBrowserHarness({
   baseIds.forEach(id => {
     const el = document.getElementById(id);
     el.connected = true;
-    if (id === 'printDateRange') el.tagName = 'SELECT';
-    if (id === 'showTransport' || id === 'showAccom' || id === 'showActivities' || id === 'showCosts') {
-      el.tagName = 'INPUT';
-      el.type = 'checkbox';
-      el.checked = ['showTransport', 'showAccom', 'showActivities'].includes(id);
-    }
   });
 
   const mobileMenuSheet = document.getElementById('mobileMenuSheet');
@@ -748,47 +741,6 @@ function createBrowserHarness({
     pane.className = 'tab-pane';
     if (index === 0) pane.classList.add('active');
   });
-
-  const printStyleSummary = document.createElement('input');
-  printStyleSummary.type = 'radio';
-  printStyleSummary.name = 'printStyle';
-  printStyleSummary.value = 'summary';
-  printStyleSummary.checked = true;
-  printStyleSummary.id = 'printStyleSummary';
-  document.body.appendChild(printStyleSummary);
-
-  const printStyleDetailed = document.createElement('input');
-  printStyleDetailed.type = 'radio';
-  printStyleDetailed.name = 'printStyle';
-  printStyleDetailed.value = 'detailed';
-  printStyleDetailed.checked = false;
-  printStyleDetailed.id = 'printStyleDetailed';
-  document.body.appendChild(printStyleDetailed);
-
-  const printDateRange = document.getElementById('printDateRange');
-  printDateRange.tagName = 'SELECT';
-
-  const dayCard = document.createElement('div');
-  dayCard.className = 'day-card open';
-  const dayBar = document.createElement('div');
-  dayBar.className = 'day-bar';
-  const dayNum = document.createElement('span');
-  dayNum.className = 'day-num';
-  dayNum.textContent = '1';
-  const dayName = document.createElement('span');
-  dayName.className = 'day-name';
-  dayName.textContent = 'Mon';
-  dayBar.appendChild(dayNum);
-  dayBar.appendChild(dayName);
-  dayCard.appendChild(dayBar);
-  document.body.appendChild(dayCard);
-
-  const leg = document.createElement('div');
-  leg.className = 'leg';
-  document.body.appendChild(leg);
-
-  const printPreviewModal = document.getElementById('print-preview-modal');
-  printPreviewModal.style.display = 'none';
 
   const aiModal = document.getElementById('ai-modal');
   aiModal.style.display = 'none';
@@ -836,7 +788,7 @@ function createBrowserHarness({
     el.tagName = 'INPUT';
   });
 
-  ['stayCitySelect', 'stayStatus', 'activityCategory', 'newCityCountrySelect', 'printDateRange'].forEach(id => {
+  ['stayCitySelect', 'stayStatus', 'activityCategory', 'newCityCountrySelect'].forEach(id => {
     const el = document.getElementById(id);
     el.tagName = 'SELECT';
   });

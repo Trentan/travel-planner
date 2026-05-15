@@ -116,6 +116,8 @@ function buildAccomTab(cityFilter = null) {
       <th style="width:28px;"></th>
       <th>City</th>
       <th>Property</th>
+      <th>Provider</th>
+      <th>Booking Ref</th>
       <th>Check-in</th>
       <th>Check-out</th>
       <th>Nights</th>
@@ -151,9 +153,6 @@ function buildAccomTab(cityFilter = null) {
     };
     const statusColor = statusColors[status] || statusColors.planned;
     const statusIcon = statusIcons[status] || '⏳';
-
-    const bookingRef = stay.bookingRef ? `<br><span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${stay.bookingRef}</span>` : '';
-    const provider = stay.provider ? `<br><span style="font-size:0.8rem; color:#888;">${stay.provider}</span>` : '';
     const isExpanded = isStayRowExpanded(stay.id);
     const expandBtn = `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleStayRowDetails('${stay.id}')" title="Show stay details" aria-expanded="${isExpanded}">${isExpanded ? '▼' : '▶'}</button>`;
 
@@ -162,8 +161,9 @@ function buildAccomTab(cityFilter = null) {
       <td class="city-col" data-label="City">${getCityFlagHTML(cityName)} ${cityName}</td>
       <td class="property-col" data-label="Property">
         <span class="stay-property-name" contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)">${escapeHtml(stay.propertyName)}</span>
-        ${stay.provider ? `<span class="stay-provider">${escapeHtml(stay.provider)}</span>` : ''}
       </td>
+      <td class="stay-provider-col" data-label="Provider">${stay.provider || '—'}</td>
+      <td class="stay-bookingref-col" data-label="Booking Ref">${stay.bookingRef || '—'}</td>
       <td class="date-col stay-dates-col" data-label="Stay">
         ${formatDateShort(stay.checkIn)}
         ${renderStayDateSummary(stay, status, statusIcon)}
@@ -184,7 +184,7 @@ function buildAccomTab(cityFilter = null) {
 
     html += `
       <tr class="stay-detail-row ${isExpanded ? 'expanded' : ''}" data-stay-id="${stay.id}" style="display:${isExpanded ? 'table-row' : 'none'}; border-left-color: ${cityColor}">
-        <td colspan="8">
+        <td colspan="11">
           <div class="stay-detail-grid">
             ${renderStayDetailBlock('Status', `${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}`)}
             ${renderStayDetailBlock('Booking Ref', stay.bookingRef)}

@@ -84,10 +84,10 @@ const GUIDE_STEPS = [
   },
   {
     id: 'print',
-    title: 'Print Your Itinerary',
-    description: 'Click "🖨 Print Itinerary" for options: date ranges, what to include, and style (Summary vs Detailed).',
-    demo: 'print',
-    hint: 'The print view is optimized for saving to PDF or taking on your trip!'
+    title: 'Export Your Itinerary',
+    description: 'Use "Export Itinerary Text" for a clean shareable itinerary, or "Share Export" for a filtered JSON file that can be imported back into the app.',
+    demo: 'import-export',
+    hint: 'The text export is the best option for sharing or pasting into AI tools.'
   },
   {
     id: 'export',

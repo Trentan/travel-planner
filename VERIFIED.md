@@ -180,3 +180,15 @@ Confirmed completed items. Append-only archive — do not edit existing entries.
 - 13c: Removed Fun Mode and Force Refresh from the top-level UI.
 - Reset App now handles the full clear path for browser data and cache state.
 - User-tested after mobile theme tweaks and confirmed working.
+
+---
+
+### Item 15: Testing checklist converted into automated browser and unit coverage
+**Completed:** 2026-05-15 - branch `item-14-mobile-shell-polish` merged as `fc34c66`
+
+- Added a dedicated `tests/` folder for the suite entry points and shared helpers.
+- Added `npm test`, `npm run test:browser`, and `npm run test:browser:headed`.
+- Added click-to-run launchers for terminal and visible browser runs.
+- Added real Chromium desktop and mobile browser coverage with headed mode support.
+- Added modal, CRUD, drag-and-drop, export/import, packing, print, service worker, and file save/load coverage.
+- Updated the README with the test-running workflow so changes can be validated before commit or push.

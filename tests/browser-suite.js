@@ -124,6 +124,10 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     }
     assert(await page.locator('#transport-table-container').textContent(), 'Desktop: transport tab should render');
     assert(await page.locator('#accom-table-container').textContent(), 'Desktop: accommodation tab should render');
+    assert((await page.locator('#transport-table-container thead').innerText()).includes('Booking Ref'), 'Desktop: transport table should show booking ref column');
+    const accomHead = await page.locator('#accom-table-container thead').innerText();
+    assert(accomHead.includes('Provider'), 'Desktop: accommodation table should show provider column');
+    assert(accomHead.includes('Booking Ref'), 'Desktop: accommodation table should show booking ref column');
     assert(await page.locator('#budget-kpi-container').textContent(), 'Desktop: budget tab should render');
     assert(await page.locator('#packing-areas-container').textContent(), 'Desktop: packing tab should render');
 
@@ -291,13 +295,13 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     assert(await page.getByText('Mobile Watch Hotel', { exact: false }).count() > 0, 'Mobile: stay should appear after saving from modal');
     reporter.add('mobile', 'add stay', 'opened mobile modal, filled fields, saved stay');
 
-    await page.evaluate(() => openPrintPreview());
-    await page.waitForFunction(() => document.getElementById('print-preview-modal').style.display === 'flex');
+    await page.evaluate(() => openShareExportDialog());
+    await page.waitForFunction(() => document.getElementById('share-export-modal').style.display === 'flex');
     await humanPause(page, 400);
-    reporter.add('mobile', 'print preview', 'print modal opened');
+    reporter.add('mobile', 'share export', 'share modal opened');
 
-    await page.evaluate(() => closePrintPreview());
-    await page.waitForFunction(() => document.getElementById('print-preview-modal').style.display === 'none');
+    await page.evaluate(() => closeShareExportDialog());
+    await page.waitForFunction(() => document.getElementById('share-export-modal').style.display === 'none');
 
     await page.locator('.mobile-menu-btn').click();
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));

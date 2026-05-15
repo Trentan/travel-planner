@@ -723,6 +723,7 @@ main {
   .transport-table .transport-arrives-col,
   .transport-table .transport-provider-col,
   .transport-table .transport-routecode-col,
+  .transport-table .transport-bookingref-col,
   .transport-table .budget-field {
     display: none !important;
   }
@@ -977,6 +978,8 @@ main {
   }
   .accom-table .stay-expand-col,
   .accom-table .city-col,
+  .accom-table .stay-provider-col,
+  .accom-table .stay-bookingref-col,
   .accom-table .stay-out-col,
   .accom-table .nights-col {
     display: none !important;
@@ -1232,16 +1235,22 @@ main {
     width: 32px;
   }
   .accom-table .city-col {
-    width: 16%;
+    width: 12%;
   }
   .accom-table .property-col {
-    width: 42%;
+    width: 28%;
+  }
+  .accom-table .stay-provider-col {
+    width: 12%;
+  }
+  .accom-table .stay-bookingref-col {
+    width: 12%;
   }
   .accom-table .date-col {
-    width: 16%;
+    width: 12%;
   }
   .accom-table .budget-field {
-    width: 12%;
+    width: 10%;
   }
   .budget-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
   .budget-kpi { padding: 1rem 0.85rem; }
@@ -2272,7 +2281,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
 .journey-stats { margin-top: 1.5rem; }
 
-/* PRINT PREVIEW MODAL */
+/* SHARED MODAL STYLES */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -2339,79 +2348,27 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   background: #FAFAF8;
 }
 
-.print-options {
+.share-options {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 1.5rem;
 }
 
-.option-group {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  flex-wrap: wrap;
+.share-help {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 0.92rem;
 }
 
-.option-group > label {
-  font-weight: 600;
-  color: #2C3E50;
-  min-width: 100px;
-  font-size: 0.9rem;
-}
-
-.radio-group, .checkbox-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.radio-label, .check-label {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
-.radio-label input, .check-label input {
-  cursor: pointer;
-}
-
-#printDateRange {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 0.9rem;
-  min-width: 200px;
-}
-
-.print-preview-content {
-  background: #f5f5f5;
-  border: 1px solid #ddd;
+.share-note {
+  padding: 0.85rem 1rem;
   border-radius: 8px;
-  padding: 1.5rem;
-  min-height: 300px;
-}
-
-.print-preview-content h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1rem;
-  margin-bottom: 0.75rem;
-  color: #2C3E50;
-}
-
-.print-preview-content .preview-item {
-  padding: 0.5rem 0;
-  border-bottom: 1px dashed #ddd;
-  font-size: 0.85rem;
-}
-
-@media print {
-  .modal-overlay { display: none !important; }
+  background: #F7F5F0;
+  border: 1px solid #E2DDD4;
+  color: #4C4C4C;
+  font-size: 0.88rem;
+  line-height: 1.45;
 }
 
 /* ==================== */
@@ -3048,13 +3005,14 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   table-layout: fixed;
 }
 
-.transport-segment-col-journey { width: 24%; }
-.transport-segment-col-leg { width: 8%; }
+.transport-segment-col-journey { width: 22%; }
+.transport-segment-col-leg { width: 7%; }
 .transport-segment-col-route { width: 16%; }
 .transport-segment-col-departs { width: 12%; }
 .transport-segment-col-arrives { width: 12%; }
-.transport-segment-col-provider { width: 18%; }
+.transport-segment-col-provider { width: 15%; }
 .transport-segment-col-code { width: 6%; }
+.transport-segment-col-bookingref { width: 6%; }
 .transport-segment-col-cost { width: 4%; }
 
 .transport-segment-head {

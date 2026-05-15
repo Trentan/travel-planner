@@ -674,6 +674,7 @@ function buildTransportTab(cityFilter = null) {
           <th>Arrives</th>
           <th>Provider</th>
           <th>Code</th>
+          <th>Booking Ref</th>
           <th>Cost</th>
           <th>Status</th>
           <th>Actions</th>
@@ -738,6 +739,7 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
         <td class="transport-arrives-col" data-label="Arrives">${lastArr !== '�' ? lastArr + ' ' + lastArrTime : '�'}</td>
         <td class="transport-provider-col" data-label="Provider">${rep.provider || '—'}</td>
         <td class="transport-routecode-col" data-label="Code">${rep.routeCode || '—'}</td>
+        <td class="transport-bookingref-col" data-label="Booking Ref">${rep.bookingReference || '—'}</td>
         <td class="budget-field" data-label="Cost">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
         <td class="transport-status-col" data-label="Status">
           <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
@@ -769,6 +771,7 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
             <td class="transport-segment-arrives">${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
             <td class="transport-segment-provider">${seg.provider || '—'}</td>
             <td class="transport-segment-code">${seg.routeCode || '—'}</td>
+            <td class="transport-segment-bookingref">${seg.bookingReference || '—'}</td>
             <td class="transport-segment-cost">${seg.cost ? `$${seg.cost}` : '—'}</td>
           </tr>
         `;
@@ -786,6 +789,7 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
               <col class="transport-segment-col-arrives">
               <col class="transport-segment-col-provider">
               <col class="transport-segment-col-code">
+              <col class="transport-segment-col-bookingref">
               <col class="transport-segment-col-cost">
             </colgroup>
             <thead>
@@ -797,6 +801,7 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
                 <th>Arrives</th>
                 <th>Provider</th>
                 <th>Code</th>
+                <th>Booking Ref</th>
                 <th>Cost</th>
               </tr>
             </thead>
@@ -809,7 +814,7 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
 
       html += `
         <tr class="journey-detail-row ${isExpanded ? 'expanded' : ''}" data-group="${gid}" style="display:${isExpanded ? 'table-row' : 'none'};">
-          <td colspan="10">
+          <td colspan="12">
             ${detailRowContent}
           </td>
         </tr>`;
