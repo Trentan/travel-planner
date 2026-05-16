@@ -41,6 +41,38 @@ function countCompletedLeaveHomeTasks() {
   return leaveHomeData.filter(item => !isLeaveHomeSection(item) && item.done).length;
 }
 
+function calculatePackingAreaProgress(aIdx) {
+  const area = packingData[aIdx];
+  let total = 0;
+  let done = 0;
+  area.categories.forEach(cat => {
+    cat.items.forEach(item => {
+      total++;
+      if (item.done) done++;
+    });
+  });
+  const percent = total ? Math.round((done / total) * 100) : 0;
+  return { total, done, percent };
+}
+
+function renderPackingAreaProgress(aIdx) {
+  const { total, done, percent } = calculatePackingAreaProgress(aIdx);
+  if (total === 0) return '';
+
+  return `
+    <div class="packing-area-progress" title="${done} of ${total} items packed">
+      <div class="packing-area-progress-info">
+        <span class="packing-area-progress-label">Progress:</span>
+        <span class="packing-area-progress-count">${done}/${total}</span>
+      </div>
+      <div class="packing-area-progress-bar">
+        <span style="width: ${percent}%"></span>
+      </div>
+      <div class="packing-area-progress-percent">${percent}%</div>
+    </div>
+  `;
+}
+
 function toggleLeaveHomeItem(e, iIdx) {
   if (isLeaveHomeSection(leaveHomeData[iIdx])) return;
   leaveHomeData[iIdx].done = e.target.checked;
