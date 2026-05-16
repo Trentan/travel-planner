@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-16
-Progress: 8/24 items complete
+Progress: 16/24 items complete
 
 ---
 
@@ -15,16 +15,8 @@ Progress: 8/24 items complete
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
 | [WI-009](./items/WI-009.md) | Map Is A Static SVG Approximation | Major (1-3 days) | Todo | [WI-009-Before](./screenshots/before/desktop-09-map.png) | [WI-009-Proposed](./items/proposals/WI-009-proposal.png) | - | - |
-| [WI-010](./items/WI-010.md) | Journey Transport Type Buttons Are Partly Hidden | Quick Win (<1 hr) | Review | [WI-010-Before](./screenshots/before/mobile-08-journey-modal-top.png) | [WI-010-Proposed](./items/proposals/WI-010-proposal.png) | [WI-010-After](./screenshots/after/WI-010-after.png) | - |
-| [WI-011](./items/WI-011.md) | Journey Date And Time Inputs Overflow | Quick Win (<1 hr) | Review | [WI-011-Before](./screenshots/before/mobile-08-journey-modal-top.png) | [WI-011-Proposed](./items/proposals/WI-011-proposal.png) | [WI-011-After](./screenshots/after/WI-011-after.png) | - |
-| [WI-012](./items/WI-012.md) | Modal Close Buttons Lack Guaranteed 44px Target | Quick Win (<1 hr) | Review | [WI-012-Before](./screenshots/before/mobile-04-menu-open.png) | [WI-012-Proposed](./items/proposals/WI-012-proposal.png) | [WI-012-After](./screenshots/after/WI-012-after.png) | - |
-| [WI-013](./items/WI-013.md) | Action Buttons Are 40px Tall Not 44px | Quick Win (<1 hr) | Review | [WI-013-Before](./screenshots/before/mobile-01-home.png) | [WI-013-Proposed](./items/proposals/WI-013-proposal.png) | [WI-013-After](./screenshots/after/WI-013-after.png) | - |
-| [WI-014](./items/WI-014.md) | City Nav Buttons Are Slightly Below Tap Target | Quick Win (<1 hr) | Review | [WI-014-Before](./screenshots/before/mobile-03-tabs.png) | [WI-014-Proposed](./items/proposals/WI-014-proposal.png) | [WI-014-After](./screenshots/after/WI-014-after.png) | - |
 | [WI-015](./items/WI-015.md) | Drag And Drop Has No Touch Path | Medium (2-8 hrs) | Todo | [WI-015-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-015-Proposed](./items/proposals/WI-015-proposal.png) | - | - |
-| [WI-016](./items/WI-016.md) | Mobile Export Actions Need Explanatory Subtitles | Quick Win (<1 hr) | Review | [WI-016-Before](./screenshots/before/mobile-04-menu-open.png) | [WI-016-Proposed](./items/proposals/WI-016-proposal.png) | [WI-016-After](./screenshots/after/WI-016-after.png) | - |
 | [WI-017](./items/WI-017.md) | AI Builder Modal Lacks Current Trip Context | Medium (2-8 hrs) | Todo | [WI-017-Before](./screenshots/before/mobile-10-ai-builder.png) | [WI-017-Proposed](./items/proposals/WI-017-proposal.png) | - | - |
-| [WI-018](./items/WI-018.md) | Desktop City Nav Also Overflows Without Cue | Quick Win (<1 hr) | Review | [WI-018-Before](./screenshots/before/desktop-04-tabs.png) | [WI-018-Proposed](./items/proposals/WI-018-proposal.png) | [WI-018-After](./screenshots/after/WI-018-after.png) | - |
-| [WI-019](./items/WI-019.md) | Header Hero Is Too Tall On Mobile | Quick Win (<1 hr) | Review | [WI-019-Before](./screenshots/before/mobile-01-home.png) | [WI-019-Proposed](./items/proposals/WI-019-proposal.png) | [WI-019-After](./screenshots/after/WI-019-after.png) | - |
 | [WI-020](./items/WI-020.md) | Mobile Itinerary Cards Are Over-Scaled | Medium (2-8 hrs) | Todo | [WI-020-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-020-Proposed](./items/proposals/WI-020-proposal.png) | - | - |
 
 ## Polish
@@ -40,6 +32,14 @@ Progress: 8/24 items complete
 
 | ID | Title | Before | Proposed | After | Completed |
 |----|-------|--------|----------|-------|-----------|
+| [WI-019](./items/WI-019.md) | Header Hero Is Too Tall On Mobile | [WI-019-Before](./screenshots/before/mobile-01-home.png) | [WI-019-Proposed](./items/proposals/WI-019-proposal.png) | [WI-019-After](./screenshots/after/WI-019-after.png) | 2026-05-16 |
+| [WI-018](./items/WI-018.md) | Desktop City Nav Also Overflows Without Cue | [WI-018-Before](./screenshots/before/desktop-04-tabs.png) | [WI-018-Proposed](./items/proposals/WI-018-proposal.png) | [WI-018-After](./screenshots/after/WI-018-after.png) | 2026-05-16 |
+| [WI-016](./items/WI-016.md) | Mobile Export Actions Need Explanatory Subtitles | [WI-016-Before](./screenshots/before/mobile-04-menu-open.png) | [WI-016-Proposed](./items/proposals/WI-016-proposal.png) | [WI-016-After](./screenshots/after/WI-016-after.png) | 2026-05-16 |
+| [WI-014](./items/WI-014.md) | City Nav Buttons Are Slightly Below Tap Target | [WI-014-Before](./screenshots/before/mobile-03-tabs.png) | [WI-014-Proposed](./items/proposals/WI-014-proposal.png) | [WI-014-After](./screenshots/after/WI-014-after.png) | 2026-05-16 |
+| [WI-013](./items/WI-013.md) | Action Buttons Are 40px Tall Not 44px | [WI-013-Before](./screenshots/before/mobile-01-home.png) | [WI-013-Proposed](./items/proposals/WI-013-proposal.png) | [WI-013-After](./screenshots/after/WI-013-after.png) | 2026-05-16 |
+| [WI-012](./items/WI-012.md) | Modal Close Buttons Lack Guaranteed 44px Target | [WI-012-Before](./screenshots/before/mobile-04-menu-open.png) | [WI-012-Proposed](./items/proposals/WI-012-proposal.png) | [WI-012-After](./screenshots/after/WI-012-after.png) | 2026-05-16 |
+| [WI-011](./items/WI-011.md) | Journey Date And Time Inputs Overflow | [WI-011-Before](./screenshots/before/mobile-08-journey-modal-top.png) | [WI-011-Proposed](./items/proposals/WI-011-proposal.png) | [WI-011-After](./screenshots/after/WI-011-after.png) | 2026-05-16 |
+| [WI-010](./items/WI-010.md) | Journey Transport Type Buttons Are Partly Hidden | [WI-010-Before](./screenshots/before/mobile-08-journey-modal-top.png) | [WI-010-Proposed](./items/proposals/WI-010-proposal.png) | [WI-010-After](./screenshots/after/WI-010-after.png) | 2026-05-16 |
 | [WI-008](./items/WI-008.md) | Editable Header Text Opens Keyboard On Casual Mobile Taps | [WI-008-Before](./screenshots/before/mobile-02-header.png) | [WI-008-Proposed](./items/proposals/WI-008-proposal.png) | [WI-008-After](./screenshots/after/WI-008-after-3.png) | 2026-05-16 |
 | [WI-007](./items/WI-007.md) | Budget Mobile Numbers Look Like Broken Precision | [WI-007-Before](./screenshots/before/mobile-07-budget.png) | [WI-007-Proposed](./items/proposals/WI-007-proposal.png) | [WI-007-After](./screenshots/after/WI-007-after.png) | 2026-05-16 |
 | [WI-006](./items/WI-006.md) | Mobile Transport Table Is Dense And Loses Actions | [WI-006-Before](./screenshots/before/mobile-06-transport.png) | [WI-006-Proposed](./items/proposals/WI-006-proposal.png) | [WI-006-After](./screenshots/after/WI-006-after-21.png) | 2026-05-16 |

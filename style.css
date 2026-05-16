@@ -1001,7 +1001,7 @@ main {
   .app-menu-btn {
     flex: 0 0 auto;
     justify-content: center;
-    min-height: 32px;
+    min-height: 44px;
     padding: 0.34rem 0.62rem;
     font-size: 0.72rem;
   }
@@ -1052,6 +1052,7 @@ main {
   .top-controls { gap: 0.6rem; }
   .top-controls .action-btn,
   .map-controls .action-btn { width: 100%; justify-content: center; }
+  .action-btn { min-height: 44px; }
   .day-bar { grid-template-columns: 24px 62px minmax(0, 1fr) auto; }
   .day-total-cost { display: none; }
   .mobile-table-wrapper {
@@ -1782,14 +1783,19 @@ main {
     justify-content: center;
   }
   #journey-modal .journey-transport-type-group {
-    flex-wrap: wrap !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem !important;
     overflow-x: visible !important;
     padding-bottom: 0 !important;
     margin-bottom: 1.1rem !important;
   }
   #journey-modal .journey-transport-type-group .transport-type-btn {
-    flex: 1 1 calc(50% - 0.25rem);
+    width: 100%;
+    min-height: 44px;
     min-width: 0;
+    padding: 0.55rem 0.4rem;
+    font-size: 0.72rem;
   }
   #journey-modal .journey-inline-row {
     flex-direction: column !important;
@@ -1807,9 +1813,11 @@ main {
   #journey-modal .journey-datetime-pair {
     flex-direction: column !important;
     gap: 0.5rem !important;
+    min-width: 0;
   }
   #journey-modal .journey-datetime-pair input {
     width: 100%;
+    min-width: 0;
   }
   #journey-modal .journey-modal-footer {
     flex-direction: column !important;
@@ -3511,8 +3519,13 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   font-size: 1.5rem;
   cursor: pointer;
   color: #666;
-  padding: 0.25rem;
+  padding: 0;
   line-height: 1;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-close:hover { color: #E74C3C; }
