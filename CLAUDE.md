@@ -21,7 +21,7 @@ node scripts/regression-city-nav.js
 polish/screenshots/after/WI-XXX-after.png
 ```
 
-8. Update the work item and `polish/TRACKER.md`.
+8. Update the work item and `polish/TRACKER.md`, and make the after screenshot a clickable markdown link in the work item file.
 
 ## Session Start
 
@@ -39,8 +39,9 @@ Before reporting done:
 2. Capture `polish/screenshots/after/WI-XXX-after.png`.
 3. Update the WI status to Done.
 4. Update `polish/TRACKER.md`.
-5. Commit the completed WI on the WI branch with the WI referenced in the commit message, then push that same branch.
-6. Summarize changed files, verification, branch name, and commit hash.
+5. Make sure the work item's after screenshot field links directly to `polish/screenshots/after/WI-XXX-after.png`.
+6. Commit the completed WI on the WI branch with the WI referenced in the commit message, then push that same branch.
+7. Summarize changed files, verification, branch name, and commit hash.
 
 ## File Map
 
