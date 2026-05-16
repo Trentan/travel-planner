@@ -2689,7 +2689,7 @@ body.mobile-menu-open {
 }
 
 .packing-area-progress-bar {
-  height: 8px;
+  height: 6px;
   background: #ece6da;
   border-radius: 999px;
   overflow: hidden;

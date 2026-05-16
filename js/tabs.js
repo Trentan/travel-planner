@@ -375,12 +375,12 @@ function buildPackingTab() {
   const globalProgressHTML = typeof renderPackingGlobalProgress === 'function' ? renderPackingGlobalProgress() : '';
 
   guidesContainer.innerHTML = `
-    ${globalProgressHTML}
     <div class="guides-container">
       <div class="guides-container-header">
         <h3>Packing Guides & Checklist</h3>
         <div class="divider"></div>
       </div>
+      ${globalProgressHTML}
       ${guidesContent}
     </div>
   `;
