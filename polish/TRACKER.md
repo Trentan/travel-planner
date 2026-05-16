@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-16  
-Progress: 1/24 items complete
+Progress: 2/24 items complete
 
 ---
 
@@ -9,7 +9,6 @@ Progress: 1/24 items complete
 
 | ID | Title | Effort | Status | Done |
 |----|-------|--------|--------|------|
-| [WI-002](./items/WI-002.md) | Mobile Top Chrome Consumes Too Much Viewport | 🟡 Medium (2-8 hrs) | 🔲 Todo | - |
 | [WI-003](./items/WI-003.md) | Journey Modal Clips Horizontally On Mobile | 🟡 Medium (2-8 hrs) | 🔲 Todo | - |
 | [WI-004](./items/WI-004.md) | Primary Tab Strip Crops Labels On Mobile | 🟢 Quick Win (<1 hr) | 🔲 Todo | - |
 | [WI-005](./items/WI-005.md) | City Nav Overflow Has No Scroll Affordance | 🟢 Quick Win (<1 hr) | 🔲 Todo | - |
@@ -49,6 +48,7 @@ Progress: 1/24 items complete
 
 | ID | Title | Completed |
 |----|-------|-----------|
+| [WI-002](./items/WI-002.md) | Mobile Top Chrome Consumes Too Much Viewport | 2026-05-16 |
 | [WI-001](./items/WI-001.md) | Desktop App Menu Wraps Into A 154px Header | 2026-05-16 |
 
 ---
