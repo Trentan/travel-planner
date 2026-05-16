@@ -391,11 +391,35 @@ main {
   backdrop-filter: blur(8px);
 }
 
+.app-tabs-nav::before,
+.app-tabs-nav::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.app-tabs-nav::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.98), rgba(255,255,255,0));
+}
+
+.app-tabs-nav::after {
+  right: 0;
+  background: linear-gradient(270deg, rgba(255,255,255,0.98), rgba(255,255,255,0));
+}
+
 .app-tabs-list {
   display: flex;
   gap: 0.25rem;
   flex-wrap: nowrap;
   overflow-x: auto;
+  scroll-snap-type: x proximity;
   scrollbar-width: none;
   max-width: 1100px;
   margin: 0 auto;
@@ -421,6 +445,7 @@ main {
   align-items: center;
   gap: 0.5rem;
   white-space: nowrap;
+  scroll-snap-align: center;
 }
 
 .app-tab-btn:hover {
@@ -672,8 +697,16 @@ main {
 /* Responsive Tabs */
 @media (max-width: 768px) {
   .tab-label { display: inline; }
-  .app-tab-btn { padding: 0.8rem 0.9rem; }
-  .tab-icon { font-size: 1.25rem; }
+  .app-tabs-nav::before,
+  .app-tabs-nav::after {
+    opacity: 1;
+  }
+  .app-tabs-list {
+    padding: 0 1rem;
+    scroll-padding-inline: 1rem;
+  }
+  .app-tab-btn { padding: 0.72rem 0.7rem; font-size: 0.82rem; }
+  .tab-icon { font-size: 1.05rem; }
   .app-tabs-nav { padding: 0 0.75rem; }
   .app-menu-bar {
     padding: 0.2rem 0.65rem;
@@ -1805,8 +1838,8 @@ body.mobile-menu-open {
 }
 
 @media (max-width: 400px) {
-  .app-tab-btn { padding: 0.75rem 0.625rem; }
-  .tab-icon { font-size: 1.1rem; }
+  .app-tab-btn { padding: 0.66rem 0.55rem; font-size: 0.76rem; }
+  .tab-icon { font-size: 1rem; }
   .app-menu-btn { font-size: 0.75rem; padding: 0.5rem 0.75rem; }
   .day-bar { grid-template-columns: 24px 1fr auto; }
   .day-date { display: none; }
