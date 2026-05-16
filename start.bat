@@ -1,4 +1,4 @@
-@echo off
+good c@echo off
 echo Starting TeleCodex in Travel Planner workspace...
 
 :: Make codex CLI findable

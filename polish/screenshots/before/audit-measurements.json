@@ -1,0 +1,267 @@
+{
+  "desktop": {
+    ".app-menu-bar": {
+      "width": 1440,
+      "height": 154,
+      "scrollWidth": 1440,
+      "scrollHeight": 154,
+      "clientWidth": 1440,
+      "clientHeight": 154,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".app-tabs-nav": {
+      "width": 1376,
+      "height": 59,
+      "scrollWidth": 1376,
+      "scrollHeight": 57,
+      "clientWidth": 1376,
+      "clientHeight": 57,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".city-nav-list": {
+      "width": 1328,
+      "height": 52,
+      "scrollWidth": 1906,
+      "scrollHeight": 52,
+      "clientWidth": 1328,
+      "clientHeight": 52,
+      "overflowX": "auto",
+      "overflowY": "auto"
+    },
+    ".app-tab-btn[data-tab=\"accom\"]": {
+      "width": 187,
+      "height": 59,
+      "scrollWidth": 187,
+      "scrollHeight": 56,
+      "clientWidth": 187,
+      "clientHeight": 56,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".mobile-menu-btn": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".modal-close": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".action-btn": {
+      "width": 125,
+      "height": 40,
+      "scrollWidth": 123,
+      "scrollHeight": 38,
+      "clientWidth": 123,
+      "clientHeight": 38,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".city-nav-btn": {
+      "width": 72,
+      "height": 44,
+      "scrollWidth": 70,
+      "scrollHeight": 42,
+      "clientWidth": 70,
+      "clientHeight": 42,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    "#expandAll": {
+      "width": 150,
+      "height": 40,
+      "scrollWidth": 148,
+      "scrollHeight": 38,
+      "clientWidth": 148,
+      "clientHeight": 38,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".budget-kpi-grid": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".transport-type-group": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "auto",
+      "overflowY": "auto"
+    },
+    "#journey-modal .modal-content": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "hidden",
+      "overflowY": "hidden"
+    },
+    "#tab-map": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    }
+  },
+  "mobile": {
+    ".app-menu-bar": {
+      "width": 390,
+      "height": 117,
+      "scrollWidth": 390,
+      "scrollHeight": 117,
+      "clientWidth": 390,
+      "clientHeight": 117,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".app-tabs-nav": {
+      "width": 361,
+      "height": 51,
+      "scrollWidth": 361,
+      "scrollHeight": 49,
+      "clientWidth": 361,
+      "clientHeight": 49,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".city-nav-list": {
+      "width": 337,
+      "height": 50,
+      "scrollWidth": 1829,
+      "scrollHeight": 50,
+      "clientWidth": 337,
+      "clientHeight": 50,
+      "overflowX": "auto",
+      "overflowY": "auto"
+    },
+    ".app-tab-btn[data-tab=\"accom\"]": {
+      "width": 172,
+      "height": 51,
+      "scrollWidth": 172,
+      "scrollHeight": 48,
+      "clientWidth": 172,
+      "clientHeight": 48,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".mobile-menu-btn": {
+      "width": 71,
+      "height": 40,
+      "scrollWidth": 69,
+      "scrollHeight": 38,
+      "clientWidth": 69,
+      "clientHeight": 38,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".modal-close": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".action-btn": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".city-nav-btn": {
+      "width": 67,
+      "height": 42,
+      "scrollWidth": 65,
+      "scrollHeight": 40,
+      "clientWidth": 65,
+      "clientHeight": 40,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    "#expandAll": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".budget-kpi-grid": {
+      "width": 361,
+      "height": 544,
+      "scrollWidth": 361,
+      "scrollHeight": 544,
+      "clientWidth": 361,
+      "clientHeight": 544,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    },
+    ".transport-type-group": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "auto",
+      "overflowY": "auto"
+    },
+    "#journey-modal .modal-content": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "hidden",
+      "overflowY": "hidden"
+    },
+    "#tab-map": {
+      "width": 0,
+      "height": 0,
+      "scrollWidth": 0,
+      "scrollHeight": 0,
+      "clientWidth": 0,
+      "clientHeight": 0,
+      "overflowX": "visible",
+      "overflowY": "visible"
+    }
+  },
+  "failures": []
+}
