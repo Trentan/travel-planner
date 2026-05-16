@@ -8,9 +8,8 @@ Read this file at the start of every session. When using Claude Code, read from 
 
 ## Active Work
 
-### Item 14: Mobile app shell polish
-- [ ] 14g. Final mobile visual review for the table parity work.
-- [ ] 14h. Make compact view a persistent toggle called Detailed mode / Compact mode, always visible on desktop and mobile.
+### Item 14: App Polish
+- [ ] Read POLISH.md and complete every step in it from top to bottom. Start the dev server if it's not already running, then work through Steps 1–7 in order. Don't skip steps. When done, print a summary of what was created.
 
 ### Item 17: Trip editing and planning workflow
 - [ ] 17f. Activity time planning / schedule, so added items can start at a chosen time and avoid overlaps.

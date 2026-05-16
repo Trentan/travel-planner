@@ -66,7 +66,7 @@
       "colour": "#C0392B",
       "cityFood": [
         {
-          "text": "🥟 MUST EAT: Din Tai Fung soup dumplings (xiaolongbao)",
+          "text": "🥟 Din Tai Fung soup dumplings (xiaolongbao)",
           "done": false,
           "cityId": "city-taipei"
         }
@@ -142,7 +142,7 @@
       "colour": "#8E44AD",
       "cityFood": [
         {
-          "text": "🥩 MUST EAT: Wiener Schnitzel at Figlmüller Bäckerstrasse",
+          "text": "🥩 Wiener Schnitzel at Figlmüller Bäckerstrasse",
           "done": false,
           "cityId": "city-vienna"
         }
@@ -226,7 +226,7 @@
       "colour": "#6C5CE7",
       "cityFood": [
         {
-          "text": "🥩 MUST EAT: Bryndzové halušky — Slovak sheep-cheese dumplings",
+          "text": "🥩 Bryndzové halušky — Slovak sheep-cheese dumplings",
           "done": false,
           "cityId": "city-bratislava"
         },
@@ -369,7 +369,7 @@
       "colour": "#E67E22",
       "cityFood": [
         {
-          "text": "🍺 MUST EAT: Svíčková with bread dumplings",
+          "text": "🍺 Svíčková with bread dumplings",
           "done": false,
           "cityId": "city-prague"
         },
@@ -504,7 +504,7 @@
       "colour": "#B7440A",
       "cityFood": [
         {
-          "text": "🌭 MUST EAT: Nuremberg Bratwurst at Bratwursthäusle",
+          "text": "🌭 Nuremberg Bratwurst at Bratwursthäusle",
           "done": false,
           "cityId": "city-nuremberg"
         }
@@ -596,7 +596,7 @@
       "colour": "#1A5276",
       "cityFood": [
         {
-          "text": "🥨 MUST EAT: Weisswurst + sweet mustard",
+          "text": "🥨 Weisswurst + sweet mustard",
           "done": false,
           "cityId": "city-munich"
         },
@@ -861,7 +861,7 @@
       "colour": "#1A8A6F",
       "cityFood": [
         {
-          "text": "🥘 MUST EAT: Tiroler Gröstl",
+          "text": "🥘 Tiroler Gröstl",
           "done": false,
           "cityId": "city-innsbruck"
         }
@@ -949,7 +949,7 @@
       "colour": "#5B4A9C",
       "cityFood": [
         {
-          "text": "🍷 MUST EAT: Schlutzkrapfen",
+          "text": "🍷 Schlutzkrapfen",
           "done": false,
           "cityId": "city-bolzano"
         },
@@ -1152,7 +1152,7 @@
       "colour": "#27AE60",
       "cityFood": [
         {
-          "text": "🍚 MUST EAT: Risotto alla Milanese",
+          "text": "🍚 Risotto alla Milanese",
           "done": false,
           "cityId": "city-milan"
         }
@@ -1240,7 +1240,7 @@
       "colour": "#B7770D",
       "cityFood": [
         {
-          "text": "🧀 MUST EAT: Cheese fondue",
+          "text": "🧀 Cheese fondue",
           "done": false,
           "cityId": "city-zurich"
         },
@@ -1387,12 +1387,12 @@
       "colour": "#B7860B",
       "cityFood": [
         {
-          "text": "🍜 MUST EAT: Pad Thai at Thip Samai",
+          "text": "🍜 Pad Thai at Thip Samai",
           "done": false,
           "cityId": "city-bangkok"
         },
         {
-          "text": "🥭 MUST EAT: Mango sticky rice",
+          "text": "🥭 Mango sticky rice",
           "done": false,
           "cityId": "city-bangkok"
         }
@@ -1510,42 +1510,42 @@
       "colour": "#0E6655",
       "cityFood": [
         {
-          "text": "🌴 MUST EAT: Som Tam Thai",
+          "text": "🌴 Som Tam Thai",
           "done": false,
           "cityId": "city-koh-samui"
         },
         {
-          "text": "🐟 MUST EAT: Whole grilled fish",
+          "text": "🐟 Whole grilled fish",
           "done": false,
           "cityId": "city-koh-samui"
         },
         {
-          "text": "🦑 MUST EAT: Grilled squid",
+          "text": "🦑 Grilled squid",
           "done": false,
           "cityId": "city-koh-samui"
         },
         {
-          "text": "🍲 MUST EAT: Cook your own Massaman curry",
+          "text": "🍲 Cook your own Massaman curry",
           "done": false,
           "cityId": "city-koh-samui"
         },
         {
-          "text": "🥘 MUST EAT: Khao Pad",
+          "text": "🥘 Khao Pad",
           "done": false,
           "cityId": "city-koh-samui"
         },
         {
-          "text": "🍛 MUST EAT: Gaeng Keow Wan",
+          "text": "🍛 Gaeng Keow Wan",
           "done": false,
           "cityId": "city-koh-samui"
         },
         {
-          "text": "🦞 MUST EAT: Whole lobster",
+          "text": "🦞 Whole lobster",
           "done": false,
           "cityId": "city-koh-samui"
         },
         {
-          "text": "🍜 MUST EAT: Khao Tom",
+          "text": "🍜 Khao Tom",
           "done": false,
           "cityId": "city-koh-samui"
         }
