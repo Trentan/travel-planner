@@ -372,7 +372,10 @@ function buildPackingTab() {
     </div>
   `;
   const guidesContent = typeof renderPackingGuidesShell === 'function' ? renderPackingGuidesShell() : guidesHTML;
+  const globalProgressHTML = typeof renderPackingGlobalProgress === 'function' ? renderPackingGlobalProgress() : '';
+
   guidesContainer.innerHTML = `
+    ${globalProgressHTML}
     <div class="guides-container">
       <div class="guides-container-header">
         <h3>Packing Guides & Checklist</h3>
@@ -384,13 +387,11 @@ function buildPackingTab() {
 
   let areasHTML = '';
   packingData.forEach((area, aIdx) => {
-    const areaProgressHTML = typeof renderPackingAreaProgress === 'function' ? renderPackingAreaProgress(aIdx) : '';
     areasHTML += `
       <div style="margin-bottom: 4rem;">
         <h2 style="font-family:'Playfair Display', serif; color:${area.areaColor}; border-bottom: 2px solid ${area.areaColor}; padding-bottom:0.5rem; margin-bottom:1.5rem;">
           <span contenteditable="${isEditMode}" onblur="updatePackingAreaName(${aIdx}, this.innerText)">${area.areaName}</span>
         </h2>
-        ${areaProgressHTML}
         <div class="packing-grid">
           ${area.categories.map((cat, cIdx) => `
             <div class="packing-card">

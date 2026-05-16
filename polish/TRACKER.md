@@ -24,7 +24,7 @@ Progress: 16/24 items complete
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
 | [WI-021](./items/WI-021.md) | Desktop Itinerary Is Visually Busy | Medium (2-8 hrs) | Todo | [WI-021-Before](./screenshots/before/desktop-01-home.png) | [WI-021-Proposed](./items/proposals/WI-021-proposal.png) | - | - |
-| [WI-022](./items/WI-022.md) | Packing Tab Needs Stronger Empty/Progress Hierarchy | Quick Win (<1 hr) | 🟡 Review | [WI-022-Before](./screenshots/before/desktop-08-packing.png) | [WI-022-Proposed](./items/proposals/WI-022-proposal.png) | [WI-022-After](./screenshots/after/WI-022-after.png) | - |
+| [WI-022](./items/WI-022.md) | Packing Tab Needs Stronger Empty/Progress Hierarchy | Quick Win (<1 hr) | 🟡 Review | [WI-022-Before](./screenshots/before/desktop-08-packing.png) | [WI-022-Proposed](./items/proposals/WI-022-proposal.png) | [WI-022-After](./screenshots/after/WI-022-after-2.png) | - |
 | [WI-023](./items/WI-023.md) | Status And Cost Controls Lack Consistent Mobile Styling | Medium (2-8 hrs) | Todo | [WI-023-Before](./screenshots/before/mobile-06-transport.png) | [WI-023-Proposed](./items/proposals/WI-023-proposal.png) | - | - |
 | [WI-024](./items/WI-024.md) | Visual System Uses Too Many Inline Styles | Major (1-3 days) | Todo | [WI-024-Before](./screenshots/before/desktop-03-header.png) | [WI-024-Proposed](./items/proposals/WI-024-proposal.png) | - | - |
 

@@ -56,21 +56,32 @@ function calculatePackingAreaProgress(aIdx) {
 }
 
 function renderPackingAreaProgress(aIdx) {
+  const area = packingData[aIdx];
   const { total, done, percent } = calculatePackingAreaProgress(aIdx);
   if (total === 0) return '';
 
   return `
-    <div class="packing-area-progress" title="${done} of ${total} items packed">
-      <div class="packing-area-progress-info">
-        <span class="packing-area-progress-label">Progress:</span>
-        <span class="packing-area-progress-count">${done}/${total}</span>
+    <div class="packing-area-progress" style="--area-color: ${area.areaColor || 'var(--accent)'}">
+      <div class="packing-area-progress-header">
+        <span class="packing-area-progress-title">${area.areaName}</span>
+        <span class="packing-area-progress-info">${done}/${total}</span>
       </div>
       <div class="packing-area-progress-bar">
         <span style="width: ${percent}%"></span>
       </div>
-      <div class="packing-area-progress-percent">${percent}%</div>
     </div>
   `;
+}
+
+function renderPackingGlobalProgress() {
+  if (!packingData || packingData.length === 0) return '';
+  
+  let html = '<div class="packing-progress-grid">';
+  packingData.forEach((_, aIdx) => {
+    html += renderPackingAreaProgress(aIdx);
+  });
+  html += '</div>';
+  return html;
 }
 
 function toggleLeaveHomeItem(e, iIdx) {
@@ -284,3 +295,4 @@ window.addPackingCat = addPackingCat;
 window.deletePackingCat = deletePackingCat;
 window.renderPackingGuidePanel = renderPackingGuidePanel;
 window.renderPackingGuidesShell = renderPackingGuidesShell;
+window.renderPackingGlobalProgress = renderPackingGlobalProgress;
