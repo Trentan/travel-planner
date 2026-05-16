@@ -1,4 +1,4 @@
-// Transport/Journey management module
+﻿// Transport/Journey management module
 // Supports rich journey display with times, providers, booking refs
 // Multi-leg journeys: N segments share a journeyId and journeyName
 // Note: journeys variable is declared in data.js for proper loading order
@@ -101,7 +101,7 @@ function getLocationCodeDisplay(locationName) {
 // Transport type icons
 const TRANSPORT_ICONS = {
   flight: '✈️',
-  train: '🚂',
+  train: '🚆',
   car: '🚗',
   ferry: '⛴️',
   bus: '🚌',
@@ -302,7 +302,7 @@ function detectTransportType(text) {
   if (!text) return 'other';
   const t = text.toLowerCase();
   if (t.includes('✈') || t.includes('flight') || t.includes('arrive') || t.includes('depart')) return 'flight';
-  if (t.includes('🚂') || t.includes('train') || t.includes('rail') || t.includes('ice') || t.includes('obb') || t.includes('sbb')) return 'train';
+  if (t.includes('🚆') || t.includes('train') || t.includes('rail') || t.includes('ice') || t.includes('obb') || t.includes('sbb')) return 'train';
   if (t.includes('🚌') || t.includes('bus')) return 'bus';
   if (t.includes('⛴') || t.includes('🚣') || t.includes('ferry') || t.includes('boat')) return 'ferry';
   if (t.includes('🚗') || t.includes('car') || t.includes('drive')) return 'car';
@@ -568,29 +568,55 @@ function renderTransportDetailBlock(title, value, extraClass = '') {
   `;
 }
 
-function renderJourneyMobileSummary(rep, legCountText, durationText) {
-  const parts = [
-    rep.provider || '',
-    rep.routeCode || '',
-    durationText || ''
-  ].filter(Boolean);
-  const legsText = legCountText ? `(${legCountText})` : '';
+function renderJourneyMobileSummary(legCountText) {
+  if (!legCountText) return '';
 
   return `
     <div class="mobile-table-meta transport-mobile-meta">
-      <span class="transport-mobile-provider">${parts.join(' &bull; ')}${legsText ? ` ${legsText}` : ''}</span>
+      <span class="transport-mobile-provider">${legCountText}</span>
     </div>
   `;
 }
 
-function renderTransportScheduleMobile(icon, firstDep, lastArr, lastArrTime) {
-  const arrivalText = lastArr !== '�' ? `${lastArr} ${lastArrTime || ''}`.trim() : '�';
+function formatJourneyNameDisplay(name) {
+  if (!name) return '—';
+  const match = name.match(/^(.*?)(\s*\(via\s+.+\))$/i);
+  if (!match) return name;
+  return `${match[1]}<span class="journey-name-via">${match[2]}</span>`;
+}
+
+function renderTransportScheduleMobile(firstDep, lastArr, lastArrTime, durationText = '', typeIcon = '') {
+  const arrivalText = lastArr !== '—' ? `${lastArr} ${lastArrTime || ''}`.trim() : '—';
+  const durationLabel = durationText ? `(${durationText.replace(/\s+/g, '')})` : '';
+  const durationIcon = typeIcon ? `<span class="transport-schedule-type">${typeIcon}</span>` : '';
 
   return `
     <div class="mobile-table-meta transport-schedule-meta">
-      <span class="transport-schedule-type">${icon}</span>
-      <span><strong>D:</strong> ${firstDep || '�'}</span>
-      <span><strong>A:</strong> ${arrivalText}</span>
+      <span class="transport-schedule-line"><strong>D:</strong> ${firstDep || '—'}</span>
+      <span class="transport-schedule-line"><strong>A:</strong> ${arrivalText}</span>
+      ${durationLabel ? `<span class="transport-schedule-line transport-schedule-duration">${durationIcon}${durationLabel}</span>` : ''}
+    </div>
+  `;
+}
+
+function renderTransportCarrierMobile(provider, routeCode, bookingReference, statusText, statusIcon, statusColor, costValue, journeyId, isEditable) {
+  const providerLine = provider ? `<span class="transport-carrier-provider">${provider}</span>` : '';
+  const codeLine = routeCode ? `<span class="transport-carrier-code">${routeCode}</span>` : '';
+  const refAndCost = [bookingReference ? `<span class="transport-carrier-pnr">${bookingReference}</span>` : '', costValue !== '' ? `<span class="transport-carrier-cost">$${costValue}</span>` : '']
+    .filter(Boolean)
+    .join('');
+  const statusNode = isEditable
+    ? `<button type="button" class="status-badge transport-mobile-status-btn" style="background:${statusColor};" onclick="toggleJourneyStatus('${journeyId}')" title="Change status">${statusIcon} ${statusText}</button>`
+    : `<span class="status-badge transport-mobile-status-btn" style="background:${statusColor};">${statusIcon} ${statusText}</span>`;
+
+  return `
+    <div class="mobile-table-meta transport-carrier-meta">
+      <div class="transport-carrier-meta-inner">
+        ${statusNode}
+      </div>
+      ${refAndCost ? `<div class="transport-carrier-inline-meta">${refAndCost}</div>` : ''}
+      ${providerLine}
+      ${codeLine}
     </div>
   `;
 }
@@ -611,7 +637,7 @@ function renderTransportStatusCostMobile(statusText, statusIcon, statusColor, co
   return '';
 }
 
-// ─── BUILD TRANSPORT TAB ────────────────────────────────────────────────────
+// â”€â”€â”€ BUILD TRANSPORT TAB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function buildTransportTab(cityFilter = null) {
   if (typeof journeys === 'undefined' || journeys === null) {
@@ -677,16 +703,16 @@ function buildTransportTab(cityFilter = null) {
           <th>Booking Ref</th>
           <th>Cost</th>
           <th>Status</th>
-          <th>Actions</th>
-        </tr>
-        <tr class="transport-mobile-head-row" aria-hidden="true">
-          <th>Journey</th>
-          <th>Schedule</th>
-          <th>Status / Cost</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
+        <th>Edit</th>
+      </tr>
+      <tr class="transport-mobile-head-row" aria-hidden="true">
+        <th>Journey</th>
+        <th>Schedule</th>
+        <th>Carrier</th>
+        <th>Edit</th>
+      </tr>
+    </thead>
+    <tbody>
       `;
 
   groupOrder.forEach(gid => {
@@ -712,32 +738,47 @@ const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + f
 
     const icon = isMultiLeg ? '✈️' : getTransportIcon(rep.transportType);
 
-const nameDisplay = rep.journeyName || '—';
+const nameDisplay = formatJourneyNameDisplay(rep.journeyName || '—');
 
 // Calculate and display total travel time for multi-leg journeys
 const durationHours = isMultiLeg ? calculateJourneyDuration(segs) : null;
-const durationDisplay = durationHours !== null ? `<br><small style="color:#888; font-style:italic;">${durationHours}hrs</small>` : '';
+const durationDisplay = durationHours !== null ? `${durationHours}h` : calculateDuration(rep.departureDate || rep.dayDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
 
 
     const isExpanded = isTransportGroupExpanded(gid);
-    const expandBtn = isMultiLeg ? `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" title="Show journey details" aria-expanded="${isExpanded}">${isExpanded ? '▼' : '▶'}</button>` : '';
+    const desktopExpandControl = isMultiLeg
+      ? `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" title="Show journey details" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Collapse journey details' : 'Expand journey details'}">
+          <span class="transport-expand-arrow">${isExpanded ? '▼' : '▶'}</span>
+        </button>`
+      : '';
+    const journeyNameCell = isMultiLeg
+      ? `
+          <div class="journey-name-main">${nameDisplay}</div>
+          <button class="journey-name-toggle ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" title="Show journey details" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Collapse journey details' : 'Expand journey details'}">
+            <span class="transport-expand-arrow">${isExpanded ? '▼' : '▶'}</span>
+            <span class="journey-name-toggle-text">${nameDisplay}</span>
+            <span class="journey-leg-badge">${segs.length} legs</span>
+          </button>`
+      : `<div class="journey-name-main">${nameDisplay}</div>`;
 
     html += `
-      <tr class="journey-parent-row" data-group="${gid}" style="border-left:3px solid ${statusColor};">
-        <td data-label="Expand">${expandBtn}</td>
+      <tr class="journey-parent-row ${isMultiLeg ? 'multi-leg-row' : ''}" data-group="${gid}" style="border-left:3px solid ${statusColor};">
+        <td class="transport-expand-col" data-label="Expand">${desktopExpandControl}</td>
         <td class="journey-name-col" data-label="Journey" title="${rep.journeyName || ''}">
-          ${expandBtn ? `<span class="transport-mobile-expand">${expandBtn}</span>` : ''}
-          <div class="journey-name-main">${nameDisplay}${durationDisplay}${isMultiLeg ? ` <span class="journey-leg-badge">${segs.length} legs</span>` : ''}</div>
-          ${renderJourneyMobileSummary(rep, isMultiLeg ? `${segs.length} legs` : ``, durationHours !== null ? `${durationHours}h` : ``)}
+          ${journeyNameCell}
+          ${renderJourneyMobileSummary(isMultiLeg ? `${segs.length} legs` : ``)}
         </td>
         <td class="transport-type-col" data-label="Type">${icon}</td>
         <td class="route-col" data-label="Route">${route}</td>
         <td class="date-col transport-departs-col" data-label="Departs">
           <span class="transport-departs-desktop">${firstDep}</span>
-          ${renderTransportScheduleMobile(icon, firstDep, lastArr, lastArrTime)}
+          ${renderTransportScheduleMobile(firstDep, lastArr, lastArrTime, durationDisplay, icon)}
         </td>
-        <td class="transport-arrives-col" data-label="Arrives">${lastArr !== '�' ? lastArr + ' ' + lastArrTime : '�'}</td>
-        <td class="transport-provider-col" data-label="Provider">${rep.provider || '—'}</td>
+        <td class="transport-arrives-col" data-label="Arrives">${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
+        <td class="transport-provider-col" data-label="Carrier">
+          <span class="transport-provider-desktop">${rep.provider || '—'}</span>
+          ${renderTransportCarrierMobile(rep.provider, rep.routeCode, rep.bookingReference, statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.id, isEditMode)}
+        </td>
         <td class="transport-routecode-col" data-label="Code">${rep.routeCode || '—'}</td>
         <td class="transport-bookingref-col" data-label="Booking Ref">${rep.bookingReference || '—'}</td>
         <td class="budget-field" data-label="Cost">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
@@ -747,21 +788,41 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
           </span>
           ${renderTransportStatusCostMobile(statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.bookingReference, rep.id, isEditMode)}
         </td>
-        <td class="transport-actions-col" data-label="Actions">
-          <button class="edit-btn" onclick="editJourney('${gid}')" title="Edit journey">✎</button>
-          ${isMultiLeg
-        ? `<button class="del-btn" onclick="if(confirm('Delete all ${segs.length} segments of this journey?')) { deleteJourneyGroup('${gid}'); buildTransportTab(); }" title="Delete journey">×</button>`
-        : `<button class="del-btn" onclick="deleteJourney('${rep.id}'); buildTransportTab();" title="Delete">×</button>`}
+        <td class="transport-actions-col" data-label="Edit">
+          <button class="edit-btn transport-edit-btn" onclick="editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">✎</button>
         </td>
       </tr>`;
 
     if (isMultiLeg) {
+      const useCompactSegments = typeof window !== 'undefined' && (window.isCompactView || document.body.classList.contains('mobile-app-mode'));
       const detailRows = segs.map((seg, i) => {
         const segDepDate = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
         const segDepTime = seg.departureTime || '';
         const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTime : segDepDate;
         const segArr = formatJourneyDate(seg.arrivalDate) || '—';
         const segRoute = `${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}`;
+
+        if (useCompactSegments) {
+          return `
+            <div class="transport-segment-mobile-row">
+              <div class="transport-segment-mobile-journey" data-label="Journey">
+                <span class="transport-segment-mobile-leg">Leg ${i + 1}</span>
+                <span class="transport-segment-mobile-route">${seg.fromLocation || '—'} → ${seg.toLocation || '—'}</span>
+              </div>
+              <div class="transport-segment-mobile-schedule" data-label="Schedule">
+                <span class="transport-schedule-line"><strong>D:</strong> ${segDep}</span>
+                <span class="transport-schedule-line"><strong>A:</strong> ${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</span>
+              </div>
+              <div class="transport-segment-mobile-provider" data-label="Carrier">
+                <span class="transport-segment-mobile-provider-name">${seg.provider || '—'}</span>
+                <span class="transport-segment-mobile-provider-meta">${seg.routeCode || '—'}</span>
+                <span class="transport-segment-mobile-provider-meta">${seg.bookingReference || '—'}</span>
+                <span class="transport-segment-mobile-provider-meta transport-segment-mobile-cost-inline">${seg.cost ? `$${seg.cost}` : '—'}</span>
+              </div>
+            </div>
+          `;
+        }
+
         return `
           <tr class="transport-segment-row">
             <td class="transport-segment-journey">${seg.fromLocation || '—'} → ${seg.toLocation || '—'}</td>
@@ -777,7 +838,21 @@ const durationDisplay = durationHours !== null ? `<br><small style="color:#888; 
         `;
       }).join('');
 
-      const detailRowContent = `
+      const detailRowContent = useCompactSegments
+        ? `
+        <div class="transport-segments-list transport-segments-list-mobile">
+          <div class="transport-segments-title">Journey Segments</div>
+          <div class="transport-segment-mobile-head-row">
+            <span>Journey</span>
+            <span>Schedule</span>
+            <span>Carrier</span>
+          </div>
+          <div class="transport-segment-mobile-list">
+            ${detailRows}
+          </div>
+        </div>
+      `
+        : `
         <div class="transport-segments-list">
           <div class="transport-segments-title">Journey Segments</div>
           <table class="transport-segment-table">
@@ -843,7 +918,7 @@ function toggleJourneyStatus(journeyId) { if (!window.isEditMode) return;
   }
 }
 
-// ─── ADD JOURNEY MODAL ──────────────────────────────────────────────────────
+// â”€â”€â”€ ADD JOURNEY MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let _pendingSegments = [];
 let _pendingJourneyId = null;
 let _pendingJourneyName = ''; // Track the name when editing
@@ -1075,7 +1150,7 @@ function _updateSegmentList() {
         <span>${depString} ➔ ${arrString}</span>
         ${providerStr ? `<span style="color: #ccc;">&bull;</span><span>${providerStr}</span>` : ''}
         <button onclick="editPendingSegment(${i})" style="background:none; border:none; color:#3498DB; cursor:pointer; font-size:1rem; opacity:0.8; padding:0 4px;" title="Edit leg">✎</button>
-        <button onclick="removePendingSegment(${i})" style="background:none; border:none; color:#E74C3C; cursor:pointer; font-size:1rem; opacity:0.6; padding:0 4px;" title="Remove leg">×</button>
+        <button onclick="removePendingSegment(${i})" style="background:none; border:none; color:#E74C3C; cursor:pointer; font-size:1rem; opacity:0.6; padding:0 4px;" title="Remove leg">Ã—</button>
       </div>`;
     }).join('');
   }
@@ -1285,4 +1360,5 @@ window.selectJourneyType = selectJourneyType;
 window.promptAddNewCity = promptAddNewCity;
 window.editJourney = editJourney;
 window.editPendingSegment = editPendingSegment;
+
 

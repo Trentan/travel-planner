@@ -46,6 +46,221 @@ body {
   font-size: 0.85rem;
   box-shadow: 0 2px 16px rgba(0,0,0,0.14);
 }
+
+@media (max-width: 768px) {
+  .transport-table-wrapper {
+    overflow-x: auto;
+    overflow-y: visible;
+    background: var(--card-strong);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .transport-table {
+    display: table;
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.78rem;
+  }
+
+  .transport-table thead {
+    display: table-header-group;
+  }
+
+  .transport-table thead tr:not(.transport-mobile-head-row) {
+    display: none;
+  }
+
+  .transport-mobile-head-row {
+    display: table-row !important;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .transport-mobile-head-row th {
+    display: table-cell !important;
+    position: sticky;
+    top: 0;
+    z-index: 8;
+    padding: 0.72rem 0.35rem 0.62rem;
+    background: linear-gradient(180deg, var(--card-strong), #fffdfb);
+    border-bottom: 1px solid rgba(36, 72, 93, 0.14);
+    vertical-align: middle;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .transport-mobile-head-row th:nth-child(1) {
+    width: 34%;
+    padding-left: 0.7rem;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(2) {
+    width: 28%;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(3) {
+    width: 26%;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(4) {
+    width: 12%;
+    padding-right: 0.6rem;
+    text-align: center;
+  }
+
+  .transport-table tbody {
+    display: table-row-group;
+  }
+
+  .transport-table .journey-parent-row {
+    display: table-row;
+    background: var(--card-strong);
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+    border-left: 4px solid transparent;
+  }
+
+  .transport-table .journey-parent-row > td {
+    display: table-cell;
+    padding: 0.66rem 0.35rem 0.58rem;
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+    vertical-align: top;
+    background: var(--card-strong);
+  }
+
+  .transport-table .journey-parent-row > td:nth-child(1),
+  .transport-table .journey-parent-row > td.transport-type-col,
+  .transport-table .journey-parent-row > td.route-col,
+  .transport-table .journey-parent-row > td.transport-arrives-col,
+  .transport-table .journey-parent-row > td.transport-routecode-col,
+  .transport-table .journey-parent-row > td.transport-bookingref-col,
+  .transport-table .journey-parent-row > td.budget-field,
+  .transport-table .journey-parent-row > td.transport-status-col {
+    display: none !important;
+  }
+
+  .transport-table .journey-parent-row > td.journey-name-col {
+    display: table-cell;
+    width: 34%;
+    padding-left: 0.7rem;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.date-col.transport-departs-col {
+    display: table-cell;
+    width: 28%;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.transport-provider-col {
+    display: table-cell;
+    width: 26%;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.transport-actions-col {
+    display: table-cell;
+    width: 12%;
+    text-align: center;
+    vertical-align: middle;
+    padding-right: 0.55rem;
+  }
+
+  .transport-table .journey-name-col .journey-name-main {
+    display: block;
+    font-size: 0.76rem;
+    line-height: 1.2;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .transport-table .journey-name-col .transport-mobile-meta,
+  .transport-table .date-col.transport-departs-col .transport-schedule-meta,
+  .transport-table .transport-provider-col .transport-carrier-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    margin-top: 0.18rem;
+  }
+
+  .transport-table .date-col.transport-departs-col .transport-schedule-line,
+  .transport-table .transport-provider-col .transport-carrier-provider,
+  .transport-table .transport-provider-col .transport-carrier-code,
+  .transport-table .transport-provider-col .transport-mobile-booking,
+  .transport-table .transport-provider-col .transport-mobile-cost-value {
+    font-size: 0.63rem;
+    line-height: 1.15;
+    color: var(--muted);
+  }
+
+  .transport-table .transport-provider-col .transport-carrier-provider {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .transport-table .date-col.transport-departs-col .transport-departs-desktop,
+  .transport-table .transport-provider-col > .transport-provider-desktop {
+    display: none;
+  }
+
+  .transport-table .transport-provider-col .transport-carrier-meta-inner {
+    align-items: flex-start;
+  }
+
+  .transport-table .transport-provider-col .transport-mobile-status-btn {
+    padding: 0.16rem 0.4rem;
+  }
+
+  .transport-table .transport-provider-col .transport-mobile-cost-line,
+  .transport-table .transport-provider-col .transport-mobile-booking {
+    justify-content: flex-start;
+  }
+
+  .transport-table .transport-action-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.22rem;
+    align-items: stretch;
+  }
+
+  .transport-table .transport-actions-col .transport-edit-btn,
+  .transport-table .transport-actions-col .del-btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 26px;
+    height: 26px;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    border: 1px solid rgba(36, 72, 93, 0.14);
+    font-size: 0.62rem;
+    line-height: 1;
+    font-weight: 700;
+    display: inline-flex !important;
+  }
+
+  .transport-table .transport-actions-col .transport-edit-btn {
+    background: rgba(36, 72, 93, 0.06);
+    color: var(--accent-strong);
+  }
+
+  .transport-table .transport-actions-col .del-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(231, 76, 60, 0.08);
+    color: #B23B2B;
+  }
+}
 .app-menu-left, .app-menu-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap; min-width: 0;}
 .app-menu-left { flex: 1 1 auto; }
 .app-menu-right { justify-content: flex-end; }
@@ -1163,7 +1378,6 @@ main {
   .accom-table .stay-actions-col .del-btn {
     display: none;
   }
-  .transport-table .transport-actions-col .edit-btn,
   .accom-table .stay-actions-col .edit-btn {
     width: auto;
     min-width: 40px;
@@ -1177,7 +1391,6 @@ main {
     position: relative;
     font-size: 0;
   }
-  .transport-table .transport-actions-col .edit-btn::before,
   .accom-table .stay-actions-col .edit-btn::before {
     content: 'Edit';
     position: absolute;
@@ -1672,6 +1885,25 @@ body.mobile-app-mode .file-badge-value {
     font-weight: 700;
   }
 
+  body.compact-view-mode .transport-table thead {
+    display: table-header-group !important;
+  }
+
+  body.compact-view-mode .transport-table thead tr:not(.transport-mobile-head-row) {
+    display: none !important;
+  }
+
+  body.compact-view-mode .transport-mobile-head-row {
+    display: table-row !important;
+  }
+
+  body.compact-view-mode .transport-mobile-head-row th {
+    display: table-cell !important;
+    position: sticky;
+    top: 0;
+    z-index: 8;
+  }
+
   .transport-mobile-head-row th {
     display: table-cell;
     position: sticky;
@@ -1730,17 +1962,17 @@ body.mobile-app-mode .file-badge-value {
   .transport-table .journey-parent-row > td.transport-type-col,
   .transport-table .journey-parent-row > td.route-col,
   .transport-table .journey-parent-row > td.transport-arrives-col,
-  .transport-table .journey-parent-row > td.transport-provider-col,
   .transport-table .journey-parent-row > td.transport-routecode-col,
   .transport-table .journey-parent-row > td.transport-bookingref-col,
-  .transport-table .journey-parent-row > td.budget-field {
+  .transport-table .journey-parent-row > td.budget-field,
+  .transport-table .journey-parent-row > td.transport-status-col {
     display: none !important;
   }
 
   .transport-table .journey-parent-row > td.journey-name-col {
     display: table-cell;
-    width: 40%;
-    padding-left: 0.75rem;
+    width: 34%;
+    padding-left: 0.7rem;
     border-right: 1px solid rgba(36, 72, 93, 0.08);
   }
 
@@ -1750,92 +1982,324 @@ body.mobile-app-mode .file-badge-value {
     border-right: 1px solid rgba(36, 72, 93, 0.08);
   }
 
-  .transport-table .journey-parent-row > td.transport-status-col {
+  .transport-table .journey-parent-row > td.transport-provider-col {
     display: table-cell;
-    width: 22%;
+    width: 26%;
     border-right: 1px solid rgba(36, 72, 93, 0.08);
   }
 
   .transport-table .journey-parent-row > td.transport-actions-col {
     display: table-cell;
-    width: 10%;
+    width: 12%;
     text-align: center;
     vertical-align: middle;
-    padding-right: 0.65rem;
+    padding-right: 0.55rem;
   }
 
   .transport-table .journey-name-col .journey-name-main {
     display: block;
-    font-size: 0.77rem;
-    line-height: 1.25;
+    font-size: 0.76rem;
+    line-height: 1.2;
     font-weight: 700;
     overflow-wrap: anywhere;
   }
 
   .transport-table .journey-name-col .transport-mobile-meta,
   .transport-table .date-col.transport-departs-col .transport-schedule-meta,
-  .transport-table .transport-status-col .transport-status-cost-meta {
+  .transport-table .transport-provider-col .transport-carrier-meta {
     display: flex;
     flex-direction: column;
     gap: 0.12rem;
     margin-top: 0.18rem;
   }
 
+  .transport-table .date-col.transport-departs-col .transport-schedule-meta {
+    align-items: flex-start;
+    text-align: left;
+  }
+
   .transport-table .journey-name-col .transport-mobile-provider,
   .transport-table .date-col.transport-departs-col .transport-schedule-meta span,
-  .transport-table .transport-status-col .transport-status-cost-meta span {
+  .transport-table .transport-provider-col .transport-carrier-provider,
+  .transport-table .transport-provider-col .transport-carrier-code,
+  .transport-table .transport-provider-col .transport-mobile-booking,
+  .transport-table .transport-provider-col .transport-mobile-cost-value {
     font-size: 0.65rem;
     line-height: 1.15;
     color: var(--muted);
   }
 
   .transport-table .date-col.transport-departs-col .transport-departs-desktop,
-  .transport-table .transport-status-col > .status-badge {
+  .transport-table .transport-provider-col > .transport-provider-desktop,
+  .transport-table .transport-status-col {
     display: none;
   }
 
-  .transport-table .transport-status-col .transport-status-cost-meta {
+  .transport-table .transport-provider-col .transport-carrier-provider {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .transport-table .transport-provider-col .transport-carrier-meta-inner {
     align-items: flex-start;
     text-align: left;
   }
 
-  .transport-table .transport-mobile-status-btn {
+  .transport-table .transport-provider-col .transport-mobile-status-btn {
     padding: 0.15rem 0.38rem;
   }
 
-  .transport-table .transport-mobile-cost-line,
-  .transport-table .transport-mobile-booking {
+  .transport-table .transport-provider-col .transport-mobile-cost-line,
+  .transport-table .transport-provider-col .transport-mobile-booking {
     justify-content: flex-start;
   }
 
-  .transport-table .transport-actions-col .del-btn,
-  .transport-table .transport-actions-col .edit-btn {
-    min-width: 40px;
-    height: 28px;
-    min-height: 28px;
-    padding: 0 0.45rem;
+  .transport-table .transport-action-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.22rem;
+    align-items: stretch;
+  }
+
+  .transport-table .transport-actions-col .transport-edit-btn,
+  .transport-table .transport-actions-col .del-btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 26px;
+    height: 26px;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    border: 1px solid rgba(36, 72, 93, 0.14);
+    font-size: 0.62rem;
+    line-height: 1;
+    font-weight: 700;
+  }
+
+  .transport-table .transport-actions-col .transport-edit-btn {
+    background: rgba(36, 72, 93, 0.06);
+    color: var(--accent-strong);
   }
 
   .transport-table .transport-actions-col .del-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    background: rgba(231, 76, 60, 0.08);
+    color: #B23B2B;
+  }
+}
+
+@media (max-width: 768px) {
+  .transport-table-wrapper {
+    overflow-x: auto;
+    overflow-y: visible;
+    background: var(--card-strong);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
   }
 
-  .transport-table .transport-actions-col .edit-btn {
+  .transport-table {
+    display: table;
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.78rem;
+  }
+
+  .transport-table thead {
+    display: table-header-group;
+  }
+
+  .transport-table thead tr:not(.transport-mobile-head-row) {
+    display: none;
+  }
+
+  .transport-mobile-head-row {
+    display: table-row;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .transport-mobile-head-row th {
+    display: table-cell;
+    position: sticky;
+    top: 0;
+    z-index: 8;
+    padding: 0.72rem 0.35rem 0.62rem;
+    background: linear-gradient(180deg, var(--card-strong), #fffdfb);
+    border-bottom: 1px solid rgba(36, 72, 93, 0.14);
+    vertical-align: middle;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .transport-mobile-head-row th:nth-child(1) {
+    width: 34%;
+    padding-left: 0.7rem;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(2) {
+    width: 28%;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(3) {
+    width: 26%;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(4) {
+    width: 12%;
+    padding-right: 0.6rem;
+    text-align: center;
+  }
+
+  .transport-table tbody {
+    display: table-row-group;
+  }
+
+  .transport-table .journey-parent-row {
+    display: table-row;
+    background: var(--card-strong);
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+    border-left: 4px solid transparent;
+  }
+
+  .transport-table .journey-parent-row > td {
+    display: table-cell;
+    padding: 0.66rem 0.35rem 0.58rem;
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+    vertical-align: top;
+    background: var(--card-strong);
+  }
+
+  .transport-table .journey-parent-row > td:nth-child(1),
+  .transport-table .journey-parent-row > td.transport-type-col,
+  .transport-table .journey-parent-row > td.route-col,
+  .transport-table .journey-parent-row > td.transport-arrives-col,
+  .transport-table .journey-parent-row > td.transport-routecode-col,
+  .transport-table .journey-parent-row > td.transport-bookingref-col,
+  .transport-table .journey-parent-row > td.budget-field,
+  .transport-table .journey-parent-row > td.transport-status-col {
+    display: none !important;
+  }
+
+  .transport-table .journey-parent-row > td.journey-name-col {
+    display: table-cell;
+    width: 34%;
+    padding-left: 0.7rem;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.date-col.transport-departs-col {
+    display: table-cell;
+    width: 28%;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.transport-provider-col {
+    display: table-cell;
+    width: 26%;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.transport-actions-col {
+    display: table-cell;
+    width: 12%;
+    text-align: center;
+    vertical-align: middle;
+    padding-right: 0.55rem;
+  }
+
+  .transport-table .journey-name-col .journey-name-main {
+    display: block;
+    font-size: 0.76rem;
+    line-height: 1.2;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .transport-table .journey-name-col .transport-mobile-meta,
+  .transport-table .date-col.transport-departs-col .transport-schedule-meta,
+  .transport-table .transport-provider-col .transport-carrier-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    margin-top: 0.18rem;
+  }
+
+  .transport-table .date-col.transport-departs-col .transport-schedule-line,
+  .transport-table .transport-provider-col .transport-carrier-provider,
+  .transport-table .transport-provider-col .transport-carrier-code,
+  .transport-table .transport-provider-col .transport-mobile-booking,
+  .transport-table .transport-provider-col .transport-mobile-cost-value {
+    font-size: 0.63rem;
+    line-height: 1.15;
+    color: var(--muted);
+  }
+
+  .transport-table .transport-provider-col .transport-carrier-provider {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .transport-table .date-col.transport-departs-col .transport-departs-desktop,
+  .transport-table .transport-provider-col > .transport-provider-desktop {
+    display: none;
+  }
+
+  .transport-table .transport-provider-col .transport-carrier-meta-inner {
+    align-items: flex-start;
+  }
+
+  .transport-table .transport-provider-col .transport-mobile-status-btn {
+    padding: 0.16rem 0.4rem;
+  }
+
+  .transport-table .transport-provider-col .transport-mobile-cost-line,
+  .transport-table .transport-provider-col .transport-mobile-booking {
+    justify-content: flex-start;
+  }
+
+  .transport-table .transport-action-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.22rem;
+    align-items: stretch;
+  }
+
+  .transport-table .transport-actions-col .transport-edit-btn,
+  .transport-table .transport-actions-col .del-btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 26px;
+    height: 26px;
+    padding: 0 0.3rem;
     border-radius: 999px;
     border: 1px solid rgba(36, 72, 93, 0.14);
-    background: rgba(36, 72, 93, 0.04);
-    color: var(--accent-strong);
-    font-size: 0;
-    position: relative;
+    font-size: 0.62rem;
+    line-height: 1;
+    font-weight: 700;
   }
 
-  .transport-table .transport-actions-col .edit-btn::before {
-    content: 'Edit';
-    font-size: 0.66rem;
-    font-weight: 700;
-    line-height: 1;
+  .transport-table .transport-actions-col .transport-edit-btn {
+    background: rgba(36, 72, 93, 0.06);
+    color: var(--accent-strong);
+  }
+
+  .transport-table .transport-actions-col .del-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(231, 76, 60, 0.08);
+    color: #B23B2B;
   }
 }
 
@@ -3962,6 +4426,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   .transport-mobile-head-row,
   .transport-mobile-expand,
   .transport-schedule-meta,
+  .transport-carrier-meta,
   .transport-status-cost-meta,
   .transport-mobile-menu-btn,
   .stay-mobile-meta,
@@ -4019,15 +4484,53 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
 
   .transport-table thead {
-    display: none !important;
+    display: table-header-group;
   }
 
   .transport-mobile-head-row {
-    display: none !important;
+    display: table-row;
   }
 
   .transport-table tbody {
     display: block;
+  }
+
+  .transport-mobile-column-head-detailed {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.9fr) auto;
+    align-items: center;
+    gap: 0;
+    position: sticky;
+    top: var(--tabs-nav-sticky-top, 0px);
+    z-index: 5;
+    background: var(--card-strong);
+    border: 1px solid rgba(36, 72, 93, 0.12);
+    border-bottom: 1px solid rgba(36, 72, 93, 0.18);
+    border-radius: 12px 12px 0 0;
+    margin: 0 0 0.4rem 0;
+    overflow: hidden;
+  }
+
+  .transport-mobile-column-head-detailed span {
+    display: block;
+    padding: 0.55rem 0.45rem 0.5rem;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 800;
+    color: var(--text);
+    white-space: nowrap;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-mobile-column-head-detailed span:nth-child(1) {
+    padding-left: 0.75rem;
+  }
+
+  .transport-mobile-column-head-detailed span:nth-child(4) {
+    text-align: center;
+    border-right: 0;
+    padding-right: 0.65rem;
   }
 
   .transport-table .journey-parent-row {
@@ -4093,12 +4596,57 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     display: none !important;
   }
 
+  .transport-table .journey-name-col .journey-name-main,
+  .transport-table .journey-name-col .journey-name-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font-size: 0.72rem;
+    line-height: 1.18;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+  }
+
   .transport-table .journey-name-col .journey-name-main {
     display: block;
-    font-size: 0.78rem;
-    line-height: 1.1;
-    font-weight: 700;
+    cursor: default;
+  }
+
+  .transport-table .journey-name-col .journey-name-toggle {
+    color: var(--text);
+  }
+
+  .transport-table .journey-name-col .journey-name-toggle .transport-expand-arrow {
+    font-size: 0.62rem;
+    line-height: 1;
+    flex: 0 0 auto;
+    color: var(--accent-strong);
+    opacity: 0.82;
+  }
+
+  .transport-table .journey-name-col .journey-name-toggle .journey-name-toggle-text {
+    flex: 1 1 auto;
+    min-width: 0;
     overflow-wrap: anywhere;
+    font: inherit;
+    color: inherit;
+  }
+
+  .transport-table .journey-name-col .journey-name-toggle .journey-leg-badge {
+    flex: 0 0 auto;
+    margin-left: 0.1rem;
+  }
+
+  .transport-table .journey-name-col .journey-name-via {
+    font-style: italic !important;
+    font-weight: 400 !important;
   }
 
   .transport-table .journey-name-col .transport-mobile-meta {
@@ -4160,25 +4708,32 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     line-height: 1;
   }
 
-  .transport-table .transport-actions-col .edit-btn {
-    width: auto;
-    min-width: 40px;
-    height: 26px;
-    min-height: 26px;
-    padding: 0 0.5rem;
+  .transport-table .transport-actions-col .transport-edit-btn {
+    width: 1.8rem;
+    min-width: 1.8rem;
+    height: 1.8rem;
+    min-height: 1.8rem;
+    padding: 0;
     border-radius: 999px;
-    border: 1px solid rgba(36, 72, 93, 0.14);
-    background: rgba(36, 72, 93, 0.04);
-    color: var(--accent-strong);
+    border: 1px solid rgba(45, 156, 219, 0.28);
+    background: rgba(45, 156, 219, 0.08);
+    color: #2d9cdb;
     font-size: 0;
     font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .transport-table .transport-actions-col .edit-btn::before {
-    content: 'Edit';
-    position: static;
-    color: var(--accent-strong);
-    font-size: 0.66rem;
+  .transport-table .transport-actions-col .transport-edit-btn::before {
+    content: '\270E';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #2d9cdb;
+    font-size: 0.78rem;
     line-height: 1;
   }
 }
@@ -4357,7 +4912,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
 
   .transport-table .transport-actions-col .del-btn,
-  .transport-table .transport-actions-col .edit-btn {
+  .transport-table .transport-actions-col .transport-edit-btn {
     min-width: 40px;
     height: 28px;
     min-height: 28px;
@@ -4370,7 +4925,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     justify-content: center;
   }
 
-  .transport-table .transport-actions-col .edit-btn {
+  .transport-table .transport-actions-col .transport-edit-btn {
     border-radius: 999px;
     border: 1px solid rgba(36, 72, 93, 0.14);
     background: rgba(36, 72, 93, 0.04);
@@ -4379,11 +4934,504 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     position: relative;
   }
 
-  .transport-table .transport-actions-col .edit-btn::before {
-    content: 'Edit';
-    font-size: 0.66rem;
+  .transport-table .transport-actions-col .transport-edit-btn::before {
+    content: '\270E';
+    font-size: 0.72rem;
     font-weight: 700;
     line-height: 1;
+    color: #2d9cdb;
+  }
+}
+
+@media (max-width: 768px) {
+  .transport-table-wrapper {
+    overflow-x: auto;
+    overflow-y: visible;
+    background: var(--card-strong);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .transport-table {
+    display: table;
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.78rem;
+  }
+
+  .transport-table thead {
+    display: table-header-group;
+  }
+
+  .transport-table thead tr:not(.transport-mobile-head-row) {
+    display: none;
+  }
+
+  .transport-mobile-head-row {
+    display: table-row;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .transport-mobile-head-row th {
+    display: table-cell;
+    position: sticky;
+    top: 0;
+    z-index: 8;
+    padding: 0.72rem 0.35rem 0.62rem;
+    background: linear-gradient(180deg, var(--card-strong), #fffdfb);
+    border-bottom: 1px solid rgba(36, 72, 93, 0.14);
+    vertical-align: middle;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .transport-mobile-head-row th:nth-child(1) { width: 34%; padding-left: 0.7rem; text-align: left; }
+  .transport-mobile-head-row th:nth-child(2) { width: 28%; text-align: left; }
+  .transport-mobile-head-row th:nth-child(3) { width: 26%; text-align: left; }
+  .transport-mobile-head-row th:nth-child(4) { width: 12%; padding-right: 0.6rem; text-align: center; }
+
+  .transport-table tbody {
+    display: table-row-group;
+  }
+
+  .transport-table .journey-parent-row {
+    display: table-row;
+    background: var(--card-strong);
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+    border-left: 4px solid transparent;
+  }
+
+  .transport-table .journey-parent-row > td {
+    display: table-cell;
+    padding: 0.66rem 0.35rem 0.58rem;
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+    vertical-align: top;
+    background: var(--card-strong);
+  }
+
+  .transport-table .journey-parent-row > td:nth-child(1),
+  .transport-table .journey-parent-row > td.transport-type-col,
+  .transport-table .journey-parent-row > td.route-col,
+  .transport-table .journey-parent-row > td.transport-arrives-col,
+  .transport-table .journey-parent-row > td.transport-routecode-col,
+  .transport-table .journey-parent-row > td.transport-bookingref-col,
+  .transport-table .journey-parent-row > td.budget-field,
+  .transport-table .journey-parent-row > td.transport-status-col {
+    display: none !important;
+  }
+
+  .transport-table .journey-parent-row > td.journey-name-col {
+    display: table-cell !important;
+    width: 34%;
+    padding-left: 0.7rem;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.date-col.transport-departs-col {
+    display: table-cell !important;
+    width: 28%;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.transport-provider-col {
+    display: table-cell !important;
+    width: 26%;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.transport-actions-col {
+    display: table-cell !important;
+    width: 12%;
+    text-align: center;
+    vertical-align: middle;
+    padding-right: 0.55rem;
+  }
+
+  .transport-table .journey-name-col .journey-name-main {
+    display: block;
+    font-size: 0.76rem;
+    line-height: 1.2;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .transport-table .journey-name-col .transport-mobile-meta,
+  .transport-table .date-col.transport-departs-col .transport-schedule-meta,
+  .transport-table .transport-provider-col .transport-carrier-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    margin-top: 0.18rem;
+  }
+
+  .transport-table .journey-name-col .transport-mobile-provider,
+  .transport-table .date-col.transport-departs-col .transport-schedule-meta span,
+  .transport-table .transport-provider-col .transport-carrier-provider,
+  .transport-table .transport-provider-col .transport-carrier-code,
+  .transport-table .transport-provider-col .transport-mobile-booking,
+  .transport-table .transport-provider-col .transport-mobile-cost-value {
+    font-size: 0.63rem;
+    line-height: 1.15;
+    color: var(--muted);
+  }
+
+  .transport-table .transport-provider-col .transport-carrier-provider {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .transport-table .transport-provider-col .transport-carrier-inline-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.28rem;
+    align-items: baseline;
+    margin-top: 0.1rem;
+    font-size: 0.63rem;
+    line-height: 1.1;
+    color: var(--muted);
+  }
+
+  .transport-table .transport-provider-col .transport-carrier-pnr {
+    font-weight: 600;
+  }
+
+  .transport-table .transport-provider-col .transport-carrier-cost {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .transport-table .date-col.transport-departs-col .transport-departs-desktop,
+  .transport-table .transport-provider-col > .transport-provider-desktop,
+  .transport-table .transport-status-col {
+    display: none !important;
+  }
+
+  .transport-table .date-col.transport-departs-col .transport-schedule-duration {
+    color: var(--muted);
+    font-size: 0.64rem;
+  }
+
+  .transport-table .transport-segments-list,
+  .transport-table .transport-segment-row {
+    display: none !important;
+  }
+
+  body.compact-view-mode .transport-table .journey-name-col .transport-mobile-expand,
+  body.compact-view-mode .transport-table .journey-name-col .transport-mobile-expand .journey-expand-btn {
+    display: inline-flex !important;
+    align-items: center;
+  }
+
+  body.compact-view-mode .transport-table .journey-name-col .journey-name-toggle {
+    display: inline-flex;
+  }
+
+  body.compact-view-mode .transport-table .journey-name-col .transport-mobile-expand {
+    margin-top: 0.16rem;
+  }
+
+  body.compact-view-mode .transport-table .journey-name-col .journey-expand-btn {
+    gap: 0.25rem;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    color: var(--accent-strong);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  body.compact-view-mode .transport-table .journey-name-col .journey-expand-btn::before {
+    content: none;
+  }
+
+  body.compact-view-mode .transport-table .journey-name-col .journey-name-toggle {
+    gap: 0.25rem;
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--text);
+    font-size: 0.72rem;
+    line-height: 1.18;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  body.compact-view-mode .transport-table .journey-name-col .journey-name-toggle .transport-expand-arrow {
+    font-size: 0.62rem;
+    color: var(--accent-strong);
+    opacity: 0.82;
+  }
+
+  body.compact-view-mode .transport-table .journey-name-col .journey-name-via,
+  body.mobile-app-mode .transport-table .journey-name-col .journey-name-via {
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segments-list-mobile,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segments-list-mobile {
+    display: block !important;
+    margin-top: 0.2rem;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded {
+    display: block !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    box-sizing: border-box;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded td,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded td {
+    display: block !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    box-sizing: border-box;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row,
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row {
+    display: grid !important;
+    grid-template-columns: 34% 34% 32%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row {
+    position: sticky;
+    top: 0;
+    z-index: 7;
+    background: #eef3f7;
+    border-top: 1px solid rgba(36, 72, 93, 0.12);
+    border-bottom: 1px solid rgba(36, 72, 93, 0.2);
+    box-shadow: inset 0 -1px 0 rgba(36, 72, 93, 0.06);
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row span,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row span {
+    display: block;
+    padding: 0.52rem 0.4rem 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.62rem;
+    color: var(--text);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row span:nth-child(1),
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row span:nth-child(1) { padding-left: 0.7rem; text-align: left; border-right: 1px solid rgba(36, 72, 93, 0.08); }
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row span:nth-child(2),
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row span:nth-child(2) { text-align: left; border-right: 1px solid rgba(36, 72, 93, 0.08); }
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row span:nth-child(3),
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-head-row span:nth-child(3) { padding-right: 0.5rem; text-align: left; border-right: 0; }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row {
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+    background: var(--card-strong);
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row > div,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row > div {
+    padding: 0.62rem 0.4rem 0.56rem;
+    vertical-align: top;
+    background: var(--card-strong);
+    min-width: 0;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row > div:nth-child(1),
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row > div:nth-child(1) {
+    padding-left: 0.7rem;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row > div:nth-child(2),
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row > div:nth-child(3),
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row > div:nth-child(2),
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-row > div:nth-child(3) {
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-leg,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-leg {
+    display: block;
+    font-size: 0.56rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 0.08rem;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-route,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-route {
+    display: block;
+    font-size: 0.72rem;
+    line-height: 1.18;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-schedule,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-schedule {
+    text-align: left;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-schedule .transport-schedule-line,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-schedule .transport-schedule-line {
+    display: block;
+    font-size: 0.62rem;
+    line-height: 1.15;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-provider,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-provider {
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-provider-name,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-provider-name {
+    display: block;
+    font-size: 0.72rem;
+    line-height: 1.15;
+    font-weight: 700;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-provider-meta,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-provider-meta {
+    display: block;
+    font-size: 0.62rem;
+    line-height: 1.12;
+    color: var(--muted);
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-cost-inline,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-cost-inline {
+    margin-top: 0.08rem;
+    color: var(--text);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  body.compact-view-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-list,
+  body.mobile-app-mode .transport-table .journey-detail-row.expanded .transport-segment-mobile-list {
+    display: block;
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .transport-provider-col .transport-carrier-meta-inner {
+    align-items: flex-start;
+  }
+
+  .transport-table .transport-provider-col .transport-mobile-status-btn {
+    padding: 0.16rem 0.4rem;
+  }
+
+  .transport-table .transport-provider-col .transport-mobile-cost-line,
+  .transport-table .transport-provider-col .transport-mobile-booking {
+    justify-content: flex-start;
+  }
+
+  .transport-table .transport-action-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.22rem;
+    align-items: stretch;
+  }
+
+  .transport-table .transport-actions-col .transport-edit-btn {
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    padding: 0 4px;
+    border: 0;
+    border-radius: 0;
+    background: none !important;
+    color: #3498DB;
+    font-size: 1rem;
+    line-height: 1;
+    font-weight: 400;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.3;
+    text-decoration: none;
+    position: static;
+  }
+
+  .transport-table .transport-actions-col .transport-edit-btn::before {
+    content: none;
+  }
+
+  .transport-table .transport-actions-col .del-btn {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .transport-table .journey-parent-row.multi-leg-row > td.transport-expand-col {
+    width: 52px;
+    text-align: center;
+    vertical-align: middle;
+    padding-left: 0.4rem;
+    padding-right: 0.25rem;
+  }
+
+  .transport-table .journey-parent-row.multi-leg-row > td.transport-expand-col .journey-expand-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+  }
+
+  .transport-table .journey-parent-row.multi-leg-row > td.journey-name-col .journey-name-toggle {
+    display: none !important;
+  }
+
+  .transport-table .journey-parent-row.multi-leg-row > td.journey-name-col .journey-name-main {
+    display: block;
+  }
+
+  .transport-table .transport-actions-col .edit-btn.transport-edit-btn {
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 4px;
+    min-width: 0;
+    min-height: 0;
+    width: auto;
+    height: auto;
+    border: 0;
+    background: none;
+    color: #3498DB;
+    opacity: 0.3;
+  }
+}
+
+@media (max-width: 768px) {
+  .transport-table .journey-parent-row.multi-leg-row > td.transport-expand-col {
+    display: none !important;
+  }
+
+  .transport-table .journey-parent-row.multi-leg-row > td.journey-name-col .journey-name-main {
+    display: none !important;
+  }
+
+  .transport-table .journey-parent-row.multi-leg-row > td.journey-name-col .journey-name-toggle {
+    display: inline-flex !important;
   }
 }
 
