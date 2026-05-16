@@ -69,7 +69,7 @@ function renderStayStatusCostSummary(stay, status, statusIcon) {
         statusOnClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
         costOnBlur: `updateStayField('${stay.id}', 'totalCost', this.innerText)`,
         statusButtonTitle: 'Change status',
-        metaClass: 'stay-status-cost-meta',
+        metaClass: 'stay-status-cost-meta mobile-status-cost-meta',
         editableCost: isEditMode
       })
     : '';

@@ -1328,11 +1328,20 @@ main {
   .transport-table .transport-status-col > .status-badge {
     display: none;
   }
-  .transport-status-cost-meta {
-    margin-top: 0;
+  .transport-status-cost-meta,
+  .stay-status-cost-meta,
+  .mobile-status-cost-meta {
+    display: flex !important;
+    flex-wrap: wrap;
     align-items: center;
+    column-gap: 0.5rem;
+    row-gap: 0.15rem;
+    margin-top: 0.15rem;
     text-align: left;
+    align-content: flex-start;
   }
+  .mobile-status-cost-meta .transport-mobile-status-btn,
+  .mobile-status-cost-meta .status-badge,
   .transport-mobile-status-btn {
     display: inline-flex;
     align-items: center;
@@ -1348,6 +1357,22 @@ main {
     white-space: nowrap;
     cursor: pointer;
     appearance: none;
+    border-radius: 4px;
+  }
+  .mobile-status-cost-meta .transport-mobile-cost-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.05rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .mobile-status-cost-meta .transport-mobile-booking {
+    display: inline-block;
+    font-size: 0.64rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
     -webkit-appearance: none;
     outline: none;
     box-shadow: none;

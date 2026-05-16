@@ -630,7 +630,7 @@ function renderTransportStatusCostMobile(statusText, statusIcon, statusColor, co
       statusOnClick: isEditable ? `toggleJourneyStatus('${journeyId}')` : '',
       costOnBlur: `updateJourneyCost('${journeyId}', this.innerText); buildTransportTab();`,
       statusButtonTitle: 'Change status',
-      metaClass: 'transport-status-cost-meta',
+      metaClass: 'transport-status-cost-meta mobile-status-cost-meta',
       editableCost: isEditable
     });
   }
