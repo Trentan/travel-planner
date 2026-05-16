@@ -680,10 +680,10 @@ function buildTransportTab(cityFilter = null) {
           <th>Actions</th>
         </tr>
         <tr class="transport-mobile-head-row" aria-hidden="true">
-          <th>Destination / Leg</th>
+          <th>Journey</th>
           <th>Schedule</th>
-          <th>Status & Cost/PNR</th>
-          <th aria-hidden="true"></th>
+          <th>Status / Cost</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>

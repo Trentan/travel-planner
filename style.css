@@ -1003,6 +1003,21 @@ main {
     gap: 0.12rem;
     margin-top: 0.18rem;
   }
+  .transport-table .date-col.transport-departs-col .transport-schedule-meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.35rem;
+    row-gap: 0.08rem;
+  }
+  .transport-table .transport-status-col .transport-status-cost-meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.45rem;
+    row-gap: 0.1rem;
+    align-content: flex-start;
+  }
   .transport-table .journey-name-col .transport-mobile-meta {
     gap: 0.04rem;
     margin-top: 0;
@@ -1017,16 +1032,16 @@ main {
   .transport-table .journey-name-col .transport-mobile-meta span,
   .transport-table .date-col.transport-departs-col .transport-schedule-meta span,
   .transport-table .transport-status-col .transport-status-cost-meta span {
-    display: block;
+    display: inline;
     padding: 0;
     border: 0;
     background: transparent;
-    font-size: 0.69rem;
-    line-height: 1.25;
+    font-size: 0.66rem;
+    line-height: 1.1;
     color: var(--muted);
   }
   .transport-table .date-col.transport-departs-col .transport-schedule-type {
-    display: block;
+    display: none;
     font-size: 0.8rem;
     line-height: 1;
     color: var(--text);
@@ -1068,7 +1083,7 @@ main {
     font-weight: 600;
   }
   .transport-table .transport-status-col .transport-mobile-booking {
-    display: block;
+    display: none !important;
     margin-top: 0.08rem;
     font-size: 0.68rem;
     color: var(--muted);
@@ -1082,18 +1097,18 @@ main {
   .transport-status-cost-meta {
     margin-top: 0;
     align-items: center;
-    text-align: center;
+    text-align: left;
   }
   .transport-mobile-status-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    width: auto;
     margin: 0;
-    padding: 0.18rem 0.45rem;
+    padding: 0.14rem 0.42rem;
     border: 0;
     color: #fff;
-    font-size: 0.72rem;
+    font-size: 0.66rem;
     font-weight: 700;
     line-height: 1.1;
     white-space: nowrap;
@@ -1112,10 +1127,10 @@ main {
     gap: 0.08rem;
     white-space: nowrap;
     line-height: 1;
-    width: 100%;
+    width: auto;
   }
   .transport-mobile-cost-currency {
-    font-size: 0.72rem;
+    font-size: 0.66rem;
     font-weight: 700;
     color: var(--accent-strong);
     line-height: 1;
@@ -1123,7 +1138,7 @@ main {
   .transport-mobile-cost-value {
     font-family: 'DM Mono', monospace;
     font-weight: 700;
-    font-size: 0.74rem;
+    font-size: 0.68rem;
     color: var(--accent-strong);
     white-space: nowrap;
   }
@@ -1150,27 +1165,28 @@ main {
   }
   .transport-table .transport-actions-col .edit-btn,
   .accom-table .stay-actions-col .edit-btn {
-    width: 28px;
-    height: 28px;
-    min-height: 28px;
-    padding: 0;
-    border-radius: 6px;
-    background: transparent;
-    border-color: transparent;
-    color: transparent;
+    width: auto;
+    min-width: 40px;
+    height: 26px;
+    min-height: 26px;
+    padding: 0 0.5rem;
+    border-radius: 999px;
+    border: 1px solid rgba(36, 72, 93, 0.14);
+    background: rgba(36, 72, 93, 0.04);
+    color: var(--accent-strong);
     position: relative;
     font-size: 0;
   }
   .transport-table .transport-actions-col .edit-btn::before,
   .accom-table .stay-actions-col .edit-btn::before {
-    content: '\22EE';
+    content: 'Edit';
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--accent-strong);
-    font-size: 1rem;
+    font-size: 0.66rem;
     line-height: 1;
   }
   .transport-table .journey-detail-row td,
@@ -1617,6 +1633,210 @@ body.mobile-app-mode .file-badge-label {
 body.mobile-app-mode .file-badge-value {
   min-width: 0;
   max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .transport-table-wrapper {
+    overflow-x: auto;
+    overflow-y: visible;
+    background: var(--card-strong);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .transport-table {
+    display: table;
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.79rem;
+  }
+
+  .transport-table thead {
+    display: table-header-group;
+  }
+
+  .transport-table thead tr:not(.transport-mobile-head-row) {
+    display: none;
+  }
+
+  .transport-mobile-head-row {
+    display: table-row;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .transport-mobile-head-row th {
+    display: table-cell;
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    padding: 0.72rem 0.4rem 0.62rem;
+    background: var(--card-strong);
+    border-bottom: 1px solid rgba(36, 72, 93, 0.12);
+    vertical-align: middle;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+
+  .transport-mobile-head-row th:nth-child(1) {
+    width: 40%;
+    padding-left: 0.75rem;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(2) {
+    width: 28%;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(3) {
+    width: 22%;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(4) {
+    width: 10%;
+    padding-right: 0.65rem;
+    text-align: center;
+  }
+
+  .transport-table tbody {
+    display: table-row-group;
+  }
+
+  .transport-table .journey-parent-row {
+    display: table-row;
+    background: var(--card-strong);
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+    border-left: 4px solid transparent;
+  }
+
+  .transport-table .journey-parent-row > td {
+    display: table-cell;
+    padding: 0.68rem 0.4rem 0.62rem;
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+    vertical-align: top;
+    background: var(--card-strong);
+  }
+
+  .transport-table .journey-parent-row > td:nth-child(1),
+  .transport-table .journey-parent-row > td.transport-type-col,
+  .transport-table .journey-parent-row > td.route-col,
+  .transport-table .journey-parent-row > td.transport-arrives-col,
+  .transport-table .journey-parent-row > td.transport-provider-col,
+  .transport-table .journey-parent-row > td.transport-routecode-col,
+  .transport-table .journey-parent-row > td.transport-bookingref-col,
+  .transport-table .journey-parent-row > td.budget-field {
+    display: none !important;
+  }
+
+  .transport-table .journey-parent-row > td.journey-name-col {
+    display: table-cell;
+    width: 40%;
+    padding-left: 0.75rem;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.date-col.transport-departs-col {
+    display: table-cell;
+    width: 28%;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.transport-status-col {
+    display: table-cell;
+    width: 22%;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.transport-actions-col {
+    display: table-cell;
+    width: 10%;
+    text-align: center;
+    vertical-align: middle;
+    padding-right: 0.65rem;
+  }
+
+  .transport-table .journey-name-col .journey-name-main {
+    display: block;
+    font-size: 0.77rem;
+    line-height: 1.25;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .transport-table .journey-name-col .transport-mobile-meta,
+  .transport-table .date-col.transport-departs-col .transport-schedule-meta,
+  .transport-table .transport-status-col .transport-status-cost-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    margin-top: 0.18rem;
+  }
+
+  .transport-table .journey-name-col .transport-mobile-provider,
+  .transport-table .date-col.transport-departs-col .transport-schedule-meta span,
+  .transport-table .transport-status-col .transport-status-cost-meta span {
+    font-size: 0.65rem;
+    line-height: 1.15;
+    color: var(--muted);
+  }
+
+  .transport-table .date-col.transport-departs-col .transport-departs-desktop,
+  .transport-table .transport-status-col > .status-badge {
+    display: none;
+  }
+
+  .transport-table .transport-status-col .transport-status-cost-meta {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .transport-table .transport-mobile-status-btn {
+    padding: 0.15rem 0.38rem;
+  }
+
+  .transport-table .transport-mobile-cost-line,
+  .transport-table .transport-mobile-booking {
+    justify-content: flex-start;
+  }
+
+  .transport-table .transport-actions-col .del-btn,
+  .transport-table .transport-actions-col .edit-btn {
+    min-width: 40px;
+    height: 28px;
+    min-height: 28px;
+    padding: 0 0.45rem;
+  }
+
+  .transport-table .transport-actions-col .del-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .transport-table .transport-actions-col .edit-btn {
+    border-radius: 999px;
+    border: 1px solid rgba(36, 72, 93, 0.14);
+    background: rgba(36, 72, 93, 0.04);
+    color: var(--accent-strong);
+    font-size: 0;
+    position: relative;
+  }
+
+  .transport-table .transport-actions-col .edit-btn::before {
+    content: 'Edit';
+    font-size: 0.66rem;
+    font-weight: 700;
+    line-height: 1;
+  }
 }
 
 body.mobile-app-mode .save-status,
@@ -3779,6 +3999,391 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
   .accom-table .stay-status-cost-meta .transport-mobile-booking {
     display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .transport-table-wrapper {
+    overflow: visible;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .transport-table {
+    display: block;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.7rem;
+    font-size: 0.84rem;
+  }
+
+  .transport-table thead {
+    display: none !important;
+  }
+
+  .transport-mobile-head-row {
+    display: none !important;
+  }
+
+  .transport-table tbody {
+    display: block;
+  }
+
+  .transport-table .journey-parent-row {
+    display: grid;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "journey actions"
+      "schedule actions"
+      "status actions";
+    column-gap: 0.6rem;
+    row-gap: 0.18rem;
+    background: var(--card-strong);
+    border: 1px solid rgba(36, 72, 93, 0.12);
+    border-left-width: 4px;
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+    padding: 0.42rem 0.45rem 0.38rem 0;
+  }
+
+  .transport-table .journey-parent-row > td {
+    display: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    min-width: 0;
+  }
+
+  .transport-table .journey-parent-row > td.journey-name-col {
+    display: block;
+    grid-area: journey;
+    padding-left: 0.65rem;
+  }
+
+  .transport-table .journey-parent-row > td.date-col.transport-departs-col {
+    display: block;
+    grid-area: schedule;
+    padding-left: 0.65rem;
+  }
+
+  .transport-table .journey-parent-row > td.transport-status-col {
+    display: block;
+    grid-area: status;
+    padding-left: 0.65rem;
+  }
+
+  .transport-table .journey-parent-row > td.transport-actions-col {
+    display: flex;
+    grid-area: actions;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding-right: 0.15rem;
+    padding-top: 0.1rem;
+  }
+
+  .transport-table .journey-parent-row > td.transport-type-col,
+  .transport-table .journey-parent-row > td.route-col,
+  .transport-table .journey-parent-row > td.transport-arrives-col,
+  .transport-table .journey-parent-row > td.transport-provider-col,
+  .transport-table .journey-parent-row > td.transport-routecode-col,
+  .transport-table .journey-parent-row > td.transport-bookingref-col,
+  .transport-table .journey-parent-row > td.budget-field {
+    display: none !important;
+  }
+
+  .transport-table .journey-name-col .journey-name-main {
+    display: block;
+    font-size: 0.78rem;
+    line-height: 1.1;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .transport-table .journey-name-col .transport-mobile-meta {
+    display: none !important;
+  }
+
+  .transport-table .journey-name-col .transport-mobile-meta,
+  .transport-table .date-col.transport-departs-col .transport-schedule-meta,
+  .transport-table .transport-status-col .transport-status-cost-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.08rem;
+    margin-top: 0.08rem;
+  }
+
+  .transport-table .journey-name-col .transport-mobile-meta {
+    gap: 0.04rem;
+    margin-top: 0;
+  }
+
+  .transport-table .transport-departs-col .transport-departs-desktop {
+    display: none;
+  }
+
+  .transport-table .transport-status-col > .status-badge {
+    display: none;
+  }
+
+  .transport-status-cost-meta {
+    margin-top: 0;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .transport-table .journey-expand-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.16rem 0.48rem;
+    border-radius: 999px;
+    border: 1px solid rgba(36, 72, 93, 0.14);
+    background: rgba(36, 72, 93, 0.04);
+    color: var(--accent-strong);
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-right: 0.35rem;
+    min-height: 28px;
+  }
+
+  .transport-table .journey-expand-btn::after {
+    content: 'Details';
+    font-size: 0.68rem;
+    line-height: 1;
+  }
+
+  .transport-table .journey-expand-btn .transport-expand-arrow {
+    font-size: 0.82rem;
+    line-height: 1;
+  }
+
+  .transport-table .transport-actions-col .edit-btn {
+    width: auto;
+    min-width: 40px;
+    height: 26px;
+    min-height: 26px;
+    padding: 0 0.5rem;
+    border-radius: 999px;
+    border: 1px solid rgba(36, 72, 93, 0.14);
+    background: rgba(36, 72, 93, 0.04);
+    color: var(--accent-strong);
+    font-size: 0;
+    font-weight: 700;
+  }
+
+  .transport-table .transport-actions-col .edit-btn::before {
+    content: 'Edit';
+    position: static;
+    color: var(--accent-strong);
+    font-size: 0.66rem;
+    line-height: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .transport-table-wrapper {
+    overflow-x: auto;
+    overflow-y: visible;
+    background: var(--card-strong);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .transport-table {
+    display: table;
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.79rem;
+  }
+
+  .transport-table thead {
+    display: table-header-group;
+  }
+
+  .transport-table thead tr:not(.transport-mobile-head-row) {
+    display: none;
+  }
+
+  .transport-mobile-head-row {
+    display: table-row;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .transport-mobile-head-row th {
+    display: table-cell;
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    padding: 0.72rem 0.4rem 0.62rem;
+    background: var(--card-strong);
+    border-bottom: 1px solid rgba(36, 72, 93, 0.12);
+    vertical-align: middle;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+
+  .transport-mobile-head-row th:nth-child(1) {
+    width: 40%;
+    padding-left: 0.75rem;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(2) {
+    width: 28%;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(3) {
+    width: 22%;
+    text-align: left;
+  }
+
+  .transport-mobile-head-row th:nth-child(4) {
+    width: 10%;
+    padding-right: 0.65rem;
+    text-align: center;
+  }
+
+  .transport-table tbody {
+    display: table-row-group;
+  }
+
+  .transport-table .journey-parent-row {
+    display: table-row;
+    background: var(--card-strong);
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+    border-left: 4px solid transparent;
+  }
+
+  .transport-table .journey-parent-row > td {
+    display: table-cell;
+    padding: 0.68rem 0.4rem 0.62rem;
+    border-top: 1px solid rgba(36, 72, 93, 0.08);
+    vertical-align: top;
+    background: var(--card-strong);
+  }
+
+  .transport-table .journey-parent-row > td:nth-child(1),
+  .transport-table .journey-parent-row > td.transport-type-col,
+  .transport-table .journey-parent-row > td.route-col,
+  .transport-table .journey-parent-row > td.transport-arrives-col,
+  .transport-table .journey-parent-row > td.transport-provider-col,
+  .transport-table .journey-parent-row > td.transport-routecode-col,
+  .transport-table .journey-parent-row > td.transport-bookingref-col,
+  .transport-table .journey-parent-row > td.budget-field {
+    display: none !important;
+  }
+
+  .transport-table .journey-parent-row > td.journey-name-col {
+    display: table-cell;
+    width: 40%;
+    padding-left: 0.75rem;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.date-col.transport-departs-col {
+    display: table-cell;
+    width: 28%;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.transport-status-col {
+    display: table-cell;
+    width: 22%;
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
+  }
+
+  .transport-table .journey-parent-row > td.transport-actions-col {
+    display: table-cell;
+    width: 10%;
+    text-align: center;
+    vertical-align: middle;
+    padding-right: 0.65rem;
+  }
+
+  .transport-table .journey-name-col .journey-name-main {
+    display: block;
+    font-size: 0.77rem;
+    line-height: 1.25;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .transport-table .journey-name-col .transport-mobile-meta,
+  .transport-table .date-col.transport-departs-col .transport-schedule-meta,
+  .transport-table .transport-status-col .transport-status-cost-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    margin-top: 0.18rem;
+  }
+
+  .transport-table .journey-name-col .transport-mobile-provider,
+  .transport-table .date-col.transport-departs-col .transport-schedule-meta span,
+  .transport-table .transport-status-col .transport-status-cost-meta span {
+    font-size: 0.65rem;
+    line-height: 1.15;
+    color: var(--muted);
+  }
+
+  .transport-table .date-col.transport-departs-col .transport-departs-desktop,
+  .transport-table .transport-status-col > .status-badge {
+    display: none;
+  }
+
+  .transport-table .transport-status-col .transport-status-cost-meta {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .transport-table .transport-mobile-status-btn {
+    padding: 0.15rem 0.38rem;
+  }
+
+  .transport-table .transport-mobile-cost-line,
+  .transport-table .transport-mobile-booking {
+    justify-content: flex-start;
+  }
+
+  .transport-table .transport-actions-col .del-btn,
+  .transport-table .transport-actions-col .edit-btn {
+    min-width: 40px;
+    height: 28px;
+    min-height: 28px;
+    padding: 0 0.45rem;
+  }
+
+  .transport-table .transport-actions-col .del-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .transport-table .transport-actions-col .edit-btn {
+    border-radius: 999px;
+    border: 1px solid rgba(36, 72, 93, 0.14);
+    background: rgba(36, 72, 93, 0.04);
+    color: var(--accent-strong);
+    font-size: 0;
+    position: relative;
+  }
+
+  .transport-table .transport-actions-col .edit-btn::before {
+    content: 'Edit';
+    font-size: 0.66rem;
+    font-weight: 700;
+    line-height: 1;
   }
 }
 
