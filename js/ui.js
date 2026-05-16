@@ -168,18 +168,22 @@ function renameTripHeader() {
   
   title.focus();
   
-  // Disable when done
-  const handleBlur = function() {
-    if (isMobileViewport()) {
-      title.contentEditable = false;
-      if (subtitle) subtitle.contentEditable = false;
-    }
-    title.removeEventListener('blur', handleBlur);
-    if (subtitle) subtitle.removeEventListener('blur', handleBlur);
+  const handleFocusOut = function() {
+    setTimeout(() => {
+      const active = document.activeElement;
+      if (active !== title && active !== subtitle) {
+        if (isMobileViewport()) {
+          title.contentEditable = false;
+          if (subtitle) subtitle.contentEditable = false;
+        }
+        title.removeEventListener('focusout', handleFocusOut);
+        if (subtitle) subtitle.removeEventListener('focusout', handleFocusOut);
+      }
+    }, 100);
   };
 
-  title.addEventListener('blur', handleBlur);
-  if (subtitle) subtitle.addEventListener('blur', handleBlur);
+  title.addEventListener('focusout', handleFocusOut);
+  if (subtitle) subtitle.addEventListener('focusout', handleFocusOut);
 }
 
 function toggleMode() {
