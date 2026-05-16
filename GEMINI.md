@@ -26,6 +26,7 @@ polish/screenshots/after/WI-XXX-after.png
 10. In the final response, include direct clickable links to the before image, proposal image, and latest after image for immediate review.
 11. When the WI is in `Review`, capture the user's latest feedback in the work item's `Review Notes` section as a running log before making the next revision.
 12. When multiple WIs are active, keep branch ownership strict: one WI per branch, no cross-WI tracker edits, and no reverting another WI's changes.
+13. Use separate worktrees for parallel WIs when possible; if you cannot, re-check the current branch before every edit.
 
 ## Session Start
 
@@ -35,6 +36,7 @@ polish/screenshots/after/WI-XXX-after.png
 4. Start or verify the dev server at `http://localhost:3000`.
 5. Load real data from `backups/2026_June_July_Europe_Thailand.json` for visual work.
 6. If another WI's edits are already present, pause and verify the branch before making changes so you do not overwrite a teammate's work.
+7. If a different WI is already checked out, do not touch its files or tracker rows until you have switched context cleanly.
 
 ## Completion
 
@@ -53,6 +55,7 @@ Before reporting done:
 11. Summarize changed files, verification, branch name, and commit hash.
 12. Include direct clickable links to the before image, proposal image, and latest after image in the completion response.
 13. When concurrent work is happening, commit and push the current WI as soon as it is verified so the branch tip is safe before you switch tasks.
+14. Never carry a verified WI forward into another task without committing it first.
 
 ## File Map
 

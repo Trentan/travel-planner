@@ -26,6 +26,7 @@ polish/screenshots/after/WI-XXX-after.png
 10. In the final response, include direct clickable links to the before image, proposal image, and latest after image for immediate review.
 11. When the WI is in `Review`, capture the user's latest feedback in the work item's `Review Notes` section as a running log before making the next revision.
 12. If multiple WIs are being worked concurrently, keep each WI on its own branch and do not edit another WI's files or tracker row.
+13. When parallel WIs are active, use separate worktrees if possible; if not, re-check the current branch before every edit.
 
 ## Session Start
 
@@ -35,6 +36,7 @@ polish/screenshots/after/WI-XXX-after.png
 4. Start or verify the dev server at `http://localhost:3000`.
 5. Load real data from `backups/2026_June_July_Europe_Thailand.json` for visual work.
 6. If the worktree is already carrying edits for a different WI, stop and confirm the current branch before making changes.
+7. If you discover another WI's files or tracker row in the current worktree, do not overwrite them; switch worktrees or pause and ask for direction.
 
 ## Completion
 
@@ -53,6 +55,7 @@ Before reporting done:
 11. Summarize changed files, verification, branch name, and commit hash.
 12. Include direct clickable links to the before image, proposal image, and latest after image in the completion response.
 13. When multiple WIs are active, commit and push the current WI as soon as it is verified so the branch tip is preserved before switching context.
+14. Never leave a verified WI uncommitted while starting another WI in the same worktree.
 
 ## File Map
 
