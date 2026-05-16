@@ -580,7 +580,30 @@ ${(() => {
     section.innerHTML = html;
     container.appendChild(section);
   });
+  if (typeof renderActivityActionButtons === 'function') renderActivityActionButtons(container);
   if (typeof reObserveLegs === "function") reObserveLegs();
+}
+
+function renderActivityActionButtons(root) {
+  if (!root) return;
+  root.querySelectorAll('.activity-item button[onclick*="openActivityAssignModal"]').forEach(btn => {
+    const title = (btn.getAttribute('title') || btn.getAttribute('aria-label') || '').toLowerCase();
+    const isMove = title.includes('move');
+    const icon = isMove ? '📌' : '📍';
+    const label = isMove ? 'Move to another day' : 'Add to day';
+    btn.textContent = icon;
+    btn.setAttribute('aria-label', label);
+    btn.setAttribute('title', label);
+    btn.style.width = '2.1rem';
+    btn.style.height = '2.1rem';
+    btn.style.padding = '0';
+    btn.style.display = 'inline-flex';
+    btn.style.alignItems = 'center';
+    btn.style.justifyContent = 'center';
+    btn.style.borderRadius = '999px';
+    btn.style.fontSize = '0.95rem';
+    btn.style.lineHeight = '1';
+  });
 }
 
 // Helper to rebuild the current active view

@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-16
-Progress: 16/24 items complete
+Progress: 17/24 items complete
 
 ---
 
@@ -15,7 +15,6 @@ Progress: 16/24 items complete
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
 | [WI-009](./items/WI-009.md) | Map Is A Static SVG Approximation | Major (1-3 days) | Todo | [WI-009-Before](./screenshots/before/desktop-09-map.png) | [WI-009-Proposed](./items/proposals/WI-009-proposal.png) | - | - |
-| [WI-015](./items/WI-015.md) | Drag And Drop Has No Touch Path | Medium (2-8 hrs) | Review | [WI-015-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-015-Proposed](./items/proposals/WI-015-proposal.png) | [WI-015-After](./screenshots/after/WI-015-after-6.png) | - |
 | [WI-017](./items/WI-017.md) | AI Builder Modal Lacks Current Trip Context | Medium (2-8 hrs) | Todo | [WI-017-Before](./screenshots/before/mobile-10-ai-builder.png) | [WI-017-Proposed](./items/proposals/WI-017-proposal.png) | - | - |
 | [WI-020](./items/WI-020.md) | Mobile Itinerary Cards Are Over-Scaled | Medium (2-8 hrs) | Todo | [WI-020-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-020-Proposed](./items/proposals/WI-020-proposal.png) | - | - |
 
@@ -32,6 +31,7 @@ Progress: 16/24 items complete
 
 | ID | Title | Before | Proposed | After | Completed |
 |----|-------|--------|----------|-------|-----------|
+| [WI-015](./items/WI-015.md) | Drag And Drop Has No Touch Path | [WI-015-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-015-Proposed](./items/proposals/WI-015-proposal.png) | [WI-015-After](./screenshots/after/WI-015-after-7.png) | 2026-05-16 |
 | [WI-019](./items/WI-019.md) | Header Hero Is Too Tall On Mobile | [WI-019-Before](./screenshots/before/mobile-01-home.png) | [WI-019-Proposed](./items/proposals/WI-019-proposal.png) | [WI-019-After](./screenshots/after/WI-019-after.png) | 2026-05-16 |
 | [WI-018](./items/WI-018.md) | Desktop City Nav Also Overflows Without Cue | [WI-018-Before](./screenshots/before/desktop-04-tabs.png) | [WI-018-Proposed](./items/proposals/WI-018-proposal.png) | [WI-018-After](./screenshots/after/WI-018-after.png) | 2026-05-16 |
 | [WI-016](./items/WI-016.md) | Mobile Export Actions Need Explanatory Subtitles | [WI-016-Before](./screenshots/before/mobile-04-menu-open.png) | [WI-016-Proposed](./items/proposals/WI-016-proposal.png) | [WI-016-After](./screenshots/after/WI-016-after.png) | 2026-05-16 |

@@ -123,8 +123,9 @@ function saveUiSettings() {
 function setHeaderEditable(isEditable) {
   const title = document.getElementById('mainTitle');
   const subtitle = document.getElementById('mainSubtitle');
-  if (title) title.contentEditable = !!isEditable;
-  if (subtitle) subtitle.contentEditable = !!isEditable;
+  const allowEdit = !!isEditable && !isMobileViewport();
+  if (title) title.contentEditable = allowEdit;
+  if (subtitle) subtitle.contentEditable = allowEdit;
 }
 
 function applyUiSettings() {

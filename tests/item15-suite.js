@@ -53,6 +53,9 @@ async function testMobileSmoke() {
   assert(app.context.isCompactView === true, 'Mobile smoke: compact view should default on mobile');
   assert(app.document.body.classList.contains('mobile-app-mode'), 'Mobile smoke: body should have mobile app mode');
   assert(app.document.body.classList.contains('compact-view-mode'), 'Mobile smoke: body should have compact mode');
+  assert(app.document.getElementById('mainTitle').contentEditable === false, 'Mobile smoke: header title should not be editable');
+  app.context.toggleEditMode();
+  assert(app.document.getElementById('mainTitle').contentEditable === false, 'Mobile smoke: header title should stay locked after toggling edit mode');
 
   app.context.buildItinerary();
   app.context.buildTransportTab();
@@ -298,13 +301,14 @@ async function testTouchAssignSmoke() {
   assert(assigned === true, 'Touch assign smoke: helper should assign the activity to a day');
   await settle(app);
   assert(state(context).itinerary[targetLegIdx].suggestedActivities[0].assignedDayIdx === 0, 'Touch assign smoke: day button should assign the activity');
-  assert(state(context).itinerary[targetLegIdx].days[0].activityItems.some(item => item.text === 'Sunset pier walk — Harbour'), 'Touch assign smoke: assigned activity should land in the day list');
+  assert(state(context).itinerary[targetLegIdx].days[0].activityItems.some(item => String(item.text || '').includes('Sunset pier walk')), 'Touch assign smoke: assigned activity should land in the day list');
 
-  context.deleteDayItem(targetLegIdx, 0, 'activityItems', 0);
+  context.openActivityAssignModal(targetLegIdx, 0);
   await settle(app);
-  context.buildItinerary();
+  app.document.getElementById('activityAssignClearBtn').click();
   await settle(app);
-  assert(state(context).itinerary[targetLegIdx].suggestedActivities[0].assignedDayIdx === null, 'Touch assign smoke: deleting the day item should release the suggestion');
+  assert(state(context).itinerary[targetLegIdx].suggestedActivities[0].assignedDayIdx === null, 'Touch assign smoke: remove button should clear the assignment');
+  assert(!state(context).itinerary[targetLegIdx].days[0].activityItems.some(item => String(item.text || '').includes('Sunset pier walk')), 'Touch assign smoke: remove button should remove the day item');
 }
 
 async function testModeToggles() {

@@ -445,6 +445,27 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
   return true;
 }
 
+function clearAssignedSuggestedActivityFromDay(sourceLegIdx, activityIdx) {
+  const sourceLeg = appData[sourceLegIdx];
+  const activity = sourceLeg?.suggestedActivities?.[activityIdx];
+  if (!activity) return false;
+
+  const previousDayIdx = activity.assignedDayIdx;
+  if (previousDayIdx === null || previousDayIdx === undefined) return false;
+
+  const previousDay = sourceLeg?.days?.[previousDayIdx];
+  if (previousDay && Array.isArray(previousDay.activityItems)) {
+    const prevIndex = previousDay.activityItems.findIndex(item => item.text === activity.title);
+    if (prevIndex !== -1) previousDay.activityItems.splice(prevIndex, 1);
+    if (previousDay.activityItems.length === 1 && isPlaceholderActivityItem(previousDay.activityItems[0])) {
+      previousDay.activityItems = [];
+    }
+  }
+
+  activity.assignedDayIdx = null;
+  return true;
+}
+
 function openActivityAssignModal(legIdx, activityIdx) {
   const leg = appData[legIdx];
   const activity = leg?.suggestedActivities?.[activityIdx];
@@ -461,6 +482,7 @@ function openActivityAssignModal(legIdx, activityIdx) {
   const currentDayLabel = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined && leg.days[activity.assignedDayIdx]
     ? `${leg.days[activity.assignedDayIdx].day} ${leg.days[activity.assignedDayIdx].date}`
     : 'Unassigned';
+  const hasCurrentAssignment = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
 
   const dayButtons = leg.days.map((day, dayIdx) => {
     const isCurrent = activity.assignedDayIdx === dayIdx;
@@ -487,6 +509,7 @@ function openActivityAssignModal(legIdx, activityIdx) {
               ${activity.category ? `${activity.category} · ` : ''}${activity.estTime || '1 hr'} · $${activity.estCost || '0'}
             </div>
             <div style="font-size:0.78rem; color:var(--muted); margin-top:0.35rem;">Current assignment: ${currentDayLabel}</div>
+            ${hasCurrentAssignment ? `<button type="button" class="action-btn" id="activityAssignClearBtn" style="margin-top:0.75rem; width:100%; justify-content:center;">Remove from day</button>` : ''}
           </div>
           <div style="display:grid; gap:0.6rem; max-height:52vh; overflow:auto; padding-right:0.2rem;">
             ${dayButtons}
@@ -504,6 +527,16 @@ function openActivityAssignModal(legIdx, activityIdx) {
   const closeModal = () => modal.remove();
   document.getElementById('activityAssignCloseBtn').onclick = closeModal;
   document.getElementById('activityAssignCancelBtn').onclick = closeModal;
+  const clearButton = document.getElementById('activityAssignClearBtn');
+  if (clearButton) {
+    clearButton.onclick = () => {
+      const cleared = clearAssignedSuggestedActivityFromDay(legIdx, activityIdx);
+      if (!cleared) return;
+      saveData();
+      buildItinerary();
+      closeModal();
+    };
+  }
   modal.addEventListener('click', e => {
     if (e.target === modal) closeModal();
   });
