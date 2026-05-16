@@ -60,10 +60,18 @@ function renderPackingAreaProgress(aIdx) {
   const { total, done, percent } = calculatePackingAreaProgress(aIdx);
   if (total === 0) return '';
 
+  const shortNameMap = {
+    "🚶 Walk-on Gear (Wear onto plane)": "Walk-on",
+    "🧳 Carry-on Packed Bag (Main Luggage)": "Carry-on",
+    "🎒 Personal Item Bag (Under Seat)": "Personal",
+    "📝 Trip Notes": "Notes"
+  };
+  const shortName = shortNameMap[area.areaName] || area.areaName;
+
   return `
-    <div class="packing-area-progress" style="--area-color: ${area.areaColor || 'var(--accent)'}">
+    <div class="packing-area-progress" style="--area-color: ${area.areaColor || 'var(--accent)'}" onclick="document.getElementById('packing-area-${aIdx}').scrollIntoView({behavior: 'smooth'})" title="Jump to ${shortName}">
       <div class="packing-area-progress-header">
-        <span class="packing-area-progress-title">${area.areaName}</span>
+        <span class="packing-area-progress-title">${shortName}</span>
         <span class="packing-area-progress-info">${done}/${total}</span>
       </div>
       <div class="packing-area-progress-bar">
@@ -261,13 +269,20 @@ function renderPackingGuidePanel() {
 }
 
 function renderPackingGuidesShell() {
+  const globalProgressHTML = typeof renderPackingGlobalProgress === 'function' ? renderPackingGlobalProgress() : '';
+
   return `
     <div class="packing-guides-shell">
       <div class="packing-guides-toolbar">
-        <div class="packing-guides-buttons">
-          <button type="button" class="packing-guide-btn ${isActiveGuide('leaveHome') ? 'active' : ''}" onclick="toggleGuidePanel('leaveHome')">Before Leaving Home</button>
-          <button type="button" class="packing-guide-btn ${isActiveGuide('sink') ? 'active' : ''}" onclick="toggleGuidePanel('sink')">Hotel Sink Washing</button>
-          <button type="button" class="packing-guide-btn ${isActiveGuide('capsule') ? 'active' : ''}" onclick="toggleGuidePanel('capsule')">Capsule Wardrobe Prompt</button>
+        <div class="packing-guides-toolbar-left">
+          ${globalProgressHTML}
+        </div>
+        <div class="packing-guides-toolbar-right">
+          <div class="packing-guides-buttons">
+            <button type="button" class="packing-guide-btn ${isActiveGuide('leaveHome') ? 'active' : ''}" onclick="toggleGuidePanel('leaveHome')">Before Leaving Home</button>
+            <button type="button" class="packing-guide-btn ${isActiveGuide('sink') ? 'active' : ''}" onclick="toggleGuidePanel('sink')">Hotel Sink Washing</button>
+            <button type="button" class="packing-guide-btn ${isActiveGuide('capsule') ? 'active' : ''}" onclick="toggleGuidePanel('capsule')">Capsule Wardrobe Prompt</button>
+          </div>
         </div>
       </div>
       ${renderPackingGuidePanel()}
