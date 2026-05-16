@@ -2544,9 +2544,30 @@ body.mobile-menu-open {
 .mobile-menu-sheet-grid .app-menu-btn {
   width: 100%;
   justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
   color: var(--text);
   background: #f7f4ed;
   border-color: var(--border);
+  min-height: 44px;
+  padding: 0.75rem 0.9rem;
+  white-space: normal;
+  text-align: left;
+  gap: 0.15rem;
+}
+
+.mobile-menu-sheet-grid .app-menu-btn-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.mobile-menu-sheet-grid .app-menu-btn-subtitle {
+  font-size: 0.72rem;
+  line-height: 1.2;
+  color: var(--muted);
 }
 
 .mobile-menu-divider {

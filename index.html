@@ -182,12 +182,27 @@
         <button class="app-menu-btn" onclick="closeMobileMenu(); openAIDialog()">🤖 AI Builder</button>
         <button class="app-menu-btn" onclick="closeMobileMenu(); openGuideDialog()">📖 Guide</button>
         <div class="mobile-menu-divider" aria-hidden="true"></div>
-        <button class="app-menu-btn" onclick="exportItinerarySummaryText(); closeMobileMenu()">🧾 Export AI Summary</button>
-        <button class="app-menu-btn" onclick="exportItineraryText(); closeMobileMenu()">📝 Export Itinerary Text</button>
-        <button class="app-menu-btn" onclick="closeMobileMenu(); openShareExportDialog()">🔗 Share Export</button>
+        <button class="app-menu-btn" onclick="exportItinerarySummaryText(); closeMobileMenu()">
+          <span class="app-menu-btn-title">🧾 Export AI Summary</span>
+          <span class="app-menu-btn-subtitle">Quick summary for sharing</span>
+        </button>
+        <button class="app-menu-btn" onclick="exportItineraryText(); closeMobileMenu()">
+          <span class="app-menu-btn-title">📝 Export Itinerary Text</span>
+          <span class="app-menu-btn-subtitle">Plain text trip outline</span>
+        </button>
+        <button class="app-menu-btn" onclick="closeMobileMenu(); openShareExportDialog()">
+          <span class="app-menu-btn-title">🔗 Share Export</span>
+          <span class="app-menu-btn-subtitle">Create a shareable file</span>
+        </button>
         <div class="mobile-menu-divider" aria-hidden="true"></div>
-        <button id="mobileSaveAsBtn" class="app-menu-btn" onclick="openTripFile(); closeMobileMenu()">Save As</button>
-        <button id="mobileOpenFileBtn" class="app-menu-btn" onclick="openExistingTripFile(); closeMobileMenu()">Open File</button>
+        <button id="mobileSaveAsBtn" class="app-menu-btn" onclick="openTripFile(); closeMobileMenu()">
+          <span class="app-menu-btn-title">Save As</span>
+          <span class="app-menu-btn-subtitle">Download a trip file</span>
+        </button>
+        <button id="mobileOpenFileBtn" class="app-menu-btn" onclick="openExistingTripFile(); closeMobileMenu()">
+          <span class="app-menu-btn-title">Open File</span>
+          <span class="app-menu-btn-subtitle">Load an existing trip</span>
+        </button>
         <button class="app-menu-btn danger" onclick="closeMobileMenu(); promptResetData()">Reset App</button>
         <button id="mobileInstallAppBtn" class="app-menu-btn install-btn" hidden onclick="closeMobileMenu(); promptInstallApp()">⬇ Install App</button>
       </div>
