@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-16
-Progress: 4/24 items complete
+Progress: 5/24 items complete
 
 ---
 
@@ -9,7 +9,6 @@ Progress: 4/24 items complete
 
 | ID | Title | Effort | Status | Done |
 |----|-------|--------|--------|------|
-| [WI-005](./items/WI-005.md) | City Nav Overflow Has No Scroll Affordance | Quick Win (<1 hr) | Todo | - |
 | [WI-006](./items/WI-006.md) | Mobile Transport Table Is Dense And Loses Actions | Major (1-3 days) | Todo | - |
 | [WI-007](./items/WI-007.md) | Budget Mobile Numbers Look Like Broken Precision | Quick Win (<1 hr) | Todo | - |
 | [WI-008](./items/WI-008.md) | Editable Header Text Opens Keyboard On Casual Mobile Taps | Medium (2-8 hrs) | Todo | - |
@@ -46,6 +45,7 @@ Progress: 4/24 items complete
 
 | ID | Title | Completed |
 |----|-------|-----------|
+| [WI-005](./items/WI-005.md) | City Nav Overflow Has No Scroll Affordance | 2026-05-16 |
 | [WI-004](./items/WI-004.md) | Primary Tab Strip Crops Labels On Mobile | 2026-05-16 |
 | [WI-003](./items/WI-003.md) | Journey Modal Clips Horizontally On Mobile | 2026-05-16 |
 | [WI-002](./items/WI-002.md) | Mobile Top Chrome Consumes Too Much Viewport | 2026-05-16 |

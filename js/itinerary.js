@@ -926,10 +926,30 @@ function buildCityNav() {
     }
 
     const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">📍</span>';
-    btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
-    navList.appendChild(btn);
-  });
-}
+      btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
+      navList.appendChild(btn);
+    });
+
+    updateCityNavOverflowCue(nav, navList);
+    if (!nav.dataset.overflowCueBound) {
+      nav.dataset.overflowCueBound = '1';
+      navList.addEventListener('scroll', () => updateCityNavOverflowCue(nav, navList), { passive: true });
+      window.addEventListener('resize', () => updateCityNavOverflowCue(nav, navList));
+    }
+  }
+
+  function updateCityNavOverflowCue(nav, navList) {
+    if (!nav || !navList) return;
+    const maxScrollLeft = Math.max(0, navList.scrollWidth - navList.clientWidth);
+    const hasOverflow = maxScrollLeft > 4;
+    const scrollLeft = navList.scrollLeft || 0;
+    const atStart = !hasOverflow || scrollLeft <= 4;
+    const atEnd = !hasOverflow || scrollLeft >= maxScrollLeft - 4;
+
+    nav.classList.toggle('city-nav-has-overflow', hasOverflow);
+    nav.classList.toggle('city-nav-at-start', atStart);
+    nav.classList.toggle('city-nav-at-end', atEnd);
+  }
 
 function selectCityFilter(cityId, btn) {
   window.currentCityFilter = cityId;
