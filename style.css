@@ -1466,6 +1466,53 @@ main {
     flex: 1 1 0;
     justify-content: center;
   }
+  #journey-modal .journey-transport-type-group {
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 1.1rem !important;
+  }
+  #journey-modal .journey-transport-type-group .transport-type-btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-width: 0;
+  }
+  #journey-modal .journey-inline-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+  #journey-modal .journey-route-row {
+    margin-bottom: 0.75rem !important;
+  }
+  #journey-modal .journey-route-arrow {
+    align-self: center;
+    padding-bottom: 0 !important;
+    line-height: 1;
+  }
+  #journey-modal .journey-datetime-pair {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  #journey-modal .journey-datetime-pair input {
+    width: 100%;
+  }
+  #journey-modal .journey-modal-footer {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  #journey-modal .journey-footer-actions {
+    width: 100%;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+  #journey-modal .journey-footer-actions .action-btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-width: 0;
+    justify-content: center;
+  }
+  #journey-modal .journey-footer-actions #journeyDeleteBtn {
+    flex-basis: 100%;
+  }
 }
 
 body.mobile-app-mode .app-menu-left {
