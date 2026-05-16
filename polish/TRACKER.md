@@ -68,3 +68,9 @@ When you finish a work item:
 10. Include direct clickable links to the before image, proposal image, and latest after image in your final completion response so they can be reviewed immediately.
 11. Update the progress count at the top of this file when the WI is actually moved to Completed.
 12. Commit the completed WI on the WI branch with the WI number in the commit message, then push that same branch before closing the item.
+
+## Concurrent Work
+
+- Keep each WI on its own branch and avoid editing another WI's tracker row or files.
+- If the worktree already has edits for a different WI, verify the branch before making changes.
+- As soon as a WI is verified, commit and push that WI so the branch tip is preserved before switching context.
