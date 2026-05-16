@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-16
-Progress: 6/24 items complete
+Progress: 5/24 items complete
 
 ---
 
@@ -9,6 +9,7 @@ Progress: 6/24 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
+| [WI-006](./items/WI-006.md) | Mobile Transport Table Is Dense And Loses Actions | Major (1-3 days) | Review | [WI-006-Before](./screenshots/before/mobile-06-transport.png) | [WI-006-Proposed](./items/proposals/WI-006-proposal.png) | [WI-006-After](./screenshots/after/WI-006-after.png) | - |
 | [WI-007](./items/WI-007.md) | Budget Mobile Numbers Look Like Broken Precision | Quick Win (<1 hr) | Todo | [WI-007-Before](./screenshots/before/mobile-07-budget.png) | [WI-007-Proposed](./items/proposals/WI-007-proposal.png) | - | - |
 | [WI-008](./items/WI-008.md) | Editable Header Text Opens Keyboard On Casual Mobile Taps | Medium (2-8 hrs) | Todo | [WI-008-Before](./screenshots/before/mobile-02-header.png) | [WI-008-Proposed](./items/proposals/WI-008-proposal.png) | - | - |
 
@@ -42,7 +43,6 @@ Progress: 6/24 items complete
 
 | ID | Title | Before | Proposed | After | Completed |
 |----|-------|--------|----------|-------|-----------|
-| [WI-006](./items/WI-006.md) | Mobile Transport Table Is Dense And Loses Actions | [WI-006-Before](./screenshots/before/mobile-06-transport.png) | [WI-006-Proposed](./items/proposals/WI-006-proposal.png) | [WI-006-After](./screenshots/after/WI-006-after.png) | 2026-05-16 |
 | [WI-005](./items/WI-005.md) | City Nav Overflow Has No Scroll Affordance | [WI-005-Before](./screenshots/before/mobile-11-city-nav-overflow.png) | [WI-005-Proposed](./items/proposals/WI-005-proposal.png) | [WI-005-After](./screenshots/after/WI-005-after.png) | 2026-05-16 |
 | [WI-004](./items/WI-004.md) | Primary Tab Strip Crops Labels On Mobile | [WI-004-Before](./screenshots/before/mobile-01-home.png) | [WI-004-Proposed](./items/proposals/WI-004-proposal.png) | [WI-004-After](./screenshots/after/WI-004-after.png) | 2026-05-16 |
 | [WI-003](./items/WI-003.md) | Journey Modal Clips Horizontally On Mobile | [WI-003-Before](./screenshots/before/mobile-08-journey-modal-top.png) | [WI-003-Proposed](./items/proposals/WI-003-proposal.png) | [WI-003-After](./screenshots/after/WI-003-after.png) | 2026-05-16 |
@@ -61,6 +61,7 @@ When you finish a work item:
 4. Take an after screenshot -> save to `screenshots/after/WI-XXX-after.png`
 5. Update the Before, Proposed, and After link columns in `polish/TRACKER.md` so the row stays clickable and compact
 6. Update the after screenshot reference in `items/WI-XXX.md` as a clickable markdown link to the screenshot
-7. Include direct clickable links to the before image, proposal image, and after image in your final completion response so they can be reviewed immediately
-8. Update the progress count at the top of this file
-9. Commit the completed WI on the WI branch with the WI number in the commit message, then push that same branch before closing the item
+7. Leave the WI in `Review` until the user explicitly confirms the final review is done, then move it to `Done` and Completed
+8. Include direct clickable links to the before image, proposal image, and after image in your final completion response so they can be reviewed immediately
+9. Update the progress count at the top of this file when the WI is actually moved to Completed
+10. Commit the completed WI on the WI branch with the WI number in the commit message, then push that same branch before closing the item

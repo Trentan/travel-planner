@@ -38,13 +38,14 @@ Before reporting done:
 
 1. Run relevant tests/checks.
 2. Capture `polish/screenshots/after/WI-XXX-after.png`.
-3. Update the WI status to Done.
-4. Update `polish/TRACKER.md`.
+3. Update the WI status to `Review` after capturing the after screenshot.
+4. Update `polish/TRACKER.md` with the after screenshot link, but do not move the WI to Completed or mark it Done until the user explicitly confirms final review.
 5. Make sure the work item's after screenshot field links directly to `polish/screenshots/after/WI-XXX-after.png`.
 6. Update the `Before`, `Proposed`, and `After` columns in `polish/TRACKER.md` so the row stays compact and clickable.
-7. Commit the completed WI on the WI branch with the WI referenced in the commit message, then push that same branch.
-8. Summarize changed files, verification, branch name, and commit hash.
-9. Include direct clickable links to the before image, proposal image, and after image in the completion response.
+7. Wait for the user's explicit final-review confirmation before changing the status to Done and moving the row to Completed.
+8. Commit the completed WI on the WI branch with the WI referenced in the commit message, then push that same branch.
+9. Summarize changed files, verification, branch name, and commit hash.
+10. Include direct clickable links to the before image, proposal image, and after image in the completion response.
 
 ## File Map
 
