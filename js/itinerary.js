@@ -61,8 +61,8 @@ function buildCompactItinerary() {
     leg.days.forEach((day, dayIdx) => {
       const dayTotal = getDayTotal(day);
       const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
-      html += `<div style="border-left:4px solid ${leg.colour}; margin:6px 0; padding:6px; background:#fafafa;">
-      <div style="display:flex; gap:6px; align-items:center; font-size:11px;">
+      html += `<div style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
+      <div style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
         <input type="checkbox" ${day.completed ? 'checked' : ''}
           onchange="toggleDayCompleted(event, ${legIndex}, ${dayIdx})"
           style="width:14px; height:14px; accent-color:#27AE60;">
