@@ -22,6 +22,27 @@ function buildCompactItinerary() {
     `;
 
     html += '<div style="padding:8px;">';
+
+    if ((leg.cityFood || []).length > 0) {
+      html += `
+      <div style="border-left:4px solid ${leg.colour}; margin:6px 0; padding:6px; background:#fffaf2;">
+        <div style="display:flex; gap:6px; align-items:center; font-size:11px; margin-bottom:4px;">
+          <strong>🍔 Food Quests</strong>
+          <span style="font-size:10px; color:#666;">Must eat items to tick off</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:4px; font-size:10px;">
+          ${(leg.cityFood || []).map((f, i) => `
+            <label class="quest-item" style="margin-bottom:0;">
+              <input type="checkbox" ${f.done ? 'checked' : ''}
+                onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"
+                style="width:14px; height:14px; accent-color:#27AE60;">
+              <span style="${f.done ? 'text-decoration:line-through; opacity:0.7;' : ''}">${f.text}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+
     leg.days.forEach((day, dayIdx) => {
       const dayTotal = getDayTotal(day);
       const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
