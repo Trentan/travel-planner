@@ -21,9 +21,23 @@ function updateStickyOffsets() {
   }
 }
 
+function syncMobileMenuControls() {
+  const shouldHideDisabledControls = isMobileViewport();
+  const controlIds = ['undoBtn', 'redoBtn', 'mobileUndoBtn', 'mobileRedoBtn'];
+
+  controlIds.forEach(id => {
+    const button = document.getElementById(id);
+    if (!button) return;
+    const hidden = shouldHideDisabledControls && button.disabled;
+    button.hidden = hidden;
+    button.setAttribute('aria-hidden', String(hidden));
+  });
+}
+
 function syncResponsiveUi() {
   document.body.classList.toggle('mobile-app-mode', isMobileViewport());
   updateStickyOffsets();
+  syncMobileMenuControls();
 
   if (!isMobileViewport()) {
     closeMobileMenu();
@@ -375,6 +389,7 @@ window.toggleMobileMenu = toggleMobileMenu;
 window.closeDesktopActionsMenu = closeDesktopActionsMenu;
 window.closeMobileMenu = closeMobileMenu;
 window.syncResponsiveUi = syncResponsiveUi;
+window.syncMobileMenuControls = syncMobileMenuControls;
 window.promptResetData = promptResetData;
 window.addLeg = addLeg;
 

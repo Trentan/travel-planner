@@ -458,9 +458,12 @@ function syncActiveFileDisplay() {
   const fileDisplay = document.getElementById('activeFileDisplay');
   if (fileDisplay) {
     const status = getFileConnectionStatusLabel();
-    fileDisplay.innerText = status
-      ? `📂 ${getActiveFileHandleName()} · ${status}`
-      : `📂 ${getActiveFileHandleName()}`;
+    const badgeText = status
+      ? `${getActiveFileHandleName()} · ${status}`
+      : getActiveFileHandleName();
+    fileDisplay.innerText = badgeText;
+    const badge = fileDisplay.closest('.file-badge');
+    if (badge) badge.title = badgeText;
   }
 }
 
@@ -596,6 +599,10 @@ function syncHistoryControls() {
     button.disabled = !enabled;
     button.setAttribute('aria-disabled', String(!enabled));
   });
+
+  if (typeof window.syncMobileMenuControls === 'function') {
+    window.syncMobileMenuControls();
+  }
 }
 
 function resetHistoryState(snapshot = cloneHistorySnapshot()) {

@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-16  
-Progress: 1/24 items complete
+Progress: 2/24 items complete
 
 ---
 
@@ -9,7 +9,6 @@ Progress: 1/24 items complete
 
 | ID | Title | Effort | Status | Done |
 |----|-------|--------|--------|------|
-| [WI-002](./items/WI-002.md) | Mobile Top Chrome Consumes Too Much Viewport | 🟡 Medium (2-8 hrs) | 🔲 Todo | - |
 | [WI-003](./items/WI-003.md) | Journey Modal Clips Horizontally On Mobile | 🟡 Medium (2-8 hrs) | 🔲 Todo | - |
 | [WI-004](./items/WI-004.md) | Primary Tab Strip Crops Labels On Mobile | 🟢 Quick Win (<1 hr) | 🔲 Todo | - |
 | [WI-005](./items/WI-005.md) | City Nav Overflow Has No Scroll Affordance | 🟢 Quick Win (<1 hr) | 🔲 Todo | - |
@@ -49,6 +48,7 @@ Progress: 1/24 items complete
 
 | ID | Title | Completed |
 |----|-------|-----------|
+| [WI-002](./items/WI-002.md) | Mobile Top Chrome Consumes Too Much Viewport | 2026-05-16 |
 | [WI-001](./items/WI-001.md) | Desktop App Menu Wraps Into A 154px Header | 2026-05-16 |
 
 ---
@@ -56,12 +56,13 @@ Progress: 1/24 items complete
 ## How to update this file
 
 When you finish a work item:
+0. Create or switch to a branch named for the work item, for example `WI-001_Desktop-App-Menu-Wraps`
 1. Change its Status cell to `✅ Done`
 2. Fill in the Done date
 3. Move the row to the Completed table at the bottom
 4. Take an after screenshot -> save to `screenshots/after/WI-XXX-after.png`
 5. Update the after screenshot reference in `items/WI-XXX.md`
 6. Update the progress count at the top of this file
-7. Commit the completed WI on the current branch with the WI number in the commit message, then push the branch before closing the item
+7. Commit the completed WI on the WI branch with the WI number in the commit message, then push that same branch before closing the item
 
 
