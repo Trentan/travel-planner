@@ -18,30 +18,22 @@ function buildCompactItinerary() {
           <span style="font-size:11px; margin-left:10px;">${nightLabel}</span>
         </div>
       </div>
+      ${(leg.cityFood || []).length > 0 ? `
+        <div style="margin-top:4px; display:flex; flex-wrap:wrap; gap:4px;">
+          ${(leg.cityFood || []).map((f, i) => `
+            <label style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); border-radius:999px; padding:2px 6px; font-size:10px; line-height:1.15; cursor:pointer; opacity:0.9;">
+              <input type="checkbox" ${f.done ? 'checked' : ''}
+                onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"
+                style="width:12px; height:12px; accent-color:#27AE60; margin:0;">
+              <span style="color:rgba(255,255,255,0.92); ${f.done ? 'text-decoration:line-through; opacity:0.72;' : ''}">${f.text}</span>
+            </label>
+          `).join('')}
+        </div>
+      ` : ''}
     </div>
     `;
 
     html += '<div style="padding:8px;">';
-
-    if ((leg.cityFood || []).length > 0) {
-      html += `
-      <div style="border-left:4px solid ${leg.colour}; margin:8px 0; padding:10px 10px 8px; background:#fff4e5; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,0.04);">
-        <div style="display:flex; gap:6px; align-items:center; justify-content:space-between; font-size:12px; margin-bottom:6px; flex-wrap:wrap;">
-          <strong>🍔 Food Quests</strong>
-          <span style="font-size:10px; color:#666;">Must eat items to tick off</span>
-        </div>
-        <div style="display:flex; flex-direction:column; gap:6px; font-size:12px;">
-          ${(leg.cityFood || []).map((f, i) => `
-            <label class="quest-item" style="margin-bottom:0;">
-              <input type="checkbox" ${f.done ? 'checked' : ''}
-                onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"
-                style="width:16px; height:16px; accent-color:#27AE60; margin-top:1px;">
-              <span style="font-size:12px; line-height:1.35; ${f.done ? 'text-decoration:line-through; opacity:0.7;' : ''}">${f.text}</span>
-            </label>
-          `).join('')}
-        </div>
-      </div>`;
-    }
 
     leg.days.forEach((day, dayIdx) => {
       const dayTotal = getDayTotal(day);

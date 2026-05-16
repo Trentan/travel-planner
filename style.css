@@ -2057,7 +2057,7 @@ body.compact-view-mode .leg { margin: var(--compact-margin); border: 1px solid v
 body.compact-view-mode .leg-header { padding: 6px 12px; }
 body.compact-view-mode .leg-header h2 { font-size: 14px; }
 body.compact-view-mode .leg-subtitle { display: none; }
-body.compact-view-mode .top-controls { margin-bottom: 0.75rem; gap: 0.5rem; }
+body.compact-view-mode .top-controls { display: none !important; }
 body.compact-view-mode .action-btn { padding: 5px 10px; font-size: 12px; }
 body.compact-view-mode .app-tabs-content { margin-top: 1rem; }
 
