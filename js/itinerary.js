@@ -13,6 +13,82 @@ function getCompactFoodQuestTitle(label) {
   return `${cleaned || 'Food'} - Food Quest`;
 }
 
+function stripCompactLeadingEmoji(text) {
+  return String(text || '')
+    .replace(/^\s*(?:\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji})+(?:\uFE0F)?\s*/gu, '')
+    .replace(/^\s*[-–—:·•]+\s*/u, '')
+    .trim();
+}
+
+function escapeCompactText(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function renderCompactMetaSuffix(value) {
+  const trimmed = String(value || '').trim();
+  if (!trimmed) return '';
+  return ` <span style="color:#888; font-size:10px; font-style:italic;">[${escapeCompactText(trimmed)}]</span>`;
+}
+
+function renderCompactEmojiLine({ emoji, text, duration = '', done = false }) {
+  const cleanText = escapeCompactText(stripCompactLeadingEmoji(text));
+  const suffix = renderCompactMetaSuffix(duration);
+  const textStyle = done ? 'text-decoration:line-through; opacity:0.65;' : '';
+  return `
+    <span class="compact-line">
+      <span class="compact-line-emoji">${emoji}</span>
+      <span class="compact-line-text" style="${textStyle}">${cleanText}${suffix}</span>
+    </span>
+  `;
+}
+
+function parseCompactDateTime(dateStr, timeStr = '') {
+  if (!dateStr) return null;
+  const rawTime = String(timeStr || '').trim() || '00:00';
+  const isoCandidate = `${dateStr}T${rawTime}:00`;
+  const direct = new Date(isoCandidate);
+  if (!Number.isNaN(direct.getTime())) return direct;
+
+  const fallback = new Date(`${dateStr} 2026 ${rawTime}`);
+  if (!Number.isNaN(fallback.getTime())) return fallback;
+  return null;
+}
+
+function formatCompactJourneyDuration(segments) {
+  if (!Array.isArray(segments) || segments.length === 0) return '';
+  const firstSeg = segments[0];
+  const lastSeg = segments[segments.length - 1];
+  const depDate = firstSeg.departureDate || firstSeg.dayDate;
+  const arrDate = lastSeg.arrivalDate || lastSeg.departureDate || lastSeg.dayDate;
+  const dep = parseCompactDateTime(depDate, firstSeg.departureTime);
+  const arr = parseCompactDateTime(arrDate, lastSeg.arrivalTime);
+  if (!dep || !arr) return '';
+
+  let diffMinutes = Math.round((arr.getTime() - dep.getTime()) / 60000);
+  if (diffMinutes < 0) diffMinutes += 24 * 60;
+  if (diffMinutes <= 0) return '';
+
+  const hours = Math.floor(diffMinutes / 60);
+  const minutes = diffMinutes % 60;
+  if (hours === 0) return `${minutes}m`;
+  return minutes > 0 ? `${hours}h${String(minutes).padStart(2, '0')}m` : `${hours}h`;
+}
+
+function renderCompactBlock(title, linesHtml, fullWidth = false) {
+  if (!linesHtml) return '';
+  return `
+    <div class="compact-day-block${fullWidth ? ' compact-day-block-wide' : ''}">
+      <div class="compact-day-block-title">${title}</div>
+      <div class="compact-day-block-lines">${linesHtml}</div>
+    </div>
+  `;
+}
+
 function buildCompactItinerary() {
   const container = document.getElementById('itinerary');
   container.innerHTML = '';
@@ -51,7 +127,7 @@ function buildCompactItinerary() {
               <input type="checkbox" ${f.done ? 'checked' : ''}
                 onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"
                 style="width:12px; height:12px; accent-color:#27AE60; margin-top:1px;">
-              <span style="line-height:1.3; ${f.done ? 'text-decoration:line-through; opacity:0.65;' : ''}">${f.text}</span>
+              <span style="line-height:1.3; ${f.done ? 'text-decoration:line-through; opacity:0.65;' : ''}">${renderCompactEmojiLine({ emoji: '🍽️', text: f.text, done: f.done })}</span>
             </label>
           `).join('')}
         </div>
@@ -59,8 +135,53 @@ function buildCompactItinerary() {
     }
 
     leg.days.forEach((day, dayIdx) => {
+      {
       const dayTotal = getDayTotal(day);
       const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
+      const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
+      const dayStayInfo = getStayDisplayForDay(day.date, day.to);
+      const transportLines = dayJourneys.map(j => {
+        const icon = getTransportIcon(j.transportType);
+        const journeyLabel = stripCompactLeadingEmoji(j.provider || j.journeyName || j.notes || `${j.fromLocation}→${j.toLocation}`);
+        const segs = (window.journeys || [])
+          .filter(seg => seg.journeyId === j.journeyId)
+          .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+        const duration = formatCompactJourneyDuration(segs);
+        return renderCompactEmojiLine({ emoji: icon, text: journeyLabel, duration });
+      }).join('');
+      const accomLines = dayStayInfo.map(info => renderCompactEmojiLine({
+        emoji: '🏨',
+        text: info.propertyName || 'Accommodation'
+      })).join('');
+      const activityLines = (day.activityItems || []).map((item, itemIdx) => {
+        const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
+        const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+        return `
+          <div style="display:flex; align-items:flex-start; gap:6px; ${doneStyle}">
+            <input type="checkbox" ${item.done ? 'checked' : ''}
+              onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
+              style="width:12px; height:12px; accent-color:#27AE60; margin-top:1px;">
+            <div style="min-width:0;">${renderCompactEmojiLine({ emoji, text: item.text, duration: item.time || '1 hr', done: item.done })}</div>
+          </div>`;
+      }).join('');
+
+      html += `<div class="compact-day-card" style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
+      <div class="compact-day-top" style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
+        <input type="checkbox" ${day.completed ? 'checked' : ''}
+          onchange="toggleDayCompleted(event, ${legIndex}, ${dayIdx})"
+          style="width:14px; height:14px; accent-color:#27AE60;">
+        <span class="compact-day-label" style="font-weight:600;">${day.day} ${dayDateLabel}</span>
+        <span class="compact-day-route" style="font-size:10px;">${day.from} → ${day.to}</span>
+        <span class="compact-day-desc" style="font-size:9px; color:#666; flex:1;">${day.desc || ''}</span>
+      </div>
+      <div class="compact-day-grid" style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px; margin-top:5px; font-size:10px;">
+        ${renderCompactBlock('Transport', transportLines)}
+        ${renderCompactBlock('Accom', accomLines)}
+        ${renderCompactBlock('Activities', activityLines, true)}
+      </div>
+      </div></div>`;
+      return;
+      }
       html += `<div style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
       <div style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
         <input type="checkbox" ${day.completed ? 'checked' : ''}
@@ -69,7 +190,6 @@ function buildCompactItinerary() {
         <span style="font-weight:600;">${day.day} ${dayDateLabel}</span>
         <span style="font-size:10px;">${day.from} → ${day.to}</span>
         <span style="font-size:9px; color:#666; flex:1;">${day.desc || ''}</span>
-        ${dayTotal ? `<span style="font-weight:600; font-family:monospace;">${dayTotal}</span>` : ''}
       </div>
 
       <div style="display:flex; gap:8px; margin-top:4px; font-size:10px;">`;
@@ -77,12 +197,19 @@ function buildCompactItinerary() {
       // Display transport from journeys
       const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
       if (dayJourneys.length > 0) {
-        html += '<div style="flex:1;"><strong>🚌</strong> ';
+        html += '<div style="flex:1;"><strong>Transport</strong> ';
         html += dayJourneys.map(j => {
           const status = j.status || 'planned';
-          const statusIcon = status === 'booked' ? '✓' : '⏳';
+          const statusText = status === 'booked' ? 'Booked' : 'Planned';
           const icon = getTransportIcon(j.transportType);
-          return `${icon} ${j.notes || j.fromLocation + '→' + j.toLocation}${j.cost ? ` ($${j.cost})` : ''} <span style="color:${status === 'booked' ? '#27AE60' : '#E67E22'}">${statusIcon}</span>`;
+          const journeyLabel = stripCompactLeadingEmoji(j.notes || `${j.fromLocation}→${j.toLocation}`);
+          const segs = (window.journeys || [])
+            .filter(seg => seg.journeyId === j.journeyId)
+            .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+          const duration = j.isMultiLeg && typeof calculateJourneyDuration === 'function' && segs.length > 0
+            ? `${calculateJourneyDuration(segs)}h`
+            : '';
+          return `${renderCompactEmojiLine({ emoji: icon, text: journeyLabel, duration })} <span style="color:${status === 'booked' ? '#27AE60' : '#E67E22'}">${statusText}</span>`;
         }).join(', ');
         html += '</div>';
       }
@@ -95,7 +222,7 @@ function buildCompactItinerary() {
     html += dayStayInfo.map(info => {
       const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
       const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
-      return `<span style="margin-right:12px;">${icon} <strong>${label}:</strong> ${info.propertyName}${info.cost ? ` ($${info.cost})` : ''}</span>`;
+      return `<span style="margin-right:12px;">${renderCompactEmojiLine({ emoji: icon, text: `${label}: ${info.propertyName}` })}</span>`;
     }).join('');
     html += '</div>';
   }
@@ -110,7 +237,7 @@ function buildCompactItinerary() {
             <input type="checkbox" ${item.done ? 'checked' : ''}
               onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
               style="width:12px; height:12px; accent-color:#27AE60; margin-right:4px;">
-            ${item.text}${item.cost ? ` ($${item.cost})` : ''}
+            ${renderCompactEmojiLine({ emoji: '📍', text: item.text, duration: item.time || '1 hr', done: item.done })}
           </span>`;
         }).join('');
         html += '</div>';

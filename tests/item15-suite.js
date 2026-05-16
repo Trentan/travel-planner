@@ -307,11 +307,36 @@ async function testCompactView() {
     app.document.getElementById('compactToggleLabel').textContent.includes('Compact mode'),
     'Compact view: top-bar toggle should relabel to compact mode'
   );
-  context.buildItinerary();
-  assert(app.document.getElementById('itinerary').children.length > 0, 'Compact view: itinerary should still render checkboxes and cards');
   assert(
-    app.document.getElementById('itinerary').children[0].innerHTML.includes('Food Quest'),
+    context.stripCompactLeadingEmoji('🍽️ Try local noodles') === 'Try local noodles',
+    'Compact view: leading emoji helper should remove duplicated prefixes'
+  );
+  context.buildItinerary();
+  const itineraryEl = app.document.getElementById('itinerary');
+  assert(itineraryEl.children.length > 0, 'Compact view: itinerary should still render checkboxes and cards');
+  assert(
+    itineraryEl.children[0].innerHTML.includes('Food Quest'),
     'Compact view: must eat items should still render in itinerary'
+  );
+  assert(
+    !itineraryEl.innerHTML.includes('<strong>🚌</strong>'),
+    'Compact view: transport section should not add a second emoji'
+  );
+  assert(
+    !itineraryEl.innerHTML.includes('⏳'),
+    'Compact view: transport rows should not use hourglass icons'
+  );
+  assert(
+    !itineraryEl.textContent.includes('$'),
+    'Compact view: costs should be hidden from the itinerary'
+  );
+  assert(
+    context.renderCompactEmojiLine({
+      emoji: '📍',
+      text: 'Morning run',
+      duration: '2 hrs'
+    }).includes('[2 hrs]'),
+    'Compact view: durations should render in muted brackets'
   );
   context.toggleCompactView();
   assert(context.isCompactView === false, 'Compact view: second toggle should disable compact mode');

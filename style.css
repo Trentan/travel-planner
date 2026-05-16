@@ -2095,6 +2095,105 @@ body.compact-view-mode .cost-item {
 body.compact-view-mode .cost-item-text { font-size: 11px; flex: 1; }
 body.compact-view-mode .budget-field { font-size: 10px; }
 
+body.compact-view-mode .compact-day-card {
+  padding: 5px 0 6px;
+}
+
+body.compact-view-mode .compact-day-top {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  row-gap: 3px;
+}
+
+body.compact-view-mode .compact-day-label {
+  font-weight: 700;
+}
+
+body.compact-view-mode .compact-day-route {
+  color: #2F3A4A;
+  font-weight: 600;
+}
+
+body.compact-view-mode .compact-day-desc {
+  flex-basis: 100%;
+  color: #667085;
+}
+
+body.compact-view-mode .compact-day-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 5px;
+}
+
+body.compact-view-mode .compact-day-block {
+  padding: 6px 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 8px;
+  min-width: 0;
+}
+
+body.compact-view-mode .compact-day-block-wide {
+  grid-column: 1 / -1;
+}
+
+body.compact-view-mode .compact-day-block-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #2F3A4A;
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+body.compact-view-mode .compact-day-block-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+body.compact-view-mode .compact-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+body.compact-view-mode .compact-line-emoji {
+  flex-shrink: 0;
+  width: 1.15em;
+  text-align: center;
+}
+
+body.compact-view-mode .compact-line-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+body.compact-view-mode .compact-activity-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 3px 0;
+}
+
+@media (max-width: 600px) {
+  body.compact-view-mode .compact-day-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.compact-view-mode .compact-day-block-wide {
+    grid-column: 1 / -1;
+  }
+
+  body.compact-view-mode .compact-day-card {
+    padding-bottom: 8px;
+  }
+}
+
 body.compact-view-mode .data-table-wrapper {
   border-radius: 6px;
   box-shadow: var(--shadow-soft);

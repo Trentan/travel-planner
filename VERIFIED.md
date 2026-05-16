@@ -192,3 +192,25 @@ Confirmed completed items. Append-only archive — do not edit existing entries.
 - Added real Chromium desktop and mobile browser coverage with headed mode support.
 - Added modal, CRUD, drag-and-drop, export/import, packing, print, service worker, and file save/load coverage.
 - Updated the README with the test-running workflow so changes can be validated before commit or push.
+
+---
+
+### Compact Itinerary Mobile Polish
+**Completed:** 2026-05-16
+
+- Reworked compact itinerary day cards into modular transport, accommodation, and activities blocks.
+- Hid compact-mode costs and kept durations visible as muted bracketed suffixes.
+- Removed duplicate emoji and transport status glyphs from compact itinerary rows.
+- Added mobile-focused compact styling so the blocks stack cleanly on small screens.
+
+---
+
+### Item 14: Mobile app shell polish
+**Completed:** 2026-05-16
+
+- Consolidated the top menu into a mobile action sheet.
+- Made compact view meaningfully reduce chrome on phones.
+- Kept the city filter sticky on mobile.
+- Improved the reset experience on mobile.
+- Removed the home / destination clocks from the mobile shell.
+- Unified transport and accommodation mobile table rendering, shared action buttons, and modal delete actions.
