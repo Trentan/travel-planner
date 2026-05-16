@@ -1,3 +1,18 @@
+function getCompactFoodQuestTitle(label) {
+  const cleaned = String(label || '')
+    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+    .replace(/[\u{2600}-\u{26FF}]/gu, '')
+    .replace(/[\u{2700}-\u{27BF}]/gu, '')
+    .replace(/\p{Emoji}/gu, '')
+    .replace(/\s*[â†’>-].*$/u, '')
+    .replace(/[^\w\s()&,-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return `${cleaned || 'Food'} - Food Quest`;
+}
+
 function buildCompactItinerary() {
   const container = document.getElementById('itinerary');
   container.innerHTML = '';
@@ -18,22 +33,30 @@ function buildCompactItinerary() {
           <span style="font-size:11px; margin-left:10px;">${nightLabel}</span>
         </div>
       </div>
-      ${(leg.cityFood || []).length > 0 ? `
-        <div style="margin-top:4px; display:flex; flex-wrap:wrap; gap:4px;">
-          ${(leg.cityFood || []).map((f, i) => `
-            <label style="display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); border-radius:999px; padding:2px 6px; font-size:10px; line-height:1.15; cursor:pointer; opacity:0.9;">
-              <input type="checkbox" ${f.done ? 'checked' : ''}
-                onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"
-                style="width:12px; height:12px; accent-color:#27AE60; margin:0;">
-              <span style="color:rgba(255,255,255,0.92); ${f.done ? 'text-decoration:line-through; opacity:0.72;' : ''}">${f.text}</span>
-            </label>
-          `).join('')}
-        </div>
-      ` : ''}
     </div>
     `;
 
     html += '<div style="padding:8px;">';
+
+    if ((leg.cityFood || []).length > 0) {
+      html += `
+      <div style="margin:4px 0 8px; padding:6px 8px 5px; background:rgba(255,255,255,0.74); border-left:3px solid ${leg.colour}; border-radius:8px; font-size:10px; line-height:1.25;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:4px; color:#4A4A4A;">
+          <strong style="font-size:10px;">${getCompactFoodQuestTitle(leg.label)}</strong>
+          <span style="font-size:9px; color:#7A7A7A;">Must eat items</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:3px;">
+          ${(leg.cityFood || []).map((f, i) => `
+            <label style="display:flex; align-items:flex-start; gap:6px; font-size:10px; color:#495057; cursor:pointer;">
+              <input type="checkbox" ${f.done ? 'checked' : ''}
+                onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"
+                style="width:12px; height:12px; accent-color:#27AE60; margin-top:1px;">
+              <span style="line-height:1.3; ${f.done ? 'text-decoration:line-through; opacity:0.65;' : ''}">${f.text}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>`;
+    }
 
     leg.days.forEach((day, dayIdx) => {
       const dayTotal = getDayTotal(day);
