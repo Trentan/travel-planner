@@ -23,8 +23,8 @@ Progress: 8/24 items complete
 | [WI-015](./items/WI-015.md) | Drag And Drop Has No Touch Path | Medium (2-8 hrs) | Todo | [WI-015-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-015-Proposed](./items/proposals/WI-015-proposal.png) | - | - |
 | [WI-016](./items/WI-016.md) | Mobile Export Actions Need Explanatory Subtitles | Quick Win (<1 hr) | Todo | [WI-016-Before](./screenshots/before/mobile-04-menu-open.png) | [WI-016-Proposed](./items/proposals/WI-016-proposal.png) | - | - |
 | [WI-017](./items/WI-017.md) | AI Builder Modal Lacks Current Trip Context | Medium (2-8 hrs) | Todo | [WI-017-Before](./screenshots/before/mobile-10-ai-builder.png) | [WI-017-Proposed](./items/proposals/WI-017-proposal.png) | - | - |
-| [WI-018](./items/WI-018.md) | Desktop City Nav Also Overflows Without Cue | Quick Win (<1 hr) | Todo | [WI-018-Before](./screenshots/before/desktop-04-tabs.png) | [WI-018-Proposed](./items/proposals/WI-018-proposal.png) | - | - |
-| [WI-019](./items/WI-019.md) | Header Hero Is Too Tall On Mobile | Quick Win (<1 hr) | Todo | [WI-019-Before](./screenshots/before/mobile-01-home.png) | [WI-019-Proposed](./items/proposals/WI-019-proposal.png) | - | - |
+| [WI-018](./items/WI-018.md) | Desktop City Nav Also Overflows Without Cue | Quick Win (<1 hr) | Review | [WI-018-Before](./screenshots/before/desktop-04-tabs.png) | [WI-018-Proposed](./items/proposals/WI-018-proposal.png) | [WI-018-After](./screenshots/after/WI-018-after.png) | - |
+| [WI-019](./items/WI-019.md) | Header Hero Is Too Tall On Mobile | Quick Win (<1 hr) | Review | [WI-019-Before](./screenshots/before/mobile-01-home.png) | [WI-019-Proposed](./items/proposals/WI-019-proposal.png) | [WI-019-After](./screenshots/after/WI-019-after.png) | - |
 | [WI-020](./items/WI-020.md) | Mobile Itinerary Cards Are Over-Scaled | Medium (2-8 hrs) | Todo | [WI-020-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-020-Proposed](./items/proposals/WI-020-proposal.png) | - | - |
 
 ## Polish
