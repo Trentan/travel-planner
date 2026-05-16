@@ -107,3 +107,10 @@ Recommended workflow:
 1. Run `npm test` or double-click `run-tests.bat`.
 2. If you want to watch the UI, run `npm run test:browser:headed` or double-click `run-browser-tests.bat`.
 3. Confirm everything passes before committing or pushing branch changes.
+
+### Parallel work protocol
+If multiple work items are active at the same time:
+1. Keep one WI per branch or worktree.
+2. Check `git branch --show-current` and `git status --short` before editing.
+3. Do not edit another WI's files or tracker rows in a shared worktree.
+4. Commit and push a verified WI before switching to another item.
