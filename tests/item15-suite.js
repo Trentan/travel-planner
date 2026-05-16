@@ -309,6 +309,10 @@ async function testCompactView() {
   );
   context.buildItinerary();
   assert(app.document.getElementById('itinerary').children.length > 0, 'Compact view: itinerary should still render checkboxes and cards');
+  assert(
+    app.document.getElementById('itinerary').children[0].innerHTML.includes('Food Quests'),
+    'Compact view: must eat items should still render in itinerary'
+  );
   context.toggleCompactView();
   assert(context.isCompactView === false, 'Compact view: second toggle should disable compact mode');
 }
