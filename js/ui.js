@@ -27,6 +27,7 @@ function syncResponsiveUi() {
 
   if (!isMobileViewport()) {
     closeMobileMenu();
+    closeDesktopActionsMenu();
   }
 }
 
@@ -38,6 +39,13 @@ function toggleMobileMenu() {
     sheet.setAttribute('aria-hidden', String(!isMobileMenuOpen));
   }
   document.body.classList.toggle('mobile-menu-open', isMobileMenuOpen);
+}
+
+function closeDesktopActionsMenu() {
+  const menu = document.getElementById('desktopActionsMenu');
+  if (menu) {
+    menu.open = false;
+  }
 }
 
 function closeMobileMenu(event) {
@@ -364,6 +372,7 @@ window.toggleCompactView = toggleCompactView;
 window.applyUiSettings = applyUiSettings;
 window.switchTab = switchTab;
 window.toggleMobileMenu = toggleMobileMenu;
+window.closeDesktopActionsMenu = closeDesktopActionsMenu;
 window.closeMobileMenu = closeMobileMenu;
 window.syncResponsiveUi = syncResponsiveUi;
 window.promptResetData = promptResetData;

@@ -55,6 +55,7 @@ All items live in `/polish/items/`. Progress tracked in TRACKER.md.
 4. Run regression: `node scripts/regression-city-nav.js`
 5. Take an after screenshot and save to `screenshots/after/WI-XXX-after.png`
 6. Update TRACKER.md status to ✅ Done
+7. Commit the completed WI on the current branch with the WI number in the commit message, then push the branch.
 ```
 
 ---
@@ -430,4 +431,8 @@ Work through items in this order for maximum visible improvement fastest:
 - Use real CSS selectors from the actual source files — read them before writing fix code.
 - Do not invent issues. Only report what you can actually see in screenshots or source code.
 - The `/polish` folder is self-contained. Nothing outside it needs to change until you implement a fix.
+- When a WI is moved to Done, commit the change on the current branch with the WI referenced in the commit message, then push the branch before closing the item out.
 - When done, print a one-line summary: `Polish audit complete — X items found, files in /polish/`
+
+## Prompt for work
+- Work on the next Todo item in polish/TRACKER.md. Follow CODEX.md. Complete the item end-to-end, including verification, after screenshot, and tracker updates.

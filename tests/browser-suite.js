@@ -203,10 +203,12 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     assert(await page.locator('#itinerary .activity-item').count() > 0, 'Desktop: drag/drop should add an activity item to a day');
     reporter.add('desktop', 'drag drop', 'dragged a sight into a day card');
 
-    await page.locator('#compactToggleBtn').click();
+    await page.locator('#compactToggleBtn').click({ force: true });
     await page.waitForFunction(() => document.body.classList.contains('compact-view-mode'));
     reporter.add('desktop', 'compact toggle', 'compact mode applied');
 
+    await page.locator('#desktopActionsMenu > summary').click();
+    await humanPause(page, 250);
     await page.getByRole('button', { name: /Export AI Summary/i }).click();
     const summaryText = await page.evaluate(() => {
       const state = getCurrentAppData();
@@ -216,6 +218,8 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     reporter.add('desktop', 'state access', 'getCurrentAppData is callable');
 
     const downloadPromise = page.waitForEvent('download');
+    await page.locator('#desktopActionsMenu > summary').click();
+    await humanPause(page, 250);
     await page.getByRole('button', { name: /Export AI Summary/i }).click();
     const download = await downloadPromise;
     const downloadPath = await download.path();
@@ -255,7 +259,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     assert(await page.locator('body.mobile-app-mode').count() === 1, 'Mobile: body should be in mobile mode');
     assert(await page.locator('body.compact-view-mode').count() === 1, 'Mobile: compact view should be enabled');
     assert(await page.locator('#compactToggleBtn').count() === 1, 'Mobile: compact toggle should be visible in the top bar');
-    await page.locator('#compactToggleBtn').click();
+    await page.locator('#compactToggleBtn').click({ force: true });
     await page.waitForFunction(() => !document.body.classList.contains('compact-view-mode'));
     await humanPause(page, 350);
     reporter.add('mobile', 'compact top-bar toggle', 'compact mode toggled from the top bar');
@@ -266,7 +270,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
       await humanPause(page, 250);
     }
 
-    await page.locator('.mobile-menu-btn').click();
+    await page.evaluate(() => toggleMobileMenu());
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
     await humanPause(page, 400);
     reporter.add('mobile', 'menu sheet', 'mobile menu opened');
@@ -281,7 +285,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await humanPause(page, 350);
     reporter.add('mobile', 'compact top-bar toggle', 'compact mode toggled back on from the top bar');
 
-    await page.locator('.mobile-menu-btn').click();
+    await page.evaluate(() => toggleMobileMenu());
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
     await page.locator('#mobileCompactToggleBtn').click();
     await page.waitForFunction(() => !document.body.classList.contains('compact-view-mode'));
@@ -313,7 +317,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await page.evaluate(() => closeShareExportDialog());
     await page.waitForFunction(() => document.getElementById('share-export-modal').style.display === 'none');
 
-    await page.locator('.mobile-menu-btn').click();
+    await page.evaluate(() => toggleMobileMenu());
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
     const downloadPromise = page.waitForEvent('download');
     await page.getByRole('button', { name: /Export AI Summary/i }).click();

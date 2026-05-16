@@ -37,16 +37,17 @@ body {
 .app-menu-bar {
   background: linear-gradient(180deg, #1a242f 0%, #101820 100%);
   color: white;
-  padding: 0.75rem 1.25rem;
+  padding: 0.62rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.85rem;
+  flex-wrap: nowrap;
+  gap: 0.6rem;
   font-size: 0.85rem;
   box-shadow: 0 2px 16px rgba(0,0,0,0.14);
 }
-.app-menu-left, .app-menu-right { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; min-width: 0;}
+.app-menu-left, .app-menu-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap; min-width: 0;}
+.app-menu-left { flex: 1 1 auto; }
 .app-menu-right { justify-content: flex-end; }
 .file-badge {
   background: rgba(255,255,255,0.08);
@@ -164,6 +165,68 @@ body {
   background: rgba(255,255,255,0.18);
   flex: 0 0 auto;
   margin: 0 0.15rem;
+}
+
+.app-menu-actions {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.app-menu-actions > summary {
+  list-style: none;
+}
+
+.app-menu-actions > summary::-webkit-details-marker {
+  display: none;
+}
+
+.app-menu-actions-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.app-menu-actions-summary::after {
+  content: "▾";
+  font-size: 0.78rem;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.app-menu-actions[open] .app-menu-actions-summary {
+  background: rgba(255,255,255,0.18);
+}
+
+.app-menu-actions-panel {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.45rem);
+  min-width: 18rem;
+  max-width: min(24rem, calc(100vw - 1rem));
+  padding: 0.6rem;
+  background: #15202a;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  box-shadow: 0 16px 32px rgba(0,0,0,0.28);
+  z-index: 400;
+}
+
+.app-menu-actions[open] .app-menu-actions-panel {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.app-menu-actions-panel .app-menu-btn {
+  width: 100%;
+  justify-content: flex-start;
+  white-space: nowrap;
+}
+
+.app-menu-actions-panel .app-menu-divider {
+  width: 100%;
+  height: 1px;
+  margin: 0.15rem 0.1rem;
 }
 
 .mobile-menu-btn { display: none; }
@@ -618,7 +681,8 @@ main {
   }
   .app-menu-right::-webkit-scrollbar { display: none; }
   .app-menu-right > span,
-  .app-menu-right .app-menu-btn:not(.mobile-menu-btn):not(#editToggleBtn):not(#compactToggleBtn) { display: none; }
+  .app-menu-right .app-menu-btn:not(.mobile-menu-btn):not(#editToggleBtn):not(#compactToggleBtn),
+  .app-menu-actions { display: none; }
   #editToggleBtn { display: none; }
   #compactToggleBtn { display: inline-flex; }
   .mobile-menu-btn { display: inline-flex; }
@@ -1423,6 +1487,15 @@ body.mobile-app-mode .app-menu-right .app-menu-switch {
 body.mobile-app-mode .app-menu-right .mobile-menu-btn {
   flex: 0 0 auto;
   margin-left: auto;
+}
+
+@media (min-width: 769px) {
+  .app-menu-bar {
+    flex-wrap: nowrap;
+  }
+  .app-menu-left, .app-menu-right {
+    min-width: 0;
+  }
 }
 
 body.mobile-app-mode.compact-view-mode .tab-label {

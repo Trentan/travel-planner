@@ -1,4 +1,4 @@
-# CODEX.md
+# GEMINI.md
 
 ## Workflow
 
