@@ -62,6 +62,6 @@ When you finish a work item:
 3. Move the row to the Completed table at the bottom
 4. Take an after screenshot -> save to `screenshots/after/WI-XXX-after.png`
 5. Update the after screenshot reference in `items/WI-XXX.md` as a clickable markdown link to the screenshot
-6. Include a direct clickable link to the after image in your final completion response so it can be reviewed immediately
+6. Include direct clickable links to the before image, proposal image, and after image in your final completion response so they can be reviewed immediately
 7. Update the progress count at the top of this file
 8. Commit the completed WI on the WI branch with the WI number in the commit message, then push that same branch before closing the item
