@@ -413,7 +413,7 @@
           </div>
 
           <input type="hidden" id="journeyType" value="flight">
-          <div class="transport-type-group" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 4px;">
+          <div class="transport-type-group journey-transport-type-group" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 4px;">
             <button class="transport-type-btn active" data-type="flight" onclick="selectJourneyType('flight')"><span style="font-size:1.2rem;">✈️</span> Flight</button>
             <button class="transport-type-btn" data-type="train" onclick="selectJourneyType('train')"><span style="font-size:1.2rem;">🚂</span> Train</button>
             <button class="transport-type-btn" data-type="ferry" onclick="selectJourneyType('ferry')"><span style="font-size:1.2rem;">⛴️</span> Ferry</button>
@@ -421,12 +421,12 @@
             <button class="transport-type-btn" data-type="car" onclick="selectJourneyType('car')"><span style="font-size:1.2rem;">🚗</span> Car</button>
           </div>
 
-          <div style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 0.25rem;">
+          <div class="journey-inline-row journey-route-row" style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 0.25rem;">
             <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
               <label>From</label>
               <select id="journeyFromCity" onchange="_journeyFormDirty=true" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"></select>
             </div>
-            <div style="padding-bottom: 0.6rem; color: #AAB7C4; font-weight: bold;">➔</div>
+            <div class="journey-route-arrow" style="padding-bottom: 0.6rem; color: #AAB7C4; font-weight: bold;">➔</div>
             <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
               <label>To</label>
               <select id="journeyToCity" onchange="_journeyFormDirty=true" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"></select>
@@ -436,26 +436,26 @@
             <a href="#" onclick="promptAddNewCity(); return false;" style="font-size: 0.8rem; color: #3498DB; text-decoration: none;">+ Add new city (opens Cities dialog)</a>
           </div>
 
-          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+          <div class="journey-inline-row journey-time-row" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
             <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
               <label>Departure</label>
-              <div style="display: flex; gap: 0.5rem;">
+              <div class="journey-datetime-pair" style="display: flex; gap: 0.5rem;">
                 <input type="date" id="journeyDateFrom" onchange="_journeyFormDirty=true" style="flex: 3; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
                 <input type="time" id="journeyTimeFrom" onchange="_journeyFormDirty=true" style="flex: 2; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
               </div>
             </div>
           </div>
-          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="journey-inline-row journey-time-row" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
             <div class="ai-form-group" style="flex: 1; margin-bottom: 0;">
               <label>Arrival</label>
-              <div style="display: flex; gap: 0.5rem;">
+              <div class="journey-datetime-pair" style="display: flex; gap: 0.5rem;">
                 <input type="date" id="journeyDateTo" onchange="_journeyFormDirty=true" style="flex: 3; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
                 <input type="time" id="journeyTimeTo" onchange="_journeyFormDirty=true" style="flex: 2; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'DM Sans', sans-serif;">
               </div>
             </div>
           </div>
 
-<div style="display: flex; gap: 1rem; margin-bottom: 1rem;"> 
+<div class="journey-inline-row journey-meta-row" style="display: flex; gap: 1rem; margin-bottom: 1rem;"> 
  <div class="ai-form-group" style="flex: 2; margin-bottom: 0;"> 
  <label>Provider</label> 
  <input type="text" id="journeyProvider" onchange="_journeyFormDirty=true" placeholder="e.g. EVA Air" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
@@ -465,7 +465,7 @@
  <input type="text" id="journeyRouteCode" onchange="_journeyFormDirty=true" placeholder="BR067" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
  </div> 
 </div> 
-<div style="display: flex; gap: 1rem; margin-bottom: 0;"> 
+<div class="journey-inline-row journey-meta-row" style="display: flex; gap: 1rem; margin-bottom: 0;"> 
  <div class="ai-form-group" style="flex: 1; margin-bottom: 0;"> 
  <label>Booking Ref</label> 
  <input type="text" id="journeyBookingRef" onchange="_journeyFormDirty=true" placeholder="e.g. ABC123" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;"> 
@@ -496,9 +496,9 @@
 
       </div>
 
-      <div class="modal-footer" style="display: flex; justify-content: space-between; background: transparent; border-top: none; padding-top: 0;">
+      <div class="modal-footer journey-modal-footer" style="display: flex; justify-content: space-between; background: transparent; border-top: none; padding-top: 0;">
         <button class="action-btn" onclick="closeJourneyModal()" style="background: transparent;">Cancel</button>
-        <div style="display: flex; gap: 0.5rem;">
+        <div class="journey-footer-actions" style="display: flex; gap: 0.5rem;">
           <button id="journeyDeleteBtn" class="action-btn" onclick="deleteJourneyFromModal()" style="background: #E74C3C; color: white; border-color: #E74C3C; display: none;">Delete</button>
           <button class="action-btn" onclick="addSegmentToJourney()" style="background: #2C3E50; color: white;">+ Add segment</button>
           <button class="action-btn" onclick="saveJourneyFromModal()" style="background: #27AE60; color: white; border-color: #27AE60;">✓ Save journey</button>
