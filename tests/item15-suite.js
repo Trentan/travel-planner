@@ -271,6 +271,42 @@ async function testDragDropSmoke() {
   assert(state(context).itinerary[0].days[0].activityItems.some(item => item.text.includes('Morning run')), 'Drag/drop smoke: dropped activity should land on day card');
 }
 
+async function testTouchAssignSmoke() {
+  const app = await createBootedApp();
+  const { context } = app;
+  assertBootClean(app, 'Touch assign smoke');
+
+  const targetLegIdx = state(context).itinerary.findIndex(leg => Array.isArray(leg.days) && leg.days.length > 0);
+  assert(targetLegIdx >= 0, 'Touch assign smoke: should find a leg with day cards');
+
+  context.addActivity(targetLegIdx);
+  app.document.getElementById('activityCategory').value = 'sight';
+  app.document.getElementById('activityTitle').value = 'Sunset pier walk';
+  app.document.getElementById('activityLocation').value = 'Harbour';
+  app.document.getElementById('activityTime').value = '90 min';
+  app.document.getElementById('activityCost').value = '12';
+  app.document.getElementById('saveActivityBtn').click();
+  await settle(app);
+  context.buildItinerary();
+  await settle(app);
+
+  context.openActivityAssignModal(targetLegIdx, 0);
+  await settle(app);
+  assert(app.document.getElementById('activity-assign-modal'), 'Touch assign smoke: tapping Assign should open the picker modal');
+
+  const assigned = context.assignSuggestedActivityToDay(targetLegIdx, 0, targetLegIdx, 0);
+  assert(assigned === true, 'Touch assign smoke: helper should assign the activity to a day');
+  await settle(app);
+  assert(state(context).itinerary[targetLegIdx].suggestedActivities[0].assignedDayIdx === 0, 'Touch assign smoke: day button should assign the activity');
+  assert(state(context).itinerary[targetLegIdx].days[0].activityItems.some(item => item.text === 'Sunset pier walk — Harbour'), 'Touch assign smoke: assigned activity should land in the day list');
+
+  context.deleteDayItem(targetLegIdx, 0, 'activityItems', 0);
+  await settle(app);
+  context.buildItinerary();
+  await settle(app);
+  assert(state(context).itinerary[targetLegIdx].suggestedActivities[0].assignedDayIdx === null, 'Touch assign smoke: deleting the day item should release the suggestion');
+}
+
 async function testModeToggles() {
   const app = await createBootedApp();
   const { context } = app;
@@ -522,6 +558,7 @@ async function run() {
   await testMobileSmoke();
   await testCrudSmoke();
   await testDragDropSmoke();
+  await testTouchAssignSmoke();
   await testModeToggles();
   await testCompactView();
   await testExportImport();

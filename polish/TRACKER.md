@@ -15,7 +15,7 @@ Progress: 16/24 items complete
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
 | [WI-009](./items/WI-009.md) | Map Is A Static SVG Approximation | Major (1-3 days) | Todo | [WI-009-Before](./screenshots/before/desktop-09-map.png) | [WI-009-Proposed](./items/proposals/WI-009-proposal.png) | - | - |
-| [WI-015](./items/WI-015.md) | Drag And Drop Has No Touch Path | Medium (2-8 hrs) | Todo | [WI-015-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-015-Proposed](./items/proposals/WI-015-proposal.png) | - | - |
+| [WI-015](./items/WI-015.md) | Drag And Drop Has No Touch Path | Medium (2-8 hrs) | Review | [WI-015-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-015-Proposed](./items/proposals/WI-015-proposal.png) | [WI-015-After](./screenshots/after/WI-015-after.png) | - |
 | [WI-017](./items/WI-017.md) | AI Builder Modal Lacks Current Trip Context | Medium (2-8 hrs) | Todo | [WI-017-Before](./screenshots/before/mobile-10-ai-builder.png) | [WI-017-Proposed](./items/proposals/WI-017-proposal.png) | - | - |
 | [WI-020](./items/WI-020.md) | Mobile Itinerary Cards Are Over-Scaled | Medium (2-8 hrs) | Todo | [WI-020-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-020-Proposed](./items/proposals/WI-020-proposal.png) | - | - |
 

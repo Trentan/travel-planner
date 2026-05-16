@@ -123,8 +123,8 @@ function saveUiSettings() {
 function setHeaderEditable(isEditable) {
   const title = document.getElementById('mainTitle');
   const subtitle = document.getElementById('mainSubtitle');
-  if (title) title.contentEditable = String(!!isEditable);
-  if (subtitle) subtitle.contentEditable = String(!!isEditable);
+  if (title) title.contentEditable = !!isEditable;
+  if (subtitle) subtitle.contentEditable = !!isEditable;
 }
 
 function applyUiSettings() {
@@ -153,7 +153,7 @@ function applyUiSettings() {
   document.body.classList.toggle('read-only-mode', !isEditMode);
   syncResponsiveUi();
   syncModeToggleButtons();
-  setHeaderEditable(false);
+  setHeaderEditable(isEditMode);
 }
 
 function openRenameTripDialog() {
@@ -223,7 +223,7 @@ function toggleEditMode() {
 
   document.body.classList.toggle('read-only-mode', !isEditMode);
   const btn = document.getElementById('editToggleBtn');
-  setHeaderEditable(false);
+  setHeaderEditable(isEditMode);
 
   if(isEditMode) { btn.innerHTML = "🔒 Lock"; btn.classList.remove('edit-mode'); }
   else { btn.innerHTML = "✏️ Unlock"; btn.classList.add('edit-mode'); saveData(); }

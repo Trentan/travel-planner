@@ -10,12 +10,30 @@ function deleteSight(legIdx, sightIdx) { appData[legIdx].suggestedSights.splice(
 function deleteActivity(legIdx, activityIdx) { appData[legIdx].suggestedActivities.splice(activityIdx, 1); saveData(); buildItinerary(); }
 function deleteLegTip(legIdx, tipIdx) { appData[legIdx].legTips.splice(tipIdx, 1); saveData(); buildItinerary(); }
 
+function findAssignedSuggestedActivity(legIdx, dayIdx, itemText) {
+  const activities = appData[legIdx]?.suggestedActivities || [];
+  return activities.find(activity => activity && activity.assignedDayIdx === dayIdx && activity.title === itemText) || null;
+}
+
+function syncAssignedSuggestedActivityField(legIdx, dayIdx, itemText, field, value) {
+  const activity = findAssignedSuggestedActivity(legIdx, dayIdx, itemText);
+  if (!activity) return;
+  activity[field] = value;
+}
+
+function isPlaceholderActivityItem(item) {
+  const text = String(item?.text || '').trim();
+  return /^[-—]$/.test(text) || text === 'Explore local area' || text === 'Add item...' || text === 'New item...';
+}
+
 function deleteDayItem(legIdx, dayIdx, category, itemIdx) {
   const itemText = appData[legIdx].days[dayIdx][category][itemIdx].text;
   if (category === 'activityItems') {
-    const poolSight = appData[legIdx].suggestedSights.find(s => s.title === itemText && s.assignedDayIdx === dayIdx);
+    const poolActivity = findAssignedSuggestedActivity(legIdx, dayIdx, itemText);
+    if (poolActivity) poolActivity.assignedDayIdx = null;
+    const poolSight = (appData[legIdx].suggestedSights || []).find(s => s.title === itemText && s.assignedDayIdx === dayIdx);
     if (poolSight) poolSight.assignedDayIdx = null;
-    const poolRun = appData[legIdx].cityRun.find(s => s.title === itemText && s.assignedDayIdx === dayIdx);
+    const poolRun = (appData[legIdx].cityRun || []).find(s => s.title === itemText && s.assignedDayIdx === dayIdx);
     if (poolRun) poolRun.assignedDayIdx = null;
   }
   appData[legIdx].days[dayIdx][category].splice(itemIdx, 1); saveData(); buildItinerary();
@@ -356,11 +374,23 @@ function updateLegTip(legIdx, tipIdx, val) {
 }
 
 function updateDayItemText(legIdx, dayIdx, category, itemIdx, text, fromTabs = false) {
-  appData[legIdx].days[dayIdx][category][itemIdx].text = text; saveData();
+  const item = appData[legIdx].days[dayIdx][category][itemIdx];
+  const previousText = item.text;
+  item.text = text;
+  if (category === 'activityItems') {
+    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'title', text);
+  }
+  saveData();
   if(!fromTabs) buildItinerary();
 }
 function updateDayItemCost(legIdx, dayIdx, category, itemIdx, cost, fromTabs = false) {
-  appData[legIdx].days[dayIdx][category][itemIdx].cost = cost; saveData();
+  const item = appData[legIdx].days[dayIdx][category][itemIdx];
+  const previousText = item.text;
+  item.cost = cost;
+  if (category === 'activityItems') {
+    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'estCost', cost);
+  }
+  saveData();
   if(fromTabs) {
     if(category === 'transportItems') buildTransportTab();
     if(category === 'accomItems') buildAccomTab();
@@ -368,12 +398,133 @@ function updateDayItemCost(legIdx, dayIdx, category, itemIdx, cost, fromTabs = f
   else buildItinerary();
 }
 function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
-  appData[legIdx].days[dayIdx][category][itemIdx].time = time; saveData();
+  const item = appData[legIdx].days[dayIdx][category][itemIdx];
+  const previousText = item.text;
+  item.time = time;
+  if (category === 'activityItems') {
+    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'estTime', time);
+  }
+  saveData();
 }
 
 function toggleFoodCompleted(e, legIdx, foodIdx) { appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); buildItinerary(); }
 function toggleDayCompleted(e, legIdx, dayIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].completed = e.target.checked; saveData(); buildItinerary(); }
 function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) { appData[legIdx].days[dayIdx].activityItems[itemIdx].done = e.target.checked; saveData(); buildItinerary(); }
+
+function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, targetDayIdx) {
+  const sourceLeg = appData[sourceLegIdx];
+  const targetLeg = appData[targetLegIdx];
+  const activity = sourceLeg?.suggestedActivities?.[activityIdx];
+  const targetDay = targetLeg?.days?.[targetDayIdx];
+  if (!activity || !targetDay) return false;
+
+  const previousDayIdx = activity.assignedDayIdx;
+  if (previousDayIdx !== null && previousDayIdx !== undefined && sourceLegIdx === targetLegIdx && previousDayIdx !== targetDayIdx) {
+    const previousDay = targetLeg.days[previousDayIdx];
+    if (previousDay && Array.isArray(previousDay.activityItems)) {
+      const prevIndex = previousDay.activityItems.findIndex(item => item.text === activity.title);
+      if (prevIndex !== -1) previousDay.activityItems.splice(prevIndex, 1);
+    }
+  }
+
+  if (!Array.isArray(targetDay.activityItems)) targetDay.activityItems = [];
+  if (targetDay.activityItems.length === 1 && isPlaceholderActivityItem(targetDay.activityItems[0])) {
+    targetDay.activityItems = [];
+  }
+
+  if (!targetDay.activityItems.some(item => item.text === activity.title)) {
+    targetDay.activityItems.push({
+      text: activity.title,
+      cost: activity.estCost || '0',
+      time: activity.estTime || '1 hr',
+      done: false
+    });
+  }
+
+  activity.assignedDayIdx = targetDayIdx;
+  return true;
+}
+
+function openActivityAssignModal(legIdx, activityIdx) {
+  const leg = appData[legIdx];
+  const activity = leg?.suggestedActivities?.[activityIdx];
+  if (!leg || !activity || !Array.isArray(leg.days) || leg.days.length === 0) return;
+
+  const existingModal = document.getElementById('activity-assign-modal');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'activity-assign-modal';
+  modal.className = 'modal-overlay';
+  modal.style.display = 'flex';
+
+  const currentDayLabel = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined && leg.days[activity.assignedDayIdx]
+    ? `${leg.days[activity.assignedDayIdx].day} ${leg.days[activity.assignedDayIdx].date}`
+    : 'Unassigned';
+
+  const dayButtons = leg.days.map((day, dayIdx) => {
+    const isCurrent = activity.assignedDayIdx === dayIdx;
+    return `
+      <button type="button" class="action-btn" data-day-index="${dayIdx}" style="width:100%; margin:0; display:flex; flex-direction:column; align-items:flex-start; gap:0.25rem; text-align:left; ${isCurrent ? 'background:#2C3E50; color:white; border-color:#2C3E50;' : ''}">
+        <span style="font-weight:700;">Day ${day.day} ${day.date}</span>
+        <span style="font-size:0.8rem; opacity:${isCurrent ? '0.85' : '0.75'};">${day.from} → ${day.to}</span>
+        <span style="font-size:0.75rem; opacity:${isCurrent ? '0.85' : '0.7'};">${isCurrent ? 'Current day' : 'Tap to assign here'}</span>
+      </button>
+    `;
+  }).join('');
+
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h2>📌 Assign Suggested Activity</h2>
+        <button class="modal-close" type="button" id="activityAssignCloseBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+          <div style="padding:0.9rem 1rem; border:1px solid var(--border); border-radius:12px; background:var(--card-strong);">
+            <div style="font-weight:700; margin-bottom:0.25rem;">${activity.title}</div>
+            <div style="font-size:0.85rem; color:var(--muted);">
+              ${activity.category ? `${activity.category} · ` : ''}${activity.estTime || '1 hr'} · $${activity.estCost || '0'}
+            </div>
+            <div style="font-size:0.78rem; color:var(--muted); margin-top:0.35rem;">Current assignment: ${currentDayLabel}</div>
+          </div>
+          <div style="display:grid; gap:0.6rem; max-height:52vh; overflow:auto; padding-right:0.2rem;">
+            ${dayButtons}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn" type="button" id="activityAssignCancelBtn">Cancel</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const closeModal = () => modal.remove();
+  document.getElementById('activityAssignCloseBtn').onclick = closeModal;
+  document.getElementById('activityAssignCancelBtn').onclick = closeModal;
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeModal();
+  });
+
+  const firstButton = modal.querySelector('[data-day-index]');
+  if (firstButton) {
+    setTimeout(() => firstButton.focus(), 50);
+  }
+
+  modal.querySelectorAll('[data-day-index]').forEach(button => {
+    button.addEventListener('click', () => {
+      const targetDayIdx = Number(button.getAttribute('data-day-index'));
+      if (!Number.isFinite(targetDayIdx)) return;
+      const assigned = assignSuggestedActivityToDay(legIdx, activityIdx, legIdx, targetDayIdx);
+      if (!assigned) return;
+      saveData();
+      buildItinerary();
+      closeModal();
+    });
+  });
+}
 
 // Dialog functions for Add New Leg
 function openAddLegDialog() {
