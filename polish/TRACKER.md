@@ -9,7 +9,7 @@ Progress: 6/24 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
-| [WI-007](./items/WI-007.md) | Budget Mobile Numbers Look Like Broken Precision | Quick Win (<1 hr) | Todo | [WI-007-Before](./screenshots/before/mobile-07-budget.png) | [WI-007-Proposed](./items/proposals/WI-007-proposal.png) | - | - |
+| [WI-007](./items/WI-007.md) | Budget Mobile Numbers Look Like Broken Precision | Quick Win (<1 hr) | Review | [WI-007-Before](./screenshots/before/mobile-07-budget.png) | [WI-007-Proposed](./items/proposals/WI-007-proposal.png) | [WI-007-After](./screenshots/after/WI-007-after.png) | - |
 | [WI-008](./items/WI-008.md) | Editable Header Text Opens Keyboard On Casual Mobile Taps | Medium (2-8 hrs) | Todo | [WI-008-Before](./screenshots/before/mobile-02-header.png) | [WI-008-Proposed](./items/proposals/WI-008-proposal.png) | - | - |
 
 ## Important

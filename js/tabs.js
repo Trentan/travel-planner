@@ -413,6 +413,16 @@ function buildPackingTab() {
   listsContainer.innerHTML = areasHTML + restoreFooterHTML;
 }
 
+function formatBudgetAmount(value) {
+  const parsed = Number.parseFloat(String(value ?? '').replace(/[^0-9.-]/g, ''));
+  const amount = Number.isFinite(parsed) ? parsed : 0;
+  const decimals = Number.isInteger(amount) ? 0 : 2;
+  return `$${new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  }).format(amount)}`;
+}
+
 function buildBudgetTab() {
   const container = document.getElementById('budget-table-container');
   const kpiContainer = document.getElementById('budget-kpi-container');
@@ -502,15 +512,15 @@ function buildBudgetTab() {
   const grandTotal = totalTrans + totalAccom + totalAct;
 
   kpiContainer.innerHTML = `
-    <div class="budget-kpi"><h3>Transport</h3><div class="amount">$${totalTrans}</div></div>
-    <div class="budget-kpi"><h3>Accommodation</h3><div class="amount">$${totalAccom}</div></div>
-    <div class="budget-kpi"><h3>Activities</h3><div class="amount">$${totalAct}</div></div>
-    <div class="budget-kpi grand-total"><h3>Grand Total</h3><div class="amount">$${grandTotal}</div></div>
+    <div class="budget-kpi"><h3>Transport</h3><div class="amount">${formatBudgetAmount(totalTrans)}</div></div>
+    <div class="budget-kpi"><h3>Accommodation</h3><div class="amount">${formatBudgetAmount(totalAccom)}</div></div>
+    <div class="budget-kpi"><h3>Activities</h3><div class="amount">${formatBudgetAmount(totalAct)}</div></div>
+    <div class="budget-kpi grand-total"><h3>Grand Total</h3><div class="amount">${formatBudgetAmount(grandTotal)}</div></div>
   `;
 
   let html = `<div class="data-table-wrapper budget-table-wrapper"><table class="data-table budget-table"><thead><tr><th>Trip Leg</th><th>Transport</th><th>Accommodation</th><th>Activities</th><th>Leg Total</th></tr></thead><tbody>`;
   legBreakdown.forEach(l => {
-    html += `<tr style="border-left-color: ${l.colour}"><td data-label="Trip Leg" style="font-weight:600;">${l.label}</td><td data-label="Transport">$${l.trans}</td><td data-label="Accommodation">$${l.accom}</td><td data-label="Activities">$${l.act}</td><td data-label="Leg Total" style="font-family:'DM Mono',monospace; font-weight:600;">$${l.total}</td></tr>`;
+    html += `<tr style="border-left-color: ${l.colour}"><td data-label="Trip Leg" style="font-weight:600;">${l.label}</td><td data-label="Transport">${formatBudgetAmount(l.trans)}</td><td data-label="Accommodation">${formatBudgetAmount(l.accom)}</td><td data-label="Activities">${formatBudgetAmount(l.act)}</td><td data-label="Leg Total" style="font-family:'DM Mono',monospace; font-weight:600;">${formatBudgetAmount(l.total)}</td></tr>`;
   });
   html += `</tbody></table></div>`;
   container.innerHTML = html;
