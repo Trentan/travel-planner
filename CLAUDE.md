@@ -22,6 +22,7 @@ polish/screenshots/after/WI-XXX-after.png
 ```
 
 8. Update the work item and `polish/TRACKER.md`, and make the after screenshot a clickable markdown link in the work item file.
+9. In the final response, include a direct clickable link to the after image for immediate review.
 
 ## Session Start
 
@@ -42,6 +43,7 @@ Before reporting done:
 5. Make sure the work item's after screenshot field links directly to `polish/screenshots/after/WI-XXX-after.png`.
 6. Commit the completed WI on the WI branch with the WI referenced in the commit message, then push that same branch.
 7. Summarize changed files, verification, branch name, and commit hash.
+8. Include a direct clickable link to the after image in the completion response.
 
 ## File Map
 
