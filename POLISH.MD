@@ -428,12 +428,18 @@ Work through items in this order for maximum visible improvement fastest:
 ## NOTES FOR CLAUDE CODE / CODEX
 
 - Work through Steps 1–7 in order. Do not skip steps.
-- If Puppeteer screenshots fail (server not running, selector not found), note the failure in the relevant item's `WI-XXX.md` and continue — do not stop the whole audit.
-- Use real CSS selectors from the actual source files — read them before writing fix code.
+- If Puppeteer screenshots fail (server not running, selector not found), note the failure in the relevant item's `WI-XXX.md` and continue – do not stop the whole audit.
+- Use real CSS selectors from the actual source files – read them before writing fix code.
 - Do not invent issues. Only report what you can actually see in screenshots or source code.
+- If multiple WIs are active, keep one WI per branch or worktree and verify the current branch before editing anything.
+- Do not edit another WI's files or tracker row in a shared worktree; commit and push a verified WI before switching context.
 - The `/polish` folder is self-contained. Nothing outside it needs to change until you implement a fix.
 - When a WI is moved to Done, commit the change on the WI branch with the WI referenced in the commit message, then push that same branch before closing the item out.
 - When done, print a one-line summary: `Polish audit complete — X items found, files in /polish/`
 
 ## Prompt for work
 - Work on the next Todo item in polish/TRACKER.md. Follow CODEX.md. Complete the item end-to-end, including verification, after screenshot, and tracker updates.
+
+or
+
+- Work on Todo item WI-000 in polish/TRACKER.md. Follow CODEX.md. Complete the item end-to-end, including verification, after screenshot, and tracker updates.
