@@ -35,11 +35,14 @@ function syncMobileMenuControls() {
 }
 
 function syncResponsiveUi() {
-  document.body.classList.toggle('mobile-app-mode', isMobileViewport());
+  const mobile = isMobileViewport();
+  document.body.classList.toggle('mobile-app-mode', mobile);
+  document.body.classList.toggle('compact-view-mode', isCompactView);
+  window.isCompactView = isCompactView;
   updateStickyOffsets();
   syncMobileMenuControls();
 
-  if (!isMobileViewport()) {
+  if (!mobile) {
     closeMobileMenu();
     closeDesktopActionsMenu();
   }
@@ -146,8 +149,37 @@ function applyUiSettings() {
 
   const title = document.getElementById('mainTitle');
   const subtitle = document.getElementById('mainSubtitle');
-  if (title) title.contentEditable = isEditMode;
-  if (subtitle) subtitle.contentEditable = isEditMode;
+  const isMobile = isMobileViewport();
+  if (title) title.contentEditable = isEditMode && !isMobile;
+  if (subtitle) subtitle.contentEditable = isEditMode && !isMobile;
+}
+
+function renameTripHeader() {
+  const title = document.getElementById('mainTitle');
+  const subtitle = document.getElementById('mainSubtitle');
+  if (!title) return;
+  
+  if (!isEditMode) {
+    toggleEditMode();
+  }
+  
+  title.contentEditable = true;
+  if (subtitle) subtitle.contentEditable = true;
+  
+  title.focus();
+  
+  // Disable when done
+  const handleBlur = function() {
+    if (isMobileViewport()) {
+      title.contentEditable = false;
+      if (subtitle) subtitle.contentEditable = false;
+    }
+    title.removeEventListener('blur', handleBlur);
+    if (subtitle) subtitle.removeEventListener('blur', handleBlur);
+  };
+
+  title.addEventListener('blur', handleBlur);
+  if (subtitle) subtitle.addEventListener('blur', handleBlur);
 }
 
 function toggleMode() {
@@ -173,8 +205,9 @@ function toggleEditMode() {
 
   document.body.classList.toggle('read-only-mode', !isEditMode);
   const btn = document.getElementById('editToggleBtn');
-  document.getElementById('mainTitle').contentEditable = isEditMode;
-  document.getElementById('mainSubtitle').contentEditable = isEditMode;
+  const isMobile = isMobileViewport();
+  document.getElementById('mainTitle').contentEditable = isEditMode && !isMobile;
+  document.getElementById('mainSubtitle').contentEditable = isEditMode && !isMobile;
 
   if(isEditMode) { btn.innerHTML = "🔒 Lock"; btn.classList.remove('edit-mode'); }
   else { btn.innerHTML = "✏️ Unlock"; btn.classList.add('edit-mode'); saveData(); }
@@ -277,24 +310,6 @@ function toggleCompactView(nextValue = null) {
   }
 }
 
-function toggleEditMode() {
-  isEditMode = !isEditMode;
-  saveUiSettings();
-  window.isEditMode = isEditMode;
-  document.body.classList.toggle('read-only-mode', !isEditMode);
-  const title = document.getElementById('mainTitle');
-  const subtitle = document.getElementById('mainSubtitle');
-  if (title) title.contentEditable = isEditMode;
-  if (subtitle) subtitle.contentEditable = isEditMode;
-  if (!isEditMode) saveData();
-  applyUiSettings();
-  const activeTab = document.querySelector('.app-tab-btn.active')?.innerText || '';
-  const cityFilter = typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all';
-  if (activeTab.includes('Transport')) buildTransportTab(cityFilter);
-  if (activeTab.includes('Accommodation')) buildAccomTab(cityFilter);
-  if (activeTab.includes('Packing')) buildPackingTab();
-}
-
 function promptResetData() {
   closeMobileMenu();
   const mobileResetMessage = [
@@ -392,4 +407,5 @@ window.syncResponsiveUi = syncResponsiveUi;
 window.syncMobileMenuControls = syncMobileMenuControls;
 window.promptResetData = promptResetData;
 window.addLeg = addLeg;
+window.renameTripHeader = renameTripHeader;
 
