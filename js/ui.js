@@ -120,6 +120,13 @@ function saveUiSettings() {
   }));
 }
 
+function setHeaderEditable(isEditable) {
+  const title = document.getElementById('mainTitle');
+  const subtitle = document.getElementById('mainSubtitle');
+  if (title) title.contentEditable = String(!!isEditable);
+  if (subtitle) subtitle.contentEditable = String(!!isEditable);
+}
+
 function applyUiSettings() {
   let savedSettings = null;
   try {
@@ -146,44 +153,51 @@ function applyUiSettings() {
   document.body.classList.toggle('read-only-mode', !isEditMode);
   syncResponsiveUi();
   syncModeToggleButtons();
-
-  const title = document.getElementById('mainTitle');
-  const subtitle = document.getElementById('mainSubtitle');
-  const isMobile = isMobileViewport();
-  if (title) title.contentEditable = isEditMode && !isMobile;
-  if (subtitle) subtitle.contentEditable = isEditMode && !isMobile;
+  setHeaderEditable(false);
 }
 
-function renameTripHeader() {
+function openRenameTripDialog() {
+  const dialog = document.getElementById('rename-trip-modal');
   const title = document.getElementById('mainTitle');
   const subtitle = document.getElementById('mainSubtitle');
-  if (!title) return;
-  
+  const titleInput = document.getElementById('renameTripTitle');
+  const subtitleInput = document.getElementById('renameTripSubtitle');
+  if (!dialog || !title || !titleInput || !subtitleInput) return;
+
   if (!isEditMode) {
     toggleEditMode();
   }
-  
-  title.contentEditable = true;
-  if (subtitle) subtitle.contentEditable = true;
-  
-  title.focus();
-  
-  const handleFocusOut = function() {
-    setTimeout(() => {
-      const active = document.activeElement;
-      if (active !== title && active !== subtitle) {
-        if (isMobileViewport()) {
-          title.contentEditable = false;
-          if (subtitle) subtitle.contentEditable = false;
-        }
-        title.removeEventListener('focusout', handleFocusOut);
-        if (subtitle) subtitle.removeEventListener('focusout', handleFocusOut);
-      }
-    }, 100);
-  };
 
-  title.addEventListener('focusout', handleFocusOut);
-  if (subtitle) subtitle.addEventListener('focusout', handleFocusOut);
+  titleInput.value = (title.innerText || '').trim();
+  subtitleInput.value = subtitle ? (subtitle.innerText || '').trim() : '';
+  dialog.style.display = 'flex';
+  dialog.setAttribute('aria-hidden', 'false');
+  requestAnimationFrame(() => titleInput.focus());
+}
+
+function closeRenameTripDialog() {
+  const dialog = document.getElementById('rename-trip-modal');
+  if (!dialog) return;
+  dialog.style.display = 'none';
+  dialog.setAttribute('aria-hidden', 'true');
+}
+
+function saveRenameTripDialog() {
+  const title = document.getElementById('mainTitle');
+  const subtitle = document.getElementById('mainSubtitle');
+  const titleInput = document.getElementById('renameTripTitle');
+  const subtitleInput = document.getElementById('renameTripSubtitle');
+  if (!title || !titleInput || !subtitleInput) return;
+
+  const nextTitle = titleInput.value.trim() || 'New Trip Plan';
+  const nextSubtitle = subtitleInput.value.trim();
+  title.innerText = nextTitle;
+  if (subtitle) subtitle.innerText = nextSubtitle;
+  titleData.title = nextTitle;
+  titleData.subtitle = nextSubtitle;
+  saveData();
+  trackUserEdit();
+  closeRenameTripDialog();
 }
 
 function toggleMode() {
@@ -209,9 +223,7 @@ function toggleEditMode() {
 
   document.body.classList.toggle('read-only-mode', !isEditMode);
   const btn = document.getElementById('editToggleBtn');
-  const isMobile = isMobileViewport();
-  document.getElementById('mainTitle').contentEditable = isEditMode && !isMobile;
-  document.getElementById('mainSubtitle').contentEditable = isEditMode && !isMobile;
+  setHeaderEditable(false);
 
   if(isEditMode) { btn.innerHTML = "🔒 Lock"; btn.classList.remove('edit-mode'); }
   else { btn.innerHTML = "✏️ Unlock"; btn.classList.add('edit-mode'); saveData(); }
@@ -411,5 +423,7 @@ window.syncResponsiveUi = syncResponsiveUi;
 window.syncMobileMenuControls = syncMobileMenuControls;
 window.promptResetData = promptResetData;
 window.addLeg = addLeg;
-window.renameTripHeader = renameTripHeader;
+window.openRenameTripDialog = openRenameTripDialog;
+window.closeRenameTripDialog = closeRenameTripDialog;
+window.saveRenameTripDialog = saveRenameTripDialog;
 

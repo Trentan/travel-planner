@@ -37,6 +37,7 @@
       <summary class="app-menu-btn app-menu-actions-summary" aria-label="Open app actions" aria-haspopup="menu">Actions</summary>
       <div class="app-menu-actions-panel" role="menu" aria-label="App actions">
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCityDialog()">🌍 Cities</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openRenameTripDialog()">✏️ Rename Trip</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openAIDialog()">🤖 AI Builder</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openGuideDialog()">📖 Guide</button>
         <div class="app-menu-divider" aria-hidden="true"></div>
@@ -58,8 +59,8 @@
 <header>
   <div class="header-inner">
     <div class="header-text">
-      <h1 contenteditable="true" id="mainTitle"></h1>
-      <p contenteditable="true" id="mainSubtitle"></p>
+      <h1 contenteditable="false" id="mainTitle"></h1>
+      <p contenteditable="false" id="mainSubtitle"></p>
     </div>
   </div>
 </header>
@@ -169,7 +170,7 @@
       </div>
       <div class="mobile-menu-sheet-grid">
         <button id="mobileEditToggleBtn" class="app-menu-btn" onclick="closeMobileMenu(); toggleEditMode()">🔒 Lock: Read Only</button>
-        <button id="mobileRenameBtn" class="app-menu-btn" onclick="closeMobileMenu(); renameTripHeader()">✏️ Rename Trip</button>
+        <button id="mobileRenameBtn" class="app-menu-btn" onclick="closeMobileMenu(); openRenameTripDialog()">✏️ Rename Trip</button>
         <label id="mobileCompactToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="false" title="Toggle detailed or compact mode">
           <input id="mobileCompactToggleInput" type="checkbox" onchange="closeMobileMenu(); toggleCompactView(this.checked)" aria-label="Toggle detailed or compact mode">
           <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
@@ -226,6 +227,29 @@
         <button class="action-btn" style="background: #556B2F; color: white;" onclick="copyShareEmailDraft()">Copy Email Text</button>
         <button class="action-btn" style="background: #2C3E50; color: white;" onclick="exportShareJSON()">Download Share File</button>
         <button class="action-btn" style="background: #1F6F8B; color: white;" onclick="exportShareEmail()">Open Email Draft</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="rename-trip-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 560px;">
+      <div class="modal-header">
+        <h2>✏️ Rename Trip</h2>
+        <button class="modal-close" onclick="closeRenameTripDialog()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="option-group">
+          <label for="renameTripTitle">Trip title</label>
+          <input type="text" id="renameTripTitle" maxlength="120" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="option-group">
+          <label for="renameTripSubtitle">Trip subtitle</label>
+          <textarea id="renameTripSubtitle" rows="4" maxlength="240" spellcheck="false"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn" onclick="closeRenameTripDialog()">Cancel</button>
+        <button class="action-btn" style="background:#2C3E50; color:white;" onclick="saveRenameTripDialog()">Save Trip Name</button>
       </div>
     </div>
   </div>
