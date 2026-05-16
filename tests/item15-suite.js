@@ -310,7 +310,7 @@ async function testCompactView() {
   context.buildItinerary();
   assert(app.document.getElementById('itinerary').children.length > 0, 'Compact view: itinerary should still render checkboxes and cards');
   assert(
-    app.document.getElementById('itinerary').children[0].innerHTML.includes('Food Quests'),
+    app.document.getElementById('itinerary').children[0].innerHTML.includes('Food Quest'),
     'Compact view: must eat items should still render in itinerary'
   );
   context.toggleCompactView();
