@@ -56,12 +56,13 @@ Progress: 1/24 items complete
 ## How to update this file
 
 When you finish a work item:
+0. Create or switch to a branch named for the work item, for example `WI-001_Desktop-App-Menu-Wraps`
 1. Change its Status cell to `✅ Done`
 2. Fill in the Done date
 3. Move the row to the Completed table at the bottom
 4. Take an after screenshot -> save to `screenshots/after/WI-XXX-after.png`
 5. Update the after screenshot reference in `items/WI-XXX.md`
 6. Update the progress count at the top of this file
-7. Commit the completed WI on the current branch with the WI number in the commit message, then push the branch before closing the item
+7. Commit the completed WI on the WI branch with the WI number in the commit message, then push that same branch before closing the item
 
 

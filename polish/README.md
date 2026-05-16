@@ -14,8 +14,9 @@ All items live in `/polish/items/`. Progress tracked in TRACKER.md.
 ## How to work through items
 1. Open TRACKER.md - pick the next Todo item
 2. Open its WI-XXX.md for full context, before screenshot ref, and proposed fix
-3. Implement the fix
-4. Run regression: `node scripts/regression-city-nav.js`
-5. Take an actual after screenshot and save to `screenshots/after/WI-XXX-after.png`
-6. Update TRACKER.md status to Done
-7. Commit the WI on the current branch with the WI number in the commit message, then push the branch before treating the item as finished
+3. Create or switch to a branch named for the work item, for example `WI-001_Desktop-App-Menu-Wraps`
+4. Implement the fix
+5. Run regression: `node scripts/regression-city-nav.js`
+6. Take an actual after screenshot and save to `screenshots/after/WI-XXX-after.png`
+7. Update TRACKER.md status to Done
+8. Commit the WI on the WI branch with the WI number in the commit message, then push that same branch before treating the item as finished

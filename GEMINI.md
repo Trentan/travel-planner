@@ -6,21 +6,22 @@ Use the polish sprint files as the source of truth.
 
 1. Open `polish/TRACKER.md`.
 2. Pick the next `Todo` item in priority order unless the user names a specific `WI-XXX`.
-3. Open `polish/items/WI-XXX.md`.
-4. Implement only that work item.
-5. Run the relevant checks. If available, run:
+3. Create or switch to a branch named for the work item, for example `WI-001_Desktop-App-Menu-Wraps`.
+4. Open `polish/items/WI-XXX.md`.
+5. Implement only that work item.
+6. Run the relevant checks. If available, run:
 
 ```powershell
 node scripts/regression-city-nav.js
 ```
 
-6. Capture the real completed screenshot to:
+7. Capture the real completed screenshot to:
 
 ```text
 polish/screenshots/after/WI-XXX-after.png
 ```
 
-7. Update the work item and `polish/TRACKER.md`.
+8. Update the work item and `polish/TRACKER.md`.
 
 ## Session Start
 
@@ -38,7 +39,7 @@ Before reporting done:
 2. Capture `polish/screenshots/after/WI-XXX-after.png`.
 3. Update the WI status to Done.
 4. Update `polish/TRACKER.md`.
-5. Commit the completed WI on the current branch with the WI referenced in the commit message, then push the branch.
+5. Commit the completed WI on the WI branch with the WI referenced in the commit message, then push that same branch.
 6. Summarize changed files, verification, branch name, and commit hash.
 
 ## File Map
@@ -57,7 +58,7 @@ Before reporting done:
 - Preserve unrelated local changes.
 - If a new issue is found, add a new `WI-XXX.md` and update `TRACKER.md`.
 - When an item is done, mark it `Done`, add the date, and move it to Completed in `TRACKER.md`.
-- After moving a WI to Done, create a git commit on the current branch that references the WI number, then push the branch before reporting completion.
+- After moving a WI to Done, create a git commit on the WI branch that references the WI number, then push that same branch before reporting completion.
 
 ## App
 
