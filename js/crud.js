@@ -468,7 +468,7 @@ function openActivityAssignModal(legIdx, activityIdx) {
       <button type="button" class="action-btn" data-day-index="${dayIdx}" style="width:100%; margin:0; display:flex; flex-direction:column; align-items:flex-start; gap:0.25rem; text-align:left; ${isCurrent ? 'background:#2C3E50; color:white; border-color:#2C3E50;' : ''}">
         <span style="font-weight:700;">Day ${day.day} ${day.date}</span>
         <span style="font-size:0.8rem; opacity:${isCurrent ? '0.85' : '0.75'};">${day.from} → ${day.to}</span>
-        <span style="font-size:0.75rem; opacity:${isCurrent ? '0.85' : '0.7'};">${isCurrent ? 'Current day' : 'Tap to assign here'}</span>
+        <span style="font-size:0.75rem; opacity:${isCurrent ? '0.85' : '0.7'};">${isCurrent ? 'Current day' : 'Tap to add here'}</span>
       </button>
     `;
   }).join('');
@@ -476,7 +476,7 @@ function openActivityAssignModal(legIdx, activityIdx) {
   modal.innerHTML = `
     <div class="modal-content" style="max-width: 520px;">
       <div class="modal-header">
-        <h2>📌 Assign Suggested Activity</h2>
+        <h2>◎ Add to Day</h2>
         <button class="modal-close" type="button" id="activityAssignCloseBtn">&times;</button>
       </div>
       <div class="modal-body">
