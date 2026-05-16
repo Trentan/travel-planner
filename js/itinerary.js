@@ -25,18 +25,18 @@ function buildCompactItinerary() {
 
     if ((leg.cityFood || []).length > 0) {
       html += `
-      <div style="border-left:4px solid ${leg.colour}; margin:6px 0; padding:6px; background:#fffaf2;">
-        <div style="display:flex; gap:6px; align-items:center; font-size:11px; margin-bottom:4px;">
+      <div style="border-left:4px solid ${leg.colour}; margin:8px 0; padding:10px 10px 8px; background:#fff4e5; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+        <div style="display:flex; gap:6px; align-items:center; justify-content:space-between; font-size:12px; margin-bottom:6px; flex-wrap:wrap;">
           <strong>🍔 Food Quests</strong>
           <span style="font-size:10px; color:#666;">Must eat items to tick off</span>
         </div>
-        <div style="display:flex; flex-direction:column; gap:4px; font-size:10px;">
+        <div style="display:flex; flex-direction:column; gap:6px; font-size:12px;">
           ${(leg.cityFood || []).map((f, i) => `
             <label class="quest-item" style="margin-bottom:0;">
               <input type="checkbox" ${f.done ? 'checked' : ''}
                 onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"
-                style="width:14px; height:14px; accent-color:#27AE60;">
-              <span style="${f.done ? 'text-decoration:line-through; opacity:0.7;' : ''}">${f.text}</span>
+                style="width:16px; height:16px; accent-color:#27AE60; margin-top:1px;">
+              <span style="font-size:12px; line-height:1.35; ${f.done ? 'text-decoration:line-through; opacity:0.7;' : ''}">${f.text}</span>
             </label>
           `).join('')}
         </div>
