@@ -410,6 +410,7 @@ function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
 function rebuildItineraryPreservingScroll() {
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
+  if (typeof captureMobilePagerStates === 'function') captureMobilePagerStates(document.getElementById('itinerary') || document);
   buildItinerary();
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }

@@ -258,7 +258,12 @@ function switchTab(tabId, btnElement) {
   // Check for current city filter and pass to tab builders
   const cityFilter = typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all';
 
-  if (tabId === 'itinerary') buildItinerary();
+  if (tabId === 'itinerary') {
+    if (typeof resetMobilePagerActiveIndex === 'function') {
+      resetMobilePagerActiveIndex('compact-city-swipe');
+    }
+    buildItinerary();
+  }
   if (tabId === 'transport') buildTransportTab(cityFilter);
   if (tabId === 'accom') buildAccomTab(cityFilter);
   if (tabId === 'budget') buildBudgetTab();

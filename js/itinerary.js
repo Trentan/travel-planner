@@ -1576,9 +1576,8 @@ function selectCityFilter(cityId, btn) {
       buildAccomTab();
     } else if (tabType === 'itinerary') {
       if (typeof isMobileViewport === 'function' ? isMobileViewport() : window.innerWidth <= 768) {
-        if (!scrollToCompactCitySlide(cityId, getCityNameById(cityId))) {
-          buildItinerary();
-        }
+        if (typeof resetMobilePagerActiveIndex === 'function') resetMobilePagerActiveIndex('compact-city-swipe');
+        buildItinerary();
       } else {
         buildItinerary();
       }

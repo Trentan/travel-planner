@@ -200,6 +200,35 @@ function setMobilePagerActiveIndex(pagerKey, index) {
   store[pagerKey] = Math.max(0, Number(index) || 0);
 }
 
+function resetMobilePagerActiveIndex(pagerKey) {
+  if (!pagerKey) return;
+  const store = getMobilePagerStateStore();
+  delete store[pagerKey];
+}
+
+function captureMobilePagerStates(root = document) {
+  if (typeof window === 'undefined' || !root) return;
+  root.querySelectorAll('[data-role="mobile-swipe-pager"]').forEach(pager => {
+    const pagerKey = pager.dataset.pagerKey || '';
+    if (!pagerKey) return;
+
+    const carousel = pager.querySelector('[data-role="mobile-swipe-carousel"]');
+    const slides = Array.from(pager.querySelectorAll('[data-role="mobile-swipe-slide"]'));
+    if (!carousel || slides.length === 0) return;
+
+    let bestIndex = Number(pager.dataset.activeIndex || 0);
+    let bestDistance = Number.POSITIVE_INFINITY;
+    slides.forEach((slide, index) => {
+      const distance = Math.abs((slide.offsetLeft - carousel.offsetLeft) - carousel.scrollLeft);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
+      }
+    });
+    setMobilePagerActiveIndex(pagerKey, bestIndex);
+  });
+}
+
 function renderMobileSurfaceCard({
                                    cardClass = '',
                                    accentColor = '',
@@ -582,3 +611,5 @@ window.setupMobileSwipePagers = setupMobileSwipePagers;
 window.renderMobileStatusCostMeta = renderMobileStatusCostMeta;
 window.getMobilePagerActiveIndex = getMobilePagerActiveIndex;
 window.setMobilePagerActiveIndex = setMobilePagerActiveIndex;
+window.resetMobilePagerActiveIndex = resetMobilePagerActiveIndex;
+window.captureMobilePagerStates = captureMobilePagerStates;
