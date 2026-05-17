@@ -456,9 +456,7 @@ function buildCompactItinerary() {
 
   appData.forEach((leg, legIndex) => {
     const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
-    const nightLabel = isTransitLegForDisplay(leg)
-        ? 'Day Transit / Stop'
-        : `${daysCount} night${daysCount !== 1 ? 's' : ''}`;
+    const nightLabel = getLegNightSummary(leg).label;
     const firstDay = leg.days && leg.days[0];
     const lastDay = leg.days && leg.days[daysCount - 1];
     const legDateRange = firstDay && lastDay
@@ -530,7 +528,7 @@ function buildCompactItineraryLegacy() {
     section.id = 'leg-' + leg.id;
 
     const daysCount = leg.days.length;
-    const nightLabel = `${daysCount} night${daysCount !== 1 ? 's' : ''}`;
+    const nightLabel = getLegNightSummary(leg).label;
 
     let html = `
     <div class="leg-header" style="background:${leg.colour}; cursor:default;">
@@ -762,8 +760,66 @@ function getStayDisplayForDay(dayDate, dayCity) {
   return result;
 }
 
+function getLegStayNightCount(leg) {
+  const staysData = Array.isArray(stays)
+      ? stays
+      : (typeof window !== 'undefined' && Array.isArray(window.stays) ? window.stays : []);
+
+  if (!Array.isArray(staysData) || staysData.length === 0 || !leg) return 0;
+
+  const legCityName = cleanCityNavLabel(leg.label || leg.subtitle || leg.desc || '').toLowerCase();
+  const legCity = legCityName ? getCityByName(legCityName) : null;
+  const legCityId = legCity ? legCity.id : (leg.id ? `city-${String(leg.id).replace(/^city-/, '')}` : '');
+  const legCityIdNormalized = String(legCityId || '').toLowerCase();
+
+  return staysData.reduce((total, stay) => {
+    if (!stay) return total;
+
+    const stayCityId = String(stay.cityId || '').toLowerCase();
+    const stayCityName = cleanCityNavLabel(getCityNameForNavId(stay.cityId) || stay.city || '').toLowerCase();
+    const matchesLegCity =
+        (legCityIdNormalized && stayCityId === legCityIdNormalized) ||
+        (legCityName && stayCityName === legCityName);
+
+    if (!matchesLegCity) return total;
+
+    const stayNights = Number(stay.nights) || (typeof calculateNightsBetween === 'function'
+        ? calculateNightsBetween(stay.checkIn, stay.checkOut)
+        : 0);
+
+    return total + Math.max(0, stayNights);
+  }, 0);
+}
+
+function getLegNightSummary(leg) {
+  const stayNights = getLegStayNightCount(leg);
+  if (stayNights > 0) {
+    return {
+      label: `${stayNights} night${stayNights !== 1 ? 's' : ''}`,
+      isTransit: false,
+      nights: stayNights
+    };
+  }
+
+  if (isTransitLegForDisplay(leg)) {
+    return {
+      label: 'Day Transit / Stop',
+      isTransit: true,
+      nights: 0
+    };
+  }
+
+  const fallbackNights = Array.isArray(leg && leg.days) && leg.days.length > 0 ? leg.days.length : 1;
+  return {
+    label: `${fallbackNights} night${fallbackNights !== 1 ? 's' : ''}`,
+    isTransit: false,
+    nights: fallbackNights
+  };
+}
+
 function isTransitLegForDisplay(leg) {
   if (!leg || !Array.isArray(leg.days) || leg.days.length === 0) return false;
+  if (getLegStayNightCount(leg) > 0) return false;
   if (leg.days.length > 1) return false;
 
   const legText = [
@@ -873,8 +929,9 @@ function buildItinerary() {
       }
     }
 
-    const nightLabel = isTransitLegForDisplay(leg) ? '✈ Day Transit / Stop' : `${daysCount} night${daysCount !== 1 ? 's' : ''}`;
-    const badgeClass = isTransit ? 'leg-night-count badge-transit' : 'leg-night-count';
+    const nightSummary = getLegNightSummary(leg);
+    const nightLabel = nightSummary.isTransit ? '✈ Day Transit / Stop' : nightSummary.label;
+    const badgeClass = nightSummary.isTransit || isTransit ? 'leg-night-count badge-transit' : 'leg-night-count';
 
     const firstDateObj = daysCount > 0 ? leg.days[0] : null;
     const lastDateObj = daysCount > 0 ? leg.days[daysCount - 1] : null;
@@ -1320,6 +1377,58 @@ function scrollToElementWithNavOffset(el) {
   return true;
 }
 
+function findCompactCitySlideIndex(cityId, cityName) {
+  if (!Array.isArray(appData) || appData.length === 0) return -1;
+
+  const normalizedCityId = String(cityId || '').trim().toLowerCase();
+  const normalizedCityName = String(cityName || '').trim().toLowerCase();
+
+  for (let i = 0; i < appData.length; i++) {
+    const leg = appData[i];
+    if (!leg) continue;
+
+    const legId = String(leg.id || '').trim().toLowerCase();
+    const legLabel = cleanCityNavLabel(leg.label || '').toLowerCase();
+
+    if (normalizedCityId && (legId === normalizedCityId || legId === normalizedCityId.replace(/^city-/, ''))) {
+      return i;
+    }
+
+    if (normalizedCityName && legLabel === normalizedCityName) {
+      return i;
+    }
+
+    if (normalizedCityName && Array.isArray(leg.days) && leg.days.some(day =>
+        (day.from && day.from.toLowerCase() === normalizedCityName) ||
+        (day.to && day.to.toLowerCase() === normalizedCityName)
+    )) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
+function scrollToCompactCitySlide(cityId, cityName) {
+  const slideIndex = findCompactCitySlideIndex(cityId, cityName);
+  if (slideIndex < 0) return false;
+
+  const slide = document.querySelector(`.compact-city-swipe-pager .compact-city-slide[data-slide-index="${slideIndex}"]`);
+  if (!slide) return false;
+
+  slide.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+
+  const pager = slide.closest('.mobile-swipe-pager');
+  if (pager) {
+    pager.dataset.activeIndex = String(slideIndex);
+    if (typeof setMobilePagerActiveIndex === 'function') {
+      setMobilePagerActiveIndex(pager.dataset.pagerKey || 'compact-city-swipe', slideIndex);
+    }
+  }
+
+  return true;
+}
+
 function getLegElement(leg) {
   if (!leg) return null;
   return document.getElementById('leg-' + leg.id);
@@ -1446,7 +1555,13 @@ function selectCityFilter(cityId, btn) {
     } else if (tabType === 'accom' && typeof buildAccomTab === 'function') {
       buildAccomTab();
     } else if (tabType === 'itinerary') {
-      buildItinerary();
+      if (typeof isMobileViewport === 'function' ? isMobileViewport() : window.innerWidth <= 768) {
+        if (!scrollToCompactCitySlide(cityId, getCityNameById(cityId))) {
+          buildItinerary();
+        }
+      } else {
+        buildItinerary();
+      }
     }
   } else {
     // Filter by city
@@ -1459,8 +1574,14 @@ function selectCityFilter(cityId, btn) {
     } else if (tabType === 'accom' && typeof buildAccomTab === 'function') {
       buildAccomTab(cityId);
     } else if (tabType === 'itinerary') {
-      // Scroll to first leg with this city
-      scrollToCity(cityId);
+      if (typeof isMobileViewport === 'function' ? isMobileViewport() : window.innerWidth <= 768) {
+        if (!scrollToCompactCitySlide(cityId, cityName)) {
+          scrollToCity(cityId);
+        }
+      } else {
+        // Scroll to first leg with this city
+        scrollToCity(cityId);
+      }
     }
   }
 }
