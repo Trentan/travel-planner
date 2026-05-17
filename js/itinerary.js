@@ -324,7 +324,14 @@ function setupCompactItineraryPagers(root = document) {
       const slide = slides[nextIndex];
       if (!slide) return;
       suppressObserver = true;
-      slide.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      if (typeof scrollChildIntoHorizontalView === 'function') {
+        scrollChildIntoHorizontalView(carousel, slide, { behavior: 'smooth', align: 'start' });
+      } else {
+        carousel.scrollTo({
+          left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
+          behavior: 'smooth'
+        });
+      }
       setActive(nextIndex);
       window.setTimeout(() => {
         suppressObserver = false;
@@ -392,6 +399,46 @@ function setupCompactItineraryPagers(root = document) {
   });
 }
 
+function captureCompactDayPagerStates(root = document) {
+  if (!root) return;
+  root.querySelectorAll('.compact-day-pager').forEach(pager => {
+    const pagerKey = pager.dataset.pagerKey || '';
+    if (!pagerKey || typeof setMobilePagerActiveIndex !== 'function') return;
+
+    const carousel = pager.querySelector('.compact-day-carousel');
+    const slides = Array.from(pager.querySelectorAll('.compact-day-slide'));
+    if (!carousel || slides.length === 0) return;
+
+    let bestIndex = Number(pager.dataset.activeIndex || 0);
+    let bestDistance = Number.POSITIVE_INFINITY;
+    slides.forEach((slide, index) => {
+      const distance = Math.abs((slide.offsetLeft - carousel.offsetLeft) - carousel.scrollLeft);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
+      }
+    });
+    setMobilePagerActiveIndex(pagerKey, bestIndex);
+  });
+}
+
+function restoreCompactDayPagerScrollPositions(root = document) {
+  if (!root) return;
+  root.querySelectorAll('.compact-day-pager').forEach(pager => {
+    const carousel = pager.querySelector('.compact-day-carousel');
+    const slides = Array.from(pager.querySelectorAll('.compact-day-slide'));
+    if (!carousel || slides.length === 0) return;
+
+    const pagerKey = pager.dataset.pagerKey || '';
+    const activeIndex = typeof getMobilePagerActiveIndex === 'function'
+        ? getMobilePagerActiveIndex(pagerKey, Number(pager.dataset.activeIndex || 0))
+        : Number(pager.dataset.activeIndex || 0);
+    const safeIndex = Math.max(0, Math.min(slides.length - 1, Number(activeIndex) || 0));
+    const slide = slides[safeIndex];
+    carousel.scrollLeft = Math.max(0, slide.offsetLeft - carousel.offsetLeft);
+  });
+}
+
 function syncCompactDayPagerState(pager, nextIndex, context = {}) {
   if (!pager) return;
 
@@ -426,7 +473,11 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
 
   const activeChip = chips[safeIndex];
   if (rail && activeChip) {
-    activeChip.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+    if (typeof scrollChildIntoHorizontalView === 'function') {
+      scrollChildIntoHorizontalView(rail, activeChip, { behavior: 'auto', align: 'center' });
+    } else {
+      rail.scrollLeft = Math.max(0, activeChip.offsetLeft - rail.offsetLeft - (rail.clientWidth - activeChip.offsetWidth) / 2);
+    }
   }
 }
 
@@ -1436,10 +1487,17 @@ function scrollToCompactCitySlide(cityId, cityName) {
   const slide = document.querySelector(`.compact-city-swipe-pager .compact-city-slide[data-slide-index="${slideIndex}"]`);
   if (!slide) return false;
 
-  slide.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-
   const pager = slide.closest('.mobile-swipe-pager');
   if (pager) {
+    const carousel = pager.querySelector('[data-role="mobile-swipe-carousel"]');
+    if (typeof scrollChildIntoHorizontalView === 'function') {
+      scrollChildIntoHorizontalView(carousel, slide, { behavior: 'smooth', align: 'start' });
+    } else if (carousel) {
+      carousel.scrollTo({
+        left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
+        behavior: 'smooth'
+      });
+    }
     pager.dataset.activeIndex = String(slideIndex);
     if (typeof setMobilePagerActiveIndex === 'function') {
       setMobilePagerActiveIndex(pager.dataset.pagerKey || 'compact-city-swipe', slideIndex);
@@ -1649,6 +1707,8 @@ window.selectCityFilter = selectCityFilter;
 window.getStayDisplayForDay = getStayDisplayForDay;
 window.toggleFoodQuestDetails = toggleFoodQuestDetails;
 window.compactItineraryGoToDay = compactItineraryGoToDay;
+window.captureCompactDayPagerStates = captureCompactDayPagerStates;
+window.restoreCompactDayPagerScrollPositions = restoreCompactDayPagerScrollPositions;
 
 // Expand to show a city in the itinerary
 function expandToCity(cityId) {

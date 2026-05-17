@@ -411,8 +411,14 @@ function rebuildItineraryPreservingScroll() {
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
   if (typeof captureMobilePagerStates === 'function') captureMobilePagerStates(document.getElementById('itinerary') || document);
+  if (typeof captureCompactDayPagerStates === 'function') captureCompactDayPagerStates(document.getElementById('itinerary') || document);
   buildItinerary();
-  requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
+  requestAnimationFrame(() => {
+    if (typeof restoreCompactDayPagerScrollPositions === 'function') {
+      restoreCompactDayPagerScrollPositions(document.getElementById('itinerary') || document);
+    }
+    window.scrollTo(scrollX, scrollY);
+  });
 }
 
 function toggleFoodCompleted(e, legIdx, foodIdx) { e.stopPropagation(); appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }

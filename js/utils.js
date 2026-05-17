@@ -229,6 +229,18 @@ function captureMobilePagerStates(root = document) {
   });
 }
 
+function scrollChildIntoHorizontalView(container, child, { behavior = 'auto', align = 'center' } = {}) {
+  if (!container || !child) return;
+  const childLeft = child.offsetLeft - container.offsetLeft;
+  const targetLeft = align === 'start'
+      ? childLeft
+      : childLeft - (container.clientWidth - child.offsetWidth) / 2;
+  container.scrollTo({
+    left: Math.max(0, targetLeft),
+    behavior
+  });
+}
+
 function renderMobileSurfaceCard({
                                    cardClass = '',
                                    accentColor = '',
@@ -327,7 +339,7 @@ function setupMobileSwipePagers(root = document) {
 
       const activeChip = chips[safeIndex];
       if (rail && activeChip) {
-        activeChip.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+        scrollChildIntoHorizontalView(rail, activeChip, { behavior: 'auto', align: 'center' });
       }
     };
 
@@ -335,7 +347,7 @@ function setupMobileSwipePagers(root = document) {
       const slide = slides[nextIndex];
       if (!slide) return;
       suppressObserver = true;
-      slide.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      scrollChildIntoHorizontalView(carousel, slide, { behavior: 'smooth', align: 'start' });
       setActive(nextIndex);
       window.setTimeout(() => {
         suppressObserver = false;
@@ -613,3 +625,4 @@ window.getMobilePagerActiveIndex = getMobilePagerActiveIndex;
 window.setMobilePagerActiveIndex = setMobilePagerActiveIndex;
 window.resetMobilePagerActiveIndex = resetMobilePagerActiveIndex;
 window.captureMobilePagerStates = captureMobilePagerStates;
+window.scrollChildIntoHorizontalView = scrollChildIntoHorizontalView;
