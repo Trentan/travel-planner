@@ -1329,7 +1329,6 @@ main {
     display: none;
   }
   .transport-status-cost-meta,
-  .stay-status-cost-meta,
   .mobile-status-cost-meta {
     display: flex !important;
     flex-wrap: wrap;
@@ -1340,9 +1339,18 @@ main {
     text-align: left;
     align-content: flex-start;
   }
+  .stay-status-cost-meta {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.12rem;
+    margin-top: 0;
+    align-items: flex-start;
+    text-align: left;
+  }
   .mobile-status-cost-meta .transport-mobile-status-btn,
   .mobile-status-cost-meta .status-badge,
-  .transport-mobile-status-btn {
+  .transport-mobile-status-btn,
+  .stay-status-cost-meta .transport-mobile-status-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1359,7 +1367,8 @@ main {
     appearance: none;
     border-radius: 4px;
   }
-  .mobile-status-cost-meta .transport-mobile-cost-line {
+  .mobile-status-cost-meta .transport-mobile-cost-line,
+  .stay-status-cost-meta .transport-mobile-cost-line {
     display: inline-flex;
     align-items: center;
     gap: 0.05rem;
@@ -1367,7 +1376,8 @@ main {
     font-weight: 700;
     color: var(--text);
   }
-  .mobile-status-cost-meta .transport-mobile-booking {
+  .mobile-status-cost-meta .transport-mobile-booking,
+  .stay-status-cost-meta .transport-mobile-booking {
     display: inline-block;
     font-size: 0.64rem;
     color: var(--muted);
@@ -4581,7 +4591,10 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     display: inline;
   }
   .accom-table thead th:first-child {
-    display: none !important;
+    display: table-cell !important;
+  }
+  .data-table thead {
+    display: table-header-group !important;
   }
 
   .stay-expand-col,
@@ -4594,7 +4607,6 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   .transport-mobile-expand,
   .transport-schedule-meta,
   .transport-carrier-meta,
-  .transport-status-cost-meta,
   .transport-mobile-menu-btn,
   .stay-mobile-meta,
   .stay-date-meta {
@@ -4603,7 +4615,8 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   .accom-table .stay-status-badge {
     display: inline-flex;
   }
-  .accom-table .stay-status-cost-meta {
+  .accom-table .stay-status-cost-meta,
+  .mobile-status-cost-meta {
     display: none !important;
   }
 }

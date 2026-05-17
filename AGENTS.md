@@ -1,4 +1,4 @@
-# CODEX.md
+# AGENTS.md
 
 ## Workflow
 
@@ -11,7 +11,7 @@ Use the polish sprint files as the source of truth.
 5. Implement only that work item.
 6. Run the relevant checks. If available, run:
 
-```powershell
+```bash
 node scripts/regression-city-nav.js
 ```
 
@@ -25,8 +25,8 @@ polish/screenshots/after/WI-XXX-after.png
 9. Update the work item and `polish/TRACKER.md`, and make the latest after screenshot a clickable markdown link in the work item file.
 10. In the final response, include direct clickable links to the before image, proposal image, and latest after image for immediate review.
 11. When the WI is in `Review`, capture the user's latest feedback in the work item's `Review Notes` section as a running log before making the next revision.
-12. If multiple WIs are being worked concurrently, keep each WI on its own branch and do not edit another WI's files or tracker row.
-13. When parallel WIs are active, use separate worktrees if possible; if not, re-check the current branch before every edit.
+12. If multiple WIs are active, keep each one on its own branch and avoid editing files or tracker rows that belong to a different WI.
+13. Prefer separate worktrees for parallel WIs; otherwise, verify the branch before every edit and do not mix work items in one worktree.
 
 ## Session Start
 
@@ -35,8 +35,8 @@ polish/screenshots/after/WI-XXX-after.png
 3. Check `git status --short`.
 4. Start or verify the dev server at `http://localhost:3000`.
 5. Load real data from `backups/2026_June_July_Europe_Thailand.json` for visual work.
-6. If the worktree is already carrying edits for a different WI, stop and confirm the current branch before making changes.
-7. If you discover another WI's files or tracker row in the current worktree, do not overwrite them; switch worktrees or pause and ask for direction.
+6. If the current worktree already contains another WI's edits, verify the branch before touching files so no branch gets overwritten.
+7. If another WI's changes are present, stop rather than trying to merge them into the current item by hand.
 
 ## Completion
 
@@ -54,8 +54,8 @@ Before reporting done:
 10. Commit the completed WI on the WI branch with the WI referenced in the commit message, then push that same branch.
 11. Summarize changed files, verification, branch name, and commit hash.
 12. Include direct clickable links to the before image, proposal image, and latest after image in the completion response.
-13. When multiple WIs are active, commit and push the current WI as soon as it is verified so the branch tip is preserved before switching context.
-14. Never leave a verified WI uncommitted while starting another WI in the same worktree.
+13. When multiple WIs are being worked at once, commit and push each WI immediately after verification before switching context.
+14. Do not begin a new WI in the same worktree until the previous verified WI is committed and pushed.
 
 ## File Map
 
@@ -81,7 +81,7 @@ Before reporting done:
 
 Run locally with:
 
-```powershell
+```bash
 npx serve . --listen 3000
 ```
 
