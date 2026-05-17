@@ -11,8 +11,8 @@ function getLocationDisplayWithCode(locationName) {
   }
 
   const city = typeof citiesData !== 'undefined'
-    ? citiesData.find(c => c.name === locationName)
-    : null;
+      ? citiesData.find(c => c.name === locationName)
+      : null;
 
   if (city && city.code) {
     const countryName = city.country || '';
@@ -73,8 +73,8 @@ function getLocationCodeDisplay(locationName) {
 
   // First check trip cities (citiesData)
   const city = typeof citiesData !== 'undefined'
-    ? citiesData.find(c => c.name === locationName)
-    : null;
+      ? citiesData.find(c => c.name === locationName)
+      : null;
 
   if (city && city.code) {
     const countryFlag = city.countryCode ? getCountryFlag(city.countryCode) : '';
@@ -84,8 +84,8 @@ function getLocationCodeDisplay(locationName) {
 
   // Fall back to CITY_DATABASE lookup (for transit cities like London)
   const dbCity = typeof CITY_DATABASE !== 'undefined'
-    ? CITY_DATABASE.find(c => c.name.toLowerCase() === locationName.toLowerCase())
-    : null;
+      ? CITY_DATABASE.find(c => c.name.toLowerCase() === locationName.toLowerCase())
+      : null;
 
   if (dbCity) {
     const countryFlag = dbCity.countryCode ? getCountryFlag(dbCity.countryCode) : '';
@@ -112,6 +112,21 @@ const TRANSPORT_ICONS = {
 
 function getTransportIcon(type) {
   return TRANSPORT_ICONS[type] || TRANSPORT_ICONS.other;
+}
+
+const TRANSPORT_LABELS = {
+  flight: 'Flight',
+  train: 'Train',
+  car: 'Car',
+  ferry: 'Ferry',
+  bus: 'Bus',
+  bike: 'Bike',
+  walk: 'Walk',
+  other: 'Transport'
+};
+
+function getTransportLabel(type) {
+  return TRANSPORT_LABELS[type] || TRANSPORT_LABELS.other;
 }
 
 // Initialize journeys from localStorage - called by data.js
@@ -163,8 +178,8 @@ function normalizeJourneyLocation(value) {
 function getCityIdForJourneyLocation(locationName) {
   if (!locationName || locationName === 'Home' || locationName === 'In transit') return '';
   const city = Array.isArray(citiesData)
-    ? citiesData.find(c => normalizeJourneyLocation(c.name) === normalizeJourneyLocation(locationName))
-    : null;
+      ? citiesData.find(c => normalizeJourneyLocation(c.name) === normalizeJourneyLocation(locationName))
+      : null;
   return city ? city.id : '';
 }
 
@@ -204,24 +219,24 @@ function findBestLegForJourney(journey) {
   }
 
   const routeAndDateMatch = appData.find(leg =>
-    (leg.days || []).some(day => {
-      const depDateMatches = journeyDatesMatch(journey.departureDate || journey.dayDate, day.date);
-      const arrDateMatches = journeyDatesMatch(journey.arrivalDate, day.date);
-      return (depDateMatches || arrDateMatches) && journeyRouteMatchesDay(journey, day.from, day.to);
-    })
+      (leg.days || []).some(day => {
+        const depDateMatches = journeyDatesMatch(journey.departureDate || journey.dayDate, day.date);
+        const arrDateMatches = journeyDatesMatch(journey.arrivalDate, day.date);
+        return (depDateMatches || arrDateMatches) && journeyRouteMatchesDay(journey, day.from, day.to);
+      })
   );
   if (routeAndDateMatch) return routeAndDateMatch;
 
   const dateOnlyMatch = appData.find(leg =>
-    (leg.days || []).some(day =>
-      journeyDatesMatch(journey.departureDate || journey.dayDate, day.date) ||
-      journeyDatesMatch(journey.arrivalDate, day.date)
-    )
+      (leg.days || []).some(day =>
+          journeyDatesMatch(journey.departureDate || journey.dayDate, day.date) ||
+          journeyDatesMatch(journey.arrivalDate, day.date)
+      )
   );
   if (dateOnlyMatch) return dateOnlyMatch;
 
   const routeOnlyMatch = appData.find(leg =>
-    (leg.days || []).some(day => journeyRouteMatchesDay(journey, day.from, day.to))
+      (leg.days || []).some(day => journeyRouteMatchesDay(journey, day.from, day.to))
   );
   return routeOnlyMatch || null;
 }
@@ -340,7 +355,7 @@ function buildJourneyName(segments) {
 
   // Remove duplicates while preserving order
   const uniqueViaCities = intermediateCities.filter((city, idx, arr) =>
-    arr.indexOf(city) === idx
+      arr.indexOf(city) === idx
   );
 
   if (uniqueViaCities.length === 0) {
@@ -562,8 +577,8 @@ function toggleTransportGroupDetails(groupId) {
 function renderTransportDetailBlock(title, value, extraClass = '') {
   return `
     <div class="transport-detail-block ${extraClass}">
-      <span class="transport-detail-label">${title}</span>
-      <span class="transport-detail-value">${value || '—'}</span>
+      <span class="transport-detail-label">${escapeHtmlText(title)}</span>
+      <span class="transport-detail-value">${escapeHtmlText(value || '—')}</span>
     </div>
   `;
 }
@@ -603,11 +618,11 @@ function renderTransportCarrierMobile(provider, routeCode, bookingReference, sta
   const providerLine = provider ? `<span class="transport-carrier-provider">${provider}</span>` : '';
   const codeLine = routeCode ? `<span class="transport-carrier-code">${routeCode}</span>` : '';
   const refAndCost = [bookingReference ? `<span class="transport-carrier-pnr">${bookingReference}</span>` : '', costValue !== '' ? `<span class="transport-carrier-cost">$${costValue}</span>` : '']
-    .filter(Boolean)
-    .join('');
+      .filter(Boolean)
+      .join('');
   const statusNode = isEditable
-    ? `<button type="button" class="status-badge transport-mobile-status-btn" style="--status-color:${statusColor};" onclick="toggleJourneyStatus('${journeyId}')" title="Change status">${statusIcon} ${statusText}</button>`
-    : `<span class="status-badge transport-mobile-status-btn" style="--status-color:${statusColor};">${statusIcon} ${statusText}</span>`;
+      ? `<button type="button" class="status-badge transport-mobile-status-btn" style="--status-color:${statusColor};" onclick="toggleJourneyStatus('${journeyId}')" title="Change status">${statusIcon} ${statusText}</button>`
+      : `<span class="status-badge transport-mobile-status-btn" style="--status-color:${statusColor};">${statusIcon} ${statusText}</span>`;
 
   return `
     <div class="mobile-table-meta transport-carrier-meta">
@@ -635,6 +650,137 @@ function renderTransportStatusCostMobile(statusText, statusIcon, statusColor, co
     });
   }
   return '';
+}
+
+function isTransportMobileCardLayout() {
+  return typeof isMobileViewport === 'function'
+      ? isMobileViewport()
+      : (typeof window !== 'undefined' && window.innerWidth <= 768);
+}
+
+function renderTransportSegmentsDetailContent(segs) {
+  const useCompactSegments = typeof window !== 'undefined' && (window.isCompactView || document.body.classList.contains('mobile-app-mode'));
+  const detailRows = segs.map((seg, i) => {
+    const segDepDate = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
+    const segDepTime = seg.departureTime || '';
+    const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTime : segDepDate;
+    const segArr = formatJourneyDate(seg.arrivalDate) || '—';
+    const segRoute = `${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}`;
+
+    if (useCompactSegments) {
+      return `
+        <div class="transport-segment-mobile-row">
+          <div class="transport-segment-mobile-journey" data-label="Journey">
+            <span class="transport-segment-mobile-leg">Leg ${i + 1}</span>
+            <span class="transport-segment-mobile-route">${escapeHtmlText(seg.fromLocation || '—')} → ${escapeHtmlText(seg.toLocation || '—')}</span>
+          </div>
+          <div class="transport-segment-mobile-schedule" data-label="Schedule">
+            <span class="transport-schedule-line"><strong>D:</strong> ${escapeHtmlText(segDep)}</span>
+            <span class="transport-schedule-line"><strong>A:</strong> ${segArr !== '—' ? escapeHtmlText(segArr + ' ' + (seg.arrivalTime || '')) : '—'}</span>
+          </div>
+          <div class="transport-segment-mobile-provider" data-label="Carrier">
+            <span class="transport-segment-mobile-provider-name">${escapeHtmlText(seg.provider || '—')}</span>
+            <span class="transport-segment-mobile-provider-meta">${escapeHtmlText(seg.routeCode || '—')}</span>
+            <span class="transport-segment-mobile-provider-meta">${escapeHtmlText(seg.bookingReference || '—')}</span>
+            <span class="transport-segment-mobile-provider-meta transport-segment-mobile-cost-inline">${seg.cost ? escapeHtmlText(`$${seg.cost}`) : '—'}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <tr class="transport-segment-row">
+        <td class="transport-segment-journey">${seg.fromLocation || '—'} → ${seg.toLocation || '—'}</td>
+        <td class="transport-segment-leg">Leg ${i + 1}</td>
+        <td class="transport-segment-route">${segRoute}</td>
+        <td class="transport-segment-departs">${segDep}</td>
+        <td class="transport-segment-arrives">${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
+        <td class="transport-segment-provider">${seg.provider || '—'}</td>
+        <td class="transport-segment-code">${seg.routeCode || '—'}</td>
+        <td class="transport-segment-bookingref">${seg.bookingReference || '—'}</td>
+        <td class="transport-segment-cost">${seg.cost ? `$${seg.cost}` : '—'}</td>
+      </tr>
+    `;
+  }).join('');
+
+  return useCompactSegments
+      ? `
+      <div class="transport-segments-list transport-segments-list-mobile">
+        <div class="transport-segments-title">Journey Segments</div>
+        <div class="transport-segment-mobile-head-row">
+          <span>Journey</span>
+          <span>Schedule</span>
+          <span>Carrier</span>
+        </div>
+        <div class="transport-segment-mobile-list">
+          ${detailRows}
+        </div>
+      </div>
+    `
+      : `
+      <div class="transport-segments-list">
+        <div class="transport-segments-title">Journey Segments</div>
+        <table class="transport-segment-table">
+          <colgroup>
+            <col class="transport-segment-col-journey">
+            <col class="transport-segment-col-leg">
+            <col class="transport-segment-col-route">
+            <col class="transport-segment-col-departs">
+            <col class="transport-segment-col-arrives">
+            <col class="transport-segment-col-provider">
+            <col class="transport-segment-col-code">
+            <col class="transport-segment-col-bookingref">
+            <col class="transport-segment-col-cost">
+          </colgroup>
+          <thead>
+            <tr class="transport-segment-head">
+              <th>Journey</th>
+              <th>Leg</th>
+              <th>Route</th>
+              <th>Departs</th>
+              <th>Arrives</th>
+              <th>Provider</th>
+              <th>Code</th>
+              <th>Booking Ref</th>
+              <th>Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${detailRows}
+          </tbody>
+        </table>
+      </div>
+    `;
+}
+
+function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, journeyId) {
+  if (!segs || segs.length === 0) return '';
+
+  if (segs.length > 1) {
+    return renderTransportSegmentsDetailContent(segs);
+  }
+
+  const firstSeg = segs[0];
+  const firstDepDate = formatJourneyDate(firstSeg.departureDate) || firstSeg.dayDate || '—';
+  const firstDepTime = firstSeg.departureTime || '';
+  const firstDep = firstDepDate !== '—' && firstDepTime ? `${firstDepDate} ${firstDepTime}` : firstDepDate;
+  const lastArr = formatJourneyDate(firstSeg.arrivalDate) || '—';
+  const lastArrTime = firstSeg.arrivalTime || '—';
+  const route = `${firstSeg.fromLocation || '—'} → ${firstSeg.toLocation || '—'}`;
+  const costValue = totalCost > 0 ? `$${totalCost.toFixed(0)}` : '$0';
+
+  return `
+    <div class="transport-detail-grid transport-mobile-detail-grid">
+      ${renderTransportDetailBlock('Route', route)}
+      ${renderTransportDetailBlock('Depart', firstDep)}
+      ${renderTransportDetailBlock('Arrive', lastArr !== '—' ? `${lastArr} ${lastArrTime}`.trim() : '—')}
+      ${renderTransportDetailBlock('Carrier', rep.provider || '—')}
+      ${renderTransportDetailBlock('Code', rep.routeCode || '—')}
+      ${renderTransportDetailBlock('Booking', rep.bookingReference || '—')}
+      ${renderTransportDetailBlock('Status', statusText)}
+      ${renderTransportDetailBlock('Cost', costValue)}
+    </div>
+  `;
 }
 
 // â”€â”€â”€ BUILD TRANSPORT TAB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -688,6 +834,95 @@ function buildTransportTab(cityFilter = null) {
     }
     groups[gid].push(j);
   });
+
+  const useMobileCards = isTransportMobileCardLayout();
+  if (useMobileCards) {
+    const slidesHtml = [];
+    const railHtml = [];
+
+    groupOrder.forEach((gid, index) => {
+      const segs = groups[gid].sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+      const isMultiLeg = segs.length > 1;
+      const rep = segs[0];
+      const totalCost = segs.reduce((sum, s) => sum + (parseFloat(s.cost) || 0), 0);
+      const routeText = isMultiLeg
+          ? buildRouteChain(segs)
+          : `${rep.fromLocation || '—'} → ${rep.toLocation || '—'}`;
+      const firstDepDate = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
+      const firstDepTime = rep.departureTime || '';
+      const firstDep = firstDepDate !== '—' && firstDepTime ? `${firstDepDate} ${firstDepTime}` : firstDepDate;
+      const lastSeg = segs[segs.length - 1];
+      const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
+      const lastArrTime = lastSeg.arrivalTime || '—';
+      const statusColor = rep.status === 'booked' || rep.status === 'confirmed' ? '#27AE60' : rep.status === 'cancelled' ? '#E74C3C' : '#E67E22';
+      const statusIcon = rep.status === 'booked' ? '✓' : rep.status === 'confirmed' ? '🎫' : rep.status === 'cancelled' ? '❌' : '⏳';
+      const statusText = rep.status === 'booked' ? 'Booked' : rep.status === 'confirmed' ? 'Confirmed' : rep.status === 'cancelled' ? 'Cancelled' : 'Planned';
+      const isExpanded = isTransportGroupExpanded(gid);
+      const durationHours = isMultiLeg ? calculateJourneyDuration(segs) : null;
+      const durationDisplay = durationHours !== null ? `${durationHours}h` : calculateDuration(rep.departureDate || rep.dayDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
+      const eyebrow = `${getTransportLabel(rep.transportType)}${isMultiLeg ? ` · ${segs.length} legs` : ''}`;
+      const subtitleParts = [rep.provider || '—'];
+      if (rep.routeCode) subtitleParts.push(rep.routeCode);
+      if (durationDisplay) subtitleParts.push(durationDisplay);
+      const statusMeta = renderTransportStatusCostMobile(
+          statusText,
+          statusIcon,
+          statusColor,
+          totalCost.toFixed(0),
+          rep.bookingReference,
+          rep.id,
+          isEditMode
+      );
+      const meta = `
+        ${renderMobileStat('Schedule', firstDep, lastArr !== '—' ? `Arr ${escapeHtmlText(`${lastArr}${lastArrTime ? ` ${lastArrTime}` : ''}`)}` : '')}
+        ${renderMobileStat('Carrier', rep.provider || '—', [rep.routeCode, rep.bookingReference ? `#${rep.bookingReference}` : ''].filter(Boolean).map(escapeHtmlText).join(' · '))}
+        <div class="mobile-surface-card-stat mobile-surface-card-stat--status">${statusMeta}</div>
+      `;
+      const actions = `
+        <button class="mobile-surface-card-button transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">Edit</button>
+        <button class="mobile-surface-card-button mobile-surface-card-button--danger transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">Delete</button>
+      `;
+      const primaryAction = `
+        <button class="mobile-surface-card-button mobile-surface-card-button--secondary transport-details-btn" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Hide journey details' : 'Show journey details'}">${isExpanded ? 'Hide details' : 'Details'}</button>
+      `;
+      const details = isExpanded ? renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, rep.id) : '';
+      const cardHtml = renderMobileSurfaceCard({
+        cardClass: 'transport-mobile-card row-accent',
+        accentColor: statusColor,
+        dateLabel: firstDepDate,
+        title: rep.journeyName || routeText,
+        subtitle: subtitleParts.filter(Boolean).join(' · '),
+        primaryAction,
+        meta,
+        actions,
+        details,
+        detailsOpen: isExpanded
+      });
+      slidesHtml.push(`
+        <div id="transport-slide-${index}" class="mobile-swipe-slide transport-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}">
+          ${cardHtml}
+        </div>
+      `);
+      railHtml.push(`
+        <button type="button" class="mobile-swipe-chip" data-role="mobile-swipe-chip" data-slide-index="${index}" aria-controls="transport-slide-${index}" aria-selected="${index === 0 ? 'true' : 'false'}">
+          <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(eyebrow)}</span>
+          <span class="mobile-swipe-chip-title">${escapeHtmlText(rep.journeyName || routeText)}</span>
+          <span class="mobile-swipe-chip-route">${escapeHtmlText(routeText)}</span>
+        </button>
+      `);
+    });
+    html += renderMobileSwipePager({
+      pagerClass: 'transport-swipe-pager',
+      pagerKey: 'transport-swipe',
+      railHtml: railHtml.join(''),
+      slidesHtml: slidesHtml.join(''),
+      ariaLabel: 'Transport journeys'
+    });
+    container.innerHTML = html;
+    if (typeof setupMobileSwipePagers === 'function') setupMobileSwipePagers(container);
+    return;
+  }
+
   html += `<div class="data-table-wrapper transport-table-wrapper mobile-table-wrapper">
     <table class="data-table transport-table mobile-table">
       <thead>
@@ -722,14 +957,14 @@ function buildTransportTab(cityFilter = null) {
 
     const statusColor = rep.status === 'booked' || rep.status === 'confirmed' ? '#27AE60' : rep.status === 'cancelled' ? '#E74C3C' : '#E67E22';
     const statusIcon = rep.status === 'booked' ? '✓' : rep.status === 'confirmed' ? '🎫' : rep.status === 'cancelled' ? '❌' : '⏳';
-const statusText = rep.status === 'booked' ? 'Booked' : rep.status === 'confirmed' ? 'Confirmed' : rep.status === 'cancelled' ? 'Cancelled' : 'Planned';
+    const statusText = rep.status === 'booked' ? 'Booked' : rep.status === 'confirmed' ? 'Confirmed' : rep.status === 'cancelled' ? 'Cancelled' : 'Planned';
 
     const route = isMultiLeg
-    ? buildRouteChainWithCodes(segs)
-    : `${getLocationCodeDisplay(rep.fromLocation)} → ${getLocationCodeDisplay(rep.toLocation)}`;
+        ? buildRouteChainWithCodes(segs)
+        : `${getLocationCodeDisplay(rep.fromLocation)} → ${getLocationCodeDisplay(rep.toLocation)}`;
     const firstDepDate = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
-const firstDepTime = rep.departureTime || '';
-const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + firstDepTime : firstDepDate;
+    const firstDepTime = rep.departureTime || '';
+    const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + firstDepTime : firstDepDate;
     const lastSeg = segs[segs.length - 1];
     const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
     const lastArrTime = lastSeg.arrivalTime || '—';
@@ -738,28 +973,28 @@ const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + f
 
     const icon = isMultiLeg ? '✈️' : getTransportIcon(rep.transportType);
 
-const nameDisplay = formatJourneyNameDisplay(rep.journeyName || '—');
+    const nameDisplay = formatJourneyNameDisplay(rep.journeyName || '—');
 
 // Calculate and display total travel time for multi-leg journeys
-const durationHours = isMultiLeg ? calculateJourneyDuration(segs) : null;
-const durationDisplay = durationHours !== null ? `${durationHours}h` : calculateDuration(rep.departureDate || rep.dayDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
+    const durationHours = isMultiLeg ? calculateJourneyDuration(segs) : null;
+    const durationDisplay = durationHours !== null ? `${durationHours}h` : calculateDuration(rep.departureDate || rep.dayDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
 
 
     const isExpanded = isTransportGroupExpanded(gid);
     const desktopExpandControl = isMultiLeg
-      ? `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" title="Show journey details" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Collapse journey details' : 'Expand journey details'}">
+        ? `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" title="Show journey details" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Collapse journey details' : 'Expand journey details'}">
           <span class="transport-expand-arrow">${isExpanded ? '▼' : '▶'}</span>
         </button>`
-      : '';
+        : '';
     const journeyNameCell = isMultiLeg
-      ? `
+        ? `
           <div class="journey-name-main">${nameDisplay}</div>
           <button class="journey-name-toggle ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" title="Show journey details" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Collapse journey details' : 'Expand journey details'}">
             <span class="transport-expand-arrow">${isExpanded ? '▼' : '▶'}</span>
             <span class="journey-name-toggle-text">${nameDisplay}</span>
             <span class="journey-leg-badge">${segs.length} legs</span>
           </button>`
-      : `<div class="journey-name-main">${nameDisplay}</div>`;
+        : `<div class="journey-name-main">${nameDisplay}</div>`;
 
     html += `
       <tr class="journey-parent-row row-accent ${isMultiLeg ? 'multi-leg-row' : ''}" data-group="${gid}" style="--row-border-color:${statusColor};">
@@ -795,98 +1030,7 @@ const durationDisplay = durationHours !== null ? `${durationHours}h` : calculate
       </tr>`;
 
     if (isMultiLeg) {
-      const useCompactSegments = typeof window !== 'undefined' && (window.isCompactView || document.body.classList.contains('mobile-app-mode'));
-      const detailRows = segs.map((seg, i) => {
-        const segDepDate = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
-        const segDepTime = seg.departureTime || '';
-        const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTime : segDepDate;
-        const segArr = formatJourneyDate(seg.arrivalDate) || '—';
-        const segRoute = `${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}`;
-
-        if (useCompactSegments) {
-          return `
-            <div class="transport-segment-mobile-row">
-              <div class="transport-segment-mobile-journey" data-label="Journey">
-                <span class="transport-segment-mobile-leg">Leg ${i + 1}</span>
-                <span class="transport-segment-mobile-route">${seg.fromLocation || '—'} → ${seg.toLocation || '—'}</span>
-              </div>
-              <div class="transport-segment-mobile-schedule" data-label="Schedule">
-                <span class="transport-schedule-line"><strong>D:</strong> ${segDep}</span>
-                <span class="transport-schedule-line"><strong>A:</strong> ${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</span>
-              </div>
-              <div class="transport-segment-mobile-provider" data-label="Carrier">
-                <span class="transport-segment-mobile-provider-name">${seg.provider || '—'}</span>
-                <span class="transport-segment-mobile-provider-meta">${seg.routeCode || '—'}</span>
-                <span class="transport-segment-mobile-provider-meta">${seg.bookingReference || '—'}</span>
-                <span class="transport-segment-mobile-provider-meta transport-segment-mobile-cost-inline">${seg.cost ? `$${seg.cost}` : '—'}</span>
-              </div>
-            </div>
-          `;
-        }
-
-        return `
-          <tr class="transport-segment-row">
-            <td class="transport-segment-journey">${seg.fromLocation || '—'} → ${seg.toLocation || '—'}</td>
-            <td class="transport-segment-leg">Leg ${i + 1}</td>
-            <td class="transport-segment-route">${segRoute}</td>
-            <td class="transport-segment-departs">${segDep}</td>
-            <td class="transport-segment-arrives">${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
-            <td class="transport-segment-provider">${seg.provider || '—'}</td>
-            <td class="transport-segment-code">${seg.routeCode || '—'}</td>
-            <td class="transport-segment-bookingref">${seg.bookingReference || '—'}</td>
-            <td class="transport-segment-cost">${seg.cost ? `$${seg.cost}` : '—'}</td>
-          </tr>
-        `;
-      }).join('');
-
-      const detailRowContent = useCompactSegments
-        ? `
-        <div class="transport-segments-list transport-segments-list-mobile">
-          <div class="transport-segments-title">Journey Segments</div>
-          <div class="transport-segment-mobile-head-row">
-            <span>Journey</span>
-            <span>Schedule</span>
-            <span>Carrier</span>
-          </div>
-          <div class="transport-segment-mobile-list">
-            ${detailRows}
-          </div>
-        </div>
-      `
-        : `
-        <div class="transport-segments-list">
-          <div class="transport-segments-title">Journey Segments</div>
-          <table class="transport-segment-table">
-            <colgroup>
-              <col class="transport-segment-col-journey">
-              <col class="transport-segment-col-leg">
-              <col class="transport-segment-col-route">
-              <col class="transport-segment-col-departs">
-              <col class="transport-segment-col-arrives">
-              <col class="transport-segment-col-provider">
-              <col class="transport-segment-col-code">
-              <col class="transport-segment-col-bookingref">
-              <col class="transport-segment-col-cost">
-            </colgroup>
-            <thead>
-              <tr class="transport-segment-head">
-                <th>Journey</th>
-                <th>Leg</th>
-                <th>Route</th>
-                <th>Departs</th>
-                <th>Arrives</th>
-                <th>Provider</th>
-                <th>Code</th>
-                <th>Booking Ref</th>
-                <th>Cost</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${detailRows}
-            </tbody>
-          </table>
-        </div>
-      `;
+      const detailRowContent = renderTransportSegmentsDetailContent(segs);
 
       html += `
         <tr class="journey-detail-row ${isExpanded ? 'expanded' : ''}" data-group="${gid}" style="display:${isExpanded ? 'table-row' : 'none'};">
@@ -909,7 +1053,7 @@ function toggleJourneySegments(journeyId) {
   if (btn) btn.textContent = isHidden ? '▼' : '▶';
 }
 
-function toggleJourneyStatus(journeyId) { if (!window.isEditMode) return; 
+function toggleJourneyStatus(journeyId) { if (!window.isEditMode) return;
   const journey = findJourney(journeyId);
   if (journey) {
     const statusCycle = { 'planned': 'booked', 'booked': 'confirmed', 'confirmed': 'cancelled', 'cancelled': 'planned' }; const newStatus = statusCycle[journey.status] || 'planned';
@@ -946,11 +1090,11 @@ function editJourney(journeyId) {
   _populateJourneyCityDropdowns();
 
   // Multi-leg: all segments go into array, first one loaded into form for editing
-_pendingSegments = segmentsCopy;
-_activeSegmentIndex = segmentsCopy.length > 0 ? 0 : -1;
-if (segmentsCopy.length > 0) {
-  _loadSegmentIntoForm(segmentsCopy[0]);
-}
+  _pendingSegments = segmentsCopy;
+  _activeSegmentIndex = segmentsCopy.length > 0 ? 0 : -1;
+  if (segmentsCopy.length > 0) {
+    _loadSegmentIntoForm(segmentsCopy[0]);
+  }
 
   _updateSegmentList();
   _syncJourneyModalActions();
@@ -1121,7 +1265,7 @@ function _updateSegmentList() {
 
     _pendingSegments.forEach((seg, i) => {
       const isActive = _activeSegmentIndex === i;
-      trackerHtml += `<div class="segment-pill ${isActive ? 'active' : 'completed'} is-clickable" onclick="editPendingSegment(${i})" title="${isActive ? 'Currently editing' : 'Click to edit'}"><span class="pill-num">${i + 1}</span> ${seg.fromLocation} → ${seg.toLocation}</div>`;
+      trackerHtml += `<div class="segment-pill ${isActive ? 'here' : 'behind'} is-clickable" onclick="editPendingSegment(${i})" title="${isActive ? 'Here now' : 'Behind you'}"><span class="pill-num">${i + 1}</span> ${seg.fromLocation} → ${seg.toLocation}</div>`;
       if (i < totalSegments - 1) {
         trackerHtml += '<div class="segment-arrow">➔</div>';
       }
@@ -1138,8 +1282,8 @@ function _updateSegmentList() {
     }
 
     summaryContainer.innerHTML = _pendingSegments.map((s, i) => {
-  const isCurrent = _activeSegmentIndex === i;
-  const bgStyle = isCurrent ? 'background: #e8f0fe; border: 1px solid #3c5a99; padding: 6px; border-radius: 6px;' : '';
+      const isCurrent = _activeSegmentIndex === i;
+      const bgStyle = isCurrent ? 'background: #e8f0fe; border: 1px solid #3c5a99; padding: 6px; border-radius: 6px;' : '';
       const depString = `${formatJourneyDate(s.departureDate)} ${s.departureTime || ''}`.trim();
       const arrString = `${formatJourneyDate(s.arrivalDate)} ${s.arrivalTime || ''}`.trim();
       const providerStr = `${s.provider} ${s.routeCode}`.trim();

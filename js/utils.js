@@ -133,16 +133,247 @@ function getActivityLabel(category) {
   return ACTIVITY_CATEGORIES[category]?.label || 'Activity';
 }
 
+function escapeHtmlText(text) {
+  if (text === null || text === undefined) return '';
+  return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+}
+
+function renderMobileStat(label, primary, secondary = '', extraClass = '') {
+  return `
+    <div class="mobile-surface-card-stat ${extraClass}">
+      <span class="mobile-surface-card-stat-label">${escapeHtmlText(label)}</span>
+      <span class="mobile-surface-card-stat-primary">${primary ? escapeHtmlText(primary) : '—'}</span>
+      ${secondary ? `<span class="mobile-surface-card-stat-secondary">${secondary}</span>` : ''}
+    </div>
+  `;
+}
+
+function renderMobileTripTracker({
+                                   label = 'Trip',
+                                   position = '',
+                                   behind = 0,
+                                   here = 1,
+                                   ahead = 0
+                                 }) {
+  const behindCount = Math.max(0, Number(behind) || 0);
+  const hereCount = Math.max(0, Number(here) || 0);
+  const aheadCount = Math.max(0, Number(ahead) || 0);
+  const total = Math.max(1, behindCount + hereCount + aheadCount);
+  return `
+    <div class="mobile-trip-tracker">
+      <div class="mobile-trip-tracker-top">
+        <span class="mobile-trip-tracker-label">${escapeHtmlText(label)}</span>
+        ${position ? `<span class="mobile-trip-tracker-position">${escapeHtmlText(position)}</span>` : ''}
+      </div>
+      <div class="mobile-trip-tracker-bar" aria-hidden="true">
+        <span class="mobile-trip-tracker-segment is-behind" style="width:${(behindCount / total) * 100}%"></span>
+        <span class="mobile-trip-tracker-segment is-here" style="width:${(hereCount / total) * 100}%"></span>
+        <span class="mobile-trip-tracker-segment is-ahead" style="width:${(aheadCount / total) * 100}%"></span>
+      </div>
+    </div>
+  `;
+}
+
+function getMobilePagerStateStore() {
+  if (typeof window === 'undefined') return {};
+  if (!window.__mobilePagerState) {
+    window.__mobilePagerState = {};
+  }
+  return window.__mobilePagerState;
+}
+
+function getMobilePagerActiveIndex(pagerKey, fallback = 0) {
+  if (!pagerKey) return Math.max(0, Number(fallback) || 0);
+  const store = getMobilePagerStateStore();
+  const value = store[pagerKey];
+  return Number.isFinite(Number(value)) ? Number(value) : Math.max(0, Number(fallback) || 0);
+}
+
+function setMobilePagerActiveIndex(pagerKey, index) {
+  if (!pagerKey) return;
+  const store = getMobilePagerStateStore();
+  store[pagerKey] = Math.max(0, Number(index) || 0);
+}
+
+function renderMobileSurfaceCard({
+                                   cardClass = '',
+                                   accentColor = '',
+                                   dateLabel = '',
+                                   title = '',
+                                   subtitle = '',
+                                   summary = '',
+                                   meta = '',
+                                   primaryAction = '',
+                                   actions = '',
+                                   details = '',
+                                   detailsOpen = false
+                                 }) {
+  const accentStyle = accentColor ? ` style="--card-accent:${accentColor};"` : '';
+  return `
+    <article class="mobile-surface-card ${cardClass}"${accentStyle}>
+      <div class="mobile-surface-card-head">
+        <div class="mobile-surface-card-headline">
+          <div class="mobile-surface-card-headline-line">
+            ${dateLabel ? `<span class="mobile-surface-card-date">${escapeHtmlText(dateLabel)}</span>` : ''}
+            ${title ? `<span class="mobile-surface-card-title">${escapeHtmlText(title || '—')}</span>` : ''}
+            ${subtitle ? `<span class="mobile-surface-card-subtitle">${escapeHtmlText(subtitle)}</span>` : ''}
+          </div>
+        </div>
+        ${primaryAction ? `<div class="mobile-surface-card-primary-action">${primaryAction}</div>` : ''}
+      </div>
+      ${summary ? `<div class="mobile-surface-card-summary">${summary}</div>` : ''}
+      ${meta ? `<div class="mobile-surface-card-meta-grid">${meta}</div>` : ''}
+      ${actions ? `<div class="mobile-surface-card-actions">${actions}</div>` : ''}
+      ${details ? `<div class="mobile-surface-card-details ${detailsOpen ? 'expanded' : ''}">${details}</div>` : ''}
+    </article>
+  `;
+}
+
+function renderMobileSwipePager({
+                                  pagerClass = '',
+                                  pagerKey = '',
+                                  label = '',
+                                  title = '',
+                                  hint = '',
+                                  positionPrefix = 'Item',
+                                  position = '',
+                                  counter = '',
+                                  railHtml = '',
+                                  slidesHtml = '',
+                                  ariaLabel = ''
+                                }) {
+  const pagerKeyAttr = pagerKey ? ` data-pager-key="${escapeHtmlText(pagerKey)}"` : '';
+  return `
+    <div class="mobile-swipe-pager ${pagerClass}" data-role="mobile-swipe-pager"${pagerKeyAttr}>
+      ${railHtml ? `<div class="mobile-swipe-rail" role="tablist" aria-label="${escapeHtmlText(ariaLabel || 'Swipe rail')}">${railHtml}</div>` : ''}
+      <div class="mobile-swipe-progress" aria-hidden="true">
+        <span class="mobile-swipe-progress-fill" data-role="mobile-swipe-progress"></span>
+      </div>
+      <div class="mobile-swipe-carousel" data-role="mobile-swipe-carousel">
+        ${slidesHtml}
+      </div>
+    </div>
+  `;
+}
+
+function setupMobileSwipePagers(root = document) {
+  const pagers = root.querySelectorAll('[data-role="mobile-swipe-pager"]');
+  pagers.forEach(pager => {
+    const carousel = pager.querySelector('[data-role="mobile-swipe-carousel"]');
+    const rail = pager.querySelector('.mobile-swipe-rail');
+    const slides = Array.from(pager.querySelectorAll('[data-role="mobile-swipe-slide"]'));
+    const chips = Array.from(pager.querySelectorAll('[data-role="mobile-swipe-chip"]'));
+    const progressFill = pager.querySelector('[data-role="mobile-swipe-progress"]');
+    const pagerKey = pager.dataset.pagerKey || '';
+
+    if (!carousel || slides.length === 0) return;
+
+    const total = slides.length;
+    let suppressObserver = false;
+    let scrollFrame = 0;
+    const initialIndex = getMobilePagerActiveIndex(pagerKey, Number(pager.dataset.activeIndex || 0));
+
+    const setActive = nextIndex => {
+      const safeIndex = Math.max(0, Math.min(total - 1, Number(nextIndex) || 0));
+
+      slides.forEach((slide, idx) => {
+        slide.classList.toggle('is-active', idx === safeIndex);
+      });
+
+      chips.forEach((chip, idx) => {
+        const active = idx === safeIndex;
+        chip.classList.toggle('active', active);
+        chip.setAttribute('aria-selected', active ? 'true' : 'false');
+        chip.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+
+      if (progressFill) progressFill.style.width = `${((safeIndex + 1) / total) * 100}%`;
+      pager.dataset.activeIndex = String(safeIndex);
+      setMobilePagerActiveIndex(pagerKey, safeIndex);
+
+      const activeChip = chips[safeIndex];
+      if (rail && activeChip) {
+        activeChip.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+      }
+    };
+
+    const scrollToIndex = nextIndex => {
+      const slide = slides[nextIndex];
+      if (!slide) return;
+      suppressObserver = true;
+      slide.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      setActive(nextIndex);
+      window.setTimeout(() => {
+        suppressObserver = false;
+      }, 420);
+    };
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        scrollToIndex(Number(chip.dataset.dayIndex || chip.dataset.slideIndex || 0));
+      });
+    });
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        if (suppressObserver) return;
+        const visibleEntry = entries
+            .filter(entry => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visibleEntry) return;
+        const nextIndex = Number(visibleEntry.target.dataset.dayIndex || visibleEntry.target.dataset.slideIndex || 0);
+        if (!Number.isNaN(nextIndex)) setActive(nextIndex);
+      }, {
+        root: carousel,
+        threshold: [0.55, 0.7, 0.85]
+      });
+
+      slides.forEach(slide => observer.observe(slide));
+      pager.__mobileSwipeObserver = observer;
+    } else {
+      const syncFromScroll = () => {
+        if (scrollFrame) cancelAnimationFrame(scrollFrame);
+        scrollFrame = requestAnimationFrame(() => {
+          const center = carousel.scrollLeft + carousel.clientWidth / 2;
+          let bestIndex = 0;
+          let bestDistance = Number.POSITIVE_INFINITY;
+
+          slides.forEach((slide, idx) => {
+            const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+            const distance = Math.abs(slideCenter - center);
+            if (distance < bestDistance) {
+              bestDistance = distance;
+              bestIndex = idx;
+            }
+          });
+
+          setActive(bestIndex);
+        });
+      };
+
+      carousel.addEventListener('scroll', syncFromScroll, { passive: true });
+    }
+
+    setActive(initialIndex);
+    slides[initialIndex]?.scrollIntoView({ behavior: 'auto', inline: 'start', block: 'nearest' });
+  });
+}
+
 function renderMobileStatusCostMeta({
-  status,
-  costValue,
-  bookingReference = '',
-  statusOnClick = '',
-  costOnBlur = '',
-  statusButtonTitle = 'Change status',
-  metaClass = 'transport-status-cost-meta',
-  editableCost = false
-}) {
+                                      status,
+                                      costValue,
+                                      bookingReference = '',
+                                      statusOnClick = '',
+                                      costOnBlur = '',
+                                      statusButtonTitle = 'Change status',
+                                      metaClass = 'transport-status-cost-meta',
+                                      editableCost = false
+                                    }) {
   const normalizedStatus = (status === 'pending' ? 'planned' : status) || 'planned';
   const statusColors = {
     planned: '#E67E22',
@@ -161,11 +392,11 @@ function renderMobileStatusCostMeta({
   const statusGlyph = statusIcons[normalizedStatus] || '⏳';
   const safeCost = costValue ?? '0';
   const costNode = editableCost
-    ? `<span class="transport-mobile-cost-value" contenteditable="true" onblur="${costOnBlur}">${safeCost}</span>`
-    : `<span class="transport-mobile-cost-value">${safeCost}</span>`;
+      ? `<span class="transport-mobile-cost-value" contenteditable="true" onblur="${costOnBlur}">${safeCost}</span>`
+      : `<span class="transport-mobile-cost-value">${safeCost}</span>`;
   const statusNode = statusOnClick
-    ? `<button type="button" class="status-badge transport-mobile-status-btn" style="background:${statusColor};" onclick="${statusOnClick}" title="${statusButtonTitle}">${statusGlyph} ${statusText}</button>`
-    : `<span class="status-badge transport-mobile-status-btn" style="background:${statusColor};">${statusGlyph} ${statusText}</span>`;
+      ? `<button type="button" class="status-badge transport-mobile-status-btn" style="background:${statusColor};" onclick="${statusOnClick}" title="${statusButtonTitle}">${statusGlyph} ${statusText}</button>`
+      : `<span class="status-badge transport-mobile-status-btn" style="background:${statusColor};">${statusGlyph} ${statusText}</span>`;
 
   return `
     <div class="mobile-table-meta ${metaClass}">
@@ -220,9 +451,9 @@ const DEFAULT_LEAVE_HOME = [
 
 function normalizeChecklistText(text) {
   return String(text || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ');
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ');
 }
 
 function getChecklistItemKeys(item) {
@@ -248,14 +479,14 @@ function mergeChecklistWithDefaults(savedItems, defaultItems = DEFAULT_LEAVE_HOM
   const savedList = Array.isArray(savedItems) ? savedItems : [];
   const defaults = Array.isArray(defaultItems) ? defaultItems : [];
   const savedEntries = savedList
-    .map((item, index) => ({ item, index, keys: getChecklistItemKeys(item), matched: false }))
-    .filter(entry => entry.keys.length > 0);
+      .map((item, index) => ({ item, index, keys: getChecklistItemKeys(item), matched: false }))
+      .filter(entry => entry.keys.length > 0);
 
   const merged = defaults.map(def => {
     const defaultCopy = JSON.parse(JSON.stringify(def));
     const defaultKeys = getChecklistItemKeys(def);
     const savedEntry = savedEntries.find(entry =>
-      !entry.matched && entry.keys.some(key => defaultKeys.includes(key))
+        !entry.matched && entry.keys.some(key => defaultKeys.includes(key))
     );
 
     if (!savedEntry) {
@@ -340,4 +571,11 @@ function getDayTotal(day) {
 }
 
 window.getDayTotal = getDayTotal;
+window.escapeHtmlText = escapeHtmlText;
+window.renderMobileStat = renderMobileStat;
+window.renderMobileSurfaceCard = renderMobileSurfaceCard;
+window.renderMobileSwipePager = renderMobileSwipePager;
+window.setupMobileSwipePagers = setupMobileSwipePagers;
 window.renderMobileStatusCostMeta = renderMobileStatusCostMeta;
+window.getMobilePagerActiveIndex = getMobilePagerActiveIndex;
+window.setMobilePagerActiveIndex = setMobilePagerActiveIndex;

@@ -1,32 +1,32 @@
 function getCompactFoodQuestTitle(label) {
   const cleaned = String(label || '')
-    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
-    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
-    .replace(/[\u{2600}-\u{26FF}]/gu, '')
-    .replace(/[\u{2700}-\u{27BF}]/gu, '')
-    .replace(/\p{Emoji}/gu, '')
-    .replace(/\s*[â†’>-].*$/u, '')
-    .replace(/[^\w\s()&,-]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+      .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')
+      .replace(/\p{Emoji}/gu, '')
+      .replace(/\s*[â†’>-].*$/u, '')
+      .replace(/[^\w\s()&,-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
 
   return `${cleaned || 'Food'} - Food Quest`;
 }
 
 function stripCompactLeadingEmoji(text) {
   return String(text || '')
-    .replace(/^\s*(?:\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji})+(?:\uFE0F)?\s*/gu, '')
-    .replace(/^\s*[-–—:·•]+\s*/u, '')
-    .trim();
+      .replace(/^\s*(?:\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji})+(?:\uFE0F)?\s*/gu, '')
+      .replace(/^\s*[-–—:·•]+\s*/u, '')
+      .trim();
 }
 
 function escapeCompactText(text) {
   return String(text || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
 }
 
 function renderCompactMetaSuffix(value) {
@@ -88,7 +88,439 @@ function renderCompactBlock(title, linesHtml, fullWidth = false) {
   `;
 }
 
+function getCompactDaySlideId(legId, dayIdx) {
+  return `compact-day-${String(legId)}-${dayIdx}`;
+}
+
+function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
+  const itemId = `compact-food-${legIndex}-${itemIdx}`;
+  const done = !!item.done;
+
+  return `
+    <label class="compact-food-item" for="${itemId}">
+      <input
+        id="${itemId}"
+        type="checkbox"
+        ${done ? 'checked' : ''}
+        onchange="toggleFoodCompleted(event, ${legIndex}, ${itemIdx})"
+      >
+      <span class="compact-food-item-copy">${renderCompactEmojiLine({
+    emoji: '🍽️',
+    text: item.text,
+    done
+  })}</span>
+    </label>
+  `;
+}
+
+function renderCompactFoodQuestCard(leg, legIndex) {
+  const foodItems = Array.isArray(leg.cityFood) ? leg.cityFood : [];
+  const foodLines = foodItems.length > 0
+      ? foodItems.map((item, itemIdx) => renderCompactFoodQuestItem(legIndex, item, itemIdx)).join('')
+      : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
+
+  return renderMobileSurfaceCard({
+    cardClass: 'compact-food-quest-card',
+    accentColor: leg.colour,
+    title: 'Food quests',
+    details: `<div class="compact-food-list">${foodLines}</div>`,
+    detailsOpen: true
+  });
+}
+
+function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
+  const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
+  const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
+  const dayStayInfo = getStayDisplayForDay(day.date, day.to);
+  const dayTotal = getDayTotal(day);
+  const routeLabel = `${day.from} → ${day.to}`;
+  const slideId = getCompactDaySlideId(leg.id, dayIdx);
+
+  const transportLines = dayJourneys.map(journey => {
+    const icon = getTransportIcon(journey.transportType);
+    const journeyLabel = stripCompactLeadingEmoji(
+        journey.provider || journey.journeyName || journey.notes || `${journey.fromLocation}→${journey.toLocation}`
+    );
+    const segs = (window.journeys || [])
+        .filter(seg => seg.journeyId === journey.journeyId)
+        .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+    const duration = formatCompactJourneyDuration(segs);
+    return renderCompactEmojiLine({ emoji: icon, text: journeyLabel, duration });
+  }).join('');
+
+  const accomLines = dayStayInfo.map(info => renderCompactEmojiLine({
+    emoji: '🏨',
+    text: info.propertyName || 'Accommodation'
+  })).join('');
+
+  const activityLines = (day.activityItems || []).map((item, itemIdx) => {
+    const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
+    const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    return `
+      <div class="compact-activity-row" style="${doneStyle}">
+        <input
+          type="checkbox"
+          ${item.done ? 'checked' : ''}
+          onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
+        >
+        <div class="compact-activity-copy">
+          ${renderCompactEmojiLine({
+      emoji,
+      text: item.text,
+      duration: item.time || '1 hr',
+      done: item.done
+    })}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const primaryAction = `
+    <label class="compact-day-complete-toggle" for="${slideId}-complete">
+      <input
+        id="${slideId}-complete"
+        type="checkbox"
+        ${day.completed ? 'checked' : ''}
+        onchange="toggleDayCompleted(event, ${legIndex}, ${dayIdx})"
+      >
+      <span>${day.completed ? 'Completed' : 'Mark done'}</span>
+    </label>
+  `;
+
+  const details = `
+    <div class="compact-day-grid">
+      ${renderCompactBlock('Transport', transportLines || '<div class="compact-day-empty">No transport scheduled.</div>')}
+      ${renderCompactBlock('Stay', accomLines || '<div class="compact-day-empty">No stay linked.</div>')}
+      ${renderCompactBlock('Activities', activityLines || '<div class="compact-day-empty">Nothing planned yet.</div>', true)}
+    </div>
+  `;
+
+  return `
+    <section class="compact-day-slide ${day.completed ? 'is-completed' : ''}" id="${slideId}" data-day-index="${dayIdx}">
+      ${renderMobileSurfaceCard({
+    cardClass: 'compact-day-surface',
+    accentColor: leg.colour,
+    dateLabel: dayDateLabel,
+    title: `Day ${dayIdx + 1}`,
+    subtitle: routeLabel,
+    summary: `
+          <div class="compact-day-summary-row">
+            <span class="compact-day-summary-desc">${escapeCompactText(day.desc || 'No description yet')}</span>
+            ${dayTotal ? `<span class="compact-day-total-badge">${escapeCompactText(dayTotal)}</span>` : ''}
+          </div>
+        `,
+    primaryAction,
+    details,
+    detailsOpen: true
+  })}
+    </section>
+  `;
+}
+
+function renderCompactDayPager(leg, legIndex) {
+  const days = Array.isArray(leg.days) ? leg.days : [];
+  const totalDays = days.length;
+  const pagerKey = `compact-day-${leg.id}`;
+  const initialIndex = typeof getMobilePagerActiveIndex === 'function'
+      ? getMobilePagerActiveIndex(pagerKey, 0)
+      : 0;
+  if (totalDays === 0) {
+    return `
+      <div class="compact-day-pager compact-day-pager-empty" data-pager-key="${escapeCompactText(pagerKey)}">
+        <div class="compact-day-empty">No itinerary days available for this leg.</div>
+      </div>
+    `;
+  }
+
+  const chips = days.map((day, dayIdx) => {
+    const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
+    const slideId = getCompactDaySlideId(leg.id, dayIdx);
+    const active = dayIdx === initialIndex;
+    return `
+      <button
+        type="button"
+        class="compact-day-chip${active ? ' active' : ''}"
+        data-leg-id="${escapeCompactText(leg.id)}"
+        data-day-index="${dayIdx}"
+        data-target-slide="${slideId}"
+        aria-selected="${active ? 'true' : 'false'}"
+        aria-current="${active ? 'true' : 'false'}"
+        aria-controls="${slideId}"
+        onclick="return compactItineraryGoToDay(event, this.dataset.legId, this.dataset.dayIndex)"
+      >
+        <span class="compact-day-chip-day">Day ${dayIdx + 1}</span>
+        <span class="compact-day-chip-date">${escapeCompactText(day.day)} ${escapeCompactText(dayDateLabel)}</span>
+        <span class="compact-day-chip-route">${escapeCompactText(day.from)} → ${escapeCompactText(day.to)}</span>
+      </button>
+    `;
+  }).join('');
+
+  const slides = days.map((day, dayIdx) => renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays)).join('');
+
+  return `
+      <div class="compact-day-pager" data-leg-id="${escapeCompactText(leg.id)}" data-total-days="${totalDays}" data-pager-key="${escapeCompactText(pagerKey)}" data-active-index="${initialIndex}">
+        <div class="compact-day-pager-head">
+          <div class="compact-day-pager-copy">
+            <span class="compact-day-pager-position" data-role="compact-day-position">Day 1 of ${totalDays}</span>
+          </div>
+          <div class="compact-day-pager-counter" data-role="compact-day-counter">1/${totalDays}</div>
+        </div>
+      <div class="compact-day-rail" role="tablist" aria-label="Days for ${escapeCompactText(leg.label || 'this leg')}">
+        ${chips}
+      </div>
+      <div class="compact-day-progress" aria-hidden="true">
+        <span class="compact-day-progress-fill" data-role="compact-day-progress-fill"></span>
+      </div>
+      <div class="compact-day-carousel" data-leg-id="${escapeCompactText(leg.id)}">
+        ${slides}
+      </div>
+    </div>
+  `;
+}
+
+function setupCompactItineraryPagers(root = document) {
+  const pagers = root.querySelectorAll('.compact-day-pager');
+  pagers.forEach(pager => {
+    const carousel = pager.querySelector('.compact-day-carousel');
+    const rail = pager.querySelector('.compact-day-rail');
+    const slides = Array.from(pager.querySelectorAll('.compact-day-slide'));
+    const chips = Array.from(pager.querySelectorAll('.compact-day-chip'));
+    const positionLabel = pager.querySelector('[data-role="compact-day-position"]');
+    const counterLabel = pager.querySelector('[data-role="compact-day-counter"]');
+    const progressFill = pager.querySelector('[data-role="compact-day-progress-fill"]');
+    const pagerKey = pager.dataset.pagerKey || '';
+
+    if (!carousel || slides.length === 0) return;
+
+    const total = slides.length;
+    let suppressObserver = false;
+    let scrollFrame = 0;
+    const initialIndex = typeof getMobilePagerActiveIndex === 'function'
+        ? getMobilePagerActiveIndex(pagerKey, Number(pager.dataset.activeIndex || 0))
+        : Number(pager.dataset.activeIndex || 0);
+
+    const setActive = nextIndex => syncCompactDayPagerState(pager, nextIndex, {
+      chips,
+      slides,
+      total,
+      rail,
+      positionLabel,
+      counterLabel,
+      progressFill,
+      pagerKey
+    });
+
+    const scrollToIndex = nextIndex => {
+      const slide = slides[nextIndex];
+      if (!slide) return;
+      suppressObserver = true;
+      slide.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      setActive(nextIndex);
+      window.setTimeout(() => {
+        suppressObserver = false;
+      }, 420);
+    };
+
+    pager.__compactScrollToIndex = scrollToIndex;
+    pager.__compactSetActive = setActive;
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        scrollToIndex(Number(chip.dataset.dayIndex || 0));
+      });
+    });
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        if (suppressObserver) return;
+
+        const visibleEntry = entries
+            .filter(entry => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (!visibleEntry) return;
+        const nextIndex = Number(visibleEntry.target.dataset.dayIndex || 0);
+        if (!Number.isNaN(nextIndex)) {
+          setActive(nextIndex);
+        }
+      }, {
+        root: carousel,
+        threshold: [0.55, 0.7, 0.85]
+      });
+
+      slides.forEach(slide => observer.observe(slide));
+      pager.__compactObserver = observer;
+    } else {
+      const syncFromScroll = () => {
+        if (scrollFrame) cancelAnimationFrame(scrollFrame);
+        scrollFrame = requestAnimationFrame(() => {
+          const center = carousel.scrollLeft + carousel.clientWidth / 2;
+          let bestIndex = 0;
+          let bestDistance = Number.POSITIVE_INFINITY;
+
+          slides.forEach((slide, idx) => {
+            const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+            const distance = Math.abs(slideCenter - center);
+            if (distance < bestDistance) {
+              bestDistance = distance;
+              bestIndex = idx;
+            }
+          });
+
+          setActive(bestIndex);
+        });
+      };
+
+      carousel.addEventListener('scroll', syncFromScroll, { passive: true });
+    }
+
+    setActive(initialIndex);
+    slides[initialIndex]?.scrollIntoView({ behavior: 'auto', inline: 'start', block: 'nearest' });
+  });
+}
+
+function syncCompactDayPagerState(pager, nextIndex, context = {}) {
+  if (!pager) return;
+
+  const chips = context.chips || Array.from(pager.querySelectorAll('.compact-day-chip'));
+  const slides = context.slides || Array.from(pager.querySelectorAll('.compact-day-slide'));
+  const total = Math.max(1, context.total || slides.length || 1);
+  const rail = context.rail || pager.querySelector('.compact-day-rail');
+  const positionLabel = context.positionLabel || pager.querySelector('[data-role="compact-day-position"]');
+  const counterLabel = context.counterLabel || pager.querySelector('[data-role="compact-day-counter"]');
+  const progressFill = context.progressFill || pager.querySelector('[data-role="compact-day-progress-fill"]');
+  const pagerKey = context.pagerKey || pager.dataset.pagerKey || '';
+  const safeIndex = Math.max(0, Math.min(total - 1, Number(nextIndex) || 0));
+
+  slides.forEach((slide, idx) => {
+    slide.classList.toggle('is-active', idx === safeIndex);
+  });
+
+  chips.forEach((chip, idx) => {
+    const active = idx === safeIndex;
+    chip.classList.toggle('active', active);
+    chip.setAttribute('aria-selected', active ? 'true' : 'false');
+    chip.setAttribute('aria-current', active ? 'true' : 'false');
+  });
+
+  if (positionLabel) positionLabel.textContent = `Day ${safeIndex + 1} of ${total}`;
+  if (counterLabel) counterLabel.textContent = `${safeIndex + 1}/${total}`;
+  if (progressFill) progressFill.style.width = `${((safeIndex + 1) / total) * 100}%`;
+  pager.dataset.activeIndex = String(safeIndex);
+  if (pagerKey && typeof setMobilePagerActiveIndex === 'function') {
+    setMobilePagerActiveIndex(pagerKey, safeIndex);
+  }
+
+  const activeChip = chips[safeIndex];
+  if (rail && activeChip) {
+    activeChip.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+  }
+}
+
+function compactItineraryGoToDay(event, legId, dayIndex) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  const pager = Array.from(document.querySelectorAll('.compact-day-pager')).find(el => el.dataset.legId === String(legId));
+  if (!pager) return false;
+
+  const nextIndex = Math.max(0, Number(dayIndex) || 0);
+  if (typeof pager.__compactScrollToIndex === 'function') {
+    pager.__compactScrollToIndex(nextIndex);
+    return false;
+  }
+
+  syncCompactDayPagerState(pager, nextIndex);
+
+  const carousel = pager.querySelector('.compact-day-carousel');
+  const slide = pager.querySelector(`.compact-day-slide[data-day-index="${nextIndex}"]`);
+  if (carousel && slide) {
+    carousel.scrollTo({
+      left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
+      behavior: 'smooth'
+    });
+  }
+  return false;
+}
+
 function buildCompactItinerary() {
+  const container = document.getElementById('itinerary');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  const slidesHtml = [];
+  const railHtml = [];
+
+  appData.forEach((leg, legIndex) => {
+    const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
+    const nightLabel = isTransitLegForDisplay(leg)
+        ? 'Day Transit / Stop'
+        : `${daysCount} night${daysCount !== 1 ? 's' : ''}`;
+    const firstDay = leg.days && leg.days[0];
+    const lastDay = leg.days && leg.days[daysCount - 1];
+    const legDateRange = firstDay && lastDay
+        ? `${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date} → ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date}`
+        : (firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '');
+    const routeLabel = firstDay && lastDay
+        ? `${firstDay.day || 'Day'} ${firstDay.date} → ${lastDay.day || 'Day'} ${lastDay.date}`
+        : `${daysCount} day${daysCount !== 1 ? 's' : ''}`;
+    const legLabel = leg.label && !/^trip leg$/i.test(String(leg.label).trim())
+        ? leg.label
+        : '';
+    const displayLegLabel = legLabel || routeLabel || `Leg ${legIndex + 1}`;
+    const chipDateRange = firstDay && lastDay
+        ? `${firstDay.date}${lastDay.date && lastDay.date !== firstDay.date ? ` → ${lastDay.date}` : ''}`
+        : (firstDay ? firstDay.date : '');
+
+    const legCard = `
+      <article class="compact-leg-card" style="--leg-accent:${escapeHtmlText(leg.colour || '#24485d')}">
+        <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
+          <div class="compact-leg-header-line">
+            <span class="compact-leg-date">${escapeHtmlText(legDateRange || '—')}</span>
+            <span class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</span>
+            <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
+          </div>
+        </div>
+        <div class="compact-leg-body">
+          ${renderCompactFoodQuestCard(leg, legIndex)}
+          ${renderCompactDayPager(leg, legIndex)}
+        </div>
+      </article>
+    `;
+
+    slidesHtml.push(`
+      <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide" data-role="mobile-swipe-slide" data-slide-index="${legIndex}">
+        ${legCard}
+      </div>
+    `);
+    railHtml.push(`
+      <button type="button" class="mobile-swipe-chip compact-city-chip" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
+        <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(chipDateRange || 'Trip')}</span>
+        <span class="mobile-swipe-chip-title">${escapeHtmlText(displayLegLabel)}</span>
+        <span class="mobile-swipe-chip-route">${escapeHtmlText(nightLabel)}</span>
+      </button>
+    `);
+  });
+
+  const pagerRoot = document.createElement('div');
+  pagerRoot.className = 'compact-city-swipe-root';
+  pagerRoot.innerHTML = renderMobileSwipePager({
+    pagerClass: 'compact-city-swipe-pager',
+    pagerKey: 'compact-city-swipe',
+    positionPrefix: 'Trip',
+    railHtml: railHtml.join(''),
+    slidesHtml: slidesHtml.join(''),
+    ariaLabel: 'Itinerary city cards'
+  });
+
+  container.appendChild(pagerRoot);
+  setupMobileSwipePagers(container);
+}
+
+function buildCompactItineraryLegacy() {
   const container = document.getElementById('itinerary');
   container.innerHTML = '';
 
@@ -162,9 +594,9 @@ function buildCompactItinerary() {
               style="width:12px; height:12px; accent-color:#27AE60; margin-top:1px;">
             <div style="min-width:0;">${renderCompactEmojiLine({ emoji, text: item.text, duration: item.time || '1 hr', done: item.done })}</div>
           </div>`;
-      }).join('');
+        }).join('');
 
-      html += `<div class="compact-day-card" style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
+        html += `<div class="compact-day-card" style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
       <div class="compact-day-top" style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
         <input type="checkbox" ${day.completed ? 'checked' : ''}
           onchange="toggleDayCompleted(event, ${legIndex}, ${dayIdx})"
@@ -179,7 +611,7 @@ function buildCompactItinerary() {
         ${renderCompactBlock('Activities', activityLines, true)}
       </div>
       </div></div>`;
-      return;
+        return;
       }
       html += `<div style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
       <div style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
@@ -203,28 +635,28 @@ function buildCompactItinerary() {
           const icon = getTransportIcon(j.transportType);
           const journeyLabel = stripCompactLeadingEmoji(j.notes || `${j.fromLocation}→${j.toLocation}`);
           const segs = (window.journeys || [])
-            .filter(seg => seg.journeyId === j.journeyId)
-            .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+              .filter(seg => seg.journeyId === j.journeyId)
+              .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
           const duration = j.isMultiLeg && typeof calculateJourneyDuration === 'function' && segs.length > 0
-            ? `${calculateJourneyDuration(segs)}h`
-            : '';
+              ? `${calculateJourneyDuration(segs)}h`
+              : '';
           return `${renderCompactEmojiLine({ emoji: icon, text: journeyLabel, duration })} <span style="color:${status === 'booked' ? '#27AE60' : '#E67E22'}">${statusText}</span>`;
         }).join(', ');
         html += '</div>';
       }
 
 
-  // Display stay info derived from stays[] based on date matching
-  const dayStayInfo = getStayDisplayForDay(day.date, day.to);
-  if (dayStayInfo.length > 0) {
-    html += '<div style="flex:1;">';
-    html += dayStayInfo.map(info => {
-      const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
-      const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
-      return `<span style="margin-right:12px;">${renderCompactEmojiLine({ emoji: icon, text: `${label}: ${info.propertyName}` })}</span>`;
-    }).join('');
-    html += '</div>';
-  }
+      // Display stay info derived from stays[] based on date matching
+      const dayStayInfo = getStayDisplayForDay(day.date, day.to);
+      if (dayStayInfo.length > 0) {
+        html += '<div style="flex:1;">';
+        html += dayStayInfo.map(info => {
+          const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
+          const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
+          return `<span style="margin-right:12px;">${renderCompactEmojiLine({ emoji: icon, text: `${label}: ${info.propertyName}` })}</span>`;
+        }).join('');
+        html += '</div>';
+      }
 
       html += '</div>';
 
@@ -272,15 +704,15 @@ function normalizeDate(dateStr, year = 2026) {
 // Derive stay display rows for both full and compact itinerary builders.
 function getStayDisplayForDay(dayDate, dayCity) {
   const staysData = Array.isArray(stays)
-    ? stays
-    : (typeof window !== 'undefined' && Array.isArray(window.stays) ? window.stays : []);
+      ? stays
+      : (typeof window !== 'undefined' && Array.isArray(window.stays) ? window.stays : []);
 
   if (!Array.isArray(staysData) || staysData.length === 0) return [];
 
   const normalizedDayDate = normalizeDate(dayDate);
   const matchedCity = typeof citiesData !== 'undefined'
-    ? citiesData.find(c => c.name === dayCity)
-    : null;
+      ? citiesData.find(c => c.name === dayCity)
+      : null;
   const matchedCityId = matchedCity ? matchedCity.id : null;
   const result = [];
 
@@ -330,8 +762,38 @@ function getStayDisplayForDay(dayDate, dayCity) {
   return result;
 }
 
+function isTransitLegForDisplay(leg) {
+  if (!leg || !Array.isArray(leg.days) || leg.days.length === 0) return false;
+  if (leg.days.length > 1) return false;
+
+  const legText = [
+    leg.label,
+    leg.subtitle,
+    leg.desc,
+    ...leg.days.flatMap(day => [day.desc, day.headline, day.accom, day.from, day.to])
+  ]
+      .filter(Boolean)
+      .join(' ');
+
+  return /(\bstopover\b|\bstop over\b|\ben route\b|\btransit\b|\btravel\b|\btransfer\b|\blayover\b|\bday transit\b|→|->)/i.test(legText);
+}
+
 // Track open day cards across rebuilds
 let openDayCardIds = new Set();
+let expandedFoodQuestLegs = new Set();
+
+function isFoodQuestExpanded(legId) {
+  return expandedFoodQuestLegs.has(legId);
+}
+
+function toggleFoodQuestDetails(legId) {
+  if (expandedFoodQuestLegs.has(legId)) {
+    expandedFoodQuestLegs.delete(legId);
+  } else {
+    expandedFoodQuestLegs.add(legId);
+  }
+  if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+}
 
 function buildItinerary() {
   // Check window.isCompactView for cross-module access
@@ -363,55 +825,55 @@ function buildItinerary() {
     section.className = 'leg';
     section.id = 'leg-' + leg.id;
 
-  const daysCount = leg.days.length;
+    const daysCount = leg.days.length;
 
-  // Detect transit legs based on whether there are any stays overlapping with this leg
-  let isTransit = false;
-  if (daysCount > 0) {
-    const firstDay = leg.days[0].date;
-    const lastDay = leg.days[leg.days.length - 1].date;
-    const skipCityNames = ['Home', 'In transit', 'Between cities', 'TBC', '', 'Return', 'Departure', 'Arrival'];
-    const cleanLabel = (leg.label || '')
-      .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
-      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
-      .replace(/[\u{2600}-\u{26FF}]/gu, '')
-      .replace(/[\u{2700}-\u{27BF}]/gu, '')
-      .replace(/\p{Emoji}/gu, '')
-      .replace(/[^\w\s-]/gu, '')
-      .trim();
-    const labelLooksTransit = /(\bto\b|via|transit|travel|flight|train|bus|→|->)/i.test(leg.label || '');
-    const hasDestinationDay = leg.days.some(day =>
-      day.from &&
-      day.to &&
-      day.from === day.to &&
-      !skipCityNames.includes(day.to)
-    );
-    const labelMatchesDayCity = cleanLabel && leg.days.some(day =>
-      (day.to && cleanLabel.toLowerCase() === day.to.toLowerCase()) ||
-      (day.from && cleanLabel.toLowerCase() === day.from.toLowerCase())
-    );
+    // Detect transit legs based on whether there are any stays overlapping with this leg
+    let isTransit = false;
+    if (daysCount > 0) {
+      const firstDay = leg.days[0].date;
+      const lastDay = leg.days[leg.days.length - 1].date;
+      const skipCityNames = ['Home', 'In transit', 'Between cities', 'TBC', '', 'Return', 'Departure', 'Arrival'];
+      const cleanLabel = (leg.label || '')
+          .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+          .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+          .replace(/[\u{2600}-\u{26FF}]/gu, '')
+          .replace(/[\u{2700}-\u{27BF}]/gu, '')
+          .replace(/\p{Emoji}/gu, '')
+          .replace(/[^\w\s-]/gu, '')
+          .trim();
+      const labelLooksTransit = /(\bto\b|via|transit|travel|flight|train|bus|→|->)/i.test(leg.label || '');
+      const hasDestinationDay = leg.days.some(day =>
+          day.from &&
+          day.to &&
+          day.from === day.to &&
+          !skipCityNames.includes(day.to)
+      );
+      const labelMatchesDayCity = cleanLabel && leg.days.some(day =>
+          (day.to && cleanLabel.toLowerCase() === day.to.toLowerCase()) ||
+          (day.from && cleanLabel.toLowerCase() === day.from.toLowerCase())
+      );
 
-    // Check if any stays overlap with this legs dates
-    const hasStays = (typeof stays !== 'undefined' && Array.isArray(stays)) ? stays.some(s => {
-      return s.checkIn && s.checkOut && s.checkIn <= lastDay && s.checkOut >= firstDay;
-    }) : false;
+      // Check if any stays overlap with this legs dates
+      const hasStays = (typeof stays !== 'undefined' && Array.isArray(stays)) ? stays.some(s => {
+        return s.checkIn && s.checkOut && s.checkIn <= lastDay && s.checkOut >= firstDay;
+      }) : false;
 
-    // Also check old accomItems for backward compatibility
-    const hasOldAccom = leg.days.some(d => d.accomItems && d.accomItems.length > 0);
+      // Also check old accomItems for backward compatibility
+      const hasOldAccom = leg.days.some(d => d.accomItems && d.accomItems.length > 0);
 
-    // If no accommodation at all, its likely a transit leg
-    if (!hasStays && !hasOldAccom) {
-      isTransit = labelLooksTransit || (!hasDestinationDay && !labelMatchesDayCity);
-    } else if (daysCount === 1) {
-      // For single-day legs, check if its a city mismatch
-      const toCity = leg.days[0].to;
-      if (!labelMatchesDayCity && !hasDestinationDay && !(leg.label || '').includes(toCity) && leg.days[0].from !== toCity) {
-        isTransit = true;
+      // If no accommodation at all, its likely a transit leg
+      if (!hasStays && !hasOldAccom) {
+        isTransit = labelLooksTransit || (!hasDestinationDay && !labelMatchesDayCity);
+      } else if (daysCount === 1) {
+        // For single-day legs, check if its a city mismatch
+        const toCity = leg.days[0].to;
+        if (!labelMatchesDayCity && !hasDestinationDay && !(leg.label || '').includes(toCity) && leg.days[0].from !== toCity) {
+          isTransit = true;
+        }
       }
     }
-  }
 
-    const nightLabel = isTransit ? '✈ Day Transit / Stop' : `${daysCount} night${daysCount !== 1 ? 's' : ''}`;
+    const nightLabel = isTransitLegForDisplay(leg) ? '✈ Day Transit / Stop' : `${daysCount} night${daysCount !== 1 ? 's' : ''}`;
     const badgeClass = isTransit ? 'leg-night-count badge-transit' : 'leg-night-count';
 
     const firstDateObj = daysCount > 0 ? leg.days[0] : null;
@@ -463,19 +925,19 @@ function buildItinerary() {
       <div class="city-block city-block-activities">
         <h4>📌 Suggested Activities</h4>
         <ul class="activity-list unified-activities">${(leg.suggestedActivities || []).map((activity, activityIdx) => {
-          const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
-          let isCompleted = false; let dayLabel = '';
-          if (isAssigned && leg.days[activity.assignedDayIdx]) {
-            dayLabel = leg.days[activity.assignedDayIdx].date;
-            const matchedActivity = leg.days[activity.assignedDayIdx].activityItems.find(a => a.text === activity.title);
-            if (matchedActivity && matchedActivity.done) isCompleted = true;
-          }
-          const badgeColor = isCompleted ? '#27AE60' : '#E67E22';
-          const badgeIcon = isCompleted ? '✓' : '⏳';
-          const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
-          const categoryEmoji = getCategoryEmoji(activity.category);
-          return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge" style="background: ${badgeColor};" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · $${activity.estCost}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
-        }).join('')}</ul>
+      const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
+      let isCompleted = false; let dayLabel = '';
+      if (isAssigned && leg.days[activity.assignedDayIdx]) {
+        dayLabel = leg.days[activity.assignedDayIdx].date;
+        const matchedActivity = leg.days[activity.assignedDayIdx].activityItems.find(a => a.text === activity.title);
+        if (matchedActivity && matchedActivity.done) isCompleted = true;
+      }
+      const badgeColor = isCompleted ? '#27AE60' : '#E67E22';
+      const badgeIcon = isCompleted ? '✓' : '⏳';
+      const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
+      const categoryEmoji = getCategoryEmoji(activity.category);
+      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge" style="background: ${badgeColor};" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · $${activity.estCost}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
+    }).join('')}</ul>
         <button class="add-btn" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
       </div>
     </div>`;
@@ -507,31 +969,31 @@ function buildItinerary() {
           <div class="detail-block block-transport">
             <h4>Transport</h4><div class="item-list">
             ${dayJourneys.map((journey) => {
-              const status = journey.status || 'planned';
-              const statusColor = status === 'booked' ? '#27AE60' : '#E67E22';
-              const statusIcon = status === 'booked' ? '✓' : '⏳';
-              const icon = getTransportIcon(journey.transportType);
-              const showRef = status === 'booked';
+        const status = journey.status || 'planned';
+        const statusColor = status === 'booked' ? '#27AE60' : '#E67E22';
+        const statusIcon = status === 'booked' ? '✓' : '⏳';
+        const icon = getTransportIcon(journey.transportType);
+        const showRef = status === 'booked';
 
-              // For multi-leg journeys, show the full route chain; otherwise show name or route
-              let label = '';
-              if (journey.isMultiLeg && journey.journeyId) {
-                // Find all segments and build chain
-                const allSegs = (window.journeys || [])
-                  .filter(j => j.journeyId === journey.journeyId)
-                  .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-                const stops = allSegs.length > 0
-                  ? [allSegs[0].fromLocation, ...allSegs.map(s => s.toLocation)].join(' → ')
-                  : (journey.journeyName || journey.fromLocation + ' → ' + journey.toLocation);
-                label = `${icon} ${journey.journeyName ? journey.journeyName + ' · ' : ''}${stops}`;
-              } else {
-                label = `${icon} ${journey.journeyName || journey.notes || journey.fromLocation + ' → ' + journey.toLocation}`;
-              }
+        // For multi-leg journeys, show the full route chain; otherwise show name or route
+        let label = '';
+        if (journey.isMultiLeg && journey.journeyId) {
+          // Find all segments and build chain
+          const allSegs = (window.journeys || [])
+              .filter(j => j.journeyId === journey.journeyId)
+              .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+          const stops = allSegs.length > 0
+              ? [allSegs[0].fromLocation, ...allSegs.map(s => s.toLocation)].join(' → ')
+              : (journey.journeyName || journey.fromLocation + ' → ' + journey.toLocation);
+          label = `${icon} ${journey.journeyName ? journey.journeyName + ' · ' : ''}${stops}`;
+        } else {
+          label = `${icon} ${journey.journeyName || journey.notes || journey.fromLocation + ' → ' + journey.toLocation}`;
+        }
 
-              // Show departure time if available
-              const timeHint = journey.departureTime ? ` <span style="color:#999;font-size:0.75rem;font-family:monospace;">${journey.departureTime}</span>` : '';
+        // Show departure time if available
+        const timeHint = journey.departureTime ? ` <span style="color:#999;font-size:0.75rem;font-family:monospace;">${journey.departureTime}</span>` : '';
 
-              return `<div class="cost-item journey-item">
+        return `<div class="cost-item journey-item">
                 <button class="del-btn" title="Remove Journey" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); rebuildCurrentView();">×</button>
                 <span class="cost-item-text">${label}${timeHint}</span>
                 <div class="cost-item-actions">
@@ -540,7 +1002,7 @@ function buildItinerary() {
                   <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${journey.id}', this.innerText)">${journey.cost || '0'}</span></span>
                 </div>
               </div>`;
-            }).join('')}
+      }).join('')}
             </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); openAddJourneyModal();">+ Add Journey</button>` : ''}
           </div>
 
@@ -548,19 +1010,19 @@ function buildItinerary() {
 <div class="detail-block block-accom">
 <h4>Accommodation</h4><div class="item-list">
 ${(() => {
-    const dayStayInfo = getStayDisplayForDay(day.date, day.to);
-    return dayStayInfo.map(info => {
-      const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
-      const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
-      return `<div class="cost-item">
+        const dayStayInfo = getStayDisplayForDay(day.date, day.to);
+        return dayStayInfo.map(info => {
+          const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
+          const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
+          return `<div class="cost-item">
         <span class="cost-item-text">${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` via ${info.provider}` : ''}${info.cost ? ` ($${info.cost})` : ''}</span>
         <div class="cost-item-actions">
           <span class="status-badge" style="--status-color:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✕ Cancelled' : '⏳ Pending'}</span>
           ${info.bookingRef ? `<span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${info.bookingRef}</span>` : ''}
         </div>
       </div>`;
-    }).join('');
-  })()}
+        }).join('');
+      })()}
 </div><button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Add Stay</button>
 </div>
 
@@ -626,13 +1088,13 @@ const CITY_NAV_SKIP_NAMES = ['departure', 'arrival', 'in transit', 'between citi
 function cleanCityNavLabel(value) {
   if (!value || typeof value !== 'string') return '';
   return value
-    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
-    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
-    .replace(/[\u{2600}-\u{26FF}]/gu, '')
-    .replace(/[\u{2700}-\u{27BF}]/gu, '')
-    .replace(/\p{Emoji}/gu, '')
-    .replace(/[^\w\s-]/gu, '')
-    .trim();
+      .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')
+      .replace(/\p{Emoji}/gu, '')
+      .replace(/[^\w\s-]/gu, '')
+      .trim();
 }
 
 function shouldSkipCityNavName(cityName) {
@@ -717,10 +1179,10 @@ function addCityOrderCandidate(orderMap, cityName, score, sourceRank = 0, stayWe
   const existing = orderMap.get(city.id);
   const candidate = { score, sourceRank, stayWeight };
   if (
-    !existing ||
-    stayWeight > existing.stayWeight ||
-    (stayWeight === existing.stayWeight && score < existing.score) ||
-    (stayWeight === existing.stayWeight && score === existing.score && sourceRank < existing.sourceRank)
+      !existing ||
+      stayWeight > existing.stayWeight ||
+      (stayWeight === existing.stayWeight && score < existing.score) ||
+      (stayWeight === existing.stayWeight && score === existing.score && sourceRank < existing.sourceRank)
   ) {
     orderMap.set(city.id, candidate);
   }
@@ -806,8 +1268,8 @@ function getCitiesInTravelOrder() {
     const legBaseScore = getLegDateScore(leg, legIndex);
     const labelCity = cleanCityNavLabel(leg.label);
     const labelAlreadyInDayRoute = labelCity && (leg.days || []).some(day =>
-      (day.from && day.from.toLowerCase() === labelCity.toLowerCase()) ||
-      (day.to && day.to.toLowerCase() === labelCity.toLowerCase())
+        (day.from && day.from.toLowerCase() === labelCity.toLowerCase()) ||
+        (day.to && day.to.toLowerCase() === labelCity.toLowerCase())
     );
     if (labelCity && !shouldSkipCityNavName(labelCity) && !labelAlreadyInDayRoute) {
       addCityOrderCandidate(orderMap, labelCity, legBaseScore - 0.5, 2, 10);
@@ -831,17 +1293,17 @@ function getCitiesInTravelOrder() {
   }
 
   return citiesData
-    .filter(city => !shouldSkipCityNavName(city.name))
-    .map((city, fallbackIndex) => ({
-      city,
-      order: orderMap.get(city.id) || { score: Number.MAX_SAFE_INTEGER - 1000 + fallbackIndex, sourceRank: 99 }
-    }))
-    .sort((a, b) => {
-      if (a.order.score !== b.order.score) return a.order.score - b.order.score;
-      if (a.order.sourceRank !== b.order.sourceRank) return a.order.sourceRank - b.order.sourceRank;
-      return a.city.name.localeCompare(b.city.name);
-    })
-    .map(entry => entry.city);
+      .filter(city => !shouldSkipCityNavName(city.name))
+      .map((city, fallbackIndex) => ({
+        city,
+        order: orderMap.get(city.id) || { score: Number.MAX_SAFE_INTEGER - 1000 + fallbackIndex, sourceRank: 99 }
+      }))
+      .sort((a, b) => {
+        if (a.order.score !== b.order.score) return a.order.score - b.order.score;
+        if (a.order.sourceRank !== b.order.sourceRank) return a.order.sourceRank - b.order.sourceRank;
+        return a.city.name.localeCompare(b.city.name);
+      })
+      .map(entry => entry.city);
 }
 
 function scrollToElementWithNavOffset(el) {
@@ -875,16 +1337,16 @@ function findLegForJourneyCity(cityId, cityName) {
   if (!Array.isArray(journeys)) return null;
 
   const matchingJourneys = journeys
-    .filter(j =>
-      j.fromCityId === cityId ||
-      j.toCityId === cityId ||
-      (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
-    )
-    .sort((a, b) => {
-      const aScore = getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime, Number.MAX_SAFE_INTEGER);
-      const bScore = getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime, Number.MAX_SAFE_INTEGER);
-      return aScore - bScore;
-    });
+      .filter(j =>
+          j.fromCityId === cityId ||
+          j.toCityId === cityId ||
+          (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
+      )
+      .sort((a, b) => {
+        const aScore = getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime, Number.MAX_SAFE_INTEGER);
+        const bScore = getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime, Number.MAX_SAFE_INTEGER);
+        return aScore - bScore;
+      });
 
   for (const journey of matchingJourneys) {
     if (journey.legId) {
@@ -893,11 +1355,11 @@ function findLegForJourneyCity(cityId, cityName) {
     }
 
     const targetDate = journey.toCityId === cityId || journey.toLocation === cityName
-      ? (journey.arrivalDate || journey.dayDate || journey.departureDate)
-      : (journey.departureDate || journey.dayDate || journey.arrivalDate);
+        ? (journey.arrivalDate || journey.dayDate || journey.departureDate)
+        : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
     const dateMatchedLeg = appData.find(leg =>
-      (leg.days || []).some(day => sameTimelineDay(day.date, targetDate))
+        (leg.days || []).some(day => sameTimelineDay(day.date, targetDate))
     );
     if (dateMatchedLeg) return dateMatchedLeg;
   }
@@ -940,30 +1402,30 @@ function buildCityNav() {
     }
 
     const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">📍</span>';
-      btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
-      navList.appendChild(btn);
-    });
+    btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
+    navList.appendChild(btn);
+  });
 
-    updateCityNavOverflowCue(nav, navList);
-    if (!nav.dataset.overflowCueBound) {
-      nav.dataset.overflowCueBound = '1';
-      navList.addEventListener('scroll', () => updateCityNavOverflowCue(nav, navList), { passive: true });
-      window.addEventListener('resize', () => updateCityNavOverflowCue(nav, navList));
-    }
+  updateCityNavOverflowCue(nav, navList);
+  if (!nav.dataset.overflowCueBound) {
+    nav.dataset.overflowCueBound = '1';
+    navList.addEventListener('scroll', () => updateCityNavOverflowCue(nav, navList), { passive: true });
+    window.addEventListener('resize', () => updateCityNavOverflowCue(nav, navList));
   }
+}
 
-  function updateCityNavOverflowCue(nav, navList) {
-    if (!nav || !navList) return;
-    const maxScrollLeft = Math.max(0, navList.scrollWidth - navList.clientWidth);
-    const hasOverflow = maxScrollLeft > 4;
-    const scrollLeft = navList.scrollLeft || 0;
-    const atStart = !hasOverflow || scrollLeft <= 4;
-    const atEnd = !hasOverflow || scrollLeft >= maxScrollLeft - 4;
+function updateCityNavOverflowCue(nav, navList) {
+  if (!nav || !navList) return;
+  const maxScrollLeft = Math.max(0, navList.scrollWidth - navList.clientWidth);
+  const hasOverflow = maxScrollLeft > 4;
+  const scrollLeft = navList.scrollLeft || 0;
+  const atStart = !hasOverflow || scrollLeft <= 4;
+  const atEnd = !hasOverflow || scrollLeft >= maxScrollLeft - 4;
 
-    nav.classList.toggle('city-nav-has-overflow', hasOverflow);
-    nav.classList.toggle('city-nav-at-start', atStart);
-    nav.classList.toggle('city-nav-at-end', atEnd);
-  }
+  nav.classList.toggle('city-nav-has-overflow', hasOverflow);
+  nav.classList.toggle('city-nav-at-start', atStart);
+  nav.classList.toggle('city-nav-at-end', atEnd);
+}
 
 function selectCityFilter(cityId, btn) {
   window.currentCityFilter = cityId;
@@ -1045,20 +1507,22 @@ function scrollToCity(cityId) {
 window.rebuildCurrentView = rebuildCurrentView;
 window.selectCityFilter = selectCityFilter;
 window.getStayDisplayForDay = getStayDisplayForDay;
+window.toggleFoodQuestDetails = toggleFoodQuestDetails;
+window.compactItineraryGoToDay = compactItineraryGoToDay;
 
 // Expand to show a city in the itinerary
 function expandToCity(cityId) {
-if (!cityId) return;
+  if (!cityId) return;
 // Find the leg that contains this city
-const leg = appData.find(l => l.days.some(d => d.to === getCityNameById(cityId) || d.from === getCityNameById(cityId)));
-if (leg) {
+  const leg = appData.find(l => l.days.some(d => d.to === getCityNameById(cityId) || d.from === getCityNameById(cityId)));
+  if (leg) {
 // Expand the leg if collapsed
-const legEl = document.querySelector(`[data-leg-id="${leg.id}"]`);
-if (legEl) {
-legEl.classList.add('expanded');
+    const legEl = document.querySelector(`[data-leg-id="${leg.id}"]`);
+    if (legEl) {
+      legEl.classList.add('expanded');
 // Scroll to the leg
-smoothScrollTo(legEl);
-}
-}
+      smoothScrollTo(legEl);
+    }
+  }
 }
 window.expandToCity = expandToCity;

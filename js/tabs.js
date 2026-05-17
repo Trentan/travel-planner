@@ -18,8 +18,8 @@ function toggleStayRowDetails(stayId) {
 function renderStayDetailBlock(title, value, extraClass = '') {
   return `
     <div class="stay-detail-block ${extraClass}">
-      <span class="stay-detail-label">${title}</span>
-      <span class="stay-detail-value">${value || '—'}</span>
+      <span class="stay-detail-label">${escapeHtmlText(title)}</span>
+      <span class="stay-detail-value">${escapeHtmlText(value || '—')}</span>
     </div>
   `;
 }
@@ -62,7 +62,7 @@ function renderStayStatusCostSummary(stay, status, statusIcon) {
   const statusColor = statusColors[normalizedStatus] || statusColors.planned;
   const statusIconGlyph = statusIcons[normalizedStatus] || '⏳';
   const mobileMeta = typeof renderMobileStatusCostMeta === 'function'
-    ? renderMobileStatusCostMeta({
+      ? renderMobileStatusCostMeta({
         status: normalizedStatus,
         costValue: stay.totalCost || '0',
         bookingReference: stay.bookingRef || '',
@@ -72,13 +72,36 @@ function renderStayStatusCostSummary(stay, status, statusIcon) {
         metaClass: 'stay-status-cost-meta mobile-status-cost-meta',
         editableCost: isEditMode
       })
-    : '';
+      : '';
 
   return `
     <span class="status-badge stay-status-badge" style="--status-color:${statusColor}; cursor:pointer;" onclick="if(${isEditMode})toggleStayStatus(event, '${stay.id}')">
       ${statusIconGlyph} ${statusText}
     </span>
     ${mobileMeta}
+  `;
+}
+
+function isAccomMobileCardLayout() {
+  return typeof isMobileViewport === 'function'
+      ? isMobileViewport()
+      : (typeof window !== 'undefined' && window.innerWidth <= 768);
+}
+
+function renderStayMobileDetails(stay, cityName) {
+  const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
+  const costValue = `$${stay.totalCost || '0'}`;
+
+  return `
+    <div class="stay-detail-grid stay-mobile-detail-grid">
+      ${renderStayDetailBlock('City', cityName)}
+      ${renderStayDetailBlock('Check-in', formatDateShort(stay.checkIn))}
+      ${renderStayDetailBlock('Check-out', formatDateShort(stay.checkOut))}
+      ${renderStayDetailBlock('Nights', String(nights))}
+      ${renderStayDetailBlock('Provider', stay.provider || '—')}
+      ${renderStayDetailBlock('Booking ref', stay.bookingRef || '—')}
+      ${renderStayDetailBlock('Cost', costValue)}
+    </div>
   `;
 }
 
@@ -108,6 +131,107 @@ function buildAccomTab(cityFilter = null) {
         <p class="section-header-note">Click "+ Add Stay" to add your first accommodation.</p>
       </div>
     `;
+    return;
+  }
+
+  const autopopulateHTML = (typeof initAutopopulateButton === 'function') ? initAutopopulateButton() : '';
+
+  const headerHtml = `
+    <div class="section-header accom-header">
+      <h3 class="section-header-title">🏨 Accommodation</h3>
+      <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
+    </div>
+  `;
+
+  if (isAccomMobileCardLayout()) {
+    const slidesHtml = [];
+    const railHtml = [];
+
+    sortedStays.forEach((stay, index) => {
+      const city = citiesData.find(c => c.id === stay.cityId);
+      const cityName = city ? city.name : 'Unknown';
+      const cityColor = city?.colour || '#2C3E50';
+      const status = stay.status === 'pending' ? 'planned' : (stay.status || 'planned');
+      const statusColors = {
+        planned: '#E67E22',
+        booked: '#27AE60',
+        confirmed: '#27AE60',
+        cancelled: '#E74C3C'
+      };
+      const statusIcons = {
+        planned: '⏳',
+        booked: '✓',
+        confirmed: '🎫',
+        cancelled: '❌'
+      };
+      const statusColor = statusColors[status] || statusColors.planned;
+      const statusIcon = statusIcons[status] || '⏳';
+      const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+      const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
+      const checkIn = formatDateShort(stay.checkIn);
+      const checkOut = formatDateShort(stay.checkOut);
+      const isExpanded = isStayRowExpanded(stay.id);
+      const statusMeta = typeof renderMobileStatusCostMeta === 'function'
+          ? renderMobileStatusCostMeta({
+            status,
+            costValue: stay.totalCost || '0',
+            bookingReference: stay.bookingRef || '',
+            statusOnClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
+            costOnBlur: `updateStayField('${stay.id}', 'totalCost', this.innerText)`,
+            statusButtonTitle: 'Change status',
+            metaClass: 'stay-status-cost-meta mobile-status-cost-meta',
+            editableCost: isEditMode
+          })
+          : '';
+      const meta = `
+        ${renderMobileStat('Stay', checkIn, `Out ${checkOut}`)}
+        ${renderMobileStat('Provider', stay.provider || '—', stay.bookingRef ? escapeHtmlText(`#${stay.bookingRef}`) : 'No booking ref')}
+        <div class="mobile-surface-card-stat mobile-surface-card-stat--status">${statusMeta}</div>
+      `;
+      const primaryAction = `
+        <button class="mobile-surface-card-button mobile-surface-card-button--secondary stay-details-btn" onclick="event.stopPropagation(); toggleStayRowDetails('${stay.id}')" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Hide stay details' : 'Show stay details'}">${isExpanded ? 'Hide details' : 'Details'}</button>
+      `;
+      const actions = `
+        <button class="mobile-surface-card-button stay-edit-btn" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit stay">Edit</button>
+        <button class="mobile-surface-card-button mobile-surface-card-button--danger stay-del-btn" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete stay">Delete</button>
+      `;
+      const details = isExpanded ? renderStayMobileDetails(stay, cityName) : '';
+      const cardHtml = renderMobileSurfaceCard({
+        cardClass: 'stay-mobile-card row-accent',
+        accentColor: cityColor,
+        dateLabel: checkIn,
+        title: stay.propertyName || '—',
+        subtitle: [`Out ${checkOut}`, stay.provider || '', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' · '),
+        primaryAction,
+        meta,
+        actions,
+        details,
+        detailsOpen: isExpanded
+      });
+      slidesHtml.push(`
+        <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}">
+          ${cardHtml}
+        </div>
+      `);
+      railHtml.push(`
+        <button type="button" class="mobile-swipe-chip" data-role="mobile-swipe-chip" data-slide-index="${index}" aria-controls="stay-slide-${index}" aria-selected="${index === 0 ? 'true' : 'false'}">
+          <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(cityName)}</span>
+          <span class="mobile-swipe-chip-title">${escapeHtmlText(stay.propertyName || 'Stay')}</span>
+          <span class="mobile-swipe-chip-route">${escapeHtmlText([checkIn, checkOut].filter(Boolean).join(' · '))}</span>
+        </button>
+      `);
+    });
+
+    const mobileHtml = renderMobileSwipePager({
+      pagerClass: 'stay-swipe-pager',
+      pagerKey: 'stay-swipe',
+      railHtml: railHtml.join(''),
+      slidesHtml: slidesHtml.join(''),
+      ariaLabel: 'Accommodation stays'
+    });
+
+    container.innerHTML = headerHtml + autopopulateHTML + mobileHtml;
+    if (typeof setupMobileSwipePagers === 'function') setupMobileSwipePagers(container);
     return;
   }
 
@@ -182,16 +306,6 @@ function buildAccomTab(cityFilter = null) {
   html += `</tbody></table></div>`;
 
   // Add autopopulate button if there are missing stays
-  const autopopulateHTML = (typeof initAutopopulateButton === 'function') ? initAutopopulateButton() : '';
-
-  // Header with title and Add Stay button at the top
-  const headerHtml = `
-    <div class="section-header accom-header">
-      <h3 class="section-header-title">🏨 Accommodation</h3>
-      <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
-    </div>
-  `;
-
   container.innerHTML = headerHtml + autopopulateHTML + html;
 }
 
@@ -432,7 +546,7 @@ function buildBudgetTab() {
     leg.days.forEach(day => {
       // Calculate transport costs from journeys array
       const dayJourneys = journeysData.filter(j =>
-        j.dayDate === day.date && j.fromLocation === day.from && j.toLocation === day.to
+          j.dayDate === day.date && j.fromLocation === day.from && j.toLocation === day.to
       );
       dayJourneys.forEach((j) => {
         legTrans += parseCost(j.cost);
@@ -468,8 +582,8 @@ function buildBudgetTab() {
     if (groupId && matchedJourneyIds.has(groupId)) return;
 
     const label = sortedGroup.length > 0
-      ? (sortedGroup[sortedGroup.length - 1].toLocation || sortedGroup[sortedGroup.length - 1].journeyName || sortedGroup[0].journeyName || 'Transport')
-      : 'Transport';
+        ? (sortedGroup[sortedGroup.length - 1].toLocation || sortedGroup[sortedGroup.length - 1].journeyName || sortedGroup[0].journeyName || 'Transport')
+        : 'Transport';
     const cost = sortedGroup.reduce((sum, journey) => sum + parseCost(journey.cost), 0);
     if (cost <= 0) return;
 
