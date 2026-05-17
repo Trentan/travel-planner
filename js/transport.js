@@ -606,8 +606,8 @@ function renderTransportCarrierMobile(provider, routeCode, bookingReference, sta
     .filter(Boolean)
     .join('');
   const statusNode = isEditable
-    ? `<button type="button" class="status-badge transport-mobile-status-btn" style="background:${statusColor};" onclick="toggleJourneyStatus('${journeyId}')" title="Change status">${statusIcon} ${statusText}</button>`
-    : `<span class="status-badge transport-mobile-status-btn" style="background:${statusColor};">${statusIcon} ${statusText}</span>`;
+    ? `<button type="button" class="status-badge transport-mobile-status-btn" style="--status-color:${statusColor};" onclick="toggleJourneyStatus('${journeyId}')" title="Change status">${statusIcon} ${statusText}</button>`
+    : `<span class="status-badge transport-mobile-status-btn" style="--status-color:${statusColor};">${statusIcon} ${statusText}</span>`;
 
   return `
     <div class="mobile-table-meta transport-carrier-meta">
@@ -663,8 +663,8 @@ function buildTransportTab(cityFilter = null) {
   }
 
   let html = `
-    <div class="transport-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-      <h3 style="margin:0; font-family:'Playfair Display',serif; color:#2C3E50;">✈ Transport</h3>
+    <div class="section-header transport-header">
+      <h3 class="section-header-title">✈ Transport</h3>
       <button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>
     </div>
   `;
@@ -672,7 +672,7 @@ function buildTransportTab(cityFilter = null) {
   if (toShow.length === 0) {
     html += `<div class="empty-placeholder">
       <p>No journeys planned yet.</p>
-      <p style="font-size:0.9rem;color:#666;margin-top:0.5rem;">Click "+ Add Journey" to add your first transport booking.</p>
+      <p class="section-header-note">Click "+ Add Journey" to add your first transport booking.</p>
     </div>`;
     container.innerHTML = html;
     return;
@@ -692,7 +692,7 @@ function buildTransportTab(cityFilter = null) {
     <table class="data-table transport-table mobile-table">
       <thead>
         <tr>
-          <th style="width:28px;"></th>
+          <th class="transport-expand-col" style="width:28px;"></th>
           <th>Journey</th>
           <th>Type</th>
           <th>Route</th>
@@ -762,7 +762,7 @@ const durationDisplay = durationHours !== null ? `${durationHours}h` : calculate
       : `<div class="journey-name-main">${nameDisplay}</div>`;
 
     html += `
-      <tr class="journey-parent-row ${isMultiLeg ? 'multi-leg-row' : ''}" data-group="${gid}" style="border-left:3px solid ${statusColor};">
+      <tr class="journey-parent-row row-accent ${isMultiLeg ? 'multi-leg-row' : ''}" data-group="${gid}" style="--row-border-color:${statusColor};">
         <td class="transport-expand-col" data-label="Expand">${desktopExpandControl}</td>
         <td class="journey-name-col" data-label="Journey" title="${rep.journeyName || ''}">
           ${journeyNameCell}
@@ -782,7 +782,7 @@ const durationDisplay = durationHours !== null ? `${durationHours}h` : calculate
         <td class="transport-routecode-col" data-label="Code">${rep.routeCode || '—'}</td>
         <td class="transport-bookingref-col" data-label="Booking Ref">${rep.bookingReference || '—'}</td>
         <td class="transport-status-col" data-label="Status">
-          <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
+          <span class="status-badge" style="--status-color:${statusColor}; cursor:pointer;" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
             ${statusIcon} ${statusText}
           </span>
           ${renderTransportStatusCostMobile(statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.bookingReference, rep.id, isEditMode)}
@@ -1109,9 +1109,9 @@ function _updateSegmentList() {
   if (labelEl) {
     if (_activeSegmentIndex >= 0 && _activeSegmentIndex < totalSegments) {
       const seg = _pendingSegments[_activeSegmentIndex];
-      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; margin-right: 6px;">${_activeSegmentIndex + 1}</span> Editing: ${seg.fromLocation} → ${seg.toLocation}`;
+      labelEl.innerHTML = `<span class="segment-index-badge">${_activeSegmentIndex + 1}</span> Editing: ${seg.fromLocation} → ${seg.toLocation}`;
     } else {
-      labelEl.innerHTML = `<span style="background: #2980B9; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; margin-right: 6px;">${totalSegments + 1}</span> Segment ${totalSegments + 1} — entering details`;
+      labelEl.innerHTML = `<span class="segment-index-badge">${totalSegments + 1}</span> Segment ${totalSegments + 1} — entering details`;
     }
   }
 
@@ -1121,7 +1121,7 @@ function _updateSegmentList() {
 
     _pendingSegments.forEach((seg, i) => {
       const isActive = _activeSegmentIndex === i;
-      trackerHtml += `<div class="segment-pill ${isActive ? 'active' : 'completed'}" onclick="editPendingSegment(${i})" title="${isActive ? 'Currently editing' : 'Click to edit'}" style="cursor: pointer;"><span class="pill-num">${i + 1}</span> ${seg.fromLocation} → ${seg.toLocation}</div>`;
+      trackerHtml += `<div class="segment-pill ${isActive ? 'active' : 'completed'} is-clickable" onclick="editPendingSegment(${i})" title="${isActive ? 'Currently editing' : 'Click to edit'}"><span class="pill-num">${i + 1}</span> ${seg.fromLocation} → ${seg.toLocation}</div>`;
       if (i < totalSegments - 1) {
         trackerHtml += '<div class="segment-arrow">➔</div>';
       }

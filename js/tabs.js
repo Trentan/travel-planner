@@ -75,7 +75,7 @@ function renderStayStatusCostSummary(stay, status, statusIcon) {
     : '';
 
   return `
-    <span class="status-badge stay-status-badge" style="background:${statusColor};cursor:pointer;" onclick="if(${isEditMode})toggleStayStatus(event, '${stay.id}')">
+    <span class="status-badge stay-status-badge" style="--status-color:${statusColor}; cursor:pointer;" onclick="if(${isEditMode})toggleStayStatus(event, '${stay.id}')">
       ${statusIconGlyph} ${statusText}
     </span>
     ${mobileMeta}
@@ -99,13 +99,13 @@ function buildAccomTab(cityFilter = null) {
 
   if (sortedStays.length === 0) {
     container.innerHTML = `
-      <div class="accom-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <h3 style="margin:0; font-family:'Playfair Display',serif; color:#2C3E50;">🏨 Accommodation</h3>
+      <div class="section-header accom-header">
+        <h3 class="section-header-title">🏨 Accommodation</h3>
         <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
       </div>
       <div class="empty-placeholder">
         <p>No stays found.</p>
-        <p style="font-size:0.9rem;color:#666;margin-top:0.5rem;">Click "+ Add Stay" to add your first accommodation.</p>
+        <p class="section-header-note">Click "+ Add Stay" to add your first accommodation.</p>
       </div>
     `;
     return;
@@ -153,7 +153,7 @@ function buildAccomTab(cityFilter = null) {
     const statusColor = statusColors[status] || statusColors.planned;
     const statusIcon = statusIcons[status] || '⏳';
 
-    html += `<tr class="stay-parent-row" style="border-left-color: ${cityColor}">
+    html += `<tr class="stay-parent-row row-accent" style="--row-border-color:${cityColor}">
       <td class="city-col" data-label="City">${getCityFlagHTML(cityName)} ${cityName}</td>
       <td class="property-col" data-label="Property">
         <span class="stay-property-name" contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)">${escapeHtml(stay.propertyName)}</span>
@@ -169,7 +169,7 @@ function buildAccomTab(cityFilter = null) {
       <td class="stay-status-col" data-label="Status">
         ${renderStayStatusCostSummary(stay, status, statusIcon)}
       </td>
-      <td class="budget-field" data-label="Cost" style="width:100px;">
+      <td class="budget-field budget-field--fixed" data-label="Cost">
         $<span contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'totalCost', this.innerText)">${stay.totalCost || '0'}</span>
       </td>
       <td class="stay-actions-col" data-label="Actions">
@@ -186,8 +186,8 @@ function buildAccomTab(cityFilter = null) {
 
   // Header with title and Add Stay button at the top
   const headerHtml = `
-    <div class="accom-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-      <h3 style="margin:0; font-family:'Playfair Display',serif; color:#2C3E50;">🏨 Accommodation</h3>
+    <div class="section-header accom-header">
+      <h3 class="section-header-title">🏨 Accommodation</h3>
       <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
     </div>
   `;

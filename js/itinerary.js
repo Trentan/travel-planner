@@ -32,17 +32,16 @@ function escapeCompactText(text) {
 function renderCompactMetaSuffix(value) {
   const trimmed = String(value || '').trim();
   if (!trimmed) return '';
-  return ` <span style="color:#888; font-size:10px; font-style:italic;">[${escapeCompactText(trimmed)}]</span>`;
+  return ` <span class="compact-meta-suffix">[${escapeCompactText(trimmed)}]</span>`;
 }
 
 function renderCompactEmojiLine({ emoji, text, duration = '', done = false }) {
   const cleanText = escapeCompactText(stripCompactLeadingEmoji(text));
   const suffix = renderCompactMetaSuffix(duration);
-  const textStyle = done ? 'text-decoration:line-through; opacity:0.65;' : '';
   return `
     <span class="compact-line">
       <span class="compact-line-emoji">${emoji}</span>
-      <span class="compact-line-text" style="${textStyle}">${cleanText}${suffix}</span>
+      <span class="compact-line-text ${done ? 'is-done' : ''}">${cleanText}${suffix}</span>
     </span>
   `;
 }
@@ -475,7 +474,7 @@ function buildItinerary() {
           const badgeIcon = isCompleted ? '✓' : '⏳';
           const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
           const categoryEmoji = getCategoryEmoji(activity.category);
-          return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge" style="background: ${badgeColor};" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · $${activity.estCost}</span><button class="action-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})" style="margin-left:0.25rem; padding:0.3rem 0.65rem; border-radius:999px; font-size:0.72rem; background:${isAssigned ? '#2C3E50' : 'white'}; color:${isAssigned ? 'white' : '#2C3E50'}; border-color:${isAssigned ? '#2C3E50' : 'var(--border)'};">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
+          return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge" style="background: ${badgeColor};" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · $${activity.estCost}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
         }).join('')}</ul>
         <button class="add-btn" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
       </div>
@@ -536,7 +535,7 @@ function buildItinerary() {
                 <button class="del-btn" title="Remove Journey" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); rebuildCurrentView();">×</button>
                 <span class="cost-item-text">${label}${timeHint}</span>
                 <div class="cost-item-actions">
-                  <span class="status-badge" style="background:${statusColor}; ${isEditMode ? 'cursor:pointer;' : ''}" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}');">${statusIcon} ${status === 'booked' ? 'Booked' : 'Planned'}</span>
+                  <span class="status-badge ${isEditMode ? 'status-badge-clickable' : ''}" style="--status-color:${statusColor};" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}');">${statusIcon} ${status === 'booked' ? 'Booked' : 'Planned'}</span>
                   ${showRef ? `<input type="text" class="booking-ref-input confirmed" value="${journey.bookingReference || ''}" placeholder="Ref #" onchange="event.stopPropagation(); updateJourneyBookingRef('${journey.id}', this.value);" ${isEditMode ? '' : 'disabled'}/>` : ''}
                   <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${journey.id}', this.innerText)">${journey.cost || '0'}</span></span>
                 </div>
@@ -556,7 +555,7 @@ ${(() => {
       return `<div class="cost-item">
         <span class="cost-item-text">${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` via ${info.provider}` : ''}${info.cost ? ` ($${info.cost})` : ''}</span>
         <div class="cost-item-actions">
-          <span class="status-badge" style="background:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✕ Cancelled' : '⏳ Pending'}</span>
+          <span class="status-badge" style="--status-color:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✕ Cancelled' : '⏳ Pending'}</span>
           ${info.bookingRef ? `<span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${info.bookingRef}</span>` : ''}
         </div>
       </div>`;
@@ -594,15 +593,7 @@ function renderActivityActionButtons(root) {
     btn.textContent = icon;
     btn.setAttribute('aria-label', label);
     btn.setAttribute('title', label);
-    btn.style.width = '2.1rem';
-    btn.style.height = '2.1rem';
-    btn.style.padding = '0';
-    btn.style.display = 'inline-flex';
-    btn.style.alignItems = 'center';
-    btn.style.justifyContent = 'center';
-    btn.style.borderRadius = '999px';
-    btn.style.fontSize = '0.95rem';
-    btn.style.lineHeight = '1';
+    btn.classList.add('activity-action-btn');
   });
 }
 

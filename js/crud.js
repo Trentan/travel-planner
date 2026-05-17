@@ -45,7 +45,7 @@ function addFood(legIdx) {
   modal.className = 'modal-overlay';
   modal.style.display = 'flex';
   modal.innerHTML = `
-    <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-content modal-sm">
       <div class="modal-header">
         <h2>🍽️ Add Food Item</h2>
         <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
@@ -53,16 +53,16 @@ function addFood(legIdx) {
       <div class="modal-body">
         <div class="ai-form-group">
           <label>Food Item</label>
-          <input type="text" id="foodName" placeholder="e.g., Try local pizza" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          <input type="text" id="foodName" class="form-control form-control--compact" placeholder="e.g., Try local pizza">
         </div>
         <div class="ai-form-group">
           <label>Estimated Cost ($)</label>
-          <input type="text" id="foodCost" placeholder="0" value="0" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          <input type="text" id="foodCost" class="form-control form-control--compact" placeholder="0" value="0">
         </div>
       </div>
       <div class="modal-footer">
         <button class="action-btn" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
-        <button class="action-btn" style="background: #2C3E50; color: white;" id="saveFoodBtn">Save Food Item</button>
+        <button class="action-btn action-btn-secondary" id="saveFoodBtn">Save Food Item</button>
       </div>
     </div>
   `;
@@ -107,7 +107,7 @@ function _openActivityModal(legIdx, activityIdx = null) {
   modal.style.display = 'flex';
   const defaults = _splitActivityTitle(activity?.title || '');
   modal.innerHTML = `
-    <div class="modal-content" style="max-width: 420px;">
+    <div class="modal-content modal-md">
       <div class="modal-header">
         <h2>${isEditing ? '✎ Edit Suggested Activity' : '➕ Add Suggested Activity'}</h2>
         <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
@@ -115,7 +115,7 @@ function _openActivityModal(legIdx, activityIdx = null) {
       <div class="modal-body">
         <div class="ai-form-group">
           <label>Category</label>
-          <select id="activityCategory" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          <select id="activityCategory" class="form-control form-control--compact">
             <option value="fitness">🏃 Fitness</option>
             <option value="sight" selected>🏛️ Sight</option>
             <option value="attraction">🎢 Attraction</option>
@@ -126,24 +126,24 @@ function _openActivityModal(legIdx, activityIdx = null) {
         </div>
         <div class="ai-form-group">
           <label>Description</label>
-          <input type="text" id="activityTitle" placeholder="e.g., Morning yoga in the park" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          <input type="text" id="activityTitle" class="form-control form-control--compact" placeholder="e.g., Morning yoga in the park">
         </div>
         <div class="ai-form-group">
           <label>Location</label>
-          <input type="text" id="activityLocation" placeholder="e.g., Central Park" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          <input type="text" id="activityLocation" class="form-control form-control--compact" placeholder="e.g., Central Park">
         </div>
         <div class="ai-form-group">
           <label>Estimated Time</label>
-          <input type="text" id="activityTime" placeholder="e.g., 1 hr" value="1 hr" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          <input type="text" id="activityTime" class="form-control form-control--compact" placeholder="e.g., 1 hr" value="1 hr">
         </div>
         <div class="ai-form-group">
           <label>Estimated Cost ($)</label>
-          <input type="text" id="activityCost" placeholder="0" value="0" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+          <input type="text" id="activityCost" class="form-control form-control--compact" placeholder="0" value="0">
         </div>
       </div>
       <div class="modal-footer">
         <button class="action-btn" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
-        <button class="action-btn" style="background: #2C3E50; color: white;" id="saveActivityBtn">${isEditing ? 'Save Changes' : 'Save Activity'}</button>
+        <button class="action-btn action-btn-secondary" id="saveActivityBtn">${isEditing ? 'Save Changes' : 'Save Activity'}</button>
       </div>
     </div>
   `;
