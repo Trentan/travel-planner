@@ -4591,10 +4591,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     display: inline;
   }
   .accom-table thead th:first-child {
-    display: table-cell !important;
-  }
-  .data-table thead {
-    display: table-header-group !important;
+    display: none !important;
   }
 
   .stay-expand-col,
@@ -4607,17 +4604,16 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   .transport-mobile-expand,
   .transport-schedule-meta,
   .transport-carrier-meta,
+  .transport-status-cost-meta,
   .transport-mobile-menu-btn,
   .stay-mobile-meta,
-  .stay-date-meta {
+  .stay-date-meta,
+  .mobile-status-cost-meta,
+  .stay-status-cost-meta {
     display: none !important;
   }
   .accom-table .stay-status-badge {
     display: inline-flex;
-  }
-  .accom-table .stay-status-cost-meta,
-  .mobile-status-cost-meta {
-    display: none !important;
   }
 }
 
