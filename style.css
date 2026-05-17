@@ -170,7 +170,7 @@ body {
 
   .transport-table .journey-parent-row > td.transport-actions-col {
     display: table-cell;
-    width: 12%;
+    width: 5%;
     text-align: center;
     vertical-align: middle;
     padding-right: 0.55rem;
@@ -1383,6 +1383,8 @@ main {
     color: var(--muted);
     font-family: var(--font-mono);
   }
+  .mobile-status-cost-meta .transport-mobile-cost-value,
+  .stay-status-cost-meta .transport-mobile-cost-value {
     -webkit-appearance: none;
     outline: none;
     box-shadow: none;
@@ -4590,11 +4592,6 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   .transport-table .transport-departs-col .transport-departs-desktop {
     display: inline;
   }
-  .accom-table thead th:first-child {
-    display: none !important;
-  }
-
-  .stay-expand-col,
   .stay-detail-row {
     display: none !important;
   }
@@ -4885,15 +4882,15 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
 
   .transport-table .transport-actions-col .transport-edit-btn {
-    width: 1.8rem;
-    min-width: 1.8rem;
-    height: 1.8rem;
-    min-height: 1.8rem;
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    min-height: 28px;
     padding: 0;
     border-radius: 999px;
-    border: 1px solid rgba(45, 156, 219, 0.28);
-    background: rgba(45, 156, 219, 0.08);
-    color: #2d9cdb;
+    border: 1px solid rgba(36, 72, 93, 0.14);
+    background: rgba(36, 72, 93, 0.04);
+    color: var(--accent-strong);
     font-size: 0;
     font-weight: 700;
     display: inline-flex;
@@ -5583,17 +5580,71 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
 
   .transport-table .transport-actions-col .edit-btn.transport-edit-btn {
-    font-size: 1rem;
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(36, 72, 93, 0.14) !important;
+    background: rgba(36, 72, 93, 0.04) !important;
+    color: var(--accent-strong) !important;
+    font-size: 0 !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 1 !important;
+    position: relative !important;
+  }
+
+  .transport-table .transport-actions-col .edit-btn.transport-edit-btn::before {
+    content: '\270E';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2d9cdb;
+    font-size: 0.72rem;
     line-height: 1;
-    padding: 0 4px;
-    min-width: 0;
-    min-height: 0;
-    width: auto;
-    height: auto;
-    border: 0;
-    background: none;
-    color: #3498DB;
-    opacity: 0.3;
+  }
+
+  .transport-table .transport-actions-col .del-btn.transport-del-btn {
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(36, 72, 93, 0.14) !important;
+    background: rgba(231, 76, 60, 0.08) !important;
+    color: #B23B2B !important;
+    font-size: 0 !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 1 !important;
+    margin-left: 0.2rem !important;
+    position: relative !important;
+  }
+
+  .transport-table .transport-actions-col .del-btn.transport-del-btn::before {
+    content: '\00D7';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.92rem;
+    line-height: 1;
+  }
+
+  .transport-table .journey-parent-row > td.transport-actions-col {
+    border-right: 1px solid rgba(36, 72, 93, 0.08);
   }
 }
 
@@ -5610,4 +5661,151 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     display: inline-flex !important;
   }
 }
+
+@media (min-width: 769px) {
+  .transport-table .transport-actions-col {
+    width: 5%;
+    text-align: center;
+    vertical-align: middle;
+    padding-right: 0.55rem;
+  }
+
+  .transport-table .transport-actions-col .edit-btn,
+  .transport-table .transport-actions-col .del-btn {
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    min-height: 28px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(36, 72, 93, 0.14);
+    font-size: 0;
+    line-height: 1;
+    font-weight: 700;
+    position: relative;
+    opacity: 1;
+  }
+
+  .transport-table .transport-actions-col .edit-btn {
+    background: rgba(36, 72, 93, 0.04);
+    color: var(--accent-strong);
+  }
+
+  .transport-table .transport-actions-col .edit-btn::before {
+    content: '\270E';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2d9cdb;
+    font-size: 0.72rem;
+    line-height: 1;
+  }
+
+  .transport-table .transport-actions-col .del-btn {
+    background: rgba(231, 76, 60, 0.08);
+    color: #B23B2B;
+    margin-left: 0.2rem;
+  }
+
+  .transport-table .transport-actions-col .del-btn::before {
+    content: '\00D7';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.92rem;
+    line-height: 1;
+  }
+
+  .accom-table .stay-actions-col {
+    width: 5%;
+    text-align: center;
+    vertical-align: middle;
+    padding-right: 0.55rem;
+  }
+
+  .accom-table .stay-actions-col .edit-btn,
+  .accom-table .stay-actions-col .del-btn {
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    min-height: 28px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(36, 72, 93, 0.14);
+    font-size: 0;
+    line-height: 1;
+    font-weight: 700;
+    position: relative;
+    opacity: 1;
+  }
+
+  .accom-table .stay-actions-col .edit-btn {
+    background: rgba(36, 72, 93, 0.04);
+    color: var(--accent-strong);
+  }
+
+  .accom-table .stay-actions-col .edit-btn::before {
+    content: '\270E';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2d9cdb;
+    font-size: 0.72rem;
+    line-height: 1;
+  }
+
+  .accom-table .stay-actions-col .del-btn {
+    background: rgba(231, 76, 60, 0.08);
+    color: #B23B2B;
+    margin-left: 0.2rem;
+  }
+
+  .accom-table .stay-actions-col .del-btn::before {
+    content: '\00D7';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.92rem;
+    line-height: 1;
+  }
+
+  .transport-table .transport-actions-col .del-btn {
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    min-height: 28px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(36, 72, 93, 0.14);
+    background: rgba(231, 76, 60, 0.08);
+    color: #B23B2B;
+    font-size: 0;
+    line-height: 1;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.2rem;
+  }
+
+  .transport-table .transport-actions-col .del-btn::before {
+    content: '\00D7';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 0.92rem;
+    line-height: 1;
+  }
+}
+
 

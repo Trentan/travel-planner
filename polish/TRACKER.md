@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
-Last updated: 2026-05-16
-Progress: 18/24 items complete
+Last updated: 2026-05-17
+Progress: 19/24 items complete
 
 ---
 
@@ -23,8 +23,8 @@ Progress: 18/24 items complete
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
 | [WI-021](./items/WI-021.md) | Desktop Itinerary Is Visually Busy | Medium (2-8 hrs) | Todo | [WI-021-Before](./screenshots/before/desktop-01-home.png) | [WI-021-Proposed](./items/proposals/WI-021-proposal.png) | - | - |
-| [WI-023](./items/WI-023.md) | Status And Cost Controls Lack Consistent Mobile Styling | Medium (2-8 hrs) | Review | [WI-023-Before](./screenshots/before/mobile-06-transport.png) | [WI-023-Proposed](./items/proposals/WI-023-proposal.png) | [WI-023-After](./screenshots/after/WI-023-after.png) | - |
 | [WI-024](./items/WI-024.md) | Visual System Uses Too Many Inline Styles | Major (1-3 days) | Todo | [WI-024-Before](./screenshots/before/desktop-03-header.png) | [WI-024-Proposed](./items/proposals/WI-024-proposal.png) | - | - |
+| [WI-025](./items/WI-025.md) | Mobile Transport And Accommodation Cards Need Consistent Styling | Medium (2-8 hrs) | Todo | [WI-025-Before](./screenshots/before/mobile-06-transport.png) | [WI-025-Proposed](./items/proposals/WI-025-proposal.png) | - | - |
 
 ## Completed
 
@@ -47,6 +47,7 @@ Progress: 18/24 items complete
 | [WI-003](./items/WI-003.md) | Journey Modal Clips Horizontally On Mobile | [WI-003-Before](./screenshots/before/mobile-08-journey-modal-top.png) | [WI-003-Proposed](./items/proposals/WI-003-proposal.png) | [WI-003-After](./screenshots/after/WI-003-after.png) | 2026-05-16 |
 | [WI-002](./items/WI-002.md) | Mobile Top Chrome Consumes Too Much Viewport | [WI-002-Before](./screenshots/before/mobile-01-home.png) | [WI-002-Proposed](./items/proposals/WI-002-proposal.png) | [WI-002-After](./screenshots/after/WI-002-after.png) | 2026-05-16 |
 | [WI-001](./items/WI-001.md) | Desktop App Menu Wraps Into A 154px Header | [WI-001-Before](./screenshots/before/desktop-02-menu-bar.png) | [WI-001-Proposed](./items/proposals/WI-001-proposal.png) | [WI-001-After](./screenshots/after/WI-001-after.png) | 2026-05-16 |
+| [WI-023](./items/WI-023.md) | Accommodation And Transport Table Cleanups Desktop | [WI-023-Before](./screenshots/before/mobile-06-transport.png) | [WI-023-Proposed](./items/proposals/WI-023-proposal.png) | [WI-023-After](./screenshots/after/WI-023-after-10.png) | 2026-05-17 |
 | [WI-022](./items/WI-022.md) | Packing Tab Needs Stronger Empty/Progress Hierarchy | [WI-022-Before](./screenshots/before/desktop-08-packing.png) | [WI-022-Proposed](./items/proposals/WI-022-proposal.png) | [WI-022-After](./screenshots/after/WI-022-after-5.png) | 2026-05-16 |
 
 ---

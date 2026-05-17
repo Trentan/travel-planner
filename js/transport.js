@@ -664,7 +664,7 @@ function buildTransportTab(cityFilter = null) {
 
   let html = `
     <div class="transport-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-      <h3 style="margin:0; font-family:'Playfair Display',serif; color:#2C3E50;"><span class="transport-title-desktop">Transport Itinerary</span><span class="transport-title-mobile">Transport</span></h3>
+      <h3 style="margin:0; font-family:'Playfair Display',serif; color:#2C3E50;">✈ Transport</h3>
       <button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>
     </div>
   `;
@@ -701,15 +701,15 @@ function buildTransportTab(cityFilter = null) {
           <th>Provider</th>
           <th>Code</th>
           <th>Booking Ref</th>
-          <th>Cost</th>
           <th>Status</th>
-        <th>Edit</th>
+          <th>Cost</th>
+          <th>Actions</th>
       </tr>
       <tr class="transport-mobile-head-row" aria-hidden="true">
         <th>Journey</th>
         <th>Schedule</th>
         <th>Carrier</th>
-        <th>Edit</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -781,15 +781,16 @@ const durationDisplay = durationHours !== null ? `${durationHours}h` : calculate
         </td>
         <td class="transport-routecode-col" data-label="Code">${rep.routeCode || '—'}</td>
         <td class="transport-bookingref-col" data-label="Booking Ref">${rep.bookingReference || '—'}</td>
-        <td class="budget-field" data-label="Cost">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
         <td class="transport-status-col" data-label="Status">
           <span class="status-badge" style="background:${statusColor};cursor:pointer;" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
             ${statusIcon} ${statusText}
           </span>
           ${renderTransportStatusCostMobile(statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.bookingReference, rep.id, isEditMode)}
         </td>
-        <td class="transport-actions-col" data-label="Edit">
-          <button class="edit-btn transport-edit-btn" onclick="editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">✎</button>
+        <td class="budget-field" data-label="Cost">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
+        <td class="transport-actions-col" data-label="Actions">
+          <button class="edit-btn transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">✎</button>
+          <button class="del-btn transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">×</button>
         </td>
       </tr>`;
 

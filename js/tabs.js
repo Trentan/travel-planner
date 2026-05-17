@@ -113,7 +113,6 @@ function buildAccomTab(cityFilter = null) {
 
   let html = `<div class="data-table-wrapper accom-table-wrapper mobile-table-wrapper"><table class="data-table accom-table mobile-table"><thead>
     <tr>
-      <th style="width:28px;"></th>
       <th>City</th>
       <th>Property</th>
       <th>Provider</th>
@@ -153,11 +152,8 @@ function buildAccomTab(cityFilter = null) {
     };
     const statusColor = statusColors[status] || statusColors.planned;
     const statusIcon = statusIcons[status] || '⏳';
-    const isExpanded = isStayRowExpanded(stay.id);
-    const expandBtn = `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleStayRowDetails('${stay.id}')" title="Show stay details" aria-expanded="${isExpanded}">${isExpanded ? '▼' : '▶'}</button>`;
 
     html += `<tr class="stay-parent-row" style="border-left-color: ${cityColor}">
-      <td class="stay-expand-col" data-label="Expand">${expandBtn}</td>
       <td class="city-col" data-label="City">${getCityFlagHTML(cityName)} ${cityName}</td>
       <td class="property-col" data-label="Property">
         <span class="stay-property-name" contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)">${escapeHtml(stay.propertyName)}</span>
@@ -181,27 +177,6 @@ function buildAccomTab(cityFilter = null) {
         <button class="del-btn" title="Delete Stay" onclick="event.stopPropagation(); deleteStay('${stay.id}')">×</button>
       </td>
     </tr>`;
-
-    html += `
-      <tr class="stay-detail-row ${isExpanded ? 'expanded' : ''}" data-stay-id="${stay.id}" style="display:${isExpanded ? 'table-row' : 'none'}; border-left-color: ${cityColor}">
-        <td colspan="11">
-          <div class="stay-detail-grid">
-            ${renderStayDetailBlock('Status', `${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}`)}
-            ${renderStayDetailBlock('Booking Ref', stay.bookingRef)}
-            ${renderStayDetailBlock('Provider', stay.provider)}
-            ${renderStayDetailBlock('Nights', String(stay.nights || calculateNights(stay.checkIn, stay.checkOut)))}
-            ${renderStayDetailBlock('Cost', `$${stay.totalCost || '0'}`)}
-            ${stay.notes ? renderStayDetailBlock('Notes', escapeHtml(stay.notes), 'full-width') : ''}
-            <div class="stay-detail-block full-width">
-              <span class="stay-detail-label">Actions</span>
-              <span class="stay-detail-actions">
-                <button class="edit-btn" title="Edit Stay" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')">✎</button>
-                <button class="del-btn" title="Delete Stay" onclick="event.stopPropagation(); deleteStay('${stay.id}')">×</button>
-              </span>
-            </div>
-          </div>
-        </td>
-      </tr>`;
   });
 
   html += `</tbody></table></div>`;
