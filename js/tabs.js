@@ -170,7 +170,6 @@ function buildAccomTab(cityFilter = null) {
       const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
       const checkIn = formatDateShort(stay.checkIn);
       const checkOut = formatDateShort(stay.checkOut);
-      const isExpanded = isStayRowExpanded(stay.id);
       const statusMeta = typeof renderMobileStatusCostMeta === 'function'
           ? renderMobileStatusCostMeta({
             status,
@@ -188,25 +187,21 @@ function buildAccomTab(cityFilter = null) {
         ${renderMobileStat('Provider', stay.provider || '—', stay.bookingRef ? escapeHtmlText(`#${stay.bookingRef}`) : 'No booking ref')}
         <div class="mobile-surface-card-stat mobile-surface-card-stat--status">${statusMeta}</div>
       `;
-      const primaryAction = `
-        <button class="mobile-surface-card-button mobile-surface-card-button--secondary stay-details-btn" onclick="event.stopPropagation(); toggleStayRowDetails('${stay.id}')" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Hide stay details' : 'Show stay details'}">${isExpanded ? 'Hide details' : 'Details'}</button>
-      `;
       const actions = `
         <button class="mobile-surface-card-button stay-edit-btn" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit stay">Edit</button>
         <button class="mobile-surface-card-button mobile-surface-card-button--danger stay-del-btn" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete stay">Delete</button>
       `;
-      const details = isExpanded ? renderStayMobileDetails(stay, cityName) : '';
+      const details = renderStayMobileDetails(stay, cityName);
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'stay-mobile-card row-accent',
         accentColor: cityColor,
         dateLabel: checkIn,
         title: stay.propertyName || '—',
         subtitle: [`Out ${checkOut}`, stay.provider || '', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' · '),
-        primaryAction,
         meta,
         actions,
         details,
-        detailsOpen: isExpanded
+        detailsOpen: true
       });
       slidesHtml.push(`
         <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}">

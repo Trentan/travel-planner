@@ -115,17 +115,27 @@ function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
 
 function renderCompactFoodQuestCard(leg, legIndex) {
   const foodItems = Array.isArray(leg.cityFood) ? leg.cityFood : [];
+  const completedCount = foodItems.filter(item => item && item.done).length;
+  const totalCount = foodItems.length;
+  const legId = leg.id || legIndex;
+  const countLabel = `${completedCount}/${totalCount}`;
+  const progressWidth = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const foodLines = foodItems.length > 0
       ? foodItems.map((item, itemIdx) => renderCompactFoodQuestItem(legIndex, item, itemIdx)).join('')
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
 
-  return renderMobileSurfaceCard({
-    cardClass: 'compact-food-quest-card',
-    accentColor: leg.colour,
-    title: 'Food quests',
-    details: `<div class="compact-food-list">${foodLines}</div>`,
-    detailsOpen: true
-  });
+  return `
+    <article class="mobile-surface-card compact-food-quest-card is-expanded" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+      <div class="compact-food-summary">
+        <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍗</span> Food quests</span>
+        <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
+        <span class="compact-food-summary-count">${escapeCompactText(countLabel)}</span>
+      </div>
+      <div class="mobile-surface-card-details expanded">
+        <div class="compact-food-list">${foodLines}</div>
+      </div>
+    </article>
+  `;
 }
 
 function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
@@ -375,7 +385,10 @@ function setupCompactItineraryPagers(root = document) {
     }
 
     setActive(initialIndex);
-    slides[initialIndex]?.scrollIntoView({ behavior: 'auto', inline: 'start', block: 'nearest' });
+    const initialSlide = slides[initialIndex];
+    if (carousel && initialSlide) {
+      carousel.scrollLeft = Math.max(0, initialSlide.offsetLeft - carousel.offsetLeft);
+    }
   });
 }
 
@@ -843,19 +856,26 @@ function isFoodQuestExpanded(legId) {
 }
 
 function toggleFoodQuestDetails(legId) {
+  const scrollX = window.scrollX || 0;
+  const scrollY = window.scrollY || 0;
   if (expandedFoodQuestLegs.has(legId)) {
     expandedFoodQuestLegs.delete(legId);
   } else {
     expandedFoodQuestLegs.add(legId);
   }
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+  requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }
 
 function buildItinerary() {
   // Check window.isCompactView for cross-module access
   const isCompact = typeof window !== 'undefined' && window.isCompactView;
   if (isCompact) {
-    buildCompactItinerary();
+    if (typeof isMobileViewport === 'function' && isMobileViewport()) {
+      buildCompactItinerary();
+    } else {
+      buildCompactItineraryLegacy();
+    }
     return;
   }
 

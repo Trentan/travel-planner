@@ -23,7 +23,7 @@ Progress: 20/24 items complete
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
 | [WI-021](./items/WI-021.md) | Desktop Itinerary Is Visually Busy | Medium (2-8 hrs) | Todo | [WI-021-Before](./screenshots/before/desktop-01-home.png) | [WI-021-Proposed](./items/proposals/WI-021-proposal.png) | - | - |
-| [WI-025](./items/WI-025.md) | Mobile Transport And Accommodation Cards Need Consistent Styling | Medium (2-8 hrs) | Review | [WI-025-Before](./screenshots/before/mobile-06-transport.png) | [WI-025-Proposed](./items/proposals/WI-025-proposal.png) | [WI-025-After](./screenshots/after/WI-025-after-43-city-nav-mobile.png) | - |
+| [WI-025](./items/WI-025.md) | Mobile Transport And Accommodation Cards Need Consistent Styling | Medium (2-8 hrs) | Review | [WI-025-Before](./screenshots/before/mobile-06-transport.png) | [WI-025-Proposed](./items/proposals/WI-025-proposal.png) | [WI-025-After](./screenshots/after/WI-025-after-54-desktop-compact-itinerary.png) | - |
 
 ## Completed
 

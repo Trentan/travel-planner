@@ -407,9 +407,16 @@ function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
   saveData();
 }
 
-function toggleFoodCompleted(e, legIdx, foodIdx) { appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); buildItinerary(); }
-function toggleDayCompleted(e, legIdx, dayIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].completed = e.target.checked; saveData(); buildItinerary(); }
-function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) { appData[legIdx].days[dayIdx].activityItems[itemIdx].done = e.target.checked; saveData(); buildItinerary(); }
+function rebuildItineraryPreservingScroll() {
+  const scrollX = window.scrollX || 0;
+  const scrollY = window.scrollY || 0;
+  buildItinerary();
+  requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
+}
+
+function toggleFoodCompleted(e, legIdx, foodIdx) { e.stopPropagation(); appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
+function toggleDayCompleted(e, legIdx, dayIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].completed = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
+function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].activityItems[itemIdx].done = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
 
 function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, targetDayIdx) {
   const sourceLeg = appData[sourceLegIdx];

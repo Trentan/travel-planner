@@ -777,7 +777,7 @@ main {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   flex-wrap: wrap;
 }
 
@@ -2811,8 +2811,37 @@ body.mobile-app-mode.compact-view-mode .app-tabs-nav {
 }
 
 body.mobile-app-mode.compact-view-mode .city-nav {
-  padding: 0.3rem 0.35rem;
+  padding: 0.22rem 0.35rem;
   box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+
+body.mobile-app-mode.compact-view-mode .city-nav-list {
+  gap: 0.3rem;
+  padding: 0.05rem 0.75rem 0.05rem 0;
+}
+
+body.mobile-app-mode.compact-view-mode .city-nav-btn {
+  min-height: 32px;
+  padding: 0.28rem 0.58rem;
+  border-radius: 10px;
+  font-size: 0.74rem;
+  line-height: 1.05;
+  box-shadow: 0 3px 8px rgba(26, 36, 47, 0.04);
+}
+
+body.mobile-app-mode.compact-view-mode .city-nav-btn.active {
+  box-shadow: 0 5px 12px rgba(26, 36, 47, 0.14);
+}
+
+body.mobile-app-mode.compact-view-mode .city-nav-content {
+  gap: 0.25rem;
+}
+
+body.mobile-app-mode.compact-view-mode .city-nav-content .city-flag,
+body.mobile-app-mode.compact-view-mode .city-nav-content .city-flag-img {
+  width: 14px;
+  height: 14px;
+  font-size: 0.82rem;
 }
 
 body.mobile-app-mode.compact-view-mode .app-tabs-content {
@@ -3609,7 +3638,7 @@ body.compact-view-mode .compact-activity-copy {
 body.compact-view-mode .compact-day-pager {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 body.compact-view-mode .compact-day-pager-head {
@@ -3651,9 +3680,9 @@ body.compact-view-mode .compact-day-pager-counter {
 
 body.compact-view-mode .compact-day-rail {
   display: flex;
-  gap: 0.55rem;
+  gap: 0.35rem;
   overflow-x: auto;
-  padding: 0.05rem 0 0.15rem;
+  padding: 0.02rem 0 0.08rem;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
@@ -3664,19 +3693,22 @@ body.compact-view-mode .compact-day-rail::-webkit-scrollbar {
 
 body.compact-view-mode .compact-day-chip {
   flex: 0 0 auto;
-  min-width: 10.5rem;
-  max-width: 12.5rem;
-  padding: 0.72rem 0.78rem;
-  border-radius: 18px;
+  min-width: 8.9rem;
+  max-width: 10.6rem;
+  min-height: 50px;
+  padding: 0.44rem 0.55rem;
+  border-radius: 14px;
   border: 1px solid rgba(36, 72, 93, 0.12);
   background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 8px 18px rgba(26, 36, 47, 0.06);
+  box-shadow: 0 6px 14px rgba(26, 36, 47, 0.05);
   color: var(--text);
   text-align: left;
   scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  gap: 0.12rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: center;
+  column-gap: 0.35rem;
+  row-gap: 0.04rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
@@ -3693,24 +3725,39 @@ body.compact-view-mode .compact-day-chip:focus-visible {
 }
 
 body.compact-view-mode .compact-day-chip-day {
+  grid-column: 1;
   font-size: 0.64rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
   font-weight: 800;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 body.compact-view-mode .compact-day-chip-date {
-  font-size: 0.84rem;
-  line-height: 1.25;
+  grid-column: 2;
+  min-width: 0;
+  font-size: 0.78rem;
+  line-height: 1.12;
   font-weight: 800;
   color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 body.compact-view-mode .compact-day-chip-route {
-  font-size: 0.74rem;
-  line-height: 1.25;
+  grid-column: 1 / -1;
+  min-width: 0;
+  font-size: 0.69rem;
+  line-height: 1.12;
   color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 body.compact-view-mode .compact-day-progress {
@@ -3731,11 +3778,11 @@ body.compact-view-mode .compact-day-progress-fill {
 
 body.compact-view-mode .compact-day-carousel {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-padding-inline: 0.1rem;
-  padding-bottom: 0.2rem;
+  padding-bottom: 0.12rem;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -4311,7 +4358,6 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
 }
 
 .transport-header h3 {
@@ -6490,7 +6536,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
   .section-header {
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 0.55rem;
   }
 
   .section-header .action-btn {
@@ -6508,7 +6554,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   .mobile-surface-card {
     position: relative;
     overflow: hidden;
-    padding: 0.92rem 0.9rem 0.88rem;
+    padding: 0.82rem 0.8rem 0.78rem;
     border-radius: 22px;
     border: 1px solid rgba(36, 72, 93, 0.1);
     border-left: 4px solid var(--card-accent, var(--accent));
@@ -6531,7 +6577,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 0.8rem;
+    gap: 0.6rem;
   }
 
   .mobile-surface-card-headline {
@@ -6613,7 +6659,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
 
   .mobile-surface-card-summary {
-    margin-top: 0.72rem;
+    margin-top: 0.58rem;
     color: var(--text);
     font-size: 0.84rem;
     line-height: 1.35;
@@ -6626,13 +6672,13 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   .mobile-surface-card-meta-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.58rem;
-    margin-top: 0.82rem;
+    gap: 0.45rem;
+    margin-top: 0.62rem;
   }
 
   .mobile-surface-card-stat {
-    padding: 0.68rem 0.72rem;
-    border-radius: 16px;
+    padding: 0.55rem 0.6rem;
+    border-radius: 14px;
     background: rgba(255, 255, 255, 0.78);
     border: 1px solid rgba(36, 72, 93, 0.08);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
@@ -6695,8 +6741,8 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
   .mobile-surface-card-actions {
     display: flex;
-    gap: 0.55rem;
-    margin-top: 0.82rem;
+    gap: 0.42rem;
+    margin-top: 0.62rem;
     flex-wrap: wrap;
   }
 
@@ -6706,8 +6752,8 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
   .mobile-surface-card-details {
     display: none;
-    margin-top: 0.82rem;
-    padding-top: 0.82rem;
+    margin-top: 0.62rem;
+    padding-top: 0.62rem;
     border-top: 1px solid rgba(36, 72, 93, 0.1);
   }
 
@@ -6815,7 +6861,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   .mobile-swipe-pager {
     display: flex;
     flex-direction: column;
-    gap: 0.62rem;
+    gap: 0.45rem;
   }
 
   .mobile-swipe-pager-head {
@@ -6871,9 +6917,9 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
   .mobile-swipe-rail {
     display: flex;
-    gap: 0.55rem;
+    gap: 0.36rem;
     overflow-x: auto;
-    padding: 0.05rem 0.2rem 0.15rem;
+    padding: 0.02rem 0.08rem 0.08rem;
     scroll-padding-inline: 0.7rem;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
@@ -6886,19 +6932,21 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
   .mobile-swipe-chip {
     flex: 0 0 auto;
-    min-width: 10.5rem;
-    max-width: 13rem;
-    padding: 0.72rem 0.78rem;
-    border-radius: 18px;
+    min-width: 9.4rem;
+    max-width: 11.2rem;
+    min-height: 58px;
+    padding: 0.42rem 0.55rem;
+    border-radius: 14px;
     border: 1px solid rgba(36, 72, 93, 0.12);
     background: rgba(255, 255, 255, 0.82);
-    box-shadow: 0 8px 18px rgba(26, 36, 47, 0.06);
+    box-shadow: 0 6px 14px rgba(26, 36, 47, 0.05);
     color: var(--text);
     text-align: left;
     scroll-snap-align: start;
     display: flex;
     flex-direction: column;
-    gap: 0.12rem;
+    justify-content: center;
+    gap: 0.05rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
   }
 
@@ -6915,24 +6963,36 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
 
   .mobile-swipe-chip-eyebrow {
-    font-size: 0.62rem;
+    min-width: 0;
+    font-size: 0.6rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mobile-swipe-chip-title {
-    font-size: 0.84rem;
-    line-height: 1.25;
+    min-width: 0;
+    font-size: 0.78rem;
+    line-height: 1.1;
     font-weight: 800;
     color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mobile-swipe-chip-route {
-    font-size: 0.74rem;
-    line-height: 1.25;
+    min-width: 0;
+    font-size: 0.69rem;
+    line-height: 1.1;
     color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mobile-swipe-progress {
@@ -6953,11 +7013,11 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
   .mobile-swipe-carousel {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.5rem;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: 0.1rem;
-    padding-bottom: 0.2rem;
+    padding-bottom: 0.12rem;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
@@ -7041,9 +7101,74 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
 
   .compact-food-quest-card .mobile-surface-card-details {
+    margin-top: 0.42rem;
+    padding-top: 0.42rem;
+  }
+
+  .compact-food-summary {
+    position: relative;
+    width: 100%;
+    min-height: 26px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    display: grid;
+    grid-template-columns: auto minmax(2.75rem, 1fr) auto;
+    align-items: center;
+    gap: 0.34rem;
+    text-align: left;
+    cursor: default;
+  }
+
+  .compact-food-summary-title {
+    min-width: 0;
+    font-size: 0.78rem;
+    line-height: 1.1;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+    white-space: nowrap;
+  }
+
+  .compact-food-summary-icon {
+    font-size: 0.82rem;
+    line-height: 1;
+  }
+
+  .compact-food-summary-meter {
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(36, 72, 93, 0.1);
+    overflow: hidden;
+  }
+
+  .compact-food-summary-meter span {
     display: block;
-    margin-top: 0.62rem;
-    padding-top: 0.62rem;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--accent), #5f7f96);
+  }
+
+  .compact-food-summary-count {
+    flex: 0 0 auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.66rem;
+    font-weight: 800;
+    color: var(--accent-strong);
+    background: rgba(36, 72, 93, 0.08);
+    border: 1px solid rgba(36, 72, 93, 0.1);
+    border-radius: 999px;
+    padding: 0.08rem 0.32rem;
+  }
+
+  .compact-food-summary-chevron {
+    color: var(--accent-strong);
+    font-size: 0.76rem;
+    font-weight: 800;
+    line-height: 1;
   }
 
   .compact-food-quest-card .compact-food-list {
@@ -7173,6 +7298,113 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   .transport-mobile-card .transport-segment-mobile-provider,
   .transport-mobile-card .transport-segment-mobile-journey {
     min-width: 0;
+  }
+
+  body.mobile-app-mode.compact-view-mode .section-header {
+    gap: 0.42rem;
+    margin-bottom: 0.42rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .transport-header,
+  body.mobile-app-mode.compact-view-mode .accom-header {
+    padding-bottom: 0;
+    align-items: center !important;
+  }
+
+  body.mobile-app-mode.compact-view-mode .transport-header h3,
+  body.mobile-app-mode.compact-view-mode .accom-header h3 {
+    font-size: 1.2rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .section-header .action-btn {
+    min-height: 32px;
+    padding: 0.32rem 0.58rem;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    line-height: 1.1;
+    box-shadow: none;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-card-stack,
+  body.mobile-app-mode.compact-view-mode .mobile-swipe-pager {
+    gap: 0.38rem;
+    margin-top: 0.55rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card {
+    padding: 0.68rem 0.64rem 0.66rem;
+    border-radius: 18px;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-head,
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-headline-line {
+    gap: 0.32rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-date {
+    font-size: 0.92rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-title {
+    font-size: 0.8rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-subtitle {
+    font-size: 0.7rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-summary,
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-meta-grid,
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-actions,
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-details {
+    margin-top: 0.48rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-meta-grid {
+    gap: 0.36rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-stat {
+    padding: 0.44rem 0.5rem;
+    border-radius: 12px;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-button {
+    min-height: 34px;
+    padding: 0.38rem 0.58rem;
+    border-radius: 10px;
+    font-size: 0.72rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-surface-card-details {
+    padding-top: 0.48rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-swipe-rail,
+  body.mobile-app-mode.compact-view-mode .compact-day-rail {
+    gap: 0.28rem;
+    padding-bottom: 0.05rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-swipe-chip {
+    min-width: 8.6rem;
+    max-width: 10rem;
+    min-height: 56px;
+    padding: 0.34rem 0.46rem;
+    border-radius: 12px;
+  }
+
+  body.mobile-app-mode.compact-view-mode .compact-day-chip {
+    min-width: 8.1rem;
+    max-width: 9.6rem;
+    min-height: 46px;
+    padding: 0.34rem 0.46rem;
+    border-radius: 12px;
+  }
+
+  body.mobile-app-mode.compact-view-mode .mobile-swipe-chip.active,
+  body.mobile-app-mode.compact-view-mode .compact-day-chip.active {
+    transform: translateY(-1px);
   }
 
   .day-card,

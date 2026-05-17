@@ -228,8 +228,8 @@ function renderMobileSurfaceCard({
       </div>
       ${summary ? `<div class="mobile-surface-card-summary">${summary}</div>` : ''}
       ${meta ? `<div class="mobile-surface-card-meta-grid">${meta}</div>` : ''}
-      ${actions ? `<div class="mobile-surface-card-actions">${actions}</div>` : ''}
       ${details ? `<div class="mobile-surface-card-details ${detailsOpen ? 'expanded' : ''}">${details}</div>` : ''}
+      ${actions ? `<div class="mobile-surface-card-actions">${actions}</div>` : ''}
     </article>
   `;
 }
@@ -360,7 +360,10 @@ function setupMobileSwipePagers(root = document) {
     }
 
     setActive(initialIndex);
-    slides[initialIndex]?.scrollIntoView({ behavior: 'auto', inline: 'start', block: 'nearest' });
+    const initialSlide = slides[initialIndex];
+    if (carousel && initialSlide) {
+      carousel.scrollLeft = Math.max(0, initialSlide.offsetLeft - carousel.offsetLeft);
+    }
   });
 }
 

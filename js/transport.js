@@ -98,6 +98,32 @@ function getLocationCodeDisplay(locationName) {
   return locationName.substring(0, 3).toUpperCase();
 }
 
+function getLocationCodeText(locationName) {
+  if (!locationName) return '---';
+
+  const normalized = String(locationName).trim();
+  if (!normalized) return '---';
+
+  const tripCity = typeof citiesData !== 'undefined'
+      ? citiesData.find(c => c.name && c.name.toLowerCase() === normalized.toLowerCase())
+      : null;
+  if (tripCity && tripCity.code) return tripCity.code.toUpperCase();
+
+  const dbCity = typeof CITY_DATABASE !== 'undefined'
+      ? CITY_DATABASE.find(c => c.name && c.name.toLowerCase() === normalized.toLowerCase())
+      : null;
+  if (dbCity && dbCity.code) return dbCity.code.toUpperCase();
+
+  return normalized.replace(/[^a-z0-9]/gi, '').substring(0, 3).toUpperCase() || '---';
+}
+
+function buildRouteCodeChain(segments) {
+  if (!segments || segments.length === 0) return '---';
+  const stops = [getLocationCodeText(segments[0].fromLocation)];
+  segments.forEach(seg => stops.push(getLocationCodeText(seg.toLocation)));
+  return stops.join(' → ');
+}
+
 // Transport type icons
 const TRANSPORT_ICONS = {
   flight: '✈️',
@@ -756,17 +782,20 @@ function renderTransportSegmentsDetailContent(segs) {
 function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, journeyId) {
   if (!segs || segs.length === 0) return '';
 
-  if (segs.length > 1) {
-    return renderTransportSegmentsDetailContent(segs);
-  }
-
   const firstSeg = segs[0];
+  const lastSeg = segs[segs.length - 1];
   const firstDepDate = formatJourneyDate(firstSeg.departureDate) || firstSeg.dayDate || '—';
   const firstDepTime = firstSeg.departureTime || '';
   const firstDep = firstDepDate !== '—' && firstDepTime ? `${firstDepDate} ${firstDepTime}` : firstDepDate;
-  const lastArr = formatJourneyDate(firstSeg.arrivalDate) || '—';
-  const lastArrTime = firstSeg.arrivalTime || '—';
-  const route = `${firstSeg.fromLocation || '—'} → ${firstSeg.toLocation || '—'}`;
+  const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
+  const lastArrTime = lastSeg.arrivalTime || '—';
+  const route = segs.length > 1 ? buildRouteChain(segs) : `${firstSeg.fromLocation || '—'} → ${firstSeg.toLocation || '—'}`;
+  const providerSet = Array.from(new Set(segs.map(seg => seg.provider).filter(Boolean)));
+  const routeCodeSet = Array.from(new Set(segs.map(seg => seg.routeCode).filter(Boolean)));
+  const bookingSet = Array.from(new Set(segs.map(seg => seg.bookingReference).filter(Boolean)));
+  const providerLabel = providerSet.length > 1 ? `${providerSet.length} carriers` : (providerSet[0] || rep.provider || '—');
+  const routeCodeLabel = routeCodeSet.length > 1 ? `${routeCodeSet.length} codes` : (routeCodeSet[0] || rep.routeCode || '—');
+  const bookingLabel = bookingSet.length > 1 ? `${bookingSet.length} refs` : (bookingSet[0] || rep.bookingReference || '—');
   const costValue = totalCost > 0 ? `$${totalCost.toFixed(0)}` : '$0';
 
   return `
@@ -774,12 +803,13 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
       ${renderTransportDetailBlock('Route', route)}
       ${renderTransportDetailBlock('Depart', firstDep)}
       ${renderTransportDetailBlock('Arrive', lastArr !== '—' ? `${lastArr} ${lastArrTime}`.trim() : '—')}
-      ${renderTransportDetailBlock('Carrier', rep.provider || '—')}
-      ${renderTransportDetailBlock('Code', rep.routeCode || '—')}
-      ${renderTransportDetailBlock('Booking', rep.bookingReference || '—')}
+      ${renderTransportDetailBlock('Carrier', providerLabel)}
+      ${renderTransportDetailBlock('Code', routeCodeLabel)}
+      ${renderTransportDetailBlock('Booking', bookingLabel)}
       ${renderTransportDetailBlock('Status', statusText)}
       ${renderTransportDetailBlock('Cost', costValue)}
     </div>
+    ${segs.length > 1 ? renderTransportSegmentsDetailContent(segs) : ''}
   `;
 }
 
@@ -848,6 +878,7 @@ function buildTransportTab(cityFilter = null) {
       const routeText = isMultiLeg
           ? buildRouteChain(segs)
           : `${rep.fromLocation || '—'} → ${rep.toLocation || '—'}`;
+      const routeCodeText = buildRouteCodeChain(segs);
       const firstDepDate = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
       const firstDepTime = rep.departureTime || '';
       const firstDep = firstDepDate !== '—' && firstDepTime ? `${firstDepDate} ${firstDepTime}` : firstDepDate;
@@ -857,10 +888,9 @@ function buildTransportTab(cityFilter = null) {
       const statusColor = rep.status === 'booked' || rep.status === 'confirmed' ? '#27AE60' : rep.status === 'cancelled' ? '#E74C3C' : '#E67E22';
       const statusIcon = rep.status === 'booked' ? '✓' : rep.status === 'confirmed' ? '🎫' : rep.status === 'cancelled' ? '❌' : '⏳';
       const statusText = rep.status === 'booked' ? 'Booked' : rep.status === 'confirmed' ? 'Confirmed' : rep.status === 'cancelled' ? 'Cancelled' : 'Planned';
-      const isExpanded = isTransportGroupExpanded(gid);
       const durationHours = isMultiLeg ? calculateJourneyDuration(segs) : null;
       const durationDisplay = durationHours !== null ? `${durationHours}h` : calculateDuration(rep.departureDate || rep.dayDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
-      const eyebrow = `${getTransportLabel(rep.transportType)}${isMultiLeg ? ` · ${segs.length} legs` : ''}`;
+      const eyebrow = `${getTransportIcon(rep.transportType)} ${firstDepDate}`;
       const subtitleParts = [rep.provider || '—'];
       if (rep.routeCode) subtitleParts.push(rep.routeCode);
       if (durationDisplay) subtitleParts.push(durationDisplay);
@@ -882,21 +912,17 @@ function buildTransportTab(cityFilter = null) {
         <button class="mobile-surface-card-button transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">Edit</button>
         <button class="mobile-surface-card-button mobile-surface-card-button--danger transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">Delete</button>
       `;
-      const primaryAction = `
-        <button class="mobile-surface-card-button mobile-surface-card-button--secondary transport-details-btn" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Hide journey details' : 'Show journey details'}">${isExpanded ? 'Hide details' : 'Details'}</button>
-      `;
-      const details = isExpanded ? renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, rep.id) : '';
+      const details = renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, rep.id);
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'transport-mobile-card row-accent',
         accentColor: statusColor,
         dateLabel: firstDepDate,
         title: rep.journeyName || routeText,
         subtitle: subtitleParts.filter(Boolean).join(' · '),
-        primaryAction,
         meta,
         actions,
         details,
-        detailsOpen: isExpanded
+        detailsOpen: true
       });
       slidesHtml.push(`
         <div id="transport-slide-${index}" class="mobile-swipe-slide transport-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}">
@@ -907,7 +933,7 @@ function buildTransportTab(cityFilter = null) {
         <button type="button" class="mobile-swipe-chip" data-role="mobile-swipe-chip" data-slide-index="${index}" aria-controls="transport-slide-${index}" aria-selected="${index === 0 ? 'true' : 'false'}">
           <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(eyebrow)}</span>
           <span class="mobile-swipe-chip-title">${escapeHtmlText(rep.journeyName || routeText)}</span>
-          <span class="mobile-swipe-chip-route">${escapeHtmlText(routeText)}</span>
+          <span class="mobile-swipe-chip-route">${escapeHtmlText(routeCodeText)}</span>
         </button>
       `);
     });

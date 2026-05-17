@@ -246,7 +246,13 @@ function switchTab(tabId, btnElement) {
 
   // Scroll selected tab into view on mobile
   if (window.innerWidth <= 768) {
-    btnElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    const tabsList = btnElement.closest('.app-tabs-list');
+    if (tabsList) {
+      tabsList.scrollTo({
+        left: Math.max(0, btnElement.offsetLeft - (tabsList.clientWidth - btnElement.offsetWidth) / 2),
+        behavior: 'smooth'
+      });
+    }
   }
 
   // Check for current city filter and pass to tab builders
@@ -259,6 +265,10 @@ function switchTab(tabId, btnElement) {
   if (tabId === 'packing') buildPackingTab();
   if (tabId === 'map') buildJourneyMap();
   if (tabId === 'guide') buildGuideSteps();
+
+  if (window.innerWidth <= 768) {
+    requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
+  }
 }
 
 function toggleLeg(headerEl) { headerEl.parentElement.classList.toggle('collapsed'); }
