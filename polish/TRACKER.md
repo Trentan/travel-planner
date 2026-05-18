@@ -9,8 +9,6 @@ Progress: 22/25 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
-| [WI-026](./items/WI-026.md) | "Reset App" Is Too Destructive And Misleading | 🟢 Quick Win | ✅ Done | [WI-026-Before](./screenshots/before/desktop-12-mobile-menu.png) | [WI-026-Proposed](./items/proposals/WI-026-proposal.png) | [WI-026-After](./screenshots/after/WI-026-after.png) | 2026-05-18 |
-| [WI-027](./items/WI-027.md) | Extreme Transport Row Compression | 🟢 Quick Win | ✅ Done | [WI-027-Before](./screenshots/before/desktop-01-home.png) | [WI-027-Proposed](./items/WI-027.md) | [WI-027-After](./screenshots/after/WI-027-after.png) | 2026-05-18 |
 
 ## Important
 
@@ -51,6 +49,8 @@ Progress: 22/25 items complete
 | [WI-023](./items/WI-023.md) | Accommodation And Transport Table Cleanups Desktop | [WI-023-Before](./screenshots/before/mobile-06-transport.png) | [WI-023-Proposed](./items/proposals/WI-023-proposal.png) | [WI-023-After](./screenshots/after/WI-023-after-10.png) | 2026-05-17 |
 | [WI-024](./items/WI-024.md) | Visual System Uses Too Many Inline Styles | [WI-024-Before](./screenshots/before/desktop-03-header.png) | [WI-024-Proposed](./items/proposals/WI-024-proposal.png) | [WI-024-After](./screenshots/after/WI-024-after-5.png) | 2026-05-17 |
 | [WI-022](./items/WI-022.md) | Packing Tab Needs Stronger Empty/Progress Hierarchy | [WI-022-Before](./screenshots/before/desktop-08-packing.png) | [WI-022-Proposed](./items/proposals/WI-022-proposal.png) | [WI-022-After](./screenshots/after/WI-022-after-5.png) | 2026-05-16 |
+| [WI-026](./items/WI-026.md) | "Reset App" Is Too Destructive And Misleading | [WI-026-Before](./screenshots/before/desktop-12-mobile-menu.png) | [WI-026-Proposed](./items/proposals/WI-026-proposal.png) | [WI-026-After](./screenshots/after/WI-026-after.png) | 2026-05-18 |
+| [WI-027](./items/WI-027.md) | Extreme Transport Row Compression | [WI-027-Before](./screenshots/before/desktop-01-home.png) | [WI-027-Proposed](./items/WI-027.md) | [WI-027-After](./screenshots/after/WI-027-after.png) | 2026-05-18 |
 
 ---
 
