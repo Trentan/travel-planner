@@ -22,7 +22,7 @@ Progress: 26/32 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
-| [WI-021](./items/WI-021.md) | Desktop Itinerary Is Visually Busy | Medium (2-8 hrs) | 🔲 Todo | [WI-021-Before](./screenshots/before/desktop-01-home.png) | [WI-021-Proposed](./screenshots/after/WI-021-proposal.png) | - | - |
+| [WI-021](./items/WI-021.md) | Desktop Itinerary Is Visually Busy | Medium (2-8 hrs) | Review | [Before](./screenshots/before/desktop-01-home.png) | [Proposed](./screenshots/after/WI-021-proposal.png) | [After](./screenshots/after/WI-021-after.png) | - |
 | [WI-032](./items/WI-032.md) | Global Currency Formatting Consistency | Medium (2-8 hrs) | 🔲 Todo | [WI-032-Before](./screenshots/before/mde-07-budget.png) | [WI-032-Proposed](./screenshots/after/WI-032-proposal.png) | - | - |
 
 ## Completed

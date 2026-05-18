@@ -1457,6 +1457,169 @@ main {
 @media (max-width: 900px) { .detail-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) { .detail-grid { grid-template-columns: 1fr; } }
 
+@media (min-width: 901px) {
+  body:not(.compact-view-mode) #itinerary {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  body:not(.compact-view-mode) .leg {
+    margin-bottom: 0;
+    border: 1px solid rgba(36, 72, 93, 0.1);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.74);
+    box-shadow: 0 18px 34px rgba(26, 36, 47, 0.08);
+    overflow: hidden;
+  }
+
+  body:not(.compact-view-mode) .leg-header {
+    padding: 0.95rem 1.25rem;
+    border-radius: 0;
+  }
+
+  body:not(.compact-view-mode) .leg-header-top {
+    gap: 1rem;
+  }
+
+  body:not(.compact-view-mode) .leg-header h2 {
+    font-size: 1.34rem;
+    line-height: 1.05;
+  }
+
+  body:not(.compact-view-mode) .leg-subtitle {
+    max-width: 72rem;
+    margin-top: 0.42rem;
+    opacity: 0.74;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  body:not(.compact-view-mode) .leg-night-count {
+    background: rgba(255,255,255,0.24);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  body:not(.compact-view-mode) .city-dashboard {
+    gap: 1rem;
+    padding: 1rem;
+    border-width: 0 0 1px;
+    border-radius: 0;
+    box-shadow: none;
+    background: #f7f4ed;
+  }
+
+  body:not(.compact-view-mode) .city-block {
+    min-width: 0;
+    padding: 0.85rem;
+    border: 1px solid rgba(36, 72, 93, 0.08);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.68);
+  }
+
+  body:not(.compact-view-mode) .city-block h4 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
+    color: var(--accent-strong);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+
+  body:not(.compact-view-mode) .city-block li,
+  body:not(.compact-view-mode) .activity-item,
+  body:not(.compact-view-mode) .tip-item,
+  body:not(.compact-view-mode) .quest-item {
+    color: #4c5962;
+    font-size: 0.82rem;
+  }
+
+  body:not(.compact-view-mode) .add-btn,
+  body:not(.compact-view-mode) .del-btn,
+  body:not(.compact-view-mode) .edit-btn,
+  body:not(.compact-view-mode) .header-del-btn,
+  body:not(.compact-view-mode) .drag-handle {
+    opacity: 0.06;
+  }
+
+  body:not(.compact-view-mode) .leg:hover .header-del-btn,
+  body:not(.compact-view-mode) .leg:focus-within .header-del-btn,
+  body:not(.compact-view-mode) .city-block:hover .add-btn,
+  body:not(.compact-view-mode) .city-block:focus-within .add-btn,
+  body:not(.compact-view-mode) li:hover .del-btn,
+  body:not(.compact-view-mode) li:focus-within .del-btn,
+  body:not(.compact-view-mode) li:hover .edit-btn,
+  body:not(.compact-view-mode) li:focus-within .edit-btn,
+  body:not(.compact-view-mode) .activity-item:hover .drag-handle,
+  body:not(.compact-view-mode) .activity-item:focus-within .drag-handle,
+  body:not(.compact-view-mode) .cost-item:hover .del-btn,
+  body:not(.compact-view-mode) .cost-item:focus-within .del-btn {
+    opacity: 0.72;
+  }
+
+  body:not(.compact-view-mode) .add-btn:focus-visible,
+  body:not(.compact-view-mode) .del-btn:focus-visible,
+  body:not(.compact-view-mode) .edit-btn:focus-visible,
+  body:not(.compact-view-mode) .header-del-btn:focus-visible {
+    opacity: 1;
+  }
+
+  body:not(.compact-view-mode) .day-card {
+    border-inline: 0;
+    box-shadow: none;
+  }
+
+  body:not(.compact-view-mode) .day-card:last-child {
+    border-radius: 0;
+  }
+
+  body:not(.compact-view-mode) .day-bar {
+    grid-template-columns: 24px 88px minmax(0, 1fr) auto auto;
+    padding: 0.78rem 1.15rem 0.78rem 0.85rem;
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  body:not(.compact-view-mode) .day-bar:hover {
+    background: #fffdf8;
+  }
+
+  body:not(.compact-view-mode) .day-date .day-num {
+    color: var(--accent-strong);
+    font-size: 0.92rem;
+    font-weight: 800;
+  }
+
+  body:not(.compact-view-mode) .day-date .day-name {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  body:not(.compact-view-mode) .day-cities {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  body:not(.compact-view-mode) .day-desc {
+    margin-top: 0.1rem;
+    font-size: 0.82rem;
+  }
+
+  body:not(.compact-view-mode) .day-total-cost {
+    background: rgba(36, 72, 93, 0.08);
+    border: 1px solid rgba(36, 72, 93, 0.1);
+  }
+
+  body:not(.compact-view-mode) .day-detail {
+    padding: 0.9rem 1.15rem 1.15rem;
+    background: #fbf8f2;
+  }
+}
+
 /* Responsive Tabs */
 @media (max-width: 768px) {
   .tab-label { display: inline; }

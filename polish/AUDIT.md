@@ -6,7 +6,7 @@
 **Last sync:** 2026-05-18  
 **Viewports tested:** DDE (1440x900) / DCO (1440x900) / MDE (390x844) / MCO (390x844)  
 **Real data used:** 2026_June_July_Europe_Thailand.json  
-**Tracker sync:** 26/32 complete, 0 in Review, 5 Todo backlog rows.
+**Tracker sync:** 26/32 complete, 1 in Review, 4 Todo backlog rows.
 
 ---
 
@@ -26,7 +26,7 @@
 
 ## Polish Items
 
-1. **[WI-021] Desktop Itinerary Is Visually Busy.** Status: Todo.
+1. **[WI-021] Desktop Itinerary Is Visually Busy.** Status: Review. Desktop itinerary panels are calmer, with edit chrome de-emphasized until hover/focus.
 2. **[WI-032] Global Currency Formatting Consistency.** Status: Todo. Centralize currency rendering to ensure consistent symbols and decimal places.
 
 ---
@@ -46,3 +46,4 @@
 - 2026-05-18 / WI-028: User approved final review; WI-028 moved to Done/Completed.
 - 2026-05-18 / WI-029: Mobile Playwright verification at 390x844 with real trip data passed the touch assignment checks and saved [WI-029-after-4.png](./screenshots/after/WI-029-after-4.png). Assign is 44x44 on mobile, the unassigned action uses the suggested-activity thumbtack, the assigned action stays as a chevron, and assigned status uses a soft green check instead of a yellow hourglass. `node tests/city-nav-regression.js` passed; `node tests/run-tests.js` still stops on the existing map harness issue `L is not defined`.
 - 2026-05-18 / WI-029: User approved final review; WI-029 moved to Done/Completed.
+- 2026-05-18 / WI-021: Desktop Playwright verification at 1440x900 with real trip data passed itinerary visual-busy checks and saved [WI-021-after.png](./screenshots/after/WI-021-after.png). Confirmed styled leg panels, stronger day hierarchy, and low-opacity edit chrome until interaction. `node tests/city-nav-regression.js` passed.
