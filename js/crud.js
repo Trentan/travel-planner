@@ -480,7 +480,27 @@ function clearAssignedSuggestedActivityFromDay(sourceLegIdx, activityIdx) {
   return true;
 }
 
-function openActivityAssignModal(legIdx, activityIdx) {
+function showActivityAssignFeedback(message) {
+  if (!message) return;
+  const existing = document.getElementById('activity-assign-feedback');
+  if (existing) existing.remove();
+
+  const feedback = document.createElement('div');
+  feedback.id = 'activity-assign-feedback';
+  feedback.className = 'activity-assign-feedback';
+  feedback.setAttribute('role', 'status');
+  feedback.setAttribute('aria-live', 'polite');
+  feedback.textContent = message;
+  document.body.appendChild(feedback);
+
+  setTimeout(() => feedback.classList.add('is-visible'), 10);
+  setTimeout(() => {
+    feedback.classList.remove('is-visible');
+    setTimeout(() => feedback.remove(), 220);
+  }, 2600);
+}
+
+function openActivityAssignModalLegacy(legIdx, activityIdx) {
   const leg = appData[legIdx];
   const activity = leg?.suggestedActivities?.[activityIdx];
   if (!leg || !activity || !Array.isArray(leg.days) || leg.days.length === 0) return;
@@ -569,6 +589,111 @@ function openActivityAssignModal(legIdx, activityIdx) {
       saveData();
       buildItinerary();
       closeModal();
+    });
+  });
+}
+
+function openActivityAssignModal(legIdx, activityIdx) {
+  const leg = appData[legIdx];
+  const activity = leg?.suggestedActivities?.[activityIdx];
+  if (!leg || !activity || !Array.isArray(leg.days) || leg.days.length === 0) return;
+
+  const existingModal = document.getElementById('activity-assign-modal');
+  if (existingModal) existingModal.remove();
+
+  const html = typeof escapeHtmlText === 'function' ? escapeHtmlText : value => String(value ?? '');
+  const modal = document.createElement('div');
+  modal.id = 'activity-assign-modal';
+  modal.className = 'modal-overlay';
+  modal.style.display = 'flex';
+
+  const currentDayLabel = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined && leg.days[activity.assignedDayIdx]
+    ? `${leg.days[activity.assignedDayIdx].day} ${leg.days[activity.assignedDayIdx].date}`
+    : 'Unassigned';
+  const hasCurrentAssignment = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
+
+  const dayButtons = leg.days.map((day, dayIdx) => {
+    const isCurrent = activity.assignedDayIdx === dayIdx;
+    const plannedCount = Array.isArray(day.activityItems)
+      ? day.activityItems.filter(item => !isPlaceholderActivityItem(item)).length
+      : 0;
+    const dayLabel = `Day ${day.day} ${day.date}`;
+    const routeLabel = day.from === day.to ? day.to : `${day.from} -> ${day.to}`;
+    const desc = String(day.desc || '').trim();
+    return `
+      <button type="button" class="activity-assign-day ${isCurrent ? 'is-current' : ''}" data-day-index="${dayIdx}" aria-pressed="${isCurrent ? 'true' : 'false'}">
+        <span class="activity-assign-day-main">
+          <span class="activity-assign-day-date">${html(dayLabel)}</span>
+          <span class="activity-assign-day-route">${html(routeLabel)}</span>
+        </span>
+        ${desc ? `<span class="activity-assign-day-desc">${html(desc)}</span>` : ''}
+        <span class="activity-assign-day-meta">${isCurrent ? 'Current day' : `${plannedCount} planned activit${plannedCount === 1 ? 'y' : 'ies'}`}</span>
+      </button>
+    `;
+  }).join('');
+
+  modal.innerHTML = `
+    <div class="modal-content activity-assign-modal">
+      <div class="modal-header">
+        <h2>Assign Activity</h2>
+        <button class="modal-close" type="button" id="activityAssignCloseBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="activity-assign-layout">
+          <div class="activity-assign-summary">
+            <div class="activity-assign-kicker">${html(activity.category || 'Activity')}</div>
+            <div class="activity-assign-title">${html(activity.title)}</div>
+            <div class="activity-assign-meta">${html(activity.estTime || '1 hr')} &middot; $${html(activity.estCost || '0')}</div>
+            <div class="activity-assign-current">Current assignment: ${html(currentDayLabel)}</div>
+            ${hasCurrentAssignment ? `<button type="button" class="action-btn activity-assign-clear" id="activityAssignClearBtn">Remove from day</button>` : ''}
+          </div>
+          <div class="activity-assign-days" aria-label="Choose a day">
+            ${dayButtons}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn" type="button" id="activityAssignCancelBtn">Cancel</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const closeModal = () => modal.remove();
+  document.getElementById('activityAssignCloseBtn').onclick = closeModal;
+  document.getElementById('activityAssignCancelBtn').onclick = closeModal;
+  const clearButton = document.getElementById('activityAssignClearBtn');
+  if (clearButton) {
+    clearButton.onclick = () => {
+      const cleared = clearAssignedSuggestedActivityFromDay(legIdx, activityIdx);
+      if (!cleared) return;
+      saveData();
+      buildItinerary();
+      closeModal();
+      showActivityAssignFeedback('Activity removed from day');
+    };
+  }
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeModal();
+  });
+
+  const firstButton = modal.querySelector('[data-day-index]');
+  if (firstButton) {
+    setTimeout(() => firstButton.focus(), 50);
+  }
+
+  modal.querySelectorAll('[data-day-index]').forEach(button => {
+    button.addEventListener('click', () => {
+      const targetDayIdx = Number(button.getAttribute('data-day-index'));
+      if (!Number.isFinite(targetDayIdx)) return;
+      const assigned = assignSuggestedActivityToDay(legIdx, activityIdx, legIdx, targetDayIdx);
+      if (!assigned) return;
+      const targetDay = leg.days[targetDayIdx];
+      saveData();
+      buildItinerary();
+      closeModal();
+      showActivityAssignFeedback(`Assigned to ${targetDay.day} ${targetDay.date}`);
     });
   });
 }

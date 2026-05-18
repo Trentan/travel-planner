@@ -1173,7 +1173,7 @@ ${(() => {
   if (typeof reObserveLegs === "function") reObserveLegs();
 }
 
-function renderActivityActionButtons(root) {
+function renderActivityActionButtonsLegacy(root) {
   if (!root) return;
   root.querySelectorAll('.activity-item button[onclick*="openActivityAssignModal"]').forEach(btn => {
     const title = (btn.getAttribute('title') || btn.getAttribute('aria-label') || '').toLowerCase();
@@ -1181,6 +1181,21 @@ function renderActivityActionButtons(root) {
     const icon = isMove ? '📌' : '📍';
     const label = isMove ? 'Move to another day' : 'Add to day';
     btn.textContent = icon;
+    btn.setAttribute('aria-label', label);
+    btn.setAttribute('title', label);
+    btn.classList.add('activity-action-btn');
+  });
+}
+
+function renderActivityActionButtons(root) {
+  if (!root) return;
+  root.querySelectorAll('.activity-item button[onclick*="openActivityAssignModal"]').forEach(btn => {
+    const title = (btn.getAttribute('title') || btn.getAttribute('aria-label') || '').toLowerCase();
+    const rawLabel = (btn.textContent || '').trim().toLowerCase();
+    const isMove = title.includes('move') || rawLabel === 'move';
+    const icon = isMove ? '->' : '+';
+    const label = isMove ? 'Move to another day' : 'Add to day';
+    btn.innerHTML = `<span class="activity-action-icon" aria-hidden="true">${icon}</span><span class="activity-action-label">${isMove ? 'Move' : 'Assign'}</span>`;
     btn.setAttribute('aria-label', label);
     btn.setAttribute('title', label);
     btn.classList.add('activity-action-btn');
