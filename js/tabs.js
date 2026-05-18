@@ -90,7 +90,7 @@ function isAccomMobileCardLayout() {
 
 function renderStayMobileDetails(stay, cityName) {
   const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
-  const costValue = `$${stay.totalCost || '0'}`;
+  const costValue = formatCurrency(stay.totalCost || '0');
 
   return `
     <div class="stay-detail-grid stay-mobile-detail-grid">
@@ -289,7 +289,7 @@ function buildAccomTab(cityFilter = null) {
         ${renderStayStatusCostSummary(stay, status, statusIcon)}
       </td>
       <td class="budget-field budget-field--fixed" data-label="Cost">
-        $<span contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'totalCost', this.innerText)">${stay.totalCost || '0'}</span>
+        $<span contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'totalCost', this.innerText)">${formatCurrency(stay.totalCost || '0', { includeSymbol: false })}</span>
       </td>
       <td class="stay-actions-col" data-label="Actions">
         <button class="edit-btn" title="Edit Stay" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')">✎</button>
@@ -500,13 +500,7 @@ function buildPackingTab() {
 }
 
 function formatBudgetAmount(value) {
-  const parsed = Number.parseFloat(String(value ?? '').replace(/[^0-9.-]/g, ''));
-  const amount = Number.isFinite(parsed) ? parsed : 0;
-  const decimals = Number.isInteger(amount) ? 0 : 2;
-  return `$${new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  }).format(amount)}`;
+  return formatCurrency(value);
 }
 
 function buildBudgetTab() {
