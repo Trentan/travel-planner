@@ -321,6 +321,7 @@ document.addEventListener('keydown', event => {
 function openAIDialog() {
   const modal = document.getElementById('ai-modal');
   if (modal) {
+    if (typeof prefillAIDialogFields === 'function') prefillAIDialogFields();
     modal.style.display = 'flex';
     document.getElementById('aiOutputBox').style.display = 'none';
   }
