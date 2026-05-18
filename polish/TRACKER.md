@@ -16,7 +16,7 @@ Progress: 26/32 items complete
 |----|-------|--------|--------|--------|----------|-------|------|
 | [WI-017](./items/WI-017.md) | AI Builder Trip Context Pre-fill | Quick Win (<1 hr) | 🔲 Todo | [WI-017-Before](./screenshots/before/dde-11-ai-builder.png) | [WI-017-Proposed](./screenshots/after/WI-017-proposal.png) | - | - |
 | [WI-030](./items/WI-030.md) | Mobile Menu Scannability and Hierarchy | Medium (2-8 hrs) | 🔲 Todo | [WI-030-Before](./screenshots/before/mde-04-menu-open.png) | [WI-030-Proposed](./screenshots/after/WI-030-proposal.png) | - | - |
-| [WI-031](./items/WI-031.md) | Compact Mode Visual Unification | Medium (2-8 hrs) | 🔲 Todo | [WI-031-Before](./screenshots/before/dco-04-itinerary.png) | [WI-031-Proposed](./screenshots/after/WI-031-proposal.png) | - | - |
+| [WI-031](./items/WI-031.md) | Compact Mode Visual Unification | Medium (2-8 hrs) | Review | [Before](./screenshots/before/dco-04-itinerary.png) | [Proposed](./screenshots/after/WI-031-proposal.png) | [After](./screenshots/after/WI-031-after.png) | - |
 
 ## Polish
 
