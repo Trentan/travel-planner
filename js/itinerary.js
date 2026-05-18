@@ -1060,11 +1060,11 @@ function buildItinerary() {
         const matchedActivity = leg.days[activity.assignedDayIdx].activityItems.find(a => a.text === activity.title);
         if (matchedActivity && matchedActivity.done) isCompleted = true;
       }
-      const badgeColor = isCompleted ? '#27AE60' : '#E67E22';
-      const badgeIcon = isCompleted ? '✓' : '⏳';
+      const badgeStateClass = isCompleted ? 'is-complete' : 'is-scheduled';
+      const badgeIcon = isCompleted ? '✓' : '✓';
       const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
       const categoryEmoji = getCategoryEmoji(activity.category);
-      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge" style="background: ${badgeColor};" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · $${activity.estCost}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
+      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · $${activity.estCost}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
     }).join('')}</ul>
         <button class="add-btn" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
       </div>
@@ -1178,7 +1178,7 @@ function renderActivityActionButtonsLegacy(root) {
   root.querySelectorAll('.activity-item button[onclick*="openActivityAssignModal"]').forEach(btn => {
     const title = (btn.getAttribute('title') || btn.getAttribute('aria-label') || '').toLowerCase();
     const isMove = title.includes('move');
-    const icon = isMove ? '📌' : '📍';
+    const icon = isMove ? '›' : '+';
     const label = isMove ? 'Move to another day' : 'Add to day';
     btn.textContent = icon;
     btn.setAttribute('aria-label', label);
@@ -1193,7 +1193,7 @@ function renderActivityActionButtons(root) {
     const title = (btn.getAttribute('title') || btn.getAttribute('aria-label') || '').toLowerCase();
     const rawLabel = (btn.textContent || '').trim().toLowerCase();
     const isMove = title.includes('move') || rawLabel === 'move';
-    const icon = isMove ? '📌' : '📍';
+    const icon = isMove ? '›' : '+';
     const label = isMove ? 'Move to another day' : 'Add to day';
     btn.textContent = icon;
     btn.setAttribute('aria-label', label);

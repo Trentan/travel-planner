@@ -9,7 +9,7 @@ Progress: 25/32 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
-| [WI-029](./items/WI-029.md) | Touch-Friendly Suggested Activity Assignment | Medium (2-8 hrs) | Review | [WI-029-Before](./screenshots/before/mde-05-itinerary.png) | [WI-029-Proposed](./screenshots/after/WI-029-proposal.png) | [WI-029-After](./screenshots/after/WI-029-after-2.png) | - |
+| [WI-029](./items/WI-029.md) | Touch-Friendly Suggested Activity Assignment | Medium (2-8 hrs) | Review | [WI-029-Before](./screenshots/before/mde-05-itinerary.png) | [WI-029-Proposed](./screenshots/after/WI-029-proposal.png) | [WI-029-After](./screenshots/after/WI-029-after-3.png) | - |
 
 ## Important
 
