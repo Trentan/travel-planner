@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
-Last updated: 2026-05-17
-Progress: 24/27 items complete
+Last updated: 2026-05-18
+Progress: 24/32 items complete
 
 ---
 
@@ -9,19 +9,23 @@ Progress: 24/27 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
+| [WI-028](./items/WI-028.md) | Condensed Mobile Chrome on Scroll | Medium (2-8 hrs) | 🔲 Todo | [WI-028-Before](./screenshots/before/mde-01-home.png) | [WI-028-Proposed](./screenshots/after/WI-028-proposal.png) | - | - |
+| [WI-029](./items/WI-029.md) | Touch-Friendly Suggested Activity Assignment | Medium (2-8 hrs) | 🔲 Todo | [WI-029-Before](./screenshots/before/mde-05-itinerary.png) | [WI-029-Proposed](./screenshots/after/WI-029-proposal.png) | - | - |
 
 ## Important
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
-| [WI-009](./items/WI-009.md) | Map Is A Static SVG Approximation | Major (1-3 days) | Todo | [WI-009-Before](./screenshots/before/desktop-09-map.png) | [WI-009-Proposed](./items/proposals/WI-009-proposal.png) | - | - |
-| [WI-017](./items/WI-017.md) | AI Builder Modal Lacks Current Trip Context | Medium (2-8 hrs) | Todo | [WI-017-Before](./screenshots/before/mobile-10-ai-builder.png) | [WI-017-Proposed](./items/proposals/WI-017-proposal.png) | - | - |
+| [WI-017](./items/WI-017.md) | AI Builder Trip Context Pre-fill | Quick Win (<1 hr) | 🔲 Todo | [WI-017-Before](./screenshots/before/dde-11-ai-builder.png) | [WI-017-Proposed](./screenshots/after/WI-017-proposal.png) | - | - |
+| [WI-030](./items/WI-030.md) | Mobile Menu Scannability and Hierarchy | Medium (2-8 hrs) | 🔲 Todo | [WI-030-Before](./screenshots/before/mde-04-menu-open.png) | [WI-030-Proposed](./screenshots/after/WI-030-proposal.png) | - | - |
+| [WI-031](./items/WI-031.md) | Compact Mode Visual Unification | Medium (2-8 hrs) | 🔲 Todo | [WI-031-Before](./screenshots/before/dco-04-itinerary.png) | [WI-031-Proposed](./screenshots/after/WI-031-proposal.png) | - | - |
 
 ## Polish
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
-| [WI-021](./items/WI-021.md) | Desktop Itinerary Is Visually Busy | Medium (2-8 hrs) | Todo | [WI-021-Before](./screenshots/before/desktop-01-home.png) | [WI-021-Proposed](./items/proposals/WI-021-proposal.png) | - | - |
+| [WI-021](./items/WI-021.md) | Desktop Itinerary Is Visually Busy | Medium (2-8 hrs) | 🔲 Todo | [WI-021-Before](./screenshots/before/desktop-01-home.png) | [WI-021-Proposed](./screenshots/after/WI-021-proposal.png) | - | - |
+| [WI-032](./items/WI-032.md) | Global Currency Formatting Consistency | Medium (2-8 hrs) | 🔲 Todo | [WI-032-Before](./screenshots/before/mde-07-budget.png) | [WI-032-Proposed](./screenshots/after/WI-032-proposal.png) | - | - |
 
 ## Completed
 
@@ -51,28 +55,4 @@ Progress: 24/27 items complete
 | [WI-027](./items/WI-027.md) | Extreme Transport Row Compression | [WI-027-Before](./screenshots/before/desktop-01-home.png) | [WI-027-Proposed](./items/WI-027.md) | [WI-027-After](./screenshots/after/WI-027-after.png) | 2026-05-18 |
 | [WI-020](./items/WI-020.md) | Mobile Itinerary Cards Are Over-Scaled | [WI-020-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-020-Proposed](./items/proposals/WI-020-proposal.png) | [WI-025-After](./screenshots/after/WI-025-after-56-no-jolt.png) | 2026-05-18 |
 | [WI-025](./items/WI-025.md) | Mobile Transport And Accommodation Cards Need Consistent Styling | [WI-025-Before](./screenshots/before/mobile-06-transport.png) | [WI-025-Proposed](./items/proposals/WI-025-proposal.png) | [WI-025-After](./screenshots/after/WI-025-after-56-no-jolt.png) | 2026-05-18 |
-
----
-
-## How to update this file
-
-When you finish a work item:
-0. Create or switch to a branch named for the work item, for example `WI-001_Desktop-App-Menu-Wraps`
-1. Change its Status cell to `Done`
-2. Fill in the Done date
-3. Move the row to the Completed table at the bottom
-4. Take an after screenshot -> save to `screenshots/after/WI-XXX-after.png`
-5. If the WI is already in `Review` and the user asks for more changes, take the next screenshot as `screenshots/after/WI-XXX-after-2.png`, then `-3.png`, and so on. Never overwrite an existing review screenshot.
-6. Update the Before, Proposed, and After link columns in `polish/TRACKER.md` so the row stays clickable and compact, and point `After` at the latest review screenshot.
-7. Update the after screenshot reference in `items/WI-XXX.md` as a clickable markdown link to the latest screenshot.
-8. Capture the user's latest review feedback in the review work item's `Review Notes` section as a running log before the next revision.
-9. Leave the WI in `Review` until the user explicitly confirms the final review is done, then move it to `Done` and Completed.
-10. Include direct clickable links to the before image, proposal image, and latest after image in your final completion response so they can be reviewed immediately.
-11. Update the progress count at the top of this file when the WI is actually moved to Completed.
-12. Commit the completed WI on the WI branch with the WI number in the commit message, then push that same branch before closing the item.
-
-## Concurrent Work
-
-- Keep each WI on its own branch and avoid editing another WI's tracker row or files.
-- If the worktree already has edits for a different WI, verify the branch before making changes.
-- As soon as a WI is verified, commit and push that WI so the branch tip is preserved before switching context.
+| [WI-009](./items/WI-009.md) | SVG Map Replacement with Leaflet | [WI-009-Before](./screenshots/before/dde-09-map.png) | [WI-009-Proposed](./screenshots/after/WI-009-proposal.png) | [WI-009-After](./screenshots/after/WI-009-after.png) | 2026-05-18 |

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="../../../style.css">
+  <style>
+    body { background: #f5f7fa; padding: 20px; font-family: 'DM Sans', sans-serif; }
+    .container { display: flex; gap: 40px; }
+    .preview-box { width: 450px; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    
+    .legacy-list { font-size: 0.85rem; border: 1px solid #eee; border-radius: 8px; }
+    .legacy-row { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+    
+    .unified-card { border: 1px solid #d0e7ff; border-radius: 12px; padding: 15px; background: #f0f7ff; margin-bottom: 10px; }
+    .card-title { font-weight: 700; color: #1F6F8B; margin-bottom: 5px; }
+    .card-meta { font-size: 0.75rem; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div>
+      <h3>Legacy List (Before - DCO)</h3>
+      <div class="preview-box">
+        <div class="legacy-list">
+          <div class="legacy-row"><span>Day 1: London</span><span>$150</span></div>
+          <div class="legacy-row"><span>Day 2: Paris</span><span>$220</span></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>Unified Card View (Proposed - DCO/MCO)</h3>
+      <div class="preview-box">
+        <div class="unified-card">
+          <div class="card-title">Day 1: London</div>
+          <div class="card-meta">2 activities · Total $150.00</div>
+        </div>
+        <div class="unified-card">
+          <div class="card-title">Day 2: Paris</div>
+          <div class="card-meta">3 activities · Total $220.00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

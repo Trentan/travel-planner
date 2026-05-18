@@ -1,9 +1,12 @@
-# TASK: Travel Planner — Full UI/UX Polish Audit
+# TASK: Travel Planner — Full UI/UX Polish Audit (v2)
 
 You are acting as a senior front-end developer, UX analyst, and QA tester.
-Your job is to conduct a complete mobile + desktop polish audit of this PWA,
+Your job is to conduct a complete polish audit of this PWA across **four view modes**,
 take before screenshots, describe proposed after states, and self-manage all
-findings in a `/polish` folder. Work through every step below in order.
+findings in a `/polish` folder.
+
+**This prompt is safe to re-run.** It will never delete or overwrite existing work.
+Read the safe-run rules in STEP 0 before doing anything else.
 
 ---
 
@@ -16,11 +19,86 @@ findings in a `/polish` folder. Work through every step below in order.
 - **Dev server:** run `npx serve . --listen 3000` (or check `start.bat`)
 - **Test data:** import `backups/2026_June_July_Europe_Thailand.json` so real data is visible
 
+### Four view modes (every issue must declare which modes it affects)
+
+| Mode ID | Label | Viewport | Density setting |
+|---------|-------|----------|-----------------|
+| `DDE` | Desktop / Detailed | 1440 × 900 | Default (expanded cards, full labels) |
+| `DCO` | Desktop / Compact | 1440 × 900 | Compact toggle active (condensed rows, shorter labels) |
+| `MDE` | Mobile / Detailed | 390 × 844 | Default |
+| `MCO` | Mobile / Compact | 390 × 844 | Compact toggle active |
+
+Screenshots and WI files must tag which modes they cover.
+
 ---
 
-## STEP 1 — CREATE THE /polish FOLDER STRUCTURE
+## STEP 0 — SAFE-RUN CHECK (DO THIS FIRST, EVERY TIME)
 
-Create the following files and folders (empty for now, you'll fill them in later steps):
+Before creating any file or folder, run the following checks.
+
+### 0a — Detect existing polish folder
+
+```bash
+ls polish/ 2>/dev/null && echo "EXISTS" || echo "FRESH"
+```
+
+- If **FRESH**: proceed with all steps as a first run.
+- If **EXISTS**: this is an incremental run. Follow the incremental rules below for every step.
+
+### 0b — Find the highest existing WI number
+
+```bash
+ls polish/items/WI-*.md 2>/dev/null | sort | tail -1
+```
+
+Store the result as `$LAST_WI`. All new work items must be numbered `$LAST_WI + 1` onward.
+If no items exist yet, start at WI-001.
+
+### 0c — Find the highest existing screenshot index per mode
+
+```bash
+ls polish/screenshots/before/ 2>/dev/null | sort
+```
+
+For each mode prefix (`dde-`, `dco-`, `mde-`, `mco-`), note the highest numbered file.
+New screenshots must use the next available number for that prefix.
+**Never overwrite an existing screenshot.**
+
+### 0d — Read existing TRACKER.md
+
+If `polish/TRACKER.md` exists, read it fully before writing any new rows.
+New items must be **appended** to the correct priority section — not replace existing rows.
+Items already marked ✅ Done must never be touched.
+
+### 0e — Read existing AUDIT.md
+
+If `polish/AUDIT.md` exists, read it. Append new findings as a dated section:
+
+```md
+---
+## Incremental Audit — [today's date]
+[new findings only]
+```
+
+Do not modify the original audit content.
+
+### Incremental run summary
+
+| Action | Rule |
+|--------|------|
+| `/polish/` folder | Create only if missing |
+| `/polish/README.md` | Create only if missing |
+| `/polish/AUDIT.md` | Create if missing; otherwise append new section |
+| `/polish/TRACKER.md` | Create if missing; otherwise append new rows only |
+| `items/WI-XXX.md` | Only create new files; never edit existing ones |
+| Screenshots (before) | Skip if filename already exists; only capture missing ones |
+| Screenshots (after) | Only create if the fix is done and file is missing |
+
+---
+
+## STEP 1 — CREATE OR VERIFY THE /polish FOLDER STRUCTURE
+
+Only create files/folders that do not already exist.
 
 ```
 /polish/
@@ -28,12 +106,14 @@ Create the following files and folders (empty for now, you'll fill them in later
   AUDIT.md
   TRACKER.md
   screenshots/
-    before/   ← you will populate this in Step 2
-    after/    ← you will populate this in Step 3
-  items/      ← individual WI-XXX.md files, one per work item
+    before/   ← mode-prefixed filenames (see Step 2)
+    after/    ← WI-XXX-after.png or WI-XXX-proposal.md
+  items/      ← WI-XXX.md files
+  scripts/
+    take-screenshots.js
 ```
 
-Write `/polish/README.md` with this content:
+If creating fresh, write `/polish/README.md` with this content:
 
 ```md
 # Travel Planner — App Polish Sprint
@@ -41,70 +121,113 @@ Write `/polish/README.md` with this content:
 Self-managed audit + work backlog. No GitHub issues needed.
 All items live in `/polish/items/`. Progress tracked in TRACKER.md.
 
+## View modes
+| ID | Label | Viewport | Notes |
+|----|-------|----------|-------|
+| DDE | Desktop / Detailed | 1440×900 | Default density |
+| DCO | Desktop / Compact | 1440×900 | Compact toggle on |
+| MDE | Mobile / Detailed | 390×844 | Default density |
+| MCO | Mobile / Compact | 390×844 | Compact toggle on |
+
 ## Quick links
 - [Full audit findings](./AUDIT.md)
 - [Progress tracker](./TRACKER.md)
 - [Work items](./items/)
 - [Before screenshots](./screenshots/before/)
-- [After proposals](./screenshots/after/)
+- [After proposals/screenshots](./screenshots/after/)
 
 ## How to work through items
 1. Open TRACKER.md — pick the next 🔲 Todo item
 2. Open its WI-XXX.md for full context, before screenshot ref, and proposed fix
-3. Create or switch to a branch named for the work item, for example `WI-001_Desktop-App-Menu-Wraps`
+3. Create or switch to a branch named for the work item e.g. `WI-001_Desktop-Menu-Wraps`
 4. Implement the fix
 5. Run regression: `node scripts/regression-city-nav.js`
-6. Take an after screenshot and save to `screenshots/after/WI-XXX-after.png`
+6. Take an after screenshot: `node polish/scripts/take-screenshots.js --wi WI-XXX --mode [DDE|DCO|MDE|MCO]`
 7. Update TRACKER.md status to ✅ Done
-8. Commit the completed WI on the WI branch with the WI number in the commit message, then push that same branch.
+8. Commit on the WI branch with the WI number in the message, then push.
 ```
 
 ---
 
 ## STEP 2 — TAKE BEFORE SCREENSHOTS WITH PUPPETEER
 
-Start the dev server, then use Puppeteer to capture all required screenshots.
 Install Puppeteer if not present: `npm install puppeteer --save-dev`
 
-Write and run a script `polish/scripts/take-screenshots.js` that does the following.
-If the server is not running, the script should print a clear error and exit.
+Write (or overwrite only if it doesn't exist) `polish/scripts/take-screenshots.js`.
 
-### Screenshots to capture
+The script must:
+- Accept an optional `--wi WI-XXX` flag to retake only screenshots for a specific work item
+- Accept an optional `--mode [DDE|DCO|MDE|MCO]` flag to target a single mode
+- **Skip any screenshot file that already exists in `screenshots/before/`** (never clobber)
+- Print a clear error and exit if the dev server is not running on port 3000
+- Activate the compact density toggle (if one exists in the app) before capturing Compact mode screenshots; deactivate it for Detailed mode screenshots
+- Save all files to `/polish/screenshots/before/` using the naming convention below
 
-**Desktop (viewport: 1440 × 900)**
+### Naming convention
 
-| Filename | How to capture |
-|----------|---------------|
-| `desktop-01-home.png` | Full page, Itinerary tab active, real data loaded |
-| `desktop-02-menu-bar.png` | Clip: top 60px only (the dark .app-menu-bar) |
-| `desktop-03-header.png` | Clip: `header` element |
-| `desktop-04-tabs.png` | Clip: `.app-tabs-nav` + `.city-nav` |
-| `desktop-05-itinerary.png` | Click to expand first day; screenshot `.tab-pane.active` |
-| `desktop-06-transport.png` | Click Transport tab; screenshot `#tab-transport` |
-| `desktop-07-budget.png` | Click Budget tab; screenshot `#tab-budget` |
-| `desktop-08-packing.png` | Click Packing tab; screenshot `#tab-packing` |
-| `desktop-09-map.png` | Click Map tab; screenshot `#tab-map` |
-| `desktop-10-journey-modal.png` | Click a journey entry to open modal; full modal screenshot |
-| `desktop-11-ai-builder.png` | Open AI Builder modal; full modal screenshot |
-| `desktop-12-mobile-menu.png` | Resize to 390px wide; click ☰ Menu; screenshot the bottom sheet |
+```
+[mode]-[NN]-[slug].png
+```
 
-**Mobile — iPhone 12 Pro (viewport: 390 × 844, deviceScaleFactor: 3)**
+Examples: `dde-01-home.png`, `mco-05-itinerary.png`
+
+### Screenshots to capture — Desktop Detailed (DDE) — viewport 1440 × 900
 
 | Filename | How to capture |
 |----------|---------------|
-| `mobile-01-home.png` | Full viewport, Itinerary tab, real data |
-| `mobile-02-header.png` | Clip: top 100px |
-| `mobile-03-tabs.png` | Clip: `.app-tabs-nav` + `.city-nav` |
-| `mobile-04-menu-open.png` | Tap ☰ Menu; screenshot bottom sheet |
-| `mobile-05-itinerary.png` | Expanded day card with activities visible |
-| `mobile-06-transport.png` | Transport tab |
-| `mobile-07-budget.png` | Budget tab |
-| `mobile-08-journey-modal-top.png` | Journey modal, scrolled to top |
-| `mobile-09-journey-modal-bottom.png` | Journey modal, scrolled to bottom |
-| `mobile-10-ai-builder.png` | AI Builder modal |
-| `mobile-11-city-nav-overflow.png` | City nav with many cities — scroll affordance visible? |
+| `dde-01-home.png` | Full page, Itinerary tab active, real data loaded |
+| `dde-02-menu-bar.png` | Clip: top 60px (`.app-menu-bar`) |
+| `dde-03-header.png` | Clip: `header` element |
+| `dde-04-tabs.png` | Clip: `.app-tabs-nav` + `.city-nav` |
+| `dde-05-itinerary.png` | Expand first day; screenshot `.tab-pane.active` |
+| `dde-06-transport.png` | Transport tab: `#tab-transport` |
+| `dde-07-budget.png` | Budget tab: `#tab-budget` |
+| `dde-08-packing.png` | Packing tab: `#tab-packing` |
+| `dde-09-map.png` | Map tab: `#tab-map` |
+| `dde-10-journey-modal.png` | Open a journey entry modal; full modal |
+| `dde-11-ai-builder.png` | AI Builder modal; full modal |
+| `dde-12-accom.png` | Accommodation tab: `#tab-accom` |
 
-Save all screenshots to `/polish/screenshots/before/`.
+### Screenshots to capture — Desktop Compact (DCO) — viewport 1440 × 900, compact on
+
+| Filename | How to capture |
+|----------|---------------|
+| `dco-01-home.png` | Full page, Itinerary tab, compact mode active |
+| `dco-02-menu-bar.png` | Clip: top 60px — does it still fit? |
+| `dco-03-tabs.png` | Clip: `.app-tabs-nav` + `.city-nav` — labels truncate? |
+| `dco-04-itinerary.png` | Expand first day; condensed card rows visible |
+| `dco-05-transport.png` | Transport tab in compact mode |
+| `dco-06-budget.png` | Budget tab in compact mode |
+| `dco-07-journey-modal.png` | Journey modal — does compact affect modal layout? |
+
+### Screenshots to capture — Mobile Detailed (MDE) — viewport 390 × 844, deviceScaleFactor 3
+
+| Filename | How to capture |
+|----------|---------------|
+| `mde-01-home.png` | Full viewport, Itinerary tab, real data |
+| `mde-02-header.png` | Clip: top 100px |
+| `mde-03-tabs.png` | Clip: `.app-tabs-nav` + `.city-nav` |
+| `mde-04-menu-open.png` | Tap ☰ Menu; screenshot bottom sheet |
+| `mde-05-itinerary.png` | Expanded day card with activities visible |
+| `mde-06-transport.png` | Transport tab |
+| `mde-07-budget.png` | Budget tab |
+| `mde-08-journey-modal-top.png` | Journey modal scrolled to top |
+| `mde-09-journey-modal-bottom.png` | Journey modal scrolled to bottom |
+| `mde-10-ai-builder.png` | AI Builder modal |
+| `mde-11-city-nav-overflow.png` | City nav with many cities — scroll affordance visible? |
+| `mde-12-accom.png` | Accommodation tab |
+
+### Screenshots to capture — Mobile Compact (MCO) — viewport 390 × 844, compact on
+
+| Filename | How to capture |
+|----------|---------------|
+| `mco-01-home.png` | Full viewport, Itinerary tab, compact mode active |
+| `mco-02-tabs.png` | `.app-tabs-nav` — do tab labels survive compact + small screen? |
+| `mco-03-menu-open.png` | Bottom sheet in compact mode |
+| `mco-04-itinerary.png` | Expanded day card, compact row height |
+| `mco-05-budget.png` | Budget KPI grid — does compact mode help at 390px? |
+| `mco-06-journey-modal-top.png` | Journey modal top in compact mode |
+| `mco-07-city-nav-overflow.png` | City nav in compact mode |
 
 ---
 
@@ -121,15 +244,16 @@ Read the following source files in full before writing the audit:
 
 Then review every before screenshot you captured.
 
-Write `/polish/AUDIT.md` using the structure below. Be exhaustive — aim for 20–30 issues minimum.
+If `polish/AUDIT.md` already exists, **append** a new dated section rather than overwriting.
+
+Write (or append to) `/polish/AUDIT.md` using the structure below. Aim for 20–30 issues minimum per run.
 
 ```md
-# APP_POLISH_AUDIT.md
-## Travel Planner PWA — UI/UX & Mobile Polish Audit
+# Travel Planner PWA — UI/UX & Polish Audit
 
-**Audit date:** [today]  
-**Viewports tested:** Desktop 1440×900 · iPhone 12 Pro 390×844  
-**Real data used:** 2026_June_July_Europe_Thailand.json  
+**Audit date:** [today]
+**Viewports tested:** DDE (1440×900 Detailed) · DCO (1440×900 Compact) · MDE (390×844 Detailed) · MCO (390×844 Compact)
+**Real data used:** 2026_June_July_Europe_Thailand.json
 
 ---
 
@@ -137,17 +261,17 @@ Write `/polish/AUDIT.md` using the structure below. Be exhaustive — aim for 20
 
 | Metric | Value |
 |--------|-------|
-| Total issues | X |
+| Total issues (this run) | X |
 | 🔴 Critical | X |
 | 🟡 Important | X |
 | 🟢 Polish | X |
 | Estimated total effort | X hours |
 | Design maturity (1–10) | X/10 |
 | Single biggest win | [one sentence] |
+| Modes most affected | [e.g. MCO, MDE] |
 
 ### Top 5 highest-impact changes
 1. ...
-2. ...
 
 ---
 
@@ -155,33 +279,44 @@ Write `/polish/AUDIT.md` using the structure below. Be exhaustive — aim for 20
 
 For EACH screenshot write a section:
 
-### [filename]
-**View:** Desktop / Mobile  
-**What's working:** [bullets]  
-**Issues found:**  
-① [name] — [specific description: element, location, what fails]  
-② ...  
+### [filename] — [Mode label]
+**What's working:** [bullets]
+**Issues found:**
+① [name] — [element · location · what fails · which modes affected: DDE / DCO / MDE / MCO]
+② ...
 
 ---
 
-## Known suspects — explicitly check each one
+## Known suspects — explicitly check each one across all four modes
 
-Check these specific issues and report findings:
+| Suspect | Location | DDE | DCO | MDE | MCO |
+|---------|----------|-----|-----|-----|-----|
+| App menu bar 14-button overflow | `.app-menu-bar` | ? | ? | n/a | n/a |
+| Compact mode toggle — does it exist? | UI chrome | ? | ? | ? | ? |
+| Compact mode — card row height changes | `.day-card`, `.activity-row` | ? | ? | ? | ? |
+| Compact mode — modal layout impact | all modals | ? | ? | ? | ? |
+| Journey modal height on mobile | `#journey-modal .modal-content` | n/a | n/a | ? | ? |
+| "Accommodation" tab truncation | `.app-tab-btn[data-tab="accom"]` | ? | ? | ? | ? |
+| contenteditable H1 tap-to-edit | `#mainTitle`, `#mainSubtitle` | ? | ? | ? | ? |
+| Transport type button row | `.transport-type-group` | ? | ? | ? | ? |
+| City nav scroll affordance | `.city-nav-list` | ? | ? | ? | ? |
+| Modal close button tap target ≥44px | `.modal-close` | ? | ? | ? | ? |
+| Drag handle affordance on mobile | Draggable activity cards | n/a | n/a | ? | ? |
+| Map tab placeholder | `#tab-map` | ? | ? | ? | ? |
+| Mobile menu 4 export buttons | `#mobileMenuSheet` | n/a | n/a | ? | ? |
+| Budget KPI grid at 390px | `.budget-kpi-grid` | n/a | n/a | ? | ? |
+| Compact mode — tab label truncation at 390px | `.app-tab-btn` | n/a | n/a | n/a | ? |
 
-| Suspect | Location | Check |
-|---------|----------|-------|
-| App menu bar 14-button overflow | `.app-menu-bar` | Does it wrap/clip below 1380px? |
-| Journey modal height on mobile | `#journey-modal .modal-content` | Does content exceed 844px? Is footer reachable? |
-| "Accommodation" tab truncation | `.app-tab-btn[data-tab="accom"]` | Does label fit at 390px? |
-| contenteditable H1 tap-to-edit | `#mainTitle`, `#mainSubtitle` | Opens keyboard on any mobile tap? |
-| Transport type button row | `.transport-type-group` | Do 5 buttons fit at modal width on 390px? |
-| From→To date+time inputs | `#journeyDateFrom` + `#journeyTimeFrom` | Are inputs usable on mobile? |
-| City nav scroll affordance | `.city-nav-list` | Any fade/arrow indicating scroll? |
-| Modal close button tap target | `.modal-close` | Is it ≥44×44px? |
-| Drag handle affordance on mobile | Draggable activity cards | Visible grab handle? Touch events? |
-| Map tab placeholder | `#tab-map` | Renders real map or just emoji? |
-| Mobile menu 4 export buttons | `#mobileMenuSheet` | Do subtitles/labels explain each action? |
-| Budget KPI grid at 390px | `.budget-kpi-grid` | Cards wrap correctly? No number overflow? |
+---
+
+## Mode comparison — issues unique to each mode
+
+| Mode | Issue count | Unique issues (not present in other modes) |
+|------|------------|-------------------------------------------|
+| DDE | X | ... |
+| DCO | X | ... |
+| MDE | X | ... |
+| MCO | X | ... |
 
 ---
 
@@ -189,8 +324,8 @@ Check these specific issues and report findings:
 
 ### Design maturity: X/10
 
-**Strengths:** [bullets]  
-**Weaknesses:** [bullets]  
+**Strengths:** [bullets]
+**Weaknesses:** [bullets]
 
 | Benchmark | What they do better | Takeaway for this app |
 |-----------|--------------------|-----------------------|
@@ -200,58 +335,60 @@ Check these specific issues and report findings:
 | Notion | | |
 
 ### Typography assessment
-[Playfair Display + DM Sans pairing — any issues on mobile?]
+[Playfair Display + DM Sans — issues at small sizes in compact mode?]
 
 ### Colour + contrast
-[Navy #1A242F menu bar + body palette — any WCAG AA failures?]
+[Navy #1A242F + body palette — any WCAG AA failures?]
 
 ### Visual hierarchy
-[Heading/body/action hierarchy — any problems?]
+[Heading/body/action hierarchy — does compact mode collapse it too aggressively?]
 
 ---
 
 ## Mobile tap target audit
 
-| Element | Selector | Estimated size | Min required | Pass/Fail |
-|---------|----------|---------------|--------------|-----------|
-| Tab buttons | `.app-tab-btn` | ? | 44px | ? |
-| ☰ Menu button | `.mobile-menu-btn` | ? | 44px | ? |
-| Modal close | `.modal-close` | ? | 44px | ? |
-| Action buttons | `.action-btn` | ? | 44px | ? |
-| City nav buttons | `.city-nav-btn` | ? | 44px | ? |
-| Expand/collapse | `#expandAll` | ? | 44px | ? |
+| Element | Selector | DDE | DCO | MDE | MCO | Min | Pass/Fail |
+|---------|----------|-----|-----|-----|-----|-----|-----------|
+| Tab buttons | `.app-tab-btn` | ? | ? | ? | ? | 44px | ? |
+| ☰ Menu button | `.mobile-menu-btn` | n/a | n/a | ? | ? | 44px | ? |
+| Modal close | `.modal-close` | ? | ? | ? | ? | 44px | ? |
+| Action buttons | `.action-btn` | ? | ? | ? | ? | 44px | ? |
+| City nav buttons | `.city-nav-btn` | ? | ? | ? | ? | 44px | ? |
+| Expand/collapse | `#expandAll` | ? | ? | ? | ? | 44px | ? |
 
 ---
 
-## Modal usability on mobile
+## Modal usability
 
-| Modal | Scrollable? | Footer reachable? | Rating |
-|-------|-------------|-------------------|--------|
-| Journey | | | ✅/⚠️/❌ |
-| Add Stay | | | |
-| Add Leg | | | |
-| Cities | | | |
-| AI Builder | | | |
-| Print Preview | | | |
-| Guide | | | |
+| Modal | DDE scroll? | DCO scroll? | MDE scroll? | MCO scroll? | Footer reachable? |
+|-------|-------------|-------------|-------------|-------------|-------------------|
+| Journey | | | | | |
+| Add Stay | | | | | |
+| Add Leg | | | | | |
+| Cities | | | | | |
+| AI Builder | | | | | |
+| Print Preview | | | | | |
+| Guide | | | | | |
 
 ---
 
 ## Functional gaps
 
-| Gap | Severity | Notes |
-|-----|----------|-------|
-| Map tab is a placeholder | 🔴 High | No map library — Leaflet recommended |
-| [others found] | | |
+| Gap | Severity | Modes affected | Notes |
+|-----|----------|---------------|-------|
+| Map tab is a placeholder | 🔴 High | All | No map library — Leaflet recommended |
+| [others] | | | |
 ```
 
 ---
 
 ## STEP 4 — CREATE INDIVIDUAL WORK ITEM FILES
 
-For every issue found in the audit, create a file `/polish/items/WI-XXX.md`.
+For every **new** issue found in this audit run, create `/polish/items/WI-XXX.md`.
 
-Number sequentially: WI-001, WI-002, etc. Order by priority (Critical first).
+- Number from `$LAST_WI + 1` (determined in Step 0b)
+- Order by priority within this run (Critical first)
+- **Never edit an existing WI file**
 
 Each file must follow this exact template:
 
@@ -262,33 +399,39 @@ Each file must follow this exact template:
 |-------|-------|
 | Priority | 🔴 Critical / 🟡 Important / 🟢 Polish |
 | Effort | 🔴 Major (1–3 days) / 🟡 Medium (2–8 hrs) / 🟢 Quick Win (<1 hr) |
-| Dimension | Mobile Layout / Desktop Aesthetic / Functionality / UX Flow |
+| Modes affected | DDE · DCO · MDE · MCO (list only those that show the issue) |
+| Dimension | Mobile Layout / Desktop Aesthetic / Compact Mode / Functionality / UX Flow |
 | Status | 🔲 Todo |
-| Before screenshot | `screenshots/before/[filename].png` |
-| After proposal | `screenshots/after/WI-XXX-after.png` (see below) |
+| Before screenshot | `../screenshots/before/[mode-NN-slug].png` |
+| After proposal | `../screenshots/after/WI-XXX-proposal.md` |
 | Files to change | `style.css` · `js/ui.js` · etc |
 
 ---
 
 ## Problem
 
-[2–3 sentences. Specific: what element, what screen, what fails and why it matters to the user.]
+[2–3 sentences. What element, what screen(s)/mode(s), what fails, why it matters.]
 
 ## Before (current state)
 
-> Screenshot: `../screenshots/before/[filename].png`  
-> Callout: [describe exactly what to look at in the screenshot — element, position, what's wrong]
+> Screenshot: `../screenshots/before/[filename].png`
+> Mode: [DDE / DCO / MDE / MCO]
+> Callout: [exactly what to look at — element, position, what's wrong]
 
 ## Proposed fix
 
-[Specific implementation guidance. Name the CSS class, JS function, or HTML element.]
+[Specific implementation. Name the CSS class, JS function, or HTML element.
+Note if the fix must be mode-conditional (e.g. only applies when `.compact` class is active).]
 
 ```css
 /* BEFORE */
 .some-class { ... }
 
-/* AFTER */  
+/* AFTER */
 .some-class { ... }
+
+/* Compact-mode override example */
+.compact .some-class { ... }
 ```
 
 Or for JS changes:
@@ -302,18 +445,16 @@ Or for JS changes:
 
 ## After (proposed state description)
 
-[Since we cannot auto-generate a real "after" screenshot before the fix is implemented,
-describe in precise visual terms what the corrected state should look like.
-Be specific enough that a developer knows exactly what "done" looks like.]
-
-Example: "The modal-content div should scroll internally. The Save Journey and Cancel
-buttons in the modal footer remain fixed at the bottom of the viewport regardless of
-scroll position. On iPhone 12, no more than 88% of the viewport height is occupied."
+[Describe the corrected state precisely for each affected mode.
+E.g.: "In MDE, the modal footer is pinned and reachable without scrolling.
+In MCO, the same fix applies with 10% tighter padding.
+DDE and DCO are unaffected."]
 
 ## Acceptance criteria
 
-- [ ] [Specific, testable outcome]
-- [ ] [Another outcome]
+- [ ] Fix verified in [list each affected mode]
+- [ ] No regression in unaffected modes
+- [ ] Tap targets remain ≥44px on mobile after fix
 - [ ] Regression check passes: `node scripts/regression-city-nav.js`
 
 ## How to implement
@@ -325,44 +466,43 @@ scroll position. On iPhone 12, no more than 88% of the viewport height is occupi
 
 ---
 
-## STEP 5 — WRITE THE TRACKER
+## STEP 5 — UPDATE THE TRACKER
 
-Write `/polish/TRACKER.md` — this is the single file used day-to-day to track progress.
+If `polish/TRACKER.md` does not exist, create it fresh.
+If it **does** exist, **only append new rows** to the correct priority section.
+Never modify or delete rows for existing items.
 
 ```md
 # Polish Sprint — Progress Tracker
 
-Last updated: [date]  
-Progress: 0/X items complete
+Last updated: [date]
+Progress: [existing done count]/[total including new] items complete
 
 ---
 
 ## 🔴 Critical
 
-| ID | Title | Effort | Status | Done |
-|----|-------|--------|--------|------|
-| [WI-001](./items/WI-001.md) | [title] | 🟢 Quick Win | 🔲 Todo | — |
-| ... | | | | |
+| ID | Title | Modes | Effort | Status | Done |
+|----|-------|-------|--------|--------|------|
+| [WI-001](./items/WI-001.md) | [title] | DDE · MDE | 🟢 Quick Win | 🔲 Todo | — |
 
 ## 🟡 Important
 
-| ID | Title | Effort | Status | Done |
-|----|-------|--------|--------|------|
-| ... | | | | |
+| ID | Title | Modes | Effort | Status | Done |
+|----|-------|-------|--------|--------|------|
 
 ## 🟢 Polish
 
-| ID | Title | Effort | Status | Done |
-|----|-------|--------|--------|------|
-| ... | | | | |
+| ID | Title | Modes | Effort | Status | Done |
+|----|-------|-------|--------|--------|------|
 
 ---
 
 ## Completed ✅
 
-| ID | Title | Completed |
-|----|-------|-----------|
-| — | — | — |
+| ID | Title | Modes | Completed |
+|----|-------|-------|-----------|
+| — | — | — | — |
 
 ---
 
@@ -372,74 +512,110 @@ When you finish a work item:
 1. Change its Status cell to `✅ Done`
 2. Fill in the Done date
 3. Move the row to the Completed table at the bottom
-4. Take an after screenshot → save to `screenshots/after/WI-XXX-after.png`
-5. Update the after screenshot reference in `items/WI-XXX.md`
-6. Update the progress count at the top of this file
+4. Take after screenshot: `node polish/scripts/take-screenshots.js --wi WI-XXX --mode [MODE]`
+5. Replace `WI-XXX-proposal.md` with real `WI-XXX-after.png` in `screenshots/after/`
+6. Update the after screenshot reference in `items/WI-XXX.md`
+7. Update the progress count at the top of this file
 ```
 
 ---
 
-## STEP 6 — TAKE "AFTER PROPOSAL" VISUAL NOTES
+## STEP 6 — CREATE PROPOSAL MOCKUPS
 
-For each Critical and Important work item, create a text file in `/polish/screenshots/after/`
-named `WI-XXX-proposal.md` describing the proposed visual state in enough detail to verify
-the fix when implemented. This stands in for an actual after screenshot until the fix is done.
+For each **new** Critical or Important work item, you MUST create a visual proposal.
 
-Once a fix IS implemented, replace the `.md` proposal with a real `.png` screenshot using
-the same Puppeteer script from Step 2 (re-run it after the fix).
+1. **Option A (HTML Mockup):** Create a standalone `polish/items/proposals/WI-XXX-mockup.html`. This file should:
+   - Import `style.css`.
+   - Contain a minimal HTML structure demonstrating the "fixed" state of the component.
+   - Be screenshotted and saved as `polish/screenshots/after/WI-XXX-proposal.png`.
+2. **Option B (Detailed Markdown):** If Option A is impractical, create `polish/screenshots/after/WI-XXX-proposal.md` with an exhaustive visual spec and any reference imagery.
+
+**The TRACKER.md and WI-XXX.md must link to these proposal files.**
 
 ---
 
 ## STEP 7 — FINAL SUMMARY REPORT
 
-Append a final section to `/polish/AUDIT.md`:
+Append this section to `/polish/AUDIT.md` (after the main findings):
 
 ```md
 ---
 
-## Files created
+## Run summary — [today's date]
 
-| File | Purpose |
-|------|---------|
-| `TRACKER.md` | Day-to-day progress tracker |
-| `items/WI-001.md` … `items/WI-XXX.md` | Individual work items |
-| `screenshots/before/` | X screenshots captured |
-| `screenshots/after/` | Proposal notes (replace with real screenshots post-fix) |
+| File | Count |
+|------|-------|
+| New WI files created | X |
+| New screenshots captured | X |
+| Screenshots skipped (already existed) | X |
+| New TRACKER rows added | X |
 
-## Recommended order of attack
+## Files created this run
 
-Work through items in this order for maximum visible improvement fastest:
+[list only new files]
 
-1. [WI-XXX] — [title] — why first
-2. [WI-XXX] — [title] — why second
-3. ...
+## Recommended order of attack (this run's new items)
+
+1. [WI-XXX] — [title] — [why first]
+2. ...
 
 ## Definition of done for the full sprint
 
-- [ ] All 🔴 Critical items resolved
+- [ ] All 🔴 Critical items resolved across all four modes
 - [ ] All 🟡 Important items resolved
 - [ ] Regression check passing
-- [ ] After screenshots taken for all completed items
+- [ ] After screenshots taken for all completed items in each affected mode
 - [ ] TRACKER.md showing 100% complete
 ```
 
 ---
 
-## NOTES FOR CLAUDE CODE / CODEX
+## NOTES FOR CLAUDE CODE
 
+- **Always complete Step 0 before anything else.** It determines whether you are in fresh or incremental mode and sets `$LAST_WI`.
 - Work through Steps 1–7 in order. Do not skip steps.
-- If Puppeteer screenshots fail (server not running, selector not found), note the failure in the relevant item's `WI-XXX.md` and continue – do not stop the whole audit.
-- Use real CSS selectors from the actual source files – read them before writing fix code.
-- Do not invent issues. Only report what you can actually see in screenshots or source code.
-- If multiple WIs are active, keep one WI per branch or worktree and verify the current branch before editing anything.
-- Do not edit another WI's files or tracker row in a shared worktree; commit and push a verified WI before switching context.
-- The `/polish` folder is self-contained. Nothing outside it needs to change until you implement a fix.
-- When a WI is moved to Done, commit the change on the WI branch with the WI referenced in the commit message, then push that same branch before closing the item out.
-- When done, print a one-line summary: `Polish audit complete — X items found, files in /polish/`
+- If Puppeteer screenshots fail (server not running, selector not found), note the failure in the relevant WI file and continue — do not abort the whole audit.
+- Use real CSS selectors from the actual source files — read them before writing fix code.
+- Do not invent issues. Only report what you can see in screenshots or source code.
+- For every issue, explicitly state which of the four modes (DDE / DCO / MDE / MCO) it affects.
+- Issues that only appear in Compact mode must be tagged `DCO` or `MCO` (or both) and the fix must use the `.compact` class scope where appropriate.
+- If multiple WIs are active, keep one WI per branch; verify the current branch before editing.
+- Do not edit another WI's files in a shared worktree; commit and push a verified WI before switching context.
+- The `/polish` folder is self-contained. Nothing outside it changes until you implement a fix.
+- When a WI is moved to Done, commit on the WI branch with the WI number in the commit message, then push before closing out.
+- When done, print: `Polish audit complete — X new items found, X screenshots taken, files in /polish/`
 
-## Prompt for work
-- Work on the next Todo item in polish/TRACKER.md. Follow CODEX.md. Complete the item end-to-end, including verification, after screenshot, and tracker updates.
+---
 
-or
+## PROMPT TO BEGIN (copy this into Claude Code to start or resume the audit)
 
-- Work on Todo item WI-000 in polish/TRACKER.md. Follow CODEX.md. Complete the item end-to-end, including verification, after screenshot, and tracker updates.
+```
+Read POLISH.MD in full. Then:
+
+1. Run the Step 0 safe-run checks to detect whether /polish already exists and find the highest existing WI number and screenshot index.
+2. Work through Steps 1–7 in order using the incremental rules — never overwrite existing files.
+3. Capture all missing before screenshots across all four modes: DDE (Desktop Detailed), DCO (Desktop Compact), MDE (Mobile Detailed), MCO (Mobile Compact). Skip any screenshot file that already exists.
+4. Audit the app from source + screenshots. Tag every issue with the modes it affects.
+5. Create new WI files numbered from the next available ID. Append new rows to TRACKER.md.
+6. Print a one-line completion summary when done.
+
+Do not stop if individual screenshots fail — log the failure in the relevant WI and continue.
+```
+
+### Prompt to work a single item
+
+```
+Work on the next Todo item in polish/TRACKER.md.
+Complete it end-to-end: implement the fix, verify in all modes listed on the WI, take after screenshot(s), update TRACKER.md.
+Follow all safe-run rules — do not touch other WI files or tracker rows.
+```
+
+### Prompt to work a specific item
+
+```
+Work on WI-[XXX] in polish/TRACKER.md.
+Complete it end-to-end: implement the fix, verify in modes [DDE / DCO / MDE / MCO],
+take after screenshot(s) using the Puppeteer script with --wi WI-XXX --mode [MODE],
+update TRACKER.md status to ✅ Done and move row to Completed.
+Commit on branch WI-[XXX] and push.
+```
