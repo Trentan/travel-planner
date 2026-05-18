@@ -342,16 +342,27 @@ function toggleCompactView(nextValue = null) {
   }
 }
 
-function promptResetData() {
+function promptHardRestart() {
+  if (typeof hardRestartApp === 'function') {
+    hardRestartApp();
+  }
+}
+
+function promptFactoryReset() {
   closeMobileMenu();
   const mobileResetMessage = [
-    'Reset this app on mobile?',
+    '⚠️ WIPE ALL DATA?',
     '',
-    'This will clear your trip data, saved settings, offline cache, and local backups, then reload the planner.'
+    'This will delete your trip, custom cities, and all local settings. It cannot be undone.',
+    '',
+    'Continue?'
   ].join('\n');
-  return resetData({
-    confirmMessage: isMobileViewport() ? mobileResetMessage : undefined
-  });
+
+  if (typeof factoryResetData === 'function') {
+    return factoryResetData({
+      confirmMessage: isMobileViewport() ? mobileResetMessage : undefined
+    });
+  }
 }
 
 function toggleCard(bar) { bar.parentElement.classList.toggle('open'); }
@@ -437,7 +448,8 @@ window.closeDesktopActionsMenu = closeDesktopActionsMenu;
 window.closeMobileMenu = closeMobileMenu;
 window.syncResponsiveUi = syncResponsiveUi;
 window.syncMobileMenuControls = syncMobileMenuControls;
-window.promptResetData = promptResetData;
+window.promptHardRestart = promptHardRestart;
+window.promptFactoryReset = promptFactoryReset;
 window.addLeg = addLeg;
 window.openRenameTripDialog = openRenameTripDialog;
 window.closeRenameTripDialog = closeRenameTripDialog;

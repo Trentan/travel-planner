@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-17
-Progress: 20/24 items complete
+Progress: 22/25 items complete
 
 ---
 
@@ -9,6 +9,8 @@ Progress: 20/24 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
+| [WI-026](./items/WI-026.md) | "Reset App" Is Too Destructive And Misleading | 🟢 Quick Win | ✅ Done | [WI-026-Before](./screenshots/before/desktop-12-mobile-menu.png) | [WI-026-Proposed](./items/proposals/WI-026-proposal.png) | [WI-026-After](./screenshots/after/WI-026-after.png) | 2026-05-18 |
+| [WI-027](./items/WI-027.md) | Extreme Transport Row Compression | 🟢 Quick Win | ✅ Done | [WI-027-Before](./screenshots/before/desktop-01-home.png) | [WI-027-Proposed](./items/WI-027.md) | [WI-027-After](./screenshots/after/WI-027-after.png) | 2026-05-18 |
 
 ## Important
 

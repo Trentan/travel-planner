@@ -48,7 +48,9 @@
         <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
         <button id="saveAsBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripFile()">Save As</button>
         <button id="openFileBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openExistingTripFile()">Open File</button>
-        <button class="app-menu-btn danger" onclick="closeDesktopActionsMenu(); promptResetData()">Reset App</button>
+        <div class="app-menu-divider" aria-hidden="true"></div>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); promptHardRestart()" title="Reload app and clear caches while preserving trip data">🔄 Hard Restart</button>
+        <button class="app-menu-btn danger" onclick="closeDesktopActionsMenu(); promptFactoryReset()" title="Wipe ALL data and revert to default template">⚠️ Factory Reset (Wipe All Data)</button>
         <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="closeDesktopActionsMenu(); promptInstallApp()">⬇ Install App</button>
       </div>
     </details>
@@ -203,7 +205,15 @@
           <span class="app-menu-btn-title">Open File</span>
           <span class="app-menu-btn-subtitle">Load an existing trip</span>
         </button>
-        <button class="app-menu-btn danger" onclick="closeMobileMenu(); promptResetData()">Reset App</button>
+        <div class="mobile-menu-divider" aria-hidden="true"></div>
+        <button class="app-menu-btn" onclick="closeMobileMenu(); promptHardRestart()">
+          <span class="app-menu-btn-title">🔄 Hard Restart</span>
+          <span class="app-menu-btn-subtitle">Clean refresh (keeps trip data)</span>
+        </button>
+        <button class="app-menu-btn danger" onclick="closeMobileMenu(); promptFactoryReset()">
+          <span class="app-menu-btn-title">⚠️ Factory Reset (Wipe All Data)</span>
+          <span class="app-menu-btn-subtitle">Delete everything & start over</span>
+        </button>
         <button id="mobileInstallAppBtn" class="app-menu-btn install-btn" hidden onclick="closeMobileMenu(); promptInstallApp()">⬇ Install App</button>
       </div>
     </div>

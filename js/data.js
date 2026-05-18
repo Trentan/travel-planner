@@ -2496,8 +2496,43 @@ function resetAppStateToDefaults() {
   window.currentCityFilter = currentCityFilter;
 }
 
-async function resetData(options = {}) {
-  const confirmMessage = options.confirmMessage || "Reset all edits back to the default template? This will wipe current data, clear caches, and reload the app.";
+/**
+ * Hard restart reloads the app and clears temporary caches
+ * but preserves user trip data in localStorage and IndexedDB.
+ */
+async function hardRestartApp() {
+  if(!confirm("Restart app and clear temporary caches? Your trip data will be preserved.")) {
+    return;
+  }
+
+  try { sessionStorage.clear(); } catch (e) { console.warn('Hard restart: sessionStorage cleanup skipped', e); }
+
+  try {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(registration => registration.unregister().catch(() => false)));
+    }
+  } catch (e) {
+    console.warn('Hard restart: service worker cleanup skipped', e);
+  }
+
+  try {
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+    }
+  } catch (e) {
+    console.warn('Hard restart: cache cleanup skipped', e);
+  }
+
+  location.reload();
+}
+
+/**
+ * Factory reset wipes ALL data, clears caches, and reverts to the default template.
+ */
+async function factoryResetData(options = {}) {
+  const confirmMessage = options.confirmMessage || "⚠️ DANGER: Wipe ALL trip data and custom settings? This will revert everything to the default template and cannot be undone.";
   if(!confirm(confirmMessage)) {
     return;
   }
@@ -2510,7 +2545,7 @@ async function resetData(options = {}) {
     if (key && key.startsWith('travelApp_')) keysToClear.push(key);
   }
   keysToClear.forEach(key => localStorage.removeItem(key));
-  try { sessionStorage.clear(); } catch (e) { console.warn('Reset app: sessionStorage cleanup skipped', e); }
+  try { sessionStorage.clear(); } catch (e) { console.warn('Factory reset: sessionStorage cleanup skipped', e); }
 
   try {
     if ('serviceWorker' in navigator) {
@@ -2518,7 +2553,7 @@ async function resetData(options = {}) {
       await Promise.all(registrations.map(registration => registration.unregister().catch(() => false)));
     }
   } catch (e) {
-    console.warn('Reset app: service worker cleanup skipped', e);
+    console.warn('Factory reset: service worker cleanup skipped', e);
   }
 
   try {
@@ -2527,7 +2562,7 @@ async function resetData(options = {}) {
       await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
     }
   } catch (e) {
-    console.warn('Reset app: cache cleanup skipped', e);
+    console.warn('Factory reset: cache cleanup skipped', e);
   }
 
   try {
@@ -2538,7 +2573,7 @@ async function resetData(options = {}) {
       });
     }
   } catch (e) {
-    console.warn('Reset app: IndexedDB cleanup skipped', e);
+    console.warn('Factory reset: IndexedDB cleanup skipped', e);
   }
 
   location.reload();
@@ -3792,7 +3827,8 @@ window.exportItineraryText = exportItineraryText;
 window.exportItinerarySummaryText = exportItinerarySummaryText;
 window.openShareExportDialog = openShareExportDialog;
 window.closeShareExportDialog = closeShareExportDialog;
-window.resetData = resetData;
+window.hardRestartApp = hardRestartApp;
+window.factoryResetData = factoryResetData;
 window.importJSON = importJSON;
 window.openTripFile = openTripFile;
 window.openExistingTripFile = openExistingTripFile;

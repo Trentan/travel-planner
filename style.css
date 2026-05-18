@@ -3063,7 +3063,7 @@ body.mobile-menu-open {
 /* DATA TABLES (FOR EXTRA TABS) */
 .data-table-wrapper { background: var(--card-strong); border: 1px solid var(--border); border-radius: 8px; overflow-x: auto; box-shadow: var(--shadow);}
 .data-table { width: 100%; border-collapse: collapse; min-width: 600px;}
-.data-table th, .data-table td { padding: 0.9rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+.data-table th, .data-table td { padding: 0.65rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border); }
 .data-table th { background: #f7f4ed; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em;}
 .data-table tbody tr { transition: background 0.2s; border-left: 4px solid transparent;}
 .data-table tbody tr:hover { background: #faf8f3; }
@@ -3972,16 +3972,16 @@ body.compact-view-mode .data-table {
 }
 body.compact-view-mode .data-table th,
 body.compact-view-mode .data-table td {
-  padding: 0.45rem 0.55rem;
-  line-height: 1.25;
+  padding: 0.35rem 0.5rem;
+  line-height: 1.2;
 }
 body.compact-view-mode .data-table th {
-  font-size: 0.65rem;
+  font-size: 0.62rem;
 }
 body.compact-view-mode .data-table .route-col,
 body.compact-view-mode .data-table .city-col,
 body.compact-view-mode .data-table .property-col {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 body.compact-view-mode .budget-kpi-grid {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -4959,7 +4959,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
 /* Journey name column - wider to fit longer journey names with wrapping */
 .transport-table .journey-name-col {
-  padding: 0.75rem 0.5rem;
+  padding: 0.5rem 0.5rem;
   width: 260px;
   min-width: 240px;
   max-width: 320px;
@@ -4967,10 +4967,10 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 }
 
 .transport-table .journey-name-col .journey-name-main {
-  min-height: 48px;
+  min-height: 24px;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  line-height: 1.4;
+  line-height: 1.3;
   display: inline-block;
   width: 100%;
 }
@@ -5048,7 +5048,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 }
 
 .transport-segment-row td {
-  padding: 0.65rem 0.45rem;
+  padding: 0.45rem 0.45rem;
   border-top: 1px solid rgba(36, 72, 93, 0.12);
   vertical-align: top;
   font-size: 0.84rem;
@@ -7618,3 +7618,4 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 }
 
 
+`n/* FINAL TRANSPORT COMPRESSION - FORCED OVERRIDES */`n@media (min-width: 769px) {`n  .transport-table .journey-parent-row > td {`n    padding: 0.35rem 0.4rem !important;`n  }`n  .transport-table .journey-name-col {`n    padding: 0.35rem 0.5rem !important;`n  }`n  .transport-table .journey-name-col .journey-name-main {`n    min-height: 0 !important;`n    line-height: 1.2 !important;`n  }`n  .transport-table .journey-type-col {`n    font-size: 1.1rem !important;`n  }`n  body.compact-view-mode .transport-table .journey-parent-row > td {`n    padding: 0.2rem 0.4rem !important;`n  }`n  body.compact-view-mode .transport-table .journey-name-col .journey-name-main {`n    font-size: 0.72rem !important;`n  }`n}
