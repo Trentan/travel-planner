@@ -2,70 +2,22 @@ let isFunMode = false;
 let isCompactView = false;
 let isEditMode = true;
 let isMobileMenuOpen = false;
-let isMobileChromeCondensed = false;
-let lastChromeScrollY = 0;
-let chromeScrollRaf = null;
-let chromeScrollSettleTimer = null;
-let lastChromeCondensedAt = 0;
 
 function isMobileViewport() {
   return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
 }
 
 function updateStickyOffsets() {
-  const menuBar = document.querySelector('.app-menu-bar');
   const tabsNav = document.querySelector('.app-tabs-nav');
   if (!tabsNav) return;
 
-  const menuHeight = isMobileViewport() && menuBar && !isMobileChromeCondensed ? Math.ceil(menuBar.getBoundingClientRect().height || 0) : 0;
+  const menuHeight = 0;
   const tabsHeight = Math.ceil(tabsNav.getBoundingClientRect().height || 0);
   document.documentElement.style.setProperty('--tabs-nav-sticky-top', `${menuHeight}px`);
   document.documentElement.style.setProperty('--city-nav-sticky-top', `${tabsHeight}px`);
   if (isMobileViewport()) {
     document.documentElement.style.setProperty('--city-nav-sticky-top', `${menuHeight + tabsHeight}px`);
   }
-}
-
-function setMobileChromeCondensed(nextValue) {
-  const shouldCondense = !!nextValue && isMobileViewport() && !isMobileMenuOpen;
-  if (isMobileChromeCondensed === shouldCondense) return;
-  isMobileChromeCondensed = shouldCondense;
-  if (isMobileChromeCondensed) {
-    lastChromeCondensedAt = Date.now();
-  }
-  document.body.classList.toggle('mobile-chrome-condensed', isMobileChromeCondensed);
-  updateStickyOffsets();
-  setTimeout(updateStickyOffsets, 240);
-}
-
-function syncMobileChromeFromScroll() {
-  chromeScrollRaf = null;
-
-  if (!isMobileViewport()) {
-    lastChromeScrollY = window.scrollY || 0;
-    setMobileChromeCondensed(false);
-    return;
-  }
-
-  const currentScrollY = Math.max(0, window.scrollY || 0);
-  const delta = currentScrollY - lastChromeScrollY;
-  const isNearTop = currentScrollY < 8;
-  const recentlyCondensed = Date.now() - lastChromeCondensedAt < 450;
-
-  if (isNearTop || (delta < -8 && !recentlyCondensed)) {
-    setMobileChromeCondensed(false);
-  } else if (delta >= 0 && currentScrollY > 80) {
-    setMobileChromeCondensed(true);
-  }
-
-  lastChromeScrollY = currentScrollY;
-}
-
-function scheduleMobileChromeSync() {
-  if (chromeScrollRaf) return;
-  chromeScrollRaf = requestAnimationFrame(syncMobileChromeFromScroll);
-  clearTimeout(chromeScrollSettleTimer);
-  chromeScrollSettleTimer = setTimeout(syncMobileChromeFromScroll, 140);
 }
 
 function syncMobileMenuControls() {
@@ -81,16 +33,29 @@ function syncMobileMenuControls() {
   });
 }
 
+function syncMobileMenuStatus() {
+  const sourceMap = [
+    ['activeFileDisplay', 'mobileActiveFileDisplay'],
+    ['saveStatus', 'mobileSaveStatus'],
+    ['timestampStatus', 'mobileTimestampStatus']
+  ];
+
+  sourceMap.forEach(([sourceId, targetId]) => {
+    const source = document.getElementById(sourceId);
+    const target = document.getElementById(targetId);
+    if (!source || !target) return;
+    target.textContent = (source.textContent || '').trim() || (target.dataset.fallback || '');
+  });
+}
+
 function syncResponsiveUi() {
   const mobile = isMobileViewport();
   document.body.classList.toggle('mobile-app-mode', mobile);
   document.body.classList.toggle('compact-view-mode', isCompactView);
   window.isCompactView = isCompactView;
-  if (!mobile) {
-    setMobileChromeCondensed(false);
-  }
   updateStickyOffsets();
   syncMobileMenuControls();
+  syncMobileMenuStatus();
 
   if (!mobile) {
     closeMobileMenu();
@@ -106,9 +71,7 @@ function toggleMobileMenu() {
     sheet.setAttribute('aria-hidden', String(!isMobileMenuOpen));
   }
   document.body.classList.toggle('mobile-menu-open', isMobileMenuOpen);
-  if (isMobileMenuOpen) {
-    setMobileChromeCondensed(false);
-  }
+  syncMobileMenuStatus();
 }
 
 function closeDesktopActionsMenu() {
@@ -326,7 +289,6 @@ function switchTab(tabId, btnElement) {
   if (tabId === 'guide') buildGuideSteps();
 
   if (window.innerWidth <= 768) {
-    setMobileChromeCondensed(false);
     requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
   }
 }
@@ -444,9 +406,20 @@ function toggleAllLegs() {
 
 window.addEventListener('resize', syncResponsiveUi);
 window.addEventListener('orientationchange', syncResponsiveUi);
-window.addEventListener('scroll', scheduleMobileChromeSync, { passive: true });
 document.addEventListener('DOMContentLoaded', syncResponsiveUi);
 window.addEventListener('load', syncResponsiveUi);
+
+document.addEventListener('DOMContentLoaded', () => {
+  ['activeFileDisplay', 'saveStatus', 'timestampStatus'].forEach(id => {
+    const node = document.getElementById(id);
+    if (!node || typeof MutationObserver === 'undefined') return;
+    new MutationObserver(syncMobileMenuStatus).observe(node, {
+      childList: true,
+      characterData: true,
+      subtree: true
+    });
+  });
+});
 
 document.getElementById('mainTitle').addEventListener('blur', function() { titleData.title = this.innerText; saveData(); trackUserEdit(); });
 document.getElementById('mainSubtitle').addEventListener('blur', function() { titleData.subtitle = this.innerText; saveData(); trackUserEdit(); });
@@ -504,7 +477,7 @@ window.closeDesktopActionsMenu = closeDesktopActionsMenu;
 window.closeMobileMenu = closeMobileMenu;
 window.syncResponsiveUi = syncResponsiveUi;
 window.syncMobileMenuControls = syncMobileMenuControls;
-window.syncMobileChromeFromScroll = syncMobileChromeFromScroll;
+window.syncMobileMenuStatus = syncMobileMenuStatus;
 window.promptHardRestart = promptHardRestart;
 window.promptFactoryReset = promptFactoryReset;
 window.addLeg = addLeg;

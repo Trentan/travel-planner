@@ -12,7 +12,7 @@
 
 ## Critical Items
 
-1. **[WI-028] Condensed Mobile Chrome on Scroll.** Status: Review. Navigation now condenses on mobile downward scroll and restores on upward scroll. Latest after screenshot: [WI-028-after.png](./screenshots/after/WI-028-after.png).
+1. **[WI-028] Condensed Mobile Chrome on Scroll.** Status: Review. Mobile chrome is now condensed by default: the persistent top menu bar is removed on mobile, the menu button is integrated into the tab navigation, and file/status plus compact controls live in the menu sheet. Latest after screenshot: [WI-028-after-2.png](./screenshots/after/WI-028-after-2.png).
 2. **[WI-029] Touch-Friendly Suggested Activity Assignment.** Status: Todo. Drag-and-drop is unusable on mobile. Implement a tap-to-assign flow.
 
 ---
@@ -42,5 +42,5 @@
 
 ## Verification Notes
 
-- 2026-05-18 / WI-028: Mobile Playwright verification at 390x844 with real trip data passed collapse/restore checks and saved [WI-028-after.png](./screenshots/after/WI-028-after.png).
+- 2026-05-18 / WI-028: Mobile Playwright verification at 390x844 with real trip data passed the revised compact chrome checks and saved [WI-028-after-2.png](./screenshots/after/WI-028-after-2.png). Supplemental menu sheet screenshot: [WI-028-after-2-menu.png](./screenshots/after/WI-028-after-2-menu.png).
 - 2026-05-18 / WI-028: `node tests/run-tests.js` currently passes core smoke and city nav before stopping on the existing map harness issue `L is not defined`.
