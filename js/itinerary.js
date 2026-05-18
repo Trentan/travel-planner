@@ -1478,20 +1478,27 @@ function getCitiesInTravelOrder() {
 
   if (Array.isArray(journeys)) {
     journeys.forEach((journey, journeyIndex) => {
-      const departureScore = getTimelineScore(journey.departureDate || journey.dayDate, journey.departureTime, Number.MAX_SAFE_INTEGER - 10000 + journeyIndex);
+      // Use a score that keeps them in chronological order
+      // We use a high base score but adjusted by timeline
+      const departureScore = getTimelineScore(journey.departureDate || journey.dayDate, journey.departureTime, Number.MAX_SAFE_INTEGER - 20000 + journeyIndex);
       const arrivalScore = getTimelineScore(journey.arrivalDate || journey.dayDate || journey.departureDate, journey.arrivalTime, departureScore + 1);
 
-      addCityOrderCandidate(orderMap, journey.fromLocation, departureScore, 5, 1);
-      addCityOrderCandidate(orderMap, journey.toLocation, arrivalScore, 6, 1);
+      addCityOrderCandidate(orderMap, journey.fromLocation, departureScore, 5, 2);
+      addCityOrderCandidate(orderMap, journey.toLocation, arrivalScore, 6, 2);
     });
   }
 
   return citiesData
-      .filter(city => !shouldSkipCityNavName(city.name))
-      .map((city, fallbackIndex) => ({
-        city,
-        order: orderMap.get(city.id) || { score: Number.MAX_SAFE_INTEGER - 1000 + fallbackIndex, sourceRank: 99 }
-      }))
+      .map((city, fallbackIndex) => {
+        let order = orderMap.get(city.id);
+        
+        // If no direct order found, give it a score based on its index
+        if (!order) {
+          order = { score: Number.MAX_SAFE_INTEGER - 1000 + fallbackIndex, sourceRank: 99 };
+        }
+        
+        return { city, order };
+      })
       .sort((a, b) => {
         if (a.order.score !== b.order.score) return a.order.score - b.order.score;
         if (a.order.sourceRank !== b.order.sourceRank) return a.order.sourceRank - b.order.sourceRank;
@@ -1716,6 +1723,8 @@ function selectCityFilter(cityId, btn) {
       buildTransportTab(cityId);
     } else if (tabType === 'accom' && typeof buildAccomTab === 'function') {
       buildAccomTab(cityId);
+    } else if (tabType === 'map') {
+      if (typeof focusCityOnMap === 'function') focusCityOnMap(cityId);
     } else if (tabType === 'itinerary') {
       if (typeof isMobileViewport === 'function' ? isMobileViewport() : window.innerWidth <= 768) {
         if (!scrollToCompactCitySlide(cityId, cityName)) {

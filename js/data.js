@@ -317,63 +317,61 @@ const EXTENDED_CITY_DATABASE = [
 
 // Built-in city database with IATA codes
 const CITY_DATABASE = [
-  { code: 'ADL', name: 'Adelaide', countryCode: 'AU' },
-  { code: 'AMS', name: 'Amsterdam', countryCode: 'NL' },
-  { code: 'ATH', name: 'Athens', countryCode: 'GR' },
-  { code: 'BCN', name: 'Barcelona', countryCode: 'ES' },
-  { code: 'BKK', name: 'Bangkok', countryCode: 'TH' },
-  { code: 'BNE', name: 'Brisbane', countryCode: 'AU' },
-  { code: 'BRU', name: 'Brussels', countryCode: 'BE' },
-  { code: 'BUD', name: 'Budapest', countryCode: 'HU' },
-  { code: 'CAI', name: 'Cairo', countryCode: 'EG' },
-  { code: 'CAN', name: 'Guangzhou', countryCode: 'CN' },
-  { code: 'CDG', name: 'Paris', countryCode: 'FR' },
-  { code: 'CGN', name: 'Cologne', countryCode: 'DE' },
-  { code: 'CPH', name: 'Copenhagen', countryCode: 'DK' },
-  { code: 'DRS', name: 'Dresden', countryCode: 'DE' },
-  { code: 'DUB', name: 'Dublin', countryCode: 'IE' },
-  { code: 'DUS', name: 'Dusseldorf', countryCode: 'DE' },
-  { code: 'FCO', name: 'Rome', countryCode: 'IT' },
-  { code: 'FRA', name: 'Frankfurt', countryCode: 'DE' },
-  { code: 'GVA', name: 'Geneva', countryCode: 'CH' },
-  { code: 'HAM', name: 'Hamburg', countryCode: 'DE' },
-  { code: 'HEL', name: 'Helsinki', countryCode: 'FI' },
-  { code: 'HKG', name: 'Hong Kong', countryCode: 'HK' },
-  { code: 'HKT', name: 'Phuket', countryCode: 'TH' },
-  { code: 'HND', name: 'Tokyo', countryCode: 'JP' },
-  { code: 'IST', name: 'Istanbul', countryCode: 'TR' },
-  { code: 'JFK', name: 'New York', countryCode: 'US' },
-  { code: 'KUL', name: 'Kuala Lumpur', countryCode: 'MY' },
-  { code: 'LAS', name: 'Las Vegas', countryCode: 'US' },
-  { code: 'LAX', name: 'Los Angeles', countryCode: 'US' },
-  { code: 'LHR', name: 'London', countryCode: 'GB' },
-  { code: 'LIS', name: 'Lisbon', countryCode: 'PT' },
-  { code: 'MAD', name: 'Madrid', countryCode: 'ES' },
-  { code: 'MAN', name: 'Manchester', countryCode: 'GB' },
-  { code: 'MEL', name: 'Melbourne', countryCode: 'AU' },
-  { code: 'MEX', name: 'Mexico City', countryCode: 'MX' },
-  { code: 'MIL', name: 'Milan', countryCode: 'IT' },
-  { code: 'MUC', name: 'Munich', countryCode: 'DE' },
-  { code: 'MXP', name: 'Milan', countryCode: 'IT' },
-  { code: 'NCE', name: 'Nice', countryCode: 'FR' },
-  { code: 'NRT', name: 'Tokyo Narita', countryCode: 'JP' },
-  { code: 'OSL', name: 'Oslo', countryCode: 'NO' },
-  { code: 'OSL', name: 'Oslo', countryCode: 'NO' },
-  { code: 'PER', name: 'Perth', countryCode: 'AU' },
-  { code: 'PRG', name: 'Prague', countryCode: 'CZ' },
-  { code: 'PVG', name: 'Shanghai', countryCode: 'CN' },
-  { code: 'REK', name: 'Reykjavik', countryCode: 'IS' },
-  { code: 'RIO', name: 'Rio de Janeiro', countryCode: 'BR' },
-  { code: 'SFO', name: 'San Francisco', countryCode: 'US' },
-  { code: 'SIN', name: 'Singapore', countryCode: 'SG' },
-  { code: 'STO', name: 'Stockholm', countryCode: 'SE' },
-  { code: 'STR', name: 'Stuttgart', countryCode: 'DE' },
-  { code: 'SYD', name: 'Sydney', countryCode: 'AU' },
-  { code: 'TPE', name: 'Taipei', countryCode: 'TW' },
-  { code: 'VCE', name: 'Venice', countryCode: 'IT' },
-  { code: 'VIE', name: 'Vienna', countryCode: 'AT' },
-  { code: 'YVR', name: 'Vancouver', countryCode: 'CA' },
-  { code: 'ZRH', name: 'Zurich', countryCode: 'CH' }
+  { code: 'ADL', name: 'Adelaide', countryCode: 'AU', lat: -34.9285, lng: 138.6007 },
+  { code: 'AMS', name: 'Amsterdam', countryCode: 'NL', lat: 52.3676, lng: 4.9041 },
+  { code: 'ATH', name: 'Athens', countryCode: 'GR', lat: 37.9838, lng: 23.7275 },
+  { code: 'BCN', name: 'Barcelona', countryCode: 'ES', lat: 41.3851, lng: 2.1734 },
+  { code: 'BKK', name: 'Bangkok', countryCode: 'TH', lat: 13.7563, lng: 100.5018 },
+  { code: 'BNE', name: 'Brisbane', countryCode: 'AU', lat: -27.4698, lng: 153.0251 },
+  { code: 'BRU', name: 'Brussels', countryCode: 'BE', lat: 50.8503, lng: 4.3517 },
+  { code: 'BUD', name: 'Budapest', countryCode: 'HU', lat: 47.4979, lng: 19.0402 },
+  { code: 'CAI', name: 'Cairo', countryCode: 'EG', lat: 30.0444, lng: 31.2357 },
+  { code: 'CAN', name: 'Guangzhou', countryCode: 'CN', lat: 23.1291, lng: 113.2644 },
+  { code: 'CDG', name: 'Paris', countryCode: 'FR', lat: 48.8566, lng: 2.3522 },
+  { code: 'CGN', name: 'Cologne', countryCode: 'DE', lat: 50.9375, lng: 6.9603 },
+  { code: 'CPH', name: 'Copenhagen', countryCode: 'DK', lat: 55.6761, lng: 12.5683 },
+  { code: 'DRS', name: 'Dresden', countryCode: 'DE', lat: 51.0504, lng: 13.7373 },
+  { code: 'DUB', name: 'Dublin', countryCode: 'IE', lat: 53.3498, lng: -6.2603 },
+  { code: 'DUS', name: 'Dusseldorf', countryCode: 'DE', lat: 51.2277, lng: 6.7735 },
+  { code: 'FCO', name: 'Rome', countryCode: 'IT', lat: 41.9028, lng: 12.4964 },
+  { code: 'FRA', name: 'Frankfurt', countryCode: 'DE', lat: 50.1109, lng: 8.6821 },
+  { code: 'GVA', name: 'Geneva', countryCode: 'CH', lat: 46.2044, lng: 6.1432 },
+  { code: 'HAM', name: 'Hamburg', countryCode: 'DE', lat: 53.5511, lng: 9.9937 },
+  { code: 'HEL', name: 'Helsinki', countryCode: 'FI', lat: 60.1695, lng: 24.9354 },
+  { code: 'HKG', name: 'Hong Kong', countryCode: 'HK', lat: 22.3193, lng: 114.1694 },
+  { code: 'HKT', name: 'Phuket', countryCode: 'TH', lat: 7.8804, lng: 98.3923 },
+  { code: 'HND', name: 'Tokyo', countryCode: 'JP', lat: 35.6762, lng: 139.6503 },
+  { code: 'IST', name: 'Istanbul', countryCode: 'TR', lat: 41.0082, lng: 28.9784 },
+  { code: 'JFK', name: 'New York', countryCode: 'US', lat: 40.7128, lng: -74.0060 },
+  { code: 'KUL', name: 'Kuala Lumpur', countryCode: 'MY', lat: 3.1390, lng: 101.6869 },
+  { code: 'LAS', name: 'Las Vegas', countryCode: 'US', lat: 36.1716, lng: -115.1391 },
+  { code: 'LAX', name: 'Los Angeles', countryCode: 'US', lat: 34.0522, lng: -118.2437 },
+  { code: 'LHR', name: 'London', countryCode: 'GB', lat: 51.5074, lng: -0.1278 },
+  { code: 'LIS', name: 'Lisbon', countryCode: 'PT', lat: 38.7223, lng: -9.1393 },
+  { code: 'MAD', name: 'Madrid', countryCode: 'ES', lat: 40.4168, lng: -3.7038 },
+  { code: 'MAN', name: 'Manchester', countryCode: 'GB', lat: 53.4808, lng: -2.2426 },
+  { code: 'MEL', name: 'Melbourne', countryCode: 'AU', lat: -37.8136, lng: 144.9631 },
+  { code: 'MEX', name: 'Mexico City', countryCode: 'MX', lat: 19.4326, lng: -99.1332 },
+  { code: 'MIL', name: 'Milan', countryCode: 'IT', lat: 45.4642, lng: 9.1900 },
+  { code: 'MUC', name: 'Munich', countryCode: 'DE', lat: 48.1351, lng: 11.5820 },
+  { code: 'NCE', name: 'Nice', countryCode: 'FR', lat: 43.7102, lng: 7.2620 },
+  { code: 'NRT', name: 'Tokyo', countryCode: 'JP', lat: 35.7767, lng: 140.3183 },
+  { code: 'OSL', name: 'Oslo', countryCode: 'NO', lat: 59.9139, lng: 10.7522 },
+  { code: 'PER', name: 'Perth', countryCode: 'AU', lat: -31.9505, lng: 115.8605 },
+  { code: 'PRG', name: 'Prague', countryCode: 'CZ', lat: 50.0755, lng: 14.4378 },
+  { code: 'PVG', name: 'Shanghai', countryCode: 'CN', lat: 31.2304, lng: 121.4737 },
+  { code: 'REK', name: 'Reykjavik', countryCode: 'IS', lat: 64.1265, lng: -21.8174 },
+  { code: 'RIO', name: 'Rio de Janeiro', countryCode: 'BR', lat: -22.9068, lng: -43.1729 },
+  { code: 'SFO', name: 'San Francisco', countryCode: 'US', lat: 37.7749, lng: -122.4194 },
+  { code: 'SIN', name: 'Singapore', countryCode: 'SG', lat: 1.3521, lng: 103.8198 },
+  { code: 'STO', name: 'Stockholm', countryCode: 'SE', lat: 59.3293, lng: 18.0686 },
+  { code: 'STR', name: 'Stuttgart', countryCode: 'DE', lat: 48.7758, lng: 9.1829 },
+  { code: 'SYD', name: 'Sydney', countryCode: 'AU', lat: -33.8688, lng: 151.2093 },
+  { code: 'TPE', name: 'Taipei', countryCode: 'TW', lat: 25.0330, lng: 121.5654 },
+  { code: 'VCE', name: 'Venice', countryCode: 'IT', lat: 45.4408, lng: 12.3155 },
+  { code: 'VIE', name: 'Vienna', countryCode: 'AT', lat: 48.2082, lng: 16.3738 },
+  { code: 'YVR', name: 'Vancouver', countryCode: 'CA', lat: 49.2827, lng: -123.1207 },
+  { code: 'ZRH', name: 'Zurich', countryCode: 'CH', lat: 47.3769, lng: 8.5417 }
 ];
 
 // Combine all city databases for lookups (built-in + extended + user-extensible)
@@ -996,7 +994,7 @@ function getRandomCityColor() {
 }
 
 // Add or update a city with ISO/ICAO standards
-function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cityCode = '', countryCode = '') {
+function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cityCode = '', countryCode = '', lat = null, lng = null) {
   if (!cityName) return null;
 
   const normalizedName = cityName.trim();
@@ -1008,6 +1006,8 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     if (country) existing.country = country;
     if (countryCode) existing.countryCode = countryCode;
     if (cityCode) existing.code = cityCode;
+    if (lat !== null) existing.lat = lat;
+    if (lng !== null) existing.lng = lng;
     if (dateFrom && dateFrom < existing.dateFrom) existing.dateFrom = dateFrom;
     if (dateTo && dateTo > existing.dateTo) existing.dateTo = dateTo;
     return existing;
@@ -1017,44 +1017,25 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
   let code = cityCode;
   let cCode = countryCode;
   let cName = country;
+  let cityLat = lat;
+  let cityLng = lng;
 
   // First: look up city code from built-in database or user cities
   const dbMatch = ALL_CITIES.find(c =>
-    c.name.toLowerCase() === normalizedName.toLowerCase()
+    c.name.toLowerCase() === normalizedName.toLowerCase() ||
+    (code && c.code && c.code.toUpperCase() === code.toUpperCase())
   );
 
   if (dbMatch) {
-    // City found in database - use its IATA code and country
-    code = dbMatch.code;
-    cCode = dbMatch.countryCode;
+    // City found in database - use its IATA code, country and coordinates
+    if (!code) code = dbMatch.code;
+    if (!cCode) cCode = dbMatch.countryCode;
+    if (cityLat === null && dbMatch.lat) cityLat = dbMatch.lat;
+    if (cityLng === null && dbMatch.lng) cityLng = dbMatch.lng;
+    
     // Look up the full country name from the country code
     const countryMatch = COUNTRY_DATA.find(c => c.code === dbMatch.countryCode);
     if (countryMatch) {
-      cName = countryMatch.name;
-    }
-  } else if (!code) {
-    // City not in database but cityCode provided (e.g., user entered 3-letter code)
-    // Try to match by cityCode to find country
-    const codeMatch = ALL_CITIES.find(c =>
-      c.code.toUpperCase() === cityCode.toUpperCase()
-    );
-    if (codeMatch) {
-      cCode = codeMatch.countryCode;
-      const countryMatch = COUNTRY_DATA.find(c => c.code === codeMatch.countryCode);
-      if (countryMatch) {
-        cName = countryMatch.name;
-      }
-    }
-  }
-
-  // If still no country code, try to infer from the provided country name
-  if (!cCode && country) {
-    const countryMatch = COUNTRY_DATA.find(c =>
-      c.name.toLowerCase() === country.toLowerCase() ||
-      c.code.toLowerCase() === country.toLowerCase()
-    );
-    if (countryMatch) {
-      cCode = countryMatch.code;
       cName = countryMatch.name;
     }
   }
@@ -1066,6 +1047,8 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     code: code || '',
     countryCode: cCode || '',
     country: cName || country,
+    lat: cityLat,
+    lng: cityLng,
     dateFrom: dateFrom,
     dateTo: dateTo,
     colour: getRandomCityColor()
@@ -1073,6 +1056,65 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
   citiesData.push(newCity);
   return newCity;
 }
+
+async function searchCityOnline(cityName) {
+  if (!cityName) return null;
+  const cleanName = cityName.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').trim();
+  
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cleanName)}&addressdetails=1&limit=1`, {
+      headers: { 'Accept-Language': 'en' }
+    });
+    const data = await response.json();
+    if (data && data.length > 0) {
+      const result = data[0];
+      return {
+        lat: parseFloat(result.lat),
+        lng: parseFloat(result.lon),
+        countryCode: (result.address?.country_code || '').toUpperCase(),
+        displayName: result.display_name
+      };
+    }
+  } catch (e) {
+    console.error('[Geocoding] Online search failed:', e);
+  }
+  return null;
+}
+
+window.searchCityOnline = searchCityOnline;
+
+async function triggerOnlineSearch(cityId) {
+  const city = citiesData.find(c => c.id === cityId);
+  if (!city) return;
+
+  const btn = document.querySelector(`[data-search-btn="${cityId}"]`);
+  if (btn) btn.disabled = true;
+
+  const result = await searchCityOnline(city.name);
+  if (result) {
+    city.lat = result.lat;
+    city.lng = result.lng;
+    if (!city.countryCode) city.countryCode = result.countryCode;
+    
+    // Also try to find a matching IATA code now that we have more info
+    if (!city.code) {
+      const dbMatch = ALL_CITIES.find(c => 
+        c.name.toLowerCase() === city.name.toLowerCase() || 
+        (city.countryCode && c.countryCode === city.countryCode && c.name.toLowerCase().includes(city.name.toLowerCase()))
+      );
+      if (dbMatch) city.code = dbMatch.code;
+    }
+
+    saveData(true);
+    populateCityList();
+    if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  } else {
+    alert(`Could not find coordinates for "${city.name}" online.`);
+    if (btn) btn.disabled = false;
+  }
+}
+
+window.triggerOnlineSearch = triggerOnlineSearch;
 
 // Load user-extensible country database
 const savedUserCountries = localStorage.getItem('travelApp_userCountries_v1');
@@ -1582,7 +1624,14 @@ function populateCityList() {
 
     // Build code display
     const codeDisplay = city.code ? `<span class="city-code">${city.code}</span>` : '';
-    const countryLabel = city.countryCode ? `${countryFlag} ${city.countryCode}` : (city.country || '—');
+    const hasCoords = city.lat !== undefined && city.lat !== null;
+    const searchBtn = !hasCoords ? `
+      <button class="search-btn" data-search-btn="${city.id}" 
+              style="padding: 4px 8px; border: 1px solid #3498DB; border-radius: 4px; font-size: 0.75rem; color: #3498DB; background: white; cursor: pointer;"
+              onclick="triggerOnlineSearch('${city.id}')">
+        🔍 Find on Map
+      </button>
+    ` : `<span style="color:#27AE60; font-size:0.75rem;">📍 Mapped</span>`;
 
     const row = document.createElement('div');
     row.className = 'city-list-item';
@@ -1605,7 +1654,7 @@ function populateCityList() {
               return `<option value="${c.code}"${isSelected ? ' selected' : ''}>${c.flag} ${c.name}</option>`;
             }).join('')}
             </select>
-            ${city.code ? `<span style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #666; background: #f5f5f5; padding: 2px 6px; border-radius: 4px;">IATA: ${city.code}</span>` : ''}
+            ${searchBtn}
           </div>
         </div>
       </div>

@@ -841,6 +841,28 @@ main {
   margin-bottom: 1rem;
 }
 
+/* Numbered Map Markers */
+.numbered-map-marker .marker-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  font-family: 'DM Mono', monospace;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.numbered-map-marker:hover .marker-dot {
+  transform: scale(1.15);
+  z-index: 1000 !important;
+}
+
 .map-legend-title {
   font-size: 0.9rem;
   margin-bottom: 0.75rem;
