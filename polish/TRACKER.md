@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-18
-Progress: 26/32 items complete
+Progress: 31/32 items complete
 
 ---
 
@@ -14,21 +14,21 @@ Progress: 26/32 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
-| [WI-017](./items/WI-017.md) | AI Builder Trip Context Pre-fill | Quick Win (<1 hr) | Review | [Before](./screenshots/before/dde-11-ai-builder.png) | [Proposed](./screenshots/after/WI-017-proposal.png) | [After](./screenshots/after/WI-017-after.png) | - |
-| [WI-030](./items/WI-030.md) | Mobile Menu Scannability and Hierarchy | Medium (2-8 hrs) | Review | [Before](./screenshots/before/mde-04-menu-open.png) | [Proposed](./screenshots/after/WI-030-proposal.png) | [After](./screenshots/after/WI-030-after.png) | - |
-| [WI-031](./items/WI-031.md) | Compact Mode Visual Unification | Medium (2-8 hrs) | Review | [Before](./screenshots/before/dco-04-itinerary.png) | [Proposed](./screenshots/after/WI-031-proposal.png) | [After](./screenshots/after/WI-031-after.png) | - |
 
 ## Polish
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
-| [WI-021](./items/WI-021.md) | Desktop Itinerary Is Visually Busy | Medium (2-8 hrs) | Review | [Before](./screenshots/before/desktop-01-home.png) | [Proposed](./screenshots/after/WI-021-proposal.png) | [After](./screenshots/after/WI-021-after.png) | - |
-| [WI-032](./items/WI-032.md) | Global Currency Formatting Consistency | Medium (2-8 hrs) | Review | [Before](./screenshots/before/mde-07-budget.png) | [Proposed](./screenshots/after/WI-032-proposal.png) | [After](./screenshots/after/WI-032-after.png) | - |
 
 ## Completed
 
 | ID | Title | Before | Proposed | After | Completed |
 |----|-------|--------|----------|-------|-----------|
+| [WI-017](./items/WI-017.md) | AI Builder Trip Context Pre-fill | [Before](./screenshots/before/dde-11-ai-builder.png) | [Proposed](./screenshots/after/WI-017-proposal.png) | [After](./screenshots/after/WI-017-after.png) | 2026-05-18 |
+| [WI-030](./items/WI-030.md) | Mobile Menu Scannability and Hierarchy | [Before](./screenshots/before/mde-04-menu-open.png) | [Proposed](./screenshots/after/WI-030-proposal.png) | [After](./screenshots/after/WI-030-after.png) | 2026-05-18 |
+| [WI-031](./items/WI-031.md) | Compact Mode Visual Unification | [Before](./screenshots/before/dco-04-itinerary.png) | [Proposed](./screenshots/after/WI-031-proposal.png) | [After](./screenshots/after/WI-031-after.png) | 2026-05-18 |
+| [WI-021](./items/WI-021.md) | Desktop Itinerary Is Visually Busy | [Before](./screenshots/before/desktop-01-home.png) | [Proposed](./screenshots/after/WI-021-proposal.png) | [After](./screenshots/after/WI-021-after.png) | 2026-05-18 |
+| [WI-032](./items/WI-032.md) | Global Currency Formatting Consistency | [Before](./screenshots/before/mde-07-budget.png) | [Proposed](./screenshots/after/WI-032-proposal.png) | [After](./screenshots/after/WI-032-after.png) | 2026-05-18 |
 | [WI-029](./items/WI-029.md) | Touch-Friendly Suggested Activity Assignment | [WI-029-Before](./screenshots/before/mde-05-itinerary.png) | [WI-029-Proposed](./screenshots/after/WI-029-proposal.png) | [WI-029-After](./screenshots/after/WI-029-after-4.png) | 2026-05-18 |
 | [WI-028](./items/WI-028.md) | Condensed Mobile Chrome on Scroll | [WI-028-Before](./screenshots/before/mde-01-home.png) | [WI-028-Proposed](./screenshots/after/WI-028-proposal.png) | [WI-028-After](./screenshots/after/WI-028-after-2.png) | 2026-05-18 |
 | [WI-015](./items/WI-015.md) | Drag And Drop Has No Touch Path | [WI-015-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-015-Proposed](./items/proposals/WI-015-proposal.png) | [WI-015-After](./screenshots/after/WI-015-after-7.png) | 2026-05-16 |

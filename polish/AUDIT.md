@@ -6,7 +6,7 @@
 **Last sync:** 2026-05-18  
 **Viewports tested:** DDE (1440x900) / DCO (1440x900) / MDE (390x844) / MCO (390x844)  
 **Real data used:** 2026_June_July_Europe_Thailand.json  
-**Tracker sync:** 26/32 complete, 5 in Review, 0 Todo backlog rows.
+**Tracker sync:** 31/32 complete, 0 in Review, 0 Todo backlog rows.
 
 ---
 
@@ -18,16 +18,16 @@
 
 ## Important Items
 
-1. **[WI-017] AI Builder Trip Context Pre-fill.** Status: Review. Fields now pre-fill with current trip title, date/flight summary, and destination cities.
-2. **[WI-030] Mobile Menu Scannability and Hierarchy.** Status: Review. Mobile menu is grouped into logical sections with headers and primary action emphasis.
-3. **[WI-031] Compact Mode Visual Unification.** Status: Review. Desktop compact now uses the shared compact card/pager renderer.
+1. **[WI-017] AI Builder Trip Context Pre-fill.** Status: Done. Fields now pre-fill with current trip title, date/flight summary, and destination cities.
+2. **[WI-030] Mobile Menu Scannability and Hierarchy.** Status: Done. Mobile menu is grouped into logical sections with headers and primary action emphasis.
+3. **[WI-031] Compact Mode Visual Unification.** Status: Done. Desktop compact now uses the shared compact card/pager renderer.
 
 ---
 
 ## Polish Items
 
-1. **[WI-021] Desktop Itinerary Is Visually Busy.** Status: Review. Desktop itinerary panels are calmer, with edit chrome de-emphasized until hover/focus.
-2. **[WI-032] Global Currency Formatting Consistency.** Status: Review. Shared currency formatter now drives visible budget, itinerary, accommodation, and transport cost displays.
+1. **[WI-021] Desktop Itinerary Is Visually Busy.** Status: Done. Desktop itinerary panels are calmer, with edit chrome de-emphasized until hover/focus.
+2. **[WI-032] Global Currency Formatting Consistency.** Status: Done. Shared currency formatter now drives visible budget, itinerary, accommodation, and transport cost displays.
 
 ---
 
@@ -35,7 +35,7 @@
 
 - [x] All modes (DDE, DCO, MDE, MCO) screenshotted.
 - [x] Critical items resolved.
-- [ ] Important items resolved.
+- [x] Important items resolved.
 - [x] WI-028 targeted regression passing: `node tests/city-nav-regression.js`.
 - [x] TRACKER.md updated with WI-028 completed status and after screenshot.
 
@@ -51,3 +51,4 @@
 - 2026-05-18 / WI-031: Desktop compact Playwright verification at 1440x900 with real trip data passed shared renderer checks and saved [WI-031-after.png](./screenshots/after/WI-031-after.png). Confirmed 15 compact cards render and the legacy list is not used; mobile compact sanity check confirmed 15 cards/chips still render. `node tests/city-nav-regression.js` passed.
 - 2026-05-18 / WI-021: Desktop Playwright verification at 1440x900 with real trip data passed itinerary visual-busy checks and saved [WI-021-after.png](./screenshots/after/WI-021-after.png). Confirmed styled leg panels, stronger day hierarchy, and low-opacity edit chrome until interaction. `node tests/city-nav-regression.js` passed.
 - 2026-05-18 / WI-032: Mobile Playwright verification at 390x844 with real trip data passed currency-format checks and saved [WI-032-after.png](./screenshots/after/WI-032-after.png). Confirmed budget KPI/table values use shared currency symbols, thousands separators, and decimal precision. `node --check` passed for changed JS files and `node tests/city-nav-regression.js` passed.
+- 2026-05-18 / WI-017, WI-021, WI-030, WI-031, WI-032: User approved final review after the combined commit landed on `main`; items moved to Done/Completed.
