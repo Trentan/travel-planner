@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-18
-Progress: 24/32 items complete
+Progress: 25/32 items complete
 
 ---
 
@@ -9,7 +9,6 @@ Progress: 24/32 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
-| [WI-028](./items/WI-028.md) | Condensed Mobile Chrome on Scroll | Medium (2-8 hrs) | Review | [WI-028-Before](./screenshots/before/mde-01-home.png) | [WI-028-Proposed](./screenshots/after/WI-028-proposal.png) | [WI-028-After](./screenshots/after/WI-028-after-2.png) | - |
 | [WI-029](./items/WI-029.md) | Touch-Friendly Suggested Activity Assignment | Medium (2-8 hrs) | 🔲 Todo | [WI-029-Before](./screenshots/before/mde-05-itinerary.png) | [WI-029-Proposed](./screenshots/after/WI-029-proposal.png) | - | - |
 
 ## Important
@@ -31,6 +30,7 @@ Progress: 24/32 items complete
 
 | ID | Title | Before | Proposed | After | Completed |
 |----|-------|--------|----------|-------|-----------|
+| [WI-028](./items/WI-028.md) | Condensed Mobile Chrome on Scroll | [WI-028-Before](./screenshots/before/mde-01-home.png) | [WI-028-Proposed](./screenshots/after/WI-028-proposal.png) | [WI-028-After](./screenshots/after/WI-028-after-2.png) | 2026-05-18 |
 | [WI-015](./items/WI-015.md) | Drag And Drop Has No Touch Path | [WI-015-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-015-Proposed](./items/proposals/WI-015-proposal.png) | [WI-015-After](./screenshots/after/WI-015-after-7.png) | 2026-05-16 |
 | [WI-019](./items/WI-019.md) | Header Hero Is Too Tall On Mobile | [WI-019-Before](./screenshots/before/mobile-01-home.png) | [WI-019-Proposed](./items/proposals/WI-019-proposal.png) | [WI-019-After](./screenshots/after/WI-019-after.png) | 2026-05-16 |
 | [WI-018](./items/WI-018.md) | Desktop City Nav Also Overflows Without Cue | [WI-018-Before](./screenshots/before/desktop-04-tabs.png) | [WI-018-Proposed](./items/proposals/WI-018-proposal.png) | [WI-018-After](./screenshots/after/WI-018-after.png) | 2026-05-16 |
