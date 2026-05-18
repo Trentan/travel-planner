@@ -187,51 +187,71 @@
           <span id="mobileTimestampStatus" data-fallback=""></span>
         </div>
       </div>
-      <div class="mobile-menu-sheet-grid">
-        <button id="mobileEditToggleBtn" class="app-menu-btn" onclick="closeMobileMenu(); toggleEditMode()">🔒 Lock: Read Only</button>
-        <button id="mobileRenameBtn" class="app-menu-btn" onclick="closeMobileMenu(); openRenameTripDialog()">✏️ Rename Trip</button>
-        <label id="mobileCompactToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="false" title="Toggle detailed or compact mode">
-          <input id="mobileCompactToggleInput" type="checkbox" onchange="closeMobileMenu(); toggleCompactView(this.checked)" aria-label="Toggle detailed or compact mode">
-          <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
-          <span id="mobileCompactToggleLabel" class="app-menu-switch-label">Detailed mode</span>
-        </label>
-        <button id="mobileUndoBtn" class="app-menu-btn" onclick="closeMobileMenu(); undoTripChange()" disabled>↶ Undo</button>
-        <button id="mobileRedoBtn" class="app-menu-btn" onclick="closeMobileMenu(); redoTripChange()" disabled>↷ Redo</button>
-        <button class="app-menu-btn" onclick="closeMobileMenu(); openCityDialog()">🌍 Cities</button>
-        <button class="app-menu-btn" onclick="closeMobileMenu(); openAIDialog()">🤖 AI Builder</button>
-        <button class="app-menu-btn" onclick="closeMobileMenu(); openGuideDialog()">📖 Guide</button>
-        <div class="mobile-menu-divider" aria-hidden="true"></div>
-        <button class="app-menu-btn" onclick="exportItinerarySummaryText(); closeMobileMenu()">
-          <span class="app-menu-btn-title">🧾 Export AI Summary</span>
-          <span class="app-menu-btn-subtitle">Quick summary for sharing</span>
-        </button>
-        <button class="app-menu-btn" onclick="exportItineraryText(); closeMobileMenu()">
-          <span class="app-menu-btn-title">📝 Export Itinerary Text</span>
-          <span class="app-menu-btn-subtitle">Plain text trip outline</span>
-        </button>
-        <button class="app-menu-btn" onclick="closeMobileMenu(); openShareExportDialog()">
-          <span class="app-menu-btn-title">🔗 Share Export</span>
-          <span class="app-menu-btn-subtitle">Create a shareable file</span>
-        </button>
-        <div class="mobile-menu-divider" aria-hidden="true"></div>
-        <button id="mobileSaveAsBtn" class="app-menu-btn" onclick="openTripFile(); closeMobileMenu()">
-          <span class="app-menu-btn-title">Save As</span>
-          <span class="app-menu-btn-subtitle">Download a trip file</span>
-        </button>
-        <button id="mobileOpenFileBtn" class="app-menu-btn" onclick="openExistingTripFile(); closeMobileMenu()">
-          <span class="app-menu-btn-title">Open File</span>
-          <span class="app-menu-btn-subtitle">Load an existing trip</span>
-        </button>
-        <div class="mobile-menu-divider" aria-hidden="true"></div>
-        <button class="app-menu-btn" onclick="closeMobileMenu(); promptHardRestart()">
-          <span class="app-menu-btn-title">🔄 Hard Restart</span>
-          <span class="app-menu-btn-subtitle">Clean refresh (keeps trip data)</span>
-        </button>
-        <button class="app-menu-btn danger" onclick="closeMobileMenu(); promptFactoryReset()">
-          <span class="app-menu-btn-title">⚠️ Factory Reset (Wipe All Data)</span>
-          <span class="app-menu-btn-subtitle">Delete everything & start over</span>
-        </button>
-        <button id="mobileInstallAppBtn" class="app-menu-btn install-btn" hidden onclick="closeMobileMenu(); promptInstallApp()">⬇ Install App</button>
+      <div class="mobile-menu-sections">
+        <section class="mobile-menu-section" aria-labelledby="mobileMenuTripSettings">
+          <h3 id="mobileMenuTripSettings" class="mobile-menu-section-title">Trip settings</h3>
+          <div class="mobile-menu-section-grid">
+            <button id="mobileEditToggleBtn" class="app-menu-btn mobile-menu-primary" onclick="closeMobileMenu(); toggleEditMode()">🔒 Lock: Read Only</button>
+            <button id="mobileRenameBtn" class="app-menu-btn" onclick="closeMobileMenu(); openRenameTripDialog()">✏️ Rename Trip</button>
+            <label id="mobileCompactToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="false" title="Toggle detailed or compact mode">
+              <input id="mobileCompactToggleInput" type="checkbox" onchange="closeMobileMenu(); toggleCompactView(this.checked)" aria-label="Toggle detailed or compact mode">
+              <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
+              <span id="mobileCompactToggleLabel" class="app-menu-switch-label">Detailed mode</span>
+            </label>
+            <button class="app-menu-btn" onclick="closeMobileMenu(); openCityDialog()">🌍 Cities</button>
+          </div>
+        </section>
+
+        <section class="mobile-menu-section" aria-labelledby="mobileMenuPlanningTools">
+          <h3 id="mobileMenuPlanningTools" class="mobile-menu-section-title">Planning tools</h3>
+          <div class="mobile-menu-section-grid">
+            <button class="app-menu-btn mobile-menu-primary" onclick="closeMobileMenu(); openAIDialog()">🤖 AI Builder</button>
+            <button class="app-menu-btn" onclick="closeMobileMenu(); openGuideDialog()">📖 Guide</button>
+            <button id="mobileUndoBtn" class="app-menu-btn mobile-menu-compact-action" onclick="closeMobileMenu(); undoTripChange()" disabled>↶ Undo</button>
+            <button id="mobileRedoBtn" class="app-menu-btn mobile-menu-compact-action" onclick="closeMobileMenu(); redoTripChange()" disabled>↷ Redo</button>
+          </div>
+        </section>
+
+        <section class="mobile-menu-section" aria-labelledby="mobileMenuExportFiles">
+          <h3 id="mobileMenuExportFiles" class="mobile-menu-section-title">Export & files</h3>
+          <div class="mobile-menu-section-grid mobile-menu-section-grid-stacked">
+            <button class="app-menu-btn" onclick="exportItinerarySummaryText(); closeMobileMenu()">
+              <span class="app-menu-btn-title">🧾 Export AI Summary</span>
+              <span class="app-menu-btn-subtitle">Quick summary for sharing</span>
+            </button>
+            <button class="app-menu-btn" onclick="exportItineraryText(); closeMobileMenu()">
+              <span class="app-menu-btn-title">📝 Export Itinerary Text</span>
+              <span class="app-menu-btn-subtitle">Plain text trip outline</span>
+            </button>
+            <button class="app-menu-btn" onclick="closeMobileMenu(); openShareExportDialog()">
+              <span class="app-menu-btn-title">🔗 Share Export</span>
+              <span class="app-menu-btn-subtitle">Create a shareable file</span>
+            </button>
+            <button id="mobileSaveAsBtn" class="app-menu-btn" onclick="openTripFile(); closeMobileMenu()">
+              <span class="app-menu-btn-title">Save As</span>
+              <span class="app-menu-btn-subtitle">Download a trip file</span>
+            </button>
+            <button id="mobileOpenFileBtn" class="app-menu-btn" onclick="openExistingTripFile(); closeMobileMenu()">
+              <span class="app-menu-btn-title">Open File</span>
+              <span class="app-menu-btn-subtitle">Load an existing trip</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="mobile-menu-section" aria-labelledby="mobileMenuMaintenance">
+          <h3 id="mobileMenuMaintenance" class="mobile-menu-section-title">Maintenance</h3>
+          <div class="mobile-menu-section-grid mobile-menu-section-grid-stacked">
+            <button class="app-menu-btn" onclick="closeMobileMenu(); promptHardRestart()">
+              <span class="app-menu-btn-title">🔄 Hard Restart</span>
+              <span class="app-menu-btn-subtitle">Clean refresh (keeps trip data)</span>
+            </button>
+            <button class="app-menu-btn danger" onclick="closeMobileMenu(); promptFactoryReset()">
+              <span class="app-menu-btn-title">⚠️ Factory Reset (Wipe All Data)</span>
+              <span class="app-menu-btn-subtitle">Delete everything & start over</span>
+            </button>
+            <button id="mobileInstallAppBtn" class="app-menu-btn install-btn" hidden onclick="closeMobileMenu(); promptInstallApp()">⬇ Install App</button>
+          </div>
+        </section>
       </div>
     </div>
   </div>

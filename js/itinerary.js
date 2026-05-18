@@ -922,11 +922,7 @@ function buildItinerary() {
   // Check window.isCompactView for cross-module access
   const isCompact = typeof window !== 'undefined' && window.isCompactView;
   if (isCompact) {
-    if (typeof isMobileViewport === 'function' && isMobileViewport()) {
-      buildCompactItinerary();
-    } else {
-      buildCompactItineraryLegacy();
-    }
+    buildCompactItinerary();
     return;
   }
 

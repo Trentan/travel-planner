@@ -133,6 +133,82 @@ INSTRUCTIONS FOR GENERATION:
 8. Make the JSON valid, complete, and ready to import into the app.`;
 }
 
+function getAiTripTitlePrefill() {
+  const title = typeof titleData !== 'undefined' && titleData ? titleData.title : '';
+  return String(title || '').trim();
+}
+
+function getAiTripDatesPrefill() {
+  const dates = [];
+  if (typeof appData !== 'undefined' && Array.isArray(appData)) {
+    appData.forEach(leg => {
+      (leg.days || []).forEach(day => {
+        if (day && day.date) dates.push(day.date);
+      });
+    });
+  }
+
+  const sortedDates = dates
+    .map(date => (typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(date) : date))
+    .filter(date => /^\d{4}-\d{2}-\d{2}$/.test(date))
+    .sort();
+
+  if (!sortedDates.length) return '';
+
+  const firstDate = sortedDates[0];
+  const lastDate = sortedDates[sortedDates.length - 1];
+  const formatDate = date => (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(date) : date);
+  const range = firstDate === lastDate ? formatDate(firstDate) : `${formatDate(firstDate)} - ${formatDate(lastDate)}`;
+
+  const flights = Array.isArray(window.journeys)
+    ? window.journeys.flatMap(journey => {
+        const legs = Array.isArray(journey.legs) && journey.legs.length ? journey.legs : [journey];
+        return legs
+          .filter(leg => String(leg.type || leg.transportType || '').toLowerCase() === 'flight')
+          .map(leg => leg.routeCode || leg.provider || '')
+          .filter(Boolean);
+      })
+    : [];
+
+  return flights.length ? `${range}. Flights: ${[...new Set(flights)].join(', ')}` : range;
+}
+
+function getAiTripCitiesPrefill() {
+  const cityNames = [];
+  const addCity = value => {
+    const city = String(value || '').trim();
+    if (!city || /^in transit$/i.test(city) || city === '—') return;
+    if (!cityNames.some(existing => existing.toLowerCase() === city.toLowerCase())) cityNames.push(city);
+  };
+
+  if (typeof citiesData !== 'undefined' && Array.isArray(citiesData) && citiesData.length) {
+    citiesData.filter(city => !city.isTransit).forEach(city => addCity(city.name));
+  } else if (typeof appData !== 'undefined' && Array.isArray(appData)) {
+    appData.forEach(leg => {
+      const label = String(leg.label || '').replace(/[^\w\s.'&-]/g, '').trim();
+      addCity(label);
+      (leg.days || []).forEach(day => {
+        addCity(day.from);
+        addCity(day.to);
+      });
+    });
+  }
+
+  return cityNames.join(', ');
+}
+
+function setAiFieldIfEmpty(id, value) {
+  const field = document.getElementById(id);
+  if (!field || !value || String(field.value || '').trim()) return;
+  field.value = value;
+}
+
+function prefillAIDialogFields() {
+  setAiFieldIfEmpty('aiTripTitle', getAiTripTitlePrefill());
+  setAiFieldIfEmpty('aiTripDates', getAiTripDatesPrefill());
+  setAiFieldIfEmpty('aiTripCities', getAiTripCitiesPrefill());
+}
+
 function generatePrompt() {
   const title = getAiFieldValue('aiTripTitle', 'Europe Summer Trip');
   const dates = getAiFieldValue('aiTripDates', '14 days');
@@ -182,5 +258,6 @@ async function copyPrompt() {
 }
 
 globalThis.buildAiPrompt = buildAiPrompt;
+globalThis.prefillAIDialogFields = prefillAIDialogFields;
 globalThis.generatePrompt = generatePrompt;
 globalThis.copyPrompt = copyPrompt;

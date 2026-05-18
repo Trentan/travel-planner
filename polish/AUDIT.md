@@ -6,7 +6,7 @@
 **Last sync:** 2026-05-18  
 **Viewports tested:** DDE (1440x900) / DCO (1440x900) / MDE (390x844) / MCO (390x844)  
 **Real data used:** 2026_June_July_Europe_Thailand.json  
-**Tracker sync:** 26/32 complete, 1 in Review, 4 Todo backlog rows.
+**Tracker sync:** 26/32 complete, 5 in Review, 0 Todo backlog rows.
 
 ---
 
@@ -18,15 +18,15 @@
 
 ## Important Items
 
-1. **[WI-017] AI Builder Trip Context Pre-fill.** Status: Todo. Fields open blank. Pre-fill with current trip data (Title, Dates, Cities).
-2. **[WI-030] Mobile Menu Scannability and Hierarchy.** Status: Todo. Dense grid of buttons is hard to scan. Reorganize into logical sections with headers.
-3. **[WI-031] Compact Mode Visual Unification.** Status: Todo. Align the legacy list (DCO) with the modern card pager (MCO).
+1. **[WI-017] AI Builder Trip Context Pre-fill.** Status: Review. Fields now pre-fill with current trip title, date/flight summary, and destination cities.
+2. **[WI-030] Mobile Menu Scannability and Hierarchy.** Status: Review. Mobile menu is grouped into logical sections with headers and primary action emphasis.
+3. **[WI-031] Compact Mode Visual Unification.** Status: Review. Desktop compact now uses the shared compact card/pager renderer.
 
 ---
 
 ## Polish Items
 
-1. **[WI-021] Desktop Itinerary Is Visually Busy.** Status: Todo.
+1. **[WI-021] Desktop Itinerary Is Visually Busy.** Status: Review. Desktop itinerary panels are calmer, with edit chrome de-emphasized until hover/focus.
 2. **[WI-032] Global Currency Formatting Consistency.** Status: Review. Shared currency formatter now drives visible budget, itinerary, accommodation, and transport cost displays.
 
 ---
@@ -46,4 +46,8 @@
 - 2026-05-18 / WI-028: User approved final review; WI-028 moved to Done/Completed.
 - 2026-05-18 / WI-029: Mobile Playwright verification at 390x844 with real trip data passed the touch assignment checks and saved [WI-029-after-4.png](./screenshots/after/WI-029-after-4.png). Assign is 44x44 on mobile, the unassigned action uses the suggested-activity thumbtack, the assigned action stays as a chevron, and assigned status uses a soft green check instead of a yellow hourglass. `node tests/city-nav-regression.js` passed; `node tests/run-tests.js` still stops on the existing map harness issue `L is not defined`.
 - 2026-05-18 / WI-029: User approved final review; WI-029 moved to Done/Completed.
+- 2026-05-18 / WI-017: Desktop Playwright verification at 1440x900 with real trip data passed AI Builder pre-fill checks and saved [WI-017-after.png](./screenshots/after/WI-017-after.png). Confirmed title, dates/flights, and city fields are pre-filled and editable. `node tests/city-nav-regression.js` passed.
+- 2026-05-18 / WI-030: Mobile Playwright verification at 390x844 with real trip data passed menu hierarchy checks and saved [WI-030-after.png](./screenshots/after/WI-030-after.png). Confirmed section headers, primary action emphasis, and >=44px visible menu buttons. `node tests/city-nav-regression.js` passed.
+- 2026-05-18 / WI-031: Desktop compact Playwright verification at 1440x900 with real trip data passed shared renderer checks and saved [WI-031-after.png](./screenshots/after/WI-031-after.png). Confirmed 15 compact cards render and the legacy list is not used; mobile compact sanity check confirmed 15 cards/chips still render. `node tests/city-nav-regression.js` passed.
+- 2026-05-18 / WI-021: Desktop Playwright verification at 1440x900 with real trip data passed itinerary visual-busy checks and saved [WI-021-after.png](./screenshots/after/WI-021-after.png). Confirmed styled leg panels, stronger day hierarchy, and low-opacity edit chrome until interaction. `node tests/city-nav-regression.js` passed.
 - 2026-05-18 / WI-032: Mobile Playwright verification at 390x844 with real trip data passed currency-format checks and saved [WI-032-after.png](./screenshots/after/WI-032-after.png). Confirmed budget KPI/table values use shared currency symbols, thousands separators, and decimal precision. `node --check` passed for changed JS files and `node tests/city-nav-regression.js` passed.
