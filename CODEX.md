@@ -1,4 +1,4 @@
-# AGENTS.md
+# CODEX.md
 
 ## Workflow
 
@@ -6,7 +6,7 @@ Use the polish sprint files as the source of truth.
 
 1. Open `polish/TRACKER.md`.
 2. Pick the next `Todo` item in priority order unless the user names a specific `WI-XXX`.
-3. Create or switch to a branch named for the work item, for example `WI-001_Desktop-App-Menu-Wraps`.
+3. **MANDATORY**: Create or switch to a branch named specifically for the work item: `WI-XXX_Short-Description`. **Do not work on multiple WIs on the same branch.**
 4. Open `polish/items/WI-XXX.md`.
 5. Implement only that work item.
 6. Run the relevant checks. If available, run:
@@ -25,8 +25,9 @@ polish/screenshots/after/WI-XXX-after.png
 9. Update the work item and `polish/TRACKER.md`, and make the latest after screenshot a clickable markdown link in the work item file.
 10. In the final response, include direct clickable links to the before image, proposal image, and latest after image for immediate review.
 11. When the WI is in `Review`, capture the user's latest feedback in the work item's `Review Notes` section as a running log before making the next revision.
-12. If multiple WIs are active, keep each one on its own branch and avoid editing files or tracker rows that belong to a different WI.
-13. Prefer separate worktrees for parallel WIs; otherwise, verify the branch before every edit and do not mix work items in one worktree.
+12. **COMMIT IMMEDIATELY**: As soon as a WI is verified (even for review), create a commit on the WI branch referencing the WI number and **PUSH** the branch. Do not wait for the end of the session.
+13. Keep branch ownership strict: one WI per branch, no cross-WI tracker edits, and no mixed commits.
+14. Use separate worktrees for parallel WIs when possible; if you cannot, re-check the current branch before every edit.
 
 ## Session Start
 

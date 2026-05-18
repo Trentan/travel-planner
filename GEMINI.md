@@ -6,7 +6,7 @@ Use the polish sprint files as the source of truth.
 
 1. Open `polish/TRACKER.md`.
 2. Pick the next `Todo` item in priority order unless the user names a specific `WI-XXX`.
-3. Create or switch to a branch named for the work item, for example `WI-001_Desktop-App-Menu-Wraps`.
+3. **MANDATORY**: Create or switch to a branch named specifically for the work item: `WI-XXX_Short-Description`. **Do not work on multiple WIs on the same branch.**
 4. Open `polish/items/WI-XXX.md`.
 5. Implement only that work item.
 6. Run the relevant checks. If available, run:
@@ -25,8 +25,9 @@ polish/screenshots/after/WI-XXX-after.png
 9. Update the work item and `polish/TRACKER.md`, and make the latest after screenshot a clickable markdown link in the work item file.
 10. In the final response, include direct clickable links to the before image, proposal image, and latest after image for immediate review.
 11. When the WI is in `Review`, capture the user's latest feedback in the work item's `Review Notes` section as a running log before making the next revision.
-12. When multiple WIs are active, keep branch ownership strict: one WI per branch, no cross-WI tracker edits, and no reverting another WI's changes.
-13. Use separate worktrees for parallel WIs when possible; if you cannot, re-check the current branch before every edit.
+12. **COMMIT IMMEDIATELY**: As soon as a WI is verified (even for review), create a commit on the WI branch referencing the WI number and **PUSH** the branch. Do not wait for the end of the session.
+13. Keep branch ownership strict: one WI per branch, no cross-WI tracker edits, and no mixed commits.
+14. Use separate worktrees for parallel WIs when possible; if you cannot, re-check the current branch before every edit.
 
 ## Session Start
 
@@ -35,8 +36,8 @@ polish/screenshots/after/WI-XXX-after.png
 3. Check `git status --short`.
 4. Start or verify the dev server at `http://localhost:3000`.
 5. Load real data from `backups/2026_June_July_Europe_Thailand.json` for visual work.
-6. If another WI's edits are already present, pause and verify the branch before making changes so you do not overwrite a teammate's work.
-7. If a different WI is already checked out, do not touch its files or tracker rows until you have switched context cleanly.
+6. If the current worktree already contains another WI's edits, verify the branch before touching files so no branch gets overwritten.
+7. If another WI's changes are present, stop rather than trying to merge them into the current item by hand.
 
 ## Completion
 
@@ -54,8 +55,8 @@ Before reporting done:
 10. Commit the completed WI on the WI branch with the WI referenced in the commit message, then push that same branch.
 11. Summarize changed files, verification, branch name, and commit hash.
 12. Include direct clickable links to the before image, proposal image, and latest after image in the completion response.
-13. When concurrent work is happening, commit and push the current WI as soon as it is verified so the branch tip is safe before you switch tasks.
-14. Never carry a verified WI forward into another task without committing it first.
+13. When multiple WIs are being worked at once, commit and push each WI immediately after verification before switching context.
+14. Do not begin a new WI in the same worktree until the previous verified WI is committed and pushed.
 
 ## File Map
 
