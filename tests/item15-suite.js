@@ -261,17 +261,23 @@ async function testDragDropSmoke() {
   app.document.getElementById('activityCost').value = '0';
   app.document.getElementById('saveActivityBtn').click();
   await settle(app);
+  const activityIdx = state(context).itinerary[0].suggestedActivities.findIndex(activity => String(activity.title || '').includes('Morning run'));
+  assert(activityIdx >= 0, 'Drag/drop smoke: saved activity should be findable');
 
   const transfer = {
     payload: '',
     setData(_, value) { this.payload = value; },
     getData() { return this.payload; }
   };
-  context.handleDragStart({ preventDefault() {}, dataTransfer: transfer }, 0, 'activity', 0);
+  context.handleDragStart({ preventDefault() {}, dataTransfer: transfer }, 0, 'activity', activityIdx);
   context.handleDrop({ preventDefault() {}, currentTarget: { classList: { remove() {} } }, dataTransfer: transfer }, 0, 0);
 
-  assert(state(context).itinerary[0].suggestedActivities[0].assignedDayIdx === 0, 'Drag/drop smoke: dragged activity should be assigned');
+  assert(state(context).itinerary[0].suggestedActivities[activityIdx].assignedDayIdx === 0, 'Drag/drop smoke: dragged activity should be assigned');
   assert(state(context).itinerary[0].days[0].activityItems.some(item => item.text.includes('Morning run')), 'Drag/drop smoke: dropped activity should land on day card');
+  assert(
+    state(context).itinerary[0].days[0].activityItems.some(item => String(item.text || '').startsWith(context.getActivityEmoji('fitness'))),
+    'Drag/drop smoke: assigned activity should keep its category emoji prefix'
+  );
 }
 
 async function testTouchAssignSmoke() {
@@ -292,22 +298,28 @@ async function testTouchAssignSmoke() {
   await settle(app);
   context.buildItinerary();
   await settle(app);
+  const activityIdx = state(context).itinerary[targetLegIdx].suggestedActivities.findIndex(activity => String(activity.title || '').includes('Sunset pier walk'));
+  assert(activityIdx >= 0, 'Touch assign smoke: saved activity should be findable');
 
-  context.openActivityAssignModal(targetLegIdx, 0);
+  context.openActivityAssignModal(targetLegIdx, activityIdx);
   await settle(app);
   assert(app.document.getElementById('activity-assign-modal'), 'Touch assign smoke: tapping Assign should open the picker modal');
 
-  const assigned = context.assignSuggestedActivityToDay(targetLegIdx, 0, targetLegIdx, 0);
+  const assigned = context.assignSuggestedActivityToDay(targetLegIdx, activityIdx, targetLegIdx, 0);
   assert(assigned === true, 'Touch assign smoke: helper should assign the activity to a day');
   await settle(app);
-  assert(state(context).itinerary[targetLegIdx].suggestedActivities[0].assignedDayIdx === 0, 'Touch assign smoke: day button should assign the activity');
+  assert(state(context).itinerary[targetLegIdx].suggestedActivities[activityIdx].assignedDayIdx === 0, 'Touch assign smoke: day button should assign the activity');
   assert(state(context).itinerary[targetLegIdx].days[0].activityItems.some(item => String(item.text || '').includes('Sunset pier walk')), 'Touch assign smoke: assigned activity should land in the day list');
+  assert(
+    state(context).itinerary[targetLegIdx].days[0].activityItems.some(item => String(item.text || '').startsWith(context.getActivityEmoji('sight'))),
+    'Touch assign smoke: assigned activity should keep its category emoji prefix'
+  );
 
-  context.openActivityAssignModal(targetLegIdx, 0);
+  context.openActivityAssignModal(targetLegIdx, activityIdx);
   await settle(app);
   app.document.getElementById('activityAssignClearBtn').click();
   await settle(app);
-  assert(state(context).itinerary[targetLegIdx].suggestedActivities[0].assignedDayIdx === null, 'Touch assign smoke: remove button should clear the assignment');
+  assert(state(context).itinerary[targetLegIdx].suggestedActivities[activityIdx].assignedDayIdx === null, 'Touch assign smoke: remove button should clear the assignment');
   assert(!state(context).itinerary[targetLegIdx].days[0].activityItems.some(item => String(item.text || '').includes('Sunset pier walk')), 'Touch assign smoke: remove button should remove the day item');
 }
 

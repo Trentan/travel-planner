@@ -19,6 +19,7 @@ Progress: 31/33 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
+| [WI-034](./items/WI-034.md) | Activity Assignment Emoji Retention | Small (<2 hrs) | Review | [Before](./screenshots/after/WI-029-after-4.png) | [Proposed](./screenshots/after/WI-029-proposal.png) | [After](./screenshots/after/WI-034-after.png) | - |
 | [WI-033](./items/WI-033.md) | Desktop Compact Itinerary Rework | Medium (2-8 hrs) | Review | [Before](./screenshots/after/WI-031-after.png) | [Proposed](./screenshots/after/WI-031-proposal.png) | [After](./screenshots/after/WI-033-after.png) | - |
 
 ## Completed

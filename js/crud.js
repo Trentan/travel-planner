@@ -10,9 +10,28 @@ function deleteSight(legIdx, sightIdx) { appData[legIdx].suggestedSights.splice(
 function deleteActivity(legIdx, activityIdx) { appData[legIdx].suggestedActivities.splice(activityIdx, 1); saveData(); buildItinerary(); }
 function deleteLegTip(legIdx, tipIdx) { appData[legIdx].legTips.splice(tipIdx, 1); saveData(); buildItinerary(); }
 
+function getSuggestedActivityDayText(activity) {
+  const title = String(activity?.title || '').trim();
+  const emoji = typeof getActivityEmoji === 'function' ? getActivityEmoji(activity?.category) : '';
+  if (!emoji || !title) return title;
+  return title.startsWith(emoji) ? title : `${emoji} ${title}`;
+}
+
+function getSuggestedActivityMatchTexts(activity) {
+  return [...new Set([
+    String(activity?.title || '').trim(),
+    getSuggestedActivityDayText(activity)
+  ].filter(Boolean))];
+}
+
 function findAssignedSuggestedActivity(legIdx, dayIdx, itemText) {
   const activities = appData[legIdx]?.suggestedActivities || [];
-  return activities.find(activity => activity && activity.assignedDayIdx === dayIdx && activity.title === itemText) || null;
+  const normalizedText = String(itemText || '').trim();
+  return activities.find(activity => (
+    activity
+    && activity.assignedDayIdx === dayIdx
+    && getSuggestedActivityMatchTexts(activity).includes(normalizedText)
+  )) || null;
 }
 
 function syncAssignedSuggestedActivityField(legIdx, dayIdx, itemText, field, value) {
@@ -183,7 +202,7 @@ function _openActivityModal(legIdx, activityIdx = null) {
         return;
       }
 
-      const previousTitle = target.title;
+      const previousMatchTexts = getSuggestedActivityMatchTexts(target);
       target.title = fullTitle;
       target.category = category;
       target.estTime = estTime;
@@ -193,7 +212,9 @@ function _openActivityModal(legIdx, activityIdx = null) {
         const day = appData[legIdx]?.days?.[target.assignedDayIdx];
         if (day?.activityItems?.length) {
           day.activityItems.forEach(item => {
-            if (item.text === previousTitle) item.text = fullTitle;
+            if (previousMatchTexts.includes(String(item.text || '').trim())) {
+              item.text = getSuggestedActivityDayText(target);
+            }
           });
         }
       }
@@ -436,7 +457,8 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
   if (previousDayIdx !== null && previousDayIdx !== undefined && sourceLegIdx === targetLegIdx && previousDayIdx !== targetDayIdx) {
     const previousDay = targetLeg.days[previousDayIdx];
     if (previousDay && Array.isArray(previousDay.activityItems)) {
-      const prevIndex = previousDay.activityItems.findIndex(item => item.text === activity.title);
+      const matchTexts = getSuggestedActivityMatchTexts(activity);
+      const prevIndex = previousDay.activityItems.findIndex(item => matchTexts.includes(String(item.text || '').trim()));
       if (prevIndex !== -1) previousDay.activityItems.splice(prevIndex, 1);
     }
   }
@@ -446,9 +468,11 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
     targetDay.activityItems = [];
   }
 
-  if (!targetDay.activityItems.some(item => item.text === activity.title)) {
+  const assignedText = getSuggestedActivityDayText(activity);
+  const matchTexts = getSuggestedActivityMatchTexts(activity);
+  if (!targetDay.activityItems.some(item => matchTexts.includes(String(item.text || '').trim()))) {
     targetDay.activityItems.push({
-      text: activity.title,
+      text: assignedText,
       cost: activity.estCost || '0',
       time: activity.estTime || '1 hr',
       done: false
@@ -469,7 +493,8 @@ function clearAssignedSuggestedActivityFromDay(sourceLegIdx, activityIdx) {
 
   const previousDay = sourceLeg?.days?.[previousDayIdx];
   if (previousDay && Array.isArray(previousDay.activityItems)) {
-    const prevIndex = previousDay.activityItems.findIndex(item => item.text === activity.title);
+    const matchTexts = getSuggestedActivityMatchTexts(activity);
+    const prevIndex = previousDay.activityItems.findIndex(item => matchTexts.includes(String(item.text || '').trim()));
     if (prevIndex !== -1) previousDay.activityItems.splice(prevIndex, 1);
     if (previousDay.activityItems.length === 1 && isPlaceholderActivityItem(previousDay.activityItems[0])) {
       previousDay.activityItems = [];
