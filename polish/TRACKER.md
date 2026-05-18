@@ -9,7 +9,7 @@ Progress: 24/32 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
-| [WI-028](./items/WI-028.md) | Condensed Mobile Chrome on Scroll | Medium (2-8 hrs) | 🔲 Todo | [WI-028-Before](./screenshots/before/mde-01-home.png) | [WI-028-Proposed](./screenshots/after/WI-028-proposal.png) | - | - |
+| [WI-028](./items/WI-028.md) | Condensed Mobile Chrome on Scroll | Medium (2-8 hrs) | Review | [WI-028-Before](./screenshots/before/mde-01-home.png) | [WI-028-Proposed](./screenshots/after/WI-028-proposal.png) | [WI-028-After](./screenshots/after/WI-028-after.png) | - |
 | [WI-029](./items/WI-029.md) | Touch-Friendly Suggested Activity Assignment | Medium (2-8 hrs) | 🔲 Todo | [WI-029-Before](./screenshots/before/mde-05-itinerary.png) | [WI-029-Proposed](./screenshots/after/WI-029-proposal.png) | - | - |
 
 ## Important
