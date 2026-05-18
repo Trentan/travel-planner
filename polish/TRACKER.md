@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-17
-Progress: 22/27 items complete
+Progress: 24/27 items complete
 
 ---
 
@@ -16,14 +16,12 @@ Progress: 22/27 items complete
 |----|-------|--------|--------|--------|----------|-------|------|
 | [WI-009](./items/WI-009.md) | Map Is A Static SVG Approximation | Major (1-3 days) | Todo | [WI-009-Before](./screenshots/before/desktop-09-map.png) | [WI-009-Proposed](./items/proposals/WI-009-proposal.png) | - | - |
 | [WI-017](./items/WI-017.md) | AI Builder Modal Lacks Current Trip Context | Medium (2-8 hrs) | Todo | [WI-017-Before](./screenshots/before/mobile-10-ai-builder.png) | [WI-017-Proposed](./items/proposals/WI-017-proposal.png) | - | - |
-| [WI-020](./items/WI-020.md) | Mobile Itinerary Cards Are Over-Scaled | Medium (2-8 hrs) | Todo | [WI-020-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-020-Proposed](./items/proposals/WI-020-proposal.png) | - | - |
 
 ## Polish
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
 | [WI-021](./items/WI-021.md) | Desktop Itinerary Is Visually Busy | Medium (2-8 hrs) | Todo | [WI-021-Before](./screenshots/before/desktop-01-home.png) | [WI-021-Proposed](./items/proposals/WI-021-proposal.png) | - | - |
-| [WI-025](./items/WI-025.md) | Mobile Transport And Accommodation Cards Need Consistent Styling | Medium (2-8 hrs) | Review | [WI-025-Before](./screenshots/before/mobile-06-transport.png) | [WI-025-Proposed](./items/proposals/WI-025-proposal.png) | [WI-025-After](./screenshots/after/WI-025-after-56-no-jolt.png) | - |
 
 ## Completed
 
@@ -51,6 +49,8 @@ Progress: 22/27 items complete
 | [WI-022](./items/WI-022.md) | Packing Tab Needs Stronger Empty/Progress Hierarchy | [WI-022-Before](./screenshots/before/desktop-08-packing.png) | [WI-022-Proposed](./items/proposals/WI-022-proposal.png) | [WI-022-After](./screenshots/after/WI-022-after-5.png) | 2026-05-16 |
 | [WI-026](./items/WI-026.md) | "Reset App" Is Too Destructive And Misleading | [WI-026-Before](./screenshots/before/desktop-12-mobile-menu.png) | [WI-026-Proposed](./items/proposals/WI-026-proposal.png) | [WI-026-After](./screenshots/after/WI-026-after.png) | 2026-05-18 |
 | [WI-027](./items/WI-027.md) | Extreme Transport Row Compression | [WI-027-Before](./screenshots/before/desktop-01-home.png) | [WI-027-Proposed](./items/WI-027.md) | [WI-027-After](./screenshots/after/WI-027-after.png) | 2026-05-18 |
+| [WI-020](./items/WI-020.md) | Mobile Itinerary Cards Are Over-Scaled | [WI-020-Before](./screenshots/before/mobile-05-itinerary.png) | [WI-020-Proposed](./items/proposals/WI-020-proposal.png) | [WI-025-After](./screenshots/after/WI-025-after-56-no-jolt.png) | 2026-05-18 |
+| [WI-025](./items/WI-025.md) | Mobile Transport And Accommodation Cards Need Consistent Styling | [WI-025-Before](./screenshots/before/mobile-06-transport.png) | [WI-025-Proposed](./items/proposals/WI-025-proposal.png) | [WI-025-After](./screenshots/after/WI-025-after-56-no-jolt.png) | 2026-05-18 |
 
 ---
 
