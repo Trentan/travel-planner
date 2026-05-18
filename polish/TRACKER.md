@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-17
-Progress: 22/25 items complete
+Progress: 22/27 items complete
 
 ---
 

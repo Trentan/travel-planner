@@ -11,12 +11,12 @@
 
 | Metric | Value |
 |--------|-------|
-| Total issues | 24 |
+| Total issues | 27 |
 | 🔴 Critical | 8 |
 | 🟡 Important | 12 |
-| 🟢 Polish | 4 |
-| Estimated total effort | 68-118 hours |
-| Design maturity (1-10) | 6/10 |
+| 🟢 Polish | 7 |
+| Estimated total effort | 75-125 hours |
+| Design maturity (1-10) | 8/10 |
 | Single biggest win | Fix the mobile chrome/nav/modal overflow first so the app feels intentionally responsive. |
 
 ### Top 5 highest-impact changes
@@ -333,10 +333,12 @@ The app has strong top-level hierarchy but weak second-level hierarchy. Itinerar
 | File | Purpose |
 |------|---------|
 | `TRACKER.md` | Day-to-day progress tracker |
-| `items/WI-001.md` ... `items/WI-024.md` | Individual work items |
+| `items/WI-001.md` ... `items/WI-027.md` | Individual work items |
 | `screenshots/before/` | 23 screenshots captured |
 | `items/proposals/` | Proposal mockup images and proposal notes for work items |
-| `screenshots/after/` | Reserved for actual after screenshots captured after fixes are implemented |
+| `screenshots/after/` | Actual screenshots captured after fixes are implemented |
+
+> **Note:** Items `WI-025` through `WI-027` were added during the sprint to address emergent UX and aesthetic issues found during implementation.
 
 ## Recommended order of attack
 
@@ -352,8 +354,8 @@ Work through items in this order for maximum visible improvement fastest:
 
 ## Definition of done for the full sprint
 
-- [ ] All 🔴 Critical items resolved
+- [x] All 🔴 Critical items resolved
 - [ ] All 🟡 Important items resolved
-- [ ] Regression check passing
-- [ ] After screenshots taken for all completed items
-- [ ] TRACKER.md showing 100% complete
+- [x] Regression check passing: `node tests/run-tests.js`
+- [x] After screenshots taken for all completed items
+- [ ] TRACKER.md showing 100% complete (Currently 81%)
