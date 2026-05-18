@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-18
-Progress: 31/32 items complete
+Progress: 31/33 items complete
 
 ---
 
@@ -19,6 +19,7 @@ Progress: 31/32 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
+| [WI-034](./items/WI-034.md) | Activity Assignment Emoji Retention | Small (<2 hrs) | Review | [Before](./screenshots/after/WI-029-after-4.png) | [Proposed](./screenshots/after/WI-029-proposal.png) | [After](./screenshots/after/WI-034-after.png) | - |
 
 ## Completed
 
