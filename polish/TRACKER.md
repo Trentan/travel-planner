@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-18
-Progress: 31/33 items complete
+Progress: 32/33 items complete
 
 ---
 
@@ -19,12 +19,12 @@ Progress: 31/33 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
-| [WI-034](./items/WI-034.md) | Activity Assignment Emoji Retention | Small (<2 hrs) | Review | [Before](./screenshots/after/WI-029-after-4.png) | [Proposed](./screenshots/after/WI-029-proposal.png) | [After](./screenshots/after/WI-034-after.png) | - |
 
 ## Completed
 
 | ID | Title | Before | Proposed | After | Completed |
 |----|-------|--------|----------|-------|-----------|
+| [WI-034](./items/WI-034.md) | Activity Assignment Emoji Retention | [Before](./screenshots/after/WI-029-after-4.png) | [Proposed](./screenshots/after/WI-029-proposal.png) | [After](./screenshots/after/WI-034-after.png) | 2026-05-18 |
 | [WI-017](./items/WI-017.md) | AI Builder Trip Context Pre-fill | [Before](./screenshots/before/dde-11-ai-builder.png) | [Proposed](./screenshots/after/WI-017-proposal.png) | [After](./screenshots/after/WI-017-after.png) | 2026-05-18 |
 | [WI-030](./items/WI-030.md) | Mobile Menu Scannability and Hierarchy | [Before](./screenshots/before/mde-04-menu-open.png) | [Proposed](./screenshots/after/WI-030-proposal.png) | [After](./screenshots/after/WI-030-after.png) | 2026-05-18 |
 | [WI-031](./items/WI-031.md) | Compact Mode Visual Unification | [Before](./screenshots/before/dco-04-itinerary.png) | [Proposed](./screenshots/after/WI-031-proposal.png) | [After](./screenshots/after/WI-031-after.png) | 2026-05-18 |
