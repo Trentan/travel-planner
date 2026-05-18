@@ -30,6 +30,11 @@ function handleDrop(e, targetLegIdx, targetDayIdx) {
   if (assigned) {
    saveData();
    buildItinerary();
+   if (typeof showActivityAssignFeedback === 'function') {
+    const targetDay = appData[targetLegIdx]?.days?.[targetDayIdx];
+    const dayLabel = targetDay ? `${targetDay.day} ${targetDay.date}` : 'selected day';
+    showActivityAssignFeedback(`Assigned to ${dayLabel}`);
+   }
   }
  }
 }

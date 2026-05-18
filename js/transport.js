@@ -643,7 +643,7 @@ function renderTransportScheduleMobile(firstDep, lastArr, lastArrTime, durationT
 function renderTransportCarrierMobile(provider, routeCode, bookingReference, statusText, statusIcon, statusColor, costValue, journeyId, isEditable) {
   const providerLine = provider ? `<span class="transport-carrier-provider">${provider}</span>` : '';
   const codeLine = routeCode ? `<span class="transport-carrier-code">${routeCode}</span>` : '';
-  const refAndCost = [bookingReference ? `<span class="transport-carrier-pnr">${bookingReference}</span>` : '', costValue !== '' ? `<span class="transport-carrier-cost">$${costValue}</span>` : '']
+  const refAndCost = [bookingReference ? `<span class="transport-carrier-pnr">${bookingReference}</span>` : '', costValue !== '' ? `<span class="transport-carrier-cost">${formatCurrency(costValue)}</span>` : '']
       .filter(Boolean)
       .join('');
   const statusNode = isEditable
@@ -708,7 +708,7 @@ function renderTransportSegmentsDetailContent(segs) {
             <span class="transport-segment-mobile-provider-name">${escapeHtmlText(seg.provider || '—')}</span>
             <span class="transport-segment-mobile-provider-meta">${escapeHtmlText(seg.routeCode || '—')}</span>
             <span class="transport-segment-mobile-provider-meta">${escapeHtmlText(seg.bookingReference || '—')}</span>
-            <span class="transport-segment-mobile-provider-meta transport-segment-mobile-cost-inline">${seg.cost ? escapeHtmlText(`$${seg.cost}`) : '—'}</span>
+            <span class="transport-segment-mobile-provider-meta transport-segment-mobile-cost-inline">${seg.cost ? escapeHtmlText(formatCurrency(seg.cost)) : '—'}</span>
           </div>
         </div>
       `;
@@ -724,7 +724,7 @@ function renderTransportSegmentsDetailContent(segs) {
         <td class="transport-segment-provider">${seg.provider || '—'}</td>
         <td class="transport-segment-code">${seg.routeCode || '—'}</td>
         <td class="transport-segment-bookingref">${seg.bookingReference || '—'}</td>
-        <td class="transport-segment-cost">${seg.cost ? `$${seg.cost}` : '—'}</td>
+        <td class="transport-segment-cost">${seg.cost ? formatCurrency(seg.cost) : '—'}</td>
       </tr>
     `;
   }).join('');
@@ -796,7 +796,7 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
   const providerLabel = providerSet.length > 1 ? `${providerSet.length} carriers` : (providerSet[0] || rep.provider || '—');
   const routeCodeLabel = routeCodeSet.length > 1 ? `${routeCodeSet.length} codes` : (routeCodeSet[0] || rep.routeCode || '—');
   const bookingLabel = bookingSet.length > 1 ? `${bookingSet.length} refs` : (bookingSet[0] || rep.bookingReference || '—');
-  const costValue = totalCost > 0 ? `$${totalCost.toFixed(0)}` : '$0';
+  const costValue = formatCurrency(totalCost);
 
   return `
     <div class="transport-detail-grid transport-mobile-detail-grid">
@@ -874,7 +874,7 @@ function buildTransportTab(cityFilter = null) {
       const segs = groups[gid].sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
       const isMultiLeg = segs.length > 1;
       const rep = segs[0];
-      const totalCost = segs.reduce((sum, s) => sum + (parseFloat(s.cost) || 0), 0);
+      const totalCost = segs.reduce((sum, s) => sum + parseCost(s.cost), 0);
       const routeText = isMultiLeg
           ? buildRouteChain(segs)
           : `${rep.fromLocation || '—'} → ${rep.toLocation || '—'}`;
@@ -995,7 +995,7 @@ function buildTransportTab(cityFilter = null) {
     const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
     const lastArrTime = lastSeg.arrivalTime || '—';
 
-    const totalCost = segs.reduce((sum, s) => sum + (parseFloat(s.cost) || 0), 0);
+    const totalCost = segs.reduce((sum, s) => sum + parseCost(s.cost), 0);
 
     const icon = isMultiLeg ? '✈️' : getTransportIcon(rep.transportType);
 
@@ -1048,7 +1048,7 @@ function buildTransportTab(cityFilter = null) {
           </span>
           ${renderTransportStatusCostMobile(statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.bookingReference, rep.id, isEditMode)}
         </td>
-        <td class="budget-field" data-label="Cost">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0')}</span></td>
+        <td class="budget-field" data-label="Cost">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${formatCurrency(isMultiLeg ? totalCost : (rep.cost || '0'), { includeSymbol: false })}</span></td>
         <td class="transport-actions-col" data-label="Actions">
           <button class="edit-btn transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">✎</button>
           <button class="del-btn transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">×</button>

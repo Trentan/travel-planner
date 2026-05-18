@@ -143,6 +143,29 @@ function escapeHtmlText(text) {
       .replace(/'/g, '&#39;');
 }
 
+function parseCurrencyAmount(value) {
+  const parsed = Number.parseFloat(String(value ?? '').replace(/[^0-9.-]/g, ''));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function formatCurrency(value, options = {}) {
+  const {
+    includeSymbol = true,
+    showZero = true,
+    minimumFractionDigits = 'auto',
+    maximumFractionDigits = 'auto'
+  } = options;
+  const amount = parseCurrencyAmount(value);
+  if (!showZero && amount === 0) return '';
+  const minDigits = minimumFractionDigits === 'auto' ? (Number.isInteger(amount) ? 0 : 2) : minimumFractionDigits;
+  const maxDigits = maximumFractionDigits === 'auto' ? Math.max(minDigits, 2) : maximumFractionDigits;
+  const formatted = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: minDigits,
+    maximumFractionDigits: maxDigits
+  }).format(amount);
+  return includeSymbol ? `$${formatted}` : formatted;
+}
+
 function renderMobileStat(label, primary, secondary = '', extraClass = '') {
   return `
     <div class="mobile-surface-card-stat ${extraClass}">
@@ -434,7 +457,9 @@ function renderMobileStatusCostMeta({
   const statusText = normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
   const statusColor = statusColors[normalizedStatus] || statusColors.planned;
   const statusGlyph = statusIcons[normalizedStatus] || '⏳';
-  const safeCost = costValue ?? '0';
+  const safeCost = typeof formatCurrency === 'function'
+      ? formatCurrency(costValue, { includeSymbol: false })
+      : (costValue ?? '0');
   const costNode = editableCost
       ? `<span class="transport-mobile-cost-value" contenteditable="true" onblur="${costOnBlur}">${safeCost}</span>`
       : `<span class="transport-mobile-cost-value">${safeCost}</span>`;
@@ -604,17 +629,19 @@ const DEFAULT_PACKING = [
 
 function updateClocks() {}
 
-function parseCost(val) { const num = parseFloat(String(val).replace(/[^0-9.-]+/g, "")); return isNaN(num) ? 0 : num; }
+function parseCost(val) { return parseCurrencyAmount(val); }
 
 function getDayTotal(day) {
   let total = 0;
   ['transportItems', 'accomItems', 'activityItems'].forEach(cat => {
     (day[cat] || []).forEach(item => { total += parseCost(item.cost); });
   });
-  return total > 0 ? '$' + total.toFixed(0) : '';
+  return formatCurrency(total, { showZero: false });
 }
 
 window.getDayTotal = getDayTotal;
+window.parseCurrencyAmount = parseCurrencyAmount;
+window.formatCurrency = formatCurrency;
 window.escapeHtmlText = escapeHtmlText;
 window.renderMobileStat = renderMobileStat;
 window.renderMobileSurfaceCard = renderMobileSurfaceCard;

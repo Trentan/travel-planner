@@ -8,11 +8,10 @@ function isMobileViewport() {
 }
 
 function updateStickyOffsets() {
-  const menuBar = document.querySelector('.app-menu-bar');
   const tabsNav = document.querySelector('.app-tabs-nav');
   if (!tabsNav) return;
 
-  const menuHeight = isMobileViewport() && menuBar ? Math.ceil(menuBar.getBoundingClientRect().height || 0) : 0;
+  const menuHeight = 0;
   const tabsHeight = Math.ceil(tabsNav.getBoundingClientRect().height || 0);
   document.documentElement.style.setProperty('--tabs-nav-sticky-top', `${menuHeight}px`);
   document.documentElement.style.setProperty('--city-nav-sticky-top', `${tabsHeight}px`);
@@ -34,6 +33,21 @@ function syncMobileMenuControls() {
   });
 }
 
+function syncMobileMenuStatus() {
+  const sourceMap = [
+    ['activeFileDisplay', 'mobileActiveFileDisplay'],
+    ['saveStatus', 'mobileSaveStatus'],
+    ['timestampStatus', 'mobileTimestampStatus']
+  ];
+
+  sourceMap.forEach(([sourceId, targetId]) => {
+    const source = document.getElementById(sourceId);
+    const target = document.getElementById(targetId);
+    if (!source || !target) return;
+    target.textContent = (source.textContent || '').trim() || (target.dataset.fallback || '');
+  });
+}
+
 function syncResponsiveUi() {
   const mobile = isMobileViewport();
   document.body.classList.toggle('mobile-app-mode', mobile);
@@ -41,6 +55,7 @@ function syncResponsiveUi() {
   window.isCompactView = isCompactView;
   updateStickyOffsets();
   syncMobileMenuControls();
+  syncMobileMenuStatus();
 
   if (!mobile) {
     closeMobileMenu();
@@ -56,6 +71,7 @@ function toggleMobileMenu() {
     sheet.setAttribute('aria-hidden', String(!isMobileMenuOpen));
   }
   document.body.classList.toggle('mobile-menu-open', isMobileMenuOpen);
+  syncMobileMenuStatus();
 }
 
 function closeDesktopActionsMenu() {
@@ -76,6 +92,7 @@ function closeMobileMenu(event) {
     sheet.setAttribute('aria-hidden', 'true');
   }
   document.body.classList.remove('mobile-menu-open');
+  updateStickyOffsets();
 }
 
 function syncModeToggleButtons() {
@@ -392,6 +409,18 @@ window.addEventListener('orientationchange', syncResponsiveUi);
 document.addEventListener('DOMContentLoaded', syncResponsiveUi);
 window.addEventListener('load', syncResponsiveUi);
 
+document.addEventListener('DOMContentLoaded', () => {
+  ['activeFileDisplay', 'saveStatus', 'timestampStatus'].forEach(id => {
+    const node = document.getElementById(id);
+    if (!node || typeof MutationObserver === 'undefined') return;
+    new MutationObserver(syncMobileMenuStatus).observe(node, {
+      childList: true,
+      characterData: true,
+      subtree: true
+    });
+  });
+});
+
 document.getElementById('mainTitle').addEventListener('blur', function() { titleData.title = this.innerText; saveData(); trackUserEdit(); });
 document.getElementById('mainSubtitle').addEventListener('blur', function() { titleData.subtitle = this.innerText; saveData(); trackUserEdit(); });
 
@@ -448,6 +477,7 @@ window.closeDesktopActionsMenu = closeDesktopActionsMenu;
 window.closeMobileMenu = closeMobileMenu;
 window.syncResponsiveUi = syncResponsiveUi;
 window.syncMobileMenuControls = syncMobileMenuControls;
+window.syncMobileMenuStatus = syncMobileMenuStatus;
 window.promptHardRestart = promptHardRestart;
 window.promptFactoryReset = promptFactoryReset;
 window.addLeg = addLeg;

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="../../../style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <style>
+    body { padding: 20px; background: #f5f7fa; font-family: 'DM Sans', sans-serif; }
+    .mockup-container { width: 1000px; height: 600px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; }
+    .mockup-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .mockup-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #1A242F; margin: 0; }
+    #map-mockup { flex: 1; width: 100%; height: 100%; }
+    .leaflet-container { font-family: 'DM Sans', sans-serif; }
+  </style>
+</head>
+<body>
+  <div class="mockup-container">
+    <div class="mockup-header">
+      <h2 class="mockup-title">🗺️ Interactive Journey Map (Proposal)</h2>
+      <div style="font-size: 0.9rem; color: #666;">WI-009: Leaflet.js Implementation</div>
+    </div>
+    <div id="map-mockup"></div>
+  </div>
+
+  <script>
+    const map = L.map('map-mockup').setView([48.8566, 2.3522], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    const destinations = [
+      { name: 'London', coords: [51.5074, -0.1278], color: '#E74C3C' },
+      { name: 'Paris', coords: [48.8566, 2.3522], color: '#3498DB' },
+      { name: 'Rome', coords: [41.9028, 12.4964], color: '#27AE60' }
+    ];
+
+    const points = destinations.map(d => {
+      const marker = L.circleMarker(d.coords, {
+        radius: 8,
+        fillColor: d.color,
+        color: "#fff",
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.8
+      }).addTo(map).bindPopup(`<b>${d.name}</b>`);
+      return d.coords;
+    });
+
+    L.polyline(points, { color: '#FF6B6B', weight: 3, dashArray: '10, 10' }).addTo(map);
+  </script>
+</body>
+</html>
