@@ -1466,7 +1466,7 @@ function getCitiesInTravelOrder() {
         (day.to && day.to.toLowerCase() === labelCity.toLowerCase())
     );
     if (labelCity && !shouldSkipCityNavName(labelCity) && !labelAlreadyInDayRoute) {
-      addCityOrderCandidate(orderMap, labelCity, legBaseScore - 0.5, 2, 10);
+      addCityOrderCandidate(orderMap, labelCity, legBaseScore + 0.5, 2, 10);
     }
 
     (leg.days || []).forEach((day, dayIndex) => {

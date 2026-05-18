@@ -47,6 +47,13 @@ function buildJourneyMap() {
 
   const pathStops = [];
 
+  // Get canonical city order from navigation menu source of truth
+  const citiesInOrder = typeof getCitiesInTravelOrder === 'function' ? getCitiesInTravelOrder() : [];
+  const cityToIndexMap = new Map();
+  citiesInOrder.forEach((city, idx) => {
+    cityToIndexMap.set(city.name.toLowerCase(), idx + 1);
+  });
+
   if (typeof appData !== 'undefined' && Array.isArray(appData)) {
     appData.forEach((leg, legIndex) => {
       const legBaseScore = typeof getLegDateScore === 'function' ? getLegDateScore(leg, legIndex) : legIndex * 10000;
@@ -56,15 +63,20 @@ function buildJourneyMap() {
           (day.from && day.from.toLowerCase() === labelCity.toLowerCase()) ||
           (day.to && day.to.toLowerCase() === labelCity.toLowerCase())
       );
-      if (labelCity && (!typeof shouldSkipCityNavName === 'function' || !shouldSkipCityNavName(labelCity)) && !labelAlreadyInDayRoute) {
-        pathStops.push({ id: `city-${labelCity.toLowerCase().replace(/\s+/g, '-')}`, name: labelCity, score: legBaseScore - 0.5, isTransit: true, color: leg.colour || '#95a5a6' });
-      }
 
+      // Add leg from/to cities
       (leg.days || []).forEach((day, dayIndex) => {
         const dayScore = typeof getTimelineScore === 'function' ? getTimelineScore(day.date, '', legBaseScore + dayIndex * 10) : legBaseScore + dayIndex * 10;
+        
         if (day.from && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(day.from))) {
           pathStops.push({ id: `city-${day.from.toLowerCase()}`, name: day.from, score: dayScore, isTransit: false, color: leg.colour || '#3498DB' });
         }
+
+        // Place label city (like Verona) at +0.5 between from and to
+        if (labelCity && !labelAlreadyInDayRoute && dayIndex === 0) {
+           pathStops.push({ id: `city-${labelCity.toLowerCase().replace(/\s+/g, '-')}`, name: labelCity, score: dayScore + 0.5, isTransit: true, color: leg.colour || '#95a5a6' });
+        }
+
         if (day.to && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(day.to))) {
           pathStops.push({ id: `city-${day.to.toLowerCase()}`, name: day.to, score: dayScore + 1, isTransit: false, color: leg.colour || '#3498DB' });
         }
