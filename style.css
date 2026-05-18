@@ -4036,6 +4036,44 @@ body.compact-view-mode .compact-city-swipe-root {
   margin: 0 auto;
 }
 
+body.compact-view-mode .compact-desktop-stack {
+  display: grid;
+  gap: 0.95rem;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+body.compact-view-mode .compact-desktop-leg {
+  min-width: 0;
+}
+
+body.compact-view-mode .compact-desktop-stack .compact-leg-card {
+  border-radius: 16px;
+}
+
+body.compact-view-mode .compact-desktop-stack .compact-leg-card .compact-leg-header {
+  border-radius: 16px 16px 0 0;
+}
+
+body.compact-view-mode .compact-desktop-stack .compact-leg-body {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.32fr) minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: start;
+}
+
+body.compact-view-mode .compact-desktop-stack .compact-day-pager,
+body.compact-view-mode .compact-desktop-stack .compact-day-carousel,
+body.compact-view-mode .compact-desktop-stack .compact-day-slide {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  body.compact-view-mode .compact-desktop-stack .compact-leg-body {
+    grid-template-columns: 1fr;
+  }
+}
+
 body.compact-view-mode .mobile-swipe-pager {
   display: flex;
   flex-direction: column;

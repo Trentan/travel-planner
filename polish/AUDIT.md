@@ -6,7 +6,7 @@
 **Last sync:** 2026-05-18  
 **Viewports tested:** DDE (1440x900) / DCO (1440x900) / MDE (390x844) / MCO (390x844)  
 **Real data used:** 2026_June_July_Europe_Thailand.json  
-**Tracker sync:** 31/32 complete, 0 in Review, 0 Todo backlog rows.
+**Tracker sync:** 31/33 complete, 1 in Review, 0 Todo backlog rows.
 
 ---
 
@@ -28,6 +28,7 @@
 
 1. **[WI-021] Desktop Itinerary Is Visually Busy.** Status: Done. Desktop itinerary panels are calmer, with edit chrome de-emphasized until hover/focus.
 2. **[WI-032] Global Currency Formatting Consistency.** Status: Done. Shared currency formatter now drives visible budget, itinerary, accommodation, and transport cost displays.
+3. **[WI-033] Desktop Compact Itinerary Rework.** Status: Review. Desktop compact uses a stacked compact itinerary again while mobile compact keeps the city swipe pager.
 
 ---
 
@@ -52,3 +53,4 @@
 - 2026-05-18 / WI-021: Desktop Playwright verification at 1440x900 with real trip data passed itinerary visual-busy checks and saved [WI-021-after.png](./screenshots/after/WI-021-after.png). Confirmed styled leg panels, stronger day hierarchy, and low-opacity edit chrome until interaction. `node tests/city-nav-regression.js` passed.
 - 2026-05-18 / WI-032: Mobile Playwright verification at 390x844 with real trip data passed currency-format checks and saved [WI-032-after.png](./screenshots/after/WI-032-after.png). Confirmed budget KPI/table values use shared currency symbols, thousands separators, and decimal precision. `node --check` passed for changed JS files and `node tests/city-nav-regression.js` passed.
 - 2026-05-18 / WI-017, WI-021, WI-030, WI-031, WI-032: User approved final review after the combined commit landed on `main`; items moved to Done/Completed.
+- 2026-05-18 / WI-033: Desktop compact Playwright verification at 1440x900 with real trip data passed and saved [WI-033-after.png](./screenshots/after/WI-033-after.png). Confirmed 15 stacked desktop compact cards, 15 day pagers, and no desktop city swipe shell. Mobile compact sanity check at 390x844 confirmed the city swipe shell still renders 15 cards and 15 chips. `node --check js/itinerary.js` and `node tests/city-nav-regression.js` passed.

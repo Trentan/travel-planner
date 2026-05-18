@@ -509,6 +509,39 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
   return false;
 }
 
+function renderCompactLegCard(leg, legIndex) {
+  const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
+  const nightLabel = getLegNightSummary(leg).label;
+  const firstDay = leg.days && leg.days[0];
+  const lastDay = leg.days && leg.days[daysCount - 1];
+  const legDateRange = firstDay && lastDay
+      ? `${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date} - ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date}`
+      : (firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '');
+  const routeLabel = firstDay && lastDay
+      ? `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`
+      : `${daysCount} day${daysCount !== 1 ? 's' : ''}`;
+  const legLabel = leg.label && !/^trip leg$/i.test(String(leg.label).trim())
+      ? leg.label
+      : '';
+  const displayLegLabel = legLabel || routeLabel || `Leg ${legIndex + 1}`;
+
+  return `
+    <article class="compact-leg-card" style="--leg-accent:${escapeHtmlText(leg.colour || '#24485d')}">
+      <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
+        <div class="compact-leg-header-line">
+          <span class="compact-leg-date">${escapeHtmlText(legDateRange || '-')}</span>
+          <span class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</span>
+          <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
+        </div>
+      </div>
+      <div class="compact-leg-body">
+        ${renderCompactFoodQuestCard(leg, legIndex)}
+        ${renderCompactDayPager(leg, legIndex)}
+      </div>
+    </article>
+  `;
+}
+
 function buildCompactItinerary() {
   const container = document.getElementById('itinerary');
   if (!container) return;
@@ -580,6 +613,24 @@ function buildCompactItinerary() {
 
   container.appendChild(pagerRoot);
   setupMobileSwipePagers(container);
+}
+
+function buildCompactItineraryDesktop() {
+  const container = document.getElementById('itinerary');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  const stack = document.createElement('div');
+  stack.className = 'compact-desktop-stack';
+  stack.innerHTML = appData.map((leg, legIndex) => `
+    <section class="compact-desktop-leg" id="leg-${escapeHtmlText(leg.id || `compact-${legIndex}`)}">
+      ${renderCompactLegCard(leg, legIndex)}
+    </section>
+  `).join('');
+
+  container.appendChild(stack);
+  setupCompactItineraryPagers(container);
 }
 
 function buildCompactItineraryLegacy() {
@@ -922,7 +973,11 @@ function buildItinerary() {
   // Check window.isCompactView for cross-module access
   const isCompact = typeof window !== 'undefined' && window.isCompactView;
   if (isCompact) {
-    buildCompactItinerary();
+    if (typeof isMobileViewport === 'function' && isMobileViewport()) {
+      buildCompactItinerary();
+    } else {
+      buildCompactItineraryDesktop();
+    }
     return;
   }
 

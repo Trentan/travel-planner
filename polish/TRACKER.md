@@ -1,7 +1,7 @@
 # Polish Sprint - Progress Tracker
 
 Last updated: 2026-05-18
-Progress: 31/32 items complete
+Progress: 31/33 items complete
 
 ---
 
@@ -19,6 +19,7 @@ Progress: 31/32 items complete
 
 | ID | Title | Effort | Status | Before | Proposed | After | Done |
 |----|-------|--------|--------|--------|----------|-------|------|
+| [WI-033](./items/WI-033.md) | Desktop Compact Itinerary Rework | Medium (2-8 hrs) | Review | [Before](./screenshots/after/WI-031-after.png) | [Proposed](./screenshots/after/WI-031-proposal.png) | [After](./screenshots/after/WI-033-after.png) | - |
 
 ## Completed
 
