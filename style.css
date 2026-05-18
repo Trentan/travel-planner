@@ -1061,27 +1061,15 @@ main {
   cursor: pointer;
 }
 .activity-action-btn {
-  min-width: 2.1rem;
-  min-height: 2.1rem;
-  padding: 0 0.65rem;
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
   border-radius: 999px;
   font-size: 0.95rem;
   line-height: 1;
-}
-
-.activity-action-icon {
-  font-family: 'DM Mono', monospace;
-  font-weight: 700;
-}
-
-.activity-action-label {
-  display: none;
-  font-size: 0.78rem;
-  font-weight: 700;
 }
 
 .activity-assign-btn {
@@ -6743,14 +6731,12 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
   .activity-action-btn.activity-assign-btn {
     flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
     min-height: 44px;
-    min-width: 86px;
-    padding: 0.55rem 0.75rem;
+    min-width: 44px;
+    padding: 0;
     border-radius: 999px;
-  }
-
-  .activity-action-label {
-    display: inline;
   }
 
   .activity-assign-modal {
