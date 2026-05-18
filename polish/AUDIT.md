@@ -6,13 +6,13 @@
 **Last sync:** 2026-05-18  
 **Viewports tested:** DDE (1440x900) / DCO (1440x900) / MDE (390x844) / MCO (390x844)  
 **Real data used:** 2026_June_July_Europe_Thailand.json  
-**Tracker sync:** 25/32 complete, 1 in Review, 5 Todo backlog rows.
+**Tracker sync:** 26/32 complete, 0 in Review, 5 Todo backlog rows.
 
 ---
 
 ## Critical Items
 
-1. **[WI-029] Touch-Friendly Suggested Activity Assignment.** Status: Review. Drag-and-drop is unusable on mobile. Implemented a touch-friendly Assign picker with large day targets and success feedback.
+1. **[WI-029] Touch-Friendly Suggested Activity Assignment.** Status: Done. Drag-and-drop is unusable on mobile. Implemented a touch-friendly Assign picker with large day targets and success feedback.
 
 ---
 
@@ -34,7 +34,7 @@
 ## Audit Checklist (v2)
 
 - [x] All modes (DDE, DCO, MDE, MCO) screenshotted.
-- [ ] Critical items resolved.
+- [x] Critical items resolved.
 - [ ] Important items resolved.
 - [x] WI-028 targeted regression passing: `node tests/city-nav-regression.js`.
 - [x] TRACKER.md updated with WI-028 completed status and after screenshot.
@@ -45,3 +45,4 @@
 - 2026-05-18 / WI-028: `node tests/run-tests.js` currently passes core smoke and city nav before stopping on the existing map harness issue `L is not defined`.
 - 2026-05-18 / WI-028: User approved final review; WI-028 moved to Done/Completed.
 - 2026-05-18 / WI-029: Mobile Playwright verification at 390x844 with real trip data passed the touch assignment checks and saved [WI-029-after-4.png](./screenshots/after/WI-029-after-4.png). Assign is 44x44 on mobile, the unassigned action uses the suggested-activity thumbtack, the assigned action stays as a chevron, and assigned status uses a soft green check instead of a yellow hourglass. `node tests/city-nav-regression.js` passed; `node tests/run-tests.js` still stops on the existing map harness issue `L is not defined`.
+- 2026-05-18 / WI-029: User approved final review; WI-029 moved to Done/Completed.
