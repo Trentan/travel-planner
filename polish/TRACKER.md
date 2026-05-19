@@ -14,7 +14,7 @@ Progress: 32/33 items complete
 
 | ID | Title | Effort  | Status | Before | Proposed | After | Done |
 |----|-------|---------|--------|--------|----------|-------|------|
-| [WI-035](./items/WI-035.md) | Map Geocoding & Marker Refinement | High | Review | [Before](./screenshots/before/WI-035-before.png) | [Proposed](./items/proposals/WI-035-proposal.png) | [After](./screenshots/after/WI-035-after.png) |  |
+| [WI-035](./items/WI-035.md) | Map Geocoding & Marker Refinement | High | Review | [Before](./screenshots/before/WI-035-before.png) | [Proposed](./items/proposals/WI-035-proposal.png) | [After](./screenshots/after/WI-035-after-2.png) |  |
 
 ## Polish
 

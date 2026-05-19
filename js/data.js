@@ -1087,6 +1087,59 @@ async function searchCityOnline(cityName) {
 
 window.searchCityOnline = searchCityOnline;
 
+function cityHasStoredCoords(city) {
+  return city &&
+      city.lat !== undefined &&
+      city.lng !== undefined &&
+      city.lat !== null &&
+      city.lng !== null &&
+      city.lat !== '' &&
+      city.lng !== '';
+}
+
+async function resolveCityLocation(city) {
+  if (!city || !city.name) return null;
+
+  const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
+  if (dbMatch && dbMatch.lat !== undefined && dbMatch.lng !== undefined) {
+    return {
+      lat: dbMatch.lat,
+      lng: dbMatch.lng,
+      countryCode: dbMatch.countryCode || '',
+      code: dbMatch.code || ''
+    };
+  }
+
+  const onlineMatch = await searchCityOnline(city.name);
+  if (!onlineMatch) return null;
+
+  return {
+    lat: onlineMatch.lat,
+    lng: onlineMatch.lng,
+    countryCode: onlineMatch.countryCode || '',
+    code: ''
+  };
+}
+
+function applyCityLocation(city, location) {
+  if (!city || !location) return false;
+
+  city.lat = location.lat;
+  city.lng = location.lng;
+  if (!city.countryCode && location.countryCode) city.countryCode = location.countryCode;
+  if (!city.code && location.code) city.code = location.code;
+
+  if (!city.code) {
+    const dbMatch = ALL_CITIES.find(c =>
+      c.name.toLowerCase() === city.name.toLowerCase() ||
+      (city.countryCode && c.countryCode === city.countryCode && c.name.toLowerCase().includes(city.name.toLowerCase()))
+    );
+    if (dbMatch) city.code = dbMatch.code;
+  }
+
+  return true;
+}
+
 async function triggerOnlineSearch(cityId) {
   const city = citiesData.find(c => c.id === cityId);
   if (!city) return;
@@ -1094,21 +1147,9 @@ async function triggerOnlineSearch(cityId) {
   const btn = document.querySelector(`[data-search-btn="${cityId}"]`);
   if (btn) btn.disabled = true;
 
-  const result = await searchCityOnline(city.name);
+  const result = await resolveCityLocation(city);
   if (result) {
-    city.lat = result.lat;
-    city.lng = result.lng;
-    if (!city.countryCode) city.countryCode = result.countryCode;
-    
-    // Also try to find a matching IATA code now that we have more info
-    if (!city.code) {
-      const dbMatch = ALL_CITIES.find(c => 
-        c.name.toLowerCase() === city.name.toLowerCase() || 
-        (city.countryCode && c.countryCode === city.countryCode && c.name.toLowerCase().includes(city.name.toLowerCase()))
-      );
-      if (dbMatch) city.code = dbMatch.code;
-    }
-
+    applyCityLocation(city, result);
     saveData(true);
     populateCityList();
     if (typeof buildJourneyMap === 'function') buildJourneyMap();
@@ -1119,6 +1160,45 @@ async function triggerOnlineSearch(cityId) {
 }
 
 window.triggerOnlineSearch = triggerOnlineSearch;
+
+async function fetchAllMissingCityLocations() {
+  const missingCities = citiesData.filter(city => !cityHasStoredCoords(city));
+  if (missingCities.length === 0) return;
+
+  const btn = document.getElementById('fetchMissingCityLocationsBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = `Finding 0/${missingCities.length}...`;
+  }
+
+  let foundCount = 0;
+  for (let i = 0; i < missingCities.length; i++) {
+    const city = missingCities[i];
+    if (btn) btn.textContent = `Finding ${i + 1}/${missingCities.length}...`;
+
+    const hadLocalCoords = !!ALL_CITIES.find(c =>
+      c.name.toLowerCase() === city.name.toLowerCase() &&
+      c.lat !== undefined &&
+      c.lng !== undefined
+    );
+    const result = await resolveCityLocation(city);
+    if (result && applyCityLocation(city, result)) foundCount++;
+
+    if (!hadLocalCoords && i < missingCities.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 1100));
+    }
+  }
+
+  saveData(true);
+  populateCityList();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+
+  if (foundCount < missingCities.length) {
+    alert(`Found locations for ${foundCount} of ${missingCities.length} cities. Check the remaining cities manually.`);
+  }
+}
+
+window.fetchAllMissingCityLocations = fetchAllMissingCityLocations;
 
 // Load user-extensible country database
 const savedUserCountries = localStorage.getItem('travelApp_userCountries_v1');
@@ -1608,6 +1688,22 @@ function populateCityList() {
     return;
   }
 
+  const missingLocationCount = citiesData.filter(city => !cityHasStoredCoords(city)).length;
+  if (missingLocationCount > 0) {
+    const toolbar = document.createElement('div');
+    toolbar.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.75rem 1rem; background:#f5fbff; border-bottom:1px solid #d7ebfa;';
+    toolbar.innerHTML = `
+      <span style="font-size:0.85rem; color:#2C3E50;">${missingLocationCount} ${missingLocationCount === 1 ? 'city is' : 'cities are'} missing map locations.</span>
+      <button id="fetchMissingCityLocationsBtn"
+              class="search-btn"
+              style="padding: 6px 10px; border: 1px solid #3498DB; border-radius: 4px; font-size: 0.8rem; color: #fff; background: #3498DB; cursor: pointer;"
+              onclick="fetchAllMissingCityLocations()">
+        Find all missing locations
+      </button>
+    `;
+    container.appendChild(toolbar);
+  }
+
   // Sort cities alphabetically by name
   const sortedCities = [...citiesData].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -1628,7 +1724,7 @@ function populateCityList() {
 
     // Build code display
     const codeDisplay = city.code ? `<span class="city-code">${city.code}</span>` : '';
-    const hasCoords = city.lat !== undefined && city.lat !== null;
+    const hasCoords = cityHasStoredCoords(city);
     const searchBtn = !hasCoords ? `
       <button class="search-btn" data-search-btn="${city.id}" 
               style="padding: 4px 8px; border: 1px solid #3498DB; border-radius: 4px; font-size: 0.75rem; color: #3498DB; background: white; cursor: pointer;"
@@ -1705,7 +1801,7 @@ function deleteCityFromDialog(cityId) {
   }
 }
 
-function addNewCityFromDialog() {
+async function addNewCityFromDialog() {
   const nameInput = document.getElementById('newCityName');
   const countrySelect = document.getElementById('newCityCountrySelect');
   const countryInput = document.getElementById('newCityCountry');
@@ -1798,6 +1894,11 @@ function addNewCityFromDialog() {
 
   const newCity = addOrUpdateCity(name, countryName, '', '', cityCode, countryCode);
   if (newCity) {
+    if (!cityHasStoredCoords(newCity)) {
+      const location = await resolveCityLocation(newCity);
+      if (location) applyCityLocation(newCity, location);
+    }
+
     saveData(false);
     nameInput.value = '';
     if (countryInput) countryInput.value = '';

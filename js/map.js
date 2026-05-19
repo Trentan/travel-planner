@@ -95,11 +95,13 @@ function buildJourneyMap() {
     journeys.forEach((journey, journeyIndex) => {
       const depScore = typeof getTimelineScore === 'function' ? getTimelineScore(journey.departureDate || journey.dayDate, journey.departureTime, Number.MAX_SAFE_INTEGER - 20000 + journeyIndex) : Number.MAX_SAFE_INTEGER - 20000 + journeyIndex;
       const arrScore = typeof getTimelineScore === 'function' ? getTimelineScore(journey.arrivalDate || journey.dayDate || journey.departureDate, journey.arrivalTime, depScore + 1) : depScore + 1;
+      const fromCity = typeof getCityByName === 'function' ? getCityByName(journey.fromLocation) : null;
+      const toCity = typeof getCityByName === 'function' ? getCityByName(journey.toLocation) : null;
 
-      if (journey.fromLocation && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(journey.fromLocation))) {
+      if (fromCity?.isTransit === true && journey.fromLocation && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(journey.fromLocation))) {
         pathStops.push({ id: getMapCityId(journey.fromLocation), name: journey.fromLocation, score: depScore, isTransit: true, color: '#95a5a6' });
       }
-      if (journey.toLocation && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(journey.toLocation))) {
+      if (toCity?.isTransit === true && journey.toLocation && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(journey.toLocation))) {
         pathStops.push({ id: getMapCityId(journey.toLocation), name: journey.toLocation, score: arrScore, isTransit: true, color: '#95a5a6' });
       }
     });
