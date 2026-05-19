@@ -234,7 +234,7 @@ const COUNTRY_DATA = [
 // Extended city database with IATA codes for Eastern Europe and additional destinations
 // Users can still add their own cities via the city dialog
 const EXTENDED_CITY_DATABASE = [
-{ code: 'BTS', name: 'Bratislava', countryCode: 'SK' },
+{ code: 'BTS', name: 'Bratislava', countryCode: 'SK', lat: 48.1486, lng: 17.1077 },
 { code: 'SKP', name: 'Skopje', countryCode: 'MK' },
 { code: 'TIA', name: 'Tirana', countryCode: 'AL' },
 { code: 'TGD', name: 'Podgorica', countryCode: 'ME' },
@@ -310,9 +310,13 @@ const EXTENDED_CITY_DATABASE = [
 { code: 'DMK', name: 'Bangkok Don Mueang', countryCode: 'TH' },
 { code: 'CNX', name: 'Chiang Mai', countryCode: 'TH' },
 { code: 'KBV', name: 'Krabi', countryCode: 'TH' },
-{ code: 'USM', name: 'Koh Samui', countryCode: 'TH' },
+{ code: 'USM', name: 'Koh Samui', countryCode: 'TH', lat: 9.5120, lng: 100.0136 },
 { code: 'IST', name: 'Istanbul', countryCode: 'TR' },
 { code: 'TPE', name: 'Taipei', countryCode: 'TW' },
+{ code: 'NUE', name: 'Nuremberg', countryCode: 'DE', lat: 49.4521, lng: 11.0767 },
+{ code: 'INN', name: 'Innsbruck', countryCode: 'AT', lat: 47.2692, lng: 11.4041 },
+{ code: 'BZO', name: 'Bolzano', countryCode: 'IT', lat: 46.4983, lng: 11.3548 },
+{ code: 'VRN', name: 'Verona', countryCode: 'IT', lat: 45.4384, lng: 10.9916 },
 ];
 
 // Built-in city database with IATA codes

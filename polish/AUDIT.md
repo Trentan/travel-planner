@@ -3,10 +3,10 @@
 ## Travel Planner PWA - UI/UX & Mobile Polish Audit (Post-Advances)
 
 **Audit date:** 2026-05-18  
-**Last sync:** 2026-05-18  
+**Last sync:** 2026-05-20
 **Viewports tested:** DDE (1440x900) / DCO (1440x900) / MDE (390x844) / MCO (390x844)  
 **Real data used:** 2026_June_July_Europe_Thailand.json  
-**Tracker sync:** 32/33 complete, 0 in Review, 0 Todo backlog rows.
+**Tracker sync:** 32/33 complete, 1 in Review, 0 Todo backlog rows.
 
 ---
 
@@ -21,6 +21,7 @@
 1. **[WI-017] AI Builder Trip Context Pre-fill.** Status: Done. Fields now pre-fill with current trip title, date/flight summary, and destination cities.
 2. **[WI-030] Mobile Menu Scannability and Hierarchy.** Status: Done. Mobile menu is grouped into logical sections with headers and primary action emphasis.
 3. **[WI-031] Compact Mode Visual Unification.** Status: Done. Desktop compact now uses the shared compact card/pager renderer.
+4. **[WI-035] Map Geocoding & Marker Refinement.** Status: Review. Map marker order now matches the city submenu sequence, uses contiguous marker numbering, and includes local coordinate coverage for the trip cities that were previously omitted.
 
 ---
 
@@ -37,8 +38,8 @@
 - [x] All modes (DDE, DCO, MDE, MCO) screenshotted.
 - [x] Critical items resolved.
 - [x] Important items resolved.
-- [x] WI-028 targeted regression passing: `node tests/city-nav-regression.js`.
-- [x] TRACKER.md updated with WI-028 completed status and after screenshot.
+- [x] WI-035 targeted regression passing: `node tests/city-nav-regression.js`.
+- [x] TRACKER.md updated with WI-035 review status and after screenshot.
 
 ## Verification Notes
 
@@ -55,3 +56,4 @@
 - 2026-05-18 / WI-017, WI-021, WI-030, WI-031, WI-032: User approved final review after the combined commit landed on `main`; items moved to Done/Completed.
 - 2026-05-18 / WI-034: Focused activity assignment harness check passed for assigning, moving, and clearing emoji-prefixed day items. `node --check js/crud.js`, `node --check tests/item15-suite.js`, and `node tests/city-nav-regression.js` passed. `node tests/item15-suite.js` still stops on the existing Leaflet harness issue `L is not defined` before reaching activity assignment tests.
 - 2026-05-18 / WI-034: User approved final review; WI-034 moved to Done/Completed.
+- 2026-05-20 / WI-035: Desktop Playwright verification at 1440x900 with real trip data passed map order checks and saved [WI-035-after.png](./screenshots/after/WI-035-after.png). Confirmed city nav order and map legend both use Brisbane, Taipei, Vienna, Bratislava, Prague, Nuremberg, Munich, Innsbruck, Bolzano, Verona, Milan, Zurich, London, Bangkok, Koh Samui; marker labels are contiguous 1-15. `node --check js/data.js`, `node --check js/itinerary.js`, `node --check js/map.js`, and `node tests/city-nav-regression.js` passed.

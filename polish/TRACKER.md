@@ -1,6 +1,6 @@
 # Polish Sprint - Progress Tracker
 
-Last updated: 2026-05-18
+Last updated: 2026-05-20
 Progress: 32/33 items complete
 
 ---
@@ -14,7 +14,7 @@ Progress: 32/33 items complete
 
 | ID | Title | Effort  | Status | Before | Proposed | After | Done |
 |----|-------|---------|--------|--------|----------|-------|------|
-| [WI-035](./items/WI-035.md) | Map Geocoding & Marker Refinement | Review  | | | 2026-05-18 |
+| [WI-035](./items/WI-035.md) | Map Geocoding & Marker Refinement | High | Review | [Before](./screenshots/before/WI-035-before.png) | [Proposed](./items/proposals/WI-035-proposal.png) | [After](./screenshots/after/WI-035-after.png) |  |
 
 ## Polish
 

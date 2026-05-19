@@ -24,6 +24,18 @@ function getCityCoords(cityName) {
   return null;
 }
 
+function getMapCityKey(cityName) {
+  return String(cityName || '').trim().toLowerCase();
+}
+
+function getMapCityId(cityName) {
+  if (typeof getCityByName === 'function') {
+    const city = getCityByName(cityName);
+    if (city && city.id) return city.id;
+  }
+  return 'city-' + String(cityName || '').toLowerCase().replace(/[^a-z0-9]/g, '-');
+}
+
 function buildJourneyMap() {
   const container = document.getElementById('journey-map-view');
   if (!container) return;
@@ -49,11 +61,6 @@ function buildJourneyMap() {
 
   // Get canonical city order from navigation menu source of truth
   const citiesInOrder = typeof getCitiesInTravelOrder === 'function' ? getCitiesInTravelOrder() : [];
-  const cityToIndexMap = new Map();
-  citiesInOrder.forEach((city, idx) => {
-    cityToIndexMap.set(city.name.toLowerCase(), idx + 1);
-  });
-
   if (typeof appData !== 'undefined' && Array.isArray(appData)) {
     appData.forEach((leg, legIndex) => {
       const legBaseScore = typeof getLegDateScore === 'function' ? getLegDateScore(leg, legIndex) : legIndex * 10000;
@@ -69,16 +76,16 @@ function buildJourneyMap() {
         const dayScore = typeof getTimelineScore === 'function' ? getTimelineScore(day.date, '', legBaseScore + dayIndex * 10) : legBaseScore + dayIndex * 10;
         
         if (day.from && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(day.from))) {
-          pathStops.push({ id: `city-${day.from.toLowerCase()}`, name: day.from, score: dayScore, isTransit: false, color: leg.colour || '#3498DB' });
+          pathStops.push({ id: getMapCityId(day.from), name: day.from, score: dayScore, isTransit: false, color: leg.colour || '#3498DB' });
         }
 
         // Place label city (like Verona) at +0.5 between from and to
         if (labelCity && !labelAlreadyInDayRoute && dayIndex === 0) {
-           pathStops.push({ id: `city-${labelCity.toLowerCase().replace(/\s+/g, '-')}`, name: labelCity, score: dayScore + 0.5, isTransit: true, color: leg.colour || '#95a5a6' });
+           pathStops.push({ id: getMapCityId(labelCity), name: labelCity, score: dayScore + 0.5, isTransit: true, color: leg.colour || '#95a5a6' });
         }
 
         if (day.to && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(day.to))) {
-          pathStops.push({ id: `city-${day.to.toLowerCase()}`, name: day.to, score: dayScore + 1, isTransit: false, color: leg.colour || '#3498DB' });
+          pathStops.push({ id: getMapCityId(day.to), name: day.to, score: dayScore + 1, isTransit: false, color: leg.colour || '#3498DB' });
         }
       });
     });
@@ -90,10 +97,10 @@ function buildJourneyMap() {
       const arrScore = typeof getTimelineScore === 'function' ? getTimelineScore(journey.arrivalDate || journey.dayDate || journey.departureDate, journey.arrivalTime, depScore + 1) : depScore + 1;
 
       if (journey.fromLocation && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(journey.fromLocation))) {
-        pathStops.push({ id: `city-${journey.fromLocation.toLowerCase()}`, name: journey.fromLocation, score: depScore, isTransit: true, color: '#95a5a6' });
+        pathStops.push({ id: getMapCityId(journey.fromLocation), name: journey.fromLocation, score: depScore, isTransit: true, color: '#95a5a6' });
       }
       if (journey.toLocation && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(journey.toLocation))) {
-        pathStops.push({ id: `city-${journey.toLocation.toLowerCase()}`, name: journey.toLocation, score: arrScore, isTransit: true, color: '#95a5a6' });
+        pathStops.push({ id: getMapCityId(journey.toLocation), name: journey.toLocation, score: arrScore, isTransit: true, color: '#95a5a6' });
       }
     });
   }
@@ -122,36 +129,55 @@ function buildJourneyMap() {
 
   const unmatchedCities = [];
   const destinations = [];
-  const markerDataMap = new Map();
+  const stopDataMap = new Map();
 
   travelSequence.forEach((stop, index) => {
-    const coords = getCityCoords(stop.name);
-    const seqNum = index + 1;
+    const key = getMapCityKey(stop.name);
+    if (!key) return;
 
-    if (coords) {
-      const key = stop.name.toLowerCase();
-      if (!markerDataMap.has(key)) {
-        const markerInfo = {
-          id: stop.id,
-          name: stop.name,
-          lat: coords.lat,
-          lng: coords.lng,
-          color: stop.color,
-          isTransit: stop.isTransit,
-          index: seqNum
-        };
-        markerDataMap.set(key, markerInfo);
-        destinations.push(markerInfo);
-      } else {
-        const existing = markerDataMap.get(key);
-        if (!stop.isTransit && existing.isTransit) {
-          existing.isTransit = false;
-          existing.color = stop.color;
-        }
-      }
+    if (!stopDataMap.has(key)) {
+      stopDataMap.set(key, {
+        id: stop.id,
+        name: stop.name,
+        color: stop.color,
+        isTransit: stop.isTransit,
+        visitIndexes: [index + 1]
+      });
     } else {
-      if (!unmatchedCities.includes(stop.name)) unmatchedCities.push(stop.name);
+      const existing = stopDataMap.get(key);
+      existing.visitIndexes.push(index + 1);
+      if (!stop.isTransit && existing.isTransit) {
+        existing.isTransit = false;
+        existing.color = stop.color;
+      }
     }
+  });
+
+  const orderedCities = citiesInOrder.length > 0
+      ? citiesInOrder
+      : Array.from(stopDataMap.values()).map(stop => ({ id: stop.id, name: stop.name, colour: stop.color, isTransit: stop.isTransit }));
+
+  orderedCities.forEach(city => {
+    const key = getMapCityKey(city.name);
+    const stopInfo = stopDataMap.get(key);
+    if (!stopInfo) return;
+
+    const coords = getCityCoords(city.name);
+    if (!coords) {
+      if (!unmatchedCities.includes(city.name)) unmatchedCities.push(city.name);
+      return;
+    }
+
+    destinations.push({
+      id: city.id || stopInfo.id,
+      name: city.name,
+      lat: coords.lat,
+      lng: coords.lng,
+      color: city.colour || stopInfo.color,
+      isTransit: city.isTransit === true || stopInfo.isTransit,
+      index: destinations.length + 1,
+      visitIndexes: stopInfo.visitIndexes
+    });
   });
 
   if (destinations.length === 0) {
@@ -184,6 +210,9 @@ function buildJourneyMap() {
     
     let popupText = `<b>${firstIndex}. ${d.name}</b>`;
     if (isTransit) popupText += ' <span style="font-size:0.8rem; color:#666;">(Transit)</span>';
+    if (Array.isArray(d.visitIndexes) && d.visitIndexes.length > 1) {
+      popupText += `<br><span style="font-size:0.8rem; color:#666;">Route visits: ${d.visitIndexes.join(', ')}</span>`;
+    }
     marker.bindPopup(popupText);
     
     mapMarkers.push({ id: d.id, name: d.name, marker: marker });
