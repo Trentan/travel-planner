@@ -1,7 +1,9 @@
-# Travel Planner - App Polish Sprint
+# Travel Planner - App Polish Sprint Archive
 
-Self-managed audit + work backlog. No GitHub issues needed.
-All items live in `/polish/items/`. Progress tracked in TRACKER.md.
+This directory preserves the completed private polish sprint for historical context.
+Active planning now happens in GitHub Issues.
+
+Do not add new work items here. If an archived item needs more work, open or update a GitHub Issue and link back to the relevant file or screenshot in this archive.
 
 ## Quick links
 - [Full audit findings](./AUDIT.md)
@@ -12,6 +14,8 @@ All items live in `/polish/items/`. Progress tracked in TRACKER.md.
 - [After screenshots](./screenshots/after/)
 
 ## How to work through items
+This workflow is retired and kept only to explain how the archive was produced.
+
 1. Open TRACKER.md - pick the next Todo item
 2. Open its WI-XXX.md for full context, before screenshot ref, and proposed fix
 3. Create or switch to a branch named for the work item, for example `WI-001_Desktop-App-Menu-Wraps`

@@ -672,6 +672,55 @@ function createBrowserHarness({
       return [];
     }
   };
+  windowObj.L = {
+    map(container) {
+      if (container) {
+        container.innerHTML = '<div class="leaflet-test-map"></div>';
+      }
+      return {
+        setView() { return this; },
+        fitBounds() { return this; },
+        remove() {},
+        invalidateSize() { return this; }
+      };
+    },
+    tileLayer() {
+      return {
+        addTo() { return this; }
+      };
+    },
+    divIcon(options = {}) {
+      return { ...options };
+    },
+    marker(latLng, options = {}) {
+      return {
+        latLng,
+        options,
+        addTo() { return this; },
+        bindPopup(html) {
+          this.popupHtml = html;
+          return this;
+        },
+        getLatLng() {
+          return latLng;
+        },
+        openPopup() {
+          this.popupOpened = true;
+          return this;
+        }
+      };
+    },
+    polyline(points = [], options = {}) {
+      return {
+        points,
+        options,
+        addTo() { return this; },
+        getBounds() {
+          return points;
+        }
+      };
+    }
+  };
 
   const baseIds = [
     'activeFileDisplay', 'saveStatus', 'timestampStatus', 'editToggleBtn', 'compactToggleBtn',
