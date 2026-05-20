@@ -9,13 +9,16 @@ function isMobileViewport() {
 }
 
 function updateStickyOffsets() {
+  const menuBar = document.querySelector('.app-menu-bar');
   const tabsNav = document.querySelector('.app-tabs-nav');
   if (!tabsNav) return;
 
-  const menuHeight = 0;
+  const menuHeight = !isMobileViewport() && menuBar
+    ? Math.ceil(menuBar.getBoundingClientRect().height || 0)
+    : 0;
   const tabsHeight = Math.ceil(tabsNav.getBoundingClientRect().height || 0);
   document.documentElement.style.setProperty('--tabs-nav-sticky-top', `${menuHeight}px`);
-  document.documentElement.style.setProperty('--city-nav-sticky-top', `${tabsHeight}px`);
+  document.documentElement.style.setProperty('--city-nav-sticky-top', `${menuHeight + tabsHeight}px`);
   if (isMobileViewport()) {
     document.documentElement.style.setProperty('--city-nav-sticky-top', `${menuHeight + tabsHeight}px`);
   }
