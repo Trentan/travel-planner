@@ -1382,6 +1382,13 @@ function addCityOrderCandidate(orderMap, cityName, score, sourceRank = 0, stayWe
   }
 }
 
+function addMissingCityOrderCandidate(orderMap, cityName, score, sourceRank = 0, stayWeight = 0) {
+  if (shouldSkipCityNavName(cityName)) return;
+  const city = getCityByName(cityName);
+  if (!city || orderMap.has(city.id)) return;
+  orderMap.set(city.id, { score, sourceRank, stayWeight });
+}
+
 function getCityStayCandidates() {
   const candidates = [];
 
@@ -1454,10 +1461,6 @@ function getCitiesInTravelOrder() {
 
   const orderMap = new Map();
 
-  getCityStayCandidates().forEach(candidate => {
-    addCityOrderCandidate(orderMap, candidate.cityName, candidate.score, candidate.sourceRank, candidate.weight);
-  });
-
   appData.forEach((leg, legIndex) => {
     const legBaseScore = getLegDateScore(leg, legIndex);
     const labelCity = cleanCityNavLabel(leg.label);
@@ -1466,7 +1469,7 @@ function getCitiesInTravelOrder() {
         (day.to && day.to.toLowerCase() === labelCity.toLowerCase())
     );
     if (labelCity && !shouldSkipCityNavName(labelCity) && !labelAlreadyInDayRoute) {
-      addCityOrderCandidate(orderMap, labelCity, legBaseScore - 0.5, 2, 10);
+      addCityOrderCandidate(orderMap, labelCity, legBaseScore + 0.5, 2, 10);
     }
 
     (leg.days || []).forEach((day, dayIndex) => {
@@ -1483,10 +1486,14 @@ function getCitiesInTravelOrder() {
       const departureScore = getTimelineScore(journey.departureDate || journey.dayDate, journey.departureTime, Number.MAX_SAFE_INTEGER - 20000 + journeyIndex);
       const arrivalScore = getTimelineScore(journey.arrivalDate || journey.dayDate || journey.departureDate, journey.arrivalTime, departureScore + 1);
 
-      addCityOrderCandidate(orderMap, journey.fromLocation, departureScore, 5, 2);
-      addCityOrderCandidate(orderMap, journey.toLocation, arrivalScore, 6, 2);
+      addMissingCityOrderCandidate(orderMap, journey.fromLocation, departureScore, 5, 2);
+      addMissingCityOrderCandidate(orderMap, journey.toLocation, arrivalScore, 6, 2);
     });
   }
+
+  getCityStayCandidates().forEach(candidate => {
+    addMissingCityOrderCandidate(orderMap, candidate.cityName, candidate.score, candidate.sourceRank, candidate.weight);
+  });
 
   return citiesData
       .map((city, fallbackIndex) => {

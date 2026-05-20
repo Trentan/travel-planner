@@ -1,0 +1,36 @@
+name: Polish task
+description: Track a focused UX, layout, or visual polish task.
+title: "[Polish]: "
+labels: ["polish", "ux"]
+body:
+  - type: textarea
+    id: issue
+    attributes:
+      label: What needs polish?
+      description: Name the screen, state, or workflow and what feels off.
+    validations:
+      required: true
+  - type: dropdown
+    id: modes
+    attributes:
+      label: Affected modes
+      multiple: true
+      options:
+        - Desktop detailed
+        - Desktop compact
+        - Mobile detailed
+        - Mobile compact
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or references
+      description: Add screenshots, links, or notes from the archived polish sprint if relevant.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: |
+        - [ ] ...
+        - [ ] Relevant tests pass
+    validations:
+      required: true
