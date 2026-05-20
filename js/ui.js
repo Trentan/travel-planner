@@ -2,6 +2,7 @@ let isFunMode = false;
 let isCompactView = false;
 let isEditMode = true;
 let isMobileMenuOpen = false;
+let lastViewportWasMobile = null;
 
 function isMobileViewport() {
   return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
@@ -50,6 +51,9 @@ function syncMobileMenuStatus() {
 
 function syncResponsiveUi() {
   const mobile = isMobileViewport();
+  const viewportChanged = lastViewportWasMobile !== null && mobile !== lastViewportWasMobile;
+  lastViewportWasMobile = mobile;
+
   document.body.classList.toggle('mobile-app-mode', mobile);
   document.body.classList.toggle('compact-view-mode', isCompactView);
   window.isCompactView = isCompactView;
@@ -60,6 +64,12 @@ function syncResponsiveUi() {
   if (!mobile) {
     closeMobileMenu();
     closeDesktopActionsMenu();
+  }
+
+  if (viewportChanged) {
+    if (typeof rebuildCurrentView === 'function') {
+      rebuildCurrentView();
+    }
   }
 }
 
@@ -455,7 +465,29 @@ function reObserveLegs() {
   // No-op - kept for backwards compatibility
 }
 
+// Helper to rebuild the current active view
+function rebuildCurrentView() {
+  const activeTab = document.querySelector('.app-tab-btn.active') || document.querySelector('.app-tabs-content .tab-pane.active');
+  if (!activeTab) return;
+
+  const tabType = activeTab.getAttribute('data-tab') || activeTab.id.replace('tab-', '');
+  const filter = typeof window !== 'undefined' && window.currentCityFilter ? window.currentCityFilter : 'all';
+
+  if (tabType === 'itinerary') {
+    if (typeof buildItinerary === 'function') buildItinerary();
+  } else if (tabType === 'transport') {
+    if (typeof buildTransportTab === 'function') buildTransportTab(filter);
+  } else if (tabType === 'accom') {
+    if (typeof buildAccomTab === 'function') buildAccomTab(filter);
+  } else if (tabType === 'budget') {
+    if (typeof buildBudgetTab === 'function') buildBudgetTab();
+  } else if (tabType === 'packing') {
+    if (typeof buildPackingTab === 'function') buildPackingTab();
+  }
+}
+
 // Expose UI functions to window scope for HTML onclick handlers
+window.rebuildCurrentView = rebuildCurrentView;
 window.toggleLeg = toggleLeg;
 window.toggleCard = toggleCard;
 window.updateData = updateData;
@@ -485,4 +517,5 @@ window.addLeg = addLeg;
 window.openRenameTripDialog = openRenameTripDialog;
 window.closeRenameTripDialog = closeRenameTripDialog;
 window.saveRenameTripDialog = saveRenameTripDialog;
+
 
