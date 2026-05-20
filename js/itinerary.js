@@ -117,26 +117,37 @@ function renderCompactFoodQuestCard(leg, legIndex, isMobileCompact = false) {
   const foodItems = Array.isArray(leg.cityFood) ? leg.cityFood : [];
   const completedCount = foodItems.filter(item => item && item.done).length;
   const totalCount = foodItems.length;
-  const legId = leg.id || legIndex;
   const countLabel = `${completedCount}/${totalCount}`;
   const progressWidth = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const foodLines = foodItems.length > 0
       ? foodItems.map((item, itemIdx) => renderCompactFoodQuestItem(legIndex, item, itemIdx)).join('')
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
 
-  const expanded = !isMobileCompact;
+  if (isMobileCompact) {
+    // Mobile compact view: default collapsed and completely non-collapsible
+    return `
+      <article class="mobile-surface-card compact-food-quest-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+        <div class="compact-food-summary" style="cursor: default; user-select: none;">
+          <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍗</span> Food quests</span>
+          <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
+          <span class="compact-food-summary-count">${escapeCompactText(countLabel)}</span>
+        </div>
+      </article>
+    `;
+  }
 
+  // Desktop Compact / other views: true native HTML collapsible details/summary card, open by default
   return `
-    <article class="mobile-surface-card compact-food-quest-card${expanded ? ' is-expanded' : ''}" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
-      <div class="compact-food-summary">
+    <details class="mobile-surface-card compact-food-quest-card" open style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+      <summary class="compact-food-summary" style="list-style: none; outline: none; cursor: pointer; user-select: none;">
         <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍗</span> Food quests</span>
         <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
         <span class="compact-food-summary-count">${escapeCompactText(countLabel)}</span>
-      </div>
-      <div class="mobile-surface-card-details${expanded ? ' expanded' : ''}">
+      </summary>
+      <div class="mobile-surface-card-details expanded">
         <div class="compact-food-list">${foodLines}</div>
       </div>
-    </article>
+    </details>
   `;
 }
 

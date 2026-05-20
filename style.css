@@ -410,7 +410,8 @@ body {
   list-style: none;
 }
 
-.app-menu-actions > summary::-webkit-details-marker {
+.app-menu-actions > summary::-webkit-details-marker,
+.compact-food-summary::-webkit-details-marker {
   display: none;
 }
 
