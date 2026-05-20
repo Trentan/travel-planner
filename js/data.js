@@ -1771,13 +1771,16 @@ function populateCityList() {
     // Build code display
     const codeDisplay = city.code ? `<span class="city-code">${city.code}</span>` : '';
     const hasCoords = cityHasStoredCoords(city);
+    const coordinateDisplay = hasCoords
+      ? `<span class="city-coordinates" title="Latitude and longitude">${Number.parseFloat(city.lat).toFixed(4)}, ${Number.parseFloat(city.lng).toFixed(4)}</span>`
+      : '';
     const searchBtn = !hasCoords ? `
       <button class="search-btn" data-search-btn="${city.id}" 
               style="padding: 4px 8px; border: 1px solid #3498DB; border-radius: 4px; font-size: 0.75rem; color: #3498DB; background: white; cursor: pointer;"
               onclick="triggerOnlineSearch('${city.id}')">
         🔍 Find on Map
       </button>
-    ` : `<span style="color:#27AE60; font-size:0.75rem;">📍 Mapped</span>`;
+    ` : `<span class="city-location-status">📍 Mapped</span>`;
 
     const row = document.createElement('div');
     row.className = 'city-list-item';
@@ -1801,6 +1804,7 @@ function populateCityList() {
             }).join('')}
             </select>
             ${searchBtn}
+            ${coordinateDisplay}
           </div>
         </div>
       </div>

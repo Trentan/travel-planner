@@ -5234,6 +5234,23 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   font-weight: 500;
 }
 
+.city-list-item .city-location-status {
+  color: #27AE60;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.city-list-item .city-coordinates {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: #52616f;
+  background: #eef3f6;
+  border: 1px solid #d8e3ea;
+  border-radius: 4px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
 .city-list-item .country-select {
   cursor: pointer;
 }
