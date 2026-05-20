@@ -155,6 +155,16 @@ function _openActivityModal(legIdx, activityIdx = null) {
           <label>Estimated Time</label>
           <input type="text" id="activityTime" class="form-control form-control--compact" placeholder="e.g., 1 hr" value="1 hr">
         </div>
+        <div class="modal-form-row modal-form-row--split">
+          <div class="ai-form-group">
+            <label>Start Time</label>
+            <input type="time" id="activityStartTime" class="form-control form-control--compact">
+          </div>
+          <div class="ai-form-group">
+            <label>End Time</label>
+            <input type="time" id="activityEndTime" class="form-control form-control--compact">
+          </div>
+        </div>
         <div class="ai-form-group">
           <label>Estimated Cost ($)</label>
           <input type="text" id="activityCost" class="form-control form-control--compact" placeholder="0" value="0">
@@ -173,6 +183,8 @@ function _openActivityModal(legIdx, activityIdx = null) {
   const titleEl = document.getElementById('activityTitle');
   const locationEl = document.getElementById('activityLocation');
   const timeEl = document.getElementById('activityTime');
+  const startTimeEl = document.getElementById('activityStartTime');
+  const endTimeEl = document.getElementById('activityEndTime');
   const costEl = document.getElementById('activityCost');
 
   if (isEditing && activity) {
@@ -180,6 +192,8 @@ function _openActivityModal(legIdx, activityIdx = null) {
     if (titleEl) titleEl.value = defaults.title || activity.title || '';
     if (locationEl) locationEl.value = defaults.location || '';
     if (timeEl) timeEl.value = activity.estTime || '1 hr';
+    if (startTimeEl) startTimeEl.value = activity.startTime || '';
+    if (endTimeEl) endTimeEl.value = activity.endTime || '';
     if (costEl) costEl.value = activity.estCost || '0';
   }
 
@@ -190,6 +204,8 @@ function _openActivityModal(legIdx, activityIdx = null) {
     const title = document.getElementById('activityTitle').value.trim();
     const location = document.getElementById('activityLocation').value.trim();
     const estTime = document.getElementById('activityTime').value.trim() || '1 hr';
+    const startTime = document.getElementById('activityStartTime')?.value || '';
+    const endTime = document.getElementById('activityEndTime')?.value || '';
     const estCost = document.getElementById('activityCost').value.trim() || '0';
     if (!title) { alert('Please enter a description'); return; }
 
@@ -206,6 +222,8 @@ function _openActivityModal(legIdx, activityIdx = null) {
       target.title = fullTitle;
       target.category = category;
       target.estTime = estTime;
+      target.startTime = startTime;
+      target.endTime = endTime;
       target.estCost = estCost;
 
       if (target.assignedDayIdx !== null && target.assignedDayIdx !== undefined) {
@@ -214,6 +232,8 @@ function _openActivityModal(legIdx, activityIdx = null) {
           day.activityItems.forEach(item => {
             if (previousMatchTexts.includes(String(item.text || '').trim())) {
               item.text = getSuggestedActivityDayText(target);
+              item.startTime = startTime;
+              item.endTime = endTime;
             }
           });
         }
@@ -223,6 +243,8 @@ function _openActivityModal(legIdx, activityIdx = null) {
         title: fullTitle,
         category: category,
         estTime: estTime,
+        startTime: startTime,
+        endTime: endTime,
         estCost: estCost,
         assignedDayIdx: null
       });
@@ -318,7 +340,7 @@ function addSight(legIdx) { appData[legIdx].suggestedSights.push({ title: "New s
 function addLegTip(legIdx) { appData[legIdx].legTips.push("New tip..."); saveData(); buildItinerary(); }
 
 function addDayItem(legIdx, dayIdx, category) {
-  if (category === 'activityItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", time: "1 hr", done: false }); }
+  if (category === 'activityItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", time: "1 hr", startTime: "", endTime: "", done: false }); }
   else if (category === 'transportItems' || category === 'accomItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", status: "pending", bookingRef: "", done: false }); }
   else { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", done: false }); }
   saveData(); buildItinerary();
@@ -428,6 +450,19 @@ function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
   saveData();
 }
 
+function updateDayItemScheduleTime(legIdx, dayIdx, category, itemIdx, field, time) {
+  const item = appData[legIdx].days[dayIdx][category][itemIdx];
+  if (!item || !['startTime', 'endTime'].includes(field)) return;
+  const previousText = item.text;
+  item[field] = time;
+  if (category === 'activityItems') {
+    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, field, time);
+  }
+  saveData();
+  if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
+  else buildItinerary();
+}
+
 function rebuildItineraryPreservingScroll() {
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
@@ -475,6 +510,8 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
       text: assignedText,
       cost: activity.estCost || '0',
       time: activity.estTime || '1 hr',
+      startTime: activity.startTime || '',
+      endTime: activity.endTime || '',
       done: false
     });
   }
@@ -1062,6 +1099,7 @@ window.updateLegTip = updateLegTip;
 window.updateDayItemText = updateDayItemText;
 window.updateDayItemCost = updateDayItemCost;
 window.updateDayItemTime = updateDayItemTime;
+window.updateDayItemScheduleTime = updateDayItemScheduleTime;
 window.toggleFoodCompleted = toggleFoodCompleted;
 window.toggleDayCompleted = toggleDayCompleted;
 window.toggleActivityCompleted = toggleActivityCompleted;
@@ -1109,7 +1147,9 @@ function openAddStayModal() {
   // Clear form fields
   document.getElementById('stayPropertyName').value = '';
   document.getElementById('stayCheckIn').value = '';
+  document.getElementById('stayCheckInTime').value = '';
   document.getElementById('stayCheckOut').value = '';
+  document.getElementById('stayCheckOutTime').value = '';
   document.getElementById('stayNights').value = '';
   document.getElementById('stayStatus').value = 'planned';
   document.getElementById('stayProvider').value = '';
@@ -1167,7 +1207,9 @@ function openEditStayModal(stayId) {
   // Populate form fields
   document.getElementById('stayPropertyName').value = stay.propertyName || '';
   document.getElementById('stayCheckIn').value = stay.checkIn || '';
+  document.getElementById('stayCheckInTime').value = stay.checkInTime || '';
   document.getElementById('stayCheckOut').value = stay.checkOut || '';
+  document.getElementById('stayCheckOutTime').value = stay.checkOutTime || '';
   document.getElementById('stayNights').value = stay.nights || '';
   document.getElementById('stayStatus').value = stay.status === 'pending' ? 'planned' : (stay.status || 'planned');
   document.getElementById('stayProvider').value = stay.provider || '';
@@ -1207,7 +1249,9 @@ function saveStayFromModal() {
   const cityId = document.getElementById('stayCitySelect').value;
   const propertyName = document.getElementById('stayPropertyName').value.trim();
   const checkIn = document.getElementById('stayCheckIn').value;
+  const checkInTime = document.getElementById('stayCheckInTime').value;
   const checkOut = document.getElementById('stayCheckOut').value;
+  const checkOutTime = document.getElementById('stayCheckOutTime').value;
   const nights = parseInt(document.getElementById('stayNights').value) || 0;
   const status = document.getElementById('stayStatus').value || 'planned';
   const provider = document.getElementById('stayProvider').value.trim();
@@ -1226,7 +1270,9 @@ function saveStayFromModal() {
       stay.cityId = cityId;
       stay.propertyName = propertyName;
       stay.checkIn = checkIn;
+      stay.checkInTime = checkInTime;
       stay.checkOut = checkOut;
+      stay.checkOutTime = checkOutTime;
       stay.nights = nights;
       stay.status = status;
       stay.provider = provider;
@@ -1242,7 +1288,9 @@ function saveStayFromModal() {
       cityId: cityId,
       propertyName: propertyName,
       checkIn: checkIn,
+      checkInTime: checkInTime,
       checkOut: checkOut,
+      checkOutTime: checkOutTime,
       nights: nights,
       status: status,
       provider: provider,

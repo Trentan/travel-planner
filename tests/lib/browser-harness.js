@@ -735,11 +735,11 @@ function createBrowserHarness({
     'aiTripVibe', 'aiOutputBox', 'aiPromptOutput', 'guide-modal', 'guideContainer',
     'add-leg-modal', 'city-modal', 'journey-modal', 'stay-modal', 'importFile',
     'newCityCountrySelect', 'customCountryDiv', 'customCountryName', 'customCountryCode',
-    'stayCitySelect', 'stayPropertyName', 'stayCheckIn', 'stayCheckOut', 'stayNights',
+    'stayCitySelect', 'stayPropertyName', 'stayCheckIn', 'stayCheckInTime', 'stayCheckOut', 'stayCheckOutTime', 'stayNights',
     'stayStatus', 'stayProvider', 'stayBookingRef', 'stayTotalCost', 'stayNotes',
     'stayDeleteBtn', 'journeyDeleteBtn', 'saveFoodBtn', 'foodName', 'foodCost',
     'saveActivityBtn', 'activityCategory', 'activityTitle', 'activityLocation',
-    'activityTime', 'activityCost', 'customCountryDiv', 'backup-reminder', 'expandAll',
+    'activityTime', 'activityStartTime', 'activityEndTime', 'activityCost', 'customCountryDiv', 'backup-reminder', 'expandAll',
     'expandAllLegs', 'mobileMenuSheet', 'tab-itinerary', 'tab-transport', 'tab-accom',
     'tab-budget', 'tab-packing', 'tab-map'
   ];
@@ -862,8 +862,8 @@ function createBrowserHarness({
   aiVibe.tagName = 'TEXTAREA';
   aiVibe.value = '';
 
-  ['foodName', 'foodCost', 'activityTitle', 'activityLocation', 'activityTime', 'activityCost',
-    'stayPropertyName', 'stayCheckIn', 'stayCheckOut', 'stayNights', 'stayProvider', 'stayBookingRef',
+  ['foodName', 'foodCost', 'activityTitle', 'activityLocation', 'activityTime', 'activityStartTime', 'activityEndTime', 'activityCost',
+    'stayPropertyName', 'stayCheckIn', 'stayCheckInTime', 'stayCheckOut', 'stayCheckOutTime', 'stayNights', 'stayProvider', 'stayBookingRef',
     'stayTotalCost', 'stayNotes', 'customCountryName', 'customCountryCode', 'newLegCityName',
     'legDateFrom', 'legDateTo'].forEach(id => {
     const el = document.getElementById(id);
