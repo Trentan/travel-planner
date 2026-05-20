@@ -47,7 +47,7 @@ The app keeps active edits in browser storage so it remains useful offline. Wher
 
 ## AI Builder
 
-Use the AI Builder tab to generate a structured prompt for a new trip. Paste the prompt into an AI assistant, save the returned JSON, then open that file in the app.
+Use the AI Builder tab to generate a structured prompt for a new trip. Paste the prompt into an AI assistant, ask it to return a downloadable `.json` file, then open that file in the app. The generated trip should include city `countryCode`, `code`, `lat`, and `lng` values where known so maps, weather, and city navigation work immediately after import.
 
 ## Tests
 

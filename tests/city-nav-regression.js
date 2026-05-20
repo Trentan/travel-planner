@@ -6,11 +6,49 @@ const {
   loadSource
 } = require('./lib/test-helpers');
 
+function cityHasCoords(city) {
+  return Number.isFinite(Number.parseFloat(city?.lat)) &&
+    Number.isFinite(Number.parseFloat(city?.lng));
+}
+
 function normalizeFixtureCities(importedData, importedCityBlock) {
   return new Function(
     'importedData',
     'getRandomCityColor',
-    `${importedCityBlock}
+    `const ALL_CITIES = [
+  { code: 'BNE', name: 'Brisbane', countryCode: 'AU', lat: -27.4698, lng: 153.0251 },
+  { code: 'TPE', name: 'Taipei', countryCode: 'TW', lat: 25.0330, lng: 121.5654 },
+  { code: 'VIE', name: 'Vienna', countryCode: 'AT', lat: 48.2082, lng: 16.3738 },
+  { code: 'VRN', name: 'Verona', countryCode: 'IT', lat: 45.4384, lng: 10.9916 },
+  { code: 'LHR', name: 'London', countryCode: 'GB', lat: 51.5074, lng: -0.1278 },
+  { code: 'BKK', name: 'Bangkok', countryCode: 'TH', lat: 13.7563, lng: 100.5018 }
+];
+function getCountryName(countryCode) { return countryCode; }
+function cityHasStoredCoords(city) {
+  return Number.isFinite(Number.parseFloat(city?.lat)) && Number.isFinite(Number.parseFloat(city?.lng));
+}
+function getCityLocationDatabaseMatch(city) {
+  const cityName = String(city?.name || '').trim().toLowerCase();
+  const cityCode = String(city?.code || '').trim().toUpperCase();
+  return ALL_CITIES.find(candidate =>
+    (cityName && candidate.name.toLowerCase() === cityName) ||
+    (cityCode && candidate.code === cityCode)
+  ) || null;
+}
+function normalizeCityLocationData(city) {
+  const match = getCityLocationDatabaseMatch(city);
+  if (match) {
+    if (!city.code) city.code = match.code;
+    if (!city.countryCode) city.countryCode = match.countryCode;
+    if (!city.country) city.country = getCountryName(match.countryCode);
+    if (!cityHasStoredCoords(city)) {
+      city.lat = match.lat;
+      city.lng = match.lng;
+    }
+  }
+  return city;
+}
+${importedCityBlock}
 return normalizeImportedCities(importedData);`
   )(importedData, () => '#123456');
 }
@@ -87,6 +125,8 @@ async function run() {
   );
   assert(importedCities.find(city => city.name === 'Verona')?.isTransit === true, 'Verona should remain a transit city');
   assert(importedCities.find(city => city.name === 'London')?.isTransit === true, 'London should remain a transit city');
+  assert(cityHasCoords(importedCities.find(city => city.name === 'Brisbane')), 'Imported destination cities should include known coordinates');
+  assert(cityHasCoords(importedCities.find(city => city.name === 'London')), 'Imported transit cities should include known coordinates');
 
   const cityNav = getFixtureCityNav(fixture.itinerary, importedCities, fixture.journeys, fixture.stays, cityNavBlock);
   const navNames = cityNav.order.map(city => city.name);

@@ -128,6 +128,8 @@ async function run() {
   assert(promptText.includes('Japan Spring'), 'Prompt should use the entered title');
   assert(promptText.includes('Generated 3-city itinerary'), 'Prompt should reflect the city count');
   assert(promptText.includes('Tokyo, Kyoto, Osaka'), 'Prompt should include the entered cities');
+  assert(promptText.includes('downloadable .json file'), 'Prompt should request a downloadable JSON file');
+  assert(promptText.includes('"lat"') && promptText.includes('"lng"'), 'Prompt should include city coordinate fields');
   assert(document.getElementById('aiOutputBox').style.display === 'block', 'Prompt output box should be shown');
   assert(document.getElementById('aiPromptOutput').value === promptText, 'Prompt textarea should receive the generated prompt');
 

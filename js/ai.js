@@ -16,9 +16,9 @@ TRIP DETAILS:
 - Travel Vibe & Preferences: ${vibe}
 
 YOUR TASK:
-Generate a detailed daily itinerary tailored to my preferences. Output the entire trip as a single JSON object.
+Generate a detailed daily itinerary tailored to my preferences. Create the result as a downloadable .json file that I can save and import into the app.
 
-The JSON must exactly match this structure. Do not wrap it in markdown. Output raw JSON only.
+The downloadable file must contain one JSON object that exactly matches this structure. Do not wrap it in markdown, commentary, or code fences.
 
 EXPECTED JSON SCHEMA:
 {
@@ -31,6 +31,10 @@ EXPECTED JSON SCHEMA:
       "id": "city-cityname",
       "name": "City Name",
       "country": "Country Name",
+      "countryCode": "ISO-3166-1 alpha-2 code",
+      "code": "IATA city or airport code where known",
+      "lat": 12.3456,
+      "lng": 123.4567,
       "dateFrom": "YYYY-MM-DD",
       "dateTo": "YYYY-MM-DD",
       "colour": "#HEXCOLOR"
@@ -107,7 +111,7 @@ EXPECTED JSON SCHEMA:
 
 INSTRUCTIONS FOR GENERATION:
 
-1. CITIES: Create cities array based on the user's input (${cities.join(', ')}). Auto-generate city IDs as "city-[lowercase-city-name]" and assign distinct colors from: #E74C3C, #3498DB, #27AE60, #F39C12, #9B59B6, #1ABC9C, #E91E63, #795548.
+1. CITIES: Create cities array based on the user's input (${cities.join(', ')}). Auto-generate city IDs as "city-[lowercase-city-name]" and assign distinct colors from: #E74C3C, #3498DB, #27AE60, #F39C12, #9B59B6, #1ABC9C, #E91E63, #795548. Include country, countryCode, code, lat, and lng for every city whenever known so maps, weather, and city navigation work immediately after import.
 
 2. ITINERARY LEGS: Create these leg types in order:
    - "leg-start": Departure from home
@@ -130,7 +134,9 @@ INSTRUCTIONS FOR GENERATION:
 
 7. Match the pacing and budget to the user's preferences.
 
-8. Make the JSON valid, complete, and ready to import into the app.`;
+8. Make the JSON valid, complete, and ready to import into the app without manual restructuring.
+
+9. Deliver the final answer as an attached/downloadable .json file. If your interface cannot attach files, output only the raw JSON object so I can save it as a .json file.`;
 }
 
 function getAiTripTitlePrefill() {

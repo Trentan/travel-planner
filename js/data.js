@@ -965,6 +965,7 @@ function extractCitiesFromItinerary() {
 
   // Final pass: look up country data for any remaining unknown cities
   result.forEach(city => {
+    normalizeCityLocationData(city);
     if (!city.country && !city.countryCode) {
       const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
       if (dbMatch) {
@@ -1034,8 +1035,8 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     // City found in database - use its IATA code, country and coordinates
     if (!code) code = dbMatch.code;
     if (!cCode) cCode = dbMatch.countryCode;
-    if (cityLat === null && dbMatch.lat) cityLat = dbMatch.lat;
-    if (cityLng === null && dbMatch.lng) cityLng = dbMatch.lng;
+    if ((cityLat === null || cityLat === undefined || cityLat === '') && dbMatch.lat !== undefined) cityLat = dbMatch.lat;
+    if ((cityLng === null || cityLng === undefined || cityLng === '') && dbMatch.lng !== undefined) cityLng = dbMatch.lng;
     
     // Look up the full country name from the country code
     const countryMatch = COUNTRY_DATA.find(c => c.code === dbMatch.countryCode);
@@ -1057,6 +1058,7 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     dateTo: dateTo,
     colour: getRandomCityColor()
   };
+  normalizeCityLocationData(newCity);
   citiesData.push(newCity);
   return newCity;
 }
@@ -1088,13 +1090,57 @@ async function searchCityOnline(cityName) {
 window.searchCityOnline = searchCityOnline;
 
 function cityHasStoredCoords(city) {
+  const lat = Number.parseFloat(city?.lat);
+  const lng = Number.parseFloat(city?.lng);
   return city &&
-      city.lat !== undefined &&
-      city.lng !== undefined &&
-      city.lat !== null &&
-      city.lng !== null &&
-      city.lat !== '' &&
-      city.lng !== '';
+      Number.isFinite(lat) &&
+      Number.isFinite(lng);
+}
+
+function getCityLocationDatabaseMatch(city) {
+  if (!city) return null;
+  const cityName = String(city.name || '').trim().toLowerCase();
+  const cityCode = String(city.code || '').trim().toUpperCase();
+
+  return ALL_CITIES.find(candidate => {
+    const candidateName = String(candidate.name || '').trim().toLowerCase();
+    const candidateCode = String(candidate.code || '').trim().toUpperCase();
+    return (cityName && candidateName === cityName) ||
+        (cityCode && candidateCode === cityCode);
+  }) || null;
+}
+
+function normalizeCityLocationData(city) {
+  if (!city || typeof city !== 'object') return city;
+
+  const cityName = String(city.name || '').trim();
+  if (!city.id && cityName) {
+    city.id = 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  }
+
+  const dbMatch = getCityLocationDatabaseMatch(city);
+  if (dbMatch) {
+    if (!city.code && dbMatch.code) city.code = dbMatch.code;
+    if (!city.countryCode && dbMatch.countryCode) city.countryCode = dbMatch.countryCode;
+    if (!city.country && dbMatch.countryCode) city.country = getCountryName(dbMatch.countryCode);
+    if (!cityHasStoredCoords(city) && dbMatch.lat !== undefined && dbMatch.lng !== undefined) {
+      city.lat = dbMatch.lat;
+      city.lng = dbMatch.lng;
+    }
+  } else if (city.countryCode && !city.country) {
+    city.country = getCountryName(city.countryCode);
+  }
+
+  if (city.lat !== undefined && city.lat !== null && city.lat !== '') {
+    const lat = Number.parseFloat(city.lat);
+    if (Number.isFinite(lat)) city.lat = lat;
+  }
+  if (city.lng !== undefined && city.lng !== null && city.lng !== '') {
+    const lng = Number.parseFloat(city.lng);
+    if (Number.isFinite(lng)) city.lng = lng;
+  }
+
+  return city;
 }
 
 async function resolveCityLocation(city) {
@@ -2476,6 +2522,7 @@ function normalizeTripStaysData(items) {
 function normalizeTripCitiesDateData(items) {
   if (!Array.isArray(items)) return [];
   items.forEach(item => {
+    normalizeCityLocationData(item);
     item.dateFrom = normalizeTripDateValue(item.dateFrom);
     item.dateTo = normalizeTripDateValue(item.dateTo);
   });
@@ -2869,7 +2916,7 @@ function normalizeImportedCities(importedData) {
       normalizedCity.colour = '#95a5a6';
     }
 
-    return normalizedCity;
+    return normalizeCityLocationData(normalizedCity);
   });
 }
 
@@ -3901,6 +3948,7 @@ allTransitCities.forEach(cityName => {
       colour: '#95a5a6',
       isTransit: true
     };
+    normalizeCityLocationData(newCity);
     citiesData.push(newCity);
     console.log("[Import] Created and added city: " + cityName + " with isTransit=true");
   } else {
