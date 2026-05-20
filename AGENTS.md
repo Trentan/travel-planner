@@ -107,6 +107,7 @@ Before reporting done:
 5. Push the branch.
 6. Summarize changed files, verification, branch name, commit hash, and issue links.
 7. For UI/visual work, ensure an after screenshot is captured and included in the completion summary and pull request description.
+8. Delete the corresponding local `docs/github-issue-assets/issue-XX/` folder before final pull request merge to prevent active repository bloat (GitHub will still load them from git history via their specific commit SHA).
 
 ## Archived Polish Sprint
 
