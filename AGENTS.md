@@ -47,10 +47,13 @@ When creating a GitHub Issue, use the tracker-style narrative shape:
 2. `Before screenshot`: link or attach the current-state screenshot for visual/UI work. If the issue is not UI-specific, write `Not UI-specific`. If a screenshot cannot be captured yet, explain why and state what must be captured before implementation starts.
 3. `Evidence`: include viewport/mode, realistic trip data, reproduction notes, or source-code references.
 4. `Proposed`: describe the intended change, design direction, or implementation approach.
-5. `Proposed screenshot / mockup`: link or attach a proposed-state screenshot, mockup, wireframe, or visual spec for UI work. If the issue is not UI-specific, write `Not UI-specific`.
+5. `Proposed screenshot / mockup`: link or attach a proposed-state screenshot, mockup, wireframe, or visual spec for UI work. The mockup should be specific enough to show how the before state changes into the intended after state, even when simple. If the issue is not UI-specific, write `Not UI-specific`.
 6. `After`: describe the expected user-visible result once the issue is complete.
-7. `Acceptance criteria`: list concrete checks that prove the issue is done.
-8. `Verification plan`: list the commands, browser states, data files, and modes that should be checked.
+7. `Estimate`: include effort using `Quick Win (<1 hr)`, `Medium (2-8 hrs)`, or `Major (1-3 days)`.
+8. `Files impacted`: list expected files or modules likely to change, using `TBD` only when the code path is genuinely unknown.
+9. `Tags`: list GitHub labels that should be applied, including priority, effort, and area labels.
+10. `Acceptance criteria`: list concrete checks that prove the issue is done.
+11. `Verification plan`: list the commands, browser states, data files, and modes that should be checked.
 
 For UI issues, always state which modes are affected:
 
@@ -61,16 +64,22 @@ For UI issues, always state which modes are affected:
 | `MDE` | Mobile / Detailed | 390 x 844 | Default density |
 | `MCO` | Mobile / Compact | 390 x 844 | Compact toggle active |
 
-Use the issue title and labels for priority instead of a local tracker row. If priority is known, include one of `Critical`, `Important`, or `Polish` in the issue body or labels.
+Use the issue title and labels for priority instead of a local tracker row. Apply GitHub labels when creating or updating issues. At minimum, apply:
+
+1. One priority label: `priority: critical`, `priority: important`, or `priority: polish`.
+2. One effort label: `effort: quick-win`, `effort: medium`, or `effort: major`.
+3. One or more area labels, for example `area: itinerary`, `area: map`, `area: mobile`, `area: ai-builder`, `area: data`, `area: guide`, `area: transport`, `area: accommodation`, `area: docs`.
+4. Existing type labels such as `enhancement`, `bug`, `polish`, or `ux` where appropriate.
 
 ### Working Issues
 
 1. Keep one focused branch per issue, using the default prefix `codex/`, for example `codex/90-linked-transport-map-segments`.
-2. Treat the issue body as the old WI file: read `Before`, `Proposed`, `After`, acceptance criteria, and verification plan before editing.
+2. Treat the issue body as the old WI file: read `Before`, `Proposed`, `After`, `Estimate`, `Files impacted`, acceptance criteria, and verification plan before editing.
 3. For visual work, capture or reference a before screenshot before changing behavior.
-4. For visual work, add a proposed screenshot, mockup, or visual spec before implementation unless the issue body already contains one.
+4. For visual work, add a proposed screenshot, mockup, or visual spec before implementation unless the issue body already contains one. If the proposed image is too generic to guide implementation, update it before coding.
 5. If the implementation changes the expected outcome, update the issue with a short comment explaining the decision instead of silently drifting from the proposal.
-6. Preserve the issue's scope. Create or suggest a follow-up issue for richer adjacent work rather than expanding the current issue.
+6. Update `Estimate`, `Files impacted`, and labels if discovery changes the scope.
+7. Preserve the issue's scope. Create or suggest a follow-up issue for richer adjacent work rather than expanding the current issue.
 
 ### Resolving Issues
 
@@ -78,10 +87,12 @@ When resolving an issue, leave a closing comment or update the issue with the co
 
 1. `Before`: what was broken, missing, or hard to use.
 2. `After`: what now works, including any user-visible behavior changes.
-3. `Files changed`: the main files touched.
-4. `Verification`: commands, visual checks, modes, and realistic data used.
-5. `Screenshots`: before/proposed/after screenshots or notes when visual verification applies.
-6. `Remaining notes`: follow-up work, known limitations, or `None`.
+3. `Estimate`: original estimate and whether it held.
+4. `Files changed`: the main files touched.
+5. `Labels`: final labels/tags applied.
+6. `Verification`: commands, visual checks, modes, and realistic data used.
+7. `Screenshots`: before, proposed, and after screenshots. For UI/visual work, an after screenshot MUST be captured and attached/linked here to prove the final visual state.
+8. `Remaining notes`: follow-up work, known limitations, or `None`.
 
 Pull requests should reference the issue number and include the same completion summary so the issue, branch, commit, and PR all tell the same story.
 
@@ -95,6 +106,8 @@ Before reporting done:
 4. Commit the completed work on the issue branch with the issue number in the commit message.
 5. Push the branch.
 6. Summarize changed files, verification, branch name, commit hash, and issue links.
+7. For UI/visual work, ensure an after screenshot is captured, committed to the branch, and linked in both the GitHub issue comment and pull request description *at the same time* review is requested from the user.
+8. Delete the corresponding local `docs/github-issue-assets/issue-XX/` folder before final pull request merge to prevent active repository bloat (GitHub will still load them from git history via their specific commit SHA).
 
 ## Archived Polish Sprint
 

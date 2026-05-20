@@ -1,4 +1,4 @@
-﻿// Transport/Journey management module
+// Transport/Journey management module
 // Supports rich journey display with times, providers, booking refs
 // Multi-leg journeys: N segments share a journeyId and journeyName
 // Note: journeys variable is declared in data.js for proper loading order
@@ -1490,18 +1490,6 @@ function saveJourneyFromModal() {
   }
 }
 
-function rebuildCurrentView() {
-  const activeTab = document.querySelector('.app-tab-btn.active');
-  if (activeTab) {
-    const tabType = activeTab.getAttribute('data-tab');
-    if (tabType === 'transport') buildTransportTab(currentCityFilter);
-    else if (tabType === 'accom' && typeof buildAccomTab === 'function') buildAccomTab(currentCityFilter);
-    else if (tabType === 'budget' && typeof buildBudgetTab === 'function') buildBudgetTab();
-    else if (tabType === 'packing' && typeof buildPackingTab === 'function') buildPackingTab();
-    else if (tabType === 'itinerary') buildItinerary();
-  }
-}
-
 // Expose to window
 window.getLocationDisplayWithCode = getLocationDisplayWithCode;
 window.getLocationCodeDisplay = getLocationCodeDisplay;
@@ -1526,7 +1514,7 @@ window.getTransportIcon = getTransportIcon;
 window.createJourneyFromTransportItem = createJourneyFromTransportItem;
 window.importJourneys = importJourneys;
 window.migrateJourneyCityIds = migrateJourneyCityIds;
-window.rebuildCurrentView = rebuildCurrentView;
+
 window.selectJourneyType = selectJourneyType;
 window.promptAddNewCity = promptAddNewCity;
 window.editJourney = editJourney;

@@ -117,23 +117,30 @@ function renderCompactFoodQuestCard(leg, legIndex) {
   const foodItems = Array.isArray(leg.cityFood) ? leg.cityFood : [];
   const completedCount = foodItems.filter(item => item && item.done).length;
   const totalCount = foodItems.length;
-  const legId = leg.id || legIndex;
   const countLabel = `${completedCount}/${totalCount}`;
   const progressWidth = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const foodLines = foodItems.length > 0
       ? foodItems.map((item, itemIdx) => renderCompactFoodQuestItem(legIndex, item, itemIdx)).join('')
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
 
+  // Compact food quests are always collapsible and interactive in all compact views (both mobile and desktop)
+  const legId = leg.id || String(legIndex);
+  const expanded = isFoodQuestExpanded(legId);
+  const chevronSymbol = expanded ? '▲' : '▼';
+  
   return `
-    <article class="mobile-surface-card compact-food-quest-card is-expanded" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
-      <div class="compact-food-summary">
+    <article class="mobile-surface-card compact-food-quest-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+      <div class="compact-food-summary" onclick="toggleFoodQuestDetails(event, '${legId}')" style="cursor: pointer; user-select: none;">
         <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍗</span> Food quests</span>
         <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
         <span class="compact-food-summary-count">${escapeCompactText(countLabel)}</span>
+        <span class="compact-food-summary-chevron" aria-hidden="true">${chevronSymbol}</span>
       </div>
-      <div class="mobile-surface-card-details expanded">
-        <div class="compact-food-list">${foodLines}</div>
-      </div>
+      ${expanded ? `
+        <div class="mobile-surface-card-details expanded">
+          <div class="compact-food-list">${foodLines}</div>
+        </div>
+      ` : ''}
     </article>
   `;
 }
@@ -237,7 +244,7 @@ function renderCompactDayPager(leg, legIndex) {
   if (totalDays === 0) {
     return `
       <div class="compact-day-pager compact-day-pager-empty" data-pager-key="${escapeCompactText(pagerKey)}">
-        <div class="compact-day-empty">No itinerary days available for this leg.</div>
+        <div class="compact-day-empty">No itinerary days available for this leg yet.</div>
       </div>
     `;
   }
@@ -957,7 +964,11 @@ function isFoodQuestExpanded(legId) {
   return expandedFoodQuestLegs.has(legId);
 }
 
-function toggleFoodQuestDetails(legId) {
+function toggleFoodQuestDetails(e, legId) {
+  if (e) {
+    if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+  }
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
   if (expandedFoodQuestLegs.has(legId)) {
@@ -1253,24 +1264,6 @@ function renderActivityActionButtons(root) {
   });
 }
 
-// Helper to rebuild the current active view
-function rebuildCurrentView() {
-  const activeTab = document.querySelector('.app-tabs-content .tab-pane.active');
-  if (!activeTab) return;
-
-  const tabId = activeTab.id;
-  if (tabId === 'tab-itinerary') {
-    buildItinerary();
-  } else if (tabId === 'tab-transport' && typeof buildTransportTab === 'function') {
-    buildTransportTab();
-  } else if (tabId === 'tab-accom' && typeof buildAccomTab === 'function') {
-    buildAccomTab();
-  } else if (tabId === 'tab-budget' && typeof buildBudgetTab === 'function') {
-    buildBudgetTab();
-  } else if (tabId === 'tab-packing' && typeof buildPackingTab === 'function') {
-    buildPackingTab();
-  }
-}
 
 function buildNav() {
   // Build city filter nav only (leg-nav removed per 6h)
@@ -1784,7 +1777,7 @@ function scrollToCity(cityId) {
 }
 
 // Expose itinerary functions to window scope for HTML onclick handlers
-window.rebuildCurrentView = rebuildCurrentView;
+
 window.selectCityFilter = selectCityFilter;
 window.getStayDisplayForDay = getStayDisplayForDay;
 window.toggleFoodQuestDetails = toggleFoodQuestDetails;
