@@ -206,9 +206,14 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
 
   const details = `
     <div class="compact-day-grid">
-      ${renderCompactBlock('Transport', transportLines || '<div class="compact-day-empty">No transport scheduled.</div>')}
-      ${renderCompactBlock('Stay', accomLines || '<div class="compact-day-empty">No stay linked.</div>')}
-      ${renderCompactBlock('Activities', activityLines || '<div class="compact-day-empty">Nothing planned yet.</div>', true)}
+      ${renderCompactBlock('Day Timeline', renderDailyTimeline(leg, legIndex, day, dayIdx, { compact: true }), true)}
+      ${renderCompactBlock('Grouped Plan', `
+        <div class="compact-grouped-plan">
+          <section><h5>Transport</h5>${transportLines || '<div class="compact-day-empty">No transport scheduled.</div>'}</section>
+          <section><h5>Stay</h5>${accomLines || '<div class="compact-day-empty">No stay linked.</div>'}</section>
+          <section><h5>Activities</h5>${activityLines || '<div class="compact-day-empty">Nothing planned yet.</div>'}</section>
+        </div>
+      `, true)}
     </div>
   `;
 
@@ -846,11 +851,14 @@ function getStayDisplayForDay(dayDate, dayCity) {
     if (normalizedDayDate === checkInDate) {
       result.push({
         type: 'checkin',
+        stayId: stay.id,
         propertyName: stay.propertyName,
         provider: stay.provider,
         status: stay.status,
         bookingRef: stay.bookingRef,
-        cost: stay.totalCost
+        cost: stay.totalCost,
+        startTime: stay.checkInTime || '15:00',
+        endTime: ''
       });
       return;
     }
@@ -858,11 +866,14 @@ function getStayDisplayForDay(dayDate, dayCity) {
     if (normalizedDayDate === checkOutDate) {
       result.push({
         type: 'checkout',
+        stayId: stay.id,
         propertyName: stay.propertyName,
         provider: stay.provider,
         status: stay.status,
         bookingRef: stay.bookingRef,
-        cost: stay.totalCost
+        cost: stay.totalCost,
+        startTime: stay.checkOutTime || '11:00',
+        endTime: ''
       });
       return;
     }
@@ -870,16 +881,191 @@ function getStayDisplayForDay(dayDate, dayCity) {
     if (normalizedDayDate > checkInDate && normalizedDayDate < checkOutDate) {
       result.push({
         type: 'staying',
+        stayId: stay.id,
         propertyName: stay.propertyName,
         provider: stay.provider,
         status: stay.status,
         bookingRef: null,
-        cost: null
+        cost: null,
+        startTime: '',
+        endTime: ''
       });
     }
   });
 
   return result;
+}
+
+function formatTimelineTimeRange(startTime = '', endTime = '') {
+  const start = String(startTime || '').trim();
+  const end = String(endTime || '').trim();
+  if (start && end) return `${start}-${end}`;
+  return start || end || 'Anytime';
+}
+
+function getDailyTimelineItemSortValue(dayDate, startTime, fallbackOffset = 0) {
+  const hasTime = !!String(startTime || '').trim();
+  const fallback = Number.MAX_SAFE_INTEGER - 100000 + fallbackOffset;
+  const score = getTimelineScore(dayDate, startTime || '', fallback);
+  return hasTime ? score : fallback;
+}
+
+function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
+  const items = [];
+  const dayDate = normalizeDate(day?.date || '');
+  const dayJourneys = typeof getDayJourneys === 'function'
+    ? getDayJourneys(day.date, day.from, day.to, leg.id)
+    : [];
+
+  dayJourneys.forEach((journey, journeyIndex) => {
+    const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+      ? window.journeys
+      : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+    const segments = journeysSource
+      .filter(seg => (seg.journeyId || seg.id) === (journey.journeyId || journey.id))
+      .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+    const first = segments[0] || journey;
+    const last = segments[segments.length - 1] || journey;
+    const route = segments.length > 1
+      ? [first.fromLocation, ...segments.map(seg => seg.toLocation)].filter(Boolean).join(' -> ')
+      : [journey.fromLocation, journey.toLocation].filter(Boolean).join(' -> ');
+    const startTime = first.departureTime || journey.departureTime || '';
+    const endTime = last.arrivalTime || journey.arrivalTime || '';
+    const startDate = normalizeDate(first.departureDate || first.dayDate || journey.departureDate || journey.dayDate || dayDate);
+    const endDate = normalizeDate(last.arrivalDate || last.departureDate || journey.arrivalDate || journey.departureDate || dayDate);
+    const crossDate = endDate && startDate && endDate !== startDate ? ` Arrives ${formatTripDateForDisplay(endDate)}` : '';
+
+    items.push({
+      type: 'transport',
+      typeLabel: 'Transport',
+      icon: getTransportIcon(journey.transportType),
+      title: journey.journeyName || route || 'Transport',
+      meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDate.trim()].filter(Boolean).join(' · '),
+      cost: journey.cost,
+      status: journey.status || 'planned',
+      startTime,
+      endTime,
+      sortValue: getDailyTimelineItemSortValue(startDate || dayDate, startTime, journeyIndex),
+      actionHtml: ''
+    });
+  });
+
+  getStayDisplayForDay(day.date, day.to).forEach((stayInfo, stayIndex) => {
+    const label = stayInfo.type === 'checkin' ? 'Check-in' : stayInfo.type === 'checkout' ? 'Check-out' : 'Staying';
+    const icon = stayInfo.type === 'checkout' ? '🚪' : '🏨';
+    items.push({
+      type: 'stay',
+      typeLabel: label,
+      icon,
+      title: `${label}: ${stayInfo.propertyName || 'Accommodation'}`,
+      meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : '', stayInfo.status].filter(Boolean).join(' · '),
+      cost: stayInfo.cost,
+      status: stayInfo.status || '',
+      startTime: stayInfo.startTime || '',
+      endTime: stayInfo.endTime || '',
+      sortValue: getDailyTimelineItemSortValue(dayDate, stayInfo.startTime, 2000 + stayIndex)
+    });
+  });
+
+  (day.activityItems || []).forEach((item, itemIndex) => {
+    const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    items.push({
+      type: 'activity',
+      typeLabel: 'Activity',
+      icon: emoji,
+      title: item.text || 'Activity',
+      meta: [item.time || '', item.cost ? formatCurrency(item.cost) : ''].filter(Boolean).join(' · '),
+      cost: item.cost,
+      done: !!item.done,
+      startTime: item.startTime || '',
+      endTime: item.endTime || '',
+      legIndex,
+      dayIndex,
+      itemIndex,
+      sortValue: getDailyTimelineItemSortValue(dayDate, item.startTime, 4000 + itemIndex),
+      actionHtml: `
+        <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${itemIndex})">×</button>
+        <input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${itemIndex})">
+      `
+    });
+  });
+
+  return items.sort((a, b) => {
+    if (a.sortValue !== b.sortValue) return a.sortValue - b.sortValue;
+    return String(a.title || '').localeCompare(String(b.title || ''));
+  });
+}
+
+function getDailyTimelineBuckets(items) {
+  return {
+    scheduled: items.filter(item => String(item.startTime || item.endTime || '').trim()),
+    anytime: items.filter(item => !String(item.startTime || item.endTime || '').trim())
+  };
+}
+
+function renderTimelineScheduleEditor(item) {
+  if (!isEditMode || item.type !== 'activity') return '';
+  const isScheduled = !!String(item.startTime || item.endTime || '').trim();
+  return `
+    <div class="timeline-edit-row">
+      <button class="timeline-mode-btn ${isScheduled ? '' : 'is-active'}" type="button" onclick="event.stopPropagation(); setDayItemScheduleMode(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex}, 'anytime')">Anytime</button>
+      <button class="timeline-mode-btn ${isScheduled ? 'is-active' : ''}" type="button" onclick="event.stopPropagation(); setDayItemScheduleMode(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex}, 'scheduled')">Scheduled</button>
+      <label><span>Start</span><input type="time" value="${escapeCompactText(item.startTime || '')}" onchange="event.stopPropagation(); updateDayItemScheduleTime(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex}, 'startTime', this.value)"></label>
+      <label><span>End</span><input type="time" value="${escapeCompactText(item.endTime || '')}" onchange="event.stopPropagation(); updateDayItemScheduleTime(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex}, 'endTime', this.value)"></label>
+    </div>
+  `;
+}
+
+function renderDailyTimelineRow(item, compact = false) {
+  return `
+    <div class="daily-timeline-item daily-timeline-item-${escapeCompactText(item.type)} ${item.done ? 'is-done' : ''}">
+      <div class="daily-timeline-time">${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
+      <div class="daily-timeline-marker"><span>${item.icon}</span></div>
+      <div class="daily-timeline-content">
+        <div class="daily-timeline-title-row">
+          <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
+          <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
+        </div>
+        ${item.meta ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta)}</div>` : ''}
+        ${compact ? '' : renderTimelineScheduleEditor(item)}
+      </div>
+      ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
+      ${compact ? renderTimelineScheduleEditor(item) : ''}
+    </div>
+  `;
+}
+
+function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
+  const items = buildDailyTimelineItems(leg, legIndex, day, dayIndex);
+  const compact = !!options.compact;
+  const empty = compact
+    ? '<div class="compact-day-empty">No scheduled items yet.</div>'
+    : '<div class="timeline-empty">No scheduled items yet. Add transport, stays, or activities to build the day.</div>';
+  if (items.length === 0) return empty;
+  const { scheduled, anytime } = getDailyTimelineBuckets(items);
+  const summaryParts = [
+    scheduled.length ? `${scheduled.length} scheduled` : '',
+    anytime.length ? `${anytime.length} anytime` : ''
+  ].filter(Boolean).join(' · ');
+
+  return `
+    <div class="daily-timeline-shell ${compact ? 'daily-timeline-shell-compact' : ''}">
+      ${summaryParts ? `<div class="daily-timeline-summary">${escapeCompactText(summaryParts)}</div>` : ''}
+      ${scheduled.length ? `
+        <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
+          ${scheduled.map(item => renderDailyTimelineRow(item, compact)).join('')}
+        </div>
+      ` : '<div class="timeline-empty">No timed entries yet. Add start times to build the day timeline.</div>'}
+      ${anytime.length ? `
+        <div class="timeline-anytime">
+          <div class="timeline-anytime-label">Anytime</div>
+          <div class="timeline-anytime-list">
+            ${anytime.map(item => renderDailyTimelineRow(item, compact)).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
 }
 
 function getLegStayNightCount(leg) {
@@ -1154,7 +1340,30 @@ function buildItinerary() {
           <div class="day-title"><div class="day-cities">${cityHTML}</div><div class="day-desc" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
           ${dayTotal ? `<div class="day-total-cost" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron">▼</span>
         </div>
-        <div class="day-detail"><div class="detail-grid">
+        <div class="day-detail"><div class="day-planner-shell">
+          <input class="day-view-toggle" type="radio" name="day-view-${legIndex}-${dayIndex}" id="day-view-timeline-${legIndex}-${dayIndex}" checked>
+          <input class="day-view-toggle" type="radio" name="day-view-${legIndex}-${dayIndex}" id="day-view-grouped-${legIndex}-${dayIndex}">
+          <div class="day-view-tabs" onclick="event.stopPropagation()">
+            <label for="day-view-timeline-${legIndex}-${dayIndex}">Timeline</label>
+            <label for="day-view-grouped-${legIndex}-${dayIndex}">Grouped</label>
+          </div>
+          <div class="day-view-panel day-view-panel-timeline">
+          <div class="detail-block daily-timeline-card drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
+            <div class="daily-timeline-card-header">
+              <div>
+                <h4>Day Timeline</h4>
+                <p>Activities, transport, and stays in time order.</p>
+              </div>
+              ${isEditMode ? `<div class="daily-timeline-toolbar">
+                <button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Activity</button>
+                <button class="add-btn" onclick="event.stopPropagation(); openAddJourneyModal();">+ Journey</button>
+                <button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Stay</button>
+              </div>` : ''}
+            </div>
+            ${renderDailyTimeline(leg, legIndex, day, dayIndex)}
+          </div>
+          </div>
+          <div class="day-view-panel day-view-panel-grouped"><div class="detail-grid detail-grid-grouped">
 
           <div class="detail-block block-transport">
             <h4>Transport</h4><div class="item-list">
@@ -1222,6 +1431,7 @@ ${(() => {
             </div><button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>
           </div>
 
+          </div></div>
         </div></div>
       </div>
       `;
