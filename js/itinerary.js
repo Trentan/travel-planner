@@ -124,7 +124,7 @@ function renderCompactFoodQuestCard(leg, legIndex, isMobileCompact = false) {
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
 
   if (isMobileCompact) {
-    // Mobile compact view: default collapsed and completely non-collapsible
+    // Mobile compact view: permanently collapsed, static article card
     return `
       <article class="mobile-surface-card compact-food-quest-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
         <div class="compact-food-summary" style="cursor: default; user-select: none;">
@@ -136,18 +136,18 @@ function renderCompactFoodQuestCard(leg, legIndex, isMobileCompact = false) {
     `;
   }
 
-  // Desktop Compact / other views: true native HTML collapsible details/summary card, open by default
+  // Desktop Compact / other views: permanently expanded, static article card (no details/summary, non-collapsible)
   return `
-    <details class="mobile-surface-card compact-food-quest-card" open style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
-      <summary class="compact-food-summary" style="list-style: none; outline: none; cursor: pointer; user-select: none;">
+    <article class="mobile-surface-card compact-food-quest-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+      <div class="compact-food-summary" style="cursor: default; user-select: none;">
         <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍗</span> Food quests</span>
         <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
         <span class="compact-food-summary-count">${escapeCompactText(countLabel)}</span>
-      </summary>
+      </div>
       <div class="mobile-surface-card-details expanded">
         <div class="compact-food-list">${foodLines}</div>
       </div>
-    </details>
+    </article>
   `;
 }
 
