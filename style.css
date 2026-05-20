@@ -792,6 +792,45 @@ main {
   flex-wrap: wrap;
 }
 
+.section-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.itinerary-view-mode-control {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0.24rem;
+  border: 1px solid rgba(36, 72, 93, 0.16);
+  border-radius: 10px;
+  background: rgba(36, 72, 93, 0.06);
+  gap: 0.24rem;
+}
+
+.itinerary-view-mode-btn {
+  min-height: 2.1rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.itinerary-view-mode-btn.is-active {
+  background: #1a242f;
+  border-color: #1a242f;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(26, 36, 47, 0.14);
+}
+
 .section-header-title {
   margin: 0;
   font-family: 'Playfair Display', serif;
@@ -1002,6 +1041,55 @@ main {
 .modal-form-row--split > .ai-form-group {
   flex: 1;
   margin-bottom: 0;
+}
+
+.readonly-field {
+  min-height: 2.35rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid rgba(36, 72, 93, 0.12);
+  border-radius: 8px;
+  background: rgba(36, 72, 93, 0.04);
+  color: var(--text);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.activity-assign-schedule-options {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.activity-assign-schedule-option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.65rem;
+  border: 1px solid rgba(36, 72, 93, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.activity-assign-schedule-option input {
+  margin-top: 0.2rem;
+}
+
+.activity-assign-schedule-option span {
+  display: grid;
+  gap: 0.16rem;
+  min-width: 0;
+}
+
+.activity-assign-schedule-option strong {
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.activity-assign-schedule-option small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
 }
 
 .modal-form-pair {
@@ -1734,6 +1822,20 @@ main {
 
 /* Responsive Tabs */
 @media (max-width: 768px) {
+  .section-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .itinerary-view-mode-control {
+    flex: 1 1 12rem;
+  }
+
+  .itinerary-view-mode-btn {
+    min-height: 2.25rem;
+    padding-inline: 0.5rem;
+  }
+
   .tab-label { display: inline; }
   .app-tabs-nav::before,
   .app-tabs-nav::after {
@@ -8539,46 +8641,12 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   gap: 0.85rem;
 }
 
-.day-view-toggle {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.day-view-tabs {
-  display: inline-flex;
-  width: fit-content;
-  max-width: 100%;
-  padding: 0.22rem;
-  border: 1px solid rgba(36, 72, 93, 0.12);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.76);
-  gap: 0.2rem;
-}
-
-.day-view-tabs label {
-  min-width: 5.6rem;
-  padding: 0.38rem 0.7rem;
-  border-radius: 6px;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 0.78rem;
-  font-weight: 800;
-  text-align: center;
-}
-
 .day-view-panel {
   display: none;
 }
 
-.day-view-toggle:first-of-type:checked ~ .day-view-tabs label:first-child,
-.day-view-toggle:nth-of-type(2):checked ~ .day-view-tabs label:nth-child(2) {
-  background: var(--ink);
-  color: #fff;
-}
-
-.day-view-toggle:first-of-type:checked ~ .day-view-panel-timeline,
-.day-view-toggle:nth-of-type(2):checked ~ .day-view-panel-grouped {
+.day-planner-shell-timeline .day-view-panel-timeline,
+.day-planner-shell-grouped .day-view-panel-grouped {
   display: block;
 }
 
@@ -8616,30 +8684,12 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   width: 100%;
 }
 
-.daily-timeline-card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.85rem;
-}
-
-.daily-timeline-card-header h4 {
-  margin-bottom: 0.15rem;
-}
-
-.daily-timeline-card-header p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.82rem;
-  line-height: 1.35;
-}
-
 .daily-timeline-toolbar {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.4rem;
+  margin-bottom: 0.65rem;
 }
 
 .daily-timeline-toolbar .add-btn {
@@ -8649,7 +8699,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
 .daily-timeline-shell {
   display: grid;
-  gap: 0.9rem;
+  gap: 0.65rem;
 }
 
 .daily-timeline-summary {
@@ -8663,6 +8713,13 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   font-weight: 700;
 }
 
+.timeline-section-label {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
 .daily-timeline {
   position: relative;
   display: grid;
@@ -8674,33 +8731,41 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   position: absolute;
   top: 1rem;
   bottom: 1rem;
-  left: 6.85rem;
-  width: 2px;
-  background: linear-gradient(180deg, rgba(33, 150, 143, 0.18), rgba(36, 72, 93, 0.16));
+  left: 8.88rem;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(33, 150, 143, 0.32), rgba(36, 72, 93, 0.24));
 }
 
 .daily-timeline-item {
   position: relative;
   display: grid;
-  grid-template-columns: 5.9rem 2rem minmax(0, 1fr) auto;
-  gap: 0.65rem;
+  grid-template-columns: 7.2rem 2.25rem minmax(0, 1fr) auto;
+  gap: 0.55rem;
   align-items: center;
   min-width: 0;
 }
 
+.daily-timeline-item.is-schedule-focus .daily-timeline-content {
+  border-color: rgba(36, 72, 93, 0.34);
+  box-shadow: 0 0 0 3px rgba(36, 72, 93, 0.12);
+}
+
 .daily-timeline-time {
   align-self: center;
-  width: fit-content;
-  max-width: 100%;
+  justify-self: end;
+  width: 100%;
+  max-width: 7.2rem;
   padding: 0.22rem 0.42rem;
   border-radius: 999px;
   border: 1px solid rgba(36, 72, 93, 0.12);
   background: #fff;
-  color: var(--ink);
+  color: var(--text);
   font-family: "DM Mono", monospace;
   font-size: 0.72rem;
   font-weight: 700;
   white-space: nowrap;
+  text-align: center;
 }
 
 .daily-timeline-marker {
@@ -8710,10 +8775,11 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   place-items: center;
   width: 2rem;
   height: 2rem;
-  border: 1px solid rgba(36, 72, 93, 0.16);
+  border: 1px solid rgba(36, 72, 93, 0.22);
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.94);
+  font-size: 1rem;
 }
 
 .daily-timeline-content {
@@ -8742,7 +8808,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
 .daily-timeline-title {
   min-width: 0;
-  color: var(--ink);
+  color: var(--text);
   font-weight: 700;
   line-height: 1.25;
   overflow-wrap: anywhere;
@@ -8766,16 +8832,11 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   gap: 0.35rem;
 }
 
-.timeline-edit-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 0.45rem;
-}
-
-.timeline-mode-btn {
-  min-height: 2rem;
-  padding: 0.24rem 0.52rem;
+.timeline-schedule-btn {
+  width: fit-content;
+  min-height: 1.9rem;
+  margin-top: 0.42rem;
+  padding: 0.24rem 0.62rem;
   border: 1px solid rgba(36, 72, 93, 0.16);
   border-radius: 999px;
   background: #fff;
@@ -8786,27 +8847,14 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   font-weight: 800;
 }
 
-.timeline-mode-btn.is-active {
+.timeline-schedule-btn.is-scheduled {
   border-color: #24485d;
   background: #24485d;
   color: #fff;
 }
 
-.timeline-edit-row label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.28rem;
-  color: var(--muted);
-  font-size: 0.72rem;
-}
-
-.timeline-edit-row input {
-  width: 6.8rem;
-  max-width: 100%;
-  padding: 0.25rem 0.35rem;
-  border: 1px solid rgba(36, 72, 93, 0.16);
-  border-radius: 6px;
-  font: inherit;
+.timeline-schedule-btn.is-anytime {
+  color: #24485d;
 }
 
 .timeline-empty {
@@ -8834,7 +8882,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 }
 
 .timeline-anytime-list .daily-timeline-item {
-  grid-template-columns: 5.9rem 2rem minmax(0, 1fr) auto;
+  grid-template-columns: 7.2rem 2.25rem minmax(0, 1fr) auto;
 }
 
 .timeline-anytime-list .daily-timeline-marker {
@@ -8842,11 +8890,11 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 }
 
 .daily-timeline-compact::before {
-  left: 4.45rem;
+  left: 7.1rem;
 }
 
 .daily-timeline-compact .daily-timeline-item {
-  grid-template-columns: 3.85rem 1.75rem minmax(0, 1fr);
+  grid-template-columns: 5.7rem 1.9rem minmax(0, 1fr);
   gap: 0.45rem;
 }
 
@@ -8855,8 +8903,8 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 }
 
 .daily-timeline-compact .daily-timeline-marker {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.9rem;
+  height: 1.9rem;
 }
 
 .daily-timeline-compact .daily-timeline-actions {
@@ -8869,33 +8917,19 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   gap: 0.16rem;
 }
 
-.daily-timeline-shell-compact .timeline-edit-row {
+.daily-timeline-shell-compact .timeline-schedule-btn {
   grid-column: 3;
-  margin-top: -0.15rem;
+  margin-top: -0.1rem;
 }
 
 .daily-timeline-shell-compact .timeline-anytime-list .daily-timeline-item {
-  grid-template-columns: 3.85rem 1.75rem minmax(0, 1fr);
+  grid-template-columns: 5.7rem 1.9rem minmax(0, 1fr);
 }
 
 @media (max-width: 768px) {
-  .day-view-tabs {
-    width: 100%;
-  }
-
-  .day-view-tabs label {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-
   .detail-grid-grouped,
   .compact-grouped-plan {
     grid-template-columns: 1fr;
-  }
-
-  .daily-timeline-card-header {
-    display: grid;
-    gap: 0.75rem;
   }
 
   .daily-timeline-toolbar {
@@ -8903,17 +8937,26 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
 
   .daily-timeline::before {
-    left: 4.45rem;
+    left: 7.08rem;
   }
 
   .daily-timeline-item {
-    grid-template-columns: 3.85rem 1.75rem minmax(0, 1fr);
+    grid-template-columns: 5.75rem 1.9rem minmax(0, 1fr);
     gap: 0.45rem;
     align-items: flex-start;
   }
 
   .timeline-anytime-list .daily-timeline-item {
-    grid-template-columns: 3.85rem 1.75rem minmax(0, 1fr);
+    grid-template-columns: 5.75rem 1.9rem minmax(0, 1fr);
+  }
+
+  .daily-timeline-time {
+    min-width: 0;
+    max-width: 5.75rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+    line-height: 1.15;
   }
 
   .daily-timeline-actions {
@@ -8926,16 +8969,8 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     gap: 0.16rem;
   }
 
-  .timeline-edit-row {
+  .timeline-schedule-btn {
     grid-column: 3;
-  }
-
-  .timeline-edit-row label {
-    flex: 1 1 6.5rem;
-  }
-
-  .timeline-edit-row input {
-    flex: 1 1 auto;
   }
 }
 

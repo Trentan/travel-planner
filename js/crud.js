@@ -55,7 +55,10 @@ function deleteDayItem(legIdx, dayIdx, category, itemIdx) {
     const poolRun = (appData[legIdx].cityRun || []).find(s => s.title === itemText && s.assignedDayIdx === dayIdx);
     if (poolRun) poolRun.assignedDayIdx = null;
   }
-  appData[legIdx].days[dayIdx][category].splice(itemIdx, 1); saveData(); buildItinerary();
+  appData[legIdx].days[dayIdx][category].splice(itemIdx, 1);
+  saveData();
+  if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
+  else buildItinerary();
 }
 
 function addFood(legIdx) {
@@ -343,7 +346,9 @@ function addDayItem(legIdx, dayIdx, category) {
   if (category === 'activityItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", time: "1 hr", startTime: "", endTime: "", done: false }); }
   else if (category === 'transportItems' || category === 'accomItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", status: "pending", bookingRef: "", done: false }); }
   else { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", done: false }); }
-  saveData(); buildItinerary();
+  saveData();
+  if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
+  else buildItinerary();
 }
 
 function toggleBookingStatus(e, legIdx, dayIdx, category, itemIdx) {
@@ -357,7 +362,8 @@ function toggleBookingStatus(e, legIdx, dayIdx, category, itemIdx) {
   const activeTab = document.querySelector('.tab-pane.active');
   const tabId = activeTab ? activeTab.id : '';
   if (tabId === 'tab-itinerary') {
-    buildItinerary();
+    if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
+    else buildItinerary();
   } else if (tabId === 'tab-transport') {
     if (typeof buildTransportTab === 'function') buildTransportTab();
   } else if (tabId === 'tab-accom') {
@@ -424,7 +430,10 @@ function updateDayItemText(legIdx, dayIdx, category, itemIdx, text, fromTabs = f
     syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'title', text);
   }
   saveData();
-  if(!fromTabs) buildItinerary();
+  if(!fromTabs) {
+    if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: text });
+    else buildItinerary();
+  }
 }
 function updateDayItemCost(legIdx, dayIdx, category, itemIdx, cost, fromTabs = false) {
   const item = appData[legIdx].days[dayIdx][category][itemIdx];
@@ -438,6 +447,7 @@ function updateDayItemCost(legIdx, dayIdx, category, itemIdx, cost, fromTabs = f
     if(category === 'transportItems') buildTransportTab();
     if(category === 'accomItems') buildAccomTab();
   }
+  else if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: previousText });
   else buildItinerary();
 }
 function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
@@ -465,7 +475,7 @@ function updateDayItemScheduleTime(legIdx, dayIdx, category, itemIdx, field, tim
     if (field === 'startTime' && time && item.endTime) syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'endTime', item.endTime);
   }
   saveData();
-  if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
+  if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: previousText });
   else buildItinerary();
 }
 
@@ -483,11 +493,162 @@ function setDayItemScheduleMode(legIdx, dayIdx, category, itemIdx, mode) {
   syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'startTime', item.startTime || '');
   syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'endTime', item.endTime || '');
   saveData();
-  if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
+  if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: previousText });
   else buildItinerary();
 }
 
-function rebuildItineraryPreservingScroll() {
+function escapeScheduleDialogText(value) {
+  if (typeof escapeCompactText === 'function') return escapeCompactText(value);
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function openDayItemScheduleDialog(legIdx, dayIdx, category, itemIdx) {
+  const leg = appData[legIdx];
+  const day = leg?.days?.[dayIdx];
+  const item = day?.[category]?.[itemIdx];
+  if (!leg || !day || !item || category !== 'activityItems') return;
+
+  const existingModal = document.getElementById('day-item-schedule-modal');
+  if (existingModal) existingModal.remove();
+
+  const isScheduled = !!String(item.startTime || item.endTime || '').trim();
+  const modal = document.createElement('div');
+  modal.id = 'day-item-schedule-modal';
+  modal.className = 'modal-overlay';
+  modal.style.display = 'flex';
+  modal.innerHTML = `
+    <div class="modal-content modal-md">
+      <div class="modal-header">
+        <h2>Schedule Activity</h2>
+        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="ai-form-group">
+          <label>Activity</label>
+          <div class="readonly-field">${escapeScheduleDialogText(item.text || 'Activity')}</div>
+        </div>
+        <div class="ai-form-group">
+          <label>Day</label>
+          <select id="dayItemScheduleDay" class="form-control form-control--compact">
+            ${(leg.days || []).map((candidateDay, candidateIdx) => {
+              const dateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(candidateDay.date) : candidateDay.date;
+              const label = `${candidateDay.day || `Day ${candidateIdx + 1}`} ${dateLabel || ''} - ${candidateDay.from || ''} to ${candidateDay.to || ''}`;
+              return `<option value="${candidateIdx}" ${candidateIdx === dayIdx ? 'selected' : ''}>${escapeScheduleDialogText(label)}</option>`;
+            }).join('')}
+          </select>
+        </div>
+        <div class="activity-assign-schedule-options">
+          <label class="activity-assign-schedule-option">
+            <input type="radio" name="dayItemScheduleMode" value="anytime" ${isScheduled ? '' : 'checked'}>
+            <span><strong>Anytime</strong><small>No fixed time. Keeps this activity in the Anytime section.</small></span>
+          </label>
+          <label class="activity-assign-schedule-option">
+            <input type="radio" name="dayItemScheduleMode" value="scheduled" ${isScheduled ? 'checked' : ''}>
+            <span><strong>Scheduled</strong><small>Set a start and optional end time for the selected day.</small></span>
+          </label>
+        </div>
+        <div class="modal-form-row modal-form-row--split">
+          <div class="ai-form-group">
+            <label>Start Time</label>
+            <input type="time" id="dayItemScheduleStart" class="form-control form-control--compact" value="${escapeScheduleDialogText(item.startTime || '')}">
+          </div>
+          <div class="ai-form-group">
+            <label>End Time</label>
+            <input type="time" id="dayItemScheduleEnd" class="form-control form-control--compact" value="${escapeScheduleDialogText(item.endTime || '')}">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+        <button class="action-btn action-btn-secondary" id="saveDayItemScheduleBtn">Save Schedule</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  const modeInputs = Array.from(modal.querySelectorAll('input[name="dayItemScheduleMode"]'));
+  const startEl = modal.querySelector('#dayItemScheduleStart');
+  const endEl = modal.querySelector('#dayItemScheduleEnd');
+  const dayEl = modal.querySelector('#dayItemScheduleDay');
+
+  function getSelectedMode() {
+    return modeInputs.find(input => input.checked)?.value || 'anytime';
+  }
+
+  function syncTimeDisabledState() {
+    const disabled = getSelectedMode() !== 'scheduled';
+    [startEl, endEl].forEach(input => {
+      if (!input) return;
+      input.disabled = disabled;
+    });
+  }
+
+  function setScheduledMode() {
+    const scheduledInput = modeInputs.find(input => input.value === 'scheduled');
+    if (scheduledInput) scheduledInput.checked = true;
+    syncTimeDisabledState();
+  }
+
+  modeInputs.forEach(input => input.addEventListener('change', syncTimeDisabledState));
+  [startEl, endEl].forEach(input => input?.addEventListener('input', setScheduledMode));
+  startEl?.addEventListener('change', () => {
+    if (startEl.value && !endEl.value) {
+      endEl.value = addMinutesToTimeValue(startEl.value, parseActivityDurationMinutes(item.time || '')) || '';
+    }
+  });
+  syncTimeDisabledState();
+  setTimeout(() => (isScheduled ? startEl : dayEl)?.focus(), 80);
+
+  modal.querySelector('#saveDayItemScheduleBtn').onclick = event => {
+    event.stopPropagation();
+    const previousText = item.text;
+    const targetDayIdx = Number(dayEl?.value ?? dayIdx);
+    const targetDay = leg.days?.[targetDayIdx] || day;
+    const mode = getSelectedMode();
+    const startTime = mode === 'scheduled' ? (startEl?.value || '09:00') : '';
+    const endTime = mode === 'scheduled' ? (endEl?.value || addMinutesToTimeValue(startTime, parseActivityDurationMinutes(item.time || '')) || '') : '';
+
+    const movedItem = { ...item, startTime, endTime };
+    if (targetDayIdx !== dayIdx) {
+      day[category].splice(itemIdx, 1);
+      if (!Array.isArray(targetDay[category])) targetDay[category] = [];
+      targetDay[category].push(movedItem);
+    } else {
+      item.startTime = startTime;
+      item.endTime = endTime;
+    }
+
+    const poolActivity = findAssignedSuggestedActivity(legIdx, dayIdx, previousText)
+      || findAssignedSuggestedActivity(legIdx, targetDayIdx, previousText);
+    if (poolActivity) {
+      poolActivity.assignedDayIdx = targetDayIdx;
+      poolActivity.startTime = startTime;
+      poolActivity.endTime = endTime;
+    }
+
+    modal.remove();
+    saveData();
+    if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: previousText });
+    else buildItinerary();
+  };
+
+  modal.addEventListener('click', event => {
+    if (event.target === modal) modal.remove();
+  });
+}
+
+function findTimelineItemByText(text, root = document) {
+  const needle = String(text || '').trim().toLowerCase();
+  if (!needle) return null;
+  return Array.from(root.querySelectorAll('.daily-timeline-item')).find(item => item.textContent.toLowerCase().includes(needle)) || null;
+}
+
+function rebuildItineraryPreservingScroll(options = {}) {
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
   if (typeof captureMobilePagerStates === 'function') captureMobilePagerStates(document.getElementById('itinerary') || document);
@@ -497,7 +658,14 @@ function rebuildItineraryPreservingScroll() {
     if (typeof restoreCompactDayPagerScrollPositions === 'function') {
       restoreCompactDayPagerScrollPositions(document.getElementById('itinerary') || document);
     }
-    window.scrollTo(scrollX, scrollY);
+    const focusItem = findTimelineItemByText(options.focusText);
+    if (focusItem && focusItem.offsetParent !== null && typeof focusItem.scrollIntoView === 'function') {
+      focusItem.scrollIntoView({ block: 'center', inline: 'nearest' });
+      focusItem.classList.add('is-schedule-focus');
+      setTimeout(() => focusItem.classList.remove('is-schedule-focus'), 1200);
+    } else if (typeof window.scrollTo === 'function') {
+      window.scrollTo(scrollX, scrollY);
+    }
   });
 }
 
@@ -1432,6 +1600,7 @@ window.updateDayItemCost = updateDayItemCost;
 window.updateDayItemTime = updateDayItemTime;
 window.updateDayItemScheduleTime = updateDayItemScheduleTime;
 window.setDayItemScheduleMode = setDayItemScheduleMode;
+window.openDayItemScheduleDialog = openDayItemScheduleDialog;
 window.toggleFoodCompleted = toggleFoodCompleted;
 window.toggleDayCompleted = toggleDayCompleted;
 window.toggleActivityCompleted = toggleActivityCompleted;

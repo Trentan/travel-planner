@@ -43,6 +43,9 @@ async function seedSchedulingScenario(page) {
       journeys[0].arrivalTime = '16:00';
       journeys[0].journeyName = 'Afternoon transfer';
     }
+    if (window.isEditMode === false && typeof window.toggleEditMode === 'function') {
+      window.toggleEditMode();
+    }
     saveData(false);
     buildItinerary();
   }, targetActivity);
@@ -77,6 +80,82 @@ async function run() {
     }, targetActivity);
 
     assert.deepStrictEqual(assigned, { startTime: '09:45', endTime: '11:45' });
+
+    const scheduledHeading = page.locator('.timeline-section-label', { hasText: 'Scheduled' });
+    assert((await scheduledHeading.count()) > 0, 'Timeline should label scheduled items');
+    assert.strictEqual(
+      await page.locator('.daily-timeline-card h4', { hasText: 'Day Timeline' }).count(),
+      0,
+      'Detailed timeline should not render the redundant Day Timeline heading'
+    );
+
+    await page.evaluate(() => window.setItineraryDayViewMode('grouped'));
+    await page.evaluate(() => window.setDayItemScheduleMode(0, 0, 'activityItems', 0, 'anytime'));
+    await page.waitForFunction(() => window.itineraryDayViewMode === 'grouped');
+    assert.strictEqual(
+      await page.locator('#itineraryGroupedModeBtn').getAttribute('aria-pressed'),
+      'true',
+      'Global grouped mode button should stay active after a schedule edit'
+    );
+    assert.strictEqual(
+      await page.locator('.day-view-tabs').count(),
+      0,
+      'Timeline / Grouped selector should not render inside every day card'
+    );
+    assert.strictEqual(
+      await page.locator('.day-planner-shell-grouped .day-view-panel-grouped').count() > 0,
+      true,
+      'Changing schedule mode should preserve the global grouped day view'
+    );
+
+    await page.evaluate(() => window.setItineraryDayViewMode('timeline'));
+    const activeDayKey = await page.evaluate(() => {
+      const activityCard = Array.from(document.querySelectorAll('.day-card'))
+        .find(card => card.querySelector('.timeline-schedule-btn'));
+      activityCard?.classList.add('open');
+      return activityCard?.dataset.dayKey || '';
+    });
+    assert(activeDayKey, 'An open day should expose a stable day key');
+    const visibleActivityScheduleButtons = page.locator('.day-card.open .timeline-schedule-btn');
+    assert((await visibleActivityScheduleButtons.count()) > 0, 'An open day should expose visible activity schedule buttons');
+    await visibleActivityScheduleButtons.nth(0).click();
+    await page.waitForSelector('#day-item-schedule-modal', { state: 'visible' });
+    assert.strictEqual(
+      await page.locator('#day-item-schedule-modal input[name="dayItemScheduleMode"][value="scheduled"]').count(),
+      1,
+      'Schedule button should open the focused schedule dialog'
+    );
+    await page.locator('#day-item-schedule-modal input[name="dayItemScheduleMode"][value="scheduled"]').check();
+    await page.locator('#dayItemScheduleStart').fill('10:15');
+    await page.locator('#saveDayItemScheduleBtn').click();
+    await page.waitForSelector('#day-item-schedule-modal', { state: 'detached' });
+    await page.waitForFunction(() => window.itineraryDayViewMode === 'timeline');
+    assert.strictEqual(
+      await page.locator('#itineraryTimelineModeBtn').getAttribute('aria-pressed'),
+      'true',
+      'Saving from the schedule dialog should preserve the global timeline day view'
+    );
+    assert.strictEqual(
+      await page.evaluate(dayKey => document.querySelector(`.day-card[data-day-key="${dayKey}"]`)?.classList.contains('open') === true, activeDayKey),
+      true,
+      'Saving from the schedule dialog should keep the same day card open'
+    );
+    await page.waitForFunction(() => document.querySelectorAll('.daily-timeline-item.is-schedule-focus').length === 1);
+    assert.strictEqual(
+      await page.locator('.daily-timeline-item.is-schedule-focus').count(),
+      1,
+      'Moved timeline item should receive focus styling after the rebuild'
+    );
+
+    const deleteButtons = page.locator('.day-card.open .daily-timeline-item-activity .daily-timeline-actions .del-btn');
+    assert((await deleteButtons.count()) > 0, 'An open timeline activity should expose a delete button');
+    await deleteButtons.nth(0).click();
+    await page.waitForFunction(dayKey => document.querySelector(`.day-card[data-day-key="${dayKey}"]`)?.classList.contains('open') === true, activeDayKey);
+    assert.strictEqual(
+      await page.locator('#itineraryTimelineModeBtn').getAttribute('aria-pressed'),
+      'true',
+      'Deleting an inline activity should preserve the selected global timeline view'
+    );
     console.log('Suggested scheduling regression passed');
   } finally {
     await browser.close();

@@ -3,6 +3,7 @@ let isCompactView = false;
 let isEditMode = true;
 let isMobileMenuOpen = false;
 let lastViewportWasMobile = null;
+let itineraryDayViewMode = 'timeline';
 
 function isMobileViewport() {
   return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
@@ -142,11 +143,26 @@ function syncModeToggleButtons() {
   });
 }
 
+function syncItineraryViewModeButtons() {
+  const isTimeline = itineraryDayViewMode !== 'grouped';
+  const timelineBtn = document.getElementById('itineraryTimelineModeBtn');
+  const groupedBtn = document.getElementById('itineraryGroupedModeBtn');
+  if (timelineBtn) {
+    timelineBtn.classList.toggle('is-active', isTimeline);
+    timelineBtn.setAttribute('aria-pressed', String(isTimeline));
+  }
+  if (groupedBtn) {
+    groupedBtn.classList.toggle('is-active', !isTimeline);
+    groupedBtn.setAttribute('aria-pressed', String(!isTimeline));
+  }
+}
+
 function saveUiSettings() {
   localStorage.setItem('travelApp_uiSettings_v1', JSON.stringify({
     isCompactView,
     isEditMode,
-    isFunMode
+    isFunMode,
+    itineraryDayViewMode
   }));
 }
 
@@ -170,6 +186,7 @@ function applyUiSettings() {
     isFunMode = savedSettings.isFunMode === true;
     isCompactView = !!savedSettings.isCompactView;
     isEditMode = savedSettings.isEditMode !== false;
+    itineraryDayViewMode = savedSettings.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
   } else if (isMobileViewport()) {
     isCompactView = true;
   }
@@ -178,12 +195,14 @@ function applyUiSettings() {
   window.isFunMode = isFunMode;
   window.isCompactView = isCompactView;
   window.isEditMode = isEditMode;
+  window.itineraryDayViewMode = itineraryDayViewMode;
 
   document.body.classList.toggle('fun-mode', isFunMode);
   document.body.classList.toggle('compact-view-mode', isCompactView);
   document.body.classList.toggle('read-only-mode', !isEditMode);
   syncResponsiveUi();
   syncModeToggleButtons();
+  syncItineraryViewModeButtons();
   setHeaderEditable(isEditMode);
 }
 
@@ -373,6 +392,15 @@ function toggleCompactView(nextValue = null) {
   }
 }
 
+function setItineraryDayViewMode(nextMode = 'timeline') {
+  itineraryDayViewMode = nextMode === 'grouped' ? 'grouped' : 'timeline';
+  window.itineraryDayViewMode = itineraryDayViewMode;
+  saveUiSettings();
+  syncItineraryViewModeButtons();
+  if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
+  else if (typeof buildItinerary === 'function') buildItinerary();
+}
+
 function promptHardRestart() {
   if (typeof hardRestartApp === 'function') {
     hardRestartApp();
@@ -506,6 +534,7 @@ window.deleteLegTip = deleteLegTip;
 window.toggleMode = toggleMode;
 window.toggleEditMode = toggleEditMode;
 window.toggleCompactView = toggleCompactView;
+window.setItineraryDayViewMode = setItineraryDayViewMode;
 window.applyUiSettings = applyUiSettings;
 window.switchTab = switchTab;
 window.toggleMobileMenu = toggleMobileMenu;

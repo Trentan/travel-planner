@@ -740,7 +740,7 @@ function createBrowserHarness({
     'stayDeleteBtn', 'journeyDeleteBtn', 'saveFoodBtn', 'foodName', 'foodCost',
     'saveActivityBtn', 'activityCategory', 'activityTitle', 'activityLocation',
     'activityTime', 'activityStartTime', 'activityEndTime', 'activityCost', 'customCountryDiv', 'backup-reminder', 'expandAll',
-    'expandAllLegs', 'mobileMenuSheet', 'tab-itinerary', 'tab-transport', 'tab-accom',
+    'expandAllLegs', 'itineraryTimelineModeBtn', 'itineraryGroupedModeBtn', 'mobileMenuSheet', 'tab-itinerary', 'tab-transport', 'tab-accom',
     'tab-budget', 'tab-packing', 'tab-map'
   ];
 
@@ -784,6 +784,14 @@ function createBrowserHarness({
 
   createCompactSwitch('compactToggleBtn', 'compactToggleInput', 'compactToggleLabel');
   createCompactSwitch('mobileCompactToggleBtn', 'mobileCompactToggleInput', 'mobileCompactToggleLabel');
+
+  ['itineraryTimelineModeBtn', 'itineraryGroupedModeBtn'].forEach(id => {
+    const button = document.getElementById(id);
+    button.tagName = 'BUTTON';
+    button.type = 'button';
+    button.className = 'itinerary-view-mode-btn';
+    button.textContent = id.includes('Timeline') ? 'Timeline' : 'Grouped';
+  });
 
   const appMenuBar = document.createElement('div');
   appMenuBar.className = 'app-menu-bar';
