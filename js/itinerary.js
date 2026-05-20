@@ -113,7 +113,7 @@ function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
   `;
 }
 
-function renderCompactFoodQuestCard(leg, legIndex) {
+function renderCompactFoodQuestCard(leg, legIndex, isMobileCompact = false) {
   const foodItems = Array.isArray(leg.cityFood) ? leg.cityFood : [];
   const completedCount = foodItems.filter(item => item && item.done).length;
   const totalCount = foodItems.length;
@@ -124,14 +124,16 @@ function renderCompactFoodQuestCard(leg, legIndex) {
       ? foodItems.map((item, itemIdx) => renderCompactFoodQuestItem(legIndex, item, itemIdx)).join('')
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
 
+  const expanded = !isMobileCompact;
+
   return `
-    <article class="mobile-surface-card compact-food-quest-card is-expanded" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+    <article class="mobile-surface-card compact-food-quest-card${expanded ? ' is-expanded' : ''}" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-food-summary">
         <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍗</span> Food quests</span>
         <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
         <span class="compact-food-summary-count">${escapeCompactText(countLabel)}</span>
       </div>
-      <div class="mobile-surface-card-details expanded">
+      <div class="mobile-surface-card-details${expanded ? ' expanded' : ''}">
         <div class="compact-food-list">${foodLines}</div>
       </div>
     </article>
@@ -237,7 +239,7 @@ function renderCompactDayPager(leg, legIndex) {
   if (totalDays === 0) {
     return `
       <div class="compact-day-pager compact-day-pager-empty" data-pager-key="${escapeCompactText(pagerKey)}">
-        <div class="compact-day-empty">No itinerary days available for this leg.</div>
+        <div class="compact-day-empty">No itinerary days available for this leg yet.</div>
       </div>
     `;
   }
@@ -535,7 +537,7 @@ function renderCompactLegCard(leg, legIndex) {
         </div>
       </div>
       <div class="compact-leg-body">
-        ${renderCompactFoodQuestCard(leg, legIndex)}
+        ${renderCompactFoodQuestCard(leg, legIndex, false)}
         ${renderCompactDayPager(leg, legIndex)}
       </div>
     </article>
@@ -580,7 +582,7 @@ function buildCompactItinerary() {
           </div>
         </div>
         <div class="compact-leg-body">
-          ${renderCompactFoodQuestCard(leg, legIndex)}
+          ${renderCompactFoodQuestCard(leg, legIndex, true)}
           ${renderCompactDayPager(leg, legIndex)}
         </div>
       </article>
