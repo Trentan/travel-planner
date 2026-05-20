@@ -124,14 +124,23 @@ function renderCompactFoodQuestCard(leg, legIndex, isMobileCompact = false) {
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
 
   if (isMobileCompact) {
-    // Mobile compact view: permanently collapsed, static article card
+    // Mobile compact view: default collapsed, but interactive so you can click to expand/collapse and check off food
+    const expanded = isFoodQuestExpanded(leg.id);
+    const chevronSymbol = expanded ? '▲' : '▼';
+    
     return `
       <article class="mobile-surface-card compact-food-quest-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
-        <div class="compact-food-summary" style="cursor: default; user-select: none;">
+        <div class="compact-food-summary" onclick="toggleFoodQuestDetails('${leg.id}')" style="cursor: pointer; user-select: none;">
           <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍗</span> Food quests</span>
           <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
           <span class="compact-food-summary-count">${escapeCompactText(countLabel)}</span>
+          <span class="compact-food-summary-chevron" aria-hidden="true">${chevronSymbol}</span>
         </div>
+        ${expanded ? `
+          <div class="mobile-surface-card-details expanded">
+            <div class="compact-food-list">${foodLines}</div>
+          </div>
+        ` : ''}
       </article>
     `;
   }
