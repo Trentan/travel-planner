@@ -14,6 +14,16 @@ What now works?
 
 -
 
+## Estimate
+
+Original estimate:
+
+Actual effort:
+
+## Labels
+
+Final labels/tags applied:
+
 ## Verification
 
 - [ ] Relevant issue acceptance criteria checked.

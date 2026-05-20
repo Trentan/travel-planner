@@ -118,25 +118,37 @@ async function prepareAppPage(browser, baseUrl, spec) {
   return { context, page };
 }
 
-function mockHtml(issueNumber, spec) {
+function imageDataUri(filePath) {
+  const bytes = fs.readFileSync(filePath);
+  return `data:image/png;base64,${bytes.toString('base64')}`;
+}
+
+function mockHtml(issueNumber, spec, beforeImagePath) {
   const bullets = spec.bullets.map(item => `<li>${item}</li>`).join('');
+  const beforeImage = imageDataUri(beforeImagePath);
   return `<!doctype html>
 <html>
 <head>
   <meta charset="utf-8">
   <style>
     body { margin: 0; font-family: "DM Sans", Arial, sans-serif; background: #f5f7f8; color: #1a242f; }
-    .canvas { width: 1200px; height: 760px; padding: 48px; box-sizing: border-box; background: linear-gradient(180deg, #f9fbfb, #eef4f1); }
+    .canvas { width: 1440px; height: 900px; padding: 38px 44px; box-sizing: border-box; background: linear-gradient(180deg, #f9fbfb, #eef4f1); }
     .label { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #557064; font-weight: 700; }
-    h1 { margin: 10px 0 10px; font-family: Georgia, serif; font-size: 44px; line-height: 1.05; color: #1a242f; }
-    .summary { font-size: 22px; color: #344b42; max-width: 760px; line-height: 1.35; margin-bottom: 34px; }
-    .mock { display: grid; grid-template-columns: 1.05fr .95fr; gap: 28px; align-items: stretch; }
-    .panel { background: white; border: 1px solid #dbe6e1; border-radius: 8px; padding: 26px; box-shadow: 0 18px 45px rgba(26,36,47,.08); }
+    h1 { margin: 8px 0 8px; font-family: Georgia, serif; font-size: 40px; line-height: 1.05; color: #1a242f; }
+    .summary { font-size: 20px; color: #344b42; max-width: 980px; line-height: 1.35; margin-bottom: 22px; }
+    .mock { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
+    .panel { background: white; border: 1px solid #dbe6e1; border-radius: 8px; padding: 22px; box-shadow: 0 18px 45px rgba(26,36,47,.08); }
     .mini-title { font-weight: 800; font-size: 18px; margin-bottom: 16px; }
-    .row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2ef; padding: 14px 0; gap: 18px; }
+    .before-shot { width: 100%; height: 360px; object-fit: cover; object-position: top center; border: 1px solid #d4ded9; border-radius: 6px; background: #edf2ef; }
+    .callout { margin-top: 14px; padding: 14px 16px; background: #f4f8f6; border-left: 4px solid #557064; color: #263f38; line-height: 1.45; font-size: 16px; }
+    .row { display: grid; grid-template-columns: 1fr auto; align-items: center; border-bottom: 1px solid #edf2ef; padding: 12px 0; gap: 18px; }
     .pill { border-radius: 999px; padding: 6px 10px; background: #e4f0ea; color: #24485d; font-weight: 800; font-size: 12px; white-space: nowrap; }
-    ul { margin: 0; padding-left: 22px; font-size: 20px; line-height: 1.65; color: #263f38; }
-    .footer { margin-top: 26px; font-size: 14px; color: #61736c; }
+    ul { margin: 0; padding-left: 22px; font-size: 19px; line-height: 1.58; color: #263f38; }
+    .wireframe { margin-top: 16px; display: grid; gap: 10px; }
+    .wire-row { display: grid; grid-template-columns: 90px 1fr 110px; gap: 10px; padding: 12px; border: 1px solid #dbe6e1; border-radius: 6px; background: #fbfdfc; align-items: center; font-size: 15px; }
+    .bar { height: 10px; background: #dce9e3; border-radius: 999px; }
+    .bar.dark { background: #24485d; }
+    .footer { margin-top: 18px; font-size: 14px; color: #61736c; }
   </style>
 </head>
 <body>
@@ -146,26 +158,33 @@ function mockHtml(issueNumber, spec) {
     <div class="summary">${spec.summary}</div>
     <div class="mock">
       <section class="panel">
-        <div class="mini-title">Proposed visual behavior</div>
-        <div class="row"><span>Primary workflow</span><span class="pill">Visible</span></div>
-        <div class="row"><span>Desktop detailed/compact</span><span class="pill">Checked</span></div>
-        <div class="row"><span>Mobile detailed/compact</span><span class="pill">Checked</span></div>
-        <div class="row"><span>Save/load/export impact</span><span class="pill">Planned</span></div>
+        <div class="mini-title">Before screenshot reference</div>
+        <img class="before-shot" src="${beforeImage}" alt="Before screenshot reference">
+        <div class="callout">${spec.beforeNote || 'Use the current app state as the visual baseline before implementing the issue.'}</div>
       </section>
       <section class="panel">
-        <div class="mini-title">Acceptance shape</div>
+        <div class="mini-title">Proposed outcome</div>
+        <div class="row"><span>Primary workflow becomes visible in-context</span><span class="pill">After</span></div>
+        <div class="row"><span>Desktop and mobile states have an explicit check path</span><span class="pill">Modes</span></div>
+        <div class="row"><span>Save/load/export impact is reviewed where relevant</span><span class="pill">Data</span></div>
+        <div class="wireframe" aria-hidden="true">
+          <div class="wire-row"><strong>Entry</strong><span class="bar dark"></span><span class="pill">Action</span></div>
+          <div class="wire-row"><strong>Detail</strong><span class="bar"></span><span class="pill">Status</span></div>
+          <div class="wire-row"><strong>Fallback</strong><span class="bar"></span><span class="pill">Empty</span></div>
+        </div>
+        <div class="mini-title" style="margin-top:18px;">What changes</div>
         <ul>${bullets}</ul>
       </section>
     </div>
-    <div class="footer">Mockup/spec image generated from the GitHub issue workflow. Final implementation screenshots should replace or supplement this when the issue is resolved.</div>
+    <div class="footer">Mockup/spec image generated from the GitHub issue workflow. It intentionally references the before screenshot and outlines the proposed visible change. Final implementation screenshots should replace or supplement this when the issue is resolved.</div>
   </div>
 </body>
 </html>`;
 }
 
-async function screenshotMock(browser, issueNumber, proposedSpec, outPath) {
-  const page = await browser.newPage({ viewport: { width: 1200, height: 760 } });
-  await page.setContent(mockHtml(issueNumber, proposedSpec), { waitUntil: 'load' });
+async function screenshotMock(browser, issueNumber, proposedSpec, beforeImagePath, outPath) {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  await page.setContent(mockHtml(issueNumber, proposedSpec, beforeImagePath), { waitUntil: 'load' });
   await page.screenshot({ path: outPath, fullPage: false });
   await page.close();
 }
@@ -186,7 +205,7 @@ async function run() {
       } finally {
         await context.close();
       }
-      await screenshotMock(browser, issueNumber, { title: spec.title, ...spec.proposed }, proposedPath);
+      await screenshotMock(browser, issueNumber, { title: spec.title, beforeNote: spec.before.note, ...spec.proposed }, beforePath, proposedPath);
       fs.writeFileSync(path.join(dir, 'README.md'), `# Issue #${issueNumber} assets\n\n- before.png: current app/reference state\n- proposed.png: proposed mockup/spec image\n`, 'utf8');
       console.log(`Generated issue-${issueNumber}`);
     }
