@@ -35,6 +35,56 @@ node tests/city-nav-regression.js
 npm test
 ```
 
+## GitHub Issue Workflow
+
+Carry forward the useful parts of the retired polish tracker inside GitHub Issues. Do not create new `WI-XXX` files or tracker rows; the GitHub issue is now the work item, tracker row, proposal, and completion record.
+
+### Creating Issues
+
+When creating a GitHub Issue, use the tracker-style narrative shape:
+
+1. `Before`: describe the current behavior, missing capability, bug, or user pain.
+2. `Before screenshot`: link or attach the current-state screenshot for visual/UI work. If the issue is not UI-specific, write `Not UI-specific`. If a screenshot cannot be captured yet, explain why and state what must be captured before implementation starts.
+3. `Evidence`: include viewport/mode, realistic trip data, reproduction notes, or source-code references.
+4. `Proposed`: describe the intended change, design direction, or implementation approach.
+5. `Proposed screenshot / mockup`: link or attach a proposed-state screenshot, mockup, wireframe, or visual spec for UI work. If the issue is not UI-specific, write `Not UI-specific`.
+6. `After`: describe the expected user-visible result once the issue is complete.
+7. `Acceptance criteria`: list concrete checks that prove the issue is done.
+8. `Verification plan`: list the commands, browser states, data files, and modes that should be checked.
+
+For UI issues, always state which modes are affected:
+
+| Mode ID | Label | Viewport | Density setting |
+|---------|-------|----------|-----------------|
+| `DDE` | Desktop / Detailed | 1440 x 900 | Default density |
+| `DCO` | Desktop / Compact | 1440 x 900 | Compact toggle active |
+| `MDE` | Mobile / Detailed | 390 x 844 | Default density |
+| `MCO` | Mobile / Compact | 390 x 844 | Compact toggle active |
+
+Use the issue title and labels for priority instead of a local tracker row. If priority is known, include one of `Critical`, `Important`, or `Polish` in the issue body or labels.
+
+### Working Issues
+
+1. Keep one focused branch per issue, using the default prefix `codex/`, for example `codex/90-linked-transport-map-segments`.
+2. Treat the issue body as the old WI file: read `Before`, `Proposed`, `After`, acceptance criteria, and verification plan before editing.
+3. For visual work, capture or reference a before screenshot before changing behavior.
+4. For visual work, add a proposed screenshot, mockup, or visual spec before implementation unless the issue body already contains one.
+5. If the implementation changes the expected outcome, update the issue with a short comment explaining the decision instead of silently drifting from the proposal.
+6. Preserve the issue's scope. Create or suggest a follow-up issue for richer adjacent work rather than expanding the current issue.
+
+### Resolving Issues
+
+When resolving an issue, leave a closing comment or update the issue with the completed tracker-style record:
+
+1. `Before`: what was broken, missing, or hard to use.
+2. `After`: what now works, including any user-visible behavior changes.
+3. `Files changed`: the main files touched.
+4. `Verification`: commands, visual checks, modes, and realistic data used.
+5. `Screenshots`: before/proposed/after screenshots or notes when visual verification applies.
+6. `Remaining notes`: follow-up work, known limitations, or `None`.
+
+Pull requests should reference the issue number and include the same completion summary so the issue, branch, commit, and PR all tell the same story.
+
 ## Completion
 
 Before reporting done:

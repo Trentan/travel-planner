@@ -4,24 +4,51 @@ title: "[Feature]: "
 labels: ["enhancement"]
 body:
   - type: textarea
-    id: problem
+    id: before
     attributes:
-      label: Problem or opportunity
-      description: What need would this solve?
+      label: Before
+      description: What is missing, hard to use, or not possible today?
     validations:
       required: true
   - type: textarea
-    id: proposal
+    id: evidence
     attributes:
-      label: Proposed solution
+      label: Evidence
+      description: Add screenshots, realistic trip data notes, reproduction notes, source references, or examples.
+  - type: textarea
+    id: before_screenshot
+    attributes:
+      label: Before screenshot
+      description: Attach or link the current-state screenshot for UI work. Use "Not UI-specific" when appropriate.
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed
       description: Describe the experience or behavior you want.
     validations:
       required: true
   - type: textarea
-    id: alternatives
+    id: proposed_screenshot
     attributes:
-      label: Alternatives considered
-      description: Optional. Any other approaches?
+      label: Proposed screenshot or mockup
+      description: Attach or link a proposed-state screenshot, mockup, wireframe, or visual spec for UI work. Use "Not UI-specific" when appropriate.
+  - type: textarea
+    id: after
+    attributes:
+      label: After
+      description: What should be true for the user after this is complete?
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Critical
+        - Important
+        - Polish
+    validations:
+      required: true
   - type: dropdown
     id: area
     attributes:
@@ -38,3 +65,34 @@ body:
         - Import/export
         - PWA/offline
         - Documentation
+  - type: dropdown
+    id: modes
+    attributes:
+      label: Affected modes
+      multiple: true
+      options:
+        - DDE - Desktop detailed
+        - DCO - Desktop compact
+        - MDE - Mobile detailed
+        - MCO - Mobile compact
+        - Not UI-specific
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: |
+        - [ ] ...
+        - [ ] Before screenshot captured or marked not UI-specific
+        - [ ] Proposed screenshot/mockup captured or marked not UI-specific
+        - [ ] Save/load/export behavior is covered where applicable
+        - [ ] Relevant tests pass
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification plan
+      description: Commands, visual states, viewport modes, and data files to check when resolving this issue.
+      placeholder: |
+        - Use `backups/2026_June_July_Europe_Thailand.json` for visual testing
+        - Check DDE/DCO/MDE/MCO where applicable

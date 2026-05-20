@@ -4,10 +4,22 @@ title: "[Polish]: "
 labels: ["polish", "ux"]
 body:
   - type: textarea
-    id: issue
+    id: before
     attributes:
-      label: What needs polish?
-      description: Name the screen, state, or workflow and what feels off.
+      label: Before
+      description: Name the screen, state, or workflow and what feels off today.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Add before screenshots, viewport/mode, trip data notes, or archived polish references.
+  - type: textarea
+    id: before_screenshot
+    attributes:
+      label: Before screenshot
+      description: Attach or link the current-state screenshot for this polish issue.
     validations:
       required: true
   - type: dropdown
@@ -16,21 +28,59 @@ body:
       label: Affected modes
       multiple: true
       options:
-        - Desktop detailed
-        - Desktop compact
-        - Mobile detailed
-        - Mobile compact
-  - type: textarea
-    id: screenshots
+        - DDE - Desktop detailed
+        - DCO - Desktop compact
+        - MDE - Mobile detailed
+        - MCO - Mobile compact
+  - type: dropdown
+    id: priority
     attributes:
-      label: Screenshots or references
-      description: Add screenshots, links, or notes from the archived polish sprint if relevant.
+      label: Priority
+      options:
+        - Critical
+        - Important
+        - Polish
+    validations:
+      required: true
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed
+      description: Describe the intended design, layout, or interaction change.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_screenshot
+    attributes:
+      label: Proposed screenshot or mockup
+      description: Attach or link a proposed-state screenshot, mockup, wireframe, or visual spec.
+    validations:
+      required: true
+  - type: textarea
+    id: after
+    attributes:
+      label: After
+      description: Describe the corrected user-visible state for each affected mode.
+    validations:
+      required: true
   - type: textarea
     id: acceptance
     attributes:
       label: Acceptance criteria
       placeholder: |
         - [ ] ...
+        - [ ] Before screenshot captured
+        - [ ] Proposed screenshot/mockup captured
+        - [ ] Fix verified in each affected mode
+        - [ ] No regression in unaffected modes
         - [ ] Relevant tests pass
     validations:
       required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification plan
+      description: Commands, before/after screenshots, viewport modes, and realistic data to check before closing.
+      placeholder: |
+        - Use `backups/2026_June_July_Europe_Thailand.json`
+        - Capture before/after screenshots for changed UI

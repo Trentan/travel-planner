@@ -1,17 +1,30 @@
-## Summary
-
-- 
-
-## Linked Issue
+## Issue
 
 Closes #
 
+## Before
+
+What was broken, missing, or hard to use?
+
+## After
+
+What now works?
+
+## Files changed
+
+-
+
 ## Verification
 
-- [ ] `npm test`
-- [ ] `node tests\city-nav-regression.js` if relevant
-- [ ] Visual check with `backups/2026_June_July_Europe_Thailand.json` if relevant
+- [ ] Relevant issue acceptance criteria checked.
+- [ ] `node tests/city-nav-regression.js` when city import/navigation, transport, itinerary mapping, or map behavior changed.
+- [ ] `npm test` for general changes.
+- [ ] Desktop/mobile visual states checked with `backups/2026_June_July_Europe_Thailand.json` when UI changed.
 
 ## Screenshots
 
-Add before/after screenshots for UI changes.
+Before/proposed/after screenshots or notes when visual verification applies.
+
+## Remaining notes
+
+None
