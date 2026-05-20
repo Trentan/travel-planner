@@ -72,4 +72,4 @@ Please include the commands you ran in your pull request.
 
 ## Archived Polish Sprint
 
-The original private polish sprint lives in `docs/archive/polish-sprint/` for historical context. New work should use GitHub Issues instead of adding files to that archive.
+The original private polish sprint was migrated into closed GitHub Issues with the `migrated` and `archive` labels. New work should use GitHub Issues.

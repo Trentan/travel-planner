@@ -4,7 +4,7 @@
 
 Use GitHub Issues as the active source of truth for all new work.
 
-The old polish sprint tracker has been retired and archived under `docs/archive/polish-sprint/`. Treat those files as historical context only. Do not create new `WI-XXX` files, do not add rows to the archived tracker, and do not use the archived polish files as the active backlog.
+The old polish sprint tracker has been retired and migrated into closed GitHub Issues with the `migrated` and `archive` labels. Do not create new `WI-XXX` files, do not add local tracker rows, and do not recreate the old polish archive.
 
 ## Session Start
 
@@ -48,10 +48,4 @@ Before reporting done:
 
 ## Archived Polish Sprint
 
-- Archive root: `docs/archive/polish-sprint/`
-- Historical tracker: `docs/archive/polish-sprint/TRACKER.md`
-- Historical audit: `docs/archive/polish-sprint/AUDIT.md`
-- Historical work items: `docs/archive/polish-sprint/items/`
-- Historical screenshots: `docs/archive/polish-sprint/screenshots/`
-
-Use these only to understand past decisions or to recover screenshot context for a migrated GitHub issue.
+Historical polish work lives in closed GitHub Issues. Search for labels `migrated` and `archive`, or search by the original `WI-XXX` identifier.

@@ -83,7 +83,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for the development workflow.
 
 ## Project History
 
-The original private polish sprint has been archived at [docs/archive/polish-sprint](./docs/archive/polish-sprint). Active planning now happens in GitHub Issues.
+The original private polish sprint was migrated into closed GitHub Issues with the `migrated` and `archive` labels. Active planning now happens in [GitHub Issues](https://github.com/Trentan/travel-planner/issues).
 
 ## License
 
