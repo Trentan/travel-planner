@@ -5342,6 +5342,8 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 }
 
 .city-list-item .city-coordinates {
+  display: inline-flex;
+  align-items: center;
   font-family: 'DM Mono', monospace;
   font-size: 0.72rem;
   color: #52616f;
@@ -5349,7 +5351,30 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   border: 1px solid #d8e3ea;
   border-radius: 4px;
   padding: 2px 6px;
+  text-decoration: none;
   white-space: nowrap;
+}
+
+.city-list-item .city-coordinates:hover {
+  color: #24485d;
+  background: #e2edf3;
+  border-color: #b8ccd8;
+}
+
+.city-list-item .city-reset-location-btn {
+  border: 1px solid #d7c9ba;
+  border-radius: 4px;
+  background: #fffaf4;
+  color: #7a5b3d;
+  cursor: pointer;
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.city-list-item .city-reset-location-btn:hover {
+  background: #f7eadc;
+  border-color: #c7ad93;
 }
 
 .city-list-item .country-select {

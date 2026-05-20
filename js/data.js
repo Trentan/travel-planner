@@ -1771,9 +1771,22 @@ function populateCityList() {
     // Build code display
     const codeDisplay = city.code ? `<span class="city-code">${city.code}</span>` : '';
     const hasCoords = cityHasStoredCoords(city);
-    const coordinateDisplay = hasCoords
-      ? `<span class="city-coordinates" title="Latitude and longitude">${Number.parseFloat(city.lat).toFixed(4)}, ${Number.parseFloat(city.lng).toFixed(4)}</span>`
+    const cityLat = hasCoords ? Number.parseFloat(city.lat) : null;
+    const cityLng = hasCoords ? Number.parseFloat(city.lng) : null;
+    const mapsUrl = hasCoords
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${cityLat},${cityLng}`)}`
       : '';
+    const coordinateDisplay = hasCoords
+      ? `<a class="city-coordinates" href="${mapsUrl}" target="_blank" rel="noopener noreferrer" title="Open ${city.name} coordinates in Google Maps">${cityLat.toFixed(4)}, ${cityLng.toFixed(4)}</a>`
+      : '';
+    const resetLocationBtn = hasCoords ? `
+      <button class="city-reset-location-btn"
+              type="button"
+              title="Clear this city's saved map location"
+              onclick="resetCityLocation('${city.id}')">
+        Reset
+      </button>
+    ` : '';
     const searchBtn = !hasCoords ? `
       <button class="search-btn" data-search-btn="${city.id}" 
               style="padding: 4px 8px; border: 1px solid #3498DB; border-radius: 4px; font-size: 0.75rem; color: #3498DB; background: white; cursor: pointer;"
@@ -1793,7 +1806,7 @@ function populateCityList() {
             ${city.name}${homeBadge}
             ${codeDisplay}
           </div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 6px;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 6px;">
             <select class="country-select" data-city-id="${city.id}"
               style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; min-width: 140px;">
               <option value="">Select country...</option>
@@ -1805,6 +1818,7 @@ function populateCityList() {
             </select>
             ${searchBtn}
             ${coordinateDisplay}
+            ${resetLocationBtn}
           </div>
         </div>
       </div>
@@ -1822,6 +1836,19 @@ function populateCityList() {
     });
   });
 }
+
+async function resetCityLocation(cityId) {
+  const city = citiesData.find(c => c.id === cityId);
+  if (!city) return;
+
+  delete city.lat;
+  delete city.lng;
+  await saveData(true);
+  populateCityList();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+}
+
+window.resetCityLocation = resetCityLocation;
 
 function updateCityCountry(cityId, country) {
   if (setCityCountry(cityId, country)) {
