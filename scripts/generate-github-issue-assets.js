@@ -72,6 +72,11 @@ const issueSpecs = {
     title: 'Improve interactive guide',
     before: { kind: 'app', viewport: 'desktop', action: 'guide', note: 'Guide content needs review against the newer functionality backlog.' },
     proposed: { kind: 'mock', summary: 'Refresh guide coverage and first-run flow.', bullets: ['New functionality covered', 'Desktop/mobile guide behavior', 'Useful without becoming noisy'] }
+  },
+  104: {
+    title: 'Collapsible tips card in compact mode per itinerary leg',
+    before: { kind: 'app', viewport: 'desktop', compact: true, tab: 'itinerary', note: 'In compact mode, leg-specific tips are missing. They only show in the detailed view dashboard.' },
+    proposed: { kind: 'mock', summary: 'Add a collapsible Tips card in compact mode (desktop and mobile) per itinerary leg.', bullets: ['Collapsible Tips card styled like food quests', 'Fallback for empty tips state', 'Works seamlessly in DCO and MCO viewports'] }
   }
 };
 
@@ -195,6 +200,7 @@ async function run() {
   const browser = await chromium.launch({ headless: true });
   try {
     for (const [issueNumber, spec] of Object.entries(issueSpecs)) {
+      if (issueNumber !== '104') continue;
       const dir = path.join(outRoot, `issue-${issueNumber}`);
       ensureDir(dir);
       const beforePath = path.join(dir, 'before.png');
