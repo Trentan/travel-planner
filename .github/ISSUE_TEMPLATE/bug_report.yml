@@ -4,12 +4,17 @@ title: "[Bug]: "
 labels: ["bug"]
 body:
   - type: textarea
-    id: summary
+    id: before
     attributes:
-      label: Summary
-      description: What happened?
+      label: Before
+      description: What is broken, unreliable, or confusing?
     validations:
       required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Add screenshots, trip data notes, console output, source references, or frequency.
   - type: textarea
     id: steps
     attributes:
@@ -21,9 +26,10 @@ body:
     validations:
       required: true
   - type: textarea
-    id: expected
+    id: after
     attributes:
-      label: Expected behavior
+      label: After
+      description: What should happen once fixed?
     validations:
       required: true
   - type: textarea
@@ -33,13 +39,25 @@ body:
     validations:
       required: true
   - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Critical
+        - Important
+        - Polish
+    validations:
+      required: true
+  - type: dropdown
     id: viewport
     attributes:
       label: Where did you see it?
       multiple: true
       options:
-        - Desktop
-        - Mobile
+        - DDE - Desktop detailed
+        - DCO - Desktop compact
+        - MDE - Mobile detailed
+        - MCO - Mobile compact
         - Installed PWA
         - Browser tab
         - Offline mode
@@ -53,3 +71,18 @@ body:
     attributes:
       label: Screenshots or trip data notes
       description: Attach screenshots when useful. Do not upload private trip data unless you are comfortable sharing it.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: |
+        - [ ] Bug no longer reproduces
+        - [ ] Regression coverage added or updated where practical
+        - [ ] Relevant tests pass
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification plan
+      description: Commands, modes, data files, and manual checks to use before closing.
