@@ -16,12 +16,22 @@ body:
       label: Evidence
       description: Add screenshots, realistic trip data notes, reproduction notes, source references, or examples.
   - type: textarea
+    id: before_screenshot
+    attributes:
+      label: Before screenshot
+      description: Attach or link the current-state screenshot for UI work. Use "Not UI-specific" when appropriate.
+  - type: textarea
     id: proposed
     attributes:
       label: Proposed
       description: Describe the experience or behavior you want.
     validations:
       required: true
+  - type: textarea
+    id: proposed_screenshot
+    attributes:
+      label: Proposed screenshot or mockup
+      description: Attach or link a proposed-state screenshot, mockup, wireframe, or visual spec for UI work. Use "Not UI-specific" when appropriate.
   - type: textarea
     id: after
     attributes:
@@ -72,6 +82,8 @@ body:
       label: Acceptance criteria
       placeholder: |
         - [ ] ...
+        - [ ] Before screenshot captured or marked not UI-specific
+        - [ ] Proposed screenshot/mockup captured or marked not UI-specific
         - [ ] Save/load/export behavior is covered where applicable
         - [ ] Relevant tests pass
     validations:

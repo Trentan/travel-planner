@@ -16,6 +16,11 @@ body:
       label: Evidence
       description: Add screenshots, trip data notes, console output, source references, or frequency.
   - type: textarea
+    id: before_screenshot
+    attributes:
+      label: Before screenshot
+      description: Attach or link the broken/current-state screenshot for UI bugs. Use "Not UI-specific" when appropriate.
+  - type: textarea
     id: steps
     attributes:
       label: Steps to reproduce
@@ -77,6 +82,8 @@ body:
       label: Acceptance criteria
       placeholder: |
         - [ ] Bug no longer reproduces
+        - [ ] Before screenshot captured or marked not UI-specific
+        - [ ] Proposed screenshot/mockup captured or marked not UI-specific
         - [ ] Regression coverage added or updated where practical
         - [ ] Relevant tests pass
     validations:

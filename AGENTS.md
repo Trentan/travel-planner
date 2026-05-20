@@ -44,11 +44,13 @@ Carry forward the useful parts of the retired polish tracker inside GitHub Issue
 When creating a GitHub Issue, use the tracker-style narrative shape:
 
 1. `Before`: describe the current behavior, missing capability, bug, or user pain.
-2. `Evidence`: include screenshots, viewport/mode, realistic trip data, reproduction notes, or source-code references when available.
-3. `Proposed`: describe the intended change, design direction, or implementation approach.
-4. `After`: describe the expected user-visible result once the issue is complete.
-5. `Acceptance criteria`: list concrete checks that prove the issue is done.
-6. `Verification plan`: list the commands, browser states, data files, and modes that should be checked.
+2. `Before screenshot`: link or attach the current-state screenshot for visual/UI work. If the issue is not UI-specific, write `Not UI-specific`. If a screenshot cannot be captured yet, explain why and state what must be captured before implementation starts.
+3. `Evidence`: include viewport/mode, realistic trip data, reproduction notes, or source-code references.
+4. `Proposed`: describe the intended change, design direction, or implementation approach.
+5. `Proposed screenshot / mockup`: link or attach a proposed-state screenshot, mockup, wireframe, or visual spec for UI work. If the issue is not UI-specific, write `Not UI-specific`.
+6. `After`: describe the expected user-visible result once the issue is complete.
+7. `Acceptance criteria`: list concrete checks that prove the issue is done.
+8. `Verification plan`: list the commands, browser states, data files, and modes that should be checked.
 
 For UI issues, always state which modes are affected:
 
@@ -65,9 +67,10 @@ Use the issue title and labels for priority instead of a local tracker row. If p
 
 1. Keep one focused branch per issue, using the default prefix `codex/`, for example `codex/90-linked-transport-map-segments`.
 2. Treat the issue body as the old WI file: read `Before`, `Proposed`, `After`, acceptance criteria, and verification plan before editing.
-3. For visual work, capture or reference a before screenshot before changing behavior when practical.
-4. If the implementation changes the expected outcome, update the issue with a short comment explaining the decision instead of silently drifting from the proposal.
-5. Preserve the issue's scope. Create or suggest a follow-up issue for richer adjacent work rather than expanding the current issue.
+3. For visual work, capture or reference a before screenshot before changing behavior.
+4. For visual work, add a proposed screenshot, mockup, or visual spec before implementation unless the issue body already contains one.
+5. If the implementation changes the expected outcome, update the issue with a short comment explaining the decision instead of silently drifting from the proposal.
+6. Preserve the issue's scope. Create or suggest a follow-up issue for richer adjacent work rather than expanding the current issue.
 
 ### Resolving Issues
 
@@ -77,7 +80,7 @@ When resolving an issue, leave a closing comment or update the issue with the co
 2. `After`: what now works, including any user-visible behavior changes.
 3. `Files changed`: the main files touched.
 4. `Verification`: commands, visual checks, modes, and realistic data used.
-5. `Screenshots`: before/after screenshots or notes when visual verification applies.
+5. `Screenshots`: before/proposed/after screenshots or notes when visual verification applies.
 6. `Remaining notes`: follow-up work, known limitations, or `None`.
 
 Pull requests should reference the issue number and include the same completion summary so the issue, branch, commit, and PR all tell the same story.

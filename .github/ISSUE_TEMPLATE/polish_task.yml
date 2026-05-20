@@ -15,6 +15,13 @@ body:
     attributes:
       label: Evidence
       description: Add before screenshots, viewport/mode, trip data notes, or archived polish references.
+  - type: textarea
+    id: before_screenshot
+    attributes:
+      label: Before screenshot
+      description: Attach or link the current-state screenshot for this polish issue.
+    validations:
+      required: true
   - type: dropdown
     id: modes
     attributes:
@@ -43,6 +50,13 @@ body:
     validations:
       required: true
   - type: textarea
+    id: proposed_screenshot
+    attributes:
+      label: Proposed screenshot or mockup
+      description: Attach or link a proposed-state screenshot, mockup, wireframe, or visual spec.
+    validations:
+      required: true
+  - type: textarea
     id: after
     attributes:
       label: After
@@ -55,6 +69,8 @@ body:
       label: Acceptance criteria
       placeholder: |
         - [ ] ...
+        - [ ] Before screenshot captured
+        - [ ] Proposed screenshot/mockup captured
         - [ ] Fix verified in each affected mode
         - [ ] No regression in unaffected modes
         - [ ] Relevant tests pass

@@ -23,7 +23,7 @@ What now works?
 
 ## Screenshots
 
-Before/after screenshots or notes when visual verification applies.
+Before/proposed/after screenshots or notes when visual verification applies.
 
 ## Remaining notes
 
