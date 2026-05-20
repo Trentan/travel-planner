@@ -200,7 +200,6 @@ async function run() {
   const browser = await chromium.launch({ headless: true });
   try {
     for (const [issueNumber, spec] of Object.entries(issueSpecs)) {
-      if (issueNumber !== '104') continue;
       const dir = path.join(outRoot, `issue-${issueNumber}`);
       ensureDir(dir);
       const beforePath = path.join(dir, 'before.png');
