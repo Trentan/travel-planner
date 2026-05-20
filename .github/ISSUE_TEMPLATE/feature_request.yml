@@ -112,6 +112,7 @@ body:
         - [ ] ...
         - [ ] Before screenshot captured or marked not UI-specific
         - [ ] Proposed screenshot/mockup captured or marked not UI-specific
+        - [ ] After screenshot captured or marked not UI-specific
         - [ ] Estimate and files impacted reviewed
         - [ ] GitHub labels/tags applied
         - [ ] Save/load/export behavior is covered where applicable

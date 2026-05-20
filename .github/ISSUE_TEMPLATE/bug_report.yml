@@ -109,6 +109,7 @@ body:
         - [ ] Bug no longer reproduces
         - [ ] Before screenshot captured or marked not UI-specific
         - [ ] Proposed screenshot/mockup captured or marked not UI-specific
+        - [ ] After screenshot captured or marked not UI-specific
         - [ ] Estimate and files impacted reviewed
         - [ ] GitHub labels/tags applied
         - [ ] Regression coverage added or updated where practical

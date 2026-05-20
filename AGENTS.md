@@ -91,7 +91,7 @@ When resolving an issue, leave a closing comment or update the issue with the co
 4. `Files changed`: the main files touched.
 5. `Labels`: final labels/tags applied.
 6. `Verification`: commands, visual checks, modes, and realistic data used.
-7. `Screenshots`: before/proposed/after screenshots or notes when visual verification applies.
+7. `Screenshots`: before, proposed, and after screenshots. For UI/visual work, an after screenshot MUST be captured and attached/linked here to prove the final visual state.
 8. `Remaining notes`: follow-up work, known limitations, or `None`.
 
 Pull requests should reference the issue number and include the same completion summary so the issue, branch, commit, and PR all tell the same story.
@@ -106,6 +106,7 @@ Before reporting done:
 4. Commit the completed work on the issue branch with the issue number in the commit message.
 5. Push the branch.
 6. Summarize changed files, verification, branch name, commit hash, and issue links.
+7. For UI/visual work, ensure an after screenshot is captured and included in the completion summary and pull request description.
 
 ## Archived Polish Sprint
 

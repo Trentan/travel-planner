@@ -96,6 +96,7 @@ body:
         - [ ] ...
         - [ ] Before screenshot captured
         - [ ] Proposed screenshot/mockup captured
+        - [ ] After screenshot captured
         - [ ] Estimate and files impacted reviewed
         - [ ] GitHub labels/tags applied
         - [ ] Fix verified in each affected mode

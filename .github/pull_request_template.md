@@ -33,7 +33,7 @@ Final labels/tags applied:
 
 ## Screenshots
 
-Before/proposed/after screenshots or notes when visual verification applies.
+Before/proposed/after screenshots. For UI/visual work, an after screenshot must be captured and linked here.
 
 ## Remaining notes
 
