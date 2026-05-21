@@ -82,7 +82,7 @@ function renderCompactBlock(title, linesHtml, fullWidth = false) {
   if (!linesHtml) return '';
   return `
     <div class="compact-day-block${fullWidth ? ' compact-day-block-wide' : ''}">
-      <div class="compact-day-block-title">${title}</div>
+      ${title ? `<div class="compact-day-block-title">${title}</div>` : ''}
       <div class="compact-day-block-lines">${linesHtml}</div>
     </div>
   `;
@@ -184,6 +184,7 @@ function renderCompactTipsCard(leg, legIndex) {
 }
 
 function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
+  const useGroupedView = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped';
   const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
   const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
   const dayStayInfo = getStayDisplayForDay(day.date, day.to);
@@ -242,16 +243,17 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     </label>
   `;
 
-  const details = `
-    <div class="compact-day-grid">
-      ${renderCompactBlock('Day Timeline', renderDailyTimeline(leg, legIndex, day, dayIdx, { compact: true }), true)}
-      ${renderCompactBlock('Grouped Plan', `
+  const timelineBlock = renderCompactBlock('', renderDailyTimeline(leg, legIndex, day, dayIdx, { compact: true }), true);
+  const groupedBlock = renderCompactBlock('Grouped Plan', `
         <div class="compact-grouped-plan">
           <section><h5>Transport</h5>${transportLines || '<div class="compact-day-empty">No transport scheduled.</div>'}</section>
           <section><h5>Stay</h5>${accomLines || '<div class="compact-day-empty">No stay linked.</div>'}</section>
           <section><h5>Activities</h5>${activityLines || '<div class="compact-day-empty">Nothing planned yet.</div>'}</section>
         </div>
-      `, true)}
+      `, true);
+  const details = `
+    <div class="compact-day-grid">
+      ${useGroupedView ? groupedBlock : timelineBlock}
     </div>
   `;
 
@@ -898,7 +900,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         bookingRef: stay.bookingRef,
         cost: stay.totalCost,
         startTime: stay.checkInTime || '15:00',
-        endTime: ''
+        endTime: '',
+        done: !!stay.done
       });
       return;
     }
@@ -913,7 +916,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         bookingRef: stay.bookingRef,
         cost: stay.totalCost,
         startTime: stay.checkOutTime || '11:00',
-        endTime: ''
+        endTime: '',
+        done: !!stay.done
       });
       return;
     }
@@ -928,7 +932,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         bookingRef: null,
         cost: null,
         startTime: '',
-        endTime: ''
+        endTime: '',
+        done: !!stay.done
       });
     }
   });
@@ -986,7 +991,9 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       startTime,
       endTime,
       sortValue: getDailyTimelineItemSortValue(startDate || dayDate, startTime, journeyIndex),
-      actionHtml: ''
+      actionHtml: '',
+      journeyId: journey.id,
+      done: !!journey.done
     });
   });
 
@@ -1003,7 +1010,9 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       status: stayInfo.status || '',
       startTime: stayInfo.startTime || '',
       endTime: stayInfo.endTime || '',
-      sortValue: getDailyTimelineItemSortValue(dayDate, stayInfo.startTime, 2000 + stayIndex)
+      sortValue: getDailyTimelineItemSortValue(dayDate, stayInfo.startTime, 2000 + stayIndex),
+      stayId: stayInfo.stayId,
+      done: !!stayInfo.done
     });
   });
 
@@ -1025,7 +1034,6 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       sortValue: getDailyTimelineItemSortValue(dayDate, item.startTime, 4000 + itemIndex),
       actionHtml: `
         <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${itemIndex})">×</button>
-        <input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${itemIndex})">
       `
     });
   });
@@ -1043,31 +1051,37 @@ function getDailyTimelineBuckets(items) {
   };
 }
 
-function renderTimelineScheduleEditor(item) {
-  if (!isEditMode || item.type !== 'activity') return '';
-  return `
-    <div class="timeline-edit-row">
-      <label><span>Start</span><input type="time" value="${escapeCompactText(item.startTime || '')}" onchange="event.stopPropagation(); updateDayItemScheduleTime(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex}, 'startTime', this.value)"></label>
-      <label><span>End</span><input type="time" value="${escapeCompactText(item.endTime || '')}" onchange="event.stopPropagation(); updateDayItemScheduleTime(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex}, 'endTime', this.value)"></label>
-    </div>
-  `;
-}
-
 function renderDailyTimelineRow(item, compact = false) {
+  const isTimeClickable = isEditMode && item.type === 'activity';
+  const timeClass = "daily-timeline-time" + (isTimeClickable ? " is-clickable" : "");
+  const timeOnClick = isTimeClickable
+    ? ` role="button" tabindex="0" onclick="event.stopPropagation(); openDayItemScheduleDialog(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex})"`
+    : '';
+
+  let checkboxHtml = '';
+  if (item.type === 'activity') {
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})">`;
+  } else if (item.type === 'transport') {
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox transport-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleJourneyCompleted(event, '${item.journeyId}')">`;
+  } else if (item.type === 'stay' || item.type === 'checkin' || item.type === 'checkout' || item.type === 'staying') {
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox stay-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleStayCompleted(event, '${item.stayId}')">`;
+  }
+
   return `
     <div class="daily-timeline-item daily-timeline-item-${escapeCompactText(item.type)} ${item.done ? 'is-done' : ''}">
-      <div class="daily-timeline-time">${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
+      <div class="${timeClass}"${timeOnClick}>${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
       <div class="daily-timeline-marker"><span>${item.icon}</span></div>
       <div class="daily-timeline-content">
         <div class="daily-timeline-title-row">
           <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
-          <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
+          <div class="daily-timeline-title-and-checkbox">
+            <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
+            ${checkboxHtml}
+          </div>
         </div>
         ${item.meta ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta)}</div>` : ''}
-        ${compact ? '' : renderTimelineScheduleEditor(item)}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
-      ${compact ? renderTimelineScheduleEditor(item) : ''}
     </div>
   `;
 }
@@ -1089,6 +1103,7 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
     <div class="daily-timeline-shell ${compact ? 'daily-timeline-shell-compact' : ''}">
       ${summaryParts ? `<div class="daily-timeline-summary">${escapeCompactText(summaryParts)}</div>` : ''}
       ${scheduled.length ? `
+        <div class="timeline-section-label">Scheduled</div>
         <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
           ${scheduled.map(item => renderDailyTimelineRow(item, compact)).join('')}
         </div>
@@ -1240,6 +1255,11 @@ function buildItinerary() {
   // Save open state of day cards before rebuilding
   openDayCardIds.clear();
   document.querySelectorAll('.day-card.open').forEach(card => {
+    const preservedDayKey = card.getAttribute('data-day-key');
+    if (preservedDayKey) {
+      openDayCardIds.add(preservedDayKey);
+      return;
+    }
     const dayBar = card.querySelector('.day-bar');
     if (dayBar) {
       const dayNum = dayBar.querySelector('.day-num')?.textContent;
@@ -1363,7 +1383,10 @@ function buildItinerary() {
       let isCompleted = false; let dayLabel = '';
       if (isAssigned && leg.days[activity.assignedDayIdx]) {
         dayLabel = leg.days[activity.assignedDayIdx].date;
-        const matchedActivity = leg.days[activity.assignedDayIdx].activityItems.find(a => a.text === activity.title);
+        const matchTexts = typeof getSuggestedActivityMatchTexts === 'function'
+          ? getSuggestedActivityMatchTexts(activity)
+          : [activity.title];
+        const matchedActivity = leg.days[activity.assignedDayIdx].activityItems.find(a => matchTexts.includes(String(a.text || '').trim()));
         if (matchedActivity && matchedActivity.done) isCompleted = true;
       }
       const badgeStateClass = isCompleted ? 'is-complete' : 'is-scheduled';
@@ -1389,35 +1412,19 @@ function buildItinerary() {
       const shouldBeOpen = openDayCardIds.has(dayKey);
       const openClass = shouldBeOpen ? 'open' : '';
       const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
+      const dayViewMode = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
 
       html += `
-      <div class="day-card ${completedClass} ${openClass}">
+      <div class="day-card ${completedClass} ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
         <div class="day-bar" style="--leg-colour:${leg.colour}" onclick="toggleCard(this)">
           <input type="checkbox" class="day-checkbox" ${day.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleDayCompleted(event, ${legIndex}, ${dayIndex})">
           <div class="day-date"><span class="day-num">${dayDateLabel}</span><span class="day-name">${day.day}</span></div>
           <div class="day-title"><div class="day-cities">${cityHTML}</div><div class="day-desc" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
           ${dayTotal ? `<div class="day-total-cost" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron">▼</span>
         </div>
-        <div class="day-detail"><div class="day-planner-shell">
-          <input class="day-view-toggle" type="radio" name="day-view-${legIndex}-${dayIndex}" id="day-view-timeline-${legIndex}-${dayIndex}" checked>
-          <input class="day-view-toggle" type="radio" name="day-view-${legIndex}-${dayIndex}" id="day-view-grouped-${legIndex}-${dayIndex}">
-          <div class="day-view-tabs" onclick="event.stopPropagation()">
-            <label for="day-view-timeline-${legIndex}-${dayIndex}">Timeline</label>
-            <label for="day-view-grouped-${legIndex}-${dayIndex}">Grouped</label>
-          </div>
+        <div class="day-detail"><div class="day-planner-shell day-planner-shell-${dayViewMode}">
           <div class="day-view-panel day-view-panel-timeline">
-          <div class="detail-block daily-timeline-card drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
-            <div class="daily-timeline-card-header">
-              <div>
-                <h4>Day Timeline</h4>
-                <p>Activities, transport, and stays in time order.</p>
-              </div>
-              ${isEditMode ? `<div class="daily-timeline-toolbar">
-                <button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Activity</button>
-                <button class="add-btn" onclick="event.stopPropagation(); openAddJourneyModal();">+ Journey</button>
-                <button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Stay</button>
-              </div>` : ''}
-            </div>
+          <div class="detail-block daily-timeline-card drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
             ${renderDailyTimeline(leg, legIndex, day, dayIndex)}
           </div>
           </div>

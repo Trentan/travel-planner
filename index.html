@@ -42,6 +42,7 @@
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCityDialog()">🌍 Cities</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openRenameTripDialog()">✏️ Rename Trip</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openAIDialog()">🤖 AI Builder</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openBookingIntakeDialog()">Import Booking</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openGuideDialog()">📖 Guide</button>
         <div class="app-menu-divider" aria-hidden="true"></div>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItinerarySummaryText()">🧾 Export AI Summary</button>
@@ -60,6 +61,8 @@
     <button class="app-menu-btn mobile-menu-btn" onclick="toggleMobileMenu()">☰ Menu</button>
   </div>
 </div>
+
+<div id="jsonWriteWarning" class="json-write-warning" hidden></div>
 
 <header>
   <div class="header-inner">
@@ -113,7 +116,13 @@
     <div id="tab-itinerary" class="tab-pane active">
       <div class="section-header">
         <h3 class="section-header-title">🗓️ Itinerary</h3>
-        <button class="action-btn" onclick="openAddLegDialog()">+ Add Trip Leg</button>
+        <div class="section-header-actions">
+          <div class="itinerary-view-mode-control" role="group" aria-label="Itinerary day view">
+            <button id="itineraryTimelineModeBtn" class="itinerary-view-mode-btn is-active" type="button" onclick="setItineraryDayViewMode('timeline')">Timeline</button>
+            <button id="itineraryGroupedModeBtn" class="itinerary-view-mode-btn" type="button" onclick="setItineraryDayViewMode('grouped')">Grouped</button>
+          </div>
+          <button class="action-btn" onclick="openAddLegDialog()">+ Add Trip Leg</button>
+        </div>
       </div>
       <div class="top-controls">
         <button class="action-btn" onclick="toggleAllDays()" id="expandAll">▼ Expand all days</button>
@@ -204,6 +213,7 @@
           <h3 id="mobileMenuPlanningTools" class="mobile-menu-section-title">Planning tools</h3>
           <div class="mobile-menu-section-grid">
             <button class="app-menu-btn mobile-menu-primary" onclick="closeMobileMenu(); openAIDialog()">🤖 AI Builder</button>
+            <button class="app-menu-btn" onclick="closeMobileMenu(); openBookingIntakeDialog()">Import Booking</button>
             <button class="app-menu-btn" onclick="closeMobileMenu(); openGuideDialog()">📖 Guide</button>
             <button id="mobileUndoBtn" class="app-menu-btn mobile-menu-compact-action" onclick="closeMobileMenu(); undoTripChange()" disabled>↶ Undo</button>
             <button id="mobileRedoBtn" class="app-menu-btn mobile-menu-compact-action" onclick="closeMobileMenu(); redoTripChange()" disabled>↷ Redo</button>
@@ -250,6 +260,48 @@
             <button id="mobileInstallAppBtn" class="app-menu-btn install-btn" hidden onclick="closeMobileMenu(); promptInstallApp()">⬇ Install App</button>
           </div>
         </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="booking-intake-modal" class="modal-overlay" style="display: none;" aria-hidden="true">
+    <div class="modal-content modal-xl booking-intake-modal">
+      <div class="modal-header">
+        <h2>Import Booking</h2>
+        <button class="modal-close" onclick="closeBookingIntakeDialog()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="booking-intake-grid">
+          <section class="booking-intake-panel">
+            <div class="ai-form-group">
+              <label for="bookingIntakeText">Paste confirmation text</label>
+              <textarea id="bookingIntakeText" class="form-control booking-intake-textarea" placeholder="Paste flight, train, hotel, tour, or reservation confirmation text here..."></textarea>
+            </div>
+            <div class="ai-form-group">
+              <label for="bookingIntakeFile">Upload a confirmation file</label>
+              <input id="bookingIntakeFile" class="form-control form-control--compact" type="file" accept=".txt,.eml,.pdf,.png,.jpg,.jpeg" onchange="handleBookingIntakeFile(event)">
+              <p class="booking-intake-help">Readable text from .txt, .eml, and text-based PDFs is extracted locally. Image uploads are listed for review when text cannot be read.</p>
+            </div>
+            <div class="booking-intake-actions">
+              <button class="action-btn" onclick="clearBookingIntakeDialog()">Clear</button>
+              <button class="action-btn action-btn-secondary" onclick="previewBookingIntake()">Extract & Review</button>
+            </div>
+            <div id="bookingIntakeSourceStatus" class="booking-intake-status"></div>
+          </section>
+          <section class="booking-intake-panel booking-intake-review-panel">
+            <div class="booking-intake-review-header">
+              <h3>Review extracted plans</h3>
+              <span id="bookingIntakeReviewCount" class="booking-intake-count">No items yet</span>
+            </div>
+            <div id="bookingIntakeReview" class="booking-intake-review">
+              <p class="booking-intake-empty">Paste or upload a booking confirmation, then extract it to preview proposed trip changes.</p>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div class="modal-footer modal-footer-space-between">
+        <button class="action-btn" onclick="closeBookingIntakeDialog()">Cancel</button>
+        <button id="bookingIntakeMergeBtn" class="action-btn action-btn-success" onclick="mergeBookingIntakePreview()" disabled>Merge selected</button>
       </div>
     </div>
   </div>
@@ -691,6 +743,7 @@
   <script src="./js/backup.js"></script>
 <script src="./js/auto-stays.js"></script>
 <script src="./js/transport.js"></script>
+<script src="./js/booking-intake.js"></script>
 <script>
   let deferredInstallPrompt = null;
 

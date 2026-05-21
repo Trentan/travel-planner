@@ -34,6 +34,25 @@ function state(context) {
   return context.getCurrentAppData();
 }
 
+function installSaveCallTracker(context) {
+  const calls = [];
+  const originalSaveData = context.saveData;
+  context.saveData = function trackedSaveData(...args) {
+    calls.push(args);
+    return originalSaveData.apply(this, args);
+  };
+
+  return {
+    calls,
+    expectSave(label, action) {
+      const before = calls.length;
+      const result = action();
+      assert(calls.length > before, `${label}: should call saveData()`);
+      return result;
+    }
+  };
+}
+
 async function testDesktopSmoke() {
   const app = await createBootedApp();
   assertBootClean(app, 'Desktop smoke');
@@ -323,6 +342,195 @@ async function testTouchAssignSmoke() {
   assert(!state(context).itinerary[targetLegIdx].days[0].activityItems.some(item => String(item.text || '').includes('Sunset pier walk')), 'Touch assign smoke: remove button should remove the day item');
 }
 
+async function testItineraryEditPersistence() {
+  const app = await createBootedApp();
+  const { context } = app;
+  assertBootClean(app, 'Itinerary persistence');
+
+  context.addLeg();
+  await settle(app);
+
+  const legIdx = state(context).itinerary.findIndex(leg =>
+    Array.isArray(leg.days) && leg.days.length > 0
+    && Array.isArray(leg.cityFood)
+    && Array.isArray(leg.cityRun)
+    && Array.isArray(leg.suggestedSights)
+    && Array.isArray(leg.legTips)
+  );
+  const dayIdx = 0;
+  assert(legIdx >= 0, 'Itinerary persistence: should find a leg with a day');
+  const activityLegIdx = state(context).itinerary.findIndex(leg =>
+    Array.isArray(leg.days) && leg.days.length > 0 && Array.isArray(leg.suggestedActivities)
+  );
+  assert(activityLegIdx >= 0, 'Itinerary persistence: should find a leg with suggested activities');
+
+  if ((state(context).itinerary[legIdx].cityFood || []).length === 0) {
+    context.addFood(legIdx);
+    app.document.getElementById('foodName').value = 'Persistence snack';
+    app.document.getElementById('foodCost').value = '8';
+    app.document.getElementById('saveFoodBtn').click();
+    await settle(app);
+  }
+
+  if ((state(context).itinerary[legIdx].days[dayIdx].activityItems || []).length === 0) {
+    context.addDayItem(legIdx, dayIdx, 'activityItems');
+    await settle(app);
+  }
+
+  const day = state(context).itinerary[legIdx].days[dayIdx];
+  context.journeys = [];
+  context.window.journeys = context.journeys;
+  context.stays = [{
+    id: 'stay-persistence',
+    cityId: 'city-london',
+    propertyName: 'Persistence Hotel',
+    checkIn: day.date,
+    checkOut: day.date,
+    nights: 1,
+    status: 'booked',
+    totalCost: '200',
+    done: false
+  }];
+  context.window.stays = context.stays;
+
+  const tracker = installSaveCallTracker(context);
+  const event = checked => ({ target: { checked }, stopPropagation() {}, preventDefault() {} });
+
+  tracker.expectSave('Leg label edit', () => context.updateData(legIdx, 'label', 'Persistence Leg'));
+  tracker.expectSave('Day description edit', () => context.updateDayData(legIdx, dayIdx, 'desc', 'Persistence day description'));
+
+  tracker.expectSave('Food modal add', () => {
+    context.addFood(legIdx);
+    app.document.getElementById('foodName').value = 'Persistence dessert';
+    app.document.getElementById('foodCost').value = '11';
+    app.document.getElementById('saveFoodBtn').click();
+  });
+  const foodIdx = state(context).itinerary[legIdx].cityFood.length - 1;
+  tracker.expectSave('Food text edit', () => context.updateFoodText(legIdx, foodIdx, 'Persistence dessert edited'));
+  tracker.expectSave('Food checkbox', () => context.toggleFoodCompleted(event(true), legIdx, 0));
+  tracker.expectSave('Food delete', () => context.deleteFood(legIdx, foodIdx));
+
+  tracker.expectSave('Run add', () => context.addRun(legIdx));
+  let runIdx = state(context).itinerary[legIdx].cityRun.length - 1;
+  tracker.expectSave('Run title edit', () => context.updateRunPool(legIdx, runIdx, 'title', 'Persistence run'));
+  tracker.expectSave('Run time edit', () => context.updateRunPool(legIdx, runIdx, 'estTime', '45 min'));
+  tracker.expectSave('Run delete', () => context.deleteRun(legIdx, runIdx));
+
+  tracker.expectSave('Sight add', () => context.addSight(legIdx));
+  let sightIdx = state(context).itinerary[legIdx].suggestedSights.length - 1;
+  tracker.expectSave('Sight title edit', () => context.updateSightPool(legIdx, sightIdx, 'title', 'Persistence sight'));
+  tracker.expectSave('Sight cost edit', () => context.updateSightPool(legIdx, sightIdx, 'estCost', '9'));
+  tracker.expectSave('Sight delete', () => context.deleteSight(legIdx, sightIdx));
+
+  tracker.expectSave('Tip add', () => context.addLegTip(legIdx));
+  const tipIdx = state(context).itinerary[legIdx].legTips.length - 1;
+  tracker.expectSave('Tip edit', () => context.updateLegTip(legIdx, tipIdx, 'Persistence tip'));
+  tracker.expectSave('Tip delete', () => context.deleteLegTip(legIdx, tipIdx));
+
+  tracker.expectSave('Day checkbox', () => context.toggleDayCompleted(event(true), legIdx, dayIdx));
+  tracker.expectSave('Activity checkbox', () => context.toggleActivityCompleted(event(true), legIdx, dayIdx, 0));
+  tracker.expectSave('Activity text edit', () => context.updateDayItemText(legIdx, dayIdx, 'activityItems', 0, 'Persistence museum'));
+  tracker.expectSave('Activity cost edit', () => context.updateDayItemCost(legIdx, dayIdx, 'activityItems', 0, '18'));
+  tracker.expectSave('Activity duration edit', () => context.updateDayItemTime(legIdx, dayIdx, 'activityItems', 0, '2 hr'));
+  tracker.expectSave('Activity start time edit', () => context.updateDayItemScheduleTime(legIdx, dayIdx, 'activityItems', 0, 'startTime', '10:00'));
+  tracker.expectSave('Activity schedule mode edit', () => context.setDayItemScheduleMode(legIdx, dayIdx, 'activityItems', 0, 'anytime'));
+  tracker.expectSave('Activity add', () => context.addDayItem(legIdx, dayIdx, 'activityItems'));
+  const addedIdx = state(context).itinerary[legIdx].days[dayIdx].activityItems.length - 1;
+  tracker.expectSave('Activity delete', () => context.deleteDayItem(legIdx, dayIdx, 'activityItems', addedIdx));
+  tracker.expectSave('Suggested activity modal add', () => {
+    context.addActivity(activityLegIdx);
+    app.document.getElementById('activityCategory').value = 'sight';
+    app.document.getElementById('activityTitle').value = 'Persistence suggested';
+    app.document.getElementById('activityLocation').value = 'Gallery';
+    app.document.getElementById('activityTime').value = '1 hr';
+    app.document.getElementById('activityCost').value = '12';
+    app.document.getElementById('saveActivityBtn').click();
+  });
+  let activityIdx = state(context).itinerary[activityLegIdx].suggestedActivities.findIndex(activity => String(activity.title || '').includes('Persistence suggested'));
+  assert(activityIdx >= 0, 'Itinerary persistence: suggested activity should be added');
+  tracker.expectSave('Suggested activity modal edit', () => {
+    context.openEditActivityModal(activityLegIdx, activityIdx);
+    app.document.getElementById('activityTitle').value = 'Persistence suggested edited';
+    app.document.getElementById('saveActivityBtn').click();
+  });
+  activityIdx = state(context).itinerary[activityLegIdx].suggestedActivities.findIndex(activity => String(activity.title || '').includes('Persistence suggested edited'));
+  tracker.expectSave('Suggested activity drag/drop assignment', () => {
+    const transfer = {
+      payload: '',
+      setData(_, value) { this.payload = value; },
+      getData() { return this.payload; }
+    };
+    context.handleDragStart({ preventDefault() {}, dataTransfer: transfer }, activityLegIdx, 'activity', activityIdx);
+    context.handleDrop({ preventDefault() {}, currentTarget: { classList: { remove() {} } }, dataTransfer: transfer }, activityLegIdx, 0);
+  });
+  const assignedActivityItemIdx = state(context).itinerary[activityLegIdx].days[0].activityItems.findIndex(item =>
+    String(item.text || '').includes('Persistence suggested edited')
+  );
+  assert(assignedActivityItemIdx >= 0, 'Itinerary persistence: dragged suggested activity should be on the day');
+  tracker.expectSave('Assigned suggested activity checkbox', () => (
+    context.toggleActivityCompleted(event(true), activityLegIdx, 0, assignedActivityItemIdx)
+  ));
+  const assignedExport = context.buildExportPayload();
+  const exportedPoolActivity = assignedExport.itinerary[activityLegIdx].suggestedActivities.find(activity =>
+    String(activity.title || '').includes('Persistence suggested edited')
+  );
+  const exportedDayActivity = assignedExport.itinerary[activityLegIdx].days[0].activityItems.find(item =>
+    String(item.text || '').includes('Persistence suggested edited')
+  );
+  assert(exportedDayActivity?.done === true, 'Itinerary persistence: exported day activity should include done=true');
+  assert(exportedPoolActivity?.done === true, 'Itinerary persistence: exported suggested activity should include done=true');
+  tracker.expectSave('Suggested activity assignment clear', () => {
+    context.openActivityAssignModal(activityLegIdx, activityIdx);
+    app.document.getElementById('activityAssignClearBtn').click();
+  });
+  tracker.expectSave('Suggested activity delete', () => context.deleteActivity(activityLegIdx, activityIdx));
+
+  tracker.expectSave('Transport day item add', () => context.addDayItem(legIdx, dayIdx, 'transportItems'));
+  const transportIdx = state(context).itinerary[legIdx].days[dayIdx].transportItems.length - 1;
+  tracker.expectSave('Transport day item text edit', () => context.updateDayItemText(legIdx, dayIdx, 'transportItems', transportIdx, 'Persistence shuttle'));
+  tracker.expectSave('Transport day item cost edit', () => context.updateDayItemCost(legIdx, dayIdx, 'transportItems', transportIdx, '22'));
+  tracker.expectSave('Transport booking status edit', () => context.toggleBookingStatus(event(false), legIdx, dayIdx, 'transportItems', transportIdx));
+  tracker.expectSave('Transport booking ref edit', () => context.updateBookingRef(legIdx, dayIdx, 'transportItems', transportIdx, 'TRANS-1'));
+  tracker.expectSave('Transport day item delete', () => context.deleteDayItem(legIdx, dayIdx, 'transportItems', transportIdx));
+
+  tracker.expectSave('Accommodation day item add', () => context.addDayItem(legIdx, dayIdx, 'accomItems'));
+  const accomIdx = state(context).itinerary[legIdx].days[dayIdx].accomItems.length - 1;
+  tracker.expectSave('Accommodation day item text edit', () => context.updateDayItemText(legIdx, dayIdx, 'accomItems', accomIdx, 'Persistence inn'));
+  tracker.expectSave('Accommodation day item cost edit', () => context.updateDayItemCost(legIdx, dayIdx, 'accomItems', accomIdx, '120'));
+  tracker.expectSave('Accommodation booking status edit', () => context.toggleBookingStatus(event(false), legIdx, dayIdx, 'accomItems', accomIdx));
+  tracker.expectSave('Accommodation booking ref edit', () => context.updateBookingRef(legIdx, dayIdx, 'accomItems', accomIdx, 'ACCOM-1'));
+  tracker.expectSave('Accommodation day item delete', () => context.deleteDayItem(legIdx, dayIdx, 'accomItems', accomIdx));
+
+  const journey = tracker.expectSave('Journey create from itinerary transport', () => context.createJourneyFromTransportItem(
+    { text: 'Persistence train', cost: '33', status: 'confirmed', bookingRef: 'PERSIST-1' },
+    state(context).itinerary[legIdx].id,
+    day.date,
+    day.from,
+    day.to
+  ));
+  tracker.expectSave('Journey status edit', () => context.updateJourneyStatus(journey.id, 'confirmed'));
+  tracker.expectSave('Journey booking ref edit', () => context.updateJourneyBookingRef(journey.id, 'PERSIST-2'));
+  tracker.expectSave('Journey cost edit', () => context.updateJourneyCost(journey.id, '44'));
+  tracker.expectSave('Journey checkbox', () => context.toggleJourneyCompleted(event(true), journey.id));
+  tracker.expectSave('Journey delete', () => context.deleteJourney(journey.id));
+
+  tracker.expectSave('Stay checkbox', () => context.toggleStayCompleted(event(true), 'stay-persistence'));
+  tracker.expectSave('Stay status edit', () => context.toggleStayStatus(event(false), 'stay-persistence'));
+  tracker.expectSave('Stay field edit', () => context.updateStayField('stay-persistence', 'totalCost', '225'));
+  tracker.expectSave('Stay delete', () => context.deleteStay('stay-persistence'));
+
+  tracker.expectSave('Leg add', () => context.addLeg());
+  const addedLegIdx = state(context).itinerary.findIndex(leg => String(leg.label || '').includes('New City'));
+  assert(addedLegIdx >= 0, 'Itinerary persistence: added leg should be findable');
+  const adjustableLegIdx = state(context).itinerary.findIndex(leg => /^\d{4}-\d{2}-\d{2}$/.test(String(leg.days?.[0]?.date || '')));
+  assert(adjustableLegIdx >= 0, 'Itinerary persistence: adjustable dated leg should be findable');
+  tracker.expectSave('Leg day add', () => context.adjustLegDays(adjustableLegIdx, 1));
+  tracker.expectSave('Leg day remove', () => context.adjustLegDays(adjustableLegIdx, -1));
+  tracker.expectSave('Leg delete', () => context.deleteLeg(addedLegIdx));
+
+  await settle(app);
+}
+
 async function testModeToggles() {
   const app = await createBootedApp();
   const { context } = app;
@@ -402,11 +610,19 @@ async function testExportImport() {
   app.document.getElementById('mainTitle').innerText = 'Export Test';
   app.document.getElementById('mainSubtitle').innerText = 'Automated';
   context.updateDayData(0, 0, 'desc', 'Changed for export');
+  context.addDayItem(0, 0, 'activityItems');
+  const activityIdx = state(context).itinerary[0].days[0].activityItems.length - 1;
+  context.updateDayItemText(0, 0, 'activityItems', activityIdx, 'Export checked activity');
+  context.toggleActivityCompleted({ target: { checked: true }, stopPropagation() {} }, 0, 0, activityIdx);
   await context.exportJSON();
   const exported = JSON.parse(decodeDownloadUri(app.document.lastDownload.href));
   assert(app.document.lastDownload.download.endsWith('.json'), 'Export: download should be JSON');
   assert(exported.meta.title === 'Export Test', 'Export: should include current title');
   assert(exported.itinerary[0].days[0].desc === 'Changed for export', 'Export: should include updated itinerary data');
+  assert(
+    exported.itinerary[0].days[0].activityItems.some(item => item.text === 'Export checked activity' && item.done === true),
+    'Export: checked activity should include done=true in JSON'
+  );
 
   app.setImportedFileContent(JSON.stringify(exported));
   context.importJSON({
@@ -561,12 +777,47 @@ async function testFileSaveLoadAndBackup() {
   reload.context.openExistingTripFile();
   assert(reload.document.getElementById('importFile').selected === true || reload.document.lastClickedElement?.id === 'importFile', 'File save/load: openExistingTripFile should click import input in fallback mode');
 
-  sharedLocalStorage.setItem('travelApp_editCount', '9');
-  reload.context.loadBackupTracking();
-  reload.context.trackUserEdit();
-  reload.context.checkBackupReminder();
+  const importedPayload = state(reload.context);
+  reload.context.importJSON({
+    target: {
+      files: [{
+        name: 'readonly-import.json',
+        text: async () => JSON.stringify(importedPayload)
+      }],
+      value: ''
+    }
+  });
   await settle(reload);
-  assert(reload.document.querySelector('#backup-reminder'), 'File save/load: backup reminder should appear after enough edits');
+  assert(reload.context.isJsonWriteWarningActive() === true, 'File save/load: plain JSON import should mark file as not writable');
+  assert(
+    reload.document.getElementById('jsonWriteWarning').innerHTML.includes('JSON file not connected'),
+    'File save/load: read-only JSON warning should be visible'
+  );
+  reload.context.updateDayData(0, 0, 'desc', 'Readonly import local edit');
+  await reload.context.saveData(true);
+  assert(
+    reload.document.getElementById('saveStatus').textContent.includes('JSON file not updated'),
+    'File save/load: disconnected save status should warn JSON was not updated'
+  );
+  await reload.context.exportJSON();
+  await settle(reload);
+  assert(reload.context.isJsonWriteWarningActive() === false, 'File save/load: exporting JSON should clear read-only warning');
+
+  const fileBacked = await createBootedApp({ supportFileSystemAccess: true });
+  fileBacked.setImportedFileContent(JSON.stringify(state(fileBacked.context)));
+  await fileBacked.context.openExistingTripFile();
+  await settle(fileBacked);
+  assert(fileBacked.context.hasActiveFileHandle() === true, 'File save/load: Open File should connect a writable file handle when supported');
+  assert(fileBacked.context.isJsonWriteWarningActive() === false, 'File save/load: writable file import should not show read-only warning');
+  assert(await fileBacked.context.saveData(false) === true, 'File save/load: writable file handle should save to JSON file');
+
+  const backupApp = await createBootedApp({ sharedLocalStorage });
+  sharedLocalStorage.setItem('travelApp_editCount', '9');
+  backupApp.context.loadBackupTracking();
+  backupApp.context.trackUserEdit();
+  backupApp.context.checkBackupReminder();
+  await settle(backupApp);
+  assert(backupApp.document.querySelector('#backup-reminder'), 'File save/load: backup reminder should appear after enough edits');
 }
 
 async function run() {
@@ -575,6 +826,7 @@ async function run() {
   await testCrudSmoke();
   await testDragDropSmoke();
   await testTouchAssignSmoke();
+  await testItineraryEditPersistence();
   await testModeToggles();
   await testCompactView();
   await testExportImport();

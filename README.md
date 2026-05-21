@@ -8,6 +8,7 @@ An offline-first, JSON-driven Progressive Web App for planning complex trips. It
 - Portable trip data stored in a single JSON file.
 - Itinerary planning with city navigation, suggested activities, and day-by-day organization.
 - Transport and accommodation tracking with costs, dates, status, and notes.
+- Booking confirmation intake for pasted text and readable uploaded confirmation files, with review before merge.
 - Budget summaries with consistent currency formatting.
 - Packing checklists grouped by bag and pre-trip task.
 - Map view with trip route and city markers.
@@ -48,6 +49,10 @@ The app keeps active edits in browser storage so it remains useful offline. Wher
 ## AI Builder
 
 Use the AI Builder tab to generate a structured prompt for a new trip. Paste the prompt into an AI assistant, ask it to return a downloadable `.json` file, then open that file in the app. The generated trip should include city `countryCode`, `code`, `lat`, and `lng` values where known so maps, weather, and city navigation work immediately after import.
+
+## Booking Intake
+
+Use Actions -> Import Booking to paste confirmation text or upload a readable `.txt`, `.eml`, or text-based `.pdf` confirmation. The app extracts likely journeys, stays, and dated reservations into a review list before merging selected records into the active trip. Image uploads are accepted as a prompt to paste visible confirmation text because local OCR is not bundled.
 
 ## Tests
 

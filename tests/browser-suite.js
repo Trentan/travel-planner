@@ -217,6 +217,34 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     assert(summaryText, 'Desktop: state should still be queryable after export');
     reporter.add('desktop', 'state access', 'getCurrentAppData is callable');
 
+    await page.evaluate(() => openBookingIntakeDialog());
+    await page.waitForSelector('#booking-intake-modal', { state: 'visible' });
+    await page.locator('#bookingIntakeText').fill(`
+      FlyAway confirmation
+      Booking reference: UI93A1
+      Flight FA204
+      From Testville to Demo City
+      Departure: 20 Jun 2026 08:30
+      Arrival: 20 Jun 2026 10:45
+
+      Hotel: Demo City Rooms
+      Check-in: 20 Jun 2026
+      Check-out: 22 Jun 2026
+      City: Demo City
+    `);
+    await page.getByRole('button', { name: /Extract & Review/i }).click();
+    await page.waitForFunction(() => document.querySelectorAll('.booking-intake-card').length >= 2);
+    await page.getByRole('button', { name: /Merge selected/i }).click();
+    await page.waitForFunction(() => (window.journeys || []).some(j => j.bookingReference === 'UI93A1'));
+    const intakeMerged = await page.evaluate(() => ({
+      journeys: (window.journeys || []).filter(j => j.bookingReference === 'UI93A1').length,
+      stays: (window.stays || []).filter(stay => stay.bookingRef === 'UI93A1').length
+    }));
+    assert(intakeMerged.journeys === 1, 'Desktop: booking intake should merge extracted journey');
+    assert(intakeMerged.stays === 1, 'Desktop: booking intake should merge extracted stay');
+    await page.evaluate(() => closeBookingIntakeDialog());
+    reporter.add('desktop', 'booking intake', 'extracted and merged pasted confirmation');
+
     const downloadPromise = page.waitForEvent('download');
     await page.locator('#desktopActionsMenu > summary').click();
     await humanPause(page, 250);
@@ -277,6 +305,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await page.evaluate(() => toggleMobileMenu());
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
     await humanPause(page, 400);
+    assert(await page.getByRole('button', { name: /Import Booking/i }).count() > 0, 'Mobile: booking intake entry should be available from menu');
     reporter.add('mobile', 'menu sheet', 'mobile menu opened');
 
     await page.getByRole('button', { name: /Lock: Read Only/i }).click();

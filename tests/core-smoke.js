@@ -3,6 +3,7 @@ const path = require('path');
 const {
   assert,
   createAiContext,
+  createVmContext,
   extractBetween,
   loadSource,
   runScriptInContext
@@ -13,6 +14,7 @@ function loadDateHelpers() {
   const transportJs = loadSource(path.join('js', 'transport.js'));
   const utilsJs = loadSource(path.join('js', 'utils.js'));
   const aiJs = loadSource(path.join('js', 'ai.js'));
+  const bookingIntakeJs = loadSource(path.join('js', 'booking-intake.js'));
 
   const dateHelpersBlock = extractBetween(
     dataJs,
@@ -70,16 +72,29 @@ return {
   const aiHarness = createAiContext();
   runScriptInContext(aiJs, aiHarness.context, 'js/ai.js');
 
+  const bookingContext = createVmContext({
+    window: {},
+    document: { getElementById: () => null, querySelectorAll: () => [] },
+    appData: [],
+    journeys: [],
+    stays: [],
+    citiesData: [],
+    alert: () => {}
+  });
+  bookingContext.window = bookingContext;
+  runScriptInContext(bookingIntakeJs, bookingContext, 'js/booking-intake.js');
+
   return {
     dateHelpers,
     checklistHelpers,
     transportHelpers,
-    aiHarness
+    aiHarness,
+    bookingContext
   };
 }
 
 async function run() {
-  const { dateHelpers, checklistHelpers, transportHelpers, aiHarness } = loadDateHelpers();
+  const { dateHelpers, checklistHelpers, transportHelpers, aiHarness, bookingContext } = loadDateHelpers();
   const { context, document, alerts, clipboardWrites, execCommands } = aiHarness;
 
   assert(dateHelpers.normalizeTripDateValue('7 Jun') === '2026-06-07', 'Date normalization should convert short dates to ISO');
@@ -138,6 +153,22 @@ async function run() {
   assert(clipboardWrites[0] === promptText, 'copyPrompt should write the prompt to the clipboard');
   assert(alerts.length >= 1, 'copyPrompt should notify the user');
   assert(execCommands.length === 0, 'Clipboard API should avoid the execCommand fallback when available');
+
+  const bookingItems = bookingContext.parseBookingConfirmationText(`
+    EVA Air booking confirmation
+    Booking reference: ABC123
+    Flight BR316
+    From Brisbane to Vienna
+    Departure: 7 Jun 2026 22:15
+    Arrival: 8 Jun 2026 14:40
+
+    Hotel: Vienna Central Hotel
+    Check-in: 8 Jun 2026
+    Check-out: 12 Jun 2026
+    City: Vienna
+  `);
+  assert(bookingItems.some(item => item.kind === 'journey' && item.bookingReference === 'ABC123'), 'Booking intake should extract transport with booking ref');
+  assert(bookingItems.some(item => item.kind === 'stay' && item.propertyName.includes('Vienna')), 'Booking intake should extract stay details');
 
   console.log('Core smoke checks passed');
 }
