@@ -76,10 +76,27 @@ async function run() {
     await page.waitForSelector('#activity-assign-modal', { state: 'detached' });
     const assigned = await page.evaluate(title => {
       const item = appData[0].days[0].activityItems.find(candidate => String(candidate.text || '').includes(title));
-      return item ? { startTime: item.startTime, endTime: item.endTime } : null;
+      const pool = appData[0].suggestedActivities.find(candidate => candidate.title === title);
+      return item ? {
+        startDate: item.startDate,
+        startTime: item.startTime,
+        endDate: item.endDate,
+        endTime: item.endTime,
+        poolStartDate: pool?.startDate,
+        poolEndDate: pool?.endDate,
+        poolAssignedDate: pool?.assignedDate
+      } : null;
     }, targetActivity);
 
-    assert.deepStrictEqual(assigned, { startTime: '09:45', endTime: '11:45' });
+    assert.deepStrictEqual(assigned, {
+      startDate: '2026-06-08',
+      startTime: '09:45',
+      endDate: '2026-06-08',
+      endTime: '11:45',
+      poolStartDate: '2026-06-08',
+      poolEndDate: '2026-06-08',
+      poolAssignedDate: '2026-06-08'
+    });
 
     const scheduledHeading = page.locator('.timeline-section-label', { hasText: 'Scheduled' });
     assert((await scheduledHeading.count()) > 0, 'Timeline should label scheduled items');
@@ -119,16 +136,21 @@ async function run() {
     const visibleActivityScheduleButtons = page.locator('.day-card.open .daily-timeline-time.is-clickable');
     assert((await visibleActivityScheduleButtons.count()) > 0, 'An open day should expose visible activity schedule buttons');
     await visibleActivityScheduleButtons.nth(0).click();
-    await page.waitForSelector('#day-item-schedule-modal', { state: 'visible' });
+    await page.waitForSelector('#activity-assign-modal', { state: 'visible' });
     assert.strictEqual(
-      await page.locator('#day-item-schedule-modal input[name="dayItemScheduleMode"][value="scheduled"]').count(),
+      await page.locator('#activity-assign-modal input[name="activityAssignScheduleMode"][value="scheduled"]').count(),
       1,
-      'Schedule button should open the focused schedule dialog'
+      'Timeline time badge should open the unified activity assignment/schedule dialog'
     );
-    await page.locator('#day-item-schedule-modal input[name="dayItemScheduleMode"][value="scheduled"]').check();
-    await page.locator('#dayItemScheduleStart').fill('10:15');
-    await page.locator('#saveDayItemScheduleBtn').click();
-    await page.waitForSelector('#day-item-schedule-modal', { state: 'detached' });
+    assert.strictEqual(
+      await page.locator('#activity-assign-modal input[name="activityAssignScheduleMode"][value="suggested"]').count(),
+      1,
+      'Unified schedule dialog should expose Suggested mode'
+    );
+    await page.locator('#activity-assign-modal input[name="activityAssignScheduleMode"][value="scheduled"]').check();
+    await page.locator('#activityAssignStartTime').fill('10:15');
+    await page.locator('#activity-assign-modal .activity-assign-day.is-current').click();
+    await page.waitForSelector('#activity-assign-modal', { state: 'detached' });
     await page.waitForFunction(() => window.itineraryDayViewMode === 'timeline');
     assert.strictEqual(
       await page.locator('#itineraryTimelineModeBtn').getAttribute('aria-pressed'),
@@ -146,6 +168,43 @@ async function run() {
       1,
       'Moved timeline item should receive focus styling after the rebuild'
     );
+    const exportedTimelineFields = await page.evaluate(() => {
+      const payload = buildExportPayload();
+      const day = payload.itinerary[0].days[0];
+      const activity = day.activityItems.find(item => item.startTime === '10:15');
+      const journey = payload.journeys[0];
+      const stay = payload.stays[0];
+      return {
+        activity: activity ? {
+          startDate: activity.startDate,
+          startTime: activity.startTime,
+          endDate: activity.endDate,
+          endTime: activity.endTime
+        } : null,
+        journey: journey ? {
+          startDate: journey.startDate,
+          startTime: journey.startTime,
+          endDate: journey.endDate,
+          endTime: journey.endTime
+        } : null,
+        stay: stay ? {
+          startDate: stay.startDate,
+          startTime: stay.startTime,
+          endDate: stay.endDate,
+          endTime: stay.endTime
+        } : null
+      };
+    });
+    assert.deepStrictEqual(exportedTimelineFields.activity, {
+      startDate: '2026-06-08',
+      startTime: '10:15',
+      endDate: '2026-06-08',
+      endTime: '12:15'
+    });
+    assert(exportedTimelineFields.journey?.startDate, 'Exported journeys should include plotting startDate');
+    assert('startTime' in exportedTimelineFields.journey, 'Exported journeys should include plotting startTime');
+    assert(exportedTimelineFields.stay?.startDate, 'Exported stays should include plotting startDate');
+    assert('startTime' in exportedTimelineFields.stay, 'Exported stays should include plotting startTime');
 
     const deleteButtons = page.locator('.day-card.open .daily-timeline-item-activity .daily-timeline-actions .del-btn');
     assert((await deleteButtons.count()) > 0, 'An open timeline activity should expose a delete button');

@@ -2414,6 +2414,10 @@ async function saveData(showTick = true) {
     if (t && t.innerText.trim()) titleData.title = t.innerText;
     if (s && s.innerText.trim()) titleData.subtitle = s.innerText;
 
+    normalizeTripLegsData(appData);
+    normalizeTripJourneysData(journeys);
+    normalizeTripStaysData(stays);
+
     captureHistoryBeforeSave();
 
     const useIndexedDB = await shouldUseIndexedDB();
@@ -2526,6 +2530,21 @@ function normalizeTripLegsData(legs) {
     if (!Array.isArray(leg.days)) leg.days = [];
     (leg.days || []).forEach(day => {
       day.date = normalizeTripDateValue(day.date);
+      (day.activityItems || []).forEach(item => {
+        if (!item || typeof item !== 'object') return;
+        item.startDate = normalizeTripDateValue(item.startDate || day.date);
+        item.endDate = normalizeTripDateValue(item.endDate || item.startDate || day.date);
+        if (item.startTime === undefined) item.startTime = '';
+        if (item.endTime === undefined) item.endTime = '';
+      });
+    });
+    (leg.suggestedActivities || []).forEach(activity => {
+      if (!activity || typeof activity !== 'object') return;
+      activity.assignedDate = normalizeTripDateValue(activity.assignedDate || activity.startDate || '');
+      activity.startDate = normalizeTripDateValue(activity.startDate || activity.assignedDate || '');
+      activity.endDate = normalizeTripDateValue(activity.endDate || activity.startDate || '');
+      if (activity.startTime === undefined) activity.startTime = '';
+      if (activity.endTime === undefined) activity.endTime = '';
     });
   });
   return legs;
@@ -2534,9 +2553,15 @@ function normalizeTripLegsData(legs) {
 function normalizeTripJourneysData(items) {
   if (!Array.isArray(items)) return [];
   items.forEach(item => {
-    item.dayDate = normalizeTripDateValue(item.dayDate);
-    item.departureDate = normalizeTripDateValue(item.departureDate);
-    item.arrivalDate = normalizeTripDateValue(item.arrivalDate);
+    item.dayDate = normalizeTripDateValue(item.dayDate || item.startDate);
+    item.departureDate = normalizeTripDateValue(item.departureDate || item.startDate || item.dayDate);
+    item.arrivalDate = normalizeTripDateValue(item.arrivalDate || item.endDate || item.departureDate || item.dayDate);
+    item.departureTime = item.departureTime || item.startTime || '';
+    item.arrivalTime = item.arrivalTime || item.endTime || '';
+    item.startDate = item.departureDate || item.dayDate || '';
+    item.endDate = item.arrivalDate || item.startDate || '';
+    item.startTime = item.departureTime || '';
+    item.endTime = item.arrivalTime || '';
   });
   return items;
 }
@@ -2544,8 +2569,14 @@ function normalizeTripJourneysData(items) {
 function normalizeTripStaysData(items) {
   if (!Array.isArray(items)) return [];
   items.forEach(item => {
-    item.checkIn = normalizeTripDateValue(item.checkIn);
-    item.checkOut = normalizeTripDateValue(item.checkOut);
+    item.checkIn = normalizeTripDateValue(item.checkIn || item.startDate);
+    item.checkOut = normalizeTripDateValue(item.checkOut || item.endDate || item.checkIn);
+    item.checkInTime = item.checkInTime || item.startTime || '';
+    item.checkOutTime = item.checkOutTime || item.endTime || '';
+    item.startDate = item.checkIn || '';
+    item.endDate = item.checkOut || item.startDate || '';
+    item.startTime = item.checkInTime || '';
+    item.endTime = item.checkOutTime || '';
   });
   return items;
 }

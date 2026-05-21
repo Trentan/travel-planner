@@ -40,6 +40,39 @@ function syncAssignedSuggestedActivityField(legIdx, dayIdx, itemText, field, val
   activity[field] = value;
 }
 
+function getNormalizedDayDate(day) {
+  if (!day) return '';
+  return typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(day.date || '') : (day.date || '');
+}
+
+function applyActivityScheduleFields(target, day, schedule = {}) {
+  if (!target) return;
+  const dayDate = getNormalizedDayDate(day);
+  const startTime = String(schedule.startTime || '').trim();
+  const endTime = String(schedule.endTime || '').trim();
+  target.startDate = schedule.startDate || dayDate;
+  target.startTime = startTime;
+  target.endDate = schedule.endDate || target.startDate || dayDate;
+  target.endTime = endTime;
+}
+
+function clearActivityScheduleFields(target, day) {
+  if (!target) return;
+  const dayDate = getNormalizedDayDate(day);
+  target.startDate = dayDate;
+  target.startTime = '';
+  target.endDate = dayDate;
+  target.endTime = '';
+}
+
+function syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, itemText, schedule = {}) {
+  const activity = findAssignedSuggestedActivity(legIdx, dayIdx, itemText);
+  if (!activity) return;
+  activity.assignedDayIdx = dayIdx;
+  activity.assignedDate = schedule.startDate || getNormalizedDayDate(appData[legIdx]?.days?.[dayIdx]);
+  applyActivityScheduleFields(activity, appData[legIdx]?.days?.[dayIdx], schedule);
+}
+
 function isPlaceholderActivityItem(item) {
   const text = String(item?.text || '').trim();
   return /^[-—]$/.test(text) || text === 'Explore local area' || text === 'Add item...' || text === 'New item...';
@@ -225,30 +258,40 @@ function _openActivityModal(legIdx, activityIdx = null) {
       target.title = fullTitle;
       target.category = category;
       target.estTime = estTime;
-      target.startTime = startTime;
-      target.endTime = endTime;
       target.estCost = estCost;
 
       if (target.assignedDayIdx !== null && target.assignedDayIdx !== undefined) {
         const day = appData[legIdx]?.days?.[target.assignedDayIdx];
+        applyActivityScheduleFields(target, day, { startTime, endTime });
+        target.assignedDate = target.startDate || getNormalizedDayDate(day);
         if (day?.activityItems?.length) {
           day.activityItems.forEach(item => {
             if (previousMatchTexts.includes(String(item.text || '').trim())) {
               item.text = getSuggestedActivityDayText(target);
-              item.startTime = startTime;
-              item.endTime = endTime;
+              item.time = estTime;
+              item.cost = estCost;
+              applyActivityScheduleFields(item, day, target);
             }
           });
         }
+      } else {
+        target.startDate = '';
+        target.startTime = startTime;
+        target.endDate = '';
+        target.endTime = endTime;
+        target.assignedDate = '';
       }
     } else {
       appData[legIdx].suggestedActivities.push({
         title: fullTitle,
         category: category,
         estTime: estTime,
+        startDate: '',
         startTime: startTime,
+        endDate: '',
         endTime: endTime,
         estCost: estCost,
+        assignedDate: '',
         assignedDayIdx: null
       });
     }
@@ -343,7 +386,19 @@ function addSight(legIdx) { appData[legIdx].suggestedSights.push({ title: "New s
 function addLegTip(legIdx) { appData[legIdx].legTips.push("New tip..."); saveData(); buildItinerary(); }
 
 function addDayItem(legIdx, dayIdx, category) {
-  if (category === 'activityItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", time: "1 hr", startTime: "", endTime: "", done: false }); }
+  if (category === 'activityItems') {
+    const day = appData[legIdx].days[dayIdx];
+    appData[legIdx].days[dayIdx][category].push({
+      text: "New item...",
+      cost: "0",
+      time: "1 hr",
+      startDate: getNormalizedDayDate(day),
+      startTime: "",
+      endDate: getNormalizedDayDate(day),
+      endTime: "",
+      done: false
+    });
+  }
   else if (category === 'transportItems' || category === 'accomItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", status: "pending", bookingRef: "", done: false }); }
   else { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", done: false }); }
   saveData();
@@ -463,6 +518,7 @@ function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
 function updateDayItemScheduleTime(legIdx, dayIdx, category, itemIdx, field, time) {
   const item = appData[legIdx].days[dayIdx][category][itemIdx];
   if (!item || !['startTime', 'endTime'].includes(field)) return;
+  const day = appData[legIdx].days[dayIdx];
   const previousText = item.text;
   item[field] = time;
   if (category === 'activityItems' && field === 'startTime') {
@@ -470,9 +526,13 @@ function updateDayItemScheduleTime(legIdx, dayIdx, category, itemIdx, field, tim
     item.endTime = time ? (item.endTime || addMinutesToTimeValue(time, durationMinutes)) : '';
   }
   if (category === 'activityItems') {
-    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, field, time);
-    if (field === 'startTime' && !time) syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'endTime', '');
-    if (field === 'startTime' && time && item.endTime) syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'endTime', item.endTime);
+    if (item.startTime || item.endTime) {
+      applyActivityScheduleFields(item, day, { startTime: item.startTime || '', endTime: item.endTime || '' });
+      syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, previousText, item);
+    } else {
+      clearActivityScheduleFields(item, day);
+      syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, previousText, item);
+    }
   }
   saveData();
   if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: previousText });
@@ -484,14 +544,14 @@ function setDayItemScheduleMode(legIdx, dayIdx, category, itemIdx, mode) {
   if (!item || category !== 'activityItems') return;
   const previousText = item.text;
   if (mode === 'anytime') {
-    item.startTime = '';
-    item.endTime = '';
+    clearActivityScheduleFields(item, appData[legIdx].days[dayIdx]);
   } else if (mode === 'scheduled' && !item.startTime) {
-    item.startTime = '09:00';
-    item.endTime = addMinutesToTimeValue(item.startTime, parseActivityDurationMinutes(item.time || '')) || '';
+    applyActivityScheduleFields(item, appData[legIdx].days[dayIdx], {
+      startTime: '09:00',
+      endTime: addMinutesToTimeValue('09:00', parseActivityDurationMinutes(item.time || '')) || ''
+    });
   }
-  syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'startTime', item.startTime || '');
-  syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'endTime', item.endTime || '');
+  syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, previousText, item);
   saveData();
   if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: previousText });
   else buildItinerary();
@@ -513,132 +573,177 @@ function openDayItemScheduleDialog(legIdx, dayIdx, category, itemIdx) {
   const item = day?.[category]?.[itemIdx];
   if (!leg || !day || !item || category !== 'activityItems') return;
 
-  const existingModal = document.getElementById('day-item-schedule-modal');
+  const existingModal = document.getElementById('activity-assign-modal');
   if (existingModal) existingModal.remove();
 
-  const isScheduled = !!String(item.startTime || item.endTime || '').trim();
+  const html = typeof escapeHtmlText === 'function' ? escapeHtmlText : escapeScheduleDialogText;
+  const activityLike = {
+    title: item.text || 'Activity',
+    category: 'Activity',
+    estTime: item.time || '1 hr',
+    estCost: item.cost || '0'
+  };
+  const preferredStart = item.startTime || '';
+  const preferredEnd = item.endTime || '';
+  const preferredMode = preferredStart || preferredEnd ? 'scheduled' : 'suggested';
+  const daySuggestions = leg.days.map(candidateDay => suggestActivityTimeForDay(leg, candidateDay, activityLike));
+  const dayButtons = (leg.days || []).map((candidateDay, candidateIdx) => {
+    const isCurrent = candidateIdx === dayIdx;
+    const suggestion = daySuggestions[candidateIdx];
+    const plannedCount = Array.isArray(candidateDay.activityItems)
+      ? candidateDay.activityItems.filter(candidate => !isPlaceholderActivityItem(candidate)).length
+      : 0;
+    const dateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(candidateDay.date) : candidateDay.date;
+    const dayLabel = `Day ${candidateDay.day || candidateIdx + 1} ${dateLabel || ''}`;
+    const routeLabel = candidateDay.from === candidateDay.to ? candidateDay.to : `${candidateDay.from || ''} -> ${candidateDay.to || ''}`;
+    const desc = String(candidateDay.desc || '').trim();
+    return `
+      <button type="button" class="activity-assign-day ${isCurrent ? 'is-current' : ''}" data-day-index="${candidateIdx}" data-suggest-start="${html(suggestion.startTime)}" data-suggest-end="${html(suggestion.endTime)}" data-suggest-available="${suggestion.available ? 'true' : 'false'}" aria-pressed="${isCurrent ? 'true' : 'false'}">
+        <span class="activity-assign-day-main">
+          <span class="activity-assign-day-date">${html(dayLabel)}</span>
+          <span class="activity-assign-day-route">${html(routeLabel)}</span>
+        </span>
+        ${desc ? `<span class="activity-assign-day-desc">${html(desc)}</span>` : ''}
+        <span class="activity-assign-day-meta">${isCurrent ? 'Current day' : `${plannedCount} planned activit${plannedCount === 1 ? 'y' : 'ies'}`}</span>
+        <span class="activity-assign-day-suggestion ${suggestion.available ? '' : 'is-empty'}">${suggestion.available ? `Suggested ${html(suggestion.label)} · ${html(suggestion.reason)}` : html(suggestion.reason)}</span>
+      </button>
+    `;
+  }).join('');
+
   const modal = document.createElement('div');
-  modal.id = 'day-item-schedule-modal';
+  modal.id = 'activity-assign-modal';
   modal.className = 'modal-overlay';
   modal.style.display = 'flex';
   modal.innerHTML = `
-    <div class="modal-content modal-md">
+    <div class="modal-content activity-assign-modal">
       <div class="modal-header">
-        <h2>Schedule Activity</h2>
-        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+        <h2>Assign / Schedule Activity</h2>
+        <button class="modal-close" type="button" id="activityAssignCloseBtn">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="ai-form-group">
-          <label>Activity</label>
-          <div class="readonly-field">${escapeScheduleDialogText(item.text || 'Activity')}</div>
-        </div>
-        <div class="ai-form-group">
-          <label>Day</label>
-          <select id="dayItemScheduleDay" class="form-control form-control--compact">
-            ${(leg.days || []).map((candidateDay, candidateIdx) => {
-              const dateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(candidateDay.date) : candidateDay.date;
-              const label = `${candidateDay.day || `Day ${candidateIdx + 1}`} ${dateLabel || ''} - ${candidateDay.from || ''} to ${candidateDay.to || ''}`;
-              return `<option value="${candidateIdx}" ${candidateIdx === dayIdx ? 'selected' : ''}>${escapeScheduleDialogText(label)}</option>`;
-            }).join('')}
-          </select>
-        </div>
-        <div class="activity-assign-schedule-options">
-          <label class="activity-assign-schedule-option">
-            <input type="radio" name="dayItemScheduleMode" value="anytime" ${isScheduled ? '' : 'checked'}>
-            <span><strong>Anytime</strong><small>No fixed time. Keeps this activity in the Anytime section.</small></span>
-          </label>
-          <label class="activity-assign-schedule-option">
-            <input type="radio" name="dayItemScheduleMode" value="scheduled" ${isScheduled ? 'checked' : ''}>
-            <span><strong>Scheduled</strong><small>Set a start and optional end time for the selected day.</small></span>
-          </label>
-        </div>
-        <div class="modal-form-row modal-form-row--split">
-          <div class="ai-form-group">
-            <label>Start Time</label>
-            <input type="time" id="dayItemScheduleStart" class="form-control form-control--compact" value="${escapeScheduleDialogText(item.startTime || '')}">
+        <div class="activity-assign-layout">
+          <div class="activity-assign-summary">
+            <div class="activity-assign-kicker">Activity</div>
+            <div class="activity-assign-title">${html(item.text || 'Activity')}</div>
+            <div class="activity-assign-meta">${html(item.time || '1 hr')} &middot; $${html(item.cost || '0')}</div>
+            <div class="activity-assign-current">Current day: ${html(day.day || `Day ${dayIdx + 1}`)} ${html(typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date)}</div>
+            <div class="activity-assign-schedule">
+              <div class="activity-assign-schedule-title">Schedule preference</div>
+              <div class="activity-assign-mode">
+                <label>
+                  <input type="radio" name="activityAssignScheduleMode" value="anytime" ${preferredMode === 'anytime' ? 'checked' : ''}>
+                  <span>Anytime</span>
+                </label>
+                <label>
+                  <input type="radio" name="activityAssignScheduleMode" value="suggested" ${preferredMode === 'suggested' ? 'checked' : ''}>
+                  <span>Suggested</span>
+                </label>
+                <label>
+                  <input type="radio" name="activityAssignScheduleMode" value="scheduled" ${preferredMode === 'scheduled' ? 'checked' : ''}>
+                  <span>Fixed time</span>
+                </label>
+              </div>
+              <div class="activity-assign-time-row">
+                <label>Start <input type="time" id="activityAssignStartTime" value="${html(preferredStart)}"></label>
+                <label>End <input type="time" id="activityAssignEndTime" value="${html(preferredEnd)}"></label>
+              </div>
+              <div class="activity-assign-schedule-hint">Suggested uses each day's best open slot. Fixed time calculates the end from duration when left blank.</div>
+            </div>
           </div>
-          <div class="ai-form-group">
-            <label>End Time</label>
-            <input type="time" id="dayItemScheduleEnd" class="form-control form-control--compact" value="${escapeScheduleDialogText(item.endTime || '')}">
+          <div class="activity-assign-days" aria-label="Choose a day">
+            ${dayButtons}
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="action-btn" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
-        <button class="action-btn action-btn-secondary" id="saveDayItemScheduleBtn">Save Schedule</button>
+        <button class="action-btn" type="button" id="activityAssignCancelBtn">Cancel</button>
       </div>
     </div>
   `;
 
   document.body.appendChild(modal);
-  const modeInputs = Array.from(modal.querySelectorAll('input[name="dayItemScheduleMode"]'));
-  const startEl = modal.querySelector('#dayItemScheduleStart');
-  const endEl = modal.querySelector('#dayItemScheduleEnd');
-  const dayEl = modal.querySelector('#dayItemScheduleDay');
-
-  function getSelectedMode() {
-    return modeInputs.find(input => input.checked)?.value || 'anytime';
-  }
-
-  function syncTimeDisabledState() {
-    const disabled = getSelectedMode() !== 'scheduled';
-    [startEl, endEl].forEach(input => {
-      if (!input) return;
-      input.disabled = disabled;
-    });
-  }
-
-  function setScheduledMode() {
+  const closeModal = () => modal.remove();
+  document.getElementById('activityAssignCloseBtn').onclick = closeModal;
+  document.getElementById('activityAssignCancelBtn').onclick = closeModal;
+  const modeInputs = Array.from(modal.querySelectorAll('input[name="activityAssignScheduleMode"]'));
+  const startInput = modal.querySelector('#activityAssignStartTime');
+  const endInput = modal.querySelector('#activityAssignEndTime');
+  const getScheduleForButton = button => {
+    const selectedMode = modeInputs.find(input => input.checked)?.value || 'suggested';
+    const scheduleMode = ['scheduled', 'suggested'].includes(selectedMode) ? selectedMode : 'anytime';
+    const targetDayIdx = Number(button.getAttribute('data-day-index'));
+    const targetDay = leg.days?.[targetDayIdx] || day;
+    if (scheduleMode === 'anytime') return {
+      startDate: getNormalizedDayDate(targetDay),
+      startTime: '',
+      endDate: getNormalizedDayDate(targetDay),
+      endTime: ''
+    };
+    const startTime = scheduleMode === 'scheduled'
+      ? (startInput?.value || '09:00')
+      : (button.getAttribute('data-suggest-start') || '');
+    const endTime = scheduleMode === 'scheduled'
+      ? (endInput?.value || addMinutesToTimeValue(startTime, parseActivityDurationMinutes(item.time || '')) || '')
+      : (button.getAttribute('data-suggest-end') || '');
+    return {
+      startDate: getNormalizedDayDate(targetDay),
+      startTime,
+      endDate: getNormalizedDayDate(targetDay),
+      endTime: startTime ? endTime : ''
+    };
+  };
+  const syncScheduleControls = () => {
+    const scheduled = modeInputs.find(input => input.checked)?.value === 'scheduled';
+    if (startInput) startInput.disabled = !scheduled;
+    if (endInput) endInput.disabled = !scheduled;
+  };
+  modeInputs.forEach(input => input.addEventListener('change', syncScheduleControls));
+  startInput?.addEventListener('input', () => {
     const scheduledInput = modeInputs.find(input => input.value === 'scheduled');
     if (scheduledInput) scheduledInput.checked = true;
-    syncTimeDisabledState();
-  }
-
-  modeInputs.forEach(input => input.addEventListener('change', syncTimeDisabledState));
-  [startEl, endEl].forEach(input => input?.addEventListener('input', setScheduledMode));
-  startEl?.addEventListener('change', () => {
-    if (startEl.value && !endEl.value) {
-      endEl.value = addMinutesToTimeValue(startEl.value, parseActivityDurationMinutes(item.time || '')) || '';
+    syncScheduleControls();
+    if (startInput.value && endInput) {
+      endInput.value = addMinutesToTimeValue(startInput.value, parseActivityDurationMinutes(item.time || '')) || '';
     }
   });
-  syncTimeDisabledState();
-  setTimeout(() => (isScheduled ? startEl : dayEl)?.focus(), 80);
+  syncScheduleControls();
+  modal.addEventListener('click', event => {
+    if (event.target === modal) closeModal();
+  });
 
-  modal.querySelector('#saveDayItemScheduleBtn').onclick = event => {
-    event.stopPropagation();
-    const previousText = item.text;
-    const targetDayIdx = Number(dayEl?.value ?? dayIdx);
-    const targetDay = leg.days?.[targetDayIdx] || day;
-    const mode = getSelectedMode();
-    const startTime = mode === 'scheduled' ? (startEl?.value || '09:00') : '';
-    const endTime = mode === 'scheduled' ? (endEl?.value || addMinutesToTimeValue(startTime, parseActivityDurationMinutes(item.time || '')) || '') : '';
+  const firstButton = modal.querySelector('[data-day-index]');
+  if (firstButton) setTimeout(() => firstButton.focus({ preventScroll: true }), 50);
 
-    const movedItem = { ...item, startTime, endTime };
+  modal.querySelectorAll('[data-day-index]').forEach(button => {
+    button.addEventListener('click', () => {
+      const previousText = item.text;
+      const targetDayIdx = Number(button.getAttribute('data-day-index'));
+      if (!Number.isFinite(targetDayIdx)) return;
+      const targetDay = leg.days?.[targetDayIdx] || day;
+      const schedule = getScheduleForButton(button);
+      const movedItem = { ...item };
+      applyActivityScheduleFields(movedItem, targetDay, schedule);
     if (targetDayIdx !== dayIdx) {
       day[category].splice(itemIdx, 1);
       if (!Array.isArray(targetDay[category])) targetDay[category] = [];
       targetDay[category].push(movedItem);
     } else {
-      item.startTime = startTime;
-      item.endTime = endTime;
+      applyActivityScheduleFields(item, targetDay, schedule);
     }
 
     const poolActivity = findAssignedSuggestedActivity(legIdx, dayIdx, previousText)
       || findAssignedSuggestedActivity(legIdx, targetDayIdx, previousText);
     if (poolActivity) {
       poolActivity.assignedDayIdx = targetDayIdx;
-      poolActivity.startTime = startTime;
-      poolActivity.endTime = endTime;
+      poolActivity.assignedDate = schedule.startDate;
+      applyActivityScheduleFields(poolActivity, targetDay, schedule);
     }
 
-    modal.remove();
+    closeModal();
     saveData();
     if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: previousText });
     else buildItinerary();
-  };
-
-  modal.addEventListener('click', event => {
-    if (event.target === modal) modal.remove();
+    });
   });
 }
 
@@ -949,25 +1054,28 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
   const assignedText = getSuggestedActivityDayText(activity);
   const matchTexts = getSuggestedActivityMatchTexts(activity);
   const schedule = getActivityScheduleFromOptions(activity, options);
+  const datedSchedule = {
+    ...schedule,
+    startDate: getNormalizedDayDate(targetDay),
+    endDate: getNormalizedDayDate(targetDay)
+  };
   let targetItem = targetDay.activityItems.find(item => matchTexts.includes(String(item.text || '').trim()));
   if (!targetItem) {
     targetItem = {
       text: assignedText,
       cost: activity.estCost || '0',
       time: activity.estTime || '1 hr',
-      startTime: schedule.startTime,
-      endTime: schedule.endTime,
       done: false
     };
+    applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
     targetDay.activityItems.push(targetItem);
   } else {
-    targetItem.startTime = schedule.startTime;
-    targetItem.endTime = schedule.endTime;
+    applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
   }
 
   activity.assignedDayIdx = targetDayIdx;
-  activity.startTime = schedule.startTime;
-  activity.endTime = schedule.endTime;
+  activity.assignedDate = datedSchedule.startDate;
+  applyActivityScheduleFields(activity, targetDay, datedSchedule);
   return true;
 }
 
@@ -990,6 +1098,11 @@ function clearAssignedSuggestedActivityFromDay(sourceLegIdx, activityIdx) {
   }
 
   activity.assignedDayIdx = null;
+  activity.assignedDate = '';
+  activity.startDate = '';
+  activity.startTime = '';
+  activity.endDate = '';
+  activity.endTime = '';
   return true;
 }
 
@@ -1236,7 +1349,7 @@ function openActivityAssignModal(legIdx, activityIdx) {
       const scheduledInput = modeInputs.find(input => input.value === 'scheduled');
       if (scheduledInput) scheduledInput.checked = true;
       syncScheduleControls();
-      if (startInput.value && endInput && !endInput.value) {
+      if (startInput.value && endInput) {
         endInput.value = addMinutesToTimeValue(startInput.value, parseActivityDurationMinutes(activity.estTime || '')) || '';
       }
     });
