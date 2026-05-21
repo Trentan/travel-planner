@@ -777,12 +777,47 @@ async function testFileSaveLoadAndBackup() {
   reload.context.openExistingTripFile();
   assert(reload.document.getElementById('importFile').selected === true || reload.document.lastClickedElement?.id === 'importFile', 'File save/load: openExistingTripFile should click import input in fallback mode');
 
-  sharedLocalStorage.setItem('travelApp_editCount', '9');
-  reload.context.loadBackupTracking();
-  reload.context.trackUserEdit();
-  reload.context.checkBackupReminder();
+  const importedPayload = state(reload.context);
+  reload.context.importJSON({
+    target: {
+      files: [{
+        name: 'readonly-import.json',
+        text: async () => JSON.stringify(importedPayload)
+      }],
+      value: ''
+    }
+  });
   await settle(reload);
-  assert(reload.document.querySelector('#backup-reminder'), 'File save/load: backup reminder should appear after enough edits');
+  assert(reload.context.isJsonWriteWarningActive() === true, 'File save/load: plain JSON import should mark file as not writable');
+  assert(
+    reload.document.getElementById('jsonWriteWarning').innerHTML.includes('JSON file not connected'),
+    'File save/load: read-only JSON warning should be visible'
+  );
+  reload.context.updateDayData(0, 0, 'desc', 'Readonly import local edit');
+  await reload.context.saveData(true);
+  assert(
+    reload.document.getElementById('saveStatus').textContent.includes('JSON file not updated'),
+    'File save/load: disconnected save status should warn JSON was not updated'
+  );
+  await reload.context.exportJSON();
+  await settle(reload);
+  assert(reload.context.isJsonWriteWarningActive() === false, 'File save/load: exporting JSON should clear read-only warning');
+
+  const fileBacked = await createBootedApp({ supportFileSystemAccess: true });
+  fileBacked.setImportedFileContent(JSON.stringify(state(fileBacked.context)));
+  await fileBacked.context.openExistingTripFile();
+  await settle(fileBacked);
+  assert(fileBacked.context.hasActiveFileHandle() === true, 'File save/load: Open File should connect a writable file handle when supported');
+  assert(fileBacked.context.isJsonWriteWarningActive() === false, 'File save/load: writable file import should not show read-only warning');
+  assert(await fileBacked.context.saveData(false) === true, 'File save/load: writable file handle should save to JSON file');
+
+  const backupApp = await createBootedApp({ sharedLocalStorage });
+  sharedLocalStorage.setItem('travelApp_editCount', '9');
+  backupApp.context.loadBackupTracking();
+  backupApp.context.trackUserEdit();
+  backupApp.context.checkBackupReminder();
+  await settle(backupApp);
+  assert(backupApp.document.querySelector('#backup-reminder'), 'File save/load: backup reminder should appear after enough edits');
 }
 
 async function run() {

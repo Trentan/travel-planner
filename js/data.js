@@ -416,6 +416,7 @@ let activeFileHandle = null;
 let activeFileHandleName = null;
 let pendingFileHandle = null;
 let fileWriteFailed = false;
+let importedJsonWithoutWriteAccess = localStorage.getItem('travelApp_json_write_warning') === 'true';
 const ACTIVE_FILE_HANDLE_DB_KEY = 'activeFileHandle';
 
 // Journeys data - make global so all modules can access
@@ -443,6 +444,63 @@ function hasFileWriteFailed() {
 
 function isSavingToFile() {
   return hasActiveFileHandle() || (!!localStorage.getItem('travelApp_file_handle_name') && !fileWriteFailed);
+}
+
+function isJsonWriteWarningActive() {
+  return importedJsonWithoutWriteAccess && !isSavingToFile();
+}
+
+function getJsonWriteWarningMessage() {
+  return 'JSON file not connected. Edits are saved in this browser only until you Save As or Export JSON.';
+}
+
+function ensureJsonWriteWarningElement() {
+  let warning = document.getElementById('jsonWriteWarning');
+  if (warning) return warning;
+
+  warning = document.createElement('div');
+  warning.id = 'jsonWriteWarning';
+  warning.className = 'json-write-warning';
+  warning.hidden = true;
+  const menuBar = document.querySelector('.app-menu-bar');
+  if (menuBar && menuBar.parentNode) {
+    menuBar.parentNode.insertBefore(warning, menuBar.nextSibling);
+  } else if (document.body) {
+    document.body.insertBefore(warning, document.body.firstChild);
+  }
+  return warning;
+}
+
+function syncJsonWriteWarning() {
+  const warning = ensureJsonWriteWarningElement();
+  const shouldShow = isJsonWriteWarningActive();
+  warning.hidden = !shouldShow;
+  if (!shouldShow) {
+    warning.innerHTML = '';
+    return;
+  }
+
+  const connectAction = isFSASupported()
+    ? '<button type="button" onclick="openTripFile()">Save As</button>'
+    : '';
+  warning.innerHTML = `
+    <span class="json-write-warning-text">${getJsonWriteWarningMessage()}</span>
+    <span class="json-write-warning-actions">
+      ${connectAction}
+      <button type="button" onclick="exportJSON()">Export JSON</button>
+    </span>
+  `;
+}
+
+function setImportedJsonWithoutWriteAccess(active) {
+  importedJsonWithoutWriteAccess = !!active;
+  if (importedJsonWithoutWriteAccess) {
+    localStorage.setItem('travelApp_json_write_warning', 'true');
+  } else {
+    localStorage.removeItem('travelApp_json_write_warning');
+  }
+  syncJsonWriteWarning();
+  if (typeof window.syncMobileMenuStatus === 'function') window.syncMobileMenuStatus();
 }
 
 function getActiveFileHandleName() {
@@ -479,6 +537,8 @@ function setActiveFileHandle(handle) {
   activeFileHandle = handle || null;
   activeFileHandleName = handle ? handle.name : null;
   if (activeFileHandleName) {
+    importedJsonWithoutWriteAccess = false;
+    localStorage.removeItem('travelApp_json_write_warning');
     fileWriteFailed = false;
     syncCurrentFileName(activeFileHandleName);
     localStorage.setItem('travelApp_file_handle_name', activeFileHandleName);
@@ -494,6 +554,7 @@ function setActiveFileHandle(handle) {
     if (typeof window.updateExportIndicator === 'function') window.updateExportIndicator();
     configureFileActionButtons();
   }
+  syncJsonWriteWarning();
 }
 
 function clearActiveFileHandle() {
@@ -2456,11 +2517,18 @@ async function saveData(showTick = true) {
   localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
   localStorage.setItem('travelApp_filename_v2026', currentFileName);
   const savedToFile = await saveFileToDisk();
+  if (savedToFile) {
+    setImportedJsonWithoutWriteAccess(false);
+  } else {
+    syncJsonWriteWarning();
+  }
 
   if(showTick) {
     const status = document.getElementById('saveStatus');
     if (status) {
-      status.textContent = savedToFile ? "✓ Saved to file" : "✓ Saved locally";
+      status.textContent = savedToFile
+        ? "✓ Saved to JSON file"
+        : (isJsonWriteWarningActive() ? "Saved locally - JSON file not updated" : "✓ Saved locally");
       setTimeout(() => status.textContent = "", 2000);
     }
   }
@@ -3138,6 +3206,7 @@ async function exportJSON() {
   // Record export timestamp
   localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
   localStorage.setItem('travelApp_last_export_filename', dlName);
+  setImportedJsonWithoutWriteAccess(false);
 }
 
 function getShareExportOptions() {
@@ -4134,6 +4203,7 @@ if (importedData.stays && Array.isArray(importedData.stays)) {
         setActiveFileHandle(fileHandleForThisImport);
       } else {
         clearActiveFileHandle();
+        setImportedJsonWithoutWriteAccess(true);
       }
       if (typeof displayTimestampStatus === 'function') displayTimestampStatus();
 
@@ -4195,6 +4265,9 @@ window.redoTripChange = redoTripChange;
 window.hasActiveFileHandle = hasActiveFileHandle;
 window.hasFileWriteFailed = hasFileWriteFailed;
 window.isSavingToFile = isSavingToFile;
+window.isJsonWriteWarningActive = isJsonWriteWarningActive;
+window.setImportedJsonWithoutWriteAccess = setImportedJsonWithoutWriteAccess;
+window.syncJsonWriteWarning = syncJsonWriteWarning;
 window.getActiveFileHandleName = getActiveFileHandleName;
 window.setActiveFileHandle = setActiveFileHandle;
 window.clearActiveFileHandle = clearActiveFileHandle;
@@ -4203,6 +4276,8 @@ window.addOrUpdateCity = addOrUpdateCity;
 window.saveData = saveData;
 window.createCityDatalists = createCityDatalists;
 window.getCountryName = getCountryName;
+
+window.addEventListener('DOMContentLoaded', syncJsonWriteWarning);
 window.getCountryFlag = getCountryFlag;
 window.addUserCity = addUserCity;
 window.updateCityCountryCode = updateCityCountryCode;
