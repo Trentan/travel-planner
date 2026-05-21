@@ -1035,12 +1035,33 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
     const endDate = normalizeDate(last.arrivalDate || last.departureDate || journey.arrivalDate || journey.departureDate || dayDate);
     const crossDate = endDate && startDate && endDate !== startDate ? ` Arrives ${formatTripDateForDisplay(endDate)}` : '';
 
+    let subLocations = '';
+    if (segments.length > 0) {
+      const parts = [];
+      segments.forEach((seg, idx) => {
+        if (seg.fromAddress || seg.toAddress) {
+          const segLabel = segments.length > 1 ? `Leg ${idx + 1}: ` : '';
+          const fromPart = seg.fromAddress ? `📍 ${seg.fromAddress}` : '';
+          const toPart = seg.toAddress ? `🏁 ${seg.toAddress}` : '';
+          if (fromPart && toPart) {
+            parts.push(`${segLabel}${fromPart} ➔ ${toPart}`);
+          } else if (fromPart) {
+            parts.push(`${segLabel}${fromPart}`);
+          } else if (toPart) {
+            parts.push(`${segLabel}${toPart}`);
+          }
+        }
+      });
+      subLocations = parts.join(' · ');
+    }
+
     items.push({
       type: 'transport',
       typeLabel: 'Transport',
       icon: getTransportIcon(journey.transportType),
       title: journey.journeyName || route || 'Transport',
       meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDate.trim()].filter(Boolean).join(' · '),
+      subLocations: subLocations,
       cost: journey.cost,
       status: journey.status || 'planned',
       startTime,
@@ -1135,6 +1156,7 @@ function renderDailyTimelineRow(item, compact = false) {
           </div>
         </div>
         ${item.meta ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta)}</div>` : ''}
+        ${item.subLocations ? `<div class="daily-timeline-sub-locations">${escapeCompactText(item.subLocations)}</div>` : ''}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
     </div>

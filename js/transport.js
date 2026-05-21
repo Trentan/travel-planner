@@ -706,6 +706,12 @@ function renderTransportSegmentsDetailContent(segs) {
           <div class="transport-segment-mobile-journey" data-label="Journey">
             <span class="transport-segment-mobile-leg">Leg ${i + 1}</span>
             <span class="transport-segment-mobile-route">${escapeHtmlText(seg.fromLocation || '—')} → ${escapeHtmlText(seg.toLocation || '—')}</span>
+            ${(seg.fromAddress || seg.toAddress) ? `
+              <div class="transport-segment-sub-locations" style="margin-top: 0.15rem;">
+                ${seg.fromAddress ? `<div class="from-sub-loc" style="font-size:0.75rem; opacity:0.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📍 ${escapeHtmlText(seg.fromAddress)}</div>` : ''}
+                ${seg.toAddress ? `<div class="to-sub-loc" style="font-size:0.75rem; opacity:0.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🏁 ${escapeHtmlText(seg.toAddress)}</div>` : ''}
+              </div>
+            ` : ''}
           </div>
           <div class="transport-segment-mobile-schedule" data-label="Schedule">
             <span class="transport-schedule-line"><strong>D:</strong> ${escapeHtmlText(segDep)}</span>
@@ -723,7 +729,15 @@ function renderTransportSegmentsDetailContent(segs) {
 
     return `
       <tr class="transport-segment-row">
-        <td class="transport-segment-journey">${seg.fromLocation || '—'} → ${seg.toLocation || '—'}</td>
+        <td class="transport-segment-journey">
+          ${seg.fromLocation || '—'} → ${seg.toLocation || '—'}
+          ${(seg.fromAddress || seg.toAddress) ? `
+            <div class="transport-segment-sub-locations">
+              ${seg.fromAddress ? `<div class="from-sub-loc" title="${escapeHtmlText(seg.fromAddress)}">📍 ${escapeHtmlText(seg.fromAddress)}</div>` : ''}
+              ${seg.toAddress ? `<div class="to-sub-loc" title="${escapeHtmlText(seg.toAddress)}">🏁 ${escapeHtmlText(seg.toAddress)}</div>` : ''}
+            </div>
+          ` : ''}
+        </td>
         <td class="transport-segment-leg">Leg ${i + 1}</td>
         <td class="transport-segment-route">${segRoute}</td>
         <td class="transport-segment-departs">${segDep}</td>
@@ -815,6 +829,8 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
       ${renderTransportDetailBlock('Booking', bookingLabel)}
       ${renderTransportDetailBlock('Status', statusText)}
       ${renderTransportDetailBlock('Cost', costValue)}
+      ${segs.length === 1 && firstSeg.fromAddress ? renderTransportDetailBlock('From Details', firstSeg.fromAddress) : ''}
+      ${segs.length === 1 && firstSeg.toAddress ? renderTransportDetailBlock('To Details', firstSeg.toAddress) : ''}
     </div>
     ${segs.length > 1 ? renderTransportSegmentsDetailContent(segs) : ''}
   `;
@@ -995,6 +1011,21 @@ function buildTransportTab(cityFilter = null) {
     const route = isMultiLeg
         ? buildRouteChainWithCodes(segs)
         : `${getLocationCodeDisplay(rep.fromLocation)} → ${getLocationCodeDisplay(rep.toLocation)}`;
+    let routeDisplay = route;
+    if (!isMultiLeg) {
+      const hasFrom = !!rep.fromAddress;
+      const hasTo = !!rep.toAddress;
+      if (hasFrom || hasTo) {
+        routeDisplay = `
+          <div class="transport-route-main">${route}</div>
+          <div class="transport-route-sub-locations">
+            ${hasFrom ? `<span class="from-sub-loc" title="${escapeHtmlText(rep.fromAddress)}">📍 ${escapeHtmlText(rep.fromAddress)}</span>` : ''}
+            ${hasFrom && hasTo ? ' <span class="sub-loc-arrow">➔</span> ' : ''}
+            ${hasTo ? `<span class="to-sub-loc" title="${escapeHtmlText(rep.toAddress)}">🏁 ${escapeHtmlText(rep.toAddress)}</span>` : ''}
+          </div>
+        `;
+      }
+    }
     const firstDepDate = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
     const firstDepTime = rep.departureTime || '';
     const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + firstDepTime : firstDepDate;
@@ -1037,7 +1068,7 @@ function buildTransportTab(cityFilter = null) {
           ${renderJourneyMobileSummary(isMultiLeg ? `${segs.length} legs` : ``)}
         </td>
         <td class="transport-type-col" data-label="Type">${icon}</td>
-        <td class="route-col" data-label="Route">${route}</td>
+        <td class="route-col" data-label="Route">${routeDisplay}</td>
         <td class="date-col transport-departs-col" data-label="Departs">
           <span class="transport-departs-desktop">${firstDep}</span>
           ${renderTransportScheduleMobile(firstDep, lastArr, lastArrTime, durationDisplay, icon)}
@@ -1154,6 +1185,8 @@ function _loadSegmentIntoForm(seg) {
 
   document.getElementById('journeyFromCity').value = seg.fromLocation || '';
   document.getElementById('journeyToCity').value = seg.toLocation || '';
+  document.getElementById('journeyFromAddress').value = seg.fromAddress || '';
+  document.getElementById('journeyToAddress').value = seg.toAddress || '';
   document.getElementById('journeyDateFrom').value = seg.departureDate || '';
   document.getElementById('journeyTimeFrom').value = seg.departureTime || '';
   document.getElementById('journeyDateTo').value = seg.arrivalDate || '';
@@ -1260,7 +1293,7 @@ function openAddJourneyModal() {
     document.getElementById('journeyDateFrom').value = today;
     document.getElementById('journeyDateTo').value = today;
 
-    ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode','journeyBookingRef','journeyCost','journeyNotes']
+    ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode','journeyBookingRef','journeyCost','journeyNotes','journeyFromAddress','journeyToAddress']
         .forEach(id => {
           const el = document.getElementById(id);
           if (el) el.value = '';
@@ -1392,6 +1425,8 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
   const cost = document.getElementById('journeyCost')?.value.trim() || '0';
   const status = document.getElementById('journeyStatus')?.value || 'planned';
   const notes = document.getElementById('journeyNotes')?.value.trim() || '';
+  const fromAddress = document.getElementById('journeyFromAddress')?.value.trim() || '';
+  const toAddress = document.getElementById('journeyToAddress')?.value.trim() || '';
 
   const fromCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === fromLocation) : null;
   const toCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === toLocation) : null;
@@ -1419,6 +1454,8 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
     isMultiLeg: false,
     segmentOrder: segmentOrder,
     notes: notes,
+    fromAddress: fromAddress,
+    toAddress: toAddress,
     legs: []
   };
 }

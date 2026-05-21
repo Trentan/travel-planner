@@ -9545,3 +9545,62 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   opacity: 0.55;
   transition: opacity 0.2s ease;
 }
+
+/* Route sub-locations styling in Transport Table */
+.transport-route-sub-locations {
+  font-size: 0.78rem;
+  color: var(--muted, #7f8c8d);
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.transport-route-sub-locations .from-sub-loc,
+.transport-route-sub-locations .to-sub-loc {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+  background: var(--bg-hover, #f8f9fa);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border, #e2e8f0);
+  font-weight: normal;
+}
+
+.transport-route-sub-locations .sub-loc-arrow {
+  color: var(--muted, #bdc3c7);
+  font-size: 0.7rem;
+}
+
+/* Timeline sub-locations */
+.daily-timeline-sub-locations {
+  font-size: 0.78rem;
+  color: var(--muted, #57606f);
+  margin-top: 0.25rem;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+/* Multi-leg detail row segments list sub-locations */
+.transport-segment-sub-locations {
+  font-size: 0.75rem;
+  color: var(--muted, #7f8c8d);
+  margin-top: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.transport-segment-sub-locations .from-sub-loc,
+.transport-segment-sub-locations .to-sub-loc {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}

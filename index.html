@@ -573,6 +573,17 @@
               <select id="journeyToCity" class="form-control" onchange="_journeyFormDirty=true"></select>
             </div>
           </div>
+          <div class="journey-inline-row journey-address-row modal-form-row modal-form-row--split" style="margin-top: -0.5rem; margin-bottom: 1rem;">
+            <div class="ai-form-group">
+              <label for="journeyFromAddress">From Details (Station / terminal / address)</label>
+              <input type="text" id="journeyFromAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Heathrow Terminal 5">
+            </div>
+            <div class="journey-route-spacer" style="width: 24px;"></div>
+            <div class="ai-form-group">
+              <label for="journeyToAddress">To Details (Station / terminal / address)</label>
+              <input type="text" id="journeyToAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Haneda Terminal 3">
+            </div>
+          </div>
           <div style="text-align: right; margin-bottom: 1.5rem;">
             <a href="#" class="inline-action-link" onclick="promptAddNewCity(); return false;">+ Add new city (opens Cities dialog)</a>
           </div>
