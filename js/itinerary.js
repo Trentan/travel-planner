@@ -287,18 +287,6 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     `;
   }).join('');
 
-  const primaryAction = `
-    <label class="compact-day-complete-toggle" for="${slideId}-complete">
-      <input
-        id="${slideId}-complete"
-        type="checkbox"
-        ${day.completed ? 'checked' : ''}
-        onchange="toggleDayCompleted(event, ${legIndex}, ${dayIdx})"
-      >
-      <span>${day.completed ? 'Completed' : 'Mark done'}</span>
-    </label>
-  `;
-
   const timelineBlock = renderCompactBlock('', renderDailyTimeline(leg, legIndex, day, dayIdx, { compact: true }), true);
   const groupedBlock = renderCompactBlock('Grouped Plan', `
         <div class="compact-grouped-plan">
@@ -314,7 +302,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   `;
 
   return `
-    <section class="compact-day-slide ${day.completed ? 'is-completed' : ''}" id="${slideId}" data-day-index="${dayIdx}">
+    <section class="compact-day-slide" id="${slideId}" data-day-index="${dayIdx}">
       ${renderMobileSurfaceCard({
     cardClass: 'compact-day-surface',
     accentColor: leg.colour,
@@ -327,7 +315,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
             ${dayTotal ? `<span class="compact-day-total-badge">${escapeCompactText(dayTotal)}</span>` : ''}
           </div>
         `,
-    primaryAction,
+    primaryAction: '',
     details,
     detailsOpen: true
   })}
@@ -820,9 +808,6 @@ function buildCompactItineraryLegacy() {
 
         html += `<div class="compact-day-card" style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
       <div class="compact-day-top" style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
-        <input type="checkbox" ${day.completed ? 'checked' : ''}
-          onchange="toggleDayCompleted(event, ${legIndex}, ${dayIdx})"
-          style="width:14px; height:14px; accent-color:#27AE60;">
         <span class="compact-day-label" style="font-weight:600;">${day.day} ${dayDateLabel}</span>
         <span class="compact-day-route" style="font-size:10px;">${day.from} → ${day.to}</span>
         <span class="compact-day-desc" style="font-size:9px; color:#666; flex:1;">${day.desc || ''}</span>
@@ -837,9 +822,6 @@ function buildCompactItineraryLegacy() {
       }
       html += `<div style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
       <div style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
-        <input type="checkbox" ${day.completed ? 'checked' : ''}
-          onchange="toggleDayCompleted(event, ${legIndex}, ${dayIdx})"
-          style="width:14px; height:14px; accent-color:#27AE60;">
         <span style="font-weight:600;">${day.day} ${dayDateLabel}</span>
         <span style="font-size:10px;">${day.from} → ${day.to}</span>
         <span style="font-size:9px; color:#666; flex:1;">${day.desc || ''}</span>
@@ -1478,7 +1460,6 @@ function buildItinerary() {
 
     leg.days.forEach((day, dayIndex) => {
       const cityHTML = day.from === day.to ? `<span class="city-same">${day.from}</span>` : `${day.from} <span style="opacity:0.4">→</span> ${day.to}`;
-      const completedClass = day.completed ? 'is-completed' : '';
       const dayTotal = getDayTotal(day);
 
       // Get journeys for this day
@@ -1492,9 +1473,8 @@ function buildItinerary() {
       const dayViewMode = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
 
       html += `
-      <div class="day-card ${completedClass} ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
+      <div class="day-card ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
         <div class="day-bar" style="--leg-colour:${leg.colour}" onclick="toggleCard(this)">
-          <input type="checkbox" class="day-checkbox" ${day.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleDayCompleted(event, ${legIndex}, ${dayIndex})">
           <div class="day-date"><span class="day-num">${dayDateLabel}</span><span class="day-name">${day.day}</span></div>
           <div class="day-title"><div class="day-cities">${cityHTML}</div><div class="day-desc" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
           ${dayTotal ? `<div class="day-total-cost" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron">▼</span>

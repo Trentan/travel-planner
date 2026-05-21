@@ -427,7 +427,12 @@ async function testItineraryEditPersistence() {
   tracker.expectSave('Tip edit', () => context.updateLegTip(legIdx, tipIdx, 'Persistence tip'));
   tracker.expectSave('Tip delete', () => context.deleteLegTip(legIdx, tipIdx));
 
-  tracker.expectSave('Day checkbox', () => context.toggleDayCompleted(event(true), legIdx, dayIdx));
+  state(context).itinerary[legIdx].days[dayIdx].completed = true;
+  context.buildItinerary();
+  assert(
+    app.document.querySelector('.day-checkbox') === null,
+    'Itinerary UI: whole-day completion checkbox should not render even when old completed data exists'
+  );
   tracker.expectSave('Activity checkbox', () => context.toggleActivityCompleted(event(true), legIdx, dayIdx, 0));
   tracker.expectSave('Activity text edit', () => context.updateDayItemText(legIdx, dayIdx, 'activityItems', 0, 'Persistence museum'));
   tracker.expectSave('Activity cost edit', () => context.updateDayItemCost(legIdx, dayIdx, 'activityItems', 0, '18'));
