@@ -849,7 +849,14 @@ function buildTransportTab(cityFilter = null) {
   if (!Array.isArray(journeys) || journeys.length === 0) {
     const saved = localStorage.getItem('travelApp_journeys_v1');
     if (saved) {
-      try { journeys = JSON.parse(saved); window.journeys = journeys; }
+      try {
+        let parsed = JSON.parse(saved);
+        if (typeof normalizeTripJourneysData === 'function') {
+          parsed = normalizeTripJourneysData(parsed);
+        }
+        journeys = parsed;
+        window.journeys = journeys;
+      }
       catch (e) { journeys = []; }
     } else { journeys = []; }
   }
@@ -1060,11 +1067,27 @@ function buildTransportTab(cityFilter = null) {
           </button>`
         : `<div class="journey-name-main">${nameDisplay}</div>`;
 
+    let mobileSubLocationsHtml = '';
+    if (!isMultiLeg) {
+      const hasFrom = !!rep.fromAddress;
+      const hasTo = !!rep.toAddress;
+      if (hasFrom || hasTo) {
+        mobileSubLocationsHtml = `
+          <div class="transport-route-sub-locations transport-mobile-sub-locations">
+            ${hasFrom ? `<span class="from-sub-loc" title="${escapeHtmlText(rep.fromAddress)}">📍 ${escapeHtmlText(rep.fromAddress)}</span>` : ''}
+            ${hasFrom && hasTo ? ' <span class="sub-loc-arrow">➔</span> ' : ''}
+            ${hasTo ? `<span class="to-sub-loc" title="${escapeHtmlText(rep.toAddress)}">🏁 ${escapeHtmlText(rep.toAddress)}</span>` : ''}
+          </div>
+        `;
+      }
+    }
+
     html += `
       <tr class="journey-parent-row row-accent ${isMultiLeg ? 'multi-leg-row' : ''}" data-group="${gid}" style="--row-border-color:${statusColor};">
         <td class="transport-expand-col" data-label="Expand">${desktopExpandControl}</td>
         <td class="journey-name-col" data-label="Journey" title="${rep.journeyName || ''}">
           ${journeyNameCell}
+          ${mobileSubLocationsHtml}
           ${renderJourneyMobileSummary(isMultiLeg ? `${segs.length} legs` : ``)}
         </td>
         <td class="transport-type-col" data-label="Type">${icon}</td>

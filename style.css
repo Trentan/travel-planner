@@ -9552,6 +9552,17 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   font-size: 0.7rem;
 }
 
+.transport-mobile-sub-locations {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .transport-mobile-sub-locations {
+    display: flex !important;
+    margin-top: 0.2rem;
+  }
+}
+
 /* Timeline sub-locations */
 .daily-timeline-sub-locations {
   font-size: 0.78rem;
