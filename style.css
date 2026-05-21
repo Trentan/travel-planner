@@ -4770,6 +4770,113 @@ body.compact-view-mode .mobile-surface-card-details.expanded {
   line-height: 1.28;
 }
 
+.compact-mobile-leg-info {
+  display: none;
+}
+
+.compact-mobile-info-chips {
+  display: flex;
+  gap: 0.34rem;
+  align-items: stretch;
+}
+
+.compact-mobile-info-chip {
+  min-width: 0;
+  min-height: 30px;
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.32rem;
+  padding: 0.3rem 0.46rem;
+  border: 1px solid rgba(36, 72, 93, 0.12);
+  border-left: 3px solid var(--leg-accent, var(--accent));
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--text);
+  box-shadow: 0 6px 14px rgba(26, 36, 47, 0.05);
+  font: inherit;
+  text-align: left;
+}
+
+.compact-mobile-info-chip.is-active {
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: inset 0 0 0 1px rgba(36, 72, 93, 0.08), 0 8px 16px rgba(26, 36, 47, 0.07);
+}
+
+.compact-mobile-info-chip-title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compact-mobile-info-chip-count {
+  flex: 0 0 auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent-strong);
+  background: rgba(36, 72, 93, 0.08);
+  border: 1px solid rgba(36, 72, 93, 0.1);
+  border-radius: 999px;
+  padding: 0.09rem 0.28rem;
+}
+
+.compact-mobile-info-panel {
+  margin-top: 0.28rem;
+  padding: 0.42rem 0.48rem;
+  border: 1px solid rgba(36, 72, 93, 0.1);
+  border-left: 3px solid var(--leg-accent, var(--accent));
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.compact-mobile-info-list {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compact-mobile-info-panel .compact-food-list {
+  display: grid;
+  gap: 0.24rem;
+}
+
+.compact-mobile-info-panel .compact-food-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  line-height: 1.22;
+  cursor: pointer;
+}
+
+.compact-mobile-info-panel .compact-food-item input {
+  margin-top: 0.08rem;
+  width: 0.86rem;
+  height: 0.86rem;
+  accent-color: var(--success);
+  flex-shrink: 0;
+}
+
+.compact-mobile-info-panel .compact-line {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+
+.compact-mobile-info-panel .compact-line-text {
+  font-size: 0.72rem;
+  line-height: 1.22;
+}
+
 .compact-food-quest-card .compact-food-list {
   display: grid;
   gap: 0.38rem;
@@ -8565,50 +8672,13 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
 
   body.mobile-app-mode.compact-view-mode .compact-leg-card .compact-leg-body {
-    gap: 0.46rem;
-    padding: 0.62rem;
+    gap: 0.44rem;
+    padding: 0.5rem 0.58rem 0.62rem;
   }
 
-  body.mobile-app-mode.compact-view-mode .compact-tips-card,
-  body.mobile-app-mode.compact-view-mode .compact-food-quest-card {
-    padding: 0.48rem 0.56rem;
-    border-radius: 14px;
-    box-shadow: 0 8px 18px rgba(26, 36, 47, 0.06);
-  }
-
-  body.mobile-app-mode.compact-view-mode .compact-tips-summary,
-  body.mobile-app-mode.compact-view-mode .compact-food-summary {
-    min-height: 20px;
-    gap: 0.26rem;
-  }
-
-  body.mobile-app-mode.compact-view-mode .compact-tips-summary-title,
-  body.mobile-app-mode.compact-view-mode .compact-food-summary-title {
-    font-size: 0.74rem;
-  }
-
-  body.mobile-app-mode.compact-view-mode .compact-tips-summary-count,
-  body.mobile-app-mode.compact-view-mode .compact-food-summary-count {
-    font-size: 0.62rem;
-    padding: 0.04rem 0.28rem;
-  }
-
-  body.mobile-app-mode.compact-view-mode .compact-tips-card .mobile-surface-card-details,
-  body.mobile-app-mode.compact-view-mode .compact-food-quest-card .mobile-surface-card-details {
-    margin-top: 0.28rem;
-    padding-top: 0.3rem;
-  }
-
-  body.mobile-app-mode.compact-view-mode .compact-tips-card .compact-tips-list,
-  body.mobile-app-mode.compact-view-mode .compact-food-quest-card .compact-food-list {
-    gap: 0.24rem;
-  }
-
-  body.mobile-app-mode.compact-view-mode .compact-tips-card .compact-line-text,
-  body.mobile-app-mode.compact-view-mode .compact-food-quest-card .compact-line-text,
-  body.mobile-app-mode.compact-view-mode .compact-food-quest-card .compact-food-item {
-    font-size: 0.72rem;
-    line-height: 1.22;
+  body.mobile-app-mode.compact-view-mode .compact-mobile-leg-info {
+    display: grid;
+    gap: 0;
   }
 
   body.mobile-app-mode.compact-view-mode .mobile-swipe-rail,

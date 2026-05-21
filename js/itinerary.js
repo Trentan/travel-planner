@@ -183,6 +183,58 @@ function renderCompactTipsCard(leg, legIndex) {
   `;
 }
 
+function renderCompactMobileLegInfoCluster(leg, legIndex) {
+  const tips = Array.isArray(leg.legTips) ? leg.legTips : [];
+  const foodItems = Array.isArray(leg.cityFood) ? leg.cityFood : [];
+  const completedFoodCount = foodItems.filter(item => item && item.done).length;
+  const legId = leg.id || String(legIndex);
+  const tipsExpanded = isTipsCardExpanded(legId);
+  const foodExpanded = isFoodQuestExpanded(legId);
+  const tipsLabel = `${tips.length} tip${tips.length === 1 ? '' : 's'}`;
+  const foodLabel = `${completedFoodCount}/${foodItems.length}`;
+  const tipsList = tips.length > 0
+      ? `<ul class="compact-mobile-info-list">${tips.map(tip => renderCompactTipItem(tip)).join('')}</ul>`
+      : '<div class="compact-day-empty">No tips saved for this leg yet.</div>';
+  const foodLines = foodItems.length > 0
+      ? foodItems.map((item, itemIdx) => renderCompactFoodQuestItem(legIndex, item, itemIdx)).join('')
+      : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
+
+  return `
+    <div class="compact-mobile-leg-info">
+      <div class="compact-mobile-info-chips" aria-label="Leg info">
+        <button
+          type="button"
+          class="compact-mobile-info-chip ${tipsExpanded ? 'is-active' : ''}"
+          onclick="toggleTipsCardDetails(event, '${legId}')"
+          aria-expanded="${tipsExpanded ? 'true' : 'false'}"
+        >
+          <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#128161;</span> Tips</span>
+          <span class="compact-mobile-info-chip-count">${escapeCompactText(tipsLabel)}</span>
+        </button>
+        <button
+          type="button"
+          class="compact-mobile-info-chip ${foodExpanded ? 'is-active' : ''}"
+          onclick="toggleFoodQuestDetails(event, '${legId}')"
+          aria-expanded="${foodExpanded ? 'true' : 'false'}"
+        >
+          <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#127831;</span> Food</span>
+          <span class="compact-mobile-info-chip-count">${escapeCompactText(foodLabel)}</span>
+        </button>
+      </div>
+      ${tipsExpanded ? `
+        <div class="compact-mobile-info-panel compact-mobile-info-panel-tips">
+          ${tipsList}
+        </div>
+      ` : ''}
+      ${foodExpanded ? `
+        <div class="compact-mobile-info-panel compact-mobile-info-panel-food">
+          <div class="compact-food-list">${foodLines}</div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
 function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const useGroupedView = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped';
   const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
@@ -633,8 +685,7 @@ function buildCompactItinerary() {
           </div>
         </div>
         <div class="compact-leg-body">
-          ${renderCompactTipsCard(leg, legIndex)}
-          ${renderCompactFoodQuestCard(leg, legIndex)}
+          ${renderCompactMobileLegInfoCluster(leg, legIndex)}
           ${renderCompactDayPager(leg, legIndex)}
         </div>
       </article>
