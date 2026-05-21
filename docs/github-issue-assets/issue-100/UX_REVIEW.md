@@ -43,10 +43,8 @@ If no clean slot exists, the dialog says so and keeps the user in control with A
 
 Screenshot: [after-suggested-DDE.png](after-suggested-DDE.png)
 
-Why it works:
-
-- The full-width timeline has enough room for labels, time pills, type markers, and inline controls.
-- Scheduled rows remain readable because controls sit below or beside the main title/meta rather than replacing it.
+- The full-width timeline has enough room for labels, time pills, type markers, and inline checkboxes.
+- Scheduled rows remain readable because checkboxes sit aligned right and other controls are kept contextual.
 - The suggested item lands between existing commitments, proving the computed slot is visible in the same place the user will manage it.
 - The Timeline / Grouped selector now uses a high-contrast active state in the itinerary header, so the user can understand and change the mode before opening an individual day.
 - The Timeline / Grouped control is now global at the itinerary header rather than repeated inside every day, preserving vertical space and making the chosen planning mode consistent across the whole itinerary.
@@ -55,7 +53,7 @@ Usability notes:
 
 - Use Timeline for sequencing.
 - Use Grouped when reviewing bookings and activity buckets.
-- Use inline Scheduled/Anytime controls for quick corrections.
+- Use clickable time badges for scheduling corrections.
 - Schedule edits now preserve the open day and selected Timeline/Grouped view instead of resetting the planner context.
 - The redundant `Day Timeline` header/copy has been removed so the card starts with the actual schedule, reducing dead space above the first row.
 
@@ -82,11 +80,9 @@ Why it works:
 
 - The vertical timeline uses the phone's natural scroll direction.
 - Time, marker, and content stay in separate columns, so schedule scanning is still possible.
-- Editing controls are available, but the row still leads with the activity title and time.
-- Long time ranges reserve a wider column and can wrap inside the time pill, avoiding overlap with the marker and activity card.
-- The Scheduled heading is explicit above timed rows, so the switch from scheduled items to Anytime items is visible without relying on spacing alone.
-- The time column is wider and the center marker/line column is clearer, keeping long time ranges readable while preserving the description column.
-- Activity rows now show a single Anytime/Scheduled action instead of inline radio buttons and time inputs, keeping the timeline readable and moving heavier editing into a focused dialog.
+- Clickable Time Badges: Activity rows now use the left-hand time badge (`.daily-timeline-time`) as the interactive trigger for the scheduling dialog, allowing the temporary `Anytime`/`Scheduled` buttons to be completely removed.
+- Inline Activity Checkboxes: The activity completion checkbox is now inline on the same row as the title, aligned to the far right.
+- Transport and Accommodation Checklist: Added checkbox elements for transport and stay timeline rows, letting travelers check them off with persistent state and a clean visual strikethrough.
 
 Usability notes:
 
