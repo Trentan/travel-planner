@@ -619,11 +619,38 @@ async function testExportImport() {
   const activityIdx = state(context).itinerary[0].days[0].activityItems.length - 1;
   context.updateDayItemText(0, 0, 'activityItems', activityIdx, 'Export checked activity');
   context.toggleActivityCompleted({ target: { checked: true }, stopPropagation() {} }, 0, 0, activityIdx);
+  context.journeys.push({
+    id: 'journey_export_sub_locations',
+    journeyId: 'journey_export_sub_locations',
+    journeyName: 'Export sub-location journey',
+    legId: state(context).itinerary[0].id,
+    dayDate: '2026-01-04',
+    fromLocation: 'London',
+    toLocation: 'Paris',
+    fromCityId: 'london',
+    toCityId: 'paris',
+    departureDate: '2026-01-04',
+    departureTime: '09:15',
+    arrivalDate: '2026-01-04',
+    arrivalTime: '12:30',
+    transportType: 'train',
+    provider: 'Eurostar',
+    routeCode: 'ES 9004',
+    bookingReference: 'SUBLOC-99',
+    status: 'booked',
+    cost: '120',
+    segmentOrder: 1,
+    fromAddress: 'St Pancras Platform 9',
+    toAddress: 'Gare du Nord Hall 2'
+  });
   await context.exportJSON();
   const exported = JSON.parse(decodeDownloadUri(app.document.lastDownload.href));
   assert(app.document.lastDownload.download.endsWith('.json'), 'Export: download should be JSON');
   assert(exported.meta.title === 'Export Test', 'Export: should include current title');
   assert(exported.itinerary[0].days[0].desc === 'Changed for export', 'Export: should include updated itinerary data');
+  const exportedJourney = exported.journeys.find(journey => journey.bookingReference === 'SUBLOC-99');
+  assert(exportedJourney?.fromAddress === 'St Pancras Platform 9', 'Export: journey should include fromAddress');
+  assert(exportedJourney?.toAddress === 'Gare du Nord Hall 2', 'Export: journey should include toAddress');
   assert(
     exported.itinerary[0].days[0].activityItems.some(item => item.text === 'Export checked activity' && item.done === true),
     'Export: checked activity should include done=true in JSON'
@@ -642,6 +669,9 @@ async function testExportImport() {
   await settle(app);
   assert(state(context).itinerary[0].days[0].desc === 'Changed for export', 'Import: should reload itinerary data');
   assert(state(context).meta.title === 'Export Test', 'Import: should reload title');
+  const importedJourney = state(context).journeys.find(journey => journey.bookingReference === 'SUBLOC-99');
+  assert(importedJourney?.fromAddress === 'St Pancras Platform 9', 'Import: journey should preserve fromAddress');
+  assert(importedJourney?.toAddress === 'Gare du Nord Hall 2', 'Import: journey should preserve toAddress');
 }
 
 async function testShareExport() {
