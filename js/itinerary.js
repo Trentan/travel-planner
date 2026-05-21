@@ -166,11 +166,13 @@ function renderCompactTipsCard(leg, legIndex) {
   const expanded = isTipsCardExpanded(legId);
   const chevronSymbol = expanded ? '&#9650;' : '&#9660;';
   const countLabel = `${tips.length} tip${tips.length === 1 ? '' : 's'}`;
+  const progressWidth = tips.length > 0 ? 100 : 0;
 
   return `
     <article class="mobile-surface-card compact-tips-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-tips-summary" onclick="toggleTipsCardDetails(event, '${legId}')" style="cursor: pointer; user-select: none;">
         <span class="compact-tips-summary-title"><span class="compact-tips-summary-icon" aria-hidden="true">&#128161;</span> Tips</span>
+        <span class="compact-tips-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
         <span class="compact-tips-summary-count">${escapeCompactText(countLabel)}</span>
         <span class="compact-tips-summary-chevron" aria-hidden="true">${chevronSymbol}</span>
       </div>

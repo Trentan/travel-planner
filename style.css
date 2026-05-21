@@ -4454,7 +4454,7 @@ body.compact-view-mode .mobile-surface-card-details.expanded {
   color: var(--text);
   font: inherit;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(2.75rem, 1fr) auto auto;
   align-items: center;
   gap: 0.34rem;
   text-align: left;
@@ -4481,6 +4481,20 @@ body.compact-view-mode .mobile-surface-card-details.expanded {
 .compact-tips-summary-icon {
   font-size: 0.82rem;
   line-height: 1;
+}
+
+.compact-tips-summary-meter {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(36, 72, 93, 0.1);
+  overflow: hidden;
+}
+
+.compact-tips-summary-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), #5f7f96);
 }
 
 .compact-tips-summary-count {
