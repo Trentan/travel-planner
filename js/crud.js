@@ -776,7 +776,14 @@ function rebuildItineraryPreservingScroll(options = {}) {
 
 function toggleFoodCompleted(e, legIdx, foodIdx) { e.stopPropagation(); appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
 function toggleDayCompleted(e, legIdx, dayIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].completed = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
-function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].activityItems[itemIdx].done = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
+function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) {
+  e.stopPropagation();
+  const item = appData[legIdx].days[dayIdx].activityItems[itemIdx];
+  item.done = e.target.checked;
+  syncAssignedSuggestedActivityField(legIdx, dayIdx, item.text, 'done', item.done);
+  saveData();
+  rebuildItineraryPreservingScroll();
+}
 function toggleJourneyCompleted(e, journeyId) {
   e.stopPropagation();
   const targetId = String(journeyId);
