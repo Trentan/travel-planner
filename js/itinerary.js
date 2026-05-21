@@ -239,6 +239,21 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
   `;
 }
 
+function formatJourneySubLocationText(segments) {
+  if (!Array.isArray(segments) || segments.length === 0) return '';
+  return segments
+    .map((seg, index) => {
+      const parts = [
+        seg.fromAddress ? `From: ${seg.fromAddress}` : '',
+        seg.toAddress ? `To: ${seg.toAddress}` : ''
+      ].filter(Boolean);
+      if (parts.length === 0) return '';
+      return segments.length > 1 ? `Leg ${index + 1} ${parts.join(' / ')}` : parts.join(' / ');
+    })
+    .filter(Boolean)
+    .join(' | ');
+}
+
 function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const useGroupedView = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped';
   const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
@@ -257,7 +272,8 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
         .filter(seg => seg.journeyId === journey.journeyId)
         .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
     const duration = formatCompactJourneyDuration(segs);
-    return renderCompactEmojiLine({ emoji: icon, text: journeyLabel, duration });
+    const details = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
+    return renderCompactEmojiLine({ emoji: icon, text: [journeyLabel, details].filter(Boolean).join(' | '), duration });
   }).join('');
 
   const accomLines = dayStayInfo.map(info => renderCompactEmojiLine({
@@ -788,7 +804,8 @@ function buildCompactItineraryLegacy() {
           .filter(seg => seg.journeyId === j.journeyId)
           .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
         const duration = formatCompactJourneyDuration(segs);
-        return renderCompactEmojiLine({ emoji: icon, text: journeyLabel, duration });
+        const details = formatJourneySubLocationText(segs.length > 0 ? segs : [j]);
+        return renderCompactEmojiLine({ emoji: icon, text: [journeyLabel, details].filter(Boolean).join(' | '), duration });
       }).join('');
       const accomLines = dayStayInfo.map(info => renderCompactEmojiLine({
         emoji: '🏨',
@@ -844,7 +861,8 @@ function buildCompactItineraryLegacy() {
           const duration = j.isMultiLeg && typeof calculateJourneyDuration === 'function' && segs.length > 0
               ? `${calculateJourneyDuration(segs)}h`
               : '';
-          return `${renderCompactEmojiLine({ emoji: icon, text: journeyLabel, duration })} <span style="color:${status === 'booked' ? '#27AE60' : '#E67E22'}">${statusText}</span>`;
+          const details = formatJourneySubLocationText(segs.length > 0 ? segs : [j]);
+          return `${renderCompactEmojiLine({ emoji: icon, text: [journeyLabel, details].filter(Boolean).join(' | '), duration })} <span style="color:${status === 'booked' ? '#27AE60' : '#E67E22'}">${statusText}</span>`;
         }).join(', ');
         html += '</div>';
       }
@@ -1017,25 +1035,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
     const endDate = normalizeDate(last.arrivalDate || last.departureDate || journey.arrivalDate || journey.departureDate || dayDate);
     const crossDate = endDate && startDate && endDate !== startDate ? ` Arrives ${formatTripDateForDisplay(endDate)}` : '';
 
-    let subLocations = '';
-    if (segments.length > 0) {
-      const parts = [];
-      segments.forEach((seg, idx) => {
-        if (seg.fromAddress || seg.toAddress) {
-          const segLabel = segments.length > 1 ? `Leg ${idx + 1}: ` : '';
-          const fromPart = seg.fromAddress ? `📍 ${seg.fromAddress}` : '';
-          const toPart = seg.toAddress ? `🏁 ${seg.toAddress}` : '';
-          if (fromPart && toPart) {
-            parts.push(`${segLabel}${fromPart} ➔ ${toPart}`);
-          } else if (fromPart) {
-            parts.push(`${segLabel}${fromPart}`);
-          } else if (toPart) {
-            parts.push(`${segLabel}${toPart}`);
-          }
-        }
-      });
-      subLocations = parts.join(' · ');
-    }
+    const subLocations = formatJourneySubLocationText(segments.length > 0 ? segments : [journey]);
 
     items.push({
       type: 'transport',

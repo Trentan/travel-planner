@@ -616,6 +616,36 @@ function renderTransportDetailBlock(title, value, extraClass = '') {
   `;
 }
 
+function getTransportSubLocationParts(seg) {
+  if (!seg) return [];
+  return [
+    seg.fromAddress ? { label: 'From', value: seg.fromAddress } : null,
+    seg.toAddress ? { label: 'To', value: seg.toAddress } : null
+  ].filter(Boolean);
+}
+
+function renderTransportSubLocationChips(seg, extraClass = '') {
+  const parts = getTransportSubLocationParts(seg);
+  if (parts.length === 0) return '';
+
+  return `
+    <div class="transport-sub-location-chips ${extraClass}">
+      ${parts.map(part => `
+        <span class="transport-sub-location-chip" title="${escapeHtmlText(part.value)}">
+          <span class="transport-sub-location-label">${escapeHtmlText(part.label)}</span>
+          <span class="transport-sub-location-value">${escapeHtmlText(part.value)}</span>
+        </span>
+      `).join('')}
+    </div>
+  `;
+}
+
+function formatTransportSubLocationText(seg) {
+  return getTransportSubLocationParts(seg)
+      .map(part => `${part.label}: ${part.value}`)
+      .join(' | ');
+}
+
 function renderJourneyMobileSummary(legCountText) {
   if (!legCountText) return '';
 
@@ -706,12 +736,7 @@ function renderTransportSegmentsDetailContent(segs) {
           <div class="transport-segment-mobile-journey" data-label="Journey">
             <span class="transport-segment-mobile-leg">Leg ${i + 1}</span>
             <span class="transport-segment-mobile-route">${escapeHtmlText(seg.fromLocation || '—')} → ${escapeHtmlText(seg.toLocation || '—')}</span>
-            ${(seg.fromAddress || seg.toAddress) ? `
-              <div class="transport-segment-sub-locations" style="margin-top: 0.15rem;">
-                ${seg.fromAddress ? `<div class="from-sub-loc" style="font-size:0.75rem; opacity:0.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📍 ${escapeHtmlText(seg.fromAddress)}</div>` : ''}
-                ${seg.toAddress ? `<div class="to-sub-loc" style="font-size:0.75rem; opacity:0.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🏁 ${escapeHtmlText(seg.toAddress)}</div>` : ''}
-              </div>
-            ` : ''}
+            ${renderTransportSubLocationChips(seg, 'transport-segment-sub-locations')}
           </div>
           <div class="transport-segment-mobile-schedule" data-label="Schedule">
             <span class="transport-schedule-line"><strong>D:</strong> ${escapeHtmlText(segDep)}</span>
@@ -731,12 +756,7 @@ function renderTransportSegmentsDetailContent(segs) {
       <tr class="transport-segment-row">
         <td class="transport-segment-journey">
           ${seg.fromLocation || '—'} → ${seg.toLocation || '—'}
-          ${(seg.fromAddress || seg.toAddress) ? `
-            <div class="transport-segment-sub-locations">
-              ${seg.fromAddress ? `<div class="from-sub-loc" title="${escapeHtmlText(seg.fromAddress)}">📍 ${escapeHtmlText(seg.fromAddress)}</div>` : ''}
-              ${seg.toAddress ? `<div class="to-sub-loc" title="${escapeHtmlText(seg.toAddress)}">🏁 ${escapeHtmlText(seg.toAddress)}</div>` : ''}
-            </div>
-          ` : ''}
+          ${renderTransportSubLocationChips(seg, 'transport-segment-sub-locations')}
         </td>
         <td class="transport-segment-leg">Leg ${i + 1}</td>
         <td class="transport-segment-route">${segRoute}</td>
@@ -811,6 +831,7 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
   const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
   const lastArrTime = lastSeg.arrivalTime || '—';
   const route = segs.length > 1 ? buildRouteChain(segs) : `${firstSeg.fromLocation || '—'} → ${firstSeg.toLocation || '—'}`;
+  const routeDetails = formatTransportSubLocationText(firstSeg);
   const providerSet = Array.from(new Set(segs.map(seg => seg.provider).filter(Boolean)));
   const routeCodeSet = Array.from(new Set(segs.map(seg => seg.routeCode).filter(Boolean)));
   const bookingSet = Array.from(new Set(segs.map(seg => seg.bookingReference).filter(Boolean)));
@@ -822,6 +843,7 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
   return `
     <div class="transport-detail-grid transport-mobile-detail-grid">
       ${renderTransportDetailBlock('Route', route)}
+      ${segs.length === 1 && routeDetails ? renderTransportDetailBlock('Route details', routeDetails, 'transport-detail-block--wide') : ''}
       ${renderTransportDetailBlock('Depart', firstDep)}
       ${renderTransportDetailBlock('Arrive', lastArr !== '—' ? `${lastArr} ${lastArrTime}`.trim() : '—')}
       ${renderTransportDetailBlock('Carrier', providerLabel)}
@@ -829,8 +851,6 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
       ${renderTransportDetailBlock('Booking', bookingLabel)}
       ${renderTransportDetailBlock('Status', statusText)}
       ${renderTransportDetailBlock('Cost', costValue)}
-      ${segs.length === 1 && firstSeg.fromAddress ? renderTransportDetailBlock('From Details', firstSeg.fromAddress) : ''}
-      ${segs.length === 1 && firstSeg.toAddress ? renderTransportDetailBlock('To Details', firstSeg.toAddress) : ''}
     </div>
     ${segs.length > 1 ? renderTransportSegmentsDetailContent(segs) : ''}
   `;
@@ -942,6 +962,7 @@ function buildTransportTab(cityFilter = null) {
         <button class="mobile-surface-card-button transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">Edit</button>
         <button class="mobile-surface-card-button mobile-surface-card-button--danger transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">Delete</button>
       `;
+      const summary = !isMultiLeg ? renderTransportSubLocationChips(rep, 'transport-card-sub-locations') : '';
       const details = renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, rep.id);
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'transport-mobile-card row-accent',
@@ -949,6 +970,7 @@ function buildTransportTab(cityFilter = null) {
         dateLabel: firstDepDate,
         title: rep.journeyName || routeText,
         subtitle: subtitleParts.filter(Boolean).join(' · '),
+        summary,
         meta,
         actions,
         details,
@@ -1020,16 +1042,11 @@ function buildTransportTab(cityFilter = null) {
         : `${getLocationCodeDisplay(rep.fromLocation)} → ${getLocationCodeDisplay(rep.toLocation)}`;
     let routeDisplay = route;
     if (!isMultiLeg) {
-      const hasFrom = !!rep.fromAddress;
-      const hasTo = !!rep.toAddress;
-      if (hasFrom || hasTo) {
+      const subLocationChips = renderTransportSubLocationChips(rep);
+      if (subLocationChips) {
         routeDisplay = `
           <div class="transport-route-main">${route}</div>
-          <div class="transport-route-sub-locations">
-            ${hasFrom ? `<span class="from-sub-loc" title="${escapeHtmlText(rep.fromAddress)}">📍 ${escapeHtmlText(rep.fromAddress)}</span>` : ''}
-            ${hasFrom && hasTo ? ' <span class="sub-loc-arrow">➔</span> ' : ''}
-            ${hasTo ? `<span class="to-sub-loc" title="${escapeHtmlText(rep.toAddress)}">🏁 ${escapeHtmlText(rep.toAddress)}</span>` : ''}
-          </div>
+          ${subLocationChips}
         `;
       }
     }
@@ -1069,17 +1086,7 @@ function buildTransportTab(cityFilter = null) {
 
     let mobileSubLocationsHtml = '';
     if (!isMultiLeg) {
-      const hasFrom = !!rep.fromAddress;
-      const hasTo = !!rep.toAddress;
-      if (hasFrom || hasTo) {
-        mobileSubLocationsHtml = `
-          <div class="transport-route-sub-locations transport-mobile-sub-locations">
-            ${hasFrom ? `<span class="from-sub-loc" title="${escapeHtmlText(rep.fromAddress)}">📍 ${escapeHtmlText(rep.fromAddress)}</span>` : ''}
-            ${hasFrom && hasTo ? ' <span class="sub-loc-arrow">➔</span> ' : ''}
-            ${hasTo ? `<span class="to-sub-loc" title="${escapeHtmlText(rep.toAddress)}">🏁 ${escapeHtmlText(rep.toAddress)}</span>` : ''}
-          </div>
-        `;
-      }
+      mobileSubLocationsHtml = renderTransportSubLocationChips(rep, 'transport-mobile-sub-locations');
     }
 
     html += `
@@ -1423,7 +1430,7 @@ function addSegmentToJourney() {
   const toSelect = document.getElementById('journeyToCity');
   if (toSelect) toSelect.value = '';
 
-  ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode'].forEach(id => {
+  ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode','journeyBookingRef','journeyCost','journeyNotes','journeyFromAddress','journeyToAddress'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });

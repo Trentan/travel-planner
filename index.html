@@ -563,7 +563,7 @@
             <button class="transport-type-btn" data-type="car" onclick="selectJourneyType('car')"><span class="journey-type-icon">🚗</span> Car</button>
           </div>
 
-          <div class="journey-inline-row journey-route-row modal-form-row modal-form-row--split">
+          <div class="journey-route-grid journey-route-row modal-form-row">
             <div class="ai-form-group">
               <label>From</label>
               <select id="journeyFromCity" class="form-control" onchange="_journeyFormDirty=true"></select>
@@ -574,12 +574,12 @@
               <select id="journeyToCity" class="form-control" onchange="_journeyFormDirty=true"></select>
             </div>
           </div>
-          <div class="journey-inline-row journey-address-row modal-form-row modal-form-row--split" style="margin-top: -0.5rem; margin-bottom: 1rem;">
+          <div class="journey-route-grid journey-address-row modal-form-row">
             <div class="ai-form-group">
               <label for="journeyFromAddress">From Details</label>
               <input type="text" id="journeyFromAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Heathrow Terminal 5">
             </div>
-            <div class="journey-route-spacer" style="width: 24px;"></div>
+            <div class="journey-route-spacer" aria-hidden="true"></div>
             <div class="ai-form-group">
               <label for="journeyToAddress">To Details</label>
               <input type="text" id="journeyToAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Haneda Terminal 3">
