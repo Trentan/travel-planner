@@ -192,6 +192,7 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
   const foodExpanded = isFoodQuestExpanded(legId);
   const tipsLabel = `${tips.length} tip${tips.length === 1 ? '' : 's'}`;
   const foodLabel = `${completedFoodCount}/${foodItems.length}`;
+  const foodProgressWidth = foodItems.length > 0 ? Math.round((completedFoodCount / foodItems.length) * 100) : 0;
   const tipsList = tips.length > 0
       ? `<ul class="compact-mobile-info-list">${tips.map(tip => renderCompactTipItem(tip)).join('')}</ul>`
       : '<div class="compact-day-empty">No tips saved for this leg yet.</div>';
@@ -216,9 +217,12 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
           class="compact-mobile-info-chip ${foodExpanded ? 'is-active' : ''}"
           onclick="toggleFoodQuestDetails(event, '${legId}')"
           aria-expanded="${foodExpanded ? 'true' : 'false'}"
+          aria-label="Food quests ${escapeCompactText(foodLabel)} complete"
+          title="Food quests"
         >
           <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#127831;</span> Food</span>
           <span class="compact-mobile-info-chip-count">${escapeCompactText(foodLabel)}</span>
+          <span class="compact-mobile-info-progress" aria-hidden="true"><span style="width:${foodProgressWidth}%"></span></span>
         </button>
       </div>
       ${tipsExpanded ? `

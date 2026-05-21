@@ -4781,6 +4781,7 @@ body.compact-view-mode .mobile-surface-card-details.expanded {
 }
 
 .compact-mobile-info-chip {
+  position: relative;
   min-width: 0;
   min-height: 30px;
   flex: 1 1 0;
@@ -4797,6 +4798,7 @@ body.compact-view-mode .mobile-surface-card-details.expanded {
   box-shadow: 0 6px 14px rgba(26, 36, 47, 0.05);
   font: inherit;
   text-align: left;
+  overflow: hidden;
 }
 
 .compact-mobile-info-chip.is-active {
@@ -4825,6 +4827,24 @@ body.compact-view-mode .mobile-surface-card-details.expanded {
   border: 1px solid rgba(36, 72, 93, 0.1);
   border-radius: 999px;
   padding: 0.09rem 0.28rem;
+}
+
+.compact-mobile-info-progress {
+  position: absolute;
+  right: 0.42rem;
+  bottom: 0.2rem;
+  left: 0.46rem;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(36, 72, 93, 0.1);
+  overflow: hidden;
+}
+
+.compact-mobile-info-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), #5f7f96);
 }
 
 .compact-mobile-info-panel {
