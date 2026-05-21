@@ -111,12 +111,12 @@ async function run() {
     await page.evaluate(() => window.setItineraryDayViewMode('timeline'));
     const activeDayKey = await page.evaluate(() => {
       const activityCard = Array.from(document.querySelectorAll('.day-card'))
-        .find(card => card.querySelector('.timeline-schedule-btn'));
+        .find(card => card.querySelector('.daily-timeline-time.is-clickable'));
       activityCard?.classList.add('open');
       return activityCard?.dataset.dayKey || '';
     });
     assert(activeDayKey, 'An open day should expose a stable day key');
-    const visibleActivityScheduleButtons = page.locator('.day-card.open .timeline-schedule-btn');
+    const visibleActivityScheduleButtons = page.locator('.day-card.open .daily-timeline-time.is-clickable');
     assert((await visibleActivityScheduleButtons.count()) > 0, 'An open day should expose visible activity schedule buttons');
     await visibleActivityScheduleButtons.nth(0).click();
     await page.waitForSelector('#day-item-schedule-modal', { state: 'visible' });

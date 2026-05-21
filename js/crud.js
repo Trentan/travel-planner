@@ -672,6 +672,26 @@ function rebuildItineraryPreservingScroll(options = {}) {
 function toggleFoodCompleted(e, legIdx, foodIdx) { e.stopPropagation(); appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
 function toggleDayCompleted(e, legIdx, dayIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].completed = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
 function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].activityItems[itemIdx].done = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
+function toggleJourneyCompleted(e, journeyId) {
+  e.stopPropagation();
+  const targetId = String(journeyId);
+  const journey = (window.journeys || []).find(j => String(j.id) === targetId);
+  if (journey) {
+    journey.done = e.target.checked;
+    saveData();
+    rebuildItineraryPreservingScroll();
+  }
+}
+function toggleStayCompleted(e, stayId) {
+  e.stopPropagation();
+  const targetId = String(stayId);
+  const stay = (window.stays || []).find(s => String(s.id) === targetId);
+  if (stay) {
+    stay.done = e.target.checked;
+    saveData();
+    rebuildItineraryPreservingScroll();
+  }
+}
 
 function parseActivityDurationMinutes(durationText) {
   const text = String(durationText || '').toLowerCase();
@@ -1604,6 +1624,8 @@ window.openDayItemScheduleDialog = openDayItemScheduleDialog;
 window.toggleFoodCompleted = toggleFoodCompleted;
 window.toggleDayCompleted = toggleDayCompleted;
 window.toggleActivityCompleted = toggleActivityCompleted;
+window.toggleJourneyCompleted = toggleJourneyCompleted;
+window.toggleStayCompleted = toggleStayCompleted;
 window.openAddLegDialog = openAddLegDialog;
 window.closeAddLegDialog = closeAddLegDialog;
 window.openEditActivityModal = openEditActivityModal;

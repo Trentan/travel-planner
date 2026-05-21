@@ -860,7 +860,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         bookingRef: stay.bookingRef,
         cost: stay.totalCost,
         startTime: stay.checkInTime || '15:00',
-        endTime: ''
+        endTime: '',
+        done: !!stay.done
       });
       return;
     }
@@ -875,7 +876,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         bookingRef: stay.bookingRef,
         cost: stay.totalCost,
         startTime: stay.checkOutTime || '11:00',
-        endTime: ''
+        endTime: '',
+        done: !!stay.done
       });
       return;
     }
@@ -890,7 +892,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         bookingRef: null,
         cost: null,
         startTime: '',
-        endTime: ''
+        endTime: '',
+        done: !!stay.done
       });
     }
   });
@@ -948,7 +951,9 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       startTime,
       endTime,
       sortValue: getDailyTimelineItemSortValue(startDate || dayDate, startTime, journeyIndex),
-      actionHtml: ''
+      actionHtml: '',
+      journeyId: journey.id,
+      done: !!journey.done
     });
   });
 
@@ -965,7 +970,9 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       status: stayInfo.status || '',
       startTime: stayInfo.startTime || '',
       endTime: stayInfo.endTime || '',
-      sortValue: getDailyTimelineItemSortValue(dayDate, stayInfo.startTime, 2000 + stayIndex)
+      sortValue: getDailyTimelineItemSortValue(dayDate, stayInfo.startTime, 2000 + stayIndex),
+      stayId: stayInfo.stayId,
+      done: !!stayInfo.done
     });
   });
 
@@ -987,7 +994,6 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       sortValue: getDailyTimelineItemSortValue(dayDate, item.startTime, 4000 + itemIndex),
       actionHtml: `
         <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${itemIndex})">×</button>
-        <input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${itemIndex})">
       `
     });
   });
@@ -1005,29 +1011,37 @@ function getDailyTimelineBuckets(items) {
   };
 }
 
-function renderTimelineScheduleEditor(item) {
-  if (!isEditMode || item.type !== 'activity') return '';
-  const isScheduled = !!String(item.startTime || item.endTime || '').trim();
-  return `
-    <button class="timeline-schedule-btn ${isScheduled ? 'is-scheduled' : 'is-anytime'}" type="button" onclick="event.stopPropagation(); openDayItemScheduleDialog(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex})">${isScheduled ? 'Scheduled' : 'Anytime'}</button>
-  `;
-}
-
 function renderDailyTimelineRow(item, compact = false) {
+  const isTimeClickable = isEditMode && item.type === 'activity';
+  const timeClass = "daily-timeline-time" + (isTimeClickable ? " is-clickable" : "");
+  const timeOnClick = isTimeClickable
+    ? ` role="button" tabindex="0" onclick="event.stopPropagation(); openDayItemScheduleDialog(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex})"`
+    : '';
+
+  let checkboxHtml = '';
+  if (item.type === 'activity') {
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})">`;
+  } else if (item.type === 'transport') {
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox transport-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleJourneyCompleted(event, '${item.journeyId}')">`;
+  } else if (item.type === 'stay' || item.type === 'checkin' || item.type === 'checkout' || item.type === 'staying') {
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox stay-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleStayCompleted(event, '${item.stayId}')">`;
+  }
+
   return `
     <div class="daily-timeline-item daily-timeline-item-${escapeCompactText(item.type)} ${item.done ? 'is-done' : ''}">
-      <div class="daily-timeline-time">${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
+      <div class="${timeClass}"${timeOnClick}>${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
       <div class="daily-timeline-marker"><span>${item.icon}</span></div>
       <div class="daily-timeline-content">
         <div class="daily-timeline-title-row">
           <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
-          <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
+          <div class="daily-timeline-title-and-checkbox">
+            <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
+            ${checkboxHtml}
+          </div>
         </div>
         ${item.meta ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta)}</div>` : ''}
-        ${compact ? '' : renderTimelineScheduleEditor(item)}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
-      ${compact ? renderTimelineScheduleEditor(item) : ''}
     </div>
   `;
 }
