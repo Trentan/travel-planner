@@ -8975,6 +8975,146 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
 }
 
+.booking-intake-modal {
+  max-width: min(1040px, calc(100vw - 2rem));
+}
+
+.booking-intake-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(320px, 1.15fr);
+  gap: 1rem;
+}
+
+.booking-intake-panel {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid rgba(36, 72, 93, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.booking-intake-textarea {
+  min-height: 260px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.booking-intake-help,
+.booking-intake-empty,
+.booking-intake-status {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.booking-intake-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 0.9rem;
+}
+
+.booking-intake-review-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+}
+
+.booking-intake-review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.booking-intake-review-header h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.booking-intake-count {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.booking-intake-review {
+  display: grid;
+  gap: 0.7rem;
+  overflow: auto;
+}
+
+.booking-intake-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.85rem;
+  border: 1px solid rgba(36, 72, 93, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.booking-intake-card.has-warning {
+  border-color: rgba(230, 126, 34, 0.45);
+  background: rgba(255, 248, 236, 0.86);
+}
+
+.booking-intake-card-body {
+  display: grid;
+  gap: 0.22rem;
+  min-width: 0;
+  font-size: 0.86rem;
+}
+
+.booking-intake-card-kind {
+  width: fit-content;
+  padding: 0.1rem 0.42rem;
+  border-radius: 999px;
+  background: rgba(36, 72, 93, 0.1);
+  color: var(--ink);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.booking-intake-warning {
+  color: #9a5b08;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .booking-intake-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-intake-review-panel {
+    min-height: 260px;
+  }
+
+  .booking-intake-has-preview .booking-intake-review-panel {
+    order: -1;
+  }
+
+  .booking-intake-textarea {
+    min-height: 180px;
+  }
+
+  .booking-intake-actions {
+    flex-direction: column-reverse;
+  }
+
+  .booking-intake-actions .action-btn {
+    width: 100%;
+  }
+}
+
+
 /* FINAL TRANSPORT COMPRESSION - FORCED OVERRIDES */
 @media (min-width: 769px) {
   .transport-table .journey-parent-row > td {
