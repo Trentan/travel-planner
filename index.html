@@ -113,7 +113,13 @@
     <div id="tab-itinerary" class="tab-pane active">
       <div class="section-header">
         <h3 class="section-header-title">🗓️ Itinerary</h3>
-        <button class="action-btn" onclick="openAddLegDialog()">+ Add Trip Leg</button>
+        <div class="section-header-actions">
+          <div class="itinerary-view-mode-control" role="group" aria-label="Itinerary day view">
+            <button id="itineraryTimelineModeBtn" class="itinerary-view-mode-btn is-active" type="button" onclick="setItineraryDayViewMode('timeline')">Timeline</button>
+            <button id="itineraryGroupedModeBtn" class="itinerary-view-mode-btn" type="button" onclick="setItineraryDayViewMode('grouped')">Grouped</button>
+          </div>
+          <button class="action-btn" onclick="openAddLegDialog()">+ Add Trip Leg</button>
+        </div>
       </div>
       <div class="top-controls">
         <button class="action-btn" onclick="toggleAllDays()" id="expandAll">▼ Expand all days</button>
@@ -620,8 +626,18 @@
               <input type="date" id="stayCheckIn" class="form-control form-control--compact">
             </div>
             <div class="ai-form-group">
+              <label for="stayCheckInTime">Check-in time</label>
+              <input type="time" id="stayCheckInTime" class="form-control form-control--compact">
+            </div>
+          </div>
+          <div class="modal-form-row modal-form-row--split">
+            <div class="ai-form-group">
               <label for="stayCheckOut">Check-out</label>
               <input type="date" id="stayCheckOut" class="form-control form-control--compact">
+            </div>
+            <div class="ai-form-group">
+              <label for="stayCheckOutTime">Check-out time</label>
+              <input type="time" id="stayCheckOutTime" class="form-control form-control--compact">
             </div>
           </div>
           <div class="ai-form-group">

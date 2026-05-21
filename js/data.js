@@ -2414,6 +2414,10 @@ async function saveData(showTick = true) {
     if (t && t.innerText.trim()) titleData.title = t.innerText;
     if (s && s.innerText.trim()) titleData.subtitle = s.innerText;
 
+    normalizeTripLegsData(appData);
+    normalizeTripJourneysData(journeys);
+    normalizeTripStaysData(stays);
+
     captureHistoryBeforeSave();
 
     const useIndexedDB = await shouldUseIndexedDB();
@@ -2526,6 +2530,21 @@ function normalizeTripLegsData(legs) {
     if (!Array.isArray(leg.days)) leg.days = [];
     (leg.days || []).forEach(day => {
       day.date = normalizeTripDateValue(day.date);
+      (day.activityItems || []).forEach(item => {
+        if (!item || typeof item !== 'object') return;
+        item.startDate = normalizeTripDateValue(item.startDate || day.date);
+        item.endDate = normalizeTripDateValue(item.endDate || item.startDate || day.date);
+        if (item.startTime === undefined) item.startTime = '';
+        if (item.endTime === undefined) item.endTime = '';
+      });
+    });
+    (leg.suggestedActivities || []).forEach(activity => {
+      if (!activity || typeof activity !== 'object') return;
+      activity.assignedDate = normalizeTripDateValue(activity.assignedDate || activity.startDate || '');
+      activity.startDate = normalizeTripDateValue(activity.startDate || activity.assignedDate || '');
+      activity.endDate = normalizeTripDateValue(activity.endDate || activity.startDate || '');
+      if (activity.startTime === undefined) activity.startTime = '';
+      if (activity.endTime === undefined) activity.endTime = '';
     });
   });
   return legs;
@@ -2534,9 +2553,15 @@ function normalizeTripLegsData(legs) {
 function normalizeTripJourneysData(items) {
   if (!Array.isArray(items)) return [];
   items.forEach(item => {
-    item.dayDate = normalizeTripDateValue(item.dayDate);
-    item.departureDate = normalizeTripDateValue(item.departureDate);
-    item.arrivalDate = normalizeTripDateValue(item.arrivalDate);
+    item.dayDate = normalizeTripDateValue(item.dayDate || item.startDate);
+    item.departureDate = normalizeTripDateValue(item.departureDate || item.startDate || item.dayDate);
+    item.arrivalDate = normalizeTripDateValue(item.arrivalDate || item.endDate || item.departureDate || item.dayDate);
+    item.departureTime = item.departureTime || item.startTime || '';
+    item.arrivalTime = item.arrivalTime || item.endTime || '';
+    item.startDate = item.departureDate || item.dayDate || '';
+    item.endDate = item.arrivalDate || item.startDate || '';
+    item.startTime = item.departureTime || '';
+    item.endTime = item.arrivalTime || '';
   });
   return items;
 }
@@ -2544,8 +2569,14 @@ function normalizeTripJourneysData(items) {
 function normalizeTripStaysData(items) {
   if (!Array.isArray(items)) return [];
   items.forEach(item => {
-    item.checkIn = normalizeTripDateValue(item.checkIn);
-    item.checkOut = normalizeTripDateValue(item.checkOut);
+    item.checkIn = normalizeTripDateValue(item.checkIn || item.startDate);
+    item.checkOut = normalizeTripDateValue(item.checkOut || item.endDate || item.checkIn);
+    item.checkInTime = item.checkInTime || item.startTime || '';
+    item.checkOutTime = item.checkOutTime || item.endTime || '';
+    item.startDate = item.checkIn || '';
+    item.endDate = item.checkOut || item.startDate || '';
+    item.startTime = item.checkInTime || '';
+    item.endTime = item.checkOutTime || '';
   });
   return items;
 }
@@ -2895,7 +2926,7 @@ function getImportedDestinationCityNames(importedData) {
         }
       }
 
-      (leg.days || []).forEach(day => {
+      (leg.days || []).forEach((day, dayIdx) => {
         if (day.from && day.to && day.from === day.to) addName(day.to);
         if (labelName && day.to && labelName.toLowerCase() === day.to.toLowerCase()) addName(day.to);
         if (labelName && day.from && labelName.toLowerCase() === day.from.toLowerCase()) addName(day.from);
@@ -3054,7 +3085,7 @@ function redactShareExportPayload(exportObj, options = {}) {
         });
       }
 
-      (leg.days || []).forEach(day => {
+      (leg.days || []).forEach((day, dayIdx) => {
         (day.transportItems || []).forEach(redactBookingFields);
         (day.accomItems || []).forEach(redactBookingFields);
         (day.activityItems || []).forEach(redactBookingFields);
@@ -3383,6 +3414,87 @@ function buildExportItemLine(item, fallbackLabel = 'Item') {
   return `- ${parts.join(' | ')}`;
 }
 
+function getExportCityName(cityId) {
+  if (!cityId || !Array.isArray(citiesData)) return '';
+  const city = citiesData.find(c => c.id === cityId);
+  return city ? city.name : '';
+}
+
+function getExportTimelineScore(dateValue, timeValue = '', fallback = Number.MAX_SAFE_INTEGER) {
+  if (typeof getTimelineScore === 'function') return getTimelineScore(dateValue, timeValue, fallback);
+  if (!dateValue) return fallback;
+  const normalized = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(dateValue) : dateValue;
+  const time = String(timeValue || '').trim() || '12:00';
+  const date = new Date(`${normalized}T${time}:00`);
+  return Number.isNaN(date.getTime()) ? fallback : date.getTime() / 60000;
+}
+
+function buildExportDailyTimelineItems(leg, day, legIdx, dayIdx, journeysData = [], staysData = []) {
+  const dayDate = normalizeTripDateValue(day.date);
+  const timelineItems = [];
+  const normalizeName = value => String(value || '').trim().toLowerCase();
+
+  journeysData.forEach((journey, journeyIdx) => {
+    const depDate = normalizeTripDateValue(journey.departureDate || journey.dayDate || '');
+    const arrDate = normalizeTripDateValue(journey.arrivalDate || journey.dayDate || journey.departureDate || '');
+    const legMatch = journey.legId && leg.id && journey.legId === leg.id;
+    const dateMatch = depDate === dayDate || arrDate === dayDate;
+    const routeMatch = (
+      normalizeName(journey.fromLocation) === normalizeName(day.from) ||
+      normalizeName(journey.toLocation) === normalizeName(day.to) ||
+      normalizeName(journey.fromLocation) === normalizeName(day.to) ||
+      normalizeName(journey.toLocation) === normalizeName(day.from)
+    );
+    if (!dateMatch || (!legMatch && !routeMatch)) return;
+
+    const route = [journey.fromLocation, journey.toLocation].filter(Boolean).join(' -> ');
+    const time = [journey.departureTime, journey.arrivalTime].filter(Boolean).join('-') || 'Anytime';
+    const parts = [
+      time,
+      `Transport: ${formatTextValue(journey.journeyName || route, 'Journey')}`,
+      formatTextValue(journey.provider, ''),
+      formatTextValue(journey.routeCode, ''),
+      journey.bookingReference ? `Ref ${formatTextValue(journey.bookingReference)}` : '',
+      journey.cost ? formatSummaryMoney(journey.cost) : ''
+    ].filter(Boolean);
+    timelineItems.push({
+      sortValue: getExportTimelineScore(depDate || dayDate, journey.departureTime, journeyIdx),
+      text: parts.join(' | ')
+    });
+  });
+
+  staysData.forEach((stay, stayIdx) => {
+    const cityName = stay.city || stay.cityName || getExportCityName(stay.cityId);
+    const cityMatches = !cityName || [day.from, day.to].some(name => normalizeName(name) === normalizeName(cityName));
+    const checkIn = normalizeTripDateValue(stay.checkIn || '');
+    const checkOut = normalizeTripDateValue(stay.checkOut || '');
+    if (cityMatches && checkIn === dayDate) {
+      const time = stay.checkInTime || '15:00';
+      timelineItems.push({
+        sortValue: getExportTimelineScore(dayDate, time, 2000 + stayIdx),
+        text: [time, `Stay check-in: ${formatTextValue(stay.propertyName, 'Accommodation')}`, stay.provider, stay.bookingRef ? `Ref ${formatTextValue(stay.bookingRef)}` : '', stay.totalCost ? formatSummaryMoney(stay.totalCost) : ''].filter(Boolean).join(' | ')
+      });
+    }
+    if (cityMatches && checkOut === dayDate) {
+      const time = stay.checkOutTime || '11:00';
+      timelineItems.push({
+        sortValue: getExportTimelineScore(dayDate, time, 2500 + stayIdx),
+        text: [time, `Stay check-out: ${formatTextValue(stay.propertyName, 'Accommodation')}`, stay.bookingRef ? `Ref ${formatTextValue(stay.bookingRef)}` : ''].filter(Boolean).join(' | ')
+      });
+    }
+  });
+
+  (day.activityItems || []).forEach((item, itemIdx) => {
+    const time = item.startTime ? `${item.startTime}${item.endTime ? `-${item.endTime}` : ''}` : 'Anytime';
+    timelineItems.push({
+      sortValue: getExportTimelineScore(dayDate, item.startTime, 4000 + itemIdx),
+      text: [time, `Activity: ${formatTextValue(item.text)}`, item.time ? `Duration ${formatTextValue(item.time)}` : '', item.cost ? formatSummaryMoney(item.cost) : ''].filter(Boolean).join(' | ')
+    });
+  });
+
+  return timelineItems.sort((a, b) => a.sortValue - b.sortValue);
+}
+
 async function exportItineraryText() {
   const previousSuppress = window.__suppressBackupTracking;
   window.__suppressBackupTracking = true;
@@ -3434,6 +3546,13 @@ async function exportItineraryText() {
           ];
           if (day.desc) dayParts.push(`Desc: ${truncateText(day.desc, 90)}`);
           sections.push(`  - ${dayParts.join(' | ')}`);
+          const timelineItems = buildExportDailyTimelineItems(leg, day, legIdx, dayIdx, journeysData, staysData);
+          if (timelineItems.length > 0) {
+            sections.push('    Agenda:');
+            timelineItems.forEach(item => {
+              sections.push(`      - ${item.text}`);
+            });
+          }
           if (Array.isArray(day.transportItems) && day.transportItems.length > 0) {
             day.transportItems.forEach(item => {
               const transportParts = [
@@ -3609,7 +3728,7 @@ async function exportItinerarySummaryText() {
       const dateList = (leg.days || []).map(day => formatTextValue(day.date)).filter(Boolean);
       const daySpan = dateList.length > 0 ? `${dateList[0]} -> ${dateList[dateList.length - 1]}` : '—';
       lines.push(`- ${legName} | ${daySpan}`);
-      (leg.days || []).forEach(day => {
+      (leg.days || []).forEach((day, dayIdx) => {
         const dayLabel = [day.date, day.day].filter(Boolean).join(' ');
         const summaryBits = [];
         if (day.from || day.to) summaryBits.push(`${formatTextValue(day.from)} -> ${formatTextValue(day.to)}`);
@@ -3618,6 +3737,10 @@ async function exportItinerarySummaryText() {
         if (Array.isArray(day.activityItems) && day.activityItems.length > 0) summaryBits.push(`Activities ${day.activityItems.length}`);
         if (day.desc) summaryBits.push(`Note ${truncateText(day.desc, 60)}`);
         lines.push(`  ${formatTextValue(dayLabel)} | ${summaryBits.join(' | ') || 'No details'}`);
+        const timelineItems = buildExportDailyTimelineItems(leg, day, legIdx, dayIdx, journeysData, staysData);
+        timelineItems.forEach(item => {
+          lines.push(`    - ${item.text}`);
+        });
       });
     });
   }

@@ -82,7 +82,7 @@ function renderCompactBlock(title, linesHtml, fullWidth = false) {
   if (!linesHtml) return '';
   return `
     <div class="compact-day-block${fullWidth ? ' compact-day-block-wide' : ''}">
-      <div class="compact-day-block-title">${title}</div>
+      ${title ? `<div class="compact-day-block-title">${title}</div>` : ''}
       <div class="compact-day-block-lines">${linesHtml}</div>
     </div>
   `;
@@ -146,6 +146,7 @@ function renderCompactFoodQuestCard(leg, legIndex) {
 }
 
 function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
+  const useGroupedView = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped';
   const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
   const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
   const dayStayInfo = getStayDisplayForDay(day.date, day.to);
@@ -204,11 +205,17 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     </label>
   `;
 
+  const timelineBlock = renderCompactBlock('', renderDailyTimeline(leg, legIndex, day, dayIdx, { compact: true }), true);
+  const groupedBlock = renderCompactBlock('Grouped Plan', `
+        <div class="compact-grouped-plan">
+          <section><h5>Transport</h5>${transportLines || '<div class="compact-day-empty">No transport scheduled.</div>'}</section>
+          <section><h5>Stay</h5>${accomLines || '<div class="compact-day-empty">No stay linked.</div>'}</section>
+          <section><h5>Activities</h5>${activityLines || '<div class="compact-day-empty">Nothing planned yet.</div>'}</section>
+        </div>
+      `, true);
   const details = `
     <div class="compact-day-grid">
-      ${renderCompactBlock('Transport', transportLines || '<div class="compact-day-empty">No transport scheduled.</div>')}
-      ${renderCompactBlock('Stay', accomLines || '<div class="compact-day-empty">No stay linked.</div>')}
-      ${renderCompactBlock('Activities', activityLines || '<div class="compact-day-empty">Nothing planned yet.</div>', true)}
+      ${useGroupedView ? groupedBlock : timelineBlock}
     </div>
   `;
 
@@ -846,11 +853,15 @@ function getStayDisplayForDay(dayDate, dayCity) {
     if (normalizedDayDate === checkInDate) {
       result.push({
         type: 'checkin',
+        stayId: stay.id,
         propertyName: stay.propertyName,
         provider: stay.provider,
         status: stay.status,
         bookingRef: stay.bookingRef,
-        cost: stay.totalCost
+        cost: stay.totalCost,
+        startTime: stay.checkInTime || '15:00',
+        endTime: '',
+        done: !!stay.done
       });
       return;
     }
@@ -858,11 +869,15 @@ function getStayDisplayForDay(dayDate, dayCity) {
     if (normalizedDayDate === checkOutDate) {
       result.push({
         type: 'checkout',
+        stayId: stay.id,
         propertyName: stay.propertyName,
         provider: stay.provider,
         status: stay.status,
         bookingRef: stay.bookingRef,
-        cost: stay.totalCost
+        cost: stay.totalCost,
+        startTime: stay.checkOutTime || '11:00',
+        endTime: '',
+        done: !!stay.done
       });
       return;
     }
@@ -870,16 +885,199 @@ function getStayDisplayForDay(dayDate, dayCity) {
     if (normalizedDayDate > checkInDate && normalizedDayDate < checkOutDate) {
       result.push({
         type: 'staying',
+        stayId: stay.id,
         propertyName: stay.propertyName,
         provider: stay.provider,
         status: stay.status,
         bookingRef: null,
-        cost: null
+        cost: null,
+        startTime: '',
+        endTime: '',
+        done: !!stay.done
       });
     }
   });
 
   return result;
+}
+
+function formatTimelineTimeRange(startTime = '', endTime = '') {
+  const start = String(startTime || '').trim();
+  const end = String(endTime || '').trim();
+  if (start && end) return `${start}-${end}`;
+  return start || end || 'Anytime';
+}
+
+function getDailyTimelineItemSortValue(dayDate, startTime, fallbackOffset = 0) {
+  const hasTime = !!String(startTime || '').trim();
+  const fallback = Number.MAX_SAFE_INTEGER - 100000 + fallbackOffset;
+  const score = getTimelineScore(dayDate, startTime || '', fallback);
+  return hasTime ? score : fallback;
+}
+
+function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
+  const items = [];
+  const dayDate = normalizeDate(day?.date || '');
+  const dayJourneys = typeof getDayJourneys === 'function'
+    ? getDayJourneys(day.date, day.from, day.to, leg.id)
+    : [];
+
+  dayJourneys.forEach((journey, journeyIndex) => {
+    const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+      ? window.journeys
+      : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+    const segments = journeysSource
+      .filter(seg => (seg.journeyId || seg.id) === (journey.journeyId || journey.id))
+      .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+    const first = segments[0] || journey;
+    const last = segments[segments.length - 1] || journey;
+    const route = segments.length > 1
+      ? [first.fromLocation, ...segments.map(seg => seg.toLocation)].filter(Boolean).join(' -> ')
+      : [journey.fromLocation, journey.toLocation].filter(Boolean).join(' -> ');
+    const startTime = first.departureTime || journey.departureTime || '';
+    const endTime = last.arrivalTime || journey.arrivalTime || '';
+    const startDate = normalizeDate(first.departureDate || first.dayDate || journey.departureDate || journey.dayDate || dayDate);
+    const endDate = normalizeDate(last.arrivalDate || last.departureDate || journey.arrivalDate || journey.departureDate || dayDate);
+    const crossDate = endDate && startDate && endDate !== startDate ? ` Arrives ${formatTripDateForDisplay(endDate)}` : '';
+
+    items.push({
+      type: 'transport',
+      typeLabel: 'Transport',
+      icon: getTransportIcon(journey.transportType),
+      title: journey.journeyName || route || 'Transport',
+      meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDate.trim()].filter(Boolean).join(' · '),
+      cost: journey.cost,
+      status: journey.status || 'planned',
+      startTime,
+      endTime,
+      sortValue: getDailyTimelineItemSortValue(startDate || dayDate, startTime, journeyIndex),
+      actionHtml: '',
+      journeyId: journey.id,
+      done: !!journey.done
+    });
+  });
+
+  getStayDisplayForDay(day.date, day.to).forEach((stayInfo, stayIndex) => {
+    const label = stayInfo.type === 'checkin' ? 'Check-in' : stayInfo.type === 'checkout' ? 'Check-out' : 'Staying';
+    const icon = stayInfo.type === 'checkout' ? '🚪' : '🏨';
+    items.push({
+      type: 'stay',
+      typeLabel: label,
+      icon,
+      title: `${label}: ${stayInfo.propertyName || 'Accommodation'}`,
+      meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : '', stayInfo.status].filter(Boolean).join(' · '),
+      cost: stayInfo.cost,
+      status: stayInfo.status || '',
+      startTime: stayInfo.startTime || '',
+      endTime: stayInfo.endTime || '',
+      sortValue: getDailyTimelineItemSortValue(dayDate, stayInfo.startTime, 2000 + stayIndex),
+      stayId: stayInfo.stayId,
+      done: !!stayInfo.done
+    });
+  });
+
+  (day.activityItems || []).forEach((item, itemIndex) => {
+    const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    items.push({
+      type: 'activity',
+      typeLabel: 'Activity',
+      icon: emoji,
+      title: item.text || 'Activity',
+      meta: [item.time || '', item.cost ? formatCurrency(item.cost) : ''].filter(Boolean).join(' · '),
+      cost: item.cost,
+      done: !!item.done,
+      startTime: item.startTime || '',
+      endTime: item.endTime || '',
+      legIndex,
+      dayIndex,
+      itemIndex,
+      sortValue: getDailyTimelineItemSortValue(dayDate, item.startTime, 4000 + itemIndex),
+      actionHtml: `
+        <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${itemIndex})">×</button>
+      `
+    });
+  });
+
+  return items.sort((a, b) => {
+    if (a.sortValue !== b.sortValue) return a.sortValue - b.sortValue;
+    return String(a.title || '').localeCompare(String(b.title || ''));
+  });
+}
+
+function getDailyTimelineBuckets(items) {
+  return {
+    scheduled: items.filter(item => String(item.startTime || item.endTime || '').trim()),
+    anytime: items.filter(item => !String(item.startTime || item.endTime || '').trim())
+  };
+}
+
+function renderDailyTimelineRow(item, compact = false) {
+  const isTimeClickable = isEditMode && item.type === 'activity';
+  const timeClass = "daily-timeline-time" + (isTimeClickable ? " is-clickable" : "");
+  const timeOnClick = isTimeClickable
+    ? ` role="button" tabindex="0" onclick="event.stopPropagation(); openDayItemScheduleDialog(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex})"`
+    : '';
+
+  let checkboxHtml = '';
+  if (item.type === 'activity') {
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})">`;
+  } else if (item.type === 'transport') {
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox transport-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleJourneyCompleted(event, '${item.journeyId}')">`;
+  } else if (item.type === 'stay' || item.type === 'checkin' || item.type === 'checkout' || item.type === 'staying') {
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox stay-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleStayCompleted(event, '${item.stayId}')">`;
+  }
+
+  return `
+    <div class="daily-timeline-item daily-timeline-item-${escapeCompactText(item.type)} ${item.done ? 'is-done' : ''}">
+      <div class="${timeClass}"${timeOnClick}>${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
+      <div class="daily-timeline-marker"><span>${item.icon}</span></div>
+      <div class="daily-timeline-content">
+        <div class="daily-timeline-title-row">
+          <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
+          <div class="daily-timeline-title-and-checkbox">
+            <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
+            ${checkboxHtml}
+          </div>
+        </div>
+        ${item.meta ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta)}</div>` : ''}
+      </div>
+      ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
+    </div>
+  `;
+}
+
+function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
+  const items = buildDailyTimelineItems(leg, legIndex, day, dayIndex);
+  const compact = !!options.compact;
+  const empty = compact
+    ? '<div class="compact-day-empty">No scheduled items yet.</div>'
+    : '<div class="timeline-empty">No scheduled items yet. Add transport, stays, or activities to build the day.</div>';
+  if (items.length === 0) return empty;
+  const { scheduled, anytime } = getDailyTimelineBuckets(items);
+  const summaryParts = [
+    scheduled.length ? `${scheduled.length} scheduled` : '',
+    anytime.length ? `${anytime.length} anytime` : ''
+  ].filter(Boolean).join(' · ');
+
+  return `
+    <div class="daily-timeline-shell ${compact ? 'daily-timeline-shell-compact' : ''}">
+      ${summaryParts ? `<div class="daily-timeline-summary">${escapeCompactText(summaryParts)}</div>` : ''}
+      ${scheduled.length ? `
+        <div class="timeline-section-label">Scheduled</div>
+        <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
+          ${scheduled.map(item => renderDailyTimelineRow(item, compact)).join('')}
+        </div>
+      ` : '<div class="timeline-empty">No timed entries yet. Add start times to build the day timeline.</div>'}
+      ${anytime.length ? `
+        <div class="timeline-anytime">
+          <div class="timeline-anytime-label">Anytime</div>
+          <div class="timeline-anytime-list">
+            ${anytime.map(item => renderDailyTimelineRow(item, compact)).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
 }
 
 function getLegStayNightCount(leg) {
@@ -996,6 +1194,11 @@ function buildItinerary() {
   // Save open state of day cards before rebuilding
   openDayCardIds.clear();
   document.querySelectorAll('.day-card.open').forEach(card => {
+    const preservedDayKey = card.getAttribute('data-day-key');
+    if (preservedDayKey) {
+      openDayCardIds.add(preservedDayKey);
+      return;
+    }
     const dayBar = card.querySelector('.day-bar');
     if (dayBar) {
       const dayNum = dayBar.querySelector('.day-num')?.textContent;
@@ -1145,16 +1348,23 @@ function buildItinerary() {
       const shouldBeOpen = openDayCardIds.has(dayKey);
       const openClass = shouldBeOpen ? 'open' : '';
       const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
+      const dayViewMode = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
 
       html += `
-      <div class="day-card ${completedClass} ${openClass}">
+      <div class="day-card ${completedClass} ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
         <div class="day-bar" style="--leg-colour:${leg.colour}" onclick="toggleCard(this)">
           <input type="checkbox" class="day-checkbox" ${day.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleDayCompleted(event, ${legIndex}, ${dayIndex})">
           <div class="day-date"><span class="day-num">${dayDateLabel}</span><span class="day-name">${day.day}</span></div>
           <div class="day-title"><div class="day-cities">${cityHTML}</div><div class="day-desc" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
           ${dayTotal ? `<div class="day-total-cost" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron">▼</span>
         </div>
-        <div class="day-detail"><div class="detail-grid">
+        <div class="day-detail"><div class="day-planner-shell day-planner-shell-${dayViewMode}">
+          <div class="day-view-panel day-view-panel-timeline">
+          <div class="detail-block daily-timeline-card drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
+            ${renderDailyTimeline(leg, legIndex, day, dayIndex)}
+          </div>
+          </div>
+          <div class="day-view-panel day-view-panel-grouped"><div class="detail-grid detail-grid-grouped">
 
           <div class="detail-block block-transport">
             <h4>Transport</h4><div class="item-list">
@@ -1222,6 +1432,7 @@ ${(() => {
             </div><button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>
           </div>
 
+          </div></div>
         </div></div>
       </div>
       `;
