@@ -1322,7 +1322,10 @@ function buildItinerary() {
       let isCompleted = false; let dayLabel = '';
       if (isAssigned && leg.days[activity.assignedDayIdx]) {
         dayLabel = leg.days[activity.assignedDayIdx].date;
-        const matchedActivity = leg.days[activity.assignedDayIdx].activityItems.find(a => a.text === activity.title);
+        const matchTexts = typeof getSuggestedActivityMatchTexts === 'function'
+          ? getSuggestedActivityMatchTexts(activity)
+          : [activity.title];
+        const matchedActivity = leg.days[activity.assignedDayIdx].activityItems.find(a => matchTexts.includes(String(a.text || '').trim()));
         if (matchedActivity && matchedActivity.done) isCompleted = true;
       }
       const badgeStateClass = isCompleted ? 'is-complete' : 'is-scheduled';

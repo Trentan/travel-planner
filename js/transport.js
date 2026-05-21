@@ -197,6 +197,13 @@ function saveJourneys() {
   window.journeys = journeys;
 }
 
+function persistJourneys(showTick = true) {
+  saveJourneys();
+  if (typeof saveData === 'function') {
+    saveData(showTick);
+  }
+}
+
 function normalizeJourneyLocation(value) {
   return (value || '').trim().toLowerCase();
 }
@@ -334,7 +341,7 @@ function createJourneyFromTransportItem(item, legId, dayDate, fromLoc, toLoc) {
   };
   journeys.push(journey);
   window.journeys = journeys;
-  saveJourneys();
+  persistJourneys();
   return journey;
 }
 
@@ -460,7 +467,7 @@ function updateJourneyStatus(id, newStatus) {
   const journey = findJourney(id);
   if (journey) {
     journey.status = newStatus;
-    saveJourneys();
+    persistJourneys();
     return journey;
   }
   return null;
@@ -470,7 +477,7 @@ function updateJourneyBookingRef(id, ref) {
   const journey = findJourney(id);
   if (journey) {
     journey.bookingReference = ref;
-    saveJourneys();
+    persistJourneys();
     if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
     return journey;
   }
@@ -481,7 +488,7 @@ function updateJourneyCost(id, cost) {
   const journey = findJourney(id);
   if (journey) {
     journey.cost = cost;
-    saveJourneys();
+    persistJourneys();
     if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
     return journey;
   }
@@ -491,14 +498,14 @@ function updateJourneyCost(id, cost) {
 function deleteJourney(id) {
   journeys = journeys.filter(j => j.id !== id);
   window.journeys = journeys;
-  saveJourneys();
+  persistJourneys();
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
 }
 
 function deleteJourneyGroup(journeyId) {
   journeys = journeys.filter(j => j.journeyId !== journeyId);
   window.journeys = journeys;
-  saveJourneys();
+  persistJourneys();
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
 }
 
@@ -1437,7 +1444,7 @@ function deleteJourneyFromModal() {
     const pendingIds = new Set(_pendingSegments.map(seg => seg.id).filter(Boolean));
     journeys = journeys.filter(j => !pendingIds.has(j.id));
     window.journeys = journeys;
-    saveJourneys();
+    persistJourneys();
     if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   }
   closeJourneyModal();
@@ -1481,7 +1488,7 @@ function saveJourneyFromModal() {
 
     journeys.push(...finalSegments);
     window.journeys = journeys;
-    saveJourneys();
+    persistJourneys();
     closeJourneyModal();
     buildTransportTab();
   } catch (e) {
