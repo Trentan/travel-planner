@@ -475,7 +475,8 @@ body {
 }
 
 .app-menu-actions > summary::-webkit-details-marker,
-.compact-food-summary::-webkit-details-marker {
+.compact-food-summary::-webkit-details-marker,
+.compact-tips-summary::-webkit-details-marker {
   display: none;
 }
 
@@ -854,6 +855,10 @@ main {
   justify-content: flex-end;
   gap: 0.65rem;
   flex-wrap: wrap;
+}
+
+.add-leg-short {
+  display: none;
 }
 
 .itinerary-view-mode-control {
@@ -4332,6 +4337,16 @@ body.compact-view-mode .compact-desktop-stack .compact-leg-body {
   align-items: start;
 }
 
+body.compact-view-mode .compact-desktop-stack .compact-tips-card,
+body.compact-view-mode .compact-desktop-stack .compact-food-quest-card {
+  grid-column: 1;
+}
+
+body.compact-view-mode .compact-desktop-stack .compact-day-pager {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+}
+
 body.compact-view-mode .compact-desktop-stack .compact-day-pager,
 body.compact-view-mode .compact-desktop-stack .compact-day-carousel,
 body.compact-view-mode .compact-desktop-stack .compact-day-slide {
@@ -4341,6 +4356,13 @@ body.compact-view-mode .compact-desktop-stack .compact-day-slide {
 @media (max-width: 900px) {
   body.compact-view-mode .compact-desktop-stack .compact-leg-body {
     grid-template-columns: 1fr;
+  }
+
+  body.compact-view-mode .compact-desktop-stack .compact-tips-card,
+  body.compact-view-mode .compact-desktop-stack .compact-food-quest-card,
+  body.compact-view-mode .compact-desktop-stack .compact-day-pager {
+    grid-column: auto;
+    grid-row: auto;
   }
 }
 
@@ -4583,6 +4605,11 @@ body.compact-view-mode .mobile-surface-card-details.expanded {
   padding-top: 0.42rem;
 }
 
+.compact-tips-card .mobile-surface-card-details {
+  margin-top: 0.42rem;
+  padding-top: 0.42rem;
+}
+
 .compact-food-summary {
   position: relative;
   width: 100%;
@@ -4658,6 +4685,220 @@ body.compact-view-mode .mobile-surface-card-details.expanded {
 
 .compact-food-summary:hover .compact-food-summary-chevron {
   transform: scale(1.18);
+}
+
+.compact-tips-summary {
+  position: relative;
+  width: 100%;
+  min-height: 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.34rem;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.compact-tips-summary:hover {
+  opacity: 0.82;
+}
+
+.compact-tips-summary-title {
+  min-width: 0;
+  font-size: 0.78rem;
+  line-height: 1.1;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  white-space: nowrap;
+}
+
+.compact-tips-summary-icon {
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+.compact-tips-summary-count {
+  flex: 0 0 auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: var(--accent-strong);
+  background: rgba(36, 72, 93, 0.08);
+  border: 1px solid rgba(36, 72, 93, 0.1);
+  border-radius: 999px;
+  padding: 0.08rem 0.32rem;
+}
+
+.compact-tips-summary-chevron {
+  color: var(--accent-strong);
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.compact-tips-summary:hover .compact-tips-summary-chevron {
+  transform: scale(1.18);
+}
+
+.compact-tips-card .compact-tips-list {
+  display: grid;
+  gap: 0.38rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compact-tips-card .compact-tip-item {
+  font-size: 0.77rem;
+  line-height: 1.28;
+}
+
+.compact-tips-card .compact-line {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.compact-tips-card .compact-line-text {
+  font-size: 0.77rem;
+  line-height: 1.28;
+}
+
+.compact-mobile-leg-info {
+  display: none;
+}
+
+.compact-mobile-info-chips {
+  display: flex;
+  gap: 0.34rem;
+  align-items: stretch;
+}
+
+.compact-mobile-info-chip {
+  position: relative;
+  min-width: 0;
+  min-height: 30px;
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.32rem;
+  padding: 0.3rem 0.46rem;
+  border: 1px solid rgba(36, 72, 93, 0.12);
+  border-left: 3px solid var(--leg-accent, var(--accent));
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--text);
+  box-shadow: 0 6px 14px rgba(26, 36, 47, 0.05);
+  font: inherit;
+  text-align: left;
+  overflow: hidden;
+}
+
+.compact-mobile-info-chip.is-active {
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: inset 0 0 0 1px rgba(36, 72, 93, 0.08), 0 8px 16px rgba(26, 36, 47, 0.07);
+}
+
+.compact-mobile-info-chip-title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compact-mobile-info-chip-count {
+  flex: 0 0 auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent-strong);
+  background: rgba(36, 72, 93, 0.08);
+  border: 1px solid rgba(36, 72, 93, 0.1);
+  border-radius: 999px;
+  padding: 0.09rem 0.28rem;
+}
+
+.compact-mobile-info-progress {
+  position: absolute;
+  right: 0.42rem;
+  bottom: 0.2rem;
+  left: 0.46rem;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(36, 72, 93, 0.1);
+  overflow: hidden;
+}
+
+.compact-mobile-info-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), #5f7f96);
+}
+
+.compact-mobile-info-panel {
+  margin-top: 0.28rem;
+  padding: 0.42rem 0.48rem;
+  border: 1px solid rgba(36, 72, 93, 0.1);
+  border-left: 3px solid var(--leg-accent, var(--accent));
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.compact-mobile-info-list {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compact-mobile-info-panel .compact-food-list {
+  display: grid;
+  gap: 0.24rem;
+}
+
+.compact-mobile-info-panel .compact-food-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  line-height: 1.22;
+  cursor: pointer;
+}
+
+.compact-mobile-info-panel .compact-food-item input {
+  margin-top: 0.08rem;
+  width: 0.86rem;
+  height: 0.86rem;
+  accent-color: var(--success);
+  flex-shrink: 0;
+}
+
+.compact-mobile-info-panel .compact-line {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+
+.compact-mobile-info-panel .compact-line-text {
+  font-size: 0.72rem;
+  line-height: 1.22;
 }
 
 .compact-food-quest-card .compact-food-list {
@@ -8379,6 +8620,62 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     margin-bottom: 0.42rem;
   }
 
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .section-header {
+    display: grid;
+    grid-template-columns: minmax(4.9rem, auto) minmax(0, 1fr);
+    align-items: center;
+    gap: 0.34rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .section-header-title {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 1.05rem;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .section-header-actions {
+    width: auto;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(7.8rem, 1fr) auto;
+    gap: 0.32rem;
+    justify-content: end;
+  }
+
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .itinerary-view-mode-control {
+    min-width: 0;
+    padding: 0.18rem;
+    border-radius: 9px;
+    gap: 0.18rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .itinerary-view-mode-btn {
+    min-height: 30px;
+    padding: 0.24rem 0.34rem;
+    border-radius: 7px;
+    font-size: 0.68rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-action {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-full {
+    display: none;
+  }
+
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-short {
+    display: inline;
+  }
+
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-short::before {
+    content: "+ Add Leg";
+  }
+
   body.mobile-app-mode.compact-view-mode .transport-header,
   body.mobile-app-mode.compact-view-mode .accom-header {
     padding-bottom: 0;
@@ -8452,6 +8749,16 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
   body.mobile-app-mode.compact-view-mode .mobile-surface-card-details {
     padding-top: 0.48rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .compact-leg-card .compact-leg-body {
+    gap: 0.44rem;
+    padding: 0.5rem 0.58rem 0.62rem;
+  }
+
+  body.mobile-app-mode.compact-view-mode .compact-mobile-leg-info {
+    display: grid;
+    gap: 0;
   }
 
   body.mobile-app-mode.compact-view-mode .mobile-swipe-rail,
