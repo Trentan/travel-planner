@@ -48,6 +48,62 @@ body {
   box-shadow: 0 2px 16px rgba(0,0,0,0.14);
 }
 
+.json-write-warning {
+  background: #fff3cd;
+  border-bottom: 1px solid #f2c94c;
+  color: #5f4300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(26, 36, 47, 0.08);
+}
+
+.json-write-warning[hidden] {
+  display: none;
+}
+
+.json-write-warning-text {
+  max-width: 760px;
+}
+
+.json-write-warning-actions {
+  display: inline-flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.json-write-warning button {
+  border: 1px solid rgba(95, 67, 0, 0.22);
+  border-radius: 6px;
+  background: #ffffff;
+  color: #24485d;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.45rem 0.62rem;
+}
+
+.json-write-warning button:hover {
+  background: #f8f5ee;
+}
+
+@media (max-width: 768px) {
+  .json-write-warning {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.7rem 0.85rem;
+  }
+}
+
 @media (min-width: 769px) {
   .app-menu-bar {
     position: sticky;
