@@ -419,7 +419,8 @@ body {
 }
 
 .app-menu-actions > summary::-webkit-details-marker,
-.compact-food-summary::-webkit-details-marker {
+.compact-food-summary::-webkit-details-marker,
+.compact-tips-summary::-webkit-details-marker {
   display: none;
 }
 
@@ -4093,6 +4094,16 @@ body.compact-view-mode .compact-desktop-stack .compact-leg-body {
   align-items: start;
 }
 
+body.compact-view-mode .compact-desktop-stack .compact-tips-card,
+body.compact-view-mode .compact-desktop-stack .compact-food-quest-card {
+  grid-column: 1;
+}
+
+body.compact-view-mode .compact-desktop-stack .compact-day-pager {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+}
+
 body.compact-view-mode .compact-desktop-stack .compact-day-pager,
 body.compact-view-mode .compact-desktop-stack .compact-day-carousel,
 body.compact-view-mode .compact-desktop-stack .compact-day-slide {
@@ -4102,6 +4113,13 @@ body.compact-view-mode .compact-desktop-stack .compact-day-slide {
 @media (max-width: 900px) {
   body.compact-view-mode .compact-desktop-stack .compact-leg-body {
     grid-template-columns: 1fr;
+  }
+
+  body.compact-view-mode .compact-desktop-stack .compact-tips-card,
+  body.compact-view-mode .compact-desktop-stack .compact-food-quest-card,
+  body.compact-view-mode .compact-desktop-stack .compact-day-pager {
+    grid-column: auto;
+    grid-row: auto;
   }
 }
 
@@ -4344,6 +4362,11 @@ body.compact-view-mode .mobile-surface-card-details.expanded {
   padding-top: 0.42rem;
 }
 
+.compact-tips-card .mobile-surface-card-details {
+  margin-top: 0.42rem;
+  padding-top: 0.42rem;
+}
+
 .compact-food-summary {
   position: relative;
   width: 100%;
@@ -4419,6 +4442,93 @@ body.compact-view-mode .mobile-surface-card-details.expanded {
 
 .compact-food-summary:hover .compact-food-summary-chevron {
   transform: scale(1.18);
+}
+
+.compact-tips-summary {
+  position: relative;
+  width: 100%;
+  min-height: 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.34rem;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.compact-tips-summary:hover {
+  opacity: 0.82;
+}
+
+.compact-tips-summary-title {
+  min-width: 0;
+  font-size: 0.78rem;
+  line-height: 1.1;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  white-space: nowrap;
+}
+
+.compact-tips-summary-icon {
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+.compact-tips-summary-count {
+  flex: 0 0 auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: var(--accent-strong);
+  background: rgba(36, 72, 93, 0.08);
+  border: 1px solid rgba(36, 72, 93, 0.1);
+  border-radius: 999px;
+  padding: 0.08rem 0.32rem;
+}
+
+.compact-tips-summary-chevron {
+  color: var(--accent-strong);
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.compact-tips-summary:hover .compact-tips-summary-chevron {
+  transform: scale(1.18);
+}
+
+.compact-tips-card .compact-tips-list {
+  display: grid;
+  gap: 0.38rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compact-tips-card .compact-tip-item {
+  font-size: 0.77rem;
+  line-height: 1.28;
+}
+
+.compact-tips-card .compact-line {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.compact-tips-card .compact-line-text {
+  font-size: 0.77rem;
+  line-height: 1.28;
 }
 
 .compact-food-quest-card .compact-food-list {

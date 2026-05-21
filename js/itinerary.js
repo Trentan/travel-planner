@@ -145,6 +145,44 @@ function renderCompactFoodQuestCard(leg, legIndex) {
   `;
 }
 
+function renderCompactTipItem(tip) {
+  const text = typeof tip === 'string' ? tip : (tip && tip.text) || '';
+  return `
+    <li class="compact-tip-item">
+      ${renderCompactEmojiLine({
+    emoji: '&#128161;',
+    text: text || 'Untitled tip'
+  })}
+    </li>
+  `;
+}
+
+function renderCompactTipsCard(leg, legIndex) {
+  const tips = Array.isArray(leg.legTips) ? leg.legTips : [];
+  const tipsList = tips.length > 0
+      ? `<ul class="compact-tips-list">${tips.map(tip => renderCompactTipItem(tip)).join('')}</ul>`
+      : '<div class="compact-day-empty">No tips saved for this leg yet.</div>';
+  const legId = leg.id || String(legIndex);
+  const expanded = isTipsCardExpanded(legId);
+  const chevronSymbol = expanded ? '&#9650;' : '&#9660;';
+  const countLabel = `${tips.length} tip${tips.length === 1 ? '' : 's'}`;
+
+  return `
+    <article class="mobile-surface-card compact-tips-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+      <div class="compact-tips-summary" onclick="toggleTipsCardDetails(event, '${legId}')" style="cursor: pointer; user-select: none;">
+        <span class="compact-tips-summary-title"><span class="compact-tips-summary-icon" aria-hidden="true">&#128161;</span> Tips</span>
+        <span class="compact-tips-summary-count">${escapeCompactText(countLabel)}</span>
+        <span class="compact-tips-summary-chevron" aria-hidden="true">${chevronSymbol}</span>
+      </div>
+      ${expanded ? `
+        <div class="mobile-surface-card-details expanded">
+          ${tipsList}
+        </div>
+      ` : ''}
+    </article>
+  `;
+}
+
 function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
   const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
@@ -547,6 +585,7 @@ function renderCompactLegCard(leg, legIndex) {
         </div>
       </div>
       <div class="compact-leg-body">
+        ${renderCompactTipsCard(leg, legIndex)}
         ${renderCompactFoodQuestCard(leg, legIndex)}
         ${renderCompactDayPager(leg, legIndex)}
       </div>
@@ -592,6 +631,7 @@ function buildCompactItinerary() {
           </div>
         </div>
         <div class="compact-leg-body">
+          ${renderCompactTipsCard(leg, legIndex)}
           ${renderCompactFoodQuestCard(leg, legIndex)}
           ${renderCompactDayPager(leg, legIndex)}
         </div>
@@ -1142,9 +1182,14 @@ function isTransitLegForDisplay(leg) {
 // Track open day cards across rebuilds
 let openDayCardIds = new Set();
 let expandedFoodQuestLegs = new Set();
+let expandedTipsLegs = new Set();
 
 function isFoodQuestExpanded(legId) {
   return expandedFoodQuestLegs.has(legId);
+}
+
+function isTipsCardExpanded(legId) {
+  return expandedTipsLegs.has(legId);
 }
 
 function toggleFoodQuestDetails(e, legId) {
@@ -1158,6 +1203,22 @@ function toggleFoodQuestDetails(e, legId) {
     expandedFoodQuestLegs.delete(legId);
   } else {
     expandedFoodQuestLegs.add(legId);
+  }
+  if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+  requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
+}
+
+function toggleTipsCardDetails(e, legId) {
+  if (e) {
+    if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+  }
+  const scrollX = window.scrollX || 0;
+  const scrollY = window.scrollY || 0;
+  if (expandedTipsLegs.has(legId)) {
+    expandedTipsLegs.delete(legId);
+  } else {
+    expandedTipsLegs.add(legId);
   }
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
@@ -1988,6 +2049,7 @@ function scrollToCity(cityId) {
 window.selectCityFilter = selectCityFilter;
 window.getStayDisplayForDay = getStayDisplayForDay;
 window.toggleFoodQuestDetails = toggleFoodQuestDetails;
+window.toggleTipsCardDetails = toggleTipsCardDetails;
 window.compactItineraryGoToDay = compactItineraryGoToDay;
 window.captureCompactDayPagerStates = captureCompactDayPagerStates;
 window.restoreCompactDayPagerScrollPositions = restoreCompactDayPagerScrollPositions;
