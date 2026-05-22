@@ -9589,7 +9589,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   white-space: nowrap;
   color: var(--text);
   font-size: 0.74rem;
-  font-weight: 650;
+  font-weight: 400;
 }
 
 .transport-mobile-sub-locations {
@@ -9673,10 +9673,11 @@ body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detai
   color: var(--muted, #57606f);
   margin-top: 0.25rem;
   font-weight: 400;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  flex-wrap: wrap;
+  display: block;
+}
+
+.daily-timeline-sub-location-details {
+  margin-top: 0;
 }
 
 /* Multi-leg detail row segments list sub-locations */

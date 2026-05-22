@@ -254,6 +254,27 @@ function formatJourneySubLocationText(segments) {
     .join(' | ');
 }
 
+function renderJourneySubLocationTextHtml(text) {
+  const parts = String(text || '').split(' | ').map(part => part.trim()).filter(Boolean);
+  if (parts.length === 0) return '';
+
+  return `
+    <div class="transport-sub-location-details daily-timeline-sub-location-details">
+      ${parts.map(part => {
+        const colonIndex = part.indexOf(':');
+        const label = colonIndex >= 0 ? part.slice(0, colonIndex).trim() : '';
+        const value = colonIndex >= 0 ? part.slice(colonIndex + 1).trim() : part;
+        return `
+          <span class="transport-sub-location-detail">
+            ${label ? `<span class="transport-sub-location-label">${escapeCompactText(label)}</span>` : ''}
+            <span class="transport-sub-location-value">${escapeCompactText(value)}</span>
+          </span>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
 function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const useGroupedView = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped';
   const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
@@ -1138,7 +1159,7 @@ function renderDailyTimelineRow(item, compact = false) {
           </div>
         </div>
         ${item.meta ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta)}</div>` : ''}
-        ${item.subLocations ? `<div class="daily-timeline-sub-locations">${escapeCompactText(item.subLocations)}</div>` : ''}
+        ${item.subLocations ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
     </div>
