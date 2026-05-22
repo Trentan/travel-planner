@@ -231,9 +231,26 @@ function formatJourneySubLocationText(segments) {
   return segments
     .flatMap((seg, index) => {
       const legPrefix = isMultiLeg ? `Leg ${index + 1} ` : '';
+      
+      let fromVal = seg.fromAddress || '';
+      if (fromVal && seg.fromLocation) {
+        const cleanCity = String(seg.fromLocation).trim();
+        if (cleanCity && !fromVal.toLowerCase().includes(cleanCity.toLowerCase())) {
+          fromVal = `${fromVal} (${cleanCity})`;
+        }
+      }
+      
+      let toVal = seg.toAddress || '';
+      if (toVal && seg.toLocation) {
+        const cleanCity = String(seg.toLocation).trim();
+        if (cleanCity && !toVal.toLowerCase().includes(cleanCity.toLowerCase())) {
+          toVal = `${toVal} (${cleanCity})`;
+        }
+      }
+
       return [
-        seg.fromAddress ? `${legPrefix}Depart: ${seg.fromAddress}` : '',
-        seg.toAddress ? `${legPrefix}Arrive: ${seg.toAddress}` : ''
+        seg.fromAddress ? `${legPrefix}Depart: ${fromVal}` : '',
+        seg.toAddress ? `${legPrefix}Arrive: ${toVal}` : ''
       ];
     })
     .filter(Boolean)
@@ -1082,7 +1099,14 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       icon,
       title: `${label}: ${stayInfo.propertyName || 'Accommodation'}`,
       meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : '', stayInfo.status].filter(Boolean).join(' · '),
-      subLocations: stayInfo.location ? `Location: ${stayInfo.location}` : '',
+      subLocations: stayInfo.location ? (() => {
+        let loc = stayInfo.location;
+        const cleanCity = String(day.to).trim();
+        if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+          loc = `${loc} (${cleanCity})`;
+        }
+        return `Location: ${loc}`;
+      })() : '',
       cost: stayInfo.cost,
       status: stayInfo.status || '',
       startTime: stayInfo.startTime || '',

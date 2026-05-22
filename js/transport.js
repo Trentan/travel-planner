@@ -619,8 +619,8 @@ function renderTransportDetailBlock(title, value, extraClass = '') {
 function getTransportSubLocationParts(seg) {
   if (!seg) return [];
   return [
-    seg.fromAddress ? { label: 'Depart', value: seg.fromAddress } : null,
-    seg.toAddress ? { label: 'Arrive', value: seg.toAddress } : null
+    seg.fromAddress ? { label: 'Depart', value: seg.fromAddress, city: seg.fromLocation } : null,
+    seg.toAddress ? { label: 'Arrive', value: seg.toAddress, city: seg.toLocation } : null
   ].filter(Boolean);
 }
 
@@ -633,7 +633,7 @@ function renderTransportSubLocationParts(parts, extraClass = '') {
         <span class="transport-sub-location-detail" title="${escapeHtmlText(part.value)}">
           <span class="transport-sub-location-label">${escapeHtmlText(part.label)}</span>
           <span class="transport-sub-location-value">
-            <a href="${getMapSearchUrl(part.value)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
+            <a href="${getMapSearchUrl(part.value, part.city)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
               <span class="location-map-icon">🗺️</span> ${escapeHtmlText(part.value)}
             </a>
           </span>
@@ -653,8 +653,8 @@ function getJourneySubLocationParts(segs) {
   return segs.flatMap((seg, index) => {
     const legPrefix = isMultiLeg ? `Leg ${index + 1} ` : '';
     return [
-      seg.fromAddress ? { label: `${legPrefix}Depart`, value: seg.fromAddress } : null,
-      seg.toAddress ? { label: `${legPrefix}Arrive`, value: seg.toAddress } : null
+      seg.fromAddress ? { label: `${legPrefix}Depart`, value: seg.fromAddress, city: seg.fromLocation } : null,
+      seg.toAddress ? { label: `${legPrefix}Arrive`, value: seg.toAddress, city: seg.toLocation } : null
     ].filter(Boolean);
   });
 }

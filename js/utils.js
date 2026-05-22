@@ -629,9 +629,16 @@ const DEFAULT_PACKING = [
 
 function updateClocks() {}
 
-function getMapSearchUrl(query) {
+function getMapSearchUrl(query, city = '') {
   if (!query) return '';
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  let fullQuery = query;
+  if (city) {
+    const cleanCity = String(city).trim();
+    if (cleanCity && !query.toLowerCase().includes(cleanCity.toLowerCase())) {
+      fullQuery = `${query}, ${cleanCity}`;
+    }
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullQuery)}`;
 }
 
 function parseCost(val) { return parseCurrencyAmount(val); }
@@ -668,6 +675,13 @@ function getDayTotal(day) {
     }
     const journeysForDay = getDayJourneys(day.date, day.from, day.to, legId);
     journeysForDay.forEach(journey => {
+      // Avoid double-counting overnight or transit journeys on arrival day:
+      // Only sum the cost on the departure day!
+      const depDate = journey.departureDate || journey.dayDate;
+      const isDepDay = depDate && (typeof journeyDatesMatch === 'function' ? journeyDatesMatch(depDate, day.date) : (depDate === day.date));
+      if (depDate && !isDepDay) {
+        return;
+      }
       total += parseCost(journey.cost);
     });
   } else {
