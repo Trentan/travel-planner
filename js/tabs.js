@@ -31,7 +31,11 @@ function renderStayLocationDetails(stay, extraClass = '') {
     <div class="transport-sub-location-details stay-location-details ${extraClass}">
       <span class="transport-sub-location-detail" title="${escapeHtmlText(stay.location)}">
         <span class="transport-sub-location-label">Location</span>
-        <span class="transport-sub-location-value">${escapeHtmlText(stay.location)}</span>
+        <span class="transport-sub-location-value">
+          <a href="${getMapSearchUrl(stay.location)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
+            <span class="location-map-icon">🗺️</span> ${escapeHtmlText(stay.location)}
+          </a>
+        </span>
       </span>
     </div>
   `;

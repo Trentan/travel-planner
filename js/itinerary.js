@@ -253,7 +253,11 @@ function renderJourneySubLocationTextHtml(text) {
         return `
           <span class="transport-sub-location-detail">
             ${label ? `<span class="transport-sub-location-label">${escapeCompactText(label)}</span>` : ''}
-            <span class="transport-sub-location-value">${escapeCompactText(value)}</span>
+            <span class="transport-sub-location-value">
+              <a href="${getMapSearchUrl(value)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
+                <span class="location-map-icon">🗺️</span> ${escapeCompactText(value)}
+              </a>
+            </span>
           </span>
         `;
       }).join('')}
@@ -631,6 +635,7 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
 function renderCompactLegCard(leg, legIndex) {
   const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
   const nightLabel = getLegNightSummary(leg).label;
+  const legCost = getLegTotalCost(leg);
   const firstDay = leg.days && leg.days[0];
   const lastDay = leg.days && leg.days[daysCount - 1];
   const legDateRange = firstDay && lastDay
@@ -650,6 +655,7 @@ function renderCompactLegCard(leg, legIndex) {
         <div class="compact-leg-header-line">
           <span class="compact-leg-date">${escapeHtmlText(legDateRange || '-')}</span>
           <span class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</span>
+          <span class="compact-leg-cost-badge">${formatCurrency(legCost)}</span>
           <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
         </div>
       </div>
@@ -674,6 +680,7 @@ function buildCompactItinerary() {
   appData.forEach((leg, legIndex) => {
     const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
     const nightLabel = getLegNightSummary(leg).label;
+    const legCost = getLegTotalCost(leg);
     const firstDay = leg.days && leg.days[0];
     const lastDay = leg.days && leg.days[daysCount - 1];
     const legDateRange = firstDay && lastDay
@@ -696,6 +703,7 @@ function buildCompactItinerary() {
           <div class="compact-leg-header-line">
             <span class="compact-leg-date">${escapeHtmlText(legDateRange || '—')}</span>
             <span class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</span>
+            <span class="compact-leg-cost-badge">${formatCurrency(legCost)}</span>
             <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
           </div>
         </div>
@@ -1264,6 +1272,77 @@ function isTransitLegForDisplay(leg) {
   return /(\bstopover\b|\bstop over\b|\ben route\b|\btransit\b|\btravel\b|\btransfer\b|\blayover\b|\bday transit\b|→|->)/i.test(legText);
 }
 
+function getLegTotalCost(leg) {
+  const parseCost = window.parseCurrencyAmount || ((val) => {
+    if (typeof val === 'number') return val;
+    const s = String(val || '').replace(/[^0-9.-]/g, '');
+    return parseFloat(s) || 0;
+  });
+
+  let total = 0;
+
+  // 1. Sum up all day-level activity costs
+  (leg.days || []).forEach(day => {
+    (day.activityItems || []).forEach(item => {
+      total += parseCost(item.cost);
+    });
+  });
+
+  // 2. Add unassigned suggested activities
+  (leg.suggestedActivities || []).forEach(activity => {
+    const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
+    if (!isAssigned) {
+      total += parseCost(activity.estCost);
+    }
+  });
+
+  // 3. Sum stays costs (only check-in days within the leg)
+  if (typeof getStayDisplayForDay === 'function') {
+    (leg.days || []).forEach(day => {
+      const staysForDay = getStayDisplayForDay(day.date, day.to);
+      staysForDay.forEach(stayInfo => {
+        if (stayInfo.type === 'checkin') {
+          total += parseCost(stayInfo.cost);
+        }
+      });
+    });
+  } else {
+    // Fallback to legacy accomItems
+    (leg.days || []).forEach(day => {
+      (day.accomItems || []).forEach(item => {
+        total += parseCost(item.cost);
+      });
+    });
+  }
+
+  // 4. Sum up journey costs, deduplicated by their database entry ID
+  if (typeof getDayJourneys === 'function') {
+    const seenJourneys = new Set();
+    (leg.days || []).forEach(day => {
+      const journeysForDay = getDayJourneys(day.date, day.from, day.to, leg.id);
+      journeysForDay.forEach(journey => {
+        const key = journey.id || journey.journeyId;
+        if (key && !seenJourneys.has(key)) {
+          seenJourneys.add(key);
+          total += parseCost(journey.cost);
+        }
+      });
+    });
+  } else {
+    // Fallback to legacy transportItems
+    (leg.days || []).forEach(day => {
+      (day.transportItems || []).forEach(item => {
+        total += parseCost(item.cost);
+      });
+    });
+  }
+
+  return total;
+}
+
+window.getLegTotalCost = getLegTotalCost;
+
+
 // Track open day cards across rebuilds
 let openDayCardIds = new Set();
 let expandedFoodQuestLegs = new Set();
@@ -1409,6 +1488,8 @@ function buildItinerary() {
     const unassigned = (leg.suggestedActivities||[]).filter(s => s.assignedDayIdx === null || s.assignedDayIdx === undefined);
     const subtitle = unassigned.length === 0 ? "All suggested activities assigned! 🎉" : `Remaining Ideas: ${unassigned.slice(0, 3).map(s => s.title.split('—')[0].trim()).join(', ')}${unassigned.length > 3 ? '...' : ''}`;
 
+    const legCost = getLegTotalCost(leg);
+
     let html = `
     <div class="leg-header" style="background:${leg.colour}" onclick="toggleLeg(this)">
       <div class="leg-header-top">
@@ -1417,6 +1498,7 @@ function buildItinerary() {
           <span style="opacity:0.8; font-size:0.9rem; font-family:'DM Mono', monospace;">${dateRange}</span>
         </div>
         <div style="display:flex; align-items:center; gap:10px;">
+          <span class="leg-cost-total-badge">${formatCurrency(legCost)}</span>
           <span class="${badgeClass}">${nightLabel}</span>
           ${isEditMode ? `<button class="header-del-btn" title="Add a day to this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, 1)">+</button>` : ''}
           ${isEditMode ? `<button class="header-del-btn" title="Remove a day from this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, -1)">−</button>` : ''}

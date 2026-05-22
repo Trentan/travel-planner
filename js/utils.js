@@ -629,16 +629,57 @@ const DEFAULT_PACKING = [
 
 function updateClocks() {}
 
+function getMapSearchUrl(query) {
+  if (!query) return '';
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
 function parseCost(val) { return parseCurrencyAmount(val); }
 
 function getDayTotal(day) {
   let total = 0;
-  ['transportItems', 'accomItems', 'activityItems'].forEach(cat => {
-    (day[cat] || []).forEach(item => { total += parseCost(item.cost); });
+  
+  // 1. Sum up custom activity items stored directly on the day (activityItems)
+  (day.activityItems || []).forEach(item => {
+    total += parseCost(item.cost);
   });
+
+  // 2. Sum up stays checkin costs from the global stays database for this day
+  if (typeof getStayDisplayForDay === 'function') {
+    const staysForDay = getStayDisplayForDay(day.date, day.to);
+    staysForDay.forEach(stayInfo => {
+      // ONLY sum the cost on check-in day, to avoid double-counting on check-out day!
+      if (stayInfo.type === 'checkin') {
+        total += parseCost(stayInfo.cost);
+      }
+    });
+  } else {
+    (day.accomItems || []).forEach(item => {
+      total += parseCost(item.cost);
+    });
+  }
+
+  // 3. Sum up journey costs from the global journeys database for this day
+  if (typeof getDayJourneys === 'function') {
+    let legId = '';
+    if (typeof appData !== 'undefined') {
+      const parentLeg = appData.find(leg => (leg.days || []).some(d => d.date === day.date));
+      if (parentLeg) legId = parentLeg.id;
+    }
+    const journeysForDay = getDayJourneys(day.date, day.from, day.to, legId);
+    journeysForDay.forEach(journey => {
+      total += parseCost(journey.cost);
+    });
+  } else {
+    (day.transportItems || []).forEach(item => {
+      total += parseCost(item.cost);
+    });
+  }
+
   return formatCurrency(total, { showZero: false });
 }
 
+window.getMapSearchUrl = getMapSearchUrl;
 window.getDayTotal = getDayTotal;
 window.parseCurrencyAmount = parseCurrencyAmount;
 window.formatCurrency = formatCurrency;

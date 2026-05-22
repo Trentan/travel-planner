@@ -632,7 +632,11 @@ function renderTransportSubLocationParts(parts, extraClass = '') {
       ${parts.map(part => `
         <span class="transport-sub-location-detail" title="${escapeHtmlText(part.value)}">
           <span class="transport-sub-location-label">${escapeHtmlText(part.label)}</span>
-          <span class="transport-sub-location-value">${escapeHtmlText(part.value)}</span>
+          <span class="transport-sub-location-value">
+            <a href="${getMapSearchUrl(part.value)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
+              <span class="location-map-icon">🗺️</span> ${escapeHtmlText(part.value)}
+            </a>
+          </span>
         </span>
       `).join('')}
     </div>
