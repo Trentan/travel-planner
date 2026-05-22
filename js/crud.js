@@ -388,28 +388,95 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
 
   const itemText = item.text;
   const suggestedActivities = appData[legIdx]?.suggestedActivities || [];
+
+  function isMatch(activity) {
+    if (!activity || !itemText) return false;
+    const cleanItem = String(itemText).trim().toLowerCase();
+    const cleanTitle = String(activity.title || '').trim().toLowerCase();
+    if (cleanItem === cleanTitle) return true;
+
+    const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
+    const cleanItemNoEmoji = cleanItem.replace(emojiPattern, '').trim();
+    const cleanTitleNoEmoji = cleanTitle.replace(emojiPattern, '').trim();
+    if (cleanItemNoEmoji === cleanTitleNoEmoji) return true;
+
+    // Check base title (without location suffix)
+    const baseTitle = cleanTitle.split(' — ')[0].trim();
+    const baseTitleNoEmoji = baseTitle.replace(emojiPattern, '').trim();
+    if (cleanItemNoEmoji === baseTitleNoEmoji) return true;
+
+    const matchTexts = typeof getSuggestedActivityMatchTexts === 'function'
+      ? getSuggestedActivityMatchTexts(activity).map(t => String(t).trim().toLowerCase())
+      : [cleanTitle];
+
+    if (matchTexts.includes(cleanItem)) return true;
+
+    const matchTextsNoEmoji = matchTexts.map(t => t.replace(emojiPattern, '').trim());
+    if (matchTextsNoEmoji.includes(cleanItemNoEmoji)) return true;
+
+    return false;
+  }
+
+  // Phase 1: Try to find a match assigned to this day
   let activityIdx = suggestedActivities.findIndex(activity => (
-    activity
-    && activity.assignedDayIdx === dayIdx
-    && getSuggestedActivityMatchTexts(activity).includes(String(itemText || '').trim())
+    activity && activity.assignedDayIdx === dayIdx && isMatch(activity)
   ));
 
+  // Phase 2: Try to find a match assigned to any day or unassigned
+  if (activityIdx === -1) {
+    activityIdx = suggestedActivities.findIndex(activity => activity && isMatch(activity));
+  }
+
+  // Phase 3: Run normalization fallback
   if (activityIdx === -1) {
     if (typeof normalizeTripLegsData === 'function') {
       normalizeTripLegsData(appData);
       saveData(false);
-      activityIdx = appData[legIdx]?.suggestedActivities?.findIndex(activity => (
-        activity
-        && activity.assignedDayIdx === dayIdx
-        && getSuggestedActivityMatchTexts(activity).includes(String(itemText || '').trim())
+      
+      const refreshedActivities = appData[legIdx]?.suggestedActivities || [];
+      activityIdx = refreshedActivities.findIndex(activity => (
+        activity && activity.assignedDayIdx === dayIdx && isMatch(activity)
       ));
+      if (activityIdx === -1) {
+        activityIdx = refreshedActivities.findIndex(activity => activity && isMatch(activity));
+      }
     }
   }
 
   if (activityIdx !== undefined && activityIdx !== -1) {
     _openActivityModal(legIdx, activityIdx);
   } else {
-    alert("Could not find matching activity to edit.");
+    // Phase 4: Auto-create a matching suggested activity entry and open it!
+    let category = 'sight';
+    const text = String(itemText || '').trim();
+    if (/food|restaurant|eat|dinner|lunch|breakfast|cafe/i.test(text)) category = 'food';
+    else if (/run|fitness|jog|workout|gym/i.test(text)) category = 'fitness';
+    else if (/wellness|yoga|spa|massage/i.test(text)) category = 'wellness';
+    else if (/tour|guide|bus/i.test(text)) category = 'tour';
+    else if (/attraction|park|ride/i.test(text)) category = 'attraction';
+
+    const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
+    const cleanTitle = text.replace(emojiPattern, '').trim();
+
+    if (!Array.isArray(appData[legIdx].suggestedActivities)) {
+      appData[legIdx].suggestedActivities = [];
+    }
+
+    appData[legIdx].suggestedActivities.push({
+      title: cleanTitle,
+      category: category,
+      estTime: item.time || '1 hr',
+      estCost: item.cost || '0',
+      assignedDayIdx: dayIdx,
+      assignedDate: day.date || '',
+      startDate: item.startDate || day.date || '',
+      startTime: item.startTime || '',
+      endDate: item.endDate || day.date || '',
+      endTime: item.endTime || ''
+    });
+
+    saveData(false);
+    _openActivityModal(legIdx, appData[legIdx].suggestedActivities.length - 1);
   }
 }
 
@@ -532,13 +599,22 @@ function updateLegTip(legIdx, tipIdx, val) {
 function updateDayItemText(legIdx, dayIdx, category, itemIdx, text, fromTabs = false) {
   const item = appData[legIdx].days[dayIdx][category][itemIdx];
   const previousText = item.text;
-  item.text = text;
+  
+  let newText = text;
   if (category === 'activityItems') {
-    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'title', text);
+    const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(previousText) : { title: previousText, location: '' };
+    if (split.location && !text.includes(' — ')) {
+      newText = `${text} — ${split.location}`;
+    }
+  }
+  
+  item.text = newText;
+  if (category === 'activityItems') {
+    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'title', newText);
   }
   saveData();
   if(!fromTabs) {
-    if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: text });
+    if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: newText });
     else buildItinerary();
   }
 }

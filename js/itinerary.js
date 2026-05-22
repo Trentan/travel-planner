@@ -362,6 +362,16 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
     const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
+    const activityLoc = split.location ? (() => {
+      let loc = split.location;
+      const cleanCity = String(day.to || day.from || '').trim();
+      if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+        loc = `${loc} (${cleanCity})`;
+      }
+      return `Location: ${loc}`;
+    })() : '';
+    const subLocsHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
     return `
       <div class="compact-activity-row" style="${doneStyle}">
         <input
@@ -369,14 +379,15 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
           ${item.done ? 'checked' : ''}
           onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
         >
-        <div class="compact-activity-copy">
+        <div class="compact-activity-copy" style="display: flex; flex-direction: column; width: 100%;">
           ${renderCompactEmojiLine({
             emoji,
-            text: item.text,
+            text: split.title,
             duration: item.time || '1 hr',
             cost: item.cost ? formatCurrency(item.cost) : '',
             done: item.done
           })}
+          ${subLocsHtml}
         </div>
       </div>
     `;
@@ -1170,11 +1181,22 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
 
   (day.activityItems || []).forEach((item, itemIndex) => {
     const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
+    const activityLoc = split.location ? (() => {
+      let loc = split.location;
+      const cleanCity = String(day.to || day.from || '').trim();
+      if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+        loc = `${loc} (${cleanCity})`;
+      }
+      return `Location: ${loc}`;
+    })() : '';
+
     items.push({
       type: 'activity',
       typeLabel: 'Activity',
       icon: emoji,
-      title: item.text || 'Activity',
+      title: split.title || 'Activity',
+      subLocations: activityLoc,
       meta: [item.time || ''].filter(Boolean).join(' · '),
       cost: item.cost,
       done: !!item.done,
@@ -1748,7 +1770,33 @@ ${(() => {
 
           <div class="detail-block block-activities drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
             <h4>Planned Activities</h4><div class="item-list">
-            ${(day.activityItems || []).map((item, i) => `<div class="cost-item"><button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button>${isEditMode ? `<button class="edit-btn" title="Edit Activity" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">✎</button>` : ''}<input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})"><span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.text}</span><span class="budget-field" style="color:#666;">⏱ <span contenteditable="${isEditMode}" onblur="updateDayItemTime(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.time || '1 hr'}</span></span><span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span></div>`).join('')}
+            ${(day.activityItems || []).map((item, i) => {
+              const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
+              const activityLoc = split.location ? (() => {
+                let loc = split.location;
+                const cleanCity = String(day.to || day.from || '').trim();
+                if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+                  loc = `${loc} (${cleanCity})`;
+                }
+                return `Location: ${loc}`;
+              })() : '';
+              const locHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
+              return `
+                <div class="cost-item">
+                  <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button>
+                      ${isEditMode ? `<button class="edit-btn" title="Edit Activity" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">✎</button>` : ''}
+                      <input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})">
+                      <span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${split.title}</span>
+                    </div>
+                    ${locHtml}
+                  </div>
+                  <span class="budget-field" style="color:#666;">⏱ <span contenteditable="${isEditMode}" onblur="updateDayItemTime(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.time || '1 hr'}</span></span>
+                  <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span>
+                </div>
+              `;
+            }).join('')}
             </div><button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>
           </div>
 
