@@ -4,6 +4,7 @@ let isEditMode = true;
 let isMobileMenuOpen = false;
 let lastViewportWasMobile = null;
 let itineraryDayViewMode = 'timeline';
+let showMoneyFigures = true;
 
 function isMobileViewport() {
   return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
@@ -162,7 +163,8 @@ function saveUiSettings() {
     isCompactView,
     isEditMode,
     isFunMode,
-    itineraryDayViewMode
+    itineraryDayViewMode,
+    showMoneyFigures
   }));
 }
 
@@ -187,6 +189,7 @@ function applyUiSettings() {
     isCompactView = !!savedSettings.isCompactView;
     isEditMode = savedSettings.isEditMode !== false;
     itineraryDayViewMode = savedSettings.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
+    showMoneyFigures = savedSettings.showMoneyFigures !== false;
   } else if (isMobileViewport()) {
     isCompactView = true;
   }
@@ -196,15 +199,36 @@ function applyUiSettings() {
   window.isCompactView = isCompactView;
   window.isEditMode = isEditMode;
   window.itineraryDayViewMode = itineraryDayViewMode;
+  window.showMoneyFigures = showMoneyFigures;
 
   document.body.classList.toggle('fun-mode', isFunMode);
   document.body.classList.toggle('compact-view-mode', isCompactView);
   document.body.classList.toggle('read-only-mode', !isEditMode);
+  document.body.classList.toggle('hide-money-figures', !showMoneyFigures);
   syncResponsiveUi();
   syncModeToggleButtons();
   syncItineraryViewModeButtons();
+  syncShowMoneyButtons();
   setHeaderEditable(isEditMode);
 }
+
+function syncShowMoneyButtons() {
+  const showMoneyToggleBtn = document.getElementById('showMoneyToggleBtn');
+  const mobileShowMoneyToggleBtn = document.getElementById('mobileShowMoneyToggleBtn');
+  if (showMoneyToggleBtn) {
+    showMoneyToggleBtn.textContent = showMoneyFigures ? '💵 Hide Prices' : '💵 Show Prices';
+  }
+  if (mobileShowMoneyToggleBtn) {
+    mobileShowMoneyToggleBtn.textContent = showMoneyFigures ? '💵 Hide Prices' : '💵 Show Prices';
+  }
+}
+
+function toggleShowMoney(nextValue = null) {
+  showMoneyFigures = nextValue !== null ? !!nextValue : !showMoneyFigures;
+  saveUiSettings();
+  applyUiSettings();
+}
+window.toggleShowMoney = toggleShowMoney;
 
 function openRenameTripDialog() {
   const dialog = document.getElementById('rename-trip-modal');

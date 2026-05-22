@@ -29,15 +29,43 @@ function escapeCompactText(text) {
       .replace(/'/g, '&#39;');
 }
 
+function getJourneyDisplayCost(journey) {
+  if (!journey) return '';
+  const ownCost = parseFloat(journey.cost || '0');
+  if (ownCost > 0) return journey.cost;
+
+  if (journey.journeyId) {
+    const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+      ? window.journeys
+      : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+    const matching = journeysSource.filter(seg => seg.journeyId === journey.journeyId);
+    for (const seg of matching) {
+      const segCost = parseFloat(seg.cost || '0');
+      if (segCost > 0) {
+        return seg.cost;
+      }
+    }
+  }
+  return journey.cost;
+}
+
 function renderCompactMetaSuffix(value) {
   const trimmed = String(value || '').trim();
   if (!trimmed) return '';
   return ` <span class="compact-meta-suffix">[${escapeCompactText(trimmed)}]</span>`;
 }
 
-function renderCompactEmojiLine({ emoji, text, duration = '', done = false }) {
+function renderCompactEmojiLine({ emoji, text, duration = '', cost = '', done = false }) {
   const cleanText = escapeCompactText(stripCompactLeadingEmoji(text));
-  const suffix = renderCompactMetaSuffix(duration);
+  const durationTrimmed = String(duration || '').trim();
+  const costTrimmed = String(cost || '').trim();
+  
+  let suffixParts = [];
+  if (durationTrimmed) suffixParts.push(escapeCompactText(durationTrimmed));
+  if (costTrimmed) suffixParts.push(`<span class="compact-inline-meta-cost">${escapeCompactText(costTrimmed)}</span>`);
+  
+  const suffix = suffixParts.length > 0 ? ` <span class="compact-meta-suffix">[${suffixParts.join(' · ')}]</span>` : '';
+  
   return `
     <span class="compact-line">
       <span class="compact-line-emoji">${emoji}</span>
@@ -231,9 +259,26 @@ function formatJourneySubLocationText(segments) {
   return segments
     .flatMap((seg, index) => {
       const legPrefix = isMultiLeg ? `Leg ${index + 1} ` : '';
+      
+      let fromVal = seg.fromAddress || '';
+      if (fromVal && seg.fromLocation) {
+        const cleanCity = String(seg.fromLocation).trim();
+        if (cleanCity && !fromVal.toLowerCase().includes(cleanCity.toLowerCase())) {
+          fromVal = `${fromVal} (${cleanCity})`;
+        }
+      }
+      
+      let toVal = seg.toAddress || '';
+      if (toVal && seg.toLocation) {
+        const cleanCity = String(seg.toLocation).trim();
+        if (cleanCity && !toVal.toLowerCase().includes(cleanCity.toLowerCase())) {
+          toVal = `${toVal} (${cleanCity})`;
+        }
+      }
+
       return [
-        seg.fromAddress ? `${legPrefix}Depart: ${seg.fromAddress}` : '',
-        seg.toAddress ? `${legPrefix}Arrive: ${seg.toAddress}` : ''
+        seg.fromAddress ? `${legPrefix}Depart: ${fromVal}` : '',
+        seg.toAddress ? `${legPrefix}Arrive: ${toVal}` : ''
       ];
     })
     .filter(Boolean)
@@ -253,7 +298,11 @@ function renderJourneySubLocationTextHtml(text) {
         return `
           <span class="transport-sub-location-detail">
             ${label ? `<span class="transport-sub-location-label">${escapeCompactText(label)}</span>` : ''}
-            <span class="transport-sub-location-value">${escapeCompactText(value)}</span>
+            <span class="transport-sub-location-value">
+              <a href="${getMapSearchUrl(value)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
+                <span class="location-map-icon">🗺️</span> ${escapeCompactText(value)}
+              </a>
+            </span>
           </span>
         `;
       }).join('')}
@@ -275,18 +324,40 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     const journeyLabel = stripCompactLeadingEmoji(
         journey.provider || journey.journeyName || journey.notes || `${journey.fromLocation}→${journey.toLocation}`
     );
-    const segs = (window.journeys || [])
+    const segs = journey.journeyId ? (window.journeys || [])
         .filter(seg => seg.journeyId === journey.journeyId)
-        .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+        .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1)) : [];
     const duration = formatCompactJourneyDuration(segs);
     const details = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
-    return renderCompactEmojiLine({ emoji: icon, text: [journeyLabel, details].filter(Boolean).join(' | '), duration });
+    const mainLine = renderCompactEmojiLine({
+      emoji: icon,
+      text: journeyLabel,
+      duration: duration,
+      cost: getJourneyDisplayCost(journey) ? formatCurrency(getJourneyDisplayCost(journey)) : ''
+    });
+    const subLocsHtml = details ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(details)}</div>` : '';
+    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}</div>`;
   }).join('');
 
-  const accomLines = dayStayInfo.map(info => renderCompactEmojiLine({
-    emoji: '🏨',
-    text: info.propertyName || 'Accommodation'
-  })).join('');
+  const accomLines = dayStayInfo.map(info => {
+    const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
+    const mainLine = renderCompactEmojiLine({
+      emoji: '🏨',
+      text: `${label}: ${info.propertyName || 'Accommodation'}`,
+      duration: '',
+      cost: info.cost ? formatCurrency(info.cost) : ''
+    });
+    const stayLoc = info.location ? (() => {
+      let loc = info.location;
+      const cleanCity = String(day.to).trim();
+      if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+        loc = `${loc} (${cleanCity})`;
+      }
+      return `Location: ${loc}`;
+    })() : '';
+    const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
+    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}</div>`;
+  }).join('');
 
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
@@ -300,11 +371,12 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
         >
         <div class="compact-activity-copy">
           ${renderCompactEmojiLine({
-      emoji,
-      text: item.text,
-      duration: item.time || '1 hr',
-      done: item.done
-    })}
+            emoji,
+            text: item.text,
+            duration: item.time || '1 hr',
+            cost: item.cost ? formatCurrency(item.cost) : '',
+            done: item.done
+          })}
         </div>
       </div>
     `;
@@ -631,6 +703,7 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
 function renderCompactLegCard(leg, legIndex) {
   const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
   const nightLabel = getLegNightSummary(leg).label;
+  const legCost = getLegTotalCost(leg);
   const firstDay = leg.days && leg.days[0];
   const lastDay = leg.days && leg.days[daysCount - 1];
   const legDateRange = firstDay && lastDay
@@ -650,6 +723,7 @@ function renderCompactLegCard(leg, legIndex) {
         <div class="compact-leg-header-line">
           <span class="compact-leg-date">${escapeHtmlText(legDateRange || '-')}</span>
           <span class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</span>
+          <span class="compact-leg-cost-badge">${formatCurrency(legCost)}</span>
           <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
         </div>
       </div>
@@ -674,6 +748,7 @@ function buildCompactItinerary() {
   appData.forEach((leg, legIndex) => {
     const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
     const nightLabel = getLegNightSummary(leg).label;
+    const legCost = getLegTotalCost(leg);
     const firstDay = leg.days && leg.days[0];
     const lastDay = leg.days && leg.days[daysCount - 1];
     const legDateRange = firstDay && lastDay
@@ -696,6 +771,7 @@ function buildCompactItinerary() {
           <div class="compact-leg-header-line">
             <span class="compact-leg-date">${escapeHtmlText(legDateRange || '—')}</span>
             <span class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</span>
+            <span class="compact-leg-cost-badge">${formatCurrency(legCost)}</span>
             <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
           </div>
         </div>
@@ -1054,7 +1130,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       title: journey.journeyName || route || 'Transport',
       meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDate.trim()].filter(Boolean).join(' · '),
       subLocations: subLocations,
-      cost: journey.cost,
+      cost: getJourneyDisplayCost(journey),
       status: journey.status || 'planned',
       startTime,
       endTime,
@@ -1074,7 +1150,14 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       icon,
       title: `${label}: ${stayInfo.propertyName || 'Accommodation'}`,
       meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : '', stayInfo.status].filter(Boolean).join(' · '),
-      subLocations: stayInfo.location ? `Location: ${stayInfo.location}` : '',
+      subLocations: stayInfo.location ? (() => {
+        let loc = stayInfo.location;
+        const cleanCity = String(day.to).trim();
+        if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+          loc = `${loc} (${cleanCity})`;
+        }
+        return `Location: ${loc}`;
+      })() : '',
       cost: stayInfo.cost,
       status: stayInfo.status || '',
       startTime: stayInfo.startTime || '',
@@ -1092,7 +1175,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       typeLabel: 'Activity',
       icon: emoji,
       title: item.text || 'Activity',
-      meta: [item.time || '', item.cost ? formatCurrency(item.cost) : ''].filter(Boolean).join(' · '),
+      meta: [item.time || ''].filter(Boolean).join(' · '),
       cost: item.cost,
       done: !!item.done,
       startTime: item.startTime || '',
@@ -1148,7 +1231,7 @@ function renderDailyTimelineRow(item, compact = false) {
             ${checkboxHtml}
           </div>
         </div>
-        ${item.meta ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta)}</div>` : ''}
+        ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> · ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
         ${item.subLocations ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
@@ -1263,6 +1346,80 @@ function isTransitLegForDisplay(leg) {
 
   return /(\bstopover\b|\bstop over\b|\ben route\b|\btransit\b|\btravel\b|\btransfer\b|\blayover\b|\bday transit\b|→|->)/i.test(legText);
 }
+
+function getLegTotalCost(leg) {
+  const parseCost = window.parseCurrencyAmount || ((val) => {
+    if (typeof val === 'number') return val;
+    const s = String(val || '').replace(/[^0-9.-]/g, '');
+    return parseFloat(s) || 0;
+  });
+
+  let total = 0;
+
+  // 1. Sum up all day-level activity costs
+  (leg.days || []).forEach(day => {
+    (day.activityItems || []).forEach(item => {
+      total += parseCost(item.cost);
+    });
+  });
+
+  // 2. Add unassigned suggested activities
+  (leg.suggestedActivities || []).forEach(activity => {
+    const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
+    if (!isAssigned) {
+      total += parseCost(activity.estCost);
+    }
+  });
+
+  // 3. Sum stays costs (only check-in days within the leg)
+  if (typeof getStayDisplayForDay === 'function') {
+    (leg.days || []).forEach(day => {
+      const staysForDay = getStayDisplayForDay(day.date, day.to);
+      staysForDay.forEach(stayInfo => {
+        if (stayInfo.type === 'checkin') {
+          total += parseCost(stayInfo.cost);
+        }
+      });
+    });
+  } else {
+    // Fallback to legacy accomItems
+    (leg.days || []).forEach(day => {
+      (day.accomItems || []).forEach(item => {
+        total += parseCost(item.cost);
+      });
+    });
+  }
+
+  // 4. Sum up journey costs, deduplicated by their database entry ID
+  if (typeof getDayJourneys === 'function') {
+    const seenJourneys = new Set();
+    (leg.days || []).forEach(day => {
+      const journeysForDay = getDayJourneys(day.date, day.from, day.to, leg.id);
+      journeysForDay.forEach(journey => {
+        if (journey.legId && journey.legId !== leg.id) {
+          return;
+        }
+        const key = journey.id || journey.journeyId;
+        if (key && !seenJourneys.has(key)) {
+          seenJourneys.add(key);
+          total += parseCost(journey.cost);
+        }
+      });
+    });
+  } else {
+    // Fallback to legacy transportItems
+    (leg.days || []).forEach(day => {
+      (day.transportItems || []).forEach(item => {
+        total += parseCost(item.cost);
+      });
+    });
+  }
+
+  return total;
+}
+
+window.getLegTotalCost = getLegTotalCost;
+
 
 // Track open day cards across rebuilds
 let openDayCardIds = new Set();
@@ -1409,6 +1566,8 @@ function buildItinerary() {
     const unassigned = (leg.suggestedActivities||[]).filter(s => s.assignedDayIdx === null || s.assignedDayIdx === undefined);
     const subtitle = unassigned.length === 0 ? "All suggested activities assigned! 🎉" : `Remaining Ideas: ${unassigned.slice(0, 3).map(s => s.title.split('—')[0].trim()).join(', ')}${unassigned.length > 3 ? '...' : ''}`;
 
+    const legCost = getLegTotalCost(leg);
+
     let html = `
     <div class="leg-header" style="background:${leg.colour}" onclick="toggleLeg(this)">
       <div class="leg-header-top">
@@ -1417,6 +1576,7 @@ function buildItinerary() {
           <span style="opacity:0.8; font-size:0.9rem; font-family:'DM Mono', monospace;">${dateRange}</span>
         </div>
         <div style="display:flex; align-items:center; gap:10px;">
+          <span class="leg-cost-total-badge">${formatCurrency(legCost)}</span>
           <span class="${badgeClass}">${nightLabel}</span>
           ${isEditMode ? `<button class="header-del-btn" title="Add a day to this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, 1)">+</button>` : ''}
           ${isEditMode ? `<button class="header-del-btn" title="Remove a day from this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, -1)">−</button>` : ''}
@@ -1463,7 +1623,7 @@ function buildItinerary() {
       const badgeIcon = isCompleted ? '✓' : '✓';
       const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
       const categoryEmoji = getCategoryEmoji(activity.category);
-      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · ${formatCurrency(activity.estCost || 0)}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
+      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span></span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
     }).join('')}</ul>
         <button class="add-btn" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
       </div>
@@ -1525,9 +1685,20 @@ function buildItinerary() {
         // Show departure time if available
         const timeHint = journey.departureTime ? ` <span style="color:#999;font-size:0.75rem;font-family:monospace;">${journey.departureTime}</span>` : '';
 
+        const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+          ? window.journeys
+          : [];
+        const segs = journey.journeyId ? journeysSource
+            .filter(seg => seg.journeyId === journey.journeyId)
+            .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1)) : [];
+        const subLocations = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
+
         return `<div class="cost-item journey-item">
                 <button class="del-btn" title="Remove Journey" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); rebuildCurrentView();">×</button>
-                <span class="cost-item-text">${label}${timeHint}</span>
+                <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
+                  <span>${label}${timeHint}</span>
+                  ${subLocations ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(subLocations)}</div>` : ''}
+                </div>
                 <div class="cost-item-actions">
                   <span class="status-badge ${isEditMode ? 'status-badge-clickable' : ''}" style="--status-color:${statusColor};" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}');">${statusIcon} ${status === 'booked' ? 'Booked' : 'Planned'}</span>
                   ${showRef ? `<input type="text" class="booking-ref-input confirmed" value="${journey.bookingReference || ''}" placeholder="Ref #" onchange="event.stopPropagation(); updateJourneyBookingRef('${journey.id}', this.value);" ${isEditMode ? '' : 'disabled'}/>` : ''}
@@ -1546,8 +1717,20 @@ ${(() => {
         return dayStayInfo.map(info => {
           const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
           const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
+          const stayLoc = info.location ? (() => {
+            let loc = info.location;
+            const cleanCity = String(day.to).trim();
+            if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+              loc = `${loc} (${cleanCity})`;
+            }
+            return `Location: ${loc}`;
+          })() : '';
+
           return `<div class="cost-item">
-        <span class="cost-item-text">${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` via ${info.provider}` : ''}${info.cost ? ` (${formatCurrency(info.cost)})` : ''}</span>
+        <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
+          <span>${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` via ${info.provider}` : ''}${info.cost ? `<span class="accom-inline-meta-cost"> (${formatCurrency(info.cost)})</span>` : ''}</span>
+          ${stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : ''}
+        </div>
         <div class="cost-item-actions">
           <span class="status-badge" style="--status-color:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✕ Cancelled' : '⏳ Pending'}</span>
           ${info.bookingRef ? `<span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${info.bookingRef}</span>` : ''}

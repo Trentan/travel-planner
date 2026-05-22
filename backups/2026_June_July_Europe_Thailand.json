@@ -736,7 +736,7 @@
           "title": "Bratwursthäusle for dinner",
           "category": "sight",
           "estTime": "1.5 hrs",
-          "estCost": "0",
+          "estCost": "25",
           "assignedDayIdx": null,
           "cityId": "city-nuremberg",
           "assignedDate": "",
@@ -817,8 +817,19 @@
               "cityId": "city-munich",
               "startDate": "2026-06-16",
               "endDate": "2026-06-16",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "13:00",
+              "endTime": "17:00"
+            },
+            {
+              "text": "🍽️ Speaker Dinner (SoftwareAG) — Hotel lobby",
+              "cost": "0",
+              "time": "2 hr",
+              "done": false,
+              "startDate": "2026-06-16",
+              "startTime": "19:00",
+              "endDate": "2026-06-16",
+              "endTime": "14:10",
+              "cityId": "city-munich"
             }
           ]
         },
@@ -1068,6 +1079,19 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "Speaker Dinner (SoftwareAG) — Hotel lobby",
+          "category": "food",
+          "estTime": "2 hr",
+          "startDate": "2026-06-16",
+          "startTime": "19:00",
+          "endDate": "2026-06-16",
+          "endTime": "14:10",
+          "estCost": "0",
+          "assignedDate": "2026-06-16",
+          "assignedDayIdx": 0,
+          "cityId": "city-munich"
         }
       ],
       "legTips": [

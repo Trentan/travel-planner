@@ -27,11 +27,21 @@ function renderStayDetailBlock(title, value, extraClass = '') {
 function renderStayLocationDetails(stay, extraClass = '') {
   if (!stay || !stay.location) return '';
 
+  let cityName = '';
+  if (stay.cityId && typeof citiesData !== 'undefined') {
+    const city = citiesData.find(c => c.id === stay.cityId);
+    if (city) cityName = city.name;
+  }
+
   return `
     <div class="transport-sub-location-details stay-location-details ${extraClass}">
       <span class="transport-sub-location-detail" title="${escapeHtmlText(stay.location)}">
         <span class="transport-sub-location-label">Location</span>
-        <span class="transport-sub-location-value">${escapeHtmlText(stay.location)}</span>
+        <span class="transport-sub-location-value">
+          <a href="${getMapSearchUrl(stay.location, cityName)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
+            <span class="location-map-icon">🗺️</span> ${escapeHtmlText(stay.location)}
+          </a>
+        </span>
       </span>
     </div>
   `;
@@ -551,15 +561,30 @@ function buildBudgetTab() {
   appData.forEach((leg, legIndex) => {
     let legTrans = 0, legAccom = 0, legAct = 0;
     const legDestinations = [];
+
+    // 1. Match journeys by legId first
+    const legJourneys = journeysData.filter(j => j.legId === leg.id);
+    legJourneys.forEach(j => {
+      legTrans += parseCost(j.cost);
+      if (j.journeyId) matchedJourneyIds.add(j.journeyId);
+      else if (j.id) matchedJourneyIds.add(j.id);
+      if (j.toLocation && !legDestinations.includes(j.toLocation)) {
+        legDestinations.push(j.toLocation);
+      }
+    });
+
     leg.days.forEach(day => {
-      // Calculate transport costs from journeys array
+      // 2. Match journeys by day date and from/to only if they don't have a legId
       const dayJourneys = journeysData.filter(j =>
-          j.dayDate === day.date && j.fromLocation === day.from && j.toLocation === day.to
+          !j.legId && j.dayDate === day.date && j.fromLocation === day.from && j.toLocation === day.to
       );
       dayJourneys.forEach((j) => {
         legTrans += parseCost(j.cost);
         if (j.journeyId) matchedJourneyIds.add(j.journeyId);
-        if (j.toLocation && !legDestinations.includes(j.toLocation)) legDestinations.push(j.toLocation);
+        else if (j.id) matchedJourneyIds.add(j.id);
+        if (j.toLocation && !legDestinations.includes(j.toLocation)) {
+          legDestinations.push(j.toLocation);
+        }
       });
 
       // Legacy: still count old accomItems for backward compatibility
@@ -571,7 +596,7 @@ function buildBudgetTab() {
 
     const legTotal = legTrans + legAccom + legAct;
     if (legTotal > 0) {
-      const displayLabel = legDestinations.length > 0 ? legDestinations[legDestinations.length - 1] : leg.label;
+      const displayLabel = leg.label || (legDestinations.length > 0 ? legDestinations[legDestinations.length - 1] : 'Trip Leg');
       legBreakdown.push({ label: displayLabel, colour: leg.colour, trans: legTrans, accom: legAccom, act: legAct, total: legTotal });
       totalTrans += legTrans; totalAccom += legAccom; totalAct += legAct;
     }

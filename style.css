@@ -9708,3 +9708,89 @@ body.mobile-app-mode .stay-card-location .transport-sub-location-detail + .trans
 .stay-detail-block--wide {
   grid-column: 1 / -1;
 }
+
+/* --- Issue 113 & 117 Custom Styles --- */
+
+/* Leg Cost Total Badge (Issue 113) */
+.leg-cost-total-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  color: #ffffff;
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.leg-cost-total-badge:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: scale(1.03);
+}
+
+body.compact-view-mode .compact-leg-cost-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.95);
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-right: 0.35rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+body.compact-view-mode .compact-leg-cost-badge:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* Actionable Maps Links (Issue 117) */
+.transport-sub-location-value-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent-strong, #24485d);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(36, 72, 93, 0.4);
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.transport-sub-location-value-link:hover {
+  color: #d35400; /* nice warm premium color for hover */
+  border-bottom-color: #d35400;
+}
+
+.transport-sub-location-value-link .location-map-icon {
+  display: inline-block;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.transport-sub-location-value-link:hover .location-map-icon {
+  transform: scale(1.22) rotate(-8deg);
+}
+
+/* Hide Prices Toggle Feature */
+body.hide-money-figures .day-total-cost,
+body.hide-money-figures .leg-cost-total-badge,
+body.hide-money-figures .compact-leg-cost-badge,
+body.hide-money-figures .compact-day-total-badge,
+body.hide-money-figures .budget-field,
+body.hide-money-figures .accom-inline-meta-cost,
+body.hide-money-figures .timeline-inline-meta-cost,
+body.hide-money-figures .compact-inline-meta-cost,
+body.hide-money-figures .sight-inline-meta-cost {
+  display: none !important;
+}
+
