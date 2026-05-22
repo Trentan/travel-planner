@@ -9599,6 +9599,23 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   margin: 0;
 }
 
+body.mobile-app-mode .transport-mobile-sub-locations,
+body.mobile-app-mode .transport-card-sub-locations {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.12rem 0.35rem;
+}
+
+body.mobile-app-mode .transport-mobile-sub-locations .transport-sub-location-detail,
+body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detail {
+  min-width: 0;
+}
+
+body.mobile-app-mode .transport-mobile-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before,
+body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before {
+  content: none;
+}
+
 .route-col .transport-sub-location-details,
 .transport-table-sub-locations {
   max-width: 20rem;
@@ -9622,7 +9639,8 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     display: none;
   }
 
-  .transport-mobile-sub-locations {
+  .transport-mobile-sub-locations,
+  .transport-card-sub-locations {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-top: 0.24rem;
@@ -9630,16 +9648,20 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     gap: 0.12rem 0.35rem;
   }
 
-  .transport-mobile-sub-locations .transport-sub-location-detail {
+  .transport-mobile-sub-locations .transport-sub-location-detail,
+  .transport-card-sub-locations .transport-sub-location-detail {
     min-width: 0;
   }
 
-  .transport-mobile-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before {
+  .transport-mobile-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before,
+  .transport-card-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before {
     content: none;
   }
 
   .transport-mobile-sub-locations .transport-sub-location-label,
-  .transport-mobile-sub-locations .transport-sub-location-value {
+  .transport-mobile-sub-locations .transport-sub-location-value,
+  .transport-card-sub-locations .transport-sub-location-label,
+  .transport-card-sub-locations .transport-sub-location-value {
     font-size: 0.66rem;
   }
 }
