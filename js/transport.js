@@ -619,8 +619,8 @@ function renderTransportDetailBlock(title, value, extraClass = '') {
 function getTransportSubLocationParts(seg) {
   if (!seg) return [];
   return [
-    seg.fromAddress ? { label: 'depart', value: seg.fromAddress } : null,
-    seg.toAddress ? { label: 'arrive', value: seg.toAddress } : null
+    seg.fromAddress ? { label: 'Depart', value: seg.fromAddress } : null,
+    seg.toAddress ? { label: 'Arrive', value: seg.toAddress } : null
   ].filter(Boolean);
 }
 
@@ -649,8 +649,8 @@ function getJourneySubLocationParts(segs) {
   return segs.flatMap((seg, index) => {
     const legPrefix = isMultiLeg ? `Leg ${index + 1} ` : '';
     return [
-      seg.fromAddress ? { label: `${legPrefix}depart`, value: seg.fromAddress } : null,
-      seg.toAddress ? { label: `${legPrefix}arrive`, value: seg.toAddress } : null
+      seg.fromAddress ? { label: `${legPrefix}Depart`, value: seg.fromAddress } : null,
+      seg.toAddress ? { label: `${legPrefix}Arrive`, value: seg.toAddress } : null
     ].filter(Boolean);
   });
 }

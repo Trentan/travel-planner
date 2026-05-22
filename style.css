@@ -9567,13 +9567,14 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 .transport-sub-location-detail + .transport-sub-location-detail::before {
   content: '|';
   color: rgba(36, 72, 93, 0.32);
+  font-weight: 800;
   margin-right: 0.23rem;
 }
 
 .transport-sub-location-label {
   flex: 0 0 auto;
   font-size: 0.68rem;
-  font-weight: 800;
+  font-weight: 850;
   color: var(--accent-strong);
 }
 

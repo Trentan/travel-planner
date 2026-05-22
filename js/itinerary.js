@@ -246,8 +246,8 @@ function formatJourneySubLocationText(segments) {
     .flatMap((seg, index) => {
       const legPrefix = isMultiLeg ? `Leg ${index + 1} ` : '';
       return [
-        seg.fromAddress ? `${legPrefix}depart: ${seg.fromAddress}` : '',
-        seg.toAddress ? `${legPrefix}arrive: ${seg.toAddress}` : ''
+        seg.fromAddress ? `${legPrefix}Depart: ${seg.fromAddress}` : '',
+        seg.toAddress ? `${legPrefix}Arrive: ${seg.toAddress}` : ''
       ];
     })
     .filter(Boolean)
