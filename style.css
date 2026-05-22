@@ -9541,37 +9541,41 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 }
 
 /* Route sub-locations styling in Transport views */
-.transport-sub-location-chips {
+.transport-sub-location-details {
   display: flex;
-  align-items: stretch;
-  gap: 0.34rem;
+  align-items: baseline;
+  gap: 0.22rem 0.45rem;
   flex-wrap: wrap;
   min-width: 0;
-  margin-top: 0.38rem;
+  margin-top: 0.22rem;
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.3;
 }
 
-.transport-sub-location-chip {
+.transport-sub-location-detail {
   display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.06rem;
-  min-width: min(100%, 9rem);
+  align-items: baseline;
+  gap: 0.2rem;
+  min-width: 0;
   max-width: 100%;
-  padding: 0.28rem 0.48rem;
-  border: 1px solid rgba(36, 72, 93, 0.18);
-  border-radius: 6px;
-  background: rgba(36, 72, 93, 0.07);
-  color: var(--text);
-  line-height: 1.25;
+}
+
+.transport-sub-location-detail + .transport-sub-location-detail::before {
+  content: '\00B7';
+  color: rgba(36, 72, 93, 0.32);
+  margin-right: 0.23rem;
 }
 
 .transport-sub-location-label {
   flex: 0 0 auto;
-  font-size: 0.56rem;
-  font-weight: 800;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
-  color: var(--accent-strong);
+  font-size: 0.68rem;
+  font-weight: 750;
+  color: var(--muted);
+}
+
+.transport-sub-location-label::after {
+  content: ':';
 }
 
 .transport-sub-location-value {
@@ -9579,8 +9583,9 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.78rem;
-  font-weight: 750;
+  color: var(--text);
+  font-size: 0.74rem;
+  font-weight: 650;
 }
 
 .transport-mobile-sub-locations {
@@ -9591,18 +9596,19 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   margin: 0;
 }
 
-.route-col .transport-sub-location-chips,
+.transport-sub-location-details--stacked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.08rem;
+}
+
+.transport-sub-location-details--stacked .transport-sub-location-detail + .transport-sub-location-detail::before {
+  content: none;
+}
+
+.route-col .transport-sub-location-details,
 .transport-table-sub-locations {
   max-width: 20rem;
-}
-
-.transport-mobile-sub-locations .transport-sub-location-chip,
-.transport-card-sub-locations .transport-sub-location-chip {
-  flex: 1 1 8.5rem;
-}
-
-.transport-table-sub-locations .transport-sub-location-chip {
-  flex: 1 1 8.75rem;
 }
 
 .transport-detail-block--wide {
@@ -9625,7 +9631,13 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
   .transport-mobile-sub-locations {
     display: flex;
-    margin-top: 0.22rem;
+    margin-top: 0.24rem;
+    font-size: 0.66rem;
+  }
+
+  .transport-mobile-sub-locations .transport-sub-location-label,
+  .transport-mobile-sub-locations .transport-sub-location-value {
+    font-size: 0.66rem;
   }
 }
 
