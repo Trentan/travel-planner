@@ -29,6 +29,26 @@ function escapeCompactText(text) {
       .replace(/'/g, '&#39;');
 }
 
+function getJourneyDisplayCost(journey) {
+  if (!journey) return '';
+  const ownCost = parseFloat(journey.cost || '0');
+  if (ownCost > 0) return journey.cost;
+
+  if (journey.journeyId) {
+    const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+      ? window.journeys
+      : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+    const matching = journeysSource.filter(seg => seg.journeyId === journey.journeyId);
+    for (const seg of matching) {
+      const segCost = parseFloat(seg.cost || '0');
+      if (segCost > 0) {
+        return seg.cost;
+      }
+    }
+  }
+  return journey.cost;
+}
+
 function renderCompactMetaSuffix(value) {
   const trimmed = String(value || '').trim();
   if (!trimmed) return '';
@@ -313,7 +333,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       emoji: icon,
       text: journeyLabel,
       duration: duration,
-      cost: journey.cost ? formatCurrency(journey.cost) : ''
+      cost: getJourneyDisplayCost(journey) ? formatCurrency(getJourneyDisplayCost(journey)) : ''
     });
     const subLocsHtml = details ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(details)}</div>` : '';
     return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}</div>`;
@@ -1110,7 +1130,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       title: journey.journeyName || route || 'Transport',
       meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDate.trim()].filter(Boolean).join(' · '),
       subLocations: subLocations,
-      cost: journey.cost,
+      cost: getJourneyDisplayCost(journey),
       status: journey.status || 'planned',
       startTime,
       endTime,
