@@ -241,14 +241,14 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
 
 function formatJourneySubLocationText(segments) {
   if (!Array.isArray(segments) || segments.length === 0) return '';
+  const isMultiLeg = segments.length > 1;
   return segments
-    .map((seg, index) => {
-      const parts = [
-        seg.fromAddress ? `From: ${seg.fromAddress}` : '',
-        seg.toAddress ? `To: ${seg.toAddress}` : ''
-      ].filter(Boolean);
-      if (parts.length === 0) return '';
-      return segments.length > 1 ? `Leg ${index + 1} ${parts.join(' / ')}` : parts.join(' / ');
+    .flatMap((seg, index) => {
+      const legPrefix = isMultiLeg ? `Leg ${index + 1} ` : '';
+      return [
+        seg.fromAddress ? `${legPrefix}depart: ${seg.fromAddress}` : '',
+        seg.toAddress ? `${legPrefix}arrive: ${seg.toAddress}` : ''
+      ];
     })
     .filter(Boolean)
     .join(' | ');

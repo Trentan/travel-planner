@@ -619,17 +619,16 @@ function renderTransportDetailBlock(title, value, extraClass = '') {
 function getTransportSubLocationParts(seg) {
   if (!seg) return [];
   return [
-    seg.fromAddress ? { label: 'Depart', value: seg.fromAddress } : null,
-    seg.toAddress ? { label: 'Arrive', value: seg.toAddress } : null
+    seg.fromAddress ? { label: 'depart', value: seg.fromAddress } : null,
+    seg.toAddress ? { label: 'arrive', value: seg.toAddress } : null
   ].filter(Boolean);
 }
 
-function renderTransportSubLocationParts(parts, extraClass = '', options = {}) {
+function renderTransportSubLocationParts(parts, extraClass = '') {
   if (parts.length === 0) return '';
-  const isStacked = !!options.stacked;
 
   return `
-    <div class="transport-sub-location-details ${isStacked ? 'transport-sub-location-details--stacked' : ''} ${extraClass}">
+    <div class="transport-sub-location-details ${extraClass}">
       ${parts.map(part => `
         <span class="transport-sub-location-detail" title="${escapeHtmlText(part.value)}">
           <span class="transport-sub-location-label">${escapeHtmlText(part.label)}</span>
@@ -640,8 +639,8 @@ function renderTransportSubLocationParts(parts, extraClass = '', options = {}) {
   `;
 }
 
-function renderTransportSubLocationDetails(seg, extraClass = '', options = {}) {
-  return renderTransportSubLocationParts(getTransportSubLocationParts(seg), extraClass, options);
+function renderTransportSubLocationDetails(seg, extraClass = '') {
+  return renderTransportSubLocationParts(getTransportSubLocationParts(seg), extraClass);
 }
 
 function getJourneySubLocationParts(segs) {
@@ -656,8 +655,8 @@ function getJourneySubLocationParts(segs) {
   });
 }
 
-function renderJourneySubLocationDetails(segs, extraClass = '', options = {}) {
-  return renderTransportSubLocationParts(getJourneySubLocationParts(segs), extraClass, options);
+function renderJourneySubLocationDetails(segs, extraClass = '') {
+  return renderTransportSubLocationParts(getJourneySubLocationParts(segs), extraClass);
 }
 
 function formatTransportSubLocationText(seg) {
@@ -756,7 +755,7 @@ function renderTransportSegmentsDetailContent(segs) {
           <div class="transport-segment-mobile-journey" data-label="Journey">
             <span class="transport-segment-mobile-leg">Leg ${i + 1}</span>
             <span class="transport-segment-mobile-route">${escapeHtmlText(seg.fromLocation || '—')} → ${escapeHtmlText(seg.toLocation || '—')}</span>
-            ${renderTransportSubLocationDetails(seg, 'transport-segment-sub-locations', { stacked: true })}
+            ${renderTransportSubLocationDetails(seg, 'transport-segment-sub-locations')}
           </div>
           <div class="transport-segment-mobile-schedule" data-label="Schedule">
             <span class="transport-schedule-line"><strong>D:</strong> ${escapeHtmlText(segDep)}</span>
@@ -776,7 +775,7 @@ function renderTransportSegmentsDetailContent(segs) {
       <tr class="transport-segment-row">
         <td class="transport-segment-journey">
           ${seg.fromLocation || '—'} → ${seg.toLocation || '—'}
-          ${renderTransportSubLocationDetails(seg, 'transport-segment-sub-locations', { stacked: true })}
+          ${renderTransportSubLocationDetails(seg, 'transport-segment-sub-locations')}
         </td>
         <td class="transport-segment-leg">Leg ${i + 1}</td>
         <td class="transport-segment-route">${segRoute}</td>
@@ -982,7 +981,7 @@ function buildTransportTab(cityFilter = null) {
         <button class="mobile-surface-card-button transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">Edit</button>
         <button class="mobile-surface-card-button mobile-surface-card-button--danger transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">Delete</button>
       `;
-      const summary = renderJourneySubLocationDetails(segs, 'transport-card-sub-locations', { stacked: true });
+      const summary = renderJourneySubLocationDetails(segs, 'transport-card-sub-locations');
       const details = renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, rep.id);
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'transport-mobile-card row-accent',
@@ -1098,7 +1097,7 @@ function buildTransportTab(cityFilter = null) {
           </button>`
         : `<div class="journey-name-main">${nameDisplay}</div>`;
 
-    const mobileSubLocationsHtml = renderJourneySubLocationDetails(segs, 'transport-mobile-sub-locations', { stacked: true });
+    const mobileSubLocationsHtml = renderJourneySubLocationDetails(segs, 'transport-mobile-sub-locations');
 
     html += `
       <tr class="journey-parent-row row-accent ${isMultiLeg ? 'multi-leg-row' : ''}" data-group="${gid}" style="--row-border-color:${statusColor};">
