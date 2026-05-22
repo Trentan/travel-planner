@@ -675,6 +675,9 @@ function getDayTotal(day) {
     }
     const journeysForDay = getDayJourneys(day.date, day.from, day.to, legId);
     journeysForDay.forEach(journey => {
+      if (journey.legId && legId && journey.legId !== legId) {
+        return;
+      }
       // Avoid double-counting overnight or transit journeys on arrival day:
       // Only sum the cost on the departure day!
       const depDate = journey.departureDate || journey.dayDate;

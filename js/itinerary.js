@@ -1345,6 +1345,9 @@ function getLegTotalCost(leg) {
     (leg.days || []).forEach(day => {
       const journeysForDay = getDayJourneys(day.date, day.from, day.to, leg.id);
       journeysForDay.forEach(journey => {
+        if (journey.legId && journey.legId !== leg.id) {
+          return;
+        }
         const key = journey.id || journey.journeyId;
         if (key && !seenJourneys.has(key)) {
           seenJourneys.add(key);
