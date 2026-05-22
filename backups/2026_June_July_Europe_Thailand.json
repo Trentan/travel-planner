@@ -10,7 +10,7 @@
       "colour": "#2C3E50",
       "cityFood": [
         {
-          "text": "🍗 Last Aussie meal: Roll'd or your local favourite before the airport",
+          "text": "🍗 Last Aussie meal: local favourite before airport",
           "done": false,
           "cityId": "city-brisbane"
         }
@@ -46,7 +46,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-brisbane"
+          "cityId": "city-brisbane",
+          "startTime": "",
+          "endTime": "",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": ""
         }
       ],
       "legTips": [
@@ -98,6 +103,32 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
+              "cityId": "city-taipei",
+              "startTime": "09:00",
+              "endTime": "10:00",
+              "startDate": "2026-06-09",
+              "endDate": "2026-06-09"
+            },
+            {
+              "text": "Elephant Mountain trail - queue early",
+              "cost": "0",
+              "time": "1 hr",
+              "done": false,
+              "cityId": "city-taipei",
+              "startDate": "2026-06-09",
+              "endDate": "2026-06-09",
+              "startTime": "",
+              "endTime": ""
+            },
+            {
+              "text": "🏛️ Din Tai Fung lunch — queue early",
+              "cost": "0",
+              "time": "2 hrs",
+              "startTime": "12:00",
+              "endTime": "14:00",
+              "done": false,
+              "startDate": "2026-06-09",
+              "endDate": "2026-06-09",
               "cityId": "city-taipei"
             }
           ]
@@ -109,16 +140,26 @@
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-taipei"
+          "assignedDayIdx": 0,
+          "cityId": "city-taipei",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Din Tai Fung lunch — queue early",
           "category": "sight",
           "estTime": "2 hrs",
           "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-taipei"
+          "assignedDayIdx": 0,
+          "cityId": "city-taipei",
+          "startTime": "12:00",
+          "endTime": "14:00",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": ""
         },
         {
           "title": "Shilin Night Market evening",
@@ -126,7 +167,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-taipei"
+          "cityId": "city-taipei",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -174,7 +220,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-vienna"
+              "cityId": "city-vienna",
+              "startDate": "2026-06-10",
+              "endDate": "2026-06-10",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -186,7 +236,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-vienna"
+          "cityId": "city-vienna",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Belvedere Palace & Klimt's The Kiss",
@@ -194,7 +249,12 @@
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-vienna"
+          "cityId": "city-vienna",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Naschmarkt food stalls afternoon",
@@ -202,7 +262,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-vienna"
+          "cityId": "city-vienna",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -263,7 +328,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-bratislava"
+              "cityId": "city-bratislava",
+              "startDate": "2026-06-11",
+              "endDate": "2026-06-11",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -293,7 +362,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-bratislava"
+              "cityId": "city-bratislava",
+              "startDate": "2026-06-12",
+              "endDate": "2026-06-12",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -305,7 +378,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bratislava"
+          "cityId": "city-bratislava",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Devín Castle loop - combine with Morava river path to Austrian border",
@@ -313,7 +391,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bratislava"
+          "cityId": "city-bratislava",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Blue Church",
@@ -321,7 +404,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bratislava"
+          "cityId": "city-bratislava",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Kozlovna Beer Knuckle dinner",
@@ -329,7 +417,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bratislava"
+          "cityId": "city-bratislava",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Danube river cruise",
@@ -337,7 +430,12 @@
           "estTime": "1.5 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bratislava"
+          "cityId": "city-bratislava",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "UFO Observation Deck",
@@ -345,7 +443,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bratislava"
+          "cityId": "city-bratislava",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -406,7 +509,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-prague"
+              "cityId": "city-prague",
+              "startDate": "2026-06-13",
+              "endDate": "2026-06-13",
+              "startTime": "18:30",
+              "endTime": "19:30"
             }
           ]
         },
@@ -436,7 +543,22 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-prague"
+              "cityId": "city-prague",
+              "startDate": "2026-06-14",
+              "endDate": "2026-06-14",
+              "startTime": "",
+              "endTime": ""
+            },
+            {
+              "text": "Prague Castle district at dusk",
+              "cost": "0",
+              "time": "2 hrs",
+              "done": false,
+              "cityId": "city-prague",
+              "startDate": "2026-06-14",
+              "endDate": "2026-06-14",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -448,7 +570,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-prague"
+          "cityId": "city-prague",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Vyšehrad 5km loop - excellent path along the Vltava river",
@@ -456,15 +583,25 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-prague"
+          "cityId": "city-prague",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Prague Castle district at dusk",
           "category": "sight",
           "estTime": "2 hrs",
           "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-prague"
+          "assignedDayIdx": 1,
+          "cityId": "city-prague",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Josefov Jewish Quarter",
@@ -472,7 +609,12 @@
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-prague"
+          "cityId": "city-prague",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Vyšehrad 5km loop",
@@ -480,7 +622,12 @@
           "estTime": "1.5 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-prague"
+          "cityId": "city-prague",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -536,7 +683,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-nuremberg"
+              "cityId": "city-nuremberg",
+              "startDate": "2026-06-15",
+              "endDate": "2026-06-15",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -548,7 +699,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-nuremberg"
+          "cityId": "city-nuremberg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Wöhrder Wiese park - great 5km flat loop",
@@ -556,7 +712,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-nuremberg"
+          "cityId": "city-nuremberg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "City walls walk",
@@ -564,7 +725,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-nuremberg"
+          "cityId": "city-nuremberg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Bratwursthäusle for dinner",
@@ -572,7 +738,12 @@
           "estTime": "1.5 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-nuremberg"
+          "cityId": "city-nuremberg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -643,7 +814,11 @@
               "cost": "",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-munich"
+              "cityId": "city-munich",
+              "startDate": "2026-06-16",
+              "endDate": "2026-06-16",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -673,7 +848,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-munich"
+              "cityId": "city-munich",
+              "startDate": "2026-06-17",
+              "endDate": "2026-06-17",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -703,7 +882,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-munich"
+              "cityId": "city-munich",
+              "startDate": "2026-06-18",
+              "endDate": "2026-06-18",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -733,7 +916,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-munich"
+              "cityId": "city-munich",
+              "startDate": "2026-06-19",
+              "endDate": "2026-06-19",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -745,7 +932,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Nymphenburg Palace canal path",
@@ -753,7 +945,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Isar riverside path - very popular flat run, extending into nature reserve south",
@@ -761,7 +958,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Olympiapark 5km loop - hilly park around 1972 olympic venues",
@@ -769,7 +971,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Marienplatz Glockenspiel",
@@ -777,7 +984,12 @@
           "estTime": "30 mins",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Hofbräuhaus evening",
@@ -785,7 +997,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Chinesischer Turm beer garden",
@@ -793,7 +1010,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Viktualienmarkt lunch",
@@ -801,7 +1023,12 @@
           "estTime": "1.5 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Dallmayr gourmet deli",
@@ -809,7 +1036,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Nymphenburg Palace & grounds",
@@ -817,7 +1049,12 @@
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Allianz Arena tour",
@@ -825,7 +1062,12 @@
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -893,7 +1135,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-innsbruck"
+              "cityId": "city-innsbruck",
+              "startDate": "2026-06-20",
+              "endDate": "2026-06-20",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -905,7 +1151,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-innsbruck"
+          "cityId": "city-innsbruck",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Maria-Theresien-Straße afternoon stroll",
@@ -913,7 +1164,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-innsbruck"
+          "cityId": "city-innsbruck",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Nordkette cable car to 2,300m",
@@ -921,7 +1177,12 @@
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-innsbruck"
+          "cityId": "city-innsbruck",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Golden Roof old town walk",
@@ -929,7 +1190,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-innsbruck"
+          "cityId": "city-innsbruck",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -986,7 +1252,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-bolzano"
+              "cityId": "city-bolzano",
+              "startTime": "",
+              "endTime": "",
+              "startDate": "2026-06-21",
+              "endDate": "2026-06-21"
             }
           ]
         },
@@ -1016,7 +1286,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-bolzano"
+              "cityId": "city-bolzano",
+              "startDate": "2026-06-22",
+              "endDate": "2026-06-22",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -1028,7 +1302,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bolzano"
+          "cityId": "city-bolzano",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Trail run between cable car stations - challenging elevation",
@@ -1036,7 +1315,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bolzano"
+          "cityId": "city-bolzano",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Renon cable car",
@@ -1044,7 +1328,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bolzano"
+          "cityId": "city-bolzano",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Wine trail along the Adige",
@@ -1052,7 +1341,12 @@
           "estTime": "2.5 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bolzano"
+          "cityId": "city-bolzano",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Alpe di Siusi",
@@ -1060,7 +1354,12 @@
           "estTime": "4 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bolzano"
+          "cityId": "city-bolzano",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -1116,7 +1415,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-milan"
+              "cityId": "city-milan",
+              "startDate": "2026-06-23",
+              "endDate": "2026-06-23",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -1128,7 +1431,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-milan"
+          "cityId": "city-milan",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Milan arrival: Navigli canals aperitivo",
@@ -1136,7 +1444,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-milan"
+          "cityId": "city-milan",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -1184,7 +1497,22 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-milan"
+              "cityId": "city-milan",
+              "startDate": "2026-06-24",
+              "endDate": "2026-06-24",
+              "startTime": "",
+              "endTime": ""
+            },
+            {
+              "text": "Statue viewin — Main park",
+              "cost": "0",
+              "time": "1 hr",
+              "done": false,
+              "cityId": "city-milan",
+              "startDate": "2026-06-24",
+              "endDate": "2026-06-24",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -1196,7 +1524,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-milan"
+          "cityId": "city-milan",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Navigli canal towpath - flat 10km run out of the city",
@@ -1204,7 +1537,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-milan"
+          "cityId": "city-milan",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "The Last Supper (Cenacolo Vinciano)",
@@ -1212,7 +1550,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-milan"
+          "cityId": "city-milan",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Brera neighbourhood lunch",
@@ -1220,7 +1563,25 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-milan"
+          "cityId": "city-milan",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
+          "title": "Statue viewin — Main park",
+          "category": "attraction",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-milan",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -1277,7 +1638,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-zurich"
+              "cityId": "city-zurich",
+              "startDate": "2026-06-25",
+              "endDate": "2026-06-25",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -1307,7 +1672,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-zurich"
+              "cityId": "city-zurich",
+              "startDate": "2026-06-26",
+              "endDate": "2026-06-26",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -1319,7 +1688,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-zurich"
+          "cityId": "city-zurich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Limmat River path",
@@ -1327,7 +1701,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-zurich"
+          "cityId": "city-zurich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Confiserie Sprüngli",
@@ -1335,7 +1714,12 @@
           "estTime": "45 mins",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-zurich"
+          "cityId": "city-zurich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Dinner in Old Town",
@@ -1343,7 +1727,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-zurich"
+          "cityId": "city-zurich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Rhine Falls day trip",
@@ -1351,7 +1740,12 @@
           "estTime": "4 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-zurich"
+          "cityId": "city-zurich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Uetliberg hill",
@@ -1359,7 +1753,12 @@
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-zurich"
+          "cityId": "city-zurich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -1424,7 +1823,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-bangkok"
+              "cityId": "city-bangkok",
+              "startDate": "2026-06-27",
+              "endDate": "2026-06-27",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -1454,7 +1857,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-bangkok"
+              "cityId": "city-bangkok",
+              "startDate": "2026-06-28",
+              "endDate": "2026-06-28",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -1466,7 +1873,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Benchakitti Park loop - newly expanded, beautiful elevated walkways",
@@ -1474,7 +1886,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Khao San Road evening",
@@ -1482,7 +1899,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Grand Palace",
@@ -1490,7 +1912,12 @@
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -1577,7 +2004,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "startDate": "2026-06-29",
+              "endDate": "2026-06-29",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -1607,7 +2038,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "startDate": "2026-06-30",
+              "endDate": "2026-06-30",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -1637,7 +2072,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "startDate": "2026-07-01",
+              "endDate": "2026-07-01",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -1667,7 +2106,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "startDate": "2026-07-02",
+              "endDate": "2026-07-02",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -1697,7 +2140,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "startDate": "2026-07-03",
+              "endDate": "2026-07-03",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -1727,7 +2174,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "startDate": "2026-07-04",
+              "endDate": "2026-07-04",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -1757,7 +2208,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "startDate": "2026-07-05",
+              "endDate": "2026-07-05",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -1787,7 +2242,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-06",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -1799,7 +2258,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Ang Thong island hike to viewpoint - steep 500m climb, incredible view",
@@ -1807,7 +2271,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Koh Tao: hike to Mango Viewpoint - brutal climb, worth the sweat",
@@ -1815,7 +2284,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Hin Lad Waterfall trail - 2km jungle trek each way, wear actual shoes",
@@ -1823,7 +2297,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Lamai Beach early morning run - quieter than Chaweng",
@@ -1831,7 +2310,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Chaweng Lake mangrove loop - flat 5km track, very popular with locals",
@@ -1839,7 +2323,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Silver Beach headland trail - rock hopping to hidden coves",
@@ -1847,7 +2336,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Sunrise run: Hin Ta & Hin Yai - coastal path before 7am - empty & cool breeze",
@@ -1855,7 +2349,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Grab local SIM at USM",
@@ -1863,7 +2362,12 @@
           "estTime": "30 mins",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Sunset drinks on the beach",
@@ -1871,7 +2375,12 @@
           "estTime": "1.5 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Kayaking through sea caves",
@@ -1879,7 +2388,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Thale Nai crater lake hike",
@@ -1887,7 +2401,12 @@
           "estTime": "1.5 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Na Muang Waterfall 2",
@@ -1895,7 +2414,12 @@
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Turtle spotting",
@@ -1903,7 +2427,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Wat Plai Laem Temple",
@@ -1911,7 +2440,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Fisherman's Village Bo Phut",
@@ -1919,7 +2453,12 @@
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Lamai Beach morning",
@@ -1927,7 +2466,12 @@
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Hin Ta & Hin Yai",
@@ -1935,7 +2479,12 @@
           "estTime": "1.5 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Resort pool + Thai massage",
@@ -1943,7 +2492,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Chaweng Lake kayak tour",
@@ -1951,7 +2505,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Nikki Beach club afternoon",
@@ -1959,7 +2518,12 @@
           "estTime": "4 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "West coast sunset cocktails",
@@ -1967,7 +2531,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Chaweng Night Bazaar",
@@ -1975,7 +2544,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Farewell dinner",
@@ -1983,7 +2557,12 @@
           "estTime": "2.5 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -2064,7 +2643,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-bangkok"
+              "cityId": "city-bangkok",
+              "startDate": "2026-07-07",
+              "endDate": "2026-07-07",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -2094,7 +2677,11 @@
               "cost": "0",
               "done": false,
               "time": "1 hr",
-              "cityId": "city-brisbane"
+              "cityId": "city-brisbane",
+              "startDate": "2026-07-08",
+              "endDate": "2026-07-08",
+              "startTime": "",
+              "endTime": ""
             }
           ]
         }
@@ -2106,7 +2693,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "☕ Your own coffee machine",
@@ -2114,7 +2706,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "BKK layover: CentralFestival mall connected to airport via Skytrain - great food court",
@@ -2122,7 +2719,12 @@
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Col. Germ lounge",
@@ -2130,7 +2732,12 @@
           "estTime": "2 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Download & back up all photos",
@@ -2138,7 +2745,12 @@
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -2551,6 +3163,29 @@
           ]
         }
       ]
+    },
+    {
+      "areaName": "📝 Trip Notes",
+      "areaColor": "#6C5CE7",
+      "categories": [
+        {
+          "title": "Notes",
+          "items": [
+            {
+              "text": "Booking reminders",
+              "done": false
+            },
+            {
+              "text": "Places to book",
+              "done": false
+            },
+            {
+              "text": "Trip ideas to follow up",
+              "done": false
+            }
+          ]
+        }
+      ]
     }
   ],
   "leaveHome": [
@@ -2785,156 +3420,6 @@
   ],
   "journeys": [
     {
-      "id": "journey_3",
-      "legId": "bratislava",
-      "dayDate": "2026-06-11",
-      "fromLocation": "Vienna",
-      "toLocation": "Bratislava",
-      "departureDate": "2026-06-11",
-      "departureTime": "",
-      "arrivalDate": "2026-06-11",
-      "arrivalTime": "",
-      "transportType": "train",
-      "provider": "RegioJet",
-      "routeCode": "",
-      "status": "planned",
-      "cost": "0",
-      "bookingReference": "",
-      "isMultiLeg": false,
-      "notes": "🚂 RegioJet ~1h",
-      "legs": [],
-      "fromCityId": "city-vienna",
-      "toCityId": "city-bratislava",
-      "journeyId": "jid_single_journey_3",
-      "journeyName": "Vienna to Bratislava",
-      "segmentOrder": 1
-    },
-    {
-      "id": "journey_4",
-      "legId": "bratislava",
-      "dayDate": "2026-06-12",
-      "fromLocation": "Bratislava",
-      "toLocation": "Bratislava",
-      "departureDate": "2026-06-12",
-      "departureTime": "",
-      "arrivalDate": "2026-06-12",
-      "arrivalTime": "",
-      "transportType": "bus",
-      "provider": "",
-      "routeCode": "",
-      "status": "planned",
-      "cost": "0",
-      "bookingReference": "",
-      "isMultiLeg": false,
-      "notes": "— (Bus 29 for Devín)",
-      "legs": [],
-      "fromCityId": "city-bratislava",
-      "toCityId": "city-bratislava",
-      "journeyId": "jid_single_journey_4",
-      "journeyName": "Bratislava to Bratislava",
-      "segmentOrder": 1
-    },
-    {
-      "id": "journey_5",
-      "legId": "prague",
-      "dayDate": "2026-06-13",
-      "fromLocation": "Bratislava",
-      "toLocation": "Prague",
-      "departureDate": "2026-06-13",
-      "departureTime": "",
-      "arrivalDate": "2026-06-13",
-      "arrivalTime": "",
-      "transportType": "train",
-      "provider": "RegioJet",
-      "routeCode": "",
-      "status": "planned",
-      "cost": "0",
-      "bookingReference": "",
-      "isMultiLeg": false,
-      "notes": "🚂 RegioJet ~4.5h",
-      "legs": [],
-      "fromCityId": "city-bratislava",
-      "toCityId": "city-prague",
-      "journeyId": "jid_single_journey_5",
-      "journeyName": "Bratislava to Prague",
-      "segmentOrder": 1
-    },
-    {
-      "id": "journey_6",
-      "legId": "prague",
-      "dayDate": "2026-06-14",
-      "fromLocation": "Prague",
-      "toLocation": "Prague",
-      "departureDate": "2026-06-14",
-      "departureTime": "",
-      "arrivalDate": "2026-06-14",
-      "arrivalTime": "",
-      "transportType": "other",
-      "provider": "",
-      "routeCode": "",
-      "status": "planned",
-      "cost": "0",
-      "bookingReference": "",
-      "isMultiLeg": false,
-      "notes": "— (metro / tram)",
-      "legs": [],
-      "fromCityId": "city-prague",
-      "toCityId": "city-prague",
-      "journeyId": "jid_single_journey_6",
-      "journeyName": "Prague to Prague",
-      "segmentOrder": 1
-    },
-    {
-      "id": "journey_7",
-      "legId": "nuremberg",
-      "dayDate": "2026-06-15",
-      "fromLocation": "Prague",
-      "toLocation": "Nuremberg",
-      "departureDate": "2026-06-15",
-      "departureTime": "",
-      "arrivalDate": "2026-06-15",
-      "arrivalTime": "",
-      "transportType": "train",
-      "provider": "RegioJet",
-      "routeCode": "",
-      "status": "planned",
-      "cost": "0",
-      "bookingReference": "",
-      "isMultiLeg": false,
-      "notes": "🚂 RegioJet ~3.5h",
-      "legs": [],
-      "fromCityId": "city-prague",
-      "toCityId": "city-nuremberg",
-      "journeyId": "jid_single_journey_7",
-      "journeyName": "Prague to Nuremberg",
-      "segmentOrder": 1
-    },
-    {
-      "id": "journey_8",
-      "legId": "munich",
-      "dayDate": "2026-06-16",
-      "fromLocation": "Nuremberg",
-      "toLocation": "Munich",
-      "departureDate": "2026-06-16",
-      "departureTime": "",
-      "arrivalDate": "2026-06-16",
-      "arrivalTime": "",
-      "transportType": "train",
-      "provider": "DB ICE",
-      "routeCode": "",
-      "status": "planned",
-      "cost": "0",
-      "bookingReference": "",
-      "isMultiLeg": false,
-      "notes": "🚂 ICE ~1h",
-      "legs": [],
-      "fromCityId": "city-nuremberg",
-      "toCityId": "city-munich",
-      "journeyId": "jid_single_journey_8",
-      "journeyName": "Nuremberg to Munich",
-      "segmentOrder": 1
-    },
-    {
       "id": "journey_9",
       "legId": "innsbruck",
       "dayDate": "2026-06-20",
@@ -2957,7 +3442,13 @@
       "toCityId": "city-innsbruck",
       "journeyId": "jid_single_journey_9",
       "journeyName": "Munich to Innsbruck",
-      "segmentOrder": 1
+      "segmentOrder": 1,
+      "startDate": "2026-06-20",
+      "endDate": "2026-06-20",
+      "startTime": "",
+      "endTime": "",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
       "id": "journey_10",
@@ -2982,7 +3473,13 @@
       "toCityId": "city-bolzano",
       "journeyId": "jid_single_journey_10",
       "journeyName": "Innsbruck to Bolzano",
-      "segmentOrder": 1
+      "segmentOrder": 1,
+      "startDate": "2026-06-21",
+      "endDate": "2026-06-21",
+      "startTime": "",
+      "endTime": "",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
       "id": "journey_11",
@@ -3007,7 +3504,13 @@
       "toCityId": "city-bolzano",
       "journeyId": "jid_single_journey_11",
       "journeyName": "Bolzano to Bolzano",
-      "segmentOrder": 1
+      "segmentOrder": 1,
+      "startDate": "2026-06-22",
+      "endDate": "2026-06-22",
+      "startTime": "",
+      "endTime": "",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
       "id": "journey_12",
@@ -3032,7 +3535,13 @@
       "toCityId": "city-milan",
       "journeyId": "jid_single_journey_12",
       "journeyName": "Bolzano to Milan",
-      "segmentOrder": 1
+      "segmentOrder": 1,
+      "startDate": "2026-06-23",
+      "endDate": "2026-06-23",
+      "startTime": "",
+      "endTime": "",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
       "id": "journey_13",
@@ -3057,85 +3566,109 @@
       "toCityId": "city-zurich",
       "journeyId": "jid_single_journey_13",
       "journeyName": "Milan to Zurich",
-      "segmentOrder": 1
+      "segmentOrder": 1,
+      "startDate": "2026-06-25",
+      "endDate": "2026-06-25",
+      "startTime": "",
+      "endTime": "",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
-      "id": "journey_16",
-      "legId": "bangkok",
-      "dayDate": "2026-06-28",
-      "fromLocation": "Bangkok",
-      "toLocation": "Bangkok",
-      "departureDate": "2026-06-28",
-      "departureTime": "10:05",
-      "arrivalDate": "2026-06-28",
-      "arrivalTime": "",
-      "transportType": "other",
-      "provider": "",
-      "routeCode": "",
-      "status": "planned",
-      "cost": "0",
-      "bookingReference": "",
+      "id": "journey_1779252331001_rduqbe",
+      "journeyId": "jid_single_journey_5",
+      "journeyName": "Bratislava → Prague",
+      "legId": "prague",
+      "dayDate": "2026-06-13",
+      "fromLocation": "Bratislava",
+      "toLocation": "Prague",
+      "fromCityId": "city-bratislava",
+      "toCityId": "city-prague",
+      "departureDate": "2026-06-13",
+      "departureTime": "12:26",
+      "arrivalDate": "2026-06-13",
+      "arrivalTime": "16:58",
+      "transportType": "train",
+      "provider": "RegioJet",
+      "routeCode": "RJ1048",
+      "status": "confirmed",
+      "cost": "30.54",
+      "bookingReference": "1876160174",
       "isMultiLeg": false,
-      "notes": "✈ Family arr 10:05",
+      "segmentOrder": 1,
+      "notes": "🚂 RegioJet ~4.5h,  Carriage 2/28 Seat",
       "legs": [],
-      "fromCityId": "city-bangkok",
-      "toCityId": "city-bangkok",
-      "journeyId": "jid_single_journey_16",
-      "journeyName": "Bangkok to Bangkok",
-      "segmentOrder": 1
+      "startDate": "2026-06-13",
+      "endDate": "2026-06-13",
+      "startTime": "12:26",
+      "endTime": "16:58",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
-      "id": "journey_18",
-      "legId": "samui",
-      "dayDate": "2026-06-30",
-      "fromLocation": "Koh Samui",
-      "toLocation": "Koh Samui",
-      "departureDate": "2026-06-30",
-      "departureTime": "",
-      "arrivalDate": "2026-06-30",
-      "arrivalTime": "",
-      "transportType": "ferry",
-      "provider": "",
-      "routeCode": "",
-      "status": "planned",
-      "cost": "0",
-      "bookingReference": "",
+      "id": "journey_1779252564144_3v7ees",
+      "journeyId": "jid_single_journey_7",
+      "journeyName": "Prague → Nuremberg",
+      "legId": "nuremberg",
+      "dayDate": "2026-06-15",
+      "fromLocation": "Prague",
+      "toLocation": "Nuremberg",
+      "fromCityId": "city-prague",
+      "toCityId": "city-nuremberg",
+      "departureDate": "2026-06-15",
+      "departureTime": "09:10",
+      "arrivalDate": "2026-06-15",
+      "arrivalTime": "13:00",
+      "transportType": "bus",
+      "provider": "FlixBus",
+      "routeCode": "Route 084, Platform 7",
+      "status": "confirmed",
+      "cost": "36.53",
+      "bookingReference": "335 636 2705",
       "isMultiLeg": false,
-      "notes": "— (tour boat)",
+      "segmentOrder": 1,
+      "notes": "🚌 FlixBus~3h 50m, Dep: Prague (Ostrovského 34/1, 150 00 Praha), Arr: Nuremberg (Ostrovského 34/1, 150 00 Praha)",
       "legs": [],
-      "fromCityId": "city-koh-samui",
-      "toCityId": "city-koh-samui",
-      "journeyId": "jid_single_journey_18",
-      "journeyName": "Koh Samui to Koh Samui",
-      "segmentOrder": 1
+      "startDate": "2026-06-15",
+      "endDate": "2026-06-15",
+      "startTime": "09:10",
+      "endTime": "13:00",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
-      "id": "journey_19",
-      "legId": "samui",
-      "dayDate": "2026-07-01",
-      "fromLocation": "Koh Samui",
-      "toLocation": "Koh Samui",
-      "departureDate": "2026-07-01",
-      "departureTime": "",
-      "arrivalDate": "2026-07-01",
-      "arrivalTime": "",
-      "transportType": "ferry",
-      "provider": "",
-      "routeCode": "",
-      "status": "planned",
-      "cost": "0",
-      "bookingReference": "",
+      "id": "journey_1779252705895_3up06o",
+      "journeyId": "jid_single_journey_8",
+      "journeyName": "Nuremberg → Munich",
+      "legId": "munich",
+      "dayDate": "2026-06-16",
+      "fromLocation": "Nuremberg",
+      "toLocation": "Munich",
+      "fromCityId": "city-nuremberg",
+      "toCityId": "city-munich",
+      "departureDate": "2026-06-16",
+      "departureTime": "11:01",
+      "arrivalDate": "2026-06-16",
+      "arrivalTime": "12:12",
+      "transportType": "train",
+      "provider": "DB ICE",
+      "routeCode": "ICE 527",
+      "status": "confirmed",
+      "cost": "29.35",
+      "bookingReference": "492464815842",
       "isMultiLeg": false,
-      "notes": "— (speedboat)",
+      "segmentOrder": 1,
+      "notes": "🚂 ICE ~1h",
       "legs": [],
-      "fromCityId": "city-koh-samui",
-      "toCityId": "city-koh-samui",
-      "journeyId": "jid_single_journey_19",
-      "journeyName": "Koh Samui to Koh Samui",
-      "segmentOrder": 1
+      "startDate": "2026-06-16",
+      "endDate": "2026-06-16",
+      "startTime": "11:01",
+      "endTime": "12:12",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
-      "id": "journey_1778473166253_06fhe3",
+      "id": "journey_1779253742104_nvhvy4",
       "journeyId": "jid_single_journey_17",
       "journeyName": "Bangkok → Koh Samui",
       "legId": "samui",
@@ -3147,20 +3680,88 @@
       "departureDate": "2026-06-29",
       "departureTime": "06:05",
       "arrivalDate": "2026-06-29",
-      "arrivalTime": "",
+      "arrivalTime": "07:10",
       "transportType": "flight",
       "provider": "Bangkok Airways",
-      "routeCode": "",
-      "status": "planned",
-      "cost": "0",
-      "bookingReference": "",
+      "routeCode": "PG101",
+      "status": "confirmed",
+      "cost": "400",
+      "bookingReference": "FQ4BHU",
       "isMultiLeg": false,
       "segmentOrder": 1,
       "notes": "✈ Bangkok Air BKK→USM 06:05",
-      "legs": []
+      "legs": [],
+      "startDate": "2026-06-29",
+      "endDate": "2026-06-29",
+      "startTime": "06:05",
+      "endTime": "07:10",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
-      "id": "journey_1778474231627_8kwf23",
+      "id": "journey_1779253857395_lwk9ek",
+      "journeyId": "jid_return_789",
+      "journeyName": "Koh Samui → Brisbane (via Bangkok)",
+      "legId": "return",
+      "dayDate": "2026-07-07",
+      "fromLocation": "Koh Samui",
+      "toLocation": "Bangkok",
+      "fromCityId": "city-koh-samui",
+      "toCityId": "city-bangkok",
+      "departureDate": "2026-07-07",
+      "departureTime": "07:50",
+      "arrivalDate": "2026-07-07",
+      "arrivalTime": "09:05",
+      "transportType": "flight",
+      "provider": "Bangkok Airways",
+      "routeCode": "PG102",
+      "status": "confirmed",
+      "cost": "400",
+      "bookingReference": "FQ4BHU",
+      "isMultiLeg": true,
+      "segmentOrder": 1,
+      "notes": "✈ Bangkok Air USM→BKK 07:50",
+      "legs": [],
+      "startDate": "2026-07-07",
+      "endDate": "2026-07-07",
+      "startTime": "07:50",
+      "endTime": "09:05",
+      "fromAddress": "",
+      "toAddress": ""
+    },
+    {
+      "id": "journey_1779253900785_5c7jns",
+      "journeyId": "jid_return_789",
+      "journeyName": "Koh Samui → Brisbane (via Bangkok)",
+      "legId": "return",
+      "dayDate": "2026-07-07",
+      "fromLocation": "Bangkok",
+      "toLocation": "Brisbane",
+      "fromCityId": "city-bangkok",
+      "toCityId": "city-brisbane",
+      "departureDate": "2026-07-07",
+      "departureTime": "21:40",
+      "arrivalDate": "2026-07-08",
+      "arrivalTime": "09:30",
+      "transportType": "flight",
+      "provider": "Jetstar",
+      "routeCode": "JQ 66",
+      "status": "confirmed",
+      "cost": "1850",
+      "bookingReference": "GS9QHX",
+      "isMultiLeg": true,
+      "segmentOrder": 2,
+      "notes": "✈ Jetstar BKK→BNE 21:40 - Includes meal and drink",
+      "legs": [],
+      "startDate": "2026-07-07",
+      "endDate": "2026-07-08",
+      "startTime": "21:40",
+      "endTime": "09:30",
+      "fromAddress": "",
+      "toAddress": ""
+    },
+    {
+      "id": "journey_1779254036457_tntum2",
       "journeyId": "jid_zrh_bkk_456",
       "journeyName": "Zurich → Bangkok (via London)",
       "legId": "zurich",
@@ -3177,12 +3778,18 @@
       "provider": "Swiss",
       "routeCode": "LX338",
       "status": "confirmed",
-      "cost": "0",
-      "bookingReference": "",
+      "cost": "163",
+      "bookingReference": "B4RP63",
       "isMultiLeg": true,
       "segmentOrder": 1,
-      "notes": "✈ Swiss LX ZRH→LHR 18:30 · ✈ EVA BR LHR→BKK 21:35",
-      "legs": []
+      "notes": "✈ Swiss LX ZRH→LHR 18:30 · ✈ EVA BR LHR→BKK 21:35 ($160 CAD + 80,000 points)",
+      "legs": [],
+      "startDate": "2026-06-26",
+      "endDate": "2026-06-26",
+      "startTime": "18:30",
+      "endTime": "19:20",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
       "id": "journey_1778474236720_qwd9zd",
@@ -3207,10 +3814,16 @@
       "isMultiLeg": true,
       "segmentOrder": 2,
       "notes": "✈ EVA BR LHR→BKK 21:35",
-      "legs": []
+      "legs": [],
+      "startDate": "2026-06-26",
+      "endDate": "2026-06-27",
+      "startTime": "21:35",
+      "endTime": "15:30",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
-      "id": "journey_1778474416279_xl8dgk",
+      "id": "journey_1779416037864_rnta1l",
       "journeyId": "jid_outbound_123",
       "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
       "legId": "departure",
@@ -3232,7 +3845,13 @@
       "isMultiLeg": true,
       "segmentOrder": 1,
       "notes": "✈ EVA Air BNE→TPE 22:15",
-      "legs": []
+      "fromAddress": "Brisbane Terminal 1",
+      "toAddress": "Taiwan Terminal 2",
+      "legs": [],
+      "startDate": "2026-06-08",
+      "endDate": "2026-06-09",
+      "startTime": "22:15",
+      "endTime": "05:15"
     },
     {
       "id": "journey_1778474341607_iobkbm",
@@ -3257,7 +3876,13 @@
       "isMultiLeg": true,
       "segmentOrder": 2,
       "notes": "✈ EVA Air BNE→TPE 22:15",
-      "legs": []
+      "legs": [],
+      "startDate": "2026-06-09",
+      "endDate": "2026-06-10",
+      "startTime": "22:30",
+      "endTime": "01:10",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
       "id": "journey_1778474359483_dqz7rz",
@@ -3282,72 +3907,66 @@
       "isMultiLeg": true,
       "segmentOrder": 3,
       "notes": "✈ EVA Air TPE→VIE 22:40",
-      "legs": []
+      "legs": [],
+      "startDate": "2026-06-10",
+      "endDate": "2026-06-10",
+      "startTime": "02:20",
+      "endTime": "08:35",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
-      "id": "journey_1778499151878_zq1fwu",
-      "journeyId": "jid_return_789",
-      "journeyName": "Koh Samui → Brisbane (via Bangkok)",
-      "legId": "return",
-      "dayDate": "2026-07-07",
-      "fromLocation": "Koh Samui",
-      "toLocation": "Bangkok",
-      "fromCityId": "city-koh-samui",
-      "toCityId": "city-bangkok",
-      "departureDate": "2026-07-07",
-      "departureTime": "07:50",
-      "arrivalDate": "2026-07-07",
-      "arrivalTime": "",
-      "transportType": "flight",
-      "provider": "Bangkok Airways",
-      "routeCode": "",
+      "id": "journey_1779417927293_qtv31a",
+      "journeyId": "jid_single_journey_3",
+      "journeyName": "Vienna → Bratislava",
+      "legId": "bratislava",
+      "dayDate": "2026-06-11",
+      "fromLocation": "Vienna",
+      "toLocation": "Bratislava",
+      "fromCityId": "city-vienna",
+      "toCityId": "city-bratislava",
+      "departureDate": "2026-06-11",
+      "departureTime": "11:14",
+      "arrivalDate": "2026-06-11",
+      "arrivalTime": "12:10",
+      "transportType": "train",
+      "provider": "OBB",
+      "routeCode": "REX8",
       "status": "confirmed",
-      "cost": "0",
-      "bookingReference": "",
-      "isMultiLeg": true,
+      "cost": "20.09",
+      "bookingReference": "1181",
+      "isMultiLeg": false,
       "segmentOrder": 1,
-      "notes": "✈ Bangkok Air USM→BKK 07:50",
-      "legs": []
-    },
-    {
-      "id": "journey_1778499154064_j0arhf",
-      "journeyId": "jid_return_789",
-      "journeyName": "Koh Samui → Brisbane (via Bangkok)",
-      "legId": "return",
-      "dayDate": "2026-07-07",
-      "fromLocation": "Bangkok",
-      "toLocation": "Brisbane",
-      "fromCityId": "city-bangkok",
-      "toCityId": "city-brisbane",
-      "departureDate": "2026-07-07",
-      "departureTime": "21:40",
-      "arrivalDate": "2026-07-08",
-      "arrivalTime": "09:30",
-      "transportType": "flight",
-      "provider": "Jetstar",
-      "routeCode": "",
-      "status": "confirmed",
-      "cost": "0",
-      "bookingReference": "",
-      "isMultiLeg": true,
-      "segmentOrder": 2,
-      "notes": "✈ Jetstar BKK→BNE 21:40",
-      "legs": []
+      "notes": "🚂 56m, Bahnsteige 3-12~, Platform 11C-E, Wien Hbf",
+      "fromAddress": "Platform 1",
+      "toAddress": "Platform 2",
+      "legs": [],
+      "startDate": "2026-06-11",
+      "endDate": "2026-06-11",
+      "startTime": "11:14",
+      "endTime": "12:10"
     }
   ],
   "stays": [
     {
       "id": "stay_0_1777289776",
       "cityId": "city-vienna",
-      "propertyName": "ibis Wien",
+      "propertyName": "Ibis Wein",
       "checkIn": "2026-06-10",
       "checkOut": "2026-06-11",
       "nights": 1,
-      "status": "pending",
-      "provider": "",
-      "bookingRef": "",
-      "totalCost": "0",
-      "notes": ""
+      "status": "confirmed",
+      "provider": "Accor",
+      "bookingRef": "QJQDBFRD",
+      "totalCost": "103",
+      "notes": "",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-10",
+      "endDate": "2026-06-11",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
     },
     {
       "id": "stay_1_1777289776",
@@ -3360,33 +3979,54 @@
       "provider": "Airbnb",
       "bookingRef": "HMQKDE233E",
       "totalCost": "110.60",
-      "notes": "Near Train Station - Murgašova 3131/2 2, Bratislava, Bratislavský kraj 811 04, Slovakia"
+      "notes": "Near Train Station - Murgašova 3131/2 2, Bratislava, Bratislavský kraj 811 04, Slovakia",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-11",
+      "endDate": "2026-06-13",
+      "startTime": "",
+      "endTime": "",
+      "location": "Murgašova 3131/2 2, Bratislava, Bratislavský kraj 811 04, Slovakia"
     },
     {
       "id": "stay_2_1777289776",
       "cityId": "city-prague",
-      "propertyName": "tbc — prague old town",
+      "propertyName": "Hotel Lunik",
       "checkIn": "2026-06-13",
       "checkOut": "2026-06-15",
       "nights": 2,
-      "status": "pending",
-      "provider": "",
-      "bookingRef": "",
-      "totalCost": "0",
-      "notes": ""
+      "status": "confirmed",
+      "provider": "Qantas Hotels",
+      "bookingRef": "QAJW7GXTZ",
+      "totalCost": "232",
+      "notes": "",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-13",
+      "endDate": "2026-06-15",
+      "startTime": "",
+      "endTime": "",
+      "location": "Londynska 50, Prague 120 00, Czech Republic"
     },
     {
       "id": "stay_3_1777289776",
       "cityId": "city-nuremberg",
-      "propertyName": "tbc — nuremberg old town",
+      "propertyName": "ibis Nuernberg City am Plaerrer",
       "checkIn": "2026-06-15",
       "checkOut": "2026-06-16",
       "nights": 1,
-      "status": "pending",
-      "provider": "",
-      "bookingRef": "",
-      "totalCost": "0",
-      "notes": ""
+      "status": "confirmed",
+      "provider": "Accor",
+      "bookingRef": "QJZDHQGF",
+      "totalCost": "73.75",
+      "notes": "Steinbuehler Strasse 2 - 90443 NUREMBERG - Germany",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-15",
+      "endDate": "2026-06-16",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
     },
     {
       "id": "stay_4_1777289776",
@@ -3399,7 +4039,14 @@
       "provider": "Direct",
       "bookingRef": "MUN144766",
       "totalCost": "760",
-      "notes": "Goethestraße 7, 80336 München, Germany. Sharing with Simon (Software AG covering, Breakfast included)"
+      "notes": "Goethestraße 7, 80336 München, Germany. Sharing with Simon (Software AG covering, Breakfast included)",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-16",
+      "endDate": "2026-06-19",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
     },
     {
       "id": "stay_5_1777289776",
@@ -3408,11 +4055,18 @@
       "checkIn": "2026-06-19",
       "checkOut": "2026-06-20",
       "nights": 1,
-      "status": "pending",
+      "status": "planned",
       "provider": "",
       "bookingRef": "",
       "totalCost": "0",
-      "notes": ""
+      "notes": "",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-19",
+      "endDate": "2026-06-20",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
     },
     {
       "id": "stay_6_1777289776",
@@ -3425,7 +4079,14 @@
       "provider": "",
       "bookingRef": "",
       "totalCost": "0",
-      "notes": ""
+      "notes": "",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-20",
+      "endDate": "2026-06-21",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
     },
     {
       "id": "stay_7_1777289776",
@@ -3438,7 +4099,14 @@
       "provider": "",
       "bookingRef": "",
       "totalCost": "0",
-      "notes": ""
+      "notes": "",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-21",
+      "endDate": "2026-06-23",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
     },
     {
       "id": "stay_8_1777289776",
@@ -3451,7 +4119,14 @@
       "provider": "",
       "bookingRef": "",
       "totalCost": "0",
-      "notes": ""
+      "notes": "",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-23",
+      "endDate": "2026-06-25",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
     },
     {
       "id": "stay_10_1777289776",
@@ -3464,7 +4139,14 @@
       "provider": "",
       "bookingRef": "",
       "totalCost": "0",
-      "notes": ""
+      "notes": "",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-25",
+      "endDate": "2026-06-26",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
     },
     {
       "id": "stay_11_1777289776",
@@ -3477,7 +4159,14 @@
       "provider": "Accor",
       "bookingRef": "QJPSFWHK",
       "totalCost": "217.60",
-      "notes": "1122 Sukhumvit Road, Phra Khanong Khlong Toei, . - 10110 BANGKOK - Thailand"
+      "notes": "1122 Sukhumvit Road, Phra Khanong Khlong Toei, . - 10110 BANGKOK - Thailand",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-27",
+      "endDate": "2026-06-29",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
     },
     {
       "id": "stay_12_1777289776",
@@ -3490,7 +4179,14 @@
       "provider": "Direct",
       "bookingRef": "27872",
       "totalCost": "1700",
-      "notes": "99, 9, Bo Put, Ko Samui District, Surat Thani 84320, Thailand. Breakfast included"
+      "notes": "99, 9, Bo Put, Ko Samui District, Surat Thani 84320, Thailand. Breakfast included",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-29",
+      "endDate": "2026-07-07",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
     }
   ],
   "cities": [
@@ -3502,7 +4198,9 @@
       "countryCode": "AU",
       "dateFrom": "2026-07-08",
       "dateTo": "2026-06-08",
-      "colour": "#3498DB"
+      "colour": "#3498DB",
+      "lat": -27.4689623,
+      "lng": 153.0235009
     },
     {
       "id": "city-taipei",
@@ -3512,7 +4210,9 @@
       "countryCode": "TW",
       "dateFrom": "2026-06-09",
       "dateTo": "2026-06-09",
-      "colour": "#3498DB"
+      "colour": "#3498DB",
+      "lat": 25.0375198,
+      "lng": 121.5636796
     },
     {
       "id": "city-vienna",
@@ -3522,7 +4222,9 @@
       "countryCode": "AT",
       "dateFrom": "2026-06-10",
       "dateTo": "2026-06-10",
-      "colour": "#2C3E50"
+      "colour": "#2C3E50",
+      "lat": 48.2083537,
+      "lng": 16.3725042
     },
     {
       "id": "city-bratislava",
@@ -3532,7 +4234,9 @@
       "countryCode": "SK",
       "dateFrom": "2026-06-11",
       "dateTo": "2026-06-11",
-      "colour": "#FF5722"
+      "colour": "#FF5722",
+      "lat": 48.1516988,
+      "lng": 17.1093063
     },
     {
       "id": "city-prague",
@@ -3542,7 +4246,9 @@
       "countryCode": "CZ",
       "dateFrom": "2026-06-13",
       "dateTo": "2026-06-13",
-      "colour": "#E91E63"
+      "colour": "#E91E63",
+      "lat": 50.0874654,
+      "lng": 14.4212535
     },
     {
       "id": "city-nuremberg",
@@ -3552,7 +4258,9 @@
       "countryCode": "DE",
       "dateFrom": "2026-06-15",
       "dateTo": "2026-06-15",
-      "colour": "#8BC34A"
+      "colour": "#8BC34A",
+      "lat": 49.453872,
+      "lng": 11.077298
     },
     {
       "id": "city-munich",
@@ -3562,7 +4270,9 @@
       "countryCode": "DE",
       "dateFrom": "2026-06-16",
       "dateTo": "2026-06-19",
-      "colour": "#CDDC39"
+      "colour": "#CDDC39",
+      "lat": 48.1371079,
+      "lng": 11.5753822
     },
     {
       "id": "city-innsbruck",
@@ -3572,7 +4282,9 @@
       "countryCode": "AT",
       "dateFrom": "2026-06-20",
       "dateTo": "2026-06-21",
-      "colour": "#E74C3C"
+      "colour": "#E74C3C",
+      "lat": 47.2654296,
+      "lng": 11.3927685
     },
     {
       "id": "city-bolzano",
@@ -3582,7 +4294,9 @@
       "countryCode": "IT",
       "dateFrom": "2026-06-21",
       "dateTo": "2026-06-23",
-      "colour": "#E91E63"
+      "colour": "#E91E63",
+      "lat": 46.6559455,
+      "lng": 11.2302129
     },
     {
       "id": "city-milan",
@@ -3592,7 +4306,9 @@
       "countryCode": "IT",
       "dateFrom": "2026-06-23",
       "dateTo": "2026-06-25",
-      "colour": "#2C3E50"
+      "colour": "#2C3E50",
+      "lat": 45.4641943,
+      "lng": 9.1896346
     },
     {
       "id": "city-zurich",
@@ -3602,7 +4318,9 @@
       "countryCode": "CH",
       "dateFrom": "2026-06-25",
       "dateTo": "2026-06-26",
-      "colour": "#795548"
+      "colour": "#795548",
+      "lat": 47.3744489,
+      "lng": 8.5410422
     },
     {
       "id": "city-bangkok",
@@ -3612,7 +4330,9 @@
       "countryCode": "TH",
       "dateFrom": "2026-06-27",
       "dateTo": "2026-07-07",
-      "colour": "#8BC34A"
+      "colour": "#8BC34A",
+      "lat": 13.7524938,
+      "lng": 100.4935089
     },
     {
       "id": "city-koh-samui",
@@ -3622,7 +4342,9 @@
       "countryCode": "TH",
       "dateFrom": "2026-07-01",
       "dateTo": "2026-07-07",
-      "colour": "#F39C12"
+      "colour": "#F39C12",
+      "lat": 9.5013945,
+      "lng": 99.9956193
     },
     {
       "id": "city-london",
@@ -3633,7 +4355,9 @@
       "dateFrom": "",
       "dateTo": "",
       "colour": "#FF9800",
-      "isTransit": true
+      "isTransit": true,
+      "lat": 51.5074456,
+      "lng": -0.1277653
     },
     {
       "id": "city-verona",
@@ -3644,7 +4368,9 @@
       "dateFrom": "",
       "dateTo": "",
       "colour": "#9B59B6",
-      "isTransit": true
+      "isTransit": true,
+      "lat": 45.4424977,
+      "lng": 10.9857377
     }
   ],
   "userCities": [],
