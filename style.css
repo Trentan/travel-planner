@@ -9543,34 +9543,35 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 /* Route sub-locations styling in Transport views */
 .transport-sub-location-chips {
   display: flex;
-  align-items: center;
-  gap: 0.28rem;
+  align-items: stretch;
+  gap: 0.34rem;
   flex-wrap: wrap;
   min-width: 0;
-  margin-top: 0.28rem;
+  margin-top: 0.38rem;
 }
 
 .transport-sub-location-chip {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.25rem;
-  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.06rem;
+  min-width: min(100%, 9rem);
   max-width: 100%;
-  padding: 0.12rem 0.42rem;
-  border: 1px solid rgba(36, 72, 93, 0.12);
+  padding: 0.28rem 0.48rem;
+  border: 1px solid rgba(36, 72, 93, 0.18);
   border-radius: 6px;
-  background: rgba(36, 72, 93, 0.04);
+  background: rgba(36, 72, 93, 0.07);
   color: var(--text);
   line-height: 1.25;
 }
 
 .transport-sub-location-label {
   flex: 0 0 auto;
-  font-size: 0.58rem;
+  font-size: 0.56rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.055em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--accent-strong);
 }
 
 .transport-sub-location-value {
@@ -9578,8 +9579,8 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.75rem;
-  font-weight: 650;
+  font-size: 0.78rem;
+  font-weight: 750;
 }
 
 .transport-mobile-sub-locations {
@@ -9588,6 +9589,15 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
 .transport-card-sub-locations {
   margin: 0;
+}
+
+.route-col .transport-sub-location-chips {
+  max-width: 20rem;
+}
+
+.transport-mobile-sub-locations .transport-sub-location-chip,
+.transport-card-sub-locations .transport-sub-location-chip {
+  flex: 1 1 8.5rem;
 }
 
 .transport-detail-block--wide {

@@ -619,8 +619,8 @@ function renderTransportDetailBlock(title, value, extraClass = '') {
 function getTransportSubLocationParts(seg) {
   if (!seg) return [];
   return [
-    seg.fromAddress ? { label: 'From', value: seg.fromAddress } : null,
-    seg.toAddress ? { label: 'To', value: seg.toAddress } : null
+    seg.fromAddress ? { label: 'Depart from', value: seg.fromAddress } : null,
+    seg.toAddress ? { label: 'Arrive at', value: seg.toAddress } : null
   ].filter(Boolean);
 }
 
