@@ -296,22 +296,41 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     const journeyLabel = stripCompactLeadingEmoji(
         journey.provider || journey.journeyName || journey.notes || `${journey.fromLocation}→${journey.toLocation}`
     );
-    const segs = (window.journeys || [])
+    const segs = journey.journeyId ? (window.journeys || [])
         .filter(seg => seg.journeyId === journey.journeyId)
-        .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+        .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1)) : [];
     const duration = formatCompactJourneyDuration(segs);
     const details = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
-    return renderCompactEmojiLine({ emoji: icon, text: [journeyLabel, details].filter(Boolean).join(' | '), duration });
+    const costSuffix = journey.cost ? ` · ${formatCurrency(journey.cost)}` : '';
+    const mainLine = renderCompactEmojiLine({ emoji: icon, text: journeyLabel, duration: `${duration}${costSuffix}` });
+    const subLocsHtml = details ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(details)}</div>` : '';
+    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}</div>`;
   }).join('');
 
-  const accomLines = dayStayInfo.map(info => renderCompactEmojiLine({
-    emoji: '🏨',
-    text: info.propertyName || 'Accommodation'
-  })).join('');
+  const accomLines = dayStayInfo.map(info => {
+    const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
+    const costSuffix = info.cost ? `${formatCurrency(info.cost)}` : '';
+    const mainLine = renderCompactEmojiLine({
+      emoji: '🏨',
+      text: `${label}: ${info.propertyName || 'Accommodation'}`,
+      duration: costSuffix
+    });
+    const stayLoc = info.location ? (() => {
+      let loc = info.location;
+      const cleanCity = String(day.to).trim();
+      if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+        loc = `${loc} (${cleanCity})`;
+      }
+      return `Location: ${loc}`;
+    })() : '';
+    const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
+    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}</div>`;
+  }).join('');
 
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
     const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    const costSuffix = item.cost ? ` · ${formatCurrency(item.cost)}` : '';
     return `
       <div class="compact-activity-row" style="${doneStyle}">
         <input
@@ -323,7 +342,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
           ${renderCompactEmojiLine({
       emoji,
       text: item.text,
-      duration: item.time || '1 hr',
+      duration: `${item.time || '1 hr'}${costSuffix}`,
       done: item.done
     })}
         </div>
@@ -1077,7 +1096,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       typeLabel: 'Transport',
       icon: getTransportIcon(journey.transportType),
       title: journey.journeyName || route || 'Transport',
-      meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDate.trim()].filter(Boolean).join(' · '),
+      meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDate.trim(), journey.cost ? formatCurrency(journey.cost) : ''].filter(Boolean).join(' · '),
       subLocations: subLocations,
       cost: journey.cost,
       status: journey.status || 'planned',
@@ -1098,7 +1117,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       typeLabel: label,
       icon,
       title: `${label}: ${stayInfo.propertyName || 'Accommodation'}`,
-      meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : '', stayInfo.status].filter(Boolean).join(' · '),
+      meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : '', stayInfo.status, stayInfo.cost ? formatCurrency(stayInfo.cost) : ''].filter(Boolean).join(' · '),
       subLocations: stayInfo.location ? (() => {
         let loc = stayInfo.location;
         const cleanCity = String(day.to).trim();
@@ -1634,9 +1653,20 @@ function buildItinerary() {
         // Show departure time if available
         const timeHint = journey.departureTime ? ` <span style="color:#999;font-size:0.75rem;font-family:monospace;">${journey.departureTime}</span>` : '';
 
+        const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+          ? window.journeys
+          : [];
+        const segs = journey.journeyId ? journeysSource
+            .filter(seg => seg.journeyId === journey.journeyId)
+            .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1)) : [];
+        const subLocations = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
+
         return `<div class="cost-item journey-item">
                 <button class="del-btn" title="Remove Journey" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); rebuildCurrentView();">×</button>
-                <span class="cost-item-text">${label}${timeHint}</span>
+                <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
+                  <span>${label}${timeHint}</span>
+                  ${subLocations ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(subLocations)}</div>` : ''}
+                </div>
                 <div class="cost-item-actions">
                   <span class="status-badge ${isEditMode ? 'status-badge-clickable' : ''}" style="--status-color:${statusColor};" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}');">${statusIcon} ${status === 'booked' ? 'Booked' : 'Planned'}</span>
                   ${showRef ? `<input type="text" class="booking-ref-input confirmed" value="${journey.bookingReference || ''}" placeholder="Ref #" onchange="event.stopPropagation(); updateJourneyBookingRef('${journey.id}', this.value);" ${isEditMode ? '' : 'disabled'}/>` : ''}
@@ -1655,8 +1685,20 @@ ${(() => {
         return dayStayInfo.map(info => {
           const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
           const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
+          const stayLoc = info.location ? (() => {
+            let loc = info.location;
+            const cleanCity = String(day.to).trim();
+            if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+              loc = `${loc} (${cleanCity})`;
+            }
+            return `Location: ${loc}`;
+          })() : '';
+
           return `<div class="cost-item">
-        <span class="cost-item-text">${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` via ${info.provider}` : ''}${info.cost ? ` (${formatCurrency(info.cost)})` : ''}</span>
+        <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
+          <span>${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` via ${info.provider}` : ''}${info.cost ? ` (${formatCurrency(info.cost)})` : ''}</span>
+          ${stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : ''}
+        </div>
         <div class="cost-item-actions">
           <span class="status-badge" style="--status-color:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✕ Cancelled' : '⏳ Pending'}</span>
           ${info.bookingRef ? `<span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${info.bookingRef}</span>` : ''}
