@@ -230,6 +230,7 @@ async function testCrudSmoke() {
   context.openAddStayModal();
   app.document.getElementById('stayCitySelect').value = city.id;
   app.document.getElementById('stayPropertyName').value = 'Hotel Example';
+  app.document.getElementById('stayLocation').value = '12 Station Road';
   app.document.getElementById('stayCheckIn').value = '2026-06-01';
   app.document.getElementById('stayCheckOut').value = '2026-06-04';
   app.document.getElementById('stayNights').value = '3';
@@ -242,9 +243,11 @@ async function testCrudSmoke() {
   const stayId = state(context).stays.find(stay => stay.propertyName === 'Hotel Example').id;
   context.openEditStayModal(stayId);
   app.document.getElementById('stayPropertyName').value = 'Hotel Edited';
+  app.document.getElementById('stayLocation').value = '14 Station Road';
   app.document.getElementById('stayTotalCost').value = '650';
   context.saveStayFromModal();
   assert(state(context).stays.find(stay => stay.id === stayId).propertyName === 'Hotel Edited', 'CRUD smoke: stay edit should persist');
+  assert(state(context).stays.find(stay => stay.id === stayId).location === '14 Station Road', 'CRUD smoke: stay location should persist');
   context.toggleStayStatus({ stopPropagation() {} }, stayId);
   assert(state(context).stays.find(stay => stay.id === stayId).status !== 'booked', 'CRUD smoke: stay status should toggle');
   context.deleteStay(stayId);
@@ -643,6 +646,20 @@ async function testExportImport() {
     fromAddress: 'St Pancras Platform 9',
     toAddress: 'Gare du Nord Hall 2'
   });
+  context.stays.push({
+    id: 'stay_export_location',
+    cityId: state(context).cities[0].id,
+    propertyName: 'Export Location Hotel',
+    location: '88 Riverside Lane',
+    checkIn: '2026-01-04',
+    checkOut: '2026-01-06',
+    nights: 2,
+    status: 'booked',
+    provider: 'Direct',
+    bookingRef: 'STAYLOC-99',
+    totalCost: '300',
+    notes: ''
+  });
   await context.exportJSON();
   const exported = JSON.parse(decodeDownloadUri(app.document.lastDownload.href));
   assert(app.document.lastDownload.download.endsWith('.json'), 'Export: download should be JSON');
@@ -651,6 +668,8 @@ async function testExportImport() {
   const exportedJourney = exported.journeys.find(journey => journey.bookingReference === 'SUBLOC-99');
   assert(exportedJourney?.fromAddress === 'St Pancras Platform 9', 'Export: journey should include fromAddress');
   assert(exportedJourney?.toAddress === 'Gare du Nord Hall 2', 'Export: journey should include toAddress');
+  const exportedStay = exported.stays.find(stay => stay.bookingRef === 'STAYLOC-99');
+  assert(exportedStay?.location === '88 Riverside Lane', 'Export: stay should include location');
   assert(
     exported.itinerary[0].days[0].activityItems.some(item => item.text === 'Export checked activity' && item.done === true),
     'Export: checked activity should include done=true in JSON'
@@ -672,6 +691,8 @@ async function testExportImport() {
   const importedJourney = state(context).journeys.find(journey => journey.bookingReference === 'SUBLOC-99');
   assert(importedJourney?.fromAddress === 'St Pancras Platform 9', 'Import: journey should preserve fromAddress');
   assert(importedJourney?.toAddress === 'Gare du Nord Hall 2', 'Import: journey should preserve toAddress');
+  const importedStay = state(context).stays.find(stay => stay.bookingRef === 'STAYLOC-99');
+  assert(importedStay?.location === '88 Riverside Lane', 'Import: stay should preserve location');
 }
 
 async function testShareExport() {

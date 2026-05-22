@@ -1789,6 +1789,7 @@ function openAddStayModal() {
 
   // Clear form fields
   document.getElementById('stayPropertyName').value = '';
+  document.getElementById('stayLocation').value = '';
   document.getElementById('stayCheckIn').value = '';
   document.getElementById('stayCheckInTime').value = '';
   document.getElementById('stayCheckOut').value = '';
@@ -1849,6 +1850,7 @@ function openEditStayModal(stayId) {
 
   // Populate form fields
   document.getElementById('stayPropertyName').value = stay.propertyName || '';
+  document.getElementById('stayLocation').value = stay.location || '';
   document.getElementById('stayCheckIn').value = stay.checkIn || '';
   document.getElementById('stayCheckInTime').value = stay.checkInTime || '';
   document.getElementById('stayCheckOut').value = stay.checkOut || '';
@@ -1891,6 +1893,7 @@ function closeAddStayModal() {
 function saveStayFromModal() {
   const cityId = document.getElementById('stayCitySelect').value;
   const propertyName = document.getElementById('stayPropertyName').value.trim();
+  const location = document.getElementById('stayLocation').value.trim();
   const checkIn = document.getElementById('stayCheckIn').value;
   const checkInTime = document.getElementById('stayCheckInTime').value;
   const checkOut = document.getElementById('stayCheckOut').value;
@@ -1912,6 +1915,7 @@ function saveStayFromModal() {
     if (stay) {
       stay.cityId = cityId;
       stay.propertyName = propertyName;
+      stay.location = location;
       stay.checkIn = checkIn;
       stay.checkInTime = checkInTime;
       stay.checkOut = checkOut;
@@ -1930,6 +1934,7 @@ function saveStayFromModal() {
       id: 'stay_' + Date.now(),
       cityId: cityId,
       propertyName: propertyName,
+      location: location,
       checkIn: checkIn,
       checkInTime: checkInTime,
       checkOut: checkOut,

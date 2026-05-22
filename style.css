@@ -9601,19 +9601,22 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 }
 
 body.mobile-app-mode .transport-mobile-sub-locations,
-body.mobile-app-mode .transport-card-sub-locations {
+body.mobile-app-mode .transport-card-sub-locations,
+body.mobile-app-mode .stay-card-location {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.12rem 0.35rem;
 }
 
 body.mobile-app-mode .transport-mobile-sub-locations .transport-sub-location-detail,
-body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detail {
+body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detail,
+body.mobile-app-mode .stay-card-location .transport-sub-location-detail {
   min-width: 0;
 }
 
 body.mobile-app-mode .transport-mobile-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before,
-body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before {
+body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before,
+body.mobile-app-mode .stay-card-location .transport-sub-location-detail + .transport-sub-location-detail::before {
   content: none;
 }
 
@@ -9641,7 +9644,8 @@ body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detai
   }
 
   .transport-mobile-sub-locations,
-  .transport-card-sub-locations {
+  .transport-card-sub-locations,
+  .stay-card-location {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-top: 0.24rem;
@@ -9650,19 +9654,23 @@ body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detai
   }
 
   .transport-mobile-sub-locations .transport-sub-location-detail,
-  .transport-card-sub-locations .transport-sub-location-detail {
+  .transport-card-sub-locations .transport-sub-location-detail,
+  .stay-card-location .transport-sub-location-detail {
     min-width: 0;
   }
 
   .transport-mobile-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before,
-  .transport-card-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before {
+  .transport-card-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before,
+  .stay-card-location .transport-sub-location-detail + .transport-sub-location-detail::before {
     content: none;
   }
 
   .transport-mobile-sub-locations .transport-sub-location-label,
   .transport-mobile-sub-locations .transport-sub-location-value,
   .transport-card-sub-locations .transport-sub-location-label,
-  .transport-card-sub-locations .transport-sub-location-value {
+  .transport-card-sub-locations .transport-sub-location-value,
+  .stay-card-location .transport-sub-location-label,
+  .stay-card-location .transport-sub-location-value {
     font-size: 0.66rem;
   }
 }
@@ -9684,4 +9692,12 @@ body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detai
 .transport-segment-sub-locations {
   margin-top: 0.25rem;
   align-items: flex-start;
+}
+
+.stay-location-details {
+  margin-top: 0.22rem;
+}
+
+.stay-detail-block--wide {
+  grid-column: 1 / -1;
 }

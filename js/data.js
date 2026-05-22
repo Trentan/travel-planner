@@ -2647,6 +2647,7 @@ function normalizeTripStaysData(items) {
     item.endDate = item.checkOut || item.startDate || '';
     item.startTime = item.checkInTime || '';
     item.endTime = item.checkOutTime || '';
+    item.location = item.location || item.address || '';
   });
   return items;
 }
