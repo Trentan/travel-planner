@@ -123,24 +123,16 @@ function renderCompactFoodQuestCard(leg, legIndex) {
       ? foodItems.map((item, itemIdx) => renderCompactFoodQuestItem(legIndex, item, itemIdx)).join('')
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
 
-  // Compact food quests are always collapsible and interactive in all compact views (both mobile and desktop)
-  const legId = leg.id || String(legIndex);
-  const expanded = isFoodQuestExpanded(legId);
-  const chevronSymbol = expanded ? '▲' : '▼';
-  
   return `
     <article class="mobile-surface-card compact-food-quest-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
-      <div class="compact-food-summary" onclick="toggleFoodQuestDetails(event, '${legId}')" style="cursor: pointer; user-select: none;">
+      <div class="compact-food-summary" style="cursor: default; user-select: none;">
         <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍗</span> Food quests</span>
         <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
         <span class="compact-food-summary-count">${escapeCompactText(countLabel)}</span>
-        <span class="compact-food-summary-chevron" aria-hidden="true">${chevronSymbol}</span>
       </div>
-      ${expanded ? `
-        <div class="mobile-surface-card-details expanded">
-          <div class="compact-food-list">${foodLines}</div>
-        </div>
-      ` : ''}
+      <div class="mobile-surface-card-details expanded">
+        <div class="compact-food-list">${foodLines}</div>
+      </div>
     </article>
   `;
 }
@@ -162,23 +154,17 @@ function renderCompactTipsCard(leg, legIndex) {
   const tipsList = tips.length > 0
       ? `<ul class="compact-tips-list">${tips.map(tip => renderCompactTipItem(tip)).join('')}</ul>`
       : '<div class="compact-day-empty">No tips saved for this leg yet.</div>';
-  const legId = leg.id || String(legIndex);
-  const expanded = isTipsCardExpanded(legId);
-  const chevronSymbol = expanded ? '&#9650;' : '&#9660;';
   const countLabel = `${tips.length} tip${tips.length === 1 ? '' : 's'}`;
 
   return `
     <article class="mobile-surface-card compact-tips-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
-      <div class="compact-tips-summary" onclick="toggleTipsCardDetails(event, '${legId}')" style="cursor: pointer; user-select: none;">
+      <div class="compact-tips-summary" style="cursor: default; user-select: none;">
         <span class="compact-tips-summary-title"><span class="compact-tips-summary-icon" aria-hidden="true">&#128161;</span> Tips</span>
         <span class="compact-tips-summary-count">${escapeCompactText(countLabel)}</span>
-        <span class="compact-tips-summary-chevron" aria-hidden="true">${chevronSymbol}</span>
       </div>
-      ${expanded ? `
-        <div class="mobile-surface-card-details expanded">
-          ${tipsList}
-        </div>
-      ` : ''}
+      <div class="mobile-surface-card-details expanded">
+        ${tipsList}
+      </div>
     </article>
   `;
 }
