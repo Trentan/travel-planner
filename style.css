@@ -4356,6 +4356,13 @@ body.compact-view-mode .compact-desktop-stack .compact-food-quest-card {
   grid-column: 1;
 }
 
+body.compact-view-mode .compact-desktop-stack .compact-food-summary,
+body.compact-view-mode .compact-desktop-stack .compact-tips-summary {
+  cursor: default;
+  pointer-events: none;
+}
+
+
 body.compact-view-mode .compact-desktop-stack .compact-day-pager {
   grid-column: 2;
   grid-row: 1 / span 3;
