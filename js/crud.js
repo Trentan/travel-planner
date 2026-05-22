@@ -381,6 +381,38 @@ function openEditActivityModal(legIdx, activityIdx) {
   return _openActivityModal(legIdx, activityIdx);
 }
 
+function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
+  const day = appData[legIdx]?.days?.[dayIdx];
+  const item = day?.activityItems?.[itemIdx];
+  if (!item) return;
+
+  const itemText = item.text;
+  const suggestedActivities = appData[legIdx]?.suggestedActivities || [];
+  let activityIdx = suggestedActivities.findIndex(activity => (
+    activity
+    && activity.assignedDayIdx === dayIdx
+    && getSuggestedActivityMatchTexts(activity).includes(String(itemText || '').trim())
+  ));
+
+  if (activityIdx === -1) {
+    if (typeof normalizeTripLegsData === 'function') {
+      normalizeTripLegsData(appData);
+      saveData(false);
+      activityIdx = appData[legIdx]?.suggestedActivities?.findIndex(activity => (
+        activity
+        && activity.assignedDayIdx === dayIdx
+        && getSuggestedActivityMatchTexts(activity).includes(String(itemText || '').trim())
+      ));
+    }
+  }
+
+  if (activityIdx !== undefined && activityIdx !== -1) {
+    _openActivityModal(legIdx, activityIdx);
+  } else {
+    alert("Could not find matching activity to edit.");
+  }
+}
+
 function addRun(legIdx) { appData[legIdx].cityRun.push({ title: "New run...", estTime: "1 hr", estCost: "0", assignedDayIdx: null }); saveData(); buildItinerary(); }
 function addSight(legIdx) { appData[legIdx].suggestedSights.push({ title: "New sight...", estTime: "1 hr", estCost: "0", assignedDayIdx: null }); saveData(); buildItinerary(); }
 function addLegTip(legIdx) { appData[legIdx].legTips.push("New tip..."); saveData(); buildItinerary(); }
@@ -1769,6 +1801,7 @@ window.toggleStayCompleted = toggleStayCompleted;
 window.openAddLegDialog = openAddLegDialog;
 window.closeAddLegDialog = closeAddLegDialog;
 window.openEditActivityModal = openEditActivityModal;
+window.openEditDayActivityModal = openEditDayActivityModal;
 window.onLegTypeChange = onLegTypeChange;
 window.checkDateConflict = checkDateConflict;
 window.adjustLegDays = adjustLegDays;

@@ -478,6 +478,19 @@ async function testItineraryEditPersistence() {
   tracker.expectSave('Assigned suggested activity checkbox', () => (
     context.toggleActivityCompleted(event(true), activityLegIdx, 0, assignedActivityItemIdx)
   ));
+  tracker.expectSave('Day activity modal edit', () => {
+    context.openEditDayActivityModal(activityLegIdx, 0, assignedActivityItemIdx);
+    app.document.getElementById('activityTitle').value = 'Persistence suggested edited via day';
+    app.document.getElementById('saveActivityBtn').click();
+  });
+  const updatedDayActivity = state(context).itinerary[activityLegIdx].days[0].activityItems[assignedActivityItemIdx];
+  assert(
+    String(updatedDayActivity?.text || '').includes('Persistence suggested edited via day'),
+    'Itinerary persistence: day activity should be updated via modal edit'
+  );
+  activityIdx = state(context).itinerary[activityLegIdx].suggestedActivities.findIndex(activity =>
+    String(activity.title || '').includes('Persistence suggested edited via day')
+  );
   const assignedExport = context.buildExportPayload();
   const exportedPoolActivity = assignedExport.itinerary[activityLegIdx].suggestedActivities.find(activity =>
     String(activity.title || '').includes('Persistence suggested edited')

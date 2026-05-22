@@ -142,9 +142,9 @@
           "estCost": "0",
           "assignedDayIdx": 0,
           "cityId": "city-taipei",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
+          "assignedDate": "2026-06-09",
+          "startDate": "2026-06-09",
+          "endDate": "2026-06-09",
           "startTime": "",
           "endTime": ""
         },
@@ -157,9 +157,9 @@
           "cityId": "city-taipei",
           "startTime": "12:00",
           "endTime": "14:00",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": ""
+          "assignedDate": "2026-06-09",
+          "startDate": "2026-06-09",
+          "endDate": "2026-06-09"
         },
         {
           "title": "Shilin Night Market evening",
@@ -173,6 +173,19 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "Ximending → CKS Memorial",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-09",
+          "startDate": "2026-06-09",
+          "startTime": "09:00",
+          "endDate": "2026-06-09",
+          "endTime": "10:00",
+          "cityId": "city-taipei"
         }
       ],
       "legTips": [
@@ -268,6 +281,19 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "RS Vienna City Walk: Stephansdom → Hofburg",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-10",
+          "startDate": "2026-06-10",
+          "startTime": "",
+          "endDate": "2026-06-10",
+          "endTime": "",
+          "cityId": "city-vienna"
         }
       ],
       "legTips": [
@@ -449,6 +475,32 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "RS-style: Hlavné Nám → Michael's Gate",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-11",
+          "startDate": "2026-06-11",
+          "startTime": "",
+          "endDate": "2026-06-11",
+          "endTime": "",
+          "cityId": "city-bratislava"
+        },
+        {
+          "title": "Devín Castle ruins",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-12",
+          "startDate": "2026-06-12",
+          "startTime": "",
+          "endDate": "2026-06-12",
+          "endTime": "",
+          "cityId": "city-bratislava"
         }
       ],
       "legTips": [
@@ -597,9 +649,9 @@
           "estCost": "0",
           "assignedDayIdx": 1,
           "cityId": "city-prague",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
+          "assignedDate": "2026-06-14",
+          "startDate": "2026-06-14",
+          "endDate": "2026-06-14",
           "startTime": "",
           "endTime": ""
         },
@@ -628,6 +680,32 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "RS Prague Old Town Walk",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-13",
+          "startDate": "2026-06-13",
+          "startTime": "18:30",
+          "endDate": "2026-06-13",
+          "endTime": "19:30",
+          "cityId": "city-prague"
+        },
+        {
+          "title": "RS Prague Castle Walk",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-14",
+          "startDate": "2026-06-14",
+          "startTime": "",
+          "endDate": "2026-06-14",
+          "endTime": "",
+          "cityId": "city-prague"
         }
       ],
       "legTips": [
@@ -744,6 +822,19 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "RS-style: Hauptmarkt → Kaiserburg",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-15",
+          "startDate": "2026-06-15",
+          "startTime": "",
+          "endDate": "2026-06-15",
+          "endTime": "",
+          "cityId": "city-nuremberg"
         }
       ],
       "legTips": [
@@ -1092,6 +1183,58 @@
           "assignedDate": "2026-06-16",
           "assignedDayIdx": 0,
           "cityId": "city-munich"
+        },
+        {
+          "title": "Conference check-in & afternoon sessions",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-16",
+          "startDate": "2026-06-16",
+          "startTime": "13:00",
+          "endDate": "2026-06-16",
+          "endTime": "17:00",
+          "cityId": "city-munich"
+        },
+        {
+          "title": "Full conference day",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-17",
+          "startDate": "2026-06-17",
+          "startTime": "",
+          "endDate": "2026-06-17",
+          "endTime": "",
+          "cityId": "city-munich"
+        },
+        {
+          "title": "Final conference sessions",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 2,
+          "assignedDate": "2026-06-18",
+          "startDate": "2026-06-18",
+          "startTime": "",
+          "endDate": "2026-06-18",
+          "endTime": "",
+          "cityId": "city-munich"
+        },
+        {
+          "title": "RS Munich Walk",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 3,
+          "assignedDate": "2026-06-19",
+          "startDate": "2026-06-19",
+          "startTime": "",
+          "endDate": "2026-06-19",
+          "endTime": "",
+          "cityId": "city-munich"
         }
       ],
       "legTips": [
@@ -1220,6 +1363,19 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "Innpromenade parkrun 8:45am SAT",
+          "category": "fitness",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-20",
+          "startDate": "2026-06-20",
+          "startTime": "",
+          "endDate": "2026-06-20",
+          "endTime": "",
+          "cityId": "city-innsbruck"
         }
       ],
       "legTips": [
@@ -1384,6 +1540,32 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "RS-style: Lauben arcades → Ötzi the Iceman Museum",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-21",
+          "startDate": "2026-06-21",
+          "startTime": "",
+          "endDate": "2026-06-21",
+          "endTime": "",
+          "cityId": "city-bolzano"
+        },
+        {
+          "title": "Seceda cable car — soaring rocky spires",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-22",
+          "startDate": "2026-06-22",
+          "startTime": "",
+          "endDate": "2026-06-22",
+          "endTime": "",
+          "cityId": "city-bolzano"
         }
       ],
       "legTips": [
@@ -1474,6 +1656,19 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "RS Verona self-walk: Arena di Verona",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-23",
+          "startDate": "2026-06-23",
+          "startTime": "",
+          "endDate": "2026-06-23",
+          "endTime": "",
+          "cityId": "city-milan"
         }
       ],
       "legTips": [
@@ -1601,11 +1796,24 @@
           "estCost": "0",
           "assignedDayIdx": 0,
           "cityId": "city-milan",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
+          "assignedDate": "2026-06-24",
+          "startDate": "2026-06-24",
+          "endDate": "2026-06-24",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "RS Milan walk: Duomo rooftop → Galleria",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-24",
+          "startDate": "2026-06-24",
+          "startTime": "",
+          "endDate": "2026-06-24",
+          "endTime": "",
+          "cityId": "city-milan"
         }
       ],
       "legTips": [
@@ -1783,6 +1991,32 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "Zurich Altstadt evening",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-25",
+          "startDate": "2026-06-25",
+          "startTime": "",
+          "endDate": "2026-06-25",
+          "endTime": "",
+          "cityId": "city-zurich"
+        },
+        {
+          "title": "RS-style Zurich walk: Lindenhügel viewpoint",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-26",
+          "startDate": "2026-06-26",
+          "startTime": "",
+          "endDate": "2026-06-26",
+          "endTime": "",
+          "cityId": "city-zurich"
         }
       ],
       "legTips": [
@@ -1942,6 +2176,32 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "Wat Pho → Chao Phraya Express boat",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-27",
+          "startDate": "2026-06-27",
+          "startTime": "",
+          "endDate": "2026-06-27",
+          "endTime": "",
+          "cityId": "city-bangkok"
+        },
+        {
+          "title": "Chatuchak Weekend Market",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-28",
+          "startDate": "2026-06-28",
+          "startTime": "",
+          "endDate": "2026-06-28",
+          "endTime": "",
+          "cityId": "city-bangkok"
         }
       ],
       "legTips": [
@@ -2587,6 +2847,110 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "Chaweng Beach afternoon → Big Buddha Temple",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-29",
+          "startDate": "2026-06-29",
+          "startTime": "",
+          "endDate": "2026-06-29",
+          "endTime": "",
+          "cityId": "city-koh-samui"
+        },
+        {
+          "title": "Ang Thong Marine Park full day",
+          "category": "attraction",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-30",
+          "startDate": "2026-06-30",
+          "startTime": "",
+          "endDate": "2026-06-30",
+          "endTime": "",
+          "cityId": "city-koh-samui"
+        },
+        {
+          "title": "Koh Tao snorkelling — Shark Bay",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 2,
+          "assignedDate": "2026-07-01",
+          "startDate": "2026-07-01",
+          "startTime": "",
+          "endDate": "2026-07-01",
+          "endTime": "",
+          "cityId": "city-koh-samui"
+        },
+        {
+          "title": "Thai cooking class then 🐘 Elephant Sanctuary",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 3,
+          "assignedDate": "2026-07-02",
+          "startDate": "2026-07-02",
+          "startTime": "",
+          "endDate": "2026-07-02",
+          "endTime": "",
+          "cityId": "city-koh-samui"
+        },
+        {
+          "title": "Fisherman's Village Friday Night Market",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 4,
+          "assignedDate": "2026-07-03",
+          "startDate": "2026-07-03",
+          "startTime": "",
+          "endDate": "2026-07-03",
+          "endTime": "",
+          "cityId": "city-koh-samui"
+        },
+        {
+          "title": "Kayak Chaweng Lake mangroves",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 5,
+          "assignedDate": "2026-07-04",
+          "startDate": "2026-07-04",
+          "startTime": "",
+          "endDate": "2026-07-04",
+          "endTime": "",
+          "cityId": "city-koh-samui"
+        },
+        {
+          "title": "Silver Beach morning",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 6,
+          "assignedDate": "2026-07-05",
+          "startDate": "2026-07-05",
+          "startTime": "",
+          "endDate": "2026-07-05",
+          "endTime": "",
+          "cityId": "city-koh-samui"
+        },
+        {
+          "title": "Sunrise at Hin Ta & Hin Yai Rocks",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 7,
+          "assignedDate": "2026-07-06",
+          "startDate": "2026-07-06",
+          "startTime": "",
+          "endDate": "2026-07-06",
+          "endTime": "",
+          "cityId": "city-koh-samui"
         }
       ],
       "legTips": [
@@ -2775,6 +3139,32 @@
           "endDate": "",
           "startTime": "",
           "endTime": ""
+        },
+        {
+          "title": "USM 07:50 → BKK 08:55",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-07-07",
+          "startDate": "2026-07-07",
+          "startTime": "",
+          "endDate": "2026-07-07",
+          "endTime": "",
+          "cityId": "city-bangkok"
+        },
+        {
+          "title": "Welcome back to Brisbane!",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-07-08",
+          "startDate": "2026-07-08",
+          "startTime": "",
+          "endDate": "2026-07-08",
+          "endTime": "",
+          "cityId": "city-bangkok"
         }
       ],
       "legTips": [
