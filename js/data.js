@@ -2593,10 +2593,35 @@ function toLocalIsoDate(dateValue) {
 
 function normalizeTripLegsData(legs) {
   if (!Array.isArray(legs)) return [];
+  
+  function isItemMatchingActivity(itemText, activity) {
+    if (!activity || !itemText) return false;
+    const cleanItem = String(itemText).trim().toLowerCase();
+    const cleanTitle = String(activity.title || '').trim().toLowerCase();
+    if (cleanItem === cleanTitle) return true;
+
+    const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
+    const cleanItemNoEmoji = cleanItem.replace(emojiPattern, '').trim();
+    const cleanTitleNoEmoji = cleanTitle.replace(emojiPattern, '').trim();
+    if (cleanItemNoEmoji === cleanTitleNoEmoji) return true;
+
+    if (typeof getSuggestedActivityMatchTexts === 'function') {
+      const matchTexts = getSuggestedActivityMatchTexts(activity).map(t => String(t).trim().toLowerCase());
+      if (matchTexts.includes(cleanItem)) return true;
+    }
+    return false;
+  }
+
   legs.forEach(leg => {
     if (!leg || typeof leg !== 'object') return;
     if (!Array.isArray(leg.days)) leg.days = [];
-    (leg.days || []).forEach(day => {
+    if (!Array.isArray(leg.suggestedActivities)) leg.suggestedActivities = [];
+
+    // Perform once-off normalization/migration of day activities into suggestedActivities
+    const suggested = leg.suggestedActivities;
+    const usedSuggestionIndices = new Set();
+
+    (leg.days || []).forEach((day, dayIdx) => {
       day.date = normalizeTripDateValue(day.date);
       (day.activityItems || []).forEach(item => {
         if (!item || typeof item !== 'object') return;
@@ -2604,8 +2629,91 @@ function normalizeTripLegsData(legs) {
         item.endDate = normalizeTripDateValue(item.endDate || item.startDate || day.date);
         if (item.startTime === undefined) item.startTime = '';
         if (item.endTime === undefined) item.endTime = '';
+
+        // Skip placeholders
+        const text = String(item.text || '').trim();
+        const isPlaceholder = /^[-—]$/.test(text) || text === 'Explore local area' || text === 'Add item...' || text === 'New item...';
+        if (isPlaceholder) return;
+
+        // Try to find a match in the suggested pool
+        let matchIdx = -1;
+        // Priority 1: Match by title and already assigned to this day
+        for (let i = 0; i < suggested.length; i++) {
+          if (usedSuggestionIndices.has(i)) continue;
+          const act = suggested[i];
+          if (act && act.assignedDayIdx === dayIdx && isItemMatchingActivity(text, act)) {
+            matchIdx = i;
+            break;
+          }
+        }
+        // Priority 2: Match by title and unassigned (or assigned to another day - prefer unassigned)
+        if (matchIdx === -1) {
+          for (let i = 0; i < suggested.length; i++) {
+            if (usedSuggestionIndices.has(i)) continue;
+            const act = suggested[i];
+            if (act && (act.assignedDayIdx === null || act.assignedDayIdx === undefined) && isItemMatchingActivity(text, act)) {
+              matchIdx = i;
+              break;
+            }
+          }
+        }
+        // Priority 3: Match by title even if assigned to another day (e.g. duplicate or newly scheduled)
+        if (matchIdx === -1) {
+          for (let i = 0; i < suggested.length; i++) {
+            if (usedSuggestionIndices.has(i)) continue;
+            const act = suggested[i];
+            if (act && isItemMatchingActivity(text, act)) {
+              matchIdx = i;
+              break;
+            }
+          }
+        }
+
+        if (matchIdx !== -1) {
+          // Sync scheduling fields
+          const act = suggested[matchIdx];
+          act.assignedDayIdx = dayIdx;
+          act.assignedDate = day.date || '';
+          act.startDate = item.startDate || day.date || '';
+          act.startTime = item.startTime || '';
+          act.endDate = item.endDate || day.date || '';
+          act.endTime = item.endTime || '';
+          if (item.cost && item.cost !== '0' && (!act.estCost || act.estCost === '0')) act.estCost = item.cost;
+          if (item.time && item.time !== '1 hr' && (!act.estTime || act.estTime === '1 hr')) act.estTime = item.time;
+          usedSuggestionIndices.add(matchIdx);
+        } else {
+          // No match found - create a new suggested activity entry!
+          let category = 'sight';
+          if (/food|restaurant|eat|dinner|lunch|breakfast|cafe/i.test(text)) category = 'food';
+          else if (/run|fitness|jog|workout|gym/i.test(text)) category = 'fitness';
+          else if (/wellness|yoga|spa|massage/i.test(text)) category = 'wellness';
+          else if (/tour|guide|bus/i.test(text)) category = 'tour';
+          else if (/attraction|park|ride/i.test(text)) category = 'attraction';
+
+          let cleanTitle = text;
+          const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
+          if (emojiPattern.test(cleanTitle)) {
+            cleanTitle = cleanTitle.replace(emojiPattern, '').trim();
+          }
+
+          const newActivity = {
+            title: cleanTitle,
+            category: category,
+            estTime: item.time || '1 hr',
+            estCost: item.cost || '0',
+            assignedDayIdx: dayIdx,
+            assignedDate: day.date || '',
+            startDate: item.startDate || day.date || '',
+            startTime: item.startTime || '',
+            endDate: item.endDate || day.date || '',
+            endTime: item.endTime || ''
+          };
+          suggested.push(newActivity);
+          usedSuggestionIndices.add(suggested.length - 1);
+        }
       });
     });
+
     (leg.suggestedActivities || []).forEach(activity => {
       if (!activity || typeof activity !== 'object') return;
       activity.assignedDate = normalizeTripDateValue(activity.assignedDate || activity.startDate || '');
