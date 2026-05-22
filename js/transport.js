@@ -624,8 +624,7 @@ function getTransportSubLocationParts(seg) {
   ].filter(Boolean);
 }
 
-function renderTransportSubLocationChips(seg, extraClass = '') {
-  const parts = getTransportSubLocationParts(seg);
+function renderTransportSubLocationParts(parts, extraClass = '') {
   if (parts.length === 0) return '';
 
   return `
@@ -638,6 +637,26 @@ function renderTransportSubLocationChips(seg, extraClass = '') {
       `).join('')}
     </div>
   `;
+}
+
+function renderTransportSubLocationChips(seg, extraClass = '') {
+  return renderTransportSubLocationParts(getTransportSubLocationParts(seg), extraClass);
+}
+
+function getJourneySubLocationParts(segs) {
+  if (!Array.isArray(segs)) return [];
+  const isMultiLeg = segs.length > 1;
+  return segs.flatMap((seg, index) => {
+    const legPrefix = isMultiLeg ? `Leg ${index + 1} ` : '';
+    return [
+      seg.fromAddress ? { label: `${legPrefix}depart from`, value: seg.fromAddress } : null,
+      seg.toAddress ? { label: `${legPrefix}arrive at`, value: seg.toAddress } : null
+    ].filter(Boolean);
+  });
+}
+
+function renderJourneySubLocationChips(segs, extraClass = '') {
+  return renderTransportSubLocationParts(getJourneySubLocationParts(segs), extraClass);
 }
 
 function formatTransportSubLocationText(seg) {
@@ -962,7 +981,7 @@ function buildTransportTab(cityFilter = null) {
         <button class="mobile-surface-card-button transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">Edit</button>
         <button class="mobile-surface-card-button mobile-surface-card-button--danger transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">Delete</button>
       `;
-      const summary = !isMultiLeg ? renderTransportSubLocationChips(rep, 'transport-card-sub-locations') : '';
+      const summary = renderJourneySubLocationChips(segs, 'transport-card-sub-locations');
       const details = renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, rep.id);
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'transport-mobile-card row-accent',
@@ -1040,16 +1059,10 @@ function buildTransportTab(cityFilter = null) {
     const route = isMultiLeg
         ? buildRouteChainWithCodes(segs)
         : `${getLocationCodeDisplay(rep.fromLocation)} → ${getLocationCodeDisplay(rep.toLocation)}`;
-    let routeDisplay = route;
-    if (!isMultiLeg) {
-      const subLocationChips = renderTransportSubLocationChips(rep);
-      if (subLocationChips) {
-        routeDisplay = `
-          <div class="transport-route-main">${route}</div>
-          ${subLocationChips}
-        `;
-      }
-    }
+    const routeSubLocationChips = renderJourneySubLocationChips(segs, 'transport-table-sub-locations');
+    const routeDisplay = routeSubLocationChips
+        ? `<div class="transport-route-main">${route}</div>${routeSubLocationChips}`
+        : route;
     const firstDepDate = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
     const firstDepTime = rep.departureTime || '';
     const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + firstDepTime : firstDepDate;
@@ -1084,10 +1097,7 @@ function buildTransportTab(cityFilter = null) {
           </button>`
         : `<div class="journey-name-main">${nameDisplay}</div>`;
 
-    let mobileSubLocationsHtml = '';
-    if (!isMultiLeg) {
-      mobileSubLocationsHtml = renderTransportSubLocationChips(rep, 'transport-mobile-sub-locations');
-    }
+    const mobileSubLocationsHtml = renderJourneySubLocationChips(segs, 'transport-mobile-sub-locations');
 
     html += `
       <tr class="journey-parent-row row-accent ${isMultiLeg ? 'multi-leg-row' : ''}" data-group="${gid}" style="--row-border-color:${statusColor};">

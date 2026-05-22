@@ -9591,13 +9591,18 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   margin: 0;
 }
 
-.route-col .transport-sub-location-chips {
+.route-col .transport-sub-location-chips,
+.transport-table-sub-locations {
   max-width: 20rem;
 }
 
 .transport-mobile-sub-locations .transport-sub-location-chip,
 .transport-card-sub-locations .transport-sub-location-chip {
   flex: 1 1 8.5rem;
+}
+
+.transport-table-sub-locations .transport-sub-location-chip {
+  flex: 1 1 8.75rem;
 }
 
 .transport-detail-block--wide {
