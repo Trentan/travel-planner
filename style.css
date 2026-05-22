@@ -4248,7 +4248,7 @@ body.fun-mode .detail-grid .block-transport,
 body.fun-mode .detail-grid .block-accom { display: none; }
 body.fun-mode .day-desc, body.fun-mode .leg-night-count { display: none; }
 
-body.read-only-mode .add-btn, body.read-only-mode .del-btn, body.read-only-mode .drag-handle, body.read-only-mode .header-del-btn { display: none !important; }
+body.read-only-mode .add-btn, body.read-only-mode .del-btn, body.read-only-mode .drag-handle, body.read-only-mode .header-del-btn, body.read-only-mode .edit-btn { display: none !important; }
 body.read-only-mode [contenteditable="true"] { pointer-events: none; outline: none !important; }
 body.read-only-mode .drop-zone { border-color: transparent !important; }
 
