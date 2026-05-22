@@ -388,13 +388,33 @@ function addLegTip(legIdx) { appData[legIdx].legTips.push("New tip..."); saveDat
 function addDayItem(legIdx, dayIdx, category) {
   if (category === 'activityItems') {
     const day = appData[legIdx].days[dayIdx];
+    const dayDate = getNormalizedDayDate(day);
+
+    if (!Array.isArray(appData[legIdx].suggestedActivities)) {
+      appData[legIdx].suggestedActivities = [];
+    }
+
+    appData[legIdx].suggestedActivities.push({
+      title: "New item...",
+      category: "sight",
+      estTime: "1 hr",
+      estCost: "0",
+      assignedDayIdx: dayIdx,
+      assignedDate: dayDate,
+      startDate: dayDate,
+      startTime: "",
+      endDate: dayDate,
+      endTime: "",
+      done: false
+    });
+
     appData[legIdx].days[dayIdx][category].push({
       text: "New item...",
       cost: "0",
       time: "1 hr",
-      startDate: getNormalizedDayDate(day),
+      startDate: dayDate,
       startTime: "",
-      endDate: getNormalizedDayDate(day),
+      endDate: dayDate,
       endTime: "",
       done: false
     });
