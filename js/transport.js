@@ -616,6 +616,55 @@ function renderTransportDetailBlock(title, value, extraClass = '') {
   `;
 }
 
+function getTransportSubLocationParts(seg) {
+  if (!seg) return [];
+  return [
+    seg.fromAddress ? { label: 'Depart', value: seg.fromAddress } : null,
+    seg.toAddress ? { label: 'Arrive', value: seg.toAddress } : null
+  ].filter(Boolean);
+}
+
+function renderTransportSubLocationParts(parts, extraClass = '') {
+  if (parts.length === 0) return '';
+
+  return `
+    <div class="transport-sub-location-details ${extraClass}">
+      ${parts.map(part => `
+        <span class="transport-sub-location-detail" title="${escapeHtmlText(part.value)}">
+          <span class="transport-sub-location-label">${escapeHtmlText(part.label)}</span>
+          <span class="transport-sub-location-value">${escapeHtmlText(part.value)}</span>
+        </span>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderTransportSubLocationDetails(seg, extraClass = '') {
+  return renderTransportSubLocationParts(getTransportSubLocationParts(seg), extraClass);
+}
+
+function getJourneySubLocationParts(segs) {
+  if (!Array.isArray(segs)) return [];
+  const isMultiLeg = segs.length > 1;
+  return segs.flatMap((seg, index) => {
+    const legPrefix = isMultiLeg ? `Leg ${index + 1} ` : '';
+    return [
+      seg.fromAddress ? { label: `${legPrefix}Depart`, value: seg.fromAddress } : null,
+      seg.toAddress ? { label: `${legPrefix}Arrive`, value: seg.toAddress } : null
+    ].filter(Boolean);
+  });
+}
+
+function renderJourneySubLocationDetails(segs, extraClass = '') {
+  return renderTransportSubLocationParts(getJourneySubLocationParts(segs), extraClass);
+}
+
+function formatTransportSubLocationText(seg) {
+  return getTransportSubLocationParts(seg)
+      .map(part => `${part.label}: ${part.value}`)
+      .join(' | ');
+}
+
 function renderJourneyMobileSummary(legCountText) {
   if (!legCountText) return '';
 
@@ -706,6 +755,7 @@ function renderTransportSegmentsDetailContent(segs) {
           <div class="transport-segment-mobile-journey" data-label="Journey">
             <span class="transport-segment-mobile-leg">Leg ${i + 1}</span>
             <span class="transport-segment-mobile-route">${escapeHtmlText(seg.fromLocation || '—')} → ${escapeHtmlText(seg.toLocation || '—')}</span>
+            ${renderTransportSubLocationDetails(seg, 'transport-segment-sub-locations')}
           </div>
           <div class="transport-segment-mobile-schedule" data-label="Schedule">
             <span class="transport-schedule-line"><strong>D:</strong> ${escapeHtmlText(segDep)}</span>
@@ -723,7 +773,10 @@ function renderTransportSegmentsDetailContent(segs) {
 
     return `
       <tr class="transport-segment-row">
-        <td class="transport-segment-journey">${seg.fromLocation || '—'} → ${seg.toLocation || '—'}</td>
+        <td class="transport-segment-journey">
+          ${seg.fromLocation || '—'} → ${seg.toLocation || '—'}
+          ${renderTransportSubLocationDetails(seg, 'transport-segment-sub-locations')}
+        </td>
         <td class="transport-segment-leg">Leg ${i + 1}</td>
         <td class="transport-segment-route">${segRoute}</td>
         <td class="transport-segment-departs">${segDep}</td>
@@ -797,6 +850,7 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
   const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
   const lastArrTime = lastSeg.arrivalTime || '—';
   const route = segs.length > 1 ? buildRouteChain(segs) : `${firstSeg.fromLocation || '—'} → ${firstSeg.toLocation || '—'}`;
+  const routeDetails = formatTransportSubLocationText(firstSeg);
   const providerSet = Array.from(new Set(segs.map(seg => seg.provider).filter(Boolean)));
   const routeCodeSet = Array.from(new Set(segs.map(seg => seg.routeCode).filter(Boolean)));
   const bookingSet = Array.from(new Set(segs.map(seg => seg.bookingReference).filter(Boolean)));
@@ -808,6 +862,7 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
   return `
     <div class="transport-detail-grid transport-mobile-detail-grid">
       ${renderTransportDetailBlock('Route', route)}
+      ${segs.length === 1 && routeDetails ? renderTransportDetailBlock('Route details', routeDetails, 'transport-detail-block--wide') : ''}
       ${renderTransportDetailBlock('Depart', firstDep)}
       ${renderTransportDetailBlock('Arrive', lastArr !== '—' ? `${lastArr} ${lastArrTime}`.trim() : '—')}
       ${renderTransportDetailBlock('Carrier', providerLabel)}
@@ -833,7 +888,14 @@ function buildTransportTab(cityFilter = null) {
   if (!Array.isArray(journeys) || journeys.length === 0) {
     const saved = localStorage.getItem('travelApp_journeys_v1');
     if (saved) {
-      try { journeys = JSON.parse(saved); window.journeys = journeys; }
+      try {
+        let parsed = JSON.parse(saved);
+        if (typeof normalizeTripJourneysData === 'function') {
+          parsed = normalizeTripJourneysData(parsed);
+        }
+        journeys = parsed;
+        window.journeys = journeys;
+      }
       catch (e) { journeys = []; }
     } else { journeys = []; }
   }
@@ -919,6 +981,7 @@ function buildTransportTab(cityFilter = null) {
         <button class="mobile-surface-card-button transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">Edit</button>
         <button class="mobile-surface-card-button mobile-surface-card-button--danger transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">Delete</button>
       `;
+      const summary = renderJourneySubLocationDetails(segs, 'transport-card-sub-locations');
       const details = renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, rep.id);
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'transport-mobile-card row-accent',
@@ -926,6 +989,7 @@ function buildTransportTab(cityFilter = null) {
         dateLabel: firstDepDate,
         title: rep.journeyName || routeText,
         subtitle: subtitleParts.filter(Boolean).join(' · '),
+        summary,
         meta,
         actions,
         details,
@@ -995,6 +1059,10 @@ function buildTransportTab(cityFilter = null) {
     const route = isMultiLeg
         ? buildRouteChainWithCodes(segs)
         : `${getLocationCodeDisplay(rep.fromLocation)} → ${getLocationCodeDisplay(rep.toLocation)}`;
+    const routeSubLocationDetails = renderJourneySubLocationDetails(segs, 'transport-table-sub-locations');
+    const routeDisplay = routeSubLocationDetails
+        ? `<div class="transport-route-main">${route}</div>${routeSubLocationDetails}`
+        : route;
     const firstDepDate = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
     const firstDepTime = rep.departureTime || '';
     const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + firstDepTime : firstDepDate;
@@ -1029,15 +1097,18 @@ function buildTransportTab(cityFilter = null) {
           </button>`
         : `<div class="journey-name-main">${nameDisplay}</div>`;
 
+    const mobileSubLocationsHtml = renderJourneySubLocationDetails(segs, 'transport-mobile-sub-locations');
+
     html += `
       <tr class="journey-parent-row row-accent ${isMultiLeg ? 'multi-leg-row' : ''}" data-group="${gid}" style="--row-border-color:${statusColor};">
         <td class="transport-expand-col" data-label="Expand">${desktopExpandControl}</td>
         <td class="journey-name-col" data-label="Journey" title="${rep.journeyName || ''}">
           ${journeyNameCell}
+          ${mobileSubLocationsHtml}
           ${renderJourneyMobileSummary(isMultiLeg ? `${segs.length} legs` : ``)}
         </td>
         <td class="transport-type-col" data-label="Type">${icon}</td>
-        <td class="route-col" data-label="Route">${route}</td>
+        <td class="route-col" data-label="Route">${routeDisplay}</td>
         <td class="date-col transport-departs-col" data-label="Departs">
           <span class="transport-departs-desktop">${firstDep}</span>
           ${renderTransportScheduleMobile(firstDep, lastArr, lastArrTime, durationDisplay, icon)}
@@ -1154,6 +1225,8 @@ function _loadSegmentIntoForm(seg) {
 
   document.getElementById('journeyFromCity').value = seg.fromLocation || '';
   document.getElementById('journeyToCity').value = seg.toLocation || '';
+  document.getElementById('journeyFromAddress').value = seg.fromAddress || '';
+  document.getElementById('journeyToAddress').value = seg.toAddress || '';
   document.getElementById('journeyDateFrom').value = seg.departureDate || '';
   document.getElementById('journeyTimeFrom').value = seg.departureTime || '';
   document.getElementById('journeyDateTo').value = seg.arrivalDate || '';
@@ -1260,7 +1333,7 @@ function openAddJourneyModal() {
     document.getElementById('journeyDateFrom').value = today;
     document.getElementById('journeyDateTo').value = today;
 
-    ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode','journeyBookingRef','journeyCost','journeyNotes']
+    ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode','journeyBookingRef','journeyCost','journeyNotes','journeyFromAddress','journeyToAddress']
         .forEach(id => {
           const el = document.getElementById(id);
           if (el) el.value = '';
@@ -1367,7 +1440,7 @@ function addSegmentToJourney() {
   const toSelect = document.getElementById('journeyToCity');
   if (toSelect) toSelect.value = '';
 
-  ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode'].forEach(id => {
+  ['journeyTimeFrom','journeyTimeTo','journeyProvider','journeyRouteCode','journeyBookingRef','journeyCost','journeyNotes','journeyFromAddress','journeyToAddress'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -1392,6 +1465,8 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
   const cost = document.getElementById('journeyCost')?.value.trim() || '0';
   const status = document.getElementById('journeyStatus')?.value || 'planned';
   const notes = document.getElementById('journeyNotes')?.value.trim() || '';
+  const fromAddress = document.getElementById('journeyFromAddress')?.value.trim() || '';
+  const toAddress = document.getElementById('journeyToAddress')?.value.trim() || '';
 
   const fromCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === fromLocation) : null;
   const toCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === toLocation) : null;
@@ -1419,6 +1494,8 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
     isMultiLeg: false,
     segmentOrder: segmentOrder,
     notes: notes,
+    fromAddress: fromAddress,
+    toAddress: toAddress,
     legs: []
   };
 }

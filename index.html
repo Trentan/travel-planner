@@ -563,7 +563,7 @@
             <button class="transport-type-btn" data-type="car" onclick="selectJourneyType('car')"><span class="journey-type-icon">🚗</span> Car</button>
           </div>
 
-          <div class="journey-inline-row journey-route-row modal-form-row modal-form-row--split">
+          <div class="journey-route-grid journey-route-row modal-form-row">
             <div class="ai-form-group">
               <label>From</label>
               <select id="journeyFromCity" class="form-control" onchange="_journeyFormDirty=true"></select>
@@ -572,6 +572,17 @@
             <div class="ai-form-group">
               <label>To</label>
               <select id="journeyToCity" class="form-control" onchange="_journeyFormDirty=true"></select>
+            </div>
+          </div>
+          <div class="journey-route-grid journey-address-row modal-form-row">
+            <div class="ai-form-group">
+              <label for="journeyFromAddress">From Details</label>
+              <input type="text" id="journeyFromAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Heathrow Terminal 5">
+            </div>
+            <div class="journey-route-spacer" aria-hidden="true"></div>
+            <div class="ai-form-group">
+              <label for="journeyToAddress">To Details</label>
+              <input type="text" id="journeyToAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Haneda Terminal 3">
             </div>
           </div>
           <div style="text-align: right; margin-bottom: 1.5rem;">
@@ -666,6 +677,10 @@
           <div class="ai-form-group">
             <label for="stayPropertyName">Property Name</label>
             <input type="text" id="stayPropertyName" class="form-control form-control--compact" placeholder="e.g. Grand Hotel or Cozy Airbnb">
+          </div>
+          <div class="ai-form-group">
+            <label for="stayLocation">Location</label>
+            <input type="text" id="stayLocation" class="form-control form-control--compact" placeholder="e.g. 12 Station Road, near Central Station">
           </div>
           <div class="modal-form-row modal-form-row--split">
             <div class="ai-form-group">

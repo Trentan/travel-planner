@@ -2630,6 +2630,8 @@ function normalizeTripJourneysData(items) {
     item.endDate = item.arrivalDate || item.startDate || '';
     item.startTime = item.departureTime || '';
     item.endTime = item.arrivalTime || '';
+    item.fromAddress = item.fromAddress || '';
+    item.toAddress = item.toAddress || '';
   });
   return items;
 }
@@ -2645,6 +2647,7 @@ function normalizeTripStaysData(items) {
     item.endDate = item.checkOut || item.startDate || '';
     item.startTime = item.checkInTime || '';
     item.endTime = item.checkOutTime || '';
+    item.location = item.location || item.address || '';
   });
   return items;
 }

@@ -24,12 +24,26 @@ function renderStayDetailBlock(title, value, extraClass = '') {
   `;
 }
 
+function renderStayLocationDetails(stay, extraClass = '') {
+  if (!stay || !stay.location) return '';
+
+  return `
+    <div class="transport-sub-location-details stay-location-details ${extraClass}">
+      <span class="transport-sub-location-detail" title="${escapeHtmlText(stay.location)}">
+        <span class="transport-sub-location-label">Location</span>
+        <span class="transport-sub-location-value">${escapeHtmlText(stay.location)}</span>
+      </span>
+    </div>
+  `;
+}
+
 function renderStayMobileSummary(stay, status, statusIcon, cityName) {
   const providerText = [stay.provider || '—', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' ');
 
   return `
     <div class="mobile-table-meta stay-mobile-meta">
       <span><strong>Details:</strong> ${cityName}${providerText !== '—' ? ` · ${providerText}` : ''}</span>
+      ${renderStayLocationDetails(stay, 'stay-mobile-location')}
     </div>
   `;
 }
@@ -95,6 +109,7 @@ function renderStayMobileDetails(stay, cityName) {
   return `
     <div class="stay-detail-grid stay-mobile-detail-grid">
       ${renderStayDetailBlock('City', cityName)}
+      ${stay.location ? renderStayDetailBlock('Location', stay.location, 'stay-detail-block--wide') : ''}
       ${renderStayDetailBlock('Check-in', formatDateShort(stay.checkIn))}
       ${renderStayDetailBlock('Check-out', formatDateShort(stay.checkOut))}
       ${renderStayDetailBlock('Nights', String(nights))}
@@ -192,12 +207,14 @@ function buildAccomTab(cityFilter = null) {
         <button class="mobile-surface-card-button mobile-surface-card-button--danger stay-del-btn" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete stay">Delete</button>
       `;
       const details = renderStayMobileDetails(stay, cityName);
+      const summary = renderStayLocationDetails(stay, 'stay-card-location');
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'stay-mobile-card row-accent',
         accentColor: cityColor,
         dateLabel: checkIn,
         title: stay.propertyName || '—',
         subtitle: [`Out ${checkOut}`, stay.provider || '', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' · '),
+        summary,
         meta,
         actions,
         details,
@@ -276,6 +293,8 @@ function buildAccomTab(cityFilter = null) {
       <td class="city-col" data-label="City">${getCityFlagHTML(cityName)} ${cityName}</td>
       <td class="property-col" data-label="Property">
         <span class="stay-property-name" contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)">${escapeHtml(stay.propertyName)}</span>
+        ${renderStayLocationDetails(stay, 'stay-table-location')}
+        ${renderStayMobileSummary(stay, status, statusIcon, cityName)}
       </td>
       <td class="stay-provider-col" data-label="Provider">${stay.provider || '—'}</td>
       <td class="stay-bookingref-col" data-label="Booking Ref">${stay.bookingRef || '—'}</td>

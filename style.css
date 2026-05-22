@@ -1045,6 +1045,23 @@ main {
   font-weight: 700;
 }
 
+.journey-route-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.journey-address-row {
+  margin-top: -0.25rem;
+  margin-bottom: 1rem;
+}
+
+.journey-route-spacer {
+  width: 24px;
+  height: 1px;
+}
+
 .journey-pending-segments {
   padding: 0.5rem 1.5rem 1rem;
 }
@@ -9521,4 +9538,166 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 .daily-timeline-item.is-done .daily-timeline-meta {
   opacity: 0.55;
   transition: opacity 0.2s ease;
+}
+
+/* Route sub-locations styling in Transport views */
+.transport-sub-location-details {
+  display: flex;
+  align-items: baseline;
+  gap: 0.22rem 0.45rem;
+  flex-wrap: wrap;
+  min-width: 0;
+  margin-top: 0.22rem;
+  padding: 0.14rem 0.32rem;
+  border-radius: 4px;
+  background: rgba(36, 72, 93, 0.035);
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.3;
+}
+
+.transport-sub-location-detail {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.transport-sub-location-detail + .transport-sub-location-detail::before {
+  content: '|';
+  color: rgba(36, 72, 93, 0.32);
+  font-weight: 800;
+  margin-right: 0.23rem;
+}
+
+.transport-sub-location-label {
+  flex: 0 0 auto;
+  font-size: 0.68rem;
+  font-weight: 850;
+  color: var(--accent-strong);
+}
+
+.transport-sub-location-label::after {
+  content: ':';
+}
+
+.transport-sub-location-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+  font-size: 0.74rem;
+  font-weight: 400;
+}
+
+.transport-mobile-sub-locations {
+  display: none;
+}
+
+.transport-card-sub-locations {
+  margin: 0;
+}
+
+body.mobile-app-mode .transport-mobile-sub-locations,
+body.mobile-app-mode .transport-card-sub-locations,
+body.mobile-app-mode .stay-card-location {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.12rem 0.35rem;
+}
+
+body.mobile-app-mode .transport-mobile-sub-locations .transport-sub-location-detail,
+body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detail,
+body.mobile-app-mode .stay-card-location .transport-sub-location-detail {
+  min-width: 0;
+}
+
+body.mobile-app-mode .transport-mobile-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before,
+body.mobile-app-mode .transport-card-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before,
+body.mobile-app-mode .stay-card-location .transport-sub-location-detail + .transport-sub-location-detail::before {
+  content: none;
+}
+
+.route-col .transport-sub-location-details,
+.transport-table-sub-locations {
+  max-width: 20rem;
+}
+
+.transport-detail-block--wide {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .journey-route-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+
+  #journey-modal .journey-route-grid {
+    display: grid !important;
+  }
+
+  .journey-route-spacer {
+    display: none;
+  }
+
+  .transport-mobile-sub-locations,
+  .transport-card-sub-locations,
+  .stay-card-location {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 0.24rem;
+    font-size: 0.66rem;
+    gap: 0.12rem 0.35rem;
+  }
+
+  .transport-mobile-sub-locations .transport-sub-location-detail,
+  .transport-card-sub-locations .transport-sub-location-detail,
+  .stay-card-location .transport-sub-location-detail {
+    min-width: 0;
+  }
+
+  .transport-mobile-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before,
+  .transport-card-sub-locations .transport-sub-location-detail + .transport-sub-location-detail::before,
+  .stay-card-location .transport-sub-location-detail + .transport-sub-location-detail::before {
+    content: none;
+  }
+
+  .transport-mobile-sub-locations .transport-sub-location-label,
+  .transport-mobile-sub-locations .transport-sub-location-value,
+  .transport-card-sub-locations .transport-sub-location-label,
+  .transport-card-sub-locations .transport-sub-location-value,
+  .stay-card-location .transport-sub-location-label,
+  .stay-card-location .transport-sub-location-value {
+    font-size: 0.66rem;
+  }
+}
+
+/* Timeline sub-locations */
+.daily-timeline-sub-locations {
+  font-size: 0.78rem;
+  color: var(--muted, #57606f);
+  margin-top: 0.25rem;
+  font-weight: 400;
+  display: block;
+}
+
+.daily-timeline-sub-location-details {
+  margin-top: 0;
+}
+
+/* Multi-leg detail row segments list sub-locations */
+.transport-segment-sub-locations {
+  margin-top: 0.25rem;
+  align-items: flex-start;
+}
+
+.stay-location-details {
+  margin-top: 0.22rem;
+}
+
+.stay-detail-block--wide {
+  grid-column: 1 / -1;
 }
