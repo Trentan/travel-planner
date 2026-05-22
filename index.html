@@ -45,6 +45,7 @@
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openAIDialog()">🤖 AI Builder</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openBookingIntakeDialog()">Import Booking</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openGuideDialog()">📖 Guide</button>
+        <button id="showMoneyToggleBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); toggleShowMoney()">💵 Hide Prices</button>
         <div class="app-menu-divider" aria-hidden="true"></div>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItinerarySummaryText()">🧾 Export AI Summary</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItineraryText()">📝 Export Itinerary Text</button>
@@ -207,6 +208,7 @@
               <span id="mobileCompactToggleLabel" class="app-menu-switch-label">Detailed mode</span>
             </label>
             <button class="app-menu-btn" onclick="closeMobileMenu(); openCityDialog()">🌍 Cities</button>
+            <button id="mobileShowMoneyToggleBtn" class="app-menu-btn" onclick="closeMobileMenu(); toggleShowMoney()">💵 Hide Prices</button>
           </div>
         </section>
 

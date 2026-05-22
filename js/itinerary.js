@@ -35,9 +35,17 @@ function renderCompactMetaSuffix(value) {
   return ` <span class="compact-meta-suffix">[${escapeCompactText(trimmed)}]</span>`;
 }
 
-function renderCompactEmojiLine({ emoji, text, duration = '', done = false }) {
+function renderCompactEmojiLine({ emoji, text, duration = '', cost = '', done = false }) {
   const cleanText = escapeCompactText(stripCompactLeadingEmoji(text));
-  const suffix = renderCompactMetaSuffix(duration);
+  const durationTrimmed = String(duration || '').trim();
+  const costTrimmed = String(cost || '').trim();
+  
+  let suffixParts = [];
+  if (durationTrimmed) suffixParts.push(escapeCompactText(durationTrimmed));
+  if (costTrimmed) suffixParts.push(`<span class="compact-inline-meta-cost">${escapeCompactText(costTrimmed)}</span>`);
+  
+  const suffix = suffixParts.length > 0 ? ` <span class="compact-meta-suffix">[${suffixParts.join(' · ')}]</span>` : '';
+  
   return `
     <span class="compact-line">
       <span class="compact-line-emoji">${emoji}</span>
@@ -301,19 +309,23 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
         .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1)) : [];
     const duration = formatCompactJourneyDuration(segs);
     const details = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
-    const costSuffix = journey.cost ? ` · ${formatCurrency(journey.cost)}` : '';
-    const mainLine = renderCompactEmojiLine({ emoji: icon, text: journeyLabel, duration: `${duration}${costSuffix}` });
+    const mainLine = renderCompactEmojiLine({
+      emoji: icon,
+      text: journeyLabel,
+      duration: duration,
+      cost: journey.cost ? formatCurrency(journey.cost) : ''
+    });
     const subLocsHtml = details ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(details)}</div>` : '';
     return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}</div>`;
   }).join('');
 
   const accomLines = dayStayInfo.map(info => {
     const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
-    const costSuffix = info.cost ? `${formatCurrency(info.cost)}` : '';
     const mainLine = renderCompactEmojiLine({
       emoji: '🏨',
       text: `${label}: ${info.propertyName || 'Accommodation'}`,
-      duration: costSuffix
+      duration: '',
+      cost: info.cost ? formatCurrency(info.cost) : ''
     });
     const stayLoc = info.location ? (() => {
       let loc = info.location;
@@ -330,7 +342,6 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
     const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
-    const costSuffix = item.cost ? ` · ${formatCurrency(item.cost)}` : '';
     return `
       <div class="compact-activity-row" style="${doneStyle}">
         <input
@@ -340,11 +351,12 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
         >
         <div class="compact-activity-copy">
           ${renderCompactEmojiLine({
-      emoji,
-      text: item.text,
-      duration: `${item.time || '1 hr'}${costSuffix}`,
-      done: item.done
-    })}
+            emoji,
+            text: item.text,
+            duration: item.time || '1 hr',
+            cost: item.cost ? formatCurrency(item.cost) : '',
+            done: item.done
+          })}
         </div>
       </div>
     `;
@@ -1096,7 +1108,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       typeLabel: 'Transport',
       icon: getTransportIcon(journey.transportType),
       title: journey.journeyName || route || 'Transport',
-      meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDate.trim(), journey.cost ? formatCurrency(journey.cost) : ''].filter(Boolean).join(' · '),
+      meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDate.trim()].filter(Boolean).join(' · '),
       subLocations: subLocations,
       cost: journey.cost,
       status: journey.status || 'planned',
@@ -1117,7 +1129,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       typeLabel: label,
       icon,
       title: `${label}: ${stayInfo.propertyName || 'Accommodation'}`,
-      meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : '', stayInfo.status, stayInfo.cost ? formatCurrency(stayInfo.cost) : ''].filter(Boolean).join(' · '),
+      meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : '', stayInfo.status].filter(Boolean).join(' · '),
       subLocations: stayInfo.location ? (() => {
         let loc = stayInfo.location;
         const cleanCity = String(day.to).trim();
@@ -1143,7 +1155,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       typeLabel: 'Activity',
       icon: emoji,
       title: item.text || 'Activity',
-      meta: [item.time || '', item.cost ? formatCurrency(item.cost) : ''].filter(Boolean).join(' · '),
+      meta: [item.time || ''].filter(Boolean).join(' · '),
       cost: item.cost,
       done: !!item.done,
       startTime: item.startTime || '',
@@ -1199,7 +1211,7 @@ function renderDailyTimelineRow(item, compact = false) {
             ${checkboxHtml}
           </div>
         </div>
-        ${item.meta ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta)}</div>` : ''}
+        ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> · ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
         ${item.subLocations ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
@@ -1591,7 +1603,7 @@ function buildItinerary() {
       const badgeIcon = isCompleted ? '✓' : '✓';
       const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
       const categoryEmoji = getCategoryEmoji(activity.category);
-      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · ${formatCurrency(activity.estCost || 0)}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
+      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span></span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
     }).join('')}</ul>
         <button class="add-btn" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
       </div>
@@ -1696,7 +1708,7 @@ ${(() => {
 
           return `<div class="cost-item">
         <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
-          <span>${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` via ${info.provider}` : ''}${info.cost ? ` (${formatCurrency(info.cost)})` : ''}</span>
+          <span>${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` via ${info.provider}` : ''}${info.cost ? `<span class="accom-inline-meta-cost"> (${formatCurrency(info.cost)})</span>` : ''}</span>
           ${stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : ''}
         </div>
         <div class="cost-item-actions">

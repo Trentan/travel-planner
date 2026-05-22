@@ -9781,3 +9781,16 @@ body.compact-view-mode .compact-leg-cost-badge:hover {
   transform: scale(1.22) rotate(-8deg);
 }
 
+/* Hide Prices Toggle Feature */
+body.hide-money-figures .day-total-cost,
+body.hide-money-figures .leg-cost-total-badge,
+body.hide-money-figures .compact-leg-cost-badge,
+body.hide-money-figures .compact-day-total-badge,
+body.hide-money-figures .budget-field,
+body.hide-money-figures .accom-inline-meta-cost,
+body.hide-money-figures .timeline-inline-meta-cost,
+body.hide-money-figures .compact-inline-meta-cost,
+body.hide-money-figures .sight-inline-meta-cost {
+  display: none !important;
+}
+
