@@ -1185,7 +1185,6 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       itemIndex,
       sortValue: getDailyTimelineItemSortValue(dayDate, item.startTime, 4000 + itemIndex),
       actionHtml: `
-        ${isEditMode ? `<button class="edit-btn" title="Edit Activity" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${itemIndex})">✎</button>` : ''}
         <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${itemIndex})">×</button>
       `
     });
@@ -1212,8 +1211,12 @@ function renderDailyTimelineRow(item, compact = false) {
     : '';
 
   let checkboxHtml = '';
+  let editBtnHtml = '';
   if (item.type === 'activity') {
     checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})">`;
+    if (isEditMode) {
+      editBtnHtml = `<button class="edit-btn" title="Edit Activity" onclick="event.stopPropagation(); openEditDayActivityModal(${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})">✎</button>`;
+    }
   } else if (item.type === 'transport') {
     checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox transport-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleJourneyCompleted(event, '${item.journeyId}')">`;
   } else if (item.type === 'stay' || item.type === 'checkin' || item.type === 'checkout' || item.type === 'staying') {
@@ -1229,6 +1232,7 @@ function renderDailyTimelineRow(item, compact = false) {
           <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
           <div class="daily-timeline-title-and-checkbox">
             <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
+            ${editBtnHtml}
             ${checkboxHtml}
           </div>
         </div>

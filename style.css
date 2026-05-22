@@ -1832,7 +1832,9 @@ main {
   body:not(.compact-view-mode) .cost-item:hover .del-btn,
   body:not(.compact-view-mode) .cost-item:focus-within .del-btn,
   body:not(.compact-view-mode) .cost-item:hover .edit-btn,
-  body:not(.compact-view-mode) .cost-item:focus-within .edit-btn {
+  body:not(.compact-view-mode) .cost-item:focus-within .edit-btn,
+  body:not(.compact-view-mode) .daily-timeline-item:hover .edit-btn,
+  body:not(.compact-view-mode) .daily-timeline-item:focus-within .edit-btn {
     opacity: 0.72;
   }
 
