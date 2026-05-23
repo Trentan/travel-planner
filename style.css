@@ -5102,6 +5102,118 @@ body.compact-view-mode .mobile-surface-card-details.expanded {
   flex: 1;
 }
 
+/* Compact Activities Panel Styles */
+.compact-mobile-info-panel-activities .compact-suggested-activity-list {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.compact-suggested-activity-list {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.compact-suggested-activity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid rgba(36, 72, 93, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  min-height: 44px;
+}
+
+.compact-suggested-activity-emoji {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.compact-suggested-activity-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.compact-suggested-activity-meta {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.65rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.compact-suggested-activity-time {
+  font-family: 'DM Mono', monospace;
+}
+
+.compact-suggested-activity-cost {
+  font-family: 'DM Mono', monospace;
+  color: var(--accent-strong);
+}
+
+.compact-activity-action-btn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  min-width: 44px;
+  min-height: 44px;
+  border: none;
+  background: rgba(36, 72, 93, 0.08);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.compact-activity-action-btn:hover {
+  background: rgba(36, 72, 93, 0.15);
+}
+
+.compact-activities-card .compact-suggested-activity-list {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.compact-activities-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.5rem;
+  gap: 0.5rem;
+  cursor: default;
+  user-select: none;
+}
+
+.compact-activities-summary-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.77rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.compact-activities-summary-icon {
+  font-size: 0.9rem;
+}
+
+.compact-activities-summary-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: rgba(36, 72, 93, 0.08);
+  border: 1px solid rgba(36, 72, 93, 0.1);
+  border-radius: 999px;
+  padding: 0.15rem 0.4rem;
+}
+
 body.compact-view-mode .compact-activity-copy {
   min-width: 0;
   flex: 1;
