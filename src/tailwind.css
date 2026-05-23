@@ -11,6 +11,38 @@
 /* Dark mode variant using data-theme attribute (existing pattern) */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* Migration layer: Component styles using Tailwind utilities */
+/* These will replace the old style.css rules gradually */
+
+@layer components {
+  /* Base action button */
+  .action-btn {
+    @apply inline-flex items-center gap-1.5 px-4 py-2 min-h-[40px]
+           bg-surface-card border border-border rounded-lg shadow-sm
+           font-medium text-sm text-text-primary
+           cursor-pointer transition-all duration-200
+           hover:bg-btn-hover-bg hover:border-border-strong;
+  }
+
+  /* Secondary action button */
+  .action-btn-secondary {
+    @apply bg-btn-secondary text-white border-btn-secondary
+           hover:bg-btn-secondary-hover hover:border-btn-secondary-hover;
+  }
+
+  /* Success action button */
+  .action-btn-success {
+    @apply bg-btn-success text-white border-btn-success
+           hover:bg-btn-success-hover hover:border-btn-success-hover;
+  }
+
+  /* Danger action button */
+  .action-btn-danger {
+    @apply bg-btn-danger text-white border-btn-danger
+           hover:bg-btn-danger-hover hover:border-btn-danger-hover;
+  }
+}
+
 /* Tailwind v4 Design Token System - mapped from existing CSS variables */
 @theme {
   /* Primary Background Colors (Light Mode) */
@@ -42,7 +74,16 @@
   --color-status-confirmed: #059669;
   --color-status-cancelled: #dc2626;
 
-  /* Dark Mode Overrides */
+  /* Button Colors */
+  --color-btn-secondary: #2C3E50;
+  --color-btn-secondary-hover: #243443;
+  --color-btn-success: #27AE60;
+  --color-btn-success-hover: #219150;
+  --color-btn-danger: #E74C3C;
+  --color-btn-danger-hover: #c93d30;
+  --color-btn-hover-bg: #f5f3ee;
+
+  /* Dark Mode Raw Values (these will be used by [data-theme="dark"] selector) */
   --color-dark-bg-primary: #090d16;
   --color-dark-bg-secondary: #0f172a;
   --color-dark-surface-card: #1e293b;
@@ -60,6 +101,12 @@
   --color-dark-status-booked: #34d399;
   --color-dark-status-confirmed: #10b981;
   --color-dark-status-cancelled: #f87171;
+  --color-dark-btn-secondary: #3E526C;
+  --color-dark-btn-secondary-hover: #4A5F7C;
+  --color-dark-btn-success: #34D399;
+  --color-dark-btn-success-hover: #10B981;
+  --color-dark-btn-danger: #F87171;
+  --color-dark-btn-danger-hover: #EF4444;
 
   /* Font Families */
   --font-sans: 'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -84,4 +131,32 @@
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Dark mode CSS variable overrides (outside @theme block) */
+[data-theme="dark"] {
+  --color-bg-primary: var(--color-dark-bg-primary);
+  --color-bg-secondary: var(--color-dark-bg-secondary);
+  --color-surface-card: var(--color-dark-surface-card);
+  --color-surface-input: var(--color-dark-surface-input);
+  --color-text-primary: var(--color-dark-text-primary);
+  --color-text-muted: var(--color-dark-text-muted);
+  --color-text-light: var(--color-dark-text-light);
+  --color-border: var(--color-dark-border);
+  --color-border-strong: var(--color-dark-border-strong);
+  --color-accent-teal: var(--color-dark-accent-teal);
+  --color-accent-teal-hover: var(--color-dark-accent-teal-hover);
+  --color-accent-coral: var(--color-dark-accent-coral);
+  --color-accent-coral-hover: var(--color-dark-accent-coral-hover);
+  --color-status-planned: var(--color-dark-status-planned);
+  --color-status-booked: var(--color-dark-status-booked);
+  --color-status-confirmed: var(--color-dark-status-confirmed);
+  --color-status-cancelled: var(--color-dark-status-cancelled);
+  --color-btn-secondary: var(--color-dark-btn-secondary);
+  --color-btn-secondary-hover: var(--color-dark-btn-secondary-hover);
+  --color-btn-success: var(--color-dark-btn-success);
+  --color-btn-success-hover: var(--color-dark-btn-success-hover);
+  --color-btn-danger: var(--color-dark-btn-danger);
+  --color-btn-danger-hover: var(--color-dark-btn-danger-hover);
+  --color-btn-hover-bg: var(--color-dark-bg-secondary);
 }
