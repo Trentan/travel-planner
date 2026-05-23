@@ -5,6 +5,7 @@ let isMobileMenuOpen = false;
 let lastViewportWasMobile = null;
 let itineraryDayViewMode = 'timeline';
 let showMoneyFigures = true;
+let currentTheme = 'system';
 
 function isMobileViewport() {
   return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
@@ -164,7 +165,8 @@ function saveUiSettings() {
     isEditMode,
     isFunMode,
     itineraryDayViewMode,
-    showMoneyFigures
+    showMoneyFigures,
+    theme: currentTheme
   }));
 }
 
@@ -175,6 +177,56 @@ function setHeaderEditable(isEditable) {
   if (title) title.contentEditable = allowEdit;
   if (subtitle) subtitle.contentEditable = allowEdit;
 }
+
+function applyTheme(theme = null) {
+  if (theme) {
+    currentTheme = theme;
+  } else {
+    let savedSettings = null;
+    try {
+      savedSettings = JSON.parse(localStorage.getItem('travelApp_uiSettings_v1') || 'null');
+    } catch (e) {
+      savedSettings = null;
+    }
+    currentTheme = (savedSettings && savedSettings.theme) || 'system';
+  }
+
+  let effectiveTheme = currentTheme;
+  if (effectiveTheme === 'system') {
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    effectiveTheme = isDark ? 'dark' : 'light';
+  }
+
+  document.documentElement.setAttribute('data-theme', effectiveTheme);
+
+  // Sync inputs and button styles
+  const toggleInput = document.getElementById('themeToggleInput');
+  const mobileToggleInput = document.getElementById('mobileThemeToggleInput');
+  const toggleBtn = document.getElementById('themeToggleBtn');
+  const mobileToggleBtn = document.getElementById('mobileThemeToggleBtn');
+  const isDarkActive = effectiveTheme === 'dark';
+
+  if (toggleInput) toggleInput.checked = isDarkActive;
+  if (mobileToggleInput) mobileToggleInput.checked = isDarkActive;
+
+  if (toggleBtn) {
+    toggleBtn.setAttribute('aria-checked', String(isDarkActive));
+    toggleBtn.classList.toggle('active-mode', isDarkActive);
+  }
+  if (mobileToggleBtn) {
+    mobileToggleBtn.setAttribute('aria-checked', String(isDarkActive));
+    mobileToggleBtn.classList.toggle('active-mode', isDarkActive);
+  }
+
+  saveUiSettings();
+}
+
+function toggleThemeMode(isDark) {
+  const nextTheme = isDark ? 'dark' : 'light';
+  applyTheme(nextTheme);
+}
+window.toggleThemeMode = toggleThemeMode;
+window.applyTheme = applyTheme;
 
 function applyUiSettings() {
   let savedSettings = null;
@@ -190,6 +242,7 @@ function applyUiSettings() {
     isEditMode = savedSettings.isEditMode !== false;
     itineraryDayViewMode = savedSettings.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
     showMoneyFigures = savedSettings.showMoneyFigures !== false;
+    currentTheme = savedSettings.theme || 'system';
   } else if (isMobileViewport()) {
     isCompactView = true;
   }
@@ -205,6 +258,7 @@ function applyUiSettings() {
   document.body.classList.toggle('compact-view-mode', isCompactView);
   document.body.classList.toggle('read-only-mode', !isEditMode);
   document.body.classList.toggle('hide-money-figures', !showMoneyFigures);
+  applyTheme();
   syncResponsiveUi();
   syncModeToggleButtons();
   syncItineraryViewModeButtons();
@@ -474,6 +528,14 @@ window.addEventListener('resize', syncResponsiveUi);
 window.addEventListener('orientationchange', syncResponsiveUi);
 document.addEventListener('DOMContentLoaded', syncResponsiveUi);
 window.addEventListener('load', syncResponsiveUi);
+
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (currentTheme === 'system') {
+      applyTheme();
+    }
+  });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   ['activeFileDisplay', 'saveStatus', 'timestampStatus'].forEach(id => {

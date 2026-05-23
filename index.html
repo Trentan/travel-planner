@@ -11,7 +11,7 @@
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#1A242F">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
   <!-- Leaflet.js for interactive maps -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -34,6 +34,11 @@
       <input id="compactToggleInput" type="checkbox" onchange="toggleCompactView(this.checked)" aria-label="Toggle detailed or compact mode">
       <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
       <span id="compactToggleLabel" class="app-menu-switch-label">Detailed mode</span>
+    </label>
+    <label id="themeToggleBtn" class="app-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
+      <input id="themeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
+      <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
+      <span id="themeToggleLabel" class="app-menu-switch-label">🌓 Dark theme</span>
     </label>
     <button id="undoBtn" class="app-menu-btn" onclick="undoTripChange()" disabled>↶ Undo</button>
     <button id="redoBtn" class="app-menu-btn" onclick="redoTripChange()" disabled>↷ Redo</button>
@@ -206,6 +211,11 @@
               <input id="mobileCompactToggleInput" type="checkbox" onchange="closeMobileMenu(); toggleCompactView(this.checked)" aria-label="Toggle detailed or compact mode">
               <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
               <span id="mobileCompactToggleLabel" class="app-menu-switch-label">Detailed mode</span>
+            </label>
+            <label id="mobileThemeToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
+              <input id="mobileThemeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
+              <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
+              <span id="mobileThemeToggleLabel" class="app-menu-switch-label">🌓 Dark theme</span>
             </label>
             <button class="app-menu-btn" onclick="closeMobileMenu(); openCityDialog()">🌍 Cities</button>
             <button id="mobileShowMoneyToggleBtn" class="app-menu-btn" onclick="closeMobileMenu(); toggleShowMoney()">💵 Hide Prices</button>

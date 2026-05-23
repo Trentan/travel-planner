@@ -1,35 +1,102 @@
 :root {
-  --bg: #f4efe6;
-  --bg-alt: #f8f5ee;
-  --card: #fffdf8;
-  --card-strong: #ffffff;
-  --text: #18212b;
-  --muted: #66707a;
-  --border: #ddd3c6;
-  --border-strong: #c8bdad;
-  --accent: #24485d;
-  --accent-strong: #1a242f;
-  --accent-soft: #e8eef2;
-  --success: #2f855a;
-  --warning: #d97706;
-  --radius: 12px;
-  --shadow: 0 10px 30px rgba(26, 36, 47, 0.08);
-  --shadow-soft: 0 4px 14px rgba(26, 36, 47, 0.06);
+  /* System Fonts */
+  --font-family-sans: 'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-serif: 'Outfit', 'Playfair Display', Georgia, serif;
+  --font-family-mono: 'DM Mono', Fira Code, monospace;
+
+  /* Spacing Grid */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+
+  /* Border Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* Light Theme Color Mapping (WCAG AA Compliant) */
+  --color-bg-primary: #f8fafc;        /* Soft Slate Pearl */
+  --color-bg-secondary: #f1f5f9;      /* Light Cool Grey */
+  --color-surface-card: #ffffff;      /* Pure White */
+  --color-surface-input: #ffffff;     /* Pure White */
+  --color-text-primary: #0f172a;      /* Deep Slate Black */
+  --color-text-muted: #475569;        /* Mid Slate */
+  --color-text-light: #94a3b8;        /* Light Grey Slate */
+  --color-border: #e2e8f0;            /* Soft Grey Border */
+  --color-border-strong: #cbd5e1;     /* Mid Grey Border */
+  --color-accent-teal: #0891b2;       /* Ocean Teal */
+  --color-accent-teal-hover: #0e7490;
+  --color-accent-coral: #f43f5e;      /* Sunset Coral Accent */
+  --color-accent-coral-hover: #e11d48;
+  
+  /* Status Colors */
+  --color-status-planned: #d97706;    /* Amber */
+  --color-status-booked: #16a34a;     /* Emerald Green */
+  --color-status-confirmed: #059669;  /* Jade Green */
+  --color-status-cancelled: #dc2626;  /* Red */
+
+  /* Legacy CSS Variables Mapping for Compatibility */
+  --bg: var(--color-bg-primary);
+  --bg-alt: var(--color-bg-secondary);
+  --card: var(--color-surface-card);
+  --card-strong: var(--color-surface-card);
+  --text: var(--color-text-primary);
+  --muted: var(--color-text-muted);
+  --border: var(--color-border);
+  --border-strong: var(--color-border-strong);
+  --accent: var(--color-accent-teal);
+  --accent-strong: var(--color-accent-teal-hover);
+  --accent-soft: var(--color-bg-secondary);
+  --success: var(--color-status-booked);
+  --warning: var(--color-status-planned);
+  --radius: var(--radius-lg);
+  --shadow: var(--shadow-lg);
+  --shadow-soft: var(--shadow-md);
   --tabs-nav-sticky-top: 0px;
   --city-nav-sticky-top: 56px;
+}
+
+/* Dark Theme Color Mapping */
+[data-theme="dark"] {
+  --color-bg-primary: #090d16;        /* Deep Midnight */
+  --color-bg-secondary: #0f172a;      /* Slate Blue Black */
+  --color-surface-card: #1e293b;      /* Dark Slate Card */
+  --color-surface-input: #1e293b;     /* Dark Slate Input */
+  --color-text-primary: #f8fafc;      /* White */
+  --color-text-muted: #cbd5e1;        /* Light Slate */
+  --color-text-light: #64748b;        /* Muted Blue Slate */
+  --color-border: #334155;            /* Dark Slate Border */
+  --color-border-strong: #475569;     /* Strong Dark Slate Border */
+  --color-accent-teal: #22d3ee;       /* Bright Cyan-Teal */
+  --color-accent-teal-hover: #06b6d4;
+  --color-accent-coral: #fb7185;      /* Pastel Coral */
+  --color-accent-coral-hover: #fda4af;
+
+  /* Status overrides for Dark Mode */
+  --color-status-planned: #fbbf24;
+  --color-status-booked: #34d399;
+  --color-status-confirmed: #10b981;
+  --color-status-cancelled: #f87171;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  font-family: 'DM Sans', sans-serif;
-  background:
-          linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.22) 18%, rgba(255,255,255,0) 30%),
-          linear-gradient(180deg, var(--bg-alt) 0%, var(--bg) 100%);
+  font-family: var(--font-family-sans);
+  background: linear-gradient(180deg, var(--bg-alt) 0%, var(--bg) 100%);
   color: var(--text);
   font-size: 15px;
   line-height: 1.6;
-  transition: background 0.3s;
+  transition: background 0.3s, color 0.3s;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -1533,12 +1600,60 @@ main {
 
 /* ITINERARY TAB STYLES */
 .top-controls { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;}
-.leg { margin-bottom: 2.5rem; }
-.leg-header { padding: 0.75rem 1.25rem; border-radius: var(--radius) var(--radius) 0 0; color: white; position: relative; cursor: pointer; user-select: none;}
-.leg-header-top { display: flex; align-items: center; justify-content: space-between; }
-.leg-header h2 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 600; margin: 0; outline: none; cursor: text;}
-.leg-subtitle { font-size: 0.8rem; opacity: 0.85; margin-top: 4px; font-style: italic; font-weight: 300;}
-.leg-night-count { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 3px 10px; font-size: 0.75rem; font-family: 'DM Mono', monospace; font-weight: 500;}
+.leg {
+  margin-bottom: 2.5rem;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.leg-header {
+  padding: 1.25rem 1.5rem;
+  background: transparent !important; /* Override inline dynamic backgrounds! */
+  color: var(--color-text-primary) !important;
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.leg-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.leg-header h2 {
+  font-family: var(--font-family-serif);
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin: 0;
+  outline: none;
+  cursor: text;
+  color: var(--color-text-primary) !important;
+}
+
+.leg-subtitle {
+  font-size: 0.82rem;
+  color: var(--color-text-muted) !important;
+  margin-top: 6px;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.leg-night-count {
+  background: var(--color-bg-secondary) !important;
+  color: var(--color-text-muted) !important;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-family: var(--font-family-mono);
+  font-weight: 600;
+}
 .badge-transit { background: #E67E22; color: white; border: 1px solid #D35400;}
 .leg-chevron { transition: transform 0.25s; display: inline-block; font-size: 0.8rem; opacity: 0.8;}
 .leg.collapsed .leg-chevron { transform: rotate(-90deg); }
@@ -7945,30 +8060,58 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   }
 
   .app-tabs-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto !important; /* Override sticky top */
+    z-index: 300;
+    padding: 6px 12px 14px; /* Bottom nav padding with safe area spacing */
+    background: var(--color-surface-card);
+    border-top: 1px solid var(--color-border);
+    border-bottom: none;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(14px);
     display: flex;
     align-items: center;
     gap: 0.45rem;
-    padding: 0.48rem 0.55rem 0.42rem;
-    background: linear-gradient(180deg, rgba(248, 245, 238, 0.98), rgba(248, 245, 238, 0.92));
-    backdrop-filter: blur(14px);
   }
 
   .app-tabs-list {
     flex: 1 1 auto;
     min-width: 0;
-    gap: 0.45rem;
-    padding-bottom: 0.05rem;
+    gap: 0.2rem;
+    padding-bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
   }
 
   .app-tab-btn {
-    min-height: 44px;
-    padding: 0.55rem 0.82rem;
-    border-radius: 16px;
-    font-size: 0.77rem;
+    flex: 1 1 0%;
+    min-height: 48px;
+    padding: 4px 2px;
+    border-radius: 12px;
+    font-size: 0.68rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border-bottom: none !important;
+    background: none !important;
+    transition: color 0.2s, transform 0.1s;
+    color: var(--color-text-muted);
+  }
+
+  .app-tab-btn.active {
+    color: var(--color-accent-teal);
+    font-weight: 700;
   }
 
   .app-tab-btn .tab-icon {
-    font-size: 1.02rem;
+    font-size: 1.15rem;
+    margin-bottom: 1px;
   }
 
   .city-nav {
@@ -9845,4 +9988,306 @@ body.hide-money-figures .compact-inline-meta-cost,
 body.hide-money-figures .sight-inline-meta-cost {
   display: none !important;
 }
+
+/* ========================================== */
+/*   COMPREHENSIVE DARK MODE LEGIBILITY OVERRIDES */
+/* ========================================== */
+[data-theme="dark"] {
+  /* Global Text Legibility overrides for hardcoded dark slate */
+  h1, h2, h3, h4, h5, h6,
+  .leg-header h2,
+  .packing-card h3,
+  .budget-kpi .amount,
+  .guide-header h2,
+  .tutorial-tooltip h4,
+  .map-header h2,
+  .guide-step-title,
+  .city-block h4,
+  .city-block h5,
+  .city-nav-btn,
+  .city-flag,
+  .app-menu-switch-label,
+  .save-status,
+  .timestamp-status,
+  .tutorial-nav,
+  .tutorial-progress,
+  .guide-step-text,
+  .stay-property-name,
+  .stay-detail-value,
+  .transport-mobile-provider,
+  .stay-mobile-location a,
+  .transport-sub-location-value-link,
+  .journey-name-main,
+  .journey-leg-badge,
+  .transport-segment-mobile-route,
+  .transport-segment-mobile-provider-name,
+  .stay-detail-label {
+    color: var(--color-text-primary) !important;
+  }
+
+  /* Secondary/Muted text overrides */
+  .leg-subtitle,
+  .day-desc,
+  .section-header-note,
+  .clock-label,
+  .file-badge-value,
+  .app-menu-actions-panel .app-menu-btn,
+  .guide-details,
+  .guide-content,
+  .tutorial-tooltip p,
+  .map-placeholder-inner p,
+  .journey-stats-panel,
+  .map-legend-title,
+  .stay-detail-label,
+  .transport-detail-label,
+  .transport-segment-mobile-provider-meta,
+  .compact-meta-suffix,
+  .transport-sub-location-label,
+  .stay-meta-checkout {
+    color: var(--color-text-muted) !important;
+  }
+
+  /* Specific Hardcoded Saturated backgrounds and borders */
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #090d16 100%) !important;
+    border-bottom-color: var(--color-border) !important;
+  }
+  
+  header::before {
+    opacity: 0.05;
+  }
+
+  .leg,
+  .day-card,
+  .packing-card,
+  .clock-widget,
+  .mobile-surface-card,
+  .stay-mobile-card,
+  .transport-mobile-card,
+  .journey-modal-panel,
+  .surface-panel--card,
+  .tutorial-tooltip,
+  .app-menu-actions-panel {
+    background-color: var(--color-surface-card) !important;
+    border-color: var(--color-border) !important;
+    box-shadow: var(--shadow-soft) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  /* Inner elements */
+  .day-bar {
+    background: var(--color-bg-secondary) !important;
+    border-bottom-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .compact-grouped-plan section {
+    border-color: var(--color-border) !important;
+  }
+
+  .compact-day-block-title {
+    color: var(--color-text-muted) !important;
+    border-color: var(--color-border) !important;
+  }
+
+  /* Tables & Lists overrides */
+  .data-table-wrapper,
+  .transport-table-wrapper,
+  .accom-table-wrapper,
+  .budget-table-wrapper,
+  .mobile-table-wrapper {
+    background: var(--color-surface-card) !important;
+    border-color: var(--color-border) !important;
+  }
+
+  .data-table,
+  .transport-table,
+  .accom-table,
+  .budget-table,
+  .transport-segment-table {
+    background: var(--color-surface-card) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .data-table th,
+  .transport-table th,
+  .accom-table th,
+  .budget-table th,
+  .transport-mobile-head-row th,
+  .stay-mobile-head-row th,
+  .transport-segment-head th {
+    background: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+  }
+
+  .data-table td,
+  .transport-table td,
+  .accom-table td,
+  .budget-table td,
+  .journey-parent-row td,
+  .stay-parent-row td,
+  .transport-segment-row td {
+    background: var(--color-surface-card) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+  }
+
+  .journey-detail-row td {
+    background: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+  }
+
+  /* Interactive Form controls & Modals */
+  .modal-content {
+    background-color: var(--color-surface-card) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border) !important;
+    box-shadow: var(--shadow-lg) !important;
+  }
+
+  .modal-header,
+  .modal-footer {
+    border-color: var(--color-border) !important;
+    background-color: var(--color-bg-secondary) !important;
+  }
+
+  .form-control,
+  input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  select,
+  textarea {
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border) !important;
+  }
+
+  .form-control:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--color-accent-teal) !important;
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.22) !important;
+    outline: none !important;
+  }
+
+  /* Budget field & KPI boxes */
+  .budget-field {
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+  }
+
+  .budget-kpi {
+    background-color: var(--color-surface-card) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .budget-kpi.grand-total {
+    background: var(--color-accent-teal) !important;
+    color: #0f172a !important; /* High contrast dark text on bright teal kpi */
+    border: none !important;
+  }
+
+  .budget-kpi.grand-total h3,
+  .budget-kpi.grand-total .amount {
+    color: #0f172a !important;
+  }
+
+  /* Drag & Drop suggested list overrides */
+  .suggested-activities-container,
+  .suggested-activity-card {
+    background-color: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .suggested-activity-card:hover {
+    background-color: var(--color-surface-card) !important;
+    border-color: var(--color-accent-teal) !important;
+  }
+
+  /* Details and Summaries */
+  .guide-summary {
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border) !important;
+  }
+
+  .guide-details[open] .guide-summary {
+    border-bottom-color: transparent !important;
+  }
+
+  .tutorial-tooltip {
+    border: 1px solid var(--color-border) !important;
+  }
+
+  /* Mobile menu drawer sheet */
+  .mobile-menu-sheet-panel {
+    background-color: var(--color-surface-card) !important;
+    border-left: 1px solid var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .mobile-menu-section-title {
+    color: var(--color-text-muted) !important;
+    border-bottom-color: var(--color-border) !important;
+  }
+
+  .mobile-menu-trip-status {
+    background-color: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+  }
+
+  .mobile-menu-trip-label {
+    color: var(--color-text-light) !important;
+  }
+
+  .mobile-menu-trip-value {
+    color: var(--color-text-primary) !important;
+  }
+
+  /* Map placeholder & Journey stats Panel */
+  .map-placeholder {
+    background: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-muted) !important;
+  }
+
+  .map-legend {
+    background: var(--color-surface-card) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .journey-stats-panel {
+    background: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  /* Quick action buttons overrides */
+  .add-btn,
+  .action-btn {
+    background-color: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .add-btn:hover,
+  .action-btn:hover {
+    background-color: var(--color-surface-card) !important;
+    border-color: var(--color-accent-teal) !important;
+    color: var(--color-accent-teal) !important;
+  }
+
+  /* Map and Leaflet specific classes */
+  .leaflet-container {
+    background: var(--color-bg-secondary) !important;
+  }
+}
+
 
