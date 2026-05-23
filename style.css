@@ -1282,9 +1282,6 @@ main {
   max-width: 540px;
 }
 
-.activity-assign-modal.modal-lg {
-  max-width: 820px;
-}
 
 .activity-assign-layout {
   display: grid;
@@ -2802,7 +2799,7 @@ main {
     padding: 0;
   }
   .modal-content {
-    max-width: none;
+    max-width: 100% !important;
     max-height: none;
     height: 100dvh;
     border-radius: 0;
@@ -7809,6 +7806,14 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     text-align: center;
     vertical-align: middle;
     padding-right: 0.55rem;
+  }
+
+  body:not(.read-only-mode) .accom-table .stay-actions-col .edit-btn,
+  body:not(.read-only-mode):not(.compact-view-mode) .accom-table .stay-actions-col .del-btn {
+    display: inline-flex !important;
+    opacity: 1 !important;
+    align-items: center;
+    justify-content: center;
   }
 
   .accom-table .stay-actions-col .edit-btn,

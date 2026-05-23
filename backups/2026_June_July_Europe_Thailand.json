@@ -114,6 +114,7 @@
               "cost": "0",
               "time": "1 hr",
               "done": false,
+              "notes": "Go before sunset for the best view",
               "cityId": "city-taipei",
               "startDate": "2026-06-09",
               "endDate": "2026-06-09",
@@ -127,6 +128,7 @@
               "startTime": "12:00",
               "endTime": "14:00",
               "done": false,
+              "notes": "Get ticket number by 11:30 AM",
               "startDate": "2026-06-09",
               "endDate": "2026-06-09",
               "cityId": "city-taipei"
@@ -140,6 +142,7 @@
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
+          "notes": "Go before sunset for the best view",
           "assignedDayIdx": 0,
           "cityId": "city-taipei",
           "assignedDate": "2026-06-09",
@@ -153,19 +156,22 @@
           "category": "sight",
           "estTime": "2 hrs",
           "estCost": "0",
+          "notes": "Get ticket number by 11:30 AM",
           "assignedDayIdx": 0,
           "cityId": "city-taipei",
           "startTime": "12:00",
           "endTime": "14:00",
           "assignedDate": "2026-06-09",
           "startDate": "2026-06-09",
-          "endDate": "2026-06-09"
+          "endDate": "2026-06-09",
+          "done": false
         },
         {
           "title": "Shilin Night Market evening",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
+          "notes": "Try the hot star large fried chicken",
           "assignedDayIdx": null,
           "cityId": "city-taipei",
           "assignedDate": "",
@@ -477,7 +483,7 @@
           "endTime": ""
         },
         {
-          "title": "RS-style: Hlavné Nám → Michael's Gate",
+          "title": "RS-style: Hlavné Nám → Michael's Gate — Bratislava Park",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -487,7 +493,8 @@
           "startTime": "",
           "endDate": "2026-06-11",
           "endTime": "",
-          "cityId": "city-bratislava"
+          "cityId": "city-bratislava",
+          "notes": "Light gear"
         },
         {
           "title": "Devín Castle ruins",
@@ -499,6 +506,19 @@
           "startDate": "2026-06-12",
           "startTime": "",
           "endDate": "2026-06-12",
+          "endTime": "",
+          "cityId": "city-bratislava"
+        },
+        {
+          "title": "RS-style: Hlavné Nám → Michael's Gate",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-11",
+          "startDate": "2026-06-11",
+          "startTime": "",
+          "endDate": "2026-06-11",
           "endTime": "",
           "cityId": "city-bratislava"
         }

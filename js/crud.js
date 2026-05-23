@@ -234,26 +234,36 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       <div class="modal-body">
         <div class="activity-assign-layout">
           <!-- Left Panel -->
-          <div class="activity-assign-summary" style="display:flex; flex-direction:column; gap:0.75rem;">
-            <div class="ai-form-group">
-              <label>Category</label>
-              <select id="activityCategory" class="form-control form-control--compact">
-                <option value="fitness" ${activity?.category === 'fitness' ? 'selected' : ''}>🏃 Fitness</option>
-                <option value="sight" ${!activity || activity.category === 'sight' ? 'selected' : ''}>🏛️ Sight</option>
-                <option value="attraction" ${activity?.category === 'attraction' ? 'selected' : ''}>🎢 Attraction</option>
-                <option value="wellness" ${activity?.category === 'wellness' ? 'selected' : ''}>🧘 Wellness</option>
-                <option value="food" ${activity?.category === 'food' ? 'selected' : ''}>🍽️ Food</option>
-                <option value="tour" ${activity?.category === 'tour' ? 'selected' : ''}>🚌 Tour</option>
-              </select>
+          <div class="activity-assign-summary" style="display:flex; flex-direction:column; gap:0.6rem; padding: 0.85rem;">
+            <div style="display:grid; grid-template-columns:0.35fr 0.65fr; gap:0.5rem;">
+              <div class="ai-form-group">
+                <label>Category</label>
+                <select id="activityCategory" class="form-control form-control--compact">
+                  <option value="fitness" ${activity?.category === 'fitness' ? 'selected' : ''}>🏃 Fitness</option>
+                  <option value="sight" ${!activity || activity.category === 'sight' ? 'selected' : ''}>🏛️ Sight</option>
+                  <option value="attraction" ${activity?.category === 'attraction' ? 'selected' : ''}>🎢 Attraction</option>
+                  <option value="wellness" ${activity?.category === 'wellness' ? 'selected' : ''}>🧘 Wellness</option>
+                  <option value="food" ${activity?.category === 'food' ? 'selected' : ''}>🍽️ Food</option>
+                  <option value="tour" ${activity?.category === 'tour' ? 'selected' : ''}>🚌 Tour</option>
+                </select>
+              </div>
+              <div class="ai-form-group">
+                <label>Description</label>
+                <input type="text" id="activityTitle" class="form-control form-control--compact" placeholder="e.g., Morning yoga" value="${html(defaults.title || activity?.title || '')}">
+              </div>
             </div>
-            <div class="ai-form-group">
-              <label>Description</label>
-              <input type="text" id="activityTitle" class="form-control form-control--compact" placeholder="e.g., Morning yoga" value="${html(defaults.title || activity?.title || '')}">
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+              <div class="ai-form-group">
+                <label>Location</label>
+                <input type="text" id="activityLocation" class="form-control form-control--compact" placeholder="e.g., Central Park" value="${html(defaults.location || '')}">
+              </div>
+              <div class="ai-form-group">
+                <label>Notes</label>
+                <input type="text" id="activityNotes" class="form-control form-control--compact" placeholder="e.g., Book in advance" value="${html(activity?.notes || '')}">
+              </div>
             </div>
-            <div class="ai-form-group">
-              <label>Location</label>
-              <input type="text" id="activityLocation" class="form-control form-control--compact" placeholder="e.g., Central Park" value="${html(defaults.location || '')}">
-            </div>
+
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
               <div class="ai-form-group">
                 <label>Estimated Time</label>
@@ -266,7 +276,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
             </div>
 
             <!-- Schedule Preferences -->
-            <div class="activity-assign-schedule" style="margin-top:0.4rem; padding-top:0.4rem;">
+            <div class="activity-assign-schedule" style="margin-top:0.3rem; padding-top:0.3rem; gap: 0.4rem;">
               <div class="activity-assign-schedule-title">Schedule preference</div>
               <div class="activity-assign-mode">
                 <label>
@@ -286,13 +296,13 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
                 <label>Start <input type="time" id="activityAssignStartTime" value="${html(preferredStart)}"></label>
                 <label>End <input type="time" id="activityAssignEndTime" value="${html(preferredEnd)}"></label>
               </div>
-              <div class="activity-assign-schedule-hint">Suggested uses each day's best open slot. Fixed time calculates the end from duration when left blank.</div>
+              <div class="activity-assign-schedule-hint" style="font-size:0.7rem;">Suggested uses each day's best open slot. Fixed time calculates the end from duration when left blank.</div>
             </div>
 
             <!-- Assignment Info & Remove Button -->
-            <div style="margin-top:0.4rem; padding-top:0.4rem; border-top:1px solid rgba(36, 72, 93, 0.1);">
+            <div style="margin-top:0.3rem; padding-top:0.3rem; border-top:1px solid rgba(36, 72, 93, 0.1);">
               <div class="activity-assign-current">Current assignment: <strong>${html(currentDayLabel)}</strong></div>
-              ${hasCurrentAssignment ? `<button type="button" class="action-btn activity-assign-clear" id="activityAssignClearBtn" style="margin-top:0.5rem;">Move to Suggested Pool (Unassign)</button>` : ''}
+              ${hasCurrentAssignment ? `<button type="button" class="action-btn activity-assign-clear" id="activityAssignClearBtn" style="margin-top:0.4rem;">Move to Suggested Pool (Unassign)</button>` : ''}
             </div>
           </div>
 
@@ -369,12 +379,13 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
     const location = document.getElementById('activityLocation').value.trim();
     const estTime = document.getElementById('activityTime').value.trim() || '1 hr';
     const estCost = document.getElementById('activityCost').value.trim() || '0';
+    const notes = document.getElementById('activityNotes').value.trim();
     if (!title) {
       alert('Please enter a description');
       return null;
     }
     const fullTitle = location ? `${title} — ${location}` : title;
-    return { category, title: fullTitle, estTime, estCost };
+    return { category, title: fullTitle, estTime, estCost, notes };
   };
 
   modal.querySelectorAll('[data-day-index]').forEach(button => {
@@ -406,6 +417,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
         target.title = formData.title;
         target.estTime = formData.estTime;
         target.estCost = formData.estCost;
+        target.notes = formData.notes;
       }
 
       const assigned = assignSuggestedActivityToDay(legIdx, targetIdx, legIdx, targetDayIdx, getScheduleOptions(button));
@@ -432,6 +444,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       target.title = formData.title;
       target.estTime = formData.estTime;
       target.estCost = formData.estCost;
+      target.notes = formData.notes;
 
       const cleared = clearAssignedSuggestedActivityFromDay(legIdx, activityIdx);
       if (!cleared) return;
@@ -471,6 +484,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       target.title = formData.title;
       target.estTime = formData.estTime;
       target.estCost = formData.estCost;
+      target.notes = formData.notes;
 
       if (target.assignedDayIdx !== null && target.assignedDayIdx !== undefined) {
         const day = leg.days[target.assignedDayIdx];
@@ -491,6 +505,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
               item.text = getSuggestedActivityDayText(target);
               item.time = formData.estTime;
               item.cost = formData.estCost;
+              item.notes = formData.notes;
               applyActivityScheduleFields(item, day, datedSchedule);
             }
           });
@@ -624,6 +639,7 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
       category: category,
       estTime: item.time || '1 hr',
       estCost: item.cost || '0',
+      notes: item.notes || '',
       assignedDayIdx: dayIdx,
       assignedDate: day.date || '',
       startDate: item.startDate || day.date || '',
@@ -1183,11 +1199,13 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
       text: assignedText,
       cost: activity.estCost || '0',
       time: activity.estTime || '1 hr',
-      done: false
+      done: false,
+      notes: activity.notes || ''
     };
     applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
     targetDay.activityItems.push(targetItem);
   } else {
+    targetItem.notes = activity.notes || '';
     applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
   }
 

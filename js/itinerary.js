@@ -1199,6 +1199,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       subLocations: activityLoc,
       meta: [item.time || ''].filter(Boolean).join(' · '),
       cost: item.cost,
+      notes: item.notes || '',
       done: !!item.done,
       startTime: item.startTime || '',
       endTime: item.endTime || '',
@@ -1259,6 +1260,7 @@ function renderDailyTimelineRow(item, compact = false) {
           </div>
         </div>
         ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> · ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
+        ${item.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8;">💬 ${escapeCompactText(item.notes)}</div>` : ''}
         ${item.subLocations ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
@@ -1650,7 +1652,8 @@ function buildItinerary() {
       const badgeIcon = isCompleted ? '✓' : '✓';
       const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
       const categoryEmoji = getCategoryEmoji(activity.category);
-      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span></span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
+      const notesMetaHtml = activity.notes ? ` · <span class="sight-inline-meta-notes" style="font-style:italic; color:var(--muted);" title="${escapeHtmlText(activity.notes)}">💬 ${escapeHtmlText(activity.notes)}</span>` : '';
+      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span>${notesMetaHtml}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
     }).join('')}</ul>
         <button class="add-btn" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
       </div>
@@ -1781,6 +1784,7 @@ ${(() => {
                 return `Location: ${loc}`;
               })() : '';
               const locHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
+              const notesHtml = item.notes ? `<div class="daily-timeline-notes" style="font-size:0.72rem; color:var(--muted); font-style:italic; padding-left:0; margin-top:2px;">💬 ${escapeCompactText(item.notes)}</div>` : '';
               return `
                 <div class="cost-item">
                   <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
@@ -1790,6 +1794,7 @@ ${(() => {
                       <span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${split.title}</span>
                     </div>
                     ${locHtml}
+                    ${notesHtml}
                   </div>
                   ${isEditMode
                     ? `<span class="budget-field budget-field--clickable" style="color:#666; cursor:pointer;" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">⏱ <span>${item.time || '1 hr'}</span></span>`
