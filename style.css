@@ -10117,534 +10117,638 @@ body.hide-money-figures .sight-inline-meta-cost {
 /* ========================================== */
 /*   COMPREHENSIVE DARK MODE LEGIBILITY OVERRIDES */
 /* ========================================== */
-[data-theme="dark"] {
-  /* Global Text Legibility overrides for hardcoded dark slate */
-  h1, h2, h3, h4, h5, h6,
-  .leg-header h2,
-  .packing-card h3,
-  .budget-kpi .amount,
-  .guide-header h2,
-  .tutorial-tooltip h4,
-  .map-header h2,
-  .guide-step-title,
-  .city-block h4,
-  .city-block h5,
-  .city-nav-btn,
-  .city-flag,
-  .app-menu-switch-label,
-  .save-status,
-  .timestamp-status,
-  .tutorial-nav,
-  .tutorial-progress,
-  .guide-step-text,
-  .stay-property-name,
-  .stay-detail-value,
-  .transport-mobile-provider,
-  .stay-mobile-location a,
-  .transport-sub-location-value-link,
-  .journey-name-main,
-  .journey-leg-badge,
-  .transport-segment-mobile-route,
-  .transport-segment-mobile-provider-name,
-  .stay-detail-label {
-    color: var(--color-text-primary) !important;
-  }
-
-  /* Secondary/Muted text overrides */
-  .leg-subtitle,
-  .day-desc,
-  .section-header-note,
-  .clock-label,
-  .file-badge-value,
-  .app-menu-actions-panel .app-menu-btn,
-  .guide-details,
-  .guide-content,
-  .tutorial-tooltip p,
-  .map-placeholder-inner p,
-  .journey-stats-panel,
-  .map-legend-title,
-  .stay-detail-label,
-  .transport-detail-label,
-  .transport-segment-mobile-provider-meta,
-  .compact-meta-suffix,
-  .transport-sub-location-label,
-  .stay-meta-checkout {
-    color: var(--color-text-muted) !important;
-  }
-
-  /* Specific Hardcoded Saturated backgrounds and borders */
-  header {
-    background: linear-gradient(135deg, #0f172a 0%, #090d16 100%) !important;
-    border-bottom-color: var(--color-border) !important;
-  }
-  
-  header::before {
-    opacity: 0.05;
-  }
-
-  .leg,
-  .day-card,
-  .packing-card,
-  .clock-widget,
-  .mobile-surface-card,
-  .stay-mobile-card,
-  .transport-mobile-card,
-  .journey-modal-panel,
-  .surface-panel--card,
-  .tutorial-tooltip,
-  .app-menu-actions-panel {
-    background: var(--color-surface-card) !important; /* Overrides light linear-gradients cleanly! */
-    border-color: var(--color-border) !important;
-    box-shadow: var(--shadow-soft) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  /* Mobile Swipe Chips (City Nav Swipe) */
-  .mobile-swipe-chip {
-    background: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-  .mobile-swipe-chip.active {
-    background: var(--color-surface-card) !important;
-    border-color: var(--color-accent-teal) !important;
-    color: var(--color-text-primary) !important;
-  }
-  .mobile-swipe-chip-eyebrow,
-  .mobile-swipe-chip-title,
-  .mobile-swipe-chip-route {
-    color: inherit !important;
-  }
-
-  /* Compact Day Swipe Chips */
-  .compact-day-chip {
-    background: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-  .compact-day-chip.active {
-    background: var(--color-surface-card) !important;
-    border-color: var(--color-accent-teal) !important;
-    color: var(--color-text-primary) !important;
-  }
-  .compact-day-chip-day,
-  .compact-day-chip-date,
-  .compact-day-chip-route {
-    color: inherit !important;
-  }
-
-  /* Compact Mobile Info Chips (Tips, Food, Activities) */
-  .compact-mobile-info-chip {
-    background: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-  .compact-mobile-info-chip.is-active {
-    background: var(--color-surface-card) !important;
-    border-color: var(--color-accent-teal) !important;
-    color: var(--color-text-primary) !important;
-  }
-  .compact-mobile-info-chip-title {
-    color: inherit !important;
-  }
-  .compact-mobile-info-chip-count {
-    color: var(--color-accent-teal) !important;
-    background: rgba(34, 211, 238, 0.12) !important;
-    border-color: rgba(34, 211, 238, 0.25) !important;
-  }
-  .compact-mobile-info-progress {
-    background: rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Compact Mobile Info Panels (Expanded Content Blocks) */
-  .compact-mobile-info-panel {
-    background: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-  .compact-mobile-info-panel-tips,
-  .compact-mobile-info-panel-food,
-  .compact-mobile-info-panel-activities {
-    background: var(--color-bg-secondary) !important;
-    color: var(--color-text-primary) !important;
-  }
-  
-  /* Detailed Day Card Expanded Detail Panel */
-  .day-detail {
-    background: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  /* Inner elements */
-  .day-bar {
-    background: var(--color-bg-secondary) !important;
-    border-bottom-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  .compact-grouped-plan section {
-    border-color: var(--color-border) !important;
-  }
-
-  .compact-day-block-title {
-    color: var(--color-text-muted) !important;
-    border-color: var(--color-border) !important;
-  }
-
-  /* Tables & Lists overrides */
-  .data-table-wrapper,
-  .transport-table-wrapper,
-  .accom-table-wrapper,
-  .budget-table-wrapper,
-  .mobile-table-wrapper {
-    background: var(--color-surface-card) !important;
-    border-color: var(--color-border) !important;
-  }
-
-  .data-table,
-  .transport-table,
-  .accom-table,
-  .budget-table,
-  .transport-segment-table {
-    background: var(--color-surface-card) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  .data-table th,
-  .transport-table th,
-  .accom-table th,
-  .budget-table th,
-  .transport-mobile-head-row th,
-  .stay-mobile-head-row th,
-  .transport-segment-head th {
-    background: var(--color-bg-secondary) !important;
-    color: var(--color-text-primary) !important;
-    border-color: var(--color-border) !important;
-  }
-
-  .data-table td,
-  .transport-table td,
-  .accom-table td,
-  .budget-table td,
-  .journey-parent-row td,
-  .stay-parent-row td,
-  .transport-segment-row td {
-    background: var(--color-surface-card) !important;
-    color: var(--color-text-primary) !important;
-    border-color: var(--color-border) !important;
-  }
-
-  .journey-detail-row td {
-    background: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-  }
-
-  /* Interactive Form controls & Modals */
-  .modal-content {
-    background-color: var(--color-surface-card) !important;
-    color: var(--color-text-primary) !important;
-    border: 1px solid var(--color-border) !important;
-    box-shadow: var(--shadow-lg) !important;
-  }
-
-  .modal-header,
-  .modal-footer {
-    border-color: var(--color-border) !important;
-    background-color: var(--color-bg-secondary) !important;
-  }
-
-  .form-control,
-  input[type="text"],
-  input[type="date"],
-  input[type="time"],
-  input[type="number"],
-  select,
-  textarea {
-    background-color: var(--color-bg-secondary) !important;
-    color: var(--color-text-primary) !important;
-    border: 1px solid var(--color-border) !important;
-  }
-
-  .form-control:focus,
-  input:focus,
-  select:focus,
-  textarea:focus {
-    border-color: var(--color-accent-teal) !important;
-    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.22) !important;
-    outline: none !important;
-  }
-
-  /* Budget field & KPI boxes */
-  .budget-field {
-    background-color: var(--color-bg-secondary) !important;
-    color: var(--color-text-primary) !important;
-    border-color: var(--color-border) !important;
-  }
-
-  .budget-kpi {
-    background-color: var(--color-surface-card) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  .budget-kpi.grand-total {
-    background: var(--color-accent-teal) !important;
-    color: #0f172a !important; /* High contrast dark text on bright teal kpi */
-    border: none !important;
-  }
-
-  .budget-kpi.grand-total h3,
-  .budget-kpi.grand-total .amount {
-    color: #0f172a !important;
-  }
-
-  /* Drag & Drop suggested list overrides */
-  .suggested-activities-container,
-  .suggested-activity-card {
-    background-color: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  .suggested-activity-card:hover {
-    background-color: var(--color-surface-card) !important;
-    border-color: var(--color-accent-teal) !important;
-  }
-
-  /* Details and Summaries */
-  .guide-summary {
-    background-color: var(--color-bg-secondary) !important;
-    color: var(--color-text-primary) !important;
-    border: 1px solid var(--color-border) !important;
-  }
-
-  .guide-details[open] .guide-summary {
-    border-bottom-color: transparent !important;
-  }
-
-  .tutorial-tooltip {
-    border: 1px solid var(--color-border) !important;
-  }
-
-  /* Mobile menu drawer sheet */
-  .mobile-menu-sheet-panel {
-    background-color: var(--color-surface-card) !important;
-    border-left: 1px solid var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  .mobile-menu-section-title {
-    color: var(--color-text-muted) !important;
-    border-bottom-color: var(--color-border) !important;
-  }
-
-  .mobile-menu-trip-status {
-    background-color: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-  }
-
-  .mobile-menu-trip-label {
-    color: var(--color-text-light) !important;
-  }
-
-  .mobile-menu-trip-value {
-    color: var(--color-text-primary) !important;
-  }
-
-  /* Map placeholder & Journey stats Panel */
-  .map-placeholder {
-    background: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-muted) !important;
-  }
-
-  .map-legend {
-    background: var(--color-surface-card) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  .journey-stats-panel {
-    background: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  /* Quick action buttons overrides */
-  .add-btn,
-  .action-btn {
-    background-color: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  .add-btn:hover,
-  .action-btn:hover {
-    background-color: var(--color-surface-card) !important;
-    border-color: var(--color-accent-teal) !important;
-    color: var(--color-accent-teal) !important;
-  }
-
-  /* Map and Leaflet specific classes */
-  .leaflet-container {
-    background: var(--color-bg-secondary) !important;
-  }
-
-  /* Compact leg cards standard premium styling in dark mode */
-  .compact-leg-card,
-  body.compact-view-mode .compact-leg-card {
-    background: var(--color-surface-card) !important;
-    border: 1px solid var(--color-border) !important;
-    border-left: 6px solid var(--leg-accent, var(--color-border)) !important;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-
-  [data-theme="dark"] .compact-leg-header,
-  [data-theme="dark"] .leg-header.compact-leg-header,
-  .compact-leg-card .compact-leg-header,
-  body.compact-view-mode .compact-leg-card .compact-leg-header {
-    background: transparent !important;
-    border-bottom: 1px solid var(--color-border) !important;
-  }
-
-  .compact-leg-date,
-  .compact-leg-label,
-  body.compact-view-mode .compact-leg-date,
-  body.compact-view-mode .compact-leg-label {
-    color: var(--color-text-primary) !important;
-  }
-
-  .compact-leg-card .compact-leg-night-count,
-  .compact-leg-card .compact-leg-header-hint,
-  body.compact-view-mode .compact-leg-card .compact-leg-night-count,
-  body.compact-view-mode .compact-leg-card .compact-leg-header-hint {
-    color: var(--color-text-muted) !important;
-  }
-
-  /* Cost badges and meta costs in dark mode */
-  .compact-leg-cost-badge,
-  body.compact-view-mode .compact-leg-cost-badge {
-    background: var(--color-bg-secondary) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  .leg-cost-total-badge {
-    background: var(--color-bg-secondary) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  .timeline-inline-meta-cost,
-  .compact-inline-meta-cost,
-  .sight-inline-meta-cost,
-  .accom-inline-meta-cost {
-    color: var(--color-text-muted) !important;
-  }
-
-  .day-total-cost {
-    background: var(--color-bg-secondary) !important;
-    color: var(--color-text-primary) !important;
-    border-color: var(--color-border) !important;
-  }
-
-  /* City nav overflow indicators - dark mode */
-  .city-nav::before,
-  .city-nav::after {
-    background: linear-gradient(270deg, var(--color-bg-primary) 0%, var(--color-bg-primary) 55%, rgba(9, 13, 22, 0) 100%) !important;
-    color: var(--color-text-muted) !important;
-    text-shadow: none !important;
-    box-shadow: none !important;
-  }
-
-  .city-nav-list {
-    padding-left: 0.5rem !important;
-  }
-
-  /* Top app menu bar - Dark gradient override */
-  .app-menu-bar {
-    background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important;
-  }
-
-  /* JSON Write Warning - Dark mode */
-  .json-write-warning {
-    background: var(--color-bg-secondary) !important;
-    border-bottom-color: var(--color-border-strong) !important;
-    color: var(--color-text-primary) !important;
-  }
-
-  .json-write-warning button {
-    background: var(--color-surface-card) !important;
-    color: var(--color-text-primary) !important;
-    border-color: var(--color-border) !important;
-  }
-
-  .json-write-warning button:hover {
-    background: var(--color-bg-secondary) !important;
-  }
-
-  /* Tab active indicators and border overrides */
-  .app-tab-btn.active {
-    border-bottom-color: var(--color-accent-teal) !important;
-  }
-
-  /* Form inputs in dark mode */
-  input, textarea, select {
-    background-color: var(--color-surface-input) !important;
-    color: var(--color-text-primary) !important;
-    border-color: var(--color-border) !important;
-  }
-
-  input:focus, textarea:focus, select:focus {
-    border-color: var(--color-accent-teal) !important;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2) !important;
-  }
-
-  /* Buttons - primary */
-  button:not(.app-menu-btn):not(.add-btn):not(.action-btn):not(.app-tab-btn):not(.city-nav-btn):not(.compact-mobile-info-chip):not(.compact-day-chip):not(.mobile-swipe-chip) {
-    background-color: var(--color-accent-teal) !important;
-    color: #000 !important;
-    border-color: var(--color-accent-teal) !important;
-  }
-
-  button:not(.app-menu-btn):not(.add-btn):not(.action-btn):not(.app-tab-btn):not(.city-nav-btn):not(.compact-mobile-info-chip):not(.compact-day-chip):not(.mobile-swipe-chip):hover {
-    background-color: var(--color-accent-teal-hover) !important;
-    border-color: var(--color-accent-teal-hover) !important;
-  }
-
-  /* Secondary/Ghost buttons */
-  button.secondary, .secondary-btn {
-    background-color: var(--color-bg-secondary) !important;
-    color: var(--color-text-primary) !important;
-    border-color: var(--color-border) !important;
-  }
-
-  /* Modal/Dialog overlays */
-  .modal-overlay, dialog::backdrop {
-    background: rgba(0, 0, 0, 0.6) !important;
-  }
-
-  dialog, .modal-panel {
-    background: var(--color-surface-card) !important;
-    color: var(--color-text-primary) !important;
-    border: 1px solid var(--color-border) !important;
-  }
-
-  /* Scrollbar styling for dark mode */
-  ::-webkit-scrollbar-track {
-    background: var(--color-bg-secondary) !important;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-border-strong) !important;
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-text-light) !important;
-  }
+/* Global Text Legibility overrides for hardcoded dark slate */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] .leg-header h2,
+[data-theme="dark"] .packing-card h3,
+[data-theme="dark"] .budget-kpi .amount,
+[data-theme="dark"] .guide-header h2,
+[data-theme="dark"] .tutorial-tooltip h4,
+[data-theme="dark"] .map-header h2,
+[data-theme="dark"] .guide-step-title,
+[data-theme="dark"] .city-block h4,
+[data-theme="dark"] .city-block h5,
+[data-theme="dark"] .city-nav-btn,
+[data-theme="dark"] .city-flag,
+[data-theme="dark"] .app-menu-switch-label,
+[data-theme="dark"] .save-status,
+[data-theme="dark"] .timestamp-status,
+[data-theme="dark"] .tutorial-nav,
+[data-theme="dark"] .tutorial-progress,
+[data-theme="dark"] .guide-step-text,
+[data-theme="dark"] .stay-property-name,
+[data-theme="dark"] .stay-detail-value,
+[data-theme="dark"] .transport-mobile-provider,
+[data-theme="dark"] .stay-mobile-location a,
+[data-theme="dark"] .transport-sub-location-value-link,
+[data-theme="dark"] .journey-name-main,
+[data-theme="dark"] .journey-leg-badge,
+[data-theme="dark"] .transport-segment-mobile-route,
+[data-theme="dark"] .transport-segment-mobile-provider-name,
+[data-theme="dark"] .stay-detail-label {
+  color: var(--color-text-primary) !important;
+}
+
+/* Secondary/Muted text overrides */
+[data-theme="dark"] .leg-subtitle,
+[data-theme="dark"] .day-desc,
+[data-theme="dark"] .section-header-note,
+[data-theme="dark"] .clock-label,
+[data-theme="dark"] .file-badge-value,
+[data-theme="dark"] .app-menu-actions-panel .app-menu-btn,
+[data-theme="dark"] .guide-details,
+[data-theme="dark"] .guide-content,
+[data-theme="dark"] .tutorial-tooltip p,
+[data-theme="dark"] .map-placeholder-inner p,
+[data-theme="dark"] .journey-stats-panel,
+[data-theme="dark"] .map-legend-title,
+[data-theme="dark"] .stay-detail-label,
+[data-theme="dark"] .transport-detail-label,
+[data-theme="dark"] .transport-segment-mobile-provider-meta,
+[data-theme="dark"] .compact-meta-suffix,
+[data-theme="dark"] .transport-sub-location-label,
+[data-theme="dark"] .stay-meta-checkout {
+  color: var(--color-text-muted) !important;
+}
+
+/* Specific Hardcoded Saturated backgrounds and borders */
+[data-theme="dark"] header {
+  background: linear-gradient(135deg, #0f172a 0%, #090d16 100%) !important;
+  border-bottom-color: var(--color-border) !important;
+}
+[data-theme="dark"] header::before {
+  opacity: 0.05;
+}
+
+[data-theme="dark"] .leg,
+[data-theme="dark"] .day-card,
+[data-theme="dark"] .packing-card,
+[data-theme="dark"] .clock-widget,
+[data-theme="dark"] .mobile-surface-card,
+[data-theme="dark"] .stay-mobile-card,
+[data-theme="dark"] .transport-mobile-card,
+[data-theme="dark"] .journey-modal-panel,
+[data-theme="dark"] .surface-panel--card,
+[data-theme="dark"] .tutorial-tooltip,
+[data-theme="dark"] .app-menu-actions-panel {
+  background: var(--color-surface-card) !important; /* Overrides light linear-gradients cleanly! */
+  border-color: var(--color-border) !important;
+  box-shadow: var(--shadow-soft) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Mobile Swipe Chips (City Nav Swipe) */
+[data-theme="dark"] .mobile-swipe-chip {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+[data-theme="dark"] .mobile-swipe-chip.active {
+  background: var(--color-surface-card) !important;
+  border-color: var(--color-accent-teal) !important;
+  color: var(--color-text-primary) !important;
+}
+[data-theme="dark"] .mobile-swipe-chip-eyebrow,
+[data-theme="dark"] .mobile-swipe-chip-title,
+[data-theme="dark"] .mobile-swipe-chip-route {
+  color: inherit !important;
+}
+
+/* Compact Day Swipe Chips */
+[data-theme="dark"] .compact-day-chip {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+[data-theme="dark"] .compact-day-chip.active {
+  background: var(--color-surface-card) !important;
+  border-color: var(--color-accent-teal) !important;
+  color: var(--color-text-primary) !important;
+}
+[data-theme="dark"] .compact-day-chip-day,
+[data-theme="dark"] .compact-day-chip-date,
+[data-theme="dark"] .compact-day-chip-route {
+  color: inherit !important;
+}
+
+/* Compact Mobile Info Chips (Tips, Food, Activities) */
+[data-theme="dark"] .compact-mobile-info-chip {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+[data-theme="dark"] .compact-mobile-info-chip.is-active {
+  background: var(--color-surface-card) !important;
+  border-color: var(--color-accent-teal) !important;
+  color: var(--color-text-primary) !important;
+}
+[data-theme="dark"] .compact-mobile-info-chip-title {
+  color: inherit !important;
+}
+[data-theme="dark"] .compact-mobile-info-chip-count {
+  color: var(--color-accent-teal) !important;
+  background: rgba(34, 211, 238, 0.12) !important;
+  border-color: rgba(34, 211, 238, 0.25) !important;
+}
+[data-theme="dark"] .compact-mobile-info-progress {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Compact Mobile Info Panels (Expanded Content Blocks) */
+[data-theme="dark"] .compact-mobile-info-panel {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+[data-theme="dark"] .compact-mobile-info-panel-tips,
+[data-theme="dark"] .compact-mobile-info-panel-food,
+[data-theme="dark"] .compact-mobile-info-panel-activities {
+  background: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Detailed Day Card Expanded Detail Panel */
+[data-theme="dark"] .day-detail {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Inner elements */
+[data-theme="dark"] .day-bar {
+  background: var(--color-bg-secondary) !important;
+  border-bottom-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .compact-grouped-plan section {
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .compact-day-block-title {
+  color: var(--color-text-muted) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Tables & Lists overrides */
+[data-theme="dark"] .data-table-wrapper,
+[data-theme="dark"] .transport-table-wrapper,
+[data-theme="dark"] .accom-table-wrapper,
+[data-theme="dark"] .budget-table-wrapper,
+[data-theme="dark"] .mobile-table-wrapper {
+  background: var(--color-surface-card) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .data-table,
+[data-theme="dark"] .transport-table,
+[data-theme="dark"] .accom-table,
+[data-theme="dark"] .budget-table,
+[data-theme="dark"] .transport-segment-table {
+  background: var(--color-surface-card) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .data-table th,
+[data-theme="dark"] .transport-table th,
+[data-theme="dark"] .accom-table th,
+[data-theme="dark"] .budget-table th,
+[data-theme="dark"] .transport-mobile-head-row th,
+[data-theme="dark"] .stay-mobile-head-row th,
+[data-theme="dark"] .transport-segment-head th {
+  background: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .data-table td,
+[data-theme="dark"] .transport-table td,
+[data-theme="dark"] .accom-table td,
+[data-theme="dark"] .budget-table td,
+[data-theme="dark"] .journey-parent-row td,
+[data-theme="dark"] .stay-parent-row td,
+[data-theme="dark"] .transport-segment-row td {
+  background: var(--color-surface-card) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .journey-detail-row td {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Interactive Form controls & Modals */
+[data-theme="dark"] .modal-content {
+  background-color: var(--color-surface-card) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+  border-color: var(--color-border) !important;
+  background-color: var(--color-bg-secondary) !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="date"],
+[data-theme="dark"] input[type="time"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus {
+  border-color: var(--color-accent-teal) !important;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.22) !important;
+  outline: none !important;
+}
+
+/* Budget field & KPI boxes */
+[data-theme="dark"] .budget-field {
+  background-color: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .budget-kpi {
+  background-color: var(--color-surface-card) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .budget-kpi.grand-total {
+  background: var(--color-accent-teal) !important;
+  color: #0f172a !important;
+  border: none !important;
+}
+
+[data-theme="dark"] .budget-kpi.grand-total h3,
+[data-theme="dark"] .budget-kpi.grand-total .amount {
+  color: #0f172a !important;
+}
+
+/* Drag & Drop suggested list overrides */
+[data-theme="dark"] .suggested-activities-container,
+[data-theme="dark"] .suggested-activity-card {
+  background-color: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .suggested-activity-card:hover {
+  background-color: var(--color-surface-card) !important;
+  border-color: var(--color-accent-teal) !important;
+}
+
+/* Details and Summaries */
+[data-theme="dark"] .guide-summary {
+  background-color: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+[data-theme="dark"] .guide-details[open] .guide-summary {
+  border-bottom-color: transparent !important;
+}
+
+[data-theme="dark"] .tutorial-tooltip {
+  border: 1px solid var(--color-border) !important;
+}
+
+/* Mobile menu drawer sheet */
+[data-theme="dark"] .mobile-menu-sheet-panel {
+  background-color: var(--color-surface-card) !important;
+  border-left: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .mobile-menu-section-title {
+  color: var(--color-text-muted) !important;
+  border-bottom-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .mobile-menu-trip-status {
+  background-color: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .mobile-menu-trip-label {
+  color: var(--color-text-light) !important;
+}
+
+[data-theme="dark"] .mobile-menu-trip-value {
+  color: var(--color-text-primary) !important;
+}
+
+/* Map placeholder & Journey stats Panel */
+[data-theme="dark"] .map-placeholder {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-muted) !important;
+}
+
+[data-theme="dark"] .map-legend {
+  background: var(--color-surface-card) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .journey-stats-panel {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Quick action buttons overrides */
+[data-theme="dark"] .add-btn,
+[data-theme="dark"] .action-btn {
+  background-color: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .add-btn:hover,
+[data-theme="dark"] .action-btn:hover {
+  background-color: var(--color-surface-card) !important;
+  border-color: var(--color-accent-teal) !important;
+  color: var(--color-accent-teal) !important;
+}
+
+/* Map and Leaflet specific classes */
+[data-theme="dark"] .leaflet-container {
+  background: var(--color-bg-secondary) !important;
+}
+
+/* Compact leg cards standard premium styling in dark mode */
+[data-theme="dark"] .compact-leg-card,
+body.compact-view-mode[data-theme="dark"] .compact-leg-card {
+  background: var(--color-surface-card) !important;
+  border: 1px solid var(--color-border) !important;
+  border-left: 6px solid var(--leg-accent, var(--color-border)) !important;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+[data-theme="dark"] .compact-leg-header,
+[data-theme="dark"] .leg-header.compact-leg-header,
+[data-theme="dark"] .compact-leg-card .compact-leg-header,
+body.compact-view-mode[data-theme="dark"] .compact-leg-card .compact-leg-header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+[data-theme="dark"] .compact-leg-date,
+[data-theme="dark"] .compact-leg-label,
+body.compact-view-mode[data-theme="dark"] .compact-leg-date,
+body.compact-view-mode[data-theme="dark"] .compact-leg-label {
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .compact-leg-card .compact-leg-night-count,
+[data-theme="dark"] .compact-leg-card .compact-leg-header-hint,
+body.compact-view-mode[data-theme="dark"] .compact-leg-card .compact-leg-night-count,
+body.compact-view-mode[data-theme="dark"] .compact-leg-card .compact-leg-header-hint {
+  color: var(--color-text-muted) !important;
+}
+
+/* Cost badges and meta costs in dark mode */
+[data-theme="dark"] .compact-leg-cost-badge,
+body.compact-view-mode[data-theme="dark"] .compact-leg-cost-badge {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .leg-cost-total-badge {
+  background: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .timeline-inline-meta-cost,
+[data-theme="dark"] .compact-inline-meta-cost,
+[data-theme="dark"] .sight-inline-meta-cost,
+[data-theme="dark"] .accom-inline-meta-cost {
+  color: var(--color-text-muted) !important;
+}
+
+[data-theme="dark"] .day-total-cost {
+  background: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* City nav overflow indicators - dark mode */
+[data-theme="dark"] .city-nav::before,
+[data-theme="dark"] .city-nav::after {
+  background: linear-gradient(270deg, var(--color-bg-primary) 0%, var(--color-bg-primary) 55%, rgba(9, 13, 22, 0) 100%) !important;
+  color: var(--color-text-muted) !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+[data-theme="dark"] .city-nav-list {
+  padding-left: 0.5rem !important;
+}
+
+/* Top app menu bar - Dark gradient override */
+[data-theme="dark"] .app-menu-bar {
+  background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important;
+}
+
+/* JSON Write Warning - Dark mode */
+[data-theme="dark"] .json-write-warning {
+  background: var(--color-bg-secondary) !important;
+  border-bottom-color: var(--color-border-strong) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .json-write-warning button {
+  background: var(--color-surface-card) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .json-write-warning button:hover {
+  background: var(--color-bg-secondary) !important;
+}
+
+/* Tab active indicators and border overrides */
+[data-theme="dark"] .app-tab-btn.active {
+  border-bottom-color: var(--color-accent-teal) !important;
+}
+
+/* Form inputs in dark mode */
+[data-theme="dark"] input, 
+[data-theme="dark"] textarea, 
+[data-theme="dark"] select {
+  background-color: var(--color-surface-input) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] input:focus, 
+[data-theme="dark"] textarea:focus, 
+[data-theme="dark"] select:focus {
+  border-color: var(--color-accent-teal) !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2) !important;
+}
+
+/* Buttons - primary */
+[data-theme="dark"] button:not(.app-menu-btn):not(.add-btn):not(.action-btn):not(.app-tab-btn):not(.city-nav-btn):not(.compact-mobile-info-chip):not(.compact-day-chip):not(.mobile-swipe-chip) {
+  background-color: var(--color-accent-teal) !important;
+  color: #000 !important;
+  border-color: var(--color-accent-teal) !important;
+}
+
+[data-theme="dark"] button:not(.app-menu-btn):not(.add-btn):not(.action-btn):not(.app-tab-btn):not(.city-nav-btn):not(.compact-mobile-info-chip):not(.compact-day-chip):not(.mobile-swipe-chip):hover {
+  background-color: var(--color-accent-teal-hover) !important;
+  border-color: var(--color-accent-teal-hover) !important;
+}
+
+/* Secondary/Ghost buttons */
+[data-theme="dark"] button.secondary, 
+[data-theme="dark"] .secondary-btn {
+  background-color: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Modal/Dialog overlays */
+[data-theme="dark"] .modal-overlay, 
+[data-theme="dark"] dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="dark"] dialog, 
+[data-theme="dark"] .modal-panel {
+  background: var(--color-surface-card) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+/* Webkit Scrollbars in dark mode */
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary) !important;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong) !important;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-light) !important;
+}
+
+/* ========================================== */
+/*   DAILY TIMELINE & WORK ITEMS OVERRIDES    */
+/* ========================================== */
+
+/* Timeline background panels and high-contrast texts */
+[data-theme="dark"] .daily-timeline-content {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .daily-timeline-time {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .daily-timeline-marker {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  box-shadow: rgba(15, 23, 42, 0.94) 0px 0px 0px 4px !important;
+}
+
+[data-theme="dark"] .daily-timeline-marker.is-clickable:hover {
+  background-color: var(--color-surface-card) !important;
+  border-color: var(--color-accent-teal) !important;
+  box-shadow: rgba(34, 211, 238, 0.28) 0px 0px 0px 4px !important;
+}
+
+[data-theme="dark"] .daily-timeline-type {
+  color: var(--color-accent-teal) !important;
+}
+
+[data-theme="dark"] .daily-timeline-title {
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .daily-timeline-meta {
+  color: var(--color-text-muted) !important;
+}
+
+[data-theme="dark"] .daily-timeline-notes {
+  color: var(--color-text-muted) !important;
+}
+
+[data-theme="dark"] .timeline-section-label {
+  color: var(--color-accent-teal) !important;
+}
+
+[data-theme="dark"] .daily-timeline-summary {
+  color: var(--color-text-muted) !important;
+}
+
+[data-theme="dark"] .daily-timeline-checkbox {
+  border-color: var(--color-border) !important;
+  background-color: var(--color-surface-input) !important;
+}
+
+/* ========================================== */
+/*   COMPACT MOBILE ACTIVITIES PANEL OVERRIDES */
+/* ========================================== */
+
+/* Expanded suggested activities list items */
+[data-theme="dark"] .compact-suggested-activity-item {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .compact-suggested-activity-text {
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .compact-suggested-activity-meta {
+  color: var(--color-text-muted) !important;
+}
+
+[data-theme="dark"] .compact-suggested-activity-cost {
+  color: var(--color-accent-teal) !important;
+}
+
+[data-theme="dark"] .compact-activity-action-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .compact-activity-action-btn:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: var(--color-accent-teal) !important;
+}
+
+[data-theme="dark"] .compact-activities-summary-count {
+  color: var(--color-text-muted) !important;
 }
 
 /* ==========================================================================
