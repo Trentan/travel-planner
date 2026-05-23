@@ -2,13 +2,13 @@
 
 ---
 
-## 🔄 RESUME HERE - Last Updated: 2026-05-23
+## 🔄 RESUME HERE - Last Updated: 2026-05-24
 
-**Current Phase**: Phase 3 Batch B - Navigation & Layout
+**Current Phase**: Phase 3 Batch B - Partial Complete
 
-**Ready to start**: Menu Bar, Header, City Nav, Tabs, Mobile Menu
+**Ready to continue**: Finish remaining navigation components, then Batch C (Content)
 
-See "What's Done" section below for completed Batch A work.
+See "What's Done" section below for completed work.
 
 ---
 
@@ -29,17 +29,18 @@ See "What's Done" section below for completed Batch A work.
 
 ### Phase 3 Batch A - Foundation: COMPLETE ✅
 
-- [x] **Buttons (.action-btn)** - commit `f01a0f1`
+- [x] **Buttons** - commit `f01a0f1`
 - [x] **Form Controls** - commit `dcef97f`
-  - form-control base + variants (muted, compact, panel, mono)
-  - checkbox styling
-  - add-btn (dashed)
 - [x] **Modals** - commit `fcf487f`
-  - modal-overlay, modal-content (with size variants)
-  - modal-header, modal-body, modal-footer
 - [x] **Section Headers** - commit `fcf487f`
-  - section-header layout
-  - itinerary-view-mode-btn
+
+### Phase 3 Batch B - Navigation: IN PROGRESS 🚧
+
+- [x] **Menu Bar** (.app-menu-bar, buttons, toggle switches) - commit `fd4463d`
+- [x] **City Navigation** (.city-nav, .city-nav-btn) - commit `fd4463d`
+- [x] **Tab Navigation** (.app-tabs-nav, .app-tab-btn) - commit `fd4463d`
+- [x] **Mobile Menu** (.mobile-menu-sheet, panel, sections) - commit `fd4463d`
+- [x] **Header** (basic styles) - commit `fd4463d`
 
 ### Phase 2 - Viewport-Driven Modes: COMPLETE
 
@@ -50,21 +51,10 @@ See "What's Done" section below for completed Batch A work.
 - [x] `syncResponsiveUi()` computes compact mode on-the-fly from viewport
 - [x] Commits: `c5a890e`, `a823849`, `bc0a8a3`
 
-### Next Steps: Phase 3 - Component Migration Batches
+### Next Steps: Phase 3 Remaining Batches
 
-Planned batches (complete in order):
-
-| Batch | Components | Est. Time | Priority |
-|-------|------------|-----------|----------|
-| A | Buttons, Forms, Modals, Section Headers | ~3.5 hours | Start here |
-| B | Menu Bar, Header, City Nav, Tabs, Mobile Menu | ~9.5 hours | After Batch A |
-| C | Itinerary, Timeline, Transport, Accommodation, Budget, Packing, Map | ~23.5 hours | After Batch B |
+| Batch | Components | Est. Time | Status |
+|-------|------------|-----------|--------|
+| C | Itinerary, Timeline, Transport, Accommodation, Budget, Packing, Map | ~23.5 hours | Next |
 | D | Dark Mode Cleanup | ~1.5 hours | After Batch C |
 
-### Session Notes
-
-- Working on GitHub Issue #123
-- "Open Questions" from plan need review:
-  1. Delete `tailwind.config.js` and `postcss.config.js` in v4 since config is in CSS?
-  2. Should we update GitHub Issue #123 description to reflect the Tailwind pivot?
-  3. Print styles (~40 lines in style.css) - preserve or drop in migration?
