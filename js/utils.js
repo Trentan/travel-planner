@@ -284,7 +284,7 @@ function renderMobileSurfaceCard({
         <div class="mobile-surface-card-headline">
           <div class="mobile-surface-card-headline-line">
             ${dateLabel ? `<span class="mobile-surface-card-date">${escapeHtmlText(dateLabel)}</span>` : ''}
-            ${title ? `<span class="mobile-surface-card-title">${escapeHtmlText(title || '—')}</span>` : ''}
+            ${title ? `<h3 class="mobile-surface-card-title">${escapeHtmlText(title || '—')}</h3>` : ''}
             ${subtitle ? `<span class="mobile-surface-card-subtitle">${escapeHtmlText(subtitle)}</span>` : ''}
           </div>
         </div>

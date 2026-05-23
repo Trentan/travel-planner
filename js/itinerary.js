@@ -754,7 +754,7 @@ function renderCompactLegCard(leg, legIndex) {
       <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
         <div class="compact-leg-header-line">
           <span class="compact-leg-date">${escapeHtmlText(legDateRange || '-')}</span>
-          <span class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</span>
+          <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
           <span class="compact-leg-cost-badge">${formatCurrency(legCost)}</span>
           <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
         </div>
@@ -802,7 +802,7 @@ function buildCompactItinerary() {
         <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
           <div class="compact-leg-header-line">
             <span class="compact-leg-date">${escapeHtmlText(legDateRange || '—')}</span>
-            <span class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</span>
+            <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
             <span class="compact-leg-cost-badge">${formatCurrency(legCost)}</span>
             <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
           </div>

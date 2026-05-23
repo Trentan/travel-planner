@@ -86,6 +86,19 @@
   --color-status-booked: #34d399;
   --color-status-confirmed: #10b981;
   --color-status-cancelled: #f87171;
+
+  /* Redefine core variables for automatic cascading theme updates */
+  --bg: #090d16;
+  --bg-alt: #0f172a;
+  --card: #1e293b;
+  --card-strong: #111827;
+  --text: #f8fafc;
+  --muted: #cbd5e1;
+  --border: #334155;
+  --border-strong: #475569;
+  --accent: #22d3ee;
+  --accent-strong: #38bdf8;
+  --accent-soft: rgba(34, 211, 238, 0.15);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -4425,7 +4438,7 @@ body.compact-view-mode .city-dashboard {
   grid-template-columns: repeat(3, 1fr);
   gap: var(--compact-gap);
   padding: var(--compact-padding);
-  background: white;
+  background: var(--card-strong);
   border: 1px solid var(--compact-border);
   border-radius: var(--radius) var(--radius) 0 0;
   border-bottom: none; }
