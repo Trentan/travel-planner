@@ -96,6 +96,107 @@
     @apply border-btn-secondary text-btn-secondary;
     background-color: #F7F5F0;
   }
+
+  /* Modal overlay - full screen backdrop */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/70 flex items-center justify-center
+           z-[1000] p-4;
+  }
+
+  /* Modal content panel */
+  .modal-content {
+    @apply bg-white rounded-lg w-full max-w-[700px] max-h-[90vh]
+           overflow-hidden flex flex-col shadow-2xl;
+  }
+
+  /* Modal header */
+  .modal-header {
+    @apply flex justify-between items-center px-6 py-4
+           border-b border-border bg-[#FAFAF8];
+  }
+
+  .modal-header h2 {
+    @apply font-serif text-xl text-btn-secondary m-0;
+  }
+
+  /* Modal close button */
+  .modal-close {
+    @apply bg-none border-none text-xl cursor-pointer text-[#666]
+           p-0 leading-none min-w-[44px] min-h-[44px]
+           inline-flex items-center justify-center;
+  }
+
+  .modal-close:hover {
+    @apply text-btn-danger;
+  }
+
+  /* Modal body */
+  .modal-body {
+    @apply flex-1 overflow-y-auto px-6 py-4;
+  }
+
+  /* Modal footer */
+  .modal-footer {
+    @apply flex justify-end gap-3 px-6 py-4
+           border-t border-border bg-[#FAFAF8];
+  }
+
+  /* Modal size variants */
+  .modal-content.modal-sm { max-width: 400px; }
+  .modal-content.modal-md { max-width: 500px; }
+  .modal-content.modal-lg { max-width: 560px; }
+  .modal-content.modal-xl { max-width: 700px; }
+
+  .modal-content.modal-surface {
+    @apply bg-[#f9f9f9];
+  }
+
+  /* View mode toggle button */
+  .itinerary-view-mode-btn {
+    @apply min-h-[2.1rem] px-2.5 py-1 border-transparent
+           rounded-lg bg-transparent text-[0.78rem] font-bold
+           cursor-pointer;
+    font-family: inherit;
+  }
+
+  .itinerary-view-mode-btn:hover {
+    @apply border-btn-secondary;
+  }
+
+  .itinerary-view-mode-btn.is-active {
+    @apply bg-btn-secondary text-white border-btn-secondary;
+    box-shadow: 0 6px 14px rgba(26, 36, 47, 0.14);
+  }
+
+  .itinerary-view-mode-control {
+    @apply inline-grid grid-cols-2 px-1 py-1
+           border-border border rounded-lg bg-bg-secondary;
+  }
+
+  /* Section header layout */
+  .section-header {
+    @apply flex justify-between items-center gap-4 mb-3 flex-wrap;
+  }
+
+  .section-header-actions {
+    @apply flex items-center justify-end gap-2.5 flex-wrap;
+  }
+
+  .section-header-title {
+    @apply m-0 font-serif text-[1.2rem] text-btn-secondary;
+  }
+
+  .section-header-title.large {
+    @apply text-[1.25rem];
+  }
+
+  .section-header-note {
+    @apply text-[0.9rem] text-[#666] mt-2;
+  }
+
+  .add-leg-short {
+    @apply hidden;
+  }
 }
 
 /* Tailwind v4 Design Token System - mapped from existing CSS variables */
@@ -241,6 +342,21 @@
 [data-theme="dark"] .form-control:disabled {
   background-color: var(--color-dark-surface-input) !important;
   color: var(--color-dark-text-muted) !important;
+}
+
+/* Dark mode modal overrides */
+[data-theme="dark"] .modal-content {
+  background-color: var(--color-dark-surface-card) !important;
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+  background-color: var(--color-dark-bg-secondary) !important;
+  border-color: var(--color-dark-border) !important;
+}
+
+[data-theme="dark"] .modal-header h2 {
+  color: var(--color-dark-text-primary) !important;
 }
 
 /* Inline action links */
