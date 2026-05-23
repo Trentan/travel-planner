@@ -139,13 +139,17 @@ function addFood(legIdx) {
 function _splitActivityTitle(title) {
   const raw = (title || '').trim();
   if (!raw) return { title: '', location: '' };
-  const separator = ' — ';
-  const separatorIdx = raw.indexOf(separator);
-  if (separatorIdx === -1) return { title: raw, location: '' };
-  return {
-    title: raw.slice(0, separatorIdx).trim(),
-    location: raw.slice(separatorIdx + separator.length).trim()
-  };
+  const separators = [' — ', ' – ', ' - ', ' | ', ' @ '];
+  for (const separator of separators) {
+    const separatorIdx = raw.indexOf(separator);
+    if (separatorIdx !== -1) {
+      return {
+        title: raw.slice(0, separatorIdx).trim(),
+        location: raw.slice(separatorIdx + separator.length).trim()
+      };
+    }
+  }
+  return { title: raw, location: '' };
 }
 
 function openActivityModalUnified(legIdx, activityIdx = null) {

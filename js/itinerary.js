@@ -336,7 +336,8 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       cost: getJourneyDisplayCost(journey) ? formatCurrency(getJourneyDisplayCost(journey)) : ''
     });
     const subLocsHtml = details ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(details)}</div>` : '';
-    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}</div>`;
+    const notesHtml = journey.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(journey.notes)}</div>` : '';
+    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   const accomLines = dayStayInfo.map(info => {
@@ -356,7 +357,8 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       return `Location: ${loc}`;
     })() : '';
     const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
-    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}</div>`;
+    const notesHtml = info.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(info.notes)}</div>` : '';
+    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
@@ -372,6 +374,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       return `Location: ${loc}`;
     })() : '';
     const subLocsHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
+    const notesHtml = item.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(item.notes)}</div>` : '';
     return `
       <div class="compact-activity-row" style="${doneStyle}">
         <input
@@ -388,6 +391,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
             done: item.done
           })}
           ${subLocsHtml}
+          ${notesHtml}
         </div>
       </div>
     `;
@@ -1051,7 +1055,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         cost: stay.totalCost,
         startTime: stay.checkInTime || '15:00',
         endTime: '',
-        done: !!stay.done
+        done: !!stay.done,
+        notes: stay.notes || ''
       });
       return;
     }
@@ -1068,7 +1073,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         cost: stay.totalCost,
         startTime: stay.checkOutTime || '11:00',
         endTime: '',
-        done: !!stay.done
+        done: !!stay.done,
+        notes: stay.notes || ''
       });
       return;
     }
@@ -1085,7 +1091,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         cost: null,
         startTime: '',
         endTime: '',
-        done: !!stay.done
+        done: !!stay.done,
+        notes: stay.notes || ''
       });
     }
   });
@@ -1148,7 +1155,8 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       sortValue: getDailyTimelineItemSortValue(startDate || dayDate, startTime, journeyIndex),
       actionHtml: '',
       journeyId: journey.id,
-      done: !!journey.done
+      done: !!journey.done,
+      notes: journey.notes || ''
     });
   });
 
@@ -1175,7 +1183,8 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       endTime: stayInfo.endTime || '',
       sortValue: getDailyTimelineItemSortValue(dayDate, stayInfo.startTime, 2000 + stayIndex),
       stayId: stayInfo.stayId,
-      done: !!stayInfo.done
+      done: !!stayInfo.done,
+      notes: stayInfo.notes || ''
     });
   });
 

@@ -2680,6 +2680,14 @@ function normalizeTripLegsData(legs) {
           act.endTime = item.endTime || '';
           if (item.cost && item.cost !== '0' && (!act.estCost || act.estCost === '0')) act.estCost = item.cost;
           if (item.time && item.time !== '1 hr' && (!act.estTime || act.estTime === '1 hr')) act.estTime = item.time;
+          
+          // Bidirectional sync for notes
+          if (item.notes && !act.notes) {
+            act.notes = item.notes;
+          } else if (act.notes && !item.notes) {
+            item.notes = act.notes;
+          }
+          
           usedSuggestionIndices.add(matchIdx);
         } else {
           // No match found - create a new suggested activity entry!
@@ -2701,6 +2709,7 @@ function normalizeTripLegsData(legs) {
             category: category,
             estTime: item.time || '1 hr',
             estCost: item.cost || '0',
+            notes: item.notes || '',
             assignedDayIdx: dayIdx,
             assignedDate: day.date || '',
             startDate: item.startDate || day.date || '',
