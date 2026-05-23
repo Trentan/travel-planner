@@ -4,13 +4,11 @@
 
 ## 🔄 RESUME HERE - Last Updated: 2026-05-23
 
-**Current Phase**: Phase 3 Batch A - Component Migration
+**Current Phase**: Phase 3 Batch B - Navigation & Layout
 
-**Ready to continue**: Form Controls, Modals, Section Headers
+**Ready to start**: Menu Bar, Header, City Nav, Tabs, Mobile Menu
 
-- [x] Buttons (.action-btn) - Tailwind styles added, ready to clean up style.css
-
-See "What's Done" section below for completed work.
+See "What's Done" section below for completed Batch A work.
 
 ---
 
@@ -28,7 +26,20 @@ See "What's Done" section below for completed work.
 - [x] Dark mode variant configured (`@custom-variant dark`)
 - [x] Build succeeds: `npm run build:css` produces `dist/tailwind.css` (9KB minified)
 - [x] Both stylesheets linked in `index.html` (style.css + tailwind.css)
-- [x] **Phase 3 Batch A1: Buttons (.action-btn)** - Tailwind styles in `src/tailwind.css`
+
+### Phase 3 Batch A - Foundation: COMPLETE ✅
+
+- [x] **Buttons (.action-btn)** - commit `f01a0f1`
+- [x] **Form Controls** - commit `dcef97f`
+  - form-control base + variants (muted, compact, panel, mono)
+  - checkbox styling
+  - add-btn (dashed)
+- [x] **Modals** - commit `fcf487f`
+  - modal-overlay, modal-content (with size variants)
+  - modal-header, modal-body, modal-footer
+- [x] **Section Headers** - commit `fcf487f`
+  - section-header layout
+  - itinerary-view-mode-btn
 
 ### Phase 2 - Viewport-Driven Modes: COMPLETE
 
