@@ -1233,12 +1233,8 @@ function renderDailyTimelineRow(item, compact = false) {
     : '';
 
   let checkboxHtml = '';
-  let editBtnHtml = '';
   if (item.type === 'activity') {
     checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})">`;
-    if (isEditMode) {
-      editBtnHtml = `<button class="edit-btn" title="Edit Activity" onclick="event.stopPropagation(); openEditDayActivityModal(${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})">✎</button>`;
-    }
   } else if (item.type === 'transport') {
     checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox transport-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleJourneyCompleted(event, '${item.journeyId}')">`;
   } else if (item.type === 'stay' || item.type === 'checkin' || item.type === 'checkout' || item.type === 'staying') {
@@ -1254,7 +1250,6 @@ function renderDailyTimelineRow(item, compact = false) {
           <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
           <div class="daily-timeline-title-and-checkbox">
             <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
-            ${editBtnHtml}
             ${checkboxHtml}
           </div>
         </div>
@@ -1650,7 +1645,7 @@ function buildItinerary() {
       const badgeIcon = isCompleted ? '✓' : '✓';
       const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
       const categoryEmoji = getCategoryEmoji(activity.category);
-      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span></span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
+      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span></span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
     }).join('')}</ul>
         <button class="add-btn" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
       </div>
@@ -1786,13 +1781,15 @@ ${(() => {
                   <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
                     <div style="display: flex; align-items: center; gap: 6px;">
                       <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button>
-                      ${isEditMode ? `<button class="edit-btn" title="Edit Activity" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">✎</button>` : ''}
                       <input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})">
                       <span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${split.title}</span>
                     </div>
                     ${locHtml}
                   </div>
-                  <span class="budget-field" style="color:#666;">⏱ <span contenteditable="${isEditMode}" onblur="updateDayItemTime(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.time || '1 hr'}</span></span>
+                  ${isEditMode
+                    ? `<span class="budget-field budget-field--clickable" style="color:#666; cursor:pointer;" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">⏱ <span>${item.time || '1 hr'}</span></span>`
+                    : `<span class="budget-field" style="color:#666;">⏱ <span>${item.time || '1 hr'}</span></span>`
+                  }
                   <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span>
                 </div>
               `;

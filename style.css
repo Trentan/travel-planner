@@ -1282,9 +1282,24 @@ main {
   max-width: 540px;
 }
 
+.activity-assign-modal.modal-lg {
+  max-width: 820px;
+}
+
 .activity-assign-layout {
   display: grid;
   gap: 0.85rem;
+}
+
+@media (min-width: 769px) {
+  .activity-assign-modal.modal-lg {
+    max-width: 820px;
+    width: 820px;
+  }
+  .activity-assign-modal.modal-lg .activity-assign-layout {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 1.25rem;
+  }
 }
 
 .activity-assign-summary {
@@ -3775,6 +3790,15 @@ body.mobile-menu-open {
 .budget-field { flex-shrink: 0; font-family: 'DM Mono', monospace; font-size: 0.75rem; color: #2C3E50; background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid #ccc; font-weight: 400; text-transform: none; display: flex; align-items: center;}
 .budget-field--fixed {
   width: 100px;
+}
+.budget-field--clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.budget-field--clickable:hover {
+  border-color: #2980b9;
+  background-color: #ebf5fb;
+  color: #2980b9;
 }
 
 [contenteditable="true"] { outline: 1px dashed transparent; transition: outline 0.2s; border-radius: 2px; }
