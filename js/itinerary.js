@@ -364,9 +364,19 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
     const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    let locationVal = item.location || '';
+    if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
+      const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
+      if (matched && matched.location) {
+        locationVal = matched.location;
+      }
+    }
     const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
-    const activityLoc = split.location ? (() => {
-      let loc = split.location;
+    if (!locationVal) {
+      locationVal = split.location;
+    }
+    const activityLoc = locationVal ? (() => {
+      let loc = locationVal;
       const cleanCity = String(day.to || day.from || '').trim();
       if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
         loc = `${loc} (${cleanCity})`;
@@ -1197,9 +1207,19 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
 
   (day.activityItems || []).forEach((item, itemIndex) => {
     const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    let locationVal = item.location || '';
+    if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
+      const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
+      if (matched && matched.location) {
+        locationVal = matched.location;
+      }
+    }
     const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
-    const activityLoc = split.location ? (() => {
-      let loc = split.location;
+    if (!locationVal) {
+      locationVal = split.location;
+    }
+    const activityLoc = locationVal ? (() => {
+      let loc = locationVal;
       const cleanCity = String(day.to || day.from || '').trim();
       if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
         loc = `${loc} (${cleanCity})`;
@@ -1805,9 +1825,19 @@ ${(() => {
           <div class="detail-block block-activities drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
             <h4>Planned Activities</h4><div class="item-list">
             ${(day.activityItems || []).map((item, i) => {
+              let locationVal = item.location || '';
+              if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
+                const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
+                if (matched && matched.location) {
+                  locationVal = matched.location;
+                }
+              }
               const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
-              const activityLoc = split.location ? (() => {
-                let loc = split.location;
+              if (!locationVal) {
+                locationVal = split.location;
+              }
+              const activityLoc = locationVal ? (() => {
+                let loc = locationVal;
                 const cleanCity = String(day.to || day.from || '').trim();
                 if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
                   loc = `${loc} (${cleanCity})`;

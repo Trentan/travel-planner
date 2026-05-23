@@ -295,7 +295,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
               <div class="ai-form-group">
                 <label>Location</label>
-                <input type="text" id="activityLocation" class="form-control form-control--compact" placeholder="e.g., Central Park" value="${html(defaults.location || '')}">
+                <input type="text" id="activityLocation" class="form-control form-control--compact" placeholder="e.g., Central Park" value="${html(activity?.location || defaults.location || '')}">
               </div>
               <div class="ai-form-group">
                 <label>Notes</label>
@@ -424,7 +424,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       return null;
     }
     const fullTitle = location ? `${title} — ${location}` : title;
-    return { category, title: fullTitle, estTime, estCost, notes };
+    return { category, title: fullTitle, estTime, estCost, notes, location };
   };
 
   modal.querySelectorAll('[data-day-index]').forEach(button => {
@@ -457,6 +457,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
         target.estTime = formData.estTime;
         target.estCost = formData.estCost;
         target.notes = formData.notes;
+        target.location = formData.location;
       }
 
       const assigned = assignSuggestedActivityToDay(legIdx, targetIdx, legIdx, targetDayIdx, getScheduleOptions(button));
@@ -484,6 +485,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       target.estTime = formData.estTime;
       target.estCost = formData.estCost;
       target.notes = formData.notes;
+      target.location = formData.location;
 
       const cleared = clearAssignedSuggestedActivityFromDay(legIdx, activityIdx);
       if (!cleared) return;
@@ -524,6 +526,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       target.estTime = formData.estTime;
       target.estCost = formData.estCost;
       target.notes = formData.notes;
+      target.location = formData.location;
 
       if (target.assignedDayIdx !== null && target.assignedDayIdx !== undefined) {
         const day = leg.days[target.assignedDayIdx];
@@ -545,6 +548,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
               item.time = formData.estTime;
               item.cost = formData.estCost;
               item.notes = formData.notes;
+              item.location = formData.location;
               applyActivityScheduleFields(item, day, datedSchedule);
             }
           });
@@ -666,8 +670,13 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
     else if (/tour|guide|bus/i.test(text)) category = 'tour';
     else if (/attraction|park|ride/i.test(text)) category = 'attraction';
 
+    const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(text) : { title: text, location: '' };
     const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
-    const cleanTitle = text.replace(emojiPattern, '').trim();
+    const cleanTitle = split.title.replace(emojiPattern, '').trim();
+    const cleanLocation = item.location || split.location || '';
+    if (cleanLocation && !item.location) {
+      item.location = cleanLocation;
+    }
 
     if (!Array.isArray(appData[legIdx].suggestedActivities)) {
       appData[legIdx].suggestedActivities = [];
@@ -679,6 +688,7 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
       estTime: item.time || '1 hr',
       estCost: item.cost || '0',
       notes: item.notes || '',
+      location: cleanLocation,
       assignedDayIdx: dayIdx,
       assignedDate: day.date || '',
       startDate: item.startDate || day.date || '',
@@ -1239,12 +1249,14 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
       cost: activity.estCost || '0',
       time: activity.estTime || '1 hr',
       done: false,
-      notes: activity.notes || ''
+      notes: activity.notes || '',
+      location: activity.location || ''
     };
     applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
     targetDay.activityItems.push(targetItem);
   } else {
     targetItem.notes = activity.notes || '';
+    targetItem.location = activity.location || '';
     applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
   }
 

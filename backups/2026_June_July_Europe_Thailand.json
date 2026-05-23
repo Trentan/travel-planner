@@ -114,12 +114,12 @@
               "cost": "0",
               "time": "1 hr",
               "done": false,
-              "notes": "Go before sunset for the best view",
               "cityId": "city-taipei",
               "startDate": "2026-06-09",
               "endDate": "2026-06-09",
               "startTime": "",
-              "endTime": ""
+              "endTime": "",
+              "location": "queue early"
             },
             {
               "text": "🏛️ Din Tai Fung lunch — queue early",
@@ -128,10 +128,10 @@
               "startTime": "12:00",
               "endTime": "14:00",
               "done": false,
-              "notes": "Get ticket number by 11:30 AM",
               "startDate": "2026-06-09",
               "endDate": "2026-06-09",
-              "cityId": "city-taipei"
+              "cityId": "city-taipei",
+              "location": "queue early"
             }
           ]
         }
@@ -142,21 +142,20 @@
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "Go before sunset for the best view",
           "assignedDayIdx": 0,
           "cityId": "city-taipei",
           "assignedDate": "2026-06-09",
           "startDate": "2026-06-09",
           "endDate": "2026-06-09",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "location": "queue early"
         },
         {
           "title": "Din Tai Fung lunch — queue early",
           "category": "sight",
           "estTime": "2 hrs",
           "estCost": "0",
-          "notes": "Get ticket number by 11:30 AM",
           "assignedDayIdx": 0,
           "cityId": "city-taipei",
           "startTime": "12:00",
@@ -164,14 +163,14 @@
           "assignedDate": "2026-06-09",
           "startDate": "2026-06-09",
           "endDate": "2026-06-09",
-          "done": false
+          "done": false,
+          "location": "queue early"
         },
         {
           "title": "Shilin Night Market evening",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "Try the hot star large fried chicken",
           "assignedDayIdx": null,
           "cityId": "city-taipei",
           "assignedDate": "",
@@ -289,10 +288,26 @@
           "endTime": ""
         },
         {
+          "title": "RS Vienna City Walk: Stephansdom → Hofburg — Vienna Park",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-10",
+          "startDate": "2026-06-10",
+          "startTime": "",
+          "endDate": "2026-06-10",
+          "endTime": "",
+          "cityId": "city-vienna",
+          "notes": "Careful pigeons",
+          "location": "Vienna Park"
+        },
+        {
           "title": "RS Vienna City Walk: Stephansdom → Hofburg",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
+          "notes": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-10",
           "startDate": "2026-06-10",
@@ -494,7 +509,8 @@
           "endDate": "2026-06-11",
           "endTime": "",
           "cityId": "city-bratislava",
-          "notes": "Light gear"
+          "notes": "Light gear",
+          "location": "Bratislava Park"
         },
         {
           "title": "Devín Castle ruins",
@@ -940,7 +956,8 @@
               "startTime": "19:00",
               "endDate": "2026-06-16",
               "endTime": "14:10",
-              "cityId": "city-munich"
+              "cityId": "city-munich",
+              "location": "Hotel lobby"
             }
           ]
         },
@@ -1202,7 +1219,8 @@
           "estCost": "0",
           "assignedDate": "2026-06-16",
           "assignedDayIdx": 0,
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "location": "Hotel lobby"
         },
         {
           "title": "Conference check-in & afternoon sessions",
@@ -1490,7 +1508,8 @@
               "startDate": "2026-06-22",
               "endDate": "2026-06-22",
               "startTime": "",
-              "endTime": ""
+              "endTime": "",
+              "location": "soaring rocky spires"
             }
           ]
         }
@@ -1585,7 +1604,8 @@
           "startTime": "",
           "endDate": "2026-06-22",
           "endTime": "",
-          "cityId": "city-bolzano"
+          "cityId": "city-bolzano",
+          "location": "soaring rocky spires"
         }
       ],
       "legTips": [
@@ -1751,7 +1771,8 @@
               "startDate": "2026-06-24",
               "endDate": "2026-06-24",
               "startTime": "",
-              "endTime": ""
+              "endTime": "",
+              "location": "Main park"
             }
           ]
         }
@@ -1820,7 +1841,8 @@
           "startDate": "2026-06-24",
           "endDate": "2026-06-24",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "location": "Main park"
         },
         {
           "title": "RS Milan walk: Duomo rooftop → Galleria",
@@ -2380,7 +2402,8 @@
               "startDate": "2026-07-01",
               "endDate": "2026-07-01",
               "startTime": "",
-              "endTime": ""
+              "endTime": "",
+              "location": "Shark Bay"
             }
           ]
         },
@@ -2905,7 +2928,8 @@
           "startTime": "",
           "endDate": "2026-07-01",
           "endTime": "",
-          "cityId": "city-koh-samui"
+          "cityId": "city-koh-samui",
+          "location": "Shark Bay"
         },
         {
           "title": "Thai cooking class then 🐘 Elephant Sanctuary",
