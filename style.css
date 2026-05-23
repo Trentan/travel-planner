@@ -10309,6 +10309,32 @@ body.hide-money-figures .sight-inline-meta-cost {
     color: var(--color-text-primary) !important;
   }
 
+  /* Cost badges and meta costs in dark mode */
+  .compact-leg-cost-badge,
+  body.compact-view-mode .compact-leg-cost-badge {
+    background: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .leg-cost-total-badge {
+    background: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .timeline-inline-meta-cost,
+  .compact-inline-meta-cost,
+  .sight-inline-meta-cost,
+  .accom-inline-meta-cost {
+    color: var(--color-text-muted) !important;
+  }
+
+  .day-total-cost {
+    background: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+  }
+
   /* City nav overflow indicators - dark mode */
   .city-nav::before,
   .city-nav::after {
