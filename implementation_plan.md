@@ -171,6 +171,14 @@ Implemented:
    - [x] Window resize: Mode switches automatically
    - [x] Dark mode: Still works independently
 
+### Phase 3 - Component Migration: IN PROGRESS
+
+**Batch A - Foundation (In Progress):**
+- [x] Buttons (.action-btn) - Tailwind styles added in `src/tailwind.css`, commit `f01a0f1`
+- [ ] Form Controls (.form-control)
+- [ ] Modals (.modal-*)
+- [ ] Section Headers
+
 ---
 
 ## Phase 3 - Component-by-Component Migration

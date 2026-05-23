@@ -4,9 +4,11 @@
 
 ## 🔄 RESUME HERE - Last Updated: 2026-05-23
 
-**Current Phase**: Phase 3 - Component Migration
+**Current Phase**: Phase 3 Batch A - Component Migration
 
-**Ready to start**: Batch A (Buttons, Forms, Modals, Section Headers)
+**Ready to continue**: Form Controls, Modals, Section Headers
+
+- [x] Buttons (.action-btn) - Tailwind styles added, ready to clean up style.css
 
 See "What's Done" section below for completed work.
 
@@ -26,6 +28,7 @@ See "What's Done" section below for completed work.
 - [x] Dark mode variant configured (`@custom-variant dark`)
 - [x] Build succeeds: `npm run build:css` produces `dist/tailwind.css` (9KB minified)
 - [x] Both stylesheets linked in `index.html` (style.css + tailwind.css)
+- [x] **Phase 3 Batch A1: Buttons (.action-btn)** - Tailwind styles in `src/tailwind.css`
 
 ### Phase 2 - Viewport-Driven Modes: COMPLETE
 
@@ -34,7 +37,7 @@ See "What's Done" section below for completed work.
 - [x] Compact view automatically determined by viewport width (< 769px = compact)
 - [x] Removed `isCompactView` from localStorage persistence
 - [x] `syncResponsiveUi()` computes compact mode on-the-fly from viewport
-- [x] Commit: `c5a890e`
+- [x] Commits: `c5a890e`, `a823849`, `bc0a8a3`
 
 ### Next Steps: Phase 3 - Component Migration Batches
 
