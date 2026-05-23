@@ -10288,6 +10288,90 @@ body.hide-money-figures .sight-inline-meta-cost {
   .leaflet-container {
     background: var(--color-bg-secondary) !important;
   }
+
+  /* Top app menu bar - Dark gradient override */
+  .app-menu-bar {
+    background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important;
+  }
+
+  /* JSON Write Warning - Dark mode */
+  .json-write-warning {
+    background: var(--color-bg-secondary) !important;
+    border-bottom-color: var(--color-border-strong) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .json-write-warning button {
+    background: var(--color-surface-card) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+  }
+
+  .json-write-warning button:hover {
+    background: var(--color-bg-secondary) !important;
+  }
+
+  /* Tab active indicators and border overrides */
+  .app-tab-btn.active {
+    border-bottom-color: var(--color-accent-teal) !important;
+  }
+
+  /* Form inputs in dark mode */
+  input, textarea, select {
+    background-color: var(--color-surface-input) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--color-accent-teal) !important;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2) !important;
+  }
+
+  /* Buttons - primary */
+  button:not(.app-menu-btn):not(.add-btn):not(.action-btn) {
+    background-color: var(--color-accent-teal) !important;
+    color: #000 !important;
+    border-color: var(--color-accent-teal) !important;
+  }
+
+  button:not(.app-menu-btn):not(.add-btn):not(.action-btn):hover {
+    background-color: var(--color-accent-teal-hover) !important;
+    border-color: var(--color-accent-teal-hover) !important;
+  }
+
+  /* Secondary/Ghost buttons */
+  button.secondary, .secondary-btn {
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+  }
+
+  /* Modal/Dialog overlays */
+  .modal-overlay, dialog::backdrop {
+    background: rgba(0, 0, 0, 0.6) !important;
+  }
+
+  dialog, .modal-panel {
+    background: var(--color-surface-card) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border) !important;
+  }
+
+  /* Scrollbar styling for dark mode */
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary) !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong) !important;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-light) !important;
+  }
 }
 
 
