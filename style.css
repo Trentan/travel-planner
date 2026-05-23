@@ -10295,6 +10295,13 @@ body.hide-money-figures .sight-inline-meta-cost {
     background: var(--color-accent-teal) !important;
   }
 
+  /* Compact leg header should NOT have inline backgrounds in dark mode */
+  [data-theme="dark"] .compact-leg-header,
+  [data-theme="dark"] .leg-header.compact-leg-header {
+    background: var(--color-accent-teal) !important;
+    border-bottom-color: var(--color-border) !important;
+  }
+
   .compact-leg-date,
   .compact-leg-label,
   body.compact-view-mode .compact-leg-date,
