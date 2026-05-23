@@ -10536,5 +10536,45 @@ body.hide-money-figures .sight-inline-meta-cost {
   transform: scale(1.08);
 }
 
+/* SKELETON SHIMMER LOADING EFFECTS */
+.shimmer-card {
+  padding: 1.1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.shimmer-line {
+  height: 12px;
+  background: linear-gradient(90deg, var(--color-bg-secondary) 25%, var(--color-border) 37%, var(--color-bg-secondary) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+  border-radius: var(--radius-sm);
+}
+
+.shimmer-line.shimmer-title {
+  height: 16px;
+  width: 60%;
+}
+
+.shimmer-line.shimmer-text {
+  width: 90%;
+}
+
+.shimmer-line.shimmer-meta {
+  width: 40%;
+  height: 10px;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 
 
