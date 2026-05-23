@@ -379,7 +379,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
           ${item.done ? 'checked' : ''}
           onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
         >
-        <div class="compact-activity-copy" style="display: flex; flex-direction: column; width: 100%;">
+        <div class="compact-activity-copy" ${isEditMode ? `style="display: flex; flex-direction: column; width: 100%; cursor: pointer;" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIdx}, ${itemIdx})"` : `style="display: flex; flex-direction: column; width: 100%;"`}>
           ${renderCompactEmojiLine({
             emoji,
             text: split.title,

@@ -4979,6 +4979,13 @@ body.compact-view-mode .compact-activity-copy {
   flex: 1;
 }
 
+body:not(.read-only-mode).compact-view-mode .compact-activity-copy {
+  transition: opacity 0.15s ease;
+}
+body:not(.read-only-mode).compact-view-mode .compact-activity-copy:hover {
+  opacity: 0.72;
+}
+
 .compact-food-quest-card .compact-line {
   display: inline-flex;
   align-items: flex-start;
