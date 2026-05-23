@@ -73,7 +73,7 @@
   --color-surface-input: #1e293b;     /* Dark Slate Input */
   --color-text-primary: #f8fafc;      /* White */
   --color-text-muted: #cbd5e1;        /* Light Slate */
-  --color-text-light: #64748b;        /* Muted Blue Slate */
+  --color-text-light: #94a3b8;        /* Muted Blue Slate (WCAG Compliant) */
   --color-border: #334155;            /* Dark Slate Border */
   --color-border-strong: #475569;     /* Strong Dark Slate Border */
   --color-accent-teal: #22d3ee;       /* Bright Cyan-Teal */
@@ -10289,17 +10289,22 @@ body.hide-money-figures .sight-inline-meta-cost {
     background: var(--color-bg-secondary) !important;
   }
 
-  /* Compact leg header in dark mode - text visibility */
-  .compact-leg-card .compact-leg-header,
-  body.compact-view-mode .compact-leg-card .compact-leg-header {
-    background: var(--color-accent-teal) !important;
+  /* Compact leg cards standard premium styling in dark mode */
+  .compact-leg-card,
+  body.compact-view-mode .compact-leg-card {
+    background: var(--color-surface-card) !important;
+    border: 1px solid var(--color-border) !important;
+    border-left: 6px solid var(--leg-accent, var(--color-border)) !important;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
   }
 
-  /* Compact leg header should NOT have inline backgrounds in dark mode */
   [data-theme="dark"] .compact-leg-header,
-  [data-theme="dark"] .leg-header.compact-leg-header {
-    background: var(--color-accent-teal) !important;
-    border-bottom-color: var(--color-border) !important;
+  [data-theme="dark"] .leg-header.compact-leg-header,
+  .compact-leg-card .compact-leg-header,
+  body.compact-view-mode .compact-leg-card .compact-leg-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--color-border) !important;
   }
 
   .compact-leg-date,
@@ -10313,7 +10318,7 @@ body.hide-money-figures .sight-inline-meta-cost {
   .compact-leg-card .compact-leg-header-hint,
   body.compact-view-mode .compact-leg-card .compact-leg-night-count,
   body.compact-view-mode .compact-leg-card .compact-leg-header-hint {
-    color: var(--color-text-primary) !important;
+    color: var(--color-text-muted) !important;
   }
 
   /* Cost badges and meta costs in dark mode */
@@ -10439,5 +10444,97 @@ body.hide-money-figures .sight-inline-meta-cost {
     background: var(--color-text-light) !important;
   }
 }
+
+/* ==========================================================================
+   STATUS BADGES — HIGH CONTRAST & ACCESSIBILITY (WCAG AAA) OVERRIDES
+   ========================================================================== */
+.status-badge,
+.transport-mobile-status-btn {
+  padding: 4px 10px !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  border: 1px solid transparent !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  text-transform: capitalize !important;
+}
+
+/* Light mode statuses */
+.status-badge.planned,
+.status-badge.pending,
+.transport-mobile-status-btn[style*="background:#E67E22"],
+.transport-mobile-status-btn[style*="background:rgb(230"] {
+  background: rgba(217, 119, 6, 0.1) !important;
+  color: #b45309 !important;
+  border-color: rgba(217, 119, 6, 0.25) !important;
+}
+.status-badge.booked,
+.status-badge.confirmed,
+.transport-mobile-status-btn[style*="background:#27AE60"],
+.transport-mobile-status-btn[style*="background:rgb(39"] {
+  background: rgba(5, 150, 105, 0.1) !important;
+  color: #059669 !important;
+  border-color: rgba(5, 150, 105, 0.25) !important;
+}
+.status-badge.cancelled,
+.transport-mobile-status-btn[style*="background:#E74C3C"],
+.transport-mobile-status-btn[style*="background:rgb(231"] {
+  background: rgba(220, 38, 38, 0.1) !important;
+  color: #dc2626 !important;
+  border-color: rgba(220, 38, 38, 0.25) !important;
+}
+
+/* Dark mode statuses override */
+[data-theme="dark"] .status-badge.planned,
+[data-theme="dark"] .status-badge.pending,
+[data-theme="dark"] .transport-mobile-status-btn[style*="background:#E67E22"],
+[data-theme="dark"] .transport-mobile-status-btn[style*="background:rgb(230"] {
+  background: rgba(251, 191, 36, 0.15) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
+}
+[data-theme="dark"] .status-badge.booked,
+[data-theme="dark"] .status-badge.confirmed,
+[data-theme="dark"] .transport-mobile-status-btn[style*="background:#27AE60"],
+[data-theme="dark"] .transport-mobile-status-btn[style*="background:rgb(39"] {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+[data-theme="dark"] .status-badge.cancelled,
+[data-theme="dark"] .transport-mobile-status-btn[style*="background:#E74C3C"],
+[data-theme="dark"] .transport-mobile-status-btn[style*="background:rgb(231"] {
+  background: rgba(248, 113, 113, 0.15) !important;
+  color: #f87171 !important;
+  border-color: rgba(248, 113, 113, 0.3) !important;
+}
+
+/* CAROUSEL MOBILE SWIPE PAGE DOTS INDICATORS */
+.mobile-swipe-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 12px 0 6px 0;
+}
+
+.mobile-swipe-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-border-strong);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.mobile-swipe-dot.active {
+  background: var(--color-accent-teal);
+  width: 18px;
+  border-radius: var(--radius-full);
+  transform: scale(1.08);
+}
+
 
 

@@ -1584,7 +1584,9 @@ function buildItinerary() {
     const section = document.createElement('div');
     section.className = 'leg';
     section.id = 'leg-' + leg.id;
-    section.style.setProperty('--leg-accent', leg.colour);
+    if (section.style && typeof section.style.setProperty === 'function') {
+      section.style.setProperty('--leg-accent', leg.colour);
+    }
     section.style.borderLeft = `6px solid ${leg.colour}`;
 
     const daysCount = leg.days.length;
