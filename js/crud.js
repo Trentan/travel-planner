@@ -26,12 +26,47 @@ function getSuggestedActivityMatchTexts(activity) {
 
 function findAssignedSuggestedActivity(legIdx, dayIdx, itemText) {
   const activities = appData[legIdx]?.suggestedActivities || [];
-  const normalizedText = String(itemText || '').trim();
-  return activities.find(activity => (
-    activity
-    && activity.assignedDayIdx === dayIdx
-    && getSuggestedActivityMatchTexts(activity).includes(normalizedText)
-  )) || null;
+  const cleanItem = String(itemText || '').trim().toLowerCase();
+  if (!cleanItem) return null;
+
+  const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
+  const cleanItemNoEmoji = cleanItem.replace(emojiPattern, '').trim();
+
+  return activities.find(activity => {
+    if (!activity) return false;
+    
+    // Must match the assigned day
+    if (activity.assignedDayIdx !== dayIdx) return false;
+
+    const cleanTitle = String(activity.title || '').trim().toLowerCase();
+    if (cleanItem === cleanTitle) return true;
+
+    const cleanTitleNoEmoji = cleanTitle.replace(emojiPattern, '').trim();
+    if (cleanItemNoEmoji === cleanTitleNoEmoji) return true;
+
+    // Split on first separator to get the base title
+    const separators = [' — ', ' – ', ' - ', ' | ', ' @ '];
+    let baseTitle = cleanTitle;
+    for (const separator of separators) {
+      const idx = cleanTitle.indexOf(separator);
+      if (idx !== -1) {
+        baseTitle = cleanTitle.slice(0, idx).trim();
+        break;
+      }
+    }
+    
+    const baseTitleNoEmoji = baseTitle.replace(emojiPattern, '').trim();
+    if (cleanItemNoEmoji === baseTitleNoEmoji) return true;
+
+    if (typeof getSuggestedActivityMatchTexts === 'function') {
+      const matchTexts = getSuggestedActivityMatchTexts(activity).map(t => String(t).trim().toLowerCase());
+      if (matchTexts.includes(cleanItem)) return true;
+      const matchTextsNoEmoji = matchTexts.map(t => t.replace(emojiPattern, '').trim());
+      if (matchTextsNoEmoji.includes(cleanItemNoEmoji)) return true;
+    }
+
+    return false;
+  }) || null;
 }
 
 function syncAssignedSuggestedActivityField(legIdx, dayIdx, itemText, field, value) {

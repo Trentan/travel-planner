@@ -337,7 +337,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     });
     const subLocsHtml = details ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(details)}</div>` : '';
     const notesHtml = journey.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(journey.notes)}</div>` : '';
-    return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); editJourney('${journey.id}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
+    return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); editJourney('${journey.journeyId || journey.id}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   const accomLines = dayStayInfo.map(info => {
@@ -1161,7 +1161,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       endTime,
       sortValue: getDailyTimelineItemSortValue(startDate || dayDate, startTime, journeyIndex),
       actionHtml: '',
-      journeyId: journey.id,
+      journeyId: journey.journeyId || journey.id,
       done: !!journey.done,
       notes: journey.notes || ''
     });
