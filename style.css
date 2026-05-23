@@ -10081,9 +10081,86 @@ body.hide-money-figures .sight-inline-meta-cost {
   .surface-panel--card,
   .tutorial-tooltip,
   .app-menu-actions-panel {
-    background-color: var(--color-surface-card) !important;
+    background: var(--color-surface-card) !important; /* Overrides light linear-gradients cleanly! */
     border-color: var(--color-border) !important;
     box-shadow: var(--shadow-soft) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  /* Mobile Swipe Chips (City Nav Swipe) */
+  .mobile-swipe-chip {
+    background: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+  .mobile-swipe-chip.active {
+    background: var(--color-surface-card) !important;
+    border-color: var(--color-accent-teal) !important;
+    color: var(--color-text-primary) !important;
+  }
+  .mobile-swipe-chip-eyebrow,
+  .mobile-swipe-chip-title,
+  .mobile-swipe-chip-route {
+    color: inherit !important;
+  }
+
+  /* Compact Day Swipe Chips */
+  .compact-day-chip {
+    background: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+  .compact-day-chip.active {
+    background: var(--color-surface-card) !important;
+    border-color: var(--color-accent-teal) !important;
+    color: var(--color-text-primary) !important;
+  }
+  .compact-day-chip-day,
+  .compact-day-chip-date,
+  .compact-day-chip-route {
+    color: inherit !important;
+  }
+
+  /* Compact Mobile Info Chips (Tips, Food, Activities) */
+  .compact-mobile-info-chip {
+    background: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+  .compact-mobile-info-chip.is-active {
+    background: var(--color-surface-card) !important;
+    border-color: var(--color-accent-teal) !important;
+    color: var(--color-text-primary) !important;
+  }
+  .compact-mobile-info-chip-title {
+    color: inherit !important;
+  }
+  .compact-mobile-info-chip-count {
+    color: var(--color-accent-teal) !important;
+    background: rgba(34, 211, 238, 0.12) !important;
+    border-color: rgba(34, 211, 238, 0.25) !important;
+  }
+  .compact-mobile-info-progress {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Compact Mobile Info Panels (Expanded Content Blocks) */
+  .compact-mobile-info-panel {
+    background: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+  .compact-mobile-info-panel-tips,
+  .compact-mobile-info-panel-food,
+  .compact-mobile-info-panel-activities {
+    background: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+  }
+  
+  /* Detailed Day Card Expanded Detail Panel */
+  .day-detail {
+    background: var(--color-bg-secondary) !important;
+    border-color: var(--color-border) !important;
     color: var(--color-text-primary) !important;
   }
 
@@ -10414,13 +10491,13 @@ body.hide-money-figures .sight-inline-meta-cost {
   }
 
   /* Buttons - primary */
-  button:not(.app-menu-btn):not(.add-btn):not(.action-btn) {
+  button:not(.app-menu-btn):not(.add-btn):not(.action-btn):not(.app-tab-btn):not(.city-nav-btn):not(.compact-mobile-info-chip):not(.compact-day-chip):not(.mobile-swipe-chip) {
     background-color: var(--color-accent-teal) !important;
     color: #000 !important;
     border-color: var(--color-accent-teal) !important;
   }
 
-  button:not(.app-menu-btn):not(.add-btn):not(.action-btn):hover {
+  button:not(.app-menu-btn):not(.add-btn):not(.action-btn):not(.app-tab-btn):not(.city-nav-btn):not(.compact-mobile-info-chip):not(.compact-day-chip):not(.mobile-swipe-chip):hover {
     background-color: var(--color-accent-teal-hover) !important;
     border-color: var(--color-accent-teal-hover) !important;
   }
