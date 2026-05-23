@@ -336,7 +336,8 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       cost: getJourneyDisplayCost(journey) ? formatCurrency(getJourneyDisplayCost(journey)) : ''
     });
     const subLocsHtml = details ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(details)}</div>` : '';
-    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}</div>`;
+    const notesHtml = journey.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(journey.notes)}</div>` : '';
+    return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); editJourney('${journey.journeyId || journey.id}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   const accomLines = dayStayInfo.map(info => {
@@ -356,12 +357,41 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       return `Location: ${loc}`;
     })() : '';
     const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
-    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}</div>`;
+    const notesHtml = info.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(info.notes)}</div>` : '';
+    return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); openEditStayModal('${info.stayId}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
     const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    let locationVal = item.location || '';
+    if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
+      const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
+      if (matched && matched.location) {
+        locationVal = matched.location;
+      }
+    }
+    const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
+    if (!locationVal) {
+      locationVal = split.location;
+    }
+    const activityLoc = locationVal ? (() => {
+      let loc = locationVal;
+      const cleanCity = String(day.to || day.from || '').trim();
+      if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+        loc = `${loc} (${cleanCity})`;
+      }
+      return `Location: ${loc}`;
+    })() : '';
+    const subLocsHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
+    let notes = item.notes || '';
+    if (!notes && typeof findAssignedSuggestedActivity === 'function') {
+      const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
+      if (matched && matched.notes) {
+        notes = matched.notes;
+      }
+    }
+    const notesHtml = notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(notes)}</div>` : '';
     return `
       <div class="compact-activity-row" style="${doneStyle}">
         <input
@@ -369,14 +399,16 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
           ${item.done ? 'checked' : ''}
           onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
         >
-        <div class="compact-activity-copy">
+        <div class="compact-activity-copy" ${isEditMode ? `style="display: flex; flex-direction: column; width: 100%; cursor: pointer;" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIdx}, ${itemIdx})"` : `style="display: flex; flex-direction: column; width: 100%;"`}>
           ${renderCompactEmojiLine({
             emoji,
-            text: item.text,
+            text: split.title,
             duration: item.time || '1 hr',
             cost: item.cost ? formatCurrency(item.cost) : '',
             done: item.done
           })}
+          ${subLocsHtml}
+          ${notesHtml}
         </div>
       </div>
     `;
@@ -1040,7 +1072,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         cost: stay.totalCost,
         startTime: stay.checkInTime || '15:00',
         endTime: '',
-        done: !!stay.done
+        done: !!stay.done,
+        notes: stay.notes || ''
       });
       return;
     }
@@ -1057,7 +1090,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         cost: stay.totalCost,
         startTime: stay.checkOutTime || '11:00',
         endTime: '',
-        done: !!stay.done
+        done: !!stay.done,
+        notes: stay.notes || ''
       });
       return;
     }
@@ -1074,7 +1108,8 @@ function getStayDisplayForDay(dayDate, dayCity) {
         cost: null,
         startTime: '',
         endTime: '',
-        done: !!stay.done
+        done: !!stay.done,
+        notes: stay.notes || ''
       });
     }
   });
@@ -1136,8 +1171,9 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       endTime,
       sortValue: getDailyTimelineItemSortValue(startDate || dayDate, startTime, journeyIndex),
       actionHtml: '',
-      journeyId: journey.id,
-      done: !!journey.done
+      journeyId: journey.journeyId || journey.id,
+      done: !!journey.done,
+      notes: journey.notes || ''
     });
   });
 
@@ -1164,19 +1200,50 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       endTime: stayInfo.endTime || '',
       sortValue: getDailyTimelineItemSortValue(dayDate, stayInfo.startTime, 2000 + stayIndex),
       stayId: stayInfo.stayId,
-      done: !!stayInfo.done
+      done: !!stayInfo.done,
+      notes: stayInfo.notes || ''
     });
   });
 
   (day.activityItems || []).forEach((item, itemIndex) => {
     const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    let locationVal = item.location || '';
+    if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
+      const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
+      if (matched && matched.location) {
+        locationVal = matched.location;
+      }
+    }
+    const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
+    if (!locationVal) {
+      locationVal = split.location;
+    }
+    const activityLoc = locationVal ? (() => {
+      let loc = locationVal;
+      const cleanCity = String(day.to || day.from || '').trim();
+      if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+        loc = `${loc} (${cleanCity})`;
+      }
+      return `Location: ${loc}`;
+    })() : '';
+
+    let notes = item.notes || '';
+    if (!notes && typeof findAssignedSuggestedActivity === 'function') {
+      const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
+      if (matched && matched.notes) {
+        notes = matched.notes;
+      }
+    }
+
     items.push({
       type: 'activity',
       typeLabel: 'Activity',
       icon: emoji,
-      title: item.text || 'Activity',
+      title: split.title || 'Activity',
+      subLocations: activityLoc,
       meta: [item.time || ''].filter(Boolean).join(' · '),
       cost: item.cost,
+      notes: notes,
       done: !!item.done,
       startTime: item.startTime || '',
       endTime: item.endTime || '',
@@ -1204,11 +1271,23 @@ function getDailyTimelineBuckets(items) {
 }
 
 function renderDailyTimelineRow(item, compact = false) {
-  const isTimeClickable = isEditMode && item.type === 'activity';
+  const isTimeClickable = isEditMode && (item.type === 'activity' || item.type === 'transport' || item.type === 'stay');
   const timeClass = "daily-timeline-time" + (isTimeClickable ? " is-clickable" : "");
-  const timeOnClick = isTimeClickable
-    ? ` role="button" tabindex="0" onclick="event.stopPropagation(); openDayItemScheduleDialog(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex})"`
-    : '';
+  
+  let onClickAction = '';
+  if (isTimeClickable) {
+    if (item.type === 'activity') {
+      onClickAction = ` role="button" tabindex="0" onclick="event.stopPropagation(); openDayItemScheduleDialog(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex})"`;
+    } else if (item.type === 'stay') {
+      onClickAction = ` role="button" tabindex="0" onclick="event.stopPropagation(); openEditStayModal('${item.stayId}')"`;
+    } else if (item.type === 'transport') {
+      onClickAction = ` role="button" tabindex="0" onclick="event.stopPropagation(); editJourney('${item.journeyId}')"`;
+    }
+  }
+
+  const timeOnClick = onClickAction;
+  const markerClass = "daily-timeline-marker" + (isTimeClickable ? " is-clickable" : "");
+  const markerOnClick = onClickAction;
 
   let checkboxHtml = '';
   if (item.type === 'activity') {
@@ -1222,7 +1301,7 @@ function renderDailyTimelineRow(item, compact = false) {
   return `
     <div class="daily-timeline-item daily-timeline-item-${escapeCompactText(item.type)} ${item.done ? 'is-done' : ''}">
       <div class="${timeClass}"${timeOnClick}>${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
-      <div class="daily-timeline-marker"><span>${item.icon}</span></div>
+      <div class="${markerClass}"${markerOnClick}><span>${item.icon}</span></div>
       <div class="daily-timeline-content">
         <div class="daily-timeline-title-row">
           <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
@@ -1232,6 +1311,7 @@ function renderDailyTimelineRow(item, compact = false) {
           </div>
         </div>
         ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> · ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
+        ${item.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8;">💬 ${escapeCompactText(item.notes)}</div>` : ''}
         ${item.subLocations ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
@@ -1623,7 +1703,8 @@ function buildItinerary() {
       const badgeIcon = isCompleted ? '✓' : '✓';
       const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
       const categoryEmoji = getCategoryEmoji(activity.category);
-      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span></span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button>${isEditMode ? `<button class="edit-btn" title="Edit activity" onclick="event.stopPropagation(); openEditActivityModal(${legIndex}, ${activityIdx})">✎</button>` : ''}</li>`;
+      const notesMetaHtml = activity.notes ? ` · <span class="sight-inline-meta-notes" style="font-style:italic; color:var(--muted);" title="${escapeHtmlText(activity.notes)}">💬 ${escapeHtmlText(activity.notes)}</span>` : '';
+      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span>${notesMetaHtml}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
     }).join('')}</ul>
         <button class="add-btn" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
       </div>
@@ -1743,7 +1824,54 @@ ${(() => {
 
           <div class="detail-block block-activities drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
             <h4>Planned Activities</h4><div class="item-list">
-            ${(day.activityItems || []).map((item, i) => `<div class="cost-item"><button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button><input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})"><span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.text}</span><span class="budget-field" style="color:#666;">⏱ <span contenteditable="${isEditMode}" onblur="updateDayItemTime(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${item.time || '1 hr'}</span></span><span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span></div>`).join('')}
+            ${(day.activityItems || []).map((item, i) => {
+              let locationVal = item.location || '';
+              if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
+                const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
+                if (matched && matched.location) {
+                  locationVal = matched.location;
+                }
+              }
+              const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
+              if (!locationVal) {
+                locationVal = split.location;
+              }
+              const activityLoc = locationVal ? (() => {
+                let loc = locationVal;
+                const cleanCity = String(day.to || day.from || '').trim();
+                if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+                  loc = `${loc} (${cleanCity})`;
+                }
+                return `Location: ${loc}`;
+              })() : '';
+              const locHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
+              let notes = item.notes || '';
+              if (!notes && typeof findAssignedSuggestedActivity === 'function') {
+                const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
+                if (matched && matched.notes) {
+                  notes = matched.notes;
+                }
+              }
+              const notesHtml = notes ? `<div class="daily-timeline-notes" style="font-size:0.72rem; color:var(--muted); font-style:italic; padding-left:0; margin-top:2px;">💬 ${escapeCompactText(notes)}</div>` : '';
+              return `
+                <div class="cost-item">
+                  <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button>
+                      <input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})">
+                      <span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${split.title}</span>
+                    </div>
+                    ${locHtml}
+                    ${notesHtml}
+                  </div>
+                  ${isEditMode
+                    ? `<span class="budget-field budget-field--clickable" style="color:#666; cursor:pointer;" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">⏱ <span>${item.time || '1 hr'}</span></span>`
+                    : `<span class="budget-field" style="color:#666;">⏱ <span>${item.time || '1 hr'}</span></span>`
+                  }
+                  <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span>
+                </div>
+              `;
+            }).join('')}
             </div><button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>
           </div>
 

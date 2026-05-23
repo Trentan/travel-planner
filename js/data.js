@@ -2594,6 +2594,22 @@ function toLocalIsoDate(dateValue) {
 function normalizeTripLegsData(legs) {
   if (!Array.isArray(legs)) return [];
   
+  function _localSplitActivityTitle(title) {
+    const raw = (title || '').trim();
+    if (!raw) return { title: '', location: '' };
+    const separators = [' — ', ' – ', ' - ', ' | ', ' @ '];
+    for (const separator of separators) {
+      const separatorIdx = raw.indexOf(separator);
+      if (separatorIdx !== -1) {
+        return {
+          title: raw.slice(0, separatorIdx).trim(),
+          location: raw.slice(separatorIdx + separator.length).trim()
+        };
+      }
+    }
+    return { title: raw, location: '' };
+  }
+
   function isItemMatchingActivity(itemText, activity) {
     if (!activity || !itemText) return false;
     const cleanItem = String(itemText).trim().toLowerCase();
@@ -2680,6 +2696,30 @@ function normalizeTripLegsData(legs) {
           act.endTime = item.endTime || '';
           if (item.cost && item.cost !== '0' && (!act.estCost || act.estCost === '0')) act.estCost = item.cost;
           if (item.time && item.time !== '1 hr' && (!act.estTime || act.estTime === '1 hr')) act.estTime = item.time;
+          
+          // Bidirectional sync for notes
+          if (item.notes && !act.notes) {
+            act.notes = item.notes;
+          } else if (act.notes && !item.notes) {
+            item.notes = act.notes;
+          }
+
+          // Bidirectional sync for location
+          if (item.location && !act.location) {
+            act.location = item.location;
+          } else if (act.location && !item.location) {
+            item.location = act.location;
+          } else if (!item.location && !act.location) {
+            const splitFn = typeof _splitActivityTitle === 'function' ? _splitActivityTitle : _localSplitActivityTitle;
+            const splitItem = splitFn(text);
+            const splitAct = splitFn(act.title);
+            const resolvedLoc = splitItem.location || splitAct.location || '';
+            if (resolvedLoc) {
+              item.location = resolvedLoc;
+              act.location = resolvedLoc;
+            }
+          }
+          
           usedSuggestionIndices.add(matchIdx);
         } else {
           // No match found - create a new suggested activity entry!
@@ -2690,10 +2730,17 @@ function normalizeTripLegsData(legs) {
           else if (/tour|guide|bus/i.test(text)) category = 'tour';
           else if (/attraction|park|ride/i.test(text)) category = 'attraction';
 
-          let cleanTitle = text;
+          const splitFn = typeof _splitActivityTitle === 'function' ? _splitActivityTitle : _localSplitActivityTitle;
+          const splitItem = splitFn(text);
+          let cleanTitle = splitItem.title;
           const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
           if (emojiPattern.test(cleanTitle)) {
             cleanTitle = cleanTitle.replace(emojiPattern, '').trim();
+          }
+
+          const resolvedLoc = item.location || splitItem.location || '';
+          if (resolvedLoc && !item.location) {
+            item.location = resolvedLoc;
           }
 
           const newActivity = {
@@ -2701,6 +2748,8 @@ function normalizeTripLegsData(legs) {
             category: category,
             estTime: item.time || '1 hr',
             estCost: item.cost || '0',
+            notes: item.notes || '',
+            location: resolvedLoc,
             assignedDayIdx: dayIdx,
             assignedDate: day.date || '',
             startDate: item.startDate || day.date || '',

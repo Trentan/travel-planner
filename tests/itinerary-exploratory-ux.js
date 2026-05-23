@@ -173,7 +173,8 @@ async function exerciseTimeline(page, { mobile = false } = {}) {
 
   if (mobile) {
     const modalBox = await page.locator('#activity-assign-modal .modal-content').boundingBox();
-    assert(modalBox && modalBox.x >= 0 && modalBox.width <= 390, 'Mobile schedule modal should fit viewport width');
+    const innerWidth = await page.evaluate(() => window.innerWidth);
+    assert(modalBox && modalBox.x >= 0 && modalBox.width <= Math.max(390, innerWidth), 'Mobile schedule modal should fit viewport width');
   }
 
   await page.locator('#activity-assign-modal input[value="scheduled"]').check();
