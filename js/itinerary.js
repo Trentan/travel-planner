@@ -1232,6 +1232,11 @@ function renderDailyTimelineRow(item, compact = false) {
     ? ` role="button" tabindex="0" onclick="event.stopPropagation(); openDayItemScheduleDialog(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex})"`
     : '';
 
+  const markerClass = "daily-timeline-marker" + (isTimeClickable ? " is-clickable" : "");
+  const markerOnClick = isTimeClickable
+    ? ` role="button" tabindex="0" onclick="event.stopPropagation(); openDayItemScheduleDialog(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex})"`
+    : '';
+
   let checkboxHtml = '';
   if (item.type === 'activity') {
     checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})">`;
@@ -1244,7 +1249,7 @@ function renderDailyTimelineRow(item, compact = false) {
   return `
     <div class="daily-timeline-item daily-timeline-item-${escapeCompactText(item.type)} ${item.done ? 'is-done' : ''}">
       <div class="${timeClass}"${timeOnClick}>${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
-      <div class="daily-timeline-marker"><span>${item.icon}</span></div>
+      <div class="${markerClass}"${markerOnClick}><span>${item.icon}</span></div>
       <div class="daily-timeline-content">
         <div class="daily-timeline-title-row">
           <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
