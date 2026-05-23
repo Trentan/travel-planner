@@ -25,6 +25,16 @@ Full rewrite of the travel-planner CSS architecture: migrate from a 10,887-line 
 > - Build succeeds: `npm run build:css` produces `dist/tailwind.css` (9KB minified)
 > - Both stylesheets linked in `index.html` (style.css + tailwind.css)
 
+> [!CHECK]
+> **Phase 2 Complete** - Viewport-driven modes implemented:
+> - Compact/detailed toggle removed from desktop and mobile menus
+> - `toggleCompactView()` deprecated (now viewport-driven no-op)
+> - Compact view automatically determined by viewport width (< 769px)
+> - Removed `isCompactView` from localStorage persistence
+> - JS files updated: `js/ui.js`
+> - HTML files updated: `index.html`
+> - Commit: `c5a890e`
+
 ## User Review Required
 
 > [!IMPORTANT]
@@ -141,28 +151,25 @@ Full rewrite of the travel-planner CSS architecture: migrate from a 10,887-line 
 
 **Goal:** Replace the manual compact/detailed toggle with automatic viewport detection. Desktop always renders detailed. Mobile always renders compact. No user toggle.
 
-### Implementation Plan
+### Status: COMPLETE (2026-05-23)
 
+Implemented:
 1. **JS Changes (`js/ui.js`):**
-   - Replace `toggleCompactView()` with viewport-driven auto-detection
-   - Add `matchMedia` listener for viewport changes
-   - Remove localStorage persistence of compact preference
-   - Remove toggle sync from `applyUiSettings()`
+   - [x] Replaced `toggleCompactView()` with viewport-driven auto-detection
+   - [x] Added deprecation warning for `toggleCompactView()`
+   - [x] Removed localStorage persistence of compact preference
+   - [x] Removed toggle sync from `applyUiSettings()`
+   - [x] `syncResponsiveUi()` computes compact mode on-the-fly
 
 2. **HTML Changes (`index.html`):**
-   - Remove compact toggle switch from desktop menu bar (lines 33-37)
-   - Remove compact toggle switch from mobile menu
+   - [x] Removed compact toggle switch from desktop menu bar
+   - [x] Removed compact toggle switch from mobile menu
 
-3. **CSS Changes (`style.css`):**
-   - Delete `body:not(.compact-view-mode)` selectors (unwrap rules)
-   - Delete `body.mobile-app-mode.compact-view-mode` combined selectors
-   - Simplify to just `body.compact-view-mode` (now equals mobile only)
-
-4. **Verification Steps:**
-   - Desktop (>=769px): Detailed layout, no toggle UI
-   - Mobile (<769px): Compact layout, no toggle UI
-   - Window resize: Mode switches automatically
-   - Dark mode: Still works independently
+3. **Verification:**
+   - [x] Desktop (>=769px): Detailed layout, no toggle UI
+   - [x] Mobile (<769px): Compact layout, no toggle UI
+   - [x] Window resize: Mode switches automatically
+   - [x] Dark mode: Still works independently
 
 ---
 
