@@ -337,7 +337,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     });
     const subLocsHtml = details ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(details)}</div>` : '';
     const notesHtml = journey.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(journey.notes)}</div>` : '';
-    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}${notesHtml}</div>`;
+    return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); editJourney('${journey.id}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   const accomLines = dayStayInfo.map(info => {
@@ -358,7 +358,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     })() : '';
     const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
     const notesHtml = info.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(info.notes)}</div>` : '';
-    return `<div class="compact-grouped-item">${mainLine}${subLocsHtml}${notesHtml}</div>`;
+    return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); openEditStayModal('${info.stayId}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
@@ -374,7 +374,14 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       return `Location: ${loc}`;
     })() : '';
     const subLocsHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
-    const notesHtml = item.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(item.notes)}</div>` : '';
+    let notes = item.notes || '';
+    if (!notes && typeof findAssignedSuggestedActivity === 'function') {
+      const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
+      if (matched && matched.notes) {
+        notes = matched.notes;
+      }
+    }
+    const notesHtml = notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(notes)}</div>` : '';
     return `
       <div class="compact-activity-row" style="${doneStyle}">
         <input
@@ -1200,6 +1207,14 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       return `Location: ${loc}`;
     })() : '';
 
+    let notes = item.notes || '';
+    if (!notes && typeof findAssignedSuggestedActivity === 'function') {
+      const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
+      if (matched && matched.notes) {
+        notes = matched.notes;
+      }
+    }
+
     items.push({
       type: 'activity',
       typeLabel: 'Activity',
@@ -1208,7 +1223,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       subLocations: activityLoc,
       meta: [item.time || ''].filter(Boolean).join(' · '),
       cost: item.cost,
-      notes: item.notes || '',
+      notes: notes,
       done: !!item.done,
       startTime: item.startTime || '',
       endTime: item.endTime || '',
@@ -1236,16 +1251,23 @@ function getDailyTimelineBuckets(items) {
 }
 
 function renderDailyTimelineRow(item, compact = false) {
-  const isTimeClickable = isEditMode && item.type === 'activity';
+  const isTimeClickable = isEditMode && (item.type === 'activity' || item.type === 'transport' || item.type === 'stay');
   const timeClass = "daily-timeline-time" + (isTimeClickable ? " is-clickable" : "");
-  const timeOnClick = isTimeClickable
-    ? ` role="button" tabindex="0" onclick="event.stopPropagation(); openDayItemScheduleDialog(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex})"`
-    : '';
+  
+  let onClickAction = '';
+  if (isTimeClickable) {
+    if (item.type === 'activity') {
+      onClickAction = ` role="button" tabindex="0" onclick="event.stopPropagation(); openDayItemScheduleDialog(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex})"`;
+    } else if (item.type === 'stay') {
+      onClickAction = ` role="button" tabindex="0" onclick="event.stopPropagation(); openEditStayModal('${item.stayId}')"`;
+    } else if (item.type === 'transport') {
+      onClickAction = ` role="button" tabindex="0" onclick="event.stopPropagation(); editJourney('${item.journeyId}')"`;
+    }
+  }
 
+  const timeOnClick = onClickAction;
   const markerClass = "daily-timeline-marker" + (isTimeClickable ? " is-clickable" : "");
-  const markerOnClick = isTimeClickable
-    ? ` role="button" tabindex="0" onclick="event.stopPropagation(); openDayItemScheduleDialog(${item.legIndex}, ${item.dayIndex}, 'activityItems', ${item.itemIndex})"`
-    : '';
+  const markerOnClick = onClickAction;
 
   let checkboxHtml = '';
   if (item.type === 'activity') {
@@ -1793,7 +1815,14 @@ ${(() => {
                 return `Location: ${loc}`;
               })() : '';
               const locHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
-              const notesHtml = item.notes ? `<div class="daily-timeline-notes" style="font-size:0.72rem; color:var(--muted); font-style:italic; padding-left:0; margin-top:2px;">💬 ${escapeCompactText(item.notes)}</div>` : '';
+              let notes = item.notes || '';
+              if (!notes && typeof findAssignedSuggestedActivity === 'function') {
+                const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
+                if (matched && matched.notes) {
+                  notes = matched.notes;
+                }
+              }
+              const notesHtml = notes ? `<div class="daily-timeline-notes" style="font-size:0.72rem; color:var(--muted); font-style:italic; padding-left:0; margin-top:2px;">💬 ${escapeCompactText(notes)}</div>` : '';
               return `
                 <div class="cost-item">
                   <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
