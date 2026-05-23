@@ -10289,6 +10289,39 @@ body.hide-money-figures .sight-inline-meta-cost {
     background: var(--color-bg-secondary) !important;
   }
 
+  /* Compact leg header in dark mode - text visibility */
+  .compact-leg-card .compact-leg-header,
+  body.compact-view-mode .compact-leg-card .compact-leg-header {
+    background: var(--color-accent-teal) !important;
+  }
+
+  .compact-leg-date,
+  .compact-leg-label,
+  body.compact-view-mode .compact-leg-date,
+  body.compact-view-mode .compact-leg-label {
+    color: var(--color-text-primary) !important;
+  }
+
+  .compact-leg-card .compact-leg-night-count,
+  .compact-leg-card .compact-leg-header-hint,
+  body.compact-view-mode .compact-leg-card .compact-leg-night-count,
+  body.compact-view-mode .compact-leg-card .compact-leg-header-hint {
+    color: var(--color-text-primary) !important;
+  }
+
+  /* City nav overflow indicators - dark mode */
+  .city-nav::before,
+  .city-nav::after {
+    background: linear-gradient(270deg, var(--color-bg-primary) 0%, var(--color-bg-primary) 55%, rgba(9, 13, 22, 0) 100%) !important;
+    color: var(--color-text-muted) !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  .city-nav-list {
+    padding-left: 0.5rem !important;
+  }
+
   /* Top app menu bar - Dark gradient override */
   .app-menu-bar {
     background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important;
