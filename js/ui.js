@@ -61,6 +61,8 @@ function syncResponsiveUi() {
   lastViewportWasMobile = mobile;
 
   document.body.classList.toggle('mobile-app-mode', mobile);
+  // Compact view is now viewport-driven
+  isCompactView = mobile;
   document.body.classList.toggle('compact-view-mode', isCompactView);
   window.isCompactView = isCompactView;
   updateStickyOffsets();
@@ -73,6 +75,7 @@ function syncResponsiveUi() {
   }
 
   if (viewportChanged) {
+    // Rebuild view when switching between mobile/desktop
     if (typeof rebuildCurrentView === 'function') {
       rebuildCurrentView();
     }
@@ -161,7 +164,6 @@ function syncItineraryViewModeButtons() {
 
 function saveUiSettings() {
   localStorage.setItem('travelApp_uiSettings_v1', JSON.stringify({
-    isCompactView,
     isEditMode,
     isFunMode,
     itineraryDayViewMode,
@@ -238,24 +240,24 @@ function applyUiSettings() {
 
   if (savedSettings) {
     isFunMode = savedSettings.isFunMode === true;
-    isCompactView = !!savedSettings.isCompactView;
     isEditMode = savedSettings.isEditMode !== false;
     itineraryDayViewMode = savedSettings.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
     showMoneyFigures = savedSettings.showMoneyFigures !== false;
     currentTheme = savedSettings.theme || 'system';
-  } else if (isMobileViewport()) {
-    isCompactView = true;
   }
+
+  // Compact view is now viewport-driven (applied in syncResponsiveUi)
+  // Set initial compact view based on viewport
+  isCompactView = isMobileViewport();
+  window.isCompactView = isCompactView;
 
   // Sync to window for cross-module access
   window.isFunMode = isFunMode;
-  window.isCompactView = isCompactView;
   window.isEditMode = isEditMode;
   window.itineraryDayViewMode = itineraryDayViewMode;
   window.showMoneyFigures = showMoneyFigures;
 
   document.body.classList.toggle('fun-mode', isFunMode);
-  document.body.classList.toggle('compact-view-mode', isCompactView);
   document.body.classList.toggle('read-only-mode', !isEditMode);
   document.body.classList.toggle('hide-money-figures', !showMoneyFigures);
   applyTheme();
@@ -455,12 +457,13 @@ function closeGuideDialog() {
   if (modal) modal.style.display = 'none';
 }
 
-function toggleCompactView(nextValue = null) {
-  isCompactView = typeof nextValue === 'boolean' ? nextValue : !isCompactView;
-  saveUiSettings();
+function applyViewportDrivenMode() {
+  // Automatically set compact view based on viewport width (< 769px = compact)
+  const isMobile = isMobileViewport();
+  isCompactView = isMobile;
   window.isCompactView = isCompactView;
   document.body.classList.toggle('compact-view-mode', isCompactView);
-  applyUiSettings();
+  // Rebuild current view to apply the correct layout
   const activeTabBtn = document.querySelector('.app-tab-btn.active');
   if (activeTabBtn && activeTabBtn.dataset.tab) {
     switchTab(activeTabBtn.dataset.tab, activeTabBtn);
@@ -468,6 +471,13 @@ function toggleCompactView(nextValue = null) {
     buildItinerary();
     buildPackingTab();
   }
+}
+
+function toggleCompactView(nextValue = null) {
+  // Deprecated: This function is now viewport-driven only.
+  // The nextValue parameter is ignored; compact view is determined by viewport width.
+  applyViewportDrivenMode();
+  console.warn('toggleCompactView() is deprecated. Compact view is now auto-detected from viewport.');
 }
 
 function setItineraryDayViewMode(nextMode = 'timeline') {
