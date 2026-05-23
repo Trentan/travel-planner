@@ -284,7 +284,7 @@ function renderMobileSurfaceCard({
         <div class="mobile-surface-card-headline">
           <div class="mobile-surface-card-headline-line">
             ${dateLabel ? `<span class="mobile-surface-card-date">${escapeHtmlText(dateLabel)}</span>` : ''}
-            ${title ? `<span class="mobile-surface-card-title">${escapeHtmlText(title || '—')}</span>` : ''}
+            ${title ? `<h3 class="mobile-surface-card-title">${escapeHtmlText(title || '—')}</h3>` : ''}
             ${subtitle ? `<span class="mobile-surface-card-subtitle">${escapeHtmlText(subtitle)}</span>` : ''}
           </div>
         </div>
@@ -342,6 +342,21 @@ function setupMobileSwipePagers(root = document) {
     let scrollFrame = 0;
     const initialIndex = getMobilePagerActiveIndex(pagerKey, Number(pager.dataset.activeIndex || 0));
 
+    // Dynamically build visual dots indicators
+    let dotsContainer = pager.querySelector('.mobile-swipe-dots');
+    if (!dotsContainer && total > 1) {
+      dotsContainer = document.createElement('div');
+      dotsContainer.className = 'mobile-swipe-dots';
+      pager.appendChild(dotsContainer);
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'mobile-swipe-dot';
+        dot.dataset.slideIndex = String(i);
+        dotsContainer.appendChild(dot);
+      }
+    }
+    const dots = dotsContainer ? Array.from(dotsContainer.querySelectorAll('.mobile-swipe-dot')) : [];
+
     const setActive = nextIndex => {
       const safeIndex = Math.max(0, Math.min(total - 1, Number(nextIndex) || 0));
 
@@ -354,6 +369,11 @@ function setupMobileSwipePagers(root = document) {
         chip.classList.toggle('active', active);
         chip.setAttribute('aria-selected', active ? 'true' : 'false');
         chip.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+
+      // Update active state of dot indicators
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === safeIndex);
       });
 
       if (progressFill) progressFill.style.width = `${((safeIndex + 1) / total) * 100}%`;
@@ -380,6 +400,13 @@ function setupMobileSwipePagers(root = document) {
     chips.forEach(chip => {
       chip.addEventListener('click', () => {
         scrollToIndex(Number(chip.dataset.dayIndex || chip.dataset.slideIndex || 0));
+      });
+    });
+
+    // Add click listeners to page dots
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        scrollToIndex(Number(dot.dataset.slideIndex || 0));
       });
     });
 

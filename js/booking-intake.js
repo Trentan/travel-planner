@@ -421,8 +421,32 @@ async function handleBookingIntakeFile(event) {
 function previewBookingIntake() {
   const text = document.getElementById('bookingIntakeText')?.value || '';
   const sourceName = bookingIntakeLastFile?.name || 'Pasted confirmation';
-  bookingIntakePreviewItems = parseBookingConfirmationText(text, sourceName);
-  renderBookingIntakeReview(bookingIntakePreviewItems);
+  
+  const reviewEl = document.getElementById('bookingIntakeReview');
+  if (reviewEl) {
+    reviewEl.innerHTML = `
+      <div class="shimmer-card">
+        <div class="shimmer-line shimmer-title"></div>
+        <div class="shimmer-line shimmer-text"></div>
+        <div class="shimmer-line shimmer-meta"></div>
+      </div>
+      <div class="shimmer-card">
+        <div class="shimmer-line shimmer-title"></div>
+        <div class="shimmer-line shimmer-text"></div>
+        <div class="shimmer-line shimmer-meta"></div>
+      </div>
+    `;
+    const countEl = document.getElementById('bookingIntakeReviewCount');
+    if (countEl) countEl.textContent = 'Extracting booking details...';
+    const mergeBtn = document.getElementById('bookingIntakeMergeBtn');
+    if (mergeBtn) mergeBtn.disabled = true;
+    getBookingIntakeModal()?.classList.add('booking-intake-has-preview');
+  }
+
+  setTimeout(() => {
+    bookingIntakePreviewItems = parseBookingConfirmationText(text, sourceName);
+    renderBookingIntakeReview(bookingIntakePreviewItems);
+  }, 500);
 }
 
 function createJourneyFromBookingItem(item) {

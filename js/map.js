@@ -50,8 +50,18 @@ function buildJourneyMap() {
   }
 
   mainMap = L.map(container).setView([20, 0], 2);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
+
+  // Select tile layer based on current theme
+  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+  const tileUrl = isDarkMode
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+  L.tileLayer(tileUrl, {
+    attribution: isDarkMode
+      ? '© OpenStreetMap contributors © CARTO'
+      : '© OpenStreetMap contributors',
+    subdomains: 'abcd'
   }).addTo(mainMap);
 
   mapMarkers = [];
@@ -310,18 +320,47 @@ function openAllInGoogleMaps() {
   });
 
   if (cities.length === 0) return;
-  
+
   let url = "https://www.google.com/maps/dir/";
   cities.forEach(c => url += encodeURIComponent(c) + "/");
   window.open(url, '_blank');
 }
 
-// Watch for tab switch
+// Update map tiles when theme changes
+function updateMapTiles() {
+  if (!mainMap) return;
+
+  // Remove existing tile layers
+  mainMap.eachLayer(layer => {
+    if (layer._url) {
+      mainMap.removeLayer(layer);
+    }
+  });
+
+  // Add new tile layer based on current theme
+  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+  const tileUrl = isDarkMode
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+  L.tileLayer(tileUrl, {
+    attribution: isDarkMode
+      ? '© OpenStreetMap contributors © CARTO'
+      : '© OpenStreetMap contributors',
+    subdomains: 'abcd'
+  }).addTo(mainMap);
+}
+
+// Watch for tab switch and theme changes
 document.addEventListener('DOMContentLoaded', () => {
   const observer = new MutationObserver((mutations) => {
     mutations.forEach(mutation => {
       if (mutation.target.id === 'tab-map' && mutation.target.classList.contains('active')) {
         setTimeout(buildJourneyMap, 100);
+      }
+      // Watch for theme changes
+      if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+        updateMapTiles();
       }
     });
   });
@@ -329,6 +368,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const mapTab = document.getElementById('tab-map');
   if (mapTab) {
     observer.observe(mapTab, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  // Watch for theme changes on html element
+  const htmlEl = document.documentElement;
+  if (htmlEl) {
+    observer.observe(htmlEl, { attributes: true, attributeFilter: ['data-theme'] });
   }
 });
 
