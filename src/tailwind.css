@@ -2055,12 +2055,20 @@
     @apply pl-0 mt-0.5;
   }
 
+  .timeline-sub-locations-indented {
+    @apply pl-5 mt-0.5;
+  }
+
   .booking-ref-inline {
     @apply font-mono text-[0.75rem] text-[#666];
   }
 
   .timeline-notes-inline {
     @apply text-[0.72rem] text-text-muted italic pl-0 mt-0.5;
+  }
+
+  .timeline-notes-indented {
+    @apply text-[0.72rem] text-text-muted italic pl-5 mt-0.5;
   }
 
   .cost-item-row {
@@ -3022,7 +3030,7 @@
 }
 
 [data-theme="dark"] .mobile-menu-sheet-header p {
-  @apply text-white/70;
+  @apply text-white/80;
 }
 
 [data-theme="dark"] .mobile-menu-trip-status {
@@ -3038,7 +3046,36 @@
 
 [data-theme="dark"] .mobile-menu-trip-label,
 [data-theme="dark"] .mobile-menu-section-title {
-  @apply text-white/70;
+  @apply text-white/80;
+}
+
+[data-theme="dark"] .app-tab-btn {
+  color: rgb(203 213 225 / 0.95);
+}
+
+[data-theme="dark"] .app-tab-btn:hover {
+  color: rgb(248 250 252 / 1);
+  background: rgba(51, 65, 85, 0.34);
+}
+
+[data-theme="dark"] .app-tab-btn.active {
+  color: rgb(125 211 252 / 1);
+  background: rgba(8, 145, 178, 0.16);
+}
+
+[data-theme="dark"] .daily-timeline-summary,
+[data-theme="dark"] .timeline-section-label,
+[data-theme="dark"] .daily-timeline-type,
+[data-theme="dark"] .daily-timeline-meta,
+[data-theme="dark"] .daily-timeline-notes,
+[data-theme="dark"] .daily-timeline-sub-locations,
+[data-theme="dark"] .sight-inline-meta-notes {
+  color: rgb(226 232 240 / 0.95);
+}
+
+[data-theme="dark"] .daily-timeline-summary {
+  border-color: rgba(148, 163, 184, 0.34);
+  background: rgba(15, 23, 42, 0.78);
 }
 
 [data-theme="dark"] .daily-timeline-time,

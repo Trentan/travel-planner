@@ -460,8 +460,8 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       duration: duration,
       cost: getJourneyDisplayCost(journey) ? formatCurrency(getJourneyDisplayCost(journey)) : ''
     });
-    const subLocsHtml = details ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(details)}</div>` : '';
-    const notesHtml = journey.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(journey.notes)}</div>` : '';
+    const subLocsHtml = details ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(details)}</div>` : '';
+    const notesHtml = journey.notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(journey.notes)}</div>` : '';
     return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); editJourney('${journey.journeyId || journey.id}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
@@ -481,8 +481,8 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       }
       return `Location: ${loc}`;
     })() : '';
-    const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
-    const notesHtml = info.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(info.notes)}</div>` : '';
+    const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
+    const notesHtml = info.notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(info.notes)}</div>` : '';
     return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); openEditStayModal('${info.stayId}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
@@ -508,7 +508,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       }
       return `Location: ${loc}`;
     })() : '';
-    const subLocsHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
+    const subLocsHtml = activityLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
     let notes = item.notes || '';
     if (!notes && typeof findAssignedSuggestedActivity === 'function') {
       const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
@@ -516,7 +516,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
         notes = matched.notes;
       }
     }
-    const notesHtml = notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(notes)}</div>` : '';
+    const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(notes)}</div>` : '';
     return `
       <div class="compact-activity-row" style="${doneStyle}">
         <input
@@ -1437,7 +1437,7 @@ function renderDailyTimelineRow(item, compact = false) {
           </div>
         </div>
         ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> · ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
-        ${item.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8;">💬 ${escapeCompactText(item.notes)}</div>` : ''}
+        ${item.notes ? `<div class="daily-timeline-notes">💬 ${escapeCompactText(item.notes)}</div>` : ''}
         ${item.subLocations ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
@@ -1851,7 +1851,7 @@ function buildItinerary() {
       const badgeIcon = isCompleted ? '✓' : '✓';
       const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
       const categoryEmoji = getCategoryEmoji(activity.category);
-      const notesMetaHtml = activity.notes ? ` · <span class="sight-inline-meta-notes" style="font-style:italic; color:var(--muted);" title="${escapeHtmlText(activity.notes)}">💬 ${escapeHtmlText(activity.notes)}</span>` : '';
+      const notesMetaHtml = activity.notes ? ` · <span class="sight-inline-meta-notes" title="${escapeHtmlText(activity.notes)}">💬 ${escapeHtmlText(activity.notes)}</span>` : '';
       return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle opacity-50 hover:opacity-100 cursor-grab shrink-0 mt-0.5" title="Drag to assign">⠿</span>` : `<span class="assigned-badge shrink-0 mt-0.5 ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji shrink-0 mt-0.5">${categoryEmoji}</span><div class="flex flex-col min-w-0 flex-1"><span class="break-words" style="${isCompleted ? 'text-decoration:line-through;opacity:0.6;' : ''}">${activity.title}</span><span class="sight-inline-meta text-xs text-slate-400 mt-0.5 block truncate">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span>${notesMetaHtml}</span></div><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn shrink-0" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
     }).join('')}</ul>
         <button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
@@ -1992,7 +1992,7 @@ ${(() => {
                 }
                 return `Location: ${loc}`;
               })() : '';
-              const locHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
+              const locHtml = activityLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-inline">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
               let notes = item.notes || '';
               if (!notes && typeof findAssignedSuggestedActivity === 'function') {
                 const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
@@ -2000,7 +2000,7 @@ ${(() => {
                   notes = matched.notes;
                 }
               }
-              const notesHtml = notes ? `<div class="daily-timeline-notes" style="font-size:0.72rem; color:var(--muted); font-style:italic; padding-left:0; margin-top:2px;">💬 ${escapeCompactText(notes)}</div>` : '';
+              const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-inline">💬 ${escapeCompactText(notes)}</div>` : '';
               return `
                 <div class="cost-item flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200/50 dark:border-slate-600/50 text-sm hover:shadow-md transition-shadow group">
                   <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
