@@ -672,8 +672,24 @@ function initMobileScrollNav() {
       cityNavEl.classList.remove('city-nav-hidden');
     }
     
-    lastScrollY = currentScrollY;
+    cityNavLastScrollY = currentScrollY;
   }, { passive: true });
 }
 
 document.addEventListener('DOMContentLoaded', initMobileScrollNav);
+
+
+// -- City Nav Scroll Behavior --
+let cityNavLastScrollY = window.scrollY;
+window.addEventListener('scroll', () => {
+  const cityNav = document.getElementById('cityNav');
+  if (!cityNav) return;
+  const currentScrollY = window.scrollY;
+  // If scrolled down past 60px, hide the nav by translating it up
+  if (currentScrollY > cityNavLastScrollY && currentScrollY > 60) {
+    cityNav.classList.add('-translate-y-full');
+  } else {
+    cityNav.classList.remove('-translate-y-full');
+  }
+  cityNavLastScrollY = currentScrollY;
+}, { passive: true });

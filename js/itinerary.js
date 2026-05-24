@@ -560,7 +560,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     summary: `
           <div class="compact-day-summary-row">
             <span class="compact-day-summary-desc">${escapeCompactText(day.desc || 'No description yet')}</span>
-            ${dayTotal ? `<span class="compact-day-total-badge">${escapeCompactText(dayTotal)}</span>` : ''}
+            ${dayTotal ? `<span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${escapeCompactText(dayTotal)}</span>` : ''}
           </div>
         `,
     primaryAction: '',
@@ -876,7 +876,7 @@ function renderCompactLegCard(leg, legIndex) {
         <div class="compact-leg-header-line">
           <span class="compact-leg-date">${escapeHtmlText(legDateRange || '-')}</span>
           <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
-          <span class="compact-leg-cost-badge">${formatCurrency(legCost)}</span>
+          <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
           <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
         </div>
       </div>
@@ -925,7 +925,7 @@ function buildCompactItinerary() {
           <div class="compact-leg-header-line">
             <span class="compact-leg-date">${escapeHtmlText(legDateRange || '—')}</span>
             <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
-            <span class="compact-leg-cost-badge">${formatCurrency(legCost)}</span>
+            <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
             <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
           </div>
         </div>
@@ -2436,7 +2436,7 @@ function buildCityNav() {
 
   // Keep the "All" button
   navList.innerHTML = `
-    <button class="city-nav-btn ${filter === 'all' ? 'active' : ''}" data-city="all" onclick="selectCityFilter('all', this)">
+    <button class="city-nav-btn px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700 ${filter === 'all' ? 'active' : ''}" data-city="all" onclick="selectCityFilter('all', this)">
       <span>🏙️ All</span>
     </button>
   `;
@@ -2455,10 +2455,10 @@ function buildCityNav() {
     const color = city.colour || (isTransit ? '#95a5a6' : '#2C3E50');
 
     if (isTransit) {
-      btn.className = 'city-nav-btn city-nav-btn-transit' + (filter === city.id ? ' active' : '');
+      btn.className = 'city-nav-btn px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700 opacity-70' + (filter === city.id ? ' active' : '');
       btn.style.borderLeft = `4px dashed ${color}`;
     } else {
-      btn.className = 'city-nav-btn' + (filter === city.id ? ' active' : '');
+      btn.className = 'city-nav-btn px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700' + (filter === city.id ? ' active' : '');
       btn.style.borderLeft = `4px solid ${color}`;
     }
 
