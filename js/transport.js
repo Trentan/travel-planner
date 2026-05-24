@@ -1028,7 +1028,7 @@ function buildTransportTab(cityFilter = null) {
     <table class="data-table transport-table mobile-table">
       <thead>
         <tr>
-          <th class="transport-expand-col" style="width:28px;"></th>
+          <th class="transport-expand-col transport-expand-col-narrow"></th>
           <th>Journey</th>
           <th>Type</th>
           <th>Route</th>
@@ -1125,7 +1125,7 @@ function buildTransportTab(cityFilter = null) {
         <td class="transport-routecode-col" data-label="Code">${rep.routeCode || '—'}</td>
         <td class="transport-bookingref-col" data-label="Booking Ref">${rep.bookingReference || '—'}</td>
         <td class="transport-status-col" data-label="Status">
-          <span class="status-badge" style="--status-color:${statusColor}; cursor:pointer;" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
+          <span class="status-badge transport-status-badge-clickable" style="--status-color:${statusColor};" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
             ${statusIcon} ${statusText}
           </span>
           ${renderTransportStatusCostMobile(statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.bookingReference, rep.id, isEditMode)}
@@ -1393,19 +1393,18 @@ function _updateSegmentList() {
 
     summaryContainer.innerHTML = _pendingSegments.map((s, i) => {
       const isCurrent = _activeSegmentIndex === i;
-      const bgStyle = isCurrent ? 'background: #e8f0fe; border: 1px solid #3c5a99; padding: 6px; border-radius: 6px;' : '';
       const depString = `${formatJourneyDate(s.departureDate)} ${s.departureTime || ''}`.trim();
       const arrString = `${formatJourneyDate(s.arrivalDate)} ${s.arrivalTime || ''}`.trim();
       const providerStr = `${s.provider} ${s.routeCode}`.trim();
 
       return `
-      <div style="font-size: 0.85rem; color: #666; text-align: center; margin-bottom: 8px; ${bgStyle}">
+      <div class="pending-segment-summary ${isCurrent ? 'is-current' : ''}">
         <span>✓ Segment ${i + 1}: ${s.fromLocation} ➔ ${s.toLocation}</span>
-        <span style="color: #ccc;">&bull;</span>
+        <span class="pending-segment-separator">&bull;</span>
         <span>${depString} ➔ ${arrString}</span>
-        ${providerStr ? `<span style="color: #ccc;">&bull;</span><span>${providerStr}</span>` : ''}
-        <button onclick="editPendingSegment(${i})" style="background:none; border:none; color:#3498DB; cursor:pointer; font-size:1rem; opacity:0.8; padding:0 4px;" title="Edit leg">✎</button>
-        <button onclick="removePendingSegment(${i})" style="background:none; border:none; color:#E74C3C; cursor:pointer; font-size:1rem; opacity:0.6; padding:0 4px;" title="Remove leg">Ã—</button>
+        ${providerStr ? `<span class="pending-segment-separator">&bull;</span><span>${providerStr}</span>` : ''}
+        <button onclick="editPendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-edit" title="Edit leg">✎</button>
+        <button onclick="removePendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-remove" title="Remove leg">Ã—</button>
       </div>`;
     }).join('');
   }

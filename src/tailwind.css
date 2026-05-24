@@ -11,6 +11,17 @@
 /* Dark mode variant using data-theme attribute (existing pattern) */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+@layer base {
+  input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  select,
+  textarea {
+    @apply dark:bg-bg-secondary dark:text-text-primary dark:border-border;
+  }
+}
+
 /* Migration layer: Component styles using Tailwind utilities */
 /* These will replace the old style.css rules gradually */
 
@@ -42,21 +53,35 @@
            hover:bg-btn-danger-hover hover:border-btn-danger-hover;
   }
 
+  .action-btn-olive {
+    @apply text-white;
+    background-color: #556B2F;
+    border-color: #556B2F;
+  }
+
+  .action-btn-teal {
+    @apply text-white;
+    background-color: #1F6F8B;
+    border-color: #1F6F8B;
+  }
+
   /* Form controls - base input/select/textarea styling */
   .form-control {
     @apply w-full px-3 py-2.5 rounded-[6px]
            bg-surface-input border border-[#ddd]
            font-sans text-[0.95rem] text-text-primary
-           transition-colors duration-200;
+           transition-colors duration-200
+           dark:bg-bg-secondary dark:text-text-primary dark:border-border;
   }
 
   .form-control:focus {
-    @apply border-border-strong outline-none;
+    @apply border-border-strong outline-none dark:border-accent-teal;
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-teal) 30%, transparent);
   }
 
   .form-control:disabled {
-    @apply bg-[#f5f5f5] text-[#7a7a7a] cursor-not-allowed;
+    @apply bg-[#f5f5f5] text-[#7a7a7a] cursor-not-allowed
+           dark:bg-surface-input dark:text-text-muted;
   }
 
   /* Form control variants */
@@ -74,6 +99,90 @@
 
   .form-control--mono {
     @apply font-mono;
+  }
+
+  .add-leg-field-gap {
+    @apply mb-2;
+  }
+
+  .stack-gap-4 {
+    @apply flex flex-col gap-4;
+  }
+
+  .row-gap-2 {
+    @apply flex gap-2;
+  }
+
+  .divider-or-wrap {
+    @apply text-center text-[#666] text-[0.9rem] relative;
+  }
+
+  .divider-or-label {
+    @apply bg-[#f5f5f5] px-4 relative z-[1];
+  }
+
+  .divider-or-line {
+    @apply absolute top-1/2 left-0 right-0 h-px bg-[#ddd] z-0;
+  }
+
+  .guide-actions-spaced {
+    @apply mb-6;
+  }
+
+  .city-list-scroll {
+    @apply max-h-[400px] overflow-y-auto;
+  }
+
+  .city-add-section {
+    @apply mt-6 pt-4 border-t border-border;
+  }
+
+  .city-add-heading {
+    @apply mb-4;
+  }
+
+  .city-add-stack {
+    @apply flex flex-col gap-3;
+  }
+
+  .city-add-input {
+    @apply text-[0.95rem] px-3 py-2.5 rounded-[6px];
+  }
+
+  .city-custom-country {
+    @apply p-2.5 px-3 bg-[#f0f7ff] rounded-[6px] border border-[#b3d9ff];
+  }
+
+  .city-custom-country-label {
+    @apply text-[0.85rem] text-[#333] mb-1.5;
+  }
+
+  .city-custom-country-input {
+    @apply px-2 py-2 text-[0.9rem] border-[#a3c9e8] rounded;
+  }
+
+  .city-custom-country-code {
+    @apply w-[100px] px-2 py-2 text-[0.9rem] border-[#a3c9e8] rounded uppercase;
+  }
+
+  .city-code-display {
+    @apply bg-[#f5f5f5] px-3 py-2 rounded text-[0.85rem] text-[#666];
+  }
+
+  .modal-form-divider-tight {
+    @apply mb-2;
+  }
+
+  .journey-city-link-row {
+    @apply text-right mb-6;
+  }
+
+  .stay-nights-input {
+    @apply w-[100px];
+  }
+
+  .stay-notes-input {
+    @apply resize-y min-h-[60px];
   }
 
   /* Checkbox styling */
@@ -106,17 +215,20 @@
   /* Modal content panel */
   .modal-content {
     @apply bg-white rounded-lg w-full max-w-[700px] max-h-[90vh]
-           overflow-hidden flex flex-col shadow-2xl;
+           overflow-hidden flex flex-col shadow-2xl
+           dark:bg-surface-card;
   }
 
   /* Modal header */
   .modal-header {
     @apply flex justify-between items-center px-6 py-4
-           border-b border-border bg-[#FAFAF8];
+           border-b border-border bg-[#FAFAF8]
+           dark:bg-bg-secondary dark:border-border;
   }
 
   .modal-header h2 {
-    @apply font-serif text-xl text-btn-secondary m-0;
+    @apply font-serif text-xl text-btn-secondary m-0
+           dark:text-text-primary;
   }
 
   /* Modal close button */
@@ -138,7 +250,8 @@
   /* Modal footer */
   .modal-footer {
     @apply flex justify-end gap-3 px-6 py-4
-           border-t border-border bg-[#FAFAF8];
+           border-t border-border bg-[#FAFAF8]
+           dark:bg-bg-secondary dark:border-border;
   }
 
   /* Modal size variants */
@@ -192,6 +305,452 @@
 
   .section-header-note {
     @apply text-[0.9rem] text-[#666] mt-2;
+  }
+
+  .compact-sub-locations {
+    @apply pl-5 mt-0.5;
+  }
+
+  .compact-item-notes {
+    @apply pl-5 mt-px text-[0.72rem] text-text-muted italic opacity-80;
+  }
+
+  .compact-grouped-item-editable {
+    @apply cursor-pointer;
+  }
+
+  .compact-activity-row.is-done {
+    @apply line-through opacity-70;
+  }
+
+  .compact-activity-checkbox {
+    @apply w-3 h-3 mt-px accent-btn-success;
+  }
+
+  .compact-activity-copy-editable {
+    @apply cursor-pointer;
+  }
+
+  .compact-legacy-activity-row {
+    @apply flex items-start gap-1.5;
+  }
+
+  .compact-legacy-activity-row.is-done {
+    @apply line-through opacity-70;
+  }
+
+  .compact-legacy-activity-checkbox {
+    @apply w-3 h-3 mt-px accent-btn-success;
+  }
+
+  .compact-legacy-activity-content {
+    @apply min-w-0;
+  }
+
+  .compact-legacy-day-card {
+    @apply m-0 border-t border-black/10;
+  }
+
+  .compact-legacy-day-top {
+    @apply flex items-center gap-1.5 text-[11px] py-1;
+  }
+
+  .compact-legacy-day-label {
+    @apply font-semibold;
+  }
+
+  .compact-legacy-day-route {
+    @apply text-[10px];
+  }
+
+  .compact-legacy-day-desc {
+    @apply text-[9px] text-[#666] flex-1;
+  }
+
+  .compact-legacy-day-grid {
+    @apply grid grid-cols-2 gap-1.5 mt-[5px] text-[10px];
+  }
+
+  .compact-legacy-leg-content {
+    @apply p-2;
+  }
+
+  .compact-legacy-leg-header-row {
+    @apply flex items-center justify-between;
+  }
+
+  .compact-legacy-leg-header-title {
+    @apply m-0 text-sm cursor-default;
+  }
+
+  .compact-legacy-leg-header-night {
+    @apply text-[11px] ml-2.5;
+  }
+
+  .compact-legacy-food-card {
+    @apply my-1 mb-2 px-2 pt-1.5 pb-1 rounded-lg text-[10px] leading-tight bg-white/75 border-l-[3px];
+  }
+
+  .compact-legacy-food-header {
+    @apply flex items-center justify-between gap-1.5 mb-1 text-[#4A4A4A];
+  }
+
+  .compact-legacy-food-title {
+    @apply text-[10px];
+  }
+
+  .compact-legacy-food-subtitle {
+    @apply text-[9px] text-[#7A7A7A];
+  }
+
+  .compact-legacy-food-list {
+    @apply flex flex-col gap-[3px];
+  }
+
+  .compact-legacy-food-item {
+    @apply flex items-start gap-1.5 text-[10px] text-[#495057] cursor-pointer;
+  }
+
+  .compact-legacy-food-text {
+    @apply leading-[1.3];
+  }
+
+  .compact-legacy-food-text.is-done {
+    @apply line-through opacity-65;
+  }
+
+  .compact-suggested-activity-title.is-done {
+    @apply line-through opacity-60;
+  }
+
+  .compact-header-static {
+    @apply cursor-default;
+  }
+
+  .leg-header-dynamic-bg {
+    background: var(--leg-header-bg);
+  }
+
+  .border-left-accent-var {
+    border-left-color: var(--accent-border);
+  }
+
+  .progress-width-var {
+    width: var(--progress-width);
+  }
+
+  .compact-summary-static {
+    @apply cursor-default select-none;
+  }
+
+  .leg-header-title-row {
+    @apply flex items-center gap-2.5 flex-wrap;
+  }
+
+  .leg-date-range {
+    @apply opacity-80 text-[0.9rem] font-mono;
+  }
+
+  .leg-header-actions-row {
+    @apply flex items-center gap-2.5;
+  }
+
+  .content-done {
+    @apply line-through opacity-60;
+  }
+
+  .area-color-var {
+    color: var(--area-color);
+  }
+
+  .border-color-var {
+    border-color: var(--border-color);
+  }
+
+  .stay-status-badge-clickable {
+    @apply cursor-pointer;
+  }
+
+  .add-btn-home-task {
+    @apply w-auto mt-2.5 border-btn-danger text-[#C0392B];
+  }
+
+  .guide-prompt-block {
+    @apply italic bg-[#f8f6f1] p-3 border-l-[3px] border-[#cfc6b8] text-text-primary;
+  }
+
+  .packing-area-spaced {
+    @apply mb-12;
+    scroll-margin-top: 140px;
+  }
+
+  .packing-area-heading {
+    @apply font-serif border-b-2 pb-2 mb-4;
+    color: var(--area-color);
+  }
+
+  .packing-card-add-block {
+    @apply border-2 border-dashed border-border flex items-center justify-center cursor-pointer;
+  }
+
+  .packing-card-add-label {
+    @apply font-medium text-text-muted;
+  }
+
+  .budget-row-accent {
+    border-left: 4px solid var(--row-border-color);
+  }
+
+  .budget-leg-label {
+    @apply font-semibold;
+  }
+
+  .budget-leg-total {
+    @apply font-mono font-semibold;
+  }
+
+  .transport-expand-col-narrow {
+    width: 28px;
+  }
+
+  .transport-status-badge-clickable {
+    @apply cursor-pointer;
+  }
+
+  .pending-segment-summary {
+    @apply text-[0.85rem] text-[#666] text-center mb-2;
+  }
+
+  .pending-segment-summary.is-current {
+    @apply bg-[#e8f0fe] border border-[#3c5a99] p-1.5 rounded-md;
+  }
+
+  .pending-segment-separator {
+    @apply text-[#ccc];
+  }
+
+  .pending-segment-icon-btn {
+    @apply bg-transparent border-none cursor-pointer text-base px-1;
+  }
+
+  .pending-segment-icon-btn-edit {
+    @apply text-[#3498DB] opacity-80;
+  }
+
+  .pending-segment-icon-btn-remove {
+    @apply text-btn-danger opacity-60;
+  }
+
+  .autopopulate-notice {
+    @apply bg-[#E8F5E9] border border-[#4CAF50] rounded p-3 mb-4 text-text-primary;
+  }
+
+  .autopopulate-notice-copy {
+    @apply text-[#2E7D32];
+  }
+
+  .autopopulate-notice-btn {
+    @apply ml-3;
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+    color: #fff;
+  }
+
+  .backup-reminder-shell {
+    @apply fixed bottom-5 right-5 z-[9999];
+  }
+
+  .backup-reminder-card {
+    @apply bg-[#FFF3CD] border border-[#FFE69C] rounded-lg p-4 shadow-lg max-w-[380px];
+  }
+
+  .backup-reminder-title {
+    @apply font-medium text-[#856404] mb-2;
+  }
+
+  .backup-reminder-message {
+    @apply text-sm text-[#856404] mb-2;
+  }
+
+  .backup-reminder-tip {
+    @apply text-xs text-[#6C757D] mb-3 italic;
+  }
+
+  .backup-reminder-actions {
+    @apply flex gap-2;
+  }
+
+  .backup-reminder-btn {
+    @apply px-3 py-1.5 text-sm border-none rounded cursor-pointer text-white;
+  }
+
+  .backup-reminder-btn-save {
+    @apply bg-btn-success;
+  }
+
+  .backup-reminder-btn-later {
+    background: #6C757D;
+  }
+
+  .sight-inline-meta-notes {
+    @apply italic text-text-muted;
+  }
+
+  .activity-title {
+    @apply flex-1;
+  }
+
+  .city-arrow-muted {
+    @apply opacity-40;
+  }
+
+  .timeline-time-hint {
+    @apply text-[#999] text-[0.75rem] font-mono;
+  }
+
+  .cost-item-stack {
+    @apply flex flex-col gap-1;
+  }
+
+  .timeline-sub-locations-inline {
+    @apply pl-0 mt-0.5;
+  }
+
+  .booking-ref-inline {
+    @apply font-mono text-[0.75rem] text-[#666];
+  }
+
+  .timeline-notes-inline {
+    @apply text-[0.72rem] text-text-muted italic pl-0 mt-0.5;
+  }
+
+  .cost-item-row {
+    @apply flex items-center gap-1.5;
+  }
+
+  .budget-field-time {
+    @apply text-[#666];
+  }
+
+  .activity-assign-summary-layout {
+    @apply flex flex-col gap-2.5 p-3.5;
+  }
+
+  .activity-assign-grid {
+    @apply grid gap-2;
+  }
+
+  .activity-assign-grid-split {
+    grid-template-columns: 0.35fr 0.65fr;
+  }
+
+  .activity-assign-grid-equal {
+    @apply grid-cols-2;
+  }
+
+  .activity-assign-schedule-layout {
+    @apply mt-1 pt-1 gap-1.5;
+  }
+
+  .activity-assign-schedule-hint-text {
+    @apply text-[0.7rem];
+  }
+
+  .activity-assign-current-wrap {
+    @apply mt-1 pt-1 border-t border-[rgba(36,72,93,0.1)];
+  }
+
+  .activity-assign-clear-spaced {
+    @apply mt-1.5;
+  }
+
+  .activity-assign-days-wrap {
+    @apply flex flex-col gap-2;
+  }
+
+  .activity-assign-days-title {
+    @apply mb-1;
+  }
+
+  .activity-assign-days-scroll {
+    max-height: 56vh;
+  }
+
+  .activity-assign-footer {
+    @apply flex justify-between items-center w-full;
+  }
+
+  .activity-assign-footer-actions {
+    @apply flex gap-2;
+  }
+
+  .activity-assign-delete-btn {
+    @apply bg-btn-danger text-white;
+  }
+
+  .activity-assign-save-btn {
+    @apply bg-btn-secondary text-white;
+  }
+
+  .activity-assign-day-legacy {
+    @apply w-full m-0 flex flex-col items-start gap-1 text-left;
+  }
+
+  .activity-assign-day-legacy.is-current {
+    @apply bg-btn-secondary text-white border-btn-secondary;
+  }
+
+  .activity-assign-day-legacy-title {
+    @apply font-bold;
+  }
+
+  .activity-assign-day-legacy-route {
+    @apply text-[0.8rem] opacity-75;
+  }
+
+  .activity-assign-day-legacy-route.is-current {
+    @apply opacity-85;
+  }
+
+  .activity-assign-day-legacy-meta {
+    @apply text-[0.75rem] opacity-70;
+  }
+
+  .activity-assign-day-legacy-meta.is-current {
+    @apply opacity-85;
+  }
+
+  .activity-assign-modal-legacy {
+    max-width: 520px;
+  }
+
+  .activity-assign-legacy-stack {
+    @apply flex flex-col gap-3;
+  }
+
+  .activity-assign-legacy-summary {
+    @apply p-4 border border-border rounded-xl bg-bg-secondary;
+  }
+
+  .activity-assign-legacy-title {
+    @apply font-bold mb-1;
+  }
+
+  .activity-assign-legacy-subline {
+    @apply text-[0.85rem] text-text-muted;
+  }
+
+  .activity-assign-legacy-current {
+    @apply text-[0.78rem] text-text-muted mt-1.5;
+  }
+
+  .activity-assign-legacy-clear {
+    @apply mt-3 w-full justify-center;
+  }
+
+  .activity-assign-legacy-days {
+    @apply grid gap-2.5 overflow-auto pr-1;
+    max-height: 52vh;
   }
 
   .add-leg-short {
@@ -567,48 +1126,6 @@
   --color-btn-hover-bg: var(--color-dark-bg-secondary);
 }
 
-/* Form control dark mode overrides */
-[data-theme="dark"] .form-control,
-[data-theme="dark"] input[type="text"],
-[data-theme="dark"] input[type="date"],
-[data-theme="dark"] input[type="time"],
-[data-theme="dark"] input[type="number"],
-[data-theme="dark"] select,
-[data-theme="dark"] textarea {
-  background-color: var(--color-dark-bg-secondary) !important;
-  color: var(--color-dark-text-primary) !important;
-  border-color: var(--color-dark-border) !important;
-}
-
-[data-theme="dark"] .form-control:focus,
-[data-theme="dark"] input:focus,
-[data-theme="dark"] select:focus,
-[data-theme="dark"] textarea:focus {
-  border-color: var(--color-dark-accent-teal) !important;
-  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.22) !important;
-  outline: none !important;
-}
-
-[data-theme="dark"] .form-control:disabled {
-  background-color: var(--color-dark-surface-input) !important;
-  color: var(--color-dark-text-muted) !important;
-}
-
-/* Dark mode modal overrides */
-[data-theme="dark"] .modal-content {
-  background-color: var(--color-dark-surface-card) !important;
-}
-
-[data-theme="dark"] .modal-header,
-[data-theme="dark"] .modal-footer {
-  background-color: var(--color-dark-bg-secondary) !important;
-  border-color: var(--color-dark-border) !important;
-}
-
-[data-theme="dark"] .modal-header h2 {
-  color: var(--color-dark-text-primary) !important;
-}
-
 /* Inline action links */
 @layer components {
   .inline-action-link {
@@ -619,3 +1136,4 @@
     @apply underline;
   }
 }
+

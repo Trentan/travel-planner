@@ -220,10 +220,10 @@ function initAutopopulateButton() {
       .join(', ');
 
     return `
-      <div class="autopopulate-notice" style="background:#E8F5E9; border:1px solid #4CAF50; border-radius:4px; padding:12px; margin-bottom:16px;">
+      <div class="autopopulate-notice">
         <strong>🏨 Missing Accommodation!</strong><br>
-        <span style="color:#2E7D32;">Found ${totalMissing} nights without accommodation: ${cities}</span>
-        <button class="action-btn" style="background:#4CAF50; margin-left:12px;" onclick="autopopulateStays()">✨ Autopopulate Missing Stays</button>
+        <span class="autopopulate-notice-copy">Found ${totalMissing} nights without accommodation: ${cities}</span>
+        <button class="action-btn autopopulate-notice-btn" onclick="autopopulateStays()">✨ Autopopulate Missing Stays</button>
       </div>
     `;
   }

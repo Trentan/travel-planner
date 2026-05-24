@@ -99,7 +99,7 @@ function renderStayStatusCostSummary(stay, status, statusIcon) {
       : '';
 
   return `
-    <span class="status-badge stay-status-badge" style="--status-color:${statusColor}; cursor:pointer;" onclick="if(${isEditMode})toggleStayStatus(event, '${stay.id}')">
+    <span class="status-badge stay-status-badge stay-status-badge-clickable" style="--status-color:${statusColor};" onclick="if(${isEditMode})toggleStayStatus(event, '${stay.id}')">
       ${statusIconGlyph} ${statusText}
     </span>
     ${mobileMeta}
@@ -442,10 +442,10 @@ function buildPackingTab() {
             <div class="packing-item">
               <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">×</button>
               <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
-              <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}">${item.text}</span>
+        <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
             </div>
           `).join('')}
-          <button class="add-btn" style="width:auto; margin-top:10px; border-color:#E74C3C; color:#C0392B;" onclick="addLeaveHomeItem()">+ Add Home Task</button>
+          <button class="add-btn add-btn-home-task" onclick="addLeaveHomeItem()">+ Add Home Task</button>
         </div>
       </details>
 
@@ -471,7 +471,7 @@ function buildPackingTab() {
       <details class="guide-details">
         <summary class="guide-summary">💡 Example Capsule Wardrobe Prompt</summary>
         <div class="guide-content">
-          <p style="font-style: italic; background: #f9f9f9; padding: 10px; border-left: 3px solid #ccc;">
+          <p class="guide-prompt-block">
             "I'm going on a 14-day trip to Europe in June and want to pack carry-on only. I want to create a minimalist capsule wardrobe with as few pieces as possible that will give me 14 different outfits (can be achieved with a 3x3 method - 3 shirts, 3 bottoms, 3 layers). Please build me a packing list by telling me the number of tops, bottoms and layering pieces that can be mixed and matched. My style is classic and practical with neutral colors. I want outfits that are comfortable and stylish for activities like sightseeing, casual dinners, and lots of walking. No more than 2 shoes (formal and sports). I need outfits for touring ports, lounging, and a couple of dressy dinners + I will need swimmers for asia or any hotel pools."
           </p>
           <h4>Example Output Breakdown:</h4>
@@ -491,8 +491,8 @@ function buildPackingTab() {
   let areasHTML = '';
   packingData.forEach((area, aIdx) => {
     areasHTML += `
-      <div id="packing-area-${aIdx}" class="packing-area-section" style="margin-bottom: 3rem; scroll-margin-top: 140px;">
-        <h2 style="font-family:'Playfair Display', serif; color:${area.areaColor}; border-bottom: 2px solid ${area.areaColor}; padding-bottom:0.5rem; margin-bottom:1rem;">
+      <div id="packing-area-${aIdx}" class="packing-area-section packing-area-spaced">
+        <h2 class="packing-area-heading area-color-var border-color-var" style="--area-color:${area.areaColor}; --border-color:${area.areaColor};">
           <span contenteditable="${isEditMode}" onblur="updatePackingAreaName(${aIdx}, this.innerText)">${area.areaName}</span>
         </h2>
         <div class="packing-grid">
@@ -506,14 +506,14 @@ function buildPackingTab() {
                 <div class="packing-item">
                   <button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">×</button>
                   <input type="checkbox" ${item.done ? 'checked' : ''} onchange="togglePackingItem(event, ${aIdx}, ${cIdx}, ${iIdx})">
-                  <span contenteditable="${isEditMode}" onblur="updatePackingItem(${aIdx}, ${cIdx}, ${iIdx}, this.innerText)" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}">${item.text}</span>
+                  <span contenteditable="${isEditMode}" onblur="updatePackingItem(${aIdx}, ${cIdx}, ${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
                 </div>
               `).join('')}
               <button class="add-btn" onclick="addPackingItem(${aIdx}, ${cIdx})">+ Add Item</button>
             </div>
           `).join('')}
-          <div class="packing-card" style="border: 2px dashed var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="addPackingCat(${aIdx})">
-            <span style="color:var(--muted); font-weight:500;">+ Add New Category Block</span>
+          <div class="packing-card packing-card-add-block" onclick="addPackingCat(${aIdx})">
+            <span class="packing-card-add-label">+ Add New Category Block</span>
           </div>
         </div>
       </div>`;
@@ -644,7 +644,7 @@ function buildBudgetTab() {
 
   let html = `<div class="data-table-wrapper budget-table-wrapper"><table class="data-table budget-table"><thead><tr><th>Trip Leg</th><th>Transport</th><th>Accommodation</th><th>Activities</th><th>Leg Total</th></tr></thead><tbody>`;
   legBreakdown.forEach(l => {
-    html += `<tr style="border-left-color: ${l.colour}"><td data-label="Trip Leg" style="font-weight:600;">${l.label}</td><td data-label="Transport">${formatBudgetAmount(l.trans)}</td><td data-label="Accommodation">${formatBudgetAmount(l.accom)}</td><td data-label="Activities">${formatBudgetAmount(l.act)}</td><td data-label="Leg Total" style="font-family:'DM Mono',monospace; font-weight:600;">${formatBudgetAmount(l.total)}</td></tr>`;
+    html += `<tr class="budget-row-accent" style="--row-border-color:${l.colour}"><td data-label="Trip Leg" class="budget-leg-label">${l.label}</td><td data-label="Transport">${formatBudgetAmount(l.trans)}</td><td data-label="Accommodation">${formatBudgetAmount(l.accom)}</td><td data-label="Activities">${formatBudgetAmount(l.act)}</td><td data-label="Leg Total" class="budget-leg-total">${formatBudgetAmount(l.total)}</td></tr>`;
   });
   html += `</tbody></table></div>`;
   container.innerHTML = html;

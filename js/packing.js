@@ -69,13 +69,13 @@ function renderPackingAreaProgress(aIdx) {
   const shortName = shortNameMap[area.areaName] || area.areaName;
 
   return `
-    <div class="packing-area-progress" style="--area-color: ${area.areaColor || 'var(--accent)'}" onclick="document.getElementById('packing-area-${aIdx}').scrollIntoView({behavior: 'smooth'})" title="Jump to ${shortName}">
+    <div class="packing-area-progress area-color-var" style="--area-color:${area.areaColor || 'var(--accent)'}" onclick="document.getElementById('packing-area-${aIdx}').scrollIntoView({behavior: 'smooth'})" title="Jump to ${shortName}">
       <div class="packing-area-progress-header">
         <span class="packing-area-progress-title">${shortName}</span>
         <span class="packing-area-progress-info">${done}/${total}</span>
       </div>
       <div class="packing-area-progress-bar">
-        <span style="width: ${percent}%"></span>
+        <span class="progress-width-var" style="--progress-width:${percent}%"></span>
       </div>
     </div>
   `;
@@ -184,7 +184,7 @@ function renderLeaveHomeItems() {
       <div class="packing-item leave-home-item">
         <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">×</button>
         <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
-        <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}">${item.text}</span>
+        <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
       </div>
     `;
   }).join('');
@@ -207,7 +207,7 @@ function renderPackingGuidePanel() {
         <div class="guide-panel-content leave-home-guide-content">
           <div class="leave-home-progress">
             <div class="leave-home-progress-bar">
-              <span style="width:${progressWidth}%"></span>
+              <span class="progress-width-var" style="--progress-width:${progressWidth}%"></span>
             </div>
           </div>
           <div class="leave-home-list">
@@ -251,7 +251,7 @@ function renderPackingGuidePanel() {
           <h4>Example Capsule Prompt</h4>
         </div>
         <div class="guide-panel-content">
-          <p style="font-style: italic; background: #f8f6f1; padding: 12px; border-left: 3px solid #cfc6b8;">
+          <p class="guide-prompt-block">
             "I'm going on a 14-day trip to Europe in June and want to pack carry-on only. I want to create a minimalist capsule wardrobe with as few pieces as possible that will give me 14 different outfits. Please build me a packing list with tops, bottoms, and layering pieces that can be mixed and matched. My style is classic and practical with neutral colors."
           </p>
           <h4>Example output breakdown:</h4>
