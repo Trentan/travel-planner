@@ -35,6 +35,15 @@ Full rewrite of the travel-planner CSS architecture: migrate from a 10,887-line 
 > - HTML files updated: `index.html`
 > - Commit: `c5a890e`
 
+> [!IMPORTANT]
+> **Scope split (2026-05-24):** Remaining polish/hardening work from issue #123 was split into focused follow-up issues:
+> - #125 Dark mode hardening
+> - #126 Mobile touch-target and row-density remediation
+> - #127 Chip rail overflow/truncation polish
+> - #128 Modal/form system consolidation
+>
+> Use #123 as umbrella context and close it when follow-up scope is complete or explicitly de-scoped.
+
 ## User Review Required
 
 > [!IMPORTANT]
