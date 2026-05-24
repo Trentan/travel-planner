@@ -100,9 +100,7 @@ body:
       multiple: true
       options:
         - DDE - Desktop detailed
-        - DCO - Desktop compact
         - MDE - Mobile detailed
-        - MCO - Mobile compact
         - Not UI-specific
   - type: textarea
     id: acceptance
@@ -126,4 +124,4 @@ body:
       description: Commands, visual states, viewport modes, and data files to check when resolving this issue.
       placeholder: |
         - Use `backups/2026_June_July_Europe_Thailand.json` for visual testing
-        - Check DDE/DCO/MDE/MCO where applicable
+        - Check DDE/MDE where applicable (Light Mode and Dark Mode)
