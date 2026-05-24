@@ -60,7 +60,7 @@
         <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="closeDesktopActionsMenu(); promptInstallApp()">⬇ Install App</button>
       </div>
     </details>
-    <button class="app-menu-btn mobile-menu-btn" onclick="toggleMobileMenu()">☰ Menu</button>
+    <button class="app-menu-btn mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu">☰</button>
   </div>
 </div>
 
@@ -76,41 +76,41 @@
 </header>
 
 <main>
-    <nav id="cityNav" class="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 flex items-center shadow-sm transition-transform duration-300 translate-y-0">
-    <div class="city-nav-list flex-1 flex overflow-x-auto overflow-y-hidden hide-scrollbar px-2 py-2 gap-2">
-      <button class="city-nav-btn active px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700" data-city="all" onclick="selectCityFilter('all', this)">
+    <nav id="cityNav" class="city-nav transition-transform duration-300 translate-y-0">
+    <div class="city-nav-list hide-scrollbar">
+      <button class="city-nav-btn active" data-city="all" onclick="selectCityFilter('all', this)">
         <span>🏙️ All</span>
       </button>
     </div>
   </nav>
-<div class="app-tabs-nav w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-[53px] z-40 flex items-center shadow-sm">
-    <div class="app-tabs-list flex-1 flex overflow-x-auto overflow-y-hidden hide-scrollbar">
-      <button class="app-tab-btn active flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="itinerary" onclick="switchTab('itinerary', this)">
+<div class="app-tabs-nav">
+    <div class="app-tabs-list hide-scrollbar">
+      <button class="app-tab-btn active" data-tab="itinerary" onclick="switchTab('itinerary', this)">
         <span class="tab-icon text-lg md:text-base">🗺️</span>
         <span class="tab-label hidden sm:inline">Itinerary</span>
       </button>
-      <button class="app-tab-btn flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="transport" onclick="switchTab('transport', this)">
+      <button class="app-tab-btn" data-tab="transport" onclick="switchTab('transport', this)">
         <span class="tab-icon text-lg md:text-base">✈️</span>
         <span class="tab-label hidden sm:inline">Transport</span>
       </button>
-      <button class="app-tab-btn flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="accom" onclick="switchTab('accom', this)">
+      <button class="app-tab-btn" data-tab="accom" onclick="switchTab('accom', this)">
         <span class="tab-icon text-lg md:text-base">🏨</span>
         <span class="tab-label hidden sm:inline">Accommodation</span>
       </button>
-      <button class="app-tab-btn flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="budget" onclick="switchTab('budget', this)">
+      <button class="app-tab-btn" data-tab="budget" onclick="switchTab('budget', this)">
         <span class="tab-icon text-lg md:text-base">💰</span>
         <span class="tab-label hidden sm:inline">Budget</span>
       </button>
-      <button class="app-tab-btn flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="packing" onclick="switchTab('packing', this)">
+      <button class="app-tab-btn" data-tab="packing" onclick="switchTab('packing', this)">
         <span class="tab-icon text-lg md:text-base">🧳</span>
         <span class="tab-label hidden sm:inline">Packing</span>
       </button>
-      <button class="app-tab-btn flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="map" onclick="switchTab('map', this)">
+      <button class="app-tab-btn" data-tab="map" onclick="switchTab('map', this)">
         <span class="tab-icon text-lg md:text-base">🗺️</span>
         <span class="tab-label hidden sm:inline">Map</span>
       </button>
     </div>
-    <button class="mobile-tabs-menu-btn flex md:hidden items-center justify-center p-3 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200" type="button" onclick="toggleMobileMenu()" aria-label="Open menu">
+    <button class="mobile-tabs-menu-btn" type="button" onclick="toggleMobileMenu()" aria-label="Open menu">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
   </div>

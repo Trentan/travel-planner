@@ -14,16 +14,16 @@ function isMobileViewport() {
 function updateStickyOffsets() {
   const menuBar = document.querySelector('.app-menu-bar');
   const tabsNav = document.querySelector('.app-tabs-nav');
+  const cityNav = document.querySelector('.city-nav');
   if (!tabsNav) return;
 
   const menuHeight = !isMobileViewport() && menuBar
     ? Math.ceil(menuBar.getBoundingClientRect().height || 0)
     : 0;
   const tabsHeight = Math.ceil(tabsNav.getBoundingClientRect().height || 0);
-  document.documentElement.style.setProperty('--tabs-nav-sticky-top', `${menuHeight}px`);
-  document.documentElement.style.setProperty('--city-nav-sticky-top', `${menuHeight + tabsHeight}px`);
-  if (isMobileViewport()) {
-    document.documentElement.style.setProperty('--city-nav-sticky-top', `${menuHeight + tabsHeight}px`);
+  tabsNav.style.top = `${menuHeight}px`;
+  if (cityNav) {
+    cityNav.style.top = `${menuHeight + tabsHeight}px`;
   }
 }
 
