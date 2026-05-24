@@ -17,9 +17,9 @@ function toggleStayRowDetails(stayId) {
 
 function renderStayDetailBlock(title, value, extraClass = '') {
   return `
-    <div class="stay-detail-block ${extraClass}">
-      <span class="stay-detail-label">${escapeHtmlText(title)}</span>
-      <span class="stay-detail-value">${escapeHtmlText(value || '—')}</span>
+    <div class="flex flex-col gap-1 p-2 bg-slate-50 dark:bg-slate-800/40 rounded border border-slate-100 dark:border-slate-800/60 ${extraClass}">
+      <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">${escapeHtmlText(title)}</span>
+      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(value || '—')}</span>
     </div>
   `;
 }
@@ -117,9 +117,9 @@ function renderStayMobileDetails(stay, cityName) {
   const costValue = formatCurrency(stay.totalCost || '0');
 
   return `
-    <div class="stay-detail-grid stay-mobile-detail-grid">
+    <div class="grid grid-cols-2 gap-2 mt-4">
       ${renderStayDetailBlock('City', cityName)}
-      ${stay.location ? renderStayDetailBlock('Location', stay.location, 'stay-detail-block--wide') : ''}
+      ${stay.location ? renderStayDetailBlock('Location', stay.location, 'col-span-2') : ''}
       ${renderStayDetailBlock('Check-in', formatDateShort(stay.checkIn))}
       ${renderStayDetailBlock('Check-out', formatDateShort(stay.checkOut))}
       ${renderStayDetailBlock('Nights', String(nights))}
@@ -257,26 +257,23 @@ function buildAccomTab(cityFilter = null) {
     return;
   }
 
-  let html = `<div class="data-table-wrapper accom-table-wrapper mobile-table-wrapper"><table class="data-table accom-table mobile-table"><thead>
-    <tr>
-      <th>City</th>
-      <th>Property</th>
-      <th>Provider</th>
-      <th>Booking Ref</th>
-      <th>Check-in</th>
-      <th>Check-out</th>
-      <th>Nights</th>
-      <th>Status</th>
-      <th>Cost</th>
-      <th>Actions</th>
-    </tr>
-    <tr class="stay-mobile-head-row" aria-hidden="true">
-      <th>Stay</th>
-      <th>Schedule</th>
-      <th>Status & Cost</th>
-      <th aria-hidden="true"></th>
-    </tr>
-  </thead><tbody>`;
+  let html = `<div class="w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4">
+    <table class="w-full text-left border-collapse min-w-[800px]">
+      <thead>
+        <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/60 dark:border-slate-700/60">
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">City</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Property</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Provider</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Booking Ref</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Check-in</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Check-out</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Nights</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Cost</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">`;
 
   sortedStays.forEach(stay => {
     const city = citiesData.find(c => c.id === stay.cityId);
@@ -299,30 +296,40 @@ function buildAccomTab(cityFilter = null) {
     const statusColor = statusColors[status] || statusColors.planned;
     const statusIcon = statusIcons[status] || '⏳';
 
-    html += `<tr class="stay-parent-row row-accent" style="--row-border-color:${cityColor}">
-      <td class="city-col" data-label="City">${getCityFlagHTML(cityName)} ${cityName}</td>
-      <td class="property-col" data-label="Property">
-        <span class="stay-property-name" contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)">${escapeHtml(stay.propertyName)}</span>
-        ${renderStayLocationDetails(stay, 'stay-table-location')}
-        ${renderStayMobileSummary(stay, status, statusIcon, cityName)}
+    html += `<tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" style="border-left: 4px solid ${cityColor};">
+      <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">${getCityFlagHTML(cityName)} <span class="ml-1">${cityName}</span></td>
+      <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium min-w-[200px]">
+        <span contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1 -ml-1">${escapeHtml(stay.propertyName)}</span>
+        ${renderStayLocationDetails(stay, 'text-xs mt-0.5 text-slate-500')}
+        <div class="md:hidden mt-2 border-t border-slate-100 dark:border-slate-800 pt-2">
+          ${renderStayMobileSummary(stay, status, statusIcon, cityName)}
+        </div>
       </td>
-      <td class="stay-provider-col" data-label="Provider">${stay.provider || '—'}</td>
-      <td class="stay-bookingref-col" data-label="Booking Ref">${stay.bookingRef || '—'}</td>
-      <td class="date-col stay-dates-col" data-label="Stay">
+      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${stay.provider || '—'}</td>
+      <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase">${stay.bookingRef || '—'}</td>
+      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
         ${formatDateShort(stay.checkIn)}
-        ${renderStayDateSummary(stay, status, statusIcon)}
+        <div class="md:hidden mt-1 text-slate-500">
+          ${renderStayDateSummary(stay, status, statusIcon)}
+        </div>
       </td>
-      <td class="date-col stay-out-col" data-label="Check-out">${formatDateShort(stay.checkOut)}</td>
-      <td class="nights-col" data-label="Nights">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
-      <td class="stay-status-col" data-label="Status">
+      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${formatDateShort(stay.checkOut)}</td>
+      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm text-center">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
+      <td class="px-4 py-3 align-middle">
         ${renderStayStatusCostSummary(stay, status, statusIcon)}
       </td>
-      <td class="budget-field budget-field--fixed" data-label="Cost">
-        $<span contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'totalCost', this.innerText)">${formatCurrency(stay.totalCost || '0', { includeSymbol: false })}</span>
+      <td class="px-4 py-3 align-middle text-right font-medium text-slate-800 dark:text-slate-200">
+        $<span contenteditable="${isEditMode}" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1" onblur="updateStayField('${stay.id}', 'totalCost', this.innerText)">${formatCurrency(stay.totalCost || '0', { includeSymbol: false })}</span>
       </td>
-      <td class="stay-actions-col" data-label="Actions">
-        <button class="edit-btn" title="Edit Stay" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')">✎</button>
-        <button class="del-btn" title="Delete Stay" onclick="event.stopPropagation(); deleteStay('${stay.id}')">×</button>
+      <td class="px-4 py-3 align-middle text-center whitespace-nowrap">
+        <div class="inline-flex gap-2">
+          <button class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit Stay">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
+          </button>
+          <button class="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete Stay">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+          </button>
+        </div>
       </td>
     </tr>`;
   });
@@ -636,15 +643,30 @@ function buildBudgetTab() {
   const grandTotal = totalTrans + totalAccom + totalAct;
 
   kpiContainer.innerHTML = `
-    <div class="budget-kpi"><h3>Transport</h3><div class="amount">${formatBudgetAmount(totalTrans)}</div></div>
-    <div class="budget-kpi"><h3>Accommodation</h3><div class="amount">${formatBudgetAmount(totalAccom)}</div></div>
-    <div class="budget-kpi"><h3>Activities</h3><div class="amount">${formatBudgetAmount(totalAct)}</div></div>
-    <div class="budget-kpi grand-total"><h3>Grand Total</h3><div class="amount">${formatBudgetAmount(grandTotal)}</div></div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-xl p-4 shadow-sm flex flex-col justify-center">
+        <h3 class="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Transport</h3>
+        <div class="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">${formatBudgetAmount(totalTrans)}</div>
+      </div>
+      <div class="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-xl p-4 shadow-sm flex flex-col justify-center">
+        <h3 class="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Accommodation</h3>
+        <div class="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">${formatBudgetAmount(totalAccom)}</div>
+      </div>
+      <div class="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-xl p-4 shadow-sm flex flex-col justify-center">
+        <h3 class="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Activities</h3>
+        <div class="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">${formatBudgetAmount(totalAct)}</div>
+      </div>
+      <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/50 rounded-xl p-4 shadow-sm flex flex-col justify-center relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-indigo-100 dark:bg-indigo-800/40 rounded-full blur-xl"></div>
+        <h3 class="text-[10px] md:text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1 relative z-10">Grand Total</h3>
+        <div class="text-2xl md:text-3xl font-black text-indigo-700 dark:text-indigo-300 relative z-10">${formatBudgetAmount(grandTotal)}</div>
+      </div>
+    </div>
   `;
 
-  let html = `<div class="data-table-wrapper budget-table-wrapper"><table class="data-table budget-table"><thead><tr><th>Trip Leg</th><th>Transport</th><th>Accommodation</th><th>Activities</th><th>Leg Total</th></tr></thead><tbody>`;
+  let html = `<div class="w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/60 dark:border-slate-700/60"><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Trip Leg</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Transport</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Accommodation</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Activities</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Leg Total</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">`;
   legBreakdown.forEach(l => {
-    html += `<tr class="budget-row-accent" style="--row-border-color:${l.colour}"><td data-label="Trip Leg" class="budget-leg-label">${l.label}</td><td data-label="Transport">${formatBudgetAmount(l.trans)}</td><td data-label="Accommodation">${formatBudgetAmount(l.accom)}</td><td data-label="Activities">${formatBudgetAmount(l.act)}</td><td data-label="Leg Total" class="budget-leg-total">${formatBudgetAmount(l.total)}</td></tr>`;
+    html += `<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" style="border-left: 4px solid ${l.colour}"><td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">${l.label}</td><td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-right font-medium">${formatBudgetAmount(l.trans)}</td><td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-right font-medium">${formatBudgetAmount(l.accom)}</td><td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-right font-medium">${formatBudgetAmount(l.act)}</td><td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 whitespace-nowrap text-right font-bold">${formatBudgetAmount(l.total)}</td></tr>`;
   });
   html += `</tbody></table></div>`;
   container.innerHTML = html;

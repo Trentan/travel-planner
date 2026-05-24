@@ -7591,16 +7591,16 @@ body.compact-view-mode .packing-item { font-size: 11px; }
   body.compact-view-mode .transport-table .journey-detail-row.expanded,
   body.mobile-app-mode .transport-table .journey-detail-row.expanded {
     display: block !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
+    width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box;
   }
 
   body.compact-view-mode .transport-table .journey-detail-row.expanded td,
   body.mobile-app-mode .transport-table .journey-detail-row.expanded td {
     display: block !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
+    width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box;
   }
 
@@ -8113,7 +8113,6 @@ body.compact-view-mode .packing-item { font-size: 11px; }
     padding-bottom: 0;
     display: flex;
     justify-content: space-between;
-    width: 100%;
   }
 
   .app-tab-btn {

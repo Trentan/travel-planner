@@ -609,9 +609,9 @@ function toggleTransportGroupDetails(groupId) {
 
 function renderTransportDetailBlock(title, value, extraClass = '') {
   return `
-    <div class="transport-detail-block ${extraClass}">
-      <span class="transport-detail-label">${escapeHtmlText(title)}</span>
-      <span class="transport-detail-value">${escapeHtmlText(value || '—')}</span>
+    <div class="flex flex-col gap-1 p-2 bg-slate-50 dark:bg-slate-800/40 rounded border border-slate-100 dark:border-slate-800/60 ${extraClass}">
+      <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">${escapeHtmlText(title)}</span>
+      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(value || '—')}</span>
     </div>
   `;
 }
@@ -755,90 +755,87 @@ function renderTransportSegmentsDetailContent(segs) {
 
     if (useCompactSegments) {
       return `
-        <div class="transport-segment-mobile-row">
-          <div class="transport-segment-mobile-journey" data-label="Journey">
-            <span class="transport-segment-mobile-leg">Leg ${i + 1}</span>
-            <span class="transport-segment-mobile-route">${escapeHtmlText(seg.fromLocation || '—')} → ${escapeHtmlText(seg.toLocation || '—')}</span>
-            ${renderTransportSubLocationDetails(seg, 'transport-segment-sub-locations')}
+        <div class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-700/50 rounded-lg p-3 shadow-sm text-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Leg ${i + 1}</span>
+            <span class="font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(seg.fromLocation || '—')} → ${escapeHtmlText(seg.toLocation || '—')}</span>
           </div>
-          <div class="transport-segment-mobile-schedule" data-label="Schedule">
-            <span class="transport-schedule-line"><strong>D:</strong> ${escapeHtmlText(segDep)}</span>
-            <span class="transport-schedule-line"><strong>A:</strong> ${segArr !== '—' ? escapeHtmlText(segArr + ' ' + (seg.arrivalTime || '')) : '—'}</span>
+          ${renderTransportSubLocationDetails(seg, 'text-xs text-slate-500 mb-2')}
+          <div class="grid grid-cols-2 gap-2 text-slate-600 dark:text-slate-400 mb-2">
+            <div>
+              <span class="block text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">Departs</span>
+              <span class="font-medium">${escapeHtmlText(segDep)}</span>
+            </div>
+            <div>
+              <span class="block text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">Arrives</span>
+              <span>${segArr !== '—' ? escapeHtmlText(segArr + ' ' + (seg.arrivalTime || '')) : '—'}</span>
+            </div>
           </div>
-          <div class="transport-segment-mobile-provider" data-label="Carrier">
-            <span class="transport-segment-mobile-provider-name">${escapeHtmlText(seg.provider || '—')}</span>
-            <span class="transport-segment-mobile-provider-meta">${escapeHtmlText(seg.routeCode || '—')}</span>
-            <span class="transport-segment-mobile-provider-meta">${escapeHtmlText(seg.bookingReference || '—')}</span>
-            <span class="transport-segment-mobile-provider-meta transport-segment-mobile-cost-inline">${seg.cost ? escapeHtmlText(formatCurrency(seg.cost)) : '—'}</span>
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <span class="font-medium text-slate-700 dark:text-slate-300">${escapeHtmlText(seg.provider || '—')}</span>
+            ${seg.routeCode ? `<span class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded font-mono">${escapeHtmlText(seg.routeCode)}</span>` : ''}
+            ${seg.bookingReference ? `<span class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded font-mono">${escapeHtmlText(seg.bookingReference)}</span>` : ''}
+            <span class="ml-auto font-semibold text-slate-800 dark:text-slate-200">${seg.cost ? escapeHtmlText(formatCurrency(seg.cost)) : '—'}</span>
           </div>
         </div>
       `;
     }
 
     return `
-      <tr class="transport-segment-row">
-        <td class="transport-segment-journey">
+      <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm font-medium text-slate-800 dark:text-slate-200">
           ${seg.fromLocation || '—'} → ${seg.toLocation || '—'}
-          ${renderTransportSubLocationDetails(seg, 'transport-segment-sub-locations')}
+          ${renderTransportSubLocationDetails(seg, 'text-xs mt-0.5 text-slate-500')}
         </td>
-        <td class="transport-segment-leg">Leg ${i + 1}</td>
-        <td class="transport-segment-route">${segRoute}</td>
-        <td class="transport-segment-departs">${segDep}</td>
-        <td class="transport-segment-arrives">${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
-        <td class="transport-segment-provider">${seg.provider || '—'}</td>
-        <td class="transport-segment-code">${seg.routeCode || '—'}</td>
-        <td class="transport-segment-bookingref">${seg.bookingReference || '—'}</td>
-        <td class="transport-segment-cost">${seg.cost ? formatCurrency(seg.cost) : '—'}</td>
+        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">Leg ${i + 1}</td>
+        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${segRoute}</td>
+        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap font-medium">${segDep}</td>
+        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
+        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${seg.provider || '—'}</td>
+        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 font-mono uppercase">${seg.routeCode || '—'}</td>
+        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 font-mono uppercase">${seg.bookingReference || '—'}</td>
+        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-800 dark:text-slate-200 font-medium text-right">${seg.cost ? formatCurrency(seg.cost) : '—'}</td>
       </tr>
     `;
   }).join('');
 
   return useCompactSegments
       ? `
-      <div class="transport-segments-list transport-segments-list-mobile">
-        <div class="transport-segments-title">Journey Segments</div>
-        <div class="transport-segment-mobile-head-row">
+      <div class="mt-2 bg-slate-50/50 dark:bg-slate-800/30 rounded-lg p-3">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Journey Segments</div>
+        <div class="hidden">
           <span>Journey</span>
           <span>Schedule</span>
           <span>Carrier</span>
         </div>
-        <div class="transport-segment-mobile-list">
+        <div class="space-y-2">
           ${detailRows}
         </div>
       </div>
     `
       : `
-      <div class="transport-segments-list">
-        <div class="transport-segments-title">Journey Segments</div>
-        <table class="transport-segment-table">
-          <colgroup>
-            <col class="transport-segment-col-journey">
-            <col class="transport-segment-col-leg">
-            <col class="transport-segment-col-route">
-            <col class="transport-segment-col-departs">
-            <col class="transport-segment-col-arrives">
-            <col class="transport-segment-col-provider">
-            <col class="transport-segment-col-code">
-            <col class="transport-segment-col-bookingref">
-            <col class="transport-segment-col-cost">
-          </colgroup>
-          <thead>
-            <tr class="transport-segment-head">
-              <th>Journey</th>
-              <th>Leg</th>
-              <th>Route</th>
-              <th>Departs</th>
-              <th>Arrives</th>
-              <th>Provider</th>
-              <th>Code</th>
-              <th>Booking Ref</th>
-              <th>Cost</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${detailRows}
-          </tbody>
-        </table>
+      <div class="mt-2 bg-slate-50/50 dark:bg-slate-800/20 rounded-lg border border-slate-200/50 dark:border-slate-700/50 overflow-hidden">
+        <div class="px-4 py-2 bg-slate-100/50 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50 text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Journey Segments</div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse min-w-[800px]">
+            <thead>
+              <tr class="bg-white/50 dark:bg-slate-800/20 border-b border-slate-200/50 dark:border-slate-700/50">
+                <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Journey</th>
+                <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Leg</th>
+                <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Route</th>
+                <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Departs</th>
+                <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Arrives</th>
+                <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Provider</th>
+                <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Code</th>
+                <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Booking Ref</th>
+                <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase text-right">Cost</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-slate-900">
+              ${detailRows}
+            </tbody>
+          </table>
+        </div>
       </div>
     `;
 }
@@ -864,9 +861,9 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
   const costValue = formatCurrency(totalCost);
 
   return `
-    <div class="transport-detail-grid transport-mobile-detail-grid">
-      ${renderTransportDetailBlock('Route', route)}
-      ${segs.length === 1 && routeDetails ? renderTransportDetailBlock('Route details', routeDetails, 'transport-detail-block--wide') : ''}
+    <div class="grid grid-cols-2 gap-2 mt-4">
+      ${renderTransportDetailBlock('Route', route, 'col-span-2')}
+      ${segs.length === 1 && routeDetails ? renderTransportDetailBlock('Route details', routeDetails, 'col-span-2') : ''}
       ${renderTransportDetailBlock('Depart', firstDep)}
       ${renderTransportDetailBlock('Arrive', lastArr !== '—' ? `${lastArr} ${lastArrTime}`.trim() : '—')}
       ${renderTransportDetailBlock('Carrier', providerLabel)}
@@ -1024,31 +1021,25 @@ function buildTransportTab(cityFilter = null) {
     return;
   }
 
-  html += `<div class="data-table-wrapper transport-table-wrapper mobile-table-wrapper">
-    <table class="data-table transport-table mobile-table">
+  html += `<div class="w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4">
+    <table class="w-full text-left border-collapse min-w-[800px]">
       <thead>
-        <tr>
-          <th class="transport-expand-col transport-expand-col-narrow"></th>
-          <th>Journey</th>
-          <th>Type</th>
-          <th>Route</th>
-          <th>Departs</th>
-          <th>Arrives</th>
-          <th>Provider</th>
-          <th>Code</th>
-          <th>Booking Ref</th>
-          <th>Status</th>
-          <th>Cost</th>
-          <th>Actions</th>
-      </tr>
-      <tr class="transport-mobile-head-row" aria-hidden="true">
-        <th>Journey</th>
-        <th>Schedule</th>
-        <th>Carrier</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
+        <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/60 dark:border-slate-700/60">
+          <th class="px-3 py-3 w-8"></th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Journey</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Type</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Route</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Departs</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Arrives</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Provider</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Code</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Booking Ref</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Cost</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
       `;
 
   groupOrder.forEach(gid => {
@@ -1104,36 +1095,44 @@ function buildTransportTab(cityFilter = null) {
     const mobileSubLocationsHtml = renderJourneySubLocationDetails(segs, 'transport-mobile-sub-locations');
 
     html += `
-      <tr class="journey-parent-row row-accent ${isMultiLeg ? 'multi-leg-row' : ''}" data-group="${gid}" style="--row-border-color:${statusColor};">
-        <td class="transport-expand-col" data-label="Expand">${desktopExpandControl}</td>
-        <td class="journey-name-col" data-label="Journey" title="${rep.journeyName || ''}">
+      <tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${isMultiLeg ? 'cursor-pointer' : ''}" data-group="${gid}" style="border-left: 4px solid ${statusColor};" ${isMultiLeg ? `onclick="toggleTransportGroupDetails('${gid}')"` : ''}>
+        <td class="px-3 py-3 w-8 align-middle">${desktopExpandControl}</td>
+        <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap" title="${rep.journeyName || ''}">
           ${journeyNameCell}
           ${mobileSubLocationsHtml}
           ${renderJourneyMobileSummary(isMultiLeg ? `${segs.length} legs` : ``)}
         </td>
-        <td class="transport-type-col" data-label="Type">${icon}</td>
-        <td class="route-col" data-label="Route">${routeDisplay}</td>
-        <td class="date-col transport-departs-col" data-label="Departs">
-          <span class="transport-departs-desktop">${firstDep}</span>
+        <td class="px-4 py-3 align-middle text-center text-xl">${icon}</td>
+        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm">${routeDisplay}</td>
+        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
+          <span class="block font-medium">${firstDep}</span>
           ${renderTransportScheduleMobile(firstDep, lastArr, lastArrTime, durationDisplay, icon)}
         </td>
-        <td class="transport-arrives-col" data-label="Arrives">${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
-        <td class="transport-provider-col" data-label="Carrier">
-          <span class="transport-provider-desktop">${rep.provider || '—'}</span>
+        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
+        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
+          <span class="font-medium">${rep.provider || '—'}</span>
           ${renderTransportCarrierMobile(rep.provider, rep.routeCode, rep.bookingReference, statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.id, isEditMode)}
         </td>
-        <td class="transport-routecode-col" data-label="Code">${rep.routeCode || '—'}</td>
-        <td class="transport-bookingref-col" data-label="Booking Ref">${rep.bookingReference || '—'}</td>
-        <td class="transport-status-col" data-label="Status">
-          <span class="status-badge transport-status-badge-clickable" style="--status-color:${statusColor};" onclick="if(${isEditMode})toggleJourneyStatus('${rep.id}')">
+        <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase">${rep.routeCode || '—'}</td>
+        <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase">${rep.bookingReference || '—'}</td>
+        <td class="px-4 py-3 align-middle">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors" style="background-color: ${statusColor}15; color: ${statusColor};" onclick="event.stopPropagation(); if(${isEditMode})toggleJourneyStatus('${rep.id}')">
             ${statusIcon} ${statusText}
           </span>
           ${renderTransportStatusCostMobile(statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.bookingReference, rep.id, isEditMode)}
         </td>
-        <td class="budget-field" data-label="Cost">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${formatCurrency(isMultiLeg ? totalCost : (rep.cost || '0'), { includeSymbol: false })}</span></td>
-        <td class="transport-actions-col" data-label="Actions">
-          <button class="edit-btn transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">✎</button>
-          <button class="del-btn transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">×</button>
+        <td class="px-4 py-3 align-middle text-right font-medium text-slate-800 dark:text-slate-200" onclick="event.stopPropagation()">
+          $<span contenteditable="${isEditMode}" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${formatCurrency(isMultiLeg ? totalCost : (rep.cost || '0'), { includeSymbol: false })}</span>
+        </td>
+        <td class="px-4 py-3 align-middle text-center whitespace-nowrap" onclick="event.stopPropagation()">
+          <div class="inline-flex gap-2">
+            <button class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors" onclick="editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
+            </button>
+            <button class="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors" onclick="deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+            </button>
+          </div>
         </td>
       </tr>`;
 

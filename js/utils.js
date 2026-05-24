@@ -168,10 +168,10 @@ function formatCurrency(value, options = {}) {
 
 function renderMobileStat(label, primary, secondary = '', extraClass = '') {
   return `
-    <div class="mobile-surface-card-stat ${extraClass}">
-      <span class="mobile-surface-card-stat-label">${escapeHtmlText(label)}</span>
-      <span class="mobile-surface-card-stat-primary">${primary ? escapeHtmlText(primary) : '—'}</span>
-      ${secondary ? `<span class="mobile-surface-card-stat-secondary">${secondary}</span>` : ''}
+    <div class="flex flex-col gap-0.5 flex-1 min-w-[45%] p-2 bg-slate-50 dark:bg-slate-800/50 rounded ${extraClass}">
+      <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">${escapeHtmlText(label)}</span>
+      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${primary ? escapeHtmlText(primary) : '—'}</span>
+      ${secondary ? `<span class="text-xs text-slate-500 dark:text-slate-400 truncate">${secondary}</span>` : ''}
     </div>
   `;
 }
@@ -277,23 +277,23 @@ function renderMobileSurfaceCard({
                                    details = '',
                                    detailsOpen = false
                                  }) {
-  const accentStyle = accentColor ? ` style="--card-accent:${accentColor};"` : '';
+  const accentStyle = accentColor ? ` style="border-left-color: ${accentColor};"` : '';
   return `
-    <article class="mobile-surface-card ${cardClass}"${accentStyle}>
-      <div class="mobile-surface-card-head">
-        <div class="mobile-surface-card-headline">
-          <div class="mobile-surface-card-headline-line">
-            ${dateLabel ? `<span class="mobile-surface-card-date">${escapeHtmlText(dateLabel)}</span>` : ''}
-            ${title ? `<h3 class="mobile-surface-card-title">${escapeHtmlText(title || '—')}</h3>` : ''}
-            ${subtitle ? `<span class="mobile-surface-card-subtitle">${escapeHtmlText(subtitle)}</span>` : ''}
+    <article class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-700/50 rounded-xl p-4 shadow-sm flex flex-col gap-3 relative ${cardClass}"${accentStyle}>
+      <div class="flex justify-between items-start gap-3">
+        <div class="flex flex-col gap-0.5 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            ${dateLabel ? `<span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${escapeHtmlText(dateLabel)}</span>` : ''}
+            ${title ? `<h3 class="text-base font-bold text-slate-800 dark:text-slate-100 truncate">${escapeHtmlText(title || '—')}</h3>` : ''}
+            ${subtitle ? `<span class="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">${escapeHtmlText(subtitle)}</span>` : ''}
           </div>
         </div>
-        ${primaryAction ? `<div class="mobile-surface-card-primary-action">${primaryAction}</div>` : ''}
+        ${primaryAction ? `<div class="shrink-0">${primaryAction}</div>` : ''}
       </div>
-      ${summary ? `<div class="mobile-surface-card-summary">${summary}</div>` : ''}
-      ${meta ? `<div class="mobile-surface-card-meta-grid">${meta}</div>` : ''}
-      ${details ? `<div class="mobile-surface-card-details ${detailsOpen ? 'expanded' : ''}">${details}</div>` : ''}
-      ${actions ? `<div class="mobile-surface-card-actions">${actions}</div>` : ''}
+      ${summary ? `<div class="text-sm text-slate-600 dark:text-slate-300 leading-snug">${summary}</div>` : ''}
+      ${meta ? `<div class="flex flex-wrap gap-2 text-xs">${meta}</div>` : ''}
+      ${details ? `<div class="mt-1 ${detailsOpen ? 'block' : 'hidden'}">${details}</div>` : ''}
+      ${actions ? `<div class="flex flex-wrap items-center gap-2 mt-2 pt-3 border-t border-slate-100 dark:border-slate-800">${actions}</div>` : ''}
     </article>
   `;
 }
@@ -476,19 +476,19 @@ function renderMobileStatusCostMeta({
       ? formatCurrency(costValue, { includeSymbol: false })
       : (costValue ?? '0');
   const costNode = editableCost
-      ? `<span class="transport-mobile-cost-value" contenteditable="true" onblur="${costOnBlur}">${safeCost}</span>`
-      : `<span class="transport-mobile-cost-value">${safeCost}</span>`;
+      ? `<span contenteditable="true" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1 min-w-[20px] inline-block" onblur="${costOnBlur}">${safeCost}</span>`
+      : `<span>${safeCost}</span>`;
   const statusNode = statusOnClick
-      ? `<button type="button" class="status-badge transport-mobile-status-btn" style="background:${statusColor};" onclick="${statusOnClick}" title="${statusButtonTitle}">${statusGlyph} ${statusText}</button>`
-      : `<span class="status-badge transport-mobile-status-btn" style="background:${statusColor};">${statusGlyph} ${statusText}</span>`;
+      ? `<button type="button" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase text-white shadow-sm transition-transform active:scale-95" style="background-color:${statusColor};" onclick="${statusOnClick}" title="${statusButtonTitle}">${statusGlyph} ${statusText}</button>`
+      : `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase text-white shadow-sm" style="background-color:${statusColor};">${statusGlyph} ${statusText}</span>`;
 
   return `
-    <div class="mobile-table-meta ${metaClass}">
+    <div class="flex items-center justify-between w-full mt-1 ${metaClass}">
       ${statusNode}
-      <div class="transport-mobile-cost-line">
-        <span class="transport-mobile-cost-currency">$</span>${costNode}
+      <div class="font-bold text-slate-800 dark:text-slate-100 text-sm">
+        <span class="text-slate-500 dark:text-slate-400 font-medium mr-0.5">$</span>${costNode}
       </div>
-      ${bookingReference ? `<span class="transport-mobile-booking">${bookingReference}</span>` : ''}
+      ${bookingReference ? `<span class="text-[10px] text-slate-400 ml-2 font-mono truncate">${bookingReference}</span>` : ''}
     </div>
   `;
 }

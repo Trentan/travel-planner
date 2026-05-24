@@ -77,6 +77,85 @@
 </header>
 
 <main>
+  <div class="app-tabs-nav w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 flex items-center shadow-sm">
+    <div class="app-tabs-list flex-1 flex overflow-x-auto overflow-y-hidden hide-scrollbar">
+      <button class="app-tab-btn active flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="itinerary" onclick="switchTab('itinerary', this)">
+        <span class="tab-icon text-lg md:text-base">🗺️</span>
+        <span class="tab-label hidden sm:inline">Itinerary</span>
+      </button>
+      <button class="app-tab-btn flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="transport" onclick="switchTab('transport', this)">
+        <span class="tab-icon text-lg md:text-base">✈️</span>
+        <span class="tab-label hidden sm:inline">Transport</span>
+      </button>
+      <button class="app-tab-btn flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="accom" onclick="switchTab('accom', this)">
+        <span class="tab-icon text-lg md:text-base">🏨</span>
+        <span class="tab-label hidden sm:inline">Accommodation</span>
+      </button>
+      <button class="app-tab-btn flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="budget" onclick="switchTab('budget', this)">
+        <span class="tab-icon text-lg md:text-base">💰</span>
+        <span class="tab-label hidden sm:inline">Budget</span>
+      </button>
+      <button class="app-tab-btn flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="packing" onclick="switchTab('packing', this)">
+        <span class="tab-icon text-lg md:text-base">🧳</span>
+        <span class="tab-label hidden sm:inline">Packing</span>
+      </button>
+      <button class="app-tab-btn flex items-center justify-center gap-2 py-3 px-4 md:px-6 border-b-2 text-sm font-medium transition-colors text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 dark:hover:text-slate-200 dark:text-slate-400 [&.active]:border-teal-600 [&.active]:text-teal-700 [&.active]:bg-teal-50/50 dark:[&.active]:text-teal-400 dark:[&.active]:bg-teal-900/20 whitespace-nowrap min-w-0 flex-1 md:flex-none" data-tab="map" onclick="switchTab('map', this)">
+        <span class="tab-icon text-lg md:text-base">🗺️</span>
+        <span class="tab-label hidden sm:inline">Map</span>
+      </button>
+    </div>
+    <button class="mobile-tabs-menu-btn flex md:hidden items-center justify-center p-3 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200" type="button" onclick="toggleMobileMenu()" aria-label="Open menu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+  </div>
+  <div class="app-menu-right">
+    <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
+    <label id="themeToggleBtn" class="app-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
+      <input id="themeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
+      <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
+      <span id="themeToggleLabel" class="app-menu-switch-label">🌓 Dark theme</span>
+    </label>
+    <button id="undoBtn" class="app-menu-btn" onclick="undoTripChange()" disabled>↶ Undo</button>
+    <button id="redoBtn" class="app-menu-btn" onclick="redoTripChange()" disabled>↷ Redo</button>
+    <details class="app-menu-actions" id="desktopActionsMenu">
+      <summary class="app-menu-btn app-menu-actions-summary" aria-label="Open app actions" aria-haspopup="menu">Actions</summary>
+      <div class="app-menu-actions-panel" role="menu" aria-label="App actions">
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCityDialog()">🌍 Cities</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openRenameTripDialog()">✏️ Rename Trip</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openAIDialog()">🤖 AI Builder</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openBookingIntakeDialog()">Import Booking</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openGuideDialog()">📖 Guide</button>
+        <button id="showMoneyToggleBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); toggleShowMoney()">💵 Hide Prices</button>
+        <div class="app-menu-divider" aria-hidden="true"></div>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItinerarySummaryText()">🧾 Export AI Summary</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItineraryText()">📝 Export Itinerary Text</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openShareExportDialog()">🔗 Share Export</button>
+        <div class="app-menu-divider" aria-hidden="true"></div>
+        <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
+        <button id="saveAsBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripFile()">Save As</button>
+        <button id="openFileBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openExistingTripFile()">Open File</button>
+        <div class="app-menu-divider" aria-hidden="true"></div>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); promptHardRestart()" title="Reload app and clear caches while preserving trip data">🔄 Hard Restart</button>
+        <button class="app-menu-btn danger" onclick="closeDesktopActionsMenu(); promptFactoryReset()" title="Wipe ALL data and revert to default template">⚠️ Factory Reset (Wipe All Data)</button>
+        <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="closeDesktopActionsMenu(); promptInstallApp()">⬇ Install App</button>
+      </div>
+    </details>
+    <button class="app-menu-btn mobile-menu-btn" onclick="toggleMobileMenu()">☰ Menu</button>
+  </div>
+</div>
+
+<div id="jsonWriteWarning" class="json-write-warning" hidden></div>
+
+<header>
+  <div class="header-inner">
+    <div class="header-text">
+      <h1 contenteditable="false" id="mainTitle"></h1>
+      <p contenteditable="false" id="mainSubtitle"></p>
+    </div>
+  </div>
+</header>
+
+<main>
   <div class="app-tabs-nav">
     <div class="app-tabs-list">
       <button class="app-tab-btn active" data-tab="itinerary" onclick="switchTab('itinerary', this)">
