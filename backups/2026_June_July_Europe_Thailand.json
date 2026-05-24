@@ -302,7 +302,8 @@
           "endTime": "",
           "cityId": "city-vienna",
           "notes": "Careful pigeons",
-          "location": "Vienna Park"
+          "location": "Vienna Park",
+          "done": false
         },
         {
           "title": "RS Vienna City Walk: Stephansdom → Hofburg",
@@ -380,8 +381,8 @@
               "cityId": "city-bratislava",
               "startDate": "2026-06-11",
               "endDate": "2026-06-11",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "09:00",
+              "endTime": "10:00"
             }
           ]
         },
@@ -535,9 +536,9 @@
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-11",
           "startDate": "2026-06-11",
-          "startTime": "",
+          "startTime": "09:00",
           "endDate": "2026-06-11",
-          "endTime": "",
+          "endTime": "10:00",
           "cityId": "city-bratislava"
         }
       ],
@@ -1235,7 +1236,8 @@
           "startTime": "13:00",
           "endDate": "2026-06-16",
           "endTime": "17:00",
-          "cityId": "city-munich"
+          "cityId": "city-munich",
+          "done": false
         },
         {
           "title": "Full conference day",
@@ -1593,7 +1595,8 @@
           "startTime": "",
           "endDate": "2026-06-21",
           "endTime": "",
-          "cityId": "city-bolzano"
+          "cityId": "city-bolzano",
+          "done": false
         },
         {
           "title": "Seceda cable car — soaring rocky spires",

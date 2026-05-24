@@ -1822,20 +1822,20 @@ function buildItinerary() {
       return emojis[cat] || '📍';
     };
 
-    html += `<div class="city-dashboard">
-      <div class="city-block city-block-tips">
-        <h4>💡 Tips</h4>
-        <ul class="tips-list">${(leg.legTips || []).map((t, i) => `<li class="tip-item"><span contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span><button class="del-btn" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
-        <button class="add-btn" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>
+    html += `<div class="flex flex-col md:grid md:grid-cols-3 gap-4 p-4 border-b border-slate-200/50 bg-amber-50/30 dark:bg-slate-800/40">
+      <div class="flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm">
+        <h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">💡 Tips</h4>
+        <ul class="tips-list space-y-1.5">${(leg.legTips || []).map((t, i) => `<li class="tip-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-400 group"><span class="flex-1 outline-none" contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
+        <button class="add-btn mt-2 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>
       </div>
-      <div class="city-block city-block-food">
-        <h4>🍔 Food Quests</h4>
-        <ul class="food-list">${(leg.cityFood || []).map((f, i) => `<li class="quest-item"><button class="del-btn" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">×</button><input type="checkbox" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span></li>`).join('')}</ul>
-        <button class="add-btn" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>
+      <div class="flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm">
+        <h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">🍔 Food Quests</h4>
+        <ul class="food-list space-y-1.5">${(leg.cityFood || []).map((f, i) => `<li class="quest-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-400 group"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500 cursor-pointer shrink-0" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span class="flex-1 outline-none transition-opacity" contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
+        <button class="add-btn mt-2 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>
       </div>
-      <div class="city-block city-block-activities">
-        <h4>📌 Suggested Activities</h4>
-        <ul class="activity-list unified-activities">${(leg.suggestedActivities || []).map((activity, activityIdx) => {
+      <div class="flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm">
+        <h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">📌 Suggested Activities</h4>
+        <ul class="activity-list unified-activities space-y-1.5">${(leg.suggestedActivities || []).map((activity, activityIdx) => {
       const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
       let isCompleted = false; let dayLabel = '';
       if (isAssigned && leg.days[activity.assignedDayIdx]) {
@@ -1853,7 +1853,7 @@ function buildItinerary() {
       const notesMetaHtml = activity.notes ? ` · <span class="sight-inline-meta-notes" style="font-style:italic; color:var(--muted);" title="${escapeHtmlText(activity.notes)}">💬 ${escapeHtmlText(activity.notes)}</span>` : '';
       return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span>${notesMetaHtml}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
     }).join('')}</ul>
-        <button class="add-btn" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
+        <button class="add-btn mt-2 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
       </div>
     </div>`;
 
@@ -1872,22 +1872,22 @@ function buildItinerary() {
       const dayViewMode = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
 
       html += `
-      <div class="day-card ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
-        <div class="day-bar" style="--leg-colour:${leg.colour}" onclick="toggleCard(this)">
-          <div class="day-date"><span class="day-num">${dayDateLabel}</span><span class="day-name">${day.day}</span></div>
-          <div class="day-title"><div class="day-cities">${cityHTML}</div><div class="day-desc" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
-          ${dayTotal ? `<div class="day-total-cost" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron">▼</span>
+      <div class="day-card group flex flex-col mb-4 overflow-hidden bg-white/90 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 rounded-xl shadow-sm transition-all duration-300 ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
+        <div class="day-bar flex items-center p-3 sm:p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors relative" style="border-left: 5px solid var(--leg-colour, ${leg.colour})" onclick="toggleCard(this)">
+          <div class="day-date w-16 sm:w-20 shrink-0 text-center flex flex-col items-center justify-center border-r border-slate-200 dark:border-slate-700 pr-3 sm:pr-4 mr-3 sm:mr-4"><span class="day-num text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">${dayDateLabel}</span><span class="day-name text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${day.day}</span></div>
+          <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${cityHTML}</div><div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
+          ${dayTotal ? `<div class="day-total-cost hidden sm:flex shrink-0 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-full border border-slate-200 dark:border-slate-600 shadow-inner mr-4" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron shrink-0 w-8 h-8 flex items-center justify-center text-slate-400 transition-transform duration-300 bg-slate-100 dark:bg-slate-700/50 rounded-full group-[.open]:rotate-180">▼</span>
         </div>
-        <div class="day-detail"><div class="day-planner-shell day-planner-shell-${dayViewMode}">
+        <div class="day-detail hidden group-[.open]:block border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 p-4 sm:p-5"><div class="day-planner-shell day-planner-shell-${dayViewMode}">
           <div class="day-view-panel day-view-panel-timeline">
-          <div class="detail-block daily-timeline-card drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
+          <div class="detail-block bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80 dark:border-slate-700/80 drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
             ${renderDailyTimeline(leg, legIndex, day, dayIndex)}
           </div>
           </div>
-          <div class="day-view-panel day-view-panel-grouped"><div class="detail-grid detail-grid-grouped">
+          <div class="day-view-panel day-view-panel-grouped"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
 
-          <div class="detail-block block-transport">
-            <h4>Transport</h4><div class="item-list">
+          <div class="detail-block block-transport flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm">
+            <h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Transport</h4><div class="item-list space-y-2">
             ${dayJourneys.map((journey) => {
         const status = journey.status || 'planned';
         const statusColor = status === 'booked' ? '#27AE60' : '#E67E22';
@@ -1921,16 +1921,16 @@ function buildItinerary() {
             .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1)) : [];
         const subLocations = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
 
-        return `<div class="cost-item journey-item">
-                <button class="del-btn" title="Remove Journey" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); rebuildCurrentView();">×</button>
+        return `<div class="cost-item journey-item flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200/50 dark:border-slate-600/50 text-sm hover:shadow-md transition-shadow group">
+                <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-red-500 rounded" title="Remove Journey" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); rebuildCurrentView();">×</button>
                 <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
-                  <span>${label}${timeHint}</span>
+                  <span class="font-medium text-slate-700 dark:text-slate-200">${label}${timeHint}</span>
                   ${subLocations ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(subLocations)}</div>` : ''}
                 </div>
-                <div class="cost-item-actions">
-                  <span class="status-badge ${isEditMode ? 'status-badge-clickable' : ''}" style="--status-color:${statusColor};" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}');">${statusIcon} ${status === 'booked' ? 'Booked' : 'Planned'}</span>
-                  ${showRef ? `<input type="text" class="booking-ref-input confirmed" value="${journey.bookingReference || ''}" placeholder="Ref #" onchange="event.stopPropagation(); updateJourneyBookingRef('${journey.id}', this.value);" ${isEditMode ? '' : 'disabled'}/>` : ''}
-                  <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${journey.id}', this.innerText)">${formatCurrency(journey.cost || '0', { includeSymbol: false })}</span></span>
+                <div class="cost-item-actions flex flex-col items-end gap-1.5 shrink-0">
+                  <span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white ${isEditMode ? 'cursor-pointer hover:opacity-80' : ''}" style="background-color:${statusColor};" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}');">${statusIcon} ${status === 'booked' ? 'Booked' : 'Planned'}</span>
+                  ${showRef ? `<input type="text" class="booking-ref-input confirmed text-xs px-1.5 py-0.5 border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500" value="${journey.bookingReference || ''}" placeholder="Ref #" onchange="event.stopPropagation(); updateJourneyBookingRef('${journey.id}', this.value);" ${isEditMode ? '' : 'disabled'}/>` : ''}
+                  <span class="budget-field text-slate-600 dark:text-slate-400 font-mono text-sm mt-1">$<span class="outline-none" contenteditable="${isEditMode}" onblur="updateJourneyCost('${journey.id}', this.innerText)">${formatCurrency(journey.cost || '0', { includeSymbol: false })}</span></span>
                 </div>
               </div>`;
       }).join('')}
@@ -1938,8 +1938,8 @@ function buildItinerary() {
           </div>
 
 
-<div class="detail-block block-accom">
-<h4>Accommodation</h4><div class="item-list">
+<div class="detail-block block-accom flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm">
+<h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Accommodation</h4><div class="item-list space-y-2">
 ${(() => {
         const dayStayInfo = getStayDisplayForDay(day.date, day.to);
         return dayStayInfo.map(info => {
@@ -1954,14 +1954,14 @@ ${(() => {
             return `Location: ${loc}`;
           })() : '';
 
-          return `<div class="cost-item">
+          return `<div class="cost-item flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200/50 dark:border-slate-600/50 text-sm">
         <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
-          <span>${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` via ${info.provider}` : ''}${info.cost ? `<span class="accom-inline-meta-cost"> (${formatCurrency(info.cost)})</span>` : ''}</span>
+          <span class="font-medium text-slate-700 dark:text-slate-200">${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` <span class="text-slate-500 font-normal">via ${info.provider}</span>` : ''}${info.cost ? `<span class="accom-inline-meta-cost text-slate-500 font-mono text-xs ml-1">(${formatCurrency(info.cost)})</span>` : ''}</span>
           ${stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : ''}
         </div>
-        <div class="cost-item-actions">
-          <span class="status-badge" style="--status-color:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✕ Cancelled' : '⏳ Pending'}</span>
-          ${info.bookingRef ? `<span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${info.bookingRef}</span>` : ''}
+        <div class="cost-item-actions flex flex-col items-end gap-1.5 shrink-0">
+          <span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white" style="background-color:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✕ Cancelled' : '⏳ Pending'}</span>
+          ${info.bookingRef ? `<span class="booking-ref text-[10px] font-mono text-slate-500 bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">${info.bookingRef}</span>` : ''}
         </div>
       </div>`;
         }).join('');
@@ -1969,8 +1969,8 @@ ${(() => {
 </div><button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Add Stay</button>
 </div>
 
-          <div class="detail-block block-activities drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
-            <h4>Planned Activities</h4><div class="item-list">
+          <div class="detail-block block-activities drop-zone flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
+            <h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Planned Activities</h4><div class="item-list space-y-2">
             ${(day.activityItems || []).map((item, i) => {
               let locationVal = item.location || '';
               if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
@@ -2001,21 +2001,21 @@ ${(() => {
               }
               const notesHtml = notes ? `<div class="daily-timeline-notes" style="font-size:0.72rem; color:var(--muted); font-style:italic; padding-left:0; margin-top:2px;">💬 ${escapeCompactText(notes)}</div>` : '';
               return `
-                <div class="cost-item">
+                <div class="cost-item flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200/50 dark:border-slate-600/50 text-sm hover:shadow-md transition-shadow group">
                   <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
                     <div style="display: flex; align-items: center; gap: 6px;">
-                      <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button>
-                      <input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})">
-                      <span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${split.title}</span>
+                      <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-red-500 rounded" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button>
+                      <input type="checkbox" class="activity-checkbox w-4 h-4 accent-emerald-500 cursor-pointer" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})">
+                      <span class="cost-item-text font-medium text-slate-700 dark:text-slate-200 outline-none" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${split.title}</span>
                     </div>
                     ${locHtml}
                     ${notesHtml}
                   </div>
                   ${isEditMode
-                    ? `<span class="budget-field budget-field--clickable" style="color:#666; cursor:pointer;" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">⏱ <span>${item.time || '1 hr'}</span></span>`
-                    : `<span class="budget-field" style="color:#666;">⏱ <span>${item.time || '1 hr'}</span></span>`
+                    ? `<span class="budget-field budget-field--clickable text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors cursor-pointer text-xs font-mono" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">⏱ <span>${item.time || '1 hr'}</span></span>`
+                    : `<span class="budget-field text-slate-500 text-xs font-mono">⏱ <span>${item.time || '1 hr'}</span></span>`
                   }
-                  <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span>
+                  <span class="budget-field text-slate-600 dark:text-slate-400 font-mono text-sm mt-1">$<span class="outline-none" contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span>
                 </div>
               `;
             }).join('')}
