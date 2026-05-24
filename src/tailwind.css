@@ -644,6 +644,47 @@
     @apply flex items-center gap-1.5;
   }
 
+  .timeline-empty {
+    @apply rounded-lg border border-border/70 bg-white/75 text-text-muted p-3 text-[0.9rem] leading-6;
+  }
+
+  .timeline-anytime-label {
+    @apply text-[0.8rem] font-bold uppercase tracking-wide text-text-muted mb-1.5;
+  }
+
+  .daily-timeline-title-and-checkbox {
+    @apply flex items-center gap-2 min-w-0;
+  }
+
+  .daily-timeline-notes {
+    @apply mt-1 text-[0.74rem] text-text-muted italic opacity-85;
+  }
+
+  .daily-timeline-sub-locations {
+    @apply mt-1 text-[0.74rem] text-text-muted;
+  }
+
+  [data-theme="dark"] .daily-timeline-time,
+  [data-theme="dark"] .daily-timeline-marker,
+  [data-theme="dark"] .daily-timeline-content,
+  [data-theme="dark"] .timeline-empty {
+    border-color: rgba(148, 163, 184, 0.3);
+  }
+
+  [data-theme="dark"] .daily-timeline-time {
+    background: rgba(15, 23, 42, 0.86);
+  }
+
+  [data-theme="dark"] .daily-timeline-marker {
+    background: rgba(15, 23, 42, 0.92);
+    box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.55);
+  }
+
+  [data-theme="dark"] .daily-timeline-content,
+  [data-theme="dark"] .timeline-empty {
+    background: rgba(15, 23, 42, 0.76);
+  }
+
   .timeline-anytime-list .daily-timeline-item {
     grid-template-columns: 7.2rem 2.25rem minmax(0, 1fr) auto;
   }
@@ -2410,6 +2451,17 @@
     background: rgba(36, 72, 93, 0.06);
   }
 
+  .mobile-tabs-menu-btn {
+    @apply inline-flex items-center justify-center rounded-lg border border-border bg-white/90 text-text-primary;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .mobile-tabs-menu-btn svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
   .tab-icon {
     @apply text-[1.1rem];
   }
@@ -2429,6 +2481,71 @@
 
   .tab-pane.active {
     @apply block;
+  }
+
+  /* Modal form baseline: keep fields aligned and touch friendly */
+  .modal-content input[type="text"],
+  .modal-content input[type="date"],
+  .modal-content input[type="time"],
+  .modal-content input[type="number"],
+  .modal-content select,
+  .modal-content textarea {
+    @apply w-full rounded-lg border border-border bg-surface-input text-text-primary;
+    min-height: 2.75rem;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .modal-content textarea {
+    min-height: 6rem;
+  }
+
+  .modal-content input:focus,
+  .modal-content select:focus,
+  .modal-content textarea:focus {
+    @apply outline-none border-border-strong;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-teal) 22%, transparent);
+  }
+
+  .ai-form-group {
+    @apply mb-3;
+  }
+
+  .ai-form-group label {
+    @apply block text-[0.82rem] font-semibold text-text-muted mb-1.5;
+  }
+
+  .ai-generate-btn {
+    @apply inline-flex items-center justify-center rounded-lg border border-btn-secondary bg-btn-secondary text-white font-semibold;
+    min-height: 2.75rem;
+    padding: 0.65rem 1rem;
+  }
+
+  .guide-demo-btn,
+  .search-btn,
+  .city-reset-location-btn,
+  .country-select {
+    @apply rounded-lg border border-border bg-white text-text-primary;
+    min-height: 2.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.84rem;
+  }
+
+  .guide-demo-input {
+    @apply rounded-lg border border-border bg-white text-text-primary;
+    min-height: 2.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.84rem;
+  }
+
+  .city-list-item {
+    @apply rounded-lg border border-border/80 bg-white;
+  }
+
+  .daily-timeline-checkbox {
+    width: 1.05rem;
+    height: 1.05rem;
   }
 
   /* Header */

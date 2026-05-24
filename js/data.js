@@ -1803,7 +1803,7 @@ function populateCityList() {
       <span style="font-size:0.85rem; color:#2C3E50;">${missingLocationCount} ${missingLocationCount === 1 ? 'city is' : 'cities are'} missing map locations.</span>
       <button id="fetchMissingCityLocationsBtn"
               class="search-btn"
-              style="padding: 6px 10px; border: 1px solid #3498DB; border-radius: 4px; font-size: 0.8rem; color: #fff; background: #3498DB; cursor: pointer;"
+              style="color: #fff; background: #3498DB; cursor: pointer;"
               onclick="fetchAllMissingCityLocations()">
         Find all missing locations
       </button>
@@ -1850,7 +1850,7 @@ function populateCityList() {
     ` : '';
     const searchBtn = !hasCoords ? `
       <button class="search-btn" data-search-btn="${city.id}" 
-              style="padding: 4px 8px; border: 1px solid #3498DB; border-radius: 4px; font-size: 0.75rem; color: #3498DB; background: white; cursor: pointer;"
+              style="color: #3498DB; background: white; cursor: pointer;"
               onclick="triggerOnlineSearch('${city.id}')">
         🔍 Find on Map
       </button>
@@ -1869,7 +1869,7 @@ function populateCityList() {
           </div>
           <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 6px;">
             <select class="country-select" data-city-id="${city.id}"
-              style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; min-width: 140px;">
+              style="min-width: 140px;">
               <option value="">Select country...</option>
               ${COUNTRY_DATA.map(c => {
               const cityCode = (city.countryCode || '').toUpperCase();
@@ -4443,3 +4443,4 @@ window.addUserCity = addUserCity;
 window.updateCityCountryCode = updateCityCountryCode;
 window.populateCountrySelect = populateCountrySelect;
 window.setupCityAutocomplete = setupCityAutocomplete;
+
