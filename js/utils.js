@@ -342,20 +342,8 @@ function setupMobileSwipePagers(root = document) {
     let scrollFrame = 0;
     const initialIndex = getMobilePagerActiveIndex(pagerKey, Number(pager.dataset.activeIndex || 0));
 
-    // Dynamically build visual dots indicators
-    let dotsContainer = pager.querySelector('.mobile-swipe-dots');
-    if (!dotsContainer && total > 1) {
-      dotsContainer = document.createElement('div');
-      dotsContainer.className = 'mobile-swipe-dots';
-      pager.appendChild(dotsContainer);
-      for (let i = 0; i < total; i++) {
-        const dot = document.createElement('span');
-        dot.className = 'mobile-swipe-dot';
-        dot.dataset.slideIndex = String(i);
-        dotsContainer.appendChild(dot);
-      }
-    }
-    const dots = dotsContainer ? Array.from(dotsContainer.querySelectorAll('.mobile-swipe-dot')) : [];
+    // Visual dots removed per user request (top day chips act as indicator)
+    const dots = [];
 
     const setActive = nextIndex => {
       const safeIndex = Math.max(0, Math.min(total - 1, Number(nextIndex) || 0));

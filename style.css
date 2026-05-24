@@ -8118,6 +8118,7 @@ body.compact-view-mode .packing-item { font-size: 11px; }
 
   .app-tab-btn {
     flex: 1 1 0%;
+    min-width: 0;
     min-height: 48px;
     padding: 4px 2px;
     border-radius: 12px;
@@ -10789,6 +10790,9 @@ body.compact-view-mode[data-theme="dark"] .compact-leg-cost-badge {
 /* Mobile specific fixes */
 @media (max-width: 768px) {
   html, body {
+    width: 100%;
+    max-width: 100%;
+    position: relative;
     overflow-x: hidden !important;
   }
   
