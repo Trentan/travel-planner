@@ -886,6 +886,8 @@
       grid-template-columns: 5.75rem 1.9rem minmax(0, 1fr);
       gap: 0.45rem;
       align-items: flex-start;
+      min-height: 2.75rem;
+      padding-block: 0.25rem;
     }
 
     .timeline-anytime-list .daily-timeline-item {
@@ -899,6 +901,30 @@
       overflow-wrap: anywhere;
       text-align: center;
       line-height: 1.15;
+    }
+
+    .daily-timeline-time.is-clickable {
+      min-height: 2.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .daily-timeline-marker.is-clickable::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+    }
+
+    .daily-timeline-checkbox-wrapper {
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+      margin-left: -0.5rem;
+      margin-right: -0.5rem;
     }
 
     body.mobile-app-mode.compact-view-mode .tab-label {
@@ -2479,6 +2505,12 @@
 
   .city-list-item {
     @apply rounded-lg border border-border/80 bg-white;
+  }
+
+  .daily-timeline-checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .daily-timeline-checkbox {

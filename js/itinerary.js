@@ -1417,11 +1417,11 @@ function renderDailyTimelineRow(item, compact = false) {
 
   let checkboxHtml = '';
   if (item.type === 'activity') {
-    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})">`;
+    checkboxHtml = `<label class="daily-timeline-checkbox-wrapper" onclick="event.stopPropagation();"><input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})"></label>`;
   } else if (item.type === 'transport') {
-    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox transport-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleJourneyCompleted(event, '${item.journeyId}')">`;
+    checkboxHtml = `<label class="daily-timeline-checkbox-wrapper" onclick="event.stopPropagation();"><input type="checkbox" class="daily-timeline-checkbox transport-checkbox" ${item.done ? 'checked' : ''} onchange="toggleJourneyCompleted(event, '${item.journeyId}')"></label>`;
   } else if (item.type === 'stay' || item.type === 'checkin' || item.type === 'checkout' || item.type === 'staying') {
-    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox stay-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleStayCompleted(event, '${item.stayId}')">`;
+    checkboxHtml = `<label class="daily-timeline-checkbox-wrapper" onclick="event.stopPropagation();"><input type="checkbox" class="daily-timeline-checkbox stay-checkbox" ${item.done ? 'checked' : ''} onchange="toggleStayCompleted(event, '${item.stayId}')"></label>`;
   }
 
   return `
