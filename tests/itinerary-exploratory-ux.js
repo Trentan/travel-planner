@@ -129,7 +129,8 @@ async function seedTimelineScenario(page) {
     window.stays = stays;
 
     if (typeof window.setItineraryDayViewMode === 'function') window.setItineraryDayViewMode('timeline');
-    if (typeof window.toggleCompactView === 'function') window.toggleCompactView(false);
+    window.isCompactView = false;
+    document.body.classList.remove('compact-view-mode');
     if (typeof window.buildNav === 'function') window.buildNav();
     if (typeof window.buildItinerary === 'function') window.buildItinerary();
     const firstCard = document.querySelector('.day-card');

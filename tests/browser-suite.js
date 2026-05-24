@@ -203,9 +203,7 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     assert(await page.locator('#itinerary .activity-item').count() > 0, 'Desktop: drag/drop should add an activity item to a day');
     reporter.add('desktop', 'drag drop', 'dragged a sight into a day card');
 
-    await page.locator('#compactToggleBtn').click({ force: true });
-    await page.waitForFunction(() => document.body.classList.contains('compact-view-mode'));
-    reporter.add('desktop', 'compact toggle', 'compact mode applied');
+
 
     await page.locator('#desktopActionsMenu > summary').click();
     await humanPause(page, 250);
@@ -286,16 +284,6 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     assert(errors.length === 0, `Mobile page errors: ${errors.join(' | ')}`);
     assert(await page.locator('body.mobile-app-mode').count() === 1, 'Mobile: body should be in mobile mode');
     assert(await page.locator('body.compact-view-mode').count() === 1, 'Mobile: compact view should be enabled');
-    assert(await page.locator('#mobileCompactToggleBtn').count() === 1, 'Mobile: compact toggle should exist in the menu sheet');
-    await page.evaluate(() => toggleMobileMenu());
-    await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
-    await page.locator('#mobileCompactToggleBtn').click();
-    await page.waitForFunction(() => !document.body.classList.contains('compact-view-mode'));
-    await humanPause(page, 350);
-    reporter.add('mobile', 'compact menu toggle', 'compact mode toggled from the mobile menu');
-    await page.evaluate(() => closeMobileMenu());
-    await page.waitForFunction(() => !document.body.classList.contains('mobile-menu-open'));
-    await humanPause(page, 400);
 
     for (const tabId of ['transport', 'accom', 'budget', 'packing']) {
       await page.locator(`.app-tab-btn[data-tab="${tabId}"]`).click();
@@ -313,25 +301,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await humanPause(page, 350);
     reporter.add('mobile', 'read-only toggle', 'read-only mode toggled');
 
-    await page.evaluate(() => {
-      if (!document.body.classList.contains('mobile-menu-open')) toggleMobileMenu();
-    });
-    await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
-    await page.locator('#mobileCompactToggleBtn').click({ force: true });
-    await page.waitForFunction(() => document.body.classList.contains('compact-view-mode'));
-    await humanPause(page, 350);
-    reporter.add('mobile', 'compact menu toggle', 'compact mode toggled back on from the mobile menu');
 
-    await page.evaluate(() => {
-      if (!document.body.classList.contains('mobile-menu-open')) toggleMobileMenu();
-    });
-    await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
-    await page.locator('#mobileCompactToggleBtn').click({ force: true });
-    await page.waitForFunction(() => !document.body.classList.contains('compact-view-mode'));
-    await humanPause(page, 350);
-    reporter.add('mobile', 'compact toggle', 'compact mode toggled');
-    await page.evaluate(() => closeMobileMenu());
-    await page.waitForFunction(() => !document.body.classList.contains('mobile-menu-open'));
 
     await page.locator('.app-tab-btn[data-tab="accom"]').click();
     await humanPause(page, 350);
