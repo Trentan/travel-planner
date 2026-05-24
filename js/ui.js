@@ -645,5 +645,35 @@ window.addLeg = addLeg;
 window.openRenameTripDialog = openRenameTripDialog;
 window.closeRenameTripDialog = closeRenameTripDialog;
 window.saveRenameTripDialog = saveRenameTripDialog;
+let lastScrollY = window.scrollY || 0;
+let cityNavEl = null;
 
+function initMobileScrollNav() {
+  window.addEventListener('scroll', () => {
+    if (!document.body.classList.contains('mobile-app-mode')) return;
+    
+    if (!cityNavEl) {
+      cityNavEl = document.getElementById('cityNav');
+      if (!cityNavEl) return;
+    }
+    
+    const currentScrollY = window.scrollY;
+    
+    // Only apply hide on scroll if we are scrolled past the initial top threshold
+    if (currentScrollY > 60) {
+      if (currentScrollY > lastScrollY + 5) {
+        // Scrolling down (with threshold)
+        cityNavEl.classList.add('city-nav-hidden');
+      } else if (currentScrollY < lastScrollY - 5) {
+        // Scrolling up
+        cityNavEl.classList.remove('city-nav-hidden');
+      }
+    } else {
+      cityNavEl.classList.remove('city-nav-hidden');
+    }
+    
+    lastScrollY = currentScrollY;
+  }, { passive: true });
+}
 
+document.addEventListener('DOMContentLoaded', initMobileScrollNav);

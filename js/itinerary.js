@@ -1803,7 +1803,7 @@ function buildItinerary() {
           <span style="opacity:0.8; font-size:0.9rem; font-family:'DM Mono', monospace;">${dateRange}</span>
         </div>
         <div style="display:flex; align-items:center; gap:10px;">
-          <span class="leg-cost-total-badge">${formatCurrency(legCost)}</span>
+          <div class="hidden sm:flex shrink-0 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-full shadow-sm border border-slate-200 dark:border-slate-700 mr-2" title="Leg estimated cost">${formatCurrency(legCost)}</div>
           <span class="${badgeClass}">${nightLabel}</span>
           ${isEditMode ? `<button class="header-del-btn" title="Add a day to this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, 1)">+</button>` : ''}
           ${isEditMode ? `<button class="header-del-btn" title="Remove a day from this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, -1)">−</button>` : ''}
@@ -1822,19 +1822,19 @@ function buildItinerary() {
       return emojis[cat] || '📍';
     };
 
-    html += `<div class="flex flex-col md:grid md:grid-cols-3 gap-4 p-4 border-b border-slate-200/50 bg-amber-50/30 dark:bg-slate-800/40">
-      <div class="flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm">
-        <h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">💡 Tips</h4>
-        <ul class="tips-list space-y-1.5">${(leg.legTips || []).map((t, i) => `<li class="tip-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-400 group"><span class="flex-1 outline-none" contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
-        <button class="add-btn mt-2 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>
+    html += `<div class="flex flex-col md:grid md:grid-cols-3 gap-4 md:gap-5 p-4 md:p-5 border-b border-slate-200/80 dark:border-slate-700/80 bg-slate-100/60 dark:bg-slate-900/40">
+      <div class="flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">💡 Tips</h4>
+        <ul class="tips-list space-y-2">${(leg.legTips || []).map((t, i) => `<li class="tip-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><span class="flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
+        <button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>
       </div>
-      <div class="flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm">
-        <h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">🍔 Food Quests</h4>
-        <ul class="food-list space-y-1.5">${(leg.cityFood || []).map((f, i) => `<li class="quest-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-400 group"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500 cursor-pointer shrink-0" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span class="flex-1 outline-none transition-opacity" contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
-        <button class="add-btn mt-2 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>
+      <div class="flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">🍔 Food Quests</h4>
+        <ul class="food-list space-y-2">${(leg.cityFood || []).map((f, i) => `<li class="quest-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500 cursor-pointer shrink-0" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span class="flex-1 outline-none transition-opacity min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
+        <button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>
       </div>
-      <div class="flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm">
-        <h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">📌 Suggested Activities</h4>
+      <div class="flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">📌 Suggested Activities</h4>
         <ul class="activity-list unified-activities space-y-1.5">${(leg.suggestedActivities || []).map((activity, activityIdx) => {
       const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
       let isCompleted = false; let dayLabel = '';
@@ -1851,9 +1851,9 @@ function buildItinerary() {
       const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
       const categoryEmoji = getCategoryEmoji(activity.category);
       const notesMetaHtml = activity.notes ? ` · <span class="sight-inline-meta-notes" style="font-style:italic; color:var(--muted);" title="${escapeHtmlText(activity.notes)}">💬 ${escapeHtmlText(activity.notes)}</span>` : '';
-      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span>${notesMetaHtml}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
+      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle opacity-50 hover:opacity-100 cursor-grab shrink-0 mt-0.5" title="Drag to assign">⠿</span>` : `<span class="assigned-badge shrink-0 mt-0.5 ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji shrink-0 mt-0.5">${categoryEmoji}</span><div class="flex flex-col min-w-0 flex-1"><span class="break-words" style="${isCompleted ? 'text-decoration:line-through;opacity:0.6;' : ''}">${activity.title}</span><span class="sight-inline-meta text-xs text-slate-400 mt-0.5 block truncate">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span>${notesMetaHtml}</span></div><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn shrink-0" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
     }).join('')}</ul>
-        <button class="add-btn mt-2 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
+        <button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
       </div>
     </div>`;
 
@@ -1884,10 +1884,10 @@ function buildItinerary() {
             ${renderDailyTimeline(leg, legIndex, day, dayIndex)}
           </div>
           </div>
-          <div class="day-view-panel day-view-panel-grouped"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+          <div class="day-view-panel day-view-panel-grouped"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 mt-4">
 
-          <div class="detail-block block-transport flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm">
-            <h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Transport</h4><div class="item-list space-y-2">
+          <div class="detail-block block-transport flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md">
+            <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Transport</h4><div class="item-list space-y-2">
             ${dayJourneys.map((journey) => {
         const status = journey.status || 'planned';
         const statusColor = status === 'booked' ? '#27AE60' : '#E67E22';
@@ -1938,8 +1938,8 @@ function buildItinerary() {
           </div>
 
 
-<div class="detail-block block-accom flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm">
-<h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Accommodation</h4><div class="item-list space-y-2">
+<div class="detail-block block-accom flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md">
+<h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Accommodation</h4><div class="item-list space-y-2">
 ${(() => {
         const dayStayInfo = getStayDisplayForDay(day.date, day.to);
         return dayStayInfo.map(info => {
@@ -1969,8 +1969,8 @@ ${(() => {
 </div><button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Add Stay</button>
 </div>
 
-          <div class="detail-block block-activities drop-zone flex flex-col min-w-0 p-3 border border-slate-200/50 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-sm" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
-            <h4 class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Planned Activities</h4><div class="item-list space-y-2">
+          <div class="detail-block block-activities drop-zone flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
+            <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Planned Activities</h4><div class="item-list space-y-2">
             ${(day.activityItems || []).map((item, i) => {
               let locationVal = item.location || '';
               if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
