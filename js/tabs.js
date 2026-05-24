@@ -499,7 +499,7 @@ function buildPackingTab() {
   packingData.forEach((area, aIdx) => {
     areasHTML += `
       <div id="packing-area-${aIdx}" class="packing-area-section packing-area-spaced">
-        <h2 class="packing-area-heading area-color-var border-color-var" style="--area-color:${area.areaColor}; --border-color:${area.areaColor};">
+        <h2 class="packing-area-heading area-color-var border-color-var" style="color:${area.areaColor}; border-color:${area.areaColor};">
           <span contenteditable="${isEditMode}" onblur="updatePackingAreaName(${aIdx}, this.innerText)">${area.areaName}</span>
         </h2>
         <div class="packing-grid">

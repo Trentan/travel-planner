@@ -485,6 +485,10 @@ function setItineraryDayViewMode(nextMode = 'timeline') {
   window.itineraryDayViewMode = itineraryDayViewMode;
   saveUiSettings();
   syncItineraryViewModeButtons();
+  document.querySelectorAll('#tab-itinerary .day-planner-shell').forEach(shell => {
+    shell.classList.remove('day-planner-shell-timeline', 'day-planner-shell-grouped');
+    shell.classList.add(itineraryDayViewMode === 'grouped' ? 'day-planner-shell-grouped' : 'day-planner-shell-timeline');
+  });
   if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
   else if (typeof buildItinerary === 'function') buildItinerary();
 }

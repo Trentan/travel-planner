@@ -225,7 +225,7 @@ function renderCompactFoodQuestCard(leg, legIndex) {
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
 
   return `
-    <article class="mobile-surface-card compact-food-quest-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+    <article class="mobile-surface-card compact-food-quest-card" style="border-left-color:${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-food-summary" style="cursor: default; user-select: none;">
         <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍗</span> Food quests</span>
         <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
@@ -258,7 +258,7 @@ function renderCompactTipsCard(leg, legIndex) {
   const countLabel = `${tips.length} tip${tips.length === 1 ? '' : 's'}`;
 
   return `
-    <article class="mobile-surface-card compact-tips-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+    <article class="mobile-surface-card compact-tips-card" style="border-left-color:${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-tips-summary" style="cursor: default; user-select: none;">
         <span class="compact-tips-summary-title"><span class="compact-tips-summary-icon" aria-hidden="true">&#128161;</span> Tips</span>
         <span class="compact-tips-summary-count">${escapeCompactText(countLabel)}</span>
@@ -280,7 +280,7 @@ function renderCompactActivitiesCard(leg, legIndex) {
       : '<div class="compact-day-empty">No suggested activities available.</div>';
 
   return `
-    <article class="mobile-surface-card compact-activities-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+    <article class="mobile-surface-card compact-activities-card" style="border-left-color:${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-activities-summary" style="cursor: default; user-select: none;">
         <span class="compact-activities-summary-title"><span class="compact-activities-summary-icon" aria-hidden="true">&#128205;</span> Activities</span>
         <span class="compact-activities-summary-count">${escapeCompactText(countLabel)}</span>
@@ -308,6 +308,7 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
   // Count assigned vs unassigned suggested activities
   const assignedCount = suggestedActivities.filter(a => a.assignedDayIdx !== null && a.assignedDayIdx !== undefined).length;
   const activitiesLabel = `${assignedCount}/${suggestedActivities.length}`;
+  const accentColor = escapeCompactText(leg.colour || '#24485d');
 
   const tipsList = tips.length > 0
       ? `<ul class="compact-mobile-info-list">${tips.map(tip => renderCompactTipItem(tip)).join('')}</ul>`
@@ -325,6 +326,7 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
         <button
           type="button"
           class="compact-mobile-info-chip ${tipsExpanded ? 'is-active' : ''}"
+          style="border-left-color:${accentColor};"
           onclick="toggleTipsCardDetails(event, '${legId}')"
           aria-expanded="${tipsExpanded ? 'true' : 'false'}"
         >
@@ -334,6 +336,7 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
         <button
           type="button"
           class="compact-mobile-info-chip ${foodExpanded ? 'is-active' : ''}"
+          style="border-left-color:${accentColor};"
           onclick="toggleFoodQuestDetails(event, '${legId}')"
           aria-expanded="${foodExpanded ? 'true' : 'false'}"
           aria-label="Food quests ${escapeCompactText(foodLabel)} complete"
@@ -346,6 +349,7 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
         <button
           type="button"
           class="compact-mobile-info-chip ${activitiesExpanded ? 'is-active' : ''}"
+          style="border-left-color:${accentColor};"
           onclick="toggleActivitiesCardDetails(event, '${legId}')"
           aria-expanded="${activitiesExpanded ? 'true' : 'false'}"
           aria-label="Activities ${escapeCompactText(activitiesLabel)} assigned"
@@ -356,17 +360,17 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
         </button>
       </div>
       ${tipsExpanded ? `
-        <div class="compact-mobile-info-panel compact-mobile-info-panel-tips">
+        <div class="compact-mobile-info-panel compact-mobile-info-panel-tips" style="border-left-color:${accentColor};">
           ${tipsList}
         </div>
       ` : ''}
       ${foodExpanded ? `
-        <div class="compact-mobile-info-panel compact-mobile-info-panel-food">
+        <div class="compact-mobile-info-panel compact-mobile-info-panel-food" style="border-left-color:${accentColor};">
           <div class="compact-food-list">${foodLines}</div>
         </div>
       ` : ''}
       ${activitiesExpanded ? `
-        <div class="compact-mobile-info-panel compact-mobile-info-panel-activities">
+        <div class="compact-mobile-info-panel compact-mobile-info-panel-activities" style="border-left-color:${accentColor};">
           <div class="compact-suggested-activity-list">${activityLines}</div>
         </div>
       ` : ''}
@@ -871,7 +875,7 @@ function renderCompactLegCard(leg, legIndex) {
   const displayLegLabel = legLabel || routeLabel || `Leg ${legIndex + 1}`;
 
   return `
-    <article class="compact-leg-card" style="--leg-accent:${escapeHtmlText(leg.colour || '#24485d')}">
+    <article class="compact-leg-card">
       <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
         <div class="compact-leg-header-line">
           <span class="compact-leg-date">${escapeHtmlText(legDateRange || '-')}</span>
@@ -920,7 +924,7 @@ function buildCompactItinerary() {
         : (firstDay ? firstDay.date : '');
 
     const legCard = `
-      <article class="compact-leg-card" style="--leg-accent:${escapeHtmlText(leg.colour || '#24485d')}">
+      <article class="compact-leg-card">
         <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
           <div class="compact-leg-header-line">
             <span class="compact-leg-date">${escapeHtmlText(legDateRange || '—')}</span>
@@ -1727,9 +1731,6 @@ function buildItinerary() {
     const section = document.createElement('div');
     section.className = 'leg';
     section.id = 'leg-' + leg.id;
-    if (section.style && typeof section.style.setProperty === 'function') {
-      section.style.setProperty('--leg-accent', leg.colour);
-    }
     section.style.borderLeft = `6px solid ${leg.colour}`;
 
     const daysCount = leg.days.length;
@@ -1822,20 +1823,20 @@ function buildItinerary() {
       return emojis[cat] || '📍';
     };
 
-    html += `<div class="flex flex-col md:grid md:grid-cols-3 gap-4 md:gap-5 p-4 md:p-5 border-b border-slate-200/80 dark:border-slate-700/80 bg-slate-100/60 dark:bg-slate-900/40">
-      <div class="flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
-        <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">💡 Tips</h4>
-        <ul class="tips-list space-y-2">${(leg.legTips || []).map((t, i) => `<li class="tip-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><span class="flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
+    html += `<div class="itinerary-leg-panels flex flex-col md:grid md:grid-cols-3 gap-4 md:gap-5 p-4 md:p-5 border-b border-slate-200/80 dark:border-slate-700/80 bg-slate-100/60 dark:bg-slate-900/40">
+      <div class="itinerary-info-panel itinerary-info-panel-tips flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">💡 Tips</h4>
+        <ul class="itinerary-panel-list tips-list space-y-2">${(leg.legTips || []).map((t, i) => `<li class="itinerary-panel-item tip-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><span class="flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
         <button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>
       </div>
-      <div class="flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
-        <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">🍔 Food Quests</h4>
-        <ul class="food-list space-y-2">${(leg.cityFood || []).map((f, i) => `<li class="quest-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500 cursor-pointer shrink-0" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span class="flex-1 outline-none transition-opacity min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
+      <div class="itinerary-info-panel itinerary-info-panel-food flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">🍔 Food Quests</h4>
+        <ul class="itinerary-panel-list food-list space-y-2">${(leg.cityFood || []).map((f, i) => `<li class="itinerary-panel-item quest-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500 cursor-pointer shrink-0" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span class="flex-1 outline-none transition-opacity min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
         <button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>
       </div>
-      <div class="flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
-        <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">📌 Suggested Activities</h4>
-        <ul class="activity-list unified-activities space-y-1.5">${(leg.suggestedActivities || []).map((activity, activityIdx) => {
+      <div class="itinerary-info-panel itinerary-info-panel-activities flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">📌 Suggested Activities</h4>
+        <ul class="itinerary-panel-list activity-list unified-activities space-y-1.5">${(leg.suggestedActivities || []).map((activity, activityIdx) => {
       const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
       let isCompleted = false; let dayLabel = '';
       if (isAssigned && leg.days[activity.assignedDayIdx]) {

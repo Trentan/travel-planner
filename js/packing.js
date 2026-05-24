@@ -69,13 +69,13 @@ function renderPackingAreaProgress(aIdx) {
   const shortName = shortNameMap[area.areaName] || area.areaName;
 
   return `
-    <div class="packing-area-progress area-color-var" style="--area-color:${area.areaColor || 'var(--accent)'}" onclick="document.getElementById('packing-area-${aIdx}').scrollIntoView({behavior: 'smooth'})" title="Jump to ${shortName}">
+    <div class="packing-area-progress area-color-var" style="color:${area.areaColor || '#0891b2'}" onclick="document.getElementById('packing-area-${aIdx}').scrollIntoView({behavior: 'smooth'})" title="Jump to ${shortName}">
       <div class="packing-area-progress-header">
         <span class="packing-area-progress-title">${shortName}</span>
         <span class="packing-area-progress-info">${done}/${total}</span>
       </div>
       <div class="packing-area-progress-bar">
-        <span class="progress-width-var" style="--progress-width:${percent}%"></span>
+        <span class="progress-width-var" style="width:${percent}%; background:${area.areaColor || '#0891b2'}"></span>
       </div>
     </div>
   `;
@@ -207,7 +207,7 @@ function renderPackingGuidePanel() {
         <div class="guide-panel-content leave-home-guide-content">
           <div class="leave-home-progress">
             <div class="leave-home-progress-bar">
-              <span class="progress-width-var" style="--progress-width:${progressWidth}%"></span>
+              <span class="progress-width-var" style="width:${progressWidth}%"></span>
             </div>
           </div>
           <div class="leave-home-list">
