@@ -295,8 +295,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       <div class="modal-body">
         <div class="activity-assign-layout">
           <!-- Left Panel -->
-          <div class="activity-assign-summary" style="display:flex; flex-direction:column; gap:0.6rem; padding: 0.85rem;">
-            <div style="display:grid; grid-template-columns:0.35fr 0.65fr; gap:0.5rem;">
+          <div class="activity-assign-summary activity-assign-summary-layout">
+            <div class="activity-assign-grid activity-assign-grid-split">
               <div class="ai-form-group">
                 <label>Category</label>
                 <select id="activityCategory" class="form-control form-control--compact">
@@ -314,7 +314,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
               </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+            <div class="activity-assign-grid activity-assign-grid-equal">
               <div class="ai-form-group">
                 <label>Location</label>
                 <input type="text" id="activityLocation" class="form-control form-control--compact" placeholder="e.g., Central Park" value="${html(activity?.location || defaults.location || '')}">
@@ -325,7 +325,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
               </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+            <div class="activity-assign-grid activity-assign-grid-equal">
               <div class="ai-form-group">
                 <label>Estimated Time</label>
                 <input type="text" id="activityTime" class="form-control form-control--compact" placeholder="e.g., 1 hr" value="${html(activity?.estTime || '1 hr')}">
@@ -337,7 +337,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
             </div>
 
             <!-- Schedule Preferences -->
-            <div class="activity-assign-schedule" style="margin-top:0.3rem; padding-top:0.3rem; gap: 0.4rem;">
+            <div class="activity-assign-schedule activity-assign-schedule-layout">
               <div class="activity-assign-schedule-title">Schedule preference</div>
               <div class="activity-assign-mode">
                 <label>
@@ -357,32 +357,32 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
                 <label>Start <input type="time" id="activityAssignStartTime" value="${html(preferredStart)}"></label>
                 <label>End <input type="time" id="activityAssignEndTime" value="${html(preferredEnd)}"></label>
               </div>
-              <div class="activity-assign-schedule-hint" style="font-size:0.7rem;">Suggested uses each day's best open slot. Fixed time calculates the end from duration when left blank.</div>
+              <div class="activity-assign-schedule-hint activity-assign-schedule-hint-text">Suggested uses each day's best open slot. Fixed time calculates the end from duration when left blank.</div>
             </div>
 
             <!-- Assignment Info & Remove Button -->
-            <div style="margin-top:0.3rem; padding-top:0.3rem; border-top:1px solid rgba(36, 72, 93, 0.1);">
+            <div class="activity-assign-current-wrap">
               <div class="activity-assign-current">Current assignment: <strong>${html(currentDayLabel)}</strong></div>
-              ${hasCurrentAssignment ? `<button type="button" class="action-btn activity-assign-clear" id="activityAssignClearBtn" style="margin-top:0.4rem;">Move to Suggested Pool (Unassign)</button>` : ''}
+              ${hasCurrentAssignment ? `<button type="button" class="action-btn activity-assign-clear activity-assign-clear-spaced" id="activityAssignClearBtn">Move to Suggested Pool (Unassign)</button>` : ''}
             </div>
           </div>
 
           <!-- Right Panel: Choose Day -->
-          <div style="display:flex; flex-direction:column; gap:0.5rem;">
-            <div class="activity-assign-schedule-title" style="margin-bottom:0.25rem;">Allocate to Day</div>
-            <div class="activity-assign-days" aria-label="Choose a day" style="max-height:56vh;">
+          <div class="activity-assign-days-wrap">
+            <div class="activity-assign-schedule-title activity-assign-days-title">Allocate to Day</div>
+            <div class="activity-assign-days activity-assign-days-scroll" aria-label="Choose a day">
               ${dayButtons}
             </div>
           </div>
         </div>
       </div>
-      <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+      <div class="modal-footer activity-assign-footer">
         <div>
-          ${isEditing ? `<button class="action-btn" style="background:#e74c3c; color:white;" id="activityAssignDeleteBtn">Delete</button>` : ''}
+          ${isEditing ? `<button class="action-btn activity-assign-delete-btn" id="activityAssignDeleteBtn">Delete</button>` : ''}
         </div>
-        <div style="display:flex; gap:0.5rem;">
+        <div class="activity-assign-footer-actions">
           <button class="action-btn" type="button" id="activityAssignCancelBtn">Cancel</button>
-          <button class="action-btn action-btn-secondary" style="background:#2C3E50; color:white;" id="saveActivityBtn">Save Changes</button>
+          <button class="action-btn action-btn-secondary activity-assign-save-btn" id="saveActivityBtn">Save Changes</button>
         </div>
       </div>
     </div>

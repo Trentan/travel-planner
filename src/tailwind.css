@@ -294,6 +294,231 @@
     @apply bg-[#f9f9f9];
   }
 
+  /* Modal/layout utility classes used by journey/stay/AI flows */
+  .journey-modal-panel {
+    @apply px-6 pt-3 pb-2;
+  }
+
+  .journey-modal-title {
+    @apply text-base font-semibold text-text-primary;
+  }
+
+  .journey-segment-tracker {
+    @apply flex items-center gap-2 overflow-x-auto pb-1;
+  }
+
+  .surface-panel {
+    @apply p-4 rounded-lg border border-border bg-[#FAFAF8];
+  }
+
+  .surface-panel--quiet {
+    @apply bg-[#f9f9f9];
+  }
+
+  .surface-panel--card {
+    @apply bg-white shadow-sm;
+  }
+
+  .journey-form-card {
+    @apply mt-3 mb-2;
+  }
+
+  #journey-modal .modal-content {
+    max-width: min(1220px, 97vw);
+    width: min(1220px, 97vw);
+    max-height: 94vh;
+  }
+
+  #journey-modal .modal-body {
+    max-height: calc(94vh - 142px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.75rem 0;
+  }
+
+  .journey-form-header {
+    @apply flex items-center justify-between mb-3;
+  }
+
+  .journey-segment-label {
+    @apply text-[0.95rem] font-semibold text-[#2980B9];
+  }
+
+  .journey-type-icon {
+    @apply text-[1.2rem];
+  }
+
+  .journey-route-arrow {
+    @apply pb-2.5 font-bold text-slate-400;
+  }
+
+  .journey-route-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: end;
+  }
+
+  .journey-address-row {
+    margin-top: -0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .journey-route-spacer {
+    width: 24px;
+    height: 1px;
+  }
+
+  .journey-pending-segments {
+    @apply px-6 pt-1 pb-2;
+  }
+
+  .journey-transport-type-group {
+    @apply grid gap-2 mb-3;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .transport-type-btn {
+    @apply inline-flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg border border-border bg-white text-[0.78rem] font-medium text-text-primary transition-colors;
+    min-height: 2.5rem;
+  }
+
+  .transport-type-btn:hover {
+    @apply bg-[#f7f5f0] border-border-strong;
+  }
+
+  .transport-type-btn.active {
+    @apply bg-btn-secondary text-white border-btn-secondary;
+  }
+
+  .journey-inline-row {
+    @apply flex items-end gap-3;
+  }
+
+  .journey-time-row,
+  .journey-meta-row {
+    @apply gap-3;
+  }
+
+  .journey-time-grid {
+    @apply grid gap-2.5;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #journey-modal .journey-meta-row.modal-form-row--split {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+    align-items: end;
+  }
+
+  #journey-modal .journey-city-link-row {
+    @apply mt-0.5 mb-2;
+  }
+
+  .journey-datetime-pair {
+    @apply flex gap-2 min-w-0;
+  }
+
+  .journey-datetime-pair input {
+    min-width: 0;
+  }
+
+  .journey-footer-actions {
+    @apply flex gap-2;
+  }
+
+  .journey-footer-actions .action-btn {
+    min-width: 0;
+  }
+
+  .modal-body.modal-body-compact {
+    padding: 0;
+  }
+
+  .modal-body.modal-body-scroll {
+    overflow-y: auto;
+  }
+
+  .modal-footer.modal-footer-transparent {
+    background: transparent;
+    border-top: none;
+  }
+
+  .modal-footer.modal-footer-space-between {
+    justify-content: space-between;
+  }
+
+  .modal-footer.modal-footer-tight {
+    padding-top: 0;
+  }
+
+  .modal-footer.modal-footer-wrap {
+    flex-wrap: wrap;
+  }
+
+  .modal-form-stack {
+    @apply flex flex-col gap-4;
+  }
+
+  .stay-form-grid {
+    @apply grid gap-4;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stay-form-grid > .ai-form-group,
+  .stay-form-grid > .modal-form-row {
+    min-width: 0;
+  }
+
+  .stay-form-grid > .ai-form-group:nth-child(1),
+  .stay-form-grid > .ai-form-group:nth-child(2),
+  .stay-form-grid > .ai-form-group:nth-child(3),
+  .stay-form-grid > .ai-form-group:nth-child(10) {
+    grid-column: 1 / -1;
+  }
+
+  .modal-form-row {
+    @apply flex items-end gap-4;
+  }
+
+  .modal-form-row--tight {
+    gap: 0.5rem;
+  }
+
+  .modal-form-row--split > .ai-form-group {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  .modal-form-pair {
+    @apply flex gap-2;
+  }
+
+  .modal-form-divider {
+    @apply relative text-center text-[0.9rem] text-[#666];
+  }
+
+  .modal-form-divider-label {
+    @apply relative z-1 px-4 bg-[#f5f5f5];
+  }
+
+  .modal-form-divider::before {
+    content: '';
+    @apply absolute left-0 right-0 top-1/2 h-px bg-[#ddd] z-0;
+  }
+
+  .readonly-field {
+    min-height: 2.35rem;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid rgba(36, 72, 93, 0.12);
+    border-radius: 8px;
+    background: rgba(36, 72, 93, 0.04);
+    color: var(--color-text-primary);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
   /* View mode toggle button */
   .itinerary-view-mode-btn {
     @apply min-h-[2.1rem] px-2.5 py-1 border-transparent
@@ -1318,6 +1543,129 @@
     body.mobile-app-mode .modal-footer .action-btn {
       min-height: 2.75rem;
       font-size: var(--m-font-sm);
+    }
+
+    body.mobile-app-mode .journey-modal-panel {
+      @apply px-4 pt-3 pb-2;
+    }
+
+    body.mobile-app-mode .journey-pending-segments {
+      @apply px-4 pb-3;
+    }
+
+    body.mobile-app-mode .modal-form-row {
+      @apply flex-col items-stretch gap-3;
+    }
+
+    body.mobile-app-mode .modal-form-pair {
+      @apply flex-col gap-2;
+    }
+
+    body.mobile-app-mode .journey-route-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.65rem;
+    }
+
+    body.mobile-app-mode #journey-modal .modal-content {
+      width: calc(100vw - 0.75rem);
+      max-width: calc(100vw - 0.75rem);
+      max-height: 94vh;
+    }
+
+    body.mobile-app-mode #journey-modal .modal-body {
+      max-height: none;
+      overflow-y: auto;
+    }
+
+    body.mobile-app-mode .journey-transport-type-group {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.45rem;
+      margin-bottom: 1.1rem;
+    }
+
+    body.mobile-app-mode .journey-transport-type-group .transport-type-btn {
+      width: 100%;
+      min-width: 0;
+      min-height: 44px;
+      padding: 0.55rem 0.4rem;
+      font-size: 0.72rem;
+    }
+
+    body.mobile-app-mode .journey-inline-row {
+      @apply flex-col items-stretch gap-2;
+    }
+
+    body.mobile-app-mode .journey-time-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.5rem;
+    }
+
+    body.mobile-app-mode .journey-datetime-pair {
+      @apply flex-col gap-2;
+    }
+
+    body.mobile-app-mode .journey-datetime-pair input {
+      width: 100%;
+    }
+
+    body.mobile-app-mode #journey-modal .journey-meta-row.modal-form-row--split {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.5rem;
+    }
+
+    body.mobile-app-mode .journey-route-arrow,
+    body.mobile-app-mode .journey-route-spacer {
+      display: none;
+    }
+
+    body.mobile-app-mode .journey-modal-footer {
+      @apply flex-col items-stretch;
+    }
+
+    body.mobile-app-mode .journey-footer-actions {
+      @apply w-full flex-wrap gap-2;
+    }
+
+    body.mobile-app-mode .journey-footer-actions .action-btn {
+      flex: 1 1 calc(50% - 0.25rem);
+      min-width: 0;
+      justify-content: center;
+    }
+
+    body.mobile-app-mode .activity-assign-modal {
+      width: calc(100vw - 0.75rem);
+      max-width: calc(100vw - 0.75rem) !important;
+      max-height: 94vh;
+    }
+
+    body.mobile-app-mode .activity-assign-modal .modal-body {
+      overflow-y: auto;
+    }
+
+    body.mobile-app-mode .activity-assign-layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.85rem;
+    }
+
+    body.mobile-app-mode .activity-assign-summary,
+    body.mobile-app-mode .activity-assign-days-scroll {
+      max-height: none;
+      overflow: visible;
+    }
+
+    body.mobile-app-mode .stay-form-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    body.mobile-app-mode .stay-form-grid > .ai-form-group:nth-child(1),
+    body.mobile-app-mode .stay-form-grid > .ai-form-group:nth-child(2),
+    body.mobile-app-mode .stay-form-grid > .ai-form-group:nth-child(3),
+    body.mobile-app-mode .stay-form-grid > .ai-form-group:nth-child(10) {
+      grid-column: auto;
+    }
+
+    body.mobile-app-mode .modal-footer.modal-footer-space-between {
+      @apply flex-col items-stretch;
     }
 
     body.mobile-app-mode .modal-close {
@@ -2662,6 +3010,32 @@
     @apply flex flex-col gap-2.5 p-3.5;
   }
 
+  .activity-assign-modal {
+    max-width: min(1160px, 96vw) !important;
+    width: min(1160px, 96vw);
+    max-height: 92vh;
+  }
+
+  .activity-assign-modal .modal-body {
+    @apply p-4;
+    overflow: hidden;
+  }
+
+  .activity-assign-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr);
+    gap: 1rem;
+    align-items: start;
+    min-height: 0;
+  }
+
+  .activity-assign-summary {
+    min-height: 0;
+    overflow: auto;
+    max-height: calc(92vh - 250px);
+    @apply rounded-2xl border border-slate-200/80 bg-white;
+  }
+
   .activity-assign-grid {
     @apply grid gap-2;
   }
@@ -2675,7 +3049,7 @@
   }
 
   .activity-assign-schedule-layout {
-    @apply mt-1 pt-1 gap-1.5;
+    @apply mt-2 pt-3 gap-1.5 border-t border-slate-200/80;
   }
 
   .activity-assign-schedule-hint-text {
@@ -2683,7 +3057,7 @@
   }
 
   .activity-assign-current-wrap {
-    @apply mt-1 pt-1 border-t border-[rgba(36,72,93,0.1)];
+    @apply mt-2 pt-3 border-t border-slate-200/80;
   }
 
   .activity-assign-clear-spaced {
@@ -2691,15 +3065,65 @@
   }
 
   .activity-assign-days-wrap {
-    @apply flex flex-col gap-2;
+    @apply flex flex-col gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-3;
+    min-height: 0;
   }
 
   .activity-assign-days-title {
-    @apply mb-1;
+    @apply mb-1 text-[0.82rem] font-extrabold uppercase tracking-[0.06em] text-slate-600;
   }
 
   .activity-assign-days-scroll {
-    max-height: 56vh;
+    max-height: calc(92vh - 300px);
+    overflow: auto;
+    padding-right: 0.15rem;
+  }
+
+  .activity-assign-days {
+    @apply grid gap-2;
+  }
+
+  .activity-assign-day {
+    @apply w-full m-0 p-3 rounded-xl border border-border bg-white text-left
+           flex flex-col items-start gap-1.5 transition-colors;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+  }
+
+  .activity-assign-day:hover {
+    @apply bg-slate-50 border-slate-300;
+  }
+
+  .activity-assign-day.is-current {
+    @apply border-btn-secondary bg-slate-100;
+    box-shadow: inset 0 0 0 1px rgba(44, 62, 80, 0.08);
+  }
+
+  .activity-assign-day-main {
+    @apply w-full flex items-start justify-between gap-2;
+  }
+
+  .activity-assign-day-date {
+    @apply text-[0.78rem] font-extrabold uppercase tracking-[0.06em] text-slate-800;
+  }
+
+  .activity-assign-day-route {
+    @apply text-[0.74rem] text-slate-600 text-right;
+  }
+
+  .activity-assign-day-desc {
+    @apply text-[0.82rem] text-slate-700;
+  }
+
+  .activity-assign-day-meta {
+    @apply text-[0.75rem] text-slate-600;
+  }
+
+  .activity-assign-day-suggestion {
+    @apply text-[0.8rem] font-semibold text-slate-700;
+  }
+
+  .activity-assign-day-suggestion.is-empty {
+    @apply font-normal text-slate-500;
   }
 
   .activity-assign-footer {
@@ -2716,6 +3140,53 @@
 
   .activity-assign-save-btn {
     @apply bg-btn-secondary text-white;
+  }
+
+  #activity-assign-modal .modal-header h2 {
+    @apply text-[2rem] font-bold tracking-tight text-slate-800;
+  }
+
+  #activity-assign-modal .modal-body .ai-form-group > label {
+    @apply text-[0.8rem] font-extrabold uppercase tracking-[0.05em] text-slate-600 mb-1;
+  }
+
+  #activity-assign-modal .form-control {
+    @apply border-slate-300 bg-white;
+  }
+
+  #activity-assign-modal .form-control:focus {
+    border-color: #334155;
+    box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.16);
+  }
+
+  #activity-assign-modal .activity-assign-mode {
+    @apply grid gap-2;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  #activity-assign-modal .activity-assign-mode label {
+    @apply flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-[0.88rem] font-semibold text-slate-700 cursor-pointer;
+  }
+
+  #activity-assign-modal .activity-assign-mode input[type="radio"] {
+    accent-color: #2c3e50;
+  }
+
+  #activity-assign-modal .activity-assign-time-row {
+    @apply grid gap-2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #activity-assign-modal .activity-assign-time-row label {
+    @apply flex flex-col gap-1 text-[0.75rem] font-bold uppercase tracking-[0.04em] text-slate-600;
+  }
+
+  #activity-assign-modal .activity-assign-current {
+    @apply text-[0.9rem] text-slate-600;
+  }
+
+  #activity-assign-modal .activity-assign-current strong {
+    @apply text-slate-800;
   }
 
   .activity-assign-day-legacy {
@@ -3228,31 +3699,6 @@
 
   .tab-pane.active {
     @apply block;
-  }
-
-  /* Modal form baseline: keep fields aligned and touch friendly */
-  .modal-content input[type="text"],
-  .modal-content input[type="date"],
-  .modal-content input[type="time"],
-  .modal-content input[type="number"],
-  .modal-content select,
-  .modal-content textarea {
-    @apply w-full rounded-lg border border-border bg-surface-input text-text-primary;
-    min-height: 2.75rem;
-    padding: 0.65rem 0.75rem;
-    font-size: 0.95rem;
-    line-height: 1.35;
-  }
-
-  .modal-content textarea {
-    min-height: 6rem;
-  }
-
-  .modal-content input:focus,
-  .modal-content select:focus,
-  .modal-content textarea:focus {
-    @apply outline-none border-border-strong;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-teal) 22%, transparent);
   }
 
   .ai-form-group {
