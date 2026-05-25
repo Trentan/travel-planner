@@ -17,13 +17,26 @@ function updateStickyOffsets() {
   const cityNav = document.querySelector('.city-nav');
   if (!tabsNav) return;
 
-  const menuHeight = !isMobileViewport() && menuBar
+  const isMobile = isMobileViewport();
+  const menuHeight = !isMobile && menuBar
     ? Math.ceil(menuBar.getBoundingClientRect().height || 0)
     : 0;
   const tabsHeight = Math.ceil(tabsNav.getBoundingClientRect().height || 0);
   tabsNav.style.top = `${menuHeight}px`;
+
+  const cityHeight = cityNav
+    ? Math.ceil(cityNav.getBoundingClientRect().height || 0)
+    : 0;
+
   if (cityNav) {
-    cityNav.style.top = `${menuHeight + tabsHeight}px`;
+    const cityTop = isMobile ? (menuHeight + tabsHeight) : Math.max(0, menuHeight + tabsHeight - 1);
+    cityNav.style.top = `${cityTop}px`;
+  }
+
+  if (!isMobile) {
+    document.body.style.paddingTop = `${menuHeight + tabsHeight + cityHeight}px`;
+  } else {
+    document.body.style.paddingTop = '';
   }
 }
 
@@ -359,8 +372,11 @@ function toggleEditMode() {
   else { btn.innerHTML = "✏️ Unlock"; btn.classList.add('edit-mode'); saveData(); }
 
   applyUiSettings();
-  const activeTab = document.querySelector('.app-tab-btn.active').innerText;
+  const activeTabBtn = document.querySelector('.app-tab-btn.active');
+  const activeTab = activeTabBtn ? activeTabBtn.innerText : '';
+  const activeTabId = activeTabBtn ? activeTabBtn.getAttribute('data-tab') : '';
   const cityFilter = typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all';
+  if (activeTabId === 'itinerary' && typeof buildItinerary === 'function') buildItinerary();
   if(activeTab.includes('Transport')) buildTransportTab(cityFilter);
   if(activeTab.includes('Accommodation')) buildAccomTab(cityFilter);
   if(activeTab.includes('Packing')) buildPackingTab();
@@ -686,6 +702,7 @@ document.addEventListener('DOMContentLoaded', initMobileScrollNav);
 // -- City Nav Scroll Behavior --
 let cityNavLastScrollY = window.scrollY;
 window.addEventListener('scroll', () => {
+  if (!isMobileViewport()) return;
   const cityNav = document.getElementById('cityNav');
   if (!cityNav) return;
   const currentScrollY = window.scrollY;

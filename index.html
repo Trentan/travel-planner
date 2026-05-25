@@ -30,16 +30,17 @@
   </div>
   <div class="app-menu-right">
     <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
-    <label id="themeToggleBtn" class="app-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
-      <input id="themeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
-      <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
-      <span id="themeToggleLabel" class="app-menu-switch-label">🌓 Dark theme</span>
-    </label>
     <button id="undoBtn" class="app-menu-btn" onclick="undoTripChange()" disabled>↶ Undo</button>
     <button id="redoBtn" class="app-menu-btn" onclick="redoTripChange()" disabled>↷ Redo</button>
     <details class="app-menu-actions" id="desktopActionsMenu">
-      <summary class="app-menu-btn app-menu-actions-summary" aria-label="Open app actions" aria-haspopup="menu">Actions</summary>
+      <summary class="app-menu-btn app-menu-actions-summary" aria-label="Open app actions" aria-haspopup="menu">☰ Actions</summary>
       <div class="app-menu-actions-panel" role="menu" aria-label="App actions">
+        <label id="themeToggleBtn" class="app-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
+          <input id="themeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
+          <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
+          <span id="themeToggleLabel" class="app-menu-switch-label">🌓 Dark theme</span>
+        </label>
+        <div class="app-menu-divider" aria-hidden="true"></div>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCityDialog()">🌍 Cities</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openRenameTripDialog()">✏️ Rename Trip</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openAIDialog()">🤖 AI Builder</button>
@@ -76,17 +77,10 @@
 </header>
 
 <main>
-    <nav id="cityNav" class="city-nav transition-transform duration-300 translate-y-0">
-    <div class="city-nav-list hide-scrollbar">
-      <button class="city-nav-btn active" data-city="all" onclick="selectCityFilter('all', this)">
-        <span>🏙️ All</span>
-      </button>
-    </div>
-  </nav>
 <div class="app-tabs-nav">
     <div class="app-tabs-list hide-scrollbar">
       <button class="app-tab-btn active" data-tab="itinerary" onclick="switchTab('itinerary', this)">
-        <span class="tab-icon text-lg md:text-base">🗺️</span>
+        <span class="tab-icon text-lg md:text-base">🗓️</span>
         <span class="tab-label hidden sm:inline">Itinerary</span>
       </button>
       <button class="app-tab-btn" data-tab="transport" onclick="switchTab('transport', this)">
@@ -114,6 +108,13 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
   </div>
+    <nav id="cityNav" class="city-nav transition-transform duration-300 translate-y-0">
+    <div class="city-nav-list hide-scrollbar">
+      <button class="city-nav-btn active" data-city="all" onclick="selectCityFilter('all', this)">
+        <span>🏙️ All</span>
+      </button>
+    </div>
+  </nav>
   
 
   <div class="app-tabs-content">
