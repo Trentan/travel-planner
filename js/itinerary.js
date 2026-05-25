@@ -205,12 +205,13 @@ function renderCompactSuggestedActivityItem(legIndex, activityIdx, activity) {
       </span>
       <button
         type="button"
-        class="compact-activity-action-btn"
+        class="compact-activity-action-btn flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-colors ml-auto"
         onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})"
         title="${actionTitle}"
         aria-label="${actionTitle}"
       >
-        ${actionIcon}
+        <span style="font-size: 1.1rem; line-height: 1;">${actionIcon}</span>
+        <span style="font-size: 0.75rem; font-weight: 600; padding-left: 2px;">${actionTitle}</span>
       </button>
     </div>
   `;
@@ -227,7 +228,7 @@ function renderCompactFoodQuestCard(leg, legIndex) {
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
 
   return `
-    <article class="mobile-surface-card compact-food-quest-card" style="border-left-color:${escapeCompactText(leg.colour || '#24485d')};">
+    <article class="compact-food-quest-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-food-summary" style="cursor: default; user-select: none;">
         <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍗</span> Food quests</span>
         <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
@@ -261,7 +262,7 @@ function renderCompactTipsCard(leg, legIndex) {
   const countLabel = `${tips.length} tip${tips.length === 1 ? '' : 's'}`;
 
   return `
-    <article class="mobile-surface-card compact-tips-card" style="border-left-color:${escapeCompactText(leg.colour || '#24485d')};">
+    <article class="compact-tips-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-tips-summary" style="cursor: default; user-select: none;">
         <span class="compact-tips-summary-title"><span class="compact-tips-summary-icon" aria-hidden="true">&#128161;</span> Tips</span>
         <span class="compact-tips-summary-count">${escapeCompactText(countLabel)}</span>
@@ -284,7 +285,7 @@ function renderCompactActivitiesCard(leg, legIndex) {
       : '<div class="compact-day-empty">No suggested activities available.</div>';
 
   return `
-    <article class="mobile-surface-card compact-activities-card" style="border-left-color:${escapeCompactText(leg.colour || '#24485d')};">
+    <article class="compact-activities-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-activities-summary" style="cursor: default; user-select: none;">
         <span class="compact-activities-summary-title"><span class="compact-activities-summary-icon" aria-hidden="true">&#128205;</span> Activities</span>
         <span class="compact-activities-summary-count">${escapeCompactText(countLabel)}</span>
@@ -890,17 +891,20 @@ function renderCompactLegCard(leg, legIndex) {
 
   return `
     <article class="compact-leg-card">
-      <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
+      <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:pointer;" onclick="toggleLeg(this)">
         <div class="compact-leg-header-line">
           <span class="compact-leg-date">${escapeHtmlText(legDateRange || '-')}</span>
           <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
           <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
           <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
+          <span class="leg-chevron ml-auto" style="color: white; font-size: 1.2rem;">▼</span>
         </div>
       </div>
-      <div class="compact-leg-body">
-        ${renderCompactTipsCard(leg, legIndex)}
-        ${renderCompactFoodQuestCard(leg, legIndex)}
+      <div class="compact-leg-body leg-content">
+        <div class="compact-tips-food-col flex flex-col gap-3.5">
+          ${renderCompactTipsCard(leg, legIndex)}
+          ${renderCompactFoodQuestCard(leg, legIndex)}
+        </div>
         ${renderCompactActivitiesCard(leg, legIndex)}
         ${renderCompactDayPager(leg, legIndex)}
       </div>

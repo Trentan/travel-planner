@@ -1,6 +1,11 @@
 let isFunMode = false;
 let isCompactView = false;
-let isEditMode = true;
+let isEditMode = false;
+let editingTripName = false;
+let mapSidebarOpen = false;
+let allExpanded = true;
+let allLegsExpanded = true;
+let isCompactMode = false;
 let isMobileMenuOpen = false;
 let lastViewportWasMobile = null;
 let itineraryDayViewMode = 'timeline';
@@ -421,7 +426,10 @@ function switchTab(tabId, btnElement) {
   }
 }
 
-function toggleLeg(headerEl) { headerEl.parentElement.classList.toggle('collapsed'); }
+function toggleLeg(headerEl) { 
+  const legEl = headerEl.closest('.leg') || headerEl.parentElement;
+  legEl.classList.toggle('collapsed'); 
+}
 
 function isHistoryEditableTarget(target) {
   if (!target) return false;
@@ -534,18 +542,19 @@ function promptFactoryReset() {
 
 function toggleCard(bar) { bar.parentElement.classList.toggle('open'); }
 
-let allExpanded = false;
-let allLegsExpanded = true;
+
 
 function toggleAllDays() {
   allExpanded = !allExpanded;
   document.querySelectorAll('.day-card').forEach(c => c.classList.toggle('open', allExpanded));
-  if (allExpanded) {
-    allLegsExpanded = true;
-    document.querySelectorAll('.leg').forEach(l => l.classList.remove('collapsed'));
-    document.getElementById('expandAllLegs').textContent = '▲ Collapse all legs';
+  
+  allLegsExpanded = allExpanded;
+  document.querySelectorAll('.leg').forEach(l => l.classList.toggle('collapsed', !allLegsExpanded));
+  
+  const expandAllBtn = document.getElementById('expandAll');
+  if (expandAllBtn) {
+    expandAllBtn.textContent = allExpanded ? '▲ Collapse all days' : '▼ Expand all days';
   }
-  document.getElementById('expandAll').textContent = allExpanded ? '▲ Collapse all days' : '▼ Expand all days';
 }
 
 function toggleAllLegs() {

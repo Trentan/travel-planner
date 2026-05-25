@@ -122,16 +122,13 @@
       <div class="section-header">
         <h3 class="section-header-title">🗓️ Itinerary</h3>
         <div class="section-header-actions">
+          <button class="action-btn" onclick="toggleAllDays()" id="expandAll">▼ Expand all days</button>
           <div class="itinerary-view-mode-control" role="group" aria-label="Itinerary day view">
             <button id="itineraryTimelineModeBtn" class="itinerary-view-mode-btn is-active" type="button" onclick="setItineraryDayViewMode('timeline')">Timeline</button>
             <button id="itineraryGroupedModeBtn" class="itinerary-view-mode-btn" type="button" onclick="setItineraryDayViewMode('grouped')">Grouped</button>
           </div>
           <button class="action-btn add-leg-action" onclick="openAddLegDialog()"><span class="add-leg-full">+ Add Trip Leg</span><span class="add-leg-short" aria-hidden="true"></span></button>
         </div>
-      </div>
-      <div class="top-controls">
-        <button class="action-btn" onclick="toggleAllDays()" id="expandAll">▼ Expand all days</button>
-        <button class="action-btn" onclick="toggleAllLegs()" id="expandAllLegs">▲ Collapse all legs</button>
       </div>
       <div id="itinerary"></div>
     </div>
