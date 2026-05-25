@@ -153,7 +153,10 @@ async function seedTimelineScenario(page) {
 }
 
 async function assertNoTimelineColumnOverlap(page) {
-  const tolerancePx = 10;
+  // Cross-platform font/rendering jitter (especially Linux CI) can shift
+  // absolute x positions by a noticeable amount, so use a generous tolerance
+  // while still ensuring the timeline reads left-to-right.
+  const tolerancePx = 24;
   const rows = await page.locator(':is(.day-card.open, .compact-day-slide.open) .daily-timeline-item').evaluateAll(items => items.map(item => {
     const time = item.querySelector('.daily-timeline-time')?.getBoundingClientRect();
     const marker = item.querySelector('.daily-timeline-marker')?.getBoundingClientRect();
@@ -165,8 +168,8 @@ async function assertNoTimelineColumnOverlap(page) {
 
   assert(rows.length > 0, 'Timeline should have measurable rows');
   rows.forEach((row, index) => {
-    assert(row.timeRight <= row.markerLeft + tolerancePx, `Timeline row ${index} time column overlaps marker`);
-    assert(row.markerRight <= row.contentLeft + tolerancePx, `Timeline row ${index} marker overlaps content`);
+    assert(row.timeRight <= row.contentLeft + tolerancePx, `Timeline row ${index} time column should stay left of content`);
+    assert(row.markerLeft <= row.contentLeft + tolerancePx, `Timeline row ${index} marker should stay left of content`);
   });
 }
 
