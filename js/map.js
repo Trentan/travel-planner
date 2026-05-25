@@ -263,19 +263,15 @@ function updateMapLegend(destinations) {
   if (!legend) return;
   
   if (destinations.length === 0) {
-    legend.innerHTML = '<div style="color:#999; font-size:0.8rem;">No cities mapped yet.</div>';
+    legend.innerHTML = '<div class="text-slate-400 text-xs">No cities mapped yet.</div>';
     return;
   }
 
   legend.innerHTML = destinations.map(d => {
     return `
-      <div class="legend-item" 
-           style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:0.9rem; cursor:pointer; padding:4px; border-radius:4px; transition:background 0.2s;"
-           onclick="focusCityOnMap('${d.id}')"
-           onmouseover="this.style.background='rgba(0,0,0,0.05)'"
-           onmouseout="this.style.background='transparent'">
-        <span style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:${d.color}; color:#fff; font-size:13px; font-weight:700; border:1px solid #fff; box-shadow:0 0 2px rgba(0,0,0,0.2); flex-shrink:0;">${d.index}</span>
-        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.name}</span>
+      <div class="legend-item" onclick="focusCityOnMap('${d.id}')">
+        <span class="legend-item-index" style="background:${d.color};">${d.index}</span>
+        <span class="legend-item-name">${d.name}</span>
       </div>
     `;
   }).join('');
@@ -287,22 +283,22 @@ function updateMapStats(destinations, unmatchedCities) {
   if (!stats) return;
   
   let html = `
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-bottom:1rem;">
-      <div style="background:#fff; padding:10px; border-radius:8px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-        <div style="font-size:1.2rem; font-weight:700;">${destinations.length}</div>
-        <div style="font-size:0.75rem; color:#666;">Mapped Cities</div>
+    <div class="map-stats-grid">
+      <div class="map-stat-card">
+        <div class="map-stat-value">${destinations.length}</div>
+        <div class="map-stat-label">Mapped Cities</div>
       </div>
-      <div style="background:#fff; padding:10px; border-radius:8px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-        <div style="font-size:1.2rem; font-weight:700;">${appData.length}</div>
-        <div style="font-size:0.75rem; color:#666;">Trip Legs</div>
+      <div class="map-stat-card">
+        <div class="map-stat-value">${appData.length}</div>
+        <div class="map-stat-label">Trip Legs</div>
       </div>
     </div>
   `;
 
   if (unmatchedCities.length > 0) {
     html += `
-      <div style="background:#fff4e5; padding:10px; border-radius:8px; font-size:0.8rem; color:#664d03; border:1px solid #ffecb5;">
-        <strong>⚠️ Unmapped:</strong> ${unmatchedCities.join(', ')}
+      <div class="map-unmatched">
+        <strong>Unmapped:</strong> ${unmatchedCities.join(', ')}
       </div>
     `;
   }

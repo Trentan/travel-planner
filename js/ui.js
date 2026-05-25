@@ -1,6 +1,11 @@
 let isFunMode = false;
 let isCompactView = false;
-let isEditMode = true;
+let isEditMode = false;
+let editingTripName = false;
+let mapSidebarOpen = false;
+let allExpanded = true;
+let allLegsExpanded = true;
+let isCompactMode = false;
 let isMobileMenuOpen = false;
 let lastViewportWasMobile = null;
 let itineraryDayViewMode = 'timeline';
@@ -14,16 +19,29 @@ function isMobileViewport() {
 function updateStickyOffsets() {
   const menuBar = document.querySelector('.app-menu-bar');
   const tabsNav = document.querySelector('.app-tabs-nav');
+  const cityNav = document.querySelector('.city-nav');
   if (!tabsNav) return;
 
-  const menuHeight = !isMobileViewport() && menuBar
+  const isMobile = isMobileViewport();
+  const menuHeight = !isMobile && menuBar
     ? Math.ceil(menuBar.getBoundingClientRect().height || 0)
     : 0;
   const tabsHeight = Math.ceil(tabsNav.getBoundingClientRect().height || 0);
-  document.documentElement.style.setProperty('--tabs-nav-sticky-top', `${menuHeight}px`);
-  document.documentElement.style.setProperty('--city-nav-sticky-top', `${menuHeight + tabsHeight}px`);
-  if (isMobileViewport()) {
-    document.documentElement.style.setProperty('--city-nav-sticky-top', `${menuHeight + tabsHeight}px`);
+  tabsNav.style.top = `${menuHeight}px`;
+
+  const cityHeight = cityNav
+    ? Math.ceil(cityNav.getBoundingClientRect().height || 0)
+    : 0;
+
+  if (cityNav) {
+    const cityTop = isMobile ? (menuHeight + tabsHeight) : Math.max(0, menuHeight + tabsHeight - 1);
+    cityNav.style.top = `${cityTop}px`;
+  }
+
+  if (!isMobile) {
+    document.body.style.paddingTop = `${menuHeight + tabsHeight + cityHeight}px`;
+  } else {
+    document.body.style.paddingTop = '';
   }
 }
 
@@ -61,6 +79,8 @@ function syncResponsiveUi() {
   lastViewportWasMobile = mobile;
 
   document.body.classList.toggle('mobile-app-mode', mobile);
+  // Compact view is now viewport-driven
+  isCompactView = mobile;
   document.body.classList.toggle('compact-view-mode', isCompactView);
   window.isCompactView = isCompactView;
   updateStickyOffsets();
@@ -73,6 +93,7 @@ function syncResponsiveUi() {
   }
 
   if (viewportChanged) {
+    // Rebuild view when switching between mobile/desktop
     if (typeof rebuildCurrentView === 'function') {
       rebuildCurrentView();
     }
@@ -161,7 +182,6 @@ function syncItineraryViewModeButtons() {
 
 function saveUiSettings() {
   localStorage.setItem('travelApp_uiSettings_v1', JSON.stringify({
-    isCompactView,
     isEditMode,
     isFunMode,
     itineraryDayViewMode,
@@ -238,24 +258,24 @@ function applyUiSettings() {
 
   if (savedSettings) {
     isFunMode = savedSettings.isFunMode === true;
-    isCompactView = !!savedSettings.isCompactView;
     isEditMode = savedSettings.isEditMode !== false;
     itineraryDayViewMode = savedSettings.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
     showMoneyFigures = savedSettings.showMoneyFigures !== false;
     currentTheme = savedSettings.theme || 'system';
-  } else if (isMobileViewport()) {
-    isCompactView = true;
   }
+
+  // Compact view is now viewport-driven (applied in syncResponsiveUi)
+  // Set initial compact view based on viewport
+  isCompactView = isMobileViewport();
+  window.isCompactView = isCompactView;
 
   // Sync to window for cross-module access
   window.isFunMode = isFunMode;
-  window.isCompactView = isCompactView;
   window.isEditMode = isEditMode;
   window.itineraryDayViewMode = itineraryDayViewMode;
   window.showMoneyFigures = showMoneyFigures;
 
   document.body.classList.toggle('fun-mode', isFunMode);
-  document.body.classList.toggle('compact-view-mode', isCompactView);
   document.body.classList.toggle('read-only-mode', !isEditMode);
   document.body.classList.toggle('hide-money-figures', !showMoneyFigures);
   applyTheme();
@@ -357,8 +377,11 @@ function toggleEditMode() {
   else { btn.innerHTML = "✏️ Unlock"; btn.classList.add('edit-mode'); saveData(); }
 
   applyUiSettings();
-  const activeTab = document.querySelector('.app-tab-btn.active').innerText;
+  const activeTabBtn = document.querySelector('.app-tab-btn.active');
+  const activeTab = activeTabBtn ? activeTabBtn.innerText : '';
+  const activeTabId = activeTabBtn ? activeTabBtn.getAttribute('data-tab') : '';
   const cityFilter = typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all';
+  if (activeTabId === 'itinerary' && typeof buildItinerary === 'function') buildItinerary();
   if(activeTab.includes('Transport')) buildTransportTab(cityFilter);
   if(activeTab.includes('Accommodation')) buildAccomTab(cityFilter);
   if(activeTab.includes('Packing')) buildPackingTab();
@@ -403,7 +426,10 @@ function switchTab(tabId, btnElement) {
   }
 }
 
-function toggleLeg(headerEl) { headerEl.parentElement.classList.toggle('collapsed'); }
+function toggleLeg(headerEl) { 
+  const legEl = headerEl.closest('.leg') || headerEl.parentElement;
+  legEl.classList.toggle('collapsed'); 
+}
 
 function isHistoryEditableTarget(target) {
   if (!target) return false;
@@ -455,12 +481,13 @@ function closeGuideDialog() {
   if (modal) modal.style.display = 'none';
 }
 
-function toggleCompactView(nextValue = null) {
-  isCompactView = typeof nextValue === 'boolean' ? nextValue : !isCompactView;
-  saveUiSettings();
+function applyViewportDrivenMode() {
+  // Automatically set compact view based on viewport width (< 769px = compact)
+  const isMobile = isMobileViewport();
+  isCompactView = isMobile;
   window.isCompactView = isCompactView;
   document.body.classList.toggle('compact-view-mode', isCompactView);
-  applyUiSettings();
+  // Rebuild current view to apply the correct layout
   const activeTabBtn = document.querySelector('.app-tab-btn.active');
   if (activeTabBtn && activeTabBtn.dataset.tab) {
     switchTab(activeTabBtn.dataset.tab, activeTabBtn);
@@ -470,11 +497,22 @@ function toggleCompactView(nextValue = null) {
   }
 }
 
+function toggleCompactView(nextValue = null) {
+  // Deprecated: This function is now viewport-driven only.
+  // The nextValue parameter is ignored; compact view is determined by viewport width.
+  applyViewportDrivenMode();
+  console.warn('toggleCompactView() is deprecated. Compact view is now auto-detected from viewport.');
+}
+
 function setItineraryDayViewMode(nextMode = 'timeline') {
   itineraryDayViewMode = nextMode === 'grouped' ? 'grouped' : 'timeline';
   window.itineraryDayViewMode = itineraryDayViewMode;
   saveUiSettings();
   syncItineraryViewModeButtons();
+  document.querySelectorAll('#tab-itinerary .day-planner-shell').forEach(shell => {
+    shell.classList.remove('day-planner-shell-timeline', 'day-planner-shell-grouped');
+    shell.classList.add(itineraryDayViewMode === 'grouped' ? 'day-planner-shell-grouped' : 'day-planner-shell-timeline');
+  });
   if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
   else if (typeof buildItinerary === 'function') buildItinerary();
 }
@@ -504,18 +542,19 @@ function promptFactoryReset() {
 
 function toggleCard(bar) { bar.parentElement.classList.toggle('open'); }
 
-let allExpanded = false;
-let allLegsExpanded = true;
+
 
 function toggleAllDays() {
   allExpanded = !allExpanded;
   document.querySelectorAll('.day-card').forEach(c => c.classList.toggle('open', allExpanded));
-  if (allExpanded) {
-    allLegsExpanded = true;
-    document.querySelectorAll('.leg').forEach(l => l.classList.remove('collapsed'));
-    document.getElementById('expandAllLegs').textContent = '▲ Collapse all legs';
+  
+  allLegsExpanded = allExpanded;
+  document.querySelectorAll('.leg').forEach(l => l.classList.toggle('collapsed', !allLegsExpanded));
+  
+  const expandAllBtn = document.getElementById('expandAll');
+  if (expandAllBtn) {
+    expandAllBtn.textContent = allExpanded ? '▲ Collapse all days' : '▼ Expand all days';
   }
-  document.getElementById('expandAll').textContent = allExpanded ? '▲ Collapse all days' : '▼ Expand all days';
 }
 
 function toggleAllLegs() {
@@ -635,5 +674,52 @@ window.addLeg = addLeg;
 window.openRenameTripDialog = openRenameTripDialog;
 window.closeRenameTripDialog = closeRenameTripDialog;
 window.saveRenameTripDialog = saveRenameTripDialog;
+let lastScrollY = window.scrollY || 0;
+let cityNavEl = null;
+
+function initMobileScrollNav() {
+  window.addEventListener('scroll', () => {
+    if (!document.body.classList.contains('mobile-app-mode')) return;
+    
+    if (!cityNavEl) {
+      cityNavEl = document.getElementById('cityNav');
+      if (!cityNavEl) return;
+    }
+    
+    const currentScrollY = window.scrollY;
+    
+    // Only apply hide on scroll if we are scrolled past the initial top threshold
+    if (currentScrollY > 60) {
+      if (currentScrollY > lastScrollY + 5) {
+        // Scrolling down (with threshold)
+        cityNavEl.classList.add('city-nav-hidden');
+      } else if (currentScrollY < lastScrollY - 5) {
+        // Scrolling up
+        cityNavEl.classList.remove('city-nav-hidden');
+      }
+    } else {
+      cityNavEl.classList.remove('city-nav-hidden');
+    }
+    
+    cityNavLastScrollY = currentScrollY;
+  }, { passive: true });
+}
+
+document.addEventListener('DOMContentLoaded', initMobileScrollNav);
 
 
+// -- City Nav Scroll Behavior --
+let cityNavLastScrollY = window.scrollY;
+window.addEventListener('scroll', () => {
+  if (!isMobileViewport()) return;
+  const cityNav = document.getElementById('cityNav');
+  if (!cityNav) return;
+  const currentScrollY = window.scrollY;
+  // If scrolled down past 60px, hide the nav by translating it up
+  if (currentScrollY > cityNavLastScrollY && currentScrollY > 60) {
+    cityNav.classList.add('-translate-y-full');
+  } else {
+    cityNav.classList.remove('-translate-y-full');
+  }
+  cityNavLastScrollY = currentScrollY;
+}, { passive: true });

@@ -6,10 +6,15 @@
   "scripts": {
     "test": "node tests/run-tests.js",
     "test:browser": "node tests/browser-suite.js",
-    "test:browser:headed": "node tests/browser-suite.js --headed --slowmo=400"
+    "test:browser:headed": "node tests/browser-suite.js --headed --slowmo=400",
+    "build:css": "npx @tailwindcss/cli -i ./src/tailwind.css -o ./dist/tailwind.css --minify",
+    "watch:css": "npx @tailwindcss/cli -i ./src/tailwind.css -o ./dist/tailwind.css --watch"
   },
   "devDependencies": {
+    "autoprefixer": "^10.5.0",
     "playwright": "^1.54.0",
-    "puppeteer": "^25.0.2"
+    "postcss": "^8.5.15",
+    "puppeteer": "^25.0.2",
+    "tailwindcss": "^4.3.0"
   }
 }

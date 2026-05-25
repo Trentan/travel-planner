@@ -29,6 +29,24 @@ function escapeCompactText(text) {
       .replace(/'/g, '&#39;');
 }
 
+function focusCompactInlineEditable(selector) {
+  const el = typeof document !== 'undefined' ? document.querySelector(selector) : null;
+  if (!el) return;
+  try {
+    el.focus();
+    if (typeof window.getSelection === 'function' && typeof document.createRange === 'function') {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  } catch (_) {}
+}
+
 function getJourneyDisplayCost(journey) {
   if (!journey) return '';
   const ownCost = parseFloat(journey.cost || '0');
@@ -123,6 +141,24 @@ function getCompactDaySlideId(legId, dayIdx) {
 function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
   const itemId = `compact-food-${legIndex}-${itemIdx}`;
   const done = !!item.done;
+  const rawText = String(item.text || '');
+  const cleanText = stripCompactLeadingEmoji(rawText);
+  const text = escapeCompactText(cleanText);
+  const lower = rawText.toLowerCase();
+  let foodEmoji = '&#127869;&#65039;'; // default: plate
+
+  if (/pizza/.test(lower)) foodEmoji = '&#127829;';
+  else if (/burger|hamburger/.test(lower)) foodEmoji = '&#127828;';
+  else if (/sushi/.test(lower)) foodEmoji = '&#127843;';
+  else if (/ramen|noodle|udon|pho/.test(lower)) foodEmoji = '&#127836;';
+  else if (/taco|burrito/.test(lower)) foodEmoji = '&#127790;';
+  else if (/curry/.test(lower)) foodEmoji = '&#127835;';
+  else if (/lobster|prawn|shrimp|crab|fish|squid|seafood|snorkel/.test(lower)) foodEmoji = '&#129424;';
+  else if (/salad|vegan|vegetarian/.test(lower)) foodEmoji = '&#129367;';
+  else if (/coffee|cafe|espresso/.test(lower)) foodEmoji = '&#9749;';
+  else if (/beer|bar|cocktail|wine/.test(lower)) foodEmoji = '&#127863;';
+  else if (/dessert|ice cream|gelato|cake|sweet/.test(lower)) foodEmoji = '&#127856;';
+  else if (/thai|som tam|massaman|khao|gaeng|tom/.test(lower)) foodEmoji = '&#127834;';
 
   return `
     <label class="compact-food-item" for="${itemId}">
@@ -132,11 +168,11 @@ function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
         ${done ? 'checked' : ''}
         onchange="toggleFoodCompleted(event, ${legIndex}, ${itemIdx})"
       >
-      <span class="compact-food-item-copy">${renderCompactEmojiLine({
-    emoji: '🍽️',
-    text: item.text,
-    done
-  })}</span>
+      <span class="compact-food-item-copy ${done ? 'is-done' : ''}">
+        <span class="compact-food-item-emoji" aria-hidden="true">${foodEmoji}</span>
+        <span id="compact-food-text-${legIndex}-${itemIdx}" class="compact-food-item-text ${isEditMode ? 'is-editable' : ''}" ${isEditMode ? `contenteditable="true" onblur="updateFoodText(${legIndex}, ${itemIdx}, this.innerText)"` : ''}>${text}</span>
+      </span>
+      ${isEditMode ? `<span class="compact-inline-actions"><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-edit" title="Edit Food" onclick="event.preventDefault(); event.stopPropagation(); focusCompactInlineEditable('#compact-food-text-${legIndex}-${itemIdx}');">&#9998;</button><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-remove" title="Delete Food" onclick="event.preventDefault(); event.stopPropagation(); if (confirm('Delete this food quest item?')) deleteFood(${legIndex}, ${itemIdx});">&#10005;</button></span>` : ''}
     </label>
   `;
 }
@@ -168,11 +204,10 @@ function getCompactActivityCategoryEmoji(cat) {
   return emojis[cat] || '📍';
 }
 
+
 function renderCompactSuggestedActivityItem(legIndex, activityIdx, activity) {
-  const itemId = `compact-suggested-activity-${legIndex}-${activityIdx}`;
   const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
 
-  // Check if completed - look for matching activity item in the assigned day
   let isCompleted = false;
   if (isAssigned && appData[legIndex]?.days?.[activity.assignedDayIdx]) {
     const day = appData[legIndex].days[activity.assignedDayIdx];
@@ -182,25 +217,32 @@ function renderCompactSuggestedActivityItem(legIndex, activityIdx, activity) {
     const matchedItem = day.activityItems?.find(item =>
       matchTexts.includes(String(item.text || '').trim())
     );
-    if (matchedItem && matchedItem.done) {
-      isCompleted = true;
-    }
+    if (matchedItem && matchedItem.done) isCompleted = true;
   }
 
   const categoryEmoji = getCompactActivityCategoryEmoji(activity.category);
+  const leadIcon = isAssigned ? '&#10003;' : '&#128204;';
+  const titleClass = isCompleted ? 'compact-suggested-activity-title is-done' : 'compact-suggested-activity-title';
+  const metaParts = [];
+  if (activity.estTime) metaParts.push(`&#9201; ${escapeCompactText(activity.estTime)}`);
+  if (activity.estCost) metaParts.push(`$${escapeCompactText(activity.estCost)}`);
+  const metaLine = metaParts.length > 0
+    ? `<div class="compact-suggested-activity-subline">${metaParts.join(' · ')}</div>`
+    : '';
 
-  // Icon: chevron when assigned, pin when not assigned
-  const actionIcon = isAssigned ? '›' : '📌';
+  const actionIcon = isAssigned ? '&#8250;' : '&#128204;';
   const actionTitle = isAssigned ? 'Move to another day' : 'Assign to day';
+  const dragClass = isAssigned ? 'assigned-sight' : 'draggable-sight';
+  const dragAttrs = !isAssigned ? ` draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : '';
 
   return `
-    <div class="compact-suggested-activity-item">
-      <span class="compact-suggested-activity-emoji">${categoryEmoji}</span>
-      <span class="compact-suggested-activity-text">${isCompleted ? '<span style="text-decoration:line-through;opacity:0.6;">' : ''}${escapeCompactText(activity.title)}${isCompleted ? '</span>' : ''}</span>
-      <span class="compact-suggested-activity-meta">
-        ${activity.estTime ? `<span class="compact-suggested-activity-time">⏱ ${escapeCompactText(activity.estTime)}</span>` : ''}
-        ${activity.estCost ? `<span class="compact-suggested-activity-cost">$${escapeCompactText(activity.estCost)}</span>` : ''}
-      </span>
+    <div class="compact-suggested-activity-item ${dragClass}"${dragAttrs}>
+      <span class="compact-suggested-activity-lead" aria-hidden="true">${leadIcon}</span>
+      <span class="compact-suggested-activity-emoji" aria-hidden="true">${categoryEmoji}</span>
+      <div class="compact-suggested-activity-main">
+        <div class="${titleClass}">${escapeCompactText(activity.title)}</div>
+        ${metaLine}
+      </div>
       <button
         type="button"
         class="compact-activity-action-btn"
@@ -208,9 +250,32 @@ function renderCompactSuggestedActivityItem(legIndex, activityIdx, activity) {
         title="${actionTitle}"
         aria-label="${actionTitle}"
       >
-        ${actionIcon}
+        <span class="compact-activity-action-icon">${actionIcon}</span>
       </button>
     </div>
+  `;
+}
+
+function renderCompactActivitiesCard(leg, legIndex) {
+  const suggestedActivities = Array.isArray(leg.suggestedActivities) ? leg.suggestedActivities : [];
+  const assignedCount = suggestedActivities.filter(activity => activity && activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined).length;
+  const countLabel = `${assignedCount}/${suggestedActivities.length}`;
+
+  const activityLines = suggestedActivities.length > 0
+      ? suggestedActivities.map((activity, activityIdx) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
+      : '<div class="compact-day-empty">No suggested activities.</div>';
+
+  return `
+    <article class="compact-activities-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
+      <div class="compact-activities-summary" style="cursor: default; user-select: none;">
+        <span class="compact-activities-summary-title"><span class="compact-activities-summary-icon" aria-hidden="true">&#128204;</span> Suggested Activities</span>
+        <span class="compact-activities-summary-count">${escapeCompactText(countLabel)}</span>
+      </div>
+      <div class="mobile-surface-card-details expanded">
+        <div class="compact-suggested-activity-list">${activityLines}</div>
+        ${isEditMode ? `<button class="add-btn mt-2" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>` : ''}
+      </div>
+    </article>
   `;
 }
 
@@ -225,7 +290,7 @@ function renderCompactFoodQuestCard(leg, legIndex) {
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
 
   return `
-    <article class="mobile-surface-card compact-food-quest-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+    <article class="compact-food-quest-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-food-summary" style="cursor: default; user-select: none;">
         <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍗</span> Food quests</span>
         <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
@@ -233,19 +298,32 @@ function renderCompactFoodQuestCard(leg, legIndex) {
       </div>
       <div class="mobile-surface-card-details expanded">
         <div class="compact-food-list">${foodLines}</div>
+        ${isEditMode ? `<button class="add-btn mt-2" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>` : ''}
       </div>
     </article>
   `;
 }
 
-function renderCompactTipItem(tip) {
-  const text = typeof tip === 'string' ? tip : (tip && tip.text) || '';
+function renderCompactTipItem(tip, legIndex = null, tipIdx = null) {
+  const rawText = typeof tip === 'string' ? tip : (tip && tip.text) || '';
+  const text = escapeCompactText(rawText);
+  const actions = isEditMode && legIndex !== null && tipIdx !== null
+    ? `<span class="compact-inline-actions"><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-edit" title="Edit Tip" onclick="event.preventDefault(); event.stopPropagation(); focusCompactInlineEditable('#compact-tip-text-${legIndex}-${tipIdx}');">&#9998;</button><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-remove" title="Delete Tip" onclick="event.preventDefault(); event.stopPropagation(); if (confirm('Delete this tip?')) deleteLegTip(${legIndex}, ${tipIdx});">&#10005;</button></span>`
+    : '';
+  const tipBody = isEditMode && legIndex !== null && tipIdx !== null
+    ? `
+    <span class="compact-line">
+      <span class="compact-line-emoji">&#128161;</span>
+      <span id="compact-tip-text-${legIndex}-${tipIdx}" class="compact-line-text is-editable" contenteditable="true" onblur="updateLegTip(${legIndex}, ${tipIdx}, this.innerText)">${text || 'Untitled tip'}</span>
+    </span>`
+    : renderCompactEmojiLine({
+      emoji: '&#128161;',
+      text: rawText || 'Untitled tip'
+    });
   return `
     <li class="compact-tip-item">
-      ${renderCompactEmojiLine({
-    emoji: '&#128161;',
-    text: text || 'Untitled tip'
-  })}
+      ${tipBody}
+      ${actions}
     </li>
   `;
 }
@@ -253,44 +331,24 @@ function renderCompactTipItem(tip) {
 function renderCompactTipsCard(leg, legIndex) {
   const tips = Array.isArray(leg.legTips) ? leg.legTips : [];
   const tipsList = tips.length > 0
-      ? `<ul class="compact-tips-list">${tips.map(tip => renderCompactTipItem(tip)).join('')}</ul>`
+      ? `<ul class="compact-tips-list">${tips.map((tip, tipIdx) => renderCompactTipItem(tip, legIndex, tipIdx)).join('')}</ul>`
       : '<div class="compact-day-empty">No tips saved for this leg yet.</div>';
   const countLabel = `${tips.length} tip${tips.length === 1 ? '' : 's'}`;
 
   return `
-    <article class="mobile-surface-card compact-tips-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
+    <article class="compact-tips-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-tips-summary" style="cursor: default; user-select: none;">
         <span class="compact-tips-summary-title"><span class="compact-tips-summary-icon" aria-hidden="true">&#128161;</span> Tips</span>
         <span class="compact-tips-summary-count">${escapeCompactText(countLabel)}</span>
       </div>
       <div class="mobile-surface-card-details expanded">
         ${tipsList}
+        ${isEditMode ? `<button class="add-btn mt-2" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>` : ''}
       </div>
     </article>
   `;
 }
 
-function renderCompactActivitiesCard(leg, legIndex) {
-  const suggestedActivities = Array.isArray(leg.suggestedActivities) ? leg.suggestedActivities : [];
-  const assignedCount = suggestedActivities.filter(a => a.assignedDayIdx !== null && a.assignedDayIdx !== undefined).length;
-  const countLabel = `${assignedCount}/${suggestedActivities.length}`;
-
-  const activityLines = suggestedActivities.length > 0
-      ? suggestedActivities.map((activity, activityIdx) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
-      : '<div class="compact-day-empty">No suggested activities available.</div>';
-
-  return `
-    <article class="mobile-surface-card compact-activities-card" style="--card-accent:${escapeCompactText(leg.colour || '#24485d')};">
-      <div class="compact-activities-summary" style="cursor: default; user-select: none;">
-        <span class="compact-activities-summary-title"><span class="compact-activities-summary-icon" aria-hidden="true">&#128205;</span> Activities</span>
-        <span class="compact-activities-summary-count">${escapeCompactText(countLabel)}</span>
-      </div>
-      <div class="mobile-surface-card-details expanded">
-        <div class="compact-suggested-activity-list">${activityLines}</div>
-      </div>
-    </article>
-  `;
-}
 
 function renderCompactMobileLegInfoCluster(leg, legIndex) {
   const tips = Array.isArray(leg.legTips) ? leg.legTips : [];
@@ -306,18 +364,21 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
   const foodProgressWidth = foodItems.length > 0 ? Math.round((completedFoodCount / foodItems.length) * 100) : 0;
 
   // Count assigned vs unassigned suggested activities
-  const assignedCount = suggestedActivities.filter(a => a.assignedDayIdx !== null && a.assignedDayIdx !== undefined).length;
-  const activitiesLabel = `${assignedCount}/${suggestedActivities.length}`;
+  const unassignedActivities = suggestedActivities
+    .map((activity, activityIdx) => ({ activity, activityIdx }))
+    .filter(({ activity }) => activity && (activity.assignedDayIdx === null || activity.assignedDayIdx === undefined));
+  const activitiesLabel = `${unassignedActivities.length} unscheduled`;
+  const accentColor = escapeCompactText(leg.colour || '#24485d');
 
   const tipsList = tips.length > 0
-      ? `<ul class="compact-mobile-info-list">${tips.map(tip => renderCompactTipItem(tip)).join('')}</ul>`
+      ? `<ul class="compact-mobile-info-list">${tips.map((tip, tipIdx) => renderCompactTipItem(tip, legIndex, tipIdx)).join('')}</ul>`
       : '<div class="compact-day-empty">No tips saved for this leg yet.</div>';
   const foodLines = foodItems.length > 0
       ? foodItems.map((item, itemIdx) => renderCompactFoodQuestItem(legIndex, item, itemIdx)).join('')
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
-  const activityLines = suggestedActivities.length > 0
-      ? suggestedActivities.map((activity, activityIdx) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
-      : '<div class="compact-day-empty">No suggested activities available.</div>';
+  const activityLines = unassignedActivities.length > 0
+      ? unassignedActivities.map(({ activity, activityIdx }) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
+      : '<div class="compact-day-empty">No unscheduled activities.</div>';
 
   return `
     <div class="compact-mobile-leg-info">
@@ -325,15 +386,19 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
         <button
           type="button"
           class="compact-mobile-info-chip ${tipsExpanded ? 'is-active' : ''}"
+          style="border-left-color:${accentColor};"
           onclick="toggleTipsCardDetails(event, '${legId}')"
           aria-expanded="${tipsExpanded ? 'true' : 'false'}"
+          aria-label="Tips ${tips.length}"
+          title="Tips"
         >
           <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#128161;</span> Tips</span>
-          <span class="compact-mobile-info-chip-count">${escapeCompactText(tipsLabel)}</span>
+          <span class="compact-mobile-info-chip-count">${tips.length}</span>
         </button>
         <button
           type="button"
           class="compact-mobile-info-chip ${foodExpanded ? 'is-active' : ''}"
+          style="border-left-color:${accentColor};"
           onclick="toggleFoodQuestDetails(event, '${legId}')"
           aria-expanded="${foodExpanded ? 'true' : 'false'}"
           aria-label="Food quests ${escapeCompactText(foodLabel)} complete"
@@ -346,27 +411,28 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
         <button
           type="button"
           class="compact-mobile-info-chip ${activitiesExpanded ? 'is-active' : ''}"
+          style="border-left-color:${accentColor};"
           onclick="toggleActivitiesCardDetails(event, '${legId}')"
           aria-expanded="${activitiesExpanded ? 'true' : 'false'}"
           aria-label="Activities ${escapeCompactText(activitiesLabel)} assigned"
           title="Activities"
         >
-          <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#128205;</span> Activities</span>
-          <span class="compact-mobile-info-chip-count">${escapeCompactText(activitiesLabel)}</span>
+          <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#127919;</span> Fun</span>
+          <span class="compact-mobile-info-chip-count">${unassignedActivities.length}</span>
         </button>
       </div>
       ${tipsExpanded ? `
-        <div class="compact-mobile-info-panel compact-mobile-info-panel-tips">
+        <div class="compact-mobile-info-panel compact-mobile-info-panel-tips" style="border-left-color:${accentColor};">
           ${tipsList}
         </div>
       ` : ''}
       ${foodExpanded ? `
-        <div class="compact-mobile-info-panel compact-mobile-info-panel-food">
+        <div class="compact-mobile-info-panel compact-mobile-info-panel-food" style="border-left-color:${accentColor};">
           <div class="compact-food-list">${foodLines}</div>
         </div>
       ` : ''}
       ${activitiesExpanded ? `
-        <div class="compact-mobile-info-panel compact-mobile-info-panel-activities">
+        <div class="compact-mobile-info-panel compact-mobile-info-panel-activities" style="border-left-color:${accentColor};">
           <div class="compact-suggested-activity-list">${activityLines}</div>
         </div>
       ` : ''}
@@ -420,8 +486,8 @@ function renderJourneySubLocationTextHtml(text) {
           <span class="transport-sub-location-detail">
             ${label ? `<span class="transport-sub-location-label">${escapeCompactText(label)}</span>` : ''}
             <span class="transport-sub-location-value">
-              <a href="${getMapSearchUrl(value)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
-                <span class="location-map-icon">🗺️</span> ${escapeCompactText(value)}
+              <a href="${getMapSearchUrl(value)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link" onclick="event.stopPropagation();" title="Open in Google Maps">
+                <span class="location-map-icon">&#x1F5FA;&#xFE0F;</span> ${escapeCompactText(value)}
               </a>
             </span>
           </span>
@@ -456,8 +522,8 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       duration: duration,
       cost: getJourneyDisplayCost(journey) ? formatCurrency(getJourneyDisplayCost(journey)) : ''
     });
-    const subLocsHtml = details ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(details)}</div>` : '';
-    const notesHtml = journey.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(journey.notes)}</div>` : '';
+    const subLocsHtml = details ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(details)}</div>` : '';
+    const notesHtml = journey.notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(journey.notes)}</div>` : '';
     return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); editJourney('${journey.journeyId || journey.id}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
@@ -477,8 +543,8 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       }
       return `Location: ${loc}`;
     })() : '';
-    const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
-    const notesHtml = info.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(info.notes)}</div>` : '';
+    const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
+    const notesHtml = info.notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(info.notes)}</div>` : '';
     return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); openEditStayModal('${info.stayId}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
@@ -504,7 +570,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       }
       return `Location: ${loc}`;
     })() : '';
-    const subLocsHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 20px; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
+    const subLocsHtml = activityLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
     let notes = item.notes || '';
     if (!notes && typeof findAssignedSuggestedActivity === 'function') {
       const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
@@ -512,7 +578,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
         notes = matched.notes;
       }
     }
-    const notesHtml = notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8; padding-left: 20px;">💬 ${escapeCompactText(notes)}</div>` : '';
+    const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(notes)}</div>` : '';
     return `
       <div class="compact-activity-row" style="${doneStyle}">
         <input
@@ -544,26 +610,40 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
         </div>
       `, true);
   const details = `
-    <div class="compact-day-grid">
-      ${useGroupedView ? groupedBlock : timelineBlock}
+    <div class="day-planner-shell day-planner-shell-${useGroupedView ? 'grouped' : 'timeline'}">
+      <div class="day-view-panel day-view-panel-${useGroupedView ? 'grouped' : 'timeline'}">
+        <div class="detail-block drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
+        <div class="compact-day-grid">
+          ${useGroupedView ? groupedBlock : timelineBlock}
+        </div>
+        </div>
+      </div>
     </div>
   `;
+  const dayKey = `${day.day}-${day.date}`;
+  const isActive = dayIdx === 0;
 
   return `
-    <section class="compact-day-slide" id="${slideId}" data-day-index="${dayIdx}">
+    <section class="compact-day-slide day-card ${isActive ? 'open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
       ${renderMobileSurfaceCard({
     cardClass: 'compact-day-surface',
     accentColor: leg.colour,
+    accentWidth: '6px',
     dateLabel: dayDateLabel,
     title: `Day ${dayIdx + 1}`,
     subtitle: routeLabel,
+    primaryAction: `
+      <span class="compact-day-header-chips">
+        ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
+        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.72rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}</span>
+      </span>
+    `,
     summary: `
           <div class="compact-day-summary-row">
             <span class="compact-day-summary-desc">${escapeCompactText(day.desc || 'No description yet')}</span>
-            ${dayTotal ? `<span class="compact-day-total-badge">${escapeCompactText(dayTotal)}</span>` : ''}
+            <span class="compact-day-summary-meta flex items-center gap-1.5 shrink-0"></span>
           </div>
         `,
-    primaryAction: '',
     details,
     detailsOpen: true
   })}
@@ -590,10 +670,57 @@ function renderCompactDayPager(leg, legIndex) {
     const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
     const slideId = getCompactDaySlideId(leg.id, dayIdx);
     const active = dayIdx === initialIndex;
+    const chipDate = `Day ${dayIdx + 1}, ${day.day} ${dayDateLabel}`;
+    const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
+    const isTravelDay = String(day.from || '').trim().toLowerCase() !== String(day.to || '').trim().toLowerCase();
+    const hasTravelJourney = Array.isArray(dayJourneys) && dayJourneys.some(j => {
+      const from = String(j?.fromLocation || '').trim().toLowerCase();
+      const to = String(j?.toLocation || '').trim().toLowerCase();
+      const type = String(j?.transportType || '').trim().toLowerCase();
+      return (from && to && from !== to) || type === 'flight' || type === 'plane';
+    });
+    let chipRoute = day.to || day.from || leg.label || 'City';
+    if ((isTravelDay || hasTravelJourney) && Array.isArray(dayJourneys) && dayJourneys.length > 0) {
+      const inferJourneyType = (journey) => {
+        const type = String(journey?.transportType || '').toLowerCase();
+        if (type) return type;
+        const blob = [
+          journey?.provider,
+          journey?.journeyName,
+          journey?.notes,
+          journey?.fromLocation,
+          journey?.toLocation
+        ].filter(Boolean).join(' ').toLowerCase();
+        if (/(flight|air|airline|airport|terminal|depart|arrive|eva|qantas|jetstar|emirates|lufthansa|scoot|thai airways)/.test(blob)) return 'flight';
+        if (/(train|rail|metro|bahn|trenitalia|renfe|jr\b|tgv|intercity)/.test(blob)) return 'train';
+        if (/(bus|coach|shuttle)/.test(blob)) return 'bus';
+        if (/(ferry|boat|catamaran|ship)/.test(blob)) return 'ferry';
+        return 'car';
+      };
+      const typePriority = { flight: 5, plane: 5, train: 4, rail: 4, bus: 3, ferry: 2, boat: 2, car: 1 };
+      let bestJourney = dayJourneys[0];
+      let bestType = inferJourneyType(bestJourney);
+      let bestScore = typePriority[bestType] || 0;
+      dayJourneys.forEach(journey => {
+        const t = inferJourneyType(journey);
+        const score = typePriority[t] || 0;
+        if (score > bestScore) {
+          bestJourney = journey;
+          bestType = t;
+          bestScore = score;
+        }
+      });
+      const icon = getTransportIcon(bestType);
+      const cityLabel = String(day.to || bestJourney.toLocation || day.from || 'City').trim();
+      chipRoute = `${icon} ${cityLabel}`;
+    } else if (isTravelDay || hasTravelJourney) {
+      chipRoute = String(day.to || day.from || leg.label || 'City').trim();
+    }
     return `
       <button
         type="button"
         class="compact-day-chip${active ? ' active' : ''}"
+        style="--day-chip-accent: ${escapeCompactText(leg.colour || '#3b82f6')};"
         data-leg-id="${escapeCompactText(leg.id)}"
         data-day-index="${dayIdx}"
         data-target-slide="${slideId}"
@@ -602,9 +729,8 @@ function renderCompactDayPager(leg, legIndex) {
         aria-controls="${slideId}"
         onclick="return compactItineraryGoToDay(event, this.dataset.legId, this.dataset.dayIndex)"
       >
-        <span class="compact-day-chip-day">Day ${dayIdx + 1}</span>
-        <span class="compact-day-chip-date">${escapeCompactText(day.day)} ${escapeCompactText(dayDateLabel)}</span>
-        <span class="compact-day-chip-route">${escapeCompactText(day.from)} → ${escapeCompactText(day.to)}</span>
+        <span class="compact-day-chip-date">${escapeCompactText(chipDate)}</span>
+        <span class="compact-day-chip-route">${escapeCompactText(chipRoute)}</span>
       </button>
     `;
   }).join('');
@@ -613,22 +739,13 @@ function renderCompactDayPager(leg, legIndex) {
 
   return `
       <div class="compact-day-pager" data-leg-id="${escapeCompactText(leg.id)}" data-total-days="${totalDays}" data-pager-key="${escapeCompactText(pagerKey)}" data-active-index="${initialIndex}">
-        <div class="compact-day-pager-head">
-          <div class="compact-day-pager-copy">
-            <span class="compact-day-pager-position" data-role="compact-day-position">Day 1 of ${totalDays}</span>
-          </div>
-          <div class="compact-day-pager-counter" data-role="compact-day-counter">1/${totalDays}</div>
+        <div class="compact-day-rail" role="tablist" aria-label="Days for ${escapeCompactText(leg.label || 'this leg')}">
+          ${chips}
         </div>
-      <div class="compact-day-rail" role="tablist" aria-label="Days for ${escapeCompactText(leg.label || 'this leg')}">
-        ${chips}
+        <div class="compact-day-carousel" data-leg-id="${escapeCompactText(leg.id)}">
+          ${slides}
+        </div>
       </div>
-      <div class="compact-day-progress" aria-hidden="true">
-        <span class="compact-day-progress-fill" data-role="compact-day-progress-fill"></span>
-      </div>
-      <div class="compact-day-carousel" data-leg-id="${escapeCompactText(leg.id)}">
-        ${slides}
-      </div>
-    </div>
   `;
 }
 
@@ -797,12 +914,17 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
   const safeIndex = Math.max(0, Math.min(total - 1, Number(nextIndex) || 0));
 
   slides.forEach((slide, idx) => {
-    slide.classList.toggle('is-active', idx === safeIndex);
+    const active = idx === safeIndex;
+    slide.classList.toggle('is-active', active);
+    slide.classList.toggle('open', active);
+    slide.hidden = !active;
+    slide.style.display = active ? '' : 'none';
   });
 
   chips.forEach((chip, idx) => {
     const active = idx === safeIndex;
     chip.classList.toggle('active', active);
+    chip.classList.toggle('is-active', active);
     chip.setAttribute('aria-selected', active ? 'true' : 'false');
     chip.setAttribute('aria-current', active ? 'true' : 'false');
   });
@@ -818,9 +940,12 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
   const activeChip = chips[safeIndex];
   if (rail && activeChip) {
     if (typeof scrollChildIntoHorizontalView === 'function') {
-      scrollChildIntoHorizontalView(rail, activeChip, { behavior: 'auto', align: 'center' });
+      scrollChildIntoHorizontalView(rail, activeChip, { behavior: 'smooth', align: 'center' });
     } else {
-      rail.scrollLeft = Math.max(0, activeChip.offsetLeft - rail.offsetLeft - (rail.clientWidth - activeChip.offsetWidth) / 2);
+      rail.scrollTo({
+        left: Math.max(0, activeChip.offsetLeft - rail.offsetLeft - (rail.clientWidth - activeChip.offsetWidth) / 2),
+        behavior: 'smooth'
+      });
     }
   }
 }
@@ -871,18 +996,21 @@ function renderCompactLegCard(leg, legIndex) {
   const displayLegLabel = legLabel || routeLabel || `Leg ${legIndex + 1}`;
 
   return `
-    <article class="compact-leg-card" style="--leg-accent:${escapeHtmlText(leg.colour || '#24485d')}">
-      <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
+    <article class="compact-leg-card">
+      <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:pointer;" onclick="toggleLeg(this)">
         <div class="compact-leg-header-line">
           <span class="compact-leg-date">${escapeHtmlText(legDateRange || '-')}</span>
           <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
-          <span class="compact-leg-cost-badge">${formatCurrency(legCost)}</span>
+          <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
           <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
+          <span class="leg-chevron ml-auto" style="color: white; font-size: 1.2rem;">▼</span>
         </div>
       </div>
-      <div class="compact-leg-body">
-        ${renderCompactTipsCard(leg, legIndex)}
-        ${renderCompactFoodQuestCard(leg, legIndex)}
+      <div class="compact-leg-body leg-content">
+        <div class="compact-tips-food-col flex flex-col gap-3.5">
+          ${renderCompactTipsCard(leg, legIndex)}
+          ${renderCompactFoodQuestCard(leg, legIndex)}
+        </div>
         ${renderCompactActivitiesCard(leg, legIndex)}
         ${renderCompactDayPager(leg, legIndex)}
       </div>
@@ -920,12 +1048,12 @@ function buildCompactItinerary() {
         : (firstDay ? firstDay.date : '');
 
     const legCard = `
-      <article class="compact-leg-card" style="--leg-accent:${escapeHtmlText(leg.colour || '#24485d')}">
+      <article class="compact-leg-card">
         <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
           <div class="compact-leg-header-line">
             <span class="compact-leg-date">${escapeHtmlText(legDateRange || '—')}</span>
             <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
-            <span class="compact-leg-cost-badge">${formatCurrency(legCost)}</span>
+            <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
             <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
           </div>
         </div>
@@ -974,7 +1102,7 @@ function buildCompactItineraryDesktop() {
   const stack = document.createElement('div');
   stack.className = 'compact-desktop-stack';
   stack.innerHTML = appData.map((leg, legIndex) => `
-    <section class="compact-desktop-leg" id="leg-${escapeHtmlText(leg.id || `compact-${legIndex}`)}">
+    <section class="compact-desktop-leg leg" id="leg-${escapeHtmlText(leg.id || `compact-${legIndex}`)}">
       ${renderCompactLegCard(leg, legIndex)}
     </section>
   `).join('');
@@ -1373,9 +1501,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       dayIndex,
       itemIndex,
       sortValue: getDailyTimelineItemSortValue(dayDate, item.startTime, 4000 + itemIndex),
-      actionHtml: `
-        <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${itemIndex})">×</button>
-      `
+      actionHtml: ''
     });
   });
 
@@ -1413,11 +1539,11 @@ function renderDailyTimelineRow(item, compact = false) {
 
   let checkboxHtml = '';
   if (item.type === 'activity') {
-    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})">`;
+    checkboxHtml = `<label class="daily-timeline-checkbox-wrapper" onclick="event.stopPropagation();"><input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})"></label>`;
   } else if (item.type === 'transport') {
-    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox transport-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleJourneyCompleted(event, '${item.journeyId}')">`;
+    checkboxHtml = `<label class="daily-timeline-checkbox-wrapper" onclick="event.stopPropagation();"><input type="checkbox" class="daily-timeline-checkbox transport-checkbox" ${item.done ? 'checked' : ''} onchange="toggleJourneyCompleted(event, '${item.journeyId}')"></label>`;
   } else if (item.type === 'stay' || item.type === 'checkin' || item.type === 'checkout' || item.type === 'staying') {
-    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox stay-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleStayCompleted(event, '${item.stayId}')">`;
+    checkboxHtml = `<label class="daily-timeline-checkbox-wrapper" onclick="event.stopPropagation();"><input type="checkbox" class="daily-timeline-checkbox stay-checkbox" ${item.done ? 'checked' : ''} onchange="toggleStayCompleted(event, '${item.stayId}')"></label>`;
   }
 
   return `
@@ -1429,11 +1555,11 @@ function renderDailyTimelineRow(item, compact = false) {
           <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
           <div class="daily-timeline-title-and-checkbox">
             <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
-            ${checkboxHtml}
           </div>
+          ${checkboxHtml ? `<div class="daily-timeline-inline-check">${checkboxHtml}</div>` : ''}
         </div>
         ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> · ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
-        ${item.notes ? `<div class="daily-timeline-notes" style="font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; opacity: 0.8;">💬 ${escapeCompactText(item.notes)}</div>` : ''}
+        ${item.notes ? `<div class="daily-timeline-notes">💬 ${escapeCompactText(item.notes)}</div>` : ''}
         ${item.subLocations ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
@@ -1449,14 +1575,8 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
     : '<div class="timeline-empty">No scheduled items yet. Add transport, stays, or activities to build the day.</div>';
   if (items.length === 0) return empty;
   const { scheduled, anytime } = getDailyTimelineBuckets(items);
-  const summaryParts = [
-    scheduled.length ? `${scheduled.length} scheduled` : '',
-    anytime.length ? `${anytime.length} anytime` : ''
-  ].filter(Boolean).join(' · ');
-
   return `
     <div class="daily-timeline-shell ${compact ? 'daily-timeline-shell-compact' : ''}">
-      ${summaryParts ? `<div class="daily-timeline-summary">${escapeCompactText(summaryParts)}</div>` : ''}
       ${scheduled.length ? `
         <div class="timeline-section-label">Scheduled</div>
         <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
@@ -1648,11 +1768,11 @@ function toggleFoodQuestDetails(e, legId) {
   }
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
-  if (expandedFoodQuestLegs.has(legId)) {
-    expandedFoodQuestLegs.delete(legId);
-  } else {
-    expandedFoodQuestLegs.add(legId);
-  }
+  const wasOpen = expandedFoodQuestLegs.has(legId);
+  expandedTipsLegs.delete(legId);
+  expandedActivitiesLegs.delete(legId);
+  expandedFoodQuestLegs.delete(legId);
+  if (!wasOpen) expandedFoodQuestLegs.add(legId);
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }
@@ -1664,11 +1784,11 @@ function toggleTipsCardDetails(e, legId) {
   }
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
-  if (expandedTipsLegs.has(legId)) {
-    expandedTipsLegs.delete(legId);
-  } else {
-    expandedTipsLegs.add(legId);
-  }
+  const wasOpen = expandedTipsLegs.has(legId);
+  expandedFoodQuestLegs.delete(legId);
+  expandedActivitiesLegs.delete(legId);
+  expandedTipsLegs.delete(legId);
+  if (!wasOpen) expandedTipsLegs.add(legId);
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }
@@ -1680,11 +1800,11 @@ function toggleActivitiesCardDetails(e, legId) {
   }
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
-  if (expandedActivitiesLegs.has(legId)) {
-    expandedActivitiesLegs.delete(legId);
-  } else {
-    expandedActivitiesLegs.add(legId);
-  }
+  const wasOpen = expandedActivitiesLegs.has(legId);
+  expandedTipsLegs.delete(legId);
+  expandedFoodQuestLegs.delete(legId);
+  expandedActivitiesLegs.delete(legId);
+  if (!wasOpen) expandedActivitiesLegs.add(legId);
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }
@@ -1692,12 +1812,11 @@ function toggleActivitiesCardDetails(e, legId) {
 function buildItinerary() {
   // Check window.isCompactView for cross-module access
   const isCompact = typeof window !== 'undefined' && window.isCompactView;
-  if (isCompact) {
-    if (typeof isMobileViewport === 'function' && isMobileViewport()) {
-      buildCompactItinerary();
-    } else {
-      buildCompactItineraryDesktop();
-    }
+  const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (window.innerWidth <= 768);
+  // Desktop itinerary default: compact card/chip renderer.
+  if (!isMobile || isCompact) {
+    if (isMobile) buildCompactItinerary();
+    else buildCompactItineraryDesktop();
     return;
   }
 
@@ -1727,9 +1846,6 @@ function buildItinerary() {
     const section = document.createElement('div');
     section.className = 'leg';
     section.id = 'leg-' + leg.id;
-    if (section.style && typeof section.style.setProperty === 'function') {
-      section.style.setProperty('--leg-accent', leg.colour);
-    }
     section.style.borderLeft = `6px solid ${leg.colour}`;
 
     const daysCount = leg.days.length;
@@ -1798,12 +1914,12 @@ function buildItinerary() {
     let html = `
     <div class="leg-header" style="background:${leg.colour}" onclick="toggleLeg(this)">
       <div class="leg-header-top">
-        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; min-width:0;">
           <h2 contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateData(${legIndex}, 'label', this.innerText)">${leg.label}</h2>
           <span style="opacity:0.8; font-size:0.9rem; font-family:'DM Mono', monospace;">${dateRange}</span>
         </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span class="leg-cost-total-badge">${formatCurrency(legCost)}</span>
+        <div style="display:flex; align-items:center; gap:10px; margin-left:auto; flex-wrap:nowrap;">
+          <div class="hidden sm:flex shrink-0 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-full shadow-sm border border-slate-200 dark:border-slate-700 mr-2" title="Leg estimated cost">${formatCurrency(legCost)}</div>
           <span class="${badgeClass}">${nightLabel}</span>
           ${isEditMode ? `<button class="header-del-btn" title="Add a day to this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, 1)">+</button>` : ''}
           ${isEditMode ? `<button class="header-del-btn" title="Remove a day from this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, -1)">−</button>` : ''}
@@ -1822,20 +1938,23 @@ function buildItinerary() {
       return emojis[cat] || '📍';
     };
 
-    html += `<div class="city-dashboard">
-      <div class="city-block city-block-tips">
-        <h4>💡 Tips</h4>
-        <ul class="tips-list">${(leg.legTips || []).map((t, i) => `<li class="tip-item"><span contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span><button class="del-btn" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
-        <button class="add-btn" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>
+    html += `<div class="itinerary-leg-panels flex flex-col md:grid md:grid-cols-3 gap-4 md:gap-5 p-4 md:p-5 border-b border-slate-200/80 dark:border-slate-700/80 bg-slate-100/60 dark:bg-slate-900/40">
+      <div class="itinerary-info-panel itinerary-info-panel-tips flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">💡 Tips</h4>
+        <ul class="itinerary-panel-list tips-list flex flex-col gap-2 mt-1.5 pl-4">${(leg.legTips || []).map((t, i) => `<li class="compact-tip-item group" style="position:relative;"><button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity absolute -left-5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 rounded" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button>${renderCompactEmojiLine({emoji: '💡', text: `<span class="flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span>`})}</li>`).join('')}</ul>
+        ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>` : ''}
       </div>
-      <div class="city-block city-block-food">
-        <h4>🍔 Food Quests</h4>
-        <ul class="food-list">${(leg.cityFood || []).map((f, i) => `<li class="quest-item"><button class="del-btn" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">×</button><input type="checkbox" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span></li>`).join('')}</ul>
-        <button class="add-btn" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>
+      <div class="itinerary-info-panel itinerary-info-panel-food flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">🍔 Food Quests</h4>
+        <ul class="itinerary-panel-list food-list flex flex-col gap-2 mt-1.5 pl-4">${(leg.cityFood || []).map((f, i) => `<li class="compact-food-quest-item group" style="position:relative;"><button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity absolute -left-5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 rounded" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">×</button><label class="compact-food-quest-label"><input type="checkbox" class="compact-food-quest-checkbox" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span class="compact-food-quest-text flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span></label></li>`).join('')}</ul>
+        ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>` : ''}
       </div>
-      <div class="city-block city-block-activities">
-        <h4>📌 Suggested Activities</h4>
-        <ul class="activity-list unified-activities">${(leg.suggestedActivities || []).map((activity, activityIdx) => {
+      <div class="itinerary-info-panel itinerary-info-panel-activities flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">📌 Suggested Activities</h4>
+        <ul class="itinerary-panel-list activity-list unified-activities flex flex-col gap-2 mt-1.5 pl-4">${(leg.suggestedActivities || [])
+          .map((activity, activityIdx) => ({ activity, activityIdx }))
+          .filter(({ activity }) => activity && (activity.assignedDayIdx === null || activity.assignedDayIdx === undefined))
+          .map(({ activity, activityIdx }) => {
       const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
       let isCompleted = false; let dayLabel = '';
       if (isAssigned && leg.days[activity.assignedDayIdx]) {
@@ -1843,17 +1962,32 @@ function buildItinerary() {
         const matchTexts = typeof getSuggestedActivityMatchTexts === 'function'
           ? getSuggestedActivityMatchTexts(activity)
           : [activity.title];
-        const matchedActivity = leg.days[activity.assignedDayIdx].activityItems.find(a => matchTexts.includes(String(a.text || '').trim()));
+        const matchedActivity = (leg.days[activity.assignedDayIdx].activityItems || []).find(a => matchTexts.includes(String(a.text || '').trim()));
         if (matchedActivity && matchedActivity.done) isCompleted = true;
       }
       const badgeStateClass = isCompleted ? 'is-complete' : 'is-scheduled';
       const badgeIcon = isCompleted ? '✓' : '✓';
       const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
-      const categoryEmoji = getCategoryEmoji(activity.category);
-      const notesMetaHtml = activity.notes ? ` · <span class="sight-inline-meta-notes" style="font-style:italic; color:var(--muted);" title="${escapeHtmlText(activity.notes)}">💬 ${escapeHtmlText(activity.notes)}</span>` : '';
-      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle" title="Drag to assign">⠿</span>` : `<span class="assigned-badge ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji">${categoryEmoji}</span><span style="${isCompleted ? 'text-decoration:line-through;' : ''}; flex:1;">${activity.title}</span><span class="sight-inline-meta">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span>${notesMetaHtml}</span><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
+      const categoryEmoji = getCompactActivityCategoryEmoji(activity.category);
+      const notesMetaHtml = activity.notes ? ` · <span class="sight-inline-meta-notes" title="${escapeHtmlText(activity.notes)}">💬 ${escapeHtmlText(activity.notes)}</span>` : '';
+      const actionIcon = isAssigned ? '›' : '📌';
+      const actionTitle = isAssigned ? 'Move to another day' : 'Assign to day';
+      const dragClass = isAssigned ? 'assigned-sight' : 'draggable-sight';
+      const dragAttrs = !isAssigned ? ` draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : '';
+      return `<li class="compact-suggested-activity-item group ${dragClass}"${dragAttrs} style="position:relative;">
+        <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity absolute -left-5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 rounded" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>
+        <span class="compact-suggested-activity-emoji">${categoryEmoji}</span>
+        <span class="compact-suggested-activity-text flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'title', this.innerText)" style="${isCompleted ? 'text-decoration:line-through;opacity:0.6;' : ''}">${escapeCompactText(activity.title)}</span>
+        <span class="compact-suggested-activity-meta">
+          ${activity.estTime ? `<span class="compact-suggested-activity-time outline-none" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'estTime', this.innerText)">⏱ ${escapeCompactText(activity.estTime)}</span>` : ''}
+          ${activity.estCost ? `<span class="compact-suggested-activity-cost outline-none" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'estCost', this.innerText)">$${escapeCompactText(activity.estCost)}</span>` : ''}
+        </span>
+        <button type="button" class="compact-activity-action-btn flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-colors ml-auto" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})" title="${actionTitle}">
+          <span class="text-base">${actionIcon}</span>
+        </button>
+      </li>`;
     }).join('')}</ul>
-        <button class="add-btn" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
+        ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>` : ''}
       </div>
     </div>`;
 
@@ -1872,22 +2006,22 @@ function buildItinerary() {
       const dayViewMode = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
 
       html += `
-      <div class="day-card ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
-        <div class="day-bar" style="--leg-colour:${leg.colour}" onclick="toggleCard(this)">
-          <div class="day-date"><span class="day-num">${dayDateLabel}</span><span class="day-name">${day.day}</span></div>
-          <div class="day-title"><div class="day-cities">${cityHTML}</div><div class="day-desc" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
-          ${dayTotal ? `<div class="day-total-cost" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron">▼</span>
+      <div class="day-card group flex flex-col mb-4 overflow-hidden bg-white/90 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 rounded-xl shadow-sm transition-all duration-300 ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
+        <div class="day-bar flex items-center p-3 sm:p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors relative" style="border-left: 5px solid var(--leg-colour, ${leg.colour})" onclick="toggleCard(this)">
+          <div class="day-date w-16 sm:w-20 shrink-0 text-center flex flex-col items-center justify-center border-r border-slate-200 dark:border-slate-700 pr-3 sm:pr-4 mr-3 sm:mr-4"><span class="day-num text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">${dayDateLabel}</span><span class="day-name text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${day.day}</span></div>
+          <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${cityHTML}</div><div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
+          ${dayTotal ? `<div class="day-total-cost hidden sm:flex shrink-0 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-full border border-slate-200 dark:border-slate-600 shadow-inner mr-4" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron shrink-0 w-8 h-8 flex items-center justify-center text-slate-400 transition-transform duration-300 bg-slate-100 dark:bg-slate-700/50 rounded-full group-[.open]:rotate-180">▼</span>
         </div>
-        <div class="day-detail"><div class="day-planner-shell day-planner-shell-${dayViewMode}">
+        <div class="day-detail hidden group-[.open]:block border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 p-4 sm:p-5"><div class="day-planner-shell day-planner-shell-${dayViewMode}">
           <div class="day-view-panel day-view-panel-timeline">
-          <div class="detail-block daily-timeline-card drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
+          <div class="detail-block bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80 dark:border-slate-700/80 drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
             ${renderDailyTimeline(leg, legIndex, day, dayIndex)}
           </div>
           </div>
-          <div class="day-view-panel day-view-panel-grouped"><div class="detail-grid detail-grid-grouped">
+          <div class="day-view-panel day-view-panel-grouped"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 mt-4">
 
-          <div class="detail-block block-transport">
-            <h4>Transport</h4><div class="item-list">
+          <div class="detail-block block-transport flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md">
+            <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Transport</h4><div class="item-list space-y-2">
             ${dayJourneys.map((journey) => {
         const status = journey.status || 'planned';
         const statusColor = status === 'booked' ? '#27AE60' : '#E67E22';
@@ -1921,16 +2055,16 @@ function buildItinerary() {
             .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1)) : [];
         const subLocations = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
 
-        return `<div class="cost-item journey-item">
-                <button class="del-btn" title="Remove Journey" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); rebuildCurrentView();">×</button>
+        return `<div class="cost-item journey-item flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200/50 dark:border-slate-600/50 text-sm hover:shadow-md transition-shadow group">
+                <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-red-500 rounded" title="Remove Journey" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); rebuildCurrentView();">×</button>
                 <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
-                  <span>${label}${timeHint}</span>
+                  <span class="font-medium text-slate-700 dark:text-slate-200">${label}${timeHint}</span>
                   ${subLocations ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(subLocations)}</div>` : ''}
                 </div>
-                <div class="cost-item-actions">
-                  <span class="status-badge ${isEditMode ? 'status-badge-clickable' : ''}" style="--status-color:${statusColor};" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}');">${statusIcon} ${status === 'booked' ? 'Booked' : 'Planned'}</span>
-                  ${showRef ? `<input type="text" class="booking-ref-input confirmed" value="${journey.bookingReference || ''}" placeholder="Ref #" onchange="event.stopPropagation(); updateJourneyBookingRef('${journey.id}', this.value);" ${isEditMode ? '' : 'disabled'}/>` : ''}
-                  <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateJourneyCost('${journey.id}', this.innerText)">${formatCurrency(journey.cost || '0', { includeSymbol: false })}</span></span>
+                <div class="cost-item-actions flex flex-col items-end gap-1.5 shrink-0">
+                  <span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white ${isEditMode ? 'cursor-pointer hover:opacity-80' : ''}" style="background-color:${statusColor};" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}');">${statusIcon} ${status === 'booked' ? 'Booked' : 'Planned'}</span>
+                  ${showRef ? `<input type="text" class="booking-ref-input confirmed text-xs px-1.5 py-0.5 border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500" value="${journey.bookingReference || ''}" placeholder="Ref #" onchange="event.stopPropagation(); updateJourneyBookingRef('${journey.id}', this.value);" ${isEditMode ? '' : 'disabled'}/>` : ''}
+                  <span class="budget-field text-slate-600 dark:text-slate-400 font-mono text-sm mt-1">$<span class="outline-none" contenteditable="${isEditMode}" onblur="updateJourneyCost('${journey.id}', this.innerText)">${formatCurrency(journey.cost || '0', { includeSymbol: false })}</span></span>
                 </div>
               </div>`;
       }).join('')}
@@ -1938,8 +2072,8 @@ function buildItinerary() {
           </div>
 
 
-<div class="detail-block block-accom">
-<h4>Accommodation</h4><div class="item-list">
+<div class="detail-block block-accom flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md">
+<h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Accommodation</h4><div class="item-list space-y-2">
 ${(() => {
         const dayStayInfo = getStayDisplayForDay(day.date, day.to);
         return dayStayInfo.map(info => {
@@ -1954,14 +2088,14 @@ ${(() => {
             return `Location: ${loc}`;
           })() : '';
 
-          return `<div class="cost-item">
+          return `<div class="cost-item flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200/50 dark:border-slate-600/50 text-sm">
         <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
-          <span>${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` via ${info.provider}` : ''}${info.cost ? `<span class="accom-inline-meta-cost"> (${formatCurrency(info.cost)})</span>` : ''}</span>
+          <span class="font-medium text-slate-700 dark:text-slate-200">${icon} <strong>${label}:</strong> ${info.propertyName}${info.provider ? ` <span class="text-slate-500 font-normal">via ${info.provider}</span>` : ''}${info.cost ? `<span class="accom-inline-meta-cost text-slate-500 font-mono text-xs ml-1">(${formatCurrency(info.cost)})</span>` : ''}</span>
           ${stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : ''}
         </div>
-        <div class="cost-item-actions">
-          <span class="status-badge" style="--status-color:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✕ Cancelled' : '⏳ Pending'}</span>
-          ${info.bookingRef ? `<span class="booking-ref" style="font-family:monospace; font-size:0.75rem; color:#666;">${info.bookingRef}</span>` : ''}
+        <div class="cost-item-actions flex flex-col items-end gap-1.5 shrink-0">
+          <span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white" style="background-color:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✕ Cancelled' : '⏳ Pending'}</span>
+          ${info.bookingRef ? `<span class="booking-ref text-[10px] font-mono text-slate-500 bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">${info.bookingRef}</span>` : ''}
         </div>
       </div>`;
         }).join('');
@@ -1969,8 +2103,8 @@ ${(() => {
 </div><button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Add Stay</button>
 </div>
 
-          <div class="detail-block block-activities drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
-            <h4>Planned Activities</h4><div class="item-list">
+          <div class="detail-block block-activities drop-zone flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
+            <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Planned Activities</h4><div class="item-list space-y-2">
             ${(day.activityItems || []).map((item, i) => {
               let locationVal = item.location || '';
               if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
@@ -1991,7 +2125,7 @@ ${(() => {
                 }
                 return `Location: ${loc}`;
               })() : '';
-              const locHtml = activityLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
+              const locHtml = activityLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-inline">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
               let notes = item.notes || '';
               if (!notes && typeof findAssignedSuggestedActivity === 'function') {
                 const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
@@ -1999,27 +2133,27 @@ ${(() => {
                   notes = matched.notes;
                 }
               }
-              const notesHtml = notes ? `<div class="daily-timeline-notes" style="font-size:0.72rem; color:var(--muted); font-style:italic; padding-left:0; margin-top:2px;">💬 ${escapeCompactText(notes)}</div>` : '';
+              const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-inline">💬 ${escapeCompactText(notes)}</div>` : '';
               return `
-                <div class="cost-item">
+                <div class="cost-item flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200/50 dark:border-slate-600/50 text-sm hover:shadow-md transition-shadow group">
                   <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
                     <div style="display: flex; align-items: center; gap: 6px;">
-                      <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button>
-                      <input type="checkbox" class="activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})">
-                      <span class="cost-item-text" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${split.title}</span>
+                      <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-red-500 rounded" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button>
+                      <input type="checkbox" class="activity-checkbox w-4 h-4 accent-emerald-500 cursor-pointer" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})">
+                      <span class="cost-item-text font-medium text-slate-700 dark:text-slate-200 outline-none" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${split.title}</span>
                     </div>
                     ${locHtml}
                     ${notesHtml}
                   </div>
                   ${isEditMode
-                    ? `<span class="budget-field budget-field--clickable" style="color:#666; cursor:pointer;" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">⏱ <span>${item.time || '1 hr'}</span></span>`
-                    : `<span class="budget-field" style="color:#666;">⏱ <span>${item.time || '1 hr'}</span></span>`
+                    ? `<span class="budget-field budget-field--clickable text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors cursor-pointer text-xs font-mono" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">⏱ <span>${item.time || '1 hr'}</span></span>`
+                    : `<span class="budget-field text-slate-500 text-xs font-mono">⏱ <span>${item.time || '1 hr'}</span></span>`
                   }
-                  <span class="budget-field">$<span contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span>
+                  <span class="budget-field text-slate-600 dark:text-slate-400 font-mono text-sm mt-1">$<span class="outline-none" contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span>
                 </div>
               `;
             }).join('')}
-            </div><button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>
+            </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>` : ''}
           </div>
 
           </div></div>
@@ -2436,7 +2570,7 @@ function buildCityNav() {
 
   // Keep the "All" button
   navList.innerHTML = `
-    <button class="city-nav-btn ${filter === 'all' ? 'active' : ''}" data-city="all" onclick="selectCityFilter('all', this)">
+    <button class="city-nav-btn px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700 ${filter === 'all' ? 'active' : ''}" data-city="all" onclick="selectCityFilter('all', this)">
       <span>🏙️ All</span>
     </button>
   `;
@@ -2455,10 +2589,10 @@ function buildCityNav() {
     const color = city.colour || (isTransit ? '#95a5a6' : '#2C3E50');
 
     if (isTransit) {
-      btn.className = 'city-nav-btn city-nav-btn-transit' + (filter === city.id ? ' active' : '');
+      btn.className = 'city-nav-btn px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700 opacity-70' + (filter === city.id ? ' active' : '');
       btn.style.borderLeft = `4px dashed ${color}`;
     } else {
-      btn.className = 'city-nav-btn' + (filter === city.id ? ' active' : '');
+      btn.className = 'city-nav-btn px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700' + (filter === city.id ? ' active' : '');
       btn.style.borderLeft = `4px solid ${color}`;
     }
 
@@ -2604,3 +2738,5 @@ function expandToCity(cityId) {
   }
 }
 window.expandToCity = expandToCity;
+
+

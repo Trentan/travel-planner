@@ -12,7 +12,7 @@
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#1A242F">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./dist/tailwind.css">
   <!-- Leaflet.js for interactive maps -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -30,21 +30,17 @@
   </div>
   <div class="app-menu-right">
     <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
-    <label id="compactToggleBtn" class="app-menu-switch" role="switch" aria-checked="false" title="Toggle detailed or compact mode">
-      <input id="compactToggleInput" type="checkbox" onchange="toggleCompactView(this.checked)" aria-label="Toggle detailed or compact mode">
-      <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
-      <span id="compactToggleLabel" class="app-menu-switch-label">Detailed mode</span>
-    </label>
-    <label id="themeToggleBtn" class="app-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
-      <input id="themeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
-      <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
-      <span id="themeToggleLabel" class="app-menu-switch-label">🌓 Dark theme</span>
-    </label>
     <button id="undoBtn" class="app-menu-btn" onclick="undoTripChange()" disabled>↶ Undo</button>
     <button id="redoBtn" class="app-menu-btn" onclick="redoTripChange()" disabled>↷ Redo</button>
     <details class="app-menu-actions" id="desktopActionsMenu">
-      <summary class="app-menu-btn app-menu-actions-summary" aria-label="Open app actions" aria-haspopup="menu">Actions</summary>
+      <summary class="app-menu-btn app-menu-actions-summary" aria-label="Open app actions" aria-haspopup="menu">☰ Actions</summary>
       <div class="app-menu-actions-panel" role="menu" aria-label="App actions">
+        <label id="themeToggleBtn" class="app-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
+          <input id="themeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
+          <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
+          <span id="themeToggleLabel" class="app-menu-switch-label">🌓 Dark theme</span>
+        </label>
+        <div class="app-menu-divider" aria-hidden="true"></div>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCityDialog()">🌍 Cities</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openRenameTripDialog()">✏️ Rename Trip</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openAIDialog()">🤖 AI Builder</button>
@@ -65,75 +61,74 @@
         <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="closeDesktopActionsMenu(); promptInstallApp()">⬇ Install App</button>
       </div>
     </details>
-    <button class="app-menu-btn mobile-menu-btn" onclick="toggleMobileMenu()">☰ Menu</button>
+    <button class="app-menu-btn mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu">☰</button>
   </div>
 </div>
 
 <div id="jsonWriteWarning" class="json-write-warning" hidden></div>
 
-<header>
-  <div class="header-inner">
-    <div class="header-text">
-      <h1 contenteditable="false" id="mainTitle"></h1>
-      <p contenteditable="false" id="mainSubtitle"></p>
+<header class="hidden md:block bg-teal-800 dark:bg-slate-900 text-white shadow-md relative z-30 transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4 py-6 md:py-8">
+    <div class="flex flex-col gap-1">
+      <h1 contenteditable="false" id="mainTitle" class="text-2xl md:text-3xl font-bold tracking-tight outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"></h1>
+      <p contenteditable="false" id="mainSubtitle" class="text-teal-100 dark:text-slate-400 text-sm md:text-base outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"></p>
     </div>
   </div>
 </header>
 
 <main>
-  <div class="app-tabs-nav">
-    <div class="app-tabs-list">
+<div class="app-tabs-nav">
+    <div class="app-tabs-list hide-scrollbar">
       <button class="app-tab-btn active" data-tab="itinerary" onclick="switchTab('itinerary', this)">
-        <span class="tab-icon">🗺️</span>
-        <span class="tab-label">Itinerary</span>
+        <span class="tab-icon text-lg md:text-base">🗓️</span>
+        <span class="tab-label hidden sm:inline">Itinerary</span>
       </button>
       <button class="app-tab-btn" data-tab="transport" onclick="switchTab('transport', this)">
-        <span class="tab-icon">✈️</span>
-        <span class="tab-label">Transport</span>
+        <span class="tab-icon text-lg md:text-base">✈️</span>
+        <span class="tab-label hidden sm:inline">Transport</span>
       </button>
       <button class="app-tab-btn" data-tab="accom" onclick="switchTab('accom', this)">
-        <span class="tab-icon">🏨</span>
-        <span class="tab-label">Accommodation</span>
+        <span class="tab-icon text-lg md:text-base">🏨</span>
+        <span class="tab-label hidden sm:inline">Accommodation</span>
       </button>
       <button class="app-tab-btn" data-tab="budget" onclick="switchTab('budget', this)">
-        <span class="tab-icon">💰</span>
-        <span class="tab-label">Budget</span>
+        <span class="tab-icon text-lg md:text-base">💰</span>
+        <span class="tab-label hidden sm:inline">Budget</span>
       </button>
       <button class="app-tab-btn" data-tab="packing" onclick="switchTab('packing', this)">
-        <span class="tab-icon">🧳</span>
-        <span class="tab-label">Packing</span>
+        <span class="tab-icon text-lg md:text-base">🧳</span>
+        <span class="tab-label hidden sm:inline">Packing</span>
       </button>
       <button class="app-tab-btn" data-tab="map" onclick="switchTab('map', this)">
-        <span class="tab-icon">🗺️</span>
-        <span class="tab-label">Map</span>
+        <span class="tab-icon text-lg md:text-base">🗺️</span>
+        <span class="tab-label hidden sm:inline">Map</span>
       </button>
     </div>
-    <button class="mobile-tabs-menu-btn" type="button" onclick="toggleMobileMenu()" aria-label="Open menu">☰</button>
+    <button class="mobile-tabs-menu-btn" type="button" onclick="toggleMobileMenu()" aria-label="Open menu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
   </div>
-
-  <nav class="city-nav" id="cityNav">
-    <div class="city-nav-list">
+    <nav id="cityNav" class="city-nav transition-transform duration-300 translate-y-0">
+    <div class="city-nav-list hide-scrollbar">
       <button class="city-nav-btn active" data-city="all" onclick="selectCityFilter('all', this)">
         <span>🏙️ All</span>
       </button>
     </div>
   </nav>
+  
 
   <div class="app-tabs-content">
     <div id="tab-itinerary" class="tab-pane active">
       <div class="section-header">
         <h3 class="section-header-title">🗓️ Itinerary</h3>
         <div class="section-header-actions">
+          <button class="action-btn" onclick="toggleAllDays()" id="expandAll">▼ Expand all days</button>
           <div class="itinerary-view-mode-control" role="group" aria-label="Itinerary day view">
             <button id="itineraryTimelineModeBtn" class="itinerary-view-mode-btn is-active" type="button" onclick="setItineraryDayViewMode('timeline')">Timeline</button>
             <button id="itineraryGroupedModeBtn" class="itinerary-view-mode-btn" type="button" onclick="setItineraryDayViewMode('grouped')">Grouped</button>
           </div>
           <button class="action-btn add-leg-action" onclick="openAddLegDialog()"><span class="add-leg-full">+ Add Trip Leg</span><span class="add-leg-short" aria-hidden="true"></span></button>
         </div>
-      </div>
-      <div class="top-controls">
-        <button class="action-btn" onclick="toggleAllDays()" id="expandAll">▼ Expand all days</button>
-        <button class="action-btn" onclick="toggleAllLegs()" id="expandAllLegs">▲ Collapse all legs</button>
       </div>
       <div id="itinerary"></div>
     </div>
@@ -207,11 +202,6 @@
           <div class="mobile-menu-section-grid">
             <button id="mobileEditToggleBtn" class="app-menu-btn mobile-menu-primary" onclick="closeMobileMenu(); toggleEditMode()">🔒 Lock: Read Only</button>
             <button id="mobileRenameBtn" class="app-menu-btn" onclick="closeMobileMenu(); openRenameTripDialog()">✏️ Rename Trip</button>
-            <label id="mobileCompactToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="false" title="Toggle detailed or compact mode">
-              <input id="mobileCompactToggleInput" type="checkbox" onchange="closeMobileMenu(); toggleCompactView(this.checked)" aria-label="Toggle detailed or compact mode">
-              <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
-              <span id="mobileCompactToggleLabel" class="app-menu-switch-label">Detailed mode</span>
-            </label>
             <label id="mobileThemeToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
               <input id="mobileThemeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
               <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
@@ -349,15 +339,15 @@
       </div>
       <div class="modal-footer">
         <button class="action-btn" onclick="closeShareExportDialog()">Cancel</button>
-        <button class="action-btn" style="background: #556B2F; color: white;" onclick="copyShareEmailDraft()">Copy Email Text</button>
-        <button class="action-btn" style="background: #2C3E50; color: white;" onclick="exportShareJSON()">Download Share File</button>
-        <button class="action-btn" style="background: #1F6F8B; color: white;" onclick="exportShareEmail()">Open Email Draft</button>
+        <button class="action-btn action-btn-olive" onclick="copyShareEmailDraft()">Copy Email Text</button>
+        <button class="action-btn action-btn-secondary" onclick="exportShareJSON()">Download Share File</button>
+        <button class="action-btn action-btn-teal" onclick="exportShareEmail()">Open Email Draft</button>
       </div>
     </div>
   </div>
 
   <div id="rename-trip-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 560px;">
+    <div class="modal-content modal-lg">
       <div class="modal-header">
         <h2>✏️ Rename Trip</h2>
         <button class="modal-close" onclick="closeRenameTripDialog()">&times;</button>
@@ -374,13 +364,13 @@
       </div>
       <div class="modal-footer">
         <button class="action-btn" onclick="closeRenameTripDialog()">Cancel</button>
-        <button class="action-btn" style="background:#2C3E50; color:white;" onclick="saveRenameTripDialog()">Save Trip Name</button>
+        <button class="action-btn action-btn-secondary" onclick="saveRenameTripDialog()">Save Trip Name</button>
       </div>
     </div>
   </div>
 
   <div id="ai-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 600px;">
+    <div class="modal-content modal-lg">
       <div class="modal-header">
         <h2>🤖 AI Builder</h2>
         <button class="modal-close" onclick="closeAIDialog()">&times;</button>
@@ -415,7 +405,7 @@
   </div>
 
   <div id="guide-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 700px; max-height: 90vh;">
+    <div class="modal-content modal-xl">
       <div class="modal-header">
         <h2>📖 How to Use Travel Planner</h2>
         <button class="modal-close" onclick="closeGuideDialog()">&times;</button>
@@ -433,16 +423,16 @@
   </div>
 
   <div id="add-leg-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-content modal-md">
       <div class="modal-header">
         <h2>➕ Add New Leg</h2>
         <button class="modal-close" onclick="closeAddLegDialog()">&times;</button>
       </div>
       <div class="modal-body">
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="stack-gap-4">
           <div class="ai-form-group">
             <label>Leg Type</label>
-            <select id="legTypeSelect" onchange="onLegTypeChange()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+            <select id="legTypeSelect" class="form-control" onchange="onLegTypeChange()">
               <option value="start">🏠 Start (Departure from Home)</option>
               <option value="travel">✈️ Travel (City to City)</option>
               <option value="city" selected>📍 City (Destination)</option>
@@ -452,13 +442,13 @@
           <div id="routeSelectionGroup" style="display: none;">
             <div class="ai-form-group">
               <label>From City</label>
-              <select id="fromCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+              <select id="fromCitySelect" class="form-control">
                 <option value="Home">🏠 Home</option>
               </select>
             </div>
             <div class="ai-form-group">
               <label>To City</label>
-              <select id="toCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+              <select id="toCitySelect" class="form-control">
                 <option value="">-- Choose destination --</option>
               </select>
             </div>
@@ -466,60 +456,60 @@
           <div id="citySelectionGroup">
             <div class="ai-form-group">
               <label>Option 1: Select Existing City</label>
-              <select id="existingCitySelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+              <select id="existingCitySelect" class="form-control">
                 <option value="">-- Choose a city --</option>
               </select>
             </div>
-            <div style="text-align: center; color: #666; font-size: 0.9rem; position: relative;">
-              <span style="background: #f5f5f5; padding: 0 1rem; position: relative; z-index: 1;">or</span>
-              <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #ddd; z-index: 0;"></div>
+            <div class="divider-or-wrap">
+              <span class="divider-or-label">or</span>
+              <div class="divider-or-line"></div>
             </div>
             <div class="ai-form-group">
               <label>Option 2: Create New City</label>
-              <input type="text" id="newLegCityName" placeholder="City name (e.g., Prague)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif; margin-bottom: 0.5rem;">
-              <select id="newLegCityCountrySelect" onchange="onNewLegCountryChange()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif; margin-bottom: 0.5rem;">
+              <input type="text" id="newLegCityName" class="form-control add-leg-field-gap" placeholder="City name (e.g., Prague)">
+              <select id="newLegCityCountrySelect" class="form-control add-leg-field-gap" onchange="onNewLegCountryChange()">
 <option value="">Select country...</option>
 </select>
-<input type="text" id="newLegCityCountryOther" placeholder="Enter country name..." style="display: none; width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+<input type="text" id="newLegCityCountryOther" class="form-control" placeholder="Enter country name..." style="display: none;">
             </div>
             <div class="ai-form-group">
               <label id="datesLabel">Dates in City</label>
-              <div style="display: flex; gap: 0.5rem;">
-                <input type="text" id="newLegStartDate" placeholder="Date (e.g., 15 Jun)" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
-                <input type="text" id="newLegEndDate" placeholder="To (e.g., 18 Jun)" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans', sans-serif;">
+              <div class="row-gap-2">
+                <input type="text" id="newLegStartDate" class="form-control" placeholder="Date (e.g., 15 Jun)">
+                <input type="text" id="newLegEndDate" class="form-control" placeholder="To (e.g., 18 Jun)">
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
           <button class="action-btn" onclick="closeAddLegDialog()">Cancel</button>
-          <button class="action-btn" style="background: #2C3E50; color: white;" onclick="confirmAddLeg()">Add Leg</button>
+          <button class="action-btn action-btn-secondary" onclick="confirmAddLeg()">Add Leg</button>
         </div>
       </div>
     </div>
   </div>
 
   <div id="city-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-content modal-md">
       <div class="modal-header">
         <h2>🌍 Manage Cities</h2>
         <button class="modal-close" onclick="closeCityDialog()">&times;</button>
       </div>
       <div class="modal-body">
-        <div id="cityListContainer" style="max-height: 400px; overflow-y: auto;">
+        <div id="cityListContainer" class="city-list-scroll">
         </div>
-        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
-          <h4 style="margin-bottom: 1rem;">➕ Add New City</h4>
-          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <input type="text" id="newCityName" list="cities-datalist" placeholder="City name (e.g., Bangkok)" style="padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem;">
-            <div style="display: flex; gap: 0.5rem;">
-              <select id="newCityCountrySelect" style="flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem;">
+        <div class="city-add-section">
+          <h4 class="city-add-heading">➕ Add New City</h4>
+          <div class="city-add-stack">
+            <input type="text" id="newCityName" class="form-control city-add-input" list="cities-datalist" placeholder="City name (e.g., Bangkok)">
+            <div class="row-gap-2">
+              <select id="newCityCountrySelect" class="form-control city-add-input">
                 <option value="">Select country...</option>
               </select>
-              <input type="text" id="newCityCountry" list="countries-datalist" placeholder="Or type country..." style="flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem;">
+              <input type="text" id="newCityCountry" class="form-control city-add-input" list="countries-datalist" placeholder="Or type country...">
             </div>
-<div id="customCountryDiv" style="display: none; padding: 10px 12px; background: #f0f7ff; border-radius: 6px; border: 1px solid #b3d9ff;"><div style="font-size: 0.85rem; color: #333; margin-bottom: 6px;">Enter custom country details:</div><div style="display: flex; gap: 0.5rem;"><input type="text" id="customCountryName" placeholder="Country name (e.g., Myanmar)" style="flex: 1; padding: 8px; border: 1px solid #a3c9e8; border-radius: 4px; font-size: 0.9rem;"><input type="text" id="customCountryCode" placeholder="ISO code (e.g., MM)" style="width: 100px; padding: 8px; border: 1px solid #a3c9e8; border-radius: 4px; font-size: 0.9rem; text-transform: uppercase;"></div></div>
-            <div id="cityCodeDisplay" style="display: none; background: #f5f5f5; padding: 8px 12px; border-radius: 4px; font-size: 0.85rem; color: #666;">
+<div id="customCountryDiv" class="city-custom-country" style="display: none;"><div class="city-custom-country-label">Enter custom country details:</div><div class="row-gap-2"><input type="text" id="customCountryName" class="form-control city-custom-country-input" placeholder="Country name (e.g., Myanmar)"><input type="text" id="customCountryCode" class="form-control city-custom-country-code" placeholder="ISO code (e.g., MM)"></div></div>
+            <div id="cityCodeDisplay" class="city-code-display" style="display: none;">
               <span id="cityCodeInfo"></span>
             </div>
             <button class="action-btn" onclick="addNewCityFromDialog()">Add City</button>
@@ -546,14 +536,14 @@
 
   <!-- Journey Title Display -->
   <div class="journey-modal-panel surface-panel surface-panel--card">
-    <div class="modal-form-divider" style="margin-bottom: 0.5rem;">
+    <div class="modal-form-divider modal-form-divider-tight">
       <span class="modal-form-divider-label">Journey</span>
     </div>
     <div id="journeyTitleDisplay" class="journey-modal-title">Loading...</div>
   </div>
 
         <div class="journey-modal-panel surface-panel surface-panel--card">
-          <div class="modal-form-divider" style="margin-bottom: 0.5rem;">
+          <div class="modal-form-divider modal-form-divider-tight">
             <span class="modal-form-divider-label">Segments</span>
           </div>
           <div id="segmentTracker" class="journey-segment-tracker">
@@ -597,25 +587,27 @@
               <input type="text" id="journeyToAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Haneda Terminal 3">
             </div>
           </div>
-          <div style="text-align: right; margin-bottom: 1.5rem;">
+          <div class="journey-city-link-row">
             <a href="#" class="inline-action-link" onclick="promptAddNewCity(); return false;">+ Add new city (opens Cities dialog)</a>
           </div>
 
-          <div class="journey-inline-row journey-time-row modal-form-row">
-            <div class="ai-form-group">
-              <label>Departure</label>
-              <div class="journey-datetime-pair modal-form-pair">
-                <input type="date" id="journeyDateFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
-                <input type="time" id="journeyTimeFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+          <div class="journey-time-grid">
+            <div class="journey-inline-row journey-time-row modal-form-row">
+              <div class="ai-form-group">
+                <label>Departure</label>
+                <div class="journey-datetime-pair modal-form-pair">
+                  <input type="date" id="journeyDateFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                  <input type="time" id="journeyTimeFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                </div>
               </div>
             </div>
-          </div>
-          <div class="journey-inline-row journey-time-row modal-form-row">
-            <div class="ai-form-group">
-              <label>Arrival</label>
-              <div class="journey-datetime-pair modal-form-pair">
-                <input type="date" id="journeyDateTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
-                <input type="time" id="journeyTimeTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+            <div class="journey-inline-row journey-time-row modal-form-row">
+              <div class="ai-form-group">
+                <label>Arrival</label>
+                <div class="journey-datetime-pair modal-form-pair">
+                  <input type="date" id="journeyDateTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                  <input type="time" id="journeyTimeTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                </div>
               </div>
             </div>
           </div>
@@ -679,7 +671,7 @@
         <button class="modal-close" onclick="closeAddStayModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="modal-form-stack">
+        <div class="modal-form-stack stay-form-grid">
           <div class="ai-form-group">
             <label for="stayCitySelect">City</label>
             <select id="stayCitySelect" class="form-control form-control--compact">
@@ -716,7 +708,7 @@
           </div>
           <div class="ai-form-group">
             <label for="stayNights">Nights</label>
-            <input type="text" id="stayNights" readonly class="form-control form-control--compact form-control--mono" placeholder="Auto" style="width: 100px;">
+            <input type="text" id="stayNights" readonly class="form-control form-control--compact form-control--mono stay-nights-input" placeholder="Auto">
           </div>
           <div class="ai-form-group">
             <label for="stayStatus">Booking Status</label>
@@ -741,7 +733,7 @@
           </div>
           <div class="ai-form-group">
             <label for="stayNotes">Notes</label>
-            <textarea id="stayNotes" class="form-control form-control--compact" placeholder="Optional: address, phone, check-in instructions..." style="resize: vertical; min-height: 60px;"></textarea>
+            <textarea id="stayNotes" class="form-control form-control--compact stay-notes-input" placeholder="Optional: address, phone, check-in instructions..."></textarea>
           </div>
         </div>
       </div>
@@ -766,9 +758,9 @@
 <script src="./js/ai.js"></script>
 <script src="./js/guide.js"></script>
 <script src="./js/map.js"></script>
-<script src="./js/ui.js"></script>
-<script src="./js/itinerary.js"></script>
-  <script src="./js/backup.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/itinerary.js"></script>
+  <script src="js/backup.js"></script>
 <script src="./js/auto-stays.js"></script>
 <script src="./js/transport.js"></script>
 <script src="./js/booking-intake.js"></script>
@@ -799,10 +791,28 @@
     }
   }
 
+  const isLocalDevHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(err => console.log('SW registration failed:', err));
-    });
+    if (isLocalDevHost) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.getRegistrations()
+          .then(registrations => Promise.all(registrations.map(reg => reg.unregister())))
+          .catch(err => console.log('SW unregister failed:', err));
+        if (window.caches && typeof window.caches.keys === 'function') {
+          window.caches.keys()
+            .then(keys => Promise.all(
+              keys
+                .filter(key => key.startsWith('travel-planner-'))
+                .map(key => window.caches.delete(key))
+            ))
+            .catch(err => console.log('Cache cleanup failed:', err));
+        }
+      });
+    } else {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(err => console.log('SW registration failed:', err));
+      });
+    }
   }
 
   window.addEventListener('beforeinstallprompt', (event) => {

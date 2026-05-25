@@ -78,16 +78,16 @@ function showBackupReminder(message) {
   const reminder = document.createElement('div');
   reminder.id = 'backup-reminder';
   reminder.innerHTML = `
-    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
-      <div style="background: #FFF3CD; border: 1px solid #FFE69C; border-radius: 8px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 380px;">
-        <div style="font-weight: 500; color: #856404; margin-bottom: 8px;">Backup Reminder</div>
-        <div class="reminder-text" style="font-size: 14px; color: #856404; margin-bottom: 8px;">${message}</div>
-        <div style="font-size: 12px; color: #6C757D; margin-bottom: 12px; font-style: italic;">Tip: After exporting, find the downloaded file and copy it to overwrite your previous backup.</div>
-        <div style="display: flex; gap: 8px;">
+    <div class="backup-reminder-shell">
+      <div class="backup-reminder-card">
+        <div class="backup-reminder-title">Backup Reminder</div>
+        <div class="reminder-text backup-reminder-message">${message}</div>
+        <div class="backup-reminder-tip">Tip: After exporting, find the downloaded file and copy it to overwrite your previous backup.</div>
+        <div class="backup-reminder-actions">
           <button onclick="${typeof window.isFSASupported === 'function' && window.isFSASupported() ? 'hideBackupReminder(); openTripFile();' : 'exportJSON(); checkBackupReminder(); hideBackupReminder();'}"
-                  style="padding: 6px 12px; background: #27AE60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">${typeof window.isFSASupported === 'function' && window.isFSASupported() ? 'Save As' : 'Export Now'}</button>
+                  class="backup-reminder-btn backup-reminder-btn-save">${typeof window.isFSASupported === 'function' && window.isFSASupported() ? 'Save As' : 'Export Now'}</button>
           <button onclick="hideBackupReminder();"
-                  style="padding: 6px 12px; background: #6C757D; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Later</button>
+                  class="backup-reminder-btn backup-reminder-btn-later">Later</button>
         </div>
       </div>
     </div>
