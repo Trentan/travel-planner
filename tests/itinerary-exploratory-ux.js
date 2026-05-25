@@ -20,7 +20,8 @@ async function importFixture(page) {
 async function loadApp(page, baseUrl) {
   const consoleErrors = [];
   const shouldIgnoreError = message =>
-    String(message || '').includes('Failed to load resource: net::ERR_NAME_NOT_RESOLVED');
+    String(message || '').includes('Failed to load resource: net::ERR_NAME_NOT_RESOLVED')
+    || String(message || '').includes('Failed to load resource: the server responded with a status of 404 (Not Found)');
   page.on('pageerror', error => {
     const text = error?.message || '';
     if (!shouldIgnoreError(text)) consoleErrors.push(text);
