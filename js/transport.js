@@ -633,8 +633,8 @@ function renderTransportSubLocationParts(parts, extraClass = '') {
         <span class="transport-sub-location-detail" title="${escapeHtmlText(part.value)}">
           <span class="transport-sub-location-label">${escapeHtmlText(part.label)}</span>
           <span class="transport-sub-location-value">
-            <a href="${getMapSearchUrl(part.value, part.city)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
-              <span class="location-map-icon">🗺️</span> ${escapeHtmlText(part.value)}
+            <a href="${getMapSearchUrl(part.value, part.city)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link" onclick="event.stopPropagation();" title="Open in Google Maps">
+              <span class="location-map-icon">&#x1F5FA;&#xFE0F;</span> ${escapeHtmlText(part.value)}
             </a>
           </span>
         </span>
@@ -1605,5 +1605,6 @@ window.selectJourneyType = selectJourneyType;
 window.promptAddNewCity = promptAddNewCity;
 window.editJourney = editJourney;
 window.editPendingSegment = editPendingSegment;
+
 
 

@@ -29,6 +29,24 @@ function escapeCompactText(text) {
       .replace(/'/g, '&#39;');
 }
 
+function focusCompactInlineEditable(selector) {
+  const el = typeof document !== 'undefined' ? document.querySelector(selector) : null;
+  if (!el) return;
+  try {
+    el.focus();
+    if (typeof window.getSelection === 'function' && typeof document.createRange === 'function') {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  } catch (_) {}
+}
+
 function getJourneyDisplayCost(journey) {
   if (!journey) return '';
   const ownCost = parseFloat(journey.cost || '0');
@@ -124,7 +142,8 @@ function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
   const itemId = `compact-food-${legIndex}-${itemIdx}`;
   const done = !!item.done;
   const rawText = String(item.text || '');
-  const text = escapeCompactText(stripCompactLeadingEmoji(rawText));
+  const cleanText = stripCompactLeadingEmoji(rawText);
+  const text = escapeCompactText(cleanText);
   const lower = rawText.toLowerCase();
   let foodEmoji = '&#127869;&#65039;'; // default: plate
 
@@ -151,9 +170,9 @@ function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
       >
       <span class="compact-food-item-copy ${done ? 'is-done' : ''}">
         <span class="compact-food-item-emoji" aria-hidden="true">${foodEmoji}</span>
-        <span class="compact-food-item-text">${text}</span>
+        <span id="compact-food-text-${legIndex}-${itemIdx}" class="compact-food-item-text ${isEditMode ? 'is-editable' : ''}" ${isEditMode ? `contenteditable="true" onblur="updateFoodText(${legIndex}, ${itemIdx}, this.innerText)"` : ''}>${text}</span>
       </span>
-      ${isEditMode ? `<button type="button" class="compact-inline-delete" title="Delete Food" onclick="event.preventDefault(); event.stopPropagation(); deleteFood(${legIndex}, ${itemIdx});">×</button>` : ''}
+      ${isEditMode ? `<span class="compact-inline-actions"><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-edit" title="Edit Food" onclick="event.preventDefault(); event.stopPropagation(); focusCompactInlineEditable('#compact-food-text-${legIndex}-${itemIdx}');">&#9998;</button><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-remove" title="Delete Food" onclick="event.preventDefault(); event.stopPropagation(); if (confirm('Delete this food quest item?')) deleteFood(${legIndex}, ${itemIdx});">&#10005;</button></span>` : ''}
     </label>
   `;
 }
@@ -185,11 +204,10 @@ function getCompactActivityCategoryEmoji(cat) {
   return emojis[cat] || '📍';
 }
 
+
 function renderCompactSuggestedActivityItem(legIndex, activityIdx, activity) {
-  const itemId = `compact-suggested-activity-${legIndex}-${activityIdx}`;
   const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
 
-  // Check if completed - look for matching activity item in the assigned day
   let isCompleted = false;
   if (isAssigned && appData[legIndex]?.days?.[activity.assignedDayIdx]) {
     const day = appData[legIndex].days[activity.assignedDayIdx];
@@ -199,38 +217,65 @@ function renderCompactSuggestedActivityItem(legIndex, activityIdx, activity) {
     const matchedItem = day.activityItems?.find(item =>
       matchTexts.includes(String(item.text || '').trim())
     );
-    if (matchedItem && matchedItem.done) {
-      isCompleted = true;
-    }
+    if (matchedItem && matchedItem.done) isCompleted = true;
   }
 
   const categoryEmoji = getCompactActivityCategoryEmoji(activity.category);
+  const leadIcon = isAssigned ? '&#10003;' : '&#128204;';
+  const titleClass = isCompleted ? 'compact-suggested-activity-title is-done' : 'compact-suggested-activity-title';
+  const metaParts = [];
+  if (activity.estTime) metaParts.push(`&#9201; ${escapeCompactText(activity.estTime)}`);
+  if (activity.estCost) metaParts.push(`$${escapeCompactText(activity.estCost)}`);
+  const metaLine = metaParts.length > 0
+    ? `<div class="compact-suggested-activity-subline">${metaParts.join(' · ')}</div>`
+    : '';
 
-  // Icon: chevron when assigned, pin when not assigned
-  const actionIcon = isAssigned ? '›' : '📌';
+  const actionIcon = isAssigned ? '&#8250;' : '&#128204;';
   const actionTitle = isAssigned ? 'Move to another day' : 'Assign to day';
   const dragClass = isAssigned ? 'assigned-sight' : 'draggable-sight';
   const dragAttrs = !isAssigned ? ` draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : '';
 
   return `
     <div class="compact-suggested-activity-item ${dragClass}"${dragAttrs}>
-      <span class="compact-suggested-activity-emoji">${categoryEmoji}</span>
-      <span class="compact-suggested-activity-text">${isCompleted ? '<span style="text-decoration:line-through;opacity:0.6;">' : ''}${escapeCompactText(activity.title)}${isCompleted ? '</span>' : ''}</span>
-      <span class="compact-suggested-activity-meta">
-        ${activity.estTime ? `<span class="compact-suggested-activity-time">⏱ ${escapeCompactText(activity.estTime)}</span>` : ''}
-        ${activity.estCost ? `<span class="compact-suggested-activity-cost">$${escapeCompactText(activity.estCost)}</span>` : ''}
-      </span>
+      <span class="compact-suggested-activity-lead" aria-hidden="true">${leadIcon}</span>
+      <span class="compact-suggested-activity-emoji" aria-hidden="true">${categoryEmoji}</span>
+      <div class="compact-suggested-activity-main">
+        <div class="${titleClass}">${escapeCompactText(activity.title)}</div>
+        ${metaLine}
+      </div>
       <button
         type="button"
-        class="compact-activity-action-btn flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-colors ml-auto"
+        class="compact-activity-action-btn"
         onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})"
         title="${actionTitle}"
         aria-label="${actionTitle}"
       >
-        <span style="font-size: 1.1rem; line-height: 1;">${actionIcon}</span>
-        <span style="font-size: 0.75rem; font-weight: 600; padding-left: 2px;">${actionTitle}</span>
+        <span class="compact-activity-action-icon">${actionIcon}</span>
       </button>
     </div>
+  `;
+}
+
+function renderCompactActivitiesCard(leg, legIndex) {
+  const suggestedActivities = Array.isArray(leg.suggestedActivities) ? leg.suggestedActivities : [];
+  const assignedCount = suggestedActivities.filter(activity => activity && activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined).length;
+  const countLabel = `${assignedCount}/${suggestedActivities.length}`;
+
+  const activityLines = suggestedActivities.length > 0
+      ? suggestedActivities.map((activity, activityIdx) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
+      : '<div class="compact-day-empty">No suggested activities.</div>';
+
+  return `
+    <article class="compact-activities-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
+      <div class="compact-activities-summary" style="cursor: default; user-select: none;">
+        <span class="compact-activities-summary-title"><span class="compact-activities-summary-icon" aria-hidden="true">&#128204;</span> Suggested Activities</span>
+        <span class="compact-activities-summary-count">${escapeCompactText(countLabel)}</span>
+      </div>
+      <div class="mobile-surface-card-details expanded">
+        <div class="compact-suggested-activity-list">${activityLines}</div>
+        ${isEditMode ? `<button class="add-btn mt-2" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>` : ''}
+      </div>
+    </article>
   `;
 }
 
@@ -260,17 +305,25 @@ function renderCompactFoodQuestCard(leg, legIndex) {
 }
 
 function renderCompactTipItem(tip, legIndex = null, tipIdx = null) {
-  const text = typeof tip === 'string' ? tip : (tip && tip.text) || '';
-  const deleteBtn = isEditMode && legIndex !== null && tipIdx !== null
-    ? `<button type="button" class="compact-inline-delete" title="Delete Tip" onclick="event.preventDefault(); event.stopPropagation(); deleteLegTip(${legIndex}, ${tipIdx});">×</button>`
+  const rawText = typeof tip === 'string' ? tip : (tip && tip.text) || '';
+  const text = escapeCompactText(rawText);
+  const actions = isEditMode && legIndex !== null && tipIdx !== null
+    ? `<span class="compact-inline-actions"><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-edit" title="Edit Tip" onclick="event.preventDefault(); event.stopPropagation(); focusCompactInlineEditable('#compact-tip-text-${legIndex}-${tipIdx}');">&#9998;</button><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-remove" title="Delete Tip" onclick="event.preventDefault(); event.stopPropagation(); if (confirm('Delete this tip?')) deleteLegTip(${legIndex}, ${tipIdx});">&#10005;</button></span>`
     : '';
+  const tipBody = isEditMode && legIndex !== null && tipIdx !== null
+    ? `
+    <span class="compact-line">
+      <span class="compact-line-emoji">&#128161;</span>
+      <span id="compact-tip-text-${legIndex}-${tipIdx}" class="compact-line-text is-editable" contenteditable="true" onblur="updateLegTip(${legIndex}, ${tipIdx}, this.innerText)">${text || 'Untitled tip'}</span>
+    </span>`
+    : renderCompactEmojiLine({
+      emoji: '&#128161;',
+      text: rawText || 'Untitled tip'
+    });
   return `
     <li class="compact-tip-item">
-      ${renderCompactEmojiLine({
-    emoji: '&#128161;',
-    text: text || 'Untitled tip'
-  })}
-      ${deleteBtn}
+      ${tipBody}
+      ${actions}
     </li>
   `;
 }
@@ -296,30 +349,6 @@ function renderCompactTipsCard(leg, legIndex) {
   `;
 }
 
-function renderCompactActivitiesCard(leg, legIndex) {
-  const suggestedActivities = Array.isArray(leg.suggestedActivities) ? leg.suggestedActivities : [];
-  const unassignedActivities = suggestedActivities
-    .map((activity, activityIdx) => ({ activity, activityIdx }))
-    .filter(({ activity }) => activity && (activity.assignedDayIdx === null || activity.assignedDayIdx === undefined));
-  const countLabel = `${unassignedActivities.length} unscheduled`;
-
-  const activityLines = unassignedActivities.length > 0
-      ? unassignedActivities.map(({ activity, activityIdx }) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
-      : '<div class="compact-day-empty">No unscheduled activities.</div>';
-
-  return `
-    <article class="compact-activities-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
-      <div class="compact-activities-summary" style="cursor: default; user-select: none;">
-        <span class="compact-activities-summary-title"><span class="compact-activities-summary-icon" aria-hidden="true">&#128205;</span> Activities</span>
-        <span class="compact-activities-summary-count">${escapeCompactText(countLabel)}</span>
-      </div>
-      <div class="mobile-surface-card-details expanded">
-        <div class="compact-suggested-activity-list">${activityLines}</div>
-        ${isEditMode ? `<button class="add-btn mt-2" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>` : ''}
-      </div>
-    </article>
-  `;
-}
 
 function renderCompactMobileLegInfoCluster(leg, legIndex) {
   const tips = Array.isArray(leg.legTips) ? leg.legTips : [];
@@ -360,9 +389,11 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
           style="border-left-color:${accentColor};"
           onclick="toggleTipsCardDetails(event, '${legId}')"
           aria-expanded="${tipsExpanded ? 'true' : 'false'}"
+          aria-label="Tips ${tips.length}"
+          title="Tips"
         >
           <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#128161;</span> Tips</span>
-          <span class="compact-mobile-info-chip-count">${escapeCompactText(tipsLabel)}</span>
+          <span class="compact-mobile-info-chip-count">${tips.length}</span>
         </button>
         <button
           type="button"
@@ -386,8 +417,8 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
           aria-label="Activities ${escapeCompactText(activitiesLabel)} assigned"
           title="Activities"
         >
-          <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#128205;</span> Activities</span>
-          <span class="compact-mobile-info-chip-count">${escapeCompactText(activitiesLabel)}</span>
+          <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#127919;</span> Fun</span>
+          <span class="compact-mobile-info-chip-count">${unassignedActivities.length}</span>
         </button>
       </div>
       ${tipsExpanded ? `
@@ -455,8 +486,8 @@ function renderJourneySubLocationTextHtml(text) {
           <span class="transport-sub-location-detail">
             ${label ? `<span class="transport-sub-location-label">${escapeCompactText(label)}</span>` : ''}
             <span class="transport-sub-location-value">
-              <a href="${getMapSearchUrl(value)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
-                <span class="location-map-icon">🗺️</span> ${escapeCompactText(value)}
+              <a href="${getMapSearchUrl(value)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link" onclick="event.stopPropagation();" title="Open in Google Maps">
+                <span class="location-map-icon">&#x1F5FA;&#xFE0F;</span> ${escapeCompactText(value)}
               </a>
             </span>
           </span>
@@ -601,13 +632,18 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     dateLabel: dayDateLabel,
     title: `Day ${dayIdx + 1}`,
     subtitle: routeLabel,
+    primaryAction: `
+      <span class="compact-day-header-chips">
+        ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
+        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.72rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}</span>
+      </span>
+    `,
     summary: `
           <div class="compact-day-summary-row">
             <span class="compact-day-summary-desc">${escapeCompactText(day.desc || 'No description yet')}</span>
-            ${dayTotal ? `<span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${escapeCompactText(dayTotal)}</span>` : ''}
+            <span class="compact-day-summary-meta flex items-center gap-1.5 shrink-0"></span>
           </div>
         `,
-    primaryAction: '',
     details,
     detailsOpen: true
   })}
@@ -634,11 +670,57 @@ function renderCompactDayPager(leg, legIndex) {
     const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
     const slideId = getCompactDaySlideId(leg.id, dayIdx);
     const active = dayIdx === initialIndex;
-    const chipLabel = `Day ${dayIdx + 1} ${day.day} ${dayDateLabel} ${day.from} -> ${day.to}`;
+    const chipDate = `Day ${dayIdx + 1}, ${day.day} ${dayDateLabel}`;
+    const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
+    const isTravelDay = String(day.from || '').trim().toLowerCase() !== String(day.to || '').trim().toLowerCase();
+    const hasTravelJourney = Array.isArray(dayJourneys) && dayJourneys.some(j => {
+      const from = String(j?.fromLocation || '').trim().toLowerCase();
+      const to = String(j?.toLocation || '').trim().toLowerCase();
+      const type = String(j?.transportType || '').trim().toLowerCase();
+      return (from && to && from !== to) || type === 'flight' || type === 'plane';
+    });
+    let chipRoute = day.to || day.from || leg.label || 'City';
+    if ((isTravelDay || hasTravelJourney) && Array.isArray(dayJourneys) && dayJourneys.length > 0) {
+      const inferJourneyType = (journey) => {
+        const type = String(journey?.transportType || '').toLowerCase();
+        if (type) return type;
+        const blob = [
+          journey?.provider,
+          journey?.journeyName,
+          journey?.notes,
+          journey?.fromLocation,
+          journey?.toLocation
+        ].filter(Boolean).join(' ').toLowerCase();
+        if (/(flight|air|airline|airport|terminal|depart|arrive|eva|qantas|jetstar|emirates|lufthansa|scoot|thai airways)/.test(blob)) return 'flight';
+        if (/(train|rail|metro|bahn|trenitalia|renfe|jr\b|tgv|intercity)/.test(blob)) return 'train';
+        if (/(bus|coach|shuttle)/.test(blob)) return 'bus';
+        if (/(ferry|boat|catamaran|ship)/.test(blob)) return 'ferry';
+        return 'car';
+      };
+      const typePriority = { flight: 5, plane: 5, train: 4, rail: 4, bus: 3, ferry: 2, boat: 2, car: 1 };
+      let bestJourney = dayJourneys[0];
+      let bestType = inferJourneyType(bestJourney);
+      let bestScore = typePriority[bestType] || 0;
+      dayJourneys.forEach(journey => {
+        const t = inferJourneyType(journey);
+        const score = typePriority[t] || 0;
+        if (score > bestScore) {
+          bestJourney = journey;
+          bestType = t;
+          bestScore = score;
+        }
+      });
+      const icon = getTransportIcon(bestType);
+      const cityLabel = String(day.to || bestJourney.toLocation || day.from || 'City').trim();
+      chipRoute = `${icon} ${cityLabel}`;
+    } else if (isTravelDay || hasTravelJourney) {
+      chipRoute = String(day.to || day.from || leg.label || 'City').trim();
+    }
     return `
       <button
         type="button"
         class="compact-day-chip${active ? ' active' : ''}"
+        style="--day-chip-accent: ${escapeCompactText(leg.colour || '#3b82f6')};"
         data-leg-id="${escapeCompactText(leg.id)}"
         data-day-index="${dayIdx}"
         data-target-slide="${slideId}"
@@ -647,7 +729,8 @@ function renderCompactDayPager(leg, legIndex) {
         aria-controls="${slideId}"
         onclick="return compactItineraryGoToDay(event, this.dataset.legId, this.dataset.dayIndex)"
       >
-        <span class="compact-day-chip-label">${escapeCompactText(chipLabel)}</span>
+        <span class="compact-day-chip-date">${escapeCompactText(chipDate)}</span>
+        <span class="compact-day-chip-route">${escapeCompactText(chipRoute)}</span>
       </button>
     `;
   }).join('');
@@ -659,7 +742,6 @@ function renderCompactDayPager(leg, legIndex) {
         <div class="compact-day-rail" role="tablist" aria-label="Days for ${escapeCompactText(leg.label || 'this leg')}">
           ${chips}
         </div>
-        <div class="compact-day-pager-counter" data-role="compact-day-length">${totalDays} day${totalDays === 1 ? '' : 's'}</div>
         <div class="compact-day-carousel" data-leg-id="${escapeCompactText(leg.id)}">
           ${slides}
         </div>
@@ -845,8 +927,6 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
     chip.classList.toggle('is-active', active);
     chip.setAttribute('aria-selected', active ? 'true' : 'false');
     chip.setAttribute('aria-current', active ? 'true' : 'false');
-    chip.style.background = active ? 'rgba(8, 145, 178, 0.14)' : '';
-    chip.style.borderColor = active ? 'rgba(8, 145, 178, 0.45)' : '';
   });
 
   if (positionLabel) positionLabel.textContent = `Day ${safeIndex + 1} of ${total}`;
@@ -860,9 +940,12 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
   const activeChip = chips[safeIndex];
   if (rail && activeChip) {
     if (typeof scrollChildIntoHorizontalView === 'function') {
-      scrollChildIntoHorizontalView(rail, activeChip, { behavior: 'auto', align: 'center' });
+      scrollChildIntoHorizontalView(rail, activeChip, { behavior: 'smooth', align: 'center' });
     } else {
-      rail.scrollLeft = Math.max(0, activeChip.offsetLeft - rail.offsetLeft - (rail.clientWidth - activeChip.offsetWidth) / 2);
+      rail.scrollTo({
+        left: Math.max(0, activeChip.offsetLeft - rail.offsetLeft - (rail.clientWidth - activeChip.offsetWidth) / 2),
+        behavior: 'smooth'
+      });
     }
   }
 }
@@ -1418,9 +1501,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       dayIndex,
       itemIndex,
       sortValue: getDailyTimelineItemSortValue(dayDate, item.startTime, 4000 + itemIndex),
-      actionHtml: `
-        <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${itemIndex})">×</button>
-      `
+      actionHtml: ''
     });
   });
 
@@ -1474,8 +1555,8 @@ function renderDailyTimelineRow(item, compact = false) {
           <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
           <div class="daily-timeline-title-and-checkbox">
             <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
-            ${checkboxHtml}
           </div>
+          ${checkboxHtml ? `<div class="daily-timeline-inline-check">${checkboxHtml}</div>` : ''}
         </div>
         ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> · ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
         ${item.notes ? `<div class="daily-timeline-notes">💬 ${escapeCompactText(item.notes)}</div>` : ''}
@@ -1494,14 +1575,8 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
     : '<div class="timeline-empty">No scheduled items yet. Add transport, stays, or activities to build the day.</div>';
   if (items.length === 0) return empty;
   const { scheduled, anytime } = getDailyTimelineBuckets(items);
-  const summaryParts = [
-    scheduled.length ? `${scheduled.length} scheduled` : '',
-    anytime.length ? `${anytime.length} anytime` : ''
-  ].filter(Boolean).join(' · ');
-
   return `
     <div class="daily-timeline-shell ${compact ? 'daily-timeline-shell-compact' : ''}">
-      ${summaryParts ? `<div class="daily-timeline-summary">${escapeCompactText(summaryParts)}</div>` : ''}
       ${scheduled.length ? `
         <div class="timeline-section-label">Scheduled</div>
         <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
@@ -1693,11 +1768,11 @@ function toggleFoodQuestDetails(e, legId) {
   }
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
-  if (expandedFoodQuestLegs.has(legId)) {
-    expandedFoodQuestLegs.delete(legId);
-  } else {
-    expandedFoodQuestLegs.add(legId);
-  }
+  const wasOpen = expandedFoodQuestLegs.has(legId);
+  expandedTipsLegs.delete(legId);
+  expandedActivitiesLegs.delete(legId);
+  expandedFoodQuestLegs.delete(legId);
+  if (!wasOpen) expandedFoodQuestLegs.add(legId);
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }
@@ -1709,11 +1784,11 @@ function toggleTipsCardDetails(e, legId) {
   }
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
-  if (expandedTipsLegs.has(legId)) {
-    expandedTipsLegs.delete(legId);
-  } else {
-    expandedTipsLegs.add(legId);
-  }
+  const wasOpen = expandedTipsLegs.has(legId);
+  expandedFoodQuestLegs.delete(legId);
+  expandedActivitiesLegs.delete(legId);
+  expandedTipsLegs.delete(legId);
+  if (!wasOpen) expandedTipsLegs.add(legId);
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }
@@ -1725,11 +1800,11 @@ function toggleActivitiesCardDetails(e, legId) {
   }
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
-  if (expandedActivitiesLegs.has(legId)) {
-    expandedActivitiesLegs.delete(legId);
-  } else {
-    expandedActivitiesLegs.add(legId);
-  }
+  const wasOpen = expandedActivitiesLegs.has(legId);
+  expandedTipsLegs.delete(legId);
+  expandedFoodQuestLegs.delete(legId);
+  expandedActivitiesLegs.delete(legId);
+  if (!wasOpen) expandedActivitiesLegs.add(legId);
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }
@@ -2663,4 +2738,5 @@ function expandToCity(cityId) {
   }
 }
 window.expandToCity = expandToCity;
+
 

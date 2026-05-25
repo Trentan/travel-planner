@@ -985,9 +985,11 @@ function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) {
 function toggleJourneyCompleted(e, journeyId) {
   e.stopPropagation();
   const targetId = String(journeyId);
-  const journey = (window.journeys || []).find(j => String(j.id) === targetId);
-  if (journey) {
-    journey.done = e.target.checked;
+  const matches = (window.journeys || []).filter(j => String(j.id) === targetId || String(j.journeyId || '') === targetId);
+  if (matches.length > 0) {
+    matches.forEach(journey => {
+      journey.done = e.target.checked;
+    });
     saveData();
     rebuildItineraryPreservingScroll();
   }

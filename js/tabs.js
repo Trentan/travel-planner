@@ -38,8 +38,8 @@ function renderStayLocationDetails(stay, extraClass = '') {
       <span class="transport-sub-location-detail" title="${escapeHtmlText(stay.location)}">
         <span class="transport-sub-location-label">Location</span>
         <span class="transport-sub-location-value">
-          <a href="${getMapSearchUrl(stay.location, cityName)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
-            <span class="location-map-icon">🗺️</span> ${escapeHtmlText(stay.location)}
+          <a href="${getMapSearchUrl(stay.location, cityName)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link" onclick="event.stopPropagation();" title="Open in Google Maps">
+            <span class="location-map-icon">&#x1F5FA;&#xFE0F;</span> ${escapeHtmlText(stay.location)}
           </a>
         </span>
       </span>
@@ -671,3 +671,4 @@ function buildBudgetTab() {
   html += `</tbody></table></div>`;
   container.innerHTML = html;
 }
+
