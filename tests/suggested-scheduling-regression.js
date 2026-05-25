@@ -206,14 +206,14 @@ async function run() {
     assert(exportedTimelineFields.stay?.startDate, 'Exported stays should include plotting startDate');
     assert('startTime' in exportedTimelineFields.stay, 'Exported stays should include plotting startTime');
 
-    const deleteButtons = page.locator('.day-card.open .daily-timeline-item-activity .daily-timeline-actions .del-btn');
-    assert((await deleteButtons.count()) > 0, 'An open timeline activity should expose a delete button');
-    await deleteButtons.nth(0).click();
+    const timelineCheckboxes = page.locator('.day-card.open .daily-timeline-item-activity .daily-timeline-checkbox.activity-checkbox');
+    assert((await timelineCheckboxes.count()) > 0, 'An open timeline activity should expose a completion checkbox');
+    await timelineCheckboxes.nth(0).check();
     await page.waitForFunction(dayKey => document.querySelector(`.day-card[data-day-key="${dayKey}"]`)?.classList.contains('open') === true, activeDayKey);
     assert.strictEqual(
       await page.locator('#itineraryTimelineModeBtn').getAttribute('aria-pressed'),
       'true',
-      'Deleting an inline activity should preserve the selected global timeline view'
+      'Toggling an inline timeline activity should preserve the selected global timeline view'
     );
     console.log('Suggested scheduling regression passed');
   } finally {

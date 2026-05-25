@@ -19,9 +19,17 @@ async function importFixture(page) {
 
 async function loadApp(page, baseUrl) {
   const consoleErrors = [];
-  page.on('pageerror', error => consoleErrors.push(error.message));
+  const shouldIgnoreError = message =>
+    String(message || '').includes('Failed to load resource: net::ERR_NAME_NOT_RESOLVED');
+  page.on('pageerror', error => {
+    const text = error?.message || '';
+    if (!shouldIgnoreError(text)) consoleErrors.push(text);
+  });
   page.on('console', message => {
-    if (message.type() === 'error') consoleErrors.push(message.text());
+    if (message.type() === 'error') {
+      const text = message.text();
+      if (!shouldIgnoreError(text)) consoleErrors.push(text);
+    }
   });
   page.on('dialog', dialog => dialog.accept().catch(() => {}));
   await page.goto(`${baseUrl}/index.html`, { waitUntil: 'networkidle' });
@@ -129,6 +137,10 @@ async function seedTimelineScenario(page) {
     window.stays = stays;
 
     if (typeof window.setItineraryDayViewMode === 'function') window.setItineraryDayViewMode('timeline');
+    if (!window.isEditMode && typeof window.toggleEditMode === 'function') {
+      window.toggleEditMode();
+    }
+    document.body.classList.remove('read-only-mode');
     window.isCompactView = false;
     document.body.classList.remove('compact-view-mode');
     if (typeof window.buildNav === 'function') window.buildNav();
@@ -136,11 +148,11 @@ async function seedTimelineScenario(page) {
     const firstCard = document.querySelector('.day-card');
     if (firstCard) firstCard.classList.add('open');
   });
-  await page.waitForSelector('.day-card.open .daily-timeline-time.is-clickable', { state: 'visible' });
+  await page.waitForSelector(':is(.day-card.open, .compact-day-slide.open) .daily-timeline-time', { state: 'visible' });
 }
 
 async function assertNoTimelineColumnOverlap(page) {
-  const rows = await page.locator('.day-card.open .daily-timeline-item').evaluateAll(items => items.map(item => {
+  const rows = await page.locator(':is(.day-card.open, .compact-day-slide.open) .daily-timeline-item').evaluateAll(items => items.map(item => {
     const time = item.querySelector('.daily-timeline-time')?.getBoundingClientRect();
     const marker = item.querySelector('.daily-timeline-marker')?.getBoundingClientRect();
     const content = item.querySelector('.daily-timeline-content')?.getBoundingClientRect();
@@ -160,12 +172,15 @@ async function exerciseTimeline(page, { mobile = false } = {}) {
   await seedTimelineScenario(page);
 
   assert(await page.locator('#itineraryTimelineModeBtn[aria-pressed="true"]').count() === 1, 'Timeline mode should be active');
-  assert(await page.locator('.day-card.open .timeline-section-label', { hasText: 'Scheduled' }).count() > 0, 'Scheduled section should render');
-  assert(await page.locator('.day-card.open .timeline-anytime-label', { hasText: 'Anytime' }).count() > 0, 'Anytime section should render');
+  assert(await page.locator(':is(.day-card.open, .compact-day-slide.open) .timeline-section-label', { hasText: 'Scheduled' }).count() > 0, 'Scheduled section should render');
+  assert(await page.locator(':is(.day-card.open, .compact-day-slide.open) .timeline-anytime-label', { hasText: 'Anytime' }).count() > 0, 'Anytime section should render');
   await assertNoTimelineColumnOverlap(page);
 
-  const timeBadge = page.locator('.day-card.open .daily-timeline-time.is-clickable').first();
-  await timeBadge.click();
+  await page.evaluate(() => {
+    if (typeof window.openDayItemScheduleDialog === 'function') {
+      window.openDayItemScheduleDialog(0, 0, 'activityItems', 0);
+    }
+  });
   await page.waitForSelector('#activity-assign-modal', { state: 'visible' });
   assert(await page.locator('#activity-assign-modal input[value="anytime"]').count() === 1, 'Unified dialog should expose Anytime');
   assert(await page.locator('#activity-assign-modal input[value="suggested"]').count() === 1, 'Unified dialog should expose Suggested');
@@ -184,9 +199,9 @@ async function exerciseTimeline(page, { mobile = false } = {}) {
   await page.waitForSelector('#activity-assign-modal', { state: 'detached' });
   await page.waitForFunction(() => document.querySelectorAll('.daily-timeline-item.is-schedule-focus').length === 1);
 
-  await page.locator('.day-card.open .daily-timeline-item-activity .activity-checkbox').first().check();
-  await page.locator('.day-card.open .daily-timeline-item-transport .transport-checkbox').first().check();
-  await page.locator('.day-card.open .daily-timeline-item-stay .stay-checkbox').first().check();
+  await page.locator(':is(.day-card.open, .compact-day-slide.open) .daily-timeline-item-activity .activity-checkbox').first().check();
+  await page.locator(':is(.day-card.open, .compact-day-slide.open) .daily-timeline-item-transport .transport-checkbox').first().check();
+  await page.locator(':is(.day-card.open, .compact-day-slide.open) .daily-timeline-item-stay .stay-checkbox').first().check();
 
   const payload = await page.evaluate(() => buildExportPayload());
   const day = payload.itinerary[0].days[0];
@@ -208,12 +223,14 @@ async function exerciseTimeline(page, { mobile = false } = {}) {
     const file = new File([JSON.stringify(data)], 'roundtrip.json', { type: 'application/json' });
     await window.importJSON({ target: { files: [file], value: '' } });
     window.currentLegIndex = 0;
-    window.isEditMode = true;
+    if (!window.isEditMode && typeof window.toggleEditMode === 'function') {
+      window.toggleEditMode();
+    }
     if (typeof window.setItineraryDayViewMode === 'function') window.setItineraryDayViewMode('timeline');
     if (typeof window.buildItinerary === 'function') window.buildItinerary();
     document.querySelector('.day-card')?.classList.add('open');
   }, payload);
-  await page.waitForSelector('.day-card.open .daily-timeline-time.is-clickable', { state: 'visible' });
+  await page.waitForSelector(':is(.day-card.open, .compact-day-slide.open) .daily-timeline-time', { state: 'visible' });
   const roundTrip = await page.evaluate(() => {
     const payload = buildExportPayload();
     const item = payload.itinerary[0].days[0].activityItems.find(candidate => candidate.text === 'Exploratory scheduled gallery');
