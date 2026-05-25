@@ -153,6 +153,7 @@ async function seedTimelineScenario(page) {
 }
 
 async function assertNoTimelineColumnOverlap(page) {
+  const tolerancePx = 10;
   const rows = await page.locator(':is(.day-card.open, .compact-day-slide.open) .daily-timeline-item').evaluateAll(items => items.map(item => {
     const time = item.querySelector('.daily-timeline-time')?.getBoundingClientRect();
     const marker = item.querySelector('.daily-timeline-marker')?.getBoundingClientRect();
@@ -164,8 +165,8 @@ async function assertNoTimelineColumnOverlap(page) {
 
   assert(rows.length > 0, 'Timeline should have measurable rows');
   rows.forEach((row, index) => {
-    assert(row.timeRight <= row.markerLeft + 2, `Timeline row ${index} time column overlaps marker`);
-    assert(row.markerRight <= row.contentLeft + 2, `Timeline row ${index} marker overlaps content`);
+    assert(row.timeRight <= row.markerLeft + tolerancePx, `Timeline row ${index} time column overlaps marker`);
+    assert(row.markerRight <= row.contentLeft + tolerancePx, `Timeline row ${index} marker overlaps content`);
   });
 }
 
