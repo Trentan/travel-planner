@@ -192,9 +192,11 @@ function renderCompactSuggestedActivityItem(legIndex, activityIdx, activity) {
   // Icon: chevron when assigned, pin when not assigned
   const actionIcon = isAssigned ? '›' : '📌';
   const actionTitle = isAssigned ? 'Move to another day' : 'Assign to day';
+  const dragClass = isAssigned ? 'assigned-sight' : 'draggable-sight';
+  const dragAttrs = !isAssigned ? ` draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : '';
 
   return `
-    <div class="compact-suggested-activity-item">
+    <div class="compact-suggested-activity-item ${dragClass}"${dragAttrs}>
       <span class="compact-suggested-activity-emoji">${categoryEmoji}</span>
       <span class="compact-suggested-activity-text">${isCompleted ? '<span style="text-decoration:line-through;opacity:0.6;">' : ''}${escapeCompactText(activity.title)}${isCompleted ? '</span>' : ''}</span>
       <span class="compact-suggested-activity-meta">
@@ -553,15 +555,19 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const details = `
     <div class="day-planner-shell day-planner-shell-${useGroupedView ? 'grouped' : 'timeline'}">
       <div class="day-view-panel day-view-panel-${useGroupedView ? 'grouped' : 'timeline'}">
+        <div class="detail-block drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
         <div class="compact-day-grid">
           ${useGroupedView ? groupedBlock : timelineBlock}
+        </div>
         </div>
       </div>
     </div>
   `;
+  const dayKey = `${day.day}-${day.date}`;
+  const isActive = dayIdx === 0;
 
   return `
-    <section class="compact-day-slide" id="${slideId}" data-day-index="${dayIdx}">
+    <section class="compact-day-slide day-card ${isActive ? 'open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
       ${renderMobileSurfaceCard({
     cardClass: 'compact-day-surface',
     accentColor: leg.colour,
@@ -809,6 +815,7 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
 
   slides.forEach((slide, idx) => {
     slide.classList.toggle('is-active', idx === safeIndex);
+    slide.classList.toggle('open', idx === safeIndex);
   });
 
   chips.forEach((chip, idx) => {
@@ -985,7 +992,7 @@ function buildCompactItineraryDesktop() {
   const stack = document.createElement('div');
   stack.className = 'compact-desktop-stack';
   stack.innerHTML = appData.map((leg, legIndex) => `
-    <section class="compact-desktop-leg" id="leg-${escapeHtmlText(leg.id || `compact-${legIndex}`)}">
+    <section class="compact-desktop-leg leg" id="leg-${escapeHtmlText(leg.id || `compact-${legIndex}`)}">
       ${renderCompactLegCard(leg, legIndex)}
     </section>
   `).join('');
@@ -1704,8 +1711,8 @@ function buildItinerary() {
   // Check window.isCompactView for cross-module access
   const isCompact = typeof window !== 'undefined' && window.isCompactView;
   const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (window.innerWidth <= 768);
-  // Desktop itinerary uses compact card/chip renderer in read-only mode.
-  if (isCompact || (!isMobile && !isEditMode)) {
+  // Desktop itinerary default: compact card/chip renderer.
+  if (!isMobile || isCompact) {
     if (isMobile) buildCompactItinerary();
     else buildCompactItineraryDesktop();
     return;
