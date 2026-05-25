@@ -1216,6 +1216,10 @@ function editJourney(journeyId) {
   if (header) header.textContent = '✈️ Edit journey';
 
   modal.style.display = 'flex';
+  const modalBody = modal.querySelector('.modal-body');
+  if (modalBody) modalBody.scrollTop = 0;
+  const pendingList = document.getElementById('pendingSegmentsList');
+  if (pendingList) pendingList.scrollTop = 0;
 }
 
 // Track if form is "dirty" (has unsaved user changes)
@@ -1346,6 +1350,10 @@ function openAddJourneyModal() {
     if (header) header.textContent = '✈️ Add journey';
 
     modal.style.display = 'flex';
+    const modalBody = modal.querySelector('.modal-body');
+    if (modalBody) modalBody.scrollTop = 0;
+    const pendingList = document.getElementById('pendingSegmentsList');
+    if (pendingList) pendingList.scrollTop = 0;
   } catch (e) {
     console.error('[openAddJourneyModal] Error:', e);
   }
