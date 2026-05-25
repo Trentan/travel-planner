@@ -418,6 +418,9 @@ let pendingFileHandle = null;
 let fileWriteFailed = false;
 let importedJsonWithoutWriteAccess = localStorage.getItem('travelApp_json_write_warning') === 'true';
 const ACTIVE_FILE_HANDLE_DB_KEY = 'activeFileHandle';
+let saveQueuePromise = null;
+let saveQueued = false;
+let saveQueuedShowTick = false;
 
 // Journeys data - make global so all modules can access
 var journeys = [];
@@ -2469,7 +2472,7 @@ function displayTimestampStatus() {
   timestampEl.textContent = message;
 }
 
-async function saveData(showTick = true) {
+async function runSaveData(showTick = true) {
     const t = document.getElementById('mainTitle');
     const s = document.getElementById('mainSubtitle');
     if (t && t.innerText.trim()) titleData.title = t.innerText;
@@ -2523,13 +2526,28 @@ async function saveData(showTick = true) {
     syncJsonWriteWarning();
   }
 
-  if(showTick) {
+  if (showTick) {
     const status = document.getElementById('saveStatus');
     if (status) {
-      status.textContent = savedToFile
-        ? "✓ Saved to JSON file"
-        : (isJsonWriteWarningActive() ? "Saved locally - JSON file not updated" : "✓ Saved locally");
-      setTimeout(() => status.textContent = "", 2000);
+      if (savedToFile) {
+        status.textContent = '✓ Saved to JSON file';
+        status.style.color = '#16a34a';
+      } else if (hasActiveFileHandle()) {
+        status.textContent = 'Save failed - file not updated';
+        status.style.color = '#dc2626';
+      } else if (isJsonWriteWarningActive()) {
+        status.textContent = 'Saved locally - JSON file not updated';
+        status.style.color = '#d97706';
+      } else {
+        status.textContent = 'Saved locally';
+        status.style.color = '#64748b';
+      }
+      if (typeof window.syncMobileMenuStatus === 'function') window.syncMobileMenuStatus();
+      setTimeout(() => {
+        status.textContent = '';
+        status.style.color = '';
+        if (typeof window.syncMobileMenuStatus === 'function') window.syncMobileMenuStatus();
+      }, 2500);
     }
   }
 
@@ -2538,6 +2556,27 @@ async function saveData(showTick = true) {
   }
 
   return savedToFile;
+}
+
+async function saveData(showTick = true) {
+  saveQueued = true;
+  saveQueuedShowTick = saveQueuedShowTick || !!showTick;
+
+  if (saveQueuePromise) return saveQueuePromise;
+
+  saveQueuePromise = (async () => {
+    while (saveQueued) {
+      const shouldShowTick = saveQueuedShowTick;
+      saveQueued = false;
+      saveQueuedShowTick = false;
+      await runSaveData(shouldShowTick);
+    }
+    return true;
+  })().finally(() => {
+    saveQueuePromise = null;
+  });
+
+  return saveQueuePromise;
 }
 
 const TRIP_DATE_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -2610,10 +2649,45 @@ function normalizeTripLegsData(legs) {
     return { title: raw, location: '' };
   }
 
+  function normalizeActivityMatchText(value) {
+    let text = String(value || '').trim().toLowerCase();
+    if (!text) return '';
+
+    // Remove leading emoji/icon markers used by UI renderers.
+    text = text.replace(/^[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\s]+/gu, '').trim();
+    // Strip common inline metadata that can leak into saved activity text.
+    text = text.replace(/\s*[⏱🕒]\s*[^$|•]+/gu, '');
+    text = text.replace(/\s*\$\s*\d[\d.,]*/gu, '');
+    text = text.replace(/\s*[›»]\s*$/gu, '');
+    // Remove common action-label text if present in pasted/legacy rows.
+    text = text.replace(/\bmove to another day\b/gi, '').trim();
+
+    text = text.replace(/\s+/g, ' ').trim();
+    // Collapse common "title - details" variants to a base title for matching/dedupe.
+    const separators = [' — ', ' – ', ' - ', ' | ', ' @ '];
+    for (const separator of separators) {
+      const idx = text.indexOf(separator);
+      if (idx > 0) {
+        text = text.slice(0, idx).trim();
+        break;
+      }
+    }
+    return text;
+  }
+
+  function buildActivityDedupKey(value) {
+    const normalized = normalizeActivityMatchText(value);
+    if (!normalized) return '';
+    return normalized
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   function isItemMatchingActivity(itemText, activity) {
     if (!activity || !itemText) return false;
-    const cleanItem = String(itemText).trim().toLowerCase();
-    const cleanTitle = String(activity.title || '').trim().toLowerCase();
+    const cleanItem = buildActivityDedupKey(itemText);
+    const cleanTitle = buildActivityDedupKey(activity.title || '');
     if (cleanItem === cleanTitle) return true;
 
     const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
@@ -2622,7 +2696,9 @@ function normalizeTripLegsData(legs) {
     if (cleanItemNoEmoji === cleanTitleNoEmoji) return true;
 
     if (typeof getSuggestedActivityMatchTexts === 'function') {
-      const matchTexts = getSuggestedActivityMatchTexts(activity).map(t => String(t).trim().toLowerCase());
+      const matchTexts = getSuggestedActivityMatchTexts(activity)
+        .map(t => buildActivityDedupKey(t))
+        .filter(Boolean);
       if (matchTexts.includes(cleanItem)) return true;
     }
     return false;
@@ -2761,6 +2837,34 @@ function normalizeTripLegsData(legs) {
           usedSuggestionIndices.add(suggested.length - 1);
         }
       });
+
+      // Deduplicate duplicate day activity rows by normalized text on the same day.
+      if (Array.isArray(day.activityItems) && day.activityItems.length > 1) {
+        const dedupedDayItems = [];
+        const seenDayItems = new Map();
+        day.activityItems.forEach(item => {
+          if (!item || typeof item !== 'object') return;
+          const key = buildActivityDedupKey(item.text || '');
+          if (!key) {
+            dedupedDayItems.push(item);
+            return;
+          }
+          const existingIndex = seenDayItems.get(key);
+          if (existingIndex === undefined) {
+            seenDayItems.set(key, dedupedDayItems.length);
+            dedupedDayItems.push(item);
+            return;
+          }
+          const existing = dedupedDayItems[existingIndex];
+          if ((!existing.notes || existing.notes === '') && item.notes) existing.notes = item.notes;
+          if ((!existing.location || existing.location === '') && item.location) existing.location = item.location;
+          if ((!existing.time || existing.time === '1 hr') && item.time) existing.time = item.time;
+          if ((!existing.cost || existing.cost === '0') && item.cost) existing.cost = item.cost;
+          if ((existing.startTime || '') === '' && item.startTime) existing.startTime = item.startTime;
+          if ((existing.endTime || '') === '' && item.endTime) existing.endTime = item.endTime;
+        });
+        day.activityItems = dedupedDayItems;
+      }
     });
 
     (leg.suggestedActivities || []).forEach(activity => {
@@ -2771,6 +2875,33 @@ function normalizeTripLegsData(legs) {
       if (activity.startTime === undefined) activity.startTime = '';
       if (activity.endTime === undefined) activity.endTime = '';
     });
+
+    // Deduplicate activities that share the same normalized title + assignment target.
+    const deduped = [];
+    const seen = new Map();
+    (leg.suggestedActivities || []).forEach(activity => {
+      if (!activity || typeof activity !== 'object') return;
+      const titleKey = buildActivityDedupKey(activity.title || '');
+      const dayKey = activity.assignedDayIdx === null || activity.assignedDayIdx === undefined
+        ? 'unassigned'
+        : String(activity.assignedDayIdx);
+      const key = `${titleKey}__${dayKey}`;
+      const existingIndex = seen.get(key);
+      if (existingIndex === undefined) {
+        seen.set(key, deduped.length);
+        deduped.push(activity);
+        return;
+      }
+      const existing = deduped[existingIndex];
+      // Keep richer fields when collapsing duplicates.
+      if ((!existing.notes || existing.notes === '') && activity.notes) existing.notes = activity.notes;
+      if ((!existing.location || existing.location === '') && activity.location) existing.location = activity.location;
+      if ((!existing.estTime || existing.estTime === '1 hr') && activity.estTime) existing.estTime = activity.estTime;
+      if ((!existing.estCost || existing.estCost === '0') && activity.estCost) existing.estCost = activity.estCost;
+      if ((existing.startTime || '') === '' && activity.startTime) existing.startTime = activity.startTime;
+      if ((existing.endTime || '') === '' && activity.endTime) existing.endTime = activity.endTime;
+    });
+    leg.suggestedActivities = deduped;
   });
   return legs;
 }
@@ -4055,7 +4186,7 @@ async function importJSON(event) {
     return;
   }
 
-  if (!file.name.endsWith('.json')) {
+  if (!String(file.name || '').toLowerCase().endsWith('.json')) {
     alert('Please select a .json file. The file you selected is not valid JSON.');
     event.target.value = '';
     pendingFileHandle = null;

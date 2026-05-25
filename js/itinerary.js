@@ -123,6 +123,23 @@ function getCompactDaySlideId(legId, dayIdx) {
 function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
   const itemId = `compact-food-${legIndex}-${itemIdx}`;
   const done = !!item.done;
+  const rawText = String(item.text || '');
+  const text = escapeCompactText(stripCompactLeadingEmoji(rawText));
+  const lower = rawText.toLowerCase();
+  let foodEmoji = '&#127869;&#65039;'; // default: plate
+
+  if (/pizza/.test(lower)) foodEmoji = '&#127829;';
+  else if (/burger|hamburger/.test(lower)) foodEmoji = '&#127828;';
+  else if (/sushi/.test(lower)) foodEmoji = '&#127843;';
+  else if (/ramen|noodle|udon|pho/.test(lower)) foodEmoji = '&#127836;';
+  else if (/taco|burrito/.test(lower)) foodEmoji = '&#127790;';
+  else if (/curry/.test(lower)) foodEmoji = '&#127835;';
+  else if (/lobster|prawn|shrimp|crab|fish|squid|seafood|snorkel/.test(lower)) foodEmoji = '&#129424;';
+  else if (/salad|vegan|vegetarian/.test(lower)) foodEmoji = '&#129367;';
+  else if (/coffee|cafe|espresso/.test(lower)) foodEmoji = '&#9749;';
+  else if (/beer|bar|cocktail|wine/.test(lower)) foodEmoji = '&#127863;';
+  else if (/dessert|ice cream|gelato|cake|sweet/.test(lower)) foodEmoji = '&#127856;';
+  else if (/thai|som tam|massaman|khao|gaeng|tom/.test(lower)) foodEmoji = '&#127834;';
 
   return `
     <label class="compact-food-item" for="${itemId}">
@@ -132,11 +149,11 @@ function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
         ${done ? 'checked' : ''}
         onchange="toggleFoodCompleted(event, ${legIndex}, ${itemIdx})"
       >
-      <span class="compact-food-item-copy">${renderCompactEmojiLine({
-    emoji: '🍽️',
-    text: item.text,
-    done
-  })}</span>
+      <span class="compact-food-item-copy ${done ? 'is-done' : ''}">
+        <span class="compact-food-item-emoji" aria-hidden="true">${foodEmoji}</span>
+        <span class="compact-food-item-text">${text}</span>
+      </span>
+      ${isEditMode ? `<button type="button" class="compact-inline-delete" title="Delete Food" onclick="event.preventDefault(); event.stopPropagation(); deleteFood(${legIndex}, ${itemIdx});">×</button>` : ''}
     </label>
   `;
 }
@@ -242,14 +259,18 @@ function renderCompactFoodQuestCard(leg, legIndex) {
   `;
 }
 
-function renderCompactTipItem(tip) {
+function renderCompactTipItem(tip, legIndex = null, tipIdx = null) {
   const text = typeof tip === 'string' ? tip : (tip && tip.text) || '';
+  const deleteBtn = isEditMode && legIndex !== null && tipIdx !== null
+    ? `<button type="button" class="compact-inline-delete" title="Delete Tip" onclick="event.preventDefault(); event.stopPropagation(); deleteLegTip(${legIndex}, ${tipIdx});">×</button>`
+    : '';
   return `
     <li class="compact-tip-item">
       ${renderCompactEmojiLine({
     emoji: '&#128161;',
     text: text || 'Untitled tip'
   })}
+      ${deleteBtn}
     </li>
   `;
 }
@@ -257,7 +278,7 @@ function renderCompactTipItem(tip) {
 function renderCompactTipsCard(leg, legIndex) {
   const tips = Array.isArray(leg.legTips) ? leg.legTips : [];
   const tipsList = tips.length > 0
-      ? `<ul class="compact-tips-list">${tips.map(tip => renderCompactTipItem(tip)).join('')}</ul>`
+      ? `<ul class="compact-tips-list">${tips.map((tip, tipIdx) => renderCompactTipItem(tip, legIndex, tipIdx)).join('')}</ul>`
       : '<div class="compact-day-empty">No tips saved for this leg yet.</div>';
   const countLabel = `${tips.length} tip${tips.length === 1 ? '' : 's'}`;
 
@@ -277,12 +298,14 @@ function renderCompactTipsCard(leg, legIndex) {
 
 function renderCompactActivitiesCard(leg, legIndex) {
   const suggestedActivities = Array.isArray(leg.suggestedActivities) ? leg.suggestedActivities : [];
-  const assignedCount = suggestedActivities.filter(a => a.assignedDayIdx !== null && a.assignedDayIdx !== undefined).length;
-  const countLabel = `${assignedCount}/${suggestedActivities.length}`;
+  const unassignedActivities = suggestedActivities
+    .map((activity, activityIdx) => ({ activity, activityIdx }))
+    .filter(({ activity }) => activity && (activity.assignedDayIdx === null || activity.assignedDayIdx === undefined));
+  const countLabel = `${unassignedActivities.length} unscheduled`;
 
-  const activityLines = suggestedActivities.length > 0
-      ? suggestedActivities.map((activity, activityIdx) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
-      : '<div class="compact-day-empty">No suggested activities available.</div>';
+  const activityLines = unassignedActivities.length > 0
+      ? unassignedActivities.map(({ activity, activityIdx }) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
+      : '<div class="compact-day-empty">No unscheduled activities.</div>';
 
   return `
     <article class="compact-activities-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
@@ -312,19 +335,21 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
   const foodProgressWidth = foodItems.length > 0 ? Math.round((completedFoodCount / foodItems.length) * 100) : 0;
 
   // Count assigned vs unassigned suggested activities
-  const assignedCount = suggestedActivities.filter(a => a.assignedDayIdx !== null && a.assignedDayIdx !== undefined).length;
-  const activitiesLabel = `${assignedCount}/${suggestedActivities.length}`;
+  const unassignedActivities = suggestedActivities
+    .map((activity, activityIdx) => ({ activity, activityIdx }))
+    .filter(({ activity }) => activity && (activity.assignedDayIdx === null || activity.assignedDayIdx === undefined));
+  const activitiesLabel = `${unassignedActivities.length} unscheduled`;
   const accentColor = escapeCompactText(leg.colour || '#24485d');
 
   const tipsList = tips.length > 0
-      ? `<ul class="compact-mobile-info-list">${tips.map(tip => renderCompactTipItem(tip)).join('')}</ul>`
+      ? `<ul class="compact-mobile-info-list">${tips.map((tip, tipIdx) => renderCompactTipItem(tip, legIndex, tipIdx)).join('')}</ul>`
       : '<div class="compact-day-empty">No tips saved for this leg yet.</div>';
   const foodLines = foodItems.length > 0
       ? foodItems.map((item, itemIdx) => renderCompactFoodQuestItem(legIndex, item, itemIdx)).join('')
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
-  const activityLines = suggestedActivities.length > 0
-      ? suggestedActivities.map((activity, activityIdx) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
-      : '<div class="compact-day-empty">No suggested activities available.</div>';
+  const activityLines = unassignedActivities.length > 0
+      ? unassignedActivities.map(({ activity, activityIdx }) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
+      : '<div class="compact-day-empty">No unscheduled activities.</div>';
 
   return `
     <div class="compact-mobile-leg-info">
@@ -572,6 +597,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       ${renderMobileSurfaceCard({
     cardClass: 'compact-day-surface',
     accentColor: leg.colour,
+    accentWidth: '6px',
     dateLabel: dayDateLabel,
     title: `Day ${dayIdx + 1}`,
     subtitle: routeLabel,
@@ -608,6 +634,7 @@ function renderCompactDayPager(leg, legIndex) {
     const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
     const slideId = getCompactDaySlideId(leg.id, dayIdx);
     const active = dayIdx === initialIndex;
+    const chipLabel = `Day ${dayIdx + 1} ${day.day} ${dayDateLabel} ${day.from} -> ${day.to}`;
     return `
       <button
         type="button"
@@ -620,9 +647,7 @@ function renderCompactDayPager(leg, legIndex) {
         aria-controls="${slideId}"
         onclick="return compactItineraryGoToDay(event, this.dataset.legId, this.dataset.dayIndex)"
       >
-        <span class="compact-day-chip-day">Day ${dayIdx + 1}</span>
-        <span class="compact-day-chip-date">${escapeCompactText(day.day)} ${escapeCompactText(dayDateLabel)}</span>
-        <span class="compact-day-chip-route">${escapeCompactText(day.from)} → ${escapeCompactText(day.to)}</span>
+        <span class="compact-day-chip-label">${escapeCompactText(chipLabel)}</span>
       </button>
     `;
   }).join('');
@@ -631,22 +656,14 @@ function renderCompactDayPager(leg, legIndex) {
 
   return `
       <div class="compact-day-pager" data-leg-id="${escapeCompactText(leg.id)}" data-total-days="${totalDays}" data-pager-key="${escapeCompactText(pagerKey)}" data-active-index="${initialIndex}">
-        <div class="compact-day-pager-head">
-          <div class="compact-day-pager-copy">
-            <span class="compact-day-pager-position" data-role="compact-day-position">Day 1 of ${totalDays}</span>
-          </div>
-          <div class="compact-day-pager-counter" data-role="compact-day-counter">1/${totalDays}</div>
+        <div class="compact-day-rail" role="tablist" aria-label="Days for ${escapeCompactText(leg.label || 'this leg')}">
+          ${chips}
         </div>
-      <div class="compact-day-rail" role="tablist" aria-label="Days for ${escapeCompactText(leg.label || 'this leg')}">
-        ${chips}
+        <div class="compact-day-pager-counter" data-role="compact-day-length">${totalDays} day${totalDays === 1 ? '' : 's'}</div>
+        <div class="compact-day-carousel" data-leg-id="${escapeCompactText(leg.id)}">
+          ${slides}
+        </div>
       </div>
-      <div class="compact-day-progress" aria-hidden="true">
-        <span class="compact-day-progress-fill" data-role="compact-day-progress-fill"></span>
-      </div>
-      <div class="compact-day-carousel" data-leg-id="${escapeCompactText(leg.id)}">
-        ${slides}
-      </div>
-    </div>
   `;
 }
 
@@ -815,15 +832,21 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
   const safeIndex = Math.max(0, Math.min(total - 1, Number(nextIndex) || 0));
 
   slides.forEach((slide, idx) => {
-    slide.classList.toggle('is-active', idx === safeIndex);
-    slide.classList.toggle('open', idx === safeIndex);
+    const active = idx === safeIndex;
+    slide.classList.toggle('is-active', active);
+    slide.classList.toggle('open', active);
+    slide.hidden = !active;
+    slide.style.display = active ? '' : 'none';
   });
 
   chips.forEach((chip, idx) => {
     const active = idx === safeIndex;
     chip.classList.toggle('active', active);
+    chip.classList.toggle('is-active', active);
     chip.setAttribute('aria-selected', active ? 'true' : 'false');
     chip.setAttribute('aria-current', active ? 'true' : 'false');
+    chip.style.background = active ? 'rgba(8, 145, 178, 0.14)' : '';
+    chip.style.borderColor = active ? 'rgba(8, 145, 178, 0.45)' : '';
   });
 
   if (positionLabel) positionLabel.textContent = `Day ${safeIndex + 1} of ${total}`;
@@ -1843,17 +1866,20 @@ function buildItinerary() {
     html += `<div class="itinerary-leg-panels flex flex-col md:grid md:grid-cols-3 gap-4 md:gap-5 p-4 md:p-5 border-b border-slate-200/80 dark:border-slate-700/80 bg-slate-100/60 dark:bg-slate-900/40">
       <div class="itinerary-info-panel itinerary-info-panel-tips flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
         <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">💡 Tips</h4>
-        <ul class="itinerary-panel-list tips-list space-y-2">${(leg.legTips || []).map((t, i) => `<li class="itinerary-panel-item tip-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><span class="flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
+        <ul class="itinerary-panel-list tips-list flex flex-col gap-2 mt-1.5 pl-4">${(leg.legTips || []).map((t, i) => `<li class="compact-tip-item group" style="position:relative;"><button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity absolute -left-5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 rounded" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button>${renderCompactEmojiLine({emoji: '💡', text: `<span class="flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span>`})}</li>`).join('')}</ul>
         ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>` : ''}
       </div>
       <div class="itinerary-info-panel itinerary-info-panel-food flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
         <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">🍔 Food Quests</h4>
-        <ul class="itinerary-panel-list food-list space-y-2">${(leg.cityFood || []).map((f, i) => `<li class="itinerary-panel-item quest-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500 cursor-pointer shrink-0" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span class="flex-1 outline-none transition-opacity min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">×</button></li>`).join('')}</ul>
+        <ul class="itinerary-panel-list food-list flex flex-col gap-2 mt-1.5 pl-4">${(leg.cityFood || []).map((f, i) => `<li class="compact-food-quest-item group" style="position:relative;"><button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity absolute -left-5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 rounded" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">×</button><label class="compact-food-quest-label"><input type="checkbox" class="compact-food-quest-checkbox" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span class="compact-food-quest-text flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span></label></li>`).join('')}</ul>
         ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>` : ''}
       </div>
       <div class="itinerary-info-panel itinerary-info-panel-activities flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
         <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">📌 Suggested Activities</h4>
-        <ul class="itinerary-panel-list activity-list unified-activities space-y-1.5">${(leg.suggestedActivities || []).map((activity, activityIdx) => {
+        <ul class="itinerary-panel-list activity-list unified-activities flex flex-col gap-2 mt-1.5 pl-4">${(leg.suggestedActivities || [])
+          .map((activity, activityIdx) => ({ activity, activityIdx }))
+          .filter(({ activity }) => activity && (activity.assignedDayIdx === null || activity.assignedDayIdx === undefined))
+          .map(({ activity, activityIdx }) => {
       const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
       let isCompleted = false; let dayLabel = '';
       if (isAssigned && leg.days[activity.assignedDayIdx]) {
@@ -1861,15 +1887,30 @@ function buildItinerary() {
         const matchTexts = typeof getSuggestedActivityMatchTexts === 'function'
           ? getSuggestedActivityMatchTexts(activity)
           : [activity.title];
-        const matchedActivity = leg.days[activity.assignedDayIdx].activityItems.find(a => matchTexts.includes(String(a.text || '').trim()));
+        const matchedActivity = (leg.days[activity.assignedDayIdx].activityItems || []).find(a => matchTexts.includes(String(a.text || '').trim()));
         if (matchedActivity && matchedActivity.done) isCompleted = true;
       }
       const badgeStateClass = isCompleted ? 'is-complete' : 'is-scheduled';
       const badgeIcon = isCompleted ? '✓' : '✓';
       const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
-      const categoryEmoji = getCategoryEmoji(activity.category);
+      const categoryEmoji = getCompactActivityCategoryEmoji(activity.category);
       const notesMetaHtml = activity.notes ? ` · <span class="sight-inline-meta-notes" title="${escapeHtmlText(activity.notes)}">💬 ${escapeHtmlText(activity.notes)}</span>` : '';
-      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>${!isAssigned ? `<span class="drag-handle opacity-50 hover:opacity-100 cursor-grab shrink-0 mt-0.5" title="Drag to assign">⠿</span>` : `<span class="assigned-badge shrink-0 mt-0.5 ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji shrink-0 mt-0.5">${categoryEmoji}</span><div class="flex flex-col min-w-0 flex-1"><span class="break-words" style="${isCompleted ? 'text-decoration:line-through;opacity:0.6;' : ''}">${activity.title}</span><span class="sight-inline-meta text-xs text-slate-400 mt-0.5 block truncate">⏱ ${activity.estTime} · <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span>${notesMetaHtml}</span></div><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn shrink-0" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
+      const actionIcon = isAssigned ? '›' : '📌';
+      const actionTitle = isAssigned ? 'Move to another day' : 'Assign to day';
+      const dragClass = isAssigned ? 'assigned-sight' : 'draggable-sight';
+      const dragAttrs = !isAssigned ? ` draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : '';
+      return `<li class="compact-suggested-activity-item group ${dragClass}"${dragAttrs} style="position:relative;">
+        <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity absolute -left-5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 rounded" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>
+        <span class="compact-suggested-activity-emoji">${categoryEmoji}</span>
+        <span class="compact-suggested-activity-text flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'title', this.innerText)" style="${isCompleted ? 'text-decoration:line-through;opacity:0.6;' : ''}">${escapeCompactText(activity.title)}</span>
+        <span class="compact-suggested-activity-meta">
+          ${activity.estTime ? `<span class="compact-suggested-activity-time outline-none" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'estTime', this.innerText)">⏱ ${escapeCompactText(activity.estTime)}</span>` : ''}
+          ${activity.estCost ? `<span class="compact-suggested-activity-cost outline-none" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'estCost', this.innerText)">$${escapeCompactText(activity.estCost)}</span>` : ''}
+        </span>
+        <button type="button" class="compact-activity-action-btn flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-colors ml-auto" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})" title="${actionTitle}">
+          <span class="text-base">${actionIcon}</span>
+        </button>
+      </li>`;
     }).join('')}</ul>
         ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>` : ''}
       </div>
@@ -2622,3 +2663,4 @@ function expandToCity(cityId) {
   }
 }
 window.expandToCity = expandToCity;
+

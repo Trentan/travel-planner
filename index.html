@@ -756,9 +756,9 @@
 <script src="./js/ai.js"></script>
 <script src="./js/guide.js"></script>
 <script src="./js/map.js"></script>
-<script src="./js/ui.js"></script>
-<script src="./js/itinerary.js"></script>
-  <script src="./js/backup.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/itinerary.js"></script>
+  <script src="js/backup.js"></script>
 <script src="./js/auto-stays.js"></script>
 <script src="./js/transport.js"></script>
 <script src="./js/booking-intake.js"></script>
@@ -789,10 +789,28 @@
     }
   }
 
+  const isLocalDevHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(err => console.log('SW registration failed:', err));
-    });
+    if (isLocalDevHost) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.getRegistrations()
+          .then(registrations => Promise.all(registrations.map(reg => reg.unregister())))
+          .catch(err => console.log('SW unregister failed:', err));
+        if (window.caches && typeof window.caches.keys === 'function') {
+          window.caches.keys()
+            .then(keys => Promise.all(
+              keys
+                .filter(key => key.startsWith('travel-planner-'))
+                .map(key => window.caches.delete(key))
+            ))
+            .catch(err => console.log('Cache cleanup failed:', err));
+        }
+      });
+    } else {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(err => console.log('SW registration failed:', err));
+      });
+    }
   }
 
   window.addEventListener('beforeinstallprompt', (event) => {

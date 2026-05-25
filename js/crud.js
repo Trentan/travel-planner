@@ -7,7 +7,29 @@ function deleteLeg(idx) {
 function deleteFood(legIdx, foodIdx) { appData[legIdx].cityFood.splice(foodIdx, 1); saveData(); buildItinerary(); }
 function deleteRun(legIdx, runIdx) { appData[legIdx].cityRun.splice(runIdx, 1); saveData(); buildItinerary(); }
 function deleteSight(legIdx, sightIdx) { appData[legIdx].suggestedSights.splice(sightIdx, 1); saveData(); buildItinerary(); }
-function deleteActivity(legIdx, activityIdx) { appData[legIdx].suggestedActivities.splice(activityIdx, 1); saveData(); buildItinerary(); }
+async function deleteActivity(legIdx, activityIdx) {
+  const leg = appData[legIdx];
+  const activity = leg?.suggestedActivities?.[activityIdx];
+  if (!leg || !activity) return;
+
+  // If scheduled on a day, remove matching day activity row as well.
+  const assignedDayIdx = activity.assignedDayIdx;
+  if (assignedDayIdx !== null && assignedDayIdx !== undefined && leg.days?.[assignedDayIdx]) {
+    const day = leg.days[assignedDayIdx];
+    if (Array.isArray(day.activityItems)) {
+      const matchTexts = typeof getSuggestedActivityMatchTexts === 'function'
+        ? getSuggestedActivityMatchTexts(activity).map(t => String(t || '').trim())
+        : [String(activity.title || '').trim()];
+      const matchSet = new Set(matchTexts.filter(Boolean));
+      day.activityItems = day.activityItems.filter(item => !matchSet.has(String(item?.text || '').trim()));
+    }
+  }
+
+  leg.suggestedActivities.splice(activityIdx, 1);
+  await saveData();
+  if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
+  else buildItinerary();
+}
 function deleteLegTip(legIdx, tipIdx) { appData[legIdx].legTips.splice(tipIdx, 1); saveData(); buildItinerary(); }
 
 function getSuggestedActivityDayText(activity) {

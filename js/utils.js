@@ -267,6 +267,7 @@ function scrollChildIntoHorizontalView(container, child, { behavior = 'auto', al
 function renderMobileSurfaceCard({
                                    cardClass = '',
                                    accentColor = '',
+                                   accentWidth = '',
                                    dateLabel = '',
                                    title = '',
                                    subtitle = '',
@@ -277,7 +278,9 @@ function renderMobileSurfaceCard({
                                    details = '',
                                    detailsOpen = false
                                  }) {
-  const accentStyle = accentColor ? ` style="border-left-color: ${accentColor};"` : '';
+  const accentStyle = accentColor
+    ? ` style="border-left-color: ${accentColor};${accentWidth ? ` border-left-width: ${accentWidth}; border-left-style: solid;` : ''}"`
+    : '';
   return `
     <article class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-700/50 rounded-xl p-4 shadow-sm flex flex-col gap-3 relative ${cardClass}"${accentStyle}>
       <div class="flex justify-between items-start gap-3">
