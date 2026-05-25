@@ -36,7 +36,21 @@
               "cityId": "city-brisbane"
             }
           ],
-          "activityItems": []
+          "activityItems": [
+            {
+              "text": "🏃 Kangaroo Point Cliffs path — last Brisbane run if time allows",
+              "cost": "0",
+              "time": "1 hr",
+              "done": false,
+              "notes": "",
+              "location": "last Brisbane run if time allows",
+              "startDate": "2026-06-08",
+              "startTime": "09:00",
+              "endDate": "2026-06-08",
+              "endTime": "10:00",
+              "cityId": "city-brisbane"
+            }
+          ]
         }
       ],
       "suggestedActivities": [
@@ -45,13 +59,15 @@
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
-          "assignedDayIdx": null,
+          "assignedDayIdx": 0,
           "cityId": "city-brisbane",
-          "startTime": "",
-          "endTime": "",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": ""
+          "startTime": "09:00",
+          "endTime": "10:00",
+          "assignedDate": "2026-06-08",
+          "startDate": "2026-06-08",
+          "endDate": "2026-06-08",
+          "notes": "",
+          "location": "last Brisbane run if time allows"
         }
       ],
       "legTips": [
