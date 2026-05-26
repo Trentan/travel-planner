@@ -1170,6 +1170,7 @@ function buildCompactItinerary() {
         ? `${firstDay.date}${lastDay.date && lastDay.date !== firstDay.date ? ` â†’ ${lastDay.date}` : ''}`
         : (firstDay ? firstDay.date : '');
 
+    const flightTimeLabel = getLegFlightButtonTimeLabel(leg);
     const legCard = `
       <article class="compact-leg-card">
         <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
@@ -1196,7 +1197,7 @@ function buildCompactItinerary() {
       <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
         <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(chipDateRange || 'Trip')}</span>
         <span class="mobile-swipe-chip-title">${escapeHtmlText(displayLegLabel)}</span>
-        <span class="mobile-swipe-chip-route">${escapeHtmlText(nightLabel)}</span>
+        <span class="mobile-swipe-chip-route">${escapeHtmlText(flightTimeLabel || nightLabel)}</span>
       </button>
     `);
   });
@@ -1215,6 +1216,54 @@ function buildCompactItinerary() {
   container.appendChild(pagerRoot);
   setupMobileSwipePagers(container);
   setupCompactCityNavSync(container);
+}
+
+function getLegFlightButtonTimeLabel(leg) {
+  if (!leg) return '';
+  const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+  const legJourneys = journeysSource.filter(j => !leg.id || j.legId === leg.id);
+  if (legJourneys.length === 0) return '';
+
+  const isFlight = entry => {
+    const type = String(entry?.transportType || '').toLowerCase();
+    if (type === 'flight' || type === 'plane') return true;
+    const blob = [
+      entry?.provider,
+      entry?.journeyName,
+      entry?.notes,
+      entry?.fromLocation,
+      entry?.toLocation
+    ].filter(Boolean).join(' ').toLowerCase();
+    return /(flight|air|airline|airport|terminal|depart|arrive|eva|qantas|jetstar|emirates|lufthansa|scoot|thai airways)/.test(blob);
+  };
+
+  const flightEntries = legJourneys.filter(isFlight);
+  if (flightEntries.length === 0) return '';
+
+  const byJourneyId = new Map();
+  flightEntries.forEach(seg => {
+    const gid = seg.journeyId || seg.id;
+    if (!byJourneyId.has(gid)) byJourneyId.set(gid, []);
+    byJourneyId.get(gid).push(seg);
+  });
+
+  const firstSegments = [];
+  const lastSegments = [];
+  byJourneyId.forEach(segments => {
+    const ordered = [...segments].sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+    firstSegments.push(ordered[0]);
+    lastSegments.push(ordered[ordered.length - 1]);
+  });
+
+  const firstFlight = firstSegments.sort((a, b) => getTimelineScore(a.departureDate || a.dayDate, a.departureTime || '', Number.MAX_SAFE_INTEGER) - getTimelineScore(b.departureDate || b.dayDate, b.departureTime || '', Number.MAX_SAFE_INTEGER))[0];
+  const lastFlight = lastSegments.sort((a, b) => getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime || '', Number.MIN_SAFE_INTEGER) - getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime || '', Number.MIN_SAFE_INTEGER))[0];
+
+  const depTime = String(firstFlight?.departureTime || '').trim();
+  const arrTime = String(lastFlight?.arrivalTime || lastFlight?.departureTime || '').trim();
+  if (depTime && arrTime) return `${depTime} -> ${arrTime}`;
+  return depTime || arrTime || '';
 }
 
 function moveToAdjacentCityDayPager(currentPager, direction) {
