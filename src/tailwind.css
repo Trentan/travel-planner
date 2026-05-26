@@ -4833,6 +4833,11 @@
     padding: 0.25rem !important;
   }
 
+  /* Desktop detailed itinerary: display selected day only */
+  body:not(.mobile-app-mode):not(.compact-view-mode) .compact-day-slide:not(.is-active) {
+    display: none;
+  }
+
   .compact-activities-card,
   .compact-food-quest-card,
   .compact-tips-card {
