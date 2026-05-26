@@ -503,7 +503,90 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
   const dayStayInfo = getStayDisplayForDay(day.date, day.to);
   const dayTotal = getDayTotal(day);
-  const routeLabel = `${day.from} → ${day.to}`;
+  const fromCity = String(day.from || '').trim();
+  const toCity = String(day.to || '').trim();
+  const isTravelDay = fromCity && toCity && fromCity.toLowerCase() !== toCity.toLowerCase();
+  const hasTravelJourney = Array.isArray(dayJourneys) && dayJourneys.some(j => {
+    const from = String(j?.fromLocation || '').trim().toLowerCase();
+    const to = String(j?.toLocation || '').trim().toLowerCase();
+    return from && to && from !== to;
+  });
+  const cityCore = toCity || fromCity || '';
+  const typePriority = { flight: 5, plane: 5, train: 4, rail: 4, bus: 3, ferry: 2, boat: 2, car: 1 };
+  const inferJourneyType = journey => {
+    const type = String(journey?.transportType || '').toLowerCase();
+    if (type) return type;
+    const blob = [journey?.provider, journey?.journeyName, journey?.notes, journey?.fromLocation, journey?.toLocation]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    if (/(flight|air|airline|airport|terminal|depart|arrive|eva|qantas|jetstar|emirates|lufthansa|scoot|thai airways)/.test(blob)) return 'flight';
+    if (/(train|rail|metro|bahn|trenitalia|renfe|jr\b|tgv|intercity)/.test(blob)) return 'train';
+    if (/(bus|coach|shuttle)/.test(blob)) return 'bus';
+    if (/(ferry|boat|catamaran|ship)/.test(blob)) return 'ferry';
+    return 'car';
+  };
+  const pickBestIcon = (journeys = []) => {
+    if (!Array.isArray(journeys) || journeys.length === 0) return '';
+    let bestType = inferJourneyType(journeys[0]);
+    let bestScore = typePriority[bestType] || 0;
+    journeys.forEach(journey => {
+      const t = inferJourneyType(journey);
+      const score = typePriority[t] || 0;
+      if (score > bestScore) {
+        bestType = t;
+        bestScore = score;
+      }
+    });
+    return getTransportIcon(bestType);
+  };
+  const normalizeCityText = value => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+  const cityMatches = (location, city) => {
+    const loc = normalizeCityText(location);
+    const c = normalizeCityText(city);
+    if (!loc || !c) return false;
+    return loc === c || loc.includes(c) || c.includes(loc);
+  };
+  const endpointSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+  const endpointCandidates = endpointSource.filter(j => !leg.id || j.legId === leg.id);
+  const byJourneyId = new Map();
+  endpointCandidates.forEach(seg => {
+    const gid = seg.journeyId || seg.id;
+    if (!byJourneyId.has(gid)) byJourneyId.set(gid, []);
+    byJourneyId.get(gid).push(seg);
+  });
+  const dayIso = normalizeDate(day.date);
+  const inboundJourneys = [];
+  const outboundJourneys = [];
+  byJourneyId.forEach(segments => {
+    const ordered = [...segments].sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+    const first = ordered[0];
+    const last = ordered[ordered.length - 1];
+    const depDate = normalizeDate(first?.departureDate || first?.dayDate || '');
+    const arrDate = normalizeDate(last?.arrivalDate || last?.departureDate || last?.dayDate || '');
+    const depCity = String(first?.fromLocation || '').trim();
+    const arrCity = String(last?.toLocation || '').trim();
+
+    if (cityCore && arrDate === dayIso && cityMatches(arrCity, cityCore) && depCity && !cityMatches(depCity, cityCore)) {
+      inboundJourneys.push(last);
+    }
+    if (cityCore && depDate === dayIso && cityMatches(depCity, cityCore) && arrCity && !cityMatches(arrCity, cityCore)) {
+      outboundJourneys.push(first);
+    }
+  });
+
+  const inboundIcon = pickBestIcon(inboundJourneys);
+  const outboundIcon = pickBestIcon(outboundJourneys);
+  const travelIcon = pickBestIcon(dayJourneys || []);
+  const routeLabel = (isTravelDay || hasTravelJourney)
+    ? `${fromCity}${travelIcon ? ` ${travelIcon}` : ''} -> ${toCity}`
+    : `${inboundIcon ? `${inboundIcon} ` : ''}${cityCore}${outboundIcon ? ` ${outboundIcon}` : ''}`;
   const slideId = getCompactDaySlideId(leg.id, dayIdx);
 
   const transportLines = dayJourneys.map(journey => {
@@ -634,8 +717,8 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     subtitle: routeLabel,
     primaryAction: `
       <span class="compact-day-header-chips">
-        ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
         <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.72rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}</span>
+        ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
       </span>
     `,
     summary: `
@@ -802,6 +885,26 @@ function setupCompactItineraryPagers(root = document) {
     pager.__compactScrollToIndex = scrollToIndex;
     pager.__compactSetActive = setActive;
 
+    let touchStartX = 0;
+    let touchStartY = 0;
+    carousel.addEventListener('touchstart', evt => {
+      const t = evt.touches && evt.touches[0];
+      if (!t) return;
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+    }, { passive: true });
+    carousel.addEventListener('touchend', evt => {
+      const t = evt.changedTouches && evt.changedTouches[0];
+      if (!t) return;
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      if (Math.abs(dx) < 28 || Math.abs(dx) <= Math.abs(dy)) return;
+      const atLast = Number(pager.dataset.activeIndex || 0) >= (total - 1);
+      const atFirst = Number(pager.dataset.activeIndex || 0) <= 0;
+      if (dx < 0 && atLast) moveToAdjacentCityDayPager(pager, 1);
+      if (dx > 0 && atFirst) moveToAdjacentCityDayPager(pager, -1);
+    }, { passive: true });
+
     chips.forEach(chip => {
       chip.addEventListener('click', () => {
         scrollToIndex(Number(chip.dataset.dayIndex || 0));
@@ -917,8 +1020,6 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
     const active = idx === safeIndex;
     slide.classList.toggle('is-active', active);
     slide.classList.toggle('open', active);
-    slide.hidden = !active;
-    slide.style.display = active ? '' : 'none';
   });
 
   chips.forEach((chip, idx) => {
@@ -1027,7 +1128,10 @@ function buildCompactItinerary() {
   const slidesHtml = [];
   const railHtml = [];
 
-  appData.forEach((leg, legIndex) => {
+  const mobileLegSequence = getCompactMobileLegSequence();
+
+  mobileLegSequence.forEach((entry, legIndex) => {
+    const leg = entry.leg;
     const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
     const nightLabel = getLegNightSummary(leg).label;
     const legCost = getLegTotalCost(leg);
@@ -1065,12 +1169,12 @@ function buildCompactItinerary() {
     `;
 
     slidesHtml.push(`
-      <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide" data-role="mobile-swipe-slide" data-slide-index="${legIndex}">
+      <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(leg.id || '')}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
         ${legCard}
       </div>
     `);
     railHtml.push(`
-      <button type="button" class="mobile-swipe-chip compact-city-chip" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
+      <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
         <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(chipDateRange || 'Trip')}</span>
         <span class="mobile-swipe-chip-title">${escapeHtmlText(displayLegLabel)}</span>
         <span class="mobile-swipe-chip-route">${escapeHtmlText(nightLabel)}</span>
@@ -1091,6 +1195,58 @@ function buildCompactItinerary() {
 
   container.appendChild(pagerRoot);
   setupMobileSwipePagers(container);
+  setupCompactCityNavSync(container);
+}
+
+function moveToAdjacentCityDayPager(currentPager, direction) {
+  const cityPager = document.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]');
+  if (!cityPager) return;
+  const citySlides = Array.from(cityPager.querySelectorAll('.compact-city-slide[data-slide-index]'));
+  const activeCityIndex = Math.max(0, Math.min(citySlides.length - 1, Number(cityPager.dataset.activeIndex || 0)));
+  const nextCityIndex = activeCityIndex + Number(direction || 0);
+  if (nextCityIndex < 0 || nextCityIndex >= citySlides.length) return;
+
+  const nextCitySlide = citySlides[nextCityIndex];
+  const carousel = cityPager.querySelector('[data-role="mobile-swipe-carousel"]');
+  if (carousel && nextCitySlide) {
+    if (typeof scrollChildIntoHorizontalView === 'function') {
+      scrollChildIntoHorizontalView(carousel, nextCitySlide, { behavior: 'smooth', align: 'start' });
+    } else {
+      carousel.scrollTo({
+        left: Math.max(0, nextCitySlide.offsetLeft - carousel.offsetLeft),
+        behavior: 'smooth'
+      });
+    }
+  }
+  cityPager.dataset.activeIndex = String(nextCityIndex);
+  if (typeof setMobilePagerActiveIndex === 'function') {
+    setMobilePagerActiveIndex(cityPager.dataset.pagerKey || 'compact-city-swipe', nextCityIndex);
+  }
+
+  const nextDayPager = nextCitySlide ? nextCitySlide.querySelector('.compact-day-pager') : null;
+  if (!nextDayPager) return;
+  const targetDayIndex = direction > 0 ? 0 : Math.max(0, Number(nextDayPager.dataset.totalDays || 1) - 1);
+  if (typeof nextDayPager.__compactScrollToIndex === 'function') {
+    nextDayPager.__compactScrollToIndex(targetDayIndex);
+  } else if (typeof nextDayPager.__compactSetActive === 'function') {
+    nextDayPager.__compactSetActive(targetDayIndex);
+  } else {
+    syncCompactDayPagerState(nextDayPager, targetDayIndex);
+  }
+}
+
+function getCompactMobileLegSequence() {
+  const baseLegs = Array.isArray(appData) ? appData : [];
+  const baseEntries = baseLegs.map((leg, idx) => {
+    const firstDay = Array.isArray(leg.days) && leg.days[0] ? leg.days[0] : null;
+    return {
+      leg,
+      score: getLegDateScore(leg, idx),
+      cityId: String(leg.id || '').startsWith('city-') ? String(leg.id) : '',
+      cityName: cleanCityNavLabel(leg.label || firstDay?.to || firstDay?.from || '')
+    };
+  });
+  return baseEntries.sort((a, b) => a.score - b.score);
 }
 
 function buildCompactItineraryDesktop() {
@@ -2457,6 +2613,19 @@ function scrollToElementWithNavOffset(el) {
 }
 
 function findCompactCitySlideIndex(cityId, cityName) {
+  const domSlides = Array.from(document.querySelectorAll('.compact-city-swipe-pager .compact-city-slide[data-slide-index]'));
+  if (domSlides.length > 0) {
+    const cityIdNorm = String(cityId || '').trim().toLowerCase();
+    const cityNameNorm = String(cityName || '').trim().toLowerCase();
+    const direct = domSlides.find(slide => {
+      const sid = String(slide.dataset.cityId || '').trim().toLowerCase();
+      const legId = String(slide.dataset.legId || '').trim().toLowerCase();
+      return (cityIdNorm && (sid === cityIdNorm || legId === cityIdNorm || legId === cityIdNorm.replace(/^city-/, '')))
+        || (cityNameNorm && legId.includes(cityNameNorm));
+    });
+    if (direct) return Number(direct.dataset.slideIndex || -1);
+  }
+
   if (!Array.isArray(appData) || appData.length === 0) return -1;
 
   const normalizedCityId = String(cityId || '').trim().toLowerCase();
@@ -2486,6 +2655,86 @@ function findCompactCitySlideIndex(cityId, cityName) {
   }
 
   return -1;
+}
+
+function resolveCityNavButtonForLeg(leg) {
+  const nav = document.getElementById('cityNav');
+  if (!nav || !leg) return null;
+  const buttons = Array.from(nav.querySelectorAll('.city-nav-btn[data-city]'));
+  if (buttons.length === 0) return null;
+
+  const legIdRaw = String(leg.id || '').trim();
+  const legId = legIdRaw.toLowerCase();
+  const legIdAlt = legId.replace(/^city-/, '');
+  const legLabel = cleanCityNavLabel(leg.label || '').toLowerCase();
+
+  let btn = buttons.find(b => {
+    const cityId = String(b.dataset.city || '').trim().toLowerCase();
+    return cityId && (cityId === legId || cityId === legIdAlt || `city-${cityId}` === legId);
+  });
+  if (btn) return btn;
+
+  if (legLabel) {
+    btn = buttons.find(b => {
+      const cityId = String(b.dataset.city || '').trim();
+      const city = (Array.isArray(citiesData) ? citiesData.find(c => c.id === cityId) : null);
+      return city && cleanCityNavLabel(city.name || '').toLowerCase() === legLabel;
+    });
+  }
+  return btn || null;
+}
+
+function syncCityNavHighlightToLeg(leg) {
+  const nav = document.getElementById('cityNav');
+  if (!nav || !leg) return;
+  const btn = resolveCityNavButtonForLeg(leg);
+  if (!btn) return;
+
+  nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const navList = nav.querySelector('.city-nav-list');
+  if (!navList) return;
+  if (typeof scrollChildIntoHorizontalView === 'function') {
+    scrollChildIntoHorizontalView(navList, btn, { behavior: 'smooth', align: 'center' });
+  } else {
+    navList.scrollTo({
+      left: Math.max(0, btn.offsetLeft - navList.offsetLeft - (navList.clientWidth - btn.offsetWidth) / 2),
+      behavior: 'smooth'
+    });
+  }
+}
+
+function setupCompactCityNavSync(root = document) {
+  const pager = root.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]');
+  if (!pager || pager.__cityNavSyncAttached) return;
+  pager.__cityNavSyncAttached = true;
+
+  const carousel = pager.querySelector('[data-role="mobile-swipe-carousel"]');
+  const slides = Array.from(pager.querySelectorAll('.compact-city-slide[data-slide-index]'));
+  if (!carousel || slides.length === 0) return;
+
+  const syncByIndex = index => {
+    const safe = Math.max(0, Math.min(slides.length - 1, Number(index) || 0));
+    const slide = slides[safe];
+    if (!slide) return;
+    const slideLegId = String(slide.dataset.legId || '').trim();
+    if (!Array.isArray(appData)) return;
+    const targetLeg = appData.find(l => String(l.id || '') === slideLegId) || null;
+    if (targetLeg) syncCityNavHighlightToLeg(targetLeg);
+  };
+
+  syncByIndex(Number(pager.dataset.activeIndex || 0));
+
+  const observer = new IntersectionObserver(entries => {
+    const visible = entries.filter(e => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    if (!visible) return;
+    const idx = Number(visible.target.dataset.slideIndex || 0);
+    if (!Number.isNaN(idx)) syncByIndex(idx);
+  }, { root: carousel, threshold: [0.55, 0.7, 0.85] });
+
+  slides.forEach(slide => observer.observe(slide));
+  pager.__cityNavSyncObserver = observer;
 }
 
 function scrollToCompactCitySlide(cityId, cityName) {

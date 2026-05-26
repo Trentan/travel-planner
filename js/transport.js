@@ -997,7 +997,7 @@ function buildTransportTab(cityFilter = null) {
         detailsOpen: true
       });
       slidesHtml.push(`
-        <div id="transport-slide-${index}" class="mobile-swipe-slide transport-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}">
+        <div id="transport-slide-${index}" class="mobile-swipe-slide transport-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(rep.toCityId || rep.fromCityId || '')}">
           ${cardHtml}
         </div>
       `);
@@ -1012,6 +1012,7 @@ function buildTransportTab(cityFilter = null) {
     html += renderMobileSwipePager({
       pagerClass: 'transport-swipe-pager',
       pagerKey: 'transport-swipe',
+      syncCityNav: true,
       railHtml: railHtml.join(''),
       slidesHtml: slidesHtml.join(''),
       ariaLabel: 'Transport journeys'
