@@ -127,7 +127,7 @@
             <button id="itineraryTimelineModeBtn" class="itinerary-view-mode-btn is-active" type="button" onclick="setItineraryDayViewMode('timeline')">Timeline</button>
             <button id="itineraryGroupedModeBtn" class="itinerary-view-mode-btn" type="button" onclick="setItineraryDayViewMode('grouped')">Grouped</button>
           </div>
-          <button class="action-btn add-leg-action" onclick="openAddLegDialog()"><span class="add-leg-full">+ Add Trip Leg</span><span class="add-leg-short" aria-hidden="true"></span></button>
+          <button class="action-btn add-leg-action" onclick="openLegEditorDialog()"><span class="add-leg-full">🧭 Manage Legs</span><span class="add-leg-short" aria-hidden="true"></span></button>
         </div>
       </div>
       <div id="itinerary"></div>
@@ -425,11 +425,17 @@
   <div id="add-leg-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content modal-md">
       <div class="modal-header">
-        <h2>➕ Add New Leg</h2>
+        <h2 id="legDialogTitle">Edit Dialog</h2>
         <button class="modal-close" onclick="closeAddLegDialog()">&times;</button>
       </div>
       <div class="modal-body">
         <div class="stack-gap-4">
+          <div class="ai-form-group">
+            <label>Edit Existing Leg (optional)</label>
+            <select id="editLegSelect" class="form-control">
+              <option value="">-- Add a new leg --</option>
+            </select>
+          </div>
           <div class="ai-form-group">
             <label>Leg Type</label>
             <select id="legTypeSelect" class="form-control" onchange="onLegTypeChange()">
@@ -479,11 +485,15 @@
                 <input type="text" id="newLegEndDate" class="form-control" placeholder="To (e.g., 18 Jun)">
               </div>
             </div>
+            <div class="ai-form-group">
+              <label for="legDayNotesInput">Day Notes (one line per day)</label>
+              <textarea id="legDayNotesInput" class="form-control" rows="4" placeholder="Arrival and check-in&#10;Explore old town&#10;Museum + dinner"></textarea>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
           <button class="action-btn" onclick="closeAddLegDialog()">Cancel</button>
-          <button class="action-btn action-btn-secondary" onclick="confirmAddLeg()">Add Leg</button>
+          <button id="legDialogSaveBtn" class="action-btn action-btn-secondary" onclick="confirmAddLeg()">Save Leg</button>
         </div>
       </div>
     </div>

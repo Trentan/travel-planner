@@ -142,15 +142,16 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     await page.locator('.app-tab-btn[data-tab="itinerary"]').click();
     await humanPause(page, 350);
 
-    await page.locator('button:has-text("+ Add Trip Leg")').click();
+    const legEditorBtn = page.locator('button:has-text("Manage Legs"), button:has-text("Leg Editor"), button:has-text("+ Add Trip Leg")').first();
+    await legEditorBtn.click();
     await page.waitForSelector('#add-leg-modal', { state: 'visible' });
     await humanPause(page, 400);
-    await selectOptionByIndex(page.locator('#legTypeSelect'), 1);
+    await page.locator('#legTypeSelect').selectOption('city');
     await humanPause(page, 250);
     await page.locator('#existingCitySelect').selectOption({ index: 1 });
     await page.locator('#newLegStartDate').fill('15 Jun');
     await page.locator('#newLegEndDate').fill('18 Jun');
-    await page.locator('button:has-text("Add Leg")').click();
+    await page.locator('#legDialogSaveBtn, button:has-text("Add Leg"), button:has-text("Update Leg")').first().click();
     await page.waitForSelector('#add-leg-modal', { state: 'hidden' });
     await humanPause(page, 500);
     reporter.add('desktop', 'add trip leg', 'opened modal, filled fields, saved leg');

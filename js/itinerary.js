@@ -951,7 +951,12 @@ function setupCompactItineraryPagers(root = document) {
       }
     };
 
-    carousel.addEventListener('touchstart', evt => {
+    const swipeTargets = [carousel, pager, ...slides];
+    const bindSwipeEvent = (eventName, handler, opts) => {
+      swipeTargets.forEach(target => target.addEventListener(eventName, handler, opts));
+    };
+
+    bindSwipeEvent('touchstart', evt => {
       const t = evt.touches && evt.touches[0];
       if (!t) return;
       touchStartX = t.clientX;
@@ -959,37 +964,37 @@ function setupCompactItineraryPagers(root = document) {
       hasSwipedAdjacent = false;
     }, { passive: true });
 
-    carousel.addEventListener('touchmove', evt => {
+    bindSwipeEvent('touchmove', evt => {
       const t = evt.touches && evt.touches[0];
       if (!t) return;
       handleGestureMove(t.clientX, t.clientY);
     }, { passive: true });
 
-    carousel.addEventListener('touchend', evt => {
+    bindSwipeEvent('touchend', evt => {
       const t = evt.changedTouches && evt.changedTouches[0];
       if (!t) return;
       handleGestureEnd(t.clientX, t.clientY);
     }, { passive: true });
 
-    carousel.addEventListener('touchcancel', evt => {
+    bindSwipeEvent('touchcancel', evt => {
       const t = evt.changedTouches && evt.changedTouches[0];
       if (!t) return;
       handleGestureEnd(t.clientX, t.clientY);
     }, { passive: true });
 
-    carousel.addEventListener('pointerdown', evt => {
+    bindSwipeEvent('pointerdown', evt => {
       touchStartX = evt.clientX;
       touchStartY = evt.clientY;
       hasSwipedAdjacent = false;
     }, { passive: true });
 
-    carousel.addEventListener('pointermove', evt => {
+    bindSwipeEvent('pointermove', evt => {
       if (evt.buttons > 0) { // dragging active
         handleGestureMove(evt.clientX, evt.clientY);
       }
     }, { passive: true });
 
-    carousel.addEventListener('pointerup', evt => {
+    bindSwipeEvent('pointerup', evt => {
       handleGestureEnd(evt.clientX, evt.clientY);
     }, { passive: true });
 
@@ -1341,11 +1346,21 @@ function getLegFlightButtonTimeLabel(leg) {
   return depTime || arrTime || '';
 }
 
+let compactCityPagerTransitionLockUntil = 0;
+
 function moveToAdjacentCityDayPager(currentPager, direction) {
+  const now = Date.now();
+  if (now < compactCityPagerTransitionLockUntil) return;
+  compactCityPagerTransitionLockUntil = now + 320;
+
   const cityPager = document.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]');
   if (!cityPager) return;
   const citySlides = Array.from(cityPager.querySelectorAll('.compact-city-slide[data-slide-index]'));
-  let activeCityIndex = citySlides.findIndex(slide => slide.classList.contains('is-active'));
+  const currentCitySlide = currentPager?.closest?.('.compact-city-slide[data-slide-index]');
+  let activeCityIndex = Number(currentCitySlide?.dataset?.slideIndex);
+  if (!Number.isFinite(activeCityIndex)) {
+    activeCityIndex = citySlides.findIndex(slide => slide.classList.contains('is-active'));
+  }
   if (activeCityIndex === -1) {
     activeCityIndex = Math.max(0, Math.min(citySlides.length - 1, Number(cityPager.dataset.activeIndex || 0)));
   }

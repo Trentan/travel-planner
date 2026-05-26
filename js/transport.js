@@ -910,7 +910,7 @@ function buildTransportTab(cityFilter = null) {
 
   let html = `
     <div class="section-header transport-header">
-      <h3 class="section-header-title">✈ Transport</h3>
+      <h3 class="section-header-title">&#9992;&#65039; Transport</h3>
       <button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>
     </div>
   `;
@@ -1614,6 +1614,7 @@ window.selectJourneyType = selectJourneyType;
 window.promptAddNewCity = promptAddNewCity;
 window.editJourney = editJourney;
 window.editPendingSegment = editPendingSegment;
+
 
 
 
