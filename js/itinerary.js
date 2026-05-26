@@ -906,8 +906,10 @@ function setupCompactItineraryPagers(root = document) {
 
     let touchStartX = 0;
     let touchStartY = 0;
+    let hasSwipedAdjacent = false;
 
     const handleGestureEnd = (endX, endY) => {
+      if (hasSwipedAdjacent) return;
       const dx = endX - touchStartX;
       const dy = endY - touchStartY;
       if (Math.abs(dx) < 28 || Math.abs(dx) <= Math.abs(dy)) return;
@@ -915,9 +917,37 @@ function setupCompactItineraryPagers(root = document) {
       const atFirst = Number(pager.dataset.activeIndex || 0) <= 0;
       if (dx < 0 && atLast) {
         moveToAdjacentCityDayPager(pager, 1);
+        hasSwipedAdjacent = true;
       }
       if (dx > 0 && atFirst) {
         moveToAdjacentCityDayPager(pager, -1);
+        hasSwipedAdjacent = true;
+      }
+    };
+
+    const handleGestureMove = (currentX, currentY) => {
+      if (hasSwipedAdjacent) return;
+      const dx = currentX - touchStartX;
+      const dy = currentY - touchStartY;
+      if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy)) return;
+      
+      const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+      
+      // If swiping left (trying to scroll right past bounds)
+      if (dx < -40 && carousel.scrollLeft >= maxScroll - 5) {
+        const atLast = Number(pager.dataset.activeIndex || 0) >= (total - 1);
+        if (atLast) {
+          moveToAdjacentCityDayPager(pager, 1);
+          hasSwipedAdjacent = true;
+        }
+      }
+      // If swiping right (trying to scroll left past bounds)
+      if (dx > 40 && carousel.scrollLeft <= 5) {
+        const atFirst = Number(pager.dataset.activeIndex || 0) <= 0;
+        if (atFirst) {
+          moveToAdjacentCityDayPager(pager, -1);
+          hasSwipedAdjacent = true;
+        }
       }
     };
 
@@ -926,6 +956,13 @@ function setupCompactItineraryPagers(root = document) {
       if (!t) return;
       touchStartX = t.clientX;
       touchStartY = t.clientY;
+      hasSwipedAdjacent = false;
+    }, { passive: true });
+
+    carousel.addEventListener('touchmove', evt => {
+      const t = evt.touches && evt.touches[0];
+      if (!t) return;
+      handleGestureMove(t.clientX, t.clientY);
     }, { passive: true });
 
     carousel.addEventListener('touchend', evt => {
@@ -943,6 +980,13 @@ function setupCompactItineraryPagers(root = document) {
     carousel.addEventListener('pointerdown', evt => {
       touchStartX = evt.clientX;
       touchStartY = evt.clientY;
+      hasSwipedAdjacent = false;
+    }, { passive: true });
+
+    carousel.addEventListener('pointermove', evt => {
+      if (evt.buttons > 0) { // dragging active
+        handleGestureMove(evt.clientX, evt.clientY);
+      }
     }, { passive: true });
 
     carousel.addEventListener('pointerup', evt => {
