@@ -2590,12 +2590,17 @@
     right: 0.72rem;
     z-index: 2;
     display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.2rem;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-surface .compact-day-header-chips .compact-day-counter-chip {
     position: static;
+  }
+
+  body.mobile-app-mode.compact-view-mode .compact-day-surface .compact-day-header-chips .compact-day-amount-chip {
+    align-self: flex-end;
   }
 
   .compact-day-amount-chip {
@@ -2621,6 +2626,15 @@
 
   body.mobile-app-mode.compact-view-mode .compact-day-grid {
     @apply mt-1.5;
+  }
+
+  /* Request: hide mobile day chip rail and rely on swipe between day cards */
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .compact-day-rail {
+    display: none;
+  }
+
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .compact-day-carousel {
+    margin-top: 0;
   }
 
   body.mobile-app-mode #expandAll {

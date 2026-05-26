@@ -713,7 +713,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     accentColor: leg.colour,
     accentWidth: '6px',
     dateLabel: dayDateLabel,
-    title: `Day ${dayIdx + 1}`,
+    title: `Day ${dayIdx + 1} · ${day.day || ''}`.trim(),
     subtitle: routeLabel,
     primaryAction: `
       <span class="compact-day-header-chips">
