@@ -589,31 +589,50 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     : `${inboundIcon ? `${inboundIcon} ` : ''}${cityCore}${outboundIcon ? ` ${outboundIcon}` : ''}`;
   const slideId = getCompactDaySlideId(leg.id, dayIdx);
 
-  const transportLines = dayJourneys.map(journey => {
-    const icon = getTransportIcon(journey.transportType);
-    const journeyLabel = stripCompactLeadingEmoji(
-        journey.provider || journey.journeyName || journey.notes || `${journey.fromLocation}â†’${journey.toLocation}`
-    );
-    const segs = journey.journeyId ? (window.journeys || [])
-        .filter(seg => seg.journeyId === journey.journeyId)
-        .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1)) : [];
-    const duration = formatCompactJourneyDuration(segs);
-    const details = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
-    const mainLine = renderCompactEmojiLine({
-      emoji: icon,
-      text: journeyLabel,
-      duration: duration,
-      cost: getJourneyDisplayCost(journey) ? formatCurrency(getJourneyDisplayCost(journey)) : ''
+  const transportLines = dayJourneys.flatMap(journey => {
+    const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+      ? window.journeys
+      : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+    const segs = journey.journeyId
+      ? journeysSource
+          .filter(seg => (seg.journeyId || seg.id) === (journey.journeyId || journey.id))
+          .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1))
+      : [journey];
+    const dayIso = normalizeDate(day.date);
+    const lines = [];
+    segs.forEach((seg, idx) => {
+      const depDate = normalizeDate(seg.departureDate || seg.dayDate || journey.departureDate || journey.dayDate || '');
+      const arrDate = normalizeDate(seg.arrivalDate || depDate || journey.arrivalDate || '');
+      const isDepartureDay = depDate && depDate === dayIso;
+      const isArrivalDay = arrDate && arrDate === dayIso;
+      if (!isDepartureDay && !isArrivalDay) return;
+
+      const fromLoc = seg.fromLocation || journey.fromLocation || '';
+      const toLoc = seg.toLocation || journey.toLocation || '';
+      const route = [fromLoc, toLoc].filter(Boolean).join(' -> ');
+      const depTime = seg.departureTime || journey.departureTime || '';
+      const arrTime = seg.arrivalTime || journey.arrivalTime || '';
+      const isSameDaySegment = isDepartureDay && isArrivalDay && depDate === arrDate;
+      const labelPrefix = isSameDaySegment ? 'Leg' : (isDepartureDay ? 'Depart' : 'Arrive');
+      const label = stripCompactLeadingEmoji(`${labelPrefix}: ${route || (journey.journeyName || 'Transport')}`);
+      const details = formatJourneySubLocationText([seg]);
+      const mainLine = renderCompactEmojiLine({
+        emoji: getTransportIcon(seg.transportType || journey.transportType),
+        text: label,
+        duration: depTime || arrTime ? `${depTime || ''}${arrTime ? `-${arrTime}` : ''}` : '',
+        cost: getJourneyDisplayCost(journey) ? formatCurrency(getJourneyDisplayCost(journey)) : ''
+      });
+      const subLocsHtml = details ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(details)}</div>` : '';
+      const notesHtml = (seg.notes || journey.notes) ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(seg.notes || journey.notes)}</div>` : '';
+      lines.push(`<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); editJourney('${journey.journeyId || journey.id}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`);
     });
-    const subLocsHtml = details ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(details)}</div>` : '';
-    const notesHtml = journey.notes ? `<div class="daily-timeline-notes timeline-notes-indented">ðŸ’¬ ${escapeCompactText(journey.notes)}</div>` : '';
-    return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); editJourney('${journey.journeyId || journey.id}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
+    return lines;
   }).join('');
 
   const accomLines = dayStayInfo.map(info => {
     const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
     const mainLine = renderCompactEmojiLine({
-      emoji: 'ðŸ¨',
+      emoji: '🏨',
       text: `${label}: ${info.propertyName || 'Accommodation'}`,
       duration: '',
       cost: info.cost ? formatCurrency(info.cost) : ''
@@ -627,13 +646,13 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       return `Location: ${loc}`;
     })() : '';
     const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
-    const notesHtml = info.notes ? `<div class="daily-timeline-notes timeline-notes-indented">ðŸ’¬ ${escapeCompactText(info.notes)}</div>` : '';
+    const notesHtml = info.notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(info.notes)}</div>` : '';
     return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); openEditStayModal('${info.stayId}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
-    const emoji = /food/i.test(item.text || '') ? 'ðŸ½ï¸' : 'ðŸ“';
+    const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
     let locationVal = item.location || '';
     if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
       const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
@@ -661,7 +680,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
         notes = matched.notes;
       }
     }
-    const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-indented">ðŸ’¬ ${escapeCompactText(notes)}</div>` : '';
+    const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(notes)}</div>` : '';
     return `
       <div class="compact-activity-row" style="${doneStyle}">
         <input
