@@ -836,6 +836,10 @@
            px-2.5 py-1.5 rounded-full border border-[rgba(36,72,93,0.14)]
            bg-white text-text-primary font-mono text-[0.82rem] font-bold
            whitespace-nowrap text-center;
+    width: auto;
+    min-width: 5.2rem;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .daily-timeline-time.is-clickable {
@@ -1908,6 +1912,15 @@
     mask-size: 100% 100%;
   }
 
+  body.compact-view-mode .mobile-swipe-progress {
+    @apply h-[2px] rounded-full bg-slate-200/80 dark:bg-slate-700/80 my-1;
+  }
+
+  body.compact-view-mode .mobile-swipe-progress-fill {
+    @apply block h-full rounded-full bg-cyan-600 transition-all duration-300;
+    width: 0;
+  }
+
   body.compact-view-mode .mobile-swipe-carousel {
     @apply flex gap-2.5 overflow-x-auto;
     padding-bottom: 0.12rem;
@@ -2394,7 +2407,7 @@
   }
 
   body.compact-view-mode .compact-day-rail {
-    @apply flex gap-2 overflow-x-auto overflow-y-hidden pb-1.5 mb-2.5;
+    @apply flex gap-2 overflow-x-auto overflow-y-hidden pb-1.5 mb-1.5;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     scroll-snap-type: x proximity;
@@ -2439,7 +2452,7 @@
 
   /* Mobile itinerary parity: restore compact card language */
   body.mobile-app-mode.compact-view-mode .compact-city-swipe-root {
-    @apply mt-2;
+    @apply mt-0.5;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-city-swipe-pager {
