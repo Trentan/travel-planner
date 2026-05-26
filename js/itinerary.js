@@ -906,23 +906,49 @@ function setupCompactItineraryPagers(root = document) {
 
     let touchStartX = 0;
     let touchStartY = 0;
+
+    const handleGestureEnd = (endX, endY) => {
+      const dx = endX - touchStartX;
+      const dy = endY - touchStartY;
+      if (Math.abs(dx) < 28 || Math.abs(dx) <= Math.abs(dy)) return;
+      const atLast = Number(pager.dataset.activeIndex || 0) >= (total - 1);
+      const atFirst = Number(pager.dataset.activeIndex || 0) <= 0;
+      if (dx < 0 && atLast) {
+        moveToAdjacentCityDayPager(pager, 1);
+      }
+      if (dx > 0 && atFirst) {
+        moveToAdjacentCityDayPager(pager, -1);
+      }
+    };
+
     carousel.addEventListener('touchstart', evt => {
       const t = evt.touches && evt.touches[0];
       if (!t) return;
       touchStartX = t.clientX;
       touchStartY = t.clientY;
     }, { passive: true });
+
     carousel.addEventListener('touchend', evt => {
       const t = evt.changedTouches && evt.changedTouches[0];
       if (!t) return;
-      const dx = t.clientX - touchStartX;
-      const dy = t.clientY - touchStartY;
-      if (Math.abs(dx) < 28 || Math.abs(dx) <= Math.abs(dy)) return;
-      const atLast = Number(pager.dataset.activeIndex || 0) >= (total - 1);
-      const atFirst = Number(pager.dataset.activeIndex || 0) <= 0;
-      if (dx < 0 && atLast) moveToAdjacentCityDayPager(pager, 1);
-      if (dx > 0 && atFirst) moveToAdjacentCityDayPager(pager, -1);
+      handleGestureEnd(t.clientX, t.clientY);
     }, { passive: true });
+
+    carousel.addEventListener('touchcancel', evt => {
+      const t = evt.changedTouches && evt.changedTouches[0];
+      if (!t) return;
+      handleGestureEnd(t.clientX, t.clientY);
+    }, { passive: true });
+
+    carousel.addEventListener('pointerdown', evt => {
+      touchStartX = evt.clientX;
+      touchStartY = evt.clientY;
+    }, { passive: true });
+
+    carousel.addEventListener('pointerup', evt => {
+      handleGestureEnd(evt.clientX, evt.clientY);
+    }, { passive: true });
+
 
     chips.forEach(chip => {
       chip.addEventListener('click', () => {
@@ -1156,26 +1182,31 @@ function buildCompactItinerary() {
     const legCost = getLegTotalCost(leg);
     const firstDay = leg.days && leg.days[0];
     const lastDay = leg.days && leg.days[daysCount - 1];
-    const legDateRange = firstDay && lastDay
-        ? `${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date} â†’ ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date}`
-        : (firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '');
+    
+    const firstDateFormatted = firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '';
+    const lastDateFormatted = lastDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date) : '';
+    const legDateRangeHtml = firstDay && lastDay && firstDateFormatted !== lastDateFormatted
+        ? `${escapeHtmlText(firstDateFormatted)} &rarr; ${escapeHtmlText(lastDateFormatted)}`
+        : escapeHtmlText(firstDateFormatted || '—');
+
     const routeLabel = firstDay && lastDay
-        ? `${firstDay.day || 'Day'} ${firstDay.date} â†’ ${lastDay.day || 'Day'} ${lastDay.date}`
+        ? `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`
         : `${daysCount} day${daysCount !== 1 ? 's' : ''}`;
     const legLabel = leg.label && !/^trip leg$/i.test(String(leg.label).trim())
         ? leg.label
         : '';
     const displayLegLabel = legLabel || routeLabel || `Leg ${legIndex + 1}`;
-    const chipDateRange = firstDay && lastDay
-        ? `${firstDay.date}${lastDay.date && lastDay.date !== firstDay.date ? ` â†’ ${lastDay.date}` : ''}`
-        : (firstDay ? firstDay.date : '');
+
+    const chipDateRangeHtml = firstDay && lastDay && firstDay.date !== lastDay.date
+        ? `${escapeHtmlText(firstDay.date)} &rarr; ${escapeHtmlText(lastDay.date)}`
+        : escapeHtmlText(firstDay ? firstDay.date : 'Trip');
 
     const flightTimeLabel = getLegFlightButtonTimeLabel(leg);
     const legCard = `
       <article class="compact-leg-card">
         <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
           <div class="compact-leg-header-line">
-            <span class="compact-leg-date">${escapeHtmlText(legDateRange || 'â€”')}</span>
+            <span class="compact-leg-date">${legDateRangeHtml}</span>
             <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
             <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
             <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
@@ -1195,7 +1226,7 @@ function buildCompactItinerary() {
     `);
     railHtml.push(`
       <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
-        <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(chipDateRange || 'Trip')}</span>
+        <span class="mobile-swipe-chip-eyebrow">${chipDateRangeHtml}</span>
         <span class="mobile-swipe-chip-title">${escapeHtmlText(displayLegLabel)}</span>
         <span class="mobile-swipe-chip-route">${escapeHtmlText(flightTimeLabel || nightLabel)}</span>
       </button>
@@ -1270,7 +1301,10 @@ function moveToAdjacentCityDayPager(currentPager, direction) {
   const cityPager = document.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]');
   if (!cityPager) return;
   const citySlides = Array.from(cityPager.querySelectorAll('.compact-city-slide[data-slide-index]'));
-  const activeCityIndex = Math.max(0, Math.min(citySlides.length - 1, Number(cityPager.dataset.activeIndex || 0)));
+  let activeCityIndex = citySlides.findIndex(slide => slide.classList.contains('is-active'));
+  if (activeCityIndex === -1) {
+    activeCityIndex = Math.max(0, Math.min(citySlides.length - 1, Number(cityPager.dataset.activeIndex || 0)));
+  }
   const nextCityIndex = activeCityIndex + Number(direction || 0);
   if (nextCityIndex < 0 || nextCityIndex >= citySlides.length) return;
 
@@ -1294,13 +1328,16 @@ function moveToAdjacentCityDayPager(currentPager, direction) {
   const nextDayPager = nextCitySlide ? nextCitySlide.querySelector('.compact-day-pager') : null;
   if (!nextDayPager) return;
   const targetDayIndex = direction > 0 ? 0 : Math.max(0, Number(nextDayPager.dataset.totalDays || 1) - 1);
-  if (typeof nextDayPager.__compactScrollToIndex === 'function') {
-    nextDayPager.__compactScrollToIndex(targetDayIndex);
-  } else if (typeof nextDayPager.__compactSetActive === 'function') {
-    nextDayPager.__compactSetActive(targetDayIndex);
-  } else {
-    syncCompactDayPagerState(nextDayPager, targetDayIndex);
-  }
+  
+  setTimeout(() => {
+    if (typeof nextDayPager.__compactScrollToIndex === 'function') {
+      nextDayPager.__compactScrollToIndex(targetDayIndex);
+    } else if (typeof nextDayPager.__compactSetActive === 'function') {
+      nextDayPager.__compactSetActive(targetDayIndex);
+    } else {
+      syncCompactDayPagerState(nextDayPager, targetDayIndex);
+    }
+  }, 100);
 }
 
 function getCompactMobileLegSequence() {
@@ -1415,7 +1452,7 @@ function buildCompactItineraryLegacy() {
         html += `<div class="compact-day-card" style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
       <div class="compact-day-top" style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
         <span class="compact-day-label" style="font-weight:600;">${day.day} ${dayDateLabel}</span>
-        <span class="compact-day-route" style="font-size:10px;">${day.from} → ${day.to}</span>
+        <span class="compact-day-route" style="font-size:10px;">${escapeHtmlText(day.from)} &rarr; ${escapeHtmlText(day.to)}</span>
         <span class="compact-day-desc" style="font-size:9px; color:#666; flex:1;">${day.desc || ''}</span>
       </div>
       <div class="compact-day-grid" style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px; margin-top:5px; font-size:10px;">
@@ -1429,7 +1466,7 @@ function buildCompactItineraryLegacy() {
       html += `<div style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
       <div style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
         <span style="font-weight:600;">${day.day} ${dayDateLabel}</span>
-        <span style="font-size:10px;">${day.from} â†’ ${day.to}</span>
+        <span style="font-size:10px;">${escapeHtmlText(day.from)} &rarr; ${escapeHtmlText(day.to)}</span>
         <span style="font-size:9px; color:#666; flex:1;">${day.desc || ''}</span>
       </div>
 
