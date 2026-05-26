@@ -1196,29 +1196,41 @@
       display: none !important;
     }
 
-    .daily-timeline::before {
-      left: 3rem;
+    .daily-timeline::before,
+    .daily-timeline-compact::before {
+      left: 2.75rem;
     }
 
-    .daily-timeline-item {
-      grid-template-columns: 6.1rem minmax(0, 1fr);
-      gap: 0.4rem;
+    .daily-timeline-item,
+    .daily-timeline-compact .daily-timeline-item {
+      grid-template-columns: 5.5rem minmax(0, 1fr);
+      gap: 0.35rem 0.5rem;
       align-items: flex-start;
       min-height: 2.75rem;
       padding-block: 0.22rem;
+    }
+
+    .daily-timeline-marker,
+    .daily-timeline-compact .daily-timeline-marker {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: start;
+    }
+
+    .daily-timeline-content,
+    .daily-timeline-compact .daily-timeline-content {
+      grid-column: 2;
+      grid-row: 1 / span 2;
     }
 
     .daily-timeline-type {
       display: none;
     }
 
-    .timeline-anytime-list .daily-timeline-item {
-      grid-template-columns: 6.1rem minmax(0, 1fr);
-    }
-
     .daily-timeline-time {
       min-width: 0;
-      max-width: 6rem;
+      max-width: 5.2rem;
+      width: 100%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1227,7 +1239,8 @@
       font-size: 0.74rem;
       justify-self: center;
       grid-column: 1;
-      align-self: center;
+      grid-row: 2;
+      align-self: start;
     }
 
     .daily-timeline-time.is-clickable {
@@ -4440,4 +4453,92 @@
   .mobile-tabs-menu-btn {
     display: inline-flex !important;
   }
+
+  /* Make accommodation, transport, activity items compact and fit evenly in their panels on mobile */
+  .detail-block {
+    padding: 0.75rem !important; /* overrides p-4 */
+    border-radius: 0.75rem !important; /* overrides rounded-xl */
+  }
+
+  .detail-block h4 {
+    margin-bottom: 0.5rem !important; /* overrides mb-3 */
+    font-size: 0.75rem !important; /* overrides text-xs */
+  }
+
+  .item-list.space-y-2 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.375rem !important; /* overrides space-y-2 */
+  }
+
+  .cost-item {
+    padding: 0.5rem 0.625rem !important; /* overrides p-3 */
+    gap: 0.5rem !important; /* overrides gap-3 */
+    font-size: 0.8rem !important; /* overrides text-sm */
+    border-radius: 0.5rem !important; /* overrides rounded-lg */
+  }
+
+  .cost-item-text {
+    gap: 2px !important; /* tighter layout */
+  }
+
+  .cost-item-actions {
+    gap: 0.25rem !important; /* overrides gap-1.5 */
+  }
+
+  .cost-item .del-btn {
+    opacity: 1 !important; /* show delete button on mobile where hover doesn't exist */
+  }
+
+  /* Make Anytime timeline section content compact too */
+  .daily-timeline-content,
+  .daily-timeline-compact .daily-timeline-content {
+    padding: 0.5rem 0.625rem !important;
+    border-radius: 0.625rem !important;
+  }
+
+  .daily-timeline-title {
+    font-size: 0.9rem !important;
+  }
+
+  .daily-timeline-title-row {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    align-items: center !important; /* ensures perfect vertical alignment with panel elements */
+  }
+
+  /* Widen accommodation, transport, activities panels to nearly the edge and minimize white space */
+  .day-detail {
+    padding-left: 0.35rem !important; /* overrides p-4 */
+    padding-right: 0.35rem !important; /* overrides p-4 */
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.65rem !important;
+  }
+  
+  .day-card {
+    margin-left: 0.25rem !important;
+    margin-right: 0.25rem !important;
+    border-radius: 0.75rem !important;
+  }
+
+  .day-planner-shell-timeline .detail-block {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  .day-view-panel-grouped .grid {
+    gap: 0.5rem !important; /* tighter layout between columns/panels */
+  }
+
+  .daily-timeline-shell {
+    padding-left: 0.1rem !important;
+    padding-right: 0.1rem !important;
+  }
+  
+  .daily-timeline-item {
+    gap: 0.3rem 0.4rem !important;
+  }
+
+  .daily-timeline-content {
+    margin-right: 0.1rem !important;
+  }
 }
+
