@@ -876,22 +876,17 @@
   }
 
   .daily-timeline-item {
-    @apply relative grid items-start min-w-0;
-    grid-template-columns: 6.2rem minmax(0, 1fr);
-    gap: 0.7rem;
-    padding-block: 0.24rem;
+    @apply relative grid items-center min-w-0;
+    grid-template-columns: 8.1rem 2.7rem minmax(0, 1fr) auto;
+    gap: 0.8rem;
+    padding-block: 0.28rem;
   }
 
   .daily-timeline-time {
-    @apply self-center justify-self-center w-full max-w-[6rem]
+    @apply self-center justify-self-end w-full max-w-[8.1rem]
            px-2.5 py-1.5 rounded-full border border-[rgba(36,72,93,0.14)]
            bg-white text-text-primary font-mono text-[0.82rem] font-bold
            whitespace-nowrap text-center;
-    grid-column: 1;
-    width: max-content;
-    min-width: 4.95rem;
-    margin-left: 0;
-    margin-right: 0;
   }
 
   .daily-timeline-time.is-clickable {
@@ -902,10 +897,6 @@
     @apply relative z-1 grid place-items-center w-10 h-10 rounded-full
            border border-[rgba(36,72,93,0.22)] bg-white text-base;
     box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.94);
-    grid-column: 1;
-    align-self: start;
-    justify-self: center;
-    margin-top: 0;
   }
 
   .daily-timeline-marker.is-clickable {
@@ -933,7 +924,6 @@
   .daily-timeline-content {
     @apply min-w-0 px-3.5 py-2.5 border border-[rgba(36,72,93,0.12)]
            rounded-xl bg-white/90;
-    grid-column: 2;
   }
 
   .daily-timeline-title-row {
@@ -950,10 +940,7 @@
 
   .daily-timeline-title {
     @apply min-w-0 text-text-primary font-bold text-[1.15rem] leading-[1.3];
-    display: block;
-    width: 100%;
-    overflow-wrap: break-word;
-    word-break: normal;
+    overflow-wrap: anywhere;
   }
 
   .daily-timeline-meta {
@@ -973,7 +960,7 @@
   }
 
   .daily-timeline-title-and-checkbox {
-    @apply flex items-center gap-2 min-w-0 flex-1;
+    @apply flex items-center gap-2 min-w-0;
   }
 
   .daily-timeline-notes {
@@ -1003,7 +990,7 @@
   }
 
   .timeline-anytime-list .daily-timeline-item {
-    grid-template-columns: 6.2rem minmax(0, 1fr) auto;
+    grid-template-columns: 8.1rem 2.7rem minmax(0, 1fr) auto;
   }
 
   .daily-timeline-compact::before {
@@ -1264,11 +1251,20 @@
       padding-block: 0.22rem;
     }
 
+    .timeline-anytime-list .daily-timeline-item {
+      grid-template-columns: 5.5rem minmax(0, 1fr);
+      gap: 0.35rem 0.5rem;
+      align-items: flex-start;
+      min-height: 2.75rem;
+      padding-block: 0.22rem;
+    }
+
     .daily-timeline-marker,
     .daily-timeline-compact .daily-timeline-marker {
       grid-column: 1;
       grid-row: 1;
       align-self: start;
+      justify-self: center;
     }
 
     .daily-timeline-content,
@@ -4485,6 +4481,13 @@
 
 /* Desktop/mobile menu visibility and top-bar readability enforcement */
 @media (min-width: 769px) {
+  .timeline-anytime-list .daily-timeline-item {
+    grid-template-columns: 8.1rem 2.7rem minmax(0, 1fr) auto;
+    gap: 0.8rem;
+    align-items: center;
+    padding-block: 0.28rem;
+  }
+
   .mobile-menu-btn,
   .mobile-tabs-menu-btn {
     display: none !important;
@@ -4827,6 +4830,7 @@
     padding-right: 0.05rem !important;
   }
 }
+
 
 
 

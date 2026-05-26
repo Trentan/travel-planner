@@ -1529,7 +1529,7 @@ function updateLegDialogUiMode() {
   const title = document.getElementById('legDialogTitle') || document.querySelector('#add-leg-modal .modal-header h2');
   const saveBtn = document.getElementById('legDialogSaveBtn');
   const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
-  if (title) title.textContent = 'Edit Dialog';
+  if (title) title.textContent = 'Edit Legs';
   if (saveBtn) saveBtn.textContent = isEdit ? 'Update Leg' : 'Add Leg';
 }
 
