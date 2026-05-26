@@ -1325,6 +1325,25 @@ function moveToAdjacentCityDayPager(currentPager, direction) {
     setMobilePagerActiveIndex(cityPager.dataset.pagerKey || 'compact-city-swipe', nextCityIndex);
   }
 
+  // Instantly synchronize active states for seamless transition
+  citySlides.forEach((slide, idx) => {
+    slide.classList.toggle('is-active', idx === nextCityIndex);
+  });
+  const cityChips = Array.from(cityPager.querySelectorAll('[data-role="mobile-swipe-chip"]'));
+  cityChips.forEach((chip, idx) => {
+    const active = idx === nextCityIndex;
+    chip.classList.toggle('active', active);
+    chip.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  const progressFill = cityPager.querySelector('[data-role="mobile-swipe-progress"]');
+  if (progressFill) {
+    progressFill.style.width = `${((nextCityIndex + 1) / citySlides.length) * 100}%`;
+  }
+  const nextCitySlideId = nextCitySlide?.dataset.cityId || '';
+  if (nextCitySlideId && typeof highlightCityNavByCityId === 'function') {
+    highlightCityNavByCityId(nextCitySlideId);
+  }
+
   const nextDayPager = nextCitySlide ? nextCitySlide.querySelector('.compact-day-pager') : null;
   if (!nextDayPager) return;
   const targetDayIndex = direction > 0 ? 0 : Math.max(0, Number(nextDayPager.dataset.totalDays || 1) - 1);
