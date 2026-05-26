@@ -5,7 +5,7 @@ function getCompactFoodQuestTitle(label) {
       .replace(/[\u{2600}-\u{26FF}]/gu, '')
       .replace(/[\u{2700}-\u{27BF}]/gu, '')
       .replace(/\p{Emoji}/gu, '')
-      .replace(/\s*[Ã¢â€ â€™>-].*$/u, '')
+      .replace(/\s*[→>-].*$/u, '')
       .replace(/[^\w\s()&,-]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
@@ -16,7 +16,7 @@ function getCompactFoodQuestTitle(label) {
 function stripCompactLeadingEmoji(text) {
   return String(text || '')
       .replace(/^\s*(?:\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji})+(?:\uFE0F)?\s*/gu, '')
-      .replace(/^\s*[-â€“â€”:Â·â€¢]+\s*/u, '')
+      .replace(/^\s*[-–—:·•]+\s*/u, '')
       .trim();
 }
 
@@ -82,7 +82,7 @@ function renderCompactEmojiLine({ emoji, text, duration = '', cost = '', done = 
   if (durationTrimmed) suffixParts.push(escapeCompactText(durationTrimmed));
   if (costTrimmed) suffixParts.push(`<span class="compact-inline-meta-cost">${escapeCompactText(costTrimmed)}</span>`);
   
-  const suffix = suffixParts.length > 0 ? ` <span class="compact-meta-suffix">[${suffixParts.join(' Â· ')}]</span>` : '';
+  const suffix = suffixParts.length > 0 ? ` <span class="compact-meta-suffix">[${suffixParts.join(' · ')}]</span>` : '';
   
   return `
     <span class="compact-line">
@@ -227,7 +227,7 @@ function renderCompactSuggestedActivityItem(legIndex, activityIdx, activity) {
   if (activity.estTime) metaParts.push(`&#9201; ${escapeCompactText(activity.estTime)}`);
   if (activity.estCost) metaParts.push(`$${escapeCompactText(activity.estCost)}`);
   const metaLine = metaParts.length > 0
-    ? `<div class="compact-suggested-activity-subline">${metaParts.join(' Â· ')}</div>`
+    ? `<div class="compact-suggested-activity-subline">${metaParts.join(' · ')}</div>`
     : '';
 
   const actionIcon = isAssigned ? '&#8250;' : '&#128204;';
@@ -1198,7 +1198,7 @@ function renderCompactLegCard(leg, legIndex) {
           <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
           <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
           <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
-          <span class="leg-chevron ml-auto" style="color: white; font-size: 1.2rem;">â–¼</span>
+          <span class="leg-chevron ml-auto" style="color: white; font-size: 1.2rem;">&#9660;</span>
         </div>
       </div>
       <div class="compact-leg-body leg-content">
@@ -3032,7 +3032,7 @@ function buildCityNav() {
       btn.style.borderLeft = `4px solid ${color}`;
     }
 
-    const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">ðŸ“</span>';
+    const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">&#128205;</span>';
     btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
     navList.appendChild(btn);
   });

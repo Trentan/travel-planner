@@ -1263,7 +1263,7 @@
     .daily-timeline-compact .daily-timeline-marker {
       grid-column: 1;
       grid-row: 1;
-      align-self: start;
+      align-self: center;
       justify-self: center;
     }
 

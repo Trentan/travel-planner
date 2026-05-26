@@ -1412,7 +1412,7 @@ function _updateSegmentList() {
         <span>${depString} ➔ ${arrString}</span>
         ${providerStr ? `<span class="pending-segment-separator">&bull;</span><span>${providerStr}</span>` : ''}
         <button onclick="editPendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-edit" title="Edit leg">✎</button>
-        <button onclick="removePendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-remove" title="Remove leg">Ã—</button>
+        <button onclick="removePendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-remove" title="Remove leg">&times;</button>
       </div>`;
     }).join('');
   }
