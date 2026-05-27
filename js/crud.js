@@ -1614,6 +1614,114 @@ function regenerateItineraryFromJourneys(linkedJourneys, legId) {
   return true;
 }
 
+function syncAllLegDays() {
+  if (!confirm('This will autonomously recalculate day cards for all legs based on your saved journeys and stays. Proceed?')) {
+    return;
+  }
+
+  let changesMade = 0;
+
+  appData.forEach(leg => {
+    const cityName = leg.label;
+    if (!cityName) return;
+    const cityId = 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+    const legStays = (window.stays || []).filter(s => s.cityId === cityId || (s.city && s.city.toLowerCase() === cityName.toLowerCase()));
+    const arrivingJourneys = (window.journeys || []).filter(j => j.toCityId === cityId || (j.toLocation && j.toLocation.toLowerCase() === cityName.toLowerCase()));
+    const departingJourneys = (window.journeys || []).filter(j => j.fromCityId === cityId || (j.fromLocation && j.fromLocation.toLowerCase() === cityName.toLowerCase()));
+    
+    let earliestDate = null;
+    let latestDate = null;
+
+    const considerDate = (d) => {
+      if (!d) return;
+      const normalized = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(d) : d;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return;
+      if (!earliestDate || normalized < earliestDate) earliestDate = normalized;
+      if (!latestDate || normalized > latestDate) latestDate = normalized;
+    };
+
+    legStays.forEach(s => considerDate(s.checkIn));
+    arrivingJourneys.forEach(j => considerDate(j.arrivalDate || j.dayDate));
+    departingJourneys.forEach(j => considerDate(j.departureDate || j.dayDate));
+
+    if (!earliestDate && leg.days && leg.days.length > 0) {
+      considerDate(leg.days[0].date);
+      considerDate(leg.days[leg.days.length - 1].date);
+    }
+
+    if (!earliestDate) return;
+    if (!latestDate) latestDate = earliestDate;
+
+    let newDays = [];
+    if (typeof buildLegDaysWithNotes === 'function') {
+      newDays = buildLegDaysWithNotes({
+        dateFrom: earliestDate,
+        dateTo: latestDate,
+        fromCity: cityName,
+        toCity: cityName,
+        legType: 'city',
+        dayNotes: []
+      });
+    }
+
+    departingJourneys.forEach(j => {
+      const depDate = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(j.departureDate || j.dayDate) : (j.departureDate || j.dayDate);
+      if (!depDate) return;
+      
+      const toCity = j.toLocation || 'Next Destination';
+      
+      let dayIndex = newDays.findIndex(d => d.date === depDate);
+      if (dayIndex !== -1) {
+        newDays[dayIndex].to = toCity;
+        newDays[dayIndex].desc = `Depart for ${toCity}`;
+        if (j.provider) newDays[dayIndex].desc += ` via ${j.provider}`;
+      } else {
+        newDays.push({
+          date: depDate,
+          day: new Date(depDate).toLocaleDateString('en-US', { weekday: 'short' }),
+          from: cityName,
+          to: toCity,
+          accom: '—',
+          desc: `Depart for ${toCity}` + (j.provider ? ` via ${j.provider}` : ''),
+          completed: false,
+          accomCost: '0',
+          activityCost: '0',
+          accomItems: [{ text: '—', cost: '0', status: 'pending', bookingRef: '', cityId: cityId }],
+          activityItems: []
+        });
+      }
+    });
+
+    newDays.sort((a, b) => a.date.localeCompare(b.date));
+
+    if (Array.isArray(leg.days)) {
+      newDays.forEach(nd => {
+        const oldDay = leg.days.find(od => od.date === nd.date);
+        if (oldDay) {
+          if (oldDay.desc && !nd.desc.startsWith('Depart for')) nd.desc = oldDay.desc;
+          if (oldDay.accomItems) nd.accomItems = oldDay.accomItems;
+          if (oldDay.activityItems) nd.activityItems = oldDay.activityItems;
+          if (oldDay.transportItems) nd.transportItems = oldDay.transportItems;
+        }
+      });
+    }
+
+    leg.days = newDays;
+    changesMade++;
+  });
+
+  if (changesMade > 0) {
+    if (typeof saveData === 'function') saveData();
+    if (typeof buildItinerary === 'function') buildItinerary();
+    if (typeof closeAddLegDialog === 'function') closeAddLegDialog();
+    alert(`Successfully synced ${changesMade} leg(s) with your journey and stay dates!`);
+  } else {
+    alert('No changes were needed.');
+  }
+}
+
+
 function onEditLegSelectionChange() {
   const editSelect = document.getElementById('editLegSelect');
   const selected = Number(editSelect?.value);
@@ -2027,6 +2135,7 @@ window.openEditDayActivityModal = openEditDayActivityModal;
 window.onLegTypeChange = onLegTypeChange;
 window.checkDateConflict = checkDateConflict;
 window.adjustLegDays = adjustLegDays;
+window.syncAllLegDays = syncAllLegDays;
 window.confirmAddLeg = confirmAddLeg;
 window.deleteLegFromDialog = deleteLegFromDialog;
 window.regenerateItineraryFromJourneys = regenerateItineraryFromJourneys;
