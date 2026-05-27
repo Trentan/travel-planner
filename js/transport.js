@@ -876,7 +876,21 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
   `;
 }
 
-// â”€â”€â”€ BUILD TRANSPORT TAB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function getJourneyMapSearchQuery(address, location, transportType) {
+  let suffix = '';
+  if (transportType === 'flight') suffix = ' Airport';
+  else if (transportType === 'train') suffix = ' Train Station';
+  else if (transportType === 'bus') suffix = ' Bus Station';
+  else if (transportType === 'ferry') suffix = ' Ferry Terminal';
+
+  let resolvedLoc = location || '';
+  if (suffix && resolvedLoc && !resolvedLoc.toLowerCase().includes(suffix.toLowerCase())) {
+    resolvedLoc = resolvedLoc + suffix;
+  }
+  return address ? `${address}, ${resolvedLoc}` : resolvedLoc;
+}
+
+// ─── BUILD TRANSPORT TAB ──────────────────────────────────────────
 
 function buildTransportTab(cityFilter = null) {
   if (typeof journeys === 'undefined' || journeys === null) {
@@ -1032,10 +1046,12 @@ function buildTransportTab(cityFilter = null) {
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Route</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Departs</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Arrives</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Duration</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Provider</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Code</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Booking Ref</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notes</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Status</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Cost</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Actions</th>
         </tr>
@@ -1052,79 +1068,160 @@ function buildTransportTab(cityFilter = null) {
     const statusIcon = rep.status === 'booked' ? '✓' : rep.status === 'confirmed' ? '🎫' : rep.status === 'cancelled' ? '❌' : '⏳';
     const statusText = rep.status === 'booked' ? 'Booked' : rep.status === 'confirmed' ? 'Confirmed' : rep.status === 'cancelled' ? 'Cancelled' : 'Planned';
 
-    const route = isMultiLeg
-        ? buildRouteChainWithCodes(segs)
-        : `${getLocationCodeDisplay(rep.fromLocation)} → ${getLocationCodeDisplay(rep.toLocation)}`;
-    const routeSubLocationDetails = renderJourneySubLocationDetails(segs, 'transport-table-sub-locations');
-    const routeDisplay = routeSubLocationDetails
-        ? `<div class="transport-route-main">${route}</div>${routeSubLocationDetails}`
-        : route;
+    const lastSeg = segs[segs.length - 1];
     const firstDepDate = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
     const firstDepTime = rep.departureTime || '';
     const firstDep = firstDepDate !== '—' && firstDepTime ? firstDepDate + ' ' + firstDepTime : firstDepDate;
-    const lastSeg = segs[segs.length - 1];
     const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
     const lastArrTime = lastSeg.arrivalTime || '—';
 
     const totalCost = segs.reduce((sum, s) => sum + parseCost(s.cost), 0);
-
     const icon = isMultiLeg ? '✈️' : getTransportIcon(rep.transportType);
-
     const nameDisplay = formatJourneyNameDisplay(rep.journeyName || '—');
 
-// Calculate and display total travel time for multi-leg journeys
-    const durationHours = isMultiLeg ? calculateJourneyDuration(segs) : null;
-    const durationDisplay = durationHours !== null ? `${durationHours}h` : calculateDuration(rep.departureDate || rep.dayDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
+    const durationText = isMultiLeg ? calculateJourneyDuration(segs) : null;
+    const durationDisplay = durationText !== null ? durationText : calculateDuration(rep.departureDate || rep.dayDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
 
-
+    const firstLoc = getLocationCodeDisplay(rep.fromLocation);
+    const lastLoc = getLocationCodeDisplay(lastSeg.toLocation);
+    let routeDisplay = `${firstLoc} → ${lastLoc}`;
+    let desktopExpandControl = '';
+    
     const isExpanded = isTransportGroupExpanded(gid);
-    const desktopExpandControl = isMultiLeg
-        ? `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" title="Show journey details" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Collapse journey details' : 'Expand journey details'}">
+    if (isMultiLeg) {
+      const vias = segs.slice(0, -1).map(s => getLocationCodeDisplay(s.toLocation));
+      const viaText = vias.length > 0 ? `(via ${vias.map(v => v.replace(/<[^>]*>?/gm, '')).join(', ')})` : '';
+      desktopExpandControl = `<button class="journey-expand-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" title="Show journey details" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Collapse journey details' : 'Expand journey details'}">
           <span class="transport-expand-arrow">${isExpanded ? '▼' : '▶'}</span>
-        </button>`
-        : '';
-    const journeyNameCell = isMultiLeg
-        ? `
-          <div class="journey-name-main">${nameDisplay}</div>
-          <button class="journey-name-toggle ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); toggleTransportGroupDetails('${gid}')" title="Show journey details" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Collapse journey details' : 'Expand journey details'}">
-            <span class="transport-expand-arrow">${isExpanded ? '▼' : '▶'}</span>
-            <span class="journey-name-toggle-text">${nameDisplay}</span>
-            <span class="journey-leg-badge">${segs.length} legs</span>
-          </button>`
-        : `<div class="journey-name-main">${nameDisplay}</div>`;
+        </button>`;
+      
+      routeDisplay = `
+        <div class="transport-route-main flex items-center">
+          ${firstLoc} → ${lastLoc} 
+          <span class="text-[10px] text-slate-500 ml-1 font-normal uppercase tracking-wider">${viaText}</span>
+        </div>`;
+    }
 
-    const mobileSubLocationsHtml = renderJourneySubLocationDetails(segs, 'transport-mobile-sub-locations');
+    const fromCityName = (typeof getCityNameById === 'function' && rep.fromCityId) ? getCityNameById(rep.fromCityId) : '';
+    const toCityName = (typeof getCityNameById === 'function' && lastSeg.toCityId) ? getCityNameById(lastSeg.toCityId) : '';
+
+    const cleanFromCity = (fromCityName || '').trim();
+    const cleanFromLoc = (rep.fromLocation || '').trim();
+    const cleanFromAddr = (rep.fromAddress || '').trim();
+
+    let fromDetailsHtml = '';
+    if (cleanFromAddr) {
+      fromDetailsHtml = `
+        <a href="${getMapSearchUrl(getJourneyMapSearchQuery(cleanFromAddr, cleanFromLoc, rep.transportType))}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 hover:underline text-slate-400 dark:text-slate-500 transition-colors inline-flex items-center gap-1 text-xs" title="Open in Google Maps" onclick="event.stopPropagation();">
+          <span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanFromCity || cleanFromLoc || '—')}</span>
+          <span>·</span>
+          <span>${escapeHtmlText(cleanFromAddr)}</span>
+        </a>
+      `;
+    } else {
+      if (cleanFromCity && cleanFromLoc && cleanFromCity.toLowerCase() !== cleanFromLoc.toLowerCase()) {
+        fromDetailsHtml = `
+          <div class="text-slate-400 dark:text-slate-500 inline-flex items-center gap-1 text-xs">
+            <span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanFromCity)}</span>
+            <span>·</span>
+            <span>${escapeHtmlText(cleanFromLoc)}</span>
+          </div>
+        `;
+      } else {
+        fromDetailsHtml = `
+          <span class="font-medium text-slate-600 dark:text-slate-400 text-xs">${escapeHtmlText(cleanFromCity || cleanFromLoc || '—')}</span>
+        `;
+      }
+    }
+
+    const cleanToCity = (toCityName || '').trim();
+    const cleanToLoc = (lastSeg.toLocation || '').trim();
+    const cleanToAddr = (lastSeg.toAddress || '').trim();
+
+    let toDetailsHtml = '';
+    if (cleanToAddr) {
+      toDetailsHtml = `
+        <a href="${getMapSearchUrl(getJourneyMapSearchQuery(cleanToAddr, cleanToLoc, lastSeg.transportType))}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 hover:underline text-slate-400 dark:text-slate-500 transition-colors inline-flex items-center gap-1 text-xs" title="Open in Google Maps" onclick="event.stopPropagation();">
+          <span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanToCity || cleanToLoc || '—')}</span>
+          <span>·</span>
+          <span>${escapeHtmlText(cleanToAddr)}</span>
+        </a>
+      `;
+    } else {
+      if (cleanToCity && cleanToLoc && cleanToCity.toLowerCase() !== cleanToLoc.toLowerCase()) {
+        toDetailsHtml = `
+          <div class="text-slate-400 dark:text-slate-500 inline-flex items-center gap-1 text-xs">
+            <span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanToCity)}</span>
+            <span>·</span>
+            <span>${escapeHtmlText(cleanToLoc)}</span>
+          </div>
+        `;
+      } else {
+        toDetailsHtml = `
+          <span class="font-medium text-slate-600 dark:text-slate-400 text-xs">${escapeHtmlText(cleanToCity || cleanToLoc || '—')}</span>
+        `;
+      }
+    }
 
     html += `
       <tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${isMultiLeg ? 'cursor-pointer' : ''}" data-group="${gid}" style="border-left: 4px solid ${statusColor};" ${isMultiLeg ? `onclick="toggleTransportGroupDetails('${gid}')"` : ''}>
-        <td class="px-3 py-3 w-8 align-middle">${desktopExpandControl}</td>
-        <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap" title="${rep.journeyName || ''}">
-          ${journeyNameCell}
-          ${mobileSubLocationsHtml}
-          ${renderJourneyMobileSummary(isMultiLeg ? `${segs.length} legs` : ``)}
+        <td class="px-3 py-3 w-8 align-middle text-center">${desktopExpandControl}</td>
+        <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap" title="${escapeHtmlText(rep.journeyName || '')}">
+          <div class="journey-name-main">${nameDisplay}</div>
+          ${isMultiLeg ? `<div class="text-[11px] text-slate-400 dark:text-slate-500 font-normal mt-0.5">${segs.length} legs</div>` : ''}
         </td>
         <td class="px-4 py-3 align-middle text-center text-xl">${icon}</td>
-        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm">${routeDisplay}</td>
+        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">${routeDisplay}</td>
+        
         <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
-          <span class="block font-medium">${firstDep}</span>
-          ${renderTransportScheduleMobile(firstDep, lastArr, lastArrTime, durationDisplay, icon)}
+          <div class="flex flex-col">
+            <span class="block font-medium text-slate-800 dark:text-slate-200">${firstDep}</span>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              ${fromDetailsHtml}
+            </div>
+          </div>
         </td>
-        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</td>
+        
         <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
-          <span class="font-medium">${rep.provider || '—'}</span>
-          ${renderTransportCarrierMobile(rep.provider, rep.routeCode, rep.bookingReference, statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.id, isEditMode)}
+          <div class="flex flex-col">
+            <span class="block font-medium text-slate-800 dark:text-slate-200">${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</span>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              ${toDetailsHtml}
+            </div>
+          </div>
         </td>
-        <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase">${rep.routeCode || '—'}</td>
-        <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase">${rep.bookingReference || '—'}</td>
-        <td class="px-4 py-3 align-middle">
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors" style="background-color: ${statusColor}15; color: ${statusColor};" onclick="event.stopPropagation(); if(${isEditMode})toggleJourneyStatus('${rep.id}')">
+        
+        <td class="px-4 py-3 align-middle text-center text-slate-600 dark:text-slate-300 text-sm font-medium whitespace-nowrap">
+          ${durationDisplay || '—'}
+        </td>
+        
+        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
+          <span class="font-medium">${escapeHtmlText(rep.provider || '—')}</span>
+        </td>
+        
+        <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">
+          ${escapeHtmlText(rep.routeCode || '—')}
+        </td>
+        
+        <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">
+          ${escapeHtmlText(rep.bookingReference || '—')}
+        </td>
+        
+        <!-- Notes -->
+        <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[130px] break-words" title="${escapeHtmlText(rep.notes || '')}">
+          ${escapeHtmlText(rep.notes || '—')}
+        </td>
+        
+        <td class="px-4 py-3 align-middle text-center">
+          <button class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors border border-transparent hover:border-current focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-slate-300" style="background-color: ${statusColor}15; color: ${statusColor};" onclick="event.stopPropagation(); if(${window.isEditMode})toggleJourneyStatus('${rep.id}')" title="Toggle status">
             ${statusIcon} ${statusText}
-          </span>
-          ${renderTransportStatusCostMobile(statusText, statusIcon, statusColor, isMultiLeg ? totalCost.toFixed(0) : (rep.cost || '0'), rep.bookingReference, rep.id, isEditMode)}
+          </button>
         </td>
+        
         <td class="px-4 py-3 align-middle text-right font-medium text-slate-800 dark:text-slate-200" onclick="event.stopPropagation()">
-          $<span contenteditable="${isEditMode}" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${formatCurrency(isMultiLeg ? totalCost : (rep.cost || '0'), { includeSymbol: false })}</span>
+          $<span contenteditable="${window.isEditMode}" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${formatCurrency(isMultiLeg ? totalCost : (rep.cost || '0'), { includeSymbol: false })}</span>
         </td>
+        
         <td class="px-4 py-3 align-middle text-center whitespace-nowrap" onclick="event.stopPropagation()">
           <div class="inline-flex gap-2">
             <button class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors" onclick="editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">
@@ -1142,7 +1239,7 @@ function buildTransportTab(cityFilter = null) {
 
       html += `
         <tr class="journey-detail-row ${isExpanded ? 'expanded' : ''}" data-group="${gid}" style="display:${isExpanded ? 'table-row' : 'none'};">
-          <td colspan="12">
+          <td colspan="14">
             ${detailRowContent}
           </td>
         </tr>`;

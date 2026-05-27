@@ -81,7 +81,9 @@ async function testMobileSmoke() {
   app.context.buildAccomTab();
   app.context.buildBudgetTab();
   app.context.buildPackingTab();
+  app.document.getElementById('tab-map').classList.add('active');
   app.context.buildJourneyMap();
+  await settle(app);
 
   assert(app.document.getElementById('itinerary').children.length > 0, 'Mobile smoke: itinerary should render');
   assert(app.document.getElementById('transport-table-container').innerHTML.length > 0, 'Mobile smoke: transport should render');

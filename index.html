@@ -448,6 +448,7 @@
             <select id="editLegSelect" class="form-control">
               <option value="">-- Add a new leg --</option>
             </select>
+            <small id="legDialogModeHint" class="text-xs text-slate-500">Choose a leg to edit it, or leave blank to add a new one.</small>
           </div>
           <div class="ai-form-group">
             <label>Leg Type</label>
@@ -504,9 +505,12 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button class="action-btn" onclick="closeAddLegDialog()">Cancel</button>
-          <button id="legDialogSaveBtn" class="action-btn action-btn-secondary" onclick="confirmAddLeg()">Save Leg</button>
+        <div class="modal-footer modal-footer-space-between modal-footer-wrap">
+          <button id="legDialogDeleteBtn" class="action-btn action-btn-danger" onclick="deleteLegFromDialog()" style="display: none;">Delete Leg</button>
+          <div class="journey-footer-actions">
+            <button class="action-btn" onclick="closeAddLegDialog()">Cancel</button>
+            <button id="legDialogSaveBtn" class="action-btn action-btn-secondary" onclick="confirmAddLeg()">Save Leg</button>
+          </div>
         </div>
       </div>
     </div>
