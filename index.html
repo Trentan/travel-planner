@@ -9,10 +9,18 @@
   <meta name="apple-mobile-web-app-title" content="Travel Planner">
   <title>Travel Planner</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <link rel="manifest" href="./manifest.json">
+  <script>
+    // Only load manifest if not on local file system to avoid CORS errors in console
+    if (window.location.protocol !== 'file:') {
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = './manifest.json';
+      document.head.appendChild(link);
+    }
+  </script>
   <meta name="theme-color" content="#1A242F">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./dist/tailwind.css">
+  <link rel="stylesheet" href="./dist/tailwind.css?v=9">
   <!-- Leaflet.js for interactive maps -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -142,21 +150,26 @@
     </div>
 
     <div id="tab-budget" class="tab-pane">
+      <div class="section-header">
+        <h3 class="section-header-title">💰 Budget</h3>
+      </div>
       <div id="budget-kpi-container" class="budget-kpi-grid"></div>
       <div id="budget-table-container"></div>
     </div>
 
     <div id="tab-packing" class="tab-pane">
+      <div class="section-header">
+        <h3 class="section-header-title">🧳 Packing</h3>
+      </div>
       <div id="guides-container" class="guides-container"></div>
       <div id="packing-areas-container"></div>
     </div>
 
     <div id="tab-map" class="tab-pane">
+          <div class="flex items-center gap-3 mb-6">
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">Map</h2>
+          </div>
       <div class="map-container" id="mapContainer">
-        <div class="map-header">
-          <h2>🗺️ Journey Map</h2>
-          <p>Visualize your complete trip route</p>
-        </div>
         <div id="journey-map-view" class="map-placeholder">
           <div class="map-placeholder-inner">
             <div class="map-placeholder-icon">🗺️</div>
@@ -767,7 +780,7 @@
 <script src="./js/tabs.js"></script>
 <script src="./js/ai.js"></script>
 <script src="./js/guide.js"></script>
-<script src="./js/map.js"></script>
+<script src="./js/map.js?v=7"></script>
   <script src="js/ui.js"></script>
   <script src="js/itinerary.js"></script>
   <script src="js/backup.js"></script>
@@ -802,7 +815,7 @@
   }
 
   const isLocalDevHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
-  if ('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
     if (isLocalDevHost) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.getRegistrations()

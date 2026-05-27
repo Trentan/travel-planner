@@ -40,29 +40,35 @@ function buildJourneyMap() {
   const container = document.getElementById('journey-map-view');
   if (!container) return;
 
-  // Clear placeholder
-  container.innerHTML = '';
-  container.classList.remove('map-placeholder');
+  // Abort if the user clicked away before the map could build
+  if (!document.getElementById('tab-map').classList.contains('active')) return;
 
   if (mainMap) {
     mainMap.remove();
     mainMap = null;
   }
 
-  mainMap = L.map(container).setView([20, 0], 2);
+  // Clear placeholder and recreate fresh map
+  container.innerHTML = '';
+  container.classList.remove('map-placeholder');
 
-  // Select tile layer based on current theme
+  mainMap = L.map(container, { trackResize: true });
+
   const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
   const tileUrl = isDarkMode
     ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
   L.tileLayer(tileUrl, {
-    attribution: isDarkMode
-      ? '© OpenStreetMap contributors © CARTO'
-      : '© OpenStreetMap contributors',
+    attribution: '© OpenStreetMap contributors © CARTO',
     subdomains: 'abcd'
   }).addTo(mainMap);
+
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => {
+      if (mainMap) mainMap.invalidateSize();
+    }).observe(container);
+  }
 
   mapMarkers = [];
   mapPolylines = [];
@@ -233,19 +239,27 @@ function buildJourneyMap() {
   if (polylinePoints.length > 1) {
     const polyline = L.polyline(polylinePoints, { color: '#FF6B6B', weight: 3, dashArray: '10, 10', opacity: 0.7 }).addTo(mainMap);
     mapPolylines.push(polyline);
-    mainMap.fitBounds(polyline.getBounds(), { padding: [50, 50] });
-  } else if (polylinePoints.length === 1) {
-    mainMap.setView(polylinePoints[0], 10);
   }
 
-  // Update map legend passing original unique sequence order if we want it by first visit, destinations array is already ordered by first appearance
+  if (mainMap) {
+    setTimeout(() => {
+      if (!mainMap) return;
+      mainMap.invalidateSize(false);
+      
+      if (window.currentCityFilter && window.currentCityFilter !== 'all') {
+        focusCityOnMap(window.currentCityFilter);
+      } else if (polylinePoints.length > 1 && mapPolylines.length > 0) {
+        mainMap.fitBounds(mapPolylines[0].getBounds(), { padding: [50, 50], animate: false });
+      } else if (polylinePoints.length === 1) {
+        mainMap.setView(polylinePoints[0], 10, { animate: false });
+      } else {
+        mainMap.setView([20, 0], 2, { animate: false });
+      }
+    }, 500);
+  }
+
   updateMapLegend(destinations);
   updateMapStats(destinations, unmatchedCities);
-
-  // If there's an active city filter, focus on it
-  if (window.currentCityFilter && window.currentCityFilter !== 'all') {
-    focusCityOnMap(window.currentCityFilter);
-  }
 }
 
 function focusCityOnMap(cityId) {
@@ -259,15 +273,16 @@ function focusCityOnMap(cityId) {
 }
 
 function updateMapLegend(destinations) {
-  const legend = document.getElementById('map-legend-container');
+  const legend = document.getElementById('mapCityLegend');
   if (!legend) return;
-  
-  if (destinations.length === 0) {
-    legend.innerHTML = '<div class="text-slate-400 text-xs">No cities mapped yet.</div>';
-    return;
-  }
 
-  legend.innerHTML = destinations.map(d => {
+  legend.innerHTML = `
+    <button class="map-legend-btn active" data-city="all" style="background-color: var(--primary-color, #10B981); border-color: var(--primary-color, #10B981); color: white;">
+      All
+    </button>
+  `;
+
+  legend.innerHTML += destinations.map(d => {
     return `
       <div class="legend-item" onclick="focusCityOnMap('${d.id}')">
         <span class="legend-item-index" style="background:${d.color};">${d.index}</span>
@@ -337,12 +352,10 @@ function updateMapTiles() {
   const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
   const tileUrl = isDarkMode
     ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
   L.tileLayer(tileUrl, {
-    attribution: isDarkMode
-      ? '© OpenStreetMap contributors © CARTO'
-      : '© OpenStreetMap contributors',
+    attribution: '© OpenStreetMap contributors © CARTO',
     subdomains: 'abcd'
   }).addTo(mainMap);
 }
