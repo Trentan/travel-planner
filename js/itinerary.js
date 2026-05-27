@@ -1927,11 +1927,9 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
         </div>
       ` : '<div class="timeline-empty">No timed entries yet. Add start times to build the day timeline.</div>'}
       ${anytime.length ? `
-        <div class="timeline-anytime">
-          <div class="timeline-anytime-label">Anytime</div>
-          <div class="timeline-anytime-list">
-            ${anytime.map(item => renderDailyTimelineRow(item, compact)).join('')}
-          </div>
+        <div class="timeline-section-label">Anytime</div>
+        <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
+          ${anytime.map(item => renderDailyTimelineRow(item, compact)).join('')}
         </div>
       ` : ''}
     </div>
