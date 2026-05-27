@@ -265,6 +265,27 @@
               "endTime": ""
             }
           ]
+        },
+        {
+          "date": "2026-06-11",
+          "day": "Thu",
+          "from": "Vienna",
+          "to": "Bratislava",
+          "accom": "—",
+          "desc": "Morning in Vienna — depart for Bratislava",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
+          "accomItems": [
+            {
+              "text": "—",
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-vienna"
+            }
+          ],
+          "activityItems": []
         }
       ],
       "suggestedActivities": [
@@ -422,6 +443,27 @@
               "endTime": ""
             }
           ]
+        },
+        {
+          "date": "2026-06-13",
+          "day": "Sat",
+          "from": "Bratislava",
+          "to": "Prague",
+          "accom": "—",
+          "desc": "Morning in Bratislava — depart for Prague",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
+          "accomItems": [
+            {
+              "text": "—",
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-bratislava"
+            }
+          ],
+          "activityItems": []
         }
       ],
       "suggestedActivities": [
@@ -644,6 +686,27 @@
               "endTime": ""
             }
           ]
+        },
+        {
+          "date": "2026-06-15",
+          "day": "Mon",
+          "from": "Prague",
+          "to": "Nuremberg",
+          "accom": "—",
+          "desc": "Morning in Prague — depart for Nuremberg",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
+          "accomItems": [
+            {
+              "text": "—",
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-prague"
+            }
+          ],
+          "activityItems": []
         }
       ],
       "suggestedActivities": [
@@ -790,6 +853,27 @@
               "endTime": ""
             }
           ]
+        },
+        {
+          "date": "2026-06-16",
+          "day": "Tue",
+          "from": "Nuremberg",
+          "to": "Munich",
+          "accom": "—",
+          "desc": "Morning in Nuremberg — depart for Munich",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
+          "accomItems": [
+            {
+              "text": "—",
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-nuremberg"
+            }
+          ],
+          "activityItems": []
         }
       ],
       "suggestedActivities": [
@@ -1471,6 +1555,27 @@
               "location": "soaring rocky spires"
             }
           ]
+        },
+        {
+          "date": "2026-06-23",
+          "day": "Tue",
+          "from": "Bolzano",
+          "to": "Milan",
+          "accom": "—",
+          "desc": "Morning in Bolzano — depart for Milan via Verona",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
+          "accomItems": [
+            {
+              "text": "—",
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-bolzano"
+            }
+          ],
+          "activityItems": []
         }
       ],
       "suggestedActivities": [
@@ -1739,6 +1844,27 @@
               "location": "Main park"
             }
           ]
+        },
+        {
+          "date": "2026-06-26",
+          "day": "Fri",
+          "from": "Milan",
+          "to": "Zurich",
+          "accom": "—",
+          "desc": "Morning in Milan — depart for Zurich",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
+          "accomItems": [
+            {
+              "text": "—",
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-milan"
+            }
+          ],
+          "activityItems": []
         }
       ],
       "suggestedActivities": [
@@ -1920,6 +2046,27 @@
               "cityId": "city-zurich"
             }
           ]
+        },
+        {
+          "date": "2026-06-27",
+          "day": "Sat",
+          "from": "Zurich",
+          "to": "Bangkok",
+          "accom": "—",
+          "desc": "Morning in Zurich — flight departure to Bangkok",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
+          "accomItems": [
+            {
+              "text": "—",
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-zurich"
+            }
+          ],
+          "activityItems": []
         }
       ],
       "suggestedActivities": [
@@ -2135,6 +2282,27 @@
               "endTime": ""
             }
           ]
+        },
+        {
+          "date": "2026-07-01",
+          "day": "Wed",
+          "from": "Bangkok",
+          "to": "Koh Samui",
+          "accom": "—",
+          "desc": "Morning in Bangkok — depart for Koh Samui",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
+          "accomItems": [
+            {
+              "text": "—",
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-bangkok"
+            }
+          ],
+          "activityItems": []
         }
       ],
       "suggestedActivities": [
@@ -2551,6 +2719,27 @@
               "endTime": ""
             }
           ]
+        },
+        {
+          "date": "2026-07-08",
+          "day": "Wed",
+          "from": "Koh Samui",
+          "to": "Home",
+          "accom": "—",
+          "desc": "Departure day from Koh Samui — return flight",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
+          "accomItems": [
+            {
+              "text": "—",
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-samui"
+            }
+          ],
+          "activityItems": []
         }
       ],
       "suggestedActivities": [
