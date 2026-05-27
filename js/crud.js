@@ -1620,6 +1620,7 @@ function syncAllLegDays() {
   }
 
   let changesMade = 0;
+  const changelog = [];
 
   appData.forEach(leg => {
     const cityName = leg.label;
@@ -1665,6 +1666,43 @@ function syncAllLegDays() {
       });
     }
 
+    const formatShortDate = (dStr) => {
+      if (!dStr) return '';
+      const d = new Date(dStr);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    // 1. Handle Arrival Overlaps
+    arrivingJourneys.forEach(j => {
+      const arrDate = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(j.arrivalDate || j.dayDate) : (j.arrivalDate || j.dayDate);
+      if (!arrDate) return;
+      
+      const fromCity = j.fromLocation || 'Previous Destination';
+      
+      let dayIndex = newDays.findIndex(d => d.date === arrDate);
+      if (dayIndex !== -1) {
+        newDays[dayIndex].from = fromCity; // Sets "Paris -> Rome" travel indicator in header
+        newDays[dayIndex].desc = `Arrive from ${fromCity}` + (j.provider ? ` via ${j.provider}` : '');
+        changelog.push(`Updated arrival day (${formatShortDate(arrDate)}) in ${cityName} with travel from ${fromCity}`);
+      } else {
+        newDays.push({
+          date: arrDate,
+          day: new Date(arrDate).toLocaleDateString('en-US', { weekday: 'short' }),
+          from: fromCity,
+          to: cityName,
+          accom: '—',
+          desc: `Arrive from ${fromCity}` + (j.provider ? ` via ${j.provider}` : ''),
+          completed: false,
+          accomCost: '0',
+          activityCost: '0',
+          accomItems: [{ text: '—', cost: '0', status: 'pending', bookingRef: '', cityId: cityId }],
+          activityItems: []
+        });
+        changelog.push(`Added arrival day (${formatShortDate(arrDate)}) in ${cityName} from ${fromCity}`);
+      }
+    });
+
+    // 2. Handle Departure Overlaps
     departingJourneys.forEach(j => {
       const depDate = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(j.departureDate || j.dayDate) : (j.departureDate || j.dayDate);
       if (!depDate) return;
@@ -1674,8 +1712,8 @@ function syncAllLegDays() {
       let dayIndex = newDays.findIndex(d => d.date === depDate);
       if (dayIndex !== -1) {
         newDays[dayIndex].to = toCity;
-        newDays[dayIndex].desc = `Depart for ${toCity}`;
-        if (j.provider) newDays[dayIndex].desc += ` via ${j.provider}`;
+        newDays[dayIndex].desc = `Depart for ${toCity}` + (j.provider ? ` via ${j.provider}` : '');
+        changelog.push(`Updated departure day (${formatShortDate(depDate)}) in ${cityName} with travel to ${toCity}`);
       } else {
         newDays.push({
           date: depDate,
@@ -1690,16 +1728,21 @@ function syncAllLegDays() {
           accomItems: [{ text: '—', cost: '0', status: 'pending', bookingRef: '', cityId: cityId }],
           activityItems: []
         });
+        changelog.push(`Added departure day (${formatShortDate(depDate)}) to ${cityName} for travel to ${toCity}`);
       }
     });
 
     newDays.sort((a, b) => a.date.localeCompare(b.date));
 
+    // Preserve existing notes
     if (Array.isArray(leg.days)) {
       newDays.forEach(nd => {
         const oldDay = leg.days.find(od => od.date === nd.date);
         if (oldDay) {
-          if (oldDay.desc && !nd.desc.startsWith('Depart for')) nd.desc = oldDay.desc;
+          // Keep old notes if user had custom text, except if it was just an old travel generic string
+          if (oldDay.desc && !nd.desc.startsWith('Depart for') && !nd.desc.startsWith('Arrive from') && !oldDay.desc.startsWith('Depart for') && !oldDay.desc.startsWith('Arrive from')) {
+            nd.desc = oldDay.desc;
+          }
           if (oldDay.accomItems) nd.accomItems = oldDay.accomItems;
           if (oldDay.activityItems) nd.activityItems = oldDay.activityItems;
           if (oldDay.transportItems) nd.transportItems = oldDay.transportItems;
@@ -1707,17 +1750,42 @@ function syncAllLegDays() {
       });
     }
 
+    // Check if lengths differ
+    if (!leg.days || leg.days.length !== newDays.length) {
+      if (!changelog.some(log => log.includes(`Added`) && log.includes(cityName))) {
+         changelog.push(`Rebuilt ${newDays.length} day(s) for ${cityName}`);
+      }
+      changesMade++;
+    } else {
+      // Check for structural changes
+      const structuralChange = leg.days.some((od, i) => od.from !== newDays[i].from || od.to !== newDays[i].to || od.date !== newDays[i].date);
+      if (structuralChange) changesMade++;
+    }
+
     leg.days = newDays;
-    changesMade++;
   });
 
-  if (changesMade > 0) {
+  if (changesMade > 0 || changelog.length > 0) {
     if (typeof saveData === 'function') saveData();
     if (typeof buildItinerary === 'function') buildItinerary();
     if (typeof closeAddLegDialog === 'function') closeAddLegDialog();
-    alert(`Successfully synced ${changesMade} leg(s) with your journey and stay dates!`);
+    
+    // Display Modal
+    const modal = document.getElementById('sync-results-modal');
+    if (modal) {
+      document.getElementById('sync-results-summary').textContent = `Successfully synced days based on your latest journeys.`;
+      const logContainer = document.getElementById('sync-results-log');
+      if (changelog.length > 0) {
+        logContainer.textContent = changelog.map(line => '• ' + line).join('\n');
+      } else {
+        logContainer.textContent = 'Dates re-aligned properly. No major day overrides needed.';
+      }
+      modal.style.display = 'flex';
+    } else {
+      alert('Successfully synced legs!\n\n' + changelog.map(line => '• ' + line).join('\n'));
+    }
   } else {
-    alert('No changes were needed.');
+    alert('No changes were needed. Day cards are already in sync with journeys and stays.');
   }
 }
 
