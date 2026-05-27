@@ -1540,7 +1540,7 @@ function updateLegDialogUiMode() {
   const modeHint = document.getElementById('legDialogModeHint');
   const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
   if (title) title.textContent = 'Edit Legs';
-  if (saveBtn) saveBtn.textContent = isEdit ? 'Update Leg' : 'Add Leg';
+  if (saveBtn) saveBtn.textContent = isEdit ? 'Confirm Leg Changes' : 'Add Leg';
   if (modeHint) {
     modeHint.textContent = isEdit
       ? 'Editing selected leg. Update details below or delete this leg.'
@@ -1551,8 +1551,80 @@ function updateLegDialogUiMode() {
 
 function _syncLegDialogActions() {
   const deleteBtn = document.getElementById('legDialogDeleteBtn');
+  const recalcBtn = document.getElementById('legDialogRecalcBtn');
   const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
   if (deleteBtn) deleteBtn.style.display = isEdit ? 'inline-flex' : 'none';
+  if (recalcBtn) recalcBtn.style.display = isEdit ? 'inline-flex' : 'none';
+}
+
+function recalculateLegFromJourneys() {
+  const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
+  if (!isEdit) {
+    alert('Choose a leg first, then recalculate from journeys.');
+    return;
+  }
+
+  const leg = appData?.[legDialogState.editLegIdx];
+  if (!leg?.id) {
+    alert('Could not find the selected leg.');
+    return;
+  }
+
+  const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+  const linked = journeysSource.filter(j => String(j?.legId || '') === String(leg.id));
+  if (!linked.length) {
+    alert('No journeys linked to this leg yet.');
+    return;
+  }
+
+  const toSortable = (val) => {
+    if (!val) return '';
+    if (typeof normalizeTripDateValue === 'function') {
+      const normalized = normalizeTripDateValue(val);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(normalized || '')) return normalized;
+    }
+    return String(val);
+  };
+  const getDepDate = (j) => toSortable(j.departureDate || j.dayDate || '');
+  const getArrDate = (j) => toSortable(j.arrivalDate || j.departureDate || j.dayDate || '');
+  const getDepTime = (j) => String(j.departureTime || '').padStart(5, '0');
+  const getArrTime = (j) => String(j.arrivalTime || '').padStart(5, '0');
+
+  linked.sort((a, b) => {
+    const dateCmp = getDepDate(a).localeCompare(getDepDate(b));
+    if (dateCmp !== 0) return dateCmp;
+    return getDepTime(a).localeCompare(getDepTime(b));
+  });
+
+  const first = linked[0];
+  const last = [...linked].sort((a, b) => {
+    const dateCmp = getArrDate(a).localeCompare(getArrDate(b));
+    if (dateCmp !== 0) return dateCmp;
+    return getArrTime(a).localeCompare(getArrTime(b));
+  }).slice(-1)[0];
+
+  const fromLoc = String(first?.fromLocation || '').trim();
+  const toLoc = String(last?.toLocation || '').trim();
+  const dateFrom = getDepDate(first);
+  const dateTo = getArrDate(last) || dateFrom;
+  const looksTravel = !!fromLoc && !!toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase();
+
+  const legTypeSelect = document.getElementById('legTypeSelect');
+  const fromCitySelect = document.getElementById('fromCitySelect');
+  const toCitySelect = document.getElementById('toCitySelect');
+  const existingCitySelect = document.getElementById('existingCitySelect');
+  const startInput = document.getElementById('newLegStartDate');
+  const endInput = document.getElementById('newLegEndDate');
+
+  if (legTypeSelect) legTypeSelect.value = looksTravel ? 'travel' : 'city';
+  onLegTypeChange();
+  if (fromCitySelect && fromLoc) fromCitySelect.value = fromLoc;
+  if (toCitySelect && toLoc) toCitySelect.value = toLoc;
+  if (existingCitySelect && toLoc) existingCitySelect.value = toLoc;
+  if (startInput && dateFrom) startInput.value = dateFrom;
+  if (endInput && dateTo) endInput.value = dateTo;
 }
 
 function onEditLegSelectionChange() {
@@ -1968,6 +2040,7 @@ window.checkDateConflict = checkDateConflict;
 window.adjustLegDays = adjustLegDays;
 window.confirmAddLeg = confirmAddLeg;
 window.deleteLegFromDialog = deleteLegFromDialog;
+window.recalculateLegFromJourneys = recalculateLegFromJourneys;
 window.deleteActivity = deleteActivity;
 window._populateAddLegCityDropdowns = _populateAddLegCityDropdowns;
 window.onNewLegCountryChange = onNewLegCountryChange;
