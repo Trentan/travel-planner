@@ -1551,33 +1551,15 @@ function updateLegDialogUiMode() {
 
 function _syncLegDialogActions() {
   const deleteBtn = document.getElementById('legDialogDeleteBtn');
-  const recalcBtn = document.getElementById('legDialogRecalcBtn');
   const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
   if (deleteBtn) deleteBtn.style.display = isEdit ? 'inline-flex' : 'none';
-  if (recalcBtn) recalcBtn.style.display = isEdit ? 'inline-flex' : 'none';
 }
 
-function recalculateLegFromJourneys() {
-  const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
-  if (!isEdit) {
-    alert('Choose a leg first, then recalculate from journeys.');
-    return;
-  }
-
-  const leg = appData?.[legDialogState.editLegIdx];
-  if (!leg?.id) {
-    alert('Could not find the selected leg.');
-    return;
-  }
-
-  const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-    ? window.journeys
-    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-  const linked = journeysSource.filter(j => String(j?.legId || '') === String(leg.id));
-  if (!linked.length) {
-    alert('No journeys linked to this leg yet.');
-    return;
-  }
+function regenerateItineraryFromJourneys(linkedJourneys, legId) {
+  if (!linkedJourneys || !linkedJourneys.length || !legId) return false;
+  
+  const leg = appData.find(l => String(l.id) === String(legId));
+  if (!leg) return false;
 
   const toSortable = (val) => {
     if (!val) return '';
@@ -1592,39 +1574,44 @@ function recalculateLegFromJourneys() {
   const getDepTime = (j) => String(j.departureTime || '').padStart(5, '0');
   const getArrTime = (j) => String(j.arrivalTime || '').padStart(5, '0');
 
-  linked.sort((a, b) => {
+  const sorted = [...linkedJourneys].sort((a, b) => {
     const dateCmp = getDepDate(a).localeCompare(getDepDate(b));
     if (dateCmp !== 0) return dateCmp;
     return getDepTime(a).localeCompare(getDepTime(b));
   });
 
-  const first = linked[0];
-  const last = [...linked].sort((a, b) => {
+  const first = sorted[0];
+  const last = [...sorted].sort((a, b) => {
     const dateCmp = getArrDate(a).localeCompare(getArrDate(b));
     if (dateCmp !== 0) return dateCmp;
     return getArrTime(a).localeCompare(getArrTime(b));
   }).slice(-1)[0];
 
-  const fromLoc = String(first?.fromLocation || '').trim();
-  const toLoc = String(last?.toLocation || '').trim();
   const dateFrom = getDepDate(first);
   const dateTo = getArrDate(last) || dateFrom;
-  const looksTravel = !!fromLoc && !!toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase();
+  
+  if (!dateFrom) return false;
 
-  const legTypeSelect = document.getElementById('legTypeSelect');
-  const fromCitySelect = document.getElementById('fromCitySelect');
-  const toCitySelect = document.getElementById('toCitySelect');
-  const existingCitySelect = document.getElementById('existingCitySelect');
-  const startInput = document.getElementById('newLegStartDate');
-  const endInput = document.getElementById('newLegEndDate');
+  // We simply regenerate the days array for this leg using buildLegDaysWithNotes
+  const newDays = buildLegDaysWithNotes({
+    dateFrom,
+    dateTo,
+    fromCity: first.fromLocation || '',
+    toCity: last.toLocation || '',
+    legType: leg.label,
+    dayNotes: []
+  });
+  
+  // Merge notes from old days if they match by date
+  newDays.forEach(nd => {
+    const oldDay = leg.days.find(od => od.date === nd.date);
+    if (oldDay && oldDay.desc) {
+      nd.desc = oldDay.desc;
+    }
+  });
 
-  if (legTypeSelect) legTypeSelect.value = looksTravel ? 'travel' : 'city';
-  onLegTypeChange();
-  if (fromCitySelect && fromLoc) fromCitySelect.value = fromLoc;
-  if (toCitySelect && toLoc) toCitySelect.value = toLoc;
-  if (existingCitySelect && toLoc) existingCitySelect.value = toLoc;
-  if (startInput && dateFrom) startInput.value = dateFrom;
-  if (endInput && dateTo) endInput.value = dateTo;
+  leg.days = newDays;
+  return true;
 }
 
 function onEditLegSelectionChange() {
@@ -1930,7 +1917,8 @@ function confirmAddLeg() {
 
     if (existingCity && existingCity !== 'Home') {
       // Using existing city
-      label = '📍 ' + existingCity;
+      const flag = typeof getCityFlag === 'function' ? getCityFlag(existingCity) : '📍';
+      label = flag + ' ' + existingCity;
       fromCity = existingCity;
       toCity = existingCity;
     } else if (newCityName) {
@@ -1956,7 +1944,8 @@ function confirmAddLeg() {
         buildCityNav();
       }
 
-      label = '📍 ' + newCityName;
+      const flag = typeof getCityFlag === 'function' ? getCityFlag(newCityName) : '📍';
+      label = flag + ' ' + newCityName;
       fromCity = newCityName;
       toCity = newCityName;
     } else {
@@ -2040,7 +2029,7 @@ window.checkDateConflict = checkDateConflict;
 window.adjustLegDays = adjustLegDays;
 window.confirmAddLeg = confirmAddLeg;
 window.deleteLegFromDialog = deleteLegFromDialog;
-window.recalculateLegFromJourneys = recalculateLegFromJourneys;
+window.regenerateItineraryFromJourneys = regenerateItineraryFromJourneys;
 window.deleteActivity = deleteActivity;
 window._populateAddLegCityDropdowns = _populateAddLegCityDropdowns;
 window.onNewLegCountryChange = onNewLegCountryChange;

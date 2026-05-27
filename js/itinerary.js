@@ -1927,7 +1927,7 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
         </div>
       ` : '<div class="timeline-empty">No timed entries yet. Add start times to build the day timeline.</div>'}
       ${anytime.length ? `
-        <div class="timeline-section-label">Anytime</div>
+        <div class="timeline-section-label timeline-anytime-label">Anytime</div>
         <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
           ${anytime.map(item => renderDailyTimelineRow(item, compact)).join('')}
         </div>
@@ -2264,6 +2264,7 @@ function buildItinerary() {
           <span class="${badgeClass}">${nightLabel}</span>
           ${isEditMode ? `<button class="header-del-btn" title="Add a day to this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, 1)">+</button>` : ''}
           ${isEditMode ? `<button class="header-del-btn" title="Remove a day from this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, -1)">−</button>` : ''}
+          ${isEditMode ? `<button class="header-del-btn" title="Edit Leg" onclick="event.stopPropagation(); openLegEditorDirect(${legIndex})">✎</button>` : ''}
           ${isEditMode ? `<button class="header-del-btn" title="Delete Leg" onclick="event.stopPropagation(); deleteLeg(${legIndex})">🗑️</button>` : ''}
           <span class="leg-chevron">▼</span>
         </div>

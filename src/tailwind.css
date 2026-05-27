@@ -2510,6 +2510,16 @@
     display: none;
   }
 
+  /* Desktop mode grouped day cards visibility */
+  @media (min-width: 768px) {
+    body:not(.mobile-app-mode) .compact-desktop-stack .compact-day-carousel {
+      display: block;
+    }
+    body:not(.mobile-app-mode) .compact-desktop-stack .compact-day-slide:not(.is-active) {
+      display: none;
+    }
+  }
+
   body.compact-view-mode .compact-day-slide {
     @apply shrink-0 w-full min-w-0;
     flex: 0 0 100%;

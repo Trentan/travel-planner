@@ -24,7 +24,7 @@ function renderStayDetailBlock(title, value, extraClass = '') {
   `;
 }
 
-function renderStayLocationDetails(stay, extraClass = '') {
+function renderStayLocationDetails(stay, extraClass = '', showLabel = true) {
   if (!stay || !stay.location) return '';
 
   let cityName = '';
@@ -36,7 +36,7 @@ function renderStayLocationDetails(stay, extraClass = '') {
   return `
     <div class="transport-sub-location-details stay-location-details ${extraClass}">
       <span class="transport-sub-location-detail" title="${escapeHtmlText(stay.location)}">
-        <span class="transport-sub-location-label">Location</span>
+        ${showLabel ? '<span class="transport-sub-location-label">Location</span>' : ''}
         <span class="transport-sub-location-value">
           <a href="${getMapSearchUrl(stay.location, cityName)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link" onclick="event.stopPropagation();" title="Open in Google Maps">
             <span class="location-map-icon">&#x1F5FA;&#xFE0F;</span> ${escapeHtmlText(stay.location)}
@@ -264,12 +264,14 @@ function buildAccomTab(cityFilter = null) {
         <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/60 dark:border-slate-700/60">
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">City</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Property</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Location</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Provider</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Booking Ref</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Check-in</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Check-out</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Nights</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Booking Ref</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notes</th>
+          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Status</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Cost</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Actions</th>
         </tr>
@@ -298,16 +300,19 @@ function buildAccomTab(cityFilter = null) {
     const statusIcon = statusIcons[status] || '⏳';
 
     html += `<tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" style="border-left: 4px solid ${cityColor};">
-      <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">${getCityFlagHTML(cityName)} <span class="ml-1">${cityName}</span></td>
+      <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">
+        <div class="flex items-center gap-1.5">${getCityFlagHTML(cityName)} <span class="ml-1">${cityName}</span></div>
+      </td>
       <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium min-w-[200px]">
-        <span contenteditable="${isEditMode}" onblur="updateStayField('${stay.id}', 'propertyName', this.innerText)" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1 -ml-1">${escapeHtml(stay.propertyName)}</span>
-        ${renderStayLocationDetails(stay, 'text-xs mt-0.5 text-slate-500')}
+        <span>${escapeHtml(stay.propertyName)}</span>
         <div class="md:hidden mt-2 border-t border-slate-100 dark:border-slate-800 pt-2">
           ${renderStayMobileSummary(stay, status, statusIcon, cityName)}
         </div>
       </td>
-      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${stay.provider || '—'}</td>
-      <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase">${stay.bookingRef || '—'}</td>
+      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">
+        ${stay.location ? renderStayLocationDetails(stay, 'text-xs', false) : '—'}
+      </td>
+      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${escapeHtmlText(stay.provider || '—')}</td>
       <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
         ${formatDateShort(stay.checkIn)}
         <div class="md:hidden mt-1 text-slate-500">
@@ -316,11 +321,20 @@ function buildAccomTab(cityFilter = null) {
       </td>
       <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${formatDateShort(stay.checkOut)}</td>
       <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm text-center">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
-      <td class="px-4 py-3 align-middle">
-        ${renderStayStatusCostSummary(stay, status, statusIcon)}
+      <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">${escapeHtmlText(stay.bookingRef || '—')}</td>
+      
+      <!-- Notes -->
+      <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[130px] break-words" title="${escapeHtmlText(stay.notes || '')}">
+        ${escapeHtmlText(stay.notes || '—')}
+      </td>
+
+      <td class="px-4 py-3 align-middle text-center">
+        <button class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors border border-transparent hover:border-current focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-slate-300" style="background-color: ${statusColor}15; color: ${statusColor};" onclick="event.stopPropagation(); if(${isEditMode})toggleStayStatus(event, '${stay.id}')" title="Toggle status">
+          ${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}
+        </button>
       </td>
       <td class="px-4 py-3 align-middle text-right font-medium text-slate-800 dark:text-slate-200">
-        $<span contenteditable="${isEditMode}" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1" onblur="updateStayField('${stay.id}', 'totalCost', this.innerText)">${formatCurrency(stay.totalCost || '0', { includeSymbol: false })}</span>
+        $<span>${formatCurrency(stay.totalCost || '0', { includeSymbol: false })}</span>
       </td>
       <td class="px-4 py-3 align-middle text-center whitespace-nowrap">
         <div class="inline-flex gap-2">
