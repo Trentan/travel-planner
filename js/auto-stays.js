@@ -11,7 +11,7 @@ function calculateExpectedStays() {
   const expectedStays = {};
 
   // Skip list for destinations that don't represent actual stays
-  const skipList = ['Home', 'In transit', 'Between cities', 'TBC', ''];
+  const skipList = ['Home', 'In transit', 'Between cities', 'TBC', '', 'Return', 'Departure', 'Flight'];
 
   appData.forEach(leg => {
     leg.days.forEach((day, dayIndex) => {
@@ -141,7 +141,7 @@ function autopopulateStays() {
   const createdStays = [];
 
   // Skip list for destinations that don't represent actual stays
-  const skipList = ['Home', 'In transit', 'Between cities', 'TBC', ''];
+  const skipList = ['Home', 'In transit', 'Between cities', 'TBC', '', 'Return', 'Departure', 'Flight'];
 
   appData.forEach((leg, legIndex) => {
     let currentCity = null;

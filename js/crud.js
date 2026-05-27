@@ -1645,6 +1645,51 @@ function syncAllLegDays() {
       (j.fromCityId !== j.toCityId && (!j.fromLocation || !j.toLocation || j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase()))
     );
     
+    // 1. Establish an anchor timeframe to prevent merging distant transits with main stays
+    let anchorEarliest = null;
+    let anchorLatest = null;
+    
+    // Anchor priority 1: Stays
+    const stayDates = [];
+    legStays.forEach(s => { if (s.checkIn) stayDates.push(s.checkIn); if (s.checkOut) stayDates.push(s.checkOut); });
+    if (stayDates.length > 0) {
+      stayDates.sort();
+      anchorEarliest = stayDates[0];
+      anchorLatest = stayDates[stayDates.length - 1];
+    }
+    
+    // Anchor priority 2: Explicitly mapped journeys
+    if (!anchorEarliest) {
+      const mappedDates = [];
+      (window.journeys || []).forEach(j => {
+        if (j.legId === leg.id) {
+          if (j.arrivalDate) mappedDates.push(j.arrivalDate);
+          if (j.departureDate) mappedDates.push(j.departureDate);
+          if (j.dayDate) mappedDates.push(j.dayDate);
+        }
+      });
+      if (mappedDates.length > 0) {
+        mappedDates.sort();
+        anchorEarliest = mappedDates[0];
+        anchorLatest = mappedDates[mappedDates.length - 1];
+      }
+    }
+    
+    // Anchor priority 3: Existing leg.days
+    if (!anchorEarliest && leg.days && leg.days.length > 0) {
+      anchorEarliest = leg.days[0].date;
+      anchorLatest = leg.days[leg.days.length - 1].date;
+    }
+    
+    const isWithinAnchor = (dStr) => {
+      if (!anchorEarliest || !anchorLatest) return true; // Allow all if no anchor exists
+      if (!dStr) return false;
+      const dTime = new Date(dStr).getTime();
+      const minTime = new Date(anchorEarliest).getTime() - (14 * 24 * 60 * 60 * 1000);
+      const maxTime = new Date(anchorLatest).getTime() + (14 * 24 * 60 * 60 * 1000);
+      return dTime >= minTime && dTime <= maxTime;
+    };
+    
     let earliestDate = null;
     let latestDate = null;
 
@@ -1652,6 +1697,7 @@ function syncAllLegDays() {
       if (!d) return;
       const normalized = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(d) : d;
       if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return;
+      if (!isWithinAnchor(normalized)) return; // Ignore distant transit dates
       if (!earliestDate || normalized < earliestDate) earliestDate = normalized;
       if (!latestDate || normalized > latestDate) latestDate = normalized;
     };
