@@ -597,7 +597,7 @@
   }
 
   .section-header-title {
-    @apply m-0 font-serif text-[1.2rem] text-text-primary;
+    @apply m-0 font-serif text-[1.38rem] font-bold text-text-primary tracking-tight;
   }
 
   .section-header-title.large {
@@ -611,10 +611,6 @@
   /* Itinerary readability pass: stronger hierarchy, cleaner spacing */
   #tab-itinerary .section-header {
     @apply mb-4 gap-3;
-  }
-
-  #tab-itinerary .section-header-title {
-    @apply text-[1.38rem] font-bold text-text-primary tracking-tight;
   }
 
   #tab-itinerary .itinerary-view-mode-control {
@@ -760,10 +756,6 @@
   @media (min-width: 901px) {
     #tab-itinerary .section-header {
       @apply flex-nowrap items-center;
-    }
-
-    #tab-itinerary .section-header-title {
-      @apply shrink-0;
     }
 
     #tab-itinerary .top-controls .action-btn {
@@ -4005,9 +3997,7 @@
   }
 
   /* Packing page parity layer */
-  #tab-packing {
-    @apply px-3 sm:px-4 md:px-5;
-  }
+  
 
   .packing-guides-shell {
     @apply mb-4 p-3 sm:p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80
@@ -4084,7 +4074,7 @@
   }
 
   .leave-home-list {
-    @apply grid gap-1.5;
+    @apply flex flex-wrap gap-2;
   }
 
   .leave-home-progress {
@@ -4138,9 +4128,7 @@
   }
 
   /* Map tab parity layer */
-  #tab-map {
-    @apply px-3 sm:px-4 md:px-5;
-  }
+  
 
   .map-container {
     @apply rounded-2xl border border-slate-200/70 dark:border-slate-700/80
@@ -4161,7 +4149,12 @@
   }
 
   #journey-map-view {
-    @apply min-h-80 sm:min-h-105;
+    @apply h-[320px] sm:h-[420px] min-h-[320px] sm:min-h-[420px];
+  }
+
+  /* Fix for Leaflet tiles breaking with Tailwind */
+  .leaflet-container img {
+    max-width: none !important;
   }
 
   .map-placeholder {
@@ -4174,6 +4167,28 @@
 
   .map-placeholder-icon {
     @apply text-4xl mb-1;
+  }
+
+  .numbered-map-marker {
+    @apply bg-transparent border-none;
+  }
+
+  .marker-dot {
+    @apply w-[30px] h-[30px] rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-md;
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .marker-flared {
+    z-index: 1000 !important;
+  }
+
+  .marker-flared .marker-dot {
+    transform: scale(1.3);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4), 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .is-transit-marker .marker-dot {
+    @apply border-dashed;
   }
 
   .map-controls {
@@ -4216,7 +4231,7 @@
   }
 
   .map-legend-list {
-    @apply grid gap-1.5;
+    @apply flex flex-wrap justify-center gap-2;
   }
 
   .legend-item {
@@ -4273,7 +4288,7 @@
     }
 
     #tab-map #journey-map-view {
-      @apply min-h-70;
+      @apply h-[280px] min-h-[280px];
     }
 
     #tab-map .map-header,

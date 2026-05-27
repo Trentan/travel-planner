@@ -148,7 +148,7 @@ function buildAccomTab(cityFilter = null) {
   if (sortedStays.length === 0) {
     container.innerHTML = `
       <div class="section-header accom-header">
-        <h3 class="section-header-title">&#127968; Accommodation</h3>
+        <h3 class="section-header-title">🏨 Accommodation</h3>
         <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
       </div>
       <div class="empty-placeholder">
@@ -163,7 +163,7 @@ function buildAccomTab(cityFilter = null) {
 
   const headerHtml = `
     <div class="section-header accom-header">
-      <h3 class="section-header-title">&#127968; Accommodation</h3>
+      <h3 class="section-header-title">🏨 Accommodation</h3>
       <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
     </div>
   `;
