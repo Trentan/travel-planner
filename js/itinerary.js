@@ -1749,10 +1749,12 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       const route = [fromLoc, toLoc].filter(Boolean).join(' -> ');
       const isSameDaySegment = isDepartureDay && isArrivalDay && depDate === arrDate;
       const crossDateNote = arrDate && depDate && arrDate !== depDate ? `Arrives ${formatTripDateForDisplay(arrDate)}` : '';
+      
+      const transportTypeLabel = isSameDaySegment ? 'Transport' : (isDepartureDay ? 'Depart' : 'Arrive');
 
       items.push({
         type: 'transport',
-        typeLabel: isSameDaySegment ? 'Transport' : (isDepartureDay ? 'Depart' : 'Arrive'),
+        typeLabel: transportTypeLabel,
         icon: getTransportIcon(segment.transportType || journey.transportType),
         title: journey.journeyName || route || 'Transport',
         meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDateNote].filter(Boolean).join(' · '),
@@ -1767,6 +1769,20 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
         done: !!journey.done,
         notes: segment.notes || journey.notes || ''
       });
+      
+      // If it's a departure from the city to another city, add the cutoff line
+      if (isDepartureDay && fromLoc && toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase() && !items.some(i => i.type === 'departureBlock')) {
+        const transType = segment.transportType || journey.transportType || 'Transport';
+        const transTypeCapitalized = transType.charAt(0).toUpperCase() + transType.slice(1);
+        items.push({
+          type: 'departureBlock',
+          typeLabel: 'Departure',
+          icon: '✈️',
+          title: `Departed ${fromLoc} - ${transTypeCapitalized} to ${toLoc}`,
+          startTime: depTime,
+          sortValue: getDailyTimelineItemSortValue(dayDate, depTime, 99999)
+        });
+      }
     });
   });
 
@@ -1848,6 +1864,19 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
     });
   });
 
+  // If it is the final departure day but no journey created a departure block, create a generic one
+  const isFinalDepartureDay = dayIndex === leg.days.length - 1 && day.from && day.to && day.from !== day.to;
+  if (isFinalDepartureDay && !items.some(i => i.type === 'departureBlock')) {
+    items.push({
+      type: 'departureBlock',
+      typeLabel: 'Departure',
+      icon: '✈️',
+      title: `Departed ${day.from} to ${day.to}`,
+      startTime: '23:59', // Put it at the very end
+      sortValue: getDailyTimelineItemSortValue(dayDate, '23:59', 99999)
+    });
+  }
+
   return items.sort((a, b) => {
     if (a.sortValue !== b.sortValue) return a.sortValue - b.sortValue;
     return String(a.title || '').localeCompare(String(b.title || ''));
@@ -1862,6 +1891,15 @@ function getDailyTimelineBuckets(items) {
 }
 
 function renderDailyTimelineRow(item, compact = false) {
+  if (item.type === 'departureBlock') {
+    return `
+      <div class="daily-timeline-departure-block" style="grid-column: 1 / -1; background: repeating-linear-gradient(45deg, #FFF9C4 0px, #FFF9C4 10px, #FFF176 10px, #FFF176 20px); border-top: 2px solid #FBC02D; border-bottom: 2px solid #FBC02D; padding: 12px 16px; margin: 24px 0 0 0; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; position: relative;">
+         <span style="font-weight: 800; color: #F57F17; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; background: rgba(255,255,255,0.7); padding: 2px 8px; border-radius: 4px;">🚫 ${item.title}</span>
+         <span style="font-size: 0.7rem; color: #F57F17; font-weight: 600; text-transform: uppercase; background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px;">No activities after departure</span>
+         <div style="position: absolute; bottom: -200px; left: 0; right: 0; top: 100%; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 10px, transparent 10px, transparent 20px); pointer-events: none; z-index: 10;"></div>
+      </div>
+    `;
+  }
   const isTimeClickable = isEditMode && (item.type === 'activity' || item.type === 'transport' || item.type === 'stay');
   const timeClass = "daily-timeline-time" + (isTimeClickable ? " is-clickable" : "");
   
@@ -2334,7 +2372,6 @@ function buildItinerary() {
     </div>`;
 
     leg.days.forEach((day, dayIndex) => {
-      const isDepartureDay = dayIndex === leg.days.length - 1 && day.to && day.from && day.to !== day.from;
       const cityHTML = day.from === day.to ? `<span class="city-same">${day.from}</span>` : `${day.from} <span style="opacity:0.4">→</span> ${day.to}`;
       const dayTotal = getDayTotal(day);
 
@@ -2347,20 +2384,18 @@ function buildItinerary() {
       const openClass = shouldBeOpen ? 'open' : '';
       const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
       const dayViewMode = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
-      
-      const departureClass = isDepartureDay ? 'departure-block opacity-80 border-b-4 !border-b-slate-400 dark:!border-b-slate-500' : '';
 
       html += `
-      <div class="day-card group flex flex-col mb-4 overflow-hidden bg-white/90 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 rounded-xl shadow-sm transition-all duration-300 ${openClass} ${departureClass}" data-day-key="${escapeCompactText(dayKey)}">
+      <div class="day-card group flex flex-col mb-4 overflow-hidden bg-white/90 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 rounded-xl shadow-sm transition-all duration-300 ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
         <div class="day-bar flex items-center p-3 sm:p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors relative" style="border-left: 5px solid var(--leg-colour, ${leg.colour})" onclick="toggleCard(this)">
           <div class="day-date w-16 sm:w-20 shrink-0 text-center flex flex-col items-center justify-center border-r border-slate-200 dark:border-slate-700 pr-3 sm:pr-4 mr-3 sm:mr-4"><span class="day-num text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">${dayDateLabel}</span><span class="day-name text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${day.day}</span></div>
-          <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${cityHTML}</div><div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode && !isDepartureDay}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${isDepartureDay ? '<i>End of stay - departure day</i>' : day.desc}</div></div>
+          <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${cityHTML}</div><div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
           ${dayTotal ? `<div class="day-total-cost hidden sm:flex shrink-0 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-full border border-slate-200 dark:border-slate-600 shadow-inner mr-4" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron shrink-0 w-8 h-8 flex items-center justify-center text-slate-400 transition-transform duration-300 bg-slate-100 dark:bg-slate-700/50 rounded-full group-[.open]:rotate-180">▼</span>
         </div>
         <div class="day-detail hidden group-[.open]:block border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 p-4 sm:p-5"><div class="day-planner-shell day-planner-shell-${dayViewMode}">
           <div class="day-view-panel day-view-panel-timeline">
-          <div class="detail-block bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80 dark:border-slate-700/80 ${isDepartureDay ? '' : 'drop-zone'}" ${isDepartureDay ? '' : `onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})"`}>
-            ${renderDailyTimeline(leg, legIndex, day, dayIndex, isDepartureDay)}
+          <div class="detail-block bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80 dark:border-slate-700/80 drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
+            ${renderDailyTimeline(leg, legIndex, day, dayIndex)}
           </div>
           </div>
           <div class="day-view-panel day-view-panel-grouped"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 mt-4">
@@ -2413,7 +2448,7 @@ function buildItinerary() {
                 </div>
               </div>`;
       }).join('')}
-            </div>${isEditMode && !isDepartureDay ? `<button class="add-btn" onclick="event.stopPropagation(); openAddJourneyModal();">+ Add Journey</button>` : ''}
+            </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); openAddJourneyModal();">+ Add Journey</button>` : ''}
           </div>
 
 
@@ -2445,10 +2480,10 @@ ${(() => {
       </div>`;
         }).join('');
       })()}
-</div>${isEditMode && !isDepartureDay ? `<button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Add Stay</button>` : ''}
+</div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Add Stay</button>` : ''}
 </div>
 
-          <div class="detail-block block-activities ${isDepartureDay ? '' : 'drop-zone'} flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md" ${isDepartureDay ? '' : `ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})"`}>
+          <div class="detail-block block-activities drop-zone flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
             <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Planned Activities</h4><div class="item-list space-y-2">
             ${(day.activityItems || []).map((item, i) => {
               let locationVal = item.location || '';
@@ -2498,7 +2533,7 @@ ${(() => {
                 </div>
               `;
             }).join('')}
-            </div>${isEditMode && !isDepartureDay ? `<button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>` : ''}
+            </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>` : ''}
           </div>
 
           </div></div>
