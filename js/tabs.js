@@ -231,7 +231,7 @@ function buildAccomTab(cityFilter = null) {
         detailsOpen: true
       });
       slidesHtml.push(`
-        <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}">
+        <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(stay.cityId || '')}">
           ${cardHtml}
         </div>
       `);
@@ -247,6 +247,7 @@ function buildAccomTab(cityFilter = null) {
     const mobileHtml = renderMobileSwipePager({
       pagerClass: 'stay-swipe-pager',
       pagerKey: 'stay-swipe',
+      syncCityNav: true,
       railHtml: railHtml.join(''),
       slidesHtml: slidesHtml.join(''),
       ariaLabel: 'Accommodation stays'
@@ -671,4 +672,5 @@ function buildBudgetTab() {
   html += `</tbody></table></div>`;
   container.innerHTML = html;
 }
+
 

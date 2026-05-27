@@ -910,7 +910,7 @@ function buildTransportTab(cityFilter = null) {
 
   let html = `
     <div class="section-header transport-header">
-      <h3 class="section-header-title">✈ Transport</h3>
+      <h3 class="section-header-title">✈️ Transport</h3>
       <button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>
     </div>
   `;
@@ -997,7 +997,7 @@ function buildTransportTab(cityFilter = null) {
         detailsOpen: true
       });
       slidesHtml.push(`
-        <div id="transport-slide-${index}" class="mobile-swipe-slide transport-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}">
+        <div id="transport-slide-${index}" class="mobile-swipe-slide transport-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(rep.toCityId || rep.fromCityId || '')}">
           ${cardHtml}
         </div>
       `);
@@ -1012,6 +1012,7 @@ function buildTransportTab(cityFilter = null) {
     html += renderMobileSwipePager({
       pagerClass: 'transport-swipe-pager',
       pagerKey: 'transport-swipe',
+      syncCityNav: true,
       railHtml: railHtml.join(''),
       slidesHtml: slidesHtml.join(''),
       ariaLabel: 'Transport journeys'
@@ -1411,7 +1412,7 @@ function _updateSegmentList() {
         <span>${depString} ➔ ${arrString}</span>
         ${providerStr ? `<span class="pending-segment-separator">&bull;</span><span>${providerStr}</span>` : ''}
         <button onclick="editPendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-edit" title="Edit leg">✎</button>
-        <button onclick="removePendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-remove" title="Remove leg">Ã—</button>
+        <button onclick="removePendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-remove" title="Remove leg">&times;</button>
       </div>`;
     }).join('');
   }
@@ -1613,6 +1614,7 @@ window.selectJourneyType = selectJourneyType;
 window.promptAddNewCity = promptAddNewCity;
 window.editJourney = editJourney;
 window.editPendingSegment = editPendingSegment;
+
 
 
 

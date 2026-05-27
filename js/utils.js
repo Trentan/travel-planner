@@ -304,6 +304,7 @@ function renderMobileSurfaceCard({
 function renderMobileSwipePager({
                                   pagerClass = '',
                                   pagerKey = '',
+                                  syncCityNav = false,
                                   label = '',
                                   title = '',
                                   hint = '',
@@ -315,8 +316,9 @@ function renderMobileSwipePager({
                                   ariaLabel = ''
                                 }) {
   const pagerKeyAttr = pagerKey ? ` data-pager-key="${escapeHtmlText(pagerKey)}"` : '';
+  const syncCityAttr = syncCityNav ? ` data-sync-city-nav="true"` : '';
   return `
-    <div class="mobile-swipe-pager ${pagerClass}" data-role="mobile-swipe-pager"${pagerKeyAttr}>
+    <div class="mobile-swipe-pager ${pagerClass}" data-role="mobile-swipe-pager"${pagerKeyAttr}${syncCityAttr}>
       ${railHtml ? `<div class="mobile-swipe-rail" role="tablist" aria-label="${escapeHtmlText(ariaLabel || 'Swipe rail')}">${railHtml}</div>` : ''}
       <div class="mobile-swipe-progress" aria-hidden="true">
         <span class="mobile-swipe-progress-fill" data-role="mobile-swipe-progress"></span>
@@ -370,6 +372,12 @@ function setupMobileSwipePagers(root = document) {
       if (progressFill) progressFill.style.width = `${((safeIndex + 1) / total) * 100}%`;
       pager.dataset.activeIndex = String(safeIndex);
       setMobilePagerActiveIndex(pagerKey, safeIndex);
+
+      if (pager.dataset.syncCityNav === 'true') {
+        const activeSlide = slides[safeIndex];
+        const cityId = String(activeSlide?.dataset.cityId || '').trim();
+        if (cityId) highlightCityNavByCityId(cityId);
+      }
 
       const activeChip = chips[safeIndex];
       if (rail && activeChip) {
@@ -447,6 +455,26 @@ function setupMobileSwipePagers(root = document) {
       carousel.scrollLeft = Math.max(0, initialSlide.offsetLeft - carousel.offsetLeft);
     }
   });
+}
+
+function highlightCityNavByCityId(cityId) {
+  const nav = document.getElementById('cityNav');
+  if (!nav || !cityId) return;
+  const btn = nav.querySelector(`.city-nav-btn[data-city="${cityId}"]`);
+  if (!btn) return;
+  nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const navList = nav.querySelector('.city-nav-list');
+  if (!navList) return;
+  if (typeof scrollChildIntoHorizontalView === 'function') {
+    scrollChildIntoHorizontalView(navList, btn, { behavior: 'smooth', align: 'center' });
+  } else {
+    navList.scrollTo({
+      left: Math.max(0, btn.offsetLeft - navList.offsetLeft - (navList.clientWidth - btn.offsetWidth) / 2),
+      behavior: 'smooth'
+    });
+  }
 }
 
 function renderMobileStatusCostMeta({

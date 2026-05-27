@@ -52,6 +52,52 @@
   }
 }
 
+@media (max-width: 768px) {
+  body.mobile-app-mode .tab-pane .section-header {
+    margin-bottom: 0.25rem !important;
+    padding-bottom: 0 !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .compact-city-swipe-root,
+  body.mobile-app-mode #tab-itinerary .compact-day-pager,
+  body.mobile-app-mode #tab-itinerary .compact-day-carousel,
+  body.mobile-app-mode #tab-itinerary .compact-day-slide {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .compact-leg-card,
+  body.mobile-app-mode #tab-itinerary .mobile-surface-card,
+  body.mobile-app-mode #tab-itinerary .compact-day-surface {
+    border-width: 1px !important;
+    border-radius: 0.5rem !important;
+    box-shadow: none !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .compact-day-surface {
+    padding: 0.45rem !important;
+    gap: 0.55rem !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .daily-timeline-content,
+  body.mobile-app-mode #tab-itinerary .daily-timeline-compact .daily-timeline-content {
+    padding: 0 !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .daily-timeline-content .daily-timeline-title,
+  body.mobile-app-mode #tab-itinerary .daily-timeline-content .daily-timeline-meta,
+  body.mobile-app-mode #tab-itinerary .daily-timeline-content .daily-timeline-notes,
+  body.mobile-app-mode #tab-itinerary .daily-timeline-content .daily-timeline-sub-locations {
+    padding-inline: 0.4rem !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .compact-day-slide .mobile-card-stack {
+    gap: 0.35rem !important;
+  }
+}
+
 /* Migration layer: Component styles using Tailwind utilities */
 /* These will replace the old style.css rules gradually */
 
@@ -551,7 +597,7 @@
   }
 
   .section-header-title {
-    @apply m-0 font-serif text-[1.2rem] text-text-primary;
+    @apply m-0 font-serif text-[1.38rem] font-bold text-text-primary tracking-tight;
   }
 
   .section-header-title.large {
@@ -565,10 +611,6 @@
   /* Itinerary readability pass: stronger hierarchy, cleaner spacing */
   #tab-itinerary .section-header {
     @apply mb-4 gap-3;
-  }
-
-  #tab-itinerary .section-header-title {
-    @apply text-[1.38rem] font-bold text-text-primary tracking-tight;
   }
 
   #tab-itinerary .itinerary-view-mode-control {
@@ -657,6 +699,11 @@
     display: block;
   }
 
+  .day-planner-shell-timeline .detail-block {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
   /* Desktop parity: leg collapse behavior */
   .leg.collapsed .leg-content {
     display: none !important;
@@ -709,10 +756,6 @@
   @media (min-width: 901px) {
     #tab-itinerary .section-header {
       @apply flex-nowrap items-center;
-    }
-
-    #tab-itinerary .section-header-title {
-      @apply shrink-0;
     }
 
     #tab-itinerary .top-controls .action-btn {
@@ -1079,7 +1122,7 @@
     }
 
     body.mobile-app-mode .app-tabs-content {
-      padding-bottom: 8.85rem;
+      padding-bottom: 8.2rem;
     }
 
     [data-theme="dark"] body.mobile-app-mode .app-tabs-nav {
@@ -1186,38 +1229,66 @@
       display: none !important;
     }
 
-    .daily-timeline::before {
-      left: 7.88rem;
+    .daily-timeline::before,
+    .daily-timeline-compact::before {
+      left: 2.75rem;
     }
 
-    .daily-timeline-item {
-      grid-template-columns: 6.2rem 2.2rem minmax(0, 1fr);
-      gap: 0.58rem;
+    .daily-timeline-item,
+    .daily-timeline-compact .daily-timeline-item {
+      grid-template-columns: 5.5rem minmax(0, 1fr);
+      gap: 0.35rem 0.5rem;
       align-items: flex-start;
-      min-height: 3.1rem;
-      padding-block: 0.34rem;
+      min-height: 2.75rem;
+      padding-block: 0.22rem;
+    }
+
+    .timeline-anytime-list .daily-timeline-item {
+      grid-template-columns: 5.5rem minmax(0, 1fr);
+      gap: 0.35rem 0.5rem;
+      align-items: flex-start;
+      min-height: 2.75rem;
+      padding-block: 0.22rem;
+    }
+
+    .daily-timeline-marker,
+    .daily-timeline-compact .daily-timeline-marker {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: center;
+      justify-self: center;
+    }
+
+    .daily-timeline-content,
+    .daily-timeline-compact .daily-timeline-content {
+      grid-column: 2;
+      grid-row: 1 / span 2;
     }
 
     .daily-timeline-type {
       display: none;
     }
 
-    .timeline-anytime-list .daily-timeline-item {
-      grid-template-columns: 6.2rem 2.2rem minmax(0, 1fr);
-    }
-
     .daily-timeline-time {
       min-width: 0;
-      max-width: 6.2rem;
-      white-space: normal;
-      overflow-wrap: anywhere;
+      max-width: 5.2rem;
+      width: 100%;
+      padding: 0.32rem 0.35rem;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
       text-align: center;
-      line-height: 1.15;
-      font-size: 0.78rem;
+      line-height: 1.1;
+      font-size: 0.76rem;
+      letter-spacing: -0.01em;
+      justify-self: center;
+      grid-column: 1;
+      grid-row: 2;
+      align-self: start;
     }
 
     .daily-timeline-time.is-clickable {
-      min-height: 2.75rem;
+      min-height: 2.35rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1265,7 +1336,7 @@
       min-width: 0;
     }
 
-    body.mobile-app-mode #tab-itinerary .section-header-title {
+    body.mobile-app-mode .tab-pane .section-header-title {
       white-space: nowrap;
       margin: 0;
       font-size: 1.6rem;
@@ -1302,7 +1373,7 @@
     }
 
     body.mobile-app-mode #tab-itinerary .add-leg-short::before {
-      content: "+ Add";
+      content: "\01F9ED Legs";
     }
 
     body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-full {
@@ -1314,7 +1385,7 @@
     }
 
     body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-short::before {
-      content: "+ Add Leg";
+      content: "\01F9ED Legs";
     }
 
     body.mobile-app-mode.compact-view-mode .top-controls {
@@ -1868,7 +1939,7 @@
   }
 
   body.compact-view-mode .mobile-swipe-pager {
-    @apply flex flex-col gap-2.5;
+    @apply flex flex-col gap-1.5;
   }
 
   body.compact-view-mode .mobile-swipe-pager-head {
@@ -1907,9 +1978,18 @@
     mask-size: 100% 100%;
   }
 
+  body.compact-view-mode .mobile-swipe-progress {
+    @apply h-[2px] rounded-full bg-slate-200/80 dark:bg-slate-700/80 my-1;
+  }
+
+  body.compact-view-mode .mobile-swipe-progress-fill {
+    @apply block h-full rounded-full bg-cyan-600 transition-all duration-300;
+    width: 0;
+  }
+
   body.compact-view-mode .mobile-swipe-carousel {
-    @apply flex gap-2.5 overflow-x-auto;
-    padding-bottom: 0.12rem;
+    @apply flex gap-1.75 overflow-x-auto;
+    padding-bottom: 0.04rem;
     scroll-padding-inline: 0.1rem;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
@@ -1927,12 +2007,12 @@
   }
 
   .mobile-card-stack {
-    @apply grid gap-3.5 mt-3.5;
+    @apply grid gap-2 mt-1.5;
   }
 
   .mobile-surface-card {
     @apply relative overflow-hidden rounded-[22px] border shadow-sm border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800;
-    padding: 0.82rem 0.8rem 0.78rem;
+    padding: 0.62rem 0.62rem 0.58rem;
     border-left: 4px solid var(--color-accent-teal);
   }
 
@@ -2373,7 +2453,7 @@
   }
 
   body.compact-view-mode .compact-day-pager {
-    @apply mt-3.5 grid gap-2.5;
+    @apply mt-1.5 grid gap-1.25;
   }
 
   body.compact-view-mode .compact-day-pager-head {
@@ -2393,7 +2473,7 @@
   }
 
   body.compact-view-mode .compact-day-rail {
-    @apply flex gap-2 overflow-x-auto overflow-y-hidden pb-1.5 mb-2.5;
+    @apply flex gap-2 overflow-x-auto overflow-y-hidden pb-1.5 mb-1.5;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     scroll-snap-type: x proximity;
@@ -2438,11 +2518,11 @@
 
   /* Mobile itinerary parity: restore compact card language */
   body.mobile-app-mode.compact-view-mode .compact-city-swipe-root {
-    @apply mt-2;
+    @apply mt-0.5;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-city-swipe-pager {
-    @apply grid gap-2.5;
+    @apply grid gap-1.25;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-leg-card {
@@ -2471,11 +2551,11 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-leg-body {
-    @apply p-3;
+    @apply p-2;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-leg-info {
-    @apply mb-2;
+    @apply mb-1;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-info-chips {
@@ -2483,11 +2563,13 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-info-chip {
-    @apply min-h-11 rounded-[16px] px-2.5 border-[#d3d9df] bg-white;
+    @apply min-h-10 rounded-[16px] px-2 border-[#d3d9df] bg-white;
+    display: grid;
     box-shadow: inset 0 0 0 1px rgba(80, 102, 122, 0.05);
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    column-gap: 0.5rem;
+    justify-items: center;
+    column-gap: 0.4rem;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-info-chip.is-active {
@@ -2504,11 +2586,14 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-info-chip-title {
-    @apply text-[0.78rem] font-bold leading-none min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-0.5;
+    @apply text-[0.72rem] font-bold leading-none min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex items-center justify-center gap-0.5;
+    justify-self: center;
+    margin-inline: auto;
+    text-align: center;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-info-chip-count {
-    @apply text-[0.8rem] px-2 py-0.5 rounded-full bg-slate-100 border-slate-300 text-slate-700 font-bold min-w-[2.2rem] text-center;
+    @apply text-[0.74rem] px-1.5 py-0.5 rounded-full bg-slate-100 border-slate-300 text-slate-700 font-bold min-w-[2rem] text-center;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-info-panel {
@@ -2576,12 +2661,17 @@
     right: 0.72rem;
     z-index: 2;
     display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.2rem;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-surface .compact-day-header-chips .compact-day-counter-chip {
     position: static;
+  }
+
+  body.mobile-app-mode.compact-view-mode .compact-day-surface .compact-day-header-chips .compact-day-amount-chip {
+    align-self: flex-end;
   }
 
   .compact-day-amount-chip {
@@ -2598,7 +2688,7 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-summary-row {
-    @apply flex items-center justify-between gap-2 pb-1 border-b border-slate-100;
+    @apply flex items-center justify-between gap-1 pb-0 border-b border-slate-100;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-summary-desc {
@@ -2606,7 +2696,31 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-grid {
-    @apply mt-1.5;
+    @apply mt-0;
+  }
+
+  body.mobile-app-mode.compact-view-mode .compact-day-grid .timeline-section-label {
+    margin-top: 0 !important;
+    margin-bottom: 0.15rem !important;
+    line-height: 1.1 !important;
+  }
+
+  body.mobile-app-mode.compact-view-mode .compact-day-grid .timeline-anytime-label {
+    font-size: 0.72rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0 !important;
+    line-height: 1.1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0.15rem !important;
+  }
+
+  /* Request: hide mobile day chip rail and rely on swipe between day cards */
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .compact-day-rail {
+    display: none;
+  }
+
+  body.mobile-app-mode.compact-view-mode #tab-itinerary .compact-day-carousel {
+    margin-top: 0;
   }
 
   body.mobile-app-mode #expandAll {
@@ -2614,11 +2728,11 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-grouped-plan {
-    @apply rounded-[16px] border border-slate-200 bg-[#fbfbfa] p-2.5 grid gap-2;
+    @apply rounded-[14px] border border-slate-200 bg-[#fbfbfa] p-2 grid gap-1.25;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-grouped-plan section {
-    @apply rounded-xl border border-slate-200 bg-white p-2.5;
+    @apply rounded-lg border border-slate-200 bg-white p-2;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-grouped-plan section h5 {
@@ -3850,10 +3964,40 @@
     @apply grid gap-3;
   }
 
-  /* Packing page parity layer */
-  #tab-packing {
-    @apply px-3 sm:px-4 md:px-5;
+  /* Mobile actions sheet readability (light mode first) */
+  .mobile-menu-sheet .app-menu-btn {
+    @apply w-full min-h-11 rounded-lg border border-slate-200
+           bg-white text-slate-800 text-[0.9rem] font-medium;
   }
+
+  .mobile-menu-sheet .app-menu-btn:hover {
+    @apply bg-slate-50 border-slate-300;
+  }
+
+  .mobile-menu-sheet .app-menu-btn:disabled {
+    @apply text-slate-400 border-slate-200 bg-slate-50;
+    opacity: 1;
+  }
+
+  .mobile-menu-sheet .app-menu-switch {
+    @apply min-h-11 w-full rounded-lg border border-slate-200 bg-white px-3;
+  }
+
+  .mobile-menu-sheet .app-menu-switch-label {
+    @apply text-slate-800 text-[0.9rem] font-medium;
+  }
+
+  .mobile-menu-trip-value {
+    @apply min-w-0 text-right font-semibold text-slate-800;
+    overflow-wrap: anywhere;
+  }
+
+  .mobile-menu-status-row span {
+    @apply text-[0.9rem] text-slate-700;
+  }
+
+  /* Packing page parity layer */
+  
 
   .packing-guides-shell {
     @apply mb-4 p-3 sm:p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80
@@ -3930,7 +4074,7 @@
   }
 
   .leave-home-list {
-    @apply grid gap-1.5;
+    @apply flex flex-wrap gap-2;
   }
 
   .leave-home-progress {
@@ -3984,9 +4128,7 @@
   }
 
   /* Map tab parity layer */
-  #tab-map {
-    @apply px-3 sm:px-4 md:px-5;
-  }
+  
 
   .map-container {
     @apply rounded-2xl border border-slate-200/70 dark:border-slate-700/80
@@ -4007,7 +4149,12 @@
   }
 
   #journey-map-view {
-    @apply min-h-80 sm:min-h-105;
+    @apply h-[320px] sm:h-[420px] min-h-[320px] sm:min-h-[420px];
+  }
+
+  /* Fix for Leaflet tiles breaking with Tailwind */
+  .leaflet-container img {
+    max-width: none !important;
   }
 
   .map-placeholder {
@@ -4020,6 +4167,28 @@
 
   .map-placeholder-icon {
     @apply text-4xl mb-1;
+  }
+
+  .numbered-map-marker {
+    @apply bg-transparent border-none;
+  }
+
+  .marker-dot {
+    @apply w-[30px] h-[30px] rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-md;
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .marker-flared {
+    z-index: 1000 !important;
+  }
+
+  .marker-flared .marker-dot {
+    transform: scale(1.3);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4), 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .is-transit-marker .marker-dot {
+    @apply border-dashed;
   }
 
   .map-controls {
@@ -4062,7 +4231,7 @@
   }
 
   .map-legend-list {
-    @apply grid gap-1.5;
+    @apply flex flex-wrap justify-center gap-2;
   }
 
   .legend-item {
@@ -4119,7 +4288,7 @@
     }
 
     #tab-map #journey-map-view {
-      @apply min-h-70;
+      @apply h-[280px] min-h-[280px];
     }
 
     #tab-map .map-header,
@@ -4278,6 +4447,27 @@
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(15, 23, 42, 0.98) 100%);
 }
 
+[data-theme="dark"] .mobile-menu-sheet .app-menu-btn {
+  @apply bg-slate-800 border-slate-700 text-slate-100;
+}
+
+[data-theme="dark"] .mobile-menu-sheet .app-menu-btn:hover {
+  @apply bg-slate-700 border-slate-600;
+}
+
+[data-theme="dark"] .mobile-menu-sheet .app-menu-btn:disabled {
+  @apply bg-slate-800 border-slate-700 text-slate-500;
+  opacity: 1;
+}
+
+[data-theme="dark"] .mobile-menu-sheet .app-menu-switch {
+  @apply bg-slate-800 border-slate-700;
+}
+
+[data-theme="dark"] .mobile-menu-sheet .app-menu-switch-label {
+  @apply text-slate-100;
+}
+
 [data-theme="dark"] .mobile-menu-sheet-header h2 {
   @apply text-white;
 }
@@ -4361,6 +4551,13 @@
 
 /* Desktop/mobile menu visibility and top-bar readability enforcement */
 @media (min-width: 769px) {
+  .timeline-anytime-list .daily-timeline-item {
+    grid-template-columns: 8.1rem 2.7rem minmax(0, 1fr) auto;
+    gap: 0.8rem;
+    align-items: center;
+    padding-block: 0.28rem;
+  }
+
   .mobile-menu-btn,
   .mobile-tabs-menu-btn {
     display: none !important;
@@ -4403,4 +4600,312 @@
   .mobile-tabs-menu-btn {
     display: inline-flex !important;
   }
+
+  /* Make accommodation, transport, activity items compact and fit evenly in their panels on mobile */
+  .detail-block {
+    padding: 0.75rem !important; /* overrides p-4 */
+    border-radius: 0.75rem !important; /* overrides rounded-xl */
+  }
+
+  .detail-block h4 {
+    margin-bottom: 0.5rem !important; /* overrides mb-3 */
+    font-size: 0.75rem !important; /* overrides text-xs */
+  }
+
+  .item-list.space-y-2 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.375rem !important; /* overrides space-y-2 */
+  }
+
+  .cost-item {
+    padding: 0.5rem 0.625rem !important; /* overrides p-3 */
+    gap: 0.5rem !important; /* overrides gap-3 */
+    font-size: 0.8rem !important; /* overrides text-sm */
+    border-radius: 0.5rem !important; /* overrides rounded-lg */
+  }
+
+  .cost-item-text {
+    gap: 2px !important; /* tighter layout */
+  }
+
+  .cost-item-actions {
+    gap: 0.25rem !important; /* overrides gap-1.5 */
+  }
+
+  .cost-item .del-btn {
+    opacity: 1 !important; /* show delete button on mobile where hover doesn't exist */
+  }
+
+  /* Make Anytime timeline section content compact too */
+  .daily-timeline-content,
+  .daily-timeline-compact .daily-timeline-content {
+    padding: 0.5rem 0.625rem !important;
+    border-radius: 0.625rem !important;
+  }
+
+  .daily-timeline-title {
+    font-size: 0.9rem !important;
+  }
+
+  .daily-timeline-title-row {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    align-items: center !important; /* ensures perfect vertical alignment with panel elements */
+  }
+
+  /* Widen accommodation, transport, activities panels to nearly the edge and minimize white space */
+  .day-detail {
+    padding-left: 0.35rem !important; /* overrides p-4 */
+    padding-right: 0.35rem !important; /* overrides p-4 */
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.65rem !important;
+  }
+  
+  .day-card {
+    margin-left: 0.25rem !important;
+    margin-right: 0.25rem !important;
+    border-radius: 0.75rem !important;
+  }
+
+  .day-planner-shell-timeline .detail-block {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .day-view-panel-grouped .grid {
+    gap: 0.5rem !important; /* tighter layout between columns/panels */
+  }
+
+  .daily-timeline-shell {
+    padding-left: 0.1rem !important;
+    padding-right: 0.1rem !important;
+  }
+  
+  .daily-timeline-item {
+    gap: 0.3rem 0.4rem !important;
+  }
+
+  .daily-timeline-content {
+    margin-right: 0.1rem !important;
+  }
+
+  .daily-timeline-shell,
+  .daily-timeline-shell-compact {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Compact all borders, margins, and paddings for mobile viewports */
+  main,
+  .max-w-7xl,
+  .container {
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+  }
+  
+  .app-tabs-content {
+    padding-left: 0.15rem !important;
+    padding-right: 0.15rem !important;
+  }
+
+  .day-card {
+    margin-left: 0.1rem !important;
+    margin-right: 0.1rem !important;
+    margin-bottom: 0.5rem !important; /* from mb-4 */
+    border-radius: 0.5rem !important;
+    border-color: rgba(226, 232, 240, 0.4) !important;
+  }
+
+  .day-bar {
+    padding: 0.5rem 0.625rem !important; /* overrides p-3 sm:p-4 */
+  }
+
+  .day-date {
+    width: 3.5rem !important; /* overrides w-16 sm:w-20 */
+    padding-right: 0.5rem !important;
+    margin-right: 0.5rem !important;
+  }
+
+  .day-num {
+    font-size: 1.15rem !important; /* overrides text-xl sm:text-2xl */
+  }
+
+  .day-name {
+    font-size: 0.65rem !important; /* overrides text-xs sm:text-sm */
+  }
+
+  .day-title {
+    padding-right: 0.5rem !important;
+  }
+
+  .day-cities {
+    font-size: 0.85rem !important;
+    margin-bottom: 0px !important;
+  }
+
+  .day-desc {
+    font-size: 0.72rem !important;
+  }
+
+  .day-chevron {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .day-detail {
+    padding-left: 0.2rem !important;
+    padding-right: 0.2rem !important;
+    padding-top: 0.4rem !important;
+    padding-bottom: 0.4rem !important;
+  }
+
+  .leg {
+    margin-bottom: 0.75rem !important;
+  }
+
+  .leg-header {
+    padding: 0.625rem 0.75rem !important;
+    border-radius: 0.5rem !important;
+  }
+
+  .itinerary-leg-panels {
+    padding: 0.5rem !important; /* overrides p-4 */
+    gap: 0.5rem !important;
+  }
+
+  .itinerary-info-panel {
+    padding: 0.625rem !important; /* overrides p-4 */
+    border-radius: 0.5rem !important;
+  }
+
+  .detail-block {
+    padding: 0.5rem !important; /* overrides 0.75rem */
+    border-radius: 0.5rem !important;
+    border-color: rgba(226, 232, 240, 0.5) !important;
+  }
+
+  .detail-block h4 {
+    margin-bottom: 0.35rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .item-list {
+    margin-top: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .item-list.space-y-2 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.25rem !important; /* overrides space-y-2 (0.5rem) */
+  }
+
+  .cost-item {
+    padding: 0.375rem 0.5rem !important; /* from 0.5rem 0.625rem */
+    gap: 0.375rem !important; /* from 0.5rem */
+    font-size: 0.76rem !important; /* overrides 0.8rem */
+    border-radius: 0.375rem !important;
+  }
+
+  .cost-item-text {
+    gap: 1px !important;
+  }
+
+  .cost-item-actions {
+    gap: 0.15rem !important;
+  }
+
+  .status-badge {
+    padding: 0.1rem 0.35rem !important;
+    font-size: 0.55rem !important;
+  }
+
+  .daily-timeline-content,
+  .daily-timeline-compact .daily-timeline-content {
+    padding: 0.375rem 0.5rem !important;
+    border-radius: 0.5rem !important;
+  }
+
+  .daily-timeline-title {
+    font-size: 0.84rem !important;
+  }
+
+  .daily-timeline-meta {
+    font-size: 0.72rem !important;
+  }
+
+  .daily-timeline-notes {
+    font-size: 0.72rem !important;
+  }
+
+  .daily-timeline-sub-locations {
+    font-size: 0.74rem !important;
+  }
+
+  .compact-day-slide {
+    padding: 0.25rem !important;
+  }
+
+  /* Desktop detailed itinerary: display selected day only */
+  body:not(.mobile-app-mode):not(.compact-view-mode) .compact-day-slide:not(.is-active) {
+    display: none;
+  }
+
+  .compact-activities-card,
+  .compact-food-quest-card,
+  .compact-tips-card {
+    padding: 0.5rem !important;
+    border-radius: 0.5rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  .compact-activities-summary,
+  .compact-food-summary,
+  .compact-tips-summary {
+    font-size: 0.75rem !important;
+  }
+
+  .add-btn {
+    padding-block: 0.25rem !important;
+    font-size: 0.72rem !important;
+    margin-top: 0.35rem !important;
+  }
+
+  /* Extreme mobile spacing compression to remove gaps & make scroll indicator slimmer */
+  .day-detail {
+    padding-left: 0.1rem !important;
+    padding-right: 0.1rem !important;
+    padding-top: 0.4rem !important;
+    padding-bottom: 0.4rem !important;
+  }
+
+  .day-planner-shell-timeline .detail-block {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-radius: 0.375rem !important;
+  }
+
+  /* Make indicators much slimmer & compact */
+  body.compact-view-mode .compact-day-progress,
+  body.compact-view-mode .mobile-swipe-progress {
+    height: 2px !important;
+    margin-top: 0.15rem !important;
+    margin-bottom: 0.15rem !important;
+  }
+
+  /* Reduce panel & carousel gaps on mobile */
+  body.compact-view-mode .compact-day-carousel {
+    gap: 0.35rem !important; /* overrides gap-2.5 */
+  }
+
+  .daily-timeline-shell {
+    padding-left: 0.05rem !important;
+    padding-right: 0.05rem !important;
+  }
 }
+
+
+
+

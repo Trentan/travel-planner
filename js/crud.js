@@ -1439,11 +1439,24 @@ function openActivityAssignModal(legIdx, activityIdx) {
 }
 
 // Dialog functions for Add New Leg
+let legDialogState = { mode: 'add', editLegIdx: null };
+
+function openLegEditorDialog() {
+  legDialogState = { mode: 'add', editLegIdx: null };
+  openAddLegDialog();
+}
+
 function openAddLegDialog() {
   const modal = document.getElementById('add-leg-modal');
   if (modal) {
     _populateAddLegCityDropdowns();
     modal.style.display = 'flex';
+    const editSelect = document.getElementById('editLegSelect');
+    if (editSelect) {
+      editSelect.value = '';
+      editSelect.onchange = onEditLegSelectionChange;
+    }
+    updateLegDialogUiMode();
     onLegTypeChange();
   }
 }
@@ -1453,6 +1466,7 @@ function _populateAddLegCityDropdowns() {
   const fromSelect = document.getElementById('fromCitySelect');
   const toSelect = document.getElementById('toCitySelect');
   const countrySelect = document.getElementById('newLegCityCountrySelect');
+  const editLegSelect = document.getElementById('editLegSelect');
 
   // Build options HTML with Home + cities
   let cityOptionsHtml = '';
@@ -1496,6 +1510,72 @@ function _populateAddLegCityDropdowns() {
       '<option value="OTHER">✏️ Other...</option>';
     if (currentValue) countrySelect.value = currentValue;
   }
+
+  if (editLegSelect) {
+    const currentValue = editLegSelect.value;
+    const options = ['<option value="">-- Add a new leg --</option>'];
+    (appData || []).forEach((leg, idx) => {
+      const firstDay = leg?.days?.[0];
+      const legDate = firstDay?.date || '';
+      const label = `${idx + 1}. ${leg?.label || 'Untitled leg'}${legDate ? ` (${legDate})` : ''}`;
+      options.push(`<option value="${idx}">${label}</option>`);
+    });
+    editLegSelect.innerHTML = options.join('');
+    if (currentValue) editLegSelect.value = currentValue;
+  }
+}
+
+function updateLegDialogUiMode() {
+  const title = document.getElementById('legDialogTitle') || document.querySelector('#add-leg-modal .modal-header h2');
+  const saveBtn = document.getElementById('legDialogSaveBtn');
+  const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
+  if (title) title.textContent = 'Edit Legs';
+  if (saveBtn) saveBtn.textContent = isEdit ? 'Update Leg' : 'Add Leg';
+}
+
+function onEditLegSelectionChange() {
+  const editSelect = document.getElementById('editLegSelect');
+  const selected = Number(editSelect?.value);
+  if (!Number.isFinite(selected)) {
+    legDialogState = { mode: 'add', editLegIdx: null };
+    updateLegDialogUiMode();
+    return;
+  }
+  const leg = appData?.[selected];
+  if (!leg) return;
+  legDialogState = { mode: 'edit', editLegIdx: selected };
+
+  const firstDay = leg.days?.[0] || {};
+  const lastDay = leg.days?.[leg.days.length - 1] || firstDay;
+  const normalizedLabel = String(leg.label || '').toLowerCase();
+  let legType = 'city';
+  if (normalizedLabel.includes('start')) legType = 'start';
+  else if (normalizedLabel.includes('return')) legType = 'return';
+  else if (firstDay.from && firstDay.to && firstDay.from !== firstDay.to) legType = 'travel';
+
+  const legTypeSelect = document.getElementById('legTypeSelect');
+  if (legTypeSelect) legTypeSelect.value = legType;
+  const fromCitySelect = document.getElementById('fromCitySelect');
+  const toCitySelect = document.getElementById('toCitySelect');
+  const existingCitySelect = document.getElementById('existingCitySelect');
+  const newCityName = document.getElementById('newLegCityName');
+  const dateFrom = document.getElementById('newLegStartDate');
+  const dateTo = document.getElementById('newLegEndDate');
+  const dayNotesInput = document.getElementById('legDayNotesInput');
+
+  if (fromCitySelect && firstDay.from) fromCitySelect.value = firstDay.from;
+  if (toCitySelect && firstDay.to) toCitySelect.value = firstDay.to;
+  if (existingCitySelect && firstDay.to) existingCitySelect.value = firstDay.to;
+  if (newCityName) newCityName.value = '';
+  if (dateFrom) dateFrom.value = firstDay.date || '';
+  if (dateTo) dateTo.value = lastDay.date || '';
+  if (dayNotesInput) {
+    dayNotesInput.value = (leg.days || [])
+      .map(day => String(day?.desc || '').trim())
+      .join('\n');
+  }
+  updateLegDialogUiMode();
+  onLegTypeChange();
 }
 
 function onNewLegCountryChange() {
@@ -1515,6 +1595,7 @@ function onNewLegCountryChange() {
 function closeAddLegDialog() {
   const modal = document.getElementById('add-leg-modal');
   if (modal) modal.style.display = 'none';
+  legDialogState = { mode: 'add', editLegIdx: null };
 
   // Clear form inputs
   const existingCitySelect = document.getElementById('existingCitySelect');
@@ -1523,6 +1604,8 @@ function closeAddLegDialog() {
   const countryOther = document.getElementById('newLegCityCountryOther');
   const fromDate = document.getElementById('newLegStartDate');
   const toDate = document.getElementById('newLegEndDate');
+  const editLegSelect = document.getElementById('editLegSelect');
+  const dayNotesInput = document.getElementById('legDayNotesInput');
 
   if (existingCitySelect) existingCitySelect.value = '';
   if (newCityName) newCityName.value = '';
@@ -1533,16 +1616,68 @@ function closeAddLegDialog() {
   }
   if (fromDate) fromDate.value = '';
   if (toDate) toDate.value = '';
+  if (editLegSelect) editLegSelect.value = '';
+  if (dayNotesInput) dayNotesInput.value = '';
+  updateLegDialogUiMode();
+}
+
+function parseLegDayNotes() {
+  const raw = document.getElementById('legDayNotesInput')?.value || '';
+  return raw
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function buildLegDaysWithNotes({ dateFrom, dateTo, fromCity, toCity, legType, dayNotes }) {
+  const normalizedFrom = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(dateFrom) : dateFrom;
+  const normalizedTo = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(dateTo) : dateTo;
+  const validFrom = /^\d{4}-\d{2}-\d{2}$/.test(normalizedFrom || '');
+  const validTo = /^\d{4}-\d{2}-\d{2}$/.test(normalizedTo || '');
+  const defaultFirstDesc = legType === 'start' ? 'Departure day' : (legType === 'return' ? 'Return home' : 'Travel and arrival day');
+  const defaultOtherDesc = 'Exploring';
+
+  const buildDay = (dateValue, idx) => ({
+    date: dateValue,
+    day: getWeekdayLabelForTripDate(dateValue),
+    from: idx === 0 ? fromCity : toCity,
+    to: toCity,
+    completed: false,
+    desc: dayNotes[idx] || (idx === 0 ? defaultFirstDesc : defaultOtherDesc),
+    transportItems: idx === 0 ? [{ text: "Add transport...", cost: "0" }] : [],
+    accomItems: [{ text: "Add accommodation...", cost: "0" }],
+    activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false }]
+  });
+
+  if (validFrom && validTo && normalizedFrom <= normalizedTo) {
+    const days = [];
+    let current = normalizedFrom;
+    let guard = 0;
+    while (current && current <= normalizedTo && guard < 120) {
+      days.push(buildDay(current, days.length));
+      current = typeof addDaysToIsoDate === 'function' ? addDaysToIsoDate(current, 1) : '';
+      guard++;
+    }
+    if (days.length > 0) return days;
+  }
+
+  const firstDate = dateFrom || 'DD Mon';
+  const days = [buildDay(firstDate, 0)];
+  if (dateTo && dateFrom !== dateTo) {
+    days.push(buildDay(dateTo, 1));
+  }
+  return days;
 }
 
 function onLegTypeChange() {
   const type = document.getElementById('legTypeSelect')?.value || 'city';
-  const citySection = document.getElementById('city-section');
-  const startSection = document.getElementById('start-section');
-  const returnSection = document.getElementById('return-section');
+  const citySection = document.getElementById('citySelectionGroup');
+  const routeSection = document.getElementById('routeSelectionGroup');
+  const datesLabel = document.getElementById('datesLabel');
+  const isRouteType = type === 'travel' || type === 'start' || type === 'return';
   if (citySection) citySection.style.display = type === 'city' ? 'block' : 'none';
-  if (startSection) startSection.style.display = type === 'start' ? 'block' : 'none';
-  if (returnSection) returnSection.style.display = type === 'return' ? 'block' : 'none';
+  if (routeSection) routeSection.style.display = isRouteType ? 'block' : 'none';
+  if (datesLabel) datesLabel.textContent = isRouteType ? 'Journey Date Range' : 'Dates in City';
 }
 
 function checkDateConflict(dateStr, excludeLegIdx) {
@@ -1652,6 +1787,7 @@ function confirmAddLeg() {
   const legType = document.getElementById('legTypeSelect')?.value || 'city';
   const dateFrom = document.getElementById('newLegStartDate')?.value;
   const dateTo = document.getElementById('newLegEndDate')?.value;
+  const dayNotes = parseLegDayNotes();
 
   // Check for date conflicts
   if (dateFrom && dateTo) {
@@ -1666,11 +1802,19 @@ function confirmAddLeg() {
   if (legType === 'start') {
     label = '🚀 Start';
     fromCity = 'Home';
-    toCity = document.getElementById('startCitySelect')?.value || 'Home';
+    toCity = document.getElementById('toCitySelect')?.value || 'Home';
   } else if (legType === 'return') {
     label = '🏠 Return';
-    fromCity = document.getElementById('returnCitySelect')?.value || 'Home';
+    fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
     toCity = 'Home';
+  } else if (legType === 'travel') {
+    fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
+    toCity = document.getElementById('toCitySelect')?.value || '';
+    if (!toCity) {
+      alert('Please choose a destination city for this travel leg.');
+      return;
+    }
+    label = `✈️ ${fromCity} to ${toCity}`;
   } else {
     // Regular city leg
     const existingCity = document.getElementById('existingCitySelect')?.value;
@@ -1714,7 +1858,7 @@ function confirmAddLeg() {
     }
   }
 
-  const newLeg = {
+  const legPayload = {
     id: 'leg_' + Date.now(),
     label: label,
     colour: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'),
@@ -1722,35 +1866,27 @@ function confirmAddLeg() {
     cityRun: [{ title: "5km park loop", estTime: "1 hr", estCost: "0", assignedDayIdx: null }],
     suggestedSights: [],
     legTips: ["Add tip..."],
-    days: [{
-      date: dateFrom || 'DD Mon',
-      day: 'Mon',
-      from: fromCity,
-      to: toCity,
-      completed: false,
-      desc: legType === 'start' ? 'Departure day' : (legType === 'return' ? 'Return home' : 'Travel and arrival day'),
-      transportItems: [{ text: "Add transport...", cost: "0" }],
-      accomItems: [{ text: "Add accommodation...", cost: "0" }],
-      activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false }]
-    }]
+    days: buildLegDaysWithNotes({
+      dateFrom,
+      dateTo,
+      fromCity,
+      toCity,
+      legType,
+      dayNotes
+    })
   };
 
-  if (dateTo && dateFrom !== dateTo) {
-    // Add end date day if different
-    newLeg.days.push({
-      date: dateTo,
-      day: 'Tue',
-      from: toCity,
-      to: toCity,
-      completed: false,
-      desc: 'Exploring',
-      transportItems: [],
-      accomItems: [{ text: "Add accommodation...", cost: "0" }],
-      activityItems: [{ text: "Explore local area", cost: "0", time: "1 hr", done: false }]
-    });
+  const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
+  if (isEdit && appData[legDialogState.editLegIdx]) {
+    const target = appData[legDialogState.editLegIdx];
+    const preservedId = target.id;
+    target.label = legPayload.label;
+    target.colour = target.colour || legPayload.colour;
+    target.days = legPayload.days;
+    target.id = preservedId;
+  } else {
+    appData.push(legPayload);
   }
-
-  appData.push(newLeg);
   closeAddLegDialog();
   sortLegs();
 }
@@ -1786,6 +1922,7 @@ window.toggleActivityCompleted = toggleActivityCompleted;
 window.toggleJourneyCompleted = toggleJourneyCompleted;
 window.toggleStayCompleted = toggleStayCompleted;
 window.openAddLegDialog = openAddLegDialog;
+window.openLegEditorDialog = openLegEditorDialog;
 window.closeAddLegDialog = closeAddLegDialog;
 window.openEditActivityModal = openEditActivityModal;
 window.openEditDayActivityModal = openEditDayActivityModal;
