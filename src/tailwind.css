@@ -704,8 +704,8 @@
   }
 
   .day-planner-shell-timeline .detail-block {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   /* Desktop parity: leg collapse behavior */
@@ -4652,8 +4652,8 @@
   }
 
   .day-planner-shell-timeline .detail-block {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   .day-view-panel-grouped .grid {
@@ -4867,8 +4867,8 @@
   }
 
   .day-planner-shell-timeline .detail-block {
-    padding-left: 0.15rem !important;
-    padding-right: 0.15rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
     border-radius: 0.375rem !important;
   }
 
