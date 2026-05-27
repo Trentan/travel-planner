@@ -1446,6 +1446,15 @@ function openLegEditorDialog() {
   openAddLegDialog();
 }
 
+function openLegEditorDirect(legIdx) {
+  openAddLegDialog();
+  const editSelect = document.getElementById('editLegSelect');
+  if (editSelect) {
+    editSelect.value = legIdx;
+    onEditLegSelectionChange();
+  }
+}
+
 function openAddLegDialog() {
   const modal = document.getElementById('add-leg-modal');
   if (modal) {
@@ -1528,9 +1537,22 @@ function _populateAddLegCityDropdowns() {
 function updateLegDialogUiMode() {
   const title = document.getElementById('legDialogTitle') || document.querySelector('#add-leg-modal .modal-header h2');
   const saveBtn = document.getElementById('legDialogSaveBtn');
+  const modeHint = document.getElementById('legDialogModeHint');
   const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
   if (title) title.textContent = 'Edit Legs';
   if (saveBtn) saveBtn.textContent = isEdit ? 'Update Leg' : 'Add Leg';
+  if (modeHint) {
+    modeHint.textContent = isEdit
+      ? 'Editing selected leg. Update details below or delete this leg.'
+      : 'Choose a leg to edit it, or leave blank to add a new one.';
+  }
+  _syncLegDialogActions();
+}
+
+function _syncLegDialogActions() {
+  const deleteBtn = document.getElementById('legDialogDeleteBtn');
+  const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
+  if (deleteBtn) deleteBtn.style.display = isEdit ? 'inline-flex' : 'none';
 }
 
 function onEditLegSelectionChange() {
@@ -1576,6 +1598,17 @@ function onEditLegSelectionChange() {
   }
   updateLegDialogUiMode();
   onLegTypeChange();
+}
+
+function deleteLegFromDialog() {
+  const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
+  if (!isEdit) return;
+  const legIdx = legDialogState.editLegIdx;
+  const legLabel = appData?.[legIdx]?.label || `Leg ${legIdx + 1}`;
+  const confirmed = confirm(`Delete ${legLabel} and all its days? This cannot be undone.`);
+  if (!confirmed) return;
+  deleteLeg(legIdx);
+  closeAddLegDialog();
 }
 
 function onNewLegCountryChange() {
@@ -1791,10 +1824,13 @@ function confirmAddLeg() {
 
   // Check for date conflicts
   if (dateFrom && dateTo) {
-    const startConflict = checkDateConflict(dateFrom);
+    const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
+    const excludeIdx = isEdit ? legDialogState.editLegIdx : undefined;
+    const startConflict = checkDateConflict(dateFrom, excludeIdx);
     if (startConflict) {
-      alert('Warning: Start date conflicts with ' + startConflict.legLabel);
-      return;
+      if (!confirm('Warning: Start date conflicts with ' + startConflict.legLabel + '. Do you want to proceed and handle the conflict later?')) {
+        return;
+      }
     }
   }
 
@@ -1923,6 +1959,7 @@ window.toggleJourneyCompleted = toggleJourneyCompleted;
 window.toggleStayCompleted = toggleStayCompleted;
 window.openAddLegDialog = openAddLegDialog;
 window.openLegEditorDialog = openLegEditorDialog;
+window.openLegEditorDirect = openLegEditorDirect;
 window.closeAddLegDialog = closeAddLegDialog;
 window.openEditActivityModal = openEditActivityModal;
 window.openEditDayActivityModal = openEditDayActivityModal;
@@ -1930,6 +1967,7 @@ window.onLegTypeChange = onLegTypeChange;
 window.checkDateConflict = checkDateConflict;
 window.adjustLegDays = adjustLegDays;
 window.confirmAddLeg = confirmAddLeg;
+window.deleteLegFromDialog = deleteLegFromDialog;
 window.deleteActivity = deleteActivity;
 window._populateAddLegCityDropdowns = _populateAddLegCityDropdowns;
 window.onNewLegCountryChange = onNewLegCountryChange;
