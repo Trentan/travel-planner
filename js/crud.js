@@ -1623,13 +1623,27 @@ function syncAllLegDays() {
   const changelog = [];
 
   appData.forEach(leg => {
-    const cityName = leg.label;
-    if (!cityName) return;
+    const rawCityName = leg.label;
+    if (!rawCityName) return;
+    
+    // Strip emojis for data matching
+    const cityName = typeof cleanCityNavLabel === 'function' 
+      ? cleanCityNavLabel(rawCityName) 
+      : rawCityName.replace(/[^\x00-\x7F]/g, '').trim();
+      
     const cityId = 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-');
 
     const legStays = (window.stays || []).filter(s => s.cityId === cityId || (s.city && s.city.toLowerCase() === cityName.toLowerCase()));
-    const arrivingJourneys = (window.journeys || []).filter(j => j.toCityId === cityId || (j.toLocation && j.toLocation.toLowerCase() === cityName.toLowerCase()));
-    const departingJourneys = (window.journeys || []).filter(j => j.fromCityId === cityId || (j.fromLocation && j.fromLocation.toLowerCase() === cityName.toLowerCase()));
+    
+    // Ignore local intra-city transport by ensuring fromLocation !== toLocation
+    const arrivingJourneys = (window.journeys || []).filter(j => 
+      (j.toCityId === cityId || (j.toLocation && j.toLocation.toLowerCase() === cityName.toLowerCase())) &&
+      (j.fromCityId !== j.toCityId && (!j.fromLocation || !j.toLocation || j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase()))
+    );
+    const departingJourneys = (window.journeys || []).filter(j => 
+      (j.fromCityId === cityId || (j.fromLocation && j.fromLocation.toLowerCase() === cityName.toLowerCase())) &&
+      (j.fromCityId !== j.toCityId && (!j.fromLocation || !j.toLocation || j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase()))
+    );
     
     let earliestDate = null;
     let latestDate = null;
@@ -1642,7 +1656,10 @@ function syncAllLegDays() {
       if (!latestDate || normalized > latestDate) latestDate = normalized;
     };
 
-    legStays.forEach(s => considerDate(s.checkIn));
+    legStays.forEach(s => {
+      considerDate(s.checkIn);
+      if (s.checkOut) considerDate(s.checkOut);
+    });
     arrivingJourneys.forEach(j => considerDate(j.arrivalDate || j.dayDate));
     departingJourneys.forEach(j => considerDate(j.departureDate || j.dayDate));
 
