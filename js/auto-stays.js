@@ -14,6 +14,15 @@ function calculateExpectedStays() {
   const skipList = ['Home', 'In transit', 'Between cities', 'TBC', '', 'Return', 'Departure', 'Flight'];
 
   appData.forEach(leg => {
+    // Skip Trip Start / Trip Finish legs — they are transit legs, not city stays
+    const label = String(leg.label || '').toLowerCase();
+    const legId = String(leg.id || '');
+    if (legId === 'departure' || legId === 'return' ||
+        label.includes('(trip start)') || label.includes('(trip finish)') || label.includes('(trip end)') ||
+        legId.endsWith('-start') || legId.endsWith('-finish')) {
+      return;
+    }
+
     leg.days.forEach((day, dayIndex) => {
       const city = day.to;
 

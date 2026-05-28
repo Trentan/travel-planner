@@ -2176,53 +2176,75 @@ function migrateCitiesToISOFormat() {
 function migrateDepartureReturnLegs() {
   if (typeof appData === 'undefined' || !Array.isArray(appData)) return;
 
-  const depLeg = appData.find(l => l.id === 'departure');
+  const jArr = (typeof window !== 'undefined' && window.journeys && Array.isArray(window.journeys))
+    ? window.journeys : [];
+
+  // --- Trip Start leg ---
+  // Find by original id OR by previously-migrated id/label
+  let depLeg = appData.find(l => l.id === 'departure');
+  if (!depLeg) depLeg = appData.find(l => String(l.label || '').includes('(Trip Start)'));
+  if (!depLeg) depLeg = appData.find(l => String(l.id || '').endsWith('-start'));
+
   if (depLeg) {
+    const oldId = depLeg.id;
     let fromCity = 'Departure';
-    if (typeof window !== 'undefined' && window.journeys && Array.isArray(window.journeys)) {
-      const outbound = window.journeys.filter(j => j.legId === 'departure' || j._inferredFromLegId === 'departure');
-      if (outbound.length > 0) {
-        outbound.sort((a, b) => (Number(a.segmentOrder) || 1) - (Number(b.segmentOrder) || 1));
-        if (outbound[0].fromLocation) fromCity = outbound[0].fromLocation;
-      }
+
+    // Look at ALL journeys whose legId matches the old id OR 'departure'
+    const candidateIds = new Set(['departure', oldId]);
+    const outbound = jArr.filter(j =>
+      candidateIds.has(j.legId) || candidateIds.has(j._inferredFromLegId)
+    );
+    if (outbound.length > 0) {
+      outbound.sort((a, b) => (Number(a.segmentOrder) || 1) - (Number(b.segmentOrder) || 1));
+      if (outbound[0].fromLocation) fromCity = outbound[0].fromLocation;
     }
-    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Departure';
+
+    const cleanCity = (typeof cleanCityNavLabel === 'function'
+      ? cleanCityNavLabel(fromCity)
+      : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Departure';
     const newId = 'city-' + cleanCity.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-start';
     depLeg.id = newId;
     depLeg.label = `${cleanCity} (Trip Start)`;
-    
-    if (typeof window !== 'undefined' && window.journeys && Array.isArray(window.journeys)) {
-      window.journeys.forEach(j => {
-        if (j.legId === 'departure') j.legId = newId;
-        if (j._inferredFromLegId === 'departure') j._inferredFromLegId = newId;
-        if (j._inferredToLegId === 'departure') j._inferredToLegId = newId;
-      });
-    }
+
+    // Update all journey references from old id → new id
+    jArr.forEach(j => {
+      if (j.legId === oldId || j.legId === 'departure') j.legId = newId;
+      if (j._inferredFromLegId === oldId || j._inferredFromLegId === 'departure') j._inferredFromLegId = newId;
+      if (j._inferredToLegId === oldId || j._inferredToLegId === 'departure') j._inferredToLegId = newId;
+    });
   }
 
-  const retLeg = appData.find(l => l.id === 'return');
+  // --- Trip Finish leg ---
+  let retLeg = appData.find(l => l.id === 'return');
+  if (!retLeg) retLeg = appData.find(l => String(l.label || '').includes('(Trip Finish)'));
+  if (!retLeg) retLeg = appData.find(l => String(l.id || '').endsWith('-finish'));
+
   if (retLeg) {
+    const oldId = retLeg.id;
     let toCity = 'Return';
-    if (typeof window !== 'undefined' && window.journeys && Array.isArray(window.journeys)) {
-      const returns = window.journeys.filter(j => j.legId === 'return' || j._inferredToLegId === 'return');
-      if (returns.length > 0) {
-        returns.sort((a, b) => (Number(a.segmentOrder) || 1) - (Number(b.segmentOrder) || 1));
-        const lastJ = returns[returns.length - 1];
-        if (lastJ.toLocation) toCity = lastJ.toLocation;
-      }
+
+    const candidateIds = new Set(['return', oldId]);
+    const returns = jArr.filter(j =>
+      candidateIds.has(j.legId) || candidateIds.has(j._inferredToLegId)
+    );
+    if (returns.length > 0) {
+      returns.sort((a, b) => (Number(a.segmentOrder) || 1) - (Number(b.segmentOrder) || 1));
+      const lastJ = returns[returns.length - 1];
+      if (lastJ.toLocation) toCity = lastJ.toLocation;
     }
-    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Return';
+
+    const cleanCity = (typeof cleanCityNavLabel === 'function'
+      ? cleanCityNavLabel(toCity)
+      : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Return';
     const newId = 'city-' + cleanCity.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-finish';
     retLeg.id = newId;
     retLeg.label = `${cleanCity} (Trip Finish)`;
-    
-    if (typeof window !== 'undefined' && window.journeys && Array.isArray(window.journeys)) {
-      window.journeys.forEach(j => {
-        if (j.legId === 'return') j.legId = newId;
-        if (j._inferredFromLegId === 'return') j._inferredFromLegId = newId;
-        if (j._inferredToLegId === 'return') j._inferredToLegId = newId;
-      });
-    }
+
+    jArr.forEach(j => {
+      if (j.legId === oldId || j.legId === 'return') j.legId = newId;
+      if (j._inferredFromLegId === oldId || j._inferredFromLegId === 'return') j._inferredFromLegId = newId;
+      if (j._inferredToLegId === oldId || j._inferredToLegId === 'return') j._inferredToLegId = newId;
+    });
   }
 }
 
