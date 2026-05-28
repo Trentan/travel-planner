@@ -76,12 +76,35 @@ function getMissingStays() {
   const missing = {};
   let totalMissing = 0;
 
-  Object.entries(expected).forEach(([city, expectedNights]) => {
-    const existingNights = existing[city] || 0;
-    const missingNights = Math.max(0, expectedNights - existingNights);
+  const cleanKey = k => {
+    let c = String(k || '').trim();
+    c = c.replace(/^[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\s]+/gu, '').trim();
+    c = c.replace(/\s*\(Trip Start\)/gi, '');
+    c = c.replace(/\s*\(Trip End\)/gi, '');
+    c = c.replace(/\s*\(Trip Finish\)/gi, '');
+    c = c.replace(/\s*\(\d+\)/g, '');
+    return c.trim().toLowerCase();
+  };
+
+  const existingMap = {};
+  Object.entries(existing).forEach(([city, count]) => {
+    const k = cleanKey(city);
+    existingMap[k] = (existingMap[k] || 0) + count;
+  });
+
+  const expectedMap = {};
+  Object.entries(expected).forEach(([city, count]) => {
+    const k = cleanKey(city);
+    if (!expectedMap[k]) expectedMap[k] = { name: city, count: 0 };
+    expectedMap[k].count += count;
+  });
+
+  Object.values(expectedMap).forEach(({ name, count }) => {
+    const existingNights = existingMap[cleanKey(name)] || 0;
+    const missingNights = Math.max(0, count - existingNights);
 
     if (missingNights > 0) {
-      missing[city] = missingNights;
+      missing[name] = missingNights;
       totalMissing += missingNights;
     }
   });
