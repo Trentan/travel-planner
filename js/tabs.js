@@ -324,7 +324,7 @@ function buildAccomTab(cityFilter = null) {
       <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">${escapeHtmlText(stay.bookingRef || '—')}</td>
       
       <!-- Notes -->
-      <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[130px] break-words" title="${escapeHtmlText(stay.notes || '')}">
+      <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[250px] break-words" title="${escapeHtmlText(stay.notes || '')}">
         ${escapeHtmlText(stay.notes || '—')}
       </td>
 

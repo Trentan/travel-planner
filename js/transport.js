@@ -1208,7 +1208,7 @@ function buildTransportTab(cityFilter = null) {
         </td>
         
         <!-- Notes -->
-        <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[130px] break-words" title="${escapeHtmlText(rep.notes || '')}">
+        <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[250px] break-words" title="${escapeHtmlText(rep.notes || '')}">
           ${escapeHtmlText(rep.notes || '—')}
         </td>
         
