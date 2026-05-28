@@ -3810,6 +3810,131 @@ async function copyShareEmailDraft() {
   }
 }
 
+const SHARE_KEY_MAP = {
+  meta: 'm',
+  title: 't',
+  subtitle: 's',
+  startDate: 'sd',
+  endDate: 'ed',
+  startCity: 'sc',
+  endCity: 'ec',
+  exportKind: 'ek',
+  redactions: 'r',
+  costs: 'c',
+  bookingRefs: 'br',
+  notes: 'n',
+  itinerary: 'i',
+  id: 'id',
+  label: 'l',
+  days: 'd',
+  date: 'dt',
+  day: 'dy',
+  from: 'f',
+  to: 'to',
+  desc: 'de',
+  suggestedActivities: 'sa',
+  transportItems: 'ti',
+  accomItems: 'ai',
+  activityItems: 'ac',
+  text: 'tx',
+  time: 'tm',
+  cost: 'co',
+  status: 'st',
+  bookingRef: 'bref',
+  bookingReference: 'bref_ref',
+  provider: 'pr',
+  routeCode: 'rc',
+  propertyName: 'pn',
+  city: 'cy',
+  cityName: 'cn',
+  cityId: 'cid',
+  checkIn: 'chin',
+  checkOut: 'chout',
+  checkInTime: 'cit',
+  checkOutTime: 'cot',
+  nights: 'ni',
+  totalCost: 'tc',
+  journeys: 'j',
+  journeyName: 'jn',
+  transportType: 'tt',
+  fromLocation: 'fl',
+  toLocation: 'tl',
+  departureDate: 'dd',
+  departureTime: 'dtm',
+  arrivalDate: 'ad',
+  arrivalTime: 'atm',
+  cities: 'cs',
+  name: 'nm',
+  country: 'ct',
+  packing: 'pk',
+  leaveHome: 'lh'
+};
+
+const REVERSE_SHARE_KEY_MAP = {};
+for (const [k, v] of Object.entries(SHARE_KEY_MAP)) {
+  REVERSE_SHARE_KEY_MAP[v] = k;
+}
+
+function isPlaceholderShareItem(item) {
+  if (!item || typeof item !== 'object') return false;
+  const text = String(item.text || item.title || '').trim();
+  if (/^[-—]$/.test(text)) return true;
+  if (text === 'Add transport...' || text === 'Add accommodation...' || text === 'Explore local area' || text === 'Add item...' || text === 'New item...') {
+    return true;
+  }
+  return false;
+}
+
+function minifySharePayload(obj) {
+  if (Array.isArray(obj)) {
+    return obj
+      .filter(item => {
+        if (isPlaceholderShareItem(item)) return false;
+        return true;
+      })
+      .map(minifySharePayload)
+      .filter(x => x !== null && x !== undefined && (typeof x !== 'object' || Object.keys(x).length > 0));
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const minified = {};
+    for (const [key, val] of Object.entries(obj)) {
+      if (val === "" || val === null || val === undefined) continue;
+      if (Array.isArray(val) && val.length === 0) continue;
+      if (typeof val === 'object' && Object.keys(val).length === 0) continue;
+      
+      if ((key === 'cost' || key === 'estCost' || key === 'totalCost') && (val === '0' || val === 0 || val === '0.00')) continue;
+      if (key === 'status' && val === 'pending') continue;
+      if (key === 'done' && val === false) continue;
+      if (key === 'completed' && val === false) continue;
+      if (key === 'assignedDayIdx' && val === null) continue;
+
+      const newKey = SHARE_KEY_MAP[key] || key;
+      const minVal = minifySharePayload(val);
+
+      if (minVal !== null && minVal !== undefined && (typeof minVal !== 'object' || Array.isArray(minVal) || Object.keys(minVal).length > 0)) {
+        minified[newKey] = minVal;
+      }
+    }
+    return minified;
+  }
+  return obj;
+}
+
+function expandSharePayload(obj) {
+  if (Array.isArray(obj)) {
+    return obj.map(expandSharePayload);
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const expanded = {};
+    for (const [key, val] of Object.entries(obj)) {
+      const originalKey = REVERSE_SHARE_KEY_MAP[key] || key;
+      expanded[originalKey] = expandSharePayload(val);
+    }
+    return expanded;
+  }
+  return obj;
+}
+
 async function compressStringToGzipBase64(str) {
   const bytes = new TextEncoder().encode(str);
   const cs = new CompressionStream('gzip');
@@ -3865,7 +3990,8 @@ async function decompressGzipBase64ToString(base64) {
 }
 
 async function generateShareLink(exportObj) {
-  const jsonStr = JSON.stringify(exportObj);
+  const minified = minifySharePayload(exportObj);
+  const jsonStr = JSON.stringify(minified);
   const compressedBase64 = await compressStringToGzipBase64(jsonStr);
   const urlSafe = compressedBase64
     .replace(/\+/g, '-')
@@ -3911,9 +4037,14 @@ async function checkUrlForImportedTrip() {
     const jsonStr = await decompressGzipBase64ToString(base64);
     const importedData = JSON.parse(jsonStr);
     
+    let expandedData = importedData;
+    if (importedData && (importedData.m || !importedData.meta)) {
+      expandedData = expandSharePayload(importedData);
+    }
+    
     clearActiveFileHandle();
     setImportedJsonWithoutWriteAccess(true);
-    await loadImportedPayload(importedData, 'URL Shared Trip');
+    await loadImportedPayload(expandedData, 'URL Shared Trip');
     
     alert('🌍 Shared Travel Planner itinerary loaded successfully!');
     window.history.replaceState({}, document.title, window.location.pathname);

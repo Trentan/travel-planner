@@ -148,6 +148,39 @@ async function run() {
   const decompressed = await windowContext.decompressGzipBase64ToString(compressed);
   assert(decompressed === testString, 'Decompressed string must exactly match the input string');
 
+  // Test minification & expansion
+  console.log('Testing share payload key minification & expansion...');
+  assert(typeof windowContext.minifySharePayload === 'function', 'minifySharePayload should be defined');
+  assert(typeof windowContext.expandSharePayload === 'function', 'expandSharePayload should be defined');
+
+  const samplePayload = {
+    meta: { title: 'Adventure', subtitle: 'Fun trip' },
+    itinerary: [
+      {
+        id: 'leg-1',
+        label: 'Paris',
+        days: [
+          {
+            date: '2026-07-01',
+            activityItems: [
+              { text: 'Eiffel Tower', cost: '10', notes: 'Nice view' },
+              { text: 'Add transport...', cost: '0' } // Should be skipped (placeholder)
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  const minified = windowContext.minifySharePayload(samplePayload);
+  assert(minified.m.t === 'Adventure', 'Minified meta title should be mapped to m.t');
+  assert(minified.i[0].d[0].ac[0].tx === 'Eiffel Tower', 'Minified activity text should be mapped to i.d.ac.tx');
+  assert(minified.i[0].d[0].ac.length === 1, 'Placeholder activity should be skipped in minified payload');
+
+  const expanded = windowContext.expandSharePayload(minified);
+  assert(expanded.meta.title === 'Adventure', 'Expanded title should match original');
+  assert(expanded.itinerary[0].days[0].activityItems[0].text === 'Eiffel Tower', 'Expanded activity text should match original');
+
   console.log('Share presets & gzip URL tests passed successfully!');
 }
 

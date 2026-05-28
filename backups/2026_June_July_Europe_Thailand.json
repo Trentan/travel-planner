@@ -6,7 +6,7 @@
   "itinerary": [
     {
       "id": "city-brisbane-start",
-      "label": "Brisbane (Trip Start) (1)",
+      "label": "Brisbane (Trip Start)",
       "colour": "#2C3E50",
       "cityFood": [
         {
@@ -3356,7 +3356,7 @@
     },
     {
       "id": "city-brisbane-finish",
-      "label": "Brisbane (Trip Finish) (2)",
+      "label": "Brisbane (Trip Finish)",
       "colour": "#2C3E50",
       "cityFood": [
         {
@@ -5121,6 +5121,28 @@
       "colour": "#9B59B6",
       "lat": 45.4424977,
       "lng": 10.9857377
+    },
+    {
+      "id": "city-brisbane-trip-start",
+      "name": "Brisbane Trip Start",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-brisbane-trip-finish",
+      "name": "Brisbane Trip Finish",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
     }
   ],
   "userCities": [],
