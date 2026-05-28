@@ -20,6 +20,19 @@ function stripCompactLeadingEmoji(text) {
       .trim();
 }
 
+function getLegHeaderLabelWithFlag(label) {
+  if (!label) return '';
+  const hasEmoji = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/u.test(label);
+  if (!hasEmoji) {
+    const cleanName = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(label) : label.trim();
+    const flag = typeof getCityFlag === 'function' ? getCityFlag(cleanName) : '📍';
+    if (flag && flag !== '📍' && flag !== '🌐') {
+      return flag + ' ' + label;
+    }
+  }
+  return label;
+}
+
 function escapeCompactText(text) {
   return String(text || '')
       .replace(/&/g, '&amp;')
@@ -1195,7 +1208,7 @@ function renderCompactLegCard(leg, legIndex) {
   const legLabel = leg.label && !/^trip leg$/i.test(String(leg.label).trim())
       ? leg.label
       : '';
-  const displayLegLabel = legLabel || routeLabel || `Leg ${legIndex + 1}`;
+  const displayLegLabel = getLegHeaderLabelWithFlag(legLabel || routeLabel || `Leg ${legIndex + 1}`);
 
   return `
     <article class="compact-leg-card">
@@ -1251,7 +1264,7 @@ function buildCompactItinerary() {
     const legLabel = leg.label && !/^trip leg$/i.test(String(leg.label).trim())
         ? leg.label
         : '';
-    const displayLegLabel = legLabel || routeLabel || `Leg ${legIndex + 1}`;
+    const displayLegLabel = getLegHeaderLabelWithFlag(legLabel || routeLabel || `Leg ${legIndex + 1}`);
 
     const chipDateRangeHtml = firstDay && lastDay && firstDay.date !== lastDay.date
         ? `${escapeHtmlText(firstDay.date)} &rarr; ${escapeHtmlText(lastDay.date)}`
@@ -1473,7 +1486,7 @@ function buildCompactItineraryLegacy() {
     <div class="leg-header" style="background:${leg.colour}; cursor:default;">
       <div style="display:flex; align-items:center; justify-content:space-between;">
         <div>
-          <h2 style="margin:0; font-size:14px; cursor:default;">${leg.label}</h2>
+          <h2 style="margin:0; font-size:14px; cursor:default;">${getLegHeaderLabelWithFlag(leg.label)}</h2>
           <span style="font-size:11px; margin-left:10px;">${nightLabel}</span>
         </div>
       </div>
@@ -2304,6 +2317,7 @@ function buildItinerary() {
           .replace(/[\u{2600}-\u{26FF}]/gu, '')
           .replace(/[\u{2700}-\u{27BF}]/gu, '')
           .replace(/\p{Emoji}/gu, '')
+          .replace(/\s*\([^)]*\)/gu, '')
           .replace(/[^\w\s-]/gu, '')
           .trim();
       const labelLooksTransit = /(\bto\b|via|transit|travel|flight|train|bus|→|->)/i.test(leg.label || '');
@@ -2357,7 +2371,7 @@ function buildItinerary() {
     <div class="leg-header" style="background:${leg.colour}" onclick="toggleLeg(this)">
       <div class="leg-header-top">
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; min-width:0;">
-          <h2 contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateData(${legIndex}, 'label', this.innerText)">${leg.label}</h2>
+          <h2 contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateData(${legIndex}, 'label', this.innerText)">${getLegHeaderLabelWithFlag(leg.label)}</h2>
           <span style="opacity:0.8; font-size:0.9rem; font-family:'DM Mono', monospace;">${dateRange}</span>
         </div>
         <div style="display:flex; align-items:center; gap:10px; margin-left:auto; flex-wrap:nowrap;">

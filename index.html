@@ -323,38 +323,80 @@
   </div>
 
   <div id="share-export-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
+    <div class="modal-content modal-lg">
       <div class="modal-header">
         <h2>🔗 Share Export</h2>
         <button class="modal-close" onclick="closeShareExportDialog()">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="share-options">
-          <p class="share-help">
-            Create a JSON file that someone else can import into Travel Planner. Hide private fields if you are sending it outside your own device.
+        <div class="share-options flex flex-col gap-5">
+          <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+            Create an itinerary payload that others can import into Travel Planner. Choose a preset to automatically filter sensitive fields based on who you are sharing with.
           </p>
+
           <div class="option-group">
-            <label>Hide:</label>
-            <div class="checkbox-group">
-              <label class="check-label"><input type="checkbox" id="shareHideCosts" checked onchange="refreshShareEmailDraft()"> Costs</label>
-              <label class="check-label"><input type="checkbox" id="shareHideRefs" checked onchange="refreshShareEmailDraft()"> Booking refs / PNRs</label>
-              <label class="check-label"><input type="checkbox" id="shareHideNotes" onchange="refreshShareEmailDraft()"> Notes</label>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Recipient Presets</label>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
+              <button type="button" id="share-preset-co-traveler" onclick="applySharePreset('co-traveler')" class="flex flex-col text-left p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-all cursor-pointer">
+                <span class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-1">👥 Co-traveler</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 mt-1">Full details. Share everything including PNRs.</span>
+              </button>
+              <button type="button" id="share-preset-family" onclick="applySharePreset('family')" class="flex flex-col text-left p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-all cursor-pointer">
+                <span class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-1">👨‍👩‍👧 Family/Friends</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 mt-1">General schedule. Hides booking references.</span>
+              </button>
+              <button type="button" id="share-preset-public" onclick="applySharePreset('public')" class="flex flex-col text-left p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-all cursor-pointer">
+                <span class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-1">🌍 Public/Blog</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 mt-1">Anonymized plan. Hides costs and references.</span>
+              </button>
+              <button type="button" id="share-preset-confidential" onclick="applySharePreset('confidential')" class="flex flex-col text-left p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-all cursor-pointer">
+                <span class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-1">🔒 Confidential</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 mt-1">Minimal summary. Hides notes, costs, and refs.</span>
+              </button>
+            </div>
+            
+            <div id="share-preset-custom-wrap" class="flex justify-end text-xs" style="margin-top: -8px;">
+              <span id="share-preset-custom" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium">
+                ⚙️ Custom Configuration Active
+              </span>
             </div>
           </div>
-          <div class="option-group">
-            <label for="shareEmailDraft">Email draft</label>
-            <textarea id="shareEmailDraft" rows="8" readonly onclick="this.select()"></textarea>
+
+          <div class="option-group bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200/60 dark:border-slate-800">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">⚙️ Custom Redactions</label>
+            <div class="flex flex-wrap gap-4">
+              <label class="check-label flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-200 text-sm">
+                <input type="checkbox" id="shareHideCosts" checked onchange="syncPresetHighlightingFromCheckboxes(); refreshShareEmailDraft()" class="form-checkbox rounded text-teal-600 focus:ring-teal-500">
+                Hide Costs
+              </label>
+              <label class="check-label flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-200 text-sm">
+                <input type="checkbox" id="shareHideRefs" checked onchange="syncPresetHighlightingFromCheckboxes(); refreshShareEmailDraft()" class="form-checkbox rounded text-teal-600 focus:ring-teal-500">
+                Hide Booking refs / PNRs
+              </label>
+              <label class="check-label flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-200 text-sm">
+                <input type="checkbox" id="shareHideNotes" onchange="syncPresetHighlightingFromCheckboxes(); refreshShareEmailDraft()" class="form-checkbox rounded text-teal-600 focus:ring-teal-500">
+                Hide Notes
+              </label>
+            </div>
           </div>
-          <div class="share-note">
-            Use the draft below to copy/paste the message into your email app. It includes the app link and attachment wording.
+
+          <div class="option-group">
+            <label for="shareEmailDraft" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">📧 Email Draft Preview</label>
+            <textarea id="shareEmailDraft" rows="6" readonly onclick="this.select()" class="w-full form-control font-mono text-xs p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none leading-relaxed"></textarea>
+            <span class="block text-[10px] text-slate-400 dark:text-slate-500 mt-1 leading-normal">
+              Click draft to select and copy text to your clipboard.
+            </span>
           </div>
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer flex items-center justify-between flex-wrap gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
         <button class="action-btn" onclick="closeShareExportDialog()">Cancel</button>
-        <button class="action-btn action-btn-olive" onclick="copyShareEmailDraft()">Copy Email Text</button>
-        <button class="action-btn action-btn-secondary" onclick="exportShareJSON()">Download Share File</button>
-        <button class="action-btn action-btn-teal" onclick="exportShareEmail()">Open Email Draft</button>
+        <div class="flex gap-2">
+          <button class="action-btn action-btn-olive" onclick="copyShareLink()">🔗 Copy Share Link</button>
+          <button class="action-btn action-btn-olive" onclick="copyShareEmailDraft()">Copy Email Text</button>
+          <button class="action-btn action-btn-secondary" onclick="exportShareJSON()">Download Share File</button>
+          <button class="action-btn action-btn-teal" onclick="exportShareEmail()">Open Email Draft</button>
+        </div>
       </div>
     </div>
   </div>
