@@ -1180,10 +1180,10 @@ function renderCompactLegCard(leg, legIndex) {
   const firstDay = leg.days && leg.days[0];
   const lastDay = leg.days && leg.days[daysCount - 1];
   const legDateRange = firstDay && lastDay
-      ? `${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date} - ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date}`
+      ? (firstDay.date === lastDay.date ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : `${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date} - ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date}`)
       : (firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '');
   const routeLabel = firstDay && lastDay
-      ? `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`
+      ? (firstDay.date === lastDay.date ? `${firstDay.day || 'Day'} ${firstDay.date}` : `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`)
       : `${daysCount} day${daysCount !== 1 ? 's' : ''}`;
   const legLabel = leg.label && !/^trip leg$/i.test(String(leg.label).trim())
       ? leg.label
@@ -1239,7 +1239,7 @@ function buildCompactItinerary() {
         : escapeHtmlText(firstDateFormatted || '—');
 
     const routeLabel = firstDay && lastDay
-        ? `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`
+        ? (firstDay.date === lastDay.date ? `${firstDay.day || 'Day'} ${firstDay.date}` : `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`)
         : `${daysCount} day${daysCount !== 1 ? 's' : ''}`;
     const legLabel = leg.label && !/^trip leg$/i.test(String(leg.label).trim())
         ? leg.label
@@ -1748,7 +1748,11 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       const toLoc = segment.toLocation || journey.toLocation || '';
       const route = [fromLoc, toLoc].filter(Boolean).join(' -> ');
       const isSameDaySegment = isDepartureDay && isArrivalDay && depDate === arrDate;
-      const crossDateNote = arrDate && depDate && arrDate !== depDate ? `Arrives ${formatTripDateForDisplay(arrDate)}` : '';
+      let crossDateNote = '';
+      if (arrDate && depDate && arrDate !== depDate) {
+        if (isDepartureDay) crossDateNote = `Arrives ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(arrDate) : arrDate}`;
+        else if (isArrivalDay) crossDateNote = `Departed ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(depDate) : depDate}`;
+      }
       
       const transportTypeLabel = isSameDaySegment ? 'Transport' : (isDepartureDay ? 'Depart' : 'Arrive');
 

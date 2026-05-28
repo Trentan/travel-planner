@@ -19,10 +19,10 @@
         {
           "date": "2026-06-09",
           "day": "Tue",
-          "from": "Brisbane",
-          "to": "Departure",
+          "from": "🛫 Departure",
+          "to": "🛫 Departure",
           "completed": false,
-          "desc": "Arrive from Brisbane via EVA Air",
+          "desc": "Travel and arrival day",
           "transportItems": [
             {
               "text": "Add transport...",
@@ -94,7 +94,7 @@
         {
           "date": "2026-06-09",
           "day": "Tue",
-          "from": "Taipei",
+          "from": "Brisbane",
           "to": "Bangkok",
           "completed": false,
           "desc": "Depart for Bangkok via EVA Air",
@@ -148,35 +148,6 @@
               "endDate": "2026-06-09",
               "cityId": "city-taipei",
               "location": "queue early"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-10",
-          "day": "Wed",
-          "from": "Taipei",
-          "to": "Taipei",
-          "completed": false,
-          "desc": "Arrive from Taipei via EVA Air",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-taipei"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-10",
-              "endDate": "2026-06-10",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-taipei"
             }
           ]
         }
@@ -257,13 +228,16 @@
         {
           "date": "2026-06-10",
           "day": "Wed",
-          "from": "Bangkok",
+          "from": "Taipei",
           "to": "Vienna",
-          "accom": "—",
-          "desc": "Depart for Vienna via EVA Air",
           "completed": false,
-          "accomCost": "0",
-          "activityCost": "0",
+          "desc": "Depart for Vienna via EVA Air",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
           "accomItems": [
             {
               "text": "—",
@@ -274,330 +248,6 @@
             }
           ],
           "activityItems": []
-        },
-        {
-          "date": "2026-06-27",
-          "day": "Sat",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Travel and arrival day",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-27",
-              "endDate": "2026-06-27",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-28",
-          "day": "Sun",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-28",
-              "endDate": "2026-06-28",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-29",
-          "day": "Mon",
-          "from": "Bangkok",
-          "to": "Koh Samui",
-          "completed": false,
-          "desc": "Depart for Koh Samui via Bangkok Airways",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-koh-samui"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-29",
-              "endDate": "2026-06-29",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-koh-samui"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-30",
-          "day": "Tue",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-30",
-              "endDate": "2026-06-30",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-01",
-          "day": "Wed",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-01",
-              "endDate": "2026-07-01",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-02",
-          "day": "Thu",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-02",
-              "endDate": "2026-07-02",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-03",
-          "day": "Fri",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-03",
-              "endDate": "2026-07-03",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-04",
-          "day": "Sat",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-04",
-              "endDate": "2026-07-04",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-05",
-          "day": "Sun",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-05",
-              "endDate": "2026-07-05",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-06",
-          "day": "Mon",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-06",
-              "endDate": "2026-07-06",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-07",
-          "day": "Tue",
-          "from": "Bangkok",
-          "to": "Brisbane",
-          "completed": false,
-          "desc": "Depart for Brisbane",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-brisbane"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-07",
-              "endDate": "2026-07-07",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-brisbane"
-            }
-          ]
         }
       ],
       "suggestedActivities": [],
@@ -619,7 +269,7 @@
           "date": "2026-06-10",
           "day": "Wed",
           "from": "Bangkok",
-          "to": "Vienna",
+          "to": "🇦🇹 Vienna",
           "completed": false,
           "desc": "Arrive from Bangkok via EVA Air",
           "transportItems": [
@@ -654,7 +304,7 @@
         {
           "date": "2026-06-11",
           "day": "Thu",
-          "from": "Vienna",
+          "from": "🇦🇹 Vienna",
           "to": "Bratislava",
           "completed": false,
           "desc": "Depart for Bratislava via OBB",
@@ -773,7 +423,7 @@
           "date": "2026-06-11",
           "day": "Thu",
           "from": "Vienna",
-          "to": "Bratislava",
+          "to": "🇸🇰 Bratislava",
           "completed": false,
           "desc": "Arrive from Vienna via OBB",
           "transportItems": [
@@ -808,8 +458,8 @@
         {
           "date": "2026-06-12",
           "day": "Fri",
-          "from": "Bratislava",
-          "to": "Bratislava",
+          "from": "🇸🇰 Bratislava",
+          "to": "🇸🇰 Bratislava",
           "completed": false,
           "desc": "Full day Bratislava",
           "transportItems": [],
@@ -839,7 +489,7 @@
         {
           "date": "2026-06-13",
           "day": "Sat",
-          "from": "Bratislava",
+          "from": "🇸🇰 Bratislava",
           "to": "Prague",
           "completed": false,
           "desc": "Depart for Prague via RegioJet",
@@ -1012,7 +662,7 @@
           "date": "2026-06-13",
           "day": "Sat",
           "from": "Bratislava",
-          "to": "Prague",
+          "to": "🇨🇿 Prague",
           "completed": false,
           "desc": "Arrive from Bratislava via RegioJet",
           "transportItems": [
@@ -1047,8 +697,8 @@
         {
           "date": "2026-06-14",
           "day": "Sun",
-          "from": "Prague",
-          "to": "Prague",
+          "from": "🇨🇿 Prague",
+          "to": "🇨🇿 Prague",
           "completed": false,
           "desc": "Full day Prague",
           "transportItems": [],
@@ -1089,7 +739,7 @@
         {
           "date": "2026-06-15",
           "day": "Mon",
-          "from": "Prague",
+          "from": "🇨🇿 Prague",
           "to": "Nuremberg",
           "completed": false,
           "desc": "Depart for Nuremberg via FlixBus",
@@ -1231,7 +881,7 @@
           "date": "2026-06-15",
           "day": "Mon",
           "from": "Prague",
-          "to": "Nuremberg",
+          "to": "🇩🇪 Nuremberg",
           "completed": false,
           "desc": "Arrive from Prague via FlixBus",
           "transportItems": [
@@ -1266,7 +916,7 @@
         {
           "date": "2026-06-16",
           "day": "Tue",
-          "from": "Nuremberg",
+          "from": "🇩🇪 Nuremberg",
           "to": "Munich",
           "completed": false,
           "desc": "Depart for Munich via DB ICE",
@@ -1408,7 +1058,7 @@
           "date": "2026-06-16",
           "day": "Tue",
           "from": "Nuremberg",
-          "to": "Munich",
+          "to": "🇩🇪 Munich",
           "completed": false,
           "desc": "Arrive from Nuremberg via DB ICE",
           "transportItems": [
@@ -1443,8 +1093,8 @@
         {
           "date": "2026-06-17",
           "day": "Wed",
-          "from": "Munich",
-          "to": "Munich",
+          "from": "🇩🇪 Munich",
+          "to": "🇩🇪 Munich",
           "completed": false,
           "desc": "Conference day 2",
           "transportItems": [],
@@ -1474,8 +1124,8 @@
         {
           "date": "2026-06-18",
           "day": "Thu",
-          "from": "Munich",
-          "to": "Munich",
+          "from": "🇩🇪 Munich",
+          "to": "🇩🇪 Munich",
           "completed": false,
           "desc": "Conference day 3 — last",
           "transportItems": [],
@@ -1505,8 +1155,8 @@
         {
           "date": "2026-06-19",
           "day": "Fri",
-          "from": "Munich",
-          "to": "Munich",
+          "from": "🇩🇪 Munich",
+          "to": "🇩🇪 Munich",
           "completed": false,
           "desc": "Free day — explore beyond conference",
           "transportItems": [],
@@ -1536,7 +1186,7 @@
         {
           "date": "2026-06-20",
           "day": "Sat",
-          "from": "Munich",
+          "from": "🇩🇪 Munich",
           "to": "Bolzano",
           "completed": false,
           "desc": "Depart for Bolzano via ÖBB",
@@ -1803,7 +1453,7 @@
           "date": "2026-06-20",
           "day": "Sat",
           "from": "Munich",
-          "to": "Bolzano",
+          "to": "🇮🇹 Bolzano",
           "completed": false,
           "desc": "Arrive from Munich via ÖBB",
           "transportItems": [
@@ -1836,7 +1486,7 @@
         {
           "date": "2026-06-21",
           "day": "Sun",
-          "from": "Bolzano",
+          "from": "🇮🇹 Bolzano",
           "to": "Verona",
           "completed": false,
           "desc": "Depart for Verona via Italo",
@@ -1859,35 +1509,6 @@
               "startTime": "",
               "endTime": "",
               "cityId": "city-verona"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-22",
-          "day": "Mon",
-          "from": "Bolzano",
-          "to": "Bolzano",
-          "completed": false,
-          "desc": "Arrive from Bolzano via Italo",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bolzano"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-22",
-              "endDate": "2026-06-22",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bolzano"
             }
           ]
         }
@@ -2019,8 +1640,8 @@
         {
           "date": "2026-06-21",
           "day": "Sun",
-          "from": "Verona",
-          "to": "Verona",
+          "from": "🇮🇹 Verona",
+          "to": "🇮🇹 Verona",
           "completed": false,
           "desc": "Verona stopover en route",
           "transportItems": [
@@ -2053,7 +1674,7 @@
         {
           "date": "2026-06-22",
           "day": "Mon",
-          "from": "Verona",
+          "from": "Bolzano",
           "to": "Milan",
           "completed": false,
           "desc": "Depart for Milan via Italo",
@@ -2145,10 +1766,10 @@
         {
           "date": "2026-06-22",
           "day": "Mon",
-          "from": "Milan",
-          "to": "Milan",
+          "from": "Verona",
+          "to": "🇮🇹 Milan",
           "completed": false,
-          "desc": "Travel and arrival day",
+          "desc": "Arrive from Verona via Italo",
           "transportItems": [
             {
               "text": "Add transport...",
@@ -2179,8 +1800,8 @@
         {
           "date": "2026-06-23",
           "day": "Tue",
-          "from": "Milan",
-          "to": "Milan",
+          "from": "🇮🇹 Milan",
+          "to": "🇮🇹 Milan",
           "completed": false,
           "desc": "Exploring",
           "transportItems": [],
@@ -2208,8 +1829,8 @@
         {
           "date": "2026-06-24",
           "day": "Wed",
-          "from": "Milan",
-          "to": "Milan",
+          "from": "🇮🇹 Milan",
+          "to": "🇮🇹 Milan",
           "completed": false,
           "desc": "Exploring",
           "transportItems": [],
@@ -2237,7 +1858,7 @@
         {
           "date": "2026-06-25",
           "day": "Thu",
-          "from": "Milan",
+          "from": "🇮🇹 Milan",
           "to": "Zurich",
           "completed": false,
           "desc": "Depart for Zurich via Trenitalia",
@@ -2379,7 +2000,7 @@
           "date": "2026-06-25",
           "day": "Thu",
           "from": "Milan",
-          "to": "Zurich",
+          "to": "🇨🇭 Zurich",
           "completed": false,
           "desc": "Arrive from Milan via Trenitalia",
           "transportItems": [
@@ -2402,7 +2023,7 @@
         {
           "date": "2026-06-26",
           "day": "Fri",
-          "from": "Zurich",
+          "from": "🇨🇭 Zurich",
           "to": "London",
           "completed": false,
           "desc": "Depart for London via Swiss",
@@ -2581,7 +2202,7 @@
         {
           "date": "2026-06-26",
           "day": "Fri",
-          "from": "London",
+          "from": "Zurich",
           "to": "Bangkok",
           "completed": false,
           "desc": "Depart for Bangkok via EVA Air",
@@ -2634,47 +2255,10 @@
       ],
       "days": [
         {
-          "date": "2026-06-10",
-          "day": "Wed",
-          "from": "Bangkok",
-          "to": "Vienna",
-          "accom": "—",
-          "desc": "Depart for Vienna via EVA Air",
-          "completed": false,
-          "accomCost": "0",
-          "activityCost": "0",
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-vienna"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-10",
-              "endDate": "2026-06-10",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-vienna"
-            }
-          ],
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ]
-        },
-        {
           "date": "2026-06-27",
           "day": "Sat",
           "from": "London",
-          "to": "Bangkok",
+          "to": "🇹🇭 Bangkok (2)",
           "completed": false,
           "desc": "Arrive from London via EVA Air",
           "transportItems": [
@@ -2709,8 +2293,8 @@
         {
           "date": "2026-06-28",
           "day": "Sun",
-          "from": "Bangkok",
-          "to": "Bangkok",
+          "from": "🇹🇭 Bangkok (2)",
+          "to": "🇹🇭 Bangkok (2)",
           "completed": false,
           "desc": "Family arrives! ⚠️ EARLY FLIGHT TOMORROW",
           "transportItems": [],
@@ -2740,7 +2324,7 @@
         {
           "date": "2026-06-29",
           "day": "Mon",
-          "from": "Bangkok",
+          "from": "🇹🇭 Bangkok (2)",
           "to": "Koh Samui",
           "completed": false,
           "desc": "Depart for Koh Samui via Bangkok Airways",
@@ -2763,238 +2347,6 @@
               "startTime": "",
               "endTime": "",
               "cityId": "city-koh-samui"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-30",
-          "day": "Tue",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-30",
-              "endDate": "2026-06-30",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-01",
-          "day": "Wed",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-01",
-              "endDate": "2026-07-01",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-02",
-          "day": "Thu",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-02",
-              "endDate": "2026-07-02",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-03",
-          "day": "Fri",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-03",
-              "endDate": "2026-07-03",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-04",
-          "day": "Sat",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-04",
-              "endDate": "2026-07-04",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-05",
-          "day": "Sun",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-05",
-              "endDate": "2026-07-05",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-06",
-          "day": "Mon",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-06",
-              "endDate": "2026-07-06",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-07",
-          "day": "Tue",
-          "from": "Bangkok",
-          "to": "Brisbane",
-          "completed": false,
-          "desc": "Depart for Brisbane",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-brisbane"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-07",
-              "endDate": "2026-07-07",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-brisbane"
             }
           ]
         }
@@ -3059,7 +2411,7 @@
           "estCost": "0",
           "notes": "",
           "location": "",
-          "assignedDayIdx": 1,
+          "assignedDayIdx": 0,
           "assignedDate": "2026-06-27",
           "startDate": "2026-06-27",
           "startTime": "",
@@ -3074,7 +2426,7 @@
           "estCost": "0",
           "notes": "",
           "location": "",
-          "assignedDayIdx": 2,
+          "assignedDayIdx": 1,
           "assignedDate": "2026-06-28",
           "startDate": "2026-06-28",
           "startTime": "",
@@ -3145,7 +2497,7 @@
           "date": "2026-06-29",
           "day": "Mon",
           "from": "Bangkok",
-          "to": "Koh Samui",
+          "to": "🌴 Koh Samui",
           "completed": false,
           "desc": "Arrive from Bangkok via Bangkok Airways",
           "transportItems": [
@@ -3180,8 +2532,8 @@
         {
           "date": "2026-06-30",
           "day": "Tue",
-          "from": "Koh Samui",
-          "to": "Koh Samui",
+          "from": "🌴 Koh Samui",
+          "to": "🌴 Koh Samui",
           "completed": false,
           "desc": "Day trip: Ang Thong",
           "transportItems": [],
@@ -3211,8 +2563,8 @@
         {
           "date": "2026-07-01",
           "day": "Wed",
-          "from": "Koh Samui",
-          "to": "Koh Samui",
+          "from": "🌴 Koh Samui",
+          "to": "🌴 Koh Samui",
           "completed": false,
           "desc": "Koh Tao snorkelling",
           "transportItems": [],
@@ -3243,8 +2595,8 @@
         {
           "date": "2026-07-02",
           "day": "Thu",
-          "from": "Koh Samui",
-          "to": "Koh Samui",
+          "from": "🌴 Koh Samui",
+          "to": "🌴 Koh Samui",
           "completed": false,
           "desc": "Culture & wildlife day",
           "transportItems": [],
@@ -3274,8 +2626,8 @@
         {
           "date": "2026-07-03",
           "day": "Fri",
-          "from": "Koh Samui",
-          "to": "Koh Samui",
+          "from": "🌴 Koh Samui",
+          "to": "🌴 Koh Samui",
           "completed": false,
           "desc": "Beach day + Night Market",
           "transportItems": [],
@@ -3305,8 +2657,8 @@
         {
           "date": "2026-07-04",
           "day": "Sat",
-          "from": "Koh Samui",
-          "to": "Koh Samui",
+          "from": "🌴 Koh Samui",
+          "to": "🌴 Koh Samui",
           "completed": false,
           "desc": "Adventure day",
           "transportItems": [],
@@ -3336,8 +2688,8 @@
         {
           "date": "2026-07-05",
           "day": "Sun",
-          "from": "Koh Samui",
-          "to": "Koh Samui",
+          "from": "🌴 Koh Samui",
+          "to": "🌴 Koh Samui",
           "completed": false,
           "desc": "Relaxed beach day",
           "transportItems": [],
@@ -3367,8 +2719,8 @@
         {
           "date": "2026-07-06",
           "day": "Mon",
-          "from": "Koh Samui",
-          "to": "Koh Samui",
+          "from": "🌴 Koh Samui",
+          "to": "🌴 Koh Samui",
           "completed": false,
           "desc": "Last full day on Samui",
           "transportItems": [],
@@ -3398,7 +2750,7 @@
         {
           "date": "2026-07-07",
           "day": "Tue",
-          "from": "Koh Samui",
+          "from": "🌴 Koh Samui",
           "to": "Bangkok",
           "completed": false,
           "desc": "Depart for Bangkok via Bangkok Air",
@@ -3900,325 +3252,9 @@
       "colour": "#808080",
       "days": [
         {
-          "date": "2026-06-10",
-          "day": "Wed",
-          "from": "Bangkok",
-          "to": "Vienna",
-          "accom": "—",
-          "desc": "Depart for Vienna via EVA Air",
-          "completed": false,
-          "accomCost": "0",
-          "activityCost": "0",
-          "accomItems": [
-            {
-              "text": "—",
-              "cost": "0",
-              "status": "pending",
-              "bookingRef": "",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": []
-        },
-        {
-          "date": "2026-06-27",
-          "day": "Sat",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Travel and arrival day",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-27",
-              "endDate": "2026-06-27",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-28",
-          "day": "Sun",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-28",
-              "endDate": "2026-06-28",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-29",
-          "day": "Mon",
-          "from": "Bangkok",
-          "to": "Koh Samui",
-          "completed": false,
-          "desc": "Depart for Koh Samui via Bangkok Airways",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-koh-samui"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-29",
-              "endDate": "2026-06-29",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-koh-samui"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-30",
-          "day": "Tue",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-30",
-              "endDate": "2026-06-30",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-01",
-          "day": "Wed",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-01",
-              "endDate": "2026-07-01",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-02",
-          "day": "Thu",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-02",
-              "endDate": "2026-07-02",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-03",
-          "day": "Fri",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-03",
-              "endDate": "2026-07-03",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-04",
-          "day": "Sat",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-04",
-              "endDate": "2026-07-04",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-05",
-          "day": "Sun",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-05",
-              "endDate": "2026-07-05",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
-          "date": "2026-07-06",
-          "day": "Mon",
-          "from": "Bangkok",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-06",
-              "endDate": "2026-07-06",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        },
-        {
           "date": "2026-07-07",
           "day": "Tue",
-          "from": "Bangkok",
+          "from": "Koh Samui",
           "to": "Brisbane",
           "completed": false,
           "desc": "Depart for Brisbane",
@@ -4268,10 +3304,10 @@
         {
           "date": "2026-07-07",
           "day": "Tue",
-          "from": "Koh Samui",
-          "to": "Return",
+          "from": "🛫 Return",
+          "to": "🛫 Return",
           "completed": false,
-          "desc": "Arrive from Koh Samui via Bangkok Air",
+          "desc": "Travel and arrival day",
           "transportItems": [
             {
               "text": "Add transport...",
@@ -4304,10 +3340,10 @@
         {
           "date": "2026-07-08",
           "day": "Wed",
-          "from": "Bangkok",
-          "to": "Return",
+          "from": "🛫 Return",
+          "to": "🛫 Return",
           "completed": false,
-          "desc": "Arrive from Bangkok",
+          "desc": "Exploring",
           "transportItems": [],
           "accomItems": [
             {
@@ -5126,7 +4162,8 @@
       "endTime": "05:15",
       "done": false,
       "fromAddress": "",
-      "toAddress": ""
+      "toAddress": "",
+      "_inferredToLegId": "taipei"
     },
     {
       "id": "journey_1778474341607_iobkbm",
@@ -5158,7 +4195,9 @@
       "endTime": "01:10",
       "fromAddress": "",
       "toAddress": "",
-      "done": false
+      "done": false,
+      "_inferredToLegId": "leg-17799265810539540",
+      "_inferredFromLegId": "taipei"
     },
     {
       "id": "journey_1778474359483_dqz7rz",
@@ -5190,7 +4229,9 @@
       "endTime": "08:35",
       "fromAddress": "",
       "toAddress": "",
-      "done": false
+      "done": false,
+      "_inferredToLegId": "vienna",
+      "_inferredFromLegId": "leg-17799265810539540"
     },
     {
       "id": "journey_1779252185623_huf5dt",
@@ -5221,7 +4262,9 @@
       "startTime": "11:14",
       "endTime": "12:10",
       "fromAddress": "",
-      "toAddress": ""
+      "toAddress": "",
+      "_inferredToLegId": "bratislava",
+      "_inferredFromLegId": "vienna"
     },
     {
       "id": "journey_1779252331001_rduqbe",
@@ -5252,7 +4295,9 @@
       "startTime": "12:26",
       "endTime": "16:58",
       "fromAddress": "",
-      "toAddress": ""
+      "toAddress": "",
+      "_inferredToLegId": "prague",
+      "_inferredFromLegId": "bratislava"
     },
     {
       "id": "journey_1779252705895_3up06o",
@@ -5283,7 +4328,9 @@
       "startTime": "11:01",
       "endTime": "12:12",
       "fromAddress": "",
-      "toAddress": ""
+      "toAddress": "",
+      "_inferredToLegId": "munich",
+      "_inferredFromLegId": "nuremberg"
     },
     {
       "id": "journey_1779253742104_nvhvy4",
@@ -5314,7 +4361,9 @@
       "startTime": "06:05",
       "endTime": "07:10",
       "fromAddress": "",
-      "toAddress": ""
+      "toAddress": "",
+      "_inferredToLegId": "samui",
+      "_inferredFromLegId": "bangkok"
     },
     {
       "id": "journey_1779254036457_tntum2",
@@ -5345,7 +4394,9 @@
       "startTime": "18:30",
       "endTime": "19:20",
       "fromAddress": "",
-      "toAddress": ""
+      "toAddress": "",
+      "_inferredToLegId": "leg-17799265810545900",
+      "_inferredFromLegId": "zurich"
     },
     {
       "id": "journey_1778474236720_qwd9zd",
@@ -5376,7 +4427,9 @@
       "startTime": "21:35",
       "endTime": "15:30",
       "fromAddress": "",
-      "toAddress": ""
+      "toAddress": "",
+      "_inferredToLegId": "bangkok",
+      "_inferredFromLegId": "leg-17799265810545900"
     },
     {
       "id": "journey_1779881104451_owxydr",
@@ -5407,7 +4460,8 @@
       "startDate": "2026-07-07",
       "endDate": "2026-07-08",
       "startTime": "21:40",
-      "endTime": "07:30"
+      "endTime": "07:30",
+      "_inferredFromLegId": "leg-17799265810546360ret"
     },
     {
       "id": "journey_1779884038859_11oncs",
@@ -5438,7 +4492,9 @@
       "startDate": "2026-07-07",
       "endDate": "2026-07-07",
       "startTime": "07:00",
-      "endTime": "08:00"
+      "endTime": "08:00",
+      "_inferredToLegId": "leg-17799265810546360ret",
+      "_inferredFromLegId": "samui"
     },
     {
       "id": "journey_1779880837955_pe6x8j",
@@ -5469,7 +4525,9 @@
       "startDate": "2026-06-22",
       "endDate": "2026-06-22",
       "startTime": "12:12",
-      "endTime": "13:25"
+      "endTime": "13:25",
+      "_inferredToLegId": "milan",
+      "_inferredFromLegId": "verona"
     },
     {
       "id": "journey_1779880844682_9mm2uu",
@@ -5500,7 +4558,9 @@
       "startDate": "2026-06-25",
       "endDate": "2026-06-25",
       "startTime": "12:05",
-      "endTime": "15:27"
+      "endTime": "15:27",
+      "_inferredToLegId": "zurich",
+      "_inferredFromLegId": "milan"
     },
     {
       "id": "journey_1779880831644_ezlx95",
@@ -5531,7 +4591,9 @@
       "startDate": "2026-06-21",
       "endDate": "2026-06-22",
       "startTime": "14:42",
-      "endTime": "16:40"
+      "endTime": "16:40",
+      "_inferredToLegId": "verona",
+      "_inferredFromLegId": "bolzano"
     },
     {
       "id": "journey_1779885159223_007jbh",
@@ -5562,7 +4624,9 @@
       "startDate": "2026-06-15",
       "endDate": "2026-06-15",
       "startTime": "09:10",
-      "endTime": "13:00"
+      "endTime": "13:00",
+      "_inferredToLegId": "nuremberg",
+      "_inferredFromLegId": "prague"
     },
     {
       "id": "journey_1779885231014_v8mtx7",
@@ -5593,7 +4657,9 @@
       "startDate": "2026-06-20",
       "endDate": "2026-06-20",
       "startTime": "11:23",
-      "endTime": "15:27"
+      "endTime": "15:27",
+      "_inferredToLegId": "bolzano",
+      "_inferredFromLegId": "munich"
     }
   ],
   "stays": [
@@ -5616,7 +4682,8 @@
       "startTime": "",
       "endTime": "",
       "location": "Schönbrunner Str. 92, 1050 Wien",
-      "done": false
+      "done": false,
+      "_inferredLegId": "vienna"
     },
     {
       "id": "stay_1_1777289776",
@@ -5636,7 +4703,8 @@
       "endDate": "2026-06-13",
       "startTime": "",
       "endTime": "",
-      "location": ""
+      "location": "",
+      "_inferredLegId": "bratislava"
     },
     {
       "id": "stay_2_1777289776",
@@ -5656,7 +4724,8 @@
       "endDate": "2026-06-15",
       "startTime": "",
       "endTime": "",
-      "location": ""
+      "location": "",
+      "_inferredLegId": "prague"
     },
     {
       "id": "stay_3_1777289776",
@@ -5676,7 +4745,8 @@
       "endDate": "2026-06-16",
       "startTime": "",
       "endTime": "",
-      "location": ""
+      "location": "",
+      "_inferredLegId": "nuremberg"
     },
     {
       "id": "stay_4_1777289776",
@@ -5696,7 +4766,8 @@
       "endDate": "2026-06-19",
       "startTime": "",
       "endTime": "",
-      "location": ""
+      "location": "",
+      "_inferredLegId": "munich"
     },
     {
       "id": "stay_5_1777289776",
@@ -5716,7 +4787,8 @@
       "endDate": "2026-06-20",
       "startTime": "",
       "endTime": "",
-      "location": ""
+      "location": "",
+      "_inferredLegId": "munich"
     },
     {
       "id": "stay_7_1777289776",
@@ -5736,7 +4808,8 @@
       "endDate": "2026-06-21",
       "startTime": "",
       "endTime": "",
-      "location": ""
+      "location": "",
+      "_inferredLegId": "bolzano"
     },
     {
       "id": "stay_8_1777289776",
@@ -5756,7 +4829,8 @@
       "endDate": "2026-06-25",
       "startTime": "",
       "endTime": "",
-      "location": ""
+      "location": "",
+      "_inferredLegId": "milan"
     },
     {
       "id": "stay_10_1777289776",
@@ -5776,7 +4850,8 @@
       "endDate": "2026-06-26",
       "startTime": "",
       "endTime": "",
-      "location": ""
+      "location": "",
+      "_inferredLegId": "zurich"
     },
     {
       "id": "stay_11_1777289776",
@@ -5796,7 +4871,8 @@
       "endDate": "2026-06-29",
       "startTime": "",
       "endTime": "",
-      "location": ""
+      "location": "",
+      "_inferredLegId": "bangkok"
     },
     {
       "id": "stay_12_1777289776",
@@ -5836,7 +4912,8 @@
       "startDate": "2026-06-21",
       "endDate": "2026-06-22",
       "startTime": "",
-      "endTime": ""
+      "endTime": "",
+      "_inferredLegId": "verona"
     }
   ],
   "cities": [
