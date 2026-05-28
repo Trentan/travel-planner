@@ -435,6 +435,22 @@
     </div>
   </div>
 
+  <div id="sync-results-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content modal-md">
+      <div class="modal-header">
+        <h2>🔄 Auto-Sync Results</h2>
+        <button class="modal-close" onclick="document.getElementById('sync-results-modal').style.display='none'">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-slate-600 dark:text-slate-300 mb-4 font-medium" id="sync-results-summary"></p>
+        <div id="sync-results-log" class="bg-slate-50 dark:bg-slate-800 p-4 rounded border border-slate-200 dark:border-slate-700 text-sm font-mono text-slate-700 dark:text-slate-300 overflow-y-auto" style="max-height: 400px; white-space: pre-wrap;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn action-btn-secondary" onclick="document.getElementById('sync-results-modal').style.display='none'">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div id="add-leg-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content modal-md">
       <div class="modal-header">
@@ -442,6 +458,11 @@
         <button class="modal-close" onclick="closeAddLegDialog()">&times;</button>
       </div>
       <div class="modal-body">
+        <div style="margin-bottom: 1.5rem;">
+          <button type="button" class="action-btn" style="width: 100%; display: flex; justify-content: center; gap: 0.5rem;" onclick="syncAllLegDays()">
+            <span>🔄</span> Auto-Sync Days from Journeys
+          </button>
+        </div>
         <div class="stack-gap-4">
           <div class="ai-form-group">
             <label>Edit Existing Leg (optional)</label>

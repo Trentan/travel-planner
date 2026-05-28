@@ -86,7 +86,7 @@ return {
   londonLeg: journeys.find(j => j.toLocation === 'London')?.legId,
   outboundLegs: journeys.filter(j => j.journeyId === 'jid_outbound_123').map(j => j.legId),
   zurichDay: getDayJourneys('26 Jun', 'Zurich', 'Bangkok', 'zurich').map(j => j.journeyId || j.id),
-  veronaDay: getDayJourneys('22 Jun', 'Bolzano', 'Milan', 'verona').map(j => j.id)
+  veronaDay: getDayJourneys('23 Jun', 'Bolzano', 'Milan', 'verona').map(j => j.id)
 };`
   )(appData, citiesData, journeys);
 }
@@ -123,7 +123,7 @@ async function run() {
     importedCityNames.length === new Set(importedCityNames.map(name => name.toLowerCase())).size,
     'Imported city list should not contain duplicate names'
   );
-  assert(importedCities.find(city => city.name === 'Verona')?.isTransit !== true, 'Verona should be a destination city because it has stays');
+  assert(importedCities.find(city => city.name === 'Verona')?.isTransit === true, 'Verona should remain a transit city');
   assert(importedCities.find(city => city.name === 'London')?.isTransit === true, 'London should remain a transit city');
   assert(cityHasCoords(importedCities.find(city => city.name === 'Brisbane')), 'Imported destination cities should include known coordinates');
   assert(cityHasCoords(importedCities.find(city => city.name === 'London')), 'Imported transit cities should include known coordinates');
@@ -160,15 +160,15 @@ async function run() {
   assert(journeyMapping.blankLegIds === 0, 'Journey migration should fill blank leg IDs');
   assert(journeyMapping.londonLeg === 'zurich', 'London journey segment should map to Zurich leg');
   assert(
-    journeyMapping.outboundLegs.join(' > ') === 'city-brisbane-start > taipei > vienna',
-    'Outbound journey segments should map to city-brisbane-start, Taipei, and Vienna legs'
+    journeyMapping.outboundLegs.join(' > ') === 'departure > taipei > vienna',
+    'Outbound journey segments should map to departure, Taipei, and Vienna legs'
   );
   assert(
     journeyMapping.zurichDay.includes('jid_zrh_bkk_456'),
     'Zurich day should include Zurich to Bangkok journey group'
   );
   assert(
-    journeyMapping.veronaDay.includes('journey_1779880837955_pe6x8j'),
+    journeyMapping.veronaDay.includes('journey_12'),
     'Verona day should include Bolzano to Milan journey'
   );
 

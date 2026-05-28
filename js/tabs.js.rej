@@ -1,0 +1,30 @@
+diff a/js/tabs.js b/js/tabs.js	(rejected hunks)
+@@ -232,7 +232,7 @@
+       });
+-      slidesHtml.push(`
+-        <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}">
+-          ${cardHtml}
+-        </div>
+-      `);
++      slidesHtml.push(`
++        <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(stay.cityId || '')}">
++          ${cardHtml}
++        </div>
++      `);
+       railHtml.push(`
+@@ -246,8 +246,9 @@
+ 
+-    const mobileHtml = renderMobileSwipePager({
+-      pagerClass: 'stay-swipe-pager',
+-      pagerKey: 'stay-swipe',
+-      railHtml: railHtml.join(''),
+-      slidesHtml: slidesHtml.join(''),
+-      ariaLabel: 'Accommodation stays'
++    const mobileHtml = renderMobileSwipePager({
++      pagerClass: 'stay-swipe-pager',
++      pagerKey: 'stay-swipe',
++      syncCityNav: true,
++      railHtml: railHtml.join(''),
++      slidesHtml: slidesHtml.join(''),
++      ariaLabel: 'Accommodation stays'
+     });

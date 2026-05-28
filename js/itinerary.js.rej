@@ -1,0 +1,13 @@
+diff a/js/itinerary.js b/js/itinerary.js	(rejected hunks)
+@@ -1114,3 +1114,10 @@
+     const cityId = String(leg.id || '');
+-    const btn = nav.querySelector(`.city-nav-btn[data-city="${cityId}"]`);
++    const legLabel = cleanCityNavLabel(leg.label || '');
++    let btn = nav.querySelector(`.city-nav-btn[data-city="${cityId}"]`);
++    if (!btn && legLabel && Array.isArray(citiesData)) {
++      const cityMatch = citiesData.find(c => cleanCityNavLabel(c.name || '') === legLabel);
++      if (cityMatch) {
++        btn = nav.querySelector(`.city-nav-btn[data-city="${cityMatch.id}"]`);
++      }
++    }
+     if (!btn) return;

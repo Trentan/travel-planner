@@ -12,6 +12,9 @@ async function deleteActivity(legIdx, activityIdx) {
   const activity = leg?.suggestedActivities?.[activityIdx];
   if (!leg || !activity) return;
 
+  const emojiRe = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}\u{FE0F}\s]+/gu;
+  const normalize = t => String(t || '').trim().replace(emojiRe, '').trim().toLowerCase();
+
   // If scheduled on a day, remove matching day activity row as well.
   const assignedDayIdx = activity.assignedDayIdx;
   if (assignedDayIdx !== null && assignedDayIdx !== undefined && leg.days?.[assignedDayIdx]) {
@@ -21,7 +24,16 @@ async function deleteActivity(legIdx, activityIdx) {
         ? getSuggestedActivityMatchTexts(activity).map(t => String(t || '').trim())
         : [String(activity.title || '').trim()];
       const matchSet = new Set(matchTexts.filter(Boolean));
-      day.activityItems = day.activityItems.filter(item => !matchSet.has(String(item?.text || '').trim()));
+      const normalizedMatchSet = new Set(matchTexts.map(normalize).filter(Boolean));
+
+      day.activityItems = day.activityItems.filter(item => {
+        const itemText = String(item?.text || '').trim();
+        // Exact match
+        if (matchSet.has(itemText)) return false;
+        // Normalized match (strip emojis, case-insensitive)
+        if (normalizedMatchSet.has(normalize(itemText))) return false;
+        return true;
+      });
     }
   }
 
@@ -593,10 +605,10 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
 
   const deleteBtn = document.getElementById('activityAssignDeleteBtn');
   if (deleteBtn) {
-    deleteBtn.onclick = () => {
+    deleteBtn.onclick = async () => {
       if (confirm('Are you sure you want to delete this activity?')) {
-        deleteActivity(legIdx, activityIdx);
         closeModal();
+        await deleteActivity(legIdx, activityIdx);
       }
     };
   }
@@ -1614,6 +1626,422 @@ function regenerateItineraryFromJourneys(linkedJourneys, legId) {
   return true;
 }
 
+function autoGenerateMissingTransitLegs(legsList) {
+  if (!window.journeys || window.journeys.length === 0) return 0;
+  
+  const sortedJourneys = window.journeys.filter(j => j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase()).sort((a,b) => {
+    const aTime = (a.departureDate||a.date||'') + 'T' + (a.departureTime||'00:00');
+    const bTime = (b.departureDate||b.date||'') + 'T' + (b.departureTime||'00:00');
+    return aTime.localeCompare(bTime);
+  });
+  const routeCities = [];
+  if (sortedJourneys.length > 0) {
+    routeCities.push(sortedJourneys[0].fromLocation);
+    sortedJourneys.forEach(j => {
+       if (routeCities[routeCities.length - 1].toLowerCase() !== j.fromLocation.toLowerCase()) {
+          routeCities.push(j.fromLocation);
+       }
+       if (routeCities[routeCities.length - 1].toLowerCase() !== j.toLocation.toLowerCase()) {
+          routeCities.push(j.toLocation);
+       }
+    });
+  }
+
+  function getBaseName(name) {
+    if (!name) return '';
+    let base = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(name) : name.replace(/[^\x00-\x7F]/g, '').trim();
+    base = base.replace(/\s*\(.*?\)$/, ''); 
+    let strippedNum = base.replace(/\s*\d+$/, '');
+    if (strippedNum.trim().length > 0) base = strippedNum;
+    return base.trim().toLowerCase();
+  }
+
+  let routeIndex = 0;
+  let i = 0;
+  let legsAdded = 0;
+
+  while (i < legsList.length - 1) {
+    const currentLeg = legsList[i];
+    const nextLeg = legsList[i + 1];
+    
+    if (currentLeg.label && currentLeg.label.includes('Departure')) { i++; continue; }
+    if (nextLeg.label && nextLeg.label.includes('Return')) break; 
+    
+    const currentBase = getBaseName(currentLeg.label);
+    const nextBase = getBaseName(nextLeg.label);
+    
+    let foundCurrent = -1;
+    for (let r = routeIndex; r < routeCities.length; r++) {
+      if (routeCities[r].toLowerCase() === currentBase) {
+        foundCurrent = r;
+        break;
+      }
+    }
+    
+    if (foundCurrent !== -1) {
+      let foundNext = -1;
+      for (let r = foundCurrent + 1; r < routeCities.length; r++) {
+        if (routeCities[r].toLowerCase() === nextBase) {
+          foundNext = r;
+          break;
+        }
+      }
+      
+      if (foundNext !== -1) {
+        const missingCount = foundNext - foundCurrent - 1;
+        if (missingCount > 0) {
+          for (let m = 0; m < missingCount; m++) {
+            const missingCity = routeCities[foundCurrent + 1 + m];
+            legsList.splice(i + 1 + m, 0, {
+              id: 'leg-' + Date.now() + Math.floor(Math.random()*1000) + m,
+              label: missingCity,
+              colour: '#808080',
+              days: []
+            });
+            legsAdded++;
+          }
+          i += missingCount;
+        }
+        routeIndex = foundNext;
+      }
+    }
+    i++;
+  }
+
+  // Check gap before Return
+  const lastLeg = legsList[legsList.length - 2];
+  if (lastLeg) {
+    const lastBase = getBaseName(lastLeg.label);
+    let foundLast = -1;
+    for (let r = routeIndex; r < routeCities.length; r++) {
+      if (routeCities[r].toLowerCase() === lastBase) {
+        foundLast = r;
+        break;
+      }
+    }
+    if (foundLast !== -1 && foundLast < routeCities.length - 2) {
+      const missingCount = routeCities.length - 2 - foundLast;
+      if (missingCount > 0) {
+        for (let m = 0; m < missingCount; m++) {
+          const missingCity = routeCities[foundLast + 1 + m];
+          legsList.splice(legsList.length - 1, 0, {
+            id: 'leg-' + Date.now() + Math.floor(Math.random()*1000) + m + 'ret',
+            label: missingCity,
+            colour: '#808080',
+            days: []
+          });
+          legsAdded++;
+        }
+      }
+    }
+  }
+
+  // Numbering phase
+  const cityCounts = {};
+  legsList.forEach(leg => {
+    if (leg.label && !leg.label.includes('Departure') && !leg.label.includes('Return')) {
+      const base = getBaseName(leg.label);
+      cityCounts[base] = (cityCounts[base] || 0) + 1;
+    }
+  });
+
+  const currentIndices = {};
+  legsList.forEach(leg => {
+    if (leg.label && !leg.label.includes('Departure') && !leg.label.includes('Return')) {
+      const base = getBaseName(leg.label);
+      if (cityCounts[base] > 1) {
+        currentIndices[base] = (currentIndices[base] || 0) + 1;
+        // Check if there's an emoji to preserve
+        const emojiMatch = leg.label.match(/^([^\x00-\x7F]+\s*)/);
+        const prefix = emojiMatch ? emojiMatch[1] : '';
+        const cleanLabel = leg.label.replace(/^([^\x00-\x7F]+\s*)/, '').replace(/\s*\(\d+\)$/, '').replace(/\s*\d+$/, '').trim();
+        leg.label = `${prefix}${cleanLabel} (${currentIndices[base]})`;
+      }
+    }
+  });
+
+  return legsAdded;
+}
+
+function syncAllLegDays() {
+  if (!confirm('This will autonomously recalculate day cards for all legs based on your saved journeys and stays. Proceed?')) {
+    return;
+  }
+  
+  const legsInjected = autoGenerateMissingTransitLegs(appData);
+  if (legsInjected > 0 && typeof saveAppData === 'function') {
+    // Force a render of the sidebar before continuing if it's the UI
+    if (typeof renderSidebar === 'function') renderSidebar();
+  }
+
+  let changesMade = 0;
+  const changelog = [];
+  
+  const formatShortDate = (d) => {
+    try {
+      return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    } catch(e) {
+      return String(d);
+    }
+  };
+
+  function getBaseNameGlobal(name) {
+    if (!name) return '';
+    let base = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(name) : name.replace(/[^\x00-\x7F]/g, '').trim();
+    base = base.replace(/\s*\(.*?\)$/, ''); 
+    let strippedNum = base.replace(/\s*\d+$/, '');
+    if (strippedNum.trim().length > 0) base = strippedNum;
+    return base.trim().toLowerCase();
+  }
+
+  // Pre-calculate leg inferred mappings for journeys
+  const sortedJourneysForMapping = (window.journeys || []).slice().sort((a,b) => {
+    const aTime = (a.departureDate||a.date||'') + 'T' + (a.departureTime||'00:00');
+    const bTime = (b.departureDate||b.date||'') + 'T' + (b.departureTime||'00:00');
+    return aTime.localeCompare(bTime);
+  });
+
+  let currentToIdx = 0;
+  sortedJourneysForMapping.forEach(j => {
+    if (!j.toLocation) return;
+    const toBase = getBaseNameGlobal(j.toLocation);
+    let foundTo = -1;
+    for (let i = currentToIdx; i < appData.length; i++) {
+      if (getBaseNameGlobal(appData[i].label) === toBase) {
+        foundTo = i;
+        break;
+      }
+    }
+    if (foundTo !== -1) {
+      j._inferredToLegId = appData[foundTo].id;
+      currentToIdx = foundTo;
+    }
+  });
+
+  let currentFromIdx = 0;
+  sortedJourneysForMapping.forEach(j => {
+    if (!j.fromLocation) return;
+    const fromBase = getBaseNameGlobal(j.fromLocation);
+    let foundFrom = -1;
+    for (let i = currentFromIdx; i < appData.length; i++) {
+      if (getBaseNameGlobal(appData[i].label) === fromBase) {
+        foundFrom = i;
+        break;
+      }
+    }
+    if (foundFrom !== -1) {
+      j._inferredFromLegId = appData[foundFrom].id;
+      currentFromIdx = foundFrom;
+    }
+  });
+
+  // Pre-calculate leg inferred mappings for stays
+  const sortedStaysForMapping = (window.stays || []).slice().sort((a,b) => (a.checkIn||'').localeCompare(b.checkIn||''));
+  let currentStayIdx = 0;
+  sortedStaysForMapping.forEach(s => {
+    if (!s.city && !s.cityId) return;
+    const stayCity = s.city || s.cityId.replace('city-', '');
+    const stayBase = getBaseNameGlobal(stayCity);
+    let foundStay = -1;
+    for (let i = currentStayIdx; i < appData.length; i++) {
+      if (getBaseNameGlobal(appData[i].label) === stayBase) {
+        foundStay = i;
+        break;
+      }
+    }
+    if (foundStay !== -1) {
+      s._inferredLegId = appData[foundStay].id;
+      currentStayIdx = foundStay;
+    }
+  });
+
+  appData.forEach(leg => {
+    const rawCityName = leg.label;
+    if (!rawCityName) return;
+    const cityName = rawCityName;
+    
+    const baseCityName = getBaseNameGlobal(rawCityName);
+    const cityId = 'city-' + baseCityName.replace(/[^a-z0-9]/g, '-');
+
+    const legStays = (window.stays || []).filter(s => 
+      s._inferredLegId === leg.id || 
+      // Fallback if not inferred
+      (!s._inferredLegId && (s.cityId === cityId || (s.city && getBaseNameGlobal(s.city) === baseCityName)))
+    );
+    
+    // Ignore local intra-city transport by ensuring fromLocation !== toLocation
+    const arrivingJourneys = (window.journeys || []).filter(j => 
+      (j._inferredToLegId === leg.id && (j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase())) ||
+      (!j._inferredToLegId && (j.legId === leg.id || !j.legId) && (j.toCityId === cityId || (j.toLocation && getBaseNameGlobal(j.toLocation) === baseCityName)) && (j.fromCityId !== j.toCityId))
+    );
+    const departingJourneys = (window.journeys || []).filter(j => 
+      (j._inferredFromLegId === leg.id && (j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase())) ||
+      (!j._inferredFromLegId && (j.legId === leg.id || !j.legId) && (j.fromCityId === cityId || (j.fromLocation && getBaseNameGlobal(j.fromLocation) === baseCityName)) && (j.fromCityId !== j.toCityId))
+    );
+    
+    // Calculate precise date bounds based strictly on mapped items
+    let earliestDate = null;
+    let latestDate = null;
+
+    const considerDate = (d) => {
+      if (!d) return;
+      const normalized = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(d) : d;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return;
+      if (!earliestDate || normalized < earliestDate) earliestDate = normalized;
+      if (!latestDate || normalized > latestDate) latestDate = normalized;
+    };
+
+    legStays.forEach(s => {
+      considerDate(s.checkIn);
+      if (s.checkOut) considerDate(s.checkOut);
+    });
+    arrivingJourneys.forEach(j => considerDate(j.arrivalDate || j.dayDate));
+    departingJourneys.forEach(j => considerDate(j.departureDate || j.dayDate));
+
+    if (!earliestDate && leg.days && leg.days.length > 0) {
+      considerDate(leg.days[0].date);
+      considerDate(leg.days[leg.days.length - 1].date);
+    }
+
+    if (!earliestDate) return;
+    if (!latestDate) latestDate = earliestDate;
+
+    let newDays = [];
+    if (typeof buildLegDaysWithNotes === 'function') {
+      newDays = buildLegDaysWithNotes({
+        dateFrom: earliestDate,
+        dateTo: latestDate,
+        fromCity: cityName,
+        toCity: cityName,
+        legType: 'city',
+        dayNotes: []
+      });
+    }
+
+    const formatShortDate = (dStr) => {
+      if (!dStr) return '';
+      const d = new Date(dStr);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    // 1. Handle Arrival Overlaps
+    arrivingJourneys.forEach(j => {
+      const arrDate = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(j.arrivalDate || j.dayDate) : (j.arrivalDate || j.dayDate);
+      if (!arrDate) return;
+      
+      const fromCity = j.fromLocation || 'Previous Destination';
+      
+      let dayIndex = newDays.findIndex(d => d.date === arrDate);
+      if (dayIndex !== -1) {
+        newDays[dayIndex].from = fromCity; // Sets "Paris -> Rome" travel indicator in header
+        newDays[dayIndex].desc = `Arrive from ${fromCity}` + (j.provider ? ` via ${j.provider}` : '');
+        changelog.push(`Updated arrival day (${formatShortDate(arrDate)}) in ${cityName} with travel from ${fromCity}`);
+      } else {
+        newDays.push({
+          date: arrDate,
+          day: new Date(arrDate).toLocaleDateString('en-US', { weekday: 'short' }),
+          from: fromCity,
+          to: cityName,
+          accom: '—',
+          desc: `Arrive from ${fromCity}` + (j.provider ? ` via ${j.provider}` : ''),
+          completed: false,
+          accomCost: '0',
+          activityCost: '0',
+          accomItems: [{ text: '—', cost: '0', status: 'pending', bookingRef: '', cityId: cityId }],
+          activityItems: []
+        });
+        changelog.push(`Added arrival day (${formatShortDate(arrDate)}) in ${cityName} from ${fromCity}`);
+      }
+    });
+
+    // 2. Handle Departure Overlaps
+    departingJourneys.forEach(j => {
+      const depDate = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(j.departureDate || j.dayDate) : (j.departureDate || j.dayDate);
+      if (!depDate) return;
+      
+      const toCity = j.toLocation || 'Next Destination';
+      
+      let dayIndex = newDays.findIndex(d => d.date === depDate);
+      if (dayIndex !== -1) {
+        newDays[dayIndex].to = toCity;
+        newDays[dayIndex].desc = `Depart for ${toCity}` + (j.provider ? ` via ${j.provider}` : '');
+        changelog.push(`Updated departure day (${formatShortDate(depDate)}) in ${cityName} with travel to ${toCity}`);
+      } else {
+        newDays.push({
+          date: depDate,
+          day: new Date(depDate).toLocaleDateString('en-US', { weekday: 'short' }),
+          from: cityName,
+          to: toCity,
+          accom: '—',
+          desc: `Depart for ${toCity}` + (j.provider ? ` via ${j.provider}` : ''),
+          completed: false,
+          accomCost: '0',
+          activityCost: '0',
+          accomItems: [{ text: '—', cost: '0', status: 'pending', bookingRef: '', cityId: cityId }],
+          activityItems: []
+        });
+        changelog.push(`Added departure day (${formatShortDate(depDate)}) to ${cityName} for travel to ${toCity}`);
+      }
+    });
+
+    newDays.sort((a, b) => a.date.localeCompare(b.date));
+
+    // Preserve existing notes
+    if (Array.isArray(leg.days)) {
+      newDays.forEach(nd => {
+        const oldDay = leg.days.find(od => od.date === nd.date);
+        if (oldDay) {
+          // Keep old notes if user had custom text, except if it was just an old travel generic string
+          if (oldDay.desc && !nd.desc.startsWith('Depart for') && !nd.desc.startsWith('Arrive from') && !oldDay.desc.startsWith('Depart for') && !oldDay.desc.startsWith('Arrive from')) {
+            nd.desc = oldDay.desc;
+          }
+          if (oldDay.accomItems) nd.accomItems = oldDay.accomItems;
+          if (oldDay.activityItems) nd.activityItems = oldDay.activityItems;
+          if (oldDay.transportItems) nd.transportItems = oldDay.transportItems;
+        }
+      });
+    }
+
+    // Check if lengths differ
+    if (!leg.days || leg.days.length !== newDays.length) {
+      if (!changelog.some(log => log.includes(`Added`) && log.includes(cityName))) {
+         changelog.push(`Rebuilt ${newDays.length} day(s) for ${cityName}`);
+      }
+      changesMade++;
+    } else {
+      // Check for structural changes
+      const structuralChange = leg.days.some((od, i) => od.from !== newDays[i].from || od.to !== newDays[i].to || od.date !== newDays[i].date);
+      if (structuralChange) changesMade++;
+    }
+
+    leg.days = newDays;
+  });
+
+  if (changesMade > 0 || changelog.length > 0) {
+    if (typeof saveData === 'function') saveData();
+    if (typeof buildItinerary === 'function') buildItinerary();
+    if (typeof closeAddLegDialog === 'function') closeAddLegDialog();
+    
+    // Display Modal
+    const modal = document.getElementById('sync-results-modal');
+    if (modal) {
+      document.getElementById('sync-results-summary').textContent = `Successfully synced days based on your latest journeys.`;
+      const logContainer = document.getElementById('sync-results-log');
+      if (changelog.length > 0) {
+        logContainer.textContent = changelog.map(line => '• ' + line).join('\n');
+      } else {
+        logContainer.textContent = 'Dates re-aligned properly. No major day overrides needed.';
+      }
+      modal.style.display = 'flex';
+    } else {
+      alert('Successfully synced legs!\n\n' + changelog.map(line => '• ' + line).join('\n'));
+    }
+  } else {
+    alert('No changes were needed. Day cards are already in sync with journeys and stays.');
+  }
+}
+
+
 function onEditLegSelectionChange() {
   const editSelect = document.getElementById('editLegSelect');
   const selected = Number(editSelect?.value);
@@ -1895,13 +2323,15 @@ function confirmAddLeg() {
 
   let label, fromCity, toCity;
   if (legType === 'start') {
-    label = '🚀 Start';
     fromCity = 'Home';
     toCity = document.getElementById('toCitySelect')?.value || 'Home';
+    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
+    label = `${cleanCity} (Trip Start)`;
   } else if (legType === 'return') {
-    label = '🏠 Return';
     fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
     toCity = 'Home';
+    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
+    label = `${cleanCity} (Trip Finish)`;
   } else if (legType === 'travel') {
     fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
     toCity = document.getElementById('toCitySelect')?.value || '';
@@ -2027,6 +2457,7 @@ window.openEditDayActivityModal = openEditDayActivityModal;
 window.onLegTypeChange = onLegTypeChange;
 window.checkDateConflict = checkDateConflict;
 window.adjustLegDays = adjustLegDays;
+window.syncAllLegDays = syncAllLegDays;
 window.confirmAddLeg = confirmAddLeg;
 window.deleteLegFromDialog = deleteLegFromDialog;
 window.regenerateItineraryFromJourneys = regenerateItineraryFromJourneys;

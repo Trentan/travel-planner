@@ -46,6 +46,13 @@ const DEFAULT_DATA = [
           { text: "British Museum", cost: "0", time: "3 hrs", done: false, cityId: 'city-london' },
           { text: "Covent Garden dinner", cost: "40", time: "2 hrs", done: false, cityId: 'city-london' }
         ]
+      },
+      {
+        date:'4 Jan', day:'Thu', from:'London', to:'Paris',
+        completed: false, desc:'Departure day from London',
+        transportItems: [{ text: "Eurostar to Paris", cost: "100", status: "confirmed", bookingRef: "EST789" }],
+        accomItems: [],
+        activityItems: []
       }
     ]
   },
@@ -96,6 +103,13 @@ const DEFAULT_DATA = [
           { text: "Louvre Museum", cost: "17", time: "4 hrs", done: false, cityId: 'city-paris' },
           { text: "Eiffel Tower", cost: "28", time: "2 hrs", done: false, cityId: 'city-paris' }
         ]
+      },
+      {
+        date:'6 Jan', day:'Sat', from:'Paris', to:'Home',
+        completed: false, desc:'Departure day from Paris',
+        transportItems: [{ text: "Flight CDG → BNE", cost: "1200", status: "confirmed", bookingRef: "RET321" }],
+        accomItems: [],
+        activityItems: []
       }
     ]
   },
