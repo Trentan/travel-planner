@@ -1764,6 +1764,14 @@ function syncAllLegDays() {
 
   let changesMade = 0;
   const changelog = [];
+  
+  const formatShortDate = (d) => {
+    try {
+      return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    } catch(e) {
+      return String(d);
+    }
+  };
 
   function getBaseNameGlobal(name) {
     if (!name) return '';
@@ -1838,6 +1846,7 @@ function syncAllLegDays() {
   appData.forEach(leg => {
     const rawCityName = leg.label;
     if (!rawCityName) return;
+    const cityName = rawCityName;
     
     const baseCityName = getBaseNameGlobal(rawCityName);
     const cityId = 'city-' + baseCityName.replace(/[^a-z0-9]/g, '-');
