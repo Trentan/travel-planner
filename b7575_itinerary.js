@@ -1,11 +1,11 @@
-function getCompactFoodQuestTitle(label) {
+﻿function getCompactFoodQuestTitle(label) {
   const cleaned = String(label || '')
       .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
       .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
       .replace(/[\u{2600}-\u{26FF}]/gu, '')
       .replace(/[\u{2700}-\u{27BF}]/gu, '')
       .replace(/\p{Emoji}/gu, '')
-      .replace(/\s*[→>-].*$/u, '')
+      .replace(/\s*[├óÔÇáÔÇÖ>-].*$/u, '')
       .replace(/[^\w\s()&,-]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
@@ -16,7 +16,7 @@ function getCompactFoodQuestTitle(label) {
 function stripCompactLeadingEmoji(text) {
   return String(text || '')
       .replace(/^\s*(?:\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji})+(?:\uFE0F)?\s*/gu, '')
-      .replace(/^\s*[-–—:·•]+\s*/u, '')
+      .replace(/^\s*[-ÔÇôÔÇö:┬ÀÔÇó]+\s*/u, '')
       .trim();
 }
 
@@ -27,24 +27,6 @@ function escapeCompactText(text) {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
-}
-
-function focusCompactInlineEditable(selector) {
-  const el = typeof document !== 'undefined' ? document.querySelector(selector) : null;
-  if (!el) return;
-  try {
-    el.focus();
-    if (typeof window.getSelection === 'function' && typeof document.createRange === 'function') {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      range.collapse(false);
-      const sel = window.getSelection();
-      if (sel) {
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }
-    }
-  } catch (_) {}
 }
 
 function getJourneyDisplayCost(journey) {
@@ -82,7 +64,7 @@ function renderCompactEmojiLine({ emoji, text, duration = '', cost = '', done = 
   if (durationTrimmed) suffixParts.push(escapeCompactText(durationTrimmed));
   if (costTrimmed) suffixParts.push(`<span class="compact-inline-meta-cost">${escapeCompactText(costTrimmed)}</span>`);
   
-  const suffix = suffixParts.length > 0 ? ` <span class="compact-meta-suffix">[${suffixParts.join(' · ')}]</span>` : '';
+  const suffix = suffixParts.length > 0 ? ` <span class="compact-meta-suffix">[${suffixParts.join(' ┬À ')}]</span>` : '';
   
   return `
     <span class="compact-line">
@@ -141,24 +123,6 @@ function getCompactDaySlideId(legId, dayIdx) {
 function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
   const itemId = `compact-food-${legIndex}-${itemIdx}`;
   const done = !!item.done;
-  const rawText = String(item.text || '');
-  const cleanText = stripCompactLeadingEmoji(rawText);
-  const text = escapeCompactText(cleanText);
-  const lower = rawText.toLowerCase();
-  let foodEmoji = '&#127869;&#65039;'; // default: plate
-
-  if (/pizza/.test(lower)) foodEmoji = '&#127829;';
-  else if (/burger|hamburger/.test(lower)) foodEmoji = '&#127828;';
-  else if (/sushi/.test(lower)) foodEmoji = '&#127843;';
-  else if (/ramen|noodle|udon|pho/.test(lower)) foodEmoji = '&#127836;';
-  else if (/taco|burrito/.test(lower)) foodEmoji = '&#127790;';
-  else if (/curry/.test(lower)) foodEmoji = '&#127835;';
-  else if (/lobster|prawn|shrimp|crab|fish|squid|seafood|snorkel/.test(lower)) foodEmoji = '&#129424;';
-  else if (/salad|vegan|vegetarian/.test(lower)) foodEmoji = '&#129367;';
-  else if (/coffee|cafe|espresso/.test(lower)) foodEmoji = '&#9749;';
-  else if (/beer|bar|cocktail|wine/.test(lower)) foodEmoji = '&#127863;';
-  else if (/dessert|ice cream|gelato|cake|sweet/.test(lower)) foodEmoji = '&#127856;';
-  else if (/thai|som tam|massaman|khao|gaeng|tom/.test(lower)) foodEmoji = '&#127834;';
 
   return `
     <label class="compact-food-item" for="${itemId}">
@@ -168,11 +132,11 @@ function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
         ${done ? 'checked' : ''}
         onchange="toggleFoodCompleted(event, ${legIndex}, ${itemIdx})"
       >
-      <span class="compact-food-item-copy ${done ? 'is-done' : ''}">
-        <span class="compact-food-item-emoji" aria-hidden="true">${foodEmoji}</span>
-        <span id="compact-food-text-${legIndex}-${itemIdx}" class="compact-food-item-text ${isEditMode ? 'is-editable' : ''}" ${isEditMode ? `contenteditable="true" onblur="updateFoodText(${legIndex}, ${itemIdx}, this.innerText)"` : ''}>${text}</span>
-      </span>
-      ${isEditMode ? `<span class="compact-inline-actions"><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-edit" title="Edit Food" onclick="event.preventDefault(); event.stopPropagation(); focusCompactInlineEditable('#compact-food-text-${legIndex}-${itemIdx}');">&#9998;</button><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-remove" title="Delete Food" onclick="event.preventDefault(); event.stopPropagation(); if (confirm('Delete this food quest item?')) deleteFood(${legIndex}, ${itemIdx});">&#10005;</button></span>` : ''}
+      <span class="compact-food-item-copy">${renderCompactEmojiLine({
+    emoji: '­ƒì¢´©Å',
+    text: item.text,
+    done
+  })}</span>
     </label>
   `;
 }
@@ -180,7 +144,7 @@ function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
 function renderCompactActivityItemForPanel(legIndex, dayIdx, itemIdx, item) {
   const itemId = `compact-activity-${legIndex}-${dayIdx}-${itemIdx}`;
   const done = !!item.done;
-  const emoji = /food/i.test(item.text || '') ? '🍽️' : '📌';
+  const emoji = /food/i.test(item.text || '') ? '­ƒì¢´©Å' : '­ƒôì';
 
   return `
     <label class="compact-activity-item" for="${itemId}">
@@ -200,14 +164,15 @@ function renderCompactActivityItemForPanel(legIndex, dayIdx, itemIdx, item) {
 }
 
 function getCompactActivityCategoryEmoji(cat) {
-  const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌' };
-  return emojis[cat] || '📌';
+  const emojis = { fitness: '­ƒÅâ', sight: '­ƒÅø´©Å', attraction: '­ƒÄó', wellness: '­ƒºÿ', food: '­ƒì¢´©Å', tour: '­ƒÜî' };
+  return emojis[cat] || '­ƒôì';
 }
 
-
 function renderCompactSuggestedActivityItem(legIndex, activityIdx, activity) {
+  const itemId = `compact-suggested-activity-${legIndex}-${activityIdx}`;
   const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
 
+  // Check if completed - look for matching activity item in the assigned day
   let isCompleted = false;
   if (isAssigned && appData[legIndex]?.days?.[activity.assignedDayIdx]) {
     const day = appData[legIndex].days[activity.assignedDayIdx];
@@ -217,32 +182,25 @@ function renderCompactSuggestedActivityItem(legIndex, activityIdx, activity) {
     const matchedItem = day.activityItems?.find(item =>
       matchTexts.includes(String(item.text || '').trim())
     );
-    if (matchedItem && matchedItem.done) isCompleted = true;
+    if (matchedItem && matchedItem.done) {
+      isCompleted = true;
+    }
   }
 
   const categoryEmoji = getCompactActivityCategoryEmoji(activity.category);
-  const leadIcon = isAssigned ? '&#10003;' : '&#128204;';
-  const titleClass = isCompleted ? 'compact-suggested-activity-title is-done' : 'compact-suggested-activity-title';
-  const metaParts = [];
-  if (activity.estTime) metaParts.push(`&#9201; ${escapeCompactText(activity.estTime)}`);
-  if (activity.estCost) metaParts.push(`$${escapeCompactText(activity.estCost)}`);
-  const metaLine = metaParts.length > 0
-    ? `<div class="compact-suggested-activity-subline">${metaParts.join(' · ')}</div>`
-    : '';
 
-  const actionIcon = isAssigned ? '&#8250;' : '&#128204;';
+  // Icon: chevron when assigned, pin when not assigned
+  const actionIcon = isAssigned ? 'ÔÇ║' : '­ƒôî';
   const actionTitle = isAssigned ? 'Move to another day' : 'Assign to day';
-  const dragClass = isAssigned ? 'assigned-sight' : 'draggable-sight';
-  const dragAttrs = !isAssigned ? ` draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : '';
 
   return `
-    <div class="compact-suggested-activity-item ${dragClass}"${dragAttrs}>
-      <span class="compact-suggested-activity-lead" aria-hidden="true">${leadIcon}</span>
-      <span class="compact-suggested-activity-emoji" aria-hidden="true">${categoryEmoji}</span>
-      <div class="compact-suggested-activity-main">
-        <div class="${titleClass}">${escapeCompactText(activity.title)}</div>
-        ${metaLine}
-      </div>
+    <div class="compact-suggested-activity-item">
+      <span class="compact-suggested-activity-emoji">${categoryEmoji}</span>
+      <span class="compact-suggested-activity-text">${isCompleted ? '<span style="text-decoration:line-through;opacity:0.6;">' : ''}${escapeCompactText(activity.title)}${isCompleted ? '</span>' : ''}</span>
+      <span class="compact-suggested-activity-meta">
+        ${activity.estTime ? `<span class="compact-suggested-activity-time">ÔÅ▒ ${escapeCompactText(activity.estTime)}</span>` : ''}
+        ${activity.estCost ? `<span class="compact-suggested-activity-cost">$${escapeCompactText(activity.estCost)}</span>` : ''}
+      </span>
       <button
         type="button"
         class="compact-activity-action-btn"
@@ -250,32 +208,9 @@ function renderCompactSuggestedActivityItem(legIndex, activityIdx, activity) {
         title="${actionTitle}"
         aria-label="${actionTitle}"
       >
-        <span class="compact-activity-action-icon">${actionIcon}</span>
+        ${actionIcon}
       </button>
     </div>
-  `;
-}
-
-function renderCompactActivitiesCard(leg, legIndex) {
-  const suggestedActivities = Array.isArray(leg.suggestedActivities) ? leg.suggestedActivities : [];
-  const assignedCount = suggestedActivities.filter(activity => activity && activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined).length;
-  const countLabel = `${assignedCount}/${suggestedActivities.length}`;
-
-  const activityLines = suggestedActivities.length > 0
-      ? suggestedActivities.map((activity, activityIdx) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
-      : '<div class="compact-day-empty">No suggested activities.</div>';
-
-  return `
-    <article class="compact-activities-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
-      <div class="compact-activities-summary" style="cursor: default; user-select: none;">
-        <span class="compact-activities-summary-title"><span class="compact-activities-summary-icon" aria-hidden="true">&#128204;</span> Suggested Activities</span>
-        <span class="compact-activities-summary-count">${escapeCompactText(countLabel)}</span>
-      </div>
-      <div class="mobile-surface-card-details expanded">
-        <div class="compact-suggested-activity-list">${activityLines}</div>
-        ${isEditMode ? `<button class="add-btn mt-2" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>` : ''}
-      </div>
-    </article>
   `;
 }
 
@@ -290,9 +225,9 @@ function renderCompactFoodQuestCard(leg, legIndex) {
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
 
   return `
-    <article class="compact-food-quest-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
+    <article class="mobile-surface-card compact-food-quest-card" style="border-left-color:${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-food-summary" style="cursor: default; user-select: none;">
-        <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">🍔</span> Food quests</span>
+        <span class="compact-food-summary-title"><span class="compact-food-summary-icon" aria-hidden="true">­ƒìù</span> Food quests</span>
         <span class="compact-food-summary-meter" aria-hidden="true"><span style="width:${progressWidth}%"></span></span>
         <span class="compact-food-summary-count">${escapeCompactText(countLabel)}</span>
       </div>
@@ -304,26 +239,14 @@ function renderCompactFoodQuestCard(leg, legIndex) {
   `;
 }
 
-function renderCompactTipItem(tip, legIndex = null, tipIdx = null) {
-  const rawText = typeof tip === 'string' ? tip : (tip && tip.text) || '';
-  const text = escapeCompactText(rawText);
-  const actions = isEditMode && legIndex !== null && tipIdx !== null
-    ? `<span class="compact-inline-actions"><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-edit" title="Edit Tip" onclick="event.preventDefault(); event.stopPropagation(); focusCompactInlineEditable('#compact-tip-text-${legIndex}-${tipIdx}');">&#9998;</button><button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-remove" title="Delete Tip" onclick="event.preventDefault(); event.stopPropagation(); if (confirm('Delete this tip?')) deleteLegTip(${legIndex}, ${tipIdx});">&#10005;</button></span>`
-    : '';
-  const tipBody = isEditMode && legIndex !== null && tipIdx !== null
-    ? `
-    <span class="compact-line">
-      <span class="compact-line-emoji">&#128161;</span>
-      <span id="compact-tip-text-${legIndex}-${tipIdx}" class="compact-line-text is-editable" contenteditable="true" onblur="updateLegTip(${legIndex}, ${tipIdx}, this.innerText)">${text || 'Untitled tip'}</span>
-    </span>`
-    : renderCompactEmojiLine({
-      emoji: '&#128161;',
-      text: rawText || 'Untitled tip'
-    });
+function renderCompactTipItem(tip) {
+  const text = typeof tip === 'string' ? tip : (tip && tip.text) || '';
   return `
     <li class="compact-tip-item">
-      ${tipBody}
-      ${actions}
+      ${renderCompactEmojiLine({
+    emoji: '&#128161;',
+    text: text || 'Untitled tip'
+  })}
     </li>
   `;
 }
@@ -331,12 +254,12 @@ function renderCompactTipItem(tip, legIndex = null, tipIdx = null) {
 function renderCompactTipsCard(leg, legIndex) {
   const tips = Array.isArray(leg.legTips) ? leg.legTips : [];
   const tipsList = tips.length > 0
-      ? `<ul class="compact-tips-list">${tips.map((tip, tipIdx) => renderCompactTipItem(tip, legIndex, tipIdx)).join('')}</ul>`
+      ? `<ul class="compact-tips-list">${tips.map(tip => renderCompactTipItem(tip)).join('')}</ul>`
       : '<div class="compact-day-empty">No tips saved for this leg yet.</div>';
   const countLabel = `${tips.length} tip${tips.length === 1 ? '' : 's'}`;
 
   return `
-    <article class="compact-tips-card bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80" style="border-left: 4px solid ${escapeCompactText(leg.colour || '#24485d')};">
+    <article class="mobile-surface-card compact-tips-card" style="border-left-color:${escapeCompactText(leg.colour || '#24485d')};">
       <div class="compact-tips-summary" style="cursor: default; user-select: none;">
         <span class="compact-tips-summary-title"><span class="compact-tips-summary-icon" aria-hidden="true">&#128161;</span> Tips</span>
         <span class="compact-tips-summary-count">${escapeCompactText(countLabel)}</span>
@@ -349,6 +272,28 @@ function renderCompactTipsCard(leg, legIndex) {
   `;
 }
 
+function renderCompactActivitiesCard(leg, legIndex) {
+  const suggestedActivities = Array.isArray(leg.suggestedActivities) ? leg.suggestedActivities : [];
+  const assignedCount = suggestedActivities.filter(a => a.assignedDayIdx !== null && a.assignedDayIdx !== undefined).length;
+  const countLabel = `${assignedCount}/${suggestedActivities.length}`;
+
+  const activityLines = suggestedActivities.length > 0
+      ? suggestedActivities.map((activity, activityIdx) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
+      : '<div class="compact-day-empty">No suggested activities available.</div>';
+
+  return `
+    <article class="mobile-surface-card compact-activities-card" style="border-left-color:${escapeCompactText(leg.colour || '#24485d')};">
+      <div class="compact-activities-summary" style="cursor: default; user-select: none;">
+        <span class="compact-activities-summary-title"><span class="compact-activities-summary-icon" aria-hidden="true">&#128205;</span> Activities</span>
+        <span class="compact-activities-summary-count">${escapeCompactText(countLabel)}</span>
+      </div>
+      <div class="mobile-surface-card-details expanded">
+        <div class="compact-suggested-activity-list">${activityLines}</div>
+        ${isEditMode ? `<button class="add-btn mt-2" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>` : ''}
+      </div>
+    </article>
+  `;
+}
 
 function renderCompactMobileLegInfoCluster(leg, legIndex) {
   const tips = Array.isArray(leg.legTips) ? leg.legTips : [];
@@ -364,21 +309,19 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
   const foodProgressWidth = foodItems.length > 0 ? Math.round((completedFoodCount / foodItems.length) * 100) : 0;
 
   // Count assigned vs unassigned suggested activities
-  const unassignedActivities = suggestedActivities
-    .map((activity, activityIdx) => ({ activity, activityIdx }))
-    .filter(({ activity }) => activity && (activity.assignedDayIdx === null || activity.assignedDayIdx === undefined));
-  const activitiesLabel = `${unassignedActivities.length} unscheduled`;
+  const assignedCount = suggestedActivities.filter(a => a.assignedDayIdx !== null && a.assignedDayIdx !== undefined).length;
+  const activitiesLabel = `${assignedCount}/${suggestedActivities.length}`;
   const accentColor = escapeCompactText(leg.colour || '#24485d');
 
   const tipsList = tips.length > 0
-      ? `<ul class="compact-mobile-info-list">${tips.map((tip, tipIdx) => renderCompactTipItem(tip, legIndex, tipIdx)).join('')}</ul>`
+      ? `<ul class="compact-mobile-info-list">${tips.map(tip => renderCompactTipItem(tip)).join('')}</ul>`
       : '<div class="compact-day-empty">No tips saved for this leg yet.</div>';
   const foodLines = foodItems.length > 0
       ? foodItems.map((item, itemIdx) => renderCompactFoodQuestItem(legIndex, item, itemIdx)).join('')
       : '<div class="compact-day-empty">No food quests saved for this leg yet.</div>';
-  const activityLines = unassignedActivities.length > 0
-      ? unassignedActivities.map(({ activity, activityIdx }) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
-      : '<div class="compact-day-empty">No unscheduled activities.</div>';
+  const activityLines = suggestedActivities.length > 0
+      ? suggestedActivities.map((activity, activityIdx) => renderCompactSuggestedActivityItem(legIndex, activityIdx, activity)).join('')
+      : '<div class="compact-day-empty">No suggested activities available.</div>';
 
   return `
     <div class="compact-mobile-leg-info">
@@ -389,11 +332,9 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
           style="border-left-color:${accentColor};"
           onclick="toggleTipsCardDetails(event, '${legId}')"
           aria-expanded="${tipsExpanded ? 'true' : 'false'}"
-          aria-label="Tips ${tips.length}"
-          title="Tips"
         >
           <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#128161;</span> Tips</span>
-          <span class="compact-mobile-info-chip-count">${tips.length}</span>
+          <span class="compact-mobile-info-chip-count">${escapeCompactText(tipsLabel)}</span>
         </button>
         <button
           type="button"
@@ -417,8 +358,8 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
           aria-label="Activities ${escapeCompactText(activitiesLabel)} assigned"
           title="Activities"
         >
-          <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#127919;</span> Fun</span>
-          <span class="compact-mobile-info-chip-count">${unassignedActivities.length}</span>
+          <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#128205;</span> Activities</span>
+          <span class="compact-mobile-info-chip-count">${escapeCompactText(activitiesLabel)}</span>
         </button>
       </div>
       ${tipsExpanded ? `
@@ -486,8 +427,8 @@ function renderJourneySubLocationTextHtml(text) {
           <span class="transport-sub-location-detail">
             ${label ? `<span class="transport-sub-location-label">${escapeCompactText(label)}</span>` : ''}
             <span class="transport-sub-location-value">
-              <a href="${getMapSearchUrl(value)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link" onclick="event.stopPropagation();" title="Open in Google Maps">
-                <span class="location-map-icon">&#x1F5FA;&#xFE0F;</span> ${escapeCompactText(value)}
+              <a href="${getMapSearchUrl(value)}" target="_blank" rel="noopener noreferrer" class="transport-sub-location-value-link">
+                <span class="location-map-icon">­ƒù║´©Å</span> ${escapeCompactText(value)}
               </a>
             </span>
           </span>
@@ -503,136 +444,34 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
   const dayStayInfo = getStayDisplayForDay(day.date, day.to);
   const dayTotal = getDayTotal(day);
-  const fromCity = String(day.from || '').trim();
-  const toCity = String(day.to || '').trim();
-  const isTravelDay = fromCity && toCity && fromCity.toLowerCase() !== toCity.toLowerCase();
-  const hasTravelJourney = Array.isArray(dayJourneys) && dayJourneys.some(j => {
-    const from = String(j?.fromLocation || '').trim().toLowerCase();
-    const to = String(j?.toLocation || '').trim().toLowerCase();
-    return from && to && from !== to;
-  });
-  const cityCore = toCity || fromCity || '';
-  const typePriority = { flight: 5, plane: 5, train: 4, rail: 4, bus: 3, ferry: 2, boat: 2, car: 1 };
-  const inferJourneyType = journey => {
-    const type = String(journey?.transportType || '').toLowerCase();
-    if (type) return type;
-    const blob = [journey?.provider, journey?.journeyName, journey?.notes, journey?.fromLocation, journey?.toLocation]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
-    if (/(flight|air|airline|airport|terminal|depart|arrive|eva|qantas|jetstar|emirates|lufthansa|scoot|thai airways)/.test(blob)) return 'flight';
-    if (/(train|rail|metro|bahn|trenitalia|renfe|jr\b|tgv|intercity)/.test(blob)) return 'train';
-    if (/(bus|coach|shuttle)/.test(blob)) return 'bus';
-    if (/(ferry|boat|catamaran|ship)/.test(blob)) return 'ferry';
-    return 'car';
-  };
-  const pickBestIcon = (journeys = []) => {
-    if (!Array.isArray(journeys) || journeys.length === 0) return '';
-    let bestType = inferJourneyType(journeys[0]);
-    let bestScore = typePriority[bestType] || 0;
-    journeys.forEach(journey => {
-      const t = inferJourneyType(journey);
-      const score = typePriority[t] || 0;
-      if (score > bestScore) {
-        bestType = t;
-        bestScore = score;
-      }
-    });
-    return getTransportIcon(bestType);
-  };
-  const normalizeCityText = value => String(value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
-  const cityMatches = (location, city) => {
-    const loc = normalizeCityText(location);
-    const c = normalizeCityText(city);
-    if (!loc || !c) return false;
-    return loc === c || loc.includes(c) || c.includes(loc);
-  };
-  const endpointSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-    ? window.journeys
-    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-  const endpointCandidates = endpointSource.filter(j => !leg.id || j.legId === leg.id);
-  const byJourneyId = new Map();
-  endpointCandidates.forEach(seg => {
-    const gid = seg.journeyId || seg.id;
-    if (!byJourneyId.has(gid)) byJourneyId.set(gid, []);
-    byJourneyId.get(gid).push(seg);
-  });
-  const dayIso = normalizeDate(day.date);
-  const inboundJourneys = [];
-  const outboundJourneys = [];
-  byJourneyId.forEach(segments => {
-    const ordered = [...segments].sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-    const first = ordered[0];
-    const last = ordered[ordered.length - 1];
-    const depDate = normalizeDate(first?.departureDate || first?.dayDate || '');
-    const arrDate = normalizeDate(last?.arrivalDate || last?.departureDate || last?.dayDate || '');
-    const depCity = String(first?.fromLocation || '').trim();
-    const arrCity = String(last?.toLocation || '').trim();
-
-    if (cityCore && arrDate === dayIso && cityMatches(arrCity, cityCore) && depCity && !cityMatches(depCity, cityCore)) {
-      inboundJourneys.push(last);
-    }
-    if (cityCore && depDate === dayIso && cityMatches(depCity, cityCore) && arrCity && !cityMatches(arrCity, cityCore)) {
-      outboundJourneys.push(first);
-    }
-  });
-
-  const inboundIcon = pickBestIcon(inboundJourneys);
-  const outboundIcon = pickBestIcon(outboundJourneys);
-  const travelIcon = pickBestIcon(dayJourneys || []);
-  const routeLabel = (isTravelDay || hasTravelJourney)
-    ? `${fromCity}${travelIcon ? ` ${travelIcon}` : ''} -> ${toCity}`
-    : `${inboundIcon ? `${inboundIcon} ` : ''}${cityCore}${outboundIcon ? ` ${outboundIcon}` : ''}`;
+  const routeLabel = `${day.from} ÔåÆ ${day.to}`;
   const slideId = getCompactDaySlideId(leg.id, dayIdx);
 
-  const transportLines = dayJourneys.flatMap(journey => {
-    const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-      ? window.journeys
-      : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-    const segs = journey.journeyId
-      ? journeysSource
-          .filter(seg => (seg.journeyId || seg.id) === (journey.journeyId || journey.id))
-          .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1))
-      : [journey];
-    const dayIso = normalizeDate(day.date);
-    const lines = [];
-    segs.forEach((seg, idx) => {
-      const depDate = normalizeDate(seg.departureDate || seg.dayDate || journey.departureDate || journey.dayDate || '');
-      const arrDate = normalizeDate(seg.arrivalDate || depDate || journey.arrivalDate || '');
-      const isDepartureDay = depDate && depDate === dayIso;
-      const isArrivalDay = arrDate && arrDate === dayIso;
-      if (!isDepartureDay && !isArrivalDay) return;
-
-      const fromLoc = seg.fromLocation || journey.fromLocation || '';
-      const toLoc = seg.toLocation || journey.toLocation || '';
-      const route = [fromLoc, toLoc].filter(Boolean).join(' -> ');
-      const depTime = seg.departureTime || journey.departureTime || '';
-      const arrTime = seg.arrivalTime || journey.arrivalTime || '';
-      const isSameDaySegment = isDepartureDay && isArrivalDay && depDate === arrDate;
-      const labelPrefix = isSameDaySegment ? 'Leg' : (isDepartureDay ? 'Depart' : 'Arrive');
-      const label = stripCompactLeadingEmoji(`${labelPrefix}: ${route || (journey.journeyName || 'Transport')}`);
-      const details = formatJourneySubLocationText([seg]);
-      const mainLine = renderCompactEmojiLine({
-        emoji: getTransportIcon(seg.transportType || journey.transportType),
-        text: label,
-        duration: depTime || arrTime ? `${depTime || ''}${arrTime ? `-${arrTime}` : ''}` : '',
-        cost: getJourneyDisplayCost(journey) ? formatCurrency(getJourneyDisplayCost(journey)) : ''
-      });
-      const subLocsHtml = details ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(details)}</div>` : '';
-      const notesHtml = (seg.notes || journey.notes) ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(seg.notes || journey.notes)}</div>` : '';
-      lines.push(`<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); editJourney('${journey.journeyId || journey.id}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`);
+  const transportLines = dayJourneys.map(journey => {
+    const icon = getTransportIcon(journey.transportType);
+    const journeyLabel = stripCompactLeadingEmoji(
+        journey.provider || journey.journeyName || journey.notes || `${journey.fromLocation}ÔåÆ${journey.toLocation}`
+    );
+    const segs = journey.journeyId ? (window.journeys || [])
+        .filter(seg => seg.journeyId === journey.journeyId)
+        .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1)) : [];
+    const duration = formatCompactJourneyDuration(segs);
+    const details = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
+    const mainLine = renderCompactEmojiLine({
+      emoji: icon,
+      text: journeyLabel,
+      duration: duration,
+      cost: getJourneyDisplayCost(journey) ? formatCurrency(getJourneyDisplayCost(journey)) : ''
     });
-    return lines;
+    const subLocsHtml = details ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(details)}</div>` : '';
+    const notesHtml = journey.notes ? `<div class="daily-timeline-notes timeline-notes-indented">­ƒÆ¼ ${escapeCompactText(journey.notes)}</div>` : '';
+    return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); editJourney('${journey.journeyId || journey.id}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   const accomLines = dayStayInfo.map(info => {
     const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
     const mainLine = renderCompactEmojiLine({
-      emoji: '🏨',
+      emoji: '­ƒÅ¿',
       text: `${label}: ${info.propertyName || 'Accommodation'}`,
       duration: '',
       cost: info.cost ? formatCurrency(info.cost) : ''
@@ -646,13 +485,13 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       return `Location: ${loc}`;
     })() : '';
     const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
-    const notesHtml = info.notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(info.notes)}</div>` : '';
+    const notesHtml = info.notes ? `<div class="daily-timeline-notes timeline-notes-indented">­ƒÆ¼ ${escapeCompactText(info.notes)}</div>` : '';
     return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); openEditStayModal('${info.stayId}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
-    const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    const emoji = /food/i.test(item.text || '') ? '­ƒì¢´©Å' : '­ƒôì';
     let locationVal = item.location || '';
     if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
       const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
@@ -680,7 +519,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
         notes = matched.notes;
       }
     }
-    const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(notes)}</div>` : '';
+    const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-indented">­ƒÆ¼ ${escapeCompactText(notes)}</div>` : '';
     return `
       <div class="compact-activity-row" style="${doneStyle}">
         <input
@@ -714,38 +553,28 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const details = `
     <div class="day-planner-shell day-planner-shell-${useGroupedView ? 'grouped' : 'timeline'}">
       <div class="day-view-panel day-view-panel-${useGroupedView ? 'grouped' : 'timeline'}">
-        <div class="detail-block drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
         <div class="compact-day-grid">
           ${useGroupedView ? groupedBlock : timelineBlock}
-        </div>
         </div>
       </div>
     </div>
   `;
-  const dayKey = `${day.day}-${day.date}`;
-  const isActive = dayIdx === 0;
 
   return `
-    <section class="compact-day-slide day-card ${isActive ? 'open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
+    <section class="compact-day-slide" id="${slideId}" data-day-index="${dayIdx}">
       ${renderMobileSurfaceCard({
     cardClass: 'compact-day-surface',
     accentColor: leg.colour,
-    accentWidth: '6px',
     dateLabel: dayDateLabel,
-    title: `Day ${dayIdx + 1} · ${day.day || ''}`.trim(),
+    title: `Day ${dayIdx + 1}`,
     subtitle: routeLabel,
-    primaryAction: `
-      <span class="compact-day-header-chips">
-        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.72rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}</span>
-        ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
-      </span>
-    `,
     summary: `
           <div class="compact-day-summary-row">
             <span class="compact-day-summary-desc">${escapeCompactText(day.desc || 'No description yet')}</span>
-            <span class="compact-day-summary-meta flex items-center gap-1.5 shrink-0"></span>
+            ${dayTotal ? `<span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${escapeCompactText(dayTotal)}</span>` : ''}
           </div>
         `,
+    primaryAction: '',
     details,
     detailsOpen: true
   })}
@@ -772,57 +601,10 @@ function renderCompactDayPager(leg, legIndex) {
     const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
     const slideId = getCompactDaySlideId(leg.id, dayIdx);
     const active = dayIdx === initialIndex;
-    const chipDate = `Day ${dayIdx + 1}, ${day.day} ${dayDateLabel}`;
-    const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
-    const isTravelDay = String(day.from || '').trim().toLowerCase() !== String(day.to || '').trim().toLowerCase();
-    const hasTravelJourney = Array.isArray(dayJourneys) && dayJourneys.some(j => {
-      const from = String(j?.fromLocation || '').trim().toLowerCase();
-      const to = String(j?.toLocation || '').trim().toLowerCase();
-      const type = String(j?.transportType || '').trim().toLowerCase();
-      return (from && to && from !== to) || type === 'flight' || type === 'plane';
-    });
-    let chipRoute = day.to || day.from || leg.label || 'City';
-    if ((isTravelDay || hasTravelJourney) && Array.isArray(dayJourneys) && dayJourneys.length > 0) {
-      const inferJourneyType = (journey) => {
-        const type = String(journey?.transportType || '').toLowerCase();
-        if (type) return type;
-        const blob = [
-          journey?.provider,
-          journey?.journeyName,
-          journey?.notes,
-          journey?.fromLocation,
-          journey?.toLocation
-        ].filter(Boolean).join(' ').toLowerCase();
-        if (/(flight|air|airline|airport|terminal|depart|arrive|eva|qantas|jetstar|emirates|lufthansa|scoot|thai airways)/.test(blob)) return 'flight';
-        if (/(train|rail|metro|bahn|trenitalia|renfe|jr\b|tgv|intercity)/.test(blob)) return 'train';
-        if (/(bus|coach|shuttle)/.test(blob)) return 'bus';
-        if (/(ferry|boat|catamaran|ship)/.test(blob)) return 'ferry';
-        return 'car';
-      };
-      const typePriority = { flight: 5, plane: 5, train: 4, rail: 4, bus: 3, ferry: 2, boat: 2, car: 1 };
-      let bestJourney = dayJourneys[0];
-      let bestType = inferJourneyType(bestJourney);
-      let bestScore = typePriority[bestType] || 0;
-      dayJourneys.forEach(journey => {
-        const t = inferJourneyType(journey);
-        const score = typePriority[t] || 0;
-        if (score > bestScore) {
-          bestJourney = journey;
-          bestType = t;
-          bestScore = score;
-        }
-      });
-      const icon = getTransportIcon(bestType);
-      const cityLabel = String(day.to || bestJourney.toLocation || day.from || 'City').trim();
-      chipRoute = `${icon} ${cityLabel}`;
-    } else if (isTravelDay || hasTravelJourney) {
-      chipRoute = String(day.to || day.from || leg.label || 'City').trim();
-    }
     return `
       <button
         type="button"
         class="compact-day-chip${active ? ' active' : ''}"
-        style="--day-chip-accent: ${escapeCompactText(leg.colour || '#3b82f6')};"
         data-leg-id="${escapeCompactText(leg.id)}"
         data-day-index="${dayIdx}"
         data-target-slide="${slideId}"
@@ -831,8 +613,9 @@ function renderCompactDayPager(leg, legIndex) {
         aria-controls="${slideId}"
         onclick="return compactItineraryGoToDay(event, this.dataset.legId, this.dataset.dayIndex)"
       >
-        <span class="compact-day-chip-date">${escapeCompactText(chipDate)}</span>
-        <span class="compact-day-chip-route">${escapeCompactText(chipRoute)}</span>
+        <span class="compact-day-chip-day">Day ${dayIdx + 1}</span>
+        <span class="compact-day-chip-date">${escapeCompactText(day.day)} ${escapeCompactText(dayDateLabel)}</span>
+        <span class="compact-day-chip-route">${escapeCompactText(day.from)} ÔåÆ ${escapeCompactText(day.to)}</span>
       </button>
     `;
   }).join('');
@@ -841,13 +624,22 @@ function renderCompactDayPager(leg, legIndex) {
 
   return `
       <div class="compact-day-pager" data-leg-id="${escapeCompactText(leg.id)}" data-total-days="${totalDays}" data-pager-key="${escapeCompactText(pagerKey)}" data-active-index="${initialIndex}">
-        <div class="compact-day-rail" role="tablist" aria-label="Days for ${escapeCompactText(leg.label || 'this leg')}">
-          ${chips}
+        <div class="compact-day-pager-head">
+          <div class="compact-day-pager-copy">
+            <span class="compact-day-pager-position" data-role="compact-day-position">Day 1 of ${totalDays}</span>
+          </div>
+          <div class="compact-day-pager-counter" data-role="compact-day-counter">1/${totalDays}</div>
         </div>
-        <div class="compact-day-carousel" data-leg-id="${escapeCompactText(leg.id)}">
-          ${slides}
-        </div>
+      <div class="compact-day-rail" role="tablist" aria-label="Days for ${escapeCompactText(leg.label || 'this leg')}">
+        ${chips}
       </div>
+      <div class="compact-day-progress" aria-hidden="true">
+        <span class="compact-day-progress-fill" data-role="compact-day-progress-fill"></span>
+      </div>
+      <div class="compact-day-carousel" data-leg-id="${escapeCompactText(leg.id)}">
+        ${slides}
+      </div>
+    </div>
   `;
 }
 
@@ -903,101 +695,6 @@ function setupCompactItineraryPagers(root = document) {
 
     pager.__compactScrollToIndex = scrollToIndex;
     pager.__compactSetActive = setActive;
-
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let hasSwipedAdjacent = false;
-
-    const handleGestureEnd = (endX, endY) => {
-      if (hasSwipedAdjacent) return;
-      const dx = endX - touchStartX;
-      const dy = endY - touchStartY;
-      if (Math.abs(dx) < 28 || Math.abs(dx) <= Math.abs(dy)) return;
-      const atLast = Number(pager.dataset.activeIndex || 0) >= (total - 1);
-      const atFirst = Number(pager.dataset.activeIndex || 0) <= 0;
-      if (dx < 0 && atLast) {
-        moveToAdjacentCityDayPager(pager, 1);
-        hasSwipedAdjacent = true;
-      }
-      if (dx > 0 && atFirst) {
-        moveToAdjacentCityDayPager(pager, -1);
-        hasSwipedAdjacent = true;
-      }
-    };
-
-    const handleGestureMove = (currentX, currentY) => {
-      if (hasSwipedAdjacent) return;
-      const dx = currentX - touchStartX;
-      const dy = currentY - touchStartY;
-      if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy)) return;
-      
-      const maxScroll = carousel.scrollWidth - carousel.clientWidth;
-      
-      // If swiping left (trying to scroll right past bounds)
-      if (dx < -40 && carousel.scrollLeft >= maxScroll - 5) {
-        const atLast = Number(pager.dataset.activeIndex || 0) >= (total - 1);
-        if (atLast) {
-          moveToAdjacentCityDayPager(pager, 1);
-          hasSwipedAdjacent = true;
-        }
-      }
-      // If swiping right (trying to scroll left past bounds)
-      if (dx > 40 && carousel.scrollLeft <= 5) {
-        const atFirst = Number(pager.dataset.activeIndex || 0) <= 0;
-        if (atFirst) {
-          moveToAdjacentCityDayPager(pager, -1);
-          hasSwipedAdjacent = true;
-        }
-      }
-    };
-
-    const swipeTargets = [carousel, pager, ...slides];
-    const bindSwipeEvent = (eventName, handler, opts) => {
-      swipeTargets.forEach(target => target.addEventListener(eventName, handler, opts));
-    };
-
-    bindSwipeEvent('touchstart', evt => {
-      const t = evt.touches && evt.touches[0];
-      if (!t) return;
-      touchStartX = t.clientX;
-      touchStartY = t.clientY;
-      hasSwipedAdjacent = false;
-    }, { passive: true });
-
-    bindSwipeEvent('touchmove', evt => {
-      const t = evt.touches && evt.touches[0];
-      if (!t) return;
-      handleGestureMove(t.clientX, t.clientY);
-    }, { passive: true });
-
-    bindSwipeEvent('touchend', evt => {
-      const t = evt.changedTouches && evt.changedTouches[0];
-      if (!t) return;
-      handleGestureEnd(t.clientX, t.clientY);
-    }, { passive: true });
-
-    bindSwipeEvent('touchcancel', evt => {
-      const t = evt.changedTouches && evt.changedTouches[0];
-      if (!t) return;
-      handleGestureEnd(t.clientX, t.clientY);
-    }, { passive: true });
-
-    bindSwipeEvent('pointerdown', evt => {
-      touchStartX = evt.clientX;
-      touchStartY = evt.clientY;
-      hasSwipedAdjacent = false;
-    }, { passive: true });
-
-    bindSwipeEvent('pointermove', evt => {
-      if (evt.buttons > 0) { // dragging active
-        handleGestureMove(evt.clientX, evt.clientY);
-      }
-    }, { passive: true });
-
-    bindSwipeEvent('pointerup', evt => {
-      handleGestureEnd(evt.clientX, evt.clientY);
-    }, { passive: true });
-
 
     chips.forEach(chip => {
       chip.addEventListener('click', () => {
@@ -1111,15 +808,12 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
   const safeIndex = Math.max(0, Math.min(total - 1, Number(nextIndex) || 0));
 
   slides.forEach((slide, idx) => {
-    const active = idx === safeIndex;
-    slide.classList.toggle('is-active', active);
-    slide.classList.toggle('open', active);
+    slide.classList.toggle('is-active', idx === safeIndex);
   });
 
   chips.forEach((chip, idx) => {
     const active = idx === safeIndex;
     chip.classList.toggle('active', active);
-    chip.classList.toggle('is-active', active);
     chip.setAttribute('aria-selected', active ? 'true' : 'false');
     chip.setAttribute('aria-current', active ? 'true' : 'false');
   });
@@ -1135,12 +829,9 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
   const activeChip = chips[safeIndex];
   if (rail && activeChip) {
     if (typeof scrollChildIntoHorizontalView === 'function') {
-      scrollChildIntoHorizontalView(rail, activeChip, { behavior: 'smooth', align: 'center' });
+      scrollChildIntoHorizontalView(rail, activeChip, { behavior: 'auto', align: 'center' });
     } else {
-      rail.scrollTo({
-        left: Math.max(0, activeChip.offsetLeft - rail.offsetLeft - (rail.clientWidth - activeChip.offsetWidth) / 2),
-        behavior: 'smooth'
-      });
+      rail.scrollLeft = Math.max(0, activeChip.offsetLeft - rail.offsetLeft - (rail.clientWidth - activeChip.offsetWidth) / 2);
     }
   }
 }
@@ -1180,10 +871,10 @@ function renderCompactLegCard(leg, legIndex) {
   const firstDay = leg.days && leg.days[0];
   const lastDay = leg.days && leg.days[daysCount - 1];
   const legDateRange = firstDay && lastDay
-      ? (firstDay.date === lastDay.date ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : `${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date} - ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date}`)
+      ? `${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date} - ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date}`
       : (firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '');
   const routeLabel = firstDay && lastDay
-      ? (firstDay.date === lastDay.date ? `${firstDay.day || 'Day'} ${firstDay.date}` : `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`)
+      ? `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`
       : `${daysCount} day${daysCount !== 1 ? 's' : ''}`;
   const legLabel = leg.label && !/^trip leg$/i.test(String(leg.label).trim())
       ? leg.label
@@ -1192,20 +883,17 @@ function renderCompactLegCard(leg, legIndex) {
 
   return `
     <article class="compact-leg-card">
-      <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:pointer;" onclick="toggleLeg(this)">
+      <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
         <div class="compact-leg-header-line">
           <span class="compact-leg-date">${escapeHtmlText(legDateRange || '-')}</span>
           <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
           <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
           <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
-          <span class="leg-chevron ml-auto" style="color: white; font-size: 1.2rem;">&#9660;</span>
         </div>
       </div>
-      <div class="compact-leg-body leg-content">
-        <div class="compact-tips-food-col flex flex-col gap-3.5">
-          ${renderCompactTipsCard(leg, legIndex)}
-          ${renderCompactFoodQuestCard(leg, legIndex)}
-        </div>
+      <div class="compact-leg-body">
+        ${renderCompactTipsCard(leg, legIndex)}
+        ${renderCompactFoodQuestCard(leg, legIndex)}
         ${renderCompactActivitiesCard(leg, legIndex)}
         ${renderCompactDayPager(leg, legIndex)}
       </div>
@@ -1222,40 +910,31 @@ function buildCompactItinerary() {
   const slidesHtml = [];
   const railHtml = [];
 
-  const mobileLegSequence = getCompactMobileLegSequence();
-
-  mobileLegSequence.forEach((entry, legIndex) => {
-    const leg = entry.leg;
+  appData.forEach((leg, legIndex) => {
     const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
     const nightLabel = getLegNightSummary(leg).label;
     const legCost = getLegTotalCost(leg);
     const firstDay = leg.days && leg.days[0];
     const lastDay = leg.days && leg.days[daysCount - 1];
-    
-    const firstDateFormatted = firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '';
-    const lastDateFormatted = lastDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date) : '';
-    const legDateRangeHtml = firstDay && lastDay && firstDateFormatted !== lastDateFormatted
-        ? `${escapeHtmlText(firstDateFormatted)} &rarr; ${escapeHtmlText(lastDateFormatted)}`
-        : escapeHtmlText(firstDateFormatted || '—');
-
+    const legDateRange = firstDay && lastDay
+        ? `${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date} ÔåÆ ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date}`
+        : (firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '');
     const routeLabel = firstDay && lastDay
-        ? (firstDay.date === lastDay.date ? `${firstDay.day || 'Day'} ${firstDay.date}` : `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`)
+        ? `${firstDay.day || 'Day'} ${firstDay.date} ÔåÆ ${lastDay.day || 'Day'} ${lastDay.date}`
         : `${daysCount} day${daysCount !== 1 ? 's' : ''}`;
     const legLabel = leg.label && !/^trip leg$/i.test(String(leg.label).trim())
         ? leg.label
         : '';
     const displayLegLabel = legLabel || routeLabel || `Leg ${legIndex + 1}`;
+    const chipDateRange = firstDay && lastDay
+        ? `${firstDay.date}${lastDay.date && lastDay.date !== firstDay.date ? ` ÔåÆ ${lastDay.date}` : ''}`
+        : (firstDay ? firstDay.date : '');
 
-    const chipDateRangeHtml = firstDay && lastDay && firstDay.date !== lastDay.date
-        ? `${escapeHtmlText(firstDay.date)} &rarr; ${escapeHtmlText(lastDay.date)}`
-        : escapeHtmlText(firstDay ? firstDay.date : 'Trip');
-
-    const flightTimeLabel = getLegFlightButtonTimeLabel(leg);
     const legCard = `
       <article class="compact-leg-card">
         <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
           <div class="compact-leg-header-line">
-            <span class="compact-leg-date">${legDateRangeHtml}</span>
+            <span class="compact-leg-date">${escapeHtmlText(legDateRange || 'ÔÇö')}</span>
             <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
             <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
             <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
@@ -1269,15 +948,15 @@ function buildCompactItinerary() {
     `;
 
     slidesHtml.push(`
-      <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(leg.id || '')}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
+      <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide" data-role="mobile-swipe-slide" data-slide-index="${legIndex}">
         ${legCard}
       </div>
     `);
     railHtml.push(`
-      <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
-        <span class="mobile-swipe-chip-eyebrow">${chipDateRangeHtml}</span>
+      <button type="button" class="mobile-swipe-chip compact-city-chip" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
+        <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(chipDateRange || 'Trip')}</span>
         <span class="mobile-swipe-chip-title">${escapeHtmlText(displayLegLabel)}</span>
-        <span class="mobile-swipe-chip-route">${escapeHtmlText(flightTimeLabel || nightLabel)}</span>
+        <span class="mobile-swipe-chip-route">${escapeHtmlText(nightLabel)}</span>
       </button>
     `);
   });
@@ -1295,141 +974,6 @@ function buildCompactItinerary() {
 
   container.appendChild(pagerRoot);
   setupMobileSwipePagers(container);
-  setupCompactCityNavSync(container);
-}
-
-function getLegFlightButtonTimeLabel(leg) {
-  if (!leg) return '';
-  const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-    ? window.journeys
-    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-  const legJourneys = journeysSource.filter(j => !leg.id || j.legId === leg.id);
-  if (legJourneys.length === 0) return '';
-
-  const isFlight = entry => {
-    const type = String(entry?.transportType || '').toLowerCase();
-    if (type === 'flight' || type === 'plane') return true;
-    const blob = [
-      entry?.provider,
-      entry?.journeyName,
-      entry?.notes,
-      entry?.fromLocation,
-      entry?.toLocation
-    ].filter(Boolean).join(' ').toLowerCase();
-    return /(flight|air|airline|airport|terminal|depart|arrive|eva|qantas|jetstar|emirates|lufthansa|scoot|thai airways)/.test(blob);
-  };
-
-  const flightEntries = legJourneys.filter(isFlight);
-  if (flightEntries.length === 0) return '';
-
-  const byJourneyId = new Map();
-  flightEntries.forEach(seg => {
-    const gid = seg.journeyId || seg.id;
-    if (!byJourneyId.has(gid)) byJourneyId.set(gid, []);
-    byJourneyId.get(gid).push(seg);
-  });
-
-  const firstSegments = [];
-  const lastSegments = [];
-  byJourneyId.forEach(segments => {
-    const ordered = [...segments].sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-    firstSegments.push(ordered[0]);
-    lastSegments.push(ordered[ordered.length - 1]);
-  });
-
-  const firstFlight = firstSegments.sort((a, b) => getTimelineScore(a.departureDate || a.dayDate, a.departureTime || '', Number.MAX_SAFE_INTEGER) - getTimelineScore(b.departureDate || b.dayDate, b.departureTime || '', Number.MAX_SAFE_INTEGER))[0];
-  const lastFlight = lastSegments.sort((a, b) => getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime || '', Number.MIN_SAFE_INTEGER) - getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime || '', Number.MIN_SAFE_INTEGER))[0];
-
-  const depTime = String(firstFlight?.departureTime || '').trim();
-  const arrTime = String(lastFlight?.arrivalTime || lastFlight?.departureTime || '').trim();
-  if (depTime && arrTime) return `${depTime} -> ${arrTime}`;
-  return depTime || arrTime || '';
-}
-
-let compactCityPagerTransitionLockUntil = 0;
-
-function moveToAdjacentCityDayPager(currentPager, direction) {
-  const now = Date.now();
-  if (now < compactCityPagerTransitionLockUntil) return;
-  compactCityPagerTransitionLockUntil = now + 320;
-
-  const cityPager = document.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]');
-  if (!cityPager) return;
-  const citySlides = Array.from(cityPager.querySelectorAll('.compact-city-slide[data-slide-index]'));
-  const currentCitySlide = currentPager?.closest?.('.compact-city-slide[data-slide-index]');
-  let activeCityIndex = Number(currentCitySlide?.dataset?.slideIndex);
-  if (!Number.isFinite(activeCityIndex)) {
-    activeCityIndex = citySlides.findIndex(slide => slide.classList.contains('is-active'));
-  }
-  if (activeCityIndex === -1) {
-    activeCityIndex = Math.max(0, Math.min(citySlides.length - 1, Number(cityPager.dataset.activeIndex || 0)));
-  }
-  const nextCityIndex = activeCityIndex + Number(direction || 0);
-  if (nextCityIndex < 0 || nextCityIndex >= citySlides.length) return;
-
-  const nextCitySlide = citySlides[nextCityIndex];
-  const carousel = cityPager.querySelector('[data-role="mobile-swipe-carousel"]');
-  if (carousel && nextCitySlide) {
-    if (typeof scrollChildIntoHorizontalView === 'function') {
-      scrollChildIntoHorizontalView(carousel, nextCitySlide, { behavior: 'smooth', align: 'start' });
-    } else {
-      carousel.scrollTo({
-        left: Math.max(0, nextCitySlide.offsetLeft - carousel.offsetLeft),
-        behavior: 'smooth'
-      });
-    }
-  }
-  cityPager.dataset.activeIndex = String(nextCityIndex);
-  if (typeof setMobilePagerActiveIndex === 'function') {
-    setMobilePagerActiveIndex(cityPager.dataset.pagerKey || 'compact-city-swipe', nextCityIndex);
-  }
-
-  // Instantly synchronize active states for seamless transition
-  citySlides.forEach((slide, idx) => {
-    slide.classList.toggle('is-active', idx === nextCityIndex);
-  });
-  const cityChips = Array.from(cityPager.querySelectorAll('[data-role="mobile-swipe-chip"]'));
-  cityChips.forEach((chip, idx) => {
-    const active = idx === nextCityIndex;
-    chip.classList.toggle('active', active);
-    chip.setAttribute('aria-selected', active ? 'true' : 'false');
-  });
-  const progressFill = cityPager.querySelector('[data-role="mobile-swipe-progress"]');
-  if (progressFill) {
-    progressFill.style.width = `${((nextCityIndex + 1) / citySlides.length) * 100}%`;
-  }
-  const nextCitySlideId = nextCitySlide?.dataset.cityId || '';
-  if (nextCitySlideId && typeof highlightCityNavByCityId === 'function') {
-    highlightCityNavByCityId(nextCitySlideId);
-  }
-
-  const nextDayPager = nextCitySlide ? nextCitySlide.querySelector('.compact-day-pager') : null;
-  if (!nextDayPager) return;
-  const targetDayIndex = direction > 0 ? 0 : Math.max(0, Number(nextDayPager.dataset.totalDays || 1) - 1);
-  
-  setTimeout(() => {
-    if (typeof nextDayPager.__compactScrollToIndex === 'function') {
-      nextDayPager.__compactScrollToIndex(targetDayIndex);
-    } else if (typeof nextDayPager.__compactSetActive === 'function') {
-      nextDayPager.__compactSetActive(targetDayIndex);
-    } else {
-      syncCompactDayPagerState(nextDayPager, targetDayIndex);
-    }
-  }, 100);
-}
-
-function getCompactMobileLegSequence() {
-  const baseLegs = Array.isArray(appData) ? appData : [];
-  const baseEntries = baseLegs.map((leg, idx) => {
-    const firstDay = Array.isArray(leg.days) && leg.days[0] ? leg.days[0] : null;
-    return {
-      leg,
-      score: getLegDateScore(leg, idx),
-      cityId: String(leg.id || '').startsWith('city-') ? String(leg.id) : '',
-      cityName: cleanCityNavLabel(leg.label || firstDay?.to || firstDay?.from || '')
-    };
-  });
-  return baseEntries.sort((a, b) => a.score - b.score);
 }
 
 function buildCompactItineraryDesktop() {
@@ -1441,7 +985,7 @@ function buildCompactItineraryDesktop() {
   const stack = document.createElement('div');
   stack.className = 'compact-desktop-stack';
   stack.innerHTML = appData.map((leg, legIndex) => `
-    <section class="compact-desktop-leg leg" id="leg-${escapeHtmlText(leg.id || `compact-${legIndex}`)}">
+    <section class="compact-desktop-leg" id="leg-${escapeHtmlText(leg.id || `compact-${legIndex}`)}">
       ${renderCompactLegCard(leg, legIndex)}
     </section>
   `).join('');
@@ -1488,7 +1032,7 @@ function buildCompactItineraryLegacy() {
               <input type="checkbox" ${f.done ? 'checked' : ''}
                 onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"
                 style="width:12px; height:12px; accent-color:#27AE60; margin-top:1px;">
-              <span style="line-height:1.3; ${f.done ? 'text-decoration:line-through; opacity:0.65;' : ''}">${renderCompactEmojiLine({ emoji: '🍽️', text: f.text, done: f.done })}</span>
+              <span style="line-height:1.3; ${f.done ? 'text-decoration:line-through; opacity:0.65;' : ''}">${renderCompactEmojiLine({ emoji: '­ƒì¢´©Å', text: f.text, done: f.done })}</span>
             </label>
           `).join('')}
         </div>
@@ -1503,7 +1047,7 @@ function buildCompactItineraryLegacy() {
       const dayStayInfo = getStayDisplayForDay(day.date, day.to);
       const transportLines = dayJourneys.map(j => {
         const icon = getTransportIcon(j.transportType);
-        const journeyLabel = stripCompactLeadingEmoji(j.provider || j.journeyName || j.notes || `${j.fromLocation}→${j.toLocation}`);
+        const journeyLabel = stripCompactLeadingEmoji(j.provider || j.journeyName || j.notes || `${j.fromLocation}ÔåÆ${j.toLocation}`);
         const segs = (window.journeys || [])
           .filter(seg => seg.journeyId === j.journeyId)
           .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
@@ -1512,12 +1056,12 @@ function buildCompactItineraryLegacy() {
         return renderCompactEmojiLine({ emoji: icon, text: [journeyLabel, details].filter(Boolean).join(' | '), duration });
       }).join('');
       const accomLines = dayStayInfo.map(info => renderCompactEmojiLine({
-        emoji: '🏨',
+        emoji: '­ƒÅ¿',
         text: info.propertyName || 'Accommodation'
       })).join('');
       const activityLines = (day.activityItems || []).map((item, itemIdx) => {
         const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
-        const emoji = /food/i.test(item.text || '') ? '🍽️' : '📌';
+        const emoji = /food/i.test(item.text || '') ? '­ƒì¢´©Å' : '­ƒôì';
         return `
           <div style="display:flex; align-items:flex-start; gap:6px; ${doneStyle}">
             <input type="checkbox" ${item.done ? 'checked' : ''}
@@ -1530,7 +1074,7 @@ function buildCompactItineraryLegacy() {
         html += `<div class="compact-day-card" style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
       <div class="compact-day-top" style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
         <span class="compact-day-label" style="font-weight:600;">${day.day} ${dayDateLabel}</span>
-        <span class="compact-day-route" style="font-size:10px;">${escapeHtmlText(day.from)} &rarr; ${escapeHtmlText(day.to)}</span>
+        <span class="compact-day-route" style="font-size:10px;">${day.from} ÔåÆ ${day.to}</span>
         <span class="compact-day-desc" style="font-size:9px; color:#666; flex:1;">${day.desc || ''}</span>
       </div>
       <div class="compact-day-grid" style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px; margin-top:5px; font-size:10px;">
@@ -1544,7 +1088,7 @@ function buildCompactItineraryLegacy() {
       html += `<div style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
       <div style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
         <span style="font-weight:600;">${day.day} ${dayDateLabel}</span>
-        <span style="font-size:10px;">${escapeHtmlText(day.from)} &rarr; ${escapeHtmlText(day.to)}</span>
+        <span style="font-size:10px;">${day.from} ÔåÆ ${day.to}</span>
         <span style="font-size:9px; color:#666; flex:1;">${day.desc || ''}</span>
       </div>
 
@@ -1558,7 +1102,7 @@ function buildCompactItineraryLegacy() {
           const status = j.status || 'planned';
           const statusText = status === 'booked' ? 'Booked' : 'Planned';
           const icon = getTransportIcon(j.transportType);
-          const journeyLabel = stripCompactLeadingEmoji(j.notes || `${j.fromLocation}→${j.toLocation}`);
+          const journeyLabel = stripCompactLeadingEmoji(j.notes || `${j.fromLocation}ÔåÆ${j.toLocation}`);
           const segs = (window.journeys || [])
               .filter(seg => seg.journeyId === j.journeyId)
               .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
@@ -1577,7 +1121,7 @@ function buildCompactItineraryLegacy() {
       if (dayStayInfo.length > 0) {
         html += '<div style="flex:1;">';
         html += dayStayInfo.map(info => {
-          const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
+          const icon = info.type === 'checkin' ? '­ƒÅ¿' : info.type === 'checkout' ? '­ƒÜ¬' : '­ƒÅ¿';
           const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
           return `<span style="margin-right:12px;">${renderCompactEmojiLine({ emoji: icon, text: `${label}: ${info.propertyName}` })}</span>`;
         }).join('');
@@ -1594,7 +1138,7 @@ function buildCompactItineraryLegacy() {
             <input type="checkbox" ${item.done ? 'checked' : ''}
               onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
               style="width:12px; height:12px; accent-color:#27AE60; margin-right:4px;">
-            ${renderCompactEmojiLine({ emoji: '📌', text: item.text, duration: item.time || '1 hr', done: item.done })}
+            ${renderCompactEmojiLine({ emoji: '­ƒôì', text: item.text, duration: item.time || '1 hr', done: item.done })}
           </span>`;
         }).join('');
         html += '</div>';
@@ -1734,89 +1278,47 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
     const segments = journeysSource
       .filter(seg => (seg.journeyId || seg.id) === (journey.journeyId || journey.id))
       .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-    const orderedSegments = segments.length > 0 ? segments : [journey];
-    orderedSegments.forEach((segment, segmentIndex) => {
-      const depDate = normalizeDate(segment.departureDate || segment.dayDate || journey.departureDate || journey.dayDate || '');
-      const arrDate = normalizeDate(segment.arrivalDate || depDate || journey.arrivalDate || '');
-      const depTime = segment.departureTime || journey.departureTime || '';
-      const arrTime = segment.arrivalTime || journey.arrivalTime || '';
-      const isDepartureDay = depDate && depDate === dayDate;
-      const isArrivalDay = arrDate && arrDate === dayDate;
-      if (!isDepartureDay && !isArrivalDay) return;
+    const first = segments[0] || journey;
+    const last = segments[segments.length - 1] || journey;
+    const route = segments.length > 1
+      ? [first.fromLocation, ...segments.map(seg => seg.toLocation)].filter(Boolean).join(' -> ')
+      : [journey.fromLocation, journey.toLocation].filter(Boolean).join(' -> ');
+    const startTime = first.departureTime || journey.departureTime || '';
+    const endTime = last.arrivalTime || journey.arrivalTime || '';
+    const startDate = normalizeDate(first.departureDate || first.dayDate || journey.departureDate || journey.dayDate || dayDate);
+    const endDate = normalizeDate(last.arrivalDate || last.departureDate || journey.arrivalDate || journey.departureDate || dayDate);
+    const crossDate = endDate && startDate && endDate !== startDate ? ` Arrives ${formatTripDateForDisplay(endDate)}` : '';
 
-      const fromLoc = segment.fromLocation || journey.fromLocation || '';
-      const toLoc = segment.toLocation || journey.toLocation || '';
-      const route = [fromLoc, toLoc].filter(Boolean).join(' -> ');
-      const isSameDaySegment = isDepartureDay && isArrivalDay && depDate === arrDate;
-      let crossDateNote = '';
-      if (arrDate && depDate && arrDate !== depDate) {
-        if (isDepartureDay) crossDateNote = `Arrives ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(arrDate) : arrDate}`;
-        else if (isArrivalDay) crossDateNote = `Departed ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(depDate) : depDate}`;
-      }
-      
-      const transportTypeLabel = isSameDaySegment ? 'Transport' : (isDepartureDay ? 'Depart' : 'Arrive');
+    const subLocations = formatJourneySubLocationText(segments.length > 0 ? segments : [journey]);
 
-      items.push({
-        type: 'transport',
-        typeLabel: transportTypeLabel,
-        icon: getTransportIcon(segment.transportType || journey.transportType),
-        title: journey.journeyName || route || 'Transport',
-        meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDateNote].filter(Boolean).join(' · '),
-        subLocations: formatJourneySubLocationText([segment]),
-        cost: getJourneyDisplayCost(journey),
-        status: journey.status || segment.status || 'planned',
-        startTime: isDepartureDay ? depTime : arrTime,
-        endTime: isSameDaySegment ? arrTime : '',
-        sortValue: getDailyTimelineItemSortValue(dayDate, (isDepartureDay ? depTime : arrTime), journeyIndex * 10 + segmentIndex),
-        actionHtml: '',
-        journeyId: journey.journeyId || journey.id,
-        done: !!journey.done,
-        notes: segment.notes || journey.notes || ''
-      });
-      
-      const currentLegCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label || '')).toLowerCase();
-      const isArrivalToCurrent = toLoc && currentLegCity && toLoc.toLowerCase() === currentLegCity;
-      const isDepartureFromCurrent = fromLoc && currentLegCity && fromLoc.toLowerCase() === currentLegCity;
-
-      // If it's an arrival to the city from another city, add the start line
-      if (isArrivalDay && fromLoc && toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase() && isArrivalToCurrent && !items.some(i => i.type === 'arrivalBlock')) {
-        const transType = segment.transportType || journey.transportType || 'Transport';
-        const transTypeCapitalized = transType.charAt(0).toUpperCase() + transType.slice(1);
-        items.push({
-          type: 'arrivalBlock',
-          typeLabel: 'Arrival',
-          icon: '🛬',
-          title: `Arrived in ${toLoc} - ${transTypeCapitalized} from ${fromLoc}`,
-          startTime: arrTime,
-          sortValue: getDailyTimelineItemSortValue(dayDate, arrTime, 99999)
-        });
-      }
-      
-      // If it's a departure from the city to another city, add the cutoff line
-      if (isDepartureDay && fromLoc && toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase() && isDepartureFromCurrent && !items.some(i => i.type === 'departureBlock')) {
-        const transType = segment.transportType || journey.transportType || 'Transport';
-        const transTypeCapitalized = transType.charAt(0).toUpperCase() + transType.slice(1);
-        items.push({
-          type: 'departureBlock',
-          typeLabel: 'Departure',
-          icon: '✈️',
-          title: `Departed ${fromLoc} - ${transTypeCapitalized} to ${toLoc}`,
-          startTime: depTime,
-          sortValue: getDailyTimelineItemSortValue(dayDate, depTime, 99999)
-        });
-      }
+    items.push({
+      type: 'transport',
+      typeLabel: 'Transport',
+      icon: getTransportIcon(journey.transportType),
+      title: journey.journeyName || route || 'Transport',
+      meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDate.trim()].filter(Boolean).join(' ┬À '),
+      subLocations: subLocations,
+      cost: getJourneyDisplayCost(journey),
+      status: journey.status || 'planned',
+      startTime,
+      endTime,
+      sortValue: getDailyTimelineItemSortValue(startDate || dayDate, startTime, journeyIndex),
+      actionHtml: '',
+      journeyId: journey.journeyId || journey.id,
+      done: !!journey.done,
+      notes: journey.notes || ''
     });
   });
 
   getStayDisplayForDay(day.date, day.to).forEach((stayInfo, stayIndex) => {
     const label = stayInfo.type === 'checkin' ? 'Check-in' : stayInfo.type === 'checkout' ? 'Check-out' : 'Staying';
-    const icon = stayInfo.type === 'checkout' ? '🚪' : '🏨';
+    const icon = stayInfo.type === 'checkout' ? '­ƒÜ¬' : '­ƒÅ¿';
     items.push({
       type: 'stay',
       typeLabel: label,
       icon,
       title: `${label}: ${stayInfo.propertyName || 'Accommodation'}`,
-      meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : '', stayInfo.status].filter(Boolean).join(' · '),
+      meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : '', stayInfo.status].filter(Boolean).join(' ┬À '),
       subLocations: stayInfo.location ? (() => {
         let loc = stayInfo.location;
         const cleanCity = String(day.to).trim();
@@ -1837,7 +1339,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
   });
 
   (day.activityItems || []).forEach((item, itemIndex) => {
-    const emoji = /food/i.test(item.text || '') ? '🍽️' : '📌';
+    const emoji = /food/i.test(item.text || '') ? '­ƒì¢´©Å' : '­ƒôì';
     let locationVal = item.location || '';
     if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
       const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
@@ -1872,7 +1374,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       icon: emoji,
       title: split.title || 'Activity',
       subLocations: activityLoc,
-      meta: [item.time || ''].filter(Boolean).join(' · '),
+      meta: [item.time || ''].filter(Boolean).join(' ┬À '),
       cost: item.cost,
       notes: notes,
       done: !!item.done,
@@ -1882,24 +1384,11 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       dayIndex,
       itemIndex,
       sortValue: getDailyTimelineItemSortValue(dayDate, item.startTime, 4000 + itemIndex),
-      actionHtml: ''
+      actionHtml: `
+        <button class="del-btn" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${itemIndex})">├ù</button>
+      `
     });
   });
-
-  // If it is the final departure day but no journey created a departure block, create a generic one
-  const isFinalDepartureDay = dayIndex === leg.days.length - 1 && day.from && day.to && day.from !== day.to;
-  const legCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label || '')).toLowerCase();
-  const isDepartureFromCurrent2 = day.from && legCity && day.from.toLowerCase() === legCity;
-  if (isFinalDepartureDay && isDepartureFromCurrent2 && !items.some(i => i.type === 'departureBlock')) {
-    items.push({
-      type: 'departureBlock',
-      typeLabel: 'Departure',
-      icon: '✈️',
-      title: `Departed ${day.from} to ${day.to}`,
-      startTime: '23:59', // Put it at the very end
-      sortValue: getDailyTimelineItemSortValue(dayDate, '23:59', 99999)
-    });
-  }
 
   return items.sort((a, b) => {
     if (a.sortValue !== b.sortValue) return a.sortValue - b.sortValue;
@@ -1915,32 +1404,6 @@ function getDailyTimelineBuckets(items) {
 }
 
 function renderDailyTimelineRow(item, compact = false) {
-  if (item.type === 'arrivalBlock') {
-    const timeStr = item.startTime ? `<div style="font-size: 1.8rem; font-weight: 800; color: #1565C0; margin-right: 16px; background: rgba(255,255,255,0.7); padding: 4px 12px; border-radius: 6px;">${item.startTime}</div>` : '';
-    return `
-      <div class="daily-timeline-arrival-block" style="grid-column: 1 / -1; background: repeating-linear-gradient(45deg, #E3F2FD 0px, #E3F2FD 10px, #BBDEFB 10px, #BBDEFB 20px); border-top: 2px solid #64B5F6; border-bottom: 2px solid #64B5F6; padding: 12px 16px; margin: 0 0 24px 0; border-radius: 6px; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; position: relative;">
-         ${timeStr}
-         <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-           <span style="font-weight: 800; color: #1565C0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; background: rgba(255,255,255,0.7); padding: 2px 8px; border-radius: 4px;">✅ ${item.title}</span>
-           <span style="font-size: 0.7rem; color: #1565C0; font-weight: 600; text-transform: uppercase; background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px;">No activities prior to arrival</span>
-         </div>
-         <div style="position: absolute; top: -200px; left: 0; right: 0; bottom: 100%; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 10px, transparent 10px, transparent 20px); pointer-events: none; z-index: 10;"></div>
-      </div>
-    `;
-  }
-  if (item.type === 'departureBlock') {
-    const timeStr = item.startTime ? `<div style="font-size: 1.8rem; font-weight: 800; color: #F57F17; margin-right: 16px; background: rgba(255,255,255,0.7); padding: 4px 12px; border-radius: 6px;">${item.startTime}</div>` : '';
-    return `
-      <div class="daily-timeline-departure-block" style="grid-column: 1 / -1; background: repeating-linear-gradient(45deg, #FFF9C4 0px, #FFF9C4 10px, #FFF176 10px, #FFF176 20px); border-top: 2px solid #FBC02D; border-bottom: 2px solid #FBC02D; padding: 12px 16px; margin: 24px 0 0 0; border-radius: 6px; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; position: relative;">
-         ${timeStr}
-         <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-           <span style="font-weight: 800; color: #F57F17; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; background: rgba(255,255,255,0.7); padding: 2px 8px; border-radius: 4px;">🚫 ${item.title}</span>
-           <span style="font-size: 0.7rem; color: #F57F17; font-weight: 600; text-transform: uppercase; background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px;">No activities after departure</span>
-         </div>
-         <div style="position: absolute; bottom: -200px; left: 0; right: 0; top: 100%; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 10px, transparent 10px, transparent 20px); pointer-events: none; z-index: 10;"></div>
-      </div>
-    `;
-  }
   const isTimeClickable = isEditMode && (item.type === 'activity' || item.type === 'transport' || item.type === 'stay');
   const timeClass = "daily-timeline-time" + (isTimeClickable ? " is-clickable" : "");
   
@@ -1961,11 +1424,11 @@ function renderDailyTimelineRow(item, compact = false) {
 
   let checkboxHtml = '';
   if (item.type === 'activity') {
-    checkboxHtml = `<label class="daily-timeline-checkbox-wrapper" onclick="event.stopPropagation();"><input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})"></label>`;
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox activity-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex})">`;
   } else if (item.type === 'transport') {
-    checkboxHtml = `<label class="daily-timeline-checkbox-wrapper" onclick="event.stopPropagation();"><input type="checkbox" class="daily-timeline-checkbox transport-checkbox" ${item.done ? 'checked' : ''} onchange="toggleJourneyCompleted(event, '${item.journeyId}')"></label>`;
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox transport-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleJourneyCompleted(event, '${item.journeyId}')">`;
   } else if (item.type === 'stay' || item.type === 'checkin' || item.type === 'checkout' || item.type === 'staying') {
-    checkboxHtml = `<label class="daily-timeline-checkbox-wrapper" onclick="event.stopPropagation();"><input type="checkbox" class="daily-timeline-checkbox stay-checkbox" ${item.done ? 'checked' : ''} onchange="toggleStayCompleted(event, '${item.stayId}')"></label>`;
+    checkboxHtml = `<input type="checkbox" class="daily-timeline-checkbox stay-checkbox" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleStayCompleted(event, '${item.stayId}')">`;
   }
 
   return `
@@ -1977,11 +1440,11 @@ function renderDailyTimelineRow(item, compact = false) {
           <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
           <div class="daily-timeline-title-and-checkbox">
             <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
+            ${checkboxHtml}
           </div>
-          ${checkboxHtml ? `<div class="daily-timeline-inline-check">${checkboxHtml}</div>` : ''}
         </div>
-        ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> · ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
-        ${item.notes ? `<div class="daily-timeline-notes">💬 ${escapeCompactText(item.notes)}</div>` : ''}
+        ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> ┬À ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
+        ${item.notes ? `<div class="daily-timeline-notes">­ƒÆ¼ ${escapeCompactText(item.notes)}</div>` : ''}
         ${item.subLocations ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
@@ -1997,8 +1460,14 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
     : '<div class="timeline-empty">No scheduled items yet. Add transport, stays, or activities to build the day.</div>';
   if (items.length === 0) return empty;
   const { scheduled, anytime } = getDailyTimelineBuckets(items);
+  const summaryParts = [
+    scheduled.length ? `${scheduled.length} scheduled` : '',
+    anytime.length ? `${anytime.length} anytime` : ''
+  ].filter(Boolean).join(' ┬À ');
+
   return `
     <div class="daily-timeline-shell ${compact ? 'daily-timeline-shell-compact' : ''}">
+      ${summaryParts ? `<div class="daily-timeline-summary">${escapeCompactText(summaryParts)}</div>` : ''}
       ${scheduled.length ? `
         <div class="timeline-section-label">Scheduled</div>
         <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
@@ -2006,9 +1475,11 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
         </div>
       ` : '<div class="timeline-empty">No timed entries yet. Add start times to build the day timeline.</div>'}
       ${anytime.length ? `
-        <div class="timeline-section-label timeline-anytime-label">Anytime</div>
-        <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
-          ${anytime.map(item => renderDailyTimelineRow(item, compact)).join('')}
+        <div class="timeline-anytime">
+          <div class="timeline-anytime-label">Anytime</div>
+          <div class="timeline-anytime-list">
+            ${anytime.map(item => renderDailyTimelineRow(item, compact)).join('')}
+          </div>
         </div>
       ` : ''}
     </div>
@@ -2030,28 +1501,13 @@ function getLegStayNightCount(leg) {
   return staysData.reduce((total, stay) => {
     if (!stay) return total;
 
-    // Check chronological bounding first: if leg has specific days generated,
-    // the stay checkIn must fall within those days.
-    if (leg.days && leg.days.length > 0) {
-      const stayDate = String(stay.checkIn || '').split('T')[0];
-      const fallsWithinDays = leg.days.some(d => String(d.date) === stayDate);
-      if (!fallsWithinDays && stay.legId !== leg.id) {
-        return total;
-      }
-    }
-
     const stayCityId = String(stay.cityId || '').toLowerCase();
     const stayCityName = cleanCityNavLabel(getCityNameForNavId(stay.cityId) || stay.city || '').toLowerCase();
-    
-    // Support "Bangkok (1)" matching
-    let baseLegCityName = legCityName.replace(/\s*\(\d+\)$/, '').trim();
-    
     const matchesLegCity =
         (legCityIdNormalized && stayCityId === legCityIdNormalized) ||
-        (baseLegCityName && stayCityName === baseLegCityName) ||
         (legCityName && stayCityName === legCityName);
 
-    if (!matchesLegCity && stay.legId !== leg.id) return total;
+    if (!matchesLegCity) return total;
 
     const stayNights = Number(stay.nights) || (typeof calculateNightsBetween === 'function'
         ? calculateNightsBetween(stay.checkIn, stay.checkOut)
@@ -2101,7 +1557,7 @@ function isTransitLegForDisplay(leg) {
       .filter(Boolean)
       .join(' ');
 
-  return /(\bstopover\b|\bstop over\b|\ben route\b|\btransit\b|\btravel\b|\btransfer\b|\blayover\b|\bday transit\b|→|->)/i.test(legText);
+  return /(\bstopover\b|\bstop over\b|\ben route\b|\btransit\b|\btravel\b|\btransfer\b|\blayover\b|\bday transit\b|ÔåÆ|->)/i.test(legText);
 }
 
 function getLegTotalCost(leg) {
@@ -2203,11 +1659,11 @@ function toggleFoodQuestDetails(e, legId) {
   }
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
-  const wasOpen = expandedFoodQuestLegs.has(legId);
-  expandedTipsLegs.delete(legId);
-  expandedActivitiesLegs.delete(legId);
-  expandedFoodQuestLegs.delete(legId);
-  if (!wasOpen) expandedFoodQuestLegs.add(legId);
+  if (expandedFoodQuestLegs.has(legId)) {
+    expandedFoodQuestLegs.delete(legId);
+  } else {
+    expandedFoodQuestLegs.add(legId);
+  }
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }
@@ -2219,11 +1675,11 @@ function toggleTipsCardDetails(e, legId) {
   }
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
-  const wasOpen = expandedTipsLegs.has(legId);
-  expandedFoodQuestLegs.delete(legId);
-  expandedActivitiesLegs.delete(legId);
-  expandedTipsLegs.delete(legId);
-  if (!wasOpen) expandedTipsLegs.add(legId);
+  if (expandedTipsLegs.has(legId)) {
+    expandedTipsLegs.delete(legId);
+  } else {
+    expandedTipsLegs.add(legId);
+  }
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }
@@ -2235,11 +1691,11 @@ function toggleActivitiesCardDetails(e, legId) {
   }
   const scrollX = window.scrollX || 0;
   const scrollY = window.scrollY || 0;
-  const wasOpen = expandedActivitiesLegs.has(legId);
-  expandedTipsLegs.delete(legId);
-  expandedFoodQuestLegs.delete(legId);
-  expandedActivitiesLegs.delete(legId);
-  if (!wasOpen) expandedActivitiesLegs.add(legId);
+  if (expandedActivitiesLegs.has(legId)) {
+    expandedActivitiesLegs.delete(legId);
+  } else {
+    expandedActivitiesLegs.add(legId);
+  }
   if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }
@@ -2248,8 +1704,8 @@ function buildItinerary() {
   // Check window.isCompactView for cross-module access
   const isCompact = typeof window !== 'undefined' && window.isCompactView;
   const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (window.innerWidth <= 768);
-  // Desktop itinerary default: compact card/chip renderer.
-  if (!isMobile || isCompact) {
+  // Desktop itinerary uses compact card/chip renderer in read-only mode.
+  if (isCompact || (!isMobile && !isEditMode)) {
     if (isMobile) buildCompactItinerary();
     else buildCompactItineraryDesktop();
     return;
@@ -2299,7 +1755,7 @@ function buildItinerary() {
           .replace(/\p{Emoji}/gu, '')
           .replace(/[^\w\s-]/gu, '')
           .trim();
-      const labelLooksTransit = /(\bto\b|via|transit|travel|flight|train|bus|→|->)/i.test(leg.label || '');
+      const labelLooksTransit = /(\bto\b|via|transit|travel|flight|train|bus|ÔåÆ|->)/i.test(leg.label || '');
       const hasDestinationDay = leg.days.some(day =>
           day.from &&
           day.to &&
@@ -2332,17 +1788,17 @@ function buildItinerary() {
     }
 
     const nightSummary = getLegNightSummary(leg);
-    const nightLabel = nightSummary.isTransit ? '✈️ Day Transit / Stop' : nightSummary.label;
+    const nightLabel = nightSummary.isTransit ? 'Ô£ê Day Transit / Stop' : nightSummary.label;
     const badgeClass = nightSummary.isTransit || isTransit ? 'leg-night-count badge-transit' : 'leg-night-count';
 
     const firstDateObj = daysCount > 0 ? leg.days[0] : null;
     const lastDateObj = daysCount > 0 ? leg.days[daysCount - 1] : null;
     const firstDateStr = firstDateObj ? `${firstDateObj.day} ${firstDateObj.date}` : '';
     const lastDateStr = lastDateObj ? `${lastDateObj.day} ${lastDateObj.date}` : '';
-    const dateRange = (firstDateStr && lastDateStr && firstDateStr !== lastDateStr) ? `${firstDateStr} – ${lastDateStr}` : firstDateStr;
+    const dateRange = (firstDateStr && lastDateStr && firstDateStr !== lastDateStr) ? `${firstDateStr} ÔÇô ${lastDateStr}` : firstDateStr;
 
     const unassigned = (leg.suggestedActivities||[]).filter(s => s.assignedDayIdx === null || s.assignedDayIdx === undefined);
-    const subtitle = unassigned.length === 0 ? "All suggested activities assigned! 🎉" : `Remaining Ideas: ${unassigned.slice(0, 3).map(s => s.title.split('—')[0].trim()).join(', ')}${unassigned.length > 3 ? '...' : ''}`;
+    const subtitle = unassigned.length === 0 ? "All suggested activities assigned! ­ƒÄë" : `Remaining Ideas: ${unassigned.slice(0, 3).map(s => s.title.split('ÔÇö')[0].trim()).join(', ')}${unassigned.length > 3 ? '...' : ''}`;
 
     const legCost = getLegTotalCost(leg);
 
@@ -2357,10 +1813,9 @@ function buildItinerary() {
           <div class="hidden sm:flex shrink-0 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-full shadow-sm border border-slate-200 dark:border-slate-700 mr-2" title="Leg estimated cost">${formatCurrency(legCost)}</div>
           <span class="${badgeClass}">${nightLabel}</span>
           ${isEditMode ? `<button class="header-del-btn" title="Add a day to this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, 1)">+</button>` : ''}
-          ${isEditMode ? `<button class="header-del-btn" title="Remove a day from this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, -1)">−</button>` : ''}
-          ${isEditMode ? `<button class="header-del-btn" title="Edit Leg" onclick="event.stopPropagation(); openLegEditorDirect(${legIndex})">✎</button>` : ''}
-          ${isEditMode ? `<button class="header-del-btn" title="Delete Leg" onclick="event.stopPropagation(); deleteLeg(${legIndex})">🗑️</button>` : ''}
-          <span class="leg-chevron">▼</span>
+          ${isEditMode ? `<button class="header-del-btn" title="Remove a day from this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, -1)">ÔêÆ</button>` : ''}
+          ${isEditMode ? `<button class="header-del-btn" title="Delete Leg" onclick="event.stopPropagation(); deleteLeg(${legIndex})">­ƒùæ</button>` : ''}
+          <span class="leg-chevron">Ôû╝</span>
         </div>
       </div>
       <div class="leg-subtitle">${subtitle}</div>
@@ -2370,27 +1825,24 @@ function buildItinerary() {
 
     // Get emoji for activity category
     const getCategoryEmoji = (cat) => {
-      const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌' };
-      return emojis[cat] || '📌';
+      const emojis = { fitness: '­ƒÅâ', sight: '­ƒÅø´©Å', attraction: '­ƒÄó', wellness: '­ƒºÿ', food: '­ƒì¢´©Å', tour: '­ƒÜî' };
+      return emojis[cat] || '­ƒôì';
     };
 
     html += `<div class="itinerary-leg-panels flex flex-col md:grid md:grid-cols-3 gap-4 md:gap-5 p-4 md:p-5 border-b border-slate-200/80 dark:border-slate-700/80 bg-slate-100/60 dark:bg-slate-900/40">
       <div class="itinerary-info-panel itinerary-info-panel-tips flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
-        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">💡 Tips</h4>
-        <ul class="itinerary-panel-list tips-list flex flex-col gap-2 mt-1.5 pl-4">${(leg.legTips || []).map((t, i) => `<li class="compact-tip-item group" style="position:relative;"><button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity absolute -left-5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 rounded" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">×</button>${renderCompactEmojiLine({emoji: '💡', text: `<span class="flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span>`})}</li>`).join('')}</ul>
+        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">­ƒÆí Tips</h4>
+        <ul class="itinerary-panel-list tips-list space-y-2">${(leg.legTips || []).map((t, i) => `<li class="itinerary-panel-item tip-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><span class="flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">├ù</button></li>`).join('')}</ul>
         ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>` : ''}
       </div>
       <div class="itinerary-info-panel itinerary-info-panel-food flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
-        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">🍔 Food Quests</h4>
-        <ul class="itinerary-panel-list food-list flex flex-col gap-2 mt-1.5 pl-4">${(leg.cityFood || []).map((f, i) => `<li class="compact-food-quest-item group" style="position:relative;"><button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity absolute -left-5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 rounded" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">×</button><label class="compact-food-quest-label"><input type="checkbox" class="compact-food-quest-checkbox" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span class="compact-food-quest-text flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span></label></li>`).join('')}</ul>
+        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">­ƒìö Food Quests</h4>
+        <ul class="itinerary-panel-list food-list space-y-2">${(leg.cityFood || []).map((f, i) => `<li class="itinerary-panel-item quest-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500 cursor-pointer shrink-0" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span class="flex-1 outline-none transition-opacity min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">├ù</button></li>`).join('')}</ul>
         ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>` : ''}
       </div>
       <div class="itinerary-info-panel itinerary-info-panel-activities flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
-        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">📌 Suggested Activities</h4>
-        <ul class="itinerary-panel-list activity-list unified-activities flex flex-col gap-2 mt-1.5 pl-4">${(leg.suggestedActivities || [])
-          .map((activity, activityIdx) => ({ activity, activityIdx }))
-          .filter(({ activity }) => activity && (activity.assignedDayIdx === null || activity.assignedDayIdx === undefined))
-          .map(({ activity, activityIdx }) => {
+        <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">­ƒôî Suggested Activities</h4>
+        <ul class="itinerary-panel-list activity-list unified-activities space-y-1.5">${(leg.suggestedActivities || []).map((activity, activityIdx) => {
       const isAssigned = activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
       let isCompleted = false; let dayLabel = '';
       if (isAssigned && leg.days[activity.assignedDayIdx]) {
@@ -2398,37 +1850,22 @@ function buildItinerary() {
         const matchTexts = typeof getSuggestedActivityMatchTexts === 'function'
           ? getSuggestedActivityMatchTexts(activity)
           : [activity.title];
-        const matchedActivity = (leg.days[activity.assignedDayIdx].activityItems || []).find(a => matchTexts.includes(String(a.text || '').trim()));
+        const matchedActivity = leg.days[activity.assignedDayIdx].activityItems.find(a => matchTexts.includes(String(a.text || '').trim()));
         if (matchedActivity && matchedActivity.done) isCompleted = true;
       }
       const badgeStateClass = isCompleted ? 'is-complete' : 'is-scheduled';
-      const badgeIcon = isCompleted ? '✓' : '✓';
+      const badgeIcon = isCompleted ? 'Ô£ô' : 'Ô£ô';
       const badgeHoverText = isCompleted ? `Completed on ${dayLabel}` : (isAssigned ? `Scheduled for ${dayLabel}` : 'Drag to day');
-      const categoryEmoji = getCompactActivityCategoryEmoji(activity.category);
-      const notesMetaHtml = activity.notes ? ` · <span class="sight-inline-meta-notes" title="${escapeHtmlText(activity.notes)}">💬 ${escapeHtmlText(activity.notes)}</span>` : '';
-      const actionIcon = isAssigned ? '›' : '📌';
-      const actionTitle = isAssigned ? 'Move to another day' : 'Assign to day';
-      const dragClass = isAssigned ? 'assigned-sight' : 'draggable-sight';
-      const dragAttrs = !isAssigned ? ` draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : '';
-      return `<li class="compact-suggested-activity-item group ${dragClass}"${dragAttrs} style="position:relative;">
-        <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity absolute -left-5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 rounded" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">×</button>
-        <span class="compact-suggested-activity-emoji">${categoryEmoji}</span>
-        <span class="compact-suggested-activity-text flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'title', this.innerText)" style="${isCompleted ? 'text-decoration:line-through;opacity:0.6;' : ''}">${escapeCompactText(activity.title)}</span>
-        <span class="compact-suggested-activity-meta">
-          ${activity.estTime ? `<span class="compact-suggested-activity-time outline-none" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'estTime', this.innerText)">⏱️ ${escapeCompactText(activity.estTime)}</span>` : ''}
-          ${activity.estCost ? `<span class="compact-suggested-activity-cost outline-none" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'estCost', this.innerText)">$${escapeCompactText(activity.estCost)}</span>` : ''}
-        </span>
-        <button type="button" class="compact-activity-action-btn flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-colors ml-auto" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})" title="${actionTitle}">
-          <span class="text-base">${actionIcon}</span>
-        </button>
-      </li>`;
+      const categoryEmoji = getCategoryEmoji(activity.category);
+      const notesMetaHtml = activity.notes ? ` ┬À <span class="sight-inline-meta-notes" title="${escapeHtmlText(activity.notes)}">­ƒÆ¼ ${escapeHtmlText(activity.notes)}</span>` : '';
+      return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">├ù</button>${!isAssigned ? `<span class="drag-handle opacity-50 hover:opacity-100 cursor-grab shrink-0 mt-0.5" title="Drag to assign">Ôá┐</span>` : `<span class="assigned-badge shrink-0 mt-0.5 ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji shrink-0 mt-0.5">${categoryEmoji}</span><div class="flex flex-col min-w-0 flex-1"><span class="break-words" style="${isCompleted ? 'text-decoration:line-through;opacity:0.6;' : ''}">${activity.title}</span><span class="sight-inline-meta text-xs text-slate-400 mt-0.5 block truncate">ÔÅ▒ ${activity.estTime} ┬À <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span>${notesMetaHtml}</span></div><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn shrink-0" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
     }).join('')}</ul>
         ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>` : ''}
       </div>
     </div>`;
 
     leg.days.forEach((day, dayIndex) => {
-      const cityHTML = day.from === day.to ? `<span class="city-same">${day.from}</span>` : `${day.from} <span style="opacity:0.4">→</span> ${day.to}`;
+      const cityHTML = day.from === day.to ? `<span class="city-same">${day.from}</span>` : `${day.from} <span style="opacity:0.4">ÔåÆ</span> ${day.to}`;
       const dayTotal = getDayTotal(day);
 
       // Get journeys for this day
@@ -2446,7 +1883,7 @@ function buildItinerary() {
         <div class="day-bar flex items-center p-3 sm:p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors relative" style="border-left: 5px solid var(--leg-colour, ${leg.colour})" onclick="toggleCard(this)">
           <div class="day-date w-16 sm:w-20 shrink-0 text-center flex flex-col items-center justify-center border-r border-slate-200 dark:border-slate-700 pr-3 sm:pr-4 mr-3 sm:mr-4"><span class="day-num text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">${dayDateLabel}</span><span class="day-name text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${day.day}</span></div>
           <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${cityHTML}</div><div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
-          ${dayTotal ? `<div class="day-total-cost hidden sm:flex shrink-0 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-full border border-slate-200 dark:border-slate-600 shadow-inner mr-4" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron shrink-0 w-8 h-8 flex items-center justify-center text-slate-400 transition-transform duration-300 bg-slate-100 dark:bg-slate-700/50 rounded-full group-[.open]:rotate-180">▼</span>
+          ${dayTotal ? `<div class="day-total-cost hidden sm:flex shrink-0 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-full border border-slate-200 dark:border-slate-600 shadow-inner mr-4" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron shrink-0 w-8 h-8 flex items-center justify-center text-slate-400 transition-transform duration-300 bg-slate-100 dark:bg-slate-700/50 rounded-full group-[.open]:rotate-180">Ôû╝</span>
         </div>
         <div class="day-detail hidden group-[.open]:block border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 p-4 sm:p-5"><div class="day-planner-shell day-planner-shell-${dayViewMode}">
           <div class="day-view-panel day-view-panel-timeline">
@@ -2461,7 +1898,7 @@ function buildItinerary() {
             ${dayJourneys.map((journey) => {
         const status = journey.status || 'planned';
         const statusColor = status === 'booked' ? '#27AE60' : '#E67E22';
-        const statusIcon = status === 'booked' ? '✓' : '⧗';
+        const statusIcon = status === 'booked' ? 'Ô£ô' : 'ÔÅ│';
         const icon = getTransportIcon(journey.transportType);
         const showRef = status === 'booked';
 
@@ -2473,11 +1910,11 @@ function buildItinerary() {
               .filter(j => j.journeyId === journey.journeyId)
               .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
           const stops = allSegs.length > 0
-              ? [allSegs[0].fromLocation, ...allSegs.map(s => s.toLocation)].join(' → ')
-              : (journey.journeyName || journey.fromLocation + ' → ' + journey.toLocation);
-          label = `${icon} ${journey.journeyName ? journey.journeyName + ' · ' : ''}${stops}`;
+              ? [allSegs[0].fromLocation, ...allSegs.map(s => s.toLocation)].join(' ÔåÆ ')
+              : (journey.journeyName || journey.fromLocation + ' ÔåÆ ' + journey.toLocation);
+          label = `${icon} ${journey.journeyName ? journey.journeyName + ' ┬À ' : ''}${stops}`;
         } else {
-          label = `${icon} ${journey.journeyName || journey.notes || journey.fromLocation + ' → ' + journey.toLocation}`;
+          label = `${icon} ${journey.journeyName || journey.notes || journey.fromLocation + ' ÔåÆ ' + journey.toLocation}`;
         }
 
         // Show departure time if available
@@ -2492,7 +1929,7 @@ function buildItinerary() {
         const subLocations = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
 
         return `<div class="cost-item journey-item flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200/50 dark:border-slate-600/50 text-sm hover:shadow-md transition-shadow group">
-                <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-red-500 rounded" title="Remove Journey" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); rebuildCurrentView();">×</button>
+                <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-red-500 rounded" title="Remove Journey" onclick="event.stopPropagation(); deleteJourney('${journey.id}'); rebuildCurrentView();">├ù</button>
                 <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
                   <span class="font-medium text-slate-700 dark:text-slate-200">${label}${timeHint}</span>
                   ${subLocations ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(subLocations)}</div>` : ''}
@@ -2513,7 +1950,7 @@ function buildItinerary() {
 ${(() => {
         const dayStayInfo = getStayDisplayForDay(day.date, day.to);
         return dayStayInfo.map(info => {
-          const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
+          const icon = info.type === 'checkin' ? '­ƒÅ¿' : info.type === 'checkout' ? '­ƒÜ¬' : '­ƒÅ¿';
           const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
           const stayLoc = info.location ? (() => {
             let loc = info.location;
@@ -2530,13 +1967,13 @@ ${(() => {
           ${stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : ''}
         </div>
         <div class="cost-item-actions flex flex-col items-end gap-1.5 shrink-0">
-          <span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white" style="background-color:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✖ Cancelled' : '⧗ Pending'}</span>
+          <span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white" style="background-color:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? 'Ô£ô Confirmed' : info.status === 'cancelled' ? 'Ô£ò Cancelled' : 'ÔÅ│ Pending'}</span>
           ${info.bookingRef ? `<span class="booking-ref text-[10px] font-mono text-slate-500 bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">${info.bookingRef}</span>` : ''}
         </div>
       </div>`;
         }).join('');
       })()}
-</div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Add Stay</button>` : ''}
+</div><button class="add-btn" onclick="event.stopPropagation(); openAddStayModal()">+ Add Stay</button>
 </div>
 
           <div class="detail-block block-activities drop-zone flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
@@ -2569,12 +2006,12 @@ ${(() => {
                   notes = matched.notes;
                 }
               }
-              const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-inline">💬 ${escapeCompactText(notes)}</div>` : '';
+              const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-inline">­ƒÆ¼ ${escapeCompactText(notes)}</div>` : '';
               return `
                 <div class="cost-item flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200/50 dark:border-slate-600/50 text-sm hover:shadow-md transition-shadow group">
                   <div class="cost-item-text" style="display: flex; flex-direction: column; gap: 4px;">
                     <div style="display: flex; align-items: center; gap: 6px;">
-                      <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-red-500 rounded" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button>
+                      <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-red-500 rounded" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">├ù</button>
                       <input type="checkbox" class="activity-checkbox w-4 h-4 accent-emerald-500 cursor-pointer" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})">
                       <span class="cost-item-text font-medium text-slate-700 dark:text-slate-200 outline-none" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${split.title}</span>
                     </div>
@@ -2582,8 +2019,8 @@ ${(() => {
                     ${notesHtml}
                   </div>
                   ${isEditMode
-                    ? `<span class="budget-field budget-field--clickable text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors cursor-pointer text-xs font-mono" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">⏱️ <span>${item.time || '1 hr'}</span></span>`
-                    : `<span class="budget-field text-slate-500 text-xs font-mono">⏱️ <span>${item.time || '1 hr'}</span></span>`
+                    ? `<span class="budget-field budget-field--clickable text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors cursor-pointer text-xs font-mono" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">ÔÅ▒ <span>${item.time || '1 hr'}</span></span>`
+                    : `<span class="budget-field text-slate-500 text-xs font-mono">ÔÅ▒ <span>${item.time || '1 hr'}</span></span>`
                   }
                   <span class="budget-field text-slate-600 dark:text-slate-400 font-mono text-sm mt-1">$<span class="outline-none" contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span>
                 </div>
@@ -2611,7 +2048,7 @@ function renderActivityActionButtonsLegacy(root) {
   root.querySelectorAll('.activity-item button[onclick*="openActivityAssignModal"]').forEach(btn => {
     const title = (btn.getAttribute('title') || btn.getAttribute('aria-label') || '').toLowerCase();
     const isMove = title.includes('move');
-    const icon = isMove ? '›' : '📌';
+    const icon = isMove ? 'ÔÇ║' : '­ƒôî';
     const label = isMove ? 'Move to another day' : 'Add to day';
     btn.textContent = icon;
     btn.setAttribute('aria-label', label);
@@ -2626,7 +2063,7 @@ function renderActivityActionButtons(root) {
     const title = (btn.getAttribute('title') || btn.getAttribute('aria-label') || '').toLowerCase();
     const rawLabel = (btn.textContent || '').trim().toLowerCase();
     const isMove = title.includes('move') || rawLabel === 'move';
-    const icon = isMove ? '›' : '📌';
+    const icon = isMove ? 'ÔÇ║' : '­ƒôî';
     const label = isMove ? 'Move to another day' : 'Add to day';
     btn.textContent = icon;
     btn.setAttribute('aria-label', label);
@@ -2893,19 +2330,6 @@ function scrollToElementWithNavOffset(el) {
 }
 
 function findCompactCitySlideIndex(cityId, cityName) {
-  const domSlides = Array.from(document.querySelectorAll('.compact-city-swipe-pager .compact-city-slide[data-slide-index]'));
-  if (domSlides.length > 0) {
-    const cityIdNorm = String(cityId || '').trim().toLowerCase();
-    const cityNameNorm = String(cityName || '').trim().toLowerCase();
-    const direct = domSlides.find(slide => {
-      const sid = String(slide.dataset.cityId || '').trim().toLowerCase();
-      const legId = String(slide.dataset.legId || '').trim().toLowerCase();
-      return (cityIdNorm && (sid === cityIdNorm || legId === cityIdNorm || legId === cityIdNorm.replace(/^city-/, '')))
-        || (cityNameNorm && legId.includes(cityNameNorm));
-    });
-    if (direct) return Number(direct.dataset.slideIndex || -1);
-  }
-
   if (!Array.isArray(appData) || appData.length === 0) return -1;
 
   const normalizedCityId = String(cityId || '').trim().toLowerCase();
@@ -2935,86 +2359,6 @@ function findCompactCitySlideIndex(cityId, cityName) {
   }
 
   return -1;
-}
-
-function resolveCityNavButtonForLeg(leg) {
-  const nav = document.getElementById('cityNav');
-  if (!nav || !leg) return null;
-  const buttons = Array.from(nav.querySelectorAll('.city-nav-btn[data-city]'));
-  if (buttons.length === 0) return null;
-
-  const legIdRaw = String(leg.id || '').trim();
-  const legId = legIdRaw.toLowerCase();
-  const legIdAlt = legId.replace(/^city-/, '');
-  const legLabel = cleanCityNavLabel(leg.label || '').toLowerCase();
-
-  let btn = buttons.find(b => {
-    const cityId = String(b.dataset.city || '').trim().toLowerCase();
-    return cityId && (cityId === legId || cityId === legIdAlt || `city-${cityId}` === legId);
-  });
-  if (btn) return btn;
-
-  if (legLabel) {
-    btn = buttons.find(b => {
-      const cityId = String(b.dataset.city || '').trim();
-      const city = (Array.isArray(citiesData) ? citiesData.find(c => c.id === cityId) : null);
-      return city && cleanCityNavLabel(city.name || '').toLowerCase() === legLabel;
-    });
-  }
-  return btn || null;
-}
-
-function syncCityNavHighlightToLeg(leg) {
-  const nav = document.getElementById('cityNav');
-  if (!nav || !leg) return;
-  const btn = resolveCityNavButtonForLeg(leg);
-  if (!btn) return;
-
-  nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-
-  const navList = nav.querySelector('.city-nav-list');
-  if (!navList) return;
-  if (typeof scrollChildIntoHorizontalView === 'function') {
-    scrollChildIntoHorizontalView(navList, btn, { behavior: 'smooth', align: 'center' });
-  } else {
-    navList.scrollTo({
-      left: Math.max(0, btn.offsetLeft - navList.offsetLeft - (navList.clientWidth - btn.offsetWidth) / 2),
-      behavior: 'smooth'
-    });
-  }
-}
-
-function setupCompactCityNavSync(root = document) {
-  const pager = root.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]');
-  if (!pager || pager.__cityNavSyncAttached) return;
-  pager.__cityNavSyncAttached = true;
-
-  const carousel = pager.querySelector('[data-role="mobile-swipe-carousel"]');
-  const slides = Array.from(pager.querySelectorAll('.compact-city-slide[data-slide-index]'));
-  if (!carousel || slides.length === 0) return;
-
-  const syncByIndex = index => {
-    const safe = Math.max(0, Math.min(slides.length - 1, Number(index) || 0));
-    const slide = slides[safe];
-    if (!slide) return;
-    const slideLegId = String(slide.dataset.legId || '').trim();
-    if (!Array.isArray(appData)) return;
-    const targetLeg = appData.find(l => String(l.id || '') === slideLegId) || null;
-    if (targetLeg) syncCityNavHighlightToLeg(targetLeg);
-  };
-
-  syncByIndex(Number(pager.dataset.activeIndex || 0));
-
-  const observer = new IntersectionObserver(entries => {
-    const visible = entries.filter(e => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-    if (!visible) return;
-    const idx = Number(visible.target.dataset.slideIndex || 0);
-    if (!Number.isNaN(idx)) syncByIndex(idx);
-  }, { root: carousel, threshold: [0.55, 0.7, 0.85] });
-
-  slides.forEach(slide => observer.observe(slide));
-  pager.__cityNavSyncObserver = observer;
 }
 
 function scrollToCompactCitySlide(cityId, cityName) {
@@ -3100,7 +2444,7 @@ function buildCityNav() {
   // Keep the "All" button
   navList.innerHTML = `
     <button class="city-nav-btn px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700 ${filter === 'all' ? 'active' : ''}" data-city="all" onclick="selectCityFilter('all', this)">
-      <span>🏙️ All</span>
+      <span>­ƒÅÖ´©Å All</span>
     </button>
   `;
 
@@ -3125,7 +2469,7 @@ function buildCityNav() {
       btn.style.borderLeft = `4px solid ${color}`;
     }
 
-    const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">&#128205;</span>';
+    const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">­ƒôì</span>';
     btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
     navList.appendChild(btn);
   });
@@ -3267,5 +2611,3 @@ function expandToCity(cityId) {
   }
 }
 window.expandToCity = expandToCity;
-
-

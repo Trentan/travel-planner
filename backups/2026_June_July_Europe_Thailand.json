@@ -5,50 +5,38 @@
   },
   "itinerary": [
     {
-      "id": "city-taipei-start",
-      "label": "Taipei (Trip Start)",
+      "id": "departure",
+      "label": "🛫 Departure",
       "colour": "#2C3E50",
       "cityFood": [
         {
-          "text": "Last Aussie meal: local favourite before airport",
+          "text": "🍗 Last Aussie meal: local favourite before airport",
           "done": false,
           "cityId": "city-brisbane"
         }
       ],
       "days": [
         {
-          "date": "2026-06-09",
-          "day": "Tue",
-          "from": "Taipei (Trip Start)",
-          "to": "Taipei (Trip Start)",
+          "date": "2026-06-08",
+          "day": "Mon",
+          "from": "Brisbane",
+          "to": "In transit",
+          "accom": "—",
+          "desc": "Depart Brisbane",
+          "headline": "🌙 Late departure — check-in online, arrive airport 3hrs early",
           "completed": false,
-          "desc": "Travel and arrival day",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
-              "text": "Add accommodation...",
+              "text": "—",
               "cost": "0",
-              "cityId": ""
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-brisbane"
             }
           ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-09",
-              "endDate": "2026-06-09",
-              "startTime": "",
-              "endTime": "",
-              "cityId": ""
-            }
-          ]
+          "activityItems": []
         }
       ],
       "suggestedActivities": [
@@ -57,15 +45,13 @@
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
-          "assignedDayIdx": 0,
+          "assignedDayIdx": null,
           "cityId": "city-brisbane",
-          "startTime": "09:00",
-          "endTime": "10:00",
-          "assignedDate": "2026-06-08",
-          "startDate": "2026-06-08",
-          "endDate": "2026-06-08",
-          "notes": "",
-          "location": "last Brisbane run if time allows"
+          "startTime": "",
+          "endTime": "",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": ""
         }
       ],
       "legTips": [
@@ -94,16 +80,14 @@
         {
           "date": "2026-06-09",
           "day": "Tue",
-          "from": "Brisbane",
-          "to": "Bangkok",
+          "from": "Taipei",
+          "to": "Taipei",
+          "accom": "— (transit, no hotel)",
+          "desc": "Free EVA stopover — apply for tourist voucher",
+          "headline": "🎧 RS-style: Ximending → CKS Memorial",
           "completed": false,
-          "desc": "Depart for Bangkok via EVA Air",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "— (transit, no hotel)",
@@ -138,7 +122,7 @@
               "location": "queue early"
             },
             {
-              "text": "🏛️ Din Tai Fung lunch — queue early",
+              "text": "🏛️ Din Tai Fung lunch — Da fuq?",
               "cost": "0",
               "time": "2 hrs",
               "startTime": "12:00",
@@ -147,7 +131,8 @@
               "startDate": "2026-06-09",
               "endDate": "2026-06-09",
               "cityId": "city-taipei",
-              "location": "queue early"
+              "location": "Da fuq?",
+              "notes": "queue early"
             }
           ]
         }
@@ -165,11 +150,10 @@
           "endDate": "2026-06-09",
           "startTime": "",
           "endTime": "",
-          "location": "queue early",
-          "done": false
+          "location": "queue early"
         },
         {
-          "title": "Din Tai Fung lunch — queue early",
+          "title": "Din Tai Fung lunch — Da fuq?",
           "category": "sight",
           "estTime": "2 hrs",
           "estCost": "0",
@@ -180,8 +164,9 @@
           "assignedDate": "2026-06-09",
           "startDate": "2026-06-09",
           "endDate": "2026-06-09",
-          "location": "queue early",
-          "done": false
+          "done": false,
+          "location": "Da fuq?",
+          "notes": "queue early"
         },
         {
           "title": "Shilin Night Market evening",
@@ -201,16 +186,13 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-09",
           "startDate": "2026-06-09",
           "startTime": "09:00",
           "endDate": "2026-06-09",
           "endTime": "10:00",
-          "cityId": "city-taipei",
-          "done": false
+          "cityId": "city-taipei"
         }
       ],
       "legTips": [
@@ -219,39 +201,6 @@
           "cityId": "city-taipei"
         }
       ]
-    },
-    {
-      "id": "leg-17799265810539540",
-      "label": "Bangkok (1)",
-      "colour": "#808080",
-      "days": [
-        {
-          "date": "2026-06-10",
-          "day": "Wed",
-          "from": "Taipei",
-          "to": "Vienna",
-          "completed": false,
-          "desc": "Depart for Vienna via EVA Air",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
-          "accomItems": [
-            {
-              "text": "—",
-              "cost": "0",
-              "status": "pending",
-              "bookingRef": "",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": []
-        }
-      ],
-      "suggestedActivities": [],
-      "legTips": []
     },
     {
       "id": "vienna",
@@ -268,16 +217,14 @@
         {
           "date": "2026-06-10",
           "day": "Wed",
-          "from": "Bangkok",
-          "to": "🇦🇹 Vienna",
+          "from": "Vienna",
+          "to": "Vienna",
+          "accom": "TBC — Vienna city centre",
+          "desc": "Arrive Vienna — settle into Europe",
+          "headline": "🎧 RS Vienna City Walk: Stephansdom → Hofburg",
           "completed": false,
-          "desc": "Arrive from Bangkok via EVA Air",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Vienna city centre",
@@ -298,35 +245,6 @@
               "endDate": "2026-06-10",
               "startTime": "",
               "endTime": ""
-            }
-          ]
-        },
-        {
-          "date": "2026-06-11",
-          "day": "Thu",
-          "from": "🇦🇹 Vienna",
-          "to": "Bratislava",
-          "completed": false,
-          "desc": "Depart for Bratislava via OBB",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bratislava"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-11",
-              "endDate": "2026-06-11",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bratislava"
             }
           ]
         }
@@ -372,12 +290,26 @@
           "endTime": ""
         },
         {
+          "title": "RS Vienna City Walk: Stephansdom → Hofburg — Vienna Park",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-10",
+          "startDate": "2026-06-10",
+          "startTime": "",
+          "endDate": "2026-06-10",
+          "endTime": "",
+          "cityId": "city-vienna",
+          "notes": "Careful pigeons",
+          "location": "Vienna Park"
+        },
+        {
           "title": "RS Vienna City Walk: Stephansdom → Hofburg",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
           "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-10",
           "startDate": "2026-06-10",
@@ -423,15 +355,13 @@
           "date": "2026-06-11",
           "day": "Thu",
           "from": "Vienna",
-          "to": "🇸🇰 Bratislava",
+          "to": "Bratislava",
+          "accom": "TBC — Bratislava old town",
+          "desc": "Day into Bratislava",
+          "headline": "🎧 RS-style: Hlavné Nám → Michael's Gate",
           "completed": false,
-          "desc": "Arrive from Vienna via OBB",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Bratislava old town",
@@ -458,11 +388,14 @@
         {
           "date": "2026-06-12",
           "day": "Fri",
-          "from": "🇸🇰 Bratislava",
-          "to": "🇸🇰 Bratislava",
-          "completed": false,
+          "from": "Bratislava",
+          "to": "Bratislava",
+          "accom": "TBC — Bratislava old town",
           "desc": "Full day Bratislava",
-          "transportItems": [],
+          "headline": "🏯 Devín Castle ruins",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Bratislava old town",
@@ -483,35 +416,6 @@
               "endDate": "2026-06-12",
               "startTime": "",
               "endTime": ""
-            }
-          ]
-        },
-        {
-          "date": "2026-06-13",
-          "day": "Sat",
-          "from": "🇸🇰 Bratislava",
-          "to": "Prague",
-          "completed": false,
-          "desc": "Depart for Prague via RegioJet",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-prague"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-13",
-              "endDate": "2026-06-13",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-prague"
             }
           ]
         }
@@ -596,32 +500,43 @@
           "endTime": ""
         },
         {
-          "title": "RS-style: Hlavné Nám → Michael's Gate",
+          "title": "RS-style: Hlavné Nám → Michael's Gate — Bratislava Park",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-11",
           "startDate": "2026-06-11",
           "startTime": "",
           "endDate": "2026-06-11",
           "endTime": "",
-          "cityId": "city-bratislava"
+          "cityId": "city-bratislava",
+          "notes": "Light gear",
+          "location": "Bratislava Park"
         },
         {
           "title": "Devín Castle ruins",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 1,
           "assignedDate": "2026-06-12",
           "startDate": "2026-06-12",
           "startTime": "",
           "endDate": "2026-06-12",
+          "endTime": "",
+          "cityId": "city-bratislava"
+        },
+        {
+          "title": "RS-style: Hlavné Nám → Michael's Gate",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-11",
+          "startDate": "2026-06-11",
+          "startTime": "",
+          "endDate": "2026-06-11",
           "endTime": "",
           "cityId": "city-bratislava"
         }
@@ -662,15 +577,13 @@
           "date": "2026-06-13",
           "day": "Sat",
           "from": "Bratislava",
-          "to": "🇨🇿 Prague",
+          "to": "Prague",
+          "accom": "TBC — Prague old town",
+          "desc": "Travel to Prague — arrive afternoon",
+          "headline": "🎧 RS Prague Old Town Walk",
           "completed": false,
-          "desc": "Arrive from Bratislava via RegioJet",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Prague old town",
@@ -689,19 +602,22 @@
               "cityId": "city-prague",
               "startDate": "2026-06-13",
               "endDate": "2026-06-13",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "18:30",
+              "endTime": "19:30"
             }
           ]
         },
         {
           "date": "2026-06-14",
           "day": "Sun",
-          "from": "🇨🇿 Prague",
-          "to": "🇨🇿 Prague",
-          "completed": false,
+          "from": "Prague",
+          "to": "Prague",
+          "accom": "TBC — Prague old town",
           "desc": "Full day Prague",
-          "transportItems": [],
+          "headline": "🎧 RS Prague Castle Walk",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Prague old town",
@@ -735,35 +651,6 @@
               "endTime": ""
             }
           ]
-        },
-        {
-          "date": "2026-06-15",
-          "day": "Mon",
-          "from": "🇨🇿 Prague",
-          "to": "Nuremberg",
-          "completed": false,
-          "desc": "Depart for Nuremberg via FlixBus",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-nuremberg"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-15",
-              "endDate": "2026-06-15",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-nuremberg"
-            }
-          ]
         }
       ],
       "suggestedActivities": [
@@ -783,7 +670,7 @@
         {
           "title": "Vyšehrad 5km loop - excellent path along the Vltava river",
           "category": "fitness",
-          "estTime": "1.5 hrs",
+          "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": null,
           "cityId": "city-prague",
@@ -820,18 +707,29 @@
           "endTime": ""
         },
         {
+          "title": "Vyšehrad 5km loop",
+          "category": "sight",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-prague",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
           "title": "RS Prague Old Town Walk",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-13",
           "startDate": "2026-06-13",
-          "startTime": "",
+          "startTime": "18:30",
           "endDate": "2026-06-13",
-          "endTime": "",
+          "endTime": "19:30",
           "cityId": "city-prague"
         },
         {
@@ -839,8 +737,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 1,
           "assignedDate": "2026-06-14",
           "startDate": "2026-06-14",
@@ -881,15 +777,13 @@
           "date": "2026-06-15",
           "day": "Mon",
           "from": "Prague",
-          "to": "🇩🇪 Nuremberg",
+          "to": "Nuremberg",
+          "accom": "TBC — Nuremberg old town",
+          "desc": "Stopover en route to Munich",
+          "headline": "🎧 RS-style: Hauptmarkt → Kaiserburg",
           "completed": false,
-          "desc": "Arrive from Prague via FlixBus",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Nuremberg old town",
@@ -910,35 +804,6 @@
               "endDate": "2026-06-15",
               "startTime": "",
               "endTime": ""
-            }
-          ]
-        },
-        {
-          "date": "2026-06-16",
-          "day": "Tue",
-          "from": "🇩🇪 Nuremberg",
-          "to": "Munich",
-          "completed": false,
-          "desc": "Depart for Munich via DB ICE",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-munich"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-16",
-              "endDate": "2026-06-16",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-munich"
             }
           ]
         }
@@ -987,7 +852,7 @@
           "title": "Bratwursthäusle for dinner",
           "category": "sight",
           "estTime": "1.5 hrs",
-          "estCost": "0",
+          "estCost": "25",
           "assignedDayIdx": null,
           "cityId": "city-nuremberg",
           "assignedDate": "",
@@ -1001,8 +866,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-15",
           "startDate": "2026-06-15",
@@ -1058,15 +921,13 @@
           "date": "2026-06-16",
           "day": "Tue",
           "from": "Nuremberg",
-          "to": "🇩🇪 Munich",
+          "to": "Munich",
+          "accom": "TBC — Munich conference hotel",
+          "desc": "SoftwareAG Conference begins",
+          "headline": "💼 Conference check-in & afternoon sessions",
           "completed": false,
-          "desc": "Arrive from Nuremberg via DB ICE",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "10",
           "accomItems": [
             {
               "text": "TBC — Munich conference hotel",
@@ -1085,19 +946,34 @@
               "cityId": "city-munich",
               "startDate": "2026-06-16",
               "endDate": "2026-06-16",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "13:00",
+              "endTime": "17:00"
+            },
+            {
+              "text": "🍽️ Speaker Dinner (SoftwareAG) — Hotel lobby",
+              "cost": "0",
+              "time": "2 hr",
+              "done": false,
+              "startDate": "2026-06-16",
+              "startTime": "19:00",
+              "endDate": "2026-06-16",
+              "endTime": "14:10",
+              "cityId": "city-munich",
+              "location": "Hotel lobby"
             }
           ]
         },
         {
           "date": "2026-06-17",
           "day": "Wed",
-          "from": "🇩🇪 Munich",
-          "to": "🇩🇪 Munich",
-          "completed": false,
+          "from": "Munich",
+          "to": "Munich",
+          "accom": "TBC — Munich conference hotel",
           "desc": "Conference day 2",
-          "transportItems": [],
+          "headline": "💼 Full conference day",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Munich conference hotel",
@@ -1124,11 +1000,14 @@
         {
           "date": "2026-06-18",
           "day": "Thu",
-          "from": "🇩🇪 Munich",
-          "to": "🇩🇪 Munich",
-          "completed": false,
+          "from": "Munich",
+          "to": "Munich",
+          "accom": "TBC — Munich conference hotel",
           "desc": "Conference day 3 — last",
-          "transportItems": [],
+          "headline": "💼 Final conference sessions",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Munich conference hotel",
@@ -1155,11 +1034,14 @@
         {
           "date": "2026-06-19",
           "day": "Fri",
-          "from": "🇩🇪 Munich",
-          "to": "🇩🇪 Munich",
-          "completed": false,
+          "from": "Munich",
+          "to": "Munich",
+          "accom": "TBC — Munich personal accommodation",
           "desc": "Free day — explore beyond conference",
-          "transportItems": [],
+          "headline": "🎧 RS Munich Walk",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Munich personal accommodation",
@@ -1180,35 +1062,6 @@
               "endDate": "2026-06-19",
               "startTime": "",
               "endTime": ""
-            }
-          ]
-        },
-        {
-          "date": "2026-06-20",
-          "day": "Sat",
-          "from": "🇩🇪 Munich",
-          "to": "Bolzano",
-          "completed": false,
-          "desc": "Depart for Bolzano via ÖBB",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bolzano"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-20",
-              "endDate": "2026-06-20",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bolzano"
             }
           ]
         }
@@ -1345,18 +1198,43 @@
           "endTime": ""
         },
         {
+          "title": "Allianz Arena tour",
+          "category": "sight",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
+          "title": "Speaker Dinner (SoftwareAG) — Hotel lobby",
+          "category": "food",
+          "estTime": "2 hr",
+          "startDate": "2026-06-16",
+          "startTime": "19:00",
+          "endDate": "2026-06-16",
+          "endTime": "14:10",
+          "estCost": "0",
+          "assignedDate": "2026-06-16",
+          "assignedDayIdx": 0,
+          "cityId": "city-munich",
+          "location": "Hotel lobby"
+        },
+        {
           "title": "Conference check-in & afternoon sessions",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-16",
           "startDate": "2026-06-16",
-          "startTime": "",
+          "startTime": "13:00",
           "endDate": "2026-06-16",
-          "endTime": "",
+          "endTime": "17:00",
           "cityId": "city-munich"
         },
         {
@@ -1364,8 +1242,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 1,
           "assignedDate": "2026-06-17",
           "startDate": "2026-06-17",
@@ -1379,8 +1255,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 2,
           "assignedDate": "2026-06-18",
           "startDate": "2026-06-18",
@@ -1394,8 +1268,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 3,
           "assignedDate": "2026-06-19",
           "startDate": "2026-06-19",
@@ -1433,6 +1305,131 @@
       ]
     },
     {
+      "id": "innsbruck",
+      "label": "🇦🇹 Innsbruck",
+      "colour": "#1A8A6F",
+      "cityFood": [
+        {
+          "text": "🥘 Tiroler Gröstl",
+          "done": false,
+          "cityId": "city-innsbruck"
+        }
+      ],
+      "days": [
+        {
+          "date": "2026-06-20",
+          "day": "Sat",
+          "from": "Munich",
+          "to": "Innsbruck",
+          "accom": "TBC — Innsbruck old town",
+          "desc": "Into the Austrian Alps",
+          "headline": "Innpromenade parkrun 8:45am SAT",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
+          "accomItems": [
+            {
+              "text": "TBC — Innsbruck old town",
+              "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-innsbruck"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "Innpromenade parkrun 8:45am SAT",
+              "cost": "0",
+              "done": false,
+              "time": "1 hr",
+              "cityId": "city-innsbruck",
+              "startDate": "2026-06-20",
+              "endDate": "2026-06-20",
+              "startTime": "",
+              "endTime": ""
+            }
+          ]
+        }
+      ],
+      "suggestedActivities": [
+        {
+          "title": "Parkrun done! Afternoon: Inn riverside stroll",
+          "category": "fitness",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-innsbruck",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
+          "title": "Maria-Theresien-Straße afternoon stroll",
+          "category": "fitness",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-innsbruck",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
+          "title": "Nordkette cable car to 2,300m",
+          "category": "sight",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-innsbruck",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
+          "title": "Golden Roof old town walk",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-innsbruck",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
+          "title": "Innpromenade parkrun 8:45am SAT",
+          "category": "fitness",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-20",
+          "startDate": "2026-06-20",
+          "startTime": "",
+          "endDate": "2026-06-20",
+          "endTime": "",
+          "cityId": "city-innsbruck"
+        }
+      ],
+      "legTips": [
+        {
+          "text": "Nordkette: buy combo ticket - funicular to cable car to summit",
+          "cityId": "city-innsbruck"
+        },
+        {
+          "text": "Old Town (Altstadt) - walk only, beautifully preserved",
+          "cityId": "city-innsbruck"
+        }
+      ]
+    },
+    {
       "id": "bolzano",
       "label": "🇮🇹 Bolzano",
       "colour": "#5B4A9C",
@@ -1450,65 +1447,71 @@
       ],
       "days": [
         {
-          "date": "2026-06-20",
-          "day": "Sat",
-          "from": "Munich",
-          "to": "🇮🇹 Bolzano",
+          "date": "2026-06-21",
+          "day": "Sun",
+          "from": "Innsbruck",
+          "to": "Bolzano",
+          "accom": "TBC — Bolzano city centre",
+          "desc": "Bolzano via dramatic Brenner Pass crossing",
+          "headline": "🎧 RS-style: Lauben arcades → Ötzi the Iceman Museum",
           "completed": false,
-          "desc": "Arrive from Munich via ÖBB",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
-              "text": "Add accommodation...",
+              "text": "TBC — Bolzano city centre",
               "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
               "cityId": "city-bolzano"
             }
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "🎧 RS-style: Lauben arcades → Ötzi the Iceman Museum",
               "cost": "0",
-              "time": "1 hr",
               "done": false,
-              "startDate": "2026-06-20",
-              "endDate": "2026-06-20",
+              "time": "1 hr",
+              "cityId": "city-bolzano",
               "startTime": "",
               "endTime": "",
-              "cityId": "city-bolzano"
+              "startDate": "2026-06-21",
+              "endDate": "2026-06-21"
             }
           ]
         },
         {
-          "date": "2026-06-21",
-          "day": "Sun",
-          "from": "🇮🇹 Bolzano",
-          "to": "Verona",
+          "date": "2026-06-22",
+          "day": "Mon",
+          "from": "Bolzano",
+          "to": "Bolzano",
+          "accom": "TBC — Bolzano city centre",
+          "desc": "Dolomites day trip",
+          "headline": "🏔 Seceda cable car — soaring rocky spires",
           "completed": false,
-          "desc": "Depart for Verona via Italo",
-          "transportItems": [],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
-              "text": "Add accommodation...",
+              "text": "TBC — Bolzano city centre",
               "cost": "0",
-              "cityId": "city-verona"
+              "status": "pending",
+              "bookingRef": "",
+              "cityId": "city-bolzano"
             }
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "🏔 Seceda cable car — soaring rocky spires",
               "cost": "0",
-              "time": "1 hr",
               "done": false,
-              "startDate": "2026-06-21",
-              "endDate": "2026-06-21",
+              "time": "1 hr",
+              "cityId": "city-bolzano",
+              "startDate": "2026-06-22",
+              "endDate": "2026-06-22",
               "startTime": "",
               "endTime": "",
-              "cityId": "city-verona"
+              "location": "soaring rocky spires"
             }
           ]
         }
@@ -1584,8 +1587,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-21",
           "startDate": "2026-06-21",
@@ -1595,19 +1596,18 @@
           "cityId": "city-bolzano"
         },
         {
-          "title": "Seceda cable car",
+          "title": "Seceda cable car — soaring rocky spires",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "soaring rocky spires",
           "assignedDayIdx": 1,
           "assignedDate": "2026-06-22",
           "startDate": "2026-06-22",
           "startTime": "",
           "endDate": "2026-06-22",
           "endTime": "",
-          "cityId": "city-bolzano"
+          "cityId": "city-bolzano",
+          "location": "soaring rocky spires"
         }
       ],
       "legTips": [
@@ -1638,65 +1638,36 @@
       ],
       "days": [
         {
-          "date": "2026-06-21",
-          "day": "Sun",
-          "from": "🇮🇹 Verona",
-          "to": "🇮🇹 Verona",
-          "completed": false,
-          "desc": "Verona stopover en route",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-verona"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-21",
-              "endDate": "2026-06-21",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-verona"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-22",
-          "day": "Mon",
+          "date": "2026-06-23",
+          "day": "Tue",
           "from": "Bolzano",
           "to": "Milan",
+          "accom": "TBC — Milan city centre",
+          "desc": "Verona stopover en route",
+          "headline": "🎧 RS Verona self-walk: Arena di Verona",
           "completed": false,
-          "desc": "Depart for Milan via Italo",
-          "transportItems": [],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
-              "text": "Add accommodation...",
+              "text": "TBC — Milan city centre",
               "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
               "cityId": "city-milan"
             }
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "🎧 RS Verona self-walk: Arena di Verona",
               "cost": "0",
-              "time": "1 hr",
               "done": false,
-              "startDate": "2026-06-22",
-              "endDate": "2026-06-22",
+              "time": "1 hr",
+              "cityId": "city-milan",
+              "startDate": "2026-06-23",
+              "endDate": "2026-06-23",
               "startTime": "",
-              "endTime": "",
-              "cityId": "city-milan"
+              "endTime": ""
             }
           ]
         }
@@ -1733,8 +1704,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-23",
           "startDate": "2026-06-23",
@@ -1764,123 +1733,48 @@
       ],
       "days": [
         {
-          "date": "2026-06-22",
-          "day": "Mon",
-          "from": "Verona",
-          "to": "🇮🇹 Milan",
-          "completed": false,
-          "desc": "Arrive from Verona via Italo",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-milan"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-22",
-              "endDate": "2026-06-22",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-milan"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-23",
-          "day": "Tue",
-          "from": "🇮🇹 Milan",
-          "to": "🇮🇹 Milan",
-          "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-milan"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-23",
-              "endDate": "2026-06-23",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-milan"
-            }
-          ]
-        },
-        {
           "date": "2026-06-24",
           "day": "Wed",
-          "from": "🇮🇹 Milan",
-          "to": "🇮🇹 Milan",
+          "from": "Milan",
+          "to": "Milan",
+          "accom": "TBC — Milan city centre",
+          "desc": "Full day Milan",
+          "headline": "🎧 RS Milan walk: Duomo rooftop → Galleria",
           "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
-              "text": "Add accommodation...",
+              "text": "TBC — Milan city centre",
               "cost": "0",
+              "status": "pending",
+              "bookingRef": "",
               "cityId": "city-milan"
             }
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "🎧 RS Milan walk: Duomo rooftop → Galleria",
+              "cost": "0",
+              "done": false,
+              "time": "1 hr",
+              "cityId": "city-milan",
+              "startDate": "2026-06-24",
+              "endDate": "2026-06-24",
+              "startTime": "",
+              "endTime": ""
+            },
+            {
+              "text": "Statue viewin — Main park",
               "cost": "0",
               "time": "1 hr",
               "done": false,
+              "cityId": "city-milan",
               "startDate": "2026-06-24",
               "endDate": "2026-06-24",
               "startTime": "",
               "endTime": "",
-              "cityId": "city-milan"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-25",
-          "day": "Thu",
-          "from": "🇮🇹 Milan",
-          "to": "Zurich",
-          "completed": false,
-          "desc": "Depart for Zurich via Trenitalia",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-zurich"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-25",
-              "endDate": "2026-06-25",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-zurich"
+              "location": "Main park"
             }
           ]
         }
@@ -1957,8 +1851,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-24",
           "startDate": "2026-06-24",
@@ -2000,15 +1892,13 @@
           "date": "2026-06-25",
           "day": "Thu",
           "from": "Milan",
-          "to": "🇨🇭 Zurich",
+          "to": "Zurich",
+          "accom": "TBC — Zurich city centre",
+          "desc": "Morning Milan → arrive Zurich evening",
+          "headline": "🏘 Zurich Altstadt evening",
           "completed": false,
-          "desc": "Arrive from Milan via Trenitalia",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Zurich city centre",
@@ -2018,16 +1908,31 @@
               "cityId": "city-zurich"
             }
           ],
-          "activityItems": []
+          "activityItems": [
+            {
+              "text": "🏘 Zurich Altstadt evening",
+              "cost": "0",
+              "done": false,
+              "time": "1 hr",
+              "cityId": "city-zurich",
+              "startDate": "2026-06-25",
+              "endDate": "2026-06-25",
+              "startTime": "",
+              "endTime": ""
+            }
+          ]
         },
         {
           "date": "2026-06-26",
           "day": "Fri",
-          "from": "🇨🇭 Zurich",
-          "to": "London",
+          "from": "Zurich",
+          "to": "In transit",
+          "accom": "— (in transit)",
+          "desc": "Full day Zurich — fly evening",
+          "headline": "🎧 RS-style Zurich walk: Lindenhügel viewpoint",
           "completed": false,
-          "desc": "Depart for London via Swiss",
-          "transportItems": [],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "— (in transit)",
@@ -2048,19 +1953,6 @@
               "endDate": "2026-06-26",
               "startTime": "",
               "endTime": ""
-            },
-            {
-              "text": "🏛️ Zurich Altstadt evening",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "notes": "",
-              "location": "",
-              "startDate": "2026-06-26",
-              "startTime": "09:00",
-              "endDate": "2026-06-26",
-              "endTime": "10:00",
-              "cityId": "city-zurich"
             }
           ]
         }
@@ -2149,14 +2041,12 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 1,
-          "assignedDate": "2026-06-26",
-          "startDate": "2026-06-26",
-          "startTime": "09:00",
-          "endDate": "2026-06-26",
-          "endTime": "10:00",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-25",
+          "startDate": "2026-06-25",
+          "startTime": "",
+          "endDate": "2026-06-25",
+          "endTime": "",
           "cityId": "city-zurich"
         },
         {
@@ -2164,8 +2054,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 1,
           "assignedDate": "2026-06-26",
           "startDate": "2026-06-26",
@@ -2195,51 +2083,8 @@
       ]
     },
     {
-      "id": "leg-17799265810545900",
-      "label": "London",
-      "colour": "#808080",
-      "days": [
-        {
-          "date": "2026-06-26",
-          "day": "Fri",
-          "from": "Zurich",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Depart for Bangkok via EVA Air",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-26",
-              "endDate": "2026-06-26",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
-            }
-          ]
-        }
-      ],
-      "suggestedActivities": [],
-      "legTips": []
-    },
-    {
       "id": "bangkok",
-      "label": "🇹🇭 Bangkok (2)",
+      "label": "🇹🇭 Bangkok",
       "colour": "#B7860B",
       "cityFood": [
         {
@@ -2248,7 +2093,7 @@
           "cityId": "city-bangkok"
         },
         {
-          "text": "Mango sticky rice",
+          "text": "🥭 Mango sticky rice",
           "done": false,
           "cityId": "city-bangkok"
         }
@@ -2257,16 +2102,14 @@
         {
           "date": "2026-06-27",
           "day": "Sat",
-          "from": "London",
-          "to": "🇹🇭 Bangkok (2)",
+          "from": "In transit",
+          "to": "Bangkok",
+          "accom": "TBC — Bangkok city",
+          "desc": "Arrive Bangkok — settle in solo",
+          "headline": "🛕 Wat Pho → Chao Phraya Express boat",
           "completed": false,
-          "desc": "Arrive from London via EVA Air",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Bangkok city",
@@ -2293,11 +2136,14 @@
         {
           "date": "2026-06-28",
           "day": "Sun",
-          "from": "🇹🇭 Bangkok (2)",
-          "to": "🇹🇭 Bangkok (2)",
-          "completed": false,
+          "from": "Bangkok",
+          "to": "Bangkok",
+          "accom": "TBC — Bangkok city",
           "desc": "Family arrives! ⚠️ EARLY FLIGHT TOMORROW",
-          "transportItems": [],
+          "headline": "🛍 Chatuchak Weekend Market",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "TBC — Bangkok city",
@@ -2318,35 +2164,6 @@
               "endDate": "2026-06-28",
               "startTime": "",
               "endTime": ""
-            }
-          ]
-        },
-        {
-          "date": "2026-06-29",
-          "day": "Mon",
-          "from": "🇹🇭 Bangkok (2)",
-          "to": "Koh Samui",
-          "completed": false,
-          "desc": "Depart for Koh Samui via Bangkok Airways",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-koh-samui"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-29",
-              "endDate": "2026-06-29",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-koh-samui"
             }
           ]
         }
@@ -2409,8 +2226,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-27",
           "startDate": "2026-06-27",
@@ -2424,8 +2239,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 1,
           "assignedDate": "2026-06-28",
           "startDate": "2026-06-28",
@@ -2496,16 +2309,14 @@
         {
           "date": "2026-06-29",
           "day": "Mon",
-          "from": "Bangkok",
-          "to": "🌴 Koh Samui",
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "accom": "🏨 Homm Hotel",
+          "desc": "Arrive Koh Samui",
+          "headline": "🏖 Chaweng Beach afternoon → Big Buddha Temple",
           "completed": false,
-          "desc": "Arrive from Bangkok via Bangkok Airways",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
@@ -2532,11 +2343,14 @@
         {
           "date": "2026-06-30",
           "day": "Tue",
-          "from": "🌴 Koh Samui",
-          "to": "🌴 Koh Samui",
-          "completed": false,
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "accom": "🏨 Homm Hotel",
           "desc": "Day trip: Ang Thong",
-          "transportItems": [],
+          "headline": "⛵ Ang Thong Marine Park full day",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
@@ -2563,11 +2377,14 @@
         {
           "date": "2026-07-01",
           "day": "Wed",
-          "from": "🌴 Koh Samui",
-          "to": "🌴 Koh Samui",
-          "completed": false,
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "accom": "🏨 Homm Hotel",
           "desc": "Koh Tao snorkelling",
-          "transportItems": [],
+          "headline": "🐠 Koh Tao snorkelling — Shark Bay",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
@@ -2595,11 +2412,14 @@
         {
           "date": "2026-07-02",
           "day": "Thu",
-          "from": "🌴 Koh Samui",
-          "to": "🌴 Koh Samui",
-          "completed": false,
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "accom": "🏨 Homm Hotel",
           "desc": "Culture & wildlife day",
-          "transportItems": [],
+          "headline": "🍳 Thai cooking class then 🐘 Elephant Sanctuary",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
@@ -2626,11 +2446,14 @@
         {
           "date": "2026-07-03",
           "day": "Fri",
-          "from": "🌴 Koh Samui",
-          "to": "🌴 Koh Samui",
-          "completed": false,
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "accom": "🏨 Homm Hotel",
           "desc": "Beach day + Night Market",
-          "transportItems": [],
+          "headline": "🛍 Fisherman's Village Friday Night Market",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
@@ -2657,11 +2480,14 @@
         {
           "date": "2026-07-04",
           "day": "Sat",
-          "from": "🌴 Koh Samui",
-          "to": "🌴 Koh Samui",
-          "completed": false,
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "accom": "🏨 Homm Hotel",
           "desc": "Adventure day",
-          "transportItems": [],
+          "headline": "🚣 Kayak Chaweng Lake mangroves",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
@@ -2688,11 +2514,14 @@
         {
           "date": "2026-07-05",
           "day": "Sun",
-          "from": "🌴 Koh Samui",
-          "to": "🌴 Koh Samui",
-          "completed": false,
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "accom": "🏨 Homm Hotel",
           "desc": "Relaxed beach day",
-          "transportItems": [],
+          "headline": "🌊 Silver Beach morning",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
@@ -2719,11 +2548,14 @@
         {
           "date": "2026-07-06",
           "day": "Mon",
-          "from": "🌴 Koh Samui",
-          "to": "🌴 Koh Samui",
-          "completed": false,
+          "from": "Koh Samui",
+          "to": "Koh Samui",
+          "accom": "🏨 Homm Hotel",
           "desc": "Last full day on Samui",
-          "transportItems": [],
+          "headline": "🌅 Sunrise at Hin Ta & Hin Yai Rocks",
+          "completed": false,
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "🏨 Homm Hotel",
@@ -2744,35 +2576,6 @@
               "endDate": "2026-07-06",
               "startTime": "",
               "endTime": ""
-            }
-          ]
-        },
-        {
-          "date": "2026-07-07",
-          "day": "Tue",
-          "from": "🌴 Koh Samui",
-          "to": "Bangkok",
-          "completed": false,
-          "desc": "Depart for Bangkok via Bangkok Air",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-07",
-              "endDate": "2026-07-07",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
             }
           ]
         }
@@ -3095,8 +2898,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-29",
           "startDate": "2026-06-29",
@@ -3110,8 +2911,6 @@
           "category": "attraction",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 1,
           "assignedDate": "2026-06-30",
           "startDate": "2026-06-30",
@@ -3121,12 +2920,24 @@
           "cityId": "city-koh-samui"
         },
         {
+          "title": "Koh Tao snorkelling — Shark Bay",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 2,
+          "assignedDate": "2026-07-01",
+          "startDate": "2026-07-01",
+          "startTime": "",
+          "endDate": "2026-07-01",
+          "endTime": "",
+          "cityId": "city-koh-samui",
+          "location": "Shark Bay"
+        },
+        {
           "title": "Thai cooking class then 🐘 Elephant Sanctuary",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 3,
           "assignedDate": "2026-07-02",
           "startDate": "2026-07-02",
@@ -3140,8 +2951,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 4,
           "assignedDate": "2026-07-03",
           "startDate": "2026-07-03",
@@ -3155,8 +2964,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 5,
           "assignedDate": "2026-07-04",
           "startDate": "2026-07-04",
@@ -3170,8 +2977,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 6,
           "assignedDate": "2026-07-05",
           "startDate": "2026-07-05",
@@ -3185,28 +2990,11 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 7,
           "assignedDate": "2026-07-06",
           "startDate": "2026-07-06",
           "startTime": "",
           "endDate": "2026-07-06",
-          "endTime": "",
-          "cityId": "city-koh-samui"
-        },
-        {
-          "title": "Koh Tao snorkelling",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "Shark Bay",
-          "assignedDayIdx": 2,
-          "assignedDate": "2026-07-01",
-          "startDate": "2026-07-01",
-          "startTime": "",
-          "endDate": "2026-07-01",
           "endTime": "",
           "cityId": "city-koh-samui"
         }
@@ -3247,46 +3035,8 @@
       ]
     },
     {
-      "id": "leg-17799265810546360ret",
-      "label": "Bangkok (3)",
-      "colour": "#808080",
-      "days": [
-        {
-          "date": "2026-07-07",
-          "day": "Tue",
-          "from": "Koh Samui",
-          "to": "Brisbane",
-          "completed": false,
-          "desc": "Depart for Brisbane",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Add accommodation...",
-              "cost": "0",
-              "cityId": "city-brisbane"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Explore local area",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-07-07",
-              "endDate": "2026-07-07",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-brisbane"
-            }
-          ]
-        }
-      ],
-      "suggestedActivities": [],
-      "legTips": []
-    },
-    {
-      "id": "city-bangkok-finish",
-      "label": "Bangkok (Trip Finish)",
+      "id": "return",
+      "label": "🛫 Return",
       "colour": "#2C3E50",
       "cityFood": [
         {
@@ -3304,16 +3054,14 @@
         {
           "date": "2026-07-07",
           "day": "Tue",
-          "from": "Bangkok (Trip Finish)",
-          "to": "Bangkok (Trip Finish)",
+          "from": "Koh Samui",
+          "to": "Bangkok",
+          "accom": "— (transit)",
+          "desc": "Fly home via Bangkok",
+          "headline": "🛫 USM 07:50 → BKK 08:55",
           "completed": false,
-          "desc": "Travel and arrival day",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "— (transit)",
@@ -3340,11 +3088,14 @@
         {
           "date": "2026-07-08",
           "day": "Wed",
-          "from": "Bangkok (Trip Finish)",
-          "to": "Bangkok (Trip Finish)",
+          "from": "Brisbane",
+          "to": "Brisbane",
+          "accom": "— (home!)",
+          "desc": "Home! 🏠",
+          "headline": "🏠 Welcome back to Brisbane!",
           "completed": false,
-          "desc": "Exploring",
-          "transportItems": [],
+          "accomCost": "0",
+          "activityCost": "0",
           "accomItems": [
             {
               "text": "— (home!)",
@@ -3440,8 +3191,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-07-07",
           "startDate": "2026-07-07",
@@ -3455,8 +3204,6 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 1,
           "assignedDate": "2026-07-08",
           "startDate": "2026-07-08",
@@ -4133,138 +3880,159 @@
   ],
   "journeys": [
     {
-      "id": "journey_1778474416279_xl8dgk",
-      "journeyId": "jid_outbound_123",
-      "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
-      "legId": "city-taipei-start",
-      "dayDate": "2026-06-08",
-      "fromLocation": "Brisbane",
-      "toLocation": "Taipei",
-      "fromCityId": "city-brisbane",
-      "toCityId": "city-taipei",
-      "departureDate": "2026-06-08",
-      "departureTime": "22:15",
-      "arrivalDate": "2026-06-09",
-      "arrivalTime": "05:15",
-      "transportType": "flight",
-      "provider": "EVA Air",
-      "routeCode": "BR316",
-      "status": "confirmed",
-      "cost": "677",
-      "bookingReference": "B4V64X",
-      "isMultiLeg": true,
-      "segmentOrder": 1,
-      "notes": "✈ EVA Air BNE→TPE 22:15",
-      "legs": [],
-      "startDate": "2026-06-08",
-      "endDate": "2026-06-09",
-      "startTime": "22:15",
-      "endTime": "05:15",
-      "done": false,
-      "fromAddress": "",
-      "toAddress": "",
-      "_inferredToLegId": "taipei"
-    },
-    {
-      "id": "journey_1778474341607_iobkbm",
-      "journeyId": "jid_outbound_123",
-      "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
-      "legId": "taipei",
-      "dayDate": "2026-06-09",
-      "fromLocation": "Taipei",
-      "toLocation": "Bangkok",
-      "fromCityId": "city-taipei",
-      "toCityId": "city-bangkok",
-      "departureDate": "2026-06-09",
-      "departureTime": "22:30",
-      "arrivalDate": "2026-06-10",
-      "arrivalTime": "01:10",
-      "transportType": "flight",
-      "provider": "EVA Air",
-      "routeCode": "BR061",
-      "status": "booked",
-      "cost": "0",
-      "bookingReference": "",
-      "isMultiLeg": true,
-      "segmentOrder": 2,
-      "notes": "✈ EVA Air BNE→TPE 22:15",
-      "legs": [],
-      "startDate": "2026-06-09",
-      "endDate": "2026-06-10",
-      "startTime": "22:30",
-      "endTime": "01:10",
-      "fromAddress": "",
-      "toAddress": "",
-      "done": false,
-      "_inferredToLegId": "leg-17799265810539540",
-      "_inferredFromLegId": "taipei"
-    },
-    {
-      "id": "journey_1778474359483_dqz7rz",
-      "journeyId": "jid_outbound_123",
-      "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
-      "legId": "vienna",
-      "dayDate": "2026-06-10",
-      "fromLocation": "Bangkok",
-      "toLocation": "Vienna",
-      "fromCityId": "city-bangkok",
-      "toCityId": "city-vienna",
-      "departureDate": "2026-06-10",
-      "departureTime": "02:20",
-      "arrivalDate": "2026-06-10",
-      "arrivalTime": "08:35",
-      "transportType": "flight",
-      "provider": "EVA Air",
-      "routeCode": "BR061",
+      "id": "journey_9",
+      "legId": "innsbruck",
+      "dayDate": "2026-06-20",
+      "fromLocation": "Munich",
+      "toLocation": "Innsbruck",
+      "departureDate": "2026-06-20",
+      "departureTime": "",
+      "arrivalDate": "2026-06-20",
+      "arrivalTime": "",
+      "transportType": "train",
+      "provider": "ÖBB",
+      "routeCode": "",
       "status": "planned",
       "cost": "0",
-      "bookingReference": "B4V64X",
-      "isMultiLeg": true,
-      "segmentOrder": 3,
-      "notes": "✈ EVA Air TPE→VIE 22:40",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "🚂 ÖBB ~1h 45m",
       "legs": [],
-      "startDate": "2026-06-10",
-      "endDate": "2026-06-10",
-      "startTime": "02:20",
-      "endTime": "08:35",
+      "fromCityId": "city-munich",
+      "toCityId": "city-innsbruck",
+      "journeyId": "jid_single_journey_9",
+      "journeyName": "Munich to Innsbruck",
+      "segmentOrder": 1,
+      "startDate": "2026-06-20",
+      "endDate": "2026-06-20",
+      "startTime": "",
+      "endTime": "",
       "fromAddress": "",
-      "toAddress": "",
-      "done": false,
-      "_inferredToLegId": "vienna",
-      "_inferredFromLegId": "leg-17799265810539540"
+      "toAddress": ""
     },
     {
-      "id": "journey_1779252185623_huf5dt",
-      "journeyId": "jid_single_journey_3",
-      "journeyName": "Vienna → Bratislava",
-      "legId": "bratislava",
-      "dayDate": "2026-06-11",
-      "fromLocation": "Vienna",
-      "toLocation": "Bratislava",
-      "fromCityId": "city-vienna",
-      "toCityId": "city-bratislava",
-      "departureDate": "2026-06-11",
-      "departureTime": "11:14",
-      "arrivalDate": "2026-06-11",
-      "arrivalTime": "12:10",
+      "id": "journey_10",
+      "legId": "bolzano",
+      "dayDate": "2026-06-21",
+      "fromLocation": "Innsbruck",
+      "toLocation": "Bolzano",
+      "departureDate": "2026-06-21",
+      "departureTime": "",
+      "arrivalDate": "2026-06-21",
+      "arrivalTime": "",
       "transportType": "train",
-      "provider": "OBB",
-      "routeCode": "REX8",
-      "status": "confirmed",
-      "cost": "20.09",
-      "bookingReference": "1181",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
       "isMultiLeg": false,
-      "segmentOrder": 1,
-      "notes": "🚂 56m, Bahnsteige 3-12~, Platform 11C-E, Wien Hbf",
+      "notes": "🚂 Brenner Pass ~2h",
       "legs": [],
-      "startDate": "2026-06-11",
-      "endDate": "2026-06-11",
-      "startTime": "11:14",
-      "endTime": "12:10",
+      "fromCityId": "city-innsbruck",
+      "toCityId": "city-bolzano",
+      "journeyId": "jid_single_journey_10",
+      "journeyName": "Innsbruck to Bolzano",
+      "segmentOrder": 1,
+      "startDate": "2026-06-21",
+      "endDate": "2026-06-21",
+      "startTime": "",
+      "endTime": "",
       "fromAddress": "",
-      "toAddress": "",
-      "_inferredToLegId": "bratislava",
-      "_inferredFromLegId": "vienna"
+      "toAddress": ""
+    },
+    {
+      "id": "journey_11",
+      "legId": "bolzano",
+      "dayDate": "2026-06-22",
+      "fromLocation": "Bolzano",
+      "toLocation": "Bolzano",
+      "departureDate": "2026-06-22",
+      "departureTime": "",
+      "arrivalDate": "2026-06-22",
+      "arrivalTime": "",
+      "transportType": "bus",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "— (cable car / local bus)",
+      "legs": [],
+      "fromCityId": "city-bolzano",
+      "toCityId": "city-bolzano",
+      "journeyId": "jid_single_journey_11",
+      "journeyName": "Bolzano to Bolzano",
+      "segmentOrder": 1,
+      "startDate": "2026-06-22",
+      "endDate": "2026-06-22",
+      "startTime": "",
+      "endTime": "",
+      "fromAddress": "",
+      "toAddress": ""
+    },
+    {
+      "id": "journey_12",
+      "legId": "verona",
+      "dayDate": "2026-06-23",
+      "fromLocation": "Bolzano",
+      "toLocation": "Milan",
+      "departureDate": "2026-06-23",
+      "departureTime": "",
+      "arrivalDate": "2026-06-23",
+      "arrivalTime": "",
+      "transportType": "train",
+      "provider": "",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "🚂 Bolzano→Verona ~1.5h · Verona→Milan ~1.5h",
+      "legs": [],
+      "fromCityId": "city-bolzano",
+      "toCityId": "city-milan",
+      "journeyId": "jid_single_journey_12",
+      "journeyName": "Bolzano to Milan",
+      "segmentOrder": 1,
+      "startDate": "2026-06-23",
+      "endDate": "2026-06-23",
+      "startTime": "",
+      "endTime": "",
+      "fromAddress": "",
+      "toAddress": ""
+    },
+    {
+      "id": "journey_13",
+      "legId": "zurich",
+      "dayDate": "2026-06-25",
+      "fromLocation": "Milan",
+      "toLocation": "Zurich",
+      "departureDate": "2026-06-25",
+      "departureTime": "",
+      "arrivalDate": "2026-06-25",
+      "arrivalTime": "",
+      "transportType": "train",
+      "provider": "SBB",
+      "routeCode": "",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "notes": "🚂 SBB Eurocity ~3.5h",
+      "legs": [],
+      "fromCityId": "city-milan",
+      "toCityId": "city-zurich",
+      "journeyId": "jid_single_journey_13",
+      "journeyName": "Milan to Zurich",
+      "segmentOrder": 1,
+      "startDate": "2026-06-25",
+      "endDate": "2026-06-25",
+      "startTime": "",
+      "endTime": "",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
       "id": "journey_1779252331001_rduqbe",
@@ -4295,9 +4063,38 @@
       "startTime": "12:26",
       "endTime": "16:58",
       "fromAddress": "",
-      "toAddress": "",
-      "_inferredToLegId": "prague",
-      "_inferredFromLegId": "bratislava"
+      "toAddress": ""
+    },
+    {
+      "id": "journey_1779252564144_3v7ees",
+      "journeyId": "jid_single_journey_7",
+      "journeyName": "Prague → Nuremberg",
+      "legId": "nuremberg",
+      "dayDate": "2026-06-15",
+      "fromLocation": "Prague",
+      "toLocation": "Nuremberg",
+      "fromCityId": "city-prague",
+      "toCityId": "city-nuremberg",
+      "departureDate": "2026-06-15",
+      "departureTime": "09:10",
+      "arrivalDate": "2026-06-15",
+      "arrivalTime": "13:00",
+      "transportType": "bus",
+      "provider": "FlixBus",
+      "routeCode": "Route 084, Platform 7",
+      "status": "confirmed",
+      "cost": "36.53",
+      "bookingReference": "335 636 2705",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "notes": "🚌 FlixBus~3h 50m, Dep: Prague (Ostrovského 34/1, 150 00 Praha), Arr: Nuremberg (Ostrovského 34/1, 150 00 Praha)",
+      "legs": [],
+      "startDate": "2026-06-15",
+      "endDate": "2026-06-15",
+      "startTime": "09:10",
+      "endTime": "13:00",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
       "id": "journey_1779252705895_3up06o",
@@ -4328,9 +4125,7 @@
       "startTime": "11:01",
       "endTime": "12:12",
       "fromAddress": "",
-      "toAddress": "",
-      "_inferredToLegId": "munich",
-      "_inferredFromLegId": "nuremberg"
+      "toAddress": ""
     },
     {
       "id": "journey_1779253742104_nvhvy4",
@@ -4361,9 +4156,69 @@
       "startTime": "06:05",
       "endTime": "07:10",
       "fromAddress": "",
-      "toAddress": "",
-      "_inferredToLegId": "samui",
-      "_inferredFromLegId": "bangkok"
+      "toAddress": ""
+    },
+    {
+      "id": "journey_1779253857395_lwk9ek",
+      "journeyId": "jid_return_789",
+      "journeyName": "Koh Samui → Brisbane (via Bangkok)",
+      "legId": "return",
+      "dayDate": "2026-07-07",
+      "fromLocation": "Koh Samui",
+      "toLocation": "Bangkok",
+      "fromCityId": "city-koh-samui",
+      "toCityId": "city-bangkok",
+      "departureDate": "2026-07-07",
+      "departureTime": "07:50",
+      "arrivalDate": "2026-07-07",
+      "arrivalTime": "09:05",
+      "transportType": "flight",
+      "provider": "Bangkok Airways",
+      "routeCode": "PG102",
+      "status": "confirmed",
+      "cost": "400",
+      "bookingReference": "FQ4BHU",
+      "isMultiLeg": true,
+      "segmentOrder": 1,
+      "notes": "✈ Bangkok Air USM→BKK 07:50",
+      "legs": [],
+      "startDate": "2026-07-07",
+      "endDate": "2026-07-07",
+      "startTime": "07:50",
+      "endTime": "09:05",
+      "fromAddress": "",
+      "toAddress": ""
+    },
+    {
+      "id": "journey_1779253900785_5c7jns",
+      "journeyId": "jid_return_789",
+      "journeyName": "Koh Samui → Brisbane (via Bangkok)",
+      "legId": "return",
+      "dayDate": "2026-07-07",
+      "fromLocation": "Bangkok",
+      "toLocation": "Brisbane",
+      "fromCityId": "city-bangkok",
+      "toCityId": "city-brisbane",
+      "departureDate": "2026-07-07",
+      "departureTime": "21:40",
+      "arrivalDate": "2026-07-08",
+      "arrivalTime": "09:30",
+      "transportType": "flight",
+      "provider": "Jetstar",
+      "routeCode": "JQ 66",
+      "status": "confirmed",
+      "cost": "1850",
+      "bookingReference": "GS9QHX",
+      "isMultiLeg": true,
+      "segmentOrder": 2,
+      "notes": "✈ Jetstar BKK→BNE 21:40 - Includes meal and drink",
+      "legs": [],
+      "startDate": "2026-07-07",
+      "endDate": "2026-07-08",
+      "startTime": "21:40",
+      "endTime": "09:30",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
       "id": "journey_1779254036457_tntum2",
@@ -4394,9 +4249,7 @@
       "startTime": "18:30",
       "endTime": "19:20",
       "fromAddress": "",
-      "toAddress": "",
-      "_inferredToLegId": "leg-17799265810545900",
-      "_inferredFromLegId": "zurich"
+      "toAddress": ""
     },
     {
       "id": "journey_1778474236720_qwd9zd",
@@ -4427,239 +4280,131 @@
       "startTime": "21:35",
       "endTime": "15:30",
       "fromAddress": "",
-      "toAddress": "",
-      "_inferredToLegId": "bangkok",
-      "_inferredFromLegId": "leg-17799265810545900"
+      "toAddress": ""
     },
     {
-      "id": "journey_1779881104451_owxydr",
-      "journeyId": "jid_1779881034863_uc8k0e",
-      "journeyName": "Bangkok → Brisbane",
-      "legId": "city-bangkok-finish",
-      "dayDate": "2026-07-07",
-      "fromLocation": "Bangkok",
-      "toLocation": "Brisbane",
-      "fromCityId": "city-bangkok",
-      "toCityId": "city-brisbane",
-      "departureDate": "2026-07-07",
-      "departureTime": "21:40",
-      "arrivalDate": "2026-07-08",
-      "arrivalTime": "07:30",
+      "id": "journey_1779416037864_rnta1l",
+      "journeyId": "jid_outbound_123",
+      "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
+      "legId": "departure",
+      "dayDate": "2026-06-08",
+      "fromLocation": "Brisbane",
+      "toLocation": "Taipei",
+      "fromCityId": "city-brisbane",
+      "toCityId": "city-taipei",
+      "departureDate": "2026-06-08",
+      "departureTime": "22:15",
+      "arrivalDate": "2026-06-09",
+      "arrivalTime": "05:15",
       "transportType": "flight",
-      "provider": "",
-      "routeCode": "JQ 66",
+      "provider": "EVA Air",
+      "routeCode": "BR316",
       "status": "confirmed",
-      "cost": "1850",
-      "bookingReference": "",
-      "isMultiLeg": false,
+      "cost": "676.90",
+      "bookingReference": "B4V64X",
+      "isMultiLeg": true,
       "segmentOrder": 1,
-      "notes": "",
-      "fromAddress": "",
-      "toAddress": "",
+      "notes": "✈ EVA Air BNE→TPE 22:15",
+      "fromAddress": "Brisbane Terminal 1",
+      "toAddress": "Taiwan Terminal 2",
       "legs": [],
-      "startDate": "2026-07-07",
-      "endDate": "2026-07-08",
-      "startTime": "21:40",
-      "endTime": "07:30",
-      "_inferredFromLegId": "leg-17799265810546360ret"
+      "startDate": "2026-06-08",
+      "endDate": "2026-06-09",
+      "startTime": "22:15",
+      "endTime": "05:15"
     },
     {
-      "id": "journey_1779884038859_11oncs",
-      "journeyId": "jid_1779884009081_34sqva",
-      "journeyName": "Koh Samui → Bangkok",
-      "legId": "city-bangkok-finish",
-      "dayDate": "2026-07-07",
-      "fromLocation": "Koh Samui",
+      "id": "journey_1778474341607_iobkbm",
+      "journeyId": "jid_outbound_123",
+      "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
+      "legId": "taipei",
+      "dayDate": "2026-06-09",
+      "fromLocation": "Taipei",
       "toLocation": "Bangkok",
-      "fromCityId": "city-koh-samui",
+      "fromCityId": "city-taipei",
       "toCityId": "city-bangkok",
-      "departureDate": "2026-07-07",
-      "departureTime": "07:00",
-      "arrivalDate": "2026-07-07",
-      "arrivalTime": "08:00",
+      "departureDate": "2026-06-09",
+      "departureTime": "22:30",
+      "arrivalDate": "2026-06-10",
+      "arrivalTime": "01:10",
       "transportType": "flight",
-      "provider": "Bangkok Air",
-      "routeCode": "",
-      "status": "confirmed",
-      "cost": "400",
+      "provider": "EVA Air",
+      "routeCode": "BR061",
+      "status": "booked",
+      "cost": "0",
       "bookingReference": "",
-      "isMultiLeg": false,
-      "segmentOrder": 1,
-      "notes": "",
-      "fromAddress": "",
-      "toAddress": "",
+      "isMultiLeg": true,
+      "segmentOrder": 2,
+      "notes": "✈ EVA Air BNE→TPE 22:15",
       "legs": [],
-      "startDate": "2026-07-07",
-      "endDate": "2026-07-07",
-      "startTime": "07:00",
-      "endTime": "08:00",
-      "_inferredToLegId": "leg-17799265810546360ret",
-      "_inferredFromLegId": "samui"
+      "startDate": "2026-06-09",
+      "endDate": "2026-06-10",
+      "startTime": "22:30",
+      "endTime": "01:10",
+      "fromAddress": "",
+      "toAddress": ""
     },
     {
-      "id": "journey_1779880837955_pe6x8j",
-      "journeyId": "jid_1779880787528_xsth24",
-      "journeyName": "Verona → Milan",
-      "legId": "bolzano",
-      "dayDate": "2026-06-22",
-      "fromLocation": "Verona",
-      "toLocation": "Milan",
-      "fromCityId": "city-verona",
-      "toCityId": "city-milan",
-      "departureDate": "2026-06-22",
-      "departureTime": "12:12",
-      "arrivalDate": "2026-06-22",
-      "arrivalTime": "13:25",
+      "id": "journey_1778474359483_dqz7rz",
+      "journeyId": "jid_outbound_123",
+      "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
+      "legId": "vienna",
+      "dayDate": "2026-06-10",
+      "fromLocation": "Bangkok",
+      "toLocation": "Vienna",
+      "fromCityId": "city-bangkok",
+      "toCityId": "city-vienna",
+      "departureDate": "2026-06-10",
+      "departureTime": "02:20",
+      "arrivalDate": "2026-06-10",
+      "arrivalTime": "08:35",
+      "transportType": "flight",
+      "provider": "EVA Air",
+      "routeCode": "BR061",
+      "status": "planned",
+      "cost": "0",
+      "bookingReference": "B4V64X",
+      "isMultiLeg": true,
+      "segmentOrder": 3,
+      "notes": "✈ EVA Air TPE→VIE 22:40",
+      "legs": [],
+      "startDate": "2026-06-10",
+      "endDate": "2026-06-10",
+      "startTime": "02:20",
+      "endTime": "08:35",
+      "fromAddress": "",
+      "toAddress": ""
+    },
+    {
+      "id": "journey_1779417927293_qtv31a",
+      "journeyId": "jid_single_journey_3",
+      "journeyName": "Vienna → Bratislava",
+      "legId": "bratislava",
+      "dayDate": "2026-06-11",
+      "fromLocation": "Vienna",
+      "toLocation": "Bratislava",
+      "fromCityId": "city-vienna",
+      "toCityId": "city-bratislava",
+      "departureDate": "2026-06-11",
+      "departureTime": "11:14",
+      "arrivalDate": "2026-06-11",
+      "arrivalTime": "12:10",
       "transportType": "train",
-      "provider": "Italo",
-      "routeCode": "8978",
+      "provider": "OBB",
+      "routeCode": "REX8",
       "status": "confirmed",
-      "cost": "30.84",
-      "bookingReference": "FEP9MJ",
+      "cost": "20.09",
+      "bookingReference": "1181",
       "isMultiLeg": false,
       "segmentOrder": 1,
-      "notes": "Carriage 5, Seat 53",
-      "fromAddress": "",
-      "toAddress": "",
+      "notes": "🚂 56m, Bahnsteige 3-12~, Platform 11C-E, Wien Hbf",
+      "fromAddress": "Platform 1",
+      "toAddress": "Platform 2",
       "legs": [],
-      "startDate": "2026-06-22",
-      "endDate": "2026-06-22",
-      "startTime": "12:12",
-      "endTime": "13:25",
-      "_inferredToLegId": "milan",
-      "_inferredFromLegId": "verona"
-    },
-    {
-      "id": "journey_1779880844682_9mm2uu",
-      "journeyId": "jid_single_journey_13",
-      "journeyName": "Milan → Zurich",
-      "legId": "zurich",
-      "dayDate": "2026-06-25",
-      "fromLocation": "Milan",
-      "toLocation": "Zurich",
-      "fromCityId": "city-milan",
-      "toCityId": "city-zurich",
-      "departureDate": "2026-06-25",
-      "departureTime": "12:05",
-      "arrivalDate": "2026-06-25",
-      "arrivalTime": "15:27",
-      "transportType": "train",
-      "provider": "Trenitalia",
-      "routeCode": "Eurocity 30",
-      "status": "confirmed",
-      "cost": "60.50",
-      "bookingReference": "XAN9H5",
-      "isMultiLeg": false,
-      "segmentOrder": 1,
-      "notes": "Carriage 2, Seat 36",
-      "fromAddress": "",
-      "toAddress": "",
-      "legs": [],
-      "startDate": "2026-06-25",
-      "endDate": "2026-06-25",
-      "startTime": "12:05",
-      "endTime": "15:27",
-      "_inferredToLegId": "zurich",
-      "_inferredFromLegId": "milan"
-    },
-    {
-      "id": "journey_1779880831644_ezlx95",
-      "journeyId": "jid_single_journey_12",
-      "journeyName": "Bolzano → Verona",
-      "legId": "bolzano",
-      "dayDate": "2026-06-21",
-      "fromLocation": "Bolzano",
-      "toLocation": "Verona",
-      "fromCityId": "city-bolzano",
-      "toCityId": "city-verona",
-      "departureDate": "2026-06-21",
-      "departureTime": "14:42",
-      "arrivalDate": "2026-06-22",
-      "arrivalTime": "16:40",
-      "transportType": "train",
-      "provider": "Italo",
-      "routeCode": "8963",
-      "status": "confirmed",
-      "cost": "16.15",
-      "bookingReference": "DCGMXC",
-      "isMultiLeg": false,
-      "segmentOrder": 1,
-      "notes": "🚂 Bolzano→Verona ~1.5h · Verona→Milan ~1.5h",
-      "fromAddress": "",
-      "toAddress": "",
-      "legs": [],
-      "startDate": "2026-06-21",
-      "endDate": "2026-06-22",
-      "startTime": "14:42",
-      "endTime": "16:40",
-      "_inferredToLegId": "verona",
-      "_inferredFromLegId": "bolzano"
-    },
-    {
-      "id": "journey_1779885159223_007jbh",
-      "journeyId": "jid_single_journey_7",
-      "journeyName": "Prague → Nuremberg",
-      "legId": "nuremberg",
-      "dayDate": "2026-06-15",
-      "fromLocation": "Prague",
-      "toLocation": "Nuremberg",
-      "fromCityId": "city-prague",
-      "toCityId": "city-nuremberg",
-      "departureDate": "2026-06-15",
-      "departureTime": "09:10",
-      "arrivalDate": "2026-06-15",
-      "arrivalTime": "13:00",
-      "transportType": "bus",
-      "provider": "FlixBus",
-      "routeCode": "Route 084",
-      "status": "confirmed",
-      "cost": "36.53",
-      "bookingReference": "335 636 2705",
-      "isMultiLeg": false,
-      "segmentOrder": 1,
-      "notes": "",
-      "fromAddress": "Ostrovského 34/1, 150 00 Praha",
-      "toAddress": "",
-      "legs": [],
-      "startDate": "2026-06-15",
-      "endDate": "2026-06-15",
-      "startTime": "09:10",
-      "endTime": "13:00",
-      "_inferredToLegId": "nuremberg",
-      "_inferredFromLegId": "prague"
-    },
-    {
-      "id": "journey_1779885231014_v8mtx7",
-      "journeyId": "jid_single_journey_9",
-      "journeyName": "Munich → Bolzano",
-      "legId": "bolzano",
-      "dayDate": "2026-06-20",
-      "fromLocation": "Munich",
-      "toLocation": "Bolzano",
-      "fromCityId": "city-munich",
-      "toCityId": "city-bolzano",
-      "departureDate": "2026-06-20",
-      "departureTime": "11:23",
-      "arrivalDate": "2026-06-20",
-      "arrivalTime": "15:27",
-      "transportType": "train",
-      "provider": "ÖBB",
-      "routeCode": "RJ 85",
-      "status": "confirmed",
-      "cost": "73.91",
-      "bookingReference": "2579 9070 8186 7643",
-      "isMultiLeg": false,
-      "segmentOrder": 1,
-      "notes": "1st Class (Access DB Lounge Munich hbf)",
-      "fromAddress": "",
-      "toAddress": "",
-      "legs": [],
-      "startDate": "2026-06-20",
-      "endDate": "2026-06-20",
-      "startTime": "11:23",
-      "endTime": "15:27",
-      "_inferredToLegId": "bolzano",
-      "_inferredFromLegId": "munich"
+      "startDate": "2026-06-11",
+      "endDate": "2026-06-11",
+      "startTime": "11:14",
+      "endTime": "12:10"
     }
   ],
   "stays": [
@@ -4681,9 +4426,7 @@
       "endDate": "2026-06-11",
       "startTime": "",
       "endTime": "",
-      "location": "Schönbrunner Str. 92, 1050 Wien",
-      "done": false,
-      "_inferredLegId": "vienna"
+      "location": ""
     },
     {
       "id": "stay_1_1777289776",
@@ -4696,15 +4439,14 @@
       "provider": "Airbnb",
       "bookingRef": "HMQKDE233E",
       "totalCost": "110.60",
-      "notes": "Near Train Station - Murgašova 3131/2 2, Bratislava, Bratislavský kraj 811 04, Slovakia (Shared Apartment Room)",
+      "notes": "Near Train Station - Murgašova 3131/2 2, Bratislava, Bratislavský kraj 811 04, Slovakia",
       "checkInTime": "",
       "checkOutTime": "",
       "startDate": "2026-06-11",
       "endDate": "2026-06-13",
       "startTime": "",
       "endTime": "",
-      "location": "",
-      "_inferredLegId": "bratislava"
+      "location": "Murgašova 3131/2 2, Bratislava, Bratislavský kraj 811 04, Slovakia"
     },
     {
       "id": "stay_2_1777289776",
@@ -4717,15 +4459,14 @@
       "provider": "Qantas Hotels",
       "bookingRef": "QAJW7GXTZ",
       "totalCost": "232",
-      "notes": "Londynska 50, Prague 120 00, Czech Republic (Breakfast Included)",
+      "notes": "",
       "checkInTime": "",
       "checkOutTime": "",
       "startDate": "2026-06-13",
       "endDate": "2026-06-15",
       "startTime": "",
       "endTime": "",
-      "location": "",
-      "_inferredLegId": "prague"
+      "location": "Londynska 50, Prague 120 00, Czech Republic"
     },
     {
       "id": "stay_3_1777289776",
@@ -4745,8 +4486,7 @@
       "endDate": "2026-06-16",
       "startTime": "",
       "endTime": "",
-      "location": "",
-      "_inferredLegId": "nuremberg"
+      "location": ""
     },
     {
       "id": "stay_4_1777289776",
@@ -4766,8 +4506,7 @@
       "endDate": "2026-06-19",
       "startTime": "",
       "endTime": "",
-      "location": "",
-      "_inferredLegId": "munich"
+      "location": ""
     },
     {
       "id": "stay_5_1777289776",
@@ -4787,17 +4526,16 @@
       "endDate": "2026-06-20",
       "startTime": "",
       "endTime": "",
-      "location": "",
-      "_inferredLegId": "munich"
+      "location": ""
     },
     {
-      "id": "stay_7_1777289776",
-      "cityId": "city-bolzano",
-      "propertyName": "tbc — bolzano city centre",
+      "id": "stay_6_1777289776",
+      "cityId": "city-innsbruck",
+      "propertyName": "tbc — innsbruck old town",
       "checkIn": "2026-06-20",
       "checkOut": "2026-06-21",
       "nights": 1,
-      "status": "planned",
+      "status": "pending",
       "provider": "",
       "bookingRef": "",
       "totalCost": "0",
@@ -4808,29 +4546,47 @@
       "endDate": "2026-06-21",
       "startTime": "",
       "endTime": "",
-      "location": "",
-      "_inferredLegId": "bolzano"
+      "location": ""
     },
     {
-      "id": "stay_8_1777289776",
-      "cityId": "city-milan",
-      "propertyName": "tbc — milan city centre",
-      "checkIn": "2026-06-22",
-      "checkOut": "2026-06-25",
-      "nights": 3,
-      "status": "planned",
+      "id": "stay_7_1777289776",
+      "cityId": "city-bolzano",
+      "propertyName": "tbc — bolzano city centre",
+      "checkIn": "2026-06-21",
+      "checkOut": "2026-06-23",
+      "nights": 2,
+      "status": "pending",
       "provider": "",
       "bookingRef": "",
       "totalCost": "0",
       "notes": "",
       "checkInTime": "",
       "checkOutTime": "",
-      "startDate": "2026-06-22",
+      "startDate": "2026-06-21",
+      "endDate": "2026-06-23",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
+    },
+    {
+      "id": "stay_8_1777289776",
+      "cityId": "city-milan",
+      "propertyName": "tbc — milan city centre",
+      "checkIn": "2026-06-23",
+      "checkOut": "2026-06-25",
+      "nights": 2,
+      "status": "pending",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": "",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-06-23",
       "endDate": "2026-06-25",
       "startTime": "",
       "endTime": "",
-      "location": "",
-      "_inferredLegId": "milan"
+      "location": ""
     },
     {
       "id": "stay_10_1777289776",
@@ -4850,8 +4606,7 @@
       "endDate": "2026-06-26",
       "startTime": "",
       "endTime": "",
-      "location": "",
-      "_inferredLegId": "zurich"
+      "location": ""
     },
     {
       "id": "stay_11_1777289776",
@@ -4871,8 +4626,7 @@
       "endDate": "2026-06-29",
       "startTime": "",
       "endTime": "",
-      "location": "",
-      "_inferredLegId": "bangkok"
+      "location": ""
     },
     {
       "id": "stay_12_1777289776",
@@ -4893,27 +4647,6 @@
       "startTime": "",
       "endTime": "",
       "location": ""
-    },
-    {
-      "id": "stay_1779881215677",
-      "cityId": "city-verona",
-      "propertyName": "tbc - verona",
-      "location": "",
-      "checkIn": "2026-06-21",
-      "checkInTime": "",
-      "checkOut": "2026-06-22",
-      "checkOutTime": "",
-      "nights": 1,
-      "status": "planned",
-      "provider": "",
-      "bookingRef": "",
-      "totalCost": "0",
-      "notes": "",
-      "startDate": "2026-06-21",
-      "endDate": "2026-06-22",
-      "startTime": "",
-      "endTime": "",
-      "_inferredLegId": "verona"
     }
   ],
   "cities": [

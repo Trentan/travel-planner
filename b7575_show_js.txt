@@ -1,0 +1,114 @@
+﻿commit b7575f40ba53c7ad57aa4218d6a172123312254c
+Author: Trentan Healey <trentanh@gmail.com>
+Date:   Mon May 25 10:35:16 2026 +1000
+
+    #125 Restore desktop itinerary compact card style and spacing polish
+
+diff --git a/js/itinerary.js b/js/itinerary.js
+index cf3336a..501d51b 100644
+--- a/js/itinerary.js
++++ b/js/itinerary.js
+@@ -233,6 +233,7 @@ function renderCompactFoodQuestCard(leg, legIndex) {
+       </div>
+       <div class="mobile-surface-card-details expanded">
+         <div class="compact-food-list">${foodLines}</div>
++        ${isEditMode ? `<button class="add-btn mt-2" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>` : ''}
+       </div>
+     </article>
+   `;
+@@ -265,6 +266,7 @@ function renderCompactTipsCard(leg, legIndex) {
+       </div>
+       <div class="mobile-surface-card-details expanded">
+         ${tipsList}
++        ${isEditMode ? `<button class="add-btn mt-2" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>` : ''}
+       </div>
+     </article>
+   `;
+@@ -287,6 +289,7 @@ function renderCompactActivitiesCard(leg, legIndex) {
+       </div>
+       <div class="mobile-surface-card-details expanded">
+         <div class="compact-suggested-activity-list">${activityLines}</div>
++        ${isEditMode ? `<button class="add-btn mt-2" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>` : ''}
+       </div>
+     </article>
+   `;
+@@ -548,8 +551,12 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
+         </div>
+       `, true);
+   const details = `
+-    <div class="compact-day-grid">
+-      ${useGroupedView ? groupedBlock : timelineBlock}
++    <div class="day-planner-shell day-planner-shell-${useGroupedView ? 'grouped' : 'timeline'}">
++      <div class="day-view-panel day-view-panel-${useGroupedView ? 'grouped' : 'timeline'}">
++        <div class="compact-day-grid">
++          ${useGroupedView ? groupedBlock : timelineBlock}
++        </div>
++      </div>
+     </div>
+   `;
+ 
+@@ -1696,12 +1703,11 @@ function toggleActivitiesCardDetails(e, legId) {
+ function buildItinerary() {
+   // Check window.isCompactView for cross-module access
+   const isCompact = typeof window !== 'undefined' && window.isCompactView;
+-  if (isCompact) {
+-    if (typeof isMobileViewport === 'function' && isMobileViewport()) {
+-      buildCompactItinerary();
+-    } else {
+-      buildCompactItineraryDesktop();
+-    }
++  const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (window.innerWidth <= 768);
++  // Desktop itinerary uses compact card/chip renderer in read-only mode.
++  if (isCompact || (!isMobile && !isEditMode)) {
++    if (isMobile) buildCompactItinerary();
++    else buildCompactItineraryDesktop();
+     return;
+   }
+ 
+@@ -1799,11 +1805,11 @@ function buildItinerary() {
+     let html = `
+     <div class="leg-header" style="background:${leg.colour}" onclick="toggleLeg(this)">
+       <div class="leg-header-top">
+-        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
++        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; min-width:0;">
+           <h2 contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateData(${legIndex}, 'label', this.innerText)">${leg.label}</h2>
+           <span style="opacity:0.8; font-size:0.9rem; font-family:'DM Mono', monospace;">${dateRange}</span>
+         </div>
+-        <div style="display:flex; align-items:center; gap:10px;">
++        <div style="display:flex; align-items:center; gap:10px; margin-left:auto; flex-wrap:nowrap;">
+           <div class="hidden sm:flex shrink-0 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-full shadow-sm border border-slate-200 dark:border-slate-700 mr-2" title="Leg estimated cost">${formatCurrency(legCost)}</div>
+           <span class="${badgeClass}">${nightLabel}</span>
+           ${isEditMode ? `<button class="header-del-btn" title="Add a day to this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, 1)">+</button>` : ''}
+@@ -1827,12 +1833,12 @@ function buildItinerary() {
+       <div class="itinerary-info-panel itinerary-info-panel-tips flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+         <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">­ƒÆí Tips</h4>
+         <ul class="itinerary-panel-list tips-list space-y-2">${(leg.legTips || []).map((t, i) => `<li class="itinerary-panel-item tip-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><span class="flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateLegTip(${legIndex}, ${i}, this.innerText)">${t.text || t}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Tip" onclick="event.stopPropagation(); deleteLegTip(${legIndex}, ${i})">├ù</button></li>`).join('')}</ul>
+-        <button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>
++        ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>` : ''}
+       </div>
+       <div class="itinerary-info-panel itinerary-info-panel-food flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+         <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">­ƒìö Food Quests</h4>
+         <ul class="itinerary-panel-list food-list space-y-2">${(leg.cityFood || []).map((f, i) => `<li class="itinerary-panel-item quest-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300 group"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500 cursor-pointer shrink-0" ${f.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleFoodCompleted(event, ${legIndex}, ${i})"><span class="flex-1 outline-none transition-opacity min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateFoodText(${legIndex}, ${i}, this.innerText)" style="${f.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${f.text}</span><button class="del-btn opacity-0 group-hover:opacity-60 focus:opacity-100 transition-opacity" title="Delete Food" onclick="event.stopPropagation(); deleteFood(${legIndex}, ${i})">├ù</button></li>`).join('')}</ul>
+-        <button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>
++        ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>` : ''}
+       </div>
+       <div class="itinerary-info-panel itinerary-info-panel-activities flex flex-col min-w-0 p-4 md:p-5 border border-slate-200/80 dark:border-slate-700/80 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
+         <h4 class="itinerary-panel-title flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">­ƒôî Suggested Activities</h4>
+@@ -1854,7 +1860,7 @@ function buildItinerary() {
+       const notesMetaHtml = activity.notes ? ` ┬À <span class="sight-inline-meta-notes" title="${escapeHtmlText(activity.notes)}">­ƒÆ¼ ${escapeHtmlText(activity.notes)}</span>` : '';
+       return `<li class="${isAssigned ? 'assigned-sight' : 'draggable-sight'} activity-item flex items-start gap-2 text-[0.82rem] text-slate-600 dark:text-slate-300" ${!isAssigned ? `draggable="true" ondragstart="handleDragStart(event, ${legIndex}, 'activity', ${activityIdx})"` : ''}><button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" title="Delete" onclick="event.stopPropagation(); deleteActivity(${legIndex}, ${activityIdx})">├ù</button>${!isAssigned ? `<span class="drag-handle opacity-50 hover:opacity-100 cursor-grab shrink-0 mt-0.5" title="Drag to assign">Ôá┐</span>` : `<span class="assigned-badge shrink-0 mt-0.5 ${badgeStateClass}" title="${badgeHoverText}">${badgeIcon}</span>`}<span class="activity-emoji shrink-0 mt-0.5">${categoryEmoji}</span><div class="flex flex-col min-w-0 flex-1"><span class="break-words" style="${isCompleted ? 'text-decoration:line-through;opacity:0.6;' : ''}">${activity.title}</span><span class="sight-inline-meta text-xs text-slate-400 mt-0.5 block truncate">ÔÅ▒ ${activity.estTime} ┬À <span class="sight-inline-meta-cost">${formatCurrency(activity.estCost || 0)}</span>${notesMetaHtml}</span></div><button class="action-btn ${isAssigned ? 'action-btn-secondary' : ''} activity-assign-btn shrink-0" type="button" onclick="event.stopPropagation(); openActivityAssignModal(${legIndex}, ${activityIdx})">${isAssigned ? 'Move' : 'Assign'}</button></li>`;
+     }).join('')}</ul>
+-        <button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>
++        ${isEditMode ? `<button class="add-btn mt-3 text-left text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-50 hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>` : ''}
+       </div>
+     </div>`;
+ 
+@@ -2020,7 +2026,7 @@ ${(() => {
+                 </div>
+               `;
+             }).join('')}
+-            </div><button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>
++            </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>` : ''}
+           </div>
+ 
+           </div></div>

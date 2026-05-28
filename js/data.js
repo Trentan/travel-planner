@@ -2178,12 +2178,15 @@ function migrateDepartureReturnLegs() {
 
   const depLeg = appData.find(l => l.id === 'departure');
   if (depLeg) {
-    let toCity = 'Departure';
+    let fromCity = 'Departure';
     if (typeof window !== 'undefined' && window.journeys && Array.isArray(window.journeys)) {
-      const j = window.journeys.find(j => j.legId === 'departure' || j._inferredFromLegId === 'departure');
-      if (j && j.toLocation) toCity = j.toLocation;
+      const outbound = window.journeys.filter(j => j.legId === 'departure' || j._inferredFromLegId === 'departure');
+      if (outbound.length > 0) {
+        outbound.sort((a, b) => (Number(a.segmentOrder) || 1) - (Number(b.segmentOrder) || 1));
+        if (outbound[0].fromLocation) fromCity = outbound[0].fromLocation;
+      }
     }
-    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Departure';
+    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Departure';
     const newId = 'city-' + cleanCity.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-start';
     depLeg.id = newId;
     depLeg.label = `${cleanCity} (Trip Start)`;
@@ -2199,12 +2202,16 @@ function migrateDepartureReturnLegs() {
 
   const retLeg = appData.find(l => l.id === 'return');
   if (retLeg) {
-    let fromCity = 'Return';
+    let toCity = 'Return';
     if (typeof window !== 'undefined' && window.journeys && Array.isArray(window.journeys)) {
-      const j = window.journeys.find(j => j.legId === 'return' || j._inferredToLegId === 'return');
-      if (j && j.fromLocation) fromCity = j.fromLocation;
+      const returns = window.journeys.filter(j => j.legId === 'return' || j._inferredToLegId === 'return');
+      if (returns.length > 0) {
+        returns.sort((a, b) => (Number(a.segmentOrder) || 1) - (Number(b.segmentOrder) || 1));
+        const lastJ = returns[returns.length - 1];
+        if (lastJ.toLocation) toCity = lastJ.toLocation;
+      }
     }
-    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Return';
+    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Return';
     const newId = 'city-' + cleanCity.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-finish';
     retLeg.id = newId;
     retLeg.label = `${cleanCity} (Trip Finish)`;
