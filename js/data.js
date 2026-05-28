@@ -2172,6 +2172,53 @@ function migrateCitiesToISOFormat() {
 }
 
 // Migrate leg-level entities to include cityId
+// Migrate Departure and Return legs to City (Trip Start) and City (Trip Finish)
+function migrateDepartureReturnLegs() {
+  if (typeof appData === 'undefined' || !Array.isArray(appData)) return;
+
+  const depLeg = appData.find(l => l.id === 'departure');
+  if (depLeg) {
+    let toCity = 'Departure';
+    if (typeof window !== 'undefined' && window.journeys && Array.isArray(window.journeys)) {
+      const j = window.journeys.find(j => j.legId === 'departure' || j._inferredFromLegId === 'departure');
+      if (j && j.toLocation) toCity = j.toLocation;
+    }
+    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Departure';
+    const newId = 'city-' + cleanCity.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-start';
+    depLeg.id = newId;
+    depLeg.label = `${cleanCity} (Trip Start)`;
+    
+    if (typeof window !== 'undefined' && window.journeys && Array.isArray(window.journeys)) {
+      window.journeys.forEach(j => {
+        if (j.legId === 'departure') j.legId = newId;
+        if (j._inferredFromLegId === 'departure') j._inferredFromLegId = newId;
+        if (j._inferredToLegId === 'departure') j._inferredToLegId = newId;
+      });
+    }
+  }
+
+  const retLeg = appData.find(l => l.id === 'return');
+  if (retLeg) {
+    let fromCity = 'Return';
+    if (typeof window !== 'undefined' && window.journeys && Array.isArray(window.journeys)) {
+      const j = window.journeys.find(j => j.legId === 'return' || j._inferredToLegId === 'return');
+      if (j && j.fromLocation) fromCity = j.fromLocation;
+    }
+    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Return';
+    const newId = 'city-' + cleanCity.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-finish';
+    retLeg.id = newId;
+    retLeg.label = `${cleanCity} (Trip Finish)`;
+    
+    if (typeof window !== 'undefined' && window.journeys && Array.isArray(window.journeys)) {
+      window.journeys.forEach(j => {
+        if (j.legId === 'return') j.legId = newId;
+        if (j._inferredFromLegId === 'return') j._inferredFromLegId = newId;
+        if (j._inferredToLegId === 'return') j._inferredToLegId = newId;
+      });
+    }
+  }
+}
+
 function migrateLegCityIds() {
   appData.forEach(leg => {
     if (!leg || !Array.isArray(leg.days)) return;
@@ -2431,6 +2478,10 @@ if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title &&
   // Migrate journeys to link city IDs (if migration function exists)
   if (typeof migrateJourneyCityIds === 'function') {
     migrateJourneyCityIds();
+  }
+
+  if (typeof migrateDepartureReturnLegs === 'function') {
+    migrateDepartureReturnLegs();
   }
 
   // Migrate leg-level entities with city IDs
@@ -3287,8 +3338,6 @@ function getImportedDestinationCityNames(importedData) {
 
       (leg.days || []).forEach((day, dayIdx) => {
         if (day.from && day.to && day.from === day.to) addName(day.to);
-        if (labelName && day.to && labelName.toLowerCase() === day.to.toLowerCase()) addName(day.to);
-        if (labelName && day.from && labelName.toLowerCase() === day.from.toLowerCase()) addName(day.from);
 
         (day.accomItems || []).forEach(item => {
           if (item.cityId && cityIdToName.has(item.cityId)) addName(cityIdToName.get(item.cityId));

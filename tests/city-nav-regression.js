@@ -160,8 +160,8 @@ async function run() {
   assert(journeyMapping.blankLegIds === 0, 'Journey migration should fill blank leg IDs');
   assert(journeyMapping.londonLeg === 'zurich', 'London journey segment should map to Zurich leg');
   assert(
-    journeyMapping.outboundLegs.join(' > ') === 'departure > taipei > vienna',
-    'Outbound journey segments should map to departure, Taipei, and Vienna legs'
+    journeyMapping.outboundLegs.join(' > ') === 'brisbane > taipei > vienna',
+    'Outbound journey segments should map to Brisbane, Taipei, and Vienna legs'
   );
   assert(
     journeyMapping.zurichDay.includes('jid_zrh_bkk_456'),

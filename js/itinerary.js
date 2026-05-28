@@ -1774,8 +1774,12 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
         notes: segment.notes || journey.notes || ''
       });
       
+      const currentLegCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label || '')).toLowerCase();
+      const isArrivalToCurrent = toLoc && currentLegCity && toLoc.toLowerCase() === currentLegCity;
+      const isDepartureFromCurrent = fromLoc && currentLegCity && fromLoc.toLowerCase() === currentLegCity;
+
       // If it's an arrival to the city from another city, add the start line
-      if (isArrivalDay && fromLoc && toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase() && !items.some(i => i.type === 'arrivalBlock')) {
+      if (isArrivalDay && fromLoc && toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase() && isArrivalToCurrent && !items.some(i => i.type === 'arrivalBlock')) {
         const transType = segment.transportType || journey.transportType || 'Transport';
         const transTypeCapitalized = transType.charAt(0).toUpperCase() + transType.slice(1);
         items.push({
@@ -1789,7 +1793,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       }
       
       // If it's a departure from the city to another city, add the cutoff line
-      if (isDepartureDay && fromLoc && toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase() && !items.some(i => i.type === 'departureBlock')) {
+      if (isDepartureDay && fromLoc && toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase() && isDepartureFromCurrent && !items.some(i => i.type === 'departureBlock')) {
         const transType = segment.transportType || journey.transportType || 'Transport';
         const transTypeCapitalized = transType.charAt(0).toUpperCase() + transType.slice(1);
         items.push({
@@ -1884,7 +1888,9 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
 
   // If it is the final departure day but no journey created a departure block, create a generic one
   const isFinalDepartureDay = dayIndex === leg.days.length - 1 && day.from && day.to && day.from !== day.to;
-  if (isFinalDepartureDay && !items.some(i => i.type === 'departureBlock')) {
+  const legCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label || '')).toLowerCase();
+  const isDepartureFromCurrent2 = day.from && legCity && day.from.toLowerCase() === legCity;
+  if (isFinalDepartureDay && isDepartureFromCurrent2 && !items.some(i => i.type === 'departureBlock')) {
     items.push({
       type: 'departureBlock',
       typeLabel: 'Departure',

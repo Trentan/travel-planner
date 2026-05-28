@@ -5,8 +5,8 @@
   },
   "itinerary": [
     {
-      "id": "departure",
-      "label": "🛫 Departure",
+      "id": "city-taipei-start",
+      "label": "Taipei (Trip Start)",
       "colour": "#2C3E50",
       "cityFood": [
         {
@@ -19,8 +19,8 @@
         {
           "date": "2026-06-09",
           "day": "Tue",
-          "from": "🛫 Departure",
-          "to": "🛫 Departure",
+          "from": "Taipei (Trip Start)",
+          "to": "Taipei (Trip Start)",
           "completed": false,
           "desc": "Travel and arrival day",
           "transportItems": [
@@ -3285,8 +3285,8 @@
       "legTips": []
     },
     {
-      "id": "return",
-      "label": "🛫 Return",
+      "id": "city-bangkok-finish",
+      "label": "Bangkok (Trip Finish)",
       "colour": "#2C3E50",
       "cityFood": [
         {
@@ -3304,8 +3304,8 @@
         {
           "date": "2026-07-07",
           "day": "Tue",
-          "from": "🛫 Return",
-          "to": "🛫 Return",
+          "from": "Bangkok (Trip Finish)",
+          "to": "Bangkok (Trip Finish)",
           "completed": false,
           "desc": "Travel and arrival day",
           "transportItems": [
@@ -3340,8 +3340,8 @@
         {
           "date": "2026-07-08",
           "day": "Wed",
-          "from": "🛫 Return",
-          "to": "🛫 Return",
+          "from": "Bangkok (Trip Finish)",
+          "to": "Bangkok (Trip Finish)",
           "completed": false,
           "desc": "Exploring",
           "transportItems": [],
@@ -4136,7 +4136,7 @@
       "id": "journey_1778474416279_xl8dgk",
       "journeyId": "jid_outbound_123",
       "journeyName": "Brisbane → Vienna (via Taipei, Bangkok)",
-      "legId": "departure",
+      "legId": "city-taipei-start",
       "dayDate": "2026-06-08",
       "fromLocation": "Brisbane",
       "toLocation": "Taipei",
@@ -4435,7 +4435,7 @@
       "id": "journey_1779881104451_owxydr",
       "journeyId": "jid_1779881034863_uc8k0e",
       "journeyName": "Bangkok → Brisbane",
-      "legId": "return",
+      "legId": "city-bangkok-finish",
       "dayDate": "2026-07-07",
       "fromLocation": "Bangkok",
       "toLocation": "Brisbane",
@@ -4467,7 +4467,7 @@
       "id": "journey_1779884038859_11oncs",
       "journeyId": "jid_1779884009081_34sqva",
       "journeyName": "Koh Samui → Bangkok",
-      "legId": "return",
+      "legId": "city-bangkok-finish",
       "dayDate": "2026-07-07",
       "fromLocation": "Koh Samui",
       "toLocation": "Bangkok",

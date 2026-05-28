@@ -2311,13 +2311,15 @@ function confirmAddLeg() {
 
   let label, fromCity, toCity;
   if (legType === 'start') {
-    label = '🚀 Start';
     fromCity = 'Home';
     toCity = document.getElementById('toCitySelect')?.value || 'Home';
+    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
+    label = `${cleanCity} (Trip Start)`;
   } else if (legType === 'return') {
-    label = '🏠 Return';
     fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
     toCity = 'Home';
+    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
+    label = `${cleanCity} (Trip Finish)`;
   } else if (legType === 'travel') {
     fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
     toCity = document.getElementById('toCitySelect')?.value || '';
