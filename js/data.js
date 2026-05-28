@@ -885,11 +885,20 @@ function extractCitiesFromItinerary() {
   // Helper to add/update city
   const addCity = (cityName, sourceDate = null, source = 'itinerary') => {
     if (!cityName) return;
-    const skipList = ['Home', 'In transit', 'Between cities', 'TBC', '', 'Return', 'Departure', 'Arrival'];
-    if (skipList.some(skipName => skipName.toLowerCase() === cityName.trim().toLowerCase())) return;
 
-    // Normalize city name - remove trailing descriptions, keep main city name
-    let normalized = cityName.trim();
+    // Normalize city name - strip emojis, parentheses (like (Trip Start) or (1)), and trim
+    let normalized = cityName
+      .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')
+      .replace(/\p{Emoji}/gu, '')
+      .replace(/\s*\([^)]*\)/gu, '')
+      .replace(/[^\w\s-]/gu, '')
+      .trim();
+
+    const skipList = ['Home', 'In transit', 'Between cities', 'TBC', '', 'Return', 'Departure', 'Arrival'];
+    if (skipList.some(skipName => skipName.toLowerCase() === normalized.toLowerCase())) return;
 
     // Try to look up the city to get country info
     let existing = cityMap.get(normalized);
