@@ -1545,6 +1545,7 @@
       flex-direction: column;
       justify-content: center;
       overflow: hidden;
+      min-width: 0; /* Outer container flex-shrink safety */
     }
 
     body.mobile-app-mode .mobile-swipe-chip-eyebrow {
@@ -1552,6 +1553,7 @@
       line-height: 1.15;
       /* Prevent overflow clipping */
       min-width: 0;
+      width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -1562,6 +1564,7 @@
       line-height: 1.15;
       /* Strong text truncation for long city names */
       min-width: 0;
+      width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -1573,6 +1576,7 @@
       line-height: 1.15;
       /* Prevent overflow with soft truncation */
       min-width: 0;
+      width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -1585,9 +1589,10 @@
       padding: 0.48rem 0.58rem;
       /* Overflow strategy: grid layout with text safety */
       display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr);
       gap: 0.04rem;
       overflow: hidden;
+      min-width: 0;
     }
 
     /* Mobile modals: full-width on small screens with readable text */
