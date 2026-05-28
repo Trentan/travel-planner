@@ -3998,7 +3998,7 @@ async function generateShareLink(exportObj) {
     .replace(/\//g, '_')
     .replace(/=+$/, '');
   
-  return `${window.location.origin}${window.location.pathname}?trip=${urlSafe}`;
+  return `${window.location.origin}${window.location.pathname}#trip=${urlSafe}`;
 }
 
 async function copyShareLink() {
@@ -4023,9 +4023,24 @@ async function copyShareLink() {
 }
 
 async function checkUrlForImportedTrip() {
-  if (typeof window === 'undefined' || !window.location || !window.location.search) return;
-  const params = new URLSearchParams(window.location.search);
-  const tripBase64 = params.get('trip');
+  if (typeof window === 'undefined' || !window.location) return;
+  
+  let tripBase64 = null;
+  
+  if (window.location.search) {
+    const params = new URLSearchParams(window.location.search);
+    tripBase64 = params.get('trip');
+  }
+  
+  if (!tripBase64 && window.location.hash) {
+    const hash = window.location.hash.slice(1);
+    if (hash.startsWith('trip=')) {
+      tripBase64 = hash.slice(5);
+    } else if (hash.length > 20) {
+      tripBase64 = hash;
+    }
+  }
+  
   if (!tripBase64) return;
 
   try {
