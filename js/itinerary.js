@@ -2304,6 +2304,7 @@ function buildItinerary() {
           .replace(/[\u{2600}-\u{26FF}]/gu, '')
           .replace(/[\u{2700}-\u{27BF}]/gu, '')
           .replace(/\p{Emoji}/gu, '')
+          .replace(/\s*\([^)]*\)/gu, '')
           .replace(/[^\w\s-]/gu, '')
           .trim();
       const labelLooksTransit = /(\bto\b|via|transit|travel|flight|train|bus|→|->)/i.test(leg.label || '');

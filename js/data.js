@@ -3363,6 +3363,7 @@ function getImportedDestinationCityNames(importedData) {
       .replace(/[\u{2600}-\u{26FF}]/gu, '')
       .replace(/[\u{2700}-\u{27BF}]/gu, '')
       .replace(/\p{Emoji}/gu, '')
+      .replace(/\s*\([^)]*\)/gu, '')
       .replace(/[^\w\s-]/gu, '')
       .trim();
   };
@@ -4650,6 +4651,7 @@ async function loadImportedPayload(importedData, fileName) {
         .replace(/[\u{2600}-\u{26FF}]/gu, '')
         .replace(/[\u{2700}-\u{27BF}]/gu, '')
         .replace(/\p{Emoji}/gu, '')
+        .replace(/\s*\([^)]*\)/gu, '')
         .replace(/[^\w\s-]/gu, '')
         .trim();
 
