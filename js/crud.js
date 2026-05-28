@@ -1614,9 +1614,152 @@ function regenerateItineraryFromJourneys(linkedJourneys, legId) {
   return true;
 }
 
+function autoGenerateMissingTransitLegs(legsList) {
+  if (!window.journeys || window.journeys.length === 0) return 0;
+  
+  const sortedJourneys = window.journeys.filter(j => j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase()).sort((a,b) => {
+    const aTime = (a.departureDate||a.date||'') + 'T' + (a.departureTime||'00:00');
+    const bTime = (b.departureDate||b.date||'') + 'T' + (b.departureTime||'00:00');
+    return aTime.localeCompare(bTime);
+  });
+  const routeCities = [];
+  if (sortedJourneys.length > 0) {
+    routeCities.push(sortedJourneys[0].fromLocation);
+    sortedJourneys.forEach(j => {
+       if (routeCities[routeCities.length - 1].toLowerCase() !== j.fromLocation.toLowerCase()) {
+          routeCities.push(j.fromLocation);
+       }
+       if (routeCities[routeCities.length - 1].toLowerCase() !== j.toLocation.toLowerCase()) {
+          routeCities.push(j.toLocation);
+       }
+    });
+  }
+
+  function getBaseName(name) {
+    if (!name) return '';
+    let base = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(name) : name.replace(/[^\x00-\x7F]/g, '').trim();
+    base = base.replace(/\s*\(.*?\)$/, ''); 
+    let strippedNum = base.replace(/\s*\d+$/, '');
+    if (strippedNum.trim().length > 0) base = strippedNum;
+    return base.trim().toLowerCase();
+  }
+
+  let routeIndex = 0;
+  let i = 0;
+  let legsAdded = 0;
+
+  while (i < legsList.length - 1) {
+    const currentLeg = legsList[i];
+    const nextLeg = legsList[i + 1];
+    
+    if (currentLeg.label && currentLeg.label.includes('Departure')) { i++; continue; }
+    if (nextLeg.label && nextLeg.label.includes('Return')) break; 
+    
+    const currentBase = getBaseName(currentLeg.label);
+    const nextBase = getBaseName(nextLeg.label);
+    
+    let foundCurrent = -1;
+    for (let r = routeIndex; r < routeCities.length; r++) {
+      if (routeCities[r].toLowerCase() === currentBase) {
+        foundCurrent = r;
+        break;
+      }
+    }
+    
+    if (foundCurrent !== -1) {
+      let foundNext = -1;
+      for (let r = foundCurrent + 1; r < routeCities.length; r++) {
+        if (routeCities[r].toLowerCase() === nextBase) {
+          foundNext = r;
+          break;
+        }
+      }
+      
+      if (foundNext !== -1) {
+        const missingCount = foundNext - foundCurrent - 1;
+        if (missingCount > 0) {
+          for (let m = 0; m < missingCount; m++) {
+            const missingCity = routeCities[foundCurrent + 1 + m];
+            legsList.splice(i + 1 + m, 0, {
+              id: 'leg-' + Date.now() + Math.floor(Math.random()*1000) + m,
+              label: missingCity,
+              colour: '#808080',
+              days: []
+            });
+            legsAdded++;
+          }
+          i += missingCount;
+        }
+        routeIndex = foundNext;
+      }
+    }
+    i++;
+  }
+
+  // Check gap before Return
+  const lastLeg = legsList[legsList.length - 2];
+  if (lastLeg) {
+    const lastBase = getBaseName(lastLeg.label);
+    let foundLast = -1;
+    for (let r = routeIndex; r < routeCities.length; r++) {
+      if (routeCities[r].toLowerCase() === lastBase) {
+        foundLast = r;
+        break;
+      }
+    }
+    if (foundLast !== -1 && foundLast < routeCities.length - 2) {
+      const missingCount = routeCities.length - 2 - foundLast;
+      if (missingCount > 0) {
+        for (let m = 0; m < missingCount; m++) {
+          const missingCity = routeCities[foundLast + 1 + m];
+          legsList.splice(legsList.length - 1, 0, {
+            id: 'leg-' + Date.now() + Math.floor(Math.random()*1000) + m + 'ret',
+            label: missingCity,
+            colour: '#808080',
+            days: []
+          });
+          legsAdded++;
+        }
+      }
+    }
+  }
+
+  // Numbering phase
+  const cityCounts = {};
+  legsList.forEach(leg => {
+    if (leg.label && !leg.label.includes('Departure') && !leg.label.includes('Return')) {
+      const base = getBaseName(leg.label);
+      cityCounts[base] = (cityCounts[base] || 0) + 1;
+    }
+  });
+
+  const currentIndices = {};
+  legsList.forEach(leg => {
+    if (leg.label && !leg.label.includes('Departure') && !leg.label.includes('Return')) {
+      const base = getBaseName(leg.label);
+      if (cityCounts[base] > 1) {
+        currentIndices[base] = (currentIndices[base] || 0) + 1;
+        // Check if there's an emoji to preserve
+        const emojiMatch = leg.label.match(/^([^\x00-\x7F]+\s*)/);
+        const prefix = emojiMatch ? emojiMatch[1] : '';
+        const cleanLabel = leg.label.replace(/^([^\x00-\x7F]+\s*)/, '').replace(/\s*\(\d+\)$/, '').replace(/\s*\d+$/, '').trim();
+        leg.label = `${prefix}${cleanLabel} (${currentIndices[base]})`;
+      }
+    }
+  });
+
+  return legsAdded;
+}
+
 function syncAllLegDays() {
   if (!confirm('This will autonomously recalculate day cards for all legs based on your saved journeys and stays. Proceed?')) {
     return;
+  }
+  
+  const legsInjected = autoGenerateMissingTransitLegs(appData);
+  if (legsInjected > 0 && typeof saveAppData === 'function') {
+    // Force a render of the sidebar before continuing if it's the UI
+    if (typeof renderSidebar === 'function') renderSidebar();
   }
 
   let changesMade = 0;
@@ -1631,17 +1774,25 @@ function syncAllLegDays() {
       ? cleanCityNavLabel(rawCityName) 
       : rawCityName.replace(/[^\x00-\x7F]/g, '').trim();
       
-    const cityId = 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    // Strip trailing numbers/parentheses to support "Bangkok (1)" or "Bangkok (Transit)"
+    let baseCityName = cityName.replace(/\s*\(.*?\)$/, ''); 
+    let strippedNum = baseCityName.replace(/\s*\d+$/, '');
+    if (strippedNum.trim().length > 0) baseCityName = strippedNum;
+    baseCityName = baseCityName.trim().toLowerCase();
 
-    const legStays = (window.stays || []).filter(s => s.cityId === cityId || (s.city && s.city.toLowerCase() === cityName.toLowerCase()));
+    const cityId = 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    const baseCityId = 'city-' + baseCityName.replace(/[^a-z0-9]/g, '-');
+
+    const legStays = (window.stays || []).filter(s => s.cityId === cityId || s.cityId === baseCityId || (s.city && s.city.toLowerCase() === baseCityName));
     
     // Ignore local intra-city transport by ensuring fromLocation !== toLocation
     const arrivingJourneys = (window.journeys || []).filter(j => 
-      (j.toCityId === cityId || (j.toLocation && j.toLocation.toLowerCase() === cityName.toLowerCase())) &&
+      (j.legId === leg.id) ||
+      (!j.legId && (j.toCityId === cityId || j.toCityId === baseCityId || (j.toLocation && j.toLocation.toLowerCase() === baseCityName))) &&
       (j.fromCityId !== j.toCityId && (!j.fromLocation || !j.toLocation || j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase()))
     );
     const departingJourneys = (window.journeys || []).filter(j => 
-      (j.fromCityId === cityId || (j.fromLocation && j.fromLocation.toLowerCase() === cityName.toLowerCase())) &&
+      (j.fromCityId === cityId || j.fromCityId === baseCityId || (j.fromLocation && j.fromLocation.toLowerCase() === baseCityName)) &&
       (j.fromCityId !== j.toCityId && (!j.fromLocation || !j.toLocation || j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase()))
     );
     
