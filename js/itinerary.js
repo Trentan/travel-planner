@@ -1774,6 +1774,20 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
         notes: segment.notes || journey.notes || ''
       });
       
+      // If it's an arrival to the city from another city, add the start line
+      if (isArrivalDay && fromLoc && toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase() && !items.some(i => i.type === 'arrivalBlock')) {
+        const transType = segment.transportType || journey.transportType || 'Transport';
+        const transTypeCapitalized = transType.charAt(0).toUpperCase() + transType.slice(1);
+        items.push({
+          type: 'arrivalBlock',
+          typeLabel: 'Arrival',
+          icon: '🛬',
+          title: `Arrived in ${toLoc} - ${transTypeCapitalized} from ${fromLoc}`,
+          startTime: arrTime,
+          sortValue: getDailyTimelineItemSortValue(dayDate, arrTime, 99999)
+        });
+      }
+      
       // If it's a departure from the city to another city, add the cutoff line
       if (isDepartureDay && fromLoc && toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase() && !items.some(i => i.type === 'departureBlock')) {
         const transType = segment.transportType || journey.transportType || 'Transport';
@@ -1895,6 +1909,15 @@ function getDailyTimelineBuckets(items) {
 }
 
 function renderDailyTimelineRow(item, compact = false) {
+  if (item.type === 'arrivalBlock') {
+    return `
+      <div class="daily-timeline-arrival-block" style="grid-column: 1 / -1; background: repeating-linear-gradient(45deg, #E3F2FD 0px, #E3F2FD 10px, #BBDEFB 10px, #BBDEFB 20px); border-top: 2px solid #64B5F6; border-bottom: 2px solid #64B5F6; padding: 12px 16px; margin: 0 0 24px 0; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; position: relative;">
+         <span style="font-weight: 800; color: #1565C0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; background: rgba(255,255,255,0.7); padding: 2px 8px; border-radius: 4px;">✅ ${item.title}</span>
+         <span style="font-size: 0.7rem; color: #1565C0; font-weight: 600; text-transform: uppercase; background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px;">No activities prior to arrival</span>
+         <div style="position: absolute; top: -200px; left: 0; right: 0; bottom: 100%; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 10px, transparent 10px, transparent 20px); pointer-events: none; z-index: 10;"></div>
+      </div>
+    `;
+  }
   if (item.type === 'departureBlock') {
     return `
       <div class="daily-timeline-departure-block" style="grid-column: 1 / -1; background: repeating-linear-gradient(45deg, #FFF9C4 0px, #FFF9C4 10px, #FFF176 10px, #FFF176 20px); border-top: 2px solid #FBC02D; border-bottom: 2px solid #FBC02D; padding: 12px 16px; margin: 24px 0 0 0; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; position: relative;">
