@@ -1989,13 +1989,28 @@ function getLegStayNightCount(leg) {
   return staysData.reduce((total, stay) => {
     if (!stay) return total;
 
+    // Check chronological bounding first: if leg has specific days generated,
+    // the stay checkIn must fall within those days.
+    if (leg.days && leg.days.length > 0) {
+      const stayDate = String(stay.checkIn || '').split('T')[0];
+      const fallsWithinDays = leg.days.some(d => String(d.date) === stayDate);
+      if (!fallsWithinDays && stay.legId !== leg.id) {
+        return total;
+      }
+    }
+
     const stayCityId = String(stay.cityId || '').toLowerCase();
     const stayCityName = cleanCityNavLabel(getCityNameForNavId(stay.cityId) || stay.city || '').toLowerCase();
+    
+    // Support "Bangkok (1)" matching
+    let baseLegCityName = legCityName.replace(/\s*\(\d+\)$/, '').trim();
+    
     const matchesLegCity =
         (legCityIdNormalized && stayCityId === legCityIdNormalized) ||
+        (baseLegCityName && stayCityName === baseLegCityName) ||
         (legCityName && stayCityName === legCityName);
 
-    if (!matchesLegCity) return total;
+    if (!matchesLegCity && stay.legId !== leg.id) return total;
 
     const stayNights = Number(stay.nights) || (typeof calculateNightsBetween === 'function'
         ? calculateNightsBetween(stay.checkIn, stay.checkOut)

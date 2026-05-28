@@ -1850,13 +1850,12 @@ function syncAllLegDays() {
     
     // Ignore local intra-city transport by ensuring fromLocation !== toLocation
     const arrivingJourneys = (window.journeys || []).filter(j => 
-      (j.legId === leg.id) ||
       (j._inferredToLegId === leg.id && (j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase())) ||
-      (!j._inferredToLegId && !j.legId && (j.toCityId === cityId || (j.toLocation && getBaseNameGlobal(j.toLocation) === baseCityName)) && (j.fromCityId !== j.toCityId))
+      (!j._inferredToLegId && (j.legId === leg.id || !j.legId) && (j.toCityId === cityId || (j.toLocation && getBaseNameGlobal(j.toLocation) === baseCityName)) && (j.fromCityId !== j.toCityId))
     );
     const departingJourneys = (window.journeys || []).filter(j => 
       (j._inferredFromLegId === leg.id && (j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase())) ||
-      (!j._inferredFromLegId && (j.fromCityId === cityId || (j.fromLocation && getBaseNameGlobal(j.fromLocation) === baseCityName)) && (j.fromCityId !== j.toCityId))
+      (!j._inferredFromLegId && (j.legId === leg.id || !j.legId) && (j.fromCityId === cityId || (j.fromLocation && getBaseNameGlobal(j.fromLocation) === baseCityName)) && (j.fromCityId !== j.toCityId))
     );
     
     // Calculate precise date bounds based strictly on mapped items
