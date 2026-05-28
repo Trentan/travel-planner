@@ -3602,6 +3602,85 @@ async function exportJSON() {
   setImportedJsonWithoutWriteAccess(false);
 }
 
+function applySharePreset(presetName) {
+  const hideCosts = document.getElementById('shareHideCosts');
+  const hideRefs = document.getElementById('shareHideRefs');
+  const hideNotes = document.getElementById('shareHideNotes');
+
+  if (presetName === 'co-traveler') {
+    if (hideCosts) hideCosts.checked = false;
+    if (hideRefs) hideRefs.checked = false;
+    if (hideNotes) hideNotes.checked = false;
+  } else if (presetName === 'family') {
+    if (hideCosts) hideCosts.checked = false;
+    if (hideRefs) hideRefs.checked = true;
+    if (hideNotes) hideNotes.checked = false;
+  } else if (presetName === 'public') {
+    if (hideCosts) hideCosts.checked = true;
+    if (hideRefs) hideRefs.checked = true;
+    if (hideNotes) hideNotes.checked = false;
+  } else if (presetName === 'confidential') {
+    if (hideCosts) hideCosts.checked = true;
+    if (hideRefs) hideRefs.checked = true;
+    if (hideNotes) hideNotes.checked = true;
+  }
+
+  syncPresetHighlightingFromCheckboxes();
+  if (typeof refreshShareEmailDraft === 'function') refreshShareEmailDraft();
+}
+
+function syncPresetHighlightingFromCheckboxes() {
+  const hideCosts = document.getElementById('shareHideCosts')?.checked ?? false;
+  const hideRefs = document.getElementById('shareHideRefs')?.checked ?? false;
+  const hideNotes = document.getElementById('shareHideNotes')?.checked ?? false;
+
+  let activePreset = 'custom';
+  if (!hideCosts && !hideRefs && !hideNotes) {
+    activePreset = 'co-traveler';
+  } else if (!hideCosts && hideRefs && !hideNotes) {
+    activePreset = 'family';
+  } else if (hideCosts && hideRefs && !hideNotes) {
+    activePreset = 'public';
+  } else if (hideCosts && hideRefs && hideNotes) {
+    activePreset = 'confidential';
+  }
+
+  const presets = ['co-traveler', 'family', 'public', 'confidential', 'custom'];
+  presets.forEach(p => {
+    const btn = document.getElementById(`share-preset-${p}`);
+    if (btn) {
+      if (p === activePreset) {
+        btn.classList.add('border-teal-600');
+        btn.classList.add('dark:border-cyan-400');
+        btn.classList.add('bg-teal-50/50');
+        btn.classList.add('dark:bg-slate-800/50');
+        btn.classList.add('ring-2');
+        btn.classList.add('ring-teal-600/20');
+        btn.classList.remove('border-slate-200');
+        btn.classList.remove('dark:border-slate-700');
+        btn.classList.remove('bg-white');
+        btn.classList.remove('dark:bg-slate-900');
+      } else {
+        btn.classList.remove('border-teal-600');
+        btn.classList.remove('dark:border-cyan-400');
+        btn.classList.remove('bg-teal-50/50');
+        btn.classList.remove('dark:bg-slate-800/50');
+        btn.classList.remove('ring-2');
+        btn.classList.remove('ring-teal-600/20');
+        btn.classList.add('border-slate-200');
+        btn.classList.add('dark:border-slate-700');
+        btn.classList.add('bg-white');
+        btn.classList.add('dark:bg-slate-900');
+      }
+    }
+  });
+
+  const customBadge = document.getElementById('share-preset-custom-wrap');
+  if (customBadge) {
+    customBadge.style.display = activePreset === 'custom' ? 'flex' : 'none';
+  }
+}
+
 function getShareExportOptions() {
   return {
     redactCosts: document.getElementById('shareHideCosts')?.checked ?? false,
@@ -3613,6 +3692,7 @@ function getShareExportOptions() {
 function openShareExportDialog() {
   const modal = document.getElementById('share-export-modal');
   if (modal) modal.style.display = 'flex';
+  syncPresetHighlightingFromCheckboxes();
   if (typeof refreshShareEmailDraft === 'function') refreshShareEmailDraft();
 }
 
