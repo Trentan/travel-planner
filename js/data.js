@@ -2195,7 +2195,19 @@ function migrateDepartureReturnLegs() {
       candidateIds.has(j.legId) || candidateIds.has(j._inferredFromLegId)
     );
     if (outbound.length > 0) {
-      outbound.sort((a, b) => (Number(a.segmentOrder) || 1) - (Number(b.segmentOrder) || 1));
+      outbound.sort((a, b) => {
+        const orderA = Number(a.segmentOrder) || 1;
+        const orderB = Number(b.segmentOrder) || 1;
+        if (orderA !== orderB) return orderA - orderB;
+
+        const dateA = a.departureDate || a.dayDate || '';
+        const dateB = b.departureDate || b.dayDate || '';
+        if (dateA !== dateB) return dateA.localeCompare(dateB);
+
+        const timeA = a.departureTime || '';
+        const timeB = b.departureTime || '';
+        return timeA.localeCompare(timeB);
+      });
       if (outbound[0].fromLocation) fromCity = outbound[0].fromLocation;
     }
 
@@ -2228,7 +2240,19 @@ function migrateDepartureReturnLegs() {
       candidateIds.has(j.legId) || candidateIds.has(j._inferredToLegId)
     );
     if (returns.length > 0) {
-      returns.sort((a, b) => (Number(a.segmentOrder) || 1) - (Number(b.segmentOrder) || 1));
+      returns.sort((a, b) => {
+        const orderA = Number(a.segmentOrder) || 1;
+        const orderB = Number(b.segmentOrder) || 1;
+        if (orderA !== orderB) return orderA - orderB;
+
+        const dateA = a.departureDate || a.dayDate || '';
+        const dateB = b.departureDate || b.dayDate || '';
+        if (dateA !== dateB) return dateA.localeCompare(dateB);
+
+        const timeA = a.departureTime || '';
+        const timeB = b.departureTime || '';
+        return timeA.localeCompare(timeB);
+      });
       const lastJ = returns[returns.length - 1];
       if (lastJ.toLocation) toCity = lastJ.toLocation;
     }

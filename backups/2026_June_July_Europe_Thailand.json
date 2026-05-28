@@ -6,7 +6,7 @@
   "itinerary": [
     {
       "id": "city-brisbane-start",
-      "label": "Brisbane (Trip Start)",
+      "label": "Brisbane (Trip Start) (1)",
       "colour": "#2C3E50",
       "cityFood": [
         {
@@ -19,10 +19,10 @@
         {
           "date": "2026-06-08",
           "day": "Mon",
-          "from": "Brisbane (Trip Start)",
-          "to": "Brisbane (Trip Start)",
+          "from": "Brisbane (Trip Start) (1)",
+          "to": "Taipei",
           "completed": false,
-          "desc": "Depart Brisbane",
+          "desc": "Depart for Taipei via EVA Air",
           "transportItems": [
             {
               "text": "Add transport...",
@@ -3355,8 +3355,8 @@
       "legTips": []
     },
     {
-      "id": "city-bangkok-finish",
-      "label": "Bangkok (Trip Finish)",
+      "id": "city-brisbane-finish",
+      "label": "Brisbane (Trip Finish) (2)",
       "colour": "#2C3E50",
       "cityFood": [
         {
@@ -3372,48 +3372,12 @@
       ],
       "days": [
         {
-          "date": "2026-07-07",
-          "day": "Tue",
-          "from": "Bangkok (Trip Finish)",
-          "to": "Bangkok (Trip Finish)",
-          "completed": false,
-          "desc": "Fly home via Bangkok",
-          "transportItems": [
-            {
-              "text": "Add transport...",
-              "cost": "0"
-            }
-          ],
-          "accomItems": [
-            {
-              "text": "— (transit)",
-              "cost": "0",
-              "status": "pending",
-              "bookingRef": "",
-              "cityId": "city-bangkok"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "🛫 USM 07:50 → BKK 08:55",
-              "cost": "0",
-              "done": false,
-              "time": "1 hr",
-              "cityId": "city-bangkok",
-              "startDate": "2026-07-07",
-              "endDate": "2026-07-07",
-              "startTime": "",
-              "endTime": ""
-            }
-          ]
-        },
-        {
           "date": "2026-07-08",
           "day": "Wed",
-          "from": "Bangkok (Trip Finish)",
-          "to": "Bangkok (Trip Finish)",
+          "from": "Bangkok",
+          "to": "Brisbane (Trip Finish) (2)",
           "completed": false,
-          "desc": "Home! 🏠",
+          "desc": "Arrive from Bangkok",
           "transportItems": [],
           "accomItems": [
             {
@@ -3527,7 +3491,7 @@
           "estCost": "0",
           "notes": "",
           "location": "",
-          "assignedDayIdx": 1,
+          "assignedDayIdx": 0,
           "assignedDate": "2026-07-08",
           "startDate": "2026-07-08",
           "startTime": "",
@@ -4233,7 +4197,8 @@
       "done": false,
       "fromAddress": "",
       "toAddress": "",
-      "_inferredToLegId": "taipei"
+      "_inferredToLegId": "taipei",
+      "_inferredFromLegId": "city-brisbane-start"
     },
     {
       "id": "journey_1778474341607_iobkbm",
@@ -4505,7 +4470,7 @@
       "id": "journey_1779881104451_owxydr",
       "journeyId": "jid_1779881034863_uc8k0e",
       "journeyName": "Bangkok → Brisbane",
-      "legId": "city-bangkok-finish",
+      "legId": "city-brisbane-finish",
       "dayDate": "2026-07-07",
       "fromLocation": "Bangkok",
       "toLocation": "Brisbane",
@@ -4531,13 +4496,14 @@
       "endDate": "2026-07-08",
       "startTime": "21:40",
       "endTime": "07:30",
-      "_inferredFromLegId": "leg-17799424099399850ret"
+      "_inferredFromLegId": "leg-17799424099399850ret",
+      "_inferredToLegId": "city-brisbane-finish"
     },
     {
       "id": "journey_1779884038859_11oncs",
       "journeyId": "jid_1779884009081_34sqva",
       "journeyName": "Koh Samui → Bangkok",
-      "legId": "city-bangkok-finish",
+      "legId": "city-brisbane-finish",
       "dayDate": "2026-07-07",
       "fromLocation": "Koh Samui",
       "toLocation": "Bangkok",

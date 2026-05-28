@@ -2668,6 +2668,7 @@ function cleanCityNavLabel(value) {
       .replace(/[\u{2600}-\u{26FF}]/gu, '')
       .replace(/[\u{2700}-\u{27BF}]/gu, '')
       .replace(/\p{Emoji}/gu, '')
+      .replace(/\s*\([^)]*\)/gu, '')
       .replace(/[^\w\s-]/gu, '')
       .trim();
 }
@@ -2678,7 +2679,13 @@ function shouldSkipCityNavName(cityName) {
 
 function getCityByName(cityName) {
   if (!cityName || !Array.isArray(citiesData)) return null;
-  return citiesData.find(c => (c.name || '').toLowerCase() === cityName.trim().toLowerCase()) || null;
+  const normalize = (val) => String(val || '')
+    .replace(/\s*\(trip start\)/gi, '')
+    .replace(/\s*\(trip finish\)/gi, '')
+    .replace(/\s*\(trip end\)/gi, '')
+    .trim().toLowerCase();
+  const target = normalize(cityName);
+  return citiesData.find(c => normalize(c.name) === target) || null;
 }
 
 function getCityNameForNavId(cityId) {
@@ -2873,7 +2880,7 @@ function getCitiesInTravelOrder() {
   }
 
   getCityStayCandidates().forEach(candidate => {
-    addMissingCityOrderCandidate(orderMap, candidate.cityName, candidate.score, candidate.sourceRank, candidate.weight);
+    addCityOrderCandidate(orderMap, candidate.cityName, candidate.score, candidate.sourceRank, candidate.weight);
   });
 
   return citiesData
