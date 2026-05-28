@@ -3800,6 +3800,146 @@ async function copyShareEmailDraft() {
   }
 }
 
+async function compressStringToGzipBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  const cs = new CompressionStream('gzip');
+  const writer = cs.writable.getWriter();
+  writer.write(bytes);
+  writer.close();
+  
+  const chunks = [];
+  const reader = cs.readable.getReader();
+  while (true) {
+    const { value, done } = await reader.read();
+    if (value) chunks.push(value);
+    if (done) break;
+  }
+  
+  const totalLength = chunks.reduce((acc, c) => acc + c.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const c of chunks) {
+    result.set(c, offset);
+    offset += c.length;
+  }
+  
+  return btoa(String.fromCharCode(...result));
+}
+
+async function decompressGzipBase64ToString(base64) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array([...binary].map(c => c.charCodeAt(0)));
+  
+  const ds = new DecompressionStream('gzip');
+  const writer = ds.writable.getWriter();
+  writer.write(bytes);
+  writer.close();
+  
+  const chunks = [];
+  const reader = ds.readable.getReader();
+  while (true) {
+    const { value, done } = await reader.read();
+    if (value) chunks.push(value);
+    if (done) break;
+  }
+  
+  const totalLength = chunks.reduce((acc, c) => acc + c.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const c of chunks) {
+    result.set(c, offset);
+    offset += c.length;
+  }
+  
+  return new TextDecoder().decode(result);
+}
+
+async function generateShareLink(exportObj) {
+  const jsonStr = JSON.stringify(exportObj);
+  const compressedBase64 = await compressStringToGzipBase64(jsonStr);
+  const urlSafe = compressedBase64
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+  
+  return `${window.location.origin}${window.location.pathname}?trip=${urlSafe}`;
+}
+
+async function copyShareLink() {
+  const exportObj = redactShareExportPayload(buildExportPayload(), getShareExportOptions());
+  try {
+    const shareLink = await generateShareLink(exportObj);
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(shareLink);
+    } else {
+      const tempInput = document.createElement('input');
+      tempInput.value = shareLink;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      tempInput.remove();
+    }
+    alert('Share link copied to clipboard successfully!');
+  } catch (error) {
+    console.error('Failed to generate/copy share link:', error);
+    alert('Failed to generate share link. Please try standard download or email export.');
+  }
+}
+
+async function checkUrlForImportedTrip() {
+  if (typeof window === 'undefined' || !window.location || !window.location.search) return;
+  const params = new URLSearchParams(window.location.search);
+  const tripBase64 = params.get('trip');
+  if (!tripBase64) return;
+
+  try {
+    let base64 = tripBase64.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) {
+      base64 += '=';
+    }
+    
+    const jsonStr = await decompressGzipBase64ToString(base64);
+    const importedData = JSON.parse(jsonStr);
+    
+    if (typeof loadImportedData === 'function') {
+      loadImportedData(importedData, 'URL Shared Trip');
+    } else if (typeof handleImportedPayload === 'function') {
+      handleImportedPayload(importedData);
+    } else {
+      if (importedData.meta) titleData = importedData.meta;
+      if (importedData.itinerary) appData = importedData.itinerary;
+      if (importedData.packing) packingData = importedData.packing;
+      if (importedData.leaveHome) leaveHomeData = importedData.leaveHome;
+      if (importedData.journeys) journeys = importedData.journeys;
+      if (importedData.stays) stays = importedData.stays;
+      if (importedData.cities) citiesData = importedData.cities;
+      if (importedData.userCities) userCities = importedData.userCities;
+      if (importedData.userCountries) userCountries = importedData.userCountries;
+      
+      if (typeof saveData === 'function') await saveData(true);
+      if (typeof syncResponsiveUi === 'function') syncResponsiveUi();
+      if (typeof renderAllViews === 'function') renderAllViews();
+    }
+    
+    alert('🌍 Shared Travel Planner itinerary loaded successfully!');
+    window.history.replaceState({}, document.title, window.location.pathname);
+  } catch (err) {
+    console.error("Failed to decode share link:", err);
+    alert('⚠️ Failed to load the shared trip link. The URL might be incomplete or corrupted.');
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    checkUrlForImportedTrip();
+  }, 150);
+});
+
+window.applySharePreset = applySharePreset;
+window.copyShareLink = copyShareLink;
+window.checkUrlForImportedTrip = checkUrlForImportedTrip;
+
+
 async function exportShareJSON() {
   const previousSuppress = window.__suppressBackupTracking;
   window.__suppressBackupTracking = true;

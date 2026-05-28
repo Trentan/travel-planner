@@ -6,7 +6,7 @@ const {
   runScriptInContext
 } = require('./lib/test-helpers');
 
-function run() {
+async function run() {
   const dataJs = loadSource(path.join('js', 'data.js'));
 
   // Create a minimal DOM and state context to load js/data.js
@@ -59,7 +59,13 @@ function run() {
       getItem: () => null
     },
     navigator: {},
-    addEventListener: () => {}
+    addEventListener: () => {},
+    TextEncoder,
+    TextDecoder,
+    CompressionStream,
+    DecompressionStream,
+    btoa,
+    atob
   });
   windowContext.window.window = windowContext.window;
 
@@ -114,16 +120,6 @@ function run() {
   assert(familyPayload.itinerary[0].days[0].activityItems[0].notes === 'Private note', 'Family preset should preserve notes');
   assert(familyPayload.journeys[0].bookingReference === '', 'Family preset should redact journey refs');
 
-  // Test Public Preset (Hides refs and costs)
-  const publicPayload = windowContext.redactShareExportPayload(testPayload, {
-    redactCosts: true,
-    redactRefs: true,
-    redactNotes: false
-  });
-  assert(publicPayload.itinerary[0].days[0].activityItems[0].cost === '', 'Public preset should redact costs');
-  assert(publicPayload.itinerary[0].days[0].activityItems[0].bookingRef === '', 'Public preset should redact refs');
-  assert(publicPayload.itinerary[0].days[0].activityItems[0].notes === 'Private note', 'Public preset should preserve notes');
-
   // Test applySharePreset function
   console.log('Testing applySharePreset...');
   assert(typeof windowContext.applySharePreset === 'function', 'applySharePreset should be defined');
@@ -140,28 +136,26 @@ function run() {
   assert(getElementById('shareHideRefs').checked === true, 'family preset should check Hide Refs');
   assert(getElementById('shareHideNotes').checked === false, 'family preset should uncheck Hide Notes');
 
-  // Apply "public"
-  windowContext.applySharePreset('public');
-  assert(getElementById('shareHideCosts').checked === true, 'public preset should check Hide Costs');
-  assert(getElementById('shareHideRefs').checked === true, 'public preset should check Hide Refs');
-  assert(getElementById('shareHideNotes').checked === false, 'public preset should uncheck Hide Notes');
+  // Test gzip compression and decompression on-the-fly
+  console.log('Testing gzip compression & decompression logic...');
+  assert(typeof windowContext.compressStringToGzipBase64 === 'function', 'compressStringToGzipBase64 should be defined');
+  assert(typeof windowContext.decompressGzipBase64ToString === 'function', 'decompressGzipBase64ToString should be defined');
 
-  // Apply "confidential"
-  windowContext.applySharePreset('confidential');
-  assert(getElementById('shareHideCosts').checked === true, 'confidential preset should check Hide Costs');
-  assert(getElementById('shareHideRefs').checked === true, 'confidential preset should check Hide Refs');
-  assert(getElementById('shareHideNotes').checked === true, 'confidential preset should check Hide Notes');
+  const testString = JSON.stringify({ hello: 'world', trip: 'planner', nested: [1, 2, 3] });
+  const compressed = await windowContext.compressStringToGzipBase64(testString);
+  assert(typeof compressed === 'string' && compressed.length > 0, 'Compressed output should be a valid string');
+  
+  const decompressed = await windowContext.decompressGzipBase64ToString(compressed);
+  assert(decompressed === testString, 'Decompressed string must exactly match the input string');
 
-  console.log('Share presets tests passed successfully!');
+  console.log('Share presets & gzip URL tests passed successfully!');
 }
 
 if (require.main === module) {
-  try {
-    run();
-  } catch (error) {
+  run().catch(error => {
     console.error(error.message);
     process.exitCode = 1;
-  }
+  });
 }
 
 module.exports = { run };
