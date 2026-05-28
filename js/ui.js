@@ -10,7 +10,7 @@ let isMobileMenuOpen = false;
 let lastViewportWasMobile = null;
 let itineraryDayViewMode = 'timeline';
 let showMoneyFigures = true;
-let currentTheme = 'system';
+let currentTheme = 'light';
 
 function isMobileViewport() {
   return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
@@ -208,7 +208,7 @@ function applyTheme(theme = null) {
     } catch (e) {
       savedSettings = null;
     }
-    currentTheme = (savedSettings && savedSettings.theme) || 'system';
+    currentTheme = (savedSettings && savedSettings.theme) || 'light';
   }
 
   let effectiveTheme = currentTheme;
@@ -261,7 +261,7 @@ function applyUiSettings() {
     isEditMode = savedSettings.isEditMode !== false;
     itineraryDayViewMode = savedSettings.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
     showMoneyFigures = savedSettings.showMoneyFigures !== false;
-    currentTheme = savedSettings.theme || 'system';
+    currentTheme = savedSettings.theme || 'light';
   }
 
   // Compact view is now viewport-driven (applied in syncResponsiveUi)
@@ -723,3 +723,12 @@ window.addEventListener('scroll', () => {
   }
   cityNavLastScrollY = currentScrollY;
 }, { passive: true });
+
+// Close Actions menu on click away
+document.addEventListener('click', event => {
+  const menu = document.getElementById('desktopActionsMenu');
+  if (menu && menu.open && !menu.contains(event.target)) {
+    menu.open = false;
+  }
+});
+
