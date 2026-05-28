@@ -12,6 +12,9 @@ async function deleteActivity(legIdx, activityIdx) {
   const activity = leg?.suggestedActivities?.[activityIdx];
   if (!leg || !activity) return;
 
+  const emojiRe = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}\u{FE0F}\s]+/gu;
+  const normalize = t => String(t || '').trim().replace(emojiRe, '').trim().toLowerCase();
+
   // If scheduled on a day, remove matching day activity row as well.
   const assignedDayIdx = activity.assignedDayIdx;
   if (assignedDayIdx !== null && assignedDayIdx !== undefined && leg.days?.[assignedDayIdx]) {
@@ -21,7 +24,16 @@ async function deleteActivity(legIdx, activityIdx) {
         ? getSuggestedActivityMatchTexts(activity).map(t => String(t || '').trim())
         : [String(activity.title || '').trim()];
       const matchSet = new Set(matchTexts.filter(Boolean));
-      day.activityItems = day.activityItems.filter(item => !matchSet.has(String(item?.text || '').trim()));
+      const normalizedMatchSet = new Set(matchTexts.map(normalize).filter(Boolean));
+
+      day.activityItems = day.activityItems.filter(item => {
+        const itemText = String(item?.text || '').trim();
+        // Exact match
+        if (matchSet.has(itemText)) return false;
+        // Normalized match (strip emojis, case-insensitive)
+        if (normalizedMatchSet.has(normalize(itemText))) return false;
+        return true;
+      });
     }
   }
 
@@ -593,10 +605,10 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
 
   const deleteBtn = document.getElementById('activityAssignDeleteBtn');
   if (deleteBtn) {
-    deleteBtn.onclick = () => {
+    deleteBtn.onclick = async () => {
       if (confirm('Are you sure you want to delete this activity?')) {
-        deleteActivity(legIdx, activityIdx);
         closeModal();
+        await deleteActivity(legIdx, activityIdx);
       }
     };
   }
