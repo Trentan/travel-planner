@@ -629,7 +629,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     return lines;
   }).join('');
 
-  const accomLines = dayStayInfo.map(info => {
+  let accomLines = dayStayInfo.map(info => {
     const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
     const mainLine = renderCompactEmojiLine({
       emoji: '🏨',
@@ -649,6 +649,13 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     const notesHtml = info.notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(info.notes)}</div>` : '';
     return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); openEditStayModal('${info.stayId}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
+
+  if (!accomLines) {
+    const isLastDay = dayIdx === (leg.days ? leg.days.length - 1 : 0);
+    if (!isLastDay) {
+       accomLines = `<div class="compact-grouped-item" style="background-color: #FFFBEB; border-color: #FDE68A; color: #D97706; padding: 6px 10px; font-size: 0.75rem; font-weight: 600;">⚠️ Accommodation needed</div>`;
+    }
+  }
 
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
@@ -2512,6 +2519,16 @@ function buildItinerary() {
 <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Accommodation</h4><div class="item-list space-y-2">
 ${(() => {
         const dayStayInfo = getStayDisplayForDay(day.date, day.to);
+        if (dayStayInfo.length === 0) {
+          const isLastDay = dayIndex === (leg.days ? leg.days.length - 1 : 0);
+          if (!isLastDay) {
+            return `<div class="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-500 text-sm rounded border border-amber-200 dark:border-amber-800/50 font-medium flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                Accommodation needed for tonight
+            </div>`;
+          }
+          return '';
+        }
         return dayStayInfo.map(info => {
           const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
           const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
