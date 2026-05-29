@@ -556,7 +556,50 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
     });
   }
 
-  modeInputs.forEach(input => input.addEventListener('change', syncScheduleControls));
+  const syncTimeAndDayFromMode = () => {
+    const selectedMode = modeInputs.find(input => input.checked)?.value || 'suggested';
+    let activeDayBtn = modal.querySelector('.activity-assign-day.is-current');
+    if (!activeDayBtn) {
+      activeDayBtn = modal.querySelector('.activity-assign-day');
+      if (activeDayBtn && selectedMode !== 'anytime') {
+        activeDayBtn.classList.add('is-current');
+        activeDayBtn.setAttribute('aria-pressed', 'true');
+        const dayLabel = activeDayBtn.querySelector('.activity-assign-day-date')?.textContent || 'Day';
+        const currentAssignmentText = modal.querySelector('.activity-assign-current strong');
+        if (currentAssignmentText) currentAssignmentText.textContent = dayLabel;
+      }
+    }
+
+    if (activeDayBtn) {
+      if (selectedMode === 'suggested' || selectedMode === 'scheduled') {
+        const suggestStart = activeDayBtn.getAttribute('data-suggest-start') || '';
+        const suggestEnd = activeDayBtn.getAttribute('data-suggest-end') || '';
+        if (startInput) startInput.value = suggestStart;
+        if (endInput) endInput.value = suggestEnd;
+        syncSelectsFromInputs();
+      } else if (selectedMode === 'anytime') {
+        if (startInput) startInput.value = '';
+        if (endInput) endInput.value = '';
+        const sh = document.getElementById('activityStartHour');
+        const sm = document.getElementById('activityStartMinute');
+        const sa = document.getElementById('activityStartAmpm');
+        const eh = document.getElementById('activityEndHour');
+        const em = document.getElementById('activityEndMinute');
+        const ea = document.getElementById('activityEndAmpm');
+        if (sh) sh.value = '12';
+        if (sm) sm.value = '00';
+        if (sa) sa.value = 'AM';
+        if (eh) eh.value = '12';
+        if (em) em.value = '00';
+        if (ea) ea.value = 'AM';
+      }
+    }
+  };
+
+  modeInputs.forEach(input => input.addEventListener('change', () => {
+    syncScheduleControls();
+    syncTimeAndDayFromMode();
+  }));
 
   const updateEndTimeFromDuration = () => {
     const startVal = getSelectedTimeValue('activityStartHour', 'activityStartMinute', 'activityStartAmpm');
