@@ -42,6 +42,32 @@ function escapeCompactText(text) {
       .replace(/'/g, '&#39;');
 }
 
+function getActivityStatusBadgeHtml(status, clickHandlerCall = '') {
+  const normStatus = status || 'planned';
+  let bgColor = '#E67E22'; // Orange/Amber
+  let label = 'Planned';
+  let icon = '⧗';
+
+  if (normStatus === 'confirmed') {
+    bgColor = '#27AE60'; // Green
+    label = 'Confirmed';
+    icon = '✓';
+  } else if (normStatus === 'booked') {
+    bgColor = '#2980B9'; // Blue
+    label = 'Booked';
+    icon = '✓';
+  } else if (normStatus === 'cancelled') {
+    bgColor = '#E74C3C'; // Red
+    label = 'Cancelled';
+    icon = '✖';
+  }
+
+  const cursorClass = clickHandlerCall ? 'cursor-pointer hover:opacity-80' : '';
+  const onClickAttr = clickHandlerCall ? ` onclick="${clickHandlerCall}"` : '';
+
+  return `<span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white ${cursorClass}" style="background-color:${bgColor}; display: inline-flex; align-items: center; gap: 4px;"${onClickAttr}>${icon} ${label}</span>`;
+}
+
 function focusCompactInlineEditable(selector) {
   const el = typeof document !== 'undefined' ? document.querySelector(selector) : null;
   if (!el) return;
@@ -1902,7 +1928,8 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       dayIndex,
       itemIndex,
       sortValue: getDailyTimelineItemSortValue(dayDate, item.startTime, 4000 + itemIndex),
-      actionHtml: ''
+      actionHtml: '',
+      status: item.status || 'planned'
     });
   });
 
@@ -1988,6 +2015,12 @@ function renderDailyTimelineRow(item, compact = false) {
     checkboxHtml = `<label class="daily-timeline-checkbox-wrapper" onclick="event.stopPropagation();"><input type="checkbox" class="daily-timeline-checkbox stay-checkbox" ${item.done ? 'checked' : ''} onchange="toggleStayCompleted(event, '${item.stayId}')"></label>`;
   }
 
+  let badgeHtml = '';
+  if (item.type === 'activity') {
+    const clickHandler = isEditMode ? `event.stopPropagation(); toggleActivityStatus(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex});` : '';
+    badgeHtml = getActivityStatusBadgeHtml(item.status, clickHandler);
+  }
+
   return `
     <div class="daily-timeline-item daily-timeline-item-${escapeCompactText(item.type)} ${item.done ? 'is-done' : ''}">
       <div class="${timeClass}"${timeOnClick}>${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
@@ -1995,8 +2028,9 @@ function renderDailyTimelineRow(item, compact = false) {
       <div class="daily-timeline-content">
         <div class="daily-timeline-title-row">
           <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
-          <div class="daily-timeline-title-and-checkbox">
+          <div class="daily-timeline-title-and-checkbox" style="display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
+            ${badgeHtml}
           </div>
           ${checkboxHtml ? `<div class="daily-timeline-inline-check">${checkboxHtml}</div>` : ''}
         </div>
@@ -2436,6 +2470,7 @@ function buildItinerary() {
         <span class="compact-suggested-activity-emoji">${categoryEmoji}</span>
         <span class="compact-suggested-activity-text flex-1 outline-none min-w-0 break-words" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'title', this.innerText)" style="${isCompleted ? 'text-decoration:line-through;opacity:0.6;' : ''}">${escapeCompactText(activity.title)}</span>
         <span class="compact-suggested-activity-meta">
+          ${getActivityStatusBadgeHtml(activity.status, isEditMode ? `event.stopPropagation(); toggleSuggestedActivityStatus(event, ${legIndex}, ${activityIdx});` : '')}
           ${activity.estTime ? `<span class="compact-suggested-activity-time outline-none" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'estTime', this.innerText)">⏱️ ${escapeCompactText(activity.estTime)}</span>` : ''}
           ${activity.estCost ? `<span class="compact-suggested-activity-cost outline-none" contenteditable="${isEditMode}" onblur="updateSightPool(${legIndex}, ${activityIdx}, 'estCost', this.innerText)">$${escapeCompactText(activity.estCost)}</span>` : ''}
         </span>
@@ -2612,11 +2647,14 @@ ${(() => {
                     ${locHtml}
                     ${notesHtml}
                   </div>
-                  ${isEditMode
-                    ? `<span class="budget-field budget-field--clickable text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors cursor-pointer text-xs font-mono" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">⏱️ <span>${item.time || '1 hr'}</span></span>`
-                    : `<span class="budget-field text-slate-500 text-xs font-mono">⏱️ <span>${item.time || '1 hr'}</span></span>`
-                  }
-                  <span class="budget-field text-slate-600 dark:text-slate-400 font-mono text-sm mt-1">$<span class="outline-none" contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span>
+                  <div class="cost-item-actions flex flex-col items-end gap-1.5 shrink-0">
+                    ${getActivityStatusBadgeHtml(item.status, isEditMode ? `event.stopPropagation(); toggleActivityStatus(event, ${legIndex}, ${dayIndex}, ${i});` : '')}
+                    ${isEditMode
+                      ? `<span class="budget-field budget-field--clickable text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors cursor-pointer text-xs font-mono" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">⏱️ <span>${item.time || '1 hr'}</span></span>`
+                      : `<span class="budget-field text-slate-500 text-xs font-mono">⏱️ <span>${item.time || '1 hr'}</span></span>`
+                    }
+                    <span class="budget-field text-slate-600 dark:text-slate-400 font-mono text-sm mt-1">$<span class="outline-none" contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span>
+                  </div>
                 </div>
               `;
             }).join('')}
