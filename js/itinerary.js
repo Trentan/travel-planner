@@ -2113,7 +2113,7 @@ function renderDailyTimelineRow(item, compact = false) {
     if (item.subLocations) {
       const cleanLoc = String(item.subLocations).replace(/^Location:\s*/i, '').trim();
       if (cleanLoc) {
-        parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 ${escapeCompactText(cleanLoc)}</span>`);
+        parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="\${getMapSearchUrl(cleanLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">\${escapeCompactText(cleanLoc)}</a></span>`);
       }
     }
 
@@ -2152,7 +2152,7 @@ function renderDailyTimelineRow(item, compact = false) {
     if (item.subLocations) {
       const cleanLoc = String(item.subLocations).replace(/^Location:\s*/i, '').trim();
       if (cleanLoc) {
-        parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 ${escapeCompactText(cleanLoc)}</span>`);
+        parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="\${getMapSearchUrl(cleanLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">\${escapeCompactText(cleanLoc)}</a></span>`);
       }
     }
 
