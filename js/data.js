@@ -2908,6 +2908,20 @@ function normalizeTripLegsData(legs) {
               act.location = resolvedLoc;
             }
           }
+
+          // Bidirectional sync for status
+          if (item.status && !act.status) {
+            act.status = item.status;
+          } else if (act.status && !item.status) {
+            item.status = act.status;
+          }
+
+          // Bidirectional sync for bookingRef
+          if (item.bookingRef && !act.bookingRef) {
+            act.bookingRef = item.bookingRef;
+          } else if (act.bookingRef && !item.bookingRef) {
+            item.bookingRef = act.bookingRef;
+          }
           
           usedSuggestionIndices.add(matchIdx);
         } else {
@@ -2939,6 +2953,8 @@ function normalizeTripLegsData(legs) {
             estCost: item.cost || '0',
             notes: item.notes || '',
             location: resolvedLoc,
+            status: item.status || '',
+            bookingRef: item.bookingRef || '',
             assignedDayIdx: dayIdx,
             assignedDate: day.date || '',
             startDate: item.startDate || day.date || '',

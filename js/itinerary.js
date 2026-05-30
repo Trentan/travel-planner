@@ -43,7 +43,10 @@ function escapeCompactText(text) {
 }
 
 function getActivityStatusBadgeHtml(status, clickHandlerCall = '') {
-  const normStatus = status || 'planned';
+  if (!status || status === 'none' || status === 'null') {
+    return '';
+  }
+  const normStatus = status;
   let bgColor = '#E67E22'; // Orange/Amber
   let label = 'Planned';
   let icon = '⧗';
@@ -60,6 +63,62 @@ function getActivityStatusBadgeHtml(status, clickHandlerCall = '') {
     bgColor = '#E74C3C'; // Red
     label = 'Cancelled';
     icon = '✖';
+  } else if (normStatus === 'planned') {
+    bgColor = '#E67E22'; // Orange/Amber
+    label = 'Planned';
+    icon = '⧗';
+  }
+
+  const cursorClass = clickHandlerCall ? 'cursor-pointer hover:opacity-80' : '';
+  const onClickAttr = clickHandlerCall ? ` onclick="${clickHandlerCall}"` : '';
+
+  return `<span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white ${cursorClass}" style="background-color:${bgColor}; display: inline-flex; align-items: center; gap: 4px;"${onClickAttr}>${icon} ${label}</span>`;
+}
+
+function getStayStatusBadgeHtml(status, clickHandlerCall = '') {
+  if (!status || status === 'none' || status === 'null') {
+    return '';
+  }
+  let bgColor = '#E67E22'; // Orange/Amber
+  let label = 'Pending';
+  let icon = '⧗';
+
+  if (status === 'confirmed') {
+    bgColor = '#27AE60'; // Green
+    label = 'Confirmed';
+    icon = '✓';
+  } else if (status === 'cancelled') {
+    bgColor = '#E74C3C'; // Red
+    label = 'Cancelled';
+    icon = '✖';
+  }
+
+  const cursorClass = clickHandlerCall ? 'cursor-pointer hover:opacity-80' : '';
+  const onClickAttr = clickHandlerCall ? ` onclick="${clickHandlerCall}"` : '';
+
+  return `<span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white ${cursorClass}" style="background-color:${bgColor}; display: inline-flex; align-items: center; gap: 4px;"${onClickAttr}>${icon} ${label}</span>`;
+}
+
+function getTransportStatusBadgeHtml(status, clickHandlerCall = '') {
+  if (!status || status === 'none' || status === 'null') {
+    return '';
+  }
+  let bgColor = '#E67E22'; // Orange/Amber
+  let label = 'Planned';
+  let icon = '⏳';
+
+  if (status === 'confirmed') {
+    bgColor = '#27AE60'; // Green
+    label = 'Confirmed';
+    icon = '🎫';
+  } else if (status === 'booked') {
+    bgColor = '#27AE60'; // Green / Emerald
+    label = 'Booked';
+    icon = '✓';
+  } else if (status === 'cancelled') {
+    bgColor = '#E74C3C'; // Red
+    label = 'Cancelled';
+    icon = '❌';
   }
 
   const cursorClass = clickHandlerCall ? 'cursor-pointer hover:opacity-80' : '';
@@ -1817,9 +1876,12 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
         actionHtml: '',
         journeyId: journey.journeyId || journey.id,
         done: !!journey.done,
-        notes: segment.notes || journey.notes || ''
+        notes: segment.notes || journey.notes || '',
+        provider: journey.provider || '',
+        routeCode: segment.routeCode || journey.routeCode || '',
+        bookingRef: journey.bookingReference || '',
+        crossDateNote: crossDateNote || ''
       });
-      
       const currentLegCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label || '')).toLowerCase();
       const isArrivalToCurrent = toLoc && currentLegCity && toLoc.toLowerCase() === currentLegCity;
       const isDepartureFromCurrent = fromLoc && currentLegCity && fromLoc.toLowerCase() === currentLegCity;
@@ -1878,7 +1940,9 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       sortValue: getDailyTimelineItemSortValue(dayDate, stayInfo.startTime, 2000 + stayIndex),
       stayId: stayInfo.stayId,
       done: !!stayInfo.done,
-      notes: stayInfo.notes || ''
+      notes: stayInfo.notes || '',
+      provider: stayInfo.provider || '',
+      bookingRef: stayInfo.bookingRef || ''
     });
   });
 
@@ -1929,7 +1993,9 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       itemIndex,
       sortValue: getDailyTimelineItemSortValue(dayDate, item.startTime, 4000 + itemIndex),
       actionHtml: '',
-      status: item.status || 'planned'
+      status: item.status || '',
+      bookingRef: item.bookingRef || '',
+      time: item.time || ''
     });
   });
 
@@ -2015,10 +2081,130 @@ function renderDailyTimelineRow(item, compact = false) {
     checkboxHtml = `<label class="daily-timeline-checkbox-wrapper" onclick="event.stopPropagation();"><input type="checkbox" class="daily-timeline-checkbox stay-checkbox" ${item.done ? 'checked' : ''} onchange="toggleStayCompleted(event, '${item.stayId}')"></label>`;
   }
 
+
   let badgeHtml = '';
+  let activityMetaHtml = '';
   if (item.type === 'activity') {
+    const parts = [];
+    
+    // 1. duration
+    if (item.time) {
+      parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">⏱️ ${escapeCompactText(item.time)}</span>`);
+    }
+    
+    // 2. cost
+    if (item.cost && parseFloat(item.cost) > 0) {
+      parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-900/30 font-mono">${formatCurrency(item.cost)}</span>`);
+    }
+    
+    // 3. status
     const clickHandler = isEditMode ? `event.stopPropagation(); toggleActivityStatus(event, ${item.legIndex}, ${item.dayIndex}, ${item.itemIndex});` : '';
-    badgeHtml = getActivityStatusBadgeHtml(item.status, clickHandler);
+    const badge = getActivityStatusBadgeHtml(item.status, clickHandler);
+    if (badge) {
+      parts.push(badge);
+    }
+    
+    // 4. booking reference
+    if (item.bookingRef) {
+      parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-blue-50/50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-100/50 dark:border-blue-900/30 font-mono">Ref: ${escapeCompactText(item.bookingRef)}</span>`);
+    }
+
+    // 5. location chip
+    if (item.subLocations) {
+      const cleanLoc = String(item.subLocations).replace(/^Location:\s*/i, '').trim();
+      if (cleanLoc) {
+        parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 ${escapeCompactText(cleanLoc)}</span>`);
+      }
+    }
+
+    if (parts.length > 0) {
+      activityMetaHtml = `<div class="daily-timeline-meta" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 6px;">${parts.join('')}</div>`;
+    }
+  }
+
+  let stayMetaHtml = '';
+  if (item.type === 'stay') {
+    const parts = [];
+    
+    // 1. Provider
+    if (item.provider) {
+      parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">🏨 ${escapeCompactText(item.provider)}</span>`);
+    }
+    
+    // 2. Cost
+    if (item.cost && parseFloat(item.cost) > 0) {
+      parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-900/30 font-mono">${formatCurrency(item.cost)}</span>`);
+    }
+    
+    // 3. Status
+    const clickHandler = isEditMode ? `event.stopPropagation(); openEditStayModal('${item.stayId}');` : '';
+    const badge = getStayStatusBadgeHtml(item.status, clickHandler);
+    if (badge) {
+      parts.push(badge);
+    }
+    
+    // 4. Booking Reference
+    if (item.bookingRef) {
+      parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-blue-50/50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-100/50 dark:border-blue-900/30 font-mono">Ref: ${escapeCompactText(item.bookingRef)}</span>`);
+    }
+
+    // 5. location chip
+    if (item.subLocations) {
+      const cleanLoc = String(item.subLocations).replace(/^Location:\s*/i, '').trim();
+      if (cleanLoc) {
+        parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 ${escapeCompactText(cleanLoc)}</span>`);
+      }
+    }
+
+    if (parts.length > 0) {
+      stayMetaHtml = `<div class="daily-timeline-meta" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 6px;">${parts.join('')}</div>`;
+    }
+  }
+
+  let transportMetaHtml = '';
+  if (item.type === 'transport') {
+    const parts = [];
+    
+    // 1. Provider & Code
+    if (item.provider || item.routeCode) {
+      const providerPart = [item.provider, item.routeCode].filter(Boolean).join(' ');
+      parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">${escapeCompactText(providerPart)}</span>`);
+    }
+    
+    // 2. Cross date note
+    if (item.crossDateNote) {
+      parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-rose-50/50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 border-rose-100/50 dark:border-rose-900/30 font-semibold">${escapeCompactText(item.crossDateNote)}</span>`);
+    }
+    
+    // 3. Cost
+    if (item.cost && parseFloat(item.cost) > 0) {
+      parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-900/30 font-mono">${formatCurrency(item.cost)}</span>`);
+    }
+    
+    // 4. Status
+    const clickHandler = isEditMode ? `event.stopPropagation(); editJourney('${item.journeyId}');` : '';
+    const badge = getTransportStatusBadgeHtml(item.status, clickHandler);
+    if (badge) {
+      parts.push(badge);
+    }
+    
+    // 5. Booking Reference
+    if (item.bookingRef) {
+      parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-blue-50/50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-100/50 dark:border-blue-900/30 font-mono">Ref: ${escapeCompactText(item.bookingRef)}</span>`);
+    }
+
+    if (parts.length > 0) {
+      transportMetaHtml = `<div class="daily-timeline-meta" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 6px;">${parts.join('')}</div>`;
+    }
+  }
+
+  let typeColorClasses = 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
+  if (item.type === 'activity') {
+    typeColorClasses = 'bg-purple-50 text-purple-600 dark:bg-purple-950/20 dark:text-purple-400 border border-purple-100/50 dark:border-purple-900/30';
+  } else if (item.type === 'stay' || item.type === 'checkin' || item.type === 'checkout' || item.type === 'staying') {
+    typeColorClasses = 'bg-amber-50 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-100/50 dark:border-amber-900/30';
+  } else if (item.type === 'transport') {
+    typeColorClasses = 'bg-blue-50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400 border border-blue-100/50 dark:border-blue-900/30';
   }
 
   return `
@@ -2027,16 +2213,18 @@ function renderDailyTimelineRow(item, compact = false) {
       <div class="${markerClass}"${markerOnClick}><span>${item.icon}</span></div>
       <div class="daily-timeline-content">
         <div class="daily-timeline-title-row">
-          <span class="daily-timeline-type">${escapeCompactText(item.typeLabel || item.type)}</span>
+          <span class="daily-timeline-type px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${typeColorClasses}">${escapeCompactText(item.typeLabel || item.type)}</span>
           <div class="daily-timeline-title-and-checkbox" style="display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
             ${badgeHtml}
           </div>
           ${checkboxHtml ? `<div class="daily-timeline-inline-check">${checkboxHtml}</div>` : ''}
         </div>
-        ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> · ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
+        ${item.type === 'activity' ? activityMetaHtml : item.type === 'stay' ? stayMetaHtml : item.type === 'transport' ? transportMetaHtml : `
+          ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> · ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
+        `}
         ${item.notes ? `<div class="daily-timeline-notes">💬 ${escapeCompactText(item.notes)}</div>` : ''}
-        ${item.subLocations ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
+        ${item.subLocations && item.type !== 'activity' && item.type !== 'stay' ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
     </div>
@@ -2649,13 +2837,13 @@ ${(() => {
                   </div>
                   <div class="cost-item-actions flex flex-col items-end gap-1.5 shrink-0">
                     ${getActivityStatusBadgeHtml(item.status, isEditMode ? `event.stopPropagation(); toggleActivityStatus(event, ${legIndex}, ${dayIndex}, ${i});` : '')}
+                    ${item.bookingRef ? `<span class="booking-ref text-[10px] font-mono text-slate-500 bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">${item.bookingRef}</span>` : ''}
                     ${isEditMode
                       ? `<span class="budget-field budget-field--clickable text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors cursor-pointer text-xs font-mono" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIndex}, ${i})">⏱️ <span>${item.time || '1 hr'}</span></span>`
                       : `<span class="budget-field text-slate-500 text-xs font-mono">⏱️ <span>${item.time || '1 hr'}</span></span>`
                     }
                     <span class="budget-field text-slate-600 dark:text-slate-400 font-mono text-sm mt-1">$<span class="outline-none" contenteditable="${isEditMode}" onblur="updateDayItemCost(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${formatCurrency(item.cost || '0', { includeSymbol: false })}</span></span>
                   </div>
-                </div>
               `;
             }).join('')}
             </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>` : ''}
