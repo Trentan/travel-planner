@@ -69,8 +69,7 @@
           "startDate": "2026-06-08",
           "endDate": "2026-06-08",
           "notes": "",
-          "location": "last Brisbane run if time allows",
-          "done": false
+          "location": "last Brisbane run if time allows"
         }
       ],
       "legTips": [
@@ -138,8 +137,8 @@
               "cityId": "city-taipei",
               "startDate": "2026-06-09",
               "endDate": "2026-06-09",
-              "startTime": "07:00",
-              "endTime": "08:00",
+              "startTime": "10:15",
+              "endTime": "11:15",
               "location": "queue early"
             },
             {
@@ -153,19 +152,6 @@
               "endDate": "2026-06-09",
               "cityId": "city-taipei",
               "location": "queue early"
-            },
-            {
-              "text": "🏛️ Shilin Night Market evening",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "notes": "",
-              "location": "",
-              "startDate": "2026-06-09",
-              "startTime": "17:00",
-              "endDate": "2026-06-09",
-              "endTime": "18:00",
-              "cityId": "city-bangkok"
             }
           ]
         }
@@ -181,8 +167,8 @@
           "assignedDate": "2026-06-09",
           "startDate": "2026-06-09",
           "endDate": "2026-06-09",
-          "startTime": "07:00",
-          "endTime": "08:00",
+          "startTime": "10:15",
+          "endTime": "11:15",
           "location": "queue early",
           "done": false,
           "notes": ""
@@ -207,15 +193,13 @@
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "assignedDayIdx": 0,
+          "assignedDayIdx": null,
           "cityId": "city-taipei",
-          "assignedDate": "2026-06-09",
-          "startDate": "2026-06-09",
-          "endDate": "2026-06-09",
-          "startTime": "17:00",
-          "endTime": "18:00",
-          "notes": "",
-          "location": ""
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Ximending → CKS Memorial",
@@ -242,7 +226,7 @@
       ]
     },
     {
-      "id": "leg-17799424099393160",
+      "id": "leg-17799748470576270",
       "label": "Bangkok (1)",
       "colour": "#808080",
       "days": [
@@ -327,34 +311,8 @@
               "cityId": "city-vienna",
               "startDate": "2026-06-10",
               "endDate": "2026-06-10",
-              "startTime": "10:15",
-              "endTime": "11:15"
-            },
-            {
-              "text": "🏛️ Naschmarkt food stalls afternoon",
-              "cost": "0",
-              "time": "2 hrs",
-              "done": false,
-              "notes": "",
-              "location": "",
-              "startDate": "2026-06-10",
-              "startTime": "12:00",
-              "endDate": "2026-06-10",
-              "endTime": "14:00",
-              "cityId": ""
-            },
-            {
-              "text": "🏛️ Belvedere Palace & Klimt's The Kiss",
-              "cost": "0",
-              "time": "3 hrs",
-              "done": false,
-              "notes": "",
-              "location": "",
-              "startDate": "2026-06-10",
-              "startTime": "14:15",
-              "endDate": "2026-06-10",
-              "endTime": "17:15",
-              "cityId": ""
+              "startTime": "",
+              "endTime": ""
             }
           ]
         },
@@ -375,16 +333,14 @@
           ],
           "activityItems": [
             {
-              "text": "🏃 Prater Hauptallee — 4.5km straight tree-lined boulevard",
+              "text": "Explore local area",
               "cost": "0",
               "time": "1 hr",
               "done": false,
-              "notes": "",
-              "location": "4.5km straight tree-lined boulevard",
               "startDate": "2026-06-11",
-              "startTime": "07:00",
               "endDate": "2026-06-11",
-              "endTime": "08:00",
+              "startTime": "",
+              "endTime": "",
               "cityId": "city-bratislava"
             }
           ]
@@ -396,45 +352,39 @@
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
-          "assignedDayIdx": 1,
+          "assignedDayIdx": null,
           "cityId": "city-vienna",
-          "assignedDate": "2026-06-11",
-          "startDate": "2026-06-11",
-          "endDate": "2026-06-11",
-          "startTime": "07:00",
-          "endTime": "08:00",
-          "notes": "",
-          "location": "4.5km straight tree-lined boulevard"
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Belvedere Palace & Klimt's The Kiss",
           "category": "sight",
           "estTime": "3 hrs",
           "estCost": "0",
-          "assignedDayIdx": 0,
+          "assignedDayIdx": null,
           "cityId": "city-vienna",
-          "assignedDate": "2026-06-10",
-          "startDate": "2026-06-10",
-          "endDate": "2026-06-10",
-          "startTime": "14:15",
-          "endTime": "17:15",
-          "notes": "",
-          "location": ""
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "Naschmarkt food stalls afternoon",
           "category": "sight",
           "estTime": "2 hrs",
           "estCost": "0",
-          "assignedDayIdx": 0,
+          "assignedDayIdx": null,
           "cityId": "city-vienna",
-          "assignedDate": "2026-06-10",
-          "startDate": "2026-06-10",
-          "endDate": "2026-06-10",
-          "startTime": "12:00",
-          "endTime": "14:00",
-          "notes": "",
-          "location": ""
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
         },
         {
           "title": "RS Vienna City Walk: Stephansdom → Hofburg",
@@ -446,9 +396,9 @@
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-10",
           "startDate": "2026-06-10",
-          "startTime": "10:15",
+          "startTime": "",
           "endDate": "2026-06-10",
-          "endTime": "11:15",
+          "endTime": "",
           "cityId": "city-vienna"
         }
       ],
@@ -2260,7 +2210,7 @@
       ]
     },
     {
-      "id": "leg-17799424099396830",
+      "id": "leg-17799748470577950",
       "label": "London",
       "colour": "#808080",
       "days": [
@@ -3312,7 +3262,7 @@
       ]
     },
     {
-      "id": "leg-17799424099399850ret",
+      "id": "leg-17799748470573440",
       "label": "Bangkok (3)",
       "colour": "#808080",
       "days": [
@@ -3378,7 +3328,12 @@
           "to": "Brisbane (Trip Finish) (2)",
           "completed": false,
           "desc": "Arrive from Bangkok",
-          "transportItems": [],
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
           "accomItems": [
             {
               "text": "— (home!)",
@@ -4231,7 +4186,7 @@
       "fromAddress": "",
       "toAddress": "",
       "done": false,
-      "_inferredToLegId": "leg-17799424099393160",
+      "_inferredToLegId": "leg-17799748470576270",
       "_inferredFromLegId": "taipei"
     },
     {
@@ -4266,7 +4221,7 @@
       "toAddress": "",
       "done": false,
       "_inferredToLegId": "vienna",
-      "_inferredFromLegId": "leg-17799424099393160"
+      "_inferredFromLegId": "leg-17799748470576270"
     },
     {
       "id": "journey_1779252185623_huf5dt",
@@ -4430,7 +4385,7 @@
       "endTime": "19:20",
       "fromAddress": "",
       "toAddress": "",
-      "_inferredToLegId": "leg-17799424099396830",
+      "_inferredToLegId": "leg-17799748470577950",
       "_inferredFromLegId": "zurich"
     },
     {
@@ -4464,7 +4419,7 @@
       "fromAddress": "",
       "toAddress": "",
       "_inferredToLegId": "bangkok",
-      "_inferredFromLegId": "leg-17799424099396830"
+      "_inferredFromLegId": "leg-17799748470577950"
     },
     {
       "id": "journey_1779881104451_owxydr",
@@ -4496,8 +4451,8 @@
       "endDate": "2026-07-08",
       "startTime": "21:40",
       "endTime": "07:30",
-      "_inferredFromLegId": "leg-17799424099399850ret",
-      "_inferredToLegId": "city-brisbane-finish"
+      "_inferredToLegId": "city-brisbane-finish",
+      "_inferredFromLegId": "leg-17799748470573440"
     },
     {
       "id": "journey_1779884038859_11oncs",
@@ -4529,7 +4484,7 @@
       "endDate": "2026-07-07",
       "startTime": "07:00",
       "endTime": "08:00",
-      "_inferredToLegId": "leg-17799424099399850ret",
+      "_inferredToLegId": "leg-17799748470573440",
       "_inferredFromLegId": "samui"
     },
     {
@@ -4711,12 +4666,12 @@
       "bookingRef": "QJQDBFRD",
       "totalCost": "103",
       "notes": "",
-      "checkInTime": "09:30",
-      "checkOutTime": "10:00",
+      "checkInTime": "",
+      "checkOutTime": "",
       "startDate": "2026-06-10",
       "endDate": "2026-06-11",
-      "startTime": "09:30",
-      "endTime": "10:00",
+      "startTime": "",
+      "endTime": "",
       "location": "Schönbrunner Str. 92, 1050 Wien",
       "done": false,
       "_inferredLegId": "vienna"
@@ -4733,12 +4688,12 @@
       "bookingRef": "HMQKDE233E",
       "totalCost": "110.60",
       "notes": "Near Train Station - Murgašova 3131/2 2, Bratislava, Bratislavský kraj 811 04, Slovakia (Shared Apartment Room)",
-      "checkInTime": "15:00",
-      "checkOutTime": "10:00",
+      "checkInTime": "",
+      "checkOutTime": "",
       "startDate": "2026-06-11",
       "endDate": "2026-06-13",
-      "startTime": "15:00",
-      "endTime": "10:00",
+      "startTime": "",
+      "endTime": "",
       "location": "",
       "_inferredLegId": "bratislava"
     },
@@ -4754,11 +4709,11 @@
       "bookingRef": "QAJW7GXTZ",
       "totalCost": "232",
       "notes": "Londynska 50, Prague 120 00, Czech Republic (Breakfast Included)",
-      "checkInTime": "",
+      "checkInTime": "17:30",
       "checkOutTime": "",
       "startDate": "2026-06-13",
       "endDate": "2026-06-15",
-      "startTime": "",
+      "startTime": "17:30",
       "endTime": "",
       "location": "",
       "_inferredLegId": "prague"
@@ -4833,7 +4788,7 @@
       "checkIn": "2026-06-20",
       "checkOut": "2026-06-21",
       "nights": 1,
-      "status": "planned",
+      "status": "confirmed",
       "provider": "",
       "bookingRef": "",
       "totalCost": "0",
@@ -4854,7 +4809,7 @@
       "checkIn": "2026-06-22",
       "checkOut": "2026-06-25",
       "nights": 3,
-      "status": "planned",
+      "status": "confirmed",
       "provider": "",
       "bookingRef": "",
       "totalCost": "0",
@@ -4940,7 +4895,7 @@
       "checkOut": "2026-06-22",
       "checkOutTime": "",
       "nights": 1,
-      "status": "planned",
+      "status": "confirmed",
       "provider": "",
       "bookingRef": "",
       "totalCost": "0",
@@ -5038,6 +4993,18 @@
       "lng": 11.5753822
     },
     {
+      "id": "city-innsbruck",
+      "name": "Innsbruck",
+      "country": "Austria",
+      "code": "INN",
+      "countryCode": "AT",
+      "dateFrom": "2026-06-20",
+      "dateTo": "2026-06-21",
+      "colour": "#E74C3C",
+      "lat": 47.2654296,
+      "lng": 11.3927685
+    },
+    {
       "id": "city-bolzano",
       "name": "Bolzano",
       "country": "Italy",
@@ -5121,28 +5088,6 @@
       "colour": "#9B59B6",
       "lat": 45.4424977,
       "lng": 10.9857377
-    },
-    {
-      "id": "city-brisbane-trip-start",
-      "name": "Brisbane Trip Start",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-brisbane-trip-finish",
-      "name": "Brisbane Trip Finish",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
     }
   ],
   "userCities": [],

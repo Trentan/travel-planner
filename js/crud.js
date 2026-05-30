@@ -260,6 +260,9 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
     }
   }
 
+  const startParts = parse24HourTo12HourParts(preferredStart);
+  const endParts = parse24HourTo12HourParts(preferredEnd);
+
   const daySuggestions = leg.days.map(day => {
     const activityLike = {
       title: activity?.title || 'New item...',
@@ -308,7 +311,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
         <div class="activity-assign-layout">
           <!-- Left Panel -->
           <div class="activity-assign-summary activity-assign-summary-layout">
-            <div class="activity-assign-grid activity-assign-grid-split">
+            <div class="activity-assign-grid activity-assign-grid-equal" style="grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
               <div class="ai-form-group">
                 <label>Category</label>
                 <select id="activityCategory" class="form-control form-control--compact">
@@ -321,15 +324,29 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
                 </select>
               </div>
               <div class="ai-form-group">
+                <label>Status</label>
+                <select id="activityStatus" class="form-control form-control--compact">
+                  <option value="" ${!activity || !activity.status ? 'selected' : ''}>-- No Status (None) --</option>
+                  <option value="planned" ${activity?.status === 'planned' ? 'selected' : ''}>⏳ Planned</option>
+                  <option value="booked" ${activity?.status === 'booked' ? 'selected' : ''}>✓ Booked</option>
+                  <option value="confirmed" ${activity?.status === 'confirmed' ? 'selected' : ''}>🎫 Confirmed</option>
+                  <option value="cancelled" ${activity?.status === 'cancelled' ? 'selected' : ''}>✗ Cancelled</option>
+                </select>
+              </div>
+              <div class="ai-form-group">
                 <label>Description</label>
                 <input type="text" id="activityTitle" class="form-control form-control--compact" placeholder="e.g., Morning yoga" value="${html(defaults.title || activity?.title || '')}">
               </div>
             </div>
 
-            <div class="activity-assign-grid activity-assign-grid-equal">
+            <div class="activity-assign-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
               <div class="ai-form-group">
                 <label>Location</label>
                 <input type="text" id="activityLocation" class="form-control form-control--compact" placeholder="e.g., Central Park" value="${html(activity?.location || defaults.location || '')}">
+              </div>
+              <div class="ai-form-group">
+                <label>Booking Reference</label>
+                <input type="text" id="activityBookingRef" class="form-control form-control--compact" placeholder="e.g., ABC123XYZ" value="${html(activity?.bookingRef || '')}">
               </div>
               <div class="ai-form-group">
                 <label>Notes</label>
@@ -365,9 +382,39 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
                   <span>Fixed time</span>
                 </label>
               </div>
-              <div class="activity-assign-time-row">
-                <label>Start <input type="time" id="activityAssignStartTime" value="${html(preferredStart)}"></label>
-                <label>End <input type="time" id="activityAssignEndTime" value="${html(preferredEnd)}"></label>
+              <div class="activity-assign-time-row" style="display: flex; gap: 16px; align-items: center; margin-top: 10px;">
+                <input type="text" id="activityAssignStartTime" value="${html(preferredStart)}" style="width: 1px; height: 1px; opacity: 0.01; position: absolute; border: 0; padding: 0; z-index: -1; pointer-events: none;">
+                <input type="text" id="activityAssignEndTime" value="${html(preferredEnd)}" style="width: 1px; height: 1px; opacity: 0.01; position: absolute; border: 0; padding: 0; z-index: -1; pointer-events: none;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted, #7f8c8d);">Start Time</span>
+                  <div style="display: flex; gap: 6px;">
+                    <select id="activityStartHour" class="form-control form-control--compact" style="width: 70px;">
+                      ${['12','01','02','03','04','05','06','07','08','09','10','11'].map(h => `<option value="${h}" ${startParts.hour === h ? 'selected' : ''}>${h}</option>`).join('')}
+                    </select>
+                    <select id="activityStartMinute" class="form-control form-control--compact" style="width: 70px;">
+                      ${['00','15','30','45'].map(m => `<option value="${m}" ${startParts.minute === m ? 'selected' : ''}>${m}</option>`).join('')}
+                    </select>
+                    <select id="activityStartAmpm" class="form-control form-control--compact" style="width: 75px;">
+                      <option value="AM" ${startParts.ampm === 'AM' ? 'selected' : ''}>AM</option>
+                      <option value="PM" ${startParts.ampm === 'PM' ? 'selected' : ''}>PM</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted, #7f8c8d);">End Time</span>
+                  <div style="display: flex; gap: 6px;">
+                    <select id="activityEndHour" class="form-control form-control--compact" style="width: 70px;">
+                      ${['12','01','02','03','04','05','06','07','08','09','10','11'].map(h => `<option value="${h}" ${endParts.hour === h ? 'selected' : ''}>${h}</option>`).join('')}
+                    </select>
+                    <select id="activityEndMinute" class="form-control form-control--compact" style="width: 70px;">
+                      ${['00','15','30','45'].map(m => `<option value="${m}" ${endParts.minute === m ? 'selected' : ''}>${m}</option>`).join('')}
+                    </select>
+                    <select id="activityEndAmpm" class="form-control form-control--compact" style="width: 75px;">
+                      <option value="AM" ${endParts.ampm === 'AM' ? 'selected' : ''}>AM</option>
+                      <option value="PM" ${endParts.ampm === 'PM' ? 'selected' : ''}>PM</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               <div class="activity-assign-schedule-hint activity-assign-schedule-hint-text">Suggested uses each day's best open slot. Fixed time calculates the end from duration when left blank.</div>
             </div>
@@ -407,18 +454,27 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
   document.getElementById('activityAssignCancelBtn').onclick = closeModal;
 
   const modeInputs = Array.from(modal.querySelectorAll('input[name="activityAssignScheduleMode"]'));
-  const startInput = document.getElementById('activityAssignStartTime');
-  const endInput = document.getElementById('activityAssignEndTime');
+  
+  const getSelectedTimeValue = (hourId, minuteId, ampmId) => {
+    const h = document.getElementById(hourId)?.value;
+    const m = document.getElementById(minuteId)?.value;
+    const ampm = document.getElementById(ampmId)?.value;
+    return get24HourTimeFrom12HourParts(h, m, ampm);
+  };
 
   const getScheduleOptions = (button = null) => {
     const selectedMode = modeInputs.find(input => input.checked)?.value || 'suggested';
     const scheduleMode = ['scheduled', 'suggested'].includes(selectedMode) ? selectedMode : 'anytime';
     const suggestedStartTime = button?.getAttribute('data-suggest-start') || '';
     const suggestedEndTime = button?.getAttribute('data-suggest-end') || '';
+    
+    const startTime = getSelectedTimeValue('activityStartHour', 'activityStartMinute', 'activityStartAmpm');
+    const endTime = getSelectedTimeValue('activityEndHour', 'activityEndMinute', 'activityEndAmpm');
+
     return {
       scheduleMode,
-      startTime: startInput?.value || '',
-      endTime: endInput?.value || '',
+      startTime,
+      endTime,
       suggestedStartTime,
       suggestedEndTime
     };
@@ -426,23 +482,162 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
 
   const syncScheduleControls = () => {
     const scheduled = modeInputs.find(input => input.checked)?.value === 'scheduled';
-    if (startInput) startInput.disabled = !scheduled;
-    if (endInput) endInput.disabled = !scheduled;
+    ['activityStartHour', 'activityStartMinute', 'activityStartAmpm', 'activityEndHour', 'activityEndMinute', 'activityEndAmpm'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = !scheduled;
+    });
   };
 
-  modeInputs.forEach(input => input.addEventListener('change', syncScheduleControls));
+  const startInput = document.getElementById('activityAssignStartTime');
+  const endInput = document.getElementById('activityAssignEndTime');
+
+  const syncSelectsFromInputs = () => {
+    if (startInput && startInput.value) {
+      const parts = parse24HourTo12HourParts(startInput.value);
+      const sh = document.getElementById('activityStartHour');
+      const sm = document.getElementById('activityStartMinute');
+      const sa = document.getElementById('activityStartAmpm');
+      if (sh) sh.value = parts.hour;
+      if (sm) sm.value = parts.minute;
+      if (sa) sa.value = parts.ampm;
+    }
+    if (endInput && endInput.value) {
+      const parts = parse24HourTo12HourParts(endInput.value);
+      const eh = document.getElementById('activityEndHour');
+      const em = document.getElementById('activityEndMinute');
+      const ea = document.getElementById('activityEndAmpm');
+      if (eh) eh.value = parts.hour;
+      if (em) em.value = parts.minute;
+      if (ea) ea.value = parts.ampm;
+    }
+  };
+
+  const updateInputsFromSelects = () => {
+    if (startInput) {
+      startInput.value = getSelectedTimeValue('activityStartHour', 'activityStartMinute', 'activityStartAmpm') || '';
+    }
+    if (endInput) {
+      endInput.value = getSelectedTimeValue('activityEndHour', 'activityEndMinute', 'activityEndAmpm') || '';
+    }
+  };
 
   if (startInput) {
     startInput.addEventListener('input', () => {
       const scheduledInput = modeInputs.find(input => input.value === 'scheduled');
       if (scheduledInput) scheduledInput.checked = true;
       syncScheduleControls();
+      syncSelectsFromInputs();
       if (startInput.value && endInput) {
         const durationText = document.getElementById('activityTime').value.trim() || '1 hr';
         endInput.value = addMinutesToTimeValue(startInput.value, parseActivityDurationMinutes(durationText)) || '';
+        syncSelectsFromInputs();
+      }
+    });
+    startInput.addEventListener('change', () => {
+      const scheduledInput = modeInputs.find(input => input.value === 'scheduled');
+      if (scheduledInput) scheduledInput.checked = true;
+      syncScheduleControls();
+      syncSelectsFromInputs();
+      if (startInput.value && endInput) {
+        const durationText = document.getElementById('activityTime').value.trim() || '1 hr';
+        endInput.value = addMinutesToTimeValue(startInput.value, parseActivityDurationMinutes(durationText)) || '';
+        syncSelectsFromInputs();
       }
     });
   }
+
+  if (endInput) {
+    endInput.addEventListener('input', () => {
+      const scheduledInput = modeInputs.find(input => input.value === 'scheduled');
+      if (scheduledInput) scheduledInput.checked = true;
+      syncScheduleControls();
+      syncSelectsFromInputs();
+    });
+    endInput.addEventListener('change', () => {
+      const scheduledInput = modeInputs.find(input => input.value === 'scheduled');
+      if (scheduledInput) scheduledInput.checked = true;
+      syncScheduleControls();
+      syncSelectsFromInputs();
+    });
+  }
+
+  const syncTimeAndDayFromMode = () => {
+    const selectedMode = modeInputs.find(input => input.checked)?.value || 'suggested';
+    let activeDayBtn = modal.querySelector('.activity-assign-day.is-current');
+    if (!activeDayBtn) {
+      activeDayBtn = modal.querySelector('.activity-assign-day');
+      if (activeDayBtn && selectedMode !== 'anytime') {
+        activeDayBtn.classList.add('is-current');
+        activeDayBtn.setAttribute('aria-pressed', 'true');
+        const dayLabel = activeDayBtn.querySelector('.activity-assign-day-date')?.textContent || 'Day';
+        const currentAssignmentText = modal.querySelector('.activity-assign-current strong');
+        if (currentAssignmentText) currentAssignmentText.textContent = dayLabel;
+      }
+    }
+
+    if (activeDayBtn) {
+      if (selectedMode === 'suggested' || selectedMode === 'scheduled') {
+        const suggestStart = activeDayBtn.getAttribute('data-suggest-start') || '';
+        const suggestEnd = activeDayBtn.getAttribute('data-suggest-end') || '';
+        if (startInput) startInput.value = suggestStart;
+        if (endInput) endInput.value = suggestEnd;
+        syncSelectsFromInputs();
+      } else if (selectedMode === 'anytime') {
+        if (startInput) startInput.value = '';
+        if (endInput) endInput.value = '';
+        const sh = document.getElementById('activityStartHour');
+        const sm = document.getElementById('activityStartMinute');
+        const sa = document.getElementById('activityStartAmpm');
+        const eh = document.getElementById('activityEndHour');
+        const em = document.getElementById('activityEndMinute');
+        const ea = document.getElementById('activityEndAmpm');
+        if (sh) sh.value = '12';
+        if (sm) sm.value = '00';
+        if (sa) sa.value = 'AM';
+        if (eh) eh.value = '12';
+        if (em) em.value = '00';
+        if (ea) ea.value = 'AM';
+      }
+    }
+  };
+
+  modeInputs.forEach(input => input.addEventListener('change', () => {
+    syncScheduleControls();
+    syncTimeAndDayFromMode();
+  }));
+
+  const updateEndTimeFromDuration = () => {
+    const startVal = getSelectedTimeValue('activityStartHour', 'activityStartMinute', 'activityStartAmpm');
+    if (startVal) {
+      const durationText = document.getElementById('activityTime').value.trim() || '1 hr';
+      const endVal = addMinutesToTimeValue(startVal, parseActivityDurationMinutes(durationText)) || '';
+      if (endVal) {
+        const parts = parse24HourTo12HourParts(endVal);
+        const eh = document.getElementById('activityEndHour');
+        const em = document.getElementById('activityEndMinute');
+        const ea = document.getElementById('activityEndAmpm');
+        if (eh) eh.value = parts.hour;
+        if (em) em.value = parts.minute;
+        if (ea) ea.value = parts.ampm;
+      }
+    }
+  };
+
+  ['activityStartHour', 'activityStartMinute', 'activityStartAmpm', 'activityEndHour', 'activityEndMinute', 'activityEndAmpm'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('change', () => {
+        const scheduledInput = modeInputs.find(input => input.value === 'scheduled');
+        if (scheduledInput) scheduledInput.checked = true;
+        syncScheduleControls();
+        updateInputsFromSelects();
+        if (['activityStartHour', 'activityStartMinute', 'activityStartAmpm'].includes(id)) {
+          updateEndTimeFromDuration();
+          updateInputsFromSelects();
+        }
+      });
+    }
+  });
 
   syncScheduleControls();
 
@@ -453,12 +648,14 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
     const estTime = document.getElementById('activityTime').value.trim() || '1 hr';
     const estCost = document.getElementById('activityCost').value.trim() || '0';
     const notes = document.getElementById('activityNotes').value.trim();
+    const status = document.getElementById('activityStatus').value || '';
+    const bookingRef = document.getElementById('activityBookingRef').value.trim();
     if (!title) {
       alert('Please enter a description');
       return null;
     }
     const fullTitle = location ? `${title} — ${location}` : title;
-    return { category, title: fullTitle, estTime, estCost, notes, location };
+    return { category, title: fullTitle, estTime, estCost, notes, location, status, bookingRef };
   };
 
   modal.querySelectorAll('[data-day-index]').forEach(button => {
@@ -492,6 +689,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
         target.estCost = formData.estCost;
         target.notes = formData.notes;
         target.location = formData.location;
+        target.status = formData.status;
+        target.bookingRef = formData.bookingRef;
       }
 
       const assigned = assignSuggestedActivityToDay(legIdx, targetIdx, legIdx, targetDayIdx, getScheduleOptions(button));
@@ -520,6 +719,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       target.estCost = formData.estCost;
       target.notes = formData.notes;
       target.location = formData.location;
+      target.status = formData.status;
+      target.bookingRef = formData.bookingRef;
 
       const cleared = clearAssignedSuggestedActivityFromDay(legIdx, activityIdx);
       if (!cleared) return;
@@ -561,6 +762,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       target.estCost = formData.estCost;
       target.notes = formData.notes;
       target.location = formData.location;
+      target.status = formData.status;
+      target.bookingRef = formData.bookingRef;
 
       if (target.assignedDayIdx !== null && target.assignedDayIdx !== undefined) {
         const day = leg.days[target.assignedDayIdx];
@@ -583,6 +786,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
               item.cost = formData.estCost;
               item.notes = formData.notes;
               item.location = formData.location;
+              item.status = formData.status;
+              item.bookingRef = formData.bookingRef;
               applyActivityScheduleFields(item, day, datedSchedule);
             }
           });
@@ -760,7 +965,8 @@ function addDayItem(legIdx, dayIdx, category) {
       startTime: "",
       endDate: dayDate,
       endTime: "",
-      done: false
+      done: false,
+      status: "planned"
     });
 
     appData[legIdx].days[dayIdx][category].push({
@@ -771,7 +977,8 @@ function addDayItem(legIdx, dayIdx, category) {
       startTime: "",
       endDate: dayDate,
       endTime: "",
-      done: false
+      done: false,
+      status: "planned"
     });
   }
   else if (category === 'transportItems' || category === 'accomItems') { appData[legIdx].days[dayIdx][category].push({ text: "New item...", cost: "0", status: "pending", bookingRef: "", done: false }); }
@@ -1286,13 +1493,17 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
       time: activity.estTime || '1 hr',
       done: false,
       notes: activity.notes || '',
-      location: activity.location || ''
+      location: activity.location || '',
+      status: activity.status || '',
+      bookingRef: activity.bookingRef || ''
     };
     applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
     targetDay.activityItems.push(targetItem);
   } else {
     targetItem.notes = activity.notes || '';
     targetItem.location = activity.location || '';
+    targetItem.status = activity.status || '';
+    targetItem.bookingRef = activity.bookingRef || '';
     applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
   }
 
@@ -2418,6 +2629,95 @@ function confirmAddLeg() {
   sortLegs();
 }
 
+function parse24HourTo12HourParts(timeStr) {
+  if (!timeStr) return { hour: '12', minute: '00', ampm: 'AM' };
+  const parts = timeStr.split(':');
+  let h = parseInt(parts[0], 10);
+  const m = parts[1] || '00';
+  
+  let minNum = parseInt(m, 10);
+  minNum = Math.round(minNum / 15) * 15;
+  if (minNum >= 60) {
+    minNum = 45;
+  }
+  const roundedMinStr = String(minNum).padStart(2, '0');
+
+  let ampm = 'AM';
+  if (h >= 12) {
+    ampm = 'PM';
+    if (h > 12) h -= 12;
+  } else if (h === 0) {
+    h = 12;
+  }
+  const hourStr = String(h).padStart(2, '0');
+  return { hour: hourStr, minute: roundedMinStr, ampm };
+}
+
+function get24HourTimeFrom12HourParts(hour, minute, ampm) {
+  if (!hour || !minute || !ampm) return '';
+  let h = parseInt(hour, 10);
+  if (ampm === 'PM' && h < 12) h += 12;
+  if (ampm === 'AM' && h === 12) h = 0;
+  const hourStr = String(h).padStart(2, '0');
+  return `${hourStr}:${minute}`;
+}
+
+function toggleActivityStatus(e, legIdx, dayIdx, itemIdx) {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  const item = appData[legIdx]?.days?.[dayIdx]?.activityItems?.[itemIdx];
+  if (!item) return;
+  const states = ['planned', 'booked', 'confirmed', 'cancelled'];
+  const currentStatus = item.status || 'planned';
+  const currentIdx = states.indexOf(currentStatus);
+  const nextStatus = states[(currentIdx + 1) % states.length];
+  item.status = nextStatus;
+  
+  syncAssignedSuggestedActivityField(legIdx, dayIdx, item.text, 'status', nextStatus);
+  
+  saveData();
+  if (typeof rebuildItineraryPreservingScroll === 'function') {
+    rebuildItineraryPreservingScroll();
+  } else {
+    buildItinerary();
+  }
+}
+
+function toggleSuggestedActivityStatus(e, legIdx, activityIdx) {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  const target = appData[legIdx]?.suggestedActivities?.[activityIdx];
+  if (!target) return;
+  const states = ['planned', 'booked', 'confirmed', 'cancelled'];
+  const currentStatus = target.status || 'planned';
+  const currentIdx = states.indexOf(currentStatus);
+  const nextStatus = states[(currentIdx + 1) % states.length];
+  target.status = nextStatus;
+  
+  if (target.assignedDayIdx !== null && target.assignedDayIdx !== undefined) {
+    const day = appData[legIdx]?.days?.[target.assignedDayIdx];
+    const previousMatchTexts = getSuggestedActivityMatchTexts(target);
+    if (day?.activityItems?.length) {
+      day.activityItems.forEach(item => {
+        if (previousMatchTexts.includes(String(item.text || '').trim())) {
+          item.status = nextStatus;
+        }
+      });
+    }
+  }
+  
+  saveData();
+  if (typeof rebuildItineraryPreservingScroll === 'function') {
+    rebuildItineraryPreservingScroll();
+  } else {
+    buildItinerary();
+  }
+}
+
 // Expose functions to window scope for HTML onclick handlers
 window.deleteLeg = deleteLeg;
 window.deleteFood = deleteFood;
@@ -2446,6 +2746,8 @@ window.openDayItemScheduleDialog = openDayItemScheduleDialog;
 window.toggleFoodCompleted = toggleFoodCompleted;
 window.toggleDayCompleted = toggleDayCompleted;
 window.toggleActivityCompleted = toggleActivityCompleted;
+window.toggleActivityStatus = toggleActivityStatus;
+window.toggleSuggestedActivityStatus = toggleSuggestedActivityStatus;
 window.toggleJourneyCompleted = toggleJourneyCompleted;
 window.toggleStayCompleted = toggleStayCompleted;
 window.openAddLegDialog = openAddLegDialog;
