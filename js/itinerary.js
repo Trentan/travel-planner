@@ -1942,7 +1942,8 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       done: !!stayInfo.done,
       notes: stayInfo.notes || '',
       provider: stayInfo.provider || '',
-      bookingRef: stayInfo.bookingRef || ''
+      bookingRef: stayInfo.bookingRef || '',
+      cityName: String(day.to).trim()
     });
   });
 
@@ -1995,7 +1996,8 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       actionHtml: '',
       status: item.status || '',
       bookingRef: item.bookingRef || '',
-      time: item.time || ''
+      time: item.time || '',
+      cityName: String(day.to || day.from || '').trim()
     });
   });
 
@@ -2113,7 +2115,20 @@ function renderDailyTimelineRow(item, compact = false) {
     if (item.subLocations) {
       const cleanLoc = String(item.subLocations).replace(/^Location:\s*/i, '').trim();
       if (cleanLoc) {
-        parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="${getMapSearchUrl(cleanLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">${escapeCompactText(cleanLoc)}</a></span>`);
+        let sophisticatedLoc = cleanLoc;
+        let matchCity = item.cityName || '';
+        if (!matchCity) {
+          const parenMatch = cleanLoc.match(/\(([^)]+)\)/);
+          if (parenMatch) matchCity = parenMatch[1].trim();
+        }
+        if (matchCity) {
+          const cityObj = typeof getCityByName === 'function' ? getCityByName(matchCity) : null;
+          const countryName = cityObj && cityObj.country ? cityObj.country : '';
+          if (countryName && !cleanLoc.toLowerCase().includes(countryName.toLowerCase())) {
+            sophisticatedLoc = `${cleanLoc}, ${countryName}`;
+          }
+        }
+        parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="${getMapSearchUrl(sophisticatedLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">${escapeCompactText(cleanLoc)}</a></span>`);
       }
     }
 
@@ -2152,7 +2167,20 @@ function renderDailyTimelineRow(item, compact = false) {
     if (item.subLocations) {
       const cleanLoc = String(item.subLocations).replace(/^Location:\s*/i, '').trim();
       if (cleanLoc) {
-        parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="${getMapSearchUrl(cleanLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">${escapeCompactText(cleanLoc)}</a></span>`);
+        let sophisticatedLoc = cleanLoc;
+        let matchCity = item.cityName || '';
+        if (!matchCity) {
+          const parenMatch = cleanLoc.match(/\(([^)]+)\)/);
+          if (parenMatch) matchCity = parenMatch[1].trim();
+        }
+        if (matchCity) {
+          const cityObj = typeof getCityByName === 'function' ? getCityByName(matchCity) : null;
+          const countryName = cityObj && cityObj.country ? cityObj.country : '';
+          if (countryName && !cleanLoc.toLowerCase().includes(countryName.toLowerCase())) {
+            sophisticatedLoc = `${cleanLoc}, ${countryName}`;
+          }
+        }
+        parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="${getMapSearchUrl(sophisticatedLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">${escapeCompactText(cleanLoc)}</a></span>`);
       }
     }
 
@@ -2193,6 +2221,33 @@ function renderDailyTimelineRow(item, compact = false) {
       parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-blue-50/50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-100/50 dark:border-blue-900/30 font-mono">Ref: ${escapeCompactText(item.bookingRef)}</span>`);
     }
 
+    // 6. location chips
+    if (item.subLocations) {
+      const locParts = String(item.subLocations).split(' | ').map(p => p.trim()).filter(Boolean);
+      locParts.forEach(part => {
+        const colonIndex = part.indexOf(':');
+        const label = colonIndex >= 0 ? part.slice(0, colonIndex).trim() : '';
+        const value = colonIndex >= 0 ? part.slice(colonIndex + 1).trim() : part;
+        if (value) {
+          let sophisticatedLoc = value;
+          let matchCity = '';
+          const parenMatch = value.match(/\(([^)]+)\)/);
+          if (parenMatch) {
+            matchCity = parenMatch[1].trim();
+          }
+          if (matchCity) {
+            const cityObj = typeof getCityByName === 'function' ? getCityByName(matchCity) : null;
+            const countryName = cityObj && cityObj.country ? cityObj.country : '';
+            if (countryName && !value.toLowerCase().includes(countryName.toLowerCase())) {
+              sophisticatedLoc = `${value}, ${countryName}`;
+            }
+          }
+          const displayLabel = label ? `${label}: ${value}` : value;
+          parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="${getMapSearchUrl(sophisticatedLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">${escapeCompactText(displayLabel)}</a></span>`);
+        }
+      });
+    }
+
     if (parts.length > 0) {
       transportMetaHtml = `<div class="daily-timeline-meta" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 6px;">${parts.join('')}</div>`;
     }
@@ -2224,7 +2279,7 @@ function renderDailyTimelineRow(item, compact = false) {
           ${(item.meta || item.cost) ? `<div class="daily-timeline-meta">${escapeCompactText(item.meta || '')}${item.cost ? `<span class="timeline-inline-meta-cost"> · ${formatCurrency(item.cost)}</span>` : ''}</div>` : ''}
         `}
         ${item.notes ? `<div class="daily-timeline-notes">💬 ${escapeCompactText(item.notes)}</div>` : ''}
-        ${item.subLocations && item.type !== 'activity' && item.type !== 'stay' ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
+        ${item.subLocations && item.type !== 'activity' && item.type !== 'stay' && item.type !== 'transport' ? `<div class="daily-timeline-sub-locations">${renderJourneySubLocationTextHtml(item.subLocations)}</div>` : ''}
       </div>
       ${item.actionHtml ? `<div class="daily-timeline-actions">${item.actionHtml}</div>` : ''}
     </div>
