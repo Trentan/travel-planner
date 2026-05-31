@@ -12,7 +12,13 @@ async function deleteActivity(legIdx, activityIdx) {
   const activity = leg?.suggestedActivities?.[activityIdx];
   if (!leg || !activity) return;
 
-  const isItemMatch = (itemText) => {
+  const activityId = activity.id;
+
+  const isItemMatch = (item) => {
+    if (!item) return false;
+    if (activityId && item.activityId === activityId) return true;
+
+    const itemText = item.text;
     if (!itemText) return false;
     const cleanItem = getComparisonString(itemText);
     const cleanTitle = getComparisonString(activity.title);
@@ -43,7 +49,7 @@ async function deleteActivity(legIdx, activityIdx) {
     leg.days.forEach(day => {
       if (day && Array.isArray(day.activityItems)) {
         day.activityItems = day.activityItems.filter(item => {
-          if (isItemMatch(item?.text)) return false;
+          if (isItemMatch(item)) return false;
           return true;
         });
       }
@@ -79,8 +85,13 @@ function getSuggestedActivityMatchTexts(activity) {
   ].filter(Boolean))];
 }
 
-function findAssignedSuggestedActivity(legIdx, dayIdx, itemText) {
+function findAssignedSuggestedActivity(legIdx, dayIdx, itemText, activityId = null) {
   const activities = appData[legIdx]?.suggestedActivities || [];
+  if (activityId) {
+    const found = activities.find(activity => activity && activity.id === activityId);
+    if (found) return found;
+  }
+
   const cleanItem = String(itemText || '').trim().toLowerCase();
   if (!cleanItem) return null;
 
@@ -124,8 +135,8 @@ function findAssignedSuggestedActivity(legIdx, dayIdx, itemText) {
   }) || null;
 }
 
-function syncAssignedSuggestedActivityField(legIdx, dayIdx, itemText, field, value) {
-  const activity = findAssignedSuggestedActivity(legIdx, dayIdx, itemText);
+function syncAssignedSuggestedActivityField(legIdx, dayIdx, itemText, field, value, activityId = null) {
+  const activity = findAssignedSuggestedActivity(legIdx, dayIdx, itemText, activityId);
   if (!activity) return;
   activity[field] = value;
 }
@@ -155,8 +166,8 @@ function clearActivityScheduleFields(target, day) {
   target.endTime = '';
 }
 
-function syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, itemText, schedule = {}) {
-  const activity = findAssignedSuggestedActivity(legIdx, dayIdx, itemText);
+function syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, itemText, schedule = {}, activityId = null) {
+  const activity = findAssignedSuggestedActivity(legIdx, dayIdx, itemText, activityId);
   if (!activity) return;
   activity.assignedDayIdx = dayIdx;
   activity.assignedDate = schedule.startDate || getNormalizedDayDate(appData[legIdx]?.days?.[dayIdx]);
@@ -898,10 +909,13 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
   if (!item) return;
 
   const itemText = item.text;
+  const activityId = item.activityId;
   const suggestedActivities = appData[legIdx]?.suggestedActivities || [];
 
   function isMatch(activity) {
-    if (!activity || !itemText) return false;
+    if (!activity) return false;
+    if (activityId && activity.id === activityId) return true;
+    if (!itemText) return false;
 
     const getComparisonString = (str) => {
       return String(str || '')
@@ -928,10 +942,20 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
     return false;
   }
 
+  // Priority 1: Match strictly by ID if timeline item has activityId
+  let activityIdx = -1;
+  if (activityId) {
+    activityIdx = suggestedActivities.findIndex(activity => (
+      activity && activity.id === activityId
+    ));
+  }
+
   // Phase 1: Try to find a match assigned to this day
-  let activityIdx = suggestedActivities.findIndex(activity => (
-    activity && activity.assignedDayIdx === dayIdx && isMatch(activity)
-  ));
+  if (activityIdx === -1) {
+    activityIdx = suggestedActivities.findIndex(activity => (
+      activity && activity.assignedDayIdx === dayIdx && isMatch(activity)
+    ));
+  }
 
   // Phase 2: Try to find a match assigned to any day or unassigned
   if (activityIdx === -1) {
@@ -945,9 +969,16 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
       saveData(false);
       
       const refreshedActivities = appData[legIdx]?.suggestedActivities || [];
-      activityIdx = refreshedActivities.findIndex(activity => (
-        activity && activity.assignedDayIdx === dayIdx && isMatch(activity)
-      ));
+      if (activityId) {
+        activityIdx = refreshedActivities.findIndex(activity => (
+          activity && activity.id === activityId
+        ));
+      }
+      if (activityIdx === -1) {
+        activityIdx = refreshedActivities.findIndex(activity => (
+          activity && activity.assignedDayIdx === dayIdx && isMatch(activity)
+        ));
+      }
       if (activityIdx === -1) {
         activityIdx = refreshedActivities.findIndex(activity => activity && isMatch(activity));
       }
@@ -979,7 +1010,11 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
       appData[legIdx].suggestedActivities = [];
     }
 
+    const newId = 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+    item.activityId = newId;
+
     appData[legIdx].suggestedActivities.push({
+      id: newId,
       title: cleanTitle,
       category: category,
       estTime: item.time || '1 hr',
@@ -1131,7 +1166,7 @@ function updateDayItemText(legIdx, dayIdx, category, itemIdx, text, fromTabs = f
   
   item.text = newText;
   if (category === 'activityItems') {
-    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'title', newText);
+    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'title', newText, item.activityId);
   }
   saveData();
   if(!fromTabs) {
@@ -1144,7 +1179,7 @@ function updateDayItemCost(legIdx, dayIdx, category, itemIdx, cost, fromTabs = f
   const previousText = item.text;
   item.cost = cost;
   if (category === 'activityItems') {
-    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'estCost', cost);
+    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'estCost', cost, item.activityId);
   }
   saveData();
   if(fromTabs) {
@@ -1159,7 +1194,7 @@ function updateDayItemTime(legIdx, dayIdx, category, itemIdx, time) {
   const previousText = item.text;
   item.time = time;
   if (category === 'activityItems') {
-    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'estTime', time);
+    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'estTime', time, item.activityId);
   }
   saveData();
 }
@@ -1177,10 +1212,10 @@ function updateDayItemScheduleTime(legIdx, dayIdx, category, itemIdx, field, tim
   if (category === 'activityItems') {
     if (item.startTime || item.endTime) {
       applyActivityScheduleFields(item, day, { startTime: item.startTime || '', endTime: item.endTime || '' });
-      syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, previousText, item);
+      syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, previousText, item, item.activityId);
     } else {
       clearActivityScheduleFields(item, day);
-      syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, previousText, item);
+      syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, previousText, item, item.activityId);
     }
   }
   saveData();
@@ -1200,7 +1235,7 @@ function setDayItemScheduleMode(legIdx, dayIdx, category, itemIdx, mode) {
       endTime: addMinutesToTimeValue('09:00', parseActivityDurationMinutes(item.time || '')) || ''
     });
   }
-  syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, previousText, item);
+  syncAssignedSuggestedActivitySchedule(legIdx, dayIdx, previousText, item, item.activityId);
   saveData();
   if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: previousText });
   else buildItinerary();
@@ -1509,8 +1544,7 @@ function getAssignedSuggestedActivityDayItem(sourceLegIdx, activityIdx) {
   const dayIdx = activity?.assignedDayIdx;
   const day = dayIdx !== null && dayIdx !== undefined ? sourceLeg?.days?.[dayIdx] : null;
   if (!activity || !day || !Array.isArray(day.activityItems)) return null;
-  const matchTexts = getSuggestedActivityMatchTexts(activity);
-  return day.activityItems.find(item => matchTexts.includes(String(item.text || '').trim())) || null;
+  return day.activityItems.find(item => activity.id ? item.activityId === activity.id : getSuggestedActivityMatchTexts(activity).includes(String(item.text || '').trim())) || null;
 }
 
 function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, targetDayIdx, options = {}) {
@@ -1520,6 +1554,11 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
   const targetDay = targetLeg?.days?.[targetDayIdx];
   if (!activity || !targetDay) return false;
 
+  if (!activity.id) {
+    activity.id = 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+  }
+  const activityId = activity.id;
+
   const getComparisonString = (str) => {
     return String(str || '')
       .toLowerCase()
@@ -1528,9 +1567,20 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
       .trim();
   };
 
-  const isItemMatch = (itemText) => {
+  const originalClean = Array.isArray(options.originalMatchTexts)
+    ? options.originalMatchTexts.map(t => getComparisonString(t))
+    : [];
+
+  const isItemMatch = (item) => {
+    if (!item) return false;
+    if (activityId && item.activityId === activityId) return true;
+
+    const itemText = item.text;
     if (!itemText) return false;
     const cleanItem = getComparisonString(itemText);
+    
+    if (originalClean.includes(cleanItem)) return true;
+
     const cleanTitle = getComparisonString(activity.title);
     if (cleanItem === cleanTitle) return true;
 
@@ -1547,7 +1597,7 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
   if (previousDayIdx !== null && previousDayIdx !== undefined && sourceLegIdx === targetLegIdx && previousDayIdx !== targetDayIdx) {
     const previousDay = targetLeg.days[previousDayIdx];
     if (previousDay && Array.isArray(previousDay.activityItems)) {
-      const prevIndex = previousDay.activityItems.findIndex(item => isItemMatch(item.text));
+      const prevIndex = previousDay.activityItems.findIndex(item => isItemMatch(item));
       if (prevIndex !== -1) previousDay.activityItems.splice(prevIndex, 1);
     }
   }
@@ -1564,9 +1614,10 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
     startDate: getNormalizedDayDate(targetDay),
     endDate: getNormalizedDayDate(targetDay)
   };
-  let targetItem = targetDay.activityItems.find(item => isItemMatch(item.text));
+  let targetItem = targetDay.activityItems.find(item => isItemMatch(item));
   if (!targetItem) {
     targetItem = {
+      activityId: activity.id,
       text: assignedText,
       cost: activity.estCost || '0',
       time: activity.estTime || '1 hr',
@@ -1581,6 +1632,7 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
     applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
     targetDay.activityItems.push(targetItem);
   } else {
+    targetItem.activityId = activity.id;
     targetItem.notes = activity.notes || '';
     targetItem.location = activity.location || '';
     targetItem.status = activity.status || '';
@@ -1596,10 +1648,15 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
   return true;
 }
 
-function clearAssignedSuggestedActivityFromDay(sourceLegIdx, activityIdx) {
+function clearAssignedSuggestedActivityFromDay(sourceLegIdx, activityIdx, originalMatchTexts = null) {
   const sourceLeg = appData[sourceLegIdx];
   const activity = sourceLeg?.suggestedActivities?.[activityIdx];
   if (!activity) return false;
+
+  if (!activity.id) {
+    activity.id = 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+  }
+  const activityId = activity.id;
 
   const previousDayIdx = activity.assignedDayIdx;
   if (previousDayIdx === null || previousDayIdx === undefined) return false;
@@ -1612,7 +1669,11 @@ function clearAssignedSuggestedActivityFromDay(sourceLegIdx, activityIdx) {
       .trim();
   };
 
-  const isItemMatch = (itemText) => {
+  const isItemMatch = (item) => {
+    if (!item) return false;
+    if (activityId && item.activityId === activityId) return true;
+
+    const itemText = item.text;
     if (!itemText) return false;
     const cleanItem = getComparisonString(itemText);
     const cleanTitle = getComparisonString(activity.title);
@@ -1629,7 +1690,7 @@ function clearAssignedSuggestedActivityFromDay(sourceLegIdx, activityIdx) {
 
   const previousDay = sourceLeg?.days?.[previousDayIdx];
   if (previousDay && Array.isArray(previousDay.activityItems)) {
-    const prevIndex = previousDay.activityItems.findIndex(item => isItemMatch(item.text));
+    const prevIndex = previousDay.activityItems.findIndex(item => isItemMatch(item));
     if (prevIndex !== -1) previousDay.activityItems.splice(prevIndex, 1);
     if (previousDay.activityItems.length === 1 && isPlaceholderActivityItem(previousDay.activityItems[0])) {
       previousDay.activityItems = [];

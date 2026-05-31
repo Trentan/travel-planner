@@ -2822,8 +2822,15 @@ function normalizeTripLegsData(legs) {
     if (!Array.isArray(leg.days)) leg.days = [];
     if (!Array.isArray(leg.suggestedActivities)) leg.suggestedActivities = [];
 
-    // Perform once-off normalization/migration of day activities into suggestedActivities
     const suggested = leg.suggestedActivities;
+
+    // Guarantee unique IDs for all suggested activities
+    suggested.forEach(act => {
+      if (act && !act.id) {
+        act.id = 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+      }
+    });
+
     const usedSuggestionIndices = new Set();
 
     (leg.days || []).forEach((day, dayIdx) => {
@@ -2842,16 +2849,28 @@ function normalizeTripLegsData(legs) {
 
         // Try to find a match in the suggested pool
         let matchIdx = -1;
-        // Priority 1: Match by title and already assigned to this day
-        for (let i = 0; i < suggested.length; i++) {
-          if (usedSuggestionIndices.has(i)) continue;
-          const act = suggested[i];
-          if (act && act.assignedDayIdx === dayIdx && isItemMatchingActivity(text, act)) {
-            matchIdx = i;
-            break;
+        // Priority 1: Match by ID if timeline item already has activityId
+        if (item.activityId) {
+          for (let i = 0; i < suggested.length; i++) {
+            if (suggested[i] && suggested[i].id === item.activityId) {
+              matchIdx = i;
+              break;
+            }
           }
         }
-        // Priority 2: Match by title and unassigned (or assigned to another day - prefer unassigned)
+
+        // Priority 2: Match by title and already assigned to this day
+        if (matchIdx === -1) {
+          for (let i = 0; i < suggested.length; i++) {
+            if (usedSuggestionIndices.has(i)) continue;
+            const act = suggested[i];
+            if (act && act.assignedDayIdx === dayIdx && isItemMatchingActivity(text, act)) {
+              matchIdx = i;
+              break;
+            }
+          }
+        }
+        // Priority 3: Match by title and unassigned (or assigned to another day - prefer unassigned)
         if (matchIdx === -1) {
           for (let i = 0; i < suggested.length; i++) {
             if (usedSuggestionIndices.has(i)) continue;
@@ -2862,7 +2881,7 @@ function normalizeTripLegsData(legs) {
             }
           }
         }
-        // Priority 3: Match by title even if assigned to another day (e.g. duplicate or newly scheduled)
+        // Priority 4: Match by title even if assigned to another day (e.g. duplicate or newly scheduled)
         if (matchIdx === -1) {
           for (let i = 0; i < suggested.length; i++) {
             if (usedSuggestionIndices.has(i)) continue;
@@ -2877,6 +2896,7 @@ function normalizeTripLegsData(legs) {
         if (matchIdx !== -1) {
           // Sync scheduling fields
           const act = suggested[matchIdx];
+          item.activityId = act.id;
           act.assignedDayIdx = dayIdx;
           act.assignedDate = day.date || '';
           act.startDate = item.startDate || day.date || '';
@@ -2958,6 +2978,7 @@ function normalizeTripLegsData(legs) {
           }
 
           const newActivity = {
+            id: 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36),
             title: cleanTitle,
             category: category,
             estTime: item.time || '1 hr',
@@ -2976,6 +2997,7 @@ function normalizeTripLegsData(legs) {
             endTime: item.endTime || ''
           };
           suggested.push(newActivity);
+          item.activityId = newActivity.id;
           usedSuggestionIndices.add(suggested.length - 1);
         }
       });
