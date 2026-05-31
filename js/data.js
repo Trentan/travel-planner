@@ -3077,6 +3077,15 @@ function normalizeTripLegsData(legs) {
 function normalizeTripJourneysData(items) {
   if (!Array.isArray(items)) return [];
   
+  items.forEach(item => {
+    if (!item.id) {
+      item.id = 'journey-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+    }
+    if (!item.journeyId) {
+      item.journeyId = item.id;
+    }
+  });
+
   const groups = {};
   items.forEach(item => {
     item.dayDate = normalizeTripDateValue(item.dayDate || item.startDate);
@@ -3122,6 +3131,9 @@ function normalizeTripJourneysData(items) {
 function normalizeTripStaysData(items) {
   if (!Array.isArray(items)) return [];
   items.forEach(item => {
+    if (!item.id) {
+      item.id = 'stay-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+    }
     item.checkIn = normalizeTripDateValue(item.checkIn || item.startDate);
     item.checkOut = normalizeTripDateValue(item.checkOut || item.endDate || item.checkIn);
     item.checkInTime = item.checkInTime || item.startTime || '';
