@@ -873,28 +873,28 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
 
   function isMatch(activity) {
     if (!activity || !itemText) return false;
-    const cleanItem = String(itemText).trim().toLowerCase();
-    const cleanTitle = String(activity.title || '').trim().toLowerCase();
+
+    const getComparisonString = (str) => {
+      return String(str || '')
+        .toLowerCase()
+        .replace(/[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}\u{1F000}-\u{1FAFF}\u{200D}\u{FE0F}]/gu, '')
+        .replace(/[^a-z0-9]/g, '')
+        .trim();
+    };
+
+    const cleanItem = getComparisonString(itemText);
+    const cleanTitle = getComparisonString(activity.title);
     if (cleanItem === cleanTitle) return true;
 
-    const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
-    const cleanItemNoEmoji = cleanItem.replace(emojiPattern, '').trim();
-    const cleanTitleNoEmoji = cleanTitle.replace(emojiPattern, '').trim();
-    if (cleanItemNoEmoji === cleanTitleNoEmoji) return true;
-
     // Check base title (without location suffix)
-    const baseTitle = cleanTitle.split(' — ')[0].trim();
-    const baseTitleNoEmoji = baseTitle.replace(emojiPattern, '').trim();
-    if (cleanItemNoEmoji === baseTitleNoEmoji) return true;
+    const baseTitle = getComparisonString(activity.title.split(' — ')[0]);
+    if (cleanItem === baseTitle) return true;
 
     const matchTexts = typeof getSuggestedActivityMatchTexts === 'function'
-      ? getSuggestedActivityMatchTexts(activity).map(t => String(t).trim().toLowerCase())
+      ? getSuggestedActivityMatchTexts(activity).map(t => getComparisonString(t))
       : [cleanTitle];
 
     if (matchTexts.includes(cleanItem)) return true;
-
-    const matchTextsNoEmoji = matchTexts.map(t => t.replace(emojiPattern, '').trim());
-    if (matchTextsNoEmoji.includes(cleanItemNoEmoji)) return true;
 
     return false;
   }
