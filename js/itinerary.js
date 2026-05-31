@@ -755,7 +755,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     }
     const activityLoc = locationVal ? (() => {
       let loc = locationVal;
-      const cleanCity = String(day.to || day.from || '').trim();
+      const cleanCity = String((typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label || '') : '') || day.to || day.from || '').trim();
       if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
         loc = `${loc} (${cleanCity})`;
       }
@@ -2024,7 +2024,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       audioTitle: item.audioTitle || '',
       audioRef: item.audioRef || item.audioUrl || '',
       time: item.time || '',
-      cityName: String(day.to || day.from || '').trim()
+      cityName: String((typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label || '') : '') || day.to || day.from || '').trim()
     });
   });
 
@@ -2054,6 +2054,138 @@ function getDailyTimelineBuckets(items) {
     scheduled: items.filter(item => String(item.startTime || item.endTime || '').trim()),
     anytime: items.filter(item => !String(item.startTime || item.endTime || '').trim())
   };
+}
+
+function getTimelineMapLocationValues(subLocations) {
+  return String(subLocations || '')
+    .split(' | ')
+    .map(part => {
+      const cleanPart = part.trim();
+      const colonIndex = cleanPart.indexOf(':');
+      return (colonIndex >= 0 ? cleanPart.slice(colonIndex + 1) : cleanPart).trim();
+    })
+    .filter(Boolean);
+}
+
+function getTimelineTransportMapLocationValues(item) {
+  const values = getTimelineMapLocationValues(item.subLocations);
+  if (values.length <= 1) return values;
+  const typeLabel = String(item.typeLabel || '').toLowerCase();
+  if (typeLabel === 'arrive') return [values[values.length - 1]];
+  if (typeLabel === 'depart') return [values[0]];
+  return values;
+}
+
+function cleanTimelineMapTitle(title) {
+  return String(title || '')
+    .replace(/^(check-in|check-out|staying|transport|activity|depart|arrive):\s*/i, '')
+    .trim();
+}
+
+function getTimelineMapFallback(item) {
+  const title = cleanTimelineMapTitle(item.title);
+  let city = String(item.cityName || '').trim();
+  if (/(→|->|\bvia\b)/i.test(city)) city = '';
+  if (item.type === 'activity' && /(→|->|\bvia\b)/i.test(title)) return city;
+  if (!title || /^(transport|activity|accommodation)$/i.test(title)) return city;
+  if (city && !title.toLowerCase().includes(city.toLowerCase())) return `${title}, ${city}`;
+  return title;
+}
+
+function addTimelineMapStop(stops, value) {
+  const cleanValue = String(value || '').trim();
+  if (!cleanValue) return;
+  const last = stops[stops.length - 1];
+  if (last && last.toLowerCase() === cleanValue.toLowerCase()) return;
+  stops.push(cleanValue);
+}
+
+function getTimelineStayAnchorStop(day, anchorType) {
+  if (typeof getStayDisplayForDay !== 'function') return '';
+  const staysForDay = getStayDisplayForDay(day?.date, day?.to);
+  if (!Array.isArray(staysForDay) || staysForDay.length === 0) return '';
+  const desiredTypes = anchorType === 'start' ? ['staying', 'checkout'] : ['checkin', 'staying'];
+  const stay = staysForDay.find(info => desiredTypes.includes(info.type));
+  if (!stay) return '';
+  if (stay.location) {
+    let loc = stay.location;
+    const cleanCity = String(day?.to || '').trim();
+    if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
+      loc = `${loc} (${cleanCity})`;
+    }
+    return loc;
+  }
+  return stay.propertyName || '';
+}
+
+function getTimelineBoundaryTransportStop(items, boundaryType) {
+  const boundary = (items || []).find(item => item.type === (boundaryType === 'arrival' ? 'arrivalBlock' : 'departureBlock'));
+  if (!boundary) return '';
+  const candidates = (items || []).filter(item => item.type === 'transport');
+  const matching = candidates.find(item => item.startTime === boundary.startTime) || candidates[0];
+  const locations = getTimelineMapLocationValues(matching?.subLocations);
+  if (locations.length === 0) return '';
+  return boundaryType === 'arrival' ? locations[locations.length - 1] : locations[0];
+}
+
+function getDailyTimelineMapRouteFromItems(items, day = null) {
+  const stops = [];
+  const arrivalStop = getTimelineBoundaryTransportStop(items, 'arrival');
+  const departureStop = getTimelineBoundaryTransportStop(items, 'departure');
+  const departureTime = (items || []).find(candidate => candidate.type === 'departureBlock')?.startTime;
+
+  addTimelineMapStop(stops, arrivalStop || getTimelineStayAnchorStop(day, 'start'));
+
+  (items || [])
+    .filter(item => ['activity', 'transport', 'stay'].includes(item.type))
+    .filter(item => !item.timelineShade)
+    .filter(item => !(item.type === 'transport' && departureStop && item.startTime === departureTime))
+    .forEach(item => {
+      const locations = item.type === 'transport'
+        ? getTimelineTransportMapLocationValues(item)
+        : getTimelineMapLocationValues(item.subLocations);
+      if (locations.length) {
+        locations.forEach(location => addTimelineMapStop(stops, location));
+      } else if (item.type === 'stay') {
+        addTimelineMapStop(stops, getTimelineMapFallback(item));
+      }
+    });
+
+  addTimelineMapStop(stops, departureStop || getTimelineStayAnchorStop(day, 'end'));
+
+  if (stops.length < 2) return { stops, url: '' };
+  return {
+    stops,
+    url: `https://www.google.com/maps/dir/${stops.map(stop => encodeURIComponent(stop)).join('/')}/`
+  };
+}
+
+function getDailyTimelineMapRoute(legIndex, dayIndex) {
+  const leg = appData?.[Number(legIndex)];
+  const day = leg?.days?.[Number(dayIndex)];
+  if (!leg || !day) return { stops: [], url: '' };
+  const items = applyTimelineTravelShading(buildDailyTimelineItems(leg, Number(legIndex), day, Number(dayIndex)));
+  return getDailyTimelineMapRouteFromItems(items, day);
+}
+
+function openDailyTimelineInMaps(legIndex, dayIndex) {
+  const route = getDailyTimelineMapRoute(legIndex, dayIndex);
+  if (!route.url) return;
+  window.open(route.url, '_blank');
+}
+
+function renderDailyTimelineMapAction(legIndex, dayIndex, items) {
+  const leg = appData?.[Number(legIndex)];
+  const day = leg?.days?.[Number(dayIndex)];
+  const route = getDailyTimelineMapRouteFromItems(items, day);
+  if (!route.url) return '';
+  return `
+    <button type="button" class="timeline-map-action" onclick="event.stopPropagation(); openDailyTimelineInMaps(${legIndex}, ${dayIndex})" title="${escapeCompactText(route.stops.join(' -> '))}">
+      <span class="location-map-icon">&#x1F5FA;&#xFE0F;</span>
+      <span>View day in Maps</span>
+      <small>${route.stops.length} stops</small>
+    </button>
+  `;
 }
 
 function applyTimelineTravelShading(items) {
@@ -2341,8 +2473,10 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
     : '<div class="timeline-empty">No scheduled items yet. Add transport, stays, or activities to build the day.</div>';
   if (items.length === 0) return empty;
   const { scheduled, anytime } = getDailyTimelineBuckets(items);
+  const mapAction = renderDailyTimelineMapAction(legIndex, dayIndex, items);
   return `
     <div class="daily-timeline-shell ${compact ? 'daily-timeline-shell-compact' : ''}">
+      ${mapAction ? `<div class="daily-timeline-heading-row"><span class="timeline-section-label">Day Timeline</span>${mapAction}</div>` : ''}
       ${scheduled.length ? `
         <div class="timeline-section-label">Scheduled</div>
         <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
@@ -3611,6 +3745,8 @@ function scrollToCity(cityId) {
 
 window.selectCityFilter = selectCityFilter;
 window.getStayDisplayForDay = getStayDisplayForDay;
+window.getDailyTimelineMapRoute = getDailyTimelineMapRoute;
+window.openDailyTimelineInMaps = openDailyTimelineInMaps;
 window.toggleFoodQuestDetails = toggleFoodQuestDetails;
 window.toggleTipsCardDetails = toggleTipsCardDetails;
 window.toggleActivitiesCardDetails = toggleActivitiesCardDetails;

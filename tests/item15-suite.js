@@ -695,6 +695,93 @@ async function testShareExport() {
   assert(exported.journeys[0].bookingReference === '', 'Share export: booking reference should be hidden');
 }
 
+async function testTimelineDayMapsRoute() {
+  const app = await createBootedApp();
+  const { context } = app;
+  assertBootClean(app, 'Timeline day maps route');
+
+  const trip = state(context);
+  const firstLeg = trip.itinerary[0];
+  firstLeg.label = 'Paris';
+  const firstDay = firstLeg.days[0];
+  firstLeg.days[1] = {
+    ...(firstLeg.days[1] || firstDay),
+    day: 'Tuesday',
+    date: '2031-01-05',
+    from: 'Paris',
+    to: 'Paris',
+    desc: 'Paris in-town day',
+    activityItems: [
+      { text: 'Morning coffee — Cafe de Flore', startTime: '09:00' },
+      { text: 'Museum visit', location: 'Musee d Orsay', startTime: '11:00' }
+    ]
+  };
+  firstDay.date = '2031-01-04';
+  firstDay.from = 'London';
+  firstDay.to = 'Paris';
+  if (!trip.cities.some(city => city.id === 'city-paris')) {
+    trip.cities.push({ id: 'city-paris', name: 'Paris', country: 'France', lat: 48.8566, lng: 2.3522 });
+  }
+  firstDay.activityItems = [
+    { text: 'Museum visit', location: 'Louvre Museum', startTime: '14:00' },
+    { text: 'Dinner — Rue Cler', startTime: '19:00' }
+  ];
+  trip.journeys.push({
+    id: 'journey_timeline_maps',
+    journeyId: 'journey_timeline_maps',
+    legId: firstLeg.id,
+    dayDate: '2031-01-04',
+    fromLocation: 'London',
+    toLocation: 'Paris',
+    departureDate: '2031-01-04',
+    departureTime: '09:15',
+    arrivalDate: '2031-01-04',
+    arrivalTime: '12:30',
+    transportType: 'train',
+    fromAddress: 'St Pancras International',
+    toAddress: 'Gare du Nord'
+  });
+  trip.stays.push({
+    id: 'stay_timeline_maps',
+    cityId: 'city-paris',
+    propertyName: 'Paris Hotel',
+    location: '',
+    checkIn: '2031-01-04',
+    checkOut: '2031-01-06'
+  });
+
+  context.importJSON({
+    target: {
+      files: [{
+        name: 'timeline-day-maps.json',
+        text: async () => JSON.stringify(trip)
+      }],
+      value: ''
+    }
+  });
+  await settle(app);
+
+  const route = context.getDailyTimelineMapRoute(0, 0);
+  assert(route.url.includes('https://www.google.com/maps/dir/'), 'Timeline day maps route: should build directions URL');
+  assert(!route.url.includes('St%20Pancras%20International'), 'Timeline day maps route: should exclude pre-arrival transport departure station');
+  assert(route.url.includes('Gare%20du%20Nord'), 'Timeline day maps route: should include transport arrival station');
+  assert(route.url.includes('Louvre%20Museum%20(Paris)'), 'Timeline day maps route: should include activity location from the timeline');
+  assert(route.url.includes('Rue%20Cler'), 'Timeline day maps route: should infer activity location from title suffix');
+  assert(route.url.includes('Paris%20Hotel'), 'Timeline day maps route: should fall back to accommodation name when no location is entered');
+  assert(route.stops[0].includes('Gare du Nord'), 'Timeline day maps route: arrival day should start from the arrival transport point');
+
+  const inTownRoute = context.getDailyTimelineMapRoute(0, 1);
+  assert(inTownRoute.stops[0] === 'Paris Hotel', 'Timeline day maps route: in-town day should start from accommodation');
+  assert(inTownRoute.stops[inTownRoute.stops.length - 1] === 'Paris Hotel', 'Timeline day maps route: in-town day should end at accommodation');
+  assert(inTownRoute.url.includes('Cafe%20de%20Flore'), 'Timeline day maps route: in-town day should include inferred activity title location');
+
+  const importedTrip = state(context);
+  const timelineHtml = context.renderDailyTimeline(importedTrip.itinerary[0], 0, importedTrip.itinerary[0].days[0], 0);
+  assert(timelineHtml.includes('View day in Maps'), 'Timeline day maps route: timeline should render the map action');
+  context.openDailyTimelineInMaps(0, 0);
+  assert(app.openedUrls[0]?.url.includes('google.com/maps/dir'), 'Timeline day maps route: action should open Google Maps');
+}
+
 async function testShareEmail() {
   const app = await createBootedApp();
   const { context } = app;
@@ -853,6 +940,7 @@ async function run() {
   await testModeToggles();
   await testCompactView();
   await testExportImport();
+  await testTimelineDayMapsRoute();
   await testShareExport();
   await testShareEmail();
   await testShareEmailDraft();
