@@ -12,17 +12,38 @@ async function deleteActivity(legIdx, activityIdx) {
   const activity = leg?.suggestedActivities?.[activityIdx];
   if (!leg || !activity) return;
 
-  const matchTexts = typeof getSuggestedActivityMatchTexts === 'function'
-    ? getSuggestedActivityMatchTexts(activity).map(t => getComparisonString(t))
-    : [getComparisonString(activity.title)];
+  const isItemMatch = (itemText) => {
+    if (!itemText) return false;
+    const cleanItem = getComparisonString(itemText);
+    const cleanTitle = getComparisonString(activity.title);
+    if (cleanItem === cleanTitle) return true;
+
+    const baseTitle = getComparisonString(activity.title.split(' — ')[0]);
+    if (cleanItem === baseTitle) return true;
+
+    const matchTexts = getSuggestedActivityMatchTexts(activity).map(t => getComparisonString(t));
+    if (matchTexts.includes(cleanItem)) return true;
+
+    // Check base parts of the itemText by splitting on separators
+    const separators = [' — ', ' – ', ' - ', ' | ', ' @ '];
+    for (const sep of separators) {
+      if (itemText.includes(sep)) {
+        const baseItem = getComparisonString(itemText.split(sep)[0]);
+        if (baseItem === cleanTitle || baseItem === baseTitle || matchTexts.includes(baseItem)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
 
   // Scan and clean matching items from all days on this leg (clears legacy duplicate leftovers)
   if (Array.isArray(leg.days)) {
     leg.days.forEach(day => {
       if (day && Array.isArray(day.activityItems)) {
         day.activityItems = day.activityItems.filter(item => {
-          const itemTextClean = getComparisonString(item?.text);
-          if (matchTexts.includes(itemTextClean)) return false;
+          if (isItemMatch(item?.text)) return false;
           return true;
         });
       }

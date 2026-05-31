@@ -1,12 +1,12 @@
 {
   "meta": {
     "title": "✈ Europe & Asia 2026",
-    "subtitle": "Trentan solo · Europe → Bangkok → Koh Samui with family → Home · Rick Steves audio walks scheduled"
+    "subtitle": "Trentan solo · Europe → Bangkok → Koh Samui with family → Home · Rick Steves audio walks scheduled · Last Supper + Cremona · fitness ideas unassigned"
   },
   "itinerary": [
     {
       "id": "city-brisbane-start",
-      "label": "Brisbane (Trip Start) (1)",
+      "label": "Brisbane (Trip Start)",
       "colour": "#2C3E50",
       "cityFood": [
         {
@@ -259,11 +259,31 @@
           "startTime": "17:30",
           "endTime": "19:00",
           "notes": "Use this instead of Shilin to avoid zig-zagging."
+        },
+        {
+          "title": "Optional fitness: skip formal workout; Elephant Mountain already covers the active hit",
+          "category": "fitness",
+          "estTime": "45–75 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-taipei",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Xinyi / Elephant Mountain",
+          "done": false,
+          "notes": "Transit day with heat and airport timing; treat Elephant Mountain as the workout."
         }
       ],
       "legTips": [
         {
           "text": "EVA free stopover voucher - apply at TPE info desk",
+          "cityId": "city-taipei"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-taipei"
         }
       ]
@@ -357,7 +377,8 @@
               "endTime": "13:30",
               "cityId": "city-vienna",
               "notes": "Print RS map and use AirPods. Stops: Opera, Café Sacher, Albertinaplatz/Albertina, Kärntner Strasse, Kaisergruft, Neuer Markt, Stephansdom/Stephansplatz, Graben, Dorotheergasse, Plague Column, St. Peter’s Church, Kohlmarkt/Demel, Michaelerplatz, Hofburg, Heldenplatz. Allow 2.5–3 hrs including photo/coffee pauses.",
-              "location": "Opera to Heldenplatz"
+              "location": "Opera to Heldenplatz",
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf"
             },
             {
               "text": "🍽 Flexible lunch/coffee stop built into the RS route — Café Sacher, Demel or Naschmarkt depending energy",
@@ -434,8 +455,8 @@
       ],
       "suggestedActivities": [
         {
-          "title": "Rick Steves Vienna City Walk: Opera → Café Sacher → Stephansdom → Graben → Hofburg → Heldenplatz",
-          "category": "audio walk",
+          "title": "Rick Steves Vienna City Walk: Opera → Café Sacher → Stephansdom → Graben → Hofburg → Heldenplatz — Opera to Heldenplatz",
+          "category": "fitness",
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": 0,
@@ -447,7 +468,11 @@
           "endTime": "13:30",
           "location": "Opera to Heldenplatz",
           "done": false,
-          "notes": "Print RS map and use AirPods. Stops: Opera, Café Sacher, Albertinaplatz/Albertina, Kärntner Strasse, Kaisergruft, Neuer Markt, Stephansdom/Stephansplatz, Graben, Dorotheergasse, Plague Column, St. Peter’s Church, Kohlmarkt/Demel, Michaelerplatz, Hofburg, Heldenplatz. Allow 2.5–3 hrs including photo/coffee pauses."
+          "notes": "Print RS map and use AirPods. Stops: Opera, Café Sacher, Albertinaplatz/Albertina, Kärntner Strasse, Kaisergruft, Neuer Markt, Stephansdom/Stephansplatz, Graben, Dorotheergasse, Plague Column, St. Peter’s Church, Kohlmarkt/Demel, Michaelerplatz, Hofburg, Heldenplatz. Allow 2.5–3 hrs including photo/coffee pauses.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf"
         },
         {
           "title": "🍽 Flexible lunch/coffee stop built into the RS route — Café Sacher, Demel or Naschmarkt depending energy",
@@ -512,6 +537,22 @@
           "location": "Old town / station",
           "done": false,
           "notes": "Keep this light; the real Vienna hit was the RS walk on arrival day."
+        },
+        {
+          "title": "Optional easy run: Prater Hauptallee or Donaukanal recovery jog",
+          "category": "fitness",
+          "estTime": "30–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-vienna",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Prater / Donaukanal",
+          "done": false,
+          "notes": "Only do this if jetlag is kind; the Rick Steves walk is already a solid walking day."
         }
       ],
       "legTips": [
@@ -525,6 +566,10 @@
         },
         {
           "text": "Naschmarkt closed on Sunday - plan accordingly",
+          "cityId": "city-vienna"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-vienna"
         }
       ]
@@ -645,17 +690,6 @@
               "endTime": "13:30",
               "cityId": "city-bratislava",
               "location": "Devín Castle"
-            },
-            {
-              "text": "🏃 Danube Promenade recovery run / fast flat walk",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-12",
-              "endDate": "2026-06-12",
-              "startTime": "17:00",
-              "endTime": "18:00",
-              "cityId": "city-bratislava"
             }
           ]
         },
@@ -787,7 +821,40 @@
           "startDate": "2026-06-13",
           "startTime": "09:00",
           "endDate": "2026-06-13",
-          "endTime": "10:30"
+          "endTime": "10:30",
+          "cityId": ""
+        },
+        {
+          "title": "Optional run: Danube Promenade flat 5–10km",
+          "category": "fitness",
+          "estTime": "30–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-bratislava",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Danube Promenade",
+          "done": false,
+          "notes": "Great easy solo run or fast walk from the Old Town/SNP Bridge area."
+        },
+        {
+          "title": "Optional longer fitness route: Devín / Morava river path if legs feel fresh",
+          "category": "fitness",
+          "estTime": "60–90 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-bratislava",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Devín / Morava",
+          "done": false,
+          "notes": "Only if the Devín sightseeing day turns into a fitness outing; do not force it before Prague transfer."
         }
       ],
       "legTips": [
@@ -801,6 +868,10 @@
         },
         {
           "text": "UFO deck booking required - everything walkable in 15 minutes",
+          "cityId": "city-bratislava"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-bratislava"
         }
       ]
@@ -889,7 +960,8 @@
               "endTime": "11:00",
               "cityId": "city-prague",
               "notes": "Print RS map and use AirPods. Stops: Wenceslas Square/National Museum, Hotel Europa/Velvet Revolution, Lucerna Arcade, Franciscan Garden, Můstek, Na Příkopě, Municipal House, Powder Tower, Celetná, Old Town Square, Astronomical Clock, Karlova Street, Charles IV Square, Charles Bridge. Allow 3 hrs with coffee/photo stops.",
-              "location": "Wenceslas Square to Charles Bridge"
+              "location": "Wenceslas Square to Charles Bridge",
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf"
             },
             {
               "text": "☕ Lunch/coffee pause after the RS Prague walk",
@@ -995,8 +1067,8 @@
           "notes": "Light orientation only after the train; save the proper Rick Steves audio walk for tomorrow morning."
         },
         {
-          "title": "Rick Steves Prague City Walk: Wenceslas Square → Old Town Square → Astronomical Clock → Charles Bridge",
-          "category": "audio walk",
+          "title": "Rick Steves Prague City Walk: Wenceslas Square → Old Town Square → Astronomical Clock → Charles Bridge — Wenceslas Square to Charles Bridge",
+          "category": "fitness",
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": 1,
@@ -1008,7 +1080,11 @@
           "endTime": "11:00",
           "location": "Wenceslas Square to Charles Bridge",
           "done": false,
-          "notes": "Print RS map and use AirPods. Stops: Wenceslas Square/National Museum, Hotel Europa/Velvet Revolution, Lucerna Arcade, Franciscan Garden, Můstek, Na Příkopě, Municipal House, Powder Tower, Celetná, Old Town Square, Astronomical Clock, Karlova Street, Charles IV Square, Charles Bridge. Allow 3 hrs with coffee/photo stops."
+          "notes": "Print RS map and use AirPods. Stops: Wenceslas Square/National Museum, Hotel Europa/Velvet Revolution, Lucerna Arcade, Franciscan Garden, Můstek, Na Příkopě, Municipal House, Powder Tower, Celetná, Old Town Square, Astronomical Clock, Karlova Street, Charles IV Square, Charles Bridge. Allow 3 hrs with coffee/photo stops.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf"
         },
         {
           "title": "☕ Lunch/coffee pause after the RS Prague walk",
@@ -1089,6 +1165,38 @@
           "location": "Near hotel / station",
           "done": false,
           "notes": "No major activity before the 09:10 FlixBus."
+        },
+        {
+          "title": "Optional easy run: Vltava river path before crowds",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-prague",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Vltava river",
+          "done": false,
+          "notes": "Best early morning; avoid a hard run before Castle stairs."
+        },
+        {
+          "title": "Optional hill hit: Malá Strana → Prague Castle steps",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-prague",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Malá Strana / Castle steps",
+          "done": false,
+          "notes": "Short but steep; only if you want a fitness challenge, not on tired legs."
         }
       ],
       "legTips": [
@@ -1102,6 +1210,10 @@
         },
         {
           "text": "Prague Visitor Pass covers all key transport and sights",
+          "cityId": "city-prague"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-prague"
         }
       ]
@@ -1191,19 +1303,7 @@
               "cityId": "city-munich"
             }
           ],
-          "activityItems": [
-            {
-              "text": "🏃 Wöhrder Wiese / Pegnitz riverside morning loop",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-16",
-              "endDate": "2026-06-16",
-              "startTime": "07:30",
-              "endTime": "08:30",
-              "cityId": "city-nuremberg"
-            }
-          ]
+          "activityItems": []
         }
       ],
       "suggestedActivities": [
@@ -1258,6 +1358,22 @@
           "endDate": "2026-06-16",
           "startTime": "07:30",
           "endTime": "08:30"
+        },
+        {
+          "title": "Optional run: Wöhrder Wiese / Pegnitz riverside loop",
+          "category": "fitness",
+          "estTime": "30–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-nuremberg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Wöhrder Wiese / Pegnitz",
+          "done": false,
+          "notes": "Good morning option before Munich if you wake early; otherwise skip and keep the transfer easy."
         }
       ],
       "legTips": [
@@ -1271,6 +1387,10 @@
         },
         {
           "text": "Walk the 5km old city walls",
+          "cityId": "city-nuremberg"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-nuremberg"
         }
       ]
@@ -1474,7 +1594,8 @@
               "endTime": "12:30",
               "cityId": "city-munich",
               "notes": "Print RS map and use AirPods. Stops: Marienplatz, St Peter’s Church, Viktualienmarkt, Jewish Synagogue/City Museum, Asam Church, Sendlinger Strasse, Kaufingerstrasse, Frauenkirche, Marienhof, Dallmayr, Platzl, Hofbräuhaus, Maximilianstrasse, Max-Joseph-Platz, Residenz, Viscardigasse, Odeonsplatz, Hofgarten. Allow 3–3.5 hrs including lunch/beer/coffee pauses.",
-              "location": "Marienplatz to Hofgarten"
+              "location": "Marienplatz to Hofgarten",
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf"
             },
             {
               "text": "🍽 Lunch/beer/coffee pause built into the RS Munich route — Viktualienmarkt, Dallmayr or Hofbräuhaus",
@@ -1647,8 +1768,8 @@
           "notes": "Easy beer-hall night without turning it into another big walk."
         },
         {
-          "title": "Rick Steves Munich City Walk: Marienplatz → Viktualienmarkt → Asam Church → Dallmayr → Hofbräuhaus → Residenz → Hofgarten",
-          "category": "audio walk",
+          "title": "Rick Steves Munich City Walk: Marienplatz → Viktualienmarkt → Asam Church → Dallmayr → Hofbräuhaus → Residenz → Hofgarten — Marienplatz to Hofgarten",
+          "category": "fitness",
           "estTime": "3.5 hrs",
           "estCost": "0",
           "assignedDayIdx": 3,
@@ -1660,7 +1781,11 @@
           "endTime": "12:30",
           "location": "Marienplatz to Hofgarten",
           "done": false,
-          "notes": "Print RS map and use AirPods. Stops: Marienplatz, St Peter’s Church, Viktualienmarkt, Jewish Synagogue/City Museum, Asam Church, Sendlinger Strasse, Kaufingerstrasse, Frauenkirche, Marienhof, Dallmayr, Platzl, Hofbräuhaus, Maximilianstrasse, Max-Joseph-Platz, Residenz, Viscardigasse, Odeonsplatz, Hofgarten. Allow 3–3.5 hrs including lunch/beer/coffee pauses."
+          "notes": "Print RS map and use AirPods. Stops: Marienplatz, St Peter’s Church, Viktualienmarkt, Jewish Synagogue/City Museum, Asam Church, Sendlinger Strasse, Kaufingerstrasse, Frauenkirche, Marienhof, Dallmayr, Platzl, Hofbräuhaus, Maximilianstrasse, Max-Joseph-Platz, Residenz, Viscardigasse, Odeonsplatz, Hofgarten. Allow 3–3.5 hrs including lunch/beer/coffee pauses.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf"
         },
         {
           "title": "🍽 Lunch/beer/coffee pause built into the RS Munich route — Viktualienmarkt, Dallmayr or Hofbräuhaus",
@@ -1725,6 +1850,38 @@
           "location": "Near hotel / München Hbf",
           "done": false,
           "notes": "Do not schedule a major sight before the 11:23 train."
+        },
+        {
+          "title": "Optional conference reset: hotel gym or 30–40 min easy jog",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Hotel gym / nearby streets",
+          "done": false,
+          "notes": "Use on conference days to reset mentally; do not stack hard runs with long evenings."
+        },
+        {
+          "title": "Optional run: English Garden / Eisbach circuit",
+          "category": "fitness",
+          "estTime": "40–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "English Garden",
+          "done": false,
+          "notes": "Excellent green-space run if staying reasonably central."
         }
       ],
       "legTips": [
@@ -1750,6 +1907,10 @@
         },
         {
           "text": "Day trip idea: Salzburg by train (1.5h) - early start if skipping last conf day",
+          "cityId": "city-munich"
+        },
+        {
+          "text": "Fitness: conference days are best for short gym/easy jog resets; do not turn them into hard training days.",
           "cityId": "city-munich"
         }
       ]
@@ -1939,6 +2100,22 @@
           "startTime": "",
           "endTime": "",
           "notes": "Not scheduled on current one-night Bolzano stop."
+        },
+        {
+          "title": "Optional run: Adige riverside path north toward vineyards",
+          "category": "fitness",
+          "estTime": "30–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-bolzano",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Adige river",
+          "done": false,
+          "notes": "Scenic and flat; better than forcing a Dolomites mission on a one-night stop."
         }
       ],
       "legTips": [
@@ -1951,7 +2128,11 @@
           "cityId": "city-bolzano"
         },
         {
-          "text": "Seceda cable car - go early, fills with day-trippers. Mind the altitude.",
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
+          "cityId": "city-bolzano"
+        },
+        {
+          "text": "Skip Seceda/Alpe di Siusi unless you add another Dolomites night; with one night, Renon + Ötzi is the smarter fit.",
           "cityId": "city-bolzano"
         }
       ]
@@ -2082,12 +2263,32 @@
           "endDate": "2026-06-22",
           "startTime": "08:30",
           "endTime": "10:30"
+        },
+        {
+          "title": "Optional run/walk: Adige river + Castelvecchio loop",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-verona",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Adige / Castelvecchio",
+          "done": false,
+          "notes": "Easy way to get movement without leaving the historic centre."
         }
       ],
       "legTips": [
         {
           "text": "Book 'The Last Supper' MONTHS in advance - sells out instantly online",
           "cityId": "city-milan"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
+          "cityId": "city-verona"
         }
       ]
     },
@@ -2125,7 +2326,7 @@
           ],
           "activityItems": [
             {
-              "text": "🌆 Easy Milan arrival: Brera wander + dinner, no major Duomo tour yet",
+              "text": "🏛️ 🌆 Easy Milan arrival: Brera wander + dinner, no major Duomo tour yet — Brera / central Milan",
               "cost": "0",
               "time": "4.5 hrs",
               "done": false,
@@ -2135,7 +2336,45 @@
               "endTime": "20:00",
               "cityId": "city-milan",
               "notes": "Save the Rick Steves Duomo audio walk for tomorrow morning when you are fresh and can do rooftop/interior properly.",
-              "location": "Brera / central Milan"
+              "location": "Brera / central Milan",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": ""
+            },
+            {
+              "text": "🍽️ 🍹 Navigli aperitivo evening — Navigli",
+              "cost": "0",
+              "time": "2.5 hrs",
+              "done": false,
+              "notes": "Separate evening cluster; easy tram/metro from central Milan.",
+              "location": "Navigli",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": "",
+              "startDate": "2026-06-22",
+              "startTime": "18:30",
+              "endDate": "2026-06-22",
+              "endTime": "21:00",
+              "cityId": ""
+            },
+            {
+              "text": "🏃 Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala — Piazza del Duomo to La Scala",
+              "cost": "0",
+              "time": "3 hrs",
+              "done": false,
+              "notes": "Print RS map and use AirPods. Stops: Piazza del Duomo, Duomo exterior, side view, interior nave/right aisle/more sights, rooftop, Galleria Vittorio Emanuele II, Piazza della Scala, La Scala Opera House. Allow 3 hrs if doing interior + rooftop slowly.",
+              "location": "Piazza del Duomo to La Scala",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf",
+              "startDate": "2026-06-22",
+              "startTime": "16:00",
+              "endDate": "2026-06-22",
+              "endTime": "19:00",
+              "cityId": ""
             }
           ]
         },
@@ -2166,7 +2405,8 @@
               "endTime": "12:00",
               "cityId": "city-milan",
               "notes": "Print RS map and use AirPods. Stops: Piazza del Duomo, Duomo exterior, side view, interior nave/right aisle/more sights, rooftop, Galleria Vittorio Emanuele II, Piazza della Scala, La Scala Opera House. Allow 3 hrs if doing interior + rooftop slowly.",
-              "location": "Piazza del Duomo to La Scala"
+              "location": "Piazza del Duomo to La Scala",
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf"
             },
             {
               "text": "🍽 Lunch/coffee pause after the RS Duomo walk",
@@ -2206,6 +2446,23 @@
               "cityId": "city-milan",
               "notes": "Separate evening cluster; easy tram/metro from central Milan.",
               "location": "Navigli"
+            },
+            {
+              "text": "🏛️ 🎨 The Last Supper timed entry — Santa Maria delle Grazie",
+              "cost": "0",
+              "time": "1 hr",
+              "done": false,
+              "notes": "Book this as the Milan priority. If ticket availability forces a different slot, move it to 23 or 25 June and keep Cremona as the flexible day trip.",
+              "location": "Santa Maria delle Grazie",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": "",
+              "startDate": "2026-06-23",
+              "startTime": "08:30",
+              "endDate": "2026-06-23",
+              "endTime": "09:30",
+              "cityId": ""
             }
           ]
         },
@@ -2215,7 +2472,7 @@
           "from": "🇮🇹 Milan",
           "to": "🇮🇹 Milan",
           "completed": false,
-          "desc": "Exploring",
+          "desc": "Last Supper timed entry + Cremona day trip",
           "transportItems": [],
           "accomItems": [
             {
@@ -2226,30 +2483,30 @@
           ],
           "activityItems": [
             {
-              "text": "🚆 Lake Como day trip: Como / ferry / Bellagio or Varenna",
+              "text": "🎨 The Last Supper timed entry — priority booking, exact slot may move",
               "cost": "0",
-              "time": "10.5 hrs",
+              "time": "1 hr",
               "done": false,
               "startDate": "2026-06-24",
               "endDate": "2026-06-24",
-              "startTime": "08:00",
-              "endTime": "18:30",
+              "startTime": "08:30",
+              "endTime": "09:30",
               "cityId": "city-milan",
-              "notes": "Weather-dependent big-outcome day. If forecast is poor, use the backup instead.",
-              "location": "Lake Como"
+              "notes": "Book this as the Milan priority. If ticket availability forces a different slot, move it to 23 or 25 June and keep Cremona as the flexible day trip.",
+              "location": "Santa Maria delle Grazie"
             },
             {
-              "text": "🎨 Backup if weather is poor: Last Supper + Brera / Porta Nuova",
+              "text": "🚆 Cremona day trip: Duomo → Torrazzo → violin heritage → relaxed piazza lunch",
               "cost": "0",
-              "time": "7.5 hrs",
+              "time": "8 hrs",
               "done": false,
               "startDate": "2026-06-24",
               "endDate": "2026-06-24",
-              "startTime": "09:00",
-              "endTime": "16:30",
+              "startTime": "10:30",
+              "endTime": "18:30",
               "cityId": "city-milan",
-              "notes": "Only viable if Last Supper tickets are available; otherwise keep it as Brera/Porta Nuova/coffee wandering.",
-              "location": "Milan"
+              "notes": "Good solo day trip from Milan with a more unusual music/history angle; keep it slower if the Last Supper slot lands later.",
+              "location": "Cremona"
             }
           ]
         },
@@ -2287,7 +2544,7 @@
       ],
       "suggestedActivities": [
         {
-          "title": "🌆 Easy Milan arrival: Brera wander + dinner, no major Duomo tour yet",
+          "title": "🌆 Easy Milan arrival: Brera wander + dinner, no major Duomo tour yet — Brera / central Milan",
           "category": "sight",
           "estTime": "4.5 hrs",
           "estCost": "0",
@@ -2300,23 +2557,31 @@
           "endTime": "20:00",
           "location": "Brera / central Milan",
           "done": false,
-          "notes": "Save the Rick Steves Duomo audio walk for tomorrow morning when you are fresh and can do rooftop/interior properly."
+          "notes": "Save the Rick Steves Duomo audio walk for tomorrow morning when you are fresh and can do rooftop/interior properly.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": ""
         },
         {
-          "title": "Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala",
-          "category": "audio walk",
+          "title": "Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala — Piazza del Duomo to La Scala",
+          "category": "fitness",
           "estTime": "3 hrs",
           "estCost": "0",
-          "assignedDayIdx": 1,
+          "assignedDayIdx": 0,
           "cityId": "city-milan",
-          "assignedDate": "2026-06-23",
-          "startDate": "2026-06-23",
-          "endDate": "2026-06-23",
-          "startTime": "09:00",
-          "endTime": "12:00",
+          "assignedDate": "2026-06-22",
+          "startDate": "2026-06-22",
+          "endDate": "2026-06-22",
+          "startTime": "16:00",
+          "endTime": "19:00",
           "location": "Piazza del Duomo to La Scala",
           "done": false,
-          "notes": "Print RS map and use AirPods. Stops: Piazza del Duomo, Duomo exterior, side view, interior nave/right aisle/more sights, rooftop, Galleria Vittorio Emanuele II, Piazza della Scala, La Scala Opera House. Allow 3 hrs if doing interior + rooftop slowly."
+          "notes": "Print RS map and use AirPods. Stops: Piazza del Duomo, Duomo exterior, side view, interior nave/right aisle/more sights, rooftop, Galleria Vittorio Emanuele II, Piazza della Scala, La Scala Opera House. Allow 3 hrs if doing interior + rooftop slowly.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf"
         },
         {
           "title": "🍽 Lunch/coffee pause after the RS Duomo walk",
@@ -2351,52 +2616,24 @@
           "notes": "This is the natural next cluster after Duomo/La Scala/Brera."
         },
         {
-          "title": "🍹 Navigli aperitivo evening",
+          "title": "🍹 Navigli aperitivo evening — Navigli",
           "category": "food",
           "estTime": "2.5 hrs",
           "estCost": "0",
-          "assignedDayIdx": 1,
+          "assignedDayIdx": 0,
           "cityId": "city-milan",
-          "assignedDate": "2026-06-23",
-          "startDate": "2026-06-23",
-          "endDate": "2026-06-23",
+          "assignedDate": "2026-06-22",
+          "startDate": "2026-06-22",
+          "endDate": "2026-06-22",
           "startTime": "18:30",
           "endTime": "21:00",
           "location": "Navigli",
           "done": false,
-          "notes": "Separate evening cluster; easy tram/metro from central Milan."
-        },
-        {
-          "title": "🚆 Lake Como day trip: Como / ferry / Bellagio or Varenna",
-          "category": "sight",
-          "estTime": "10.5 hrs",
-          "estCost": "0",
-          "assignedDayIdx": 2,
-          "cityId": "city-milan",
-          "assignedDate": "2026-06-24",
-          "startDate": "2026-06-24",
-          "endDate": "2026-06-24",
-          "startTime": "08:00",
-          "endTime": "18:30",
-          "location": "Lake Como",
-          "done": false,
-          "notes": "Weather-dependent big-outcome day. If forecast is poor, use the backup instead."
-        },
-        {
-          "title": "🎨 Backup if weather is poor: Last Supper + Brera / Porta Nuova",
-          "category": "sight",
-          "estTime": "7.5 hrs",
-          "estCost": "0",
-          "assignedDayIdx": 2,
-          "cityId": "city-milan",
-          "assignedDate": "2026-06-24",
-          "startDate": "2026-06-24",
-          "endDate": "2026-06-24",
-          "startTime": "09:00",
-          "endTime": "16:30",
-          "location": "Milan",
-          "done": false,
-          "notes": "Only viable if Last Supper tickets are available; otherwise keep it as Brera/Porta Nuova/coffee wandering."
+          "notes": "Separate evening cluster; easy tram/metro from central Milan.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": ""
         },
         {
           "title": "☕ Easy Milan coffee/walk before Zurich train",
@@ -2413,6 +2650,131 @@
           "location": "Near hotel / Milano Centrale",
           "done": false,
           "notes": "No major paid activity before the 12:05 EuroCity to Zurich."
+        },
+        {
+          "title": "🎨 The Last Supper timed entry — Santa Maria delle Grazie",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-milan",
+          "assignedDate": "2026-06-23",
+          "startDate": "2026-06-23",
+          "endDate": "2026-06-23",
+          "startTime": "08:30",
+          "endTime": "09:30",
+          "location": "Santa Maria delle Grazie",
+          "done": false,
+          "notes": "Book this as the Milan priority. If ticket availability forces a different slot, move it to 23 or 25 June and keep Cremona as the flexible day trip.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": ""
+        },
+        {
+          "title": "🚆 Cremona day trip: Duomo → Torrazzo → violin heritage → relaxed piazza lunch",
+          "category": "sight",
+          "estTime": "8 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 2,
+          "cityId": "city-milan",
+          "assignedDate": "2026-06-24",
+          "startDate": "2026-06-24",
+          "endDate": "2026-06-24",
+          "startTime": "10:30",
+          "endTime": "18:30",
+          "location": "Cremona",
+          "done": false,
+          "notes": "Good solo day trip from Milan with a more unusual music/history angle; keep it slower if the Last Supper slot lands later."
+        },
+        {
+          "title": "Optional run: Parco Sempione easy loop",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-milan",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Parco Sempione",
+          "done": false,
+          "notes": "Best Milan outdoor run option around the Sforzesco/park area; otherwise use hotel gym."
+        },
+        {
+          "title": "Optional gym: Milan hotel gym instead of street run",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-milan",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Hotel gym",
+          "done": false,
+          "notes": "Use this if heat/traffic makes outdoor running unappealing."
+        },
+        {
+          "title": "Navigli aperitivo evening",
+          "category": "sight",
+          "estTime": "2.5 hrs",
+          "estCost": "0",
+          "notes": "Separate evening cluster; easy tram/metro from central Milan.",
+          "location": "Navigli",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-23",
+          "startDate": "2026-06-23",
+          "startTime": "18:30",
+          "endDate": "2026-06-23",
+          "endTime": "21:00",
+          "cityId": ""
+        },
+        {
+          "title": "Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala",
+          "category": "sight",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "notes": "Print RS map and use AirPods. Stops: Piazza del Duomo, Duomo exterior, side view, interior nave/right aisle/more sights, rooftop, Galleria Vittorio Emanuele II, Piazza della Scala, La Scala Opera House. Allow 3 hrs if doing interior + rooftop slowly.",
+          "location": "Piazza del Duomo to La Scala",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-23",
+          "startDate": "2026-06-23",
+          "startTime": "09:00",
+          "endDate": "2026-06-23",
+          "endTime": "12:00",
+          "cityId": ""
+        },
+        {
+          "title": "The Last Supper timed entry",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Book this as the Milan priority. If ticket availability forces a different slot, move it to 23 or 25 June and keep Cremona as the flexible day trip.",
+          "location": "Santa Maria delle Grazie",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2026-06-24",
+          "startDate": "2026-06-24",
+          "startTime": "08:30",
+          "endDate": "2026-06-24",
+          "endTime": "09:30",
+          "cityId": ""
         }
       ],
       "legTips": [
@@ -2422,6 +2784,18 @@
         },
         {
           "text": "Duomo rooftop: book timed entry online - skip the line",
+          "cityId": "city-milan"
+        },
+        {
+          "text": "Last Supper: make this the priority Milan booking; move the slot around ticket availability rather than forcing a bad time.",
+          "cityId": "city-milan"
+        },
+        {
+          "text": "Cremona is now the main Milan day trip: better if you want something less obvious than the standard lake circuit.",
+          "cityId": "city-milan"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-milan"
         }
       ]
@@ -2577,6 +2951,22 @@
           "startTime": "",
           "endTime": "",
           "notes": "Possible but too transit-heavy before the Zurich → London flight."
+        },
+        {
+          "title": "Optional run: Lake Zurich promenade / Limmat easy loop",
+          "category": "fitness",
+          "estTime": "30–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-zurich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Lake Zurich / Limmat",
+          "done": false,
+          "notes": "Probably one of the best short run cities on the trip; keep airport timing in mind."
         }
       ],
       "legTips": [
@@ -2594,6 +2984,10 @@
         },
         {
           "text": "Be back by 3pm — flight 18:30",
+          "cityId": "city-zurich"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-zurich"
         }
       ]
@@ -2701,7 +3095,7 @@
           "from": "🇹🇭 Bangkok (2)",
           "to": "🇹🇭 Bangkok (2)",
           "completed": false,
-          "desc": "Family arrives! ⚠️ EARLY FLIGHT TOMORROW",
+          "desc": "Family arrives — ibis bag drop, Chatuchak market together, optional Big Buddha",
           "transportItems": [],
           "accomItems": [
             {
@@ -2714,27 +3108,51 @@
           ],
           "activityItems": [
             {
-              "text": "🛍 Chatuchak Weekend Market morning",
+              "text": "🏃 👨‍👩‍👧‍👦 Family arrives + quick ibis room bag drop / refresh — ibis Styles Bangkok Sukhumvit Phra Khanong",
               "cost": "0",
-              "time": "3 hrs 30 mins",
+              "time": "1 hr",
               "done": false,
               "startDate": "2026-06-28",
               "endDate": "2026-06-28",
-              "startTime": "09:00",
-              "endTime": "12:30",
-              "cityId": "city-bangkok"
+              "startTime": "10:30",
+              "endTime": "11:30",
+              "cityId": "city-bangkok",
+              "notes": "Use the ibis room as the easy reset point so everyone can dump bags, freshen up, and head out light.",
+              "location": "ibis Styles Bangkok Sukhumvit Phra Khanong",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": ""
             },
             {
-              "text": "👨‍👩‍👧‍👦 Family arrival buffer + low-key dinner",
+              "text": "🏛️ 🛍 Chatuchak Weekend Market with the family — Chatuchak Weekend Market",
               "cost": "0",
-              "time": "4 hrs",
+              "time": "2.5 hrs",
               "done": false,
               "startDate": "2026-06-28",
               "endDate": "2026-06-28",
-              "startTime": "16:00",
-              "endTime": "20:00",
+              "startTime": "12:00",
+              "endTime": "14:30",
               "cityId": "city-bangkok",
-              "notes": "Keep evening easy because of the 06:05 Koh Samui flight."
+              "notes": "Main family Bangkok activity. Keep it relaxed: food, souvenir stalls, people-watching; do not try to see every section.",
+              "location": "Chatuchak Weekend Market",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": ""
+            },
+            {
+              "text": "🛕 Optional Big Buddha / Wat Paknam photo stop OR simple family dinner",
+              "cost": "0",
+              "time": "1.5 hrs",
+              "done": false,
+              "startDate": "2026-06-28",
+              "endDate": "2026-06-28",
+              "startTime": "19:00",
+              "endTime": "20:30",
+              "cityId": "city-bangkok",
+              "notes": "Only do this if traffic/energy is good. It is not naturally close to Chatuchak, so a simple dinner may be the smarter call after the market.",
+              "location": "Wat Paknam / dinner nearby"
             }
           ]
         },
@@ -2785,33 +3203,6 @@
           "notes": "If tired after arrival, swap for Chinatown or a simple local dinner."
         },
         {
-          "title": "Chatuchak Weekend Market morning",
-          "category": "sight",
-          "estTime": "3 hrs 30 mins",
-          "estCost": "0",
-          "assignedDayIdx": 1,
-          "cityId": "city-bangkok",
-          "assignedDate": "2026-06-28",
-          "startDate": "2026-06-28",
-          "endDate": "2026-06-28",
-          "startTime": "09:00",
-          "endTime": "12:30"
-        },
-        {
-          "title": "Family arrival buffer + low-key dinner",
-          "category": "sight",
-          "estTime": "4 hrs",
-          "estCost": "0",
-          "assignedDayIdx": 1,
-          "cityId": "city-bangkok",
-          "assignedDate": "2026-06-28",
-          "startDate": "2026-06-28",
-          "endDate": "2026-06-28",
-          "startTime": "16:00",
-          "endTime": "20:00",
-          "notes": "Keep evening easy because of the 06:05 Koh Samui flight."
-        },
-        {
           "title": "Grand Palace - optional only if cutting something else",
           "category": "sight",
           "estTime": "3 hrs",
@@ -2854,7 +3245,80 @@
           "startDate": "2026-06-29",
           "startTime": "04:30",
           "endDate": "2026-06-29",
-          "endTime": "07:10"
+          "endTime": "07:10",
+          "cityId": ""
+        },
+        {
+          "title": "👨‍👩‍👧‍👦 Family arrives + quick ibis room bag drop / refresh — ibis Styles Bangkok Sukhumvit Phra Khanong",
+          "category": "fitness",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-bangkok",
+          "assignedDate": "2026-06-28",
+          "startDate": "2026-06-28",
+          "endDate": "2026-06-28",
+          "startTime": "10:30",
+          "endTime": "11:30",
+          "location": "ibis Styles Bangkok Sukhumvit Phra Khanong",
+          "done": false,
+          "notes": "Use the ibis room as the easy reset point so everyone can dump bags, freshen up, and head out light.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": ""
+        },
+        {
+          "title": "🛍 Chatuchak Weekend Market with the family — Chatuchak Weekend Market",
+          "category": "sight",
+          "estTime": "2.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-bangkok",
+          "assignedDate": "2026-06-28",
+          "startDate": "2026-06-28",
+          "endDate": "2026-06-28",
+          "startTime": "12:00",
+          "endTime": "14:30",
+          "location": "Chatuchak Weekend Market",
+          "done": false,
+          "notes": "Main family Bangkok activity. Keep it relaxed: food, souvenir stalls, people-watching; do not try to see every section.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": ""
+        },
+        {
+          "title": "🛕 Optional Big Buddha / Wat Paknam photo stop OR simple family dinner",
+          "category": "sight",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-bangkok",
+          "assignedDate": "2026-06-28",
+          "startDate": "2026-06-28",
+          "endDate": "2026-06-28",
+          "startTime": "19:00",
+          "endTime": "20:30",
+          "location": "Wat Paknam / dinner nearby",
+          "done": false,
+          "notes": "Only do this if traffic/energy is good. It is not naturally close to Chatuchak, so a simple dinner may be the smarter call after the market."
+        },
+        {
+          "title": "Optional fitness: hotel treadmill/gym only — avoid street running in heat/traffic",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-bangkok",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Hotel gym",
+          "done": false,
+          "notes": "Bangkok is better as a gym/treadmill city unless you are out very early."
         }
       ],
       "legTips": [
@@ -2864,6 +3328,18 @@
         },
         {
           "text": "Pre-order Grab taxi for 04:30 pickup - BKK traffic is notoriously bad",
+          "cityId": "city-bangkok"
+        },
+        {
+          "text": "Family arrival day: use the ibis room as a quick bag-drop/reset point, then do Chatuchak together as the main activity.",
+          "cityId": "city-bangkok"
+        },
+        {
+          "text": "Big Buddha / Wat Paknam is optional after Chatuchak because it creates a cross-town move; skip it if the family is cooked.",
+          "cityId": "city-bangkok"
+        },
+        {
+          "text": "Fitness: use hotel treadmill/gym; Bangkok heat and traffic make casual street runs a poor trade-off.",
           "cityId": "city-bangkok"
         }
       ]
@@ -3407,7 +3883,40 @@
           "startDate": "2026-07-07",
           "startTime": "07:00",
           "endDate": "2026-07-07",
-          "endTime": "08:00"
+          "endTime": "08:00",
+          "cityId": ""
+        },
+        {
+          "title": "Optional early run: Chaweng or Lamai beach before heat",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Chaweng / Lamai",
+          "done": false,
+          "notes": "Early only; then switch to holiday/family mode."
+        },
+        {
+          "title": "Optional resort gym / swim recovery session",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-samui",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Hotel / beach",
+          "done": false,
+          "notes": "Good between Ang Thong and Koh Tao or on the flexible final day."
         }
       ],
       "legTips": [
@@ -3442,6 +3951,10 @@
         {
           "text": "Book Grab for 06:30 airport pickup tomorrow - morning traffic to USM",
           "cityId": "city-koh-samui"
+        },
+        {
+          "text": "Fitness: keep runs early and optional; beach walks, swims and resort gym sessions are enough on family days.",
+          "cityId": "city-samui"
         }
       ]
     },
@@ -3490,7 +4003,7 @@
     },
     {
       "id": "city-brisbane-finish",
-      "label": "Brisbane (Trip Finish) (2)",
+      "label": "Brisbane (Trip Finish)",
       "colour": "#2C3E50",
       "cityFood": [
         {
