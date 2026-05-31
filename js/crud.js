@@ -477,8 +477,9 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
   const getScheduleOptions = (button = null) => {
     const selectedMode = modeInputs.find(input => input.checked)?.value || 'suggested';
     const scheduleMode = ['scheduled', 'suggested'].includes(selectedMode) ? selectedMode : 'anytime';
-    const suggestedStartTime = button?.getAttribute('data-suggest-start') || '';
-    const suggestedEndTime = button?.getAttribute('data-suggest-end') || '';
+    const targetBtn = button || modal.querySelector('.activity-assign-day.is-current');
+    const suggestedStartTime = targetBtn?.getAttribute('data-suggest-start') || '';
+    const suggestedEndTime = targetBtn?.getAttribute('data-suggest-end') || '';
     
     const startTime = getSelectedTimeValue('activityStartHour', 'activityStartMinute', 'activityStartAmpm');
     const endTime = getSelectedTimeValue('activityEndHour', 'activityEndMinute', 'activityEndAmpm');
@@ -1491,12 +1492,34 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
   const targetDay = targetLeg?.days?.[targetDayIdx];
   if (!activity || !targetDay) return false;
 
+  const getComparisonString = (str) => {
+    return String(str || '')
+      .toLowerCase()
+      .replace(/[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}\u{1F000}-\u{1FAFF}\u{200D}\u{FE0F}]/gu, '')
+      .replace(/[^a-z0-9]/g, '')
+      .trim();
+  };
+
+  const isItemMatch = (itemText) => {
+    if (!itemText) return false;
+    const cleanItem = getComparisonString(itemText);
+    const cleanTitle = getComparisonString(activity.title);
+    if (cleanItem === cleanTitle) return true;
+
+    const baseTitle = getComparisonString(activity.title.split(' — ')[0]);
+    if (cleanItem === baseTitle) return true;
+
+    const matchTexts = getSuggestedActivityMatchTexts(activity).map(t => getComparisonString(t));
+    if (matchTexts.includes(cleanItem)) return true;
+
+    return false;
+  };
+
   const previousDayIdx = activity.assignedDayIdx;
   if (previousDayIdx !== null && previousDayIdx !== undefined && sourceLegIdx === targetLegIdx && previousDayIdx !== targetDayIdx) {
     const previousDay = targetLeg.days[previousDayIdx];
     if (previousDay && Array.isArray(previousDay.activityItems)) {
-      const matchTexts = getSuggestedActivityMatchTexts(activity);
-      const prevIndex = previousDay.activityItems.findIndex(item => matchTexts.includes(String(item.text || '').trim()));
+      const prevIndex = previousDay.activityItems.findIndex(item => isItemMatch(item.text));
       if (prevIndex !== -1) previousDay.activityItems.splice(prevIndex, 1);
     }
   }
@@ -1507,14 +1530,13 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
   }
 
   const assignedText = getSuggestedActivityDayText(activity);
-  const matchTexts = getSuggestedActivityMatchTexts(activity);
   const schedule = getActivityScheduleFromOptions(activity, options);
   const datedSchedule = {
     ...schedule,
     startDate: getNormalizedDayDate(targetDay),
     endDate: getNormalizedDayDate(targetDay)
   };
-  let targetItem = targetDay.activityItems.find(item => matchTexts.includes(String(item.text || '').trim()));
+  let targetItem = targetDay.activityItems.find(item => isItemMatch(item.text));
   if (!targetItem) {
     targetItem = {
       text: assignedText,
@@ -1554,10 +1576,32 @@ function clearAssignedSuggestedActivityFromDay(sourceLegIdx, activityIdx) {
   const previousDayIdx = activity.assignedDayIdx;
   if (previousDayIdx === null || previousDayIdx === undefined) return false;
 
+  const getComparisonString = (str) => {
+    return String(str || '')
+      .toLowerCase()
+      .replace(/[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}\u{1F000}-\u{1FAFF}\u{200D}\u{FE0F}]/gu, '')
+      .replace(/[^a-z0-9]/g, '')
+      .trim();
+  };
+
+  const isItemMatch = (itemText) => {
+    if (!itemText) return false;
+    const cleanItem = getComparisonString(itemText);
+    const cleanTitle = getComparisonString(activity.title);
+    if (cleanItem === cleanTitle) return true;
+
+    const baseTitle = getComparisonString(activity.title.split(' — ')[0]);
+    if (cleanItem === baseTitle) return true;
+
+    const matchTexts = getSuggestedActivityMatchTexts(activity).map(t => getComparisonString(t));
+    if (matchTexts.includes(cleanItem)) return true;
+
+    return false;
+  };
+
   const previousDay = sourceLeg?.days?.[previousDayIdx];
   if (previousDay && Array.isArray(previousDay.activityItems)) {
-    const matchTexts = getSuggestedActivityMatchTexts(activity);
-    const prevIndex = previousDay.activityItems.findIndex(item => matchTexts.includes(String(item.text || '').trim()));
+    const prevIndex = previousDay.activityItems.findIndex(item => isItemMatch(item.text));
     if (prevIndex !== -1) previousDay.activityItems.splice(prevIndex, 1);
     if (previousDay.activityItems.length === 1 && isPlaceholderActivityItem(previousDay.activityItems[0])) {
       previousDay.activityItems = [];
