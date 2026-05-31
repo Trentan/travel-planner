@@ -137,7 +137,7 @@ const ACTIVITY_CATEGORIES = {
   wellness: { emoji: '🧘', label: 'Wellness' },
   food: { emoji: '🍽️', label: 'Food' },
   tour: { emoji: '🚌', label: 'Tour' },
-  audioTour: { emoji: '\uD83C\uDFA7', label: 'Audio Tour' }
+  audioTour: { emoji: '🎧', label: 'Audio Tour' }
 };
 
 function getActivityEmoji(category) {
@@ -501,10 +501,10 @@ function normalizeItemStatus(status) {
 function getStatusMeta(status) {
   const key = normalizeItemStatus(status);
   const meta = {
-    planned: { label: 'Planned', color: '#D97706' },
-    booked: { label: 'Booked', color: '#2563EB' },
-    confirmed: { label: 'Confirmed', color: '#059669' },
-    cancelled: { label: 'Cancelled', color: '#DC2626' }
+    planned: { label: '⏳ Planned', color: '#D97706' },
+    booked: { label: '✓ Booked', color: '#2563EB' },
+    confirmed: { label: '🎫 Confirmed', color: '#059669' },
+    cancelled: { label: '✗ Cancelled', color: '#DC2626' }
   };
   return { key, ...meta[key] };
 }

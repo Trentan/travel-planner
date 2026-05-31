@@ -238,7 +238,7 @@ function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
 function renderCompactActivityItemForPanel(legIndex, dayIdx, itemIdx, item) {
   const itemId = `compact-activity-${legIndex}-${dayIdx}-${itemIdx}`;
   const done = !!item.done;
-  const emoji = /food/i.test(item.text || '') ? '🍽️' : '📌';
+  const emoji = getActivityItemEmoji(item, legIndex, dayIdx);
 
   return `
     <label class="compact-activity-item" for="${itemId}">
@@ -257,8 +257,30 @@ function renderCompactActivityItemForPanel(legIndex, dayIdx, itemIdx, item) {
   `;
 }
 
+function getActivityItemEmoji(item, legIndex = null, dayIdx = null, fallback = '📌') {
+  if (!item) return fallback;
+  if (item.category === 'audioTour' || /audio|podcast|self-guided|self guided/i.test(item.text || '') || item.audioTitle || item.audioRef || item.audioUrl) {
+    return '🎧';
+  }
+  if (item.category === 'food' || /food/i.test(item.text || '')) {
+    return '🍽️';
+  }
+  if (item.category) {
+    const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', audioTour: '🎧' };
+    return emojis[item.category] || fallback;
+  }
+  if (legIndex !== null && dayIdx !== null && typeof findAssignedSuggestedActivity === 'function') {
+    const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
+    if (matched && matched.category) {
+      const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', audioTour: '🎧' };
+      return emojis[matched.category] || fallback;
+    }
+  }
+  return fallback;
+}
+
 function getCompactActivityCategoryEmoji(cat) {
-  const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', audioTour: '\uD83C\uDFA7' };
+  const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', audioTour: '🎧' };
   return emojis[cat] || '📌';
 }
 
@@ -718,7 +740,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
 
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
-    const emoji = /food/i.test(item.text || '') ? '🍽️' : '📍';
+    const emoji = getActivityItemEmoji(item, legIndex, dayIdx, '📍');
     let locationVal = item.location || '';
     if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
       const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
@@ -1584,7 +1606,7 @@ function buildCompactItineraryLegacy() {
       })).join('');
       const activityLines = (day.activityItems || []).map((item, itemIdx) => {
         const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
-        const emoji = /food/i.test(item.text || '') ? '🍽️' : '📌';
+        const emoji = getActivityItemEmoji(item, legIndex, dayIdx);
         return `
           <div style="display:flex; align-items:flex-start; gap:6px; ${doneStyle}">
             <input type="checkbox" ${item.done ? 'checked' : ''}
@@ -1847,6 +1869,28 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       const isArrivalToCurrent = toLoc && currentLegCity && toLoc.toLowerCase() === currentLegCity;
       const isDepartureFromCurrent = fromLoc && currentLegCity && fromLoc.toLowerCase() === currentLegCity;
 
+      // Helpers for dynamic transport-type specific arrival/departure emojis
+      const getArrivalIcon = (type) => {
+        const t = String(type || '').toLowerCase();
+        if (t === 'train') return '🚉';
+        if (t === 'bus') return '🚏';
+        if (t === 'ferry') return '⚓';
+        if (t === 'car') return '🅿️';
+        if (t === 'walk' || t === 'bike') return '🏁';
+        return '🛬';
+      };
+
+      const getDepartureIcon = (type) => {
+        const t = String(type || '').toLowerCase();
+        if (t === 'train') return '🚆';
+        if (t === 'bus') return '🚌';
+        if (t === 'ferry') return '⛴️';
+        if (t === 'car') return '🚗';
+        if (t === 'walk') return '🚶';
+        if (t === 'bike') return '🚲';
+        return '🛫';
+      };
+
       // If it's an arrival to the city from another city, add the start line
       if (isArrivalDay && fromLoc && toLoc && fromLoc.toLowerCase() !== toLoc.toLowerCase() && isArrivalToCurrent && !items.some(i => i.type === 'arrivalBlock')) {
         const transType = segment.transportType || journey.transportType || 'Transport';
@@ -1854,7 +1898,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
         items.push({
           type: 'arrivalBlock',
           typeLabel: 'Arrival',
-          icon: '🛬',
+          icon: getArrivalIcon(transType),
           title: `Arrived in ${toLoc} - ${transTypeCapitalized} from ${fromLoc}`,
           startTime: arrTime,
           sortValue: getDailyTimelineItemSortValue(dayDate, arrTime, 99999)
@@ -1868,7 +1912,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
         items.push({
           type: 'departureBlock',
           typeLabel: 'Departure',
-          icon: '✈️',
+          icon: getDepartureIcon(transType),
           title: `Departed ${fromLoc} - ${transTypeCapitalized} to ${toLoc}`,
           startTime: depTime,
           sortValue: getDailyTimelineItemSortValue(dayDate, depTime, 99999)
@@ -1909,7 +1953,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
   });
 
   (day.activityItems || []).forEach((item, itemIndex) => {
-    const emoji = /food/i.test(item.text || '') ? '🍽️' : '📌';
+    const emoji = getActivityItemEmoji(item, legIndex, dayIndex);
     let locationVal = item.location || '';
     if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
       const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
@@ -1972,7 +2016,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
     items.push({
       type: 'departureBlock',
       typeLabel: 'Departure',
-      icon: '✈️',
+      icon: '🛫',
       title: `Departed ${day.from} to ${day.to}`,
       startTime: '23:59', // Put it at the very end
       sortValue: getDailyTimelineItemSortValue(dayDate, '23:59', 99999)
@@ -2009,10 +2053,11 @@ function applyTimelineTravelShading(items) {
 
 function renderDailyTimelineRow(item, compact = false) {
   if (item.type === 'arrivalBlock') {
-    const timeStr = item.startTime ? `<span class="daily-timeline-boundary-time">${escapeCompactText(item.startTime)}</span>` : '';
+    const timeStr = `<span class="daily-timeline-boundary-time">${escapeCompactText(item.startTime || '--:--')}</span>`;
     return `
       <div class="daily-timeline-boundary daily-timeline-arrival-block">
         ${timeStr}
+        <div class="daily-timeline-boundary-marker"><span>${item.icon || '🛬'}</span></div>
         <div class="daily-timeline-boundary-copy">
           <span class="daily-timeline-boundary-title">Arrive: ${escapeCompactText(item.title)}</span>
           <span class="daily-timeline-boundary-subtitle">Earlier rows are before you arrive here</span>
@@ -2021,10 +2066,11 @@ function renderDailyTimelineRow(item, compact = false) {
     `;
   }
   if (item.type === 'departureBlock') {
-    const timeStr = item.startTime ? `<span class="daily-timeline-boundary-time">${escapeCompactText(item.startTime)}</span>` : '';
+    const timeStr = `<span class="daily-timeline-boundary-time">${escapeCompactText(item.startTime || '--:--')}</span>`;
     return `
       <div class="daily-timeline-boundary daily-timeline-departure-block">
         ${timeStr}
+        <div class="daily-timeline-boundary-marker"><span>${item.icon || '🛫'}</span></div>
         <div class="daily-timeline-boundary-copy">
           <span class="daily-timeline-boundary-title">Depart: ${escapeCompactText(item.title)}</span>
           <span class="daily-timeline-boundary-subtitle">Later rows are after you leave here</span>

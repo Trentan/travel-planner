@@ -321,7 +321,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
                   <option value="wellness" ${activity?.category === 'wellness' ? 'selected' : ''}>🧘 Wellness</option>
                   <option value="food" ${activity?.category === 'food' ? 'selected' : ''}>🍽️ Food</option>
                   <option value="tour" ${activity?.category === 'tour' ? 'selected' : ''}>🚌 Tour</option>
-                  <option value="audioTour" ${activity?.category === 'audioTour' ? 'selected' : ''}>Audio Tour</option>
+                  <option value="audioTour" ${activity?.category === 'audioTour' ? 'selected' : ''}>🎧 Audio Tour</option>
                 </select>
               </div>
               <div class="ai-form-group">

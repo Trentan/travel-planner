@@ -981,7 +981,7 @@ function buildTransportTab(cityFilter = null) {
       if (rep.routeCode) subtitleParts.push(rep.routeCode);
       if (durationDisplay) subtitleParts.push(durationDisplay);
       const statusMeta = renderTransportStatusCostMobile(
-          statusText,
+          rep.status,
           statusIcon,
           statusColor,
           totalCost.toFixed(0),
