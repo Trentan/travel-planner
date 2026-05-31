@@ -464,11 +464,16 @@ function buildRouteChainWithCodes(segments) {
 }
 
 function updateJourneyStatus(id, newStatus) {
-  const journey = findJourney(id);
-  if (journey) {
-    journey.status = newStatus;
+  const target = findJourney(id);
+  if (target) {
+    const gid = target.journeyId || target.id;
+    journeys.forEach(j => {
+      if ((j.journeyId && j.journeyId === gid) || j.id === gid) {
+        j.status = newStatus;
+      }
+    });
     persistJourneys();
-    return journey;
+    return target;
   }
   return null;
 }
@@ -1345,7 +1350,7 @@ function _loadSegmentIntoForm(seg) {
   document.getElementById('journeyCost').value = seg.cost || '0';
   document.getElementById('journeyNotes').value = seg.notes || '';
   document.getElementById('journeyBookingRef').value = seg.bookingReference || '';
-  document.getElementById('journeyStatus').value = seg.status || 'booked';
+  document.getElementById('journeyStatus').value = normalizeItemStatus(seg.status);
 }
 
 // Track which segment is currently active (0-based index for segments in pending, -1 if form is new)
@@ -1600,7 +1605,7 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
     transportType: transportType,
     provider: provider,
     routeCode: routeCode,
-    status: status || 'booked',
+    status: status || 'planned',
     cost: cost,
     bookingReference: bookingRef,
     isMultiLeg: false,
@@ -1665,11 +1670,14 @@ function saveJourneyFromModal() {
 
     const isMultiLeg = finalSegments.length > 1;
 
+    const status = document.getElementById('journeyStatus')?.value || 'planned';
+
     finalSegments.forEach((seg, i) => {
       seg.journeyName = journeyName;
       seg.isMultiLeg = isMultiLeg;
       seg.journeyId = _pendingJourneyId;
       seg.segmentOrder = i + 1; // Ensure correct ordering
+      seg.status = status; // Keep status in sync across all segments of the journey!
     });
 
     // EDIT FIX: Remove the old segments for this journeyId before saving

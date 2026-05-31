@@ -2893,7 +2893,7 @@ function openEditStayModal(stayId) {
   document.getElementById('stayCheckOut').value = stay.checkOut || '';
   document.getElementById('stayCheckOutTime').value = stay.checkOutTime || '';
   document.getElementById('stayNights').value = stay.nights || '';
-  document.getElementById('stayStatus').value = stay.status === 'pending' ? 'planned' : (stay.status || 'planned');
+  document.getElementById('stayStatus').value = normalizeItemStatus(stay.status);
   document.getElementById('stayProvider').value = stay.provider || '';
   document.getElementById('stayBookingRef').value = stay.bookingRef || '';
   document.getElementById('stayTotalCost').value = stay.totalCost || '';

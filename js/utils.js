@@ -519,13 +519,15 @@ function renderStatusBadge(status, {
   const safeTitle = typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title;
   const safeAria = typeof escapeHtmlText === 'function' ? escapeHtmlText(ariaLabel || `${meta.label} status`) : (ariaLabel || `${meta.label} status`);
   const safeClass = typeof escapeHtmlText === 'function' ? escapeHtmlText(className) : className;
-  const attrs = `class="status-badge ${onClick ? 'status-badge-clickable' : ''} ${safeClass}" style="--status-color:${meta.color};" title="${safeTitle}" aria-label="${safeAria}"`;
 
-  if (onClick) {
-    return `<button type="button" ${attrs} onclick="${onClick}">${meta.label}</button>`;
+  const isClickable = !!onClick;
+  const buttonAttrs = `class="status-badge ${isClickable ? 'status-badge-clickable' : 'cursor-default'} ${safeClass}" style="--status-color:${meta.color};" title="${safeTitle}" aria-label="${safeAria}"`;
+
+  if (isClickable) {
+    return `<button type="button" ${buttonAttrs} onclick="${onClick}">${meta.label}</button>`;
   }
 
-  return `<span ${attrs}>${meta.label}</span>`;
+  return `<button type="button" ${buttonAttrs} disabled style="cursor: default; opacity: 1 !important;">${meta.label}</button>`;
 }
 
 function renderMobileStatusCostMeta({

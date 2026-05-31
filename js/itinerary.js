@@ -1929,7 +1929,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       typeLabel: label,
       icon,
       title: `${label}: ${stayInfo.propertyName || 'Accommodation'}`,
-      meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : '', stayInfo.status].filter(Boolean).join(' · '),
+      meta: [stayInfo.provider, stayInfo.bookingRef ? `Ref ${stayInfo.bookingRef}` : ''].filter(Boolean).join(' · '),
       subLocations: stayInfo.location ? (() => {
         let loc = stayInfo.location;
         const cleanCity = String(day.to).trim();
