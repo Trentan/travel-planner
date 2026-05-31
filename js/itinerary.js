@@ -72,6 +72,21 @@ function getTransportStatusBadgeHtml(status, clickHandlerCall = '') {
   });
 }
 
+function renderActivityAudioTourMeta(item) {
+  const title = String(item?.audioTitle || '').trim();
+  const ref = String(item?.audioRef || item?.audioUrl || '').trim();
+  if (!title && !ref) return '';
+  const label = title || 'Audio tour';
+  const safeLabel = escapeCompactText(label);
+  const safeRef = escapeCompactText(ref);
+  const refHtml = ref
+      ? (/^https?:\/\//i.test(ref)
+          ? `<a href="${safeRef}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="hover:underline">${safeLabel}</a>`
+          : `${safeLabel}<span class="audio-tour-ref">${safeRef}</span>`)
+      : safeLabel;
+  return `<span class="audio-tour-chip">🎧 ${refHtml}</span>`;
+}
+
 function focusCompactInlineEditable(selector) {
   const el = typeof document !== 'undefined' ? document.querySelector(selector) : null;
   if (!el) return;
@@ -243,7 +258,7 @@ function renderCompactActivityItemForPanel(legIndex, dayIdx, itemIdx, item) {
 }
 
 function getCompactActivityCategoryEmoji(cat) {
-  const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌' };
+  const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', audioTour: '\uD83C\uDFA7' };
   return emojis[cat] || '📌';
 }
 
@@ -732,6 +747,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       }
     }
     const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(notes)}</div>` : '';
+    const audioHtml = renderActivityAudioTourMeta(item);
     return `
       <div class="compact-activity-row" style="${doneStyle}">
         <input
@@ -1941,6 +1957,8 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       actionHtml: '',
       status: item.status || '',
       bookingRef: item.bookingRef || '',
+      audioTitle: item.audioTitle || '',
+      audioRef: item.audioRef || item.audioUrl || '',
       time: item.time || '',
       cityName: String(day.to || day.from || '').trim()
     });
@@ -1974,30 +1992,43 @@ function getDailyTimelineBuckets(items) {
   };
 }
 
+function applyTimelineTravelShading(items) {
+  const arrival = items.find(item => item.type === 'arrivalBlock');
+  const departure = items.find(item => item.type === 'departureBlock');
+  return items.map(item => {
+    if (item.type === 'arrivalBlock' || item.type === 'departureBlock') return item;
+    const shaded = { ...item };
+    if (arrival && item.sortValue < arrival.sortValue) {
+      shaded.timelineShade = 'before-arrival';
+    } else if (departure && item.sortValue > departure.sortValue) {
+      shaded.timelineShade = 'after-departure';
+    }
+    return shaded;
+  });
+}
+
 function renderDailyTimelineRow(item, compact = false) {
   if (item.type === 'arrivalBlock') {
-    const timeStr = item.startTime ? `<div style="font-size: 1.8rem; font-weight: 800; color: #1565C0; margin-right: 16px; background: rgba(255,255,255,0.7); padding: 4px 12px; border-radius: 6px;">${item.startTime}</div>` : '';
+    const timeStr = item.startTime ? `<span class="daily-timeline-boundary-time">${escapeCompactText(item.startTime)}</span>` : '';
     return `
-      <div class="daily-timeline-arrival-block" style="grid-column: 1 / -1; background: repeating-linear-gradient(45deg, #E3F2FD 0px, #E3F2FD 10px, #BBDEFB 10px, #BBDEFB 20px); border-top: 2px solid #64B5F6; border-bottom: 2px solid #64B5F6; padding: 12px 16px; margin: 0 0 24px 0; border-radius: 6px; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; position: relative;">
-         ${timeStr}
-         <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-           <span style="font-weight: 800; color: #1565C0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; background: rgba(255,255,255,0.7); padding: 2px 8px; border-radius: 4px;">✅ ${item.title}</span>
-           <span style="font-size: 0.7rem; color: #1565C0; font-weight: 600; text-transform: uppercase; background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px;">No activities prior to arrival</span>
-         </div>
-         <div style="position: absolute; top: -200px; left: 0; right: 0; bottom: 100%; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 10px, transparent 10px, transparent 20px); pointer-events: none; z-index: 10;"></div>
+      <div class="daily-timeline-boundary daily-timeline-arrival-block">
+        ${timeStr}
+        <div class="daily-timeline-boundary-copy">
+          <span class="daily-timeline-boundary-title">Arrive: ${escapeCompactText(item.title)}</span>
+          <span class="daily-timeline-boundary-subtitle">Earlier rows are before you arrive here</span>
+        </div>
       </div>
     `;
   }
   if (item.type === 'departureBlock') {
-    const timeStr = item.startTime ? `<div style="font-size: 1.8rem; font-weight: 800; color: #F57F17; margin-right: 16px; background: rgba(255,255,255,0.7); padding: 4px 12px; border-radius: 6px;">${item.startTime}</div>` : '';
+    const timeStr = item.startTime ? `<span class="daily-timeline-boundary-time">${escapeCompactText(item.startTime)}</span>` : '';
     return `
-      <div class="daily-timeline-departure-block" style="grid-column: 1 / -1; background: repeating-linear-gradient(45deg, #FFF9C4 0px, #FFF9C4 10px, #FFF176 10px, #FFF176 20px); border-top: 2px solid #FBC02D; border-bottom: 2px solid #FBC02D; padding: 12px 16px; margin: 24px 0 0 0; border-radius: 6px; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; position: relative;">
-         ${timeStr}
-         <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-           <span style="font-weight: 800; color: #F57F17; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; background: rgba(255,255,255,0.7); padding: 2px 8px; border-radius: 4px;">🚫 ${item.title}</span>
-           <span style="font-size: 0.7rem; color: #F57F17; font-weight: 600; text-transform: uppercase; background: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px;">No activities after departure</span>
-         </div>
-         <div style="position: absolute; bottom: -200px; left: 0; right: 0; top: 100%; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 10px, transparent 10px, transparent 20px); pointer-events: none; z-index: 10;"></div>
+      <div class="daily-timeline-boundary daily-timeline-departure-block">
+        ${timeStr}
+        <div class="daily-timeline-boundary-copy">
+          <span class="daily-timeline-boundary-title">Depart: ${escapeCompactText(item.title)}</span>
+          <span class="daily-timeline-boundary-subtitle">Later rows are after you leave here</span>
+        </div>
       </div>
     `;
   }
@@ -2054,6 +2085,11 @@ function renderDailyTimelineRow(item, compact = false) {
     // 4. booking reference
     if (item.bookingRef) {
       parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-blue-50/50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-100/50 dark:border-blue-900/30 font-mono">Ref: ${escapeCompactText(item.bookingRef)}</span>`);
+    }
+
+    const audioMeta = renderActivityAudioTourMeta(item);
+    if (audioMeta) {
+      parts.push(audioMeta);
     }
 
     // 5. location chip
@@ -2208,7 +2244,7 @@ function renderDailyTimelineRow(item, compact = false) {
   }
 
   return `
-    <div class="daily-timeline-item daily-timeline-item-${escapeCompactText(item.type)} ${item.done ? 'is-done' : ''}">
+    <div class="daily-timeline-item daily-timeline-item-${escapeCompactText(item.type)} ${item.done ? 'is-done' : ''} ${item.timelineShade ? `is-${item.timelineShade}` : ''}">
       <div class="${timeClass}"${timeOnClick}>${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
       <div class="${markerClass}"${markerOnClick}><span>${item.icon}</span></div>
       <div class="daily-timeline-content">
@@ -2232,7 +2268,7 @@ function renderDailyTimelineRow(item, compact = false) {
 }
 
 function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
-  const items = buildDailyTimelineItems(leg, legIndex, day, dayIndex);
+  const items = applyTimelineTravelShading(buildDailyTimelineItems(leg, legIndex, day, dayIndex));
   const compact = !!options.compact;
   const empty = compact
     ? '<div class="compact-day-empty">No scheduled items yet.</div>'
@@ -2613,7 +2649,7 @@ function buildItinerary() {
 
     // Get emoji for activity category
     const getCategoryEmoji = (cat) => {
-      const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌' };
+      const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', audioTour: '\uD83C\uDFA7' };
       return emojis[cat] || '📌';
     };
 

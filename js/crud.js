@@ -321,6 +321,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
                   <option value="wellness" ${activity?.category === 'wellness' ? 'selected' : ''}>🧘 Wellness</option>
                   <option value="food" ${activity?.category === 'food' ? 'selected' : ''}>🍽️ Food</option>
                   <option value="tour" ${activity?.category === 'tour' ? 'selected' : ''}>🚌 Tour</option>
+                  <option value="audioTour" ${activity?.category === 'audioTour' ? 'selected' : ''}>Audio Tour</option>
                 </select>
               </div>
               <div class="ai-form-group">
@@ -351,6 +352,17 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
               <div class="ai-form-group">
                 <label>Notes</label>
                 <input type="text" id="activityNotes" class="form-control form-control--compact" placeholder="e.g., Book in advance" value="${html(activity?.notes || '')}">
+              </div>
+            </div>
+
+            <div class="activity-assign-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <div class="ai-form-group">
+                <label>Audio Tour Title</label>
+                <input type="text" id="activityAudioTitle" class="form-control form-control--compact" placeholder="e.g., Rick Steves walking tour" value="${html(activity?.audioTitle || '')}">
+              </div>
+              <div class="ai-form-group">
+                <label>Audio Tour Link / Ref</label>
+                <input type="text" id="activityAudioRef" class="form-control form-control--compact" placeholder="App, URL, file, or reference" value="${html(activity?.audioRef || activity?.audioUrl || '')}">
               </div>
             </div>
 
@@ -650,12 +662,14 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
     const notes = document.getElementById('activityNotes').value.trim();
     const status = document.getElementById('activityStatus').value || '';
     const bookingRef = document.getElementById('activityBookingRef').value.trim();
+    const audioTitle = document.getElementById('activityAudioTitle')?.value.trim() || '';
+    const audioRef = document.getElementById('activityAudioRef')?.value.trim() || '';
     if (!title) {
       alert('Please enter a description');
       return null;
     }
     const fullTitle = location ? `${title} — ${location}` : title;
-    return { category, title: fullTitle, estTime, estCost, notes, location, status, bookingRef };
+    return { category, title: fullTitle, estTime, estCost, notes, location, status, bookingRef, audioTitle, audioRef };
   };
 
   modal.querySelectorAll('[data-day-index]').forEach(button => {
@@ -691,6 +705,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
         target.location = formData.location;
         target.status = formData.status;
         target.bookingRef = formData.bookingRef;
+        target.audioTitle = formData.audioTitle;
+        target.audioRef = formData.audioRef;
       }
 
       const assigned = assignSuggestedActivityToDay(legIdx, targetIdx, legIdx, targetDayIdx, getScheduleOptions(button));
@@ -721,6 +737,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       target.location = formData.location;
       target.status = formData.status;
       target.bookingRef = formData.bookingRef;
+      target.audioTitle = formData.audioTitle;
+      target.audioRef = formData.audioRef;
 
       const cleared = clearAssignedSuggestedActivityFromDay(legIdx, activityIdx);
       if (!cleared) return;
@@ -764,6 +782,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       target.location = formData.location;
       target.status = formData.status;
       target.bookingRef = formData.bookingRef;
+      target.audioTitle = formData.audioTitle;
+      target.audioRef = formData.audioRef;
 
       if (target.assignedDayIdx !== null && target.assignedDayIdx !== undefined) {
         const day = leg.days[target.assignedDayIdx];
@@ -788,6 +808,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
               item.location = formData.location;
               item.status = formData.status;
               item.bookingRef = formData.bookingRef;
+              item.audioTitle = formData.audioTitle;
+              item.audioRef = formData.audioRef;
               applyActivityScheduleFields(item, day, datedSchedule);
             }
           });
@@ -906,6 +928,7 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
     if (/food|restaurant|eat|dinner|lunch|breakfast|cafe/i.test(text)) category = 'food';
     else if (/run|fitness|jog|workout|gym/i.test(text)) category = 'fitness';
     else if (/wellness|yoga|spa|massage/i.test(text)) category = 'wellness';
+    else if (/audio|podcast|self-guided|self guided/i.test(text)) category = 'audioTour';
     else if (/tour|guide|bus/i.test(text)) category = 'tour';
     else if (/attraction|park|ride/i.test(text)) category = 'attraction';
 
@@ -1495,7 +1518,9 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
       notes: activity.notes || '',
       location: activity.location || '',
       status: activity.status || '',
-      bookingRef: activity.bookingRef || ''
+      bookingRef: activity.bookingRef || '',
+      audioTitle: activity.audioTitle || '',
+      audioRef: activity.audioRef || ''
     };
     applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
     targetDay.activityItems.push(targetItem);
@@ -1504,6 +1529,8 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
     targetItem.location = activity.location || '';
     targetItem.status = activity.status || '';
     targetItem.bookingRef = activity.bookingRef || '';
+    targetItem.audioTitle = activity.audioTitle || '';
+    targetItem.audioRef = activity.audioRef || '';
     applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
   }
 

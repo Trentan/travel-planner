@@ -922,6 +922,74 @@
     padding-block: 0.28rem;
   }
 
+  .daily-timeline-item.is-before-arrival,
+  .daily-timeline-item.is-after-departure {
+    border-radius: 0.75rem;
+    background:
+      repeating-linear-gradient(135deg, rgba(100, 116, 139, 0.08) 0, rgba(100, 116, 139, 0.08) 8px, transparent 8px, transparent 16px);
+    opacity: 0.78;
+    filter: saturate(0.82);
+  }
+
+  .daily-timeline-item.is-before-arrival .daily-timeline-content,
+  .daily-timeline-item.is-after-departure .daily-timeline-content {
+    background: rgba(248, 250, 252, 0.92);
+  }
+
+  .daily-timeline-boundary {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(100, 116, 139, 0.2);
+    background: rgba(248, 250, 252, 0.92);
+  }
+
+  .daily-timeline-arrival-block {
+    border-color: rgba(37, 99, 235, 0.22);
+    background: rgba(239, 246, 255, 0.94);
+    color: #1d4ed8;
+  }
+
+  .daily-timeline-departure-block {
+    border-color: rgba(217, 119, 6, 0.26);
+    background: rgba(255, 251, 235, 0.96);
+    color: #b45309;
+  }
+
+  .daily-timeline-boundary-time {
+    flex: 0 0 auto;
+    min-width: 4.5rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.8);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.84rem;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .daily-timeline-boundary-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+  }
+
+  .daily-timeline-boundary-title {
+    font-size: 0.86rem;
+    font-weight: 850;
+    line-height: 1.25;
+  }
+
+  .daily-timeline-boundary-subtitle {
+    font-size: 0.72rem;
+    font-weight: 700;
+    opacity: 0.78;
+  }
+
   .daily-timeline-time {
     @apply self-center justify-self-end w-full max-w-[8.1rem]
            px-2.5 py-1.5 rounded-full border border-[rgba(36,72,93,0.14)]
@@ -1009,6 +1077,28 @@
 
   .daily-timeline-sub-locations {
     @apply mt-1 text-[0.86rem] text-text-muted;
+  }
+
+  .audio-tour-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    max-width: 100%;
+    padding: 0.25rem 0.55rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(14, 116, 144, 0.18);
+    background: rgba(236, 254, 255, 0.72);
+    color: #0e7490;
+    font-size: 0.68rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .audio-tour-ref {
+    margin-left: 0.25rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+    opacity: 0.78;
   }
 
   .daily-timeline-item.is-done .daily-timeline-title {
@@ -4047,11 +4137,46 @@
     height: 1.05rem;
   }
 
-  body.mobile-app-mode .daily-timeline-checkbox {
-    width: 1.35rem;
-    height: 1.35rem;
-    cursor: pointer;
-  }
+    body.mobile-app-mode .daily-timeline-checkbox {
+      width: 1.35rem;
+      height: 1.35rem;
+      cursor: pointer;
+    }
+
+    body.mobile-app-mode .transport-mobile-card .mobile-surface-card-details,
+    body.mobile-app-mode .stay-mobile-card .mobile-surface-card-details {
+      gap: 0.62rem;
+    }
+
+    body.mobile-app-mode .transport-mobile-card .grid,
+    body.mobile-app-mode .stay-mobile-card .grid {
+      gap: 0.5rem;
+    }
+
+    body.mobile-app-mode .transport-mobile-card .grid > div,
+    body.mobile-app-mode .stay-mobile-card .grid > div {
+      border-radius: 0.68rem;
+      border-color: rgba(148, 163, 184, 0.22);
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(241, 245, 249, 0.84));
+      padding: 0.68rem 0.72rem;
+    }
+
+    body.mobile-app-mode .transport-mobile-card .mobile-surface-card-button,
+    body.mobile-app-mode .stay-mobile-card .mobile-surface-card-button {
+      min-height: 2.75rem;
+      border-radius: 0.85rem;
+      border: 1px solid rgba(14, 116, 144, 0.18);
+      background: rgba(236, 254, 255, 0.78);
+      color: #0f766e;
+      font-weight: 850;
+    }
+
+    body.mobile-app-mode .transport-mobile-card .mobile-surface-card-button--danger,
+    body.mobile-app-mode .stay-mobile-card .mobile-surface-card-button--danger {
+      border-color: rgba(220, 38, 38, 0.16);
+      background: rgba(254, 242, 242, 0.84);
+      color: #b91c1c;
+    }
 
   /* Header */
   header {

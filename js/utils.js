@@ -136,7 +136,8 @@ const ACTIVITY_CATEGORIES = {
   attraction: { emoji: '🎢', label: 'Attractions' },
   wellness: { emoji: '🧘', label: 'Wellness' },
   food: { emoji: '🍽️', label: 'Food' },
-  tour: { emoji: '🚌', label: 'Tour' }
+  tour: { emoji: '🚌', label: 'Tour' },
+  audioTour: { emoji: '\uD83C\uDFA7', label: 'Audio Tour' }
 };
 
 function getActivityEmoji(category) {
