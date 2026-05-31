@@ -491,6 +491,42 @@ function highlightCityNavByCityId(cityId) {
   }
 }
 
+function normalizeItemStatus(status) {
+  const normalized = String(status || 'planned').trim().toLowerCase();
+  if (normalized === 'pending' || normalized === 'none' || normalized === 'null' || !normalized) return 'planned';
+  return ['planned', 'booked', 'confirmed', 'cancelled'].includes(normalized) ? normalized : 'planned';
+}
+
+function getStatusMeta(status) {
+  const key = normalizeItemStatus(status);
+  const meta = {
+    planned: { label: 'Planned', color: '#D97706' },
+    booked: { label: 'Booked', color: '#2563EB' },
+    confirmed: { label: 'Confirmed', color: '#059669' },
+    cancelled: { label: 'Cancelled', color: '#DC2626' }
+  };
+  return { key, ...meta[key] };
+}
+
+function renderStatusBadge(status, {
+  onClick = '',
+  title = 'Change status',
+  className = '',
+  ariaLabel = ''
+} = {}) {
+  const meta = getStatusMeta(status);
+  const safeTitle = typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title;
+  const safeAria = typeof escapeHtmlText === 'function' ? escapeHtmlText(ariaLabel || `${meta.label} status`) : (ariaLabel || `${meta.label} status`);
+  const safeClass = typeof escapeHtmlText === 'function' ? escapeHtmlText(className) : className;
+  const attrs = `class="status-badge ${onClick ? 'status-badge-clickable' : ''} ${safeClass}" style="--status-color:${meta.color};" title="${safeTitle}" aria-label="${safeAria}"`;
+
+  if (onClick) {
+    return `<button type="button" ${attrs} onclick="${onClick}">${meta.label}</button>`;
+  }
+
+  return `<span ${attrs}>${meta.label}</span>`;
+}
+
 function renderMobileStatusCostMeta({
                                       status,
                                       costValue,
@@ -501,31 +537,17 @@ function renderMobileStatusCostMeta({
                                       metaClass = 'transport-status-cost-meta',
                                       editableCost = false
                                     }) {
-  const normalizedStatus = (status === 'pending' ? 'planned' : status) || 'planned';
-  const statusColors = {
-    planned: '#E67E22',
-    booked: '#27AE60',
-    confirmed: '#27AE60',
-    cancelled: '#E74C3C'
-  };
-  const statusIcons = {
-    planned: '⏳',
-    booked: '✓',
-    confirmed: '🎫',
-    cancelled: '❌'
-  };
-  const statusText = normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
-  const statusColor = statusColors[normalizedStatus] || statusColors.planned;
-  const statusGlyph = statusIcons[normalizedStatus] || '⏳';
   const safeCost = typeof formatCurrency === 'function'
       ? formatCurrency(costValue, { includeSymbol: false })
       : (costValue ?? '0');
   const costNode = editableCost
       ? `<span contenteditable="true" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1 min-w-[20px] inline-block" onblur="${costOnBlur}">${safeCost}</span>`
       : `<span>${safeCost}</span>`;
-  const statusNode = statusOnClick
-      ? `<button type="button" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase text-white shadow-sm transition-transform active:scale-95" style="background-color:${statusColor};" onclick="${statusOnClick}" title="${statusButtonTitle}">${statusGlyph} ${statusText}</button>`
-      : `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase text-white shadow-sm" style="background-color:${statusColor};">${statusGlyph} ${statusText}</span>`;
+  const statusNode = renderStatusBadge(status, {
+    onClick: statusOnClick,
+    title: statusButtonTitle,
+    ariaLabel: `${getStatusMeta(status).label} status`
+  });
 
   return `
     <div class="flex items-center justify-between w-full mt-1 ${metaClass}">
@@ -766,6 +788,9 @@ window.renderMobileSurfaceCard = renderMobileSurfaceCard;
 window.renderMobileSwipePager = renderMobileSwipePager;
 window.setupMobileSwipePagers = setupMobileSwipePagers;
 window.renderMobileStatusCostMeta = renderMobileStatusCostMeta;
+window.normalizeItemStatus = normalizeItemStatus;
+window.getStatusMeta = getStatusMeta;
+window.renderStatusBadge = renderStatusBadge;
 window.getMobilePagerActiveIndex = getMobilePagerActiveIndex;
 window.setMobilePagerActiveIndex = setMobilePagerActiveIndex;
 window.resetMobilePagerActiveIndex = resetMobilePagerActiveIndex;

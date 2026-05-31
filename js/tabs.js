@@ -69,22 +69,7 @@ function renderStayDateSummary(stay, status, statusIcon) {
 }
 
 function renderStayStatusCostSummary(stay, status, statusIcon) {
-  const normalizedStatus = (status === 'pending' ? 'planned' : status) || 'planned';
-  const statusColors = {
-    planned: '#E67E22',
-    booked: '#27AE60',
-    confirmed: '#27AE60',
-    cancelled: '#E74C3C'
-  };
-  const statusIcons = {
-    planned: '⏳',
-    booked: '✓',
-    confirmed: '🎫',
-    cancelled: '❌'
-  };
-  const statusText = normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
-  const statusColor = statusColors[normalizedStatus] || statusColors.planned;
-  const statusIconGlyph = statusIcons[normalizedStatus] || '⏳';
+  const normalizedStatus = normalizeItemStatus(status);
   const mobileMeta = typeof renderMobileStatusCostMeta === 'function'
       ? renderMobileStatusCostMeta({
         status: normalizedStatus,
@@ -99,9 +84,11 @@ function renderStayStatusCostSummary(stay, status, statusIcon) {
       : '';
 
   return `
-    <span class="status-badge stay-status-badge stay-status-badge-clickable" style="--status-color:${statusColor};" onclick="if(${isEditMode})toggleStayStatus(event, '${stay.id}')">
-      ${statusIconGlyph} ${statusText}
-    </span>
+    ${renderStatusBadge(normalizedStatus, {
+      onClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
+      title: 'Change stay status',
+      className: 'stay-status-badge stay-status-badge-clickable'
+    })}
     ${mobileMeta}
   `;
 }
@@ -176,22 +163,11 @@ function buildAccomTab(cityFilter = null) {
       const city = citiesData.find(c => c.id === stay.cityId);
       const cityName = city ? city.name : 'Unknown';
       const cityColor = city?.colour || '#2C3E50';
-      const status = stay.status === 'pending' ? 'planned' : (stay.status || 'planned');
-      const statusColors = {
-        planned: '#E67E22',
-        booked: '#27AE60',
-        confirmed: '#27AE60',
-        cancelled: '#E74C3C'
-      };
-      const statusIcons = {
-        planned: '⏳',
-        booked: '✓',
-        confirmed: '🎫',
-        cancelled: '❌'
-      };
-      const statusColor = statusColors[status] || statusColors.planned;
-      const statusIcon = statusIcons[status] || '⏳';
-      const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+      const status = normalizeItemStatus(stay.status);
+      const statusMetaInfo = getStatusMeta(status);
+      const statusColor = statusMetaInfo.color;
+      const statusIcon = '';
+      const statusText = statusMetaInfo.label;
       const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
       const checkIn = formatDateShort(stay.checkIn);
       const checkOut = formatDateShort(stay.checkOut);
@@ -283,21 +259,10 @@ function buildAccomTab(cityFilter = null) {
     const cityName = city ? city.name : 'Unknown';
     const cityColor = city?.colour || '#2C3E50';
 
-    const status = stay.status === 'pending' ? 'planned' : (stay.status || 'planned');
-    const statusColors = {
-      planned: '#E67E22',
-      booked: '#27AE60',
-      confirmed: '#27AE60',
-      cancelled: '#E74C3C'
-    };
-    const statusIcons = {
-      planned: '⏳',
-      booked: '✓',
-      confirmed: '🎫',
-      cancelled: '❌'
-    };
-    const statusColor = statusColors[status] || statusColors.planned;
-    const statusIcon = statusIcons[status] || '⏳';
+    const status = normalizeItemStatus(stay.status);
+    const statusMetaInfo = getStatusMeta(status);
+    const statusColor = statusMetaInfo.color;
+    const statusIcon = '';
 
     html += `<tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" style="border-left: 4px solid ${cityColor};">
       <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">
@@ -329,9 +294,10 @@ function buildAccomTab(cityFilter = null) {
       </td>
 
       <td class="px-4 py-3 align-middle text-center">
-        <button class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors border border-transparent hover:border-current focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-slate-300" style="background-color: ${statusColor}15; color: ${statusColor};" onclick="event.stopPropagation(); if(${isEditMode})toggleStayStatus(event, '${stay.id}')" title="Toggle status">
-          ${statusIcon} ${status.charAt(0).toUpperCase() + status.slice(1)}
-        </button>
+        ${renderStatusBadge(status, {
+          onClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
+          title: 'Change stay status'
+        })}
       </td>
       <td class="px-4 py-3 align-middle text-right font-medium text-slate-800 dark:text-slate-200">
         $<span>${formatCurrency(stay.totalCost || '0', { includeSymbol: false })}</span>

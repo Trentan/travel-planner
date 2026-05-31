@@ -706,9 +706,11 @@ function renderTransportCarrierMobile(provider, routeCode, bookingReference, sta
   const refAndCost = [bookingReference ? `<span class="transport-carrier-pnr">${bookingReference}</span>` : '', costValue !== '' ? `<span class="transport-carrier-cost">${formatCurrency(costValue)}</span>` : '']
       .filter(Boolean)
       .join('');
-  const statusNode = isEditable
-      ? `<button type="button" class="status-badge transport-mobile-status-btn" style="--status-color:${statusColor};" onclick="toggleJourneyStatus('${journeyId}')" title="Change status">${statusIcon} ${statusText}</button>`
-      : `<span class="status-badge transport-mobile-status-btn" style="--status-color:${statusColor};">${statusIcon} ${statusText}</span>`;
+  const statusNode = renderStatusBadge(statusText, {
+    onClick: isEditable ? `toggleJourneyStatus('${journeyId}')` : '',
+    title: 'Change status',
+    className: 'transport-mobile-status-btn'
+  });
 
   return `
     <div class="mobile-table-meta transport-carrier-meta">
@@ -869,7 +871,6 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
       ${renderTransportDetailBlock('Carrier', providerLabel)}
       ${renderTransportDetailBlock('Code', routeCodeLabel)}
       ${renderTransportDetailBlock('Booking', bookingLabel)}
-      ${renderTransportDetailBlock('Status', statusText)}
       ${renderTransportDetailBlock('Cost', costValue)}
     </div>
     ${segs.length > 1 ? renderTransportSegmentsDetailContent(segs) : ''}
@@ -969,9 +970,10 @@ function buildTransportTab(cityFilter = null) {
       const lastSeg = segs[segs.length - 1];
       const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
       const lastArrTime = lastSeg.arrivalTime || '—';
-      const statusColor = rep.status === 'booked' || rep.status === 'confirmed' ? '#27AE60' : rep.status === 'cancelled' ? '#E74C3C' : '#E67E22';
-      const statusIcon = rep.status === 'booked' ? '✓' : rep.status === 'confirmed' ? '🎫' : rep.status === 'cancelled' ? '❌' : '⏳';
-      const statusText = rep.status === 'booked' ? 'Booked' : rep.status === 'confirmed' ? 'Confirmed' : rep.status === 'cancelled' ? 'Cancelled' : 'Planned';
+      const statusMetaInfo = getStatusMeta(rep.status);
+      const statusColor = statusMetaInfo.color;
+      const statusIcon = '';
+      const statusText = statusMetaInfo.label;
       const durationHours = isMultiLeg ? calculateJourneyDuration(segs) : null;
       const durationDisplay = durationHours !== null ? `${durationHours}h` : calculateDuration(rep.departureDate || rep.dayDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
       const eyebrow = `${getTransportIcon(rep.transportType)} ${firstDepDate}`;
@@ -1064,9 +1066,10 @@ function buildTransportTab(cityFilter = null) {
     const isMultiLeg = segs.length > 1;
     const rep = segs[0];
 
-    const statusColor = rep.status === 'booked' || rep.status === 'confirmed' ? '#27AE60' : rep.status === 'cancelled' ? '#E74C3C' : '#E67E22';
-    const statusIcon = rep.status === 'booked' ? '✓' : rep.status === 'confirmed' ? '🎫' : rep.status === 'cancelled' ? '❌' : '⏳';
-    const statusText = rep.status === 'booked' ? 'Booked' : rep.status === 'confirmed' ? 'Confirmed' : rep.status === 'cancelled' ? 'Cancelled' : 'Planned';
+    const statusMetaInfo = getStatusMeta(rep.status);
+      const statusColor = statusMetaInfo.color;
+      const statusIcon = '';
+      const statusText = statusMetaInfo.label;
 
     const lastSeg = segs[segs.length - 1];
     const firstDepDate = formatJourneyDate(rep.departureDate) || rep.dayDate || '—';
@@ -1213,9 +1216,10 @@ function buildTransportTab(cityFilter = null) {
         </td>
         
         <td class="px-4 py-3 align-middle text-center">
-          <button class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors border border-transparent hover:border-current focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-slate-300" style="background-color: ${statusColor}15; color: ${statusColor};" onclick="event.stopPropagation(); if(${window.isEditMode})toggleJourneyStatus('${rep.id}')" title="Toggle status">
-            ${statusIcon} ${statusText}
-          </button>
+          ${renderStatusBadge(rep.status, {
+            onClick: window.isEditMode ? `event.stopPropagation(); toggleJourneyStatus('${rep.id}')` : '',
+            title: 'Change transport status'
+          })}
         </td>
         
         <td class="px-4 py-3 align-middle text-right font-medium text-slate-800 dark:text-slate-200" onclick="event.stopPropagation()">

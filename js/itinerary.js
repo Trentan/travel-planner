@@ -46,85 +46,30 @@ function getActivityStatusBadgeHtml(status, clickHandlerCall = '') {
   if (!status || status === 'none' || status === 'null') {
     return '';
   }
-  const normStatus = status;
-  let bgColor = '#E67E22'; // Orange/Amber
-  let label = 'Planned';
-  let icon = '⧗';
-
-  if (normStatus === 'confirmed') {
-    bgColor = '#27AE60'; // Green
-    label = 'Confirmed';
-    icon = '✓';
-  } else if (normStatus === 'booked') {
-    bgColor = '#2980B9'; // Blue
-    label = 'Booked';
-    icon = '✓';
-  } else if (normStatus === 'cancelled') {
-    bgColor = '#E74C3C'; // Red
-    label = 'Cancelled';
-    icon = '✖';
-  } else if (normStatus === 'planned') {
-    bgColor = '#E67E22'; // Orange/Amber
-    label = 'Planned';
-    icon = '⧗';
-  }
-
-  const cursorClass = clickHandlerCall ? 'cursor-pointer hover:opacity-80' : '';
-  const onClickAttr = clickHandlerCall ? ` onclick="${clickHandlerCall}"` : '';
-
-  return `<span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white ${cursorClass}" style="background-color:${bgColor}; display: inline-flex; align-items: center; gap: 4px;"${onClickAttr}>${icon} ${label}</span>`;
+  return renderStatusBadge(status, {
+    onClick: clickHandlerCall,
+    title: 'Change activity status'
+  });
 }
 
 function getStayStatusBadgeHtml(status, clickHandlerCall = '') {
   if (!status || status === 'none' || status === 'null') {
     return '';
   }
-  let bgColor = '#E67E22'; // Orange/Amber
-  let label = 'Pending';
-  let icon = '⧗';
-
-  if (status === 'confirmed') {
-    bgColor = '#27AE60'; // Green
-    label = 'Confirmed';
-    icon = '✓';
-  } else if (status === 'cancelled') {
-    bgColor = '#E74C3C'; // Red
-    label = 'Cancelled';
-    icon = '✖';
-  }
-
-  const cursorClass = clickHandlerCall ? 'cursor-pointer hover:opacity-80' : '';
-  const onClickAttr = clickHandlerCall ? ` onclick="${clickHandlerCall}"` : '';
-
-  return `<span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white ${cursorClass}" style="background-color:${bgColor}; display: inline-flex; align-items: center; gap: 4px;"${onClickAttr}>${icon} ${label}</span>`;
+  return renderStatusBadge(status, {
+    onClick: clickHandlerCall,
+    title: 'Change stay status'
+  });
 }
 
 function getTransportStatusBadgeHtml(status, clickHandlerCall = '') {
   if (!status || status === 'none' || status === 'null') {
     return '';
   }
-  let bgColor = '#E67E22'; // Orange/Amber
-  let label = 'Planned';
-  let icon = '⏳';
-
-  if (status === 'confirmed') {
-    bgColor = '#27AE60'; // Green
-    label = 'Confirmed';
-    icon = '🎫';
-  } else if (status === 'booked') {
-    bgColor = '#27AE60'; // Green / Emerald
-    label = 'Booked';
-    icon = '✓';
-  } else if (status === 'cancelled') {
-    bgColor = '#E74C3C'; // Red
-    label = 'Cancelled';
-    icon = '❌';
-  }
-
-  const cursorClass = clickHandlerCall ? 'cursor-pointer hover:opacity-80' : '';
-  const onClickAttr = clickHandlerCall ? ` onclick="${clickHandlerCall}"` : '';
-
-  return `<span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white ${cursorClass}" style="background-color:${bgColor}; display: inline-flex; align-items: center; gap: 4px;"${onClickAttr}>${icon} ${label}</span>`;
+  return renderStatusBadge(status, {
+    onClick: clickHandlerCall,
+    title: 'Change transport status'
+  });
 }
 
 function focusCompactInlineEditable(selector) {
@@ -1661,8 +1606,7 @@ function buildCompactItineraryLegacy() {
       if (dayJourneys.length > 0) {
         html += '<div style="flex:1;"><strong>Transport</strong> ';
         html += dayJourneys.map(j => {
-          const status = j.status || 'planned';
-          const statusText = status === 'booked' ? 'Booked' : 'Planned';
+          const status = normalizeItemStatus(j.status);
           const icon = getTransportIcon(j.transportType);
           const journeyLabel = stripCompactLeadingEmoji(j.notes || `${j.fromLocation}→${j.toLocation}`);
           const segs = (window.journeys || [])
@@ -1672,7 +1616,7 @@ function buildCompactItineraryLegacy() {
               ? `${calculateJourneyDuration(segs)}h`
               : '';
           const details = formatJourneySubLocationText(segs.length > 0 ? segs : [j]);
-          return `${renderCompactEmojiLine({ emoji: icon, text: [journeyLabel, details].filter(Boolean).join(' | '), duration })} <span style="color:${status === 'booked' ? '#27AE60' : '#E67E22'}">${statusText}</span>`;
+          return `${renderCompactEmojiLine({ emoji: icon, text: [journeyLabel, details].filter(Boolean).join(' | '), duration })} ${renderStatusBadge(status)}`;
         }).join(', ');
         html += '</div>';
       }
@@ -2759,12 +2703,9 @@ function buildItinerary() {
           <div class="detail-block block-transport flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md">
             <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Transport</h4><div class="item-list space-y-2">
             ${dayJourneys.map((journey) => {
-        const status = journey.status || 'planned';
-        const statusColor = status === 'booked' ? '#27AE60' : '#E67E22';
-        const statusIcon = status === 'booked' ? '✓' : '⧗';
+        const status = normalizeItemStatus(journey.status);
         const icon = getTransportIcon(journey.transportType);
-        const showRef = status === 'booked';
-
+        const showRef = status === 'booked' || status === 'confirmed';
         // For multi-leg journeys, show the full route chain; otherwise show name or route
         let label = '';
         if (journey.isMultiLeg && journey.journeyId) {
@@ -2798,7 +2739,10 @@ function buildItinerary() {
                   ${subLocations ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(subLocations)}</div>` : ''}
                 </div>
                 <div class="cost-item-actions flex flex-col items-end gap-1.5 shrink-0">
-                  <span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white ${isEditMode ? 'cursor-pointer hover:opacity-80' : ''}" style="background-color:${statusColor};" title="${isEditMode ? 'Click to toggle status' : 'Booking status'}" onclick="event.stopPropagation(); toggleJourneyStatus('${journey.id}');">${statusIcon} ${status === 'booked' ? 'Booked' : 'Planned'}</span>
+                  ${renderStatusBadge(status, {
+                    onClick: isEditMode ? `event.stopPropagation(); toggleJourneyStatus('${journey.id}');` : '',
+                    title: 'Change transport status'
+                  })}
                   ${showRef ? `<input type="text" class="booking-ref-input confirmed text-xs px-1.5 py-0.5 border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 w-24 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500" value="${journey.bookingReference || ''}" placeholder="Ref #" onchange="event.stopPropagation(); updateJourneyBookingRef('${journey.id}', this.value);" ${isEditMode ? '' : 'disabled'}/>` : ''}
                   <span class="budget-field text-slate-600 dark:text-slate-400 font-mono text-sm mt-1">$<span class="outline-none" contenteditable="${isEditMode}" onblur="updateJourneyCost('${journey.id}', this.innerText)">${formatCurrency(journey.cost || '0', { includeSymbol: false })}</span></span>
                 </div>
@@ -2840,7 +2784,7 @@ ${(() => {
           ${stayLoc ? `<div class="daily-timeline-sub-locations" style="padding-left: 0; margin-top: 2px;">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : ''}
         </div>
         <div class="cost-item-actions flex flex-col items-end gap-1.5 shrink-0">
-          <span class="status-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white" style="background-color:${info.status === 'confirmed' ? '#27AE60' : info.status === 'cancelled' ? '#E74C3C' : '#E67E22'};">${info.status === 'confirmed' ? '✓ Confirmed' : info.status === 'cancelled' ? '✖ Cancelled' : '⧗ Pending'}</span>
+          ${renderStatusBadge(info.status || 'planned', { title: 'Stay status' })}
           ${info.bookingRef ? `<span class="booking-ref text-[10px] font-mono text-slate-500 bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">${info.bookingRef}</span>` : ''}
         </div>
       </div>`;
