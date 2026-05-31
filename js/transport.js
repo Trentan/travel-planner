@@ -424,9 +424,19 @@ function getDayJourneys(dayDate, fromLoc, toLoc, legId = '') {
 
     if (dateMatch && (routeMatch || legMatch)) {
       const key = j.journeyId || j.id;
-      if (!seen.has(key)) {
-        seen.add(key);
+      const existing = results.find(r => (r.journeyId && r.journeyId === key) || r.id === key);
+      if (!existing) {
         results.push(j);
+      } else {
+        // If there's already a matching segment for this journey, let's see if this one is a better match for the current day/leg!
+        const currentScore = (existing.toLocation === toLoc ? 2 : 0) + (existing.legId === legId ? 2 : 0) + (existing.departureDate === dayDate ? 1 : 0);
+        const newScore = (j.toLocation === toLoc ? 2 : 0) + (j.legId === legId ? 2 : 0) + (j.departureDate === dayDate ? 1 : 0);
+        if (newScore > currentScore) {
+          const idx = results.indexOf(existing);
+          if (idx !== -1) {
+            results[idx] = j;
+          }
+        }
       }
     }
   });

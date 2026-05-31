@@ -3054,6 +3054,8 @@ function normalizeTripLegsData(legs) {
 
 function normalizeTripJourneysData(items) {
   if (!Array.isArray(items)) return [];
+  
+  const groups = {};
   items.forEach(item => {
     item.dayDate = normalizeTripDateValue(item.dayDate || item.startDate);
     item.departureDate = normalizeTripDateValue(item.departureDate || item.startDate || item.dayDate);
@@ -3066,7 +3068,32 @@ function normalizeTripJourneysData(items) {
     item.endTime = item.arrivalTime || '';
     item.fromAddress = item.fromAddress || '';
     item.toAddress = item.toAddress || '';
+
+    const gid = item.journeyId || item.id;
+    if (gid) {
+      if (!groups[gid]) groups[gid] = [];
+      groups[gid].push(item);
+    }
   });
+
+  const statusPriority = { 'cancelled': 4, 'confirmed': 3, 'booked': 2, 'planned': 1, '': 0 };
+  Object.values(groups).forEach(segs => {
+    if (segs.length > 1) {
+      let bestStatus = 'planned';
+      let maxPriority = 0;
+      segs.forEach(s => {
+        const p = statusPriority[s.status] || 0;
+        if (p > maxPriority) {
+          maxPriority = p;
+          bestStatus = s.status;
+        }
+      });
+      if (bestStatus) {
+        segs.forEach(s => s.status = bestStatus);
+      }
+    }
+  });
+
   return items;
 }
 
