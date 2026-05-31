@@ -327,7 +327,31 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await page.waitForFunction(() => !document.body.classList.contains('mobile-menu-open'));
     await humanPause(page, 250);
 
-
+    await page.locator('.app-tab-btn[data-tab="itinerary"]').click();
+    await page.evaluate(() => {
+      if (!window.isEditMode && typeof toggleEditMode === 'function') {
+        toggleEditMode();
+      }
+    });
+    await page.waitForFunction(() => window.isEditMode === true);
+    await humanPause(page, 350);
+    assert(await page.locator('#tab-itinerary .mobile-panel-add-btn').count() === 0, 'Mobile: add actions should stay hidden until a section is expanded');
+    await page.locator('#tab-itinerary .compact-mobile-info-chip[title="Activities"]').first().click();
+    await page.waitForSelector('#tab-itinerary .mobile-panel-add-btn:has-text("+ Add Activity")', { state: 'visible' });
+    assert(await page.locator('#tab-itinerary .mobile-panel-add-btn').count() === 1, 'Mobile: only expanded section should show its add action');
+    await page.locator('#tab-itinerary .mobile-panel-add-btn:has-text("+ Add Activity")').first().click();
+    await page.waitForSelector('#activity-assign-modal', { state: 'visible' });
+    await page.locator('#activity-assign-modal .modal-close').click();
+    await page.waitForSelector('#activity-assign-modal', { state: 'detached' });
+    await page.locator('#tab-itinerary .compact-mobile-info-chip[title="Food quests"]').first().click();
+    await page.waitForSelector('#tab-itinerary .mobile-panel-add-btn:has-text("+ Add Food")', { state: 'visible' });
+    await page.locator('#tab-itinerary .mobile-panel-add-btn:has-text("+ Add Food")').first().click();
+    await page.waitForSelector('.modal-overlay #foodName', { state: 'visible' });
+    await page.locator('.modal-overlay:has(#foodName) .modal-close').click();
+    await page.waitForSelector('.modal-overlay #foodName', { state: 'detached' });
+    await page.locator('#tab-itinerary .compact-mobile-info-chip[title="Tips"]').first().click();
+    await page.waitForSelector('#tab-itinerary .mobile-panel-add-btn:has-text("+ Add Tip")', { state: 'visible' });
+    reporter.add('mobile', 'itinerary add actions', 'section-level add actions appear only when expanded');
 
     await page.locator('.app-tab-btn[data-tab="accom"]').click();
     await humanPause(page, 350);

@@ -2147,6 +2147,29 @@
   }
 
   /* Mobile chip system restored after style.css removal */
+  body.mobile-app-mode #tab-itinerary .mobile-panel-add-btn {
+    @apply flex items-center justify-center font-medium;
+    width: 100%;
+    min-height: 2.5rem;
+    margin-top: 0.45rem;
+    padding: 0.55rem 0.65rem;
+    border-top: 1px dashed rgba(36, 72, 93, 0.14);
+    border-radius: 0;
+    background: transparent;
+    color: #334155;
+    font-size: var(--m-font-sm);
+    line-height: 1.1;
+  }
+
+  body.mobile-app-mode #tab-itinerary .mobile-panel-add-btn:active {
+    transform: translateY(1px);
+  }
+
+  [data-theme="dark"] body.mobile-app-mode #tab-itinerary .mobile-panel-add-btn {
+    border-top-color: rgba(148, 163, 184, 0.16);
+    color: #cbd5e1;
+  }
+
   .compact-mobile-info-chips {
     @apply flex items-stretch gap-2;
   }

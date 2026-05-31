@@ -429,7 +429,6 @@ function renderCompactTipsCard(leg, legIndex) {
   `;
 }
 
-
 function renderCompactMobileLegInfoCluster(leg, legIndex) {
   const tips = Array.isArray(leg.legTips) ? leg.legTips : [];
   const foodItems = Array.isArray(leg.cityFood) ? leg.cityFood : [];
@@ -505,16 +504,19 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
       ${tipsExpanded ? `
         <div class="compact-mobile-info-panel compact-mobile-info-panel-tips" style="border-left-color:${accentColor};">
           ${tipsList}
+          ${isEditMode ? `<button type="button" class="mobile-panel-add-btn" onclick="event.stopPropagation(); addLegTip(${legIndex})">+ Add Tip</button>` : ''}
         </div>
       ` : ''}
       ${foodExpanded ? `
         <div class="compact-mobile-info-panel compact-mobile-info-panel-food" style="border-left-color:${accentColor};">
           <div class="compact-food-list">${foodLines}</div>
+          ${isEditMode ? `<button type="button" class="mobile-panel-add-btn" onclick="event.stopPropagation(); addFood(${legIndex})">+ Add Food</button>` : ''}
         </div>
       ` : ''}
       ${activitiesExpanded ? `
         <div class="compact-mobile-info-panel compact-mobile-info-panel-activities" style="border-left-color:${accentColor};">
           <div class="compact-suggested-activity-list">${activityLines}</div>
+          ${isEditMode ? `<button type="button" class="mobile-panel-add-btn" onclick="event.stopPropagation(); addActivity(${legIndex})">+ Add Activity</button>` : ''}
         </div>
       ` : ''}
     </div>
@@ -755,7 +757,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     }
     const activityLoc = locationVal ? (() => {
       let loc = locationVal;
-      const cleanCity = String((typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label || '') : '') || day.to || day.from || '').trim();
+      const cleanCity = String(day.to || day.from || '').trim();
       if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
         loc = `${loc} (${cleanCity})`;
       }
@@ -1987,7 +1989,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
     }
     const activityLoc = locationVal ? (() => {
       let loc = locationVal;
-      const cleanCity = String(day.to || day.from || '').trim();
+      const cleanCity = String((typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label || '') : '') || day.to || day.from || '').trim();
       if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
         loc = `${loc} (${cleanCity})`;
       }
