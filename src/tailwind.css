@@ -138,6 +138,29 @@
            hover:bg-btn-success-hover hover:border-btn-success-hover;
   }
 
+  .json-write-warning {
+    @apply flex flex-wrap items-center justify-between gap-2 px-3 py-2
+           border-b border-amber-200 bg-amber-50 text-sm text-amber-950;
+  }
+
+  .json-write-warning-text {
+    @apply min-w-0 flex-1 leading-snug;
+  }
+
+  .json-write-warning-actions {
+    @apply inline-flex flex-wrap items-center gap-2;
+  }
+
+  .json-write-warning-btn {
+    @apply inline-flex min-h-9 items-center justify-center rounded-lg border border-amber-300
+           bg-white px-3 py-1.5 text-sm font-semibold text-amber-950 shadow-sm
+           transition-colors duration-200 hover:bg-amber-100 hover:border-amber-400;
+  }
+
+  .json-write-warning-btn-secondary {
+    @apply border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400;
+  }
+
   /* Danger action button */
   .action-btn-danger {
     @apply bg-btn-danger text-white border-btn-danger
@@ -2593,13 +2616,13 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-info-chip {
-    @apply min-h-10 rounded-[16px] px-2 border-[#d3d9df] bg-white;
+    @apply min-h-10 rounded-[16px] px-1.5 border-[#d3d9df] bg-white;
     display: grid;
     box-shadow: inset 0 0 0 1px rgba(80, 102, 122, 0.05);
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     justify-items: center;
-    column-gap: 0.4rem;
+    column-gap: 0.2rem;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-info-chip.is-active {
@@ -2616,14 +2639,14 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-info-chip-title {
-    @apply text-[0.72rem] font-bold leading-none min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex items-center justify-center gap-0.5;
+    @apply text-[0.66rem] font-bold leading-none min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex items-center justify-center gap-0.5;
     justify-self: center;
     margin-inline: auto;
     text-align: center;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-info-chip-count {
-    @apply text-[0.74rem] px-1.5 py-0.5 rounded-full bg-slate-100 border-slate-300 text-slate-700 font-bold min-w-[2rem] text-center;
+    @apply text-[0.72rem] px-1 py-0.5 rounded-full bg-slate-100 border-slate-300 text-slate-700 font-bold min-w-6 text-center;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-mobile-info-panel {
@@ -3896,9 +3919,27 @@
     justify-content: center;
   }
 
+  body.mobile-app-mode .daily-timeline-checkbox-wrapper {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    margin: -0.35rem 0;
+    border-radius: 9999px;
+  }
+
+  body.mobile-app-mode .daily-timeline-checkbox-wrapper:focus-within {
+    outline: 2px solid rgba(20, 184, 166, 0.7);
+    outline-offset: 2px;
+  }
+
   .daily-timeline-checkbox {
     width: 1.05rem;
     height: 1.05rem;
+  }
+
+  body.mobile-app-mode .daily-timeline-checkbox {
+    width: 1.35rem;
+    height: 1.35rem;
+    cursor: pointer;
   }
 
   /* Header */

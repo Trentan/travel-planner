@@ -461,11 +461,12 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
   const foodLabel = `${completedFoodCount}/${foodItems.length}`;
   const foodProgressWidth = foodItems.length > 0 ? Math.round((completedFoodCount / foodItems.length) * 100) : 0;
 
-  // Count assigned vs unassigned suggested activities
   const unassignedActivities = suggestedActivities
     .map((activity, activityIdx) => ({ activity, activityIdx }))
     .filter(({ activity }) => activity && (activity.assignedDayIdx === null || activity.assignedDayIdx === undefined));
-  const activitiesLabel = `${unassignedActivities.length} unscheduled`;
+  const activitiesLabel = unassignedActivities.length === 1
+    ? '1 unscheduled activity'
+    : `${unassignedActivities.length} unscheduled activities`;
   const accentColor = escapeCompactText(leg.colour || '#24485d');
 
   const tipsList = tips.length > 0
@@ -512,10 +513,10 @@ function renderCompactMobileLegInfoCluster(leg, legIndex) {
           style="border-left-color:${accentColor};"
           onclick="toggleActivitiesCardDetails(event, '${legId}')"
           aria-expanded="${activitiesExpanded ? 'true' : 'false'}"
-          aria-label="Activities ${escapeCompactText(activitiesLabel)} assigned"
+          aria-label="Activities, ${escapeCompactText(activitiesLabel)}"
           title="Activities"
         >
-          <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#127919;</span> Fun</span>
+          <span class="compact-mobile-info-chip-title"><span aria-hidden="true">&#127919;</span> Activities</span>
           <span class="compact-mobile-info-chip-count">${unassignedActivities.length}</span>
         </button>
       </div>

@@ -484,13 +484,13 @@ function syncJsonWriteWarning() {
   }
 
   const connectAction = isFSASupported()
-    ? '<button type="button" onclick="openTripFile()">Save As</button>'
+    ? '<button type="button" class="json-write-warning-btn" onclick="openTripFile()">Save As</button>'
     : '';
   warning.innerHTML = `
     <span class="json-write-warning-text">${getJsonWriteWarningMessage()}</span>
     <span class="json-write-warning-actions">
       ${connectAction}
-      <button type="button" onclick="exportJSON()">Export JSON</button>
+      <button type="button" class="json-write-warning-btn json-write-warning-btn-secondary" onclick="exportJSON()">Export JSON</button>
     </span>
   `;
 }
