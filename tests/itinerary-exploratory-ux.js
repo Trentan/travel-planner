@@ -46,6 +46,11 @@ async function seedTimelineScenario(page) {
     const leg = appData[0];
     const day = leg.days[0];
     const dayDate = day.date;
+    const offsetDate = (iso, offset) => {
+      const date = new Date(`${iso}T00:00:00Z`);
+      date.setUTCDate(date.getUTCDate() + offset);
+      return date.toISOString().slice(0, 10);
+    };
 
     day.activityItems = [
       {
@@ -119,22 +124,36 @@ async function seedTimelineScenario(page) {
     }];
     window.journeys = journeys;
 
-    stays = [{
-      id: 'explore-stay-1',
-      city: day.to,
-      propertyName: 'Exploratory Hotel',
-      provider: 'Hotel Test',
-      checkIn: dayDate,
-      checkInTime: '16:00',
-      checkOut: dayDate,
-      checkOutTime: '18:00',
-      startDate: dayDate,
-      startTime: '16:00',
-      endDate: dayDate,
-      endTime: '18:00',
-      status: 'booked',
-      done: false
-    }];
+    stays = [
+      {
+        id: 'explore-stay-1',
+        city: day.to,
+        propertyName: 'Exploratory Hotel',
+        provider: 'Hotel Test',
+        checkIn: dayDate,
+        checkInTime: '16:00',
+        checkOut: dayDate,
+        checkOutTime: '18:00',
+        startDate: dayDate,
+        startTime: '16:00',
+        endDate: dayDate,
+        endTime: '18:00',
+        status: 'booked',
+        done: false
+      },
+      {
+        id: 'explore-stay-interior',
+        city: day.to,
+        propertyName: 'Quiet Hotel',
+        provider: 'Hotel Test',
+        checkIn: offsetDate(dayDate, -1),
+        checkInTime: '16:00',
+        checkOut: offsetDate(dayDate, 1),
+        checkOutTime: '10:00',
+        status: 'booked',
+        done: false
+      }
+    ];
     window.stays = stays;
 
     if (typeof window.setItineraryDayViewMode === 'function') window.setItineraryDayViewMode('timeline');
@@ -179,6 +198,8 @@ async function exerciseTimeline(page, { mobile = false } = {}) {
   assert(await page.locator('#itineraryTimelineModeBtn[aria-pressed="true"]').count() === 1, 'Timeline mode should be active');
   assert(await page.locator(':is(.day-card.open, .compact-day-slide.open) .timeline-section-label', { hasText: 'Scheduled' }).count() > 0, 'Scheduled section should render');
   assert(await page.locator(':is(.day-card.open, .compact-day-slide.open) .timeline-anytime-label', { hasText: 'Anytime' }).count() > 0, 'Anytime section should render');
+  assert(await page.locator(':is(.day-card.open, .compact-day-slide.open) .day-stay-heading-note', { hasText: 'Staying at Quiet Hotel' }).count() > 0, 'Interior stay should be summarized in the day heading');
+  assert.strictEqual(await page.locator(':is(.day-card.open, .compact-day-slide.open) .daily-timeline-item-stay .daily-timeline-type', { hasText: 'Staying' }).count(), 0, 'Interior stay should not render as a timeline row');
   await assertNoTimelineColumnOverlap(page);
 
   await page.evaluate(() => {

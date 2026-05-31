@@ -896,6 +896,19 @@
            text-text-muted bg-white/75 text-[0.74rem] font-bold;
   }
 
+  .day-stay-heading-note {
+    @apply inline-flex items-center max-w-full align-middle whitespace-nowrap
+           rounded-full border border-slate-200/80 bg-slate-50/80 px-2 py-0.5
+           text-[0.72rem] font-semibold leading-tight text-slate-500;
+    margin: 0 0 0.25rem;
+    max-width: min(24rem, 100%);
+  }
+
+  .day-stay-heading-note-compact {
+    @apply flex-none;
+    margin-left: 0;
+  }
+
   .timeline-section-label {
     @apply text-text-muted text-[0.72rem] font-black uppercase;
   }

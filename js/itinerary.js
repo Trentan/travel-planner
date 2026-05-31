@@ -583,6 +583,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
   const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
   const dayStayInfo = getStayDisplayForDay(day.date, day.to);
+  const stayingHeadingNote = renderStayingHeadingNote(day.date, day.to, 'day-stay-heading-note-compact');
   const dayTotal = getDayTotal(day);
   const fromCity = String(day.from || '').trim();
   const toCity = String(day.to || '').trim();
@@ -832,6 +833,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     summary: `
           <div class="compact-day-summary-row">
             <span class="compact-day-summary-desc">${escapeCompactText(day.desc || 'No description yet')}</span>
+            ${stayingHeadingNote}
             <span class="compact-day-summary-meta flex items-center gap-1.5 shrink-0"></span>
           </div>
         `,
@@ -1587,6 +1589,7 @@ function buildCompactItineraryLegacy() {
     leg.days.forEach((day, dayIdx) => {
       {
       const dayTotal = getDayTotal(day);
+      const stayingHeadingNote = renderStayingHeadingNote(day.date, day.to);
       const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
       const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
       const dayStayInfo = getStayDisplayForDay(day.date, day.to);
@@ -1794,6 +1797,23 @@ function getStayDisplayForDay(dayDate, dayCity) {
   return result;
 }
 
+function getInteriorStayDisplayForDay(dayDate, dayCity) {
+  return getStayDisplayForDay(dayDate, dayCity).filter(stayInfo => stayInfo.type === 'staying');
+}
+
+function renderStayingHeadingNote(dayDate, dayCity, extraClass = '') {
+  const interiorStays = getInteriorStayDisplayForDay(dayDate, dayCity);
+  if (interiorStays.length === 0) return '';
+  const stayNames = interiorStays
+    .map(info => String(info.propertyName || 'Accommodation').trim())
+    .filter(Boolean);
+  if (stayNames.length === 0) return '';
+  const label = stayNames.length === 1
+    ? `Staying at ${stayNames[0]}`
+    : `Staying at ${stayNames.join(', ')}`;
+  return `<span class="day-stay-heading-note ${extraClass}">${escapeCompactText(label)}</span>`;
+}
+
 function formatTimelineTimeRange(startTime = '', endTime = '') {
   const start = String(startTime || '').trim();
   const end = String(endTime || '').trim();
@@ -1921,7 +1941,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
     });
   });
 
-  getStayDisplayForDay(day.date, day.to).forEach((stayInfo, stayIndex) => {
+  getStayDisplayForDay(day.date, day.to).filter(stayInfo => stayInfo.type !== 'staying').forEach((stayInfo, stayIndex) => {
     const label = stayInfo.type === 'checkin' ? 'Check-in' : stayInfo.type === 'checkout' ? 'Check-out' : 'Staying';
     const icon = stayInfo.type === 'checkout' ? '🚪' : '🏨';
     items.push({
@@ -2766,12 +2786,13 @@ function buildItinerary() {
       const openClass = shouldBeOpen ? 'open' : '';
       const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
       const dayViewMode = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
+      const stayingHeadingNote = renderStayingHeadingNote(day.date, day.to);
 
       html += `
       <div class="day-card group flex flex-col mb-4 overflow-hidden bg-white/90 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 rounded-xl shadow-sm transition-all duration-300 ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
         <div class="day-bar flex items-center p-3 sm:p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors relative" style="border-left: 5px solid var(--leg-colour, ${leg.colour})" onclick="toggleCard(this)">
           <div class="day-date w-16 sm:w-20 shrink-0 text-center flex flex-col items-center justify-center border-r border-slate-200 dark:border-slate-700 pr-3 sm:pr-4 mr-3 sm:mr-4"><span class="day-num text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">${dayDateLabel}</span><span class="day-name text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${day.day}</span></div>
-          <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${cityHTML}</div><div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
+          <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${cityHTML}</div>${stayingHeadingNote}<div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
           ${dayTotal ? `<div class="day-total-cost hidden sm:flex shrink-0 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-full border border-slate-200 dark:border-slate-600 shadow-inner mr-4" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron shrink-0 w-8 h-8 flex items-center justify-center text-slate-400 transition-transform duration-300 bg-slate-100 dark:bg-slate-700/50 rounded-full group-[.open]:rotate-180">▼</span>
         </div>
         <div class="day-detail hidden group-[.open]:block border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 p-4 sm:p-5"><div class="day-planner-shell day-planner-shell-${dayViewMode}">
