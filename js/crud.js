@@ -222,7 +222,7 @@ function _splitActivityTitle(title) {
 }
 
 function openActivityModalUnified(legIdx, activityIdx = null) {
-  const isEditing = activityIdx !== null && activityIdx !== undefined;
+  const isEditing = activityIdx !== null && activityIdx !== undefined && activityIdx !== -1;
   const leg = appData[legIdx];
   if (!leg) return;
   const activity = isEditing ? leg?.suggestedActivities?.[activityIdx] : null;
@@ -697,6 +697,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
         targetIdx = leg.suggestedActivities.length - 1;
       } else {
         const target = leg.suggestedActivities[activityIdx];
+        if (!target) return;
         target.category = formData.category;
         target.title = formData.title;
         target.estTime = formData.estTime;
@@ -729,6 +730,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       if (!formData) return;
 
       const target = leg.suggestedActivities[activityIdx];
+      if (!target) return;
       target.category = formData.category;
       target.title = formData.title;
       target.estTime = formData.estTime;
@@ -772,6 +774,10 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       });
     } else {
       const target = leg.suggestedActivities[activityIdx];
+      if (!target) {
+        console.error(`[Activity Editor] No target activity found at index ${activityIdx}`);
+        return;
+      }
       const previousMatchTexts = getSuggestedActivityMatchTexts(target);
 
       target.category = formData.category;
