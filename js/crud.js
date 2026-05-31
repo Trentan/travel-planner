@@ -12,29 +12,21 @@ async function deleteActivity(legIdx, activityIdx) {
   const activity = leg?.suggestedActivities?.[activityIdx];
   if (!leg || !activity) return;
 
-  const emojiRe = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}\u{FE0F}\s]+/gu;
-  const normalize = t => String(t || '').trim().replace(emojiRe, '').trim().toLowerCase();
+  const matchTexts = typeof getSuggestedActivityMatchTexts === 'function'
+    ? getSuggestedActivityMatchTexts(activity).map(t => getComparisonString(t))
+    : [getComparisonString(activity.title)];
 
-  // If scheduled on a day, remove matching day activity row as well.
-  const assignedDayIdx = activity.assignedDayIdx;
-  if (assignedDayIdx !== null && assignedDayIdx !== undefined && leg.days?.[assignedDayIdx]) {
-    const day = leg.days[assignedDayIdx];
-    if (Array.isArray(day.activityItems)) {
-      const matchTexts = typeof getSuggestedActivityMatchTexts === 'function'
-        ? getSuggestedActivityMatchTexts(activity).map(t => String(t || '').trim())
-        : [String(activity.title || '').trim()];
-      const matchSet = new Set(matchTexts.filter(Boolean));
-      const normalizedMatchSet = new Set(matchTexts.map(normalize).filter(Boolean));
-
-      day.activityItems = day.activityItems.filter(item => {
-        const itemText = String(item?.text || '').trim();
-        // Exact match
-        if (matchSet.has(itemText)) return false;
-        // Normalized match (strip emojis, case-insensitive)
-        if (normalizedMatchSet.has(normalize(itemText))) return false;
-        return true;
-      });
-    }
+  // Scan and clean matching items from all days on this leg (clears legacy duplicate leftovers)
+  if (Array.isArray(leg.days)) {
+    leg.days.forEach(day => {
+      if (day && Array.isArray(day.activityItems)) {
+        day.activityItems = day.activityItems.filter(item => {
+          const itemTextClean = getComparisonString(item?.text);
+          if (matchTexts.includes(itemTextClean)) return false;
+          return true;
+        });
+      }
+    });
   }
 
   leg.suggestedActivities.splice(activityIdx, 1);
@@ -49,6 +41,14 @@ function getSuggestedActivityDayText(activity) {
   const emoji = typeof getActivityEmoji === 'function' ? getActivityEmoji(activity?.category) : '';
   if (!emoji || !title) return title;
   return title.startsWith(emoji) ? title : `${emoji} ${title}`;
+}
+
+function getComparisonString(str) {
+  return String(str || '')
+    .toLowerCase()
+    .replace(/[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}\u{1F000}-\u{1FAFF}\u{200D}\u{FE0F}]/gu, '')
+    .replace(/[^a-z0-9]/g, '')
+    .trim();
 }
 
 function getSuggestedActivityMatchTexts(activity) {
@@ -227,6 +227,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
   if (!leg) return;
   const activity = isEditing ? leg?.suggestedActivities?.[activityIdx] : null;
   if (isEditing && !activity) return;
+
+  const originalMatchTexts = activity ? getSuggestedActivityMatchTexts(activity) : [];
 
   const existingModal = document.getElementById('activity-assign-modal');
   if (existingModal) existingModal.remove();
@@ -711,7 +713,10 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
         target.audioRef = formData.audioRef;
       }
 
-      const assigned = assignSuggestedActivityToDay(legIdx, targetIdx, legIdx, targetDayIdx, getScheduleOptions(button));
+      const assigned = assignSuggestedActivityToDay(legIdx, targetIdx, legIdx, targetDayIdx, {
+        ...getScheduleOptions(button),
+        originalMatchTexts
+      });
       if (!assigned) return;
 
       saveData();
@@ -743,7 +748,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       target.audioTitle = formData.audioTitle;
       target.audioRef = formData.audioRef;
 
-      const cleared = clearAssignedSuggestedActivityFromDay(legIdx, activityIdx);
+      const cleared = clearAssignedSuggestedActivityFromDay(legIdx, activityIdx, originalMatchTexts);
       if (!cleared) return;
 
       saveData();
@@ -779,7 +784,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
         console.error(`[Activity Editor] No target activity found at index ${activityIdx}`);
         return;
       }
-      const previousMatchTexts = getSuggestedActivityMatchTexts(target);
+      const previousMatchTexts = originalMatchTexts;
+      const previousClean = previousMatchTexts.map(t => getComparisonString(t));
 
       target.category = formData.category;
       target.title = formData.title;
@@ -807,7 +813,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
 
         if (day?.activityItems?.length) {
           day.activityItems.forEach(item => {
-            if (previousMatchTexts.includes(String(item.text || '').trim())) {
+            const cleanItemText = getComparisonString(item.text);
+            if (previousClean.includes(cleanItemText)) {
               item.text = getSuggestedActivityDayText(target);
               item.time = formData.estTime;
               item.cost = formData.estCost;
