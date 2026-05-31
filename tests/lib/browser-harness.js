@@ -486,6 +486,7 @@ function createBrowserHarness({
   const errors = [];
   const warnings = [];
   const downloads = [];
+  const openedUrls = [];
   const serviceWorkerRegistrations = [];
   const timers = [];
   let timerId = 1;
@@ -894,6 +895,7 @@ function createBrowserHarness({
     __errors: errors,
     __warnings: warnings,
     __downloads: downloads,
+    __openedUrls: openedUrls,
     __timers: timers,
     __serviceWorkerRegistrations: serviceWorkerRegistrations,
     __reloadCalled: () => reloadCalled,
@@ -933,6 +935,10 @@ function createBrowserHarness({
   context.localStorage = localStorage;
   context.sessionStorage = sessionStorage;
   context.location = location;
+  context.open = (url, target) => {
+    openedUrls.push({ url, target });
+    context.lastOpenedUrl = { url, target };
+  };
 
   const originalCreateElement = document.createElement.bind(document);
   document.createElement = function(tagName) {
@@ -954,6 +960,7 @@ function createBrowserHarness({
     errors,
     warnings,
     downloads,
+    openedUrls,
     serviceWorkerRegistrations,
     flushTimers: () => context.__flushTimers(),
     dispatchWindowEvent: type => context.__dispatchWindowEvent(type),

@@ -896,6 +896,24 @@
            text-text-muted bg-white/75 text-[0.74rem] font-bold;
   }
 
+  .daily-timeline-heading-row {
+    @apply flex flex-wrap items-center justify-between gap-2;
+  }
+
+  .timeline-map-action {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-cyan-200/80 bg-cyan-50/90
+           px-3 py-1.5 text-[0.78rem] font-bold text-cyan-800 shadow-sm transition-colors;
+  }
+
+  .timeline-map-action:hover,
+  .timeline-map-action:focus-visible {
+    @apply border-cyan-300 bg-cyan-100 text-cyan-900 outline-none;
+  }
+
+  .timeline-map-action small {
+    @apply text-[0.68rem] font-semibold opacity-70;
+  }
+
   .day-stay-heading-note {
     @apply inline-flex items-center max-w-full align-middle whitespace-nowrap
            rounded-full border border-slate-200/80 bg-slate-50/80 px-2 py-0.5
