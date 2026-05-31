@@ -679,11 +679,38 @@ function buildBudgetTab() {
     </div>
   `;
 
-  let html = `<div class="w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/60 dark:border-slate-700/60"><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Trip Leg</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Transport</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Accommodation</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Activities</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Leg Total</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">`;
+  const maxLegTotal = Math.max(...legBreakdown.map(l => l.total), 1);
+  const mobileBreakdownHtml = legBreakdown.map(l => {
+    const barWidth = Math.max(6, Math.round((l.total / maxLegTotal) * 100));
+    const accent = escapeHtml(l.colour || '#24485d');
+    return `
+      <article class="budget-mobile-row" style="--budget-accent:${accent};">
+        <div class="budget-mobile-row-head">
+          <h3>${escapeHtml(l.label)}</h3>
+          <strong>${formatBudgetAmount(l.total)}</strong>
+        </div>
+        <div class="budget-mobile-meter" aria-hidden="true"><span style="width:${barWidth}%;"></span></div>
+        <dl class="budget-mobile-splits">
+          <div><dt>Transport</dt><dd>${formatBudgetAmount(l.trans)}</dd></div>
+          <div><dt>Stay</dt><dd>${formatBudgetAmount(l.accom)}</dd></div>
+          <div><dt>Activities</dt><dd>${formatBudgetAmount(l.act)}</dd></div>
+        </dl>
+      </article>
+    `;
+  }).join('');
+
+  let html = `<div class="budget-desktop-table w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/60 dark:border-slate-700/60"><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Trip Leg</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Transport</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Accommodation</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Activities</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Leg Total</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">`;
   legBreakdown.forEach(l => {
     html += `<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" style="border-left: 4px solid ${l.colour}"><td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">${l.label}</td><td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-right font-medium">${formatBudgetAmount(l.trans)}</td><td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-right font-medium">${formatBudgetAmount(l.accom)}</td><td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-right font-medium">${formatBudgetAmount(l.act)}</td><td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 whitespace-nowrap text-right font-bold">${formatBudgetAmount(l.total)}</td></tr>`;
   });
-  html += `</tbody></table></div>`;
+  html += `</tbody></table></div>
+    <div class="budget-mobile-breakdown" aria-label="Budget by trip leg">
+      <div class="budget-mobile-breakdown-head">
+        <h3>Trip Leg Breakdown</h3>
+        <span>${legBreakdown.length} legs</span>
+      </div>
+      ${mobileBreakdownHtml || '<div class="budget-mobile-empty">No budget items yet.</div>'}
+    </div>`;
   container.innerHTML = html;
 }
 
