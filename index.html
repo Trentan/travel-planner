@@ -622,138 +622,144 @@
       </div>
 
       <div class="modal-body modal-body-compact">
-
-
-  <!-- Journey Title Display -->
-  <div class="journey-modal-panel surface-panel surface-panel--card">
-    <div class="modal-form-divider modal-form-divider-tight">
-      <span class="modal-form-divider-label">Journey</span>
-    </div>
-    <div id="journeyTitleDisplay" class="journey-modal-title">Loading...</div>
-  </div>
-
-        <div class="journey-modal-panel surface-panel surface-panel--card">
-          <div class="modal-form-divider modal-form-divider-tight">
-            <span class="modal-form-divider-label">Segments</span>
-          </div>
-          <div id="segmentTracker" class="journey-segment-tracker">
-          </div>
-        </div>
-
-        <div class="journey-modal-panel surface-panel surface-panel--card journey-form-card">
-
-          <div class="journey-form-header">
-            <span id="currentSegmentLabel" class="journey-segment-label">Segment 1 — entering details</span>
-          </div>
-
-          <input type="hidden" id="journeyType" value="flight">
+        <div class="journey-modal-body-layout">
           
-          <!-- Panel 1: Type & Route -->
-          <div class="journey-form-group-panel">
-            <div class="transport-type-group journey-transport-type-group">
-              <button class="transport-type-btn active" data-type="flight" onclick="selectJourneyType('flight')"><span class="journey-type-icon">✈️</span> Flight</button>
-              <button class="transport-type-btn" data-type="train" onclick="selectJourneyType('train')"><span class="journey-type-icon">🚂</span> Train</button>
-              <button class="transport-type-btn" data-type="ferry" onclick="selectJourneyType('ferry')"><span class="journey-type-icon">⛴️</span> Ferry</button>
-              <button class="transport-type-btn" data-type="bus" onclick="selectJourneyType('bus')"><span class="journey-type-icon">🚌</span> Bus</button>
-              <button class="transport-type-btn" data-type="car" onclick="selectJourneyType('car')"><span class="journey-type-icon">🚗</span> Car</button>
+          <!-- Sidebar column: Title & Navigation -->
+          <div class="journey-modal-sidebar">
+            <div class="journey-modal-panel surface-panel surface-panel--card">
+              <div class="modal-form-divider modal-form-divider-tight">
+                <span class="modal-form-divider-label">Journey</span>
+              </div>
+              <div id="journeyTitleDisplay" class="journey-modal-title">Loading...</div>
             </div>
 
-            <div class="journey-route-grid journey-route-row modal-form-row">
-              <div class="ai-form-group">
-                <label>From</label>
-                <select id="journeyFromCity" class="form-control" onchange="_journeyFormDirty=true"></select>
+            <div class="journey-modal-panel surface-panel surface-panel--card">
+              <div class="modal-form-divider modal-form-divider-tight">
+                <span class="modal-form-divider-label">Segments</span>
               </div>
-              <div class="journey-route-arrow">➔</div>
-              <div class="ai-form-group">
-                <label>To</label>
-                <select id="journeyToCity" class="form-control" onchange="_journeyFormDirty=true"></select>
+              <div id="segmentTracker" class="journey-segment-tracker">
               </div>
-            </div>
-            <div class="journey-route-grid journey-address-row modal-form-row">
-              <div class="ai-form-group">
-                <label for="journeyFromAddress">From Details</label>
-                <input type="text" id="journeyFromAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Heathrow Terminal 5">
-              </div>
-              <div class="journey-route-spacer" aria-hidden="true"></div>
-              <div class="ai-form-group">
-                <label for="journeyToAddress">To Details</label>
-                <input type="text" id="journeyToAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Haneda Terminal 3">
-              </div>
-            </div>
-            <div class="journey-city-link-row">
-              <a href="#" class="inline-action-link" onclick="promptAddNewCity(); return false;">+ Add new city (opens Cities dialog)</a>
             </div>
           </div>
 
-          <!-- Panel 2: Dates & Times -->
-          <div class="journey-form-group-panel">
-            <div class="journey-time-grid">
-              <div class="journey-inline-row journey-time-row modal-form-row">
-                <div class="ai-form-group">
-                  <label>Departure</label>
-                  <div class="journey-datetime-pair modal-form-pair">
-                    <input type="date" id="journeyDateFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
-                    <input type="time" id="journeyTimeFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+          <!-- Main workspace column: Active form & Pending segments list -->
+          <div class="journey-modal-workspace">
+            <div class="journey-modal-panel surface-panel surface-panel--card journey-form-card">
+
+              <div class="journey-form-header">
+                <span id="currentSegmentLabel" class="journey-segment-label">Segment 1 — entering details</span>
+              </div>
+
+              <input type="hidden" id="journeyType" value="flight">
+              
+              <!-- Panel 1: Type & Route -->
+              <div class="journey-form-group-panel">
+                <div class="transport-type-group journey-transport-type-group">
+                  <button class="transport-type-btn active" data-type="flight" onclick="selectJourneyType('flight')"><span class="journey-type-icon">✈️</span> Flight</button>
+                  <button class="transport-type-btn" data-type="train" onclick="selectJourneyType('train')"><span class="journey-type-icon">🚂</span> Train</button>
+                  <button class="transport-type-btn" data-type="ferry" onclick="selectJourneyType('ferry')"><span class="journey-type-icon">⛴️</span> Ferry</button>
+                  <button class="transport-type-btn" data-type="bus" onclick="selectJourneyType('bus')"><span class="journey-type-icon">🚌</span> Bus</button>
+                  <button class="transport-type-btn" data-type="car" onclick="selectJourneyType('car')"><span class="journey-type-icon">🚗</span> Car</button>
+                </div>
+
+                <div class="journey-route-grid journey-route-row modal-form-row">
+                  <div class="ai-form-group">
+                    <label>From</label>
+                    <select id="journeyFromCity" class="form-control" onchange="_journeyFormDirty=true"></select>
+                  </div>
+                  <div class="journey-route-arrow">➔</div>
+                  <div class="ai-form-group">
+                    <label>To</label>
+                    <select id="journeyToCity" class="form-control" onchange="_journeyFormDirty=true"></select>
+                  </div>
+                </div>
+                <div class="journey-route-grid journey-address-row modal-form-row">
+                  <div class="ai-form-group">
+                    <label for="journeyFromAddress">From Details</label>
+                    <input type="text" id="journeyFromAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Heathrow Terminal 5">
+                  </div>
+                  <div class="journey-route-spacer" aria-hidden="true"></div>
+                  <div class="ai-form-group">
+                    <label for="journeyToAddress">To Details</label>
+                    <input type="text" id="journeyToAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Haneda Terminal 3">
+                  </div>
+                </div>
+                <div class="journey-city-link-row">
+                  <a href="#" class="inline-action-link" onclick="promptAddNewCity(); return false;">+ Add new city (opens Cities dialog)</a>
+                </div>
+              </div>
+
+              <!-- Panel 2: Dates & Times -->
+              <div class="journey-form-group-panel">
+                <div class="journey-time-grid">
+                  <div class="journey-inline-row journey-time-row modal-form-row">
+                    <div class="ai-form-group">
+                      <label>Departure</label>
+                      <div class="journey-datetime-pair modal-form-pair">
+                        <input type="date" id="journeyDateFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                        <input type="time" id="journeyTimeFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="journey-inline-row journey-time-row modal-form-row">
+                    <div class="ai-form-group">
+                      <label>Arrival</label>
+                      <div class="journey-datetime-pair modal-form-pair">
+                        <input type="date" id="journeyDateTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                        <input type="time" id="journeyTimeTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="journey-inline-row journey-time-row modal-form-row">
-                <div class="ai-form-group">
-                  <label>Arrival</label>
-                  <div class="journey-datetime-pair modal-form-pair">
-                    <input type="date" id="journeyDateTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
-                    <input type="time" id="journeyTimeTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+
+              <!-- Panel 3: Provider, Booking & Status -->
+              <div class="journey-form-group-panel">
+                <div class="journey-inline-row journey-meta-row modal-form-row modal-form-row--split">
+                  <div class="ai-form-group">
+                    <label>Provider</label>
+                    <input type="text" id="journeyProvider" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. EVA Air">
+                  </div>
+                  <div class="ai-form-group">
+                    <label>Route #</label>
+                    <input type="text" id="journeyRouteCode" class="form-control" onchange="_journeyFormDirty=true" placeholder="BR067">
+                  </div>
+                </div>
+                <div class="journey-inline-row journey-meta-row modal-form-row modal-form-row--split">
+                  <div class="ai-form-group">
+                    <label>Booking Ref</label>
+                    <input type="text" id="journeyBookingRef" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. ABC123">
+                  </div>
+                  <div class="ai-form-group">
+                    <label>Status</label>
+                    <select id="journeyStatus" class="form-control" onchange="_journeyFormDirty=true">
+                      <option value="planned">Planned</option>
+                      <option value="booked">Booked</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                  <div class="ai-form-group">
+                    <label>Cost ($)</label>
+                    <input type="number" id="journeyCost" class="form-control" onchange="_journeyFormDirty=true" placeholder="0">
                   </div>
                 </div>
               </div>
+
+              <!-- Panel 4: Notes -->
+              <div class="journey-form-group-panel">
+                <div class="ai-form-group">
+                  <label>Notes</label>
+                  <input type="text" id="journeyNotes" class="form-control form-control--muted" onchange="_journeyFormDirty=true" placeholder="Optional notes for this segment">
+                </div>
+              </div>
+            </div>
+
+            <div id="pendingSegmentsList" class="journey-pending-segments">
             </div>
           </div>
 
-          <!-- Panel 3: Provider, Booking & Status -->
-          <div class="journey-form-group-panel">
-            <div class="journey-inline-row journey-meta-row modal-form-row modal-form-row--split">
-              <div class="ai-form-group">
-                <label>Provider</label>
-                <input type="text" id="journeyProvider" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. EVA Air">
-              </div>
-              <div class="ai-form-group">
-                <label>Route #</label>
-                <input type="text" id="journeyRouteCode" class="form-control" onchange="_journeyFormDirty=true" placeholder="BR067">
-              </div>
-            </div>
-            <div class="journey-inline-row journey-meta-row modal-form-row modal-form-row--split">
-              <div class="ai-form-group">
-                <label>Booking Ref</label>
-                <input type="text" id="journeyBookingRef" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. ABC123">
-              </div>
-              <div class="ai-form-group">
-                <label>Status</label>
-                <select id="journeyStatus" class="form-control" onchange="_journeyFormDirty=true">
-                  <option value="planned">Planned</option>
-                  <option value="booked">Booked</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-              <div class="ai-form-group">
-                <label>Cost ($)</label>
-                <input type="number" id="journeyCost" class="form-control" onchange="_journeyFormDirty=true" placeholder="0">
-              </div>
-            </div>
-          </div>
-
-          <!-- Panel 4: Notes -->
-          <div class="journey-form-group-panel">
-            <div class="ai-form-group">
-              <label>Notes</label>
-              <input type="text" id="journeyNotes" class="form-control form-control--muted" onchange="_journeyFormDirty=true" placeholder="Optional notes for this segment">
-            </div>
-          </div>
         </div>
-
-        <div id="pendingSegmentsList" class="journey-pending-segments">
-        </div>
-
       </div>
 
       <div class="modal-footer">
