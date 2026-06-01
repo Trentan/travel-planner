@@ -65,9 +65,7 @@ function deleteLegTip(legIdx, tipIdx) { appData[legIdx].legTips.splice(tipIdx, 1
 
 function getSuggestedActivityDayText(activity) {
   const title = String(activity?.title || '').trim();
-  return typeof stripLeadingActivityEmojiText === 'function'
-    ? stripLeadingActivityEmojiText(title)
-    : title;
+  return title;
 }
 
 function getComparisonString(str) {
@@ -253,7 +251,7 @@ function _splitActivityTitle(title) {
   return { title: raw, location: '' };
 }
 
-function openActivityModalUnified(legIdx, activityIdx = null) {
+function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
   const isEditing = activityIdx !== null && activityIdx !== undefined && activityIdx !== -1;
   const leg = appData[legIdx];
   if (!leg) return;
@@ -273,7 +271,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;'));
-  const defaults = _splitActivityTitle(activity?.title || '');
+  const titleSource = options.titleOverride !== undefined ? options.titleOverride : activity?.title;
+  const defaults = _splitActivityTitle(titleSource || '');
 
   const currentDayLabel = activity && activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined && leg.days[activity.assignedDayIdx]
     ? `Day ${leg.days[activity.assignedDayIdx].day} ${leg.days[activity.assignedDayIdx].date}`
@@ -700,6 +699,26 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
     return { category, title: fullTitle, estTime, estCost, notes, location, status, bookingRef, externalLink };
   };
 
+  const showAssignDialogFeedback = (message) => {
+    if (!message) return;
+    let feedback = modal.querySelector('.activity-assign-dialog-feedback');
+    if (!feedback) {
+      feedback = document.createElement('div');
+      feedback.className = 'activity-assign-dialog-feedback';
+      feedback.setAttribute('role', 'status');
+      feedback.setAttribute('aria-live', 'polite');
+      const daysWrap = modal.querySelector('.activity-assign-days-wrap');
+      const daysTitle = modal.querySelector('.activity-assign-days-title');
+      if (daysWrap && daysTitle) {
+        daysTitle.insertAdjacentElement('afterend', feedback);
+      } else {
+        modal.querySelector('.modal-body')?.prepend(feedback);
+      }
+    }
+    feedback.textContent = message;
+    feedback.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  };
+
   modal.querySelectorAll('[data-day-index]').forEach(button => {
     button.addEventListener('click', () => {
       const targetDayIdx = Number(button.getAttribute('data-day-index'));
@@ -744,7 +763,13 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
         ...getScheduleOptions(button),
         originalMatchTexts
       });
-      if (!assigned) return;
+      if (!assigned) {
+        if (!isEditing && targetIdx === leg.suggestedActivities.length - 1) {
+          leg.suggestedActivities.pop();
+        }
+        showAssignDialogFeedback(assignSuggestedActivityToDay.lastError || 'Could not place this activity on that day.');
+        return;
+      }
 
       saveData();
       if (typeof rebuildItineraryPreservingScroll === 'function') {
@@ -892,8 +917,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
   });
 }
 
-function _openActivityModal(legIdx, activityIdx = null) {
-  return openActivityModalUnified(legIdx, activityIdx);
+function _openActivityModal(legIdx, activityIdx = null, options = {}) {
+  return openActivityModalUnified(legIdx, activityIdx, options);
 }
 
 function addActivity(legIdx) {
@@ -987,7 +1012,7 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
   }
 
   if (activityIdx !== undefined && activityIdx !== -1) {
-    _openActivityModal(legIdx, activityIdx);
+    _openActivityModal(legIdx, activityIdx, { titleOverride: itemText });
   } else {
     // Phase 4: Auto-create a matching suggested activity entry and open it!
     let category = 'sight';
@@ -1001,8 +1026,7 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
     else if (/attraction|park|ride/i.test(text)) category = 'attraction';
 
     const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(text) : { title: text, location: '' };
-    const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
-    const cleanTitle = split.title.replace(emojiPattern, '').trim();
+    const cleanTitle = String(split.title || '').trim();
     const cleanLocation = item.location || split.location || '';
     if (cleanLocation && !item.location) {
       item.location = cleanLocation;
@@ -1380,8 +1404,31 @@ function getActivityScheduleFromOptions(activity, options = {}) {
       ? String(options.suggestedEndTime || '').trim()
       : '';
   const durationMinutes = parseActivityDurationMinutes(activity?.estTime || activity?.time || '');
-  const endTime = startTime ? (explicitEndTime || addMinutesToTimeValue(startTime, durationMinutes)) : '';
+  const startMinutes = timeValueToMinutes(startTime);
+  const explicitEndMinutes = timeValueToMinutes(explicitEndTime);
+  const shouldUseExplicitEnd = explicitEndTime && startMinutes !== null && explicitEndMinutes !== null && explicitEndMinutes > startMinutes;
+  const endTime = startTime ? (shouldUseExplicitEnd ? explicitEndTime : addMinutesToTimeValue(startTime, durationMinutes)) : '';
   return { startTime, endTime };
+}
+
+function getActivityScheduleConflict(leg, day, activity, schedule) {
+  const start = timeValueToMinutes(schedule?.startTime);
+  if (start === null) return null;
+  const durationMinutes = parseActivityDurationMinutes(activity?.estTime || activity?.time || '') || 60;
+  const end = timeValueToMinutes(schedule?.endTime) ?? (start + durationMinutes);
+  const conflict = getDaySchedulingBusyIntervals(leg, day, activity)
+    .find(interval => start < interval.end && end > interval.start);
+  if (!conflict) return null;
+
+  const suggestion = suggestActivityTimeForDay(leg, day, activity);
+  const suggestionText = suggestion?.available
+    ? `Suggested slot: ${suggestion.label}.`
+    : 'No clean suggested slot is available on this day.';
+  return {
+    label: conflict.label || 'another timed item',
+    suggestion,
+    message: `That time overlaps ${conflict.label || 'another timed item'}. ${suggestionText}`
+  };
 }
 
 function activityLooksLikeMeal(activity, mealPattern) {
@@ -1550,11 +1597,15 @@ function getAssignedSuggestedActivityDayItem(sourceLegIdx, activityIdx) {
 }
 
 function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, targetDayIdx, options = {}) {
+  assignSuggestedActivityToDay.lastError = '';
   const sourceLeg = appData[sourceLegIdx];
   const targetLeg = appData[targetLegIdx];
   const activity = sourceLeg?.suggestedActivities?.[activityIdx];
   const targetDay = targetLeg?.days?.[targetDayIdx];
-  if (!activity || !targetDay) return false;
+  if (!activity || !targetDay) {
+    assignSuggestedActivityToDay.lastError = 'Could not assign this activity to that day.';
+    return false;
+  }
 
   if (!activity.id) {
     activity.id = 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
@@ -1596,6 +1647,16 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
   };
 
   const previousDayIdx = activity.assignedDayIdx;
+  const assignedText = getSuggestedActivityDayText(activity);
+  const schedule = getActivityScheduleFromOptions(activity, options);
+  const conflict = options.scheduleMode === 'scheduled'
+    ? getActivityScheduleConflict(targetLeg, targetDay, activity, schedule)
+    : null;
+  if (conflict) {
+    assignSuggestedActivityToDay.lastError = conflict.message;
+    return false;
+  }
+
   if (previousDayIdx !== null && previousDayIdx !== undefined && sourceLegIdx === targetLegIdx && previousDayIdx !== targetDayIdx) {
     const previousDay = targetLeg.days[previousDayIdx];
     if (previousDay && Array.isArray(previousDay.activityItems)) {
@@ -1609,8 +1670,6 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
     targetDay.activityItems = [];
   }
 
-  const assignedText = getSuggestedActivityDayText(activity);
-  const schedule = getActivityScheduleFromOptions(activity, options);
   const datedSchedule = {
     ...schedule,
     startDate: getNormalizedDayDate(targetDay),
@@ -1818,7 +1877,10 @@ function openActivityAssignModalLegacy(legIdx, activityIdx) {
       const targetDayIdx = Number(button.getAttribute('data-day-index'));
       if (!Number.isFinite(targetDayIdx)) return;
       const assigned = assignSuggestedActivityToDay(legIdx, activityIdx, legIdx, targetDayIdx);
-      if (!assigned) return;
+      if (!assigned) {
+        showActivityAssignFeedback(assignSuggestedActivityToDay.lastError || 'Could not place this activity on that day.');
+        return;
+      }
       saveData();
       buildItinerary();
       closeModal();

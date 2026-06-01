@@ -8,6 +8,13 @@ const root = path.resolve(__dirname, '..');
 const fixturePath = path.join(root, 'backups', '2026_June_July_Europe_Thailand.json');
 const targetActivity = 'Gallery visit with suggested slot';
 
+async function setFixedTime(page, hour, minute, ampm) {
+  await page.selectOption('#activityStartHour', hour);
+  await page.selectOption('#activityStartMinute', minute);
+  await page.selectOption('#activityStartAmpm', ampm);
+  await page.locator('#activityStartAmpm').dispatchEvent('change');
+}
+
 async function importFixture(page) {
   const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
   await page.evaluate(async data => {
@@ -62,6 +69,26 @@ async function run() {
     await page.waitForFunction(() => typeof window.importJSON === 'function' && typeof window.openActivityAssignModal === 'function');
     await importFixture(page);
     await seedSchedulingScenario(page);
+
+    const emojiDialogValue = await page.evaluate(() => {
+      const day = appData[0].days[0];
+      day.activityItems.push({
+        text: '🎧 Hauptmarkt walk',
+        time: '45 min',
+        cost: '0',
+        done: false
+      });
+      const itemIdx = day.activityItems.length - 1;
+      openEditDayActivityModal(0, 0, itemIdx);
+      return document.getElementById('activityTitle')?.value || '';
+    });
+    assert.strictEqual(
+      emojiDialogValue,
+      '🎧 Hauptmarkt walk',
+      'Day activity edit dialog should preserve authored emoji in Description'
+    );
+    await page.evaluate(() => document.getElementById('activity-assign-modal')?.remove());
+    await page.waitForSelector('#activity-assign-modal', { state: 'detached' });
 
     await page.evaluate(() => window.openActivityAssignModal(0, 0));
     await page.waitForSelector('#activity-assign-modal', { state: 'visible' });
@@ -148,7 +175,16 @@ async function run() {
       'Unified schedule dialog should expose Suggested mode'
     );
     await page.locator('#activity-assign-modal input[name="activityAssignScheduleMode"][value="scheduled"]').check();
-    await page.locator('#activityAssignStartTime').fill('10:15');
+    await setFixedTime(page, '12', '15', 'PM');
+    await page.locator('#activity-assign-modal .activity-assign-day.is-current').click();
+    await page.waitForSelector('#activity-assign-modal', { state: 'visible' });
+    const conflictFeedback = await page.locator('.activity-assign-dialog-feedback').textContent();
+    assert(
+      /overlaps Lunch hold/.test(conflictFeedback || '') && /Suggested slot/.test(conflictFeedback || ''),
+      'Fixed-time clash should warn and suggest a viable slot instead of silently failing'
+    );
+
+    await setFixedTime(page, '10', '00', 'AM');
     await page.locator('#activity-assign-modal .activity-assign-day.is-current').click();
     await page.waitForSelector('#activity-assign-modal', { state: 'detached' });
     await page.waitForFunction(() => window.itineraryDayViewMode === 'timeline');
@@ -171,7 +207,7 @@ async function run() {
     const exportedTimelineFields = await page.evaluate(() => {
       const payload = buildExportPayload();
       const day = payload.itinerary[0].days[0];
-      const activity = day.activityItems.find(item => item.startTime === '10:15');
+      const activity = day.activityItems.find(item => item.startTime === '10:00');
       const journey = payload.journeys[0];
       const stay = payload.stays[0];
       return {
@@ -197,9 +233,9 @@ async function run() {
     });
     assert.deepStrictEqual(exportedTimelineFields.activity, {
       startDate: '2026-06-08',
-      startTime: '10:15',
+      startTime: '10:00',
       endDate: '2026-06-08',
-      endTime: '12:15'
+      endTime: '12:00'
     });
     assert(exportedTimelineFields.journey?.startDate, 'Exported journeys should include plotting startDate');
     assert('startTime' in exportedTimelineFields.journey, 'Exported journeys should include plotting startTime');

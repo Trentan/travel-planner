@@ -339,6 +339,10 @@ async function testTouchAssignSmoke() {
     state(context).itinerary[targetLegIdx].days[0].activityItems.every(item => !String(item.text || '').startsWith(context.getActivityEmoji('sight'))),
     'Touch assign smoke: assigned activity text should not store a category emoji prefix'
   );
+  assert(
+    context.getSuggestedActivityDayText({ title: '🎧 Hauptmarkt walk', category: 'sight' }) === '🎧 Hauptmarkt walk',
+    'Touch assign smoke: authored emoji should stay in editable activity text'
+  );
 
   context.openActivityAssignModal(targetLegIdx, activityIdx);
   await settle(app);
