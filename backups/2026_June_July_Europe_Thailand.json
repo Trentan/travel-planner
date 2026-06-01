@@ -40,37 +40,46 @@
           ],
           "activityItems": [
             {
-              "text": "🏃 Kangaroo Point Cliffs path — last Brisbane run if time allows",
+              "text": "🏃 Gym Visit",
               "cost": "0",
               "time": "1 hr",
               "done": false,
-              "notes": "",
-              "location": "last Brisbane run if time allows",
+              "notes": "Last time to use gym - make sure to freeze membership",
+              "location": "",
               "startDate": "2026-06-08",
-              "startTime": "09:00",
+              "startTime": "12:00",
               "endDate": "2026-06-08",
-              "endTime": "10:00",
-              "cityId": "city-brisbane"
+              "endTime": "13:00",
+              "cityId": "city-brisbane",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": "",
+              "activityId": "act-06x4srlls-mptkv1jg"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "Kangaroo Point Cliffs path — last Brisbane run if time allows",
+          "title": "Gym Visit",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": 0,
           "cityId": "city-brisbane",
-          "startTime": "09:00",
-          "endTime": "10:00",
+          "startTime": "12:00",
+          "endTime": "13:00",
           "assignedDate": "2026-06-08",
           "startDate": "2026-06-08",
           "endDate": "2026-06-08",
-          "notes": "",
-          "location": "last Brisbane run if time allows",
-          "done": false
+          "notes": "Last time to use gym - make sure to freeze membership",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "",
+          "id": "act-06x4srlls-mptkv1jg"
         }
       ],
       "legTips": [
@@ -120,129 +129,180 @@
           ],
           "activityItems": [
             {
-              "text": "🎧Ximending → CKS Memorial",
+              "text": "🎧 Ximending → CKS Memorial morning walk",
               "cost": "0",
+              "time": "1 hr 15 mins",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-taipei",
+              "startDate": "2026-06-09",
+              "endDate": "2026-06-09",
               "startTime": "09:00",
-              "endTime": "10:00",
-              "startDate": "2026-06-09",
-              "endDate": "2026-06-09"
-            },
-            {
-              "text": "Elephant Mountain trail - queue early",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
+              "endTime": "10:15",
               "cityId": "city-taipei",
-              "startDate": "2026-06-09",
-              "endDate": "2026-06-09",
-              "startTime": "07:00",
-              "endTime": "08:00",
-              "location": "queue early"
+              "notes": "Start central-west; easy after the flight and before crossing town.",
+              "activityId": "act-595tacfg7-mptkv1jj"
             },
             {
-              "text": "🏛️ Din Tai Fung lunch — queue early",
+              "text": "🏙 Taipei 101 / Xinyi district quick wander",
               "cost": "0",
-              "time": "2 hrs",
-              "startTime": "12:00",
-              "endTime": "14:00",
+              "time": "45 mins",
               "done": false,
               "startDate": "2026-06-09",
               "endDate": "2026-06-09",
+              "startTime": "10:45",
+              "endTime": "11:30",
               "cityId": "city-taipei",
-              "location": "queue early"
+              "notes": "Pairs naturally with Elephant Mountain and Din Tai Fung.",
+              "activityId": "act-9j435w0v5-mptkv1jj"
             },
             {
-              "text": "🏛️ Shilin Night Market evening",
+              "text": "⛰ Elephant Mountain trail for skyline views",
               "cost": "0",
-              "time": "1 hr",
+              "time": "1 hr 15 mins",
               "done": false,
-              "notes": "",
-              "location": "",
               "startDate": "2026-06-09",
-              "startTime": "17:00",
               "endDate": "2026-06-09",
-              "endTime": "18:00",
-              "cityId": "city-bangkok"
+              "startTime": "11:30",
+              "endTime": "12:45",
+              "cityId": "city-taipei",
+              "location": "Xinyi / Elephant Mountain",
+              "activityId": "act-9ud8uwvo3-mptkv1jj"
+            },
+            {
+              "text": "🥟 Din Tai Fung lunch — Taipei 101 branch if practical",
+              "cost": "0",
+              "time": "1 hr 30 mins",
+              "done": false,
+              "startDate": "2026-06-09",
+              "endDate": "2026-06-09",
+              "startTime": "13:00",
+              "endTime": "14:30",
+              "cityId": "city-taipei",
+              "location": "Taipei 101 / Xinyi",
+              "activityId": "act-tfufc9p5r-mptkv1jj"
+            },
+            {
+              "text": "🛍 Raohe Night Market early dinner option",
+              "cost": "0",
+              "time": "1 hr 30 mins",
+              "done": false,
+              "startDate": "2026-06-09",
+              "endDate": "2026-06-09",
+              "startTime": "17:30",
+              "endTime": "19:00",
+              "cityId": "city-taipei",
+              "notes": "Better fit than Shilin because it stays on the east side before airport transfer.",
+              "activityId": "act-wlpvop0b1-mptkv1jj"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "Elephant Mountain trail — queue early",
-          "category": "fitness",
-          "estTime": "1 hr",
+          "title": "Ximending → CKS Memorial morning walk",
+          "category": "sight",
+          "estTime": "1 hr 15 mins",
           "estCost": "0",
           "assignedDayIdx": 0,
           "cityId": "city-taipei",
           "assignedDate": "2026-06-09",
           "startDate": "2026-06-09",
           "endDate": "2026-06-09",
-          "startTime": "07:00",
-          "endTime": "08:00",
-          "location": "queue early",
-          "done": false,
-          "notes": ""
-        },
-        {
-          "title": "Din Tai Fung lunch — queue early",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "0",
-          "assignedDayIdx": 0,
-          "cityId": "city-taipei",
-          "startTime": "12:00",
-          "endTime": "14:00",
-          "assignedDate": "2026-06-09",
-          "startDate": "2026-06-09",
-          "endDate": "2026-06-09",
-          "location": "queue early",
-          "done": false
-        },
-        {
-          "title": "Shilin Night Market evening",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": 0,
-          "cityId": "city-taipei",
-          "assignedDate": "2026-06-09",
-          "startDate": "2026-06-09",
-          "endDate": "2026-06-09",
-          "startTime": "17:00",
-          "endTime": "18:00",
-          "notes": "",
-          "location": ""
-        },
-        {
-          "title": "Ximending → CKS Memorial",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 0,
-          "assignedDate": "2026-06-09",
-          "startDate": "2026-06-09",
           "startTime": "09:00",
-          "endDate": "2026-06-09",
-          "endTime": "10:00",
+          "endTime": "10:15",
+          "notes": "Start central-west; easy after the flight and before crossing town.",
+          "id": "act-595tacfg7-mptkv1jj"
+        },
+        {
+          "title": "Taipei 101 / Xinyi district quick wander",
+          "category": "sight",
+          "estTime": "45 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
           "cityId": "city-taipei",
-          "done": false
+          "assignedDate": "2026-06-09",
+          "startDate": "2026-06-09",
+          "endDate": "2026-06-09",
+          "startTime": "10:45",
+          "endTime": "11:30",
+          "notes": "Pairs naturally with Elephant Mountain and Din Tai Fung.",
+          "id": "act-9j435w0v5-mptkv1jj"
+        },
+        {
+          "title": "Elephant Mountain trail for skyline views",
+          "category": "fitness",
+          "estTime": "1 hr 15 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-taipei",
+          "assignedDate": "2026-06-09",
+          "startDate": "2026-06-09",
+          "endDate": "2026-06-09",
+          "startTime": "11:30",
+          "endTime": "12:45",
+          "location": "Xinyi / Elephant Mountain",
+          "id": "act-9ud8uwvo3-mptkv1jj"
+        },
+        {
+          "title": "Din Tai Fung lunch — Taipei 101 branch if practical",
+          "category": "sight",
+          "estTime": "1 hr 30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-taipei",
+          "assignedDate": "2026-06-09",
+          "startDate": "2026-06-09",
+          "endDate": "2026-06-09",
+          "startTime": "13:00",
+          "endTime": "14:30",
+          "location": "Taipei 101 / Xinyi",
+          "id": "act-tfufc9p5r-mptkv1jj"
+        },
+        {
+          "title": "Raohe Night Market early dinner option",
+          "category": "sight",
+          "estTime": "1 hr 30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-taipei",
+          "assignedDate": "2026-06-09",
+          "startDate": "2026-06-09",
+          "endDate": "2026-06-09",
+          "startTime": "17:30",
+          "endTime": "19:00",
+          "notes": "Use this instead of Shilin to avoid zig-zagging.",
+          "id": "act-wlpvop0b1-mptkv1jj"
+        },
+        {
+          "title": "Optional fitness: skip formal workout; Elephant Mountain already covers the active hit",
+          "category": "fitness",
+          "estTime": "45–75 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-taipei",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Xinyi / Elephant Mountain",
+          "done": false,
+          "notes": "Transit day with heat and airport timing; treat Elephant Mountain as the workout.",
+          "id": "act-wt7bka1ux-mptkv1jj"
         }
       ],
       "legTips": [
         {
           "text": "EVA free stopover voucher - apply at TPE info desk",
           "cityId": "city-taipei"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
+          "cityId": "city-taipei"
         }
       ]
     },
     {
-      "id": "leg-17799424099393160",
+      "id": "leg-17799748470576270",
       "label": "Bangkok (1)",
       "colour": "#808080",
       "days": [
@@ -320,41 +380,62 @@
           ],
           "activityItems": [
             {
-              "text": "🎧 RS Vienna City Walk: Stephansdom → Hofburg",
-              "cost": "0",
-              "done": false,
-              "time": "1 hr",
-              "cityId": "city-vienna",
-              "startDate": "2026-06-10",
-              "endDate": "2026-06-10",
-              "startTime": "10:15",
-              "endTime": "11:15"
-            },
-            {
-              "text": "🏛️ Naschmarkt food stalls afternoon",
-              "cost": "0",
-              "time": "2 hrs",
-              "done": false,
-              "notes": "",
-              "location": "",
-              "startDate": "2026-06-10",
-              "startTime": "12:00",
-              "endDate": "2026-06-10",
-              "endTime": "14:00",
-              "cityId": ""
-            },
-            {
-              "text": "🏛️ Belvedere Palace & Klimt's The Kiss",
+              "text": "🎧 Rick Steves Vienna City Walk: Opera → Café Sacher → Stephansdom → Graben → Hofburg → Heldenplatz",
               "cost": "0",
               "time": "3 hrs",
               "done": false,
-              "notes": "",
-              "location": "",
               "startDate": "2026-06-10",
-              "startTime": "14:15",
               "endDate": "2026-06-10",
+              "startTime": "10:30",
+              "endTime": "13:30",
+              "cityId": "city-vienna",
+              "notes": "Print RS map and use AirPods. Stops: Opera, Café Sacher, Albertinaplatz/Albertina, Kärntner Strasse, Kaisergruft, Neuer Markt, Stephansdom/Stephansplatz, Graben, Dorotheergasse, Plague Column, St. Peter’s Church, Kohlmarkt/Demel, Michaelerplatz, Hofburg, Heldenplatz. Allow 2.5–3 hrs including photo/coffee pauses.",
+              "location": "Opera to Heldenplatz",
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf",
+              "activityId": "act-40rvnga0o-mptkv1jn",
+              "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf"
+            },
+            {
+              "text": "🍽 Flexible lunch/coffee stop built into the RS route — Café Sacher, Demel or Naschmarkt depending energy",
+              "cost": "0",
+              "time": "1 hr",
+              "done": false,
+              "startDate": "2026-06-10",
+              "endDate": "2026-06-10",
+              "startTime": "13:30",
+              "endTime": "14:30",
+              "cityId": "city-vienna",
+              "notes": "Use this as a proper pause after the audio walk rather than rushing straight to another major sight.",
+              "location": "Old town / Naschmarkt",
+              "activityId": "act-aw8ks4txs-mptkv1jn"
+            },
+            {
+              "text": "🎨 Belvedere Palace & Klimt’s The Kiss — optional if still fresh after the RS walk",
+              "cost": "0",
+              "time": "2 hrs",
+              "done": false,
+              "startDate": "2026-06-10",
+              "endDate": "2026-06-10",
+              "startTime": "15:15",
               "endTime": "17:15",
-              "cityId": ""
+              "cityId": "city-vienna",
+              "notes": "Keep this as the main optional add-on; skip if jetlag hits and just do Donaukanal/Prater instead.",
+              "location": "Belvedere",
+              "activityId": "act-co48rh5pi-mptkv1jo"
+            },
+            {
+              "text": "🌳 Low-key Prater / Donaukanal evening walk only if energy remains",
+              "cost": "0",
+              "time": "1 hr 15 mins",
+              "done": false,
+              "startDate": "2026-06-10",
+              "endDate": "2026-06-10",
+              "startTime": "18:00",
+              "endTime": "19:15",
+              "cityId": "city-vienna",
+              "notes": "No need to force this after the long-haul arrival and RS walk.",
+              "location": "Prater or Donaukanal",
+              "activityId": "act-kl0fgnmlc-mptkv1jo"
             }
           ]
         },
@@ -375,40 +456,26 @@
           ],
           "activityItems": [
             {
-              "text": "🏃 Prater Hauptallee — 4.5km straight tree-lined boulevard",
+              "text": "☕ Quick Vienna coffee + station buffer before Bratislava train",
               "cost": "0",
-              "time": "1 hr",
+              "time": "1.5 hrs",
               "done": false,
-              "notes": "",
-              "location": "4.5km straight tree-lined boulevard",
               "startDate": "2026-06-11",
-              "startTime": "07:00",
               "endDate": "2026-06-11",
-              "endTime": "08:00",
-              "cityId": "city-bratislava"
+              "startTime": "08:30",
+              "endTime": "10:00",
+              "cityId": "city-vienna",
+              "notes": "Keep this light; the real Vienna hit was the RS walk on arrival day.",
+              "location": "Old town / station",
+              "activityId": "act-oej42u76y-mptkv1jo"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "Prater Hauptallee — 4.5km straight tree-lined boulevard",
+          "title": "Rick Steves Vienna City Walk: Opera → Café Sacher → Stephansdom → Graben → Hofburg → Heldenplatz — Opera to Heldenplatz",
           "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": 1,
-          "cityId": "city-vienna",
-          "assignedDate": "2026-06-11",
-          "startDate": "2026-06-11",
-          "endDate": "2026-06-11",
-          "startTime": "07:00",
-          "endTime": "08:00",
-          "notes": "",
-          "location": "4.5km straight tree-lined boulevard"
-        },
-        {
-          "title": "Belvedere Palace & Klimt's The Kiss",
-          "category": "sight",
           "estTime": "3 hrs",
           "estCost": "0",
           "assignedDayIdx": 0,
@@ -416,13 +483,37 @@
           "assignedDate": "2026-06-10",
           "startDate": "2026-06-10",
           "endDate": "2026-06-10",
-          "startTime": "14:15",
-          "endTime": "17:15",
-          "notes": "",
-          "location": ""
+          "startTime": "10:30",
+          "endTime": "13:30",
+          "location": "Opera to Heldenplatz",
+          "done": false,
+          "notes": "Print RS map and use AirPods. Stops: Opera, Café Sacher, Albertinaplatz/Albertina, Kärntner Strasse, Kaisergruft, Neuer Markt, Stephansdom/Stephansplatz, Graben, Dorotheergasse, Plague Column, St. Peter’s Church, Kohlmarkt/Demel, Michaelerplatz, Hofburg, Heldenplatz. Allow 2.5–3 hrs including photo/coffee pauses.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf",
+          "id": "act-40rvnga0o-mptkv1jn",
+          "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf"
         },
         {
-          "title": "Naschmarkt food stalls afternoon",
+          "title": "🍽 Flexible lunch/coffee stop built into the RS route — Café Sacher, Demel or Naschmarkt depending energy",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-vienna",
+          "assignedDate": "2026-06-10",
+          "startDate": "2026-06-10",
+          "endDate": "2026-06-10",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "location": "Old town / Naschmarkt",
+          "done": false,
+          "notes": "Use this as a proper pause after the audio walk rather than rushing straight to another major sight.",
+          "id": "act-aw8ks4txs-mptkv1jn"
+        },
+        {
+          "title": "🎨 Belvedere Palace & Klimt’s The Kiss — optional if still fresh after the RS walk",
           "category": "sight",
           "estTime": "2 hrs",
           "estCost": "0",
@@ -431,25 +522,63 @@
           "assignedDate": "2026-06-10",
           "startDate": "2026-06-10",
           "endDate": "2026-06-10",
-          "startTime": "12:00",
-          "endTime": "14:00",
-          "notes": "",
-          "location": ""
+          "startTime": "15:15",
+          "endTime": "17:15",
+          "location": "Belvedere",
+          "done": false,
+          "notes": "Keep this as the main optional add-on; skip if jetlag hits and just do Donaukanal/Prater instead.",
+          "id": "act-co48rh5pi-mptkv1jo"
         },
         {
-          "title": "RS Vienna City Walk: Stephansdom → Hofburg",
+          "title": "🌳 Low-key Prater / Donaukanal evening walk only if energy remains",
           "category": "sight",
-          "estTime": "1 hr",
+          "estTime": "1 hr 15 mins",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
+          "cityId": "city-vienna",
           "assignedDate": "2026-06-10",
           "startDate": "2026-06-10",
-          "startTime": "10:15",
           "endDate": "2026-06-10",
-          "endTime": "11:15",
-          "cityId": "city-vienna"
+          "startTime": "18:00",
+          "endTime": "19:15",
+          "location": "Prater or Donaukanal",
+          "done": false,
+          "notes": "No need to force this after the long-haul arrival and RS walk.",
+          "id": "act-kl0fgnmlc-mptkv1jo"
+        },
+        {
+          "title": "☕ Quick Vienna coffee + station buffer before Bratislava train",
+          "category": "food",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-vienna",
+          "assignedDate": "2026-06-11",
+          "startDate": "2026-06-11",
+          "endDate": "2026-06-11",
+          "startTime": "08:30",
+          "endTime": "10:00",
+          "location": "Old town / station",
+          "done": false,
+          "notes": "Keep this light; the real Vienna hit was the RS walk on arrival day.",
+          "id": "act-oej42u76y-mptkv1jo"
+        },
+        {
+          "title": "Optional easy run: Prater Hauptallee or Donaukanal recovery jog",
+          "category": "fitness",
+          "estTime": "30–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-vienna",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Prater / Donaukanal",
+          "done": false,
+          "notes": "Only do this if jetlag is kind; the Rick Steves walk is already a solid walking day.",
+          "id": "act-57fgs9u6v-mptkv1jo"
         }
       ],
       "legTips": [
@@ -463,6 +592,10 @@
         },
         {
           "text": "Naschmarkt closed on Sunday - plan accordingly",
+          "cityId": "city-vienna"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-vienna"
         }
       ]
@@ -508,15 +641,53 @@
           ],
           "activityItems": [
             {
-              "text": "🎧 RS-style: Hlavné Nám → Michael's Gate",
+              "text": "🎧 Old Town walk: Hlavné Nám → Michael's Gate",
               "cost": "0",
+              "time": "1 hr 30 mins",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-bratislava",
               "startDate": "2026-06-11",
               "endDate": "2026-06-11",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "13:30",
+              "endTime": "15:00",
+              "cityId": "city-bratislava",
+              "activityId": "act-jcf76rn6f-mptkv1jp"
+            },
+            {
+              "text": "💙 Blue Church detour",
+              "cost": "0",
+              "time": "30 mins",
+              "done": false,
+              "startDate": "2026-06-11",
+              "endDate": "2026-06-11",
+              "startTime": "15:15",
+              "endTime": "15:45",
+              "cityId": "city-bratislava",
+              "activityId": "act-t5ab3rnk5-mptkv1jp"
+            },
+            {
+              "text": "🌉 Danube promenade → UFO Observation Deck sunset",
+              "cost": "0",
+              "time": "1 hr 30 mins",
+              "done": false,
+              "startDate": "2026-06-11",
+              "endDate": "2026-06-11",
+              "startTime": "17:30",
+              "endTime": "19:00",
+              "cityId": "city-bratislava",
+              "location": "Most SNP / Danube",
+              "activityId": "act-dyg445z24-mptkv1jp"
+            },
+            {
+              "text": "🍖 Kozlovna beer knuckle dinner",
+              "cost": "0",
+              "time": "1 hr 45 mins",
+              "done": false,
+              "startDate": "2026-06-11",
+              "endDate": "2026-06-11",
+              "startTime": "19:15",
+              "endTime": "21:00",
+              "cityId": "city-bratislava",
+              "activityId": "act-falwpkith-mptkv1jp"
             }
           ]
         },
@@ -539,15 +710,34 @@
           ],
           "activityItems": [
             {
-              "text": "🏯 Devín Castle ruins",
+              "text": "🏯 Devín Castle ruins + Morava/Danube riverside walk",
               "cost": "0",
+              "time": "4 hrs",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-bratislava",
               "startDate": "2026-06-12",
               "endDate": "2026-06-12",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "09:30",
+              "endTime": "13:30",
+              "cityId": "city-bratislava",
+              "location": "Devín Castle",
+              "activityId": "act-1zrcon6de-mptkv1jp"
+            },
+            {
+              "activityId": "act-ejech5j8t-mpv0x5sk",
+              "text": "🚌 Tour (Airbnb experiences)",
+              "cost": "0",
+              "time": "2",
+              "done": false,
+              "notes": "",
+              "location": "",
+              "status": "planned",
+              "bookingRef": "",
+              "externalLink": "",
+              "startDate": "2026-06-12",
+              "startTime": "14:00",
+              "endDate": "2026-06-12",
+              "endTime": "15:00",
+              "cityId": ""
             }
           ]
         },
@@ -568,127 +758,180 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "☕ Easy Bratislava breakfast before Prague train",
               "cost": "0",
-              "time": "1 hr",
+              "time": "1 hr 30 mins",
               "done": false,
               "startDate": "2026-06-13",
               "endDate": "2026-06-13",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-prague"
+              "startTime": "09:00",
+              "endTime": "10:30",
+              "cityId": "city-bratislava",
+              "notes": "Keep the morning simple before the 12:26 RegioJet departure.",
+              "activityId": "act-t444gg5xf-mptkv1jp"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "Danube Promenade - fast flat ride, 5-10km each way from SNP Bridge",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bratislava",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Devín Castle loop - combine with Morava river path to Austrian border",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bratislava",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Blue Church",
+          "title": "Old Town walk: Hlavné Nám → Michael's Gate",
           "category": "sight",
-          "estTime": "1 hr",
+          "estTime": "1 hr 30 mins",
           "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bratislava",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Kozlovna Beer Knuckle dinner",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bratislava",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Danube river cruise",
-          "category": "sight",
-          "estTime": "1.5 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bratislava",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "UFO Observation Deck",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bratislava",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "RS-style: Hlavné Nám → Michael's Gate",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
+          "cityId": "city-bratislava",
           "assignedDate": "2026-06-11",
           "startDate": "2026-06-11",
-          "startTime": "",
           "endDate": "2026-06-11",
-          "endTime": "",
-          "cityId": "city-bratislava"
+          "startTime": "13:30",
+          "endTime": "15:00",
+          "id": "act-jcf76rn6f-mptkv1jp"
         },
         {
-          "title": "Devín Castle ruins",
+          "title": "Blue Church detour",
           "category": "sight",
+          "estTime": "30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-bratislava",
+          "assignedDate": "2026-06-11",
+          "startDate": "2026-06-11",
+          "endDate": "2026-06-11",
+          "startTime": "15:15",
+          "endTime": "15:45",
+          "id": "act-t5ab3rnk5-mptkv1jp"
+        },
+        {
+          "title": "Danube promenade → UFO Observation Deck sunset",
+          "category": "sight",
+          "estTime": "1 hr 30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-bratislava",
+          "assignedDate": "2026-06-11",
+          "startDate": "2026-06-11",
+          "endDate": "2026-06-11",
+          "startTime": "17:30",
+          "endTime": "19:00",
+          "location": "Most SNP / Danube",
+          "id": "act-dyg445z24-mptkv1jp"
+        },
+        {
+          "title": "Kozlovna beer knuckle dinner",
+          "category": "sight",
+          "estTime": "1 hr 45 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-bratislava",
+          "assignedDate": "2026-06-11",
+          "startDate": "2026-06-11",
+          "endDate": "2026-06-11",
+          "startTime": "19:15",
+          "endTime": "21:00",
+          "id": "act-falwpkith-mptkv1jp"
+        },
+        {
+          "title": "Devín Castle ruins + Morava/Danube riverside walk",
+          "category": "sight",
+          "estTime": "4 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-bratislava",
+          "assignedDate": "2026-06-12",
+          "startDate": "2026-06-12",
+          "endDate": "2026-06-12",
+          "startTime": "09:30",
+          "endTime": "13:30",
+          "location": "Devín Castle",
+          "id": "act-1zrcon6de-mptkv1jp"
+        },
+        {
+          "title": "Danube Promenade recovery run / fast flat walk",
+          "category": "fitness",
           "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-bratislava",
+          "assignedDate": "2026-06-12",
+          "startDate": "2026-06-12",
+          "endDate": "2026-06-12",
+          "startTime": "17:00",
+          "endTime": "18:00",
+          "id": "act-usyxcwz7v-mptkv1jp"
+        },
+        {
+          "title": "Easy Bratislava breakfast before Prague train",
+          "category": "food",
+          "estTime": "1 hr 30 mins",
+          "estCost": "0",
+          "notes": "Keep the morning simple before the 12:26 RegioJet departure.",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2026-06-13",
+          "startDate": "2026-06-13",
+          "startTime": "09:00",
+          "endDate": "2026-06-13",
+          "endTime": "10:30",
+          "cityId": "",
+          "id": "act-t444gg5xf-mptkv1jp"
+        },
+        {
+          "title": "Optional run: Danube Promenade flat 5–10km",
+          "category": "fitness",
+          "estTime": "30–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-bratislava",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Danube Promenade",
+          "done": false,
+          "notes": "Great easy solo run or fast walk from the Old Town/SNP Bridge area.",
+          "id": "act-u8wxthcm3-mptkv1jp"
+        },
+        {
+          "title": "Optional longer fitness route: Devín / Morava river path if legs feel fresh",
+          "category": "fitness",
+          "estTime": "60–90 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-bratislava",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Devín / Morava",
+          "done": false,
+          "notes": "Only if the Devín sightseeing day turns into a fitness outing; do not force it before Prague transfer.",
+          "id": "act-p6e16ofnj-mptkv1jp"
+        },
+        {
+          "category": "tour",
+          "title": "Tour (Airbnb experiences)",
+          "estTime": "2",
           "estCost": "0",
           "notes": "",
           "location": "",
+          "status": "planned",
+          "bookingRef": "",
+          "externalLink": "",
           "assignedDayIdx": 1,
           "assignedDate": "2026-06-12",
           "startDate": "2026-06-12",
-          "startTime": "",
+          "startTime": "14:00",
           "endDate": "2026-06-12",
-          "endTime": "",
-          "cityId": "city-bratislava"
+          "endTime": "15:00",
+          "id": "act-ejech5j8t-mpv0x5sk",
+          "cityId": ""
         }
       ],
       "legTips": [
@@ -702,6 +945,10 @@
         },
         {
           "text": "UFO deck booking required - everything walkable in 15 minutes",
+          "cityId": "city-bratislava"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-bratislava"
         }
       ]
@@ -720,6 +967,12 @@
           "text": "🥩 Guláš with bread dumplings",
           "done": false,
           "cityId": "city-prague"
+        },
+        {
+          "text": "Creme de la creme ice cream",
+          "cost": "0",
+          "done": false,
+          "cityId": ""
         }
       ],
       "days": [
@@ -747,15 +1000,38 @@
           ],
           "activityItems": [
             {
-              "text": "🎧 RS Prague Old Town Walk",
+              "text": "🏛️ 🌙 Easy arrival preview: Old Town Square → Astronomical Clock → Charles Bridge at night — Old Town to Charles Bridge",
               "cost": "0",
+              "time": "2 hrs",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-prague",
               "startDate": "2026-06-13",
               "endDate": "2026-06-13",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "19:30",
+              "endTime": "21:30",
+              "cityId": "city-prague",
+              "notes": "Light orientation only after the train; save the proper Rick Steves audio walk for tomorrow morning.",
+              "location": "Old Town to Charles Bridge",
+              "activityId": "act-7hoxs7n6m-mptkv1jp",
+              "status": "",
+              "bookingRef": "",
+              "externalLink": ""
+            },
+            {
+              "activityId": "act-6strrssw1-mpv0yenl",
+              "text": "🏛️ Beer tour?",
+              "cost": "0",
+              "time": "1 hr",
+              "done": false,
+              "notes": "",
+              "location": "",
+              "status": "planned",
+              "bookingRef": "",
+              "externalLink": "",
+              "startDate": "2026-06-13",
+              "startTime": "18:00",
+              "endDate": "2026-06-13",
+              "endTime": "18:30",
+              "cityId": ""
             }
           ]
         },
@@ -778,26 +1054,76 @@
           ],
           "activityItems": [
             {
-              "text": "🎧 RS Prague Castle Walk",
+              "text": "🎧 Rick Steves Prague City Walk: Wenceslas Square → Old Town Square → Astronomical Clock → Charles Bridge",
               "cost": "0",
+              "time": "3 hrs",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-prague",
               "startDate": "2026-06-14",
               "endDate": "2026-06-14",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "08:00",
+              "endTime": "11:00",
+              "cityId": "city-prague",
+              "notes": "Print RS map and use AirPods. Stops: Wenceslas Square/National Museum, Hotel Europa/Velvet Revolution, Lucerna Arcade, Franciscan Garden, Můstek, Na Příkopě, Municipal House, Powder Tower, Celetná, Old Town Square, Astronomical Clock, Karlova Street, Charles IV Square, Charles Bridge. Allow 3 hrs with coffee/photo stops.",
+              "location": "Wenceslas Square to Charles Bridge",
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf",
+              "activityId": "act-o6taq4rkj-mptkv1jp",
+              "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf"
             },
             {
-              "text": "Prague Castle district at dusk",
+              "text": "☕ Lunch/coffee pause after the RS Prague walk",
+              "cost": "0",
+              "time": "1 hr 15 mins",
+              "done": false,
+              "startDate": "2026-06-14",
+              "endDate": "2026-06-14",
+              "startTime": "11:00",
+              "endTime": "12:15",
+              "cityId": "city-prague",
+              "notes": "Use this for a proper sit-down before climbing toward the Castle side.",
+              "location": "Old Town / Malá Strana",
+              "activityId": "act-tl8b90j3l-mptkv1jp"
+            },
+            {
+              "text": "🏰 Prague Castle district self-walk: Malá Strana steps → Castle courtyards → viewpoints",
+              "cost": "0",
+              "time": "3 hrs",
+              "done": false,
+              "startDate": "2026-06-14",
+              "endDate": "2026-06-14",
+              "startTime": "13:00",
+              "endTime": "16:00",
+              "cityId": "city-prague",
+              "notes": "This keeps the Castle side grouped after the RS walk ends at Charles Bridge.",
+              "location": "Malá Strana / Prague Castle",
+              "activityId": "act-47xvv5ey5-mptkv1jp"
+            },
+            {
+              "text": "🕍 Josefov Jewish Quarter or Letná beer garden/viewpoint — choose based on energy",
               "cost": "0",
               "time": "2 hrs",
               "done": false,
-              "cityId": "city-prague",
               "startDate": "2026-06-14",
               "endDate": "2026-06-14",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "16:30",
+              "endTime": "18:30",
+              "cityId": "city-prague",
+              "notes": "Josefov is the cultural add-on; Letná is the low-effort sunset/view option.",
+              "location": "Josefov or Letná",
+              "activityId": "act-p0y1i622e-mptkv1jp"
+            },
+            {
+              "text": "🌄 Castle district / Letná dusk viewpoint",
+              "cost": "0",
+              "time": "1.5 hrs",
+              "done": false,
+              "startDate": "2026-06-14",
+              "endDate": "2026-06-14",
+              "startTime": "19:00",
+              "endTime": "20:30",
+              "cityId": "city-prague",
+              "notes": "Optional finish; drop this if the RS walk + Castle day is already enough.",
+              "location": "Letná / Castle view",
+              "activityId": "act-2hvh2jam1-mptkv1jp"
             }
           ]
         },
@@ -818,48 +1144,101 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "☕ Early Prague coffee only before FlixBus",
               "cost": "0",
-              "time": "1 hr",
+              "time": "45 mins",
               "done": false,
               "startDate": "2026-06-15",
               "endDate": "2026-06-15",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-nuremberg"
+              "startTime": "07:30",
+              "endTime": "08:15",
+              "cityId": "city-prague",
+              "notes": "No major activity before the 09:10 FlixBus.",
+              "location": "Near hotel / station",
+              "activityId": "act-mbvesj3kd-mptkv1jp"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "Malá Strana -> Prague Castle steps - great stairs run",
-          "category": "fitness",
-          "estTime": "1 hr",
+          "title": "🌙 Easy arrival preview: Old Town Square → Astronomical Clock → Charles Bridge at night — Old Town to Charles Bridge",
+          "category": "sight",
+          "estTime": "2 hrs",
           "estCost": "0",
-          "assignedDayIdx": null,
+          "assignedDayIdx": 0,
           "cityId": "city-prague",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
+          "assignedDate": "2026-06-13",
+          "startDate": "2026-06-13",
+          "endDate": "2026-06-13",
+          "startTime": "19:30",
+          "endTime": "21:30",
+          "location": "Old Town to Charles Bridge",
+          "done": false,
+          "notes": "Light orientation only after the train; save the proper Rick Steves audio walk for tomorrow morning.",
+          "id": "act-7hoxs7n6m-mptkv1jp",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": ""
         },
         {
-          "title": "Vyšehrad 5km loop - excellent path along the Vltava river",
+          "title": "Rick Steves Prague City Walk: Wenceslas Square → Old Town Square → Astronomical Clock → Charles Bridge — Wenceslas Square to Charles Bridge",
           "category": "fitness",
-          "estTime": "1.5 hrs",
+          "estTime": "3 hrs",
           "estCost": "0",
-          "assignedDayIdx": null,
+          "assignedDayIdx": 1,
           "cityId": "city-prague",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
+          "assignedDate": "2026-06-14",
+          "startDate": "2026-06-14",
+          "endDate": "2026-06-14",
+          "startTime": "08:00",
+          "endTime": "11:00",
+          "location": "Wenceslas Square to Charles Bridge",
+          "done": false,
+          "notes": "Print RS map and use AirPods. Stops: Wenceslas Square/National Museum, Hotel Europa/Velvet Revolution, Lucerna Arcade, Franciscan Garden, Můstek, Na Příkopě, Municipal House, Powder Tower, Celetná, Old Town Square, Astronomical Clock, Karlova Street, Charles IV Square, Charles Bridge. Allow 3 hrs with coffee/photo stops.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf",
+          "id": "act-o6taq4rkj-mptkv1jp",
+          "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf"
         },
         {
-          "title": "Prague Castle district at dusk",
+          "title": "☕ Lunch/coffee pause after the RS Prague walk",
+          "category": "food",
+          "estTime": "1 hr 15 mins",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-prague",
+          "assignedDate": "2026-06-14",
+          "startDate": "2026-06-14",
+          "endDate": "2026-06-14",
+          "startTime": "11:00",
+          "endTime": "12:15",
+          "location": "Old Town / Malá Strana",
+          "done": false,
+          "notes": "Use this for a proper sit-down before climbing toward the Castle side.",
+          "id": "act-tl8b90j3l-mptkv1jp"
+        },
+        {
+          "title": "🏰 Prague Castle district self-walk: Malá Strana steps → Castle courtyards → viewpoints",
+          "category": "sight",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-prague",
+          "assignedDate": "2026-06-14",
+          "startDate": "2026-06-14",
+          "endDate": "2026-06-14",
+          "startTime": "13:00",
+          "endTime": "16:00",
+          "location": "Malá Strana / Prague Castle",
+          "done": false,
+          "notes": "This keeps the Castle side grouped after the RS walk ends at Charles Bridge.",
+          "id": "act-47xvv5ey5-mptkv1jp"
+        },
+        {
+          "title": "🕍 Josefov Jewish Quarter or Letná beer garden/viewpoint — choose based on energy",
           "category": "sight",
           "estTime": "2 hrs",
           "estCost": "0",
@@ -868,13 +1247,51 @@
           "assignedDate": "2026-06-14",
           "startDate": "2026-06-14",
           "endDate": "2026-06-14",
-          "startTime": "",
-          "endTime": ""
+          "startTime": "16:30",
+          "endTime": "18:30",
+          "location": "Josefov or Letná",
+          "done": false,
+          "notes": "Josefov is the cultural add-on; Letná is the low-effort sunset/view option.",
+          "id": "act-p0y1i622e-mptkv1jp"
         },
         {
-          "title": "Josefov Jewish Quarter",
+          "title": "🌄 Castle district / Letná dusk viewpoint",
           "category": "sight",
-          "estTime": "3 hrs",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-prague",
+          "assignedDate": "2026-06-14",
+          "startDate": "2026-06-14",
+          "endDate": "2026-06-14",
+          "startTime": "19:00",
+          "endTime": "20:30",
+          "location": "Letná / Castle view",
+          "done": false,
+          "notes": "Optional finish; drop this if the RS walk + Castle day is already enough.",
+          "id": "act-2hvh2jam1-mptkv1jp"
+        },
+        {
+          "title": "☕ Early Prague coffee only before FlixBus",
+          "category": "food",
+          "estTime": "45 mins",
+          "estCost": "0",
+          "assignedDayIdx": 2,
+          "cityId": "city-prague",
+          "assignedDate": "2026-06-15",
+          "startDate": "2026-06-15",
+          "endDate": "2026-06-15",
+          "startTime": "07:30",
+          "endTime": "08:15",
+          "location": "Near hotel / station",
+          "done": false,
+          "notes": "No major activity before the 09:10 FlixBus.",
+          "id": "act-mbvesj3kd-mptkv1jp"
+        },
+        {
+          "title": "Optional easy run: Vltava river path before crowds",
+          "category": "fitness",
+          "estTime": "30–45 mins",
           "estCost": "0",
           "assignedDayIdx": null,
           "cityId": "city-prague",
@@ -882,37 +1299,47 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "location": "Vltava river",
+          "done": false,
+          "notes": "Best early morning; avoid a hard run before Castle stairs.",
+          "id": "act-c2chn3f62-mptkv1jp"
         },
         {
-          "title": "RS Prague Old Town Walk",
+          "title": "Optional hill hit: Malá Strana → Prague Castle steps",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-prague",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Malá Strana / Castle steps",
+          "done": false,
+          "notes": "Short but steep; only if you want a fitness challenge, not on tired legs.",
+          "id": "act-9lkkf45ik-mptkv1jp"
+        },
+        {
           "category": "sight",
+          "title": "Beer tour?",
           "estTime": "1 hr",
           "estCost": "0",
           "notes": "",
           "location": "",
+          "status": "planned",
+          "bookingRef": "",
+          "externalLink": "",
           "assignedDayIdx": 0,
           "assignedDate": "2026-06-13",
           "startDate": "2026-06-13",
-          "startTime": "",
+          "startTime": "18:00",
           "endDate": "2026-06-13",
-          "endTime": "",
-          "cityId": "city-prague"
-        },
-        {
-          "title": "RS Prague Castle Walk",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 1,
-          "assignedDate": "2026-06-14",
-          "startDate": "2026-06-14",
-          "startTime": "",
-          "endDate": "2026-06-14",
-          "endTime": "",
-          "cityId": "city-prague"
+          "endTime": "18:30",
+          "id": "act-6strrssw1-mpv0yenl",
+          "cityId": ""
         }
       ],
       "legTips": [
@@ -926,6 +1353,10 @@
         },
         {
           "text": "Prague Visitor Pass covers all key transport and sights",
+          "cityId": "city-prague"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-prague"
         }
       ]
@@ -966,15 +1397,40 @@
           ],
           "activityItems": [
             {
-              "text": "🎧 RS-style: Hauptmarkt → Kaiserburg",
+              "text": "🎧 Hauptmarkt → Schöner Brunnen → Kaiserburg",
               "cost": "0",
+              "time": "2 hrs",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-nuremberg",
               "startDate": "2026-06-15",
               "endDate": "2026-06-15",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "14:00",
+              "endTime": "16:00",
+              "cityId": "city-nuremberg",
+              "activityId": "act-e14185tuq-mptkv1jq"
+            },
+            {
+              "text": "🏘 Weissgerbergasse + city walls walk",
+              "cost": "0",
+              "time": "1 hr 30 mins",
+              "done": false,
+              "startDate": "2026-06-15",
+              "endDate": "2026-06-15",
+              "startTime": "16:00",
+              "endTime": "17:30",
+              "cityId": "city-nuremberg",
+              "activityId": "act-gfcigd7m3-mptkv1jq"
+            },
+            {
+              "text": "🌭 Bratwursthäusle dinner",
+              "cost": "0",
+              "time": "1 hr 30 mins",
+              "done": false,
+              "startDate": "2026-06-15",
+              "endDate": "2026-06-15",
+              "startTime": "18:30",
+              "endTime": "20:00",
+              "cityId": "city-nuremberg",
+              "activityId": "act-s7idn6m3t-mptkv1jq"
             }
           ]
         },
@@ -995,14 +1451,20 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "activityId": "act-h85btizc5-mptkv1jq",
+              "text": "🏃 Optional run: Wöhrder Wiese / Pegnitz riverside loop — Wöhrder Wiese / Pegnitz",
               "cost": "0",
-              "time": "1 hr",
+              "time": "30–60 mins",
               "done": false,
+              "notes": "Good morning option before Munich if you wake early; otherwise skip and keep the transfer easy.",
+              "location": "Wöhrder Wiese / Pegnitz",
+              "status": "",
+              "bookingRef": "",
+              "externalLink": "",
               "startDate": "2026-06-16",
+              "startTime": "08:00",
               "endDate": "2026-06-16",
-              "startTime": "",
-              "endTime": "",
+              "endTime": "09:00",
               "cityId": "city-munich"
             }
           ]
@@ -1010,71 +1472,80 @@
       ],
       "suggestedActivities": [
         {
-          "title": "Stadtpark Nuremberg",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-nuremberg",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Wöhrder Wiese park - great 5km flat loop",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-nuremberg",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "City walls walk",
+          "title": "Hauptmarkt → Schöner Brunnen → Kaiserburg",
           "category": "sight",
           "estTime": "2 hrs",
           "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-nuremberg",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Bratwursthäusle for dinner",
-          "category": "sight",
-          "estTime": "1.5 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-nuremberg",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "RS-style: Hauptmarkt → Kaiserburg",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
+          "cityId": "city-nuremberg",
           "assignedDate": "2026-06-15",
           "startDate": "2026-06-15",
-          "startTime": "",
           "endDate": "2026-06-15",
-          "endTime": "",
-          "cityId": "city-nuremberg"
+          "startTime": "14:00",
+          "endTime": "16:00",
+          "id": "act-e14185tuq-mptkv1jq"
+        },
+        {
+          "title": "Weissgerbergasse + city walls walk",
+          "category": "sight",
+          "estTime": "1 hr 30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-nuremberg",
+          "assignedDate": "2026-06-15",
+          "startDate": "2026-06-15",
+          "endDate": "2026-06-15",
+          "startTime": "16:00",
+          "endTime": "17:30",
+          "id": "act-gfcigd7m3-mptkv1jq"
+        },
+        {
+          "title": "Bratwursthäusle dinner",
+          "category": "sight",
+          "estTime": "1 hr 30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-nuremberg",
+          "assignedDate": "2026-06-15",
+          "startDate": "2026-06-15",
+          "endDate": "2026-06-15",
+          "startTime": "18:30",
+          "endTime": "20:00",
+          "id": "act-s7idn6m3t-mptkv1jq"
+        },
+        {
+          "title": "Wöhrder Wiese / Pegnitz riverside morning loop",
+          "category": "fitness",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-nuremberg",
+          "assignedDate": "2026-06-16",
+          "startDate": "2026-06-16",
+          "endDate": "2026-06-16",
+          "startTime": "07:30",
+          "endTime": "08:30",
+          "id": "act-xz8zzgonm-mptkv1jq"
+        },
+        {
+          "title": "Optional run: Wöhrder Wiese / Pegnitz riverside loop — Wöhrder Wiese / Pegnitz",
+          "category": "fitness",
+          "estTime": "30–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-nuremberg",
+          "assignedDate": "2026-06-16",
+          "startDate": "2026-06-16",
+          "endDate": "2026-06-16",
+          "startTime": "08:00",
+          "endTime": "09:00",
+          "location": "Wöhrder Wiese / Pegnitz",
+          "done": false,
+          "notes": "Good morning option before Munich if you wake early; otherwise skip and keep the transfer easy.",
+          "id": "act-h85btizc5-mptkv1jq",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": ""
         }
       ],
       "legTips": [
@@ -1088,6 +1559,10 @@
         },
         {
           "text": "Walk the 5km old city walls",
+          "cityId": "city-nuremberg"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-nuremberg"
         }
       ]
@@ -1144,14 +1619,31 @@
           "activityItems": [
             {
               "text": "💼 Conference check-in & afternoon sessions",
-              "cost": "",
+              "cost": "0",
+              "time": "3.5 hrs",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-munich",
               "startDate": "2026-06-16",
               "endDate": "2026-06-16",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "13:30",
+              "endTime": "17:00",
+              "cityId": "city-munich",
+              "notes": "",
+              "location": "Conference venue",
+              "activityId": "act-ti4r3co94-mptkv1jq"
+            },
+            {
+              "text": "🍺 Low-effort Marienplatz / Hofbräuhaus orientation dinner",
+              "cost": "0",
+              "time": "2.5 hrs",
+              "done": false,
+              "startDate": "2026-06-16",
+              "endDate": "2026-06-16",
+              "startTime": "18:00",
+              "endTime": "20:30",
+              "cityId": "city-munich",
+              "notes": "Keep this casual; the proper RS Munich audio walk is scheduled for the free day.",
+              "location": "Old town",
+              "activityId": "act-5yj9oluvm-mptkv1jq"
             }
           ]
         },
@@ -1176,13 +1668,30 @@
             {
               "text": "💼 Full conference day",
               "cost": "0",
+              "time": "8 hrs",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-munich",
               "startDate": "2026-06-17",
               "endDate": "2026-06-17",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "09:00",
+              "endTime": "17:00",
+              "cityId": "city-munich",
+              "notes": "",
+              "location": "Conference venue",
+              "activityId": "act-yx1y8ve30-mptkv1jq"
+            },
+            {
+              "text": "🏄 English Garden / Eisbach surfers → Chinesischer Turm beer garden",
+              "cost": "0",
+              "time": "2 hr 45 mins",
+              "done": false,
+              "startDate": "2026-06-17",
+              "endDate": "2026-06-17",
+              "startTime": "17:45",
+              "endTime": "20:30",
+              "cityId": "city-munich",
+              "notes": "Good evening cluster after sitting in sessions all day.",
+              "location": "English Garden",
+              "activityId": "act-45ic97hgi-mptkv1jq"
             }
           ]
         },
@@ -1207,13 +1716,30 @@
             {
               "text": "💼 Final conference sessions",
               "cost": "0",
+              "time": "8 hrs",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-munich",
               "startDate": "2026-06-18",
               "endDate": "2026-06-18",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "09:00",
+              "endTime": "17:00",
+              "cityId": "city-munich",
+              "notes": "",
+              "location": "Conference venue",
+              "activityId": "act-78pwprxpg-mptkv1jq"
+            },
+            {
+              "text": "🍺 Augustiner-Keller low-effort Munich evening",
+              "cost": "0",
+              "time": "2 hrs",
+              "done": false,
+              "startDate": "2026-06-18",
+              "endDate": "2026-06-18",
+              "startTime": "18:30",
+              "endTime": "20:30",
+              "cityId": "city-munich",
+              "notes": "Easy beer-hall night without turning it into another big walk.",
+              "location": "Augustiner-Keller",
+              "activityId": "act-toe7u6gck-mptkv1jq"
             }
           ]
         },
@@ -1236,15 +1762,62 @@
           ],
           "activityItems": [
             {
-              "text": "🎧 RS Munich Walk",
+              "text": "🎧 Rick Steves Munich City Walk: Marienplatz → Viktualienmarkt → Asam Church → Dallmayr → Hofbräuhaus → Residenz → Hofgarten",
               "cost": "0",
+              "time": "3.5 hrs",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-munich",
               "startDate": "2026-06-19",
               "endDate": "2026-06-19",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "09:00",
+              "endTime": "12:30",
+              "cityId": "city-munich",
+              "notes": "Print RS map and use AirPods. Stops: Marienplatz, St Peter’s Church, Viktualienmarkt, Jewish Synagogue/City Museum, Asam Church, Sendlinger Strasse, Kaufingerstrasse, Frauenkirche, Marienhof, Dallmayr, Platzl, Hofbräuhaus, Maximilianstrasse, Max-Joseph-Platz, Residenz, Viscardigasse, Odeonsplatz, Hofgarten. Allow 3–3.5 hrs including lunch/beer/coffee pauses.",
+              "location": "Marienplatz to Hofgarten",
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf",
+              "activityId": "act-kohru4tfq-mptkv1jq",
+              "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf"
+            },
+            {
+              "text": "🍽 Lunch/beer/coffee pause built into the RS Munich route — Viktualienmarkt, Dallmayr or Hofbräuhaus",
+              "cost": "0",
+              "time": "1.5 hrs",
+              "done": false,
+              "startDate": "2026-06-19",
+              "endDate": "2026-06-19",
+              "startTime": "12:30",
+              "endTime": "14:00",
+              "cityId": "city-munich",
+              "notes": "Treat this as part of the walk rather than a separate cross-town move.",
+              "location": "Old town",
+              "activityId": "act-ij3hd8ckn-mptkv1jq"
+            },
+            {
+              "text": "🏟 Olympiapark + BMW Welt afternoon loop",
+              "cost": "0",
+              "time": "2.5 hrs",
+              "done": false,
+              "startDate": "2026-06-19",
+              "endDate": "2026-06-19",
+              "startTime": "15:00",
+              "endTime": "17:30",
+              "cityId": "city-munich",
+              "notes": "Keeps the afternoon in one northern cluster after the old-town RS walk.",
+              "location": "Olympiapark / BMW Welt",
+              "activityId": "act-2fuslfchn-mptkv1jq"
+            },
+            {
+              "text": "🌳 Optional Nymphenburg canal path or relaxed old-town dinner",
+              "cost": "0",
+              "time": "2.5 hrs",
+              "done": false,
+              "startDate": "2026-06-19",
+              "endDate": "2026-06-19",
+              "startTime": "18:00",
+              "endTime": "20:30",
+              "cityId": "city-munich",
+              "notes": "Only do Nymphenburg if you still want more walking; otherwise keep dinner central.",
+              "location": "Nymphenburg or old town",
+              "activityId": "act-g9i1fopyd-mptkv1jq"
             }
           ]
         },
@@ -1265,209 +1838,248 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "☕ Munich breakfast + station buffer before Bolzano train",
               "cost": "0",
-              "time": "1 hr",
+              "time": "2 hrs",
               "done": false,
               "startDate": "2026-06-20",
               "endDate": "2026-06-20",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bolzano"
+              "startTime": "08:30",
+              "endTime": "10:30",
+              "cityId": "city-munich",
+              "notes": "Do not schedule a major sight before the 11:23 train.",
+              "location": "Near hotel / München Hbf",
+              "activityId": "act-mmar17x2p-mptkv1jq"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "English Garden Eisbach circuit",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-munich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Nymphenburg Palace canal path",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-munich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Isar riverside path - very popular flat run, extending into nature reserve south",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-munich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Olympiapark 5km loop - hilly park around 1972 olympic venues",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-munich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Marienplatz Glockenspiel",
+          "title": "💼 Conference check-in & afternoon sessions",
           "category": "sight",
-          "estTime": "30 mins",
+          "estTime": "3.5 hrs",
           "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-munich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Hofbräuhaus evening",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-munich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Chinesischer Turm beer garden",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-munich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Viktualienmarkt lunch",
-          "category": "sight",
-          "estTime": "1.5 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-munich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Dallmayr gourmet deli",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-munich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Nymphenburg Palace & grounds",
-          "category": "sight",
-          "estTime": "3 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-munich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Conference check-in & afternoon sessions",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
+          "cityId": "city-munich",
           "assignedDate": "2026-06-16",
           "startDate": "2026-06-16",
-          "startTime": "",
           "endDate": "2026-06-16",
-          "endTime": "",
-          "cityId": "city-munich"
+          "startTime": "13:30",
+          "endTime": "17:00",
+          "location": "Conference venue",
+          "done": false,
+          "notes": "",
+          "id": "act-ti4r3co94-mptkv1jq"
         },
         {
-          "title": "Full conference day",
-          "category": "sight",
-          "estTime": "1 hr",
+          "title": "🍺 Low-effort Marienplatz / Hofbräuhaus orientation dinner",
+          "category": "food",
+          "estTime": "2.5 hrs",
           "estCost": "0",
-          "notes": "",
-          "location": "",
+          "assignedDayIdx": 0,
+          "cityId": "city-munich",
+          "assignedDate": "2026-06-16",
+          "startDate": "2026-06-16",
+          "endDate": "2026-06-16",
+          "startTime": "18:00",
+          "endTime": "20:30",
+          "location": "Old town",
+          "done": false,
+          "notes": "Keep this casual; the proper RS Munich audio walk is scheduled for the free day.",
+          "id": "act-5yj9oluvm-mptkv1jq"
+        },
+        {
+          "title": "💼 Full conference day",
+          "category": "sight",
+          "estTime": "8 hrs",
+          "estCost": "0",
           "assignedDayIdx": 1,
+          "cityId": "city-munich",
           "assignedDate": "2026-06-17",
           "startDate": "2026-06-17",
-          "startTime": "",
           "endDate": "2026-06-17",
-          "endTime": "",
-          "cityId": "city-munich"
+          "startTime": "09:00",
+          "endTime": "17:00",
+          "location": "Conference venue",
+          "done": false,
+          "notes": "",
+          "id": "act-yx1y8ve30-mptkv1jq"
         },
         {
-          "title": "Final conference sessions",
+          "title": "🏄 English Garden / Eisbach surfers → Chinesischer Turm beer garden",
           "category": "sight",
-          "estTime": "1 hr",
+          "estTime": "2 hr 45 mins",
           "estCost": "0",
-          "notes": "",
-          "location": "",
+          "assignedDayIdx": 1,
+          "cityId": "city-munich",
+          "assignedDate": "2026-06-17",
+          "startDate": "2026-06-17",
+          "endDate": "2026-06-17",
+          "startTime": "17:45",
+          "endTime": "20:30",
+          "location": "English Garden",
+          "done": false,
+          "notes": "Good evening cluster after sitting in sessions all day.",
+          "id": "act-45ic97hgi-mptkv1jq"
+        },
+        {
+          "title": "💼 Final conference sessions",
+          "category": "sight",
+          "estTime": "8 hrs",
+          "estCost": "0",
           "assignedDayIdx": 2,
+          "cityId": "city-munich",
           "assignedDate": "2026-06-18",
           "startDate": "2026-06-18",
-          "startTime": "",
           "endDate": "2026-06-18",
-          "endTime": "",
-          "cityId": "city-munich"
+          "startTime": "09:00",
+          "endTime": "17:00",
+          "location": "Conference venue",
+          "done": false,
+          "notes": "",
+          "id": "act-78pwprxpg-mptkv1jq"
         },
         {
-          "title": "RS Munich Walk",
-          "category": "sight",
-          "estTime": "1 hr",
+          "title": "🍺 Augustiner-Keller low-effort Munich evening",
+          "category": "food",
+          "estTime": "2 hrs",
           "estCost": "0",
-          "notes": "",
-          "location": "",
+          "assignedDayIdx": 2,
+          "cityId": "city-munich",
+          "assignedDate": "2026-06-18",
+          "startDate": "2026-06-18",
+          "endDate": "2026-06-18",
+          "startTime": "18:30",
+          "endTime": "20:30",
+          "location": "Augustiner-Keller",
+          "done": false,
+          "notes": "Easy beer-hall night without turning it into another big walk.",
+          "id": "act-toe7u6gck-mptkv1jq"
+        },
+        {
+          "title": "Rick Steves Munich City Walk: Marienplatz → Viktualienmarkt → Asam Church → Dallmayr → Hofbräuhaus → Residenz → Hofgarten — Marienplatz to Hofgarten",
+          "category": "fitness",
+          "estTime": "3.5 hrs",
+          "estCost": "0",
           "assignedDayIdx": 3,
+          "cityId": "city-munich",
           "assignedDate": "2026-06-19",
           "startDate": "2026-06-19",
-          "startTime": "",
           "endDate": "2026-06-19",
+          "startTime": "09:00",
+          "endTime": "12:30",
+          "location": "Marienplatz to Hofgarten",
+          "done": false,
+          "notes": "Print RS map and use AirPods. Stops: Marienplatz, St Peter’s Church, Viktualienmarkt, Jewish Synagogue/City Museum, Asam Church, Sendlinger Strasse, Kaufingerstrasse, Frauenkirche, Marienhof, Dallmayr, Platzl, Hofbräuhaus, Maximilianstrasse, Max-Joseph-Platz, Residenz, Viscardigasse, Odeonsplatz, Hofgarten. Allow 3–3.5 hrs including lunch/beer/coffee pauses.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf",
+          "id": "act-kohru4tfq-mptkv1jq",
+          "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf"
+        },
+        {
+          "title": "🍽 Lunch/beer/coffee pause built into the RS Munich route — Viktualienmarkt, Dallmayr or Hofbräuhaus",
+          "category": "food",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 3,
+          "cityId": "city-munich",
+          "assignedDate": "2026-06-19",
+          "startDate": "2026-06-19",
+          "endDate": "2026-06-19",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "location": "Old town",
+          "done": false,
+          "notes": "Treat this as part of the walk rather than a separate cross-town move.",
+          "id": "act-ij3hd8ckn-mptkv1jq"
+        },
+        {
+          "title": "🏟 Olympiapark + BMW Welt afternoon loop",
+          "category": "sight",
+          "estTime": "2.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 3,
+          "cityId": "city-munich",
+          "assignedDate": "2026-06-19",
+          "startDate": "2026-06-19",
+          "endDate": "2026-06-19",
+          "startTime": "15:00",
+          "endTime": "17:30",
+          "location": "Olympiapark / BMW Welt",
+          "done": false,
+          "notes": "Keeps the afternoon in one northern cluster after the old-town RS walk.",
+          "id": "act-2fuslfchn-mptkv1jq"
+        },
+        {
+          "title": "🌳 Optional Nymphenburg canal path or relaxed old-town dinner",
+          "category": "sight",
+          "estTime": "2.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 3,
+          "cityId": "city-munich",
+          "assignedDate": "2026-06-19",
+          "startDate": "2026-06-19",
+          "endDate": "2026-06-19",
+          "startTime": "18:00",
+          "endTime": "20:30",
+          "location": "Nymphenburg or old town",
+          "done": false,
+          "notes": "Only do Nymphenburg if you still want more walking; otherwise keep dinner central.",
+          "id": "act-g9i1fopyd-mptkv1jq"
+        },
+        {
+          "title": "☕ Munich breakfast + station buffer before Bolzano train",
+          "category": "food",
+          "estTime": "2 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 4,
+          "cityId": "city-munich",
+          "assignedDate": "2026-06-20",
+          "startDate": "2026-06-20",
+          "endDate": "2026-06-20",
+          "startTime": "08:30",
+          "endTime": "10:30",
+          "location": "Near hotel / München Hbf",
+          "done": false,
+          "notes": "Do not schedule a major sight before the 11:23 train.",
+          "id": "act-mmar17x2p-mptkv1jq"
+        },
+        {
+          "title": "Optional conference reset: hotel gym or 30–40 min easy jog",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
           "endTime": "",
-          "cityId": "city-munich"
+          "location": "Hotel gym / nearby streets",
+          "done": false,
+          "notes": "Use on conference days to reset mentally; do not stack hard runs with long evenings.",
+          "id": "act-j866zlp4k-mptkv1jq"
+        },
+        {
+          "title": "Optional run: English Garden / Eisbach circuit",
+          "category": "fitness",
+          "estTime": "40–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-munich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "English Garden",
+          "done": false,
+          "notes": "Excellent green-space run if staying reasonably central.",
+          "id": "act-tj5cf0gxu-mptkv1jq"
         }
       ],
       "legTips": [
@@ -1493,6 +2105,10 @@
         },
         {
           "text": "Day trip idea: Salzburg by train (1.5h) - early start if skipping last conf day",
+          "cityId": "city-munich"
+        },
+        {
+          "text": "Fitness: conference days are best for short gym/easy jog resets; do not turn them into hard training days.",
           "cityId": "city-munich"
         }
       ]
@@ -1536,15 +2152,29 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "🏘 Bolzano old town: Waltherplatz → Lauben arcades",
               "cost": "0",
-              "time": "1 hr",
+              "time": "1 hr 15 mins",
               "done": false,
               "startDate": "2026-06-20",
               "endDate": "2026-06-20",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bolzano"
+              "startTime": "16:15",
+              "endTime": "17:30",
+              "cityId": "city-bolzano",
+              "activityId": "act-liv9ict6y-mptkv1jr"
+            },
+            {
+              "text": "🚡 Renon cable car late afternoon / evening views",
+              "cost": "0",
+              "time": "2 hrs 15 mins",
+              "done": false,
+              "startDate": "2026-06-20",
+              "endDate": "2026-06-20",
+              "startTime": "17:45",
+              "endTime": "20:00",
+              "cityId": "city-bolzano",
+              "notes": "Realistic Dolomites-feel option without burning the next travel day.",
+              "activityId": "act-z36bd63pr-mptkv1jr"
             }
           ]
         },
@@ -1565,127 +2195,153 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "🧊 Ötzi the Iceman Museum",
               "cost": "0",
-              "time": "1 hr",
+              "time": "1 hr 30 mins",
               "done": false,
               "startDate": "2026-06-21",
               "endDate": "2026-06-21",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-verona"
+              "startTime": "10:00",
+              "endTime": "11:30",
+              "cityId": "city-bolzano",
+              "activityId": "act-lcesjsr3j-mptkv1jr"
+            },
+            {
+              "text": "🍷 Adige riverside / Lauben lunch before Verona train",
+              "cost": "0",
+              "time": "1 hr 45 mins",
+              "done": false,
+              "startDate": "2026-06-21",
+              "endDate": "2026-06-21",
+              "startTime": "11:45",
+              "endTime": "13:30",
+              "cityId": "city-bolzano",
+              "activityId": "act-cz75uuq39-mptkv1jr"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "Adige riverside path - flat 10km track north into the vineyards",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bolzano",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Trail run between cable car stations - challenging elevation",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bolzano",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Renon cable car",
+          "title": "Bolzano old town: Waltherplatz → Lauben arcades",
           "category": "sight",
-          "estTime": "2 hrs",
+          "estTime": "1 hr 15 mins",
           "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bolzano",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Wine trail along the Adige",
-          "category": "sight",
-          "estTime": "2.5 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bolzano",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Alpe di Siusi",
-          "category": "sight",
-          "estTime": "4 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bolzano",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "RS-style: Lauben arcades → Ötzi the Iceman Museum",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 0,
+          "cityId": "city-bolzano",
+          "assignedDate": "2026-06-20",
+          "startDate": "2026-06-20",
+          "endDate": "2026-06-20",
+          "startTime": "16:15",
+          "endTime": "17:30",
+          "id": "act-liv9ict6y-mptkv1jr"
+        },
+        {
+          "title": "Renon cable car late afternoon / evening views",
+          "category": "sight",
+          "estTime": "2 hrs 15 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-bolzano",
+          "assignedDate": "2026-06-20",
+          "startDate": "2026-06-20",
+          "endDate": "2026-06-20",
+          "startTime": "17:45",
+          "endTime": "20:00",
+          "notes": "Realistic Dolomites-feel option without burning the next travel day.",
+          "id": "act-z36bd63pr-mptkv1jr"
+        },
+        {
+          "title": "Ötzi the Iceman Museum",
+          "category": "sight",
+          "estTime": "1 hr 30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-bolzano",
           "assignedDate": "2026-06-21",
           "startDate": "2026-06-21",
-          "startTime": "",
           "endDate": "2026-06-21",
-          "endTime": "",
-          "cityId": "city-bolzano"
+          "startTime": "10:00",
+          "endTime": "11:30",
+          "id": "act-lcesjsr3j-mptkv1jr"
         },
         {
-          "title": "Seceda cable car",
+          "title": "Adige riverside / Lauben lunch before Verona train",
           "category": "sight",
-          "estTime": "1 hr",
+          "estTime": "1 hr 45 mins",
           "estCost": "0",
-          "notes": "",
-          "location": "soaring rocky spires",
           "assignedDayIdx": 1,
-          "assignedDate": "2026-06-22",
-          "startDate": "2026-06-22",
+          "cityId": "city-bolzano",
+          "assignedDate": "2026-06-21",
+          "startDate": "2026-06-21",
+          "endDate": "2026-06-21",
+          "startTime": "11:45",
+          "endTime": "13:30",
+          "id": "act-cz75uuq39-mptkv1jr"
+        },
+        {
+          "title": "Seceda cable car - only if adding another Bolzano/Dolomites night",
+          "category": "sight",
+          "estTime": "full day",
+          "estCost": "0",
+          "assignedDayIdx": "",
+          "cityId": "city-bolzano",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
           "startTime": "",
-          "endDate": "2026-06-22",
           "endTime": "",
-          "cityId": "city-bolzano"
+          "notes": "Not scheduled because current train to Verona makes this unrealistic.",
+          "id": "act-zthl11k5w-mptkv1jr"
+        },
+        {
+          "title": "Alpe di Siusi - only if adding another Bolzano/Dolomites night",
+          "category": "sight",
+          "estTime": "full day",
+          "estCost": "0",
+          "assignedDayIdx": "",
+          "cityId": "city-bolzano",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "notes": "Not scheduled on current one-night Bolzano stop.",
+          "id": "act-11vm38ztt-mptkv1jr"
+        },
+        {
+          "title": "Optional run: Adige riverside path north toward vineyards",
+          "category": "fitness",
+          "estTime": "30–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-bolzano",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Adige river",
+          "done": false,
+          "notes": "Scenic and flat; better than forcing a Dolomites mission on a one-night stop.",
+          "id": "act-smkuvi1ax-mptkv1jr"
         }
       ],
       "legTips": [
         {
-          "text": "Train from Munich is incredibly scenic - sit on the right",
-          "cityId": ""
+          "text": "Train from Innsbruck is incredibly scenic - sit on the right",
+          "cityId": "city-bolzano"
         },
         {
-          "text": "Ötzi Museum (Ice Man): ~€13 (closed Mondays!)",
-          "cityId": ""
+          "text": "Ötzi Museum: ~€13 (closed Mondays!)",
+          "cityId": "city-bolzano"
         },
         {
-          "text": "Seceda cable car - go early, fills with day-trippers. Mind the altitude.",
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
+          "cityId": "city-bolzano"
+        },
+        {
+          "text": "Skip Seceda/Alpe di Siusi unless you add another Dolomites night; with one night, Renon + Ötzi is the smarter fit.",
           "cityId": "city-bolzano"
         }
       ]
@@ -1724,15 +2380,28 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "🏛 Arena exterior → Piazza Bra → Piazza delle Erbe",
+              "cost": "0",
+              "time": "1 hr 30 mins",
+              "done": false,
+              "startDate": "2026-06-21",
+              "endDate": "2026-06-21",
+              "startTime": "17:30",
+              "endTime": "19:00",
+              "cityId": "city-verona",
+              "activityId": "act-68spfgdwm-mptkv1jr"
+            },
+            {
+              "text": "🌉 Castelvecchio Bridge sunset walk",
               "cost": "0",
               "time": "1 hr",
               "done": false,
               "startDate": "2026-06-21",
               "endDate": "2026-06-21",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-verona"
+              "startTime": "19:15",
+              "endTime": "20:15",
+              "cityId": "city-verona",
+              "activityId": "act-nmyu8e5yx-mptkv1jr"
             }
           ]
         },
@@ -1753,70 +2422,89 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "☕ Early Verona walk: Juliet balcony photo stop + riverside",
               "cost": "0",
-              "time": "1 hr",
+              "time": "2 hrs",
               "done": false,
               "startDate": "2026-06-22",
               "endDate": "2026-06-22",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-milan"
+              "startTime": "08:30",
+              "endTime": "10:30",
+              "cityId": "city-verona",
+              "activityId": "act-p6y0913rf-mptkv1jr"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "Adige riverside walk",
+          "title": "Arena exterior → Piazza Bra → Piazza delle Erbe",
+          "category": "sight",
+          "estTime": "1 hr 30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-verona",
+          "assignedDate": "2026-06-21",
+          "startDate": "2026-06-21",
+          "endDate": "2026-06-21",
+          "startTime": "17:30",
+          "endTime": "19:00",
+          "id": "act-68spfgdwm-mptkv1jr"
+        },
+        {
+          "title": "Castelvecchio Bridge sunset walk",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-milan",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
+          "assignedDayIdx": 0,
+          "cityId": "city-verona",
+          "assignedDate": "2026-06-21",
+          "startDate": "2026-06-21",
+          "endDate": "2026-06-21",
+          "startTime": "19:15",
+          "endTime": "20:15",
+          "id": "act-nmyu8e5yx-mptkv1jr"
         },
         {
-          "title": "Milan arrival: Navigli canals aperitivo",
+          "title": "Early Verona walk: Juliet balcony photo stop + riverside",
           "category": "sight",
           "estTime": "2 hrs",
           "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-verona",
+          "assignedDate": "2026-06-22",
+          "startDate": "2026-06-22",
+          "endDate": "2026-06-22",
+          "startTime": "08:30",
+          "endTime": "10:30",
+          "id": "act-p6y0913rf-mptkv1jr"
+        },
+        {
+          "title": "Optional run/walk: Adige river + Castelvecchio loop",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-milan",
+          "cityId": "city-verona",
           "assignedDate": "",
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "RS Verona self-walk: Arena di Verona",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 0,
-          "assignedDate": "2026-06-23",
-          "startDate": "2026-06-23",
-          "startTime": "",
-          "endDate": "2026-06-23",
           "endTime": "",
-          "cityId": "city-milan"
+          "location": "Adige / Castelvecchio",
+          "done": false,
+          "notes": "Easy way to get movement without leaving the historic centre.",
+          "id": "act-ry5ao0x8k-mptkv1jr"
         }
       ],
       "legTips": [
         {
-          "text": "Romeo & Juliet Balcony a must visit",
-          "cityId": ""
+          "text": "Book 'The Last Supper' MONTHS in advance - sells out instantly online",
+          "cityId": "city-milan"
         },
         {
-          "text": "Bus day pass is 3.5 euro  (Ticket Bus Verona App)",
-          "cityId": ""
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
+          "cityId": "city-verona"
         }
       ]
     },
@@ -1854,15 +2542,41 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "🏛️ 🌆 Easy Milan arrival: Brera wander + dinner, no major Duomo tour yet — Brera / central Milan",
               "cost": "0",
-              "time": "1 hr",
+              "time": "4.5 hrs",
               "done": false,
               "startDate": "2026-06-22",
               "endDate": "2026-06-22",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-milan"
+              "startTime": "15:30",
+              "endTime": "20:00",
+              "cityId": "city-milan",
+              "notes": "Save the Rick Steves Duomo audio walk for tomorrow morning when you are fresh and can do rooftop/interior properly.",
+              "location": "Brera / central Milan",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": "",
+              "activityId": "act-7hd8kgt54-mptkv1jr"
+            },
+            {
+              "activityId": "act-dgtloy8pk-mptns7ij",
+              "text": "🚌 TO BOOK — Dinner and Drinks",
+              "cost": "0",
+              "time": "3",
+              "done": false,
+              "notes": "",
+              "location": "Dinner and Drinks",
+              "status": "planned",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": "https://www.airbnb.com.au/experiences/6104268?adults=1&checkin=2026-06-22&experience_time_of_day%5B0%5D=afternoon&experience_time_of_day%5B1%5D=evening&location=Milan%2C%20Metropolitan%20City%20of%20Milan%2C%20Italy&currentTab=experience_tab&federatedSearchId=feecb416-bc63-4639-8818-7530c8a0f4cc&searchId=b9c2a69c-d883-4560-ae0a-f3a7b41f46fb&sectionId=b7a2e396-a439-477a-abb5-5c46240f98d2",
+              "startDate": "2026-06-22",
+              "startTime": "17:30",
+              "endDate": "2026-06-22",
+              "endTime": "20:30",
+              "cityId": "",
+              "externalLink": "https://www.airbnb.com.au/experiences/6104268?adults=1&checkin=2026-06-22&experience_time_of_day%5B0%5D=afternoon&experience_time_of_day%5B1%5D=evening&location=Milan%2C%20Metropolitan%20City%20of%20Milan%2C%20Italy&currentTab=experience_tab&federatedSearchId=feecb416-bc63-4639-8818-7530c8a0f4cc&searchId=b9c2a69c-d883-4560-ae0a-f3a7b41f46fb&sectionId=b7a2e396-a439-477a-abb5-5c46240f98d2"
             }
           ]
         },
@@ -1883,15 +2597,83 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "🍽 Lunch/coffee pause after the RS Duomo walk",
               "cost": "0",
-              "time": "1 hr",
+              "time": "1 hr 15 mins",
               "done": false,
               "startDate": "2026-06-23",
               "endDate": "2026-06-23",
+              "startTime": "12:00",
+              "endTime": "13:15",
+              "cityId": "city-milan",
+              "notes": "Good moment to reassess whether you want more museums or a lighter afternoon.",
+              "location": "Duomo / Brera",
+              "activityId": "act-kh7v7vb16-mptkv1jr"
+            },
+            {
+              "text": "🏰 Sforzesco Castle → Parco Sempione → Arco della Pace",
+              "cost": "0",
+              "time": "2.5 hrs",
+              "done": false,
+              "startDate": "2026-06-23",
+              "endDate": "2026-06-23",
+              "startTime": "14:00",
+              "endTime": "16:30",
+              "cityId": "city-milan",
+              "notes": "This is the natural next cluster after Duomo/La Scala/Brera.",
+              "location": "Sforzesco / Sempione",
+              "activityId": "act-2wkvfgyxk-mptkv1jr"
+            },
+            {
+              "text": "🍹 Navigli aperitivo evening",
+              "cost": "0",
+              "time": "2.5 hrs",
+              "done": false,
+              "startDate": "2026-06-23",
+              "endDate": "2026-06-23",
+              "startTime": "18:30",
+              "endTime": "21:00",
+              "cityId": "city-milan",
+              "notes": "Separate evening cluster; easy tram/metro from central Milan.",
+              "location": "Navigli",
+              "activityId": "act-g5jztw947-mptkv1jr"
+            },
+            {
+              "activityId": "act-imfi1ytnb-mptkv1jr",
+              "text": "🏛️ 🎨 The Last Supper timed entry — Santa Maria delle Grazie",
+              "cost": "0",
+              "time": "1 hr",
+              "done": false,
+              "notes": "Book this as the Milan priority. If ticket availability forces a different slot, move it to 23 or 25 June and keep Cremona as the flexible day trip.",
+              "location": "Santa Maria delle Grazie",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": "",
+              "startDate": "2026-06-23",
+              "startTime": "16:45",
+              "endDate": "2026-06-23",
+              "endTime": "17:45",
+              "cityId": ""
+            },
+            {
+              "activityId": "act-daxj36m3e-mptkv1jr",
+              "text": "🏛️ Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala — Piazza del Duomo to La Scala",
+              "cost": "0",
+              "time": "3 hrs",
+              "done": false,
+              "notes": "Print RS map and use AirPods. Stops: Piazza del Duomo, Duomo exterior, side view, interior nave/right aisle/more sights, rooftop, Galleria Vittorio Emanuele II, Piazza della Scala, La Scala Opera House. Allow 3 hrs if doing interior + rooftop slowly.",
+              "location": "Piazza del Duomo to La Scala",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf",
+              "startDate": "2026-06-23",
               "startTime": "",
+              "endDate": "2026-06-23",
               "endTime": "",
-              "cityId": "city-milan"
+              "cityId": "",
+              "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf"
             }
           ]
         },
@@ -1901,7 +2683,7 @@
           "from": "🇮🇹 Milan",
           "to": "🇮🇹 Milan",
           "completed": false,
-          "desc": "Exploring",
+          "desc": "Last Supper timed entry + Cremona day trip",
           "transportItems": [],
           "accomItems": [
             {
@@ -1912,15 +2694,18 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "🚆 Cremona day trip: Duomo → Torrazzo → violin heritage → relaxed piazza lunch",
               "cost": "0",
-              "time": "1 hr",
+              "time": "8 hrs",
               "done": false,
               "startDate": "2026-06-24",
               "endDate": "2026-06-24",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-milan"
+              "startTime": "10:30",
+              "endTime": "18:30",
+              "cityId": "city-milan",
+              "notes": "Good solo day trip from Milan with a more unusual music/history angle; keep it slower if the Last Supper slot lands later.",
+              "location": "Cremona",
+              "activityId": "act-xrc03nl0g-mptkv1jr"
             }
           ]
         },
@@ -1941,50 +2726,82 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "☕ Easy Milan coffee/walk before Zurich train",
               "cost": "0",
-              "time": "1 hr",
+              "time": "2 hrs",
               "done": false,
               "startDate": "2026-06-25",
               "endDate": "2026-06-25",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-zurich"
+              "startTime": "08:30",
+              "endTime": "10:30",
+              "cityId": "city-milan",
+              "notes": "No major paid activity before the 12:05 EuroCity to Zurich.",
+              "location": "Near hotel / Milano Centrale",
+              "activityId": "act-j0gufnzf4-mptkv1jr"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "Parco Sempione morning run - 3km loop around Sforzesco Castle",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-milan",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Navigli canal towpath - flat 10km run out of the city",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-milan",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "The Last Supper (Cenacolo Vinciano)",
+          "title": "🌆 Easy Milan arrival: Brera wander + dinner, no major Duomo tour yet — Brera / central Milan",
           "category": "sight",
-          "estTime": "1 hr",
+          "estTime": "4.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-milan",
+          "assignedDate": "2026-06-22",
+          "startDate": "2026-06-22",
+          "endDate": "2026-06-22",
+          "startTime": "15:30",
+          "endTime": "20:00",
+          "location": "Brera / central Milan",
+          "done": false,
+          "notes": "Save the Rick Steves Duomo audio walk for tomorrow morning when you are fresh and can do rooftop/interior properly.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "",
+          "id": "act-7hd8kgt54-mptkv1jr"
+        },
+        {
+          "title": "🍽 Lunch/coffee pause after the RS Duomo walk",
+          "category": "food",
+          "estTime": "1 hr 15 mins",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-milan",
+          "assignedDate": "2026-06-23",
+          "startDate": "2026-06-23",
+          "endDate": "2026-06-23",
+          "startTime": "12:00",
+          "endTime": "13:15",
+          "location": "Duomo / Brera",
+          "done": false,
+          "notes": "Good moment to reassess whether you want more museums or a lighter afternoon.",
+          "id": "act-kh7v7vb16-mptkv1jr"
+        },
+        {
+          "title": "🏰 Sforzesco Castle → Parco Sempione → Arco della Pace",
+          "category": "sight",
+          "estTime": "2.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-milan",
+          "assignedDate": "2026-06-23",
+          "startDate": "2026-06-23",
+          "endDate": "2026-06-23",
+          "startTime": "14:00",
+          "endTime": "16:30",
+          "location": "Sforzesco / Sempione",
+          "done": false,
+          "notes": "This is the natural next cluster after Duomo/La Scala/Brera.",
+          "id": "act-2wkvfgyxk-mptkv1jr"
+        },
+        {
+          "title": "🍹 Navigli aperitivo evening — Navigli",
+          "category": "food",
+          "estTime": "2.5 hrs",
           "estCost": "0",
           "assignedDayIdx": null,
           "cityId": "city-milan",
@@ -1992,49 +2809,166 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "location": "Navigli",
+          "done": false,
+          "notes": "Separate evening cluster; easy tram/metro from central Milan.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "",
+          "id": "act-qjupjvc3l-mptkv1jr"
         },
         {
-          "title": "Brera neighbourhood lunch",
-          "category": "sight",
+          "title": "☕ Easy Milan coffee/walk before Zurich train",
+          "category": "food",
           "estTime": "2 hrs",
           "estCost": "0",
+          "assignedDayIdx": 3,
+          "cityId": "city-milan",
+          "assignedDate": "2026-06-25",
+          "startDate": "2026-06-25",
+          "endDate": "2026-06-25",
+          "startTime": "08:30",
+          "endTime": "10:30",
+          "location": "Near hotel / Milano Centrale",
+          "done": false,
+          "notes": "No major paid activity before the 12:05 EuroCity to Zurich.",
+          "id": "act-j0gufnzf4-mptkv1jr"
+        },
+        {
+          "title": "🎨 The Last Supper timed entry — Santa Maria delle Grazie",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-milan",
+          "assignedDate": "2026-06-23",
+          "startDate": "2026-06-23",
+          "endDate": "2026-06-23",
+          "startTime": "16:45",
+          "endTime": "17:45",
+          "location": "Santa Maria delle Grazie",
+          "done": false,
+          "notes": "Book this as the Milan priority. If ticket availability forces a different slot, move it to 23 or 25 June and keep Cremona as the flexible day trip.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "",
+          "id": "act-imfi1ytnb-mptkv1jr"
+        },
+        {
+          "title": "🚆 Cremona day trip: Duomo → Torrazzo → violin heritage → relaxed piazza lunch",
+          "category": "sight",
+          "estTime": "8 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 2,
+          "cityId": "city-milan",
+          "assignedDate": "2026-06-24",
+          "startDate": "2026-06-24",
+          "endDate": "2026-06-24",
+          "startTime": "10:30",
+          "endTime": "18:30",
+          "location": "Cremona",
+          "done": false,
+          "notes": "Good solo day trip from Milan with a more unusual music/history angle; keep it slower if the Last Supper slot lands later.",
+          "id": "act-xrc03nl0g-mptkv1jr"
+        },
+        {
+          "title": "Optional run: Parco Sempione easy loop",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
           "assignedDayIdx": null,
           "cityId": "city-milan",
           "assignedDate": "",
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "location": "Parco Sempione",
+          "done": false,
+          "notes": "Best Milan outdoor run option around the Sforzesco/park area; otherwise use hotel gym.",
+          "id": "act-tioeil0ad-mptkv1jr"
         },
         {
-          "title": "Statue viewin — Main park",
-          "category": "attraction",
-          "estTime": "1 hr",
+          "title": "Optional gym: Milan hotel gym instead of street run",
+          "category": "fitness",
+          "estTime": "30–45 mins",
           "estCost": "0",
-          "assignedDayIdx": 0,
+          "assignedDayIdx": null,
           "cityId": "city-milan",
-          "assignedDate": "2026-06-24",
-          "startDate": "2026-06-24",
-          "endDate": "2026-06-24",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
           "startTime": "",
           "endTime": "",
-          "location": "Main park"
+          "location": "Hotel gym",
+          "done": false,
+          "notes": "Use this if heat/traffic makes outdoor running unappealing.",
+          "id": "act-1vpk23jwi-mptkv1jr"
         },
         {
-          "title": "RS Milan walk: Duomo rooftop → Galleria",
+          "title": "Navigli aperitivo evening",
           "category": "sight",
-          "estTime": "1 hr",
+          "estTime": "2.5 hrs",
+          "estCost": "0",
+          "notes": "Separate evening cluster; easy tram/metro from central Milan.",
+          "location": "Navigli",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-23",
+          "startDate": "2026-06-23",
+          "startTime": "18:30",
+          "endDate": "2026-06-23",
+          "endTime": "21:00",
+          "cityId": "",
+          "id": "act-g5jztw947-mptkv1jr"
+        },
+        {
+          "title": "Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala — Piazza del Duomo to La Scala",
+          "category": "sight",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "notes": "Print RS map and use AirPods. Stops: Piazza del Duomo, Duomo exterior, side view, interior nave/right aisle/more sights, rooftop, Galleria Vittorio Emanuele II, Piazza della Scala, La Scala Opera House. Allow 3 hrs if doing interior + rooftop slowly.",
+          "location": "Piazza del Duomo to La Scala",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-23",
+          "startDate": "2026-06-23",
+          "startTime": "",
+          "endDate": "2026-06-23",
+          "endTime": "",
+          "cityId": "",
+          "id": "act-daxj36m3e-mptkv1jr",
+          "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf"
+        },
+        {
+          "category": "tour",
+          "title": "TO BOOK — Dinner and Drinks",
+          "estTime": "3",
           "estCost": "0",
           "notes": "",
-          "location": "",
+          "location": "Dinner and Drinks",
+          "status": "planned",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "https://www.airbnb.com.au/experiences/6104268?adults=1&checkin=2026-06-22&experience_time_of_day%5B0%5D=afternoon&experience_time_of_day%5B1%5D=evening&location=Milan%2C%20Metropolitan%20City%20of%20Milan%2C%20Italy&currentTab=experience_tab&federatedSearchId=feecb416-bc63-4639-8818-7530c8a0f4cc&searchId=b9c2a69c-d883-4560-ae0a-f3a7b41f46fb&sectionId=b7a2e396-a439-477a-abb5-5c46240f98d2",
           "assignedDayIdx": 0,
-          "assignedDate": "2026-06-24",
-          "startDate": "2026-06-24",
-          "startTime": "",
-          "endDate": "2026-06-24",
-          "endTime": "",
-          "cityId": "city-milan"
+          "assignedDate": "2026-06-22",
+          "startDate": "2026-06-22",
+          "startTime": "17:30",
+          "endDate": "2026-06-22",
+          "endTime": "20:30",
+          "id": "act-dgtloy8pk-mptns7ij",
+          "cityId": "",
+          "externalLink": "https://www.airbnb.com.au/experiences/6104268?adults=1&checkin=2026-06-22&experience_time_of_day%5B0%5D=afternoon&experience_time_of_day%5B1%5D=evening&location=Milan%2C%20Metropolitan%20City%20of%20Milan%2C%20Italy&currentTab=experience_tab&federatedSearchId=feecb416-bc63-4639-8818-7530c8a0f4cc&searchId=b9c2a69c-d883-4560-ae0a-f3a7b41f46fb&sectionId=b7a2e396-a439-477a-abb5-5c46240f98d2"
         }
       ],
       "legTips": [
@@ -2044,6 +2978,18 @@
         },
         {
           "text": "Duomo rooftop: book timed entry online - skip the line",
+          "cityId": "city-milan"
+        },
+        {
+          "text": "Last Supper: make this the priority Milan booking; move the slot around ticket availability rather than forcing a bad time.",
+          "cityId": "city-milan"
+        },
+        {
+          "text": "Cremona is now the main Milan day trip: better if you want something less obvious than the standard lake circuit.",
+          "cityId": "city-milan"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
           "cityId": "city-milan"
         }
       ]
@@ -2087,7 +3033,20 @@
               "cityId": "city-zurich"
             }
           ],
-          "activityItems": []
+          "activityItems": [
+            {
+              "text": "🏙 Bahnhofstrasse → Lindenhof → Niederdorf / Altstadt dinner",
+              "cost": "0",
+              "time": "4 hrs",
+              "done": false,
+              "startDate": "2026-06-25",
+              "endDate": "2026-06-25",
+              "startTime": "16:30",
+              "endTime": "20:30",
+              "cityId": "city-zurich",
+              "activityId": "act-cfxptmsla-mptkv1ju"
+            }
+          ]
         },
         {
           "date": "2026-06-26",
@@ -2108,140 +3067,108 @@
           ],
           "activityItems": [
             {
-              "text": "🎧 RS-style Zurich walk: Lindenhügel viewpoint",
+              "text": "🌊 Lake Zurich promenade or Uetliberg morning option",
               "cost": "0",
+              "time": "2 hrs 30 mins",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-zurich",
               "startDate": "2026-06-26",
               "endDate": "2026-06-26",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "09:00",
+              "endTime": "11:30",
+              "cityId": "city-zurich",
+              "notes": "Keep this compact and airport-safe; skip Rhine Falls on this schedule.",
+              "activityId": "act-74p2amgos-mptkv1ju"
             },
             {
-              "text": "🏛️ Zurich Altstadt evening",
+              "text": "🍫 Confiserie Sprüngli / station-area buffer",
               "cost": "0",
               "time": "1 hr",
               "done": false,
-              "notes": "",
-              "location": "",
               "startDate": "2026-06-26",
-              "startTime": "09:00",
               "endDate": "2026-06-26",
-              "endTime": "10:00",
-              "cityId": "city-zurich"
+              "startTime": "12:00",
+              "endTime": "13:00",
+              "cityId": "city-zurich",
+              "activityId": "act-8zrgrs3va-mptkv1ju"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "Lake Zurich Seepromenade - excellent flat path extending out of city",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-zurich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Limmat River path",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-zurich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Confiserie Sprüngli",
-          "category": "sight",
-          "estTime": "45 mins",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-zurich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Dinner in Old Town",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-zurich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Rhine Falls day trip",
+          "title": "Bahnhofstrasse → Lindenhof → Niederdorf / Altstadt dinner",
           "category": "sight",
           "estTime": "4 hrs",
           "estCost": "0",
-          "assignedDayIdx": null,
+          "assignedDayIdx": 0,
           "cityId": "city-zurich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
+          "assignedDate": "2026-06-25",
+          "startDate": "2026-06-25",
+          "endDate": "2026-06-25",
+          "startTime": "16:30",
+          "endTime": "20:30",
+          "id": "act-cfxptmsla-mptkv1ju"
         },
         {
-          "title": "Uetliberg hill",
+          "title": "Lake Zurich promenade or Uetliberg morning option",
           "category": "sight",
-          "estTime": "3 hrs",
+          "estTime": "2 hrs 30 mins",
           "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-zurich",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Zurich Altstadt evening",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 1,
+          "cityId": "city-zurich",
           "assignedDate": "2026-06-26",
           "startDate": "2026-06-26",
+          "endDate": "2026-06-26",
           "startTime": "09:00",
-          "endDate": "2026-06-26",
-          "endTime": "10:00",
-          "cityId": "city-zurich"
+          "endTime": "11:30",
+          "notes": "Keep this compact and airport-safe; skip Rhine Falls on this schedule.",
+          "id": "act-74p2amgos-mptkv1ju"
         },
         {
-          "title": "RS-style Zurich walk: Lindenhügel viewpoint",
+          "title": "Confiserie Sprüngli / station-area buffer",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 1,
+          "cityId": "city-zurich",
           "assignedDate": "2026-06-26",
           "startDate": "2026-06-26",
-          "startTime": "",
           "endDate": "2026-06-26",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "id": "act-8zrgrs3va-mptkv1ju"
+        },
+        {
+          "title": "Rhine Falls day trip - not scheduled on current flight day",
+          "category": "sight",
+          "estTime": "4 hrs",
+          "estCost": "0",
+          "assignedDayIdx": "",
+          "cityId": "city-zurich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
           "endTime": "",
-          "cityId": "city-zurich"
+          "notes": "Possible but too transit-heavy before the Zurich → London flight.",
+          "id": "act-t5aixfvkt-mptkv1ju"
+        },
+        {
+          "title": "Optional run: Lake Zurich promenade / Limmat easy loop",
+          "category": "fitness",
+          "estTime": "30–60 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-zurich",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "location": "Lake Zurich / Limmat",
+          "done": false,
+          "notes": "Probably one of the best short run cities on the trip; keep airport timing in mind.",
+          "id": "act-ijzfmc4w3-mptkv1ju"
         }
       ],
       "legTips": [
@@ -2260,11 +3187,15 @@
         {
           "text": "Be back by 3pm — flight 18:30",
           "cityId": "city-zurich"
+        },
+        {
+          "text": "Fitness: keep runs/gym as optional unassigned extras; the scheduled walking already gives you plenty of daily movement.",
+          "cityId": "city-zurich"
         }
       ]
     },
     {
-      "id": "leg-17799424099396830",
+      "id": "leg-17799748470577950",
       "label": "London",
       "colour": "#808080",
       "days": [
@@ -2347,15 +3278,17 @@
           ],
           "activityItems": [
             {
-              "text": "🛕 Wat Pho → Chao Phraya Express boat",
+              "text": "🛕 Wat Pho / Chao Phraya river evening if energy is good",
               "cost": "0",
+              "time": "2 hrs 30 mins",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-bangkok",
               "startDate": "2026-06-27",
               "endDate": "2026-06-27",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "17:30",
+              "endTime": "20:00",
+              "cityId": "city-bangkok",
+              "notes": "If tired after arrival, swap for Chinatown or a simple local dinner.",
+              "activityId": "act-p3zadiazi-mptkv1ju"
             }
           ]
         },
@@ -2365,7 +3298,7 @@
           "from": "🇹🇭 Bangkok (2)",
           "to": "🇹🇭 Bangkok (2)",
           "completed": false,
-          "desc": "Family arrives! ⚠️ EARLY FLIGHT TOMORROW",
+          "desc": "Family arrives — ibis bag drop, Chatuchak market together, optional Big Buddha",
           "transportItems": [],
           "accomItems": [
             {
@@ -2378,15 +3311,53 @@
           ],
           "activityItems": [
             {
-              "text": "🛍 Chatuchak Weekend Market",
+              "text": "🗓️ 👨‍👩‍👧‍👦 Family arrives + quick ibis room bag drop / refresh — ibis Styles Bangkok Sukhumvit Phra Khanong",
               "cost": "0",
-              "done": false,
               "time": "1 hr",
-              "cityId": "city-bangkok",
+              "done": false,
               "startDate": "2026-06-28",
               "endDate": "2026-06-28",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "10:30",
+              "endTime": "11:30",
+              "cityId": "city-bangkok",
+              "notes": "Use the ibis room as the easy reset point so everyone can dump bags, freshen up, and head out light.",
+              "location": "ibis Styles Bangkok Sukhumvit Phra Khanong",
+              "status": "",
+              "bookingRef": "",
+              "activityId": "act-90ave4t32-mptkv1ju",
+              "externalLink": ""
+            },
+            {
+              "text": "🏛️ 🛍 Chatuchak Weekend Market with the family — Chatuchak Weekend Market",
+              "cost": "0",
+              "time": "2.5 hrs",
+              "done": false,
+              "startDate": "2026-06-28",
+              "endDate": "2026-06-28",
+              "startTime": "12:00",
+              "endTime": "14:30",
+              "cityId": "city-bangkok",
+              "notes": "Main family Bangkok activity. Keep it relaxed: food, souvenir stalls, people-watching; do not try to see every section.",
+              "location": "Chatuchak Weekend Market",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": "",
+              "activityId": "act-8iu8113es-mptkv1ju"
+            },
+            {
+              "text": "🛕 Optional Big Buddha / Wat Paknam photo stop OR simple family dinner",
+              "cost": "0",
+              "time": "1.5 hrs",
+              "done": false,
+              "startDate": "2026-06-28",
+              "endDate": "2026-06-28",
+              "startTime": "19:00",
+              "endTime": "20:30",
+              "cityId": "city-bangkok",
+              "notes": "Only do this if traffic/energy is good. It is not naturally close to Chatuchak, so a simple dinner may be the smarter call after the market.",
+              "location": "Wat Paknam / dinner nearby",
+              "activityId": "act-ntf731or9-mptkv1ju"
             }
           ]
         },
@@ -2407,101 +3378,163 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "🗓️ ️ Early Bangkok → Koh Samui flight only",
               "cost": "0",
-              "time": "1 hr",
+              "time": "travel",
               "done": false,
               "startDate": "2026-06-29",
               "endDate": "2026-06-29",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-koh-samui"
+              "startTime": "04:30",
+              "endTime": "04:45",
+              "cityId": "city-bangkok",
+              "notes": "No real sightseeing this morning.",
+              "activityId": "act-g8lmaza00-mptkv1ju",
+              "location": "",
+              "status": "",
+              "bookingRef": "",
+              "externalLink": ""
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "Lumphini Park 5km loop - watch for monitor lizards!",
-          "category": "fitness",
-          "estTime": "1 hr",
+          "title": "Wat Pho / Chao Phraya river evening if energy is good",
+          "category": "sight",
+          "estTime": "2 hrs 30 mins",
           "estCost": "0",
-          "assignedDayIdx": null,
+          "assignedDayIdx": 0,
+          "cityId": "city-bangkok",
+          "assignedDate": "2026-06-27",
+          "startDate": "2026-06-27",
+          "endDate": "2026-06-27",
+          "startTime": "17:30",
+          "endTime": "20:00",
+          "notes": "If tired after arrival, swap for Chinatown or a simple local dinner.",
+          "id": "act-p3zadiazi-mptkv1ju"
+        },
+        {
+          "title": "Grand Palace - optional only if cutting something else",
+          "category": "sight",
+          "estTime": "3 hrs",
+          "estCost": "0",
+          "assignedDayIdx": "",
           "cityId": "city-bangkok",
           "assignedDate": "",
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "notes": "Not scheduled to avoid heat/crowds/time pressure.",
+          "id": "act-42m00nsu7-mptkv1ju"
         },
         {
           "title": "Benchakitti Park loop - newly expanded, beautiful elevated walkways",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
-          "assignedDayIdx": null,
+          "assignedDayIdx": "",
           "cityId": "city-bangkok",
           "assignedDate": "",
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Khao San Road evening",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bangkok",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Grand Palace",
-          "category": "sight",
-          "estTime": "3 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-bangkok",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Wat Pho → Chao Phraya Express boat",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 0,
-          "assignedDate": "2026-06-27",
-          "startDate": "2026-06-27",
-          "startTime": "",
-          "endDate": "2026-06-27",
           "endTime": "",
-          "cityId": "city-bangkok"
+          "id": "act-jor1iyyxt-mptkv1ju"
         },
         {
-          "title": "Chatuchak Weekend Market",
-          "category": "sight",
+          "title": "️ Early Bangkok → Koh Samui flight only",
+          "category": "event",
+          "estTime": "travel",
+          "estCost": "0",
+          "notes": "No real sightseeing this morning.",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2026-06-29",
+          "startDate": "2026-06-29",
+          "startTime": "04:30",
+          "endDate": "2026-06-29",
+          "endTime": "04:45",
+          "cityId": "",
+          "id": "act-g8lmaza00-mptkv1ju",
+          "externalLink": ""
+        },
+        {
+          "title": "👨‍👩‍👧‍👦 Family arrives + quick ibis room bag drop / refresh — ibis Styles Bangkok Sukhumvit Phra Khanong",
+          "category": "event",
           "estTime": "1 hr",
           "estCost": "0",
-          "notes": "",
-          "location": "",
           "assignedDayIdx": 1,
+          "cityId": "city-bangkok",
           "assignedDate": "2026-06-28",
           "startDate": "2026-06-28",
-          "startTime": "",
           "endDate": "2026-06-28",
+          "startTime": "10:30",
+          "endTime": "11:30",
+          "location": "ibis Styles Bangkok Sukhumvit Phra Khanong",
+          "done": false,
+          "notes": "Use the ibis room as the easy reset point so everyone can dump bags, freshen up, and head out light.",
+          "status": "",
+          "bookingRef": "",
+          "id": "act-90ave4t32-mptkv1ju",
+          "externalLink": ""
+        },
+        {
+          "title": "🛍 Chatuchak Weekend Market with the family — Chatuchak Weekend Market",
+          "category": "sight",
+          "estTime": "2.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-bangkok",
+          "assignedDate": "2026-06-28",
+          "startDate": "2026-06-28",
+          "endDate": "2026-06-28",
+          "startTime": "12:00",
+          "endTime": "14:30",
+          "location": "Chatuchak Weekend Market",
+          "done": false,
+          "notes": "Main family Bangkok activity. Keep it relaxed: food, souvenir stalls, people-watching; do not try to see every section.",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "",
+          "id": "act-8iu8113es-mptkv1ju"
+        },
+        {
+          "title": "🛕 Optional Big Buddha / Wat Paknam photo stop OR simple family dinner",
+          "category": "sight",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-bangkok",
+          "assignedDate": "2026-06-28",
+          "startDate": "2026-06-28",
+          "endDate": "2026-06-28",
+          "startTime": "19:00",
+          "endTime": "20:30",
+          "location": "Wat Paknam / dinner nearby",
+          "done": false,
+          "notes": "Only do this if traffic/energy is good. It is not naturally close to Chatuchak, so a simple dinner may be the smarter call after the market.",
+          "id": "act-ntf731or9-mptkv1ju"
+        },
+        {
+          "title": "Optional fitness: hotel treadmill/gym only — avoid street running in heat/traffic",
+          "category": "fitness",
+          "estTime": "30–45 mins",
+          "estCost": "0",
+          "assignedDayIdx": null,
+          "cityId": "city-bangkok",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
           "endTime": "",
-          "cityId": "city-bangkok"
+          "location": "Hotel gym",
+          "done": false,
+          "notes": "Bangkok is better as a gym/treadmill city unless you are out very early.",
+          "id": "act-iyefw58ra-mptkv1ju"
         }
       ],
       "legTips": [
@@ -2511,6 +3544,18 @@
         },
         {
           "text": "Pre-order Grab taxi for 04:30 pickup - BKK traffic is notoriously bad",
+          "cityId": "city-bangkok"
+        },
+        {
+          "text": "Family arrival day: use the ibis room as a quick bag-drop/reset point, then do Chatuchak together as the main activity.",
+          "cityId": "city-bangkok"
+        },
+        {
+          "text": "Big Buddha / Wat Paknam is optional after Chatuchak because it creates a cross-town move; skip it if the family is cooked.",
+          "cityId": "city-bangkok"
+        },
+        {
+          "text": "Fitness: use hotel treadmill/gym; Bangkok heat and traffic make casual street runs a poor trade-off.",
           "cityId": "city-bangkok"
         }
       ]
@@ -2586,15 +3631,17 @@
           ],
           "activityItems": [
             {
-              "text": "🏖 Chaweng Beach afternoon → Big Buddha Temple",
+              "text": "🏖 Chaweng Beach settle-in → Big Buddha / Wat Plai Laem nearby",
               "cost": "0",
+              "time": "5 hrs 30 mins",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-koh-samui",
               "startDate": "2026-06-29",
               "endDate": "2026-06-29",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "10:30",
+              "endTime": "16:00",
+              "cityId": "city-koh-samui",
+              "notes": "Stay northeast/Chaweng side to minimise travel after the early flight.",
+              "activityId": "act-zof716aqr-mptkv1ju"
             }
           ]
         },
@@ -2619,13 +3666,14 @@
             {
               "text": "⛵ Ang Thong Marine Park full day",
               "cost": "0",
+              "time": "full day",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-koh-samui",
               "startDate": "2026-06-30",
               "endDate": "2026-06-30",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "07:30",
+              "endTime": "17:30",
+              "cityId": "city-koh-samui",
+              "activityId": "act-u5p3x3ls7-mptkv1ju"
             }
           ]
         },
@@ -2635,7 +3683,7 @@
           "from": "🌴 Koh Samui",
           "to": "🌴 Koh Samui",
           "completed": false,
-          "desc": "Koh Tao snorkelling",
+          "desc": "Recovery beach / resort day after Ang Thong",
           "transportItems": [],
           "accomItems": [
             {
@@ -2648,16 +3696,29 @@
           ],
           "activityItems": [
             {
-              "text": "🐠 Koh Tao snorkelling — Shark Bay",
+              "text": "🏝 Recovery beach / resort day after Ang Thong",
               "cost": "0",
+              "time": "5 hrs 30 mins",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-koh-samui",
               "startDate": "2026-07-01",
               "endDate": "2026-07-01",
-              "startTime": "",
-              "endTime": "",
-              "location": "Shark Bay"
+              "startTime": "09:30",
+              "endTime": "15:00",
+              "cityId": "city-koh-samui",
+              "notes": "Deliberately easier day before another boat/snorkel mission.",
+              "activityId": "act-vblmuqykl-mptkv1ju"
+            },
+            {
+              "text": "🌅 Sunset drinks on the beach",
+              "cost": "0",
+              "time": "1 hr 30 mins",
+              "done": false,
+              "startDate": "2026-07-01",
+              "endDate": "2026-07-01",
+              "startTime": "17:30",
+              "endTime": "19:00",
+              "cityId": "city-koh-samui",
+              "activityId": "act-itihfwoqr-mptkv1ju"
             }
           ]
         },
@@ -2667,7 +3728,7 @@
           "from": "🌴 Koh Samui",
           "to": "🌴 Koh Samui",
           "completed": false,
-          "desc": "Culture & wildlife day",
+          "desc": "Koh Tao snorkelling day",
           "transportItems": [],
           "accomItems": [
             {
@@ -2680,15 +3741,17 @@
           ],
           "activityItems": [
             {
-              "text": "🍳 Thai cooking class then 🐘 Elephant Sanctuary",
+              "text": "🐠 Koh Tao snorkelling — Shark Bay / Mango Viewpoint option",
               "cost": "0",
+              "time": "full day",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-koh-samui",
               "startDate": "2026-07-02",
               "endDate": "2026-07-02",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "07:30",
+              "endTime": "17:30",
+              "cityId": "city-koh-samui",
+              "location": "Koh Tao / Shark Bay",
+              "activityId": "act-az568zf15-mptkv1ju"
             }
           ]
         },
@@ -2711,15 +3774,30 @@
           ],
           "activityItems": [
             {
-              "text": "🛍 Fisherman's Village Friday Night Market",
+              "text": "🍳 Thai cooking class or elephant sanctuary — choose one main activity",
               "cost": "0",
+              "time": "4 hrs",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-koh-samui",
               "startDate": "2026-07-03",
               "endDate": "2026-07-03",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "09:30",
+              "endTime": "13:30",
+              "cityId": "city-koh-samui",
+              "notes": "Keeps energy for the Friday night market.",
+              "location": "choose one main activity",
+              "activityId": "act-aamnnlqu4-mptkv1ju"
+            },
+            {
+              "text": "🛍 Fisherman's Village Friday Night Market",
+              "cost": "0",
+              "time": "3 hrs 30 mins",
+              "done": false,
+              "startDate": "2026-07-03",
+              "endDate": "2026-07-03",
+              "startTime": "17:30",
+              "endTime": "21:00",
+              "cityId": "city-koh-samui",
+              "activityId": "act-9rz9qtq8l-mptkv1ju"
             }
           ]
         },
@@ -2729,7 +3807,7 @@
           "from": "🌴 Koh Samui",
           "to": "🌴 Koh Samui",
           "completed": false,
-          "desc": "Adventure day",
+          "desc": "Inland adventure day",
           "transportItems": [],
           "accomItems": [
             {
@@ -2742,15 +3820,17 @@
           ],
           "activityItems": [
             {
-              "text": "🚣 Kayak Chaweng Lake mangroves",
+              "text": "🌿 Na Muang / Hin Lad waterfall inland adventure",
               "cost": "0",
+              "time": "5 hrs",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-koh-samui",
               "startDate": "2026-07-04",
               "endDate": "2026-07-04",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "09:00",
+              "endTime": "14:00",
+              "cityId": "city-koh-samui",
+              "notes": "Better adventure-day fit than Chaweng Lake kayaking.",
+              "activityId": "act-byc6k1ny1-mptkv1ju"
             }
           ]
         },
@@ -2773,15 +3853,16 @@
           ],
           "activityItems": [
             {
-              "text": "🌊 Silver Beach morning",
+              "text": "🌊 Silver Beach morning → Lamai → Hin Ta & Hin Yai Rocks",
               "cost": "0",
+              "time": "6 hrs",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-koh-samui",
               "startDate": "2026-07-05",
               "endDate": "2026-07-05",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "09:00",
+              "endTime": "15:00",
+              "cityId": "city-koh-samui",
+              "activityId": "act-8eipfonls-mptkv1ju"
             }
           ]
         },
@@ -2804,15 +3885,17 @@
           ],
           "activityItems": [
             {
-              "text": "🌅 Sunrise at Hin Ta & Hin Yai Rocks",
+              "text": "🧘 Flexible final day: massage, pool, west-coast sunset",
               "cost": "0",
+              "time": "flexible day",
               "done": false,
-              "time": "1 hr",
-              "cityId": "city-koh-samui",
               "startDate": "2026-07-06",
               "endDate": "2026-07-06",
-              "startTime": "",
-              "endTime": ""
+              "startTime": "10:00",
+              "endTime": "19:00",
+              "cityId": "city-koh-samui",
+              "notes": "Keep the last full day flexible for weather, favourites, or rest.",
+              "activityId": "act-vfaxh7gmx-mptkv1ju"
             }
           ]
         },
@@ -2833,451 +3916,249 @@
           ],
           "activityItems": [
             {
-              "text": "Explore local area",
+              "text": "✈️ Koh Samui → Bangkok departure day",
               "cost": "0",
-              "time": "1 hr",
+              "time": "travel",
               "done": false,
               "startDate": "2026-07-07",
               "endDate": "2026-07-07",
-              "startTime": "",
-              "endTime": "",
-              "cityId": "city-bangkok"
+              "startTime": "07:00",
+              "endTime": "08:00",
+              "cityId": "city-koh-samui",
+              "activityId": "act-1oob9rl8q-mptkv1ju"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
+          "title": "Chaweng Beach settle-in → Big Buddha / Wat Plai Laem nearby",
+          "category": "sight",
+          "estTime": "5 hrs 30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 0,
+          "cityId": "city-koh-samui",
+          "assignedDate": "2026-06-29",
+          "startDate": "2026-06-29",
+          "endDate": "2026-06-29",
+          "startTime": "10:30",
+          "endTime": "16:00",
+          "notes": "Stay northeast/Chaweng side to minimise travel after the early flight.",
+          "id": "act-zof716aqr-mptkv1ju"
+        },
+        {
+          "title": "Ang Thong Marine Park full day",
+          "category": "sight",
+          "estTime": "full day",
+          "estCost": "0",
+          "assignedDayIdx": 1,
+          "cityId": "city-koh-samui",
+          "assignedDate": "2026-06-30",
+          "startDate": "2026-06-30",
+          "endDate": "2026-06-30",
+          "startTime": "07:30",
+          "endTime": "17:30",
+          "id": "act-u5p3x3ls7-mptkv1ju"
+        },
+        {
+          "title": "Recovery beach / resort day after Ang Thong",
+          "category": "sight",
+          "estTime": "5 hrs 30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 2,
+          "cityId": "city-koh-samui",
+          "assignedDate": "2026-07-01",
+          "startDate": "2026-07-01",
+          "endDate": "2026-07-01",
+          "startTime": "09:30",
+          "endTime": "15:00",
+          "notes": "Deliberately easier day before another boat/snorkel mission.",
+          "id": "act-vblmuqykl-mptkv1ju"
+        },
+        {
+          "title": "Sunset drinks on the beach",
+          "category": "sight",
+          "estTime": "1 hr 30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 2,
+          "cityId": "city-koh-samui",
+          "assignedDate": "2026-07-01",
+          "startDate": "2026-07-01",
+          "endDate": "2026-07-01",
+          "startTime": "17:30",
+          "endTime": "19:00",
+          "id": "act-itihfwoqr-mptkv1ju"
+        },
+        {
+          "title": "Koh Tao snorkelling — Shark Bay / Mango Viewpoint option",
+          "category": "sight",
+          "estTime": "full day",
+          "estCost": "0",
+          "assignedDayIdx": 3,
+          "cityId": "city-koh-samui",
+          "assignedDate": "2026-07-02",
+          "startDate": "2026-07-02",
+          "endDate": "2026-07-02",
+          "startTime": "07:30",
+          "endTime": "17:30",
+          "location": "Koh Tao / Shark Bay",
+          "id": "act-az568zf15-mptkv1ju"
+        },
+        {
+          "title": "Thai cooking class or elephant sanctuary — choose one main activity",
+          "category": "sight",
+          "estTime": "4 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 4,
+          "cityId": "city-koh-samui",
+          "assignedDate": "2026-07-03",
+          "startDate": "2026-07-03",
+          "endDate": "2026-07-03",
+          "startTime": "09:30",
+          "endTime": "13:30",
+          "notes": "Keeps energy for the Friday night market.",
+          "location": "choose one main activity",
+          "id": "act-aamnnlqu4-mptkv1ju"
+        },
+        {
+          "title": "Fisherman's Village Friday Night Market",
+          "category": "sight",
+          "estTime": "3 hrs 30 mins",
+          "estCost": "0",
+          "assignedDayIdx": 4,
+          "cityId": "city-koh-samui",
+          "assignedDate": "2026-07-03",
+          "startDate": "2026-07-03",
+          "endDate": "2026-07-03",
+          "startTime": "17:30",
+          "endTime": "21:00",
+          "id": "act-9rz9qtq8l-mptkv1ju"
+        },
+        {
+          "title": "Na Muang / Hin Lad waterfall inland adventure",
+          "category": "sight",
+          "estTime": "5 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 5,
+          "cityId": "city-koh-samui",
+          "assignedDate": "2026-07-04",
+          "startDate": "2026-07-04",
+          "endDate": "2026-07-04",
+          "startTime": "09:00",
+          "endTime": "14:00",
+          "notes": "Better adventure-day fit than Chaweng Lake kayaking.",
+          "id": "act-byc6k1ny1-mptkv1ju"
+        },
+        {
+          "title": "Silver Beach morning → Lamai → Hin Ta & Hin Yai Rocks",
+          "category": "sight",
+          "estTime": "6 hrs",
+          "estCost": "0",
+          "assignedDayIdx": 6,
+          "cityId": "city-koh-samui",
+          "assignedDate": "2026-07-05",
+          "startDate": "2026-07-05",
+          "endDate": "2026-07-05",
+          "startTime": "09:00",
+          "endTime": "15:00",
+          "id": "act-8eipfonls-mptkv1ju"
+        },
+        {
+          "title": "Flexible final day: massage, pool, west-coast sunset",
+          "category": "sight",
+          "estTime": "flexible day",
+          "estCost": "0",
+          "assignedDayIdx": 7,
+          "cityId": "city-koh-samui",
+          "assignedDate": "2026-07-06",
+          "startDate": "2026-07-06",
+          "endDate": "2026-07-06",
+          "startTime": "10:00",
+          "endTime": "19:00",
+          "notes": "Keep the last full day flexible for weather, favourites, or rest.",
+          "id": "act-vfaxh7gmx-mptkv1ju"
+        },
+        {
           "title": "Chaweng Beach early morning run - hard sand near the water, 5-6km loop",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
-          "assignedDayIdx": null,
+          "assignedDayIdx": "",
           "cityId": "city-koh-samui",
           "assignedDate": "",
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Ang Thong island hike to viewpoint - steep 500m climb, incredible view",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Koh Tao: hike to Mango Viewpoint - brutal climb, worth the sweat",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-j52rf5e7z-mptkv1ju"
         },
         {
           "title": "Hin Lad Waterfall trail - 2km jungle trek each way, wear actual shoes",
           "category": "fitness",
           "estTime": "1 hr",
           "estCost": "0",
-          "assignedDayIdx": null,
+          "assignedDayIdx": "",
           "cityId": "city-koh-samui",
           "assignedDate": "",
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-pg36nurs4-mptkv1ju"
         },
         {
-          "title": "Lamai Beach early morning run - quieter than Chaweng",
+          "title": "️ Koh Samui → Bangkok departure day",
+          "category": "sight",
+          "estTime": "travel",
+          "estCost": "0",
+          "notes": "",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "audioTitle": "",
+          "audioRef": "",
+          "assignedDayIdx": 8,
+          "assignedDate": "2026-07-07",
+          "startDate": "2026-07-07",
+          "startTime": "07:00",
+          "endDate": "2026-07-07",
+          "endTime": "08:00",
+          "cityId": "",
+          "id": "act-1oob9rl8q-mptkv1ju"
+        },
+        {
+          "title": "Optional early run: Chaweng or Lamai beach before heat",
           "category": "fitness",
-          "estTime": "1 hr",
+          "estTime": "30–45 mins",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
+          "cityId": "city-samui",
           "assignedDate": "",
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "location": "Chaweng / Lamai",
+          "done": false,
+          "notes": "Early only; then switch to holiday/family mode.",
+          "id": "act-3jmmm2byx-mptkv1ju"
         },
         {
-          "title": "Chaweng Lake mangrove loop - flat 5km track, very popular with locals",
+          "title": "Optional resort gym / swim recovery session",
           "category": "fitness",
-          "estTime": "1 hr",
+          "estTime": "30–45 mins",
           "estCost": "0",
           "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
+          "cityId": "city-samui",
           "assignedDate": "",
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Silver Beach headland trail - rock hopping to hidden coves",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Sunrise run: Hin Ta & Hin Yai - coastal path before 7am - empty & cool breeze",
-          "category": "fitness",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Grab local SIM at USM",
-          "category": "sight",
-          "estTime": "30 mins",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Sunset drinks on the beach",
-          "category": "sight",
-          "estTime": "1.5 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Kayaking through sea caves",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Thale Nai crater lake hike",
-          "category": "sight",
-          "estTime": "1.5 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Na Muang Waterfall 2",
-          "category": "sight",
-          "estTime": "3 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Turtle spotting",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Wat Plai Laem Temple",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Fisherman's Village Bo Phut",
-          "category": "sight",
-          "estTime": "3 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Lamai Beach morning",
-          "category": "sight",
-          "estTime": "3 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Hin Ta & Hin Yai",
-          "category": "sight",
-          "estTime": "1.5 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Resort pool + Thai massage",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Chaweng Lake kayak tour",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Nikki Beach club afternoon",
-          "category": "sight",
-          "estTime": "4 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "West coast sunset cocktails",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Chaweng Night Bazaar",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Farewell dinner",
-          "category": "sight",
-          "estTime": "2.5 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-koh-samui",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Chaweng Beach afternoon → Big Buddha Temple",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 0,
-          "assignedDate": "2026-06-29",
-          "startDate": "2026-06-29",
-          "startTime": "",
-          "endDate": "2026-06-29",
           "endTime": "",
-          "cityId": "city-koh-samui"
-        },
-        {
-          "title": "Ang Thong Marine Park full day",
-          "category": "attraction",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 1,
-          "assignedDate": "2026-06-30",
-          "startDate": "2026-06-30",
-          "startTime": "",
-          "endDate": "2026-06-30",
-          "endTime": "",
-          "cityId": "city-koh-samui"
-        },
-        {
-          "title": "Thai cooking class then 🐘 Elephant Sanctuary",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 3,
-          "assignedDate": "2026-07-02",
-          "startDate": "2026-07-02",
-          "startTime": "",
-          "endDate": "2026-07-02",
-          "endTime": "",
-          "cityId": "city-koh-samui"
-        },
-        {
-          "title": "Fisherman's Village Friday Night Market",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 4,
-          "assignedDate": "2026-07-03",
-          "startDate": "2026-07-03",
-          "startTime": "",
-          "endDate": "2026-07-03",
-          "endTime": "",
-          "cityId": "city-koh-samui"
-        },
-        {
-          "title": "Kayak Chaweng Lake mangroves",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 5,
-          "assignedDate": "2026-07-04",
-          "startDate": "2026-07-04",
-          "startTime": "",
-          "endDate": "2026-07-04",
-          "endTime": "",
-          "cityId": "city-koh-samui"
-        },
-        {
-          "title": "Silver Beach morning",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 6,
-          "assignedDate": "2026-07-05",
-          "startDate": "2026-07-05",
-          "startTime": "",
-          "endDate": "2026-07-05",
-          "endTime": "",
-          "cityId": "city-koh-samui"
-        },
-        {
-          "title": "Sunrise at Hin Ta & Hin Yai Rocks",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "assignedDayIdx": 7,
-          "assignedDate": "2026-07-06",
-          "startDate": "2026-07-06",
-          "startTime": "",
-          "endDate": "2026-07-06",
-          "endTime": "",
-          "cityId": "city-koh-samui"
-        },
-        {
-          "title": "Koh Tao snorkelling",
-          "category": "sight",
-          "estTime": "1 hr",
-          "estCost": "0",
-          "notes": "",
-          "location": "Shark Bay",
-          "assignedDayIdx": 2,
-          "assignedDate": "2026-07-01",
-          "startDate": "2026-07-01",
-          "startTime": "",
-          "endDate": "2026-07-01",
-          "endTime": "",
-          "cityId": "city-koh-samui"
+          "location": "Hotel / beach",
+          "done": false,
+          "notes": "Good between Ang Thong and Koh Tao or on the flexible final day.",
+          "id": "act-ujhsswjzz-mptkv1ju"
         }
       ],
       "legTips": [
@@ -3312,11 +4193,15 @@
         {
           "text": "Book Grab for 06:30 airport pickup tomorrow - morning traffic to USM",
           "cityId": "city-koh-samui"
+        },
+        {
+          "text": "Fitness: keep runs early and optional; beach walks, swims and resort gym sessions are enough on family days.",
+          "cityId": "city-samui"
         }
       ]
     },
     {
-      "id": "leg-17799424099399850ret",
+      "id": "leg-17799748470573440",
       "label": "Bangkok (3)",
       "colour": "#808080",
       "days": [
@@ -3382,7 +4267,12 @@
           "to": "Brisbane (Trip Finish) (2)",
           "completed": false,
           "desc": "Arrive from Bangkok",
-          "transportItems": [],
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
           "accomItems": [
             {
               "text": "— (home!)",
@@ -3402,7 +4292,8 @@
               "startDate": "2026-07-08",
               "endDate": "2026-07-08",
               "startTime": "",
-              "endTime": ""
+              "endTime": "",
+              "activityId": "act-685x0po4b-mptkv1jv"
             }
           ]
         }
@@ -3419,7 +4310,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-7dwv6v1nm-mptkv1jv"
         },
         {
           "title": "☕ Your own coffee machine",
@@ -3432,7 +4324,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-f7e2xbo7x-mptkv1jv"
         },
         {
           "title": "BKK layover: CentralFestival mall connected to airport via Skytrain - great food court",
@@ -3445,7 +4338,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-3jziwkxo7-mptkv1jv"
         },
         {
           "title": "Col. Germ lounge",
@@ -3458,7 +4352,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-dgbx7ddbf-mptkv1jv"
         },
         {
           "title": "Download & back up all photos",
@@ -3471,7 +4366,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-tlg9qobp1-mptkv1jv"
         },
         {
           "title": "USM 07:50 → BKK 08:55",
@@ -3486,7 +4382,8 @@
           "startTime": "",
           "endDate": "2026-07-07",
           "endTime": "",
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "id": "act-ad3ys1cfc-mptkv1jv"
         },
         {
           "title": "Welcome back to Brisbane!",
@@ -3501,7 +4398,8 @@
           "startTime": "",
           "endDate": "2026-07-08",
           "endTime": "",
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "id": "act-685x0po4b-mptkv1jv"
         }
       ],
       "legTips": [
@@ -4221,7 +5119,7 @@
       "transportType": "flight",
       "provider": "EVA Air",
       "routeCode": "BR061",
-      "status": "booked",
+      "status": "confirmed",
       "cost": "0",
       "bookingReference": "",
       "isMultiLeg": true,
@@ -4235,7 +5133,7 @@
       "fromAddress": "",
       "toAddress": "",
       "done": false,
-      "_inferredToLegId": "leg-17799424099393160",
+      "_inferredToLegId": "leg-17799748470576270",
       "_inferredFromLegId": "taipei"
     },
     {
@@ -4255,7 +5153,7 @@
       "transportType": "flight",
       "provider": "EVA Air",
       "routeCode": "BR061",
-      "status": "planned",
+      "status": "confirmed",
       "cost": "0",
       "bookingReference": "B4V64X",
       "isMultiLeg": true,
@@ -4270,7 +5168,7 @@
       "toAddress": "",
       "done": false,
       "_inferredToLegId": "vienna",
-      "_inferredFromLegId": "leg-17799424099393160"
+      "_inferredFromLegId": "leg-17799748470576270"
     },
     {
       "id": "journey_1779252185623_huf5dt",
@@ -4434,7 +5332,7 @@
       "endTime": "19:20",
       "fromAddress": "",
       "toAddress": "",
-      "_inferredToLegId": "leg-17799424099396830",
+      "_inferredToLegId": "leg-17799748470577950",
       "_inferredFromLegId": "zurich"
     },
     {
@@ -4468,7 +5366,7 @@
       "fromAddress": "",
       "toAddress": "",
       "_inferredToLegId": "bangkok",
-      "_inferredFromLegId": "leg-17799424099396830"
+      "_inferredFromLegId": "leg-17799748470577950"
     },
     {
       "id": "journey_1779881104451_owxydr",
@@ -4500,41 +5398,8 @@
       "endDate": "2026-07-08",
       "startTime": "21:40",
       "endTime": "07:30",
-      "_inferredFromLegId": "leg-17799424099399850ret",
-      "_inferredToLegId": "city-brisbane-finish"
-    },
-    {
-      "id": "journey_1779884038859_11oncs",
-      "journeyId": "jid_1779884009081_34sqva",
-      "journeyName": "Koh Samui → Bangkok",
-      "legId": "city-brisbane-finish",
-      "dayDate": "2026-07-07",
-      "fromLocation": "Koh Samui",
-      "toLocation": "Bangkok",
-      "fromCityId": "city-koh-samui",
-      "toCityId": "city-bangkok",
-      "departureDate": "2026-07-07",
-      "departureTime": "07:00",
-      "arrivalDate": "2026-07-07",
-      "arrivalTime": "08:00",
-      "transportType": "flight",
-      "provider": "Bangkok Air",
-      "routeCode": "",
-      "status": "confirmed",
-      "cost": "400",
-      "bookingReference": "",
-      "isMultiLeg": false,
-      "segmentOrder": 1,
-      "notes": "",
-      "fromAddress": "",
-      "toAddress": "",
-      "legs": [],
-      "startDate": "2026-07-07",
-      "endDate": "2026-07-07",
-      "startTime": "07:00",
-      "endTime": "08:00",
-      "_inferredToLegId": "leg-17799424099399850ret",
-      "_inferredFromLegId": "samui"
+      "_inferredToLegId": "city-brisbane-finish",
+      "_inferredFromLegId": "leg-17799748470573440"
     },
     {
       "id": "journey_1779880837955_pe6x8j",
@@ -4669,7 +5534,7 @@
       "_inferredFromLegId": "munich"
     },
     {
-      "id": "journey_1780035274781_xsryiq",
+      "id": "journey_1780197461320_i4gq77",
       "journeyId": "jid_single_journey_12",
       "journeyName": "Bolzano → Verona",
       "legId": "bolzano",
@@ -4700,6 +5565,39 @@
       "endTime": "16:40",
       "_inferredToLegId": "verona",
       "_inferredFromLegId": "bolzano"
+    },
+    {
+      "id": "journey_1780306828115_pzzfha",
+      "journeyId": "jid_1779884009081_34sqva",
+      "journeyName": "Koh Samui → Bangkok",
+      "legId": "samui",
+      "dayDate": "2026-07-07",
+      "fromLocation": "Koh Samui",
+      "toLocation": "Bangkok",
+      "fromCityId": "city-koh-samui",
+      "toCityId": "city-bangkok",
+      "departureDate": "2026-07-07",
+      "departureTime": "07:50",
+      "arrivalDate": "2026-07-07",
+      "arrivalTime": "08:55",
+      "transportType": "flight",
+      "provider": "Bangkok Air",
+      "routeCode": "",
+      "status": "confirmed",
+      "cost": "400",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "notes": "",
+      "fromAddress": "",
+      "toAddress": "",
+      "legs": [],
+      "startDate": "2026-07-07",
+      "endDate": "2026-07-07",
+      "startTime": "07:50",
+      "endTime": "08:55",
+      "_inferredToLegId": "leg-17799748470573440",
+      "_inferredFromLegId": "samui"
     }
   ],
   "stays": [
@@ -4715,11 +5613,11 @@
       "bookingRef": "QJQDBFRD",
       "totalCost": "103",
       "notes": "",
-      "checkInTime": "09:30",
+      "checkInTime": "09:00",
       "checkOutTime": "10:00",
       "startDate": "2026-06-10",
       "endDate": "2026-06-11",
-      "startTime": "09:30",
+      "startTime": "09:00",
       "endTime": "10:00",
       "location": "Schönbrunner Str. 92, 1050 Wien",
       "done": false,
@@ -4737,12 +5635,12 @@
       "bookingRef": "HMQKDE233E",
       "totalCost": "110.60",
       "notes": "Near Train Station - Murgašova 3131/2 2, Bratislava, Bratislavský kraj 811 04, Slovakia (Shared Apartment Room)",
-      "checkInTime": "15:00",
-      "checkOutTime": "10:00",
+      "checkInTime": "",
+      "checkOutTime": "",
       "startDate": "2026-06-11",
       "endDate": "2026-06-13",
-      "startTime": "15:00",
-      "endTime": "10:00",
+      "startTime": "",
+      "endTime": "",
       "location": "",
       "_inferredLegId": "bratislava"
     },
@@ -4758,11 +5656,11 @@
       "bookingRef": "QAJW7GXTZ",
       "totalCost": "232",
       "notes": "Londynska 50, Prague 120 00, Czech Republic (Breakfast Included)",
-      "checkInTime": "",
+      "checkInTime": "17:30",
       "checkOutTime": "",
       "startDate": "2026-06-13",
       "endDate": "2026-06-15",
-      "startTime": "",
+      "startTime": "17:30",
       "endTime": "",
       "location": "",
       "_inferredLegId": "prague"
@@ -4779,11 +5677,11 @@
       "bookingRef": "QJZDHQGF",
       "totalCost": "73.75",
       "notes": "Steinbuehler Strasse 2 - 90443 NUREMBERG - Germany",
-      "checkInTime": "",
+      "checkInTime": "13:00",
       "checkOutTime": "",
       "startDate": "2026-06-15",
       "endDate": "2026-06-16",
-      "startTime": "",
+      "startTime": "13:00",
       "endTime": "",
       "location": "",
       "_inferredLegId": "nuremberg"
@@ -4833,22 +5731,22 @@
     {
       "id": "stay_7_1777289776",
       "cityId": "city-bolzano",
-      "propertyName": "Ferrari Tower",
+      "propertyName": "tbc — bolzano city centre",
       "checkIn": "2026-06-20",
       "checkOut": "2026-06-21",
       "nights": 1,
       "status": "confirmed",
-      "provider": "Agoda",
-      "bookingRef": "6545475515",
-      "totalCost": "150",
-      "notes": "Near train station",
-      "checkInTime": "15:30",
-      "checkOutTime": "10:00",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": "",
+      "checkInTime": "",
+      "checkOutTime": "",
       "startDate": "2026-06-20",
       "endDate": "2026-06-21",
-      "startTime": "15:30",
-      "endTime": "10:00",
-      "location": "Schlachthofstraße, 28, Bolzano, Italy, 39100",
+      "startTime": "",
+      "endTime": "",
+      "location": "",
       "_inferredLegId": "bolzano"
     },
     {
@@ -4906,11 +5804,11 @@
       "totalCost": "217.60",
       "notes": "1122 Sukhumvit Road, Phra Khanong Khlong Toei, . - 10110 BANGKOK - Thailand",
       "checkInTime": "",
-      "checkOutTime": "",
+      "checkOutTime": "04:30",
       "startDate": "2026-06-27",
       "endDate": "2026-06-29",
       "startTime": "",
-      "endTime": "",
+      "endTime": "04:30",
       "location": "",
       "_inferredLegId": "bangkok"
     },
@@ -4937,22 +5835,22 @@
     {
       "id": "stay_1779881215677",
       "cityId": "city-verona",
-      "propertyName": "Hotel Maxim",
-      "location": "Via Carlo Belviglieri 42, Verona, Italy, 37131",
+      "propertyName": "tbc - verona",
+      "location": "",
       "checkIn": "2026-06-21",
-      "checkInTime": "17:00",
+      "checkInTime": "",
       "checkOut": "2026-06-22",
-      "checkOutTime": "10:00",
+      "checkOutTime": "",
       "nights": 1,
       "status": "confirmed",
-      "provider": "Agoda",
-      "bookingRef": "2017010277",
-      "totalCost": "78.53",
-      "notes": "Catch bus from Station can get Bus Day pass for 3.5 euro.",
+      "provider": "",
+      "bookingRef": "",
+      "totalCost": "0",
+      "notes": "",
       "startDate": "2026-06-21",
       "endDate": "2026-06-22",
-      "startTime": "17:00",
-      "endTime": "10:00",
+      "startTime": "",
+      "endTime": "",
       "_inferredLegId": "verona"
     }
   ],
@@ -5042,6 +5940,18 @@
       "lng": 11.5753822
     },
     {
+      "id": "city-innsbruck",
+      "name": "Innsbruck",
+      "country": "Austria",
+      "code": "INN",
+      "countryCode": "AT",
+      "dateFrom": "2026-06-20",
+      "dateTo": "2026-06-21",
+      "colour": "#E74C3C",
+      "lat": 47.2654296,
+      "lng": 11.3927685
+    },
+    {
       "id": "city-bolzano",
       "name": "Bolzano",
       "country": "Italy",
@@ -5125,28 +6035,6 @@
       "colour": "#9B59B6",
       "lat": 45.4424977,
       "lng": 10.9857377
-    },
-    {
-      "id": "city-brisbane-trip-start",
-      "name": "Brisbane Trip Start",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-brisbane-trip-finish",
-      "name": "Brisbane Trip Finish",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
     }
   ],
   "userCities": [],

@@ -756,13 +756,11 @@
 
       </div>
 
-      <div class="modal-footer journey-modal-footer modal-footer-transparent modal-footer-space-between modal-footer-tight">
+      <div class="modal-footer">
+        <button id="journeyDeleteBtn" class="action-btn action-btn-danger" onclick="deleteJourneyFromModal()" style="display: none;">Delete</button>
         <button class="action-btn" onclick="closeJourneyModal()">Cancel</button>
-        <div class="journey-footer-actions">
-          <button id="journeyDeleteBtn" class="action-btn action-btn-danger" onclick="deleteJourneyFromModal()" style="display: none;">Delete</button>
-          <button class="action-btn action-btn-secondary" onclick="addSegmentToJourney()">+ Add segment</button>
-          <button class="action-btn action-btn-success" onclick="saveJourneyFromModal()">✓ Save journey</button>
-        </div>
+        <button class="action-btn action-btn-secondary" onclick="addSegmentToJourney()">+ Add segment</button>
+        <button class="action-btn action-btn-success" onclick="saveJourneyFromModal()">✓ Save journey</button>
       </div>
     </div>
   </div>
