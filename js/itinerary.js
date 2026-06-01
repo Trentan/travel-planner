@@ -73,18 +73,15 @@ function getTransportStatusBadgeHtml(status, clickHandlerCall = '') {
 }
 
 function renderActivityAudioTourMeta(item) {
-  const title = String(item?.audioTitle || '').trim();
-  const ref = String(item?.audioRef || item?.audioUrl || '').trim();
-  if (!title && !ref) return '';
-  const label = title || 'Audio tour';
+  const ref = String(item?.externalLink || item?.audioRef || item?.audioUrl || '').trim();
+  if (!ref) return '';
+  const label = /^https?:\/\//i.test(ref) ? 'Open link' : 'External ref';
   const safeLabel = escapeCompactText(label);
   const safeRef = escapeCompactText(ref);
-  const refHtml = ref
-      ? (/^https?:\/\//i.test(ref)
-          ? `<a href="${safeRef}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="hover:underline">${safeLabel}</a>`
-          : `${safeLabel}<span class="audio-tour-ref">${safeRef}</span>`)
-      : safeLabel;
-  return `<span class="audio-tour-chip">🎧 ${refHtml}</span>`;
+  const refHtml = /^https?:\/\//i.test(ref)
+      ? `<a href="${safeRef}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="hover:underline">${safeLabel}</a>`
+      : `${safeLabel}<span class="audio-tour-ref">${safeRef}</span>`;
+  return `<span class="audio-tour-chip">Link ${refHtml}</span>`;
 }
 
 function focusCompactInlineEditable(selector) {
@@ -259,20 +256,20 @@ function renderCompactActivityItemForPanel(legIndex, dayIdx, itemIdx, item) {
 
 function getActivityItemEmoji(item, legIndex = null, dayIdx = null, fallback = '📌') {
   if (!item) return fallback;
-  if (item.category === 'audioTour' || /audio|podcast|self-guided|self guided/i.test(item.text || '') || item.audioTitle || item.audioRef || item.audioUrl) {
+  if (item.category === 'audioTour' || /audio|podcast|self-guided|self guided/i.test(item.text || '') || item.audioTitle) {
     return '🎧';
   }
   if (item.category === 'food' || /food/i.test(item.text || '')) {
     return '🍽️';
   }
   if (item.category) {
-    const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', audioTour: '🎧' };
+    const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', event: '🗓️', audioTour: '🎧' };
     return emojis[item.category] || fallback;
   }
   if (legIndex !== null && dayIdx !== null && typeof findAssignedSuggestedActivity === 'function') {
     const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
     if (matched && matched.category) {
-      const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', audioTour: '🎧' };
+      const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', event: '🗓️', audioTour: '🎧' };
       return emojis[matched.category] || fallback;
     }
   }
@@ -280,7 +277,7 @@ function getActivityItemEmoji(item, legIndex = null, dayIdx = null, fallback = '
 }
 
 function getCompactActivityCategoryEmoji(cat) {
-  const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', audioTour: '🎧' };
+  const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', event: '🗓️', audioTour: '🎧' };
   return emojis[cat] || '📌';
 }
 
@@ -2023,8 +2020,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       actionHtml: '',
       status: item.status || '',
       bookingRef: item.bookingRef || '',
-      audioTitle: item.audioTitle || '',
-      audioRef: item.audioRef || item.audioUrl || '',
+      externalLink: item.externalLink || item.audioRef || item.audioUrl || '',
       time: item.time || '',
       cityName: String((typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label || '') : '') || day.to || day.from || '').trim()
     });
@@ -2862,7 +2858,7 @@ function buildItinerary() {
 
     // Get emoji for activity category
     const getCategoryEmoji = (cat) => {
-      const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', audioTour: '\uD83C\uDFA7' };
+      const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', event: '🗓️', audioTour: '\uD83C\uDFA7' };
       return emojis[cat] || '📌';
     };
 

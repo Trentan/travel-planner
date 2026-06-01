@@ -739,7 +739,7 @@ function createBrowserHarness({
     'stayCitySelect', 'stayPropertyName', 'stayLocation', 'stayCheckIn', 'stayCheckInTime', 'stayCheckOut', 'stayCheckOutTime', 'stayNights',
     'stayStatus', 'stayProvider', 'stayBookingRef', 'stayTotalCost', 'stayNotes',
     'stayDeleteBtn', 'journeyDeleteBtn', 'saveFoodBtn', 'foodName', 'foodCost',
-    'saveActivityBtn', 'activityCategory', 'activityTitle', 'activityLocation',
+    'saveActivityBtn', 'activityCategory', 'activityTitle', 'activityLocation', 'activityExternalLink',
     'activityTime', 'activityStartTime', 'activityEndTime', 'activityCost', 'customCountryDiv', 'backup-reminder', 'expandAll',
     'expandAllLegs', 'itineraryTimelineModeBtn', 'itineraryGroupedModeBtn', 'mobileMenuSheet', 'tab-itinerary', 'tab-transport', 'tab-accom',
     'tab-budget', 'tab-packing', 'tab-map'

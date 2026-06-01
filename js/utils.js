@@ -137,6 +137,7 @@ const ACTIVITY_CATEGORIES = {
   wellness: { emoji: '🧘', label: 'Wellness' },
   food: { emoji: '🍽️', label: 'Food' },
   tour: { emoji: '🚌', label: 'Tour' },
+  event: { emoji: '🗓️', label: 'Event' },
   audioTour: { emoji: '🎧', label: 'Audio Tour' }
 };
 

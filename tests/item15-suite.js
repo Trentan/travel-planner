@@ -450,15 +450,18 @@ async function testItineraryEditPersistence() {
   tracker.expectSave('Activity delete', () => context.deleteDayItem(legIdx, dayIdx, 'activityItems', addedIdx));
   tracker.expectSave('Suggested activity modal add', () => {
     context.addActivity(activityLegIdx);
-    app.document.getElementById('activityCategory').value = 'sight';
+    app.document.getElementById('activityCategory').value = 'event';
     app.document.getElementById('activityTitle').value = 'Persistence suggested';
     app.document.getElementById('activityLocation').value = 'Gallery';
+    app.document.getElementById('activityExternalLink').value = 'https://example.com/invite';
     app.document.getElementById('activityTime').value = '1 hr';
     app.document.getElementById('activityCost').value = '12';
     app.document.getElementById('saveActivityBtn').click();
   });
   let activityIdx = state(context).itinerary[activityLegIdx].suggestedActivities.findIndex(activity => String(activity.title || '').includes('Persistence suggested'));
   assert(activityIdx >= 0, 'Itinerary persistence: suggested activity should be added');
+  assert(state(context).itinerary[activityLegIdx].suggestedActivities[activityIdx].category === 'event', 'Itinerary persistence: event activity type should save');
+  assert(state(context).itinerary[activityLegIdx].suggestedActivities[activityIdx].externalLink === 'https://example.com/invite', 'Itinerary persistence: activity external link should save');
   tracker.expectSave('Suggested activity modal edit', () => {
     context.openEditActivityModal(activityLegIdx, activityIdx);
     app.document.getElementById('activityTitle').value = 'Persistence suggested edited';
@@ -504,6 +507,9 @@ async function testItineraryEditPersistence() {
   );
   assert(exportedDayActivity?.done === true, 'Itinerary persistence: exported day activity should include done=true');
   assert(exportedPoolActivity?.done === true, 'Itinerary persistence: exported suggested activity should include done=true');
+  assert(exportedPoolActivity?.category === 'event', 'Itinerary persistence: exported suggested activity should keep event category');
+  assert(exportedPoolActivity?.externalLink === 'https://example.com/invite', 'Itinerary persistence: exported suggested activity should include external link');
+  assert(exportedDayActivity?.externalLink === 'https://example.com/invite', 'Itinerary persistence: exported day activity should include external link');
   tracker.expectSave('Suggested activity assignment clear', () => {
     context.openActivityAssignModal(activityLegIdx, activityIdx);
     app.document.getElementById('activityAssignClearBtn').click();
