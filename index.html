@@ -647,94 +647,107 @@
           </div>
 
           <input type="hidden" id="journeyType" value="flight">
-          <div class="transport-type-group journey-transport-type-group">
-            <button class="transport-type-btn active" data-type="flight" onclick="selectJourneyType('flight')"><span class="journey-type-icon">✈️</span> Flight</button>
-            <button class="transport-type-btn" data-type="train" onclick="selectJourneyType('train')"><span class="journey-type-icon">🚂</span> Train</button>
-            <button class="transport-type-btn" data-type="ferry" onclick="selectJourneyType('ferry')"><span class="journey-type-icon">⛴️</span> Ferry</button>
-            <button class="transport-type-btn" data-type="bus" onclick="selectJourneyType('bus')"><span class="journey-type-icon">🚌</span> Bus</button>
-            <button class="transport-type-btn" data-type="car" onclick="selectJourneyType('car')"><span class="journey-type-icon">🚗</span> Car</button>
-          </div>
+          
+          <!-- Panel 1: Type & Route -->
+          <div class="journey-form-group-panel">
+            <div class="transport-type-group journey-transport-type-group">
+              <button class="transport-type-btn active" data-type="flight" onclick="selectJourneyType('flight')"><span class="journey-type-icon">✈️</span> Flight</button>
+              <button class="transport-type-btn" data-type="train" onclick="selectJourneyType('train')"><span class="journey-type-icon">🚂</span> Train</button>
+              <button class="transport-type-btn" data-type="ferry" onclick="selectJourneyType('ferry')"><span class="journey-type-icon">⛴️</span> Ferry</button>
+              <button class="transport-type-btn" data-type="bus" onclick="selectJourneyType('bus')"><span class="journey-type-icon">🚌</span> Bus</button>
+              <button class="transport-type-btn" data-type="car" onclick="selectJourneyType('car')"><span class="journey-type-icon">🚗</span> Car</button>
+            </div>
 
-          <div class="journey-route-grid journey-route-row modal-form-row">
-            <div class="ai-form-group">
-              <label>From</label>
-              <select id="journeyFromCity" class="form-control" onchange="_journeyFormDirty=true"></select>
-            </div>
-            <div class="journey-route-arrow">➔</div>
-            <div class="ai-form-group">
-              <label>To</label>
-              <select id="journeyToCity" class="form-control" onchange="_journeyFormDirty=true"></select>
-            </div>
-          </div>
-          <div class="journey-route-grid journey-address-row modal-form-row">
-            <div class="ai-form-group">
-              <label for="journeyFromAddress">From Details</label>
-              <input type="text" id="journeyFromAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Heathrow Terminal 5">
-            </div>
-            <div class="journey-route-spacer" aria-hidden="true"></div>
-            <div class="ai-form-group">
-              <label for="journeyToAddress">To Details</label>
-              <input type="text" id="journeyToAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Haneda Terminal 3">
-            </div>
-          </div>
-          <div class="journey-city-link-row">
-            <a href="#" class="inline-action-link" onclick="promptAddNewCity(); return false;">+ Add new city (opens Cities dialog)</a>
-          </div>
-
-          <div class="journey-time-grid">
-            <div class="journey-inline-row journey-time-row modal-form-row">
+            <div class="journey-route-grid journey-route-row modal-form-row">
               <div class="ai-form-group">
-                <label>Departure</label>
-                <div class="journey-datetime-pair modal-form-pair">
-                  <input type="date" id="journeyDateFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
-                  <input type="time" id="journeyTimeFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                <label>From</label>
+                <select id="journeyFromCity" class="form-control" onchange="_journeyFormDirty=true"></select>
+              </div>
+              <div class="journey-route-arrow">➔</div>
+              <div class="ai-form-group">
+                <label>To</label>
+                <select id="journeyToCity" class="form-control" onchange="_journeyFormDirty=true"></select>
+              </div>
+            </div>
+            <div class="journey-route-grid journey-address-row modal-form-row">
+              <div class="ai-form-group">
+                <label for="journeyFromAddress">From Details</label>
+                <input type="text" id="journeyFromAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Heathrow Terminal 5">
+              </div>
+              <div class="journey-route-spacer" aria-hidden="true"></div>
+              <div class="ai-form-group">
+                <label for="journeyToAddress">To Details</label>
+                <input type="text" id="journeyToAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Haneda Terminal 3">
+              </div>
+            </div>
+            <div class="journey-city-link-row">
+              <a href="#" class="inline-action-link" onclick="promptAddNewCity(); return false;">+ Add new city (opens Cities dialog)</a>
+            </div>
+          </div>
+
+          <!-- Panel 2: Dates & Times -->
+          <div class="journey-form-group-panel">
+            <div class="journey-time-grid">
+              <div class="journey-inline-row journey-time-row modal-form-row">
+                <div class="ai-form-group">
+                  <label>Departure</label>
+                  <div class="journey-datetime-pair modal-form-pair">
+                    <input type="date" id="journeyDateFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                    <input type="time" id="journeyTimeFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                  </div>
+                </div>
+              </div>
+              <div class="journey-inline-row journey-time-row modal-form-row">
+                <div class="ai-form-group">
+                  <label>Arrival</label>
+                  <div class="journey-datetime-pair modal-form-pair">
+                    <input type="date" id="journeyDateTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                    <input type="time" id="journeyTimeTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="journey-inline-row journey-time-row modal-form-row">
+          </div>
+
+          <!-- Panel 3: Provider, Booking & Status -->
+          <div class="journey-form-group-panel">
+            <div class="journey-inline-row journey-meta-row modal-form-row modal-form-row--split">
               <div class="ai-form-group">
-                <label>Arrival</label>
-                <div class="journey-datetime-pair modal-form-pair">
-                  <input type="date" id="journeyDateTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
-                  <input type="time" id="journeyTimeTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
-                </div>
+                <label>Provider</label>
+                <input type="text" id="journeyProvider" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. EVA Air">
+              </div>
+              <div class="ai-form-group">
+                <label>Route #</label>
+                <input type="text" id="journeyRouteCode" class="form-control" onchange="_journeyFormDirty=true" placeholder="BR067">
+              </div>
+            </div>
+            <div class="journey-inline-row journey-meta-row modal-form-row modal-form-row--split">
+              <div class="ai-form-group">
+                <label>Booking Ref</label>
+                <input type="text" id="journeyBookingRef" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. ABC123">
+              </div>
+              <div class="ai-form-group">
+                <label>Status</label>
+                <select id="journeyStatus" class="form-control" onchange="_journeyFormDirty=true">
+                  <option value="planned">Planned</option>
+                  <option value="booked">Booked</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div class="ai-form-group">
+                <label>Cost ($)</label>
+                <input type="number" id="journeyCost" class="form-control" onchange="_journeyFormDirty=true" placeholder="0">
               </div>
             </div>
           </div>
 
-          <div class="journey-inline-row journey-meta-row modal-form-row modal-form-row--split">
+          <!-- Panel 4: Notes -->
+          <div class="journey-form-group-panel">
             <div class="ai-form-group">
-              <label>Provider</label>
-              <input type="text" id="journeyProvider" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. EVA Air">
+              <label>Notes</label>
+              <input type="text" id="journeyNotes" class="form-control form-control--muted" onchange="_journeyFormDirty=true" placeholder="Optional notes for this segment">
             </div>
-            <div class="ai-form-group">
-              <label>Route #</label>
-              <input type="text" id="journeyRouteCode" class="form-control" onchange="_journeyFormDirty=true" placeholder="BR067">
-            </div>
-          </div>
-          <div class="journey-inline-row journey-meta-row modal-form-row modal-form-row--split">
-            <div class="ai-form-group">
-              <label>Booking Ref</label>
-              <input type="text" id="journeyBookingRef" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. ABC123">
-            </div>
-            <div class="ai-form-group">
-              <label>Status</label>
-              <select id="journeyStatus" class="form-control" onchange="_journeyFormDirty=true">
-                <option value="planned">Planned</option>
-                <option value="booked">Booked</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
-            <div class="ai-form-group">
-              <label>Cost ($)</label>
-              <input type="number" id="journeyCost" class="form-control" onchange="_journeyFormDirty=true" placeholder="0">
-            </div>
-          </div>
-
-          <div class="ai-form-group">
-            <label>Notes</label>
-            <input type="text" id="journeyNotes" class="form-control form-control--muted" onchange="_journeyFormDirty=true" placeholder="Optional notes for this segment">
           </div>
         </div>
 
@@ -762,68 +775,83 @@
       </div>
       <div class="modal-body">
         <div class="modal-form-stack stay-form-grid">
-          <div class="ai-form-group">
-            <label for="stayCitySelect">City</label>
-            <select id="stayCitySelect" class="form-control form-control--compact">
-              <option value="">-- Select city --</option>
-            </select>
-          </div>
-          <div class="ai-form-group">
-            <label for="stayPropertyName">Property Name</label>
-            <input type="text" id="stayPropertyName" class="form-control form-control--compact" placeholder="e.g. Grand Hotel or Cozy Airbnb">
-          </div>
-          <div class="ai-form-group">
-            <label for="stayLocation">Location</label>
-            <input type="text" id="stayLocation" class="form-control form-control--compact" placeholder="e.g. 12 Station Road, near Central Station">
-          </div>
-          <div class="modal-form-row modal-form-row--split">
-            <div class="ai-form-group">
-              <label for="stayCheckIn">Check-in</label>
-              <input type="date" id="stayCheckIn" class="form-control form-control--compact">
+          <!-- Group 1: Core Details -->
+          <div class="stay-form-group-panel">
+            <div class="ai-form-group span-2">
+              <label for="stayCitySelect">City</label>
+              <select id="stayCitySelect" class="form-control form-control--compact">
+                <option value="">-- Select city --</option>
+              </select>
             </div>
-            <div class="ai-form-group">
-              <label for="stayCheckInTime">Check-in time</label>
-              <input type="time" id="stayCheckInTime" class="form-control form-control--compact">
+            <div class="ai-form-group span-2">
+              <label for="stayPropertyName">Property Name</label>
+              <input type="text" id="stayPropertyName" class="form-control form-control--compact" placeholder="e.g. Grand Hotel or Cozy Airbnb">
             </div>
           </div>
-          <div class="modal-form-row modal-form-row--split">
-            <div class="ai-form-group">
-              <label for="stayCheckOut">Check-out</label>
-              <input type="date" id="stayCheckOut" class="form-control form-control--compact">
+          
+          <!-- Group 2: Stay Dates & Nights -->
+          <div class="stay-form-group-panel">
+            <div class="modal-form-row modal-form-row--split span-2">
+              <div class="ai-form-group">
+                <label for="stayCheckIn">Check-in</label>
+                <input type="date" id="stayCheckIn" class="form-control form-control--compact">
+              </div>
+              <div class="ai-form-group">
+                <label for="stayCheckInTime">Check-in time</label>
+                <input type="time" id="stayCheckInTime" class="form-control form-control--compact">
+              </div>
+            </div>
+            <div class="modal-form-row modal-form-row--split span-2">
+              <div class="ai-form-group">
+                <label for="stayCheckOut">Check-out</label>
+                <input type="date" id="stayCheckOut" class="form-control form-control--compact">
+              </div>
+              <div class="ai-form-group">
+                <label for="stayCheckOutTime">Check-out time</label>
+                <input type="time" id="stayCheckOutTime" class="form-control form-control--compact">
+              </div>
+            </div>
+            <div class="ai-form-group span-2">
+              <label for="stayNights">Nights</label>
+              <input type="text" id="stayNights" readonly class="form-control form-control--compact form-control--mono stay-nights-input" placeholder="Auto">
+            </div>
+          </div>
+
+          <!-- Group 3: Booking Info -->
+          <div class="stay-form-group-panel">
+            <div class="ai-form-group span-2">
+              <label for="stayStatus">Booking Status</label>
+              <select id="stayStatus" class="form-control form-control--compact">
+                <option value="planned">⏳ Planned</option>
+                <option value="booked">✓ Booked</option>
+                <option value="confirmed">🎫 Confirmed</option>
+                <option value="cancelled">✗ Cancelled</option>
+              </select>
             </div>
             <div class="ai-form-group">
-              <label for="stayCheckOutTime">Check-out time</label>
-              <input type="time" id="stayCheckOutTime" class="form-control form-control--compact">
+              <label for="stayProvider">Booking Provider</label>
+              <input type="text" id="stayProvider" class="form-control form-control--compact" placeholder="e.g. Booking.com, Airbnb, Direct">
+            </div>
+            <div class="ai-form-group">
+              <label for="stayBookingRef">Booking Reference</label>
+              <input type="text" id="stayBookingRef" class="form-control form-control--compact" placeholder="e.g. ABC123XYZ">
             </div>
           </div>
-          <div class="ai-form-group">
-            <label for="stayNights">Nights</label>
-            <input type="text" id="stayNights" readonly class="form-control form-control--compact form-control--mono stay-nights-input" placeholder="Auto">
-          </div>
-          <div class="ai-form-group">
-            <label for="stayStatus">Booking Status</label>
-            <select id="stayStatus" class="form-control form-control--compact">
-              <option value="planned">⏳ Planned</option>
-              <option value="booked">✓ Booked</option>
-              <option value="confirmed">🎫 Confirmed</option>
-              <option value="cancelled">✗ Cancelled</option>
-            </select>
-          </div>
-          <div class="ai-form-group">
-            <label for="stayProvider">Booking Provider</label>
-            <input type="text" id="stayProvider" class="form-control form-control--compact" placeholder="e.g. Booking.com, Airbnb, Direct">
-          </div>
-          <div class="ai-form-group">
-            <label for="stayBookingRef">Booking Reference</label>
-            <input type="text" id="stayBookingRef" class="form-control form-control--compact" placeholder="e.g. ABC123XYZ">
-          </div>
-          <div class="ai-form-group">
-            <label for="stayTotalCost">Total Cost ($)</label>
-            <input type="number" id="stayTotalCost" class="form-control form-control--compact" placeholder="0">
-          </div>
-          <div class="ai-form-group">
-            <label for="stayNotes">Notes</label>
-            <textarea id="stayNotes" class="form-control form-control--compact stay-notes-input" placeholder="Optional: address, phone, check-in instructions..."></textarea>
+
+          <!-- Group 4: Location, Costs & Notes -->
+          <div class="stay-form-group-panel">
+            <div class="ai-form-group span-2">
+              <label for="stayLocation">Location</label>
+              <input type="text" id="stayLocation" class="form-control form-control--compact" placeholder="e.g. 12 Station Road, near Central Station">
+            </div>
+            <div class="ai-form-group span-2">
+              <label for="stayTotalCost">Total Cost ($)</label>
+              <input type="number" id="stayTotalCost" class="form-control form-control--compact" placeholder="0">
+            </div>
+            <div class="ai-form-group span-2">
+              <label for="stayNotes">Notes</label>
+              <textarea id="stayNotes" class="form-control form-control--compact stay-notes-input" placeholder="Optional: address, phone, check-in instructions..."></textarea>
+            </div>
           </div>
         </div>
       </div>
