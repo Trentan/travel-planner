@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "✈ Europe & Asia 2026",
-    "subtitle": "Trentan solo · Europe → Bangkok → Koh Samui with family → Home · Rick Steves audio walks scheduled · Last Supper + Cremona · fitness ideas unassigned"
+    "subtitle": "Trentan solo · Europe → Bangkok → Koh Samui with family → Home"
   },
   "itinerary": [
     {
@@ -54,7 +54,8 @@
               "status": "",
               "bookingRef": "",
               "audioTitle": "",
-              "audioRef": ""
+              "audioRef": "",
+              "activityId": "act-06x4srlls-mptkv1jg"
             }
           ]
         }
@@ -77,7 +78,8 @@
           "status": "",
           "bookingRef": "",
           "audioTitle": "",
-          "audioRef": ""
+          "audioRef": "",
+          "id": "act-06x4srlls-mptkv1jg"
         }
       ],
       "legTips": [
@@ -136,7 +138,8 @@
               "startTime": "09:00",
               "endTime": "10:15",
               "cityId": "city-taipei",
-              "notes": "Start central-west; easy after the flight and before crossing town."
+              "notes": "Start central-west; easy after the flight and before crossing town.",
+              "activityId": "act-595tacfg7-mptkv1jj"
             },
             {
               "text": "🏙 Taipei 101 / Xinyi district quick wander",
@@ -148,7 +151,8 @@
               "startTime": "10:45",
               "endTime": "11:30",
               "cityId": "city-taipei",
-              "notes": "Pairs naturally with Elephant Mountain and Din Tai Fung."
+              "notes": "Pairs naturally with Elephant Mountain and Din Tai Fung.",
+              "activityId": "act-9j435w0v5-mptkv1jj"
             },
             {
               "text": "⛰ Elephant Mountain trail for skyline views",
@@ -160,7 +164,8 @@
               "startTime": "11:30",
               "endTime": "12:45",
               "cityId": "city-taipei",
-              "location": "Xinyi / Elephant Mountain"
+              "location": "Xinyi / Elephant Mountain",
+              "activityId": "act-9ud8uwvo3-mptkv1jj"
             },
             {
               "text": "🥟 Din Tai Fung lunch — Taipei 101 branch if practical",
@@ -172,7 +177,8 @@
               "startTime": "13:00",
               "endTime": "14:30",
               "cityId": "city-taipei",
-              "location": "Taipei 101 / Xinyi"
+              "location": "Taipei 101 / Xinyi",
+              "activityId": "act-tfufc9p5r-mptkv1jj"
             },
             {
               "text": "🛍 Raohe Night Market early dinner option",
@@ -184,7 +190,8 @@
               "startTime": "17:30",
               "endTime": "19:00",
               "cityId": "city-taipei",
-              "notes": "Better fit than Shilin because it stays on the east side before airport transfer."
+              "notes": "Better fit than Shilin because it stays on the east side before airport transfer.",
+              "activityId": "act-wlpvop0b1-mptkv1jj"
             }
           ]
         }
@@ -202,7 +209,8 @@
           "endDate": "2026-06-09",
           "startTime": "09:00",
           "endTime": "10:15",
-          "notes": "Start central-west; easy after the flight and before crossing town."
+          "notes": "Start central-west; easy after the flight and before crossing town.",
+          "id": "act-595tacfg7-mptkv1jj"
         },
         {
           "title": "Taipei 101 / Xinyi district quick wander",
@@ -216,7 +224,8 @@
           "endDate": "2026-06-09",
           "startTime": "10:45",
           "endTime": "11:30",
-          "notes": "Pairs naturally with Elephant Mountain and Din Tai Fung."
+          "notes": "Pairs naturally with Elephant Mountain and Din Tai Fung.",
+          "id": "act-9j435w0v5-mptkv1jj"
         },
         {
           "title": "Elephant Mountain trail for skyline views",
@@ -230,7 +239,8 @@
           "endDate": "2026-06-09",
           "startTime": "11:30",
           "endTime": "12:45",
-          "location": "Xinyi / Elephant Mountain"
+          "location": "Xinyi / Elephant Mountain",
+          "id": "act-9ud8uwvo3-mptkv1jj"
         },
         {
           "title": "Din Tai Fung lunch — Taipei 101 branch if practical",
@@ -244,7 +254,8 @@
           "endDate": "2026-06-09",
           "startTime": "13:00",
           "endTime": "14:30",
-          "location": "Taipei 101 / Xinyi"
+          "location": "Taipei 101 / Xinyi",
+          "id": "act-tfufc9p5r-mptkv1jj"
         },
         {
           "title": "Raohe Night Market early dinner option",
@@ -258,7 +269,8 @@
           "endDate": "2026-06-09",
           "startTime": "17:30",
           "endTime": "19:00",
-          "notes": "Use this instead of Shilin to avoid zig-zagging."
+          "notes": "Use this instead of Shilin to avoid zig-zagging.",
+          "id": "act-wlpvop0b1-mptkv1jj"
         },
         {
           "title": "Optional fitness: skip formal workout; Elephant Mountain already covers the active hit",
@@ -274,7 +286,8 @@
           "endTime": "",
           "location": "Xinyi / Elephant Mountain",
           "done": false,
-          "notes": "Transit day with heat and airport timing; treat Elephant Mountain as the workout."
+          "notes": "Transit day with heat and airport timing; treat Elephant Mountain as the workout.",
+          "id": "act-wt7bka1ux-mptkv1jj"
         }
       ],
       "legTips": [
@@ -378,7 +391,9 @@
               "cityId": "city-vienna",
               "notes": "Print RS map and use AirPods. Stops: Opera, Café Sacher, Albertinaplatz/Albertina, Kärntner Strasse, Kaisergruft, Neuer Markt, Stephansdom/Stephansplatz, Graben, Dorotheergasse, Plague Column, St. Peter’s Church, Kohlmarkt/Demel, Michaelerplatz, Hofburg, Heldenplatz. Allow 2.5–3 hrs including photo/coffee pauses.",
               "location": "Opera to Heldenplatz",
-              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf"
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf",
+              "activityId": "act-40rvnga0o-mptkv1jn",
+              "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf"
             },
             {
               "text": "🍽 Flexible lunch/coffee stop built into the RS route — Café Sacher, Demel or Naschmarkt depending energy",
@@ -391,7 +406,8 @@
               "endTime": "14:30",
               "cityId": "city-vienna",
               "notes": "Use this as a proper pause after the audio walk rather than rushing straight to another major sight.",
-              "location": "Old town / Naschmarkt"
+              "location": "Old town / Naschmarkt",
+              "activityId": "act-aw8ks4txs-mptkv1jn"
             },
             {
               "text": "🎨 Belvedere Palace & Klimt’s The Kiss — optional if still fresh after the RS walk",
@@ -404,7 +420,8 @@
               "endTime": "17:15",
               "cityId": "city-vienna",
               "notes": "Keep this as the main optional add-on; skip if jetlag hits and just do Donaukanal/Prater instead.",
-              "location": "Belvedere"
+              "location": "Belvedere",
+              "activityId": "act-co48rh5pi-mptkv1jo"
             },
             {
               "text": "🌳 Low-key Prater / Donaukanal evening walk only if energy remains",
@@ -417,7 +434,8 @@
               "endTime": "19:15",
               "cityId": "city-vienna",
               "notes": "No need to force this after the long-haul arrival and RS walk.",
-              "location": "Prater or Donaukanal"
+              "location": "Prater or Donaukanal",
+              "activityId": "act-kl0fgnmlc-mptkv1jo"
             }
           ]
         },
@@ -448,7 +466,8 @@
               "endTime": "10:00",
               "cityId": "city-vienna",
               "notes": "Keep this light; the real Vienna hit was the RS walk on arrival day.",
-              "location": "Old town / station"
+              "location": "Old town / station",
+              "activityId": "act-oej42u76y-mptkv1jo"
             }
           ]
         }
@@ -472,7 +491,9 @@
           "status": "",
           "bookingRef": "",
           "audioTitle": "",
-          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf"
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf",
+          "id": "act-40rvnga0o-mptkv1jn",
+          "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/468/original/7a0c7deeda9285011baf225d8e276bda/map-audiotours-vienna-city-walk.pdf"
         },
         {
           "title": "🍽 Flexible lunch/coffee stop built into the RS route — Café Sacher, Demel or Naschmarkt depending energy",
@@ -488,7 +509,8 @@
           "endTime": "14:30",
           "location": "Old town / Naschmarkt",
           "done": false,
-          "notes": "Use this as a proper pause after the audio walk rather than rushing straight to another major sight."
+          "notes": "Use this as a proper pause after the audio walk rather than rushing straight to another major sight.",
+          "id": "act-aw8ks4txs-mptkv1jn"
         },
         {
           "title": "🎨 Belvedere Palace & Klimt’s The Kiss — optional if still fresh after the RS walk",
@@ -504,7 +526,8 @@
           "endTime": "17:15",
           "location": "Belvedere",
           "done": false,
-          "notes": "Keep this as the main optional add-on; skip if jetlag hits and just do Donaukanal/Prater instead."
+          "notes": "Keep this as the main optional add-on; skip if jetlag hits and just do Donaukanal/Prater instead.",
+          "id": "act-co48rh5pi-mptkv1jo"
         },
         {
           "title": "🌳 Low-key Prater / Donaukanal evening walk only if energy remains",
@@ -520,7 +543,8 @@
           "endTime": "19:15",
           "location": "Prater or Donaukanal",
           "done": false,
-          "notes": "No need to force this after the long-haul arrival and RS walk."
+          "notes": "No need to force this after the long-haul arrival and RS walk.",
+          "id": "act-kl0fgnmlc-mptkv1jo"
         },
         {
           "title": "☕ Quick Vienna coffee + station buffer before Bratislava train",
@@ -536,7 +560,8 @@
           "endTime": "10:00",
           "location": "Old town / station",
           "done": false,
-          "notes": "Keep this light; the real Vienna hit was the RS walk on arrival day."
+          "notes": "Keep this light; the real Vienna hit was the RS walk on arrival day.",
+          "id": "act-oej42u76y-mptkv1jo"
         },
         {
           "title": "Optional easy run: Prater Hauptallee or Donaukanal recovery jog",
@@ -552,7 +577,8 @@
           "endTime": "",
           "location": "Prater / Donaukanal",
           "done": false,
-          "notes": "Only do this if jetlag is kind; the Rick Steves walk is already a solid walking day."
+          "notes": "Only do this if jetlag is kind; the Rick Steves walk is already a solid walking day.",
+          "id": "act-57fgs9u6v-mptkv1jo"
         }
       ],
       "legTips": [
@@ -623,7 +649,8 @@
               "endDate": "2026-06-11",
               "startTime": "13:30",
               "endTime": "15:00",
-              "cityId": "city-bratislava"
+              "cityId": "city-bratislava",
+              "activityId": "act-jcf76rn6f-mptkv1jp"
             },
             {
               "text": "💙 Blue Church detour",
@@ -634,7 +661,8 @@
               "endDate": "2026-06-11",
               "startTime": "15:15",
               "endTime": "15:45",
-              "cityId": "city-bratislava"
+              "cityId": "city-bratislava",
+              "activityId": "act-t5ab3rnk5-mptkv1jp"
             },
             {
               "text": "🌉 Danube promenade → UFO Observation Deck sunset",
@@ -646,7 +674,8 @@
               "startTime": "17:30",
               "endTime": "19:00",
               "cityId": "city-bratislava",
-              "location": "Most SNP / Danube"
+              "location": "Most SNP / Danube",
+              "activityId": "act-dyg445z24-mptkv1jp"
             },
             {
               "text": "🍖 Kozlovna beer knuckle dinner",
@@ -657,7 +686,8 @@
               "endDate": "2026-06-11",
               "startTime": "19:15",
               "endTime": "21:00",
-              "cityId": "city-bratislava"
+              "cityId": "city-bratislava",
+              "activityId": "act-falwpkith-mptkv1jp"
             }
           ]
         },
@@ -689,7 +719,25 @@
               "startTime": "09:30",
               "endTime": "13:30",
               "cityId": "city-bratislava",
-              "location": "Devín Castle"
+              "location": "Devín Castle",
+              "activityId": "act-1zrcon6de-mptkv1jp"
+            },
+            {
+              "activityId": "act-ejech5j8t-mpv0x5sk",
+              "text": "🚌 Tour (Airbnb experiences)",
+              "cost": "0",
+              "time": "2",
+              "done": false,
+              "notes": "",
+              "location": "",
+              "status": "planned",
+              "bookingRef": "",
+              "externalLink": "",
+              "startDate": "2026-06-12",
+              "startTime": "14:00",
+              "endDate": "2026-06-12",
+              "endTime": "15:00",
+              "cityId": ""
             }
           ]
         },
@@ -719,7 +767,8 @@
               "startTime": "09:00",
               "endTime": "10:30",
               "cityId": "city-bratislava",
-              "notes": "Keep the morning simple before the 12:26 RegioJet departure."
+              "notes": "Keep the morning simple before the 12:26 RegioJet departure.",
+              "activityId": "act-t444gg5xf-mptkv1jp"
             }
           ]
         }
@@ -736,7 +785,8 @@
           "startDate": "2026-06-11",
           "endDate": "2026-06-11",
           "startTime": "13:30",
-          "endTime": "15:00"
+          "endTime": "15:00",
+          "id": "act-jcf76rn6f-mptkv1jp"
         },
         {
           "title": "Blue Church detour",
@@ -749,7 +799,8 @@
           "startDate": "2026-06-11",
           "endDate": "2026-06-11",
           "startTime": "15:15",
-          "endTime": "15:45"
+          "endTime": "15:45",
+          "id": "act-t5ab3rnk5-mptkv1jp"
         },
         {
           "title": "Danube promenade → UFO Observation Deck sunset",
@@ -763,7 +814,8 @@
           "endDate": "2026-06-11",
           "startTime": "17:30",
           "endTime": "19:00",
-          "location": "Most SNP / Danube"
+          "location": "Most SNP / Danube",
+          "id": "act-dyg445z24-mptkv1jp"
         },
         {
           "title": "Kozlovna beer knuckle dinner",
@@ -776,7 +828,8 @@
           "startDate": "2026-06-11",
           "endDate": "2026-06-11",
           "startTime": "19:15",
-          "endTime": "21:00"
+          "endTime": "21:00",
+          "id": "act-falwpkith-mptkv1jp"
         },
         {
           "title": "Devín Castle ruins + Morava/Danube riverside walk",
@@ -790,7 +843,8 @@
           "endDate": "2026-06-12",
           "startTime": "09:30",
           "endTime": "13:30",
-          "location": "Devín Castle"
+          "location": "Devín Castle",
+          "id": "act-1zrcon6de-mptkv1jp"
         },
         {
           "title": "Danube Promenade recovery run / fast flat walk",
@@ -803,7 +857,8 @@
           "startDate": "2026-06-12",
           "endDate": "2026-06-12",
           "startTime": "17:00",
-          "endTime": "18:00"
+          "endTime": "18:00",
+          "id": "act-usyxcwz7v-mptkv1jp"
         },
         {
           "title": "Easy Bratislava breakfast before Prague train",
@@ -822,7 +877,8 @@
           "startTime": "09:00",
           "endDate": "2026-06-13",
           "endTime": "10:30",
-          "cityId": ""
+          "cityId": "",
+          "id": "act-t444gg5xf-mptkv1jp"
         },
         {
           "title": "Optional run: Danube Promenade flat 5–10km",
@@ -838,7 +894,8 @@
           "endTime": "",
           "location": "Danube Promenade",
           "done": false,
-          "notes": "Great easy solo run or fast walk from the Old Town/SNP Bridge area."
+          "notes": "Great easy solo run or fast walk from the Old Town/SNP Bridge area.",
+          "id": "act-u8wxthcm3-mptkv1jp"
         },
         {
           "title": "Optional longer fitness route: Devín / Morava river path if legs feel fresh",
@@ -854,7 +911,27 @@
           "endTime": "",
           "location": "Devín / Morava",
           "done": false,
-          "notes": "Only if the Devín sightseeing day turns into a fitness outing; do not force it before Prague transfer."
+          "notes": "Only if the Devín sightseeing day turns into a fitness outing; do not force it before Prague transfer.",
+          "id": "act-p6e16ofnj-mptkv1jp"
+        },
+        {
+          "category": "tour",
+          "title": "Tour (Airbnb experiences)",
+          "estTime": "2",
+          "estCost": "0",
+          "notes": "",
+          "location": "",
+          "status": "planned",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-06-12",
+          "startDate": "2026-06-12",
+          "startTime": "14:00",
+          "endDate": "2026-06-12",
+          "endTime": "15:00",
+          "id": "act-ejech5j8t-mpv0x5sk",
+          "cityId": ""
         }
       ],
       "legTips": [
@@ -890,6 +967,12 @@
           "text": "🥩 Guláš with bread dumplings",
           "done": false,
           "cityId": "city-prague"
+        },
+        {
+          "text": "Creme de la creme ice cream",
+          "cost": "0",
+          "done": false,
+          "cityId": ""
         }
       ],
       "days": [
@@ -917,17 +1000,38 @@
           ],
           "activityItems": [
             {
-              "text": "🌙 Easy arrival preview: Old Town Square → Astronomical Clock → Charles Bridge at night",
+              "text": "🏛️ 🌙 Easy arrival preview: Old Town Square → Astronomical Clock → Charles Bridge at night — Old Town to Charles Bridge",
               "cost": "0",
               "time": "2 hrs",
               "done": false,
               "startDate": "2026-06-13",
               "endDate": "2026-06-13",
-              "startTime": "18:30",
-              "endTime": "20:30",
+              "startTime": "19:30",
+              "endTime": "21:30",
               "cityId": "city-prague",
               "notes": "Light orientation only after the train; save the proper Rick Steves audio walk for tomorrow morning.",
-              "location": "Old Town to Charles Bridge"
+              "location": "Old Town to Charles Bridge",
+              "activityId": "act-7hoxs7n6m-mptkv1jp",
+              "status": "",
+              "bookingRef": "",
+              "externalLink": ""
+            },
+            {
+              "activityId": "act-6strrssw1-mpv0yenl",
+              "text": "🏛️ Beer tour?",
+              "cost": "0",
+              "time": "1 hr",
+              "done": false,
+              "notes": "",
+              "location": "",
+              "status": "planned",
+              "bookingRef": "",
+              "externalLink": "",
+              "startDate": "2026-06-13",
+              "startTime": "18:00",
+              "endDate": "2026-06-13",
+              "endTime": "18:30",
+              "cityId": ""
             }
           ]
         },
@@ -961,7 +1065,9 @@
               "cityId": "city-prague",
               "notes": "Print RS map and use AirPods. Stops: Wenceslas Square/National Museum, Hotel Europa/Velvet Revolution, Lucerna Arcade, Franciscan Garden, Můstek, Na Příkopě, Municipal House, Powder Tower, Celetná, Old Town Square, Astronomical Clock, Karlova Street, Charles IV Square, Charles Bridge. Allow 3 hrs with coffee/photo stops.",
               "location": "Wenceslas Square to Charles Bridge",
-              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf"
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf",
+              "activityId": "act-o6taq4rkj-mptkv1jp",
+              "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf"
             },
             {
               "text": "☕ Lunch/coffee pause after the RS Prague walk",
@@ -974,7 +1080,8 @@
               "endTime": "12:15",
               "cityId": "city-prague",
               "notes": "Use this for a proper sit-down before climbing toward the Castle side.",
-              "location": "Old Town / Malá Strana"
+              "location": "Old Town / Malá Strana",
+              "activityId": "act-tl8b90j3l-mptkv1jp"
             },
             {
               "text": "🏰 Prague Castle district self-walk: Malá Strana steps → Castle courtyards → viewpoints",
@@ -987,7 +1094,8 @@
               "endTime": "16:00",
               "cityId": "city-prague",
               "notes": "This keeps the Castle side grouped after the RS walk ends at Charles Bridge.",
-              "location": "Malá Strana / Prague Castle"
+              "location": "Malá Strana / Prague Castle",
+              "activityId": "act-47xvv5ey5-mptkv1jp"
             },
             {
               "text": "🕍 Josefov Jewish Quarter or Letná beer garden/viewpoint — choose based on energy",
@@ -1000,7 +1108,8 @@
               "endTime": "18:30",
               "cityId": "city-prague",
               "notes": "Josefov is the cultural add-on; Letná is the low-effort sunset/view option.",
-              "location": "Josefov or Letná"
+              "location": "Josefov or Letná",
+              "activityId": "act-p0y1i622e-mptkv1jp"
             },
             {
               "text": "🌄 Castle district / Letná dusk viewpoint",
@@ -1013,7 +1122,8 @@
               "endTime": "20:30",
               "cityId": "city-prague",
               "notes": "Optional finish; drop this if the RS walk + Castle day is already enough.",
-              "location": "Letná / Castle view"
+              "location": "Letná / Castle view",
+              "activityId": "act-2hvh2jam1-mptkv1jp"
             }
           ]
         },
@@ -1044,14 +1154,15 @@
               "endTime": "08:15",
               "cityId": "city-prague",
               "notes": "No major activity before the 09:10 FlixBus.",
-              "location": "Near hotel / station"
+              "location": "Near hotel / station",
+              "activityId": "act-mbvesj3kd-mptkv1jp"
             }
           ]
         }
       ],
       "suggestedActivities": [
         {
-          "title": "🌙 Easy arrival preview: Old Town Square → Astronomical Clock → Charles Bridge at night",
+          "title": "🌙 Easy arrival preview: Old Town Square → Astronomical Clock → Charles Bridge at night — Old Town to Charles Bridge",
           "category": "sight",
           "estTime": "2 hrs",
           "estCost": "0",
@@ -1060,11 +1171,15 @@
           "assignedDate": "2026-06-13",
           "startDate": "2026-06-13",
           "endDate": "2026-06-13",
-          "startTime": "18:30",
-          "endTime": "20:30",
+          "startTime": "19:30",
+          "endTime": "21:30",
           "location": "Old Town to Charles Bridge",
           "done": false,
-          "notes": "Light orientation only after the train; save the proper Rick Steves audio walk for tomorrow morning."
+          "notes": "Light orientation only after the train; save the proper Rick Steves audio walk for tomorrow morning.",
+          "id": "act-7hoxs7n6m-mptkv1jp",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": ""
         },
         {
           "title": "Rick Steves Prague City Walk: Wenceslas Square → Old Town Square → Astronomical Clock → Charles Bridge — Wenceslas Square to Charles Bridge",
@@ -1084,7 +1199,9 @@
           "status": "",
           "bookingRef": "",
           "audioTitle": "",
-          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf"
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf",
+          "id": "act-o6taq4rkj-mptkv1jp",
+          "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/013/776/original/6af74b6905840dc05552e3dd935baa1e/prague-city-walk-map.pdf"
         },
         {
           "title": "☕ Lunch/coffee pause after the RS Prague walk",
@@ -1100,7 +1217,8 @@
           "endTime": "12:15",
           "location": "Old Town / Malá Strana",
           "done": false,
-          "notes": "Use this for a proper sit-down before climbing toward the Castle side."
+          "notes": "Use this for a proper sit-down before climbing toward the Castle side.",
+          "id": "act-tl8b90j3l-mptkv1jp"
         },
         {
           "title": "🏰 Prague Castle district self-walk: Malá Strana steps → Castle courtyards → viewpoints",
@@ -1116,7 +1234,8 @@
           "endTime": "16:00",
           "location": "Malá Strana / Prague Castle",
           "done": false,
-          "notes": "This keeps the Castle side grouped after the RS walk ends at Charles Bridge."
+          "notes": "This keeps the Castle side grouped after the RS walk ends at Charles Bridge.",
+          "id": "act-47xvv5ey5-mptkv1jp"
         },
         {
           "title": "🕍 Josefov Jewish Quarter or Letná beer garden/viewpoint — choose based on energy",
@@ -1132,7 +1251,8 @@
           "endTime": "18:30",
           "location": "Josefov or Letná",
           "done": false,
-          "notes": "Josefov is the cultural add-on; Letná is the low-effort sunset/view option."
+          "notes": "Josefov is the cultural add-on; Letná is the low-effort sunset/view option.",
+          "id": "act-p0y1i622e-mptkv1jp"
         },
         {
           "title": "🌄 Castle district / Letná dusk viewpoint",
@@ -1148,7 +1268,8 @@
           "endTime": "20:30",
           "location": "Letná / Castle view",
           "done": false,
-          "notes": "Optional finish; drop this if the RS walk + Castle day is already enough."
+          "notes": "Optional finish; drop this if the RS walk + Castle day is already enough.",
+          "id": "act-2hvh2jam1-mptkv1jp"
         },
         {
           "title": "☕ Early Prague coffee only before FlixBus",
@@ -1164,7 +1285,8 @@
           "endTime": "08:15",
           "location": "Near hotel / station",
           "done": false,
-          "notes": "No major activity before the 09:10 FlixBus."
+          "notes": "No major activity before the 09:10 FlixBus.",
+          "id": "act-mbvesj3kd-mptkv1jp"
         },
         {
           "title": "Optional easy run: Vltava river path before crowds",
@@ -1180,7 +1302,8 @@
           "endTime": "",
           "location": "Vltava river",
           "done": false,
-          "notes": "Best early morning; avoid a hard run before Castle stairs."
+          "notes": "Best early morning; avoid a hard run before Castle stairs.",
+          "id": "act-c2chn3f62-mptkv1jp"
         },
         {
           "title": "Optional hill hit: Malá Strana → Prague Castle steps",
@@ -1196,7 +1319,27 @@
           "endTime": "",
           "location": "Malá Strana / Castle steps",
           "done": false,
-          "notes": "Short but steep; only if you want a fitness challenge, not on tired legs."
+          "notes": "Short but steep; only if you want a fitness challenge, not on tired legs.",
+          "id": "act-9lkkf45ik-mptkv1jp"
+        },
+        {
+          "category": "sight",
+          "title": "Beer tour?",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "",
+          "location": "",
+          "status": "planned",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-13",
+          "startDate": "2026-06-13",
+          "startTime": "18:00",
+          "endDate": "2026-06-13",
+          "endTime": "18:30",
+          "id": "act-6strrssw1-mpv0yenl",
+          "cityId": ""
         }
       ],
       "legTips": [
@@ -1262,7 +1405,8 @@
               "endDate": "2026-06-15",
               "startTime": "14:00",
               "endTime": "16:00",
-              "cityId": "city-nuremberg"
+              "cityId": "city-nuremberg",
+              "activityId": "act-e14185tuq-mptkv1jq"
             },
             {
               "text": "🏘 Weissgerbergasse + city walls walk",
@@ -1273,7 +1417,8 @@
               "endDate": "2026-06-15",
               "startTime": "16:00",
               "endTime": "17:30",
-              "cityId": "city-nuremberg"
+              "cityId": "city-nuremberg",
+              "activityId": "act-gfcigd7m3-mptkv1jq"
             },
             {
               "text": "🌭 Bratwursthäusle dinner",
@@ -1284,7 +1429,8 @@
               "endDate": "2026-06-15",
               "startTime": "18:30",
               "endTime": "20:00",
-              "cityId": "city-nuremberg"
+              "cityId": "city-nuremberg",
+              "activityId": "act-s7idn6m3t-mptkv1jq"
             }
           ]
         },
@@ -1303,7 +1449,25 @@
               "cityId": "city-munich"
             }
           ],
-          "activityItems": []
+          "activityItems": [
+            {
+              "activityId": "act-h85btizc5-mptkv1jq",
+              "text": "🏃 Optional run: Wöhrder Wiese / Pegnitz riverside loop — Wöhrder Wiese / Pegnitz",
+              "cost": "0",
+              "time": "30–60 mins",
+              "done": false,
+              "notes": "Good morning option before Munich if you wake early; otherwise skip and keep the transfer easy.",
+              "location": "Wöhrder Wiese / Pegnitz",
+              "status": "",
+              "bookingRef": "",
+              "externalLink": "",
+              "startDate": "2026-06-16",
+              "startTime": "08:00",
+              "endDate": "2026-06-16",
+              "endTime": "09:00",
+              "cityId": "city-munich"
+            }
+          ]
         }
       ],
       "suggestedActivities": [
@@ -1318,7 +1482,8 @@
           "startDate": "2026-06-15",
           "endDate": "2026-06-15",
           "startTime": "14:00",
-          "endTime": "16:00"
+          "endTime": "16:00",
+          "id": "act-e14185tuq-mptkv1jq"
         },
         {
           "title": "Weissgerbergasse + city walls walk",
@@ -1331,7 +1496,8 @@
           "startDate": "2026-06-15",
           "endDate": "2026-06-15",
           "startTime": "16:00",
-          "endTime": "17:30"
+          "endTime": "17:30",
+          "id": "act-gfcigd7m3-mptkv1jq"
         },
         {
           "title": "Bratwursthäusle dinner",
@@ -1344,7 +1510,8 @@
           "startDate": "2026-06-15",
           "endDate": "2026-06-15",
           "startTime": "18:30",
-          "endTime": "20:00"
+          "endTime": "20:00",
+          "id": "act-s7idn6m3t-mptkv1jq"
         },
         {
           "title": "Wöhrder Wiese / Pegnitz riverside morning loop",
@@ -1357,23 +1524,28 @@
           "startDate": "2026-06-16",
           "endDate": "2026-06-16",
           "startTime": "07:30",
-          "endTime": "08:30"
+          "endTime": "08:30",
+          "id": "act-xz8zzgonm-mptkv1jq"
         },
         {
-          "title": "Optional run: Wöhrder Wiese / Pegnitz riverside loop",
+          "title": "Optional run: Wöhrder Wiese / Pegnitz riverside loop — Wöhrder Wiese / Pegnitz",
           "category": "fitness",
           "estTime": "30–60 mins",
           "estCost": "0",
-          "assignedDayIdx": null,
+          "assignedDayIdx": 1,
           "cityId": "city-nuremberg",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": "",
+          "assignedDate": "2026-06-16",
+          "startDate": "2026-06-16",
+          "endDate": "2026-06-16",
+          "startTime": "08:00",
+          "endTime": "09:00",
           "location": "Wöhrder Wiese / Pegnitz",
           "done": false,
-          "notes": "Good morning option before Munich if you wake early; otherwise skip and keep the transfer easy."
+          "notes": "Good morning option before Munich if you wake early; otherwise skip and keep the transfer easy.",
+          "id": "act-h85btizc5-mptkv1jq",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": ""
         }
       ],
       "legTips": [
@@ -1456,7 +1628,8 @@
               "endTime": "17:00",
               "cityId": "city-munich",
               "notes": "",
-              "location": "Conference venue"
+              "location": "Conference venue",
+              "activityId": "act-ti4r3co94-mptkv1jq"
             },
             {
               "text": "🍺 Low-effort Marienplatz / Hofbräuhaus orientation dinner",
@@ -1469,7 +1642,8 @@
               "endTime": "20:30",
               "cityId": "city-munich",
               "notes": "Keep this casual; the proper RS Munich audio walk is scheduled for the free day.",
-              "location": "Old town"
+              "location": "Old town",
+              "activityId": "act-5yj9oluvm-mptkv1jq"
             }
           ]
         },
@@ -1502,7 +1676,8 @@
               "endTime": "17:00",
               "cityId": "city-munich",
               "notes": "",
-              "location": "Conference venue"
+              "location": "Conference venue",
+              "activityId": "act-yx1y8ve30-mptkv1jq"
             },
             {
               "text": "🏄 English Garden / Eisbach surfers → Chinesischer Turm beer garden",
@@ -1515,7 +1690,8 @@
               "endTime": "20:30",
               "cityId": "city-munich",
               "notes": "Good evening cluster after sitting in sessions all day.",
-              "location": "English Garden"
+              "location": "English Garden",
+              "activityId": "act-45ic97hgi-mptkv1jq"
             }
           ]
         },
@@ -1548,7 +1724,8 @@
               "endTime": "17:00",
               "cityId": "city-munich",
               "notes": "",
-              "location": "Conference venue"
+              "location": "Conference venue",
+              "activityId": "act-78pwprxpg-mptkv1jq"
             },
             {
               "text": "🍺 Augustiner-Keller low-effort Munich evening",
@@ -1561,7 +1738,8 @@
               "endTime": "20:30",
               "cityId": "city-munich",
               "notes": "Easy beer-hall night without turning it into another big walk.",
-              "location": "Augustiner-Keller"
+              "location": "Augustiner-Keller",
+              "activityId": "act-toe7u6gck-mptkv1jq"
             }
           ]
         },
@@ -1595,7 +1773,9 @@
               "cityId": "city-munich",
               "notes": "Print RS map and use AirPods. Stops: Marienplatz, St Peter’s Church, Viktualienmarkt, Jewish Synagogue/City Museum, Asam Church, Sendlinger Strasse, Kaufingerstrasse, Frauenkirche, Marienhof, Dallmayr, Platzl, Hofbräuhaus, Maximilianstrasse, Max-Joseph-Platz, Residenz, Viscardigasse, Odeonsplatz, Hofgarten. Allow 3–3.5 hrs including lunch/beer/coffee pauses.",
               "location": "Marienplatz to Hofgarten",
-              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf"
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf",
+              "activityId": "act-kohru4tfq-mptkv1jq",
+              "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf"
             },
             {
               "text": "🍽 Lunch/beer/coffee pause built into the RS Munich route — Viktualienmarkt, Dallmayr or Hofbräuhaus",
@@ -1608,7 +1788,8 @@
               "endTime": "14:00",
               "cityId": "city-munich",
               "notes": "Treat this as part of the walk rather than a separate cross-town move.",
-              "location": "Old town"
+              "location": "Old town",
+              "activityId": "act-ij3hd8ckn-mptkv1jq"
             },
             {
               "text": "🏟 Olympiapark + BMW Welt afternoon loop",
@@ -1621,7 +1802,8 @@
               "endTime": "17:30",
               "cityId": "city-munich",
               "notes": "Keeps the afternoon in one northern cluster after the old-town RS walk.",
-              "location": "Olympiapark / BMW Welt"
+              "location": "Olympiapark / BMW Welt",
+              "activityId": "act-2fuslfchn-mptkv1jq"
             },
             {
               "text": "🌳 Optional Nymphenburg canal path or relaxed old-town dinner",
@@ -1634,7 +1816,8 @@
               "endTime": "20:30",
               "cityId": "city-munich",
               "notes": "Only do Nymphenburg if you still want more walking; otherwise keep dinner central.",
-              "location": "Nymphenburg or old town"
+              "location": "Nymphenburg or old town",
+              "activityId": "act-g9i1fopyd-mptkv1jq"
             }
           ]
         },
@@ -1665,7 +1848,8 @@
               "endTime": "10:30",
               "cityId": "city-munich",
               "notes": "Do not schedule a major sight before the 11:23 train.",
-              "location": "Near hotel / München Hbf"
+              "location": "Near hotel / München Hbf",
+              "activityId": "act-mmar17x2p-mptkv1jq"
             }
           ]
         }
@@ -1685,7 +1869,8 @@
           "endTime": "17:00",
           "location": "Conference venue",
           "done": false,
-          "notes": ""
+          "notes": "",
+          "id": "act-ti4r3co94-mptkv1jq"
         },
         {
           "title": "🍺 Low-effort Marienplatz / Hofbräuhaus orientation dinner",
@@ -1701,7 +1886,8 @@
           "endTime": "20:30",
           "location": "Old town",
           "done": false,
-          "notes": "Keep this casual; the proper RS Munich audio walk is scheduled for the free day."
+          "notes": "Keep this casual; the proper RS Munich audio walk is scheduled for the free day.",
+          "id": "act-5yj9oluvm-mptkv1jq"
         },
         {
           "title": "💼 Full conference day",
@@ -1717,7 +1903,8 @@
           "endTime": "17:00",
           "location": "Conference venue",
           "done": false,
-          "notes": ""
+          "notes": "",
+          "id": "act-yx1y8ve30-mptkv1jq"
         },
         {
           "title": "🏄 English Garden / Eisbach surfers → Chinesischer Turm beer garden",
@@ -1733,7 +1920,8 @@
           "endTime": "20:30",
           "location": "English Garden",
           "done": false,
-          "notes": "Good evening cluster after sitting in sessions all day."
+          "notes": "Good evening cluster after sitting in sessions all day.",
+          "id": "act-45ic97hgi-mptkv1jq"
         },
         {
           "title": "💼 Final conference sessions",
@@ -1749,7 +1937,8 @@
           "endTime": "17:00",
           "location": "Conference venue",
           "done": false,
-          "notes": ""
+          "notes": "",
+          "id": "act-78pwprxpg-mptkv1jq"
         },
         {
           "title": "🍺 Augustiner-Keller low-effort Munich evening",
@@ -1765,7 +1954,8 @@
           "endTime": "20:30",
           "location": "Augustiner-Keller",
           "done": false,
-          "notes": "Easy beer-hall night without turning it into another big walk."
+          "notes": "Easy beer-hall night without turning it into another big walk.",
+          "id": "act-toe7u6gck-mptkv1jq"
         },
         {
           "title": "Rick Steves Munich City Walk: Marienplatz → Viktualienmarkt → Asam Church → Dallmayr → Hofbräuhaus → Residenz → Hofgarten — Marienplatz to Hofgarten",
@@ -1785,7 +1975,9 @@
           "status": "",
           "bookingRef": "",
           "audioTitle": "",
-          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf"
+          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf",
+          "id": "act-kohru4tfq-mptkv1jq",
+          "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/004/451/original/29b2480e0a6a1e371724f8dc3f434057/map-audiotours-munich-city.pdf"
         },
         {
           "title": "🍽 Lunch/beer/coffee pause built into the RS Munich route — Viktualienmarkt, Dallmayr or Hofbräuhaus",
@@ -1801,7 +1993,8 @@
           "endTime": "14:00",
           "location": "Old town",
           "done": false,
-          "notes": "Treat this as part of the walk rather than a separate cross-town move."
+          "notes": "Treat this as part of the walk rather than a separate cross-town move.",
+          "id": "act-ij3hd8ckn-mptkv1jq"
         },
         {
           "title": "🏟 Olympiapark + BMW Welt afternoon loop",
@@ -1817,7 +2010,8 @@
           "endTime": "17:30",
           "location": "Olympiapark / BMW Welt",
           "done": false,
-          "notes": "Keeps the afternoon in one northern cluster after the old-town RS walk."
+          "notes": "Keeps the afternoon in one northern cluster after the old-town RS walk.",
+          "id": "act-2fuslfchn-mptkv1jq"
         },
         {
           "title": "🌳 Optional Nymphenburg canal path or relaxed old-town dinner",
@@ -1833,7 +2027,8 @@
           "endTime": "20:30",
           "location": "Nymphenburg or old town",
           "done": false,
-          "notes": "Only do Nymphenburg if you still want more walking; otherwise keep dinner central."
+          "notes": "Only do Nymphenburg if you still want more walking; otherwise keep dinner central.",
+          "id": "act-g9i1fopyd-mptkv1jq"
         },
         {
           "title": "☕ Munich breakfast + station buffer before Bolzano train",
@@ -1849,7 +2044,8 @@
           "endTime": "10:30",
           "location": "Near hotel / München Hbf",
           "done": false,
-          "notes": "Do not schedule a major sight before the 11:23 train."
+          "notes": "Do not schedule a major sight before the 11:23 train.",
+          "id": "act-mmar17x2p-mptkv1jq"
         },
         {
           "title": "Optional conference reset: hotel gym or 30–40 min easy jog",
@@ -1865,7 +2061,8 @@
           "endTime": "",
           "location": "Hotel gym / nearby streets",
           "done": false,
-          "notes": "Use on conference days to reset mentally; do not stack hard runs with long evenings."
+          "notes": "Use on conference days to reset mentally; do not stack hard runs with long evenings.",
+          "id": "act-j866zlp4k-mptkv1jq"
         },
         {
           "title": "Optional run: English Garden / Eisbach circuit",
@@ -1881,7 +2078,8 @@
           "endTime": "",
           "location": "English Garden",
           "done": false,
-          "notes": "Excellent green-space run if staying reasonably central."
+          "notes": "Excellent green-space run if staying reasonably central.",
+          "id": "act-tj5cf0gxu-mptkv1jq"
         }
       ],
       "legTips": [
@@ -1962,7 +2160,8 @@
               "endDate": "2026-06-20",
               "startTime": "16:15",
               "endTime": "17:30",
-              "cityId": "city-bolzano"
+              "cityId": "city-bolzano",
+              "activityId": "act-liv9ict6y-mptkv1jr"
             },
             {
               "text": "🚡 Renon cable car late afternoon / evening views",
@@ -1974,7 +2173,8 @@
               "startTime": "17:45",
               "endTime": "20:00",
               "cityId": "city-bolzano",
-              "notes": "Realistic Dolomites-feel option without burning the next travel day."
+              "notes": "Realistic Dolomites-feel option without burning the next travel day.",
+              "activityId": "act-z36bd63pr-mptkv1jr"
             }
           ]
         },
@@ -2003,7 +2203,8 @@
               "endDate": "2026-06-21",
               "startTime": "10:00",
               "endTime": "11:30",
-              "cityId": "city-bolzano"
+              "cityId": "city-bolzano",
+              "activityId": "act-lcesjsr3j-mptkv1jr"
             },
             {
               "text": "🍷 Adige riverside / Lauben lunch before Verona train",
@@ -2014,7 +2215,8 @@
               "endDate": "2026-06-21",
               "startTime": "11:45",
               "endTime": "13:30",
-              "cityId": "city-bolzano"
+              "cityId": "city-bolzano",
+              "activityId": "act-cz75uuq39-mptkv1jr"
             }
           ]
         }
@@ -2031,7 +2233,8 @@
           "startDate": "2026-06-20",
           "endDate": "2026-06-20",
           "startTime": "16:15",
-          "endTime": "17:30"
+          "endTime": "17:30",
+          "id": "act-liv9ict6y-mptkv1jr"
         },
         {
           "title": "Renon cable car late afternoon / evening views",
@@ -2045,7 +2248,8 @@
           "endDate": "2026-06-20",
           "startTime": "17:45",
           "endTime": "20:00",
-          "notes": "Realistic Dolomites-feel option without burning the next travel day."
+          "notes": "Realistic Dolomites-feel option without burning the next travel day.",
+          "id": "act-z36bd63pr-mptkv1jr"
         },
         {
           "title": "Ötzi the Iceman Museum",
@@ -2058,7 +2262,8 @@
           "startDate": "2026-06-21",
           "endDate": "2026-06-21",
           "startTime": "10:00",
-          "endTime": "11:30"
+          "endTime": "11:30",
+          "id": "act-lcesjsr3j-mptkv1jr"
         },
         {
           "title": "Adige riverside / Lauben lunch before Verona train",
@@ -2071,7 +2276,8 @@
           "startDate": "2026-06-21",
           "endDate": "2026-06-21",
           "startTime": "11:45",
-          "endTime": "13:30"
+          "endTime": "13:30",
+          "id": "act-cz75uuq39-mptkv1jr"
         },
         {
           "title": "Seceda cable car - only if adding another Bolzano/Dolomites night",
@@ -2085,7 +2291,8 @@
           "endDate": "",
           "startTime": "",
           "endTime": "",
-          "notes": "Not scheduled because current train to Verona makes this unrealistic."
+          "notes": "Not scheduled because current train to Verona makes this unrealistic.",
+          "id": "act-zthl11k5w-mptkv1jr"
         },
         {
           "title": "Alpe di Siusi - only if adding another Bolzano/Dolomites night",
@@ -2099,7 +2306,8 @@
           "endDate": "",
           "startTime": "",
           "endTime": "",
-          "notes": "Not scheduled on current one-night Bolzano stop."
+          "notes": "Not scheduled on current one-night Bolzano stop.",
+          "id": "act-11vm38ztt-mptkv1jr"
         },
         {
           "title": "Optional run: Adige riverside path north toward vineyards",
@@ -2115,7 +2323,8 @@
           "endTime": "",
           "location": "Adige river",
           "done": false,
-          "notes": "Scenic and flat; better than forcing a Dolomites mission on a one-night stop."
+          "notes": "Scenic and flat; better than forcing a Dolomites mission on a one-night stop.",
+          "id": "act-smkuvi1ax-mptkv1jr"
         }
       ],
       "legTips": [
@@ -2179,7 +2388,8 @@
               "endDate": "2026-06-21",
               "startTime": "17:30",
               "endTime": "19:00",
-              "cityId": "city-verona"
+              "cityId": "city-verona",
+              "activityId": "act-68spfgdwm-mptkv1jr"
             },
             {
               "text": "🌉 Castelvecchio Bridge sunset walk",
@@ -2190,7 +2400,8 @@
               "endDate": "2026-06-21",
               "startTime": "19:15",
               "endTime": "20:15",
-              "cityId": "city-verona"
+              "cityId": "city-verona",
+              "activityId": "act-nmyu8e5yx-mptkv1jr"
             }
           ]
         },
@@ -2219,7 +2430,8 @@
               "endDate": "2026-06-22",
               "startTime": "08:30",
               "endTime": "10:30",
-              "cityId": "city-verona"
+              "cityId": "city-verona",
+              "activityId": "act-p6y0913rf-mptkv1jr"
             }
           ]
         }
@@ -2236,7 +2448,8 @@
           "startDate": "2026-06-21",
           "endDate": "2026-06-21",
           "startTime": "17:30",
-          "endTime": "19:00"
+          "endTime": "19:00",
+          "id": "act-68spfgdwm-mptkv1jr"
         },
         {
           "title": "Castelvecchio Bridge sunset walk",
@@ -2249,7 +2462,8 @@
           "startDate": "2026-06-21",
           "endDate": "2026-06-21",
           "startTime": "19:15",
-          "endTime": "20:15"
+          "endTime": "20:15",
+          "id": "act-nmyu8e5yx-mptkv1jr"
         },
         {
           "title": "Early Verona walk: Juliet balcony photo stop + riverside",
@@ -2262,7 +2476,8 @@
           "startDate": "2026-06-22",
           "endDate": "2026-06-22",
           "startTime": "08:30",
-          "endTime": "10:30"
+          "endTime": "10:30",
+          "id": "act-p6y0913rf-mptkv1jr"
         },
         {
           "title": "Optional run/walk: Adige river + Castelvecchio loop",
@@ -2278,7 +2493,8 @@
           "endTime": "",
           "location": "Adige / Castelvecchio",
           "done": false,
-          "notes": "Easy way to get movement without leaving the historic centre."
+          "notes": "Easy way to get movement without leaving the historic centre.",
+          "id": "act-ry5ao0x8k-mptkv1jr"
         }
       ],
       "legTips": [
@@ -2340,41 +2556,27 @@
               "status": "",
               "bookingRef": "",
               "audioTitle": "",
-              "audioRef": ""
-            },
-            {
-              "text": "🍽️ 🍹 Navigli aperitivo evening — Navigli",
-              "cost": "0",
-              "time": "2.5 hrs",
-              "done": false,
-              "notes": "Separate evening cluster; easy tram/metro from central Milan.",
-              "location": "Navigli",
-              "status": "",
-              "bookingRef": "",
-              "audioTitle": "",
               "audioRef": "",
-              "startDate": "2026-06-22",
-              "startTime": "18:30",
-              "endDate": "2026-06-22",
-              "endTime": "21:00",
-              "cityId": ""
+              "activityId": "act-7hd8kgt54-mptkv1jr"
             },
             {
-              "text": "🏃 Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala — Piazza del Duomo to La Scala",
+              "activityId": "act-dgtloy8pk-mptns7ij",
+              "text": "🚌 TO BOOK — Dinner and Drinks",
               "cost": "0",
-              "time": "3 hrs",
+              "time": "3",
               "done": false,
-              "notes": "Print RS map and use AirPods. Stops: Piazza del Duomo, Duomo exterior, side view, interior nave/right aisle/more sights, rooftop, Galleria Vittorio Emanuele II, Piazza della Scala, La Scala Opera House. Allow 3 hrs if doing interior + rooftop slowly.",
-              "location": "Piazza del Duomo to La Scala",
-              "status": "",
+              "notes": "",
+              "location": "Dinner and Drinks",
+              "status": "planned",
               "bookingRef": "",
               "audioTitle": "",
-              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf",
+              "audioRef": "https://www.airbnb.com.au/experiences/6104268?adults=1&checkin=2026-06-22&experience_time_of_day%5B0%5D=afternoon&experience_time_of_day%5B1%5D=evening&location=Milan%2C%20Metropolitan%20City%20of%20Milan%2C%20Italy&currentTab=experience_tab&federatedSearchId=feecb416-bc63-4639-8818-7530c8a0f4cc&searchId=b9c2a69c-d883-4560-ae0a-f3a7b41f46fb&sectionId=b7a2e396-a439-477a-abb5-5c46240f98d2",
               "startDate": "2026-06-22",
-              "startTime": "16:00",
+              "startTime": "17:30",
               "endDate": "2026-06-22",
-              "endTime": "19:00",
-              "cityId": ""
+              "endTime": "20:30",
+              "cityId": "",
+              "externalLink": "https://www.airbnb.com.au/experiences/6104268?adults=1&checkin=2026-06-22&experience_time_of_day%5B0%5D=afternoon&experience_time_of_day%5B1%5D=evening&location=Milan%2C%20Metropolitan%20City%20of%20Milan%2C%20Italy&currentTab=experience_tab&federatedSearchId=feecb416-bc63-4639-8818-7530c8a0f4cc&searchId=b9c2a69c-d883-4560-ae0a-f3a7b41f46fb&sectionId=b7a2e396-a439-477a-abb5-5c46240f98d2"
             }
           ]
         },
@@ -2395,20 +2597,6 @@
           ],
           "activityItems": [
             {
-              "text": "🎧 Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala",
-              "cost": "0",
-              "time": "3 hrs",
-              "done": false,
-              "startDate": "2026-06-23",
-              "endDate": "2026-06-23",
-              "startTime": "09:00",
-              "endTime": "12:00",
-              "cityId": "city-milan",
-              "notes": "Print RS map and use AirPods. Stops: Piazza del Duomo, Duomo exterior, side view, interior nave/right aisle/more sights, rooftop, Galleria Vittorio Emanuele II, Piazza della Scala, La Scala Opera House. Allow 3 hrs if doing interior + rooftop slowly.",
-              "location": "Piazza del Duomo to La Scala",
-              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf"
-            },
-            {
               "text": "🍽 Lunch/coffee pause after the RS Duomo walk",
               "cost": "0",
               "time": "1 hr 15 mins",
@@ -2419,7 +2607,8 @@
               "endTime": "13:15",
               "cityId": "city-milan",
               "notes": "Good moment to reassess whether you want more museums or a lighter afternoon.",
-              "location": "Duomo / Brera"
+              "location": "Duomo / Brera",
+              "activityId": "act-kh7v7vb16-mptkv1jr"
             },
             {
               "text": "🏰 Sforzesco Castle → Parco Sempione → Arco della Pace",
@@ -2432,7 +2621,8 @@
               "endTime": "16:30",
               "cityId": "city-milan",
               "notes": "This is the natural next cluster after Duomo/La Scala/Brera.",
-              "location": "Sforzesco / Sempione"
+              "location": "Sforzesco / Sempione",
+              "activityId": "act-2wkvfgyxk-mptkv1jr"
             },
             {
               "text": "🍹 Navigli aperitivo evening",
@@ -2445,9 +2635,11 @@
               "endTime": "21:00",
               "cityId": "city-milan",
               "notes": "Separate evening cluster; easy tram/metro from central Milan.",
-              "location": "Navigli"
+              "location": "Navigli",
+              "activityId": "act-g5jztw947-mptkv1jr"
             },
             {
+              "activityId": "act-imfi1ytnb-mptkv1jr",
               "text": "🏛️ 🎨 The Last Supper timed entry — Santa Maria delle Grazie",
               "cost": "0",
               "time": "1 hr",
@@ -2459,10 +2651,29 @@
               "audioTitle": "",
               "audioRef": "",
               "startDate": "2026-06-23",
-              "startTime": "08:30",
+              "startTime": "16:45",
               "endDate": "2026-06-23",
-              "endTime": "09:30",
+              "endTime": "17:45",
               "cityId": ""
+            },
+            {
+              "activityId": "act-daxj36m3e-mptkv1jr",
+              "text": "🏛️ Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala — Piazza del Duomo to La Scala",
+              "cost": "0",
+              "time": "3 hrs",
+              "done": false,
+              "notes": "Print RS map and use AirPods. Stops: Piazza del Duomo, Duomo exterior, side view, interior nave/right aisle/more sights, rooftop, Galleria Vittorio Emanuele II, Piazza della Scala, La Scala Opera House. Allow 3 hrs if doing interior + rooftop slowly.",
+              "location": "Piazza del Duomo to La Scala",
+              "status": "",
+              "bookingRef": "",
+              "audioTitle": "",
+              "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf",
+              "startDate": "2026-06-23",
+              "startTime": "",
+              "endDate": "2026-06-23",
+              "endTime": "",
+              "cityId": "",
+              "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf"
             }
           ]
         },
@@ -2483,19 +2694,6 @@
           ],
           "activityItems": [
             {
-              "text": "🎨 The Last Supper timed entry — priority booking, exact slot may move",
-              "cost": "0",
-              "time": "1 hr",
-              "done": false,
-              "startDate": "2026-06-24",
-              "endDate": "2026-06-24",
-              "startTime": "08:30",
-              "endTime": "09:30",
-              "cityId": "city-milan",
-              "notes": "Book this as the Milan priority. If ticket availability forces a different slot, move it to 23 or 25 June and keep Cremona as the flexible day trip.",
-              "location": "Santa Maria delle Grazie"
-            },
-            {
               "text": "🚆 Cremona day trip: Duomo → Torrazzo → violin heritage → relaxed piazza lunch",
               "cost": "0",
               "time": "8 hrs",
@@ -2506,7 +2704,8 @@
               "endTime": "18:30",
               "cityId": "city-milan",
               "notes": "Good solo day trip from Milan with a more unusual music/history angle; keep it slower if the Last Supper slot lands later.",
-              "location": "Cremona"
+              "location": "Cremona",
+              "activityId": "act-xrc03nl0g-mptkv1jr"
             }
           ]
         },
@@ -2537,7 +2736,8 @@
               "endTime": "10:30",
               "cityId": "city-milan",
               "notes": "No major paid activity before the 12:05 EuroCity to Zurich.",
-              "location": "Near hotel / Milano Centrale"
+              "location": "Near hotel / Milano Centrale",
+              "activityId": "act-j0gufnzf4-mptkv1jr"
             }
           ]
         }
@@ -2561,27 +2761,8 @@
           "status": "",
           "bookingRef": "",
           "audioTitle": "",
-          "audioRef": ""
-        },
-        {
-          "title": "Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala — Piazza del Duomo to La Scala",
-          "category": "fitness",
-          "estTime": "3 hrs",
-          "estCost": "0",
-          "assignedDayIdx": 0,
-          "cityId": "city-milan",
-          "assignedDate": "2026-06-22",
-          "startDate": "2026-06-22",
-          "endDate": "2026-06-22",
-          "startTime": "16:00",
-          "endTime": "19:00",
-          "location": "Piazza del Duomo to La Scala",
-          "done": false,
-          "notes": "Print RS map and use AirPods. Stops: Piazza del Duomo, Duomo exterior, side view, interior nave/right aisle/more sights, rooftop, Galleria Vittorio Emanuele II, Piazza della Scala, La Scala Opera House. Allow 3 hrs if doing interior + rooftop slowly.",
-          "status": "",
-          "bookingRef": "",
-          "audioTitle": "",
-          "audioRef": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf"
+          "audioRef": "",
+          "id": "act-7hd8kgt54-mptkv1jr"
         },
         {
           "title": "🍽 Lunch/coffee pause after the RS Duomo walk",
@@ -2597,7 +2778,8 @@
           "endTime": "13:15",
           "location": "Duomo / Brera",
           "done": false,
-          "notes": "Good moment to reassess whether you want more museums or a lighter afternoon."
+          "notes": "Good moment to reassess whether you want more museums or a lighter afternoon.",
+          "id": "act-kh7v7vb16-mptkv1jr"
         },
         {
           "title": "🏰 Sforzesco Castle → Parco Sempione → Arco della Pace",
@@ -2613,27 +2795,29 @@
           "endTime": "16:30",
           "location": "Sforzesco / Sempione",
           "done": false,
-          "notes": "This is the natural next cluster after Duomo/La Scala/Brera."
+          "notes": "This is the natural next cluster after Duomo/La Scala/Brera.",
+          "id": "act-2wkvfgyxk-mptkv1jr"
         },
         {
           "title": "🍹 Navigli aperitivo evening — Navigli",
           "category": "food",
           "estTime": "2.5 hrs",
           "estCost": "0",
-          "assignedDayIdx": 0,
+          "assignedDayIdx": null,
           "cityId": "city-milan",
-          "assignedDate": "2026-06-22",
-          "startDate": "2026-06-22",
-          "endDate": "2026-06-22",
-          "startTime": "18:30",
-          "endTime": "21:00",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
           "location": "Navigli",
           "done": false,
           "notes": "Separate evening cluster; easy tram/metro from central Milan.",
           "status": "",
           "bookingRef": "",
           "audioTitle": "",
-          "audioRef": ""
+          "audioRef": "",
+          "id": "act-qjupjvc3l-mptkv1jr"
         },
         {
           "title": "☕ Easy Milan coffee/walk before Zurich train",
@@ -2649,7 +2833,8 @@
           "endTime": "10:30",
           "location": "Near hotel / Milano Centrale",
           "done": false,
-          "notes": "No major paid activity before the 12:05 EuroCity to Zurich."
+          "notes": "No major paid activity before the 12:05 EuroCity to Zurich.",
+          "id": "act-j0gufnzf4-mptkv1jr"
         },
         {
           "title": "🎨 The Last Supper timed entry — Santa Maria delle Grazie",
@@ -2661,15 +2846,16 @@
           "assignedDate": "2026-06-23",
           "startDate": "2026-06-23",
           "endDate": "2026-06-23",
-          "startTime": "08:30",
-          "endTime": "09:30",
+          "startTime": "16:45",
+          "endTime": "17:45",
           "location": "Santa Maria delle Grazie",
           "done": false,
           "notes": "Book this as the Milan priority. If ticket availability forces a different slot, move it to 23 or 25 June and keep Cremona as the flexible day trip.",
           "status": "",
           "bookingRef": "",
           "audioTitle": "",
-          "audioRef": ""
+          "audioRef": "",
+          "id": "act-imfi1ytnb-mptkv1jr"
         },
         {
           "title": "🚆 Cremona day trip: Duomo → Torrazzo → violin heritage → relaxed piazza lunch",
@@ -2685,7 +2871,8 @@
           "endTime": "18:30",
           "location": "Cremona",
           "done": false,
-          "notes": "Good solo day trip from Milan with a more unusual music/history angle; keep it slower if the Last Supper slot lands later."
+          "notes": "Good solo day trip from Milan with a more unusual music/history angle; keep it slower if the Last Supper slot lands later.",
+          "id": "act-xrc03nl0g-mptkv1jr"
         },
         {
           "title": "Optional run: Parco Sempione easy loop",
@@ -2701,7 +2888,8 @@
           "endTime": "",
           "location": "Parco Sempione",
           "done": false,
-          "notes": "Best Milan outdoor run option around the Sforzesco/park area; otherwise use hotel gym."
+          "notes": "Best Milan outdoor run option around the Sforzesco/park area; otherwise use hotel gym.",
+          "id": "act-tioeil0ad-mptkv1jr"
         },
         {
           "title": "Optional gym: Milan hotel gym instead of street run",
@@ -2717,7 +2905,8 @@
           "endTime": "",
           "location": "Hotel gym",
           "done": false,
-          "notes": "Use this if heat/traffic makes outdoor running unappealing."
+          "notes": "Use this if heat/traffic makes outdoor running unappealing.",
+          "id": "act-1vpk23jwi-mptkv1jr"
         },
         {
           "title": "Navigli aperitivo evening",
@@ -2736,10 +2925,11 @@
           "startTime": "18:30",
           "endDate": "2026-06-23",
           "endTime": "21:00",
-          "cityId": ""
+          "cityId": "",
+          "id": "act-g5jztw947-mptkv1jr"
         },
         {
-          "title": "Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala",
+          "title": "Rick Steves Milan Duomo Neighborhood: Duomo exterior/interior/rooftop → Galleria → La Scala — Piazza del Duomo to La Scala",
           "category": "sight",
           "estTime": "3 hrs",
           "estCost": "0",
@@ -2752,29 +2942,33 @@
           "assignedDayIdx": 1,
           "assignedDate": "2026-06-23",
           "startDate": "2026-06-23",
-          "startTime": "09:00",
+          "startTime": "",
           "endDate": "2026-06-23",
-          "endTime": "12:00",
-          "cityId": ""
+          "endTime": "",
+          "cityId": "",
+          "id": "act-daxj36m3e-mptkv1jr",
+          "externalLink": "https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/023/488/original/ab26e4982716c289f480c2fa53b37e60/italy-milan-duomo-neighborhood-map.pdf"
         },
         {
-          "title": "The Last Supper timed entry",
-          "category": "sight",
-          "estTime": "1 hr",
+          "category": "tour",
+          "title": "TO BOOK — Dinner and Drinks",
+          "estTime": "3",
           "estCost": "0",
-          "notes": "Book this as the Milan priority. If ticket availability forces a different slot, move it to 23 or 25 June and keep Cremona as the flexible day trip.",
-          "location": "Santa Maria delle Grazie",
-          "status": "",
+          "notes": "",
+          "location": "Dinner and Drinks",
+          "status": "planned",
           "bookingRef": "",
           "audioTitle": "",
-          "audioRef": "",
-          "assignedDayIdx": 2,
-          "assignedDate": "2026-06-24",
-          "startDate": "2026-06-24",
-          "startTime": "08:30",
-          "endDate": "2026-06-24",
-          "endTime": "09:30",
-          "cityId": ""
+          "audioRef": "https://www.airbnb.com.au/experiences/6104268?adults=1&checkin=2026-06-22&experience_time_of_day%5B0%5D=afternoon&experience_time_of_day%5B1%5D=evening&location=Milan%2C%20Metropolitan%20City%20of%20Milan%2C%20Italy&currentTab=experience_tab&federatedSearchId=feecb416-bc63-4639-8818-7530c8a0f4cc&searchId=b9c2a69c-d883-4560-ae0a-f3a7b41f46fb&sectionId=b7a2e396-a439-477a-abb5-5c46240f98d2",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-06-22",
+          "startDate": "2026-06-22",
+          "startTime": "17:30",
+          "endDate": "2026-06-22",
+          "endTime": "20:30",
+          "id": "act-dgtloy8pk-mptns7ij",
+          "cityId": "",
+          "externalLink": "https://www.airbnb.com.au/experiences/6104268?adults=1&checkin=2026-06-22&experience_time_of_day%5B0%5D=afternoon&experience_time_of_day%5B1%5D=evening&location=Milan%2C%20Metropolitan%20City%20of%20Milan%2C%20Italy&currentTab=experience_tab&federatedSearchId=feecb416-bc63-4639-8818-7530c8a0f4cc&searchId=b9c2a69c-d883-4560-ae0a-f3a7b41f46fb&sectionId=b7a2e396-a439-477a-abb5-5c46240f98d2"
         }
       ],
       "legTips": [
@@ -2849,7 +3043,8 @@
               "endDate": "2026-06-25",
               "startTime": "16:30",
               "endTime": "20:30",
-              "cityId": "city-zurich"
+              "cityId": "city-zurich",
+              "activityId": "act-cfxptmsla-mptkv1ju"
             }
           ]
         },
@@ -2881,7 +3076,8 @@
               "startTime": "09:00",
               "endTime": "11:30",
               "cityId": "city-zurich",
-              "notes": "Keep this compact and airport-safe; skip Rhine Falls on this schedule."
+              "notes": "Keep this compact and airport-safe; skip Rhine Falls on this schedule.",
+              "activityId": "act-74p2amgos-mptkv1ju"
             },
             {
               "text": "🍫 Confiserie Sprüngli / station-area buffer",
@@ -2892,7 +3088,8 @@
               "endDate": "2026-06-26",
               "startTime": "12:00",
               "endTime": "13:00",
-              "cityId": "city-zurich"
+              "cityId": "city-zurich",
+              "activityId": "act-8zrgrs3va-mptkv1ju"
             }
           ]
         }
@@ -2909,7 +3106,8 @@
           "startDate": "2026-06-25",
           "endDate": "2026-06-25",
           "startTime": "16:30",
-          "endTime": "20:30"
+          "endTime": "20:30",
+          "id": "act-cfxptmsla-mptkv1ju"
         },
         {
           "title": "Lake Zurich promenade or Uetliberg morning option",
@@ -2923,7 +3121,8 @@
           "endDate": "2026-06-26",
           "startTime": "09:00",
           "endTime": "11:30",
-          "notes": "Keep this compact and airport-safe; skip Rhine Falls on this schedule."
+          "notes": "Keep this compact and airport-safe; skip Rhine Falls on this schedule.",
+          "id": "act-74p2amgos-mptkv1ju"
         },
         {
           "title": "Confiserie Sprüngli / station-area buffer",
@@ -2936,7 +3135,8 @@
           "startDate": "2026-06-26",
           "endDate": "2026-06-26",
           "startTime": "12:00",
-          "endTime": "13:00"
+          "endTime": "13:00",
+          "id": "act-8zrgrs3va-mptkv1ju"
         },
         {
           "title": "Rhine Falls day trip - not scheduled on current flight day",
@@ -2950,7 +3150,8 @@
           "endDate": "",
           "startTime": "",
           "endTime": "",
-          "notes": "Possible but too transit-heavy before the Zurich → London flight."
+          "notes": "Possible but too transit-heavy before the Zurich → London flight.",
+          "id": "act-t5aixfvkt-mptkv1ju"
         },
         {
           "title": "Optional run: Lake Zurich promenade / Limmat easy loop",
@@ -2966,7 +3167,8 @@
           "endTime": "",
           "location": "Lake Zurich / Limmat",
           "done": false,
-          "notes": "Probably one of the best short run cities on the trip; keep airport timing in mind."
+          "notes": "Probably one of the best short run cities on the trip; keep airport timing in mind.",
+          "id": "act-ijzfmc4w3-mptkv1ju"
         }
       ],
       "legTips": [
@@ -3085,7 +3287,8 @@
               "startTime": "17:30",
               "endTime": "20:00",
               "cityId": "city-bangkok",
-              "notes": "If tired after arrival, swap for Chinatown or a simple local dinner."
+              "notes": "If tired after arrival, swap for Chinatown or a simple local dinner.",
+              "activityId": "act-p3zadiazi-mptkv1ju"
             }
           ]
         },
@@ -3108,7 +3311,7 @@
           ],
           "activityItems": [
             {
-              "text": "🏃 👨‍👩‍👧‍👦 Family arrives + quick ibis room bag drop / refresh — ibis Styles Bangkok Sukhumvit Phra Khanong",
+              "text": "🗓️ 👨‍👩‍👧‍👦 Family arrives + quick ibis room bag drop / refresh — ibis Styles Bangkok Sukhumvit Phra Khanong",
               "cost": "0",
               "time": "1 hr",
               "done": false,
@@ -3121,8 +3324,8 @@
               "location": "ibis Styles Bangkok Sukhumvit Phra Khanong",
               "status": "",
               "bookingRef": "",
-              "audioTitle": "",
-              "audioRef": ""
+              "activityId": "act-90ave4t32-mptkv1ju",
+              "externalLink": ""
             },
             {
               "text": "🏛️ 🛍 Chatuchak Weekend Market with the family — Chatuchak Weekend Market",
@@ -3139,7 +3342,8 @@
               "status": "",
               "bookingRef": "",
               "audioTitle": "",
-              "audioRef": ""
+              "audioRef": "",
+              "activityId": "act-8iu8113es-mptkv1ju"
             },
             {
               "text": "🛕 Optional Big Buddha / Wat Paknam photo stop OR simple family dinner",
@@ -3152,7 +3356,8 @@
               "endTime": "20:30",
               "cityId": "city-bangkok",
               "notes": "Only do this if traffic/energy is good. It is not naturally close to Chatuchak, so a simple dinner may be the smarter call after the market.",
-              "location": "Wat Paknam / dinner nearby"
+              "location": "Wat Paknam / dinner nearby",
+              "activityId": "act-ntf731or9-mptkv1ju"
             }
           ]
         },
@@ -3173,16 +3378,21 @@
           ],
           "activityItems": [
             {
-              "text": "✈️ Early Bangkok → Koh Samui flight only",
+              "text": "🗓️ ️ Early Bangkok → Koh Samui flight only",
               "cost": "0",
               "time": "travel",
               "done": false,
               "startDate": "2026-06-29",
               "endDate": "2026-06-29",
               "startTime": "04:30",
-              "endTime": "07:10",
+              "endTime": "04:45",
               "cityId": "city-bangkok",
-              "notes": "No real sightseeing this morning."
+              "notes": "No real sightseeing this morning.",
+              "activityId": "act-g8lmaza00-mptkv1ju",
+              "location": "",
+              "status": "",
+              "bookingRef": "",
+              "externalLink": ""
             }
           ]
         }
@@ -3200,7 +3410,8 @@
           "endDate": "2026-06-27",
           "startTime": "17:30",
           "endTime": "20:00",
-          "notes": "If tired after arrival, swap for Chinatown or a simple local dinner."
+          "notes": "If tired after arrival, swap for Chinatown or a simple local dinner.",
+          "id": "act-p3zadiazi-mptkv1ju"
         },
         {
           "title": "Grand Palace - optional only if cutting something else",
@@ -3214,7 +3425,8 @@
           "endDate": "",
           "startTime": "",
           "endTime": "",
-          "notes": "Not scheduled to avoid heat/crowds/time pressure."
+          "notes": "Not scheduled to avoid heat/crowds/time pressure.",
+          "id": "act-42m00nsu7-mptkv1ju"
         },
         {
           "title": "Benchakitti Park loop - newly expanded, beautiful elevated walkways",
@@ -3227,30 +3439,31 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-jor1iyyxt-mptkv1ju"
         },
         {
           "title": "️ Early Bangkok → Koh Samui flight only",
-          "category": "sight",
+          "category": "event",
           "estTime": "travel",
           "estCost": "0",
           "notes": "No real sightseeing this morning.",
           "location": "",
           "status": "",
           "bookingRef": "",
-          "audioTitle": "",
-          "audioRef": "",
           "assignedDayIdx": 2,
           "assignedDate": "2026-06-29",
           "startDate": "2026-06-29",
           "startTime": "04:30",
           "endDate": "2026-06-29",
-          "endTime": "07:10",
-          "cityId": ""
+          "endTime": "04:45",
+          "cityId": "",
+          "id": "act-g8lmaza00-mptkv1ju",
+          "externalLink": ""
         },
         {
           "title": "👨‍👩‍👧‍👦 Family arrives + quick ibis room bag drop / refresh — ibis Styles Bangkok Sukhumvit Phra Khanong",
-          "category": "fitness",
+          "category": "event",
           "estTime": "1 hr",
           "estCost": "0",
           "assignedDayIdx": 1,
@@ -3265,8 +3478,8 @@
           "notes": "Use the ibis room as the easy reset point so everyone can dump bags, freshen up, and head out light.",
           "status": "",
           "bookingRef": "",
-          "audioTitle": "",
-          "audioRef": ""
+          "id": "act-90ave4t32-mptkv1ju",
+          "externalLink": ""
         },
         {
           "title": "🛍 Chatuchak Weekend Market with the family — Chatuchak Weekend Market",
@@ -3286,7 +3499,8 @@
           "status": "",
           "bookingRef": "",
           "audioTitle": "",
-          "audioRef": ""
+          "audioRef": "",
+          "id": "act-8iu8113es-mptkv1ju"
         },
         {
           "title": "🛕 Optional Big Buddha / Wat Paknam photo stop OR simple family dinner",
@@ -3302,7 +3516,8 @@
           "endTime": "20:30",
           "location": "Wat Paknam / dinner nearby",
           "done": false,
-          "notes": "Only do this if traffic/energy is good. It is not naturally close to Chatuchak, so a simple dinner may be the smarter call after the market."
+          "notes": "Only do this if traffic/energy is good. It is not naturally close to Chatuchak, so a simple dinner may be the smarter call after the market.",
+          "id": "act-ntf731or9-mptkv1ju"
         },
         {
           "title": "Optional fitness: hotel treadmill/gym only — avoid street running in heat/traffic",
@@ -3318,7 +3533,8 @@
           "endTime": "",
           "location": "Hotel gym",
           "done": false,
-          "notes": "Bangkok is better as a gym/treadmill city unless you are out very early."
+          "notes": "Bangkok is better as a gym/treadmill city unless you are out very early.",
+          "id": "act-iyefw58ra-mptkv1ju"
         }
       ],
       "legTips": [
@@ -3424,7 +3640,8 @@
               "startTime": "10:30",
               "endTime": "16:00",
               "cityId": "city-koh-samui",
-              "notes": "Stay northeast/Chaweng side to minimise travel after the early flight."
+              "notes": "Stay northeast/Chaweng side to minimise travel after the early flight.",
+              "activityId": "act-zof716aqr-mptkv1ju"
             }
           ]
         },
@@ -3455,7 +3672,8 @@
               "endDate": "2026-06-30",
               "startTime": "07:30",
               "endTime": "17:30",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "activityId": "act-u5p3x3ls7-mptkv1ju"
             }
           ]
         },
@@ -3487,7 +3705,8 @@
               "startTime": "09:30",
               "endTime": "15:00",
               "cityId": "city-koh-samui",
-              "notes": "Deliberately easier day before another boat/snorkel mission."
+              "notes": "Deliberately easier day before another boat/snorkel mission.",
+              "activityId": "act-vblmuqykl-mptkv1ju"
             },
             {
               "text": "🌅 Sunset drinks on the beach",
@@ -3498,7 +3717,8 @@
               "endDate": "2026-07-01",
               "startTime": "17:30",
               "endTime": "19:00",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "activityId": "act-itihfwoqr-mptkv1ju"
             }
           ]
         },
@@ -3530,7 +3750,8 @@
               "startTime": "07:30",
               "endTime": "17:30",
               "cityId": "city-koh-samui",
-              "location": "Koh Tao / Shark Bay"
+              "location": "Koh Tao / Shark Bay",
+              "activityId": "act-az568zf15-mptkv1ju"
             }
           ]
         },
@@ -3563,7 +3784,8 @@
               "endTime": "13:30",
               "cityId": "city-koh-samui",
               "notes": "Keeps energy for the Friday night market.",
-              "location": "choose one main activity"
+              "location": "choose one main activity",
+              "activityId": "act-aamnnlqu4-mptkv1ju"
             },
             {
               "text": "🛍 Fisherman's Village Friday Night Market",
@@ -3574,7 +3796,8 @@
               "endDate": "2026-07-03",
               "startTime": "17:30",
               "endTime": "21:00",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "activityId": "act-9rz9qtq8l-mptkv1ju"
             }
           ]
         },
@@ -3606,7 +3829,8 @@
               "startTime": "09:00",
               "endTime": "14:00",
               "cityId": "city-koh-samui",
-              "notes": "Better adventure-day fit than Chaweng Lake kayaking."
+              "notes": "Better adventure-day fit than Chaweng Lake kayaking.",
+              "activityId": "act-byc6k1ny1-mptkv1ju"
             }
           ]
         },
@@ -3637,7 +3861,8 @@
               "endDate": "2026-07-05",
               "startTime": "09:00",
               "endTime": "15:00",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "activityId": "act-8eipfonls-mptkv1ju"
             }
           ]
         },
@@ -3669,7 +3894,8 @@
               "startTime": "10:00",
               "endTime": "19:00",
               "cityId": "city-koh-samui",
-              "notes": "Keep the last full day flexible for weather, favourites, or rest."
+              "notes": "Keep the last full day flexible for weather, favourites, or rest.",
+              "activityId": "act-vfaxh7gmx-mptkv1ju"
             }
           ]
         },
@@ -3698,7 +3924,8 @@
               "endDate": "2026-07-07",
               "startTime": "07:00",
               "endTime": "08:00",
-              "cityId": "city-koh-samui"
+              "cityId": "city-koh-samui",
+              "activityId": "act-1oob9rl8q-mptkv1ju"
             }
           ]
         }
@@ -3716,7 +3943,8 @@
           "endDate": "2026-06-29",
           "startTime": "10:30",
           "endTime": "16:00",
-          "notes": "Stay northeast/Chaweng side to minimise travel after the early flight."
+          "notes": "Stay northeast/Chaweng side to minimise travel after the early flight.",
+          "id": "act-zof716aqr-mptkv1ju"
         },
         {
           "title": "Ang Thong Marine Park full day",
@@ -3729,7 +3957,8 @@
           "startDate": "2026-06-30",
           "endDate": "2026-06-30",
           "startTime": "07:30",
-          "endTime": "17:30"
+          "endTime": "17:30",
+          "id": "act-u5p3x3ls7-mptkv1ju"
         },
         {
           "title": "Recovery beach / resort day after Ang Thong",
@@ -3743,7 +3972,8 @@
           "endDate": "2026-07-01",
           "startTime": "09:30",
           "endTime": "15:00",
-          "notes": "Deliberately easier day before another boat/snorkel mission."
+          "notes": "Deliberately easier day before another boat/snorkel mission.",
+          "id": "act-vblmuqykl-mptkv1ju"
         },
         {
           "title": "Sunset drinks on the beach",
@@ -3756,7 +3986,8 @@
           "startDate": "2026-07-01",
           "endDate": "2026-07-01",
           "startTime": "17:30",
-          "endTime": "19:00"
+          "endTime": "19:00",
+          "id": "act-itihfwoqr-mptkv1ju"
         },
         {
           "title": "Koh Tao snorkelling — Shark Bay / Mango Viewpoint option",
@@ -3770,7 +4001,8 @@
           "endDate": "2026-07-02",
           "startTime": "07:30",
           "endTime": "17:30",
-          "location": "Koh Tao / Shark Bay"
+          "location": "Koh Tao / Shark Bay",
+          "id": "act-az568zf15-mptkv1ju"
         },
         {
           "title": "Thai cooking class or elephant sanctuary — choose one main activity",
@@ -3785,7 +4017,8 @@
           "startTime": "09:30",
           "endTime": "13:30",
           "notes": "Keeps energy for the Friday night market.",
-          "location": "choose one main activity"
+          "location": "choose one main activity",
+          "id": "act-aamnnlqu4-mptkv1ju"
         },
         {
           "title": "Fisherman's Village Friday Night Market",
@@ -3798,7 +4031,8 @@
           "startDate": "2026-07-03",
           "endDate": "2026-07-03",
           "startTime": "17:30",
-          "endTime": "21:00"
+          "endTime": "21:00",
+          "id": "act-9rz9qtq8l-mptkv1ju"
         },
         {
           "title": "Na Muang / Hin Lad waterfall inland adventure",
@@ -3812,7 +4046,8 @@
           "endDate": "2026-07-04",
           "startTime": "09:00",
           "endTime": "14:00",
-          "notes": "Better adventure-day fit than Chaweng Lake kayaking."
+          "notes": "Better adventure-day fit than Chaweng Lake kayaking.",
+          "id": "act-byc6k1ny1-mptkv1ju"
         },
         {
           "title": "Silver Beach morning → Lamai → Hin Ta & Hin Yai Rocks",
@@ -3825,7 +4060,8 @@
           "startDate": "2026-07-05",
           "endDate": "2026-07-05",
           "startTime": "09:00",
-          "endTime": "15:00"
+          "endTime": "15:00",
+          "id": "act-8eipfonls-mptkv1ju"
         },
         {
           "title": "Flexible final day: massage, pool, west-coast sunset",
@@ -3839,7 +4075,8 @@
           "endDate": "2026-07-06",
           "startTime": "10:00",
           "endTime": "19:00",
-          "notes": "Keep the last full day flexible for weather, favourites, or rest."
+          "notes": "Keep the last full day flexible for weather, favourites, or rest.",
+          "id": "act-vfaxh7gmx-mptkv1ju"
         },
         {
           "title": "Chaweng Beach early morning run - hard sand near the water, 5-6km loop",
@@ -3852,7 +4089,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-j52rf5e7z-mptkv1ju"
         },
         {
           "title": "Hin Lad Waterfall trail - 2km jungle trek each way, wear actual shoes",
@@ -3865,7 +4103,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-pg36nurs4-mptkv1ju"
         },
         {
           "title": "️ Koh Samui → Bangkok departure day",
@@ -3884,7 +4123,8 @@
           "startTime": "07:00",
           "endDate": "2026-07-07",
           "endTime": "08:00",
-          "cityId": ""
+          "cityId": "",
+          "id": "act-1oob9rl8q-mptkv1ju"
         },
         {
           "title": "Optional early run: Chaweng or Lamai beach before heat",
@@ -3900,7 +4140,8 @@
           "endTime": "",
           "location": "Chaweng / Lamai",
           "done": false,
-          "notes": "Early only; then switch to holiday/family mode."
+          "notes": "Early only; then switch to holiday/family mode.",
+          "id": "act-3jmmm2byx-mptkv1ju"
         },
         {
           "title": "Optional resort gym / swim recovery session",
@@ -3916,7 +4157,8 @@
           "endTime": "",
           "location": "Hotel / beach",
           "done": false,
-          "notes": "Good between Ang Thong and Koh Tao or on the flexible final day."
+          "notes": "Good between Ang Thong and Koh Tao or on the flexible final day.",
+          "id": "act-ujhsswjzz-mptkv1ju"
         }
       ],
       "legTips": [
@@ -4050,7 +4292,8 @@
               "startDate": "2026-07-08",
               "endDate": "2026-07-08",
               "startTime": "",
-              "endTime": ""
+              "endTime": "",
+              "activityId": "act-685x0po4b-mptkv1jv"
             }
           ]
         }
@@ -4067,7 +4310,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-7dwv6v1nm-mptkv1jv"
         },
         {
           "title": "☕ Your own coffee machine",
@@ -4080,7 +4324,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-f7e2xbo7x-mptkv1jv"
         },
         {
           "title": "BKK layover: CentralFestival mall connected to airport via Skytrain - great food court",
@@ -4093,7 +4338,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-3jziwkxo7-mptkv1jv"
         },
         {
           "title": "Col. Germ lounge",
@@ -4106,7 +4352,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-dgbx7ddbf-mptkv1jv"
         },
         {
           "title": "Download & back up all photos",
@@ -4119,7 +4366,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "id": "act-tlg9qobp1-mptkv1jv"
         },
         {
           "title": "USM 07:50 → BKK 08:55",
@@ -4134,7 +4382,8 @@
           "startTime": "",
           "endDate": "2026-07-07",
           "endTime": "",
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "id": "act-ad3ys1cfc-mptkv1jv"
         },
         {
           "title": "Welcome back to Brisbane!",
@@ -4149,7 +4398,8 @@
           "startTime": "",
           "endDate": "2026-07-08",
           "endTime": "",
-          "cityId": "city-bangkok"
+          "cityId": "city-bangkok",
+          "id": "act-685x0po4b-mptkv1jv"
         }
       ],
       "legTips": [
@@ -5152,39 +5402,6 @@
       "_inferredFromLegId": "leg-17799748470573440"
     },
     {
-      "id": "journey_1779884038859_11oncs",
-      "journeyId": "jid_1779884009081_34sqva",
-      "journeyName": "Koh Samui → Bangkok",
-      "legId": "city-brisbane-finish",
-      "dayDate": "2026-07-07",
-      "fromLocation": "Koh Samui",
-      "toLocation": "Bangkok",
-      "fromCityId": "city-koh-samui",
-      "toCityId": "city-bangkok",
-      "departureDate": "2026-07-07",
-      "departureTime": "07:00",
-      "arrivalDate": "2026-07-07",
-      "arrivalTime": "08:00",
-      "transportType": "flight",
-      "provider": "Bangkok Air",
-      "routeCode": "",
-      "status": "confirmed",
-      "cost": "400",
-      "bookingReference": "",
-      "isMultiLeg": false,
-      "segmentOrder": 1,
-      "notes": "",
-      "fromAddress": "",
-      "toAddress": "",
-      "legs": [],
-      "startDate": "2026-07-07",
-      "endDate": "2026-07-07",
-      "startTime": "07:00",
-      "endTime": "08:00",
-      "_inferredToLegId": "leg-17799748470573440",
-      "_inferredFromLegId": "samui"
-    },
-    {
       "id": "journey_1779880837955_pe6x8j",
       "journeyId": "jid_1779880787528_xsth24",
       "journeyName": "Verona → Milan",
@@ -5348,6 +5565,39 @@
       "endTime": "16:40",
       "_inferredToLegId": "verona",
       "_inferredFromLegId": "bolzano"
+    },
+    {
+      "id": "journey_1780306828115_pzzfha",
+      "journeyId": "jid_1779884009081_34sqva",
+      "journeyName": "Koh Samui → Bangkok",
+      "legId": "samui",
+      "dayDate": "2026-07-07",
+      "fromLocation": "Koh Samui",
+      "toLocation": "Bangkok",
+      "fromCityId": "city-koh-samui",
+      "toCityId": "city-bangkok",
+      "departureDate": "2026-07-07",
+      "departureTime": "07:50",
+      "arrivalDate": "2026-07-07",
+      "arrivalTime": "08:55",
+      "transportType": "flight",
+      "provider": "Bangkok Air",
+      "routeCode": "",
+      "status": "confirmed",
+      "cost": "400",
+      "bookingReference": "",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "notes": "",
+      "fromAddress": "",
+      "toAddress": "",
+      "legs": [],
+      "startDate": "2026-07-07",
+      "endDate": "2026-07-07",
+      "startTime": "07:50",
+      "endTime": "08:55",
+      "_inferredToLegId": "leg-17799748470573440",
+      "_inferredFromLegId": "samui"
     }
   ],
   "stays": [
@@ -5427,11 +5677,11 @@
       "bookingRef": "QJZDHQGF",
       "totalCost": "73.75",
       "notes": "Steinbuehler Strasse 2 - 90443 NUREMBERG - Germany",
-      "checkInTime": "",
+      "checkInTime": "13:00",
       "checkOutTime": "",
       "startDate": "2026-06-15",
       "endDate": "2026-06-16",
-      "startTime": "",
+      "startTime": "13:00",
       "endTime": "",
       "location": "",
       "_inferredLegId": "nuremberg"
@@ -5527,7 +5777,7 @@
       "checkIn": "2026-06-25",
       "checkOut": "2026-06-26",
       "nights": 1,
-      "status": "planned",
+      "status": "confirmed",
       "provider": "",
       "bookingRef": "",
       "totalCost": "0",
@@ -5554,11 +5804,11 @@
       "totalCost": "217.60",
       "notes": "1122 Sukhumvit Road, Phra Khanong Khlong Toei, . - 10110 BANGKOK - Thailand",
       "checkInTime": "",
-      "checkOutTime": "",
+      "checkOutTime": "04:30",
       "startDate": "2026-06-27",
       "endDate": "2026-06-29",
       "startTime": "",
-      "endTime": "",
+      "endTime": "04:30",
       "location": "",
       "_inferredLegId": "bangkok"
     },

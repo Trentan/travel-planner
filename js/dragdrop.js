@@ -35,6 +35,8 @@ function handleDrop(e, targetLegIdx, targetDayIdx) {
     const dayLabel = targetDay ? `${targetDay.day} ${targetDay.date}` : 'selected day';
     showActivityAssignFeedback(`Assigned to ${dayLabel}`);
    }
+  } else if (typeof showActivityAssignFeedback === 'function') {
+   showActivityAssignFeedback(assignSuggestedActivityToDay.lastError || 'Could not place this activity on that day.');
   }
  }
 }
