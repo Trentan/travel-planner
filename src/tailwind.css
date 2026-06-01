@@ -3831,6 +3831,10 @@
     @apply mb-1 text-[0.82rem] font-extrabold uppercase tracking-[0.06em] text-slate-600;
   }
 
+  .activity-assign-dialog-feedback {
+    @apply rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900;
+  }
+
   .activity-assign-days-scroll {
     max-height: calc(92vh - 300px);
     overflow: auto;

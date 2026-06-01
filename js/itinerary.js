@@ -88,10 +88,7 @@ function getActivityDisplayTitle(text) {
   const split = typeof _splitActivityTitle === 'function'
     ? _splitActivityTitle(text)
     : { title: text, location: '' };
-  const title = typeof stripLeadingActivityEmojiText === 'function'
-    ? stripLeadingActivityEmojiText(split.title)
-    : String(split.title || '').trim();
-  return { ...split, title };
+  return { ...split, title: String(split.title || '').trim() };
 }
 
 function focusCompactInlineEditable(selector) {
