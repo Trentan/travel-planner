@@ -336,8 +336,8 @@ async function testTouchAssignSmoke() {
   assert(state(context).itinerary[targetLegIdx].suggestedActivities[activityIdx].assignedDayIdx === 0, 'Touch assign smoke: day button should assign the activity');
   assert(state(context).itinerary[targetLegIdx].days[0].activityItems.some(item => String(item.text || '').includes('Sunset pier walk')), 'Touch assign smoke: assigned activity should land in the day list');
   assert(
-    state(context).itinerary[targetLegIdx].days[0].activityItems.some(item => String(item.text || '').startsWith(context.getActivityEmoji('sight'))),
-    'Touch assign smoke: assigned activity should keep its category emoji prefix'
+    state(context).itinerary[targetLegIdx].days[0].activityItems.every(item => !String(item.text || '').startsWith(context.getActivityEmoji('sight'))),
+    'Touch assign smoke: assigned activity text should not store a category emoji prefix'
   );
 
   context.openActivityAssignModal(targetLegIdx, activityIdx);

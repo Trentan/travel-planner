@@ -65,9 +65,9 @@ function deleteLegTip(legIdx, tipIdx) { appData[legIdx].legTips.splice(tipIdx, 1
 
 function getSuggestedActivityDayText(activity) {
   const title = String(activity?.title || '').trim();
-  const emoji = typeof getActivityEmoji === 'function' ? getActivityEmoji(activity?.category) : '';
-  if (!emoji || !title) return title;
-  return title.startsWith(emoji) ? title : `${emoji} ${title}`;
+  return typeof stripLeadingActivityEmojiText === 'function'
+    ? stripLeadingActivityEmojiText(title)
+    : title;
 }
 
 function getComparisonString(str) {
