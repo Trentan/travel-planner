@@ -70,6 +70,26 @@ async function run() {
     await importFixture(page);
     await seedSchedulingScenario(page);
 
+    const emojiDialogValue = await page.evaluate(() => {
+      const day = appData[0].days[0];
+      day.activityItems.push({
+        text: '🎧 Hauptmarkt walk',
+        time: '45 min',
+        cost: '0',
+        done: false
+      });
+      const itemIdx = day.activityItems.length - 1;
+      openEditDayActivityModal(0, 0, itemIdx);
+      return document.getElementById('activityTitle')?.value || '';
+    });
+    assert.strictEqual(
+      emojiDialogValue,
+      '🎧 Hauptmarkt walk',
+      'Day activity edit dialog should preserve authored emoji in Description'
+    );
+    await page.evaluate(() => document.getElementById('activity-assign-modal')?.remove());
+    await page.waitForSelector('#activity-assign-modal', { state: 'detached' });
+
     await page.evaluate(() => window.openActivityAssignModal(0, 0));
     await page.waitForSelector('#activity-assign-modal', { state: 'visible' });
     await page.locator('input[name="activityAssignScheduleMode"][value="suggested"]').check();

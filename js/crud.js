@@ -251,7 +251,7 @@ function _splitActivityTitle(title) {
   return { title: raw, location: '' };
 }
 
-function openActivityModalUnified(legIdx, activityIdx = null) {
+function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
   const isEditing = activityIdx !== null && activityIdx !== undefined && activityIdx !== -1;
   const leg = appData[legIdx];
   if (!leg) return;
@@ -271,7 +271,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;'));
-  const defaults = _splitActivityTitle(activity?.title || '');
+  const titleSource = options.titleOverride !== undefined ? options.titleOverride : activity?.title;
+  const defaults = _splitActivityTitle(titleSource || '');
 
   const currentDayLabel = activity && activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined && leg.days[activity.assignedDayIdx]
     ? `Day ${leg.days[activity.assignedDayIdx].day} ${leg.days[activity.assignedDayIdx].date}`
@@ -916,8 +917,8 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
   });
 }
 
-function _openActivityModal(legIdx, activityIdx = null) {
-  return openActivityModalUnified(legIdx, activityIdx);
+function _openActivityModal(legIdx, activityIdx = null, options = {}) {
+  return openActivityModalUnified(legIdx, activityIdx, options);
 }
 
 function addActivity(legIdx) {
@@ -1011,7 +1012,7 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
   }
 
   if (activityIdx !== undefined && activityIdx !== -1) {
-    _openActivityModal(legIdx, activityIdx);
+    _openActivityModal(legIdx, activityIdx, { titleOverride: itemText });
   } else {
     // Phase 4: Auto-create a matching suggested activity entry and open it!
     let category = 'sight';
@@ -1025,8 +1026,7 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
     else if (/attraction|park|ride/i.test(text)) category = 'attraction';
 
     const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(text) : { title: text, location: '' };
-    const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
-    const cleanTitle = split.title.replace(emojiPattern, '').trim();
+    const cleanTitle = String(split.title || '').trim();
     const cleanLocation = item.location || split.location || '';
     if (cleanLocation && !item.location) {
       item.location = cleanLocation;
