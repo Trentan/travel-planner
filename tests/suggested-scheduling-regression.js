@@ -215,6 +215,44 @@ async function run() {
       'true',
       'Toggling an inline timeline activity should preserve the selected global timeline view'
     );
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.evaluate(() => {
+      document.body.classList.add('mobile-app-mode');
+      window.openActivityAssignModal(0, 0);
+    });
+    await page.waitForSelector('#activity-assign-modal', { state: 'visible' });
+    await page.locator('#activity-assign-modal input[name="activityAssignScheduleMode"][value="suggested"]').check();
+    const mobileSuggestedLayout = await page.evaluate(() => {
+      const dayWrap = document.querySelector('.activity-assign-days-wrap')?.getBoundingClientRect();
+      const firstDay = document.querySelector('.activity-assign-day')?.getBoundingClientRect();
+      const footer = document.querySelector('.activity-assign-footer')?.getBoundingClientRect();
+      const timeRow = document.querySelector('.activity-assign-time-row')?.getBoundingClientRect();
+      return {
+        scrollWidth: document.body.scrollWidth,
+        viewportWidth: window.innerWidth,
+        dayWrapTop: dayWrap?.top || 0,
+        firstDayTop: firstDay?.top || 0,
+        footerTop: footer?.top || 0,
+        timeRowVisible: !!timeRow && timeRow.height > 1
+      };
+    });
+    assert(mobileSuggestedLayout.scrollWidth <= mobileSuggestedLayout.viewportWidth, 'Mobile schedule dialog should not overflow horizontally');
+    assert(mobileSuggestedLayout.dayWrapTop < mobileSuggestedLayout.footerTop, 'Mobile schedule dialog should expose the day picker before sticky actions');
+    assert(mobileSuggestedLayout.firstDayTop < mobileSuggestedLayout.footerTop, 'Mobile schedule dialog should expose a suggested slot before sticky actions');
+    assert.strictEqual(mobileSuggestedLayout.timeRowVisible, false, 'Mobile Suggested mode should hide fixed-time selects');
+    await page.locator('#activity-assign-modal input[name="activityAssignScheduleMode"][value="scheduled"]').check();
+    assert.strictEqual(
+      await page.evaluate(() => {
+        const row = document.querySelector('.activity-assign-time-row')?.getBoundingClientRect();
+        return !!row && row.height > 1;
+      }),
+      true,
+      'Mobile Fixed time mode should reveal start/end selects'
+    );
+    await page.locator('#activity-assign-modal .modal-close').click();
+    await page.waitForSelector('#activity-assign-modal', { state: 'detached' });
+
     console.log('Suggested scheduling regression passed');
   } finally {
     await browser.close();

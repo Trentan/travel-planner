@@ -345,7 +345,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
         <div class="activity-assign-layout">
           <!-- Left Panel -->
           <div class="activity-assign-summary activity-assign-summary-layout">
-            <div class="activity-assign-grid activity-assign-grid-equal" style="grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div class="activity-assign-grid activity-assign-primary-grid">
               <div class="ai-form-group">
                 <label>Category</label>
                 <select id="activityCategory" class="form-control form-control--compact">
@@ -355,6 +355,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
                   <option value="wellness" ${activity?.category === 'wellness' ? 'selected' : ''}>🧘 Wellness</option>
                   <option value="food" ${activity?.category === 'food' ? 'selected' : ''}>🍽️ Food</option>
                   <option value="tour" ${activity?.category === 'tour' ? 'selected' : ''}>🚌 Tour</option>
+                  <option value="event" ${activity?.category === 'event' ? 'selected' : ''}>🗓️ Event</option>
                   <option value="audioTour" ${activity?.category === 'audioTour' ? 'selected' : ''}>🎧 Audio Tour</option>
                 </select>
               </div>
@@ -374,7 +375,7 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
               </div>
             </div>
 
-            <div class="activity-assign-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div class="activity-assign-grid activity-assign-detail-grid">
               <div class="ai-form-group">
                 <label>Location</label>
                 <input type="text" id="activityLocation" class="form-control form-control--compact" placeholder="e.g., Central Park" value="${html(activity?.location || defaults.location || '')}">
@@ -387,20 +388,13 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
                 <label>Notes</label>
                 <input type="text" id="activityNotes" class="form-control form-control--compact" placeholder="e.g., Book in advance" value="${html(activity?.notes || '')}">
               </div>
-            </div>
-
-            <div class="activity-assign-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-              <div class="ai-form-group">
-                <label>Audio Tour Title</label>
-                <input type="text" id="activityAudioTitle" class="form-control form-control--compact" placeholder="e.g., Rick Steves walking tour" value="${html(activity?.audioTitle || '')}">
-              </div>
-              <div class="ai-form-group">
-                <label>Audio Tour Link / Ref</label>
-                <input type="text" id="activityAudioRef" class="form-control form-control--compact" placeholder="App, URL, file, or reference" value="${html(activity?.audioRef || activity?.audioUrl || '')}">
+              <div class="ai-form-group activity-external-link-field">
+                <label>External Link / Ref</label>
+                <input type="text" id="activityExternalLink" class="form-control form-control--compact" placeholder="URL, app link, invite, or reference" value="${html(activity?.externalLink || activity?.audioRef || activity?.audioUrl || '')}">
               </div>
             </div>
 
-            <div class="activity-assign-grid activity-assign-grid-equal">
+            <div class="activity-assign-grid activity-assign-estimate-grid">
               <div class="ai-form-group">
                 <label>Estimated Time</label>
                 <input type="text" id="activityTime" class="form-control form-control--compact" placeholder="e.g., 1 hr" value="${html(activity?.estTime || '1 hr')}">
@@ -428,34 +422,34 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
                   <span>Fixed time</span>
                 </label>
               </div>
-              <div class="activity-assign-time-row" style="display: flex; gap: 16px; align-items: center; margin-top: 10px;">
+              <div class="activity-assign-time-row">
                 <input type="text" id="activityAssignStartTime" value="${html(preferredStart)}" style="width: 1px; height: 1px; opacity: 0.01; position: absolute; border: 0; padding: 0; z-index: -1; pointer-events: none;">
                 <input type="text" id="activityAssignEndTime" value="${html(preferredEnd)}" style="width: 1px; height: 1px; opacity: 0.01; position: absolute; border: 0; padding: 0; z-index: -1; pointer-events: none;">
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                  <span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted, #7f8c8d);">Start Time</span>
-                  <div style="display: flex; gap: 6px;">
-                    <select id="activityStartHour" class="form-control form-control--compact" style="width: 70px;">
+                <div class="activity-assign-time-group">
+                  <span>Start Time</span>
+                  <div class="activity-assign-time-selects">
+                    <select id="activityStartHour" class="form-control form-control--compact">
                       ${['12','01','02','03','04','05','06','07','08','09','10','11'].map(h => `<option value="${h}" ${startParts.hour === h ? 'selected' : ''}>${h}</option>`).join('')}
                     </select>
-                    <select id="activityStartMinute" class="form-control form-control--compact" style="width: 70px;">
+                    <select id="activityStartMinute" class="form-control form-control--compact">
                       ${['00','15','30','45'].map(m => `<option value="${m}" ${startParts.minute === m ? 'selected' : ''}>${m}</option>`).join('')}
                     </select>
-                    <select id="activityStartAmpm" class="form-control form-control--compact" style="width: 75px;">
+                    <select id="activityStartAmpm" class="form-control form-control--compact">
                       <option value="AM" ${startParts.ampm === 'AM' ? 'selected' : ''}>AM</option>
                       <option value="PM" ${startParts.ampm === 'PM' ? 'selected' : ''}>PM</option>
                     </select>
                   </div>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                  <span style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted, #7f8c8d);">End Time</span>
-                  <div style="display: flex; gap: 6px;">
-                    <select id="activityEndHour" class="form-control form-control--compact" style="width: 70px;">
+                <div class="activity-assign-time-group">
+                  <span>End Time</span>
+                  <div class="activity-assign-time-selects">
+                    <select id="activityEndHour" class="form-control form-control--compact">
                       ${['12','01','02','03','04','05','06','07','08','09','10','11'].map(h => `<option value="${h}" ${endParts.hour === h ? 'selected' : ''}>${h}</option>`).join('')}
                     </select>
-                    <select id="activityEndMinute" class="form-control form-control--compact" style="width: 70px;">
+                    <select id="activityEndMinute" class="form-control form-control--compact">
                       ${['00','15','30','45'].map(m => `<option value="${m}" ${endParts.minute === m ? 'selected' : ''}>${m}</option>`).join('')}
                     </select>
-                    <select id="activityEndAmpm" class="form-control form-control--compact" style="width: 75px;">
+                    <select id="activityEndAmpm" class="form-control form-control--compact">
                       <option value="AM" ${endParts.ampm === 'AM' ? 'selected' : ''}>AM</option>
                       <option value="PM" ${endParts.ampm === 'PM' ? 'selected' : ''}>PM</option>
                     </select>
@@ -697,14 +691,13 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
     const notes = document.getElementById('activityNotes').value.trim();
     const status = document.getElementById('activityStatus').value || '';
     const bookingRef = document.getElementById('activityBookingRef').value.trim();
-    const audioTitle = document.getElementById('activityAudioTitle')?.value.trim() || '';
-    const audioRef = document.getElementById('activityAudioRef')?.value.trim() || '';
+    const externalLink = document.getElementById('activityExternalLink')?.value.trim() || '';
     if (!title) {
       alert('Please enter a description');
       return null;
     }
     const fullTitle = location ? `${title} — ${location}` : title;
-    return { category, title: fullTitle, estTime, estCost, notes, location, status, bookingRef, audioTitle, audioRef };
+    return { category, title: fullTitle, estTime, estCost, notes, location, status, bookingRef, externalLink };
   };
 
   modal.querySelectorAll('[data-day-index]').forEach(button => {
@@ -741,8 +734,10 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
         target.location = formData.location;
         target.status = formData.status;
         target.bookingRef = formData.bookingRef;
-        target.audioTitle = formData.audioTitle;
-        target.audioRef = formData.audioRef;
+        target.externalLink = formData.externalLink;
+        delete target.audioTitle;
+        delete target.audioRef;
+        delete target.audioUrl;
       }
 
       const assigned = assignSuggestedActivityToDay(legIdx, targetIdx, legIdx, targetDayIdx, {
@@ -777,8 +772,10 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       target.location = formData.location;
       target.status = formData.status;
       target.bookingRef = formData.bookingRef;
-      target.audioTitle = formData.audioTitle;
-      target.audioRef = formData.audioRef;
+      target.externalLink = formData.externalLink;
+      delete target.audioTitle;
+      delete target.audioRef;
+      delete target.audioUrl;
 
       const cleared = clearAssignedSuggestedActivityFromDay(legIdx, activityIdx, originalMatchTexts);
       if (!cleared) return;
@@ -827,8 +824,10 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
       target.location = formData.location;
       target.status = formData.status;
       target.bookingRef = formData.bookingRef;
-      target.audioTitle = formData.audioTitle;
-      target.audioRef = formData.audioRef;
+      target.externalLink = formData.externalLink;
+      delete target.audioTitle;
+      delete target.audioRef;
+      delete target.audioUrl;
 
       if (target.assignedDayIdx !== null && target.assignedDayIdx !== undefined) {
         const day = leg.days[target.assignedDayIdx];
@@ -854,8 +853,10 @@ function openActivityModalUnified(legIdx, activityIdx = null) {
               item.location = formData.location;
               item.status = formData.status;
               item.bookingRef = formData.bookingRef;
-              item.audioTitle = formData.audioTitle;
-              item.audioRef = formData.audioRef;
+              item.externalLink = formData.externalLink;
+              delete item.audioTitle;
+              delete item.audioRef;
+              delete item.audioUrl;
               applyActivityScheduleFields(item, day, datedSchedule);
             }
           });
@@ -994,6 +995,7 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
     if (/food|restaurant|eat|dinner|lunch|breakfast|cafe/i.test(text)) category = 'food';
     else if (/run|fitness|jog|workout|gym/i.test(text)) category = 'fitness';
     else if (/wellness|yoga|spa|massage/i.test(text)) category = 'wellness';
+    else if (/event|meet|meeting|family|catchup|catch-up|appointment|reservation|date|hookup/i.test(text)) category = 'event';
     else if (/audio|podcast|self-guided|self guided/i.test(text)) category = 'audioTour';
     else if (/tour|guide|bus/i.test(text)) category = 'tour';
     else if (/attraction|park|ride/i.test(text)) category = 'attraction';
@@ -1626,8 +1628,7 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
       location: activity.location || '',
       status: activity.status || '',
       bookingRef: activity.bookingRef || '',
-      audioTitle: activity.audioTitle || '',
-      audioRef: activity.audioRef || ''
+      externalLink: activity.externalLink || activity.audioRef || activity.audioUrl || ''
     };
     applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
     targetDay.activityItems.push(targetItem);
@@ -1637,8 +1638,10 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
     targetItem.location = activity.location || '';
     targetItem.status = activity.status || '';
     targetItem.bookingRef = activity.bookingRef || '';
-    targetItem.audioTitle = activity.audioTitle || '';
-    targetItem.audioRef = activity.audioRef || '';
+    targetItem.externalLink = activity.externalLink || activity.audioRef || activity.audioUrl || '';
+    delete targetItem.audioTitle;
+    delete targetItem.audioRef;
+    delete targetItem.audioUrl;
     applyActivityScheduleFields(targetItem, targetDay, datedSchedule);
   }
 

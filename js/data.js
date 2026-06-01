@@ -2943,15 +2943,10 @@ function normalizeTripLegsData(legs) {
             item.bookingRef = act.bookingRef;
           }
 
-          if (item.audioTitle && !act.audioTitle) {
-            act.audioTitle = item.audioTitle;
-          } else if (act.audioTitle && !item.audioTitle) {
-            item.audioTitle = act.audioTitle;
-          }
-          if (item.audioRef && !act.audioRef) {
-            act.audioRef = item.audioRef;
-          } else if ((act.audioRef || act.audioUrl) && !item.audioRef) {
-            item.audioRef = act.audioRef || act.audioUrl;
+          if ((item.externalLink || item.audioRef || item.audioUrl) && !act.externalLink) {
+            act.externalLink = item.externalLink || item.audioRef || item.audioUrl;
+          } else if ((act.externalLink || act.audioRef || act.audioUrl) && !item.externalLink) {
+            item.externalLink = act.externalLink || act.audioRef || act.audioUrl;
           }
           
           usedSuggestionIndices.add(matchIdx);
@@ -2961,6 +2956,7 @@ function normalizeTripLegsData(legs) {
           if (/food|restaurant|eat|dinner|lunch|breakfast|cafe/i.test(text)) category = 'food';
           else if (/run|fitness|jog|workout|gym/i.test(text)) category = 'fitness';
           else if (/wellness|yoga|spa|massage/i.test(text)) category = 'wellness';
+          else if (/event|meet|meeting|family|catchup|catch-up|appointment|reservation|date|hookup/i.test(text)) category = 'event';
           else if (/tour|guide|bus/i.test(text)) category = 'tour';
           else if (/attraction|park|ride/i.test(text)) category = 'attraction';
 
@@ -2987,8 +2983,7 @@ function normalizeTripLegsData(legs) {
             location: resolvedLoc,
             status: item.status || '',
             bookingRef: item.bookingRef || '',
-            audioTitle: item.audioTitle || '',
-            audioRef: item.audioRef || '',
+            externalLink: item.externalLink || item.audioRef || item.audioUrl || '',
             assignedDayIdx: dayIdx,
             assignedDate: day.date || '',
             startDate: item.startDate || day.date || '',
@@ -3024,8 +3019,7 @@ function normalizeTripLegsData(legs) {
       if ((!existing.location || existing.location === '') && item.location) existing.location = item.location;
       if ((!existing.time || existing.time === '1 hr') && item.time) existing.time = item.time;
       if ((!existing.cost || existing.cost === '0') && item.cost) existing.cost = item.cost;
-      if ((!existing.audioTitle || existing.audioTitle === '') && item.audioTitle) existing.audioTitle = item.audioTitle;
-      if ((!existing.audioRef || existing.audioRef === '') && item.audioRef) existing.audioRef = item.audioRef;
+      if ((!existing.externalLink || existing.externalLink === '') && (item.externalLink || item.audioRef || item.audioUrl)) existing.externalLink = item.externalLink || item.audioRef || item.audioUrl;
       if ((existing.startTime || '') === '' && item.startTime) existing.startTime = item.startTime;
           if ((existing.endTime || '') === '' && item.endTime) existing.endTime = item.endTime;
         });
@@ -3064,8 +3058,7 @@ function normalizeTripLegsData(legs) {
       if ((!existing.location || existing.location === '') && activity.location) existing.location = activity.location;
       if ((!existing.estTime || existing.estTime === '1 hr') && activity.estTime) existing.estTime = activity.estTime;
       if ((!existing.estCost || existing.estCost === '0') && activity.estCost) existing.estCost = activity.estCost;
-      if ((!existing.audioTitle || existing.audioTitle === '') && activity.audioTitle) existing.audioTitle = activity.audioTitle;
-      if ((!existing.audioRef || existing.audioRef === '') && (activity.audioRef || activity.audioUrl)) existing.audioRef = activity.audioRef || activity.audioUrl;
+      if ((!existing.externalLink || existing.externalLink === '') && (activity.externalLink || activity.audioRef || activity.audioUrl)) existing.externalLink = activity.externalLink || activity.audioRef || activity.audioUrl;
       if ((existing.startTime || '') === '' && activity.startTime) existing.startTime = activity.startTime;
       if ((existing.endTime || '') === '' && activity.endTime) existing.endTime = activity.endTime;
     });
@@ -3935,6 +3928,7 @@ const SHARE_KEY_MAP = {
   cost: 'co',
   status: 'st',
   bookingRef: 'bref',
+  externalLink: 'el',
   bookingReference: 'bref_ref',
   provider: 'pr',
   routeCode: 'rc',
