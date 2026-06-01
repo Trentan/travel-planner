@@ -149,6 +149,12 @@ function getActivityLabel(category) {
   return ACTIVITY_CATEGORIES[category]?.label || 'Activity';
 }
 
+function stripLeadingActivityEmojiText(text) {
+  return String(text || '')
+    .replace(/^(?:[\u{1F000}-\u{1FAFF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\uFE0F?(?:\u200D[\u{1F000}-\u{1FAFF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}]\uFE0F?)*\s*)+/gu, '')
+    .trim();
+}
+
 function escapeHtmlText(text) {
   if (text === null || text === undefined) return '';
   return String(text)

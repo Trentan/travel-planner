@@ -84,6 +84,16 @@ function renderActivityAudioTourMeta(item) {
   return `<span class="audio-tour-chip">Link ${refHtml}</span>`;
 }
 
+function getActivityDisplayTitle(text) {
+  const split = typeof _splitActivityTitle === 'function'
+    ? _splitActivityTitle(text)
+    : { title: text, location: '' };
+  const title = typeof stripLeadingActivityEmojiText === 'function'
+    ? stripLeadingActivityEmojiText(split.title)
+    : String(split.title || '').trim();
+  return { ...split, title };
+}
+
 function focusCompactInlineEditable(selector) {
   const el = typeof document !== 'undefined' ? document.querySelector(selector) : null;
   if (!el) return;
@@ -748,7 +758,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
         locationVal = matched.location;
       }
     }
-    const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
+              const split = getActivityDisplayTitle(item.text);
     if (!locationVal) {
       locationVal = split.location;
     }
@@ -1980,7 +1990,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
         locationVal = matched.location;
       }
     }
-    const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
+    const split = getActivityDisplayTitle(item.text);
     if (!locationVal) {
       locationVal = split.location;
     }
@@ -3049,7 +3059,7 @@ ${(() => {
                   locationVal = matched.location;
                 }
               }
-              const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(item.text) : { title: item.text, location: '' };
+    const split = getActivityDisplayTitle(item.text);
               if (!locationVal) {
                 locationVal = split.location;
               }
