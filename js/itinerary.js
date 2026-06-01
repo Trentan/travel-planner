@@ -757,7 +757,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     }
     const activityLoc = locationVal ? (() => {
       let loc = locationVal;
-      const cleanCity = String(day.to || day.from || '').trim();
+      const cleanCity = String((typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label || '') : '') || day.to || day.from || '').trim();
       if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
         loc = `${loc} (${cleanCity})`;
       }
@@ -2084,13 +2084,24 @@ function cleanTimelineMapTitle(title) {
     .trim();
 }
 
+function getTimelineMapCityContext(cityName) {
+  const city = String(cityName || '').trim();
+  if (!city || /(→|->|\bvia\b)/i.test(city)) return { city: '', country: '' };
+  const cityObj = typeof getCityByName === 'function' ? getCityByName(city) : null;
+  const country = String(cityObj?.country || (cityObj?.countryCode && typeof getCountryName === 'function' ? getCountryName(cityObj.countryCode) : '')).trim();
+  return { city, country };
+}
+
 function getTimelineMapFallback(item) {
-  const title = cleanTimelineMapTitle(item.title);
-  let city = String(item.cityName || '').trim();
-  if (/(→|->|\bvia\b)/i.test(city)) city = '';
-  if (item.type === 'activity' && /(→|->|\bvia\b)/i.test(title)) return city;
+  const title = typeof stripCompactLeadingEmoji === 'function'
+    ? stripCompactLeadingEmoji(cleanTimelineMapTitle(item.title))
+    : cleanTimelineMapTitle(item.title);
+  const { city, country } = getTimelineMapCityContext(item.cityName);
   if (!title || /^(transport|activity|accommodation)$/i.test(title)) return city;
-  if (city && !title.toLowerCase().includes(city.toLowerCase())) return `${title}, ${city}`;
+  const parts = [title];
+  if (city && !title.toLowerCase().includes(city.toLowerCase())) parts.push(city);
+  if (country && !parts.join(' ').toLowerCase().includes(country.toLowerCase())) parts.push(country);
+  if (parts.length > 1) return parts.join(', ');
   return title;
 }
 
@@ -2148,7 +2159,7 @@ function getDailyTimelineMapRouteFromItems(items, day = null) {
         : getTimelineMapLocationValues(item.subLocations);
       if (locations.length) {
         locations.forEach(location => addTimelineMapStop(stops, location));
-      } else if (item.type === 'stay') {
+      } else if (item.type === 'activity' || item.type === 'stay') {
         addTimelineMapStop(stops, getTimelineMapFallback(item));
       }
     });

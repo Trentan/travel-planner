@@ -712,6 +712,7 @@ async function testTimelineDayMapsRoute() {
     to: 'Paris',
     desc: 'Paris in-town day',
     activityItems: [
+      { text: 'Walking loop — Latin Quarter → Notre Dame', startTime: '08:00' },
       { text: 'Morning coffee — Cafe de Flore', startTime: '09:00' },
       { text: 'Museum visit', location: 'Musee d Orsay', startTime: '11:00' }
     ]
@@ -722,6 +723,12 @@ async function testTimelineDayMapsRoute() {
   if (!trip.cities.some(city => city.id === 'city-paris')) {
     trip.cities.push({ id: 'city-paris', name: 'Paris', country: 'France', lat: 48.8566, lng: 2.3522 });
   }
+  trip.cities
+    .filter(city => city.id === 'city-paris' || city.name === 'Paris')
+    .forEach(city => {
+      city.country = 'France';
+      city.countryCode = 'FR';
+    });
   firstDay.activityItems = [
     { text: 'Museum visit', location: 'Louvre Museum', startTime: '14:00' },
     { text: 'Dinner — Rue Cler', startTime: '19:00' }
@@ -773,6 +780,7 @@ async function testTimelineDayMapsRoute() {
   const inTownRoute = context.getDailyTimelineMapRoute(0, 1);
   assert(inTownRoute.stops[0] === 'Paris Hotel', 'Timeline day maps route: in-town day should start from accommodation');
   assert(inTownRoute.stops[inTownRoute.stops.length - 1] === 'Paris Hotel', 'Timeline day maps route: in-town day should end at accommodation');
+  assert(inTownRoute.url.includes('Latin%20Quarter'), 'Timeline day maps route: in-town day should keep activity title fallbacks with arrows');
   assert(inTownRoute.url.includes('Cafe%20de%20Flore'), 'Timeline day maps route: in-town day should include inferred activity title location');
 
   const importedTrip = state(context);
