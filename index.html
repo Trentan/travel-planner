@@ -213,7 +213,7 @@
         <section class="mobile-menu-section" aria-labelledby="mobileMenuTripSettings">
           <h3 id="mobileMenuTripSettings" class="mobile-menu-section-title">Trip settings</h3>
           <div class="mobile-menu-section-grid">
-            <button id="mobileEditToggleBtn" class="app-menu-btn mobile-menu-primary" onclick="closeMobileMenu(); toggleEditMode()">🔒 Lock: Read Only</button>
+            <button id="mobileEditToggleBtn" class="app-menu-btn mobile-menu-primary" onclick="toggleMobileEditModeFromMenu(event)">🔒 Lock: Read Only</button>
             <button id="mobileRenameBtn" class="app-menu-btn" onclick="closeMobileMenu(); openRenameTripDialog()">✏️ Rename Trip</button>
             <label id="mobileThemeToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
               <input id="mobileThemeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">

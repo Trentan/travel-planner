@@ -176,6 +176,8 @@ function syncModeToggleButtons() {
       }
       if (labelNode) {
         labelNode.textContent = isActive ? 'Compact mode' : 'Detailed mode';
+      } else if (btn.tagName === 'BUTTON') {
+        btn.textContent = label;
       }
       btn.setAttribute('aria-checked', String(isActive));
       btn.classList.toggle(activeClass, isActive);
@@ -402,6 +404,17 @@ function toggleEditMode() {
   if(activeTab.includes('Transport')) buildTransportTab(cityFilter);
   if(activeTab.includes('Accommodation')) buildAccomTab(cityFilter);
   if(activeTab.includes('Packing')) buildPackingTab();
+}
+
+function toggleMobileEditModeFromMenu(event) {
+  if (event && typeof event.preventDefault === 'function') {
+    event.preventDefault();
+  }
+  if (event && typeof event.stopPropagation === 'function') {
+    event.stopPropagation();
+  }
+  toggleEditMode();
+  closeMobileMenu();
 }
 
 function switchTab(tabId, btnElement) {
@@ -675,6 +688,7 @@ window.updateLegTip = updateLegTip;
 window.deleteLegTip = deleteLegTip;
 window.toggleMode = toggleMode;
 window.toggleEditMode = toggleEditMode;
+window.toggleMobileEditModeFromMenu = toggleMobileEditModeFromMenu;
 window.toggleCompactView = toggleCompactView;
 window.setItineraryDayViewMode = setItineraryDayViewMode;
 window.applyUiSettings = applyUiSettings;
