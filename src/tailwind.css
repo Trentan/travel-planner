@@ -5212,6 +5212,13 @@
     font-weight: 700;
   }
 
+  body.mobile-app-mode #tab-packing .packing-item .del-btn {
+    @apply text-red-500 bg-red-50 border border-red-100 dark:bg-red-950/30 dark:border-red-900/50;
+    width: 1.9rem;
+    height: 1.9rem;
+    font-size: 1.05rem;
+  }
+
   .packing-page-footer {
     @apply mt-4 pt-2;
   }

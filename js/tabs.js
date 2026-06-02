@@ -458,9 +458,9 @@ function buildPackingTab() {
         <div class="guide-content">
           ${leaveHomeData.map((item, iIdx) => `
             <div class="packing-item">
-              ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
               <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
         <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+              ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
             </div>
           `).join('')}
           ${isEditMode ? '<button class="add-btn add-btn-home-task" onclick="addLeaveHomeItem()">+ Add Home Task</button>' : ''}
@@ -522,9 +522,9 @@ function buildPackingTab() {
               </div>
               ${cat.items.map((item, iIdx) => `
                 <div class="packing-item">
-                  ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">&times;</button>` : ''}
                   <input type="checkbox" ${item.done ? 'checked' : ''} onchange="togglePackingItem(event, ${aIdx}, ${cIdx}, ${iIdx})">
                   <span contenteditable="${isEditMode}" onblur="updatePackingItem(${aIdx}, ${cIdx}, ${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+                  ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">&times;</button>` : ''}
                 </div>
               `).join('')}
               ${isEditMode ? `<button class="add-btn" onclick="addPackingItem(${aIdx}, ${cIdx})">+ Add Item</button>` : ''}
