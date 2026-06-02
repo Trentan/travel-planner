@@ -780,10 +780,10 @@ function renderTransportMobileFacts(segs, totalCost, notes = '') {
     <div class="transport-mobile-facts-grid">
       ${renderTransportMobileLinkedFact('From', fromValue, getMapSearchUrl(fromLocation, fromLocation))}
       ${renderTransportMobileLinkedFact('To', toValue, getMapSearchUrl(toLocation, toLocation))}
-      ${fromDetail ? renderTransportMobileLinkedFact('From Details', fromDetail, getMapSearchUrl(getJourneyMapSearchQuery(fromDetail, fromLocation, firstSeg.transportType)), '', '', 'transport-mobile-fact--detail') : ''}
-      ${toDetail ? renderTransportMobileLinkedFact('To Details', toDetail, getMapSearchUrl(getJourneyMapSearchQuery(toDetail, toLocation, lastSeg.transportType)), '', '', 'transport-mobile-fact--detail') : ''}
       ${renderTransportMobileFact('Depart', firstDep)}
       ${renderTransportMobileFact('Arrive', arrive)}
+      ${renderTransportMobileLinkedFact('From Details', fromDetail, getMapSearchUrl(getJourneyMapSearchQuery(fromDetail, fromLocation, firstSeg.transportType)), '', '', 'transport-mobile-fact--detail')}
+      ${renderTransportMobileLinkedFact('To Details', toDetail, getMapSearchUrl(getJourneyMapSearchQuery(toDetail, toLocation, lastSeg.transportType)), '', '', 'transport-mobile-fact--detail')}
       ${renderTransportMobileFact('Carrier', providerLabel)}
       ${renderTransportMobileFact('Code', routeCodeLabel)}
       ${renderTransportMobileFact('Cost', formatCurrency(totalCost))}
