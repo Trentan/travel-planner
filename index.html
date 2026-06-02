@@ -69,7 +69,7 @@
         <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="closeDesktopActionsMenu(); promptInstallApp()">⬇ Install App</button>
       </div>
     </details>
-    <button class="app-menu-btn mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu">☰</button>
+    <button class="app-menu-btn mobile-menu-btn" onclick="syncMenuEditToggleLabels(); toggleMobileMenu()" aria-label="Open menu">☰</button>
   </div>
 </div>
 
@@ -112,7 +112,7 @@
         <span class="tab-label hidden sm:inline">Map</span>
       </button>
     </div>
-    <button class="mobile-tabs-menu-btn" type="button" onclick="toggleMobileMenu()" aria-label="Open menu">
+    <button class="mobile-tabs-menu-btn" type="button" onclick="syncMenuEditToggleLabels(); toggleMobileMenu()" aria-label="Open menu">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
   </div>
@@ -190,7 +190,7 @@
       </div>
     </div>
   </div>
-  <div id="mobileMenuSheet" class="mobile-menu-sheet" aria-hidden="true" inert onclick="closeMobileMenu(event)">
+  <div id="mobileMenuSheet" class="mobile-menu-sheet" aria-hidden="true" onclick="closeMobileMenu(event)">
     <div class="mobile-menu-sheet-panel" role="dialog" aria-modal="true" aria-label="App actions" onclick="event.stopPropagation()">
       <div class="mobile-menu-sheet-header">
         <div>
@@ -213,7 +213,7 @@
         <section class="mobile-menu-section" aria-labelledby="mobileMenuTripSettings">
           <h3 id="mobileMenuTripSettings" class="mobile-menu-section-title">Trip settings</h3>
           <div class="mobile-menu-section-grid">
-            <button id="mobileEditToggleBtn" class="app-menu-btn mobile-menu-primary" onclick="toggleMobileEditModeFromMenu(event)">🔒 Lock: Read Only</button>
+            <button id="mobileEditToggleBtn" class="app-menu-btn mobile-menu-primary" onclick="event.preventDefault(); event.stopPropagation(); toggleEditMode(); closeMobileMenu(); syncMenuEditToggleLabels()">🔒 Lock: Read Only</button>
             <button id="mobileRenameBtn" class="app-menu-btn" onclick="closeMobileMenu(); openRenameTripDialog()">✏️ Rename Trip</button>
             <label id="mobileThemeToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
               <input id="mobileThemeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
@@ -889,6 +889,14 @@
 <script>
   let deferredInstallPrompt = null;
 
+  function syncMenuEditToggleLabels() {
+    const isReadOnly = document.body.classList.contains('read-only-mode');
+    const label = isReadOnly ? '✏️ Unlock Editing' : '🔒 Lock: Read Only';
+    document.querySelectorAll('#editToggleBtn,#mobileEditToggleBtn').forEach(btn => {
+      btn.textContent = label;
+    });
+  }
+
   function isStandaloneDisplayMode() {
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
@@ -954,6 +962,7 @@
 
   window.appInitPromise = initData();
   applyUiSettings();
+  syncMenuEditToggleLabels();
   buildNav();
   buildItinerary();
   reObserveLegs();

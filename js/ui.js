@@ -406,17 +406,6 @@ function toggleEditMode() {
   if(activeTab.includes('Packing')) buildPackingTab();
 }
 
-function toggleMobileEditModeFromMenu(event) {
-  if (event && typeof event.preventDefault === 'function') {
-    event.preventDefault();
-  }
-  if (event && typeof event.stopPropagation === 'function') {
-    event.stopPropagation();
-  }
-  toggleEditMode();
-  closeMobileMenu();
-}
-
 function switchTab(tabId, btnElement) {
   document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.app-tab-btn').forEach(el => el.classList.remove('active'));
@@ -688,7 +677,6 @@ window.updateLegTip = updateLegTip;
 window.deleteLegTip = deleteLegTip;
 window.toggleMode = toggleMode;
 window.toggleEditMode = toggleEditMode;
-window.toggleMobileEditModeFromMenu = toggleMobileEditModeFromMenu;
 window.toggleCompactView = toggleCompactView;
 window.setItineraryDayViewMode = setItineraryDayViewMode;
 window.applyUiSettings = applyUiSettings;
