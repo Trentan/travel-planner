@@ -703,6 +703,63 @@
     #journeyDeleteBtn {
       margin-right: auto !important;
     }
+
+    #tab-transport .travel-data-table,
+    #tab-accom .travel-data-table {
+      min-width: 0;
+      max-width: 100%;
+      table-layout: fixed;
+    }
+
+    #tab-transport .travel-data-table th,
+    #tab-transport .travel-data-table td,
+    #tab-accom .travel-data-table th,
+    #tab-accom .travel-data-table td {
+      white-space: normal !important;
+    }
+
+    #tab-transport .travel-data-table th:first-child,
+    #tab-transport .travel-data-table td:first-child {
+      width: 2.25rem;
+    }
+
+    #tab-transport .travel-data-table th:nth-child(3),
+    #tab-transport .travel-data-table td:nth-child(3) {
+      width: 3.25rem;
+    }
+
+    #tab-transport .travel-data-table th:last-child,
+    #tab-transport .travel-data-table td:last-child,
+    #tab-accom .travel-data-table th:last-child,
+    #tab-accom .travel-data-table td:last-child {
+      width: 4.75rem;
+      white-space: nowrap !important;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1180px) {
+    #tab-transport .travel-data-table th,
+    #tab-transport .travel-data-table td,
+    #tab-accom .travel-data-table th,
+    #tab-accom .travel-data-table td {
+      padding-left: 0.55rem !important;
+      padding-right: 0.55rem !important;
+    }
+
+    #tab-transport .travel-data-table {
+      font-size: 0.82rem;
+    }
+
+    #tab-accom .travel-data-table {
+      font-size: 0.84rem;
+    }
+
+    #tab-transport .transport-data-table th:nth-child(11),
+    #tab-transport .transport-data-table td:nth-child(11),
+    #tab-accom .stay-data-table th:nth-child(9),
+    #tab-accom .stay-data-table td:nth-child(9) {
+      max-width: 11rem;
+    }
   }
 
   .modal-form-row {
@@ -3863,6 +3920,20 @@
 
   .transport-status-badge-clickable {
     @apply cursor-pointer;
+  }
+
+  .travel-data-table-shell {
+    scrollbar-gutter: stable;
+  }
+
+  .travel-data-table {
+    table-layout: auto;
+    min-width: min(100%, 58rem);
+  }
+
+  .travel-data-table th,
+  .travel-data-table td {
+    overflow-wrap: anywhere;
   }
 
   .pending-segment-summary {

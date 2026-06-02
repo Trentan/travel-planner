@@ -1136,8 +1136,8 @@ function buildTransportTab(cityFilter = null) {
     return;
   }
 
-  html += `<div class="w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4">
-    <table class="w-full text-left border-collapse min-w-[800px]">
+  html += `<div class="travel-data-table-shell transport-data-table-shell w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4">
+    <table class="travel-data-table transport-data-table w-full text-left border-collapse">
       <thead>
         <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/60 dark:border-slate-700/60">
           <th class="px-3 py-3 w-8"></th>
@@ -1425,6 +1425,7 @@ function editJourney(journeyId) {
 // Track if form is "dirty" (has unsaved user changes)
 let _journeyFormDirty = false;
 const JOURNEY_ADD_CITY_OPTION = '__add_new_city__';
+let _pendingJourneyCitySelectId = '';
 
 function _rememberJourneyCitySelection(selectEl) {
   if (selectEl && selectEl.value !== JOURNEY_ADD_CITY_OPTION) {
@@ -1435,6 +1436,7 @@ function _rememberJourneyCitySelection(selectEl) {
 function handleJourneyCitySelectChange(selectEl) {
   if (!selectEl) return;
   if (selectEl.value === JOURNEY_ADD_CITY_OPTION) {
+    _pendingJourneyCitySelectId = selectEl.id || '';
     selectEl.value = selectEl.dataset.previousValue || '';
     promptAddNewCity();
     return;
@@ -1535,6 +1537,37 @@ function _populateJourneyCityDropdowns() {
     if (currentTo) toSelect.value = currentTo;
     _rememberJourneyCitySelection(toSelect);
   }
+}
+
+function refreshJourneyCityDropdowns(preferredCityName = '') {
+  const fromSelect = document.getElementById('journeyFromCity');
+  const toSelect = document.getElementById('journeyToCity');
+  if (!fromSelect && !toSelect) return;
+
+  const previousFrom = fromSelect?.value || '';
+  const previousTo = toSelect?.value || '';
+  _populateJourneyCityDropdowns();
+
+  if (fromSelect) {
+    if (_pendingJourneyCitySelectId === 'journeyFromCity' && preferredCityName) {
+      fromSelect.value = preferredCityName;
+      _journeyFormDirty = true;
+    } else if (previousFrom) {
+      fromSelect.value = previousFrom;
+    }
+  }
+  if (toSelect) {
+    if (_pendingJourneyCitySelectId === 'journeyToCity' && preferredCityName) {
+      toSelect.value = preferredCityName;
+      _journeyFormDirty = true;
+    } else if (previousTo) {
+      toSelect.value = previousTo;
+    }
+  }
+
+  _rememberJourneyCitySelection(fromSelect);
+  _rememberJourneyCitySelection(toSelect);
+  _pendingJourneyCitySelectId = '';
 }
 
 function openAddJourneyModal() {
@@ -1839,6 +1872,7 @@ window.migrateJourneyCityIds = migrateJourneyCityIds;
 window.selectJourneyType = selectJourneyType;
 window.promptAddNewCity = promptAddNewCity;
 window.handleJourneyCitySelectChange = handleJourneyCitySelectChange;
+window.refreshJourneyCityDropdowns = refreshJourneyCityDropdowns;
 window.editJourney = editJourney;
 window.editPendingSegment = editPendingSegment;
 

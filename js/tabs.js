@@ -264,8 +264,8 @@ function buildAccomTab(cityFilter = null) {
     return;
   }
 
-  let html = `<div class="w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4">
-    <table class="w-full text-left border-collapse min-w-[800px]">
+  let html = `<div class="travel-data-table-shell stay-data-table-shell w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4">
+    <table class="travel-data-table stay-data-table w-full text-left border-collapse">
       <thead>
         <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/60 dark:border-slate-700/60">
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">City</th>
