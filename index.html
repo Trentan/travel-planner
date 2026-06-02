@@ -652,7 +652,7 @@
 
               <input type="hidden" id="journeyType" value="flight">
               
-              <!-- Panel 1: Type & Route -->
+              <!-- Panel 1: Type, route, and schedule -->
               <div class="journey-form-group-panel">
                 <div class="transport-type-group journey-transport-type-group">
                   <button class="transport-type-btn active" data-type="flight" onclick="selectJourneyType('flight')"><span class="journey-type-icon">✈️</span> Flight</button>
@@ -687,33 +687,27 @@
                 <div class="journey-city-link-row">
                   <a href="#" class="inline-action-link" onclick="promptAddNewCity(); return false;">+ Add new city (opens Cities dialog)</a>
                 </div>
-              </div>
-
-              <!-- Panel 2: Dates & Times -->
-              <div class="journey-form-group-panel">
                 <div class="journey-time-grid">
-                  <div class="journey-inline-row journey-time-row modal-form-row">
-                    <div class="ai-form-group">
-                      <label>Departure</label>
-                      <div class="journey-datetime-pair modal-form-pair">
-                        <input type="date" id="journeyDateFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
-                        <input type="time" id="journeyTimeFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
-                      </div>
-                    </div>
+                  <div class="ai-form-group">
+                    <label for="journeyDateFrom">Departure Date</label>
+                    <input type="date" id="journeyDateFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
                   </div>
-                  <div class="journey-inline-row journey-time-row modal-form-row">
-                    <div class="ai-form-group">
-                      <label>Arrival</label>
-                      <div class="journey-datetime-pair modal-form-pair">
-                        <input type="date" id="journeyDateTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
-                        <input type="time" id="journeyTimeTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
-                      </div>
-                    </div>
+                  <div class="ai-form-group">
+                    <label for="journeyTimeFrom">Departure Time</label>
+                    <input type="time" id="journeyTimeFrom" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                  </div>
+                  <div class="ai-form-group">
+                    <label for="journeyDateTo">Arrival Date</label>
+                    <input type="date" id="journeyDateTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
+                  </div>
+                  <div class="ai-form-group">
+                    <label for="journeyTimeTo">Arrival Time</label>
+                    <input type="time" id="journeyTimeTo" class="form-control form-control--compact" onchange="_journeyFormDirty=true">
                   </div>
                 </div>
               </div>
 
-              <!-- Panel 3: Provider, Booking & Status -->
+              <!-- Panel 2: Provider, booking, and notes -->
               <div class="journey-form-group-panel">
                 <div class="journey-inline-row journey-meta-row modal-form-row modal-form-row--split">
                   <div class="ai-form-group">
@@ -744,10 +738,6 @@
                     <input type="number" id="journeyCost" class="form-control" onchange="_journeyFormDirty=true" placeholder="0">
                   </div>
                 </div>
-              </div>
-
-              <!-- Panel 4: Notes -->
-              <div class="journey-form-group-panel">
                 <div class="ai-form-group">
                   <label for="journeyNotes">Notes</label>
                   <textarea id="journeyNotes" class="form-control form-control--muted" rows="3" onchange="_journeyFormDirty=true" placeholder="Optional transport notes, ticket details, platform reminders, or check-in instructions"></textarea>

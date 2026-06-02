@@ -337,7 +337,8 @@
   /* Modal overlay - full screen backdrop */
   .modal-overlay {
     @apply fixed inset-0 bg-black/70 flex items-center justify-center
-           z-1000 p-4;
+           p-4;
+    z-index: 2000;
   }
 
   /* Modal content panel */
@@ -422,13 +423,13 @@
   }
 
   #journey-modal .modal-content {
-    max-width: min(1220px, 97vw);
-    width: min(1220px, 97vw);
-    max-height: 94vh;
+    max-width: min(1180px, 94vw);
+    width: min(1180px, 94vw);
+    max-height: 88vh;
   }
 
   #journey-modal .modal-body {
-    max-height: calc(94vh - 142px);
+    max-height: calc(88vh - 142px);
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0.75rem 0;
@@ -499,14 +500,14 @@
   }
 
   .journey-time-grid {
-    @apply grid gap-2.5;
+    @apply grid gap-3;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   #journey-modal .journey-meta-row.modal-form-row--split {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.65rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
     align-items: end;
   }
 
@@ -607,9 +608,21 @@
     .stay-form-group-panel:nth-child(4) { grid-column: 2; grid-row: 2; }
 
     /* Desktop Journey Modal split dashboard workspace */
+    #journey-modal.modal-overlay {
+      align-items: center;
+      padding: 2rem 1.25rem;
+    }
+
+    #journey-modal .modal-content {
+      border-radius: 20px;
+      margin: 0 auto;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgb(15 23 42 / 0.22);
+    }
+
     .journey-modal-body-layout {
       display: grid !important;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 320px minmax(0, 1fr);
       gap: 1.5rem;
       padding: 1.25rem 1.5rem;
       min-height: 0;
@@ -664,7 +677,7 @@
 
     #journey-modal .journey-form-card {
       display: grid !important;
-      grid-template-columns: 1.15fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1.25rem;
       background: transparent !important;
       border: none !important;
@@ -679,12 +692,11 @@
 
     #journey-modal .journey-form-group-panel {
       align-content: start;
+      min-height: 100%;
     }
 
-    #journey-modal .journey-form-group-panel:nth-of-type(1) { grid-column: 1; grid-row: 2; }
-    #journey-modal .journey-form-group-panel:nth-of-type(2) { grid-column: 1; grid-row: 3; }
+    #journey-modal .journey-form-group-panel:nth-of-type(2) { grid-column: 1; grid-row: 2; }
     #journey-modal .journey-form-group-panel:nth-of-type(3) { grid-column: 2; grid-row: 2; }
-    #journey-modal .journey-form-group-panel:nth-of-type(4) { grid-column: 2; grid-row: 3; }
 
     /* Footer separation for Delete vs Save/Cancel */
     #stay-modal .modal-footer,

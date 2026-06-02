@@ -133,6 +133,20 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     assert(await page.locator('#transport-table-container').textContent(), 'Desktop: transport tab should render');
     assert(await page.locator('#accom-table-container').textContent(), 'Desktop: accommodation tab should render');
     assert((await page.locator('#transport-table-container thead').innerText()).includes('Booking Ref'), 'Desktop: transport table should show booking ref column');
+    await page.evaluate(() => {
+      const target = (window.journeys || [])[0];
+      if (!target || typeof window.editJourney !== 'function') throw new Error('No journey available to edit');
+      window.editJourney(target.journeyId || target.id);
+    });
+    await page.waitForSelector('#journey-modal', { state: 'visible' });
+    assert(await page.locator('#journey-modal .journey-form-card > .journey-form-group-panel').count() === 2, 'Desktop: journey modal should use two main form panels');
+    const journeyLabels = await page.locator('#journey-modal .journey-form-group-panel label').allTextContents();
+    for (const label of ['Departure Date', 'Departure Time', 'Arrival Date', 'Arrival Time', 'Notes']) {
+      assert(journeyLabels.includes(label), `Desktop: journey modal should show ${label}`);
+    }
+    await page.locator('#journey-modal .modal-close').click();
+    await page.waitForSelector('#journey-modal', { state: 'hidden' });
+    reporter.add('desktop', 'edit journey dialog layout', 'two panels with explicit date/time labels');
     const accomHead = await page.locator('#accom-table-container thead').innerText();
     assert(accomHead.includes('Provider'), 'Desktop: accommodation table should show provider column');
     assert(accomHead.includes('Booking Ref'), 'Desktop: accommodation table should show booking ref column');
