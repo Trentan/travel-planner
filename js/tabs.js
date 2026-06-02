@@ -141,13 +141,13 @@ function renderStayMobileDetails(stay, cityName) {
 
   return `
     <div class="stay-mobile-facts-grid">
-      ${renderStayMobileLinkedFact('Location', stay.location || '', locationUrl, 'stay-mobile-fact--wide')}
-      ${renderStayMobileFact('City', cityName)}
-      ${renderStayMobileFact('Nights', String(nights))}
       ${renderStayMobileFact('Check In', formatDateShort(stay.checkIn))}
       ${renderStayMobileFact('Check In Time', stay.checkInTime || '')}
       ${renderStayMobileFact('Check Out', formatDateShort(stay.checkOut))}
       ${renderStayMobileFact('Check Out Time', stay.checkOutTime || '')}
+      ${renderStayMobileFact('City', cityName)}
+      ${renderStayMobileFact('Nights', String(nights))}
+      ${renderStayMobileLinkedFact('Location', stay.location || '', locationUrl, 'stay-mobile-fact--wide')}
       ${renderStayMobileFact('Property Name', stay.propertyName || '')}
       ${renderStayMobileFact('Provider', stay.provider || '')}
       ${renderStayMobileFact('Cost', costValue)}
@@ -458,7 +458,7 @@ function buildPackingTab() {
         <div class="guide-content">
           ${leaveHomeData.map((item, iIdx) => `
             <div class="packing-item">
-              <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">Ã—</button>
+              <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>
               <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
         <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
             </div>
@@ -518,11 +518,11 @@ function buildPackingTab() {
             <div class="packing-card">
               <div class="packing-card-header">
                 <h3><span contenteditable="${isEditMode}" onblur="updatePackingCat(${aIdx}, ${cIdx}, this.innerText)">${cat.title}</span></h3>
-                <button class="del-btn" title="Delete Category Block" onclick="deletePackingCat(${aIdx}, ${cIdx})">Ã—</button>
+                <button class="del-btn" title="Delete Category Block" onclick="deletePackingCat(${aIdx}, ${cIdx})">&times;</button>
               </div>
               ${cat.items.map((item, iIdx) => `
                 <div class="packing-item">
-                  <button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">Ã—</button>
+                  <button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">&times;</button>
                   <input type="checkbox" ${item.done ? 'checked' : ''} onchange="togglePackingItem(event, ${aIdx}, ${cIdx}, ${iIdx})">
                   <span contenteditable="${isEditMode}" onblur="updatePackingItem(${aIdx}, ${cIdx}, ${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
                 </div>

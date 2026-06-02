@@ -182,7 +182,7 @@ function renderLeaveHomeItems() {
 
     return `
       <div class="packing-item leave-home-item">
-        <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">×</button>
+        <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>
         <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
         <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
       </div>

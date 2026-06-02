@@ -3092,6 +3092,7 @@ function normalizeTripJourneysData(items) {
     item.endTime = item.arrivalTime || '';
     item.fromAddress = item.fromAddress || '';
     item.toAddress = item.toAddress || '';
+    item.notes = item.notes || '';
 
     const gid = item.journeyId || item.id;
     if (gid) {

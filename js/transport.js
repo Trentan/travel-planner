@@ -117,6 +117,13 @@ function getLocationCodeText(locationName) {
   return normalized.replace(/[^a-z0-9]/gi, '').substring(0, 3).toUpperCase() || '---';
 }
 
+function getLocationCodeNameText(locationName) {
+  const name = String(locationName || '').trim();
+  if (!name) return '';
+  const code = getLocationCodeText(name);
+  return code && code !== '---' ? `${code} - ${name}` : name;
+}
+
 function buildRouteCodeChain(segments) {
   if (!segments || segments.length === 0) return '---';
   const stops = [getLocationCodeText(segments[0].fromLocation)];
@@ -510,6 +517,17 @@ function updateJourneyCost(id, cost) {
   return null;
 }
 
+function updateJourneyNotes(id, notes) {
+  const journey = findJourney(id);
+  if (journey) {
+    journey.notes = String(notes || '').trim();
+    persistJourneys();
+    if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+    return journey;
+  }
+  return null;
+}
+
 function deleteJourney(id) {
   journeys = journeys.filter(j => j.id !== id);
   window.journeys = journeys;
@@ -734,7 +752,7 @@ function renderJourneySubLocationSummary(segs, extraClass = '') {
   ], extraClass);
 }
 
-function renderTransportMobileFacts(segs, totalCost) {
+function renderTransportMobileFacts(segs, totalCost, notes = '') {
   if (!Array.isArray(segs) || segs.length === 0) return '';
   const firstSeg = segs[0];
   const lastSeg = segs[segs.length - 1];
@@ -750,21 +768,27 @@ function renderTransportMobileFacts(segs, totalCost) {
   const providerLabel = providerSet.length > 1 ? `${providerSet.length} carriers` : (providerSet[0] || '');
   const routeCodeLabel = routeCodeSet.length > 1 ? `${routeCodeSet.length} codes` : (routeCodeSet[0] || '');
   const bookingLabel = bookingSet.length > 1 ? `${bookingSet.length} refs` : (bookingSet[0] || '');
-  const fromValue = firstSeg.fromLocation || '';
-  const toValue = lastSeg.toLocation || '';
+  const fromLocation = firstSeg.fromLocation || '';
+  const toLocation = lastSeg.toLocation || '';
+  const fromValue = getLocationCodeNameText(fromLocation);
+  const toValue = getLocationCodeNameText(toLocation);
   const fromDetail = firstSeg.fromAddress || '';
   const toDetail = lastSeg.toAddress || '';
+  const notesValue = String(notes || '').trim();
 
   return `
     <div class="transport-mobile-facts-grid">
-      ${renderTransportMobileLinkedFact('From', fromValue, getMapSearchUrl(fromValue, fromValue), fromDetail, getMapSearchUrl(fromDetail, fromValue))}
-      ${renderTransportMobileLinkedFact('To', toValue, getMapSearchUrl(toValue, toValue), toDetail, getMapSearchUrl(toDetail, toValue))}
+      ${renderTransportMobileLinkedFact('From', fromValue, getMapSearchUrl(fromLocation, fromLocation))}
+      ${renderTransportMobileLinkedFact('To', toValue, getMapSearchUrl(toLocation, toLocation))}
+      ${fromDetail ? renderTransportMobileLinkedFact('From Details', fromDetail, getMapSearchUrl(getJourneyMapSearchQuery(fromDetail, fromLocation, firstSeg.transportType)), '', '', 'transport-mobile-fact--detail') : ''}
+      ${toDetail ? renderTransportMobileLinkedFact('To Details', toDetail, getMapSearchUrl(getJourneyMapSearchQuery(toDetail, toLocation, lastSeg.transportType)), '', '', 'transport-mobile-fact--detail') : ''}
       ${renderTransportMobileFact('Depart', firstDep)}
       ${renderTransportMobileFact('Arrive', arrive)}
       ${renderTransportMobileFact('Carrier', providerLabel)}
       ${renderTransportMobileFact('Code', routeCodeLabel)}
       ${renderTransportMobileFact('Cost', formatCurrency(totalCost))}
       ${renderTransportMobileFact('Booking #', bookingLabel)}
+      ${notesValue ? renderTransportMobileFact('Notes', notesValue, 'transport-mobile-fact--wide transport-mobile-fact--notes') : ''}
     </div>
   `;
 }
@@ -952,7 +976,7 @@ function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIc
   if (!segs || segs.length === 0) return '';
 
   return `
-    ${renderTransportMobileFacts(segs, totalCost)}
+    ${renderTransportMobileFacts(segs, totalCost, rep?.notes || '')}
     ${segs.length > 1 ? renderTransportSegmentsDetailContent(segs) : ''}
   `;
 }
@@ -1057,7 +1081,8 @@ function buildTransportTab(cityFilter = null) {
       const durationHours = isMultiLeg ? calculateJourneyDuration(segs) : null;
       const durationDisplay = durationHours !== null ? `${durationHours}h` : calculateDuration(rep.departureDate || rep.dayDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
       const eyebrow = `${getTransportIcon(rep.transportType)} ${firstDepDate}`;
-      const subtitleParts = [rep.provider || '—'];
+      const arrivalText = [lastArr, lastArrTime].filter(Boolean).join(' ');
+      const subtitleParts = [`Dep ${firstDep}`, `Arr ${arrivalText}`, rep.provider || '—'];
       if (rep.routeCode) subtitleParts.push(rep.routeCode);
       if (durationDisplay) subtitleParts.push(durationDisplay);
       const primaryAction = renderStatusBadge(rep.status, {
@@ -1075,7 +1100,7 @@ function buildTransportTab(cityFilter = null) {
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'transport-mobile-card row-accent',
         accentColor: statusColor,
-        dateLabel: firstDepDate,
+        dateLabel: '',
         title: rep.journeyName || routeText,
         subtitle: subtitleParts.filter(Boolean).join(' · '),
         summary,
@@ -1284,8 +1309,8 @@ function buildTransportTab(cityFilter = null) {
         </td>
         
         <!-- Notes -->
-        <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[250px] break-words" title="${escapeHtmlText(rep.notes || '')}">
-          ${escapeHtmlText(rep.notes || '—')}
+        <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[250px] break-words" title="${escapeHtmlText(rep.notes || '')}" onclick="event.stopPropagation()">
+          <span contenteditable="${window.isEditMode}" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1" onblur="updateJourneyNotes('${rep.id}', this.innerText); buildTransportTab();">${escapeHtmlText(rep.notes || '—')}</span>
         </td>
         
         <td class="px-4 py-3 align-middle text-center">
@@ -1780,6 +1805,7 @@ window.deleteJourney = deleteJourney;
 window.deleteJourneyGroup = deleteJourneyGroup;
 window.updateJourneyCost = updateJourneyCost;
 window.updateJourneyBookingRef = updateJourneyBookingRef;
+window.updateJourneyNotes = updateJourneyNotes;
 window.buildTransportTab = buildTransportTab;
 window.getDayJourneys = getDayJourneys;
 window.getTransportIcon = getTransportIcon;
