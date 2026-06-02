@@ -1074,6 +1074,7 @@ function buildTransportTab(cityFilter = null) {
       const lastSeg = segs[segs.length - 1];
       const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
       const lastArrTime = lastSeg.arrivalTime || '—';
+      const arrivalText = [lastArr, lastArrTime].filter(Boolean).join(' ');
       const statusMetaInfo = getStatusMeta(rep.status);
       const statusColor = statusMetaInfo.color;
       const statusIcon = '';
@@ -1081,7 +1082,6 @@ function buildTransportTab(cityFilter = null) {
       const durationHours = isMultiLeg ? calculateJourneyDuration(segs) : null;
       const durationDisplay = durationHours !== null ? `${durationHours}h` : calculateDuration(rep.departureDate || rep.dayDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
       const eyebrow = `${getTransportIcon(rep.transportType)} ${firstDepDate}`;
-      const arrivalText = [lastArr, lastArrTime].filter(Boolean).join(' ');
       const subtitleParts = [`Dep ${firstDep}`, `Arr ${arrivalText}`, rep.provider || '—'];
       if (rep.routeCode) subtitleParts.push(rep.routeCode);
       if (durationDisplay) subtitleParts.push(durationDisplay);
