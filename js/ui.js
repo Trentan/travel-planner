@@ -104,11 +104,26 @@ function toggleMobileMenu() {
   isMobileMenuOpen = !isMobileMenuOpen;
   const sheet = document.getElementById('mobileMenuSheet');
   if (sheet) {
+    if (!isMobileMenuOpen) {
+      releaseMobileMenuFocus(sheet);
+    }
     sheet.classList.toggle('open', isMobileMenuOpen);
     sheet.setAttribute('aria-hidden', String(!isMobileMenuOpen));
+    if (isMobileMenuOpen) {
+      sheet.removeAttribute('inert');
+    } else {
+      sheet.setAttribute('inert', '');
+    }
   }
   document.body.classList.toggle('mobile-menu-open', isMobileMenuOpen);
   syncMobileMenuStatus();
+}
+
+function releaseMobileMenuFocus(sheet) {
+  const activeElement = document.activeElement;
+  if (activeElement && sheet && sheet.contains(activeElement)) {
+    activeElement.blur();
+  }
 }
 
 function closeDesktopActionsMenu() {
@@ -125,8 +140,10 @@ function closeMobileMenu(event) {
   isMobileMenuOpen = false;
   const sheet = document.getElementById('mobileMenuSheet');
   if (sheet) {
+    releaseMobileMenuFocus(sheet);
     sheet.classList.remove('open');
     sheet.setAttribute('aria-hidden', 'true');
+    sheet.setAttribute('inert', '');
   }
   document.body.classList.remove('mobile-menu-open');
   updateStickyOffsets();
