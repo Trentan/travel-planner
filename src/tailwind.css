@@ -3981,6 +3981,84 @@
     @apply text-[#A04000] border-[#D35400];
   }
 
+  .transport-card-location-summary {
+    @apply grid grid-cols-2 gap-2 text-[0.82rem] leading-snug text-text-muted;
+  }
+
+  .stay-card-location-summary {
+    @apply flex flex-col gap-1 text-[0.82rem] leading-snug text-text-muted;
+  }
+
+  .transport-card-location-item {
+    @apply min-w-0 flex flex-col gap-0.5;
+  }
+
+  .stay-card-location-summary {
+    @apply min-w-0;
+  }
+
+  .transport-card-location-label,
+  .stay-card-location-label {
+    @apply font-semibold text-text-primary;
+  }
+
+  .transport-card-location-value,
+  .stay-card-location-value {
+    @apply break-words;
+  }
+
+  .transport-card-location-link {
+    @apply inline text-text-muted font-medium no-underline transition-colors break-words;
+  }
+
+  .transport-card-location-detail-link {
+    @apply inline text-[#D35400] font-medium no-underline border-b border-dotted border-[#E67E22]/75 transition-colors break-words;
+  }
+
+  .transport-card-location-link:hover,
+  .transport-card-location-link:focus-visible,
+  .transport-card-location-detail-link:hover,
+  .transport-card-location-detail-link:focus-visible {
+    @apply text-[#A04000] border-[#D35400];
+  }
+
+  .stay-card-location-link {
+    @apply inline text-[#D35400] font-medium no-underline border-b border-dotted border-[#E67E22]/75 transition-colors break-words;
+  }
+
+  .stay-card-location-link:hover,
+  .stay-card-location-link:focus-visible {
+    @apply text-[#A04000] border-[#D35400];
+  }
+
+  .transport-mobile-facts-grid,
+  .stay-mobile-facts-grid {
+    @apply grid grid-cols-2 gap-1 text-[0.84rem] leading-snug;
+  }
+
+  .transport-mobile-fact,
+  .stay-mobile-fact {
+    @apply min-w-0 flex flex-col gap-0.5 px-2 py-1.5 rounded-md border border-slate-100 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-800/40;
+  }
+
+  .transport-mobile-fact--wide,
+  .stay-mobile-fact--wide {
+    @apply col-span-2;
+  }
+
+  .transport-mobile-fact-label,
+  .stay-mobile-fact-label {
+    @apply text-[0.6rem] font-semibold text-slate-500 uppercase tracking-wider;
+  }
+
+  .transport-mobile-fact-value,
+  .transport-mobile-fact-link,
+  .transport-mobile-fact-detail-link,
+  .stay-mobile-fact-value,
+  .stay-mobile-fact-link {
+    @apply text-[0.88rem] font-medium text-slate-800 dark:text-slate-200 break-words;
+  }
+
   .location-map-icon {
     @apply text-[0.92rem] leading-none;
   }

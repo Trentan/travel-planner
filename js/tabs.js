@@ -1,4 +1,4 @@
-// buildTransportTab is now defined in transport.js
+﻿// buildTransportTab is now defined in transport.js
 
 let expandedStayRows = new Set();
 
@@ -19,7 +19,7 @@ function renderStayDetailBlock(title, value, extraClass = '') {
   return `
     <div class="flex flex-col gap-1 p-2 bg-slate-50 dark:bg-slate-800/40 rounded border border-slate-100 dark:border-slate-800/60 ${extraClass}">
       <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">${escapeHtmlText(title)}</span>
-      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(value || '—')}</span>
+      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(value || 'â€”')}</span>
     </div>
   `;
 }
@@ -47,12 +47,47 @@ function renderStayLocationDetails(stay, extraClass = '', showLabel = true) {
   `;
 }
 
+function renderStayLocationSummary(stay, extraClass = '') {
+  if (!stay || !stay.location) return '';
+
+  let cityName = '';
+  if (stay.cityId && typeof citiesData !== 'undefined') {
+    const city = citiesData.find(c => c.id === stay.cityId);
+    if (city) cityName = city.name;
+  }
+
+  return `
+    <div class="stay-card-location-summary ${extraClass}" title="${escapeHtmlText(stay.location)}">
+      <span class="stay-card-location-label">Location:</span>
+      <a href="${getMapSearchUrl(stay.location, cityName)}" target="_blank" rel="noopener noreferrer" class="stay-card-location-link" onclick="event.stopPropagation();" title="Open in Google Maps">${escapeHtmlText(stay.location)}</a>
+    </div>
+  `;
+}
+
+function renderStayMobileFact(label, value, extraClass = '') {
+  return `
+    <div class="stay-mobile-fact ${extraClass}">
+      <span class="stay-mobile-fact-label">${escapeHtmlText(label)}</span>
+      <span class="stay-mobile-fact-value">${escapeHtmlText(value || '')}</span>
+    </div>
+  `;
+}
+
+function renderStayMobileLinkedFact(label, value, href, extraClass = '') {
+  return `
+    <div class="stay-mobile-fact ${extraClass}">
+      <span class="stay-mobile-fact-label">${escapeHtmlText(label)}</span>
+      ${value ? `<a href="${href}" target="_blank" rel="noopener noreferrer" class="stay-card-location-link stay-mobile-fact-link" onclick="event.stopPropagation();" title="Open in Google Maps">${escapeHtmlText(value)}</a>` : '<span class="stay-mobile-fact-value"></span>'}
+    </div>
+  `;
+}
+
 function renderStayMobileSummary(stay, status, statusIcon, cityName) {
-  const providerText = [stay.provider || '—', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' ');
+  const providerText = [stay.provider || 'â€”', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' ');
 
   return `
     <div class="mobile-table-meta stay-mobile-meta">
-      <span><strong>Details:</strong> ${cityName}${providerText !== '—' ? ` · ${providerText}` : ''}</span>
+      <span><strong>Details:</strong> ${cityName}${providerText !== 'â€”' ? ` Â· ${providerText}` : ''}</span>
       ${renderStayLocationDetails(stay, 'stay-mobile-location')}
     </div>
   `;
@@ -102,17 +137,22 @@ function isAccomMobileCardLayout() {
 function renderStayMobileDetails(stay, cityName) {
   const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
   const costValue = formatCurrency(stay.totalCost || '0');
+  const locationUrl = stay.location ? getMapSearchUrl(stay.location, cityName) : '';
 
   return `
-    <div class="grid grid-cols-2 gap-2 mt-4">
-      ${renderStayDetailBlock('City', cityName)}
-      ${stay.location ? renderStayDetailBlock('Location', stay.location, 'col-span-2') : ''}
-      ${renderStayDetailBlock('Check-in', formatDateShort(stay.checkIn))}
-      ${renderStayDetailBlock('Check-out', formatDateShort(stay.checkOut))}
-      ${renderStayDetailBlock('Nights', String(nights))}
-      ${renderStayDetailBlock('Provider', stay.provider || '—')}
-      ${renderStayDetailBlock('Booking ref', stay.bookingRef || '—')}
-      ${renderStayDetailBlock('Cost', costValue)}
+    <div class="stay-mobile-facts-grid">
+      ${renderStayMobileLinkedFact('Location', stay.location || '', locationUrl, 'stay-mobile-fact--wide')}
+      ${renderStayMobileFact('City', cityName)}
+      ${renderStayMobileFact('Nights', String(nights))}
+      ${renderStayMobileFact('Check In', formatDateShort(stay.checkIn))}
+      ${renderStayMobileFact('Check In Time', stay.checkInTime || '')}
+      ${renderStayMobileFact('Check Out', formatDateShort(stay.checkOut))}
+      ${renderStayMobileFact('Check Out Time', stay.checkOutTime || '')}
+      ${renderStayMobileFact('Property Name', stay.propertyName || '')}
+      ${renderStayMobileFact('Provider', stay.provider || '')}
+      ${renderStayMobileFact('Cost', costValue)}
+      ${renderStayMobileFact('Booking #', stay.bookingRef || '')}
+      ${renderStayMobileFact('Notes', stay.notes || '', 'stay-mobile-fact--wide')}
     </div>
   `;
 }
@@ -135,7 +175,7 @@ function buildAccomTab(cityFilter = null) {
   if (sortedStays.length === 0) {
     container.innerHTML = `
       <div class="section-header accom-header">
-        <h3 class="section-header-title">🏨 Accommodation</h3>
+        <h3 class="section-header-title">&#x1F3E8; Accommodation</h3>
         <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
       </div>
       <div class="empty-placeholder">
@@ -150,7 +190,7 @@ function buildAccomTab(cityFilter = null) {
 
   const headerHtml = `
     <div class="section-header accom-header">
-      <h3 class="section-header-title">🏨 Accommodation</h3>
+      <h3 class="section-header-title">&#x1F3E8; Accommodation</h3>
       <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
     </div>
   `;
@@ -171,37 +211,27 @@ function buildAccomTab(cityFilter = null) {
       const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
       const checkIn = formatDateShort(stay.checkIn);
       const checkOut = formatDateShort(stay.checkOut);
-      const statusMeta = typeof renderMobileStatusCostMeta === 'function'
-          ? renderMobileStatusCostMeta({
-            status,
-            costValue: stay.totalCost || '0',
-            bookingReference: stay.bookingRef || '',
-            statusOnClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
-            costOnBlur: `updateStayField('${stay.id}', 'totalCost', this.innerText)`,
-            statusButtonTitle: 'Change status',
-            metaClass: 'stay-status-cost-meta mobile-status-cost-meta',
-            editableCost: isEditMode
-          })
-          : '';
-      const meta = `
-        ${renderMobileStat('Stay', checkIn, `Out ${checkOut}`)}
-        ${renderMobileStat('Provider', stay.provider || '—', stay.bookingRef ? escapeHtmlText(`#${stay.bookingRef}`) : 'No booking ref')}
-        <div class="mobile-surface-card-stat mobile-surface-card-stat--status">${statusMeta}</div>
-      `;
+      const primaryAction = renderStatusBadge(status, {
+        onClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
+        title: 'Change stay status',
+        className: 'stay-status-badge stay-status-badge-clickable'
+      });
+      const meta = '';
       const actions = `
         <button class="mobile-surface-card-button stay-edit-btn" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit stay">Edit</button>
         <button class="mobile-surface-card-button mobile-surface-card-button--danger stay-del-btn" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete stay">Delete</button>
       `;
       const details = renderStayMobileDetails(stay, cityName);
-      const summary = renderStayLocationDetails(stay, 'stay-card-location');
+      const summary = '';
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'stay-mobile-card row-accent',
         accentColor: cityColor,
-        dateLabel: checkIn,
-        title: stay.propertyName || '—',
-        subtitle: [`Out ${checkOut}`, stay.provider || '', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' · '),
+        dateLabel: '',
+        title: stay.propertyName || 'â€”',
+        subtitle: [`In ${checkIn}`, `Out ${checkOut}`, stay.provider || '', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' · '),
         summary,
         meta,
+        primaryAction,
         actions,
         details,
         detailsOpen: true
@@ -215,7 +245,7 @@ function buildAccomTab(cityFilter = null) {
         <button type="button" class="mobile-swipe-chip" data-role="mobile-swipe-chip" data-slide-index="${index}" aria-controls="stay-slide-${index}" aria-selected="${index === 0 ? 'true' : 'false'}">
           <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(cityName)}</span>
           <span class="mobile-swipe-chip-title">${escapeHtmlText(stay.propertyName || 'Stay')}</span>
-          <span class="mobile-swipe-chip-route">${escapeHtmlText([checkIn, checkOut].filter(Boolean).join(' · '))}</span>
+          <span class="mobile-swipe-chip-route">${escapeHtmlText([checkIn, checkOut].filter(Boolean).join(' Â· '))}</span>
         </button>
       `);
     });
@@ -275,9 +305,9 @@ function buildAccomTab(cityFilter = null) {
         </div>
       </td>
       <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">
-        ${stay.location ? renderStayLocationDetails(stay, 'text-xs', false) : '—'}
+        ${stay.location ? renderStayLocationDetails(stay, 'text-xs', false) : 'â€”'}
       </td>
-      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${escapeHtmlText(stay.provider || '—')}</td>
+      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${escapeHtmlText(stay.provider || 'â€”')}</td>
       <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
         ${formatDateShort(stay.checkIn)}
         <div class="md:hidden mt-1 text-slate-500">
@@ -286,11 +316,11 @@ function buildAccomTab(cityFilter = null) {
       </td>
       <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${formatDateShort(stay.checkOut)}</td>
       <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm text-center">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
-      <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">${escapeHtmlText(stay.bookingRef || '—')}</td>
+      <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">${escapeHtmlText(stay.bookingRef || 'â€”')}</td>
       
       <!-- Notes -->
       <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[250px] break-words" title="${escapeHtmlText(stay.notes || '')}">
-        ${escapeHtmlText(stay.notes || '—')}
+        ${escapeHtmlText(stay.notes || 'â€”')}
       </td>
 
       <td class="px-4 py-3 align-middle text-center">
@@ -334,7 +364,7 @@ function calculateNights(checkIn, checkOut) {
 // Helper to format date as DD MMM
 function formatDateShort(dateStr) {
   if (typeof formatTripDateForDisplay === 'function') return formatTripDateForDisplay(dateStr);
-  if (!dateStr) return '—';
+  if (!dateStr) return 'â€”';
   const date = new Date(`${dateStr}T00:00:00`);
   const day = date.getDate();
   const month = date.toLocaleDateString('en-AU', { month: 'short', timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
@@ -401,12 +431,12 @@ function buildPackingTab() {
 
   // Ensure default packing areas exist - add missing ones with defaults
   const defaultAreaNames = {
-    "🚶 Walk-on Gear (Wear onto plane)": "#E67E22",
-    "🧳 Carry-on Packed Bag (Main Luggage)": "#2980B9",
-    "🎒 Personal Item Bag (Under Seat)": "#8E44AD"
+    "ðŸš¶ Walk-on Gear (Wear onto plane)": "#E67E22",
+    "ðŸ§³ Carry-on Packed Bag (Main Luggage)": "#2980B9",
+    "ðŸŽ’ Personal Item Bag (Under Seat)": "#8E44AD"
   };
 
-  defaultAreaNames["📝 Trip Notes"] = "#6C5CE7";
+  defaultAreaNames["ðŸ“ Trip Notes"] = "#6C5CE7";
 
   Object.entries(defaultAreaNames).forEach(([areaName, areaColor]) => {
     const existing = packingData.find(a => a.areaName === areaName);
@@ -424,11 +454,11 @@ function buildPackingTab() {
   let guidesHTML = `
     <div class="guides-grid">
       <details class="guide-details">
-        <summary class="guide-summary red-alert">🏠 Before Leaving Home</summary>
+        <summary class="guide-summary red-alert">ðŸ  Before Leaving Home</summary>
         <div class="guide-content">
           ${leaveHomeData.map((item, iIdx) => `
             <div class="packing-item">
-              <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">×</button>
+              <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">Ã—</button>
               <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
         <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
             </div>
@@ -438,7 +468,7 @@ function buildPackingTab() {
       </details>
 
       <details class="guide-details">
-        <summary class="guide-summary">🧼 Hotel Sink Washing Guide</summary>
+        <summary class="guide-summary">ðŸ§¼ Hotel Sink Washing Guide</summary>
         <div class="guide-content">
           <h4>How to Do Laundry in Your Hotel Room:</h4>
           <ol>
@@ -452,12 +482,12 @@ function buildPackingTab() {
             <li><strong>The Towel Burrito Method:</strong> Lay a clean towel on the floor, place clothing flat on top, roll it up, and step on the towel to squeeze out extra moisture.</li>
             <li><strong>Hang to Dry:</strong> Drape over clothes hangers or the shower rod.</li>
           </ol>
-          <div class="guide-tip"><strong>👉 Pro Tip:</strong> Rolling clothes in a microfiber towel works even better than hotel towels.</div>
+          <div class="guide-tip"><strong>ðŸ‘‰ Pro Tip:</strong> Rolling clothes in a microfiber towel works even better than hotel towels.</div>
         </div>
       </details>
 
       <details class="guide-details">
-        <summary class="guide-summary">💡 Example Capsule Wardrobe Prompt</summary>
+        <summary class="guide-summary">ðŸ’¡ Example Capsule Wardrobe Prompt</summary>
         <div class="guide-content">
           <p class="guide-prompt-block">
             "I'm going on a 14-day trip to Europe in June and want to pack carry-on only. I want to create a minimalist capsule wardrobe with as few pieces as possible that will give me 14 different outfits (can be achieved with a 3x3 method - 3 shirts, 3 bottoms, 3 layers). Please build me a packing list by telling me the number of tops, bottoms and layering pieces that can be mixed and matched. My style is classic and practical with neutral colors. I want outfits that are comfortable and stylish for activities like sightseeing, casual dinners, and lots of walking. No more than 2 shoes (formal and sports). I need outfits for touring ports, lounging, and a couple of dressy dinners + I will need swimmers for asia or any hotel pools."
@@ -488,11 +518,11 @@ function buildPackingTab() {
             <div class="packing-card">
               <div class="packing-card-header">
                 <h3><span contenteditable="${isEditMode}" onblur="updatePackingCat(${aIdx}, ${cIdx}, this.innerText)">${cat.title}</span></h3>
-                <button class="del-btn" title="Delete Category Block" onclick="deletePackingCat(${aIdx}, ${cIdx})">×</button>
+                <button class="del-btn" title="Delete Category Block" onclick="deletePackingCat(${aIdx}, ${cIdx})">Ã—</button>
               </div>
               ${cat.items.map((item, iIdx) => `
                 <div class="packing-item">
-                  <button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">×</button>
+                  <button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">Ã—</button>
                   <input type="checkbox" ${item.done ? 'checked' : ''} onchange="togglePackingItem(event, ${aIdx}, ${cIdx}, ${iIdx})">
                   <span contenteditable="${isEditMode}" onblur="updatePackingItem(${aIdx}, ${cIdx}, ${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
                 </div>
