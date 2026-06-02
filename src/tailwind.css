@@ -302,7 +302,7 @@
   }
 
   .journey-city-link-row {
-    @apply text-right mb-6;
+    @apply text-right;
   }
 
   .stay-nights-input {
@@ -460,7 +460,7 @@
 
   .journey-address-row {
     margin-top: -0.25rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
   }
 
   .journey-route-spacer {
@@ -509,10 +509,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.85rem;
     align-items: end;
-  }
-
-  #journey-modal .journey-city-link-row {
-    @apply mt-0.5 mb-2;
   }
 
   .journey-datetime-pair {
@@ -686,17 +682,13 @@
       margin: 0 !important;
     }
 
-    #journey-modal .journey-form-header {
-      grid-column: 1 / -1;
-    }
-
     #journey-modal .journey-form-group-panel {
       align-content: start;
       min-height: 100%;
     }
 
-    #journey-modal .journey-form-group-panel:nth-of-type(2) { grid-column: 1; grid-row: 2; }
-    #journey-modal .journey-form-group-panel:nth-of-type(3) { grid-column: 2; grid-row: 2; }
+    #journey-modal .journey-form-group-panel:nth-of-type(1) { grid-column: 1; grid-row: 1; }
+    #journey-modal .journey-form-group-panel:nth-of-type(2) { grid-column: 2; grid-row: 1; }
 
     /* Footer separation for Delete vs Save/Cancel */
     #stay-modal .modal-footer,

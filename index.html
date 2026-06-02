@@ -646,10 +646,6 @@
           <div class="journey-modal-workspace">
             <div class="journey-modal-panel surface-panel surface-panel--card journey-form-card">
 
-              <div class="journey-form-header">
-                <span id="currentSegmentLabel" class="journey-segment-label">Segment 1 — entering details</span>
-              </div>
-
               <input type="hidden" id="journeyType" value="flight">
               
               <!-- Panel 1: Type, route, and schedule -->
@@ -665,12 +661,12 @@
                 <div class="journey-route-grid journey-route-row modal-form-row">
                   <div class="ai-form-group">
                     <label>From</label>
-                    <select id="journeyFromCity" class="form-control" onchange="_journeyFormDirty=true"></select>
+                    <select id="journeyFromCity" class="form-control" onchange="handleJourneyCitySelectChange(this)"></select>
                   </div>
                   <div class="journey-route-arrow">➔</div>
                   <div class="ai-form-group">
                     <label>To</label>
-                    <select id="journeyToCity" class="form-control" onchange="_journeyFormDirty=true"></select>
+                    <select id="journeyToCity" class="form-control" onchange="handleJourneyCitySelectChange(this)"></select>
                   </div>
                 </div>
                 <div class="journey-route-grid journey-address-row modal-form-row">
@@ -683,9 +679,6 @@
                     <label for="journeyToAddress">To Details</label>
                     <input type="text" id="journeyToAddress" class="form-control" onchange="_journeyFormDirty=true" placeholder="e.g. Haneda Terminal 3">
                   </div>
-                </div>
-                <div class="journey-city-link-row">
-                  <a href="#" class="inline-action-link" onclick="promptAddNewCity(); return false;">+ Add new city (opens Cities dialog)</a>
                 </div>
                 <div class="journey-time-grid">
                   <div class="ai-form-group">

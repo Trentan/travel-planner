@@ -1424,6 +1424,24 @@ function editJourney(journeyId) {
 
 // Track if form is "dirty" (has unsaved user changes)
 let _journeyFormDirty = false;
+const JOURNEY_ADD_CITY_OPTION = '__add_new_city__';
+
+function _rememberJourneyCitySelection(selectEl) {
+  if (selectEl && selectEl.value !== JOURNEY_ADD_CITY_OPTION) {
+    selectEl.dataset.previousValue = selectEl.value;
+  }
+}
+
+function handleJourneyCitySelectChange(selectEl) {
+  if (!selectEl) return;
+  if (selectEl.value === JOURNEY_ADD_CITY_OPTION) {
+    selectEl.value = selectEl.dataset.previousValue || '';
+    promptAddNewCity();
+    return;
+  }
+  _journeyFormDirty = true;
+  _rememberJourneyCitySelection(selectEl);
+}
 
 // Helper to fill the form inputs
 function _loadSegmentIntoForm(seg) {
@@ -1432,6 +1450,8 @@ function _loadSegmentIntoForm(seg) {
 
   document.getElementById('journeyFromCity').value = seg.fromLocation || '';
   document.getElementById('journeyToCity').value = seg.toLocation || '';
+  _rememberJourneyCitySelection(document.getElementById('journeyFromCity'));
+  _rememberJourneyCitySelection(document.getElementById('journeyToCity'));
   document.getElementById('journeyFromAddress').value = seg.fromAddress || '';
   document.getElementById('journeyToAddress').value = seg.toAddress || '';
   document.getElementById('journeyDateFrom').value = seg.departureDate || '';
@@ -1503,14 +1523,17 @@ function _populateJourneyCityDropdowns() {
       optionsHtml += `<option value="${city.name}">${flag} ${city.name}</option>`;
     });
   }
+  optionsHtml += `<option value="${JOURNEY_ADD_CITY_OPTION}">+ Add new city...</option>`;
 
   if (fromSelect) {
     fromSelect.innerHTML = optionsHtml;
     if (currentFrom) fromSelect.value = currentFrom;
+    _rememberJourneyCitySelection(fromSelect);
   }
   if (toSelect) {
     toSelect.innerHTML = '<option value="">-- Select city --</option>' + optionsHtml;
     if (currentTo) toSelect.value = currentTo;
+    _rememberJourneyCitySelection(toSelect);
   }
 }
 
@@ -1815,6 +1838,7 @@ window.migrateJourneyCityIds = migrateJourneyCityIds;
 
 window.selectJourneyType = selectJourneyType;
 window.promptAddNewCity = promptAddNewCity;
+window.handleJourneyCitySelectChange = handleJourneyCitySelectChange;
 window.editJourney = editJourney;
 window.editPendingSegment = editPendingSegment;
 
