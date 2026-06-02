@@ -158,6 +158,12 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
 
     await page.locator('.app-tab-btn[data-tab="accom"]').click();
     await humanPause(page, 350);
+    await page.evaluate(() => {
+      if (document.body.classList.contains('read-only-mode') && typeof toggleEditMode === 'function') {
+        toggleEditMode();
+      }
+    });
+    await page.waitForFunction(() => !document.body.classList.contains('read-only-mode'));
     await page.locator('#tab-accom .action-btn:has-text("+ Add Stay")').click();
     await page.waitForSelector('#stay-modal', { state: 'visible' });
     await humanPause(page, 400);

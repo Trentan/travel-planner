@@ -176,7 +176,7 @@ function buildAccomTab(cityFilter = null) {
     container.innerHTML = `
       <div class="section-header accom-header">
         <h3 class="section-header-title">&#x1F3E8; Accommodation</h3>
-        <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
+        ${isEditMode ? '<button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>' : ''}
       </div>
       <div class="empty-placeholder">
         <p>No stays found.</p>
@@ -191,7 +191,7 @@ function buildAccomTab(cityFilter = null) {
   const headerHtml = `
     <div class="section-header accom-header">
       <h3 class="section-header-title">&#x1F3E8; Accommodation</h3>
-      <button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>
+      ${isEditMode ? '<button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>' : ''}
     </div>
   `;
 
@@ -217,10 +217,10 @@ function buildAccomTab(cityFilter = null) {
         className: 'stay-status-badge stay-status-badge-clickable'
       });
       const meta = '';
-      const actions = `
+      const actions = isEditMode ? `
         <button class="mobile-surface-card-button stay-edit-btn" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit stay">Edit</button>
         <button class="mobile-surface-card-button mobile-surface-card-button--danger stay-del-btn" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete stay">Delete</button>
-      `;
+      ` : '';
       const details = renderStayMobileDetails(stay, cityName);
       const summary = '';
       const cardHtml = renderMobileSurfaceCard({
@@ -279,7 +279,7 @@ function buildAccomTab(cityFilter = null) {
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notes</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Status</th>
           <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Cost</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Actions</th>
+          ${isEditMode ? '<th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Actions</th>' : ''}
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">`;
@@ -332,7 +332,7 @@ function buildAccomTab(cityFilter = null) {
       <td class="px-4 py-3 align-middle text-right font-medium text-slate-800 dark:text-slate-200">
         $<span>${formatCurrency(stay.totalCost || '0', { includeSymbol: false })}</span>
       </td>
-      <td class="px-4 py-3 align-middle text-center whitespace-nowrap">
+      ${isEditMode ? `<td class="px-4 py-3 align-middle text-center whitespace-nowrap">
         <div class="inline-flex gap-2">
           <button class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit Stay">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
@@ -341,7 +341,7 @@ function buildAccomTab(cityFilter = null) {
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
         </div>
-      </td>
+      </td>` : ''}
     </tr>`;
   });
 
@@ -458,12 +458,12 @@ function buildPackingTab() {
         <div class="guide-content">
           ${leaveHomeData.map((item, iIdx) => `
             <div class="packing-item">
-              <button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>
+              ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
               <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
         <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
             </div>
           `).join('')}
-          <button class="add-btn add-btn-home-task" onclick="addLeaveHomeItem()">+ Add Home Task</button>
+          ${isEditMode ? '<button class="add-btn add-btn-home-task" onclick="addLeaveHomeItem()">+ Add Home Task</button>' : ''}
         </div>
       </details>
 
@@ -518,28 +518,28 @@ function buildPackingTab() {
             <div class="packing-card">
               <div class="packing-card-header">
                 <h3><span contenteditable="${isEditMode}" onblur="updatePackingCat(${aIdx}, ${cIdx}, this.innerText)">${cat.title}</span></h3>
-                <button class="del-btn" title="Delete Category Block" onclick="deletePackingCat(${aIdx}, ${cIdx})">&times;</button>
+                ${isEditMode ? `<button class="del-btn" title="Delete Category Block" onclick="deletePackingCat(${aIdx}, ${cIdx})">&times;</button>` : ''}
               </div>
               ${cat.items.map((item, iIdx) => `
                 <div class="packing-item">
-                  <button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">&times;</button>
+                  ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">&times;</button>` : ''}
                   <input type="checkbox" ${item.done ? 'checked' : ''} onchange="togglePackingItem(event, ${aIdx}, ${cIdx}, ${iIdx})">
                   <span contenteditable="${isEditMode}" onblur="updatePackingItem(${aIdx}, ${cIdx}, ${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
                 </div>
               `).join('')}
-              <button class="add-btn" onclick="addPackingItem(${aIdx}, ${cIdx})">+ Add Item</button>
+              ${isEditMode ? `<button class="add-btn" onclick="addPackingItem(${aIdx}, ${cIdx})">+ Add Item</button>` : ''}
             </div>
           `).join('')}
-          <div class="packing-card packing-card-add-block" onclick="addPackingCat(${aIdx})">
+          ${isEditMode ? `<div class="packing-card packing-card-add-block" onclick="addPackingCat(${aIdx})">
             <span class="packing-card-add-label">+ Add New Category Block</span>
-          </div>
+          </div>` : ''}
         </div>
       </div>`;
   });
 
   const restoreFooterHTML = `
     <div class="packing-guides-actions packing-page-footer">
-      <button class="action-btn packing-restore-btn" type="button" onclick="restorePackingToDefault()">Restore Packing to Default</button>
+      ${isEditMode ? '<button class="action-btn packing-restore-btn" type="button" onclick="restorePackingToDefault()">Restore Packing to Default</button>' : ''}
     </div>
   `;
 
