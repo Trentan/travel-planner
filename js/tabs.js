@@ -141,13 +141,13 @@ function renderStayMobileDetails(stay, cityName) {
 
   return `
     <div class="stay-mobile-facts-grid">
-      ${renderStayMobileLinkedFact('Location', stay.location || '', locationUrl, 'stay-mobile-fact--wide')}
-      ${renderStayMobileFact('City', cityName)}
-      ${renderStayMobileFact('Nights', String(nights))}
       ${renderStayMobileFact('Check In', formatDateShort(stay.checkIn))}
       ${renderStayMobileFact('Check In Time', stay.checkInTime || '')}
       ${renderStayMobileFact('Check Out', formatDateShort(stay.checkOut))}
       ${renderStayMobileFact('Check Out Time', stay.checkOutTime || '')}
+      ${renderStayMobileFact('City', cityName)}
+      ${renderStayMobileFact('Nights', String(nights))}
+      ${renderStayMobileLinkedFact('Location', stay.location || '', locationUrl, 'stay-mobile-fact--wide')}
       ${renderStayMobileFact('Property Name', stay.propertyName || '')}
       ${renderStayMobileFact('Provider', stay.provider || '')}
       ${renderStayMobileFact('Cost', costValue)}
