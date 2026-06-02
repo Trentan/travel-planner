@@ -1725,8 +1725,8 @@ function setCityCountry(cityId, country) {
 function openCityDialog() {
   const modal = document.getElementById('city-modal');
   if (modal) {
-    // Give the city modal a higher z-index than journey modal (which uses default 1000 from CSS)
-    modal.style.zIndex = '1100';
+    // Keep Cities above other open modal workflows, such as Edit journey.
+    modal.style.zIndex = '2200';
     modal.style.display = 'flex';
     createCityDatalists(); // Ensure datalists exist
     populateCityList();
@@ -2044,6 +2044,10 @@ async function addNewCityFromDialog() {
 
   const newCity = addOrUpdateCity(name, countryName, '', '', cityCode, countryCode);
   if (newCity) {
+    if (typeof refreshJourneyCityDropdowns === 'function') {
+      refreshJourneyCityDropdowns(newCity.name);
+    }
+
     if (!cityHasStoredCoords(newCity)) {
       const location = await resolveCityLocation(newCity);
       if (location) applyCityLocation(newCity, location);

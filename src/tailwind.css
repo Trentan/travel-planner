@@ -302,7 +302,7 @@
   }
 
   .journey-city-link-row {
-    @apply text-right mb-6;
+    @apply text-right;
   }
 
   .stay-nights-input {
@@ -337,7 +337,8 @@
   /* Modal overlay - full screen backdrop */
   .modal-overlay {
     @apply fixed inset-0 bg-black/70 flex items-center justify-center
-           z-1000 p-4;
+           p-4;
+    z-index: 2000;
   }
 
   /* Modal content panel */
@@ -422,13 +423,13 @@
   }
 
   #journey-modal .modal-content {
-    max-width: min(1220px, 97vw);
-    width: min(1220px, 97vw);
-    max-height: 94vh;
+    max-width: min(1180px, 94vw);
+    width: min(1180px, 94vw);
+    max-height: 88vh;
   }
 
   #journey-modal .modal-body {
-    max-height: calc(94vh - 142px);
+    max-height: calc(88vh - 142px);
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0.75rem 0;
@@ -459,7 +460,7 @@
 
   .journey-address-row {
     margin-top: -0.25rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
   }
 
   .journey-route-spacer {
@@ -499,19 +500,15 @@
   }
 
   .journey-time-grid {
-    @apply grid gap-2.5;
+    @apply grid gap-3;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   #journey-modal .journey-meta-row.modal-form-row--split {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.65rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
     align-items: end;
-  }
-
-  #journey-modal .journey-city-link-row {
-    @apply mt-0.5 mb-2;
   }
 
   .journey-datetime-pair {
@@ -607,9 +604,21 @@
     .stay-form-group-panel:nth-child(4) { grid-column: 2; grid-row: 2; }
 
     /* Desktop Journey Modal split dashboard workspace */
+    #journey-modal.modal-overlay {
+      align-items: center;
+      padding: 2rem 1.25rem;
+    }
+
+    #journey-modal .modal-content {
+      border-radius: 20px;
+      margin: 0 auto;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgb(15 23 42 / 0.22);
+    }
+
     .journey-modal-body-layout {
       display: grid !important;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 320px minmax(0, 1fr);
       gap: 1.5rem;
       padding: 1.25rem 1.5rem;
       min-height: 0;
@@ -664,7 +673,7 @@
 
     #journey-modal .journey-form-card {
       display: grid !important;
-      grid-template-columns: 1.15fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1.25rem;
       background: transparent !important;
       border: none !important;
@@ -673,18 +682,13 @@
       margin: 0 !important;
     }
 
-    #journey-modal .journey-form-header {
-      grid-column: 1 / -1;
-    }
-
     #journey-modal .journey-form-group-panel {
       align-content: start;
+      min-height: 100%;
     }
 
-    #journey-modal .journey-form-group-panel:nth-of-type(1) { grid-column: 1; grid-row: 2; }
-    #journey-modal .journey-form-group-panel:nth-of-type(2) { grid-column: 1; grid-row: 3; }
-    #journey-modal .journey-form-group-panel:nth-of-type(3) { grid-column: 2; grid-row: 2; }
-    #journey-modal .journey-form-group-panel:nth-of-type(4) { grid-column: 2; grid-row: 3; }
+    #journey-modal .journey-form-group-panel:nth-of-type(1) { grid-column: 1; grid-row: 1; }
+    #journey-modal .journey-form-group-panel:nth-of-type(2) { grid-column: 2; grid-row: 1; }
 
     /* Footer separation for Delete vs Save/Cancel */
     #stay-modal .modal-footer,
@@ -698,6 +702,63 @@
     #stayDeleteBtn,
     #journeyDeleteBtn {
       margin-right: auto !important;
+    }
+
+    #tab-transport .travel-data-table,
+    #tab-accom .travel-data-table {
+      min-width: 0;
+      max-width: 100%;
+      table-layout: fixed;
+    }
+
+    #tab-transport .travel-data-table th,
+    #tab-transport .travel-data-table td,
+    #tab-accom .travel-data-table th,
+    #tab-accom .travel-data-table td {
+      white-space: normal !important;
+    }
+
+    #tab-transport .travel-data-table th:first-child,
+    #tab-transport .travel-data-table td:first-child {
+      width: 2.25rem;
+    }
+
+    #tab-transport .travel-data-table th:nth-child(3),
+    #tab-transport .travel-data-table td:nth-child(3) {
+      width: 3.25rem;
+    }
+
+    #tab-transport .travel-data-table th:last-child,
+    #tab-transport .travel-data-table td:last-child,
+    #tab-accom .travel-data-table th:last-child,
+    #tab-accom .travel-data-table td:last-child {
+      width: 4.75rem;
+      white-space: nowrap !important;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1180px) {
+    #tab-transport .travel-data-table th,
+    #tab-transport .travel-data-table td,
+    #tab-accom .travel-data-table th,
+    #tab-accom .travel-data-table td {
+      padding-left: 0.55rem !important;
+      padding-right: 0.55rem !important;
+    }
+
+    #tab-transport .travel-data-table {
+      font-size: 0.82rem;
+    }
+
+    #tab-accom .travel-data-table {
+      font-size: 0.84rem;
+    }
+
+    #tab-transport .transport-data-table th:nth-child(11),
+    #tab-transport .transport-data-table td:nth-child(11),
+    #tab-accom .stay-data-table th:nth-child(9),
+    #tab-accom .stay-data-table td:nth-child(9) {
+      max-width: 11rem;
     }
   }
 
@@ -3859,6 +3920,20 @@
 
   .transport-status-badge-clickable {
     @apply cursor-pointer;
+  }
+
+  .travel-data-table-shell {
+    scrollbar-gutter: stable;
+  }
+
+  .travel-data-table {
+    table-layout: auto;
+    min-width: min(100%, 58rem);
+  }
+
+  .travel-data-table th,
+  .travel-data-table td {
+    overflow-wrap: anywhere;
   }
 
   .pending-segment-summary {
