@@ -19,7 +19,7 @@ function renderStayDetailBlock(title, value, extraClass = '') {
   return `
     <div class="flex flex-col gap-1 p-2 bg-slate-50 dark:bg-slate-800/40 rounded border border-slate-100 dark:border-slate-800/60 ${extraClass}">
       <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">${escapeHtmlText(title)}</span>
-      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(value || 'â€”')}</span>
+      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(value || '—')}</span>
     </div>
   `;
 }
@@ -83,11 +83,11 @@ function renderStayMobileLinkedFact(label, value, href, extraClass = '') {
 }
 
 function renderStayMobileSummary(stay, status, statusIcon, cityName) {
-  const providerText = [stay.provider || 'â€”', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' ');
+  const providerText = [stay.provider || '—', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' ');
 
   return `
     <div class="mobile-table-meta stay-mobile-meta">
-      <span><strong>Details:</strong> ${cityName}${providerText !== 'â€”' ? ` Â· ${providerText}` : ''}</span>
+      <span><strong>Details:</strong> ${cityName}${providerText !== '—' ? ` · ${providerText}` : ''}</span>
       ${renderStayLocationDetails(stay, 'stay-mobile-location')}
     </div>
   `;
@@ -227,7 +227,7 @@ function buildAccomTab(cityFilter = null) {
         cardClass: 'stay-mobile-card row-accent',
         accentColor: cityColor,
         dateLabel: '',
-        title: stay.propertyName || 'â€”',
+        title: stay.propertyName || '—',
         subtitle: [`In ${checkIn}`, `Out ${checkOut}`, stay.provider || '', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' · '),
         summary,
         meta,
@@ -245,7 +245,7 @@ function buildAccomTab(cityFilter = null) {
         <button type="button" class="mobile-swipe-chip" data-role="mobile-swipe-chip" data-slide-index="${index}" aria-controls="stay-slide-${index}" aria-selected="${index === 0 ? 'true' : 'false'}">
           <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(cityName)}</span>
           <span class="mobile-swipe-chip-title">${escapeHtmlText(stay.propertyName || 'Stay')}</span>
-          <span class="mobile-swipe-chip-route">${escapeHtmlText([checkIn, checkOut].filter(Boolean).join(' Â· '))}</span>
+          <span class="mobile-swipe-chip-route">${escapeHtmlText([checkIn, checkOut].filter(Boolean).join(' · '))}</span>
         </button>
       `);
     });
@@ -305,9 +305,9 @@ function buildAccomTab(cityFilter = null) {
         </div>
       </td>
       <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">
-        ${stay.location ? renderStayLocationDetails(stay, 'text-xs', false) : 'â€”'}
+        ${stay.location ? renderStayLocationDetails(stay, 'text-xs', false) : '—'}
       </td>
-      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${escapeHtmlText(stay.provider || 'â€”')}</td>
+      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${escapeHtmlText(stay.provider || '—')}</td>
       <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
         ${formatDateShort(stay.checkIn)}
         <div class="md:hidden mt-1 text-slate-500">
@@ -316,11 +316,11 @@ function buildAccomTab(cityFilter = null) {
       </td>
       <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${formatDateShort(stay.checkOut)}</td>
       <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm text-center">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
-      <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">${escapeHtmlText(stay.bookingRef || 'â€”')}</td>
+      <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">${escapeHtmlText(stay.bookingRef || '—')}</td>
       
       <!-- Notes -->
       <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[250px] break-words" title="${escapeHtmlText(stay.notes || '')}">
-        ${escapeHtmlText(stay.notes || 'â€”')}
+        ${escapeHtmlText(stay.notes || '—')}
       </td>
 
       <td class="px-4 py-3 align-middle text-center">
@@ -364,7 +364,7 @@ function calculateNights(checkIn, checkOut) {
 // Helper to format date as DD MMM
 function formatDateShort(dateStr) {
   if (typeof formatTripDateForDisplay === 'function') return formatTripDateForDisplay(dateStr);
-  if (!dateStr) return 'â€”';
+  if (!dateStr) return '—';
   const date = new Date(`${dateStr}T00:00:00`);
   const day = date.getDate();
   const month = date.toLocaleDateString('en-AU', { month: 'short', timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
@@ -431,12 +431,12 @@ function buildPackingTab() {
 
   // Ensure default packing areas exist - add missing ones with defaults
   const defaultAreaNames = {
-    "ðŸš¶ Walk-on Gear (Wear onto plane)": "#E67E22",
-    "ðŸ§³ Carry-on Packed Bag (Main Luggage)": "#2980B9",
-    "ðŸŽ’ Personal Item Bag (Under Seat)": "#8E44AD"
+    "🚶 Walk-on Gear (Wear onto plane)": "#E67E22",
+    "🧳 Carry-on Packed Bag (Main Luggage)": "#2980B9",
+    "🎒 Personal Item Bag (Under Seat)": "#8E44AD"
   };
 
-  defaultAreaNames["ðŸ“ Trip Notes"] = "#6C5CE7";
+  defaultAreaNames["📝 Trip Notes"] = "#6C5CE7";
 
   Object.entries(defaultAreaNames).forEach(([areaName, areaColor]) => {
     const existing = packingData.find(a => a.areaName === areaName);
@@ -454,7 +454,7 @@ function buildPackingTab() {
   let guidesHTML = `
     <div class="guides-grid">
       <details class="guide-details">
-        <summary class="guide-summary red-alert">ðŸ  Before Leaving Home</summary>
+        <summary class="guide-summary red-alert">🏠 Before Leaving Home</summary>
         <div class="guide-content">
           ${leaveHomeData.map((item, iIdx) => `
             <div class="packing-item">
@@ -468,7 +468,7 @@ function buildPackingTab() {
       </details>
 
       <details class="guide-details">
-        <summary class="guide-summary">ðŸ§¼ Hotel Sink Washing Guide</summary>
+        <summary class="guide-summary">🧼 Hotel Sink Washing Guide</summary>
         <div class="guide-content">
           <h4>How to Do Laundry in Your Hotel Room:</h4>
           <ol>
@@ -482,12 +482,12 @@ function buildPackingTab() {
             <li><strong>The Towel Burrito Method:</strong> Lay a clean towel on the floor, place clothing flat on top, roll it up, and step on the towel to squeeze out extra moisture.</li>
             <li><strong>Hang to Dry:</strong> Drape over clothes hangers or the shower rod.</li>
           </ol>
-          <div class="guide-tip"><strong>ðŸ‘‰ Pro Tip:</strong> Rolling clothes in a microfiber towel works even better than hotel towels.</div>
+          <div class="guide-tip"><strong>👉 Pro Tip:</strong> Rolling clothes in a microfiber towel works even better than hotel towels.</div>
         </div>
       </details>
 
       <details class="guide-details">
-        <summary class="guide-summary">ðŸ’¡ Example Capsule Wardrobe Prompt</summary>
+        <summary class="guide-summary">💡 Example Capsule Wardrobe Prompt</summary>
         <div class="guide-content">
           <p class="guide-prompt-block">
             "I'm going on a 14-day trip to Europe in June and want to pack carry-on only. I want to create a minimalist capsule wardrobe with as few pieces as possible that will give me 14 different outfits (can be achieved with a 3x3 method - 3 shirts, 3 bottoms, 3 layers). Please build me a packing list by telling me the number of tops, bottoms and layering pieces that can be mixed and matched. My style is classic and practical with neutral colors. I want outfits that are comfortable and stylish for activities like sightseeing, casual dinners, and lots of walking. No more than 2 shoes (formal and sports). I need outfits for touring ports, lounging, and a couple of dressy dinners + I will need swimmers for asia or any hotel pools."
