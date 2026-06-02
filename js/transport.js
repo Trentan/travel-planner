@@ -658,6 +658,42 @@ function renderTransportSubLocationParts(parts, extraClass = '') {
   `;
 }
 
+function renderTransportSubLocationPlainText(parts, extraClass = '') {
+  const visibleParts = parts.filter(part => part && part.value);
+  if (visibleParts.length === 0) return '';
+
+  return `
+    <div class="transport-card-location-summary ${extraClass}">
+      ${visibleParts.map(part => `
+        <span class="transport-card-location-item" title="${escapeHtmlText(part.value)}">
+          <span class="transport-card-location-label">${escapeHtmlText(part.label)}:</span>
+          <a href="${getMapSearchUrl(part.value, part.city)}" target="_blank" rel="noopener noreferrer" class="transport-card-location-link" onclick="event.stopPropagation();" title="Open in Google Maps">${escapeHtmlText(part.value)}</a>
+          ${part.detail ? `<a href="${getMapSearchUrl(part.detail, part.city || part.value)}" target="_blank" rel="noopener noreferrer" class="transport-card-location-detail-link" onclick="event.stopPropagation();" title="Open in Google Maps">${escapeHtmlText(part.detail)}</a>` : ''}
+        </span>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderTransportMobileFact(label, value, extraClass = '') {
+  return `
+    <div class="transport-mobile-fact ${extraClass}">
+      <span class="transport-mobile-fact-label">${escapeHtmlText(label)}</span>
+      <span class="transport-mobile-fact-value">${escapeHtmlText(value || '')}</span>
+    </div>
+  `;
+}
+
+function renderTransportMobileLinkedFact(label, value, href, detail = '', detailHref = '', extraClass = '') {
+  return `
+    <div class="transport-mobile-fact ${extraClass}">
+      <span class="transport-mobile-fact-label">${escapeHtmlText(label)}</span>
+      ${value ? `<a href="${href}" target="_blank" rel="noopener noreferrer" class="transport-card-location-link transport-mobile-fact-link" onclick="event.stopPropagation();" title="Open in Google Maps">${escapeHtmlText(value)}</a>` : '<span class="transport-mobile-fact-value"></span>'}
+      ${detail ? `<a href="${detailHref}" target="_blank" rel="noopener noreferrer" class="transport-card-location-detail-link transport-mobile-fact-detail-link" onclick="event.stopPropagation();" title="Open in Google Maps">${escapeHtmlText(detail)}</a>` : ''}
+    </div>
+  `;
+}
+
 function renderTransportSubLocationDetails(seg, extraClass = '') {
   return renderTransportSubLocationParts(getTransportSubLocationParts(seg), extraClass);
 }
@@ -676,6 +712,61 @@ function getJourneySubLocationParts(segs) {
 
 function renderJourneySubLocationDetails(segs, extraClass = '') {
   return renderTransportSubLocationParts(getJourneySubLocationParts(segs), extraClass);
+}
+
+function renderJourneySubLocationSummary(segs, extraClass = '') {
+  if (!Array.isArray(segs) || segs.length === 0) return '';
+  const firstSeg = segs[0];
+  const lastSeg = segs[segs.length - 1];
+  return renderTransportSubLocationPlainText([
+    {
+      label: 'From',
+      value: firstSeg.fromLocation || '',
+      city: firstSeg.fromLocation,
+      detail: firstSeg.fromAddress || ''
+    },
+    {
+      label: 'To',
+      value: lastSeg.toLocation || '',
+      city: lastSeg.toLocation,
+      detail: lastSeg.toAddress || ''
+    }
+  ], extraClass);
+}
+
+function renderTransportMobileFacts(segs, totalCost) {
+  if (!Array.isArray(segs) || segs.length === 0) return '';
+  const firstSeg = segs[0];
+  const lastSeg = segs[segs.length - 1];
+  const firstDepDate = formatJourneyDate(firstSeg.departureDate) || firstSeg.dayDate || '';
+  const firstDepTime = firstSeg.departureTime || '';
+  const firstDep = [firstDepDate, firstDepTime].filter(Boolean).join(' ');
+  const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '';
+  const lastArrTime = lastSeg.arrivalTime || '';
+  const arrive = [lastArr, lastArrTime].filter(Boolean).join(' ');
+  const providerSet = Array.from(new Set(segs.map(seg => seg.provider).filter(Boolean)));
+  const routeCodeSet = Array.from(new Set(segs.map(seg => seg.routeCode).filter(Boolean)));
+  const bookingSet = Array.from(new Set(segs.map(seg => seg.bookingReference).filter(Boolean)));
+  const providerLabel = providerSet.length > 1 ? `${providerSet.length} carriers` : (providerSet[0] || '');
+  const routeCodeLabel = routeCodeSet.length > 1 ? `${routeCodeSet.length} codes` : (routeCodeSet[0] || '');
+  const bookingLabel = bookingSet.length > 1 ? `${bookingSet.length} refs` : (bookingSet[0] || '');
+  const fromValue = firstSeg.fromLocation || '';
+  const toValue = lastSeg.toLocation || '';
+  const fromDetail = firstSeg.fromAddress || '';
+  const toDetail = lastSeg.toAddress || '';
+
+  return `
+    <div class="transport-mobile-facts-grid">
+      ${renderTransportMobileLinkedFact('From', fromValue, getMapSearchUrl(fromValue, fromValue), fromDetail, getMapSearchUrl(fromDetail, fromValue))}
+      ${renderTransportMobileLinkedFact('To', toValue, getMapSearchUrl(toValue, toValue), toDetail, getMapSearchUrl(toDetail, toValue))}
+      ${renderTransportMobileFact('Depart', firstDep)}
+      ${renderTransportMobileFact('Arrive', arrive)}
+      ${renderTransportMobileFact('Carrier', providerLabel)}
+      ${renderTransportMobileFact('Code', routeCodeLabel)}
+      ${renderTransportMobileFact('Cost', formatCurrency(totalCost))}
+      ${renderTransportMobileFact('Booking #', bookingLabel)}
+    </div>
+  `;
 }
 
 function formatTransportSubLocationText(seg) {
@@ -860,34 +951,8 @@ function renderTransportSegmentsDetailContent(segs) {
 function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, journeyId) {
   if (!segs || segs.length === 0) return '';
 
-  const firstSeg = segs[0];
-  const lastSeg = segs[segs.length - 1];
-  const firstDepDate = formatJourneyDate(firstSeg.departureDate) || firstSeg.dayDate || '—';
-  const firstDepTime = firstSeg.departureTime || '';
-  const firstDep = firstDepDate !== '—' && firstDepTime ? `${firstDepDate} ${firstDepTime}` : firstDepDate;
-  const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '—';
-  const lastArrTime = lastSeg.arrivalTime || '—';
-  const route = segs.length > 1 ? buildRouteChain(segs) : `${firstSeg.fromLocation || '—'} → ${firstSeg.toLocation || '—'}`;
-  const routeDetails = formatTransportSubLocationText(firstSeg);
-  const providerSet = Array.from(new Set(segs.map(seg => seg.provider).filter(Boolean)));
-  const routeCodeSet = Array.from(new Set(segs.map(seg => seg.routeCode).filter(Boolean)));
-  const bookingSet = Array.from(new Set(segs.map(seg => seg.bookingReference).filter(Boolean)));
-  const providerLabel = providerSet.length > 1 ? `${providerSet.length} carriers` : (providerSet[0] || rep.provider || '—');
-  const routeCodeLabel = routeCodeSet.length > 1 ? `${routeCodeSet.length} codes` : (routeCodeSet[0] || rep.routeCode || '—');
-  const bookingLabel = bookingSet.length > 1 ? `${bookingSet.length} refs` : (bookingSet[0] || rep.bookingReference || '—');
-  const costValue = formatCurrency(totalCost);
-
   return `
-    <div class="grid grid-cols-2 gap-2 mt-4">
-      ${renderTransportDetailBlock('Route', route, 'col-span-2')}
-      ${segs.length === 1 && routeDetails ? renderTransportDetailBlock('Route details', routeDetails, 'col-span-2') : ''}
-      ${renderTransportDetailBlock('Depart', firstDep)}
-      ${renderTransportDetailBlock('Arrive', lastArr !== '—' ? `${lastArr} ${lastArrTime}`.trim() : '—')}
-      ${renderTransportDetailBlock('Carrier', providerLabel)}
-      ${renderTransportDetailBlock('Code', routeCodeLabel)}
-      ${renderTransportDetailBlock('Booking', bookingLabel)}
-      ${renderTransportDetailBlock('Cost', costValue)}
-    </div>
+    ${renderTransportMobileFacts(segs, totalCost)}
     ${segs.length > 1 ? renderTransportSegmentsDetailContent(segs) : ''}
   `;
 }
@@ -995,25 +1060,17 @@ function buildTransportTab(cityFilter = null) {
       const subtitleParts = [rep.provider || '—'];
       if (rep.routeCode) subtitleParts.push(rep.routeCode);
       if (durationDisplay) subtitleParts.push(durationDisplay);
-      const statusMeta = renderTransportStatusCostMobile(
-          rep.status,
-          statusIcon,
-          statusColor,
-          totalCost.toFixed(0),
-          rep.bookingReference,
-          rep.id,
-          isEditMode
-      );
-      const meta = `
-        ${renderMobileStat('Schedule', firstDep, lastArr !== '—' ? `Arr ${escapeHtmlText(`${lastArr}${lastArrTime ? ` ${lastArrTime}` : ''}`)}` : '')}
-        ${renderMobileStat('Carrier', rep.provider || '—', [rep.routeCode, rep.bookingReference ? `#${rep.bookingReference}` : ''].filter(Boolean).map(escapeHtmlText).join(' · '))}
-        <div class="mobile-surface-card-stat mobile-surface-card-stat--status">${statusMeta}</div>
-      `;
+      const primaryAction = renderStatusBadge(rep.status, {
+        onClick: isEditMode ? `event.stopPropagation(); toggleJourneyStatus('${rep.id}')` : '',
+        title: 'Change status',
+        className: 'transport-mobile-status-btn'
+      });
+      const meta = '';
       const actions = `
         <button class="mobile-surface-card-button transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">Edit</button>
         <button class="mobile-surface-card-button mobile-surface-card-button--danger transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">Delete</button>
       `;
-      const summary = renderJourneySubLocationDetails(segs, 'transport-card-sub-locations');
+      const summary = '';
       const details = renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, rep.id);
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'transport-mobile-card row-accent',
@@ -1023,6 +1080,7 @@ function buildTransportTab(cityFilter = null) {
         subtitle: subtitleParts.filter(Boolean).join(' · '),
         summary,
         meta,
+        primaryAction,
         actions,
         details,
         detailsOpen: true

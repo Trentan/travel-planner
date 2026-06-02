@@ -306,18 +306,18 @@ function renderMobileSurfaceCard({
   return `
     <article class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-700/50 rounded-xl p-4 shadow-sm flex flex-col gap-3 relative ${cardClass}"${accentStyle}>
       <div class="flex justify-between items-start gap-3">
-        <div class="flex flex-col gap-0.5 min-w-0">
-          <div class="flex items-center gap-2 flex-wrap">
+        <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+          <div class="flex items-baseline gap-2 min-w-0 flex-nowrap">
             ${dateLabel ? `<span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${escapeHtmlText(dateLabel)}</span>` : ''}
-            ${title ? `<h3 class="text-base font-bold text-slate-800 dark:text-slate-100 truncate">${escapeHtmlText(title || '—')}</h3>` : ''}
-            ${subtitle ? `<span class="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">${escapeHtmlText(subtitle)}</span>` : ''}
+            ${title ? `<h3 class="text-base font-bold text-slate-800 dark:text-slate-100 truncate min-w-0 flex-1">${escapeHtmlText(title || '—')}</h3>` : ''}
           </div>
+          ${subtitle ? `<span class="text-xs font-medium text-slate-500 dark:text-slate-400 truncate block min-w-0">${escapeHtmlText(subtitle)}</span>` : ''}
         </div>
         ${primaryAction ? `<div class="shrink-0">${primaryAction}</div>` : ''}
       </div>
       ${summary ? `<div class="text-sm text-slate-600 dark:text-slate-300 leading-snug">${summary}</div>` : ''}
       ${meta ? `<div class="flex flex-wrap gap-2 text-xs">${meta}</div>` : ''}
-      ${details ? `<div class="mt-1 ${detailsOpen ? 'block' : 'hidden'}">${details}</div>` : ''}
+      ${details ? `<div class="${detailsOpen ? 'block' : 'hidden'}">${details}</div>` : ''}
       ${actions ? `<div class="flex flex-wrap items-center gap-2 mt-2 pt-3 border-t border-slate-100 dark:border-slate-800">${actions}</div>` : ''}
     </article>
   `;
