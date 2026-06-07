@@ -5,8 +5,10 @@ const {
   loadAppScripts
 } = require('./lib/browser-harness');
 
-function decodeDownloadUri(uri) {
-  const commaIndex = String(uri || '').indexOf(',');
+function getDownloadContent(download) {
+  if (download?.content) return download.content;
+  const uri = String(download?.href || '');
+  const commaIndex = uri.indexOf(',');
   return commaIndex === -1 ? '' : decodeURIComponent(uri.slice(commaIndex + 1));
 }
 
@@ -638,8 +640,10 @@ async function testExportImport() {
     notes: ''
   });
   await context.exportJSON();
-  const exported = JSON.parse(decodeDownloadUri(app.document.lastDownload.href));
+  const exported = JSON.parse(getDownloadContent(app.document.lastDownload));
   assert(app.document.lastDownload.download.endsWith('.json'), 'Export: download should be JSON');
+  assert(app.document.lastDownload.href.startsWith('blob:'), 'Export: download should use a blob URL');
+  assert(app.document.lastDownload.href.length < 100, 'Export: download URL should not contain the trip payload');
   assert(exported.meta.title === 'Export Test', 'Export: should include current title');
   assert(exported.itinerary[0].days[0].desc === 'Changed for export', 'Export: should include updated itinerary data');
   const exportedJourney = exported.journeys.find(journey => journey.bookingReference === 'SUBLOC-99');
@@ -696,13 +700,31 @@ async function testShareExport() {
   app.document.getElementById('shareHideNotes').checked = false;
 
   await context.exportShareJSON();
-  const exported = JSON.parse(decodeDownloadUri(app.document.lastDownload.href));
+  const exported = JSON.parse(getDownloadContent(app.document.lastDownload));
 
   assert(app.document.lastDownload.download.endsWith('_share.json'), 'Share export: download should use the share suffix');
+  assert(app.document.lastDownload.href.startsWith('blob:'), 'Share export: download should use a blob URL');
   assert(exported.meta.redactions.costs === true, 'Share export: export should record cost redaction');
   assert(exported.meta.redactions.bookingRefs === true, 'Share export: export should record booking ref redaction');
   assert(exported.itinerary[0].days[0].activityItems[0].cost === '', 'Share export: itinerary item cost should be hidden');
   assert(exported.journeys[0].bookingReference === '', 'Share export: booking reference should be hidden');
+}
+
+async function testLargeFileDownload() {
+  const app = await createBootedApp();
+  assertBootClean(app, 'Large file download');
+
+  const largeContent = 'large-export-content\n'.repeat(15000);
+  app.context.downloadTextFile(largeContent, 'large-export.txt');
+
+  assert(app.document.lastDownload.download === 'large-export.txt', 'Large export: should preserve the filename');
+  assert(app.document.lastDownload.href.startsWith('blob:'), 'Large export: should use a blob URL');
+  assert(app.document.lastDownload.href.length < 100, 'Large export: URL should remain short');
+  assert(getDownloadContent(app.document.lastDownload) === largeContent, 'Large export: blob should contain the complete file');
+
+  const objectUrl = app.document.lastDownload.href;
+  await settle(app);
+  assert(app.revokedObjectUrls.includes(objectUrl), 'Large export: object URL should be revoked after download');
 }
 
 async function testTimelineDayMapsRoute() {
@@ -960,6 +982,7 @@ async function run() {
   await testExportImport();
   await testTimelineDayMapsRoute();
   await testShareExport();
+  await testLargeFileDownload();
   await testShareEmail();
   await testShareEmailDraft();
   await testBudgetUpdates();

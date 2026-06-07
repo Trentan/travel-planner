@@ -3676,13 +3676,29 @@ function redactShareExportPayload(exportObj, options = {}) {
 }
 
 function downloadTextFile(content, downloadName, mimeType = 'text/plain') {
-  const dataStr = `data:${mimeType};charset=utf-8,` + encodeURIComponent(content);
   const downloadAnchorNode = document.createElement('a');
-  downloadAnchorNode.setAttribute('href', dataStr);
+  const canUseBlobUrl = typeof Blob === 'function'
+    && typeof URL !== 'undefined'
+    && typeof URL.createObjectURL === 'function';
+  let objectUrl = '';
+
+  if (canUseBlobUrl) {
+    const fileBlob = new Blob([content], { type: `${mimeType};charset=utf-8` });
+    objectUrl = URL.createObjectURL(fileBlob);
+    downloadAnchorNode.setAttribute('href', objectUrl);
+  } else {
+    downloadAnchorNode.setAttribute('href', `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`);
+  }
+
   downloadAnchorNode.setAttribute('download', downloadName);
   document.body.appendChild(downloadAnchorNode);
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
+
+  if (objectUrl) {
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  }
+
   return downloadAnchorNode;
 }
 
@@ -4576,18 +4592,11 @@ async function exportItineraryText() {
   sections.push('');
   sections.push('END OF EXPORT');
 
-  const dataStr = 'data:text/plain;charset=utf-8,' + encodeURIComponent(sections.join('\n'));
-  const downloadAnchorNode = document.createElement('a');
-  downloadAnchorNode.setAttribute('href', dataStr);
-
   let dlName = currentFileName;
   if (dlName === 'Default Template') dlName = 'travel_planner_itinerary.txt';
   else dlName = dlName.replace(/\.json$/i, '') + '_itinerary.txt';
 
-  downloadAnchorNode.setAttribute('download', dlName);
-  document.body.appendChild(downloadAnchorNode);
-  downloadAnchorNode.click();
-  downloadAnchorNode.remove();
+  downloadTextFile(sections.join('\n'), dlName);
 }
 
 async function exportItinerarySummaryText() {
@@ -4711,18 +4720,11 @@ async function exportItinerarySummaryText() {
   lines.push('');
   lines.push('END OF SUMMARY');
 
-  const dataStr = 'data:text/plain;charset=utf-8,' + encodeURIComponent(lines.join('\n'));
-  const downloadAnchorNode = document.createElement('a');
-  downloadAnchorNode.setAttribute('href', dataStr);
-
   let dlName = currentFileName;
   if (dlName === 'Default Template') dlName = 'travel_planner_ai_summary.txt';
   else dlName = dlName.replace(/\.json$/i, '') + '_ai_summary.txt';
 
-  downloadAnchorNode.setAttribute('download', dlName);
-  document.body.appendChild(downloadAnchorNode);
-  downloadAnchorNode.click();
-  downloadAnchorNode.remove();
+  downloadTextFile(lines.join('\n'), dlName);
 
   localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
   localStorage.setItem('travelApp_last_export_filename', dlName);

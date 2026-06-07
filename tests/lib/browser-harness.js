@@ -486,6 +486,8 @@ function createBrowserHarness({
   const errors = [];
   const warnings = [];
   const downloads = [];
+  const objectUrls = new Map();
+  const revokedObjectUrls = [];
   const openedUrls = [];
   const serviceWorkerRegistrations = [];
   const timers = [];
@@ -624,7 +626,27 @@ function createBrowserHarness({
     windowObj.lastPrompt = message;
     return '';
   };
-  windowObj.URL = URL;
+  windowObj.URL = class MockURL extends URL {};
+  windowObj.Blob = class MockBlob {
+    constructor(parts = [], options = {}) {
+      this.parts = parts.map(part => String(part ?? ''));
+      this.type = options.type || '';
+      this.size = this.parts.reduce((total, part) => total + Buffer.byteLength(part), 0);
+    }
+
+    async text() {
+      return this.parts.join('');
+    }
+  };
+  windowObj.URL.createObjectURL = blob => {
+    const objectUrl = `blob:mock-download-${objectUrls.size + 1}`;
+    objectUrls.set(objectUrl, blob);
+    return objectUrl;
+  };
+  windowObj.URL.revokeObjectURL = objectUrl => {
+    revokedObjectUrls.push(objectUrl);
+    objectUrls.delete(objectUrl);
+  };
   windowObj.encodeURIComponent = encodeURIComponent;
   windowObj.decodeURIComponent = decodeURIComponent;
   windowObj.JSON = JSON;
@@ -921,11 +943,14 @@ function createBrowserHarness({
       document.lastDownload = null;
     },
     __captureAnchorDownload(anchor) {
+      const blob = objectUrls.get(anchor.href);
+      const content = blob && Array.isArray(blob.parts) ? blob.parts.join('') : '';
       downloads.push({
         href: anchor.href,
-        download: anchor.download
+        download: anchor.download,
+        content
       });
-      document.lastDownload = { href: anchor.href, download: anchor.download };
+      document.lastDownload = { href: anchor.href, download: anchor.download, content };
     }
   };
 
@@ -960,6 +985,7 @@ function createBrowserHarness({
     errors,
     warnings,
     downloads,
+    revokedObjectUrls,
     openedUrls,
     serviceWorkerRegistrations,
     flushTimers: () => context.__flushTimers(),
