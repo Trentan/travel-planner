@@ -175,21 +175,32 @@ async function run() {
   );
 
   const savedPacking = JSON.parse(JSON.stringify(packingHelpers.DEFAULT_PACKING));
+  const savedCarryOn = savedPacking.find(area => area.areaName.includes('Carry-on Packed Bag'));
+  const savedWorkoutEquipment = savedCarryOn.categories.find(category => category.title === 'Workout Equipment');
   const savedEssentials = savedPacking
     .find(area => area.areaName.includes('Personal Item Bag'))
     .categories.find(category => category.title === 'Essentials');
-  savedEssentials.items = savedEssentials.items
-    .filter(item => item.text !== 'Mobile strap for running')
-    .map(item => item.text === 'Phone' ? { ...item, done: true } : item);
+  savedWorkoutEquipment.items = savedWorkoutEquipment.items.filter(item => item.text !== 'Mobile strap for running');
+  savedEssentials.items = savedEssentials.items.map(item =>
+    item.text === 'Phone' ? { ...item, done: true } : item
+  );
+  savedEssentials.items.push({ text: 'Mobile strap for running', done: true });
   savedEssentials.items.push({ text: 'Custom essentials item', done: true });
 
   const mergedPacking = packingHelpers.ensureDefaultPackingAreas(savedPacking);
+  const mergedWorkoutEquipment = mergedPacking
+    .find(area => area.areaName.includes('Carry-on Packed Bag'))
+    .categories.find(category => category.title === 'Workout Equipment');
   const mergedEssentials = mergedPacking
     .find(area => area.areaName.includes('Personal Item Bag'))
     .categories.find(category => category.title === 'Essentials');
   assert(
-    mergedEssentials.items.some(item => item.text === 'Mobile strap for running' && item.done === false),
-    'Packing defaults should add the running phone strap to saved Essentials lists'
+    mergedWorkoutEquipment.items.some(item => item.text === 'Mobile strap for running' && item.done === true),
+    'Packing defaults should move the running phone strap to Workout Equipment and preserve completion'
+  );
+  assert(
+    !mergedEssentials.items.some(item => item.text === 'Mobile strap for running'),
+    'Packing defaults should remove the running phone strap from Personal Item Essentials'
   );
   assert(
     mergedEssentials.items.find(item => item.text === 'Phone')?.done === true,

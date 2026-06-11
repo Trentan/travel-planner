@@ -2703,16 +2703,15 @@ function findItineraryPositionForDate(legs, dateValue) {
   return match;
 }
 
-function initializeItineraryPositionForToday(dateValue = new Date()) {
-  if (initialItineraryPositionApplied) return initialItineraryTarget;
-  initialItineraryPositionApplied = true;
-
+function getCurrentTripPosition(dateValue = new Date()) {
   const today = typeof toLocalIsoDate === 'function'
     ? toLocalIsoDate(dateValue)
     : '';
   const target = findItineraryPositionForDate(appData, today);
   if (!target) return null;
 
+  const destinationName = cleanCityNavLabel(target.day?.to || target.leg?.label || '');
+  const city = getCityByName(destinationName);
   const legSequence = typeof getCompactMobileLegSequence === 'function'
     ? getCompactMobileLegSequence()
     : [];
@@ -2720,21 +2719,77 @@ function initializeItineraryPositionForToday(dateValue = new Date()) {
     entry.leg === target.leg || String(entry.leg?.id || '') === String(target.leg?.id || '')
   );
 
+  return {
+    ...target,
+    cityId: city?.id || '',
+    cityName: city?.name || destinationName,
+    cityIndex: cityIndex >= 0 ? cityIndex : target.legIndex
+  };
+}
+
+function applyCurrentTripPositionForTab(tabId, dateValue = new Date()) {
+  const target = getCurrentTripPosition(dateValue);
+  const cityFilter = target?.cityId || 'all';
+  currentCityFilter = cityFilter;
+  window.currentCityFilter = cityFilter;
+
+  if (typeof buildCityNav === 'function') buildCityNav();
+
+  if (tabId === 'itinerary') {
+    if (typeof resetMobilePagerActiveIndex === 'function') {
+      resetMobilePagerActiveIndex('compact-city-swipe');
+      (appData || []).forEach(leg => resetMobilePagerActiveIndex(`compact-day-${leg.id}`));
+    }
+    if (target && typeof setMobilePagerActiveIndex === 'function') {
+      setMobilePagerActiveIndex('compact-city-swipe', target.cityIndex);
+      setMobilePagerActiveIndex(`compact-day-${target.leg.id}`, target.dayIndex);
+    }
+    initialItineraryTarget = target;
+    buildItinerary();
+
+    if (target) {
+      requestAnimationFrame(() => {
+        const legElement = document.getElementById(`leg-${target.leg.id}`);
+        if (legElement && typeof window.scrollTo === 'function' && typeof scrollToElementWithNavOffset === 'function') {
+          scrollToElementWithNavOffset(legElement);
+        }
+      });
+    }
+  } else if (tabId === 'transport') {
+    buildTransportTab(cityFilter);
+  } else if (tabId === 'accom') {
+    buildAccomTab(cityFilter);
+  }
+
+  const cityNavList = document.querySelector('#cityNav .city-nav-list');
+  if (target?.cityId && typeof cityNavList?.scrollTo === 'function' && typeof highlightCityNavByCityId === 'function') {
+    requestAnimationFrame(() => highlightCityNavByCityId(target.cityId));
+  }
+
+  return target;
+}
+
+function initializeItineraryPositionForToday(dateValue = new Date()) {
+  if (initialItineraryPositionApplied) return initialItineraryTarget;
+  initialItineraryPositionApplied = true;
+
+  const target = getCurrentTripPosition(dateValue);
+  if (!target) return null;
+
   if (typeof setMobilePagerActiveIndex === 'function') {
-    if (cityIndex >= 0) setMobilePagerActiveIndex('compact-city-swipe', cityIndex);
+    setMobilePagerActiveIndex('compact-city-swipe', target.cityIndex);
     setMobilePagerActiveIndex(`compact-day-${target.leg.id}`, target.dayIndex);
   }
 
-  initialItineraryTarget = {
-    ...target,
-    cityIndex: cityIndex >= 0 ? cityIndex : target.legIndex
-  };
+  currentCityFilter = target.cityId || 'all';
+  window.currentCityFilter = currentCityFilter;
+  initialItineraryTarget = target;
 
   requestAnimationFrame(() => {
     const legElement = Array.from(document.querySelectorAll('#itinerary .leg')).find(element =>
       element.id === `leg-${target.leg.id}`
     );
-    if (legElement && typeof scrollToElementWithNavOffset === 'function') {
+    if (legElement && typeof window.scrollTo === 'function' && typeof scrollToElementWithNavOffset === 'function') {
       scrollToElementWithNavOffset(legElement);
     }
   });
@@ -3834,6 +3889,8 @@ window.compactItineraryGoToDay = compactItineraryGoToDay;
 window.captureCompactDayPagerStates = captureCompactDayPagerStates;
 window.restoreCompactDayPagerScrollPositions = restoreCompactDayPagerScrollPositions;
 window.findItineraryPositionForDate = findItineraryPositionForDate;
+window.getCurrentTripPosition = getCurrentTripPosition;
+window.applyCurrentTripPositionForTab = applyCurrentTripPositionForTab;
 window.initializeItineraryPositionForToday = initializeItineraryPositionForToday;
 
 // Expand to show a city in the itinerary

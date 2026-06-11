@@ -424,17 +424,15 @@ function switchTab(tabId, btnElement) {
     }
   }
 
-  // Check for current city filter and pass to tab builders
-  const cityFilter = typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all';
-
-  if (tabId === 'itinerary') {
-    if (typeof resetMobilePagerActiveIndex === 'function') {
-      resetMobilePagerActiveIndex('compact-city-swipe');
-    }
+  if (['itinerary', 'transport', 'accom'].includes(tabId) && typeof applyCurrentTripPositionForTab === 'function') {
+    applyCurrentTripPositionForTab(tabId);
+  } else if (tabId === 'itinerary') {
     buildItinerary();
+  } else if (tabId === 'transport') {
+    buildTransportTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
+  } else if (tabId === 'accom') {
+    buildAccomTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
   }
-  if (tabId === 'transport') buildTransportTab(cityFilter);
-  if (tabId === 'accom') buildAccomTab(cityFilter);
   if (tabId === 'budget') buildBudgetTab();
   if (tabId === 'packing') buildPackingTab();
   if (tabId === 'map') buildJourneyMap();

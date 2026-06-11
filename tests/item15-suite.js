@@ -58,6 +58,10 @@ async function testInitialCurrentDaySelection() {
       ]
     }
   ]));
+  app.localStorage.setItem('travelApp_cities_v1', JSON.stringify([
+    { id: 'city-vienna', name: 'Vienna', colour: '#ef4444' },
+    { id: 'city-bratislava', name: 'Bratislava', colour: '#3b82f6' }
+  ]));
 
   loadAppScripts(app);
   bootstrapApp(app);
@@ -73,6 +77,14 @@ async function testInitialCurrentDaySelection() {
     app.context.__mobilePagerState['compact-day-bratislava'] === 0,
     'Initial current-day selection: should select today within the current city'
   );
+  assert(
+    app.context.currentCityFilter === 'city-bratislava',
+    'Initial current-day selection: should set the shared city filter to today'
+  );
+  assert(
+    app.document.querySelector('.city-nav-btn.active')?.dataset.city === 'city-bratislava',
+    'Initial current-day selection: default app load should visibly select today city'
+  );
 
   const initialTarget = app.context.initializeItineraryPositionForToday(new RealDate('2026-06-12T12:00:00+10:00'));
   assert(
@@ -80,12 +92,67 @@ async function testInitialCurrentDaySelection() {
     'Initial current-day selection: later rebuilds should not replace the startup position'
   );
 
+  const workoutEquipment = state(app.context).packing
+    .find(area => String(area.areaName || '').includes('Carry-on Packed Bag'))
+    .categories.find(category => category.title === 'Workout Equipment');
   const essentials = state(app.context).packing
     .find(area => String(area.areaName || '').includes('Personal Item Bag'))
     .categories.find(category => category.title === 'Essentials');
   assert(
-    essentials.items.some(item => item.text === 'Mobile strap for running'),
-    'Initial current-day selection: packing Essentials should include the running phone strap'
+    workoutEquipment.items.some(item => item.text === 'Mobile strap for running'),
+    'Initial current-day selection: Workout Equipment should include the running phone strap'
+  );
+  assert(
+    !essentials.items.some(item => item.text === 'Mobile strap for running'),
+    'Initial current-day selection: Personal Item Essentials should not include the running phone strap'
+  );
+
+  let transportFilter = '';
+  let accomFilter = '';
+  const originalBuildTransportTab = app.context.buildTransportTab;
+  const originalBuildAccomTab = app.context.buildAccomTab;
+  app.context.buildTransportTab = filter => {
+    transportFilter = filter;
+    return originalBuildTransportTab(filter);
+  };
+  app.context.buildAccomTab = filter => {
+    accomFilter = filter;
+    return originalBuildAccomTab(filter);
+  };
+  const getTabButton = tabId => Array.from(app.document.querySelectorAll('.app-tab-btn'))
+    .find(button => button.dataset.tab === tabId);
+
+  app.context.currentCityFilter = 'all';
+  app.context.__mobilePagerState['compact-city-swipe'] = 0;
+  app.context.switchTab('transport', getTabButton('transport'));
+  assert(
+    transportFilter === 'city-bratislava' && app.context.currentCityFilter === 'city-bratislava',
+    'Current-day tab switching: Transport should reapply today city filter'
+  );
+
+  app.context.currentCityFilter = 'all';
+  app.context.switchTab('accom', getTabButton('accom'));
+  assert(
+    accomFilter === 'city-bratislava' && app.context.currentCityFilter === 'city-bratislava',
+    'Current-day tab switching: Accommodation should reapply today city filter'
+  );
+
+  app.context.currentCityFilter = 'all';
+  app.context.__mobilePagerState['compact-city-swipe'] = 0;
+  app.context.switchTab('itinerary', getTabButton('itinerary'));
+  assert(
+    app.context.currentCityFilter === 'city-bratislava' &&
+      app.context.__mobilePagerState['compact-city-swipe'] === 1,
+    'Current-day tab switching: Itinerary should reapply today city and day position'
+  );
+
+  app.context.applyCurrentTripPositionForTab(
+    'transport',
+    new RealDate('2030-01-01T12:00:00+10:00')
+  );
+  assert(
+    transportFilter === 'all' && app.context.currentCityFilter === 'all',
+    'Current-day tab switching: dates outside the trip should use the All fallback'
   );
 }
 
