@@ -2565,6 +2565,12 @@ if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title &&
   }
   resetHistoryState(cloneHistorySnapshot());
 
+  const activeTab = document.querySelector('.app-tab-btn.active');
+  const activeTabId = activeTab?.getAttribute('data-tab') || 'itinerary';
+  if (typeof applyCurrentTripPositionForTab === 'function') {
+    applyCurrentTripPositionForTab(activeTabId);
+  }
+
   // Journeys loaded at start of initData(), no additional init needed
 }
 

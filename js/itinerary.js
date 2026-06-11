@@ -2750,7 +2750,7 @@ function applyCurrentTripPositionForTab(tabId, dateValue = new Date()) {
     if (target) {
       requestAnimationFrame(() => {
         const legElement = document.getElementById(`leg-${target.leg.id}`);
-        if (legElement && typeof scrollToElementWithNavOffset === 'function') {
+        if (legElement && typeof window.scrollTo === 'function' && typeof scrollToElementWithNavOffset === 'function') {
           scrollToElementWithNavOffset(legElement);
         }
       });
@@ -2759,6 +2759,11 @@ function applyCurrentTripPositionForTab(tabId, dateValue = new Date()) {
     buildTransportTab(cityFilter);
   } else if (tabId === 'accom') {
     buildAccomTab(cityFilter);
+  }
+
+  const cityNavList = document.querySelector('#cityNav .city-nav-list');
+  if (target?.cityId && typeof cityNavList?.scrollTo === 'function' && typeof highlightCityNavByCityId === 'function') {
+    requestAnimationFrame(() => highlightCityNavByCityId(target.cityId));
   }
 
   return target;
@@ -2784,7 +2789,7 @@ function initializeItineraryPositionForToday(dateValue = new Date()) {
     const legElement = Array.from(document.querySelectorAll('#itinerary .leg')).find(element =>
       element.id === `leg-${target.leg.id}`
     );
-    if (legElement && typeof scrollToElementWithNavOffset === 'function') {
+    if (legElement && typeof window.scrollTo === 'function' && typeof scrollToElementWithNavOffset === 'function') {
       scrollToElementWithNavOffset(legElement);
     }
   });

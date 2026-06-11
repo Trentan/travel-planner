@@ -81,6 +81,10 @@ async function testInitialCurrentDaySelection() {
     app.context.currentCityFilter === 'city-bratislava',
     'Initial current-day selection: should set the shared city filter to today'
   );
+  assert(
+    app.document.querySelector('.city-nav-btn.active')?.dataset.city === 'city-bratislava',
+    'Initial current-day selection: default app load should visibly select today city'
+  );
 
   const initialTarget = app.context.initializeItineraryPositionForToday(new RealDate('2026-06-12T12:00:00+10:00'));
   assert(
