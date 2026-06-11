@@ -3445,18 +3445,35 @@ function ensureDefaultPackingAreas(data) {
     }
   });
 
-  const personalItemArea = areas.find(area => String(area?.areaName || '').includes('Personal Item Bag'));
-  const essentials = personalItemArea?.categories?.find(category =>
-    String(category?.title || '').trim().toLowerCase() === 'essentials'
-  );
-  if (essentials) {
-    const runningStrap = { text: 'Mobile strap for running', done: false };
-    const hasRunningStrap = (essentials.items || []).some(item =>
-      String(item?.text || '').trim().toLowerCase() === runningStrap.text.toLowerCase()
+  const runningStrapText = 'Mobile strap for running';
+  let runningStrapDone = false;
+  areas.forEach(area => {
+    (area.categories || []).forEach(category => {
+      const retainedItems = [];
+      (category.items || []).forEach(item => {
+        if (String(item?.text || '').trim().toLowerCase() === runningStrapText.toLowerCase()) {
+          runningStrapDone = runningStrapDone || item.done === true;
+        } else {
+          retainedItems.push(item);
+        }
+      });
+      category.items = retainedItems;
+    });
+  });
+
+  const carryOnArea = areas.find(area => String(area?.areaName || '').includes('Carry-on Packed Bag'));
+  if (carryOnArea) {
+    let workoutEquipment = (carryOnArea.categories || []).find(category =>
+      String(category?.title || '').trim().toLowerCase() === 'workout equipment'
     );
-    if (!hasRunningStrap) {
-      essentials.items = [...(essentials.items || []), runningStrap];
+    if (!workoutEquipment) {
+      workoutEquipment = { title: 'Workout Equipment', items: [] };
+      carryOnArea.categories = [...(carryOnArea.categories || []), workoutEquipment];
     }
+    workoutEquipment.items = [
+      ...(workoutEquipment.items || []),
+      { text: runningStrapText, done: runningStrapDone }
+    ];
   }
 
   return areas;
