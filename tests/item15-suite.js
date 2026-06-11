@@ -28,6 +28,67 @@ async function createBootedApp(options = {}) {
   return harness;
 }
 
+async function testInitialCurrentDaySelection() {
+  const app = createBrowserHarness({ mobile: true });
+  const RealDate = Date;
+  app.context.Date = class FixedDate extends RealDate {
+    constructor(...args) {
+      super(...(args.length ? args : ['2026-06-11T12:00:00+10:00']));
+    }
+
+    static now() {
+      return new RealDate('2026-06-11T12:00:00+10:00').getTime();
+    }
+  };
+
+  app.localStorage.setItem('travelApp_v2026_template', JSON.stringify([
+    {
+      id: 'vienna',
+      label: 'Vienna',
+      colour: '#ef4444',
+      days: [{ day: 'Thu', date: '2026-06-11', from: 'Vienna', to: 'Bratislava', activityItems: [] }]
+    },
+    {
+      id: 'bratislava',
+      label: 'Bratislava',
+      colour: '#3b82f6',
+      days: [
+        { day: 'Thu', date: '2026-06-11', from: 'Vienna', to: 'Bratislava', activityItems: [] },
+        { day: 'Fri', date: '2026-06-12', from: 'Bratislava', to: 'Bratislava', activityItems: [] }
+      ]
+    }
+  ]));
+
+  loadAppScripts(app);
+  bootstrapApp(app);
+  await app.context.appInitPromise;
+  await settle(app);
+
+  assertBootClean(app, 'Initial current-day selection');
+  assert(
+    app.context.__mobilePagerState['compact-city-swipe'] === 1,
+    'Initial current-day selection: should select the arrival city on a duplicated travel date'
+  );
+  assert(
+    app.context.__mobilePagerState['compact-day-bratislava'] === 0,
+    'Initial current-day selection: should select today within the current city'
+  );
+
+  const initialTarget = app.context.initializeItineraryPositionForToday(new RealDate('2026-06-12T12:00:00+10:00'));
+  assert(
+    initialTarget?.leg?.id === 'bratislava' && initialTarget?.dayIndex === 0,
+    'Initial current-day selection: later rebuilds should not replace the startup position'
+  );
+
+  const essentials = state(app.context).packing
+    .find(area => String(area.areaName || '').includes('Personal Item Bag'))
+    .categories.find(category => category.title === 'Essentials');
+  assert(
+    essentials.items.some(item => item.text === 'Mobile strap for running'),
+    'Initial current-day selection: packing Essentials should include the running phone strap'
+  );
+}
+
 function assertBootClean(harness, label) {
   assert(harness.errors.length === 0, `${label}: unexpected console errors: ${JSON.stringify(harness.errors)}`);
 }
@@ -971,6 +1032,7 @@ async function testFileSaveLoadAndBackup() {
 }
 
 async function run() {
+  await testInitialCurrentDaySelection();
   await testDesktopSmoke();
   await testMobileSmoke();
   await testCrudSmoke();

@@ -2553,6 +2553,10 @@ if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title &&
   // Migrate leg-level entities with city IDs
   migrateLegCityIds();
 
+  if (typeof initializeItineraryPositionForToday === 'function') {
+    initializeItineraryPositionForToday();
+  }
+
   try {
     await saveData(false);
   } finally {
@@ -3440,6 +3444,20 @@ function ensureDefaultPackingAreas(data) {
       areas.push(JSON.parse(JSON.stringify(defaultArea)));
     }
   });
+
+  const personalItemArea = areas.find(area => String(area?.areaName || '').includes('Personal Item Bag'));
+  const essentials = personalItemArea?.categories?.find(category =>
+    String(category?.title || '').trim().toLowerCase() === 'essentials'
+  );
+  if (essentials) {
+    const runningStrap = { text: 'Mobile strap for running', done: false };
+    const hasRunningStrap = (essentials.items || []).some(item =>
+      String(item?.text || '').trim().toLowerCase() === runningStrap.text.toLowerCase()
+    );
+    if (!hasRunningStrap) {
+      essentials.items = [...(essentials.items || []), runningStrap];
+    }
+  }
 
   return areas;
 }
