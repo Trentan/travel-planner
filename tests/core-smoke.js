@@ -28,6 +28,24 @@ function loadDateHelpers() {
     'const DEFAULT_PACKING ='
   );
 
+  const defaultPackingBlock = extractBetween(
+    utilsJs,
+    'const DEFAULT_PACKING =',
+    'function updateClocks'
+  );
+
+  const packingMergeBlock = extractBetween(
+    dataJs,
+    'function ensureDefaultPackingAreas',
+    'function getImportedDestinationCityNames'
+  );
+
+  const itineraryPositionBlock = extractBetween(
+    loadSource(path.join('js', 'itinerary.js')),
+    'function findItineraryPositionForDate',
+    'function initializeItineraryPositionForToday'
+  );
+
   const journeyDateFormatBlock = extractBetween(
     transportJs,
     'function formatJourneyDate',
@@ -59,6 +77,21 @@ return {
 };`
   )();
 
+  const packingHelpers = new Function(
+    `${defaultPackingBlock}
+${packingMergeBlock}
+return {
+  DEFAULT_PACKING,
+  ensureDefaultPackingAreas
+};`
+  )();
+
+  const itineraryPositionHelpers = new Function(
+    'normalizeTripDateValue',
+    `${itineraryPositionBlock}
+return { findItineraryPositionForDate };`
+  )(dateHelpers.normalizeTripDateValue);
+
   const transportHelpers = new Function(
     'formatTripDateForDisplay',
     `${journeyDateFormatBlock}
@@ -87,6 +120,8 @@ return {
   return {
     dateHelpers,
     checklistHelpers,
+    packingHelpers,
+    itineraryPositionHelpers,
     transportHelpers,
     aiHarness,
     bookingContext
@@ -94,7 +129,15 @@ return {
 }
 
 async function run() {
-  const { dateHelpers, checklistHelpers, transportHelpers, aiHarness, bookingContext } = loadDateHelpers();
+  const {
+    dateHelpers,
+    checklistHelpers,
+    packingHelpers,
+    itineraryPositionHelpers,
+    transportHelpers,
+    aiHarness,
+    bookingContext
+  } = loadDateHelpers();
   const { context, document, alerts, clipboardWrites, execCommands } = aiHarness;
 
   assert(dateHelpers.normalizeTripDateValue('7 Jun') === '2026-06-07', 'Date normalization should convert short dates to ISO');
@@ -129,6 +172,55 @@ async function run() {
   assert(
     mergedChecklist.some(item => item.kind === 'section' && item.text === 'Kitchen and bins'),
     'Checklist merge should preserve section headers'
+  );
+
+  const savedPacking = JSON.parse(JSON.stringify(packingHelpers.DEFAULT_PACKING));
+  const savedEssentials = savedPacking
+    .find(area => area.areaName.includes('Personal Item Bag'))
+    .categories.find(category => category.title === 'Essentials');
+  savedEssentials.items = savedEssentials.items
+    .filter(item => item.text !== 'Mobile strap for running')
+    .map(item => item.text === 'Phone' ? { ...item, done: true } : item);
+  savedEssentials.items.push({ text: 'Custom essentials item', done: true });
+
+  const mergedPacking = packingHelpers.ensureDefaultPackingAreas(savedPacking);
+  const mergedEssentials = mergedPacking
+    .find(area => area.areaName.includes('Personal Item Bag'))
+    .categories.find(category => category.title === 'Essentials');
+  assert(
+    mergedEssentials.items.some(item => item.text === 'Mobile strap for running' && item.done === false),
+    'Packing defaults should add the running phone strap to saved Essentials lists'
+  );
+  assert(
+    mergedEssentials.items.find(item => item.text === 'Phone')?.done === true,
+    'Packing defaults should preserve saved completion state'
+  );
+  assert(
+    mergedEssentials.items.some(item => item.text === 'Custom essentials item' && item.done === true),
+    'Packing defaults should preserve custom saved items'
+  );
+
+  const itineraryLegs = [
+    {
+      id: 'vienna',
+      days: [{ day: 'Thu', date: '2026-06-11', from: 'Vienna', to: 'Bratislava' }]
+    },
+    {
+      id: 'bratislava',
+      days: [
+        { day: 'Thu', date: '2026-06-11', from: 'Vienna', to: 'Bratislava' },
+        { day: 'Fri', date: '2026-06-12', from: 'Bratislava', to: 'Bratislava' }
+      ]
+    }
+  ];
+  const currentPosition = itineraryPositionHelpers.findItineraryPositionForDate(itineraryLegs, '2026-06-11');
+  assert(
+    currentPosition?.leg.id === 'bratislava' && currentPosition.dayIndex === 0,
+    'Current itinerary position should prefer the arrival leg on duplicated travel dates'
+  );
+  assert(
+    itineraryPositionHelpers.findItineraryPositionForDate(itineraryLegs, '2026-06-30') === null,
+    'Current itinerary position should fall back when today is outside the trip'
   );
 
   document.getElementById('aiTripTitle').value = 'Japan Spring';

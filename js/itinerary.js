@@ -2677,6 +2677,70 @@ let openDayCardIds = new Set();
 let expandedFoodQuestLegs = new Set();
 let expandedTipsLegs = new Set();
 let expandedActivitiesLegs = new Set();
+let initialItineraryPositionApplied = false;
+let initialItineraryTarget = null;
+
+function findItineraryPositionForDate(legs, dateValue) {
+  if (!Array.isArray(legs) || !dateValue) return null;
+  const targetDate = typeof normalizeTripDateValue === 'function'
+    ? normalizeTripDateValue(String(dateValue))
+    : String(dateValue);
+  if (!targetDate) return null;
+
+  let match = null;
+  legs.forEach((leg, legIndex) => {
+    (leg.days || []).forEach((day, dayIndex) => {
+      const dayDate = typeof normalizeTripDateValue === 'function'
+        ? normalizeTripDateValue(day.date || '')
+        : String(day.date || '');
+      if (dayDate === targetDate) {
+        // Arrival legs follow departure legs on shared travel dates, so the
+        // later match best represents the city the traveler is up to.
+        match = { leg, legIndex, day, dayIndex, dayKey: `${day.day}-${day.date}` };
+      }
+    });
+  });
+  return match;
+}
+
+function initializeItineraryPositionForToday(dateValue = new Date()) {
+  if (initialItineraryPositionApplied) return initialItineraryTarget;
+  initialItineraryPositionApplied = true;
+
+  const today = typeof toLocalIsoDate === 'function'
+    ? toLocalIsoDate(dateValue)
+    : '';
+  const target = findItineraryPositionForDate(appData, today);
+  if (!target) return null;
+
+  const legSequence = typeof getCompactMobileLegSequence === 'function'
+    ? getCompactMobileLegSequence()
+    : [];
+  const cityIndex = legSequence.findIndex(entry =>
+    entry.leg === target.leg || String(entry.leg?.id || '') === String(target.leg?.id || '')
+  );
+
+  if (typeof setMobilePagerActiveIndex === 'function') {
+    if (cityIndex >= 0) setMobilePagerActiveIndex('compact-city-swipe', cityIndex);
+    setMobilePagerActiveIndex(`compact-day-${target.leg.id}`, target.dayIndex);
+  }
+
+  initialItineraryTarget = {
+    ...target,
+    cityIndex: cityIndex >= 0 ? cityIndex : target.legIndex
+  };
+
+  requestAnimationFrame(() => {
+    const legElement = Array.from(document.querySelectorAll('#itinerary .leg')).find(element =>
+      element.id === `leg-${target.leg.id}`
+    );
+    if (legElement && typeof scrollToElementWithNavOffset === 'function') {
+      scrollToElementWithNavOffset(legElement);
+    }
+  });
+
+  return initialItineraryTarget;
+}
 
 function isFoodQuestExpanded(legId) {
   return expandedFoodQuestLegs.has(legId);
@@ -2932,7 +2996,7 @@ function buildItinerary() {
 
       // Check if this day should be open
       const dayKey = `${day.day}-${day.date}`;
-      const shouldBeOpen = openDayCardIds.has(dayKey);
+      const shouldBeOpen = openDayCardIds.has(dayKey) || initialItineraryTarget?.dayKey === dayKey;
       const openClass = shouldBeOpen ? 'open' : '';
       const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
       const dayViewMode = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
@@ -3769,6 +3833,8 @@ window.toggleActivitiesCardDetails = toggleActivitiesCardDetails;
 window.compactItineraryGoToDay = compactItineraryGoToDay;
 window.captureCompactDayPagerStates = captureCompactDayPagerStates;
 window.restoreCompactDayPagerScrollPositions = restoreCompactDayPagerScrollPositions;
+window.findItineraryPositionForDate = findItineraryPositionForDate;
+window.initializeItineraryPositionForToday = initializeItineraryPositionForToday;
 
 // Expand to show a city in the itinerary
 function expandToCity(cityId) {
