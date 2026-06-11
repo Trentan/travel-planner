@@ -92,19 +92,23 @@ async function testInitialCurrentDaySelection() {
     'Initial current-day selection: later rebuilds should not replace the startup position'
   );
 
-  const workoutEquipment = state(app.context).packing
+  const carryOn = state(app.context).packing
     .find(area => String(area.areaName || '').includes('Carry-on Packed Bag'))
-    .categories.find(category => category.title === 'Workout Equipment');
+  const shoesAndMisc = carryOn.categories.find(category => category.title === 'Shoes & Misc');
   const essentials = state(app.context).packing
     .find(area => String(area.areaName || '').includes('Personal Item Bag'))
     .categories.find(category => category.title === 'Essentials');
   assert(
-    workoutEquipment.items.some(item => item.text === 'Mobile strap for running'),
-    'Initial current-day selection: Workout Equipment should include the running phone strap'
+    shoesAndMisc.items.some(item => item.text === 'Mobile strap for running'),
+    'Initial current-day selection: Shoes & Misc should include the running phone strap'
   );
   assert(
     !essentials.items.some(item => item.text === 'Mobile strap for running'),
     'Initial current-day selection: Personal Item Essentials should not include the running phone strap'
+  );
+  assert(
+    !carryOn.categories.some(category => category.title === 'Workout Equipment'),
+    'Initial current-day selection: packing should not include a Workout Equipment category'
   );
 
   let transportFilter = '';
