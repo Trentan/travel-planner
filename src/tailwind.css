@@ -1984,6 +1984,29 @@
       font-size: var(--m-font-sm);
     }
 
+    .city-nav-current-day {
+      display: none;
+    }
+
+    body.mobile-app-mode .city-nav-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05rem;
+      line-height: 1.1;
+    }
+
+    body.mobile-app-mode .city-nav-current-day {
+      display: block;
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      opacity: 0.82;
+    }
+
+    body.mobile-app-mode .city-nav-btn.active .city-nav-current-day {
+      color: rgba(255, 255, 255, 0.88);
+    }
+
     body.mobile-app-mode .mobile-swipe-chip {
       min-height: var(--m-chip-h);
       min-width: var(--m-chip-min-w);
