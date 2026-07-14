@@ -3732,6 +3732,18 @@ function buildCityNav() {
   const nav = document.getElementById('cityNav');
   const navList = nav.querySelector('.city-nav-list');
   const filter = window.currentCityFilter || 'all';
+  const currentTripPosition = typeof getCurrentTripPosition === 'function'
+    ? getCurrentTripPosition()
+    : null;
+  const currentDayLabel = currentTripPosition
+    ? [
+        'Today',
+        currentTripPosition.day?.day || '',
+        typeof formatTripDateForDisplay === 'function'
+          ? formatTripDateForDisplay(currentTripPosition.day?.date || '')
+          : (currentTripPosition.day?.date || '')
+      ].filter(Boolean).join(' · ')
+    : '';
 
   // Keep the "All" button
   navList.innerHTML = `
@@ -3762,7 +3774,10 @@ function buildCityNav() {
     }
 
     const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">&#128205;</span>';
-    btn.innerHTML = `<span class="city-nav-content">${flagHtml} ${city.name}</span>`;
+    const currentDayHtml = currentTripPosition?.cityId === city.id && currentDayLabel
+      ? `<span class="city-nav-current-day">${escapeHtmlText(currentDayLabel)}</span>`
+      : '';
+    btn.innerHTML = `<span class="city-nav-content"><span class="city-nav-city-line">${flagHtml} ${city.name}</span>${currentDayHtml}</span>`;
     navList.appendChild(btn);
   });
 

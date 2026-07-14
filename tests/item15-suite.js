@@ -85,6 +85,10 @@ async function testInitialCurrentDaySelection() {
     app.document.querySelector('.city-nav-btn.active')?.dataset.city === 'city-bratislava',
     'Initial current-day selection: default app load should visibly select today city'
   );
+  assert(
+    (app.document.querySelector('.city-nav-btn.active')?.innerHTML || '').includes('Today · Thu · 11 Jun'),
+    'Initial current-day selection: mobile city nav should show today day and date'
+  );
 
   const initialTarget = app.context.initializeItineraryPositionForToday(new RealDate('2026-06-12T12:00:00+10:00'));
   assert(
