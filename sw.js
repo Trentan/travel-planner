@@ -1,7 +1,9 @@
-const CACHE_NAME = 'travel-planner-v21';
+const CACHE_NAME = 'travel-planner-v22';
 const ASSETS = [
   './index.html',
   './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
   './dist/tailwind.css',
   './js/utils.js',
   './js/data.js',

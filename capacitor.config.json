@@ -1,0 +1,12 @@
+{
+  "appId": "com.trentan.travelplanner",
+  "appName": "Travel Planner",
+  "webDir": ".capacitor-web",
+  "androidScheme": "https",
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "backgroundColor": "#F7F5F0"
+    }
+  }
+}

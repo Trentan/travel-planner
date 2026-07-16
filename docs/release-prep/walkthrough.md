@@ -9,6 +9,11 @@ We have initiated the execution of the release and open-source roadmap.
 2. **Security Policy:** Created [`SECURITY.md`](file:///c:/Apps/Projects/travel-planner/SECURITY.md) to establish guidelines for reporting security bugs privately instead of filing public issues.
 3. **Contributor Guidelines:** Added [`CODE_OF_CONDUCT.md`](file:///c:/Apps/Projects/travel-planner/CODE_OF_CONDUCT.md) following the Contributor Covenant v2.1 standard to maintain a welcoming community environment.
 
+### PWA & iOS Wrapper Baseline
+1. **Store icons:** Added reproducible 192px, 512px, and native 1024px PNG icons in `icons/`; the manifest, service worker, Apple touch-icon link, and iOS asset catalog now use the existing Travel Planner mark.
+2. **Capacitor project:** Added the iOS wrapper in `ios/`, a committed Capacitor configuration, and `npm run build:mobile` to build and sync the exact web bundle that ships in the native shell.
+3. **Android boundary:** The Trusted Web Activity remains intentionally unbound until a production HTTPS origin and Android signing fingerprint exist. At that point, deploy the documented `.well-known/assetlinks.json` and initialize Bubblewrap against that origin.
+
 ---
 
 ## 🧪 Verification & Testing

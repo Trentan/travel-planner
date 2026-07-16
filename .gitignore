@@ -3,6 +3,7 @@
 
 # CSS Builds
 /dist/
+/.capacitor-web/
 
 # Tests and coverage
 /test-results/

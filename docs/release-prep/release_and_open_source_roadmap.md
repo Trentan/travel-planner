@@ -54,10 +54,10 @@ Google officially supports PWAs in the Play Store via **Trusted Web Activities (
 * **Privacy Policy URL:** A hosted privacy policy page is mandatory for Play Store listings.
 
 ### Implementation Checklist
-- [ ] **Generate PNG Launcher Icons:**
-  - The current `manifest.json` uses inline SVG data URLs. Google Play packaging requires rasterized PNG icons at specific sizes: `192x192` and `512x512` (incorporating safe-zones for adaptive icons).
-- [ ] **Configure the Web App Manifest:**
-  - Ensure the manifest includes a `description`, `theme_color`, `background_color`, and a list of `screenshots` (which are used by Android's native installation prompt).
+- [x] **Generate PNG Launcher Icons:**
+  - `icons/icon-192.png`, `icons/icon-512.png`, and the native 1024px iOS app icon are generated from the existing Travel Planner mark with `npm run generate:pwa-icons`.
+- [x] **Configure the Web App Manifest:**
+  - The manifest contains `description`, `theme_color`, `background_color`, and store-compatible PNG icon entries. Promotional screenshots remain a listing asset to capture once the production build is available.
 - [ ] **Establish Digital Asset Links:**
   - Generate a `SHA-256` signing certificate fingerprint when packaging the app.
   - Deploy a file named `assetlinks.json` inside the `.well-known` directory of the hosting domain:
@@ -99,15 +99,12 @@ Apple does not support TWAs. To release on iOS, we must wrap the web application
 > *To further secure approval, we should consider integrating at least one native feature via Capacitor APIs, such as native Share sheets, local notifications, or haptic feedback.*
 
 ### Implementation Checklist
-- [ ] **Initialize Capacitor:**
-  - Install dependency: `npm install @capacitor/core @capacitor/cli`
-  - Initialize config: `npx cap init "Travel Planner" "com.yourname.travelplanner" --web-dir=.`
-- [ ] **Add iOS Platform Support:**
-  - Install iOS package: `npm install @capacitor/ios`
-  - Add the iOS project: `npx cap add ios`
-- [ ] **Build & Sync Web Assets:**
-  - Make sure Tailwind is compiled: `npm run build:css`
-  - Sync assets into the Xcode workspace: `npx cap sync`
+- [x] **Initialize Capacitor:**
+  - Capacitor uses `capacitor.config.json` with bundle identifier `com.trentan.travelplanner` and the generated `.capacitor-web` bundle.
+- [x] **Add iOS Platform Support:**
+  - `@capacitor/core`, `@capacitor/ios`, and `@capacitor/cli` are installed, and the native project lives in `ios/`.
+- [x] **Build & Sync Web Assets:**
+  - Run `npm run build:mobile` to compile CSS, create the mobile web bundle, and sync it into the iOS project.
 - [ ] **Configure Icons & Splash Screens:**
   - Use `@capacitor/assets` or PWABuilder to generate the Xcode icon sets and launch storyboards.
 - [ ] **Open Xcode & Sign:**
