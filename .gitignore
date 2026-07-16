@@ -1,2 +1,24 @@
-/.telecodex/
+# Dependencies
 /node_modules/
+
+# CSS Builds
+/dist/
+
+# Tests and coverage
+/test-results/
+/playwright-report/
+
+# IDE & Editors
+/.idea/
+/.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Telemetry / Local agents config
+/.telecodex/
