@@ -11,8 +11,8 @@ We have initiated the execution of the release and open-source roadmap.
 
 ### PWA & iOS Wrapper Baseline
 1. **Store icons:** Added reproducible 192px, 512px, and native 1024px PNG icons in `icons/`; the manifest, service worker, Apple touch-icon link, and iOS asset catalog now use the existing Travel Planner mark.
-2. **Capacitor project:** Added the iOS wrapper in `ios/`, a committed Capacitor configuration, and `npm run build:mobile` to build and sync the exact web bundle that ships in the native shell.
-3. **Android boundary:** The Trusted Web Activity remains intentionally unbound until a production HTTPS origin and Android signing fingerprint exist. At that point, deploy the documented `.well-known/assetlinks.json` and initialize Bubblewrap against that origin.
+2. **Capacitor projects:** Added Android and iOS wrappers in `android/` and `ios/`, plus `npm run build:mobile` to build and sync the exact web bundle that ships in each native shell.
+3. **Offline-first release path:** Google Play should use the Android Capacitor bundle as the primary release artifact. Bubblewrap/TWA remains an optional web-distribution path because it renders hosted web content and requires a production HTTPS origin.
 
 ---
 

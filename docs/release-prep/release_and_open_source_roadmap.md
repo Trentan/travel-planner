@@ -14,8 +14,8 @@ graph TD
     B --> C["Android Release (Google Play)"]
     B --> D["iOS Release (Apple App Store)"]
     
-    C --> C1["Bubblewrap (TWA) - Recommended"]
-    C --> C2["Capacitor WebView Wrapper"]
+    C --> C1["Capacitor Android Bundle - Recommended for Offline"]
+    C --> C2["Bubblewrap (TWA) - Optional Hosted Web Path"]
     C1 --> C3["Deploy .well-known/assetlinks.json to Domain"]
     C3 --> C4["Generate Android App Bundle (.aab)"]
     C4 --> C5["Upload to Google Play Console"]
@@ -33,7 +33,7 @@ graph TD
 
 To wrapper the PWA for the app stores, we have three main paths. The table below outlines how they compare:
 
-| Feature / Metric | PWABuilder | Capacitor (Recommended for iOS) | Bubblewrap (Recommended for Android) |
+| Feature / Metric | PWABuilder | Capacitor (Recommended for iOS & Android) | Bubblewrap (Optional Android Web Path) |
 | :--- | :--- | :--- | :--- |
 | **Platform Support** | iOS & Android | iOS & Android | Android only |
 | **Packaging Architecture** | Cloud-based generator | Native WKWebView / WebView wrapper | Trusted Web Activity (TWA) |
@@ -46,7 +46,7 @@ To wrapper the PWA for the app stores, we have three main paths. The table below
 
 ## 🤖 1. Google Play Store Release Path (Android)
 
-Google officially supports PWAs in the Play Store via **Trusted Web Activities (TWAs)**. We recommend using **Bubblewrap** or **PWABuilder** (which uses Bubblewrap under the hood) for this.
+Google Play should use the **Capacitor Android bundle** as the primary path because Travel Planner must remain usable offline. A Trusted Web Activity via Bubblewrap remains an optional path for a hosted web edition; it renders content from the web and requires a production HTTPS origin.
 
 ### Prerequisites & Account Setup
 * **Google Play Console Account:** Requires a one-time registration fee of **$25**.

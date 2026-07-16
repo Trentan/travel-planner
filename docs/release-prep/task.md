@@ -10,5 +10,9 @@
 - [x] Capacitor (iOS) Project Setup
     - [x] Install Capacitor core, iOS, and CLI dependencies
     - [x] Initialize Capacitor config and iOS wrapper project
+- [x] Capacitor (Android) Project Setup
+    - [x] Install Android platform dependencies
+    - [x] Initialize Android wrapper project with the bundled web app
+    - [x] Sync Android and iOS assets with `npm run build:mobile`
 - [ ] Android Trusted Web Activity Setup
-    - [ ] Configure Bubblewrap with the final production HTTPS origin and Digital Asset Links key
+    - [ ] Optional web-distribution path: configure Bubblewrap with a production HTTPS origin and Digital Asset Links key
