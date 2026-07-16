@@ -3451,37 +3451,6 @@ function ensureDefaultPackingAreas(data) {
     }
   });
 
-  const runningStrapText = 'Mobile strap for running';
-  let runningStrapDone = false;
-  areas.forEach(area => {
-    (area.categories || []).forEach(category => {
-      const retainedItems = [];
-      (category.items || []).forEach(item => {
-        if (String(item?.text || '').trim().toLowerCase() === runningStrapText.toLowerCase()) {
-          runningStrapDone = runningStrapDone || item.done === true;
-        } else {
-          retainedItems.push(item);
-        }
-      });
-      category.items = retainedItems;
-    });
-  });
-
-  const carryOnArea = areas.find(area => String(area?.areaName || '').includes('Carry-on Packed Bag'));
-  if (carryOnArea) {
-    let workoutEquipment = (carryOnArea.categories || []).find(category =>
-      String(category?.title || '').trim().toLowerCase() === 'workout equipment'
-    );
-    if (!workoutEquipment) {
-      workoutEquipment = { title: 'Workout Equipment', items: [] };
-      carryOnArea.categories = [...(carryOnArea.categories || []), workoutEquipment];
-    }
-    workoutEquipment.items = [
-      ...(workoutEquipment.items || []),
-      { text: runningStrapText, done: runningStrapDone }
-    ];
-  }
-
   return areas;
 }
 
