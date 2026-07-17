@@ -1,5 +1,5 @@
 {
-  "appId": "com.trentan.travelplanner",
+  "appId": "com.trenscends.travelplanner",
   "appName": "Travel Planner",
   "webDir": ".capacitor-web",
   "androidScheme": "https",

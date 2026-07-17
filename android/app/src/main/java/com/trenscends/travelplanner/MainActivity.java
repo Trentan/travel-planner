@@ -1,4 +1,4 @@
-package com.trentan.travelplanner;
+package com.trenscends.travelplanner;
 
 import com.getcapacitor.BridgeActivity;
 
