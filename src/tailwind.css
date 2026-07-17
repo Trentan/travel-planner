@@ -1525,7 +1525,9 @@
       border-bottom: 0;
       background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(12px);
-      min-height: 4.15rem;
+      height: calc(4.15rem + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      box-sizing: border-box;
     }
 
     body.mobile-app-mode .app-tabs-list {
@@ -1534,7 +1536,7 @@
     }
 
     body.mobile-app-mode .app-tabs-content {
-      padding-bottom: 8.2rem;
+      padding-bottom: calc(8.2rem + env(safe-area-inset-bottom, 0px));
     }
 
     [data-theme="dark"] body.mobile-app-mode .app-tabs-nav {
@@ -1547,7 +1549,7 @@
       left: 0;
       right: 0;
       top: auto !important;
-      bottom: 4.15rem;
+      bottom: calc(4.15rem + env(safe-area-inset-bottom, 0px));
       z-index: 321;
       border-top: 1px solid rgba(148, 163, 184, 0.26);
       border-bottom: 1px solid rgba(148, 163, 184, 0.26);
@@ -1931,6 +1933,10 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+    }
+
+    body.mobile-app-mode .mobile-menu-sheet {
+      padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
     }
 
     body.mobile-app-mode .mobile-menu-sheet-panel {
