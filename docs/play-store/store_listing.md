@@ -57,3 +57,12 @@ Below are the generated marketing graphics. These have been copied to the reposi
 ### 🖼️ Feature Graphic
 * **Play Store Spec**: 1024 x 500 pixels, JPG or 24-bit PNG, max 1MB.
 * **Asset Location**: `docs/play-store/feature_graphic.png`
+
+### 📱 Phone Screenshots
+* **Play Store Spec**: 2 to 8 screenshots, aspect ratio 16:9 or 9:16, between 320px and 3840px, max 8MB per file.
+* **Asset Locations**:
+  * [Itinerary View](file:///c:/Apps/Projects/travel-planner/docs/play-store/screenshot-1-itinerary.png)
+  * [Transport View](file:///c:/Apps/Projects/travel-planner/docs/play-store/screenshot-2-transport.png)
+  * [Accommodation View](file:///c:/Apps/Projects/travel-planner/docs/play-store/screenshot-3-accom.png)
+  * [Budget View](file:///c:/Apps/Projects/travel-planner/docs/play-store/screenshot-4-budget.png)
+  * [Packing View](file:///c:/Apps/Projects/travel-planner/docs/play-store/screenshot-5-packing.png)
