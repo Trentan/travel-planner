@@ -3,7 +3,7 @@ const path = require('path');
 
 const root = path.resolve(__dirname, '..');
 const output = path.join(root, '.capacitor-web');
-const copies = ['index.html', 'manifest.json', 'sw.js', 'favicon.svg', 'js', 'dist', 'icons'];
+const copies = ['index.html', 'manifest.json', 'sw.js', 'favicon.png', 'js', 'dist', 'icons'];
 
 fs.rmSync(output, { recursive: true, force: true });
 fs.mkdirSync(output, { recursive: true });
