@@ -1,6 +1,6 @@
 let isFunMode = false;
 let isCompactView = false;
-let isEditMode = false;
+let isEditMode = true;
 let editingTripName = false;
 let mapSidebarOpen = false;
 let allExpanded = true;
