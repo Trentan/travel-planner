@@ -1,4 +1,4 @@
-# GitHub Issue: Improve Read-Only Mode Visibility & Ease of Use
+# GitHub Issue #178: Improve Read-Only Mode Visibility & Ease of Use
 
 **Title:** Improve Read-Only Mode Visibility and Toggle Ease-of-Use on Mobile and Web
 
