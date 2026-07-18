@@ -1452,6 +1452,10 @@
       overscroll-behavior-x: none;
     }
 
+    body.mobile-app-mode {
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+
     body.mobile-app-mode :is(
       header,
       .app-tabs-content,

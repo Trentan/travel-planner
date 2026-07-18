@@ -3,6 +3,9 @@
   "appName": "Travel Planner",
   "webDir": ".capacitor-web",
   "androidScheme": "https",
+  "android": {
+    "contentInset": "automatic"
+  },
   "plugins": {
     "SplashScreen": {
       "launchAutoHide": true,
