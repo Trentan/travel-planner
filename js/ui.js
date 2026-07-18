@@ -397,13 +397,12 @@ function toggleEditMode() {
 
   applyUiSettings();
   const activeTabBtn = document.querySelector('.app-tab-btn.active');
-  const activeTab = activeTabBtn ? activeTabBtn.innerText : '';
   const activeTabId = activeTabBtn ? activeTabBtn.getAttribute('data-tab') : '';
   const cityFilter = typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all';
   if (activeTabId === 'itinerary' && typeof buildItinerary === 'function') buildItinerary();
-  if(activeTab.includes('Transport')) buildTransportTab(cityFilter);
-  if(activeTab.includes('Accommodation')) buildAccomTab(cityFilter);
-  if(activeTab.includes('Packing')) buildPackingTab();
+  if (activeTabId === 'transport') buildTransportTab(cityFilter);
+  if (activeTabId === 'accom') buildAccomTab(cityFilter);
+  if (activeTabId === 'packing') buildPackingTab();
 }
 
 function switchTab(tabId, btnElement) {
