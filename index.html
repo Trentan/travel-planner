@@ -58,7 +58,8 @@
         <button id="showMoneyToggleBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); toggleShowMoney()">💵 Hide Prices</button>
         <div class="app-menu-divider" aria-hidden="true"></div>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripSummaryModal()">📅 View Trip Summary</button>
-        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItinerarySummaryText()">📝 Export AI Summary</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItineraryCalendar()">📅 Export to Calendar</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItinerarySummaryText()">📝 Export AI Summary</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItineraryText()">📝 Export Itinerary Text</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openShareExportDialog()">🔗 Share Export</button>
         <div class="app-menu-divider" aria-hidden="true"></div>
@@ -256,6 +257,10 @@
         <section class="mobile-menu-section" aria-labelledby="mobileMenuExportFiles">
           <h3 id="mobileMenuExportFiles" class="mobile-menu-section-title">Export & files</h3>
           <div class="mobile-menu-section-grid mobile-menu-section-grid-stacked">
+                            <button class="app-menu-btn" onclick="exportItineraryCalendar(); closeMobileMenu()">
+                  <span class="app-menu-btn-title">📅 Export to Calendar</span>
+                  <span class="app-menu-btn-subtitle">Download .ics file</span>
+                </button>
               <button class="app-menu-btn" onclick="exportItinerarySummaryText(); closeMobileMenu()">
                 <span class="app-menu-btn-title">📝 Export AI Summary</span>
                 <span class="app-menu-btn-subtitle">Quick summary for sharing</span>

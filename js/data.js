@@ -5067,6 +5067,8 @@ window.copyShareEmailDraft = copyShareEmailDraft;
 window.refreshShareEmailDraft = refreshShareEmailDraft;
 window.exportItineraryText = exportItineraryText;
 window.exportItinerarySummaryText = exportItinerarySummaryText;
+window.exportItineraryCalendar = exportItineraryCalendar;
+
 window.openShareExportDialog = openShareExportDialog;
 window.closeShareExportDialog = closeShareExportDialog;
 window.hardRestartApp = hardRestartApp;
@@ -5167,3 +5169,142 @@ window.startBlankTrip = startBlankTrip;
 window.onboardCreateNewTrip = onboardCreateNewTrip;
 window.onboardOpenExistingTrip = onboardOpenExistingTrip;
 
+
+
+async function exportItineraryCalendar() {
+  const previousSuppress = window.__suppressBackupTracking;
+  window.__suppressBackupTracking = true;
+  try {
+    const title = (appData.length > 0 && titleData.tripTitle) ? titleData.tripTitle : 'Trip Itinerary';
+    
+    let icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Trentan//Travel Planner//EN',
+      'CALSCALE:GREGORIAN',
+      'X-WR-CALNAME:' + title
+    ];
+    
+    function addEvent(start, end, summary, description, location) {
+      if (!start) return;
+      const uid = Math.random().toString(36).substring(2) + '@travelplanner.local';
+      const dtstamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      
+      icsContent.push('BEGIN:VEVENT');
+      icsContent.push('UID:' + uid);
+      icsContent.push('DTSTAMP:' + dtstamp);
+      
+      if (start.includes('T')) {
+        icsContent.push('DTSTART:' + start);
+        if (end) icsContent.push('DTEND:' + end);
+      } else {
+        icsContent.push('DTSTART;VALUE=DATE:' + start);
+        if (end) icsContent.push('DTEND;VALUE=DATE:' + end);
+      }
+      
+      if (summary) icsContent.push('SUMMARY:' + summary);
+      if (description) icsContent.push('DESCRIPTION:' + description.replace(/\n/g, '\\n'));
+      if (location) icsContent.push('LOCATION:' + location);
+      icsContent.push('END:VEVENT');
+    }
+    
+    function formatIcsDate(dateStr, timeStr = '') {
+      if (!dateStr) return '';
+      const d = dateStr.replace(/-/g, '');
+      if (!timeStr) return d;
+      const t = timeStr.replace(/:/g, '');
+      return d + 'T' + (t + '000000').substring(0,6);
+    }
+    
+    if (appData && Array.isArray(appData)) {
+      appData.forEach(leg => {
+        if (!leg.days) return;
+        leg.days.forEach(day => {
+          if (!day.date) return;
+          const start = formatIcsDate(day.date);
+          
+          const dObj = new Date(day.date);
+          dObj.setDate(dObj.getDate() + 1);
+          const end = dObj.toISOString().split('T')[0].replace(/-/g, '');
+          
+          let summary = day.to ? '📍 ' + day.to : (leg.city ? '📍 ' + leg.city : '📍 Destination');
+          let desc = '';
+          if (day.sights && day.sights.length > 0) {
+            desc = "Planned Activities:\n" + day.sights.map(s => "- " + (s.name || s.title)).join('\n');
+          }
+          addEvent(start, end, summary, desc, day.to || leg.city);
+        });
+      });
+    }
+    
+    if (typeof stays !== 'undefined' && Array.isArray(stays)) {
+      stays.forEach(stay => {
+        if (!stay.checkIn) return;
+        
+        let start = formatIcsDate(stay.checkIn, stay.checkInTime);
+        let end = formatIcsDate(stay.checkOut, stay.checkOutTime);
+        
+        if (!stay.checkInTime && !stay.checkOutTime) {
+          start = formatIcsDate(stay.checkIn);
+          if (stay.checkOut) {
+             const dObj = new Date(stay.checkOut);
+             if (stay.checkOut === stay.checkIn) dObj.setDate(dObj.getDate() + 1);
+             end = dObj.toISOString().split('T')[0].replace(/-/g, '');
+          }
+        }
+        
+        const summary = '🏨 ' + (stay.name || 'Accommodation');
+        let desc = '';
+        if (stay.bookingRef) desc += 'Booking Ref: ' + stay.bookingRef + '\n';
+        if (stay.notes) desc += 'Notes: ' + stay.notes + '\n';
+        if (stay.provider) desc += 'Provider: ' + stay.provider + '\n';
+        
+        let location = stay.location || stay.neighborhood || '';
+        
+        addEvent(start, end, summary, desc, location);
+      });
+    }
+    
+    if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
+      journeys.forEach(journey => {
+        const jDate = journey.departureDate || journey.dayDate;
+        if (!jDate) return;
+        
+        const start = formatIcsDate(jDate, journey.departureTime);
+        let end = formatIcsDate(journey.arrivalDate || jDate, journey.arrivalTime);
+        
+        if (start.includes('T') && !end) {
+          end = start; 
+        }
+        
+        const method = journey.method ? journey.method.charAt(0).toUpperCase() + journey.method.slice(1) : 'Transport';
+        const summary = '🚆 ' + method + ': ' + (journey.fromLocation || '?') + ' to ' + (journey.toLocation || '?');
+        
+        let desc = '';
+        if (journey.provider) desc += 'Provider: ' + journey.provider + '\n';
+        if (journey.bookingReference) desc += 'Booking Ref: ' + journey.bookingReference + '\n';
+        if (journey.departureStation) desc += 'Departs: ' + journey.departureStation + '\n';
+        if (journey.arrivalStation) desc += 'Arrives: ' + journey.arrivalStation + '\n';
+        if (journey.notes) desc += 'Notes: ' + journey.notes + '\n';
+        
+        addEvent(start, end, summary, desc, '');
+      });
+    }
+    
+    icsContent.push('END:VCALENDAR');
+    const finalContent = icsContent.join('\r\n'); 
+    
+    let dlName = currentFileName || 'trip';
+    dlName = dlName.replace(/\.json$/i, '') + '_calendar.ics';
+    
+    downloadTextFile(finalContent, dlName, 'text/calendar');
+    
+    localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
+    localStorage.setItem('travelApp_last_export_filename', dlName);
+  } catch (err) {
+    console.error('Error exporting calendar:', err);
+    alert('Failed to generate calendar file.');
+  } finally {
+    window.__suppressBackupTracking = previousSuppress;
+  }
+}
