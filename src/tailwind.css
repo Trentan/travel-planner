@@ -390,7 +390,7 @@
   .modal-content.modal-xl { max-width: 700px; }
 
   .modal-content.modal-surface {
-    @apply bg-[#f9f9f9];
+    @apply bg-[#f9f9f9] dark:bg-bg-primary;
   }
 
   /* Modal/layout utility classes used by journey/stay/AI flows */

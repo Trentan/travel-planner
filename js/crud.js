@@ -1,4 +1,5 @@
 function deleteLeg(idx) {
+  if (typeof triggerHaptic === "function") triggerHaptic("warning");
   if(confirm("Are you sure you want to delete this entire leg and all its days?")) {
     appData.splice(idx, 1);
     saveData(); buildNav(); buildItinerary();
@@ -61,7 +62,7 @@ async function deleteActivity(legIdx, activityIdx) {
   if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
   else buildItinerary();
 }
-function deleteLegTip(legIdx, tipIdx) { appData[legIdx].legTips.splice(tipIdx, 1); saveData(); buildItinerary(); }
+function deleteLegTip(legIdx, tipIdx) { if (typeof triggerHaptic === "function") triggerHaptic("warning"); appData[legIdx].legTips.splice(tipIdx, 1); saveData(); buildItinerary(); }
 
 function getSuggestedActivityDayText(activity) {
   const title = String(activity?.title || '').trim();
@@ -1310,10 +1311,11 @@ function rebuildItineraryPreservingScroll(options = {}) {
   });
 }
 
-function toggleFoodCompleted(e, legIdx, foodIdx) { e.stopPropagation(); appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
-function toggleDayCompleted(e, legIdx, dayIdx) { e.stopPropagation(); appData[legIdx].days[dayIdx].completed = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
+function toggleFoodCompleted(e, legIdx, foodIdx) { e.stopPropagation(); if (typeof triggerHaptic === "function") triggerHaptic("success"); appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
+function toggleDayCompleted(e, legIdx, dayIdx) { e.stopPropagation(); if (typeof triggerHaptic === "function") triggerHaptic("success"); appData[legIdx].days[dayIdx].completed = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
 function toggleActivityCompleted(e, legIdx, dayIdx, itemIdx) {
   e.stopPropagation();
+  if (typeof triggerHaptic === "function") triggerHaptic("success");
   const item = appData[legIdx].days[dayIdx].activityItems[itemIdx];
   item.done = e.target.checked;
   syncAssignedSuggestedActivityField(legIdx, dayIdx, item.text, 'done', item.done);

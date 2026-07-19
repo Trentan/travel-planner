@@ -153,10 +153,10 @@ function buildStepDemo(step) {
     case 'day-card':
       return `
         <div class="guide-step-demo">
-          <div class="day-bar" style="background:#f9f9f9; padding:8px 12px; border-radius:4px;">
-            <span style="font-family:monospace; color:#666;">Mon 1 Jan</span>
+          <div class="day-bar bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" style="padding:8px 12px; border-radius:4px;">
+            <span class="text-slate-600 dark:text-slate-400" style="font-family:monospace;">Mon 1 Jan</span>
             <span style="margin:0 8px;">Home → City</span>
-            <span style="color:#999; font-size:0.8rem;">▼</span>
+            <span class="text-slate-400 dark:text-slate-500" style="font-size:0.8rem;">▼</span>
           </div>
         </div>
       `;
@@ -164,9 +164,9 @@ function buildStepDemo(step) {
       return `
         <div class="guide-step-demo">
           <div style="display:flex;gap:8px;align-items:center;">
-            <span style="color:#999; cursor:grab;">⠿</span>
+            <span class="text-slate-400 dark:text-slate-500" style="cursor:grab;">⠿</span>
             <span>Eiffel Tower visit</span>
-            <span style="font-size:0.75rem; color:#666;">← Drag to a day!</span>
+            <span class="text-slate-500 dark:text-slate-400" style="font-size:0.75rem;">← Drag to a day!</span>
           </div>
         </div>
       `;
@@ -174,9 +174,9 @@ function buildStepDemo(step) {
       return `
         <div class="guide-step-demo">
           <div style="display:flex;gap:8px;">
-            <span style="padding:6px 12px; background:#eee; border-radius:4px; font-size:0.8rem;">✈️ Transport</span>
-            <span style="padding:6px 12px; background:#eee; border-radius:4px; font-size:0.8rem;">🏨 Accommodation</span>
-            <span style="padding:6px 12px; background:#eee; border-radius:4px; font-size:0.8rem;color:#2C3E50; font-weight:600;">💰 Budget</span>
+            <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300" style="padding:6px 12px; border-radius:4px; font-size:0.8rem;">✈️ Transport</span>
+            <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300" style="padding:6px 12px; border-radius:4px; font-size:0.8rem;">🏨 Accommodation</span>
+            <span class="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100" style="padding:6px 12px; border-radius:4px; font-size:0.8rem; font-weight:600;">💰 Budget</span>
           </div>
         </div>
       `;
@@ -201,9 +201,9 @@ function buildStepDemo(step) {
       return `
         <div class="guide-step-demo">
           <div style="display:flex;gap:12px;align-items:center;">
-            <span style="padding:6px 12px; background:#2C3E50; color:white; border-radius:4px; font-size:0.8rem;">🖨️ Print Preview</span>
-            <span style="color:#666; font-size:0.8rem;">→</span>
-            <span style="color:#666; font-size:0.8rem;">Choose options, then print!</span>
+            <span class="bg-slate-800 dark:bg-slate-600 text-white" style="padding:6px 12px; border-radius:4px; font-size:0.8rem;">🖨️ Print Preview</span>
+            <span class="text-slate-500 dark:text-slate-400" style="font-size:0.8rem;">→</span>
+            <span class="text-slate-500 dark:text-slate-400" style="font-size:0.8rem;">Choose options, then print!</span>
           </div>
         </div>
       `;
@@ -211,8 +211,8 @@ function buildStepDemo(step) {
       return `
         <div class="guide-step-demo">
           <div style="display:flex;gap:8px;">
-            <span style="padding:6px 12px; background:#eee; border-radius:4px; font-size:0.8rem;">Open File</span>
-            <span style="padding:6px 12px; background:#eee; border-radius:4px; font-size:0.8rem;">Download JSON Copy</span>
+            <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300" style="padding:6px 12px; border-radius:4px; font-size:0.8rem;">Open File</span>
+            <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300" style="padding:6px 12px; border-radius:4px; font-size:0.8rem;">Download JSON Copy</span>
           </div>
         </div>
       `;

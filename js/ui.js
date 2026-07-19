@@ -840,3 +840,21 @@ if (typeof document !== "undefined" && typeof document.addEventListener === "fun
   });
 }
 
+
+// --- Haptics Helper ---
+window.triggerHaptic = async function(type = "light") {
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
+    try {
+      if (type === "success") {
+        await window.Capacitor.Plugins.Haptics.notification({ type: "SUCCESS" });
+      } else if (type === "warning") {
+        await window.Capacitor.Plugins.Haptics.notification({ type: "WARNING" });
+      } else if (type === "error") {
+        await window.Capacitor.Plugins.Haptics.notification({ type: "ERROR" });
+      } else {
+        await window.Capacitor.Plugins.Haptics.impact({ style: type.toUpperCase() }); // LIGHT, MEDIUM, HEAVY
+      }
+    } catch(e) { /* ignore on unsupported devices */ }
+  }
+};
+
