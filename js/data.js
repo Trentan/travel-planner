@@ -3213,8 +3213,8 @@ function buildDefaultJourneysFromItinerary(legs) {
 
         // Clean city names: strip emoji and parenthetical suffixes so they
         // match the city nav labels used by the map and timeline boundary blocks.
-        const fromLocation = item.fromLocation || stripCityLabel(day.from || '');
-        const toLocation   = item.toLocation || stripCityLabel(day.to   || '');
+        const fromLocation = stripCityLabel(day.from || '');
+        const toLocation   = stripCityLabel(day.to   || '');
 
         journeysData.push({
           id: `journey_default_${leg.id || legIndex}_${dayIndex}_${itemIndex}`,
@@ -3224,6 +3224,8 @@ function buildDefaultJourneysFromItinerary(legs) {
           dayDate,
           fromLocation,
           toLocation,
+          fromAddress: item.fromLocation || '',
+          toAddress: item.toLocation || '',
           fromCityId: typeof getCityIdByName === 'function' ? getCityIdByName(fromLocation) : '',
           toCityId: typeof getCityIdByName === 'function' ? getCityIdByName(toLocation) : '',
           departureDate: dayDate,
