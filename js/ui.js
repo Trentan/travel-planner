@@ -879,3 +879,91 @@ if (typeof document !== "undefined" && typeof document.addEventListener === "fun
   });
 }
 
+window.openTripSummaryModal = openTripSummaryModal;
+window.closeTripSummaryModal = closeTripSummaryModal;
+
+function openTripSummaryModal() {
+  const modal = document.getElementById('trip-summary-modal');
+  if (!modal) return;
+  const tbody = document.getElementById('tripSummaryTableBody');
+  tbody.innerHTML = '';
+
+  if (!appData || appData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No trip data available.</td></tr>';
+    modal.style.display = 'flex';
+    return;
+  }
+
+  // Iterate over all legs and days
+  appData.forEach(leg => {
+    if (!leg.days) return;
+    leg.days.forEach(day => {
+      // Date
+      let displayDate = 'TBD';
+      if (day.date) {
+        displayDate = typeof formatDateStringForDisplay === 'function' 
+          ? formatDateStringForDisplay(day.date)
+          : day.date;
+      }
+      
+      // City
+      const city = day.to || leg.city || 'Unknown City';
+
+      // Accom
+      let accomStr = '<span class="text-slate-400 italic">None</span>';
+      if (day.date && typeof stays !== 'undefined') {
+        const nightStays = stays.filter(s => s.checkIn <= day.date && s.checkOut > day.date);
+        if (nightStays.length > 0) {
+          accomStr = nightStays.map(s => {
+            let sStr = '<strong class="text-slate-800 dark:text-slate-200">' + (s.name || 'Stay') + '</strong>';
+            if (s.neighborhood) sStr += ' <span class="text-xs text-slate-500 block">' + s.neighborhood + '</span>';
+            return sStr;
+          }).join('<br>');
+        }
+      }
+
+      // Transport & Activities
+      let eventsHtml = '';
+      
+      if (day.date && typeof journeys !== 'undefined') {
+        const dayJourneys = journeys.filter(j => j.dep && j.dep.startsWith(day.date));
+        if (dayJourneys.length > 0) {
+          eventsHtml += dayJourneys.map(j => {
+            const method = j.method || 'Transport';
+            return '<div class="mb-1 text-blue-600 dark:text-blue-400 text-sm flex items-center">' +
+                      '<span class="mr-1 text-lg">??</span>' +
+                      '<span>' + (j.from || '?') + ' &rarr; ' + (j.to || '?') + '</span>' +
+                    '</div>';
+          }).join('');
+        }
+      }
+
+      if (day.sights && day.sights.length > 0) {
+        eventsHtml += '<ul class="list-disc pl-4 text-sm text-slate-700 dark:text-slate-300 mt-1">';
+        day.sights.forEach(sight => {
+          eventsHtml += '<li>' + (sight.name || sight.title || 'Activity') + '</li>';
+        });
+        eventsHtml += '</ul>';
+      }
+
+      if (!eventsHtml) {
+        eventsHtml = '<span class="text-slate-400 italic text-sm">Free day</span>';
+      }
+
+      const row = document.createElement('tr');
+      row.className = 'border-b border-slate-200 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors';
+      row.innerHTML = '<td class="px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap align-top">' + displayDate + '</td>' +
+        '<td class="px-4 py-3 text-sm font-semibold text-slate-800 dark:text-slate-100 align-top">' + city + '</td>' +
+        '<td class="px-4 py-3 text-sm align-top">' + accomStr + '</td>' +
+        '<td class="px-4 py-3 text-sm align-top">' + eventsHtml + '</td>';
+      tbody.appendChild(row);
+    });
+  });
+
+  modal.style.display = 'flex';
+}
+
+function closeTripSummaryModal() {
+  const modal = document.getElementById('trip-summary-modal');
+  if (modal) modal.style.display = 'none';
+}

@@ -57,7 +57,8 @@
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openGuideDialog()">📖 Guide</button>
         <button id="showMoneyToggleBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); toggleShowMoney()">💵 Hide Prices</button>
         <div class="app-menu-divider" aria-hidden="true"></div>
-        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItinerarySummaryText()">🧾 Export AI Summary</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripSummaryModal()">📅 View Trip Summary</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItinerarySummaryText()">📝 Export AI Summary</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItineraryText()">📝 Export Itinerary Text</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openShareExportDialog()">🔗 Share Export</button>
         <div class="app-menu-divider" aria-hidden="true"></div>
@@ -255,10 +256,14 @@
         <section class="mobile-menu-section" aria-labelledby="mobileMenuExportFiles">
           <h3 id="mobileMenuExportFiles" class="mobile-menu-section-title">Export & files</h3>
           <div class="mobile-menu-section-grid mobile-menu-section-grid-stacked">
-            <button class="app-menu-btn" onclick="exportItinerarySummaryText(); closeMobileMenu()">
-              <span class="app-menu-btn-title">🧾 Export AI Summary</span>
-              <span class="app-menu-btn-subtitle">Quick summary for sharing</span>
-            </button>
+              <button class="app-menu-btn" onclick="exportItinerarySummaryText(); closeMobileMenu()">
+                <span class="app-menu-btn-title">📝 Export AI Summary</span>
+                <span class="app-menu-btn-subtitle">Quick summary for sharing</span>
+              </button>
+              <button class="app-menu-btn" onclick="openTripSummaryModal(); closeMobileMenu()">
+                <span class="app-menu-btn-title">📅 View Trip Summary</span>
+                <span class="app-menu-btn-subtitle">Quick scrollable overview table</span>
+              </button>
             <button class="app-menu-btn" onclick="exportItineraryText(); closeMobileMenu()">
               <span class="app-menu-btn-title">📝 Export Itinerary Text</span>
               <span class="app-menu-btn-subtitle">Plain text trip outline</span>
@@ -548,6 +553,33 @@
       </div>
       <div class="modal-footer">
         <button class="action-btn action-btn-secondary" onclick="document.getElementById('sync-results-modal').style.display='none'">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trip Summary Modal -->
+  <div id="trip-summary-modal" class="modal-overlay" style="display: none;" onclick="if(event.target===this) closeTripSummaryModal()">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h2 class="text-xl font-bold">Trip Summary</h2>
+        <button class="modal-close" onclick="closeTripSummaryModal()" aria-label="Close trip summary">&times;</button>
+      </div>
+      <div class="modal-body overflow-y-auto" style="max-height: 70vh; padding: 0;">
+        <div class="trip-summary-container">
+          <table class="trip-summary-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>City</th>
+                <th>Accommodation</th>
+                <th>Transport &amp; Key Activities</th>
+              </tr>
+            </thead>
+            <tbody id="tripSummaryTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
