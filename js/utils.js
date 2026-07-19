@@ -16,7 +16,7 @@ const DEFAULT_DATA = [
         date:'1 Jan', day:'Mon', from:'Brisbane', to:'Singapore',
         completed: false, desc:'Departure day — evening flight to Singapore',
         transportItems: [
-          { text: "Airtrain to BNE International | 19:00", cost: "20", status: "planned", bookingRef: "" },
+          { text: "Airtrain to BNE International | Dep 19:00 ➔ Arr 19:30", cost: "20", status: "planned", bookingRef: "" },
           { text: "Singapore Airlines SQ246 BNE ➔ SIN | Dep 23:35 ➔ Arr +1 05:35", cost: "850", status: "confirmed", bookingRef: "SQ88X2" }
         ],
         accomItems: [],
@@ -163,7 +163,7 @@ const DEFAULT_DATA = [
         date:'5 Jan', day:'Fri', from:'Paris', to:'Paris',
         completed: false, desc:'Arrival at Gare du Nord & evening stroll',
         transportItems: [
-          { text: "Paris Metro Line 4 to Saint-Germain-des-Prés", cost: "2.10", status: "planned", bookingRef: "" }
+          { text: "Paris Metro Line 4 to Saint-Germain-des-Prés | Dep 18:00 ➔ Arr 18:30", cost: "2.10", status: "planned", bookingRef: "" }
         ],
         accomItems: [{ text: "Hôtel des Arts", cost: "180", status: "confirmed", bookingRef: "PA987", cityId: 'city-paris' }],
         activityItems: [
@@ -188,7 +188,7 @@ const DEFAULT_DATA = [
         date:'7 Jan', day:'Sun', from:'Paris', to:'Dubai',
         completed: false, desc:'Le Marais and departure via CDG',
         transportItems: [
-          { text: "RER B train to CDG Airport | 12:00", cost: "11.45", status: "planned", bookingRef: "" },
+          { text: "RER B train to CDG Airport | Dep 12:00 ➔ Arr 12:45", cost: "11.45", status: "planned", bookingRef: "" },
           { text: "Emirates EK74 CDG ➔ DXB | Dep 15:35 ➔ Arr 00:20", cost: "950", status: "confirmed", bookingRef: "EK402A" }
         ],
         accomItems: [{ text: "Hôtel des Arts (Checkout)", cost: "0", status: "confirmed", bookingRef: "PA987", cityId: 'city-paris' }],
