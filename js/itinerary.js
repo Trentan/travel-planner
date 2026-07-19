@@ -1941,7 +1941,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
           icon: getDepartureIcon(transType),
           title: `Departed ${fromLoc} - ${transTypeCapitalized} to ${toLoc}`,
           startTime: depTime,
-          sortValue: getDailyTimelineItemSortValue(dayDate, depTime, 99999)
+          sortValue: getDailyTimelineItemSortValue(dayDate, depTime, -99999)
         });
       }
     });
