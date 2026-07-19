@@ -1,0 +1,475 @@
+[
+  {
+    "areaName": "🧳 Carry-on Packed Bag (Main Luggage)",
+    "areaColor": "#2980B9",
+    "categories": [
+      {
+        "title": "Clothes",
+        "items": [
+          {
+            "text": "Travel day outfit: Long pants, Shirt, Hoodie, Socks, Shoes",
+            "done": true
+          },
+          {
+            "text": "T-shirts, Tank Tops",
+            "done": true
+          },
+          {
+            "text": "Shorts, Skirts",
+            "done": true
+          },
+          {
+            "text": "Pants",
+            "done": true
+          },
+          {
+            "text": "Layers (hoodie, sweater, cardigan)",
+            "done": true
+          },
+          {
+            "text": "Swim suit",
+            "done": true
+          },
+          {
+            "text": "Dress",
+            "done": true
+          },
+          {
+            "text": "Socks",
+            "done": true
+          },
+          {
+            "text": "Underwear",
+            "done": true
+          },
+          {
+            "text": "Bras",
+            "done": true
+          },
+          {
+            "text": "Pyjamas, Sleepwear",
+            "done": true
+          },
+          {
+            "text": "Formal Wear",
+            "done": true
+          },
+          {
+            "text": "Hat",
+            "done": true
+          },
+          {
+            "text": "Workout outfit",
+            "done": true
+          },
+          {
+            "text": "Belt",
+            "done": true
+          },
+          {
+            "text": "Other accessories / Earrings",
+            "done": true
+          }
+        ]
+      },
+      {
+        "title": "Shoes & Misc",
+        "items": [
+          {
+            "text": "Dress shoes",
+            "done": true
+          },
+          {
+            "text": "Sandals/Crocs",
+            "done": true
+          },
+          {
+            "text": "Presents / Card",
+            "done": true
+          },
+          {
+            "text": "Crossbody/Sling Bag/Purse",
+            "done": true
+          },
+          {
+            "text": "Reusable tote bag",
+            "done": true
+          },
+          {
+            "text": "Pillowcase for used clothes\n",
+            "done": true
+          },
+          {
+            "text": "Laundry Sheets for washing",
+            "done": true
+          },
+          {
+            "text": "Raincoat/Umbrella",
+            "done": true
+          },
+          {
+            "text": "Microfibre towel",
+            "done": true
+          }
+        ]
+      },
+      {
+        "title": "Dry Toiletries",
+        "items": [
+          {
+            "text": "Floss",
+            "done": true
+          },
+          {
+            "text": "Toothbrush",
+            "done": true
+          },
+          {
+            "text": "Razor (Cartidge), Shaving",
+            "done": true
+          },
+          {
+            "text": "Bar of Soap",
+            "done": true
+          },
+          {
+            "text": "Cotton pad, q-tips",
+            "done": true
+          },
+          {
+            "text": "Nail clippers/tweezers",
+            "done": true
+          },
+          {
+            "text": "Personal Hygiene items (Pads)",
+            "done": true
+          },
+          {
+            "text": "Makeup",
+            "done": true
+          },
+          {
+            "text": "Hair clips, hair ties, bobby pins",
+            "done": true
+          },
+          {
+            "text": "Hair Brush/comb/tools",
+            "done": true
+          },
+          {
+            "text": "Bandaids, Electrolyte packs",
+            "done": true
+          },
+          {
+            "text": "Body wipes",
+            "done": true
+          },
+          {
+            "text": "Panadol / Nurofen",
+            "done": true
+          },
+          {
+            "text": "Vitamins / Tablets",
+            "done": true
+          }
+        ]
+      },
+      {
+        "title": "1 Litre Clear Bag (Liquids <100ml)",
+        "items": [
+          {
+            "text": "Clear 1 litre bag",
+            "done": true
+          },
+          {
+            "text": "Cologne/Perfume",
+            "done": true
+          },
+          {
+            "text": "Toothpaste",
+            "done": true
+          },
+          {
+            "text": "Face wash",
+            "done": true
+          },
+          {
+            "text": "Shampoo & Conditioner",
+            "done": true
+          },
+          {
+            "text": "Leave-in conditioner",
+            "done": true
+          },
+          {
+            "text": "Micellar Water or Makeup Remover",
+            "done": true
+          },
+          {
+            "text": "Sunscreen",
+            "done": true
+          },
+          {
+            "text": "Deodorant (Wrap cloth-tape repairs)",
+            "done": true
+          },
+          {
+            "text": "Moisturiser",
+            "done": true
+          },
+          {
+            "text": "Liquids pouches (for above liquids)",
+            "done": true
+          },
+          {
+            "text": "Toiletry skins (for liquid no spill)",
+            "done": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "areaName": "🎒 Personal Item Bag (Under Seat)",
+    "areaColor": "#8E44AD",
+    "categories": [
+      {
+        "title": "Essentials",
+        "items": [
+          {
+            "text": "TRS Claim + Items",
+            "done": false
+          },
+          {
+            "text": "Passport + [Copy + Tracker]",
+            "done": false
+          },
+          {
+            "text": "Reservations + Itineraries + Insurance",
+            "done": false
+          },
+          {
+            "text": "Wallet/Purse + Local cash + Cards",
+            "done": false
+          },
+          {
+            "text": "Phone",
+            "done": false
+          },
+          {
+            "text": "Sunglasses & Case",
+            "done": false
+          },
+          {
+            "text": "Airpods",
+            "done": false
+          }
+        ]
+      },
+      {
+        "title": "Flight Items",
+        "items": [
+          {
+            "text": "Travel pillow / Foot sling",
+            "done": true
+          },
+          {
+            "text": "Phone holder (watch movies)",
+            "done": true
+          },
+          {
+            "text": "Compression socks, Slippers",
+            "done": true
+          },
+          {
+            "text": "Disposable Toothbrush kit",
+            "done": true
+          },
+          {
+            "text": "Eye mask, Eye Drops",
+            "done": true
+          },
+          {
+            "text": "Ear plugs, Breath Fresheners",
+            "done": true
+          },
+          {
+            "text": "Snacks, TravelCalm",
+            "done": true
+          },
+          {
+            "text": "Headphones/Airpods",
+            "done": true
+          },
+          {
+            "text": "Airfly/Bluetooth Adapter",
+            "done": true
+          },
+          {
+            "text": "Book/Kindle",
+            "done": true
+          },
+          {
+            "text": "Water bottle",
+            "done": true
+          }
+        ]
+      },
+      {
+        "title": "Tech",
+        "items": [
+          {
+            "text": "eSIM (Installed)",
+            "done": true
+          },
+          {
+            "text": "Mobile downloads (Movies, Shows)",
+            "done": false
+          },
+          {
+            "text": "Phone charger",
+            "done": true
+          },
+          {
+            "text": "Power cables, Cords",
+            "done": true
+          },
+          {
+            "text": "Power Adapter",
+            "done": true
+          },
+          {
+            "text": "Power bank",
+            "done": true
+          },
+          {
+            "text": "Pen",
+            "done": true
+          },
+          {
+            "text": "Laptop",
+            "done": true
+          },
+          {
+            "text": "Luggage Trackers",
+            "done": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "areaName": "🚶 Walk-on Gear (Wear onto plane)",
+    "areaColor": "#E67E22",
+    "categories": [
+      {
+        "title": "Plane Outfit",
+        "items": [
+          {
+            "text": "Underwear",
+            "done": true
+          },
+          {
+            "text": "Jeans",
+            "done": true
+          },
+          {
+            "text": "Belt",
+            "done": true
+          },
+          {
+            "text": "Sports shoes",
+            "done": true
+          },
+          {
+            "text": "Socks",
+            "done": true
+          },
+          {
+            "text": "Activewear shirt",
+            "done": true
+          },
+          {
+            "text": "Hoodie",
+            "done": true
+          },
+          {
+            "text": "Sunglasses",
+            "done": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "areaName": "📝 Trip Notes",
+    "areaColor": "#6C5CE7",
+    "categories": [
+      {
+        "title": "Notes",
+        "items": [
+          {
+            "text": "Booking reminders",
+            "done": true
+          },
+          {
+            "text": "Places to book",
+            "done": true
+          },
+          {
+            "text": "Trip ideas to follow up",
+            "done": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "areaName": "🏨 Hotel Checkout",
+    "areaColor": "#1ABC9C",
+    "categories": [
+      {
+        "title": "Room Sweep",
+        "items": [
+          {
+            "text": "Check under the bed",
+            "done": false
+          },
+          {
+            "text": "Check the safe",
+            "done": false
+          },
+          {
+            "text": "Check all power outlets (chargers)",
+            "done": false
+          },
+          {
+            "text": "Check the bathroom (toiletries)",
+            "done": false
+          },
+          {
+            "text": "Check drawers and closets",
+            "done": false
+          }
+        ]
+      },
+      {
+        "title": "Checkout",
+        "items": [
+          {
+            "text": "Return room keys",
+            "done": false
+          },
+          {
+            "text": "Pay any incidentals/taxes",
+            "done": false
+          },
+          {
+            "text": "Get receipt (if needed)",
+            "done": false
+          }
+        ]
+      }
+    ]
+  }
+]

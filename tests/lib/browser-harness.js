@@ -1002,6 +1002,7 @@ function createBrowserHarness({
 
 function loadAppScripts(harness) {
   const scriptOrder = [
+    ['js/default-data.js', 'js/default-data.js'],
     ['js/utils.js', 'js/utils.js'],
     ['js/data.js', 'js/data.js'],
     ['js/packing.js', 'js/packing.js'],

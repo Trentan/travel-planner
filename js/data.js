@@ -2368,11 +2368,11 @@ async function initData() {
       }
     } catch (e) {
       console.error('[Journeys] Failed to parse:', e);
-      journeys = [];
+      journeys = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.journeys));
       window.journeys = journeys;
     }
   } else {
-    journeys = [];
+    journeys = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.journeys));
     window.journeys = journeys;
   }
 
@@ -2385,11 +2385,11 @@ async function initData() {
         window.stays = stays;
       }
     } catch (e) {
-      stays = [];
+      stays = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.stays));
       window.stays = stays;
     }
   } else {
-    stays = [];
+    stays = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.stays));
     window.stays = stays;
   }
 
@@ -2456,7 +2456,7 @@ async function initData() {
       });
     });
   }
-  else { appData = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+  else { appData = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.itinerary)); }
 
   appData = normalizeTripLegsData(appData);
 
@@ -3323,39 +3323,24 @@ function buildDefaultStaysFromItinerary(legs) {
 }
 
 function seedDefaultDerivedTravelData() {
-  if (currentFileName !== 'Default Template') return false;
-
-  let seeded = false;
-  const hasTransportSource = Array.isArray(appData) && appData.some(leg => (leg.days || []).some(day => (day.transportItems || []).length > 0));
-  const hasStaySource = Array.isArray(appData) && appData.some(leg => (leg.days || []).some(day => (day.accomItems || []).length > 0));
-
-  if ((!Array.isArray(journeys) || journeys.length === 0) && hasTransportSource) {
-    journeys = buildDefaultJourneysFromItinerary(appData);
-    window.journeys = journeys;
-    seeded = true;
-  }
-
-  if ((!Array.isArray(stays) || stays.length === 0) && hasStaySource) {
-    stays = buildDefaultStaysFromItinerary(appData);
-    window.stays = stays;
-    seeded = true;
-  }
-
-  return seeded;
+  // Not needed anymore since default data provides journeys and stays natively.
+  return false;
 }
 
 function resetAppStateToDefaults() {
-  appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  appData = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.itinerary));
   packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING));
   leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
   citiesData = typeof DEFAULT_CITIES !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_CITIES)) : [];
   userCities = [];
   userCountries = [];
-  journeys = [];
-  stays = [];
+  journeys = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.journeys));
+  window.journeys = journeys;
+  stays = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.stays));
+  window.stays = stays;
   titleData = {
-    title: "✈ New Trip Plan",
-    subtitle: "Click here to add your trip subtitle/description"
+    title: DEFAULT_TRIP_DATA.meta.title,
+    subtitle: DEFAULT_TRIP_DATA.meta.subtitle
   };
   currentFileName = "Default Template";
   currentCityFilter = 'all';
@@ -4785,7 +4770,7 @@ async function loadImportedPayload(importedData, fileName) {
 
   if (!importedData.itinerary) {
     console.warn('Missing itinerary data in import, using default');
-    importedData.itinerary = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    importedData.itinerary = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.itinerary));
   } else if (!Array.isArray(importedData.itinerary)) {
     throw new Error('Invalid itinerary format. Expected an array of trip legs.');
   }
