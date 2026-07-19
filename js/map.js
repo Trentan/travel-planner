@@ -231,7 +231,7 @@ function buildJourneyMap() {
         let weight = 3;
         
         if (matchedJourney) {
-           const method = String(matchedJourney.method || '').toLowerCase();
+           const method = String(matchedJourney.transportType || '').toLowerCase();
            if (method === 'flight') {
               lineColor = '#3b82f6'; // blue
               dashArray = '8, 8';
@@ -262,7 +262,7 @@ function buildJourneyMap() {
         
         let popupHtml = '<div style="font-family: inherit; padding: 2px;">';
         if (matchedJourney) {
-           const method = matchedJourney.method || 'Transport';
+           const method = matchedJourney.transportType || 'Transport';
            const mCap = method.charAt(0).toUpperCase() + method.slice(1);
            popupHtml += '<strong>' + mCap + '</strong> from ' + fromStop.name + ' to ' + toStop.name;
            if (matchedJourney.provider) popupHtml += '<br><span style="color:#666;">' + matchedJourney.provider + '</span>';

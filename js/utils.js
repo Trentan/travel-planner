@@ -91,7 +91,12 @@ const DEFAULT_DATA = [
             "bookingRef": "QF88X2"
           }
         ],
-        "accomItems": [],
+        "accomItems": [
+          {
+            "text": "Add accommodation...",
+            "cost": "0"
+          }
+        ],
         "activityItems": []
       }
     ]
@@ -310,8 +315,11 @@ const DEFAULT_DATA = [
         ],
         "accomItems": [
           {
-            "text": "Add accommodation...",
-            "cost": "0"
+            "text": "Shinjuku Prince Hotel",
+            "cost": "150",
+            "status": "confirmed",
+            "provider": "Booking.com",
+            "cityId": "city-tokyo"
           }
         ],
         "activityItems": [
@@ -368,8 +376,11 @@ const DEFAULT_DATA = [
         "transportItems": [],
         "accomItems": [
           {
-            "text": "Add accommodation...",
-            "cost": "0"
+            "text": "Shinjuku Prince Hotel",
+            "cost": "150",
+            "status": "confirmed",
+            "provider": "Booking.com",
+            "cityId": "city-tokyo"
           }
         ],
         "activityItems": [
@@ -408,8 +419,11 @@ const DEFAULT_DATA = [
         "transportItems": [],
         "accomItems": [
           {
-            "text": "Add accommodation...",
-            "cost": "0"
+            "text": "Shinjuku Prince Hotel",
+            "cost": "150",
+            "status": "confirmed",
+            "provider": "Booking.com",
+            "cityId": "city-tokyo"
           }
         ],
         "activityItems": [
@@ -447,8 +461,11 @@ const DEFAULT_DATA = [
         "transportItems": [],
         "accomItems": [
           {
-            "text": "Add accommodation...",
-            "cost": "0"
+            "text": "Shinjuku Prince Hotel",
+            "cost": "150",
+            "status": "confirmed",
+            "provider": "Booking.com",
+            "cityId": "city-tokyo"
           }
         ],
         "activityItems": [
@@ -1295,8 +1312,10 @@ const DEFAULT_DATA = [
         "transportItems": [],
         "accomItems": [
           {
-            "text": "Add accommodation...",
-            "cost": "0"
+            "text": "Dubai Airport Transit Hotel",
+            "cost": "150",
+            "status": "confirmed",
+            "cityId": "city-dubai"
           }
         ],
         "activityItems": [
@@ -1363,8 +1382,9 @@ const DEFAULT_DATA = [
         "desc": "Arrive from Dubai",
         "transportItems": [
           {
-            "text": "Add transport...",
-            "cost": "0"
+            "text": "Emirates Flight EK412 | Dep 10:15 - Dubai to Sydney - Arr +1 06:00",
+            "cost": "750",
+            "status": "confirmed"
           }
         ],
         "accomItems": [
