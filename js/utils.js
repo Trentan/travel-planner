@@ -51,7 +51,7 @@ const DEFAULT_DATA = [
         "to": "Tokyo",
         "transportItems": [
           {
-            "text": "Qantas QF61 | Dep 10:15 ➔ Arr 19:00",
+            "text": "Qantas Flight QF61 | Dep 10:15 ➔ Arr 19:00",
             "cost": "850",
             "status": "confirmed",
             "bookingRef": "QF88X2"
@@ -157,7 +157,7 @@ const DEFAULT_DATA = [
         "to": "London",
         "transportItems": [
           {
-            "text": "British Airways BA8 | Dep 09:35 ➔ Arr 16:10",
+            "text": "British Airways Flight BA8 | Dep 09:35 ➔ Arr 16:10",
             "cost": "1100",
             "status": "confirmed"
           }
@@ -260,7 +260,7 @@ const DEFAULT_DATA = [
         "to": "Dubai",
         "transportItems": [
           {
-            "text": "Emirates EK76 | Dep 21:55 ➔ Arr +1 06:35",
+            "text": "Emirates Flight EK76 | Dep 21:55 ➔ Arr +1 06:35",
             "cost": "750",
             "status": "confirmed"
           }
@@ -272,7 +272,7 @@ const DEFAULT_DATA = [
   },
   {
     "id": "city-sydney-end",
-    "label": "🛬 Return (Sydney)",
+    "label": "🛬 Sydney (Return)",
     "colour": "#34495e",
     "cityFood": [],
     "suggestedActivities": [],
@@ -284,7 +284,7 @@ const DEFAULT_DATA = [
         "to": "Sydney",
         "transportItems": [
           {
-            "text": "Emirates EK412 | Dep 10:15 ➔ Arr +1 06:05",
+            "text": "Emirates Flight EK412 | Dep 10:15 ➔ Arr +1 06:05",
             "cost": "1200",
             "status": "confirmed"
           }
