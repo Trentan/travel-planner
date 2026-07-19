@@ -781,10 +781,7 @@ document.addEventListener('click', event => {
     menu.open = false;
   }
 });
-
-
-
-// --- Capacitor Mobile Hardware Back Button Support ---
+// --- Capacitor Mobile Hardware Back Button Support ---
 if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
   document.addEventListener("DOMContentLoaded", () => {
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
@@ -857,4 +854,28 @@ window.triggerHaptic = async function(type = "light") {
     } catch(e) { /* ignore on unsupported devices */ }
   }
 };
+
+
+// --- Cloud File Resync Flow ---
+if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      let lastSuspendedTime = Date.now();
+      window.Capacitor.Plugins.App.addListener("appStateChange", ({ isActive }) => {
+        if (!isActive) {
+          lastSuspendedTime = Date.now();
+        } else {
+          // If suspended for > 30 seconds, show the resync modal
+          if (Date.now() - lastSuspendedTime > 30000) {
+            const resyncModal = document.getElementById("resync-modal");
+            if (resyncModal && resyncModal.style.display === "none") {
+              resyncModal.style.display = "flex";
+              if (typeof triggerHaptic === "function") triggerHaptic("light");
+            }
+          }
+        }
+      });
+    }
+  });
+}
 
