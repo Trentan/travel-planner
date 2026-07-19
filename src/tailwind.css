@@ -6414,3 +6414,117 @@ body.read-only-mode .empty-state-readonly-hint {
   transform: scale(1.2);
 }
 
+
+/* Guide Dialog Steps */
+.guide-step-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+[data-theme="dark"] .guide-step-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+.guide-step-card.completed {
+  opacity: 0.7;
+}
+.guide-step-card.completed .guide-step-number {
+  background: #10b981;
+  color: white;
+}
+.guide-step-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  background: #f8fafc;
+}
+[data-theme="dark"] .guide-step-header {
+  background: #0f172a;
+}
+.guide-step-header:hover {
+  background: #f1f5f9;
+}
+[data-theme="dark"] .guide-step-header:hover {
+  background: #1e293b;
+}
+.guide-step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+.guide-step-title {
+  flex-grow: 1;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1.05rem;
+}
+[data-theme="dark"] .guide-step-title {
+  color: #f8fafc;
+}
+.guide-step-toggle {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  transition: transform 0.2s;
+}
+.guide-step-card.open .guide-step-toggle {
+  transform: rotate(180deg);
+}
+.guide-step-content {
+  display: none;
+  padding: 1.25rem;
+  border-top: 1px solid #e2e8f0;
+  color: #475569;
+  line-height: 1.6;
+}
+[data-theme="dark"] .guide-step-content {
+  border-top-color: #334155;
+  color: #cbd5e1;
+}
+.guide-step-card.open .guide-step-content {
+  display: block;
+}
+.guide-hint {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+  border-radius: 4px;
+  color: #92400e;
+  font-size: 0.9rem;
+}
+[data-theme="dark"] .guide-hint {
+  background: rgba(245, 158, 11, 0.1);
+  color: #fcd34d;
+}
+.guide-complete-banner {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 12px;
+  margin-top: 2rem;
+}
+.guide-complete-banner h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+.guide-complete-banner p {
+  margin: 0;
+  opacity: 0.9;
+}
+

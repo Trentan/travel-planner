@@ -556,19 +556,31 @@ function showToast(message) {
   setTimeout(() => toast.remove(), 3000);
 }
 
+function acceptWelcomeTutorial() {
+  document.getElementById('welcome-tutorial-modal').style.display = 'none';
+  startTutorial();
+}
+
+function dismissWelcomeTutorial() {
+  document.getElementById('welcome-tutorial-modal').style.display = 'none';
+  localStorage.setItem('travelApp_tutorial_seen', 'true');
+}
+
 // Auto-show tutorial for first-time users
 document.addEventListener('DOMContentLoaded', () => {
+  if (navigator.webdriver) return; // don't block automated tests
+
   const hasSeenTutorial = localStorage.getItem('travelApp_tutorial_seen');
   const isGuideTab = location.hash === '#guide';
 
   if (!hasSeenTutorial && !isGuideTab && buildGuideSteps) {
-    setTimeout(() => {
-      const btn = document.getElementById('tutorialBtn');
-      if (btn) {
-        btn.classList.add('pulse-animation');
-        setTimeout(() => btn.classList.remove('pulse-animation'), 3000);
-      }
-    }, 1000);
+    // Show the welcome modal
+    const welcomeModal = document.getElementById('welcome-tutorial-modal');
+    if (welcomeModal) {
+      setTimeout(() => {
+        welcomeModal.style.display = 'flex';
+      }, 500);
+    }
   }
 });
 
@@ -581,3 +593,5 @@ window.startTutorial = startTutorial;
 window.skipTutorial = skipTutorial;
 window.nextTutorialStep = nextTutorialStep;
 window.prevTutorialStep = prevTutorialStep;
+window.acceptWelcomeTutorial = acceptWelcomeTutorial;
+window.dismissWelcomeTutorial = dismissWelcomeTutorial;

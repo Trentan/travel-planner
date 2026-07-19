@@ -493,6 +493,24 @@
     </div>
   </div>
 
+  <div id="welcome-tutorial-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content modal-md">
+      <div class="modal-header">
+        <h2>👋 Welcome to Travel Planner</h2>
+        <button class="modal-close" onclick="dismissWelcomeTutorial()">&times;</button>
+      </div>
+      <div class="modal-body" style="text-align: center; padding: 2rem 1rem;">
+        <p style="margin-bottom: 1.5rem; font-size: 1.1rem; color: #475569;" class="dark:text-slate-300">
+          Would you like a quick interactive tour to show you how to use the app?
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <button class="action-btn" onclick="acceptWelcomeTutorial()">▶ Yes, show me around</button>
+          <button class="action-btn action-btn-secondary" onclick="dismissWelcomeTutorial()">No thanks, I'll explore</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="sync-results-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content modal-md">
       <div class="modal-header">
