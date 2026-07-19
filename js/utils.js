@@ -67,37 +67,43 @@ const DEFAULT_DATA = [
     "suggestedActivities": [],
     "legTips": [
       {
-        "text": "Pack your passport in your carry-on!",
-        "cityId": "city-tokyo"
+        "text": "Pack your passport and all travel documents in your carry-on.",
+        "cityId": "city-sydney"
       },
       {
-        "text": "Check in online 24 hours before flight.",
-        "cityId": "city-tokyo"
+        "text": "Check in online 24 hours before your flight.",
+        "cityId": "city-sydney"
+      },
+      {
+        "text": "Arrive at the airport at least 3 hours before international departure.",
+        "cityId": "city-sydney"
       }
     ],
     "days": [
       {
         "date": "2026-06-01",
         "day": "Mon",
-        "from": "Sydney (Trip Start)",
+        "from": "Sydney",
         "to": "Tokyo",
         "completed": false,
-        "desc": "Depart for Tokyo",
+        "desc": "Depart Sydney for Tokyo",
         "transportItems": [
           {
-            "text": "Qantas Flight QF61 | Dep 10:15 - Sydney to Tokyo - Arr 19:00",
+            "text": "Qantas Flight QF61 | Dep 10:15 | Arr +1 19:00 | Sydney → Tokyo",
             "cost": "850",
             "status": "confirmed",
             "bookingRef": "QF88X2"
           }
         ],
-        "accomItems": [
+        "accomItems": [],
+        "activityItems": [
           {
-            "text": "Add accommodation...",
-            "cost": "0"
+            "text": "Arrive at Sydney Kingsford Smith Airport",
+            "time": "07:00 - 08:00",
+            "cost": "0",
+            "done": false
           }
-        ],
-        "activityItems": []
+        ]
       }
     ]
   },
@@ -107,49 +113,147 @@ const DEFAULT_DATA = [
     "colour": "#e74c3c",
     "cityFood": [
       {
-        "text": "Sushi at Tsukiji Outer Market",
+        "text": "Ramen at Ichiran (solo booth, authentic hakata style)",
         "done": false,
         "cityId": "city-tokyo"
       },
       {
-        "text": "Ramen in Shinjuku",
+        "text": "Sushi breakfast at Tsukiji Outer Market",
         "done": false,
         "cityId": "city-tokyo"
       },
       {
-        "text": "Wagyu Beef Yakiniku",
+        "text": "Wagyu beef at Matsusaka Don",
         "done": false,
         "cityId": "city-tokyo"
       },
       {
-        "text": "Matcha Soft Serve in Asakusa",
+        "text": "Yakitori under the train tracks in Yurakucho",
         "done": false,
         "cityId": "city-tokyo"
       }
     ],
     "legTips": [
       {
-        "text": "Buy a Suica or Pasmo card for easy train travel.",
+        "text": "Get a Suica or Pasmo card for seamless train travel.",
         "cityId": "city-tokyo"
       },
       {
-        "text": "Remember to walk on the left side of the street.",
+        "text": "Convenience stores (7-Eleven, FamilyMart) sell incredible hot food 24/7.",
         "cityId": "city-tokyo"
       },
       {
-        "text": "Don't leave a tip at restaurants; it's not customary in Japan.",
+        "text": "Most restaurants have plastic food displays outside — point to order if needed.",
         "cityId": "city-tokyo"
       }
     ],
     "suggestedActivities": [
       {
-        "title": "Tokyo Skytree",
+        "title": "Senso-ji Temple & Nakamise Street",
         "category": "sight",
+        "estTime": "2 hrs",
+        "estCost": "0",
+        "assignedDayIdx": null,
+        "cityId": "city-tokyo",
+        "id": "act-sug-tokyo-1",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
+      },
+      {
+        "title": "Shibuya Crossing & Hachiko Statue",
+        "category": "sight",
+        "estTime": "1 hr",
+        "estCost": "0",
+        "assignedDayIdx": null,
+        "cityId": "city-tokyo",
+        "id": "act-sug-tokyo-2",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
+      },
+      {
+        "title": "teamLab Borderless Digital Art Museum",
+        "category": "experience",
+        "estTime": "3 hrs",
+        "estCost": "32",
+        "assignedDayIdx": null,
+        "cityId": "city-tokyo",
+        "id": "act-sug-tokyo-3",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
+      },
+      {
+        "title": "Harajuku & Takeshita Street",
+        "category": "sight",
+        "estTime": "2 hrs",
+        "estCost": "0",
+        "assignedDayIdx": null,
+        "cityId": "city-tokyo",
+        "id": "act-sug-tokyo-4",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
+      },
+      {
+        "title": "Day trip to Nikko Shrines",
+        "category": "day-trip",
+        "estTime": "8 hrs",
+        "estCost": "60",
+        "assignedDayIdx": null,
+        "cityId": "city-tokyo",
+        "id": "act-sug-tokyo-5",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
+      },
+      {
+        "title": "Robot Restaurant Show",
+        "category": "entertainment",
+        "estTime": "90 mins",
+        "estCost": "80",
+        "assignedDayIdx": null,
+        "cityId": "city-tokyo",
+        "id": "act-sug-tokyo-6",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
+      },
+      {
+        "title": "Meiji Jingu Shrine",
+        "category": "sight",
+        "estTime": "1.5 hrs",
+        "estCost": "0",
+        "assignedDayIdx": null,
+        "cityId": "city-tokyo",
+        "id": "act-sug-tokyo-7",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
+      },
+      {
+        "title": "Tsukiji Outer Market Breakfast",
+        "category": "food",
         "estTime": "2 hrs",
         "estCost": "20",
         "assignedDayIdx": null,
         "cityId": "city-tokyo",
-        "id": "act-fp2wx5k9i-mrrpnhwr",
+        "id": "act-sug-tokyo-8",
         "assignedDate": "",
         "startDate": "",
         "endDate": "",
@@ -157,191 +261,28 @@ const DEFAULT_DATA = [
         "endTime": ""
       },
       {
-        "title": "Ghibli Museum",
-        "category": "attraction",
-        "estTime": "4 hrs",
-        "estCost": "10",
-        "assignedDayIdx": null,
-        "cityId": "city-tokyo",
-        "id": "act-5bod3xcw9-mrrpnhwr",
-        "assignedDate": "",
-        "startDate": "",
-        "endDate": "",
-        "startTime": "",
-        "endTime": ""
-      },
-      {
-        "title": "Odaiba TeamLab Planets",
-        "category": "attraction",
+        "title": "Akihabara Electronics District",
+        "category": "shopping",
         "estTime": "2 hrs",
-        "estCost": "25",
+        "estCost": "0",
         "assignedDayIdx": null,
         "cityId": "city-tokyo",
-        "id": "act-u1fubor71-mrrpnhwr",
+        "id": "act-sug-tokyo-9",
         "assignedDate": "",
         "startDate": "",
         "endDate": "",
         "startTime": "",
         "endTime": ""
-      },
-      {
-        "id": "act-l25poackn-mrrpnhww",
-        "title": "Walk around Kabukicho",
-        "category": "sight",
-        "estTime": "19:00 - 21:00",
-        "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 1,
-        "assignedDate": "2026-06-02",
-        "startDate": "2026-06-02",
-        "startTime": "",
-        "endDate": "2026-06-02",
-        "endTime": "",
-        "cityId": "city-tokyo"
-      },
-      {
-        "id": "act-0j5wcmmdk-mrrpnhww",
-        "title": "Senso-ji Temple in Asakusa",
-        "category": "sight",
-        "estTime": "09:00 - 11:30",
-        "estCost": "0",
-        "notes": "",
-        "location": "Asakusa",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 2,
-        "assignedDate": "2026-06-03",
-        "startDate": "2026-06-03",
-        "startTime": "",
-        "endDate": "2026-06-03",
-        "endTime": "",
-        "cityId": "city-tokyo"
-      },
-      {
-        "id": "act-754cz33o0-mrrpnhww",
-        "title": "Explore Akihabara Anime District",
-        "category": "sight",
-        "estTime": "13:00 - 17:00",
-        "estCost": "20",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 2,
-        "assignedDate": "2026-06-03",
-        "startDate": "2026-06-03",
-        "startTime": "",
-        "endDate": "2026-06-03",
-        "endTime": "",
-        "cityId": "city-tokyo"
-      },
-      {
-        "id": "act-4qmcw6g48-mrrpnhwx",
-        "title": "Shibuya Crossing & Hachiko",
-        "category": "sight",
-        "estTime": "10:00 - 12:00",
-        "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 3,
-        "assignedDate": "2026-06-04",
-        "startDate": "2026-06-04",
-        "startTime": "",
-        "endDate": "2026-06-04",
-        "endTime": "",
-        "cityId": "city-tokyo"
-      },
-      {
-        "id": "act-0sdbn32uw-mrrpnhwx",
-        "title": "Meiji Shrine & Yoyogi Park",
-        "category": "attraction",
-        "estTime": "14:00 - 16:30",
-        "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 3,
-        "assignedDate": "2026-06-04",
-        "startDate": "2026-06-04",
-        "startTime": "",
-        "endDate": "2026-06-04",
-        "endTime": "",
-        "cityId": "city-tokyo"
-      },
-      {
-        "id": "act-eekki9ces-mrrpnhwx",
-        "title": "Day trip to Kamakura or Yokohama (Optional)",
-        "category": "sight",
-        "estTime": "09:00 - 17:00",
-        "estCost": "30",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 4,
-        "assignedDate": "2026-06-05",
-        "startDate": "2026-06-05",
-        "startTime": "",
-        "endDate": "2026-06-05",
-        "endTime": "",
-        "cityId": "city-tokyo"
       }
     ],
     "days": [
       {
-        "date": "2026-06-01",
-        "day": "Mon",
-        "from": "Sydney",
-        "to": "🌸 Tokyo",
-        "completed": false,
-        "desc": "Arrive from Sydney",
-        "transportItems": [
-          {
-            "text": "Add transport...",
-            "cost": "0"
-          }
-        ],
-        "accomItems": [
-          {
-            "text": "Shinjuku Prince Hotel",
-            "cost": "150",
-            "status": "confirmed",
-            "provider": "Booking.com",
-            "cityId": "city-tokyo"
-          }
-        ],
-        "activityItems": [
-          {
-            "text": "Explore local area",
-            "cost": "0",
-            "time": "1 hr",
-            "done": false,
-            "startDate": "2026-06-01",
-            "endDate": "2026-06-01",
-            "startTime": "",
-            "endTime": ""
-          }
-        ]
-      },
-      {
         "date": "2026-06-02",
         "day": "Tue",
-        "from": "🌸 Tokyo",
-        "to": "🌸 Tokyo",
+        "from": "Sydney",
+        "to": "Tokyo",
         "completed": false,
-        "desc": "Exploring",
+        "desc": "Arrive in Tokyo",
         "transportItems": [],
         "accomItems": [
           {
@@ -349,30 +290,26 @@ const DEFAULT_DATA = [
             "cost": "150",
             "status": "confirmed",
             "provider": "Booking.com",
-            "cityId": "city-tokyo"
+            "cityId": "city-tokyo",
+            "bookingRef": "BK-TYO-2847"
           }
         ],
         "activityItems": [
           {
-            "text": "Walk around Kabukicho",
-            "time": "19:00 - 21:00",
+            "text": "Check in, freshen up, explore Shinjuku at night",
+            "time": "20:00 - 22:00",
             "cost": "0",
-            "startDate": "2026-06-02",
-            "endDate": "2026-06-02",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-l25poackn-mrrpnhww",
-            "cityId": "city-tokyo"
+            "done": false
           }
         ]
       },
       {
         "date": "2026-06-03",
         "day": "Wed",
-        "from": "🌸 Tokyo",
-        "to": "🌸 Tokyo",
+        "from": "Tokyo",
+        "to": "Tokyo",
         "completed": false,
-        "desc": "Exploring",
+        "desc": "Senso-ji & Akihabara",
         "transportItems": [],
         "accomItems": [
           {
@@ -380,7 +317,8 @@ const DEFAULT_DATA = [
             "cost": "150",
             "status": "confirmed",
             "provider": "Booking.com",
-            "cityId": "city-tokyo"
+            "cityId": "city-tokyo",
+            "bookingRef": "BK-TYO-2847"
           }
         ],
         "activityItems": [
@@ -388,34 +326,23 @@ const DEFAULT_DATA = [
             "text": "Senso-ji Temple in Asakusa",
             "time": "09:00 - 11:30",
             "cost": "0",
-            "location": "Asakusa",
-            "startDate": "2026-06-03",
-            "endDate": "2026-06-03",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-0j5wcmmdk-mrrpnhww",
-            "cityId": "city-tokyo"
+            "done": false
           },
           {
-            "text": "Explore Akihabara Anime District",
-            "time": "13:00 - 17:00",
-            "cost": "20",
-            "startDate": "2026-06-03",
-            "endDate": "2026-06-03",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-754cz33o0-mrrpnhww",
-            "cityId": "city-tokyo"
+            "text": "Akihabara Electronics & Anime District",
+            "time": "14:00 - 17:00",
+            "cost": "0",
+            "done": false
           }
         ]
       },
       {
         "date": "2026-06-04",
         "day": "Thu",
-        "from": "🌸 Tokyo",
-        "to": "🌸 Tokyo",
+        "from": "Tokyo",
+        "to": "Tokyo",
         "completed": false,
-        "desc": "Exploring",
+        "desc": "Shibuya & Harajuku",
         "transportItems": [],
         "accomItems": [
           {
@@ -423,41 +350,32 @@ const DEFAULT_DATA = [
             "cost": "150",
             "status": "confirmed",
             "provider": "Booking.com",
-            "cityId": "city-tokyo"
+            "cityId": "city-tokyo",
+            "bookingRef": "BK-TYO-2847"
           }
         ],
         "activityItems": [
           {
-            "text": "Shibuya Crossing & Hachiko",
+            "text": "Shibuya Crossing & Hachiko Statue",
             "time": "10:00 - 12:00",
             "cost": "0",
-            "startDate": "2026-06-04",
-            "endDate": "2026-06-04",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-4qmcw6g48-mrrpnhwx",
-            "cityId": "city-tokyo"
+            "done": false
           },
           {
-            "text": "Meiji Shrine & Yoyogi Park",
-            "time": "14:00 - 16:30",
+            "text": "Harajuku Takeshita Street & Meiji Shrine",
+            "time": "13:30 - 16:30",
             "cost": "0",
-            "startDate": "2026-06-04",
-            "endDate": "2026-06-04",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-0sdbn32uw-mrrpnhwx",
-            "cityId": "city-tokyo"
+            "done": false
           }
         ]
       },
       {
         "date": "2026-06-05",
         "day": "Fri",
-        "from": "🌸 Tokyo",
-        "to": "🌸 Tokyo",
+        "from": "Tokyo",
+        "to": "Tokyo",
         "completed": false,
-        "desc": "Exploring",
+        "desc": "Day trip to Nikko",
         "transportItems": [],
         "accomItems": [
           {
@@ -465,47 +383,79 @@ const DEFAULT_DATA = [
             "cost": "150",
             "status": "confirmed",
             "provider": "Booking.com",
-            "cityId": "city-tokyo"
+            "cityId": "city-tokyo",
+            "bookingRef": "BK-TYO-2847"
           }
         ],
         "activityItems": [
           {
-            "text": "Day trip to Kamakura or Yokohama (Optional)",
+            "text": "Nikko Tosho-gu Shrine Complex (UNESCO)",
             "time": "09:00 - 17:00",
-            "cost": "30",
-            "startDate": "2026-06-05",
-            "endDate": "2026-06-05",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-eekki9ces-mrrpnhwx",
-            "cityId": "city-tokyo"
+            "cost": "60",
+            "done": false
+          },
+          {
+            "text": "Kegon Waterfall",
+            "time": "11:00 - 12:00",
+            "cost": "8",
+            "done": false
           }
         ]
       },
       {
         "date": "2026-06-06",
         "day": "Sat",
-        "from": "🌸 Tokyo",
-        "to": "London",
+        "from": "Tokyo",
+        "to": "Tokyo",
         "completed": false,
-        "desc": "Depart for London",
+        "desc": "Tsukiji & Ginza",
         "transportItems": [],
         "accomItems": [
           {
-            "text": "Add accommodation...",
-            "cost": "0"
+            "text": "Shinjuku Prince Hotel",
+            "cost": "150",
+            "status": "confirmed",
+            "provider": "Booking.com",
+            "cityId": "city-tokyo",
+            "bookingRef": "BK-TYO-2847"
           }
         ],
         "activityItems": [
           {
-            "text": "Explore local area",
-            "cost": "0",
-            "time": "1 hr",
-            "done": false,
-            "startDate": "2026-06-06",
-            "endDate": "2026-06-06",
-            "startTime": "",
-            "endTime": ""
+            "text": "Tsukiji Outer Market breakfast",
+            "time": "07:30 - 09:30",
+            "cost": "20",
+            "done": false
+          },
+          {
+            "text": "teamLab Borderless Digital Art Museum",
+            "time": "13:00 - 16:00",
+            "cost": "32",
+            "done": false
+          }
+        ]
+      },
+      {
+        "date": "2026-06-07",
+        "day": "Sun",
+        "from": "Tokyo",
+        "to": "London",
+        "completed": false,
+        "desc": "Depart Tokyo for London",
+        "transportItems": [
+          {
+            "text": "British Airways Flight BA8 | Dep 09:35 | Arr 16:10 | Tokyo → London",
+            "cost": "1100",
+            "status": "confirmed"
+          }
+        ],
+        "accomItems": [],
+        "activityItems": [
+          {
+            "text": "Transfer to Narita Airport (Narita Express)",
+            "time": "07:00 - 08:30",
+            "cost": "30",
+            "done": false
           }
         ]
       }
@@ -514,47 +464,47 @@ const DEFAULT_DATA = [
   {
     "id": "city-london",
     "label": "🏰 London",
-    "colour": "#3498db",
+    "colour": "#2980b9",
     "cityFood": [
       {
-        "text": "Fish and Chips at a local pub",
+        "text": "Fish & Chips at Poppies Fish & Chips (Spitalfields)",
         "done": false,
         "cityId": "city-london"
       },
       {
-        "text": "Sunday Roast with Yorkshire Pudding",
+        "text": "Full English Breakfast at a classic caff",
         "done": false,
         "cityId": "city-london"
       },
       {
-        "text": "Afternoon Tea at The Ritz",
+        "text": "Afternoon Tea at The Ritz or Fortnum & Mason",
         "done": false,
         "cityId": "city-london"
       }
     ],
     "legTips": [
       {
-        "text": "Use your contactless card for the Tube (Oyster card not strictly needed).",
+        "text": "Get an Oyster card or use contactless for Tube and buses.",
         "cityId": "city-london"
       },
       {
-        "text": "Stand on the right on escalators!",
+        "text": "Most museums (British Museum, National Gallery, V&A) are free.",
         "cityId": "city-london"
       },
       {
-        "text": "Pack an umbrella, rain is always possible.",
+        "text": "Book the London Eye and popular attractions in advance online.",
         "cityId": "city-london"
       }
     ],
     "suggestedActivities": [
       {
-        "title": "Tower of London",
+        "title": "Tower of London & Crown Jewels",
         "category": "sight",
         "estTime": "3 hrs",
-        "estCost": "35",
+        "estCost": "30",
         "assignedDayIdx": null,
         "cityId": "city-london",
-        "id": "act-rsra7j6d9-mrrpnhwx",
+        "id": "act-sug-lon-1",
         "assignedDate": "",
         "startDate": "",
         "endDate": "",
@@ -562,13 +512,27 @@ const DEFAULT_DATA = [
         "endTime": ""
       },
       {
-        "title": "London Eye",
-        "category": "attraction",
+        "title": "British Museum (Rosetta Stone)",
+        "category": "sight",
+        "estTime": "3 hrs",
+        "estCost": "0",
+        "assignedDayIdx": null,
+        "cityId": "city-london",
+        "id": "act-sug-lon-2",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
+      },
+      {
+        "title": "Buckingham Palace & Changing of the Guard",
+        "category": "sight",
         "estTime": "2 hrs",
-        "estCost": "40",
+        "estCost": "0",
         "assignedDayIdx": null,
         "cityId": "city-london",
-        "id": "act-vyw34x2ex-mrrpnhwx",
+        "id": "act-sug-lon-3",
         "assignedDate": "",
         "startDate": "",
         "endDate": "",
@@ -576,13 +540,13 @@ const DEFAULT_DATA = [
         "endTime": ""
       },
       {
-        "title": "West End Theatre Show",
-        "category": "event",
+        "title": "Walk South Bank: Borough Market to Tate Modern",
+        "category": "sight",
         "estTime": "3 hrs",
-        "estCost": "80",
+        "estCost": "0",
         "assignedDayIdx": null,
         "cityId": "city-london",
-        "id": "act-yw6xzmcg3-mrrpnhwx",
+        "id": "act-sug-lon-4",
         "assignedDate": "",
         "startDate": "",
         "endDate": "",
@@ -590,293 +554,231 @@ const DEFAULT_DATA = [
         "endTime": ""
       },
       {
-        "id": "act-wvrffwws6-mrrpnhwx",
-        "title": "Rest after long flight",
-        "category": "sight",
-        "estTime": "18:00 - 20:00",
-        "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 0,
-        "assignedDate": "2026-06-06",
-        "startDate": "2026-06-06",
+        "title": "Day Trip to Windsor Castle",
+        "category": "day-trip",
+        "estTime": "6 hrs",
+        "estCost": "28",
+        "assignedDayIdx": null,
+        "cityId": "city-london",
+        "id": "act-sug-lon-5",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
         "startTime": "",
-        "endDate": "2026-06-06",
-        "endTime": "",
-        "cityId": "city-london"
+        "endTime": ""
       },
       {
-        "id": "act-2th88lhp3-mrrpnhwx",
-        "title": "British Museum",
-        "category": "sight",
-        "estTime": "10:00 - 14:00",
-        "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 1,
-        "assignedDate": "2026-06-07",
-        "startDate": "2026-06-07",
-        "startTime": "",
-        "endDate": "2026-06-07",
-        "endTime": "",
-        "cityId": "city-london"
-      },
-      {
-        "id": "act-6ed43hm2h-mrrpnhwx",
         "title": "Camden Market",
-        "category": "sight",
-        "estTime": "15:00 - 18:00",
-        "estCost": "15",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 1,
-        "assignedDate": "2026-06-07",
-        "startDate": "2026-06-07",
-        "startTime": "",
-        "endDate": "2026-06-07",
-        "endTime": "",
-        "cityId": "city-london"
-      },
-      {
-        "id": "act-x3zlna5ak-mrrpnhwx",
-        "title": "Buckingham Palace (Changing of the Guard)",
-        "category": "sight",
-        "estTime": "10:30 - 12:00",
+        "category": "shopping",
+        "estTime": "2 hrs",
         "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 2,
-        "assignedDate": "2026-06-08",
-        "startDate": "2026-06-08",
+        "assignedDayIdx": null,
+        "cityId": "city-london",
+        "id": "act-sug-lon-6",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
         "startTime": "",
-        "endDate": "2026-06-08",
-        "endTime": "",
-        "cityId": "city-london"
+        "endTime": ""
       },
       {
-        "id": "act-w46fij9y3-mrrpnhwx",
-        "title": "Walk along South Bank",
+        "title": "Westminster Abbey & Big Ben",
         "category": "sight",
-        "estTime": "14:00 - 16:00",
-        "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 2,
-        "assignedDate": "2026-06-08",
-        "startDate": "2026-06-08",
+        "estTime": "2.5 hrs",
+        "estCost": "27",
+        "assignedDayIdx": null,
+        "cityId": "city-london",
+        "id": "act-sug-lon-7",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
         "startTime": "",
-        "endDate": "2026-06-08",
-        "endTime": "",
-        "cityId": "city-london"
+        "endTime": ""
       },
       {
-        "id": "act-8u7e50oqc-mrrpnhwy",
         "title": "Natural History Museum",
         "category": "sight",
-        "estTime": "09:30 - 13:00",
+        "estTime": "2.5 hrs",
         "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 3,
-        "assignedDate": "2026-06-09",
-        "startDate": "2026-06-09",
+        "assignedDayIdx": null,
+        "cityId": "city-london",
+        "id": "act-sug-lon-8",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
         "startTime": "",
-        "endDate": "2026-06-09",
-        "endTime": "",
-        "cityId": "city-london"
+        "endTime": ""
+      },
+      {
+        "title": "Notting Hill & Portobello Road",
+        "category": "sight",
+        "estTime": "2 hrs",
+        "estCost": "0",
+        "assignedDayIdx": null,
+        "cityId": "city-london",
+        "id": "act-sug-lon-9",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
       }
     ],
     "days": [
       {
-        "date": "2026-06-06",
-        "day": "Sat",
-        "from": "Tokyo",
-        "to": "🏰 London",
-        "completed": false,
-        "desc": "Arrive from Tokyo",
-        "transportItems": [
-          {
-            "text": "British Airways Flight BA8 | Dep 09:35 - Tokyo to London - Arr 16:10",
-            "cost": "1100",
-            "status": "confirmed"
-          }
-        ],
-        "accomItems": [
-          {
-            "text": "The Hoxton, Shoreditch",
-            "cost": "250",
-            "status": "confirmed",
-            "cityId": "city-london"
-          }
-        ],
-        "activityItems": [
-          {
-            "text": "Rest after long flight",
-            "time": "18:00 - 20:00",
-            "cost": "0",
-            "startDate": "2026-06-06",
-            "endDate": "2026-06-06",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-wvrffwws6-mrrpnhwx",
-            "cityId": "city-london"
-          }
-        ]
-      },
-      {
         "date": "2026-06-07",
         "day": "Sun",
-        "from": "🏰 London",
-        "to": "🏰 London",
+        "from": "Tokyo",
+        "to": "London",
         "completed": false,
-        "desc": "Exploring",
+        "desc": "Arrive in London",
         "transportItems": [],
         "accomItems": [
           {
             "text": "The Hoxton, Shoreditch",
             "cost": "250",
             "status": "confirmed",
-            "cityId": "city-london"
+            "provider": "Hoxton Direct",
+            "cityId": "city-london",
+            "bookingRef": "HOX-97321"
           }
         ],
         "activityItems": [
           {
-            "text": "British Museum",
-            "time": "10:00 - 14:00",
+            "text": "Check in to The Hoxton, Shoreditch",
+            "time": "17:00 - 18:00",
             "cost": "0",
-            "startDate": "2026-06-07",
-            "endDate": "2026-06-07",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-2th88lhp3-mrrpnhwx",
-            "cityId": "city-london"
+            "done": false
           },
           {
-            "text": "Camden Market",
-            "time": "15:00 - 18:00",
-            "cost": "15",
-            "startDate": "2026-06-07",
-            "endDate": "2026-06-07",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-6ed43hm2h-mrrpnhwx",
-            "cityId": "city-london"
+            "text": "Evening stroll along the Thames",
+            "time": "19:30 - 21:00",
+            "cost": "0",
+            "done": false
           }
         ]
       },
       {
         "date": "2026-06-08",
         "day": "Mon",
-        "from": "🏰 London",
-        "to": "🏰 London",
+        "from": "London",
+        "to": "London",
         "completed": false,
-        "desc": "Exploring",
+        "desc": "Tower of London & South Bank",
         "transportItems": [],
         "accomItems": [
           {
             "text": "The Hoxton, Shoreditch",
             "cost": "250",
             "status": "confirmed",
-            "cityId": "city-london"
+            "provider": "Hoxton Direct",
+            "cityId": "city-london",
+            "bookingRef": "HOX-97321"
           }
         ],
         "activityItems": [
           {
-            "text": "Buckingham Palace (Changing of the Guard)",
-            "time": "10:30 - 12:00",
-            "cost": "0",
-            "startDate": "2026-06-08",
-            "endDate": "2026-06-08",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-x3zlna5ak-mrrpnhwx",
-            "cityId": "city-london"
+            "text": "Tower of London & Crown Jewels",
+            "time": "09:30 - 12:30",
+            "cost": "30",
+            "done": false
           },
           {
-            "text": "Walk along South Bank",
-            "time": "14:00 - 16:00",
-            "cost": "0",
-            "startDate": "2026-06-08",
-            "endDate": "2026-06-08",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-w46fij9y3-mrrpnhwx",
-            "cityId": "city-london"
+            "text": "Borough Market & South Bank walk to Tate Modern",
+            "time": "13:30 - 16:30",
+            "cost": "15",
+            "done": false
           }
         ]
       },
       {
         "date": "2026-06-09",
         "day": "Tue",
-        "from": "🏰 London",
-        "to": "🏰 London",
+        "from": "London",
+        "to": "London",
         "completed": false,
-        "desc": "Exploring",
+        "desc": "Buckingham Palace & Westminster",
         "transportItems": [],
         "accomItems": [
           {
             "text": "The Hoxton, Shoreditch",
             "cost": "250",
             "status": "confirmed",
-            "cityId": "city-london"
+            "provider": "Hoxton Direct",
+            "cityId": "city-london",
+            "bookingRef": "HOX-97321"
           }
         ],
         "activityItems": [
           {
-            "text": "Natural History Museum",
-            "time": "09:30 - 13:00",
+            "text": "Buckingham Palace (Changing of the Guard)",
+            "time": "10:00 - 11:30",
             "cost": "0",
-            "startDate": "2026-06-09",
-            "endDate": "2026-06-09",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-8u7e50oqc-mrrpnhwy",
-            "cityId": "city-london"
+            "done": false
+          },
+          {
+            "text": "Westminster Abbey & Big Ben",
+            "time": "13:00 - 15:30",
+            "cost": "27",
+            "done": false
           }
         ]
       },
       {
         "date": "2026-06-10",
         "day": "Wed",
-        "from": "🏰 London",
-        "to": "Paris",
+        "from": "London",
+        "to": "London",
         "completed": false,
-        "desc": "Depart for Paris",
+        "desc": "British Museum & Camden",
         "transportItems": [],
         "accomItems": [
           {
-            "text": "Add accommodation...",
-            "cost": "0"
+            "text": "The Hoxton, Shoreditch",
+            "cost": "250",
+            "status": "confirmed",
+            "provider": "Hoxton Direct",
+            "cityId": "city-london",
+            "bookingRef": "HOX-97321"
           }
         ],
         "activityItems": [
           {
-            "text": "Explore local area",
+            "text": "British Museum (free)",
+            "time": "09:30 - 13:00",
             "cost": "0",
-            "time": "1 hr",
-            "done": false,
-            "startDate": "2026-06-10",
-            "endDate": "2026-06-10",
-            "startTime": "",
-            "endTime": ""
+            "done": false
+          },
+          {
+            "text": "Camden Market — vintage & street food",
+            "time": "14:30 - 17:30",
+            "cost": "20",
+            "done": false
+          }
+        ]
+      },
+      {
+        "date": "2026-06-11",
+        "day": "Thu",
+        "from": "London",
+        "to": "Paris",
+        "completed": false,
+        "desc": "Depart London to Paris by Eurostar",
+        "transportItems": [
+          {
+            "text": "Eurostar Train | Dep 10:30 | Arr 13:47 | London → Paris",
+            "cost": "120",
+            "status": "confirmed",
+            "bookingRef": "ES-44812"
+          }
+        ],
+        "accomItems": [],
+        "activityItems": [
+          {
+            "text": "St Pancras International — enjoy the Grand Terrace before boarding",
+            "time": "09:00 - 10:00",
+            "cost": "0",
+            "done": false
           }
         ]
       }
@@ -885,10 +787,10 @@ const DEFAULT_DATA = [
   {
     "id": "city-paris",
     "label": "🥐 Paris",
-    "colour": "#9b59b6",
+    "colour": "#8e44ad",
     "cityFood": [
       {
-        "text": "Fresh Croissant from a local boulangerie",
+        "text": "Fresh croissant from a local boulangerie",
         "done": false,
         "cityId": "city-paris"
       },
@@ -905,7 +807,7 @@ const DEFAULT_DATA = [
     ],
     "legTips": [
       {
-        "text": "Learn a few basic French phrases (Bonjour, Merci).",
+        "text": "Learn a few basic French phrases — even just Bonjour and Merci.",
         "cityId": "city-paris"
       },
       {
@@ -913,19 +815,61 @@ const DEFAULT_DATA = [
         "cityId": "city-paris"
       },
       {
-        "text": "Museum passes can save you a lot of money if you plan to visit many.",
+        "text": "The Paris Museum Pass covers 50+ museums — great value if you plan ahead.",
         "cityId": "city-paris"
       }
     ],
     "suggestedActivities": [
       {
-        "title": "Musée d'Orsay",
+        "title": "Eiffel Tower at Sunset",
         "category": "sight",
-        "estTime": "3 hrs",
-        "estCost": "16",
+        "estTime": "2 hrs",
+        "estCost": "26",
         "assignedDayIdx": null,
         "cityId": "city-paris",
-        "id": "act-vogi4egyz-mrrpnhwy",
+        "id": "act-sug-par-1",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
+      },
+      {
+        "title": "Louvre Museum (Mona Lisa & Venus de Milo)",
+        "category": "sight",
+        "estTime": "4 hrs",
+        "estCost": "22",
+        "assignedDayIdx": null,
+        "cityId": "city-paris",
+        "id": "act-sug-par-2",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
+      },
+      {
+        "title": "Montmartre & Sacré-Cœur Basilica",
+        "category": "sight",
+        "estTime": "3 hrs",
+        "estCost": "0",
+        "assignedDayIdx": null,
+        "cityId": "city-paris",
+        "id": "act-sug-par-3",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
+        "startTime": "",
+        "endTime": ""
+      },
+      {
+        "title": "Versailles Palace & Gardens",
+        "category": "day-trip",
+        "estTime": "6 hrs",
+        "estCost": "25",
+        "assignedDayIdx": null,
+        "cityId": "city-paris",
+        "id": "act-sug-par-4",
         "assignedDate": "",
         "startDate": "",
         "endDate": "",
@@ -939,7 +883,7 @@ const DEFAULT_DATA = [
         "estCost": "20",
         "assignedDayIdx": null,
         "cityId": "city-paris",
-        "id": "act-szfj6uikw-mrrpnhwy",
+        "id": "act-sug-par-5",
         "assignedDate": "",
         "startDate": "",
         "endDate": "",
@@ -947,13 +891,13 @@ const DEFAULT_DATA = [
         "endTime": ""
       },
       {
-        "title": "Versailles Palace Half-Day",
+        "title": "Notre-Dame Cathedral & Île de la Cité",
         "category": "sight",
-        "estTime": "5 hrs",
-        "estCost": "25",
+        "estTime": "2 hrs",
+        "estCost": "0",
         "assignedDayIdx": null,
         "cityId": "city-paris",
-        "id": "act-0ktjedqm6-mrrpnhwy",
+        "id": "act-sug-par-6",
         "assignedDate": "",
         "startDate": "",
         "endDate": "",
@@ -961,152 +905,84 @@ const DEFAULT_DATA = [
         "endTime": ""
       },
       {
-        "id": "act-brq2i8lnx-mrrpnhwy",
-        "title": "Eiffel Tower Sunset",
+        "title": "Musée d'Orsay (Impressionists)",
         "category": "sight",
-        "estTime": "19:30 - 21:00",
-        "estCost": "25",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 0,
-        "assignedDate": "2026-06-10",
-        "startDate": "2026-06-10",
+        "estTime": "3 hrs",
+        "estCost": "16",
+        "assignedDayIdx": null,
+        "cityId": "city-paris",
+        "id": "act-sug-par-7",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
         "startTime": "",
-        "endDate": "2026-06-10",
-        "endTime": "",
-        "cityId": "city-paris"
+        "endTime": ""
       },
       {
-        "id": "act-n0pc65clj-mrrpnhwy",
-        "title": "Louvre Museum (Mona Lisa)",
+        "title": "Champs-Élysées & Arc de Triomphe",
         "category": "sight",
-        "estTime": "09:00 - 13:00",
-        "estCost": "22",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 1,
-        "assignedDate": "2026-06-11",
-        "startDate": "2026-06-11",
+        "estTime": "2 hrs",
+        "estCost": "13",
+        "assignedDayIdx": null,
+        "cityId": "city-paris",
+        "id": "act-sug-par-8",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
         "startTime": "",
-        "endDate": "2026-06-11",
-        "endTime": "",
-        "cityId": "city-paris"
-      },
-      {
-        "id": "act-qy6pdri5s-mrrpnhwz",
-        "title": "Montmartre & Sacré-Cœur",
-        "category": "sight",
-        "estTime": "15:00 - 18:00",
-        "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 1,
-        "assignedDate": "2026-06-11",
-        "startDate": "2026-06-11",
-        "startTime": "",
-        "endDate": "2026-06-11",
-        "endTime": "",
-        "cityId": "city-paris"
-      },
-      {
-        "id": "act-y8hvvqvq8-mrrpnhwz",
-        "title": "Notre-Dame & Latin Quarter Walk",
-        "category": "sight",
-        "estTime": "10:00 - 13:00",
-        "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 2,
-        "assignedDate": "2026-06-12",
-        "startDate": "2026-06-12",
-        "startTime": "",
-        "endDate": "2026-06-12",
-        "endTime": "",
-        "cityId": "city-paris"
-      },
-      {
-        "id": "act-vbmkjn5ep-mrrpnhwz",
-        "title": "Shopping at Champs-Élysées",
-        "category": "sight",
-        "estTime": "14:30 - 17:00",
-        "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 2,
-        "assignedDate": "2026-06-12",
-        "startDate": "2026-06-12",
-        "startTime": "",
-        "endDate": "2026-06-12",
-        "endTime": "",
-        "cityId": "city-paris"
+        "endTime": ""
       }
     ],
     "days": [
       {
-        "date": "2026-06-10",
-        "day": "Wed",
-        "from": "London",
-        "to": "🥐 Paris",
-        "completed": false,
-        "desc": "Arrive from London",
-        "transportItems": [
-          {
-            "text": "Eurostar Train | Dep 10:30 - London to Paris - Arr 13:47",
-            "cost": "120",
-            "status": "confirmed"
-          }
-        ],
-        "accomItems": [
-          {
-            "text": "Hotel Le Walt",
-            "cost": "280",
-            "status": "confirmed",
-            "cityId": "city-paris"
-          }
-        ],
-        "activityItems": [
-          {
-            "text": "Eiffel Tower Sunset",
-            "time": "19:30 - 21:00",
-            "cost": "25",
-            "startDate": "2026-06-10",
-            "endDate": "2026-06-10",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-brq2i8lnx-mrrpnhwy",
-            "cityId": "city-paris"
-          }
-        ]
-      },
-      {
         "date": "2026-06-11",
         "day": "Thu",
-        "from": "🥐 Paris",
-        "to": "🥐 Paris",
+        "from": "London",
+        "to": "Paris",
         "completed": false,
-        "desc": "Exploring",
+        "desc": "Arrive in Paris",
         "transportItems": [],
         "accomItems": [
           {
             "text": "Hotel Le Walt",
             "cost": "280",
             "status": "confirmed",
-            "cityId": "city-paris"
+            "provider": "Hotels.com",
+            "cityId": "city-paris",
+            "bookingRef": "HLW-PAR-5512"
+          }
+        ],
+        "activityItems": [
+          {
+            "text": "Check in to Hotel Le Walt",
+            "time": "15:00 - 16:00",
+            "cost": "0",
+            "done": false
+          },
+          {
+            "text": "Eiffel Tower at golden hour",
+            "time": "19:30 - 21:00",
+            "cost": "26",
+            "done": false
+          }
+        ]
+      },
+      {
+        "date": "2026-06-12",
+        "day": "Fri",
+        "from": "Paris",
+        "to": "Paris",
+        "completed": false,
+        "desc": "Louvre & Montmartre",
+        "transportItems": [],
+        "accomItems": [
+          {
+            "text": "Hotel Le Walt",
+            "cost": "280",
+            "status": "confirmed",
+            "provider": "Hotels.com",
+            "cityId": "city-paris",
+            "bookingRef": "HLW-PAR-5512"
           }
         ],
         "activityItems": [
@@ -1114,91 +990,77 @@ const DEFAULT_DATA = [
             "text": "Louvre Museum (Mona Lisa)",
             "time": "09:00 - 13:00",
             "cost": "22",
-            "startDate": "2026-06-11",
-            "endDate": "2026-06-11",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-n0pc65clj-mrrpnhwy",
-            "cityId": "city-paris"
+            "done": false
           },
           {
-            "text": "Montmartre & Sacré-Cœur",
+            "text": "Montmartre & Sacré-Cœur Basilica",
             "time": "15:00 - 18:00",
             "cost": "0",
-            "startDate": "2026-06-11",
-            "endDate": "2026-06-11",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-qy6pdri5s-mrrpnhwz",
-            "cityId": "city-paris"
-          }
-        ]
-      },
-      {
-        "date": "2026-06-12",
-        "day": "Fri",
-        "from": "🥐 Paris",
-        "to": "🥐 Paris",
-        "completed": false,
-        "desc": "Exploring",
-        "transportItems": [],
-        "accomItems": [
-          {
-            "text": "Hotel Le Walt",
-            "cost": "280",
-            "status": "confirmed",
-            "cityId": "city-paris"
-          }
-        ],
-        "activityItems": [
-          {
-            "text": "Notre-Dame & Latin Quarter Walk",
-            "time": "10:00 - 13:00",
-            "cost": "0",
-            "startDate": "2026-06-12",
-            "endDate": "2026-06-12",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-y8hvvqvq8-mrrpnhwz",
-            "cityId": "city-paris"
-          },
-          {
-            "text": "Shopping at Champs-Élysées",
-            "time": "14:30 - 17:00",
-            "cost": "0",
-            "startDate": "2026-06-12",
-            "endDate": "2026-06-12",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-vbmkjn5ep-mrrpnhwz",
-            "cityId": "city-paris"
+            "done": false
           }
         ]
       },
       {
         "date": "2026-06-13",
         "day": "Sat",
-        "from": "🥐 Paris",
-        "to": "Dubai",
+        "from": "Paris",
+        "to": "Paris",
         "completed": false,
-        "desc": "Depart for Dubai",
+        "desc": "Notre-Dame & Champs-Élysées",
         "transportItems": [],
         "accomItems": [
           {
-            "text": "Add accommodation...",
-            "cost": "0"
+            "text": "Hotel Le Walt",
+            "cost": "280",
+            "status": "confirmed",
+            "provider": "Hotels.com",
+            "cityId": "city-paris",
+            "bookingRef": "HLW-PAR-5512"
           }
         ],
         "activityItems": [
           {
-            "text": "Explore local area",
+            "text": "Notre-Dame Cathedral & Latin Quarter walk",
+            "time": "10:00 - 13:00",
             "cost": "0",
-            "time": "1 hr",
-            "done": false,
-            "startDate": "2026-06-13",
-            "endDate": "2026-06-13",
-            "startTime": "",
-            "endTime": ""
+            "done": false
+          },
+          {
+            "text": "Champs-Élysées & Arc de Triomphe",
+            "time": "15:00 - 17:30",
+            "cost": "13",
+            "done": false
+          }
+        ]
+      },
+      {
+        "date": "2026-06-14",
+        "day": "Sun",
+        "from": "Paris",
+        "to": "Dubai",
+        "completed": false,
+        "desc": "Last day in Paris, evening flight to Dubai",
+        "transportItems": [
+          {
+            "text": "Emirates Flight EK76 | Dep 21:55 | Arr +1 06:35 | Paris → Dubai",
+            "cost": "750",
+            "status": "confirmed",
+            "bookingRef": "EK-CDG-7712"
+          }
+        ],
+        "accomItems": [],
+        "activityItems": [
+          {
+            "text": "Seine River Cruise (last morning in Paris)",
+            "time": "10:00 - 11:30",
+            "cost": "20",
+            "done": false
+          },
+          {
+            "text": "Transfer to Charles de Gaulle Airport",
+            "time": "18:00 - 19:30",
+            "cost": "25",
+            "done": false
           }
         ]
       }
@@ -1207,38 +1069,38 @@ const DEFAULT_DATA = [
   {
     "id": "city-dubai",
     "label": "🐪 Dubai (Transit)",
-    "colour": "#f1c40f",
+    "colour": "#f39c12",
     "cityFood": [
       {
-        "text": "Shawarma in Deira",
+        "text": "Shawarma in old Deira souks",
         "done": false,
         "cityId": "city-dubai"
       },
       {
-        "text": "Karak Chai",
+        "text": "Karak Chai (spiced tea) — a UAE classic",
         "done": false,
         "cityId": "city-dubai"
       }
     ],
     "legTips": [
       {
-        "text": "Dress modestly in public spaces.",
+        "text": "Dress modestly in public areas and shopping malls.",
         "cityId": "city-dubai"
       },
       {
-        "text": "Taxis are relatively cheap and the easiest way to get around.",
+        "text": "The Dubai Metro Gold Line connects the airport to the city centre.",
         "cityId": "city-dubai"
       }
     ],
     "suggestedActivities": [
       {
-        "title": "Burj Khalifa Observation Deck",
+        "title": "Burj Khalifa Observation Deck (Level 124)",
         "category": "sight",
         "estTime": "2 hrs",
         "estCost": "50",
         "assignedDayIdx": null,
         "cityId": "city-dubai",
-        "id": "act-4ymfa7nb7-mrrpnhwz",
+        "id": "act-sug-dxb-1",
         "assignedDate": "",
         "startDate": "",
         "endDate": "",
@@ -1246,115 +1108,109 @@ const DEFAULT_DATA = [
         "endTime": ""
       },
       {
-        "id": "act-pnpt11uqf-mrrpnhwz",
-        "title": "Dubai Mall Fountain Show",
+        "title": "Dubai Mall & Fountain Show (evening)",
         "category": "sight",
-        "estTime": "18:00 - 19:00",
+        "estTime": "3 hrs",
         "estCost": "0",
-        "notes": "",
-        "location": "",
-        "status": "",
-        "bookingRef": "",
-        "externalLink": "",
-        "assignedDayIdx": 0,
-        "assignedDate": "2026-06-13",
-        "startDate": "2026-06-13",
+        "assignedDayIdx": null,
+        "cityId": "city-dubai",
+        "id": "act-sug-dxb-2",
+        "assignedDate": "",
+        "startDate": "",
+        "endDate": "",
         "startTime": "",
-        "endDate": "2026-06-13",
-        "endTime": "",
-        "cityId": "city-dubai"
+        "endTime": ""
       }
     ],
     "days": [
       {
-        "date": "2026-06-13",
-        "day": "Sat",
-        "from": "🐪 Dubai (Transit)",
-        "to": "🐪 Dubai (Transit)",
-        "completed": false,
-        "desc": "Travel and arrival day",
-        "transportItems": [
-          {
-            "text": "Emirates Flight EK76 | Dep 21:55 - Paris to Dubai - Arr +1 06:35",
-            "cost": "750",
-            "status": "confirmed"
-          }
-        ],
-        "accomItems": [
-          {
-            "text": "Dubai Airport Transit Hotel",
-            "cost": "150",
-            "status": "confirmed",
-            "cityId": "city-dubai"
-          }
-        ],
-        "activityItems": [
-          {
-            "text": "Dubai Mall Fountain Show",
-            "time": "18:00 - 19:00",
-            "cost": "0",
-            "startDate": "2026-06-13",
-            "endDate": "2026-06-13",
-            "startTime": "",
-            "endTime": "",
-            "activityId": "act-pnpt11uqf-mrrpnhwz",
-            "cityId": "city-dubai"
-          }
-        ]
-      },
-      {
-        "date": "2026-06-14",
-        "day": "Sun",
-        "from": "Paris",
-        "to": "🐪 Dubai (Transit)",
-        "completed": false,
-        "desc": "Arrive from Paris",
-        "transportItems": [],
-        "accomItems": [
-          {
-            "text": "Dubai Airport Transit Hotel",
-            "cost": "150",
-            "status": "confirmed",
-            "cityId": "city-dubai"
-          }
-        ],
-        "activityItems": [
-          {
-            "text": "Explore local area",
-            "cost": "0",
-            "time": "1 hr",
-            "done": false,
-            "startDate": "2026-06-14",
-            "endDate": "2026-06-14",
-            "startTime": "",
-            "endTime": ""
-          }
-        ]
-      },
-      {
         "date": "2026-06-15",
         "day": "Mon",
-        "from": "🐪 Dubai (Transit)",
-        "to": "Sydney",
+        "from": "Paris",
+        "to": "Dubai",
         "completed": false,
-        "desc": "Depart for Sydney",
+        "desc": "Arrive in Dubai — Transit",
         "transportItems": [],
         "accomItems": [
           {
-            "text": "Add accommodation...",
-            "cost": "0"
+            "text": "Dubai Airport Transit Hotel",
+            "cost": "150",
+            "status": "confirmed",
+            "provider": "Booking.com",
+            "cityId": "city-dubai",
+            "bookingRef": "BK-DXB-0142"
           }
         ],
         "activityItems": [
           {
-            "text": "Explore local area",
+            "text": "Check in to Dubai Airport Transit Hotel",
+            "time": "08:00 - 09:00",
             "cost": "0",
-            "time": "1 hr",
-            "done": false,
-            "startDate": "2026-06-15",
-            "endDate": "2026-06-15",
-            "startTime": "",
-            "endTime": ""
+            "done": false
+          },
+          {
+            "text": "Burj Khalifa & Dubai Mall Fountain Show",
+            "time": "17:00 - 20:00",
+            "cost": "50",
+            "done": false
+          }
+        ]
+      },
+      {
+        "date": "2026-06-16",
+        "day": "Tue",
+        "from": "Dubai",
+        "to": "Dubai",
+        "completed": false,
+        "desc": "Dubai — one full day to explore",
+        "transportItems": [],
+        "accomItems": [
+          {
+            "text": "Dubai Airport Transit Hotel",
+            "cost": "150",
+            "status": "confirmed",
+            "provider": "Booking.com",
+            "cityId": "city-dubai",
+            "bookingRef": "BK-DXB-0142"
+          }
+        ],
+        "activityItems": [
+          {
+            "text": "Dubai Creek & Al Fahidi Historic District",
+            "time": "09:00 - 12:00",
+            "cost": "0",
+            "done": false
+          },
+          {
+            "text": "Dubai Museum & Gold Souk",
+            "time": "13:00 - 16:00",
+            "cost": "5",
+            "done": false
+          }
+        ]
+      },
+      {
+        "date": "2026-06-17",
+        "day": "Wed",
+        "from": "Dubai",
+        "to": "Sydney",
+        "completed": false,
+        "desc": "Depart Dubai for Sydney",
+        "transportItems": [
+          {
+            "text": "Emirates Flight EK412 | Dep 10:15 | Arr +1 06:00 | Dubai → Sydney",
+            "cost": "750",
+            "status": "confirmed",
+            "bookingRef": "EK-DXB-9981"
+          }
+        ],
+        "accomItems": [],
+        "activityItems": [
+          {
+            "text": "Early transfer to Dubai International Airport",
+            "time": "07:00 - 08:30",
+            "cost": "25",
+            "done": false
           }
         ]
       }
@@ -1363,46 +1219,35 @@ const DEFAULT_DATA = [
   {
     "id": "city-sydney-end",
     "label": "🛬 Sydney (Return)",
-    "colour": "#34495e",
+    "colour": "#27ae60",
     "cityFood": [],
     "suggestedActivities": [],
     "legTips": [
       {
-        "text": "Declare all food items at Australian customs!",
+        "text": "Declare all food items at Australian customs — heavy fines apply.",
+        "cityId": "city-sydney"
+      },
+      {
+        "text": "The Airport Link train gets you from the airport to the CBD in 13 minutes.",
         "cityId": "city-sydney"
       }
     ],
     "days": [
       {
-        "date": "2026-06-16",
-        "day": "Tue",
+        "date": "2026-06-18",
+        "day": "Thu",
         "from": "Dubai",
-        "to": "🛬 Sydney (Return)",
+        "to": "Sydney",
         "completed": false,
-        "desc": "Arrive from Dubai",
-        "transportItems": [
-          {
-            "text": "Emirates Flight EK412 | Dep 10:15 - Dubai to Sydney - Arr +1 06:00",
-            "cost": "750",
-            "status": "confirmed"
-          }
-        ],
-        "accomItems": [
-          {
-            "text": "Add accommodation...",
-            "cost": "0"
-          }
-        ],
+        "desc": "Arrive home in Sydney!",
+        "transportItems": [],
+        "accomItems": [],
         "activityItems": [
           {
-            "text": "Explore local area",
+            "text": "Welcome home! Clear customs and head home.",
+            "time": "06:00 - 09:00",
             "cost": "0",
-            "time": "1 hr",
-            "done": false,
-            "startDate": "2026-06-16",
-            "endDate": "2026-06-16",
-            "startTime": "",
-            "endTime": ""
+            "done": false
           }
         ]
       }

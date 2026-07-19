@@ -3185,16 +3185,37 @@ function inferTransportTypeFromText(text) {
   return 'other';
 }
 
+function stripCityLabel(cityName) {
+  // Strip emoji, flag sequences, and parenthetical suffixes like (Trip Start)
+  // This mirrors cleanCityNavLabel so map matching and departure blocks work correctly
+  return String(cityName || '')
+    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+    .replace(/[\u{2600}-\u{26FF}]/gu, '')
+    .replace(/[\u{2700}-\u{27BF}]/gu, '')
+    .replace(/\p{Emoji}/gu, '')
+    .replace(/\s*\([^)]*\)/gu, '')
+    .replace(/[^\w\s-]/gu, '')
+    .trim();
+}
+
 function buildDefaultJourneysFromItinerary(legs) {
   if (!Array.isArray(legs)) return [];
 
+  const PLACEHOLDER_TRANSPORT = ['add transport...', 'add transport'];
   const journeysData = [];
   legs.forEach((leg, legIndex) => {
     (leg.days || []).forEach((day, dayIndex) => {
       const dayDate = normalizeTripDateValue(day.date);
       (day.transportItems || []).forEach((item, itemIndex) => {
-        const fromLocation = day.from || '';
-        const toLocation = day.to || '';
+        // Skip placeholder entries
+        if (!item.text || PLACEHOLDER_TRANSPORT.includes(item.text.trim().toLowerCase())) return;
+
+        // Clean city names: strip emoji and parenthetical suffixes so they
+        // match the city nav labels used by the map and timeline boundary blocks.
+        const fromLocation = stripCityLabel(day.from || '');
+        const toLocation   = stripCityLabel(day.to   || '');
+
         journeysData.push({
           id: `journey_default_${leg.id || legIndex}_${dayIndex}_${itemIndex}`,
           journeyId: `journey_default_group_${leg.id || legIndex}_${dayIndex}_${itemIndex}`,
@@ -3248,7 +3269,9 @@ function buildDefaultStaysFromItinerary(legs) {
 
       (day.accomItems || []).forEach((item, itemIndex) => {
         const propertyName = (item.text || '').trim();
-        if (!propertyName) return;
+        // Skip placeholder / empty entries that are not real hotel records
+        const PLACEHOLDER_ACCOM = ['add accommodation...', 'add accommodation'];
+        if (!propertyName || PLACEHOLDER_ACCOM.includes(propertyName.toLowerCase())) return;
 
         const cityId = item.cityId || (typeof getCityIdByName === 'function' ? getCityIdByName(day.to || day.from || '') : '');
         const key = `${cityId}||${propertyName}||${item.provider || ''}||${item.bookingRef || ''}`;
