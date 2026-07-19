@@ -260,38 +260,71 @@ function resetTutorialSeen() {
 let currentTutorialStep = 0;
 let tutorialActive = false;
 
+/**
+ * Each step can have:
+ *  - target: CSS selector for desktop highlight
+ *  - mobileTarget: fallback selector used when viewport < 768px
+ *    (or when the primary target is not visible)
+ *  - title / text / position as before
+ *
+ * On mobile the tooltip renders as a fixed bottom-sheet, so `position`
+ * is only used on desktop.
+ */
 const TUTORIAL_STEPS = [
   {
     target: '#mainTitle',
+    mobileTarget: '.app-tabs-nav',   // desktop header is hidden on mobile
     title: 'Your Trip Title',
-    text: 'Click here to edit your trip name and subtitle. This appears at the top of printed itineraries.',
+    text: 'On desktop, click the trip title at the top to rename it. On mobile, use the ☰ menu → "Rename Trip".',
     position: 'bottom'
   },
   {
     target: '.app-menu-right',
+    mobileTarget: '.mobile-tabs-menu-btn',  // hamburger button visible on mobile
     title: 'View Modes & Tools',
-    text: 'Use Read Only, Compact View, Cities, AI Builder, Guide, and Print from the top menu.',
+    text: 'Use Read Only, Cities, AI Builder, Guide, and more from the top menu. On mobile, tap the ☰ hamburger for the full menu.',
     position: 'bottom'
   },
   {
     target: '#cityNav',
+    mobileTarget: '#cityNav',
     title: 'City Filter Navigator',
     text: 'Filter your view by city across all tabs. "All" shows everything, or select a specific city to see only its items.',
     position: 'bottom'
   },
   {
     target: '.app-tabs-nav',
+    mobileTarget: '.app-tabs-nav',
     title: 'Navigation Tabs',
     text: 'Switch between Itinerary, Transport, Accommodation, Budget, Packing, and Map views.',
     position: 'bottom'
   },
   {
     target: '#expandAll',
+    mobileTarget: '.app-tabs-nav',   // #expandAll may be off-screen on mobile
     title: 'Expand/Collapse Days',
-    text: 'Quickly show or hide all day details to get an overview of your trip. The Leg button controls the trip leg sections.',
+    text: 'Quickly show or hide all day details for an overview of your trip. On mobile, day cards are swipeable — scroll sideways through days.',
     position: 'top'
   }
 ];
+
+function isMobile() {
+  return window.innerWidth < 768;
+}
+
+/** Return the best visible DOM element for a tutorial step */
+function getTutorialTarget(step) {
+  const primary = document.querySelector(step.target);
+  // Check if the primary element is actually visible
+  if (primary && primary.offsetParent !== null) return primary;
+
+  // Fall back to mobile target
+  const mobile = step.mobileTarget ? document.querySelector(step.mobileTarget) : null;
+  if (mobile && mobile.offsetParent !== null) return mobile;
+
+  // Return whichever exists even if not displayed (for spotlight sizing)
+  return primary || mobile || null;
+}
 
 function startTutorial() {
   if (!document.querySelector('#tutorial-overlay')) {
@@ -311,7 +344,7 @@ function startTutorial() {
 
   showTutorialStep(0);
 
-  // Add keyboard navigation
+  // Keyboard navigation
   document.addEventListener('keydown', handleTutorialKey);
 }
 
@@ -338,58 +371,129 @@ function createTutorialOverlay() {
   progress.className = 'tutorial-progress';
   document.body.appendChild(progress);
 
-  // Click outside to skip
+  // Click backdrop to skip
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) skipTutorial();
   });
+
+  // Touch swipe: left = next, right = back
+  let touchStartX = 0;
+  overlay.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].clientX;
+  }, { passive: true });
+  overlay.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) nextTutorialStep();   // swipe left = advance
+      else         prevTutorialStep();  // swipe right = back
+    }
+  }, { passive: true });
 }
 
 function showTutorialStep(index) {
   const step = TUTORIAL_STEPS[index];
-  const target = document.querySelector(step.target);
+  const target = getTutorialTarget(step);
   const spotlight = document.getElementById('tutorial-spotlight');
-  const tooltip = document.getElementById('tutorial-tooltip');
+  const tooltip   = document.getElementById('tutorial-tooltip');
 
   // Update content
   document.getElementById('tutorial-title').textContent = step.title;
-  document.getElementById('tutorial-text').textContent = step.text;
+  document.getElementById('tutorial-text').textContent  = step.text;
 
-  // Update buttons
-  document.getElementById('tutorial-prev').style.display = index === 0 ? 'none' : 'inline-block';
-  document.getElementById('tutorial-next').textContent = index === TUTORIAL_STEPS.length - 1 ? 'Done!' : 'Next →';
+  // Nav buttons
+  document.getElementById('tutorial-prev').style.display =
+    index === 0 ? 'none' : 'inline-block';
+  document.getElementById('tutorial-next').textContent =
+    index === TUTORIAL_STEPS.length - 1 ? 'Done! ✓' : 'Next →';
 
-  // Update progress dots
+  // Progress dots
   document.querySelectorAll('.tutorial-dot').forEach((dot, i) => {
     dot.classList.toggle('active', i === index);
   });
 
-  // Position spotlight and tooltip
-  if (target) {
-    const rect = target.getBoundingClientRect();
-    spotlight.style.left = rect.left - 4 + 'px';
-    spotlight.style.top = rect.top - 4 + 'px';
-    spotlight.style.width = rect.width + 8 + 'px';
-    spotlight.style.height = rect.height + 8 + 'px';
-
-    // Position tooltip
-    const tooltipRect = tooltip.getBoundingClientRect();
-    let top, left;
-
-    if (step.position === 'bottom') {
-      top = rect.bottom + 15;
-      left = rect.left + (rect.width - tooltipRect.width) / 2;
-    } else {
-      top = rect.top - tooltipRect.height - 15;
-      left = rect.left + (rect.width - tooltipRect.width) / 2;
-    }
-
-    // Keep tooltip in viewport
-    left = Math.max(10, Math.min(left, window.innerWidth - tooltipRect.width - 10));
-    top = Math.max(10, Math.min(top, window.innerHeight - tooltipRect.height - 10));
-
-    tooltip.style.left = left + 'px';
-    tooltip.style.top = top + 'px';
+  // ── Mobile: bottom-sheet tooltip, no absolute positioning ──────────────
+  if (isMobile()) {
+    applyMobileTutorialStyles(tooltip, spotlight, target);
+    return;
   }
+
+  // ── Desktop: spotlight + absolutely positioned tooltip ─────────────────
+  applyDesktopTutorialStyles(tooltip, spotlight, target, step);
+}
+
+/** Mobile layout: fixed bottom sheet, spotlight if target visible */
+function applyMobileTutorialStyles(tooltip, spotlight, target) {
+  // Reset any desktop inline styles
+  tooltip.style.position  = 'fixed';
+  tooltip.style.bottom    = '0';
+  tooltip.style.left      = '0';
+  tooltip.style.right     = '0';
+  tooltip.style.top       = '';
+  tooltip.style.width     = '100%';
+  tooltip.style.maxWidth  = '100%';
+  tooltip.style.transform = 'none';
+  tooltip.style.borderRadius = '16px 16px 0 0';
+  tooltip.style.boxSizing = 'border-box';
+
+  // Spotlight on the target if visible, otherwise hide it
+  if (target && target.offsetParent !== null) {
+    const rect = target.getBoundingClientRect();
+    spotlight.style.display  = 'block';
+    spotlight.style.left     = Math.max(0, rect.left   - 4) + 'px';
+    spotlight.style.top      = Math.max(0, rect.top    - 4) + 'px';
+    spotlight.style.width    = (rect.width  + 8) + 'px';
+    spotlight.style.height   = (rect.height + 8) + 'px';
+  } else {
+    spotlight.style.display  = 'none';
+  }
+}
+
+/** Desktop layout: spotlight + tooltip pinned above/below target */
+function applyDesktopTutorialStyles(tooltip, spotlight, target, step) {
+  // Reset mobile styles
+  tooltip.style.bottom   = '';
+  tooltip.style.right    = '';
+  tooltip.style.width    = '';
+  tooltip.style.maxWidth = '';
+  tooltip.style.transform = '';
+  tooltip.style.borderRadius = '';
+  tooltip.style.position = 'absolute';
+
+  if (!target || target.offsetParent === null) {
+    // No visible target: centre the tooltip, hide spotlight
+    spotlight.style.display = 'none';
+    tooltip.style.top  = '50%';
+    tooltip.style.left = '50%';
+    tooltip.style.transform = 'translate(-50%, -50%)';
+    return;
+  }
+
+  const rect = target.getBoundingClientRect();
+  spotlight.style.display  = 'block';
+  spotlight.style.left     = (rect.left   - 4) + 'px';
+  spotlight.style.top      = (rect.top    - 4) + 'px';
+  spotlight.style.width    = (rect.width  + 8) + 'px';
+  spotlight.style.height   = (rect.height + 8) + 'px';
+
+  // Use a two-pass approach: set position, then clamp after layout
+  const MARGIN = 12;
+  const tooltipW = 320; // design width — clamp conservatively
+
+  let top, left;
+  if (step.position === 'bottom') {
+    top  = rect.bottom + MARGIN;
+    left = rect.left + (rect.width  - tooltipW) / 2;
+  } else {
+    top  = rect.top - 200 - MARGIN; // approximate tooltip height
+    left = rect.left + (rect.width  - tooltipW) / 2;
+  }
+
+  // Clamp to viewport with margin
+  left = Math.max(MARGIN, Math.min(left, window.innerWidth  - tooltipW - MARGIN));
+  top  = Math.max(MARGIN, Math.min(top,  window.innerHeight - 220        - MARGIN));
+
+  tooltip.style.left = left + 'px';
+  tooltip.style.top  = top  + 'px';
 }
 
 function nextTutorialStep() {
@@ -414,10 +518,11 @@ function skipTutorial() {
 
 function endTutorial() {
   tutorialActive = false;
-  document.getElementById('tutorial-overlay').style.display = 'none';
-  document.getElementById('tutorial-progress').style.display = 'none';
+  const overlay  = document.getElementById('tutorial-overlay');
+  const progress = document.getElementById('tutorial-progress');
+  if (overlay)  overlay.style.display  = 'none';
+  if (progress) progress.style.display = 'none';
   document.removeEventListener('keydown', handleTutorialKey);
-
   localStorage.setItem('travelApp_tutorial_seen', 'true');
   showToast('✅ Tutorial complete! Check the Guide tab for more details.');
 }
@@ -425,8 +530,8 @@ function endTutorial() {
 function handleTutorialKey(e) {
   if (!tutorialActive) return;
   if (e.key === 'ArrowRight') nextTutorialStep();
-  if (e.key === 'ArrowLeft') prevTutorialStep();
-  if (e.key === 'Escape') skipTutorial();
+  if (e.key === 'ArrowLeft')  prevTutorialStep();
+  if (e.key === 'Escape')     skipTutorial();
 }
 
 function showToast(message) {
@@ -443,6 +548,8 @@ function showToast(message) {
     font-size: 0.9rem;
     z-index: 10000;
     animation: fadeIn 0.3s ease;
+    max-width: 90vw;
+    text-align: center;
   `;
   toast.textContent = message;
   document.body.appendChild(toast);

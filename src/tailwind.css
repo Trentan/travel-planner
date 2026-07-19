@@ -6308,3 +6308,109 @@ body.read-only-mode .empty-state-readonly-hint {
   color: #06b6d4;
 }
 
+
+/* Interactive Tutorial Overlay */
+.tutorial-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+.tutorial-spotlight {
+  position: absolute;
+  border-radius: 8px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 10001;
+}
+.tutorial-tooltip {
+  position: absolute;
+  background: white;
+  color: #1f2937;
+  padding: 1.5rem;
+  border-radius: 12px;
+  width: 320px;
+  z-index: 10002;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+[data-theme="dark"] .tutorial-tooltip {
+  background: #1e293b;
+  color: #f8fafc;
+}
+.tutorial-tooltip h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.tutorial-tooltip p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+  color: #4b5563;
+}
+[data-theme="dark"] .tutorial-tooltip p {
+  color: #94a3b8;
+}
+.tutorial-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.tutorial-nav button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.btn-skip {
+  background: transparent;
+  color: #6b7280;
+  padding-left: 0 !important;
+}
+[data-theme="dark"] .btn-skip { color: #94a3b8; }
+.btn-skip:hover { color: #374151; }
+[data-theme="dark"] .btn-skip:hover { color: #f1f5f9; }
+.btn-prev {
+  background: #f3f4f6;
+  color: #374151;
+}
+[data-theme="dark"] .btn-prev {
+  background: #334155;
+  color: #f1f5f9;
+}
+.btn-prev:hover { background: #e5e7eb; }
+[data-theme="dark"] .btn-prev:hover { background: #475569; }
+.btn-next {
+  background: #2C3E50;
+  color: white;
+}
+.btn-next:hover { background: #1a252f; }
+
+.tutorial-progress {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  gap: 8px;
+  z-index: 10003;
+}
+.tutorial-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+.tutorial-dot.active {
+  background: white;
+  transform: scale(1.2);
+}
+
