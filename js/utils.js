@@ -6,9 +6,9 @@ const DEFAULT_DATA = [
     legTips: [],
     days: [
       {
-        date:'1 Jan', day:'Mon', from:'Home', to:'Brisbane Airport',
-        completed: false, desc:'Departure day',
-        transportItems: [{ text: "Flight to London", cost: "1200", status: "confirmed", bookingRef: "ABC123" }],
+        date:'1 Jan', day:'Mon', from:'Home', to:'Brisbane',
+        completed: false, desc:'Departure day — evening flight to London',
+        transportItems: [{ text: "Flight BNE → LHR  |  Dep 21:30 → Arr +1 06:15", cost: "1200", status: "confirmed", bookingRef: "ABC123" }],
         accomItems: [],
         activityItems: []
       }
@@ -31,9 +31,9 @@ const DEFAULT_DATA = [
     ],
     days: [
       {
-        date:'2 Jan', day:'Tue', from:'Brisbane Airport', to:'London',
-        completed: false, desc:'Arrival and hotel check-in',
-        transportItems: [{ text: "Heathrow Express to Paddington", cost: "25", status: "pending", bookingRef: "" }],
+        date:'2 Jan', day:'Tue', from:'Brisbane', to:'London',
+        completed: false, desc:'Arrival at Heathrow 06:15 — hotel check-in',
+        transportItems: [{ text: "Heathrow Express to Paddington  |  Dep 07:05 → Arr 07:27", cost: "25", status: "planned", bookingRef: "" }],
         accomItems: [{ text: "Premier Inn London", cost: "150", status: "confirmed", bookingRef: "LON456", cityId: 'city-london' }],
         activityItems: [{ text: "Rest and explore local area", cost: "0", time: "2 hrs", done: false, cityId: 'city-london' }]
       },
@@ -49,8 +49,8 @@ const DEFAULT_DATA = [
       },
       {
         date:'4 Jan', day:'Thu', from:'London', to:'Paris',
-        completed: false, desc:'Departure day from London',
-        transportItems: [{ text: "Eurostar to Paris", cost: "100", status: "confirmed", bookingRef: "EST789" }],
+        completed: false, desc:'Eurostar to Paris — afternoon departure',
+        transportItems: [{ text: "Eurostar London → Paris  |  Dep 14:31 → Arr 17:47", cost: "100", status: "confirmed", bookingRef: "EST789" }],
         accomItems: [],
         activityItems: []
       }
@@ -64,8 +64,8 @@ const DEFAULT_DATA = [
     days: [
       {
         date:'4 Jan', day:'Thu', from:'London', to:'Paris',
-        completed: false, desc:'Travel to Paris',
-        transportItems: [{ text: "Eurostar to Paris", cost: "100", status: "confirmed", bookingRef: "EST789" }],
+        completed: false, desc:'Travel to Paris via Eurostar',
+        transportItems: [{ text: "Eurostar London → Paris  |  Dep 14:31 → Arr 17:47", cost: "100", status: "confirmed", bookingRef: "EST789" }],
         accomItems: [],
         activityItems: []
       }
@@ -89,14 +89,14 @@ const DEFAULT_DATA = [
     days: [
       {
         date:'4 Jan', day:'Thu', from:'London', to:'Paris',
-        completed: false, desc:'Arrival in Paris',
+        completed: false, desc:'Arrival in Paris — check in, evening stroll',
         transportItems: [],
         accomItems: [{ text: "Hotel des Arts", cost: "180", status: "confirmed", bookingRef: "PA987", cityId: 'city-paris' }],
         activityItems: [{ text: "Evening Seine walk", cost: "0", time: "1.5 hrs", done: false, cityId: 'city-paris' }]
       },
       {
         date:'5 Jan', day:'Fri', from:'Paris', to:'Paris',
-        completed: false, desc:'Exploring the city',
+        completed: false, desc:'Full day exploring Paris',
         transportItems: [{ text: "Metro day pass", cost: "8", status: "", bookingRef: "" }],
         accomItems: [{ text: "Hotel des Arts", cost: "180", status: "confirmed", bookingRef: "PA987", cityId: 'city-paris' }],
         activityItems: [
@@ -106,8 +106,8 @@ const DEFAULT_DATA = [
       },
       {
         date:'6 Jan', day:'Sat', from:'Paris', to:'Home',
-        completed: false, desc:'Departure day from Paris',
-        transportItems: [{ text: "Flight CDG → BNE", cost: "1200", status: "confirmed", bookingRef: "RET321" }],
+        completed: false, desc:'Departure from CDG — midday flight home',
+        transportItems: [{ text: "Flight CDG → BNE  |  Dep 12:00 → Arr +2 06:45", cost: "1200", status: "confirmed", bookingRef: "RET321" }],
         accomItems: [],
         activityItems: []
       }
@@ -121,14 +121,15 @@ const DEFAULT_DATA = [
     days: [
       {
         date:'6 Jan', day:'Sat', from:'Paris', to:'Home',
-        completed: false, desc:'Return flight home',
-        transportItems: [{ text: "Flight CDG → BNE", cost: "1200", status: "confirmed", bookingRef: "RET321" }],
+        completed: false, desc:'Return flight — arrival Brisbane 06:45 (+2 days)',
+        transportItems: [{ text: "Flight CDG → BNE  |  Dep 12:00 → Arr +2 06:45", cost: "1200", status: "confirmed", bookingRef: "RET321" }],
         accomItems: [],
         activityItems: []
       }
     ]
   },
 ];
+
 
 const ACTIVITY_CATEGORIES = {
   fitness: { emoji: '🏃', label: 'Fitness' },
