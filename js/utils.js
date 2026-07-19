@@ -1,133 +1,228 @@
 const DEFAULT_DATA = [
   {
-    id: 'leg-1', label: '🏠 Start (Brisbane)', colour: '#2C3E50',
-    cityFood: [],
-    suggestedActivities: [],
-    legTips: [],
+    id: 'leg-1', label: '✈️ Start (Brisbane)', colour: '#2C3E50',
+    cityFood: [
+      { text: "Grab coffee at The Coffee Club before boarding", done: false, cityId: 'city-bne' }
+    ],
+    suggestedActivities: [
+      { title: 'Relax at Plaza Premium Lounge', category: 'wellness', estTime: '2 hrs', estCost: '60', assignedDayIdx: null, cityId: 'city-bne' }
+    ],
+    legTips: [
+      { text: "Check in online 48 hours before SQ flight", cityId: 'city-bne' },
+      { text: "Download Singapore Airlines KrisWorld app", cityId: 'city-bne' }
+    ],
     days: [
       {
-        date:'1 Jan', day:'Mon', from:'Home', to:'Brisbane',
-        completed: false, desc:'Departure day — evening flight to London',
-        transportItems: [{ text: "Flight BNE → LHR  |  Dep 21:30 → Arr +1 06:15", cost: "1200", status: "confirmed", bookingRef: "ABC123" }],
+        date:'1 Jan', day:'Mon', from:'Brisbane', to:'Singapore',
+        completed: false, desc:'Departure day — evening flight to Singapore',
+        transportItems: [
+          { text: "Airtrain to BNE International | 19:00", cost: "20", status: "planned", bookingRef: "" },
+          { text: "Singapore Airlines SQ246 BNE ➔ SIN | Dep 23:35 ➔ Arr +1 05:35", cost: "850", status: "confirmed", bookingRef: "SQ88X2" }
+        ],
         accomItems: [],
-        activityItems: []
+        activityItems: [
+          { text: "Check-in at BNE Terminal", cost: "0", time: "20:30", done: false, cityId: 'city-bne' },
+          { text: "Pre-flight dinner at airport", cost: "35", time: "21:00 - 22:30", done: false, cityId: 'city-bne' }
+        ]
       }
     ]
   },
   {
-    id: 'leg-2', label: '📍 London', colour: '#E74C3C',
+    id: 'leg-2', label: '🌏 Transit (Singapore)', colour: '#E67E22',
     cityFood: [
-      { text: "Try authentic fish & chips", done: false, cityId: 'city-london' },
-      { text: "Visit Borough Market", done: false, cityId: 'city-london' }
+      { text: "Hainanese Chicken Rice at Jewel", done: false, cityId: 'city-sin' },
+      { text: "Kaya Toast with Kopi", done: false, cityId: 'city-sin' }
     ],
     suggestedActivities: [
-      { title: 'Morning run along Thames', category: 'fitness', estTime: '1 hr', estCost: '0', assignedDayIdx: null, cityId: 'city-london' },
-      { title: 'British Museum', category: 'sight', estTime: '3 hrs', estCost: '0', assignedDayIdx: null, cityId: 'city-london' },
-      { title: 'West End show', category: 'attraction', estTime: '3 hrs', estCost: '80', assignedDayIdx: null, cityId: 'city-london' }
+      { title: 'Butterfly Garden (T3)', category: 'sight', estTime: '30 mins', estCost: '0', assignedDayIdx: null, cityId: 'city-sin' },
+      { title: 'Free Singapore Tour (if transit > 5.5 hrs)', category: 'tour', estTime: '2.5 hrs', estCost: '0', assignedDayIdx: null, cityId: 'city-sin' },
+      { title: 'Ambassador Transit Lounge', category: 'wellness', estTime: '3 hrs', estCost: '50', assignedDayIdx: null, cityId: 'city-sin' }
     ],
     legTips: [
-      { text: "Download Citymapper for transit", cityId: 'city-london' },
-      { text: "Book museum tickets in advance", cityId: 'city-london' }
+      { text: "Free WiFi available in Changi via #WiFi@Changi", cityId: 'city-sin' },
+      { text: "Use Skytrain to move between terminals quickly", cityId: 'city-sin' }
     ],
     days: [
       {
-        date:'2 Jan', day:'Tue', from:'Brisbane', to:'London',
-        completed: false, desc:'Arrival at Heathrow 06:15 — hotel check-in',
-        transportItems: [{ text: "Heathrow Express to Paddington  |  Dep 07:05 → Arr 07:27", cost: "25", status: "planned", bookingRef: "" }],
-        accomItems: [{ text: "Premier Inn London", cost: "150", status: "confirmed", bookingRef: "LON456", cityId: 'city-london' }],
-        activityItems: [{ text: "Rest and explore local area", cost: "0", time: "2 hrs", done: false, cityId: 'city-london' }]
+        date:'2 Jan', day:'Tue', from:'Singapore', to:'London',
+        completed: false, desc:'Morning transit in Changi & onward flight',
+        transportItems: [
+          { text: "Singapore Airlines SQ318 SIN ➔ LHR | Dep 12:35 ➔ Arr 19:15", cost: "0", status: "confirmed", bookingRef: "SQ88X2" }
+        ],
+        accomItems: [],
+        activityItems: [
+          { text: "Arrive at SIN T3, clear transit security", cost: "0", time: "05:35", done: false, cityId: 'city-sin' },
+          { text: "Explore Jewel Changi Canopy Park", cost: "8", time: "07:00 - 09:00", done: false, cityId: 'city-sin' },
+          { text: "Breakfast at Song Fa Bak Kut Teh", cost: "25", time: "09:30 - 10:30", done: false, cityId: 'city-sin' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'leg-3', label: '🎡 London', colour: '#E74C3C',
+    cityFood: [
+      { text: "Authentic fish & chips at Poppies", done: false, cityId: 'city-london' },
+      { text: "Sunday Roast at a local pub", done: false, cityId: 'city-london' },
+      { text: "Afternoon Tea at Fortnum & Mason", done: false, cityId: 'city-london' }
+    ],
+    suggestedActivities: [
+      { title: 'Morning run along Thames Path', category: 'fitness', estTime: '1 hr', estCost: '0', assignedDayIdx: null, cityId: 'city-london' },
+      { title: 'Natural History Museum', category: 'sight', estTime: '3 hrs', estCost: '0', assignedDayIdx: null, cityId: 'city-london' },
+      { title: 'West End: Les Misérables', category: 'event', estTime: '3 hrs', estCost: '95', assignedDayIdx: null, cityId: 'city-london' },
+      { title: 'London Eye Fast Track', category: 'attraction', estTime: '1 hr', estCost: '45', assignedDayIdx: null, cityId: 'city-london' },
+      { title: 'Tower of London & Crown Jewels', category: 'tour', estTime: '3 hrs', estCost: '33', assignedDayIdx: null, cityId: 'city-london' }
+    ],
+    legTips: [
+      { text: "Download Citymapper for accurate transit navigation", cityId: 'city-london' },
+      { text: "Tap in/out with contactless card - no Oyster needed", cityId: 'city-london' },
+      { text: "Museums are free but require pre-booked time slots", cityId: 'city-london' }
+    ],
+    days: [
+      {
+        date:'2 Jan', day:'Tue', from:'London', to:'London',
+        completed: false, desc:'Arrival at Heathrow & evening check-in',
+        transportItems: [
+          { text: "Heathrow Express to Paddington | Dep 20:12 ➔ Arr 20:27", cost: "25", status: "planned", bookingRef: "" },
+          { text: "Elizabeth Line to Tottenham Court Road", cost: "5", status: "planned", bookingRef: "" }
+        ],
+        accomItems: [{ text: "The Hoxton, Holborn", cost: "250", status: "confirmed", bookingRef: "HOX991", cityId: 'city-london' }],
+        activityItems: [
+          { text: "Check into The Hoxton", cost: "0", time: "21:00", done: false, cityId: 'city-london' },
+          { text: "Late dinner at Dishoom Covent Garden", cost: "40", time: "21:30 - 23:00", done: false, cityId: 'city-london' }
+        ]
       },
       {
         date:'3 Jan', day:'Wed', from:'London', to:'London',
-        completed: false, desc:'First full day exploring',
-        transportItems: [{ text: "Oyster card / Contactless", cost: "10", status: "", bookingRef: "" }],
-        accomItems: [{ text: "Premier Inn London", cost: "150", status: "confirmed", bookingRef: "LON456", cityId: 'city-london' }],
+        completed: false, desc:'Classic sights and West End',
+        transportItems: [{ text: "TfL Daily Cap (Zones 1-2)", cost: "8.10", status: "", bookingRef: "" }],
+        accomItems: [{ text: "The Hoxton, Holborn", cost: "250", status: "confirmed", bookingRef: "HOX991", cityId: 'city-london' }],
         activityItems: [
-          { text: "British Museum", cost: "0", time: "3 hrs", done: false, cityId: 'city-london' },
-          { text: "Covent Garden dinner", cost: "40", time: "2 hrs", done: false, cityId: 'city-london' }
+          { text: "British Museum (Pre-booked slot)", cost: "0", time: "10:00 - 13:00", done: false, cityId: 'city-london' },
+          { text: "Lunch in Soho", cost: "30", time: "13:30 - 14:30", done: false, cityId: 'city-london' },
+          { text: "Walk through St James's Park & Buckingham Palace", cost: "0", time: "15:00 - 17:00", done: false, cityId: 'city-london' },
+          { text: "Dinner & West End Show (Phantom of the Opera)", cost: "140", time: "18:30 - 22:30", done: false, cityId: 'city-london' }
         ]
       },
       {
-        date:'4 Jan', day:'Thu', from:'London', to:'Paris',
-        completed: false, desc:'Eurostar to Paris — afternoon departure',
-        transportItems: [{ text: "Eurostar London → Paris  |  Dep 14:31 → Arr 17:47", cost: "100", status: "confirmed", bookingRef: "EST789" }],
-        accomItems: [],
-        activityItems: []
+        date:'4 Jan', day:'Thu', from:'London', to:'London',
+        completed: false, desc:'Markets, Art, and the Southbank',
+        transportItems: [{ text: "TfL Daily Cap (Zones 1-2)", cost: "8.10", status: "", bookingRef: "" }],
+        accomItems: [{ text: "The Hoxton, Holborn", cost: "250", status: "confirmed", bookingRef: "HOX991", cityId: 'city-london' }],
+        activityItems: [
+          { text: "Explore Borough Market & grab street food", cost: "25", time: "11:00 - 13:30", done: false, cityId: 'city-london' },
+          { text: "Tate Modern Art Gallery", cost: "0", time: "14:00 - 16:30", done: false, cityId: 'city-london' },
+          { text: "Walk along the Southbank & Millennium Bridge", cost: "0", time: "16:30 - 18:00", done: false, cityId: 'city-london' },
+          { text: "Drinks at the Shard (Aqua Shard)", cost: "45", time: "19:00 - 21:00", done: false, cityId: 'city-london' }
+        ]
       }
     ]
   },
   {
-    id: 'leg-3', label: '✈️ London → Paris', colour: '#3498DB',
+    id: 'leg-4', label: '🚄 London ➔ Paris', colour: '#8E44AD',
     cityFood: [],
     suggestedActivities: [],
-    legTips: [],
+    legTips: [
+      { text: "Arrive at St Pancras 90 mins before Eurostar for border checks", cityId: 'city-london' },
+      { text: "Grab M&S snacks at the station before boarding", cityId: 'city-london' }
+    ],
     days: [
       {
-        date:'4 Jan', day:'Thu', from:'London', to:'Paris',
-        completed: false, desc:'Travel to Paris via Eurostar',
-        transportItems: [{ text: "Eurostar London → Paris  |  Dep 14:31 → Arr 17:47", cost: "100", status: "confirmed", bookingRef: "EST789" }],
+        date:'5 Jan', day:'Fri', from:'London', to:'Paris',
+        completed: false, desc:'Cross-channel train to Paris',
+        transportItems: [
+          { text: "Eurostar 9032 LON ➔ PAR | Dep 14:31 ➔ Arr 17:47", cost: "145", status: "confirmed", bookingRef: "EST789" }
+        ],
         accomItems: [],
-        activityItems: []
+        activityItems: [
+          { text: "Arrive at St Pancras, clear passport control", cost: "0", time: "13:00", done: false, cityId: 'city-london' }
+        ]
       }
     ]
   },
   {
-    id: 'leg-4', label: '📍 Paris', colour: '#3498DB',
+    id: 'leg-5', label: '🥐 Paris', colour: '#3498DB',
     cityFood: [
-      { text: "Croissant at local boulangerie", done: false, cityId: 'city-paris' },
-      { text: "Dinner cruise on Seine", done: false, cityId: 'city-paris' }
+      { text: "Fresh Croissant from Du Pain et des Idées", done: false, cityId: 'city-paris' },
+      { text: "Macarons from Pierre Hermé", done: false, cityId: 'city-paris' },
+      { text: "Steak Frites at Le Relais de l'Entrecôte", done: false, cityId: 'city-paris' }
     ],
     suggestedActivities: [
-      { title: 'Run in Luxembourg Gardens', category: 'fitness', estTime: '1 hr', estCost: '0', assignedDayIdx: null, cityId: 'city-paris' },
-      { title: 'Louvre Museum', category: 'sight', estTime: '4 hrs', estCost: '17', assignedDayIdx: null, cityId: 'city-paris' },
-      { title: 'Eiffel Tower sunset', category: 'sight', estTime: '2 hrs', estCost: '28', assignedDayIdx: null, cityId: 'city-paris' }
+      { title: 'Morning run in Luxembourg Gardens', category: 'fitness', estTime: '1 hr', estCost: '0', assignedDayIdx: null, cityId: 'city-paris' },
+      { title: "Musée d'Orsay", category: 'sight', estTime: '3 hrs', estCost: '16', assignedDayIdx: null, cityId: 'city-paris' },
+      { title: 'Sainte-Chapelle Stained Glass', category: 'sight', estTime: '1.5 hrs', estCost: '11', assignedDayIdx: null, cityId: 'city-paris' },
+      { title: 'Versailles Half-Day Trip', category: 'tour', estTime: '5 hrs', estCost: '40', assignedDayIdx: null, cityId: 'city-paris' },
+      { title: 'Montmartre Walking Tour', category: 'tour', estTime: '2 hrs', estCost: '25', assignedDayIdx: null, cityId: 'city-paris' }
     ],
     legTips: [
-      { text: "Museum pass saves money", cityId: 'city-paris' },
-      { text: "Book Eiffel Tower in advance", cityId: 'city-paris' }
+      { text: "Watch out for pickpockets on Metro Line 1 & near the Eiffel Tower", cityId: 'city-paris' },
+      { text: "Learn basic French greetings (Bonjour, Merci, S'il vous plaît)", cityId: 'city-paris' },
+      { text: "Paris Navigo pass might be cheaper than single tickets", cityId: 'city-paris' }
     ],
     days: [
       {
-        date:'4 Jan', day:'Thu', from:'London', to:'Paris',
-        completed: false, desc:'Arrival in Paris — check in, evening stroll',
-        transportItems: [],
-        accomItems: [{ text: "Hotel des Arts", cost: "180", status: "confirmed", bookingRef: "PA987", cityId: 'city-paris' }],
-        activityItems: [{ text: "Evening Seine walk", cost: "0", time: "1.5 hrs", done: false, cityId: 'city-paris' }]
-      },
-      {
         date:'5 Jan', day:'Fri', from:'Paris', to:'Paris',
-        completed: false, desc:'Full day exploring Paris',
-        transportItems: [{ text: "Metro day pass", cost: "8", status: "", bookingRef: "" }],
-        accomItems: [{ text: "Hotel des Arts", cost: "180", status: "confirmed", bookingRef: "PA987", cityId: 'city-paris' }],
+        completed: false, desc:'Arrival at Gare du Nord & evening stroll',
+        transportItems: [
+          { text: "Paris Metro Line 4 to Saint-Germain-des-Prés", cost: "2.10", status: "planned", bookingRef: "" }
+        ],
+        accomItems: [{ text: "Hôtel des Arts", cost: "180", status: "confirmed", bookingRef: "PA987", cityId: 'city-paris' }],
         activityItems: [
-          { text: "Louvre Museum", cost: "17", time: "4 hrs", done: false, cityId: 'city-paris' },
-          { text: "Eiffel Tower", cost: "28", time: "2 hrs", done: false, cityId: 'city-paris' }
+          { text: "Hotel Check-in & Freshen up", cost: "0", time: "18:45", done: false, cityId: 'city-paris' },
+          { text: "Evening Seine walk towards Notre Dame", cost: "0", time: "19:30 - 20:30", done: false, cityId: 'city-paris' },
+          { text: "Dinner at a local Brasserie", cost: "65", time: "20:30 - 22:30", done: false, cityId: 'city-paris' }
         ]
       },
       {
-        date:'6 Jan', day:'Sat', from:'Paris', to:'Home',
-        completed: false, desc:'Departure from CDG — midday flight home',
-        transportItems: [{ text: "Flight CDG → BNE  |  Dep 12:00 → Arr +2 06:45", cost: "1200", status: "confirmed", bookingRef: "RET321" }],
-        accomItems: [],
-        activityItems: []
+        date:'6 Jan', day:'Sat', from:'Paris', to:'Paris',
+        completed: false, desc:'Louvre & Eiffel Tower',
+        transportItems: [{ text: "Metro Mobilis day pass (Zones 1-2)", cost: "8.45", status: "", bookingRef: "" }],
+        accomItems: [{ text: "Hôtel des Arts", cost: "180", status: "confirmed", bookingRef: "PA987", cityId: 'city-paris' }],
+        activityItems: [
+          { text: "Louvre Museum (Pre-booked entry)", cost: "17", time: "09:00 - 13:00", done: false, cityId: 'city-paris' },
+          { text: "Lunch near Jardin des Tuileries", cost: "25", time: "13:30 - 14:30", done: false, cityId: 'city-paris' },
+          { text: "Eiffel Tower Sunset Ascent", cost: "28", time: "16:30 - 19:00", done: false, cityId: 'city-paris' },
+          { text: "Seine River Cruise by Bateaux Parisiens", cost: "20", time: "19:30 - 20:30", done: false, cityId: 'city-paris' }
+        ]
+      },
+      {
+        date:'7 Jan', day:'Sun', from:'Paris', to:'Dubai',
+        completed: false, desc:'Le Marais and departure via CDG',
+        transportItems: [
+          { text: "RER B train to CDG Airport | 12:00", cost: "11.45", status: "planned", bookingRef: "" },
+          { text: "Emirates EK74 CDG ➔ DXB | Dep 15:35 ➔ Arr 00:20", cost: "950", status: "confirmed", bookingRef: "EK402A" }
+        ],
+        accomItems: [{ text: "Hôtel des Arts (Checkout)", cost: "0", status: "confirmed", bookingRef: "PA987", cityId: 'city-paris' }],
+        activityItems: [
+          { text: "Morning stroll through Le Marais", cost: "0", time: "09:00 - 11:30", done: false, cityId: 'city-paris' },
+          { text: "Arrive at CDG, Tax refund & Check-in", cost: "0", time: "12:45", done: false, cityId: 'city-paris' }
+        ]
       }
     ]
   },
   {
-    id: 'leg-5', label: '🏠 Return (Brisbane)', colour: '#2C3E50',
+    id: 'leg-6', label: '✈️ Return (Brisbane)', colour: '#2C3E50',
     cityFood: [],
-    suggestedActivities: [],
-    legTips: [],
+    suggestedActivities: [
+      { title: 'Dubai Airport Sleeping Pods', category: 'wellness', estTime: '2 hrs', estCost: '40', assignedDayIdx: null, cityId: 'city-dxb' }
+    ],
+    legTips: [
+      { text: "Keep a change of clothes in carry-on for the long transit", cityId: 'city-dxb' }
+    ],
     days: [
       {
-        date:'6 Jan', day:'Sat', from:'Paris', to:'Home',
-        completed: false, desc:'Return flight — arrival Brisbane 06:45 (+2 days)',
-        transportItems: [{ text: "Flight CDG → BNE  |  Dep 12:00 → Arr +2 06:45", cost: "1200", status: "confirmed", bookingRef: "RET321" }],
+        date:'8 Jan', day:'Mon', from:'Dubai', to:'Brisbane',
+        completed: false, desc:'Transit and arrival in Brisbane (+1 day)',
+        transportItems: [
+          { text: "Emirates EK430 DXB ➔ BNE | Dep 02:45 ➔ Arr 22:20", cost: "0", status: "confirmed", bookingRef: "EK402A" }
+        ],
         accomItems: [],
-        activityItems: []
+        activityItems: [
+          { text: "Transit via Dubai Concourse B", cost: "0", time: "00:20 - 02:00", done: false, cityId: 'city-dxb' },
+          { text: "Arrive BNE, clear customs & biosecurity", cost: "0", time: "22:20", done: false, cityId: 'city-bne' }
+        ]
       }
     ]
-  },
+  }
 ];
 
 
