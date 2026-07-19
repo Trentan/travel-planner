@@ -782,3 +782,61 @@ document.addEventListener('click', event => {
   }
 });
 
+
+
+// --- Capacitor Mobile Hardware Back Button Support ---
+if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      window.Capacitor.Plugins.App.addListener("backButton", ({ canGoBack }) => {
+        // 1. Check if mobile menu is open
+        if (typeof isMobileMenuOpen !== "undefined" && isMobileMenuOpen) {
+          if (typeof toggleMobileMenu === "function") {
+            toggleMobileMenu();
+            return;
+          }
+        }
+
+        // 2. Check if a guide tooltip overlay is active
+        const tooltipOverlay = document.getElementById("guide-tooltip-overlay");
+        if (tooltipOverlay && tooltipOverlay.style.display !== "none") {
+          if (typeof nextTutorialStep === "function") {
+            // You could skip or go next. We will just hide the tooltip for back button.
+            if (typeof skipTutorial === "function") skipTutorial();
+            return;
+          }
+        }
+
+        // 3. Find any open modals and close the topmost one
+        const openModals = Array.from(document.querySelectorAll(".modal-overlay")).filter(m => m.style.display && m.style.display !== "none");
+        if (openModals.length > 0) {
+          // Just hide the last one found in DOM, assuming its the topmost
+          const topmostModal = openModals[openModals.length - 1];
+          topmostModal.style.display = "none";
+          
+          // Specifically handle some states if we just closed their modal
+          if (topmostModal.id === "rename-trip-modal") {
+            if (typeof editingTripName !== "undefined") editingTripName = false;
+          }
+          return;
+        }
+
+        // 4. Check if map sidebar is open on mobile
+        if (typeof mapSidebarOpen !== "undefined" && mapSidebarOpen && isMobileViewport()) {
+           if (typeof toggleMapSidebar === "function") {
+             toggleMapSidebar();
+             return;
+           }
+        }
+
+        // 5. If nothing is open, we can let the app exit or go back
+        if (!canGoBack) {
+          window.Capacitor.Plugins.App.exitApp();
+        } else {
+          window.history.back();
+        }
+      });
+    }
+  });
+}
+

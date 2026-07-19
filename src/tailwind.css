@@ -6528,3 +6528,21 @@ body.read-only-mode .empty-state-readonly-hint {
   opacity: 0.9;
 }
 
+
+/* --- Mobile Touch Targets --- */
+@media (max-width: 768px) {
+  .action-btn,
+  .modal-close,
+  .app-menu-btn,
+  .tab-btn,
+  .guide-step-header {
+    min-height: 44px;
+  }
+  
+  .daily-timeline-time.is-clickable {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+

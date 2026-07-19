@@ -5147,7 +5147,7 @@ function onboardOpenExistingTrip() {
   openTripFile();
 }
 
-if (typeof document !== 'undefined') {
+if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof navigator !== 'undefined' && navigator.webdriver) return; // skip for automated testing
 
