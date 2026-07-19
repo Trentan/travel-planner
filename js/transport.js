@@ -1038,6 +1038,7 @@ function buildTransportTab(cityFilter = null) {
     html += `<div class="empty-placeholder">
       <p>No journeys planned yet.</p>
       <p class="section-header-note">Click "+ Add Journey" to add your first transport booking.</p>
+      <p class="empty-state-readonly-hint">🔒 <button class="empty-state-readonly-hint-link" onclick="toggleEditMode()">Unlock editing</button>&nbsp;to add journeys.</p>
     </div>`;
     container.innerHTML = html;
     return;

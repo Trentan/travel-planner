@@ -1,4 +1,4 @@
-﻿// buildTransportTab is now defined in transport.js
+// buildTransportTab is now defined in transport.js
 
 let expandedStayRows = new Set();
 
@@ -181,6 +181,7 @@ function buildAccomTab(cityFilter = null) {
       <div class="empty-placeholder">
         <p>No stays found.</p>
         <p class="section-header-note">Click "+ Add Stay" to add your first accommodation.</p>
+        <p class="empty-state-readonly-hint">🔒 <button class="empty-state-readonly-hint-link" onclick="toggleEditMode()">Unlock editing</button>&nbsp;to add stays.</p>
       </div>
     `;
     return;

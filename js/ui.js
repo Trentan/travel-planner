@@ -303,6 +303,37 @@ function applyUiSettings() {
   syncItineraryViewModeButtons();
   syncShowMoneyButtons();
   setHeaderEditable(isEditMode);
+  syncReadOnlyBanner();
+}
+
+/**
+ * Show or hide the read-only banner based on current isEditMode.
+ * If the user has dismissed it this session AND we're still locked, keep it hidden
+ * until the mode changes (i.e., unlock then re-lock will re-show it).
+ */
+function syncReadOnlyBanner() {
+  const banner = document.getElementById('readOnlyBanner');
+  if (!banner) return;
+  if (!isEditMode) {
+    // In read-only mode: show unless the user dismissed it this session
+    const dismissed = sessionStorage.getItem('readOnlyBannerDismissed') === 'true';
+    banner.style.display = dismissed ? 'none' : '';
+  } else {
+    // In edit mode: clear dismiss flag and hide via CSS (body class removed)
+    sessionStorage.removeItem('readOnlyBannerDismissed');
+    banner.style.display = '';
+  }
+}
+
+/**
+ * Let the user dismiss the read-only banner for this session.
+ * It will re-show if they unlock then re-lock the trip.
+ */
+function dismissReadOnlyBanner() {
+  const banner = document.getElementById('readOnlyBanner');
+  if (!banner) return;
+  sessionStorage.setItem('readOnlyBannerDismissed', 'true');
+  banner.style.display = 'none';
 }
 
 function syncShowMoneyButtons() {
@@ -395,6 +426,7 @@ function toggleEditMode() {
   if(isEditMode) { btn.innerHTML = "🔒 Lock"; btn.classList.remove('edit-mode'); }
   else { btn.innerHTML = "✏️ Unlock"; btn.classList.add('edit-mode'); saveData(); }
 
+  syncReadOnlyBanner();
   applyUiSettings();
   const activeTabBtn = document.querySelector('.app-tab-btn.active');
   const activeTabId = activeTabBtn ? activeTabBtn.getAttribute('data-tab') : '';
@@ -690,6 +722,8 @@ window.addLeg = addLeg;
 window.openRenameTripDialog = openRenameTripDialog;
 window.closeRenameTripDialog = closeRenameTripDialog;
 window.saveRenameTripDialog = saveRenameTripDialog;
+window.syncReadOnlyBanner = syncReadOnlyBanner;
+window.dismissReadOnlyBanner = dismissReadOnlyBanner;
 let lastScrollY = window.scrollY || 0;
 let cityNavEl = null;
 

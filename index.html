@@ -76,6 +76,21 @@
 
 <div id="jsonWriteWarning" class="json-write-warning" hidden></div>
 
+<!-- Read-Only Mode Banner (Issue #178) — shown automatically via CSS when body.read-only-mode -->
+<div id="readOnlyBanner" role="status" aria-live="polite" aria-label="Read-only mode active">
+  <span class="readonly-banner-icon" aria-hidden="true">🔒</span>
+  <span class="readonly-banner-text">
+    <span class="readonly-banner-title">Read-only mode</span>
+    <span class="readonly-banner-hint">Editing is disabled. Add/edit buttons are hidden.</span>
+  </span>
+  <span class="readonly-banner-actions">
+    <button class="readonly-banner-unlock-btn" onclick="toggleEditMode()" aria-label="Unlock editing">
+      ✏️ Unlock Editing
+    </button>
+    <button class="readonly-banner-dismiss-btn" onclick="dismissReadOnlyBanner()" aria-label="Dismiss banner" title="Dismiss this banner">×</button>
+  </span>
+</div>
+
 <header class="hidden md:block bg-teal-800 dark:bg-slate-900 text-white shadow-md relative z-30 transition-all duration-300">
   <div class="max-w-7xl mx-auto px-4 py-6 md:py-8">
     <div class="flex flex-col gap-1">
