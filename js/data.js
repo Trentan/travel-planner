@@ -5100,3 +5100,70 @@ window.updateCityCountryCode = updateCityCountryCode;
 window.populateCountrySelect = populateCountrySelect;
 window.setupCityAutocomplete = setupCityAutocomplete;
 
+
+
+// -- File Setup Onboarding UX --
+function dismissFileSetup() {
+  document.getElementById("file-setup-modal").style.display = "none";
+  localStorage.setItem("travelApp_file_setup_seen", "true");
+}
+
+function startBlankTrip() {
+  appData = [{
+    id: "leg-" + Date.now(),
+    label: "?? New Trip",
+    colour: "#2C3E50",
+    cityFood: [],
+    suggestedActivities: [],
+    legTips: [],
+    days: [{
+      date: "", day: "", from: "", to: "",
+      completed: false, desc: "",
+      transportItems: [], accomItems: [], activityItems: []
+    }]
+  }];
+  titleData = { title: "My Awesome Trip", subtitle: "A new adventure awaits" };
+  const mainTitleEl = document.getElementById("mainTitle");
+  if (mainTitleEl) mainTitleEl.innerText = titleData.title;
+  const mainSubEl = document.getElementById("mainSubtitle");
+  if (mainSubEl) mainSubEl.innerText = titleData.subtitle;
+  syncCurrentFileName("New_Trip.json");
+  saveData(true);
+  if (typeof buildTabs === "function") buildTabs();
+}
+
+async function onboardCreateNewTrip() {
+  dismissFileSetup();
+  startBlankTrip();
+  if (isFSASupported()) {
+    await createFileOnDisk();
+  } else {
+    exportJSON(); // fallback for mobile/unsupported
+  }
+}
+
+function onboardOpenExistingTrip() {
+  dismissFileSetup();
+  openTripFile();
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener("DOMContentLoaded", () => {
+    if (typeof navigator !== 'undefined' && navigator.webdriver) return; // skip for automated testing
+
+    const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
+    // If not seen, AND no valid file handle exists (we are using the Default Template)
+    if (!hasSeenSetup && !hasActiveFileHandle()) {
+      setTimeout(() => {
+        const modal = document.getElementById("file-setup-modal");
+        if (modal) modal.style.display = "flex";
+      }, 300);
+    }
+  });
+}
+
+window.dismissFileSetup = dismissFileSetup;
+window.startBlankTrip = startBlankTrip;
+window.onboardCreateNewTrip = onboardCreateNewTrip;
+window.onboardOpenExistingTrip = onboardOpenExistingTrip;
+
