@@ -1,3 +1,41 @@
+const DEFAULT_CITIES = [
+  {
+    "id": "city-brisbane",
+    "name": "Brisbane",
+    "lat": -27.4705,
+    "lng": 153.026,
+    "colour": "#2ecc71"
+  },
+  {
+    "id": "city-singapore",
+    "name": "Singapore",
+    "lat": 1.3521,
+    "lng": 103.8198,
+    "colour": "#e74c3c"
+  },
+  {
+    "id": "city-london",
+    "name": "London",
+    "lat": 51.5074,
+    "lng": -0.1278,
+    "colour": "#3498db"
+  },
+  {
+    "id": "city-paris",
+    "name": "Paris",
+    "lat": 48.8566,
+    "lng": 2.3522,
+    "colour": "#9b59b6"
+  },
+  {
+    "id": "city-dubai",
+    "name": "Dubai",
+    "lat": 25.2048,
+    "lng": 55.2708,
+    "colour": "#f1c40f"
+  }
+];
+
 const DEFAULT_DATA = [
   {
     id: 'leg-1', label: '✈️ Start (Brisbane)', colour: '#2C3E50',

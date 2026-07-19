@@ -176,7 +176,7 @@ function fallbackToLocalStorage() {
 let appData = [];
 let packingData = [];
 let leaveHomeData = [];
-let citiesData = []; // City entities for filtering/grouping - { id, name, code, countryCode, country, dateFrom, dateTo, colour }
+let citiesData = typeof DEFAULT_CITIES !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_CITIES)) : []; // City entities for filtering/grouping - { id, name, code, countryCode, country, dateFrom, dateTo, colour }
 let historyBaselineSnapshot = null;
 let historyBaselineSignature = '';
 let historyUndoStack = [];
@@ -2498,7 +2498,7 @@ async function initData() {
       saveData(false);
     } catch (e) {
       console.error('[Cities] Failed to parse saved cities:', e);
-      citiesData = [];
+      citiesData = typeof DEFAULT_CITIES !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_CITIES)) : [];
     }
   }
 
@@ -3316,7 +3316,7 @@ function resetAppStateToDefaults() {
   appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
   packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING));
   leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
-  citiesData = [];
+  citiesData = typeof DEFAULT_CITIES !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_CITIES)) : [];
   userCities = [];
   userCountries = [];
   journeys = [];
@@ -4868,7 +4868,7 @@ async function loadImportedPayload(importedData, fileName) {
     }
     localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
   } else {
-    citiesData = [];
+    citiesData = typeof DEFAULT_CITIES !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_CITIES)) : [];
     citiesData = extractCitiesFromItinerary();
     normalizeTripCitiesDateData(citiesData);
     if (importedData.userCities && Array.isArray(importedData.userCities)) {
