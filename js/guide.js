@@ -393,6 +393,7 @@ function createTutorialOverlay() {
 function showTutorialStep(index) {
   const step = TUTORIAL_STEPS[index];
   const target = getTutorialTarget(step);
+  if (target) { target.scrollIntoView({ behavior: 'instant', block: 'center' }); }
   const spotlight = document.getElementById('tutorial-spotlight');
   const tooltip   = document.getElementById('tutorial-tooltip');
 
