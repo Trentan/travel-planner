@@ -3241,7 +3241,14 @@ function buildDefaultJourneysFromItinerary(legs) {
           isMultiLeg: false,
           segmentOrder: 1,
           notes: item.text || '',
-          legs: []
+          legs: [],
+          startDate: dayDate,
+          endDate: (item.text.match(/Arr\s*\+(\d+)/) ? addDaysToIsoDate(dayDate, parseInt(item.text.match(/Arr\s*\+(\d+)/)[1], 10)) : dayDate),
+          startTime: item.departureTime || (item.text.match(/Dep\s+(\d{2}:\d{2})/) || [])[1] || '',
+          endTime: item.arrivalTime || (item.text.match(/Arr\s*(?:\+\d\s+)?(\d{2}:\d{2})/) || [])[1] || '',
+          done: false,
+          _inferredToLegId: typeof getCityIdByName === 'function' ? getCityIdByName(toLocation) : '',
+          _inferredFromLegId: leg.id || `leg-${legIndex}`
         });
       });
     });
