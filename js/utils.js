@@ -85,7 +85,7 @@ const DEFAULT_DATA = [
         "desc": "Depart for Tokyo",
         "transportItems": [
           {
-            "text": "Qantas Flight QF61 | Dep 10:15 ➔ Arr 19:00",
+            "text": "Qantas Flight QF61 | Dep 10:15 - Sydney to Tokyo - Arr 19:00",
             "cost": "850",
             "status": "confirmed",
             "bookingRef": "QF88X2"
@@ -366,7 +366,12 @@ const DEFAULT_DATA = [
         "completed": false,
         "desc": "Exploring",
         "transportItems": [],
-        "accomItems": [],
+        "accomItems": [
+          {
+            "text": "Add accommodation...",
+            "cost": "0"
+          }
+        ],
         "activityItems": [
           {
             "text": "Senso-ji Temple in Asakusa",
@@ -401,7 +406,12 @@ const DEFAULT_DATA = [
         "completed": false,
         "desc": "Exploring",
         "transportItems": [],
-        "accomItems": [],
+        "accomItems": [
+          {
+            "text": "Add accommodation...",
+            "cost": "0"
+          }
+        ],
         "activityItems": [
           {
             "text": "Shibuya Crossing & Hachiko",
@@ -435,7 +445,12 @@ const DEFAULT_DATA = [
         "completed": false,
         "desc": "Exploring",
         "transportItems": [],
-        "accomItems": [],
+        "accomItems": [
+          {
+            "text": "Add accommodation...",
+            "cost": "0"
+          }
+        ],
         "activityItems": [
           {
             "text": "Day trip to Kamakura or Yokohama (Optional)",
@@ -682,7 +697,7 @@ const DEFAULT_DATA = [
         "desc": "Arrive from Tokyo",
         "transportItems": [
           {
-            "text": "British Airways Flight BA8 | Dep 09:35 ➔ Arr 16:10",
+            "text": "British Airways Flight BA8 | Dep 09:35 - Tokyo to London - Arr 16:10",
             "cost": "1100",
             "status": "confirmed"
           }
@@ -717,7 +732,14 @@ const DEFAULT_DATA = [
         "completed": false,
         "desc": "Exploring",
         "transportItems": [],
-        "accomItems": [],
+        "accomItems": [
+          {
+            "text": "The Hoxton, Shoreditch",
+            "cost": "250",
+            "status": "confirmed",
+            "cityId": "city-london"
+          }
+        ],
         "activityItems": [
           {
             "text": "British Museum",
@@ -751,7 +773,14 @@ const DEFAULT_DATA = [
         "completed": false,
         "desc": "Exploring",
         "transportItems": [],
-        "accomItems": [],
+        "accomItems": [
+          {
+            "text": "The Hoxton, Shoreditch",
+            "cost": "250",
+            "status": "confirmed",
+            "cityId": "city-london"
+          }
+        ],
         "activityItems": [
           {
             "text": "Buckingham Palace (Changing of the Guard)",
@@ -785,7 +814,14 @@ const DEFAULT_DATA = [
         "completed": false,
         "desc": "Exploring",
         "transportItems": [],
-        "accomItems": [],
+        "accomItems": [
+          {
+            "text": "The Hoxton, Shoreditch",
+            "cost": "250",
+            "status": "confirmed",
+            "cityId": "city-london"
+          }
+        ],
         "activityItems": [
           {
             "text": "Natural History Museum",
@@ -1013,7 +1049,7 @@ const DEFAULT_DATA = [
         "desc": "Arrive from London",
         "transportItems": [
           {
-            "text": "Eurostar Train | Dep 10:30 ➔ Arr 13:47",
+            "text": "Eurostar Train | Dep 10:30 - London to Paris - Arr 13:47",
             "cost": "120",
             "status": "confirmed"
           }
@@ -1048,7 +1084,14 @@ const DEFAULT_DATA = [
         "completed": false,
         "desc": "Exploring",
         "transportItems": [],
-        "accomItems": [],
+        "accomItems": [
+          {
+            "text": "Hotel Le Walt",
+            "cost": "280",
+            "status": "confirmed",
+            "cityId": "city-paris"
+          }
+        ],
         "activityItems": [
           {
             "text": "Louvre Museum (Mona Lisa)",
@@ -1082,7 +1125,14 @@ const DEFAULT_DATA = [
         "completed": false,
         "desc": "Exploring",
         "transportItems": [],
-        "accomItems": [],
+        "accomItems": [
+          {
+            "text": "Hotel Le Walt",
+            "cost": "280",
+            "status": "confirmed",
+            "cityId": "city-paris"
+          }
+        ],
         "activityItems": [
           {
             "text": "Notre-Dame & Latin Quarter Walk",
@@ -1208,7 +1258,7 @@ const DEFAULT_DATA = [
         "desc": "Travel and arrival day",
         "transportItems": [
           {
-            "text": "Emirates Flight EK76 | Dep 21:55 ➔ Arr +1 06:35",
+            "text": "Emirates Flight EK76 | Dep 21:55 - Paris to Dubai - Arr +1 06:35",
             "cost": "750",
             "status": "confirmed"
           }

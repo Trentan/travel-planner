@@ -235,6 +235,12 @@ function autopopulateStays() {
 
     // Show confirmation
     alert(`✅ Created ${createdCount} accommodation stay(s) from itinerary data!`);
+    if (typeof buildAccomTab === 'function') {
+      buildAccomTab();
+    }
+    if (typeof renderAll === 'function') {
+      renderAll();
+    }
   }
 
   return createdCount;
