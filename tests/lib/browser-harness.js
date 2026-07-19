@@ -738,6 +738,9 @@ function createBrowserHarness({
         points,
         options,
         addTo() { return this; },
+        bindPopup() { return this; },
+        on() { return this; },
+        setStyle() { return this; },
         getBounds() {
           return points;
         }

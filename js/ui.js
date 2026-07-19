@@ -781,7 +781,8 @@ document.addEventListener('click', event => {
     menu.open = false;
   }
 });
-// --- Capacitor Mobile Hardware Back Button Support ---
+
+// --- Capacitor Mobile Hardware Back Button Support ---
 if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
   document.addEventListener("DOMContentLoaded", () => {
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
