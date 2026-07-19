@@ -15,6 +15,7 @@ function handleDragLeave(e) {
 }
 
 function handleDrop(e, targetLegIdx, targetDayIdx) {
+ if (typeof triggerHaptic === "function") triggerHaptic("light");
  if (!isEditMode) return;
  e.preventDefault();
  e.currentTarget.classList.remove('drag-over');

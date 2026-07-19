@@ -741,7 +741,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   if (!accomLines) {
     const isLastDay = dayIdx === (leg.days ? leg.days.length - 1 : 0);
     if (!isLastDay) {
-       accomLines = `<div class="compact-grouped-item" style="background-color: #FFFBEB; border-color: #FDE68A; color: #D97706; padding: 6px 10px; font-size: 0.75rem; font-weight: 600;">⚠️ Accommodation needed</div>`;
+       accomLines = `<div class="compact-grouped-item bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-400 px-2.5 py-1.5 text-xs font-semibold">⚠️ Accommodation needed</div>`;
     }
   }
 
@@ -1574,10 +1574,10 @@ function buildCompactItineraryLegacy() {
 
     if ((leg.cityFood || []).length > 0) {
       html += `
-      <div style="margin:4px 0 8px; padding:6px 8px 5px; background:rgba(255,255,255,0.74); border-left:3px solid ${leg.colour}; border-radius:8px; font-size:10px; line-height:1.25;">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:4px; color:#4A4A4A;">
+      <div class="bg-white/75 dark:bg-slate-800/60" style="margin:4px 0 8px; padding:6px 8px 5px; border-left:3px solid ${leg.colour}; border-radius:8px; font-size:10px; line-height:1.25;">
+        <div class="text-slate-700 dark:text-slate-300" style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:4px;">
           <strong style="font-size:10px;">${getCompactFoodQuestTitle(leg.label)}</strong>
-          <span style="font-size:9px; color:#7A7A7A;">Must eat items</span>
+          <span class="text-slate-500 dark:text-slate-400" style="font-size:9px;">Must eat items</span>
         </div>
         <div style="display:flex; flex-direction:column; gap:3px;">
           ${(leg.cityFood || []).map((f, i) => `

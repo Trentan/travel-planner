@@ -201,12 +201,94 @@ function buildJourneyMap() {
     }
 
     const polylinePoints = [];
-    travelSequence.forEach(stop => {
-      const coords = getCityCoords(stop.name);
-      if (coords) {
-        polylinePoints.push([coords.lat, coords.lng]);
+    
+    // Draw transport-aware segments instead of a single line
+    for (let i = 0; i < travelSequence.length - 1; i++) {
+      const fromStop = travelSequence[i];
+      const toStop = travelSequence[i + 1];
+      
+      const fromCoords = getCityCoords(fromStop.name);
+      const toCoords = getCityCoords(toStop.name);
+      
+      if (fromCoords && toCoords) {
+        if (i === 0) polylinePoints.push([fromCoords.lat, fromCoords.lng]);
+        polylinePoints.push([toCoords.lat, toCoords.lng]);
+        
+        // Find transport linking these two
+        let matchedJourney = null;
+        if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
+           matchedJourney = journeys.find(j => {
+             const jFrom = getMapCityKey(j.fromLocation || j.from);
+             const jTo = getMapCityKey(j.toLocation || j.to);
+             const sFrom = getMapCityKey(fromStop.name);
+             const sTo = getMapCityKey(toStop.name);
+             return jFrom === sFrom && jTo === sTo;
+           });
+        }
+        
+        let lineColor = '#FF6B6B'; // default
+        let dashArray = '10, 10';
+        let weight = 3;
+        
+        if (matchedJourney) {
+           const method = String(matchedJourney.method || '').toLowerCase();
+           if (method === 'flight') {
+              lineColor = '#3b82f6'; // blue
+              dashArray = '8, 8';
+           } else if (method === 'train') {
+              lineColor = '#22c55e'; // green
+              dashArray = null;
+           } else if (method === 'bus' || method === 'coach') {
+              lineColor = '#f97316'; // orange
+              dashArray = null;
+           } else if (method === 'car' || method === 'drive') {
+              lineColor = '#64748b'; // slate
+              dashArray = null;
+           } else {
+              lineColor = '#8b5cf6'; // purple fallback
+              dashArray = '5, 5';
+           }
+        }
+        
+        const polyline = L.polyline([
+          [fromCoords.lat, fromCoords.lng], 
+          [toCoords.lat, toCoords.lng]
+        ], { 
+          color: lineColor, 
+          weight: weight, 
+          dashArray: dashArray, 
+          opacity: 0.8 
+        }).addTo(mainMap);
+        
+        let popupHtml = '<div style="font-family: inherit; padding: 2px;">';
+        if (matchedJourney) {
+           const method = matchedJourney.method || 'Transport';
+           const mCap = method.charAt(0).toUpperCase() + method.slice(1);
+           popupHtml += '<strong>' + mCap + '</strong> from ' + fromStop.name + ' to ' + toStop.name;
+           if (matchedJourney.provider) popupHtml += '<br><span style="color:#666;">' + matchedJourney.provider + '</span>';
+           if (matchedJourney.departureTime || matchedJourney.arrivalTime) {
+             popupHtml += '<br><span style="color:#666; font-size:0.9em;">';
+             if (matchedJourney.departureTime) popupHtml += 'Dep: ' + matchedJourney.departureTime + ' ';
+             if (matchedJourney.arrivalTime) popupHtml += 'Arr: ' + matchedJourney.arrivalTime;
+             popupHtml += '</span>';
+           }
+        } else {
+           popupHtml += '<strong>' + fromStop.name + ' &rarr; ' + toStop.name + '</strong><br><span style="color:#666;">No linked transport</span>';
+        }
+        popupHtml += '</div>';
+        
+        polyline.bindPopup(popupHtml);
+        
+        polyline.on('mouseover', function(e) {
+          this.setStyle({ weight: 5, opacity: 1 });
+        });
+        polyline.on('mouseout', function(e) {
+          this.setStyle({ weight: weight, opacity: 0.8 });
+        });
+        
+        mapPolylines.push(polyline);
       }
-    });
+    }
 
     destinations.forEach(d => {
       const isTransit = d.isTransit;
@@ -231,10 +313,7 @@ function buildJourneyMap() {
       mapMarkers.push({ id: d.id, name: d.name, marker: marker });
     });
 
-    if (polylinePoints.length > 1) {
-      const polyline = L.polyline(polylinePoints, { color: '#FF6B6B', weight: 3, dashArray: '10, 10', opacity: 0.7 }).addTo(mainMap);
-      mapPolylines.push(polyline);
-    }
+
 
     updateMapLegend(destinations);
     updateMapStats(destinations, unmatchedCities);
@@ -247,7 +326,7 @@ function buildJourneyMap() {
         if (window.currentCityFilter && window.currentCityFilter !== 'all') {
           focusCityOnMap(window.currentCityFilter);
         } else if (polylinePoints.length > 1 && mapPolylines.length > 0) {
-          mainMap.fitBounds(mapPolylines[0].getBounds(), { padding: [50, 50], animate: false });
+          mainMap.fitBounds(L.polyline(polylinePoints).getBounds(), { padding: [50, 50], animate: false });
         } else if (polylinePoints.length === 1) {
           mainMap.setView(polylinePoints[0], 10, { animate: false });
         } else {

@@ -303,6 +303,37 @@ function applyUiSettings() {
   syncItineraryViewModeButtons();
   syncShowMoneyButtons();
   setHeaderEditable(isEditMode);
+  syncReadOnlyBanner();
+}
+
+/**
+ * Show or hide the read-only banner based on current isEditMode.
+ * If the user has dismissed it this session AND we're still locked, keep it hidden
+ * until the mode changes (i.e., unlock then re-lock will re-show it).
+ */
+function syncReadOnlyBanner() {
+  const banner = document.getElementById('readOnlyBanner');
+  if (!banner) return;
+  if (!isEditMode) {
+    // In read-only mode: show unless the user dismissed it this session
+    const dismissed = sessionStorage.getItem('readOnlyBannerDismissed') === 'true';
+    banner.style.display = dismissed ? 'none' : '';
+  } else {
+    // In edit mode: clear dismiss flag and hide via CSS (body class removed)
+    sessionStorage.removeItem('readOnlyBannerDismissed');
+    banner.style.display = '';
+  }
+}
+
+/**
+ * Let the user dismiss the read-only banner for this session.
+ * It will re-show if they unlock then re-lock the trip.
+ */
+function dismissReadOnlyBanner() {
+  const banner = document.getElementById('readOnlyBanner');
+  if (!banner) return;
+  sessionStorage.setItem('readOnlyBannerDismissed', 'true');
+  banner.style.display = 'none';
 }
 
 function syncShowMoneyButtons() {
@@ -395,6 +426,7 @@ function toggleEditMode() {
   if(isEditMode) { btn.innerHTML = "🔒 Lock"; btn.classList.remove('edit-mode'); }
   else { btn.innerHTML = "✏️ Unlock"; btn.classList.add('edit-mode'); saveData(); }
 
+  syncReadOnlyBanner();
   applyUiSettings();
   const activeTabBtn = document.querySelector('.app-tab-btn.active');
   const activeTabId = activeTabBtn ? activeTabBtn.getAttribute('data-tab') : '';
@@ -690,6 +722,8 @@ window.addLeg = addLeg;
 window.openRenameTripDialog = openRenameTripDialog;
 window.closeRenameTripDialog = closeRenameTripDialog;
 window.saveRenameTripDialog = saveRenameTripDialog;
+window.syncReadOnlyBanner = syncReadOnlyBanner;
+window.dismissReadOnlyBanner = dismissReadOnlyBanner;
 let lastScrollY = window.scrollY || 0;
 let cityNavEl = null;
 
@@ -748,3 +782,189 @@ document.addEventListener('click', event => {
   }
 });
 
+// --- Capacitor Mobile Hardware Back Button Support ---
+if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      window.Capacitor.Plugins.App.addListener("backButton", ({ canGoBack }) => {
+        // 1. Check if mobile menu is open
+        if (typeof isMobileMenuOpen !== "undefined" && isMobileMenuOpen) {
+          if (typeof toggleMobileMenu === "function") {
+            toggleMobileMenu();
+            return;
+          }
+        }
+
+        // 2. Check if a guide tooltip overlay is active
+        const tooltipOverlay = document.getElementById("guide-tooltip-overlay");
+        if (tooltipOverlay && tooltipOverlay.style.display !== "none") {
+          if (typeof nextTutorialStep === "function") {
+            // You could skip or go next. We will just hide the tooltip for back button.
+            if (typeof skipTutorial === "function") skipTutorial();
+            return;
+          }
+        }
+
+        // 3. Find any open modals and close the topmost one
+        const openModals = Array.from(document.querySelectorAll(".modal-overlay")).filter(m => m.style.display && m.style.display !== "none");
+        if (openModals.length > 0) {
+          // Just hide the last one found in DOM, assuming its the topmost
+          const topmostModal = openModals[openModals.length - 1];
+          topmostModal.style.display = "none";
+          
+          // Specifically handle some states if we just closed their modal
+          if (topmostModal.id === "rename-trip-modal") {
+            if (typeof editingTripName !== "undefined") editingTripName = false;
+          }
+          return;
+        }
+
+        // 4. Check if map sidebar is open on mobile
+        if (typeof mapSidebarOpen !== "undefined" && mapSidebarOpen && isMobileViewport()) {
+           if (typeof toggleMapSidebar === "function") {
+             toggleMapSidebar();
+             return;
+           }
+        }
+
+        // 5. If nothing is open, we can let the app exit or go back
+        if (!canGoBack) {
+          window.Capacitor.Plugins.App.exitApp();
+        } else {
+          window.history.back();
+        }
+      });
+    }
+  });
+}
+
+
+// --- Haptics Helper ---
+window.triggerHaptic = async function(type = "light") {
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
+    try {
+      if (type === "success") {
+        await window.Capacitor.Plugins.Haptics.notification({ type: "SUCCESS" });
+      } else if (type === "warning") {
+        await window.Capacitor.Plugins.Haptics.notification({ type: "WARNING" });
+      } else if (type === "error") {
+        await window.Capacitor.Plugins.Haptics.notification({ type: "ERROR" });
+      } else {
+        await window.Capacitor.Plugins.Haptics.impact({ style: type.toUpperCase() }); // LIGHT, MEDIUM, HEAVY
+      }
+    } catch(e) { /* ignore on unsupported devices */ }
+  }
+};
+
+
+// --- Cloud File Resync Flow ---
+if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      let lastSuspendedTime = Date.now();
+      window.Capacitor.Plugins.App.addListener("appStateChange", ({ isActive }) => {
+        if (!isActive) {
+          lastSuspendedTime = Date.now();
+        } else {
+          // If suspended for > 30 seconds, show the resync modal
+          if (Date.now() - lastSuspendedTime > 30000) {
+            const resyncModal = document.getElementById("resync-modal");
+            if (resyncModal && resyncModal.style.display === "none") {
+              resyncModal.style.display = "flex";
+              if (typeof triggerHaptic === "function") triggerHaptic("light");
+            }
+          }
+        }
+      });
+    }
+  });
+}
+
+window.openTripSummaryModal = openTripSummaryModal;
+window.closeTripSummaryModal = closeTripSummaryModal;
+
+function openTripSummaryModal() {
+  const modal = document.getElementById('trip-summary-modal');
+  if (!modal) return;
+  const tbody = document.getElementById('tripSummaryTableBody');
+  tbody.innerHTML = '';
+
+  if (!appData || appData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No trip data available.</td></tr>';
+    modal.style.display = 'flex';
+    return;
+  }
+
+  // Iterate over all legs and days
+  appData.forEach(leg => {
+    if (!leg.days) return;
+    leg.days.forEach(day => {
+      // Date
+      let displayDate = 'TBD';
+      if (day.date) {
+        displayDate = typeof formatDateStringForDisplay === 'function' 
+          ? formatDateStringForDisplay(day.date)
+          : day.date;
+      }
+      
+      // City
+      const city = day.to || leg.city || 'Unknown City';
+
+      // Accom
+      let accomStr = '<span class="text-slate-400 italic">None</span>';
+      if (day.date && typeof stays !== 'undefined') {
+        const nightStays = stays.filter(s => s.checkIn <= day.date && s.checkOut > day.date);
+        if (nightStays.length > 0) {
+          accomStr = nightStays.map(s => {
+            let sStr = '<strong class="text-slate-800 dark:text-slate-200">' + (s.name || 'Stay') + '</strong>';
+            if (s.neighborhood) sStr += ' <span class="text-xs text-slate-500 block">' + s.neighborhood + '</span>';
+            return sStr;
+          }).join('<br>');
+        }
+      }
+
+      // Transport & Activities
+      let eventsHtml = '';
+      
+      if (day.date && typeof journeys !== 'undefined') {
+        const dayJourneys = journeys.filter(j => j.dep && j.dep.startsWith(day.date));
+        if (dayJourneys.length > 0) {
+          eventsHtml += dayJourneys.map(j => {
+            const method = j.method || 'Transport';
+            return '<div class="mb-1 text-blue-600 dark:text-blue-400 text-sm flex items-center">' +
+                      '<span class="mr-1 text-lg">??</span>' +
+                      '<span>' + (j.from || '?') + ' &rarr; ' + (j.to || '?') + '</span>' +
+                    '</div>';
+          }).join('');
+        }
+      }
+
+      if (day.sights && day.sights.length > 0) {
+        eventsHtml += '<ul class="list-disc pl-4 text-sm text-slate-700 dark:text-slate-300 mt-1">';
+        day.sights.forEach(sight => {
+          eventsHtml += '<li>' + (sight.name || sight.title || 'Activity') + '</li>';
+        });
+        eventsHtml += '</ul>';
+      }
+
+      if (!eventsHtml) {
+        eventsHtml = '<span class="text-slate-400 italic text-sm">Free day</span>';
+      }
+
+      const row = document.createElement('tr');
+      row.className = 'border-b border-slate-200 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors';
+      row.innerHTML = '<td class="px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap align-top">' + displayDate + '</td>' +
+        '<td class="px-4 py-3 text-sm font-semibold text-slate-800 dark:text-slate-100 align-top">' + city + '</td>' +
+        '<td class="px-4 py-3 text-sm align-top">' + accomStr + '</td>' +
+        '<td class="px-4 py-3 text-sm align-top">' + eventsHtml + '</td>';
+      tbody.appendChild(row);
+    });
+  });
+
+  modal.style.display = 'flex';
+}
+
+function closeTripSummaryModal() {
+  const modal = document.getElementById('trip-summary-modal');
+  if (modal) modal.style.display = 'none';
+}
