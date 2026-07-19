@@ -281,13 +281,13 @@ async function testCrudSmoke() {
   context.deleteDayItem(testLegIdx, 0, 'activityItems', 0);
   assert(!state(context).itinerary[testLegIdx].days[0].activityItems.some(item => item.text === 'Walk the city'), 'CRUD smoke: deleteDayItem should remove day item');
 
-  const targetLegIdx = state(context).itinerary.findIndex(leg => leg.id === 'leg-1' || leg.days?.[0]?.date === '2026-01-01');
+  const targetLegIdx = state(context).itinerary.findIndex(leg => leg.id === 'city-sydney-start' || leg.days?.[0]?.date === '2026-06-01');
   assert(targetLegIdx >= 0, 'CRUD smoke: should find the original start leg');
 
   context.addLeg();
   const newlyAddedLegIdx = state(context).itinerary.findIndex(leg => leg.label === '📍 New City' || leg.days?.[0]?.date === 'DD Mon');
   assert(newlyAddedLegIdx >= 0, 'CRUD smoke: should find the temporary leg used for conflict testing');
-  context.updateDayData(newlyAddedLegIdx, 0, 'date', '2026-01-02');
+  context.updateDayData(newlyAddedLegIdx, 0, 'date', '2026-06-02');
   context.updateDayData(newlyAddedLegIdx, 0, 'day', 'Tue');
 
   const legZeroStartLength = state(context).itinerary[targetLegIdx].days.length;
@@ -304,11 +304,11 @@ async function testCrudSmoke() {
     'CRUD smoke: adjustLegDays should add a day to the leg'
   );
   assert(
-    state(context).itinerary[targetLegIdx].days[1].date === '2026-01-02',
+    state(context).itinerary[targetLegIdx].days[1].date === '2026-06-02',
     'CRUD smoke: added day should advance to the next calendar date'
   );
   assert(
-    state(context).itinerary[targetLegIdx].days[1].day === 'Fri',
+    state(context).itinerary[targetLegIdx].days[1].day === 'Tue',
     'CRUD smoke: added day should refresh the weekday label'
   );
   assert(
@@ -742,14 +742,14 @@ async function testExportImport() {
     journeyId: 'journey_export_sub_locations',
     journeyName: 'Export sub-location journey',
     legId: state(context).itinerary[0].id,
-    dayDate: '2026-01-04',
+    dayDate: '2026-06-04',
     fromLocation: 'London',
     toLocation: 'Paris',
     fromCityId: 'london',
     toCityId: 'paris',
-    departureDate: '2026-01-04',
+    departureDate: '2026-06-04',
     departureTime: '09:15',
-    arrivalDate: '2026-01-04',
+    arrivalDate: '2026-06-04',
     arrivalTime: '12:30',
     transportType: 'train',
     provider: 'Eurostar',
