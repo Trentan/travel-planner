@@ -280,10 +280,12 @@ const TUTORIAL_STEPS = [
   },
   {
     target: '.app-menu-right',
-    mobileTarget: '.mobile-tabs-menu-btn',  // hamburger button visible on mobile
+    mobileTarget: '.mobile-menu-sheet-panel',  // hamburger button visible on mobile
     title: 'View Modes & Tools',
     text: 'Use Read Only, Cities, AI Builder, Guide, and more from the top menu. On mobile, tap the ☰ hamburger for the full menu.',
-    position: 'bottom'
+    position: 'bottom',
+      onEnterMobile: () => { if (typeof toggleMobileMenu === 'function' && !document.getElementById('mobileMenuSheet').classList.contains('open')) toggleMobileMenu(); },
+      onLeaveMobile: () => { if (typeof closeMobileMenu === 'function') closeMobileMenu(); }
   },
   {
     target: '#cityNav',
@@ -414,7 +416,16 @@ function showTutorialStep(index) {
 
   // ── Mobile: bottom-sheet tooltip, no absolute positioning ──────────────
   if (isMobile()) {
-    applyMobileTutorialStyles(tooltip, spotlight, target);
+    if (step.onEnterMobile) {
+      step.onEnterMobile();
+      setTimeout(() => {
+        const t = getTutorialTarget(step);
+        if (t) t.scrollIntoView({ behavior: 'instant', block: 'center' });
+        applyMobileTutorialStyles(tooltip, spotlight, t);
+      }, 350);
+    } else {
+      applyMobileTutorialStyles(tooltip, spotlight, target);
+    }
     return;
   }
 
@@ -498,6 +509,8 @@ function applyDesktopTutorialStyles(tooltip, spotlight, target, step) {
 }
 
 function nextTutorialStep() {
+  const prev = TUTORIAL_STEPS[currentTutorialStep];
+  if (prev && isMobile() && prev.onLeaveMobile) prev.onLeaveMobile();
   if (currentTutorialStep < TUTORIAL_STEPS.length - 1) {
     currentTutorialStep++;
     showTutorialStep(currentTutorialStep);
@@ -507,6 +520,8 @@ function nextTutorialStep() {
 }
 
 function prevTutorialStep() {
+  const prev = TUTORIAL_STEPS[currentTutorialStep];
+  if (prev && isMobile() && prev.onLeaveMobile) prev.onLeaveMobile();
   if (currentTutorialStep > 0) {
     currentTutorialStep--;
     showTutorialStep(currentTutorialStep);
@@ -514,6 +529,8 @@ function prevTutorialStep() {
 }
 
 function skipTutorial() {
+  const prev = TUTORIAL_STEPS[currentTutorialStep];
+  if (prev && isMobile() && prev.onLeaveMobile) prev.onLeaveMobile();
   endTutorial();
 }
 
