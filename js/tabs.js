@@ -1,4 +1,4 @@
-﻿// buildTransportTab is now defined in transport.js
+// buildTransportTab is now defined in transport.js
 
 let expandedStayRows = new Set();
 
@@ -138,6 +138,7 @@ function renderStayMobileDetails(stay, cityName) {
   const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
   const costValue = formatCurrency(stay.totalCost || '0');
   const locationUrl = stay.location ? getMapSearchUrl(stay.location, cityName) : '';
+  const attachmentsHtml = stay.attachments && stay.attachments.length > 0 ? `<div class="stay-mobile-fact stay-mobile-fact--wide"><span class="stay-mobile-fact-label">Attachments & Links</span><div class="flex flex-wrap gap-1 mt-1">` + renderAttachmentsPillsHtml(stay.attachments) + `</div></div>` : '';
 
   return `
     <div class="stay-mobile-facts-grid">
@@ -153,6 +154,7 @@ function renderStayMobileDetails(stay, cityName) {
       ${renderStayMobileFact('Cost', costValue)}
       ${renderStayMobileFact('Booking #', stay.bookingRef || '')}
       ${renderStayMobileFact('Notes', stay.notes || '', 'stay-mobile-fact--wide')}
+      ${attachmentsHtml}
     </div>
   `;
 }
@@ -321,6 +323,7 @@ function buildAccomTab(cityFilter = null) {
       <!-- Notes -->
       <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[250px] break-words" title="${escapeHtmlText(stay.notes || '')}">
         ${escapeHtmlText(stay.notes || '—')}
+        ${stay.attachments && stay.attachments.length > 0 ? '<div class="mt-2 flex flex-wrap gap-1">' + renderAttachmentsPillsHtml(stay.attachments) + '</div>' : ''}
       </td>
 
       <td class="px-4 py-3 align-middle text-center">

@@ -346,7 +346,7 @@ function createTutorialOverlay() {
 
 function showTutorialStep(index) {
   const step = TUTORIAL_STEPS[index];
-  const target = document.querySelector(step.target);
+  let target = document.querySelector(step.target);
   const spotlight = document.getElementById('tutorial-spotlight');
   const tooltip = document.getElementById('tutorial-tooltip');
 
@@ -364,8 +364,32 @@ function showTutorialStep(index) {
   });
 
   // Position spotlight and tooltip
-  if (target) {
-    const rect = target.getBoundingClientRect();
+  
+    // Dynamic mobile fallbacks
+    let isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      if (step.target === '.app-menu-right') target = document.querySelector('.mobile-menu-btn') || target;
+      if (step.target === '.app-tabs-nav') step.position = 'top';
+    }
+
+    if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    
+      let rect = target.getBoundingClientRect();
+      let isVisible = rect.width > 0 && rect.height > 0;
+      
+      if (!isVisible) {
+        spotlight.style.display = 'none';
+        tooltip.style.left = '50%';
+        tooltip.style.top = '50%';
+        tooltip.style.transform = 'translate(-50%, -50%)';
+        return;
+      }
+      
+      spotlight.style.display = 'block';
+      tooltip.style.transform = 'none';
+
     spotlight.style.left = rect.left - 4 + 'px';
     spotlight.style.top = rect.top - 4 + 'px';
     spotlight.style.width = rect.width + 8 + 'px';

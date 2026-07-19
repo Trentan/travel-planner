@@ -909,6 +909,11 @@ function renderTransportSegmentsDetailContent(segs) {
             ${seg.bookingReference ? `<span class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded font-mono">${escapeHtmlText(seg.bookingReference)}</span>` : ''}
             <span class="ml-auto font-semibold text-slate-800 dark:text-slate-200">${seg.cost ? escapeHtmlText(formatCurrency(seg.cost)) : '—'}</span>
           </div>
+          <div class="journey-segment-notes" style="display:${seg.notes ? 'block' : 'none'};">
+            <span class="segment-notes-label">Notes:</span> 
+            <span class="segment-notes-text">${escapeHtmlText(seg.notes || '')}</span>
+          </div>
+          ${seg.attachments && seg.attachments.length > 0 ? '<div class="journey-segment-attachments mt-1 flex flex-wrap gap-1">' + renderAttachmentsPillsHtml(seg.attachments) + '</div>' : ''}
         </div>
       `;
     }
@@ -1457,6 +1462,12 @@ function _loadSegmentIntoForm(seg) {
   document.getElementById('journeyFromAddress').value = seg.fromAddress || '';
   document.getElementById('journeyToAddress').value = seg.toAddress || '';
   document.getElementById('journeyDateFrom').value = seg.departureDate || '';
+  
+  if (typeof window._currentAttachments !== 'undefined') {
+    window._currentAttachments = seg.attachments ? [...seg.attachments] : [];
+    if (typeof renderJourneyAttachmentsList === 'function') renderJourneyAttachmentsList();
+  }
+
   document.getElementById('journeyTimeFrom').value = seg.departureTime || '';
   document.getElementById('journeyDateTo').value = seg.arrivalDate || '';
   document.getElementById('journeyTimeTo').value = seg.arrivalTime || '';
@@ -1579,6 +1590,11 @@ function openAddJourneyModal() {
     _pendingSegments = [];
     _pendingJourneyName = ''; // Reset name
     _activeSegmentIndex = -1;
+    
+    if (typeof window._currentAttachments !== 'undefined') {
+      window._currentAttachments = [];
+      if (typeof renderJourneyAttachmentsList === 'function') renderJourneyAttachmentsList();
+    }
 
     _populateJourneyCityDropdowns();
 
@@ -1762,7 +1778,8 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
     notes: notes,
     fromAddress: fromAddress,
     toAddress: toAddress,
-    legs: []
+    legs: [],
+    attachments: typeof window._currentAttachments !== 'undefined' ? [...window._currentAttachments] : []
   };
 }
 

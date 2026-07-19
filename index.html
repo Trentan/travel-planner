@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Travel Planner">
   <title>Travel Planner</title>
   <link rel="icon" type="image/png" href="./favicon.png">
@@ -19,7 +19,7 @@
       document.head.appendChild(link);
     }
   </script>
-  <meta name="theme-color" content="#1A242F">
+  <meta name="theme-color" content="#000000">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./dist/tailwind.css?v=9">
   <!-- Leaflet.js for interactive maps -->
@@ -739,7 +739,21 @@
               </div>
             </div>
 
-            <div id="pendingSegmentsList" class="journey-pending-segments">
+            
+                <!-- Panel 3: Attachments -->
+                <div class="journey-form-group-panel">
+                  <div class="ai-form-group span-2">
+                    <label>Attachments & Links</label>
+                    <div id="journeyAttachmentsList" class="attachments-list flex flex-col gap-2 mb-2"></div>
+                    <div class="flex gap-2">
+                      <button type="button" class="action-btn action-btn-secondary text-sm px-2 py-1" onclick="promptAddJourneyLink()">📎 Add Link</button>
+                      <button type="button" class="action-btn action-btn-secondary text-sm px-2 py-1" onclick="document.getElementById('journeyImageUpload').click()">🖼️ Upload Image</button>
+                      <input type="file" id="journeyImageUpload" accept="image/*" style="display: none;" onchange="handleJourneyImageUpload(event)">
+                    </div>
+                  </div>
+                </div>
+
+              <div id="pendingSegmentsList" class="journey-pending-segments">
             </div>
           </div>
 
@@ -856,6 +870,7 @@
 </main>
 
 <script src="./js/utils.js"></script>
+  <script src="./js/attachments.js"></script>
 <script src="./js/data.js"></script>
 <script src="./js/packing.js"></script>
 <script src="./js/dragdrop.js"></script>
@@ -951,5 +966,12 @@
   buildItinerary();
   reObserveLegs();
 </script>
+
+  <!-- Fullscreen Image Lightbox -->
+  <div id="image-lightbox" class="modal-overlay" style="display: none; z-index: 10000; background-color: rgba(0,0,0,0.9);" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;">&times;</button>
+    <img id="lightbox-img" src="" style="max-width: 90vw; max-height: 90vh; margin: auto; display: block; object-fit: contain; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+  </div>
+
 </body>
 </html>

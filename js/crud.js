@@ -3011,6 +3011,10 @@ function openAddStayModal() {
   if (!modal) return;
 
   editingStayId = null; // Reset editing state
+  if (typeof window._currentAttachments !== 'undefined') {
+    window._currentAttachments = [];
+    if (typeof renderStayAttachmentsList === 'function') renderStayAttachmentsList();
+  }
 
   // Update modal title
   const title = modal.querySelector('h2');
@@ -3071,6 +3075,10 @@ function openEditStayModal(stayId) {
   if (!stay) return;
 
   editingStayId = stayId; // Set editing state
+  if (typeof window._currentAttachments !== 'undefined') {
+    window._currentAttachments = stay.attachments ? [...stay.attachments] : [];
+    if (typeof renderStayAttachmentsList === 'function') renderStayAttachmentsList();
+  }
 
   // Update modal title
   const title = modal.querySelector('h2');
@@ -3167,6 +3175,7 @@ function saveStayFromModal() {
       stay.bookingRef = bookingRef;
       stay.totalCost = totalCost;
       stay.notes = notes;
+      stay.attachments = typeof window._currentAttachments !== 'undefined' ? [...window._currentAttachments] : [];
     }
     editingStayId = null; // Reset editing state
   } else {
@@ -3185,7 +3194,8 @@ function saveStayFromModal() {
       provider: provider,
       bookingRef: bookingRef,
       totalCost: totalCost,
-      notes: notes
+      notes: notes,
+      attachments: typeof window._currentAttachments !== 'undefined' ? [...window._currentAttachments] : []
     };
     stays.push(stay);
   }
