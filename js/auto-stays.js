@@ -19,6 +19,7 @@ function calculateExpectedStays() {
     const legId = String(leg.id || '');
     if (legId === 'departure' || legId === 'return' ||
         label.includes('(trip start)') || label.includes('(trip finish)') || label.includes('(trip end)') ||
+        label.includes('(transit)') ||
         legId.endsWith('-start') || legId.endsWith('-finish')) {
       return;
     }
@@ -92,6 +93,9 @@ function getMissingStays() {
     c = c.replace(/\s*\(Trip End\)/gi, '');
     c = c.replace(/\s*\(Trip Finish\)/gi, '');
     c = c.replace(/\s*\(\d+\)/g, '');
+    if (c.toLowerCase().includes('(transit)')) {
+      return ''; // returning empty string causes it to be grouped with nothing or skipped
+    }
     return c.trim().toLowerCase();
   };
 

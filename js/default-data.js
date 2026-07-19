@@ -54,7 +54,7 @@ var DEFAULT_TRIP_DATA = {
           "desc": "Depart Sydney for Tokyo",
           "transportItems": [
             {
-              "text": "Qantas Flight QF61 | Dep 10:15 | Arr +1 19:00 | Sydney → Tokyo",
+              "text": "Qantas Flight QF61 | Dep 10:15 | Arr 19:00 | Sydney → Tokyo",
               "cost": "850",
               "status": "confirmed",
               "fromLocation": "Sydney Kingsford Smith (SYD) - Terminal 1",
@@ -261,10 +261,10 @@ var DEFAULT_TRIP_DATA = {
           "bookingRef": "",
           "externalLink": "",
           "assignedDayIdx": 0,
-          "assignedDate": "2026-06-02",
-          "startDate": "2026-06-02",
+          "assignedDate": "2026-06-01",
+          "startDate": "2026-06-01",
           "startTime": "20:00",
-          "endDate": "2026-06-02",
+          "endDate": "2026-06-01",
           "endTime": "22:00",
           "cityId": "city-tokyo"
         },
@@ -385,12 +385,12 @@ var DEFAULT_TRIP_DATA = {
       ],
       "days": [
         {
-          "date": "2026-06-02",
-          "day": "Tue",
+          "date": "2026-06-01",
+          "day": "Mon",
           "from": "Sydney",
           "to": "Tokyo",
           "completed": false,
-          "desc": "Arrive in Tokyo",
+          "desc": "Arrive in Tokyo, evening check-in",
           "transportItems": [],
           "accomItems": [
             {
@@ -400,7 +400,7 @@ var DEFAULT_TRIP_DATA = {
               "provider": "Booking.com",
               "cityId": "city-tokyo",
               "location": "1-30-1 Kabukicho, Shinjuku City",
-              "checkInTime": "15:00",
+              "checkInTime": "20:00",
               "checkOutTime": "11:00",
               "bookingRef": "BK-TYO-2847"
             }
@@ -413,8 +413,8 @@ var DEFAULT_TRIP_DATA = {
               "done": false,
               "startTime": "20:00",
               "endTime": "22:00",
-              "startDate": "2026-06-02",
-              "endDate": "2026-06-02",
+              "startDate": "2026-06-01",
+              "endDate": "2026-06-01",
               "activityId": "act-hu4o3nsbi-mrsfaupt",
               "cityId": "city-tokyo"
             }
@@ -2612,7 +2612,7 @@ var DEFAULT_TRIP_DATA = {
       "bookingReference": "QF88X2",
       "isMultiLeg": false,
       "segmentOrder": 1,
-      "notes": "Qantas Flight QF61 | Dep 10:15 | Arr +1 19:00 | Sydney → Tokyo",
+      "notes": "Qantas Flight QF61 | Dep 10:15 | Arr 19:00 | Sydney → Tokyo",
       "legs": [],
       "startDate": "2026-06-01",
       "endDate": "2026-06-01",
@@ -2764,17 +2764,17 @@ var DEFAULT_TRIP_DATA = {
       "id": "stay_default_city-tokyo_0_0",
       "cityId": "city-tokyo",
       "propertyName": "Shinjuku Prince Hotel",
-      "checkIn": "2026-06-02",
+      "checkIn": "2026-06-01",
       "checkOut": "2026-06-07",
-      "nights": 5,
+      "nights": 6,
       "status": "confirmed",
       "provider": "Booking.com",
       "bookingRef": "BK-TYO-2847",
       "totalCost": "750",
       "notes": "Shinjuku Prince Hotel",
-      "checkInTime": "",
+      "checkInTime": "20:00",
       "checkOutTime": "",
-      "startDate": "2026-06-02",
+      "startDate": "2026-06-01",
       "endDate": "2026-06-07",
       "startTime": "",
       "endTime": "",
