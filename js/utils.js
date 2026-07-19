@@ -597,6 +597,8 @@ const DEFAULT_LEAVE_HOME = [
   { text: "Set up lights on timers if away long", done: false },
 
   { text: "Travel ready", kind: "section" },
+  { text: "Setup international cards on smart devices (Apple Pay / Google Pay)", done: false },
+  { text: "Setup default transport card on smart devices", done: false },
   { text: "Charge all devices including phones, tablets, and power banks", done: false },
   { text: "Download offline maps and confirmations", done: false },
   { text: "Notify emergency contact of travel plans", done: false },

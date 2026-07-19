@@ -2080,6 +2080,11 @@
     }
 
     /* Mobile modals: full-width on small screens with readable text */
+    body.mobile-app-mode .modal-overlay {
+      padding-top: calc(0.5rem + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
     body.mobile-app-mode .modal-content {
       max-width: 100%;
       border-radius: 1rem;
