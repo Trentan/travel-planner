@@ -3008,7 +3008,7 @@ function _syncStayModalActions() {
   if (deleteBtn) deleteBtn.style.display = editingStayId ? 'inline-flex' : 'none';
 }
 
-function openAddStayModal() {
+function openAddStayModal(defaultCityId, defaultCheckIn) {
   const modal = document.getElementById('stay-modal');
   if (!modal) return;
 
@@ -3037,7 +3037,7 @@ function openAddStayModal() {
   // Clear form fields
   document.getElementById('stayPropertyName').value = '';
   document.getElementById('stayLocation').value = '';
-  document.getElementById('stayCheckIn').value = '';
+  document.getElementById('stayCheckIn').value = defaultCheckIn || '';
   document.getElementById('stayCheckInTime').value = '';
   document.getElementById('stayCheckOut').value = '';
   document.getElementById('stayCheckOutTime').value = '';

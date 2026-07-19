@@ -741,7 +741,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   if (!accomLines) {
     const isLastDay = dayIdx === (leg.days ? leg.days.length - 1 : 0);
     if (!isLastDay) {
-       accomLines = `<div class="compact-grouped-item bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-400 px-2.5 py-1.5 text-xs font-semibold">⚠️ Accommodation needed</div>`;
+       accomLines = `<div class="compact-grouped-item bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-400 px-2.5 py-1.5 text-xs font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors" onclick="event.stopPropagation(); if(typeof openAddStayModal === 'function') openAddStayModal('${leg.id}', '${day.date}');">⚠️ Accommodation needed</div>`;
     }
   }
 
@@ -3131,7 +3131,7 @@ ${(() => {
         if (dayStayInfo.length === 0) {
           const isLastDay = dayIndex === (leg.days ? leg.days.length - 1 : 0);
           if (!isLastDay) {
-            return `<div class="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-500 text-sm rounded border border-amber-200 dark:border-amber-800/50 font-medium flex items-center gap-2">
+            return `<div class="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-500 text-sm rounded border border-amber-200 dark:border-amber-800/50 font-medium flex items-center gap-2 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors" onclick="event.stopPropagation(); if(typeof openAddStayModal === 'function') openAddStayModal('${leg.id}', '${day.date}');">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 Accommodation needed for tonight
             </div>`;
