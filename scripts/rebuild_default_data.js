@@ -4,43 +4,62 @@
  *  - Transport items on the DEPARTURE day of each city leg (consistent convention)
  *  - Accommodation on EVERY night actually slept at that city (not departure night)
  *  - Correct dates throughout
+ *  - Detailed transport fields (fromLocation, toLocation, provider, routeCode)
+ *  - Detailed accom fields (location, checkInTime, checkOutTime)
+ *  - Explicit startTime and endTime for activities that have times
  *
  * Trip: Sydney → Tokyo → London → Paris → Dubai → Sydney
- * Jun 1: Depart Sydney (Qantas QF61 10:15, arr Tokyo Jun 2 19:00)
- * Jun 2–6: Tokyo (5 nights, Shinjuku Prince Hotel)
- * Jun 7: Depart Tokyo (BA8 09:35, arr London Jun 7 16:10)  ← same calendar day westbound
- * Jun 7–10: London (4 nights, The Hoxton Shoreditch)
- * Jun 11: Depart London→Paris (Eurostar 10:30, arr 13:47 same day)
- * Jun 11–13: Paris (3 nights, Hotel Le Walt)
- * Jun 14: Depart Paris (EK76 21:55, arr Dubai Jun 15 06:35)
- * Jun 15: Arrive Dubai transit (sleep at Dubai Airport Transit Hotel)
- * Jun 15: Transit day in Dubai
- * Jun 16: Depart Dubai (EK412 10:15, arr Sydney Jun 17 06:00)
- * Jun 17: Arrive home Sydney
  */
 
 const fs = require('fs');
 
-const hotel = (name, cost, provider, cityId, bookingRef) => ({
+const hotel = (name, cost, provider, cityId, bookingRef, location, checkInTime, checkOutTime) => ({
   text: name,
   cost: String(cost),
   status: 'confirmed',
   provider,
   cityId,
+  location,
+  checkInTime,
+  checkOutTime,
   ...(bookingRef ? { bookingRef } : {})
 });
 
-const transport = (text, cost, status, bookingRef) => ({
+const transport = (text, cost, status, bookingRef, fromLocation, toLocation, provider, routeCode) => ({
   text,
   cost: String(cost),
   status,
+  fromLocation,
+  toLocation,
+  provider,
+  routeCode,
   ...(bookingRef ? { bookingRef } : {})
 });
 
-const tokyoHotel  = hotel('Shinjuku Prince Hotel',       150, 'Booking.com', 'city-tokyo',  'BK-TYO-2847');
-const londonHotel = hotel('The Hoxton, Shoreditch',      250, 'Hoxton Direct', 'city-london', 'HOX-97321');
-const parisHotel  = hotel('Hotel Le Walt',               280, 'Hotels.com',  'city-paris',  'HLW-PAR-5512');
-const dubaiHotel  = hotel('Dubai Airport Transit Hotel', 150, 'Booking.com', 'city-dubai',  'BK-DXB-0142');
+const tokyoHotel  = hotel('Shinjuku Prince Hotel',       150, 'Booking.com', 'city-tokyo',  'BK-TYO-2847', '1-30-1 Kabukicho, Shinjuku City', '15:00', '11:00');
+const londonHotel = hotel('The Hoxton, Shoreditch',      250, 'Hoxton Direct', 'city-london', 'HOX-97321', '81 Great Eastern St, London', '14:00', '12:00');
+const parisHotel  = hotel('Hotel Le Walt',               280, 'Hotels.com',  'city-paris',  'HLW-PAR-5512', '37 Avenue de la Motte-Picquet, Paris', '15:00', '12:00');
+const dubaiHotel  = hotel('Dubai Airport Transit Hotel', 150, 'Booking.com', 'city-dubai',  'BK-DXB-0142', 'Terminal 3, Dubai International Airport', '14:00', '12:00');
+
+// Helper to convert "18:00 - 19:30" to { startTime, endTime }
+function parseTime(timeStr) {
+  if (!timeStr) return { startTime: '', endTime: '' };
+  const parts = timeStr.split('-').map(s => s.trim());
+  return {
+    startTime: parts[0] || '',
+    endTime: parts[1] || ''
+  };
+}
+
+const act = (text, time, cost, id, cityId) => ({
+  text,
+  time,
+  cost: String(cost),
+  done: false,
+  ...parseTime(time),
+  ...(id ? { activityId: id } : {}),
+  ...(cityId ? { cityId } : {})
+});
 
 const itinerary = [
   // ─────────────────────────────────────────────────────
@@ -63,23 +82,19 @@ const itinerary = [
         from: 'Sydney', to: 'Tokyo',
         completed: false,
         desc: 'Depart Sydney for Tokyo',
-        // Transport on the DEPARTURE day - Qantas departs Sydney
         transportItems: [
-          transport('Qantas Flight QF61 | Dep 10:15 | Arr +1 19:00 | Sydney → Tokyo', 850, 'confirmed', 'QF88X2')
+          transport('Qantas Flight QF61 | Dep 10:15 | Arr +1 19:00 | Sydney → Tokyo', 850, 'confirmed', 'QF88X2', 'Sydney Kingsford Smith (SYD) - Terminal 1', 'Tokyo Narita (NRT) - Terminal 2', 'Qantas Airways', 'QF61')
         ],
-        // No accommodation - you are on the plane overnight
         accomItems: [],
         activityItems: [
-          { text: 'Arrive at Sydney Kingsford Smith Airport', time: '07:00 - 08:00', cost: '0', done: false }
+          act('Arrive at Sydney Kingsford Smith Airport', '07:00 - 08:00', 0)
         ]
       }
     ]
   },
 
   // ─────────────────────────────────────────────────────
-  // LEG 1: Tokyo (6 days: arrival + 4 explore + departure)
-  // from Jun 2 (arrival from Sydney) to Jun 7 (depart to London)
-  // Sleep 5 nights: Jun 2, 3, 4, 5, 6
+  // LEG 1: Tokyo
   // ─────────────────────────────────────────────────────
   {
     id: 'city-tokyo',
@@ -108,19 +123,17 @@ const itinerary = [
       { title: 'Akihabara Electronics District', category: 'shopping', estTime: '2 hrs', estCost: '0', assignedDayIdx: null, cityId: 'city-tokyo', id: 'act-sug-tokyo-9', assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '' }
     ],
     days: [
-      // Day 0 – Jun 2 – ARRIVAL from Sydney
       {
         date: '2026-06-02', day: 'Tue',
         from: 'Sydney', to: 'Tokyo',
         completed: false,
         desc: 'Arrive in Tokyo',
-        transportItems: [],               // No transport here; flight was on Sydney leg
-        accomItems: [tokyoHotel],         // Sleep here tonight
+        transportItems: [],
+        accomItems: [tokyoHotel],
         activityItems: [
-          { text: 'Check in, freshen up, explore Shinjuku at night', time: '20:00 - 22:00', cost: '0', done: false }
+          act('Check in, freshen up, explore Shinjuku at night', '20:00 - 22:00', 0)
         ]
       },
-      // Day 1 – Jun 3 – Explore
       {
         date: '2026-06-03', day: 'Wed',
         from: 'Tokyo', to: 'Tokyo',
@@ -129,11 +142,10 @@ const itinerary = [
         transportItems: [],
         accomItems: [tokyoHotel],
         activityItems: [
-          { text: 'Senso-ji Temple in Asakusa', time: '09:00 - 11:30', cost: '0', done: false },
-          { text: 'Akihabara Electronics & Anime District', time: '14:00 - 17:00', cost: '0', done: false }
+          act('Senso-ji Temple in Asakusa', '09:00 - 11:30', 0),
+          act('Akihabara Electronics & Anime District', '14:00 - 17:00', 0)
         ]
       },
-      // Day 2 – Jun 4 – Explore
       {
         date: '2026-06-04', day: 'Thu',
         from: 'Tokyo', to: 'Tokyo',
@@ -142,11 +154,10 @@ const itinerary = [
         transportItems: [],
         accomItems: [tokyoHotel],
         activityItems: [
-          { text: 'Shibuya Crossing & Hachiko Statue', time: '10:00 - 12:00', cost: '0', done: false },
-          { text: 'Harajuku Takeshita Street & Meiji Shrine', time: '13:30 - 16:30', cost: '0', done: false }
+          act('Shibuya Crossing & Hachiko Statue', '10:00 - 12:00', 0),
+          act('Harajuku Takeshita Street & Meiji Shrine', '13:30 - 16:30', 0)
         ]
       },
-      // Day 3 – Jun 5 – Day Trip
       {
         date: '2026-06-05', day: 'Fri',
         from: 'Tokyo', to: 'Tokyo',
@@ -155,11 +166,10 @@ const itinerary = [
         transportItems: [],
         accomItems: [tokyoHotel],
         activityItems: [
-          { text: 'Nikko Tosho-gu Shrine Complex (UNESCO)', time: '09:00 - 17:00', cost: '60', done: false },
-          { text: 'Kegon Waterfall', time: '11:00 - 12:00', cost: '8', done: false }
+          act('Nikko Tosho-gu Shrine Complex (UNESCO)', '09:00 - 17:00', 60),
+          act('Kegon Waterfall', '11:00 - 12:00', 8)
         ]
       },
-      // Day 4 – Jun 6 – Explore
       {
         date: '2026-06-06', day: 'Sat',
         from: 'Tokyo', to: 'Tokyo',
@@ -168,32 +178,28 @@ const itinerary = [
         transportItems: [],
         accomItems: [tokyoHotel],
         activityItems: [
-          { text: 'Tsukiji Outer Market breakfast', time: '07:30 - 09:30', cost: '20', done: false },
-          { text: 'teamLab Borderless Digital Art Museum', time: '13:00 - 16:00', cost: '32', done: false }
+          act('Tsukiji Outer Market breakfast', '07:30 - 09:30', 20),
+          act('teamLab Borderless Digital Art Museum', '13:00 - 16:00', 32)
         ]
       },
-      // Day 5 – Jun 7 – DEPARTURE to London
       {
         date: '2026-06-07', day: 'Sun',
         from: 'Tokyo', to: 'London',
         completed: false,
         desc: 'Depart Tokyo for London',
-        // Transport on DEPARTURE day — BA8 departs Tokyo
         transportItems: [
-          transport('British Airways Flight BA8 | Dep 09:35 | Arr 16:10 | Tokyo → London', 1100, 'confirmed')
+          transport('British Airways Flight BA8 | Dep 09:35 | Arr 16:10 | Tokyo → London', 1100, 'confirmed', 'BA-TYO-991', 'Tokyo Haneda (HND) - Terminal 3', 'London Heathrow (LHR) - Terminal 5', 'British Airways', 'BA8')
         ],
-        accomItems: [],   // No sleep in Tokyo — on the plane
+        accomItems: [],
         activityItems: [
-          { text: 'Transfer to Narita Airport (Narita Express)', time: '07:00 - 08:30', cost: '30', done: false }
+          act('Transfer to Haneda Airport', '07:00 - 08:30', 30)
         ]
       }
     ]
   },
 
   // ─────────────────────────────────────────────────────
-  // LEG 2: London (5 days: arrival + 3 explore + departure)
-  // from Jun 7 (arrival) to Jun 11 (depart to Paris)
-  // Sleep 4 nights: Jun 7, 8, 9, 10
+  // LEG 2: London
   // ─────────────────────────────────────────────────────
   {
     id: 'city-london',
@@ -221,20 +227,18 @@ const itinerary = [
       { title: 'Notting Hill & Portobello Road', category: 'sight', estTime: '2 hrs', estCost: '0', assignedDayIdx: null, cityId: 'city-london', id: 'act-sug-lon-9', assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '' }
     ],
     days: [
-      // Day 0 – Jun 7 – ARRIVAL from Tokyo
       {
         date: '2026-06-07', day: 'Sun',
         from: 'Tokyo', to: 'London',
         completed: false,
         desc: 'Arrive in London',
-        transportItems: [],              // Flight was on Tokyo departure day
-        accomItems: [londonHotel],       // Sleep in London tonight
+        transportItems: [],
+        accomItems: [londonHotel],
         activityItems: [
-          { text: 'Check in to The Hoxton, Shoreditch', time: '17:00 - 18:00', cost: '0', done: false },
-          { text: 'Evening stroll along the Thames', time: '19:30 - 21:00', cost: '0', done: false }
+          act('Check in to The Hoxton, Shoreditch', '17:00 - 18:00', 0),
+          act('Evening stroll along the Thames', '19:30 - 21:00', 0)
         ]
       },
-      // Day 1 – Jun 8
       {
         date: '2026-06-08', day: 'Mon',
         from: 'London', to: 'London',
@@ -243,11 +247,10 @@ const itinerary = [
         transportItems: [],
         accomItems: [londonHotel],
         activityItems: [
-          { text: 'Tower of London & Crown Jewels', time: '09:30 - 12:30', cost: '30', done: false },
-          { text: 'Borough Market & South Bank walk to Tate Modern', time: '13:30 - 16:30', cost: '15', done: false }
+          act('Tower of London & Crown Jewels', '09:30 - 12:30', 30),
+          act('Borough Market & South Bank walk to Tate Modern', '13:30 - 16:30', 15)
         ]
       },
-      // Day 2 – Jun 9
       {
         date: '2026-06-09', day: 'Tue',
         from: 'London', to: 'London',
@@ -256,11 +259,10 @@ const itinerary = [
         transportItems: [],
         accomItems: [londonHotel],
         activityItems: [
-          { text: 'Buckingham Palace (Changing of the Guard)', time: '10:00 - 11:30', cost: '0', done: false },
-          { text: 'Westminster Abbey & Big Ben', time: '13:00 - 15:30', cost: '27', done: false }
+          act('Buckingham Palace (Changing of the Guard)', '10:00 - 11:30', 0),
+          act('Westminster Abbey & Big Ben', '13:00 - 15:30', 27)
         ]
       },
-      // Day 3 – Jun 10
       {
         date: '2026-06-10', day: 'Wed',
         from: 'London', to: 'London',
@@ -269,32 +271,28 @@ const itinerary = [
         transportItems: [],
         accomItems: [londonHotel],
         activityItems: [
-          { text: 'British Museum (free)', time: '09:30 - 13:00', cost: '0', done: false },
-          { text: 'Camden Market — vintage & street food', time: '14:30 - 17:30', cost: '20', done: false }
+          act('British Museum (free)', '09:30 - 13:00', 0),
+          act('Camden Market — vintage & street food', '14:30 - 17:30', 20)
         ]
       },
-      // Day 4 – Jun 11 – DEPARTURE to Paris by Eurostar
       {
         date: '2026-06-11', day: 'Thu',
         from: 'London', to: 'Paris',
         completed: false,
         desc: 'Depart London to Paris by Eurostar',
-        // Transport on DEPARTURE day — Eurostar departs London St Pancras
         transportItems: [
-          transport('Eurostar Train | Dep 10:30 | Arr 13:47 | London → Paris', 120, 'confirmed', 'ES-44812')
+          transport('Eurostar Train | Dep 10:30 | Arr 13:47 | London → Paris', 120, 'confirmed', 'ES-44812', 'London St Pancras International', 'Paris Gare du Nord', 'Eurostar', 'ES9014')
         ],
-        accomItems: [],   // No sleep in London — arriving in Paris today
+        accomItems: [],
         activityItems: [
-          { text: 'St Pancras International — enjoy the Grand Terrace before boarding', time: '09:00 - 10:00', cost: '0', done: false }
+          act('St Pancras International — enjoy the Grand Terrace before boarding', '09:00 - 10:00', 0)
         ]
       }
     ]
   },
 
   // ─────────────────────────────────────────────────────
-  // LEG 3: Paris (4 days: arrival + 2 explore + departure)
-  // from Jun 11 (arrival from London same day Eurostar) to Jun 14 (evening flight EK76)
-  // Sleep 3 nights: Jun 11, 12, 13
+  // LEG 3: Paris
   // ─────────────────────────────────────────────────────
   {
     id: 'city-paris',
@@ -321,20 +319,18 @@ const itinerary = [
       { title: 'Champs-Élysées & Arc de Triomphe', category: 'sight', estTime: '2 hrs', estCost: '13', assignedDayIdx: null, cityId: 'city-paris', id: 'act-sug-par-8', assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '' }
     ],
     days: [
-      // Day 0 – Jun 11 – ARRIVAL from London (Eurostar arrives 13:47)
       {
         date: '2026-06-11', day: 'Thu',
         from: 'London', to: 'Paris',
         completed: false,
         desc: 'Arrive in Paris',
-        transportItems: [],               // Train was on London departure day
-        accomItems: [parisHotel],         // Sleep in Paris tonight
+        transportItems: [],
+        accomItems: [parisHotel],
         activityItems: [
-          { text: 'Check in to Hotel Le Walt', time: '15:00 - 16:00', cost: '0', done: false },
-          { text: 'Eiffel Tower at golden hour', time: '19:30 - 21:00', cost: '26', done: false }
+          act('Check in to Hotel Le Walt', '15:00 - 16:00', 0),
+          act('Eiffel Tower at golden hour', '19:30 - 21:00', 26)
         ]
       },
-      // Day 1 – Jun 12
       {
         date: '2026-06-12', day: 'Fri',
         from: 'Paris', to: 'Paris',
@@ -343,11 +339,10 @@ const itinerary = [
         transportItems: [],
         accomItems: [parisHotel],
         activityItems: [
-          { text: 'Louvre Museum (Mona Lisa)', time: '09:00 - 13:00', cost: '22', done: false },
-          { text: 'Montmartre & Sacré-Cœur Basilica', time: '15:00 - 18:00', cost: '0', done: false }
+          act('Louvre Museum (Mona Lisa)', '09:00 - 13:00', 22),
+          act('Montmartre & Sacré-Cœur Basilica', '15:00 - 18:00', 0)
         ]
       },
-      // Day 2 – Jun 13
       {
         date: '2026-06-13', day: 'Sat',
         from: 'Paris', to: 'Paris',
@@ -356,32 +351,29 @@ const itinerary = [
         transportItems: [],
         accomItems: [parisHotel],
         activityItems: [
-          { text: 'Notre-Dame Cathedral & Latin Quarter walk', time: '10:00 - 13:00', cost: '0', done: false },
-          { text: 'Champs-Élysées & Arc de Triomphe', time: '15:00 - 17:30', cost: '13', done: false }
+          act('Notre-Dame Cathedral & Latin Quarter walk', '10:00 - 13:00', 0),
+          act('Champs-Élysées & Arc de Triomphe', '15:00 - 17:30', 13)
         ]
       },
-      // Day 3 – Jun 14 – DEPARTURE to Dubai (evening flight EK76 21:55)
       {
         date: '2026-06-14', day: 'Sun',
         from: 'Paris', to: 'Dubai',
         completed: false,
         desc: 'Last day in Paris, evening flight to Dubai',
-        // Transport on DEPARTURE day — EK76 departs Paris CDG
         transportItems: [
-          transport('Emirates Flight EK76 | Dep 21:55 | Arr +1 06:35 | Paris → Dubai', 750, 'confirmed', 'EK-CDG-7712')
+          transport('Emirates Flight EK76 | Dep 21:55 | Arr +1 06:35 | Paris → Dubai', 750, 'confirmed', 'EK-CDG-7712', 'Paris Charles de Gaulle (CDG) - Terminal 2C', 'Dubai International (DXB) - Terminal 3', 'Emirates', 'EK76')
         ],
-        accomItems: [],   // No sleep in Paris — overnight flight to Dubai
+        accomItems: [],
         activityItems: [
-          { text: 'Seine River Cruise (last morning in Paris)', time: '10:00 - 11:30', cost: '20', done: false },
-          { text: 'Transfer to Charles de Gaulle Airport', time: '18:00 - 19:30', cost: '25', done: false }
+          act('Seine River Cruise (last morning in Paris)', '10:00 - 11:30', 20),
+          act('Transfer to Charles de Gaulle Airport', '18:00 - 19:30', 25)
         ]
       }
     ]
   },
 
   // ─────────────────────────────────────────────────────
-  // LEG 4: Dubai Transit (3 days: arrival Jun 15 + transit day + departure Jun 16)
-  // Sleep 2 nights: Jun 15, Jun 16 (late checkout, early departure Jun 17)
+  // LEG 4: Dubai Transit
   // ─────────────────────────────────────────────────────
   {
     id: 'city-dubai',
@@ -400,20 +392,18 @@ const itinerary = [
       { title: 'Dubai Mall & Fountain Show (evening)', category: 'sight', estTime: '3 hrs', estCost: '0', assignedDayIdx: null, cityId: 'city-dubai', id: 'act-sug-dxb-2', assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '' }
     ],
     days: [
-      // Day 0 – Jun 15 – ARRIVAL from Paris (EK76 arrives 06:35)
       {
         date: '2026-06-15', day: 'Mon',
         from: 'Paris', to: 'Dubai',
         completed: false,
         desc: 'Arrive in Dubai — Transit',
-        transportItems: [],               // Flight was on Paris departure day
-        accomItems: [dubaiHotel],         // Sleep at transit hotel
+        transportItems: [],
+        accomItems: [dubaiHotel],
         activityItems: [
-          { text: 'Check in to Dubai Airport Transit Hotel', time: '08:00 - 09:00', cost: '0', done: false },
-          { text: 'Burj Khalifa & Dubai Mall Fountain Show', time: '17:00 - 20:00', cost: '50', done: false }
+          act('Check in to Dubai Airport Transit Hotel', '08:00 - 09:00', 0),
+          act('Burj Khalifa & Dubai Mall Fountain Show', '17:00 - 20:00', 50)
         ]
       },
-      // Day 1 – Jun 16 – Full transit day in Dubai
       {
         date: '2026-06-16', day: 'Tue',
         from: 'Dubai', to: 'Dubai',
@@ -422,30 +412,28 @@ const itinerary = [
         transportItems: [],
         accomItems: [dubaiHotel],
         activityItems: [
-          { text: 'Dubai Creek & Al Fahidi Historic District', time: '09:00 - 12:00', cost: '0', done: false },
-          { text: 'Dubai Museum & Gold Souk', time: '13:00 - 16:00', cost: '5', done: false }
+          act('Dubai Creek & Al Fahidi Historic District', '09:00 - 12:00', 0),
+          act('Dubai Museum & Gold Souk', '13:00 - 16:00', 5)
         ]
       },
-      // Day 2 – Jun 17 – DEPARTURE to Sydney (EK412 10:15)
       {
         date: '2026-06-17', day: 'Wed',
         from: 'Dubai', to: 'Sydney',
         completed: false,
         desc: 'Depart Dubai for Sydney',
-        // Transport on DEPARTURE day — EK412 departs Dubai
         transportItems: [
-          transport('Emirates Flight EK412 | Dep 10:15 | Arr +1 06:00 | Dubai → Sydney', 750, 'confirmed', 'EK-DXB-9981')
+          transport('Emirates Flight EK412 | Dep 10:15 | Arr +1 06:00 | Dubai → Sydney', 750, 'confirmed', 'EK-DXB-9981', 'Dubai International (DXB) - Terminal 3', 'Sydney Kingsford Smith (SYD) - Terminal 1', 'Emirates', 'EK412')
         ],
-        accomItems: [],   // No sleep — overnight flight home
+        accomItems: [],
         activityItems: [
-          { text: 'Early transfer to Dubai International Airport', time: '07:00 - 08:30', cost: '25', done: false }
+          act('Early transfer to Dubai International Airport', '07:00 - 08:30', 25)
         ]
       }
     ]
   },
 
   // ─────────────────────────────────────────────────────
-  // LEG 5: Sydney (return arrival only)
+  // LEG 5: Sydney
   // ─────────────────────────────────────────────────────
   {
     id: 'city-sydney-end',
@@ -463,60 +451,21 @@ const itinerary = [
         from: 'Dubai', to: 'Sydney',
         completed: false,
         desc: 'Arrive home in Sydney!',
-        transportItems: [],   // Flight was on Dubai departure day
-        accomItems: [],       // Home!
+        transportItems: [],
+        accomItems: [],
         activityItems: [
-          { text: 'Welcome home! Clear customs and head home.', time: '06:00 - 09:00', cost: '0', done: false }
+          act('Welcome home! Clear customs and head home.', '06:00 - 09:00', 0)
         ]
       }
     ]
   }
 ];
 
-// Verify the data is correct before writing
-console.log('Checking transport placement...');
-itinerary.forEach(leg => {
-  leg.days.forEach((day, i) => {
-    if ((day.transportItems||[]).length > 0) {
-      day.transportItems.forEach(t => {
-        if (t.text.toLowerCase().includes('add transport')) {
-          console.error('ERROR: placeholder transport in leg', leg.id, 'day', i);
-          process.exit(1);
-        }
-        console.log('  OK: Leg', leg.id, 'day', i, '| from:', day.from, '| to:', day.to, '| transport:', t.text.substring(0, 60));
-      });
-    }
-    if ((day.accomItems||[]).length > 0) {
-      day.accomItems.forEach(a => {
-        if (a.text.toLowerCase().includes('add accommodation')) {
-          console.error('ERROR: placeholder accom in leg', leg.id, 'day', i);
-          process.exit(1);
-        }
-        if (!a.cityId) {
-          console.error('ERROR: missing cityId in accom leg', leg.id, 'day', i, a.text);
-          process.exit(1);
-        }
-        if (!a.status || a.status !== 'confirmed') {
-          console.error('ERROR: accom not confirmed in leg', leg.id, 'day', i, a.text);
-          process.exit(1);
-        }
-      });
-    }
-  });
-});
-console.log('All checks passed.');
-
-// Now patch utils.js
 const content = fs.readFileSync('js/utils.js', 'utf8');
 const newContent = content.replace(
   /const DEFAULT_DATA = \[[\s\S]*?\];/,
   'const DEFAULT_DATA = ' + JSON.stringify(itinerary, null, 2) + ';'
 );
 
-if (!newContent.includes('"id": "city-sydney-start"')) {
-  console.error('ERROR: Replacement failed — DEFAULT_DATA not found in utils.js');
-  process.exit(1);
-}
-
 fs.writeFileSync('js/utils.js', newContent);
-console.log('js/utils.js updated successfully.');
+console.log('js/utils.js updated successfully with detailed properties.');

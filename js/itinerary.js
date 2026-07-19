@@ -2210,9 +2210,10 @@ function applyTimelineTravelShading(items) {
   return items.map(item => {
     if (item.type === 'arrivalBlock' || item.type === 'departureBlock') return item;
     const shaded = { ...item };
-    if (arrival && item.sortValue < arrival.sortValue) {
+    const hasTime = !!(item.startTime || '').trim();
+    if (hasTime && arrival && item.sortValue < arrival.sortValue) {
       shaded.timelineShade = 'before-arrival';
-    } else if (departure && item.sortValue > departure.sortValue) {
+    } else if (hasTime && departure && item.sortValue > departure.sortValue) {
       shaded.timelineShade = 'after-departure';
     }
     return shaded;

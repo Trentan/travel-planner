@@ -92,6 +92,10 @@ const DEFAULT_DATA = [
             "text": "Qantas Flight QF61 | Dep 10:15 | Arr +1 19:00 | Sydney → Tokyo",
             "cost": "850",
             "status": "confirmed",
+            "fromLocation": "Sydney Kingsford Smith (SYD) - Terminal 1",
+            "toLocation": "Tokyo Narita (NRT) - Terminal 2",
+            "provider": "Qantas Airways",
+            "routeCode": "QF61",
             "bookingRef": "QF88X2"
           }
         ],
@@ -101,7 +105,9 @@ const DEFAULT_DATA = [
             "text": "Arrive at Sydney Kingsford Smith Airport",
             "time": "07:00 - 08:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "07:00",
+            "endTime": "08:00"
           }
         ]
       }
@@ -291,6 +297,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Booking.com",
             "cityId": "city-tokyo",
+            "location": "1-30-1 Kabukicho, Shinjuku City",
+            "checkInTime": "15:00",
+            "checkOutTime": "11:00",
             "bookingRef": "BK-TYO-2847"
           }
         ],
@@ -299,7 +308,9 @@ const DEFAULT_DATA = [
             "text": "Check in, freshen up, explore Shinjuku at night",
             "time": "20:00 - 22:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "20:00",
+            "endTime": "22:00"
           }
         ]
       },
@@ -318,6 +329,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Booking.com",
             "cityId": "city-tokyo",
+            "location": "1-30-1 Kabukicho, Shinjuku City",
+            "checkInTime": "15:00",
+            "checkOutTime": "11:00",
             "bookingRef": "BK-TYO-2847"
           }
         ],
@@ -326,13 +340,17 @@ const DEFAULT_DATA = [
             "text": "Senso-ji Temple in Asakusa",
             "time": "09:00 - 11:30",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "09:00",
+            "endTime": "11:30"
           },
           {
             "text": "Akihabara Electronics & Anime District",
             "time": "14:00 - 17:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "14:00",
+            "endTime": "17:00"
           }
         ]
       },
@@ -351,6 +369,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Booking.com",
             "cityId": "city-tokyo",
+            "location": "1-30-1 Kabukicho, Shinjuku City",
+            "checkInTime": "15:00",
+            "checkOutTime": "11:00",
             "bookingRef": "BK-TYO-2847"
           }
         ],
@@ -359,13 +380,17 @@ const DEFAULT_DATA = [
             "text": "Shibuya Crossing & Hachiko Statue",
             "time": "10:00 - 12:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "10:00",
+            "endTime": "12:00"
           },
           {
             "text": "Harajuku Takeshita Street & Meiji Shrine",
             "time": "13:30 - 16:30",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "13:30",
+            "endTime": "16:30"
           }
         ]
       },
@@ -384,6 +409,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Booking.com",
             "cityId": "city-tokyo",
+            "location": "1-30-1 Kabukicho, Shinjuku City",
+            "checkInTime": "15:00",
+            "checkOutTime": "11:00",
             "bookingRef": "BK-TYO-2847"
           }
         ],
@@ -392,13 +420,17 @@ const DEFAULT_DATA = [
             "text": "Nikko Tosho-gu Shrine Complex (UNESCO)",
             "time": "09:00 - 17:00",
             "cost": "60",
-            "done": false
+            "done": false,
+            "startTime": "09:00",
+            "endTime": "17:00"
           },
           {
             "text": "Kegon Waterfall",
             "time": "11:00 - 12:00",
             "cost": "8",
-            "done": false
+            "done": false,
+            "startTime": "11:00",
+            "endTime": "12:00"
           }
         ]
       },
@@ -417,6 +449,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Booking.com",
             "cityId": "city-tokyo",
+            "location": "1-30-1 Kabukicho, Shinjuku City",
+            "checkInTime": "15:00",
+            "checkOutTime": "11:00",
             "bookingRef": "BK-TYO-2847"
           }
         ],
@@ -425,13 +460,17 @@ const DEFAULT_DATA = [
             "text": "Tsukiji Outer Market breakfast",
             "time": "07:30 - 09:30",
             "cost": "20",
-            "done": false
+            "done": false,
+            "startTime": "07:30",
+            "endTime": "09:30"
           },
           {
             "text": "teamLab Borderless Digital Art Museum",
             "time": "13:00 - 16:00",
             "cost": "32",
-            "done": false
+            "done": false,
+            "startTime": "13:00",
+            "endTime": "16:00"
           }
         ]
       },
@@ -446,16 +485,23 @@ const DEFAULT_DATA = [
           {
             "text": "British Airways Flight BA8 | Dep 09:35 | Arr 16:10 | Tokyo → London",
             "cost": "1100",
-            "status": "confirmed"
+            "status": "confirmed",
+            "fromLocation": "Tokyo Haneda (HND) - Terminal 3",
+            "toLocation": "London Heathrow (LHR) - Terminal 5",
+            "provider": "British Airways",
+            "routeCode": "BA8",
+            "bookingRef": "BA-TYO-991"
           }
         ],
         "accomItems": [],
         "activityItems": [
           {
-            "text": "Transfer to Narita Airport (Narita Express)",
+            "text": "Transfer to Haneda Airport",
             "time": "07:00 - 08:30",
             "cost": "30",
-            "done": false
+            "done": false,
+            "startTime": "07:00",
+            "endTime": "08:30"
           }
         ]
       }
@@ -640,6 +686,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Hoxton Direct",
             "cityId": "city-london",
+            "location": "81 Great Eastern St, London",
+            "checkInTime": "14:00",
+            "checkOutTime": "12:00",
             "bookingRef": "HOX-97321"
           }
         ],
@@ -648,13 +697,17 @@ const DEFAULT_DATA = [
             "text": "Check in to The Hoxton, Shoreditch",
             "time": "17:00 - 18:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "17:00",
+            "endTime": "18:00"
           },
           {
             "text": "Evening stroll along the Thames",
             "time": "19:30 - 21:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "19:30",
+            "endTime": "21:00"
           }
         ]
       },
@@ -673,6 +726,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Hoxton Direct",
             "cityId": "city-london",
+            "location": "81 Great Eastern St, London",
+            "checkInTime": "14:00",
+            "checkOutTime": "12:00",
             "bookingRef": "HOX-97321"
           }
         ],
@@ -681,13 +737,17 @@ const DEFAULT_DATA = [
             "text": "Tower of London & Crown Jewels",
             "time": "09:30 - 12:30",
             "cost": "30",
-            "done": false
+            "done": false,
+            "startTime": "09:30",
+            "endTime": "12:30"
           },
           {
             "text": "Borough Market & South Bank walk to Tate Modern",
             "time": "13:30 - 16:30",
             "cost": "15",
-            "done": false
+            "done": false,
+            "startTime": "13:30",
+            "endTime": "16:30"
           }
         ]
       },
@@ -706,6 +766,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Hoxton Direct",
             "cityId": "city-london",
+            "location": "81 Great Eastern St, London",
+            "checkInTime": "14:00",
+            "checkOutTime": "12:00",
             "bookingRef": "HOX-97321"
           }
         ],
@@ -714,13 +777,17 @@ const DEFAULT_DATA = [
             "text": "Buckingham Palace (Changing of the Guard)",
             "time": "10:00 - 11:30",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "10:00",
+            "endTime": "11:30"
           },
           {
             "text": "Westminster Abbey & Big Ben",
             "time": "13:00 - 15:30",
             "cost": "27",
-            "done": false
+            "done": false,
+            "startTime": "13:00",
+            "endTime": "15:30"
           }
         ]
       },
@@ -739,6 +806,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Hoxton Direct",
             "cityId": "city-london",
+            "location": "81 Great Eastern St, London",
+            "checkInTime": "14:00",
+            "checkOutTime": "12:00",
             "bookingRef": "HOX-97321"
           }
         ],
@@ -747,13 +817,17 @@ const DEFAULT_DATA = [
             "text": "British Museum (free)",
             "time": "09:30 - 13:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "09:30",
+            "endTime": "13:00"
           },
           {
             "text": "Camden Market — vintage & street food",
             "time": "14:30 - 17:30",
             "cost": "20",
-            "done": false
+            "done": false,
+            "startTime": "14:30",
+            "endTime": "17:30"
           }
         ]
       },
@@ -769,6 +843,10 @@ const DEFAULT_DATA = [
             "text": "Eurostar Train | Dep 10:30 | Arr 13:47 | London → Paris",
             "cost": "120",
             "status": "confirmed",
+            "fromLocation": "London St Pancras International",
+            "toLocation": "Paris Gare du Nord",
+            "provider": "Eurostar",
+            "routeCode": "ES9014",
             "bookingRef": "ES-44812"
           }
         ],
@@ -778,7 +856,9 @@ const DEFAULT_DATA = [
             "text": "St Pancras International — enjoy the Grand Terrace before boarding",
             "time": "09:00 - 10:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "09:00",
+            "endTime": "10:00"
           }
         ]
       }
@@ -949,6 +1029,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Hotels.com",
             "cityId": "city-paris",
+            "location": "37 Avenue de la Motte-Picquet, Paris",
+            "checkInTime": "15:00",
+            "checkOutTime": "12:00",
             "bookingRef": "HLW-PAR-5512"
           }
         ],
@@ -957,13 +1040,17 @@ const DEFAULT_DATA = [
             "text": "Check in to Hotel Le Walt",
             "time": "15:00 - 16:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "15:00",
+            "endTime": "16:00"
           },
           {
             "text": "Eiffel Tower at golden hour",
             "time": "19:30 - 21:00",
             "cost": "26",
-            "done": false
+            "done": false,
+            "startTime": "19:30",
+            "endTime": "21:00"
           }
         ]
       },
@@ -982,6 +1069,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Hotels.com",
             "cityId": "city-paris",
+            "location": "37 Avenue de la Motte-Picquet, Paris",
+            "checkInTime": "15:00",
+            "checkOutTime": "12:00",
             "bookingRef": "HLW-PAR-5512"
           }
         ],
@@ -990,13 +1080,17 @@ const DEFAULT_DATA = [
             "text": "Louvre Museum (Mona Lisa)",
             "time": "09:00 - 13:00",
             "cost": "22",
-            "done": false
+            "done": false,
+            "startTime": "09:00",
+            "endTime": "13:00"
           },
           {
             "text": "Montmartre & Sacré-Cœur Basilica",
             "time": "15:00 - 18:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "15:00",
+            "endTime": "18:00"
           }
         ]
       },
@@ -1015,6 +1109,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Hotels.com",
             "cityId": "city-paris",
+            "location": "37 Avenue de la Motte-Picquet, Paris",
+            "checkInTime": "15:00",
+            "checkOutTime": "12:00",
             "bookingRef": "HLW-PAR-5512"
           }
         ],
@@ -1023,13 +1120,17 @@ const DEFAULT_DATA = [
             "text": "Notre-Dame Cathedral & Latin Quarter walk",
             "time": "10:00 - 13:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "10:00",
+            "endTime": "13:00"
           },
           {
             "text": "Champs-Élysées & Arc de Triomphe",
             "time": "15:00 - 17:30",
             "cost": "13",
-            "done": false
+            "done": false,
+            "startTime": "15:00",
+            "endTime": "17:30"
           }
         ]
       },
@@ -1045,6 +1146,10 @@ const DEFAULT_DATA = [
             "text": "Emirates Flight EK76 | Dep 21:55 | Arr +1 06:35 | Paris → Dubai",
             "cost": "750",
             "status": "confirmed",
+            "fromLocation": "Paris Charles de Gaulle (CDG) - Terminal 2C",
+            "toLocation": "Dubai International (DXB) - Terminal 3",
+            "provider": "Emirates",
+            "routeCode": "EK76",
             "bookingRef": "EK-CDG-7712"
           }
         ],
@@ -1054,13 +1159,17 @@ const DEFAULT_DATA = [
             "text": "Seine River Cruise (last morning in Paris)",
             "time": "10:00 - 11:30",
             "cost": "20",
-            "done": false
+            "done": false,
+            "startTime": "10:00",
+            "endTime": "11:30"
           },
           {
             "text": "Transfer to Charles de Gaulle Airport",
             "time": "18:00 - 19:30",
             "cost": "25",
-            "done": false
+            "done": false,
+            "startTime": "18:00",
+            "endTime": "19:30"
           }
         ]
       }
@@ -1138,6 +1247,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Booking.com",
             "cityId": "city-dubai",
+            "location": "Terminal 3, Dubai International Airport",
+            "checkInTime": "14:00",
+            "checkOutTime": "12:00",
             "bookingRef": "BK-DXB-0142"
           }
         ],
@@ -1146,13 +1258,17 @@ const DEFAULT_DATA = [
             "text": "Check in to Dubai Airport Transit Hotel",
             "time": "08:00 - 09:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "08:00",
+            "endTime": "09:00"
           },
           {
             "text": "Burj Khalifa & Dubai Mall Fountain Show",
             "time": "17:00 - 20:00",
             "cost": "50",
-            "done": false
+            "done": false,
+            "startTime": "17:00",
+            "endTime": "20:00"
           }
         ]
       },
@@ -1171,6 +1287,9 @@ const DEFAULT_DATA = [
             "status": "confirmed",
             "provider": "Booking.com",
             "cityId": "city-dubai",
+            "location": "Terminal 3, Dubai International Airport",
+            "checkInTime": "14:00",
+            "checkOutTime": "12:00",
             "bookingRef": "BK-DXB-0142"
           }
         ],
@@ -1179,13 +1298,17 @@ const DEFAULT_DATA = [
             "text": "Dubai Creek & Al Fahidi Historic District",
             "time": "09:00 - 12:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "09:00",
+            "endTime": "12:00"
           },
           {
             "text": "Dubai Museum & Gold Souk",
             "time": "13:00 - 16:00",
             "cost": "5",
-            "done": false
+            "done": false,
+            "startTime": "13:00",
+            "endTime": "16:00"
           }
         ]
       },
@@ -1201,6 +1324,10 @@ const DEFAULT_DATA = [
             "text": "Emirates Flight EK412 | Dep 10:15 | Arr +1 06:00 | Dubai → Sydney",
             "cost": "750",
             "status": "confirmed",
+            "fromLocation": "Dubai International (DXB) - Terminal 3",
+            "toLocation": "Sydney Kingsford Smith (SYD) - Terminal 1",
+            "provider": "Emirates",
+            "routeCode": "EK412",
             "bookingRef": "EK-DXB-9981"
           }
         ],
@@ -1210,7 +1337,9 @@ const DEFAULT_DATA = [
             "text": "Early transfer to Dubai International Airport",
             "time": "07:00 - 08:30",
             "cost": "25",
-            "done": false
+            "done": false,
+            "startTime": "07:00",
+            "endTime": "08:30"
           }
         ]
       }
@@ -1247,7 +1376,9 @@ const DEFAULT_DATA = [
             "text": "Welcome home! Clear customs and head home.",
             "time": "06:00 - 09:00",
             "cost": "0",
-            "done": false
+            "done": false,
+            "startTime": "06:00",
+            "endTime": "09:00"
           }
         ]
       }
