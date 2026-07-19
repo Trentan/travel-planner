@@ -43,6 +43,14 @@ const DEFAULT_DATA = [
     "colour": "#34495e",
     "cityFood": [],
     "suggestedActivities": [],
+    "legTips": [
+      {
+        "text": "Pack your passport in your carry-on!"
+      },
+      {
+        "text": "Check in online 24 hours before flight."
+      }
+    ],
     "days": [
       {
         "date": "2026-06-01",
@@ -76,6 +84,27 @@ const DEFAULT_DATA = [
         "text": "Ramen in Shinjuku",
         "done": false,
         "cityId": "city-tokyo"
+      },
+      {
+        "text": "Wagyu Beef Yakiniku",
+        "done": false,
+        "cityId": "city-tokyo"
+      },
+      {
+        "text": "Matcha Soft Serve in Asakusa",
+        "done": false,
+        "cityId": "city-tokyo"
+      }
+    ],
+    "legTips": [
+      {
+        "text": "Buy a Suica or Pasmo card for easy train travel."
+      },
+      {
+        "text": "Remember to walk on the left side of the street."
+      },
+      {
+        "text": "Don't leave a tip at restaurants; it's not customary in Japan."
       }
     ],
     "suggestedActivities": [
@@ -84,6 +113,22 @@ const DEFAULT_DATA = [
         "category": "sight",
         "estTime": "2 hrs",
         "estCost": "20",
+        "assignedDayIdx": null,
+        "cityId": "city-tokyo"
+      },
+      {
+        "title": "Ghibli Museum",
+        "category": "attraction",
+        "estTime": "4 hrs",
+        "estCost": "10",
+        "assignedDayIdx": null,
+        "cityId": "city-tokyo"
+      },
+      {
+        "title": "Odaiba TeamLab Planets",
+        "category": "attraction",
+        "estTime": "2 hrs",
+        "estCost": "25",
         "assignedDayIdx": null,
         "cityId": "city-tokyo"
       }
@@ -123,6 +168,44 @@ const DEFAULT_DATA = [
             "time": "09:00 - 11:30",
             "cost": "0",
             "location": "Asakusa"
+          },
+          {
+            "text": "Explore Akihabara Anime District",
+            "time": "13:00 - 17:00",
+            "cost": "20"
+          }
+        ]
+      },
+      {
+        "date": "2026-06-04",
+        "day": "Thu",
+        "from": "Tokyo",
+        "to": "Tokyo",
+        "accomItems": [],
+        "activityItems": [
+          {
+            "text": "Shibuya Crossing & Hachiko",
+            "time": "10:00 - 12:00",
+            "cost": "0"
+          },
+          {
+            "text": "Meiji Shrine & Yoyogi Park",
+            "time": "14:00 - 16:30",
+            "cost": "0"
+          }
+        ]
+      },
+      {
+        "date": "2026-06-05",
+        "day": "Fri",
+        "from": "Tokyo",
+        "to": "Tokyo",
+        "accomItems": [],
+        "activityItems": [
+          {
+            "text": "Day trip to Kamakura or Yokohama (Optional)",
+            "time": "09:00 - 17:00",
+            "cost": "30"
           }
         ]
       }
@@ -137,6 +220,27 @@ const DEFAULT_DATA = [
         "text": "Fish and Chips at a local pub",
         "done": false,
         "cityId": "city-london"
+      },
+      {
+        "text": "Sunday Roast with Yorkshire Pudding",
+        "done": false,
+        "cityId": "city-london"
+      },
+      {
+        "text": "Afternoon Tea at The Ritz",
+        "done": false,
+        "cityId": "city-london"
+      }
+    ],
+    "legTips": [
+      {
+        "text": "Use your contactless card for the Tube (Oyster card not strictly needed)."
+      },
+      {
+        "text": "Stand on the right on escalators!"
+      },
+      {
+        "text": "Pack an umbrella, rain is always possible."
       }
     ],
     "suggestedActivities": [
@@ -147,12 +251,28 @@ const DEFAULT_DATA = [
         "estCost": "35",
         "assignedDayIdx": null,
         "cityId": "city-london"
+      },
+      {
+        "title": "London Eye",
+        "category": "attraction",
+        "estTime": "2 hrs",
+        "estCost": "40",
+        "assignedDayIdx": null,
+        "cityId": "city-london"
+      },
+      {
+        "title": "West End Theatre Show",
+        "category": "event",
+        "estTime": "3 hrs",
+        "estCost": "80",
+        "assignedDayIdx": null,
+        "cityId": "city-london"
       }
     ],
     "days": [
       {
-        "date": "2026-06-04",
-        "day": "Thu",
+        "date": "2026-06-06",
+        "day": "Sat",
         "from": "Tokyo",
         "to": "London",
         "transportItems": [
@@ -179,8 +299,8 @@ const DEFAULT_DATA = [
         ]
       },
       {
-        "date": "2026-06-05",
-        "day": "Fri",
+        "date": "2026-06-07",
+        "day": "Sun",
         "from": "London",
         "to": "London",
         "accomItems": [],
@@ -188,6 +308,44 @@ const DEFAULT_DATA = [
           {
             "text": "British Museum",
             "time": "10:00 - 14:00",
+            "cost": "0"
+          },
+          {
+            "text": "Camden Market",
+            "time": "15:00 - 18:00",
+            "cost": "15"
+          }
+        ]
+      },
+      {
+        "date": "2026-06-08",
+        "day": "Mon",
+        "from": "London",
+        "to": "London",
+        "accomItems": [],
+        "activityItems": [
+          {
+            "text": "Buckingham Palace (Changing of the Guard)",
+            "time": "10:30 - 12:00",
+            "cost": "0"
+          },
+          {
+            "text": "Walk along South Bank",
+            "time": "14:00 - 16:00",
+            "cost": "0"
+          }
+        ]
+      },
+      {
+        "date": "2026-06-09",
+        "day": "Tue",
+        "from": "London",
+        "to": "London",
+        "accomItems": [],
+        "activityItems": [
+          {
+            "text": "Natural History Museum",
+            "time": "09:30 - 13:00",
             "cost": "0"
           }
         ]
@@ -200,9 +358,30 @@ const DEFAULT_DATA = [
     "colour": "#9b59b6",
     "cityFood": [
       {
-        "text": "Fresh Croissant from local bakery",
+        "text": "Fresh Croissant from a local boulangerie",
         "done": false,
         "cityId": "city-paris"
+      },
+      {
+        "text": "Macarons from Pierre Hermé",
+        "done": false,
+        "cityId": "city-paris"
+      },
+      {
+        "text": "Steak Frites at Le Relais de l'Entrecôte",
+        "done": false,
+        "cityId": "city-paris"
+      }
+    ],
+    "legTips": [
+      {
+        "text": "Learn a few basic French phrases (Bonjour, Merci)."
+      },
+      {
+        "text": "Beware of pickpockets around major tourist sites like the Eiffel Tower."
+      },
+      {
+        "text": "Museum passes can save you a lot of money if you plan to visit many."
       }
     ],
     "suggestedActivities": [
@@ -213,12 +392,28 @@ const DEFAULT_DATA = [
         "estCost": "16",
         "assignedDayIdx": null,
         "cityId": "city-paris"
+      },
+      {
+        "title": "Seine River Cruise",
+        "category": "tour",
+        "estTime": "1.5 hrs",
+        "estCost": "20",
+        "assignedDayIdx": null,
+        "cityId": "city-paris"
+      },
+      {
+        "title": "Versailles Palace Half-Day",
+        "category": "sight",
+        "estTime": "5 hrs",
+        "estCost": "25",
+        "assignedDayIdx": null,
+        "cityId": "city-paris"
       }
     ],
     "days": [
       {
-        "date": "2026-06-06",
-        "day": "Sat",
+        "date": "2026-06-10",
+        "day": "Wed",
         "from": "London",
         "to": "Paris",
         "transportItems": [
@@ -243,6 +438,44 @@ const DEFAULT_DATA = [
             "cost": "25"
           }
         ]
+      },
+      {
+        "date": "2026-06-11",
+        "day": "Thu",
+        "from": "Paris",
+        "to": "Paris",
+        "accomItems": [],
+        "activityItems": [
+          {
+            "text": "Louvre Museum (Mona Lisa)",
+            "time": "09:00 - 13:00",
+            "cost": "22"
+          },
+          {
+            "text": "Montmartre & Sacré-Cœur",
+            "time": "15:00 - 18:00",
+            "cost": "0"
+          }
+        ]
+      },
+      {
+        "date": "2026-06-12",
+        "day": "Fri",
+        "from": "Paris",
+        "to": "Paris",
+        "accomItems": [],
+        "activityItems": [
+          {
+            "text": "Notre-Dame & Latin Quarter Walk",
+            "time": "10:00 - 13:00",
+            "cost": "0"
+          },
+          {
+            "text": "Shopping at Champs-Élysées",
+            "time": "14:30 - 17:00",
+            "cost": "0"
+          }
+        ]
       }
     ]
   },
@@ -250,12 +483,40 @@ const DEFAULT_DATA = [
     "id": "city-dubai",
     "label": "🐪 Dubai (Transit)",
     "colour": "#f1c40f",
-    "cityFood": [],
-    "suggestedActivities": [],
+    "cityFood": [
+      {
+        "text": "Shawarma in Deira",
+        "done": false,
+        "cityId": "city-dubai"
+      },
+      {
+        "text": "Karak Chai",
+        "done": false,
+        "cityId": "city-dubai"
+      }
+    ],
+    "legTips": [
+      {
+        "text": "Dress modestly in public spaces."
+      },
+      {
+        "text": "Taxis are relatively cheap and the easiest way to get around."
+      }
+    ],
+    "suggestedActivities": [
+      {
+        "title": "Burj Khalifa Observation Deck",
+        "category": "sight",
+        "estTime": "2 hrs",
+        "estCost": "50",
+        "assignedDayIdx": null,
+        "cityId": "city-dubai"
+      }
+    ],
     "days": [
       {
-        "date": "2026-06-07",
-        "day": "Sun",
+        "date": "2026-06-13",
+        "day": "Sat",
         "from": "Paris",
         "to": "Dubai",
         "transportItems": [
@@ -265,8 +526,21 @@ const DEFAULT_DATA = [
             "status": "confirmed"
           }
         ],
-        "accomItems": [],
-        "activityItems": []
+        "accomItems": [
+          {
+            "text": "Dubai Airport Transit Hotel",
+            "cost": "150",
+            "status": "confirmed",
+            "cityId": "city-dubai"
+          }
+        ],
+        "activityItems": [
+          {
+            "text": "Dubai Mall Fountain Show",
+            "time": "18:00 - 19:00",
+            "cost": "0"
+          }
+        ]
       }
     ]
   },
@@ -276,10 +550,15 @@ const DEFAULT_DATA = [
     "colour": "#34495e",
     "cityFood": [],
     "suggestedActivities": [],
+    "legTips": [
+      {
+        "text": "Declare all food items at Australian customs!"
+      }
+    ],
     "days": [
       {
-        "date": "2026-06-08",
-        "day": "Mon",
+        "date": "2026-06-14",
+        "day": "Sun",
         "from": "Dubai",
         "to": "Sydney",
         "transportItems": [
