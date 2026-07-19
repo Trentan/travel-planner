@@ -775,6 +775,22 @@ function renderTransportMobileFacts(segs, totalCost, notes = '') {
   const fromDetail = firstSeg.fromAddress || '';
   const toDetail = lastSeg.toAddress || '';
   const notesValue = String(notes || '').trim();
+  
+  let flightAlertHtml = '';
+  if (firstSeg.transportType === 'flight' && routeCodeSet.length > 0 && routeCodeSet[0]) {
+    const flightCode = routeCodeSet[0];
+    const statusUrl = `https://www.google.com/search?q=flight+status+${encodeURIComponent(flightCode)}`;
+    flightAlertHtml = `
+      <div class="transport-alert-banner" style="grid-column: 1 / -1;">
+        <span>✈️</span>
+        <div style="flex: 1;">Flight readiness</div>
+        <a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="transport-alert-action-btn" onclick="event.stopPropagation();">
+          Check Status
+        </a>
+      </div>
+    `;
+  }
+
 
   return `
     <div class="transport-mobile-facts-grid">
@@ -878,6 +894,22 @@ function isTransportMobileCardLayout() {
 
 function renderTransportSegmentsDetailContent(segs) {
   const useCompactSegments = typeof window !== 'undefined' && (window.isCompactView || document.body.classList.contains('mobile-app-mode'));
+    
+    let flightAlertHtml = '';
+    if (segs.length > 0 && segs[0].transportType === 'flight') {
+       const flightCode = segs.map(s => s.routeCode).filter(Boolean)[0];
+       if (flightCode) {
+           const statusUrl = `https://www.google.com/search?q=flight+status+${encodeURIComponent(flightCode)}`;
+           flightAlertHtml = `
+             <div class="transport-alert-banner" style="margin-bottom: 0.5rem; margin-top: 0;">
+               <span>✈️</span>
+               <div style="flex: 1;">Flight readiness</div>
+               <a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="transport-alert-action-btn">Check Status</a>
+             </div>
+           `;
+       }
+    }
+
   const detailRows = segs.map((seg, i) => {
     const segDepDate = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
     const segDepTime = seg.departureTime || '';
@@ -934,7 +966,10 @@ function renderTransportSegmentsDetailContent(segs) {
   return useCompactSegments
       ? `
       <div class="mt-2 bg-slate-50/50 dark:bg-slate-800/30 rounded-lg p-3">
-        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Journey Segments</div>
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex justify-between items-center">
+          <span>Journey Segments</span>
+          ${flightAlertHtml ? flightAlertHtml.replace('margin-bottom: 0.5rem; margin-top: 0;', 'margin: -0.25rem 0; padding: 0.25rem 0.5rem; font-size: 0.75rem;') : ''}
+        </div>
         <div class="hidden">
           <span>Journey</span>
           <span>Schedule</span>
@@ -947,7 +982,10 @@ function renderTransportSegmentsDetailContent(segs) {
     `
       : `
       <div class="mt-2 bg-slate-50/50 dark:bg-slate-800/20 rounded-lg border border-slate-200/50 dark:border-slate-700/50 overflow-hidden">
-        <div class="px-4 py-2 bg-slate-100/50 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50 text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Journey Segments</div>
+        <div class="px-4 py-2 bg-slate-100/50 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50 text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider flex justify-between items-center">
+          <span>Journey Segments</span>
+          ${flightAlertHtml ? flightAlertHtml.replace('margin-bottom: 0.5rem; margin-top: 0;', 'margin: -0.25rem 0; padding: 0.25rem 0.5rem; font-size: 0.75rem;') : ''}
+        </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse min-w-[800px]">
             <thead>

@@ -6592,3 +6592,45 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   min-width: 180px; /* Ensure transport/activities column has room */
 }
 
+
+
+/* Transport Readiness Alerts */
+.transport-alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #fffbeb;
+  border-left: 3px solid #f59e0b;
+  border-radius: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: #92400e;
+}
+.dark .transport-alert-banner {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+}
+.transport-alert-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.1);
+  border-radius: 0.25rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.transport-alert-action-btn:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+}
+.dark .transport-alert-action-btn {
+  color: #60a5fa;
+  background-color: rgba(96, 165, 250, 0.15);
+}
+.dark .transport-alert-action-btn:hover {
+  background-color: rgba(96, 165, 250, 0.25);
+}
