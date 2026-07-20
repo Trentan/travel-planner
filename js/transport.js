@@ -952,12 +952,11 @@ function renderTransportSegmentsDetailContent(segs) {
 
     return `
       <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm font-medium text-slate-800 dark:text-slate-200">
-          ${seg.fromLocation || '—'} → ${seg.toLocation || '—'}
-          ${renderTransportSubLocationDetails(seg, 'text-xs mt-0.5 text-slate-500')}
-        </td>
         <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">Leg ${i + 1}</td>
-        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${segRoute}</td>
+        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">
+          ${segRoute}
+          ${renderTransportSubLocationDetails(seg, 'text-xs mt-0.5 text-slate-500 font-normal')}
+        </td>
         <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap font-medium">${segDep}</td>
         <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
         <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${seg.provider || '—'}</td>
@@ -995,7 +994,6 @@ function renderTransportSegmentsDetailContent(segs) {
           <table class="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr class="bg-white/50 dark:bg-slate-800/20 border-b border-slate-200/50 dark:border-slate-700/50">
-                <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Journey</th>
                 <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Leg</th>
                 <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Route</th>
                 <th class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">Departs</th>
@@ -1018,7 +1016,20 @@ function renderTransportSegmentsDetailContent(segs) {
 function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, journeyId) {
   if (!segs || segs.length === 0) return '';
 
+  let flightAlertHtml = '';
+  if (segs.length === 1 && rep.transportType === 'flight' && rep.routeCode) {
+       const statusUrl = `https://www.google.com/search?q=flight+status+${encodeURIComponent(rep.routeCode)}`;
+       flightAlertHtml = `
+         <div class="transport-alert-banner" style="margin-bottom: 0.5rem; margin-top: 0.5rem; padding: 0.5rem;">
+           <span>✈️</span>
+           <div style="flex: 1; margin-left: 0.25rem;">Flight readiness</div>
+           <a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="transport-alert-action-btn" onclick="event.stopPropagation()">Check Status</a>
+         </div>
+       `;
+  }
+
   return `
+    ${flightAlertHtml}
     ${renderTransportMobileFacts(segs, totalCost, rep?.notes || '')}
     ${segs.length > 1 ? renderTransportSegmentsDetailContent(segs) : ''}
   `;
@@ -1308,12 +1319,25 @@ function buildTransportTab(cityFilter = null) {
       }
     }
 
+    let singleLegFlightAlert = '';
+    if (!isMultiLeg && rep.transportType === 'flight' && rep.routeCode) {
+       const statusUrl = `https://www.google.com/search?q=flight+status+${encodeURIComponent(rep.routeCode)}`;
+       singleLegFlightAlert = `
+         <div class="transport-alert-banner" style="margin-top: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+           <span>✈️</span>
+           <div style="flex: 1; margin-left: 0.25rem;">Flight readiness</div>
+           <a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="transport-alert-action-btn" onclick="event.stopPropagation()">Check Status</a>
+         </div>
+       `;
+    }
+
     html += `
       <tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${isMultiLeg ? 'cursor-pointer' : ''}" data-group="${gid}" style="border-left: 4px solid ${statusColor};" ${isMultiLeg ? `onclick="toggleTransportGroupDetails('${gid}')"` : ''}>
         <td class="px-3 py-3 w-8 align-middle text-center">${desktopExpandControl}</td>
         <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap" title="${escapeHtmlText(rep.journeyName || '')}">
           <div class="journey-name-main">${nameDisplay}</div>
           ${isMultiLeg ? `<div class="text-[11px] text-slate-400 dark:text-slate-500 font-normal mt-0.5">${segs.length} legs</div>` : ''}
+          ${singleLegFlightAlert}
         </td>
         <td class="px-4 py-3 align-middle text-center text-xl">${icon}</td>
         <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">${routeDisplay}</td>

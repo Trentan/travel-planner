@@ -543,6 +543,20 @@ const DEFAULT_LEAVE_HOME = [
   { text: "Treats", done: false, mergeKeys: ["if taking dog: treats"] }
 ];
 
+const DEFAULT_HOTEL_CHECKOUT = [
+  { text: "Room Sweep", kind: "section" },
+  { text: "Check under the bed", done: false },
+  { text: "Check the safe", done: false },
+  { text: "Check all power outlets (chargers)", done: false },
+  { text: "Check the bathroom (toiletries)", done: false },
+  { text: "Check drawers and closets", done: false },
+
+  { text: "Checkout", kind: "section" },
+  { text: "Return room keys", done: false },
+  { text: "Pay any incidentals/taxes", done: false },
+  { text: "Get receipt (if needed)", done: false }
+];
+
 function normalizeChecklistText(text) {
   return String(text || '')
       .trim()
@@ -648,14 +662,6 @@ const DEFAULT_PACKING = [
     areaColor: "#6C5CE7",
     categories: [
       { title: "Notes", items: [{text: "Booking reminders", done:false}, {text: "Places to book", done:false}, {text: "Trip ideas to follow up", done:false}] }
-    ]
-  },
-  {
-    areaName: "🏨 Hotel Checkout",
-    areaColor: "#1ABC9C",
-    categories: [
-      { title: "Room Sweep", items: [{text: "Check under the bed", done:false}, {text: "Check the safe", done:false}, {text: "Check all power outlets (chargers)", done:false}, {text: "Check the bathroom (toiletries)", done:false}, {text: "Check drawers and closets", done:false}] },
-      { title: "Checkout", items: [{text: "Return room keys", done:false}, {text: "Pay any incidentals/taxes", done:false}, {text: "Get receipt (if needed)", done:false}] }
     ]
   }
 ];

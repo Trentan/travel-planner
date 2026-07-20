@@ -176,6 +176,7 @@ function fallbackToLocalStorage() {
 let appData = [];
 let packingData = [];
 let leaveHomeData = [];
+let hotelCheckoutData = [];
 let citiesData = typeof DEFAULT_CITIES !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_CITIES)) : []; // City entities for filtering/grouping - { id, name, code, countryCode, country, dateFrom, dateTo, colour }
 let historyBaselineSnapshot = null;
 let historyBaselineSignature = '';
@@ -633,6 +634,7 @@ function getCurrentAppData() {
     itinerary: itineraryData,
     packing: packingData,
     leaveHome: leaveHomeData,
+    hotelCheckout: hotelCheckoutData,
     journeys: journeysData,
     stays: staysData,
     cities: citiesDataToExport,
@@ -727,6 +729,7 @@ function restoreHistorySnapshot(snapshot) {
     appData = normalizeTripLegsData(JSON.parse(JSON.stringify(snapshot.itinerary || [])));
     packingData = ensureDefaultPackingAreas(snapshot.packing || []);
     leaveHomeData = JSON.parse(JSON.stringify(snapshot.leaveHome || []));
+    hotelCheckoutData = JSON.parse(JSON.stringify(snapshot.hotelCheckout || []));
     journeys = normalizeTripJourneysData(JSON.parse(JSON.stringify(snapshot.journeys || [])));
     stays = normalizeTripStaysData(JSON.parse(JSON.stringify(snapshot.stays || [])));
     citiesData = normalizeTripCitiesDateData(JSON.parse(JSON.stringify(snapshot.cities || [])));
@@ -1615,7 +1618,8 @@ const COUNTRY_FLAGS = {
   'USA': '🇺🇸',
   'United States': '🇺🇸',
   'New York': '🇺🇸',
-  'Home': '🏠'
+  'Home': '🏠',
+  'Dubai': '🇦🇪'
 };
 
 // City/country name -> ISO-2 code for flagcdn.com images
@@ -1636,7 +1640,8 @@ const CITY_TO_CODE = {
   'greece': 'gr', 'athens': 'gr',
   'japan': 'jp', 'tokyo': 'jp',
   'usa': 'us', 'unitedstates': 'us', 'newyork': 'us',
-  'verona': 'it'
+  'verona': 'it',
+  'dubai': 'ae'
 };
 
 // Country name to ISO code mapping
@@ -2472,6 +2477,7 @@ async function initData() {
     } catch (e) {
       console.error('[LeaveHome] Failed to parse saved checklist:', e);
       leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
+      hotelCheckoutData = JSON.parse(JSON.stringify(DEFAULT_HOTEL_CHECKOUT));
     }
   } else {
     leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
@@ -2620,6 +2626,7 @@ async function runSaveData(showTick = true) {
         saveToIndexedDB('itinerary', appData),
         saveToIndexedDB('packing', packingData),
         saveToIndexedDB('leaveHome', leaveHomeData),
+        saveToIndexedDB('hotelCheckout', hotelCheckoutData),
         saveToIndexedDB('cities', citiesData),
         saveToIndexedDB('journeys', journeys),
         saveToIndexedDB('stays', stays),
@@ -2640,6 +2647,7 @@ async function runSaveData(showTick = true) {
   localStorage.setItem('travelApp_v2026_template', JSON.stringify(appData));
   localStorage.setItem('travelApp_packing_v3', JSON.stringify(packingData));
   localStorage.setItem('travelApp_leavehome_v3', JSON.stringify(leaveHomeData));
+  localStorage.setItem('travelApp_hotelCheckout_v1', JSON.stringify(hotelCheckoutData));
   localStorage.setItem('travelApp_stays_v1', JSON.stringify(stays));
   localStorage.setItem('travelApp_cities_v1', JSON.stringify(citiesData));
   localStorage.setItem('travelApp_journeys_v1', JSON.stringify(journeys));
@@ -3635,6 +3643,7 @@ function buildExportPayload() {
     itinerary: itineraryData,
     packing: cloneExportValue(packingData),
     leaveHome: cloneExportValue(leaveHomeData),
+    hotelCheckout: cloneExportValue(hotelCheckoutData),
     journeys: journeysData,
     stays: staysData,
     cities: citiesDataToExport,
@@ -4473,6 +4482,7 @@ async function exportItineraryText() {
   const itineraryData = normalizeTripLegsData(JSON.parse(JSON.stringify(appData || [])));
   const packing = Array.isArray(packingData) ? packingData : [];
   const leaveHome = Array.isArray(leaveHomeData) ? leaveHomeData : [];
+  const hotelCheckout = Array.isArray(hotelCheckoutData) ? hotelCheckoutData : [];
 
   const tripTitle = formatTextValue(titleData?.title, 'Untitled Trip');
   const tripSubtitle = formatTextValue(titleData?.subtitle, '');
@@ -4825,6 +4835,7 @@ async function loadImportedPayload(importedData, fileName) {
   }
   if (importedData.leaveHome && Array.isArray(importedData.leaveHome)) {
     leaveHomeData = mergeChecklistWithDefaults(importedData.leaveHome);
+    hotelCheckoutData = mergeChecklistWithDefaults(importedData.hotelCheckout, DEFAULT_HOTEL_CHECKOUT);
   } else {
     leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
   }

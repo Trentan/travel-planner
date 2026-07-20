@@ -460,14 +460,29 @@ function buildPackingTab() {
       <details class="guide-details">
         <summary class="guide-summary red-alert">🏠 Before Leaving Home</summary>
         <div class="guide-content">
-          ${leaveHomeData.map((item, iIdx) => `
+          ${leaveHomeData.map((item, iIdx) => {
+            if (isLeaveHomeSection(item)) {
+              return `
+                <div class="packing-section-header mt-4 mb-2 flex justify-between items-center group">
+                  <h4 contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
+                  ${isEditMode ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
+                </div>
+              `;
+            }
+            return `
             <div class="packing-item">
               <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
-        <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+              <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
               ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
             </div>
-          `).join('')}
-          ${isEditMode ? '<button class="add-btn add-btn-home-task" onclick="addLeaveHomeItem()">+ Add Home Task</button>' : ''}
+            `;
+          }).join('')}
+          ${isEditMode ? `
+            <div class="flex gap-2 mt-4" style="margin-top: 1rem;">
+              <button class="add-btn add-btn-home-task" onclick="addLeaveHomeItem()">+ Add Task</button>
+              <button class="add-btn add-btn-home-section" onclick="addLeaveHomeSection()">+ Add Section</button>
+            </div>
+          ` : ''}
         </div>
       </details>
 

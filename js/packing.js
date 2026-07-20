@@ -24,6 +24,7 @@ function restorePackingToDefault() {
 
   packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING));
   leaveHomeData = JSON.parse(JSON.stringify(DEFAULT_LEAVE_HOME));
+  hotelCheckoutData = JSON.parse(JSON.stringify(DEFAULT_HOTEL_CHECKOUT));
   activeGuidePanel = null;
   saveData();
   buildPackingTab();
@@ -35,6 +36,72 @@ function isLeaveHomeSection(item) {
 
 function countLeaveHomeTasks() {
   return leaveHomeData.filter(item => !isLeaveHomeSection(item)).length;
+}
+
+function toggleHotelCheckoutItem(e, iIdx) {
+  if (isLeaveHomeSection(hotelCheckoutData[iIdx])) return;
+  hotelCheckoutData[iIdx].done = e.target.checked;
+  saveData();
+  buildPackingTab();
+}
+
+function updateHotelCheckoutItem(iIdx, text) {
+  const item = hotelCheckoutData[iIdx];
+  if (isLeaveHomeSection(item)) return;
+  if (!text.trim()) {
+    hotelCheckoutData.splice(iIdx, 1);
+  } else {
+    hotelCheckoutData[iIdx].text = text;
+  }
+  saveData();
+  buildPackingTab();
+}
+
+function deleteHotelCheckoutItem(iIdx) {
+  hotelCheckoutData.splice(iIdx, 1);
+  saveData();
+  buildPackingTab();
+}
+
+function addHotelCheckoutItem() {
+  hotelCheckoutData.push({ text: 'New task...', done: false });
+  saveData();
+  buildPackingTab();
+}
+
+function addHotelCheckoutSection() {
+  hotelCheckoutData.push({ text: 'New Section', kind: 'section' });
+  saveData();
+  buildPackingTab();
+}
+
+function countHotelCheckoutTasks() {
+  return hotelCheckoutData.filter(item => !isLeaveHomeSection(item)).length;
+}
+
+function countCompletedHotelCheckoutTasks() {
+  return hotelCheckoutData.filter(item => !isLeaveHomeSection(item) && item.done).length;
+}
+
+function renderHotelCheckoutItems() {
+  return hotelCheckoutData.map((item, iIdx) => {
+    if (isLeaveHomeSection(item)) {
+      return `
+        <div class="packing-section-header mt-4 mb-2 flex justify-between items-center group">
+          <h4 contenteditable="${isEditMode}" onblur="updateHotelCheckoutItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
+          ${isEditMode ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteHotelCheckoutItem(${iIdx})">&times;</button>` : ''}
+        </div>
+      `;
+    }
+
+    return `
+      <div class="packing-item leave-home-item">
+        <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleHotelCheckoutItem(event, ${iIdx})">
+        <span contenteditable="${isEditMode}" onblur="updateHotelCheckoutItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+        ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deleteHotelCheckoutItem(${iIdx})">&times;</button>` : ''}
+      </div>
+    `;
+  }).join('');
 }
 
 function countCompletedLeaveHomeTasks() {
@@ -123,6 +190,12 @@ function addLeaveHomeItem() {
   buildPackingTab();
 }
 
+function addLeaveHomeSection() {
+  leaveHomeData.push({ text: 'New Section', kind: 'section' });
+  saveData();
+  buildPackingTab();
+}
+
 function togglePackingItem(e, aIdx, cIdx, iIdx) {
   packingData[aIdx].categories[cIdx].items[iIdx].done = e.target.checked;
   saveData();
@@ -177,7 +250,12 @@ function deletePackingCat(aIdx, cIdx) {
 function renderLeaveHomeItems() {
   return leaveHomeData.map((item, iIdx) => {
     if (isLeaveHomeSection(item)) {
-      return `<div class="leave-home-section-heading">${item.text}</div>`;
+      return `
+        <div class="packing-section-header mt-4 mb-2 flex justify-between items-center group">
+          <h4 contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
+          ${isEditMode ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
+        </div>
+      `;
     }
 
     return `
@@ -213,7 +291,45 @@ function renderPackingGuidePanel() {
           <div class="leave-home-list">
             ${renderLeaveHomeItems()}
           </div>
-          ${isEditMode ? '<button class="add-btn leave-home-add-btn" onclick="addLeaveHomeItem()">+ Add Home Task</button>' : ''}
+          ${isEditMode ? `
+            <div class="flex gap-2 mt-4" style="margin-top: 1rem;">
+              <button class="add-btn leave-home-add-btn" onclick="addLeaveHomeItem()">+ Add Task</button>
+              <button class="add-btn leave-home-add-btn" onclick="addLeaveHomeSection()">+ Add Section</button>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  if (activeGuidePanel === 'hotelCheckout') {
+    const totalTasks = countHotelCheckoutTasks();
+    const completedTasks = countCompletedHotelCheckoutTasks();
+    const progressWidth = totalTasks ? (completedTasks / totalTasks) * 100 : 0;
+
+    return `
+      <div class="packing-guide-panel guide-panel">
+        <div class="guide-panel-header">
+          <div>
+            <h4>Hotel Checkout</h4>
+            <p class="guide-panel-subtitle">${completedTasks} of ${totalTasks} tasks checked off</p>
+          </div>
+        </div>
+        <div class="guide-panel-content leave-home-guide-content">
+          <div class="leave-home-progress">
+            <div class="leave-home-progress-bar">
+              <span class="progress-width-var" style="width:${progressWidth}%"></span>
+            </div>
+          </div>
+          <div class="leave-home-list">
+            ${renderHotelCheckoutItems()}
+          </div>
+          ${isEditMode ? `
+            <div class="flex gap-2 mt-4" style="margin-top: 1rem;">
+              <button class="add-btn leave-home-add-btn" onclick="addHotelCheckoutItem()">+ Add Task</button>
+              <button class="add-btn leave-home-add-btn" onclick="addHotelCheckoutSection()">+ Add Section</button>
+            </div>
+          ` : ''}
         </div>
       </div>
     `;
@@ -280,6 +396,7 @@ function renderPackingGuidesShell() {
         <div class="packing-guides-toolbar-right">
           <div class="packing-guides-buttons">
             <button type="button" class="packing-guide-btn ${isActiveGuide('leaveHome') ? 'active' : ''}" onclick="toggleGuidePanel('leaveHome')">Before Leaving Home</button>
+            <button type="button" class="packing-guide-btn ${isActiveGuide('hotelCheckout') ? 'active' : ''}" onclick="toggleGuidePanel('hotelCheckout')">Hotel Checkout</button>
             <button type="button" class="packing-guide-btn ${isActiveGuide('sink') ? 'active' : ''}" onclick="toggleGuidePanel('sink')">Hotel Sink Washing</button>
             <button type="button" class="packing-guide-btn ${isActiveGuide('capsule') ? 'active' : ''}" onclick="toggleGuidePanel('capsule')">Capsule Wardrobe Prompt</button>
           </div>
@@ -300,6 +417,12 @@ window.toggleLeaveHomeItem = toggleLeaveHomeItem;
 window.updateLeaveHomeItem = updateLeaveHomeItem;
 window.deleteLeaveHomeItem = deleteLeaveHomeItem;
 window.addLeaveHomeItem = addLeaveHomeItem;
+window.addLeaveHomeSection = addLeaveHomeSection;
+window.toggleHotelCheckoutItem = toggleHotelCheckoutItem;
+window.updateHotelCheckoutItem = updateHotelCheckoutItem;
+window.deleteHotelCheckoutItem = deleteHotelCheckoutItem;
+window.addHotelCheckoutItem = addHotelCheckoutItem;
+window.addHotelCheckoutSection = addHotelCheckoutSection;
 window.togglePackingItem = togglePackingItem;
 window.updatePackingItem = updatePackingItem;
 window.updatePackingCat = updatePackingCat;
