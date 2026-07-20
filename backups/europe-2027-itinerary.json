@@ -27,7 +27,8 @@
           "startTime": "",
           "endDate": "2027-06-08",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Pre-flight Walk"
         }
       ],
       "legTips": [],
@@ -92,25 +93,29 @@
           "cityId": "city-athens",
           "category": "food",
           "title": "Platanos Taverna, Plaka",
-          "notes": "Running since 1932 under shady plane trees on Diogenous St; classic lamb roasted golden-brown and egg-lemon dolmades"
+          "notes": "Running since 1932 under shady plane trees on Diogenous St; classic lamb roasted golden-brown and egg-lemon dolmades",
+          "text": "Platanos Taverna, Plaka"
         },
         {
           "cityId": "city-athens",
           "category": "food",
           "title": "The Old Tavern of Psarras, Plaka",
-          "notes": "Founded 1898 in a neoclassical building; try the grilled octopus and moussaka, once a haunt of Laurence Olivier and Vivien Leigh"
+          "notes": "Founded 1898 in a neoclassical building; try the grilled octopus and moussaka, once a haunt of Laurence Olivier and Vivien Leigh",
+          "text": "The Old Tavern of Psarras, Plaka"
         },
         {
           "cityId": "city-athens",
           "category": "food",
           "title": "O Thanasis, Monastiraki",
-          "notes": "Considered Athens' best souvlaki and gyros joint, a few steps from Monastiraki Square"
+          "notes": "Considered Athens' best souvlaki and gyros joint, a few steps from Monastiraki Square",
+          "text": "O Thanasis, Monastiraki"
         },
         {
           "cityId": "city-athens",
           "category": "food",
           "title": "Saita, Plaka",
-          "notes": "Small, unpretentious taverna on Kydathineon St; order the bakaliaros skordalia (battered salt cod with garlic dip)"
+          "notes": "Small, unpretentious taverna on Kydathineon St; order the bakaliaros skordalia (battered salt cod with garlic dip)",
+          "text": "Saita, Plaka"
         }
       ],
       "suggestedActivities": [
@@ -124,7 +129,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Acropolis & Parthenon"
         },
         {
           "cityId": "city-athens",
@@ -136,7 +142,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Plaka district wander"
         },
         {
           "cityId": "city-athens",
@@ -148,7 +155,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Ancient Agora"
         },
         {
           "cityId": "city-athens",
@@ -160,7 +168,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Acropolis Museum"
         },
         {
           "id": "act-dkcs39i2f-mrsqchge",
@@ -179,7 +188,8 @@
           "startTime": "",
           "endDate": "2027-06-09",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Slow Morning in Athens"
         },
         {
           "id": "act-nea51oz3i-mrsqchgf",
@@ -198,7 +208,8 @@
           "startTime": "",
           "endDate": "2027-06-10",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Suggested Experience"
         },
         {
           "id": "act-0lxr7pfgi-mrsqchgf",
@@ -217,7 +228,8 @@
           "startTime": "",
           "endDate": "2027-06-11",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Suggested Experience"
         },
         {
           "id": "act-lzhsbsy46-mrsqchgf",
@@ -236,7 +248,8 @@
           "startTime": "",
           "endDate": "2027-06-12",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Suggested Experience"
         }
       ],
       "legTips": [
@@ -485,7 +498,8 @@
           "startDate": "2027-06-13",
           "startTime": "",
           "endDate": "2027-06-13",
-          "endTime": ""
+          "endTime": "",
+          "text": "Suggested Experience"
         }
       ],
       "days": [
@@ -563,7 +577,8 @@
           "startDate": "2027-06-14",
           "startTime": "",
           "endDate": "2027-06-14",
-          "endTime": ""
+          "endTime": "",
+          "text": "Suggested Experience"
         }
       ],
       "days": [
@@ -636,7 +651,8 @@
           "startDate": "2027-06-15",
           "startTime": "",
           "endDate": "2027-06-15",
-          "endTime": ""
+          "endTime": "",
+          "text": "Suggested Experience"
         }
       ],
       "days": [
@@ -709,7 +725,8 @@
           "startDate": "2027-06-16",
           "startTime": "",
           "endDate": "2027-06-16",
-          "endTime": ""
+          "endTime": "",
+          "text": "Suggested Experience"
         }
       ],
       "days": [
@@ -782,7 +799,8 @@
           "startDate": "2027-06-17",
           "startTime": "",
           "endDate": "2027-06-17",
-          "endTime": ""
+          "endTime": "",
+          "text": "Suggested Experience"
         }
       ],
       "days": [
@@ -855,7 +873,8 @@
           "startDate": "2027-06-18",
           "startTime": "",
           "endDate": "2027-06-18",
-          "endTime": ""
+          "endTime": "",
+          "text": "Suggested Experience"
         }
       ],
       "days": [
@@ -928,7 +947,8 @@
           "startDate": "2027-06-19",
           "startTime": "",
           "endDate": "2027-06-19",
-          "endTime": ""
+          "endTime": "",
+          "text": "Airport Transfer"
         }
       ],
       "days": [
@@ -975,19 +995,22 @@
           "cityId": "city-rome",
           "category": "food",
           "title": "Salumeria Roscioli, near Campo de' Fiori",
-          "notes": "Family-run since the mid-1800s — deli counter plus restaurant famous for cacio e pepe and charcuterie; book ahead, it's tiny"
+          "notes": "Family-run since the mid-1800s — deli counter plus restaurant famous for cacio e pepe and charcuterie; book ahead, it's tiny",
+          "text": "Salumeria Roscioli, near Campo de' Fiori"
         },
         {
           "cityId": "city-rome",
           "category": "food",
           "title": "Trattoria Da Enzo, Trastevere",
-          "notes": "Checkered-tablecloth local institution; the rigatoni alla carbonara and fried artichokes are the ones to order"
+          "notes": "Checkered-tablecloth local institution; the rigatoni alla carbonara and fried artichokes are the ones to order",
+          "text": "Trattoria Da Enzo, Trastevere"
         },
         {
           "cityId": "city-rome",
           "category": "food",
           "title": "Gelato at Fatamorgana or Giolitti",
-          "notes": "Two of Rome's most-loved gelaterias for a post-dinner crawl"
+          "notes": "Two of Rome's most-loved gelaterias for a post-dinner crawl",
+          "text": "Gelato at Fatamorgana or Giolitti"
         }
       ],
       "suggestedActivities": [
@@ -1001,7 +1024,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Colosseum & Roman Forum"
         },
         {
           "cityId": "city-rome",
@@ -1013,7 +1037,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Vatican Museums & Sistine Chapel"
         },
         {
           "cityId": "city-rome",
@@ -1025,7 +1050,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Trevi Fountain & Spanish Steps"
         },
         {
           "id": "act-vz3atgwqd-mrsqchgf",
@@ -1044,7 +1070,8 @@
           "startTime": "",
           "endDate": "2027-06-19",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Suggested Experience"
         },
         {
           "id": "act-z91r01di7-mrsqchgf",
@@ -1063,7 +1090,8 @@
           "startTime": "",
           "endDate": "2027-06-20",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Colosseum & Roman Forum"
         },
         {
           "id": "act-vp7ed62rl-mrsqchgf",
@@ -1082,7 +1110,8 @@
           "startTime": "",
           "endDate": "2027-06-21",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Vatican Museums & Sistine Chapel"
         }
       ],
       "legTips": [
@@ -1248,19 +1277,22 @@
           "cityId": "city-florence",
           "category": "food",
           "title": "Trattoria Zà Zà, Piazza del Mercato Centrale",
-          "notes": "40+ years sourcing from the market next door; the bistecca alla fiorentina is their signature"
+          "notes": "40+ years sourcing from the market next door; the bistecca alla fiorentina is their signature",
+          "text": "Trattoria Zà Zà, Piazza del Mercato Centrale"
         },
         {
           "cityId": "city-florence",
           "category": "food",
           "title": "All'Antico Vinaio, near the Uffizi",
-          "notes": "Cult-favourite sandwich shop — expect a queue but it moves fast; try 'La Favolosa'"
+          "notes": "Cult-favourite sandwich shop — expect a queue but it moves fast; try 'La Favolosa'",
+          "text": "All'Antico Vinaio, near the Uffizi"
         },
         {
           "cityId": "city-florence",
           "category": "food",
           "title": "Mercato Centrale food hall",
-          "notes": "Upstairs food court with 20+ vendors — truffle pasta and Neapolitan-style pizza stand out"
+          "notes": "Upstairs food court with 20+ vendors — truffle pasta and Neapolitan-style pizza stand out",
+          "text": "Mercato Centrale food hall"
         }
       ],
       "suggestedActivities": [
@@ -1274,7 +1306,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Uffizi Gallery"
         },
         {
           "cityId": "city-florence",
@@ -1286,7 +1319,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Duomo & Brunelleschi's Dome"
         },
         {
           "id": "act-hw1xf8jad-mrsqchgf",
@@ -1305,7 +1339,8 @@
           "startTime": "",
           "endDate": "2027-06-22",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "High-Speed Train: Rome to Florence"
         },
         {
           "id": "act-m6lgitomo-mrsqchgf",
@@ -1324,7 +1359,8 @@
           "startTime": "",
           "endDate": "2027-06-23",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Uffizi Gallery"
         }
       ],
       "legTips": [
@@ -1455,13 +1491,15 @@
           "cityId": "city-venice",
           "category": "food",
           "title": "All'Arco, near Rialto Market",
-          "notes": "Tiny standing-room bacaro famous for its crostini — try the soft-shell crab in season"
+          "notes": "Tiny standing-room bacaro famous for its crostini — try the soft-shell crab in season",
+          "text": "All'Arco, near Rialto Market"
         },
         {
           "cityId": "city-venice",
           "category": "food",
           "title": "Cantina Do Mori, San Polo",
-          "notes": "Venice's oldest bacaro, open since 1462; baccalà mantecato and sarde in saor with an ombra of house wine"
+          "notes": "Venice's oldest bacaro, open since 1462; baccalà mantecato and sarde in saor with an ombra of house wine",
+          "text": "Cantina Do Mori, San Polo"
         }
       ],
       "suggestedActivities": [
@@ -1475,7 +1513,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Gondola ride through the canals"
         },
         {
           "cityId": "city-venice",
@@ -1487,7 +1526,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "St Mark's Square & Basilica"
         },
         {
           "id": "act-sdme69964-mrsqchgf",
@@ -1506,7 +1546,8 @@
           "startTime": "",
           "endDate": "2027-06-24",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "High-Speed Train: Florence to Venice"
         },
         {
           "id": "act-h0q3me85a-mrsqchgf",
@@ -1525,7 +1566,8 @@
           "startTime": "",
           "endDate": "2027-06-25",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Classic Gondola Ride"
         }
       ],
       "legTips": [
@@ -1656,13 +1698,15 @@
           "cityId": "city-barcelona",
           "category": "food",
           "title": "El Xampanyet, El Born",
-          "notes": "Century-old tapas bar known for house-made sparkling wine and classic anchovies — no reservations, expect a squeeze"
+          "notes": "Century-old tapas bar known for house-made sparkling wine and classic anchovies — no reservations, expect a squeeze",
+          "text": "El Xampanyet, El Born"
         },
         {
           "cityId": "city-barcelona",
           "category": "food",
           "title": "El Quim de la Boqueria, La Boqueria Market",
-          "notes": "Running since 1987; famous for fried eggs with baby squid and market-fresh seafood"
+          "notes": "Running since 1987; famous for fried eggs with baby squid and market-fresh seafood",
+          "text": "El Quim de la Boqueria, La Boqueria Market"
         }
       ],
       "suggestedActivities": [
@@ -1676,7 +1720,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Sagrada Família"
         },
         {
           "cityId": "city-barcelona",
@@ -1688,7 +1733,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Park Güell"
         },
         {
           "cityId": "city-barcelona",
@@ -1700,7 +1746,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Barceloneta beach walk/run"
         },
         {
           "id": "act-h9pwcnk7k-mrsqchgg",
@@ -1719,7 +1766,8 @@
           "startTime": "",
           "endDate": "2027-06-26",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "La Plata Tapas Bar"
         },
         {
           "id": "act-k9x1n599a-mrsqchgg",
@@ -1738,7 +1786,8 @@
           "startTime": "",
           "endDate": "2027-06-27",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Sagrada Familia"
         },
         {
           "id": "act-6lm6b7p4s-mrsqchgg",
@@ -1757,7 +1806,8 @@
           "startTime": "",
           "endDate": "2027-06-28",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Barceloneta Beach Promenade"
         }
       ],
       "legTips": [
@@ -1923,13 +1973,15 @@
           "cityId": "city-madrid",
           "category": "food",
           "title": "Casa Revuelta, La Latina",
-          "notes": "Locals' favourite for bacalao rebozado (fried battered cod) with a glass of vermut de grifo — no menu, just ask"
+          "notes": "Locals' favourite for bacalao rebozado (fried battered cod) with a glass of vermut de grifo — no menu, just ask",
+          "text": "Casa Revuelta, La Latina"
         },
         {
           "cityId": "city-madrid",
           "category": "food",
           "title": "Chocolatería San Ginés, near Sol",
-          "notes": "Open since 1894 and going 24 hours — the classic spot for churros con chocolate"
+          "notes": "Open since 1894 and going 24 hours — the classic spot for churros con chocolate",
+          "text": "Chocolatería San Ginés, near Sol"
         }
       ],
       "suggestedActivities": [
@@ -1943,7 +1995,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Prado Museum"
         },
         {
           "cityId": "city-madrid",
@@ -1955,7 +2008,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Retiro Park"
         },
         {
           "cityId": "city-madrid",
@@ -1967,7 +2021,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Royal Palace"
         },
         {
           "id": "act-azabxjdx0-mrsqchgg",
@@ -1986,7 +2041,8 @@
           "startTime": "",
           "endDate": "2027-06-29",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "High-Speed Train: Barcelona to Madrid"
         },
         {
           "id": "act-yywquagts-mrsqchgg",
@@ -2005,7 +2061,8 @@
           "startTime": "",
           "endDate": "2027-06-30",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Prado Museum"
         },
         {
           "id": "act-ugi8xwqm8-mrsqchgg",
@@ -2024,7 +2081,8 @@
           "startTime": "",
           "endDate": "2027-07-01",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Retiro Park Morning Stroll"
         }
       ],
       "legTips": [
@@ -2199,13 +2257,15 @@
           "cityId": "city-lisbon",
           "category": "food",
           "title": "Pastéis de Belém, Belém",
-          "notes": "The original pastel de nata bakery, secret recipe since 1837 from monks at the nearby Jerónimos Monastery"
+          "notes": "The original pastel de nata bakery, secret recipe since 1837 from monks at the nearby Jerónimos Monastery",
+          "text": "Pastéis de Belém, Belém"
         },
         {
           "cityId": "city-lisbon",
           "category": "food",
           "title": "Farol de Santa Luzia, Alfama",
-          "notes": "Tile-lined Alfama seafood spot known for grilled octopus and bacalhau — popular with groups"
+          "notes": "Tile-lined Alfama seafood spot known for grilled octopus and bacalhau — popular with groups",
+          "text": "Farol de Santa Luzia, Alfama"
         }
       ],
       "suggestedActivities": [
@@ -2219,7 +2279,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Belém Tower & Jerónimos Monastery"
         },
         {
           "cityId": "city-lisbon",
@@ -2231,7 +2292,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Tram 28 ride through Alfama"
         },
         {
           "id": "act-fk1qnobze-mrsqchgg",
@@ -2250,7 +2312,8 @@
           "startTime": "",
           "endDate": "2027-07-02",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Pastéis de Belém"
         },
         {
           "id": "act-a4lpt558w-mrsqchgg",
@@ -2269,7 +2332,8 @@
           "startTime": "",
           "endDate": "2027-07-03",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Jerónimos Monastery"
         },
         {
           "id": "act-8fp32q0z2-mrsqchgg",
@@ -2288,7 +2352,8 @@
           "startTime": "",
           "endDate": "2027-07-04",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Ribeira das Naus Walk"
         }
       ],
       "legTips": [
@@ -2441,13 +2506,15 @@
           "cityId": "city-paris",
           "category": "food",
           "title": "Chez Janou, Le Marais",
-          "notes": "Provençale bistro on a quiet corner near Place des Vosges — famous for its bottomless chocolate mousse"
+          "notes": "Provençale bistro on a quiet corner near Place des Vosges — famous for its bottomless chocolate mousse",
+          "text": "Chez Janou, Le Marais"
         },
         {
           "cityId": "city-paris",
           "category": "food",
           "title": "Robert et Louise, Le Marais",
-          "notes": "60+ years old, wood-fired grill; classic steak-frites and duck confit"
+          "notes": "60+ years old, wood-fired grill; classic steak-frites and duck confit",
+          "text": "Robert et Louise, Le Marais"
         }
       ],
       "suggestedActivities": [
@@ -2461,7 +2528,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Eiffel Tower"
         },
         {
           "cityId": "city-paris",
@@ -2473,7 +2541,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Louvre Museum"
         },
         {
           "cityId": "city-paris",
@@ -2485,7 +2554,8 @@
           "startDate": "",
           "endDate": "",
           "startTime": "",
-          "endTime": ""
+          "endTime": "",
+          "text": "Seine River cruise"
         },
         {
           "id": "act-7mtm7l8yf-mrsqchgg",
@@ -2504,7 +2574,8 @@
           "startTime": "",
           "endDate": "2027-07-05",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Chez Janou Bistro Dinner"
         },
         {
           "id": "act-nffs7y4y5-mrsqchgg",
@@ -2523,7 +2594,8 @@
           "startTime": "",
           "endDate": "2027-07-06",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Eiffel Tower at Sunset"
         },
         {
           "id": "act-gzkh7zeyu-mrsqchgg",
@@ -2542,7 +2614,8 @@
           "startTime": "",
           "endDate": "2027-07-07",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "The Louvre Museum"
         }
       ],
       "legTips": [
@@ -2722,7 +2795,8 @@
           "startTime": "",
           "endDate": "2027-07-08",
           "endTime": "",
-          "cityId": ""
+          "cityId": "",
+          "text": "Depart via CDG Airport"
         }
       ],
       "legTips": [],
