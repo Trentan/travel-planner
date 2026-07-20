@@ -63,7 +63,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-k2w4fuspk-mrsqchge",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Easy pre-flight walk"
             },
             {
               "cityId": "city-brisbane",
@@ -75,7 +76,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-iczb40gh7-mrsrv7n7",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Light dinner at BNE before boarding"
             }
           ]
         }
@@ -283,7 +285,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-dkcs39i2f-mrsqchge",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Slow café morning, no plans"
             },
             {
               "cityId": "city-athens",
@@ -295,7 +298,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-v8c76o1ek-mrsrv7n7",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Welcome dinner at Platanos Taverna, Plaka"
             }
           ]
         },
@@ -325,7 +329,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-nea51oz3i-mrsqchgf",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Acropolis of Athens & Parthenon"
             },
             {
               "cityId": "city-athens",
@@ -337,7 +342,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-67stecp3l-mrsrv7n7",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Acropolis Museum"
             },
             {
               "cityId": "city-athens",
@@ -349,7 +355,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-w65mlhlcs-mrsrv7n7",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Lunch at Saita, Kydathineon St"
             }
           ]
         },
@@ -379,7 +386,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-0lxr7pfgi-mrsqchgf",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Morning walk through the National Garden"
             },
             {
               "cityId": "city-athens",
@@ -391,7 +399,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-5b1l4uct1-mrsrv7n7",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Monastiraki flea market"
             },
             {
               "cityId": "city-athens",
@@ -403,7 +412,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-tk9vyua62-mrsrv7n7",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Dinner at The Old Tavern of Psarras"
             }
           ]
         },
@@ -433,7 +443,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-lzhsbsy46-mrsqchgf",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Check out & transfer to Piraeus port"
             },
             {
               "cityId": "city-athens",
@@ -445,7 +456,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-4v7csmfx1-mrsrv7n7",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Farewell gyros at O Thanasis, Monastiraki"
             }
           ]
         }
@@ -508,7 +520,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-obkqqara1-mrsrabz0",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Ephesus ancient city & Library of Celsus"
             },
             {
               "cityId": "city-kusadasi",
@@ -520,7 +533,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-vis5z31lh-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Turkish mezze lunch near the port"
             }
           ]
         }
@@ -579,7 +593,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-n8bsi7v3n-mrsrabz0",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Medieval Old Town of Rhodes (UNESCO)"
             },
             {
               "cityId": "city-rhodes",
@@ -591,7 +606,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-9ti1vzq5z-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Old Town wall walk"
             }
           ]
         }
@@ -650,7 +666,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-8n33rsa7w-mrsrabz0",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Palace of Knossos"
             },
             {
               "cityId": "city-crete",
@@ -662,7 +679,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-akq0b908e-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Cretan mezze lunch"
             }
           ]
         }
@@ -721,7 +739,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-ya4wghovp-mrsrabz0",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Oia caldera views & blue-domed churches"
             },
             {
               "cityId": "city-santorini",
@@ -733,7 +752,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-sasf64xvc-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Sunset dinner at Kastro, Oia"
             }
           ]
         }
@@ -792,7 +812,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-h6t3lpx2k-mrsrabz0",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Little Venice & windmills"
             },
             {
               "cityId": "city-mykonos",
@@ -804,7 +825,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-hpu9xvx95-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Lunch at Katerina's, Little Venice"
             }
           ]
         }
@@ -863,7 +885,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-woo7oj4f3-mrsrabz0",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Sarakiniko beach"
             },
             {
               "cityId": "city-milos",
@@ -875,7 +898,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-t07n55bje-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Fresh grilled fish at a portside taverna"
             }
           ]
         }
@@ -934,7 +958,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-h266xeh8n-mrsrabz0",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Disembark & transfer to airport"
             }
           ]
         }
@@ -1106,7 +1131,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-vz3atgwqd-mrsqchgf",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Dinner at Trattoria Da Enzo, Trastevere"
             }
           ]
         },
@@ -1136,7 +1162,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-z91r01di7-mrsqchgf",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Colosseum & Roman Forum"
             },
             {
               "cityId": "city-rome",
@@ -1148,7 +1175,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-qcc7aw7g5-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Lunch at Salumeria Roscioli, Campo de' Fiori"
             }
           ]
         },
@@ -1178,7 +1206,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-vp7ed62rl-mrsqchgf",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Vatican Museums & Sistine Chapel"
             },
             {
               "cityId": "city-rome",
@@ -1190,7 +1219,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-hsgqr2ie6-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "St Peter's Basilica"
             },
             {
               "cityId": "city-rome",
@@ -1202,7 +1232,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-bms8or45c-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Gelato crawl at Fatamorgana"
             }
           ]
         }
@@ -1338,7 +1369,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-hw1xf8jad-mrsqchgf",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Frecciarossa high-speed train Rome → Florence"
             },
             {
               "cityId": "city-florence",
@@ -1350,7 +1382,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-4l7nl2bxp-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Duomo & Brunelleschi's Dome"
             }
           ]
         },
@@ -1380,7 +1413,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-m6lgitomo-mrsqchgf",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Uffizi Gallery"
             },
             {
               "cityId": "city-florence",
@@ -1392,7 +1426,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-d6fv8orqr-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Sunset at Piazzale Michelangelo"
             },
             {
               "cityId": "city-florence",
@@ -1404,7 +1439,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-kr2l71ag0-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Dinner at Mercato Centrale"
             }
           ]
         }
@@ -1534,7 +1570,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-sdme69964-mrsqchgf",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "High-speed train Florence → Venice"
             },
             {
               "cityId": "city-venice",
@@ -1546,7 +1583,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-werd8z2jl-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "St Mark's Square"
             }
           ]
         },
@@ -1576,7 +1614,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-h0q3me85a-mrsqchgf",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Gondola ride through the canals"
             },
             {
               "cityId": "city-venice",
@@ -1588,7 +1627,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-5y7ibjktk-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Murano & Burano islands"
             },
             {
               "cityId": "city-venice",
@@ -1600,7 +1640,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-yc3lwfegt-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Cicchetti crawl at All'Arco and Cantina Do Mori"
             }
           ]
         }
@@ -1765,7 +1806,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-h9pwcnk7k-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Tapas crawl at El Xampanyet, El Born"
             }
           ]
         },
@@ -1795,7 +1837,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-k9x1n599a-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Sagrada Família"
             },
             {
               "cityId": "city-barcelona",
@@ -1807,7 +1850,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-tq9chruo8-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Park Güell"
             }
           ]
         },
@@ -1837,7 +1881,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-6lm6b7p4s-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Barceloneta beach walk"
             },
             {
               "cityId": "city-barcelona",
@@ -1849,7 +1894,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-6bq51n7pl-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Lunch at El Quim de la Boqueria"
             },
             {
               "cityId": "city-barcelona",
@@ -1861,7 +1907,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-zif0e30a2-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Gothic Quarter wander"
             }
           ]
         }
@@ -2022,7 +2069,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-azabxjdx0-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Renfe AVE high-speed train Barcelona → Madrid"
             },
             {
               "cityId": "city-madrid",
@@ -2034,7 +2082,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-x7oowgrxj-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Vermouth & tapas at Casa Revuelta"
             }
           ]
         },
@@ -2064,7 +2113,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-yywquagts-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Prado Museum"
             },
             {
               "cityId": "city-madrid",
@@ -2076,7 +2126,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-ch4knf8sn-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Royal Palace"
             }
           ]
         },
@@ -2106,7 +2157,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-ugi8xwqm8-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Morning jog through Retiro Park"
             },
             {
               "cityId": "city-madrid",
@@ -2118,7 +2170,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-297ym05oq-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Plaza Mayor & Mercado de San Miguel"
             },
             {
               "cityId": "city-madrid",
@@ -2130,7 +2183,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-yxzerciaa-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Churros con chocolate at Chocolatería San Ginés"
             }
           ]
         }
@@ -2283,7 +2337,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-fk1qnobze-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Pastéis de nata at Pastéis de Belém"
             }
           ]
         },
@@ -2313,7 +2368,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-a4lpt558w-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Belém Tower & Jerónimos Monastery"
             },
             {
               "cityId": "city-lisbon",
@@ -2325,7 +2381,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-ebcr9m0m4-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Tram 28 ride through Alfama"
             }
           ]
         },
@@ -2355,7 +2412,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-8fp32q0z2-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Riverside walk along the Tagus"
             },
             {
               "cityId": "city-lisbon",
@@ -2367,7 +2425,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-0e5bp3jtp-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Seafood dinner at Farol de Santa Luzia"
             }
           ]
         }
@@ -2532,7 +2591,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-7mtm7l8yf-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Dinner at Chez Janou, Le Marais"
             }
           ]
         },
@@ -2562,7 +2622,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-nffs7y4y5-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Eiffel Tower"
             },
             {
               "cityId": "city-paris",
@@ -2574,7 +2635,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-uyk99timo-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Seine River cruise"
             }
           ]
         },
@@ -2604,7 +2666,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-gzkh7zeyu-mrsqchgg",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Louvre Museum"
             },
             {
               "cityId": "city-paris",
@@ -2616,7 +2679,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-x5xoccxte-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Montmartre & Sacré-Cœur"
             },
             {
               "cityId": "city-paris",
@@ -2628,7 +2692,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-hbwclx3py-mrsrv7n8",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Patisserie crawl in Le Marais"
             }
           ]
         }
@@ -2693,7 +2758,8 @@
               "startTime": "",
               "endTime": "",
               "activityId": "act-d7fnw6snn-mrsqchgh",
-              "time": "1 hr"
+              "time": "1 hr",
+              "text": "Check out & transfer to airport"
             }
           ]
         }
