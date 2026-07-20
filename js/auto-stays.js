@@ -93,6 +93,12 @@ function getMissingStays() {
     c = c.replace(/\s*\(Trip End\)/gi, '');
     c = c.replace(/\s*\(Trip Finish\)/gi, '');
     c = c.replace(/\s*\(\d+\)/g, '');
+    const commaIdx = c.indexOf(',');
+    if (commaIdx !== -1) c = c.slice(0, commaIdx);
+    else {
+      const splitMatch = c.match(/ (—|–|-) /);
+      if (splitMatch) c = c.slice(0, splitMatch.index);
+    }
     if (c.toLowerCase().includes('(transit)')) {
       return ''; // returning empty string causes it to be grouped with nothing or skipped
     }
