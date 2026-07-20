@@ -3275,7 +3275,17 @@ const CITY_NAV_SKIP_NAMES = ['departure', 'arrival', 'in transit', 'between citi
 
 function cleanCityNavLabel(value) {
   if (!value || typeof value !== 'string') return '';
-  return value
+  let cleanValue = String(value || '');
+  const commaIdx = cleanValue.indexOf(',');
+  if (commaIdx !== -1) {
+    cleanValue = cleanValue.slice(0, commaIdx);
+  } else {
+    const splitMatch = cleanValue.match(/ (—|–|-) /);
+    if (splitMatch) {
+      cleanValue = cleanValue.slice(0, splitMatch.index);
+    }
+  }
+  return cleanValue
       .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
       .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
       .replace(/[\u{2600}-\u{26FF}]/gu, '')

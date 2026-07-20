@@ -3229,7 +3229,17 @@ function inferTransportTypeFromText(text) {
 function stripCityLabel(cityName) {
   // Strip emoji, flag sequences, and parenthetical suffixes like (Trip Start)
   // This mirrors cleanCityNavLabel so map matching and departure blocks work correctly
-  return String(cityName || '')
+    let cleanValue = String(cityName || '');
+  const commaIdx = cleanValue.indexOf(',');
+  if (commaIdx !== -1) {
+    cleanValue = cleanValue.slice(0, commaIdx);
+  } else {
+    const splitMatch = cleanValue.match(/ (—|–|-) /);
+    if (splitMatch) {
+      cleanValue = cleanValue.slice(0, splitMatch.index);
+    }
+  }
+  return cleanValue
     .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
     .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
     .replace(/[\u{2600}-\u{26FF}]/gu, '')
@@ -3526,7 +3536,17 @@ function getImportedDestinationCityNames(importedData) {
 
   const cleanLegLabel = (label) => {
     if (!label || typeof label !== 'string') return '';
-    return label
+    let cleanValue = String(label || '');
+  const commaIdx = cleanValue.indexOf(',');
+  if (commaIdx !== -1) {
+    cleanValue = cleanValue.slice(0, commaIdx);
+  } else {
+    const splitMatch = cleanValue.match(/ (—|–|-) /);
+    if (splitMatch) {
+      cleanValue = cleanValue.slice(0, splitMatch.index);
+    }
+  }
+  return cleanValue
       .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
       .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
       .replace(/[\u{2600}-\u{26FF}]/gu, '')
