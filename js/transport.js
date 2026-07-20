@@ -767,6 +767,12 @@ function renderTransportMobileFacts(segs, totalCost, notes = '') {
   const bookingSet = Array.from(new Set(segs.map(seg => seg.bookingReference).filter(Boolean)));
   const providerLabel = providerSet.length > 1 ? `${providerSet.length} carriers` : (providerSet[0] || '');
   const routeCodeLabel = routeCodeSet.length > 1 ? `${routeCodeSet.length} codes` : (routeCodeSet[0] || '');
+  let routeCodeDisplay = escapeHtmlText(routeCodeLabel);
+  if (firstSeg.transportType === 'flight' && routeCodeSet.length === 1 && routeCodeSet[0]) {
+    const flightCode = routeCodeSet[0];
+    const statusUrl = `https://www.google.com/search?q=flight+status+${encodeURIComponent(flightCode)}+${encodeURIComponent(firstDepDate)}`;
+    routeCodeDisplay = `<a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="hover:underline text-blue-600 dark:text-blue-400 flex flex-col items-start"><span class="font-mono uppercase">${escapeHtmlText(flightCode)}</span><span class="text-[10px] text-slate-500 font-sans mt-0.5 normal-case" style="line-height:1;">Check Status ↗</span></a>`;
+  }
   const bookingLabel = bookingSet.length > 1 ? `${bookingSet.length} refs` : (bookingSet[0] || '');
   const fromLocation = firstSeg.fromLocation || '';
   const toLocation = lastSeg.toLocation || '';
@@ -775,24 +781,7 @@ function renderTransportMobileFacts(segs, totalCost, notes = '') {
   const fromDetail = firstSeg.fromAddress || '';
   const toDetail = lastSeg.toAddress || '';
   const notesValue = String(notes || '').trim();
-  
-  let flightAlertHtml = '';
-  if (firstSeg.transportType === 'flight' && routeCodeSet.length > 0 && routeCodeSet[0]) {
-    const flightCode = routeCodeSet[0];
-    const statusUrl = `https://www.google.com/search?q=flight+status+${encodeURIComponent(flightCode)}`;
-    flightAlertHtml = `
-      <div class="transport-alert-banner" style="grid-column: 1 / -1;">
-        <span>✈️</span>
-        <div style="flex: 1;">Flight readiness</div>
-        <a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="transport-alert-action-btn" onclick="event.stopPropagation();">
-          Check Status
-        </a>
-      </div>
-    `;
-  }
-
-
-  return `
+return `
     <div class="transport-mobile-facts-grid">
       ${renderTransportMobileLinkedFact('From', fromValue, getMapSearchUrl(fromLocation, fromLocation))}
       ${renderTransportMobileLinkedFact('To', toValue, getMapSearchUrl(toLocation, toLocation))}
@@ -801,7 +790,10 @@ function renderTransportMobileFacts(segs, totalCost, notes = '') {
       ${renderTransportMobileLinkedFact('From Details', fromDetail, getMapSearchUrl(getJourneyMapSearchQuery(fromDetail, fromLocation, firstSeg.transportType)), '', '', 'transport-mobile-fact--detail')}
       ${renderTransportMobileLinkedFact('To Details', toDetail, getMapSearchUrl(getJourneyMapSearchQuery(toDetail, toLocation, lastSeg.transportType)), '', '', 'transport-mobile-fact--detail')}
       ${renderTransportMobileFact('Carrier', providerLabel)}
-      ${renderTransportMobileFact('Code', routeCodeLabel)}
+      ${routeCodeDisplay ? `<div class="transport-mobile-fact">
+      <span class="transport-mobile-fact-label">Code</span>
+      <span class="transport-mobile-fact-value">${routeCodeDisplay}</span>
+    </div>` : ''}
       ${renderTransportMobileFact('Cost', formatCurrency(totalCost))}
       ${renderTransportMobileFact('Booking #', bookingLabel)}
       ${notesValue ? renderTransportMobileFact('Notes', notesValue, 'transport-mobile-fact--wide transport-mobile-fact--notes') : ''}
@@ -894,23 +886,7 @@ function isTransportMobileCardLayout() {
 
 function renderTransportSegmentsDetailContent(segs) {
   const useCompactSegments = typeof window !== 'undefined' && (window.isCompactView || document.body.classList.contains('mobile-app-mode'));
-    
-    let flightAlertHtml = '';
-    if (segs.length > 0 && segs[0].transportType === 'flight') {
-       const flightCode = segs.map(s => s.routeCode).filter(Boolean)[0];
-       if (flightCode) {
-           const statusUrl = `https://www.google.com/search?q=flight+status+${encodeURIComponent(flightCode)}`;
-           flightAlertHtml = `
-             <div class="transport-alert-banner" style="margin-bottom: 0.5rem; margin-top: 0;">
-               <span>✈️</span>
-               <div style="flex: 1;">Flight readiness</div>
-               <a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="transport-alert-action-btn">Check Status</a>
-             </div>
-           `;
-       }
-    }
-
-  const detailRows = segs.map((seg, i) => {
+const detailRows = segs.map((seg, i) => {
     const segDepDate = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
     const segDepTime = seg.departureTime || '';
     const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTime : segDepDate;
@@ -972,7 +948,7 @@ function renderTransportSegmentsDetailContent(segs) {
       <div class="mt-2 bg-slate-50/50 dark:bg-slate-800/30 rounded-lg p-3">
         <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex justify-between items-center">
           <span>Journey Segments</span>
-          ${flightAlertHtml ? flightAlertHtml.replace('margin-bottom: 0.5rem; margin-top: 0;', 'margin: -0.25rem 0; padding: 0.25rem 0.5rem; font-size: 0.75rem;') : ''}
+          
         </div>
         <div class="hidden">
           <span>Journey</span>
@@ -988,7 +964,7 @@ function renderTransportSegmentsDetailContent(segs) {
       <div class="mt-2 bg-slate-50/50 dark:bg-slate-800/20 rounded-lg border border-slate-200/50 dark:border-slate-700/50 overflow-hidden">
         <div class="px-4 py-2 bg-slate-100/50 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50 text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider flex justify-between items-center">
           <span>Journey Segments</span>
-          ${flightAlertHtml ? flightAlertHtml.replace('margin-bottom: 0.5rem; margin-top: 0;', 'margin: -0.25rem 0; padding: 0.25rem 0.5rem; font-size: 0.75rem;') : ''}
+          
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse min-w-[800px]">
@@ -1015,21 +991,7 @@ function renderTransportSegmentsDetailContent(segs) {
 
 function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, journeyId) {
   if (!segs || segs.length === 0) return '';
-
-  let flightAlertHtml = '';
-  if (segs.length === 1 && rep.transportType === 'flight' && rep.routeCode) {
-       const statusUrl = `https://www.google.com/search?q=flight+status+${encodeURIComponent(rep.routeCode)}`;
-       flightAlertHtml = `
-         <div class="transport-alert-banner" style="margin-bottom: 0.5rem; margin-top: 0.5rem; padding: 0.5rem;">
-           <span>✈️</span>
-           <div style="flex: 1; margin-left: 0.25rem;">Flight readiness</div>
-           <a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="transport-alert-action-btn" onclick="event.stopPropagation()">Check Status</a>
-         </div>
-       `;
-  }
-
-  return `
-    ${flightAlertHtml}
+return `
     ${renderTransportMobileFacts(segs, totalCost, rep?.notes || '')}
     ${segs.length > 1 ? renderTransportSegmentsDetailContent(segs) : ''}
   `;
@@ -1318,27 +1280,13 @@ function buildTransportTab(cityFilter = null) {
         `;
       }
     }
-
-    let singleLegFlightAlert = '';
-    if (!isMultiLeg && rep.transportType === 'flight' && rep.routeCode) {
-       const statusUrl = `https://www.google.com/search?q=flight+status+${encodeURIComponent(rep.routeCode)}`;
-       singleLegFlightAlert = `
-         <div class="transport-alert-banner" style="margin-top: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.75rem;">
-           <span>✈️</span>
-           <div style="flex: 1; margin-left: 0.25rem;">Flight readiness</div>
-           <a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="transport-alert-action-btn" onclick="event.stopPropagation()">Check Status</a>
-         </div>
-       `;
-    }
-
-    html += `
+html += `
       <tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${isMultiLeg ? 'cursor-pointer' : ''}" data-group="${gid}" style="border-left: 4px solid ${statusColor};" ${isMultiLeg ? `onclick="toggleTransportGroupDetails('${gid}')"` : ''}>
         <td class="px-3 py-3 w-8 align-middle text-center">${desktopExpandControl}</td>
         <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap" title="${escapeHtmlText(rep.journeyName || '')}">
           <div class="journey-name-main">${nameDisplay}</div>
           ${isMultiLeg ? `<div class="text-[11px] text-slate-400 dark:text-slate-500 font-normal mt-0.5">${segs.length} legs</div>` : ''}
-          ${singleLegFlightAlert}
-        </td>
+          </td>
         <td class="px-4 py-3 align-middle text-center text-xl">${icon}</td>
         <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">${routeDisplay}</td>
         

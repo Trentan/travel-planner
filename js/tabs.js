@@ -463,14 +463,14 @@ function buildPackingTab() {
           ${leaveHomeData.map((item, iIdx) => {
             if (isLeaveHomeSection(item)) {
               return `
-                <div class="packing-section-header mt-4 mb-2 flex justify-between items-center group">
+                <div class="packing-section-header mt-4 mb-2 px-2 flex justify-between items-center w-full group">
                   <h4 contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
                   ${isEditMode ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
                 </div>
               `;
             }
             return `
-            <div class="packing-item">
+            <div class="packing-item w-full">
               <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
               <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
               ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
