@@ -1600,36 +1600,6 @@ var DEFAULT_TRIP_DATA = {
     {
       "id": "city-dubai",
       "label": "🐪 Dubai",
-      "colour": "#808080",
-      "cityFood": [],
-      "legTips": [
-        {
-          "text": "Dress modestly in public areas and shopping malls.",
-          "cityId": "city-dubai"
-        },
-        {
-          "text": "The Dubai Metro Gold Line connects the airport to the city centre.",
-          "cityId": "city-dubai"
-        }
-      ],
-      "suggestedActivities": [],
-      "days": [
-        {
-          "date": "2026-06-15",
-          "day": "Mon",
-          "from": "Paris",
-          "to": "Sydney",
-          "completed": false,
-          "desc": "In transit via Dubai",
-          "transportItems": [],
-          "accomItems": [],
-          "activityItems": []
-        }
-      ]
-    },
-    {
-      "id": "city-dubai",
-      "label": "🐪 Dubai",
       "colour": "#f39c12",
       "cityFood": [],
       "suggestedActivities": [],
