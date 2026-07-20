@@ -3763,8 +3763,8 @@ function buildCityNav() {
     </button>
   `;
 
-  // Get cities in travel order (by leg appearance)
-  const citiesInOrder = getCitiesInTravelOrder();
+  // Get cities in travel order (by leg appearance) and exclude transit cities from the UI
+  const citiesInOrder = getCitiesInTravelOrder().filter(c => !c.isTransit && !c.name.includes('Cruise Ship') && !c.name.includes('Start') && !c.name.includes('Return Home'));
 
   // Add all city buttons - transit cities get different styling
   citiesInOrder.forEach(city => {

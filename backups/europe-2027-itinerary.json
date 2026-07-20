@@ -35,8 +35,8 @@
         {
           "date": "2027-06-08",
           "day": "Tue",
-          "from": "Start (Home City)",
-          "to": "Start (Home City)",
+          "from": "Brisbane",
+          "to": "Brisbane",
           "completed": false,
           "desc": "Depart Brisbane, overnight flight via Singapore",
           "transportItems": [
@@ -2665,8 +2665,8 @@
         {
           "date": "2027-07-08",
           "day": "Thu",
-          "from": "Return Home",
-          "to": "Return Home",
+          "from": "Brisbane",
+          "to": "Brisbane",
           "completed": false,
           "desc": "Depart Paris for the long flight home, via Singapore",
           "transportItems": [
@@ -4026,203 +4026,6 @@
       "dateFrom": "2027-07-05",
       "dateTo": "2027-07-08",
       "colour": "#E91E63"
-    },
-    {
-      "id": "city-cruise-ship--cabin-",
-      "name": "Cruise Ship (Cabin)",
-      "code": "",
-      "countryCode": "",
-      "country": "",
-      "lat": null,
-      "lng": null,
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#2C3E50"
-    },
-    {
-      "id": "city-start",
-      "name": "Start",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#E74C3C"
-    },
-    {
-      "id": "city-return-home",
-      "name": "Return Home",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#9B59B6"
-    },
-    {
-      "id": "city-athens-greece",
-      "name": "Athens Greece",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-port-day--kuadas--ephesus",
-      "name": "Port day  Kuadas  Ephesus",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-port-day--rhodes",
-      "name": "Port day  Rhodes",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-port-day--crete",
-      "name": "Port day  Crete",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-port-day--santorini",
-      "name": "Port day  Santorini",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-port-day--mykonos",
-      "name": "Port day  Mykonos",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-port-day--milos",
-      "name": "Port day  Milos",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-disembark-at-piraeus-fly-to-rome",
-      "name": "Disembark at Piraeus fly to Rome",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-rome-italy",
-      "name": "Rome Italy",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-florence-italy",
-      "name": "Florence Italy",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-venice-italy",
-      "name": "Venice Italy",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-barcelona-spain",
-      "name": "Barcelona Spain",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-madrid-spain",
-      "name": "Madrid Spain",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-lisbon-portugal",
-      "name": "Lisbon Portugal",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
-    },
-    {
-      "id": "city-paris-france",
-      "name": "Paris France",
-      "country": "",
-      "code": "",
-      "countryCode": "",
-      "dateFrom": "",
-      "dateTo": "",
-      "colour": "#95a5a6",
-      "isTransit": true
     }
   ],
   "userCities": [],
