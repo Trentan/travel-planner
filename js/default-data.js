@@ -1552,16 +1552,16 @@ var DEFAULT_TRIP_DATA = {
           "date": "2026-06-14",
           "day": "Sun",
           "from": "Paris",
-          "to": "Sydney",
+          "to": "Dubai",
           "completed": false,
-          "desc": "Evening flight home to Sydney",
+          "desc": "Last day in Paris, evening flight to Dubai",
           "transportItems": [
             {
-              "text": "Emirates EK76 / EK412 | Dep 21:55 | Arr +2 06:00 | Paris → Sydney",
+              "text": "Emirates EK76 / EK412 | Dep 21:55 | Arr +1 06:35 | Paris → Dubai",
               "cost": "750",
               "status": "confirmed",
               "fromLocation": "Paris Charles de Gaulle (CDG) - Terminal 2C",
-              "toLocation": "Sydney Kingsford Smith (SYD) - Terminal 1",
+              "toLocation": "Dubai International (DXB) - Terminal 3",
               "provider": "Emirates",
               "routeCode": "EK76",
               "bookingRef": "EK-CDG-7712"
@@ -1628,6 +1628,63 @@ var DEFAULT_TRIP_DATA = {
       ]
     },
     {
+      "id": "city-dubai",
+      "label": "🐪 Dubai",
+      "colour": "#f39c12",
+      "cityFood": [],
+      "suggestedActivities": [],
+      "legTips": [],
+      "days": [
+        {
+          "date": "2026-06-15",
+          "day": "Mon",
+          "from": "Paris",
+          "to": "Dubai",
+          "completed": false,
+          "desc": "Arrive in Dubai for a 1-night stopover",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Dubai Airport Transit Hotel",
+              "cost": "150",
+              "status": "confirmed",
+              "provider": "Booking.com",
+              "cityId": "city-dubai",
+              "location": "Terminal 3, Dubai International Airport",
+              "checkInTime": "14:00",
+              "checkOutTime": "12:00",
+              "bookingRef": "BK-DXB-0142"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "Burj Khalifa & Dubai Mall Fountain Show",
+              "time": "17:00 - 20:00",
+              "cost": "50",
+              "done": false,
+              "startTime": "17:00",
+              "endTime": "20:00",
+              "startDate": "2026-06-15",
+              "endDate": "2026-06-15",
+              "activityId": "act-85hq5ujjb-mrsfauq0",
+              "cityId": "city-dubai"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-16",
+          "day": "Tue",
+          "from": "Dubai",
+          "to": "Sydney",
+          "completed": false,
+          "desc": "Depart Dubai for Sydney",
+          "transportItems": [],
+          "accomItems": [],
+          "activityItems": []
+        }
+      ]
+    },
+    {
       "id": "city-sydney-end",
       "label": "🛬 Sydney (Return)",
       "colour": "#27ae60",
@@ -1665,8 +1722,8 @@ var DEFAULT_TRIP_DATA = {
       ],
       "days": [
         {
-          "date": "2026-06-16",
-          "day": "Tue",
+          "date": "2026-06-17",
+          "day": "Wed",
           "from": "Dubai",
           "to": "Sydney",
           "completed": false,
@@ -1681,8 +1738,8 @@ var DEFAULT_TRIP_DATA = {
               "done": false,
               "startTime": "06:00",
               "endTime": "09:00",
-              "startDate": "2026-06-16",
-              "endDate": "2026-06-16",
+              "startDate": "2026-06-17",
+              "endDate": "2026-06-17",
               "activityId": "act-bihgj09qb-mrsfauq0",
               "cityId": "city-sydney"
             }
@@ -2474,16 +2531,16 @@ var DEFAULT_TRIP_DATA = {
       "journeyId": "jid_paris_sydney_return",
       "journeyName": "Paris → Sydney (via Dubai)",
       "legId": "city-dubai",
-      "dayDate": "2026-06-15",
+      "dayDate": "2026-06-16",
       "fromLocation": "Dubai",
       "toLocation": "Sydney",
       "fromAddress": "Dubai International (DXB) - Terminal 3",
       "toAddress": "Sydney Kingsford Smith (SYD) - Terminal 1",
       "fromCityId": "city-dubai",
       "toCityId": "city-sydney",
-      "departureDate": "2026-06-15",
+      "departureDate": "2026-06-16",
       "departureTime": "10:15",
-      "arrivalDate": "2026-06-16",
+      "arrivalDate": "2026-06-17",
       "arrivalTime": "06:00",
       "transportType": "flight",
       "provider": "Emirates",
@@ -2495,8 +2552,8 @@ var DEFAULT_TRIP_DATA = {
       "segmentOrder": 2,
       "notes": "Emirates Flight EK412 | Dep 10:15 | Arr +1 06:00 | Dubai → Sydney",
       "legs": [],
-      "startDate": "2026-06-15",
-      "endDate": "2026-06-16",
+      "startDate": "2026-06-16",
+      "endDate": "2026-06-17",
       "startTime": "10:15",
       "endTime": "06:00",
       "done": false,
@@ -2564,6 +2621,25 @@ var DEFAULT_TRIP_DATA = {
       "startTime": "",
       "endTime": "",
       "location": ""
+    },
+    {
+      "id": "stay_default_city-dubai_0_0",
+      "cityId": "city-dubai",
+      "propertyName": "Dubai Airport Transit Hotel",
+      "checkIn": "2026-06-15",
+      "checkOut": "2026-06-16",
+      "nights": 1,
+      "status": "confirmed",
+      "provider": "Booking.com",
+      "bookingRef": "BK-DXB-0142",
+      "totalCost": "150",
+      "notes": "Dubai Airport Transit Hotel",
+      "checkInTime": "14:00",
+      "checkOutTime": "12:00",
+      "startDate": "2026-06-15",
+      "endDate": "2026-06-16",
+      "startTime": "14:00",
+      "endTime": "12:00"
     }
   ],
   "cities": [
