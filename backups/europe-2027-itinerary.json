@@ -12,7 +12,7 @@
       "suggestedActivities": [
         {
           "id": "act-k2w4fuspk-mrsqchge",
-          "title": "",
+          "title": "Pre-flight Walk",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -74,7 +74,7 @@
               "endDate": "2027-06-08",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-388or4lvc-mrsradx2",
+              "activityId": "act-iczb40gh7-mrsrv7n7",
               "time": "1 hr"
             }
           ]
@@ -162,7 +162,7 @@
         },
         {
           "id": "act-dkcs39i2f-mrsqchge",
-          "title": "",
+          "title": "Slow Morning in Athens",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -181,7 +181,7 @@
         },
         {
           "id": "act-nea51oz3i-mrsqchgf",
-          "title": "",
+          "title": "Suggested Experience",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -200,7 +200,7 @@
         },
         {
           "id": "act-0lxr7pfgi-mrsqchgf",
-          "title": "",
+          "title": "Suggested Experience",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -219,7 +219,7 @@
         },
         {
           "id": "act-lzhsbsy46-mrsqchgf",
-          "title": "",
+          "title": "Suggested Experience",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -294,7 +294,7 @@
               "endDate": "2027-06-09",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-wfkkyp63r-mrsradx2",
+              "activityId": "act-v8c76o1ek-mrsrv7n7",
               "time": "1 hr"
             }
           ]
@@ -336,7 +336,7 @@
               "endDate": "2027-06-10",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-hc2fkjo3m-mrsradx2",
+              "activityId": "act-67stecp3l-mrsrv7n7",
               "time": "1 hr"
             },
             {
@@ -348,7 +348,7 @@
               "endDate": "2027-06-10",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-3np17yama-mrsradx2",
+              "activityId": "act-w65mlhlcs-mrsrv7n7",
               "time": "1 hr"
             }
           ]
@@ -390,7 +390,7 @@
               "endDate": "2027-06-11",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-u51ood79q-mrsradx2",
+              "activityId": "act-5b1l4uct1-mrsrv7n7",
               "time": "1 hr"
             },
             {
@@ -402,7 +402,7 @@
               "endDate": "2027-06-11",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-7i6dgx2mr-mrsradx2",
+              "activityId": "act-tk9vyua62-mrsrv7n7",
               "time": "1 hr"
             }
           ]
@@ -444,7 +444,7 @@
               "endDate": "2027-06-12",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-pigj7lpso-mrsradx2",
+              "activityId": "act-4v7csmfx1-mrsrv7n7",
               "time": "1 hr"
             }
           ]
@@ -459,7 +459,7 @@
       "suggestedActivities": [
         {
           "id": "act-obkqqara1-mrsrabz0",
-          "title": "",
+          "title": "Suggested Experience",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -519,7 +519,7 @@
               "endDate": "2027-06-13",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-5rizsnnda-mrsradx2",
+              "activityId": "act-vis5z31lh-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -535,7 +535,7 @@
       "suggestedActivities": [
         {
           "id": "act-n8bsi7v3n-mrsrabz0",
-          "title": "",
+          "title": "Suggested Experience",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -590,7 +590,7 @@
               "endDate": "2027-06-14",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-l2insme8g-mrsradx2",
+              "activityId": "act-9ti1vzq5z-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -606,7 +606,7 @@
       "suggestedActivities": [
         {
           "id": "act-8n33rsa7w-mrsrabz0",
-          "title": "",
+          "title": "Suggested Experience",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -661,7 +661,7 @@
               "endDate": "2027-06-15",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-nrlubj6dz-mrsradx2",
+              "activityId": "act-akq0b908e-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -677,7 +677,7 @@
       "suggestedActivities": [
         {
           "id": "act-ya4wghovp-mrsrabz0",
-          "title": "",
+          "title": "Suggested Experience",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -732,7 +732,7 @@
               "endDate": "2027-06-16",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-9yay78xta-mrsradx2",
+              "activityId": "act-sasf64xvc-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -748,7 +748,7 @@
       "suggestedActivities": [
         {
           "id": "act-h6t3lpx2k-mrsrabz0",
-          "title": "",
+          "title": "Suggested Experience",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -803,7 +803,7 @@
               "endDate": "2027-06-17",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-w738bnlaj-mrsradx2",
+              "activityId": "act-hpu9xvx95-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -819,7 +819,7 @@
       "suggestedActivities": [
         {
           "id": "act-woo7oj4f3-mrsrabz0",
-          "title": "",
+          "title": "Suggested Experience",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -874,7 +874,7 @@
               "endDate": "2027-06-18",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-wm74j31em-mrsradx2",
+              "activityId": "act-t07n55bje-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -890,7 +890,7 @@
       "suggestedActivities": [
         {
           "id": "act-h266xeh8n-mrsrabz0",
-          "title": "",
+          "title": "Airport Transfer",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1004,7 +1004,7 @@
         },
         {
           "id": "act-vz3atgwqd-mrsqchgf",
-          "title": "",
+          "title": "Suggested Experience",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1023,7 +1023,7 @@
         },
         {
           "id": "act-z91r01di7-mrsqchgf",
-          "title": "",
+          "title": "Colosseum & Roman Forum",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1042,7 +1042,7 @@
         },
         {
           "id": "act-vp7ed62rl-mrsqchgf",
-          "title": "",
+          "title": "Vatican Museums & Sistine Chapel",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1147,7 +1147,7 @@
               "endDate": "2027-06-20",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-79ns8bl31-mrsradx2",
+              "activityId": "act-qcc7aw7g5-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -1189,7 +1189,7 @@
               "endDate": "2027-06-21",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-ejgu7fydd-mrsradx2",
+              "activityId": "act-hsgqr2ie6-mrsrv7n8",
               "time": "1 hr"
             },
             {
@@ -1201,7 +1201,7 @@
               "endDate": "2027-06-21",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-hm3isrt64-mrsradx2",
+              "activityId": "act-bms8or45c-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -1259,7 +1259,7 @@
         },
         {
           "id": "act-hw1xf8jad-mrsqchgf",
-          "title": "",
+          "title": "High-Speed Train: Rome to Florence",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1278,7 +1278,7 @@
         },
         {
           "id": "act-m6lgitomo-mrsqchgf",
-          "title": "",
+          "title": "Uffizi Gallery",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1349,7 +1349,7 @@
               "endDate": "2027-06-22",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-s3otebslr-mrsradx2",
+              "activityId": "act-4l7nl2bxp-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -1391,7 +1391,7 @@
               "endDate": "2027-06-23",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-6qk9blald-mrsradx2",
+              "activityId": "act-d6fv8orqr-mrsrv7n8",
               "time": "1 hr"
             },
             {
@@ -1403,7 +1403,7 @@
               "endDate": "2027-06-23",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-d40eh9vu2-mrsradx2",
+              "activityId": "act-kr2l71ag0-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -1455,7 +1455,7 @@
         },
         {
           "id": "act-sdme69964-mrsqchgf",
-          "title": "",
+          "title": "High-Speed Train: Florence to Venice",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1474,7 +1474,7 @@
         },
         {
           "id": "act-h0q3me85a-mrsqchgf",
-          "title": "",
+          "title": "Classic Gondola Ride",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1545,7 +1545,7 @@
               "endDate": "2027-06-24",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-zdvtl9oqw-mrsradx2",
+              "activityId": "act-werd8z2jl-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -1587,7 +1587,7 @@
               "endDate": "2027-06-25",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-9euad0bxz-mrsradx2",
+              "activityId": "act-5y7ibjktk-mrsrv7n8",
               "time": "1 hr"
             },
             {
@@ -1599,7 +1599,7 @@
               "endDate": "2027-06-25",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-oyc56mq88-mrsradx2",
+              "activityId": "act-yc3lwfegt-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -1663,7 +1663,7 @@
         },
         {
           "id": "act-h9pwcnk7k-mrsqchgg",
-          "title": "",
+          "title": "La Plata Tapas Bar",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1682,7 +1682,7 @@
         },
         {
           "id": "act-k9x1n599a-mrsqchgg",
-          "title": "",
+          "title": "Sagrada Familia",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1701,7 +1701,7 @@
         },
         {
           "id": "act-6lm6b7p4s-mrsqchgg",
-          "title": "",
+          "title": "Barceloneta Beach Promenade",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1806,7 +1806,7 @@
               "endDate": "2027-06-27",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-kup6h5px2-mrsradx2",
+              "activityId": "act-tq9chruo8-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -1848,7 +1848,7 @@
               "endDate": "2027-06-28",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-6idjrbjk2-mrsradx2",
+              "activityId": "act-6bq51n7pl-mrsrv7n8",
               "time": "1 hr"
             },
             {
@@ -1860,7 +1860,7 @@
               "endDate": "2027-06-28",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-7ctgqqwph-mrsradx2",
+              "activityId": "act-zif0e30a2-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -1924,7 +1924,7 @@
         },
         {
           "id": "act-azabxjdx0-mrsqchgg",
-          "title": "",
+          "title": "High-Speed Train: Barcelona to Madrid",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1943,7 +1943,7 @@
         },
         {
           "id": "act-yywquagts-mrsqchgg",
-          "title": "",
+          "title": "Prado Museum",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -1962,7 +1962,7 @@
         },
         {
           "id": "act-ugi8xwqm8-mrsqchgg",
-          "title": "",
+          "title": "Retiro Park Morning Stroll",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -2033,7 +2033,7 @@
               "endDate": "2027-06-29",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-kwml8x4yi-mrsradx2",
+              "activityId": "act-x7oowgrxj-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -2075,7 +2075,7 @@
               "endDate": "2027-06-30",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-mlrskwwnt-mrsradx2",
+              "activityId": "act-ch4knf8sn-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -2117,7 +2117,7 @@
               "endDate": "2027-07-01",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-hr6mfqrl6-mrsradx2",
+              "activityId": "act-297ym05oq-mrsrv7n8",
               "time": "1 hr"
             },
             {
@@ -2129,7 +2129,7 @@
               "endDate": "2027-07-01",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-ijyidz1n3-mrsradx2",
+              "activityId": "act-yxzerciaa-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -2181,7 +2181,7 @@
         },
         {
           "id": "act-fk1qnobze-mrsqchgg",
-          "title": "",
+          "title": "Pastéis de Belém",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -2200,7 +2200,7 @@
         },
         {
           "id": "act-a4lpt558w-mrsqchgg",
-          "title": "",
+          "title": "Jerónimos Monastery",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -2219,7 +2219,7 @@
         },
         {
           "id": "act-8fp32q0z2-mrsqchgg",
-          "title": "",
+          "title": "Ribeira das Naus Walk",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -2324,7 +2324,7 @@
               "endDate": "2027-07-03",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-5nvyz8xh0-mrsradx2",
+              "activityId": "act-ebcr9m0m4-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -2366,7 +2366,7 @@
               "endDate": "2027-07-04",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-y2s9htns6-mrsradx2",
+              "activityId": "act-0e5bp3jtp-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -2430,7 +2430,7 @@
         },
         {
           "id": "act-7mtm7l8yf-mrsqchgg",
-          "title": "",
+          "title": "Chez Janou Bistro Dinner",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -2449,7 +2449,7 @@
         },
         {
           "id": "act-nffs7y4y5-mrsqchgg",
-          "title": "",
+          "title": "Eiffel Tower at Sunset",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -2468,7 +2468,7 @@
         },
         {
           "id": "act-gzkh7zeyu-mrsqchgg",
-          "title": "",
+          "title": "The Louvre Museum",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -2573,7 +2573,7 @@
               "endDate": "2027-07-06",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-1fg5l9aj7-mrsradx2",
+              "activityId": "act-uyk99timo-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -2615,7 +2615,7 @@
               "endDate": "2027-07-07",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-omvudkbbu-mrsradx2",
+              "activityId": "act-x5xoccxte-mrsrv7n8",
               "time": "1 hr"
             },
             {
@@ -2627,7 +2627,7 @@
               "endDate": "2027-07-07",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-kzwj7h96p-mrsradx2",
+              "activityId": "act-hbwclx3py-mrsrv7n8",
               "time": "1 hr"
             }
           ]
@@ -2642,7 +2642,7 @@
       "suggestedActivities": [
         {
           "id": "act-d7fnw6snn-mrsqchgh",
-          "title": "",
+          "title": "Depart via CDG Airport",
           "category": "sight",
           "estTime": "1 hr",
           "estCost": "0",
@@ -4026,6 +4026,194 @@
       "dateFrom": "2027-07-05",
       "dateTo": "2027-07-08",
       "colour": "#E91E63"
+    },
+    {
+      "id": "city-cruise-ship--cabin-",
+      "name": "Cruise Ship (Cabin)",
+      "code": "",
+      "countryCode": "",
+      "country": "",
+      "lat": null,
+      "lng": null,
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#FF4081"
+    },
+    {
+      "id": "city-athens-greece",
+      "name": "Athens Greece",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--kuadas--ephesus",
+      "name": "Port day  Kuadas  Ephesus",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--rhodes",
+      "name": "Port day  Rhodes",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--crete",
+      "name": "Port day  Crete",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--santorini",
+      "name": "Port day  Santorini",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--mykonos",
+      "name": "Port day  Mykonos",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--milos",
+      "name": "Port day  Milos",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-disembark-at-piraeus-fly-to-rome",
+      "name": "Disembark at Piraeus fly to Rome",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-rome-italy",
+      "name": "Rome Italy",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-florence-italy",
+      "name": "Florence Italy",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-venice-italy",
+      "name": "Venice Italy",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-barcelona-spain",
+      "name": "Barcelona Spain",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-madrid-spain",
+      "name": "Madrid Spain",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-lisbon-portugal",
+      "name": "Lisbon Portugal",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-paris-france",
+      "name": "Paris France",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-return-home",
+      "name": "Return Home",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
     }
   ],
   "userCities": [],

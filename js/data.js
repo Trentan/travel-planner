@@ -1618,6 +1618,11 @@ const COUNTRY_FLAGS = {
   'USA': '🇺🇸',
   'United States': '🇺🇸',
   'New York': '🇺🇸',
+  'Portugal': '🇵🇹',
+  'Lisbon': '🇵🇹',
+  'Turkey': '🇹🇷',
+  'Kuşadası': '🇹🇷',
+  'Kusadasi': '🇹🇷',
   'Home': '🏠',
   'Dubai': '🇦🇪'
 };
@@ -1641,7 +1646,9 @@ const CITY_TO_CODE = {
   'japan': 'jp', 'tokyo': 'jp',
   'usa': 'us', 'unitedstates': 'us', 'newyork': 'us',
   'verona': 'it',
-  'dubai': 'ae'
+  'dubai': 'ae',
+  'portugal': 'pt', 'lisbon': 'pt',
+  'turkey': 'tr', 'kusadasi': 'tr', 'kuşadası': 'tr'
 };
 
 // Country name to ISO code mapping
@@ -1665,7 +1672,9 @@ const COUNTRY_TO_CODE = {
   'Greece': 'GR',
   'Japan': 'JP',
   'USA': 'US',
-  'United States': 'US'
+  'United States': 'US',
+  'Portugal': 'PT',
+  'Turkey': 'TR'
 };
 
 // Get flag emoji for a city (based on city name or country)
