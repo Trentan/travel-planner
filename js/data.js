@@ -3092,6 +3092,39 @@ function normalizeTripLegsData(legs) {
 function normalizeTripJourneysData(items) {
   if (!Array.isArray(items)) return [];
   
+  const flatItems = [];
+  items.forEach(item => {
+    if (Array.isArray(item.legs) && item.legs.length > 0 && !item.transportType) {
+      item.legs.forEach((leg, idx) => {
+        flatItems.push({
+          id: item.id ? `${item.id}_${idx}` : undefined,
+          journeyId: item.journeyId || item.id,
+          journeyName: item.journeyName || '',
+          isMultiLeg: item.legs.length > 1,
+          segmentOrder: idx + 1,
+          fromCityId: leg.fromCityId || '',
+          toCityId: leg.toCityId || '',
+          fromLocation: leg.fromLocation || leg.fromCityId || '',
+          toLocation: leg.toLocation || leg.toCityId || '',
+          departureDate: leg.departureDate || '',
+          departureTime: leg.departureTime || '',
+          arrivalDate: leg.arrivalDate || '',
+          arrivalTime: leg.arrivalTime || '',
+          transportType: leg.type || leg.transportType || 'flight',
+          provider: leg.provider || '',
+          routeCode: leg.routeCode || '',
+          cost: leg.cost || '',
+          status: leg.status || 'suggested',
+          bookingReference: leg.bookingRef || leg.bookingReference || '',
+          notes: leg.notes || ''
+        });
+      });
+    } else {
+      flatItems.push(item);
+    }
+  });
+  items = flatItems;
+
   items.forEach(item => {
     if (!item.id) {
       item.id = 'journey-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);

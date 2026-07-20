@@ -67,22 +67,21 @@ EXPECTED JSON SCHEMA:
       "journeyId": "journey-outbound",
       "journeyName": "Home to First City",
       "isMultiLeg": false,
-      "legs": [
-        {
-          "type": "flight",
-          "fromCityId": "city-home",
-          "toCityId": "city-firstcity",
-          "departureDate": "YYYY-MM-DD",
-          "departureTime": "HH:MM",
-          "arrivalDate": "YYYY-MM-DD",
-          "arrivalTime": "HH:MM",
-          "provider": "Airline Name",
-          "routeCode": "FL123",
-          "cost": 500,
-          "status": "confirmed",
-          "bookingRef": "ABC123"
-        }
-      ]
+      "segmentOrder": 1,
+      "fromLocation": "Home City",
+      "toLocation": "First City",
+      "fromCityId": "city-home",
+      "toCityId": "city-firstcity",
+      "departureDate": "YYYY-MM-DD",
+      "departureTime": "HH:MM",
+      "arrivalDate": "YYYY-MM-DD",
+      "arrivalTime": "HH:MM",
+      "transportType": "flight",
+      "provider": "Airline Name",
+      "routeCode": "FL123",
+      "cost": 500,
+      "status": "confirmed",
+      "bookingReference": "ABC123"
     }
   ],
   "stays": [
