@@ -1552,16 +1552,16 @@ var DEFAULT_TRIP_DATA = {
           "date": "2026-06-14",
           "day": "Sun",
           "from": "Paris",
-          "to": "Dubai",
+          "to": "Sydney",
           "completed": false,
-          "desc": "Last day in Paris, evening flight to Dubai",
+          "desc": "Evening flight home to Sydney",
           "transportItems": [
             {
-              "text": "Emirates Flight EK76 | Dep 21:55 | Arr +1 06:35 | Paris → Dubai",
+              "text": "Emirates EK76 / EK412 | Dep 21:55 | Arr +2 06:00 | Paris → Sydney",
               "cost": "750",
               "status": "confirmed",
               "fromLocation": "Paris Charles de Gaulle (CDG) - Terminal 2C",
-              "toLocation": "Dubai International (DXB) - Terminal 3",
+              "toLocation": "Sydney Kingsford Smith (SYD) - Terminal 1",
               "provider": "Emirates",
               "routeCode": "EK76",
               "bookingRef": "EK-CDG-7712"
@@ -1599,20 +1599,9 @@ var DEFAULT_TRIP_DATA = {
     },
     {
       "id": "city-dubai",
-      "label": "🐪 Dubai (Transit)",
-      "colour": "#f39c12",
-      "cityFood": [
-        {
-          "text": "Shawarma in old Deira souks",
-          "done": false,
-          "cityId": "city-dubai"
-        },
-        {
-          "text": "Karak Chai (spiced tea) — a UAE classic",
-          "done": false,
-          "cityId": "city-dubai"
-        }
-      ],
+      "label": "🐪 Dubai",
+      "colour": "#808080",
+      "cityFood": [],
       "legTips": [
         {
           "text": "Dress modestly in public areas and shopping malls.",
@@ -1623,262 +1612,18 @@ var DEFAULT_TRIP_DATA = {
           "cityId": "city-dubai"
         }
       ],
-      "suggestedActivities": [
-        {
-          "title": "Burj Khalifa Observation Deck (Level 124)",
-          "category": "sight",
-          "estTime": "2 hrs",
-          "estCost": "50",
-          "assignedDayIdx": null,
-          "cityId": "city-dubai",
-          "id": "act-sug-dxb-1",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "title": "Dubai Mall & Fountain Show (evening)",
-          "category": "sight",
-          "estTime": "3 hrs",
-          "estCost": "0",
-          "assignedDayIdx": null,
-          "cityId": "city-dubai",
-          "id": "act-sug-dxb-2",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
-          "startTime": "",
-          "endTime": ""
-        },
-        {
-          "id": "act-7ox7t26d9-mrsfauq0",
-          "title": "Check in to Dubai Airport Transit Hotel",
-          "category": "sight",
-          "estTime": "08:00 - 09:00",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "status": "",
-          "bookingRef": "",
-          "externalLink": "",
-          "assignedDayIdx": 0,
-          "assignedDate": "2026-06-15",
-          "startDate": "2026-06-15",
-          "startTime": "08:00",
-          "endDate": "2026-06-15",
-          "endTime": "09:00",
-          "cityId": "city-dubai"
-        },
-        {
-          "id": "act-85hq5ujjb-mrsfauq0",
-          "title": "Burj Khalifa & Dubai Mall Fountain Show",
-          "category": "sight",
-          "estTime": "17:00 - 20:00",
-          "estCost": "50",
-          "notes": "",
-          "location": "",
-          "status": "",
-          "bookingRef": "",
-          "externalLink": "",
-          "assignedDayIdx": 0,
-          "assignedDate": "2026-06-15",
-          "startDate": "2026-06-15",
-          "startTime": "17:00",
-          "endDate": "2026-06-15",
-          "endTime": "20:00",
-          "cityId": "city-dubai"
-        },
-        {
-          "id": "act-4k4qhmrrp-mrsfauq0",
-          "title": "Dubai Creek & Al Fahidi Historic District",
-          "category": "sight",
-          "estTime": "09:00 - 12:00",
-          "estCost": "0",
-          "notes": "",
-          "location": "",
-          "status": "",
-          "bookingRef": "",
-          "externalLink": "",
-          "assignedDayIdx": 1,
-          "assignedDate": "2026-06-16",
-          "startDate": "2026-06-16",
-          "startTime": "09:00",
-          "endDate": "2026-06-16",
-          "endTime": "12:00",
-          "cityId": "city-dubai"
-        },
-        {
-          "id": "act-xo01yi2q9-mrsfauq0",
-          "title": "Dubai Museum & Gold Souk",
-          "category": "sight",
-          "estTime": "13:00 - 16:00",
-          "estCost": "5",
-          "notes": "",
-          "location": "",
-          "status": "",
-          "bookingRef": "",
-          "externalLink": "",
-          "assignedDayIdx": 1,
-          "assignedDate": "2026-06-16",
-          "startDate": "2026-06-16",
-          "startTime": "13:00",
-          "endDate": "2026-06-16",
-          "endTime": "16:00",
-          "cityId": "city-dubai"
-        },
-        {
-          "id": "act-ou0vfyusm-mrsfauq0",
-          "title": "Early transfer to Dubai International Airport",
-          "category": "sight",
-          "estTime": "07:00 - 08:30",
-          "estCost": "25",
-          "notes": "",
-          "location": "",
-          "status": "",
-          "bookingRef": "",
-          "externalLink": "",
-          "assignedDayIdx": 2,
-          "assignedDate": "2026-06-17",
-          "startDate": "2026-06-17",
-          "startTime": "07:00",
-          "endDate": "2026-06-17",
-          "endTime": "08:30",
-          "cityId": "city-dubai"
-        }
-      ],
+      "suggestedActivities": [],
       "days": [
         {
           "date": "2026-06-15",
           "day": "Mon",
           "from": "Paris",
-          "to": "Dubai",
-          "completed": false,
-          "desc": "Arrive in Dubai — Transit",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Dubai Airport Transit Hotel",
-              "cost": "150",
-              "status": "confirmed",
-              "provider": "Booking.com",
-              "cityId": "city-dubai",
-              "location": "Terminal 3, Dubai International Airport",
-              "checkInTime": "14:00",
-              "checkOutTime": "12:00",
-              "bookingRef": "BK-DXB-0142"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Check in to Dubai Airport Transit Hotel",
-              "time": "08:00 - 09:00",
-              "cost": "0",
-              "done": false,
-              "startTime": "08:00",
-              "endTime": "09:00",
-              "startDate": "2026-06-15",
-              "endDate": "2026-06-15",
-              "activityId": "act-7ox7t26d9-mrsfauq0",
-              "cityId": "city-dubai"
-            },
-            {
-              "text": "Burj Khalifa & Dubai Mall Fountain Show",
-              "time": "17:00 - 20:00",
-              "cost": "50",
-              "done": false,
-              "startTime": "17:00",
-              "endTime": "20:00",
-              "startDate": "2026-06-15",
-              "endDate": "2026-06-15",
-              "activityId": "act-85hq5ujjb-mrsfauq0",
-              "cityId": "city-dubai"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-16",
-          "day": "Tue",
-          "from": "Dubai",
-          "to": "Dubai",
-          "completed": false,
-          "desc": "Dubai — one full day to explore",
-          "transportItems": [],
-          "accomItems": [
-            {
-              "text": "Dubai Airport Transit Hotel",
-              "cost": "150",
-              "status": "confirmed",
-              "provider": "Booking.com",
-              "cityId": "city-dubai",
-              "location": "Terminal 3, Dubai International Airport",
-              "checkInTime": "14:00",
-              "checkOutTime": "12:00",
-              "bookingRef": "BK-DXB-0142"
-            }
-          ],
-          "activityItems": [
-            {
-              "text": "Dubai Creek & Al Fahidi Historic District",
-              "time": "09:00 - 12:00",
-              "cost": "0",
-              "done": false,
-              "startTime": "09:00",
-              "endTime": "12:00",
-              "startDate": "2026-06-16",
-              "endDate": "2026-06-16",
-              "activityId": "act-4k4qhmrrp-mrsfauq0",
-              "cityId": "city-dubai"
-            },
-            {
-              "text": "Dubai Museum & Gold Souk",
-              "time": "13:00 - 16:00",
-              "cost": "5",
-              "done": false,
-              "startTime": "13:00",
-              "endTime": "16:00",
-              "startDate": "2026-06-16",
-              "endDate": "2026-06-16",
-              "activityId": "act-xo01yi2q9-mrsfauq0",
-              "cityId": "city-dubai"
-            }
-          ]
-        },
-        {
-          "date": "2026-06-17",
-          "day": "Wed",
-          "from": "Dubai",
           "to": "Sydney",
           "completed": false,
-          "desc": "Depart Dubai for Sydney",
-          "transportItems": [
-            {
-              "text": "Emirates Flight EK412 | Dep 10:15 | Arr +1 06:00 | Dubai → Sydney",
-              "cost": "750",
-              "status": "confirmed",
-              "fromLocation": "Dubai International (DXB) - Terminal 3",
-              "toLocation": "Sydney Kingsford Smith (SYD) - Terminal 1",
-              "provider": "Emirates",
-              "routeCode": "EK412",
-              "bookingRef": "EK-DXB-9981"
-            }
-          ],
+          "desc": "In transit via Dubai",
+          "transportItems": [],
           "accomItems": [],
-          "activityItems": [
-            {
-              "text": "Early transfer to Dubai International Airport",
-              "time": "07:00 - 08:30",
-              "cost": "25",
-              "done": false,
-              "startTime": "07:00",
-              "endTime": "08:30",
-              "startDate": "2026-06-17",
-              "endDate": "2026-06-17",
-              "activityId": "act-ou0vfyusm-mrsfauq0",
-              "cityId": "city-sydney"
-            }
-          ]
+          "activityItems": []
         }
       ]
     },
@@ -1920,8 +1665,8 @@ var DEFAULT_TRIP_DATA = {
       ],
       "days": [
         {
-          "date": "2026-06-18",
-          "day": "Thu",
+          "date": "2026-06-16",
+          "day": "Tue",
           "from": "Dubai",
           "to": "Sydney",
           "completed": false,
@@ -1936,8 +1681,8 @@ var DEFAULT_TRIP_DATA = {
               "done": false,
               "startTime": "06:00",
               "endTime": "09:00",
-              "startDate": "2026-06-18",
-              "endDate": "2026-06-18",
+              "startDate": "2026-06-16",
+              "endDate": "2026-06-16",
               "activityId": "act-bihgj09qb-mrsfauq0",
               "cityId": "city-sydney"
             }
@@ -2692,8 +2437,8 @@ var DEFAULT_TRIP_DATA = {
     },
     {
       "id": "journey_default_city-paris_3_0",
-      "journeyId": "journey_default_group_city-paris_3_0",
-      "journeyName": "Paris → Dubai",
+      "journeyId": "jid_paris_sydney_return",
+      "journeyName": "Paris → Sydney (via Dubai)",
       "legId": "city-paris",
       "dayDate": "2026-06-14",
       "fromLocation": "Paris",
@@ -2712,7 +2457,7 @@ var DEFAULT_TRIP_DATA = {
       "status": "booked",
       "cost": "750",
       "bookingReference": "EK-CDG-7712",
-      "isMultiLeg": false,
+      "isMultiLeg": true,
       "segmentOrder": 1,
       "notes": "Emirates Flight EK76 | Dep 21:55 | Arr +1 06:35 | Paris → Dubai",
       "legs": [],
@@ -2726,19 +2471,19 @@ var DEFAULT_TRIP_DATA = {
     },
     {
       "id": "journey_default_city-dubai_2_0",
-      "journeyId": "journey_default_group_city-dubai_2_0",
-      "journeyName": "Dubai → Sydney",
+      "journeyId": "jid_paris_sydney_return",
+      "journeyName": "Paris → Sydney (via Dubai)",
       "legId": "city-dubai",
-      "dayDate": "2026-06-17",
+      "dayDate": "2026-06-15",
       "fromLocation": "Dubai",
       "toLocation": "Sydney",
       "fromAddress": "Dubai International (DXB) - Terminal 3",
       "toAddress": "Sydney Kingsford Smith (SYD) - Terminal 1",
       "fromCityId": "city-dubai",
       "toCityId": "city-sydney",
-      "departureDate": "2026-06-17",
+      "departureDate": "2026-06-15",
       "departureTime": "10:15",
-      "arrivalDate": "2026-06-18",
+      "arrivalDate": "2026-06-16",
       "arrivalTime": "06:00",
       "transportType": "flight",
       "provider": "Emirates",
@@ -2746,12 +2491,12 @@ var DEFAULT_TRIP_DATA = {
       "status": "booked",
       "cost": "750",
       "bookingReference": "EK-DXB-9981",
-      "isMultiLeg": false,
-      "segmentOrder": 1,
+      "isMultiLeg": true,
+      "segmentOrder": 2,
       "notes": "Emirates Flight EK412 | Dep 10:15 | Arr +1 06:00 | Dubai → Sydney",
       "legs": [],
-      "startDate": "2026-06-17",
-      "endDate": "2026-06-18",
+      "startDate": "2026-06-15",
+      "endDate": "2026-06-16",
       "startTime": "10:15",
       "endTime": "06:00",
       "done": false,
@@ -2816,26 +2561,6 @@ var DEFAULT_TRIP_DATA = {
       "checkOutTime": "",
       "startDate": "2026-06-11",
       "endDate": "2026-06-14",
-      "startTime": "",
-      "endTime": "",
-      "location": ""
-    },
-    {
-      "id": "stay_default_city-dubai_0_0",
-      "cityId": "city-dubai",
-      "propertyName": "Dubai Airport Transit Hotel",
-      "checkIn": "2026-06-15",
-      "checkOut": "2026-06-17",
-      "nights": 2,
-      "status": "confirmed",
-      "provider": "Booking.com",
-      "bookingRef": "BK-DXB-0142",
-      "totalCost": "300",
-      "notes": "Dubai Airport Transit Hotel",
-      "checkInTime": "",
-      "checkOutTime": "",
-      "startDate": "2026-06-15",
-      "endDate": "2026-06-17",
       "startTime": "",
       "endTime": "",
       "location": ""

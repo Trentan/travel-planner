@@ -132,7 +132,7 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     }
     assert(await page.locator('#transport-table-container').textContent(), 'Desktop: transport tab should render');
     assert(await page.locator('#accom-table-container').textContent(), 'Desktop: accommodation tab should render');
-    assert((await page.locator('#transport-table-container thead').innerText()).includes('Booking Ref'), 'Desktop: transport table should show booking ref column');
+    assert((await page.locator('.transport-data-table > thead').innerText()).includes('Booking Ref'), 'Desktop: transport table should show booking ref column');
     await page.evaluate(() => {
       const target = (window.journeys || [])[0];
       if (!target || typeof window.editJourney !== 'function') throw new Error('No journey available to edit');
