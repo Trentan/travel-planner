@@ -3580,7 +3580,7 @@ function getImportedDestinationCityNames(importedData) {
       }
 
       (leg.days || []).forEach((day, dayIdx) => {
-        if (day.from && day.to && day.from === day.to) addName(day.to);
+        if (day.from && day.to && day.from === day.to) addName(typeof stripCityLabel === 'function' ? stripCityLabel(day.to) : cleanLegLabel(day.to));
 
         (day.accomItems || []).forEach(item => {
           if (item.cityId && cityIdToName.has(item.cityId)) addName(cityIdToName.get(item.cityId));
