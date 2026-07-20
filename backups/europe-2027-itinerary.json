@@ -29,6 +29,24 @@
           "endTime": "",
           "cityId": "",
           "text": "Pre-flight Walk"
+        },
+        {
+          "id": "act-jqlookeia-mrsskpln",
+          "title": "Light dinner at BNE before boarding",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Keep it simple — a proper Greek meal is waiting in Athens",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-08",
+          "startDate": "2027-06-08",
+          "startTime": "",
+          "endDate": "2027-06-08",
+          "endTime": ""
         }
       ],
       "legTips": [],
@@ -76,7 +94,7 @@
               "endDate": "2027-06-08",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-iczb40gh7-mrsrv7n7",
+              "activityId": "act-jqlookeia-mrsskpln",
               "time": "1 hr",
               "text": "Light dinner at BNE before boarding"
             }
@@ -164,12 +182,13 @@
           "title": "Acropolis Museum",
           "notes": "Modern glass-and-concrete museum built over an excavation site, housing the original Parthenon marbles Greece still holds",
           "id": "act-du7iejy7q-mrsqchge",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
+          "assignedDate": "2027-06-10",
+          "startDate": "2027-06-10",
+          "endDate": "2027-06-10",
           "startTime": "",
           "endTime": "",
-          "text": "Acropolis Museum"
+          "text": "Acropolis Museum",
+          "assignedDayIdx": 1
         },
         {
           "id": "act-dkcs39i2f-mrsqchge",
@@ -250,6 +269,96 @@
           "endTime": "",
           "cityId": "",
           "text": "Suggested Experience"
+        },
+        {
+          "id": "act-xqgvq93tj-mrsskpln",
+          "title": "Welcome dinner at Platanos Taverna, Plaka",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Since 1932; lamb, dolmades and barrel wine under the plane trees",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-09",
+          "startDate": "2027-06-09",
+          "startTime": "",
+          "endDate": "2027-06-09",
+          "endTime": ""
+        },
+        {
+          "id": "act-iq0rc404q-mrsskpln",
+          "title": "Lunch at Saita, Kydathineon St",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Bakaliaros skordalia, grilled lamb chops, baked aubergine with feta",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-10",
+          "startDate": "2027-06-10",
+          "startTime": "",
+          "endDate": "2027-06-10",
+          "endTime": ""
+        },
+        {
+          "id": "act-zgkrqydxh-mrsskplo",
+          "title": "Monastiraki flea market",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Sunday-market energy every day — antiques, records, souvenirs and street food stalls",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-11",
+          "startDate": "2027-06-11",
+          "startTime": "",
+          "endDate": "2027-06-11",
+          "endTime": ""
+        },
+        {
+          "id": "act-ykofncas1-mrsskplo",
+          "title": "Dinner at The Old Tavern of Psarras",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Since 1898; grilled octopus and moussaka in a neoclassical Plaka building",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-11",
+          "startDate": "2027-06-11",
+          "startTime": "",
+          "endDate": "2027-06-11",
+          "endTime": ""
+        },
+        {
+          "id": "act-9yl9v2fgl-mrsskplo",
+          "title": "Farewell gyros at O Thanasis, Monastiraki",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Grab a classic pork souvlaki wrap before heading to the port",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 3,
+          "assignedDate": "2027-06-12",
+          "startDate": "2027-06-12",
+          "startTime": "",
+          "endDate": "2027-06-12",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -310,7 +419,7 @@
               "endDate": "2027-06-09",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-v8c76o1ek-mrsrv7n7",
+              "activityId": "act-xqgvq93tj-mrsskpln",
               "time": "1 hr",
               "text": "Welcome dinner at Platanos Taverna, Plaka"
             }
@@ -354,7 +463,7 @@
               "endDate": "2027-06-10",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-67stecp3l-mrsrv7n7",
+              "activityId": "act-du7iejy7q-mrsqchge",
               "time": "1 hr",
               "text": "Acropolis Museum"
             },
@@ -367,7 +476,7 @@
               "endDate": "2027-06-10",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-w65mlhlcs-mrsrv7n7",
+              "activityId": "act-iq0rc404q-mrsskpln",
               "time": "1 hr",
               "text": "Lunch at Saita, Kydathineon St"
             }
@@ -411,7 +520,7 @@
               "endDate": "2027-06-11",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-5b1l4uct1-mrsrv7n7",
+              "activityId": "act-zgkrqydxh-mrsskplo",
               "time": "1 hr",
               "text": "Monastiraki flea market"
             },
@@ -424,7 +533,7 @@
               "endDate": "2027-06-11",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-tk9vyua62-mrsrv7n7",
+              "activityId": "act-ykofncas1-mrsskplo",
               "time": "1 hr",
               "text": "Dinner at The Old Tavern of Psarras"
             }
@@ -468,7 +577,7 @@
               "endDate": "2027-06-12",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-4v7csmfx1-mrsrv7n7",
+              "activityId": "act-9yl9v2fgl-mrsskplo",
               "time": "1 hr",
               "text": "Farewell gyros at O Thanasis, Monastiraki"
             }
@@ -500,6 +609,24 @@
           "endDate": "2027-06-13",
           "endTime": "",
           "text": "Suggested Experience"
+        },
+        {
+          "id": "act-d4mpj8eu9-mrsskplp",
+          "title": "Turkish mezze lunch near the port",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Grilled meze plates and fresh bread before reboarding",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-13",
+          "startDate": "2027-06-13",
+          "startTime": "",
+          "endDate": "2027-06-13",
+          "endTime": ""
         }
       ],
       "days": [
@@ -546,7 +673,7 @@
               "endDate": "2027-06-13",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-vis5z31lh-mrsrv7n8",
+              "activityId": "act-d4mpj8eu9-mrsskplp",
               "time": "1 hr",
               "text": "Turkish mezze lunch near the port"
             }
@@ -579,6 +706,24 @@
           "endDate": "2027-06-14",
           "endTime": "",
           "text": "Suggested Experience"
+        },
+        {
+          "id": "act-l3mpi2zqi-mrsskplp",
+          "title": "Old Town wall walk",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Walk part of the surviving medieval fortification walls for harbour views",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-14",
+          "startDate": "2027-06-14",
+          "startTime": "",
+          "endDate": "2027-06-14",
+          "endTime": ""
         }
       ],
       "days": [
@@ -620,7 +765,7 @@
               "endDate": "2027-06-14",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-9ti1vzq5z-mrsrv7n8",
+              "activityId": "act-l3mpi2zqi-mrsskplp",
               "time": "1 hr",
               "text": "Old Town wall walk"
             }
@@ -653,6 +798,24 @@
           "endDate": "2027-06-15",
           "endTime": "",
           "text": "Suggested Experience"
+        },
+        {
+          "id": "act-lsj2vdm4r-mrsskplp",
+          "title": "Cretan mezze lunch",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Dakos (barley rusk salad), local cheeses and raki",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-15",
+          "startDate": "2027-06-15",
+          "startTime": "",
+          "endDate": "2027-06-15",
+          "endTime": ""
         }
       ],
       "days": [
@@ -694,7 +857,7 @@
               "endDate": "2027-06-15",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-akq0b908e-mrsrv7n8",
+              "activityId": "act-lsj2vdm4r-mrsskplp",
               "time": "1 hr",
               "text": "Cretan mezze lunch"
             }
@@ -727,6 +890,24 @@
           "endDate": "2027-06-16",
           "endTime": "",
           "text": "Suggested Experience"
+        },
+        {
+          "id": "act-lqe4qxnpe-mrsskplp",
+          "title": "Sunset dinner at Kastro, Oia",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Caldera-edge terrace near the castle ruins, one of Oia's most-booked sunset tables",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-16",
+          "startDate": "2027-06-16",
+          "startTime": "",
+          "endDate": "2027-06-16",
+          "endTime": ""
         }
       ],
       "days": [
@@ -768,7 +949,7 @@
               "endDate": "2027-06-16",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-sasf64xvc-mrsrv7n8",
+              "activityId": "act-lqe4qxnpe-mrsskplp",
               "time": "1 hr",
               "text": "Sunset dinner at Kastro, Oia"
             }
@@ -801,6 +982,24 @@
           "endDate": "2027-06-17",
           "endTime": "",
           "text": "Suggested Experience"
+        },
+        {
+          "id": "act-hzyvnpinc-mrsskplq",
+          "title": "Lunch at Katerina's, Little Venice",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Balcony tables over the water; baked feta and seafood platter",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-17",
+          "startDate": "2027-06-17",
+          "startTime": "",
+          "endDate": "2027-06-17",
+          "endTime": ""
         }
       ],
       "days": [
@@ -842,7 +1041,7 @@
               "endDate": "2027-06-17",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-hpu9xvx95-mrsrv7n8",
+              "activityId": "act-hzyvnpinc-mrsskplq",
               "time": "1 hr",
               "text": "Lunch at Katerina's, Little Venice"
             }
@@ -875,6 +1074,24 @@
           "endDate": "2027-06-18",
           "endTime": "",
           "text": "Suggested Experience"
+        },
+        {
+          "id": "act-drjdmn4qb-mrsskplq",
+          "title": "Fresh grilled fish at a portside taverna",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Milos is famous for its fish tavernas — quieter and cheaper than the bigger Cyclades islands",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-18",
+          "startDate": "2027-06-18",
+          "startTime": "",
+          "endDate": "2027-06-18",
+          "endTime": ""
         }
       ],
       "days": [
@@ -916,7 +1133,7 @@
               "endDate": "2027-06-18",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-t07n55bje-mrsrv7n8",
+              "activityId": "act-drjdmn4qb-mrsskplq",
               "time": "1 hr",
               "text": "Fresh grilled fish at a portside taverna"
             }
@@ -1112,6 +1329,60 @@
           "endTime": "",
           "cityId": "",
           "text": "Vatican Museums & Sistine Chapel"
+        },
+        {
+          "id": "act-ci636vqbv-mrsskplq",
+          "title": "Lunch at Salumeria Roscioli, Campo de' Fiori",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Cacio e pepe and a board of cured meats and cheeses — reserve in advance",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-20",
+          "startDate": "2027-06-20",
+          "startTime": "",
+          "endDate": "2027-06-20",
+          "endTime": ""
+        },
+        {
+          "id": "act-eo56x3e73-mrsskplq",
+          "title": "St Peter's Basilica",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Free to enter; the dome climb (with lift partway) gives sweeping rooftop views over Rome",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-21",
+          "startDate": "2027-06-21",
+          "startTime": "",
+          "endDate": "2027-06-21",
+          "endTime": ""
+        },
+        {
+          "id": "act-qfsgbt5i4-mrsskplq",
+          "title": "Gelato crawl at Fatamorgana",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Inventive, natural-ingredient flavours — try the pistachio or the seasonal fruit sorbettos",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-21",
+          "startDate": "2027-06-21",
+          "startTime": "",
+          "endDate": "2027-06-21",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -1203,7 +1474,7 @@
               "endDate": "2027-06-20",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-qcc7aw7g5-mrsrv7n8",
+              "activityId": "act-ci636vqbv-mrsskplq",
               "time": "1 hr",
               "text": "Lunch at Salumeria Roscioli, Campo de' Fiori"
             }
@@ -1247,7 +1518,7 @@
               "endDate": "2027-06-21",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-hsgqr2ie6-mrsrv7n8",
+              "activityId": "act-eo56x3e73-mrsskplq",
               "time": "1 hr",
               "text": "St Peter's Basilica"
             },
@@ -1260,7 +1531,7 @@
               "endDate": "2027-06-21",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-bms8or45c-mrsrv7n8",
+              "activityId": "act-qfsgbt5i4-mrsskplq",
               "time": "1 hr",
               "text": "Gelato crawl at Fatamorgana"
             }
@@ -1315,12 +1586,13 @@
           "title": "Duomo & Brunelleschi's Dome",
           "notes": "Climb the 463 steps for a panoramic view over Florence's terracotta rooftops",
           "id": "act-l2xix2c6s-mrsqchgf",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
+          "assignedDate": "2027-06-22",
+          "startDate": "2027-06-22",
+          "endDate": "2027-06-22",
           "startTime": "",
           "endTime": "",
-          "text": "Duomo & Brunelleschi's Dome"
+          "text": "Duomo & Brunelleschi's Dome",
+          "assignedDayIdx": 0
         },
         {
           "id": "act-hw1xf8jad-mrsqchgf",
@@ -1361,6 +1633,42 @@
           "endTime": "",
           "cityId": "",
           "text": "Uffizi Gallery"
+        },
+        {
+          "id": "act-s1ayuhsvo-mrsskplr",
+          "title": "Sunset at Piazzale Michelangelo",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Best panoramic view of Florence, especially at golden hour; a 20-minute uphill walk from the Arno",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-23",
+          "startDate": "2027-06-23",
+          "startTime": "",
+          "endDate": "2027-06-23",
+          "endTime": ""
+        },
+        {
+          "id": "act-vvuomqidd-mrsskplr",
+          "title": "Dinner at Mercato Centrale",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Truffle pasta upstairs, then gelato from Vestri on the way out",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-23",
+          "startDate": "2027-06-23",
+          "startTime": "",
+          "endDate": "2027-06-23",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -1417,7 +1725,7 @@
               "endDate": "2027-06-22",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-4l7nl2bxp-mrsrv7n8",
+              "activityId": "act-l2xix2c6s-mrsqchgf",
               "time": "1 hr",
               "text": "Duomo & Brunelleschi's Dome"
             }
@@ -1461,7 +1769,7 @@
               "endDate": "2027-06-23",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-d6fv8orqr-mrsrv7n8",
+              "activityId": "act-s1ayuhsvo-mrsskplr",
               "time": "1 hr",
               "text": "Sunset at Piazzale Michelangelo"
             },
@@ -1474,7 +1782,7 @@
               "endDate": "2027-06-23",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-kr2l71ag0-mrsrv7n8",
+              "activityId": "act-vvuomqidd-mrsskplr",
               "time": "1 hr",
               "text": "Dinner at Mercato Centrale"
             }
@@ -1568,6 +1876,60 @@
           "endTime": "",
           "cityId": "",
           "text": "Classic Gondola Ride"
+        },
+        {
+          "id": "act-hqco4rp0g-mrsskpls",
+          "title": "St Mark's Square",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Arrive by early evening as day-trip crowds thin out",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-24",
+          "startDate": "2027-06-24",
+          "startTime": "",
+          "endDate": "2027-06-24",
+          "endTime": ""
+        },
+        {
+          "id": "act-pfmuc60ns-mrsskpls",
+          "title": "Murano & Burano islands",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Murano for glassblowing demonstrations, Burano for its rainbow-coloured lace-making houses",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-25",
+          "startDate": "2027-06-25",
+          "startTime": "",
+          "endDate": "2027-06-25",
+          "endTime": ""
+        },
+        {
+          "id": "act-4fw069d8v-mrsskpls",
+          "title": "Cicchetti crawl at All'Arco and Cantina Do Mori",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Start at All'Arco for crostini, finish at Cantina Do Mori (est. 1462) for baccalà mantecato",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-25",
+          "startDate": "2027-06-25",
+          "startTime": "",
+          "endDate": "2027-06-25",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -1624,7 +1986,7 @@
               "endDate": "2027-06-24",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-werd8z2jl-mrsrv7n8",
+              "activityId": "act-hqco4rp0g-mrsskpls",
               "time": "1 hr",
               "text": "St Mark's Square"
             }
@@ -1668,7 +2030,7 @@
               "endDate": "2027-06-25",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-5y7ibjktk-mrsrv7n8",
+              "activityId": "act-pfmuc60ns-mrsskpls",
               "time": "1 hr",
               "text": "Murano & Burano islands"
             },
@@ -1681,7 +2043,7 @@
               "endDate": "2027-06-25",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-yc3lwfegt-mrsrv7n8",
+              "activityId": "act-4fw069d8v-mrsskpls",
               "time": "1 hr",
               "text": "Cicchetti crawl at All'Arco and Cantina Do Mori"
             }
@@ -1729,12 +2091,13 @@
           "title": "Park Güell",
           "notes": "Gaudí's mosaic-tiled park overlooking the city — the monumental zone needs a timed ticket",
           "id": "act-2tih8djot-mrsqchgg",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
+          "assignedDate": "2027-06-27",
+          "startDate": "2027-06-27",
+          "endDate": "2027-06-27",
           "startTime": "",
           "endTime": "",
-          "text": "Park Güell"
+          "text": "Park Güell",
+          "assignedDayIdx": 1
         },
         {
           "cityId": "city-barcelona",
@@ -1808,6 +2171,42 @@
           "endTime": "",
           "cityId": "",
           "text": "Barceloneta Beach Promenade"
+        },
+        {
+          "id": "act-0sa0zk4m9-mrsskplt",
+          "title": "Lunch at El Quim de la Boqueria",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Counter seats inside La Boqueria market; fried baby squid and market specials",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-28",
+          "startDate": "2027-06-28",
+          "startTime": "",
+          "endDate": "2027-06-28",
+          "endTime": ""
+        },
+        {
+          "id": "act-jdd8kabhx-mrsskplt",
+          "title": "Gothic Quarter wander",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Medieval lanes around the Cathedral of Barcelona, with Roman wall fragments still visible",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-28",
+          "startDate": "2027-06-28",
+          "startTime": "",
+          "endDate": "2027-06-28",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -1899,7 +2298,7 @@
               "endDate": "2027-06-27",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-tq9chruo8-mrsrv7n8",
+              "activityId": "act-2tih8djot-mrsqchgg",
               "time": "1 hr",
               "text": "Park Güell"
             }
@@ -1943,7 +2342,7 @@
               "endDate": "2027-06-28",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-6bq51n7pl-mrsrv7n8",
+              "activityId": "act-0sa0zk4m9-mrsskplt",
               "time": "1 hr",
               "text": "Lunch at El Quim de la Boqueria"
             },
@@ -1956,7 +2355,7 @@
               "endDate": "2027-06-28",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-zif0e30a2-mrsrv7n8",
+              "activityId": "act-jdd8kabhx-mrsskplt",
               "time": "1 hr",
               "text": "Gothic Quarter wander"
             }
@@ -2017,12 +2416,13 @@
           "title": "Royal Palace",
           "notes": "Europe's largest royal palace by floor area, still used for state ceremonies",
           "id": "act-5x9oid08c-mrsqchgg",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
+          "assignedDate": "2027-06-30",
+          "startDate": "2027-06-30",
+          "endDate": "2027-06-30",
           "startTime": "",
           "endTime": "",
-          "text": "Royal Palace"
+          "text": "Royal Palace",
+          "assignedDayIdx": 1
         },
         {
           "id": "act-azabxjdx0-mrsqchgg",
@@ -2083,6 +2483,60 @@
           "endTime": "",
           "cityId": "",
           "text": "Retiro Park Morning Stroll"
+        },
+        {
+          "id": "act-9r63f1oj4-mrsskplt",
+          "title": "Vermouth & tapas at Casa Revuelta",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "No menu — order the bacalao rebozado and a vermut de grifo like the regulars",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-29",
+          "startDate": "2027-06-29",
+          "startTime": "",
+          "endDate": "2027-06-29",
+          "endTime": ""
+        },
+        {
+          "id": "act-pigovnxty-mrsskplu",
+          "title": "Plaza Mayor & Mercado de San Miguel",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Historic 17th-century square, then tapas stalls and jamón at the glass-walled market",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-01",
+          "startDate": "2027-07-01",
+          "startTime": "",
+          "endDate": "2027-07-01",
+          "endTime": ""
+        },
+        {
+          "id": "act-ty1qrvuxg-mrsskplu",
+          "title": "Churros con chocolate at Chocolatería San Ginés",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Open since 1894; the definitive Madrid churros stop, day or night",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-01",
+          "startDate": "2027-07-01",
+          "startTime": "",
+          "endDate": "2027-07-01",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -2139,7 +2593,7 @@
               "endDate": "2027-06-29",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-x7oowgrxj-mrsrv7n8",
+              "activityId": "act-9r63f1oj4-mrsskplt",
               "time": "1 hr",
               "text": "Vermouth & tapas at Casa Revuelta"
             }
@@ -2183,7 +2637,7 @@
               "endDate": "2027-06-30",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-ch4knf8sn-mrsrv7n8",
+              "activityId": "act-5x9oid08c-mrsqchgg",
               "time": "1 hr",
               "text": "Royal Palace"
             }
@@ -2227,7 +2681,7 @@
               "endDate": "2027-07-01",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-297ym05oq-mrsrv7n8",
+              "activityId": "act-pigovnxty-mrsskplu",
               "time": "1 hr",
               "text": "Plaza Mayor & Mercado de San Miguel"
             },
@@ -2240,7 +2694,7 @@
               "endDate": "2027-07-01",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-yxzerciaa-mrsrv7n8",
+              "activityId": "act-ty1qrvuxg-mrsskplu",
               "time": "1 hr",
               "text": "Churros con chocolate at Chocolatería San Ginés"
             }
@@ -2288,12 +2742,13 @@
           "title": "Tram 28 ride through Alfama",
           "notes": "Rattling vintage tram that climbs Lisbon's steepest hills — go early to avoid the crush",
           "id": "act-b234nw5l4-mrsqchgg",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
+          "assignedDate": "2027-07-03",
+          "startDate": "2027-07-03",
+          "endDate": "2027-07-03",
           "startTime": "",
           "endTime": "",
-          "text": "Tram 28 ride through Alfama"
+          "text": "Tram 28 ride through Alfama",
+          "assignedDayIdx": 1
         },
         {
           "id": "act-fk1qnobze-mrsqchgg",
@@ -2354,6 +2809,24 @@
           "endTime": "",
           "cityId": "",
           "text": "Ribeira das Naus Walk"
+        },
+        {
+          "id": "act-f9dxfgamp-mrsskplu",
+          "title": "Seafood dinner at Farol de Santa Luzia",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Grilled octopus and cataplana stew in tile-lined Alfama",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-04",
+          "startDate": "2027-07-04",
+          "startTime": "",
+          "endDate": "2027-07-04",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -2445,7 +2918,7 @@
               "endDate": "2027-07-03",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-ebcr9m0m4-mrsrv7n8",
+              "activityId": "act-b234nw5l4-mrsqchgg",
               "time": "1 hr",
               "text": "Tram 28 ride through Alfama"
             }
@@ -2489,7 +2962,7 @@
               "endDate": "2027-07-04",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-0e5bp3jtp-mrsrv7n8",
+              "activityId": "act-f9dxfgamp-mrsskplu",
               "time": "1 hr",
               "text": "Seafood dinner at Farol de Santa Luzia"
             }
@@ -2550,12 +3023,13 @@
           "title": "Seine River cruise",
           "notes": "An hour-long boat trip past Notre-Dame, the Louvre and the Eiffel Tower, especially good near sunset",
           "id": "act-pw4eyvybz-mrsqchgg",
-          "assignedDate": "",
-          "startDate": "",
-          "endDate": "",
+          "assignedDate": "2027-07-06",
+          "startDate": "2027-07-06",
+          "endDate": "2027-07-06",
           "startTime": "",
           "endTime": "",
-          "text": "Seine River cruise"
+          "text": "Seine River cruise",
+          "assignedDayIdx": 1
         },
         {
           "id": "act-7mtm7l8yf-mrsqchgg",
@@ -2616,6 +3090,42 @@
           "endTime": "",
           "cityId": "",
           "text": "The Louvre Museum"
+        },
+        {
+          "id": "act-e7ipx4r4z-mrsskplv",
+          "title": "Montmartre & Sacré-Cœur",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Cobbled artist quarter with panoramic basilica steps over the city",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-07",
+          "startDate": "2027-07-07",
+          "startTime": "",
+          "endDate": "2027-07-07",
+          "endTime": ""
+        },
+        {
+          "id": "act-ueu6m314u-mrsskplv",
+          "title": "Patisserie crawl in Le Marais",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Croissants and pastries — L'Éclair de Génie on rue Pavée is a Marais favourite for eclairs",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-07",
+          "startDate": "2027-07-07",
+          "startTime": "",
+          "endDate": "2027-07-07",
+          "endTime": ""
         }
       ],
       "legTips": [
@@ -2707,7 +3217,7 @@
               "endDate": "2027-07-06",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-uyk99timo-mrsrv7n8",
+              "activityId": "act-pw4eyvybz-mrsqchgg",
               "time": "1 hr",
               "text": "Seine River cruise"
             }
@@ -2751,7 +3261,7 @@
               "endDate": "2027-07-07",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-x5xoccxte-mrsrv7n8",
+              "activityId": "act-e7ipx4r4z-mrsskplv",
               "time": "1 hr",
               "text": "Montmartre & Sacré-Cœur"
             },
@@ -2764,7 +3274,7 @@
               "endDate": "2027-07-07",
               "startTime": "",
               "endTime": "",
-              "activityId": "act-hbwclx3py-mrsrv7n8",
+              "activityId": "act-ueu6m314u-mrsskplv",
               "time": "1 hr",
               "text": "Patisserie crawl in Le Marais"
             }
