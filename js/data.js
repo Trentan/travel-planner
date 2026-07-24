@@ -5195,6 +5195,102 @@ window.setupCityAutocomplete = setupCityAutocomplete;
 
 
 // -- File Setup Onboarding UX --
+let tripStartStep = 0;
+const tripStartAnswers = { name: '', city: '', date: '', nights: 3, transport: 'flight' };
+
+function escapeTripStartText(value) {
+  return String(value || '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+}
+
+function renderTripStart() {
+  const container = document.getElementById('trip-start-content');
+  if (!container) return;
+  const progress = `<div class="trip-start-progress"><span>Getting started</span><span>${tripStartStep + 1} of 4</span></div>`;
+  const next = `<button class="trip-start-primary" type="button" onclick="nextTripStartStep()">Continue <span aria-hidden="true">→</span></button>`;
+  const back = tripStartStep ? `<button class="trip-start-back" type="button" onclick="previousTripStartStep()">Back</button>` : '';
+  if (tripStartStep === 0) {
+    container.innerHTML = `
+      <div class="trip-start-eyebrow">TRAVEL PLANNER</div>
+      <h2 id="trip-start-title">Start with the way you like to plan.</h2>
+      <p class="trip-start-intro">Build a real trip in a minute, explore the example already loaded, or learn the essentials when you need them.</p>
+      <div class="trip-start-choices">
+        <button class="trip-start-choice trip-start-choice--primary" type="button" onclick="chooseTripStart('build')"><span class="trip-start-choice-icon">✦</span><span><strong>Build my trip</strong><small>Answer a few simple questions. You can edit everything later.</small></span><b>→</b></button>
+        <button class="trip-start-choice" type="button" onclick="chooseTripStart('sample')"><span class="trip-start-choice-icon">◌</span><span><strong>Explore the sample trip</strong><small>See a complete itinerary first, with no data overwritten.</small></span><b>→</b></button>
+        <button class="trip-start-choice" type="button" onclick="chooseTripStart('learn')"><span class="trip-start-choice-icon">?</span><span><strong>Learn the essentials</strong><small>Open the guide and take the app at your own pace.</small></span><b>→</b></button>
+      </div>
+      <button class="trip-start-quiet" type="button" onclick="dismissTripStart()">I’ll explore on my own</button>`;
+    return;
+  }
+  const steps = [
+    `<label for="tripStartName">What should we call this trip?</label><input id="tripStartName" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Japan in spring" value="${escapeTripStartText(tripStartAnswers.name)}"><p>Keep it simple — you can rename it anytime.</p>`,
+    `<label for="tripStartCity">Where’s city one?</label><input id="tripStartCity" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Tokyo" value="${escapeTripStartText(tripStartAnswers.city)}"><p>Your first destination is enough to get moving.</p>`,
+    `<label for="tripStartDate">When do you arrive?</label><input id="tripStartDate" class="trip-start-input" type="date" value="${escapeTripStartText(tripStartAnswers.date)}"><p>An approximate date is fine. You can fill in the details later.</p>`,
+    `<label for="tripStartNights">How long are you there?</label><div class="trip-start-number-row"><button type="button" aria-label="Decrease nights" onclick="adjustTripStartNights(-1)">−</button><input id="tripStartNights" type="number" min="1" max="60" value="${tripStartAnswers.nights}" oninput="tripStartAnswers.nights=Math.max(1, Math.min(60, Number(this.value)||1))"><span>nights</span><button type="button" aria-label="Increase nights" onclick="adjustTripStartNights(1)">+</button></div><fieldset class="trip-start-transport"><legend>How are you getting there?</legend>${[['flight','Flight'],['train','Train'],['bus','Bus'],['ferry','Ferry'],['other','Other']].map(([value,label]) => `<button type="button" class="${tripStartAnswers.transport === value ? 'is-selected' : ''}" onclick="selectTripStartTransport('${value}')">${label}</button>`).join('')}</fieldset>`
+  ];
+  const isLast = tripStartStep === 4;
+  container.innerHTML = `${progress}<div class="trip-start-question"><h2>${['Let’s give it a name.', 'Choose your first stop.', 'Set the arrival day.', 'A few final details.'][tripStartStep - 1]}</h2>${steps[tripStartStep - 1]}</div><div class="trip-start-actions">${back}<button class="trip-start-primary" type="button" onclick="nextTripStartStep()">${isLast ? 'Create my trip' : 'Continue'} <span aria-hidden="true">→</span></button></div><button class="trip-start-quiet" type="button" onclick="dismissTripStart()">Finish this later</button>`;
+}
+
+function chooseTripStart(choice) {
+  if (choice === 'build') { tripStartStep = 1; renderTripStart(); return; }
+  dismissTripStart();
+  if (choice === 'learn') {
+    if (typeof openGuideDialog === 'function') openGuideDialog();
+    return;
+  }
+  localStorage.setItem('travelApp_trip_start_seen', 'true');
+  showToast('Sample trip is ready — open any day to see how it is put together.');
+}
+
+function captureTripStartAnswer() {
+  const fields = { 1: 'tripStartName', 2: 'tripStartCity', 3: 'tripStartDate' };
+  const field = document.getElementById(fields[tripStartStep]);
+  if (field) tripStartAnswers[tripStartStep === 1 ? 'name' : tripStartStep === 2 ? 'city' : 'date'] = field.value.trim();
+}
+
+function nextTripStartStep() {
+  captureTripStartAnswer();
+  if (tripStartStep === 1 && !tripStartAnswers.name) { showToast('Give your trip a name to continue.'); return; }
+  if (tripStartStep === 2 && !tripStartAnswers.city) { showToast('Choose your first city to continue.'); return; }
+  if (tripStartStep < 4) { tripStartStep++; renderTripStart(); return; }
+  createTripFromStartAnswers();
+}
+
+function previousTripStartStep() { tripStartStep = Math.max(0, tripStartStep - 1); renderTripStart(); }
+function adjustTripStartNights(change) { tripStartAnswers.nights = Math.max(1, Math.min(60, Number(tripStartAnswers.nights) + change)); renderTripStart(); }
+function selectTripStartTransport(type) { tripStartAnswers.transport = type; renderTripStart(); }
+function dismissTripStart() {
+  const modal = document.getElementById('trip-start-modal');
+  if (modal) modal.style.display = 'none';
+  localStorage.setItem('travelApp_trip_start_seen', 'true');
+}
+
+function createTripFromStartAnswers() {
+  const cityName = tripStartAnswers.city;
+  const knownCity = ALL_CITIES.find(city => city.name.toLowerCase() === cityName.toLowerCase());
+  const cityId = `city-${Date.now()}`;
+  const start = tripStartAnswers.date ? new Date(`${tripStartAnswers.date}T12:00:00`) : null;
+  const dateAt = offset => start ? new Date(start.getTime() + offset * 86400000).toISOString().slice(0, 10) : '';
+  const days = Array.from({ length: tripStartAnswers.nights }, (_, index) => ({
+    id: `day-${Date.now()}-${index}`, date: dateAt(index), day: start ? `Day ${index + 1}` : '', from: cityName, to: cityName,
+    completed: false, desc: '', transportItems: [], accomItems: [], activityItems: []
+  }));
+  citiesData = [{ id: cityId, name: cityName, code: knownCity?.code || '', countryCode: knownCity?.countryCode || 'ZZ', country: getCountryName(knownCity?.countryCode || 'ZZ'), dateFrom: dateAt(0), dateTo: dateAt(tripStartAnswers.nights - 1), colour: CITY_COLORS[0] }];
+  appData = [{ id: `leg-${Date.now()}`, label: cityName, cityId, colour: CITY_COLORS[0], cityFood: [], suggestedActivities: [], legTips: [], days }];
+  titleData = { title: tripStartAnswers.name, subtitle: `${tripStartAnswers.nights} night${tripStartAnswers.nights === 1 ? '' : 's'} in ${cityName}` };
+  journeys = [{ id: `journey-${Date.now()}`, journeyId: `journey-${Date.now()}`, journeyName: `Home to ${cityName}`, legId: appData[0].id, dayDate: dateAt(0), fromLocation: 'Home', toLocation: cityName, fromCityId: '', toCityId: cityId, departureDate: dateAt(0), departureTime: '', arrivalDate: dateAt(0), arrivalTime: '', transportType: tripStartAnswers.transport, provider: '', routeCode: '', status: 'planned', cost: '0', bookingReference: '', isMultiLeg: false, segmentOrder: 1, notes: '', fromAddress: '', toAddress: '', legs: [], attachments: [] }];
+  window.journeys = journeys;
+  const title = document.getElementById('mainTitle'); const subtitle = document.getElementById('mainSubtitle');
+  if (title) title.innerText = titleData.title; if (subtitle) subtitle.innerText = titleData.subtitle;
+  syncCurrentFileName(`${tripStartAnswers.name.replace(/[^a-z0-9]+/gi, '_') || 'My_Trip'}.json`);
+  dismissTripStart();
+  saveData(true);
+  if (typeof buildNav === 'function') buildNav();
+  if (typeof buildItinerary === 'function') buildItinerary();
+  if (typeof buildTransportTab === 'function') buildTransportTab();
+  showToast(`Your ${cityName} plan is ready. Add ideas whenever you’re ready.`);
+}
+
 function dismissFileSetup() {
   document.getElementById("file-setup-modal").style.display = "none";
   localStorage.setItem("travelApp_file_setup_seen", "true");
@@ -5244,11 +5340,13 @@ if (typeof document !== "undefined" && typeof document.addEventListener === "fun
     if (typeof navigator !== 'undefined' && navigator.webdriver) return; // skip for automated testing
 
     const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
+    const hasSeenTripStart = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_trip_start_seen") : null;
     // If not seen, AND no valid file handle exists (we are using the Default Template)
-    if (!hasSeenSetup && !hasActiveFileHandle()) {
+    if (!hasSeenSetup && !hasSeenTripStart && !hasActiveFileHandle()) {
       setTimeout(() => {
-        const modal = document.getElementById("file-setup-modal");
+        const modal = document.getElementById("trip-start-modal");
         if (modal) modal.style.display = "flex";
+        renderTripStart();
       }, 300);
     }
   });
@@ -5258,6 +5356,12 @@ window.dismissFileSetup = dismissFileSetup;
 window.startBlankTrip = startBlankTrip;
 window.onboardCreateNewTrip = onboardCreateNewTrip;
 window.onboardOpenExistingTrip = onboardOpenExistingTrip;
+window.chooseTripStart = chooseTripStart;
+window.nextTripStartStep = nextTripStartStep;
+window.previousTripStartStep = previousTripStartStep;
+window.adjustTripStartNights = adjustTripStartNights;
+window.selectTripStartTransport = selectTripStartTransport;
+window.dismissTripStart = dismissTripStart;
 
 
 

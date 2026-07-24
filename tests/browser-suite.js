@@ -331,6 +331,48 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
   }
 }
 
+async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {}) {
+  const { browser, context, page, errors } = await openApp(baseUrl, launchOptions);
+  try {
+    await page.evaluate(() => {
+      localStorage.removeItem('travelApp_trip_start_seen');
+      const modal = document.getElementById('trip-start-modal');
+      modal.style.display = 'flex';
+      window.renderTripStart();
+    });
+    assert(await page.getByRole('button', { name: 'Build my trip' }).count() === 1, 'Onboarding: first screen should offer guided trip creation');
+    assert(await page.getByRole('button', { name: 'Explore the sample trip' }).count() === 1, 'Onboarding: first screen should preserve a sample-trip route');
+    assert(await page.getByRole('button', { name: 'Learn the essentials' }).count() === 1, 'Onboarding: first screen should keep help available on demand');
+
+    await page.getByRole('button', { name: 'Build my trip' }).click();
+    await page.locator('#tripStartName').fill('Japan spring escape');
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.locator('#tripStartCity').fill('Tokyo');
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.locator('#tripStartDate').fill('2026-04-10');
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.getByRole('button', { name: 'Train' }).click();
+    await page.getByRole('button', { name: 'Create my trip' }).click();
+    await page.waitForFunction(() => document.getElementById('trip-start-modal').style.display === 'none');
+
+    const createdTrip = await page.evaluate(() => ({
+      title: document.getElementById('mainTitle').innerText,
+      city: window.getCurrentAppData?.().itinerary?.[0]?.label,
+      days: window.getCurrentAppData?.().itinerary?.[0]?.days?.length,
+      transport: window.journeys?.[0]?.transportType
+    }));
+    assert(createdTrip.title === 'Japan spring escape', 'Onboarding: should set the trip title');
+    assert(createdTrip.city === 'Tokyo', 'Onboarding: should create the first city');
+    assert(createdTrip.days === 3, 'Onboarding: should create the chosen number of nights');
+    assert(createdTrip.transport === 'train', 'Onboarding: should create the selected arrival transport');
+    assert(errors.length === 0, `Onboarding page errors: ${errors.join(' | ')}`);
+    reporter.add('onboarding', 'guided trip start', 'creates a city, three days, and selected transport');
+  } finally {
+    await context.close();
+    await browser.close();
+  }
+}
+
 async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
   const { browser, context, page, errors } = await openApp(baseUrl, {
     ...launchOptions,
@@ -454,6 +496,7 @@ async function run() {
       reporter.add('browser', 'slowmo', `${launchOptions.slowMo}ms`);
     }
     await runDesktopChecks(server.baseUrl, reporter, launchOptions);
+    await runTripStartOnboardingChecks(server.baseUrl, reporter, launchOptions);
     await runMobileChecks(server.baseUrl, reporter, launchOptions);
     reporter.summarize();
     console.log('Browser suite passed');
