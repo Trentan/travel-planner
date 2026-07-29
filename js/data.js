@@ -5213,16 +5213,19 @@ const tripStartAnswers = {
 };
 
 function selectTripStartParty(party) {
+  captureTripStartAnswer();
   tripStartAnswers.party = party;
   renderTripStart();
 }
 
 function selectTripStartPacing(pacing) {
+  captureTripStartAnswer();
   tripStartAnswers.pacing = pacing;
   renderTripStart();
 }
 
 function toggleTripStartInterest(interest) {
+  captureTripStartAnswer();
   const idx = tripStartAnswers.interests.indexOf(interest);
   if (idx > -1) {
     tripStartAnswers.interests.splice(idx, 1);
@@ -5368,13 +5371,13 @@ function nextTripStartStep() {
   createTripFromStartAnswers();
 }
 
-function previousTripStartStep() { tripStartStep = Math.max(0, tripStartStep - 1); renderTripStart(); }
-function adjustTripStartNights(change) { tripStartAnswers.nights = Math.max(1, Math.min(60, Number(tripStartAnswers.nights) + change)); renderTripStart(); }
-function selectTripStartTransport(type) { tripStartAnswers.transport = type; renderTripStart(); }
-function selectTripStartReturnTransport(type) { tripStartAnswers.returnTransport = type; renderTripStart(); }
-function addTripStartStop() { tripStartAnswers.stops.push({ city: '', nights: 2, transport: 'train' }); renderTripStart(); }
-function removeTripStartStop(index) { tripStartAnswers.stops.splice(index, 1); renderTripStart(); }
-function updateTripStartStop(index, field, value) { tripStartAnswers.stops[index][field] = field === 'nights' ? Math.max(1, Math.min(60, Number(value) || 1)) : value; }
+function previousTripStartStep() { captureTripStartAnswer(); tripStartStep = Math.max(0, tripStartStep - 1); renderTripStart(); }
+function adjustTripStartNights(change) { captureTripStartAnswer(); tripStartAnswers.nights = Math.max(1, Math.min(60, Number(tripStartAnswers.nights) + change)); renderTripStart(); }
+function selectTripStartTransport(type) { captureTripStartAnswer(); tripStartAnswers.transport = type; renderTripStart(); }
+function selectTripStartReturnTransport(type) { captureTripStartAnswer(); tripStartAnswers.returnTransport = type; renderTripStart(); }
+function addTripStartStop() { captureTripStartAnswer(); tripStartAnswers.stops.push({ city: '', nights: 2, transport: 'train' }); renderTripStart(); }
+function removeTripStartStop(index) { captureTripStartAnswer(); tripStartAnswers.stops.splice(index, 1); renderTripStart(); }
+function updateTripStartStop(index, field, value) { captureTripStartAnswer(); tripStartAnswers.stops[index][field] = field === 'nights' ? Math.max(1, Math.min(60, Number(value) || 1)) : value; }
 function dismissTripStart() {
   const modal = document.getElementById('trip-start-modal');
   if (modal) modal.style.display = 'none';

@@ -359,7 +359,7 @@ async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {
     await page.getByRole('button', { name: 'Continue' }).click();
     
     // Step 4: Additional cities
-    await page.getByRole('button', { name: 'Add another city' }).click();
+    await page.locator('.trip-start-add-stop').click();
     await page.getByRole('textbox', { name: 'Additional city 1' }).fill('Kyoto');
     await page.getByRole('spinbutton', { name: 'Nights in additional city 1' }).fill('2');
     await page.getByRole('button', { name: 'Continue' }).click();
