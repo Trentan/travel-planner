@@ -212,6 +212,23 @@ function prefillAIDialogFields() {
   setAiFieldIfEmpty('aiTripTitle', getAiTripTitlePrefill());
   setAiFieldIfEmpty('aiTripDates', getAiTripDatesPrefill());
   setAiFieldIfEmpty('aiTripCities', getAiTripCitiesPrefill());
+
+  let vibePrefill = '';
+  try {
+    const savedVibe = JSON.parse(localStorage.getItem('travelApp_vibeProfile') || 'null');
+    if (savedVibe) {
+      const parts = [];
+      if (savedVibe.party) parts.push(`Party: ${savedVibe.party}`);
+      if (savedVibe.pacing) parts.push(`Pacing: ${savedVibe.pacing}`);
+      if (savedVibe.interests && savedVibe.interests.length) parts.push(`Interests: ${savedVibe.interests.join(', ')}`);
+      if (savedVibe.notes) parts.push(`Notes: ${savedVibe.notes}`);
+      vibePrefill = parts.join('. ');
+    }
+  } catch (e) {}
+
+  if (vibePrefill) {
+    setAiFieldIfEmpty('aiTripVibe', vibePrefill);
+  }
 }
 
 function generatePrompt() {
