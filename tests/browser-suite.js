@@ -392,6 +392,22 @@ async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {
     assert(createdTrip.transport === 'train', 'Onboarding: should create the selected arrival transport');
     assert(createdTrip.secondCity === 'Kyoto', 'Onboarding: should create additional cities');
     assert(createdTrip.starterFood >= 1 && createdTrip.starterActivities >= 1, 'Onboarding: should bundle editable starter food and activity ideas');
+
+    // Test city rename and refetch location/flag
+    await page.evaluate(() => {
+      window.openCityDialog();
+    });
+    await page.waitForFunction(() => document.getElementById('city-modal').style.display === 'flex');
+    const firstCityId = await page.evaluate(() => window.citiesData?.[0]?.id);
+    if (firstCityId) {
+      await page.evaluate((id) => window.renameCityInDialog(id, 'Osaka'), firstCityId);
+      await page.evaluate((id) => window.refetchCityLocationAndFlag(id), firstCityId);
+      const updatedCity = await page.evaluate((id) => window.citiesData.find(c => c.id === id), firstCityId);
+      assert(updatedCity.name === 'Osaka', 'City Management: renameCityInDialog should rename city to Osaka');
+      assert(updatedCity.countryCode === 'JP', 'City Management: refetchCityLocationAndFlag should update country code to JP');
+      reporter.add('cities', 'city rename and refetch', 'renames city and refetches location & flag');
+    }
+
     assert(errors.length === 0, `Onboarding page errors: ${errors.join(' | ')}`);
     reporter.add('onboarding', 'guided trip start', 'creates a multi-city route with starter ideas and selected transport');
   } finally {

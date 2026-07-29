@@ -1882,6 +1882,15 @@ function populateCityList() {
       </button>
     ` : `<span class="city-location-status">📍 Mapped</span>`;
 
+    const refetchBtn = `
+      <button class="search-btn" 
+              style="color: #176e67; background: #e5f3ed; border: 1px solid #b2d8cd; cursor: pointer; border-radius: 0.4rem; padding: 0.25rem 0.5rem; font-size: 0.85rem;" 
+              onclick="refetchCityLocationAndFlag('${city.id}')" 
+              title="Refetch map coordinates, country, and flag for this city">
+        🔄 Refetch Location & Flag
+      </button>
+    `;
+
     const row = document.createElement('div');
     row.className = 'city-list-item';
     row.style.cssText = `display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid #eee; border-left: 4px solid ${cityColor}; background: white;`;
@@ -1890,7 +1899,8 @@ function populateCityList() {
         <span style="font-size: 1.5rem;">${flag}</span>
         <div style="flex: 1; min-width: 0;">
           <div style="font-weight: 500; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            ${city.name}${homeBadge}
+            <input class="city-rename-input" data-city-id="${city.id}" value="${escapeTripStartText(city.name)}" style="font: inherit; font-size: 1rem; font-weight: 700; border: 1px solid #c8d6d0; border-radius: 0.4rem; padding: 0.2rem 0.4rem; max-width: 180px;" title="Click to rename city">
+            ${homeBadge}
             ${codeDisplay}
           </div>
           <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 6px;">
@@ -1903,6 +1913,7 @@ function populateCityList() {
               return `<option value="${c.code}"${isSelected ? ' selected' : ''}>${c.flag} ${c.name}</option>`;
             }).join('')}
             </select>
+            ${refetchBtn}
             ${searchBtn}
             ${coordinateDisplay}
             ${resetLocationBtn}
@@ -1914,12 +1925,22 @@ function populateCityList() {
     container.appendChild(row);
   });
 
-  // Attach change handlers to country selects
+  // Attach change handlers to country selects and rename inputs
   container.querySelectorAll('.country-select').forEach(select => {
     select.addEventListener('change', function() {
       const cityId = this.dataset.cityId;
       const countryCode = this.value;
       updateCityCountryCode(cityId, countryCode);
+    });
+  });
+
+  container.querySelectorAll('.city-rename-input').forEach(input => {
+    input.addEventListener('change', function() {
+      const cityId = this.dataset.cityId;
+      const newName = this.value.trim();
+      if (newName) {
+        renameCityInDialog(cityId, newName);
+      }
     });
   });
 }
@@ -1963,6 +1984,84 @@ function deleteCityFromDialog(cityId) {
       buildItinerary();
     }
   }
+}
+
+function renameCityInDialog(cityId, newName) {
+  const city = citiesData.find(c => c.id === cityId);
+  if (!city || !newName) return;
+  const oldName = city.name;
+  if (oldName === newName) return;
+
+  city.name = newName;
+
+  const match = ALL_CITIES.find(c => c.name.toLowerCase() === newName.toLowerCase());
+  if (match) {
+    city.code = match.code;
+    city.countryCode = match.countryCode;
+    city.country = getCountryName(match.countryCode);
+  }
+
+  (appData || []).forEach(leg => {
+    if (leg.cityId === cityId || leg.label === oldName) {
+      leg.label = newName;
+    }
+    (leg.days || []).forEach(day => {
+      if (day.from === oldName) day.from = newName;
+      if (day.to === oldName) day.to = newName;
+    });
+  });
+
+  (window.journeys || []).forEach(j => {
+    if (j.fromCityId === cityId || j.fromLocation === oldName) {
+      j.fromLocation = newName;
+    }
+    if (j.toCityId === cityId || j.toLocation === oldName) {
+      j.toLocation = newName;
+    }
+    if (j.journeyName && j.journeyName.includes(oldName)) {
+      j.journeyName = j.journeyName.replace(new RegExp(oldName, 'g'), newName);
+    }
+  });
+
+  (window.stays || []).forEach(s => {
+    if (s.cityId === cityId || s.cityName === oldName) {
+      s.cityName = newName;
+    }
+  });
+
+  saveData(true);
+  populateCityList();
+  if (typeof buildNav === 'function') buildNav();
+  if (typeof buildItinerary === 'function') buildItinerary();
+  if (typeof buildTransportTab === 'function') buildTransportTab();
+  if (typeof buildAccomTab === 'function') buildAccomTab();
+  showToast(`Renamed city to "${newName}"`);
+}
+
+async function refetchCityLocationAndFlag(cityId) {
+  const city = citiesData.find(c => c.id === cityId);
+  if (!city) return;
+
+  const cityName = city.name;
+  const match = ALL_CITIES.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+
+  if (match) {
+    city.code = match.code;
+    city.countryCode = match.countryCode;
+    city.country = getCountryName(match.countryCode);
+    city.lat = match.lat;
+    city.lng = match.lng;
+  } else if (typeof triggerOnlineSearch === 'function') {
+    await triggerOnlineSearch(cityId);
+    return;
+  }
+
+  saveData(true);
+  populateCityList();
+  if (typeof buildNav === 'function') buildNav();
+  if (typeof buildItinerary === 'function') buildItinerary();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  showToast(`Refetched location & flag for ${cityName}`);
 }
 
 async function addNewCityFromDialog() {
@@ -5693,6 +5792,8 @@ if (typeof document !== "undefined" && typeof document.addEventListener === "fun
   });
 }
 
+window.renameCityInDialog = renameCityInDialog;
+window.refetchCityLocationAndFlag = refetchCityLocationAndFlag;
 window.dismissFileSetup = dismissFileSetup;
 window.startBlankTrip = startBlankTrip;
 window.onboardCreateNewTrip = onboardCreateNewTrip;
