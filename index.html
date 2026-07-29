@@ -64,6 +64,7 @@
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openShareExportDialog()">🔗 Share Export</button>
         <div class="app-menu-divider" aria-hidden="true"></div>
         <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCreateNewTripWizard()">✦ Create New Trip</button>
         <button id="saveAsBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripFile()">Save As</button>
         <button id="openFileBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openExistingTripFile()">Open File</button>
         <div class="app-menu-divider" aria-hidden="true"></div>
@@ -257,7 +258,11 @@
         <section class="mobile-menu-section" aria-labelledby="mobileMenuExportFiles">
           <h3 id="mobileMenuExportFiles" class="mobile-menu-section-title">Export & files</h3>
           <div class="mobile-menu-section-grid mobile-menu-section-grid-stacked">
-                            <button class="app-menu-btn" onclick="exportItineraryCalendar(); closeMobileMenu()">
+            <button class="app-menu-btn mobile-menu-primary" onclick="openCreateNewTripWizard(); closeMobileMenu()">
+              <span class="app-menu-btn-title">✦ Create New Trip</span>
+              <span class="app-menu-btn-subtitle">Build a new trip step by step</span>
+            </button>
+            <button class="app-menu-btn" onclick="exportItineraryCalendar(); closeMobileMenu()">
                   <span class="app-menu-btn-title">📅 Export to Calendar</span>
                   <span class="app-menu-btn-subtitle">Download .ics file</span>
                 </button>

@@ -5381,7 +5381,7 @@ function dismissTripStart() {
   localStorage.setItem('travelApp_trip_start_seen', 'true');
 }
 
-function createTripFromStartAnswers() {
+async function createTripFromStartAnswers() {
   const route = [{ city: tripStartAnswers.city, nights: tripStartAnswers.nights, transport: tripStartAnswers.transport }].concat(tripStartAnswers.stops.filter(stop => stop.city.trim()));
   const start = tripStartAnswers.date ? new Date(`${tripStartAnswers.date}T12:00:00`) : null;
   const dateAt = offset => start ? new Date(start.getTime() + offset * 86400000).toISOString().slice(0, 10) : '';
@@ -5552,7 +5552,7 @@ function createTripFromStartAnswers() {
       departureTime: '',
       arrivalDate: returnIso,
       arrivalTime: '',
-      transportType: tripStartAnswers.returnTransport,
+      transportType: tripStartAnswers.returnTransport || 'flight',
       provider: 'TBD Transport',
       routeCode: '',
       status: 'planned',
@@ -5610,8 +5610,19 @@ function createTripFromStartAnswers() {
   if (typeof buildItinerary === 'function') buildItinerary();
   if (typeof buildTransportTab === 'function') buildTransportTab();
   if (typeof buildAccomTab === 'function') buildAccomTab();
+
+  // Prompt user to pick file location / save file!
+  if (isFSASupported()) {
+    try {
+      await createFileOnDisk();
+    } catch(e) {
+      console.warn('File save skipped or cancelled:', e);
+    }
+  } else {
+    exportJSON();
+  }
   
-  showToast(`Your ${route.length}-city plan is ready! Click 🤖 AI Builder anytime to enrich it.`);
+  showToast(`Your ${route.length}-city plan is created! Click 🤖 AI Builder anytime to enrich it.`);
 }
 
 function dismissFileSetup() {
@@ -5645,12 +5656,16 @@ function startBlankTrip() {
 
 async function onboardCreateNewTrip() {
   dismissFileSetup();
-  startBlankTrip();
-  if (isFSASupported()) {
-    await createFileOnDisk();
-  } else {
-    exportJSON(); // fallback for mobile/unsupported
-  }
+  openCreateNewTripWizard();
+}
+
+function openCreateNewTripWizard() {
+  if (typeof closeMobileMenu === 'function') closeMobileMenu();
+  if (typeof closeDesktopActionsMenu === 'function') closeDesktopActionsMenu();
+  tripStartStep = 1;
+  const modal = document.getElementById("trip-start-modal");
+  if (modal) modal.style.display = "flex";
+  renderTripStart();
 }
 
 function onboardOpenExistingTrip() {
@@ -5670,9 +5685,15 @@ if (typeof document !== "undefined" && typeof document.addEventListener === "fun
         const modal = document.getElementById("trip-start-modal");
         if (modal) modal.style.display = "flex";
         renderTripStart();
+      }, 300);
+    }
+  });
+}
+
 window.dismissFileSetup = dismissFileSetup;
 window.startBlankTrip = startBlankTrip;
 window.onboardCreateNewTrip = onboardCreateNewTrip;
+window.openCreateNewTripWizard = openCreateNewTripWizard;
 window.onboardOpenExistingTrip = onboardOpenExistingTrip;
 window.chooseTripStart = chooseTripStart;
 window.nextTripStartStep = nextTripStartStep;
