@@ -5196,7 +5196,8 @@ window.setupCityAutocomplete = setupCityAutocomplete;
 
 // -- File Setup Onboarding UX --
 let tripStartStep = 0;
-const tripStartAnswers = { 
+let tripStartAnswers = {
+  saveLocationType: 'disk',
   name: '', 
   origin: '', 
   city: '', 
@@ -5209,18 +5210,35 @@ const tripStartAnswers = {
   party: 'couple',
   pacing: 'balanced',
   interests: ['food', 'culture'],
+  bookedItems: [],
   notes: ''
 };
+
+async function selectTripStartSaveLocation(type) {
+  captureTripStartAnswer();
+  tripStartAnswers.saveLocationType = type;
+  if (type === 'disk' && typeof createFileOnDisk === 'function') {
+    try {
+      await createFileOnDisk();
+    } catch (e) {
+      console.warn('Disk storage setup skipped or cancelled:', e);
+    }
+  }
+  tripStartStep = 2;
+  renderTripStart();
+}
 
 function selectTripStartParty(party) {
   captureTripStartAnswer();
   tripStartAnswers.party = party;
+  saveVibeProfileToStorage();
   renderTripStart();
 }
 
 function selectTripStartPacing(pacing) {
   captureTripStartAnswer();
   tripStartAnswers.pacing = pacing;
+  saveVibeProfileToStorage();
   renderTripStart();
 }
 
@@ -5232,17 +5250,66 @@ function toggleTripStartInterest(interest) {
   } else {
     tripStartAnswers.interests.push(interest);
   }
+  saveVibeProfileToStorage();
   renderTripStart();
+}
+
+function saveVibeProfileToStorage() {
+  try {
+    localStorage.setItem('travelApp_vibeProfile', JSON.stringify({
+      party: tripStartAnswers.party,
+      pacing: tripStartAnswers.pacing,
+      interests: tripStartAnswers.interests
+    }));
+  } catch (e) {
+    console.error('Failed to save vibe profile:', e);
+  }
+}
+
+function addTripStartBookedItem() {
+  captureTripStartAnswer();
+  const defaultCity = tripStartAnswers.city || tripStartAnswers.stops[0]?.city || '';
+  tripStartAnswers.bookedItems.push({
+    type: 'flight',
+    city: defaultCity,
+    ref: '',
+    date: tripStartAnswers.date || ''
+  });
+  renderTripStart();
+}
+
+function removeTripStartBookedItem(index) {
+  captureTripStartAnswer();
+  tripStartAnswers.bookedItems.splice(index, 1);
+  renderTripStart();
+}
+
+function updateTripStartBookedItem(index, field, value) {
+  captureTripStartAnswer();
+  if (tripStartAnswers.bookedItems[index]) {
+    tripStartAnswers.bookedItems[index][field] = value;
+  }
 }
 
 function escapeTripStartText(value) {
   return String(value || '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
 }
 
+function calculateTripStartReturnDate() {
+  if (!tripStartAnswers.date) return '';
+  const firstNights = Number(tripStartAnswers.nights || 1);
+  const stopNights = (tripStartAnswers.stops || []).reduce((sum, s) => sum + Math.max(1, Number(s.nights) || 1), 0);
+  const totalNights = firstNights + stopNights;
+  const start = new Date(`${tripStartAnswers.date}T12:00:00`);
+  if (isNaN(start.getTime())) return '';
+  start.setDate(start.getDate() + totalNights);
+  return start.toISOString().slice(0, 10);
+}
+
 function renderTripStart() {
   const container = document.getElementById('trip-start-content');
   if (!container) return;
-  const progress = `<div class="trip-start-progress"><span>Getting started</span><span>${tripStartStep + 1} of 7</span></div>`;
+  const progress = `<div class="trip-start-progress"><span>Getting started</span><span>${tripStartStep} of 8</span></div>`;
   const back = tripStartStep ? `<button class="trip-start-back" type="button" onclick="previousTripStartStep()">Back</button>` : '';
   
   if (tripStartStep === 0) {
@@ -5301,24 +5368,50 @@ function renderTripStart() {
     <button type="button" class="trip-start-chip ${tripStartAnswers.interests.includes(val) ? 'is-selected' : ''}" onclick="toggleTripStartInterest('${val}')">${label}</button>
   `).join('');
 
+  const calculatedReturn = calculateTripStartReturnDate();
+  if (!tripStartAnswers.returnDate && calculatedReturn) {
+    tripStartAnswers.returnDate = calculatedReturn;
+  }
+
+  const allCityOptions = [tripStartAnswers.origin, tripStartAnswers.city].concat(tripStartAnswers.stops.map(s => s.city)).filter(c => c.trim());
+
+  const bookedRows = tripStartAnswers.bookedItems.map((item, index) => `
+    <div class="trip-start-stop-row" style="margin-bottom: 0.5rem;">
+      <select aria-label="Booked item type ${index + 1}" onchange="updateTripStartBookedItem(${index}, 'type', this.value)">
+        <option value="flight" ${item.type === 'flight' ? 'selected' : ''}>✈️ Flight</option>
+        <option value="train" ${item.type === 'train' ? 'selected' : ''}>🚆 Train/Transport</option>
+        <option value="stay" ${item.type === 'stay' ? 'selected' : ''}>🏨 Accommodation</option>
+      </select>
+      <select aria-label="Booked item city ${index + 1}" onchange="updateTripStartBookedItem(${index}, 'city', this.value)">
+        <option value="">Pair with city...</option>
+        ${allCityOptions.map(c => `<option value="${escapeTripStartText(c)}" ${item.city === c ? 'selected' : ''}>${escapeTripStartText(c)}</option>`).join('')}
+      </select>
+      <input class="trip-start-input" aria-label="Reference or notes ${index + 1}" placeholder="Ref / Name (e.g. QF1 or Grand Hotel)" value="${escapeTripStartText(item.ref)}" oninput="updateTripStartBookedItem(${index}, 'ref', this.value)">
+      <button type="button" aria-label="Remove booked item ${index + 1}" onclick="removeTripStartBookedItem(${index})">×</button>
+    </div>
+  `).join('');
+
   const steps = [
+    `<label>Where would you like to save your trip file?</label><p class="trip-start-list-help">Selecting your storage location upfront ensures your trip is automatically saved as you plan.</p><div class="trip-start-choices" style="margin-top: 1rem;"><button type="button" class="trip-start-choice ${tripStartAnswers.saveLocationType === 'disk' ? 'trip-start-choice--primary' : ''}" onclick="selectTripStartSaveLocation('disk')"><span class="trip-start-choice-icon">📁</span><span><strong>Pick Drive / Local File Location ${hasActiveFileHandle() ? '✓ (Location Set)' : ''}</strong><small>Saves directly to your Google Drive, OneDrive, or local folder.</small></span></button><button type="button" class="trip-start-choice ${tripStartAnswers.saveLocationType === 'browser' ? 'trip-start-choice--primary' : ''}" onclick="selectTripStartSaveLocation('browser')"><span class="trip-start-choice-icon">💾</span><span><strong>Browser Storage & Auto-Download</strong><small>Stores in local browser memory and downloads JSON file on finish.</small></span></button></div>`,
+    
     `<label for="tripStartName">What should we call this trip?</label><input id="tripStartName" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Japan in Spring" value="${escapeTripStartText(tripStartAnswers.name)}"><p>Keep it simple — you can rename it anytime.</p>`,
     
     `<label for="tripStartOrigin">Where does your journey begin?</label><input id="tripStartOrigin" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Brisbane" value="${escapeTripStartText(tripStartAnswers.origin)}"><p>This sets your starting home city.</p><label for="tripStartDate" style="margin-top: 1rem;">When do you depart/arrive?</label><input id="tripStartDate" class="trip-start-input" type="date" value="${escapeTripStartText(tripStartAnswers.date)}"><p>An approximate start date is fine.</p>`,
     
     `<label for="tripStartCity">Where are you going first?</label><input id="tripStartCity" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Tokyo" value="${escapeTripStartText(tripStartAnswers.city)}"><div class="trip-start-number-row" style="margin-top: 1rem;"><button type="button" aria-label="Decrease nights" onclick="adjustTripStartNights(-1)">−</button><input id="tripStartNights" type="number" min="1" max="60" value="${tripStartAnswers.nights}" oninput="tripStartAnswers.nights=Math.max(1, Math.min(60, Number(this.value)||1))"><span>nights</span><button type="button" aria-label="Increase nights" onclick="adjustTripStartNights(1)">+</button></div><fieldset class="trip-start-transport" style="margin-top: 1rem;"><legend>How are you getting there?</legend>${[['flight','Flight'],['train','Train'],['bus','Bus'],['ferry','Ferry'],['other','Other']].map(([value,label]) => `<button type="button" class="${tripStartAnswers.transport === value ? 'is-selected' : ''}" onclick="selectTripStartTransport('${value}')">${label}</button>`).join('')}</fieldset>`,
     
-    `<label>Will you visit other cities?</label><p class="trip-start-list-help">Add each stop with its nights and how you expect to get there.</p><div class="trip-start-stops">${stopRows}</div><button type="button" class="trip-start-add-stop" onclick="addTripStartStop()">+ Add another city</button><label for="tripStartReturnDate" style="margin-top: 1.5rem;">When do you head home?</label><input id="tripStartReturnDate" class="trip-start-input" type="date" value="${escapeTripStartText(tripStartAnswers.returnDate)}"><p>Leave blank if open-ended.</p>`,
+    `<label>Will you visit other cities?</label><p class="trip-start-list-help">Add each stop with its nights and how you expect to get there.</p><div class="trip-start-stops">${stopRows}</div><button type="button" class="trip-start-add-stop" onclick="addTripStartStop()">+ Add another city</button><label for="tripStartReturnDate" style="margin-top: 1.5rem;">When do you head home?</label><input id="tripStartReturnDate" class="trip-start-input" type="date" value="${escapeTripStartText(tripStartAnswers.returnDate)}">${calculatedReturn ? `<p style="font-size:0.8rem; color:#27AE60; font-weight:600; margin-top:0.25rem;">✓ Auto-calculated for ${calculatedReturn}</p>` : '<p>Leave blank if open-ended.</p>'}`,
     
     `<label>Who is traveling?</label><div class="trip-start-chip-group">${partyBtns}</div><label style="margin-top: 1.25rem;">What pacing do you prefer?</label><div class="trip-start-chip-group">${pacingBtns}</div>`,
     
     `<label>What are your main interests?</label><p class="trip-start-list-help">Select all that apply to seed starter activities and local food tips.</p><div class="trip-start-chip-group">${interestChips}</div>`,
     
-    `<label for="tripStartNotes">Any pre-booked flights or notes?</label><textarea id="tripStartNotes" class="trip-start-input" rows="3" placeholder="e.g. Flight QF1 booked for Day 1, interested in hidden neighborhood izakayas">${escapeTripStartText(tripStartAnswers.notes)}</textarea><p>This information will be passed directly to the AI Builder when you enrich your trip!</p>`
+    `<label>Pre-booked Flights, Transport & Accommodations</label><p class="trip-start-list-help">Pair your pre-booked items to a city so they are automatically integrated into your itinerary!</p><div class="trip-start-booked-items">${bookedRows}</div><button type="button" class="trip-start-add-stop" onclick="addTripStartBookedItem()">+ Add pre-booked item</button><label for="tripStartNotes" style="margin-top: 1.25rem;">Additional Notes for AI Builder</label><textarea id="tripStartNotes" class="trip-start-input" rows="2" placeholder="e.g. interested in hidden neighborhood izakayas, prefer train over flight when possible">${escapeTripStartText(tripStartAnswers.notes)}</textarea>`
   ];
 
-  const isLast = tripStartStep === 7;
+  const isLast = tripStartStep === 8;
   const titles = [
+    'Choose your file save location.',
     'Let’s give it a name.',
     'Where does your journey begin?',
     'Choose your first destination.',
@@ -5364,10 +5457,10 @@ function captureTripStartAnswer() {
 
 function nextTripStartStep() {
   captureTripStartAnswer();
-  if (tripStartStep === 1 && !tripStartAnswers.name) { showToast('Give your trip a name to continue.'); return; }
-  if (tripStartStep === 2 && !tripStartAnswers.origin) { showToast('Tell us where you are leaving from to continue.'); return; }
-  if (tripStartStep === 3 && !tripStartAnswers.city) { showToast('Choose your first city to continue.'); return; }
-  if (tripStartStep < 7) { tripStartStep++; renderTripStart(); return; }
+  if (tripStartStep === 2 && !tripStartAnswers.name) { showToast('Give your trip a name to continue.'); return; }
+  if (tripStartStep === 3 && !tripStartAnswers.origin) { showToast('Tell us where you are leaving from to continue.'); return; }
+  if (tripStartStep === 4 && !tripStartAnswers.city) { showToast('Choose your first city to continue.'); return; }
+  if (tripStartStep < 8) { tripStartStep++; renderTripStart(); return; }
   createTripFromStartAnswers();
 }
 
@@ -5391,37 +5484,40 @@ async function createTripFromStartAnswers() {
   
   let dayOffset = 0;
   
-  const starterContent = cityId => {
+  const starterContent = (cityId, cityName) => {
     const foodItems = [
-      { text: 'Find a local breakfast spot worth trying', done: false, cityId }
+      { text: `Find a local breakfast spot in ${cityName}`, done: false, cityId }
     ];
     if (tripStartAnswers.interests.includes('food')) {
-      foodItems.push({ text: 'Sample signature local specialty at a recommended restaurant', done: false, cityId });
-      foodItems.push({ text: 'Explore a local food market or night market', done: false, cityId });
+      foodItems.push({ text: `Sample iconic local specialty & street food in ${cityName}`, done: false, cityId });
+      foodItems.push({ text: `Explore ${cityName} central food market or night dining alley`, done: false, cityId });
     } else {
-      foodItems.push({ text: 'Choose one local specialty for dinner', done: false, cityId });
+      foodItems.push({ text: `Choose a recommended local restaurant for dinner in ${cityName}`, done: false, cityId });
     }
 
     const tips = [
-      { text: 'Save your accommodation address and a backup offline map.', cityId },
-      { text: 'Keep a little local cash or a backup card for your first day.', cityId }
+      { text: `Save your ${cityName} accommodation address & offline map access.`, cityId },
+      { text: `Check transit pass options and local currency requirements in ${cityName}.`, cityId }
     ];
 
+    const isPacked = tripStartAnswers.pacing === 'packed';
+    const isRelaxed = tripStartAnswers.pacing === 'relaxed';
+
     const activities = [
-      { id: `activity-${cityId}-walk`, title: 'Take an unhurried neighbourhood walk', category: 'sight', estTime: '2 hrs', estCost: '0', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId }
+      { id: `activity-${cityId}-walk`, title: `Explore ${cityName} historic center & neighborhood streets`, category: 'sight', estTime: isRelaxed ? '1.5 hrs' : '2.5 hrs', estCost: '0', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId }
     ];
 
     if (tripStartAnswers.interests.includes('culture')) {
-      activities.push({ id: `activity-${cityId}-culture`, title: 'Visit a landmark museum or historic district', category: 'sight', estTime: '3 hrs', estCost: 'TBC', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId });
+      activities.push({ id: `activity-${cityId}-culture`, title: `Visit top landmark museum / historic site in ${cityName}`, category: 'sight', estTime: '3 hrs', estCost: 'TBC', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId });
     }
     if (tripStartAnswers.interests.includes('nature')) {
-      activities.push({ id: `activity-${cityId}-nature`, title: 'Explore a scenic park or viewpoint', category: 'fitness', estTime: '2 hrs', estCost: '0', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId });
+      activities.push({ id: `activity-${cityId}-nature`, title: `Stroll through ${cityName} central park or scenic viewpoint`, category: 'fitness', estTime: '2 hrs', estCost: '0', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId });
     }
     if (tripStartAnswers.interests.includes('shopping')) {
-      activities.push({ id: `activity-${cityId}-shop`, title: 'Browse local crafts & souvenir boutiques', category: 'attraction', estTime: '2 hrs', estCost: 'TBC', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId });
+      activities.push({ id: `activity-${cityId}-shop`, title: `Browse ${cityName} local artisan crafts & boutique shops`, category: 'attraction', estTime: '2 hrs', estCost: 'TBC', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId });
     }
     if (tripStartAnswers.interests.includes('relaxation')) {
-      activities.push({ id: `activity-${cityId}-relax`, title: 'Enjoy a relaxing cafe break or sunset view', category: 'wellness', estTime: '1.5 hrs', estCost: '0', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId });
+      activities.push({ id: `activity-${cityId}-relax`, title: `Enjoy a relaxing cafe break or thermal spa in ${cityName}`, category: 'wellness', estTime: '1.5 hrs', estCost: '0', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId });
     }
 
     return { cityFood: foodItems, legTips: tips, suggestedActivities: activities };
@@ -5461,7 +5557,7 @@ async function createTripFromStartAnswers() {
 
   const destinationLegs = route.map((stop, index) => { 
     const city = citiesData[index]; 
-    const content = starterContent(city.id); 
+    const content = starterContent(city.id, city.name); 
     const days = Array.from({ length: Number(stop.nights) }, (_, dayIndex) => ({ 
       id: `day-${Date.now()}-${index}-${dayIndex}`, 
       date: dateAt(dayOffset + dayIndex), 
