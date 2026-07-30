@@ -5,11 +5,10 @@
 
 ---
 
-## 📱 / 💻 Viewport & Mode Key
-- **DDE**: Desktop / Detailed (1440 x 900, Default density)
-- **DCO**: Desktop / Compact (1440 x 900, Compact toggle active)
-- **MDE**: Mobile / Detailed (390 x 844, Default density)
-- **MCO**: Mobile / Compact (390 x 844, Compact toggle active)
+## 📱 / 💻 Viewport Key
+- **Desktop View**: 1440 x 900
+- **Mobile View**: 390 x 844
+*(Note: All test verification must cover both Desktop and Mobile views)*
 
 ---
 
