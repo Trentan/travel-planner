@@ -1821,20 +1821,20 @@ function populateCityList() {
     return;
   }
 
-  const missingLocationCount = citiesData.filter(city => !cityHasStoredCoords(city)).length;
+  const health = typeof auditCityHealth === 'function' ? auditCityHealth() : { totalIssues: 0 };
   const toolbar = document.createElement('div');
   toolbar.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:0.5rem; flex-wrap:wrap; padding:0.75rem 1rem; background:#f0f7f4; border-bottom:1px solid #d0e5dc;';
   toolbar.innerHTML = `
     <div style="font-size:0.85rem; color:#176e67; font-weight:600;">
-      🌍 Manage Cities (${citiesData.length} total ${missingLocationCount > 0 ? `· ⚠️ ${missingLocationCount} unmapped` : '· ✅ All mapped'})
+      🌍 Manage Cities (${citiesData.length} total ${health.totalIssues > 0 ? `· ⚠️ ${health.totalIssues} unmapped/missing flags` : '· ✅ All mapped'})
     </div>
     <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-      <button id="fetchMissingCityLocationsBtn"
+      <button id="autoRepairAllCitiesBtn"
               class="search-btn"
               style="color: #fff; background: #176e67; border:none; cursor: pointer; border-radius: 0.4rem; padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;"
-              onclick="fetchAllMissingCityLocations()"
-              title="Refetch map coordinates and country flags for all cities">
-        ⚡ Refetch All Locations & Flags
+              onclick="repairAllCityMetadata()"
+              title="Auto-repair map coordinates and country flags for all cities">
+        ⚡ Auto-repair all locations & flags
       </button>
       <button class="search-btn"
               style="color: #2C3E50; background: #fff; border:1px solid #cbd5e1; cursor: pointer; border-radius: 0.4rem; padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;"
@@ -2071,6 +2071,83 @@ async function refetchCityLocationAndFlag(cityId) {
   if (typeof buildItinerary === 'function') buildItinerary();
   if (typeof buildJourneyMap === 'function') buildJourneyMap();
   showToast(`Refetched location & flag for ${cityName}`);
+}
+
+function auditCityHealth() {
+  if (!Array.isArray(citiesData) || citiesData.length === 0) {
+    return { missingCoords: 0, missingCountry: 0, totalIssues: 0 };
+  }
+
+  let missingCoords = 0;
+  let missingCountry = 0;
+
+  citiesData.forEach(city => {
+    if (!cityHasStoredCoords(city)) missingCoords++;
+    if (!city.countryCode || !city.country) missingCountry++;
+  });
+
+  return { missingCoords, missingCountry, totalIssues: missingCoords + missingCountry };
+}
+
+function checkAndPromptCityAudit(isSilent = false) {
+  const health = auditCityHealth();
+  if (health.totalIssues > 0 && !isSilent) {
+    const existing = document.querySelector('.toast-city-audit');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-city-audit';
+    toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 3000; background: #2C3E50; color: white; padding: 0.75rem 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; border-left: 4px solid #E67E22;';
+    toast.innerHTML = `
+      <span>⚠️ <strong>${health.totalIssues} ${health.totalIssues === 1 ? 'city needs' : 'cities need'} location or flag updates</strong></span>
+      <button style="background: #E67E22; color: white; border: none; padding: 0.35rem 0.75rem; border-radius: 4px; font-weight: 600; cursor: pointer;" onclick="this.parentElement.remove(); openCityDialog();">
+        Review & Repair
+      </button>
+      <button style="background: transparent; color: #BDC3C7; border: none; font-size: 1.1rem; cursor: pointer; padding: 0 0.25rem;" onclick="this.parentElement.remove();">×</button>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 12000);
+  }
+  return health;
+}
+
+async function repairAllCityMetadata() {
+  if (!Array.isArray(citiesData) || citiesData.length === 0) return;
+
+  let repairedCount = 0;
+  for (const city of citiesData) {
+    let modified = false;
+
+    const match = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
+    if (match) {
+      if (!city.code) { city.code = match.code; modified = true; }
+      if (!city.countryCode) { city.countryCode = match.countryCode; modified = true; }
+      if (!city.country) { city.country = getCountryName(match.countryCode); modified = true; }
+      if (!cityHasStoredCoords(city) && match.lat && match.lng) {
+        city.lat = match.lat;
+        city.lng = match.lng;
+        modified = true;
+      }
+    }
+
+    if (!cityHasStoredCoords(city) && typeof triggerOnlineSearch === 'function') {
+      try {
+        await triggerOnlineSearch(city.id);
+        modified = true;
+      } catch (e) {
+        console.warn(`[City Audit] Could not geocode city "${city.name}":`, e);
+      }
+    }
+
+    if (modified) repairedCount++;
+  }
+
+  saveData(true);
+  populateCityList();
+  if (typeof buildNav === 'function') buildNav();
+  if (typeof buildItinerary === 'function') buildItinerary();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  showToast(`✨ Successfully checked & repaired ${repairedCount} city locations and flags!`);
 }
 
 async function addNewCityFromDialog() {
@@ -5184,6 +5261,7 @@ async function loadImportedPayload(importedData, fileName) {
   if (typeof buildCityNav === 'function') buildCityNav();
   if (typeof buildJourneyMap === 'function') buildJourneyMap();
   if (typeof populateCityList === 'function') populateCityList();
+  if (typeof checkAndPromptCityAudit === 'function') checkAndPromptCityAudit();
 }
 
 async function importJSON(event) {
@@ -5900,6 +5978,9 @@ if (typeof document !== "undefined" && typeof document.addEventListener === "fun
 
 window.renameCityInDialog = renameCityInDialog;
 window.refetchCityLocationAndFlag = refetchCityLocationAndFlag;
+window.auditCityHealth = auditCityHealth;
+window.checkAndPromptCityAudit = checkAndPromptCityAudit;
+window.repairAllCityMetadata = repairAllCityMetadata;
 window.dismissFileSetup = dismissFileSetup;
 window.startBlankTrip = startBlankTrip;
 window.onboardCreateNewTrip = onboardCreateNewTrip;

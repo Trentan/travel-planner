@@ -101,7 +101,7 @@ Pull requests should reference the issue number and include the same completion 
 Before reporting done:
 
 1. Run the relevant checks and record the results.
-2. Update or close the GitHub issue as appropriate.
+2. Update the GitHub issue with a summary comment. DO NOT close GitHub issues or milestones automatically — leave them OPEN until the user gives explicit final approval.
 3. If the issue still needs review, leave it open and summarize what remains.
 4. Commit the completed work on the issue branch with the issue number in the commit message.
 5. Push the branch.
