@@ -4,19 +4,21 @@ function getAiFieldValue(id, fallback) {
   return value || fallback;
 }
 
-function buildAiPrompt({ title, dates, citiesInput, cities, vibe }) {
-  const cityCount = cities.length;
+function buildAiPrompt({ title, regions, dates, citiesInput, cities, junctions, vibe }) {
+  const cityCount = cities.length || 3;
 
   return `I am building a travel itinerary app and need a complete JSON dataset for an upcoming trip.
 
 TRIP DETAILS:
 - Title: ${title}
-- Dates & Flights: ${dates}
-- Cities/Locations: ${citiesInput}
+- Target Regions / Countries: ${regions || 'Not specified (Choose logical countries based on vibe)'}
+- Specific Cities: ${citiesInput || 'None specified (AI should select 3-5 logical destination cities in the target region)'}
+- Fixed Pre-booked Flights & Junctions: ${junctions || 'None (Flexible travel junctions)'}
+- Dates & Duration: ${dates}
 - Travel Vibe & Preferences: ${vibe}
 
 YOUR TASK:
-Generate a detailed daily itinerary tailored to my preferences. Create the result as a downloadable .json file that I can save and import into the app.
+Generate a detailed daily itinerary tailored to my preferences. If specific cities are not specified above, select 3-5 logical destination cities within the requested regions/countries that fit the pre-booked flight junctions. Create the result as a downloadable .json file that I can save and import into the app.
 
 The downloadable file must contain one JSON object that exactly matches this structure. Do not wrap it in markdown, commentary, or code fences.
 
@@ -110,7 +112,7 @@ EXPECTED JSON SCHEMA:
 
 INSTRUCTIONS FOR GENERATION:
 
-1. CITIES: Create cities array based on the user's input (${cities.join(', ')}). Auto-generate city IDs as "city-[lowercase-city-name]" and assign distinct colors from: #E74C3C, #3498DB, #27AE60, #F39C12, #9B59B6, #1ABC9C, #E91E63, #795548. Include country, countryCode, code, lat, and lng for every city whenever known so maps, weather, and city navigation work immediately after import.
+1. CITIES: Create cities array. ${cities.length ? `Use specified cities: ${cities.join(', ')}.` : 'Choose 3-5 logical cities in the requested regions.'} Auto-generate city IDs as "city-[lowercase-city-name]" and assign distinct colors from: #E74C3C, #3498DB, #27AE60, #F39C12, #9B59B6, #1ABC9C, #E91E63, #795548. Include country, countryCode, code, lat, and lng for every city whenever known so maps, weather, and city navigation work immediately after import.
 
 2. ITINERARY LEGS: Create these leg types in order:
    - "leg-start": Departure from home
@@ -120,7 +122,7 @@ INSTRUCTIONS FOR GENERATION:
 
 3. CITYID ASSIGNMENT: Every tip, food item, activity, and accommodation must include the cityId matching its city.
 
-4. JOURNEYS: Create transport entries for outbound travel, inter-city travel, and the return journey. Use ISO date format (YYYY-MM-DD) for all dates.
+4. JOURNEYS & JUNCTIONS: Create transport entries matching fixed flight junctions (${junctions || 'Outbound, inter-city, and return travel'}). Use ISO date format (YYYY-MM-DD) for all dates.
 
 5. STAYS: Create accommodation entries matching the itinerary. Calculate nights from checkIn to checkOut dates.
 
@@ -232,12 +234,14 @@ function prefillAIDialogFields() {
 }
 
 function generatePrompt() {
-  const title = getAiFieldValue('aiTripTitle', 'Europe Summer Trip');
+  const title = getAiFieldValue('aiTripTitle', 'New Travel Adventure');
+  const regions = getAiFieldValue('aiTripRegions', '');
   const dates = getAiFieldValue('aiTripDates', '14 days');
-  const citiesInput = getAiFieldValue('aiTripCities', 'London, Paris, Rome');
-  const vibe = getAiFieldValue('aiTripVibe', 'Relaxed pacing, great food, no early mornings.');
-  const cities = citiesInput.split(',').map(city => city.trim()).filter(Boolean);
-  const promptText = buildAiPrompt({ title, dates, citiesInput, cities, vibe });
+  const citiesInput = getAiFieldValue('aiTripCities', '');
+  const junctions = getAiFieldValue('aiTripBookedJunctions', '');
+  const vibe = getAiFieldValue('aiTripVibe', 'Relaxed pacing, great food, local culture, walking friendly.');
+  const cities = citiesInput ? citiesInput.split(',').map(city => city.trim()).filter(Boolean) : [];
+  const promptText = buildAiPrompt({ title, regions, dates, citiesInput, cities, junctions, vibe });
 
   const outputBox = document.getElementById('aiOutputBox');
   const promptArea = document.getElementById('aiPromptOutput');
