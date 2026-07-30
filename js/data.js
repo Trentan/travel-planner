@@ -5556,7 +5556,7 @@ function renderTripStart() {
   `).join('');
 
   const calculatedReturn = calculateTripStartReturnDate();
-  if (!tripStartAnswers.returnDate && calculatedReturn) {
+  if (calculatedReturn) {
     tripStartAnswers.returnDate = calculatedReturn;
   }
 
@@ -5657,7 +5657,18 @@ function selectTripStartTransport(type) { captureTripStartAnswer(); tripStartAns
 function selectTripStartReturnTransport(type) { captureTripStartAnswer(); tripStartAnswers.returnTransport = type; renderTripStart(); }
 function addTripStartStop() { captureTripStartAnswer(); tripStartAnswers.stops.push({ city: '', nights: 2, transport: 'train' }); renderTripStart(); }
 function removeTripStartStop(index) { captureTripStartAnswer(); tripStartAnswers.stops.splice(index, 1); renderTripStart(); }
-function updateTripStartStop(index, field, value) { captureTripStartAnswer(); tripStartAnswers.stops[index][field] = field === 'nights' ? Math.max(1, Math.min(60, Number(value) || 1)) : value; }
+function updateTripStartStop(index, field, value) {
+  captureTripStartAnswer();
+  if (tripStartAnswers.stops[index]) {
+    tripStartAnswers.stops[index][field] = field === 'nights' ? Math.max(1, Math.min(60, Number(value) || 1)) : value;
+  }
+  const calc = calculateTripStartReturnDate();
+  if (calc) {
+    tripStartAnswers.returnDate = calc;
+    const input = document.getElementById('tripStartReturnDate');
+    if (input) input.value = calc;
+  }
+}
 function dismissTripStart() {
   const modal = document.getElementById('trip-start-modal');
   if (modal) modal.style.display = 'none';
