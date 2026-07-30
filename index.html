@@ -41,6 +41,7 @@
     <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
     <button id="undoBtn" class="app-menu-btn" onclick="undoTripChange()" disabled>↶ Undo</button>
     <button id="redoBtn" class="app-menu-btn" onclick="redoTripChange()" disabled>↷ Redo</button>
+    <button id="topCitiesBtn" class="app-menu-btn" onclick="openCityDialog()" title="Manage cities, rename, refetch location coordinates and country flags">🌍 Manage Cities</button>
     <details class="app-menu-actions" id="desktopActionsMenu">
       <summary class="app-menu-btn app-menu-actions-summary" aria-label="Open app actions" aria-haspopup="menu">☰ Actions</summary>
       <div class="app-menu-actions-panel" role="menu" aria-label="App actions">
@@ -154,7 +155,8 @@
             <button id="itineraryTimelineModeBtn" class="itinerary-view-mode-btn is-active" type="button" onclick="setItineraryDayViewMode('timeline')">Timeline</button>
             <button id="itineraryGroupedModeBtn" class="itinerary-view-mode-btn" type="button" onclick="setItineraryDayViewMode('grouped')">Grouped</button>
           </div>
-          <button class="action-btn add-leg-action" onclick="openLegEditorDialog()"><span class="add-leg-full">🧭 Manage Legs</span><span class="add-leg-short" aria-hidden="true"></span></button>
+          <button class="action-btn add-leg-action" onclick="openLegEditorDialog()"><span class="add-leg-full">🧭 Manage Legs</span><span class="add-leg-short" aria-hidden="true">🧭</span></button>
+          <button class="action-btn manage-cities-action" onclick="openCityDialog()" title="Manage & refetch city locations and flags"><span class="add-leg-full">🌍 Manage Cities</span><span class="add-leg-short" aria-hidden="true">🌍</span></button>
         </div>
       </div>
       <div id="itinerary"></div>
@@ -629,9 +631,12 @@
         <button class="modal-close" onclick="closeAddLegDialog()">&times;</button>
       </div>
       <div class="modal-body">
-        <div style="margin-bottom: 1.5rem;">
-          <button type="button" class="action-btn" style="width: 100%; display: flex; justify-content: center; gap: 0.5rem;" onclick="syncAllLegDays()">
-            <span>🔄</span> Auto-Sync Days from Journeys
+        <div style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button type="button" class="action-btn" style="flex: 1; min-width: 140px; display: flex; justify-content: center; gap: 0.5rem;" onclick="syncAllLegDays()">
+            <span>🔄</span> Auto-Sync Days
+          </button>
+          <button type="button" class="action-btn action-btn-secondary" style="flex: 1; min-width: 140px; display: flex; justify-content: center; gap: 0.5rem;" onclick="closeAddLegDialog(); openCityDialog();">
+            <span>🌍</span> Manage Cities
           </button>
         </div>
         <div class="stack-gap-4">

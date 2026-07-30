@@ -1822,20 +1822,29 @@ function populateCityList() {
   }
 
   const missingLocationCount = citiesData.filter(city => !cityHasStoredCoords(city)).length;
-  if (missingLocationCount > 0) {
-    const toolbar = document.createElement('div');
-    toolbar.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.75rem 1rem; background:#f5fbff; border-bottom:1px solid #d7ebfa;';
-    toolbar.innerHTML = `
-      <span style="font-size:0.85rem; color:#2C3E50;">${missingLocationCount} ${missingLocationCount === 1 ? 'city is' : 'cities are'} missing map locations.</span>
+  const toolbar = document.createElement('div');
+  toolbar.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:0.5rem; flex-wrap:wrap; padding:0.75rem 1rem; background:#f0f7f4; border-bottom:1px solid #d0e5dc;';
+  toolbar.innerHTML = `
+    <div style="font-size:0.85rem; color:#176e67; font-weight:600;">
+      🌍 Manage Cities (${citiesData.length} total ${missingLocationCount > 0 ? `· ⚠️ ${missingLocationCount} unmapped` : '· ✅ All mapped'})
+    </div>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
       <button id="fetchMissingCityLocationsBtn"
               class="search-btn"
-              style="color: #fff; background: #3498DB; cursor: pointer;"
-              onclick="fetchAllMissingCityLocations()">
-        Find all missing locations
+              style="color: #fff; background: #176e67; border:none; cursor: pointer; border-radius: 0.4rem; padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;"
+              onclick="fetchAllMissingCityLocations()"
+              title="Refetch map coordinates and country flags for all cities">
+        ⚡ Refetch All Locations & Flags
       </button>
-    `;
-    container.appendChild(toolbar);
-  }
+      <button class="search-btn"
+              style="color: #2C3E50; background: #fff; border:1px solid #cbd5e1; cursor: pointer; border-radius: 0.4rem; padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;"
+              onclick="openAllInGoogleMaps()"
+              title="Open all mapped cities in Google Maps">
+        🗺️ View All on Map
+      </button>
+    </div>
+  `;
+  container.appendChild(toolbar);
 
   // Sort cities alphabetically by name
   const sortedCities = [...citiesData].sort((a, b) => a.name.localeCompare(b.name));
