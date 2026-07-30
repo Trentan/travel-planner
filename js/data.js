@@ -1310,12 +1310,139 @@ function applyCityLocation(city, location) {
   return true;
 }
 
+async function searchCityOnlineCandidates(cityName) {
+  if (!cityName) return [];
+  const cleanName = cityName.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').trim();
+
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cleanName)}&addressdetails=1&limit=5`, {
+      headers: { 'Accept-Language': 'en' }
+    });
+    const data = await response.json();
+    if (!Array.isArray(data)) return [];
+
+    const candidates = [];
+    const seenCountries = new Set();
+
+    data.forEach(item => {
+      const cCode = (item.address?.country_code || '').toUpperCase();
+      const cName = item.address?.country || getCountryName(cCode);
+      if (cCode && !seenCountries.has(cCode)) {
+        seenCountries.add(cCode);
+        candidates.push({
+          lat: parseFloat(item.lat),
+          lng: parseFloat(item.lon),
+          countryCode: cCode,
+          countryName: cName,
+          displayName: item.display_name
+        });
+      }
+    });
+
+    return candidates;
+  } catch (e) {
+    console.error('[Geocoding] Candidate search failed:', e);
+    return [];
+  }
+}
+
+async function promptCityDisambiguation(cityId) {
+  const city = citiesData.find(c => c.id === cityId);
+  if (!city) return;
+
+  const candidates = await searchCityOnlineCandidates(city.name);
+
+  if (candidates.length <= 1) {
+    const singleMatch = candidates[0];
+    if (singleMatch) {
+      selectCityDisambiguationChoice(cityId, singleMatch.countryCode, singleMatch.lat, singleMatch.lng);
+    }
+    return;
+  }
+
+  let overlay = document.getElementById('city-disambiguation-modal');
+  if (overlay) overlay.remove();
+
+  overlay = document.createElement('div');
+  overlay.id = 'city-disambiguation-modal';
+  overlay.className = 'modal-overlay';
+  overlay.style.cssText = 'display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center;';
+
+  const choicesHtml = candidates.map(cand => {
+    const flag = getCountryFlag(cand.countryCode);
+    const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase() && c.countryCode === cand.countryCode);
+    const iataCode = dbMatch ? dbMatch.code : '';
+    const icaoCode = dbMatch ? (dbMatch.icaoCode || dbMatch.icao || '') : '';
+    
+    return `
+      <button class="trip-start-choice" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.1rem; border: 1px solid #c8d6d0; border-radius: 0.75rem; background: #fff; text-align: left; cursor: pointer; margin-bottom: 0.65rem; width: 100%;" onclick="selectCityDisambiguationChoice('${cityId}', '${cand.countryCode}', ${cand.lat}, ${cand.lng}, '${iataCode}', '${icaoCode}')">
+        <div>
+          <strong style="font-size: 1.05rem; color: #162c3b;">${flag} ${city.name}, ${cand.countryName}</strong>
+          <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: #60717b;">${cand.displayName}</p>
+        </div>
+        <span style="font-size: 1.1rem; color: #176e67; font-weight: 700;">Select →</span>
+      </button>
+    `;
+  }).join('');
+
+  overlay.innerHTML = `
+    <div class="modal-content" style="max-width: 520px; width: 90%; background: #fff; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.25);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.75rem;">
+        <h3 style="margin: 0; font-size: 1.25rem; color: #2C3E50;">❓ Which "${escapeTripStartText(city.name)}" are you visiting?</h3>
+        <button type="button" class="modal-close" style="border: none; background: transparent; font-size: 1.5rem; cursor: pointer;" onclick="document.getElementById('city-disambiguation-modal').remove()">&times;</button>
+      </div>
+      <p style="font-size: 0.9rem; color: #556677; margin-top: 0; margin-bottom: 1.25rem;">
+        Multiple cities named <strong>${escapeTripStartText(city.name)}</strong> were found. Select your destination country:
+      </p>
+      <div class="disambiguation-choices">${choicesHtml}</div>
+      <button type="button" class="action-btn" style="width: 100%; margin-top: 0.75rem;" onclick="document.getElementById('city-disambiguation-modal').remove()">Cancel</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+}
+
+function selectCityDisambiguationChoice(cityId, countryCode, lat, lng, iataCode = '', icaoCode = '') {
+  const city = citiesData.find(c => c.id === cityId);
+  if (!city) return;
+
+  city.countryCode = countryCode;
+  city.country = getCountryName(countryCode);
+  city.lat = lat;
+  city.lng = lng;
+  if (iataCode) city.code = iataCode;
+  if (icaoCode) city.icaoCode = icaoCode;
+
+  saveData(true);
+  const modal = document.getElementById('city-disambiguation-modal');
+  if (modal) modal.remove();
+
+  populateCityList();
+  if (typeof buildNav === 'function') buildNav();
+  if (typeof buildItinerary === 'function') buildItinerary();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  showToast(`Updated location for ${city.name} (${city.country})`);
+}
+
+window.searchCityOnlineCandidates = searchCityOnlineCandidates;
+window.promptCityDisambiguation = promptCityDisambiguation;
+window.selectCityDisambiguationChoice = selectCityDisambiguationChoice;
+
 async function triggerOnlineSearch(cityId) {
   const city = citiesData.find(c => c.id === cityId);
   if (!city) return;
 
   const btn = document.querySelector(`[data-search-btn="${cityId}"]`);
   if (btn) btn.disabled = true;
+
+  if (!city.countryCode) {
+    const candidates = await searchCityOnlineCandidates(city.name);
+    if (candidates.length > 1) {
+      if (btn) btn.disabled = false;
+      await promptCityDisambiguation(cityId);
+      return;
+    }
+  }
 
   const result = await resolveCityLocation(city);
   if (result) {
