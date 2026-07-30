@@ -3559,14 +3559,15 @@ async function factoryResetData(options = {}) {
     return;
   }
 
+  // Clear in-memory active file handle and write flags
+  activeFileHandle = null;
+  fileWriteFailed = false;
+  importedJsonWithoutWriteAccess = false;
+
   resetAppStateToDefaults();
 
-  const keysToClear = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith('travelApp_')) keysToClear.push(key);
-  }
-  keysToClear.forEach(key => localStorage.removeItem(key));
+  // Wipe ALL localStorage and sessionStorage completely
+  try { localStorage.clear(); } catch (e) { console.warn('Factory reset: localStorage cleanup skipped', e); }
   try { sessionStorage.clear(); } catch (e) { console.warn('Factory reset: sessionStorage cleanup skipped', e); }
 
   try {
@@ -3588,7 +3589,7 @@ async function factoryResetData(options = {}) {
   }
 
   try {
-    if (window.indexedDB && DB_NAME) {
+    if (window.indexedDB && typeof DB_NAME !== 'undefined') {
       await new Promise(resolve => {
         const request = window.indexedDB.deleteDatabase(DB_NAME);
         request.onsuccess = request.onerror = request.onblocked = () => resolve();
