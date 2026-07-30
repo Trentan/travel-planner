@@ -453,7 +453,8 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
     await humanPause(page, 400);
     assert(await page.getByRole('button', { name: /Import Booking/i }).count() > 0, 'Mobile: booking intake entry should be available from menu');
-    reporter.add('mobile', 'menu sheet', 'mobile menu opened');
+    assert(await page.locator('.mobile-desktop-advisory').count() === 1, 'Mobile: desktop recommendation advisory notice should be present in mobile menu');
+    reporter.add('mobile', 'menu sheet', 'mobile menu opened with desktop advisory notice');
 
     await page.evaluate(() => {
       if (window.isEditMode && typeof toggleEditMode === 'function') {

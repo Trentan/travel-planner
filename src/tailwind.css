@@ -6339,7 +6339,15 @@ body.read-only-mode .empty-state-readonly-hint {
 .trip-start-chip.is-selected { border-color: #176e67; background: #dcefe8; color: #125d56; font-weight: 750; }
 [data-theme="dark"] .trip-start-panel { border-color: #315159; background: linear-gradient(145deg, #152b33, #0f2028); color: #edf8f4; }.dark .trip-start-panel { border-color: #315159; background: linear-gradient(145deg, #152b33, #0f2028); color: #edf8f4; }[data-theme="dark"] .trip-start-intro, [data-theme="dark"] .trip-start-question p, [data-theme="dark"] .trip-start-quiet, [data-theme="dark"] .trip-start-number-row span { color: #abc1c7; }[data-theme="dark"] .trip-start-choice, [data-theme="dark"] .trip-start-input, [data-theme="dark"] .trip-start-number-row button, [data-theme="dark"] .trip-start-transport button { border-color: #3a5960; background: #1b343c; color: #e7f4f0; }[data-theme="dark"] .trip-start-choice--primary, [data-theme="dark"] .trip-start-transport button.is-selected { background: #1b4b49; border-color: #3c9d91; }[data-theme="dark"] .trip-start-question label, [data-theme="dark"] .trip-start-transport legend { color: #effbf7; }
 [data-theme="dark"] .trip-start-stop-nights, [data-theme="dark"] .trip-start-stop-row select { border-color: #3a5960; background: #1b343c; color: #e7f4f0; }
-@media (max-width: 480px) { .trip-start-overlay { align-items: flex-end; padding: 0; }.trip-start-panel { width: 100%; max-height: 92dvh; padding: 1.7rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom)); border-radius: 1.5rem 1.5rem 0 0; }.trip-start-panel h2 { font-size: 2rem; }.trip-start-choice { padding: .85rem; } }
+.mobile-desktop-advisory { display: flex; align-items: flex-start; gap: .75rem; padding: .85rem 1rem; margin: .75rem 1rem; background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: .75rem; color: #0c4a6e; }
+.mobile-desktop-advisory-icon { font-size: 1.5rem; line-height: 1; }
+.mobile-desktop-advisory-content strong { display: block; font-size: .9rem; font-weight: 700; color: #0369a1; }
+.mobile-desktop-advisory-content p { margin: .25rem 0 0; font-size: .8rem; color: #334155; line-height: 1.35; }
+.mobile-desktop-advisory-content a { color: #0284c7; font-weight: 600; text-decoration: underline; }
+[data-theme="dark"] .mobile-desktop-advisory, .dark .mobile-desktop-advisory { background: linear-gradient(135deg, #0c2a38 0%, #064e3b 100%); border-color: #0e7490; color: #e0f2fe; }
+[data-theme="dark"] .mobile-desktop-advisory-content strong, .dark .mobile-desktop-advisory-content strong { color: #38bdf8; }
+[data-theme="dark"] .mobile-desktop-advisory-content p, .dark .mobile-desktop-advisory-content p { color: #cbd5e1; }
+[data-theme="dark"] .mobile-desktop-advisory-content a, .dark .mobile-desktop-advisory-content a { color: #7dd3fc; }
 
 .tutorial-overlay {
   position: fixed;
