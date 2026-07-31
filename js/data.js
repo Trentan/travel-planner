@@ -918,6 +918,7 @@ function extractCitiesFromItinerary() {
       let country = '';
       let cityCode = '';
       let countryCode = '';
+      let formattedName = dbMatch ? dbMatch.name : formatCityTitleCase(normalized);
 
       if (dbMatch) {
         country = getCountryName(dbMatch.countryCode);
@@ -926,8 +927,8 @@ function extractCitiesFromItinerary() {
       }
 
       existing = {
-        id: 'city-' + normalized.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-        name: normalized,
+        id: 'city-' + formattedName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        name: formattedName,
         country: country,
         code: cityCode,
         countryCode: countryCode,
@@ -1114,6 +1115,8 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     (code && c.code && c.code.toUpperCase() === code.toUpperCase())
   );
 
+  let formattedName = dbMatch ? dbMatch.name : formatCityTitleCase(normalizedName);
+
   if (dbMatch) {
     // City found in database - use its IATA code, country and coordinates
     if (!code) code = dbMatch.code;
@@ -1130,8 +1133,8 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
 
   // Create new city with ISO structure
   const newCity = {
-    id: 'city-' + normalizedName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-    name: normalizedName,
+    id: 'city-' + formattedName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+    name: formattedName,
     code: code || '',
     countryCode: cCode || '',
     country: cName || country,
@@ -1214,11 +1217,16 @@ function normalizeCityLocationData(city) {
   if (!city || typeof city !== 'object') return city;
 
   const cityName = String(city.name || '').trim();
-  if (!city.id && cityName) {
-    city.id = 'city-' + cityName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  const dbMatch = getCityLocationDatabaseMatch(city);
+
+  if (cityName) {
+    city.name = dbMatch ? dbMatch.name : formatCityTitleCase(cityName);
   }
 
-  const dbMatch = getCityLocationDatabaseMatch(city);
+  if (!city.id && cityName) {
+    city.id = 'city-' + city.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  }
+
   if (dbMatch) {
     if (!city.code && dbMatch.code) city.code = dbMatch.code;
     if (!city.icaoCode && (dbMatch.icaoCode || dbMatch.icao)) city.icaoCode = dbMatch.icaoCode || dbMatch.icao;
@@ -1572,6 +1580,27 @@ function setupCountrySelectHandler() {
       if (customDiv) customDiv.style.display = 'none';
     }
   });
+// Format city name to proper title case (e.g. osaka -> Osaka, NEW YORK -> New York)
+function formatCityTitleCase(str) {
+  if (!str || typeof str !== 'string') return str || '';
+  const clean = str.trim();
+  if (!clean) return '';
+  
+  const minorWords = new Set(['and', 'of', 'on', 'in', 'at', 'by', 'for', 'the', 'de', 'la', 'del', 'da', 'do', 'des']);
+  return clean
+    .split(/\s+/)
+    .map((word, index) => {
+      if (!word) return word;
+      const lower = word.toLowerCase();
+      if (index > 0 && minorWords.has(lower)) {
+        return lower;
+      }
+      return word.split('-').map(sub => {
+        if (!sub) return sub;
+        return sub.charAt(0).toUpperCase() + sub.slice(1).toLowerCase();
+      }).join('-');
+    })
+    .join(' ');
 }
 
 // Get country name by code
@@ -5226,6 +5255,7 @@ window.closeCityDialog = closeCityDialog;
 window.addNewCityFromDialog = addNewCityFromDialog;
 window.updateCityCountry = updateCityCountry;
 window.deleteCityFromDialog = deleteCityFromDialog;
+window.formatCityTitleCase = formatCityTitleCase;
 window.populateCityList = populateCityList;
 
 async function loadImportedPayload(importedData, fileName) {
