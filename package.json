@@ -4,6 +4,8 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
+    "start": "npx --yes serve . -p 3000",
+    "stop": "npx --yes kill-port 3000",
     "test": "node tests/run-tests.js",
     "test:browser": "node tests/browser-suite.js",
     "test:browser:headed": "node tests/browser-suite.js --headed --slowmo=400",
