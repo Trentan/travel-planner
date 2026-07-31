@@ -1952,7 +1952,8 @@
     }
 
     body.mobile-app-mode .mobile-menu-sheet {
-      padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+      padding-top: calc(1rem + env(safe-area-inset-top, 0px)) !important;
+      padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
     }
 
     body.mobile-app-mode .mobile-menu-sheet-panel {
@@ -5074,8 +5075,10 @@
 
   /* Mobile Menu Sheet */
   .mobile-menu-sheet {
-    @apply fixed inset-0 hidden items-end justify-center px-3 pb-3 pt-8
+    @apply fixed inset-0 hidden items-end justify-center px-3 pt-4
            bg-black/58 z-1400 backdrop-blur-sm;
+    padding-top: calc(1rem + env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .mobile-menu-sheet.open {
@@ -5084,10 +5087,12 @@
 
   .mobile-menu-sheet-panel {
     @apply relative w-full rounded-t-[24px] rounded-b-[18px] shadow-2xl
-           p-4 max-h-[calc(100dvh-2.25rem)] overflow-y-auto;
+           p-4 overflow-y-auto;
+    max-height: 100% !important;
     max-width: min(100%, 520px);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(251, 247, 241, 0.98) 100%);
     overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
   .mobile-menu-sheet-panel::before {

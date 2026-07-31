@@ -66,3 +66,6 @@ Below are the generated marketing graphics. These have been copied to the reposi
   * [Accommodation View](file:///c:/Apps/Projects/travel-planner/docs/play-store/screenshot-3-accom.png)
   * [Budget View](file:///c:/Apps/Projects/travel-planner/docs/play-store/screenshot-4-budget.png)
   * [Packing View](file:///c:/Apps/Projects/travel-planner/docs/play-store/screenshot-5-packing.png)
+  * [Trip Start Wizard](file:///c:/Apps/Projects/travel-planner/docs/play-store/screenshot-6-trip-wizard.png)
+  * [Manage Cities Dialog](file:///c:/Apps/Projects/travel-planner/docs/play-store/screenshot-7-manage-cities.png)
+  * [AI Builder Dialog](file:///c:/Apps/Projects/travel-planner/docs/play-store/screenshot-8-ai-builder.png)

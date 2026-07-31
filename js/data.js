@@ -1580,6 +1580,8 @@ function setupCountrySelectHandler() {
       if (customDiv) customDiv.style.display = 'none';
     }
   });
+}
+
 // Format city name to proper title case (e.g. osaka -> Osaka, NEW YORK -> New York)
 function formatCityTitleCase(str) {
   if (!str || typeof str !== 'string') return str || '';
@@ -3878,8 +3880,13 @@ async function factoryResetData(options = {}) {
   resetAppStateToDefaults();
 
   // Wipe ALL localStorage and sessionStorage completely
-  try { localStorage.clear(); } catch (e) { console.warn('Factory reset: localStorage cleanup skipped', e); }
-  try { sessionStorage.clear(); } catch (e) { console.warn('Factory reset: sessionStorage cleanup skipped', e); }
+  try {
+    localStorage.clear();
+    sessionStorage.clear();
+    localStorage.setItem("travelApp_factory_reset_triggered", "true");
+  } catch (e) {
+    console.warn('Factory reset: storage cleanup skipped', e);
+  }
 
   try {
     if ('serviceWorker' in navigator) {
@@ -6163,26 +6170,27 @@ function dismissFileSetup() {
 }
 
 function startBlankTrip() {
-  appData = [{
-    id: "leg-" + Date.now(),
-    label: "?? New Trip",
-    colour: "#2C3E50",
-    cityFood: [],
-    suggestedActivities: [],
-    legTips: [],
-    days: [{
-      date: "", day: "", from: "", to: "",
-      completed: false, desc: "",
-      transportItems: [], accomItems: [], activityItems: []
-    }]
-  }];
-  titleData = { title: "My Awesome Trip", subtitle: "A new adventure awaits" };
+  appData = [];
+  journeys = [];
+  stays = [];
+  citiesData = [];
+  userCities = [];
+  userCountries = [];
+  window.journeys = journeys;
+  window.stays = stays;
+  titleData = { title: "My New Trip", subtitle: "0 cities · Add a city or leg to start" };
   const mainTitleEl = document.getElementById("mainTitle");
   if (mainTitleEl) mainTitleEl.innerText = titleData.title;
   const mainSubEl = document.getElementById("mainSubtitle");
   if (mainSubEl) mainSubEl.innerText = titleData.subtitle;
   syncCurrentFileName("New_Trip.json");
   saveData(true);
+  dismissTripStart();
+  dismissFileSetup();
+  if (typeof buildNav === "function") buildNav();
+  if (typeof buildItinerary === "function") buildItinerary();
+  if (typeof buildTransportTab === "function") buildTransportTab();
+  if (typeof buildAccomTab === "function") buildAccomTab();
   if (typeof buildTabs === "function") buildTabs();
 }
 
@@ -6208,6 +6216,16 @@ function onboardOpenExistingTrip() {
 if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof navigator !== 'undefined' && navigator.webdriver) return; // skip for automated testing
+
+    const isFactoryReset = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_factory_reset_triggered") === "true" : false;
+    if (isFactoryReset) {
+      try { localStorage.removeItem("travelApp_factory_reset_triggered"); } catch(e){}
+      startBlankTrip();
+      setTimeout(() => {
+        openCreateNewTripWizard();
+      }, 300);
+      return;
+    }
 
     const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
     const hasSeenTripStart = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_trip_start_seen") : null;

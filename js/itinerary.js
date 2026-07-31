@@ -1535,6 +1535,21 @@ function buildCompactItineraryDesktop() {
 
   container.innerHTML = '';
 
+  if (!appData || appData.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 4rem 1.5rem; background: rgba(255,255,255,0.85); border-radius: 1.25rem; border: 1px dashed rgba(148, 163, 184, 0.4); margin: 2rem auto; max-width: 540px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">✈️</div>
+        <h2 style="font-family: serif; color: #1e293b; margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 700;">No Trip Cities Yet</h2>
+        <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.5;">Your itinerary is currently empty. Use the Trip Wizard to build a custom multi-city itinerary, or add your first city manually!</p>
+        <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+          <button class="action-btn action-btn-primary" onclick="openCreateNewTripWizard()" style="padding: 0.6rem 1.2rem; font-weight: 600;">🧙‍♂️ Create New Trip Wizard</button>
+          <button class="action-btn action-btn-secondary" onclick="openCityDialog()" style="padding: 0.6rem 1.2rem;">🌍 Manage Cities</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   const stack = document.createElement('div');
   stack.className = 'compact-desktop-stack';
   stack.innerHTML = appData.map((leg, legIndex) => `
