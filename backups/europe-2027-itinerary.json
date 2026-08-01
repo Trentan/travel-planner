@@ -27,7 +27,7 @@
           "startTime": "",
           "endDate": "2027-06-08",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-brisbane",
           "text": "Pre-flight Walk"
         },
         {
@@ -46,7 +46,8 @@
           "startDate": "2027-06-08",
           "startTime": "",
           "endDate": "2027-06-08",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-brisbane"
         }
       ],
       "legTips": [],
@@ -68,7 +69,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-brisbane"
             }
           ],
           "activityItems": [
@@ -207,7 +208,7 @@
           "startTime": "",
           "endDate": "2027-06-09",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-athens",
           "text": "Slow Morning in Athens"
         },
         {
@@ -227,7 +228,7 @@
           "startTime": "",
           "endDate": "2027-06-10",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-athens",
           "text": "Suggested Experience"
         },
         {
@@ -247,7 +248,7 @@
           "startTime": "",
           "endDate": "2027-06-11",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-athens",
           "text": "Suggested Experience"
         },
         {
@@ -267,7 +268,7 @@
           "startTime": "",
           "endDate": "2027-06-12",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-athens",
           "text": "Suggested Experience"
         },
         {
@@ -286,7 +287,8 @@
           "startDate": "2027-06-09",
           "startTime": "",
           "endDate": "2027-06-09",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-athens"
         },
         {
           "id": "act-iq0rc404q-mrsskpln",
@@ -304,7 +306,8 @@
           "startDate": "2027-06-10",
           "startTime": "",
           "endDate": "2027-06-10",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-athens"
         },
         {
           "id": "act-zgkrqydxh-mrsskplo",
@@ -322,7 +325,8 @@
           "startDate": "2027-06-11",
           "startTime": "",
           "endDate": "2027-06-11",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-athens"
         },
         {
           "id": "act-ykofncas1-mrsskplo",
@@ -340,7 +344,8 @@
           "startDate": "2027-06-11",
           "startTime": "",
           "endDate": "2027-06-11",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-athens"
         },
         {
           "id": "act-9yl9v2fgl-mrsskplo",
@@ -358,21 +363,22 @@
           "startDate": "2027-06-12",
           "startTime": "",
           "endDate": "2027-06-12",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-athens"
         }
       ],
       "legTips": [
         {
           "text": "Book Acropolis tickets online in advance to skip queues",
-          "cityId": ""
+          "cityId": "city-athens"
         },
         {
           "text": "Wear comfortable shoes — lots of uneven marble underfoot",
-          "cityId": ""
+          "cityId": "city-athens"
         },
         {
           "text": "Praxitelous Luxury Suites is a well-rated, central pick near Syntagma if you want to book independently",
-          "cityId": ""
+          "cityId": "city-athens"
         }
       ],
       "days": [
@@ -393,7 +399,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-athens"
             }
           ],
           "activityItems": [
@@ -437,7 +443,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-athens"
             }
           ],
           "activityItems": [
@@ -494,7 +500,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-athens"
             }
           ],
           "activityItems": [
@@ -551,7 +557,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-athens"
             }
           ],
           "activityItems": [
@@ -608,7 +614,8 @@
           "startTime": "",
           "endDate": "2027-06-13",
           "endTime": "",
-          "text": "Suggested Experience"
+          "text": "Suggested Experience",
+          "cityId": "city-kusadasi"
         },
         {
           "id": "act-d4mpj8eu9-mrsskplp",
@@ -626,7 +633,8 @@
           "startDate": "2027-06-13",
           "startTime": "",
           "endDate": "2027-06-13",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-kusadasi"
         }
       ],
       "days": [
@@ -647,7 +655,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-kusadasi"
             }
           ],
           "activityItems": [
@@ -705,7 +713,8 @@
           "startTime": "",
           "endDate": "2027-06-14",
           "endTime": "",
-          "text": "Suggested Experience"
+          "text": "Suggested Experience",
+          "cityId": "city-rhodes"
         },
         {
           "id": "act-l3mpi2zqi-mrsskplp",
@@ -723,7 +732,8 @@
           "startDate": "2027-06-14",
           "startTime": "",
           "endDate": "2027-06-14",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-rhodes"
         }
       ],
       "days": [
@@ -739,7 +749,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-rhodes"
             }
           ],
           "activityItems": [
@@ -797,7 +807,8 @@
           "startTime": "",
           "endDate": "2027-06-15",
           "endTime": "",
-          "text": "Suggested Experience"
+          "text": "Suggested Experience",
+          "cityId": "city-crete"
         },
         {
           "id": "act-lsj2vdm4r-mrsskplp",
@@ -815,7 +826,8 @@
           "startDate": "2027-06-15",
           "startTime": "",
           "endDate": "2027-06-15",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-crete"
         }
       ],
       "days": [
@@ -831,7 +843,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-crete"
             }
           ],
           "activityItems": [
@@ -889,7 +901,8 @@
           "startTime": "",
           "endDate": "2027-06-16",
           "endTime": "",
-          "text": "Suggested Experience"
+          "text": "Suggested Experience",
+          "cityId": "city-santorini"
         },
         {
           "id": "act-lqe4qxnpe-mrsskplp",
@@ -907,7 +920,8 @@
           "startDate": "2027-06-16",
           "startTime": "",
           "endDate": "2027-06-16",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-santorini"
         }
       ],
       "days": [
@@ -923,7 +937,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-santorini"
             }
           ],
           "activityItems": [
@@ -981,7 +995,8 @@
           "startTime": "",
           "endDate": "2027-06-17",
           "endTime": "",
-          "text": "Suggested Experience"
+          "text": "Suggested Experience",
+          "cityId": "city-mykonos"
         },
         {
           "id": "act-hzyvnpinc-mrsskplq",
@@ -999,7 +1014,8 @@
           "startDate": "2027-06-17",
           "startTime": "",
           "endDate": "2027-06-17",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-mykonos"
         }
       ],
       "days": [
@@ -1015,7 +1031,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-mykonos"
             }
           ],
           "activityItems": [
@@ -1073,7 +1089,8 @@
           "startTime": "",
           "endDate": "2027-06-18",
           "endTime": "",
-          "text": "Suggested Experience"
+          "text": "Suggested Experience",
+          "cityId": "city-milos"
         },
         {
           "id": "act-drjdmn4qb-mrsskplq",
@@ -1091,7 +1108,8 @@
           "startDate": "2027-06-18",
           "startTime": "",
           "endDate": "2027-06-18",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-milos"
         }
       ],
       "days": [
@@ -1107,7 +1125,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-milos"
             }
           ],
           "activityItems": [
@@ -1165,7 +1183,8 @@
           "startTime": "",
           "endDate": "2027-06-19",
           "endTime": "",
-          "text": "Airport Transfer"
+          "text": "Airport Transfer",
+          "cityId": "city-athens"
         }
       ],
       "days": [
@@ -1181,7 +1200,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-athens"
             }
           ],
           "activityItems": [
@@ -1287,7 +1306,7 @@
           "startTime": "",
           "endDate": "2027-06-19",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-rome",
           "text": "Suggested Experience"
         },
         {
@@ -1307,7 +1326,7 @@
           "startTime": "",
           "endDate": "2027-06-20",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-rome",
           "text": "Colosseum & Roman Forum"
         },
         {
@@ -1327,7 +1346,7 @@
           "startTime": "",
           "endDate": "2027-06-21",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-rome",
           "text": "Vatican Museums & Sistine Chapel"
         },
         {
@@ -1346,7 +1365,8 @@
           "startDate": "2027-06-20",
           "startTime": "",
           "endDate": "2027-06-20",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-rome"
         },
         {
           "id": "act-eo56x3e73-mrsskplq",
@@ -1364,7 +1384,8 @@
           "startDate": "2027-06-21",
           "startTime": "",
           "endDate": "2027-06-21",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-rome"
         },
         {
           "id": "act-qfsgbt5i4-mrsskplq",
@@ -1382,21 +1403,22 @@
           "startDate": "2027-06-21",
           "startTime": "",
           "endDate": "2027-06-21",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-rome"
         }
       ],
       "legTips": [
         {
           "text": "Book Colosseum & Vatican tickets ahead — both sell out daily",
-          "cityId": ""
+          "cityId": "city-rome"
         },
         {
           "text": "Validate any paper transit tickets before boarding",
-          "cityId": ""
+          "cityId": "city-rome"
         },
         {
           "text": "Hotel Albergo del Senato is a well-rated pick right across from the Pantheon",
-          "cityId": ""
+          "cityId": "city-rome"
         }
       ],
       "days": [
@@ -1417,7 +1439,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-rome"
             }
           ],
           "activityItems": [
@@ -1448,7 +1470,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-rome"
             }
           ],
           "activityItems": [
@@ -1492,7 +1514,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-rome"
             }
           ],
           "activityItems": [
@@ -1611,7 +1633,7 @@
           "startTime": "",
           "endDate": "2027-06-22",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-florence",
           "text": "High-Speed Train: Rome to Florence"
         },
         {
@@ -1631,7 +1653,7 @@
           "startTime": "",
           "endDate": "2027-06-23",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-florence",
           "text": "Uffizi Gallery"
         },
         {
@@ -1650,7 +1672,8 @@
           "startDate": "2027-06-23",
           "startTime": "",
           "endDate": "2027-06-23",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-florence"
         },
         {
           "id": "act-vvuomqidd-mrsskplr",
@@ -1668,17 +1691,18 @@
           "startDate": "2027-06-23",
           "startTime": "",
           "endDate": "2027-06-23",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-florence"
         }
       ],
       "legTips": [
         {
           "text": "High-speed Frecciarossa train from Rome to Florence takes ~1.5 hours",
-          "cityId": ""
+          "cityId": "city-florence"
         },
         {
           "text": "Brunelleschi Hotel is a well-rated boutique pick 90 seconds from the Duomo",
-          "cityId": ""
+          "cityId": "city-florence"
         }
       ],
       "days": [
@@ -1699,7 +1723,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-florence"
             }
           ],
           "activityItems": [
@@ -1743,7 +1767,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-florence"
             }
           ],
           "activityItems": [
@@ -1854,7 +1878,7 @@
           "startTime": "",
           "endDate": "2027-06-24",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-venice",
           "text": "High-Speed Train: Florence to Venice"
         },
         {
@@ -1874,7 +1898,7 @@
           "startTime": "",
           "endDate": "2027-06-25",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-venice",
           "text": "Classic Gondola Ride"
         },
         {
@@ -1893,7 +1917,8 @@
           "startDate": "2027-06-24",
           "startTime": "",
           "endDate": "2027-06-24",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-venice"
         },
         {
           "id": "act-pfmuc60ns-mrsskpls",
@@ -1911,7 +1936,8 @@
           "startDate": "2027-06-25",
           "startTime": "",
           "endDate": "2027-06-25",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-venice"
         },
         {
           "id": "act-4fw069d8v-mrsskpls",
@@ -1929,17 +1955,18 @@
           "startDate": "2027-06-25",
           "startTime": "",
           "endDate": "2027-06-25",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-venice"
         }
       ],
       "legTips": [
         {
           "text": "Book a gondola ride in the late afternoon for the best light",
-          "cityId": ""
+          "cityId": "city-venice"
         },
         {
           "text": "Hotel Bella Venezia has a secret canal-facing balcony, steps from St Mark's Square",
-          "cityId": ""
+          "cityId": "city-venice"
         }
       ],
       "days": [
@@ -1960,7 +1987,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-venice"
             }
           ],
           "activityItems": [
@@ -2004,7 +2031,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-venice"
             }
           ],
           "activityItems": [
@@ -2129,7 +2156,7 @@
           "startTime": "",
           "endDate": "2027-06-26",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-barcelona",
           "text": "La Plata Tapas Bar"
         },
         {
@@ -2149,7 +2176,7 @@
           "startTime": "",
           "endDate": "2027-06-27",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-barcelona",
           "text": "Sagrada Familia"
         },
         {
@@ -2169,7 +2196,7 @@
           "startTime": "",
           "endDate": "2027-06-28",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-barcelona",
           "text": "Barceloneta Beach Promenade"
         },
         {
@@ -2188,7 +2215,8 @@
           "startDate": "2027-06-28",
           "startTime": "",
           "endDate": "2027-06-28",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-barcelona"
         },
         {
           "id": "act-jdd8kabhx-mrsskplt",
@@ -2206,21 +2234,22 @@
           "startDate": "2027-06-28",
           "startTime": "",
           "endDate": "2027-06-28",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-barcelona"
         }
       ],
       "legTips": [
         {
           "text": "Book Sagrada Família and Park Güell tickets days ahead",
-          "cityId": ""
+          "cityId": "city-barcelona"
         },
         {
           "text": "Hotel Ohla Barcelona has a great rooftop bar and central Ciutat Vella location",
-          "cityId": ""
+          "cityId": "city-barcelona"
         },
         {
           "text": "Vueling flies direct Venice → Barcelona, ~2 hours",
-          "cityId": ""
+          "cityId": "city-barcelona"
         }
       ],
       "days": [
@@ -2241,7 +2270,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-barcelona"
             }
           ],
           "activityItems": [
@@ -2272,7 +2301,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-barcelona"
             }
           ],
           "activityItems": [
@@ -2316,7 +2345,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-barcelona"
             }
           ],
           "activityItems": [
@@ -2441,7 +2470,7 @@
           "startTime": "",
           "endDate": "2027-06-29",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-madrid",
           "text": "High-Speed Train: Barcelona to Madrid"
         },
         {
@@ -2461,7 +2490,7 @@
           "startTime": "",
           "endDate": "2027-06-30",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-madrid",
           "text": "Prado Museum"
         },
         {
@@ -2481,7 +2510,7 @@
           "startTime": "",
           "endDate": "2027-07-01",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-madrid",
           "text": "Retiro Park Morning Stroll"
         },
         {
@@ -2500,7 +2529,8 @@
           "startDate": "2027-06-29",
           "startTime": "",
           "endDate": "2027-06-29",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-madrid"
         },
         {
           "id": "act-pigovnxty-mrsskplu",
@@ -2518,7 +2548,8 @@
           "startDate": "2027-07-01",
           "startTime": "",
           "endDate": "2027-07-01",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-madrid"
         },
         {
           "id": "act-ty1qrvuxg-mrsskplu",
@@ -2536,17 +2567,18 @@
           "startDate": "2027-07-01",
           "startTime": "",
           "endDate": "2027-07-01",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-madrid"
         }
       ],
       "legTips": [
         {
           "text": "High-speed Renfe AVE train from Barcelona to Madrid takes ~2.5 hours",
-          "cityId": ""
+          "cityId": "city-madrid"
         },
         {
           "text": "Hotel Palacio Del Retiro sits right across from Retiro Park",
-          "cityId": ""
+          "cityId": "city-madrid"
         }
       ],
       "days": [
@@ -2567,7 +2599,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-madrid"
             }
           ],
           "activityItems": [
@@ -2611,7 +2643,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-madrid"
             }
           ],
           "activityItems": [
@@ -2655,7 +2687,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-madrid"
             }
           ],
           "activityItems": [
@@ -2767,7 +2799,7 @@
           "startTime": "",
           "endDate": "2027-07-02",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-lisbon",
           "text": "Pastéis de Belém"
         },
         {
@@ -2787,7 +2819,7 @@
           "startTime": "",
           "endDate": "2027-07-03",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-lisbon",
           "text": "Jerónimos Monastery"
         },
         {
@@ -2807,7 +2839,7 @@
           "startTime": "",
           "endDate": "2027-07-04",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-lisbon",
           "text": "Ribeira das Naus Walk"
         },
         {
@@ -2826,21 +2858,22 @@
           "startDate": "2027-07-04",
           "startTime": "",
           "endDate": "2027-07-04",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-lisbon"
         }
       ],
       "legTips": [
         {
           "text": "No direct train between Madrid and Lisbon — flying is fastest (TAP Air Portugal / Iberia, ~1h15)",
-          "cityId": ""
+          "cityId": "city-lisbon"
         },
         {
           "text": "Buy a Viva Viagem card for easy trams, metro and buses",
-          "cityId": ""
+          "cityId": "city-lisbon"
         },
         {
           "text": "AlmaLusa Baixa/Chiado is a well-rated boutique pick right in the centre",
-          "cityId": ""
+          "cityId": "city-lisbon"
         }
       ],
       "days": [
@@ -2861,7 +2894,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-lisbon"
             }
           ],
           "activityItems": [
@@ -2892,7 +2925,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-lisbon"
             }
           ],
           "activityItems": [
@@ -2936,7 +2969,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-lisbon"
             }
           ],
           "activityItems": [
@@ -3048,7 +3081,7 @@
           "startTime": "",
           "endDate": "2027-07-05",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-paris",
           "text": "Chez Janou Bistro Dinner"
         },
         {
@@ -3068,7 +3101,7 @@
           "startTime": "",
           "endDate": "2027-07-06",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-paris",
           "text": "Eiffel Tower at Sunset"
         },
         {
@@ -3088,7 +3121,7 @@
           "startTime": "",
           "endDate": "2027-07-07",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-paris",
           "text": "The Louvre Museum"
         },
         {
@@ -3107,7 +3140,8 @@
           "startDate": "2027-07-07",
           "startTime": "",
           "endDate": "2027-07-07",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-paris"
         },
         {
           "id": "act-ueu6m314u-mrsskplv",
@@ -3125,21 +3159,22 @@
           "startDate": "2027-07-07",
           "startTime": "",
           "endDate": "2027-07-07",
-          "endTime": ""
+          "endTime": "",
+          "cityId": "city-paris"
         }
       ],
       "legTips": [
         {
           "text": "Book Louvre and Eiffel Tower tickets online in advance",
-          "cityId": ""
+          "cityId": "city-paris"
         },
         {
           "text": "Air France flies direct Lisbon → Paris CDG, ~2h30",
-          "cityId": ""
+          "cityId": "city-paris"
         },
         {
           "text": "La Chambre du Marais is a well-rated boutique pick in Le Marais",
-          "cityId": ""
+          "cityId": "city-paris"
         }
       ],
       "days": [
@@ -3160,7 +3195,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-paris"
             }
           ],
           "activityItems": [
@@ -3191,7 +3226,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-paris"
             }
           ],
           "activityItems": [
@@ -3235,7 +3270,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-paris"
             }
           ],
           "activityItems": [
@@ -3305,7 +3340,7 @@
           "startTime": "",
           "endDate": "2027-07-08",
           "endTime": "",
-          "cityId": "",
+          "cityId": "city-brisbane",
           "text": "Depart via CDG Airport"
         }
       ],
@@ -3328,7 +3363,7 @@
             {
               "text": "Add accommodation...",
               "cost": "0",
-              "cityId": ""
+              "cityId": "city-brisbane"
             }
           ],
           "activityItems": [
@@ -3951,48 +3986,7 @@
       "done": false
     }
   ],
-  "hotelCheckout": [
-    {
-      "text": "Room Sweep",
-      "kind": "section"
-    },
-    {
-      "text": "Check under the bed",
-      "done": false
-    },
-    {
-      "text": "Check the safe",
-      "done": false
-    },
-    {
-      "text": "Check all power outlets (chargers)",
-      "done": false
-    },
-    {
-      "text": "Check the bathroom (toiletries)",
-      "done": false
-    },
-    {
-      "text": "Check drawers and closets",
-      "done": false
-    },
-    {
-      "text": "Checkout",
-      "kind": "section"
-    },
-    {
-      "text": "Return room keys",
-      "done": false
-    },
-    {
-      "text": "Pay any incidentals/taxes",
-      "done": false
-    },
-    {
-      "text": "Get receipt (if needed)",
-      "done": false
-    }
-  ],
+  "hotelCheckout": [],
   "journeys": [
     {
       "id": "journey-1_0",
