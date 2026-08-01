@@ -1796,22 +1796,13 @@
       font-size: 0.76rem;
     }
 
-    body.mobile-app-mode #tab-itinerary .add-leg-action {
-      min-width: 5.9rem;
-      max-width: 5.9rem;
-      white-space: nowrap;
-      padding: 0.3rem 0.5rem;
-      font-size: 0.76rem;
-    }
-
     body.mobile-app-mode #tab-itinerary .add-leg-action,
-    body.mobile-app-mode #tab-itinerary .manage-cities-action,
     body.mobile-app-mode #tab-itinerary #expandAll {
       flex-shrink: 0;
       white-space: nowrap;
       min-width: auto;
       max-width: none;
-      padding: 0.35rem 0.6rem;
+      padding: 0.35rem 0.65rem;
       font-size: 0.78rem;
     }
 
@@ -1823,24 +1814,12 @@
       display: inline;
     }
 
-    body.mobile-app-mode #tab-itinerary .add-leg-short::before {
-      content: "\01F9ED Legs";
-    }
-
-    body.mobile-app-mode #tab-itinerary .manage-cities-action .add-leg-short::before {
-      content: "\01F30D Cities";
-    }
-
     body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-full {
       display: none;
     }
 
     body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-short {
       display: inline;
-    }
-
-    body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-short::before {
-      content: "\01F9ED Legs";
     }
 
     body.mobile-app-mode.compact-view-mode .top-controls {
