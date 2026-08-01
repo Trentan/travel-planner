@@ -1751,47 +1751,68 @@
     }
 
     body.mobile-app-mode #tab-itinerary .section-header {
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
-      column-gap: 0.5rem;
+      display: flex;
       align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      width: 100%;
+      overflow: hidden;
     }
 
     body.mobile-app-mode #tab-itinerary .section-header-actions {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      display: flex;
       align-items: center;
-      gap: 0.5rem;
-      width: 100%;
+      gap: 0.35rem;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      padding-block: 0.2rem;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      flex-shrink: 1;
       min-width: 0;
+    }
+
+    body.mobile-app-mode #tab-itinerary .section-header-actions::-webkit-scrollbar {
+      display: none;
     }
 
     body.mobile-app-mode .tab-pane .section-header-title {
       white-space: nowrap;
       margin: 0;
-      font-size: 1.6rem;
+      font-size: 1.3rem;
+      flex-shrink: 0;
     }
 
     body.mobile-app-mode #tab-itinerary .itinerary-view-mode-control {
-      width: 100%;
-      min-width: 0;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
     }
 
     body.mobile-app-mode #tab-itinerary .itinerary-view-mode-btn {
       min-width: 0;
       white-space: nowrap;
+      padding: 0.3rem 0.55rem;
+      font-size: 0.76rem;
     }
 
     body.mobile-app-mode #tab-itinerary .add-leg-action {
       min-width: 5.9rem;
       max-width: 5.9rem;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      padding-inline: 0.5rem;
-      justify-content: center;
+      padding: 0.3rem 0.5rem;
+      font-size: 0.76rem;
+    }
+
+    body.mobile-app-mode #tab-itinerary .add-leg-action,
+    body.mobile-app-mode #tab-itinerary .manage-cities-action,
+    body.mobile-app-mode #tab-itinerary #expandAll {
+      flex-shrink: 0;
+      white-space: nowrap;
+      min-width: auto;
+      max-width: none;
+      padding: 0.35rem 0.6rem;
+      font-size: 0.78rem;
     }
 
     body.mobile-app-mode #tab-itinerary .add-leg-full {
@@ -1804,6 +1825,10 @@
 
     body.mobile-app-mode #tab-itinerary .add-leg-short::before {
       content: "\01F9ED Legs";
+    }
+
+    body.mobile-app-mode #tab-itinerary .manage-cities-action .add-leg-short::before {
+      content: "\01F30D Cities";
     }
 
     body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-full {
@@ -2014,20 +2039,31 @@
     body.mobile-app-mode .city-nav-content {
       display: flex;
       flex-direction: column;
-      gap: 0.05rem;
-      line-height: 1.1;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    body.mobile-app-mode .city-nav-city-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      white-space: nowrap;
     }
 
     body.mobile-app-mode .city-nav-current-day {
-      display: block;
-      font-size: 0.64rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 600;
       opacity: 0.82;
+      margin-left: 0.2rem;
+      white-space: nowrap;
     }
 
     body.mobile-app-mode .city-nav-btn.active .city-nav-current-day {
-      color: rgba(255, 255, 255, 0.88);
+      color: rgba(255, 255, 255, 0.9);
     }
 
     body.mobile-app-mode .mobile-swipe-chip {
