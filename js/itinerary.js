@@ -1,3 +1,8 @@
+/* ==========================================================================
+   MODULE: Itinerary View & Rendering (js/itinerary.js)
+   Responsibilities: Rendering itinerary views, leg cards, day timelines
+   ========================================================================== */
+
 function getCompactFoodQuestTitle(label) {
   const cleaned = String(label || '')
       .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')

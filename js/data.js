@@ -1,3 +1,8 @@
+/* ==========================================================================
+   MODULE: Data & State Management (js/data.js)
+   Responsibilities: IndexedDB storage, Trip Data Normalization, City & Date logic
+   ========================================================================== */
+
 // IndexedDB Storage Implementation
 let db = null;
 const DB_NAME = 'travelApp_v2026';

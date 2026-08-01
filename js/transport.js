@@ -1,3 +1,8 @@
+/* ==========================================================================
+   MODULE: Transport & Journey Management (js/transport.js)
+   Responsibilities: Multi-leg journeys, flight/train/bus details, location code helpers
+   ========================================================================== */
+
 // Transport/Journey management module
 // Supports rich journey display with times, providers, booking refs
 // Multi-leg journeys: N segments share a journeyId and journeyName

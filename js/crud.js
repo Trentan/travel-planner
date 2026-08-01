@@ -1,3 +1,8 @@
+/* ==========================================================================
+   MODULE: CRUD Operations & Item Management (js/crud.js)
+   Responsibilities: Creating, editing, deleting activities, sights, runs, transport, and stays
+   ========================================================================== */
+
 function deleteLeg(idx) {
   if (typeof triggerHaptic === "function") triggerHaptic("warning");
   if(confirm("Are you sure you want to delete this entire leg and all its days?")) {
