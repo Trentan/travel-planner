@@ -54,6 +54,7 @@ Before closing an issue or finalizing a milestone release:
 
 ## Git Commit & Push Policy
 
-- **Commit & Push Work**: Once a feature, fix, or task passes verification (`npm test` and regression checks), commit the changes with a clear conventional commit message (e.g., `feat(cities): ...`, `fix(onboarding): ...`) and push the branch to remote (`git push -u origin <branch-name>`).
-- Do not leave verified work uncommitted or unpushed at the end of a task turn.
+- **Incremental Commit & Push**: Commit and push changes incrementally AS YOU WORK (after completing logical sub-tasks or code modifications), not just at the very end of a task session.
+- **Conventional Commits**: Use clear conventional commit messages (e.g., `feat(cities): ...`, `fix(onboarding): ...`) and push immediately to remote (`git push -u origin <branch-name>`).
+- Do not accumulate uncommitted or unpushed worktree changes across turns.
 
