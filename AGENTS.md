@@ -52,3 +52,8 @@ Before closing an issue or finalizing a milestone release:
 - DO NOT close GitHub issues or milestones automatically — leave them OPEN until the user gives explicit final approval.
 - Delete temporary local screenshot/asset folders (`docs/github-issue-assets/issue-XX/`) before merging PRs.
 
+## Git Commit & Push Policy
+
+- **Commit & Push Work**: Once a feature, fix, or task passes verification (`npm test` and regression checks), commit the changes with a clear conventional commit message (e.g., `feat(cities): ...`, `fix(onboarding): ...`) and push the branch to remote (`git push -u origin <branch-name>`).
+- Do not leave verified work uncommitted or unpushed at the end of a task turn.
+

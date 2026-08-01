@@ -191,49 +191,167 @@ const HISTORY_STACK_LIMIT = 50;
 let historyTrackingSuspended = false;
 let historyRestoreInProgress = false;
 
-// ISO Country codes for travel destinations
+// ISO Country codes for travel destinations (Comprehensive Global List)
 const COUNTRY_DATA = [
+  { code: 'AF', name: 'Afghanistan', flag: '🇦🇫' },
+  { code: 'AL', name: 'Albania', flag: '🇦🇱' },
+  { code: 'DZ', name: 'Algeria', flag: '🇩🇿' },
+  { code: 'AD', name: 'Andorra', flag: '🇦🇩' },
+  { code: 'AO', name: 'Angola', flag: '🇦🇴' },
+  { code: 'AG', name: 'Antigua and Barbuda', flag: '🇦🇬' },
+  { code: 'AR', name: 'Argentina', flag: '🇦🇷' },
+  { code: 'AM', name: 'Armenia', flag: '🇦🇲' },
   { code: 'AU', name: 'Australia', flag: '🇦🇺' },
   { code: 'AT', name: 'Austria', flag: '🇦🇹' },
+  { code: 'AZ', name: 'Azerbaijan', flag: '🇦🇿' },
+  { code: 'BS', name: 'Bahamas', flag: '🇧🇸' },
+  { code: 'BH', name: 'Bahrain', flag: '🇧🇭' },
+  { code: 'BD', name: 'Bangladesh', flag: '🇧🇩' },
+  { code: 'BB', name: 'Barbados', flag: '🇧🇧' },
+  { code: 'BY', name: 'Belarus', flag: '🇧🇾' },
   { code: 'BE', name: 'Belgium', flag: '🇧🇪' },
+  { code: 'BZ', name: 'Belize', flag: '🇧🇿' },
+  { code: 'BJ', name: 'Benin', flag: '🇧🇯' },
+  { code: 'BT', name: 'Bhutan', flag: '🇧🇹' },
+  { code: 'BO', name: 'Bolivia', flag: '🇧🇴' },
+  { code: 'BA', name: 'Bosnia and Herzegovina', flag: '🇧🇦' },
+  { code: 'BW', name: 'Botswana', flag: '🇧🇼' },
   { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
+  { code: 'BN', name: 'Brunei', flag: '🇧🇳' },
+  { code: 'BG', name: 'Bulgaria', flag: '🇧🇬' },
+  { code: 'BF', name: 'Burkina Faso', flag: '🇧🇫' },
+  { code: 'BI', name: 'Burundi', flag: '🇧🇮' },
+  { code: 'KH', name: 'Cambodia', flag: '🇰🇭' },
+  { code: 'CM', name: 'Cameroon', flag: '🇨🇲' },
   { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+  { code: 'CV', name: 'Cape Verde', flag: '🇨🇻' },
+  { code: 'KY', name: 'Cayman Islands', flag: '🇰🇾' },
+  { code: 'CL', name: 'Chile', flag: '🇨🇱' },
   { code: 'CN', name: 'China', flag: '🇨🇳' },
+  { code: 'CO', name: 'Colombia', flag: '🇨🇴' },
+  { code: 'CR', name: 'Costa Rica', flag: '🇨🇷' },
   { code: 'HR', name: 'Croatia', flag: '🇭🇷' },
+  { code: 'CU', name: 'Cuba', flag: '🇨🇺' },
+  { code: 'CY', name: 'Cyprus', flag: '🇨🇾' },
   { code: 'CZ', name: 'Czech Republic', flag: '🇨🇿' },
   { code: 'DK', name: 'Denmark', flag: '🇩🇰' },
+  { code: 'DJ', name: 'Djibouti', flag: '🇩🇯' },
+  { code: 'DM', name: 'Dominica', flag: '🇩🇲' },
+  { code: 'DO', name: 'Dominican Republic', flag: '🇩🇴' },
+  { code: 'EC', name: 'Ecuador', flag: '🇪🇨' },
   { code: 'EG', name: 'Egypt', flag: '🇪🇬' },
+  { code: 'SV', name: 'El Salvador', flag: '🇸🇻' },
+  { code: 'EE', name: 'Estonia', flag: '🇪🇪' },
+  { code: 'ET', name: 'Ethiopia', flag: '🇪🇹' },
+  { code: 'FJ', name: 'Fiji', flag: '🇫🇯' },
   { code: 'FI', name: 'Finland', flag: '🇫🇮' },
   { code: 'FR', name: 'France', flag: '🇫🇷' },
+  { code: 'GA', name: 'Gabon', flag: '🇬🇦' },
+  { code: 'GM', name: 'Gambia', flag: '🇬🇲' },
+  { code: 'GE', name: 'Georgia', flag: '🇬🇪' },
   { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+  { code: 'GH', name: 'Ghana', flag: '🇬🇭' },
   { code: 'GR', name: 'Greece', flag: '🇬🇷' },
+  { code: 'GD', name: 'Grenada', flag: '🇬🇩' },
+  { code: 'GT', name: 'Guatemala', flag: '🇬🇹' },
+  { code: 'GN', name: 'Guinea', flag: '🇬🇳' },
+  { code: 'GY', name: 'Guyana', flag: '🇬🇾' },
+  { code: 'HT', name: 'Haiti', flag: '🇭🇹' },
+  { code: 'HN', name: 'Honduras', flag: '🇭🇳' },
   { code: 'HK', name: 'Hong Kong', flag: '🇭🇰' },
   { code: 'HU', name: 'Hungary', flag: '🇭🇺' },
   { code: 'IS', name: 'Iceland', flag: '🇮🇸' },
   { code: 'IN', name: 'India', flag: '🇮🇳' },
   { code: 'ID', name: 'Indonesia', flag: '🇮🇩' },
+  { code: 'IR', name: 'Iran', flag: '🇮🇷' },
+  { code: 'IQ', name: 'Iraq', flag: '🇮🇶' },
   { code: 'IE', name: 'Ireland', flag: '🇮🇪' },
+  { code: 'IL', name: 'Israel', flag: '🇮🇱' },
   { code: 'IT', name: 'Italy', flag: '🇮🇹' },
+  { code: 'JM', name: 'Jamaica', flag: '🇯🇲' },
   { code: 'JP', name: 'Japan', flag: '🇯🇵' },
+  { code: 'JO', name: 'Jordan', flag: '🇯🇴' },
+  { code: 'KZ', name: 'Kazakhstan', flag: '🇰🇿' },
+  { code: 'KE', name: 'Kenya', flag: '🇰🇪' },
+  { code: 'XK', name: 'Kosovo', flag: '🇽🇰' },
+  { code: 'KW', name: 'Kuwait', flag: '🇰🇼' },
+  { code: 'KG', name: 'Kyrgyzstan', flag: '🇰🇬' },
+  { code: 'LA', name: 'Laos', flag: '🇱🇦' },
+  { code: 'LV', name: 'Latvia', flag: '🇱🇻' },
+  { code: 'LB', name: 'Lebanon', flag: '🇱🇧' },
+  { code: 'LY', name: 'Libya', flag: '🇱🇾' },
+  { code: 'LI', name: 'Liechtenstein', flag: '🇱🇮' },
+  { code: 'LT', name: 'Lithuania', flag: '🇱🇹' },
+  { code: 'LU', name: 'Luxembourg', flag: '🇱🇺' },
+  { code: 'MO', name: 'Macau', flag: '🇲🇴' },
+  { code: 'MK', name: 'North Macedonia', flag: '🇲🇰' },
+  { code: 'MG', name: 'Madagascar', flag: '🇲🇬' },
+  { code: 'MW', name: 'Malawi', flag: '🇲🇼' },
   { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
+  { code: 'MV', name: 'Maldives', flag: '🇲🇻' },
+  { code: 'MT', name: 'Malta', flag: '🇲🇹' },
+  { code: 'MU', name: 'Mauritius', flag: '🇲🇺' },
   { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
+  { code: 'MD', name: 'Moldova', flag: '🇲🇩' },
+  { code: 'MC', name: 'Monaco', flag: '🇲🇨' },
+  { code: 'MN', name: 'Mongolia', flag: '🇲🇳' },
+  { code: 'ME', name: 'Montenegro', flag: '🇲🇪' },
+  { code: 'MA', name: 'Morocco', flag: '🇲🇦' },
+  { code: 'MZ', name: 'Mozambique', flag: '🇲🇿' },
+  { code: 'MM', name: 'Myanmar', flag: '🇲🇲' },
+  { code: 'NA', name: 'Namibia', flag: '🇳🇦' },
+  { code: 'NP', name: 'Nepal', flag: '🇳🇵' },
   { code: 'NL', name: 'Netherlands', flag: '🇳🇱' },
   { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
+  { code: 'NI', name: 'Nicaragua', flag: '🇳🇮' },
+  { code: 'NG', name: 'Nigeria', flag: '🇳🇬' },
   { code: 'NO', name: 'Norway', flag: '🇳🇴' },
+  { code: 'OM', name: 'Oman', flag: '🇴🇲' },
+  { code: 'PK', name: 'Pakistan', flag: '🇵🇰' },
+  { code: 'PS', name: 'Palestine', flag: '🇵🇸' },
+  { code: 'PA', name: 'Panama', flag: '🇵🇦' },
+  { code: 'PG', name: 'Papua New Guinea', flag: '🇵🇬' },
+  { code: 'PY', name: 'Paraguay', flag: '🇵🇾' },
+  { code: 'PE', name: 'Peru', flag: '🇵🇪' },
   { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
+  { code: 'PL', name: 'Poland', flag: '🇵🇱' },
   { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
+  { code: 'PR', name: 'Puerto Rico', flag: '🇵🇷' },
+  { code: 'QA', name: 'Qatar', flag: '🇶🇦' },
+  { code: 'RO', name: 'Romania', flag: '🇷🇴' },
+  { code: 'RU', name: 'Russia', flag: '🇷🇺' },
+  { code: 'RW', name: 'Rwanda', flag: '🇷🇼' },
+  { code: 'WS', name: 'Samoa', flag: '🇼🇸' },
+  { code: 'SM', name: 'San Marino', flag: '🇸🇲' },
+  { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦' },
+  { code: 'SN', name: 'Senegal', flag: '🇸🇳' },
+  { code: 'RS', name: 'Serbia', flag: '🇷🇸' },
   { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
   { code: 'SK', name: 'Slovakia', flag: '🇸🇰' },
+  { code: 'SI', name: 'Slovenia', flag: '🇸🇮' },
+  { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
+  { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
   { code: 'ES', name: 'Spain', flag: '🇪🇸' },
+  { code: 'LK', name: 'Sri Lanka', flag: '🇱🇰' },
   { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
   { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
+  { code: 'TW', name: 'Taiwan', flag: '🇹🇼' },
+  { code: 'TZ', name: 'Tanzania', flag: '🇹🇿' },
   { code: 'TH', name: 'Thailand', flag: '🇹🇭' },
+  { code: 'TN', name: 'Tunisia', flag: '🇹🇳' },
   { code: 'TR', name: 'Turkey', flag: '🇹🇷' },
+  { code: 'UG', name: 'Uganda', flag: '🇺🇬' },
+  { code: 'UA', name: 'Ukraine', flag: '🇺🇦' },
   { code: 'AE', name: 'UAE', flag: '🇦🇪' },
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
   { code: 'US', name: 'United States', flag: '🇺🇸' },
+  { code: 'UY', name: 'Uruguay', flag: '🇺🇾' },
+  { code: 'UZ', name: 'Uzbekistan', flag: '🇺🇿' },
+  { code: 'VA', name: 'Vatican City', flag: '🇻🇦' },
+  { code: 'VE', name: 'Venezuela', flag: '🇻🇪' },
   { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
-  { code: 'TW', name: 'Taiwan', flag: '🇹🇼' },
+  { code: 'ZM', name: 'Zambia', flag: '🇿🇲' },
+  { code: 'ZW', name: 'Zimbabwe', flag: '🇿🇼' },
   { code: 'ZZ', name: 'Other', flag: '🌐' }
 ];
 
@@ -5634,7 +5752,9 @@ let tripStartAnswers = {
   saveLocationType: 'disk',
   name: '', 
   origin: '', 
+  originCountryCode: '',
   city: '', 
+  cityCountryCode: '',
   date: '', 
   nights: 3, 
   transport: 'flight', 
@@ -5740,6 +5860,44 @@ function calculateTripStartReturnDate() {
   return start.toISOString().slice(0, 10);
 }
 
+function buildCountryOptionsHtml(selectedCode = '') {
+  return '<option value="">(Select Country...)</option>' +
+    getAllCountries()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(c => `<option value="${c.code}" ${c.code === (selectedCode || '').toUpperCase() ? 'selected' : ''}>${c.flag} ${c.name}</option>`)
+      .join('');
+}
+
+function handleTripStartCityTyping(inputEl, countrySelectId, targetField, targetCountryField) {
+  const typedName = inputEl.value.trim();
+  tripStartAnswers[targetField] = typedName;
+  if (!typedName) return;
+
+  const dbMatches = ALL_CITIES.filter(c => c.name.toLowerCase() === typedName.toLowerCase());
+  if (dbMatches.length === 1 && dbMatches[0].countryCode) {
+    const matchedCode = dbMatches[0].countryCode;
+    tripStartAnswers[targetCountryField] = matchedCode;
+    const countrySelect = document.getElementById(countrySelectId);
+    if (countrySelect) countrySelect.value = matchedCode;
+  }
+}
+
+function handleTripStartStopCityTyping(index, inputEl, countrySelectId) {
+  const typedName = inputEl.value.trim();
+  if (tripStartAnswers.stops[index]) {
+    tripStartAnswers.stops[index].city = typedName;
+    if (typedName) {
+      const dbMatches = ALL_CITIES.filter(c => c.name.toLowerCase() === typedName.toLowerCase());
+      if (dbMatches.length === 1 && dbMatches[0].countryCode) {
+        const matchedCode = dbMatches[0].countryCode;
+        tripStartAnswers.stops[index].countryCode = matchedCode;
+        const countrySelect = document.getElementById(countrySelectId);
+        if (countrySelect) countrySelect.value = matchedCode;
+      }
+    }
+  }
+}
+
 function renderTripStart() {
   const container = document.getElementById('trip-start-content');
   if (!container) return;
@@ -5761,8 +5919,9 @@ function renderTripStart() {
   }
   
   const stopRows = tripStartAnswers.stops.map((stop, index) => `
-    <div class="trip-start-stop-row">
-      <input class="trip-start-input" aria-label="Additional city ${index + 1}" maxlength="80" placeholder="City" value="${escapeTripStartText(stop.city)}" oninput="updateTripStartStop(${index}, 'city', this.value)">
+    <div class="trip-start-stop-row" style="display: grid; grid-template-columns: 1fr 1fr 60px 90px 30px; gap: 0.35rem; align-items: center; margin-bottom: 0.5rem;">
+      <input class="trip-start-input" aria-label="Additional city ${index + 1}" maxlength="80" placeholder="City" value="${escapeTripStartText(stop.city)}" oninput="handleTripStartStopCityTyping(${index}, this, 'tripStartStopCountry_${index}')">
+      <select id="tripStartStopCountry_${index}" class="trip-start-input" aria-label="Country for additional city ${index + 1}" style="padding: 0.4rem; font-size: 0.85rem;" onchange="updateTripStartStop(${index}, 'countryCode', this.value)">${buildCountryOptionsHtml(stop.countryCode || '')}</select>
       <input class="trip-start-stop-nights" aria-label="Nights in additional city ${index + 1}" type="number" min="1" max="60" value="${stop.nights}" oninput="updateTripStartStop(${index}, 'nights', this.value)">
       <select aria-label="Transport to additional city ${index + 1}" onchange="updateTripStartStop(${index}, 'transport', this.value)">${[['train','Train'],['flight','Flight'],['bus','Bus'],['ferry','Ferry'],['other','Other']].map(([value, label]) => `<option value="${value}" ${stop.transport === value ? 'selected' : ''}>${label}</option>`).join('')}</select>
       <button type="button" aria-label="Remove additional city ${index + 1}" onclick="removeTripStartStop(${index})">×</button>
@@ -5830,11 +5989,24 @@ function renderTripStart() {
     
     `<label for="tripStartName">What should we call this trip?</label><input id="tripStartName" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Japan in Spring" value="${escapeTripStartText(tripStartAnswers.name)}"><p>Keep it simple — you can rename it anytime.</p>`,
     
-    `<label for="tripStartOrigin">Where does your journey begin?</label><input id="tripStartOrigin" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Brisbane" value="${escapeTripStartText(tripStartAnswers.origin)}"><p>This sets your starting home city.</p><label for="tripStartDate" style="margin-top: 1rem;">When do you depart/arrive?</label><input id="tripStartDate" class="trip-start-input" type="date" value="${escapeTripStartText(tripStartAnswers.date)}"><p>An approximate start date is fine.</p>`,
+    `<label for="tripStartOrigin">Where does your journey begin?</label>
+     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+       <input id="tripStartOrigin" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Brisbane" value="${escapeTripStartText(tripStartAnswers.origin)}" oninput="handleTripStartCityTyping(this, 'tripStartOriginCountry', 'origin', 'originCountryCode')">
+       <select id="tripStartOriginCountry" class="trip-start-input" style="padding: 0.5rem; font-size: 0.9rem;" onchange="tripStartAnswers.originCountryCode=this.value">${buildCountryOptionsHtml(tripStartAnswers.originCountryCode)}</select>
+     </div>
+     <p>This sets your starting home city & country flag.</p>
+     <label for="tripStartDate" style="margin-top: 1rem;">When do you depart/arrive?</label>
+     <input id="tripStartDate" class="trip-start-input" type="date" value="${escapeTripStartText(tripStartAnswers.date)}">
+     <p>An approximate start date is fine.</p>`,
     
-    `<label for="tripStartCity">Where are you going first?</label><input id="tripStartCity" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Tokyo" value="${escapeTripStartText(tripStartAnswers.city)}"><div class="trip-start-number-row" style="margin-top: 1rem;"><button type="button" aria-label="Decrease nights" onclick="adjustTripStartNights(-1)">−</button><input id="tripStartNights" type="number" min="1" max="60" value="${tripStartAnswers.nights}" oninput="tripStartAnswers.nights=Math.max(1, Math.min(60, Number(this.value)||1))"><span>nights</span><button type="button" aria-label="Increase nights" onclick="adjustTripStartNights(1)">+</button></div><fieldset class="trip-start-transport" style="margin-top: 1rem;"><legend>How are you getting there?</legend>${[['flight','Flight'],['train','Train'],['bus','Bus'],['ferry','Ferry'],['other','Other']].map(([value,label]) => `<button type="button" class="${tripStartAnswers.transport === value ? 'is-selected' : ''}" onclick="selectTripStartTransport('${value}')">${label}</button>`).join('')}</fieldset>`,
+    `<label for="tripStartCity">Where are you going first?</label>
+     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+       <input id="tripStartCity" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Tokyo" value="${escapeTripStartText(tripStartAnswers.city)}" oninput="handleTripStartCityTyping(this, 'tripStartCityCountry', 'city', 'cityCountryCode')">
+       <select id="tripStartCityCountry" class="trip-start-input" style="padding: 0.5rem; font-size: 0.9rem;" onchange="tripStartAnswers.cityCountryCode=this.value">${buildCountryOptionsHtml(tripStartAnswers.cityCountryCode)}</select>
+     </div>
+     <div class="trip-start-number-row" style="margin-top: 1rem;"><button type="button" aria-label="Decrease nights" onclick="adjustTripStartNights(-1)">−</button><input id="tripStartNights" type="number" min="1" max="60" value="${tripStartAnswers.nights}" oninput="tripStartAnswers.nights=Math.max(1, Math.min(60, Number(this.value)||1))"><span>nights</span><button type="button" aria-label="Increase nights" onclick="adjustTripStartNights(1)">+</button></div><fieldset class="trip-start-transport" style="margin-top: 1rem;"><legend>How are you getting there?</legend>${[['flight','Flight'],['train','Train'],['bus','Bus'],['ferry','Ferry'],['other','Other']].map(([value,label]) => `<button type="button" class="${tripStartAnswers.transport === value ? 'is-selected' : ''}" onclick="selectTripStartTransport('${value}')">${label}</button>`).join('')}</fieldset>`,
     
-    `<label>Will you visit other cities?</label><p class="trip-start-list-help">Add each stop with its nights and how you expect to get there.</p><div class="trip-start-stops">${stopRows}</div><button type="button" class="trip-start-add-stop" onclick="addTripStartStop()">+ Add another city</button><label for="tripStartReturnDate" style="margin-top: 1.5rem;">When do you head home?</label><input id="tripStartReturnDate" class="trip-start-input" type="date" value="${escapeTripStartText(tripStartAnswers.returnDate)}">${calculatedReturn ? `<p style="font-size:0.8rem; color:#27AE60; font-weight:600; margin-top:0.25rem;">✓ Auto-calculated for ${calculatedReturn}</p>` : '<p>Leave blank if open-ended.</p>'}`,
+    `<label>Will you visit other cities?</label><p class="trip-start-list-help">Add each stop with city name, country, nights, and transport.</p><div class="trip-start-stops">${stopRows}</div><button type="button" class="trip-start-add-stop" onclick="addTripStartStop()">+ Add another city</button><label for="tripStartReturnDate" style="margin-top: 1.5rem;">When do you head home?</label><input id="tripStartReturnDate" class="trip-start-input" type="date" value="${escapeTripStartText(tripStartAnswers.returnDate)}">${calculatedReturn ? `<p style="font-size:0.8rem; color:#27AE60; font-weight:600; margin-top:0.25rem;">✓ Auto-calculated for ${calculatedReturn}</p>` : '<p>Leave blank if open-ended.</p>'}`,
     
     `<label>Who is traveling?</label><div class="trip-start-chip-group">${partyBtns}</div><label style="margin-top: 1.25rem;">What pacing do you prefer?</label><div class="trip-start-chip-group">${pacingBtns}</div>`,
     
@@ -5876,11 +6048,17 @@ function captureTripStartAnswer() {
   const originInput = document.getElementById('tripStartOrigin');
   if (originInput) tripStartAnswers.origin = originInput.value.trim();
 
+  const originCountrySelect = document.getElementById('tripStartOriginCountry');
+  if (originCountrySelect) tripStartAnswers.originCountryCode = originCountrySelect.value;
+
   const dateInput = document.getElementById('tripStartDate');
   if (dateInput) tripStartAnswers.date = dateInput.value.trim();
 
   const cityInput = document.getElementById('tripStartCity');
   if (cityInput) tripStartAnswers.city = cityInput.value.trim();
+
+  const cityCountrySelect = document.getElementById('tripStartCityCountry');
+  if (cityCountrySelect) tripStartAnswers.cityCountryCode = cityCountrySelect.value;
 
   const returnDateInput = document.getElementById('tripStartReturnDate');
   if (returnDateInput) tripStartAnswers.returnDate = returnDateInput.value.trim();
@@ -5968,12 +6146,39 @@ async function createTripFromStartAnswers() {
     return { cityFood: foodItems, legTips: tips, suggestedActivities: activities };
   };
 
-  citiesData = route.map((stop, index) => { 
-    const known = ALL_CITIES.find(city => city.name.toLowerCase() === stop.city.trim().toLowerCase()); 
-    const cityId = `city-${Date.now()}-${index}`; 
-    const city = { id: cityId, name: stop.city.trim(), code: known?.code || '', countryCode: known?.countryCode || 'ZZ', country: getCountryName(known?.countryCode || 'ZZ'), dateFrom: dateAt(dayOffset), dateTo: dateAt(dayOffset + Number(stop.nights) - 1), colour: CITY_COLORS[index % CITY_COLORS.length] }; 
-    dayOffset += Number(stop.nights); 
-    return city; 
+  citiesData = route.map((stop, index) => {
+    const cityNameTrimmed = stop.city.trim();
+    const explicitCountryCode = index === 0 ? (tripStartAnswers.cityCountryCode || '') : (stop.countryCode || '');
+    
+    let dbMatch = null;
+    if (explicitCountryCode) {
+      dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === cityNameTrimmed.toLowerCase() && c.countryCode === explicitCountryCode);
+    }
+    if (!dbMatch) {
+      dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === cityNameTrimmed.toLowerCase());
+    }
+
+    const countryCode = explicitCountryCode || dbMatch?.countryCode || 'ZZ';
+    const cityId = `city-${Date.now()}-${index}`;
+    const city = {
+      id: cityId,
+      name: dbMatch ? dbMatch.name : cityNameTrimmed,
+      code: dbMatch?.code || '',
+      icaoCode: dbMatch?.icaoCode || dbMatch?.icao || '',
+      countryCode: countryCode,
+      country: getCountryName(countryCode),
+      dateFrom: dateAt(dayOffset),
+      dateTo: dateAt(dayOffset + Number(stop.nights) - 1),
+      colour: CITY_COLORS[index % CITY_COLORS.length]
+    };
+
+    if (dbMatch && dbMatch.lat !== undefined && dbMatch.lng !== undefined) {
+      city.lat = dbMatch.lat;
+      city.lng = dbMatch.lng;
+    }
+
+    dayOffset += Number(stop.nights);
+    return city;
   });
   
   dayOffset = 0;
