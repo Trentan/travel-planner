@@ -6037,6 +6037,16 @@ function chooseTripStart(choice) {
     if (typeof openGuideDialog === 'function') openGuideDialog();
     return;
   }
+  if (choice === 'sample') {
+    resetAppStateToDefaults();
+    saveData(true);
+    if (typeof buildNav === 'function') buildNav();
+    if (typeof buildItinerary === 'function') buildItinerary();
+    if (typeof buildCityNav === 'function') buildCityNav();
+    if (typeof buildTransportTab === 'function') buildTransportTab();
+    if (typeof buildAccomTab === 'function') buildAccomTab();
+    if (typeof buildTabs === 'function') buildTabs();
+  }
   localStorage.setItem('travelApp_trip_start_seen', 'true');
   showToast('Sample trip is ready — open any day to see how it is put together.');
 }
