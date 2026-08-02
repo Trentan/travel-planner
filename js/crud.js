@@ -1998,15 +1998,9 @@ function _populateAddLegCityDropdowns() {
 function updateLegDialogUiMode() {
   const title = document.getElementById('legDialogTitle') || document.querySelector('#add-leg-modal .modal-header h2');
   const saveBtn = document.getElementById('legDialogSaveBtn');
-  const modeHint = document.getElementById('legDialogModeHint');
   const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
-  if (title) title.textContent = 'Edit Legs';
-  if (saveBtn) saveBtn.textContent = isEdit ? 'Confirm Leg Changes' : 'Add Leg';
-  if (modeHint) {
-    modeHint.textContent = isEdit
-      ? 'Editing selected leg. Update details below or delete this leg.'
-      : 'Choose a leg to edit it, or leave blank to add a new one.';
-  }
+  if (title) title.textContent = 'Manage Legs';
+  if (saveBtn) saveBtn.textContent = isEdit ? 'Save Leg' : 'Add Leg';
   _syncLegDialogActions();
 }
 
@@ -2865,6 +2859,9 @@ function confirmAddLeg() {
   }
   closeAddLegDialog();
   sortLegs();
+  if (typeof syncAllLegDays === 'function') {
+    syncAllLegDays();
+  }
 }
 
 function parse24HourTo12HourParts(timeStr) {

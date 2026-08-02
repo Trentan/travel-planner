@@ -640,19 +640,23 @@
   <div id="add-leg-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content modal-md">
       <div class="modal-header">
-        <h2 id="legDialogTitle">Edit Legs</h2>
+        <h2 id="legDialogTitle">Manage Legs</h2>
         <button class="modal-close" onclick="closeAddLegDialog()">&times;</button>
       </div>
       <div class="modal-body">
         <div class="stack-gap-4">
           <div class="ai-form-group">
-            <label>Edit Existing Leg (optional)</label>
-            <select id="editLegSelect" class="form-control">
-              <option value="">-- Add a new leg --</option>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <label class="m-0 font-medium">Select Leg</label>
+              <button type="button" class="text-xs text-teal-600 dark:text-teal-400 hover:underline font-semibold" onclick="resetLegDialogToAddNew()">
+                + Add a new leg
+              </button>
+            </div>
+            <select id="editLegSelect" class="form-control" onchange="onEditLegSelectionChange()">
+              <option value="">-- Choose a leg --</option>
             </select>
-            <small id="legDialogModeHint" class="text-xs text-slate-500">Choose a leg to edit it, or leave blank to add a new one.</small>
           </div>
-          <div class="ai-form-group">
+          <div class="ai-form-group" style="display: none;">
             <label>Leg Type</label>
             <select id="legTypeSelect" class="form-control" onchange="onLegTypeChange()">
               <option value="start">🏠 Start (Departure from Home)</option>
@@ -690,8 +694,8 @@
             <div class="ai-form-group mt-3">
               <label id="datesLabel">Dates in City</label>
               <div class="row-gap-2">
-                <input type="text" id="newLegStartDate" class="form-control" placeholder="Date (e.g., 15 Jun 2026 or 2026-06-15)">
-                <input type="text" id="newLegEndDate" class="form-control" placeholder="To (e.g., 18 Jun 2026 or 2026-06-18)">
+                <input type="date" id="newLegStartDate" class="form-control">
+                <input type="date" id="newLegEndDate" class="form-control">
               </div>
             </div>
             <div class="ai-form-group">
@@ -703,7 +707,6 @@
         <div class="modal-footer modal-footer-space-between modal-footer-wrap">
           <button id="legDialogDeleteBtn" class="action-btn action-btn-danger" onclick="deleteLegFromDialog()" style="display: none;">Delete Leg</button>
           <div class="journey-footer-actions">
-            <button type="button" class="action-btn" onclick="syncAllLegDays()" title="Recalculate and auto-sync dates across all itinerary days">🔄 Auto-Sync Days</button>
             <button class="action-btn" onclick="closeAddLegDialog()">Cancel</button>
             <button id="legDialogSaveBtn" class="action-btn action-btn-secondary" onclick="confirmAddLeg()">Save Leg</button>
           </div>
