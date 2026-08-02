@@ -868,6 +868,10 @@
     @apply min-h-[2.15rem] h-[2.15rem] inline-flex items-center justify-center px-3 text-[0.84rem] font-semibold rounded-lg box-border;
   }
 
+  #tab-itinerary .view-mode-text-short {
+    display: none;
+  }
+
   #tab-itinerary .top-controls {
     @apply flex flex-wrap gap-2.5 mb-4;
   }
@@ -1813,10 +1817,15 @@
       align-items: center;
       justify-content: center;
       box-sizing: border-box;
+      gap: 0.2rem;
     }
 
-    body.mobile-app-mode #tab-itinerary .itinerary-view-mode-btn .view-mode-text {
+    body.mobile-app-mode #tab-itinerary .view-mode-text-full {
       display: none;
+    }
+
+    body.mobile-app-mode #tab-itinerary .view-mode-text-short {
+      display: inline;
     }
 
     body.mobile-app-mode #tab-itinerary .add-leg-action,
