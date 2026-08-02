@@ -848,15 +848,24 @@
 
   /* Itinerary readability pass: stronger hierarchy, cleaner spacing */
   #tab-itinerary .section-header {
-    @apply mb-4 gap-3;
+    @apply mb-4 gap-3 items-center;
+  }
+
+  #tab-itinerary .section-header-actions {
+    @apply flex items-center gap-3 flex-nowrap;
+  }
+
+  #tab-itinerary #expandAll,
+  #tab-itinerary .add-leg-action {
+    @apply min-h-[2.4rem] h-[2.4rem] inline-flex items-center justify-center px-3.5 text-[0.84rem] font-semibold rounded-xl box-border;
   }
 
   #tab-itinerary .itinerary-view-mode-control {
-    @apply p-1.5 rounded-xl;
+    @apply p-0.5 rounded-xl border border-border bg-bg-secondary inline-flex items-center min-h-[2.4rem] h-[2.4rem] box-border;
   }
 
   #tab-itinerary .itinerary-view-mode-btn {
-    @apply min-h-9 px-3 text-[0.84rem] font-semibold;
+    @apply min-h-[2.15rem] h-[2.15rem] inline-flex items-center justify-center px-3 text-[0.84rem] font-semibold rounded-lg box-border;
   }
 
   #tab-itinerary .top-controls {
@@ -1765,7 +1774,7 @@
       gap: 0.35rem;
       overflow-x: auto;
       overscroll-behavior-x: contain;
-      padding-block: 0.2rem;
+      padding-block: 0.1rem;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
       flex-shrink: 1;
@@ -1787,13 +1796,23 @@
       display: inline-flex;
       align-items: center;
       flex-shrink: 0;
+      min-height: 2.1rem;
+      height: 2.1rem;
+      padding: 0.125rem;
+      box-sizing: border-box;
     }
 
     body.mobile-app-mode #tab-itinerary .itinerary-view-mode-btn {
       min-width: 0;
       white-space: nowrap;
-      padding: 0.3rem 0.55rem;
+      padding: 0.25rem 0.55rem;
       font-size: 0.76rem;
+      min-height: 1.85rem;
+      height: 1.85rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
     }
 
     body.mobile-app-mode #tab-itinerary .add-leg-action,
@@ -1802,8 +1821,14 @@
       white-space: nowrap;
       min-width: auto;
       max-width: none;
-      padding: 0.35rem 0.65rem;
+      min-height: 2.1rem;
+      height: 2.1rem;
+      padding: 0.25rem 0.65rem;
       font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
     }
 
     body.mobile-app-mode #tab-itinerary .add-leg-full {
