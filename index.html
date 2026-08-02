@@ -685,24 +685,17 @@
           </div>
           <div id="citySelectionGroup">
             <div class="ai-form-group">
-              <label>Option 1: Select Existing City</label>
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <label class="m-0 font-medium">Destination City</label>
+                <button type="button" class="text-xs text-teal-600 dark:text-teal-400 hover:underline font-semibold" onclick="closeAddLegDialog(); openCityDialog();">
+                  + Add / Manage Cities
+                </button>
+              </div>
               <select id="existingCitySelect" class="form-control">
-                <option value="">-- Choose a city --</option>
+                <option value="">-- Select a city --</option>
               </select>
             </div>
-            <div class="divider-or-wrap">
-              <span class="divider-or-label">or</span>
-              <div class="divider-or-line"></div>
-            </div>
-            <div class="ai-form-group">
-              <label>Option 2: Create New City</label>
-              <input type="text" id="newLegCityName" class="form-control add-leg-field-gap" placeholder="City name (e.g., Prague)">
-              <select id="newLegCityCountrySelect" class="form-control add-leg-field-gap" onchange="onNewLegCountryChange()">
-<option value="">Select country...</option>
-</select>
-<input type="text" id="newLegCityCountryOther" class="form-control" placeholder="Enter country name..." style="display: none;">
-            </div>
-            <div class="ai-form-group">
+            <div class="ai-form-group mt-3">
               <label id="datesLabel">Dates in City</label>
               <div class="row-gap-2">
                 <input type="text" id="newLegStartDate" class="form-control" placeholder="Date (e.g., 15 Jun)">
