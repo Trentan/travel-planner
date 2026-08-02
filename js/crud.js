@@ -2206,9 +2206,11 @@ function autoGenerateMissingTransitLegs(legsList) {
   return legsAdded;
 }
 
-function syncAllLegDays() {
-  if (!confirm('This will autonomously recalculate day cards for all legs based on your saved journeys and stays. Proceed?')) {
-    return;
+function syncAllLegDays(silent = false) {
+  if (!silent) {
+    if (!confirm('This will autonomously recalculate day cards for all legs based on your saved journeys and stays. Proceed?')) {
+      return;
+    }
   }
   
   const legsInjected = autoGenerateMissingTransitLegs(appData);
@@ -2465,22 +2467,26 @@ function syncAllLegDays() {
     if (typeof buildItinerary === 'function') buildItinerary();
     if (typeof closeAddLegDialog === 'function') closeAddLegDialog();
     
-    // Display Modal
-    const modal = document.getElementById('sync-results-modal');
-    if (modal) {
-      document.getElementById('sync-results-summary').textContent = `Successfully synced days based on your latest journeys.`;
-      const logContainer = document.getElementById('sync-results-log');
-      if (changelog.length > 0) {
-        logContainer.textContent = changelog.map(line => '• ' + line).join('\n');
+    if (!silent) {
+      // Display Modal
+      const modal = document.getElementById('sync-results-modal');
+      if (modal) {
+        document.getElementById('sync-results-summary').textContent = `Successfully synced days based on your latest journeys.`;
+        const logContainer = document.getElementById('sync-results-log');
+        if (changelog.length > 0) {
+          logContainer.textContent = changelog.map(line => '• ' + line).join('\n');
+        } else {
+          logContainer.textContent = 'Dates re-aligned properly. No major day overrides needed.';
+        }
+        modal.style.display = 'flex';
       } else {
-        logContainer.textContent = 'Dates re-aligned properly. No major day overrides needed.';
+        alert('Successfully synced legs!\n\n' + changelog.map(line => '• ' + line).join('\n'));
       }
-      modal.style.display = 'flex';
-    } else {
-      alert('Successfully synced legs!\n\n' + changelog.map(line => '• ' + line).join('\n'));
     }
   } else {
-    alert('No changes were needed. Day cards are already in sync with journeys and stays.');
+    if (!silent) {
+      alert('No changes were needed. Day cards are already in sync with journeys and stays.');
+    }
   }
 }
 
@@ -2860,7 +2866,7 @@ function confirmAddLeg() {
   closeAddLegDialog();
   sortLegs();
   if (typeof syncAllLegDays === 'function') {
-    syncAllLegDays();
+    syncAllLegDays(true);
   }
 }
 
