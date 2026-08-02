@@ -118,6 +118,9 @@ async function openApp(baseUrl, options = {}) {
 async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
   const { browser, context, page, errors } = await openApp(baseUrl, launchOptions);
   try {
+    await page.evaluate(() => {
+      window.confirm = () => true;
+    });
     reporter.add('desktop', 'boot', 'index.html loaded in Chromium');
     assert(errors.length === 0, `Desktop page errors: ${errors.join(' | ')}`);
     assert(await page.locator('#cityNav .city-nav-btn').count() > 0, 'Desktop: city nav should render');
