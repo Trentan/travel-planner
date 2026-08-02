@@ -2502,15 +2502,34 @@ function resetLegDialogToAddNew() {
   const editLegSelect = document.getElementById('editLegSelect');
   if (editLegSelect) editLegSelect.value = 'ADD_NEW';
   legDialogState = { mode: 'add', editLegIdx: null };
+
+  const legTypeSelect = document.getElementById('legTypeSelect');
+  const fromCitySelect = document.getElementById('fromCitySelect');
+  const toCitySelect = document.getElementById('toCitySelect');
   const existingCitySelect = document.getElementById('existingCitySelect');
+  const newCityName = document.getElementById('newLegCityName');
+  const countrySelect = document.getElementById('newLegCityCountrySelect');
+  const countryOther = document.getElementById('newLegCityCountryOther');
   const dateFrom = document.getElementById('newLegStartDate');
   const dateTo = document.getElementById('newLegEndDate');
   const dayNotesInput = document.getElementById('legDayNotesInput');
+
+  if (legTypeSelect) legTypeSelect.value = 'city';
+  if (fromCitySelect) fromCitySelect.value = 'Home';
+  if (toCitySelect) toCitySelect.value = '';
   if (existingCitySelect) existingCitySelect.value = '';
+  if (newCityName) newCityName.value = '';
+  if (countrySelect) countrySelect.value = '';
+  if (countryOther) {
+    countryOther.value = '';
+    countryOther.style.display = 'none';
+  }
   if (dateFrom) dateFrom.value = '';
   if (dateTo) dateTo.value = '';
   if (dayNotesInput) dayNotesInput.value = '';
+
   updateLegDialogUiMode();
+  onLegTypeChange();
 }
 
 function onEditLegSelectionChange() {
