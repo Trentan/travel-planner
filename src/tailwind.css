@@ -1805,14 +1805,18 @@
     body.mobile-app-mode #tab-itinerary .itinerary-view-mode-btn {
       min-width: 0;
       white-space: nowrap;
-      padding: 0.25rem 0.55rem;
-      font-size: 0.76rem;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.85rem;
       min-height: 1.85rem;
       height: 1.85rem;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       box-sizing: border-box;
+    }
+
+    body.mobile-app-mode #tab-itinerary .itinerary-view-mode-btn .view-mode-text {
+      display: none;
     }
 
     body.mobile-app-mode #tab-itinerary .add-leg-action,
