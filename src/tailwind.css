@@ -1831,15 +1831,6 @@
       box-sizing: border-box;
     }
 
-    body.mobile-app-mode #tab-itinerary .add-leg-action .add-leg-label {
-      font-size: 0;
-    }
-
-    body.mobile-app-mode #tab-itinerary .add-leg-action .add-leg-label::before {
-      content: "\01F9ED Legs";
-      font-size: 0.78rem;
-    }
-
     body.mobile-app-mode.compact-view-mode .top-controls {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
