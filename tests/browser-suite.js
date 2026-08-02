@@ -189,6 +189,18 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     await legEditorBtn.click();
     await page.waitForSelector('#add-leg-modal', { state: 'visible' });
     await humanPause(page, 400);
+
+    // Verify reset state when toggling between edit and add leg
+    if (await page.locator('#editLegSelect option').count() > 2) {
+      await page.locator('#editLegSelect').selectOption({ index: 2 });
+      await humanPause(page, 250);
+      await page.evaluate(() => { if (typeof window.resetLegDialogToAddNew === 'function') window.resetLegDialogToAddNew(); });
+      await humanPause(page, 250);
+      const resetVal = await page.locator('#editLegSelect').inputValue();
+      assert(resetVal === 'ADD_NEW', 'Desktop: switching to add leg should reset leg editor selection');
+      reporter.add('desktop', 'leg editor state reset', 'resets back to ADD_NEW state');
+    }
+    await humanPause(page, 400);
     await page.locator('#existingCitySelect').selectOption({ index: 1 });
     await page.locator('#newLegStartDate').fill('2026-06-15');
     await page.locator('#newLegEndDate').fill('2026-06-18');
@@ -208,6 +220,15 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     await page.locator('#tab-accom .action-btn:has-text("+ Add Stay")').click();
     await page.waitForSelector('#stay-modal', { state: 'visible' });
     await humanPause(page, 400);
+
+    // Verify inline visual error highlight on empty form submit
+    await page.locator('#stay-modal button:has-text("Save Stay")').click();
+    await humanPause(page, 250);
+    const cityHasError = await page.locator('#stayCitySelect').evaluate(el => el.classList.contains('border-rose-500'));
+    const propHasError = await page.locator('#stayPropertyName').evaluate(el => el.classList.contains('border-rose-500'));
+    assert(cityHasError && propHasError, 'Desktop: stay modal must display rose border error highlights on mandatory field validation failure');
+    reporter.add('desktop', 'stay validation highlight', 'displays red borders on mandatory field failure');
+
     await page.locator('#stayPropertyName').fill('Harbour View Inn');
     await selectOptionByIndex(page.locator('#stayCitySelect'), 1);
     await page.locator('#stayCheckIn').fill('2026-06-01');
