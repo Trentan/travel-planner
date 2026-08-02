@@ -421,6 +421,54 @@ var DEFAULT_TRIP_DATA = {
           ]
         },
         {
+          "date": "2026-06-02",
+          "day": "Tue",
+          "from": "Tokyo",
+          "to": "Tokyo",
+          "completed": false,
+          "desc": "Tsukiji Outer Market & Shibuya Crossing",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Shinjuku Prince Hotel",
+              "cost": "150",
+              "status": "confirmed",
+              "provider": "Booking.com",
+              "cityId": "city-tokyo",
+              "location": "1-30-1 Kabukicho, Shinjuku City",
+              "checkInTime": "15:00",
+              "checkOutTime": "11:00",
+              "bookingRef": "BK-TYO-2847"
+            }
+          ],
+          "activityItems": [
+            {
+              "text": "Tsukiji Outer Market Breakfast",
+              "time": "07:30 - 09:30",
+              "cost": "20",
+              "done": false,
+              "startTime": "07:30",
+              "endTime": "09:30",
+              "startDate": "2026-06-02",
+              "endDate": "2026-06-02",
+              "activityId": "act-sug-tokyo-8",
+              "cityId": "city-tokyo"
+            },
+            {
+              "text": "Shibuya Crossing & Hachiko Statue",
+              "time": "10:00 - 12:00",
+              "cost": "0",
+              "done": false,
+              "startTime": "10:00",
+              "endTime": "12:00",
+              "startDate": "2026-06-02",
+              "endDate": "2026-06-02",
+              "activityId": "act-sug-tokyo-2",
+              "cityId": "city-tokyo"
+            }
+          ]
+        },
+        {
           "date": "2026-06-03",
           "day": "Wed",
           "from": "Tokyo",

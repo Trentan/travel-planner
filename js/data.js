@@ -3946,6 +3946,10 @@ function resetAppStateToDefaults() {
     title: DEFAULT_TRIP_DATA.meta.title,
     subtitle: DEFAULT_TRIP_DATA.meta.subtitle
   };
+  const mainTitleEl = document.getElementById("mainTitle");
+  if (mainTitleEl) mainTitleEl.innerText = titleData.title;
+  const mainSubEl = document.getElementById("mainSubtitle");
+  if (mainSubEl) mainSubEl.innerText = titleData.subtitle;
   currentFileName = "Default Template";
   currentCityFilter = 'all';
 
