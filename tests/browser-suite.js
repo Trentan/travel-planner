@@ -182,7 +182,7 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     await page.locator('.app-tab-btn[data-tab="itinerary"]').click();
     await humanPause(page, 350);
 
-    const legEditorBtn = page.locator('button:has-text("Manage Legs"), button:has-text("Leg Editor"), button:has-text("+ Add Trip Leg")').first();
+    const legEditorBtn = page.locator('button:has-text("Manage Legs"), button:has-text("Legs"), button:has-text("Leg Editor"), button:has-text("+ Add Trip Leg")').first();
     await legEditorBtn.click();
     await page.waitForSelector('#add-leg-modal', { state: 'visible' });
     await humanPause(page, 400);
