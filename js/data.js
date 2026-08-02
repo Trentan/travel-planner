@@ -181,7 +181,7 @@ function fallbackToLocalStorage() {
 let appData = [];
 let packingData = [];
 let leaveHomeData = [];
-let hotelCheckoutData = [];
+let hotelCheckoutData = typeof DEFAULT_HOTEL_CHECKOUT !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_HOTEL_CHECKOUT)) : [];
 let citiesData = typeof DEFAULT_CITIES !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_CITIES)) : []; // City entities for filtering/grouping - { id, name, code, countryCode, country, dateFrom, dateTo, colour }
 let historyBaselineSnapshot = null;
 let historyBaselineSignature = '';
@@ -6396,6 +6396,7 @@ function startBlankTrip() {
   citiesData = [];
   userCities = [];
   userCountries = [];
+  hotelCheckoutData = typeof DEFAULT_HOTEL_CHECKOUT !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_HOTEL_CHECKOUT)) : [];
   window.journeys = journeys;
   window.stays = stays;
   titleData = { title: "My New Trip", subtitle: "0 cities · Add a city or leg to start" };
