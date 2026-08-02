@@ -1983,7 +1983,10 @@ function _populateAddLegCityDropdowns() {
 
   if (editLegSelect) {
     const currentValue = editLegSelect.value;
-    const options = ['<option value="">-- Add a new leg --</option>'];
+    const options = [
+      '<option value="ADD_NEW">➕ Add New Leg</option>',
+      '<option value="" disabled>──────────</option>'
+    ];
     (appData || []).forEach((leg, idx) => {
       const firstDay = leg?.days?.[0];
       const legDate = firstDay?.date || '';
@@ -1991,7 +1994,11 @@ function _populateAddLegCityDropdowns() {
       options.push(`<option value="${idx}">${label}</option>`);
     });
     editLegSelect.innerHTML = options.join('');
-    if (currentValue) editLegSelect.value = currentValue;
+    if (currentValue && (currentValue === 'ADD_NEW' || Number.isFinite(Number(currentValue)))) {
+      editLegSelect.value = currentValue;
+    } else {
+      editLegSelect.value = 'ADD_NEW';
+    }
   }
 }
 
@@ -2491,12 +2498,31 @@ function syncAllLegDays(silent = false) {
 }
 
 
+function resetLegDialogToAddNew() {
+  const editLegSelect = document.getElementById('editLegSelect');
+  if (editLegSelect) editLegSelect.value = 'ADD_NEW';
+  legDialogState = { mode: 'add', editLegIdx: null };
+  const existingCitySelect = document.getElementById('existingCitySelect');
+  const dateFrom = document.getElementById('newLegStartDate');
+  const dateTo = document.getElementById('newLegEndDate');
+  const dayNotesInput = document.getElementById('legDayNotesInput');
+  if (existingCitySelect) existingCitySelect.value = '';
+  if (dateFrom) dateFrom.value = '';
+  if (dateTo) dateTo.value = '';
+  if (dayNotesInput) dayNotesInput.value = '';
+  updateLegDialogUiMode();
+}
+
 function onEditLegSelectionChange() {
   const editSelect = document.getElementById('editLegSelect');
-  const selected = Number(editSelect?.value);
+  const rawVal = editSelect?.value;
+  if (!rawVal || rawVal === 'ADD_NEW') {
+    resetLegDialogToAddNew();
+    return;
+  }
+  const selected = Number(rawVal);
   if (!Number.isFinite(selected)) {
-    legDialogState = { mode: 'add', editLegIdx: null };
-    updateLegDialogUiMode();
+    resetLegDialogToAddNew();
     return;
   }
   const leg = appData?.[selected];
@@ -2865,6 +2891,8 @@ function confirmAddLeg() {
   }
   closeAddLegDialog();
   sortLegs();
+  if (typeof buildItinerary === 'function') buildItinerary();
+  if (typeof buildCityNav === 'function') buildCityNav();
   if (typeof syncAllLegDays === 'function') {
     syncAllLegDays(true);
   }
