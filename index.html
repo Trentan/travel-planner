@@ -644,14 +644,6 @@
         <button class="modal-close" onclick="closeAddLegDialog()">&times;</button>
       </div>
       <div class="modal-body">
-        <div style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <button type="button" class="action-btn" style="flex: 1; min-width: 140px; display: flex; justify-content: center; gap: 0.5rem;" onclick="syncAllLegDays()">
-            <span>🔄</span> Auto-Sync Days
-          </button>
-          <button type="button" class="action-btn action-btn-secondary" style="flex: 1; min-width: 140px; display: flex; justify-content: center; gap: 0.5rem;" onclick="closeAddLegDialog(); openCityDialog();">
-            <span>🌍</span> Manage Cities
-          </button>
-        </div>
         <div class="stack-gap-4">
           <div class="ai-form-group">
             <label>Edit Existing Leg (optional)</label>
@@ -698,8 +690,8 @@
             <div class="ai-form-group mt-3">
               <label id="datesLabel">Dates in City</label>
               <div class="row-gap-2">
-                <input type="text" id="newLegStartDate" class="form-control" placeholder="Date (e.g., 15 Jun)">
-                <input type="text" id="newLegEndDate" class="form-control" placeholder="To (e.g., 18 Jun)">
+                <input type="date" id="newLegStartDate" class="form-control" placeholder="Date (e.g., 15 Jun)">
+                <input type="date" id="newLegEndDate" class="form-control" placeholder="To (e.g., 18 Jun)">
               </div>
             </div>
             <div class="ai-form-group">
@@ -711,6 +703,7 @@
         <div class="modal-footer modal-footer-space-between modal-footer-wrap">
           <button id="legDialogDeleteBtn" class="action-btn action-btn-danger" onclick="deleteLegFromDialog()" style="display: none;">Delete Leg</button>
           <div class="journey-footer-actions">
+            <button type="button" class="action-btn" onclick="syncAllLegDays()" title="Recalculate and auto-sync dates across all itinerary days">🔄 Auto-Sync Days</button>
             <button class="action-btn" onclick="closeAddLegDialog()">Cancel</button>
             <button id="legDialogSaveBtn" class="action-btn action-btn-secondary" onclick="confirmAddLeg()">Save Leg</button>
           </div>
