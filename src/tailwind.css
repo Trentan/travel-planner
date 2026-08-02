@@ -6721,3 +6721,113 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
 .dark .transport-alert-action-btn:hover {
   background-color: rgba(96, 165, 250, 0.25);
 }
+
+/* --- Mobile Responsive Dialogs & Input Field Wrapping --- */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 0.5rem !important;
+  }
+
+  .modal-content {
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: 92vh !important;
+    border-radius: 1rem !important;
+  }
+
+  .modal-body {
+    padding: 1rem 0.85rem !important;
+  }
+
+  .modal-header,
+  .modal-footer {
+    padding: 0.85rem 1rem !important;
+  }
+
+  /* Fix Date Input overflow in mobile dialogs */
+  .row-gap-2 {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+
+  .row-gap-2 input[type="date"],
+  .row-gap-2 input[type="time"],
+  .row-gap-2 select,
+  .row-gap-2 .form-control {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Ensure date inputs fit comfortably inside any flex/grid container */
+  input[type="date"],
+  input[type="time"] {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    font-size: 0.9rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+}
+
+/* Comprehensive Dark Mode Color Contrast & Legibility Overrides */
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="dark"] .modal-content {
+  background-color: #0f172a !important;
+  border: 1px solid #1e293b !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .modal-header {
+  background-color: #0f172a !important;
+  border-bottom-color: #1e293b !important;
+}
+
+[data-theme="dark"] .modal-header h2 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .modal-close {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .modal-close:hover {
+  color: #f43f5e !important;
+}
+
+[data-theme="dark"] .modal-body {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .modal-footer {
+  background-color: #0f172a !important;
+  border-top-color: #1e293b !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] select.form-control,
+[data-theme="dark"] input.form-control,
+[data-theme="dark"] textarea.form-control {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] select.form-control option {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+  color: #64748b !important;
+}
+
+[data-theme="dark"] label,
+[data-theme="dark"] .ai-form-group label {
+  color: #cbd5e1 !important;
+}
