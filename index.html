@@ -41,7 +41,6 @@
     <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
     <button id="undoBtn" class="app-menu-btn" onclick="undoTripChange()" disabled>↶ Undo</button>
     <button id="redoBtn" class="app-menu-btn" onclick="redoTripChange()" disabled>↷ Redo</button>
-    <button id="topCitiesBtn" class="app-menu-btn" onclick="openCityDialog()" title="Manage cities, rename, refetch location coordinates and country flags">🌍 Manage Cities</button>
     <details class="app-menu-actions" id="desktopActionsMenu">
       <summary class="app-menu-btn app-menu-actions-summary" aria-label="Open app actions" aria-haspopup="menu">☰ Actions</summary>
       <div class="app-menu-actions-panel" role="menu" aria-label="App actions">
@@ -155,7 +154,7 @@
             <button id="itineraryTimelineModeBtn" class="itinerary-view-mode-btn is-active" type="button" onclick="setItineraryDayViewMode('timeline')">Timeline</button>
             <button id="itineraryGroupedModeBtn" class="itinerary-view-mode-btn" type="button" onclick="setItineraryDayViewMode('grouped')">Grouped</button>
           </div>
-          <button class="action-btn add-leg-action" onclick="openLegEditorDialog()"><span class="add-leg-full">🧭 Manage Legs</span><span class="add-leg-short">🧭 Manage Legs</span></button>
+          <button class="action-btn add-leg-action" onclick="openLegEditorDialog()"><span class="add-leg-full">🧭 Manage Legs</span><span class="add-leg-short">🧭 Legs</span></button>
         </div>
       </div>
       <div id="itinerary"></div>
