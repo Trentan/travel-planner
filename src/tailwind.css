@@ -407,15 +407,15 @@
   }
 
   .surface-panel {
-    @apply p-4 rounded-lg border border-border bg-[#FAFAF8];
+    @apply p-4 rounded-lg border border-border bg-[#FAFAF8] dark:bg-slate-900/80 dark:border-slate-800;
   }
 
   .surface-panel--quiet {
-    @apply bg-[#f9f9f9];
+    @apply bg-[#f9f9f9] dark:bg-slate-900/40;
   }
 
   .surface-panel--card {
-    @apply bg-white shadow-sm;
+    @apply bg-white shadow-sm dark:bg-slate-900 dark:border-slate-800;
   }
 
   .journey-form-card {
