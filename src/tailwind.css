@@ -995,6 +995,12 @@
     @apply flex-nowrap ml-auto;
   }
 
+  @media (max-width: 900px) {
+    #tab-itinerary .view-mode-text {
+      display: none !important;
+    }
+  }
+
   #tab-itinerary .top-controls {
     @apply flex-nowrap overflow-x-auto overflow-y-hidden pb-1;
     scrollbar-width: thin;
@@ -1817,7 +1823,7 @@
     }
 
     body.mobile-app-mode #tab-itinerary .itinerary-view-mode-btn .view-mode-text {
-      display: none;
+      display: none !important;
     }
 
     body.mobile-app-mode #tab-itinerary .add-leg-action,
