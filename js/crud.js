@@ -3178,12 +3178,18 @@ function closeAddStayModal() {
 }
 
 function saveStayFromModal() {
-  const cityId = document.getElementById('stayCitySelect').value;
-  const propertyName = document.getElementById('stayPropertyName').value.trim();
+  const citySelect = document.getElementById('stayCitySelect');
+  const propInput = document.getElementById('stayPropertyName');
+  const checkInInput = document.getElementById('stayCheckIn');
+  const checkOutInput = document.getElementById('stayCheckOut');
+
+  const cityId = citySelect.value;
+  const propertyName = propInput.value.trim();
   const location = document.getElementById('stayLocation').value.trim();
-  const checkIn = document.getElementById('stayCheckIn').value;
+  const checkIn = checkInInput.value;
   const checkInTime = document.getElementById('stayCheckInTime').value;
-  const checkOut = document.getElementById('stayCheckOut').value;
+  const checkOut = checkOutInput.value;
+
   const checkOutTime = document.getElementById('stayCheckOutTime').value;
   const nights = parseInt(document.getElementById('stayNights').value) || 0;
   const status = document.getElementById('stayStatus').value || 'planned';
@@ -3192,9 +3198,33 @@ function saveStayFromModal() {
   const totalCost = document.getElementById('stayTotalCost').value.trim() || '0';
   const notes = document.getElementById('stayNotes').value.trim();
 
-  if (!cityId) return alert('Please select a city');
-  if (!propertyName) return alert('Please enter a property name');
-  if (!checkIn || !checkOut) return alert('Please enter check-in and check-out dates');
+  // Reset visual error state
+  [citySelect, propInput, checkInInput, checkOutInput].forEach(el => {
+    if (el) el.classList.remove('border-rose-500', 'bg-rose-50', 'dark:bg-rose-950/20');
+  });
+
+  let hasError = false;
+  if (!cityId) {
+    citySelect.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-950/20');
+    hasError = true;
+  }
+  if (!propertyName) {
+    propInput.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-950/20');
+    hasError = true;
+  }
+  if (!checkIn) {
+    checkInInput.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-950/20');
+    hasError = true;
+  }
+  if (!checkOut) {
+    checkOutInput.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-950/20');
+    hasError = true;
+  }
+
+  if (hasError) {
+    alert('Please fill in all mandatory stay fields (City, Property Name, Check-in, and Check-out dates).');
+    return;
+  }
 
   if (editingStayId) {
     // Editing existing stay
