@@ -1831,20 +1831,13 @@
       box-sizing: border-box;
     }
 
-    body.mobile-app-mode #tab-itinerary .add-leg-full {
-      display: none;
+    body.mobile-app-mode #tab-itinerary .add-leg-action .add-leg-label {
+      font-size: 0;
     }
 
-    body.mobile-app-mode #tab-itinerary .add-leg-short {
-      display: inline;
-    }
-
-    body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-full {
-      display: none;
-    }
-
-    body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-short {
-      display: inline;
+    body.mobile-app-mode #tab-itinerary .add-leg-action .add-leg-label::before {
+      content: "\01F9ED Legs";
+      font-size: 0.78rem;
     }
 
     body.mobile-app-mode.compact-view-mode .top-controls {
@@ -4527,10 +4520,6 @@
   .activity-assign-legacy-days {
     @apply grid gap-2.5 overflow-auto pr-1;
     max-height: 52vh;
-  }
-
-  .add-leg-short {
-    @apply hidden;
   }
 
   /* Batch B: Navigation Components */
