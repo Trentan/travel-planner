@@ -546,6 +546,19 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await page.evaluate(() => closeShareExportDialog());
     await page.waitForFunction(() => document.getElementById('share-export-modal').style.display === 'none');
 
+    // Test Issue #200 Browser Recovery Check: Corrupted Share URL hash cleanup
+    await page.evaluate(() => {
+      window.location.hash = 'trip=invalid_test_hash_recovery';
+    });
+    let alertShown = false;
+    page.once('dialog', async dialog => {
+      alertShown = true;
+      await dialog.dismiss();
+    });
+    await page.evaluate(() => checkUrlForImportedTrip());
+    await page.waitForFunction(() => !window.location.hash || window.location.hash === '#');
+    reporter.add('mobile', 'share hash recovery', 'handled corrupted share URL hash and stripped fragment safely');
+
     await page.evaluate(() => toggleMobileMenu());
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
     const downloadPromise = page.waitForEvent('download');
