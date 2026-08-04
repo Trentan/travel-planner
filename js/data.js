@@ -3170,6 +3170,21 @@ async function runSaveData(showTick = true) {
 
     captureHistoryBeforeSave();
 
+    // Create automated emergency backup snapshot in localStorage before overwrite
+    try {
+      if (Array.isArray(appData) && appData.length > 0) {
+        localStorage.setItem('travelApp_last_known_good_backup', JSON.stringify({
+          meta: titleData,
+          itinerary: appData,
+          journeys,
+          stays,
+          savedAt: new Date().toISOString()
+        }));
+      }
+    } catch (err) {
+      console.warn('Could not write emergency local backup:', err);
+    }
+
     const useIndexedDB = await shouldUseIndexedDB();
 
   if (useIndexedDB) {
