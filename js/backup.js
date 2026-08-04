@@ -41,6 +41,11 @@ function resetEditTracking() {
 
 // Check if we should show a backup reminder
 function checkBackupReminder() {
+  if (sessionStorage.getItem('travelApp_backupReminderDismissed') === 'true') {
+    hideBackupReminder();
+    return;
+  }
+
   if (isFileBackedMode()) {
     hideBackupReminder();
     return;
@@ -86,7 +91,7 @@ function showBackupReminder(message) {
         <div class="backup-reminder-actions">
           <button onclick="${typeof window.isFSASupported === 'function' && window.isFSASupported() ? 'hideBackupReminder(); openTripFile();' : 'exportJSON(); checkBackupReminder(); hideBackupReminder();'}"
                   class="backup-reminder-btn backup-reminder-btn-save">${typeof window.isFSASupported === 'function' && window.isFSASupported() ? 'Save As' : 'Export Now'}</button>
-          <button onclick="hideBackupReminder();"
+          <button onclick="hideBackupReminder(true);"
                   class="backup-reminder-btn backup-reminder-btn-later">Later</button>
         </div>
       </div>
@@ -96,7 +101,10 @@ function showBackupReminder(message) {
 }
 
 // Hide reminder popup
-function hideBackupReminder() {
+function hideBackupReminder(markDismissed = false) {
+  if (markDismissed) {
+    sessionStorage.setItem('travelApp_backupReminderDismissed', 'true');
+  }
   const reminder = document.getElementById('backup-reminder');
   if (reminder) reminder.remove();
 }
