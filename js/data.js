@@ -4738,31 +4738,36 @@ async function compressStringToGzipBase64(str) {
 }
 
 async function decompressGzipBase64ToString(base64) {
-  const binary = atob(base64);
-  const bytes = new Uint8Array([...binary].map(c => c.charCodeAt(0)));
-  
-  const ds = new DecompressionStream('gzip');
-  const writer = ds.writable.getWriter();
-  writer.write(bytes);
-  writer.close();
-  
-  const chunks = [];
-  const reader = ds.readable.getReader();
-  while (true) {
-    const { value, done } = await reader.read();
-    if (value) chunks.push(value);
-    if (done) break;
+  try {
+    const binary = atob(base64);
+    const bytes = new Uint8Array([...binary].map(c => c.charCodeAt(0)));
+    
+    const ds = new DecompressionStream('gzip');
+    const writer = ds.writable.getWriter();
+    writer.write(bytes).catch(() => {});
+    writer.close().catch(() => {});
+    
+    const chunks = [];
+    const reader = ds.readable.getReader();
+    while (true) {
+      const { value, done } = await reader.read();
+      if (value) chunks.push(value);
+      if (done) break;
+    }
+    
+    const totalLength = chunks.reduce((acc, c) => acc + c.length, 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const c of chunks) {
+      result.set(c, offset);
+      offset += c.length;
+    }
+    
+    return new TextDecoder().decode(result);
+  } catch (err) {
+    console.warn('Decompression error caught:', err);
+    return null;
   }
-  
-  const totalLength = chunks.reduce((acc, c) => acc + c.length, 0);
-  const result = new Uint8Array(totalLength);
-  let offset = 0;
-  for (const c of chunks) {
-    result.set(c, offset);
-    offset += c.length;
-  }
-  
-  return new TextDecoder().decode(result);
 }
 
 async function generateShareLink(exportObj) {
