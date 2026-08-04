@@ -4766,6 +4766,16 @@ async function copyShareLink() {
   const exportObj = redactShareExportPayload(buildExportPayload(), getShareExportOptions());
   try {
     const shareLink = await generateShareLink(exportObj);
+    if (shareLink.length > 3500) {
+      const confirmDownload = confirm(
+        `⚠️ This itinerary is detailed and the generated share URL is too long for standard link sharing (${shareLink.length} characters).\n\n` +
+        `Would you like to download the filtered Share JSON file instead? (You can send this JSON file directly to your co-traveler).`
+      );
+      if (confirmDownload) {
+        await exportShareJSON();
+      }
+      return;
+    }
     if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
       await navigator.clipboard.writeText(shareLink);
     } else {
@@ -4811,6 +4821,8 @@ async function checkUrlForImportedTrip() {
     }
     
     const jsonStr = await decompressGzipBase64ToString(base64);
+    if (!jsonStr) throw new Error('Decompressed share link returned empty payload');
+
     const importedData = JSON.parse(jsonStr);
     
     let expandedData = importedData;
@@ -4823,10 +4835,15 @@ async function checkUrlForImportedTrip() {
     await loadImportedPayload(expandedData, 'URL Shared Trip');
     
     alert('🌍 Shared Travel Planner itinerary loaded successfully!');
-    window.history.replaceState({}, document.title, window.location.pathname);
+    if (window.history && typeof window.history.replaceState === 'function') {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
   } catch (err) {
     console.error("Failed to decode share link:", err);
     alert('⚠️ Failed to load the shared trip link. The URL might be incomplete or corrupted.');
+    if (window.history && typeof window.history.replaceState === 'function') {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
   }
 }
 
