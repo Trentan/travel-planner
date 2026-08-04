@@ -2953,74 +2953,86 @@ async function initData() {
 
   const saved = localStorage.getItem('travelApp_v2026_template');
   if (saved) {
-    appData = normalizeTripLegsData(JSON.parse(saved));
-    appData.forEach(leg => {
-      if (!leg.legTips) {
-        leg.legTips = [];
-        leg.days.forEach(day => {
-          if (day.tips && day.tips.length > 0) leg.legTips.push(...day.tips);
-          delete day.tips;
-        });
-      }
-      // Migrate legacy cityRun and suggestedSights to unified suggestedActivities
-      if (!leg.suggestedActivities) {
-        leg.suggestedActivities = [];
-        // Migrate cityRun items to fitness category
-        if (leg.cityRun && leg.cityRun.length > 0) {
-          if (typeof leg.cityRun[0] === 'string') {
-            leg.cityRun.forEach(r => {
-              leg.suggestedActivities.push({
-                title: r,
-                category: 'fitness',
-                estTime: '1 hr',
-                estCost: '0',
-                assignedDayIdx: null
+    try {
+      appData = normalizeTripLegsData(JSON.parse(saved));
+      appData.forEach(leg => {
+        if (!leg.legTips) {
+          leg.legTips = [];
+          leg.days.forEach(day => {
+            if (day.tips && day.tips.length > 0) leg.legTips.push(...day.tips);
+            delete day.tips;
+          });
+        }
+        // Migrate legacy cityRun and suggestedSights to unified suggestedActivities
+        if (!leg.suggestedActivities) {
+          leg.suggestedActivities = [];
+          // Migrate cityRun items to fitness category
+          if (leg.cityRun && leg.cityRun.length > 0) {
+            if (typeof leg.cityRun[0] === 'string') {
+              leg.cityRun.forEach(r => {
+                leg.suggestedActivities.push({
+                  title: r,
+                  category: 'fitness',
+                  estTime: '1 hr',
+                  estCost: '0',
+                  assignedDayIdx: null
+                });
               });
-            });
-          } else {
-            leg.cityRun.forEach(r => {
+            } else {
+              leg.cityRun.forEach(r => {
+                leg.suggestedActivities.push({
+                  title: r.title,
+                  category: 'fitness',
+                  estTime: r.estTime || '1 hr',
+                  estCost: r.estCost || '0',
+                  assignedDayIdx: r.assignedDayIdx !== undefined ? r.assignedDayIdx : null
+                });
+              });
+            }
+          }
+          // Migrate suggestedSights items to sight category
+          if (leg.suggestedSights && leg.suggestedSights.length > 0) {
+            leg.suggestedSights.forEach(s => {
               leg.suggestedActivities.push({
-                title: r.title,
-                category: 'fitness',
-                estTime: r.estTime || '1 hr',
-                estCost: r.estCost || '0',
-                assignedDayIdx: r.assignedDayIdx !== undefined ? r.assignedDayIdx : null
+                title: s.title,
+                category: 'sight',
+                estTime: s.estTime || '1 hr',
+                estCost: s.estCost || '0',
+                assignedDayIdx: s.assignedDayIdx !== undefined ? s.assignedDayIdx : null
               });
             });
           }
+          // Clean up legacy properties
+          delete leg.cityRun;
+          delete leg.suggestedSights;
         }
-        // Migrate suggestedSights items to sight category
-        if (leg.suggestedSights && leg.suggestedSights.length > 0) {
-          leg.suggestedSights.forEach(s => {
-            leg.suggestedActivities.push({
-              title: s.title,
-              category: 'sight',
-              estTime: s.estTime || '1 hr',
-              estCost: s.estCost || '0',
-              assignedDayIdx: s.assignedDayIdx !== undefined ? s.assignedDayIdx : null
+        leg.days.forEach(day => {
+          if(day.activityItems) {
+            day.activityItems.forEach(act => {
+              if (act.time === undefined) act.time = "1 hr";
             });
-          });
-        }
-        // Clean up legacy properties
-        delete leg.cityRun;
-        delete leg.suggestedSights;
-      }
-      leg.days.forEach(day => {
-        if(day.activityItems) {
-          day.activityItems.forEach(act => {
-            if (act.time === undefined) act.time = "1 hr";
-          });
-        }
+          }
+        });
       });
-    });
+    } catch (e) {
+      console.error('[Itinerary] Failed to parse itinerary template:', e);
+      appData = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.itinerary));
+    }
   }
   else { appData = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.itinerary)); }
 
   appData = normalizeTripLegsData(appData);
 
   const savedPacking = localStorage.getItem('travelApp_packing_v3');
-  if (savedPacking) { packingData = ensureDefaultPackingAreas(JSON.parse(savedPacking)); }
-  else { packingData = JSON.parse(JSON.stringify(DEFAULT_PACKING)); }
+  if (savedPacking) {
+    try {
+      packingData = ensureDefaultPackingAreas(JSON.parse(savedPacking));
+    } catch (e) {
+      console.error('[Packing] Failed to parse packing template:', e);
+      packingData = typeof DEFAULT_PACKING !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_PACKING)) : [];
+    }
+  }
+  else { packingData = typeof DEFAULT_PACKING !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_PACKING)) : []; }
 
   const savedLeaveHome = localStorage.getItem('travelApp_leavehome_v3');
   if (savedLeaveHome) {
