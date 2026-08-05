@@ -564,6 +564,15 @@ window.stays = stays;
 var currentCityFilter = 'all';
 window.currentCityFilter = currentCityFilter;
 
+function calculateDjb2Hash(str) {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+  }
+  return hash >>> 0; // Return unsigned 32-bit integer
+}
+window.calculateDjb2Hash = calculateDjb2Hash;
+
 function isFSASupported() {
   return !!(window.isSecureContext && 'showOpenFilePicker' in window);
 }
@@ -636,6 +645,11 @@ function setImportedJsonWithoutWriteAccess(active) {
   syncJsonWriteWarning();
   if (typeof window.syncMobileMenuStatus === 'function') window.syncMobileMenuStatus();
 }
+
+function getActiveFileHandle() {
+  return activeFileHandle;
+}
+window.getActiveFileHandle = getActiveFileHandle;
 
 function getActiveFileHandleName() {
   return activeFileHandleName || currentFileName || 'Default Template';
@@ -927,11 +941,19 @@ async function saveFileToDisk() {
   if (!await ensureActiveFileHandle()) return false;
 
   try {
+    const payloadStr = JSON.stringify(getCurrentAppData(), null, 2);
     const writable = await activeFileHandle.createWritable();
-    await writable.write(JSON.stringify(getCurrentAppData(), null, 2));
+    await writable.write(payloadStr);
     await writable.close();
     fileWriteFailed = false;
     localStorage.setItem('travelApp_file_handle_name', getActiveFileHandleName());
+    
+    // Store DJB2 hash of payload
+    try {
+      const hash = calculateDjb2Hash(payloadStr);
+      localStorage.setItem('travelApp_last_known_hash', String(hash));
+    } catch(err) {}
+
     configureFileActionButtons();
     const status = document.getElementById('saveStatus');
     if (status) status.textContent = '✓ Saved to file';
@@ -5740,6 +5762,12 @@ async function importJSON(event) {
         clearActiveFileHandle();
         setImportedJsonWithoutWriteAccess(true);
       }
+
+      // Store hash of imported content
+      try {
+        const hash = calculateDjb2Hash(content);
+        localStorage.setItem('travelApp_last_known_hash', String(hash));
+      } catch(err) {}
 
       await loadImportedPayload(importedData, file.name);
 

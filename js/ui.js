@@ -862,16 +862,29 @@ if (typeof document !== "undefined" && typeof document.addEventListener === "fun
   document.addEventListener("DOMContentLoaded", () => {
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
       let lastSuspendedTime = Date.now();
-      window.Capacitor.Plugins.App.addListener("appStateChange", ({ isActive }) => {
+      window.Capacitor.Plugins.App.addListener("appStateChange", async ({ isActive }) => {
         if (!isActive) {
           lastSuspendedTime = Date.now();
         } else {
-          // If suspended for > 15 minutes, show the resync modal
-          if (Date.now() - lastSuspendedTime > 900000) {
-            const resyncModal = document.getElementById("resync-modal");
-            if (resyncModal && resyncModal.style.display === "none") {
-              resyncModal.style.display = "flex";
-              if (typeof triggerHaptic === "function") triggerHaptic("light");
+          // Check if there is an active file handle
+          if (typeof window.getActiveFileHandle === "function" && window.getActiveFileHandle()) {
+            try {
+              const handle = window.getActiveFileHandle();
+              const file = await handle.getFile();
+              const text = await file.text();
+              if (typeof window.calculateDjb2Hash === "function") {
+                const currentHash = window.calculateDjb2Hash(text);
+                const lastHash = localStorage.getItem("travelApp_last_known_hash");
+                if (lastHash && String(currentHash) !== String(lastHash)) {
+                  const resyncModal = document.getElementById("resync-modal");
+                  if (resyncModal && resyncModal.style.display === "none") {
+                    resyncModal.style.display = "flex";
+                    if (typeof triggerHaptic === "function") triggerHaptic("light");
+                  }
+                }
+              }
+            } catch (err) {
+              console.warn("Could not check background file checksum:", err);
             }
           }
         }

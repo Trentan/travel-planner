@@ -100,10 +100,26 @@ function createTestingContext() {
       log: () => {},
       warn: () => {},
       error: () => {}
+    },
+    localStorage: mockLocalStorage,
+    calculateDjb2Hash: (str) => {
+      let hash = 5381;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) + hash) + str.charCodeAt(i);
+      }
+      return hash >>> 0;
     }
   });
 
   context.window.localStorage = mockLocalStorage;
+  context.window.calculateDjb2Hash = (str) => {
+    let hash = 5381;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    }
+    return hash >>> 0;
+  };
+  context.calculateDjb2Hash = context.window.calculateDjb2Hash;
 
   return { context, localStorageData, elements };
 }
@@ -240,29 +256,41 @@ async function run() {
     documentListeners.forEach(cb => cb());
   }
 
+  // Set up active file handle mock returning specific text file content
+  let mockFileText = '{"itinerary":[]}';
+  const mockFileHandle = {
+    getFile: async () => ({
+      text: async () => mockFileText
+    })
+  };
+  context.window.getActiveFileHandle = () => mockFileHandle;
+  context.getActiveFileHandle = context.window.getActiveFileHandle;
+
+  // Set initial saved hash matching file text
+  const initialHash = context.calculateDjb2Hash(mockFileText);
+  localStorageData.set('travelApp_last_known_hash', String(initialHash));
+
   // Verify listeners were added
   assert(appListeners.length > 0, 'Capacitor appStateChange listener should be registered');
 
-  // Trigger active state change with a gap of 20 seconds (should NOT trigger resync modal)
+  // Trigger active state change with matching checksum (should NOT trigger resync modal)
   const listener = appListeners[0];
+  listener({ isActive: false });
+  await listener({ isActive: true });
+  await new Promise(resolve => setTimeout(resolve, 50));
+  assert(resyncModalDisplayed === false, 'Resync modal should not trigger if file checksum matches local hash');
 
-  listener({ isActive: false }); // Records lastSuspendedTime at mockTime
-  
-  mockTime += 20000; // Jump 20 seconds
-  listener({ isActive: true });
-  assert(resyncModalDisplayed === false, 'Resync modal should not trigger for idle duration under 15 minutes');
-
-  // Trigger active state change with a gap of 16 minutes (should trigger resync modal)
-  listener({ isActive: false }); // Records lastSuspendedTime at mockTime
-  
-  mockTime += 1000000; // Jump ~16.6 minutes (>15 minutes)
-  listener({ isActive: true });
-  assert(resyncModalDisplayed === true, 'Resync modal should trigger for idle duration exceeding 15 minutes');
+  // Trigger active state change with modified checksum (should trigger resync modal)
+  listener({ isActive: false });
+  mockFileText = '{"itinerary":[{"label":"New destination"}]}'; // Modify file contents
+  await listener({ isActive: true });
+  await new Promise(resolve => setTimeout(resolve, 50));
+  assert(resyncModalDisplayed === true, 'Resync modal should trigger if background file checksum has changed');
 
   // Restore global Clock helper
   Date.now = originalNow;
 
-  console.log('File I/O Robustness, onboarding choice priority, and resync timeout checks passed');
+  console.log('File I/O Robustness, onboarding choice priority, and background checksum resync checks passed');
 }
 
 if (require.main === module) {
