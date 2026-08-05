@@ -456,13 +456,20 @@ function renderPackingGuidePanel() {
 
 function renderPackingGuidesShell() {
   const globalProgressHTML = typeof renderPackingGlobalProgress === 'function' ? renderPackingGlobalProgress() : '';
+  const shellClass = mobilePackingGuidesExpanded ? 'mobile-expanded' : 'mobile-collapsed';
 
   return `
-    <div class="packing-guides-shell">
+    <div class="packing-guides-shell ${shellClass}">
       <div class="packing-guides-toolbar">
         <div class="packing-guides-toolbar-left">
           ${globalProgressHTML}
         </div>
+        
+        <div class="packing-guides-mobile-header" onclick="toggleMobilePackingGuides()">
+          <span class="packing-guides-mobile-title">⚡ Packing Guides & Prompts</span>
+          <span class="packing-guides-mobile-chevron">▼</span>
+        </div>
+
         <div class="packing-guides-toolbar-right">
           <div class="packing-guides-buttons">
             <button type="button" class="packing-guide-btn ${isActiveGuide('leaveHome') ? 'active' : ''}" onclick="toggleGuidePanel('leaveHome')">Before Leaving Home</button>

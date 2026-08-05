@@ -5254,6 +5254,10 @@
            bg-white/95 dark:bg-slate-800/85 shadow-sm;
   }
 
+  .packing-guides-mobile-header {
+    display: none;
+  }
+
   .packing-guides-toolbar {
     @apply flex flex-col gap-3;
   }
@@ -5530,6 +5534,35 @@
 
     #tab-packing .packing-guides-shell {
       @apply rounded-lg p-3;
+    }
+
+    #tab-packing .packing-guides-mobile-header {
+      @apply flex items-center justify-between px-3.5 py-3 rounded-lg border border-slate-200/85 dark:border-slate-700/80
+             bg-slate-50/50 dark:bg-slate-900/30 cursor-pointer select-none transition-colors w-full;
+    }
+
+    #tab-packing .packing-guides-mobile-header:hover {
+      @apply bg-slate-100/50 dark:bg-slate-800/40;
+    }
+
+    #tab-packing .packing-guides-mobile-title {
+      @apply text-[0.82rem] font-bold text-slate-700 dark:text-slate-200;
+    }
+
+    #tab-packing .packing-guides-mobile-chevron {
+      @apply text-[0.7rem] text-slate-400 dark:text-slate-500 transition-transform duration-200 font-bold;
+    }
+
+    #tab-packing .packing-guides-shell.mobile-expanded .packing-guides-mobile-chevron {
+      transform: rotate(180deg);
+    }
+
+    #tab-packing .packing-guides-shell.mobile-collapsed .packing-guides-toolbar-right {
+      display: none !important;
+    }
+
+    #tab-packing .packing-guides-shell.mobile-collapsed .packing-guide-panel {
+      display: none !important;
     }
 
     #tab-packing .packing-guides-buttons {
