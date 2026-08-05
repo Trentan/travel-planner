@@ -369,6 +369,15 @@ async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {
 
     await page.evaluate(() => window.chooseTripStart('build'));
     
+    // Since location setup is now the file-setup-modal redirect as step 2 choice target, mock dismissing and opening the wizard
+    await page.evaluate(() => {
+      window.dismissFileSetup();
+      window.openCreateNewTripWizard();
+      // Directly advance to step 1
+      window.tripStartStep = 1;
+      window.renderTripStart();
+    });
+    
     // Step 1: Trip Name
     await page.waitForSelector('#tripStartName');
     await page.locator('#tripStartName').fill('Japan spring escape');

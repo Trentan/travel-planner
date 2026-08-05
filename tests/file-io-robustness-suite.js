@@ -211,9 +211,9 @@ async function run() {
     classList: { add: () => {}, remove: () => {}, toggle: () => {}, contains: () => false }
   });
 
-  // Selecting 'build' should now advance tripStartStep directly to 1
+  // Selecting 'build' should now redirect to show file-setup-modal
   context.chooseTripStart('build');
-  assert(context.window.tripStartStep === 1, 'chooseTripStart("build") should set tripStartStep directly to 1');
+  assert(setupModalDisplayed === true, 'chooseTripStart("build") should show the file-setup-modal if storage setup not seen yet');
 
   // Test 5: resync timeout threshold checking
   console.log('Testing resync appStateChange timeout threshold...');

@@ -6109,7 +6109,16 @@ function renderTripStart() {
 }
 
 function chooseTripStart(choice) {
+  const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
+  const isSetupConfigured = hasSeenSetup || hasActiveFileHandle();
+
   if (choice === 'build') {
+    if (!isSetupConfigured) {
+      dismissTripStart();
+      const setupModal = document.getElementById("file-setup-modal");
+      if (setupModal) setupModal.style.display = "flex";
+      return;
+    }
     tripStartStep = 1;
     renderTripStart();
     return;
@@ -6117,6 +6126,10 @@ function chooseTripStart(choice) {
   dismissTripStart();
   if (choice === 'learn') {
     if (typeof openGuideDialog === 'function') openGuideDialog();
+    if (!isSetupConfigured) {
+      const setupModal = document.getElementById("file-setup-modal");
+      if (setupModal) setupModal.style.display = "flex";
+    }
     return;
   }
   if (choice === 'sample') {
@@ -6128,6 +6141,10 @@ function chooseTripStart(choice) {
     if (typeof buildTransportTab === 'function') buildTransportTab();
     if (typeof buildAccomTab === 'function') buildAccomTab();
     if (typeof buildTabs === 'function') buildTabs();
+    if (!isSetupConfigured) {
+      const setupModal = document.getElementById("file-setup-modal");
+      if (setupModal) setupModal.style.display = "flex";
+    }
   }
   localStorage.setItem('travelApp_trip_start_seen', 'true');
   showToast('Sample trip is ready — open any day to see how it is put together.');
