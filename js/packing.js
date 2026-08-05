@@ -1,8 +1,75 @@
 // Active guide panel state (stored globally)
 let activeGuidePanel = null;
+let mobilePackingGuidesExpanded = false;
+window.isPackingEditLocked = true;
 
 function isActiveGuide(panel) {
   return activeGuidePanel === panel;
+}
+
+function toggleMobilePackingGuides() {
+  mobilePackingGuidesExpanded = !mobilePackingGuidesExpanded;
+  buildPackingTab();
+}
+
+function togglePackingEditLock() {
+  window.isPackingEditLocked = !window.isPackingEditLocked;
+  buildPackingTab();
+  updatePackingLockUI();
+}
+
+function updatePackingLockUI() {
+  const iconEl = document.getElementById('packingEditLockIcon');
+  const textEl = document.getElementById('packingEditLockText');
+  if (iconEl && textEl) {
+    if (isPackingEditLocked) {
+      iconEl.textContent = '🔓';
+      textEl.textContent = 'Edit';
+    } else {
+      iconEl.textContent = '🔒';
+      textEl.textContent = 'Lock';
+    }
+  }
+}
+
+function resetAllPackingCheckboxes() {
+  if (!confirm('Are you sure you want to clear/reset all checkmarks on the packing list?')) return;
+
+  // Clear packingData checkboxes
+  if (packingData && Array.isArray(packingData)) {
+    packingData.forEach(area => {
+      if (area.categories && Array.isArray(area.categories)) {
+        area.categories.forEach(cat => {
+          if (cat.items && Array.isArray(cat.items)) {
+            cat.items.forEach(item => {
+              item.done = false;
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // Clear leaveHomeData checkboxes
+  if (leaveHomeData && Array.isArray(leaveHomeData)) {
+    leaveHomeData.forEach(item => {
+      if (item && typeof item === 'object' && !isLeaveHomeSection(item)) {
+        item.done = false;
+      }
+    });
+  }
+
+  // Clear hotelCheckoutData checkboxes
+  if (hotelCheckoutData && Array.isArray(hotelCheckoutData)) {
+    hotelCheckoutData.forEach(item => {
+      if (item && typeof item === 'object' && !isLeaveHomeSection(item)) {
+        item.done = false;
+      }
+    });
+  }
+
+  saveData();
+  buildPackingTab();
 }
 
 function toggleGuidePanel(panel) {
@@ -84,12 +151,13 @@ function countCompletedHotelCheckoutTasks() {
 }
 
 function renderHotelCheckoutItems() {
+  const canEdit = !window.isPackingEditLocked;
   return hotelCheckoutData.map((item, iIdx) => {
     if (isLeaveHomeSection(item)) {
       return `
         <div class="packing-section-header mt-4 mb-2 px-2 flex justify-between items-center w-full group">
-          <h4 contenteditable="${isEditMode}" onblur="updateHotelCheckoutItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
-          ${isEditMode ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteHotelCheckoutItem(${iIdx})">&times;</button>` : ''}
+          <h4 contenteditable="${canEdit}" onblur="updateHotelCheckoutItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
+          ${canEdit ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteHotelCheckoutItem(${iIdx})">&times;</button>` : ''}
         </div>
       `;
     }
@@ -97,8 +165,8 @@ function renderHotelCheckoutItems() {
     return `
       <div class="packing-item leave-home-item w-full">
         <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleHotelCheckoutItem(event, ${iIdx})">
-        <span contenteditable="${isEditMode}" onblur="updateHotelCheckoutItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
-        ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deleteHotelCheckoutItem(${iIdx})">&times;</button>` : ''}
+        <span contenteditable="${canEdit}" onblur="updateHotelCheckoutItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+        ${canEdit ? `<button class="del-btn" title="Delete Item" onclick="deleteHotelCheckoutItem(${iIdx})">&times;</button>` : ''}
       </div>
     `;
   }).join('');
@@ -248,12 +316,13 @@ function deletePackingCat(aIdx, cIdx) {
 }
 
 function renderLeaveHomeItems() {
+  const canEdit = !window.isPackingEditLocked;
   return leaveHomeData.map((item, iIdx) => {
     if (isLeaveHomeSection(item)) {
       return `
         <div class="packing-section-header mt-4 mb-2 px-2 flex justify-between items-center w-full group">
-          <h4 contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
-          ${isEditMode ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
+          <h4 contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
+          ${canEdit ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
         </div>
       `;
     }
@@ -261,14 +330,15 @@ function renderLeaveHomeItems() {
     return `
       <div class="packing-item leave-home-item">
         <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
-        <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
-        ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
+        <span contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+        ${canEdit ? `<button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
       </div>
     `;
   }).join('');
 }
 
 function renderPackingGuidePanel() {
+  const canEdit = !window.isPackingEditLocked;
   if (activeGuidePanel === 'leaveHome') {
     const totalTasks = countLeaveHomeTasks();
     const completedTasks = countCompletedLeaveHomeTasks();
@@ -291,7 +361,7 @@ function renderPackingGuidePanel() {
           <div class="leave-home-list">
             ${renderLeaveHomeItems()}
           </div>
-          ${isEditMode ? `
+          ${canEdit ? `
             <div class="flex gap-2 mt-4" style="margin-top: 1rem;">
               <button class="add-btn leave-home-add-btn" onclick="addLeaveHomeItem()">+ Add Task</button>
               <button class="add-btn leave-home-add-btn" onclick="addLeaveHomeSection()">+ Add Section</button>
@@ -324,7 +394,7 @@ function renderPackingGuidePanel() {
           <div class="leave-home-list">
             ${renderHotelCheckoutItems()}
           </div>
-          ${isEditMode ? `
+          ${canEdit ? `
             <div class="flex gap-2 mt-4" style="margin-top: 1rem;">
               <button class="add-btn leave-home-add-btn" onclick="addHotelCheckoutItem()">+ Add Task</button>
               <button class="add-btn leave-home-add-btn" onclick="addHotelCheckoutSection()">+ Add Section</button>
@@ -410,6 +480,9 @@ function renderPackingGuidesShell() {
 // Expose packing guide functions to window scope
 window.isActiveGuide = isActiveGuide;
 window.toggleGuidePanel = toggleGuidePanel;
+window.toggleMobilePackingGuides = toggleMobilePackingGuides;
+window.togglePackingEditLock = togglePackingEditLock;
+window.resetAllPackingCheckboxes = resetAllPackingCheckboxes;
 window.collapseAllGuides = collapseAllGuides;
 window.restorePackingToDefault = restorePackingToDefault;
 window.isLeaveHomeSection = isLeaveHomeSection;

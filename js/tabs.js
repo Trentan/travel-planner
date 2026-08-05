@@ -430,6 +430,7 @@ function escapeHtml(text) {
 }
 
 function buildPackingTab() {
+  const canEdit = !window.isPackingEditLocked;
   const guidesContainer = document.getElementById('guides-container');
   const listsContainer = document.getElementById('packing-areas-container');
 
@@ -464,20 +465,20 @@ function buildPackingTab() {
             if (isLeaveHomeSection(item)) {
               return `
                 <div class="packing-section-header mt-4 mb-2 px-2 flex justify-between items-center w-full group">
-                  <h4 contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
-                  ${isEditMode ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
+                  <h4 contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
+                  ${canEdit ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
                 </div>
               `;
             }
             return `
             <div class="packing-item w-full">
               <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
-              <span contenteditable="${isEditMode}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
-              ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
+              <span contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+              ${canEdit ? `<button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
             </div>
             `;
           }).join('')}
-          ${isEditMode ? `
+          ${canEdit ? `
             <div class="flex gap-2 mt-4" style="margin-top: 1rem;">
               <button class="add-btn add-btn-home-task" onclick="addLeaveHomeItem()">+ Add Task</button>
               <button class="add-btn add-btn-home-section" onclick="addLeaveHomeSection()">+ Add Section</button>
@@ -530,26 +531,26 @@ function buildPackingTab() {
     areasHTML += `
       <div id="packing-area-${aIdx}" class="packing-area-section packing-area-spaced">
         <h2 class="packing-area-heading area-color-var border-color-var" style="color:${area.areaColor}; border-color:${area.areaColor};">
-          <span contenteditable="${isEditMode}" onblur="updatePackingAreaName(${aIdx}, this.innerText)">${area.areaName}</span>
+          <span contenteditable="${canEdit}" onblur="updatePackingAreaName(${aIdx}, this.innerText)">${area.areaName}</span>
         </h2>
         <div class="packing-grid">
           ${area.categories.map((cat, cIdx) => `
             <div class="packing-card">
               <div class="packing-card-header">
-                <h3><span contenteditable="${isEditMode}" onblur="updatePackingCat(${aIdx}, ${cIdx}, this.innerText)">${cat.title}</span></h3>
-                ${isEditMode ? `<button class="del-btn" title="Delete Category Block" onclick="deletePackingCat(${aIdx}, ${cIdx})">&times;</button>` : ''}
+                <h3><span contenteditable="${canEdit}" onblur="updatePackingCat(${aIdx}, ${cIdx}, this.innerText)">${cat.title}</span></h3>
+                ${canEdit ? `<button class="del-btn" title="Delete Category Block" onclick="deletePackingCat(${aIdx}, ${cIdx})">&times;</button>` : ''}
               </div>
               ${cat.items.map((item, iIdx) => `
                 <div class="packing-item">
                   <input type="checkbox" ${item.done ? 'checked' : ''} onchange="togglePackingItem(event, ${aIdx}, ${cIdx}, ${iIdx})">
-                  <span contenteditable="${isEditMode}" onblur="updatePackingItem(${aIdx}, ${cIdx}, ${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
-                  ${isEditMode ? `<button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">&times;</button>` : ''}
+                  <span contenteditable="${canEdit}" onblur="updatePackingItem(${aIdx}, ${cIdx}, ${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+                  ${canEdit ? `<button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">&times;</button>` : ''}
                 </div>
               `).join('')}
-              ${isEditMode ? `<button class="add-btn" onclick="addPackingItem(${aIdx}, ${cIdx})">+ Add Item</button>` : ''}
+              ${canEdit ? `<button class="add-btn" onclick="addPackingItem(${aIdx}, ${cIdx})">+ Add Item</button>` : ''}
             </div>
           `).join('')}
-          ${isEditMode ? `<div class="packing-card packing-card-add-block" onclick="addPackingCat(${aIdx})">
+          ${canEdit ? `<div class="packing-card packing-card-add-block" onclick="addPackingCat(${aIdx})">
             <span class="packing-card-add-label">+ Add New Category Block</span>
           </div>` : ''}
         </div>
@@ -558,7 +559,7 @@ function buildPackingTab() {
 
   const restoreFooterHTML = `
     <div class="packing-guides-actions packing-page-footer">
-      ${isEditMode ? '<button class="action-btn packing-restore-btn" type="button" onclick="restorePackingToDefault()">Restore Packing to Default</button>' : ''}
+      ${canEdit ? '<button class="action-btn packing-restore-btn" type="button" onclick="restorePackingToDefault()">Restore Packing to Default</button>' : ''}
     </div>
   `;
 
