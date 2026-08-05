@@ -373,6 +373,9 @@ async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {
     await page.evaluate(() => {
       window.dismissFileSetup();
       window.openCreateNewTripWizard();
+      // Since openCreateNewTripWizard now initializes step 0 (Choice Wizard) for factory reset/rebuilds, jump to step 1
+      window.tripStartStep = 1;
+      window.renderTripStart();
     });
     
     // Step 1: Save Location (Browser Storage)

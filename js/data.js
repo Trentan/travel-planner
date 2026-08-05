@@ -6522,7 +6522,7 @@ async function onboardCreateNewTrip() {
 function openCreateNewTripWizard() {
   if (typeof closeMobileMenu === 'function') closeMobileMenu();
   if (typeof closeDesktopActionsMenu === 'function') closeDesktopActionsMenu();
-  tripStartStep = 1;
+  tripStartStep = 0;
   const modal = document.getElementById("trip-start-modal");
   if (modal) modal.style.display = "flex";
   renderTripStart();
