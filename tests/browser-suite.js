@@ -364,6 +364,7 @@ async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {
       window.renderTripStart();
     });
     assert(await page.getByRole('button', { name: 'Build my trip' }).count() === 1, 'Onboarding: first screen should offer guided trip creation');
+    assert(await page.getByRole('button', { name: 'Load pre-existing trip' }).count() === 1, 'Onboarding: first screen should offer loading a pre-existing trip');
     assert(await page.getByRole('button', { name: 'Explore the sample trip' }).count() === 1, 'Onboarding: first screen should preserve a sample-trip route');
     assert(await page.getByRole('button', { name: 'Learn the essentials' }).count() === 1, 'Onboarding: first screen should keep help available on demand');
 
