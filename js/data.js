@@ -6517,7 +6517,6 @@ function startBlankTrip() {
   syncCurrentFileName("New_Trip.json");
   saveData(true);
   dismissTripStart();
-  dismissFileSetup();
   if (typeof buildNav === "function") buildNav();
   if (typeof buildItinerary === "function") buildItinerary();
   if (typeof buildTransportTab === "function") buildTransportTab();
@@ -6527,7 +6526,15 @@ function startBlankTrip() {
 
 async function onboardCreateNewTrip() {
   dismissFileSetup();
-  openCreateNewTripWizard();
+  if (isFSASupported()) {
+    try {
+      await createFileOnDisk();
+    } catch(e) {
+      console.warn('File setup save skipped:', e);
+    }
+  } else {
+    exportJSON();
+  }
 }
 
 function openCreateNewTripWizard() {
