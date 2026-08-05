@@ -5987,12 +5987,12 @@ function renderTripStart() {
 
   if (tripStartStep === 0) {
     container.innerHTML = `
-      <div class="trip-start-eyebrow">TRAVEL PLANNER</div>
-      <h2 id="trip-start-title">Start with the way you like to plan.</h2>
-      <p class="trip-start-intro">Build a real trip in a minute, explore the example already loaded, load a pre-existing trip file, or learn the essentials when you need them.</p>
+      <div class="trip-start-eyebrow">TRENSCENDS</div>
+      <h2 id="trip-start-title">Welcome to Trenscends Travel Planner</h2>
+      <p class="trip-start-intro">Build a real trip in a minute, explore the example already loaded, load a pre-existing Trenscends trip, or learn the essentials when you need them.</p>
       <div class="trip-start-choices">
         <button class="trip-start-choice trip-start-choice--primary" type="button" onclick="chooseTripStart('build')"><span class="trip-start-choice-icon">✦</span><span><strong>Build my trip</strong><small>Answer a few simple questions. You can edit everything later.</small></span><b>→</b></button>
-        <button class="trip-start-choice" type="button" onclick="chooseTripStart('load_existing')"><span class="trip-start-choice-icon">📂</span><span><strong>Load pre-existing trip</strong><small>Open an existing .json trip file from your drive or device.</small></span><b>→</b></button>
+        <button class="trip-start-choice" type="button" onclick="chooseTripStart('load_existing')"><span class="trip-start-choice-icon">📂</span><span><strong>Load a pre-existing Trenscends trip</strong><small>Open an existing .json trip file from your drive or device.</small></span><b>→</b></button>
         <button class="trip-start-choice" type="button" onclick="chooseTripStart('sample')"><span class="trip-start-choice-icon">◌</span><span><strong>Explore the sample trip</strong><small>See a complete itinerary first, with no data overwritten.</small></span><b>→</b></button>
         <button class="trip-start-choice" type="button" onclick="chooseTripStart('learn')"><span class="trip-start-choice-icon">?</span><span><strong>Learn the essentials</strong><small>Open the guide and take the app at your own pace.</small></span><b>→</b></button>
       </div>
