@@ -866,8 +866,8 @@ if (typeof document !== "undefined" && typeof document.addEventListener === "fun
         if (!isActive) {
           lastSuspendedTime = Date.now();
         } else {
-          // If suspended for > 30 seconds, show the resync modal
-          if (Date.now() - lastSuspendedTime > 30000) {
+          // If suspended for > 15 minutes, show the resync modal
+          if (Date.now() - lastSuspendedTime > 900000) {
             const resyncModal = document.getElementById("resync-modal");
             if (resyncModal && resyncModal.style.display === "none") {
               resyncModal.style.display = "flex";

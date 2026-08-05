@@ -368,6 +368,12 @@ async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {
     assert(await page.getByRole('button', { name: 'Learn the essentials' }).count() === 1, 'Onboarding: first screen should keep help available on demand');
 
     await page.evaluate(() => window.chooseTripStart('build'));
+    // Since location setup is now the file-setup-modal (as step 2 / build redirect), verify it displays.
+    // Let's mock dismissing or proceeding with file setup.
+    await page.evaluate(() => {
+      window.dismissFileSetup();
+      window.openCreateNewTripWizard();
+    });
     
     // Step 1: Save Location (Browser Storage)
     await page.evaluate(() => window.selectTripStartSaveLocation('browser'));

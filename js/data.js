@@ -6084,7 +6084,19 @@ function renderTripStart() {
 }
 
 function chooseTripStart(choice) {
-  if (choice === 'build') { tripStartStep = 1; renderTripStart(); return; }
+  if (choice === 'build') {
+    // Check if we need to set up file location first
+    const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
+    if (!hasSeenSetup && !hasActiveFileHandle()) {
+      dismissTripStart();
+      const setupModal = document.getElementById("file-setup-modal");
+      if (setupModal) setupModal.style.display = "flex";
+      return;
+    }
+    tripStartStep = 1;
+    renderTripStart();
+    return;
+  }
   dismissTripStart();
   if (choice === 'learn') {
     if (typeof openGuideDialog === 'function') openGuideDialog();
@@ -6424,14 +6436,20 @@ async function createTripFromStartAnswers() {
   if (typeof buildAccomTab === 'function') buildAccomTab();
 
   // Prompt user to pick file location / save file!
-  if (isFSASupported()) {
-    try {
-      await createFileOnDisk();
-    } catch(e) {
-      console.warn('File save skipped or cancelled:', e);
-    }
+  const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
+  if (!hasSeenSetup && !hasActiveFileHandle()) {
+    const setupModal = document.getElementById("file-setup-modal");
+    if (setupModal) setupModal.style.display = "flex";
   } else {
-    exportJSON();
+    if (isFSASupported()) {
+      try {
+        await createFileOnDisk();
+      } catch(e) {
+        console.warn('File save skipped or cancelled:', e);
+      }
+    } else {
+      exportJSON();
+    }
   }
   
   showToast(`Your ${route.length}-city plan is created! Click 🤖 AI Builder anytime to enrich it.`);
@@ -6501,11 +6519,11 @@ if (typeof document !== "undefined" && typeof document.addEventListener === "fun
       return;
     }
 
-    const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
     const hasSeenTripStart = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_trip_start_seen") : null;
-    // If not seen, AND no valid file handle exists (we are using the Default Template)
-    if (!hasSeenSetup && !hasSeenTripStart && !hasActiveFileHandle()) {
+    // Launch Step 0 options dialog first
+    if (!hasSeenTripStart && !hasActiveFileHandle()) {
       setTimeout(() => {
+        tripStartStep = 0;
         const modal = document.getElementById("trip-start-modal");
         if (modal) modal.style.display = "flex";
         renderTripStart();
