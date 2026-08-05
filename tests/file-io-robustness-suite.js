@@ -198,9 +198,22 @@ async function run() {
   localStorageData.delete('travelApp_file_setup_seen');
   context.clearActiveFileHandle();
 
-  // Selecting 'build' should now redirect to show file-setup-modal
-  await context.chooseTripStart('build');
-  assert(setupModalDisplayed === true, 'chooseTripStart("build") should show the file-setup-modal if storage setup not seen yet');
+  // Set up mock elements needed for renderTripStart to run successfully
+  elements.set('trip-start-content', {
+    id: 'trip-start-content',
+    style: {},
+    classList: { add: () => {}, remove: () => {}, toggle: () => {}, contains: () => false },
+    innerHTML: ''
+  });
+  elements.set('trip-start-modal', {
+    id: 'trip-start-modal',
+    style: { display: 'none' },
+    classList: { add: () => {}, remove: () => {}, toggle: () => {}, contains: () => false }
+  });
+
+  // Selecting 'build' should now advance tripStartStep directly to 1
+  context.chooseTripStart('build');
+  assert(context.window.tripStartStep === 1, 'chooseTripStart("build") should set tripStartStep directly to 1');
 
   // Test 5: resync timeout threshold checking
   console.log('Testing resync appStateChange timeout threshold...');

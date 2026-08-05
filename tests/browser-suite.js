@@ -368,55 +368,44 @@ async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {
     assert(await page.getByRole('button', { name: 'Learn the essentials' }).count() === 1, 'Onboarding: first screen should keep help available on demand');
 
     await page.evaluate(() => window.chooseTripStart('build'));
-    // Since location setup is now the file-setup-modal (as step 2 / build redirect), verify it displays.
-    // Let's mock dismissing or proceeding with file setup.
-    await page.evaluate(() => {
-      window.dismissFileSetup();
-      window.openCreateNewTripWizard();
-      // Since openCreateNewTripWizard now initializes step 0 (Choice Wizard) for factory reset/rebuilds, jump to step 1
-      window.tripStartStep = 1;
-      window.renderTripStart();
-    });
     
-    // Step 1: Save Location (Browser Storage)
-    await page.evaluate(() => window.selectTripStartSaveLocation('browser'));
-
-    // Step 2: Trip Name
+    // Step 1: Trip Name
     await page.waitForSelector('#tripStartName');
     await page.locator('#tripStartName').fill('Japan spring escape');
     await page.locator('.trip-start-actions button.trip-start-primary').click();
     
-    // Step 3: Origin & Date
+    // Step 2: Origin & Date
     await page.locator('#tripStartOrigin').fill('Brisbane');
     await page.locator('#tripStartDate').fill('2026-04-10');
     await page.locator('.trip-start-actions button.trip-start-primary').click();
     
-    // Step 4: First Destination & Transport
+    // Step 3: First Destination & Transport
     await page.locator('#tripStartCity').fill('Tokyo');
     await page.getByRole('button', { name: 'Train' }).click();
     await page.locator('.trip-start-actions button.trip-start-primary').click();
     
-    // Step 5: Additional cities
+    // Step 4: Additional cities
     await page.locator('.trip-start-add-stop').click();
     await page.getByRole('textbox', { name: 'Additional city 1' }).fill('Kyoto');
     await page.getByRole('spinbutton', { name: 'Nights in additional city 1' }).fill('2');
     await page.locator('.trip-start-actions button.trip-start-primary').click();
 
-    // Step 6: Party & Pacing
+    // Step 5: Party & Pacing
     await page.getByRole('button', { name: '👥 Couple' }).click();
     await page.getByRole('button', { name: '☕ Relaxed' }).click();
     await page.locator('.trip-start-actions button.trip-start-primary').click();
 
-    // Step 7: Interests
+    // Step 6: Interests
     await page.getByRole('button', { name: '🍽️ Food & Dining' }).click();
     await page.getByRole('button', { name: '🏛️ History & Culture' }).click();
     await page.locator('.trip-start-actions button.trip-start-primary').click();
 
-    // Step 8: Pre-booked items & create
+    // Step 7: Pre-booked items & create
     await page.getByRole('button', { name: '+ Add pre-booked item' }).click();
     await page.getByRole('combobox', { name: 'Booked item city 1' }).selectOption('Tokyo');
     await page.getByRole('textbox', { name: 'Reference or notes 1' }).fill('Flight QF1');
     await page.locator('.trip-start-actions button.trip-start-primary').click();
+    await page.evaluate(() => window.dismissFileSetup());
     await page.waitForFunction(() => document.getElementById('trip-start-modal').style.display === 'none');
 
     const createdTrip = await page.evaluate(() => ({

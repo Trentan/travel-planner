@@ -5859,7 +5859,7 @@ async function selectTripStartSaveLocation(type) {
       console.warn('Disk storage setup skipped or cancelled:', e);
     }
   }
-  tripStartStep = 2;
+  tripStartStep = 1;
   renderTripStart();
 }
 
@@ -5982,9 +5982,9 @@ function handleTripStartStopCityTyping(index, inputEl, countrySelectId) {
 function renderTripStart() {
   const container = document.getElementById('trip-start-content');
   if (!container) return;
-  const progress = `<div class="trip-start-progress"><span>Getting started</span><span>${tripStartStep} of 8</span></div>`;
+  const progress = `<div class="trip-start-progress"><span>Getting started</span><span>${tripStartStep} of 7</span></div>`;
   const back = tripStartStep ? `<button class="trip-start-back" type="button" onclick="previousTripStartStep()">Back</button>` : '';
-  
+
   if (tripStartStep === 0) {
     container.innerHTML = `
       <div class="trip-start-eyebrow">TRAVEL PLANNER</div>
@@ -6066,8 +6066,6 @@ function renderTripStart() {
   `).join('');
 
   const steps = [
-    `<label>Where would you like to save your trip file?</label><p class="trip-start-list-help">Selecting your storage location upfront ensures your trip is automatically saved as you plan.</p><div class="trip-start-choices" style="margin-top: 1rem;"><button type="button" class="trip-start-choice ${tripStartAnswers.saveLocationType === 'disk' ? 'trip-start-choice--primary' : ''}" onclick="selectTripStartSaveLocation('disk')"><span class="trip-start-choice-icon">📁</span><span><strong>Pick Drive / Local File Location ${hasActiveFileHandle() ? '✓ (Location Set)' : ''}</strong><small>Saves directly to your Google Drive, OneDrive, or local folder.</small></span></button><button type="button" class="trip-start-choice ${tripStartAnswers.saveLocationType === 'browser' ? 'trip-start-choice--primary' : ''}" onclick="selectTripStartSaveLocation('browser')"><span class="trip-start-choice-icon">💾</span><span><strong>Browser Storage & Auto-Download</strong><small>Stores in local browser memory and downloads JSON file on finish.</small></span></button></div>`,
-    
     `<label for="tripStartName">What should we call this trip?</label><input id="tripStartName" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Japan in Spring" value="${escapeTripStartText(tripStartAnswers.name)}"><p>Keep it simple — you can rename it anytime.</p>`,
     
     `<label for="tripStartOrigin">Where does your journey begin?</label>
@@ -6096,9 +6094,8 @@ function renderTripStart() {
     `<label>Pre-booked Flights, Transport & Accommodations</label><p class="trip-start-list-help">Pair your pre-booked items to a city so they are automatically integrated into your itinerary!</p><div class="trip-start-booked-items">${bookedRows}</div><button type="button" class="trip-start-add-stop" onclick="addTripStartBookedItem()">+ Add pre-booked item</button><label for="tripStartNotes" style="margin-top: 1.25rem;">Additional Notes for AI Builder</label><textarea id="tripStartNotes" class="trip-start-input" rows="2" placeholder="e.g. interested in hidden neighborhood izakayas, prefer train over flight when possible">${escapeTripStartText(tripStartAnswers.notes)}</textarea>`
   ];
 
-  const isLast = tripStartStep === 8;
+  const isLast = tripStartStep === 7;
   const titles = [
-    'Choose your file save location.',
     'Let’s give it a name.',
     'Where does your journey begin?',
     'Choose your first destination.',
@@ -6113,14 +6110,6 @@ function renderTripStart() {
 
 function chooseTripStart(choice) {
   if (choice === 'build') {
-    // Check if we need to set up file location first
-    const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
-    if (!hasSeenSetup && !hasActiveFileHandle()) {
-      dismissTripStart();
-      const setupModal = document.getElementById("file-setup-modal");
-      if (setupModal) setupModal.style.display = "flex";
-      return;
-    }
     tripStartStep = 1;
     renderTripStart();
     return;
@@ -6172,10 +6161,10 @@ function captureTripStartAnswer() {
 
 function nextTripStartStep() {
   captureTripStartAnswer();
-  if (tripStartStep === 2 && !tripStartAnswers.name) { showToast('Give your trip a name to continue.'); return; }
-  if (tripStartStep === 3 && !tripStartAnswers.origin) { showToast('Tell us where you are leaving from to continue.'); return; }
-  if (tripStartStep === 4 && !tripStartAnswers.city) { showToast('Choose your first city to continue.'); return; }
-  if (tripStartStep < 8) { tripStartStep++; renderTripStart(); return; }
+  if (tripStartStep === 1 && !tripStartAnswers.name) { showToast('Give your trip a name to continue.'); return; }
+  if (tripStartStep === 2 && !tripStartAnswers.origin) { showToast('Tell us where you are leaving from to continue.'); return; }
+  if (tripStartStep === 3 && !tripStartAnswers.city) { showToast('Choose your first city to continue.'); return; }
+  if (tripStartStep < 7) { tripStartStep++; renderTripStart(); return; }
   createTripFromStartAnswers();
 }
 
@@ -6579,6 +6568,17 @@ window.dismissTripStart = dismissTripStart;
 window.addTripStartStop = addTripStartStop;
 window.removeTripStartStop = removeTripStartStop;
 window.updateTripStartStop = updateTripStartStop;
+window.tripStartStep = tripStartStep;
+window.tripStartAnswers = tripStartAnswers;
+
+Object.defineProperty(window, 'tripStartStep', {
+  get: () => tripStartStep,
+  set: (val) => { tripStartStep = val; }
+});
+Object.defineProperty(window, 'tripStartAnswers', {
+  get: () => tripStartAnswers,
+  set: (val) => { tripStartAnswers = val; }
+});
 
 
 
