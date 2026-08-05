@@ -10,4 +10,5 @@
 - [x] Issue #196: Manage legs dialog reset state fixed
 - [x] Issue #197: Dark mode theme contrast fixed
 - [x] Issue #198: Stay modal visual validation fixed
+- [x] Issue #204: Collapsible packing guides buttons in mobile mode
 - [x] Native Release Build: BUILD SUCCESSFUL
