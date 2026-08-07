@@ -284,7 +284,18 @@ For live multi-user editing (Google Docs style), state is represented as a Confl
 
 ## 6. Recommended Architectural Roadmap for Travel Planner
 
-We recommend a **5-Phase Progressive Architectural Implementation Strategy**:
+### 6.1 Consumer UX Standard: Zero Technical Friction & 1-Click Cloud Sync
+
+> [!IMPORTANT]
+> **Consumer Architectural Mandate**: Non-technical travel planner users must NEVER be exposed to developer console steps, raw API key configurations, or Client ID input fields.
+
+1. **Seamless 1-Click Authentication**: Cloud Sync options must present a single, frictionless **"Connect Google Drive"** button using pre-authorized OAuth scopes (`appDataFolder`).
+2. **Invisible Local Fallback**: When offline or unauthenticated, the app operates 100% locally with zero warning prompts or blocking popups (`⚡ Local Only`).
+3. **No Developer Friction**: All developer setup instructions and manual API inputs are completely removed from consumer UI modals.
+
+---
+
+### 6.2 Five-Phase Architectural Implementation Strategy
 
 ```
                        FIVE-PHASE IMPLEMENTATION ROADMAP
