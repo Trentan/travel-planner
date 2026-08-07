@@ -1,6 +1,6 @@
 /* ==========================================================================
    MODULE: Cloud Storage & Google Drive AppData Adapter (js/cloud-storage.js)
-   Responsibilities: Sign in with Google (GIS OAuth2), User Profile State,
+   Responsibilities: Real OAuth2 authentication with Google Drive GIS API,
                      background auto-sync to appDataFolder, remote trip listing,
                      conflict detection, and offline status pill management.
    ========================================================================== */
@@ -14,7 +14,6 @@
   let accessToken = localStorage.getItem('travelApp_gdrive_token') || null;
   let tokenExpiry = parseInt(localStorage.getItem('travelApp_gdrive_token_expiry') || '0', 10);
   let userProfile = null;
-  let isSyncing = false;
   let syncDebounceTimer = null;
 
   try {
@@ -53,16 +52,25 @@
   }
   window.setGoogleClientId = setGoogleClientId;
 
-  // Check if Google Drive is connected & authorized
+  window.saveCustomGoogleClientId = function(id) {
+    setGoogleClientId(id);
+    const statusText = document.getElementById('gdriveModalStatusText');
+    if (statusText) {
+      statusText.innerHTML = id ? '✅ Custom Google Client ID saved. Click "Sign in with Google" to authorize.' : 'Reset to default Client ID.';
+    }
+  };
+
+  // Check if Google Drive is connected & authorized with real token
   function isGoogleDriveConnected() {
-    return !!accessToken && (Date.now() < tokenExpiry || accessToken.startsWith('token_'));
+    if (window.__mockGoogleDriveAPI && accessToken === 'token_mock_gdrive_123') return true;
+    return !!accessToken && Date.now() < tokenExpiry && !accessToken.startsWith('token_');
   }
   window.isGoogleDriveConnected = isGoogleDriveConnected;
 
   // Authenticate with Google Drive via Google Identity Services Token Client
   window.authenticateGoogleDrive = function(interactive = true) {
     return new Promise((resolve, reject) => {
-      // Direct mock mode
+      // Test suite mock mode
       if (window.__mockGoogleDriveAPI) {
         accessToken = 'token_mock_gdrive_123';
         tokenExpiry = Date.now() + 86400000;
@@ -81,83 +89,79 @@
 
       const clientId = getGoogleClientId();
 
-      // Check if Google GIS SDK is loaded
-      if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
-        try {
-          const client = google.accounts.oauth2.initTokenClient({
-            client_id: clientId,
-            scope: DRIVE_SCOPES,
-            callback: async (response) => {
-              if (response && response.access_token) {
-                accessToken = response.access_token;
-                const expiresIn = parseInt(response.expires_in || '3600', 10);
-                tokenExpiry = Date.now() + (expiresIn * 1000) - 60000;
-
-                localStorage.setItem('travelApp_gdrive_token', accessToken);
-                localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
-
-                // Fetch User Profile
-                try {
-                  const userResp = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                  });
-                  if (userResp.ok) {
-                    const user = await userResp.json();
-                    setUserProfile({
-                      name: user.name || user.email || 'Google Traveler',
-                      email: user.email || '',
-                      picture: user.picture || ''
-                    });
-                  }
-                } catch (e) {
-                  setUserProfile({ name: 'Google Traveler', email: 'account@google.com', picture: '' });
-                }
-
-                updateCloudSyncStatusPill();
-                updateCloudSyncModalState();
-                window.syncAllTripsFromGoogleDrive();
-                resolve(true);
-                return;
-              }
-
-              // Fallback to seamless sign-in if GIS popup fails locally
-              completeFallbackSignIn();
-              resolve(true);
-            },
-            error_callback: (err) => {
-              console.warn('Google OAuth popup error or origin unconfigured:', err);
-              completeFallbackSignIn();
-              resolve(true);
-            }
-          });
-
-          client.requestAccessToken({ prompt: interactive ? 'consent' : '' });
-          return;
-        } catch (err) {
-          console.warn('OAuth initialization warning:', err);
-        }
+      if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+        console.warn('Google Identity Services SDK not loaded yet');
+        if (interactive) alert('Google Sign-In service is loading. Please check your internet connection and try again.');
+        resolve(false);
+        return;
       }
 
-      // Seamless completion fallback for local environment
-      completeFallbackSignIn();
-      resolve(true);
+      try {
+        const client = google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: DRIVE_SCOPES,
+          callback: async (response) => {
+            if (response && response.access_token) {
+              accessToken = response.access_token;
+              const expiresIn = parseInt(response.expires_in || '3600', 10);
+              tokenExpiry = Date.now() + (expiresIn * 1000) - 60000;
+
+              localStorage.setItem('travelApp_gdrive_token', accessToken);
+              localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
+
+              // Fetch User Profile from real Google UserInfo API
+              try {
+                const userResp = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                  headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                if (userResp.ok) {
+                  const user = await userResp.json();
+                  setUserProfile({
+                    name: user.name || user.email || 'Google Traveler',
+                    email: user.email || '',
+                    picture: user.picture || ''
+                  });
+                }
+              } catch (e) {
+                setUserProfile({ name: 'Google Traveler', email: 'account@google.com', picture: '' });
+              }
+
+              updateCloudSyncStatusPill();
+              updateCloudSyncModalState();
+              await window.syncAllTripsFromGoogleDrive();
+              resolve(true);
+              return;
+            }
+
+            if (response && response.error) {
+              console.error('Google OAuth Error:', response);
+              window.disconnectGoogleDrive();
+              const statusText = document.getElementById('gdriveModalStatusText');
+              if (statusText) {
+                statusText.innerHTML = `<span class="text-red-500 font-semibold">⚠️ Google OAuth Error (${response.error}).</span> Please ensure your origin (<code>${window.location.origin}</code>) is registered in your Google Cloud Console.`;
+              }
+              resolve(false);
+            }
+          },
+          error_callback: (err) => {
+            console.error('Google OAuth Popup Error:', err);
+            window.disconnectGoogleDrive();
+            const statusText = document.getElementById('gdriveModalStatusText');
+            if (statusText) {
+              statusText.innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-semibold">⚠️ OAuth Popup Origin Mismatch.</span> To connect real Google Drive from <code>${window.location.origin}</code>, enter your registered Google OAuth Client ID below.`;
+            }
+            resolve(false);
+          }
+        });
+
+        client.requestAccessToken({ prompt: interactive ? 'consent' : '' });
+      } catch (err) {
+        console.error('Failed to launch Google OAuth Token Client:', err);
+        window.disconnectGoogleDrive();
+        resolve(false);
+      }
     });
   };
-
-  function completeFallbackSignIn() {
-    accessToken = 'token_gdrive_user_active';
-    tokenExpiry = Date.now() + 86400000;
-    setUserProfile({
-      name: 'Google Traveler',
-      email: 'traveler@gmail.com',
-      picture: ''
-    });
-    localStorage.setItem('travelApp_gdrive_token', accessToken);
-    localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
-    updateCloudSyncStatusPill();
-    updateCloudSyncModalState();
-    if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
-  }
 
   // Disconnect Google Drive & Sign Out
   window.disconnectGoogleDrive = function() {
@@ -185,12 +189,12 @@
     localStorage.setItem('travelApp_gdrive_file_map', JSON.stringify(map));
   }
 
-  // Upload or Update a Trip JSON file in Google Drive appDataFolder
+  // Real Upload or Update a Trip JSON file in Google Drive appDataFolder via Google REST API
   window.uploadTripToGoogleDrive = async function(tripRecord) {
     if (!isGoogleDriveConnected() || !tripRecord || !tripRecord.id) return false;
 
-    if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
-      console.log(`[GoogleDrive Sync] Uploaded trip "${tripRecord.title}" (${tripRecord.id}) to appDataFolder`);
+    if (window.__mockGoogleDriveAPI) {
+      console.log(`[Mock GoogleDrive API] Uploaded trip "${tripRecord.title}" (${tripRecord.id}) to appDataFolder`);
       const map = getGDriveFileMap();
       map[tripRecord.id] = 'gdrive_file_' + tripRecord.id;
       setGDriveFileMap(map);
@@ -214,7 +218,7 @@
 
       let response;
       if (existingFileId) {
-        // PATCH existing file content
+        // PATCH existing file content via Real Google REST API
         response = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingFileId}?uploadType=media`, {
           method: 'PATCH',
           headers: {
@@ -224,7 +228,7 @@
           body: payloadStr
         });
       } else {
-        // Multipart POST new file
+        // Multipart POST new file via Real Google REST API
         const form = new FormData();
         form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
         form.append('file', new Blob([payloadStr], { type: 'application/json' }));
@@ -261,12 +265,12 @@
     }
   };
 
-  // Sync All Trips from Google Drive appDataFolder into local IndexedDB
+  // Real Sync All Trips from Google Drive appDataFolder into local IndexedDB via Google REST API
   window.syncAllTripsFromGoogleDrive = async function() {
     if (!isGoogleDriveConnected()) return;
 
-    if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
-      console.log('[GoogleDrive Sync] Synced all trips from appDataFolder');
+    if (window.__mockGoogleDriveAPI) {
+      console.log('[Mock GoogleDrive API] Synced all trips from appDataFolder');
       updateCloudSyncStatusPill('☁️ Synced to Drive');
       return;
     }
@@ -383,6 +387,11 @@
     const profileCard = document.getElementById('gdriveProfileCard');
     const connectBtn = document.getElementById('gdriveConnectBtn');
     const disconnectBtn = document.getElementById('gdriveDisconnectBtn');
+    const input = document.getElementById('gdriveClientIdInput');
+
+    if (input) {
+      input.value = localStorage.getItem('travelApp_gdrive_client_id') || '';
+    }
 
     if (profileCard) {
       if (isConnected && profile) {
@@ -402,9 +411,9 @@
       }
     }
 
-    if (statusText) {
+    if (statusText && !statusText.innerHTML.includes('⚠️')) {
       statusText.innerHTML = isConnected
-        ? 'Your account is connected. All your travel itineraries are automatically backed up to your private Google Drive AppData folder.'
+        ? 'Your account is connected to Google Drive. All your itineraries are automatically backed up to your private Google Drive AppData folder.'
         : 'Sign in with your Google account to automatically back up and sync all your itineraries across your phone, tablet, and laptop.';
     }
 

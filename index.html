@@ -1063,6 +1063,14 @@
         <p>⚡ <strong>Offline First</strong>: Edits save to your device instantly and sync automatically whenever you're connected.</p>
       </div>
 
+      <details class="text-xs text-slate-500 pt-1">
+        <summary class="cursor-pointer font-medium hover:text-slate-700 dark:hover:text-slate-300">⚙️ Advanced: Custom Google OAuth Client ID</summary>
+        <div class="pt-2 space-y-1">
+          <input type="text" id="gdriveClientIdInput" class="w-full px-3 py-1.5 text-xs border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white" placeholder="123456789-xyz.apps.googleusercontent.com" onchange="saveCustomGoogleClientId(this.value)">
+          <p class="text-[11px] text-slate-400">Set your registered Google Cloud OAuth Client ID for <code>http://localhost:3000</code> or your deployment domain.</p>
+        </div>
+      </details>
+
       <div class="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
         <button class="action-btn" onclick="closeCloudSyncModal()">Close</button>
         <button id="gdriveDisconnectBtn" class="action-btn action-btn-danger" style="display: none;" onclick="disconnectGoogleDrive(); closeCloudSyncModal();">Sign Out & Disconnect</button>
