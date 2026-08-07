@@ -3428,6 +3428,9 @@ async function runSaveData(showTick = true) {
       if (typeof window.renderHeaderTripSwitcher === 'function') {
         window.renderHeaderTripSwitcher();
       }
+      if (typeof window.autoSyncActiveTripToCloud === 'function') {
+        window.autoSyncActiveTripToCloud();
+      }
     } catch (e) {
       console.error('Failed to save to IndexedDB, falling back to localStorage:', e);
       fallbackToLocalStorage();

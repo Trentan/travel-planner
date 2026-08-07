@@ -1029,10 +1029,38 @@
     <div class="modal-body py-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
         <p class="text-sm text-slate-600 dark:text-slate-300">Select a trip to load, create a new itinerary, or duplicate existing plans.</p>
-        <button class="action-btn action-btn-secondary whitespace-nowrap" onclick="createNewTripFromLibrary()">✦ Create New Trip</button>
+        <div class="flex items-center gap-2">
+          <span class="cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300" id="cloudSyncStatusPill">⚡ Local Only</span>
+          <button class="action-btn action-btn-secondary text-xs whitespace-nowrap" onclick="openCloudSyncModal()">☁️ Cloud Sync</button>
+          <button class="action-btn action-btn-secondary text-xs whitespace-nowrap" onclick="createNewTripFromLibrary()">✦ New Trip</button>
+        </div>
       </div>
       <div class="trip-gallery-grid grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto p-1" id="tripGalleryGrid">
         <!-- Rendered dynamically by js/trip-library.js -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Google Drive Cloud Sync Modal -->
+<div id="cloudSyncModal" class="modal-overlay" hidden>
+  <div class="modal-card cloud-sync-modal-card max-w-lg w-[90vw] bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-2xl">
+    <div class="modal-header flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-700">
+      <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">☁️ Google Drive Cloud Sync</h2>
+      <button class="modal-close-btn text-2xl font-bold text-slate-400 hover:text-slate-600 dark:hover:text-white" onclick="closeCloudSyncModal()">×</button>
+    </div>
+    <div class="modal-body py-4 space-y-4">
+      <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" id="gdriveModalStatusText">
+        Connect your Google account to automatically backup all your travel itineraries to your private Google Drive AppData folder.
+      </p>
+      <div class="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl text-xs text-slate-600 dark:text-slate-300 space-y-2 border border-slate-200/60 dark:border-slate-700/60">
+        <p>🔒 <strong>Private App Data Scope</strong>: Travel Planner stores trips in an isolated app folder (<code>appDataFolder</code>). No raw files clutter your Drive.</p>
+        <p>⚡ <strong>Offline First</strong>: Edits save locally immediately and auto-sync when online.</p>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button class="action-btn" onclick="closeCloudSyncModal()">Close</button>
+        <button id="gdriveDisconnectBtn" class="action-btn action-btn-danger" style="display: none;" onclick="disconnectGoogleDrive(); closeCloudSyncModal();">Disconnect Drive</button>
+        <button id="gdriveConnectBtn" class="action-btn action-btn-secondary" onclick="authenticateGoogleDrive(true);">Connect Google Drive</button>
       </div>
     </div>
   </div>
@@ -1047,6 +1075,8 @@
   <script src="./js/attachments.js"></script>
 <script src="./js/data.js"></script>
 <script src="./js/trip-library.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="./js/cloud-storage.js"></script>
 <script src="./js/packing.js"></script>
 <script src="./js/dragdrop.js"></script>
 <script src="./js/crud.js"></script>
