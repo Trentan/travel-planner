@@ -42,6 +42,7 @@
         <div class="app-menu-divider"></div>
         <button class="trip-dropdown-item" onclick="openTripLibraryModal()">🖼️ View All Trips</button>
         <button class="trip-dropdown-item" onclick="closeTripDropdown(); openCreateNewTripWizard();">✦ Create New Trip</button>
+        <button class="trip-dropdown-item" onclick="closeTripDropdown(); openCloudSyncModal();">☁️ Cloud Sync (Google Drive)</button>
       </div>
     </div>
     <span class="save-status" id="saveStatus"></span>
@@ -75,6 +76,7 @@
         <div class="app-menu-divider" aria-hidden="true"></div>
         <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripLibraryModal()">🖼️ My Trips Gallery</button>
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCloudSyncModal()">☁️ Cloud Sync (Google Drive)</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCreateNewTripWizard()">✦ Create New Trip</button>
         <button id="saveAsBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripFile()">Save As</button>
         <button id="openFileBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openExistingTripFile()">Open File</button>
