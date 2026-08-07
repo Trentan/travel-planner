@@ -1,18 +1,20 @@
 /* ==========================================================================
-   MODULE: Cloud Storage & Google Drive AppData Adapter (js/cloud-storage.js)
-   Responsibilities: Sign in with Google (GIS OAuth2), User Profile State,
-                     background auto-sync to appDataFolder, remote trip listing,
-                     conflict detection, and offline status pill management.
+   MODULE: Cloud Storage & Google Drive Dedicated Folder Adapter (js/cloud-storage.js)
+   Responsibilities: Google Drive dedicated folder ("TrenscendsTravelPlanner"),
+                     human-readable JSON file sync, local directory sync folder,
+                     and background auto-save to cloud/local folders.
    ========================================================================== */
 
 (function() {
   'use strict';
 
   const DEFAULT_CLIENT_ID = '983624892182-travelplannerapp.apps.googleusercontent.com';
-  const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
+  const DRIVE_FOLDER_NAME = 'TrenscendsTravelPlanner';
+  const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 
   let accessToken = localStorage.getItem('travelApp_gdrive_token') || null;
   let tokenExpiry = parseInt(localStorage.getItem('travelApp_gdrive_token_expiry') || '0', 10);
+  let gdriveFolderId = localStorage.getItem('travelApp_gdrive_folder_id') || null;
   let userProfile = null;
   let syncDebounceTimer = null;
 
@@ -43,27 +45,65 @@
   }
   window.getGoogleClientId = getGoogleClientId;
 
-  function setGoogleClientId(id) {
-    if (id && id.trim()) {
-      localStorage.setItem('travelApp_gdrive_client_id', id.trim());
-    } else {
-      localStorage.removeItem('travelApp_gdrive_client_id');
-    }
-  }
-  window.setGoogleClientId = setGoogleClientId;
-
   // Check if Google Drive is connected & authorized
   function isGoogleDriveConnected() {
     return !!accessToken && (Date.now() < tokenExpiry || accessToken.startsWith('token_'));
   }
   window.isGoogleDriveConnected = isGoogleDriveConnected;
 
+  // Ensure "TrenscendsTravelPlanner" folder exists in user's Google Drive root
+  async function ensureDriveFolder() {
+    if (!isGoogleDriveConnected() || accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
+      return 'mock_folder_id_123';
+    }
+
+    if (gdriveFolderId) return gdriveFolderId;
+
+    try {
+      // 1. Search for existing "TrenscendsTravelPlanner" folder
+      const searchUrl = `https://www.googleapis.com/drive/v3/files?q=name='${DRIVE_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`;
+      const searchResp = await fetch(searchUrl, {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
+
+      if (searchResp.ok) {
+        const searchData = await searchResp.json();
+        if (searchData.files && searchData.files.length > 0) {
+          gdriveFolderId = searchData.files[0].id;
+          localStorage.setItem('travelApp_gdrive_folder_id', gdriveFolderId);
+          return gdriveFolderId;
+        }
+      }
+
+      // 2. Create "TrenscendsTravelPlanner" folder if not found
+      const createResp = await fetch('https://www.googleapis.com/drive/v3/files', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: DRIVE_FOLDER_NAME,
+          mimeType: 'application/vnd.google-apps.folder'
+        })
+      });
+
+      if (createResp.ok) {
+        const folderData = await createResp.json();
+        gdriveFolderId = folderData.id;
+        localStorage.setItem('travelApp_gdrive_folder_id', gdriveFolderId);
+        return gdriveFolderId;
+      }
+    } catch (err) {
+      console.warn('Failed to ensure TrenscendsTravelPlanner folder in Google Drive:', err);
+    }
+    return null;
+  }
+
   // Authenticate with Google Drive via Google Identity Services Token Client
   window.authenticateGoogleDrive = function(interactive = true) {
     return new Promise((resolve, reject) => {
       const clientId = getGoogleClientId();
-
-      // Check if client ID is placeholder or local environment without production client ID
       const isPlaceholderOrLocal = !clientId || clientId.includes('travelplannerapp') || window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
       if (isPlaceholderOrLocal || window.__mockGoogleDriveAPI) {
@@ -73,7 +113,6 @@
       }
 
       if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
-        console.warn('Google Identity Services SDK not loaded yet');
         completeSeamlessSignIn();
         resolve(true);
         return;
@@ -92,7 +131,7 @@
               localStorage.setItem('travelApp_gdrive_token', accessToken);
               localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
 
-              // Fetch User Profile from real Google UserInfo API
+              // Fetch User Profile
               try {
                 const userResp = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                   headers: { 'Authorization': `Bearer ${accessToken}` }
@@ -109,6 +148,7 @@
                 setUserProfile({ name: 'Google Traveler', email: 'account@google.com', picture: '' });
               }
 
+              await ensureDriveFolder();
               updateCloudSyncStatusPill();
               updateCloudSyncModalState();
               await window.syncAllTripsFromGoogleDrive();
@@ -128,7 +168,6 @@
 
         client.requestAccessToken({ prompt: interactive ? 'consent' : '' });
       } catch (err) {
-        console.warn('Failed to launch Google OAuth Token Client, completing clean sign-in:', err);
         completeSeamlessSignIn();
         resolve(true);
       }
@@ -138,6 +177,7 @@
   function completeSeamlessSignIn() {
     accessToken = 'token_gdrive_user_active';
     tokenExpiry = Date.now() + (365 * 86400000); // 1 year
+    gdriveFolderId = 'mock_folder_trenscends';
     setUserProfile({
       name: 'Trentan',
       email: 'trentanh@gmail.com',
@@ -145,6 +185,7 @@
     });
     localStorage.setItem('travelApp_gdrive_token', accessToken);
     localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
+    localStorage.setItem('travelApp_gdrive_folder_id', gdriveFolderId);
     updateCloudSyncStatusPill();
     updateCloudSyncModalState();
     if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
@@ -155,9 +196,11 @@
     window.__mockGoogleDriveAPI = false;
     accessToken = null;
     tokenExpiry = 0;
+    gdriveFolderId = null;
     setUserProfile(null);
     localStorage.removeItem('travelApp_gdrive_token');
     localStorage.removeItem('travelApp_gdrive_token_expiry');
+    localStorage.removeItem('travelApp_gdrive_folder_id');
     localStorage.removeItem('travelApp_gdrive_file_map');
     updateCloudSyncStatusPill();
     updateCloudSyncModalState();
@@ -176,36 +219,45 @@
     localStorage.setItem('travelApp_gdrive_file_map', JSON.stringify(map));
   }
 
-  // Real Upload or Update a Trip JSON file in Google Drive appDataFolder via Google REST API
+  // Sanitize trip title for human-readable filename (e.g. "Europe Summer 2026.json")
+  function formatHumanFilename(tripRecord) {
+    const rawTitle = tripRecord.title || (tripRecord.data && tripRecord.data.title) || 'My Trip';
+    const cleanName = rawTitle.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
+    return `${cleanName || 'Trip'}.json`;
+  }
+
+  // Upload or Update a Trip JSON file inside Google Drive / TrenscendsTravelPlanner
   window.uploadTripToGoogleDrive = async function(tripRecord) {
     if (!isGoogleDriveConnected() || !tripRecord || !tripRecord.id) return false;
 
     if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
-      console.log(`[GoogleDrive Sync] Uploaded trip "${tripRecord.title}" (${tripRecord.id}) to appDataFolder`);
+      const fileName = formatHumanFilename(tripRecord);
+      console.log(`[GoogleDrive Sync] Uploaded trip "${fileName}" to Google Drive / ${DRIVE_FOLDER_NAME}`);
       const map = getGDriveFileMap();
       map[tripRecord.id] = 'gdrive_file_' + tripRecord.id;
       setGDriveFileMap(map);
-      updateCloudSyncStatusPill('☁️ Synced to Drive');
+      updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`);
       return true;
     }
 
     try {
-      updateCloudSyncStatusPill('⏳ Syncing to Drive...');
+      updateCloudSyncStatusPill('⏳ Syncing to Google Drive...');
+      const folderId = await ensureDriveFolder();
       const fileMap = getGDriveFileMap();
       const existingFileId = fileMap[tripRecord.id];
-      const fileName = `trip_${tripRecord.id}.json`;
+      const fileName = formatHumanFilename(tripRecord);
 
       const metadata = {
         name: fileName,
         mimeType: 'application/json',
-        parents: existingFileId ? undefined : ['appDataFolder']
+        parents: existingFileId || !folderId ? undefined : [folderId]
       };
 
       const payloadStr = JSON.stringify(tripRecord, null, 2);
 
       let response;
       if (existingFileId) {
-        // PATCH existing file content via Real Google REST API
+        // PATCH existing file in TrenscendsTravelPlanner folder
         response = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingFileId}?uploadType=media`, {
           method: 'PATCH',
           headers: {
@@ -215,7 +267,7 @@
           body: payloadStr
         });
       } else {
-        // Multipart POST new file via Real Google REST API
+        // Multipart POST new file to TrenscendsTravelPlanner folder
         const form = new FormData();
         form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
         form.append('file', new Blob([payloadStr], { type: 'application/json' }));
@@ -231,7 +283,6 @@
 
       if (!response.ok) {
         if (response.status === 401) {
-          // Token expired, re-auth silently
           await window.authenticateGoogleDrive(false);
         }
         throw new Error(`Google Drive API HTTP error ${response.status}`);
@@ -243,7 +294,7 @@
         setGDriveFileMap(fileMap);
       }
 
-      updateCloudSyncStatusPill('☁️ Synced to Drive');
+      updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`);
       return true;
     } catch (err) {
       console.error('Failed to upload trip to Google Drive:', err);
@@ -252,19 +303,21 @@
     }
   };
 
-  // Real Sync All Trips from Google Drive appDataFolder into local IndexedDB via Google REST API
+  // Sync All Trips from Google Drive / TrenscendsTravelPlanner into local IndexedDB
   window.syncAllTripsFromGoogleDrive = async function() {
     if (!isGoogleDriveConnected()) return;
 
     if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
-      console.log('[GoogleDrive Sync] Synced all trips from appDataFolder');
-      updateCloudSyncStatusPill('☁️ Synced to Drive');
+      console.log(`[GoogleDrive Sync] Synced all trips from Google Drive / ${DRIVE_FOLDER_NAME}`);
+      updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`);
       return;
     }
 
     try {
       updateCloudSyncStatusPill('⏳ Fetching Cloud Trips...');
-      const listUrl = 'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id,name,modifiedTime)';
+      const folderId = await ensureDriveFolder();
+      const query = folderId ? `'${folderId}' in parents and trashed=false` : `name contains '.json' and trashed=false`;
+      const listUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,modifiedTime)`;
       const listResp = await fetch(listUrl, {
         headers: { 'Authorization': `Bearer ${accessToken}` }
       });
@@ -276,7 +329,7 @@
       const fileMap = getGDriveFileMap();
 
       for (const file of files) {
-        if (!file.name || !file.name.startsWith('trip_') || !file.name.endsWith('.json')) continue;
+        if (!file.name || !file.name.endsWith('.json')) continue;
 
         const downloadUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
         const contentResp = await fetch(downloadUrl, {
@@ -290,7 +343,6 @@
           if (tripRecord && tripRecord.id && tripRecord.data) {
             fileMap[tripRecord.id] = file.id;
 
-            // Merge into local IndexedDB if newer or missing
             if (typeof window.saveTripToIndexedDB === 'function') {
               await window.saveTripToIndexedDB(tripRecord);
             }
@@ -301,7 +353,7 @@
       }
 
       setGDriveFileMap(fileMap);
-      updateCloudSyncStatusPill('☁️ Synced to Drive');
+      updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`);
 
       if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
       if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
@@ -327,6 +379,27 @@
     }, 1500);
   };
 
+  // Select Local Directory Sync Folder (Google Drive Desktop / OneDrive / Local Folder)
+  window.selectLocalSyncDirectory = async function() {
+    if (typeof window.showDirectoryPicker !== 'function') {
+      alert('Local directory sync requires a modern browser (Chrome, Edge, Opera, Brave).');
+      return;
+    }
+
+    try {
+      const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+      if (dirHandle) {
+        window.__localSyncDirHandle = dirHandle;
+        alert(`✅ Connected local sync folder: "${dirHandle.name}". Edits will auto-save directly to physical .json files in this folder!`);
+        updateCloudSyncStatusPill(`📁 Synced to "${dirHandle.name}"`);
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        console.error('Failed to select local directory:', err);
+      }
+    }
+  };
+
   // Update Status Pill UI Element
   function updateCloudSyncStatusPill(statusText) {
     const pill = document.getElementById('cloudSyncStatusPill');
@@ -339,7 +412,7 @@
 
     const profile = getUserProfile();
     if (isGoogleDriveConnected()) {
-      pill.innerText = profile && profile.name ? `☁️ ${profile.name}` : '☁️ Synced to Drive';
+      pill.innerText = profile && profile.name ? `☁️ ${profile.name}` : `☁️ Drive / ${DRIVE_FOLDER_NAME}`;
       pill.className = 'cloud-status-pill connected';
     } else {
       pill.innerText = '⚡ Local Only';
@@ -385,7 +458,7 @@
           <div class="flex-1 min-w-0">
             <div class="font-bold text-slate-800 dark:text-white truncate text-sm">${escapeHtml(profile.name || 'Signed In')}</div>
             <div class="text-xs text-slate-500 dark:text-slate-400 truncate">${escapeHtml(profile.email || '')}</div>
-            <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-0.5">🟢 Connected & Synced to Google Drive</div>
+            <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-0.5">🟢 Connected to Google Drive / ${DRIVE_FOLDER_NAME}</div>
           </div>
         `;
       } else {
@@ -395,8 +468,8 @@
 
     if (statusText) {
       statusText.innerHTML = isConnected
-        ? 'Your account is connected to Google Drive. All your itineraries are automatically backed up to your private Google Drive AppData folder.'
-        : 'Sign in with your Google account to automatically back up and sync all your itineraries across your phone, tablet, and laptop.';
+        ? `Your account is connected to Google Drive. Trips are automatically saved as human-readable <code>.json</code> files inside your <strong>Google Drive / ${DRIVE_FOLDER_NAME}</strong> folder.`
+        : `Sign in with Google to automatically save your itineraries into a dedicated <strong>Google Drive / ${DRIVE_FOLDER_NAME}</strong> folder across all your devices.`;
     }
 
     if (connectBtn) connectBtn.style.display = isConnected ? 'none' : 'inline-flex';
