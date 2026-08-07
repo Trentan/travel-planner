@@ -131,6 +131,26 @@ async function runMultiTripLibrarySuite() {
     }
     console.log(`Successfully registered imported trip in gallery: "${importedTrip.title}"`);
 
+    console.log('9. Testing loading an existing trip without meta (root array payload)...');
+    await page.evaluate(async () => {
+      const rootArrayImport = [
+        { label: 'Paris', days: [{ date: '2026-12-01', from: 'Paris', to: 'Paris' }] }
+      ];
+      const rootTripId = 'trip_' + Date.now() + '_root';
+      window.setActiveTripId(rootTripId);
+      await window.loadImportedPayload(rootArrayImport, 'winter_paris_trip.json');
+      await window.saveActiveTripToStore();
+    });
+
+    const titleAfterRootImport = await page.evaluate(() => {
+      const el = document.getElementById('mainTitle');
+      return el ? el.innerText : '';
+    });
+    console.log(`Loaded Root Array Trip Title: "${titleAfterRootImport}"`);
+    if (!titleAfterRootImport || !titleAfterRootImport.toLowerCase().includes('paris')) {
+      throw new Error(`Expected fallback title "Winter paris trip", got "${titleAfterRootImport}"`);
+    }
+
     console.log('✅ ALL MULTI-TRIP LIBRARY INTEGRATION TESTS PASSED CLEANLY!');
   } catch (err) {
     console.error('❌ MULTI-TRIP LIBRARY SUITE FAILED:', err);

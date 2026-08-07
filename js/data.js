@@ -3382,8 +3382,8 @@ function displayTimestampStatus() {
 async function runSaveData(showTick = true) {
     const t = document.getElementById('mainTitle');
     const s = document.getElementById('mainSubtitle');
-    if (t && t.innerText.trim()) titleData.title = t.innerText;
-    if (s && s.innerText.trim()) titleData.subtitle = s.innerText;
+    if (t && t.innerText.trim()) titleData.title = t.innerText.trim();
+    if (s && s.innerText.trim()) titleData.subtitle = s.innerText.trim();
 
     normalizeTripLegsData(appData);
     normalizeTripJourneysData(journeys);
@@ -5658,8 +5658,12 @@ async function loadImportedPayload(importedData, fileName) {
   resetAppStateToDefaults();
 
   if (!importedData.itinerary) {
-    console.warn('Missing itinerary data in import, using default');
-    importedData.itinerary = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.itinerary));
+    if (Array.isArray(importedData)) {
+      importedData = { itinerary: importedData };
+    } else {
+      console.warn('Missing itinerary data in import, using default');
+      importedData.itinerary = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.itinerary));
+    }
   } else if (!Array.isArray(importedData.itinerary)) {
     throw new Error('Invalid itinerary format. Expected an array of trip legs.');
   }
@@ -5721,6 +5725,10 @@ async function loadImportedPayload(importedData, fileName) {
   if (importedData.meta) {
     if (importedData.meta.title) titleData.title = importedData.meta.title;
     if (importedData.meta.subtitle) titleData.subtitle = importedData.meta.subtitle;
+  } else if (fileName && fileName !== 'Default Template') {
+    const cleanName = fileName.replace(/\.json$/i, '').replace(/[_-]/g, ' ');
+    titleData.title = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+    titleData.subtitle = 'Imported trip file';
   }
   const titleEl = document.getElementById('mainTitle');
   const subtitleEl = document.getElementById('mainSubtitle');
