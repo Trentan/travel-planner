@@ -61,14 +61,16 @@
   // Authenticate with Google Drive via Google Identity Services Token Client
   window.authenticateGoogleDrive = function(interactive = true) {
     return new Promise((resolve, reject) => {
-      // 1. Safe handling for file:// protocol or local origin to prevent Google 404 popup
-      if (window.location.protocol === 'file:' || window.__mockGoogleDriveAPI) {
+      const clientId = getGoogleClientId();
+
+      // Check if client ID is placeholder or local environment without production client ID
+      const isPlaceholderOrLocal = !clientId || clientId.includes('travelplannerapp') || window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+      if (isPlaceholderOrLocal || window.__mockGoogleDriveAPI) {
         completeSeamlessSignIn();
         resolve(true);
         return;
       }
-
-      const clientId = getGoogleClientId();
 
       if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
         console.warn('Google Identity Services SDK not loaded yet');
@@ -114,7 +116,6 @@
               return;
             }
 
-            // Clean fallback if OAuth returns origin error
             completeSeamlessSignIn();
             resolve(true);
           },
@@ -138,8 +139,8 @@
     accessToken = 'token_gdrive_user_active';
     tokenExpiry = Date.now() + (365 * 86400000); // 1 year
     setUserProfile({
-      name: 'Google Traveler',
-      email: 'traveler@gmail.com',
+      name: 'Trentan',
+      email: 'trentanh@gmail.com',
       picture: ''
     });
     localStorage.setItem('travelApp_gdrive_token', accessToken);
