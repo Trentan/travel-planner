@@ -6,8 +6,31 @@
 // IndexedDB Storage Implementation
 let db = null;
 const DB_NAME = 'travelApp_v2026';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'appData';
+const TRIPS_STORE_NAME = 'trips';
+let activeTripId = localStorage.getItem('travelApp_active_trip_id') || 'trip_default';
+
+function getActiveTripId() {
+  return activeTripId || localStorage.getItem('travelApp_active_trip_id') || 'trip_default';
+}
+window.getActiveTripId = getActiveTripId;
+
+function setActiveTripId(tripId) {
+  activeTripId = tripId;
+  localStorage.setItem('travelApp_active_trip_id', tripId);
+}
+window.setActiveTripId = setActiveTripId;
+
+function getCountryFlagEmoji(countryCode) {
+  if (!countryCode || typeof countryCode !== 'string' || countryCode.length !== 2) return '';
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+}
+window.getCountryFlagEmoji = getCountryFlagEmoji;
 
 // Open IndexedDB
 function openDB() {
@@ -32,15 +55,179 @@ function openDB() {
 
     request.onupgradeneeded = (event) => {
       db = event.target.result;
-      console.log('Creating IndexedDB object store...');
+      console.log('Creating IndexedDB object stores...');
 
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         const store = db.createObjectStore(STORE_NAME, { keyPath: 'key' });
         store.createIndex('key', 'key', { unique: true });
       }
+      if (!db.objectStoreNames.contains(TRIPS_STORE_NAME)) {
+        const tripsStore = db.createObjectStore(TRIPS_STORE_NAME, { keyPath: 'id' });
+        tripsStore.createIndex('updatedAt', 'updatedAt', { unique: false });
+      }
     };
   });
 }
+
+// Multi-Trip IndexedDB Helpers
+function getAllTripsFromIndexedDB() {
+  return openDB().then(db => {
+    return new Promise((resolve, reject) => {
+      if (!db.objectStoreNames.contains(TRIPS_STORE_NAME)) {
+        resolve([]);
+        return;
+      }
+      const transaction = db.transaction([TRIPS_STORE_NAME], 'readonly');
+      const store = transaction.objectStore(TRIPS_STORE_NAME);
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const trips = (request.result || []).sort((a, b) => {
+          return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+        });
+        resolve(trips);
+      };
+
+      request.onerror = () => {
+        console.error('Failed to load trips from IndexedDB:', request.error);
+        resolve([]);
+      };
+    });
+  });
+}
+window.getAllTripsFromIndexedDB = getAllTripsFromIndexedDB;
+
+function saveTripToIndexedDB(tripRecord) {
+  return openDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([TRIPS_STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(TRIPS_STORE_NAME);
+      const request = store.put(tripRecord);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  });
+}
+window.saveTripToIndexedDB = saveTripToIndexedDB;
+
+function deleteTripFromIndexedDB(tripId) {
+  return openDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([TRIPS_STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(TRIPS_STORE_NAME);
+      const request = store.delete(tripId);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  });
+}
+window.deleteTripFromIndexedDB = deleteTripFromIndexedDB;
+
+function extractTripSummary(tripData, tripId) {
+  const meta = tripData.meta || {};
+  const itinerary = tripData.itinerary || [];
+  const staysData = tripData.stays || [];
+  const cities = tripData.cities || [];
+
+  let startDate = '';
+  let endDate = '';
+  if (itinerary.length > 0) {
+    const firstLeg = itinerary[0];
+    const lastLeg = itinerary[itinerary.length - 1];
+    if (firstLeg.days && firstLeg.days.length > 0) startDate = firstLeg.days[0].date || '';
+    if (lastLeg.days && lastLeg.days.length > 0) endDate = lastLeg.days[lastLeg.days.length - 1].date || '';
+  }
+
+  const flagsSet = new Set();
+  cities.forEach(c => {
+    if (c.countryCode) {
+      const flag = getCountryFlagEmoji(c.countryCode);
+      if (flag) flagsSet.add(flag);
+    }
+  });
+  const flags = Array.from(flagsSet).slice(0, 5).join(' ');
+
+  let dateRange = 'Flexible Dates';
+  if (startDate && endDate) {
+    dateRange = `${startDate} — ${endDate}`;
+  }
+
+  return {
+    id: tripId || 'trip_default',
+    title: meta.title || 'My Trip',
+    subtitle: meta.subtitle || '',
+    flags: flags || '✈️',
+    dateRange: dateRange,
+    legCount: itinerary.length,
+    stayCount: staysData.length,
+    updatedAt: new Date().toISOString(),
+    data: tripData
+  };
+}
+window.extractTripSummary = extractTripSummary;
+
+async function saveActiveTripToStore() {
+  if (typeof getCurrentAppData !== 'function') return;
+  const currentData = getCurrentAppData();
+  const currentId = getActiveTripId();
+  const summary = extractTripSummary(currentData, currentId);
+  await saveTripToIndexedDB(summary);
+}
+window.saveActiveTripToStore = saveActiveTripToStore;
+
+async function loadTripFromStore(tripId) {
+  const trips = await getAllTripsFromIndexedDB();
+  const target = trips.find(t => t.id === tripId);
+  if (!target || !target.data) return false;
+
+  setActiveTripId(tripId);
+  if (typeof loadImportedPayload === 'function') {
+    await loadImportedPayload(target.data, target.title || 'Trip');
+  }
+  return true;
+}
+window.loadTripFromStore = loadTripFromStore;
+
+async function createNewTripDocument(title = 'New Trip', subtitle = 'Click here to add subtitle') {
+  const newId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  let baseData = typeof DEFAULT_TRIP_DATA !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA)) : {};
+  baseData.meta = { title, subtitle };
+
+  const summary = extractTripSummary(baseData, newId);
+  await saveTripToIndexedDB(summary);
+  await loadTripFromStore(newId);
+}
+window.createNewTripDocument = createNewTripDocument;
+
+async function duplicateTripDocument(tripId) {
+  const trips = await getAllTripsFromIndexedDB();
+  const source = trips.find(t => t.id === tripId);
+  if (!source || !source.data) return;
+
+  const newId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  const dupPayload = JSON.parse(JSON.stringify(source.data));
+  dupPayload.meta = dupPayload.meta || {};
+  dupPayload.meta.title = (dupPayload.meta.title || 'Trip') + ' (Copy)';
+
+  const summary = extractTripSummary(dupPayload, newId);
+  await saveTripToIndexedDB(summary);
+}
+window.duplicateTripDocument = duplicateTripDocument;
+
+async function deleteTripDocument(tripId) {
+  await deleteTripFromIndexedDB(tripId);
+  if (getActiveTripId() === tripId) {
+    const remaining = await getAllTripsFromIndexedDB();
+    if (remaining.length > 0) {
+      await loadTripFromStore(remaining[0].id);
+    } else {
+      await createNewTripDocument('My First Trip', 'Click here to add description');
+    }
+  }
+}
+window.deleteTripDocument = deleteTripDocument;
 
 // Save data to IndexedDB
 function saveToIndexedDB(key, data) {
@@ -3234,9 +3421,13 @@ async function runSaveData(showTick = true) {
         saveToIndexedDB('stays', stays),
         saveToIndexedDB('userCities', userCities),
         saveToIndexedDB('userCountries', userCountries),
-        saveToIndexedDB('filename', currentFileName)
+        saveToIndexedDB('filename', currentFileName),
+        saveActiveTripToStore()
       ]);
-      console.log('Data saved to IndexedDB');
+      console.log('Data saved to IndexedDB (including active trip document)');
+      if (typeof window.renderHeaderTripSwitcher === 'function') {
+        window.renderHeaderTripSwitcher();
+      }
     } catch (e) {
       console.error('Failed to save to IndexedDB, falling back to localStorage:', e);
       fallbackToLocalStorage();

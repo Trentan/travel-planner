@@ -30,10 +30,20 @@
 
 <div class="app-menu-bar">
   <div class="app-menu-left">
-    <span class="file-badge">
-      <span class="file-badge-label">Trip file</span>
-      <span class="file-badge-value" id="activeFileDisplay">Default Template</span>
-    </span>
+    <div class="header-trip-switcher" id="headerTripSwitcher">
+      <button class="trip-switcher-btn" id="currentTripBtn" onclick="toggleTripDropdown(event)" aria-label="Switch active trip">
+        <span class="trip-icon">✈️</span>
+        <span class="trip-title" id="currentTripTitle">My Trip</span>
+        <span class="switcher-arrow">▾</span>
+      </button>
+      <div class="trip-dropdown-menu" id="tripDropdownMenu" hidden>
+        <div class="trip-dropdown-header">Recent Trips</div>
+        <div class="trip-dropdown-list" id="recentTripsList"></div>
+        <div class="app-menu-divider"></div>
+        <button class="trip-dropdown-item" onclick="openTripLibraryModal()">🖼️ View All Trips</button>
+        <button class="trip-dropdown-item" onclick="closeTripDropdown(); openCreateNewTripWizard();">✦ Create New Trip</button>
+      </div>
+    </div>
     <span class="save-status" id="saveStatus"></span>
     <span class="timestamp-status" id="timestampStatus"></span>
   </div>
@@ -64,6 +74,7 @@
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openShareExportDialog()">🔗 Share Export</button>
         <div class="app-menu-divider" aria-hidden="true"></div>
         <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
+        <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripLibraryModal()">🖼️ My Trips Gallery</button>
         <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCreateNewTripWizard()">✦ Create New Trip</button>
         <button id="saveAsBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripFile()">Save As</button>
         <button id="openFileBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openExistingTripFile()">Open File</button>
@@ -1008,6 +1019,25 @@
     </div>
   </div>
 
+<!-- Multi-Trip Library Gallery Modal -->
+<div id="tripLibraryModal" class="modal-overlay" hidden>
+  <div class="modal-card trip-library-modal-card">
+    <div class="modal-header flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-700">
+      <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">🖼️ My Trips Gallery</h2>
+      <button class="modal-close-btn text-2xl font-bold text-slate-400 hover:text-slate-600 dark:hover:text-white" onclick="closeTripLibraryModal()">×</button>
+    </div>
+    <div class="modal-body py-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+        <p class="text-sm text-slate-600 dark:text-slate-300">Select a trip to load, create a new itinerary, or duplicate existing plans.</p>
+        <button class="action-btn action-btn-secondary whitespace-nowrap" onclick="createNewTripFromLibrary()">✦ Create New Trip</button>
+      </div>
+      <div class="trip-gallery-grid grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto p-1" id="tripGalleryGrid">
+        <!-- Rendered dynamically by js/trip-library.js -->
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 
 </main>
@@ -1016,6 +1046,7 @@
 <script src="./js/utils.js"></script>
   <script src="./js/attachments.js"></script>
 <script src="./js/data.js"></script>
+<script src="./js/trip-library.js"></script>
 <script src="./js/packing.js"></script>
 <script src="./js/dragdrop.js"></script>
 <script src="./js/crud.js"></script>
