@@ -6,6 +6,7 @@ const { run: runSuggestedSchedulingRegression } = require('./suggested-schedulin
 const { run: runItineraryExploratoryUx } = require('./itinerary-exploratory-ux');
 const { run: runBrowserSuite } = require('./browser-suite');
 const { run: runSharePresetsVerify } = require('./share-presets-verify');
+const { run: runIosPwaNavVerify } = require('./ios-pwa-nav-verify');
 
 async function run() {
   await runCoreSmoke();
@@ -15,6 +16,7 @@ async function run() {
   await runSuggestedSchedulingRegression();
   await runItineraryExploratoryUx();
   await runSharePresetsVerify();
+  await runIosPwaNavVerify();
   await runBrowserSuite();
   console.log('All travel planner tests passed');
 }
