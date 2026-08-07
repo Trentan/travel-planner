@@ -11,7 +11,6 @@
   // Configuration
   const DEFAULT_CLIENT_ID = '983624892182-travelplannerapp.apps.googleusercontent.com';
   const DRIVE_APPDATA_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
-  const DISCOVERY_DOC = 'https://www.googleapis.com/$discovery/rest?version=v3';
 
   let accessToken = localStorage.getItem('travelApp_gdrive_token') || null;
   let tokenExpiry = parseInt(localStorage.getItem('travelApp_gdrive_token_expiry') || '0', 10);
@@ -32,6 +31,32 @@
     }
   }
   window.setGoogleClientId = setGoogleClientId;
+
+  window.saveCustomGoogleClientId = function(clientId) {
+    if (clientId && clientId.trim()) {
+      setGoogleClientId(clientId.trim());
+      const statusText = document.getElementById('gdriveModalStatusText');
+      if (statusText) statusText.innerText = 'Custom Google Client ID saved. Click "Connect Google Drive" to test.';
+    } else {
+      localStorage.removeItem('travelApp_gdrive_client_id');
+    }
+  };
+
+  // Demo Mode for instant local testing without Google Cloud setup
+  window.enableDemoCloudSync = function() {
+    window.__mockGoogleDriveAPI = true;
+    window.authenticateGoogleDrive(false);
+    updateCloudSyncModalState();
+    alert('Demo Cloud Sync active! Your trips will simulate background Google Drive AppData sync.');
+  };
+
+  // Toggle Setup Guide
+  window.toggleGoogleDriveGuide = function() {
+    const guide = document.getElementById('gdriveGuideBox');
+    if (guide) {
+      guide.hidden = !guide.hidden;
+    }
+  };
 
   // Check if Google Drive is connected & authorized
   function isGoogleDriveConnected() {
@@ -67,6 +92,10 @@
           callback: (response) => {
             if (response.error) {
               console.error('Google Auth Error:', response);
+              const statusText = document.getElementById('gdriveModalStatusText');
+              if (statusText) {
+                statusText.innerHTML = `<span class="text-red-500 font-semibold">⚠️ Connection failed (${response.error}).</span> Please enter your Google OAuth Client ID or use Demo Mode below.`;
+              }
               resolve(false);
               return;
             }
@@ -79,8 +108,17 @@
             localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
 
             updateCloudSyncStatusPill();
+            updateCloudSyncModalState();
             window.syncAllTripsFromGoogleDrive();
             resolve(true);
+          },
+          error_callback: (err) => {
+            console.error('Google OAuth Popup Error:', err);
+            const statusText = document.getElementById('gdriveModalStatusText');
+            if (statusText) {
+              statusText.innerHTML = `<span class="text-red-500 font-semibold">⚠️ Google OAuth Error.</span> If running locally, enter your OAuth Client ID below or try Demo Mode.`;
+            }
+            resolve(false);
           }
         });
 
@@ -91,6 +129,10 @@
         }
       } catch (err) {
         console.error('Failed to initialize Google Token Client:', err);
+        const statusText = document.getElementById('gdriveModalStatusText');
+        if (statusText) {
+          statusText.innerHTML = `<span class="text-red-500 font-semibold">⚠️ Failed to launch Google popup.</span> Please check your Client ID or use Demo Mode.`;
+        }
         resolve(false);
       }
     });
@@ -98,12 +140,14 @@
 
   // Disconnect Google Drive
   window.disconnectGoogleDrive = function() {
+    window.__mockGoogleDriveAPI = false;
     accessToken = null;
     tokenExpiry = 0;
     localStorage.removeItem('travelApp_gdrive_token');
     localStorage.removeItem('travelApp_gdrive_token_expiry');
     localStorage.removeItem('travelApp_gdrive_file_map');
     updateCloudSyncStatusPill();
+    updateCloudSyncModalState();
   };
 
   // Get File ID mapping for trips { tripId -> gdriveFileId }
@@ -313,11 +357,16 @@
     const statusText = document.getElementById('gdriveModalStatusText');
     const connectBtn = document.getElementById('gdriveConnectBtn');
     const disconnectBtn = document.getElementById('gdriveDisconnectBtn');
+    const input = document.getElementById('gdriveClientIdInput');
+
+    if (input) {
+      input.value = getGoogleClientId();
+    }
 
     if (statusText) {
-      statusText.innerText = isConnected
+      statusText.innerHTML = isConnected
         ? 'Connected — Trips are automatically backed up to your private Google Drive AppData folder.'
-        : 'Not Connected — Edits are currently saved to this device only.';
+        : 'Not Connected — Edits are currently saved to this device only (⚡ Local Only).';
     }
 
     if (connectBtn) connectBtn.style.display = isConnected ? 'none' : 'inline-flex';
