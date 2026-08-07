@@ -45,6 +45,15 @@
   }
   window.getGoogleClientId = getGoogleClientId;
 
+  function setGoogleClientId(id) {
+    if (id && id.trim()) {
+      localStorage.setItem('travelApp_gdrive_client_id', id.trim());
+    } else {
+      localStorage.removeItem('travelApp_gdrive_client_id');
+    }
+  }
+  window.setGoogleClientId = setGoogleClientId;
+
   // Check if Google Drive is connected & authorized
   function isGoogleDriveConnected() {
     return !!accessToken && (Date.now() < tokenExpiry || accessToken.startsWith('token_'));
@@ -104,9 +113,10 @@
   window.authenticateGoogleDrive = function(interactive = true) {
     return new Promise((resolve, reject) => {
       const clientId = getGoogleClientId();
-      const isPlaceholderOrLocal = !clientId || clientId.includes('travelplannerapp') || window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const isCustomClientIdSet = clientId && !clientId.includes('travelplannerapp');
+      const isPlaceholderOrFile = (!isCustomClientIdSet && (window.location.protocol === 'file:' || !clientId || clientId.includes('travelplannerapp'))) || window.__mockGoogleDriveAPI;
 
-      if (isPlaceholderOrLocal || window.__mockGoogleDriveAPI) {
+      if (isPlaceholderOrFile) {
         completeSeamlessSignIn();
         resolve(true);
         return;
