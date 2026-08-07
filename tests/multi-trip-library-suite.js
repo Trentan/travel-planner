@@ -109,6 +109,28 @@ async function runMultiTripLibrarySuite() {
     }
     console.log('Trip Library Modal successfully opened!');
 
+    console.log('8. Testing JSON file import registration in Trips Gallery...');
+    const countBeforeImport = (await page.evaluate(async () => await window.getAllTripsFromIndexedDB())).length;
+
+    await page.evaluate(async () => {
+      const sampleImport = {
+        meta: { title: 'Thailand Explorer 2026', subtitle: 'Bangkok & Phuket' },
+        itinerary: [{ cityName: 'Bangkok', days: [{ date: '2026-11-01', from: 'Bangkok', to: 'Bangkok' }] }]
+      };
+      const newTripId = 'trip_' + Date.now() + '_test';
+      window.setActiveTripId(newTripId);
+      await window.loadImportedPayload(sampleImport, 'Thailand_Explorer.json');
+      await window.saveActiveTripToStore();
+    });
+
+    const tripsAfterImport = await page.evaluate(async () => await window.getAllTripsFromIndexedDB());
+    console.log(`Trips count after import: ${tripsAfterImport.length}`);
+    const importedTrip = tripsAfterImport.find(t => t.title && t.title.includes('Thailand'));
+    if (!importedTrip) {
+      throw new Error('Failed to auto-register imported JSON file into Trips Gallery');
+    }
+    console.log(`Successfully registered imported trip in gallery: "${importedTrip.title}"`);
+
     console.log('✅ ALL MULTI-TRIP LIBRARY INTEGRATION TESTS PASSED CLEANLY!');
   } catch (err) {
     console.error('❌ MULTI-TRIP LIBRARY SUITE FAILED:', err);

@@ -5960,9 +5960,21 @@ async function importJSON(event) {
         localStorage.setItem('travelApp_last_known_hash', String(hash));
       } catch(err) {}
 
-      await loadImportedPayload(importedData, file.name);
+      // Assign a distinct trip ID for the imported file so it is saved as a document in My Trips Gallery
+      const importedTripId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+      setActiveTripId(importedTripId);
 
-      alert('Import successful! ' + appData.length + ' trip legs loaded.');
+      await loadImportedPayload(importedData, file.name);
+      await saveActiveTripToStore();
+
+      if (typeof window.renderHeaderTripSwitcher === 'function') {
+        window.renderHeaderTripSwitcher();
+      }
+      if (typeof window.renderTripGalleryGrid === 'function') {
+        window.renderTripGalleryGrid();
+      }
+
+      alert('Import successful! "' + (titleData.title || file.name) + '" added to your Trips Gallery.');
     } catch (err) {
       console.error('Import error:', err);
       alert(`Import failed: ${err.message || 'Unknown error'}. Your current data remains safe.`);

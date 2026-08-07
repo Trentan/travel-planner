@@ -197,6 +197,17 @@
     }
   };
 
+  // Import Trip File from Library
+  window.importTripFromLibrary = function() {
+    window.closeTripLibraryModal();
+    if (typeof window.openExistingTripFile === 'function') {
+      window.openExistingTripFile();
+    } else {
+      const input = document.getElementById('importFile');
+      if (input) input.click();
+    }
+  };
+
   // Duplicate Trip
   window.duplicateTripFromLibrary = async function(tripId) {
     if (typeof window.duplicateTripDocument === 'function') {
