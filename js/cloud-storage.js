@@ -8,7 +8,7 @@
 (function() {
   'use strict';
 
-  const DEFAULT_CLIENT_ID = '983624892182-travelplannerapp.apps.googleusercontent.com';
+  const DEFAULT_CLIENT_ID = '253620621116-u76e3v3e2qv6ffq9b58re4l4bbqs1e3g.apps.googleusercontent.com';
   const DRIVE_FOLDER_NAME = 'TrenscendsTravelPlanner';
   const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 
