@@ -91,16 +91,14 @@
     const modal = document.getElementById('tripLibraryModal');
     if (!modal) return;
 
-    modal.hidden = false;
-    modal.classList.add('active');
+    modal.style.display = 'flex';
     await window.renderTripGalleryGrid();
   };
 
   window.closeTripLibraryModal = function() {
     const modal = document.getElementById('tripLibraryModal');
     if (modal) {
-      modal.hidden = true;
-      modal.classList.remove('active');
+      modal.style.display = 'none';
     }
   };
 

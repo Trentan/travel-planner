@@ -469,16 +469,14 @@
     const modal = document.getElementById('cloudSyncModal');
     if (!modal) return;
 
-    modal.hidden = false;
-    modal.classList.add('active');
+    modal.style.display = 'flex';
     updateCloudSyncModalState();
   };
 
   window.closeCloudSyncModal = function() {
     const modal = document.getElementById('cloudSyncModal');
     if (modal) {
-      modal.hidden = true;
-      modal.classList.remove('active');
+      modal.style.display = 'none';
     }
   };
 
