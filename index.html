@@ -1027,67 +1027,6 @@
         <button class="action-btn action-btn-secondary" onclick="saveStayFromModal()">Save Stay</button>
       </div>
     </div>
-  </div>
-
-<!-- Multi-Trip Library Gallery Modal -->
-<div id="tripLibraryModal" class="modal-overlay" style="display: none;">
-  <div class="modal-content max-w-3xl">
-    <div class="modal-header">
-      <h2>🖼️ My Trips Gallery</h2>
-      <button class="modal-close" onclick="closeTripLibraryModal()">&times;</button>
-    </div>
-    <div class="modal-body space-y-4">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <p class="text-sm text-slate-600 dark:text-slate-300">Select a trip to load, create a new itinerary, or duplicate existing plans.</p>
-        <div class="flex items-center gap-2">
-          <span class="cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300" id="cloudSyncStatusPill">⚡ Local Only</span>
-          <button class="action-btn action-btn-secondary text-xs whitespace-nowrap" onclick="openCloudSyncModal()">☁️ Cloud Sync</button>
-          <button class="action-btn action-btn-secondary text-xs whitespace-nowrap" onclick="createNewTripFromLibrary()">✦ New Trip</button>
-        </div>
-      </div>
-      <div class="trip-gallery-grid grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto p-1" id="tripGalleryGrid">
-        <!-- Rendered dynamically by js/trip-library.js -->
-      </div>
-    </div>
-    <div class="modal-footer flex justify-end">
-      <button class="action-btn" onclick="closeTripLibraryModal()">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- Google Drive Cloud Sync Modal -->
-<div id="cloudSyncModal" class="modal-overlay" style="display: none;">
-  <div class="modal-content max-w-lg">
-    <div class="modal-header">
-      <h2>☁️ Google Drive Cloud Sync</h2>
-      <button class="modal-close" onclick="closeCloudSyncModal()">&times;</button>
-    </div>
-    <div class="modal-body space-y-4">
-      <div id="gdriveProfileCard" class="bg-slate-100 dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-3" style="display: none;">
-        <!-- Dynamically rendered by js/cloud-storage.js -->
-      </div>
-      <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" id="gdriveModalStatusText">
-        Sign in with your Google account to automatically back up and sync all your itineraries across your phone, tablet, and laptop.
-      </p>
-      <div class="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl text-xs text-slate-600 dark:text-slate-300 space-y-2 border border-slate-200/60 dark:border-slate-700/60">
-        <p>📁 <strong>Dedicated Drive Folder</strong>: Saves your trips cleanly into a visible <strong><code>Google Drive / TrenscendsTravelPlanner</code></strong> folder as human-readable <code>.json</code> files.</p>
-        <p>⚡ <strong>Offline First</strong>: Edits save to your device instantly and sync automatically whenever you're connected.</p>
-      </div>
-    </div>
-    <div class="modal-footer flex flex-wrap justify-between items-center gap-2">
-      <button class="action-btn text-xs" onclick="selectLocalSyncDirectory();">📁 Select Local Sync Folder</button>
-      <div class="flex gap-2">
-        <button class="action-btn" onclick="closeCloudSyncModal()">Close</button>
-        <button id="gdriveDisconnectBtn" class="action-btn action-btn-danger" style="display: none;" onclick="disconnectGoogleDrive(); closeCloudSyncModal();">Sign Out & Disconnect</button>
-        <button id="gdriveConnectBtn" class="action-btn action-btn-secondary flex items-center gap-2" onclick="authenticateGoogleDrive(true);">
-          <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          <span>Sign in with Google</span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
 </div>
 
 </main>
@@ -1199,6 +1138,65 @@
   <div id="image-lightbox" class="modal-overlay" style="display: none; z-index: 10000; background-color: rgba(0,0,0,0.9);" onclick="closeLightbox()">
     <button class="lightbox-close" onclick="closeLightbox()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;">&times;</button>
     <img id="lightbox-img" src="" style="max-width: 90vw; max-height: 90vh; margin: auto; display: block; object-fit: contain; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+  </div>
+
+  <!-- Multi-Trip Library Gallery Modal -->
+  <div id="tripLibraryModal" class="modal-overlay" style="display: none; z-index: 9999;">
+    <div class="modal-content w-full max-w-3xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden" style="width: 100%; max-width: 800px; margin: auto;">
+      <div class="modal-header">
+        <h2>🖼️ My Trips Gallery</h2>
+        <button class="modal-close" onclick="closeTripLibraryModal()">&times;</button>
+      </div>
+      <div class="modal-body space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <p class="text-sm text-slate-600 dark:text-slate-300">Select a trip to load, create a new itinerary, or duplicate existing plans.</p>
+          <div class="flex items-center gap-2">
+            <span class="cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300" id="cloudSyncStatusPill">⚡ Local Only</span>
+            <button class="action-btn action-btn-secondary text-xs whitespace-nowrap" onclick="openCloudSyncModal()">☁️ Cloud Sync</button>
+            <button class="action-btn action-btn-secondary text-xs whitespace-nowrap" onclick="createNewTripFromLibrary()">✦ New Trip</button>
+          </div>
+        </div>
+        <div class="trip-gallery-grid grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto p-1" id="tripGalleryGrid">
+          <!-- Rendered dynamically by js/trip-library.js -->
+        </div>
+      </div>
+      <div class="modal-footer flex justify-end">
+        <button class="action-btn" onclick="closeTripLibraryModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Drive Cloud Sync Modal -->
+  <div id="cloudSyncModal" class="modal-overlay" style="display: none; z-index: 9999;">
+    <div class="modal-content w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden" style="width: 100%; max-width: 540px; margin: auto;">
+      <div class="modal-header">
+        <h2>☁️ Google Drive Cloud Sync</h2>
+        <button class="modal-close" onclick="closeCloudSyncModal()">&times;</button>
+      </div>
+      <div class="modal-body space-y-4">
+        <div id="gdriveProfileCard" class="bg-slate-100 dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-3" style="display: none;">
+          <!-- Dynamically rendered by js/cloud-storage.js -->
+        </div>
+        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" id="gdriveModalStatusText">
+          Sign in with your Google account to automatically back up and sync all your itineraries across your phone, tablet, and laptop.
+        </p>
+        <div class="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl text-xs text-slate-600 dark:text-slate-300 space-y-2 border border-slate-200/60 dark:border-slate-700/60">
+          <p>📁 <strong>Dedicated Drive Folder</strong>: Saves your trips cleanly into a visible <strong><code>Google Drive / TrenscendsTravelPlanner</code></strong> folder as human-readable <code>.json</code> files.</p>
+          <p>⚡ <strong>Offline First</strong>: Edits save to your device instantly and sync automatically whenever you're connected.</p>
+        </div>
+      </div>
+      <div class="modal-footer flex flex-wrap justify-between items-center gap-2">
+        <button class="action-btn text-xs" onclick="selectLocalSyncDirectory();">📁 Select Local Sync Folder</button>
+        <div class="flex gap-2">
+          <button class="action-btn" onclick="closeCloudSyncModal()">Close</button>
+          <button id="gdriveDisconnectBtn" class="action-btn action-btn-danger" style="display: none;" onclick="disconnectGoogleDrive(); closeCloudSyncModal();">Sign Out & Disconnect</button>
+          <button id="gdriveConnectBtn" class="action-btn action-btn-secondary flex items-center gap-2" onclick="authenticateGoogleDrive(true);">
+            <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            <span>Sign in with Google</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
 </body>
