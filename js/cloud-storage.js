@@ -18,6 +18,14 @@
   let userProfile = null;
   let syncDebounceTimer = null;
 
+  // Clean up legacy fallback tokens on real production origin
+  if (accessToken && accessToken.startsWith('token_') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.__mockGoogleDriveAPI) {
+    accessToken = null;
+    tokenExpiry = 0;
+    localStorage.removeItem('travelApp_gdrive_token');
+    localStorage.removeItem('travelApp_gdrive_token_expiry');
+  }
+
   try {
     userProfile = JSON.parse(localStorage.getItem('travelApp_user_profile') || 'null');
   } catch (e) {
@@ -114,17 +122,17 @@
     return new Promise((resolve, reject) => {
       const clientId = getGoogleClientId();
       const isCustomClientIdSet = clientId && !clientId.includes('travelplannerapp');
-      const isPlaceholderOrFile = (!isCustomClientIdSet && (window.location.protocol === 'file:' || !clientId || clientId.includes('travelplannerapp'))) || window.__mockGoogleDriveAPI;
+      const isFileProtocol = window.location.protocol === 'file:';
 
-      if (isPlaceholderOrFile) {
+      if (isFileProtocol || window.__mockGoogleDriveAPI) {
         completeSeamlessSignIn();
         resolve(true);
         return;
       }
 
       if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
-        completeSeamlessSignIn();
-        resolve(true);
+        if (interactive) alert('Google Sign-In script is loading. Please check your internet connection and try again.');
+        resolve(false);
         return;
       }
 
@@ -141,7 +149,7 @@
               localStorage.setItem('travelApp_gdrive_token', accessToken);
               localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
 
-              // Fetch User Profile
+              // Fetch User Profile from Google UserInfo API
               try {
                 const userResp = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                   headers: { 'Authorization': `Bearer ${accessToken}` }
@@ -161,25 +169,31 @@
               await ensureDriveFolder();
               updateCloudSyncStatusPill();
               updateCloudSyncModalState();
+
+              // Sync all trips: Push local trips & pull remote trips
+              await window.uploadAllLocalTripsToDrive();
               await window.syncAllTripsFromGoogleDrive();
               resolve(true);
               return;
             }
 
-            completeSeamlessSignIn();
-            resolve(true);
+            if (response && response.error) {
+              console.error('Google OAuth Error:', response);
+              if (interactive) alert(`Google OAuth Notice: ${response.error}`);
+              resolve(false);
+            }
           },
           error_callback: (err) => {
-            console.warn('Google OAuth popup origin notice, completing clean sign-in:', err);
-            completeSeamlessSignIn();
-            resolve(true);
+            console.error('Google OAuth Popup Error:', err);
+            if (interactive) alert('Google Sign-In popup was closed or blocked. Please allow popups for this site.');
+            resolve(false);
           }
         });
 
         client.requestAccessToken({ prompt: interactive ? 'consent' : '' });
       } catch (err) {
-        completeSeamlessSignIn();
-        resolve(true);
+        console.error('Failed to launch Google OAuth Client:', err);
+        resolve(false);
       }
     });
   };
@@ -242,7 +256,7 @@
 
     if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
       const fileName = formatHumanFilename(tripRecord);
-      console.log(`[GoogleDrive Sync] Uploaded trip "${fileName}" to Google Drive / ${DRIVE_FOLDER_NAME}`);
+      console.log(`[GoogleDrive Sync] Simulated sync of "${fileName}" to Google Drive / ${DRIVE_FOLDER_NAME}`);
       const map = getGDriveFileMap();
       map[tripRecord.id] = 'gdrive_file_' + tripRecord.id;
       setGDriveFileMap(map);
@@ -313,12 +327,25 @@
     }
   };
 
+  // Upload all local trips to Google Drive
+  window.uploadAllLocalTripsToDrive = async function() {
+    if (!isGoogleDriveConnected() || typeof window.getAllTripsFromIndexedDB !== 'function') return;
+    try {
+      const trips = await window.getAllTripsFromIndexedDB();
+      for (const trip of trips) {
+        await window.uploadTripToGoogleDrive(trip);
+      }
+    } catch (err) {
+      console.warn('Failed to upload local trips to Google Drive:', err);
+    }
+  };
+
   // Sync All Trips from Google Drive / TrenscendsTravelPlanner into local IndexedDB
   window.syncAllTripsFromGoogleDrive = async function() {
     if (!isGoogleDriveConnected()) return;
 
     if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
-      console.log(`[GoogleDrive Sync] Synced all trips from Google Drive / ${DRIVE_FOLDER_NAME}`);
+      console.log(`[GoogleDrive Sync] Simulated fetch of all trips from Google Drive / ${DRIVE_FOLDER_NAME}`);
       updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`);
       return;
     }
