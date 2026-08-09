@@ -470,6 +470,7 @@
     if (!modal) return;
 
     modal.hidden = false;
+    modal.style.display = 'flex';
     modal.classList.add('active');
     updateCloudSyncModalState();
   };
@@ -478,6 +479,7 @@
     const modal = document.getElementById('cloudSyncModal');
     if (modal) {
       modal.hidden = true;
+      modal.style.display = 'none';
       modal.classList.remove('active');
     }
   };

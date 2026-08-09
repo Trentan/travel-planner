@@ -92,6 +92,7 @@
     if (!modal) return;
 
     modal.hidden = false;
+    modal.style.display = 'flex';
     modal.classList.add('active');
     await window.renderTripGalleryGrid();
   };
@@ -100,6 +101,7 @@
     const modal = document.getElementById('tripLibraryModal');
     if (modal) {
       modal.hidden = true;
+      modal.style.display = 'none';
       modal.classList.remove('active');
     }
   };
