@@ -244,9 +244,9 @@
           <span class="mobile-menu-trip-label">Trip file</span>
           <span class="mobile-menu-trip-value" id="mobileActiveFileDisplay" data-fallback="Default Template">Default Template</span>
         </div>
-        <div class="mobile-menu-status-row">
+        <div class="mobile-menu-status-row flex justify-between items-center pt-1">
           <span id="mobileSaveStatus" data-fallback=""></span>
-          <span id="mobileTimestampStatus" data-fallback=""></span>
+          <button id="mobileCloudSyncStatusPill" class="cloud-status-pill text-xs font-semibold px-2 py-0.5 rounded-full cursor-pointer" onclick="openCloudSyncModal(); closeMobileMenu();">⚡ Local Only</button>
         </div>
       </div>
       <div class="mobile-desktop-advisory" role="note">
@@ -286,7 +286,15 @@
         <section class="mobile-menu-section" aria-labelledby="mobileMenuExportFiles">
           <h3 id="mobileMenuExportFiles" class="mobile-menu-section-title">Export & files</h3>
           <div class="mobile-menu-section-grid mobile-menu-section-grid-stacked">
-            <button class="app-menu-btn mobile-menu-primary" onclick="openCreateNewTripWizard(); closeMobileMenu()">
+            <button class="app-menu-btn mobile-menu-primary" onclick="openCloudSyncModal(); closeMobileMenu()">
+              <span class="app-menu-btn-title">☁️ Google Drive Cloud Sync</span>
+              <span class="app-menu-btn-subtitle">Back up & sync trips across devices</span>
+            </button>
+            <button class="app-menu-btn" onclick="openTripGalleryModal(); closeMobileMenu()">
+              <span class="app-menu-btn-title">✈️ My Trips Gallery</span>
+              <span class="app-menu-btn-subtitle">Switch, manage, and view all saved trips</span>
+            </button>
+            <button class="app-menu-btn" onclick="openCreateNewTripWizard(); closeMobileMenu()">
               <span class="app-menu-btn-title">✦ Create New Trip</span>
               <span class="app-menu-btn-subtitle">Build a new trip step by step</span>
             </button>

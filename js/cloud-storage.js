@@ -437,24 +437,30 @@
     }
   };
 
-  // Update Status Pill UI Element
+  // Update Status Pill UI Element across Desktop and Mobile
   function updateCloudSyncStatusPill(statusText) {
-    const pill = document.getElementById('cloudSyncStatusPill');
-    if (!pill) return;
+    const pills = [
+      document.getElementById('cloudSyncStatusPill'),
+      document.getElementById('mobileCloudSyncStatusPill')
+    ].filter(Boolean);
 
-    if (statusText) {
-      pill.innerText = statusText;
-      return;
-    }
+    if (pills.length === 0) return;
 
-    const profile = getUserProfile();
-    if (isGoogleDriveConnected()) {
-      pill.innerText = profile && profile.name ? `☁️ ${profile.name}` : `☁️ Drive / ${DRIVE_FOLDER_NAME}`;
-      pill.className = 'cloud-status-pill connected';
-    } else {
-      pill.innerText = '⚡ Local Only';
-      pill.className = 'cloud-status-pill disconnected';
-    }
+    pills.forEach(pill => {
+      if (statusText) {
+        pill.innerText = statusText;
+        return;
+      }
+
+      const profile = getUserProfile();
+      if (isGoogleDriveConnected()) {
+        pill.innerText = profile && profile.name ? `☁️ ${profile.name}` : `☁️ Drive / ${DRIVE_FOLDER_NAME}`;
+        pill.className = 'cloud-status-pill connected';
+      } else {
+        pill.innerText = '⚡ Local Only';
+        pill.className = 'cloud-status-pill disconnected';
+      }
+    });
   }
   window.updateCloudSyncStatusPill = updateCloudSyncStatusPill;
 
