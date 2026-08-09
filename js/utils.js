@@ -1,0 +1,755 @@
+const DEFAULT_CITIES = [
+  {
+    "id": "city-sydney",
+    "name": "Sydney",
+    "lat": -33.8688,
+    "lng": 151.2093,
+    "colour": "#34495e",
+    "code": "SYD",
+    "countryCode": "AU",
+    "country": "Australia",
+    "dateFrom": "",
+    "dateTo": ""
+  },
+  {
+    "id": "city-tokyo",
+    "name": "Tokyo",
+    "lat": 35.6762,
+    "lng": 139.6503,
+    "colour": "#e74c3c",
+    "code": "HND",
+    "countryCode": "JP",
+    "country": "Japan",
+    "dateFrom": "",
+    "dateTo": ""
+  },
+  {
+    "id": "city-london",
+    "name": "London",
+    "lat": 51.5074,
+    "lng": -0.1278,
+    "colour": "#3498db",
+    "code": "LHR",
+    "countryCode": "GB",
+    "country": "United Kingdom",
+    "dateFrom": "",
+    "dateTo": ""
+  },
+  {
+    "id": "city-paris",
+    "name": "Paris",
+    "lat": 48.8566,
+    "lng": 2.3522,
+    "colour": "#9b59b6",
+    "code": "CDG",
+    "countryCode": "FR",
+    "country": "France",
+    "dateFrom": "",
+    "dateTo": ""
+  },
+  {
+    "id": "city-dubai",
+    "name": "Dubai",
+    "lat": 25.2048,
+    "lng": 55.2708,
+    "colour": "#f1c40f",
+    "dateFrom": "",
+    "dateTo": ""
+  }
+];
+
+const DEFAULT_DATA = typeof DEFAULT_TRIP_DATA !== 'undefined' ? DEFAULT_TRIP_DATA.itinerary : [];
+
+
+const ACTIVITY_CATEGORIES = {
+  fitness: { emoji: '🏃', label: 'Fitness' },
+  sight: { emoji: '🏛️', label: 'Sights' },
+  attraction: { emoji: '🎢', label: 'Attractions' },
+  wellness: { emoji: '🧘', label: 'Wellness' },
+  food: { emoji: '🍽️', label: 'Food' },
+  tour: { emoji: '🚌', label: 'Tour' },
+  event: { emoji: '🗓️', label: 'Event' },
+  audioTour: { emoji: '🎧', label: 'Audio Tour' }
+};
+
+function getActivityEmoji(category) {
+  return ACTIVITY_CATEGORIES[category]?.emoji || '📍';
+}
+
+function getActivityLabel(category) {
+  return ACTIVITY_CATEGORIES[category]?.label || 'Activity';
+}
+
+function stripLeadingActivityEmojiText(text) {
+  return String(text || '')
+    .replace(/^(?:[\u{1F000}-\u{1FAFF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\uFE0F?(?:\u200D[\u{1F000}-\u{1FAFF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}]\uFE0F?)*\s*)+/gu, '')
+    .trim();
+}
+
+function escapeHtmlText(text) {
+  if (text === null || text === undefined) return '';
+  return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+}
+
+function parseCurrencyAmount(value) {
+  const parsed = Number.parseFloat(String(value ?? '').replace(/[^0-9.-]/g, ''));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function formatCurrency(value, options = {}) {
+  const {
+    includeSymbol = true,
+    showZero = true,
+    minimumFractionDigits = 'auto',
+    maximumFractionDigits = 'auto'
+  } = options;
+  const amount = parseCurrencyAmount(value);
+  if (!showZero && amount === 0) return '';
+  const minDigits = minimumFractionDigits === 'auto' ? (Number.isInteger(amount) ? 0 : 2) : minimumFractionDigits;
+  const maxDigits = maximumFractionDigits === 'auto' ? Math.max(minDigits, 2) : maximumFractionDigits;
+  const formatted = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: minDigits,
+    maximumFractionDigits: maxDigits
+  }).format(amount);
+  return includeSymbol ? `$${formatted}` : formatted;
+}
+
+function renderMobileStat(label, primary, secondary = '', extraClass = '') {
+  return `
+    <div class="flex flex-col gap-0.5 flex-1 min-w-[45%] p-2 bg-slate-50 dark:bg-slate-800/50 rounded ${extraClass}">
+      <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">${escapeHtmlText(label)}</span>
+      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${primary ? escapeHtmlText(primary) : '—'}</span>
+      ${secondary ? `<span class="text-xs text-slate-500 dark:text-slate-400 truncate">${secondary}</span>` : ''}
+    </div>
+  `;
+}
+
+function renderMobileTripTracker({
+                                   label = 'Trip',
+                                   position = '',
+                                   behind = 0,
+                                   here = 1,
+                                   ahead = 0
+                                 }) {
+  const behindCount = Math.max(0, Number(behind) || 0);
+  const hereCount = Math.max(0, Number(here) || 0);
+  const aheadCount = Math.max(0, Number(ahead) || 0);
+  const total = Math.max(1, behindCount + hereCount + aheadCount);
+  return `
+    <div class="mobile-trip-tracker">
+      <div class="mobile-trip-tracker-top">
+        <span class="mobile-trip-tracker-label">${escapeHtmlText(label)}</span>
+        ${position ? `<span class="mobile-trip-tracker-position">${escapeHtmlText(position)}</span>` : ''}
+      </div>
+      <div class="mobile-trip-tracker-bar" aria-hidden="true">
+        <span class="mobile-trip-tracker-segment is-behind" style="width:${(behindCount / total) * 100}%"></span>
+        <span class="mobile-trip-tracker-segment is-here" style="width:${(hereCount / total) * 100}%"></span>
+        <span class="mobile-trip-tracker-segment is-ahead" style="width:${(aheadCount / total) * 100}%"></span>
+      </div>
+    </div>
+  `;
+}
+
+function getMobilePagerStateStore() {
+  if (typeof window === 'undefined') return {};
+  if (!window.__mobilePagerState) {
+    window.__mobilePagerState = {};
+  }
+  return window.__mobilePagerState;
+}
+
+function getMobilePagerActiveIndex(pagerKey, fallback = 0) {
+  if (!pagerKey) return Math.max(0, Number(fallback) || 0);
+  const store = getMobilePagerStateStore();
+  const value = store[pagerKey];
+  return Number.isFinite(Number(value)) ? Number(value) : Math.max(0, Number(fallback) || 0);
+}
+
+function setMobilePagerActiveIndex(pagerKey, index) {
+  if (!pagerKey) return;
+  const store = getMobilePagerStateStore();
+  store[pagerKey] = Math.max(0, Number(index) || 0);
+}
+
+function resetMobilePagerActiveIndex(pagerKey) {
+  if (!pagerKey) return;
+  const store = getMobilePagerStateStore();
+  delete store[pagerKey];
+}
+
+function captureMobilePagerStates(root = document) {
+  if (typeof window === 'undefined' || !root) return;
+  root.querySelectorAll('[data-role="mobile-swipe-pager"]').forEach(pager => {
+    const pagerKey = pager.dataset.pagerKey || '';
+    if (!pagerKey) return;
+
+    const carousel = pager.querySelector('[data-role="mobile-swipe-carousel"]');
+    const slides = Array.from(pager.querySelectorAll('[data-role="mobile-swipe-slide"]'));
+    if (!carousel || slides.length === 0) return;
+
+    let bestIndex = Number(pager.dataset.activeIndex || 0);
+    let bestDistance = Number.POSITIVE_INFINITY;
+    slides.forEach((slide, index) => {
+      const distance = Math.abs((slide.offsetLeft - carousel.offsetLeft) - carousel.scrollLeft);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
+      }
+    });
+    setMobilePagerActiveIndex(pagerKey, bestIndex);
+  });
+}
+
+function scrollChildIntoHorizontalView(container, child, { behavior = 'auto', align = 'center' } = {}) {
+  if (!container || !child) return;
+  const childLeft = child.offsetLeft - container.offsetLeft;
+  const targetLeft = align === 'start'
+      ? childLeft
+      : childLeft - (container.clientWidth - child.offsetWidth) / 2;
+  container.scrollTo({
+    left: Math.max(0, targetLeft),
+    behavior
+  });
+}
+
+function renderMobileSurfaceCard({
+                                   cardClass = '',
+                                   accentColor = '',
+                                   accentWidth = '',
+                                   dateLabel = '',
+                                   title = '',
+                                   subtitle = '',
+                                   summary = '',
+                                   meta = '',
+                                   primaryAction = '',
+                                   actions = '',
+                                   details = '',
+                                   detailsOpen = false
+                                 }) {
+  const accentStyle = accentColor
+    ? ` style="border-left-color: ${accentColor};${accentWidth ? ` border-left-width: ${accentWidth}; border-left-style: solid;` : ''}"`
+    : '';
+  return `
+    <article class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-700/50 rounded-xl p-4 shadow-sm flex flex-col gap-3 relative ${cardClass}"${accentStyle}>
+      <div class="flex justify-between items-start gap-3">
+        <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+          <div class="flex items-baseline gap-2 min-w-0 flex-nowrap">
+            ${dateLabel ? `<span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${escapeHtmlText(dateLabel)}</span>` : ''}
+            ${title ? `<h3 class="text-base font-bold text-slate-800 dark:text-slate-100 truncate min-w-0 flex-1">${escapeHtmlText(title || '—')}</h3>` : ''}
+          </div>
+          ${subtitle ? `<span class="text-xs font-medium text-slate-500 dark:text-slate-400 truncate block min-w-0">${escapeHtmlText(subtitle)}</span>` : ''}
+        </div>
+        ${primaryAction ? `<div class="shrink-0">${primaryAction}</div>` : ''}
+      </div>
+      ${summary ? `<div class="text-sm text-slate-600 dark:text-slate-300 leading-snug">${summary}</div>` : ''}
+      ${meta ? `<div class="flex flex-wrap gap-2 text-xs">${meta}</div>` : ''}
+      ${details ? `<div class="${detailsOpen ? 'block' : 'hidden'}">${details}</div>` : ''}
+      ${actions ? `<div class="flex flex-wrap items-center gap-2 mt-2 pt-3 border-t border-slate-100 dark:border-slate-800">${actions}</div>` : ''}
+    </article>
+  `;
+}
+
+function renderMobileSwipePager({
+                                  pagerClass = '',
+                                  pagerKey = '',
+                                  syncCityNav = false,
+                                  label = '',
+                                  title = '',
+                                  hint = '',
+                                  positionPrefix = 'Item',
+                                  position = '',
+                                  counter = '',
+                                  railHtml = '',
+                                  slidesHtml = '',
+                                  ariaLabel = ''
+                                }) {
+  const pagerKeyAttr = pagerKey ? ` data-pager-key="${escapeHtmlText(pagerKey)}"` : '';
+  const syncCityAttr = syncCityNav ? ` data-sync-city-nav="true"` : '';
+  return `
+    <div class="mobile-swipe-pager ${pagerClass}" data-role="mobile-swipe-pager"${pagerKeyAttr}${syncCityAttr}>
+      ${railHtml ? `<div class="mobile-swipe-rail" role="tablist" aria-label="${escapeHtmlText(ariaLabel || 'Swipe rail')}">${railHtml}</div>` : ''}
+      <div class="mobile-swipe-progress" aria-hidden="true">
+        <span class="mobile-swipe-progress-fill" data-role="mobile-swipe-progress"></span>
+      </div>
+      <div class="mobile-swipe-carousel" data-role="mobile-swipe-carousel">
+        ${slidesHtml}
+      </div>
+    </div>
+  `;
+}
+
+function setupMobileSwipePagers(root = document) {
+  const pagers = root.querySelectorAll('[data-role="mobile-swipe-pager"]');
+  pagers.forEach(pager => {
+    const carousel = pager.querySelector('[data-role="mobile-swipe-carousel"]');
+    const rail = pager.querySelector('.mobile-swipe-rail');
+    const slides = Array.from(pager.querySelectorAll('[data-role="mobile-swipe-slide"]'));
+    const chips = Array.from(pager.querySelectorAll('[data-role="mobile-swipe-chip"]'));
+    const progressFill = pager.querySelector('[data-role="mobile-swipe-progress"]');
+    const pagerKey = pager.dataset.pagerKey || '';
+
+    if (!carousel || slides.length === 0) return;
+
+    const total = slides.length;
+    let suppressObserver = false;
+    let scrollFrame = 0;
+    const initialIndex = getMobilePagerActiveIndex(pagerKey, Number(pager.dataset.activeIndex || 0));
+
+    // Visual dots removed per user request (top day chips act as indicator)
+    const dots = [];
+
+    const setActive = nextIndex => {
+      const safeIndex = Math.max(0, Math.min(total - 1, Number(nextIndex) || 0));
+
+      slides.forEach((slide, idx) => {
+        slide.classList.toggle('is-active', idx === safeIndex);
+      });
+
+      chips.forEach((chip, idx) => {
+        const active = idx === safeIndex;
+        chip.classList.toggle('active', active);
+        chip.setAttribute('aria-selected', active ? 'true' : 'false');
+        chip.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+
+      // Update active state of dot indicators
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === safeIndex);
+      });
+
+      if (progressFill) progressFill.style.width = `${((safeIndex + 1) / total) * 100}%`;
+      pager.dataset.activeIndex = String(safeIndex);
+      setMobilePagerActiveIndex(pagerKey, safeIndex);
+
+      if (pager.dataset.syncCityNav === 'true') {
+        const activeSlide = slides[safeIndex];
+        const cityId = String(activeSlide?.dataset.cityId || '').trim();
+        if (cityId) highlightCityNavByCityId(cityId);
+      }
+
+      const activeChip = chips[safeIndex];
+      if (rail && activeChip) {
+        scrollChildIntoHorizontalView(rail, activeChip, { behavior: 'auto', align: 'center' });
+      }
+    };
+
+    const scrollToIndex = nextIndex => {
+      const slide = slides[nextIndex];
+      if (!slide) return;
+      suppressObserver = true;
+      scrollChildIntoHorizontalView(carousel, slide, { behavior: 'smooth', align: 'start' });
+      setActive(nextIndex);
+      window.setTimeout(() => {
+        suppressObserver = false;
+      }, 420);
+    };
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        scrollToIndex(Number(chip.dataset.dayIndex || chip.dataset.slideIndex || 0));
+      });
+    });
+
+    // Add click listeners to page dots
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        scrollToIndex(Number(dot.dataset.slideIndex || 0));
+      });
+    });
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        if (suppressObserver) return;
+        const visibleEntry = entries
+            .filter(entry => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visibleEntry) return;
+        const nextIndex = Number(visibleEntry.target.dataset.dayIndex || visibleEntry.target.dataset.slideIndex || 0);
+        if (!Number.isNaN(nextIndex)) setActive(nextIndex);
+      }, {
+        root: carousel,
+        threshold: [0.55, 0.7, 0.85]
+      });
+
+      slides.forEach(slide => observer.observe(slide));
+      pager.__mobileSwipeObserver = observer;
+    } else {
+      const syncFromScroll = () => {
+        if (scrollFrame) cancelAnimationFrame(scrollFrame);
+        scrollFrame = requestAnimationFrame(() => {
+          const center = carousel.scrollLeft + carousel.clientWidth / 2;
+          let bestIndex = 0;
+          let bestDistance = Number.POSITIVE_INFINITY;
+
+          slides.forEach((slide, idx) => {
+            const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+            const distance = Math.abs(slideCenter - center);
+            if (distance < bestDistance) {
+              bestDistance = distance;
+              bestIndex = idx;
+            }
+          });
+
+          setActive(bestIndex);
+        });
+      };
+
+      carousel.addEventListener('scroll', syncFromScroll, { passive: true });
+    }
+
+    setActive(initialIndex);
+    const initialSlide = slides[initialIndex];
+    if (carousel && initialSlide) {
+      carousel.scrollLeft = Math.max(0, initialSlide.offsetLeft - carousel.offsetLeft);
+    }
+  });
+}
+
+function highlightCityNavByCityId(cityId) {
+  const nav = document.getElementById('cityNav');
+  if (!nav || !cityId) return;
+  const btn = nav.querySelector(`.city-nav-btn[data-city="${cityId}"]`);
+  if (!btn) return;
+  nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const navList = nav.querySelector('.city-nav-list');
+  if (!navList) return;
+  if (typeof scrollChildIntoHorizontalView === 'function') {
+    scrollChildIntoHorizontalView(navList, btn, { behavior: 'smooth', align: 'center' });
+  } else {
+    navList.scrollTo({
+      left: Math.max(0, btn.offsetLeft - navList.offsetLeft - (navList.clientWidth - btn.offsetWidth) / 2),
+      behavior: 'smooth'
+    });
+  }
+}
+
+function normalizeItemStatus(status) {
+  const normalized = String(status || 'planned').trim().toLowerCase();
+  if (normalized === 'pending' || normalized === 'none' || normalized === 'null' || !normalized) return 'planned';
+  return ['planned', 'booked', 'confirmed', 'cancelled'].includes(normalized) ? normalized : 'planned';
+}
+
+function getStatusMeta(status) {
+  const key = normalizeItemStatus(status);
+  const meta = {
+    planned: { label: '⏳ Planned', color: '#D97706' },
+    booked: { label: '✓ Booked', color: '#2563EB' },
+    confirmed: { label: '🎫 Confirmed', color: '#059669' },
+    cancelled: { label: '✗ Cancelled', color: '#DC2626' }
+  };
+  return { key, ...meta[key] };
+}
+
+function renderStatusBadge(status, {
+  onClick = '',
+  title = 'Change status',
+  className = '',
+  ariaLabel = ''
+} = {}) {
+  const meta = getStatusMeta(status);
+  const safeTitle = typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title;
+  const safeAria = typeof escapeHtmlText === 'function' ? escapeHtmlText(ariaLabel || `${meta.label} status`) : (ariaLabel || `${meta.label} status`);
+  const safeClass = typeof escapeHtmlText === 'function' ? escapeHtmlText(className) : className;
+
+  const isClickable = !!onClick;
+  const buttonAttrs = `class="status-badge ${isClickable ? 'status-badge-clickable' : 'cursor-default'} ${safeClass}" style="--status-color:${meta.color};" title="${safeTitle}" aria-label="${safeAria}"`;
+
+  if (isClickable) {
+    return `<button type="button" ${buttonAttrs} onclick="${onClick}">${meta.label}</button>`;
+  }
+
+  return `<button type="button" ${buttonAttrs} disabled style="cursor: default; opacity: 1 !important;">${meta.label}</button>`;
+}
+
+function renderMobileStatusCostMeta({
+                                      status,
+                                      costValue,
+                                      bookingReference = '',
+                                      statusOnClick = '',
+                                      costOnBlur = '',
+                                      statusButtonTitle = 'Change status',
+                                      metaClass = 'transport-status-cost-meta',
+                                      editableCost = false
+                                    }) {
+  const safeCost = typeof formatCurrency === 'function'
+      ? formatCurrency(costValue, { includeSymbol: false })
+      : (costValue ?? '0');
+  const costNode = editableCost
+      ? `<span contenteditable="true" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1 min-w-[20px] inline-block" onblur="${costOnBlur}">${safeCost}</span>`
+      : `<span>${safeCost}</span>`;
+  const statusNode = renderStatusBadge(status, {
+    onClick: statusOnClick,
+    title: statusButtonTitle,
+    ariaLabel: `${getStatusMeta(status).label} status`
+  });
+
+  return `
+    <div class="flex items-center justify-between w-full mt-1 ${metaClass}">
+      ${statusNode}
+      <div class="font-bold text-slate-800 dark:text-slate-100 text-sm">
+        <span class="text-slate-500 dark:text-slate-400 font-medium mr-0.5">$</span>${costNode}
+      </div>
+      ${bookingReference ? `<span class="text-[10px] text-slate-400 ml-2 font-mono truncate">${bookingReference}</span>` : ''}
+    </div>
+  `;
+}
+
+const DEFAULT_LEAVE_HOME = [
+  { text: "Kitchen and bins", kind: "section" },
+  { text: "Empty fridge and pantry perishables", done: false },
+  { text: "Empty coffee and compost bins and leave outside", done: false },
+  { text: "Empty bins", done: false, mergeKeys: ["take out all rubbish and recycling"] },
+  { text: "Pause or reschedule any regular deliveries", done: false },
+  { text: "Check mailbox is empty or hold mail service", done: false },
+
+  { text: "Home shutdown", kind: "section" },
+  { text: "Turn power off everywhere not needed", done: false, mergeKeys: ["switch off power points at the wall except fridge"] },
+  { text: "Check all lights and fans off", done: false },
+  { text: "Close and check all windows", done: false, mergeKeys: ["lock all doors and windows"] },
+  { text: "Blinds partial down", done: false, mergeKeys: ["close blinds or curtains and secure loose outdoor items"] },
+  { text: "Water off (including outdoor taps)", done: false, mergeKeys: ["water off, including outdoor taps", "turn off all taps and check for leaks"] },
+  { text: "Turn off gas supply if applicable", done: false },
+  { text: "Adjust thermostat to away or saver mode", done: false },
+
+  { text: "Security and pets", kind: "section" },
+  { text: "Check CCTV on", done: false },
+  { text: "Dog door panel / lock", done: false },
+  { text: "Automatic fish feeder", done: false, mergeKeys: ["automatic fish feeder"] },
+  { text: "Security system on", done: false, mergeKeys: ["set security alarm / notify security company"] },
+  { text: "Water plants or arrange plant care", done: false },
+  { text: "Set up lights on timers if away long", done: false },
+
+  { text: "Travel ready", kind: "section" },
+  { text: "Setup international cards on smart devices (Apple Pay / Google Pay)", done: false },
+  { text: "Setup default transport card on smart devices", done: false },
+  { text: "Charge all devices including phones, tablets, and power banks", done: false },
+  { text: "Download offline maps and confirmations", done: false },
+  { text: "Notify emergency contact of travel plans", done: false },
+  { text: "Pause gym membership or group activities", done: false },
+
+  { text: "If taking dog", kind: "section" },
+  { text: "Waste bags", done: false, mergeKeys: ["if taking dog: waste bags"] },
+  { text: "Water bowl", done: false, mergeKeys: ["if taking dog: water bowl"] },
+  { text: "Food", done: false, mergeKeys: ["if taking dog: food"] },
+  { text: "Toys", done: false, mergeKeys: ["if taking dog: toys"] },
+  { text: "Leash", done: false, mergeKeys: ["if taking dog: leash"] },
+  { text: "Treats", done: false, mergeKeys: ["if taking dog: treats"] }
+];
+
+const DEFAULT_HOTEL_CHECKOUT = [
+  { text: "Room Sweep", kind: "section" },
+  { text: "Check under the bed", done: false },
+  { text: "Check the safe", done: false },
+  { text: "Check all power outlets (chargers)", done: false },
+  { text: "Check the bathroom (toiletries)", done: false },
+  { text: "Check drawers and closets", done: false },
+
+  { text: "Checkout", kind: "section" },
+  { text: "Return room keys", done: false },
+  { text: "Pay any incidentals/taxes", done: false },
+  { text: "Get receipt (if needed)", done: false }
+];
+
+function normalizeChecklistText(text) {
+  return String(text || '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ');
+}
+
+function getChecklistItemKeys(item) {
+  if (!item) return [];
+
+  const keys = [];
+  const primary = normalizeChecklistText(item.text);
+  if (primary) keys.push(primary);
+
+  if (Array.isArray(item.mergeKeys)) {
+    item.mergeKeys.forEach(key => {
+      const normalized = normalizeChecklistText(key);
+      if (normalized && !keys.includes(normalized)) {
+        keys.push(normalized);
+      }
+    });
+  }
+
+  return keys;
+}
+
+function mergeChecklistWithDefaults(savedItems, defaultItems = DEFAULT_LEAVE_HOME) {
+  const savedList = Array.isArray(savedItems) ? savedItems : [];
+  const defaults = Array.isArray(defaultItems) ? defaultItems : [];
+  const savedEntries = savedList
+      .map((item, index) => ({ item, index, keys: getChecklistItemKeys(item), matched: false }))
+      .filter(entry => entry.keys.length > 0);
+
+  const merged = defaults.map(def => {
+    const defaultCopy = JSON.parse(JSON.stringify(def));
+    const defaultKeys = getChecklistItemKeys(def);
+    const savedEntry = savedEntries.find(entry =>
+        !entry.matched && entry.keys.some(key => defaultKeys.includes(key))
+    );
+
+    if (!savedEntry) {
+      if (defaultCopy.kind !== 'section' && typeof defaultCopy.done !== 'boolean') {
+        defaultCopy.done = false;
+      }
+      return defaultCopy;
+    }
+
+    savedEntry.matched = true;
+
+    if (defaultCopy.kind === 'section') {
+      return defaultCopy;
+    }
+
+    return {
+      ...defaultCopy,
+      ...savedEntry.item,
+      text: defaultCopy.text,
+      done: Boolean(savedEntry.item.done)
+    };
+  });
+
+  savedEntries.forEach(entry => {
+    if (entry.matched) return;
+    const item = { ...entry.item };
+    if (!item.kind && typeof item.done !== 'boolean') {
+      item.done = false;
+    }
+    merged.push(item);
+  });
+
+  return merged;
+}
+
+const DEFAULT_PACKING = [
+  {
+    areaName: "🚶 Walk-on Gear (Wear onto plane)",
+    areaColor: "#E67E22",
+    categories: [
+      { title: "Plane Outfit", items: [{text: "Underwear", done:false}, {text: "Jeans", done:false}, {text: "Belt", done:false}, {text: "Sports shoes", done:false}, {text: "Socks", done:false}, {text: "Activewear shirt", done:false}, {text: "Hoodie", done:false}, {text: "Sunglasses", done:false}] }
+    ]
+  },
+  {
+    areaName: "🧳 Carry-on Packed Bag (Main Luggage)",
+    areaColor: "#2980B9",
+    categories: [
+      { title: "Clothes", items: [{text: "T-shirts, Tank Tops", done:false}, {text: "Shorts, Skirts", done:false}, {text: "Pants", done:false}, {text: "Layers (hoodie, sweater)", done:false}, {text: "Swim suit", done:false}, {text: "Dress", done:false}, {text: "Socks", done:false}, {text: "Underwear", done:false}, {text: "Bras", done:false}, {text: "Pyjamas, Sleepwear", done:false}, {text: "Formal Wear", done:false}, {text: "Hat", done:false}, {text: "Workout outfit", done:false}, {text: "Other accessories / Earrings", done:false}] },
+      { title: "Shoes & Misc", items: [{text: "Dress shoes", done:false}, {text: "Sandals/Crocs", done:false}, {text: "Mobile strap for running", done:false}, {text: "Presents / Card", done:false}, {text: "Reusable tote bag", done:false}, {text: "Pillowcase for used clothes", done:false}, {text: "Micro-fibre Towel", done:false}, {text: "Foldable hangers", done:false}, {text: "Laundry Sheets for washing", done:false}, {text: "Raincoat/Umbrella", done:false}] },
+      { title: "Dry Toiletries", items: [{text: "Floss", done:false}, {text: "Toothbrush", done:false}, {text: "Razor (Cartidge), Shaving", done:false}, {text: "Bar of Soap", done:false}, {text: "Cotton pad, q-tips", done:false}, {text: "Nail clippers/tweezers", done:false}, {text: "Personal Hygiene items (Pads)", done:false}, {text: "Makeup", done:false}, {text: "Hair clips, hair ties", done:false}, {text: "Hair Brush/comb", done:false}, {text: "Bandaids, Electrolyte packs", done:false}, {text: "Body wipes", done:false}, {text: "Panadol / Nurofen", done:false}, {text: "Vitamins / Tablets", done:false}] },
+      { title: "💧 1L Clear Bag (Liquids <100ml)", items: [{text: "Clear 1 litre bag", done:false}, {text: "Cologne/Perfume", done:false}, {text: "Toothpaste", done:false}, {text: "Face wash", done:false}, {text: "Shampoo & Conditioner", done:false}, {text: "Leave-in conditioner", done:false}, {text: "Micellar Water/Makeup Remover", done:false}, {text: "Sunscreen", done:false}, {text: "Deodorant", done:false}, {text: "Moisturiser", done:false}] }
+    ]
+  },
+  {
+    areaName: "🎒 Personal Item Bag (Under Seat)",
+    areaColor: "#8E44AD",
+    categories: [
+      { title: "Essentials", items: [{text: "TRS Claim + Items", done:false}, {text: "Passport + [Copy + Tracker]", done:false}, {text: "Reservations + Itineraries + Insurance", done:false}, {text: "Wallet/Purse + Local cash + Cards", done:false}, {text: "Phone", done:false}, {text: "Crossbody/Sling Bag", done:false}] },
+      { title: "Flight Items", items: [{text: "Travel pillow / Foot sling", done:false}, {text: "Phone holder (watch movies)", done:false}, {text: "Compression socks, Slippers", done:false}, {text: "Disposable Toothbrush kit", done:false}, {text: "Eye mask, Eye Drops", done:false}, {text: "Ear plugs, Breath Fresheners", done:false}, {text: "Snacks, TravelCalm", done:false}, {text: "Headphones/Airpods", done:false}, {text: "Airfly/Bluetooth Adapter", done:false}, {text: "Book/Kindle", done:false}, {text: "Water bottle", done:false}] },
+      { title: "Tech", items: [{text: "eSIM (Installed)", done:false}, {text: "Mobile downloads (Movies, Shows)", done:false}, {text: "Phone charger", done:false}, {text: "Power cables, Cords", done:false}, {text: "Power Adapter", done:false}, {text: "Power bank", done:false}, {text: "Pen", done:false}, {text: "Laptop", done:false}, {text: "Luggage Trackers", done:false}] }
+    ]
+  },
+  {
+    areaName: "📝 Trip Notes",
+    areaColor: "#6C5CE7",
+    categories: [
+      { title: "Notes", items: [{text: "Booking reminders", done:false}, {text: "Places to book", done:false}, {text: "Trip ideas to follow up", done:false}] }
+    ]
+  }
+];
+
+function updateClocks() {}
+
+function getMapSearchUrl(query, city = '') {
+  if (!query) return '';
+  let fullQuery = query;
+  if (city) {
+    const cleanCity = String(city).trim();
+    if (cleanCity && !query.toLowerCase().includes(cleanCity.toLowerCase())) {
+      fullQuery = `${query}, ${cleanCity}`;
+    }
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullQuery)}`;
+}
+
+function parseCost(val) { return parseCurrencyAmount(val); }
+
+function getDayTotal(day) {
+  let total = 0;
+  
+  // 1. Sum up custom activity items stored directly on the day (activityItems)
+  (day.activityItems || []).forEach(item => {
+    total += parseCost(item.cost);
+  });
+
+  // 2. Sum up stays checkin costs from the global stays database for this day
+  if (typeof getStayDisplayForDay === 'function') {
+    const staysForDay = getStayDisplayForDay(day.date, day.to);
+    staysForDay.forEach(stayInfo => {
+      // ONLY sum the cost on check-in day, to avoid double-counting on check-out day!
+      if (stayInfo.type === 'checkin') {
+        total += parseCost(stayInfo.cost);
+      }
+    });
+  } else {
+    (day.accomItems || []).forEach(item => {
+      total += parseCost(item.cost);
+    });
+  }
+
+  // 3. Sum up journey costs from the global journeys database for this day
+  if (typeof getDayJourneys === 'function') {
+    let legId = '';
+    if (typeof appData !== 'undefined') {
+      const parentLeg = appData.find(leg => (leg.days || []).some(d => d.date === day.date));
+      if (parentLeg) legId = parentLeg.id;
+    }
+    const journeysForDay = getDayJourneys(day.date, day.from, day.to, legId);
+    journeysForDay.forEach(journey => {
+      if (journey.legId && legId && journey.legId !== legId) {
+        return;
+      }
+      // Avoid double-counting overnight or transit journeys on arrival day:
+      // Only sum the cost on the departure day!
+      const depDate = journey.departureDate || journey.dayDate;
+      const isDepDay = depDate && (typeof journeyDatesMatch === 'function' ? journeyDatesMatch(depDate, day.date) : (depDate === day.date));
+      if (depDate && !isDepDay) {
+        return;
+      }
+      total += parseCost(journey.cost);
+    });
+  } else {
+    (day.transportItems || []).forEach(item => {
+      total += parseCost(item.cost);
+    });
+  }
+
+  return formatCurrency(total, { showZero: false });
+}
+
+window.getMapSearchUrl = getMapSearchUrl;
+window.getDayTotal = getDayTotal;
+window.parseCurrencyAmount = parseCurrencyAmount;
+window.formatCurrency = formatCurrency;
+window.escapeHtmlText = escapeHtmlText;
+window.renderMobileStat = renderMobileStat;
+window.renderMobileSurfaceCard = renderMobileSurfaceCard;
+window.renderMobileSwipePager = renderMobileSwipePager;
+window.setupMobileSwipePagers = setupMobileSwipePagers;
+window.renderMobileStatusCostMeta = renderMobileStatusCostMeta;
+window.normalizeItemStatus = normalizeItemStatus;
+window.getStatusMeta = getStatusMeta;
+window.renderStatusBadge = renderStatusBadge;
+window.getMobilePagerActiveIndex = getMobilePagerActiveIndex;
+window.setMobilePagerActiveIndex = setMobilePagerActiveIndex;
+window.resetMobilePagerActiveIndex = resetMobilePagerActiveIndex;
+window.captureMobilePagerStates = captureMobilePagerStates;
+window.scrollChildIntoHorizontalView = scrollChildIntoHorizontalView;

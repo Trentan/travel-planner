@@ -1,0 +1,289 @@
+function getAiFieldValue(id, fallback) {
+  const el = document.getElementById(id);
+  const value = el && typeof el.value === 'string' ? el.value.trim() : '';
+  return value || fallback;
+}
+
+function buildAiPrompt({ title, regions, dates, citiesInput, cities, junctions, vibe }) {
+  const cityCount = cities.length || 3;
+
+  return `I am building a travel itinerary app and need a complete JSON dataset for an upcoming trip.
+
+TRIP DETAILS:
+- Title: ${title}
+- Target Regions / Countries: ${regions || 'Not specified (Choose logical countries based on vibe)'}
+- Specific Cities: ${citiesInput || 'None specified (AI should select 3-5 logical destination cities in the target region)'}
+- Fixed Pre-booked Flights & Junctions: ${junctions || 'None (Flexible travel junctions)'}
+- Dates & Duration: ${dates}
+- Travel Vibe & Preferences: ${vibe}
+
+YOUR TASK:
+Generate a detailed daily itinerary tailored to my preferences. If specific cities are not specified above, select 3-5 logical destination cities within the requested regions/countries that fit the pre-booked flight junctions. Create the result as a downloadable .json file that I can save and import into the app.
+
+The downloadable file must contain one JSON object that exactly matches this structure. Do not wrap it in markdown, commentary, or code fences.
+
+EXPECTED JSON SCHEMA:
+{
+  "meta": {
+    "title": "${title}",
+    "subtitle": "Generated ${cityCount}-city itinerary"
+  },
+  "cities": [
+    {
+      "id": "city-cityname",
+      "name": "City Name",
+      "country": "Country Name",
+      "countryCode": "ISO-3166-1 alpha-2 code",
+      "code": "IATA city or airport code where known",
+      "lat": 12.3456,
+      "lng": 123.4567,
+      "dateFrom": "YYYY-MM-DD",
+      "dateTo": "YYYY-MM-DD",
+      "colour": "#HEXCOLOR"
+    }
+  ],
+  "itinerary": [
+    {
+      "id": "leg-start",
+      "label": "🏠 Start (Home City)",
+      "colour": "#2C3E50",
+      "cityFood": [],
+      "suggestedActivities": [],
+      "legTips": [],
+      "days": [
+        {
+          "date": "YYYY-MM-DD",
+          "day": "Mon",
+          "from": "Home",
+          "to": "Departure City",
+          "completed": false,
+          "desc": "Travel day",
+          "activityItems": []
+        }
+      ]
+    }
+  ],
+  "journeys": [
+    {
+      "id": "journey-1",
+      "journeyId": "journey-outbound",
+      "journeyName": "Home to First City",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromLocation": "Home City",
+      "toLocation": "First City",
+      "fromCityId": "city-home",
+      "toCityId": "city-firstcity",
+      "departureDate": "YYYY-MM-DD",
+      "departureTime": "HH:MM",
+      "arrivalDate": "YYYY-MM-DD",
+      "arrivalTime": "HH:MM",
+      "transportType": "flight",
+      "provider": "Airline Name",
+      "routeCode": "FL123",
+      "cost": 500,
+      "status": "confirmed",
+      "bookingReference": "ABC123"
+    }
+  ],
+  "stays": [
+    {
+      "id": "stay-1",
+      "cityId": "city-cityname",
+      "city": "City Name",
+      "propertyName": "Hotel Name",
+      "checkIn": "YYYY-MM-DD",
+      "checkOut": "YYYY-MM-DD",
+      "nights": 3,
+      "status": "confirmed",
+      "provider": "Booking.com",
+      "bookingRef": "ABC123",
+      "totalCost": 450,
+      "notes": "Near city center, late check-in available"
+    }
+  ],
+  "packing": [],
+  "leaveHome": [
+    {"text": "Lock all doors and windows", "done": false},
+    {"text": "Set security alarm", "done": false},
+    {"text": "Charge all devices", "done": false}
+  ]
+}
+
+INSTRUCTIONS FOR GENERATION:
+
+1. CITIES: Create cities array. ${cities.length ? `Use specified cities: ${cities.join(', ')}.` : 'Choose 3-5 logical cities in the requested regions.'} Auto-generate city IDs as "city-[lowercase-city-name]" and assign distinct colors from: #E74C3C, #3498DB, #27AE60, #F39C12, #9B59B6, #1ABC9C, #E91E63, #795548. Include country, countryCode, code, lat, and lng for every city whenever known so maps, weather, and city navigation work immediately after import.
+
+2. ITINERARY LEGS: Create these leg types in order:
+   - "leg-start": Departure from home
+   - One leg per city
+   - "leg-travel-X" between cities if multiple cities
+   - "leg-return": Return to home
+
+3. CITYID ASSIGNMENT: Every tip, food item, activity, and accommodation must include the cityId matching its city.
+
+4. JOURNEYS & JUNCTIONS: Create transport entries matching fixed flight junctions (${junctions || 'Outbound, inter-city, and return travel'}). Use ISO date format (YYYY-MM-DD) for all dates.
+
+5. STAYS: Create accommodation entries matching the itinerary. Calculate nights from checkIn to checkOut dates.
+
+6. ACTIVITIES: Include variety from these categories:
+   - "fitness" (runs, walks, gym)
+   - "sight" (museums, landmarks)
+   - "attraction" (tours, shows)
+   - "wellness" (spa, yoga)
+   - "food" (restaurants, markets)
+
+7. Match the pacing and budget to the user's preferences.
+
+8. Make the JSON valid, complete, and ready to import into the app without manual restructuring.
+
+9. Deliver the final answer as an attached/downloadable .json file. If your interface cannot attach files, output only the raw JSON object so I can save it as a .json file.`;
+}
+
+function getAiTripTitlePrefill() {
+  const title = typeof titleData !== 'undefined' && titleData ? titleData.title : '';
+  return String(title || '').trim();
+}
+
+function getAiTripDatesPrefill() {
+  const dates = [];
+  if (typeof appData !== 'undefined' && Array.isArray(appData)) {
+    appData.forEach(leg => {
+      (leg.days || []).forEach(day => {
+        if (day && day.date) dates.push(day.date);
+      });
+    });
+  }
+
+  const sortedDates = dates
+    .map(date => (typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(date) : date))
+    .filter(date => /^\d{4}-\d{2}-\d{2}$/.test(date))
+    .sort();
+
+  if (!sortedDates.length) return '';
+
+  const firstDate = sortedDates[0];
+  const lastDate = sortedDates[sortedDates.length - 1];
+  const formatDate = date => (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(date) : date);
+  const range = firstDate === lastDate ? formatDate(firstDate) : `${formatDate(firstDate)} - ${formatDate(lastDate)}`;
+
+  const flights = Array.isArray(window.journeys)
+    ? window.journeys.flatMap(journey => {
+        const legs = Array.isArray(journey.legs) && journey.legs.length ? journey.legs : [journey];
+        return legs
+          .filter(leg => String(leg.type || leg.transportType || '').toLowerCase() === 'flight')
+          .map(leg => leg.routeCode || leg.provider || '')
+          .filter(Boolean);
+      })
+    : [];
+
+  return flights.length ? `${range}. Flights: ${[...new Set(flights)].join(', ')}` : range;
+}
+
+function getAiTripCitiesPrefill() {
+  const cityNames = [];
+  const addCity = value => {
+    const city = String(value || '').trim();
+    if (!city || /^in transit$/i.test(city) || city === '—') return;
+    if (!cityNames.some(existing => existing.toLowerCase() === city.toLowerCase())) cityNames.push(city);
+  };
+
+  if (typeof citiesData !== 'undefined' && Array.isArray(citiesData) && citiesData.length) {
+    citiesData.filter(city => !city.isTransit).forEach(city => addCity(city.name));
+  } else if (typeof appData !== 'undefined' && Array.isArray(appData)) {
+    appData.forEach(leg => {
+      const label = String(leg.label || '').replace(/[^\w\s.'&-]/g, '').trim();
+      addCity(label);
+      (leg.days || []).forEach(day => {
+        addCity(day.from);
+        addCity(day.to);
+      });
+    });
+  }
+
+  return cityNames.join(', ');
+}
+
+function setAiFieldIfEmpty(id, value) {
+  const field = document.getElementById(id);
+  if (!field || !value || String(field.value || '').trim()) return;
+  field.value = value;
+}
+
+function prefillAIDialogFields() {
+  setAiFieldIfEmpty('aiTripTitle', getAiTripTitlePrefill());
+  setAiFieldIfEmpty('aiTripDates', getAiTripDatesPrefill());
+  setAiFieldIfEmpty('aiTripCities', getAiTripCitiesPrefill());
+
+  let vibePrefill = '';
+  try {
+    const savedVibe = JSON.parse(localStorage.getItem('travelApp_vibeProfile') || 'null');
+    if (savedVibe) {
+      const parts = [];
+      if (savedVibe.party) parts.push(`Party: ${savedVibe.party}`);
+      if (savedVibe.pacing) parts.push(`Pacing: ${savedVibe.pacing}`);
+      if (savedVibe.interests && savedVibe.interests.length) parts.push(`Interests: ${savedVibe.interests.join(', ')}`);
+      if (savedVibe.notes) parts.push(`Notes: ${savedVibe.notes}`);
+      vibePrefill = parts.join('. ');
+    }
+  } catch (e) {}
+
+  if (vibePrefill) {
+    setAiFieldIfEmpty('aiTripVibe', vibePrefill);
+  }
+}
+
+function generatePrompt() {
+  const title = getAiFieldValue('aiTripTitle', 'New Travel Adventure');
+  const regions = getAiFieldValue('aiTripRegions', '');
+  const dates = getAiFieldValue('aiTripDates', '14 days');
+  const citiesInput = getAiFieldValue('aiTripCities', '');
+  const junctions = getAiFieldValue('aiTripBookedJunctions', '');
+  const vibe = getAiFieldValue('aiTripVibe', 'Relaxed pacing, great food, local culture, walking friendly.');
+  const cities = citiesInput ? citiesInput.split(',').map(city => city.trim()).filter(Boolean) : [];
+  const promptText = buildAiPrompt({ title, regions, dates, citiesInput, cities, junctions, vibe });
+
+  const outputBox = document.getElementById('aiOutputBox');
+  const promptArea = document.getElementById('aiPromptOutput');
+
+  if (outputBox) outputBox.style.display = 'block';
+  if (promptArea) promptArea.value = promptText;
+
+  return promptText;
+}
+
+async function copyPrompt() {
+  const promptArea = document.getElementById('aiPromptOutput');
+  const promptText = promptArea ? promptArea.value : '';
+
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(promptText);
+    } else if (promptArea && typeof promptArea.select === 'function' && typeof document.execCommand === 'function') {
+      promptArea.select();
+      document.execCommand('copy');
+    } else {
+      throw new Error('Clipboard API unavailable');
+    }
+
+    alert('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+    return true;
+  } catch (error) {
+    if (promptArea && typeof promptArea.select === 'function' && typeof document.execCommand === 'function') {
+      promptArea.select();
+      const copied = document.execCommand('copy');
+      if (copied) {
+        alert('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+        return true;
+      }
+    }
+
+    alert('Could not copy automatically. Select the prompt and copy it manually.');
+    return false;
+  }
+}
+
+globalThis.buildAiPrompt = buildAiPrompt;
+globalThis.prefillAIDialogFields = prefillAIDialogFields;
+globalThis.generatePrompt = generatePrompt;
+globalThis.copyPrompt = copyPrompt;

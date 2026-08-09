@@ -1,0 +1,4865 @@
+{
+  "meta": {
+    "title": "✈ Europe 2027",
+    "subtitle": "Greece, Italy, Spain, Portugal & France — 8 Jun to 8 Jul (relaxed pace, great food)"
+  },
+  "itinerary": [
+    {
+      "id": "city-brisbane-start",
+      "label": "Brisbane (Trip Start)",
+      "colour": "#2C3E50",
+      "cityFood": [],
+      "suggestedActivities": [
+        {
+          "id": "act-k2w4fuspk-mrsqchge",
+          "title": "Pre-flight Walk",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "A loop around the terminal or nearby park to loosen up before ~21 hours in transit",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-08",
+          "startDate": "2027-06-08",
+          "startTime": "",
+          "endDate": "2027-06-08",
+          "endTime": "",
+          "cityId": "city-brisbane",
+          "text": "Pre-flight Walk"
+        },
+        {
+          "id": "act-jqlookeia-mrsskpln",
+          "title": "Light dinner at BNE before boarding",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Keep it simple — a proper Greek meal is waiting in Athens",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-08",
+          "startDate": "2027-06-08",
+          "startTime": "",
+          "endDate": "2027-06-08",
+          "endTime": "",
+          "cityId": "city-brisbane"
+        }
+      ],
+      "legTips": [],
+      "days": [
+        {
+          "date": "2027-06-08",
+          "day": "Tue",
+          "from": "Brisbane",
+          "to": "Brisbane",
+          "completed": false,
+          "desc": "Depart Brisbane, overnight flight via Singapore",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-brisbane"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-brisbane",
+              "category": "fitness",
+              "title": "Easy pre-flight walk",
+              "notes": "A loop around the terminal or nearby park to loosen up before ~21 hours in transit",
+              "startDate": "2027-06-08",
+              "endDate": "2027-06-08",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-k2w4fuspk-mrsqchge",
+              "time": "1 hr",
+              "text": "Easy pre-flight walk"
+            },
+            {
+              "cityId": "city-brisbane",
+              "category": "food",
+              "title": "Light dinner at BNE before boarding",
+              "notes": "Keep it simple — a proper Greek meal is waiting in Athens",
+              "startDate": "2027-06-08",
+              "endDate": "2027-06-08",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-jqlookeia-mrsskpln",
+              "time": "1 hr",
+              "text": "Light dinner at BNE before boarding"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-athens",
+      "label": "🏛️ Athens, Greece",
+      "colour": "#3498DB",
+      "cityFood": [
+        {
+          "cityId": "city-athens",
+          "category": "food",
+          "title": "Platanos Taverna, Plaka",
+          "notes": "Running since 1932 under shady plane trees on Diogenous St; classic lamb roasted golden-brown and egg-lemon dolmades",
+          "text": "Platanos Taverna, Plaka"
+        },
+        {
+          "cityId": "city-athens",
+          "category": "food",
+          "title": "The Old Tavern of Psarras, Plaka",
+          "notes": "Founded 1898 in a neoclassical building; try the grilled octopus and moussaka, once a haunt of Laurence Olivier and Vivien Leigh",
+          "text": "The Old Tavern of Psarras, Plaka"
+        },
+        {
+          "cityId": "city-athens",
+          "category": "food",
+          "title": "O Thanasis, Monastiraki",
+          "notes": "Considered Athens' best souvlaki and gyros joint, a few steps from Monastiraki Square",
+          "text": "O Thanasis, Monastiraki"
+        },
+        {
+          "cityId": "city-athens",
+          "category": "food",
+          "title": "Saita, Plaka",
+          "notes": "Small, unpretentious taverna on Kydathineon St; order the bakaliaros skordalia (battered salt cod with garlic dip)",
+          "text": "Saita, Plaka"
+        }
+      ],
+      "suggestedActivities": [
+        {
+          "cityId": "city-athens",
+          "category": "sight",
+          "title": "Acropolis & Parthenon",
+          "notes": "5th-century BC citadel; buy timed-entry tickets online to skip the queue and go at opening (8am) to beat both heat and crowds",
+          "id": "act-caoss1slh-mrsqchge",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Acropolis & Parthenon"
+        },
+        {
+          "cityId": "city-athens",
+          "category": "attraction",
+          "title": "Plaka district wander",
+          "notes": "The old neighbourhood beneath the Acropolis — neoclassical lanes, Anafiotika's Cycladic-style alleys, and tavernas",
+          "id": "act-15850xbt8-mrsqchge",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Plaka district wander"
+        },
+        {
+          "cityId": "city-athens",
+          "category": "sight",
+          "title": "Ancient Agora",
+          "notes": "The heart of ancient Athenian civic life, with the well-preserved Temple of Hephaestus",
+          "id": "act-8ydmoez3i-mrsqchge",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Ancient Agora"
+        },
+        {
+          "cityId": "city-athens",
+          "category": "sight",
+          "title": "Acropolis Museum",
+          "notes": "Modern glass-and-concrete museum built over an excavation site, housing the original Parthenon marbles Greece still holds",
+          "id": "act-du7iejy7q-mrsqchge",
+          "assignedDate": "2027-06-10",
+          "startDate": "2027-06-10",
+          "endDate": "2027-06-10",
+          "startTime": "",
+          "endTime": "",
+          "text": "Acropolis Museum",
+          "assignedDayIdx": 1
+        },
+        {
+          "id": "act-dkcs39i2f-mrsqchge",
+          "title": "Slow Morning in Athens",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Recovery day after the long flight — a Greek coffee in Syntagma Square is enough of an agenda",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-09",
+          "startDate": "2027-06-09",
+          "startTime": "",
+          "endDate": "2027-06-09",
+          "endTime": "",
+          "cityId": "city-athens",
+          "text": "Slow Morning in Athens"
+        },
+        {
+          "id": "act-nea51oz3i-mrsqchgf",
+          "title": "Suggested Experience",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Go at 8am opening to beat the heat and crowds; allow 2 hours",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-10",
+          "startDate": "2027-06-10",
+          "startTime": "",
+          "endDate": "2027-06-10",
+          "endTime": "",
+          "cityId": "city-athens",
+          "text": "Suggested Experience"
+        },
+        {
+          "id": "act-0lxr7pfgi-mrsqchgf",
+          "title": "Suggested Experience",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Shaded 15-hectare park behind the old Royal Palace — a cool escape before the heat sets in",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-11",
+          "startDate": "2027-06-11",
+          "startTime": "",
+          "endDate": "2027-06-11",
+          "endTime": "",
+          "cityId": "city-athens",
+          "text": "Suggested Experience"
+        },
+        {
+          "id": "act-lzhsbsy46-mrsqchgf",
+          "title": "Suggested Experience",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Celestyal's Idyllic Aegean departs Piraeus around 5pm — allow at least an hour for check-in",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 3,
+          "assignedDate": "2027-06-12",
+          "startDate": "2027-06-12",
+          "startTime": "",
+          "endDate": "2027-06-12",
+          "endTime": "",
+          "cityId": "city-athens",
+          "text": "Suggested Experience"
+        },
+        {
+          "id": "act-xqgvq93tj-mrsskpln",
+          "title": "Welcome dinner at Platanos Taverna, Plaka",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Since 1932; lamb, dolmades and barrel wine under the plane trees",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-09",
+          "startDate": "2027-06-09",
+          "startTime": "",
+          "endDate": "2027-06-09",
+          "endTime": "",
+          "cityId": "city-athens"
+        },
+        {
+          "id": "act-iq0rc404q-mrsskpln",
+          "title": "Lunch at Saita, Kydathineon St",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Bakaliaros skordalia, grilled lamb chops, baked aubergine with feta",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-10",
+          "startDate": "2027-06-10",
+          "startTime": "",
+          "endDate": "2027-06-10",
+          "endTime": "",
+          "cityId": "city-athens"
+        },
+        {
+          "id": "act-zgkrqydxh-mrsskplo",
+          "title": "Monastiraki flea market",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Sunday-market energy every day — antiques, records, souvenirs and street food stalls",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-11",
+          "startDate": "2027-06-11",
+          "startTime": "",
+          "endDate": "2027-06-11",
+          "endTime": "",
+          "cityId": "city-athens"
+        },
+        {
+          "id": "act-ykofncas1-mrsskplo",
+          "title": "Dinner at The Old Tavern of Psarras",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Since 1898; grilled octopus and moussaka in a neoclassical Plaka building",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-11",
+          "startDate": "2027-06-11",
+          "startTime": "",
+          "endDate": "2027-06-11",
+          "endTime": "",
+          "cityId": "city-athens"
+        },
+        {
+          "id": "act-9yl9v2fgl-mrsskplo",
+          "title": "Farewell gyros at O Thanasis, Monastiraki",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Grab a classic pork souvlaki wrap before heading to the port",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 3,
+          "assignedDate": "2027-06-12",
+          "startDate": "2027-06-12",
+          "startTime": "",
+          "endDate": "2027-06-12",
+          "endTime": "",
+          "cityId": "city-athens"
+        }
+      ],
+      "legTips": [
+        {
+          "text": "Book Acropolis tickets online in advance to skip queues",
+          "cityId": "city-athens"
+        },
+        {
+          "text": "Wear comfortable shoes — lots of uneven marble underfoot",
+          "cityId": "city-athens"
+        },
+        {
+          "text": "Praxitelous Luxury Suites is a well-rated, central pick near Syntagma if you want to book independently",
+          "cityId": "city-athens"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-09",
+          "day": "Wed",
+          "from": "Athens",
+          "to": "Athens",
+          "completed": false,
+          "desc": "Arrive Athens, recover from the flight",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-athens"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-athens",
+              "category": "wellness",
+              "title": "Slow café morning, no plans",
+              "notes": "Recovery day after the long flight — a Greek coffee in Syntagma Square is enough of an agenda",
+              "startDate": "2027-06-09",
+              "endDate": "2027-06-09",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-dkcs39i2f-mrsqchge",
+              "time": "1 hr",
+              "text": "Slow café morning, no plans"
+            },
+            {
+              "cityId": "city-athens",
+              "category": "food",
+              "title": "Welcome dinner at Platanos Taverna, Plaka",
+              "notes": "Since 1932; lamb, dolmades and barrel wine under the plane trees",
+              "startDate": "2027-06-09",
+              "endDate": "2027-06-09",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-xqgvq93tj-mrsskpln",
+              "time": "1 hr",
+              "text": "Welcome dinner at Platanos Taverna, Plaka"
+            }
+          ]
+        },
+        {
+          "date": "2027-06-10",
+          "day": "Thu",
+          "from": "Athens",
+          "to": "Athens",
+          "completed": false,
+          "desc": "Acropolis day",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-athens"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-athens",
+              "category": "sight",
+              "title": "Acropolis of Athens & Parthenon",
+              "notes": "Go at 8am opening to beat the heat and crowds; allow 2 hours",
+              "startDate": "2027-06-10",
+              "endDate": "2027-06-10",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-nea51oz3i-mrsqchgf",
+              "time": "1 hr",
+              "text": "Acropolis of Athens & Parthenon"
+            },
+            {
+              "cityId": "city-athens",
+              "category": "sight",
+              "title": "Acropolis Museum",
+              "notes": "Right at the base of the hill — the glass floor over live excavations is a highlight",
+              "startDate": "2027-06-10",
+              "endDate": "2027-06-10",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-du7iejy7q-mrsqchge",
+              "time": "1 hr",
+              "text": "Acropolis Museum"
+            },
+            {
+              "cityId": "city-athens",
+              "category": "food",
+              "title": "Lunch at Saita, Kydathineon St",
+              "notes": "Bakaliaros skordalia, grilled lamb chops, baked aubergine with feta",
+              "startDate": "2027-06-10",
+              "endDate": "2027-06-10",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-iq0rc404q-mrsskpln",
+              "time": "1 hr",
+              "text": "Lunch at Saita, Kydathineon St"
+            }
+          ]
+        },
+        {
+          "date": "2027-06-11",
+          "day": "Fri",
+          "from": "Athens",
+          "to": "Athens",
+          "completed": false,
+          "desc": "Free day / local flavour",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-athens"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-athens",
+              "category": "fitness",
+              "title": "Morning walk through the National Garden",
+              "notes": "Shaded 15-hectare park behind the old Royal Palace — a cool escape before the heat sets in",
+              "startDate": "2027-06-11",
+              "endDate": "2027-06-11",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-0lxr7pfgi-mrsqchgf",
+              "time": "1 hr",
+              "text": "Morning walk through the National Garden"
+            },
+            {
+              "cityId": "city-athens",
+              "category": "attraction",
+              "title": "Monastiraki flea market",
+              "notes": "Sunday-market energy every day — antiques, records, souvenirs and street food stalls",
+              "startDate": "2027-06-11",
+              "endDate": "2027-06-11",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-zgkrqydxh-mrsskplo",
+              "time": "1 hr",
+              "text": "Monastiraki flea market"
+            },
+            {
+              "cityId": "city-athens",
+              "category": "food",
+              "title": "Dinner at The Old Tavern of Psarras",
+              "notes": "Since 1898; grilled octopus and moussaka in a neoclassical Plaka building",
+              "startDate": "2027-06-11",
+              "endDate": "2027-06-11",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-ykofncas1-mrsskplo",
+              "time": "1 hr",
+              "text": "Dinner at The Old Tavern of Psarras"
+            }
+          ]
+        },
+        {
+          "date": "2027-06-12",
+          "day": "Sat",
+          "from": "Athens",
+          "to": "Athens",
+          "completed": false,
+          "desc": "Transfer to Piraeus port, board Idyllic Aegean cruise",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-athens"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-athens",
+              "category": "attraction",
+              "title": "Check out & transfer to Piraeus port",
+              "notes": "Celestyal's Idyllic Aegean departs Piraeus around 5pm — allow at least an hour for check-in",
+              "startDate": "2027-06-12",
+              "endDate": "2027-06-12",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-lzhsbsy46-mrsqchgf",
+              "time": "1 hr",
+              "text": "Check out & transfer to Piraeus port"
+            },
+            {
+              "cityId": "city-athens",
+              "category": "food",
+              "title": "Farewell gyros at O Thanasis, Monastiraki",
+              "notes": "Grab a classic pork souvlaki wrap before heading to the port",
+              "startDate": "2027-06-12",
+              "endDate": "2027-06-12",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-9yl9v2fgl-mrsskplo",
+              "time": "1 hr",
+              "text": "Farewell gyros at O Thanasis, Monastiraki"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-cruise-2027-06-13",
+      "label": "🚢 Port day — Kuşadası / Ephesus",
+      "colour": "#27AE60",
+      "cityFood": [],
+      "suggestedActivities": [
+        {
+          "id": "act-obkqqara1-mrsrabz0",
+          "title": "Suggested Experience",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "A ~20-minute drive from port; the Library of Celsus facade and the Great Theatre are unmissable",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-13",
+          "startDate": "2027-06-13",
+          "startTime": "",
+          "endDate": "2027-06-13",
+          "endTime": "",
+          "text": "Suggested Experience",
+          "cityId": "city-kusadasi"
+        },
+        {
+          "id": "act-d4mpj8eu9-mrsskplp",
+          "title": "Turkish mezze lunch near the port",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Grilled meze plates and fresh bread before reboarding",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-13",
+          "startDate": "2027-06-13",
+          "startTime": "",
+          "endDate": "2027-06-13",
+          "endTime": "",
+          "cityId": "city-kusadasi"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-13",
+          "day": "Sun",
+          "from": "Athens",
+          "to": "Kuşadası",
+          "completed": false,
+          "desc": "Port day — Kuşadası / Ephesus",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-kusadasi"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-kusadasi",
+              "category": "sight",
+              "title": "Ephesus ancient city & Library of Celsus",
+              "notes": "A ~20-minute drive from port; the Library of Celsus facade and the Great Theatre are unmissable",
+              "startDate": "2027-06-13",
+              "endDate": "2027-06-13",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-obkqqara1-mrsrabz0",
+              "time": "1 hr",
+              "text": "Ephesus ancient city & Library of Celsus"
+            },
+            {
+              "cityId": "city-kusadasi",
+              "category": "food",
+              "title": "Turkish mezze lunch near the port",
+              "notes": "Grilled meze plates and fresh bread before reboarding",
+              "startDate": "2027-06-13",
+              "endDate": "2027-06-13",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-d4mpj8eu9-mrsskplp",
+              "time": "1 hr",
+              "text": "Turkish mezze lunch near the port"
+            }
+          ]
+        }
+      ],
+      "legTips": []
+    },
+    {
+      "id": "leg-cruise-2027-06-14",
+      "label": "🚢 Port day — Rhodes",
+      "colour": "#27AE60",
+      "cityFood": [],
+      "suggestedActivities": [
+        {
+          "id": "act-n8bsi7v3n-mrsrabz0",
+          "title": "Suggested Experience",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Cobbled Street of the Knights and the Palace of the Grand Master",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-14",
+          "startDate": "2027-06-14",
+          "startTime": "",
+          "endDate": "2027-06-14",
+          "endTime": "",
+          "text": "Suggested Experience",
+          "cityId": "city-rhodes"
+        },
+        {
+          "id": "act-l3mpi2zqi-mrsskplp",
+          "title": "Old Town wall walk",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Walk part of the surviving medieval fortification walls for harbour views",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-14",
+          "startDate": "2027-06-14",
+          "startTime": "",
+          "endDate": "2027-06-14",
+          "endTime": "",
+          "cityId": "city-rhodes"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-14",
+          "day": "Mon",
+          "from": "Kuşadası",
+          "to": "Rhodes",
+          "completed": false,
+          "desc": "Port day — Rhodes",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-rhodes"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-rhodes",
+              "category": "sight",
+              "title": "Medieval Old Town of Rhodes (UNESCO)",
+              "notes": "Cobbled Street of the Knights and the Palace of the Grand Master",
+              "startDate": "2027-06-14",
+              "endDate": "2027-06-14",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-n8bsi7v3n-mrsrabz0",
+              "time": "1 hr",
+              "text": "Medieval Old Town of Rhodes (UNESCO)"
+            },
+            {
+              "cityId": "city-rhodes",
+              "category": "fitness",
+              "title": "Old Town wall walk",
+              "notes": "Walk part of the surviving medieval fortification walls for harbour views",
+              "startDate": "2027-06-14",
+              "endDate": "2027-06-14",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-l3mpi2zqi-mrsskplp",
+              "time": "1 hr",
+              "text": "Old Town wall walk"
+            }
+          ]
+        }
+      ],
+      "legTips": []
+    },
+    {
+      "id": "leg-cruise-2027-06-15",
+      "label": "🚢 Port day — Crete",
+      "colour": "#27AE60",
+      "cityFood": [],
+      "suggestedActivities": [
+        {
+          "id": "act-8n33rsa7w-mrsrabz0",
+          "title": "Suggested Experience",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Minoan palace complex ~5km from Heraklion, home of the Minotaur myth",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-15",
+          "startDate": "2027-06-15",
+          "startTime": "",
+          "endDate": "2027-06-15",
+          "endTime": "",
+          "text": "Suggested Experience",
+          "cityId": "city-crete"
+        },
+        {
+          "id": "act-lsj2vdm4r-mrsskplp",
+          "title": "Cretan mezze lunch",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Dakos (barley rusk salad), local cheeses and raki",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-15",
+          "startDate": "2027-06-15",
+          "startTime": "",
+          "endDate": "2027-06-15",
+          "endTime": "",
+          "cityId": "city-crete"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-15",
+          "day": "Tue",
+          "from": "Rhodes",
+          "to": "Crete (Heraklion)",
+          "completed": false,
+          "desc": "Port day — Crete",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-crete"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-crete",
+              "category": "sight",
+              "title": "Palace of Knossos",
+              "notes": "Minoan palace complex ~5km from Heraklion, home of the Minotaur myth",
+              "startDate": "2027-06-15",
+              "endDate": "2027-06-15",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-8n33rsa7w-mrsrabz0",
+              "time": "1 hr",
+              "text": "Palace of Knossos"
+            },
+            {
+              "cityId": "city-crete",
+              "category": "food",
+              "title": "Cretan mezze lunch",
+              "notes": "Dakos (barley rusk salad), local cheeses and raki",
+              "startDate": "2027-06-15",
+              "endDate": "2027-06-15",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-lsj2vdm4r-mrsskplp",
+              "time": "1 hr",
+              "text": "Cretan mezze lunch"
+            }
+          ]
+        }
+      ],
+      "legTips": []
+    },
+    {
+      "id": "leg-cruise-2027-06-16",
+      "label": "🚢 Port day — Santorini (late stay)",
+      "colour": "#27AE60",
+      "cityFood": [],
+      "suggestedActivities": [
+        {
+          "id": "act-ya4wghovp-mrsrabz0",
+          "title": "Suggested Experience",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Iconic whitewashed village on the volcanic rim — go before the afternoon cruise-ship crowds",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-16",
+          "startDate": "2027-06-16",
+          "startTime": "",
+          "endDate": "2027-06-16",
+          "endTime": "",
+          "text": "Suggested Experience",
+          "cityId": "city-santorini"
+        },
+        {
+          "id": "act-lqe4qxnpe-mrsskplp",
+          "title": "Sunset dinner at Kastro, Oia",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Caldera-edge terrace near the castle ruins, one of Oia's most-booked sunset tables",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-16",
+          "startDate": "2027-06-16",
+          "startTime": "",
+          "endDate": "2027-06-16",
+          "endTime": "",
+          "cityId": "city-santorini"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-16",
+          "day": "Wed",
+          "from": "Crete (Heraklion)",
+          "to": "Santorini",
+          "completed": false,
+          "desc": "Port day — Santorini (late stay)",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-santorini"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-santorini",
+              "category": "sight",
+              "title": "Oia caldera views & blue-domed churches",
+              "notes": "Iconic whitewashed village on the volcanic rim — go before the afternoon cruise-ship crowds",
+              "startDate": "2027-06-16",
+              "endDate": "2027-06-16",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-ya4wghovp-mrsrabz0",
+              "time": "1 hr",
+              "text": "Oia caldera views & blue-domed churches"
+            },
+            {
+              "cityId": "city-santorini",
+              "category": "food",
+              "title": "Sunset dinner at Kastro, Oia",
+              "notes": "Caldera-edge terrace near the castle ruins, one of Oia's most-booked sunset tables",
+              "startDate": "2027-06-16",
+              "endDate": "2027-06-16",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-lqe4qxnpe-mrsskplp",
+              "time": "1 hr",
+              "text": "Sunset dinner at Kastro, Oia"
+            }
+          ]
+        }
+      ],
+      "legTips": []
+    },
+    {
+      "id": "leg-cruise-2027-06-17",
+      "label": "🚢 Port day — Mykonos",
+      "colour": "#27AE60",
+      "cityFood": [],
+      "suggestedActivities": [
+        {
+          "id": "act-h6t3lpx2k-mrsrabz0",
+          "title": "Suggested Experience",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Waterfront houses built to the sea's edge, beside Mykonos's five surviving windmills",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-17",
+          "startDate": "2027-06-17",
+          "startTime": "",
+          "endDate": "2027-06-17",
+          "endTime": "",
+          "text": "Suggested Experience",
+          "cityId": "city-mykonos"
+        },
+        {
+          "id": "act-hzyvnpinc-mrsskplq",
+          "title": "Lunch at Katerina's, Little Venice",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Balcony tables over the water; baked feta and seafood platter",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-17",
+          "startDate": "2027-06-17",
+          "startTime": "",
+          "endDate": "2027-06-17",
+          "endTime": "",
+          "cityId": "city-mykonos"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-17",
+          "day": "Thu",
+          "from": "Santorini",
+          "to": "Mykonos",
+          "completed": false,
+          "desc": "Port day — Mykonos",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-mykonos"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-mykonos",
+              "category": "attraction",
+              "title": "Little Venice & windmills",
+              "notes": "Waterfront houses built to the sea's edge, beside Mykonos's five surviving windmills",
+              "startDate": "2027-06-17",
+              "endDate": "2027-06-17",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-h6t3lpx2k-mrsrabz0",
+              "time": "1 hr",
+              "text": "Little Venice & windmills"
+            },
+            {
+              "cityId": "city-mykonos",
+              "category": "food",
+              "title": "Lunch at Katerina's, Little Venice",
+              "notes": "Balcony tables over the water; baked feta and seafood platter",
+              "startDate": "2027-06-17",
+              "endDate": "2027-06-17",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-hzyvnpinc-mrsskplq",
+              "time": "1 hr",
+              "text": "Lunch at Katerina's, Little Venice"
+            }
+          ]
+        }
+      ],
+      "legTips": []
+    },
+    {
+      "id": "leg-cruise-2027-06-18",
+      "label": "🚢 Port day — Milos",
+      "colour": "#27AE60",
+      "cityFood": [],
+      "suggestedActivities": [
+        {
+          "id": "act-woo7oj4f3-mrsrabz0",
+          "title": "Suggested Experience",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Otherworldly white volcanic-rock coastline, more moonscape than beach — go for the swim, not the sand",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-18",
+          "startDate": "2027-06-18",
+          "startTime": "",
+          "endDate": "2027-06-18",
+          "endTime": "",
+          "text": "Suggested Experience",
+          "cityId": "city-milos"
+        },
+        {
+          "id": "act-drjdmn4qb-mrsskplq",
+          "title": "Fresh grilled fish at a portside taverna",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Milos is famous for its fish tavernas — quieter and cheaper than the bigger Cyclades islands",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-18",
+          "startDate": "2027-06-18",
+          "startTime": "",
+          "endDate": "2027-06-18",
+          "endTime": "",
+          "cityId": "city-milos"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-18",
+          "day": "Fri",
+          "from": "Mykonos",
+          "to": "Milos",
+          "completed": false,
+          "desc": "Port day — Milos",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-milos"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-milos",
+              "category": "wellness",
+              "title": "Sarakiniko beach",
+              "notes": "Otherworldly white volcanic-rock coastline, more moonscape than beach — go for the swim, not the sand",
+              "startDate": "2027-06-18",
+              "endDate": "2027-06-18",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-woo7oj4f3-mrsrabz0",
+              "time": "1 hr",
+              "text": "Sarakiniko beach"
+            },
+            {
+              "cityId": "city-milos",
+              "category": "food",
+              "title": "Fresh grilled fish at a portside taverna",
+              "notes": "Milos is famous for its fish tavernas — quieter and cheaper than the bigger Cyclades islands",
+              "startDate": "2027-06-18",
+              "endDate": "2027-06-18",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-drjdmn4qb-mrsskplq",
+              "time": "1 hr",
+              "text": "Fresh grilled fish at a portside taverna"
+            }
+          ]
+        }
+      ],
+      "legTips": []
+    },
+    {
+      "id": "leg-cruise-2027-06-19",
+      "label": "🚢 Disembark at Piraeus, fly to Rome",
+      "colour": "#27AE60",
+      "cityFood": [],
+      "suggestedActivities": [
+        {
+          "id": "act-h266xeh8n-mrsrabz0",
+          "title": "Airport Transfer",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Celestyal arrives back into Piraeus early morning; allow ~1.5 hours to reach Athens airport",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-19",
+          "startDate": "2027-06-19",
+          "startTime": "",
+          "endDate": "2027-06-19",
+          "endTime": "",
+          "text": "Airport Transfer",
+          "cityId": "city-athens"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-19",
+          "day": "Sat",
+          "from": "Milos",
+          "to": "Athens",
+          "completed": false,
+          "desc": "Disembark at Piraeus, fly to Rome",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-athens"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-athens",
+              "category": "attraction",
+              "title": "Disembark & transfer to airport",
+              "notes": "Celestyal arrives back into Piraeus early morning; allow ~1.5 hours to reach Athens airport",
+              "startDate": "2027-06-19",
+              "endDate": "2027-06-19",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-h266xeh8n-mrsrabz0",
+              "time": "1 hr",
+              "text": "Disembark & transfer to airport"
+            }
+          ]
+        }
+      ],
+      "legTips": []
+    },
+    {
+      "id": "leg-rome",
+      "label": "🍝 Rome, Italy",
+      "colour": "#F39C12",
+      "cityFood": [
+        {
+          "cityId": "city-rome",
+          "category": "food",
+          "title": "Salumeria Roscioli, near Campo de' Fiori",
+          "notes": "Family-run since the mid-1800s — deli counter plus restaurant famous for cacio e pepe and charcuterie; book ahead, it's tiny",
+          "text": "Salumeria Roscioli, near Campo de' Fiori"
+        },
+        {
+          "cityId": "city-rome",
+          "category": "food",
+          "title": "Trattoria Da Enzo, Trastevere",
+          "notes": "Checkered-tablecloth local institution; the rigatoni alla carbonara and fried artichokes are the ones to order",
+          "text": "Trattoria Da Enzo, Trastevere"
+        },
+        {
+          "cityId": "city-rome",
+          "category": "food",
+          "title": "Gelato at Fatamorgana or Giolitti",
+          "notes": "Two of Rome's most-loved gelaterias for a post-dinner crawl",
+          "text": "Gelato at Fatamorgana or Giolitti"
+        }
+      ],
+      "suggestedActivities": [
+        {
+          "cityId": "city-rome",
+          "category": "sight",
+          "title": "Colosseum & Roman Forum",
+          "notes": "Book combined skip-the-line tickets — the Forum is included and often skipped by rushed visitors",
+          "id": "act-w0ttf7haj-mrsqchgf",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Colosseum & Roman Forum"
+        },
+        {
+          "cityId": "city-rome",
+          "category": "sight",
+          "title": "Vatican Museums & Sistine Chapel",
+          "notes": "Pre-book a timed entry; the Raphael Rooms lead into the Sistine Chapel",
+          "id": "act-q708jueor-mrsqchgf",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Vatican Museums & Sistine Chapel"
+        },
+        {
+          "cityId": "city-rome",
+          "category": "attraction",
+          "title": "Trevi Fountain & Spanish Steps",
+          "notes": "Toss a coin in the Trevi (tradition says it guarantees a return to Rome)",
+          "id": "act-c4n8y2ibf-mrsqchgf",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Trevi Fountain & Spanish Steps"
+        },
+        {
+          "id": "act-vz3atgwqd-mrsqchgf",
+          "title": "Suggested Experience",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Book ahead — there's usually a line; carbonara and stracciatella with cherry tomatoes to start",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-19",
+          "startDate": "2027-06-19",
+          "startTime": "",
+          "endDate": "2027-06-19",
+          "endTime": "",
+          "cityId": "city-rome",
+          "text": "Suggested Experience"
+        },
+        {
+          "id": "act-z91r01di7-mrsqchgf",
+          "title": "Colosseum & Roman Forum",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Skip-the-line combined ticket; go early morning for softer light and thinner crowds",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-20",
+          "startDate": "2027-06-20",
+          "startTime": "",
+          "endDate": "2027-06-20",
+          "endTime": "",
+          "cityId": "city-rome",
+          "text": "Colosseum & Roman Forum"
+        },
+        {
+          "id": "act-vp7ed62rl-mrsqchgf",
+          "title": "Vatican Museums & Sistine Chapel",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Pre-booked timed entry avoids multi-hour queues",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-21",
+          "startDate": "2027-06-21",
+          "startTime": "",
+          "endDate": "2027-06-21",
+          "endTime": "",
+          "cityId": "city-rome",
+          "text": "Vatican Museums & Sistine Chapel"
+        },
+        {
+          "id": "act-ci636vqbv-mrsskplq",
+          "title": "Lunch at Salumeria Roscioli, Campo de' Fiori",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Cacio e pepe and a board of cured meats and cheeses — reserve in advance",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-20",
+          "startDate": "2027-06-20",
+          "startTime": "",
+          "endDate": "2027-06-20",
+          "endTime": "",
+          "cityId": "city-rome"
+        },
+        {
+          "id": "act-eo56x3e73-mrsskplq",
+          "title": "St Peter's Basilica",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Free to enter; the dome climb (with lift partway) gives sweeping rooftop views over Rome",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-21",
+          "startDate": "2027-06-21",
+          "startTime": "",
+          "endDate": "2027-06-21",
+          "endTime": "",
+          "cityId": "city-rome"
+        },
+        {
+          "id": "act-qfsgbt5i4-mrsskplq",
+          "title": "Gelato crawl at Fatamorgana",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Inventive, natural-ingredient flavours — try the pistachio or the seasonal fruit sorbettos",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-21",
+          "startDate": "2027-06-21",
+          "startTime": "",
+          "endDate": "2027-06-21",
+          "endTime": "",
+          "cityId": "city-rome"
+        }
+      ],
+      "legTips": [
+        {
+          "text": "Book Colosseum & Vatican tickets ahead — both sell out daily",
+          "cityId": "city-rome"
+        },
+        {
+          "text": "Validate any paper transit tickets before boarding",
+          "cityId": "city-rome"
+        },
+        {
+          "text": "Hotel Albergo del Senato is a well-rated pick right across from the Pantheon",
+          "cityId": "city-rome"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-19",
+          "day": "Sat",
+          "from": "Rome",
+          "to": "Rome",
+          "completed": false,
+          "desc": "Fly into Rome, settle in",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-rome"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-rome",
+              "category": "food",
+              "title": "Dinner at Trattoria Da Enzo, Trastevere",
+              "notes": "Book ahead — there's usually a line; carbonara and stracciatella with cherry tomatoes to start",
+              "startDate": "2027-06-19",
+              "endDate": "2027-06-19",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-vz3atgwqd-mrsqchgf",
+              "time": "1 hr",
+              "text": "Dinner at Trattoria Da Enzo, Trastevere"
+            }
+          ]
+        },
+        {
+          "date": "2027-06-20",
+          "day": "Sun",
+          "from": "Rome",
+          "to": "Rome",
+          "completed": false,
+          "desc": "Ancient Rome",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-rome"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-rome",
+              "category": "sight",
+              "title": "Colosseum & Roman Forum",
+              "notes": "Skip-the-line combined ticket; go early morning for softer light and thinner crowds",
+              "startDate": "2027-06-20",
+              "endDate": "2027-06-20",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-z91r01di7-mrsqchgf",
+              "time": "1 hr",
+              "text": "Colosseum & Roman Forum"
+            },
+            {
+              "cityId": "city-rome",
+              "category": "food",
+              "title": "Lunch at Salumeria Roscioli, Campo de' Fiori",
+              "notes": "Cacio e pepe and a board of cured meats and cheeses — reserve in advance",
+              "startDate": "2027-06-20",
+              "endDate": "2027-06-20",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-ci636vqbv-mrsskplq",
+              "time": "1 hr",
+              "text": "Lunch at Salumeria Roscioli, Campo de' Fiori"
+            }
+          ]
+        },
+        {
+          "date": "2027-06-21",
+          "day": "Mon",
+          "from": "Rome",
+          "to": "Rome",
+          "completed": false,
+          "desc": "Vatican day",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-rome"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-rome",
+              "category": "sight",
+              "title": "Vatican Museums & Sistine Chapel",
+              "notes": "Pre-booked timed entry avoids multi-hour queues",
+              "startDate": "2027-06-21",
+              "endDate": "2027-06-21",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-vp7ed62rl-mrsqchgf",
+              "time": "1 hr",
+              "text": "Vatican Museums & Sistine Chapel"
+            },
+            {
+              "cityId": "city-rome",
+              "category": "attraction",
+              "title": "St Peter's Basilica",
+              "notes": "Free to enter; the dome climb (with lift partway) gives sweeping rooftop views over Rome",
+              "startDate": "2027-06-21",
+              "endDate": "2027-06-21",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-eo56x3e73-mrsskplq",
+              "time": "1 hr",
+              "text": "St Peter's Basilica"
+            },
+            {
+              "cityId": "city-rome",
+              "category": "food",
+              "title": "Gelato crawl at Fatamorgana",
+              "notes": "Inventive, natural-ingredient flavours — try the pistachio or the seasonal fruit sorbettos",
+              "startDate": "2027-06-21",
+              "endDate": "2027-06-21",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-qfsgbt5i4-mrsskplq",
+              "time": "1 hr",
+              "text": "Gelato crawl at Fatamorgana"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-florence",
+      "label": "🎨 Florence, Italy",
+      "colour": "#9B59B6",
+      "cityFood": [
+        {
+          "cityId": "city-florence",
+          "category": "food",
+          "title": "Trattoria Zà Zà, Piazza del Mercato Centrale",
+          "notes": "40+ years sourcing from the market next door; the bistecca alla fiorentina is their signature",
+          "text": "Trattoria Zà Zà, Piazza del Mercato Centrale"
+        },
+        {
+          "cityId": "city-florence",
+          "category": "food",
+          "title": "All'Antico Vinaio, near the Uffizi",
+          "notes": "Cult-favourite sandwich shop — expect a queue but it moves fast; try 'La Favolosa'",
+          "text": "All'Antico Vinaio, near the Uffizi"
+        },
+        {
+          "cityId": "city-florence",
+          "category": "food",
+          "title": "Mercato Centrale food hall",
+          "notes": "Upstairs food court with 20+ vendors — truffle pasta and Neapolitan-style pizza stand out",
+          "text": "Mercato Centrale food hall"
+        }
+      ],
+      "suggestedActivities": [
+        {
+          "cityId": "city-florence",
+          "category": "sight",
+          "title": "Uffizi Gallery",
+          "notes": "Botticelli's Birth of Venus and Primavera are the headline works — book a timed slot",
+          "id": "act-2sejyo7zo-mrsqchgf",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Uffizi Gallery"
+        },
+        {
+          "cityId": "city-florence",
+          "category": "sight",
+          "title": "Duomo & Brunelleschi's Dome",
+          "notes": "Climb the 463 steps for a panoramic view over Florence's terracotta rooftops",
+          "id": "act-l2xix2c6s-mrsqchgf",
+          "assignedDate": "2027-06-22",
+          "startDate": "2027-06-22",
+          "endDate": "2027-06-22",
+          "startTime": "",
+          "endTime": "",
+          "text": "Duomo & Brunelleschi's Dome",
+          "assignedDayIdx": 0
+        },
+        {
+          "id": "act-hw1xf8jad-mrsqchgf",
+          "title": "High-Speed Train: Rome to Florence",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "~1h30 direct, Roma Termini to Firenze Santa Maria Novella",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-22",
+          "startDate": "2027-06-22",
+          "startTime": "",
+          "endDate": "2027-06-22",
+          "endTime": "",
+          "cityId": "city-florence",
+          "text": "High-Speed Train: Rome to Florence"
+        },
+        {
+          "id": "act-m6lgitomo-mrsqchgf",
+          "title": "Uffizi Gallery",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Home to the Renaissance's greatest hits — Botticelli, Michelangelo, Da Vinci",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-23",
+          "startDate": "2027-06-23",
+          "startTime": "",
+          "endDate": "2027-06-23",
+          "endTime": "",
+          "cityId": "city-florence",
+          "text": "Uffizi Gallery"
+        },
+        {
+          "id": "act-s1ayuhsvo-mrsskplr",
+          "title": "Sunset at Piazzale Michelangelo",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Best panoramic view of Florence, especially at golden hour; a 20-minute uphill walk from the Arno",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-23",
+          "startDate": "2027-06-23",
+          "startTime": "",
+          "endDate": "2027-06-23",
+          "endTime": "",
+          "cityId": "city-florence"
+        },
+        {
+          "id": "act-vvuomqidd-mrsskplr",
+          "title": "Dinner at Mercato Centrale",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Truffle pasta upstairs, then gelato from Vestri on the way out",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-23",
+          "startDate": "2027-06-23",
+          "startTime": "",
+          "endDate": "2027-06-23",
+          "endTime": "",
+          "cityId": "city-florence"
+        }
+      ],
+      "legTips": [
+        {
+          "text": "High-speed Frecciarossa train from Rome to Florence takes ~1.5 hours",
+          "cityId": "city-florence"
+        },
+        {
+          "text": "Brunelleschi Hotel is a well-rated boutique pick 90 seconds from the Duomo",
+          "cityId": "city-florence"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-22",
+          "day": "Tue",
+          "from": "Florence",
+          "to": "Florence",
+          "completed": false,
+          "desc": "Train to Florence, Renaissance city",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-florence"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-florence",
+              "category": "attraction",
+              "title": "Frecciarossa high-speed train Rome → Florence",
+              "notes": "~1h30 direct, Roma Termini to Firenze Santa Maria Novella",
+              "startDate": "2027-06-22",
+              "endDate": "2027-06-22",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-hw1xf8jad-mrsqchgf",
+              "time": "1 hr",
+              "text": "Frecciarossa high-speed train Rome → Florence"
+            },
+            {
+              "cityId": "city-florence",
+              "category": "sight",
+              "title": "Duomo & Brunelleschi's Dome",
+              "notes": "Free to view the exterior and interior; the dome climb needs a separate timed ticket",
+              "startDate": "2027-06-22",
+              "endDate": "2027-06-22",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-l2xix2c6s-mrsqchgf",
+              "time": "1 hr",
+              "text": "Duomo & Brunelleschi's Dome"
+            }
+          ]
+        },
+        {
+          "date": "2027-06-23",
+          "day": "Wed",
+          "from": "Florence",
+          "to": "Florence",
+          "completed": false,
+          "desc": "Art & views",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-florence"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-florence",
+              "category": "sight",
+              "title": "Uffizi Gallery",
+              "notes": "Home to the Renaissance's greatest hits — Botticelli, Michelangelo, Da Vinci",
+              "startDate": "2027-06-23",
+              "endDate": "2027-06-23",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-m6lgitomo-mrsqchgf",
+              "time": "1 hr",
+              "text": "Uffizi Gallery"
+            },
+            {
+              "cityId": "city-florence",
+              "category": "attraction",
+              "title": "Sunset at Piazzale Michelangelo",
+              "notes": "Best panoramic view of Florence, especially at golden hour; a 20-minute uphill walk from the Arno",
+              "startDate": "2027-06-23",
+              "endDate": "2027-06-23",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-s1ayuhsvo-mrsskplr",
+              "time": "1 hr",
+              "text": "Sunset at Piazzale Michelangelo"
+            },
+            {
+              "cityId": "city-florence",
+              "category": "food",
+              "title": "Dinner at Mercato Centrale",
+              "notes": "Truffle pasta upstairs, then gelato from Vestri on the way out",
+              "startDate": "2027-06-23",
+              "endDate": "2027-06-23",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-vvuomqidd-mrsskplr",
+              "time": "1 hr",
+              "text": "Dinner at Mercato Centrale"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-venice",
+      "label": "🚤 Venice, Italy",
+      "colour": "#1ABC9C",
+      "cityFood": [
+        {
+          "cityId": "city-venice",
+          "category": "food",
+          "title": "All'Arco, near Rialto Market",
+          "notes": "Tiny standing-room bacaro famous for its crostini — try the soft-shell crab in season",
+          "text": "All'Arco, near Rialto Market"
+        },
+        {
+          "cityId": "city-venice",
+          "category": "food",
+          "title": "Cantina Do Mori, San Polo",
+          "notes": "Venice's oldest bacaro, open since 1462; baccalà mantecato and sarde in saor with an ombra of house wine",
+          "text": "Cantina Do Mori, San Polo"
+        }
+      ],
+      "suggestedActivities": [
+        {
+          "cityId": "city-venice",
+          "category": "attraction",
+          "title": "Gondola ride through the canals",
+          "notes": "Officially fixed rates apply — book directly with a gondolier station for the standard 30-40 min route",
+          "id": "act-myfmde9dk-mrsqchgf",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Gondola ride through the canals"
+        },
+        {
+          "cityId": "city-venice",
+          "category": "sight",
+          "title": "St Mark's Square & Basilica",
+          "notes": "Byzantine mosaics inside the Basilica are free to view; book ahead to skip the entry queue",
+          "id": "act-og14pf1zh-mrsqchgf",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "St Mark's Square & Basilica"
+        },
+        {
+          "id": "act-sdme69964-mrsqchgf",
+          "title": "High-Speed Train: Florence to Venice",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "~2 hours direct, Firenze SMN to Venezia Santa Lucia",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-24",
+          "startDate": "2027-06-24",
+          "startTime": "",
+          "endDate": "2027-06-24",
+          "endTime": "",
+          "cityId": "city-venice",
+          "text": "High-Speed Train: Florence to Venice"
+        },
+        {
+          "id": "act-h0q3me85a-mrsqchgf",
+          "title": "Classic Gondola Ride",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Late afternoon light is best for photos, and rates are fixed by the city",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-25",
+          "startDate": "2027-06-25",
+          "startTime": "",
+          "endDate": "2027-06-25",
+          "endTime": "",
+          "cityId": "city-venice",
+          "text": "Classic Gondola Ride"
+        },
+        {
+          "id": "act-hqco4rp0g-mrsskpls",
+          "title": "St Mark's Square",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Arrive by early evening as day-trip crowds thin out",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-24",
+          "startDate": "2027-06-24",
+          "startTime": "",
+          "endDate": "2027-06-24",
+          "endTime": "",
+          "cityId": "city-venice"
+        },
+        {
+          "id": "act-pfmuc60ns-mrsskpls",
+          "title": "Murano & Burano islands",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Murano for glassblowing demonstrations, Burano for its rainbow-coloured lace-making houses",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-25",
+          "startDate": "2027-06-25",
+          "startTime": "",
+          "endDate": "2027-06-25",
+          "endTime": "",
+          "cityId": "city-venice"
+        },
+        {
+          "id": "act-4fw069d8v-mrsskpls",
+          "title": "Cicchetti crawl at All'Arco and Cantina Do Mori",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Start at All'Arco for crostini, finish at Cantina Do Mori (est. 1462) for baccalà mantecato",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-25",
+          "startDate": "2027-06-25",
+          "startTime": "",
+          "endDate": "2027-06-25",
+          "endTime": "",
+          "cityId": "city-venice"
+        }
+      ],
+      "legTips": [
+        {
+          "text": "Book a gondola ride in the late afternoon for the best light",
+          "cityId": "city-venice"
+        },
+        {
+          "text": "Hotel Bella Venezia has a secret canal-facing balcony, steps from St Mark's Square",
+          "cityId": "city-venice"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-24",
+          "day": "Thu",
+          "from": "Venice",
+          "to": "Venice",
+          "completed": false,
+          "desc": "Train to Venice",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-venice"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-venice",
+              "category": "attraction",
+              "title": "High-speed train Florence → Venice",
+              "notes": "~2 hours direct, Firenze SMN to Venezia Santa Lucia",
+              "startDate": "2027-06-24",
+              "endDate": "2027-06-24",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-sdme69964-mrsqchgf",
+              "time": "1 hr",
+              "text": "High-speed train Florence → Venice"
+            },
+            {
+              "cityId": "city-venice",
+              "category": "sight",
+              "title": "St Mark's Square",
+              "notes": "Arrive by early evening as day-trip crowds thin out",
+              "startDate": "2027-06-24",
+              "endDate": "2027-06-24",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-hqco4rp0g-mrsskpls",
+              "time": "1 hr",
+              "text": "St Mark's Square"
+            }
+          ]
+        },
+        {
+          "date": "2027-06-25",
+          "day": "Fri",
+          "from": "Venice",
+          "to": "Venice",
+          "completed": false,
+          "desc": "Canals & islands",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-venice"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-venice",
+              "category": "attraction",
+              "title": "Gondola ride through the canals",
+              "notes": "Late afternoon light is best for photos, and rates are fixed by the city",
+              "startDate": "2027-06-25",
+              "endDate": "2027-06-25",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-h0q3me85a-mrsqchgf",
+              "time": "1 hr",
+              "text": "Gondola ride through the canals"
+            },
+            {
+              "cityId": "city-venice",
+              "category": "attraction",
+              "title": "Murano & Burano islands",
+              "notes": "Murano for glassblowing demonstrations, Burano for its rainbow-coloured lace-making houses",
+              "startDate": "2027-06-25",
+              "endDate": "2027-06-25",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-pfmuc60ns-mrsskpls",
+              "time": "1 hr",
+              "text": "Murano & Burano islands"
+            },
+            {
+              "cityId": "city-venice",
+              "category": "food",
+              "title": "Cicchetti crawl at All'Arco and Cantina Do Mori",
+              "notes": "Start at All'Arco for crostini, finish at Cantina Do Mori (est. 1462) for baccalà mantecato",
+              "startDate": "2027-06-25",
+              "endDate": "2027-06-25",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-4fw069d8v-mrsskpls",
+              "time": "1 hr",
+              "text": "Cicchetti crawl at All'Arco and Cantina Do Mori"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-barcelona",
+      "label": "💃 Barcelona, Spain",
+      "colour": "#E91E63",
+      "cityFood": [
+        {
+          "cityId": "city-barcelona",
+          "category": "food",
+          "title": "El Xampanyet, El Born",
+          "notes": "Century-old tapas bar known for house-made sparkling wine and classic anchovies — no reservations, expect a squeeze",
+          "text": "El Xampanyet, El Born"
+        },
+        {
+          "cityId": "city-barcelona",
+          "category": "food",
+          "title": "El Quim de la Boqueria, La Boqueria Market",
+          "notes": "Running since 1987; famous for fried eggs with baby squid and market-fresh seafood",
+          "text": "El Quim de la Boqueria, La Boqueria Market"
+        }
+      ],
+      "suggestedActivities": [
+        {
+          "cityId": "city-barcelona",
+          "category": "sight",
+          "title": "Sagrada Família",
+          "notes": "Gaudí's still-unfinished basilica; book timed tickets weeks ahead, including a tower-access slot if you want the views",
+          "id": "act-vwr6dtun8-mrsqchgg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Sagrada Família"
+        },
+        {
+          "cityId": "city-barcelona",
+          "category": "sight",
+          "title": "Park Güell",
+          "notes": "Gaudí's mosaic-tiled park overlooking the city — the monumental zone needs a timed ticket",
+          "id": "act-2tih8djot-mrsqchgg",
+          "assignedDate": "2027-06-27",
+          "startDate": "2027-06-27",
+          "endDate": "2027-06-27",
+          "startTime": "",
+          "endTime": "",
+          "text": "Park Güell",
+          "assignedDayIdx": 1
+        },
+        {
+          "cityId": "city-barcelona",
+          "category": "fitness",
+          "title": "Barceloneta beach walk/run",
+          "notes": "Flat waterfront promenade running the length of the beach, good for an easy morning run",
+          "id": "act-9ipyfn99j-mrsqchgg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Barceloneta beach walk/run"
+        },
+        {
+          "id": "act-h9pwcnk7k-mrsqchgg",
+          "title": "La Plata Tapas Bar",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "House cava, anchovies and classic tapas in a century-old bar",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-26",
+          "startDate": "2027-06-26",
+          "startTime": "",
+          "endDate": "2027-06-26",
+          "endTime": "",
+          "cityId": "city-barcelona",
+          "text": "La Plata Tapas Bar"
+        },
+        {
+          "id": "act-k9x1n599a-mrsqchgg",
+          "title": "Sagrada Familia",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Allow 1.5-2 hours; the stained-glass light inside is best in late morning",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-27",
+          "startDate": "2027-06-27",
+          "startTime": "",
+          "endDate": "2027-06-27",
+          "endTime": "",
+          "cityId": "city-barcelona",
+          "text": "Sagrada Familia"
+        },
+        {
+          "id": "act-6lm6b7p4s-mrsqchgg",
+          "title": "Barceloneta Beach Promenade",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Easy flat walk along the promenade with a swim stop if the weather's warm",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-28",
+          "startDate": "2027-06-28",
+          "startTime": "",
+          "endDate": "2027-06-28",
+          "endTime": "",
+          "cityId": "city-barcelona",
+          "text": "Barceloneta Beach Promenade"
+        },
+        {
+          "id": "act-0sa0zk4m9-mrsskplt",
+          "title": "Lunch at El Quim de la Boqueria",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Counter seats inside La Boqueria market; fried baby squid and market specials",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-28",
+          "startDate": "2027-06-28",
+          "startTime": "",
+          "endDate": "2027-06-28",
+          "endTime": "",
+          "cityId": "city-barcelona"
+        },
+        {
+          "id": "act-jdd8kabhx-mrsskplt",
+          "title": "Gothic Quarter wander",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Medieval lanes around the Cathedral of Barcelona, with Roman wall fragments still visible",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-06-28",
+          "startDate": "2027-06-28",
+          "startTime": "",
+          "endDate": "2027-06-28",
+          "endTime": "",
+          "cityId": "city-barcelona"
+        }
+      ],
+      "legTips": [
+        {
+          "text": "Book Sagrada Família and Park Güell tickets days ahead",
+          "cityId": "city-barcelona"
+        },
+        {
+          "text": "Hotel Ohla Barcelona has a great rooftop bar and central Ciutat Vella location",
+          "cityId": "city-barcelona"
+        },
+        {
+          "text": "Vueling flies direct Venice → Barcelona, ~2 hours",
+          "cityId": "city-barcelona"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-26",
+          "day": "Sat",
+          "from": "Barcelona",
+          "to": "Barcelona",
+          "completed": false,
+          "desc": "Fly to Barcelona",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-barcelona"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-barcelona",
+              "category": "food",
+              "title": "Tapas crawl at El Xampanyet, El Born",
+              "notes": "House cava, anchovies and classic tapas in a century-old bar",
+              "startDate": "2027-06-26",
+              "endDate": "2027-06-26",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-h9pwcnk7k-mrsqchgg",
+              "time": "1 hr",
+              "text": "Tapas crawl at El Xampanyet, El Born"
+            }
+          ]
+        },
+        {
+          "date": "2027-06-27",
+          "day": "Sun",
+          "from": "Barcelona",
+          "to": "Barcelona",
+          "completed": false,
+          "desc": "Gaudí day",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-barcelona"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-barcelona",
+              "category": "sight",
+              "title": "Sagrada Família",
+              "notes": "Allow 1.5-2 hours; the stained-glass light inside is best in late morning",
+              "startDate": "2027-06-27",
+              "endDate": "2027-06-27",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-k9x1n599a-mrsqchgg",
+              "time": "1 hr",
+              "text": "Sagrada Família"
+            },
+            {
+              "cityId": "city-barcelona",
+              "category": "sight",
+              "title": "Park Güell",
+              "notes": "Mosaic terraces and the famous salamander sculpture at the entrance",
+              "startDate": "2027-06-27",
+              "endDate": "2027-06-27",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-2tih8djot-mrsqchgg",
+              "time": "1 hr",
+              "text": "Park Güell"
+            }
+          ]
+        },
+        {
+          "date": "2027-06-28",
+          "day": "Mon",
+          "from": "Barcelona",
+          "to": "Barcelona",
+          "completed": false,
+          "desc": "Beach & markets",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-barcelona"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-barcelona",
+              "category": "fitness",
+              "title": "Barceloneta beach walk",
+              "notes": "Easy flat walk along the promenade with a swim stop if the weather's warm",
+              "startDate": "2027-06-28",
+              "endDate": "2027-06-28",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-6lm6b7p4s-mrsqchgg",
+              "time": "1 hr",
+              "text": "Barceloneta beach walk"
+            },
+            {
+              "cityId": "city-barcelona",
+              "category": "food",
+              "title": "Lunch at El Quim de la Boqueria",
+              "notes": "Counter seats inside La Boqueria market; fried baby squid and market specials",
+              "startDate": "2027-06-28",
+              "endDate": "2027-06-28",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-0sa0zk4m9-mrsskplt",
+              "time": "1 hr",
+              "text": "Lunch at El Quim de la Boqueria"
+            },
+            {
+              "cityId": "city-barcelona",
+              "category": "attraction",
+              "title": "Gothic Quarter wander",
+              "notes": "Medieval lanes around the Cathedral of Barcelona, with Roman wall fragments still visible",
+              "startDate": "2027-06-28",
+              "endDate": "2027-06-28",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-jdd8kabhx-mrsskplt",
+              "time": "1 hr",
+              "text": "Gothic Quarter wander"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-madrid",
+      "label": "🖼️ Madrid, Spain",
+      "colour": "#795548",
+      "cityFood": [
+        {
+          "cityId": "city-madrid",
+          "category": "food",
+          "title": "Casa Revuelta, La Latina",
+          "notes": "Locals' favourite for bacalao rebozado (fried battered cod) with a glass of vermut de grifo — no menu, just ask",
+          "text": "Casa Revuelta, La Latina"
+        },
+        {
+          "cityId": "city-madrid",
+          "category": "food",
+          "title": "Chocolatería San Ginés, near Sol",
+          "notes": "Open since 1894 and going 24 hours — the classic spot for churros con chocolate",
+          "text": "Chocolatería San Ginés, near Sol"
+        }
+      ],
+      "suggestedActivities": [
+        {
+          "cityId": "city-madrid",
+          "category": "sight",
+          "title": "Prado Museum",
+          "notes": "One of the world's finest art museums — Velázquez's Las Meninas and Goya's Black Paintings are the highlights",
+          "id": "act-uueja860d-mrsqchgg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Prado Museum"
+        },
+        {
+          "cityId": "city-madrid",
+          "category": "attraction",
+          "title": "Retiro Park",
+          "notes": "Madrid's central green lung, with the Crystal Palace glasshouse and a boating lake",
+          "id": "act-4ss0sxjjp-mrsqchgg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Retiro Park"
+        },
+        {
+          "cityId": "city-madrid",
+          "category": "sight",
+          "title": "Royal Palace",
+          "notes": "Europe's largest royal palace by floor area, still used for state ceremonies",
+          "id": "act-5x9oid08c-mrsqchgg",
+          "assignedDate": "2027-06-30",
+          "startDate": "2027-06-30",
+          "endDate": "2027-06-30",
+          "startTime": "",
+          "endTime": "",
+          "text": "Royal Palace",
+          "assignedDayIdx": 1
+        },
+        {
+          "id": "act-azabxjdx0-mrsqchgg",
+          "title": "High-Speed Train: Barcelona to Madrid",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "~2h30 direct, Barcelona Sants to Madrid Atocha",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-29",
+          "startDate": "2027-06-29",
+          "startTime": "",
+          "endDate": "2027-06-29",
+          "endTime": "",
+          "cityId": "city-madrid",
+          "text": "High-Speed Train: Barcelona to Madrid"
+        },
+        {
+          "id": "act-yywquagts-mrsqchgg",
+          "title": "Prado Museum",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Allow at least 2-3 hours; Las Meninas is the must-see",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-06-30",
+          "startDate": "2027-06-30",
+          "startTime": "",
+          "endDate": "2027-06-30",
+          "endTime": "",
+          "cityId": "city-madrid",
+          "text": "Prado Museum"
+        },
+        {
+          "id": "act-ugi8xwqm8-mrsqchgg",
+          "title": "Retiro Park Morning Stroll",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Wide gravel paths circle the lake — a shaded, flat loop before the day heats up",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-01",
+          "startDate": "2027-07-01",
+          "startTime": "",
+          "endDate": "2027-07-01",
+          "endTime": "",
+          "cityId": "city-madrid",
+          "text": "Retiro Park Morning Stroll"
+        },
+        {
+          "id": "act-9r63f1oj4-mrsskplt",
+          "title": "Vermouth & tapas at Casa Revuelta",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "No menu — order the bacalao rebozado and a vermut de grifo like the regulars",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-06-29",
+          "startDate": "2027-06-29",
+          "startTime": "",
+          "endDate": "2027-06-29",
+          "endTime": "",
+          "cityId": "city-madrid"
+        },
+        {
+          "id": "act-pigovnxty-mrsskplu",
+          "title": "Plaza Mayor & Mercado de San Miguel",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Historic 17th-century square, then tapas stalls and jamón at the glass-walled market",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-01",
+          "startDate": "2027-07-01",
+          "startTime": "",
+          "endDate": "2027-07-01",
+          "endTime": "",
+          "cityId": "city-madrid"
+        },
+        {
+          "id": "act-ty1qrvuxg-mrsskplu",
+          "title": "Churros con chocolate at Chocolatería San Ginés",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Open since 1894; the definitive Madrid churros stop, day or night",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-01",
+          "startDate": "2027-07-01",
+          "startTime": "",
+          "endDate": "2027-07-01",
+          "endTime": "",
+          "cityId": "city-madrid"
+        }
+      ],
+      "legTips": [
+        {
+          "text": "High-speed Renfe AVE train from Barcelona to Madrid takes ~2.5 hours",
+          "cityId": "city-madrid"
+        },
+        {
+          "text": "Hotel Palacio Del Retiro sits right across from Retiro Park",
+          "cityId": "city-madrid"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-06-29",
+          "day": "Tue",
+          "from": "Madrid",
+          "to": "Madrid",
+          "completed": false,
+          "desc": "AVE train to Madrid",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-madrid"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-madrid",
+              "category": "attraction",
+              "title": "Renfe AVE high-speed train Barcelona → Madrid",
+              "notes": "~2h30 direct, Barcelona Sants to Madrid Atocha",
+              "startDate": "2027-06-29",
+              "endDate": "2027-06-29",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-azabxjdx0-mrsqchgg",
+              "time": "1 hr",
+              "text": "Renfe AVE high-speed train Barcelona → Madrid"
+            },
+            {
+              "cityId": "city-madrid",
+              "category": "food",
+              "title": "Vermouth & tapas at Casa Revuelta",
+              "notes": "No menu — order the bacalao rebozado and a vermut de grifo like the regulars",
+              "startDate": "2027-06-29",
+              "endDate": "2027-06-29",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-9r63f1oj4-mrsskplt",
+              "time": "1 hr",
+              "text": "Vermouth & tapas at Casa Revuelta"
+            }
+          ]
+        },
+        {
+          "date": "2027-06-30",
+          "day": "Wed",
+          "from": "Madrid",
+          "to": "Madrid",
+          "completed": false,
+          "desc": "Art & royalty",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-madrid"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-madrid",
+              "category": "sight",
+              "title": "Prado Museum",
+              "notes": "Allow at least 2-3 hours; Las Meninas is the must-see",
+              "startDate": "2027-06-30",
+              "endDate": "2027-06-30",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-yywquagts-mrsqchgg",
+              "time": "1 hr",
+              "text": "Prado Museum"
+            },
+            {
+              "cityId": "city-madrid",
+              "category": "sight",
+              "title": "Royal Palace",
+              "notes": "Guided or self-guided tour through the state rooms and armoury",
+              "startDate": "2027-06-30",
+              "endDate": "2027-06-30",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-5x9oid08c-mrsqchgg",
+              "time": "1 hr",
+              "text": "Royal Palace"
+            }
+          ]
+        },
+        {
+          "date": "2027-07-01",
+          "day": "Thu",
+          "from": "Madrid",
+          "to": "Madrid",
+          "completed": false,
+          "desc": "Parks & plazas",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-madrid"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-madrid",
+              "category": "fitness",
+              "title": "Morning jog through Retiro Park",
+              "notes": "Wide gravel paths circle the lake — a shaded, flat loop before the day heats up",
+              "startDate": "2027-07-01",
+              "endDate": "2027-07-01",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-ugi8xwqm8-mrsqchgg",
+              "time": "1 hr",
+              "text": "Morning jog through Retiro Park"
+            },
+            {
+              "cityId": "city-madrid",
+              "category": "attraction",
+              "title": "Plaza Mayor & Mercado de San Miguel",
+              "notes": "Historic 17th-century square, then tapas stalls and jamón at the glass-walled market",
+              "startDate": "2027-07-01",
+              "endDate": "2027-07-01",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-pigovnxty-mrsskplu",
+              "time": "1 hr",
+              "text": "Plaza Mayor & Mercado de San Miguel"
+            },
+            {
+              "cityId": "city-madrid",
+              "category": "food",
+              "title": "Churros con chocolate at Chocolatería San Ginés",
+              "notes": "Open since 1894; the definitive Madrid churros stop, day or night",
+              "startDate": "2027-07-01",
+              "endDate": "2027-07-01",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-ty1qrvuxg-mrsskplu",
+              "time": "1 hr",
+              "text": "Churros con chocolate at Chocolatería San Ginés"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-lisbon",
+      "label": "🌊 Lisbon, Portugal",
+      "colour": "#E74C3C",
+      "cityFood": [
+        {
+          "cityId": "city-lisbon",
+          "category": "food",
+          "title": "Pastéis de Belém, Belém",
+          "notes": "The original pastel de nata bakery, secret recipe since 1837 from monks at the nearby Jerónimos Monastery",
+          "text": "Pastéis de Belém, Belém"
+        },
+        {
+          "cityId": "city-lisbon",
+          "category": "food",
+          "title": "Farol de Santa Luzia, Alfama",
+          "notes": "Tile-lined Alfama seafood spot known for grilled octopus and bacalhau — popular with groups",
+          "text": "Farol de Santa Luzia, Alfama"
+        }
+      ],
+      "suggestedActivities": [
+        {
+          "cityId": "city-lisbon",
+          "category": "sight",
+          "title": "Belém Tower & Jerónimos Monastery",
+          "notes": "UNESCO-listed monuments from Portugal's Age of Discovery",
+          "id": "act-y8hukziih-mrsqchgg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Belém Tower & Jerónimos Monastery"
+        },
+        {
+          "cityId": "city-lisbon",
+          "category": "attraction",
+          "title": "Tram 28 ride through Alfama",
+          "notes": "Rattling vintage tram that climbs Lisbon's steepest hills — go early to avoid the crush",
+          "id": "act-b234nw5l4-mrsqchgg",
+          "assignedDate": "2027-07-03",
+          "startDate": "2027-07-03",
+          "endDate": "2027-07-03",
+          "startTime": "",
+          "endTime": "",
+          "text": "Tram 28 ride through Alfama",
+          "assignedDayIdx": 1
+        },
+        {
+          "id": "act-fk1qnobze-mrsqchgg",
+          "title": "Pastéis de Belém",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Warm from the oven with a dusting of cinnamon — the original since 1837",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-07-02",
+          "startDate": "2027-07-02",
+          "startTime": "",
+          "endDate": "2027-07-02",
+          "endTime": "",
+          "cityId": "city-lisbon",
+          "text": "Pastéis de Belém"
+        },
+        {
+          "id": "act-a4lpt558w-mrsqchgg",
+          "title": "Jerónimos Monastery",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "16th-century fortress and monastery marking Portugal's Age of Discovery",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-07-03",
+          "startDate": "2027-07-03",
+          "startTime": "",
+          "endDate": "2027-07-03",
+          "endTime": "",
+          "cityId": "city-lisbon",
+          "text": "Jerónimos Monastery"
+        },
+        {
+          "id": "act-8fp32q0z2-mrsqchgg",
+          "title": "Ribeira das Naus Walk",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Flat waterfront path past Praça do Comércio, good for an easy morning walk with river views",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-04",
+          "startDate": "2027-07-04",
+          "startTime": "",
+          "endDate": "2027-07-04",
+          "endTime": "",
+          "cityId": "city-lisbon",
+          "text": "Ribeira das Naus Walk"
+        },
+        {
+          "id": "act-f9dxfgamp-mrsskplu",
+          "title": "Seafood dinner at Farol de Santa Luzia",
+          "category": "food",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Grilled octopus and cataplana stew in tile-lined Alfama",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-04",
+          "startDate": "2027-07-04",
+          "startTime": "",
+          "endDate": "2027-07-04",
+          "endTime": "",
+          "cityId": "city-lisbon"
+        }
+      ],
+      "legTips": [
+        {
+          "text": "No direct train between Madrid and Lisbon — flying is fastest (TAP Air Portugal / Iberia, ~1h15)",
+          "cityId": "city-lisbon"
+        },
+        {
+          "text": "Buy a Viva Viagem card for easy trams, metro and buses",
+          "cityId": "city-lisbon"
+        },
+        {
+          "text": "AlmaLusa Baixa/Chiado is a well-rated boutique pick right in the centre",
+          "cityId": "city-lisbon"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-07-02",
+          "day": "Fri",
+          "from": "Lisbon",
+          "to": "Lisbon",
+          "completed": false,
+          "desc": "Fly to Lisbon",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-lisbon"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-lisbon",
+              "category": "food",
+              "title": "Pastéis de nata at Pastéis de Belém",
+              "notes": "Warm from the oven with a dusting of cinnamon — the original since 1837",
+              "startDate": "2027-07-02",
+              "endDate": "2027-07-02",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-fk1qnobze-mrsqchgg",
+              "time": "1 hr",
+              "text": "Pastéis de nata at Pastéis de Belém"
+            }
+          ]
+        },
+        {
+          "date": "2027-07-03",
+          "day": "Sat",
+          "from": "Lisbon",
+          "to": "Lisbon",
+          "completed": false,
+          "desc": "Belém & Alfama",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-lisbon"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-lisbon",
+              "category": "sight",
+              "title": "Belém Tower & Jerónimos Monastery",
+              "notes": "16th-century fortress and monastery marking Portugal's Age of Discovery",
+              "startDate": "2027-07-03",
+              "endDate": "2027-07-03",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-a4lpt558w-mrsqchgg",
+              "time": "1 hr",
+              "text": "Belém Tower & Jerónimos Monastery"
+            },
+            {
+              "cityId": "city-lisbon",
+              "category": "attraction",
+              "title": "Tram 28 ride through Alfama",
+              "notes": "Board near Martim Moniz early morning to get a seat, not just standing room",
+              "startDate": "2027-07-03",
+              "endDate": "2027-07-03",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-b234nw5l4-mrsqchgg",
+              "time": "1 hr",
+              "text": "Tram 28 ride through Alfama"
+            }
+          ]
+        },
+        {
+          "date": "2027-07-04",
+          "day": "Sun",
+          "from": "Lisbon",
+          "to": "Lisbon",
+          "completed": false,
+          "desc": "Free day, relaxed pace",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-lisbon"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-lisbon",
+              "category": "fitness",
+              "title": "Riverside walk along the Tagus",
+              "notes": "Flat waterfront path past Praça do Comércio, good for an easy morning walk with river views",
+              "startDate": "2027-07-04",
+              "endDate": "2027-07-04",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-8fp32q0z2-mrsqchgg",
+              "time": "1 hr",
+              "text": "Riverside walk along the Tagus"
+            },
+            {
+              "cityId": "city-lisbon",
+              "category": "food",
+              "title": "Seafood dinner at Farol de Santa Luzia",
+              "notes": "Grilled octopus and cataplana stew in tile-lined Alfama",
+              "startDate": "2027-07-04",
+              "endDate": "2027-07-04",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-f9dxfgamp-mrsskplu",
+              "time": "1 hr",
+              "text": "Seafood dinner at Farol de Santa Luzia"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-paris",
+      "label": "🗼 Paris, France",
+      "colour": "#3498DB",
+      "cityFood": [
+        {
+          "cityId": "city-paris",
+          "category": "food",
+          "title": "Chez Janou, Le Marais",
+          "notes": "Provençale bistro on a quiet corner near Place des Vosges — famous for its bottomless chocolate mousse",
+          "text": "Chez Janou, Le Marais"
+        },
+        {
+          "cityId": "city-paris",
+          "category": "food",
+          "title": "Robert et Louise, Le Marais",
+          "notes": "60+ years old, wood-fired grill; classic steak-frites and duck confit",
+          "text": "Robert et Louise, Le Marais"
+        }
+      ],
+      "suggestedActivities": [
+        {
+          "cityId": "city-paris",
+          "category": "sight",
+          "title": "Eiffel Tower",
+          "notes": "Book ahead for summit or second-floor access to skip the ticket-office queue",
+          "id": "act-nkwar88ci-mrsqchgg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Eiffel Tower"
+        },
+        {
+          "cityId": "city-paris",
+          "category": "sight",
+          "title": "Louvre Museum",
+          "notes": "The world's most-visited museum — pre-book and head straight for the Denon wing to beat the Mona Lisa crowds",
+          "id": "act-vm160q2fm-mrsqchgg",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": "",
+          "text": "Louvre Museum"
+        },
+        {
+          "cityId": "city-paris",
+          "category": "attraction",
+          "title": "Seine River cruise",
+          "notes": "An hour-long boat trip past Notre-Dame, the Louvre and the Eiffel Tower, especially good near sunset",
+          "id": "act-pw4eyvybz-mrsqchgg",
+          "assignedDate": "2027-07-06",
+          "startDate": "2027-07-06",
+          "endDate": "2027-07-06",
+          "startTime": "",
+          "endTime": "",
+          "text": "Seine River cruise",
+          "assignedDayIdx": 1
+        },
+        {
+          "id": "act-7mtm7l8yf-mrsqchgg",
+          "title": "Chez Janou Bistro Dinner",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Reserve ahead; save room for the famous chocolate mousse served straight from the bowl",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-07-05",
+          "startDate": "2027-07-05",
+          "startTime": "",
+          "endDate": "2027-07-05",
+          "endTime": "",
+          "cityId": "city-paris",
+          "text": "Chez Janou Bistro Dinner"
+        },
+        {
+          "id": "act-nffs7y4y5-mrsqchgg",
+          "title": "Eiffel Tower at Sunset",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Pre-booked timed entry; sunset ascent gives Paris lit up as you descend",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2027-07-06",
+          "startDate": "2027-07-06",
+          "startTime": "",
+          "endDate": "2027-07-06",
+          "endTime": "",
+          "cityId": "city-paris",
+          "text": "Eiffel Tower at Sunset"
+        },
+        {
+          "id": "act-gzkh7zeyu-mrsqchgg",
+          "title": "The Louvre Museum",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Head for the Denon wing first thing for the Mona Lisa before the tour groups arrive",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-07",
+          "startDate": "2027-07-07",
+          "startTime": "",
+          "endDate": "2027-07-07",
+          "endTime": "",
+          "cityId": "city-paris",
+          "text": "The Louvre Museum"
+        },
+        {
+          "id": "act-e7ipx4r4z-mrsskplv",
+          "title": "Montmartre & Sacré-Cœur",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Cobbled artist quarter with panoramic basilica steps over the city",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-07",
+          "startDate": "2027-07-07",
+          "startTime": "",
+          "endDate": "2027-07-07",
+          "endTime": "",
+          "cityId": "city-paris"
+        },
+        {
+          "id": "act-ueu6m314u-mrsskplv",
+          "title": "Patisserie crawl in Le Marais",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Croissants and pastries — L'Éclair de Génie on rue Pavée is a Marais favourite for eclairs",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2027-07-07",
+          "startDate": "2027-07-07",
+          "startTime": "",
+          "endDate": "2027-07-07",
+          "endTime": "",
+          "cityId": "city-paris"
+        }
+      ],
+      "legTips": [
+        {
+          "text": "Book Louvre and Eiffel Tower tickets online in advance",
+          "cityId": "city-paris"
+        },
+        {
+          "text": "Air France flies direct Lisbon → Paris CDG, ~2h30",
+          "cityId": "city-paris"
+        },
+        {
+          "text": "La Chambre du Marais is a well-rated boutique pick in Le Marais",
+          "cityId": "city-paris"
+        }
+      ],
+      "days": [
+        {
+          "date": "2027-07-05",
+          "day": "Mon",
+          "from": "Paris",
+          "to": "Paris",
+          "completed": false,
+          "desc": "Fly to Paris",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-paris"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-paris",
+              "category": "food",
+              "title": "Dinner at Chez Janou, Le Marais",
+              "notes": "Reserve ahead; save room for the famous chocolate mousse served straight from the bowl",
+              "startDate": "2027-07-05",
+              "endDate": "2027-07-05",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-7mtm7l8yf-mrsqchgg",
+              "time": "1 hr",
+              "text": "Dinner at Chez Janou, Le Marais"
+            }
+          ]
+        },
+        {
+          "date": "2027-07-06",
+          "day": "Tue",
+          "from": "Paris",
+          "to": "Paris",
+          "completed": false,
+          "desc": "Icons of Paris",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-paris"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-paris",
+              "category": "sight",
+              "title": "Eiffel Tower",
+              "notes": "Pre-booked timed entry; sunset ascent gives Paris lit up as you descend",
+              "startDate": "2027-07-06",
+              "endDate": "2027-07-06",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-nffs7y4y5-mrsqchgg",
+              "time": "1 hr",
+              "text": "Eiffel Tower"
+            },
+            {
+              "cityId": "city-paris",
+              "category": "attraction",
+              "title": "Seine River cruise",
+              "notes": "Board near the Eiffel Tower for a scenic loop past Notre-Dame and the Louvre",
+              "startDate": "2027-07-06",
+              "endDate": "2027-07-06",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-pw4eyvybz-mrsqchgg",
+              "time": "1 hr",
+              "text": "Seine River cruise"
+            }
+          ]
+        },
+        {
+          "date": "2027-07-07",
+          "day": "Wed",
+          "from": "Paris",
+          "to": "Paris",
+          "completed": false,
+          "desc": "Museums & wandering",
+          "transportItems": [],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-paris"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-paris",
+              "category": "sight",
+              "title": "Louvre Museum",
+              "notes": "Head for the Denon wing first thing for the Mona Lisa before the tour groups arrive",
+              "startDate": "2027-07-07",
+              "endDate": "2027-07-07",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-gzkh7zeyu-mrsqchgg",
+              "time": "1 hr",
+              "text": "Louvre Museum"
+            },
+            {
+              "cityId": "city-paris",
+              "category": "attraction",
+              "title": "Montmartre & Sacré-Cœur",
+              "notes": "Cobbled artist quarter with panoramic basilica steps over the city",
+              "startDate": "2027-07-07",
+              "endDate": "2027-07-07",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-e7ipx4r4z-mrsskplv",
+              "time": "1 hr",
+              "text": "Montmartre & Sacré-Cœur"
+            },
+            {
+              "cityId": "city-paris",
+              "category": "food",
+              "title": "Patisserie crawl in Le Marais",
+              "notes": "Croissants and pastries — L'Éclair de Génie on rue Pavée is a Marais favourite for eclairs",
+              "startDate": "2027-07-07",
+              "endDate": "2027-07-07",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-ueu6m314u-mrsskplv",
+              "time": "1 hr",
+              "text": "Patisserie crawl in Le Marais"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-return",
+      "label": "🏠 Return Home",
+      "colour": "#2C3E50",
+      "cityFood": [],
+      "suggestedActivities": [
+        {
+          "id": "act-d7fnw6snn-mrsqchgh",
+          "title": "Depart via CDG Airport",
+          "category": "sight",
+          "estTime": "1 hr",
+          "estCost": "0",
+          "notes": "Allow extra time — CDG security and immigration queues can be long in peak summer",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2027-07-08",
+          "startDate": "2027-07-08",
+          "startTime": "",
+          "endDate": "2027-07-08",
+          "endTime": "",
+          "cityId": "city-brisbane",
+          "text": "Depart via CDG Airport"
+        }
+      ],
+      "legTips": [],
+      "days": [
+        {
+          "date": "2027-07-08",
+          "day": "Thu",
+          "from": "Brisbane",
+          "to": "Brisbane",
+          "completed": false,
+          "desc": "Depart Paris for the long flight home, via Singapore",
+          "transportItems": [
+            {
+              "text": "Add transport...",
+              "cost": "0"
+            }
+          ],
+          "accomItems": [
+            {
+              "text": "Add accommodation...",
+              "cost": "0",
+              "cityId": "city-brisbane"
+            }
+          ],
+          "activityItems": [
+            {
+              "cityId": "city-paris",
+              "category": "attraction",
+              "title": "Check out & transfer to airport",
+              "notes": "Allow extra time — CDG security and immigration queues can be long in peak summer",
+              "startDate": "2027-07-08",
+              "endDate": "2027-07-08",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-d7fnw6snn-mrsqchgh",
+              "time": "1 hr",
+              "text": "Check out & transfer to airport"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "packing": [
+    {
+      "areaName": "🚶 Walk-on Gear (Wear onto plane)",
+      "areaColor": "#E67E22",
+      "categories": [
+        {
+          "title": "Plane Outfit",
+          "items": [
+            {
+              "text": "Underwear",
+              "done": false
+            },
+            {
+              "text": "Jeans",
+              "done": false
+            },
+            {
+              "text": "Belt",
+              "done": false
+            },
+            {
+              "text": "Sports shoes",
+              "done": false
+            },
+            {
+              "text": "Socks",
+              "done": false
+            },
+            {
+              "text": "Activewear shirt",
+              "done": false
+            },
+            {
+              "text": "Hoodie",
+              "done": false
+            },
+            {
+              "text": "Sunglasses",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "areaName": "🧳 Carry-on Packed Bag (Main Luggage)",
+      "areaColor": "#2980B9",
+      "categories": [
+        {
+          "title": "Clothes",
+          "items": [
+            {
+              "text": "T-shirts, Tank Tops",
+              "done": false
+            },
+            {
+              "text": "Shorts, Skirts",
+              "done": false
+            },
+            {
+              "text": "Pants",
+              "done": false
+            },
+            {
+              "text": "Layers (hoodie, sweater)",
+              "done": false
+            },
+            {
+              "text": "Swim suit",
+              "done": false
+            },
+            {
+              "text": "Dress",
+              "done": false
+            },
+            {
+              "text": "Socks",
+              "done": false
+            },
+            {
+              "text": "Underwear",
+              "done": false
+            },
+            {
+              "text": "Bras",
+              "done": false
+            },
+            {
+              "text": "Pyjamas, Sleepwear",
+              "done": false
+            },
+            {
+              "text": "Formal Wear",
+              "done": false
+            },
+            {
+              "text": "Hat",
+              "done": false
+            },
+            {
+              "text": "Workout outfit",
+              "done": false
+            },
+            {
+              "text": "Other accessories / Earrings",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Shoes & Misc",
+          "items": [
+            {
+              "text": "Dress shoes",
+              "done": false
+            },
+            {
+              "text": "Sandals/Crocs",
+              "done": false
+            },
+            {
+              "text": "Mobile strap for running",
+              "done": false
+            },
+            {
+              "text": "Presents / Card",
+              "done": false
+            },
+            {
+              "text": "Reusable tote bag",
+              "done": false
+            },
+            {
+              "text": "Pillowcase for used clothes",
+              "done": false
+            },
+            {
+              "text": "Micro-fibre Towel",
+              "done": false
+            },
+            {
+              "text": "Foldable hangers",
+              "done": false
+            },
+            {
+              "text": "Laundry Sheets for washing",
+              "done": false
+            },
+            {
+              "text": "Raincoat/Umbrella",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Dry Toiletries",
+          "items": [
+            {
+              "text": "Floss",
+              "done": false
+            },
+            {
+              "text": "Toothbrush",
+              "done": false
+            },
+            {
+              "text": "Razor (Cartidge), Shaving",
+              "done": false
+            },
+            {
+              "text": "Bar of Soap",
+              "done": false
+            },
+            {
+              "text": "Cotton pad, q-tips",
+              "done": false
+            },
+            {
+              "text": "Nail clippers/tweezers",
+              "done": false
+            },
+            {
+              "text": "Personal Hygiene items (Pads)",
+              "done": false
+            },
+            {
+              "text": "Makeup",
+              "done": false
+            },
+            {
+              "text": "Hair clips, hair ties",
+              "done": false
+            },
+            {
+              "text": "Hair Brush/comb",
+              "done": false
+            },
+            {
+              "text": "Bandaids, Electrolyte packs",
+              "done": false
+            },
+            {
+              "text": "Body wipes",
+              "done": false
+            },
+            {
+              "text": "Panadol / Nurofen",
+              "done": false
+            },
+            {
+              "text": "Vitamins / Tablets",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "💧 1L Clear Bag (Liquids <100ml)",
+          "items": [
+            {
+              "text": "Clear 1 litre bag",
+              "done": false
+            },
+            {
+              "text": "Cologne/Perfume",
+              "done": false
+            },
+            {
+              "text": "Toothpaste",
+              "done": false
+            },
+            {
+              "text": "Face wash",
+              "done": false
+            },
+            {
+              "text": "Shampoo & Conditioner",
+              "done": false
+            },
+            {
+              "text": "Leave-in conditioner",
+              "done": false
+            },
+            {
+              "text": "Micellar Water/Makeup Remover",
+              "done": false
+            },
+            {
+              "text": "Sunscreen",
+              "done": false
+            },
+            {
+              "text": "Deodorant",
+              "done": false
+            },
+            {
+              "text": "Moisturiser",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "areaName": "🎒 Personal Item Bag (Under Seat)",
+      "areaColor": "#8E44AD",
+      "categories": [
+        {
+          "title": "Essentials",
+          "items": [
+            {
+              "text": "TRS Claim + Items",
+              "done": false
+            },
+            {
+              "text": "Passport + [Copy + Tracker]",
+              "done": false
+            },
+            {
+              "text": "Reservations + Itineraries + Insurance",
+              "done": false
+            },
+            {
+              "text": "Wallet/Purse + Local cash + Cards",
+              "done": false
+            },
+            {
+              "text": "Phone",
+              "done": false
+            },
+            {
+              "text": "Crossbody/Sling Bag",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Flight Items",
+          "items": [
+            {
+              "text": "Travel pillow / Foot sling",
+              "done": false
+            },
+            {
+              "text": "Phone holder (watch movies)",
+              "done": false
+            },
+            {
+              "text": "Compression socks, Slippers",
+              "done": false
+            },
+            {
+              "text": "Disposable Toothbrush kit",
+              "done": false
+            },
+            {
+              "text": "Eye mask, Eye Drops",
+              "done": false
+            },
+            {
+              "text": "Ear plugs, Breath Fresheners",
+              "done": false
+            },
+            {
+              "text": "Snacks, TravelCalm",
+              "done": false
+            },
+            {
+              "text": "Headphones/Airpods",
+              "done": false
+            },
+            {
+              "text": "Airfly/Bluetooth Adapter",
+              "done": false
+            },
+            {
+              "text": "Book/Kindle",
+              "done": false
+            },
+            {
+              "text": "Water bottle",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Tech",
+          "items": [
+            {
+              "text": "eSIM (Installed)",
+              "done": false
+            },
+            {
+              "text": "Mobile downloads (Movies, Shows)",
+              "done": false
+            },
+            {
+              "text": "Phone charger",
+              "done": false
+            },
+            {
+              "text": "Power cables, Cords",
+              "done": false
+            },
+            {
+              "text": "Power Adapter",
+              "done": false
+            },
+            {
+              "text": "Power bank",
+              "done": false
+            },
+            {
+              "text": "Pen",
+              "done": false
+            },
+            {
+              "text": "Laptop",
+              "done": false
+            },
+            {
+              "text": "Luggage Trackers",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "areaName": "📝 Trip Notes",
+      "areaColor": "#6C5CE7",
+      "categories": [
+        {
+          "title": "Notes",
+          "items": [
+            {
+              "text": "Booking reminders",
+              "done": false
+            },
+            {
+              "text": "Places to book",
+              "done": false
+            },
+            {
+              "text": "Trip ideas to follow up",
+              "done": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "leaveHome": [
+    {
+      "text": "Kitchen and bins",
+      "kind": "section"
+    },
+    {
+      "text": "Empty fridge and pantry perishables",
+      "done": false
+    },
+    {
+      "text": "Empty coffee and compost bins and leave outside",
+      "done": false
+    },
+    {
+      "text": "Empty bins",
+      "done": false,
+      "mergeKeys": [
+        "take out all rubbish and recycling"
+      ]
+    },
+    {
+      "text": "Pause or reschedule any regular deliveries",
+      "done": false
+    },
+    {
+      "text": "Check mailbox is empty or hold mail service",
+      "done": false
+    },
+    {
+      "text": "Home shutdown",
+      "kind": "section"
+    },
+    {
+      "text": "Turn power off everywhere not needed",
+      "done": false,
+      "mergeKeys": [
+        "switch off power points at the wall except fridge"
+      ]
+    },
+    {
+      "text": "Check all lights and fans off",
+      "done": false
+    },
+    {
+      "text": "Close and check all windows",
+      "done": false,
+      "mergeKeys": [
+        "lock all doors and windows"
+      ]
+    },
+    {
+      "text": "Blinds partial down",
+      "done": false,
+      "mergeKeys": [
+        "close blinds or curtains and secure loose outdoor items"
+      ]
+    },
+    {
+      "text": "Water off (including outdoor taps)",
+      "done": false,
+      "mergeKeys": [
+        "water off, including outdoor taps",
+        "turn off all taps and check for leaks"
+      ]
+    },
+    {
+      "text": "Turn off gas supply if applicable",
+      "done": false
+    },
+    {
+      "text": "Adjust thermostat to away or saver mode",
+      "done": false
+    },
+    {
+      "text": "Security and pets",
+      "kind": "section"
+    },
+    {
+      "text": "Check CCTV on",
+      "done": false
+    },
+    {
+      "text": "Dog door panel / lock",
+      "done": false
+    },
+    {
+      "text": "Automatic fish feeder",
+      "done": false,
+      "mergeKeys": [
+        "automatic fish feeder"
+      ]
+    },
+    {
+      "text": "Security system on",
+      "done": false,
+      "mergeKeys": [
+        "set security alarm / notify security company"
+      ]
+    },
+    {
+      "text": "Water plants or arrange plant care",
+      "done": false
+    },
+    {
+      "text": "Set up lights on timers if away long",
+      "done": false
+    },
+    {
+      "text": "Travel ready",
+      "kind": "section"
+    },
+    {
+      "text": "Setup international cards on smart devices (Apple Pay / Google Pay)",
+      "done": false
+    },
+    {
+      "text": "Setup default transport card on smart devices",
+      "done": false
+    },
+    {
+      "text": "Charge all devices including phones, tablets, and power banks",
+      "done": false
+    },
+    {
+      "text": "Download offline maps and confirmations",
+      "done": false
+    },
+    {
+      "text": "Notify emergency contact of travel plans",
+      "done": false
+    },
+    {
+      "text": "Pause gym membership or group activities",
+      "done": false
+    },
+    {
+      "text": "If taking dog",
+      "kind": "section"
+    },
+    {
+      "text": "Waste bags",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: waste bags"
+      ]
+    },
+    {
+      "text": "Water bowl",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: water bowl"
+      ]
+    },
+    {
+      "text": "Food",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: food"
+      ]
+    },
+    {
+      "text": "Toys",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: toys"
+      ]
+    },
+    {
+      "text": "Leash",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: leash"
+      ]
+    },
+    {
+      "text": "Treats",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: treats"
+      ]
+    },
+    {
+      "text": "Set security alarm",
+      "done": false
+    },
+    {
+      "text": "Charge all devices",
+      "done": false
+    }
+  ],
+  "hotelCheckout": [],
+  "journeys": [
+    {
+      "id": "journey-1_0",
+      "journeyId": "journey-outbound",
+      "journeyName": "Brisbane to Athens (via Singapore)",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromCityId": "city-brisbane",
+      "toCityId": "city-athens",
+      "fromLocation": "Brisbane",
+      "toLocation": "Athens",
+      "departureDate": "2027-06-08",
+      "departureTime": "14:45",
+      "arrivalDate": "2027-06-09",
+      "arrivalTime": "08:40",
+      "dayDate": "2026-06-08",
+      "transportType": "flight",
+      "provider": "Singapore Airlines",
+      "routeCode": "BNE-SIN-ATH",
+      "cost": 2100,
+      "status": "suggested",
+      "bookingReference": "",
+      "notes": "~20h35m total via Singapore Changi; fastest routing on this pair, indicative fare in AUD",
+      "legs": [],
+      "startDate": "2027-06-08",
+      "endDate": "2027-06-09",
+      "startTime": "14:45",
+      "endTime": "08:40",
+      "fromAddress": "",
+      "toAddress": "",
+      "legId": "city-brisbane-start"
+    },
+    {
+      "id": "journey-2_0",
+      "journeyId": "journey-cruise-embark",
+      "journeyName": "Athens to Cruise Embarkation (Piraeus)",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromCityId": "city-athens",
+      "toCityId": "city-athens",
+      "fromLocation": "Athens",
+      "toLocation": "Athens",
+      "departureDate": "2027-06-12",
+      "departureTime": "15:00",
+      "arrivalDate": "2027-06-12",
+      "arrivalTime": "17:00",
+      "dayDate": "2026-06-12",
+      "transportType": "transfer",
+      "provider": "Port transfer / taxi",
+      "routeCode": "",
+      "cost": 25,
+      "status": "suggested",
+      "bookingReference": "",
+      "notes": "Celestyal 'Idyllic Aegean' departs Piraeus ~5pm; taxi from central Athens takes ~25-30 minutes",
+      "legs": [],
+      "startDate": "2027-06-12",
+      "endDate": "2027-06-12",
+      "startTime": "15:00",
+      "endTime": "17:00",
+      "fromAddress": "",
+      "toAddress": "",
+      "legId": "leg-athens"
+    },
+    {
+      "id": "journey-3_0",
+      "journeyId": "journey-cruise-to-rome",
+      "journeyName": "Athens (disembark) to Rome",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromCityId": "city-athens",
+      "toCityId": "city-rome",
+      "fromLocation": "Athens",
+      "toLocation": "Rome",
+      "departureDate": "2027-06-19",
+      "departureTime": "11:30",
+      "arrivalDate": "2027-06-19",
+      "arrivalTime": "13:20",
+      "dayDate": "2026-06-19",
+      "transportType": "flight",
+      "provider": "Aegean Airlines",
+      "routeCode": "ATH-FCO",
+      "cost": 180,
+      "status": "suggested",
+      "bookingReference": "",
+      "notes": "Short intra-European hop, ~2h50; Aegean and ITA both fly this route several times daily",
+      "legs": [],
+      "startDate": "2027-06-19",
+      "endDate": "2027-06-19",
+      "startTime": "11:30",
+      "endTime": "13:20",
+      "fromAddress": "",
+      "toAddress": "",
+      "legId": "leg-cruise-2027-06-19"
+    },
+    {
+      "id": "journey-4_0",
+      "journeyId": "journey-rome-florence",
+      "journeyName": "Rome to Florence",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromCityId": "city-rome",
+      "toCityId": "city-florence",
+      "fromLocation": "Rome",
+      "toLocation": "Florence",
+      "departureDate": "2027-06-22",
+      "departureTime": "09:00",
+      "arrivalDate": "2027-06-22",
+      "arrivalTime": "10:30",
+      "dayDate": "2026-06-22",
+      "transportType": "train",
+      "provider": "Trenitalia Frecciarossa",
+      "routeCode": "Roma Termini-Firenze SMN",
+      "cost": 70,
+      "status": "suggested",
+      "bookingReference": "",
+      "notes": "~1h30 high-speed, departs roughly every 30 minutes",
+      "legs": [],
+      "startDate": "2027-06-22",
+      "endDate": "2027-06-22",
+      "startTime": "09:00",
+      "endTime": "10:30",
+      "fromAddress": "",
+      "toAddress": "",
+      "legId": "leg-florence"
+    },
+    {
+      "id": "journey-5_0",
+      "journeyId": "journey-florence-venice",
+      "journeyName": "Florence to Venice",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromCityId": "city-florence",
+      "toCityId": "city-venice",
+      "fromLocation": "Florence",
+      "toLocation": "Venice",
+      "departureDate": "2027-06-24",
+      "departureTime": "09:30",
+      "arrivalDate": "2027-06-24",
+      "arrivalTime": "11:35",
+      "dayDate": "2026-06-24",
+      "transportType": "train",
+      "provider": "Trenitalia Frecciarossa",
+      "routeCode": "Firenze SMN-Venezia S.Lucia",
+      "cost": 65,
+      "status": "suggested",
+      "bookingReference": "",
+      "notes": "~2h high-speed, direct",
+      "legs": [],
+      "startDate": "2027-06-24",
+      "endDate": "2027-06-24",
+      "startTime": "09:30",
+      "endTime": "11:35",
+      "fromAddress": "",
+      "toAddress": "",
+      "legId": "leg-venice"
+    },
+    {
+      "id": "journey-6_0",
+      "journeyId": "journey-venice-barcelona",
+      "journeyName": "Venice to Barcelona",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromCityId": "city-venice",
+      "toCityId": "city-barcelona",
+      "fromLocation": "Venice",
+      "toLocation": "Barcelona",
+      "departureDate": "2027-06-26",
+      "departureTime": "12:00",
+      "arrivalDate": "2027-06-26",
+      "arrivalTime": "14:05",
+      "dayDate": "2026-06-26",
+      "transportType": "flight",
+      "provider": "Vueling",
+      "routeCode": "VCE-BCN",
+      "cost": 110,
+      "status": "suggested",
+      "bookingReference": "",
+      "notes": "Direct, ~2h; Vueling/Ryanair/Wizz all fly this route daily, ~47 weekly non-stop departures",
+      "legs": [],
+      "startDate": "2027-06-26",
+      "endDate": "2027-06-26",
+      "startTime": "12:00",
+      "endTime": "14:05",
+      "fromAddress": "",
+      "toAddress": "",
+      "legId": "leg-barcelona"
+    },
+    {
+      "id": "journey-7_0",
+      "journeyId": "journey-barcelona-madrid",
+      "journeyName": "Barcelona to Madrid",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromCityId": "city-barcelona",
+      "toCityId": "city-madrid",
+      "fromLocation": "Barcelona",
+      "toLocation": "Madrid",
+      "departureDate": "2027-06-29",
+      "departureTime": "09:00",
+      "arrivalDate": "2027-06-29",
+      "arrivalTime": "11:30",
+      "dayDate": "2026-06-29",
+      "transportType": "train",
+      "provider": "Renfe AVE",
+      "routeCode": "Barcelona Sants-Madrid Atocha",
+      "cost": 90,
+      "status": "suggested",
+      "bookingReference": "",
+      "notes": "~2h30 high-speed, one of Europe's most frequent AVE corridors",
+      "legs": [],
+      "startDate": "2027-06-29",
+      "endDate": "2027-06-29",
+      "startTime": "09:00",
+      "endTime": "11:30",
+      "fromAddress": "",
+      "toAddress": "",
+      "legId": "leg-madrid"
+    },
+    {
+      "id": "journey-8_0",
+      "journeyId": "journey-madrid-lisbon",
+      "journeyName": "Madrid to Lisbon",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromCityId": "city-madrid",
+      "toCityId": "city-lisbon",
+      "fromLocation": "Madrid",
+      "toLocation": "Lisbon",
+      "departureDate": "2027-07-02",
+      "departureTime": "10:00",
+      "arrivalDate": "2027-07-02",
+      "arrivalTime": "11:15",
+      "dayDate": "2026-07-02",
+      "transportType": "flight",
+      "provider": "TAP Air Portugal",
+      "routeCode": "MAD-LIS",
+      "cost": 140,
+      "status": "suggested",
+      "bookingReference": "",
+      "notes": "No direct train exists on this route — flying is fastest at ~1h15; Iberia also flies it hourly",
+      "legs": [],
+      "startDate": "2027-07-02",
+      "endDate": "2027-07-02",
+      "startTime": "10:00",
+      "endTime": "11:15",
+      "fromAddress": "",
+      "toAddress": "",
+      "legId": "leg-lisbon"
+    },
+    {
+      "id": "journey-9_0",
+      "journeyId": "journey-lisbon-paris",
+      "journeyName": "Lisbon to Paris",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromCityId": "city-lisbon",
+      "toCityId": "city-paris",
+      "fromLocation": "Lisbon",
+      "toLocation": "Paris",
+      "departureDate": "2027-07-05",
+      "departureTime": "17:00",
+      "arrivalDate": "2027-07-05",
+      "arrivalTime": "20:40",
+      "dayDate": "2026-07-05",
+      "transportType": "flight",
+      "provider": "Air France",
+      "routeCode": "LIS-CDG",
+      "cost": 160,
+      "status": "suggested",
+      "bookingReference": "",
+      "notes": "Direct, ~2h30-2h40; Air France is the only carrier flying LIS-CDG non-stop",
+      "legs": [],
+      "startDate": "2027-07-05",
+      "endDate": "2027-07-05",
+      "startTime": "17:00",
+      "endTime": "20:40",
+      "fromAddress": "",
+      "toAddress": "",
+      "legId": "leg-paris"
+    },
+    {
+      "id": "journey-return_0",
+      "journeyId": "journey-return",
+      "journeyName": "Paris to Brisbane (via Singapore)",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromCityId": "city-paris",
+      "toCityId": "city-brisbane",
+      "fromLocation": "Paris",
+      "toLocation": "Brisbane",
+      "departureDate": "2027-07-08",
+      "departureTime": "21:00",
+      "arrivalDate": "2027-07-09",
+      "arrivalTime": "20:00",
+      "dayDate": "2026-07-08",
+      "transportType": "flight",
+      "provider": "Singapore Airlines",
+      "routeCode": "CDG-SIN-BNE",
+      "cost": 2300,
+      "status": "suggested",
+      "bookingReference": "",
+      "notes": "~24-25h total via Singapore Changi, indicative fare in AUD",
+      "legs": [],
+      "startDate": "2027-07-08",
+      "endDate": "2027-07-09",
+      "startTime": "21:00",
+      "endTime": "20:00",
+      "fromAddress": "",
+      "toAddress": "",
+      "legId": "leg-return"
+    }
+  ],
+  "stays": [
+    {
+      "id": "stay-1",
+      "cityId": "city-athens",
+      "city": "Athens",
+      "propertyName": "Praxitelous Luxury Suites",
+      "checkIn": "2027-06-09",
+      "checkOut": "2027-06-12",
+      "nights": 3,
+      "status": "suggested",
+      "provider": "Book direct / Booking.com",
+      "bookingRef": "",
+      "totalCost": 480,
+      "notes": "4.7★ (170 reviews), central near Syntagma & Monastiraki, walkable to the Acropolis",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2027-06-09",
+      "endDate": "2027-06-12",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
+    },
+    {
+      "id": "stay-2",
+      "cityId": "city-athens",
+      "city": "Cruise Ship (Cabin)",
+      "propertyName": "Celestyal Journey — Idyllic Aegean, cabin TBC",
+      "checkIn": "2027-06-12",
+      "checkOut": "2027-06-19",
+      "nights": 7,
+      "status": "suggested",
+      "provider": "Celestyal Cruises",
+      "bookingRef": "",
+      "totalCost": 1400,
+      "notes": "Real 7-night round-trip sailing from Piraeus calling at Kuşadası, Rhodes, Crete, Santorini, Mykonos, Milos — verify current 2027 sailing dates and pricing",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2027-06-12",
+      "endDate": "2027-06-19",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
+    },
+    {
+      "id": "stay-3",
+      "cityId": "city-rome",
+      "city": "Rome",
+      "propertyName": "Hotel Albergo del Senato",
+      "checkIn": "2027-06-19",
+      "checkOut": "2027-06-22",
+      "nights": 3,
+      "status": "suggested",
+      "provider": "Book direct / Booking.com",
+      "bookingRef": "",
+      "totalCost": 690,
+      "notes": "4.8★ (1508 reviews), faces the Pantheon in Piazza della Rotonda",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2027-06-19",
+      "endDate": "2027-06-22",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
+    },
+    {
+      "id": "stay-4",
+      "cityId": "city-florence",
+      "city": "Florence",
+      "propertyName": "Brunelleschi Hotel",
+      "checkIn": "2027-06-22",
+      "checkOut": "2027-06-24",
+      "nights": 2,
+      "status": "suggested",
+      "provider": "Book direct / Booking.com",
+      "bookingRef": "",
+      "totalCost": 480,
+      "notes": "4.7★ (1518 reviews), boutique hotel 90 seconds from the Duomo",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2027-06-22",
+      "endDate": "2027-06-24",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
+    },
+    {
+      "id": "stay-5",
+      "cityId": "city-venice",
+      "city": "Venice",
+      "propertyName": "Hotel Bella Venezia",
+      "checkIn": "2027-06-24",
+      "checkOut": "2027-06-26",
+      "nights": 2,
+      "status": "suggested",
+      "provider": "Book direct / Booking.com",
+      "bookingRef": "",
+      "totalCost": 420,
+      "notes": "4.3★ (495 reviews), canal-facing balcony, 2 minutes from St Mark's Square",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2027-06-24",
+      "endDate": "2027-06-26",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
+    },
+    {
+      "id": "stay-6",
+      "cityId": "city-barcelona",
+      "city": "Barcelona",
+      "propertyName": "Hotel Ohla Barcelona",
+      "checkIn": "2027-06-26",
+      "checkOut": "2027-06-29",
+      "nights": 3,
+      "status": "suggested",
+      "provider": "Book direct / Booking.com",
+      "bookingRef": "",
+      "totalCost": 690,
+      "notes": "4.6★ (2004 reviews), central Ciutat Vella with rooftop bar",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2027-06-26",
+      "endDate": "2027-06-29",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
+    },
+    {
+      "id": "stay-7",
+      "cityId": "city-madrid",
+      "city": "Madrid",
+      "propertyName": "Hotel Palacio Del Retiro, Autograph Collection",
+      "checkIn": "2027-06-29",
+      "checkOut": "2027-07-02",
+      "nights": 3,
+      "status": "suggested",
+      "provider": "Book direct / Marriott.com",
+      "bookingRef": "",
+      "totalCost": 720,
+      "notes": "4.6★ (530 reviews), boutique heritage hotel directly across from Retiro Park",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2027-06-29",
+      "endDate": "2027-07-02",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
+    },
+    {
+      "id": "stay-8",
+      "cityId": "city-lisbon",
+      "city": "Lisbon",
+      "propertyName": "AlmaLusa Baixa/Chiado",
+      "checkIn": "2027-07-02",
+      "checkOut": "2027-07-05",
+      "nights": 3,
+      "status": "suggested",
+      "provider": "Book direct / Booking.com",
+      "bookingRef": "",
+      "totalCost": 450,
+      "notes": "4.7★ (545 reviews), central Baixa/Chiado, quiet despite the location",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2027-07-02",
+      "endDate": "2027-07-05",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
+    },
+    {
+      "id": "stay-9",
+      "cityId": "city-paris",
+      "city": "Paris",
+      "propertyName": "La Chambre du Marais",
+      "checkIn": "2027-07-05",
+      "checkOut": "2027-07-08",
+      "nights": 3,
+      "status": "suggested",
+      "provider": "Book direct / Booking.com",
+      "bookingRef": "",
+      "totalCost": 690,
+      "notes": "4.8★ (414 reviews), boutique hotel in the heart of Le Marais",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2027-07-05",
+      "endDate": "2027-07-08",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
+    }
+  ],
+  "cities": [
+    {
+      "id": "city-brisbane",
+      "name": "Brisbane",
+      "country": "Australia",
+      "countryCode": "AU",
+      "code": "BNE",
+      "lat": -27.4698,
+      "lng": 153.0251,
+      "dateFrom": "2027-06-08",
+      "dateTo": "2027-06-08",
+      "colour": "#E74C3C"
+    },
+    {
+      "id": "city-athens",
+      "name": "Athens",
+      "country": "Greece",
+      "countryCode": "GR",
+      "code": "ATH",
+      "lat": 37.9838,
+      "lng": 23.7275,
+      "dateFrom": "2027-06-09",
+      "dateTo": "2027-06-12",
+      "colour": "#3498DB"
+    },
+    {
+      "id": "city-kusadasi",
+      "name": "Kuşadası",
+      "country": "Turkey",
+      "countryCode": "TR",
+      "code": "ADB",
+      "lat": 37.8583,
+      "lng": 27.2597,
+      "dateFrom": "2027-06-13",
+      "dateTo": "2027-06-13",
+      "colour": "#27AE60"
+    },
+    {
+      "id": "city-rhodes",
+      "name": "Rhodes",
+      "country": "Greece",
+      "countryCode": "GR",
+      "code": "RHO",
+      "lat": 36.4341,
+      "lng": 28.2176,
+      "dateFrom": "2027-06-14",
+      "dateTo": "2027-06-14",
+      "colour": "#F39C12"
+    },
+    {
+      "id": "city-crete",
+      "name": "Crete (Heraklion)",
+      "country": "Greece",
+      "countryCode": "GR",
+      "code": "HER",
+      "lat": 35.3387,
+      "lng": 25.1442,
+      "dateFrom": "2027-06-15",
+      "dateTo": "2027-06-15",
+      "colour": "#9B59B6"
+    },
+    {
+      "id": "city-santorini",
+      "name": "Santorini",
+      "country": "Greece",
+      "countryCode": "GR",
+      "code": "JTR",
+      "lat": 36.3932,
+      "lng": 25.4615,
+      "dateFrom": "2027-06-16",
+      "dateTo": "2027-06-16",
+      "colour": "#1ABC9C"
+    },
+    {
+      "id": "city-mykonos",
+      "name": "Mykonos",
+      "country": "Greece",
+      "countryCode": "GR",
+      "code": "JMK",
+      "lat": 37.4467,
+      "lng": 25.3289,
+      "dateFrom": "2027-06-17",
+      "dateTo": "2027-06-17",
+      "colour": "#E91E63"
+    },
+    {
+      "id": "city-milos",
+      "name": "Milos",
+      "country": "Greece",
+      "countryCode": "GR",
+      "code": "MLO",
+      "lat": 36.6975,
+      "lng": 24.4297,
+      "dateFrom": "2027-06-18",
+      "dateTo": "2027-06-18",
+      "colour": "#795548"
+    },
+    {
+      "id": "city-rome",
+      "name": "Rome",
+      "country": "Italy",
+      "countryCode": "IT",
+      "code": "ROM",
+      "lat": 41.9028,
+      "lng": 12.4964,
+      "dateFrom": "2027-06-19",
+      "dateTo": "2027-06-22",
+      "colour": "#E74C3C"
+    },
+    {
+      "id": "city-florence",
+      "name": "Florence",
+      "country": "Italy",
+      "countryCode": "IT",
+      "code": "FLR",
+      "lat": 43.7696,
+      "lng": 11.2558,
+      "dateFrom": "2027-06-22",
+      "dateTo": "2027-06-24",
+      "colour": "#3498DB"
+    },
+    {
+      "id": "city-venice",
+      "name": "Venice",
+      "country": "Italy",
+      "countryCode": "IT",
+      "code": "VCE",
+      "lat": 45.4408,
+      "lng": 12.3155,
+      "dateFrom": "2027-06-24",
+      "dateTo": "2027-06-26",
+      "colour": "#27AE60"
+    },
+    {
+      "id": "city-barcelona",
+      "name": "Barcelona",
+      "country": "Spain",
+      "countryCode": "ES",
+      "code": "BCN",
+      "lat": 41.3874,
+      "lng": 2.1686,
+      "dateFrom": "2027-06-26",
+      "dateTo": "2027-06-29",
+      "colour": "#F39C12"
+    },
+    {
+      "id": "city-madrid",
+      "name": "Madrid",
+      "country": "Spain",
+      "countryCode": "ES",
+      "code": "MAD",
+      "lat": 40.4168,
+      "lng": -3.7038,
+      "dateFrom": "2027-06-29",
+      "dateTo": "2027-07-02",
+      "colour": "#9B59B6"
+    },
+    {
+      "id": "city-lisbon",
+      "name": "Lisbon",
+      "country": "Portugal",
+      "countryCode": "PT",
+      "code": "LIS",
+      "lat": 38.7223,
+      "lng": -9.1393,
+      "dateFrom": "2027-07-02",
+      "dateTo": "2027-07-05",
+      "colour": "#1ABC9C"
+    },
+    {
+      "id": "city-paris",
+      "name": "Paris",
+      "country": "France",
+      "countryCode": "FR",
+      "code": "PAR",
+      "lat": 48.8566,
+      "lng": 2.3522,
+      "dateFrom": "2027-07-05",
+      "dateTo": "2027-07-08",
+      "colour": "#E91E63"
+    },
+    {
+      "id": "city-cruise-ship--cabin-",
+      "name": "Cruise Ship (Cabin)",
+      "code": "",
+      "countryCode": "",
+      "country": "",
+      "lat": null,
+      "lng": null,
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#FF4081"
+    },
+    {
+      "id": "city-athens-greece",
+      "name": "Athens Greece",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--kuadas--ephesus",
+      "name": "Port day  Kuadas  Ephesus",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--rhodes",
+      "name": "Port day  Rhodes",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--crete",
+      "name": "Port day  Crete",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--santorini",
+      "name": "Port day  Santorini",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--mykonos",
+      "name": "Port day  Mykonos",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-port-day--milos",
+      "name": "Port day  Milos",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-disembark-at-piraeus-fly-to-rome",
+      "name": "Disembark at Piraeus fly to Rome",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-rome-italy",
+      "name": "Rome Italy",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-florence-italy",
+      "name": "Florence Italy",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-venice-italy",
+      "name": "Venice Italy",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-barcelona-spain",
+      "name": "Barcelona Spain",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-madrid-spain",
+      "name": "Madrid Spain",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-lisbon-portugal",
+      "name": "Lisbon Portugal",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-paris-france",
+      "name": "Paris France",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    },
+    {
+      "id": "city-return-home",
+      "name": "Return Home",
+      "country": "",
+      "code": "",
+      "countryCode": "",
+      "dateFrom": "",
+      "dateTo": "",
+      "colour": "#95a5a6",
+      "isTransit": true
+    }
+  ],
+  "userCities": [],
+  "userCountries": []
+}

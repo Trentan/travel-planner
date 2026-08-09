@@ -1,0 +1,15 @@
+{
+  "appId": "com.trenscends.travelplanner",
+  "appName": "Travel Planner",
+  "webDir": ".capacitor-web",
+  "androidScheme": "https",
+  "android": {
+    "contentInset": "automatic"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "backgroundColor": "#F7F5F0"
+    }
+  }
+}

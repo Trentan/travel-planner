@@ -1,0 +1,26 @@
+# Dependencies
+/node_modules/
+
+# CSS Builds
+/dist/
+/.capacitor-web/
+
+# Tests and coverage
+/test-results/
+/playwright-report/
+
+# IDE & Editors
+/.idea/*
+!/.idea/runConfigurations/
+/.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Telemetry / Local agents config
+/.telecodex/
