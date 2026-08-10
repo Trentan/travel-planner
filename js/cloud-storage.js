@@ -83,7 +83,11 @@
       return 'mock_folder_id_123';
     }
 
-    if (gdriveFolderId) return gdriveFolderId;
+    if (gdriveFolderId && !gdriveFolderId.startsWith('mock_')) return gdriveFolderId;
+    if (gdriveFolderId && gdriveFolderId.startsWith('mock_')) {
+      gdriveFolderId = null;
+      localStorage.removeItem('travelApp_gdrive_folder_id');
+    }
 
     try {
       // 1. Search for existing "TrenscendsTravelPlanner" folder
@@ -101,7 +105,7 @@
         }
       }
 
-      // 2. Create "TrenscendsTravelPlanner" folder if not found
+      // 2. Create "TrenscendsTravelPlanner" folder if not found in root My Drive
       const createResp = await fetch('https://www.googleapis.com/drive/v3/files', {
         method: 'POST',
         headers: {
@@ -110,7 +114,8 @@
         },
         body: JSON.stringify({
           name: DRIVE_FOLDER_NAME,
-          mimeType: 'application/vnd.google-apps.folder'
+          mimeType: 'application/vnd.google-apps.folder',
+          parents: ['root']
         })
       });
 
@@ -277,6 +282,14 @@
       const folderId = await ensureDriveFolder();
       const fileMap = getGDriveFileMap();
       let existingFileId = fileMap[tripRecord.id];
+
+      // Purge fake mock file IDs on real API calls
+      if (existingFileId && (existingFileId.startsWith('gdrive_file_') || existingFileId.startsWith('mock_'))) {
+        existingFileId = null;
+        delete fileMap[tripRecord.id];
+        setGDriveFileMap(fileMap);
+      }
+
       const fileName = formatHumanFilename(tripRecord);
       const payloadStr = JSON.stringify(tripRecord, null, 2);
 
