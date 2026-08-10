@@ -418,6 +418,9 @@
       const files = data.files || [];
       const fileMap = getGDriveFileMap();
 
+      // Fetch local trips to perform non-destructive 3-way conflict reconciliation
+      const localTrips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
+
       for (const file of files) {
         if (!file.name || !file.name.endsWith('.json')) continue;
 
@@ -429,12 +432,37 @@
         if (!contentResp.ok) continue;
 
         try {
-          const tripRecord = await contentResp.json();
-          if (tripRecord && tripRecord.id && tripRecord.data) {
-            fileMap[tripRecord.id] = file.id;
+          const remoteTrip = await contentResp.json();
+          if (remoteTrip && remoteTrip.id && remoteTrip.data) {
+            fileMap[remoteTrip.id] = file.id;
 
-            if (typeof window.saveTripToIndexedDB === 'function') {
-              await window.saveTripToIndexedDB(tripRecord);
+            const localTrip = localTrips.find(t => t.id === remoteTrip.id);
+            const remoteTime = file.modifiedTime ? new Date(file.modifiedTime).getTime() : 0;
+            const localTime = localTrip && localTrip.updatedAt ? new Date(localTrip.updatedAt).getTime() : (localTrip && localTrip.lastSaved ? new Date(localTrip.lastSaved).getTime() : 0);
+
+            if (!localTrip) {
+              // 1. New remote trip found -> Safe import into local IndexedDB
+              if (typeof window.saveTripToIndexedDB === 'function') {
+                await window.saveTripToIndexedDB(remoteTrip);
+              }
+            } else if (remoteTime > localTime + 3000) {
+              // 2. Remote file is newer -> Update local IndexedDB
+              if (typeof window.saveTripToIndexedDB === 'function') {
+                await window.saveTripToIndexedDB(remoteTrip);
+              }
+            } else if (localTime > remoteTime + 3000) {
+              // 3. Local edits are newer -> Push local trip to Google Drive
+              await window.uploadTripToGoogleDrive(localTrip);
+            } else if (JSON.stringify(localTrip.data) !== JSON.stringify(remoteTrip.data)) {
+              // 4. Data conflict -> Preserves both versions by creating a Cloud Copy branch
+              const conflictTrip = JSON.parse(JSON.stringify(remoteTrip));
+              conflictTrip.id = `${remoteTrip.id}_cloud_copy_${Date.now()}`;
+              conflictTrip.title = `${remoteTrip.title || 'Trip'} (Cloud Copy)`;
+              conflictTrip.isConflictBranch = true;
+              if (typeof window.saveTripToIndexedDB === 'function') {
+                await window.saveTripToIndexedDB(conflictTrip);
+              }
+              console.warn(`[Sync Conflict Resolved] Dual edits detected. Preserved remote version as "${conflictTrip.title}".`);
             }
           }
         } catch (parseErr) {
@@ -453,6 +481,92 @@
       updateCloudSyncStatusPill('⚡ Local Only', 'disconnected');
     }
   };
+
+  // Delete Trip File directly from Google Drive
+  window.deleteTripFromGoogleDrive = async function(fileId, tripTitle) {
+    if (!isGoogleDriveConnected() || !fileId) return false;
+    const cleanTitle = tripTitle || 'this trip';
+    if (!confirm(`Are you sure you want to delete "${cleanTitle}" from your Google Drive folder?`)) return false;
+
+    if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
+      console.log(`[GoogleDrive Sync] Simulated deletion of file ${fileId} from Google Drive`);
+      const map = getGDriveFileMap();
+      Object.keys(map).forEach(key => { if (map[key] === fileId) delete map[key]; });
+      setGDriveFileMap(map);
+      await window.syncAllTripsFromGoogleDrive();
+      return true;
+    }
+
+    try {
+      updateCloudSyncStatusPill('⏳ Deleting from Google Drive...', 'syncing');
+      const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
+
+      if (resp.ok || resp.status === 404) {
+        const map = getGDriveFileMap();
+        Object.keys(map).forEach(key => { if (map[key] === fileId) delete map[key]; });
+        setGDriveFileMap(map);
+        await window.syncAllTripsFromGoogleDrive();
+        updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
+        return true;
+      }
+    } catch (err) {
+      console.error('Failed to delete file from Google Drive:', err);
+      updateCloudSyncStatusPill('⚡ Deletion Failed', 'error');
+    }
+    return false;
+  };
+
+  // Load Trip Document directly from Google Drive into Active State
+  window.loadTripFromGoogleDrive = async function(fileId) {
+    if (!isGoogleDriveConnected() || !fileId) return false;
+
+    try {
+      updateCloudSyncStatusPill('⏳ Loading Trip from Drive...', 'syncing');
+      let tripRecord = null;
+
+      if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
+        const trips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
+        tripRecord = trips[0] || null;
+      } else {
+        const downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+        const contentResp = await fetch(downloadUrl, {
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        if (contentResp.ok) {
+          tripRecord = await contentResp.json();
+        }
+      }
+
+      if (tripRecord && tripRecord.id && typeof window.saveTripToIndexedDB === 'function') {
+        await window.saveTripToIndexedDB(tripRecord);
+        if (typeof window.switchActiveTrip === 'function') {
+          await window.switchActiveTrip(tripRecord.id);
+        }
+        window.closeCloudSyncModal();
+        updateCloudSyncStatusPill(`☁️ Loaded "${tripRecord.title || 'Trip'}"`, 'connected');
+        return true;
+      }
+    } catch (err) {
+      console.error('Failed to load trip from Google Drive:', err);
+      updateCloudSyncStatusPill('⚡ Load Failed', 'error');
+    }
+    return false;
+  };
+
+  // 60-Second Periodic Background Sync Loop
+  let backgroundHeartbeatTimer = null;
+  function startBackgroundSyncLoop() {
+    if (backgroundHeartbeatTimer) clearInterval(backgroundHeartbeatTimer);
+    backgroundHeartbeatTimer = setInterval(async () => {
+      if (isGoogleDriveConnected() && !document.hidden) {
+        console.log('[GoogleDrive Heartbeat] Running 60s background cloud sync check...');
+        await window.syncAllTripsFromGoogleDrive();
+      }
+    }, 60000);
+  }
 
   // Debounced Auto-Sync for active trip edits
   window.autoSyncActiveTripToCloud = function() {
@@ -591,24 +705,41 @@
 
     if (statusText) {
       statusText.innerHTML = isConnected
-        ? `Your account is active. All trip itineraries automatically save as human-readable <code>.json</code> files inside your <strong>Google Drive / ${DRIVE_FOLDER_NAME}</strong> folder.`
+        ? `Your account is active. All trip itineraries automatically sync to <code>.json</code> files inside your <strong>Google Drive / ${DRIVE_FOLDER_NAME}</strong> folder.`
         : `Sign in with Google to automatically back up and sync your itineraries into a dedicated <strong>Google Drive / ${DRIVE_FOLDER_NAME}</strong> folder across all your devices.`;
     }
 
     if (fileListContainer && isConnected && Array.isArray(cloudFiles) && cloudFiles.length > 0) {
       fileListContainer.style.display = 'block';
       fileListContainer.innerHTML = `
-        <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center justify-between">
-          <span>Synced Files in Drive Folder (${cloudFiles.length})</span>
-          <button class="text-blue-600 dark:text-blue-400 hover:underline" onclick="window.syncAllTripsFromGoogleDrive()">🔄 Refresh</button>
+        <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center justify-between">
+          <span>📁 Google Drive Files (${cloudFiles.length})</span>
+          <button class="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1" onclick="window.syncAllTripsFromGoogleDrive()">🔄 Sync Now</button>
         </div>
-        <div class="space-y-1 max-h-36 overflow-y-auto pr-1">
-          ${cloudFiles.map(f => `
-            <div class="flex items-center justify-between text-xs p-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-              <span class="font-medium text-slate-700 dark:text-slate-200 truncate flex-1 pr-2">📄 ${escapeHtml(f.name)}</span>
-              <span class="text-[11px] text-slate-400 shrink-0">${f.modifiedTime ? new Date(f.modifiedTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Synced'}</span>
-            </div>
-          `).join('')}
+        <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
+          ${cloudFiles.map(f => {
+            const sizeKb = f.size ? `${(parseInt(f.size, 10) / 1024).toFixed(1)} KB` : 'JSON';
+            const modTime = f.modifiedTime ? new Date(f.modifiedTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Synced';
+            return `
+              <div class="p-3 bg-white dark:bg-slate-800/90 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between sm:items-center gap-2 transition-all hover:border-blue-300 dark:hover:border-blue-700">
+                <div class="flex-1 min-w-0">
+                  <div class="font-semibold text-slate-800 dark:text-slate-100 text-xs truncate flex items-center gap-1.5">
+                    <span>📄</span>
+                    <span class="truncate">${escapeHtml(f.name)}</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-3 pt-1">
+                    <span>💾 ${sizeKb}</span>
+                    <span>🕒 ${modTime}</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0 pt-1 sm:pt-0">
+                  <button class="action-btn action-btn-secondary text-[11px] py-1 px-2.5" onclick="window.loadTripFromGoogleDrive('${f.id}')" title="Load & open this trip document">📥 Load</button>
+                  <a href="https://drive.google.com/file/d/${f.id}/view" target="_blank" rel="noopener noreferrer" class="action-btn text-[11px] py-1 px-2 text-slate-600 dark:text-slate-300" title="Open file in Google Drive">↗</a>
+                  <button class="action-btn action-btn-danger text-[11px] py-1 px-2" onclick="window.deleteTripFromGoogleDrive('${f.id}', '${escapeHtml(f.name)}')" title="Delete from cloud">🗑️</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
         </div>
       `;
     } else if (fileListContainer) {
@@ -629,12 +760,13 @@
       .replace(/'/g, '&#039;');
   }
 
-  // Initialize Cloud Sync on load
+  // Initialize Cloud Sync & Background Heartbeat Loop on load
   window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       updateCloudSyncStatusPill();
       if (isGoogleDriveConnected()) {
         window.syncAllTripsFromGoogleDrive();
+        startBackgroundSyncLoop();
       }
     }, 800);
   });
