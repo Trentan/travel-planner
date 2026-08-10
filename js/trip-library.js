@@ -126,8 +126,13 @@
       return;
     }
 
+    const fileMap = (function() {
+      try { return JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}'); } catch(e) { return {}; }
+    })();
+
     trips.forEach(trip => {
       const isCurrent = trip.id === activeTripId;
+      const isDriveSynced = !!fileMap[trip.id];
       const title = trip.title || (trip.data && trip.data.meta && trip.data.meta.title) || 'Untitled Trip';
       const subtitle = trip.subtitle || (trip.data && trip.data.meta && trip.data.meta.subtitle) || '';
       const flags = trip.flags || '🌍';
@@ -140,9 +145,13 @@
       card.className = `trip-gallery-card ${isCurrent ? 'active-card' : ''}`;
       card.innerHTML = `
         <div class="trip-card-header">
-          <div class="trip-card-badges">
+          <div class="trip-card-badges flex flex-wrap gap-1.5 items-center mb-1">
             ${isCurrent ? '<span class="active-badge">● Active Trip</span>' : ''}
-            <span class="updated-badge">Updated ${updatedDate}</span>
+            ${isDriveSynced
+              ? '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">☁️ Drive Synced</span>'
+              : '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">⚡ Local Only</span>'
+            }
+            <span class="updated-badge text-[10px]">Updated ${updatedDate}</span>
           </div>
           <h3 class="trip-card-title">${flags} ${escapeHtml(title)}</h3>
           ${subtitle ? `<p class="trip-card-subtitle">${escapeHtml(subtitle)}</p>` : ''}
