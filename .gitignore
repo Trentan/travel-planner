@@ -10,8 +10,9 @@
 /playwright-report/
 
 # IDE & Editors
-/.idea/*
-!/.idea/runConfigurations/
+.idea/*
+!.idea/runConfigurations/
+!.idea/runConfigurations/*
 /.vscode/
 *.suo
 *.ntvs*
