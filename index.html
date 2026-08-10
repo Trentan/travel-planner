@@ -47,6 +47,7 @@
     </div>
     <span class="save-status" id="saveStatus"></span>
     <span class="timestamp-status" id="timestampStatus"></span>
+    <button id="headerCloudSyncStatusPill" class="cloud-status-pill disconnected" onclick="openCloudSyncModal()" title="View Google Drive Cloud Sync status">⚡ Local Only</button>
   </div>
   <div class="app-menu-right">
     <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
@@ -1179,9 +1180,15 @@
         <div id="gdriveProfileCard" class="bg-slate-100 dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-3" style="display: none;">
           <!-- Dynamically rendered by js/cloud-storage.js -->
         </div>
+        <div id="gdriveFolderLinkContainer" style="display: none;">
+          <!-- Dynamically rendered by js/cloud-storage.js -->
+        </div>
         <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" id="gdriveModalStatusText">
           Sign in with your Google account to automatically back up and sync all your itineraries across your phone, tablet, and laptop.
         </p>
+        <div id="gdriveFileListContainer" style="display: none;">
+          <!-- Dynamically rendered list of remote files -->
+        </div>
         <div class="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl text-xs text-slate-600 dark:text-slate-300 space-y-2 border border-slate-200/60 dark:border-slate-700/60">
           <p>📁 <strong>Dedicated Drive Folder</strong>: Saves your trips cleanly into a visible <strong><code>Google Drive / TrenscendsTravelPlanner</code></strong> folder as human-readable <code>.json</code> files.</p>
           <p>⚡ <strong>Offline First</strong>: Edits save to your device instantly and sync automatically whenever you're connected.</p>

@@ -24,10 +24,14 @@ async function runCloudSyncSuite() {
 
     console.log('1. Verifying initial offline/disconnected cloud status pill...');
     const initialStatus = await page.evaluate(() => {
-      const pill = document.getElementById('cloudSyncStatusPill');
-      return pill ? pill.innerText : '';
+      const headerPill = document.getElementById('headerCloudSyncStatusPill');
+      const modalPill = document.getElementById('cloudSyncStatusPill');
+      return {
+        header: headerPill ? headerPill.innerText : '',
+        modal: modalPill ? modalPill.innerText : ''
+      };
     });
-    console.log(`Initial Status Pill Text: "${initialStatus}"`);
+    console.log(`Initial Status Pill Text - Header: "${initialStatus.header}", Modal: "${initialStatus.modal}"`);
 
     console.log('2. Enabling Mock Google Drive API Mode...');
     await page.evaluate(() => {
@@ -70,12 +74,16 @@ async function runCloudSyncSuite() {
     });
 
     const statusPillAfterSync = await page.evaluate(() => {
-      const pill = document.getElementById('cloudSyncStatusPill');
-      return pill ? pill.innerText : '';
+      const headerPill = document.getElementById('headerCloudSyncStatusPill');
+      const modalPill = document.getElementById('cloudSyncStatusPill');
+      return {
+        header: headerPill ? headerPill.innerText : '',
+        modal: modalPill ? modalPill.innerText : ''
+      };
     });
-    console.log(`Cloud Status Pill after sync: "${statusPillAfterSync}"`);
-    if (!statusPillAfterSync.includes('Synced')) {
-      throw new Error(`Expected status pill to indicate 'Synced', got "${statusPillAfterSync}"`);
+    console.log(`Cloud Status Pill after sync - Header: "${statusPillAfterSync.header}", Modal: "${statusPillAfterSync.modal}"`);
+    if (!statusPillAfterSync.header.includes('Synced') && !statusPillAfterSync.modal.includes('Synced')) {
+      throw new Error(`Expected status pill to indicate 'Synced', got header "${statusPillAfterSync.header}", modal "${statusPillAfterSync.modal}"`);
     }
 
     console.log('6. Testing Cloud Sync Modal opening and closing...');
