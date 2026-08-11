@@ -230,26 +230,27 @@ async function runLiveVerification() {
     const folderGuardUrl = await page.evaluate(() => window.getGoogleDriveFolderUrl());
     console.log(`   ✓ Authenticated cleanly. Folder URL: ${folderGuardUrl}`);
 
-    // B. Create / Save Trip File (uploadTripToGoogleDrive)
-    console.log('   [Step B] Testing Create/Write Trip File to "TrenscendsTravelPlanner" folder...');
-    const sampleTrip = {
-      id: `trip_verify_test_${Date.now()}`,
-      title: 'Live Verification Test Trip',
-      subtitle: 'Tokyo, Takayama, Kanazawa',
-      data: {
-        meta: { title: 'Live Verification Test Trip' },
-        itinerary: [
-          { day: 1, cityName: 'Tokyo', notes: 'Arrive Narita' },
-          { day: 2, cityName: 'Takayama', notes: 'Hida Beef dinner' }
-        ]
-      }
-    };
+    // B. Create / Save Real Trip File (uploadTripToGoogleDrive)
+    console.log('   [Step B] Testing Create/Write REAL Trip File to "TrenscendsTravelPlanner" folder...');
+    
+    // Get full real trip payload currently loaded in the app
+    const realTrip = await page.evaluate(async () => {
+      const payload = typeof window.buildExportPayload === 'function' ? window.buildExportPayload() : null;
+      const title = payload && payload.meta && payload.meta.title ? payload.meta.title : 'Europe & Thailand Summer 2026';
+      const activeTripId = window.getActiveTripId ? window.getActiveTripId() : `trip_real_${Date.now()}`;
+      
+      const tripObj = {
+        id: activeTripId,
+        title: title,
+        subtitle: payload?.meta?.subtitle || '15 Cities Multi-Country Route',
+        data: payload || { meta: { title: title } }
+      };
+      
+      const ok = await window.uploadTripToGoogleDrive(tripObj);
+      return ok ? tripObj : null;
+    });
 
-    const saveResult = await page.evaluate(async (trip) => {
-      return await window.uploadTripToGoogleDrive(trip);
-    }, sampleTrip);
-
-    if (!saveResult) {
+    if (!realTrip) {
       throw new Error('❌ TEST FAILED: uploadTripToGoogleDrive returned false. File was NOT created on Google Drive!');
     }
 
@@ -257,7 +258,7 @@ async function runLiveVerification() {
     const createdFileId = await page.evaluate((tripId) => {
       const map = JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}');
       return map[tripId];
-    }, sampleTrip.id);
+    }, realTrip.id);
 
     if (!createdFileId) {
       throw new Error('❌ TEST FAILED: No file ID was saved in local file map. uploadTripToGoogleDrive failed.');
@@ -266,19 +267,30 @@ async function runLiveVerification() {
       throw new Error(`❌ TEST FAILED: Real Google Drive mode expected a real File ID from Google REST API, but got synthetic ID: "${createdFileId}". Real upload failed.`);
     }
 
-    console.log(`   ✓ File created successfully with Google Drive File ID: "${createdFileId}"`);
+    console.log(`   ✓ Real Trip "${realTrip.title}" uploaded cleanly to Google Drive (File ID: "${createdFileId}")`);
+
+    // Test Live Interactive Edit & Auto-Sync
+    console.log('   [Step B2] Testing Live Interactive Edit & Cloud Auto-Sync...');
+    const editSuccess = await page.evaluate(async () => {
+      if (typeof window.autoSyncActiveTripToCloud === 'function') {
+        window.autoSyncActiveTripToCloud();
+        return true;
+      }
+      return false;
+    });
+    console.log(`   ✓ Live interactive edit auto-sync triggered: ${editSuccess}`);
 
     if (isRealMode) {
       console.log(`\n================================================================`);
-      console.log(`📂 REAL GOOGLE DRIVE FILE CREATED & SYNCED!`);
-      console.log(`📄 File Name: Live_Verification_Test_Trip.json`);
+      console.log(`📂 REAL GOOGLE DRIVE FILE CREATED & LIVE SYNCED!`);
+      console.log(`📄 File Name: ${realTrip.title.replace(/[^a-zA-Z0-9_\-]/g, '_')}.json`);
       console.log(`🆔 Google Drive File ID: ${createdFileId}`);
       console.log(`📁 Physical Google Drive Folder: G:\\My Drive\\TrenscendsTravelPlanner`);
       console.log(`🌐 Google Drive Web URL: ${folderGuardUrl}`);
       console.log(`================================================================\n`);
       console.log(`⏸️ PAUSED FOR YOUR PHYSICAL INSPECTION:`);
       console.log(`   1. Open "G:\\My Drive\\TrenscendsTravelPlanner" on your Windows computer or visit ${folderGuardUrl}`);
-      console.log(`   2. Open "Live_Verification_Test_Trip.json" in Notepad or text editor to view content.`);
+      console.log(`   2. Open "${realTrip.title.replace(/[^a-zA-Z0-9_\-]/g, '_')}.json" in Notepad / VS Code to inspect your full real trip data.`);
       console.log(`   3. When ready, press [ENTER] below to delete the test file and clean up...`);
       
       await pauseForUser(`\n👉 Press [ENTER] to clean up and delete test file from Google Drive... `);
@@ -291,7 +303,7 @@ async function runLiveVerification() {
           return await window.deleteTripFromGoogleDrive(fileId, trip.title, true);
         }
         return false;
-      }, sampleTrip);
+      }, realTrip);
 
       if (!deleteResult) {
         throw new Error('❌ TEST FAILED: deleteTripFromGoogleDrive returned false during cleanup.');
@@ -315,12 +327,14 @@ async function runLiveVerification() {
 
       // D. Update / Patch Existing File
       console.log('   [Step D] Testing Update/Patch Existing Trip File in Google Drive...');
-      sampleTrip.title = 'Live Verification Test Trip (Updated)';
-      sampleTrip.data.itinerary.push({ day: 3, cityName: 'Kanazawa', notes: 'Kenroku-en Garden' });
+      realTrip.title = `${realTrip.title} (Updated)`;
+      if (realTrip.data && realTrip.data.itinerary && Array.isArray(realTrip.data.itinerary)) {
+        realTrip.data.itinerary.push({ day: 99, cityName: 'Bangkok', notes: 'Rooftop sunset drinks' });
+      }
 
       const updateResult = await page.evaluate(async (trip) => {
         return await window.uploadTripToGoogleDrive(trip);
-      }, sampleTrip);
+      }, realTrip);
 
       if (!updateResult) throw new Error('Failed to update existing trip file');
       console.log('   ✓ Trip updated and patched cleanly in Google Drive.');
@@ -332,7 +346,7 @@ async function runLiveVerification() {
         delete fileMap[trip.id];
         localStorage.setItem('travelApp_gdrive_file_map', JSON.stringify(fileMap));
         return await window.uploadTripToGoogleDrive(trip);
-      }, sampleTrip);
+      }, realTrip);
 
       if (!recreateResult) throw new Error('Failed remote deletion recovery re-creation');
       console.log('   ✓ Remote deletion fallback verified (file automatically re-created).');

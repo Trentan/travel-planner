@@ -72,6 +72,12 @@
 
   // Check if Google Drive is connected & authorized
   function isGoogleDriveConnected() {
+    // Silent background token refresh if token is within 5 minutes of expiry
+    if (accessToken && !accessToken.startsWith('token_') && (tokenExpiry - Date.now() < 300000)) {
+      if (typeof window.authenticateGoogleDrive === 'function') {
+        window.authenticateGoogleDrive(false).catch(() => {});
+      }
+    }
     return !!accessToken && (Date.now() < tokenExpiry || accessToken.startsWith('token_'));
   }
   window.isGoogleDriveConnected = isGoogleDriveConnected;
@@ -619,12 +625,26 @@
 
     if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
     syncDebounceTimer = setTimeout(async () => {
-      if (typeof window.getAllTripsFromIndexedDB !== 'function') return;
-      const activeTripId = window.getActiveTripId ? window.getActiveTripId() : 'trip_default';
-      const trips = await window.getAllTripsFromIndexedDB();
-      const activeTrip = trips.find(t => t.id === activeTripId);
-      if (activeTrip) {
-        await window.uploadTripToGoogleDrive(activeTrip);
+      let fullTrip = null;
+      if (typeof window.buildExportPayload === 'function') {
+        const payload = window.buildExportPayload();
+        const activeTripId = window.getActiveTripId ? window.getActiveTripId() : 'trip_default';
+        const title = (payload.meta && payload.meta.title) ? payload.meta.title : 'My Travel Itinerary';
+        fullTrip = {
+          id: activeTripId,
+          title: title,
+          subtitle: payload.meta?.subtitle || '',
+          data: payload
+        };
+      } else if (typeof window.getAllTripsFromIndexedDB === 'function') {
+        const activeTripId = window.getActiveTripId ? window.getActiveTripId() : 'trip_default';
+        const trips = await window.getAllTripsFromIndexedDB();
+        fullTrip = trips.find(t => t.id === activeTripId);
+      }
+
+      if (fullTrip) {
+        console.log(`[Cloud AutoSync] Live auto-syncing full active trip document "${fullTrip.title}" to Google Drive...`);
+        await window.uploadTripToGoogleDrive(fullTrip);
       }
     }, 1500);
   };
