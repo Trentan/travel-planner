@@ -13,21 +13,24 @@
   const DRIVE_FOLDER_NAME = 'TrenscendsTravelPlanner';
   const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 
-  let accessToken = localStorage.getItem('travelApp_gdrive_token') || null;
-  let tokenExpiry = parseInt(localStorage.getItem('travelApp_gdrive_token_expiry') || '0', 10);
-  let gdriveFolderId = localStorage.getItem('travelApp_gdrive_folder_id') || null;
+  let accessToken = null;
+  let tokenExpiry = 0;
+  let gdriveFolderId = null;
   let userProfile = null;
   let syncDebounceTimer = null;
 
-  // Clean up legacy fallback tokens on real production origin
-  if (accessToken && accessToken.startsWith('token_') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.__mockGoogleDriveAPI) {
-    accessToken = null;
-    tokenExpiry = 0;
-    localStorage.removeItem('travelApp_gdrive_token');
-    localStorage.removeItem('travelApp_gdrive_token_expiry');
-  }
-
   try {
+    accessToken = localStorage.getItem('travelApp_gdrive_token') || null;
+    tokenExpiry = parseInt(localStorage.getItem('travelApp_gdrive_token_expiry') || '0', 10);
+    gdriveFolderId = localStorage.getItem('travelApp_gdrive_folder_id') || null;
+
+    if (accessToken && accessToken.startsWith('token_') && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.__mockGoogleDriveAPI) {
+      accessToken = null;
+      tokenExpiry = 0;
+      localStorage.removeItem('travelApp_gdrive_token');
+      localStorage.removeItem('travelApp_gdrive_token_expiry');
+    }
+
     userProfile = JSON.parse(localStorage.getItem('travelApp_user_profile') || 'null');
   } catch (e) {
     userProfile = null;
@@ -127,7 +130,7 @@
 
   // Ensure "TrenscendsTravelPlanner" folder exists in user's Google Drive root
   async function ensureDriveFolder() {
-    if (!isGoogleDriveConnected() || accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
+    if (!isGoogleDriveConnected() || (accessToken && accessToken.startsWith('token_')) || window.__mockGoogleDriveAPI) {
       return 'mock_folder_id_123';
     }
 
@@ -180,7 +183,7 @@
   }
 
   // Authenticate with Google Drive via Google Identity Services Token Client
-  window.authenticateGoogleDrive = function(interactive = true) {
+  function authenticateGoogleDrive(interactive = true) {
     return new Promise((resolve, reject) => {
       const clientId = getGoogleClientId();
       const isFileProtocol = window.location.protocol === 'file:';
@@ -268,7 +271,8 @@
         resolve(false);
       }
     });
-  };
+  }
+  window.authenticateGoogleDrive = authenticateGoogleDrive;
 
   function showOriginMismatchNotice(errorType) {
     const notice = document.getElementById('gdriveOriginMismatchNotice');
@@ -350,11 +354,11 @@
   }
 
   // Upload or Update a Trip JSON file inside Google Drive / TrenscendsTravelPlanner
-  window.uploadTripToGoogleDrive = async function(tripRecord) {
+  async function uploadTripToGoogleDrive(tripRecord) {
     if (!isGoogleDriveConnected() || !tripRecord || !tripRecord.id) return false;
     await ensureValidAccessToken();
 
-    if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
+    if ((accessToken && accessToken.startsWith('token_')) || window.__mockGoogleDriveAPI) {
       const fileName = formatHumanFilename(tripRecord);
       console.log(`[GoogleDrive Sync] Simulated sync of "${fileName}" to Google Drive / ${DRIVE_FOLDER_NAME}`);
       const map = getGDriveFileMap();
@@ -465,7 +469,8 @@
       updateCloudSyncStatusPill('⚡ Local Only (Sync Failed)', 'error');
       return false;
     }
-  };
+  }
+  window.uploadTripToGoogleDrive = uploadTripToGoogleDrive;
 
   // Upload all local trips to Google Drive
   window.uploadAllLocalTripsToDrive = async function() {
@@ -485,7 +490,7 @@
     if (!isGoogleDriveConnected()) return;
     await ensureValidAccessToken();
 
-    if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
+    if ((accessToken && accessToken.startsWith('token_')) || window.__mockGoogleDriveAPI) {
       console.log(`[GoogleDrive Sync] Simulated fetch of all trips from Google Drive / ${DRIVE_FOLDER_NAME}`);
       updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
       return;
@@ -577,7 +582,7 @@
     const cleanTitle = tripTitle || 'this trip';
     if (!skipConfirm && !confirm(`Are you sure you want to delete "${cleanTitle}" from your Google Drive folder?`)) return false;
 
-    if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
+    if ((accessToken && accessToken.startsWith('token_')) || window.__mockGoogleDriveAPI) {
       console.log(`[GoogleDrive Sync] Simulated deletion of file ${fileId} from Google Drive`);
       const map = getGDriveFileMap();
       Object.keys(map).forEach(key => { if (map[key] === fileId) delete map[key]; });
@@ -616,7 +621,7 @@
       updateCloudSyncStatusPill('⏳ Loading Trip from Drive...', 'syncing');
       let tripRecord = null;
 
-      if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
+      if ((accessToken && accessToken.startsWith('token_')) || window.__mockGoogleDriveAPI) {
         const trips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
         tripRecord = trips[0] || null;
       } else {
@@ -816,24 +821,16 @@
   }
   window.updateCloudSyncStatusPill = updateCloudSyncStatusPill;
 
-  // Open Cloud Sync Setup Modal
+  // Cloud Sync Modal Helper
   window.openCloudSyncModal = function() {
     const modal = document.getElementById('cloudSyncModal');
     if (!modal) return;
-
     modal.hidden = false;
     modal.style.display = 'flex';
     modal.classList.add('active');
-    updateCloudSyncModalState();
-  };
-
-  window.closeCloudSyncModal = function() {
-    const modal = document.getElementById('cloudSyncModal');
-    if (modal) {
-      modal.hidden = true;
-      modal.style.display = 'none';
-      modal.classList.remove('active');
-    }
+    try {
+      if (typeof updateCloudSyncModalState === 'function') updateCloudSyncModalState();
+    } catch(e) {}
   };
 
   function updateCloudSyncModalState(cloudFiles = null) {
