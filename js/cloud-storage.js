@@ -39,6 +39,24 @@
   }
   window.getUserProfile = getUserProfile;
 
+  window.openCloudSyncModal = function() {
+    const modal = document.getElementById('cloudSyncModal');
+    if (!modal) return;
+    modal.hidden = false;
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+    if (typeof updateCloudSyncModalState === 'function') updateCloudSyncModalState();
+  };
+
+  window.closeCloudSyncModal = function() {
+    const modal = document.getElementById('cloudSyncModal');
+    if (modal) {
+      modal.hidden = true;
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+  };
+
   function setUserProfile(profile) {
     userProfile = profile;
     if (profile) {
