@@ -785,7 +785,26 @@
 
     if (connectBtn) connectBtn.style.display = isConnected ? 'none' : 'inline-flex';
     if (disconnectBtn) disconnectBtn.style.display = isConnected ? 'inline-flex' : 'none';
+
+    const activeIdLabel = document.getElementById('gdriveActiveClientIdLabel');
+    if (activeIdLabel) {
+      activeIdLabel.innerText = getGoogleClientId();
+    }
   }
+
+  window.saveCustomGoogleClientId = function() {
+    const input = document.getElementById('gdriveCustomClientIdInput');
+    if (!input) return;
+    const newId = input.value.trim();
+    if (newId) {
+      setGoogleClientId(newId);
+      alert(`Custom Google Client ID saved: ${newId}`);
+    } else {
+      setGoogleClientId(null);
+      alert('Reset to default Google OAuth Client ID.');
+    }
+    updateCloudSyncModalState();
+  };
 
   function escapeHtml(str) {
     if (!str) return '';

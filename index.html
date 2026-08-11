@@ -1201,6 +1201,16 @@
           <p>📁 <strong>Dedicated Drive Folder</strong>: Saves your trips cleanly into a visible <strong><code>Google Drive / TrenscendsTravelPlanner</code></strong> folder as human-readable <code>.json</code> files.</p>
           <p>⚡ <strong>Offline First</strong>: Edits save to your device instantly and sync automatically whenever you're connected.</p>
         </div>
+        <details class="text-xs text-slate-500 dark:text-slate-400">
+          <summary class="cursor-pointer font-semibold hover:text-slate-700 dark:hover:text-slate-200 select-none py-1">⚙️ Custom Google OAuth Client ID (Advanced)</summary>
+          <div class="pt-2 space-y-1.5">
+            <div class="flex gap-2">
+              <input type="text" id="gdriveCustomClientIdInput" placeholder="Enter your Client ID (.apps.googleusercontent.com)" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-xs font-mono">
+              <button class="action-btn text-xs px-3" onclick="saveCustomGoogleClientId()">Save ID</button>
+            </div>
+            <p class="text-[11px] text-slate-400">Active ID: <code id="gdriveActiveClientIdLabel" class="font-mono text-[10px] bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded"></code></p>
+          </div>
+        </details>
       </div>
       <div class="modal-footer flex flex-wrap justify-between items-center gap-2">
         <button class="action-btn text-xs" onclick="selectLocalSyncDirectory();">📁 Select Local Sync Folder</button>
