@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="💻 Run Real Google Drive Test (Local Server)" type="NodeJSConfigurationType" factoryName="Node.js" application-parameters="--real --local" path-to-js-file="tests/verify-live.js" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>

@@ -11,6 +11,8 @@
     "test:browser:headed": "node tests/browser-suite.js --headed --slowmo=400",
     "test:live": "node tests/verify-live.js",
     "test:gdrive": "node tests/verify-live.js",
+    "test:gdrive:real": "node tests/verify-live.js --real",
+    "test:gdrive:real:local": "node tests/verify-live.js --real --local",
     "build:css": "npx @tailwindcss/cli -i ./src/tailwind.css -o ./dist/tailwind.css --minify",
     "watch:css": "npx @tailwindcss/cli -i ./src/tailwind.css -o ./dist/tailwind.css --watch",
     "generate:pwa-icons": "node scripts/generate-pwa-icons.js",
