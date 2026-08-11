@@ -86,7 +86,10 @@
       if (cloudFiles && cloudFiles.length > 0) {
         const cloudHeader = document.createElement('div');
         cloudHeader.className = 'px-3 py-1.5 text-[11px] font-bold text-blue-600 dark:text-blue-400 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between mt-1';
-        cloudHeader.innerHTML = `<span>☁️ Drive Cloud Files (${cloudFiles.length})</span>`;
+        cloudHeader.innerHTML = `
+          <span>☁️ Drive Cloud Files (${cloudFiles.length})</span>
+          <button class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold hover:underline" onclick="event.stopPropagation(); window.refreshGoogleDriveFolder();" title="Rescan Google Drive folder">🔄 Refresh</button>
+        `;
         recentListEl.appendChild(cloudHeader);
 
         cloudFiles.slice(0, 4).forEach(file => {
@@ -208,12 +211,19 @@
             <span>☁️ Drive Folder: <strong>Google Drive / TrenscendsTravelPlanner</strong></span>
             <span class="text-[11px] opacity-80">(${cloudFiles.length} files)</span>
           </span>
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
             <button class="action-btn action-btn-primary text-xs py-1 px-3 flex items-center gap-1" onclick="window.createNewTripInGoogleDrive()">
               <span>➕</span>
               <span>New Cloud Trip</span>
             </button>
-            <button class="action-btn action-btn-secondary text-xs py-1 px-2.5" onclick="window.syncAllTripsFromGoogleDrive()" title="Sync files with Google Drive">🔄 Sync</button>
+            <button class="action-btn action-btn-secondary text-xs py-1 px-2.5 flex items-center gap-1" onclick="window.uploadLocalJsonFileToDrive()" title="Upload a local JSON trip file directly into Google Drive">
+              <span>📥</span>
+              <span>Upload JSON</span>
+            </button>
+            <button class="action-btn action-btn-secondary text-xs py-1 px-2.5 flex items-center gap-1" onclick="window.refreshGoogleDriveFolder()" title="Rescan Google Drive folder for newly pasted JSON files">
+              <span>🔄</span>
+              <span>Refresh Drive</span>
+            </button>
           </div>
         </div>
       `;

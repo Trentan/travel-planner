@@ -726,6 +726,84 @@
     }
   };
 
+  // Explicitly Refresh Google Drive Folder (Pulls remote files & syncs gallery/switcher)
+  window.refreshGoogleDriveFolder = async function(showToastNotice = true) {
+    if (!isGoogleDriveConnected()) {
+      alert('Please sign in to Google Drive first.');
+      return;
+    }
+    try {
+      updateCloudSyncStatusPill('⏳ Syncing Drive...', 'syncing');
+      await window.syncAllTripsFromGoogleDrive();
+      if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+      if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
+      updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
+      if (showToastNotice && typeof window.showToast === 'function') {
+        window.showToast(`🔄 Refreshed Google Drive / ${DRIVE_FOLDER_NAME}`);
+      }
+    } catch (err) {
+      console.error('Failed to refresh Google Drive folder:', err);
+      updateCloudSyncStatusPill('⚡ Sync Failed', 'error');
+    }
+  };
+
+  // Upload a local JSON file directly from disk into Google Drive / TrenscendsTravelPlanner
+  window.uploadLocalJsonFileToDrive = function() {
+    if (!isGoogleDriveConnected()) {
+      alert('Please sign in to Google Drive first to upload files to your cloud folder.');
+      return;
+    }
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json,application/json';
+
+    fileInput.onchange = async (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      try {
+        updateCloudSyncStatusPill('⏳ Reading & Uploading JSON to Drive...', 'syncing');
+        const text = await file.text();
+        const rawJson = JSON.parse(text);
+
+        const tripData = rawJson.data || rawJson;
+        const meta = tripData.meta || rawJson.meta || {};
+        const cleanTitle = meta.title || rawJson.title || file.name.replace(/\.json$/i, '');
+        const newTripId = rawJson.id || meta.id || ('trip_cloud_' + Date.now());
+
+        const tripRecord = {
+          id: newTripId,
+          title: cleanTitle,
+          subtitle: meta.subtitle || 'Uploaded Cloud JSON',
+          data: tripData
+        };
+
+        const ok = await window.uploadTripToGoogleDrive(tripRecord);
+        if (ok) {
+          if (typeof window.loadImportedPayload === 'function') {
+            await window.loadImportedPayload(tripData, file.name);
+          }
+          if (typeof window.setActiveTripId === 'function') {
+            window.setActiveTripId(newTripId);
+          }
+          await window.syncAllTripsFromGoogleDrive();
+          if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+          if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
+          alert(`✅ Uploaded "${file.name}" to Google Drive / ${DRIVE_FOLDER_NAME} and loaded it into app!`);
+        } else {
+          alert('Failed to upload file to Google Drive. Please check your connection.');
+        }
+      } catch (err) {
+        console.error('Failed to parse or upload JSON file to Google Drive:', err);
+        alert('Invalid JSON document. Please select a valid travel planner JSON file.');
+        updateCloudSyncStatusPill(`☁️ Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
+      }
+    };
+
+    fileInput.click();
+  };
+
   // 60-Second Periodic Background Sync Loop
   let backgroundHeartbeatTimer = null;
   function startBackgroundSyncLoop() {
@@ -890,7 +968,10 @@
       fileListContainer.innerHTML = `
         <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center justify-between">
           <span>📁 Google Drive Files (${cloudFiles.length})</span>
-          <button class="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1" onclick="window.syncAllTripsFromGoogleDrive()">🔄 Sync Now</button>
+          <div class="flex items-center gap-2">
+            <button class="action-btn action-btn-secondary text-[11px] py-1 px-2.5 flex items-center gap-1" onclick="window.uploadLocalJsonFileToDrive()" title="Upload a local JSON trip file directly into Google Drive">📥 Upload JSON</button>
+            <button class="action-btn action-btn-secondary text-[11px] py-1 px-2.5 flex items-center gap-1" onclick="window.refreshGoogleDriveFolder()" title="Rescan Google Drive folder for newly pasted JSON files">🔄 Refresh Drive</button>
+          </div>
         </div>
         <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
           ${cloudFiles.map(f => {
