@@ -57,38 +57,42 @@ async function runLiveVerification() {
   console.log(`🔧 Mode: ${isRealMode ? '🌐 REAL Google Drive API (Strict Interactive User Verification)' : '⚡ Mock API (Automated CI Headless)'}`);
   console.log(`================================================================\n`);
 
-  const launchOptions = {
-    headless: !isRealMode
-  };
-
-  if (isRealMode) {
-    launchOptions.args = [
-      '--disable-blink-features=AutomationControlled',
-      '--no-sandbox',
-      '--disable-setuid-sandbox'
-    ];
-  }
-
-  const browser = await chromium.launch(launchOptions);
+  const authProfileDir = path.resolve(__dirname, '.gdrive_auth_profile');
+  let browser = null;
+  let context = null;
+  let desktopPage = null;
   const errors = [];
 
   try {
-    // -------------------------------------------------------------------------
-    // 1. DESKTOP VIEWPORT TEST (1440 x 900)
-    // -------------------------------------------------------------------------
-    console.log('📌 1. Testing DESKTOP Viewport (1440 x 900)...');
-    const desktopPage = await browser.newPage({
-      viewport: { width: 1440, height: 900 },
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-    });
-
     if (isRealMode) {
+      if (!fs.existsSync(authProfileDir)) {
+        fs.mkdirSync(authProfileDir, { recursive: true });
+      }
+      context = await chromium.launchPersistentContext(authProfileDir, {
+        headless: false,
+        viewport: { width: 1440, height: 900 },
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        args: [
+          '--disable-blink-features=AutomationControlled',
+          '--no-sandbox',
+          '--disable-setuid-sandbox'
+        ]
+      });
+      desktopPage = context.pages()[0] || await context.newPage();
       await desktopPage.addInitScript(() => {
         Object.defineProperty(navigator, 'webdriver', {
           get: () => undefined
         });
       });
+    } else {
+      browser = await chromium.launch({ headless: true });
+      desktopPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
     }
+
+    // -------------------------------------------------------------------------
+    // 1. DESKTOP VIEWPORT TEST (1440 x 900)
+    // -------------------------------------------------------------------------
+    console.log('📌 1. Testing DESKTOP Viewport (1440 x 900)...');
     desktopPage.on('console', msg => {
       if (msg.type() === 'error') {
         console.error('   [Browser Error]', msg.text());
@@ -141,7 +145,8 @@ async function runLiveVerification() {
     // 2. MOBILE VIEWPORT TEST (390 x 844)
     // -------------------------------------------------------------------------
     console.log('\n📌 2. Testing MOBILE Viewport (390 x 844)...');
-    const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    const mobilePage = isRealMode ? await context.newPage() : await browser.newPage();
+    await mobilePage.setViewportSize({ width: 390, height: 844 });
     await mobilePage.goto(targetUrl, { waitUntil: 'domcontentloaded' });
     await mobilePage.waitForFunction(() => typeof window.isGoogleDriveConnected === 'function' && typeof window.toggleMobileMenu === 'function', { timeout: 15000 });
 
@@ -331,6 +336,7 @@ async function runLiveVerification() {
     console.error('\n❌ VERIFICATION TEST FAILED:', err.message || err);
     process.exit(1);
   } finally {
+    if (context) await context.close();
     if (browser) await browser.close();
     if (serverInstance && typeof serverInstance.close === 'function') {
       serverInstance.close();

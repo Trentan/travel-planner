@@ -8,6 +8,7 @@
 # Tests and coverage
 /test-results/
 /playwright-report/
+/tests/.gdrive_auth_profile/
 
 # IDE & Editors
 .idea/*
