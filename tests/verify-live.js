@@ -95,6 +95,9 @@ async function runLiveVerification() {
         errors.push(msg.text());
       }
     });
+    desktopPage.on('dialog', async dialog => {
+      await dialog.accept();
+    });
 
     await desktopPage.goto(targetUrl + (targetUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now(), { waitUntil: 'domcontentloaded' });
     await desktopPage.waitForFunction(() => typeof window.isGoogleDriveConnected === 'function', { timeout: 15000 });
@@ -256,7 +259,7 @@ async function runLiveVerification() {
         const fileMap = JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}');
         const fileId = fileMap[trip.id];
         if (fileId && typeof window.deleteTripFromGoogleDrive === 'function') {
-          return await window.deleteTripFromGoogleDrive(fileId, trip.title);
+          return await window.deleteTripFromGoogleDrive(fileId, trip.title, true);
         }
         return false;
       }, sampleTrip);

@@ -528,10 +528,10 @@
   };
 
   // Delete Trip File directly from Google Drive
-  window.deleteTripFromGoogleDrive = async function(fileId, tripTitle) {
+  window.deleteTripFromGoogleDrive = async function(fileId, tripTitle, skipConfirm = false) {
     if (!isGoogleDriveConnected() || !fileId) return false;
     const cleanTitle = tripTitle || 'this trip';
-    if (!confirm(`Are you sure you want to delete "${cleanTitle}" from your Google Drive folder?`)) return false;
+    if (!skipConfirm && !confirm(`Are you sure you want to delete "${cleanTitle}" from your Google Drive folder?`)) return false;
 
     if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
       console.log(`[GoogleDrive Sync] Simulated deletion of file ${fileId} from Google Drive`);
