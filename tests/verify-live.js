@@ -35,9 +35,8 @@ async function runLiveVerification() {
   const isRealMode = args.includes('--real');
 
   if (args.includes('--local')) {
-    const port = 3199;
-    serverInstance = await startStaticServer(path.resolve(__dirname, '..'), port);
-    targetUrl = `http://localhost:${port}/index.html`;
+    serverInstance = await startStaticServer(path.resolve(__dirname, '..'), 0);
+    targetUrl = `${serverInstance.baseUrl}/index.html`;
     console.log(`[Setup] Started local test server at ${targetUrl}`);
   } else {
     const urlIdx = args.indexOf('--url');
@@ -47,9 +46,9 @@ async function runLiveVerification() {
   }
 
   console.log(`\n================================================================`);
-  console.log(`🚀 STARTING LIVE GOOGLE DRIVE & CLOUD SYNC VERIFICATION SUITE`);
+  console.log(`🚀 STARTING GOOGLE DRIVE & CLOUD SYNC VERIFICATION SUITE`);
   console.log(`🎯 Target URL: ${targetUrl}`);
-  console.log(`🔧 Mode: ${isRealMode ? '🌐 REAL Google Drive (Headed Browser + User Inspection)' : '⚡ Mock API (Automated CI Headless)'}`);
+  console.log(`🔧 Mode: ${isRealMode ? '🌐 REAL Google Drive API (Strict Interactive User Verification)' : '⚡ Mock API (Automated CI Headless)'}`);
   console.log(`================================================================\n`);
 
   const browser = await chromium.launch({ headless: !isRealMode });
@@ -148,13 +147,24 @@ async function runLiveVerification() {
     if (isRealMode) {
       console.log('   👉 Please sign in to Google Drive in the opened browser window if prompted...');
       await desktopPage.evaluate(() => window.openCloudSyncModal());
+      
+      // Wait for real Google Drive connection
+      let connected = false;
+      for (let i = 0; i < 30; i++) {
+        connected = await desktopPage.evaluate(() => window.isGoogleDriveConnected());
+        if (connected) break;
+        await desktopPage.waitForTimeout(1000);
+      }
+
+      if (!connected) {
+        throw new Error('❌ TEST FAILED: Google Drive Sign-In failed or was blocked (OAuth origin mismatch or popup closed). Test aborted.');
+      }
+    } else {
+      const authSuccess = await desktopPage.evaluate(async () => {
+        return await window.authenticateGoogleDrive(false);
+      });
+      if (!authSuccess) throw new Error('❌ TEST FAILED: Google Drive mock authentication failed');
     }
-
-    const authSuccess = await desktopPage.evaluate(async (realMode) => {
-      return await window.authenticateGoogleDrive(!realMode);
-    }, isRealMode);
-
-    if (!authSuccess && !isRealMode) throw new Error('Google Drive auth failed');
 
     const folderGuardUrl = await desktopPage.evaluate(() => window.getGoogleDriveFolderUrl());
     console.log(`   ✓ Authenticated cleanly. Folder URL: ${folderGuardUrl}`);
@@ -178,13 +188,30 @@ async function runLiveVerification() {
       return await window.uploadTripToGoogleDrive(trip);
     }, sampleTrip);
 
-    if (!saveResult && !isRealMode) throw new Error('Failed to create/write trip file');
-    console.log('   ✓ File created as "Live_Verification_Test_Trip.json" inside "TrenscendsTravelPlanner" folder.');
+    if (!saveResult) {
+      throw new Error('❌ TEST FAILED: uploadTripToGoogleDrive returned false. File was NOT created on Google Drive!');
+    }
+
+    // Strictly verify file ID returned in file map
+    const createdFileId = await desktopPage.evaluate((tripId) => {
+      const map = JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}');
+      return map[tripId];
+    }, sampleTrip.id);
+
+    if (!createdFileId) {
+      throw new Error('❌ TEST FAILED: No file ID was saved in local file map. uploadTripToGoogleDrive failed.');
+    }
+    if (isRealMode && (createdFileId.startsWith('mock_') || createdFileId.startsWith('gdrive_file_'))) {
+      throw new Error(`❌ TEST FAILED: Real Google Drive mode expected a real File ID from Google REST API, but got synthetic ID: "${createdFileId}". Real upload failed.`);
+    }
+
+    console.log(`   ✓ File created successfully with Google Drive File ID: "${createdFileId}"`);
 
     if (isRealMode) {
       console.log(`\n================================================================`);
       console.log(`📂 REAL GOOGLE DRIVE FILE CREATED & SYNCED!`);
       console.log(`📄 File Name: Live_Verification_Test_Trip.json`);
+      console.log(`🆔 Google Drive File ID: ${createdFileId}`);
       console.log(`📁 Physical Google Drive Folder: G:\\My Drive\\TrenscendsTravelPlanner`);
       console.log(`🌐 Google Drive Web URL: ${folderGuardUrl}`);
       console.log(`================================================================\n`);
@@ -196,14 +223,19 @@ async function runLiveVerification() {
       await pauseForUser(`\n👉 Press [ENTER] to clean up and delete test file from Google Drive... `);
 
       console.log('\n   [Step Clean Up] Deleting test file from Google Drive...');
-      await desktopPage.evaluate(async (trip) => {
+      const deleteResult = await desktopPage.evaluate(async (trip) => {
         const fileMap = JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}');
         const fileId = fileMap[trip.id];
         if (fileId && typeof window.deleteTripFromGoogleDrive === 'function') {
-          await window.deleteTripFromGoogleDrive(fileId, trip.title);
+          return await window.deleteTripFromGoogleDrive(fileId, trip.title);
         }
+        return false;
       }, sampleTrip);
-      console.log('   ✓ Test file deleted from Google Drive folder.');
+
+      if (!deleteResult) {
+        throw new Error('❌ TEST FAILED: deleteTripFromGoogleDrive returned false during cleanup.');
+      }
+      console.log('   ✓ Test file deleted cleanly from Google Drive folder.');
     } else {
       // C. Read / Load / Sync Trips from Google Drive
       console.log('   [Step C] Testing Read/Load/Sync Trips from Google Drive...');
@@ -264,7 +296,7 @@ async function runLiveVerification() {
     console.log(`================================================================\n`);
 
   } catch (err) {
-    console.error('\n❌ VERIFICATION TEST FAILED:', err);
+    console.error('\n❌ VERIFICATION TEST FAILED:', err.message || err);
     process.exit(1);
   } finally {
     if (browser) await browser.close();
