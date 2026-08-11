@@ -204,9 +204,16 @@ async function runLiveVerification() {
     // A. Sign-In & Authentication Guard
     console.log('   [Step A] Checking Google Drive Connection & Folder Guard...');
     if (isRealMode) {
+      // Try silent background token authentication first
+      await page.evaluate(async () => {
+        if (typeof window.authenticateGoogleDrive === 'function') {
+          await window.authenticateGoogleDrive(false);
+        }
+      });
+
       let connected = await page.evaluate(() => window.isGoogleDriveConnected());
       if (!connected) {
-        console.log('   👉 Please click "Sign in with Google" in the opened browser window...');
+        console.log('   👉 First-time sign in: Click "Sign in with Google" in the opened browser window...');
         await page.evaluate(() => window.openCloudSyncModal());
         await page.evaluate(() => window.authenticateGoogleDrive(true));
         

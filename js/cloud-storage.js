@@ -180,7 +180,7 @@
       }
 
       try {
-        const client = google.accounts.oauth2.initTokenClient({
+        const tokenConfig = {
           client_id: clientId,
           scope: DRIVE_SCOPES,
           callback: async (response) => {
@@ -243,7 +243,7 @@
           }
         });
 
-        client.requestAccessToken({ prompt: interactive ? 'consent' : '' });
+        client.requestAccessToken({ prompt: '' });
       } catch (err) {
         console.error('Failed to launch Google OAuth Client:', err);
         showOriginMismatchNotice('origin_mismatch');
