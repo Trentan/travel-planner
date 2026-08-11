@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="run-tests.js" type="NodeJSConfigurationType" nameIsGenerated="true" path-to-js-file="run-tests.js" working-dir="$PROJECT_DIR$/tests">
+    <method v="2" />
+  </configuration>
+</component>

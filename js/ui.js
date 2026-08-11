@@ -238,12 +238,18 @@ function applyTheme(theme = null) {
 
   document.documentElement.setAttribute('data-theme', effectiveTheme);
 
+  // Dynamically update mobile browser / PWA theme-color for crisp status bar contrast
+  const isDarkActive = effectiveTheme === 'dark';
+  const metaTheme = document.getElementById('metaThemeColor') || document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) {
+    metaTheme.setAttribute('content', isDarkActive ? '#0f172a' : '#0f766e');
+  }
+
   // Sync inputs and button styles
   const toggleInput = document.getElementById('themeToggleInput');
   const mobileToggleInput = document.getElementById('mobileThemeToggleInput');
   const toggleBtn = document.getElementById('themeToggleBtn');
   const mobileToggleBtn = document.getElementById('mobileThemeToggleBtn');
-  const isDarkActive = effectiveTheme === 'dark';
 
   if (toggleInput) toggleInput.checked = isDarkActive;
   if (mobileToggleInput) mobileToggleInput.checked = isDarkActive;

@@ -94,7 +94,7 @@ async function runLiveVerification() {
     console.log('\n📌 2. Testing MOBILE Viewport (390 x 844)...');
     const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 } });
     await mobilePage.goto(targetUrl, { waitUntil: 'domcontentloaded' });
-    await mobilePage.waitForFunction(() => typeof window.isGoogleDriveConnected === 'function', { timeout: 15000 });
+    await mobilePage.waitForFunction(() => typeof window.isGoogleDriveConnected === 'function' && typeof window.toggleMobileMenu === 'function', { timeout: 15000 });
 
     await mobilePage.evaluate(() => window.toggleMobileMenu());
     await mobilePage.waitForTimeout(300);
