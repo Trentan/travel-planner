@@ -39,10 +39,10 @@ async function runLiveVerification() {
     const fixedPort = 3000;
     try {
       serverInstance = await startStaticServer(path.resolve(__dirname, '..'), fixedPort);
-      const actualPort = (serverInstance && serverInstance.address && typeof serverInstance.address === 'function') ? serverInstance.address().port : fixedPort;
-      targetUrl = `http://localhost:${actualPort}/index.html`;
+      targetUrl = `${serverInstance.baseUrl}/index.html`;
     } catch (e) {
-      targetUrl = `http://localhost:${fixedPort}/index.html`;
+      serverInstance = await startStaticServer(path.resolve(__dirname, '..'), 0);
+      targetUrl = `${serverInstance.baseUrl}/index.html`;
     }
     console.log(`[Setup] Target local test server at ${targetUrl}`);
   } else {
