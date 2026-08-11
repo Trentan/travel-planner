@@ -57,7 +57,19 @@ async function runLiveVerification() {
   console.log(`🔧 Mode: ${isRealMode ? '🌐 REAL Google Drive API (Strict Interactive User Verification)' : '⚡ Mock API (Automated CI Headless)'}`);
   console.log(`================================================================\n`);
 
-  const browser = await chromium.launch({ headless: !isRealMode });
+  const launchOptions = {
+    headless: !isRealMode
+  };
+
+  if (isRealMode) {
+    launchOptions.args = [
+      '--disable-blink-features=AutomationControlled',
+      '--no-sandbox',
+      '--disable-setuid-sandbox'
+    ];
+  }
+
+  const browser = await chromium.launch(launchOptions);
   const errors = [];
 
   try {
@@ -65,7 +77,18 @@ async function runLiveVerification() {
     // 1. DESKTOP VIEWPORT TEST (1440 x 900)
     // -------------------------------------------------------------------------
     console.log('📌 1. Testing DESKTOP Viewport (1440 x 900)...');
-    const desktopPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    const desktopPage = await browser.newPage({
+      viewport: { width: 1440, height: 900 },
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+    });
+
+    if (isRealMode) {
+      await desktopPage.addInitScript(() => {
+        Object.defineProperty(navigator, 'webdriver', {
+          get: () => undefined
+        });
+      });
+    }
     desktopPage.on('console', msg => {
       if (msg.type() === 'error') {
         console.error('   [Browser Error]', msg.text());
