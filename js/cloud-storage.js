@@ -93,8 +93,9 @@
 
   // Check if Google Drive is connected & authorized
   function isGoogleDriveConnected() {
+    if (window.__mockGoogleDriveAPI) return true;
     const isConnectedFlag = localStorage.getItem('travelApp_gdrive_connected') === 'true';
-    return isConnectedFlag || (!!accessToken && (Date.now() < tokenExpiry || accessToken.startsWith('token_')));
+    return isConnectedFlag || (!!accessToken && (Date.now() < tokenExpiry || (accessToken && accessToken.startsWith('token_'))));
   }
   window.isGoogleDriveConnected = isGoogleDriveConnected;
 
@@ -201,7 +202,7 @@
       }
 
       try {
-        const tokenConfig = {
+        const client = google.accounts.oauth2.initTokenClient({
           client_id: clientId,
           scope: DRIVE_SCOPES,
           callback: async (response) => {
@@ -264,7 +265,7 @@
           }
         });
 
-        client.requestAccessToken({ prompt: '' });
+        client.requestAccessToken({ prompt: interactive ? undefined : '' });
       } catch (err) {
         console.error('Failed to launch Google OAuth Client:', err);
         showOriginMismatchNotice('origin_mismatch');
@@ -354,7 +355,7 @@
   }
 
   // Upload or Update a Trip JSON file inside Google Drive / TrenscendsTravelPlanner
-  async function uploadTripToGoogleDrive(tripRecord) {
+  window.uploadTripToGoogleDrive = async function(tripRecord) {
     if (!isGoogleDriveConnected() || !tripRecord || !tripRecord.id) return false;
     await ensureValidAccessToken();
 

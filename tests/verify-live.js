@@ -355,13 +355,23 @@ async function runLiveVerification() {
 
     const uploadedFiles = [];
     for (const trip of sampleTripsToUpload) {
-      const ok = await page.evaluate(async (t) => {
-        return await window.uploadTripToGoogleDrive(t);
+      const result = await page.evaluate(async (t) => {
+        try {
+          if (typeof window.uploadTripToGoogleDrive === 'function') {
+            const res = await window.uploadTripToGoogleDrive(t);
+            return { ok: res, err: null };
+          }
+          return { ok: false, err: 'window.uploadTripToGoogleDrive is not a function' };
+        } catch (e) {
+          return { ok: false, err: e.message || String(e) };
+        }
       }, trip);
 
-      if (ok) {
+      if (result.ok) {
         uploadedFiles.push(trip);
         console.log(`   ✓ Uploaded trip document "${trip.title}" to Google Drive folder.`);
+      } else {
+        console.warn(`   ⚠️ Failed to upload "${trip.title}":`, result.err);
       }
     }
 
