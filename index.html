@@ -1182,6 +1182,9 @@
         <button class="modal-close" onclick="closeCloudSyncModal()">&times;</button>
       </div>
       <div class="modal-body space-y-4">
+        <div id="gdriveOriginMismatchNotice" class="p-3.5 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 rounded-xl text-xs text-amber-800 dark:text-amber-200 space-y-2" style="display: none;">
+          <!-- Dynamically rendered by js/cloud-storage.js when origin_mismatch is detected -->
+        </div>
         <div id="gdriveProfileCard" class="bg-slate-100 dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-3" style="display: none;">
           <!-- Dynamically rendered by js/cloud-storage.js -->
         </div>

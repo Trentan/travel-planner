@@ -192,13 +192,22 @@
 
             if (response && response.error) {
               console.error('Google OAuth Error:', response);
-              if (interactive) alert(`Google OAuth Notice: ${response.error}`);
+              if (String(response.error).includes('origin') || String(response.error).includes('mismatch')) {
+                showOriginMismatchNotice('origin_mismatch');
+              } else if (interactive) {
+                alert(`Google OAuth Notice: ${response.error}`);
+              }
               resolve(false);
             }
           },
           error_callback: (err) => {
             console.error('Google OAuth Popup Error:', err);
-            if (interactive) alert('Google Sign-In popup was closed or blocked. Please allow popups for this site.');
+            const errStr = JSON.stringify(err || {});
+            if (errStr.includes('origin') || errStr.includes('mismatch') || errStr.includes('400')) {
+              showOriginMismatchNotice('origin_mismatch');
+            } else if (interactive) {
+              showOriginMismatchNotice('origin_mismatch');
+            }
             resolve(false);
           }
         });
@@ -206,10 +215,37 @@
         client.requestAccessToken({ prompt: interactive ? 'consent' : '' });
       } catch (err) {
         console.error('Failed to launch Google OAuth Client:', err);
+        showOriginMismatchNotice('origin_mismatch');
         resolve(false);
       }
     });
   };
+
+  function showOriginMismatchNotice(errorType) {
+    const notice = document.getElementById('gdriveOriginMismatchNotice');
+    if (!notice) return;
+
+    const currentOrigin = window.location.origin;
+    const clientId = getGoogleClientId();
+
+    notice.style.display = 'block';
+    notice.innerHTML = `
+      <div class="font-bold text-amber-900 dark:text-amber-200 text-xs flex items-center gap-1.5">
+        <span>⚠️ Google OAuth Origin Mismatch (Error 400: origin_mismatch)</span>
+      </div>
+      <p class="pt-1">Google Cloud blocked sign-in from <code class="bg-amber-100 dark:bg-amber-900/80 px-1.5 py-0.5 rounded font-mono font-bold">${escapeHtml(currentOrigin)}</code> because this domain/port is not registered under Authorized JavaScript Origins for Client ID <code class="bg-amber-100 dark:bg-amber-900/80 px-1.5 py-0.5 rounded font-mono text-[11px] block mt-1">${escapeHtml(clientId)}</code>.</p>
+      
+      <div class="font-bold pt-1.5 text-amber-900 dark:text-amber-200 text-xs">How to Resolve This:</div>
+      <ul class="list-disc pl-4 space-y-1 pt-0.5 text-slate-700 dark:text-amber-100">
+        <li><strong>Option A (Use Live Production Domain)</strong>: Open the live site at <a href="https://trentan.github.io/travel-planner/" target="_blank" class="underline font-bold text-blue-600 dark:text-blue-400">https://trentan.github.io/travel-planner/</a> (where <code>https://trentan.github.io</code> is authorized).</li>
+        <li><strong>Option B (Update Google Cloud Console)</strong>:
+          Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" class="underline font-bold text-blue-600 dark:text-blue-400">Google Cloud Credentials Console ↗</a>, open OAuth 2.0 Client ID, and under <strong>Authorized JavaScript origins</strong> add:<br>
+          <code class="bg-amber-100 dark:bg-amber-900/80 px-1.5 py-0.5 rounded font-mono select-all text-[11px] block mt-1">${escapeHtml(currentOrigin)}</code>
+        </li>
+      </ul>
+    `;
+  }
+  window.showOriginMismatchNotice = showOriginMismatchNotice;
 
   function completeSeamlessSignIn() {
     accessToken = 'token_gdrive_user_active';
