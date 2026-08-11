@@ -72,15 +72,31 @@
 
   // Check if Google Drive is connected & authorized
   function isGoogleDriveConnected() {
-    // Silent background token refresh if token is within 5 minutes of expiry
-    if (accessToken && !accessToken.startsWith('token_') && (tokenExpiry - Date.now() < 300000)) {
-      if (typeof window.authenticateGoogleDrive === 'function') {
-        window.authenticateGoogleDrive(false).catch(() => {});
-      }
-    }
-    return !!accessToken && (Date.now() < tokenExpiry || accessToken.startsWith('token_'));
+    const isConnectedFlag = localStorage.getItem('travelApp_gdrive_connected') === 'true';
+    return isConnectedFlag || (!!accessToken && (Date.now() < tokenExpiry || accessToken.startsWith('token_')));
   }
   window.isGoogleDriveConnected = isGoogleDriveConnected;
+
+  // Ensure valid active Google OAuth access token (performs silent refresh if expired)
+  async function ensureValidAccessToken() {
+    if (accessToken && Date.now() < tokenExpiry) return accessToken;
+    const isConnectedFlag = localStorage.getItem('travelApp_gdrive_connected') === 'true';
+    if (!isConnectedFlag && !accessToken) return null;
+
+    if (window.__mockGoogleDriveAPI || (accessToken && accessToken.startsWith('token_'))) {
+      return accessToken || 'token_mock_123';
+    }
+
+    try {
+      console.log('[GoogleDrive Silent Token Refresh] Requesting silent background access token update...');
+      const ok = await window.authenticateGoogleDrive(false);
+      if (ok) return accessToken;
+    } catch (err) {
+      console.warn('Silent Google token refresh attempted:', err);
+    }
+    return accessToken;
+  }
+  window.ensureValidAccessToken = ensureValidAccessToken;
 
   // Get Google Drive folder URL for user convenience
   function getGoogleDriveFolderUrl() {
@@ -173,6 +189,7 @@
               const expiresIn = parseInt(response.expires_in || '3600', 10);
               tokenExpiry = Date.now() + (expiresIn * 1000) - 60000;
 
+              localStorage.setItem('travelApp_gdrive_connected', 'true');
               localStorage.setItem('travelApp_gdrive_token', accessToken);
               localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
 
@@ -285,6 +302,7 @@
     tokenExpiry = 0;
     gdriveFolderId = null;
     setUserProfile(null);
+    localStorage.removeItem('travelApp_gdrive_connected');
     localStorage.removeItem('travelApp_gdrive_token');
     localStorage.removeItem('travelApp_gdrive_token_expiry');
     localStorage.removeItem('travelApp_gdrive_folder_id');
@@ -316,6 +334,7 @@
   // Upload or Update a Trip JSON file inside Google Drive / TrenscendsTravelPlanner
   window.uploadTripToGoogleDrive = async function(tripRecord) {
     if (!isGoogleDriveConnected() || !tripRecord || !tripRecord.id) return false;
+    await ensureValidAccessToken();
 
     if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
       const fileName = formatHumanFilename(tripRecord);
@@ -446,6 +465,7 @@
   // Sync All Trips from Google Drive / TrenscendsTravelPlanner into local IndexedDB
   window.syncAllTripsFromGoogleDrive = async function() {
     if (!isGoogleDriveConnected()) return;
+    await ensureValidAccessToken();
 
     if (accessToken.startsWith('token_') || window.__mockGoogleDriveAPI) {
       console.log(`[GoogleDrive Sync] Simulated fetch of all trips from Google Drive / ${DRIVE_FOLDER_NAME}`);
