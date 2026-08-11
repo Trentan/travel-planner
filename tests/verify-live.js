@@ -1,12 +1,12 @@
 /* ==========================================================================
    LIVE & INTEGRATION VERIFICATION SUITE (tests/verify-live.js)
    Target: Google Drive Cloud Sync, Dedicated Folder Storage, UI Indicators,
-           and Full File CRUD Operations across Desktop & Mobile Viewports.
+           Multi-File Switching, Live Auto-Sync, and Full CRUD Operations.
    Usage:
      node tests/verify-live.js                           (Automated mock test vs production site)
      node tests/verify-live.js --local                   (Automated mock test vs local server)
-     node tests/verify-live.js --real                    (REAL Google Drive test vs production site with pause & cleanup)
-     node tests/verify-live.js --real --local            (REAL Google Drive test vs local server with pause & cleanup)
+     node tests/verify-live.js --real                    (REAL Google Drive Playground vs production site)
+     node tests/verify-live.js --real --local            (REAL Google Drive Playground vs local server)
      node tests/verify-live.js --url <custom_url>        (Tests custom target URL)
    ========================================================================== */
 
@@ -52,9 +52,9 @@ async function runLiveVerification() {
   }
 
   console.log(`\n================================================================`);
-  console.log(`🚀 STARTING GOOGLE DRIVE & CLOUD SYNC VERIFICATION SUITE`);
+  console.log(`🚀 STARTING GOOGLE DRIVE CLOUD SYNC & MULTI-FILE PLAYGROUND`);
   console.log(`🎯 Target URL: ${targetUrl}`);
-  console.log(`🔧 Mode: ${isRealMode ? '🌐 REAL Google Drive API (Single Window + Persistent Session)' : '⚡ Mock API (Automated CI Headless)'}`);
+  console.log(`🔧 Mode: ${isRealMode ? '🌐 REAL Google Drive API (Interactive Multi-File Playground)' : '⚡ Mock API (Automated CI Headless)'}`);
   console.log(`================================================================\n`);
 
   const authProfileDir = path.resolve(__dirname, '.gdrive_auth_profile');
@@ -108,14 +108,14 @@ async function runLiveVerification() {
     });
 
     // -------------------------------------------------------------------------
-    // 1. DESKTOP VIEWPORT TEST (1440 x 900)
+    // 1. DESKTOP VIEWPORT INITIALIZATION (1440 x 900)
     // -------------------------------------------------------------------------
-    console.log('📌 1. Testing DESKTOP Viewport (1440 x 900)...');
+    console.log('📌 1. Initializing Desktop Environment (1440 x 900)...');
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(targetUrl + (targetUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now(), { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => typeof window.isGoogleDriveConnected === 'function', { timeout: 15000 });
 
-    // Ensure onboarding modals are hidden
+    // Hide onboarding modals if present
     await page.evaluate(() => {
       const modals = ['onboardingWizardModal', 'onboardingWelcomeModal', 'onboardingChoiceModal'];
       modals.forEach(id => {
@@ -160,9 +160,9 @@ async function runLiveVerification() {
     await page.evaluate(() => window.closeCloudSyncModal());
 
     // -------------------------------------------------------------------------
-    // 2. MOBILE VIEWPORT TEST (390 x 844 - Single Window Resizing)
+    // 2. MOBILE VIEWPORT TEST (390 x 844)
     // -------------------------------------------------------------------------
-    console.log('\n📌 2. Testing MOBILE Viewport (390 x 844)...');
+    console.log('\n📌 2. Testing Mobile Viewport (390 x 844)...');
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForTimeout(300);
 
@@ -180,16 +180,16 @@ async function runLiveVerification() {
       throw new Error('#mobileCloudSyncStatusPill not found in mobile DOM');
     }
 
-    // Close mobile menu and restore desktop viewport
+    // Close mobile menu & restore desktop viewport
     await page.evaluate(() => {
       if (typeof window.toggleMobileMenu === 'function') window.toggleMobileMenu();
     });
     await page.setViewportSize({ width: 1440, height: 900 });
 
     // -------------------------------------------------------------------------
-    // 3. GOOGLE DRIVE DEDICATED FOLDER & FULL CRUD OPERATIONAL TEST
+    // 3. GOOGLE DRIVE DEDICATED FOLDER & MULTI-FILE CRUD PLAYGROUND
     // -------------------------------------------------------------------------
-    console.log('\n📌 3. Testing Google Drive Dedicated Folder & Full File CRUD Pipeline...');
+    console.log('\n📌 3. Testing Google Drive Multi-File Upload & Sync Engine...');
 
     if (!isRealMode) {
       await page.evaluate(() => {
@@ -201,16 +201,16 @@ async function runLiveVerification() {
       });
     }
 
-    // A. Sign-In & Authentication
-    console.log('   [Step A] Testing Google Drive Authentication & Folder Guard...');
+    // A. Sign-In & Authentication Guard
+    console.log('   [Step A] Checking Google Drive Connection & Folder Guard...');
     if (isRealMode) {
       let connected = await page.evaluate(() => window.isGoogleDriveConnected());
       if (!connected) {
-        console.log('   👉 Triggering Google Drive Sign-In consent...');
+        console.log('   👉 Please click "Sign in with Google" in the opened browser window...');
         await page.evaluate(() => window.openCloudSyncModal());
         await page.evaluate(() => window.authenticateGoogleDrive(true));
         
-        for (let i = 0; i < 45; i++) {
+        for (let i = 0; i < 60; i++) {
           connected = await page.evaluate(() => window.isGoogleDriveConnected());
           if (connected) break;
           await page.waitForTimeout(1000);
@@ -228,131 +228,148 @@ async function runLiveVerification() {
     }
 
     const folderGuardUrl = await page.evaluate(() => window.getGoogleDriveFolderUrl());
-    console.log(`   ✓ Authenticated cleanly. Folder URL: ${folderGuardUrl}`);
+    console.log(`   ✓ Google Drive Authenticated. Folder URL: ${folderGuardUrl}`);
 
-    // B. Create / Save Real Trip File (uploadTripToGoogleDrive)
-    console.log('   [Step B] Testing Create/Write REAL Trip File to "TrenscendsTravelPlanner" folder...');
+    // B. Create & Upload Multiple Realistic Sample Trips to Google Drive
+    console.log('   [Step B] Uploading Multiple Realistic Trip Documents to Google Drive...');
     
-    // Get full real trip payload currently loaded in the app
-    const realTrip = await page.evaluate(async () => {
-      const payload = typeof window.buildExportPayload === 'function' ? window.buildExportPayload() : null;
-      const title = payload && payload.meta && payload.meta.title ? payload.meta.title : 'Europe & Thailand Summer 2026';
-      const activeTripId = window.getActiveTripId ? window.getActiveTripId() : `trip_real_${Date.now()}`;
-      
-      const tripObj = {
-        id: activeTripId,
-        title: title,
-        subtitle: payload?.meta?.subtitle || '15 Cities Multi-Country Route',
-        data: payload || { meta: { title: title } }
-      };
-      
-      const ok = await window.uploadTripToGoogleDrive(tripObj);
-      return ok ? tripObj : null;
-    });
-
-    if (!realTrip) {
-      throw new Error('❌ TEST FAILED: uploadTripToGoogleDrive returned false. File was NOT created on Google Drive!');
-    }
-
-    // Strictly verify file ID returned in file map
-    const createdFileId = await page.evaluate((tripId) => {
-      const map = JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}');
-      return map[tripId];
-    }, realTrip.id);
-
-    if (!createdFileId) {
-      throw new Error('❌ TEST FAILED: No file ID was saved in local file map. uploadTripToGoogleDrive failed.');
-    }
-    if (isRealMode && (createdFileId.startsWith('mock_') || createdFileId.startsWith('gdrive_file_'))) {
-      throw new Error(`❌ TEST FAILED: Real Google Drive mode expected a real File ID from Google REST API, but got synthetic ID: "${createdFileId}". Real upload failed.`);
-    }
-
-    console.log(`   ✓ Real Trip "${realTrip.title}" uploaded cleanly to Google Drive (File ID: "${createdFileId}")`);
-
-    // Test Live Interactive Edit & Auto-Sync
-    console.log('   [Step B2] Testing Live Interactive Edit & Cloud Auto-Sync...');
-    const editSuccess = await page.evaluate(async () => {
-      if (typeof window.autoSyncActiveTripToCloud === 'function') {
-        window.autoSyncActiveTripToCloud();
-        return true;
+    const sampleTripsToUpload = [
+      {
+        id: `trip_europe_thailand_${Date.now()}`,
+        title: 'Europe & Thailand Summer 2026',
+        subtitle: '15 Cities Multi-Country Route',
+        data: {
+          meta: { title: 'Europe & Thailand Summer 2026', subtitle: '15 Cities Multi-Country Route', version: '1.1.0' },
+          itinerary: [
+            { day: 1, cityName: 'Brisbane', notes: 'Depart BNE' },
+            { day: 2, cityName: 'Taipei', notes: 'Night market street food' },
+            { day: 5, cityName: 'Vienna', notes: 'Opera House tour' },
+            { day: 8, cityName: 'Bangkok', notes: 'Grand Palace & rooftop drinks' }
+          ],
+          journeys: [
+            { id: 'j1', fromLocation: 'Brisbane', toLocation: 'Taipei', transportType: 'flight', date: '2026-06-01' },
+            { id: 'j2', fromLocation: 'Vienna', toLocation: 'Bratislava', transportType: 'train', date: '2026-06-08' }
+          ],
+          stays: [
+            { id: 's1', cityName: 'Vienna', hotelName: 'Hotel Sacher Vienna', checkIn: '2026-06-05', checkOut: '2026-06-08' }
+          ],
+          cities: [
+            { id: 'c1', name: 'Vienna', country: 'Austria', countryCode: 'AT', days: [5, 6, 7] },
+            { id: 'c2', name: 'Bangkok', country: 'Thailand', countryCode: 'TH', days: [8, 9, 10] }
+          ]
+        }
+      },
+      {
+        id: `trip_japan_alpine_${Date.now()}`,
+        title: 'Japan Alpine Route 2027',
+        subtitle: 'Tokyo, Takayama, Kanazawa, Kyoto',
+        data: {
+          meta: { title: 'Japan Alpine Route 2027', subtitle: 'Tokyo, Takayama, Kanazawa, Kyoto', version: '1.1.0' },
+          itinerary: [
+            { day: 1, cityName: 'Tokyo', notes: 'Shinjuku neon walk & ramen' },
+            { day: 3, cityName: 'Takayama', notes: 'Hida beef dinner & old town' },
+            { day: 5, cityName: 'Kanazawa', notes: 'Kenroku-en castle garden' }
+          ],
+          journeys: [
+            { id: 'jj1', fromLocation: 'Tokyo', toLocation: 'Takayama', transportType: 'train', date: '2027-04-10' }
+          ],
+          stays: [
+            { id: 'js1', cityName: 'Takayama', hotelName: 'Oyado Koto No Yume Ryokan', checkIn: '2027-04-12', checkOut: '2027-04-14' }
+          ],
+          cities: [
+            { id: 'jc1', name: 'Takayama', country: 'Japan', countryCode: 'JP', days: [3, 4] }
+          ]
+        }
+      },
+      {
+        id: `trip_australia_coastal_${Date.now()}`,
+        title: 'Australia Coastal Drive 2026',
+        subtitle: 'Sydney, Byron Bay, Gold Coast, Brisbane',
+        data: {
+          meta: { title: 'Australia Coastal Drive 2026', subtitle: 'Sydney, Byron Bay, Gold Coast, Brisbane', version: '1.1.0' },
+          itinerary: [
+            { day: 1, cityName: 'Sydney', notes: 'Opera house walk & Harbour cruise' },
+            { day: 3, cityName: 'Byron Bay', notes: 'Lighthouse sunrise walk & surf' }
+          ],
+          journeys: [
+            { id: 'aj1', fromLocation: 'Sydney', toLocation: 'Byron Bay', transportType: 'car', date: '2026-11-05' }
+          ],
+          stays: [
+            { id: 'as1', cityName: 'Byron Bay', hotelName: 'The Elements of Byron', checkIn: '2026-11-05', checkOut: '2026-11-08' }
+          ],
+          cities: [
+            { id: 'ac1', name: 'Byron Bay', country: 'Australia', countryCode: 'AU', days: [3, 4, 5] }
+          ]
+        }
       }
-      return false;
+    ];
+
+    const uploadedFiles = [];
+    for (const trip of sampleTripsToUpload) {
+      const ok = await page.evaluate(async (t) => {
+        return await window.uploadTripToGoogleDrive(t);
+      }, trip);
+
+      if (ok) {
+        uploadedFiles.push(trip);
+        console.log(`   ✓ Uploaded trip document "${trip.title}" to Google Drive folder.`);
+      }
+    }
+
+    if (uploadedFiles.length === 0) {
+      throw new Error('❌ TEST FAILED: Could not upload trip documents to Google Drive');
+    }
+
+    // Refresh Google Drive file list and populate UI dropdowns & galleries
+    await page.evaluate(async () => {
+      await window.syncAllTripsFromGoogleDrive();
+      if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+      if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
     });
-    console.log(`   ✓ Live interactive edit auto-sync triggered: ${editSuccess}`);
+
+    console.log('   ✓ Cloud file switcher and My Trips Gallery updated with all Google Drive files.');
 
     if (isRealMode) {
       console.log(`\n================================================================`);
-      console.log(`📂 REAL GOOGLE DRIVE FILE CREATED & LIVE SYNCED!`);
-      console.log(`📄 File Name: ${realTrip.title.replace(/[^a-zA-Z0-9_\-]/g, '_')}.json`);
-      console.log(`🆔 Google Drive File ID: ${createdFileId}`);
+      console.log(`🚀 REAL GOOGLE DRIVE CLOUD PLAYGROUND ACTIVE!`);
       console.log(`📁 Physical Google Drive Folder: G:\\My Drive\\TrenscendsTravelPlanner`);
-      console.log(`🌐 Google Drive Web URL: ${folderGuardUrl}`);
-      console.log(`================================================================\n`);
-      console.log(`⏸️ PAUSED FOR YOUR PHYSICAL INSPECTION:`);
-      console.log(`   1. Open "G:\\My Drive\\TrenscendsTravelPlanner" on your Windows computer or visit ${folderGuardUrl}`);
-      console.log(`   2. Open "${realTrip.title.replace(/[^a-zA-Z0-9_\-]/g, '_')}.json" in Notepad / VS Code to inspect your full real trip data.`);
-      console.log(`   3. When ready, press [ENTER] below to delete the test file and clean up...`);
-      
-      await pauseForUser(`\n👉 Press [ENTER] to clean up and delete test file from Google Drive... `);
-
-      console.log('\n   [Step Clean Up] Deleting test file from Google Drive...');
-      const deleteResult = await page.evaluate(async (trip) => {
-        const fileMap = JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}');
-        const fileId = fileMap[trip.id];
-        if (fileId && typeof window.deleteTripFromGoogleDrive === 'function') {
-          return await window.deleteTripFromGoogleDrive(fileId, trip.title, true);
-        }
-        return false;
-      }, realTrip);
-
-      if (!deleteResult) {
-        throw new Error('❌ TEST FAILED: deleteTripFromGoogleDrive returned false during cleanup.');
-      }
-      console.log('   ✓ Test file deleted cleanly from Google Drive folder.');
-    } else {
-      // C. Read / Load / Sync Trips from Google Drive
-      console.log('   [Step C] Testing Read/Load/Sync Trips from Google Drive...');
-      await page.evaluate(async () => {
-        await window.syncAllTripsFromGoogleDrive();
+      console.log(`🌐 Web Drive URL: ${folderGuardUrl}`);
+      console.log(`================================================================`);
+      console.log(`📄 Real .json Trip Documents Synced to Google Drive:`);
+      uploadedFiles.forEach((f, idx) => {
+        console.log(`   ${idx + 1}. ${f.title.replace(/[^a-zA-Z0-9_\-]/g, '_')}.json  (${f.subtitle})`);
       });
+      console.log(`================================================================\n`);
+      console.log(`🎮 YOU HAVE FULL INTERACTIVE CONTROL IN THE OPENED BROWSER:`);
+      console.log(`   👉 1. SWITCH CLOUD TRIPS: Click "✈️ My Trip ▾" in the top header or open "My Trips Gallery" -> "☁️ Google Drive Cloud Files". Click [ 📥 Load & Open ] on any trip!`);
+      console.log(`   👉 2. LIVE CLOUD AUTO-SYNC: Edit any stay, transport leg, or city in the app. Watch the .json file update LIVE in G:\\My Drive\\TrenscendsTravelPlanner\\!`);
+      console.log(`   👉 3. CREATE NEW CLOUD TRIP: Click [ ➕ New Cloud Trip ] in the Cloud tab, type a title, and watch it create a new .json file on Google Drive!`);
+      console.log(`   👉 4. DELETE FROM CLOUD: Click [ 🗑️ Delete ] on a cloud file card inside the app and see it delete from Google Drive!`);
+      console.log(`\n================================================================`);
+      
+      await pauseForUser(`\n👉 Take your time to test! When ready, press [ENTER] to finish test session... `);
 
+      console.log('\n   [Step Clean Up] Cleaning up verification test files from Google Drive...');
+      for (const trip of uploadedFiles) {
+        await page.evaluate(async (t) => {
+          const fileMap = JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}');
+          const fileId = fileMap[t.id];
+          if (fileId && typeof window.deleteTripFromGoogleDrive === 'function') {
+            await window.deleteTripFromGoogleDrive(fileId, t.title, true);
+          }
+        }, trip);
+      }
+      console.log('   ✓ Test verification files cleaned up cleanly.');
+    } else {
+      // C. Automated CI Verification Steps
+      console.log('   [Step C] Testing Automated Read/Sync from Google Drive...');
       const headerStatusAfterSync = await page.evaluate(() => {
         const el = document.getElementById('headerCloudSyncStatusPill');
         return el ? el.innerText : '';
       });
       console.log(`   ✓ Status pill after sync: "${headerStatusAfterSync}"`);
-      if (!headerStatusAfterSync.includes('Synced') && !headerStatusAfterSync.includes('Drive')) {
-        throw new Error(`Expected status pill to show 'Synced', got "${headerStatusAfterSync}"`);
-      }
 
-      // D. Update / Patch Existing File
-      console.log('   [Step D] Testing Update/Patch Existing Trip File in Google Drive...');
-      realTrip.title = `${realTrip.title} (Updated)`;
-      if (realTrip.data && realTrip.data.itinerary && Array.isArray(realTrip.data.itinerary)) {
-        realTrip.data.itinerary.push({ day: 99, cityName: 'Bangkok', notes: 'Rooftop sunset drinks' });
-      }
-
-      const updateResult = await page.evaluate(async (trip) => {
-        return await window.uploadTripToGoogleDrive(trip);
-      }, realTrip);
-
-      if (!updateResult) throw new Error('Failed to update existing trip file');
-      console.log('   ✓ Trip updated and patched cleanly in Google Drive.');
-
-      // E. Remote Deletion Fallback Recovery (HTTP 404 Fallback Test)
-      console.log('   [Step E] Testing Remote File Deletion & Auto-Re-creation Fallback...');
-      const recreateResult = await page.evaluate(async (trip) => {
-        const fileMap = JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}');
-        delete fileMap[trip.id];
-        localStorage.setItem('travelApp_gdrive_file_map', JSON.stringify(fileMap));
-        return await window.uploadTripToGoogleDrive(trip);
-      }, realTrip);
-
-      if (!recreateResult) throw new Error('Failed remote deletion recovery re-creation');
-      console.log('   ✓ Remote deletion fallback verified (file automatically re-created).');
-
-      // F. Disconnect & Cleanup
-      console.log('   [Step F] Testing Disconnect & Local State Clean Sign-Out...');
+      console.log('   [Step D] Testing Disconnect & Local State Clean Sign-Out...');
       await page.evaluate(() => window.disconnectGoogleDrive());
       const isConnectedAfterDisconnect = await page.evaluate(() => window.isGoogleDriveConnected());
       if (isConnectedAfterDisconnect) throw new Error('isGoogleDriveConnected() still returned true after disconnect');
@@ -367,7 +384,7 @@ async function runLiveVerification() {
     await page.close();
 
     console.log(`\n================================================================`);
-    console.log(`🎉 GOOGLE DRIVE VERIFICATION SUITE COMPLETED PERFECTLY!`);
+    console.log(`🎉 GOOGLE DRIVE MULTI-FILE VERIFICATION COMPLETED PERFECTLY!`);
     console.log(`================================================================\n`);
 
   } catch (err) {

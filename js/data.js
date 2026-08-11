@@ -5998,6 +5998,8 @@ async function importJSON(event) {
 
 // Expose data functions to window scope for HTML onclick handlers
 window.exportJSON = exportJSON;
+window.buildExportPayload = buildExportPayload;
+window.loadImportedPayload = loadImportedPayload;
 window.exportShareJSON = exportShareJSON;
 window.exportShareEmail = exportShareEmail;
 window.copyShareEmailDraft = copyShareEmailDraft;

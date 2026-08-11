@@ -591,13 +591,31 @@
         }
       }
 
-      if (tripRecord && tripRecord.id && typeof window.saveTripToIndexedDB === 'function') {
-        await window.saveTripToIndexedDB(tripRecord);
-        if (typeof window.switchActiveTrip === 'function') {
-          await window.switchActiveTrip(tripRecord.id);
+      if (tripRecord) {
+        const payload = tripRecord.data || tripRecord;
+        const title = (payload.meta && payload.meta.title) || tripRecord.title || 'Cloud Trip';
+
+        if (typeof window.loadImportedPayload === 'function') {
+          await window.loadImportedPayload(payload, `${title}.json`);
         }
+        if (typeof window.setActiveTripId === 'function') {
+          window.setActiveTripId(tripRecord.id || `trip_cloud_${fileId}`);
+        }
+        if (typeof window.saveActiveTripToStore === 'function') {
+          await window.saveActiveTripToStore();
+        }
+        if (typeof window.renderHeaderTripSwitcher === 'function') {
+          window.renderHeaderTripSwitcher();
+        }
+        if (typeof window.renderTripGalleryGrid === 'function') {
+          window.renderTripGalleryGrid();
+        }
+
         window.closeCloudSyncModal();
-        updateCloudSyncStatusPill(`☁️ Loaded "${tripRecord.title || 'Trip'}"`, 'connected');
+        if (typeof window.closeTripLibraryModal === 'function') {
+          window.closeTripLibraryModal();
+        }
+        updateCloudSyncStatusPill(`☁️ Loaded "${title}"`, 'connected');
         return true;
       }
     } catch (err) {
@@ -605,6 +623,63 @@
       updateCloudSyncStatusPill('⚡ Load Failed', 'error');
     }
     return false;
+  };
+
+  // Create brand new Trip Document directly in Google Drive
+  window.createNewTripInGoogleDrive = async function() {
+    if (!isGoogleDriveConnected()) {
+      alert('Please sign in to Google Drive first to create cloud trips.');
+      return;
+    }
+    const title = prompt('Enter a title for your new Google Drive trip:', 'My New Travel Plan');
+    if (!title || !title.trim()) return;
+
+    const cleanTitle = title.trim();
+    const newTripId = 'trip_cloud_' + Date.now();
+    const newPayload = {
+      meta: {
+        title: cleanTitle,
+        subtitle: 'New Multi-City Itinerary',
+        dates: '2026',
+        version: '1.1.0'
+      },
+      itinerary: [
+        { day: 1, cityName: 'Start City', notes: 'First day arrival' }
+      ],
+      journeys: [],
+      stays: [],
+      cities: [
+        { id: 'city_start', name: 'Start City', country: 'Country', countryCode: 'UN', days: [1] }
+      ],
+      userCities: [],
+      userCountries: [],
+      packing: [],
+      budget: []
+    };
+
+    const newTripRecord = {
+      id: newTripId,
+      title: cleanTitle,
+      subtitle: 'New Multi-City Itinerary',
+      data: newPayload
+    };
+
+    updateCloudSyncStatusPill('⏳ Creating Cloud Trip...', 'syncing');
+    const ok = await window.uploadTripToGoogleDrive(newTripRecord);
+    if (ok) {
+      if (typeof window.loadImportedPayload === 'function') {
+        await window.loadImportedPayload(newPayload, `${cleanTitle}.json`);
+      }
+      if (typeof window.setActiveTripId === 'function') {
+        window.setActiveTripId(newTripId);
+      }
+      await window.syncAllTripsFromGoogleDrive();
+      if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+      if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
+      alert(`✅ Created and opened new Google Drive trip "${cleanTitle}"!`);
+    } else {
+      alert('Failed to create trip in Google Drive. Please check connection.');
+    }
   };
 
   // 60-Second Periodic Background Sync Loop

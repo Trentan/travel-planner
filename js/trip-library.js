@@ -202,6 +202,22 @@
         return;
       }
 
+      grid.innerHTML = `
+        <div class="col-span-full mb-2 flex flex-wrap items-center justify-between gap-2 p-3 bg-blue-50/80 dark:bg-blue-950/40 rounded-xl border border-blue-200/70 dark:border-blue-800/70">
+          <span class="text-xs font-semibold text-blue-900 dark:text-blue-200 flex items-center gap-1">
+            <span>☁️ Drive Folder: <strong>Google Drive / TrenscendsTravelPlanner</strong></span>
+            <span class="text-[11px] opacity-80">(${cloudFiles.length} files)</span>
+          </span>
+          <div class="flex items-center gap-2">
+            <button class="action-btn action-btn-primary text-xs py-1 px-3 flex items-center gap-1" onclick="window.createNewTripInGoogleDrive()">
+              <span>➕</span>
+              <span>New Cloud Trip</span>
+            </button>
+            <button class="action-btn action-btn-secondary text-xs py-1 px-2.5" onclick="window.syncAllTripsFromGoogleDrive()" title="Sync files with Google Drive">🔄 Sync</button>
+          </div>
+        </div>
+      `;
+
       cloudFiles.forEach(file => {
         const sizeKb = file.size ? `${(parseInt(file.size, 10) / 1024).toFixed(1)} KB` : 'JSON Document';
         const modTime = file.modifiedTime ? new Date(file.modifiedTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Synced';
