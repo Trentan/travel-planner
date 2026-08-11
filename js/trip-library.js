@@ -52,12 +52,13 @@
 
     if (recentListEl) {
       recentListEl.innerHTML = '';
-      if (!trips || trips.length === 0) {
-        recentListEl.innerHTML = '<div class="trip-dropdown-empty">No saved trips found</div>';
+      const cloudFiles = window.__gdriveCloudFiles || [];
+      if ((!trips || trips.length === 0) && (!cloudFiles || cloudFiles.length === 0)) {
+        recentListEl.innerHTML = '<div class="trip-dropdown-empty p-2 text-xs text-slate-400">No saved trips found</div>';
         return;
       }
 
-      trips.slice(0, 6).forEach(trip => {
+      trips.slice(0, 5).forEach(trip => {
         const isCurrent = trip.id === activeTripId;
         const tripTitle = trip.title || (trip.data && trip.data.meta && trip.data.meta.title) || 'Untitled Trip';
         const dateRange = trip.dateRange || 'Flex dates';
@@ -80,6 +81,32 @@
         };
         recentListEl.appendChild(item);
       });
+
+      // Render Google Drive Cloud Files Section in Dropdown
+      if (cloudFiles && cloudFiles.length > 0) {
+        const cloudHeader = document.createElement('div');
+        cloudHeader.className = 'px-3 py-1.5 text-[11px] font-bold text-blue-600 dark:text-blue-400 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between mt-1';
+        cloudHeader.innerHTML = `<span>☁️ Drive Cloud Files (${cloudFiles.length})</span>`;
+        recentListEl.appendChild(cloudHeader);
+
+        cloudFiles.slice(0, 4).forEach(file => {
+          const item = document.createElement('button');
+          item.className = 'trip-dropdown-item hover:bg-blue-50 dark:hover:bg-blue-950/40';
+          item.innerHTML = `
+            <span class="trip-item-icon">📄</span>
+            <div class="trip-item-info">
+              <div class="trip-item-title truncate text-xs">${escapeHtml(file.name)}</div>
+              <div class="trip-item-sub text-[10px]">Google Drive .json</div>
+            </div>
+            <span class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold shrink-0">📥 Load</span>
+          `;
+          item.onclick = async function() {
+            window.closeTripDropdown();
+            await window.loadTripFromGoogleDrive(file.id);
+          };
+          recentListEl.appendChild(item);
+        });
+      }
     }
   };
 
@@ -106,12 +133,105 @@
     }
   };
 
+  let currentTripLibraryTab = 'local';
+
+  window.switchTripLibraryTab = function(tabName) {
+    currentTripLibraryTab = tabName;
+    const tabLocal = document.getElementById('tripLibraryTabLocal');
+    const tabCloud = document.getElementById('tripLibraryTabCloud');
+
+    if (tabLocal) {
+      tabLocal.className = tabName === 'local'
+        ? 'pb-2 border-b-2 border-teal-600 text-teal-700 dark:text-teal-400 font-bold transition-all'
+        : 'pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all';
+    }
+    if (tabCloud) {
+      tabCloud.className = tabName === 'cloud'
+        ? 'pb-2 border-b-2 border-blue-600 text-blue-700 dark:text-blue-400 font-bold transition-all flex items-center gap-1.5'
+        : 'pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all flex items-center gap-1.5';
+    }
+
+    window.renderTripGalleryGrid();
+  };
+
   // Render Grid of Trip Cards in Library Modal
   window.renderTripGalleryGrid = async function() {
     const grid = document.getElementById('tripGalleryGrid');
     if (!grid) return;
 
-    grid.innerHTML = '<div class="trip-loading">Loading trips...</div>';
+    grid.innerHTML = '<div class="trip-loading p-4 text-center text-xs text-slate-500">Loading trips...</div>';
+
+    // Update cloud badge count if connected
+    const cloudFiles = window.__gdriveCloudFiles || [];
+    const badgeCount = document.getElementById('cloudFileBadgeCount');
+    if (badgeCount) {
+      if (cloudFiles.length > 0) {
+        badgeCount.innerText = String(cloudFiles.length);
+        badgeCount.style.display = 'inline-block';
+      } else {
+        badgeCount.style.display = 'none';
+      }
+    }
+
+    if (currentTripLibraryTab === 'cloud') {
+      grid.innerHTML = '';
+      if (!window.isGoogleDriveConnected || !window.isGoogleDriveConnected()) {
+        grid.innerHTML = `
+          <div class="col-span-full p-6 text-center bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700">
+            <div class="text-3xl mb-2">☁️</div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm mb-1">Google Drive Not Connected</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 max-w-sm mx-auto">Sign in with Google to automatically back up and view all your <code>.json</code> trip files from your <strong>Google Drive / TrenscendsTravelPlanner</strong> folder.</p>
+            <button class="action-btn action-btn-primary text-xs" onclick="window.closeTripLibraryModal(); window.openCloudSyncModal();">🔑 Connect Google Drive</button>
+          </div>
+        `;
+        return;
+      }
+
+      if (cloudFiles.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full p-6 text-center bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2">
+            <div class="text-3xl">📁</div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm">No Cloud Trips Found</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Click below to upload all your current trips or sync your Google Drive folder.</p>
+            <div class="flex justify-center gap-2 pt-1">
+              <button class="action-btn action-btn-secondary text-xs" onclick="window.syncAllTripsFromGoogleDrive()">🔄 Sync Drive Now</button>
+              <button class="action-btn action-btn-primary text-xs" onclick="window.uploadAllLocalTripsToDrive()">⬆️ Upload Local Trips</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      cloudFiles.forEach(file => {
+        const sizeKb = file.size ? `${(parseInt(file.size, 10) / 1024).toFixed(1)} KB` : 'JSON Document';
+        const modTime = file.modifiedTime ? new Date(file.modifiedTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Synced';
+
+        const card = document.createElement('div');
+        card.className = 'trip-gallery-card p-4 bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3';
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/70">☁️ Google Drive File</span>
+              <span class="text-[11px] text-slate-400">🕒 ${modTime}</span>
+            </div>
+            <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm truncate flex items-center gap-1.5">
+              <span>📄</span>
+              <span class="truncate">${escapeHtml(file.name)}</span>
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Size: ${sizeKb}</p>
+          </div>
+          <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+            <button class="action-btn action-btn-primary text-xs flex-1" onclick="window.loadTripFromGoogleDrive('${file.id}')">📥 Load & Open</button>
+            <a href="https://drive.google.com/file/d/${file.id}/view" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs" title="Open file in Google Drive">↗ Drive</a>
+            <button class="action-btn action-btn-danger text-xs px-2.5" onclick="window.deleteTripFromGoogleDrive('${file.id}', '${escapeHtml(file.name)}')" title="Delete file from Google Drive">🗑️</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      return;
+    }
+
+    // Local Trips rendering
     const trips = await window.getAllTripsFromIndexedDB();
     const activeTripId = window.getActiveTripId ? window.getActiveTripId() : 'trip_default';
 

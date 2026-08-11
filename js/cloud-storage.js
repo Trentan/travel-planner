@@ -416,6 +416,7 @@
 
       const data = await listResp.json();
       const files = data.files || [];
+      window.__gdriveCloudFiles = files;
       const fileMap = getGDriveFileMap();
 
       // Fetch local trips to perform non-destructive 3-way conflict reconciliation
