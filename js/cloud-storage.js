@@ -8,7 +8,8 @@
 (function() {
   'use strict';
 
-  const DEFAULT_CLIENT_ID = '253620621116-u76e3v3e2qv6ffq9b58re4l4bbqs1e3g.apps.googleusercontent.com';
+  const PROD_CLIENT_ID = '253620621116-u76e3v3e2qv6ffq9b58re4l4bbqs1e3g.apps.googleusercontent.com';
+  const LOCAL_CLIENT_ID = '253620621116-cq4mtef5e2nvt0kc7pbcs4t1rdblg7q5.apps.googleusercontent.com';
   const DRIVE_FOLDER_NAME = 'TrenscendsTravelPlanner';
   const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 
@@ -47,9 +48,16 @@
     }
   }
 
-  // Helper to get active Client ID
+  // Helper to get active Client ID (auto-detects local vs production Client IDs)
   function getGoogleClientId() {
-    return localStorage.getItem('travelApp_gdrive_client_id') || DEFAULT_CLIENT_ID;
+    const custom = localStorage.getItem('travelApp_gdrive_client_id');
+    if (custom) return custom;
+
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return LOCAL_CLIENT_ID;
+    }
+    return PROD_CLIENT_ID;
   }
   window.getGoogleClientId = getGoogleClientId;
 
