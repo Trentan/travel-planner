@@ -35,9 +35,15 @@ async function runLiveVerification() {
   const isRealMode = args.includes('--real');
 
   if (args.includes('--local')) {
-    serverInstance = await startStaticServer(path.resolve(__dirname, '..'), 0);
-    targetUrl = `${serverInstance.baseUrl}/index.html`;
-    console.log(`[Setup] Started local test server at ${targetUrl}`);
+    const fixedPort = 3000;
+    try {
+      serverInstance = await startStaticServer(path.resolve(__dirname, '..'), fixedPort);
+      targetUrl = `http://localhost:${fixedPort}/index.html`;
+    } catch (e) {
+      // Port 3000 is already active (e.g. running via npm start), reuse existing server
+      targetUrl = `http://localhost:${fixedPort}/index.html`;
+    }
+    console.log(`[Setup] Target local test server at ${targetUrl}`);
   } else {
     const urlIdx = args.indexOf('--url');
     if (urlIdx !== -1 && args[urlIdx + 1]) {
