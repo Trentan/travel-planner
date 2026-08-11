@@ -113,8 +113,8 @@ async function runLiveVerification() {
     // -------------------------------------------------------------------------
     console.log('📌 1. Initializing Desktop Environment (1440 x 900)...');
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(targetUrl + (targetUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now(), { waitUntil: 'load' });
-    await page.waitForFunction(() => typeof window.openCloudSyncModal === 'function' && typeof window.isGoogleDriveConnected === 'function', { timeout: 30000 });
+    await page.goto(targetUrl + (targetUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now(), { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => typeof window.openCloudSyncModal === 'function', { timeout: 10000 });
 
     // Hide onboarding modals if present
     await page.evaluate(() => {
