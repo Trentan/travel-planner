@@ -53,12 +53,13 @@ async function showTestHUD(page, stepNum, totalSteps, title, description) {
       hud.style.maxWidth = '90vw';
       hud.style.minWidth = '480px';
       hud.style.backdropFilter = 'blur(12px)';
+      hud.style.pointerEvents = 'none';
       hud.style.transition = 'all 0.3s ease';
       document.body.appendChild(hud);
     }
     hud.innerHTML = `
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-        <div style="flex: 1; min-width: 0;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; pointer-events: none;">
+        <div style="flex: 1; min-width: 0; pointer-events: none;">
           <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #60a5fa; margin-bottom: 2px;">
             🧪 Interactive Verification • Step ${num} of ${total}
           </div>
@@ -69,7 +70,7 @@ async function showTestHUD(page, stepNum, totalSteps, title, description) {
             ${d}
           </div>
         </div>
-        <button id="testHUDNextBtn" style="background: #2563eb; hover: #1d4ed8; color: white; border: none; padding: 9px 18px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; shrink: 0; box-shadow: 0 2px 6px rgba(37,99,235,0.4); transition: all 0.15s ease;">
+        <button id="testHUDNextBtn" style="background: #2563eb; color: white; border: none; padding: 9px 18px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; shrink: 0; box-shadow: 0 2px 6px rgba(37,99,235,0.4); pointer-events: auto; transition: all 0.15s ease;">
           ▶ Next Step
         </button>
       </div>

@@ -589,6 +589,8 @@
       Object.keys(map).forEach(key => { if (map[key] === fileId) delete map[key]; });
       setGDriveFileMap(map);
       await window.syncAllTripsFromGoogleDrive();
+      if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+      if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
       return true;
     }
 
@@ -604,6 +606,8 @@
         Object.keys(map).forEach(key => { if (map[key] === fileId) delete map[key]; });
         setGDriveFileMap(map);
         await window.syncAllTripsFromGoogleDrive();
+        if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+        if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
         updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
         return true;
       }
@@ -624,7 +628,9 @@
 
       if ((accessToken && accessToken.startsWith('token_')) || window.__mockGoogleDriveAPI) {
         const trips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
-        tripRecord = trips[0] || null;
+        const fileMap = getGDriveFileMap();
+        const mappedTripId = Object.keys(fileMap).find(k => fileMap[k] === fileId);
+        tripRecord = trips.find(t => t.id === fileId || t.id === mappedTripId) || trips.find(t => t.id === fileId.replace(/^gdrive_file_/, '')) || trips[0] || null;
       } else {
         const downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
         const contentResp = await fetch(downloadUrl, {
