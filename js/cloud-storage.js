@@ -644,12 +644,21 @@
       if (tripRecord) {
         const payload = tripRecord.data || tripRecord;
         const title = (payload.meta && payload.meta.title) || tripRecord.title || 'Cloud Trip';
+        const cloudTripId = tripRecord.id || (payload.meta && payload.meta.id) || `trip_cloud_${fileId}`;
 
+        // Ensure cloud file map registers the association between cloudTripId and Google Drive fileId
+        const fileMap = getGDriveFileMap();
+        fileMap[cloudTripId] = fileId;
+        setGDriveFileMap(fileMap);
+
+        if (typeof window.setActiveTripId === 'function') {
+          window.setActiveTripId(cloudTripId);
+        }
         if (typeof window.loadImportedPayload === 'function') {
           await window.loadImportedPayload(payload, `${title}.json`);
         }
         if (typeof window.setActiveTripId === 'function') {
-          window.setActiveTripId(tripRecord.id || `trip_cloud_${fileId}`);
+          window.setActiveTripId(cloudTripId);
         }
         if (typeof window.saveActiveTripToStore === 'function') {
           await window.saveActiveTripToStore();
@@ -885,13 +894,21 @@
 
     pills.forEach(pill => {
       if (statusText) {
-        pill.innerText = statusText;
+        let compactLabel = statusText;
+        if (statusText.includes('Synced') || statusText.includes('Loaded')) compactLabel = '☁️ Synced';
+        else if (statusText.includes('Syncing') || statusText.includes('Creating') || statusText.includes('Loading') || statusText.includes('Deleting')) compactLabel = '⏳ Syncing...';
+        else if (statusText.includes('Local')) compactLabel = '⚡ Local';
+        else if (statusText.includes('Failed') || statusText.includes('Required')) compactLabel = '⚠️ Sync Alert';
+
+        pill.innerText = compactLabel;
+        pill.title = statusText;
       } else {
-        const profile = getUserProfile();
         if (isGoogleDriveConnected()) {
-          pill.innerText = profile && profile.name ? `☁️ ${profile.name}` : `☁️ Drive / ${DRIVE_FOLDER_NAME}`;
+          pill.innerText = '☁️ Synced';
+          pill.title = `Google Drive / ${DRIVE_FOLDER_NAME} (Connected)`;
         } else {
-          pill.innerText = '⚡ Local Only';
+          pill.innerText = '⚡ Local';
+          pill.title = 'Saved locally on this device';
         }
       }
 
