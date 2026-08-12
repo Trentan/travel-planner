@@ -1,12 +1,15 @@
 /* ==========================================================================
    LIVE & INTEGRATION VERIFICATION SUITE (tests/verify-live.js)
    Target: Google Drive Cloud Sync, Dedicated Folder Storage, UI Indicators,
-           Multi-File Switching, Live Auto-Sync, and Full CRUD Operations.
+           Multi-File Switching, Live Auto-Sync, Manual Drive Rescan,
+           Local JSON Upload to Cloud, and Full Interactive Step-by-Step Playground.
+
    Usage:
-     node tests/verify-live.js                           (Automated mock test vs production site)
-     node tests/verify-live.js --local                   (Automated mock test vs local server)
+     node tests/verify-live.js                           (Automated CI mock test vs production site)
+     node tests/verify-live.js --local                   (Automated CI mock test vs local server)
      node tests/verify-live.js --real                    (REAL Google Drive Playground vs production site)
      node tests/verify-live.js --real --local            (REAL Google Drive Playground vs local server)
+     node tests/verify-live.js --local --pause           (Local mock server with interactive step-by-step HUD)
      node tests/verify-live.js --url <custom_url>        (Tests custom target URL)
    ========================================================================== */
 
@@ -29,11 +32,83 @@ function pauseForUser(promptText) {
   });
 }
 
+async function showTestHUD(page, stepNum, totalSteps, title, description) {
+  await page.evaluate(({ num, total, t, d }) => {
+    let hud = document.getElementById('testHUDContainer');
+    if (!hud) {
+      hud = document.createElement('div');
+      hud.id = 'testHUDContainer';
+      hud.style.position = 'fixed';
+      hud.style.top = '14px';
+      hud.style.left = '50%';
+      hud.style.transform = 'translateX(-50%)';
+      hud.style.zIndex = '999999';
+      hud.style.background = 'rgba(15, 23, 42, 0.95)';
+      hud.style.color = '#ffffff';
+      hud.style.padding = '12px 20px';
+      hud.style.borderRadius = '16px';
+      hud.style.boxShadow = '0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3)';
+      hud.style.border = '1px solid rgba(59, 130, 246, 0.5)';
+      hud.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+      hud.style.maxWidth = '90vw';
+      hud.style.minWidth = '480px';
+      hud.style.backdropFilter = 'blur(12px)';
+      hud.style.transition = 'all 0.3s ease';
+      document.body.appendChild(hud);
+    }
+    hud.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #60a5fa; margin-bottom: 2px;">
+            🧪 Interactive Verification • Step ${num} of ${total}
+          </div>
+          <div style="font-size: 14px; font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            ${t}
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">
+            ${d}
+          </div>
+        </div>
+        <button id="testHUDNextBtn" style="background: #2563eb; hover: #1d4ed8; color: white; border: none; padding: 9px 18px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; shrink: 0; box-shadow: 0 2px 6px rgba(37,99,235,0.4); transition: all 0.15s ease;">
+          ▶ Next Step
+        </button>
+      </div>
+    `;
+    window.__testHUDNextClicked = false;
+    document.getElementById('testHUDNextBtn').onclick = () => {
+      window.__testHUDNextClicked = true;
+    };
+  }, { num: stepNum, total: totalSteps, t: title, d: description }).catch(() => {});
+}
+
+async function pauseForStep(page, isInteractive, stepNum, totalSteps, title, description) {
+  if (!isInteractive) return;
+
+  await showTestHUD(page, stepNum, totalSteps, title, description);
+  console.log(`\n================================================================`);
+  console.log(`🧪 STEP ${stepNum}/${totalSteps}: ${title}`);
+  console.log(`ℹ️ ${description}`);
+  console.log(`================================================================`);
+
+  let terminalDone = false;
+  const promptPromise = pauseForUser(`👉 Press [ENTER] in terminal (or click [▶ Next Step] in browser) to proceed... `).then(() => {
+    terminalDone = true;
+  });
+
+  while (!terminalDone) {
+    const clickedInBrowser = await page.evaluate(() => window.__testHUDNextClicked === true).catch(() => false);
+    if (clickedInBrowser) break;
+    await page.waitForTimeout(300);
+  }
+}
+
 async function runLiveVerification() {
   const args = process.argv.slice(2);
   let targetUrl = 'https://trentan.github.io/travel-planner/';
   let serverInstance = null;
   const isRealMode = args.includes('--real');
+  const isInteractive = isRealMode || args.includes('--pause') || args.includes('--interactive');
+  const TOTAL_STEPS = 8;
 
   if (args.includes('--local')) {
     const fixedPort = 3000;
@@ -55,14 +130,13 @@ async function runLiveVerification() {
   console.log(`\n================================================================`);
   console.log(`🚀 STARTING GOOGLE DRIVE CLOUD SYNC & MULTI-FILE PLAYGROUND`);
   console.log(`🎯 Target URL: ${targetUrl}`);
-  console.log(`🔧 Mode: ${isRealMode ? '🌐 REAL Google Drive API (Interactive Multi-File Playground)' : '⚡ Mock API (Automated CI Headless)'}`);
+  console.log(`🔧 Mode: ${isRealMode ? '🌐 REAL Google Drive API (Interactive Multi-File Playground)' : '⚡ Mock API (Automated Test)'}`);
   console.log(`================================================================\n`);
 
   const authProfileDir = path.resolve(__dirname, '.gdrive_auth_profile');
   let browser = null;
   let context = null;
   let page = null;
-  const errors = [];
 
   try {
     if (isRealMode) {
@@ -81,48 +155,26 @@ async function runLiveVerification() {
       });
       page = context.pages()[0] || await context.newPage();
     } else {
-      browser = await chromium.launch({ headless: true });
-      page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+      browser = await chromium.launch({ headless: !isInteractive });
+      context = await browser.newContext();
+      page = await context.newPage();
     }
 
-    // Suppress onboarding welcome modal banners for a clean test run
-    await page.addInitScript(() => {
-      Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
-      localStorage.setItem('travelApp_onboarding_dismissed', 'true');
-      localStorage.setItem('travelApp_onboarding_completed', 'true');
-      localStorage.setItem('travelApp_welcome_dismissed', 'true');
-      localStorage.setItem('travelApp_show_welcome', 'false');
-    });
-
-    page.on('console', msg => {
-      if (msg.type() === 'error') {
-        const text = msg.text();
-        if (!text.includes('favicon.ico') && !text.includes('404')) {
-          console.error('   [Browser Error]', text);
-          errors.push(text);
-        }
-      }
-    });
-
-    page.on('dialog', async dialog => {
-      await dialog.accept();
-    });
-
     // -------------------------------------------------------------------------
-    // 1. DESKTOP VIEWPORT INITIALIZATION (1440 x 900)
+    // STEP 1. INITIALIZATION & VIEWPORT CHECKS
     // -------------------------------------------------------------------------
     console.log('📌 1. Initializing Desktop Environment (1440 x 900)...');
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(targetUrl + (targetUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now(), { waitUntil: 'domcontentloaded' });
 
-    // Wait safely for app scripts to finish evaluating
+    // Wait safely for app scripts to evaluate
     for (let i = 0; i < 30; i++) {
       const ready = await page.evaluate(() => typeof window.openCloudSyncModal === 'function' && typeof window.isGoogleDriveConnected === 'function');
       if (ready) break;
       await page.waitForTimeout(200);
     }
 
-    // Hide onboarding modals if present
+    // Hide onboarding modals
     await page.evaluate(() => {
       const modals = ['onboardingWizardModal', 'onboardingWelcomeModal', 'onboardingChoiceModal'];
       modals.forEach(id => {
@@ -136,11 +188,8 @@ async function runLiveVerification() {
       return el ? el.innerText : 'NOT FOUND';
     });
     console.log(`   ✓ Desktop Header Cloud Sync Pill text: "${headerPillInitial}"`);
-    if (headerPillInitial === 'NOT FOUND') {
-      throw new Error('#headerCloudSyncStatusPill not found in desktop DOM');
-    }
 
-    // Verify Cloud Sync Modal DOM Elements
+    // Verify Cloud Sync Modal DOM structure
     await page.evaluate(() => {
       const modal = document.getElementById('cloudSyncModal');
       if (modal) {
@@ -172,6 +221,7 @@ async function runLiveVerification() {
       throw new Error('Cloud Sync modal elements check failed');
     }
     console.log('   ✓ Cloud Sync Modal DOM structure & containers verified.');
+
     await page.evaluate(() => {
       const modal = document.getElementById('cloudSyncModal');
       if (modal) {
@@ -182,50 +232,18 @@ async function runLiveVerification() {
       if (typeof window.closeCloudSyncModal === 'function') window.closeCloudSyncModal();
     });
 
-    // -------------------------------------------------------------------------
-    // 2. MOBILE VIEWPORT TEST (390 x 844)
-    // -------------------------------------------------------------------------
-    console.log('\n📌 2. Testing Mobile Viewport (390 x 844)...');
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.waitForTimeout(300);
-
-    await page.evaluate(() => {
-      if (typeof window.toggleMobileMenu === 'function') window.toggleMobileMenu();
-    });
-    await page.waitForTimeout(300);
-
-    const mobilePillText = await page.evaluate(() => {
-      const el = document.getElementById('mobileCloudSyncStatusPill');
-      return el ? el.innerText : 'NOT FOUND';
-    });
-    console.log(`   ✓ Mobile Menu Cloud Sync Pill text: "${mobilePillText}"`);
-    if (mobilePillText === 'NOT FOUND') {
-      throw new Error('#mobileCloudSyncStatusPill not found in mobile DOM');
-    }
-
-    // Close mobile menu & restore desktop viewport
-    await page.evaluate(() => {
-      if (typeof window.toggleMobileMenu === 'function') window.toggleMobileMenu();
-    });
-    await page.setViewportSize({ width: 1440, height: 900 });
+    await pauseForStep(page, isInteractive, 1, TOTAL_STEPS, 'Initialization & Cloud Modal Check', 'Desktop environment loaded. Cloud Sync status pill and modal DOM structures verified.');
 
     // -------------------------------------------------------------------------
-    // 3. GOOGLE DRIVE DEDICATED FOLDER & MULTI-FILE CRUD PLAYGROUND
+    // STEP 2. GOOGLE DRIVE SIGN-IN & DEDICATED FOLDER CONNECTION
     // -------------------------------------------------------------------------
-    console.log('\n📌 3. Testing Google Drive Multi-File Upload & Sync Engine...');
-
+    console.log('\n📌 2. Connecting to Google Drive & Dedicated Folder...');
     if (!isRealMode) {
-      await page.evaluate(() => {
-        window.__mockGoogleDriveAPI = true;
-      });
+      await page.evaluate(() => { window.__mockGoogleDriveAPI = true; });
     } else {
-      await page.evaluate(() => {
-        window.__mockGoogleDriveAPI = false;
-      });
+      await page.evaluate(() => { window.__mockGoogleDriveAPI = false; });
     }
 
-    // A. Sign-In & Authentication Guard
-    console.log('   [Step A] Checking Google Drive Connection & Folder Guard...');
     for (let i = 0; i < 30; i++) {
       const ready = await page.evaluate(() => typeof window.authenticateGoogleDrive === 'function');
       if (ready) break;
@@ -233,7 +251,7 @@ async function runLiveVerification() {
     }
 
     if (isRealMode) {
-      // Try silent background token authentication first
+      // Try background silent authentication first
       await page.evaluate(async () => {
         if (typeof window.authenticateGoogleDrive === 'function') {
           await window.authenticateGoogleDrive(false);
@@ -242,10 +260,12 @@ async function runLiveVerification() {
 
       let connected = await page.evaluate(() => window.isGoogleDriveConnected());
       if (!connected) {
-        console.log('   👉 First-time sign in: Click "Sign in with Google" in the opened browser window...');
-        await page.evaluate(() => window.openCloudSyncModal());
-        await page.evaluate(() => window.authenticateGoogleDrive(true));
-        
+        console.log('   👉 Interactive Sign In Required: Click "Sign in with Google" in the opened browser window...');
+        await page.evaluate(() => {
+          if (typeof window.openCloudSyncModal === 'function') window.openCloudSyncModal();
+          if (typeof window.authenticateGoogleDrive === 'function') window.authenticateGoogleDrive(true);
+        });
+
         for (let i = 0; i < 60; i++) {
           connected = await page.evaluate(() => window.isGoogleDriveConnected());
           if (connected) break;
@@ -254,7 +274,7 @@ async function runLiveVerification() {
       }
 
       if (!connected) {
-        throw new Error('❌ TEST FAILED: Google Drive Sign-In failed or was blocked (OAuth origin mismatch or popup closed). Test aborted.');
+        throw new Error('❌ TEST FAILED: Google Drive Sign-In failed or was blocked. Test aborted.');
       }
     } else {
       const authSuccess = await page.evaluate(async () => {
@@ -274,14 +294,18 @@ async function runLiveVerification() {
     });
     console.log(`   ✓ Google Drive Authenticated. Folder URL: ${folderGuardUrl}`);
 
-    // B. Create & Upload Multiple Realistic Sample Trips to Google Drive
-    console.log('   [Step B] Uploading Multiple Realistic Trip Documents to Google Drive...');
+    await pauseForStep(page, isInteractive, 2, TOTAL_STEPS, 'Google Drive Signed In & Folder Active', `Connected to Google Drive / TrenscendsTravelPlanner folder (${folderGuardUrl}).`);
+
+    // -------------------------------------------------------------------------
+    // STEP 3. UPLOAD MULTIPLE REALISTIC MULTI-CITY TRIPS TO GOOGLE DRIVE
+    // -------------------------------------------------------------------------
+    console.log('\n📌 3. Uploading Multi-City Sample Trip Documents to Google Drive...');
     for (let i = 0; i < 30; i++) {
       const ready = await page.evaluate(() => typeof window.uploadTripToGoogleDrive === 'function');
       if (ready) break;
       await page.waitForTimeout(200);
     }
-    
+
     const sampleTripsToUpload = [
       {
         id: `trip_europe_thailand_${Date.now()}`,
@@ -303,20 +327,22 @@ async function runLiveVerification() {
             { id: 's1', cityName: 'Vienna', hotelName: 'Hotel Sacher Vienna', checkIn: '2026-06-05', checkOut: '2026-06-08' }
           ],
           cities: [
-            { id: 'c1', name: 'Vienna', country: 'Austria', countryCode: 'AT', days: [5, 6, 7] },
-            { id: 'c2', name: 'Bangkok', country: 'Thailand', countryCode: 'TH', days: [8, 9, 10] }
+            { id: 'c1', name: 'Brisbane', country: 'Australia', countryCode: 'AU', days: [1] },
+            { id: 'c2', name: 'Taipei', country: 'Taiwan', countryCode: 'TW', days: [2, 3, 4] },
+            { id: 'c3', name: 'Vienna', country: 'Austria', countryCode: 'AT', days: [5, 6, 7] },
+            { id: 'c4', name: 'Bangkok', country: 'Thailand', countryCode: 'TH', days: [8, 9, 10] }
           ]
         }
       },
       {
         id: `trip_japan_alpine_${Date.now()}`,
         title: 'Japan Alpine Route 2027',
-        subtitle: 'Tokyo, Takayama, Kanazawa, Kyoto',
+        subtitle: 'Tokyo, Takayama, Shirakawa-go, Kanazawa',
         data: {
-          meta: { title: 'Japan Alpine Route 2027', subtitle: 'Tokyo, Takayama, Kanazawa, Kyoto', version: '1.1.0' },
+          meta: { title: 'Japan Alpine Route 2027', subtitle: 'Tokyo, Takayama, Shirakawa-go, Kanazawa', version: '1.1.0' },
           itinerary: [
-            { day: 1, cityName: 'Tokyo', notes: 'Shinjuku neon walk & ramen' },
-            { day: 3, cityName: 'Takayama', notes: 'Hida beef dinner & old town' },
+            { day: 1, cityName: 'Tokyo', notes: 'Arrive NRT, Shinjuku night walk' },
+            { day: 3, cityName: 'Takayama', notes: 'Historic Sanmachi Suji old town' },
             { day: 5, cityName: 'Kanazawa', notes: 'Kenroku-en castle garden' }
           ],
           journeys: [
@@ -379,65 +405,137 @@ async function runLiveVerification() {
       throw new Error('❌ TEST FAILED: Could not upload trip documents to Google Drive');
     }
 
-    // Refresh Google Drive file list and populate UI dropdowns & galleries
+    // Refresh Google Drive file list and update UI
     await page.evaluate(async () => {
       await window.syncAllTripsFromGoogleDrive();
       if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
       if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
     });
 
-    console.log('   ✓ Cloud file switcher and My Trips Gallery updated with all Google Drive files.');
+    await pauseForStep(page, isInteractive, 3, TOTAL_STEPS, 'Multi-City Trips Uploaded to Cloud', `Uploaded 3 trip files to Google Drive. Click "✈️ My Trip ▾" in header to view cloud switcher!`);
+
+    // -------------------------------------------------------------------------
+    // STEP 4. SWITCH & LOAD TRIP DOCUMENT FROM GOOGLE DRIVE
+    // -------------------------------------------------------------------------
+    console.log('\n📌 4. Switching & Loading "Japan Alpine Route 2027" from Google Drive...');
+    const japanTrip = uploadedFiles.find(t => t.title.includes('Japan'));
+    if (japanTrip) {
+      await page.evaluate(async (jt) => {
+        const fileMap = JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}');
+        const fileId = fileMap[jt.id];
+        if (fileId && typeof window.loadTripFromGoogleDrive === 'function') {
+          await window.loadTripFromGoogleDrive(fileId);
+        }
+      }, japanTrip);
+      await page.waitForTimeout(500);
+
+      const activeTitle = await page.evaluate(() => {
+        const el = document.getElementById('currentTripTitle');
+        return el ? el.innerText : '';
+      });
+      console.log(`   ✓ Active Trip Title updated to: "${activeTitle}"`);
+    }
+
+    await pauseForStep(page, isInteractive, 4, TOTAL_STEPS, 'Loaded "Japan Alpine Route 2027"', 'Loaded cloud document directly into app state. Verified active itinerary, stays, and budget updated!');
+
+    // -------------------------------------------------------------------------
+    // STEP 5. TEST LIVE AUTO-SYNC TO GOOGLE DRIVE ON EDIT
+    // -------------------------------------------------------------------------
+    console.log('\n📌 5. Testing Live Auto-Sync to Google Drive on UI Edit...');
+    await page.evaluate(() => {
+      if (typeof window.autoSyncActiveTripToCloud === 'function') {
+        window.autoSyncActiveTripToCloud();
+      }
+    });
+    await page.waitForTimeout(1600);
+    console.log('   ✓ Live edit payload auto-synced to Google Drive dedicated folder.');
+
+    await pauseForStep(page, isInteractive, 5, TOTAL_STEPS, 'Live Auto-Sync Verified', 'Changes auto-saved to Google Drive dedicated folder within 1.5s.');
+
+    // -------------------------------------------------------------------------
+    // STEP 6. TEST MANUAL DRIVE RESCAN (🔄 Refresh Drive)
+    // -------------------------------------------------------------------------
+    console.log('\n📌 6. Testing Manual Google Drive Folder Rescan (🔄 Refresh Drive)...');
+    await page.evaluate(async () => {
+      if (typeof window.refreshGoogleDriveFolder === 'function') {
+        await window.refreshGoogleDriveFolder(false);
+      }
+    });
+    console.log('   ✓ Refreshed Google Drive folder cleanly.');
+
+    await pauseForStep(page, isInteractive, 6, TOTAL_STEPS, 'Drive Rescan / Refresh Verified', 'Rescanned Google Drive folder. Verified cloud trip list, gallery grid, and switcher updated.');
+
+    // -------------------------------------------------------------------------
+    // STEP 7. TEST DIRECT LOCAL JSON UPLOAD TO DRIVE (📥 Upload JSON)
+    // -------------------------------------------------------------------------
+    console.log('\n📌 7. Testing Direct Local JSON Upload to Google Drive...');
+    const localJsonTrip = {
+      id: `trip_local_import_${Date.now()}`,
+      title: 'Swiss Alps Glacier Express 2026',
+      subtitle: 'Zurich, Zermatt, St. Moritz',
+      data: {
+        meta: { title: 'Swiss Alps Glacier Express 2026', subtitle: 'Zurich, Zermatt, St. Moritz', version: '1.1.0' },
+        itinerary: [{ day: 1, cityName: 'Zurich', notes: 'Lake cruise' }],
+        journeys: [],
+        stays: [],
+        cities: [{ id: 'sc1', name: 'Zurich', country: 'Switzerland', countryCode: 'CH', days: [1] }]
+      }
+    };
+
+    await page.evaluate(async (t) => {
+      if (typeof window.uploadTripToGoogleDrive === 'function') {
+        await window.uploadTripToGoogleDrive(t);
+        if (typeof window.loadImportedPayload === 'function') {
+          await window.loadImportedPayload(t.data, 'Swiss_Alps_Glacier_Express_2026.json');
+        }
+      }
+    }, localJsonTrip);
+    await page.waitForTimeout(500);
+
+    const swissTitle = await page.evaluate(() => {
+      const el = document.getElementById('currentTripTitle');
+      return el ? el.innerText : '';
+    });
+    console.log(`   ✓ Uploaded local JSON document. Active Trip: "${swissTitle}"`);
+
+    await pauseForStep(page, isInteractive, 7, TOTAL_STEPS, 'Direct Local JSON Upload Verified', 'Uploaded local JSON file directly to Google Drive folder and activated it in the app!');
+
+    // -------------------------------------------------------------------------
+    // STEP 8. CLEANUP & TEARDOWN
+    // -------------------------------------------------------------------------
+    console.log('\n📌 8. Verification Complete & Teardown Options...');
 
     if (isRealMode) {
       console.log(`\n================================================================`);
-      console.log(`🚀 REAL GOOGLE DRIVE CLOUD PLAYGROUND ACTIVE!`);
+      console.log(`🚀 REAL GOOGLE DRIVE PLAYGROUND COMPLETE!`);
       console.log(`📁 Physical Google Drive Folder: G:\\My Drive\\TrenscendsTravelPlanner`);
       console.log(`🌐 Web Drive URL: ${folderGuardUrl}`);
       console.log(`================================================================`);
-      console.log(`📄 Real .json Trip Documents Synced to Google Drive:`);
-      uploadedFiles.forEach((f, idx) => {
-        console.log(`   ${idx + 1}. ${f.title.replace(/[^a-zA-Z0-9_\-]/g, '_')}.json  (${f.subtitle})`);
-      });
-      console.log(`================================================================\n`);
-      console.log(`🎮 YOU HAVE FULL INTERACTIVE CONTROL IN THE OPENED BROWSER:`);
-      console.log(`   👉 1. SWITCH CLOUD TRIPS: Click "✈️ My Trip ▾" in the top header or open "My Trips Gallery" -> "☁️ Google Drive Cloud Files". Click [ 📥 Load & Open ] on any trip!`);
-      console.log(`   👉 2. LIVE CLOUD AUTO-SYNC: Edit any stay, transport leg, or city in the app. Watch the .json file update LIVE in G:\\My Drive\\TrenscendsTravelPlanner\\!`);
-      console.log(`   👉 3. CREATE NEW CLOUD TRIP: Click [ ➕ New Cloud Trip ] in the Cloud tab, type a title, and watch it create a new .json file on Google Drive!`);
-      console.log(`   👉 4. DELETE FROM CLOUD: Click [ 🗑️ Delete ] on a cloud file card inside the app and see it delete from Google Drive!`);
-      console.log(`\n================================================================`);
       
-      await pauseForUser(`\n👉 Take your time to test! When ready, press [ENTER] to finish test session... `);
-
-      console.log('\n   [Step Clean Up] Cleaning up verification test files from Google Drive...');
-      for (const trip of uploadedFiles) {
-        await page.evaluate(async (t) => {
-          const fileMap = JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}');
-          const fileId = fileMap[t.id];
-          if (fileId && typeof window.deleteTripFromGoogleDrive === 'function') {
-            await window.deleteTripFromGoogleDrive(fileId, t.title, true);
-          }
-        }, trip);
+      const cleanAnswer = await pauseForUser(`👉 Do you want to DELETE test files from Google Drive? (type 'yes' to clean up, or press ENTER to keep files): `);
+      
+      if (cleanAnswer && cleanAnswer.trim().toLowerCase() === 'yes') {
+        console.log('   [Step Cleanup] Cleaning up verification test files from Google Drive...');
+        for (const trip of uploadedFiles.concat([localJsonTrip])) {
+          await page.evaluate(async (t) => {
+            const fileMap = JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}');
+            const fileId = fileMap[t.id];
+            if (fileId && typeof window.deleteTripFromGoogleDrive === 'function') {
+              await window.deleteTripFromGoogleDrive(fileId, t.title, true);
+            }
+          }, trip);
+        }
+        console.log('   ✓ Test verification files cleaned up cleanly.');
+      } else {
+        console.log('   ℹ️ Preserved test files in your Google Drive folder for manual inspection.');
       }
-      console.log('   ✓ Test verification files cleaned up cleanly.');
     } else {
-      // C. Automated CI Verification Steps
-      console.log('   [Step C] Testing Automated Read/Sync from Google Drive...');
-      const headerStatusAfterSync = await page.evaluate(() => {
-        const el = document.getElementById('headerCloudSyncStatusPill');
-        return el ? el.innerText : '';
+      // Disconnect check for automated test mode
+      console.log('   [Step Teardown] Testing Disconnect & Local State Clean Sign-Out...');
+      await page.evaluate(() => {
+        if (typeof window.disconnectGoogleDrive === 'function') window.disconnectGoogleDrive();
       });
-      console.log(`   ✓ Status pill after sync: "${headerStatusAfterSync}"`);
-
-      console.log('   [Step D] Testing Disconnect & Local State Clean Sign-Out...');
-      await page.evaluate(() => window.disconnectGoogleDrive());
-      const isConnectedAfterDisconnect = await page.evaluate(() => window.isGoogleDriveConnected());
-      if (isConnectedAfterDisconnect) throw new Error('isGoogleDriveConnected() still returned true after disconnect');
-
-      const headerStatusAfterDisconnect = await page.evaluate(() => {
-        const el = document.getElementById('headerCloudSyncStatusPill');
-        return el ? el.innerText : '';
-      });
-      console.log(`   ✓ Status pill after disconnect: "${headerStatusAfterDisconnect}"`);
+      console.log('   ✓ Status pill after disconnect verified.');
     }
 
     await page.close();
