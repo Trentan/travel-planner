@@ -522,14 +522,24 @@
   };
 
   // Sync All Trips from Google Drive / TrenscendsTravelPlanner into local IndexedDB
+  // Sync All Trips from Google Drive / TrenscendsTravelPlanner into local IndexedDB
   window.syncAllTripsFromGoogleDrive = async function() {
-    if (!isGoogleDriveConnected()) return;
+    if (!isGoogleDriveConnected()) return [];
     await ensureValidAccessToken();
 
     if ((accessToken && accessToken.startsWith('token_')) || window.__mockGoogleDriveAPI) {
       console.log(`[GoogleDrive Sync] Simulated fetch of all trips from Google Drive / ${DRIVE_FOLDER_NAME}`);
+      const localTrips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
+      window.__gdriveCloudFiles = localTrips.map(t => ({
+        id: t.id || ('gdrive_file_' + Math.random().toString(36).substr(2, 6)),
+        name: formatHumanFilename(t),
+        modifiedTime: t.updatedAt || t.lastSaved || new Date().toISOString(),
+        size: JSON.stringify(t).length
+      }));
       updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
-      return;
+      if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+      if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
+      return window.__gdriveCloudFiles;
     }
 
     try {
@@ -541,7 +551,7 @@
         headers: { 'Authorization': `Bearer ${accessToken}` }
       });
 
-      if (!listResp.ok) return;
+      if (!listResp.ok) return [];
 
       const data = await listResp.json();
       const files = data.files || [];
@@ -562,8 +572,20 @@
         if (!contentResp.ok) continue;
 
         try {
-          const remoteTrip = await contentResp.json();
-          if (remoteTrip && remoteTrip.id && remoteTrip.data) {
+          const rawContent = await contentResp.json();
+          if (rawContent) {
+            const tripData = rawContent.data || rawContent;
+            const tripMeta = tripData.meta || rawContent.meta || {};
+            const tripTitle = (rawContent.data ? rawContent.title : tripMeta.title) || file.name.replace(/\.json$/i, '');
+            const tripId = rawContent.id || tripMeta.id || ('trip_cloud_' + file.id);
+
+            const remoteTrip = {
+              id: tripId,
+              title: tripTitle,
+              subtitle: rawContent.subtitle || tripMeta.subtitle || '',
+              data: tripData
+            };
+
             fileMap[remoteTrip.id] = file.id;
 
             const localTrip = localTrips.find(t => t.id === remoteTrip.id);
@@ -582,17 +604,7 @@
               }
             } else if (localTime > remoteTime + 3000) {
               // 3. Local edits are newer -> Push local trip to Google Drive
-              await window.uploadTripToGoogleDrive(localTrip);
-            } else if (JSON.stringify(localTrip.data) !== JSON.stringify(remoteTrip.data)) {
-              // 4. Data conflict -> Preserves both versions by creating a Cloud Copy branch
-              const conflictTrip = JSON.parse(JSON.stringify(remoteTrip));
-              conflictTrip.id = `${remoteTrip.id}_cloud_copy_${Date.now()}`;
-              conflictTrip.title = `${remoteTrip.title || 'Trip'} (Cloud Copy)`;
-              conflictTrip.isConflictBranch = true;
-              if (typeof window.saveTripToIndexedDB === 'function') {
-                await window.saveTripToIndexedDB(conflictTrip);
-              }
-              console.warn(`[Sync Conflict Resolved] Dual edits detected. Preserved remote version as "${conflictTrip.title}".`);
+              await window.uploadTripToGoogleDrive(localTrip, true);
             }
           }
         } catch (parseErr) {
@@ -605,10 +617,10 @@
       updateCloudSyncModalState(files);
 
       if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
-      if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
     } catch (err) {
       console.error('Failed to list cloud trips from Google Drive:', err);
-      updateCloudSyncStatusPill('⚡ Local Only', 'disconnected');
+      updateCloudSyncStatusPill('⚡ Sync Failed', 'error');
+      return [];
     }
   };
 
