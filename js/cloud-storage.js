@@ -417,6 +417,37 @@
       }
 
       if (!existingFileId) {
+        // Prevent duplicate files: Query Google Drive folder for an existing file with the exact same filename
+        try {
+          const checkQuery = encodeURIComponent(`'${folderId}' in parents and name = '${fileName.replace(/'/g, "\\'")}' and trashed = false`);
+          const checkResp = await fetch(
+            `https://www.googleapis.com/drive/v3/files?q=${checkQuery}&fields=files(id,name)`,
+            { headers: { 'Authorization': `Bearer ${accessToken}` } }
+          );
+          if (checkResp.ok) {
+            const checkData = await checkResp.json();
+            if (checkData.files && checkData.files.length > 0) {
+              existingFileId = checkData.files[0].id;
+              fileMap[tripRecord.id] = existingFileId;
+              setGDriveFileMap(fileMap);
+
+              // PATCH existing duplicate file instead of creating another copy
+              response = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingFileId}?uploadType=media`, {
+                method: 'PATCH',
+                headers: {
+                  'Authorization': `Bearer ${accessToken}`,
+                  'Content-Type': 'application/json'
+                },
+                body: payloadStr
+              });
+            }
+          }
+        } catch (e) {
+          console.warn('Duplicate check query warning:', e);
+        }
+      }
+
+      if (!existingFileId) {
         // Multipart POST new file to TrenscendsTravelPlanner folder using MIME RFC 2046 format
         const boundary = '-------314159265358979323846';
         const delimiter = "\r\n--" + boundary + "\r\n";

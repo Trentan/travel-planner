@@ -307,6 +307,25 @@ async function runLiveVerification() {
       await page.waitForTimeout(200);
     }
 
+    // Pre-test Cleanup: Rescan Google Drive folder and purge existing test duplicates from prior halted runs
+    console.log('   [Pre-Check] Checking and removing pre-existing duplicate test files from Google Drive...');
+    await page.evaluate(async () => {
+      if (typeof window.syncAllTripsFromGoogleDrive === 'function') {
+        const files = await window.syncAllTripsFromGoogleDrive();
+        if (Array.isArray(files)) {
+          const testKeywords = ['Europe & Thailand', 'Japan Alpine Route', 'Australia Coastal Drive', 'Swiss Alps Glacier Express'];
+          for (const f of files) {
+            if (f.name && testKeywords.some(kw => f.name.includes(kw))) {
+              if (typeof window.deleteTripFromGoogleDrive === 'function') {
+                await window.deleteTripFromGoogleDrive(f.id, f.name, true);
+              }
+            }
+          }
+        }
+      }
+    });
+    console.log('   ✓ Pre-existing test duplicate files cleared.');
+
     const sampleTripsToUpload = [
       {
         id: `trip_europe_thailand_${Date.now()}`,
