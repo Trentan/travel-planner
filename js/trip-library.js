@@ -55,11 +55,13 @@
     const isDriveConnected = typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected();
     const fileMap = typeof window.getGDriveFileMap === 'function' ? window.getGDriveFileMap() : {};
 
-    // Update active trip title & icon in top header and hero section
+    // Update active trip title & icon in top header, hero section, and mobile action card
     const activeTrip = trips.find(t => t.id === activeTripId) || trips[0];
     if (activeTrip) {
       const displayTitle = activeTrip.title || (activeTrip.data && activeTrip.data.meta && activeTrip.data.meta.title) || 'My Trip';
       const activeEmoji = activeTrip.flags || (activeTrip.data && activeTrip.data.meta && activeTrip.data.meta.icon) || '✈️';
+      const cleanFilename = typeof window.formatHumanFilename === 'function' ? window.formatHumanFilename(activeTrip) : 'my_trip.json';
+
       if (titleEl) titleEl.innerText = displayTitle;
 
       const headerIconEl = document.getElementById('currentTripIcon');
@@ -70,6 +72,15 @@
 
       const heroTitleTextEl = document.getElementById('heroTripTitleText');
       if (heroTitleTextEl) heroTitleTextEl.innerText = displayTitle;
+
+      const mobileEmojiEl = document.getElementById('mobileActiveTripEmoji');
+      if (mobileEmojiEl) mobileEmojiEl.innerText = activeEmoji.split(' ')[0] || '✈️';
+
+      const mobileTitleEl = document.getElementById('mobileActiveTripTitle');
+      if (mobileTitleEl) mobileTitleEl.innerText = displayTitle;
+
+      const mobileFilenameEl = document.getElementById('mobileActiveTripFilename');
+      if (mobileFilenameEl) mobileFilenameEl.innerText = cleanFilename;
     }
 
     if (!recentListEl) return;

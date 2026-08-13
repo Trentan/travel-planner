@@ -243,14 +243,28 @@
         </div>
         <button class="modal-close" onclick="closeMobileMenu()">&times;</button>
       </div>
-      <div class="mobile-menu-trip-status" aria-label="Trip file status">
-        <div class="mobile-menu-trip-row">
-          <span class="mobile-menu-trip-label">Trip file</span>
-          <span class="mobile-menu-trip-value" id="mobileActiveFileDisplay" data-fallback="Default Template">Default Template</span>
+      <div class="mobile-menu-trip-status p-3 bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2" aria-label="Active trip status">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0 cursor-pointer" onclick="closeMobileMenu(); openTripEmojiPicker(event);">
+            <span class="text-2xl p-1 bg-white dark:bg-slate-800 rounded-lg shadow-xs border border-slate-200/60 dark:border-slate-700 select-none hover:scale-110 transition-transform shrink-0" id="mobileActiveTripEmoji" title="Click to customize trip emoji">✈️</span>
+            <div class="min-w-0 flex-1">
+              <div class="font-bold text-sm text-slate-800 dark:text-slate-100 truncate" id="mobileActiveTripTitle">My Trip</div>
+              <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate" id="mobileActiveTripFilename">my_trip.json</div>
+            </div>
+          </div>
+          <button id="mobileCloudSyncStatusPill" class="cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full cursor-pointer shrink-0" onclick="openCloudSyncModal(); closeMobileMenu();">⚡ Local Only</button>
         </div>
-        <div class="mobile-menu-status-row flex justify-between items-center pt-1">
-          <span id="mobileSaveStatus" data-fallback=""></span>
-          <button id="mobileCloudSyncStatusPill" class="cloud-status-pill text-xs font-semibold px-2 py-0.5 rounded-full cursor-pointer" onclick="openCloudSyncModal(); closeMobileMenu();">⚡ Local Only</button>
+        
+        <div class="grid grid-cols-3 gap-1.5 pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+          <button class="py-1.5 px-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 border border-slate-200/60 dark:border-slate-700 shadow-xs" onclick="closeMobileMenu(); openTripLibraryModal();">
+            <span>✈️</span> <span>Switch</span>
+          </button>
+          <button class="py-1.5 px-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 border border-slate-200/60 dark:border-slate-700 shadow-xs" onclick="closeMobileMenu(); openRenameTripDialog();">
+            <span>✏️</span> <span>Rename</span>
+          </button>
+          <button class="py-1.5 px-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 border border-slate-200/60 dark:border-slate-700 shadow-xs text-blue-600 dark:text-blue-400" onclick="event.stopPropagation(); window.refreshGoogleDriveFolder(false);">
+            <span>🔄</span> <span>Refresh</span>
+          </button>
         </div>
       </div>
       <div class="mobile-desktop-advisory" role="note">
