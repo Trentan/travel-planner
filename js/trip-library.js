@@ -667,6 +667,38 @@
     await window.selectTripEmoji(autoEmoji);
   };
 
+  window.filterNotionEmojiPicker = function(query) {
+    const q = (query || '').toLowerCase().trim();
+    const buttons = document.querySelectorAll('#notionEmojiGridContainer .emoji-item-btn');
+    buttons.forEach(btn => {
+      if (!q) {
+        btn.style.display = 'block';
+      } else {
+        const text = btn.innerText.toLowerCase();
+        const parentCategory = btn.closest('.emoji-category-block');
+        const catName = parentCategory ? (parentCategory.dataset.category || '').toLowerCase() : '';
+        if (text.includes(q) || catName.includes(q)) {
+          btn.style.display = 'block';
+        } else {
+          btn.style.display = 'none';
+        }
+      }
+    });
+  };
+
+  window.scrollToEmojiCategory = function(category) {
+    const block = document.querySelector(`#notionEmojiGridContainer [data-category="${category}"]`);
+    if (block) {
+      block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  window.selectRandomTripEmoji = async function() {
+    const funEmojis = ['🧭', '✈️', '🌍', '🏝️', '🧳', '🏕️', '🏔️', '🗺️', '🗼', '🏯', '⛩️', '🗿', '🎡', '🏰', '🗽', '🌋', '⛷️', '🏖️', '⛵', '🌊', '☀️', '🌴', '🌸', '🍁', '🍷', '🍜', '🍕', '🍣', '🥐', '☕', '🍺', '🍹', '🇯🇵', '🇨🇭', '🇮🇹', '🇫🇷', '🇹🇭', '🇦🇺', '🇦🇹', '🇹🇼', '🇬🇧', '🇺🇸', '🇪🇸', '🇩🇪', '🇸🇬', '🇮🇩', '🇳🇿', '🇻🇳', '🇨🇦', '🇬🇷', '🇲🇽', '🇧🇷'];
+    const randomEmoji = funEmojis[Math.floor(Math.random() * funEmojis.length)];
+    await window.selectTripEmoji(randomEmoji);
+  };
+
   // Helper escape HTML string
   function escapeHtml(str) {
     if (!str) return '';
