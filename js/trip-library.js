@@ -55,11 +55,21 @@
     const isDriveConnected = typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected();
     const fileMap = typeof window.getGDriveFileMap === 'function' ? window.getGDriveFileMap() : {};
 
-    // Update active trip title in top header
+    // Update active trip title & icon in top header and hero section
     const activeTrip = trips.find(t => t.id === activeTripId) || trips[0];
-    if (titleEl && activeTrip) {
+    if (activeTrip) {
       const displayTitle = activeTrip.title || (activeTrip.data && activeTrip.data.meta && activeTrip.data.meta.title) || 'My Trip';
-      titleEl.innerText = displayTitle;
+      const activeEmoji = activeTrip.flags || (activeTrip.data && activeTrip.data.meta && activeTrip.data.meta.icon) || '✈️';
+      if (titleEl) titleEl.innerText = displayTitle;
+
+      const headerIconEl = document.getElementById('currentTripIcon');
+      if (headerIconEl) headerIconEl.innerText = activeEmoji.split(' ')[0] || '✈️';
+
+      const heroEmojiEl = document.getElementById('heroTripEmoji');
+      if (heroEmojiEl) heroEmojiEl.innerText = activeEmoji.split(' ')[0] || '✈️';
+
+      const heroTitleTextEl = document.getElementById('heroTripTitleText');
+      if (heroTitleTextEl) heroTitleTextEl.innerText = displayTitle;
     }
 
     if (!recentListEl) return;
@@ -587,6 +597,63 @@
     if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
     if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
     if (typeof window.showToast === 'function') window.showToast(`✏️ Renamed cloud trip to "${cleanTitle}"`);
+  };
+
+  // Notion-Style Trip Emoji Customizer Functions
+  window.openTripEmojiPicker = function(event) {
+    if (event) event.stopPropagation();
+    const modal = document.getElementById('tripEmojiPickerModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+  };
+
+  window.closeTripEmojiPicker = function() {
+    const modal = document.getElementById('tripEmojiPickerModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.selectTripEmoji = async function(emoji) {
+    if (!emoji) return;
+    const cleanEmoji = emoji.trim();
+    const activeTripId = typeof window.getActiveTripId === 'function' ? window.getActiveTripId() : '';
+
+    if (typeof window.tripData !== 'undefined' && window.tripData) {
+      if (!window.tripData.meta) window.tripData.meta = {};
+      window.tripData.meta.icon = cleanEmoji;
+    }
+
+    const trips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
+    const activeTrip = trips.find(t => t.id === activeTripId);
+
+    if (activeTrip) {
+      activeTrip.flags = cleanEmoji;
+      if (!activeTrip.data) activeTrip.data = {};
+      if (!activeTrip.data.meta) activeTrip.data.meta = {};
+      activeTrip.data.meta.icon = cleanEmoji;
+
+      if (typeof window.saveTripToIndexedDB === 'function') {
+        await window.saveTripToIndexedDB(activeTrip);
+      }
+
+      if (typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected()) {
+        if (typeof window.uploadTripToGoogleDrive === 'function') {
+          await window.uploadTripToGoogleDrive(activeTrip, true);
+        }
+      }
+    }
+
+    window.closeTripEmojiPicker();
+    if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+    if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
+    if (typeof window.showToast === 'function') window.showToast(`🎨 Trip icon updated to ${cleanEmoji}`);
+  };
+
+  window.autoDetectAndApplyTripEmoji = async function() {
+    if (typeof window.getCurrentAppData !== 'function') return;
+    const appData = window.getCurrentAppData();
+    const summary = typeof window.extractTripSummary === 'function' ? window.extractTripSummary(appData) : null;
+    const autoEmoji = (summary && summary.flags) ? summary.flags.split(' ')[0] : '✈️';
+    await window.selectTripEmoji(autoEmoji);
   };
 
   // Helper escape HTML string

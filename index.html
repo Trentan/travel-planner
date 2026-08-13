@@ -32,9 +32,9 @@
   <div class="app-menu-left">
     <div class="header-trip-switcher" id="headerTripSwitcher">
       <button class="trip-switcher-btn" id="currentTripBtn" onclick="toggleTripDropdown(event)" aria-label="Switch active trip">
-        <span class="trip-icon">✈️</span>
+        <span class="trip-icon cursor-pointer hover:scale-110 transition-transform mr-1.5" id="currentTripIcon" onclick="event.stopPropagation(); window.openTripEmojiPicker(event);" title="Click to customize trip emoji">✈️</span>
         <span class="trip-title" id="currentTripTitle">My Trip</span>
-        <span class="switcher-arrow">▾</span>
+        <span class="switcher-arrow ml-1">▾</span>
       </button>
       <div class="trip-dropdown-menu" id="tripDropdownMenu" hidden>
         <div class="trip-dropdown-header">Recent Trips</div>
@@ -111,7 +111,10 @@
 <header class="hidden md:block bg-teal-800 dark:bg-slate-900 text-white shadow-md relative z-30 transition-all duration-300">
   <div class="max-w-7xl mx-auto px-4 py-6 md:py-8">
     <div class="flex flex-col gap-1">
-      <h1 contenteditable="false" id="mainTitle" class="text-2xl md:text-3xl font-bold tracking-tight outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"></h1>
+      <h1 contenteditable="false" id="mainTitle" class="text-2xl md:text-3xl font-bold tracking-tight outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1 flex items-center gap-2">
+        <span id="heroTripEmoji" class="cursor-pointer hover:scale-110 transition-transform select-none mr-1" onclick="window.openTripEmojiPicker(event);" title="Click to customize trip emoji">✈️</span>
+        <span id="heroTripTitleText">My Trip</span>
+      </h1>
       <p contenteditable="false" id="mainSubtitle" class="text-teal-100 dark:text-slate-400 text-sm md:text-base outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"></p>
     </div>
   </div>
@@ -1222,6 +1225,70 @@
             <span>Sign in with Google</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notion-Style Trip Emoji Picker Modal -->
+  <div id="tripEmojiPickerModal" class="modal-overlay" style="display: none; z-index: 9999;" onclick="if(event.target === this) window.closeTripEmojiPicker();">
+    <div class="modal-container max-w-sm w-full mx-4 bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-2xl border border-slate-200 dark:border-slate-800">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <span>🎨</span> <span>Customize Trip Emoji Icon</span>
+        </h3>
+        <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold" onclick="window.closeTripEmojiPicker();">&times;</button>
+      </div>
+      <div class="py-3 space-y-3">
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Country Flags</div>
+          <div class="grid grid-cols-8 gap-1.5 text-xl">
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇯🇵')">🇯🇵</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇨🇭')">🇨🇭</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇮🇹')">🇮🇹</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇫🇷')">🇫🇷</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇹🇭')">🇹🇭</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇦🇺')">🇦🇺</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇦🇹')">🇦🇹</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇹🇼')">🇹🇼</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇬🇧')">🇬🇧</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇺🇸')">🇺🇸</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇪🇸')">🇪🇸</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇩🇪')">🇩🇪</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇸🇬')">🇸🇬</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇮🇩')">🇮🇩</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇳🇿')">🇳🇿</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🇻🇳')">🇻🇳</button>
+          </div>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Travel & Places</div>
+          <div class="grid grid-cols-8 gap-1.5 text-xl">
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('✈️')">✈️</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🌍')">🌍</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🏝️')">🏝️</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🧳')">🧳</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🏕️')">🏕️</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🏔️')">🏔️</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🗺️')">🗺️</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🗼')">🗼</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🏯')">🏯</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('⛷️')">⛷️</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🏖️')">🏖️</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('⛵')">⛵</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🍷')">🍷</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🏨')">🏨</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🚗')">🚗</button>
+            <button class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="window.selectTripEmoji('🚅')">🚅</button>
+          </div>
+        </div>
+        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
+          <input type="text" id="customTripEmojiInput" placeholder="Or type any emoji..." class="flex-1 px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100">
+          <button class="action-btn text-xs px-3" onclick="const val = document.getElementById('customTripEmojiInput').value.trim(); if(val) window.selectTripEmoji(val);">Apply</button>
+        </div>
+      </div>
+      <div class="modal-footer pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+        <button class="text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline" onclick="window.autoDetectAndApplyTripEmoji();">⚡ Auto-Detect Flag</button>
+        <button class="action-btn text-xs" onclick="window.closeTripEmojiPicker();">Done</button>
       </div>
     </div>
   </div>
