@@ -20,7 +20,8 @@
       window.renderHeaderTripSwitcher();
       if (typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected()) {
         if (typeof window.syncAllTripsFromGoogleDrive === 'function') {
-          window.syncAllTripsFromGoogleDrive().then(() => {
+          // Pass isSilent = true so status pill does not flicker
+          window.syncAllTripsFromGoogleDrive(true).then(() => {
             window.renderHeaderTripSwitcher();
           });
         }
@@ -41,7 +42,7 @@
     if (dropdown) dropdown.hidden = true;
   };
 
-  // Render Header Trip Switcher button and recent trips list
+  // Render Header Trip Switcher button and unified trips list
   window.renderHeaderTripSwitcher = async function() {
     const titleEl = document.getElementById('currentTripTitle');
     const recentListEl = document.getElementById('recentTripsList');
@@ -49,103 +50,158 @@
     if (typeof window.getAllTripsFromIndexedDB !== 'function') return;
 
     const trips = await window.getAllTripsFromIndexedDB();
+    const cloudFiles = window.__gdriveCloudFiles || [];
     const activeTripId = window.getActiveTripId ? window.getActiveTripId() : 'trip_default';
+    const isDriveConnected = typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected();
+    const fileMap = typeof window.getGDriveFileMap === 'function' ? window.getGDriveFileMap() : {};
 
+    // Update active trip title in top header
     const activeTrip = trips.find(t => t.id === activeTripId) || trips[0];
     if (titleEl && activeTrip) {
       const displayTitle = activeTrip.title || (activeTrip.data && activeTrip.data.meta && activeTrip.data.meta.title) || 'My Trip';
       titleEl.innerText = displayTitle;
     }
 
-    if (recentListEl) {
-      recentListEl.innerHTML = '';
-      const cloudFiles = window.__gdriveCloudFiles || [];
-      const isDriveConnected = typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected();
-      const fileMap = typeof window.getGDriveFileMap === 'function' ? window.getGDriveFileMap() : {};
+    if (!recentListEl) return;
+    recentListEl.innerHTML = '';
 
-      if ((!trips || trips.length === 0) && (!cloudFiles || cloudFiles.length === 0)) {
-        recentListEl.innerHTML = `
-          <div class="p-3 text-xs text-slate-500 space-y-1.5">
-            <div class="font-semibold text-slate-700 dark:text-slate-200">No saved trips found locally</div>
-            ${isDriveConnected ? `
-              <button class="action-btn action-btn-secondary text-[11px] w-full mt-1 flex items-center justify-center gap-1" onclick="event.stopPropagation(); window.refreshGoogleDriveFolder();">
-                <span>🔄</span> <span>Rescan Google Drive Folder</span>
-              </button>
-            ` : ''}
-          </div>
-        `;
-        return;
+    // Render Top-Level Action Controls Header inside Dropdown Menu
+    const actionControlsHeader = document.createElement('div');
+    actionControlsHeader.className = 'p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50 flex items-center justify-between gap-1.5 mb-1';
+    actionControlsHeader.innerHTML = `
+      <button class="flex-1 py-1.5 px-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 transition-all shadow-sm" onclick="window.closeTripDropdown(); if (typeof openCreateNewTripWizard === 'function') openCreateNewTripWizard(); else window.createNewTripFromLibrary();">
+        <span>➕</span> <span>New</span>
+      </button>
+      <button class="py-1.5 px-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 transition-all" onclick="event.stopPropagation(); window.uploadLocalJsonFileToDrive();" title="Upload local JSON file">
+        <span>📥</span> <span>Upload</span>
+      </button>
+      <button class="py-1.5 px-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 transition-all text-blue-600 dark:text-blue-400" onclick="event.stopPropagation(); window.refreshGoogleDriveFolder(false);" title="Rescan Google Drive folder">
+        <span>🔄</span> <span>Refresh</span>
+      </button>
+    `;
+    recentListEl.appendChild(actionControlsHeader);
+
+    // Reconcile & Deduplicate IndexedDB Trips + Google Drive Cloud Files into a Single List
+    const cloudFileIdMap = new Map();
+    cloudFiles.forEach(cf => cloudFileIdMap.set(cf.id, cf));
+
+    const cloudFileNameMap = new Map();
+    cloudFiles.forEach(cf => cloudFileNameMap.set(cf.name.toLowerCase(), cf));
+
+    const unifiedList = [];
+    const matchedCloudFileIds = new Set();
+
+    trips.forEach(trip => {
+      const rawTitle = trip.title || (trip.data && trip.data.meta && trip.data.meta.title) || 'My Trip';
+      const cleanFilename = typeof window.formatHumanFilename === 'function'
+        ? window.formatHumanFilename(trip)
+        : `${rawTitle.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_')}.json`;
+
+      const mappedFileId = fileMap[trip.id];
+      let matchedCloudFile = null;
+
+      if (mappedFileId && cloudFileIdMap.has(mappedFileId)) {
+        matchedCloudFile = cloudFileIdMap.get(mappedFileId);
+      } else if (cloudFileNameMap.has(cleanFilename.toLowerCase())) {
+        matchedCloudFile = cloudFileNameMap.get(cleanFilename.toLowerCase());
       }
 
-      trips.slice(0, 5).forEach(trip => {
-        const isCurrent = trip.id === activeTripId;
-        const tripTitle = trip.title || (trip.data && trip.data.meta && trip.data.meta.title) || 'Untitled Trip';
-        const dateRange = trip.dateRange || 'Flex dates';
-        const flags = trip.flags || '';
+      if (matchedCloudFile) {
+        matchedCloudFileIds.add(matchedCloudFile.id);
+      }
 
-        const item = document.createElement('div');
-        item.className = `trip-dropdown-item group flex items-center justify-between ${isCurrent ? 'active bg-slate-100 dark:bg-slate-800/80 font-semibold' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'}`;
-        item.innerHTML = `
-          <div class="flex items-center gap-2 flex-1 min-w-0 cursor-pointer" onclick="window.closeTripDropdown(); ${!isCurrent ? `window.switchActiveTrip('${trip.id}')` : ''}">
-            <span class="trip-item-icon shrink-0">${isCurrent ? '✓' : '✈️'}</span>
-            <div class="trip-item-info min-w-0">
-              <div class="trip-item-title truncate">${flags} ${escapeHtml(tripTitle)}</div>
-              <div class="trip-item-sub text-[10px] truncate">${escapeHtml(dateRange)}</div>
-            </div>
-          </div>
-          <div class="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-            <button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs" onclick="window.renameTripFromDropdown(event, '${trip.id}', '${escapeHtml(tripTitle)}')" title="Rename trip">✏️</button>
-            ${trips.length > 1 ? `
-              <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromDropdown(event, '${trip.id}', '${escapeHtml(tripTitle)}')" title="Delete trip">🗑️</button>
-            ` : ''}
-          </div>
-        `;
-        recentListEl.appendChild(item);
+      unifiedList.push({
+        id: trip.id,
+        cloudFileId: matchedCloudFile ? matchedCloudFile.id : null,
+        title: rawTitle,
+        filename: matchedCloudFile ? matchedCloudFile.name : cleanFilename,
+        dateRange: trip.dateRange || (trip.data && trip.data.meta && trip.data.meta.dates) || 'Flex dates',
+        flags: trip.flags || '✈️',
+        storageState: isDriveConnected ? (matchedCloudFile ? 'synced' : 'local_only') : 'local_only',
+        isCurrent: trip.id === activeTripId,
+        source: 'local'
       });
+    });
 
-      // Render Google Drive Cloud Files Section in Dropdown
-      if (isDriveConnected) {
-        const cloudHeader = document.createElement('div');
-        cloudHeader.className = 'px-3 py-1.5 text-[11px] font-bold text-blue-600 dark:text-blue-400 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between mt-1';
-        cloudHeader.innerHTML = `
-          <span>☁️ Drive Cloud Files (${cloudFiles.length})</span>
-          <div class="flex items-center gap-1.5">
-            <button class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold hover:underline" onclick="event.stopPropagation(); window.uploadLocalJsonFileToDrive();" title="Upload JSON to Google Drive">📥 Upload</button>
-            <span class="text-slate-300 dark:text-slate-700">•</span>
-            <button class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold hover:underline" onclick="event.stopPropagation(); window.refreshGoogleDriveFolder();" title="Rescan Google Drive folder">🔄 Refresh</button>
-          </div>
-        `;
-        recentListEl.appendChild(cloudHeader);
-
-        if (cloudFiles.length === 0) {
-          const emptyCloudItem = document.createElement('div');
-          emptyCloudItem.className = 'px-3 py-2 text-[11px] text-slate-400 italic';
-          emptyCloudItem.innerText = 'No cloud .json files found. Click "Refresh" to scan Drive.';
-          recentListEl.appendChild(emptyCloudItem);
-        } else {
-          cloudFiles.slice(0, 5).forEach(file => {
-            const isActiveFile = fileMap[activeTripId] === file.id;
-            const item = document.createElement('div');
-            item.className = `trip-dropdown-item group flex items-center justify-between ${isActiveFile ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-l-2 border-emerald-500' : 'hover:bg-blue-50 dark:hover:bg-blue-950/40'}`;
-            item.innerHTML = `
-              <div class="flex items-center gap-2 flex-1 min-w-0 cursor-pointer" onclick="window.closeTripDropdown(); window.loadTripFromGoogleDrive('${file.id}');">
-                <span class="trip-item-icon shrink-0">${isActiveFile ? '●' : '📄'}</span>
-                <div class="trip-item-info min-w-0">
-                  <div class="trip-item-title truncate text-xs ${isActiveFile ? 'font-bold text-emerald-800 dark:text-emerald-300' : ''}">${escapeHtml(file.name)}</div>
-                  <div class="trip-item-sub text-[10px]">Google Drive .json</div>
-                </div>
-              </div>
-              <div class="flex items-center gap-1 shrink-0">
-                <button class="p-1 hover:bg-blue-200 dark:hover:bg-blue-900 rounded text-xs" onclick="window.renameCloudFileFromDropdown(event, '${file.id}', '${escapeHtml(file.name)}')" title="Rename cloud trip">✏️</button>
-                <a href="https://drive.google.com/file/d/${file.id}/view" target="_blank" rel="noopener noreferrer" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs text-slate-500" title="View in Google Drive" onclick="event.stopPropagation();">↗</a>
-                <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromGoogleDrive('${file.id}', '${escapeHtml(file.name)}')" title="Delete cloud trip">🗑️</button>
-              </div>
-            `;
-            recentListEl.appendChild(item);
+    // Include cloud-only files (residing on Google Drive, not loaded locally yet)
+    if (isDriveConnected) {
+      cloudFiles.forEach(cf => {
+        if (!matchedCloudFileIds.has(cf.id)) {
+          unifiedList.push({
+            id: `cloud_${cf.id}`,
+            cloudFileId: cf.id,
+            title: cf.name.replace(/\.json$/i, '').replace(/_/g, ' '),
+            filename: cf.name,
+            dateRange: cf.modifiedTime ? new Date(cf.modifiedTime).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Google Drive File',
+            flags: '☁️',
+            storageState: 'cloud_only',
+            isCurrent: false,
+            source: 'cloud'
           });
         }
-      }
+      });
     }
+
+    if (unifiedList.length === 0) {
+      const emptyItem = document.createElement('div');
+      emptyItem.className = 'p-3 text-xs text-slate-500 italic text-center';
+      emptyItem.innerText = 'No saved trips found.';
+      recentListEl.appendChild(emptyItem);
+      return;
+    }
+
+    // Render Unified Deduplicated Trip Items List
+    unifiedList.slice(0, 8).forEach(item => {
+      const isCurrent = item.isCurrent;
+      const isCloudSynced = item.storageState === 'synced';
+      const isCloudOnly = item.storageState === 'cloud_only';
+
+      let badgeHtml = '';
+      if (isCloudSynced) {
+        badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">☁️ Synced</span>';
+      } else if (isCloudOnly) {
+        badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300">☁️ Remote</span>';
+      } else {
+        badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">⚡ Local</span>';
+      }
+
+      const elem = document.createElement('div');
+      elem.className = `trip-dropdown-item group flex items-center justify-between py-2 px-2.5 rounded-lg my-0.5 ${isCurrent ? 'active bg-teal-50/90 dark:bg-teal-950/50 font-semibold border-l-2 border-teal-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800/60'}`;
+
+      const clickHandler = isCloudOnly
+        ? `window.closeTripDropdown(); window.loadTripFromGoogleDrive('${item.cloudFileId}');`
+        : `window.closeTripDropdown(); ${!isCurrent ? `window.switchActiveTrip('${item.id}')` : ''}`;
+
+      elem.innerHTML = `
+        <div class="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer" onclick="${clickHandler}">
+          <span class="trip-item-icon shrink-0 text-sm">${isCurrent ? '✓' : item.flags}</span>
+          <div class="trip-item-info min-w-0 flex-1">
+            <div class="trip-item-title truncate text-xs flex items-center gap-1.5">
+              <span class="truncate ${isCurrent ? 'font-bold text-teal-900 dark:text-teal-200' : ''}">${escapeHtml(item.title)}</span>
+              ${badgeHtml}
+            </div>
+            <div class="trip-item-sub text-[10px] text-slate-400 dark:text-slate-500 truncate font-mono mt-0.5">${escapeHtml(item.filename)}</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+          ${!isCloudOnly ? `
+            <button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs" onclick="window.renameTripFromDropdown(event, '${item.id}', '${escapeHtml(item.title)}')" title="Rename trip">✏️</button>
+          ` : `
+            <button class="p-1 hover:bg-blue-200 dark:hover:bg-blue-900 rounded text-xs" onclick="window.renameCloudFileFromDropdown(event, '${item.cloudFileId}', '${escapeHtml(item.filename)}')" title="Rename cloud file">✏️</button>
+          `}
+          ${item.cloudFileId ? `
+            <a href="https://drive.google.com/file/d/${item.cloudFileId}/view" target="_blank" rel="noopener noreferrer" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs text-slate-500" title="View physical file in Google Drive" onclick="event.stopPropagation();">↗</a>
+          ` : ''}
+          ${!isCloudOnly && trips.length > 1 ? `
+            <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromDropdown(event, '${item.id}', '${escapeHtml(item.title)}')" title="Delete trip">🗑️</button>
+          ` : ''}
+          ${isCloudOnly ? `
+            <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromGoogleDrive('${item.cloudFileId}', '${escapeHtml(item.filename)}')" title="Delete cloud file">🗑️</button>
+          ` : ''}
+        </div>
+      `;
+      recentListEl.appendChild(elem);
+    });
   };
 
   // Open Visual Trip Library Modal

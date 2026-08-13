@@ -522,8 +522,7 @@
   };
 
   // Sync All Trips from Google Drive / TrenscendsTravelPlanner into local IndexedDB
-  // Sync All Trips from Google Drive / TrenscendsTravelPlanner into local IndexedDB
-  window.syncAllTripsFromGoogleDrive = async function() {
+  window.syncAllTripsFromGoogleDrive = async function(isSilent = false) {
     if (!isGoogleDriveConnected()) return [];
     await ensureValidAccessToken();
 
@@ -536,14 +535,14 @@
         modifiedTime: t.updatedAt || t.lastSaved || new Date().toISOString(),
         size: JSON.stringify(t).length
       }));
-      updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
+      if (!isSilent) updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
       if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
       if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
       return window.__gdriveCloudFiles;
     }
 
     try {
-      updateCloudSyncStatusPill('⏳ Fetching Cloud Trips...', 'syncing');
+      if (!isSilent) updateCloudSyncStatusPill('⏳ Fetching Cloud Trips...', 'syncing');
       const folderId = await ensureDriveFolder();
       // Search dedicated folder as well as any .json files in user's Google Drive
       const query = folderId
@@ -616,13 +615,15 @@
       }
 
       setGDriveFileMap(fileMap);
-      updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
+      if (!isSilent) updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
       updateCloudSyncModalState(files);
 
       if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+      if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
+      return window.__gdriveCloudFiles || files;
     } catch (err) {
       console.error('Failed to list cloud trips from Google Drive:', err);
-      updateCloudSyncStatusPill('⚡ Sync Failed', 'error');
+      if (!isSilent) updateCloudSyncStatusPill('⚡ Sync Failed', 'error');
       return [];
     }
   };
@@ -884,8 +885,8 @@
     if (backgroundHeartbeatTimer) clearInterval(backgroundHeartbeatTimer);
     backgroundHeartbeatTimer = setInterval(async () => {
       if (isGoogleDriveConnected() && !document.hidden) {
-        console.log('[GoogleDrive Heartbeat] Running 60s background cloud sync check...');
-        await window.syncAllTripsFromGoogleDrive();
+        console.log('[GoogleDrive Heartbeat] Running silent 60s background cloud sync check...');
+        await window.syncAllTripsFromGoogleDrive(true);
       }
     }, 60000);
   }
