@@ -355,7 +355,7 @@
   }
 
   // Upload or Update a Trip JSON file inside Google Drive / TrenscendsTravelPlanner
-  window.uploadTripToGoogleDrive = async function(tripRecord) {
+  window.uploadTripToGoogleDrive = async function(tripRecord, isSilent = false) {
     if (!isGoogleDriveConnected() || !tripRecord || !tripRecord.id) return false;
     await ensureValidAccessToken();
 
@@ -365,12 +365,16 @@
       const map = getGDriveFileMap();
       map[tripRecord.id] = 'gdrive_file_' + tripRecord.id;
       setGDriveFileMap(map);
-      updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
+      if (!isSilent) {
+        updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
+      }
       return true;
     }
 
     try {
-      updateCloudSyncStatusPill('⏳ Syncing to Google Drive...', 'syncing');
+      if (!isSilent) {
+        updateCloudSyncStatusPill('⏳ Syncing to Google Drive...', 'syncing');
+      }
       const folderId = await ensureDriveFolder();
       const fileMap = getGDriveFileMap();
       let existingFileId = fileMap[tripRecord.id];
@@ -871,7 +875,7 @@
     }, 60000);
   }
 
-  // Debounced Auto-Sync for active trip edits
+  // Quiet Debounced Auto-Sync for active trip edits (runs 3.5s after user finishes editing)
   window.autoSyncActiveTripToCloud = function() {
     if (!isGoogleDriveConnected()) return;
 
@@ -895,10 +899,10 @@
       }
 
       if (fullTrip) {
-        console.log(`[Cloud AutoSync] Live auto-syncing full active trip document "${fullTrip.title}" to Google Drive...`);
-        await window.uploadTripToGoogleDrive(fullTrip);
+        console.log(`[Cloud AutoSync] Silent background auto-sync for active trip document "${fullTrip.title}"...`);
+        await window.uploadTripToGoogleDrive(fullTrip, true);
       }
-    }, 1500);
+    }, 3500);
   };
 
   // Select Local Directory Sync Folder (Google Drive Desktop / OneDrive / Local Folder)
