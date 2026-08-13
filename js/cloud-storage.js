@@ -545,8 +545,11 @@
     try {
       updateCloudSyncStatusPill('⏳ Fetching Cloud Trips...', 'syncing');
       const folderId = await ensureDriveFolder();
-      const query = folderId ? `'${folderId}' in parents and trashed=false` : `name contains '.json' and trashed=false`;
-      const listUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,modifiedTime,size)`;
+      // Search dedicated folder as well as any .json files in user's Google Drive
+      const query = folderId
+        ? `('${folderId}' in parents or name contains '.json' or mimeType='application/json') and trashed=false`
+        : `(name contains '.json' or mimeType='application/json') and trashed=false`;
+      const listUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,modifiedTime,size)&pageSize=50`;
       const listResp = await fetch(listUrl, {
         headers: { 'Authorization': `Bearer ${accessToken}` }
       });
@@ -562,7 +565,7 @@
       const localTrips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
 
       for (const file of files) {
-        if (!file.name || !file.name.endsWith('.json')) continue;
+        if (!file.name) continue;
 
         const downloadUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
         const contentResp = await fetch(downloadUrl, {

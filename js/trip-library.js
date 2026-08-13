@@ -18,6 +18,13 @@
 
     if (!dropdown.hidden) {
       window.renderHeaderTripSwitcher();
+      if (typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected()) {
+        if (typeof window.syncAllTripsFromGoogleDrive === 'function') {
+          window.syncAllTripsFromGoogleDrive().then(() => {
+            window.renderHeaderTripSwitcher();
+          });
+        }
+      }
       // Click outside listener to close dropdown
       const closeListener = (e) => {
         if (!e.target.closest('#headerTripSwitcher')) {
@@ -53,8 +60,20 @@
     if (recentListEl) {
       recentListEl.innerHTML = '';
       const cloudFiles = window.__gdriveCloudFiles || [];
+      const isDriveConnected = typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected();
+      const fileMap = typeof window.getGDriveFileMap === 'function' ? window.getGDriveFileMap() : {};
+
       if ((!trips || trips.length === 0) && (!cloudFiles || cloudFiles.length === 0)) {
-        recentListEl.innerHTML = '<div class="trip-dropdown-empty p-2 text-xs text-slate-400">No saved trips found</div>';
+        recentListEl.innerHTML = `
+          <div class="p-3 text-xs text-slate-500 space-y-1.5">
+            <div class="font-semibold text-slate-700 dark:text-slate-200">No saved trips found locally</div>
+            ${isDriveConnected ? `
+              <button class="action-btn action-btn-secondary text-[11px] w-full mt-1 flex items-center justify-center gap-1" onclick="event.stopPropagation(); window.refreshGoogleDriveFolder();">
+                <span>🔄</span> <span>Rescan Google Drive Folder</span>
+              </button>
+            ` : ''}
+          </div>
+        `;
         return;
       }
 
@@ -83,32 +102,46 @@
       });
 
       // Render Google Drive Cloud Files Section in Dropdown
-      if (cloudFiles && cloudFiles.length > 0) {
+      if (isDriveConnected) {
         const cloudHeader = document.createElement('div');
         cloudHeader.className = 'px-3 py-1.5 text-[11px] font-bold text-blue-600 dark:text-blue-400 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between mt-1';
         cloudHeader.innerHTML = `
           <span>☁️ Drive Cloud Files (${cloudFiles.length})</span>
-          <button class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold hover:underline" onclick="event.stopPropagation(); window.refreshGoogleDriveFolder();" title="Rescan Google Drive folder">🔄 Refresh</button>
+          <div class="flex items-center gap-1.5">
+            <button class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold hover:underline" onclick="event.stopPropagation(); window.uploadLocalJsonFileToDrive();" title="Upload JSON to Google Drive">📥 Upload</button>
+            <span class="text-slate-300 dark:text-slate-700">•</span>
+            <button class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold hover:underline" onclick="event.stopPropagation(); window.refreshGoogleDriveFolder();" title="Rescan Google Drive folder">🔄 Refresh</button>
+          </div>
         `;
         recentListEl.appendChild(cloudHeader);
 
-        cloudFiles.slice(0, 4).forEach(file => {
-          const item = document.createElement('button');
-          item.className = 'trip-dropdown-item hover:bg-blue-50 dark:hover:bg-blue-950/40';
-          item.innerHTML = `
-            <span class="trip-item-icon">📄</span>
-            <div class="trip-item-info">
-              <div class="trip-item-title truncate text-xs">${escapeHtml(file.name)}</div>
-              <div class="trip-item-sub text-[10px]">Google Drive .json</div>
-            </div>
-            <span class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold shrink-0">📥 Load</span>
-          `;
-          item.onclick = async function() {
-            window.closeTripDropdown();
-            await window.loadTripFromGoogleDrive(file.id);
-          };
-          recentListEl.appendChild(item);
-        });
+        if (cloudFiles.length === 0) {
+          const emptyCloudItem = document.createElement('div');
+          emptyCloudItem.className = 'px-3 py-2 text-[11px] text-slate-400 italic';
+          emptyCloudItem.innerText = 'No cloud .json files found. Click "Refresh" to scan Drive.';
+          recentListEl.appendChild(emptyCloudItem);
+        } else {
+          cloudFiles.slice(0, 5).forEach(file => {
+            const isActiveFile = fileMap[activeTripId] === file.id;
+            const item = document.createElement('button');
+            item.className = `trip-dropdown-item ${isActiveFile ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-l-2 border-emerald-500' : 'hover:bg-blue-50 dark:hover:bg-blue-950/40'}`;
+            item.innerHTML = `
+              <span class="trip-item-icon">${isActiveFile ? '●' : '📄'}</span>
+              <div class="trip-item-info">
+                <div class="trip-item-title truncate text-xs ${isActiveFile ? 'font-bold text-emerald-800 dark:text-emerald-300' : ''}">${escapeHtml(file.name)}</div>
+                <div class="trip-item-sub text-[10px]">Google Drive .json</div>
+              </div>
+              <span class="text-[10px] ${isActiveFile ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-blue-600 dark:text-blue-400 font-semibold'} shrink-0">
+                ${isActiveFile ? '✓ Open' : '📥 Load'}
+              </span>
+            `;
+            item.onclick = async function() {
+              window.closeTripDropdown();
+              await window.loadTripFromGoogleDrive(file.id);
+            };
+            recentListEl.appendChild(item);
+          });
+        }
       }
     }
   };
