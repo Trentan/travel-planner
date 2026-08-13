@@ -228,26 +228,32 @@
         </div>
       `;
 
+      const activeTripId = typeof window.getActiveTripId === 'function' ? window.getActiveTripId() : '';
+      const fileMap = typeof window.getGDriveFileMap === 'function' ? window.getGDriveFileMap() : {};
+
       cloudFiles.forEach(file => {
         const sizeKb = file.size ? `${(parseInt(file.size, 10) / 1024).toFixed(1)} KB` : 'JSON Document';
         const modTime = file.modifiedTime ? new Date(file.modifiedTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Synced';
+        const isActiveFile = fileMap[activeTripId] === file.id;
 
         const card = document.createElement('div');
-        card.className = 'trip-gallery-card p-4 bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3';
+        card.className = `trip-gallery-card p-4 ${isActiveFile ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700' : 'bg-white dark:bg-slate-800/90 border-slate-200 dark:border-slate-700'} rounded-2xl border flex flex-col justify-between space-y-3`;
         card.innerHTML = `
           <div>
             <div class="flex items-center justify-between gap-2 mb-1.5">
               <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/70">☁️ Google Drive File</span>
-              <span class="text-[11px] text-slate-400">🕒 ${modTime}</span>
+              ${isActiveFile ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">● Active</span>` : `<span class="text-[11px] text-slate-400">🕒 ${modTime}</span>`}
             </div>
             <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm truncate flex items-center gap-1.5">
               <span>📄</span>
               <span class="truncate">${escapeHtml(file.name)}</span>
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Size: ${sizeKb}</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Size: ${sizeKb} • Modified: ${modTime}</p>
           </div>
           <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
-            <button class="action-btn action-btn-primary text-xs flex-1" onclick="window.loadTripFromGoogleDrive('${file.id}')">📥 Load & Open</button>
+            <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-xs flex-1" onclick="window.loadTripFromGoogleDrive('${file.id}')">
+              ${isActiveFile ? '✓ Currently Open' : '📥 Load & Open'}
+            </button>
             <a href="https://drive.google.com/file/d/${file.id}/view" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs" title="Open file in Google Drive">↗ Drive</a>
             <button class="action-btn action-btn-danger text-xs px-2.5" onclick="window.deleteTripFromGoogleDrive('${file.id}', '${escapeHtml(file.name)}')" title="Delete file from Google Drive">🗑️</button>
           </div>

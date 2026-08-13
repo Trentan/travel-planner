@@ -653,6 +653,15 @@
   window.loadTripFromGoogleDrive = async function(fileId) {
     if (!isGoogleDriveConnected() || !fileId) return false;
 
+    const activeTripId = typeof window.getActiveTripId === 'function' ? window.getActiveTripId() : '';
+    const existingFileMap = getGDriveFileMap();
+    if (existingFileMap[activeTripId] === fileId) {
+      window.closeCloudSyncModal();
+      if (typeof window.closeTripLibraryModal === 'function') window.closeTripLibraryModal();
+      if (typeof window.showToast === 'function') window.showToast('ℹ️ Trip is already open');
+      return true;
+    }
+
     try {
       updateCloudSyncStatusPill('⏳ Loading Trip from Drive...', 'syncing');
       let tripRecord = null;
@@ -1019,6 +1028,9 @@
 
     if (fileListContainer && isConnected && Array.isArray(cloudFiles) && cloudFiles.length > 0) {
       fileListContainer.style.display = 'block';
+      const activeTripId = typeof window.getActiveTripId === 'function' ? window.getActiveTripId() : '';
+      const fileMap = getGDriveFileMap();
+
       fileListContainer.innerHTML = `
         <div class="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center justify-between">
           <span>📁 Google Drive Files (${cloudFiles.length})</span>
@@ -1027,16 +1039,19 @@
             <button class="action-btn action-btn-secondary text-[11px] py-1 px-2.5 flex items-center gap-1" onclick="window.refreshGoogleDriveFolder()" title="Rescan Google Drive folder for newly pasted JSON files">🔄 Refresh Drive</button>
           </div>
         </div>
-        <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
+        <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
           ${cloudFiles.map(f => {
             const sizeKb = f.size ? `${(parseInt(f.size, 10) / 1024).toFixed(1)} KB` : 'JSON';
             const modTime = f.modifiedTime ? new Date(f.modifiedTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Synced';
+            const isActiveFile = fileMap[activeTripId] === f.id;
+
             return `
-              <div class="p-3 bg-white dark:bg-slate-800/90 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between sm:items-center gap-2 transition-all hover:border-blue-300 dark:hover:border-blue-700">
+              <div class="p-3 ${isActiveFile ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700' : 'bg-white dark:bg-slate-800/90 border-slate-200 dark:border-slate-700'} rounded-xl border flex flex-col sm:flex-row justify-between sm:items-center gap-2 transition-all hover:border-blue-300 dark:hover:border-blue-700">
                 <div class="flex-1 min-w-0">
                   <div class="font-semibold text-slate-800 dark:text-slate-100 text-xs truncate flex items-center gap-1.5">
                     <span>📄</span>
                     <span class="truncate">${escapeHtml(f.name)}</span>
+                    ${isActiveFile ? `<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-600 text-white shrink-0">● Active</span>` : ''}
                   </div>
                   <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-3 pt-1">
                     <span>💾 ${sizeKb}</span>
@@ -1044,9 +1059,11 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0 pt-1 sm:pt-0">
-                  <button class="action-btn action-btn-secondary text-[11px] py-1 px-2.5" onclick="window.loadTripFromGoogleDrive('${f.id}')" title="Load & open this trip document">📥 Load</button>
-                  <a href="https://drive.google.com/file/d/${f.id}/view" target="_blank" rel="noopener noreferrer" class="action-btn text-[11px] py-1 px-2 text-slate-600 dark:text-slate-300" title="Open file in Google Drive">↗</a>
-                  <button class="action-btn action-btn-danger text-[11px] py-1 px-2" onclick="window.deleteTripFromGoogleDrive('${f.id}', '${escapeHtml(f.name)}')" title="Delete from cloud">🗑️</button>
+                  <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-[11px] py-1 px-3" onclick="window.loadTripFromGoogleDrive('${f.id}')" title="Load & open this trip document">
+                    ${isActiveFile ? '✓ Open' : '📥 Load'}
+                  </button>
+                  <a href="https://drive.google.com/file/d/${f.id}/view" target="_blank" rel="noopener noreferrer" class="action-btn text-[11px] py-1 px-2.5 text-slate-600 dark:text-slate-300" title="Open file in Google Drive">↗</a>
+                  <button class="action-btn action-btn-danger text-[11px] py-1 px-2.5" onclick="window.deleteTripFromGoogleDrive('${f.id}', '${escapeHtml(f.name)}')" title="Delete from cloud">🗑️</button>
                 </div>
               </div>
             `;
