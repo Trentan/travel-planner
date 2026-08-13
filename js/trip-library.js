@@ -83,21 +83,23 @@
         const dateRange = trip.dateRange || 'Flex dates';
         const flags = trip.flags || '';
 
-        const item = document.createElement('button');
-        item.className = `trip-dropdown-item ${isCurrent ? 'active' : ''}`;
+        const item = document.createElement('div');
+        item.className = `trip-dropdown-item group flex items-center justify-between ${isCurrent ? 'active bg-slate-100 dark:bg-slate-800/80 font-semibold' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'}`;
         item.innerHTML = `
-          <span class="trip-item-icon">${isCurrent ? '✓' : '✈️'}</span>
-          <div class="trip-item-info">
-            <div class="trip-item-title">${flags} ${escapeHtml(tripTitle)}</div>
-            <div class="trip-item-sub">${escapeHtml(dateRange)}</div>
+          <div class="flex items-center gap-2 flex-1 min-w-0 cursor-pointer" onclick="window.closeTripDropdown(); ${!isCurrent ? `window.switchActiveTrip('${trip.id}')` : ''}">
+            <span class="trip-item-icon shrink-0">${isCurrent ? '✓' : '✈️'}</span>
+            <div class="trip-item-info min-w-0">
+              <div class="trip-item-title truncate">${flags} ${escapeHtml(tripTitle)}</div>
+              <div class="trip-item-sub text-[10px] truncate">${escapeHtml(dateRange)}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+            <button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs" onclick="window.renameTripFromDropdown(event, '${trip.id}', '${escapeHtml(tripTitle)}')" title="Rename trip">✏️</button>
+            ${trips.length > 1 ? `
+              <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromDropdown(event, '${trip.id}', '${escapeHtml(tripTitle)}')" title="Delete trip">🗑️</button>
+            ` : ''}
           </div>
         `;
-        item.onclick = async function() {
-          window.closeTripDropdown();
-          if (!isCurrent) {
-            await window.switchActiveTrip(trip.id);
-          }
-        };
         recentListEl.appendChild(item);
       });
 
@@ -123,22 +125,22 @@
         } else {
           cloudFiles.slice(0, 5).forEach(file => {
             const isActiveFile = fileMap[activeTripId] === file.id;
-            const item = document.createElement('button');
-            item.className = `trip-dropdown-item ${isActiveFile ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-l-2 border-emerald-500' : 'hover:bg-blue-50 dark:hover:bg-blue-950/40'}`;
+            const item = document.createElement('div');
+            item.className = `trip-dropdown-item group flex items-center justify-between ${isActiveFile ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-l-2 border-emerald-500' : 'hover:bg-blue-50 dark:hover:bg-blue-950/40'}`;
             item.innerHTML = `
-              <span class="trip-item-icon">${isActiveFile ? '●' : '📄'}</span>
-              <div class="trip-item-info">
-                <div class="trip-item-title truncate text-xs ${isActiveFile ? 'font-bold text-emerald-800 dark:text-emerald-300' : ''}">${escapeHtml(file.name)}</div>
-                <div class="trip-item-sub text-[10px]">Google Drive .json</div>
+              <div class="flex items-center gap-2 flex-1 min-w-0 cursor-pointer" onclick="window.closeTripDropdown(); window.loadTripFromGoogleDrive('${file.id}');">
+                <span class="trip-item-icon shrink-0">${isActiveFile ? '●' : '📄'}</span>
+                <div class="trip-item-info min-w-0">
+                  <div class="trip-item-title truncate text-xs ${isActiveFile ? 'font-bold text-emerald-800 dark:text-emerald-300' : ''}">${escapeHtml(file.name)}</div>
+                  <div class="trip-item-sub text-[10px]">Google Drive .json</div>
+                </div>
               </div>
-              <span class="text-[10px] ${isActiveFile ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-blue-600 dark:text-blue-400 font-semibold'} shrink-0">
-                ${isActiveFile ? '✓ Open' : '📥 Load'}
-              </span>
+              <div class="flex items-center gap-1 shrink-0">
+                <button class="p-1 hover:bg-blue-200 dark:hover:bg-blue-900 rounded text-xs" onclick="window.renameCloudFileFromDropdown(event, '${file.id}', '${escapeHtml(file.name)}')" title="Rename cloud trip">✏️</button>
+                <a href="https://drive.google.com/file/d/${file.id}/view" target="_blank" rel="noopener noreferrer" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs text-slate-500" title="View in Google Drive" onclick="event.stopPropagation();">↗</a>
+                <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromGoogleDrive('${file.id}', '${escapeHtml(file.name)}')" title="Delete cloud trip">🗑️</button>
+              </div>
             `;
-            item.onclick = async function() {
-              window.closeTripDropdown();
-              await window.loadTripFromGoogleDrive(file.id);
-            };
             recentListEl.appendChild(item);
           });
         }
@@ -444,6 +446,91 @@
     document.body.appendChild(dlAnchorElem);
     dlAnchorElem.click();
     dlAnchorElem.remove();
+  };
+
+  // Rename Trip directly from Dropdown
+  window.renameTripFromDropdown = async function(event, tripId, currentTitle) {
+    if (event) event.stopPropagation();
+    const newTitle = prompt('Enter new trip title:', currentTitle || 'My Trip');
+    if (!newTitle || !newTitle.trim() || newTitle.trim() === currentTitle) return;
+
+    const cleanTitle = newTitle.trim();
+    const trips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
+    const targetTrip = trips.find(t => t.id === tripId);
+
+    if (targetTrip) {
+      if (targetTrip.data && targetTrip.data.meta) {
+        targetTrip.data.meta.title = cleanTitle;
+      }
+      targetTrip.title = cleanTitle;
+      if (typeof window.saveTripToIndexedDB === 'function') {
+        await window.saveTripToIndexedDB(targetTrip);
+      }
+    }
+
+    const activeTripId = typeof window.getActiveTripId === 'function' ? window.getActiveTripId() : '';
+    if (activeTripId === tripId) {
+      if (typeof window.tripData !== 'undefined' && window.tripData && window.tripData.meta) {
+        window.tripData.meta.title = cleanTitle;
+      }
+      const titleEl = document.getElementById('currentTripTitle');
+      if (titleEl) titleEl.innerText = cleanTitle;
+    }
+
+    if (typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected() && targetTrip) {
+      if (typeof window.uploadTripToGoogleDrive === 'function') {
+        await window.uploadTripToGoogleDrive(targetTrip, true);
+      }
+    }
+
+    if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+    if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
+    if (typeof window.showToast === 'function') window.showToast(`✏️ Renamed trip to "${cleanTitle}"`);
+  };
+
+  // Delete Trip directly from Dropdown
+  window.deleteTripFromDropdown = async function(event, tripId, tripTitle) {
+    if (event) event.stopPropagation();
+    const cleanTitle = tripTitle || 'this trip';
+    if (!confirm(`Are you sure you want to delete "${cleanTitle}"?`)) return;
+
+    if (typeof window.deleteTripDocument === 'function') {
+      await window.deleteTripDocument(tripId);
+    }
+    if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+    if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
+    if (typeof window.showToast === 'function') window.showToast(`🗑️ Deleted "${cleanTitle}"`);
+  };
+
+  // Rename Cloud File directly from Dropdown
+  window.renameCloudFileFromDropdown = async function(event, fileId, currentName) {
+    if (event) event.stopPropagation();
+    const cleanCurrent = currentName.replace(/\.json$/i, '');
+    const newTitle = prompt('Enter new trip title:', cleanCurrent);
+    if (!newTitle || !newTitle.trim() || newTitle.trim() === cleanCurrent) return;
+
+    const cleanTitle = newTitle.trim();
+    if (typeof window.loadTripFromGoogleDrive === 'function') {
+      const loaded = await window.loadTripFromGoogleDrive(fileId);
+      if (loaded) {
+        if (typeof window.tripData !== 'undefined' && window.tripData && window.tripData.meta) {
+          window.tripData.meta.title = cleanTitle;
+        }
+        const activeTripId = typeof window.getActiveTripId === 'function' ? window.getActiveTripId() : '';
+        const trips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
+        const activeTrip = trips.find(t => t.id === activeTripId);
+        if (activeTrip) {
+          activeTrip.title = cleanTitle;
+          if (activeTrip.data && activeTrip.data.meta) activeTrip.data.meta.title = cleanTitle;
+          await window.saveTripToIndexedDB(activeTrip);
+          await window.uploadTripToGoogleDrive(activeTrip, true);
+        }
+      }
+    }
+
+    if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+    if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
+    if (typeof window.showToast === 'function') window.showToast(`✏️ Renamed cloud trip to "${cleanTitle}"`);
   };
 
   // Helper escape HTML string
