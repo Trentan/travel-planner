@@ -1285,29 +1285,30 @@
     </div>
   </div>
 
-  <!-- Authentic Notion Popover Emoji & Icon Picker -->
-  <div id="tripEmojiPickerModal" class="modal-overlay" style="display: none; z-index: 9999;" onclick="if(event.target === this) window.closeTripEmojiPicker();">
-    <div class="modal-container w-[375px] max-w-[94vw] mx-auto bg-[#202020] text-slate-100 rounded-xl p-3 shadow-2xl border border-white/10 animate-in fade-in zoom-in-95 duration-150">
+  <!-- Simplified Solid Notion Emoji Picker Popover -->
+  <div id="tripEmojiPickerModal" class="modal-overlay" style="display: none; z-index: 9999; background: rgba(0,0,0,0.55);" onclick="if(event.target === this) window.closeTripEmojiPicker();">
+    <div class="modal-container w-[360px] max-w-[94vw] mx-auto bg-[#222222] text-slate-100 rounded-xl p-3.5 shadow-2xl border border-slate-700 animate-in fade-in zoom-in-95 duration-150">
       
-      <!-- 1. Notion Top Tabs: Emoji | Icons | Upload | Remove -->
-      <div class="flex items-center justify-between pb-2 mb-2 border-b border-white/10 text-xs">
-        <div class="flex items-center gap-4">
-          <button class="text-white font-semibold border-b-2 border-white pb-1">Emoji</button>
-          <button class="text-slate-400 hover:text-white font-medium pb-1 transition-colors" onclick="window.selectRandomTripEmoji()">Icons</button>
-          <button class="text-slate-400 hover:text-white font-medium pb-1 transition-colors" onclick="window.uploadLocalJsonFileToDrive(); window.closeTripEmojiPicker();">Upload</button>
+      <!-- Notion Top Header Bar: Emoji title + Random 🔀 + Remove -->
+      <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-700/80 text-xs font-semibold">
+        <div class="flex items-center gap-2">
+          <span class="text-white font-bold tracking-tight">Emoji</span>
         </div>
-        <button class="text-slate-400 hover:text-slate-200 text-xs transition-colors" onclick="window.autoDetectAndApplyTripEmoji()" title="Reset to default flag">Remove</button>
+        <div class="flex items-center gap-2">
+          <button class="px-2 py-1 rounded bg-[#2f2f2f] hover:bg-[#3f3f3f] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition-colors" onclick="window.selectRandomTripEmoji()" title="Randomize emoji">
+            <span>🔀</span> <span>Random</span>
+          </button>
+          <button class="text-slate-400 hover:text-red-400 text-[11px] font-medium transition-colors" onclick="window.autoDetectAndApplyTripEmoji()" title="Reset to default flag">Remove</button>
+        </div>
       </div>
 
-      <!-- 2. Notion Search & Quick Actions Row: [ Filter... ] [ 🔀 ] [ 🖐️ ] -->
+      <!-- Notion Search Filter Row -->
       <div class="flex items-center gap-1.5 mb-2">
         <div class="relative flex-1 flex items-center">
           <span class="absolute left-2.5 text-slate-400 text-xs">🔍</span>
           <input type="text" id="notionEmojiSearchInput" placeholder="Filter..." oninput="window.filterNotionEmojiPicker(this.value)" class="w-full pl-8 pr-7 py-1.5 bg-[#181818] rounded-md border border-[#2383e2] focus:ring-1 focus:ring-[#2383e2] text-xs text-white placeholder:text-slate-500 font-sans outline-none">
           <button class="absolute right-2 text-slate-400 hover:text-white text-xs" onclick="document.getElementById('notionEmojiSearchInput').value=''; window.filterNotionEmojiPicker('');">✕</button>
         </div>
-        <button class="w-8 h-8 rounded-md bg-[#2f2f2f] hover:bg-[#3f3f3f] text-slate-200 flex items-center justify-center text-sm transition-colors shrink-0" onclick="window.selectRandomTripEmoji()" title="Random emoji (🔀)">🔀</button>
-        <button class="w-8 h-8 rounded-md bg-[#2f2f2f] hover:bg-[#3f3f3f] text-slate-200 flex items-center justify-center text-sm transition-colors shrink-0" onclick="window.selectTripEmoji('🖐️')" title="Skin tone (🖐️)">🖐️</button>
       </div>
 
       <!-- 3. Scrollable Emoji Grid Container -->

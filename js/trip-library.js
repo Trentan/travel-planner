@@ -625,17 +625,12 @@
 
     modal.style.display = 'flex';
 
-    if (event && event.currentTarget && window.innerWidth > 768) {
-      const rect = event.currentTarget.getBoundingClientRect();
-      if (popover) {
-        popover.style.position = 'absolute';
-        popover.style.top = `${Math.min(window.innerHeight - 380, rect.bottom + 8)}px`;
-        popover.style.left = `${Math.max(16, Math.min(window.innerWidth - 390, rect.left))}px`;
-      }
-    } else if (popover) {
+    if (popover) {
       popover.style.position = 'relative';
       popover.style.top = 'auto';
       popover.style.left = 'auto';
+      popover.style.backgroundColor = '#222222';
+      popover.style.opacity = '1';
     }
 
     setTimeout(() => {
