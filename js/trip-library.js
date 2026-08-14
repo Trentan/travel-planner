@@ -615,7 +615,32 @@
     if (event) event.stopPropagation();
     const modal = document.getElementById('tripEmojiPickerModal');
     if (!modal) return;
+
+    const popover = modal.querySelector('.modal-container');
+    const searchInput = document.getElementById('notionEmojiSearchInput');
+    if (searchInput) {
+      searchInput.value = '';
+      if (typeof window.filterNotionEmojiPicker === 'function') window.filterNotionEmojiPicker('');
+    }
+
     modal.style.display = 'flex';
+
+    if (event && event.currentTarget && window.innerWidth > 768) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      if (popover) {
+        popover.style.position = 'absolute';
+        popover.style.top = `${Math.min(window.innerHeight - 380, rect.bottom + 8)}px`;
+        popover.style.left = `${Math.max(16, Math.min(window.innerWidth - 390, rect.left))}px`;
+      }
+    } else if (popover) {
+      popover.style.position = 'relative';
+      popover.style.top = 'auto';
+      popover.style.left = 'auto';
+    }
+
+    setTimeout(() => {
+      if (searchInput) searchInput.focus();
+    }, 100);
   };
 
   window.closeTripEmojiPicker = function() {

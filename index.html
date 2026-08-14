@@ -1285,123 +1285,224 @@
     </div>
   </div>
 
-  <!-- Authentic Notion-Style Emoji & Icon Picker Popover -->
+  <!-- Authentic Notion Popover Emoji & Icon Picker -->
   <div id="tripEmojiPickerModal" class="modal-overlay" style="display: none; z-index: 9999;" onclick="if(event.target === this) window.closeTripEmojiPicker();">
-    <div class="modal-container max-w-md w-full mx-4 bg-slate-900 text-slate-100 rounded-2xl p-4 shadow-2xl border border-slate-700/80 animate-in fade-in zoom-in-95 duration-150">
+    <div class="modal-container w-[375px] max-w-[94vw] mx-auto bg-[#202020] text-slate-100 rounded-xl p-3 shadow-2xl border border-white/10 animate-in fade-in zoom-in-95 duration-150">
       
-      <!-- Top Notion Tab Bar: Emoji | Icons | Upload | Random 🔀 | Remove -->
-      <div class="flex items-center justify-between pb-3 border-b border-slate-800 text-xs font-semibold">
+      <!-- 1. Notion Top Tabs: Emoji | Icons | Upload | Remove -->
+      <div class="flex items-center justify-between pb-2 mb-2 border-b border-white/10 text-xs">
         <div class="flex items-center gap-4">
-          <button class="text-white border-b-2 border-blue-500 pb-1 font-bold">Emoji</button>
-          <button class="text-slate-400 hover:text-slate-200 pb-1" onclick="window.selectRandomTripEmoji()">Icons</button>
-          <button class="text-slate-400 hover:text-slate-200 pb-1" onclick="window.uploadLocalJsonFileToDrive(); window.closeTripEmojiPicker();">Upload</button>
+          <button class="text-white font-semibold border-b-2 border-white pb-1">Emoji</button>
+          <button class="text-slate-400 hover:text-white font-medium pb-1 transition-colors" onclick="window.selectRandomTripEmoji()">Icons</button>
+          <button class="text-slate-400 hover:text-white font-medium pb-1 transition-colors" onclick="window.uploadLocalJsonFileToDrive(); window.closeTripEmojiPicker();">Upload</button>
         </div>
-        <div class="flex items-center gap-2">
-          <button class="p-1 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold flex items-center gap-1 border border-slate-700/60" onclick="window.selectRandomTripEmoji()" title="Randomize emoji">
-            <span>🔀</span> <span>Random</span>
-          </button>
-          <button class="text-slate-400 hover:text-red-400 text-[11px] font-semibold" onclick="window.autoDetectAndApplyTripEmoji()" title="Reset to country flag">Remove</button>
-        </div>
+        <button class="text-slate-400 hover:text-slate-200 text-xs transition-colors" onclick="window.autoDetectAndApplyTripEmoji()" title="Reset to default flag">Remove</button>
       </div>
 
-      <!-- Search Filter Bar (Notion Style) -->
-      <div class="py-3">
-        <div class="relative flex items-center">
-          <span class="absolute left-3 text-slate-400 text-sm">🔍</span>
-          <input type="text" id="notionEmojiSearchInput" placeholder="Filter..." oninput="window.filterNotionEmojiPicker(this.value)" class="w-full pl-9 pr-8 py-2 bg-slate-800/90 rounded-xl border border-slate-700 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono">
-          <button class="absolute right-3 text-slate-400 hover:text-white text-xs" onclick="document.getElementById('notionEmojiSearchInput').value=''; window.filterNotionEmojiPicker('');">✕</button>
+      <!-- 2. Notion Search & Quick Actions Row: [ Filter... ] [ 🔀 ] [ 🖐️ ] -->
+      <div class="flex items-center gap-1.5 mb-2">
+        <div class="relative flex-1 flex items-center">
+          <span class="absolute left-2.5 text-slate-400 text-xs">🔍</span>
+          <input type="text" id="notionEmojiSearchInput" placeholder="Filter..." oninput="window.filterNotionEmojiPicker(this.value)" class="w-full pl-8 pr-7 py-1.5 bg-[#181818] rounded-md border border-[#2383e2] focus:ring-1 focus:ring-[#2383e2] text-xs text-white placeholder:text-slate-500 font-sans outline-none">
+          <button class="absolute right-2 text-slate-400 hover:text-white text-xs" onclick="document.getElementById('notionEmojiSearchInput').value=''; window.filterNotionEmojiPicker('');">✕</button>
         </div>
+        <button class="w-8 h-8 rounded-md bg-[#2f2f2f] hover:bg-[#3f3f3f] text-slate-200 flex items-center justify-center text-sm transition-colors shrink-0" onclick="window.selectRandomTripEmoji()" title="Random emoji (🔀)">🔀</button>
+        <button class="w-8 h-8 rounded-md bg-[#2f2f2f] hover:bg-[#3f3f3f] text-slate-200 flex items-center justify-center text-sm transition-colors shrink-0" onclick="window.selectTripEmoji('🖐️')" title="Skin tone (🖐️)">🖐️</button>
       </div>
 
-      <!-- Quick Category Quick-Nav Bar -->
-      <div class="flex items-center justify-between px-1 pb-2 border-b border-slate-800/80 text-sm text-slate-400">
-        <button class="hover:text-white p-1 rounded" onclick="window.scrollToEmojiCategory('flags')" title="Flags">🏁</button>
-        <button class="hover:text-white p-1 rounded" onclick="window.scrollToEmojiCategory('travel')" title="Travel & Places">✈️</button>
-        <button class="hover:text-white p-1 rounded" onclick="window.scrollToEmojiCategory('nature')" title="Nature & Activity">🌿</button>
-        <button class="hover:text-white p-1 rounded" onclick="window.scrollToEmojiCategory('food')" title="Food & Drink">🍕</button>
-      </div>
-
-      <!-- Scrollable Emoji Grid Container -->
-      <div id="notionEmojiGridContainer" class="py-3 max-h-64 overflow-y-auto space-y-3 custom-scrollbar pr-1">
-        <!-- Flags Section -->
-        <div class="emoji-category-block" data-category="flags">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 px-1">Country Flags</div>
-          <div class="grid grid-cols-8 gap-1 text-2xl">
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇯🇵')">🇯🇵</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇨🇭')">🇨🇭</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇮🇹')">🇮🇹</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇫🇷')">🇫🇷</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇹🇭')">🇹🇭</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇦🇺')">🇦🇺</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇦🇹')">🇦🇹</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇹🇼')">🇹🇼</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇬🇧')">🇬🇧</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇺🇸')">🇺🇸</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇪🇸')">🇪🇸</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇩🇪')">🇩🇪</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇸🇬')">🇸🇬</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇮🇩')">🇮🇩</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇳🇿')">🇳🇿</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇻🇳')">🇻🇳</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇨🇦')">🇨🇦</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇬🇷')">🇬🇷</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇲🇽')">🇲🇽</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🇧🇷')">🇧🇷</button>
+      <!-- 3. Scrollable Emoji Grid Container -->
+      <div id="notionEmojiGridContainer" class="max-h-[260px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+        <!-- Category: People / Smileys -->
+        <div class="emoji-category-block" data-category="people">
+          <div class="text-[11px] font-semibold text-slate-400 px-1 py-1">People</div>
+          <div class="grid grid-cols-8 gap-0.5">
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😀')">😀</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😃')">😃</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😄')">😄</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😁')">😁</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😆')">😆</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😅')">😅</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😂')">😂</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🤣')">🤣</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🙂')">🙂</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😉')">😉</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😊')">😊</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😇')">😇</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🥰')">🥰</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😍')">😍</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🤩')">🤩</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😘')">😘</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😜')">😜</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🤪')">🤪</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😋')">😋</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🥳')">🥳</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('😎')">😎</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🧐')">🧐</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🤓')">🤓</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🥳')">🥳</button>
           </div>
         </div>
 
-        <!-- Travel Section -->
-        <div class="emoji-category-block" data-category="travel">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 px-1">Travel & Places</div>
-          <div class="grid grid-cols-8 gap-1 text-2xl">
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('✈️')">✈️</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🌍')">🌍</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🧭')">🧭</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🏝️')">🏝️</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🧳')">🧳</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🏕️')">🏕️</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🏔️')">🏔️</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🗺️')">🗺️</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🗼')">🗼</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🏯')">🏯</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('⛩️')">⛩️</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🗿')">🗿</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🎡')">🎡</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🏰')">🏰</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🗽')">🗽</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🌋')">🌋</button>
-          </div>
-        </div>
-
-        <!-- Nature & Activity Section -->
+        <!-- Category: Nature & Animals -->
         <div class="emoji-category-block" data-category="nature">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 px-1">Nature & Activities</div>
-          <div class="grid grid-cols-8 gap-1 text-2xl">
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('⛷️')">⛷️</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🏖️')">🏖️</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('⛵')">⛵</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🌊')">🌊</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('☀️')">☀️</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🌴')">🌴</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🌸')">🌸</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🍁')">🍁</button>
+          <div class="text-[11px] font-semibold text-slate-400 px-1 py-1">Nature</div>
+          <div class="grid grid-cols-8 gap-0.5">
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🐶')">🐶</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🐱')">🐱</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🐭')">🐭</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🐰')">🐰</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🦊')">🦊</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🐻')">🐻</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🐼')">🐼</button>
+
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🌿')">🌿</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🌸')">🌸</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🌲')">🌲</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🌴')">🌴</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍁')">🍁</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍄')">🍄</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🌊')">🌊</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('☀️')">☀️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🔥')">🔥</button>
           </div>
         </div>
 
-        <!-- Food & Drink Section -->
+        <!-- Category: Food & Drink -->
         <div class="emoji-category-block" data-category="food">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 px-1">Food & Drink</div>
-          <div class="grid grid-cols-8 gap-1 text-2xl">
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🍷')">🍷</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🍜')">🍜</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🍕')">🍕</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🍣')">🍣</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🥐')">🥐</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('☕')">☕</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🍺')">🍺</button>
-            <button class="emoji-item-btn p-1.5 rounded-lg hover:bg-slate-800 transition-transform hover:scale-125" onclick="window.selectTripEmoji('🍹')">🍹</button>
+          <div class="text-[11px] font-semibold text-slate-400 px-1 py-1">Food & Drink</div>
+          <div class="grid grid-cols-8 gap-0.5">
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍏')">🍏</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍕')">🍕</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍔')">🍔</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍟')">🍟</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🌭')">🌭</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍜')">🍜</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍣')">🍣</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🥐')">🥐</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('☕️')">☕️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍷')">🍷</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍺')">🍺</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍹')">🍹</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍰')">🍰</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍩')">🍩</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍪')">🍪</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🍫')">🍫</button>
           </div>
         </div>
+
+        <!-- Category: Activity -->
+        <div class="emoji-category-block" data-category="activities">
+          <div class="text-[11px] font-semibold text-slate-400 px-1 py-1">Activity</div>
+          <div class="grid grid-cols-8 gap-0.5">
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('⚽️')">⚽️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🏀')">🏀</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🎾')">🎾</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('⛷️')">⛷️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🏂')">🏂</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🏄‍♂️')">🏄‍♂️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🏊‍♀️')">🏊‍♀️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🚴‍♂️')">🚴‍♂️</button>
+          </div>
+        </div>
+
+        <!-- Category: Travel & Places -->
+        <div class="emoji-category-block" data-category="travel">
+          <div class="text-[11px] font-semibold text-slate-400 px-1 py-1">Travel & Places</div>
+          <div class="grid grid-cols-8 gap-0.5">
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('✈️')">✈️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🌍')">🌍</button>
+
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🧭')">🧭</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🏝️')">🏝️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🧳')">🧳</button>
+
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🏔️')">🏔️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🗺️')">🗺️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🗼')">🗼</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🏯')">🏯</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('⛩️')">⛩️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🗿')">🗿</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🎡')">🎡</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🏰')">🏰</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🗽')">🗽</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🌋')">🌋</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🏖️')">🏖️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🚗')">🚗</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🚅')">🚅</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('⛵️')">⛵️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('⛺️')">⛺️</button>
+          </div>
+        </div>
+
+        <!-- Category: Objects -->
+        <div class="emoji-category-block" data-category="objects">
+          <div class="text-[11px] font-semibold text-slate-400 px-1 py-1">Objects</div>
+          <div class="grid grid-cols-8 gap-0.5">
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('💡')">💡</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('📱')">📱</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('💻')">💻</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('📷')">📷</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🔑')">🔑</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('💎')">💎</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🎁')">🎁</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🎈')">🎈</button>
+          </div>
+        </div>
+
+        <!-- Category: Symbols -->
+        <div class="emoji-category-block" data-category="symbols">
+          <div class="text-[11px] font-semibold text-slate-400 px-1 py-1">Symbols</div>
+          <div class="grid grid-cols-8 gap-0.5">
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('❤️')">❤️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('✨')">✨</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🔥')">🔥</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('⭐')">⭐</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('✔️')">✔️</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('💯')">💯</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🎉')">🎉</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('📌')">📌</button>
+          </div>
+        </div>
+
+        <!-- Category: Flags -->
+        <div class="emoji-category-block" data-category="flags">
+          <div class="text-[11px] font-semibold text-slate-400 px-1 py-1">Flags</div>
+          <div class="grid grid-cols-8 gap-0.5">
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇯🇵')">🇯🇵</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇨🇭')">🇨🇭</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇮🇹')">🇮🇹</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇫🇷')">🇫🇷</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇹🇭')">🇹🇭</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇦🇺')">🇦🇺</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇦🇹')">🇦🇹</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇹🇼')">🇹🇼</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇬🇧')">🇬🇧</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇺🇸')">🇺🇸</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇪🇸')">🇪🇸</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇩🇪')">🇩🇪</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇸🇬')">🇸🇬</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇮🇩')">🇮🇩</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇳🇿')">🇳🇿</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇻🇳')">🇻🇳</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇨🇦')">🇨🇦</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇬🇷')">🇬🇷</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇲🇽')">🇲🇽</button>
+            <button class="emoji-item-btn w-9 h-9 text-xl rounded-md hover:bg-[#2f2f2f] flex items-center justify-center transition-colors select-none" onclick="window.selectTripEmoji('🇧🇷')">🇧🇷</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Notion Bottom Category Footer Bar (Exact match to Notion UI screenshot!) -->
+      <div class="flex items-center justify-between px-1 pt-2 mt-1 border-t border-white/10 text-slate-400 text-sm">
+        <button class="hover:text-white hover:bg-[#2f2f2f] p-1 rounded-md transition-colors" onclick="window.scrollToEmojiCategory('people')" title="People">🕒</button>
+        <button class="hover:text-white hover:bg-[#2f2f2f] p-1 rounded-md transition-colors" onclick="window.scrollToEmojiCategory('people')" title="People">😀</button>
+        <button class="hover:text-white hover:bg-[#2f2f2f] p-1 rounded-md transition-colors" onclick="window.scrollToEmojiCategory('nature')" title="Nature">🌿</button>
+        <button class="hover:text-white hover:bg-[#2f2f2f] p-1 rounded-md transition-colors" onclick="window.scrollToEmojiCategory('food')" title="Food & Drink">🥕</button>
+        <button class="hover:text-white hover:bg-[#2f2f2f] p-1 rounded-md transition-colors" onclick="window.scrollToEmojiCategory('activities')" title="Activity">⚽</button>
+        <button class="hover:text-white hover:bg-[#2f2f2f] p-1 rounded-md transition-colors" onclick="window.scrollToEmojiCategory('travel')" title="Travel & Places">✈️</button>
+        <button class="hover:text-white hover:bg-[#2f2f2f] p-1 rounded-md transition-colors" onclick="window.scrollToEmojiCategory('objects')" title="Objects">💡</button>
+        <button class="hover:text-white hover:bg-[#2f2f2f] p-1 rounded-md transition-colors" onclick="window.scrollToEmojiCategory('symbols')" title="Symbols">✔️</button>
+        <button class="hover:text-white hover:bg-[#2f2f2f] p-1 rounded-md transition-colors" onclick="window.scrollToEmojiCategory('flags')" title="Flags">🏁</button>
       </div>
 
     </div>
