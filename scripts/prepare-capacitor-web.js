@@ -15,3 +15,12 @@ for (const item of copies) {
   }
   fs.cpSync(source, path.join(output, item), { recursive: true });
 }
+
+// Ensure dummy Java class exists in capacitor-cordova-android-plugins so R8 finds classes.jar during release builds
+const cordovaJavaDir = path.join(root, 'android', 'capacitor-cordova-android-plugins', 'src', 'main', 'java', 'capacitor', 'cordova', 'android', 'plugins');
+const cordovaJavaFile = path.join(cordovaJavaDir, 'CordovaPlugins.java');
+if (!fs.existsSync(cordovaJavaFile)) {
+  fs.mkdirSync(cordovaJavaDir, { recursive: true });
+  fs.writeFileSync(cordovaJavaFile, `package capacitor.cordova.android.plugins;\n\npublic class CordovaPlugins {\n    // Placeholder class so R8 finds classes.jar when no cordova plugins are installed\n}\n`);
+}
+
