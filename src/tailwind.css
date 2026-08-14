@@ -4697,9 +4697,21 @@
   }
 
   .app-menu-actions-panel {
-    @apply absolute right-0 mt-2 min-w-57.5 p-2 rounded-xl border shadow-2xl backdrop-blur-md z-450 flex flex-col gap-1;
+    @apply absolute right-0 mt-2 min-w-64 p-2.5 rounded-xl border shadow-2xl backdrop-blur-md z-450 flex flex-col gap-1;
     @apply border-slate-200;
     background: rgba(255, 255, 255, 0.98);
+  }
+
+  .app-menu-section-group {
+    @apply flex flex-col gap-1;
+  }
+
+  .app-menu-section-header {
+    @apply px-2 pt-1 pb-0.5 text-[11px] font-bold tracking-wider uppercase text-slate-500 select-none;
+  }
+
+  .app-menu-actions-panel .menu-icon {
+    @apply inline-block mr-1.5 text-sm;
   }
 
   .app-menu-actions-panel .app-menu-btn {
@@ -5812,6 +5824,10 @@
 [data-theme="dark"] .app-menu-actions-panel {
   border-color: rgba(255, 255, 255, 0.2);
   background: rgba(15, 23, 42, 0.95);
+}
+
+[data-theme="dark"] .app-menu-section-header {
+  color: rgba(241, 245, 249, 0.6);
 }
 
 [data-theme="dark"] .app-menu-divider {
