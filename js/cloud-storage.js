@@ -199,12 +199,6 @@
     return new Promise((resolve, reject) => {
       const clientId = getGoogleClientId();
 
-      if (isNativePlatform()) {
-        completeSeamlessSignIn();
-        resolve(true);
-        return;
-      }
-
       const proceedOAuth = () => {
         try {
           const client = google.accounts.oauth2.initTokenClient({
@@ -234,7 +228,7 @@
                     });
                   }
                 } catch (e) {
-                  setUserProfile({ name: 'Google Traveler', email: 'account@google.com', picture: '' });
+                  setUserProfile({ name: 'Google Traveler', email: '', picture: '' });
                 }
 
                 await ensureDriveFolder();
@@ -279,13 +273,20 @@
       };
 
       if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+        if (typeof document !== 'undefined' && !document.querySelector('script[src*="accounts.google.com/gsi/client"]')) {
+          const s = document.createElement('script');
+          s.src = 'https://accounts.google.com/gsi/client';
+          s.async = true;
+          s.defer = true;
+          document.head.appendChild(s);
+        }
         let retries = 0;
         const checkInterval = setInterval(() => {
           retries++;
           if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
             clearInterval(checkInterval);
             proceedOAuth();
-          } else if (retries >= 10) {
+          } else if (retries >= 25) {
             clearInterval(checkInterval);
             if (interactive) alert('Google Sign-In script is loading. Please check your internet connection and try again.');
             resolve(false);
