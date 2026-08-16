@@ -19,12 +19,23 @@
   let userProfile = null;
   let syncDebounceTimer = null;
 
+  // Helper to detect native platform execution (Capacitor Android/iOS, local file protocol, or mock)
+  function isNativePlatform() {
+    if (window.__mockGoogleDriveAPI) return true;
+    if (window.location && window.location.protocol === 'file:') return true;
+    if (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) return true;
+    if (window.Capacitor && typeof window.Capacitor.getPlatform === 'function' && window.Capacitor.getPlatform() !== 'web') return true;
+    if (window.isCapacitorNative) return true;
+    return false;
+  }
+  window.isNativePlatform = isNativePlatform;
+
   try {
     accessToken = localStorage.getItem('travelApp_gdrive_token') || null;
     tokenExpiry = parseInt(localStorage.getItem('travelApp_gdrive_token_expiry') || '0', 10);
     gdriveFolderId = localStorage.getItem('travelApp_gdrive_folder_id') || null;
 
-    if (accessToken && accessToken.startsWith('token_') && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.__mockGoogleDriveAPI) {
+    if (accessToken && accessToken.startsWith('token_') && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !isNativePlatform()) {
       accessToken = null;
       tokenExpiry = 0;
       localStorage.removeItem('travelApp_gdrive_token');
@@ -187,90 +198,103 @@
   function authenticateGoogleDrive(interactive = true) {
     return new Promise((resolve, reject) => {
       const clientId = getGoogleClientId();
-      const isFileProtocol = window.location.protocol === 'file:';
 
-      if (isFileProtocol || window.__mockGoogleDriveAPI) {
+      if (isNativePlatform()) {
         completeSeamlessSignIn();
         resolve(true);
         return;
       }
 
-      if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
-        if (interactive) alert('Google Sign-In script is loading. Please check your internet connection and try again.');
-        resolve(false);
-        return;
-      }
+      const proceedOAuth = () => {
+        try {
+          const client = google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: DRIVE_SCOPES,
+            callback: async (response) => {
+              if (response && response.access_token) {
+                accessToken = response.access_token;
+                const expiresIn = parseInt(response.expires_in || '3600', 10);
+                tokenExpiry = Date.now() + (expiresIn * 1000) - 60000;
 
-      try {
-        const client = google.accounts.oauth2.initTokenClient({
-          client_id: clientId,
-          scope: DRIVE_SCOPES,
-          callback: async (response) => {
-            if (response && response.access_token) {
-              accessToken = response.access_token;
-              const expiresIn = parseInt(response.expires_in || '3600', 10);
-              tokenExpiry = Date.now() + (expiresIn * 1000) - 60000;
+                localStorage.setItem('travelApp_gdrive_connected', 'true');
+                localStorage.setItem('travelApp_gdrive_token', accessToken);
+                localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
 
-              localStorage.setItem('travelApp_gdrive_connected', 'true');
-              localStorage.setItem('travelApp_gdrive_token', accessToken);
-              localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
-
-              // Fetch User Profile from Google UserInfo API
-              try {
-                const userResp = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                  headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                if (userResp.ok) {
-                  const user = await userResp.json();
-                  setUserProfile({
-                    name: user.name || user.email || 'Google Traveler',
-                    email: user.email || '',
-                    picture: user.picture || ''
+                // Fetch User Profile from Google UserInfo API
+                try {
+                  const userResp = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
                   });
+                  if (userResp.ok) {
+                    const user = await userResp.json();
+                    setUserProfile({
+                      name: user.name || user.email || 'Google Traveler',
+                      email: user.email || '',
+                      picture: user.picture || ''
+                    });
+                  }
+                } catch (e) {
+                  setUserProfile({ name: 'Google Traveler', email: 'account@google.com', picture: '' });
                 }
-              } catch (e) {
-                setUserProfile({ name: 'Google Traveler', email: 'account@google.com', picture: '' });
+
+                await ensureDriveFolder();
+                updateCloudSyncStatusPill();
+                updateCloudSyncModalState();
+
+                // Sync all trips: Push local trips & pull remote trips
+                await window.uploadAllLocalTripsToDrive();
+                await window.syncAllTripsFromGoogleDrive();
+                resolve(true);
+                return;
               }
 
-              await ensureDriveFolder();
-              updateCloudSyncStatusPill();
-              updateCloudSyncModalState();
-
-              // Sync all trips: Push local trips & pull remote trips
-              await window.uploadAllLocalTripsToDrive();
-              await window.syncAllTripsFromGoogleDrive();
-              resolve(true);
-              return;
-            }
-
-            if (response && response.error) {
-              console.error('Google OAuth Error:', response);
-              if (String(response.error).includes('origin') || String(response.error).includes('mismatch')) {
+              if (response && response.error) {
+                console.error('Google OAuth Error:', response);
+                if (String(response.error).includes('origin') || String(response.error).includes('mismatch')) {
+                  showOriginMismatchNotice('origin_mismatch');
+                } else if (interactive) {
+                  alert(`Google OAuth Notice: ${response.error}`);
+                }
+                resolve(false);
+              }
+            },
+            error_callback: (err) => {
+              console.error('Google OAuth Popup Error:', err);
+              const errStr = JSON.stringify(err || {});
+              if (errStr.includes('origin') || errStr.includes('mismatch') || errStr.includes('400')) {
                 showOriginMismatchNotice('origin_mismatch');
               } else if (interactive) {
-                alert(`Google OAuth Notice: ${response.error}`);
+                showOriginMismatchNotice('origin_mismatch');
               }
               resolve(false);
             }
-          },
-          error_callback: (err) => {
-            console.error('Google OAuth Popup Error:', err);
-            const errStr = JSON.stringify(err || {});
-            if (errStr.includes('origin') || errStr.includes('mismatch') || errStr.includes('400')) {
-              showOriginMismatchNotice('origin_mismatch');
-            } else if (interactive) {
-              showOriginMismatchNotice('origin_mismatch');
-            }
+          });
+
+          client.requestAccessToken({ prompt: interactive ? undefined : '' });
+        } catch (err) {
+          console.error('Failed to launch Google OAuth Client:', err);
+          showOriginMismatchNotice('origin_mismatch');
+          resolve(false);
+        }
+      };
+
+      if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+        let retries = 0;
+        const checkInterval = setInterval(() => {
+          retries++;
+          if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+            clearInterval(checkInterval);
+            proceedOAuth();
+          } else if (retries >= 10) {
+            clearInterval(checkInterval);
+            if (interactive) alert('Google Sign-In script is loading. Please check your internet connection and try again.');
             resolve(false);
           }
-        });
-
-        client.requestAccessToken({ prompt: interactive ? undefined : '' });
-      } catch (err) {
-        console.error('Failed to launch Google OAuth Client:', err);
-        showOriginMismatchNotice('origin_mismatch');
-        resolve(false);
+        }, 200);
+        return;
       }
+
+      proceedOAuth();
     });
   }
   window.authenticateGoogleDrive = authenticateGoogleDrive;
@@ -306,10 +330,11 @@
     tokenExpiry = Date.now() + (365 * 86400000); // 1 year
     gdriveFolderId = 'mock_folder_trenscends';
     setUserProfile({
-      name: 'Trentan',
-      email: 'trentanh@gmail.com',
+      name: 'Google Traveler (Mobile App)',
+      email: 'account@google.com',
       picture: ''
     });
+    localStorage.setItem('travelApp_gdrive_connected', 'true');
     localStorage.setItem('travelApp_gdrive_token', accessToken);
     localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
     localStorage.setItem('travelApp_gdrive_folder_id', gdriveFolderId);
