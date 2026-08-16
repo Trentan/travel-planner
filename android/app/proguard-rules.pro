@@ -43,10 +43,12 @@
 }
 
 # ---------------------------------------------------------------------------
-# AndroidX / AppCompat – safe defaults
+# AndroidX / AppCompat – Allow R8 optimization via AAR consumer rules
 # ---------------------------------------------------------------------------
--keep class androidx.** { *; }
 -dontwarn androidx.**
+-keepclassmembers class * extends androidx.fragment.app.Fragment {
+    public <init>();
+}
 
 # ---------------------------------------------------------------------------
 # Suppress warnings for classes that may not be present on all API levels
