@@ -27,6 +27,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body>
+<div class="mobile-status-bar-overlay" aria-hidden="true"></div>
 
 <div class="app-menu-bar">
   <div class="app-menu-left">
@@ -205,6 +206,7 @@
             <button id="itineraryTimelineModeBtn" class="itinerary-view-mode-btn is-active" type="button" onclick="setItineraryDayViewMode('timeline')" title="Timeline View" aria-label="Timeline View"><span class="view-mode-icon">⏳</span> <span class="view-mode-text">Timeline</span></button>
             <button id="itineraryGroupedModeBtn" class="itinerary-view-mode-btn" type="button" onclick="setItineraryDayViewMode('grouped')" title="Grouped View" aria-label="Grouped View"><span class="view-mode-icon">📦</span> <span class="view-mode-text">Grouped</span></button>
           </div>
+          <button class="action-btn add-city-action" onclick="openCityDialog()"><span class="add-city-label">🌍 City</span></button>
           <button class="action-btn add-leg-action" onclick="openLegEditorDialog()"><span class="add-leg-label">🧭 Legs</span></button>
         </div>
       </div>

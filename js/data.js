@@ -2284,6 +2284,20 @@ function openCityDialog() {
     populateCityList();
     populateCountrySelect();
     setupCityAutocomplete();
+
+    // Scroll active inputs into view when focused on mobile soft keyboard
+    modal.querySelectorAll('input, select').forEach(input => {
+      if (!input.dataset.scrollBound) {
+        input.dataset.scrollBound = 'true';
+        input.addEventListener('focus', function() {
+          if (window.innerWidth <= 768) {
+            setTimeout(() => {
+              this.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }, 300);
+          }
+        });
+      }
+    });
   }
 }
 
@@ -6217,7 +6231,7 @@ function renderTripStart() {
   }
   
   const stopRows = tripStartAnswers.stops.map((stop, index) => `
-    <div class="trip-start-stop-row" style="display: grid; grid-template-columns: 1fr 1fr 60px 90px 30px; gap: 0.35rem; align-items: center; margin-bottom: 0.5rem;">
+    <div class="trip-start-stop-row trip-start-stop-grid">
       <input class="trip-start-input" aria-label="Additional city ${index + 1}" maxlength="80" placeholder="City" value="${escapeTripStartText(stop.city)}" oninput="handleTripStartStopCityTyping(${index}, this, 'tripStartStopCountry_${index}')">
       <select id="tripStartStopCountry_${index}" class="trip-start-input" aria-label="Country for additional city ${index + 1}" style="padding: 0.4rem; font-size: 0.85rem;" onchange="updateTripStartStop(${index}, 'countryCode', this.value)">${buildCountryOptionsHtml(stop.countryCode || '')}</select>
       <input class="trip-start-stop-nights" aria-label="Nights in additional city ${index + 1}" type="number" min="1" max="60" value="${stop.nights}" oninput="updateTripStartStop(${index}, 'nights', this.value)">

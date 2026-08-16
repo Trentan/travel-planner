@@ -1545,6 +1545,22 @@
       padding-top: env(safe-area-inset-top, 0px);
     }
 
+    .mobile-status-bar-overlay {
+      display: none;
+    }
+
+    body.mobile-app-mode .mobile-status-bar-overlay {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: env(safe-area-inset-top, 0px);
+      background-color: #0f172a;
+      z-index: 99999;
+      pointer-events: none;
+    }
+
     body.mobile-app-mode :is(
       header,
       .app-tabs-content,
@@ -7495,5 +7511,73 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
 [data-theme="dark"] .trip-btn-secondary:hover {
   background: #334155;
 }
+
+/* Mobile Read-Only Banner Polish */
+@media (max-width: 640px) {
+  #readOnlyBanner {
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.75rem !important;
+    gap: 0.4rem !important;
+  }
+  .readonly-banner-hint {
+    display: none !important;
+  }
+  .readonly-banner-unlock-btn {
+    padding: 0.2rem 0.55rem !important;
+    font-size: 0.72rem !important;
+    min-height: 1.6rem !important;
+  }
+}
+
+/* Build My Trip Wizard Responsive Layout Hardening */
+.trip-start-stop-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.6rem;
+  background: rgba(241, 245, 249, 0.6);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+[data-theme="dark"] .trip-start-stop-grid {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(51, 65, 85, 0.8);
+}
+@media (min-width: 640px) {
+  .trip-start-stop-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 60px 90px 30px;
+    gap: 0.35rem;
+    align-items: center;
+    padding: 0;
+    background: transparent;
+    border: none;
+  }
+}
+
+/* Modal Input & Keyboard Scroll Hardening */
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding-top: calc(0.5rem + env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .modal-content {
+    max-height: calc(88vh - env(safe-area-inset-top, 0px)) !important;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-body {
+    flex: 1;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .city-add-stack input,
+  .city-add-stack select {
+    font-size: 16px !important;
+  }
+}
+
 
 
