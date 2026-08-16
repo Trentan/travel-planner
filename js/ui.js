@@ -16,6 +16,14 @@ function isMobileViewport() {
   return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
 }
 
+function isSmallMobileViewport() {
+  return window.matchMedia && window.matchMedia('(max-width: 379px)').matches;
+}
+
+function isTabletViewport() {
+  return window.matchMedia && window.matchMedia('(min-width: 481px) and (max-width: 900px)').matches;
+}
+
 function updateStickyOffsets() {
   const menuBar = document.querySelector('.app-menu-bar');
   const tabsNav = document.querySelector('.app-tabs-nav');
@@ -27,21 +35,37 @@ function updateStickyOffsets() {
     ? Math.ceil(menuBar.getBoundingClientRect().height || 0)
     : 0;
   const tabsHeight = Math.ceil(tabsNav.getBoundingClientRect().height || 0);
-  tabsNav.style.top = `${menuHeight}px`;
+
+  if (!isMobile) {
+    tabsNav.style.top = `${menuHeight}px`;
+  } else {
+    tabsNav.style.top = '';
+  }
 
   const cityHeight = cityNav
     ? Math.ceil(cityNav.getBoundingClientRect().height || 0)
     : 0;
 
   if (cityNav) {
-    const cityTop = isMobile ? (menuHeight + tabsHeight) : Math.max(0, menuHeight + tabsHeight - 1);
-    cityNav.style.top = `${cityTop}px`;
+    if (isMobile) {
+      cityNav.style.top = '';
+    } else {
+      const cityTop = Math.max(0, menuHeight + tabsHeight - 1);
+      cityNav.style.top = `${cityTop}px`;
+    }
   }
 
   if (!isMobile) {
     document.body.style.paddingTop = `${menuHeight + tabsHeight + cityHeight}px`;
   } else {
     document.body.style.paddingTop = '';
+  }
+
+  // Set CSS custom properties on document root for fluid calculations
+  if (document.documentElement && document.documentElement.style && typeof document.documentElement.style.setProperty === 'function') {
+    document.documentElement.style.setProperty('--app-menu-height', `${menuHeight}px`);
+    document.documentElement.style.setProperty('--app-tabs-height', `${tabsHeight}px`);
+    document.documentElement.style.setProperty('--app-city-height', `${cityHeight}px`);
   }
 }
 

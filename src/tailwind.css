@@ -7579,5 +7579,76 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   MULTI-TIER DEVICE SIZE & RANGE RESPONSIVENESS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Tier 1: Extra-Small Mobile Devices (< 380px e.g. iPhone SE, Galaxy S8/S9, 320px-360px) */
+@media (max-width: 379px) {
+  .section-header {
+    padding-inline: 0.5rem !important;
+    gap: 0.35rem !important;
+  }
+
+  .section-header-actions {
+    gap: 0.25rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .action-btn,
+  .itinerary-view-mode-btn {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .modal-content {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    padding: 0.75rem !important;
+    margin-inline: auto !important;
+  }
+
+  .modal-header h2 {
+    font-size: 1.05rem !important;
+  }
+
+  .city-nav-btn {
+    padding: 0.25rem 0.6rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .compact-day-slide {
+    padding: 0.5rem !important;
+  }
+
+  .budget-kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Tier 2: Tablets & Foldable Screens (481px – 900px e.g. Surface Duo, iPad Mini, iPad Portrait) */
+@media (min-width: 481px) and (max-width: 900px) {
+  .modal-content {
+    width: clamp(440px, 85vw, 760px) !important;
+    max-width: 90vw !important;
+  }
+
+  .budget-kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+  }
+
+  #tab-itinerary .section-header-actions {
+    flex-wrap: nowrap;
+  }
+}
+
+/* Universal dynamic viewport height (dvh) support for mobile screens */
+@supports (height: 100dvh) {
+  body.mobile-app-mode .modal-content {
+    max-height: calc(88dvh - env(safe-area-inset-top, 0px)) !important;
+  }
+}
+
+
 
 
