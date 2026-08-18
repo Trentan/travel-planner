@@ -34,15 +34,20 @@
     accessToken = localStorage.getItem('travelApp_gdrive_token') || null;
     tokenExpiry = parseInt(localStorage.getItem('travelApp_gdrive_token_expiry') || '0', 10);
     gdriveFolderId = localStorage.getItem('travelApp_gdrive_folder_id') || null;
+    userProfile = JSON.parse(localStorage.getItem('travelApp_user_profile') || 'null');
 
-    if (accessToken && accessToken.startsWith('token_') && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !isNativePlatform()) {
+    // Unconditionally purge any legacy mock tokens or mock profile data across all platforms
+    if ((accessToken && accessToken.startsWith('token_')) || (userProfile && (userProfile.email === 'account@google.com' || userProfile.name.includes('Mobile App')))) {
       accessToken = null;
       tokenExpiry = 0;
+      gdriveFolderId = null;
+      userProfile = null;
+      localStorage.removeItem('travelApp_gdrive_connected');
       localStorage.removeItem('travelApp_gdrive_token');
       localStorage.removeItem('travelApp_gdrive_token_expiry');
+      localStorage.removeItem('travelApp_gdrive_folder_id');
+      localStorage.removeItem('travelApp_user_profile');
     }
-
-    userProfile = JSON.parse(localStorage.getItem('travelApp_user_profile') || 'null');
   } catch (e) {
     userProfile = null;
   }
@@ -327,21 +332,7 @@
   window.showOriginMismatchNotice = showOriginMismatchNotice;
 
   function completeSeamlessSignIn() {
-    accessToken = 'token_gdrive_user_active';
-    tokenExpiry = Date.now() + (365 * 86400000); // 1 year
-    gdriveFolderId = 'mock_folder_trenscends';
-    setUserProfile({
-      name: 'Google Traveler (Mobile App)',
-      email: 'account@google.com',
-      picture: ''
-    });
-    localStorage.setItem('travelApp_gdrive_connected', 'true');
-    localStorage.setItem('travelApp_gdrive_token', accessToken);
-    localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
-    localStorage.setItem('travelApp_gdrive_folder_id', gdriveFolderId);
-    updateCloudSyncStatusPill();
-    updateCloudSyncModalState();
-    if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+    return window.authenticateGoogleDrive(true);
   }
 
   // Disconnect Google Drive & Sign Out

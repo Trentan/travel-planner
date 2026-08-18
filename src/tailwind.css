@@ -1529,8 +1529,15 @@
       height: auto !important;
     }
 
-    body.mobile-app-mode .app-menu-bar {
+    body.mobile-app-mode .app-menu-bar,
+    body.mobile-app-mode header {
       display: none !important;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        display: none !important;
+      }
     }
 
     html,
