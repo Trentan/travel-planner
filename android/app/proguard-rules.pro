@@ -51,8 +51,21 @@
 }
 
 # ---------------------------------------------------------------------------
+# GoogleAuth Capacitor Plugin & Google Play Services Auth
+# ---------------------------------------------------------------------------
+-keep class com.codetrixstudio.capacitor.** { *; }
+-keep class com.google.android.gms.auth.api.** { *; }
+-keep class com.google.android.gms.auth.api.signin.** { *; }
+-keep class com.google.android.gms.common.** { *; }
+-keepclassmembers class * extends com.getcapacitor.Plugin {
+    *;
+}
+
+# ---------------------------------------------------------------------------
 # Suppress warnings for classes that may not be present on all API levels
 # ---------------------------------------------------------------------------
 -dontwarn org.bouncycastle.**
 -dontwarn org.conscrypt.**
 -dontwarn org.openjsse.**
+-dontwarn com.google.android.gms.**
+
