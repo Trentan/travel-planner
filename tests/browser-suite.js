@@ -478,6 +478,13 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     assert(await page.locator('body.mobile-app-mode').count() === 1, 'Mobile: body should be in mobile mode');
     assert(await page.locator('body.compact-view-mode').count() === 1, 'Mobile: compact view should be enabled');
 
+    // Dismiss PWA prompt modal if rendered on mobile emulation
+    await page.evaluate(() => {
+      if (typeof dismissPwaPrompt === 'function') dismissPwaPrompt(false);
+      const pwaModal = document.getElementById('pwaPromptModal');
+      if (pwaModal) pwaModal.style.display = 'none';
+    });
+
     for (const tabId of ['transport', 'accom', 'budget', 'packing']) {
       await page.locator(`.app-tab-btn[data-tab="${tabId}"]`).click();
       await humanPause(page, 250);

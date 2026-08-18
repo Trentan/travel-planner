@@ -41,7 +41,7 @@
     font-family: var(--font-sans);
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -1544,28 +1544,16 @@
     body {
       max-width: 100vw;
       width: 100%;
-      overflow-x: hidden;
+      overflow-x: clip;
       overscroll-behavior-x: none;
     }
 
     body.mobile-app-mode {
-      padding-top: env(safe-area-inset-top, 0px);
+      padding-top: 0px;
     }
 
     .mobile-status-bar-overlay {
-      display: none;
-    }
-
-    body.mobile-app-mode .mobile-status-bar-overlay {
-      display: block;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: env(safe-area-inset-top, 0px);
-      background-color: #0f172a;
-      z-index: 99999;
-      pointer-events: none;
+      display: none !important;
     }
 
     body.mobile-app-mode :is(
@@ -1628,26 +1616,25 @@
     }
 
     body.mobile-app-mode .app-tabs-nav {
-      position: fixed;
+      position: sticky !important;
       left: 0;
       right: 0;
-      bottom: 0;
-      top: auto !important;
-      z-index: 320;
+      top: 0 !important;
+      bottom: auto !important;
+      z-index: 200;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      border-top: 1px solid rgba(148, 163, 184, 0.32);
-      border-bottom: 0;
+      border-top: none;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.32);
       background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      height: calc(4.15rem + env(safe-area-inset-bottom, 0px));
-      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-inline: 0.5rem;
       box-sizing: border-box;
       -webkit-transform: translateZ(0);
       transform: translateZ(0);
-      will-change: transform;
     }
 
     body.mobile-app-mode .app-tabs-list {
@@ -1656,31 +1643,33 @@
     }
 
     body.mobile-app-mode .app-tabs-content {
-      padding-bottom: calc(8.2rem + env(safe-area-inset-bottom, 0px));
+      padding-top: 0.25rem;
+      padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
     }
 
     [data-theme="dark"] body.mobile-app-mode .app-tabs-nav {
       background: rgba(15, 23, 42, 0.95);
-      border-top-color: rgba(71, 85, 105, 0.65);
+      border-bottom-color: rgba(71, 85, 105, 0.65);
     }
 
     body.mobile-app-mode #cityNav {
-      position: fixed;
+      position: sticky !important;
       left: 0;
       right: 0;
-      top: auto !important;
-      bottom: calc(4.15rem + env(safe-area-inset-bottom, 0px));
-      z-index: 321;
-      border-top: 1px solid rgba(148, 163, 184, 0.26);
+      top: calc(48px + env(safe-area-inset-top, 0px)) !important;
+      bottom: auto !important;
+      z-index: 190;
+      border-top: none;
       border-bottom: 1px solid rgba(148, 163, 184, 0.26);
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       padding-block: 0.3rem;
+      padding-inline: 0.5rem;
     }
 
     [data-theme="dark"] body.mobile-app-mode #cityNav {
-      background: rgba(15, 23, 42, 0.95);
-      border-top-color: rgba(71, 85, 105, 0.65);
+      background: rgba(15, 23, 42, 0.96);
       border-bottom-color: rgba(71, 85, 105, 0.65);
     }
 
@@ -4769,7 +4758,7 @@
     position: sticky;
   }
   .city-nav {
-    top: 112px;
+    top: 48px;
   }
 
   .city-nav.city-nav-hidden,
@@ -4862,6 +4851,7 @@
 
     .city-nav {
       display: block;
+      top: 104px;
     }
 
     .city-nav-list {
@@ -5220,7 +5210,7 @@
     @apply fixed inset-0 hidden items-end justify-center px-3 pt-4
            bg-black/58 z-1400 backdrop-blur-sm;
     padding-top: calc(1rem + env(safe-area-inset-top, 0px)) !important;
-    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .mobile-menu-sheet.open {
@@ -5228,30 +5218,27 @@
   }
 
   .mobile-menu-sheet-panel {
-    @apply relative w-full rounded-t-[24px] rounded-b-[18px] shadow-2xl
-           p-4 overflow-y-auto;
-    max-height: 100% !important;
+    @apply relative w-full rounded-t-[24px] rounded-b-[18px] shadow-2xl flex flex-col;
+    max-height: calc(100% - 1rem) !important;
     max-width: min(100%, 520px);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(251, 247, 241, 0.98) 100%);
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+    background: #ffffff;
+    padding: 0 !important;
+    overflow: hidden !important;
   }
 
   .mobile-menu-sheet-panel::before {
-    content: '';
-    position: sticky;
-    top: 0;
-    display: block;
-    width: 2.75rem;
-    height: 0.25rem;
-    margin: -0.25rem auto 0.75rem;
-    border-radius: 9999px;
-    background: rgba(100, 116, 139, 0.35);
+    display: none;
   }
 
   .mobile-menu-sheet-header {
-    @apply sticky top-0 z-10 flex justify-between items-start gap-4 mb-3.5 pb-3;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.94) 78%, rgba(255, 255, 255, 0) 100%);
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    background: #ffffff;
+    z-index: 10;
   }
 
   .mobile-menu-sheet-header h2 {
@@ -5260,6 +5247,14 @@
 
   .mobile-menu-sheet-header p {
     @apply text-[0.82rem] mt-0.5 text-text-muted;
+  }
+
+  .mobile-menu-sheet-scroll-wrap {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1rem 1.25rem 1.75rem;
+    -webkit-overflow-scrolling: touch;
   }
 
   .mobile-menu-btn {
@@ -5858,7 +5853,13 @@
 }
 
 [data-theme="dark"] .mobile-menu-sheet-panel {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(15, 23, 42, 0.98) 100%);
+  background: #0f172a;
+  border: 1px solid #334155;
+}
+
+[data-theme="dark"] .mobile-menu-sheet-header {
+  background: #0f172a;
+  border-bottom-color: #334155;
 }
 
 [data-theme="dark"] .mobile-menu-sheet .app-menu-btn {
