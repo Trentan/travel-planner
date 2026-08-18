@@ -432,6 +432,10 @@
             ? `<button class="trip-btn trip-btn-active" disabled>Currently Open</button>`
             : `<button class="trip-btn trip-btn-primary" onclick="window.switchActiveTrip('${trip.id}')">Switch to Trip</button>`
           }
+          ${typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected()
+            ? `<button class="trip-btn trip-btn-secondary text-blue-600 dark:text-blue-400" onclick="window.uploadTripByIdToDrive('${trip.id}')" title="Upload this trip to Google Drive">☁️ Sync</button>`
+            : ''
+          }
           <button class="trip-btn trip-btn-secondary" onclick="window.duplicateTripFromLibrary('${trip.id}')" title="Duplicate trip">📋 Duplicate</button>
           <button class="trip-btn trip-btn-secondary" onclick="window.exportTripFromLibrary('${trip.id}')" title="Export JSON backup">📥 Export</button>
           ${trips.length > 1

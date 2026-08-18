@@ -291,14 +291,17 @@
           <button id="mobileCloudSyncStatusPill" class="cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full cursor-pointer shrink-0" onclick="openCloudSyncModal(); closeMobileMenu();">⚡ Local Only</button>
         </div>
         
-        <div class="grid grid-cols-3 gap-1.5 pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
-          <button class="py-1.5 px-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 border border-slate-200/60 dark:border-slate-700 shadow-xs" onclick="closeMobileMenu(); openTripLibraryModal();">
-            <span>🖼️</span> <span>Switch</span>
+        <div class="grid grid-cols-4 gap-1 pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+          <button class="py-1.5 px-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-0.5 border border-slate-200/60 dark:border-slate-700 shadow-xs" onclick="closeMobileMenu(); openTripLibraryModal();">
+            <span>🖼️</span> <span>Trips</span>
           </button>
-          <button id="mobileRenameBtn" class="py-1.5 px-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 border border-slate-200/60 dark:border-slate-700 shadow-xs" onclick="closeMobileMenu(); openRenameTripDialog();">
+          <button id="mobileBackupDriveBtn" class="py-1.5 px-1 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-0.5 border border-blue-200 dark:border-blue-800 shadow-xs" onclick="window.uploadActiveTripToGoogleDrive();" title="Back up current trip to Google Drive">
+            <span>☁️</span> <span>Backup</span>
+          </button>
+          <button id="mobileRenameBtn" class="py-1.5 px-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-0.5 border border-slate-200/60 dark:border-slate-700 shadow-xs" onclick="closeMobileMenu(); openRenameTripDialog();">
             <span>✏️</span> <span>Rename</span>
           </button>
-          <button class="py-1.5 px-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 border border-slate-200/60 dark:border-slate-700 shadow-xs text-blue-600 dark:text-blue-400" onclick="event.stopPropagation(); window.refreshGoogleDriveFolder(false);">
+          <button class="py-1.5 px-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-0.5 border border-slate-200/60 dark:border-slate-700 shadow-xs text-blue-600 dark:text-blue-400" onclick="event.stopPropagation(); window.refreshGoogleDriveFolder(false);">
             <span>🔄</span> <span>Refresh</span>
           </button>
         </div>

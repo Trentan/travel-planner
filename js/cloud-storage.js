@@ -681,6 +681,52 @@
     }
   };
 
+  // Upload Active Trip to Google Drive
+  window.uploadActiveTripToGoogleDrive = async function() {
+    if (!isGoogleDriveConnected()) {
+      window.openCloudSyncModal();
+      return false;
+    }
+    const activeTripId = typeof window.getActiveTripId === 'function' ? window.getActiveTripId() : 'trip_default';
+    const trips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
+    const activeTrip = trips.find(t => t.id === activeTripId) || (typeof window.buildActiveTripRecord === 'function' ? window.buildActiveTripRecord() : null);
+
+    if (activeTrip) {
+      updateCloudSyncStatusPill('⏳ Uploading to Drive...', 'syncing');
+      const ok = await window.uploadTripToGoogleDrive(activeTrip);
+      if (ok) {
+        if (typeof window.showToast === 'function') window.showToast(`☁️ Backed up "${activeTrip.title || 'Trip'}" to Google Drive!`);
+        updateCloudSyncStatusPill('☁️ Synced to Drive', 'connected');
+        if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+        if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Upload any Trip by ID to Google Drive
+  window.uploadTripByIdToDrive = async function(tripId) {
+    if (!isGoogleDriveConnected()) {
+      window.openCloudSyncModal();
+      return false;
+    }
+    const trips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
+    const targetTrip = trips.find(t => t.id === tripId);
+    if (targetTrip) {
+      updateCloudSyncStatusPill('⏳ Syncing Trip...', 'syncing');
+      const ok = await window.uploadTripToGoogleDrive(targetTrip);
+      if (ok) {
+        if (typeof window.showToast === 'function') window.showToast(`☁️ Synced "${targetTrip.title || 'Trip'}" to Google Drive!`);
+        updateCloudSyncStatusPill('☁️ Synced', 'connected');
+        if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
+        if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+        return true;
+      }
+    }
+    return false;
+  };
+
   // Sync All Trips from Google Drive / TrenscendsTravelPlanner into local IndexedDB
   window.syncAllTripsFromGoogleDrive = async function(isSilent = false) {
     if (!isGoogleDriveConnected()) return [];
