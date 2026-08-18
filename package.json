@@ -17,7 +17,10 @@
     "watch:css": "npx @tailwindcss/cli -i ./src/tailwind.css -o ./dist/tailwind.css --watch",
     "generate:pwa-icons": "node scripts/generate-pwa-icons.js",
     "prepare:capacitor-web": "node scripts/prepare-capacitor-web.js",
-    "build:mobile": "npm run build:css && npm run prepare:capacitor-web && npx cap sync"
+    "build:mobile": "npm run build:css && npm run prepare:capacitor-web && npx cap sync",
+    "build:apk:debug": "npm run build:mobile && node -e \"const { execSync } = require('child_process'); execSync(process.platform === 'win32' ? '.\\\\gradlew.bat assembleDebug' : './gradlew assembleDebug', { cwd: 'android', stdio: 'inherit' });\"",
+    "build:apk:release": "npm run build:mobile && node -e \"const { execSync } = require('child_process'); execSync(process.platform === 'win32' ? '.\\\\gradlew.bat assembleRelease' : './gradlew assembleRelease', { cwd: 'android', stdio: 'inherit' });\"",
+    "build:aab": "npm run build:mobile && node -e \"const { execSync } = require('child_process'); execSync(process.platform === 'win32' ? '.\\\\gradlew.bat bundleRelease' : './gradlew bundleRelease', { cwd: 'android', stdio: 'inherit' });\""
   },
   "devDependencies": {
     "@capacitor/cli": "^8.4.2",
