@@ -291,18 +291,74 @@
           if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
             clearInterval(checkInterval);
             proceedOAuth();
-          } else if (retries >= 25) {
+          } else if (retries >= 10) {
             clearInterval(checkInterval);
-            if (interactive) alert('Google Sign-In script is loading. Please check your internet connection and try again.');
+            // Fallback for Android WebViews & environments where GIS client is blocked:
+            const redirectUri = window.location.origin + window.location.pathname;
+            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(DRIVE_SCOPES)}&include_granted_scopes=true&prompt=select_account`;
+            if (interactive) {
+              window.location.href = authUrl;
+            }
             resolve(false);
           }
-        }, 200);
+        }, 150);
         return;
       }
 
       proceedOAuth();
     });
   }
+
+  // Process OAuth Access Token returned in URL hash from standard OAuth redirect
+  async function processOAuthCallbackFromUrl() {
+    if (typeof window === 'undefined' || !window.location) return false;
+    const hash = window.location.hash || '';
+    if (!hash || !hash.includes('access_token=')) return false;
+
+    const hashParams = new URLSearchParams(hash.startsWith('#') ? hash.substring(1) : hash);
+    const token = hashParams.get('access_token');
+    const expiresIn = parseInt(hashParams.get('expires_in') || '3600', 10);
+
+    if (token) {
+      accessToken = token;
+      tokenExpiry = Date.now() + (expiresIn * 1000) - 60000;
+      localStorage.setItem('travelApp_gdrive_connected', 'true');
+      localStorage.setItem('travelApp_gdrive_token', accessToken);
+      localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
+
+      if (window.history && window.history.replaceState) {
+        const cleanUrl = window.location.pathname + window.location.search;
+        window.history.replaceState(null, '', cleanUrl);
+      }
+
+      try {
+        const userResp = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        if (userResp.ok) {
+          const user = await userResp.json();
+          setUserProfile({
+            name: user.name || user.email || 'Google Traveler',
+            email: user.email || '',
+            picture: user.picture || ''
+          });
+        }
+      } catch (e) {
+        setUserProfile({ name: 'Google Traveler', email: '', picture: '' });
+      }
+
+      await ensureDriveFolder();
+      updateCloudSyncStatusPill();
+      updateCloudSyncModalState();
+
+      if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+      await window.uploadAllLocalTripsToDrive();
+      await window.syncAllTripsFromGoogleDrive();
+      return true;
+    }
+    return false;
+  }
+  window.processOAuthCallbackFromUrl = processOAuthCallbackFromUrl;
   window.authenticateGoogleDrive = authenticateGoogleDrive;
 
   function showOriginMismatchNotice(errorType) {
@@ -1144,8 +1200,12 @@
       .replace(/'/g, '&#039;');
   }
 
+  // Process any OAuth redirect hash immediately
+  processOAuthCallbackFromUrl();
+
   // Initialize Cloud Sync & Background Heartbeat Loop on load
   window.addEventListener('DOMContentLoaded', () => {
+    processOAuthCallbackFromUrl();
     setTimeout(() => {
       updateCloudSyncStatusPill();
       if (isGoogleDriveConnected()) {
