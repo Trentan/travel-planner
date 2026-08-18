@@ -209,7 +209,18 @@
 
     if (isNative && nativeAuthPlugin && typeof nativeAuthPlugin.signIn === 'function') {
       try {
-        console.log('[GoogleAuth Native] Launching native Android Google Account picker...');
+        console.log('[GoogleAuth Native] Initializing & launching native Android Google Account picker...');
+        if (typeof nativeAuthPlugin.initialize === 'function') {
+          try {
+            await nativeAuthPlugin.initialize({
+              clientId: clientId,
+              scopes: ['profile', 'email', 'https://www.googleapis.com/auth/drive.file'],
+              grantOfflineAccess: false
+            });
+          } catch (initErr) {
+            console.warn('[GoogleAuth Native] initialize notice:', initErr);
+          }
+        }
         const user = await nativeAuthPlugin.signIn();
         if (user) {
           accessToken = (user.authentication && user.authentication.accessToken) || (user.authentication && user.authentication.idToken) || '';

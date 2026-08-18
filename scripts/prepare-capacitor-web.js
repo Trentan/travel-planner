@@ -35,3 +35,16 @@ if (fs.existsSync(googleAuthGradle)) {
   fs.writeFileSync(googleAuthGradle, content, 'utf8');
 }
 
+// Patch GoogleAuth.java for null-safe signIn() without prior initialize()
+const googleAuthJava = path.join(root, 'node_modules', '@codetrix-studio', 'capacitor-google-auth', 'android', 'src', 'main', 'java', 'com', 'codetrixstudio', 'capacitor', 'GoogleAuth', 'GoogleAuth.java');
+if (fs.existsSync(googleAuthJava)) {
+  let javaContent = fs.readFileSync(googleAuthJava, 'utf8');
+  if (!javaContent.includes('if (googleSignInClient == null)')) {
+    javaContent = javaContent.replace(
+      'public void signIn(PluginCall call) {',
+      'public void signIn(PluginCall call) {\n    if (googleSignInClient == null) {\n      String defaultClientId = this.getContext().getString(R.string.server_client_id);\n      String[] defaultScopes = new String[]{"profile", "email", "https://www.googleapis.com/auth/drive.file"};\n      loadSignInClient(defaultClientId, false, defaultScopes);\n    }'
+    );
+    fs.writeFileSync(googleAuthJava, javaContent, 'utf8');
+  }
+}
+
