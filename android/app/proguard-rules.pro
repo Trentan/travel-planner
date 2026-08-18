@@ -6,34 +6,31 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # ---------------------------------------------------------------------------
-# Preserve line numbers in stack traces (makes crash reports readable without
-# uploading mapping.txt; mapping.txt is still uploaded to Play Console for
-# full deobfuscation).
+# High Performance R8 / ProGuard Optimization Rules for Android 15 & Capacitor
 # ---------------------------------------------------------------------------
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
-# ---------------------------------------------------------------------------
-# Capacitor / Cordova – keep all plugin classes and JS bridge interfaces.
-# R8 cannot see calls from JavaScript, so these would otherwise be removed.
-# ---------------------------------------------------------------------------
--keep class com.getcapacitor.** { *; }
+# Capacitor Core Bridge & Plugin Annotations
+-keep public class com.getcapacitor.BridgeActivity
+-keep public class com.getcapacitor.Bridge
+-keep public class com.getcapacitor.Plugin
+-keep public class com.getcapacitor.PluginCall
+-keep public class com.getcapacitor.JSObject
+-keep public class com.getcapacitor.JSArray
 -keep @com.getcapacitor.annotation.CapacitorPlugin class * { *; }
 
-# Keep all classes annotated as Capacitor plugins
 -keepclassmembers class * extends com.getcapacitor.Plugin {
-    @com.getcapacitor.annotation.CapacitorPlugin <methods>;
+    @com.getcapacitor.PluginMethod public void *(com.getcapacitor.PluginCall);
     public *;
 }
 
-# Keep JavaScript interface methods (called reflectively from WebView)
+# JavaScript Interfaces called reflectively from WebView
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
 }
 
-# ---------------------------------------------------------------------------
-# WebView / WebChromeClient – Android framework
-# ---------------------------------------------------------------------------
+# WebView framework clients
 -keepclassmembers class * extends android.webkit.WebViewClient {
     public void *(android.webkit.WebView, java.lang.String);
     public boolean *(android.webkit.WebView, android.webkit.WebResourceRequest);
@@ -42,30 +39,15 @@
     public void *(android.webkit.WebView, java.lang.String);
 }
 
-# ---------------------------------------------------------------------------
-# AndroidX / AppCompat – Allow R8 optimization via AAR consumer rules
-# ---------------------------------------------------------------------------
--dontwarn androidx.**
--keepclassmembers class * extends androidx.fragment.app.Fragment {
-    public <init>();
-}
-
-# ---------------------------------------------------------------------------
-# GoogleAuth Capacitor Plugin & Google Play Services Auth
-# ---------------------------------------------------------------------------
--keep class com.codetrixstudio.capacitor.** { *; }
--keep class com.google.android.gms.auth.api.** { *; }
+# GoogleAuth Plugin & Google Play Services Auth
+-keep class com.codetrixstudio.capacitor.GoogleAuth.** { *; }
 -keep class com.google.android.gms.auth.api.signin.** { *; }
--keep class com.google.android.gms.common.** { *; }
--keepclassmembers class * extends com.getcapacitor.Plugin {
-    *;
-}
+-keep class com.google.android.gms.common.api.** { *; }
 
-# ---------------------------------------------------------------------------
-# Suppress warnings for classes that may not be present on all API levels
-# ---------------------------------------------------------------------------
+# Allow R8 to optimize AndroidX and suppress optional API warnings
+-dontwarn androidx.**
+-dontwarn com.google.android.gms.**
 -dontwarn org.bouncycastle.**
 -dontwarn org.conscrypt.**
 -dontwarn org.openjsse.**
--dontwarn com.google.android.gms.**
 
