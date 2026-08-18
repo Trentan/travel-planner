@@ -203,6 +203,37 @@
   async function authenticateGoogleDrive(interactive = true) {
     const clientId = getGoogleClientId();
 
+    const connectBtn = document.getElementById('gdriveConnectBtn');
+    const originalBtnHtml = connectBtn ? connectBtn.innerHTML : '';
+    const statusTextEl = document.getElementById('gdriveModalStatusText');
+
+    const setLoadingUI = (isLoading, message = 'Connecting to Google...') => {
+      if (connectBtn) {
+        connectBtn.disabled = isLoading;
+        if (isLoading) {
+          connectBtn.classList.add('opacity-80', 'cursor-wait');
+          connectBtn.innerHTML = `
+            <svg class="animate-spin w-4 h-4 text-white shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>${message}</span>
+          `;
+        } else {
+          connectBtn.classList.remove('opacity-80', 'cursor-wait');
+          connectBtn.innerHTML = originalBtnHtml;
+        }
+      }
+      if (statusTextEl && isLoading) {
+        statusTextEl.innerText = 'Connecting to Google Drive and syncing your itineraries...';
+      }
+      if (isLoading) {
+        updateCloudSyncStatusPill('⏳ Connecting...', 'syncing');
+      }
+    };
+
+    if (interactive) setLoadingUI(true, 'Connecting...');
+
     // 1. Check Native Android/iOS GoogleAuth Plugin
     const isNative = window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform();
     const nativeAuthPlugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth;
@@ -223,6 +254,7 @@
         }
         const user = await nativeAuthPlugin.signIn();
         if (user) {
+          if (interactive) setLoadingUI(true, 'Syncing trips...');
           accessToken = (user.authentication && user.authentication.accessToken) || (user.authentication && user.authentication.idToken) || '';
           tokenExpiry = Date.now() + (3600 * 1000) - 60000;
 
@@ -245,10 +277,12 @@
           if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
           await window.uploadAllLocalTripsToDrive();
           await window.syncAllTripsFromGoogleDrive();
+          setLoadingUI(false);
           return true;
         }
       } catch (nativeErr) {
         console.warn('[GoogleAuth Native] Native sign-in dismissed or error:', nativeErr);
+        setLoadingUI(false);
         if (String(nativeErr).toLowerCase().includes('cancel') || String(nativeErr).includes('12501')) {
           return false;
         }
