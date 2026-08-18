@@ -316,24 +316,24 @@
       <div class="mobile-menu-sections">
         <!-- 1. Files & Trips -->
         <section class="mobile-menu-section" aria-labelledby="mobileMenuFilesTrips">
-          <h3 id="mobileMenuFilesTrips" class="mobile-menu-section-title">📁 Files & Trips</h3>
+          <h3 id="mobileMenuFilesTrips" class="mobile-menu-section-title">📁 Trips & Cloud Storage</h3>
           <div class="mobile-menu-section-grid mobile-menu-section-grid-stacked">
-            <button class="app-menu-btn mobile-menu-primary" onclick="openCloudSyncModal(); closeMobileMenu()">
-              <span class="app-menu-btn-title">☁️ Google Drive Cloud Sync</span>
-              <span class="app-menu-btn-subtitle">Back up & sync trips across devices</span>
+            <button class="app-menu-btn mobile-menu-primary" onclick="openTripLibraryModal(); closeMobileMenu()">
+              <span class="app-menu-btn-title">📁 My Trips & Cloud Hub</span>
+              <span class="app-menu-btn-subtitle">Manage all itineraries, Google Drive sync & backups</span>
             </button>
             <button class="app-menu-btn" onclick="openCreateNewTripWizard(); closeMobileMenu()">
               <span class="app-menu-btn-title">✦ Create New Trip</span>
-              <span class="app-menu-btn-subtitle">Build a new trip step by step</span>
+              <span class="app-menu-btn-subtitle">Build a new custom itinerary</span>
             </button>
-            <button id="mobileSaveAsBtn" class="app-menu-btn" onclick="openTripFile(); closeMobileMenu()">
-              <span class="app-menu-btn-title">💾 Save As JSON</span>
-              <span class="app-menu-btn-subtitle">Download a local trip file</span>
-            </button>
-            <button id="mobileOpenFileBtn" class="app-menu-btn" onclick="openExistingTripFile(); closeMobileMenu()">
-              <span class="app-menu-btn-title">📂 Open Local File</span>
-              <span class="app-menu-btn-subtitle">Load an existing trip JSON file</span>
-            </button>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="mobileSaveAsBtn" class="app-menu-btn" onclick="openTripFile(); closeMobileMenu()" title="Export JSON backup">
+                <span class="app-menu-btn-title text-xs">💾 Export JSON</span>
+              </button>
+              <button id="mobileOpenFileBtn" class="app-menu-btn" onclick="openExistingTripFile(); closeMobileMenu()" title="Import JSON trip file">
+                <span class="app-menu-btn-title text-xs">📂 Import File</span>
+              </button>
+            </div>
           </div>
         </section>
 

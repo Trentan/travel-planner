@@ -6217,14 +6217,35 @@ function renderTripStart() {
 
   if (tripStartStep === 0) {
     container.innerHTML = `
-      <div class="trip-start-eyebrow">TRENSCENDS</div>
+      <div class="trip-start-eyebrow">TRENSCENDS TRAVEL PLANNER</div>
       <h2 id="trip-start-title">Welcome to Trenscends Travel Planner</h2>
-      <p class="trip-start-intro">Build a real trip in a minute, explore the example already loaded, load a pre-existing Trenscends trip, or learn the essentials when you need them.</p>
+      <p class="trip-start-intro">Build a real trip in a minute, explore the example already loaded, load a pre-existing Trenscends trip, or sign in to sync with Google Drive.</p>
       <div class="trip-start-choices">
-        <button class="trip-start-choice trip-start-choice--primary" type="button" onclick="chooseTripStart('build')"><span class="trip-start-choice-icon">✦</span><span><strong>Build my trip</strong><small>Answer a few simple questions. You can edit everything later.</small></span><b>→</b></button>
-        <button class="trip-start-choice" type="button" onclick="chooseTripStart('load_existing')"><span class="trip-start-choice-icon">📂</span><span><strong>Load a pre-existing Trenscends trip</strong><small>Open an existing .json trip file from your drive or device.</small></span><b>→</b></button>
-        <button class="trip-start-choice" type="button" onclick="chooseTripStart('sample')"><span class="trip-start-choice-icon">◌</span><span><strong>Explore the sample trip</strong><small>See a complete itinerary first, with no data overwritten.</small></span><b>→</b></button>
-        <button class="trip-start-choice" type="button" onclick="chooseTripStart('learn')"><span class="trip-start-choice-icon">?</span><span><strong>Learn the essentials</strong><small>Open the guide and take the app at your own pace.</small></span><b>→</b></button>
+        <button class="trip-start-choice trip-start-choice--google" type="button" onclick="chooseTripStart('google_signin')">
+          <span class="trip-start-choice-icon"><svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+          <span><strong>Sign in with Google</strong><small>Automatically restore & sync your cloud itineraries from Google Drive.</small></span>
+          <b>→</b>
+        </button>
+        <button class="trip-start-choice trip-start-choice--primary" type="button" onclick="chooseTripStart('build')">
+          <span class="trip-start-choice-icon">✦</span>
+          <span><strong>Build my trip</strong><small>Answer a few simple questions. You can edit everything later.</small></span>
+          <b>→</b>
+        </button>
+        <button class="trip-start-choice" type="button" onclick="chooseTripStart('load_existing')">
+          <span class="trip-start-choice-icon">📂</span>
+          <span><strong>Load a pre-existing Trenscends trip</strong><small>Open an existing .json trip file from your drive or device.</small></span>
+          <b>→</b>
+        </button>
+        <button class="trip-start-choice" type="button" onclick="chooseTripStart('sample')">
+          <span class="trip-start-choice-icon">🌍</span>
+          <span><strong>Explore the sample trip</strong><small>See a complete itinerary first, with no data overwritten.</small></span>
+          <b>→</b>
+        </button>
+        <button class="trip-start-choice" type="button" onclick="chooseTripStart('learn')">
+          <span class="trip-start-choice-icon">?</span>
+          <span><strong>Learn the essentials</strong><small>Open the guide and take the app at your own pace.</small></span>
+          <b>→</b>
+        </button>
       </div>
       <button class="trip-start-quiet" type="button" onclick="dismissTripStart()">I’ll explore on my own</button>`;
     return;
@@ -6342,6 +6363,22 @@ function renderTripStart() {
 function chooseTripStart(choice) {
   const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
   const isSetupConfigured = hasSeenSetup || hasActiveFileHandle();
+
+  if (choice === 'google_signin') {
+    dismissTripStart();
+    localStorage.setItem('travelApp_trip_start_seen', 'true');
+    if (typeof window.authenticateGoogleDrive === 'function') {
+      window.authenticateGoogleDrive(true).then((ok) => {
+        if (ok) {
+          if (typeof window.showToast === 'function') window.showToast('☁️ Signed in! Syncing your itineraries from Google Drive...');
+          if (typeof window.openTripLibraryModal === 'function') window.openTripLibraryModal();
+        }
+      });
+    } else if (typeof window.openCloudSyncModal === 'function') {
+      window.openCloudSyncModal();
+    }
+    return;
+  }
 
   if (choice === 'build') {
     if (!isSetupConfigured) {
