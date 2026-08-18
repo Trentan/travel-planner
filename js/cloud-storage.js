@@ -238,54 +238,67 @@
     const isNative = window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform();
     const nativeAuthPlugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth;
 
-    if (isNative && nativeAuthPlugin && typeof nativeAuthPlugin.signIn === 'function') {
-      try {
-        console.log('[GoogleAuth Native] Initializing & launching native Android Google Account picker...');
-        if (typeof nativeAuthPlugin.initialize === 'function') {
-          try {
-            await nativeAuthPlugin.initialize({
-              clientId: clientId,
-              scopes: ['profile', 'email', 'https://www.googleapis.com/auth/drive.file'],
-              grantOfflineAccess: false
+    if (isNative) {
+      if (nativeAuthPlugin && typeof nativeAuthPlugin.signIn === 'function') {
+        try {
+          console.log('[GoogleAuth Native] Initializing & launching native Android Google Account picker...');
+          if (typeof nativeAuthPlugin.initialize === 'function') {
+            try {
+              await nativeAuthPlugin.initialize({
+                clientId: clientId,
+                scopes: ['profile', 'email', 'https://www.googleapis.com/auth/drive.file'],
+                grantOfflineAccess: false
+              });
+            } catch (initErr) {
+              console.warn('[GoogleAuth Native] initialize notice:', initErr);
+            }
+          }
+          const user = await nativeAuthPlugin.signIn();
+          if (user) {
+            if (interactive) setLoadingUI(true, 'Syncing trips...');
+            accessToken = (user.authentication && user.authentication.accessToken) || (user.authentication && user.authentication.idToken) || '';
+            tokenExpiry = Date.now() + (3600 * 1000) - 60000;
+
+            setUserProfile({
+              name: user.name || user.givenName || 'Google Traveler',
+              email: user.email || '',
+              picture: user.imageUrl || ''
             });
-          } catch (initErr) {
-            console.warn('[GoogleAuth Native] initialize notice:', initErr);
+
+            localStorage.setItem('travelApp_gdrive_connected', 'true');
+            if (accessToken) {
+              localStorage.setItem('travelApp_gdrive_token', accessToken);
+              localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
+            }
+
+            await ensureDriveFolder();
+            updateCloudSyncStatusPill();
+            updateCloudSyncModalState();
+
+            if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+            await window.uploadAllLocalTripsToDrive();
+            await window.syncAllTripsFromGoogleDrive();
+            setLoadingUI(false);
+            return true;
           }
-        }
-        const user = await nativeAuthPlugin.signIn();
-        if (user) {
-          if (interactive) setLoadingUI(true, 'Syncing trips...');
-          accessToken = (user.authentication && user.authentication.accessToken) || (user.authentication && user.authentication.idToken) || '';
-          tokenExpiry = Date.now() + (3600 * 1000) - 60000;
-
-          setUserProfile({
-            name: user.name || user.givenName || 'Google Traveler',
-            email: user.email || '',
-            picture: user.imageUrl || ''
-          });
-
-          localStorage.setItem('travelApp_gdrive_connected', 'true');
-          if (accessToken) {
-            localStorage.setItem('travelApp_gdrive_token', accessToken);
-            localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
-          }
-
-          await ensureDriveFolder();
-          updateCloudSyncStatusPill();
-          updateCloudSyncModalState();
-
-          if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
-          await window.uploadAllLocalTripsToDrive();
-          await window.syncAllTripsFromGoogleDrive();
+        } catch (nativeErr) {
+          console.error('[GoogleAuth Native] Native sign-in error:', nativeErr);
           setLoadingUI(false);
-          return true;
-        }
-      } catch (nativeErr) {
-        console.warn('[GoogleAuth Native] Native sign-in dismissed or error:', nativeErr);
-        setLoadingUI(false);
-        if (String(nativeErr).toLowerCase().includes('cancel') || String(nativeErr).includes('12501')) {
+          if (String(nativeErr).toLowerCase().includes('cancel') || String(nativeErr).includes('12501')) {
+            return false;
+          }
+          if (typeof showToast === 'function') {
+            showToast(`⚠️ Google Sign-In: ${nativeErr?.message || nativeErr || 'Authentication failed'}`);
+          }
           return false;
         }
+      } else {
+        console.error('[GoogleAuth Native] Native GoogleAuth plugin not available on device.');
+        setLoadingUI(false);
+        if (typeof showToast === 'function') {
+          showToast('⚠️ Google Sign-In is unavailable on this build.');
+        }
+        return false;
       }
     }
 
