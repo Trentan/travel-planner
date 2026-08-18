@@ -90,6 +90,10 @@
     const custom = localStorage.getItem('travelApp_gdrive_client_id');
     if (custom) return custom;
 
+    if (isNativePlatform()) {
+      return PROD_CLIENT_ID;
+    }
+
     const host = window.location.hostname;
     if (host === 'localhost' || host === '127.0.0.1') {
       return LOCAL_CLIENT_ID;
@@ -241,11 +245,11 @@
     if (isNative) {
       if (nativeAuthPlugin && typeof nativeAuthPlugin.signIn === 'function') {
         try {
-          console.log('[GoogleAuth Native] Initializing & launching native Android Google Account picker...');
+          console.log('[GoogleAuth Native] Initializing & launching native Android Google Account picker with client:', PROD_CLIENT_ID);
           if (typeof nativeAuthPlugin.initialize === 'function') {
             try {
               await nativeAuthPlugin.initialize({
-                clientId: clientId,
+                clientId: PROD_CLIENT_ID,
                 scopes: ['profile', 'email', 'https://www.googleapis.com/auth/drive.file'],
                 grantOfflineAccess: false
               });
@@ -253,14 +257,19 @@
               console.warn('[GoogleAuth Native] initialize notice:', initErr);
             }
           }
-          const user = await nativeAuthPlugin.signIn();
+
+          const user = await Promise.race([
+            nativeAuthPlugin.signIn(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Sign-in request timed out after 35s')), 35000))
+          ]);
+
           if (user) {
             if (interactive) setLoadingUI(true, 'Syncing trips...');
-            accessToken = (user.authentication && user.authentication.accessToken) || (user.authentication && user.authentication.idToken) || '';
+            accessToken = (user.authentication && user.authentication.accessToken) || (user.authentication && user.authentication.idToken) || user.idToken || '';
             tokenExpiry = Date.now() + (3600 * 1000) - 60000;
 
             setUserProfile({
-              name: user.name || user.givenName || 'Google Traveler',
+              name: user.name || user.displayName || user.givenName || 'Google Traveler',
               email: user.email || '',
               picture: user.imageUrl || ''
             });
@@ -291,6 +300,8 @@
             showToast(`⚠️ Google Sign-In: ${nativeErr?.message || nativeErr || 'Authentication failed'}`);
           }
           return false;
+        } finally {
+          setLoadingUI(false);
         }
       } else {
         console.error('[GoogleAuth Native] Native GoogleAuth plugin not available on device.');

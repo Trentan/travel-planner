@@ -35,56 +35,280 @@ if (fs.existsSync(googleAuthGradle)) {
   fs.writeFileSync(googleAuthGradle, content, 'utf8');
 }
 
-// Patch GoogleAuth.java for null-safe signIn() without prior initialize() and request Google Drive scopes
+// Robust Android GoogleAuth Plugin implementation
 const googleAuthJava = path.join(root, 'node_modules', '@codetrix-studio', 'capacitor-google-auth', 'android', 'src', 'main', 'java', 'com', 'codetrixstudio', 'capacitor', 'GoogleAuth', 'GoogleAuth.java');
 if (fs.existsSync(googleAuthJava)) {
-  let javaContent = fs.readFileSync(googleAuthJava, 'utf8');
-  if (!javaContent.includes('if (googleSignInClient == null)')) {
-    javaContent = javaContent.replace(
-      'public void signIn(PluginCall call) {',
-      'public void signIn(PluginCall call) {\n    if (googleSignInClient == null) {\n      String defaultClientId = this.getContext().getString(R.string.server_client_id);\n      String[] defaultScopes = new String[]{"profile", "email", "https://www.googleapis.com/auth/drive.file"};\n      loadSignInClient(defaultClientId, false, defaultScopes);\n    }'
-    );
-  }
+  const robustGoogleAuthCode = `package com.codetrixstudio.capacitor.GoogleAuth;
 
-  // Replace getAuthToken with robust GoogleAuthUtil token retriever
-  const oldGetAuthTokenMethod = `private JSONObject getAuthToken(Account account, boolean retry) throws Exception {`;
-  if (javaContent.includes(oldGetAuthTokenMethod)) {
-    const startIdx = javaContent.indexOf(oldGetAuthTokenMethod);
-    const endIdx = javaContent.indexOf('private static String fromStream', startIdx);
-    if (startIdx !== -1 && endIdx !== -1) {
-      const replacementTokenCode = `private JSONObject getAuthToken(Account account, boolean retry) throws Exception {
-    String scope = "oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata profile email";
-    String authToken = null;
-    try {
-      authToken = com.google.android.gms.auth.GoogleAuthUtil.getToken(this.getContext(), account, scope);
-    } catch (Exception e) {
-      Log.w("GoogleAuth", "GoogleAuthUtil getToken exception: " + e.getMessage());
-      try {
-        AccountManager manager = AccountManager.get(this.getContext());
-        AccountManagerFuture<Bundle> future = manager.getAuthToken(account, scope, null, this.getActivity(), null, null);
-        Bundle bundle = future.getResult();
-        authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-      } catch (Exception e2) {
-        Log.e("GoogleAuth", "AccountManager getAuthToken exception: " + e2.getMessage());
-        throw e2;
-      }
-    }
-    if (authToken == null || authToken.isEmpty()) {
-      throw new Exception("Unable to retrieve Google Drive OAuth access token.");
-    }
-    JSONObject jsonResponse = new JSONObject();
-    jsonResponse.put(FIELD_ACCESS_TOKEN, authToken);
-    jsonResponse.put(FIELD_TOKEN_EXPIRES_IN, 3600);
-    jsonResponse.put(FIELD_TOKEN_EXPIRES, 3600 + (System.currentTimeMillis() / 1000));
-    return jsonResponse;
-  }
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
 
-  `;
-      javaContent = javaContent.substring(0, startIdx) + replacementTokenCode + javaContent.substring(endIdx);
-    }
-  }
+import androidx.activity.result.ActivityResult;
 
-  fs.writeFileSync(googleAuthJava, javaContent, 'utf8');
+import com.codetrixstudio.capacitor.GoogleAuth.capacitorgoogleauth.R;
+import com.getcapacitor.JSArray;
+import com.getcapacitor.JSObject;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.ActivityCallback;
+import com.getcapacitor.annotation.CapacitorPlugin;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.Task;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+@CapacitorPlugin(name = "GoogleAuth")
+public class GoogleAuth extends Plugin {
+    private static final String TAG = "GoogleAuthNative";
+    private static final String FIELD_ACCESS_TOKEN = "accessToken";
+    private static final String FIELD_TOKEN_EXPIRES = "expires";
+    private static final String FIELD_TOKEN_EXPIRES_IN = "expires_in";
+
+    private GoogleSignInClient googleSignInClient;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    private void ensureClient(String customClientId, List<String> customScopes) {
+        String clientId = customClientId;
+        if (clientId == null || clientId.trim().isEmpty()) {
+            try {
+                clientId = getContext().getString(R.string.server_client_id);
+            } catch (Exception ignored) {
+                clientId = "253620621116-u76e3v3e2qv6ffq9b58re4l4bbqs1e3g.apps.googleusercontent.com";
+            }
+        }
+
+        GoogleSignInOptions.Builder builder = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(clientId)
+                .requestEmail()
+                .requestProfile();
+
+        List<String> scopes = (customScopes != null && !customScopes.isEmpty()) ? customScopes : getDefaultScopes();
+        for (String s : scopes) {
+            if (s != null && !s.trim().isEmpty() && !s.equalsIgnoreCase("profile") && !s.equalsIgnoreCase("email")) {
+                builder.requestScopes(new Scope(s.trim()));
+            }
+        }
+
+        googleSignInClient = GoogleSignIn.getClient(getContext(), builder.build());
+    }
+
+    private List<String> getDefaultScopes() {
+        List<String> list = new ArrayList<>();
+        list.add("profile");
+        list.add("email");
+        list.add("https://www.googleapis.com/auth/drive.file");
+        return list;
+    }
+
+    @Override
+    public void load() {}
+
+    @PluginMethod
+    public void initialize(PluginCall call) {
+        try {
+            String clientId = call.getString("clientId");
+            if (clientId == null || clientId.trim().isEmpty()) {
+                clientId = getConfig().getString("serverClientId", getConfig().getString("clientId", null));
+            }
+
+            List<String> scopeList = new ArrayList<>();
+            try {
+                JSArray arr = call.getArray("scopes");
+                if (arr != null) {
+                    for (int i = 0; i < arr.length(); i++) {
+                        String item = arr.getString(i);
+                        if (item != null && !item.trim().isEmpty()) scopeList.add(item.trim());
+                    }
+                }
+            } catch (Exception ignored) {}
+
+            if (scopeList.isEmpty()) {
+                String str = call.getString("scopes");
+                if (str != null && !str.trim().isEmpty()) {
+                    String cleanStr = str.replace('[', ' ').replace(']', ' ');
+                    for (String item : cleanStr.split(",")) {
+                        String cleanItem = item.replace('\\"', ' ').trim();
+                        if (!cleanItem.isEmpty()) scopeList.add(cleanItem);
+                    }
+                }
+            }
+
+            ensureClient(clientId, scopeList);
+            call.resolve();
+        } catch (Exception t) {
+            Log.e(TAG, "initialize error", t);
+            call.reject("Initialization failed: " + t.getMessage(), t);
+        }
+    }
+
+    @PluginMethod
+    public void signIn(PluginCall call) {
+        try {
+            if (googleSignInClient == null) {
+                ensureClient(null, null);
+            }
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            startActivityForResult(call, signInIntent, "signInResult");
+        } catch (Exception t) {
+            Log.e(TAG, "signIn start error", t);
+            call.reject("Unable to launch Google Sign-In: " + t.getMessage(), t);
+        }
+    }
+
+    @ActivityCallback
+    protected void signInResult(PluginCall call, ActivityResult result) {
+        if (call == null) return;
+        try {
+            if (result == null || result.getData() == null) {
+                call.reject("Sign-in was cancelled.", String.valueOf(GoogleSignInStatusCodes.SIGN_IN_CANCELLED));
+                return;
+            }
+
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+            GoogleSignInAccount account = task.getResult(ApiException.class);
+            if (account == null) {
+                call.reject("Google account was not returned.", "NULL_ACCOUNT");
+                return;
+            }
+
+            executor.execute(() -> {
+                try {
+                    String scopeStr = "oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata profile email";
+                    String authToken = null;
+                    try {
+                        Account androidAccount = account.getAccount();
+                        if (androidAccount != null) {
+                            authToken = GoogleAuthUtil.getToken(getContext(), androidAccount, scopeStr);
+                        } else if (account.getEmail() != null) {
+                            authToken = GoogleAuthUtil.getToken(getContext(), account.getEmail(), scopeStr);
+                        }
+                    } catch (Exception tokenEx) {
+                        Log.w(TAG, "GoogleAuthUtil token attempt: " + tokenEx.getMessage());
+                        try {
+                            AccountManager manager = AccountManager.get(getContext());
+                            Account androidAccount = account.getAccount();
+                            if (androidAccount != null) {
+                                AccountManagerFuture<Bundle> future = manager.getAuthToken(androidAccount, scopeStr, null, getActivity(), null, null);
+                                Bundle b = future.getResult();
+                                authToken = b != null ? b.getString(AccountManager.KEY_AUTHTOKEN) : null;
+                            }
+                        } catch (Exception mgrEx) {
+                            Log.w(TAG, "AccountManager token attempt: " + mgrEx.getMessage());
+                        }
+                    }
+
+                    if (authToken == null || authToken.isEmpty()) {
+                        authToken = account.getIdToken();
+                    }
+
+                    JSObject authentication = new JSObject();
+                    authentication.put("idToken", account.getIdToken());
+                    authentication.put(FIELD_ACCESS_TOKEN, authToken != null ? authToken : "");
+                    authentication.put(FIELD_TOKEN_EXPIRES, 3600 + (System.currentTimeMillis() / 1000));
+                    authentication.put(FIELD_TOKEN_EXPIRES_IN, 3600);
+
+                    JSObject user = new JSObject();
+                    user.put("serverAuthCode", account.getServerAuthCode());
+                    user.put("idToken", account.getIdToken());
+                    user.put("authentication", authentication);
+                    user.put("name", account.getDisplayName());
+                    user.put("displayName", account.getDisplayName());
+                    user.put("email", account.getEmail());
+                    user.put("familyName", account.getFamilyName());
+                    user.put("givenName", account.getGivenName());
+                    user.put("id", account.getId());
+                    user.put("imageUrl", account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : "");
+
+                    call.resolve(user);
+                } catch (Exception bgEx) {
+                    Log.e(TAG, "Background account processing error", bgEx);
+                    call.reject("Failed processing sign-in result: " + bgEx.getMessage(), bgEx);
+                }
+            });
+        } catch (ApiException apiEx) {
+            Log.w(TAG, "Google Sign-In ApiException: code=" + apiEx.getStatusCode() + " msg=" + apiEx.getMessage());
+            if (apiEx.getStatusCode() == GoogleSignInStatusCodes.SIGN_IN_CANCELLED) {
+                call.reject("The user canceled the sign-in flow.", String.valueOf(apiEx.getStatusCode()));
+            } else {
+                call.reject("Google Sign-In error (" + apiEx.getStatusCode() + "): " + apiEx.getMessage(), String.valueOf(apiEx.getStatusCode()));
+            }
+        } catch (Exception topEx) {
+            Log.e(TAG, "signInResult top-level exception", topEx);
+            call.reject("Sign-in error: " + topEx.getMessage(), topEx);
+        }
+    }
+
+    @PluginMethod
+    public void refresh(PluginCall call) {
+        try {
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
+            if (account == null) {
+                call.reject("User not logged in.");
+                return;
+            }
+
+            executor.execute(() -> {
+                try {
+                    String scopeStr = "oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata profile email";
+                    String authToken = null;
+                    try {
+                        Account androidAccount = account.getAccount();
+                        if (androidAccount != null) {
+                            authToken = GoogleAuthUtil.getToken(getContext(), androidAccount, scopeStr);
+                        } else if (account.getEmail() != null) {
+                            authToken = GoogleAuthUtil.getToken(getContext(), account.getEmail(), scopeStr);
+                        }
+                    } catch (Exception ignored) {}
+
+                    if (authToken == null || authToken.isEmpty()) {
+                        authToken = account.getIdToken();
+                    }
+
+                    JSObject auth = new JSObject();
+                    auth.put("idToken", account.getIdToken());
+                    auth.put(FIELD_ACCESS_TOKEN, authToken != null ? authToken : "");
+                    auth.put("refreshToken", "");
+                    call.resolve(auth);
+                } catch (Exception t) {
+                    call.reject("Failed refreshing token: " + t.getMessage(), t);
+                }
+            });
+        } catch (Exception t) {
+            call.reject("Refresh error: " + t.getMessage(), t);
+        }
+    }
+
+    @PluginMethod
+    public void signOut(PluginCall call) {
+        try {
+            if (googleSignInClient == null) {
+                ensureClient(null, null);
+            }
+            googleSignInClient.signOut()
+                    .addOnSuccessListener(getActivity(), aVoid -> call.resolve())
+                    .addOnFailureListener(getActivity(), e -> call.reject("Sign out failed", e));
+        } catch (Exception t) {
+            call.reject("Sign out exception: " + t.getMessage(), t);
+        }
+    }
+}
+`;
+  fs.writeFileSync(googleAuthJava, robustGoogleAuthCode, 'utf8');
 }
 
 
