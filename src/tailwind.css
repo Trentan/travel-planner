@@ -7519,20 +7519,14 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   background: #334155;
 }
 
-/* Mobile Read-Only Banner Polish */
+/* Mobile Read-Only Banner Polish — completely hidden on mobile app mode to preserve screen space */
+body.mobile-app-mode #readOnlyBanner {
+  display: none !important;
+}
+
 @media (max-width: 640px) {
   #readOnlyBanner {
-    padding: 0.35rem 0.65rem !important;
-    font-size: 0.75rem !important;
-    gap: 0.4rem !important;
-  }
-  .readonly-banner-hint {
     display: none !important;
-  }
-  .readonly-banner-unlock-btn {
-    padding: 0.2rem 0.55rem !important;
-    font-size: 0.72rem !important;
-    min-height: 1.6rem !important;
   }
 }
 
