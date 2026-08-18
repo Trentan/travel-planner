@@ -10,6 +10,11 @@
     "SplashScreen": {
       "launchAutoHide": true,
       "backgroundColor": "#F7F5F0"
+    },
+    "GoogleAuth": {
+      "scopes": ["profile", "email", "https://www.googleapis.com/auth/drive.file"],
+      "serverClientId": "253620621116-u76e3v3e2qv6ffq9b58re4l4bbqs1e3g.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": false
     }
   }
 }

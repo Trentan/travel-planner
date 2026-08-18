@@ -24,3 +24,14 @@ if (!fs.existsSync(cordovaJavaFile)) {
   fs.writeFileSync(cordovaJavaFile, `package capacitor.cordova.android.plugins;\n\npublic class CordovaPlugins {\n    // Placeholder class so R8 finds classes.jar when no cordova plugins are installed\n}\n`);
 }
 
+// Patch @codetrix-studio/capacitor-google-auth android build.gradle for Gradle 9 & AGP 8 compatibility
+const googleAuthGradle = path.join(root, 'node_modules', '@codetrix-studio', 'capacitor-google-auth', 'android', 'build.gradle');
+if (fs.existsSync(googleAuthGradle)) {
+  let content = fs.readFileSync(googleAuthGradle, 'utf8');
+  content = content.replace(/jcenter\(\)/g, 'mavenCentral()');
+  content = content.replace(/VERSION_17/g, 'VERSION_21');
+  content = content.replace(/'proguard-android\.txt'/g, "'proguard-android-optimize.txt'");
+  content = content.replace(/'com\.google\.android\.gms:play-services-auth:18\.\+'/g, "'com.google.android.gms:play-services-auth:21.2.0'");
+  fs.writeFileSync(googleAuthGradle, content, 'utf8');
+}
+

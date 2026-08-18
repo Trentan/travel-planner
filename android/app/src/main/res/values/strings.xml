@@ -4,4 +4,5 @@
     <string name="title_activity_main">Travel Planner</string>
     <string name="package_name">com.trenscends.travelplanner</string>
     <string name="custom_url_scheme">com.trenscends.travelplanner</string>
+    <string name="server_client_id">253620621116-u76e3v3e2qv6ffq9b58re4l4bbqs1e3g.apps.googleusercontent.com</string>
 </resources>

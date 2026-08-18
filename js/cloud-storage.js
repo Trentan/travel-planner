@@ -199,11 +199,53 @@
     return null;
   }
 
-  // Authenticate with Google Drive via Google Identity Services Token Client
-  function authenticateGoogleDrive(interactive = true) {
-    return new Promise((resolve, reject) => {
-      const clientId = getGoogleClientId();
+  // Authenticate with Google Drive via Native GoogleAuth Plugin (Mobile) or Google Identity Services Token Client (Web)
+  async function authenticateGoogleDrive(interactive = true) {
+    const clientId = getGoogleClientId();
 
+    // 1. Check Native Android/iOS GoogleAuth Plugin
+    const isNative = window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform();
+    const nativeAuthPlugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth;
+
+    if (isNative && nativeAuthPlugin && typeof nativeAuthPlugin.signIn === 'function') {
+      try {
+        console.log('[GoogleAuth Native] Launching native Android Google Account picker...');
+        const user = await nativeAuthPlugin.signIn();
+        if (user) {
+          accessToken = (user.authentication && user.authentication.accessToken) || (user.authentication && user.authentication.idToken) || '';
+          tokenExpiry = Date.now() + (3600 * 1000) - 60000;
+
+          setUserProfile({
+            name: user.name || user.givenName || 'Google Traveler',
+            email: user.email || '',
+            picture: user.imageUrl || ''
+          });
+
+          localStorage.setItem('travelApp_gdrive_connected', 'true');
+          if (accessToken) {
+            localStorage.setItem('travelApp_gdrive_token', accessToken);
+            localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
+          }
+
+          await ensureDriveFolder();
+          updateCloudSyncStatusPill();
+          updateCloudSyncModalState();
+
+          if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+          await window.uploadAllLocalTripsToDrive();
+          await window.syncAllTripsFromGoogleDrive();
+          return true;
+        }
+      } catch (nativeErr) {
+        console.warn('[GoogleAuth Native] Native sign-in dismissed or error:', nativeErr);
+        if (String(nativeErr).toLowerCase().includes('cancel') || String(nativeErr).includes('12501')) {
+          return false;
+        }
+      }
+    }
+
+    // 2. Web Google Identity Services (GIS) / Token Client Flow
+    return new Promise((resolve, reject) => {
       const proceedOAuth = () => {
         try {
           const client = google.accounts.oauth2.initTokenClient({
