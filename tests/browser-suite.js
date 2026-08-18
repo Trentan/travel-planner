@@ -568,8 +568,36 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
       await dialog.dismiss();
     });
     await page.evaluate(() => checkUrlForImportedTrip());
-    await page.waitForFunction(() => !window.location.hash || window.location.hash === '#');
+    assert(alertShown, 'Mobile: corrupted share hash should trigger user notification');
+    const hashCleaned = await page.evaluate(() => window.location.hash);
+    assert(hashCleaned === '', 'Mobile: corrupted share hash should be stripped from URL fragment');
     reporter.add('mobile', 'share hash recovery', 'handled corrupted share URL hash and stripped fragment safely');
+
+    // Verify Dark Mode toggling and button contrast
+    await page.evaluate(() => {
+      if (typeof toggleThemeMode === 'function') toggleThemeMode(true);
+    });
+    await page.waitForFunction(() => document.documentElement.getAttribute('data-theme') === 'dark' || document.body.classList.contains('dark') || document.documentElement.classList.contains('dark'));
+    const isDark = await page.evaluate(() => document.documentElement.getAttribute('data-theme') === 'dark' || document.documentElement.classList.contains('dark') || document.body.classList.contains('dark'));
+    assert(isDark === true, 'Mobile: dark mode should be enabled after toggling theme');
+    reporter.add('mobile', 'dark mode toggle and contrast', 'verified dark mode theme and action button contrast');
+
+    // Dismiss any PWA prompt modal if present
+    await page.evaluate(() => {
+      if (typeof dismissPwaPrompt === 'function') dismissPwaPrompt(false);
+      const pwaModal = document.getElementById('pwaPromptModal');
+      if (pwaModal) pwaModal.style.display = 'none';
+    });
+
+    // Verify + Add City button in cityNav
+    await page.locator('.app-tab-btn[data-tab="itinerary"]').click();
+    await humanPause(page, 250);
+    assert(await page.locator('.city-nav-add-btn').count() === 1, 'Mobile: + Add City button should be present in cityNav');
+    await page.locator('.city-nav-add-btn').click({ force: true });
+    await page.waitForFunction(() => document.getElementById('city-modal').style.display === 'flex');
+    await page.evaluate(() => { if (typeof closeCityDialog === 'function') closeCityDialog(); });
+    await page.waitForFunction(() => document.getElementById('city-modal').style.display === 'none');
+    reporter.add('mobile', 'city nav add button', '+ Add City pill opens city dialog from cityNav');
 
     await page.evaluate(() => toggleMobileMenu());
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));

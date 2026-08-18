@@ -7679,6 +7679,55 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   border-color: rgba(66, 133, 244, 0.6) !important;
 }
 
+/* High Contrast Dark Mode Action Buttons & City Nav */
+.dark .action-btn {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+.dark .action-btn:hover {
+  background-color: #334155;
+  border-color: #475569;
+  color: #ffffff;
+}
+
+.dark .action-btn-secondary {
+  background-color: #2563eb;
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+.dark .action-btn-secondary:hover {
+  background-color: #1d4ed8;
+  border-color: #2563eb;
+}
+
+.dark .action-btn-primary,
+.dark .btn-primary {
+  background-color: #0d9488;
+  border-color: #14b8a6;
+  color: #ffffff;
+}
+
+.dark .action-btn-primary:hover,
+.dark .btn-primary:hover {
+  background-color: #0f766e;
+  border-color: #0d9488;
+}
+
+.dark .city-nav-add-btn {
+  background-color: rgba(13, 148, 136, 0.15) !important;
+  border-color: rgba(20, 184, 166, 0.6) !important;
+  color: #2dd4bf !important;
+}
+
+.dark .city-nav-add-btn:hover {
+  background-color: rgba(13, 148, 136, 0.3) !important;
+  border-color: #2dd4bf !important;
+}
+
+
 
 
 

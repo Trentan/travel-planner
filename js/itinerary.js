@@ -3812,6 +3812,16 @@ function buildCityNav() {
     navList.appendChild(btn);
   });
 
+  // Append + Add City button at the end of the navigation list for 1-tap mobile addition
+  const addCityBtn = document.createElement('button');
+  addCityBtn.className = 'city-nav-btn city-nav-add-btn px-3 py-1.5 rounded-full border border-dashed border-teal-500/70 dark:border-teal-400/70 bg-teal-50/60 dark:bg-teal-950/40 text-sm font-semibold text-teal-700 dark:text-teal-300 whitespace-nowrap transition-all hover:bg-teal-100 dark:hover:bg-teal-900/60 active:scale-95 flex items-center gap-1 shrink-0';
+  addCityBtn.setAttribute('title', 'Add a new city or destination');
+  addCityBtn.onclick = () => {
+    if (typeof openCityDialog === 'function') openCityDialog();
+  };
+  addCityBtn.innerHTML = '<span>➕</span> <span>City</span>';
+  navList.appendChild(addCityBtn);
+
   updateCityNavOverflowCue(nav, navList);
   if (!nav.dataset.overflowCueBound) {
     nav.dataset.overflowCueBound = '1';
