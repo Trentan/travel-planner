@@ -852,12 +852,22 @@
         const mappedTripId = Object.keys(fileMap).find(k => fileMap[k] === fileId);
         tripRecord = trips.find(t => t.id === fileId || t.id === mappedTripId) || trips.find(t => t.id === fileId.replace(/^gdrive_file_/, '')) || trips[0] || null;
       } else {
+        let token = await ensureValidAccessToken() || accessToken;
         const downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
-        const contentResp = await fetch(downloadUrl, {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
+        let contentResp = await fetch(downloadUrl, {
+          headers: { 'Authorization': `Bearer ${token}` }
         });
+        if (!contentResp.ok && contentResp.status === 401) {
+          token = await ensureValidAccessToken() || accessToken;
+          contentResp = await fetch(downloadUrl, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+        }
         if (contentResp.ok) {
           tripRecord = await contentResp.json();
+        } else {
+          const errText = await contentResp.text();
+          console.error('Failed to download Google Drive file:', contentResp.status, errText);
         }
       }
 

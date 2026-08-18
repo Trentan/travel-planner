@@ -35,7 +35,7 @@ if (fs.existsSync(googleAuthGradle)) {
   fs.writeFileSync(googleAuthGradle, content, 'utf8');
 }
 
-// Patch GoogleAuth.java for null-safe signIn() without prior initialize()
+// Patch GoogleAuth.java for null-safe signIn() without prior initialize() and request Google Drive scopes
 const googleAuthJava = path.join(root, 'node_modules', '@codetrix-studio', 'capacitor-google-auth', 'android', 'src', 'main', 'java', 'com', 'codetrixstudio', 'capacitor', 'GoogleAuth', 'GoogleAuth.java');
 if (fs.existsSync(googleAuthJava)) {
   let javaContent = fs.readFileSync(googleAuthJava, 'utf8');
@@ -44,7 +44,12 @@ if (fs.existsSync(googleAuthJava)) {
       'public void signIn(PluginCall call) {',
       'public void signIn(PluginCall call) {\n    if (googleSignInClient == null) {\n      String defaultClientId = this.getContext().getString(R.string.server_client_id);\n      String[] defaultScopes = new String[]{"profile", "email", "https://www.googleapis.com/auth/drive.file"};\n      loadSignInClient(defaultClientId, false, defaultScopes);\n    }'
     );
-    fs.writeFileSync(googleAuthJava, javaContent, 'utf8');
   }
+  // Ensure AccountManager mints an access token with Google Drive scope
+  javaContent = javaContent.replace(
+    '"oauth2:profile email"',
+    '"oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata profile email"'
+  );
+  fs.writeFileSync(googleAuthJava, javaContent, 'utf8');
 }
 
