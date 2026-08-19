@@ -264,7 +264,6 @@
           ]);
 
           if (user) {
-            if (interactive) setLoadingUI(true, 'Syncing trips...');
             accessToken = (user.authentication && user.authentication.accessToken) || (user.authentication && user.authentication.idToken) || user.idToken || '';
             tokenExpiry = Date.now() + (3600 * 1000) - 60000;
 
@@ -280,14 +279,21 @@
               localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
             }
 
-            await ensureDriveFolder();
-            updateCloudSyncStatusPill();
-            updateCloudSyncModalState();
-
-            if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
-            await window.uploadAllLocalTripsToDrive();
-            await window.syncAllTripsFromGoogleDrive();
             setLoadingUI(false);
+            updateCloudSyncStatusPill('☁️ Synced to Drive', 'connected');
+            updateCloudSyncModalState();
+            if (typeof window.showToast === 'function') {
+              window.showToast(`✅ Signed in as ${user.name || user.displayName || 'Google Traveler'}!`);
+            }
+            if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+
+            // Run folder setup and sync in background
+            window.ensureDriveFolder().then(() => {
+              window.uploadAllLocalTripsToDrive().then(() => {
+                window.syncAllTripsFromGoogleDrive(true);
+              });
+            }).catch(e => console.warn('Background sync after signin notice:', e));
+
             return true;
           }
         } catch (nativeErr) {
