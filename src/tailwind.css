@@ -3607,7 +3607,7 @@
 
   body.mobile-app-mode.compact-view-mode .active-city-sticky-header {
     position: sticky !important;
-    top: 0 !important;
+    top: env(safe-area-inset-top, 0px) !important;
     z-index: 60;
     margin-bottom: 0.35rem;
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
@@ -3627,7 +3627,7 @@
   body.mobile-app-mode.compact-view-mode .compact-leg-header {
     @apply px-3.5 py-2.5 rounded-t-xl;
     position: sticky !important;
-    top: 0 !important;
+    top: env(safe-area-inset-top, 0px) !important;
     z-index: 50;
     border-bottom: 1px solid rgba(255, 255, 255, 0.24);
   }
