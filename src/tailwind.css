@@ -1653,7 +1653,7 @@
     }
 
     body.mobile-app-mode .app-tabs-content {
-      padding-top: 0 !important;
+      padding-top: 0.35rem !important;
       margin-top: 0 !important;
       padding-bottom: calc(8.2rem + env(safe-area-inset-bottom, 0px));
     }
