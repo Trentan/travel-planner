@@ -43,6 +43,7 @@ if (fs.existsSync(googleAuthJava)) {
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -58,6 +59,7 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -142,7 +144,7 @@ public class GoogleAuth extends Plugin {
                 if (str != null && !str.trim().isEmpty()) {
                     String cleanStr = str.replace('[', ' ').replace(']', ' ');
                     for (String item : cleanStr.split(",")) {
-                        String cleanItem = item.replace('\\"', ' ').trim();
+                        String cleanItem = item.replace('\"', ' ').trim();
                         if (!cleanItem.isEmpty()) scopeList.add(cleanItem);
                     }
                 }
@@ -186,60 +188,7 @@ public class GoogleAuth extends Plugin {
                 return;
             }
 
-            executor.execute(() -> {
-                try {
-                    String scopeStr = "oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata profile email";
-                    String authToken = null;
-                    try {
-                        Account androidAccount = account.getAccount();
-                        if (androidAccount != null) {
-                            authToken = GoogleAuthUtil.getToken(getContext(), androidAccount, scopeStr);
-                        } else if (account.getEmail() != null) {
-                            authToken = GoogleAuthUtil.getToken(getContext(), account.getEmail(), scopeStr);
-                        }
-                    } catch (Exception tokenEx) {
-                        Log.w(TAG, "GoogleAuthUtil token attempt: " + tokenEx.getMessage());
-                        try {
-                            AccountManager manager = AccountManager.get(getContext());
-                            Account androidAccount = account.getAccount();
-                            if (androidAccount != null) {
-                                AccountManagerFuture<Bundle> future = manager.getAuthToken(androidAccount, scopeStr, null, getActivity(), null, null);
-                                Bundle b = future.getResult();
-                                authToken = b != null ? b.getString(AccountManager.KEY_AUTHTOKEN) : null;
-                            }
-                        } catch (Exception mgrEx) {
-                            Log.w(TAG, "AccountManager token attempt: " + mgrEx.getMessage());
-                        }
-                    }
-
-                    if (authToken == null || authToken.isEmpty()) {
-                        authToken = account.getIdToken();
-                    }
-
-                    JSObject authentication = new JSObject();
-                    authentication.put("idToken", account.getIdToken());
-                    authentication.put(FIELD_ACCESS_TOKEN, authToken != null ? authToken : "");
-                    authentication.put(FIELD_TOKEN_EXPIRES, 3600 + (System.currentTimeMillis() / 1000));
-                    authentication.put(FIELD_TOKEN_EXPIRES_IN, 3600);
-
-                    JSObject user = new JSObject();
-                    user.put("serverAuthCode", account.getServerAuthCode());
-                    user.put("idToken", account.getIdToken());
-                    user.put("authentication", authentication);
-                    user.put("name", account.getDisplayName());
-                    user.put("displayName", account.getDisplayName());
-                    user.put("email", account.getEmail());
-                    user.put("familyName", account.getFamilyName());
-                    user.put("givenName", account.getGivenName());
-                    user.put("id", account.getId());
-                    user.put("imageUrl", account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : "");
-
-                    call.resolve(user);
-                } catch (Exception bgEx) {
-                    Log.e(TAG, "Background account processing error", bgEx);
-                    call.reject("Failed processing sign-in result: " + bgEx.getMessage(), bgEx);
-                }
-            });
+            processAccountAndResolve(call, account);
         } catch (ApiException apiEx) {
             Log.w(TAG, "Google Sign-In ApiException: code=" + apiEx.getStatusCode() + " msg=" + apiEx.getMessage());
             if (apiEx.getStatusCode() == GoogleSignInStatusCodes.SIGN_IN_CANCELLED) {
@@ -251,6 +200,76 @@ public class GoogleAuth extends Plugin {
             Log.e(TAG, "signInResult top-level exception", topEx);
             call.reject("Sign-in error: " + topEx.getMessage(), topEx);
         }
+    }
+
+    private void processAccountAndResolve(PluginCall call, GoogleSignInAccount account) {
+        executor.execute(() -> {
+            try {
+                String scopeStr = "oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata profile email";
+                String authToken = null;
+                Account androidAccount = account.getAccount() != null ? account.getAccount() : (account.getEmail() != null ? new Account(account.getEmail(), "com.google") : null);
+
+                if (androidAccount != null) {
+                    try {
+                        authToken = GoogleAuthUtil.getToken(getContext(), androidAccount, scopeStr);
+                    } catch (UserRecoverableAuthException urae) {
+                        Log.i(TAG, "Google Drive consent required, launching recovery intent");
+                        startActivityForResult(call, urae.getIntent(), "handleUserRecoverableAuth");
+                        return;
+                    } catch (Exception tokenEx) {
+                        Log.w(TAG, "GoogleAuthUtil token attempt: " + tokenEx.getMessage());
+                        try {
+                            AccountManager manager = AccountManager.get(getContext());
+                            AccountManagerFuture<Bundle> future = manager.getAuthToken(androidAccount, scopeStr, null, getActivity(), null, null);
+                            Bundle b = future.getResult();
+                            authToken = b != null ? b.getString(AccountManager.KEY_AUTHTOKEN) : null;
+                        } catch (Exception mgrEx) {
+                            Log.w(TAG, "AccountManager token attempt: " + mgrEx.getMessage());
+                        }
+                    }
+                }
+
+                if (authToken == null || authToken.isEmpty()) {
+                    authToken = account.getIdToken();
+                }
+
+                JSObject authentication = new JSObject();
+                authentication.put("idToken", account.getIdToken());
+                authentication.put(FIELD_ACCESS_TOKEN, authToken != null ? authToken : "");
+                authentication.put(FIELD_TOKEN_EXPIRES, 3600 + (System.currentTimeMillis() / 1000));
+                authentication.put(FIELD_TOKEN_EXPIRES_IN, 3600);
+
+                JSObject user = new JSObject();
+                user.put("serverAuthCode", account.getServerAuthCode());
+                user.put("idToken", account.getIdToken());
+                user.put("authentication", authentication);
+                user.put("name", account.getDisplayName());
+                user.put("displayName", account.getDisplayName());
+                user.put("email", account.getEmail());
+                user.put("familyName", account.getFamilyName());
+                user.put("givenName", account.getGivenName());
+                user.put("id", account.getId());
+                user.put("imageUrl", account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : "");
+
+                call.resolve(user);
+            } catch (Exception bgEx) {
+                Log.e(TAG, "Background account processing error", bgEx);
+                call.reject("Failed processing sign-in result: " + bgEx.getMessage(), bgEx);
+            }
+        });
+    }
+
+    @ActivityCallback
+    protected void handleUserRecoverableAuth(PluginCall call, ActivityResult result) {
+        if (call == null) return;
+        if (result != null && result.getResultCode() == Activity.RESULT_OK) {
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
+            if (account != null) {
+                processAccountAndResolve(call, account);
+                return;
+            }
+        }
+        call.reject("Google Drive authorization was cancelled or denied.", String.valueOf(GoogleSignInStatusCodes.SIGN_IN_CANCELLED));
     }
 
     @PluginMethod
