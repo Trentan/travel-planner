@@ -20,7 +20,9 @@
     "build:mobile": "npm run build:css && npm run prepare:capacitor-web && npx cap sync",
     "build:apk:debug": "npm run build:mobile && node -e \"const { execSync } = require('child_process'); execSync(process.platform === 'win32' ? '.\\\\gradlew.bat assembleDebug' : './gradlew assembleDebug', { cwd: 'android', stdio: 'inherit' });\"",
     "build:apk:release": "npm run build:mobile && node -e \"const { execSync } = require('child_process'); execSync(process.platform === 'win32' ? '.\\\\gradlew.bat assembleRelease' : './gradlew assembleRelease', { cwd: 'android', stdio: 'inherit' });\"",
-    "build:aab": "npm run build:mobile && node -e \"const { execSync } = require('child_process'); execSync(process.platform === 'win32' ? '.\\\\gradlew.bat bundleRelease' : './gradlew bundleRelease', { cwd: 'android', stdio: 'inherit' });\""
+    "build:aab": "npm run build:mobile && node -e \"const { execSync } = require('child_process'); execSync(process.platform === 'win32' ? '.\\\\gradlew.bat bundleRelease' : './gradlew bundleRelease', { cwd: 'android', stdio: 'inherit' });\"",
+    "emulator": "node -e \"const { spawn } = require('child_process'); const p = process.env.LOCALAPPDATA + '\\\\Android\\\\Sdk\\\\emulator\\\\emulator.exe'; spawn(p, ['-avd', 'medium_phone'], { detached: true, stdio: 'ignore' }).unref(); console.log('Emulator launching in GUI window...');\"",
+    "android:run": "npm run build:apk:debug && node -e \"const { execSync } = require('child_process'); const adb = process.env.LOCALAPPDATA + '\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe'; execSync(`\\\"${adb}\\\" install -r android/app/build/outputs/apk/debug/app-debug.apk`, { stdio: 'inherit' }); execSync(`\\\"${adb}\\\" shell am start -S -n com.trenscends.travelplanner/.MainActivity`, { stdio: 'inherit' });\""
   },
   "devDependencies": {
     "@capacitor/cli": "^8.4.2",
