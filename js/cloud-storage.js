@@ -774,19 +774,16 @@
     try {
       if (!isSilent) updateCloudSyncStatusPill('⏳ Fetching Cloud Trips...', 'syncing');
       const folderId = await ensureDriveFolder();
-      // Search dedicated folder in user's Google Drive
+      // Search dedicated folder as well as any .json files in user's Google Drive
       const query = folderId
-        ? `'${folderId}' in parents and trashed=false`
-        : `trashed=false`;
+        ? `('${folderId}' in parents or name contains '.json' or mimeType='application/json') and trashed=false`
+        : `(name contains '.json' or mimeType='application/json') and trashed=false`;
       const listUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,modifiedTime,size)&pageSize=50`;
       const listResp = await fetch(listUrl, {
         headers: { 'Authorization': `Bearer ${accessToken}` }
       });
 
-      if (!listResp.ok) {
-        console.warn('[GoogleDrive Sync] List query non-ok status:', listResp.status);
-        return [];
-      }
+      if (!listResp.ok) return [];
 
       const data = await listResp.json();
       const files = data.files || [];
@@ -848,15 +845,16 @@
       }
 
       setGDriveFileMap(fileMap);
+      if (!isSilent) updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
+      updateCloudSyncModalState(files);
+
+      if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
+      if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
       return window.__gdriveCloudFiles || files;
     } catch (err) {
       console.error('Failed to list cloud trips from Google Drive:', err);
+      if (!isSilent) updateCloudSyncStatusPill('⚡ Sync Failed', 'error');
       return [];
-    } finally {
-      if (!isSilent) updateCloudSyncStatusPill(`☁️ Synced to Drive`, 'connected');
-      updateCloudSyncModalState(window.__gdriveCloudFiles || []);
-      if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
-      if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
     }
   };
 

@@ -35,13 +35,11 @@
     --m-day-chip-min-w: 8.4rem;
   }
 
-  /* Hard default layout guard: never allow page-level horizontal overflow */
   html,
   body {
     font-family: var(--font-sans);
     width: 100%;
     max-width: 100%;
-    overflow-x: clip;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -1544,7 +1542,6 @@
     body {
       max-width: 100vw;
       width: 100%;
-      overflow-x: clip;
       overscroll-behavior-x: none;
     }
 
@@ -1689,8 +1686,8 @@
 
     body.mobile-app-mode .leg-header,
     body.mobile-app-mode.compact-view-mode .compact-leg-header {
-      position: sticky;
-      top: 0;
+      position: sticky !important;
+      top: env(safe-area-inset-top, 0px) !important;
       z-index: 50;
     }
 
