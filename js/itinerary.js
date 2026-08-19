@@ -1384,9 +1384,41 @@ function buildCompactItinerary() {
     `);
   });
 
+  let activeStickyHeaderHtml = '';
+  const firstEntry = mobileLegSequence[0];
+  if (firstEntry && firstEntry.leg) {
+    const firstLeg = firstEntry.leg;
+    const daysCount = Array.isArray(firstLeg.days) ? firstLeg.days.length : 0;
+    const nightLabel = getLegNightSummary(firstLeg).label;
+    const legCost = getLegTotalCost(firstLeg);
+    const firstDay = firstLeg.days && firstLeg.days[0];
+    const lastDay = firstLeg.days && firstLeg.days[daysCount - 1];
+    const firstDateFormatted = firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '';
+    const lastDateFormatted = lastDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date) : '';
+    const legDateRangeHtml = firstDay && lastDay && firstDateFormatted !== lastDateFormatted
+        ? `${escapeHtmlText(firstDateFormatted)} &rarr; ${escapeHtmlText(lastDateFormatted)}`
+        : escapeHtmlText(firstDateFormatted || '—');
+    const routeLabel = firstDay && lastDay
+        ? (firstDay.date === lastDay.date ? `${firstDay.day || 'Day'} ${firstDay.date}` : `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`)
+        : `${daysCount} day${daysCount !== 1 ? 's' : ''}`;
+    const legLabel = firstLeg.label && !/^trip leg$/i.test(String(firstLeg.label).trim()) ? firstLeg.label : '';
+    const displayLegLabel = getLegHeaderLabelWithFlag(legLabel || routeLabel || 'Leg 1');
+
+    activeStickyHeaderHtml = `
+      <div id="compactActiveCityHeader" class="active-city-sticky-header leg-header compact-leg-header" style="background:${firstLeg.colour || '#0ea5e9'}; cursor:default;">
+        <div class="compact-leg-header-line">
+          <span class="compact-leg-date">${legDateRangeHtml}</span>
+          <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
+          <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
+          <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
+        </div>
+      </div>
+    `;
+  }
+
   const pagerRoot = document.createElement('div');
   pagerRoot.className = 'compact-city-swipe-root';
-  pagerRoot.innerHTML = renderMobileSwipePager({
+  pagerRoot.innerHTML = activeStickyHeaderHtml + renderMobileSwipePager({
     pagerClass: 'compact-city-swipe-pager',
     pagerKey: 'compact-city-swipe',
     positionPrefix: 'Trip',
@@ -3668,7 +3700,15 @@ function setupCompactCityNavSync(root = document) {
     const slideLegId = String(slide.dataset.legId || '').trim();
     if (!Array.isArray(appData)) return;
     const targetLeg = appData.find(l => String(l.id || '') === slideLegId) || null;
-    if (targetLeg) syncCityNavHighlightToLeg(targetLeg);
+    if (targetLeg) {
+      syncCityNavHighlightToLeg(targetLeg);
+      const stickyHeader = root.querySelector('#compactActiveCityHeader');
+      const slideHeader = slide.querySelector('.compact-leg-header');
+      if (stickyHeader && slideHeader) {
+        stickyHeader.style.background = slideHeader.style.background || targetLeg.colour || '#0ea5e9';
+        stickyHeader.innerHTML = slideHeader.innerHTML;
+      }
+    }
   };
 
   syncByIndex(Number(pager.dataset.activeIndex || 0));

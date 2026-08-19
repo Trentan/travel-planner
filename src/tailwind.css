@@ -3605,6 +3605,20 @@
     @apply grid gap-1.25;
   }
 
+  body.mobile-app-mode.compact-view-mode .active-city-sticky-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 60;
+    margin-bottom: 0.35rem;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  body.mobile-app-mode.compact-view-mode .compact-leg-card > .compact-leg-header {
+    display: none !important;
+  }
+
   body.mobile-app-mode.compact-view-mode .compact-leg-card {
     @apply rounded-xl border border-slate-200/85 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900/40 shadow-[0_12px_30px_rgba(24,39,75,0.12)];
     overflow: visible;
