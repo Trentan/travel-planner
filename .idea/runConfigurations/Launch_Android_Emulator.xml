@@ -1,11 +1,16 @@
 ﻿<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="📱 Launch Android Emulator" type="js.build_tools.npm" factoryName="npm">
-    <package-json value="$PROJECT_DIR$/package.json" />
-    <command value="run" />
-    <scripts>
-      <script value="emulator" />
-    </scripts>
-    <node-interpreter value="project" />
+  <configuration default="false" name="📱 Launch Android Emulator" type="ShConfigurationType">
+    <option name="SCRIPT_TEXT" value="Start-Process "$env:LOCALAPPDATA\Android\Sdk\emulator\emulator.exe" -ArgumentList '-avd', 'medium_phone'" />
+    <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+    <option name="SCRIPT_PATH" value="" />
+    <option name="SCRIPT_OPTIONS" value="" />
+    <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+    <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+    <option name="INTERPRETER_PATH" value="powershell.exe" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="EXECUTE_IN_TERMINAL" value="true" />
+    <option name="EXECUTE_SCRIPT_FILE" value="false" />
     <envs />
     <method v="2" />
   </configuration>
