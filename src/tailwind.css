@@ -1616,21 +1616,22 @@
     }
 
     body.mobile-app-mode .app-tabs-nav {
-      position: sticky !important;
+      position: fixed !important;
       left: 0;
       right: 0;
-      top: 0 !important;
-      bottom: auto !important;
-      z-index: 200;
+      bottom: 0 !important;
+      top: auto !important;
+      z-index: 320;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      border-top: none;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.32);
+      border-top: 1px solid rgba(148, 163, 184, 0.32);
+      border-bottom: none;
       background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      padding-top: env(safe-area-inset-top, 0px);
+      height: calc(4.15rem + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
       padding-inline: 0.5rem;
       box-sizing: border-box;
       -webkit-transform: translateZ(0);
@@ -1644,33 +1645,42 @@
 
     body.mobile-app-mode .app-tabs-content {
       padding-top: 0.25rem;
-      padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+      padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
     }
 
     [data-theme="dark"] body.mobile-app-mode .app-tabs-nav {
       background: rgba(15, 23, 42, 0.95);
-      border-bottom-color: rgba(71, 85, 105, 0.65);
+      border-top-color: rgba(71, 85, 105, 0.65);
+      border-bottom-color: transparent;
     }
 
     body.mobile-app-mode #cityNav {
       position: sticky !important;
       left: 0;
       right: 0;
-      top: calc(48px + env(safe-area-inset-top, 0px)) !important;
+      top: 0 !important;
       bottom: auto !important;
-      z-index: 190;
+      z-index: 200;
       border-top: none;
       border-bottom: 1px solid rgba(148, 163, 184, 0.26);
       background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      padding-block: 0.3rem;
+      padding-top: calc(0.35rem + env(safe-area-inset-top, 0px));
+      padding-bottom: 0.35rem;
       padding-inline: 0.5rem;
+      box-sizing: border-box;
     }
 
     [data-theme="dark"] body.mobile-app-mode #cityNav {
       background: rgba(15, 23, 42, 0.96);
       border-bottom-color: rgba(71, 85, 105, 0.65);
+    }
+
+    body.mobile-app-mode:not(.compact-view-mode) .leg-header {
+      position: sticky;
+      top: calc(44px + env(safe-area-inset-top, 0px));
+      z-index: 120;
     }
 
     body.mobile-app-mode :is(

@@ -63,20 +63,20 @@ async function run() {
     const playBtnHref = await page.getAttribute('#pwaPromptModal .pwa-btn-play', 'href');
     assert(playBtnHref && playBtnHref.includes('play.google.com'), 'Android prompt should include Play Store URL');
 
-    // 3. Test Mobile Navigation Sticky Top Positioning & Accommodation Containment
+    // 3. Test Mobile Bottom Navigation Fixed Positioning & Accommodation Containment
     const navPos = await page.evaluate(() => {
       const el = document.querySelector('.app-tabs-nav');
       if (!el) return null;
       const style = window.getComputedStyle(el);
       return {
         position: style.position,
-        top: style.top,
+        bottom: style.bottom,
         zIndex: style.zIndex
       };
     });
 
-    assert(navPos.position === 'sticky', 'Mobile tab nav should have position: sticky');
-    assert(navPos.top === '0px', 'Mobile tab nav should be anchored at top: 0px');
+    assert(navPos.position === 'fixed', 'Mobile tab nav should have position: fixed');
+    assert(navPos.bottom === '0px', 'Mobile tab nav should be anchored at bottom: 0px');
 
     // Switch to Accommodation tab and verify layout containment
     await page.click('.app-tab-btn[data-tab="accom"]');
