@@ -71,14 +71,25 @@ function updateStickyOffsets() {
 
 function syncMobileMenuControls() {
   const shouldHideDisabledControls = isMobileViewport();
-  const controlIds = ['undoBtn', 'redoBtn', 'mobileUndoBtn', 'mobileRedoBtn'];
-
-  controlIds.forEach(id => {
+  const headerControlIds = ['undoBtn', 'redoBtn'];
+  headerControlIds.forEach(id => {
     const button = document.getElementById(id);
     if (!button) return;
     const hidden = shouldHideDisabledControls && button.disabled;
     button.hidden = hidden;
     button.setAttribute('aria-hidden', String(hidden));
+  });
+
+  const mobileMenuControlIds = ['mobileUndoBtn', 'mobileRedoBtn'];
+  mobileMenuControlIds.forEach(id => {
+    const button = document.getElementById(id);
+    if (!button) return;
+    button.hidden = false;
+    if (typeof button.removeAttribute === 'function') {
+      button.removeAttribute('aria-hidden');
+    } else if (typeof button.setAttribute === 'function') {
+      button.setAttribute('aria-hidden', 'false');
+    }
   });
 }
 
