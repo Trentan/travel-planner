@@ -180,12 +180,6 @@ function syncModeToggleButtons() {
       label: isEditMode ? '🔒 Lock: Read Only' : '✏️ Unlock Editing',
       activeClass: 'edit-mode',
       isActive: !isEditMode
-    },
-    {
-      ids: ['compactToggleBtn', 'mobileCompactToggleBtn'],
-      label: isCompactView ? '📄 Compact mode' : '📄 Detailed mode',
-      activeClass: 'active-mode',
-      isActive: isCompactView
     }
   ];
 
@@ -199,7 +193,8 @@ function syncModeToggleButtons() {
         switchInput.checked = isActive;
       }
       if (labelNode) {
-        labelNode.textContent = isActive ? 'Compact mode' : 'Detailed mode';
+        // Fallback for missing label logic, kept generic
+        labelNode.textContent = label;
       } else if (btn.tagName === 'BUTTON') {
         btn.textContent = label;
       }
@@ -575,13 +570,6 @@ function applyViewportDrivenMode() {
   }
 }
 
-function toggleCompactView(nextValue = null) {
-  // Deprecated: This function is now viewport-driven only.
-  // The nextValue parameter is ignored; compact view is determined by viewport width.
-  applyViewportDrivenMode();
-  console.warn('toggleCompactView() is deprecated. Compact view is now auto-detected from viewport.');
-}
-
 function setItineraryDayViewMode(nextMode = 'timeline') {
   itineraryDayViewMode = nextMode === 'grouped' ? 'grouped' : 'timeline';
   window.itineraryDayViewMode = itineraryDayViewMode;
@@ -736,7 +724,6 @@ window.updateLegTip = updateLegTip;
 window.deleteLegTip = deleteLegTip;
 window.toggleMode = toggleMode;
 window.toggleEditMode = toggleEditMode;
-window.toggleCompactView = toggleCompactView;
 window.setItineraryDayViewMode = setItineraryDayViewMode;
 window.applyUiSettings = applyUiSettings;
 window.switchTab = switchTab;
