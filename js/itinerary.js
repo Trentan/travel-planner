@@ -1389,97 +1389,38 @@ function renderCompactLegCard(leg, legIndex) {
   `;
 }
 
-function buildCompactItinerary() {
-  const container = document.getElementById('itinerary');
-  if (!container) return;
+function renderCompactLegDateRangeHtml(firstDay, lastDay) {
+  const firstDateFormatted = firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '';
+  const lastDateFormatted = lastDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date) : '';
+  return firstDay && lastDay && firstDateFormatted !== lastDateFormatted
+      ? `${escapeHtmlText(firstDateFormatted)} &rarr; ${escapeHtmlText(lastDateFormatted)}`
+      : escapeHtmlText(firstDateFormatted || '—');
+}
 
-  container.innerHTML = '';
+function getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount) {
+  const routeLabel = firstDay && lastDay
+      ? (firstDay.date === lastDay.date ? `${firstDay.day || 'Day'} ${firstDay.date}` : `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`)
+      : `${daysCount} day${daysCount !== 1 ? 's' : ''}`;
+  const legLabel = leg.label && !/^trip leg$/i.test(String(leg.label).trim())
+      ? leg.label
+      : '';
+  return getLegHeaderLabelWithFlag(legLabel || routeLabel || `Leg ${legIndex + 1}`);
+}
 
-  const slidesHtml = [];
-  const railHtml = [];
+function renderCompactCitySlide(entry, legIndex) {
+  const leg = entry.leg;
+  const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
+  const nightLabel = getLegNightSummary(leg).label;
+  const legCost = getLegTotalCost(leg);
+  const firstDay = leg.days && leg.days[0];
+  const lastDay = leg.days && leg.days[daysCount - 1];
 
-  const mobileLegSequence = getCompactMobileLegSequence();
+  const legDateRangeHtml = renderCompactLegDateRangeHtml(firstDay, lastDay);
+  const displayLegLabel = getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
 
-  mobileLegSequence.forEach((entry, legIndex) => {
-    const leg = entry.leg;
-    const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
-    const nightLabel = getLegNightSummary(leg).label;
-    const legCost = getLegTotalCost(leg);
-    const firstDay = leg.days && leg.days[0];
-    const lastDay = leg.days && leg.days[daysCount - 1];
-    
-    const firstDateFormatted = firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '';
-    const lastDateFormatted = lastDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date) : '';
-    const legDateRangeHtml = firstDay && lastDay && firstDateFormatted !== lastDateFormatted
-        ? `${escapeHtmlText(firstDateFormatted)} &rarr; ${escapeHtmlText(lastDateFormatted)}`
-        : escapeHtmlText(firstDateFormatted || '—');
-
-    const routeLabel = firstDay && lastDay
-        ? (firstDay.date === lastDay.date ? `${firstDay.day || 'Day'} ${firstDay.date}` : `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`)
-        : `${daysCount} day${daysCount !== 1 ? 's' : ''}`;
-    const legLabel = leg.label && !/^trip leg$/i.test(String(leg.label).trim())
-        ? leg.label
-        : '';
-    const displayLegLabel = getLegHeaderLabelWithFlag(legLabel || routeLabel || `Leg ${legIndex + 1}`);
-
-    const chipDateRangeHtml = firstDay && lastDay && firstDay.date !== lastDay.date
-        ? `${escapeHtmlText(firstDay.date)} &rarr; ${escapeHtmlText(lastDay.date)}`
-        : escapeHtmlText(firstDay ? firstDay.date : 'Trip');
-
-    const flightTimeLabel = getLegFlightButtonTimeLabel(leg);
-    const legCard = `
-      <article class="compact-leg-card">
-        <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
-          <div class="compact-leg-header-line">
-            <span class="compact-leg-date">${legDateRangeHtml}</span>
-            <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
-            <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
-            <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
-          </div>
-        </div>
-        <div class="compact-leg-body">
-          ${renderCompactMobileLegInfoCluster(leg, legIndex)}
-          ${renderCompactDayPager(leg, legIndex)}
-        </div>
-      </article>
-    `;
-
-    slidesHtml.push(`
-      <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide ${legIndex === 0 ? 'is-active' : ''}" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(leg.id || '')}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
-        ${legCard}
-      </div>
-    `);
-    railHtml.push(`
-      <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
-        <span class="mobile-swipe-chip-eyebrow">${chipDateRangeHtml}</span>
-        <span class="mobile-swipe-chip-title">${escapeHtmlText(displayLegLabel)}</span>
-        <span class="mobile-swipe-chip-route">${escapeHtmlText(flightTimeLabel || nightLabel)}</span>
-      </button>
-    `);
-  });
-
-  let activeStickyHeaderHtml = '';
-  const firstEntry = mobileLegSequence[0];
-  if (firstEntry && firstEntry.leg) {
-    const firstLeg = firstEntry.leg;
-    const daysCount = Array.isArray(firstLeg.days) ? firstLeg.days.length : 0;
-    const nightLabel = getLegNightSummary(firstLeg).label;
-    const legCost = getLegTotalCost(firstLeg);
-    const firstDay = firstLeg.days && firstLeg.days[0];
-    const lastDay = firstLeg.days && firstLeg.days[daysCount - 1];
-    const firstDateFormatted = firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '';
-    const lastDateFormatted = lastDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date) : '';
-    const legDateRangeHtml = firstDay && lastDay && firstDateFormatted !== lastDateFormatted
-        ? `${escapeHtmlText(firstDateFormatted)} &rarr; ${escapeHtmlText(lastDateFormatted)}`
-        : escapeHtmlText(firstDateFormatted || '—');
-    const routeLabel = firstDay && lastDay
-        ? (firstDay.date === lastDay.date ? `${firstDay.day || 'Day'} ${firstDay.date}` : `${firstDay.day || 'Day'} ${firstDay.date} - ${lastDay.day || 'Day'} ${lastDay.date}`)
-        : `${daysCount} day${daysCount !== 1 ? 's' : ''}`;
-    const legLabel = firstLeg.label && !/^trip leg$/i.test(String(firstLeg.label).trim()) ? firstLeg.label : '';
-    const displayLegLabel = getLegHeaderLabelWithFlag(legLabel || routeLabel || 'Leg 1');
-
-    activeStickyHeaderHtml = `
-      <div id="compactActiveCityHeader" class="active-city-sticky-header leg-header compact-leg-header" style="background:${firstLeg.colour || '#0ea5e9'}; cursor:default;">
+  const legCard = `
+    <article class="compact-leg-card">
+      <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
         <div class="compact-leg-header-line">
           <span class="compact-leg-date">${legDateRangeHtml}</span>
           <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
@@ -1487,8 +1428,81 @@ function buildCompactItinerary() {
           <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
         </div>
       </div>
-    `;
-  }
+      <div class="compact-leg-body">
+        ${renderCompactMobileLegInfoCluster(leg, legIndex)}
+        ${renderCompactDayPager(leg, legIndex)}
+      </div>
+    </article>
+  `;
+
+  return `
+    <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide ${legIndex === 0 ? 'is-active' : ''}" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(leg.id || '')}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
+      ${legCard}
+    </div>
+  `;
+}
+
+function renderCompactCityChip(entry, legIndex) {
+  const leg = entry.leg;
+  const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
+  const nightLabel = getLegNightSummary(leg).label;
+  const firstDay = leg.days && leg.days[0];
+  const lastDay = leg.days && leg.days[daysCount - 1];
+
+  const displayLegLabel = getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
+
+  const chipDateRangeHtml = firstDay && lastDay && firstDay.date !== lastDay.date
+      ? `${escapeHtmlText(firstDay.date)} &rarr; ${escapeHtmlText(lastDay.date)}`
+      : escapeHtmlText(firstDay ? firstDay.date : 'Trip');
+
+  const flightTimeLabel = getLegFlightButtonTimeLabel(leg);
+
+  return `
+    <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
+      <span class="mobile-swipe-chip-eyebrow">${chipDateRangeHtml}</span>
+      <span class="mobile-swipe-chip-title">${escapeHtmlText(displayLegLabel)}</span>
+      <span class="mobile-swipe-chip-route">${escapeHtmlText(flightTimeLabel || nightLabel)}</span>
+    </button>
+  `;
+}
+
+function renderCompactActiveCityHeader(firstLeg) {
+  if (!firstLeg) return '';
+
+  const daysCount = Array.isArray(firstLeg.days) ? firstLeg.days.length : 0;
+  const nightLabel = getLegNightSummary(firstLeg).label;
+  const legCost = getLegTotalCost(firstLeg);
+  const firstDay = firstLeg.days && firstLeg.days[0];
+  const lastDay = firstLeg.days && firstLeg.days[daysCount - 1];
+
+  const legDateRangeHtml = renderCompactLegDateRangeHtml(firstDay, lastDay);
+  const displayLegLabel = getCompactLegDisplayLabel(firstLeg, 0, firstDay, lastDay, daysCount);
+
+  return `
+    <div id="compactActiveCityHeader" class="active-city-sticky-header leg-header compact-leg-header" style="background:${firstLeg.colour || '#0ea5e9'}; cursor:default;">
+      <div class="compact-leg-header-line">
+        <span class="compact-leg-date">${legDateRangeHtml}</span>
+        <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
+        <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
+        <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
+      </div>
+    </div>
+  `;
+}
+
+function buildCompactItinerary() {
+  const container = document.getElementById('itinerary');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  const mobileLegSequence = getCompactMobileLegSequence();
+
+  const slidesHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCitySlide(entry, legIndex));
+  const railHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCityChip(entry, legIndex));
+
+  const firstEntry = mobileLegSequence[0];
+  const activeStickyHeaderHtml = firstEntry ? renderCompactActiveCityHeader(firstEntry.leg) : '';
 
   const pagerRoot = document.createElement('div');
   pagerRoot.className = 'compact-city-swipe-root';
