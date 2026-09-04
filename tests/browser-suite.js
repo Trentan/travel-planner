@@ -654,6 +654,29 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     assert(await page.locator('.packing-guides-shell.mobile-expanded').count() === 1, 'Mobile: packing guides should expand on tap (#204)');
     reporter.add('mobile', 'packing collapsible', 'packing guide header collapses/expands correctly on mobile');
 
+    // Verify Itinerary Vertical Scroll Bounds (#214)
+    await page.locator('.app-tab-btn[data-tab="itinerary"]').click();
+    await humanPause(page, 250);
+    const scrollBoundsPassed = await page.evaluate(async () => {
+      const cityChips = Array.from(document.querySelectorAll('.compact-city-chip'));
+      if (cityChips[1]) cityChips[1].click();
+      await new Promise(r => setTimeout(r, 300));
+      const tokyoSlide = document.getElementById('city-slide-1');
+      if (!tokyoSlide) return false;
+      const dayChips = Array.from(tokyoSlide.querySelectorAll('.compact-day-chip'));
+      if (!dayChips[1]) return false;
+      dayChips[1].click();
+      await new Promise(r => setTimeout(r, 300));
+      const activeDay = tokyoSlide.querySelector('.compact-day-slide.is-active');
+      const dayCarousel = tokyoSlide.querySelector('.compact-day-carousel');
+      const cityCarousel = document.querySelector('.compact-city-swipe-pager [data-role="mobile-swipe-carousel"]');
+      if (!activeDay || !dayCarousel || !cityCarousel) return false;
+      const dayDiff = Math.abs(dayCarousel.offsetHeight - (activeDay.querySelector('.compact-day-surface')?.offsetHeight || activeDay.offsetHeight));
+      return dayDiff <= 25 && cityCarousel.offsetHeight < 600;
+    });
+    assert(scrollBoundsPassed === true, 'Mobile: itinerary vertical scroll bounds should strictly conform to active day content (#214)');
+    reporter.add('mobile', 'itinerary vertical scroll bounds', 'mobile itinerary vertical scrolling bounds to active day height (#214)');
+
     await page.evaluate(() => toggleMobileMenu());
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
     const downloadPromise = page.waitForEvent('download');

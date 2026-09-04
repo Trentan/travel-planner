@@ -3610,18 +3610,6 @@
     height: auto;
   }
 
-  body.mobile-app-mode.compact-view-mode .compact-day-slide:not(.is-active) {
-    height: 0;
-    max-height: 0;
-    overflow: hidden;
-  }
-
-  body.mobile-app-mode.compact-view-mode .compact-day-slide.is-active {
-    height: auto;
-    max-height: none;
-    overflow: visible;
-  }
-
   /* Mobile itinerary parity: restore compact card language */
   body.mobile-app-mode.compact-view-mode .compact-city-swipe-root {
     @apply mt-0;
