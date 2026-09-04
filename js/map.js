@@ -36,6 +36,285 @@ function getMapCityId(cityName) {
   return 'city-' + String(cityName || '').toLowerCase().replace(/[^a-z0-9]/g, '-');
 }
 
+/**
+ * Collects all path stops from trip legs (appData) and journeys.
+ */
+function collectPathStops() {
+  const pathStops = [];
+
+  if (typeof appData !== 'undefined' && Array.isArray(appData)) {
+    appData.forEach((leg, legIndex) => {
+      const legBaseScore = typeof getLegDateScore === 'function' ? getLegDateScore(leg, legIndex) : legIndex * 10000;
+
+      const labelCity = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label ? leg.label.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').trim() : '');
+      const labelAlreadyInDayRoute = labelCity && (leg.days || []).some(day =>
+          (day.from && day.from.toLowerCase() === labelCity.toLowerCase()) ||
+          (day.to && day.to.toLowerCase() === labelCity.toLowerCase())
+      );
+
+      (leg.days || []).forEach((day, dayIndex) => {
+        const dayScore = typeof getTimelineScore === 'function' ? getTimelineScore(day.date, '', legBaseScore + dayIndex * 10) : legBaseScore + dayIndex * 10;
+
+        if (day.from && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(day.from))) {
+          pathStops.push({ id: getMapCityId(day.from), name: day.from, score: dayScore, isTransit: false, color: leg.colour || '#3498DB' });
+        }
+
+        if (labelCity && !labelAlreadyInDayRoute && dayIndex === 0) {
+           pathStops.push({ id: getMapCityId(labelCity), name: labelCity, score: dayScore + 0.5, isTransit: true, color: leg.colour || '#95a5a6' });
+        }
+
+        if (day.to && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(day.to))) {
+          pathStops.push({ id: getMapCityId(day.to), name: day.to, score: dayScore + 1, isTransit: false, color: leg.colour || '#3498DB' });
+        }
+      });
+    });
+  }
+
+  if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
+    journeys.forEach((journey, journeyIndex) => {
+      const depScore = typeof getTimelineScore === 'function' ? getTimelineScore(journey.departureDate || journey.dayDate, journey.departureTime, Number.MAX_SAFE_INTEGER - 20000 + journeyIndex) : Number.MAX_SAFE_INTEGER - 20000 + journeyIndex;
+      const arrScore = typeof getTimelineScore === 'function' ? getTimelineScore(journey.arrivalDate || journey.dayDate || journey.departureDate, journey.arrivalTime, depScore + 1) : depScore + 1;
+      const fromCity = typeof getCityByName === 'function' ? getCityByName(journey.fromLocation) : null;
+      const toCity = typeof getCityByName === 'function' ? getCityByName(journey.toLocation) : null;
+
+      if (fromCity?.isTransit === true && journey.fromLocation && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(journey.fromLocation))) {
+        pathStops.push({ id: getMapCityId(journey.fromLocation), name: journey.fromLocation, score: depScore, isTransit: true, color: '#95a5a6' });
+      }
+      if (toCity?.isTransit === true && journey.toLocation && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(journey.toLocation))) {
+        pathStops.push({ id: getMapCityId(journey.toLocation), name: journey.toLocation, score: arrScore, isTransit: true, color: '#95a5a6' });
+      }
+    });
+  }
+
+  pathStops.sort((a, b) => a.score - b.score);
+  return pathStops;
+}
+
+/**
+ * Deduplicates adjacent path stops into a sequential travel route.
+ */
+function buildTravelSequence(pathStops) {
+  const travelSequence = [];
+  pathStops.forEach(stop => {
+    if (travelSequence.length === 0) {
+      travelSequence.push(stop);
+    } else {
+      const lastStop = travelSequence[travelSequence.length - 1];
+      if (lastStop.name.toLowerCase() !== stop.name.toLowerCase()) {
+        travelSequence.push(stop);
+      } else {
+        if (!stop.isTransit && lastStop.isTransit) {
+          lastStop.isTransit = false;
+          lastStop.color = stop.color;
+        }
+      }
+    }
+  });
+  return travelSequence;
+}
+
+/**
+ * Builds mapped destinations and identifies unmatched cities based on travel sequence and city data.
+ */
+function buildMapDestinations(travelSequence) {
+  const unmatchedCities = [];
+  const destinations = [];
+  const stopDataMap = new Map();
+
+  travelSequence.forEach((stop, index) => {
+    const key = getMapCityKey(stop.name);
+    if (!key) return;
+
+    if (!stopDataMap.has(key)) {
+      stopDataMap.set(key, {
+        id: stop.id,
+        name: stop.name,
+        color: stop.color,
+        isTransit: stop.isTransit,
+        visitIndexes: [index + 1]
+      });
+    } else {
+      const existing = stopDataMap.get(key);
+      existing.visitIndexes.push(index + 1);
+      if (!stop.isTransit && existing.isTransit) {
+        existing.isTransit = false;
+        existing.color = stop.color;
+      }
+    }
+  });
+
+  const citiesInOrder = typeof getCitiesInTravelOrder === 'function' ? getCitiesInTravelOrder() : [];
+  const orderedCities = citiesInOrder.length > 0
+      ? citiesInOrder
+      : Array.from(stopDataMap.values()).map(stop => ({ id: stop.id, name: stop.name, colour: stop.color, isTransit: stop.isTransit }));
+
+  orderedCities.forEach(city => {
+    const key = getMapCityKey(city.name);
+    const stopInfo = stopDataMap.get(key);
+    if (!stopInfo) return;
+
+    const coords = getCityCoords(city.name);
+    if (!coords) {
+      if (!unmatchedCities.includes(city.name)) unmatchedCities.push(city.name);
+      return;
+    }
+
+    destinations.push({
+      id: city.id || stopInfo.id,
+      name: city.name,
+      lat: coords.lat,
+      lng: coords.lng,
+      color: city.colour || stopInfo.color,
+      isTransit: city.isTransit === true || stopInfo.isTransit,
+      index: destinations.length + 1,
+      visitIndexes: stopInfo.visitIndexes
+    });
+  });
+
+  return { destinations, unmatchedCities };
+}
+
+/**
+ * Draws transport-aware polyline segments on the Leaflet map between sequential stops.
+ */
+function drawMapPolylines(travelSequence) {
+  const polylinePoints = [];
+
+  for (let i = 0; i < travelSequence.length - 1; i++) {
+    const fromStop = travelSequence[i];
+    const toStop = travelSequence[i + 1];
+
+    const fromCoords = getCityCoords(fromStop.name);
+    const toCoords = getCityCoords(toStop.name);
+
+    if (fromCoords && toCoords) {
+      if (i === 0) polylinePoints.push([fromCoords.lat, fromCoords.lng]);
+      polylinePoints.push([toCoords.lat, toCoords.lng]);
+
+      // Find transport linking these two
+      let matchedJourney = null;
+      if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
+         matchedJourney = journeys.find(j => {
+           const jFrom = getMapCityKey(j.fromLocation || j.from);
+           const jTo = getMapCityKey(j.toLocation || j.to);
+           const sFrom = getMapCityKey(fromStop.name);
+           const sTo = getMapCityKey(toStop.name);
+           return jFrom === sFrom && jTo === sTo;
+         });
+      }
+
+      let lineColor = '#FF6B6B'; // default
+      let dashArray = '10, 10';
+      let weight = 3;
+
+      if (matchedJourney) {
+         const method = String(matchedJourney.transportType || '').toLowerCase();
+         if (method === 'flight') {
+            lineColor = '#3b82f6'; // blue
+            dashArray = '8, 8';
+         } else if (method === 'train') {
+            lineColor = '#22c55e'; // green
+            dashArray = null;
+         } else if (method === 'bus' || method === 'coach') {
+            lineColor = '#f97316'; // orange
+            dashArray = null;
+         } else if (method === 'car' || method === 'drive') {
+            lineColor = '#64748b'; // slate
+            dashArray = null;
+         } else {
+            lineColor = '#8b5cf6'; // purple fallback
+            dashArray = '5, 5';
+         }
+      }
+
+      const polyline = L.polyline([
+        [fromCoords.lat, fromCoords.lng],
+        [toCoords.lat, toCoords.lng]
+      ], {
+        color: lineColor,
+        weight: weight,
+        dashArray: dashArray,
+        opacity: 0.8
+      }).addTo(mainMap);
+
+      let popupHtml = '<div style="font-family: inherit; padding: 2px;">';
+      if (matchedJourney) {
+         const method = matchedJourney.transportType || 'Transport';
+         const mCap = method.charAt(0).toUpperCase() + method.slice(1);
+         popupHtml += '<strong>' + mCap + '</strong> from ' + fromStop.name + ' to ' + toStop.name;
+         if (matchedJourney.provider) popupHtml += '<br><span style="color:#666;">' + matchedJourney.provider + '</span>';
+         if (matchedJourney.departureTime || matchedJourney.arrivalTime) {
+           popupHtml += '<br><span style="color:#666; font-size:0.9em;">';
+           if (matchedJourney.departureTime) popupHtml += 'Dep: ' + matchedJourney.departureTime + ' ';
+           if (matchedJourney.arrivalTime) popupHtml += 'Arr: ' + matchedJourney.arrivalTime;
+           popupHtml += '</span>';
+         }
+      } else {
+         popupHtml += '<strong>' + fromStop.name + ' &rarr; ' + toStop.name + '</strong><br><span style="color:#666;">No linked transport</span>';
+      }
+      popupHtml += '</div>';
+
+      polyline.bindPopup(popupHtml);
+
+      polyline.on('mouseover', function(e) {
+        this.setStyle({ weight: 5, opacity: 1 });
+      });
+      polyline.on('mouseout', function(e) {
+        this.setStyle({ weight: weight, opacity: 0.8 });
+      });
+
+      mapPolylines.push(polyline);
+    }
+  }
+
+  return polylinePoints;
+}
+
+/**
+ * Renders destination markers on the Leaflet map.
+ */
+function drawMapMarkers(destinations) {
+  destinations.forEach(d => {
+    const isTransit = d.isTransit;
+    const firstIndex = d.index;
+
+    const icon = L.divIcon({
+      className: `numbered-map-marker ${isTransit ? 'is-transit-marker' : ''}`,
+      html: `<div class="marker-dot" style="background-color: ${isTransit ? '#95a5a6' : d.color}; border-style: ${isTransit ? 'dashed' : 'solid'};"><span>${firstIndex}</span></div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
+
+    const marker = L.marker([d.lat, d.lng], { icon: icon }).addTo(mainMap);
+
+    let popupText = `<b>${firstIndex}. ${d.name}</b>`;
+    if (isTransit) popupText += ' <span style="font-size:0.8rem; color:#666;">(Transit)</span>';
+    if (Array.isArray(d.visitIndexes) && d.visitIndexes.length > 1) {
+      popupText += `<br><span style="font-size:0.8rem; color:#666;">Route visits: ${d.visitIndexes.join(', ')}</span>`;
+    }
+    marker.bindPopup(popupText);
+
+    mapMarkers.push({ id: d.id, name: d.name, marker: marker });
+  });
+}
+
+/**
+ * Adjusts the map view or bounds based on active filter or polyline bounds.
+ */
+function adjustMapView(polylinePoints) {
+  if (!mainMap) return;
+
+  if (window.currentCityFilter && window.currentCityFilter !== 'all') {
+    focusCityOnMap(window.currentCityFilter);
+  } else if (polylinePoints.length > 1 && mapPolylines.length > 0) {
+    mainMap.fitBounds(L.polyline(polylinePoints).getBounds(), { padding: [50, 50], animate: false });
+  } else if (polylinePoints.length === 1) {
+    mainMap.setView(polylinePoints[0], 10, { animate: false });
+  } else {
+    mainMap.setView([20, 0], 2, { animate: false });
+  }
+}
+
 function buildJourneyMap() {
   const container = document.getElementById('journey-map-view');
   if (!container) return;
@@ -76,244 +355,17 @@ function buildJourneyMap() {
     mapMarkers = [];
     mapPolylines = [];
 
-    const pathStops = [];
-
-    const citiesInOrder = typeof getCitiesInTravelOrder === 'function' ? getCitiesInTravelOrder() : [];
-    if (typeof appData !== 'undefined' && Array.isArray(appData)) {
-      appData.forEach((leg, legIndex) => {
-        const legBaseScore = typeof getLegDateScore === 'function' ? getLegDateScore(leg, legIndex) : legIndex * 10000;
-        
-        const labelCity = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label ? leg.label.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').trim() : '');
-        const labelAlreadyInDayRoute = labelCity && (leg.days || []).some(day =>
-            (day.from && day.from.toLowerCase() === labelCity.toLowerCase()) ||
-            (day.to && day.to.toLowerCase() === labelCity.toLowerCase())
-        );
-
-        (leg.days || []).forEach((day, dayIndex) => {
-          const dayScore = typeof getTimelineScore === 'function' ? getTimelineScore(day.date, '', legBaseScore + dayIndex * 10) : legBaseScore + dayIndex * 10;
-          
-          if (day.from && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(day.from))) {
-            pathStops.push({ id: getMapCityId(day.from), name: day.from, score: dayScore, isTransit: false, color: leg.colour || '#3498DB' });
-          }
-
-          if (labelCity && !labelAlreadyInDayRoute && dayIndex === 0) {
-             pathStops.push({ id: getMapCityId(labelCity), name: labelCity, score: dayScore + 0.5, isTransit: true, color: leg.colour || '#95a5a6' });
-          }
-
-          if (day.to && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(day.to))) {
-            pathStops.push({ id: getMapCityId(day.to), name: day.to, score: dayScore + 1, isTransit: false, color: leg.colour || '#3498DB' });
-          }
-        });
-      });
-    }
-
-    if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
-      journeys.forEach((journey, journeyIndex) => {
-        const depScore = typeof getTimelineScore === 'function' ? getTimelineScore(journey.departureDate || journey.dayDate, journey.departureTime, Number.MAX_SAFE_INTEGER - 20000 + journeyIndex) : Number.MAX_SAFE_INTEGER - 20000 + journeyIndex;
-        const arrScore = typeof getTimelineScore === 'function' ? getTimelineScore(journey.arrivalDate || journey.dayDate || journey.departureDate, journey.arrivalTime, depScore + 1) : depScore + 1;
-        const fromCity = typeof getCityByName === 'function' ? getCityByName(journey.fromLocation) : null;
-        const toCity = typeof getCityByName === 'function' ? getCityByName(journey.toLocation) : null;
-
-        if (fromCity?.isTransit === true && journey.fromLocation && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(journey.fromLocation))) {
-          pathStops.push({ id: getMapCityId(journey.fromLocation), name: journey.fromLocation, score: depScore, isTransit: true, color: '#95a5a6' });
-        }
-        if (toCity?.isTransit === true && journey.toLocation && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(journey.toLocation))) {
-          pathStops.push({ id: getMapCityId(journey.toLocation), name: journey.toLocation, score: arrScore, isTransit: true, color: '#95a5a6' });
-        }
-      });
-    }
-
-    pathStops.sort((a, b) => a.score - b.score);
-
-    const travelSequence = [];
-    pathStops.forEach(stop => {
-      if (travelSequence.length === 0) {
-        travelSequence.push(stop);
-      } else {
-        const lastStop = travelSequence[travelSequence.length - 1];
-        if (lastStop.name.toLowerCase() !== stop.name.toLowerCase()) {
-          travelSequence.push(stop);
-        } else {
-          if (!stop.isTransit && lastStop.isTransit) {
-            lastStop.isTransit = false;
-            lastStop.color = stop.color;
-          }
-        }
-      }
-    });
-
-    const unmatchedCities = [];
-    const destinations = [];
-    const stopDataMap = new Map();
-
-    travelSequence.forEach((stop, index) => {
-      const key = getMapCityKey(stop.name);
-      if (!key) return;
-
-      if (!stopDataMap.has(key)) {
-        stopDataMap.set(key, {
-          id: stop.id,
-          name: stop.name,
-          color: stop.color,
-          isTransit: stop.isTransit,
-          visitIndexes: [index + 1]
-        });
-      } else {
-        const existing = stopDataMap.get(key);
-        existing.visitIndexes.push(index + 1);
-        if (!stop.isTransit && existing.isTransit) {
-          existing.isTransit = false;
-          existing.color = stop.color;
-        }
-      }
-    });
-
-    const orderedCities = citiesInOrder.length > 0
-        ? citiesInOrder
-        : Array.from(stopDataMap.values()).map(stop => ({ id: stop.id, name: stop.name, colour: stop.color, isTransit: stop.isTransit }));
-
-    orderedCities.forEach(city => {
-      const key = getMapCityKey(city.name);
-      const stopInfo = stopDataMap.get(key);
-      if (!stopInfo) return;
-
-      const coords = getCityCoords(city.name);
-      if (!coords) {
-        if (!unmatchedCities.includes(city.name)) unmatchedCities.push(city.name);
-        return;
-      }
-
-      destinations.push({
-        id: city.id || stopInfo.id,
-        name: city.name,
-        lat: coords.lat,
-        lng: coords.lng,
-        color: city.colour || stopInfo.color,
-        isTransit: city.isTransit === true || stopInfo.isTransit,
-        index: destinations.length + 1,
-        visitIndexes: stopInfo.visitIndexes
-      });
-    });
+    const pathStops = collectPathStops();
+    const travelSequence = buildTravelSequence(pathStops);
+    const { destinations, unmatchedCities } = buildMapDestinations(travelSequence);
 
     if (destinations.length === 0) {
       container.innerHTML = '<div style="padding:2rem; text-align:center;">No recognized cities found in your trip. Try adding major city names to trip legs.</div>';
       return;
     }
 
-    const polylinePoints = [];
-    
-    // Draw transport-aware segments instead of a single line
-    for (let i = 0; i < travelSequence.length - 1; i++) {
-      const fromStop = travelSequence[i];
-      const toStop = travelSequence[i + 1];
-      
-      const fromCoords = getCityCoords(fromStop.name);
-      const toCoords = getCityCoords(toStop.name);
-      
-      if (fromCoords && toCoords) {
-        if (i === 0) polylinePoints.push([fromCoords.lat, fromCoords.lng]);
-        polylinePoints.push([toCoords.lat, toCoords.lng]);
-        
-        // Find transport linking these two
-        let matchedJourney = null;
-        if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
-           matchedJourney = journeys.find(j => {
-             const jFrom = getMapCityKey(j.fromLocation || j.from);
-             const jTo = getMapCityKey(j.toLocation || j.to);
-             const sFrom = getMapCityKey(fromStop.name);
-             const sTo = getMapCityKey(toStop.name);
-             return jFrom === sFrom && jTo === sTo;
-           });
-        }
-        
-        let lineColor = '#FF6B6B'; // default
-        let dashArray = '10, 10';
-        let weight = 3;
-        
-        if (matchedJourney) {
-           const method = String(matchedJourney.transportType || '').toLowerCase();
-           if (method === 'flight') {
-              lineColor = '#3b82f6'; // blue
-              dashArray = '8, 8';
-           } else if (method === 'train') {
-              lineColor = '#22c55e'; // green
-              dashArray = null;
-           } else if (method === 'bus' || method === 'coach') {
-              lineColor = '#f97316'; // orange
-              dashArray = null;
-           } else if (method === 'car' || method === 'drive') {
-              lineColor = '#64748b'; // slate
-              dashArray = null;
-           } else {
-              lineColor = '#8b5cf6'; // purple fallback
-              dashArray = '5, 5';
-           }
-        }
-        
-        const polyline = L.polyline([
-          [fromCoords.lat, fromCoords.lng], 
-          [toCoords.lat, toCoords.lng]
-        ], { 
-          color: lineColor, 
-          weight: weight, 
-          dashArray: dashArray, 
-          opacity: 0.8 
-        }).addTo(mainMap);
-        
-        let popupHtml = '<div style="font-family: inherit; padding: 2px;">';
-        if (matchedJourney) {
-           const method = matchedJourney.transportType || 'Transport';
-           const mCap = method.charAt(0).toUpperCase() + method.slice(1);
-           popupHtml += '<strong>' + mCap + '</strong> from ' + fromStop.name + ' to ' + toStop.name;
-           if (matchedJourney.provider) popupHtml += '<br><span style="color:#666;">' + matchedJourney.provider + '</span>';
-           if (matchedJourney.departureTime || matchedJourney.arrivalTime) {
-             popupHtml += '<br><span style="color:#666; font-size:0.9em;">';
-             if (matchedJourney.departureTime) popupHtml += 'Dep: ' + matchedJourney.departureTime + ' ';
-             if (matchedJourney.arrivalTime) popupHtml += 'Arr: ' + matchedJourney.arrivalTime;
-             popupHtml += '</span>';
-           }
-        } else {
-           popupHtml += '<strong>' + fromStop.name + ' &rarr; ' + toStop.name + '</strong><br><span style="color:#666;">No linked transport</span>';
-        }
-        popupHtml += '</div>';
-        
-        polyline.bindPopup(popupHtml);
-        
-        polyline.on('mouseover', function(e) {
-          this.setStyle({ weight: 5, opacity: 1 });
-        });
-        polyline.on('mouseout', function(e) {
-          this.setStyle({ weight: weight, opacity: 0.8 });
-        });
-        
-        mapPolylines.push(polyline);
-      }
-    }
-
-    destinations.forEach(d => {
-      const isTransit = d.isTransit;
-      const firstIndex = d.index;
-      
-      const icon = L.divIcon({
-        className: `numbered-map-marker ${isTransit ? 'is-transit-marker' : ''}`,
-        html: `<div class="marker-dot" style="background-color: ${isTransit ? '#95a5a6' : d.color}; border-style: ${isTransit ? 'dashed' : 'solid'};"><span>${firstIndex}</span></div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
-      });
-
-      const marker = L.marker([d.lat, d.lng], { icon: icon }).addTo(mainMap);
-      
-      let popupText = `<b>${firstIndex}. ${d.name}</b>`;
-      if (isTransit) popupText += ' <span style="font-size:0.8rem; color:#666;">(Transit)</span>';
-      if (Array.isArray(d.visitIndexes) && d.visitIndexes.length > 1) {
-        popupText += `<br><span style="font-size:0.8rem; color:#666;">Route visits: ${d.visitIndexes.join(', ')}</span>`;
-      }
-      marker.bindPopup(popupText);
-      
-      mapMarkers.push({ id: d.id, name: d.name, marker: marker });
-    });
-
-
+    const polylinePoints = drawMapPolylines(travelSequence);
+    drawMapMarkers(destinations);
 
     updateMapLegend(destinations);
     updateMapStats(destinations, unmatchedCities);
@@ -322,16 +374,7 @@ function buildJourneyMap() {
       setTimeout(() => {
         if (!mainMap) return;
         mainMap.invalidateSize(false);
-        
-        if (window.currentCityFilter && window.currentCityFilter !== 'all') {
-          focusCityOnMap(window.currentCityFilter);
-        } else if (polylinePoints.length > 1 && mapPolylines.length > 0) {
-          mainMap.fitBounds(L.polyline(polylinePoints).getBounds(), { padding: [50, 50], animate: false });
-        } else if (polylinePoints.length === 1) {
-          mainMap.setView(polylinePoints[0], 10, { animate: false });
-        } else {
-          mainMap.setView([20, 0], 2, { animate: false });
-        }
+        adjustMapView(polylinePoints);
       }, 50);
     }
   }, 400);
@@ -383,7 +426,6 @@ function updateMapLegend(destinations) {
     `;
   }).join('');
 }
-
 
 function updateMapStats(destinations, unmatchedCities) {
   const stats = document.getElementById('journey-stats');
