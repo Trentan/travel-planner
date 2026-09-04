@@ -159,115 +159,158 @@ function renderStayMobileDetails(stay, cityName) {
   `;
 }
 
-function buildAccomTab(cityFilter = null) {
-  const container = document.getElementById('accom-table-container');
+function getFilteredAndSortedStays(cityFilter = null) {
   const staysData = (typeof stays !== 'undefined') ? stays : [];
-
-  // Filter stays by city if specified
   let filteredStays = staysData;
   if (cityFilter && cityFilter !== 'all') {
     filteredStays = staysData.filter(s => s.cityId === cityFilter);
   }
+  return filteredStays.slice().sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
+}
 
-  // Sort by check-in date
-  const sortedStays = filteredStays.slice().sort((a, b) => {
-    return new Date(a.checkIn) - new Date(b.checkIn);
-  });
-
-  if (sortedStays.length === 0) {
-    container.innerHTML = `
-      <div class="section-header accom-header">
-        <h3 class="section-header-title">&#x1F3E8; Accommodation</h3>
-        ${isEditMode ? '<button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>' : ''}
-      </div>
-      <div class="empty-placeholder">
-        <p>No stays found.</p>
-        <p class="section-header-note">Click "+ Add Stay" to add your first accommodation.</p>
-        <p class="empty-state-readonly-hint">🔒 <button class="empty-state-readonly-hint-link" onclick="toggleEditMode()">Unlock editing</button>&nbsp;to add stays.</p>
-      </div>
-    `;
-    return;
-  }
-
-  const autopopulateHTML = (typeof initAutopopulateButton === 'function') ? initAutopopulateButton() : '';
-
-  const headerHtml = `
+function renderAccomHeader() {
+  return `
     <div class="section-header accom-header">
       <h3 class="section-header-title">&#x1F3E8; Accommodation</h3>
       ${isEditMode ? '<button class="action-btn" onclick="openAddStayModal()">+ Add Stay</button>' : ''}
     </div>
   `;
+}
 
-  if (isAccomMobileCardLayout()) {
-    const slidesHtml = [];
-    const railHtml = [];
+function renderAccomEmptyState() {
+  return `
+    ${renderAccomHeader()}
+    <div class="empty-placeholder">
+      <p>No stays found.</p>
+      <p class="section-header-note">Click "+ Add Stay" to add your first accommodation.</p>
+      <p class="empty-state-readonly-hint">🔒 <button class="empty-state-readonly-hint-link" onclick="toggleEditMode()">Unlock editing</button>&nbsp;to add stays.</p>
+    </div>
+  `;
+}
 
-    sortedStays.forEach((stay, index) => {
-      const city = citiesData.find(c => c.id === stay.cityId);
-      const cityName = city ? city.name : 'Unknown';
-      const cityColor = city?.colour || '#2C3E50';
-      const status = normalizeItemStatus(stay.status);
-      const statusMetaInfo = getStatusMeta(status);
-      const statusColor = statusMetaInfo.color;
-      const statusIcon = '';
-      const statusText = statusMetaInfo.label;
-      const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
-      const checkIn = formatDateShort(stay.checkIn);
-      const checkOut = formatDateShort(stay.checkOut);
-      const primaryAction = renderStatusBadge(status, {
+function renderAccomMobileView(sortedStays) {
+  const slidesHtml = [];
+  const railHtml = [];
+
+  sortedStays.forEach((stay, index) => {
+    const city = (typeof citiesData !== 'undefined') ? citiesData.find(c => c.id === stay.cityId) : null;
+    const cityName = city ? city.name : 'Unknown';
+    const cityColor = city?.colour || '#2C3E50';
+    const status = normalizeItemStatus(stay.status);
+    const checkIn = formatDateShort(stay.checkIn);
+    const checkOut = formatDateShort(stay.checkOut);
+    const primaryAction = renderStatusBadge(status, {
+      onClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
+      title: 'Change stay status',
+      className: 'stay-status-badge stay-status-badge-clickable'
+    });
+    const actions = isEditMode ? `
+      <button class="mobile-surface-card-button stay-edit-btn" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit stay">Edit</button>
+      <button class="mobile-surface-card-button mobile-surface-card-button--danger stay-del-btn" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete stay">Delete</button>
+    ` : '';
+    const details = renderStayMobileDetails(stay, cityName);
+    const cardHtml = renderMobileSurfaceCard({
+      cardClass: 'stay-mobile-card row-accent',
+      accentColor: cityColor,
+      dateLabel: '',
+      title: stay.propertyName || '—',
+      subtitle: [`In ${checkIn}`, `Out ${checkOut}`, stay.provider || '', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' · '),
+      summary: '',
+      meta: '',
+      primaryAction,
+      actions,
+      details,
+      detailsOpen: true
+    });
+    slidesHtml.push(`
+      <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(stay.cityId || '')}">
+        ${cardHtml}
+      </div>
+    `);
+    railHtml.push(`
+      <button type="button" class="mobile-swipe-chip" data-role="mobile-swipe-chip" data-slide-index="${index}" aria-controls="stay-slide-${index}" aria-selected="${index === 0 ? 'true' : 'false'}">
+        <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(cityName)}</span>
+        <span class="mobile-swipe-chip-title">${escapeHtmlText(stay.propertyName || 'Stay')}</span>
+        <span class="mobile-swipe-chip-route">${escapeHtmlText([checkIn, checkOut].filter(Boolean).join(' · '))}</span>
+      </button>
+    `);
+  });
+
+  return renderMobileSwipePager({
+    pagerClass: 'stay-swipe-pager',
+    pagerKey: 'stay-swipe',
+    syncCityNav: true,
+    railHtml: railHtml.join(''),
+    slidesHtml: slidesHtml.join(''),
+    ariaLabel: 'Accommodation stays'
+  });
+}
+
+function renderAccomTableRow(stay) {
+  const city = (typeof citiesData !== 'undefined') ? citiesData.find(c => c.id === stay.cityId) : null;
+  const cityName = city ? city.name : 'Unknown';
+  const cityColor = city?.colour || '#2C3E50';
+
+  const status = normalizeItemStatus(stay.status);
+  const statusIcon = '';
+
+  const editActionsHtml = isEditMode ? `<td class="px-4 py-3 align-middle text-center whitespace-nowrap">
+    <div class="inline-flex gap-2">
+      <button class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit Stay">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
+      </button>
+      <button class="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete Stay">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+      </button>
+    </div>
+  </td>` : '';
+
+  return `<tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" style="border-left: 4px solid ${cityColor};">
+    <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">
+      <div class="flex items-center gap-1.5">${getCityFlagHTML(cityName)} <span class="ml-1">${cityName}</span></div>
+    </td>
+    <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium min-w-[200px]">
+      <span>${escapeHtml(stay.propertyName)}</span>
+      <div class="md:hidden mt-2 border-t border-slate-100 dark:border-slate-800 pt-2">
+        ${renderStayMobileSummary(stay, status, statusIcon, cityName)}
+      </div>
+    </td>
+    <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">
+      ${stay.location ? renderStayLocationDetails(stay, 'text-xs', false) : '—'}
+    </td>
+    <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${escapeHtmlText(stay.provider || '—')}</td>
+    <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
+      ${formatDateShort(stay.checkIn)}
+      <div class="md:hidden mt-1 text-slate-500">
+        ${renderStayDateSummary(stay, status, statusIcon)}
+      </div>
+    </td>
+    <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${formatDateShort(stay.checkOut)}</td>
+    <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm text-center">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
+    <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">${escapeHtmlText(stay.bookingRef || '—')}</td>
+
+    <!-- Notes -->
+    <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[250px] break-words" title="${escapeHtmlText(stay.notes || '')}">
+      ${escapeHtmlText(stay.notes || '—')}
+      ${stay.attachments && stay.attachments.length > 0 ? '<div class="mt-2 flex flex-wrap gap-1">' + renderAttachmentsPillsHtml(stay.attachments) + '</div>' : ''}
+    </td>
+
+    <td class="px-4 py-3 align-middle text-center">
+      ${renderStatusBadge(status, {
         onClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
-        title: 'Change stay status',
-        className: 'stay-status-badge stay-status-badge-clickable'
-      });
-      const meta = '';
-      const actions = isEditMode ? `
-        <button class="mobile-surface-card-button stay-edit-btn" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit stay">Edit</button>
-        <button class="mobile-surface-card-button mobile-surface-card-button--danger stay-del-btn" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete stay">Delete</button>
-      ` : '';
-      const details = renderStayMobileDetails(stay, cityName);
-      const summary = '';
-      const cardHtml = renderMobileSurfaceCard({
-        cardClass: 'stay-mobile-card row-accent',
-        accentColor: cityColor,
-        dateLabel: '',
-        title: stay.propertyName || '—',
-        subtitle: [`In ${checkIn}`, `Out ${checkOut}`, stay.provider || '', stay.bookingRef ? `#${stay.bookingRef}` : ''].filter(Boolean).join(' · '),
-        summary,
-        meta,
-        primaryAction,
-        actions,
-        details,
-        detailsOpen: true
-      });
-      slidesHtml.push(`
-        <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(stay.cityId || '')}">
-          ${cardHtml}
-        </div>
-      `);
-      railHtml.push(`
-        <button type="button" class="mobile-swipe-chip" data-role="mobile-swipe-chip" data-slide-index="${index}" aria-controls="stay-slide-${index}" aria-selected="${index === 0 ? 'true' : 'false'}">
-          <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(cityName)}</span>
-          <span class="mobile-swipe-chip-title">${escapeHtmlText(stay.propertyName || 'Stay')}</span>
-          <span class="mobile-swipe-chip-route">${escapeHtmlText([checkIn, checkOut].filter(Boolean).join(' · '))}</span>
-        </button>
-      `);
-    });
+        title: 'Change stay status'
+      })}
+    </td>
+    <td class="px-4 py-3 align-middle text-right font-medium text-slate-800 dark:text-slate-200">
+      $<span>${formatCurrency(stay.totalCost || '0', { includeSymbol: false })}</span>
+    </td>
+    ${editActionsHtml}
+  </tr>`;
+}
 
-    const mobileHtml = renderMobileSwipePager({
-      pagerClass: 'stay-swipe-pager',
-      pagerKey: 'stay-swipe',
-      syncCityNav: true,
-      railHtml: railHtml.join(''),
-      slidesHtml: slidesHtml.join(''),
-      ariaLabel: 'Accommodation stays'
-    });
-
-    container.innerHTML = headerHtml + autopopulateHTML + mobileHtml;
-    if (typeof setupMobileSwipePagers === 'function') setupMobileSwipePagers(container);
-    return;
-  }
-
-  let html = `<div class="travel-data-table-shell stay-data-table-shell w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4">
+function renderAccomDesktopTable(sortedStays) {
+  const rows = sortedStays.map(renderAccomTableRow).join('');
+  return `<div class="travel-data-table-shell stay-data-table-shell w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4">
     <table class="travel-data-table stay-data-table w-full text-left border-collapse">
       <thead>
         <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/60 dark:border-slate-700/60">
@@ -285,74 +328,34 @@ function buildAccomTab(cityFilter = null) {
           ${isEditMode ? '<th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Actions</th>' : ''}
         </tr>
       </thead>
-      <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">`;
+      <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">${rows}</tbody>
+    </table>
+  </div>`;
+}
 
-  sortedStays.forEach(stay => {
-    const city = citiesData.find(c => c.id === stay.cityId);
-    const cityName = city ? city.name : 'Unknown';
-    const cityColor = city?.colour || '#2C3E50';
+function buildAccomTab(cityFilter = null) {
+  const container = document.getElementById('accom-table-container');
+  if (!container) return;
 
-    const status = normalizeItemStatus(stay.status);
-    const statusMetaInfo = getStatusMeta(status);
-    const statusColor = statusMetaInfo.color;
-    const statusIcon = '';
+  const sortedStays = getFilteredAndSortedStays(cityFilter);
 
-    html += `<tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" style="border-left: 4px solid ${cityColor};">
-      <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">
-        <div class="flex items-center gap-1.5">${getCityFlagHTML(cityName)} <span class="ml-1">${cityName}</span></div>
-      </td>
-      <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium min-w-[200px]">
-        <span>${escapeHtml(stay.propertyName)}</span>
-        <div class="md:hidden mt-2 border-t border-slate-100 dark:border-slate-800 pt-2">
-          ${renderStayMobileSummary(stay, status, statusIcon, cityName)}
-        </div>
-      </td>
-      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">
-        ${stay.location ? renderStayLocationDetails(stay, 'text-xs', false) : '—'}
-      </td>
-      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${escapeHtmlText(stay.provider || '—')}</td>
-      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
-        ${formatDateShort(stay.checkIn)}
-        <div class="md:hidden mt-1 text-slate-500">
-          ${renderStayDateSummary(stay, status, statusIcon)}
-        </div>
-      </td>
-      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${formatDateShort(stay.checkOut)}</td>
-      <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm text-center">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
-      <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">${escapeHtmlText(stay.bookingRef || '—')}</td>
-      
-      <!-- Notes -->
-      <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[250px] break-words" title="${escapeHtmlText(stay.notes || '')}">
-        ${escapeHtmlText(stay.notes || '—')}
-        ${stay.attachments && stay.attachments.length > 0 ? '<div class="mt-2 flex flex-wrap gap-1">' + renderAttachmentsPillsHtml(stay.attachments) + '</div>' : ''}
-      </td>
+  if (sortedStays.length === 0) {
+    container.innerHTML = renderAccomEmptyState();
+    return;
+  }
 
-      <td class="px-4 py-3 align-middle text-center">
-        ${renderStatusBadge(status, {
-          onClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
-          title: 'Change stay status'
-        })}
-      </td>
-      <td class="px-4 py-3 align-middle text-right font-medium text-slate-800 dark:text-slate-200">
-        $<span>${formatCurrency(stay.totalCost || '0', { includeSymbol: false })}</span>
-      </td>
-      ${isEditMode ? `<td class="px-4 py-3 align-middle text-center whitespace-nowrap">
-        <div class="inline-flex gap-2">
-          <button class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit Stay">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
-          </button>
-          <button class="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete Stay">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
-          </button>
-        </div>
-      </td>` : ''}
-    </tr>`;
-  });
+  const autopopulateHTML = (typeof initAutopopulateButton === 'function') ? initAutopopulateButton() : '';
+  const headerHtml = renderAccomHeader();
 
-  html += `</tbody></table></div>`;
+  if (isAccomMobileCardLayout()) {
+    const mobileHtml = renderAccomMobileView(sortedStays);
+    container.innerHTML = headerHtml + autopopulateHTML + mobileHtml;
+    if (typeof setupMobileSwipePagers === 'function') setupMobileSwipePagers(container);
+    return;
+  }
 
-  // Add autopopulate button if there are missing stays
-  container.innerHTML = headerHtml + autopopulateHTML + html;
+  const tableHtml = renderAccomDesktopTable(sortedStays);
+  container.innerHTML = headerHtml + autopopulateHTML + tableHtml;
 }
 
 // Helper to calculate nights between dates
