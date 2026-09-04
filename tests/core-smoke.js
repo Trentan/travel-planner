@@ -117,6 +117,13 @@ return {
   bookingContext.window = bookingContext;
   runScriptInContext(bookingIntakeJs, bookingContext, 'js/booking-intake.js');
 
+  const utilsContext = createVmContext({
+    window: {},
+    document: { getElementById: () => null, querySelectorAll: () => [] }
+  });
+  utilsContext.window = utilsContext;
+  runScriptInContext(utilsJs, utilsContext, 'js/utils.js');
+
   return {
     dateHelpers,
     checklistHelpers,
@@ -124,7 +131,8 @@ return {
     itineraryPositionHelpers,
     transportHelpers,
     aiHarness,
-    bookingContext
+    bookingContext,
+    utilsContext
   };
 }
 
@@ -136,9 +144,55 @@ async function run() {
     itineraryPositionHelpers,
     transportHelpers,
     aiHarness,
-    bookingContext
+    bookingContext,
+    utilsContext
   } = loadDateHelpers();
   const { context, document, alerts, clipboardWrites, execCommands } = aiHarness;
+
+  const parseCurrencyAmount = utilsContext.parseCurrencyAmount;
+
+  // parseCurrencyAmount edge cases
+  assert(parseCurrencyAmount(100) === 100, 'parseCurrencyAmount should handle positive integers');
+  assert(parseCurrencyAmount(123.45) === 123.45, 'parseCurrencyAmount should handle floats');
+  assert(parseCurrencyAmount(0) === 0, 'parseCurrencyAmount should handle zero');
+  assert(parseCurrencyAmount(-50.25) === -50.25, 'parseCurrencyAmount should handle negative numbers');
+
+  assert(parseCurrencyAmount('100') === 100, 'parseCurrencyAmount should parse numeric integer strings');
+  assert(parseCurrencyAmount('123.45') === 123.45, 'parseCurrencyAmount should parse numeric float strings');
+  assert(parseCurrencyAmount('-50.25') === -50.25, 'parseCurrencyAmount should parse negative numeric strings');
+  assert(parseCurrencyAmount('0.00') === 0, 'parseCurrencyAmount should parse zero formatted string');
+
+  assert(parseCurrencyAmount('$100') === 100, 'parseCurrencyAmount should strip $ currency symbol');
+  assert(parseCurrencyAmount('$1,234.56') === 1234.56, 'parseCurrencyAmount should handle commas and dollar signs');
+  assert(parseCurrencyAmount('€99.99') === 99.99, 'parseCurrencyAmount should strip Euro symbol');
+  assert(parseCurrencyAmount('£1,000,000.50') === 1000000.5, 'parseCurrencyAmount should handle multiple commas and Pound symbol');
+  assert(parseCurrencyAmount('  $ 250.75  ') === 250.75, 'parseCurrencyAmount should handle leading/trailing whitespace and spaces around currency symbol');
+  assert(parseCurrencyAmount('100 USD') === 100, 'parseCurrencyAmount should handle trailing currency code');
+  assert(parseCurrencyAmount('USD 100.50') === 100.5, 'parseCurrencyAmount should handle leading currency code');
+  assert(parseCurrencyAmount('.50') === 0.5, 'parseCurrencyAmount should parse leading decimal point');
+  assert(parseCurrencyAmount('-.75') === -0.75, 'parseCurrencyAmount should parse negative decimal point without leading zero');
+
+  assert(parseCurrencyAmount(null) === 0, 'parseCurrencyAmount should return 0 for null');
+  assert(parseCurrencyAmount(undefined) === 0, 'parseCurrencyAmount should return 0 for undefined');
+  assert(parseCurrencyAmount('') === 0, 'parseCurrencyAmount should return 0 for empty string');
+  assert(parseCurrencyAmount('   ') === 0, 'parseCurrencyAmount should return 0 for whitespace-only string');
+
+  assert(parseCurrencyAmount('abc') === 0, 'parseCurrencyAmount should return 0 for non-numeric text');
+  assert(parseCurrencyAmount('free') === 0, 'parseCurrencyAmount should return 0 for word "free"');
+  assert(parseCurrencyAmount('N/A') === 0, 'parseCurrencyAmount should return 0 for "N/A"');
+  assert(parseCurrencyAmount('$$$') === 0, 'parseCurrencyAmount should return 0 for currency symbol only string');
+
+  assert(parseCurrencyAmount(NaN) === 0, 'parseCurrencyAmount should return 0 for NaN');
+  assert(parseCurrencyAmount(Infinity) === 0, 'parseCurrencyAmount should return 0 for Infinity');
+  assert(parseCurrencyAmount(-Infinity) === 0, 'parseCurrencyAmount should return 0 for -Infinity');
+  assert(parseCurrencyAmount(true) === 0, 'parseCurrencyAmount should return 0 for boolean true');
+  assert(parseCurrencyAmount(false) === 0, 'parseCurrencyAmount should return 0 for boolean false');
+  assert(parseCurrencyAmount({}) === 0, 'parseCurrencyAmount should return 0 for object');
+  assert(parseCurrencyAmount([]) === 0, 'parseCurrencyAmount should return 0 for empty array');
+  assert(parseCurrencyAmount([100]) === 100, 'parseCurrencyAmount should parse single-element array containing a number');
+
+  assert(parseCurrencyAmount('--50') === 0, 'parseCurrencyAmount should return 0 for double negative sign');
+  assert(parseCurrencyAmount('12.34.56') === 12.34, 'parseCurrencyAmount should parse up to the second decimal point');
 
   assert(dateHelpers.normalizeTripDateValue('7 Jun') === '2026-06-07', 'Date normalization should convert short dates to ISO');
   assert(dateHelpers.normalizeTripDateValue('2026-05-14') === '2026-05-14', 'Date normalization should preserve ISO dates');
