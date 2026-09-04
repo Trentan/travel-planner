@@ -1,0 +1,193 @@
+name: Android Release (AAB & APK)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      version_code:
+        description: 'Manual Version Code Override (optional, auto-computed if blank)'
+        required: false
+        type: string
+      prerelease:
+        description: 'Mark as Pre-release'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Release Android Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build web assets and sync Capacitor
+        run: |
+          npm run build:css
+          npm run prepare:capacitor-web
+          npx cap sync android
+
+      - name: Resolve Release Versions
+        id: version
+        run: |
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          if [ -n "${{ inputs.version_code }}" ]; then
+            VERSION_CODE="${{ inputs.version_code }}"
+          else
+            if [ "$COMMIT_COUNT" -gt 36 ]; then
+              VERSION_CODE="$COMMIT_COUNT"
+            else
+              VERSION_CODE=37
+            fi
+          fi
+
+          VERSION_NAME=$(node -p "require('./package.json').version || '1.1.0'")
+          RELEASE_TAG="v${VERSION_NAME}-build.${VERSION_CODE}"
+
+          echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "release_tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
+
+          echo "Resolved Version Name: $VERSION_NAME"
+          echo "Resolved Version Code: $VERSION_CODE"
+          echo "Resolved Release Tag : $RELEASE_TAG"
+
+      - name: Configure Keystore Environment
+        run: |
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "HAS_KEYSTORE=true" >> $GITHUB_ENV
+            echo "RELEASE_STORE_FILE=travelplanner-upload-key.keystore" >> $GITHUB_ENV
+            echo "RELEASE_STORE_PASSWORD=${{ secrets.RELEASE_STORE_PASSWORD }}" >> $GITHUB_ENV
+            echo "RELEASE_KEY_ALIAS=${{ secrets.RELEASE_KEY_ALIAS }}" >> $GITHUB_ENV
+            echo "RELEASE_KEY_PASSWORD=${{ secrets.RELEASE_KEY_PASSWORD }}" >> $GITHUB_ENV
+          else
+            echo "HAS_KEYSTORE=false" >> $GITHUB_ENV
+          fi
+
+      - name: Decode Release Keystore
+        if: env.HAS_KEYSTORE == 'true'
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_B64" | base64 --decode > android/app/travelplanner-upload-key.keystore
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x android/gradlew
+
+      - name: Build Android Bundle (AAB) and APKs
+        run: |
+          cd android
+          ./gradlew bundleRelease assembleDebug assembleRelease \
+            -PversionCode=${{ env.VERSION_CODE }} \
+            -PversionName=${{ env.VERSION_NAME }} \
+            --no-daemon
+
+      - name: Stage Release Artifacts
+        run: |
+          mkdir -p release-artifacts
+
+          # 1. Google Play Store AAB
+          AAB_PATH="android/app/build/outputs/bundle/release/app-release.aab"
+          if [ -f "$AAB_PATH" ]; then
+            cp "$AAB_PATH" "release-artifacts/travel-planner-${{ env.VERSION_NAME }}-b${{ env.VERSION_CODE }}.aab"
+            cp "$AAB_PATH" "release-artifacts/app-release.aab"
+          fi
+
+          # 2. Local Testing Debug APK
+          DEBUG_APK_PATH="android/app/build/outputs/apk/debug/app-debug.apk"
+          if [ -f "$DEBUG_APK_PATH" ]; then
+            cp "$DEBUG_APK_PATH" "release-artifacts/travel-planner-${{ env.VERSION_NAME }}-b${{ env.VERSION_CODE }}-debug.apk"
+            cp "$DEBUG_APK_PATH" "release-artifacts/app-debug.apk"
+          fi
+
+          # 3. Production Release APK (if signed/generated)
+          RELEASE_APK_PATH="android/app/build/outputs/apk/release/app-release.apk"
+          if [ -f "$RELEASE_APK_PATH" ]; then
+            cp "$RELEASE_APK_PATH" "release-artifacts/travel-planner-${{ env.VERSION_NAME }}-b${{ env.VERSION_CODE }}-release.apk"
+          fi
+
+          # 4. Checksums
+          cd release-artifacts
+          sha256sum * > SHA256SUMS.txt
+          cd ..
+          ls -la release-artifacts
+
+      - name: Upload Workflow Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-${{ env.VERSION_NAME }}-b${{ env.VERSION_CODE }}
+          path: release-artifacts/
+          retention-days: 90
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IS_PRERELEASE: ${{ inputs.prerelease || false }}
+        run: |
+          PRERELEASE_FLAG=""
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+
+          RELEASE_NOTES=$(cat << 'EOF'
+          ## 🚀 Travel Planner Release
+
+          ### 📦 Downloadable Assets
+          - **Google Play Store App Bundle (`.aab`)**: `travel-planner-${{ env.VERSION_NAME }}-b${{ env.VERSION_CODE }}.aab`
+            - Upload directly to Google Play Console (Production, Internal Testing, Closed Testing).
+          - **Local Test Package (`.apk`)**: `travel-planner-${{ env.VERSION_NAME }}-b${{ env.VERSION_CODE }}-debug.apk`
+            - Install directly on Android test devices via `adb install` or browser download.
+          - **Release Package (`.apk`)**: `travel-planner-${{ env.VERSION_NAME }}-b${{ env.VERSION_CODE }}-release.apk`
+            - Signed release APK matching production optimizations.
+
+          ### 🔖 Build Metadata
+          - **Version Name:** `${{ env.VERSION_NAME }}`
+          - **Version Code:** `${{ env.VERSION_CODE }}`
+          - **Commit SHA:** `${{ github.sha }}`
+          - **Trigger:** `${{ github.event_name }}`
+          EOF
+          )
+
+          if gh release view "${{ env.RELEASE_TAG }}" > /dev/null 2>&1; then
+            echo "Release ${{ env.RELEASE_TAG }} already exists; updating assets..."
+            gh release upload "${{ env.RELEASE_TAG }}" release-artifacts/* --clobber
+          else
+            echo "Creating new release ${{ env.RELEASE_TAG }}..."
+            gh release create "${{ env.RELEASE_TAG }}" \
+              release-artifacts/* \
+              --title "Travel Planner v${{ env.VERSION_NAME }} (Build ${{ env.VERSION_CODE }})" \
+              --notes "$RELEASE_NOTES" \
+              --generate-notes \
+              $PRERELEASE_FLAG
+          fi

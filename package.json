@@ -21,6 +21,8 @@
     "build:apk:debug": "npm run build:mobile && node -e \"const { execSync } = require('child_process'); execSync(process.platform === 'win32' ? '.\\\\gradlew.bat assembleDebug' : './gradlew assembleDebug', { cwd: 'android', stdio: 'inherit' });\"",
     "build:apk:release": "npm run build:mobile && node -e \"const { execSync } = require('child_process'); execSync(process.platform === 'win32' ? '.\\\\gradlew.bat assembleRelease' : './gradlew assembleRelease', { cwd: 'android', stdio: 'inherit' });\"",
     "build:aab": "npm run build:mobile && node -e \"const { execSync } = require('child_process'); execSync(process.platform === 'win32' ? '.\\\\gradlew.bat bundleRelease' : './gradlew bundleRelease', { cwd: 'android', stdio: 'inherit' });\"",
+    "version:info": "node scripts/version-info.js",
+    "build:all": "npm run build:mobile && npm run build:aab && npm run build:apk:debug",
     "emulator": "powershell -NoProfile -Command \"Start-Process \\\"$env:LOCALAPPDATA\\Android\\Sdk\\emulator\\emulator.exe\\\" -ArgumentList '-avd', 'medium_phone'\"",
     "android:run": "npm run build:apk:debug && node -e \"const { execSync } = require('child_process'); const adb = process.env.LOCALAPPDATA + '\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe'; execSync(`\\\"${adb}\\\" install -r android/app/build/outputs/apk/debug/app-debug.apk`, { stdio: 'inherit' }); execSync(`\\\"${adb}\\\" shell am start -S -n com.trenscends.travelplanner/.MainActivity`, { stdio: 'inherit' });\""
   },
