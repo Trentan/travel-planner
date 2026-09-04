@@ -63,6 +63,7 @@ async function deleteActivity(legIdx, activityIdx) {
   }
 
   leg.suggestedActivities.splice(activityIdx, 1);
+  invalidateSuggestedActivityIndex(legIdx);
   await saveData();
   if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
   else buildItinerary();
@@ -89,15 +90,132 @@ function getSuggestedActivityMatchTexts(activity) {
   ].filter(Boolean))];
 }
 
+function getSuggestedActivityIndex(activities) {
+  if (!Array.isArray(activities) || activities.length === 0) return null;
+  if (activities._index) return activities._index;
+
+  const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
+  const separators = [' — ', ' – ', ' - ', ' | ', ' @ '];
+
+  const byId = new Map();
+  const byDayAndKey = new Map();
+
+  for (let i = 0; i < activities.length; i++) {
+    const activity = activities[i];
+    if (!activity) continue;
+
+    if (activity.id) {
+      byId.set(activity.id, activity);
+    }
+
+    const dayIdx = activity.assignedDayIdx;
+    if (dayIdx === null || dayIdx === undefined) continue;
+
+    const rawTitle = String(activity.title || '').trim().toLowerCase();
+    if (!rawTitle) continue;
+
+    const cleanTitleNoEmoji = rawTitle.replace(emojiPattern, '').trim();
+
+    let baseTitle = rawTitle;
+    for (const separator of separators) {
+      const idx = rawTitle.indexOf(separator);
+      if (idx !== -1) {
+        baseTitle = rawTitle.slice(0, idx).trim();
+        break;
+      }
+    }
+    const baseTitleNoEmoji = baseTitle.replace(emojiPattern, '').trim();
+
+    const keys = new Set();
+    if (rawTitle) keys.add(rawTitle);
+    if (cleanTitleNoEmoji) keys.add(cleanTitleNoEmoji);
+    if (baseTitle) keys.add(baseTitle);
+    if (baseTitleNoEmoji) keys.add(baseTitleNoEmoji);
+
+    if (typeof getSuggestedActivityMatchTexts === 'function') {
+      const matchTexts = getSuggestedActivityMatchTexts(activity);
+      for (let m = 0; m < matchTexts.length; m++) {
+        const mt = String(matchTexts[m] || '').trim().toLowerCase();
+        if (mt) {
+          keys.add(mt);
+          const mtNoEmoji = mt.replace(emojiPattern, '').trim();
+          if (mtNoEmoji) keys.add(mtNoEmoji);
+        }
+      }
+    }
+
+    for (const key of keys) {
+      const mapKey = `${dayIdx}:${key}`;
+      if (!byDayAndKey.has(mapKey)) {
+        byDayAndKey.set(mapKey, activity);
+      }
+    }
+  }
+
+  const index = { byId, byDayAndKey };
+  Object.defineProperty(activities, '_index', {
+    value: index,
+    writable: true,
+    configurable: true,
+    enumerable: false
+  });
+  return index;
+}
+
+function invalidateSuggestedActivityIndex(target) {
+  if (!target && typeof appData !== 'undefined' && Array.isArray(appData)) {
+    appData.forEach(leg => {
+      if (Array.isArray(leg?.suggestedActivities) && leg.suggestedActivities._index) {
+        delete leg.suggestedActivities._index;
+      }
+    });
+    return;
+  }
+  if (typeof target === 'number' && typeof appData !== 'undefined') {
+    target = appData[target]?.suggestedActivities;
+  } else if (target && target.suggestedActivities) {
+    target = target.suggestedActivities;
+  }
+  if (Array.isArray(target) && target._index) {
+    delete target._index;
+  }
+}
+
 function findAssignedSuggestedActivity(legIdx, dayIdx, itemText, activityId = null) {
   const activities = appData[legIdx]?.suggestedActivities || [];
+  if (activities.length === 0) return null;
+
+  const index = getSuggestedActivityIndex(activities);
+
   if (activityId) {
-    const found = activities.find(activity => activity && activity.id === activityId);
-    if (found) return found;
+    if (index && index.byId) {
+      const found = index.byId.get(activityId);
+      if (found) return found;
+    } else {
+      const found = activities.find(activity => activity && activity.id === activityId);
+      if (found) return found;
+    }
   }
 
   const cleanItem = String(itemText || '').trim().toLowerCase();
   if (!cleanItem) return null;
+
+  if (index && index.byDayAndKey) {
+    const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
+    const cleanItemNoEmoji = cleanItem.replace(emojiPattern, '').trim();
+
+    const key1 = `${dayIdx}:${cleanItem}`;
+    let matched = index.byDayAndKey.get(key1);
+    if (matched) return matched;
+
+    if (cleanItemNoEmoji && cleanItemNoEmoji !== cleanItem) {
+      const key2 = `${dayIdx}:${cleanItemNoEmoji}`;
+      matched = index.byDayAndKey.get(key2);
+      if (matched) return matched;
+    }
+
+    return null;
+  }
 
   const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
   const cleanItemNoEmoji = cleanItem.replace(emojiPattern, '').trim();
@@ -187,7 +305,10 @@ function deleteDayItem(legIdx, dayIdx, category, itemIdx) {
   const itemText = appData[legIdx].days[dayIdx][category][itemIdx].text;
   if (category === 'activityItems') {
     const poolActivity = findAssignedSuggestedActivity(legIdx, dayIdx, itemText);
-    if (poolActivity) poolActivity.assignedDayIdx = null;
+    if (poolActivity) {
+      poolActivity.assignedDayIdx = null;
+      invalidateSuggestedActivityIndex(legIdx);
+    }
     const poolSight = (appData[legIdx].suggestedSights || []).find(s => s.title === itemText && s.assignedDayIdx === dayIdx);
     if (poolSight) poolSight.assignedDayIdx = null;
     const poolRun = (appData[legIdx].cityRun || []).find(s => s.title === itemText && s.assignedDayIdx === dayIdx);
@@ -1714,6 +1835,8 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
   activity.assignedDayIdx = targetDayIdx;
   activity.assignedDate = datedSchedule.startDate;
   applyActivityScheduleFields(activity, targetDay, datedSchedule);
+  invalidateSuggestedActivityIndex(sourceLegIdx);
+  if (sourceLegIdx !== targetLegIdx) invalidateSuggestedActivityIndex(targetLegIdx);
   return true;
 }
 
@@ -1772,6 +1895,7 @@ function clearAssignedSuggestedActivityFromDay(sourceLegIdx, activityIdx, origin
   activity.startTime = '';
   activity.endDate = '';
   activity.endTime = '';
+  invalidateSuggestedActivityIndex(sourceLegIdx);
   return true;
 }
 
