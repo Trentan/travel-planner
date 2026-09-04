@@ -1403,15 +1403,17 @@ function getCityIdByName(cityName) {
 }
 
 // Get a random city color from the palette (avoids using the same color as recently used)
-function getRandomCityColor() {
+function getRandomCityColor(usedColorsSet = null) {
   // Check which colors are already in use
-  const usedColors = new Set(citiesData.map(c => c.colour));
+  const usedColors = usedColorsSet || new Set(citiesData.map(c => c.colour));
   const availableColors = CITY_COLORS.filter(c => !usedColors.has(c));
 
   // Use available colors first, fall back to any color if all are used
   const palette = availableColors.length > 0 ? availableColors : CITY_COLORS;
   const randomIndex = Math.floor(Math.random() * palette.length);
-  return palette[randomIndex];
+  const color = palette[randomIndex];
+  if (usedColorsSet) usedColorsSet.add(color);
+  return color;
 }
 
 // Add or update a city with ISO/ICAO standards
@@ -2891,19 +2893,41 @@ function migrateCitiesToISOFormat() {
 
   console.log(`[Migration] Converting ${citiesNeedingMigration.length} cities to ISO format...`);
 
+  const usedColorsSet = new Set(citiesData.map(c => c.colour).filter(Boolean));
+
+  // Build lookup maps to replace linear searches
+  const allCitiesMap = new Map();
+  ALL_CITIES.forEach(c => {
+    if (c.name) {
+      const key = c.name.toLowerCase();
+      if (!allCitiesMap.has(key)) allCitiesMap.set(key, c);
+    }
+  });
+
+  const countryByCodeMap = new Map();
+  const countryByNameMap = new Map();
+  COUNTRY_DATA.forEach(c => {
+    if (c.code) {
+      const codeKey = c.code.toUpperCase();
+      if (!countryByCodeMap.has(codeKey)) countryByCodeMap.set(codeKey, c);
+    }
+    if (c.name) {
+      const nameKey = c.name.toLowerCase();
+      if (!countryByNameMap.has(nameKey)) countryByNameMap.set(nameKey, c);
+    }
+  });
+
   citiesNeedingMigration.forEach(city => {
     const normalizedName = city.name?.trim();
     if (!normalizedName) return;
 
     // Look up city in ALL city databases (built-in + extended)
-    const dbMatch = ALL_CITIES.find(c =>
-      c.name.toLowerCase() === normalizedName.toLowerCase()
-    );
+    const dbMatch = allCitiesMap.get(normalizedName.toLowerCase());
 
     if (dbMatch) {
       city.code = dbMatch.code;
       city.countryCode = dbMatch.countryCode;
-      const countryMatch = COUNTRY_DATA.find(c => c.code === dbMatch.countryCode);
+      const countryMatch = dbMatch.countryCode ? countryByCodeMap.get(dbMatch.countryCode.toUpperCase()) : null;
       if (countryMatch) {
         city.country = countryMatch.name;
       }
@@ -2913,9 +2937,7 @@ function migrateCitiesToISOFormat() {
       const inferredCode = CITY_TO_CODE[cityNameLower];
 
       if (inferredCode) {
-        const countryMatch = COUNTRY_DATA.find(c =>
-          c.code.toLowerCase() === inferredCode.toLowerCase()
-        );
+        const countryMatch = countryByCodeMap.get(inferredCode.toUpperCase());
         if (countryMatch) {
           city.countryCode = countryMatch.code;
           city.country = countryMatch.name;
@@ -2934,9 +2956,7 @@ function migrateCitiesToISOFormat() {
 
       // If we have a country string but no code, try to match it
       if (!city.countryCode && city.country) {
-        const countryMatch = COUNTRY_DATA.find(c =>
-          c.name.toLowerCase() === city.country.toLowerCase()
-        );
+        const countryMatch = countryByNameMap.get(city.country.toLowerCase());
         if (countryMatch) {
           city.countryCode = countryMatch.code;
         }
@@ -2945,22 +2965,31 @@ function migrateCitiesToISOFormat() {
 
     // Assign a color if missing
     if (!city.colour) {
-      city.colour = getRandomCityColor();
+      city.colour = getRandomCityColor(usedColorsSet);
     }
 
     console.log(`[Migration] City "${city.name}" → code: ${city.code || 'none'}, country: ${city.country || 'none'} (${city.countryCode || 'none'})`);
   });
 
   // Update any cities that have custom codes in userCities
-  userCities.forEach(userCity => {
-    const existingCity = citiesData.find(c =>
-      c.name.toLowerCase() === userCity.name.toLowerCase()
-    );
-    if (existingCity) {
-      existingCity.code = userCity.code;
-      existingCity.countryCode = userCity.countryCode;
-    }
-  });
+  if (userCities.length > 0) {
+    const citiesDataMap = new Map();
+    citiesData.forEach(c => {
+      if (c.name) {
+        const key = c.name.toLowerCase();
+        if (!citiesDataMap.has(key)) citiesDataMap.set(key, c);
+      }
+    });
+
+    userCities.forEach(userCity => {
+      if (!userCity.name) return;
+      const existingCity = citiesDataMap.get(userCity.name.toLowerCase());
+      if (existingCity) {
+        existingCity.code = userCity.code;
+        existingCity.countryCode = userCity.countryCode;
+      }
+    });
+  }
 
   console.log('[Migration] City ISO format migration complete');
 }
