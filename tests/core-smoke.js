@@ -248,6 +248,45 @@ async function run() {
   assert(bookingItems.some(item => item.kind === 'journey' && item.bookingReference === 'ABC123'), 'Booking intake should extract transport with booking ref');
   assert(bookingItems.some(item => item.kind === 'stay' && item.propertyName.includes('Vienna')), 'Booking intake should extract stay details');
 
+  // Tests for parseBookingDate
+  const parseBookingDate = bookingContext.parseBookingDate;
+  assert(typeof parseBookingDate === 'function', 'parseBookingDate should be exported on context');
+
+  // Falsy & empty values
+  assert(parseBookingDate('') === '', 'parseBookingDate should return empty string for empty input');
+  assert(parseBookingDate(null) === '', 'parseBookingDate should return empty string for null input');
+  assert(parseBookingDate(undefined) === '', 'parseBookingDate should return empty string for undefined input');
+  assert(parseBookingDate('   ') === '', 'parseBookingDate should return empty string for whitespace input');
+
+  // ISO format YYYY-MM-DD
+  assert(parseBookingDate('2026-07-15') === '2026-07-15', 'parseBookingDate should pass through ISO YYYY-MM-DD strings');
+
+  // Day Month Year format ("7 June 2026", "15 Jul 2026", "01 January 2026")
+  assert(parseBookingDate('7 June 2026') === '2026-06-07', 'parseBookingDate should parse "7 June 2026"');
+  assert(parseBookingDate('15 Jul 2026') === '2026-07-15', 'parseBookingDate should parse "15 Jul 2026"');
+  assert(parseBookingDate('01 January 2026') === '2026-01-01', 'parseBookingDate should parse "01 January 2026"');
+  assert(parseBookingDate('12 Sept 2026') === '2026-09-12', 'parseBookingDate should parse "12 Sept 2026"');
+
+  // Day Month without Year (default to 2026)
+  assert(parseBookingDate('7 June') === '2026-06-07', 'parseBookingDate should parse "7 June" defaulting to year 2026');
+  assert(parseBookingDate('25 Dec') === '2026-12-25', 'parseBookingDate should parse "25 Dec" defaulting to year 2026');
+
+  // Month Day Year format ("June 7 2026", "Jul 15 2026", "January 01, 2026")
+  assert(parseBookingDate('June 7 2026') === '2026-06-07', 'parseBookingDate should parse "June 7 2026"');
+  assert(parseBookingDate('Jul 15, 2026') === '2026-07-15', 'parseBookingDate should handle commas e.g. "Jul 15, 2026"');
+  assert(parseBookingDate('October 31 2026') === '2026-10-31', 'parseBookingDate should parse "October 31 2026"');
+
+  // Month Day without Year (default to 2026)
+  assert(parseBookingDate('June 7') === '2026-06-07', 'parseBookingDate should parse "June 7" defaulting to year 2026');
+  assert(parseBookingDate('Feb 14') === '2026-02-14', 'parseBookingDate should parse "Feb 14" defaulting to year 2026');
+
+  // Case insensitivity
+  assert(parseBookingDate('7 JUNE 2026') === '2026-06-07', 'parseBookingDate should handle uppercase month names');
+  assert(parseBookingDate('january 15 2026') === '2026-01-15', 'parseBookingDate should handle lowercase month names');
+
+  // Fallback JS Date parsing or invalid inputs
+  assert(parseBookingDate('invalid date string xyz') === '', 'parseBookingDate should return empty string for completely unparseable input');
+
   console.log('Core smoke checks passed');
 }
 
