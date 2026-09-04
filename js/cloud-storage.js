@@ -57,6 +57,7 @@
     return userProfile;
   }
   window.getUserProfile = getUserProfile;
+  window.setUserProfile = setUserProfile;
 
   window.openCloudSyncModal = function() {
     const modal = document.getElementById('cloudSyncModal');
@@ -1244,6 +1245,7 @@
     } catch(e) {}
   };
 
+  window.updateCloudSyncModalState = updateCloudSyncModalState;
   function updateCloudSyncModalState(cloudFiles = null) {
     const isConnected = isGoogleDriveConnected();
     const profile = getUserProfile();
@@ -1262,12 +1264,12 @@
         profileCard.style.display = 'flex';
         profileCard.innerHTML = `
           <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
-            ${profile.picture ? `<img src="${profile.picture}" class="w-full h-full object-cover">` : (profile.name ? profile.name.charAt(0).toUpperCase() : '👤')}
+            ${profile.picture ? `<img src="${escapeHtml(profile.picture)}" class="w-full h-full object-cover">` : (profile.name ? escapeHtml(profile.name.charAt(0).toUpperCase()) : '👤')}
           </div>
           <div class="flex-1 min-w-0">
             <div class="font-bold text-slate-800 dark:text-white truncate text-sm">${escapeHtml(profile.name || 'Signed In')}</div>
             <div class="text-xs text-slate-500 dark:text-slate-400 truncate">${escapeHtml(profile.email || '')}</div>
-            <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-0.5">🟢 Connected to Google Drive / ${DRIVE_FOLDER_NAME}</div>
+            <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-0.5">🟢 Connected to Google Drive / ${escapeHtml(DRIVE_FOLDER_NAME)}</div>
           </div>
         `;
       } else {
@@ -1279,8 +1281,8 @@
       if (isConnected) {
         folderLinkContainer.style.display = 'block';
         folderLinkContainer.innerHTML = `
-          <a href="${folderUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline bg-blue-50 dark:bg-blue-950/50 px-3.5 py-2 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors">
-            <span>📂 Open "Google Drive / ${DRIVE_FOLDER_NAME}" Folder</span>
+          <a href="${escapeHtml(folderUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline bg-blue-50 dark:bg-blue-950/50 px-3.5 py-2 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors">
+            <span>📂 Open "Google Drive / ${escapeHtml(DRIVE_FOLDER_NAME)}" Folder</span>
             <span class="text-[10px]">↗</span>
           </a>
         `;
@@ -1291,8 +1293,8 @@
 
     if (statusText) {
       statusText.innerHTML = isConnected
-        ? `Your account is active. All trip itineraries automatically sync to <code>.json</code> files inside your <strong>Google Drive / ${DRIVE_FOLDER_NAME}</strong> folder.`
-        : `Sign in with Google to automatically back up and sync your itineraries into a dedicated <strong>Google Drive / ${DRIVE_FOLDER_NAME}</strong> folder across all your devices.`;
+        ? `Your account is active. All trip itineraries automatically sync to <code>.json</code> files inside your <strong>Google Drive / ${escapeHtml(DRIVE_FOLDER_NAME)}</strong> folder.`
+        : `Sign in with Google to automatically back up and sync your itineraries into a dedicated <strong>Google Drive / ${escapeHtml(DRIVE_FOLDER_NAME)}</strong> folder across all your devices.`;
     }
 
     if (fileListContainer && isConnected && Array.isArray(cloudFiles) && cloudFiles.length > 0) {
@@ -1313,13 +1315,17 @@
             const sizeKb = f.size ? `${(parseInt(f.size, 10) / 1024).toFixed(1)} KB` : 'JSON';
             const modTime = f.modifiedTime ? new Date(f.modifiedTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Synced';
             const isActiveFile = fileMap[activeTripId] === f.id;
+            const safeFileIdJs = escapeHtml(escapeJs(f.id));
+            const safeFileName = escapeHtml(f.name);
+            const safeFileNameJs = escapeHtml(escapeJs(f.name));
+            const safeFileIdUrl = escapeHtml(encodeURIComponent(f.id || ''));
 
             return `
               <div class="p-3 ${isActiveFile ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700' : 'bg-white dark:bg-slate-800/90 border-slate-200 dark:border-slate-700'} rounded-xl border flex flex-col sm:flex-row justify-between sm:items-center gap-2 transition-all hover:border-blue-300 dark:hover:border-blue-700">
                 <div class="flex-1 min-w-0">
                   <div class="font-semibold text-slate-800 dark:text-slate-100 text-xs truncate flex items-center gap-1.5">
                     <span>📄</span>
-                    <span class="truncate">${escapeHtml(f.name)}</span>
+                    <span class="truncate">${safeFileName}</span>
                     ${isActiveFile ? `<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-600 text-white shrink-0">● Active</span>` : ''}
                   </div>
                   <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-3 pt-1">
@@ -1328,11 +1334,11 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0 pt-1 sm:pt-0">
-                  <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-[11px] py-1 px-3" onclick="window.loadTripFromGoogleDrive('${f.id}')" title="Load & open this trip document">
+                  <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-[11px] py-1 px-3" onclick="window.loadTripFromGoogleDrive('${safeFileIdJs}')" title="Load & open this trip document">
                     ${isActiveFile ? '✓ Open' : '📥 Load'}
                   </button>
-                  <a href="https://drive.google.com/file/d/${f.id}/view" target="_blank" rel="noopener noreferrer" class="action-btn text-[11px] py-1 px-2.5 text-slate-600 dark:text-slate-300" title="Open file in Google Drive">↗</a>
-                  <button class="action-btn action-btn-danger text-[11px] py-1 px-2.5" onclick="window.deleteTripFromGoogleDrive('${f.id}', '${escapeHtml(f.name)}')" title="Delete from cloud">🗑️</button>
+                  <a href="https://drive.google.com/file/d/${safeFileIdUrl}/view" target="_blank" rel="noopener noreferrer" class="action-btn text-[11px] py-1 px-2.5 text-slate-600 dark:text-slate-300" title="Open file in Google Drive">↗</a>
+                  <button class="action-btn action-btn-danger text-[11px] py-1 px-2.5" onclick="window.deleteTripFromGoogleDrive('${safeFileIdJs}', '${safeFileNameJs}')" title="Delete from cloud">🗑️</button>
                 </div>
               </div>
             `;
@@ -1374,6 +1380,19 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  function escapeJs(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/</g, '\\x3c')
+      .replace(/>/g, '\\x3e')
+      .replace(/&/g, '\\x26');
   }
 
   // Process any OAuth redirect hash immediately
