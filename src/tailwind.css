@@ -2013,6 +2013,10 @@
       font-size: var(--m-font-xs);
     }
 
+    body.mobile-app-mode .city-nav-btn[data-city="all"] {
+      display: none !important;
+    }
+
     body.mobile-app-mode .itinerary-view-mode-btn {
       min-height: var(--m-control-h-tight);
       padding: 0.375rem 0.625rem;
@@ -3055,8 +3059,10 @@
     width: 0;
   }
 
-  body.compact-view-mode .mobile-swipe-carousel {
-    @apply flex gap-1.75 overflow-x-auto;
+  body.compact-view-mode .mobile-swipe-carousel,
+  .mobile-swipe-carousel {
+    @apply flex items-start gap-1.75 overflow-x-auto;
+    align-items: flex-start;
     padding-bottom: 0.04rem;
     scroll-padding-inline: 0.1rem;
     scroll-snap-type: x mandatory;
@@ -3064,14 +3070,18 @@
   }
 
   body.compact-view-mode .mobile-swipe-rail::-webkit-scrollbar,
-  body.compact-view-mode .mobile-swipe-carousel::-webkit-scrollbar {
+  body.compact-view-mode .mobile-swipe-carousel::-webkit-scrollbar,
+  .mobile-swipe-carousel::-webkit-scrollbar {
     display: none;
   }
 
-  body.compact-view-mode .mobile-swipe-slide {
+  body.compact-view-mode .mobile-swipe-slide,
+  .mobile-swipe-slide {
     flex: 0 0 100%;
     min-width: 0;
     scroll-snap-align: start;
+    align-self: flex-start;
+    height: auto;
   }
 
   .mobile-card-stack {
@@ -3566,15 +3576,18 @@
     width: 0;
   }
 
-  body.compact-view-mode .compact-day-carousel {
+  body.compact-view-mode .compact-day-carousel,
+  .compact-day-carousel {
     @apply flex gap-2.5 overflow-x-auto overflow-y-hidden;
+    align-items: flex-start;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
   }
 
-  body.compact-view-mode .compact-day-carousel::-webkit-scrollbar {
+  body.compact-view-mode .compact-day-carousel::-webkit-scrollbar,
+  .compact-day-carousel::-webkit-scrollbar {
     display: none;
   }
 
@@ -3588,10 +3601,13 @@
     }
   }
 
-  body.compact-view-mode .compact-day-slide {
+  body.compact-view-mode .compact-day-slide,
+  .compact-day-slide {
     @apply shrink-0 w-full min-w-0;
     flex: 0 0 100%;
     scroll-snap-align: start;
+    align-self: flex-start;
+    height: auto;
   }
 
   /* Mobile itinerary parity: restore compact card language */
@@ -5671,6 +5687,10 @@
   @media (max-width: 768px) {
     .app-tabs-content {
       @apply mt-4;
+    }
+
+    .city-nav-btn[data-city="all"] {
+      display: none !important;
     }
 
     .app-tab-btn {

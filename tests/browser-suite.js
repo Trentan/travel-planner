@@ -351,6 +351,22 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     const swCount = await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length);
     assert(swCount >= 0, 'Desktop: service worker registration query should succeed');
     reporter.add('desktop', 'service worker', `registrations=${swCount}`);
+
+    // Sprint 1 Desktop checks
+    const desktopAllBtnVisible = await page.evaluate(() => {
+      const btn = document.querySelector('#cityNav .city-nav-btn[data-city="all"]');
+      return btn ? window.getComputedStyle(btn).display !== 'none' : false;
+    });
+    assert(desktopAllBtnVisible === true, 'Desktop: "All" button should be visible in desktop cityNav');
+
+    await page.locator('.app-tab-btn[data-tab="packing"]').click();
+    await humanPause(page, 200);
+    const desktopPackingHeaderHidden = await page.evaluate(() => {
+      const header = document.querySelector('.packing-guides-mobile-header');
+      return header ? window.getComputedStyle(header).display === 'none' : true;
+    });
+    assert(desktopPackingHeaderHidden === true, 'Desktop: mobile packing guides header should be hidden in desktop view');
+    reporter.add('desktop', 'sprint 1 parity', 'desktop retains All button and inline packing guides');
   } finally {
     await context.close();
     await browser.close();
@@ -495,6 +511,13 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await humanPause(page, 400);
     assert(await page.getByRole('button', { name: /Import Booking/i }).count() > 0, 'Mobile: booking intake entry should be available from menu');
     assert(await page.locator('.mobile-desktop-advisory').count() === 1, 'Mobile: desktop recommendation advisory notice should be present in mobile menu');
+    
+    // Issue #210: Mobile Menu Undo & Redo buttons
+    assert(await page.locator('#mobileUndoBtn').count() === 1, 'Mobile: #mobileUndoBtn should exist in mobile action menu');
+    assert(await page.locator('#mobileRedoBtn').count() === 1, 'Mobile: #mobileRedoBtn should exist in mobile action menu');
+    const undoDisabled = await page.locator('#mobileUndoBtn').getAttribute('disabled');
+    assert(undoDisabled !== null, 'Mobile: #mobileUndoBtn should be disabled initially with empty history');
+    reporter.add('mobile', 'undo redo menu', 'mobile undo and redo controls integrated and reactive');
     reporter.add('mobile', 'menu sheet', 'mobile menu opened with desktop advisory notice');
 
     await page.evaluate(() => {
@@ -596,15 +619,63 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
       if (pwaModal) pwaModal.style.display = 'none';
     });
 
-    // Verify + Add City button in cityNav
+    // Verify + Add City button in cityNav and "All" button hidden on mobile (#209)
     await page.locator('.app-tab-btn[data-tab="itinerary"]').click();
     await humanPause(page, 250);
+    const mobileAllBtnHidden = await page.evaluate(() => {
+      const btn = document.querySelector('#cityNav .city-nav-btn[data-city="all"]');
+      return btn ? window.getComputedStyle(btn).display === 'none' : true;
+    });
+    assert(mobileAllBtnHidden === true, 'Mobile: "All" button should be hidden in mobile cityNav rail (#209)');
+    reporter.add('mobile', 'city nav all button removal', 'mobile city rail excludes All button');
+
     assert(await page.locator('.city-nav-add-btn').count() === 1, 'Mobile: + Add City button should be present in cityNav');
     await page.locator('.city-nav-add-btn').click({ force: true });
     await page.waitForFunction(() => document.getElementById('city-modal').style.display === 'flex');
     await page.evaluate(() => { if (typeof closeCityDialog === 'function') closeCityDialog(); });
     await page.waitForFunction(() => document.getElementById('city-modal').style.display === 'none');
     reporter.add('mobile', 'city nav add button', '+ Add City pill opens city dialog from cityNav');
+
+    // Verify Packing Collapsible Container (#204)
+    await page.locator('.app-tab-btn[data-tab="packing"]').click();
+    await humanPause(page, 250);
+    const packingHeaderVisible = await page.evaluate(() => {
+      const header = document.querySelector('.packing-guides-mobile-header');
+      return header ? window.getComputedStyle(header).display !== 'none' : false;
+    });
+    assert(packingHeaderVisible === true, 'Mobile: packing guides header should be visible on mobile (#204)');
+    
+    const packingInitiallyCollapsed = await page.locator('.packing-guides-shell.mobile-collapsed').count();
+    assert(packingInitiallyCollapsed === 1, 'Mobile: packing guides should be collapsed by default (#204)');
+    
+    // Toggle expand
+    await page.locator('.packing-guides-mobile-header').click();
+    await humanPause(page, 200);
+    assert(await page.locator('.packing-guides-shell.mobile-expanded').count() === 1, 'Mobile: packing guides should expand on tap (#204)');
+    reporter.add('mobile', 'packing collapsible', 'packing guide header collapses/expands correctly on mobile');
+
+    // Verify Itinerary Vertical Scroll Bounds (#214)
+    await page.locator('.app-tab-btn[data-tab="itinerary"]').click();
+    await humanPause(page, 250);
+    const scrollBoundsPassed = await page.evaluate(async () => {
+      const cityChips = Array.from(document.querySelectorAll('.compact-city-chip'));
+      if (cityChips[1]) cityChips[1].click();
+      await new Promise(r => setTimeout(r, 300));
+      const tokyoSlide = document.getElementById('city-slide-1');
+      if (!tokyoSlide) return false;
+      const dayChips = Array.from(tokyoSlide.querySelectorAll('.compact-day-chip'));
+      if (!dayChips[1]) return false;
+      dayChips[1].click();
+      await new Promise(r => setTimeout(r, 300));
+      const activeDay = tokyoSlide.querySelector('.compact-day-slide.is-active');
+      const dayCarousel = tokyoSlide.querySelector('.compact-day-carousel');
+      const cityCarousel = document.querySelector('.compact-city-swipe-pager [data-role="mobile-swipe-carousel"]');
+      if (!activeDay || !dayCarousel || !cityCarousel) return false;
+      const dayDiff = Math.abs(dayCarousel.offsetHeight - (activeDay.querySelector('.compact-day-surface')?.offsetHeight || activeDay.offsetHeight));
+      return dayDiff <= 25 && cityCarousel.offsetHeight < 600;
+    });
+    assert(scrollBoundsPassed === true, 'Mobile: itinerary vertical scroll bounds should strictly conform to active day content (#214)');
+    reporter.add('mobile', 'itinerary vertical scroll bounds', 'mobile itinerary vertical scrolling bounds to active day height (#214)');
 
     await page.evaluate(() => toggleMobileMenu());
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));

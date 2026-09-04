@@ -827,7 +827,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const isActive = dayIdx === 0;
 
   return `
-    <section class="compact-day-slide day-card ${isActive ? 'open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
+    <section class="compact-day-slide day-card ${isActive ? 'is-active open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
       ${renderMobileSurfaceCard({
     cardClass: 'compact-day-surface',
     accentColor: leg.colour,
@@ -951,6 +951,67 @@ function renderCompactDayPager(leg, legIndex) {
         </div>
       </div>
   `;
+}
+
+function syncItineraryMobileHeightContainment(root = document) {
+  if (typeof window === 'undefined' || !root) return;
+  const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : window.innerWidth <= 768;
+
+  if (!isMobile) {
+    root.querySelectorAll('.compact-day-carousel, .compact-city-swipe-pager [data-role="mobile-swipe-carousel"]').forEach(el => {
+      el.style.height = '';
+    });
+    return;
+  }
+
+  // 1. Constrain each compact day carousel to its active slide's height
+  const dayPagers = root.querySelectorAll('.compact-day-pager');
+  dayPagers.forEach(pager => {
+    const carousel = pager.querySelector('.compact-day-carousel');
+    if (!carousel) return;
+    const activeSlide = pager.querySelector('.compact-day-slide.is-active') || pager.querySelector('.compact-day-slide');
+    if (activeSlide) {
+      const surface = activeSlide.querySelector('.compact-day-surface') || activeSlide;
+      const height = surface.offsetHeight || activeSlide.scrollHeight;
+      if (height > 0) {
+        carousel.style.height = `${height}px`;
+      }
+    }
+  });
+
+  // 2. Constrain outer compact city swipe carousel to its active city slide's height
+  const syncOuter = () => {
+    const cityPager = root.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]') || document.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]');
+    if (!cityPager) return;
+    const cityCarousel = cityPager.querySelector('[data-role="mobile-swipe-carousel"]');
+    if (!cityCarousel) return;
+
+    const activeIndex = Math.max(0, Number(cityPager.dataset.activeIndex || 0));
+    const slides = Array.from(cityPager.querySelectorAll('.compact-city-slide'));
+    const activeCitySlide = slides[activeIndex] || cityPager.querySelector('.compact-city-slide.is-active') || slides[0];
+    if (activeCitySlide) {
+      const card = activeCitySlide.querySelector('.compact-leg-card') || activeCitySlide;
+      const height = card.offsetHeight || activeCitySlide.scrollHeight;
+      if (height > 0) {
+        cityCarousel.style.height = `${height}px`;
+      }
+    }
+  };
+
+  syncOuter();
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(syncOuter);
+  }
+}
+window.syncItineraryMobileHeightContainment = syncItineraryMobileHeightContainment;
+
+if (typeof window !== 'undefined' && !window.__itineraryResizeBound) {
+  window.__itineraryResizeBound = true;
+  window.addEventListener('resize', () => {
+    if (typeof syncItineraryMobileHeightContainment === 'function') {
+      syncItineraryMobileHeightContainment(document);
+    }
+  });
 }
 
 function setupCompactItineraryPagers(root = document) {
@@ -1156,6 +1217,15 @@ function setupCompactItineraryPagers(root = document) {
     if (carousel && initialSlide) {
       carousel.scrollLeft = Math.max(0, initialSlide.offsetLeft - carousel.offsetLeft);
     }
+    if (typeof ResizeObserver !== 'undefined' && !pager.__heightResizeObserver) {
+      const resizeObserver = new ResizeObserver(() => {
+        if (typeof syncItineraryMobileHeightContainment === 'function') {
+          syncItineraryMobileHeightContainment(pager.closest('#tab-itinerary') || document);
+        }
+      });
+      slides.forEach(slide => resizeObserver.observe(slide));
+      pager.__heightResizeObserver = resizeObserver;
+    }
   });
 }
 
@@ -1244,6 +1314,10 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
         behavior: 'smooth'
       });
     }
+  }
+
+  if (typeof syncItineraryMobileHeightContainment === 'function') {
+    syncItineraryMobileHeightContainment(pager.closest('#tab-itinerary') || document);
   }
 }
 
@@ -1371,7 +1445,7 @@ function buildCompactItinerary() {
     `;
 
     slidesHtml.push(`
-      <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(leg.id || '')}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
+      <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide ${legIndex === 0 ? 'is-active' : ''}" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(leg.id || '')}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
         ${legCard}
       </div>
     `);
@@ -1429,7 +1503,11 @@ function buildCompactItinerary() {
 
   container.appendChild(pagerRoot);
   setupMobileSwipePagers(container);
+  setupCompactItineraryPagers(container);
   setupCompactCityNavSync(container);
+  if (typeof syncItineraryMobileHeightContainment === 'function') {
+    syncItineraryMobileHeightContainment(container);
+  }
 }
 
 function getLegFlightButtonTimeLabel(leg) {
@@ -3695,6 +3773,9 @@ function setupCompactCityNavSync(root = document) {
 
   const syncByIndex = index => {
     const safe = Math.max(0, Math.min(slides.length - 1, Number(index) || 0));
+    slides.forEach((s, idx) => {
+      s.classList.toggle('is-active', idx === safe);
+    });
     const slide = slides[safe];
     if (!slide) return;
     const slideLegId = String(slide.dataset.legId || '').trim();
@@ -3708,6 +3789,9 @@ function setupCompactCityNavSync(root = document) {
         stickyHeader.style.background = slideHeader.style.background || targetLeg.colour || '#0ea5e9';
         stickyHeader.innerHTML = slideHeader.innerHTML;
       }
+    }
+    if (typeof syncItineraryMobileHeightContainment === 'function') {
+      syncItineraryMobileHeightContainment(root);
     }
   };
 

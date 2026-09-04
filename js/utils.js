@@ -336,6 +336,10 @@ function setupMobileSwipePagers(root = document) {
       if (rail && activeChip) {
         scrollChildIntoHorizontalView(rail, activeChip, { behavior: 'auto', align: 'center' });
       }
+
+      if (typeof syncItineraryMobileHeightContainment === 'function') {
+        syncItineraryMobileHeightContainment(pager.closest('#tab-itinerary') || document);
+      }
     };
 
     const scrollToIndex = nextIndex => {
