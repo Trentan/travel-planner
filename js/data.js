@@ -2691,11 +2691,21 @@ function checkAndPromptCityAudit(isSilent = false) {
 async function repairAllCityMetadata() {
   if (!Array.isArray(citiesData) || citiesData.length === 0) return;
 
+  const cityLookup = new Map();
+  for (const c of ALL_CITIES) {
+    if (c && c.name) {
+      const lowerName = c.name.toLowerCase();
+      if (!cityLookup.has(lowerName)) {
+        cityLookup.set(lowerName, c);
+      }
+    }
+  }
+
   let repairedCount = 0;
   for (const city of citiesData) {
     let modified = false;
 
-    const match = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
+    const match = city && city.name ? cityLookup.get(city.name.toLowerCase()) : null;
     if (match) {
       if (!city.code) { city.code = match.code; modified = true; }
       if (!city.countryCode) { city.countryCode = match.countryCode; modified = true; }
