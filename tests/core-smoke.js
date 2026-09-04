@@ -58,6 +58,13 @@ function loadDateHelpers() {
     'function findJourney'
   );
 
+  const crudJs = loadSource(path.join('js', 'crud.js'));
+  const parseActivityDurationBlock = extractBetween(
+    crudJs,
+    'function parseActivityDurationMinutes(',
+    'function addMinutesToTimeValue('
+  );
+
   const dateHelpers = new Function(
     `${dateHelpersBlock}
 return {
@@ -117,6 +124,11 @@ return {
   bookingContext.window = bookingContext;
   runScriptInContext(bookingIntakeJs, bookingContext, 'js/booking-intake.js');
 
+  const parseActivityDurationMinutes = new Function(
+    `${parseActivityDurationBlock}
+return parseActivityDurationMinutes;`
+  )();
+
   return {
     dateHelpers,
     checklistHelpers,
@@ -124,7 +136,8 @@ return {
     itineraryPositionHelpers,
     transportHelpers,
     aiHarness,
-    bookingContext
+    bookingContext,
+    parseActivityDurationMinutes
   };
 }
 
@@ -136,7 +149,8 @@ async function run() {
     itineraryPositionHelpers,
     transportHelpers,
     aiHarness,
-    bookingContext
+    bookingContext,
+    parseActivityDurationMinutes
   } = loadDateHelpers();
   const { context, document, alerts, clipboardWrites, execCommands } = aiHarness;
 
@@ -247,6 +261,44 @@ async function run() {
   `);
   assert(bookingItems.some(item => item.kind === 'journey' && item.bookingReference === 'ABC123'), 'Booking intake should extract transport with booking ref');
   assert(bookingItems.some(item => item.kind === 'stay' && item.propertyName.includes('Vienna')), 'Booking intake should extract stay details');
+
+  // parseActivityDurationMinutes tests
+  // Hours
+  assert(parseActivityDurationMinutes('1h') === 60, '1h should parse to 60 minutes');
+  assert(parseActivityDurationMinutes('2 hr') === 120, '2 hr should parse to 120 minutes');
+  assert(parseActivityDurationMinutes('3.5 hrs') === 210, '3.5 hrs should parse to 210 minutes');
+  assert(parseActivityDurationMinutes('1.5 hour') === 90, '1.5 hour should parse to 90 minutes');
+  assert(parseActivityDurationMinutes('2 hours') === 120, '2 hours should parse to 120 minutes');
+
+  // Minutes
+  assert(parseActivityDurationMinutes('30m') === 30, '30m should parse to 30 minutes');
+  assert(parseActivityDurationMinutes('45 min') === 45, '45 min should parse to 45 minutes');
+  assert(parseActivityDurationMinutes('15 mins') === 15, '15 mins should parse to 15 minutes');
+  assert(parseActivityDurationMinutes('90 minute') === 90, '90 minute should parse to 90 minutes');
+  assert(parseActivityDurationMinutes('120 minutes') === 120, '120 minutes should parse to 120 minutes');
+
+  // Combined
+  assert(parseActivityDurationMinutes('1h 30m') === 90, '1h 30m should parse to 90 minutes');
+  assert(parseActivityDurationMinutes('1 hr 15 mins') === 75, '1 hr 15 mins should parse to 75 minutes');
+  assert(parseActivityDurationMinutes('2 hours 45 minutes') === 165, '2 hours 45 minutes should parse to 165 minutes');
+  assert(parseActivityDurationMinutes('1.5h 30min') === 120, '1.5h 30min should parse to 120 minutes');
+
+  // Numeric fallback (interpreted as hours)
+  assert(parseActivityDurationMinutes('2') === 120, 'Numeric string "2" should parse as 2 hours (120 min)');
+  assert(parseActivityDurationMinutes('1.5') === 90, 'Numeric string "1.5" should parse as 1.5 hours (90 min)');
+  assert(parseActivityDurationMinutes('0.5') === 30, 'Numeric string "0.5" should parse as 0.5 hours (30 min)');
+  assert(parseActivityDurationMinutes(2) === 120, 'Number 2 should parse as 2 hours (120 min)');
+
+  // Invalid / Edge cases
+  assert(parseActivityDurationMinutes(null) === 0, 'null should parse to 0');
+  assert(parseActivityDurationMinutes(undefined) === 0, 'undefined should parse to 0');
+  assert(parseActivityDurationMinutes('') === 0, 'empty string should parse to 0');
+  assert(parseActivityDurationMinutes('   ') === 0, 'whitespace string should parse to 0');
+  assert(parseActivityDurationMinutes('invalid text') === 0, 'non-duration string should parse to 0');
+  assert(parseActivityDurationMinutes('0') === 0, '"0" should parse to 0');
+  assert(parseActivityDurationMinutes('0h') === 0, '"0h" should parse to 0');
+  assert(parseActivityDurationMinutes('0 mins') === 0, '"0 mins" should parse to 0');
+  assert(parseActivityDurationMinutes('-1') === 0, 'negative number string should parse to 0');
 
   console.log('Core smoke checks passed');
 }
