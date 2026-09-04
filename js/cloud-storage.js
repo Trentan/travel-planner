@@ -57,6 +57,7 @@
     return userProfile;
   }
   window.getUserProfile = getUserProfile;
+  window.setUserProfile = setUserProfile;
 
   window.openCloudSyncModal = function() {
     const modal = document.getElementById('cloudSyncModal');
@@ -222,7 +223,7 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span>${message}</span>
+            <span>${escapeHtml(message)}</span>
           `;
         } else {
           connectBtn.classList.remove('opacity-80', 'cursor-wait');
@@ -1261,9 +1262,14 @@
     if (profileCard) {
       if (isConnected && profile) {
         profileCard.style.display = 'flex';
+        const hasPicture = isSafeUrl(profile.picture);
+        const avatarHtml = hasPicture
+          ? `<img src="${escapeHtml(profile.picture.trim())}" class="w-full h-full object-cover">`
+          : (profile.name ? escapeHtml(profile.name.charAt(0).toUpperCase()) : '👤');
+
         profileCard.innerHTML = `
           <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
-            ${profile.picture ? `<img src="${profile.picture}" class="w-full h-full object-cover">` : (profile.name ? profile.name.charAt(0).toUpperCase() : '👤')}
+            ${avatarHtml}
           </div>
           <div class="flex-1 min-w-0">
             <div class="font-bold text-slate-800 dark:text-white truncate text-sm">${escapeHtml(profile.name || 'Signed In')}</div>
@@ -1277,10 +1283,10 @@
     }
 
     if (folderLinkContainer) {
-      if (isConnected) {
+      if (isConnected && isSafeUrl(folderUrl)) {
         folderLinkContainer.style.display = 'block';
         folderLinkContainer.innerHTML = `
-          <a href="${folderUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline bg-blue-50 dark:bg-blue-950/50 px-3.5 py-2 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors">
+          <a href="${escapeHtml(folderUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline bg-blue-50 dark:bg-blue-950/50 px-3.5 py-2 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors">
             <span>📂 Open "Google Drive / ${DRIVE_FOLDER_NAME}" Folder</span>
             <span class="text-[10px]">↗</span>
           </a>
@@ -1329,11 +1335,11 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0 pt-1 sm:pt-0">
-                  <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-[11px] py-1 px-3" onclick="window.loadTripFromGoogleDrive('${f.id}')" title="Load & open this trip document">
+                  <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-[11px] py-1 px-3" onclick="window.loadTripFromGoogleDrive(${escapeJsParam(f.id)})" title="Load & open this trip document">
                     ${isActiveFile ? '✓ Open' : '📥 Load'}
                   </button>
-                  <a href="https://drive.google.com/file/d/${f.id}/view" target="_blank" rel="noopener noreferrer" class="action-btn text-[11px] py-1 px-2.5 text-slate-600 dark:text-slate-300" title="Open file in Google Drive">↗</a>
-                  <button class="action-btn action-btn-danger text-[11px] py-1 px-2.5" onclick="window.deleteTripFromGoogleDrive('${f.id}', '${escapeHtml(f.name)}')" title="Delete from cloud">🗑️</button>
+                  <a href="https://drive.google.com/file/d/${encodeURIComponent(f.id)}/view" target="_blank" rel="noopener noreferrer" class="action-btn text-[11px] py-1 px-2.5 text-slate-600 dark:text-slate-300" title="Open file in Google Drive">↗</a>
+                  <button class="action-btn action-btn-danger text-[11px] py-1 px-2.5" onclick="window.deleteTripFromGoogleDrive(${escapeJsParam(f.id)}, ${escapeJsParam(f.name)})" title="Delete from cloud">🗑️</button>
                 </div>
               </div>
             `;
@@ -1352,6 +1358,7 @@
       activeIdLabel.innerText = getGoogleClientId();
     }
   }
+  window.updateCloudSyncModalState = updateCloudSyncModalState;
 
   window.saveCustomGoogleClientId = function() {
     const input = document.getElementById('gdriveCustomClientIdInput');
@@ -1366,6 +1373,26 @@
     }
     updateCloudSyncModalState();
   };
+
+  function isSafeUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const trimmed = url.trim();
+    try {
+      const base = (typeof window !== 'undefined' && window.location && typeof window.location.href === 'string')
+        ? window.location.href
+        : 'http://localhost/';
+      const parsed = new URL(trimmed, base);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'data:';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function escapeJsParam(val) {
+    if (val === null || val === undefined) return "''";
+    const jsonStr = JSON.stringify(String(val));
+    return escapeHtml(jsonStr);
+  }
 
   function escapeHtml(str) {
     if (!str) return '';

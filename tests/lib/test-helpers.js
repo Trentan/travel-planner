@@ -27,7 +27,10 @@ function createElement(initial = {}) {
     value: '',
     textContent: '',
     style: {},
+    dataset: {},
     selected: false,
+    querySelector() { return null; },
+    querySelectorAll() { return []; },
     select() {
       this.selected = true;
     },
@@ -45,6 +48,12 @@ function createDocument() {
         elements.set(id, createElement());
       }
       return elements.get(id);
+    },
+    querySelectorAll() {
+      return [];
+    },
+    querySelector() {
+      return null;
     },
     execCommand() {
       return true;

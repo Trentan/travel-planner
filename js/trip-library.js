@@ -189,13 +189,19 @@
       const elem = document.createElement('div');
       elem.className = `trip-dropdown-item group flex items-center justify-between py-2 px-2.5 rounded-lg my-0.5 ${isCurrent ? 'active bg-teal-50/90 dark:bg-teal-950/50 font-semibold border-l-2 border-teal-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800/60'}`;
 
+      const safeItemIdJs = escapeHtml(escapeJs(item.id));
+      const safeCloudFileIdJs = escapeHtml(escapeJs(item.cloudFileId));
+      const safeCloudFileIdUrl = escapeHtml(encodeURIComponent(item.cloudFileId || ''));
+      const safeTitleJs = escapeHtml(escapeJs(item.title));
+      const safeFilenameJs = escapeHtml(escapeJs(item.filename));
+
       const clickHandler = isCloudOnly
-        ? `window.closeTripDropdown(); window.loadTripFromGoogleDrive('${item.cloudFileId}');`
-        : `window.closeTripDropdown(); ${!isCurrent ? `window.switchActiveTrip('${item.id}')` : ''}`;
+        ? `window.closeTripDropdown(); window.loadTripFromGoogleDrive('${safeCloudFileIdJs}');`
+        : `window.closeTripDropdown(); ${!isCurrent ? `window.switchActiveTrip('${safeItemIdJs}')` : ''}`;
 
       elem.innerHTML = `
         <div class="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer" onclick="${clickHandler}">
-          <span class="trip-item-icon shrink-0 text-sm">${isCurrent ? '✓' : item.flags}</span>
+          <span class="trip-item-icon shrink-0 text-sm">${isCurrent ? '✓' : escapeHtml(item.flags)}</span>
           <div class="trip-item-info min-w-0 flex-1">
             <div class="trip-item-title truncate text-xs flex items-center gap-1.5">
               <span class="truncate ${isCurrent ? 'font-bold text-teal-900 dark:text-teal-200' : ''}">${escapeHtml(item.title)}</span>
@@ -206,18 +212,18 @@
         </div>
         <div class="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
           ${!isCloudOnly ? `
-            <button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs" onclick="window.renameTripFromDropdown(event, '${item.id}', '${escapeHtml(item.title)}')" title="Rename trip">✏️</button>
+            <button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs" onclick="window.renameTripFromDropdown(event, '${safeItemIdJs}', '${safeTitleJs}')" title="Rename trip">✏️</button>
           ` : `
-            <button class="p-1 hover:bg-blue-200 dark:hover:bg-blue-900 rounded text-xs" onclick="window.renameCloudFileFromDropdown(event, '${item.cloudFileId}', '${escapeHtml(item.filename)}')" title="Rename cloud file">✏️</button>
+            <button class="p-1 hover:bg-blue-200 dark:hover:bg-blue-900 rounded text-xs" onclick="window.renameCloudFileFromDropdown(event, '${safeCloudFileIdJs}', '${safeFilenameJs}')" title="Rename cloud file">✏️</button>
           `}
           ${item.cloudFileId ? `
-            <a href="https://drive.google.com/file/d/${item.cloudFileId}/view" target="_blank" rel="noopener noreferrer" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs text-slate-500" title="View physical file in Google Drive" onclick="event.stopPropagation();">↗</a>
+            <a href="https://drive.google.com/file/d/${safeCloudFileIdUrl}/view" target="_blank" rel="noopener noreferrer" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs text-slate-500" title="View physical file in Google Drive" onclick="event.stopPropagation();">↗</a>
           ` : ''}
           ${!isCloudOnly && trips.length > 1 ? `
-            <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromDropdown(event, '${item.id}', '${escapeHtml(item.title)}')" title="Delete trip">🗑️</button>
+            <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromDropdown(event, '${safeItemIdJs}', '${safeTitleJs}')" title="Delete trip">🗑️</button>
           ` : ''}
           ${isCloudOnly ? `
-            <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromGoogleDrive('${item.cloudFileId}', '${escapeHtml(item.filename)}')" title="Delete cloud file">🗑️</button>
+            <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromGoogleDrive('${safeCloudFileIdJs}', '${safeFilenameJs}')" title="Delete cloud file">🗑️</button>
           ` : ''}
         </div>
       `;
@@ -297,7 +303,7 @@
       googleBannerHtml = `
         <div class="col-span-full mb-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-850 rounded-xl border border-blue-200/80 dark:border-slate-700 shadow-xs flex flex-wrap items-center justify-between gap-2.5">
           <div class="flex items-center gap-2.5 min-w-0">
-            ${userProfile && userProfile.picture ? `<img src="${userProfile.picture}" class="w-8 h-8 rounded-full border border-blue-300 dark:border-slate-600 shrink-0" alt="Avatar" referrerpolicy="no-referrer">` : `<div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">G</div>`}
+            ${userProfile && userProfile.picture ? `<img src="${escapeHtml(userProfile.picture)}" class="w-8 h-8 rounded-full border border-blue-300 dark:border-slate-600 shrink-0" alt="Avatar" referrerpolicy="no-referrer">` : `<div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">G</div>`}
             <div class="min-w-0">
               <div class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5 truncate">
                 <span class="truncate">${escapeHtml((userProfile && (userProfile.name || userProfile.email)) || 'Google Drive Connected')}</span>
@@ -310,7 +316,7 @@
             <button class="action-btn action-btn-secondary text-xs py-1 px-2.5 flex items-center gap-1 text-blue-600 dark:text-blue-400" onclick="window.syncAllTripsFromGoogleDrive();" title="Sync all trips from Google Drive">
               <span>🔄</span> <span>Sync All</span>
             </button>
-            <a href="${driveFolderUrl}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs py-1 px-2" title="Open Google Drive folder">
+            <a href="${escapeHtml(driveFolderUrl)}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs py-1 px-2" title="Open Google Drive folder">
               <span>↗</span>
             </a>
           </div>
@@ -392,6 +398,10 @@
         const sizeKb = file.size ? `${(parseInt(file.size, 10) / 1024).toFixed(1)} KB` : 'JSON Document';
         const modTime = file.modifiedTime ? new Date(file.modifiedTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Synced';
         const isActiveFile = fileMap[activeTripId] === file.id;
+        const safeFileIdJs = escapeHtml(escapeJs(file.id));
+        const safeFileName = escapeHtml(file.name);
+        const safeFileNameJs = escapeHtml(escapeJs(file.name));
+        const safeFileIdUrl = escapeHtml(encodeURIComponent(file.id || ''));
 
         const card = document.createElement('div');
         card.className = `trip-gallery-card p-4 ${isActiveFile ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700' : 'bg-white dark:bg-slate-800/90 border-slate-200 dark:border-slate-700'} rounded-2xl border flex flex-col justify-between space-y-3`;
@@ -403,16 +413,16 @@
             </div>
             <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm truncate flex items-center gap-1.5">
               <span>📄</span>
-              <span class="truncate">${escapeHtml(file.name)}</span>
+              <span class="truncate">${safeFileName}</span>
             </h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Size: ${sizeKb} • Modified: ${modTime}</p>
           </div>
           <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
-            <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-xs flex-1" onclick="window.loadTripFromGoogleDrive('${file.id}')">
+            <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-xs flex-1" onclick="window.loadTripFromGoogleDrive('${safeFileIdJs}')">
               ${isActiveFile ? '✓ Currently Open' : '📥 Load & Open'}
             </button>
-            <a href="https://drive.google.com/file/d/${file.id}/view" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs" title="Open file in Google Drive">↗ Drive</a>
-            <button class="action-btn action-btn-danger text-xs px-2.5" onclick="window.deleteTripFromGoogleDrive('${file.id}', '${escapeHtml(file.name)}')" title="Delete file from Google Drive">🗑️</button>
+            <a href="https://drive.google.com/file/d/${safeFileIdUrl}/view" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs" title="Open file in Google Drive">↗ Drive</a>
+            <button class="action-btn action-btn-danger text-xs px-2.5" onclick="window.deleteTripFromGoogleDrive('${safeFileIdJs}', '${safeFileNameJs}')" title="Delete file from Google Drive">🗑️</button>
           </div>
         `;
         grid.appendChild(card);
@@ -450,6 +460,7 @@
       const stayCount = trip.stayCount || 0;
       const updatedDate = trip.updatedAt ? new Date(trip.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
 
+        const safeTripIdJs = escapeHtml(escapeJs(trip.id));
       const card = document.createElement('div');
       card.className = `trip-gallery-card ${isCurrent ? 'active-card' : ''}`;
       card.innerHTML = `
@@ -475,16 +486,16 @@
         <div class="trip-card-actions">
           ${isCurrent
             ? `<button class="trip-btn trip-btn-active" disabled>Currently Open</button>`
-            : `<button class="trip-btn trip-btn-primary" onclick="window.switchActiveTrip('${trip.id}')">Switch to Trip</button>`
+              : `<button class="trip-btn trip-btn-primary" onclick="window.switchActiveTrip('${safeTripIdJs}')">Switch to Trip</button>`
           }
           ${typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected()
-            ? `<button class="trip-btn trip-btn-secondary text-blue-600 dark:text-blue-400" onclick="window.uploadTripByIdToDrive('${trip.id}')" title="Upload this trip to Google Drive">☁️ Sync</button>`
+              ? `<button class="trip-btn trip-btn-secondary text-blue-600 dark:text-blue-400" onclick="window.uploadTripByIdToDrive('${safeTripIdJs}')" title="Upload this trip to Google Drive">☁️ Sync</button>`
             : ''
           }
-          <button class="trip-btn trip-btn-secondary" onclick="window.duplicateTripFromLibrary('${trip.id}')" title="Duplicate trip">📋 Duplicate</button>
-          <button class="trip-btn trip-btn-secondary" onclick="window.exportTripFromLibrary('${trip.id}')" title="Export JSON backup">📥 Export</button>
+            <button class="trip-btn trip-btn-secondary" onclick="window.duplicateTripFromLibrary('${safeTripIdJs}')" title="Duplicate trip">📋 Duplicate</button>
+            <button class="trip-btn trip-btn-secondary" onclick="window.exportTripFromLibrary('${safeTripIdJs}')" title="Export JSON backup">📥 Export</button>
           ${trips.length > 1
-            ? `<button class="trip-btn trip-btn-danger" onclick="window.deleteTripFromLibrary('${trip.id}')" title="Delete trip">🗑️</button>`
+              ? `<button class="trip-btn trip-btn-danger" onclick="window.deleteTripFromLibrary('${safeTripIdJs}')" title="Delete trip">🗑️</button>`
             : ''
           }
         </div>
@@ -777,6 +788,19 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  function escapeJs(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/</g, '\\x3c')
+      .replace(/>/g, '\\x3e')
+      .replace(/&/g, '\\x26');
   }
 
   // Initialize Header Trip Switcher on DOM load

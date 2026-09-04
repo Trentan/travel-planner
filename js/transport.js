@@ -1886,8 +1886,8 @@ function saveJourneyFromModal() {
       seg.status = status; // Keep status in sync across all segments of the journey!
     });
 
-    // EDIT FIX: Remove the old segments for this journeyId before saving
-    journeys = journeys.filter(j => j.journeyId !== _pendingJourneyId);
+    // EDIT FIX: Remove old segments matching this journeyId or id before saving
+    journeys = journeys.filter(j => j.journeyId !== _pendingJourneyId && j.id !== _pendingJourneyId);
 
     journeys.push(...finalSegments);
     window.journeys = journeys;
