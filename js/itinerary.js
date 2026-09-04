@@ -3205,19 +3205,38 @@ function buildItinerary() {
 
           <div class="detail-block block-transport flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md">
             <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Transport</h4><div class="item-list space-y-2">
-            ${dayJourneys.map((journey) => {
+            ${(() => {
+              const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+                ? window.journeys
+                : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+              const journeysByJourneyId = new Map();
+              if (Array.isArray(journeysSource)) {
+                for (let i = 0; i < journeysSource.length; i++) {
+                  const seg = journeysSource[i];
+                  if (seg && seg.journeyId) {
+                    let list = journeysByJourneyId.get(seg.journeyId);
+                    if (!list) {
+                      list = [];
+                      journeysByJourneyId.set(seg.journeyId, list);
+                    }
+                    list.push(seg);
+                  }
+                }
+                journeysByJourneyId.forEach(list => {
+                  list.sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+                });
+              }
+
+              return dayJourneys.map((journey) => {
         const status = normalizeItemStatus(journey.status);
         const icon = getTransportIcon(journey.transportType);
         const showRef = status === 'booked' || status === 'confirmed';
+        const segs = journey.journeyId ? (journeysByJourneyId.get(journey.journeyId) || []) : [];
         // For multi-leg journeys, show the full route chain; otherwise show name or route
         let label = '';
         if (journey.isMultiLeg && journey.journeyId) {
-          // Find all segments and build chain
-          const allSegs = (window.journeys || [])
-              .filter(j => j.journeyId === journey.journeyId)
-              .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-          const stops = allSegs.length > 0
-              ? [allSegs[0].fromLocation, ...allSegs.map(s => s.toLocation)].join(' → ')
+          const stops = segs.length > 0
+              ? [segs[0].fromLocation, ...segs.map(s => s.toLocation)].join(' → ')
               : (journey.journeyName || journey.fromLocation + ' → ' + journey.toLocation);
           label = `${icon} ${journey.journeyName ? journey.journeyName + ' · ' : ''}${stops}`;
         } else {
@@ -3227,12 +3246,6 @@ function buildItinerary() {
         // Show departure time if available
         const timeHint = journey.departureTime ? ` <span style="color:#999;font-size:0.75rem;font-family:monospace;">${journey.departureTime}</span>` : '';
 
-        const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-          ? window.journeys
-          : [];
-        const segs = journey.journeyId ? journeysSource
-            .filter(seg => seg.journeyId === journey.journeyId)
-            .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1)) : [];
         const subLocations = formatJourneySubLocationText(segs.length > 0 ? segs : [journey]);
 
         return `<div class="cost-item journey-item flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200/50 dark:border-slate-600/50 text-sm hover:shadow-md transition-shadow group">
@@ -3250,7 +3263,8 @@ function buildItinerary() {
                   <span class="budget-field text-slate-600 dark:text-slate-400 font-mono text-sm mt-1">$<span class="outline-none" contenteditable="${isEditMode}" onblur="updateJourneyCost('${journey.id}', this.innerText)">${formatCurrency(journey.cost || '0', { includeSymbol: false })}</span></span>
                 </div>
               </div>`;
-      }).join('')}
+      }).join('');
+            })()}
             </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); openAddJourneyModal();">+ Add Journey</button>` : ''}
           </div>
 
