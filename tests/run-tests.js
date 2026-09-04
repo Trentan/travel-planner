@@ -7,9 +7,11 @@ const { run: runItineraryExploratoryUx } = require('./itinerary-exploratory-ux')
 const { run: runBrowserSuite } = require('./browser-suite');
 const { run: runSharePresetsVerify } = require('./share-presets-verify');
 const { run: runIosPwaNavVerify } = require('./ios-pwa-nav-verify');
+const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 
 async function run() {
   await runCoreSmoke();
+  await runAutoStaysSuite();
   await runCityNavRegression();
   await runItem15Suite();
   await runFileIoSuite();

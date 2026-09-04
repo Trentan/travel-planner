@@ -46,6 +46,19 @@ function loadDateHelpers() {
     'function initializeItineraryPositionForToday'
   );
 
+  const journeyDurationBlock = extractBetween(
+    transportJs,
+    '// Calculate total journey duration in hours',
+    '// Helper: Get compact code display for table cells'
+  );
+
+  const crudJs = loadSource(path.join('js', 'crud.js'));
+  const parseActivityDurationBlock = extractBetween(
+    crudJs,
+    'function parseActivityDurationMinutes(',
+    'function addMinutesToTimeValue('
+  );
+
   const journeyDateFormatBlock = extractBetween(
     transportJs,
     'function formatJourneyDate',
@@ -94,9 +107,11 @@ return { findItineraryPositionForDate };`
 
   const transportHelpers = new Function(
     'formatTripDateForDisplay',
-    `${journeyDateFormatBlock}
+    `${journeyDurationBlock}
+${journeyDateFormatBlock}
 ${journeyDisplayBlock}
 return {
+  calculateJourneyDuration,
   formatJourneyDate,
   getJourneyDisplayDate
 };`
@@ -117,6 +132,18 @@ return {
   bookingContext.window = bookingContext;
   runScriptInContext(bookingIntakeJs, bookingContext, 'js/booking-intake.js');
 
+  const utilsContext = createVmContext({
+    window: {},
+    document: { getElementById: () => null, querySelectorAll: () => [] }
+  });
+  utilsContext.window = utilsContext;
+  runScriptInContext(utilsJs, utilsContext, 'js/utils.js');
+
+  const parseActivityDurationMinutes = new Function(
+    `${parseActivityDurationBlock}
+return parseActivityDurationMinutes;`
+  )();
+
   return {
     dateHelpers,
     checklistHelpers,
@@ -124,7 +151,9 @@ return {
     itineraryPositionHelpers,
     transportHelpers,
     aiHarness,
-    bookingContext
+    bookingContext,
+    utilsContext,
+    parseActivityDurationMinutes
   };
 }
 
@@ -136,7 +165,9 @@ async function run() {
     itineraryPositionHelpers,
     transportHelpers,
     aiHarness,
-    bookingContext
+    bookingContext,
+    utilsContext,
+    parseActivityDurationMinutes
   } = loadDateHelpers();
   const { context, document, alerts, clipboardWrites, execCommands } = aiHarness;
 
@@ -247,6 +278,184 @@ async function run() {
   `);
   assert(bookingItems.some(item => item.kind === 'journey' && item.bookingReference === 'ABC123'), 'Booking intake should extract transport with booking ref');
   assert(bookingItems.some(item => item.kind === 'stay' && item.propertyName.includes('Vienna')), 'Booking intake should extract stay details');
+
+  // Tests for calculateJourneyDuration
+  const { calculateJourneyDuration } = transportHelpers;
+
+  // 1. Invalid or missing inputs return null
+  assert(calculateJourneyDuration(null) === null, 'calculateJourneyDuration should return null for null input');
+  assert(calculateJourneyDuration(undefined) === null, 'calculateJourneyDuration should return null for undefined input');
+  assert(calculateJourneyDuration([]) === null, 'calculateJourneyDuration should return null for empty array');
+  assert(calculateJourneyDuration([{}]) === null, 'calculateJourneyDuration should return null when segment has no dates');
+  assert(calculateJourneyDuration([{ departureDate: '2026-06-10' }]) === null, 'calculateJourneyDuration should return null when arrivalDate is missing');
+  assert(calculateJourneyDuration([{ arrivalDate: '2026-06-10' }]) === null, 'calculateJourneyDuration should return null when departureDate/dayDate is missing');
+
+  // 2. Fallback to dayDate when departureDate is omitted
+  assert(
+    calculateJourneyDuration([{ dayDate: '2026-06-10', departureTime: '08:00', arrivalDate: '2026-06-10', arrivalTime: '14:00' }]) === 6,
+    'calculateJourneyDuration should use dayDate if departureDate is omitted'
+  );
+
+  // 3. Single-leg journey with ISO dates (YYYY-MM-DD)
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-06-10', departureTime: '08:00', arrivalDate: '2026-06-10', arrivalTime: '14:30' }]) === 6,
+    'calculateJourneyDuration should calculate duration in hours and floor fractional hours'
+  );
+
+  // 4. Multi-leg journey spanning multiple dates and legs
+  const multiLegSegments = [
+    { departureDate: '2026-06-10', departureTime: '20:00', arrivalDate: '2026-06-11', arrivalTime: '06:00' },
+    { departureDate: '2026-06-11', departureTime: '09:00', arrivalDate: '2026-06-11', arrivalTime: '17:00' }
+  ];
+  assert(
+    calculateJourneyDuration(multiLegSegments) === 21,
+    'calculateJourneyDuration should calculate total duration from first segment departure to last segment arrival'
+  );
+
+  // 5. Legacy date formats (e.g., "10 Jun")
+  assert(
+    calculateJourneyDuration([{ departureDate: '10 Jun', departureTime: '09:00', arrivalDate: '10 Jun', arrivalTime: '15:00' }]) === 6,
+    'calculateJourneyDuration should support legacy date format strings'
+  );
+
+  // 6. Default time to 00:00 when departureTime/arrivalTime omitted
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-06-10', arrivalDate: '2026-06-12' }]) === 48,
+    'calculateJourneyDuration should default missing times to 00:00'
+  );
+
+  // 7. Overnight adjustment (diffMs < 0) when depTime > arrTime on same date string
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-06-10', departureTime: '22:00', arrivalDate: '2026-06-10', arrivalTime: '04:00' }]) === 6,
+    'calculateJourneyDuration should add 24 hours when arrival time is earlier than departure time on same date'
+  );
+
+  // 8. Invalid date strings resulting in NaN timestamp
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-99-99', arrivalDate: '2026-06-10' }]) === null,
+    'calculateJourneyDuration should return null for unparseable dates'
+  );
+
+  // parseCurrencyAmount edge cases
+  const parseCurrencyAmount = utilsContext.parseCurrencyAmount;
+  assert(parseCurrencyAmount(100) === 100, 'parseCurrencyAmount should handle positive integers');
+  assert(parseCurrencyAmount(123.45) === 123.45, 'parseCurrencyAmount should handle floats');
+  assert(parseCurrencyAmount(0) === 0, 'parseCurrencyAmount should handle zero');
+  assert(parseCurrencyAmount(-50.25) === -50.25, 'parseCurrencyAmount should handle negative numbers');
+
+  assert(parseCurrencyAmount('100') === 100, 'parseCurrencyAmount should parse numeric integer strings');
+  assert(parseCurrencyAmount('123.45') === 123.45, 'parseCurrencyAmount should parse numeric float strings');
+  assert(parseCurrencyAmount('-50.25') === -50.25, 'parseCurrencyAmount should parse negative numeric strings');
+  assert(parseCurrencyAmount('0.00') === 0, 'parseCurrencyAmount should parse zero formatted string');
+
+  assert(parseCurrencyAmount('$100') === 100, 'parseCurrencyAmount should strip $ currency symbol');
+  assert(parseCurrencyAmount('$1,234.56') === 1234.56, 'parseCurrencyAmount should handle commas and dollar signs');
+  assert(parseCurrencyAmount('€99.99') === 99.99, 'parseCurrencyAmount should strip Euro symbol');
+  assert(parseCurrencyAmount('£1,000,000.50') === 1000000.5, 'parseCurrencyAmount should handle multiple commas and Pound symbol');
+  assert(parseCurrencyAmount('  $ 250.75  ') === 250.75, 'parseCurrencyAmount should handle leading/trailing whitespace and spaces around currency symbol');
+  assert(parseCurrencyAmount('100 USD') === 100, 'parseCurrencyAmount should handle trailing currency code');
+  assert(parseCurrencyAmount('USD 100.50') === 100.5, 'parseCurrencyAmount should handle leading currency code');
+  assert(parseCurrencyAmount('.50') === 0.5, 'parseCurrencyAmount should parse leading decimal point');
+  assert(parseCurrencyAmount('-.75') === -0.75, 'parseCurrencyAmount should parse negative decimal point without leading zero');
+
+  assert(parseCurrencyAmount(null) === 0, 'parseCurrencyAmount should return 0 for null');
+  assert(parseCurrencyAmount(undefined) === 0, 'parseCurrencyAmount should return 0 for undefined');
+  assert(parseCurrencyAmount('') === 0, 'parseCurrencyAmount should return 0 for empty string');
+  assert(parseCurrencyAmount('   ') === 0, 'parseCurrencyAmount should return 0 for whitespace-only string');
+
+  assert(parseCurrencyAmount('abc') === 0, 'parseCurrencyAmount should return 0 for non-numeric text');
+  assert(parseCurrencyAmount('free') === 0, 'parseCurrencyAmount should return 0 for word "free"');
+  assert(parseCurrencyAmount('N/A') === 0, 'parseCurrencyAmount should return 0 for "N/A"');
+  assert(parseCurrencyAmount('$$$') === 0, 'parseCurrencyAmount should return 0 for currency symbol only string');
+
+  assert(parseCurrencyAmount(NaN) === 0, 'parseCurrencyAmount should return 0 for NaN');
+  assert(parseCurrencyAmount(Infinity) === 0, 'parseCurrencyAmount should return 0 for Infinity');
+  assert(parseCurrencyAmount(-Infinity) === 0, 'parseCurrencyAmount should return 0 for -Infinity');
+  assert(parseCurrencyAmount(true) === 0, 'parseCurrencyAmount should return 0 for boolean true');
+  assert(parseCurrencyAmount(false) === 0, 'parseCurrencyAmount should return 0 for boolean false');
+  assert(parseCurrencyAmount({}) === 0, 'parseCurrencyAmount should return 0 for object');
+  assert(parseCurrencyAmount([]) === 0, 'parseCurrencyAmount should return 0 for empty array');
+  assert(parseCurrencyAmount([100]) === 100, 'parseCurrencyAmount should parse single-element array containing a number');
+
+  assert(parseCurrencyAmount('--50') === 0, 'parseCurrencyAmount should return 0 for double negative sign');
+  assert(parseCurrencyAmount('12.34.56') === 12.34, 'parseCurrencyAmount should parse up to the second decimal point');
+
+  // Tests for parseBookingDate
+  const parseBookingDate = bookingContext.parseBookingDate;
+  assert(typeof parseBookingDate === 'function', 'parseBookingDate should be exported on context');
+
+  // Falsy & empty values
+  assert(parseBookingDate('') === '', 'parseBookingDate should return empty string for empty input');
+  assert(parseBookingDate(null) === '', 'parseBookingDate should return empty string for null input');
+  assert(parseBookingDate(undefined) === '', 'parseBookingDate should return empty string for undefined input');
+  assert(parseBookingDate('   ') === '', 'parseBookingDate should return empty string for whitespace input');
+
+  // ISO format YYYY-MM-DD
+  assert(parseBookingDate('2026-07-15') === '2026-07-15', 'parseBookingDate should pass through ISO YYYY-MM-DD strings');
+
+  // Day Month Year format ("7 June 2026", "15 Jul 2026", "01 January 2026")
+  assert(parseBookingDate('7 June 2026') === '2026-06-07', 'parseBookingDate should parse "7 June 2026"');
+  assert(parseBookingDate('15 Jul 2026') === '2026-07-15', 'parseBookingDate should parse "15 Jul 2026"');
+  assert(parseBookingDate('01 January 2026') === '2026-01-01', 'parseBookingDate should parse "01 January 2026"');
+  assert(parseBookingDate('12 Sept 2026') === '2026-09-12', 'parseBookingDate should parse "12 Sept 2026"');
+
+  // Day Month without Year (default to 2026)
+  assert(parseBookingDate('7 June') === '2026-06-07', 'parseBookingDate should parse "7 June" defaulting to year 2026');
+  assert(parseBookingDate('25 Dec') === '2026-12-25', 'parseBookingDate should parse "25 Dec" defaulting to year 2026');
+
+  // Month Day Year format ("June 7 2026", "Jul 15 2026", "January 01, 2026")
+  assert(parseBookingDate('June 7 2026') === '2026-06-07', 'parseBookingDate should parse "June 7 2026"');
+  assert(parseBookingDate('Jul 15, 2026') === '2026-07-15', 'parseBookingDate should handle commas e.g. "Jul 15, 2026"');
+  assert(parseBookingDate('October 31 2026') === '2026-10-31', 'parseBookingDate should parse "October 31 2026"');
+
+  // Month Day without Year (default to 2026)
+  assert(parseBookingDate('June 7') === '2026-06-07', 'parseBookingDate should parse "June 7" defaulting to year 2026');
+  assert(parseBookingDate('Feb 14') === '2026-02-14', 'parseBookingDate should parse "Feb 14" defaulting to year 2026');
+
+  // Case insensitivity
+  assert(parseBookingDate('7 JUNE 2026') === '2026-06-07', 'parseBookingDate should handle uppercase month names');
+  assert(parseBookingDate('january 15 2026') === '2026-01-15', 'parseBookingDate should handle lowercase month names');
+
+  // Fallback JS Date parsing or invalid inputs
+  assert(parseBookingDate('invalid date string xyz') === '', 'parseBookingDate should return empty string for completely unparseable input');
+
+  // parseActivityDurationMinutes tests
+  // Hours
+  assert(parseActivityDurationMinutes('1h') === 60, '1h should parse to 60 minutes');
+  assert(parseActivityDurationMinutes('2 hr') === 120, '2 hr should parse to 120 minutes');
+  assert(parseActivityDurationMinutes('3.5 hrs') === 210, '3.5 hrs should parse to 210 minutes');
+  assert(parseActivityDurationMinutes('1.5 hour') === 90, '1.5 hour should parse to 90 minutes');
+  assert(parseActivityDurationMinutes('2 hours') === 120, '2 hours should parse to 120 minutes');
+
+  // Minutes
+  assert(parseActivityDurationMinutes('30m') === 30, '30m should parse to 30 minutes');
+  assert(parseActivityDurationMinutes('45 min') === 45, '45 min should parse to 45 minutes');
+  assert(parseActivityDurationMinutes('15 mins') === 15, '15 mins should parse to 15 minutes');
+  assert(parseActivityDurationMinutes('90 minute') === 90, '90 minute should parse to 90 minutes');
+  assert(parseActivityDurationMinutes('120 minutes') === 120, '120 minutes should parse to 120 minutes');
+
+  // Combined
+  assert(parseActivityDurationMinutes('1h 30m') === 90, '1h 30m should parse to 90 minutes');
+  assert(parseActivityDurationMinutes('1 hr 15 mins') === 75, '1 hr 15 mins should parse to 75 minutes');
+  assert(parseActivityDurationMinutes('2 hours 45 minutes') === 165, '2 hours 45 minutes should parse to 165 minutes');
+  assert(parseActivityDurationMinutes('1.5h 30min') === 120, '1.5h 30min should parse to 120 minutes');
+
+  // Numeric fallback (interpreted as hours)
+  assert(parseActivityDurationMinutes('2') === 120, 'Numeric string "2" should parse as 2 hours (120 min)');
+  assert(parseActivityDurationMinutes('1.5') === 90, 'Numeric string "1.5" should parse as 1.5 hours (90 min)');
+  assert(parseActivityDurationMinutes('0.5') === 30, 'Numeric string "0.5" should parse as 0.5 hours (30 min)');
+  assert(parseActivityDurationMinutes(2) === 120, 'Number 2 should parse as 2 hours (120 min)');
+
+  // Invalid / Edge cases
+  assert(parseActivityDurationMinutes(null) === 0, 'null should parse to 0');
+  assert(parseActivityDurationMinutes(undefined) === 0, 'undefined should parse to 0');
+  assert(parseActivityDurationMinutes('') === 0, 'empty string should parse to 0');
+  assert(parseActivityDurationMinutes('   ') === 0, 'whitespace string should parse to 0');
+  assert(parseActivityDurationMinutes('invalid text') === 0, 'non-duration string should parse to 0');
+  assert(parseActivityDurationMinutes('0') === 0, '"0" should parse to 0');
+  assert(parseActivityDurationMinutes('0h') === 0, '"0h" should parse to 0');
+  assert(parseActivityDurationMinutes('0 mins') === 0, '"0 mins" should parse to 0');
+  assert(parseActivityDurationMinutes('-1') === 0, 'negative number string should parse to 0');
 
   console.log('Core smoke checks passed');
 }
