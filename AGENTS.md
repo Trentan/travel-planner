@@ -41,6 +41,14 @@ Before closing an issue or finalizing a milestone release:
    - For city import/navigation, transport, itinerary mapping, or map behavior: `node tests/city-nav-regression.js`
    - For general application changes: `npm test`
 
+## AI Audits & Suggested Issues (Google Jules & Subagents)
+
+When performing codebase audits, code health scans, architectural reviews, or recommending tasks **without implementing code directly**:
+1. **Never dump unformatted task lists solely in chat or PR descriptions.**
+2. **Create one markdown spec per recommendation** inside `.github/suggested-issues/<short-slug>.md` using [.github/suggested-issues/TEMPLATE.md](.github/suggested-issues/TEMPLATE.md).
+3. **Commit the markdown files and open a Pull Request.**
+4. The repository workflow (`.github/workflows/convert-jules-suggestions.yml`) will automatically parse and convert each `.md` file into an active GitHub issue with labels `jules-suggested, triage`, comment back on the PR with issue links, and close the PR.
+
 ## GitHub Issue Workflow
 
 ### Creating / Working Issues

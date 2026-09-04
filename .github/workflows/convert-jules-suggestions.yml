@@ -1,0 +1,48 @@
+name: Convert Jules Suggestions to Issues
+
+on:
+  pull_request:
+    types: [opened, labeled, closed]
+    paths:
+      - '.github/suggested-issues/**.md'
+  workflow_dispatch:
+
+jobs:
+  convert-issues:
+    # Trigger if:
+    # 1. Jules opened the PR (branch name contains jules)
+    # 2. Or PR was labeled 'convert-to-issues'
+    # 3. Or PR was merged
+    # 4. Or manually dispatched
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.merged == true ||
+      github.event.label.name == 'convert-to-issues' ||
+      (github.event.action == 'opened' && (contains(github.head_ref, 'jules') || contains(github.head_ref, 'Jules')))
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+
+    steps:
+      - name: Checkout PR Branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Convert Suggested Issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if [ -n "$PR_NUMBER" ]; then
+            node scripts/convert-suggested-issues.js --pr "$PR_NUMBER" --close-pr
+          else
+            node scripts/convert-suggested-issues.js
+          fi
