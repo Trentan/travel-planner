@@ -3056,7 +3056,7 @@
   }
 
   body.compact-view-mode .mobile-swipe-carousel {
-    @apply flex gap-1.75 overflow-x-auto;
+    @apply flex items-start gap-1.75 overflow-x-auto;
     padding-bottom: 0.04rem;
     scroll-padding-inline: 0.1rem;
     scroll-snap-type: x mandatory;
