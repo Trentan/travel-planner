@@ -46,6 +46,12 @@ function loadDateHelpers() {
     'function initializeItineraryPositionForToday'
   );
 
+  const journeyDurationBlock = extractBetween(
+    transportJs,
+    '// Calculate total journey duration in hours',
+    '// Helper: Get compact code display for table cells'
+  );
+
   const journeyDateFormatBlock = extractBetween(
     transportJs,
     'function formatJourneyDate',
@@ -94,9 +100,11 @@ return { findItineraryPositionForDate };`
 
   const transportHelpers = new Function(
     'formatTripDateForDisplay',
-    `${journeyDateFormatBlock}
+    `${journeyDurationBlock}
+${journeyDateFormatBlock}
 ${journeyDisplayBlock}
 return {
+  calculateJourneyDuration,
   formatJourneyDate,
   getJourneyDisplayDate
 };`
@@ -154,6 +162,63 @@ async function run() {
 
   assert(transportHelpers.formatJourneyDate('2026-06-07') === '7 Jun', 'Transport date formatter should use the shared trip date formatter');
   assert(transportHelpers.getJourneyDisplayDate('7 Jun') === '7 Jun', 'Journey display dates should preserve display-form dates');
+
+  // Tests for calculateJourneyDuration
+  const { calculateJourneyDuration } = transportHelpers;
+
+  // 1. Invalid or missing inputs return null
+  assert(calculateJourneyDuration(null) === null, 'calculateJourneyDuration should return null for null input');
+  assert(calculateJourneyDuration(undefined) === null, 'calculateJourneyDuration should return null for undefined input');
+  assert(calculateJourneyDuration([]) === null, 'calculateJourneyDuration should return null for empty array');
+  assert(calculateJourneyDuration([{}]) === null, 'calculateJourneyDuration should return null when segment has no dates');
+  assert(calculateJourneyDuration([{ departureDate: '2026-06-10' }]) === null, 'calculateJourneyDuration should return null when arrivalDate is missing');
+  assert(calculateJourneyDuration([{ arrivalDate: '2026-06-10' }]) === null, 'calculateJourneyDuration should return null when departureDate/dayDate is missing');
+
+  // 2. Fallback to dayDate when departureDate is omitted
+  assert(
+    calculateJourneyDuration([{ dayDate: '2026-06-10', departureTime: '08:00', arrivalDate: '2026-06-10', arrivalTime: '14:00' }]) === 6,
+    'calculateJourneyDuration should use dayDate if departureDate is omitted'
+  );
+
+  // 3. Single-leg journey with ISO dates (YYYY-MM-DD)
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-06-10', departureTime: '08:00', arrivalDate: '2026-06-10', arrivalTime: '14:30' }]) === 6,
+    'calculateJourneyDuration should calculate duration in hours and floor fractional hours'
+  );
+
+  // 4. Multi-leg journey spanning multiple dates and legs
+  const multiLegSegments = [
+    { departureDate: '2026-06-10', departureTime: '20:00', arrivalDate: '2026-06-11', arrivalTime: '06:00' },
+    { departureDate: '2026-06-11', departureTime: '09:00', arrivalDate: '2026-06-11', arrivalTime: '17:00' }
+  ];
+  assert(
+    calculateJourneyDuration(multiLegSegments) === 21,
+    'calculateJourneyDuration should calculate total duration from first segment departure to last segment arrival'
+  );
+
+  // 5. Legacy date formats (e.g., "10 Jun")
+  assert(
+    calculateJourneyDuration([{ departureDate: '10 Jun', departureTime: '09:00', arrivalDate: '10 Jun', arrivalTime: '15:00' }]) === 6,
+    'calculateJourneyDuration should support legacy date format strings'
+  );
+
+  // 6. Default time to 00:00 when departureTime/arrivalTime omitted
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-06-10', arrivalDate: '2026-06-12' }]) === 48,
+    'calculateJourneyDuration should default missing times to 00:00'
+  );
+
+  // 7. Overnight adjustment (diffMs < 0) when depTime > arrTime on same date string
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-06-10', departureTime: '22:00', arrivalDate: '2026-06-10', arrivalTime: '04:00' }]) === 6,
+    'calculateJourneyDuration should add 24 hours when arrival time is earlier than departure time on same date'
+  );
+
+  // 8. Invalid date strings resulting in NaN timestamp
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-99-99', arrivalDate: '2026-06-10' }]) === null,
+    'calculateJourneyDuration should return null for unparseable dates'
+  );
 
   const mergedChecklist = checklistHelpers.mergeChecklistWithDefaults([
     { text: 'Empty fridge and pantry perishables', done: true },
