@@ -190,12 +190,12 @@
       elem.className = `trip-dropdown-item group flex items-center justify-between py-2 px-2.5 rounded-lg my-0.5 ${isCurrent ? 'active bg-teal-50/90 dark:bg-teal-950/50 font-semibold border-l-2 border-teal-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800/60'}`;
 
       const clickHandler = isCloudOnly
-        ? `window.closeTripDropdown(); window.loadTripFromGoogleDrive('${item.cloudFileId}');`
-        : `window.closeTripDropdown(); ${!isCurrent ? `window.switchActiveTrip('${item.id}')` : ''}`;
+        ? `window.closeTripDropdown(); window.loadTripFromGoogleDrive('${escapeHtml(item.cloudFileId)}');`
+        : `window.closeTripDropdown(); ${!isCurrent ? `window.switchActiveTrip('${escapeHtml(item.id)}')` : ''}`;
 
       elem.innerHTML = `
         <div class="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer" onclick="${clickHandler}">
-          <span class="trip-item-icon shrink-0 text-sm">${isCurrent ? '✓' : item.flags}</span>
+          <span class="trip-item-icon shrink-0 text-sm">${isCurrent ? '✓' : escapeHtml(item.flags)}</span>
           <div class="trip-item-info min-w-0 flex-1">
             <div class="trip-item-title truncate text-xs flex items-center gap-1.5">
               <span class="truncate ${isCurrent ? 'font-bold text-teal-900 dark:text-teal-200' : ''}">${escapeHtml(item.title)}</span>
@@ -206,18 +206,18 @@
         </div>
         <div class="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
           ${!isCloudOnly ? `
-            <button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs" onclick="window.renameTripFromDropdown(event, '${item.id}', '${escapeHtml(item.title)}')" title="Rename trip">✏️</button>
+            <button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs" onclick="window.renameTripFromDropdown(event, '${escapeHtml(item.id)}', '${escapeHtml(item.title)}')" title="Rename trip">✏️</button>
           ` : `
-            <button class="p-1 hover:bg-blue-200 dark:hover:bg-blue-900 rounded text-xs" onclick="window.renameCloudFileFromDropdown(event, '${item.cloudFileId}', '${escapeHtml(item.filename)}')" title="Rename cloud file">✏️</button>
+            <button class="p-1 hover:bg-blue-200 dark:hover:bg-blue-900 rounded text-xs" onclick="window.renameCloudFileFromDropdown(event, '${escapeHtml(item.cloudFileId)}', '${escapeHtml(item.filename)}')" title="Rename cloud file">✏️</button>
           `}
           ${item.cloudFileId ? `
-            <a href="https://drive.google.com/file/d/${item.cloudFileId}/view" target="_blank" rel="noopener noreferrer" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs text-slate-500" title="View physical file in Google Drive" onclick="event.stopPropagation();">↗</a>
+            <a href="https://drive.google.com/file/d/${escapeHtml(item.cloudFileId)}/view" target="_blank" rel="noopener noreferrer" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs text-slate-500" title="View physical file in Google Drive" onclick="event.stopPropagation();">↗</a>
           ` : ''}
           ${!isCloudOnly && trips.length > 1 ? `
-            <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromDropdown(event, '${item.id}', '${escapeHtml(item.title)}')" title="Delete trip">🗑️</button>
+            <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromDropdown(event, '${escapeHtml(item.id)}', '${escapeHtml(item.title)}')" title="Delete trip">🗑️</button>
           ` : ''}
           ${isCloudOnly ? `
-            <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromGoogleDrive('${item.cloudFileId}', '${escapeHtml(item.filename)}')" title="Delete cloud file">🗑️</button>
+            <button class="p-1 hover:bg-red-100 dark:hover:bg-red-950/60 rounded text-xs text-red-600" onclick="window.deleteTripFromGoogleDrive('${escapeHtml(item.cloudFileId)}', '${escapeHtml(item.filename)}')" title="Delete cloud file">🗑️</button>
           ` : ''}
         </div>
       `;
@@ -399,20 +399,20 @@
           <div>
             <div class="flex items-center justify-between gap-2 mb-1.5">
               <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/70">☁️ Google Drive File</span>
-              ${isActiveFile ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">● Active</span>` : `<span class="text-[11px] text-slate-400">🕒 ${modTime}</span>`}
+              ${isActiveFile ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">● Active</span>` : `<span class="text-[11px] text-slate-400">🕒 ${escapeHtml(modTime)}</span>`}
             </div>
             <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm truncate flex items-center gap-1.5">
               <span>📄</span>
               <span class="truncate">${escapeHtml(file.name)}</span>
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Size: ${sizeKb} • Modified: ${modTime}</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Size: ${escapeHtml(sizeKb)} • Modified: ${escapeHtml(modTime)}</p>
           </div>
           <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
-            <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-xs flex-1" onclick="window.loadTripFromGoogleDrive('${file.id}')">
+            <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-xs flex-1" onclick="window.loadTripFromGoogleDrive('${escapeHtml(file.id)}')">
               ${isActiveFile ? '✓ Currently Open' : '📥 Load & Open'}
             </button>
-            <a href="https://drive.google.com/file/d/${file.id}/view" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs" title="Open file in Google Drive">↗ Drive</a>
-            <button class="action-btn action-btn-danger text-xs px-2.5" onclick="window.deleteTripFromGoogleDrive('${file.id}', '${escapeHtml(file.name)}')" title="Delete file from Google Drive">🗑️</button>
+            <a href="https://drive.google.com/file/d/${escapeHtml(file.id)}/view" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs" title="Open file in Google Drive">↗ Drive</a>
+            <button class="action-btn action-btn-danger text-xs px-2.5" onclick="window.deleteTripFromGoogleDrive('${escapeHtml(file.id)}', '${escapeHtml(file.name)}')" title="Delete file from Google Drive">🗑️</button>
           </div>
         `;
         grid.appendChild(card);
@@ -460,31 +460,31 @@
               ? '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">☁️ Drive Synced</span>'
               : '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">⚡ Local Only</span>'
             }
-            <span class="updated-badge text-[10px]">Updated ${updatedDate}</span>
+            <span class="updated-badge text-[10px]">Updated ${escapeHtml(updatedDate)}</span>
           </div>
-          <h3 class="trip-card-title">${flags} ${escapeHtml(title)}</h3>
+          <h3 class="trip-card-title">${escapeHtml(flags)} ${escapeHtml(title)}</h3>
           ${subtitle ? `<p class="trip-card-subtitle">${escapeHtml(subtitle)}</p>` : ''}
         </div>
         <div class="trip-card-body">
           <div class="trip-card-stats">
             <span class="stat-pill">📅 ${escapeHtml(dates)}</span>
-            <span class="stat-pill">📍 ${legCount} legs</span>
-            <span class="stat-pill">🏨 ${stayCount} stays</span>
+            <span class="stat-pill">📍 ${escapeHtml(legCount)} legs</span>
+            <span class="stat-pill">🏨 ${escapeHtml(stayCount)} stays</span>
           </div>
         </div>
         <div class="trip-card-actions">
           ${isCurrent
             ? `<button class="trip-btn trip-btn-active" disabled>Currently Open</button>`
-            : `<button class="trip-btn trip-btn-primary" onclick="window.switchActiveTrip('${trip.id}')">Switch to Trip</button>`
+            : `<button class="trip-btn trip-btn-primary" onclick="window.switchActiveTrip('${escapeHtml(trip.id)}')">Switch to Trip</button>`
           }
           ${typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected()
-            ? `<button class="trip-btn trip-btn-secondary text-blue-600 dark:text-blue-400" onclick="window.uploadTripByIdToDrive('${trip.id}')" title="Upload this trip to Google Drive">☁️ Sync</button>`
+            ? `<button class="trip-btn trip-btn-secondary text-blue-600 dark:text-blue-400" onclick="window.uploadTripByIdToDrive('${escapeHtml(trip.id)}')" title="Upload this trip to Google Drive">☁️ Sync</button>`
             : ''
           }
-          <button class="trip-btn trip-btn-secondary" onclick="window.duplicateTripFromLibrary('${trip.id}')" title="Duplicate trip">📋 Duplicate</button>
-          <button class="trip-btn trip-btn-secondary" onclick="window.exportTripFromLibrary('${trip.id}')" title="Export JSON backup">📥 Export</button>
+          <button class="trip-btn trip-btn-secondary" onclick="window.duplicateTripFromLibrary('${escapeHtml(trip.id)}')" title="Duplicate trip">📋 Duplicate</button>
+          <button class="trip-btn trip-btn-secondary" onclick="window.exportTripFromLibrary('${escapeHtml(trip.id)}')" title="Export JSON backup">📥 Export</button>
           ${trips.length > 1
-            ? `<button class="trip-btn trip-btn-danger" onclick="window.deleteTripFromLibrary('${trip.id}')" title="Delete trip">🗑️</button>`
+            ? `<button class="trip-btn trip-btn-danger" onclick="window.deleteTripFromLibrary('${escapeHtml(trip.id)}')" title="Delete trip">🗑️</button>`
             : ''
           }
         </div>
