@@ -1808,16 +1808,18 @@ async function fetchAllMissingCityLocations() {
     btn.textContent = `Finding 0/${missingCities.length}...`;
   }
 
+  const localCoordsCityNames = new Set(
+    ALL_CITIES
+      .filter(c => c.lat !== undefined && c.lng !== undefined)
+      .map(c => c.name.toLowerCase())
+  );
+
   let foundCount = 0;
   for (let i = 0; i < missingCities.length; i++) {
     const city = missingCities[i];
     if (btn) btn.textContent = `Finding ${i + 1}/${missingCities.length}...`;
 
-    const hadLocalCoords = !!ALL_CITIES.find(c =>
-      c.name.toLowerCase() === city.name.toLowerCase() &&
-      c.lat !== undefined &&
-      c.lng !== undefined
-    );
+    const hadLocalCoords = localCoordsCityNames.has(city.name.toLowerCase());
     const result = await resolveCityLocation(city);
     if (result && applyCityLocation(city, result)) foundCount++;
 
