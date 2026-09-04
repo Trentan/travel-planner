@@ -1,5 +1,48 @@
 apply plugin: 'com.android.application'
 
+def resolveVersionCode = { ->
+    if (project.hasProperty('versionCode')) {
+        return project.property('versionCode').toString().toInteger()
+    }
+    def envCode = System.getenv('ANDROID_VERSION_CODE') ?: System.getenv('VERSION_CODE')
+    if (envCode) {
+        return envCode.toString().toInteger()
+    }
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-list', '--count', 'HEAD'
+            standardOutput = stdout
+        }
+        def count = stdout.toString().trim().toInteger()
+        if (count > 36) {
+            return count
+        }
+    } catch (Exception ignored) {}
+    return 37
+}
+
+def resolveVersionName = { ->
+    if (project.hasProperty('versionName')) {
+        return project.property('versionName').toString()
+    }
+    def envName = System.getenv('ANDROID_VERSION_NAME') ?: System.getenv('VERSION_NAME')
+    if (envName) {
+        return envName.toString()
+    }
+    try {
+        def pkgFile = project.rootProject.file('../package.json')
+        if (pkgFile.exists()) {
+            def slurper = new groovy.json.JsonSlurper()
+            def pkg = slurper.parse(pkgFile)
+            if (pkg.version) {
+                return pkg.version.toString()
+            }
+        }
+    } catch (Exception ignored) {}
+    return "1.1.0"
+}
+
 android {
     namespace = "com.trenscends.travelplanner"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +50,8 @@ android {
         applicationId = "com.trenscends.travelplanner"
         minSdkVersion = rootProject.ext.minSdkVersion
         targetSdkVersion = rootProject.ext.targetSdkVersion
-        versionCode = 36
-        versionName = "1.0.0"
+        versionCode = resolveVersionCode()
+        versionName = resolveVersionName()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -22,16 +65,31 @@ android {
             def propertiesFile = project.rootProject.file('local.properties')
             if (propertiesFile.exists()) {
                 properties.load(propertiesFile.newDataInputStream())
-                storeFile file(properties.getProperty('RELEASE_STORE_FILE'))
-                storePassword properties.getProperty('RELEASE_STORE_PASSWORD')
-                keyAlias properties.getProperty('RELEASE_KEY_ALIAS')
-                keyPassword properties.getProperty('RELEASE_KEY_PASSWORD')
+            }
+
+            def envOrProp = { String key ->
+                return System.getenv(key) ?: properties.getProperty(key) ?: (project.hasProperty(key) ? project.property(key).toString() : null)
+            }
+
+            def releaseStoreFile = envOrProp('RELEASE_STORE_FILE')
+            def releaseStorePassword = envOrProp('RELEASE_STORE_PASSWORD')
+            def releaseKeyAlias = envOrProp('RELEASE_KEY_ALIAS')
+            def releaseKeyPassword = envOrProp('RELEASE_KEY_PASSWORD')
+
+            if (releaseStoreFile) {
+                def keystoreFile = file(releaseStoreFile)
+                if (keystoreFile.exists()) {
+                    storeFile keystoreFile
+                    storePassword releaseStorePassword
+                    keyAlias releaseKeyAlias
+                    keyPassword releaseKeyPassword
+                }
             }
         }
     }
     buildTypes {
         release {
-            signingConfig = signingConfigs.release
+            signingConfig = (signingConfigs.release.storeFile != null) ? signingConfigs.release : signingConfigs.debug
             minifyEnabled = true
             shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

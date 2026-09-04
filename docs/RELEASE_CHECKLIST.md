@@ -1,9 +1,10 @@
 # Google Play Release Checklist
 
 ## 1. App Configuration & Assets
-- [ ] App Version (`versionName` and `versionCode`) updated in build settings.
-- [ ] Application ID matches the intended package name.
+- [ ] App Version (`versionName` and `versionCode`): verified via `npm run version:info` (automated in CI).
+- [ ] Application ID matches the intended package name (`com.trenscends.travelplanner`).
 - [ ] App Icon and Splash Screen display correctly on modern Android versions.
+- [ ] Automated Release Pipeline: `.github/workflows/release-android.yml` builds `.aab` and `.apk` on every `main` merge (see `docs/ANDROID_RELEASES.md`).
 
 ## 2. Security & Compliance
 - [ ] Release build signed with production keystore.
