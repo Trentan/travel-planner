@@ -542,9 +542,10 @@
     const cleanName = rawTitle.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
     return `${cleanName || 'Trip'}.json`;
   }
+  window.formatHumanFilename = formatHumanFilename;
 
   // Upload or Update a Trip JSON file inside Google Drive / TrenscendsTravelPlanner
-  window.uploadTripToGoogleDrive = async function(tripRecord, isSilent = false) {
+  async function uploadTripToGoogleDrive(tripRecord, isSilent = false) {
     if (!isGoogleDriveConnected() || !tripRecord || !tripRecord.id) return false;
     await ensureValidAccessToken();
 
