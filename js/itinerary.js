@@ -1681,6 +1681,22 @@ function buildCompactItineraryLegacy() {
   const container = document.getElementById('itinerary');
   container.innerHTML = '';
 
+  const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+  const journeysByJourneyId = new Map();
+  journeysSource.forEach(seg => {
+    if (seg && seg.journeyId) {
+      if (!journeysByJourneyId.has(seg.journeyId)) {
+        journeysByJourneyId.set(seg.journeyId, []);
+      }
+      journeysByJourneyId.get(seg.journeyId).push(seg);
+    }
+  });
+  journeysByJourneyId.forEach(list => {
+    list.sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+  });
+
   appData.forEach((leg, legIndex) => {
     const section = document.createElement('div');
     section.className = 'leg';
@@ -1732,9 +1748,7 @@ function buildCompactItineraryLegacy() {
       const transportLines = dayJourneys.map(j => {
         const icon = getTransportIcon(j.transportType);
         const journeyLabel = stripCompactLeadingEmoji(j.provider || j.journeyName || j.notes || `${j.fromLocation}→${j.toLocation}`);
-        const segs = (window.journeys || [])
-          .filter(seg => seg.journeyId === j.journeyId)
-          .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+        const segs = (j.journeyId && journeysByJourneyId.get(j.journeyId)) || [];
         const duration = formatCompactJourneyDuration(segs);
         const details = formatJourneySubLocationText(segs.length > 0 ? segs : [j]);
         return renderCompactEmojiLine({ emoji: icon, text: [journeyLabel, details].filter(Boolean).join(' | '), duration });
@@ -1786,9 +1800,7 @@ function buildCompactItineraryLegacy() {
           const status = normalizeItemStatus(j.status);
           const icon = getTransportIcon(j.transportType);
           const journeyLabel = stripCompactLeadingEmoji(j.notes || `${j.fromLocation}→${j.toLocation}`);
-          const segs = (window.journeys || [])
-              .filter(seg => seg.journeyId === j.journeyId)
-              .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+          const segs = (j.journeyId && journeysByJourneyId.get(j.journeyId)) || [];
           const duration = j.isMultiLeg && typeof calculateJourneyDuration === 'function' && segs.length > 0
               ? `${calculateJourneyDuration(segs)}h`
               : '';
