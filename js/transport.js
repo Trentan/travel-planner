@@ -844,13 +844,37 @@ function renderTransportScheduleMobile(firstDep, lastArr, lastArrTime, durationT
 }
 
 function renderTransportCarrierMobile(provider, routeCode, bookingReference, statusText, statusIcon, statusColor, costValue, journeyId, isEditable) {
-  const providerLine = provider ? `<span class="transport-carrier-provider">${provider}</span>` : '';
-  const codeLine = routeCode ? `<span class="transport-carrier-code">${routeCode}</span>` : '';
-  const refAndCost = [bookingReference ? `<span class="transport-carrier-pnr">${bookingReference}</span>` : '', costValue !== '' ? `<span class="transport-carrier-cost">${formatCurrency(costValue)}</span>` : '']
+  const opts = (typeof provider === 'object' && provider !== null) ? provider : {
+    provider,
+    routeCode,
+    bookingReference,
+    statusText,
+    statusIcon,
+    statusColor,
+    costValue,
+    journeyId,
+    isEditable
+  };
+
+  const {
+    provider: p = '',
+    routeCode: rc = '',
+    bookingReference: ref = '',
+    statusText: st = '',
+    statusIcon: si = '',
+    statusColor: sc = '',
+    costValue: cost = '',
+    journeyId: jId = '',
+    isEditable: editable = false
+  } = opts;
+
+  const providerLine = p ? `<span class="transport-carrier-provider">${p}</span>` : '';
+  const codeLine = rc ? `<span class="transport-carrier-code">${rc}</span>` : '';
+  const refAndCost = [ref ? `<span class="transport-carrier-pnr">${ref}</span>` : '', cost !== '' && cost !== undefined ? `<span class="transport-carrier-cost">${formatCurrency(cost)}</span>` : '']
       .filter(Boolean)
       .join('');
-  const statusNode = renderStatusBadge(statusText, {
-    onClick: isEditable ? `toggleJourneyStatus('${journeyId}')` : '',
+  const statusNode = renderStatusBadge(st, {
+    onClick: editable ? `toggleJourneyStatus('${jId}')` : '',
     title: 'Change status',
     className: 'transport-mobile-status-btn'
   });
