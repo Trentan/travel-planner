@@ -8,8 +8,7 @@
 (function() {
   'use strict';
 
-  const PROD_CLIENT_ID = '253620621116-u76e3v3e2qv6ffq9b58re4l4bbqs1e3g.apps.googleusercontent.com';
-  const LOCAL_CLIENT_ID = '253620621116-cq4mtef5e2nvt0kc7pbcs4t1rdblg7q5.apps.googleusercontent.com';
+  const DEFAULT_CLIENT_ID = '253620621116-u76e3v3e2qv6ffq9b58re4l4bbqs1e3g.apps.googleusercontent.com';
   const DRIVE_FOLDER_NAME = 'TrenscendsTravelPlanner';
   const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 
@@ -85,20 +84,11 @@
     }
   }
 
-  // Helper to get active Client ID (auto-detects local vs production Client IDs)
+  // Helper to get active Client ID (returns custom override or default Client ID)
   function getGoogleClientId() {
     const custom = localStorage.getItem('travelApp_gdrive_client_id');
     if (custom) return custom;
-
-    if (isNativePlatform()) {
-      return PROD_CLIENT_ID;
-    }
-
-    const host = window.location.hostname;
-    if (host === 'localhost' || host === '127.0.0.1') {
-      return LOCAL_CLIENT_ID;
-    }
-    return PROD_CLIENT_ID;
+    return DEFAULT_CLIENT_ID;
   }
   window.getGoogleClientId = getGoogleClientId;
 
@@ -246,11 +236,11 @@
     if (isNative) {
       if (nativeAuthPlugin && typeof nativeAuthPlugin.signIn === 'function') {
         try {
-          console.log('[GoogleAuth Native] Initializing & launching native Android Google Account picker with client:', PROD_CLIENT_ID);
+          console.log('[GoogleAuth Native] Initializing & launching native Android Google Account picker with client:', clientId);
           if (typeof nativeAuthPlugin.initialize === 'function') {
             try {
               await nativeAuthPlugin.initialize({
-                clientId: PROD_CLIENT_ID,
+                clientId: clientId,
                 scopes: ['profile', 'email', 'https://www.googleapis.com/auth/drive.file'],
                 grantOfflineAccess: false
               });
