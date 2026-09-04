@@ -99,7 +99,6 @@ async function prepareAppPage(browser, baseUrl, spec) {
   await page.waitForFunction(() => typeof window.importJSON === 'function' && typeof window.getCurrentAppData === 'function');
   await importFixture(page);
   if (spec.compact) {
-    await page.evaluate(() => window.toggleCompactView(true));
     await page.waitForFunction(() => document.body.classList.contains('compact-view-mode'));
   }
   if (spec.tab) {

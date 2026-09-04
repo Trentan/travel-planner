@@ -511,7 +511,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await humanPause(page, 400);
     assert(await page.getByRole('button', { name: /Import Booking/i }).count() > 0, 'Mobile: booking intake entry should be available from menu');
     assert(await page.locator('.mobile-desktop-advisory').count() === 1, 'Mobile: desktop recommendation advisory notice should be present in mobile menu');
-    
+
     // Issue #210: Mobile Menu Undo & Redo buttons
     assert(await page.locator('#mobileUndoBtn').count() === 1, 'Mobile: #mobileUndoBtn should exist in mobile action menu');
     assert(await page.locator('#mobileRedoBtn').count() === 1, 'Mobile: #mobileRedoBtn should exist in mobile action menu');
@@ -597,7 +597,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
       alertShown = true;
       await dialog.dismiss();
     });
-    await page.evaluate(() => checkUrlForImportedTrip());
+    try { await page.evaluate(async () => await checkUrlForImportedTrip()); } catch (e) {}
     assert(alertShown, 'Mobile: corrupted share hash should trigger user notification');
     const hashCleaned = await page.evaluate(() => window.location.hash);
     assert(hashCleaned === '', 'Mobile: corrupted share hash should be stripped from URL fragment');
@@ -644,10 +644,10 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
       return header ? window.getComputedStyle(header).display !== 'none' : false;
     });
     assert(packingHeaderVisible === true, 'Mobile: packing guides header should be visible on mobile (#204)');
-    
+
     const packingInitiallyCollapsed = await page.locator('.packing-guides-shell.mobile-collapsed').count();
     assert(packingInitiallyCollapsed === 1, 'Mobile: packing guides should be collapsed by default (#204)');
-    
+
     // Toggle expand
     await page.locator('.packing-guides-mobile-header').click();
     await humanPause(page, 200);

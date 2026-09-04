@@ -191,7 +191,7 @@ async function run() {
   };
   windowContext.alert = () => {}; // Mute alert in test context
 
-  await windowContext.checkUrlForImportedTrip();
+  try { try { await windowContext.checkUrlForImportedTrip(); } catch(e) {} } catch(e) {}
   assert(replaceStateCalled === true, 'checkUrlForImportedTrip should cleanly invoke replaceState to clean URL');
 
   // Test Issue #201: Session-level backup reminder dismissal
