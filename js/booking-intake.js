@@ -580,4 +580,5 @@ if (typeof window !== 'undefined') {
   window.previewBookingIntake = previewBookingIntake;
   window.mergeBookingIntakePreview = mergeBookingIntakePreview;
   window.parseBookingConfirmationText = parseBookingConfirmationText;
+  window.parseBookingDate = parseBookingDate;
 }

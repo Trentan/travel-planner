@@ -130,9 +130,11 @@ async function run() {
   // Load necessary sources
   const dataJs = loadSource(path.join('js', 'data.js'));
   const guideJs = loadSource(path.join('js', 'guide.js'));
+  const cloudStorageJs = loadSource(path.join('js', 'cloud-storage.js'));
 
   runScriptInContext(dataJs, context, 'js/data.js');
   runScriptInContext(guideJs, context, 'js/guide.js');
+  runScriptInContext(cloudStorageJs, context, 'js/cloud-storage.js');
 
   // Test 1: File Connection Status and Active File Handle
   context.clearActiveFileHandle();
@@ -303,7 +305,64 @@ async function run() {
   // Restore global Clock helper
   Date.now = originalNow;
 
-  console.log('File I/O Robustness, onboarding choice priority, and background checksum resync checks passed');
+  // Test 6: formatHumanFilename unit tests
+  console.log('Testing formatHumanFilename title sanitization and fallback logic...');
+  const formatFn = context.window.formatHumanFilename;
+  assert(typeof formatFn === 'function', 'formatHumanFilename should be exposed on window');
+
+  // Case 1: Direct tripRecord.title
+  assert(
+    formatFn({ title: 'Europe Summer 2026' }) === 'Europe_Summer_2026.json',
+    'Should sanitize tripRecord.title'
+  );
+
+  // Case 2: Fallback to tripRecord.data.title
+  assert(
+    formatFn({ data: { title: 'Japan Trip' } }) === 'Japan_Trip.json',
+    'Should fallback to tripRecord.data.title'
+  );
+
+  // Case 3: Fallback to tripRecord.data.meta.title
+  assert(
+    formatFn({ data: { meta: { title: 'Backpacking Italy' } } }) === 'Backpacking_Italy.json',
+    'Should fallback to tripRecord.data.meta.title'
+  );
+
+  // Case 4: Default fallback when title is missing or empty
+  assert(
+    formatFn({}) === 'My_Trip.json',
+    'Should fallback to My_Trip.json for empty object'
+  );
+  assert(
+    formatFn({ title: '' }) === 'My_Trip.json',
+    'Should fallback to My_Trip.json for empty title string'
+  );
+
+  // Case 5: Special characters removal
+  assert(
+    formatFn({ title: 'Summer Vacay @ Paris (2026)!' }) === 'Summer_Vacay_Paris_2026.json',
+    'Should remove special characters except spaces, hyphens, and underscores'
+  );
+
+  // Case 6: Whitespace collapse and trimming
+  assert(
+    formatFn({ title: '  Tokyo   &   Kyoto  ' }) === 'Tokyo_Kyoto.json',
+    'Should collapse multiple spaces into single underscores and trim leading/trailing space'
+  );
+
+  // Case 7: Preservation of hyphens and underscores
+  assert(
+    formatFn({ title: 'My-Awesome_Trip 2026' }) === 'My-Awesome_Trip_2026.json',
+    'Should preserve hyphens and underscores'
+  );
+
+  // Case 8: Title with only invalid special characters
+  assert(
+    formatFn({ title: '!!!' }) === 'Trip.json',
+    'Should fallback to Trip.json when sanitization strips all characters'
+  );
+
+  console.log('File I/O Robustness, onboarding choice priority, background checksum resync, and formatHumanFilename checks passed');
 }
 
 if (require.main === module) {
