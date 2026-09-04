@@ -205,6 +205,9 @@ function importJourneys(journeysData) {
 }
 
 function saveJourneys() {
+  if (typeof window !== 'undefined' && typeof window.invalidateJourneyLegCache === 'function') {
+    window.invalidateJourneyLegCache();
+  }
   localStorage.setItem('travelApp_journeys_v1', JSON.stringify(journeys));
   window.journeys = journeys;
 }

@@ -3394,6 +3394,9 @@ function displayTimestampStatus() {
 }
 
 async function runSaveData(showTick = true) {
+    if (typeof window !== 'undefined' && typeof window.invalidateJourneyLegCache === 'function') {
+      window.invalidateJourneyLegCache();
+    }
     const t = document.getElementById('mainTitle');
     const s = document.getElementById('mainSubtitle');
     if (t && t.innerText.trim()) titleData.title = t.innerText.trim();
