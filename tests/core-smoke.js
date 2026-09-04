@@ -457,6 +457,63 @@ async function run() {
   assert(parseActivityDurationMinutes('0 mins') === 0, '"0 mins" should parse to 0');
   assert(parseActivityDurationMinutes('-1') === 0, 'negative number string should parse to 0');
 
+  // Test journey updating and removing old segments for journeyId
+  const transportJs = loadSource(path.join('js', 'transport.js'));
+  const { createDocument } = require('./lib/test-helpers');
+  const documentMock = createDocument();
+  documentMock.body = { classList: { contains: () => false } };
+  documentMock.getElementById('journeyFromCity').value = 'Zurich';
+  documentMock.getElementById('journeyToCity').value = 'Bangkok';
+  documentMock.getElementById('journeyStatus').value = 'booked';
+
+  const transportContext = createVmContext({
+    window: {},
+    document: documentMock,
+    localStorage: {
+      getItem: () => null,
+      setItem: () => {}
+    },
+    journeys: [
+      { id: 'seg1', journeyId: 'jid_123', fromLocation: 'Zurich', toLocation: 'London', segmentOrder: 1 },
+      { id: 'seg2', journeyId: 'jid_123', fromLocation: 'London', toLocation: 'Bangkok', segmentOrder: 2 },
+      { id: 'other_seg', journeyId: 'jid_456', fromLocation: 'Paris', toLocation: 'Rome', segmentOrder: 1 }
+    ],
+    citiesData: [
+      { id: 'zurich', name: 'Zurich', code: 'ZRH' },
+      { id: 'bangkok', name: 'Bangkok', code: 'BKK' }
+    ],
+    persistJourneys: () => {},
+    closeJourneyModal: () => {},
+    buildTransportTab: () => {},
+    normalizeItemStatus: s => s,
+    formatCurrency: v => '$' + v,
+    parseCost: v => parseFloat(v) || 0,
+    escapeHtmlText: s => s || '',
+    renderStatusBadge: () => '',
+    getStatusMeta: s => ({ color: '#000', label: s }),
+    isEditMode: true,
+    alert: msg => { throw new Error(msg); }
+  });
+  transportContext.window = transportContext;
+  runScriptInContext(transportJs, transportContext, 'js/transport.js');
+
+  // Simulate editing multi-leg journey jid_123 and removing leg 2
+  transportContext.editJourney('jid_123');
+  documentMock.getElementById('journeyFromCity').value = 'Zurich';
+  documentMock.getElementById('journeyToCity').value = 'Bangkok';
+  documentMock.getElementById('journeyStatus').value = 'booked';
+  // Remove 2nd leg in pending segments
+  transportContext.removePendingSegment(1);
+
+  // Execute save
+  transportContext.saveJourneyFromModal();
+
+  // Assert old segments with jid_123 were removed and replaced with the updated single segment
+  const updatedJid123Segs = transportContext.journeys.filter(j => j.journeyId === 'jid_123');
+  assert(updatedJid123Segs.length === 1, 'Updating journey should replace old segments with new segments');
+  assert(updatedJid123Segs[0].fromLocation === 'Zurich' && updatedJid123Segs[0].toLocation === 'Bangkok', 'Updated segment should have new route');
+  assert(transportContext.journeys.some(j => j.journeyId === 'jid_456'), 'Unrelated journeys should be preserved');
+
   console.log('Core smoke checks passed');
 }
 

@@ -151,6 +151,36 @@ async function runMultiTripLibrarySuite() {
       throw new Error(`Expected fallback title "Winter paris trip", got "${titleAfterRootImport}"`);
     }
 
+    console.log('10. Testing XSS security fix in rendering trip metadata in Trip Library gallery and dropdown...');
+    const xssDetected = await page.evaluate(async () => {
+      window.__xssTriggered = false;
+      const maliciousTrip = {
+        id: 'trip_xss_<img src=x onerror=window.__xssTriggered=true>',
+        title: 'XSS Test Trip <script>window.__xssTriggered=true</script>',
+        subtitle: 'Sub <img src=x onerror=window.__xssTriggered=true>',
+        flags: '<img src=x onerror=window.__xssTriggered=true>',
+        dateRange: '2026-01-01 <script>window.__xssTriggered=true</script>',
+        legCount: '1<img src=x onerror=window.__xssTriggered=true>',
+        stayCount: '2<img src=x onerror=window.__xssTriggered=true>',
+        updatedAt: '2026-01-01T00:00:00.000Z"<script>window.__xssTriggered=true</script>',
+        data: { meta: { title: 'XSS Test' } }
+      };
+
+      if (typeof window.saveTripToIndexedDB === 'function') {
+        await window.saveTripToIndexedDB(maliciousTrip);
+      }
+
+      await window.renderHeaderTripSwitcher();
+      await window.renderTripGalleryGrid();
+
+      return window.__xssTriggered;
+    });
+
+    if (xssDetected) {
+      throw new Error('XSS payload was executed when rendering trip metadata in Trip Library!');
+    }
+    console.log('XSS test passed: no script payload executed during rendering.');
+
     console.log('✅ ALL MULTI-TRIP LIBRARY INTEGRATION TESTS PASSED CLEANLY!');
   } catch (err) {
     console.error('❌ MULTI-TRIP LIBRARY SUITE FAILED:', err);
