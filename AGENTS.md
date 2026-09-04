@@ -7,6 +7,7 @@ GitHub Issues and Milestones are the active source of truth.
 - **Issue / Feature Branches**: Use prefix `issue/<number>-<description>` or `feature/<description>` (e.g. `issue/188-onboarding-wizard`, `feature/onboarding-wizard`).
 - **Milestone Branches**: Use prefix `milestone<number>` or `milestone/<description>` (e.g. `milestone2`).
 - Never create `WI-XXX` files or local tracker rows.
+- Place all proposed issue suggestions in `.github/suggested-issues/*.md` before maintainers/antigravity convert them to GitHub issues and assign them.
 
 ## Session Start
 
