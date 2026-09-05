@@ -960,6 +960,7 @@ function syncItineraryMobileHeightContainment(root = document) {
   if (!isMobile) {
     root.querySelectorAll('.compact-day-carousel, .compact-city-swipe-pager [data-role="mobile-swipe-carousel"]').forEach(el => {
       el.style.height = '';
+      el.style.minHeight = '';
     });
     return;
   }
@@ -971,10 +972,12 @@ function syncItineraryMobileHeightContainment(root = document) {
     if (!carousel) return;
     const activeSlide = pager.querySelector('.compact-day-slide.is-active') || pager.querySelector('.compact-day-slide');
     if (activeSlide) {
-      const surface = activeSlide.querySelector('.compact-day-surface') || activeSlide;
-      const height = surface.offsetHeight || activeSlide.scrollHeight;
-      if (height > 0) {
-        carousel.style.height = `${height}px`;
+      const surface = activeSlide.querySelector('.compact-day-surface');
+      const surfaceHeight = surface ? Math.max(surface.offsetHeight, surface.scrollHeight) : 0;
+      const slideHeight = Math.max(activeSlide.offsetHeight, activeSlide.scrollHeight);
+      const computedHeight = Math.max(slideHeight, surfaceHeight + 16);
+      if (computedHeight > 0) {
+        carousel.style.height = `${computedHeight}px`;
       }
     }
   });
@@ -991,16 +994,19 @@ function syncItineraryMobileHeightContainment(root = document) {
     const activeCitySlide = slides[activeIndex] || cityPager.querySelector('.compact-city-slide.is-active') || slides[0];
     if (activeCitySlide) {
       const card = activeCitySlide.querySelector('.compact-leg-card') || activeCitySlide;
-      const height = card.offsetHeight || activeCitySlide.scrollHeight;
+      const height = Math.max(card.offsetHeight, card.scrollHeight, activeCitySlide.offsetHeight, activeCitySlide.scrollHeight);
       if (height > 0) {
-        cityCarousel.style.height = `${height}px`;
+        cityCarousel.style.height = `${height + 8}px`;
       }
     }
   };
 
   syncOuter();
   if (typeof requestAnimationFrame === 'function') {
-    requestAnimationFrame(syncOuter);
+    requestAnimationFrame(() => {
+      syncOuter();
+      setTimeout(syncOuter, 50);
+    });
   }
 }
 window.syncItineraryMobileHeightContainment = syncItineraryMobileHeightContainment;
@@ -1168,6 +1174,29 @@ function setupCompactItineraryPagers(root = document) {
       });
     });
 
+    const syncFromScroll = () => {
+      if (suppressObserver) return;
+      if (scrollFrame) cancelAnimationFrame(scrollFrame);
+      scrollFrame = requestAnimationFrame(() => {
+        const center = carousel.scrollLeft + carousel.clientWidth / 2;
+        let bestIndex = 0;
+        let bestDistance = Number.POSITIVE_INFINITY;
+
+        slides.forEach((slide, idx) => {
+          const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+          const distance = Math.abs(slideCenter - center);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestIndex = idx;
+          }
+        });
+
+        setActive(bestIndex);
+      });
+    };
+
+    carousel.addEventListener('scroll', syncFromScroll, { passive: true });
+
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver(entries => {
         if (suppressObserver) return;
@@ -1183,33 +1212,11 @@ function setupCompactItineraryPagers(root = document) {
         }
       }, {
         root: carousel,
-        threshold: [0.55, 0.7, 0.85]
+        threshold: [0.15, 0.35, 0.6]
       });
 
       slides.forEach(slide => observer.observe(slide));
       pager.__compactObserver = observer;
-    } else {
-      const syncFromScroll = () => {
-        if (scrollFrame) cancelAnimationFrame(scrollFrame);
-        scrollFrame = requestAnimationFrame(() => {
-          const center = carousel.scrollLeft + carousel.clientWidth / 2;
-          let bestIndex = 0;
-          let bestDistance = Number.POSITIVE_INFINITY;
-
-          slides.forEach((slide, idx) => {
-            const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-            const distance = Math.abs(slideCenter - center);
-            if (distance < bestDistance) {
-              bestDistance = distance;
-              bestIndex = idx;
-            }
-          });
-
-          setActive(bestIndex);
-        });
-      };
-
-      carousel.addEventListener('scroll', syncFromScroll, { passive: true });
     }
 
     setActive(initialIndex);
@@ -1333,18 +1340,24 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
   const nextIndex = Math.max(0, Number(dayIndex) || 0);
   if (typeof pager.__compactScrollToIndex === 'function') {
     pager.__compactScrollToIndex(nextIndex);
-    return false;
+  } else {
+    syncCompactDayPagerState(pager, nextIndex);
+    const carousel = pager.querySelector('.compact-day-carousel');
+    const slide = pager.querySelector(`.compact-day-slide[data-day-index="${nextIndex}"]`);
+    if (carousel && slide) {
+      carousel.scrollTo({
+        left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
+        behavior: 'smooth'
+      });
+    }
   }
 
-  syncCompactDayPagerState(pager, nextIndex);
-
-  const carousel = pager.querySelector('.compact-day-carousel');
-  const slide = pager.querySelector(`.compact-day-slide[data-day-index="${nextIndex}"]`);
-  if (carousel && slide) {
-    carousel.scrollTo({
-      left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
-      behavior: 'smooth'
-    });
+  if (typeof window !== 'undefined') {
+    const pagerRect = pager.getBoundingClientRect();
+    if (pagerRect.top < 60) {
+      const targetTop = window.scrollY + pagerRect.top - 60;
+      window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    }
   }
   return false;
 }
@@ -3828,14 +3841,35 @@ function setupCompactCityNavSync(root = document) {
     }
   };
 
+  pager.__syncCityByIndex = syncByIndex;
+
   syncByIndex(Number(pager.dataset.activeIndex || 0));
+
+  let syncScrollFrame = 0;
+  carousel.addEventListener('scroll', () => {
+    if (syncScrollFrame) cancelAnimationFrame(syncScrollFrame);
+    syncScrollFrame = requestAnimationFrame(() => {
+      const center = carousel.scrollLeft + carousel.clientWidth / 2;
+      let bestIndex = 0;
+      let bestDist = Number.POSITIVE_INFINITY;
+      slides.forEach((slide, idx) => {
+        const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+        const dist = Math.abs(slideCenter - center);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestIndex = idx;
+        }
+      });
+      syncByIndex(bestIndex);
+    });
+  }, { passive: true });
 
   const observer = new IntersectionObserver(entries => {
     const visible = entries.filter(e => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
     if (!visible) return;
     const idx = Number(visible.target.dataset.slideIndex || 0);
     if (!Number.isNaN(idx)) syncByIndex(idx);
-  }, { root: carousel, threshold: [0.55, 0.7, 0.85] });
+  }, { root: carousel, threshold: [0.15, 0.35, 0.6] });
 
   slides.forEach(slide => observer.observe(slide));
   pager.__cityNavSyncObserver = observer;
@@ -3845,24 +3879,61 @@ function scrollToCompactCitySlide(cityId, cityName) {
   const slideIndex = findCompactCitySlideIndex(cityId, cityName);
   if (slideIndex < 0) return false;
 
-  const slide = document.querySelector(`.compact-city-swipe-pager .compact-city-slide[data-slide-index="${slideIndex}"]`);
+  const pager = document.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]');
+  if (!pager) return false;
+
+  const carousel = pager.querySelector('[data-role="mobile-swipe-carousel"]');
+  const slides = Array.from(pager.querySelectorAll('.compact-city-slide[data-slide-index]'));
+  const slide = slides[slideIndex] || document.querySelector(`.compact-city-swipe-pager .compact-city-slide[data-slide-index="${slideIndex}"]`);
   if (!slide) return false;
 
-  const pager = slide.closest('.mobile-swipe-pager');
-  if (pager) {
-    const carousel = pager.querySelector('[data-role="mobile-swipe-carousel"]');
-    if (typeof scrollChildIntoHorizontalView === 'function') {
-      scrollChildIntoHorizontalView(carousel, slide, { behavior: 'smooth', align: 'start' });
-    } else if (carousel) {
-      carousel.scrollTo({
-        left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
-        behavior: 'smooth'
-      });
+  if (typeof pager.__syncCityByIndex === 'function') {
+    pager.__syncCityByIndex(slideIndex);
+  } else {
+    slides.forEach((s, idx) => {
+      s.classList.toggle('is-active', idx === slideIndex);
+    });
+    const slideLegId = String(slide.dataset.legId || '').trim();
+    const targetLeg = Array.isArray(appData) ? appData.find(l => String(l.id || '') === slideLegId) : null;
+    if (targetLeg) {
+      syncCityNavHighlightToLeg(targetLeg);
+      const stickyHeader = document.getElementById('compactActiveCityHeader');
+      const slideHeader = slide.querySelector('.compact-leg-header');
+      if (stickyHeader && slideHeader) {
+        stickyHeader.style.background = slideHeader.style.background || targetLeg.colour || '#0ea5e9';
+        stickyHeader.innerHTML = slideHeader.innerHTML;
+      }
     }
-    pager.dataset.activeIndex = String(slideIndex);
-    if (typeof setMobilePagerActiveIndex === 'function') {
-      setMobilePagerActiveIndex(pager.dataset.pagerKey || 'compact-city-swipe', slideIndex);
-    }
+  }
+
+  if (typeof scrollChildIntoHorizontalView === 'function') {
+    scrollChildIntoHorizontalView(carousel, slide, { behavior: 'smooth', align: 'start' });
+  } else if (carousel) {
+    carousel.scrollTo({
+      left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
+      behavior: 'smooth'
+    });
+  }
+
+  pager.dataset.activeIndex = String(slideIndex);
+  if (typeof setMobilePagerActiveIndex === 'function') {
+    setMobilePagerActiveIndex(pager.dataset.pagerKey || 'compact-city-swipe', slideIndex);
+  }
+
+  const chips = Array.from(pager.querySelectorAll('.mobile-swipe-chip'));
+  chips.forEach((chip, idx) => {
+    const active = idx === slideIndex;
+    chip.classList.toggle('active', active);
+    chip.setAttribute('aria-selected', active ? 'true' : 'false');
+    chip.setAttribute('aria-current', active ? 'true' : 'false');
+  });
+
+  if (typeof syncItineraryMobileHeightContainment === 'function') {
+    syncItineraryMobileHeightContainment(pager.closest('#tab-itinerary') || document);
+  }
+
+  if (typeof window !== 'undefined' && window.scrollY > 0) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return true;

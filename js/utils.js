@@ -366,6 +366,32 @@ function setupMobileSwipePagers(root = document) {
       });
     });
 
+    pager.__mobileSwipeScrollToIndex = scrollToIndex;
+    pager.__mobileSwipeSetActive = setActive;
+
+    const syncFromScroll = () => {
+      if (suppressObserver) return;
+      if (scrollFrame) cancelAnimationFrame(scrollFrame);
+      scrollFrame = requestAnimationFrame(() => {
+        const center = carousel.scrollLeft + carousel.clientWidth / 2;
+        let bestIndex = 0;
+        let bestDistance = Number.POSITIVE_INFINITY;
+
+        slides.forEach((slide, idx) => {
+          const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+          const distance = Math.abs(slideCenter - center);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestIndex = idx;
+          }
+        });
+
+        setActive(bestIndex);
+      });
+    };
+
+    carousel.addEventListener('scroll', syncFromScroll, { passive: true });
+
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver(entries => {
         if (suppressObserver) return;
@@ -377,33 +403,11 @@ function setupMobileSwipePagers(root = document) {
         if (!Number.isNaN(nextIndex)) setActive(nextIndex);
       }, {
         root: carousel,
-        threshold: [0.55, 0.7, 0.85]
+        threshold: [0.15, 0.35, 0.6]
       });
 
       slides.forEach(slide => observer.observe(slide));
       pager.__mobileSwipeObserver = observer;
-    } else {
-      const syncFromScroll = () => {
-        if (scrollFrame) cancelAnimationFrame(scrollFrame);
-        scrollFrame = requestAnimationFrame(() => {
-          const center = carousel.scrollLeft + carousel.clientWidth / 2;
-          let bestIndex = 0;
-          let bestDistance = Number.POSITIVE_INFINITY;
-
-          slides.forEach((slide, idx) => {
-            const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-            const distance = Math.abs(slideCenter - center);
-            if (distance < bestDistance) {
-              bestDistance = distance;
-              bestIndex = idx;
-            }
-          });
-
-          setActive(bestIndex);
-        });
-      };
-
-      carousel.addEventListener('scroll', syncFromScroll, { passive: true });
     }
 
     setActive(initialIndex);
