@@ -3952,24 +3952,81 @@ function sameTimelineDay(dayDate, targetDate) {
   return Math.floor(dayScore / 1440) === Math.floor(targetScore / 1440);
 }
 
+const _journeysIndexWeakMap = new WeakMap();
+
 function findLegForJourneyCity(cityId, cityName) {
-  if (!Array.isArray(journeys)) return null;
+  const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : null);
+  if (!Array.isArray(journeysSource)) return null;
 
-  const matchingJourneys = journeys
-      .filter(j =>
-          j.fromCityId === cityId ||
-          j.toCityId === cityId ||
-          (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
-      )
-      .sort((a, b) => {
-        const aScore = getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime, Number.MAX_SAFE_INTEGER);
-        const bScore = getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime, Number.MAX_SAFE_INTEGER);
-        return aScore - bScore;
-      });
+  const appDataSource = (typeof window !== 'undefined' && Array.isArray(window.appData))
+    ? window.appData
+    : (typeof appData !== 'undefined' && Array.isArray(appData) ? appData : []);
 
-  for (const journey of matchingJourneys) {
+  let cityIndex = _journeysIndexWeakMap.get(journeysSource);
+  if (!cityIndex) {
+    const byCityId = new Map();
+    const byCityName = new Map();
+    for (let i = 0; i < journeysSource.length; i++) {
+      const j = journeysSource[i];
+      if (!j) continue;
+      if (j.fromCityId != null && j.fromCityId !== '') {
+        let list = byCityId.get(j.fromCityId);
+        if (!list) { list = []; byCityId.set(j.fromCityId, list); }
+        list.push(j);
+      }
+      if (j.toCityId != null && j.toCityId !== '' && j.toCityId !== j.fromCityId) {
+        let list = byCityId.get(j.toCityId);
+        if (!list) { list = []; byCityId.set(j.toCityId, list); }
+        list.push(j);
+      }
+      if (j.fromLocation != null && j.fromLocation !== '') {
+        let list = byCityName.get(j.fromLocation);
+        if (!list) { list = []; byCityName.set(j.fromLocation, list); }
+        list.push(j);
+      }
+      if (j.toLocation != null && j.toLocation !== '' && j.toLocation !== j.fromLocation) {
+        let list = byCityName.get(j.toLocation);
+        if (!list) { list = []; byCityName.set(j.toLocation, list); }
+        list.push(j);
+      }
+    }
+    cityIndex = { byCityId, byCityName };
+    _journeysIndexWeakMap.set(journeysSource, cityIndex);
+  }
+
+  const { byCityId, byCityName } = cityIndex;
+  const matching = [];
+  const seen = new Set();
+
+  if (cityId != null && cityId !== '' && byCityId.has(cityId)) {
+    const list = byCityId.get(cityId);
+    for (let i = 0; i < list.length; i++) {
+      const j = list[i];
+      if (!seen.has(j)) { seen.add(j); matching.push(j); }
+    }
+  }
+  if (cityName != null && cityName !== '' && byCityName.has(cityName)) {
+    const list = byCityName.get(cityName);
+    for (let i = 0; i < list.length; i++) {
+      const j = list[i];
+      if (!seen.has(j)) { seen.add(j); matching.push(j); }
+    }
+  }
+
+  if (matching.length === 0) return null;
+
+  matching.sort((a, b) => {
+    const aScore = getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime, Number.MAX_SAFE_INTEGER);
+    const bScore = getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime, Number.MAX_SAFE_INTEGER);
+    return aScore - bScore;
+  });
+
+  for (let i = 0; i < matching.length; i++) {
+    const journey = matching[i];
     if (journey.legId) {
-      const directLeg = appData.find(leg => leg.id === journey.legId);
+      const directLeg = appDataSource.find(leg => leg.id === journey.legId);
       if (directLeg) return directLeg;
     }
 
@@ -3977,7 +4034,7 @@ function findLegForJourneyCity(cityId, cityName) {
         ? (journey.arrivalDate || journey.dayDate || journey.departureDate)
         : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
-    const dateMatchedLeg = appData.find(leg =>
+    const dateMatchedLeg = appDataSource.find(leg =>
         (leg.days || []).some(day => sameTimelineDay(day.date, targetDate))
     );
     if (dateMatchedLeg) return dateMatchedLeg;
