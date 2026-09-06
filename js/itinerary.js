@@ -114,16 +114,46 @@ function focusCompactInlineEditable(selector) {
   } catch (_) {}
 }
 
-function getJourneyDisplayCost(journey) {
+function getJourneysGroupedByJourneyId(source) {
+  const journeysSource = source || ((typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []));
+  const byJourneyId = new Map();
+  if (Array.isArray(journeysSource)) {
+    for (let i = 0; i < journeysSource.length; i++) {
+      const seg = journeysSource[i];
+      if (seg) {
+        const gid = seg.journeyId || seg.id;
+        if (gid) {
+          let list = byJourneyId.get(gid);
+          if (!list) {
+            list = [];
+            byJourneyId.set(gid, list);
+          }
+          list.push(seg);
+        }
+      }
+    }
+    byJourneyId.forEach(list => {
+      list.sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+    });
+  }
+  return byJourneyId;
+}
+
+function getJourneyDisplayCost(journey, journeysByJourneyId) {
   if (!journey) return '';
   const ownCost = parseFloat(journey.cost || '0');
   if (ownCost > 0) return journey.cost;
 
-  if (journey.journeyId) {
-    const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-      ? window.journeys
-      : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-    const matching = journeysSource.filter(seg => seg.journeyId === journey.journeyId);
+  const gid = journey.journeyId || journey.id;
+  if (gid) {
+    const matching = (journeysByJourneyId && journeysByJourneyId.has(gid))
+      ? journeysByJourneyId.get(gid)
+      : ((typeof window !== 'undefined' && Array.isArray(window.journeys))
+          ? window.journeys
+          : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []))
+          .filter(seg => (seg.journeyId || seg.id) === gid);
     for (const seg of matching) {
       const segCost = parseFloat(seg.cost || '0');
       if (segCost > 0) {
@@ -589,7 +619,8 @@ function renderJourneySubLocationTextHtml(text) {
   `;
 }
 
-function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
+function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysByJourneyIdMap) {
+  const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
   const useGroupedView = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped';
   const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
   const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
@@ -644,23 +675,13 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     if (!loc || !c) return false;
     return loc === c || loc.includes(c) || c.includes(loc);
   };
-  const endpointSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-    ? window.journeys
-    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-  const endpointCandidates = endpointSource.filter(j => !leg.id || j.legId === leg.id);
-  const byJourneyId = new Map();
-  endpointCandidates.forEach(seg => {
-    const gid = seg.journeyId || seg.id;
-    if (!byJourneyId.has(gid)) byJourneyId.set(gid, []);
-    byJourneyId.get(gid).push(seg);
-  });
   const dayIso = normalizeDate(day.date);
   const inboundJourneys = [];
   const outboundJourneys = [];
-  byJourneyId.forEach(segments => {
-    const ordered = [...segments].sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-    const first = ordered[0];
-    const last = ordered[ordered.length - 1];
+  journeysByJourneyId.forEach(segments => {
+    const first = segments[0];
+    const last = segments[segments.length - 1];
+    if (leg.id && first?.legId && first.legId !== leg.id) return;
     const depDate = normalizeDate(first?.departureDate || first?.dayDate || '');
     const arrDate = normalizeDate(last?.arrivalDate || last?.departureDate || last?.dayDate || '');
     const depCity = String(first?.fromLocation || '').trim();
@@ -683,13 +704,9 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   const slideId = getCompactDaySlideId(leg.id, dayIdx);
 
   const transportLines = dayJourneys.flatMap(journey => {
-    const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-      ? window.journeys
-      : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-    const segs = journey.journeyId
-      ? journeysSource
-          .filter(seg => (seg.journeyId || seg.id) === (journey.journeyId || journey.id))
-          .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1))
+    const gid = journey.journeyId || journey.id;
+    const segs = (gid && journeysByJourneyId.has(gid))
+      ? journeysByJourneyId.get(gid)
       : [journey];
     const dayIso = normalizeDate(day.date);
     const lines = [];
@@ -713,7 +730,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
         emoji: getTransportIcon(seg.transportType || journey.transportType),
         text: label,
         duration: depTime || arrTime ? `${depTime || ''}${arrTime ? `-${arrTime}` : ''}` : '',
-        cost: getJourneyDisplayCost(journey) ? formatCurrency(getJourneyDisplayCost(journey)) : ''
+        cost: getJourneyDisplayCost(journey, journeysByJourneyId) ? formatCurrency(getJourneyDisplayCost(journey, journeysByJourneyId)) : ''
       });
       const subLocsHtml = details ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(details)}</div>` : '';
       const notesHtml = (seg.notes || journey.notes) ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(seg.notes || journey.notes)}</div>` : '';
@@ -804,7 +821,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     `;
   }).join('');
 
-  const timelineBlock = renderCompactBlock('', renderDailyTimeline(leg, legIndex, day, dayIdx, { compact: true }), true);
+  const timelineBlock = renderCompactBlock('', renderDailyTimeline(leg, legIndex, day, dayIdx, { compact: true, journeysByJourneyId }), true);
   const groupedBlock = renderCompactBlock('Grouped Plan', `
         <div class="compact-grouped-plan">
           <section><h5>Transport</h5>${transportLines || '<div class="compact-day-empty">No transport scheduled.</div>'}</section>
@@ -855,7 +872,8 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
   `;
 }
 
-function renderCompactDayPager(leg, legIndex) {
+function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
+  const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
   const days = Array.isArray(leg.days) ? leg.days : [];
   const totalDays = days.length;
   const pagerKey = `compact-day-${leg.id}`;
@@ -939,7 +957,7 @@ function renderCompactDayPager(leg, legIndex) {
     `;
   }).join('');
 
-  const slides = days.map((day, dayIdx) => renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays)).join('');
+  const slides = days.map((day, dayIdx) => renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysByJourneyId)).join('');
 
   return `
       <div class="compact-day-pager" data-leg-id="${escapeCompactText(leg.id)}" data-total-days="${totalDays}" data-pager-key="${escapeCompactText(pagerKey)}" data-active-index="${initialIndex}">
@@ -1362,7 +1380,8 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
   return false;
 }
 
-function renderCompactLegCard(leg, legIndex) {
+function renderCompactLegCard(leg, legIndex, journeysByJourneyIdMap) {
+  const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
   const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
   const nightLabel = getLegNightSummary(leg).label;
   const legCost = getLegTotalCost(leg);
@@ -1396,7 +1415,7 @@ function renderCompactLegCard(leg, legIndex) {
           ${renderCompactFoodQuestCard(leg, legIndex)}
         </div>
         ${renderCompactActivitiesCard(leg, legIndex)}
-        ${renderCompactDayPager(leg, legIndex)}
+        ${renderCompactDayPager(leg, legIndex, journeysByJourneyId)}
       </div>
     </article>
   `;
@@ -1420,7 +1439,8 @@ function getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount) 
   return getLegHeaderLabelWithFlag(legLabel || routeLabel || `Leg ${legIndex + 1}`);
 }
 
-function renderCompactCitySlide(entry, legIndex) {
+function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap) {
+  const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
   const leg = entry.leg;
   const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
   const nightLabel = getLegNightSummary(leg).label;
@@ -1443,7 +1463,7 @@ function renderCompactCitySlide(entry, legIndex) {
       </div>
       <div class="compact-leg-body">
         ${renderCompactMobileLegInfoCluster(leg, legIndex)}
-        ${renderCompactDayPager(leg, legIndex)}
+        ${renderCompactDayPager(leg, legIndex, journeysByJourneyId)}
       </div>
     </article>
   `;
@@ -1455,7 +1475,8 @@ function renderCompactCitySlide(entry, legIndex) {
   `;
 }
 
-function renderCompactCityChip(entry, legIndex) {
+function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap) {
+  const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
   const leg = entry.leg;
   const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
   const nightLabel = getLegNightSummary(leg).label;
@@ -1468,7 +1489,7 @@ function renderCompactCityChip(entry, legIndex) {
       ? `${escapeHtmlText(firstDay.date)} &rarr; ${escapeHtmlText(lastDay.date)}`
       : escapeHtmlText(firstDay ? firstDay.date : 'Trip');
 
-  const flightTimeLabel = getLegFlightButtonTimeLabel(leg);
+  const flightTimeLabel = getLegFlightButtonTimeLabel(leg, journeysByJourneyId);
 
   return `
     <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
@@ -1509,10 +1530,11 @@ function buildCompactItinerary() {
 
   container.innerHTML = '';
 
+  const journeysByJourneyId = getJourneysGroupedByJourneyId();
   const mobileLegSequence = getCompactMobileLegSequence();
 
-  const slidesHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCitySlide(entry, legIndex));
-  const railHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCityChip(entry, legIndex));
+  const slidesHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCitySlide(entry, legIndex, journeysByJourneyId));
+  const railHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCityChip(entry, legIndex, journeysByJourneyId));
 
   const firstEntry = mobileLegSequence[0];
   const activeStickyHeaderHtml = firstEntry ? renderCompactActiveCityHeader(firstEntry.leg) : '';
@@ -1537,13 +1559,9 @@ function buildCompactItinerary() {
   }
 }
 
-function getLegFlightButtonTimeLabel(leg) {
+function getLegFlightButtonTimeLabel(leg, journeysByJourneyIdMap) {
   if (!leg) return '';
-  const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-    ? window.journeys
-    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-  const legJourneys = journeysSource.filter(j => !leg.id || j.legId === leg.id);
-  if (legJourneys.length === 0) return '';
+  const byJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
 
   const isFlight = entry => {
     const type = String(entry?.transportType || '').toLowerCase();
@@ -1558,23 +1576,19 @@ function getLegFlightButtonTimeLabel(leg) {
     return /(flight|air|airline|airport|terminal|depart|arrive|eva|qantas|jetstar|emirates|lufthansa|scoot|thai airways)/.test(blob);
   };
 
-  const flightEntries = legJourneys.filter(isFlight);
-  if (flightEntries.length === 0) return '';
-
-  const byJourneyId = new Map();
-  flightEntries.forEach(seg => {
-    const gid = seg.journeyId || seg.id;
-    if (!byJourneyId.has(gid)) byJourneyId.set(gid, []);
-    byJourneyId.get(gid).push(seg);
-  });
-
   const firstSegments = [];
   const lastSegments = [];
   byJourneyId.forEach(segments => {
-    const ordered = [...segments].sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-    firstSegments.push(ordered[0]);
-    lastSegments.push(ordered[ordered.length - 1]);
+    if (segments.length > 0) {
+      const first = segments[0];
+      if ((!leg.id || first.legId === leg.id) && isFlight(first)) {
+        firstSegments.push(first);
+        lastSegments.push(segments[segments.length - 1]);
+      }
+    }
   });
+
+  if (firstSegments.length === 0) return '';
 
   const firstFlight = firstSegments.sort((a, b) => getTimelineScore(a.departureDate || a.dayDate, a.departureTime || '', Number.MAX_SAFE_INTEGER) - getTimelineScore(b.departureDate || b.dayDate, b.departureTime || '', Number.MAX_SAFE_INTEGER))[0];
   const lastFlight = lastSegments.sort((a, b) => getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime || '', Number.MIN_SAFE_INTEGER) - getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime || '', Number.MIN_SAFE_INTEGER))[0];
@@ -1692,11 +1706,12 @@ function buildCompactItineraryDesktop() {
     return;
   }
 
+  const journeysByJourneyId = getJourneysGroupedByJourneyId();
   const stack = document.createElement('div');
   stack.className = 'compact-desktop-stack';
   stack.innerHTML = appData.map((leg, legIndex) => `
     <section class="compact-desktop-leg leg" id="leg-${escapeHtmlText(leg.id || `compact-${legIndex}`)}">
-      ${renderCompactLegCard(leg, legIndex)}
+      ${renderCompactLegCard(leg, legIndex, journeysByJourneyId)}
     </section>
   `).join('');
 
@@ -1996,7 +2011,8 @@ function getDailyTimelineItemSortValue(dayDate, startTime, fallbackOffset = 0) {
   return hasTime ? score : fallback;
 }
 
-function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
+function buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourneyIdMap) {
+  const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
   const items = [];
   const dayDate = normalizeDate(day?.date || '');
   const dayJourneys = typeof getDayJourneys === 'function'
@@ -2004,12 +2020,8 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
     : [];
 
   dayJourneys.forEach((journey, journeyIndex) => {
-    const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-      ? window.journeys
-      : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-    const segments = journeysSource
-      .filter(seg => (seg.journeyId || seg.id) === (journey.journeyId || journey.id))
-      .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+    const gid = journey.journeyId || journey.id;
+    const segments = (gid && journeysByJourneyId.get(gid)) || [journey];
     const orderedSegments = segments.length > 0 ? segments : [journey];
     orderedSegments.forEach((segment, segmentIndex) => {
       const depDate = normalizeDate(segment.departureDate || segment.dayDate || journey.departureDate || journey.dayDate || '');
@@ -2039,7 +2051,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
         title: journey.journeyName || route || 'Transport',
         meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDateNote].filter(Boolean).join(' · '),
         subLocations: formatJourneySubLocationText([segment]),
-        cost: getJourneyDisplayCost(journey),
+        cost: getJourneyDisplayCost(journey, journeysByJourneyId),
         status: journey.status || segment.status || 'planned',
         startTime: isDepartureDay ? depTime : arrTime,
         endTime: isSameDaySegment ? arrTime : '',
@@ -2645,7 +2657,8 @@ function renderDailyTimelineRow(item, compact = false) {
 }
 
 function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
-  const items = applyTimelineTravelShading(buildDailyTimelineItems(leg, legIndex, day, dayIndex));
+  const journeysByJourneyId = options.journeysByJourneyId || getJourneysGroupedByJourneyId();
+  const items = applyTimelineTravelShading(buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourneyId));
   const compact = !!options.compact;
   const empty = compact
     ? '<div class="compact-day-empty">No scheduled items yet.</div>'
@@ -3050,6 +3063,7 @@ function buildItinerary() {
     }
   });
 
+  const journeysByJourneyId = getJourneysGroupedByJourneyId();
   const container = document.getElementById('itinerary');
   container.innerHTML = '';
 
@@ -3230,7 +3244,7 @@ function buildItinerary() {
         <div class="day-detail hidden group-[.open]:block border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 p-4 sm:p-5"><div class="day-planner-shell day-planner-shell-${dayViewMode}">
           <div class="day-view-panel day-view-panel-timeline">
           <div class="detail-block bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-5 shadow-sm border border-slate-200/80 dark:border-slate-700/80 drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIndex})">
-            ${renderDailyTimeline(leg, legIndex, day, dayIndex)}
+            ${renderDailyTimeline(leg, legIndex, day, dayIndex, { journeysByJourneyId })}
           </div>
           </div>
           <div class="day-view-panel day-view-panel-grouped"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 mt-4">
@@ -3238,32 +3252,12 @@ function buildItinerary() {
           <div class="detail-block block-transport flex flex-col min-w-0 p-4 border border-slate-200 shadow-sm rounded-xl bg-white dark:bg-slate-800 transition-shadow hover:shadow-md">
             <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Transport</h4><div class="item-list space-y-2">
             ${(() => {
-              const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-                ? window.journeys
-                : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-              const journeysByJourneyId = new Map();
-              if (Array.isArray(journeysSource)) {
-                for (let i = 0; i < journeysSource.length; i++) {
-                  const seg = journeysSource[i];
-                  if (seg && seg.journeyId) {
-                    let list = journeysByJourneyId.get(seg.journeyId);
-                    if (!list) {
-                      list = [];
-                      journeysByJourneyId.set(seg.journeyId, list);
-                    }
-                    list.push(seg);
-                  }
-                }
-                journeysByJourneyId.forEach(list => {
-                  list.sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-                });
-              }
-
               return dayJourneys.map((journey) => {
         const status = normalizeItemStatus(journey.status);
         const icon = getTransportIcon(journey.transportType);
         const showRef = status === 'booked' || status === 'confirmed';
-        const segs = journey.journeyId ? (journeysByJourneyId.get(journey.journeyId) || []) : [];
+        const gid = journey.journeyId || journey.id;
+        const segs = (gid && journeysByJourneyId.get(gid)) || [];
         // For multi-leg journeys, show the full route chain; otherwise show name or route
         let label = '';
         if (journey.isMultiLeg && journey.journeyId) {
