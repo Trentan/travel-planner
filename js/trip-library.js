@@ -473,14 +473,14 @@
             }
             <span class="updated-badge text-[10px]">Updated ${updatedDate}</span>
           </div>
-          <h3 class="trip-card-title">${flags} ${escapeHtml(title)}</h3>
+          <h3 class="trip-card-title">${escapeHtml(flags)} ${escapeHtml(title)}</h3>
           ${subtitle ? `<p class="trip-card-subtitle">${escapeHtml(subtitle)}</p>` : ''}
         </div>
         <div class="trip-card-body">
           <div class="trip-card-stats">
             <span class="stat-pill">📅 ${escapeHtml(dates)}</span>
-            <span class="stat-pill">📍 ${legCount} legs</span>
-            <span class="stat-pill">🏨 ${stayCount} stays</span>
+            <span class="stat-pill">📍 ${escapeHtml(legCount)} legs</span>
+            <span class="stat-pill">🏨 ${escapeHtml(stayCount)} stays</span>
           </div>
         </div>
         <div class="trip-card-actions">
