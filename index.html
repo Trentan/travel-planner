@@ -48,7 +48,7 @@
     </div>
     <span class="save-status" id="saveStatus"></span>
     <span class="timestamp-status" id="timestampStatus"></span>
-    <button id="headerCloudSyncStatusPill" class="cloud-status-pill disconnected" onclick="openCloudSyncModal()" title="View Google Drive Cloud Sync status">⚡ Local Only</button>
+    <button id="headerCloudSyncStatusPill" class="cloud-status-pill disconnected" onclick="openCloudSyncModal()" title="View Google Drive Cloud Sync status">● Saved to device</button>
   </div>
   <div class="app-menu-right">
     <button id="editToggleBtn" class="app-menu-btn" onclick="toggleEditMode()">🔒 Lock: Read Only</button>
@@ -289,7 +289,7 @@
               <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate" id="mobileActiveTripFilename">my_trip.json</div>
             </div>
           </div>
-          <button id="mobileCloudSyncStatusPill" class="cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full cursor-pointer shrink-0" onclick="openCloudSyncModal(); closeMobileMenu();">⚡ Local Only</button>
+          <button id="mobileCloudSyncStatusPill" class="cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full cursor-pointer shrink-0" onclick="openCloudSyncModal(); closeMobileMenu();">● Saved to device</button>
         </div>
         
         <div class="grid grid-cols-4 gap-1 pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
@@ -1230,7 +1230,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <p class="text-sm text-slate-600 dark:text-slate-300">Select a trip to load, create a new itinerary, or manage Google Drive cloud files.</p>
           <div class="flex items-center gap-2 shrink-0">
-            <span class="cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300" id="cloudSyncStatusPill">⚡ Local Only</span>
+            <span class="cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300" id="cloudSyncStatusPill">● Saved to device</span>
             <button class="action-btn action-btn-secondary text-xs whitespace-nowrap" onclick="openCloudSyncModal()">☁️ Cloud Settings</button>
             <button class="action-btn action-btn-secondary text-xs whitespace-nowrap" onclick="createNewTripFromLibrary()">✦ New Trip</button>
           </div>

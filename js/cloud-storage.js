@@ -165,7 +165,7 @@
     try {
       // 1. Search for existing "TrenscendsTravelPlanner" folder
       const searchUrl = `https://www.googleapis.com/drive/v3/files?q=name='${DRIVE_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`;
-      const searchResp = await fetch(searchUrl, {
+      const searchResp = await fetchWithRetry(searchUrl, {
         headers: { 'Authorization': `Bearer ${accessToken}` }
       });
 
@@ -179,7 +179,7 @@
       }
 
       // 2. Create "TrenscendsTravelPlanner" folder if not found in root My Drive
-      const createResp = await fetch('https://www.googleapis.com/drive/v3/files', {
+      const createResp = await fetchWithRetry('https://www.googleapis.com/drive/v3/files', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -205,8 +205,97 @@
   }
   window.ensureDriveFolder = ensureDriveFolder;
 
+  // Offline Sync Queue Management
+  function getOfflineQueue() {
+    try {
+      return JSON.parse(localStorage.getItem('travelApp_offline_sync_queue') || '[]');
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function setOfflineQueue(queue) {
+    localStorage.setItem('travelApp_offline_sync_queue', JSON.stringify(queue || []));
+  }
+
+  function enqueueOfflineSync(tripRecord) {
+    if (!tripRecord || !tripRecord.id) return;
+    const queue = getOfflineQueue();
+    const idx = queue.findIndex(item => item.tripRecord && item.tripRecord.id === tripRecord.id);
+    const entry = { tripRecord, queuedAt: new Date().toISOString() };
+    if (idx >= 0) {
+      queue[idx] = entry;
+    } else {
+      queue.push(entry);
+    }
+    setOfflineQueue(queue);
+    console.log(`[OfflineQueue] Enqueued "${tripRecord.title || 'Trip'}" for cloud sync upon reconnection.`);
+  }
+
+  async function processOfflineSyncQueue() {
+    if (!isGoogleDriveConnected() || navigator.onLine === false) return;
+    const queue = getOfflineQueue();
+    if (queue.length === 0) return;
+
+    console.log(`[OfflineQueue] Processing ${queue.length} offline queued sync items...`);
+    const remainingQueue = [];
+    for (const item of queue) {
+      if (item && item.tripRecord) {
+        const ok = await uploadTripToGoogleDrive(item.tripRecord, true);
+        if (!ok) {
+          remainingQueue.push(item);
+        }
+      }
+    }
+    setOfflineQueue(remainingQueue);
+    if (remainingQueue.length === 0) {
+      updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
+      if (typeof window.showToast === 'function') window.showToast('☁️ Offline queued changes synced to Google Drive!');
+    }
+  }
+  window.processOfflineSyncQueue = processOfflineSyncQueue;
+
+  // Resilient Fetch with Exponential Backoff
+  async function fetchWithRetry(url, options = {}, maxRetries = 3, initialDelay = 500) {
+    let delay = initialDelay;
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const response = await fetch(url, options);
+        if (response.status >= 500 && i < maxRetries - 1) {
+          await new Promise(r => setTimeout(r, delay));
+          delay *= 2;
+          continue;
+        }
+        return response;
+      } catch (err) {
+        if (i < maxRetries - 1 && navigator.onLine !== false) {
+          await new Promise(r => setTimeout(r, delay));
+          delay *= 2;
+          continue;
+        }
+        throw err;
+      }
+    }
+  }
+
   // Authenticate with Google Drive via Native GoogleAuth Plugin (Mobile) or Google Identity Services Token Client (Web)
   async function authenticateGoogleDrive(interactive = true) {
+    if (window.__mockGoogleDriveAPI) {
+      accessToken = 'token_mock_123';
+      tokenExpiry = Date.now() + 3600000;
+      setUserProfile({
+        name: 'Google Traveler (Mock)',
+        email: 'account@google.com',
+        picture: ''
+      });
+      localStorage.setItem('travelApp_gdrive_connected', 'true');
+      localStorage.setItem('travelApp_gdrive_token', accessToken);
+      localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
+      updateCloudSyncStatusPill('☁️ Synced to Drive', 'connected');
+      updateCloudSyncModalState();
+      return true;
+    }
+
     const clientId = getGoogleClientId();
 
     const connectBtn = document.getElementById('gdriveConnectBtn');
@@ -548,6 +637,13 @@
   // Upload or Update a Trip JSON file inside Google Drive / TrenscendsTravelPlanner
   async function uploadTripToGoogleDrive(tripRecord, isSilent = false) {
     if (!isGoogleDriveConnected() || !tripRecord || !tripRecord.id) return false;
+
+    if (navigator.onLine === false) {
+      enqueueOfflineSync(tripRecord);
+      updateCloudSyncStatusPill('⚡ Offline (Queued)', 'offline');
+      return false;
+    }
+
     await ensureValidAccessToken();
 
     if ((accessToken && accessToken.startsWith('token_')) || window.__mockGoogleDriveAPI) {
@@ -583,7 +679,7 @@
       let response;
       if (existingFileId) {
         // PATCH existing file content in TrenscendsTravelPlanner folder
-        response = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingFileId}?uploadType=media`, {
+        response = await fetchWithRetry(`https://www.googleapis.com/upload/drive/v3/files/${existingFileId}?uploadType=media`, {
           method: 'PATCH',
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -593,7 +689,7 @@
         });
 
         // Also update filename in case title changed
-        fetch(`https://www.googleapis.com/drive/v3/files/${existingFileId}`, {
+        fetchWithRetry(`https://www.googleapis.com/drive/v3/files/${existingFileId}`, {
           method: 'PATCH',
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -615,7 +711,7 @@
         // Prevent duplicate files: Query Google Drive folder for an existing file with the exact same filename
         try {
           const checkQuery = encodeURIComponent(`'${folderId}' in parents and name = '${fileName.replace(/'/g, "\\'")}' and trashed = false`);
-          const checkResp = await fetch(
+          const checkResp = await fetchWithRetry(
             `https://www.googleapis.com/drive/v3/files?q=${checkQuery}&fields=files(id,name)`,
             { headers: { 'Authorization': `Bearer ${accessToken}` } }
           );
@@ -627,7 +723,7 @@
               setGDriveFileMap(fileMap);
 
               // PATCH existing duplicate file instead of creating another copy
-              response = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingFileId}?uploadType=media`, {
+              response = await fetchWithRetry(`https://www.googleapis.com/upload/drive/v3/files/${existingFileId}?uploadType=media`, {
                 method: 'PATCH',
                 headers: {
                   'Authorization': `Bearer ${accessToken}`,
@@ -665,7 +761,7 @@
           payloadStr +
           close_delim;
 
-        response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        response = await fetchWithRetry('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -693,7 +789,8 @@
       return true;
     } catch (err) {
       console.error('Failed to upload trip to Google Drive:', err);
-      updateCloudSyncStatusPill('⚡ Local Only (Sync Failed)', 'error');
+      enqueueOfflineSync(tripRecord);
+      updateCloudSyncStatusPill('⚡ Offline (Queued)', 'offline');
       return false;
     }
   }
@@ -1203,28 +1300,38 @@
 
     if (pills.length === 0) return;
 
+    const queue = typeof getOfflineQueue === 'function' ? getOfflineQueue() : [];
+
     pills.forEach(pill => {
       if (statusText) {
         let compactLabel = statusText;
-        if (statusText.includes('Synced') || statusText.includes('Loaded')) compactLabel = '☁️ Synced';
+        if (statusText.includes('Synced') || statusText.includes('Loaded')) compactLabel = '☁️ Synced to Drive';
         else if (statusText.includes('Syncing') || statusText.includes('Creating') || statusText.includes('Loading') || statusText.includes('Deleting')) compactLabel = '⏳ Syncing...';
-        else if (statusText.includes('Local')) compactLabel = '⚡ Local';
-        else if (statusText.includes('Failed') || statusText.includes('Required')) compactLabel = '⚠️ Sync Alert';
+        else if (statusText.includes('Offline')) {
+          compactLabel = queue.length > 0 ? `⚡ Offline (${queue.length} Queued)` : '⚡ Offline';
+        } else if (statusText.includes('Local')) {
+          compactLabel = '● Saved to device';
+        } else if (statusText.includes('Failed') || statusText.includes('Required')) compactLabel = '⚠️ Sync Alert';
 
         pill.innerText = compactLabel;
         pill.title = statusText;
       } else {
-        if (isGoogleDriveConnected()) {
-          pill.innerText = '☁️ Synced';
+        if (queue.length > 0) {
+          pill.innerText = `⚡ Offline (${queue.length} Queued)`;
+          pill.title = `${queue.length} change(s) queued for cloud sync when reconnected`;
+        } else if (isGoogleDriveConnected()) {
+          pill.innerText = '☁️ Synced to Drive';
           pill.title = `Google Drive / ${DRIVE_FOLDER_NAME} (Connected)`;
         } else {
-          pill.innerText = '⚡ Local';
-          pill.title = 'Saved locally on this device';
+          pill.innerText = '● Saved to device';
+          pill.title = 'Saved locally in IndexedDB on this device';
         }
       }
 
       if (stateClass) {
         pill.className = `cloud-status-pill ${stateClass}`;
+      } else if (queue.length > 0) {
+        pill.className = 'cloud-status-pill offline';
       } else if (isGoogleDriveConnected()) {
         pill.className = 'cloud-status-pill connected';
       } else {
@@ -1407,12 +1514,22 @@
   // Process any OAuth redirect hash immediately
   processOAuthCallbackFromUrl();
 
+  // Automatically process offline queue when network reconnects
+  window.addEventListener('online', () => {
+    console.log('[CloudSync] Network connection restored. Flushing offline sync queue...');
+    if (isGoogleDriveConnected()) {
+      processOfflineSyncQueue();
+      syncAllTripsFromGoogleDrive(true);
+    }
+  });
+
   // Initialize Cloud Sync & Background Heartbeat Loop on load
   window.addEventListener('DOMContentLoaded', () => {
     processOAuthCallbackFromUrl();
     setTimeout(() => {
       updateCloudSyncStatusPill();
       if (isGoogleDriveConnected()) {
+        processOfflineSyncQueue();
         window.syncAllTripsFromGoogleDrive();
         startBackgroundSyncLoop();
       }

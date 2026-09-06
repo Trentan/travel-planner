@@ -179,11 +179,11 @@
 
       let badgeHtml = '';
       if (isCloudSynced) {
-        badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">☁️ Synced</span>';
+        badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">☁️ Synced to Drive</span>';
       } else if (isCloudOnly) {
         badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300">☁️ Remote</span>';
       } else {
-        badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">⚡ Local</span>';
+        badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">● Saved to device</span>';
       }
 
       const elem = document.createElement('div');
@@ -468,8 +468,8 @@
           <div class="trip-card-badges flex flex-wrap gap-1.5 items-center mb-1">
             ${isCurrent ? '<span class="active-badge">● Active Trip</span>' : ''}
             ${isDriveSynced
-              ? '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">☁️ Drive Synced</span>'
-              : '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">⚡ Local Only</span>'
+              ? '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">☁️ Synced to Drive</span>'
+              : '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">● Saved to device</span>'
             }
             <span class="updated-badge text-[10px]">Updated ${updatedDate}</span>
           </div>

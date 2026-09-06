@@ -69,11 +69,22 @@ function openDB() {
   });
 }
 
-// Multi-Trip IndexedDB Helpers
+// Multi-Trip IndexedDB Helpers & Fast Memory Cache
+let tripsCache = null;
+
+function sortTripsList(trips) {
+  return (trips || []).sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+}
+
 function getAllTripsFromIndexedDB() {
+  if (tripsCache !== null) {
+    return Promise.resolve(JSON.parse(JSON.stringify(tripsCache)));
+  }
+
   return openDB().then(db => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (!db.objectStoreNames.contains(TRIPS_STORE_NAME)) {
+        tripsCache = [];
         resolve([]);
         return;
       }
@@ -82,15 +93,14 @@ function getAllTripsFromIndexedDB() {
       const request = store.getAll();
 
       request.onsuccess = () => {
-        const trips = (request.result || []).sort((a, b) => {
-          return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
-        });
-        resolve(trips);
+        const trips = sortTripsList(request.result || []);
+        tripsCache = trips;
+        resolve(JSON.parse(JSON.stringify(trips)));
       };
 
       request.onerror = () => {
         console.error('Failed to load trips from IndexedDB:', request.error);
-        resolve([]);
+        resolve(tripsCache ? JSON.parse(JSON.stringify(tripsCache)) : []);
       };
     });
   });
@@ -98,6 +108,15 @@ function getAllTripsFromIndexedDB() {
 window.getAllTripsFromIndexedDB = getAllTripsFromIndexedDB;
 
 function saveTripToIndexedDB(tripRecord) {
+  if (!tripsCache) tripsCache = [];
+  const idx = tripsCache.findIndex(t => t.id === tripRecord.id);
+  if (idx >= 0) {
+    tripsCache[idx] = JSON.parse(JSON.stringify(tripRecord));
+  } else {
+    tripsCache.push(JSON.parse(JSON.stringify(tripRecord)));
+  }
+  sortTripsList(tripsCache);
+
   return openDB().then(db => {
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([TRIPS_STORE_NAME], 'readwrite');
@@ -112,6 +131,10 @@ function saveTripToIndexedDB(tripRecord) {
 window.saveTripToIndexedDB = saveTripToIndexedDB;
 
 function deleteTripFromIndexedDB(tripId) {
+  if (tripsCache) {
+    tripsCache = tripsCache.filter(t => t.id !== tripId);
+  }
+
   return openDB().then(db => {
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([TRIPS_STORE_NAME], 'readwrite');
