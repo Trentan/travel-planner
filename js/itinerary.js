@@ -279,7 +279,7 @@ function getActivityItemEmoji(item, legIndex = null, dayIdx = null, fallback = '
     return emojis[item.category] || fallback;
   }
   if (legIndex !== null && dayIdx !== null && typeof findAssignedSuggestedActivity === 'function') {
-    const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
+    const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text, item.activityId);
     if (matched && matched.category) {
       const emojis = { fitness: '🏃', sight: '🏛️', attraction: '🎢', wellness: '🧘', food: '🍽️', tour: '🚌', event: '🗓️', audioTour: '🎧' };
       return emojis[matched.category] || fallback;
@@ -754,13 +754,19 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
     const emoji = getActivityItemEmoji(item, legIndex, dayIdx, '📍');
     let locationVal = item.location || '';
-    if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
-      const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
-      if (matched && matched.location) {
-        locationVal = matched.location;
+    let notes = item.notes || '';
+    if ((!locationVal || !notes) && typeof findAssignedSuggestedActivity === 'function') {
+      const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text, item.activityId);
+      if (matched) {
+        if (!locationVal && matched.location) {
+          locationVal = matched.location;
+        }
+        if (!notes && matched.notes) {
+          notes = matched.notes;
+        }
       }
     }
-              const split = getActivityDisplayTitle(item.text);
+    const split = getActivityDisplayTitle(item.text);
     if (!locationVal) {
       locationVal = split.location;
     }
@@ -773,13 +779,6 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays) {
       return `Location: ${loc}`;
     })() : '';
     const subLocsHtml = activityLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
-    let notes = item.notes || '';
-    if (!notes && typeof findAssignedSuggestedActivity === 'function') {
-      const matched = findAssignedSuggestedActivity(legIndex, dayIdx, item.text);
-      if (matched && matched.notes) {
-        notes = matched.notes;
-      }
-    }
     const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(notes)}</div>` : '';
     const audioHtml = renderActivityAudioTourMeta(item);
     return `
@@ -2143,10 +2142,16 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
   (day.activityItems || []).forEach((item, itemIndex) => {
     const emoji = getActivityItemEmoji(item, legIndex, dayIndex);
     let locationVal = item.location || '';
-    if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
-      const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
-      if (matched && matched.location) {
-        locationVal = matched.location;
+    let notes = item.notes || '';
+    if ((!locationVal || !notes) && typeof findAssignedSuggestedActivity === 'function') {
+      const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text, item.activityId);
+      if (matched) {
+        if (!locationVal && matched.location) {
+          locationVal = matched.location;
+        }
+        if (!notes && matched.notes) {
+          notes = matched.notes;
+        }
       }
     }
     const split = getActivityDisplayTitle(item.text);
@@ -2161,14 +2166,6 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex) {
       }
       return `Location: ${loc}`;
     })() : '';
-
-    let notes = item.notes || '';
-    if (!notes && typeof findAssignedSuggestedActivity === 'function') {
-      const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
-      if (matched && matched.notes) {
-        notes = matched.notes;
-      }
-    }
 
     items.push({
       type: 'activity',
@@ -3346,13 +3343,19 @@ ${(() => {
             <h4 class="flex items-center justify-between mb-3 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Planned Activities</h4><div class="item-list space-y-2">
             ${(day.activityItems || []).map((item, i) => {
               let locationVal = item.location || '';
-              if (!locationVal && typeof findAssignedSuggestedActivity === 'function') {
-                const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
-                if (matched && matched.location) {
-                  locationVal = matched.location;
+              let notes = item.notes || '';
+              if ((!locationVal || !notes) && typeof findAssignedSuggestedActivity === 'function') {
+                const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text, item.activityId);
+                if (matched) {
+                  if (!locationVal && matched.location) {
+                    locationVal = matched.location;
+                  }
+                  if (!notes && matched.notes) {
+                    notes = matched.notes;
+                  }
                 }
               }
-    const split = getActivityDisplayTitle(item.text);
+              const split = getActivityDisplayTitle(item.text);
               if (!locationVal) {
                 locationVal = split.location;
               }
@@ -3365,13 +3368,6 @@ ${(() => {
                 return `Location: ${loc}`;
               })() : '';
               const locHtml = activityLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-inline">${renderJourneySubLocationTextHtml(activityLoc)}</div>` : '';
-              let notes = item.notes || '';
-              if (!notes && typeof findAssignedSuggestedActivity === 'function') {
-                const matched = findAssignedSuggestedActivity(legIndex, dayIndex, item.text);
-                if (matched && matched.notes) {
-                  notes = matched.notes;
-                }
-              }
               const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-inline">💬 ${escapeCompactText(notes)}</div>` : '';
               return `
                 <div class="cost-item flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200/50 dark:border-slate-600/50 text-sm hover:shadow-md transition-shadow group">
