@@ -3953,34 +3953,50 @@ function sameTimelineDay(dayDate, targetDate) {
 }
 
 function findLegForJourneyCity(cityId, cityName) {
-  if (!Array.isArray(journeys)) return null;
+  if (!Array.isArray(journeys) || journeys.length === 0) return null;
+  if (!Array.isArray(appData) || appData.length === 0) return null;
 
-  const matchingJourneys = journeys
-      .filter(j =>
-          j.fromCityId === cityId ||
-          j.toCityId === cityId ||
-          (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
-      )
-      .sort((a, b) => {
-        const aScore = getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime, Number.MAX_SAFE_INTEGER);
-        const bScore = getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime, Number.MAX_SAFE_INTEGER);
-        return aScore - bScore;
-      });
+  const matching = [];
+  for (let i = 0; i < journeys.length; i++) {
+    const j = journeys[i];
+    if (
+      j.fromCityId === cityId ||
+      j.toCityId === cityId ||
+      (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
+    ) {
+      const score = getTimelineScore(
+        j.arrivalDate || j.departureDate || j.dayDate,
+        j.arrivalTime || j.departureTime,
+        Number.MAX_SAFE_INTEGER
+      );
+      matching.push({ journey: j, score });
+    }
+  }
 
-  for (const journey of matchingJourneys) {
+  if (matching.length === 0) return null;
+
+  if (matching.length > 1) {
+    matching.sort((a, b) => a.score - b.score);
+  }
+
+  for (let i = 0; i < matching.length; i++) {
+    const journey = matching[i].journey;
+
     if (journey.legId) {
-      const directLeg = appData.find(leg => leg.id === journey.legId);
+      const directLeg = appData.find(leg => leg && leg.id === journey.legId);
       if (directLeg) return directLeg;
     }
 
-    const targetDate = journey.toCityId === cityId || journey.toLocation === cityName
+    const targetDate = (journey.toCityId === cityId || journey.toLocation === cityName)
         ? (journey.arrivalDate || journey.dayDate || journey.departureDate)
         : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
-    const dateMatchedLeg = appData.find(leg =>
-        (leg.days || []).some(day => sameTimelineDay(day.date, targetDate))
-    );
-    if (dateMatchedLeg) return dateMatchedLeg;
+    if (targetDate) {
+      const dateMatchedLeg = appData.find(leg =>
+        (leg && leg.days) ? leg.days.some(day => day && sameTimelineDay(day.date, targetDate)) : false
+      );
+      if (dateMatchedLeg) return dateMatchedLeg;
+    }
   }
 
   return null;
