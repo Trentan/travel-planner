@@ -214,6 +214,26 @@ function findAssignedSuggestedActivity(legIdx, dayIdx, itemText, activityId = nu
       if (matched) return matched;
     }
 
+    const separators = [' — ', ' – ', ' - ', ' | ', ' @ '];
+    let baseItem = cleanItem;
+    for (const separator of separators) {
+      const idx = cleanItem.indexOf(separator);
+      if (idx !== -1) {
+        baseItem = cleanItem.slice(0, idx).trim();
+        break;
+      }
+    }
+    if (baseItem !== cleanItem) {
+      matched = index.byDayAndKey.get(`${dayIdx}:${baseItem}`);
+      if (matched) return matched;
+
+      const baseItemNoEmoji = baseItem.replace(emojiPattern, '').trim();
+      if (baseItemNoEmoji && baseItemNoEmoji !== baseItem) {
+        matched = index.byDayAndKey.get(`${dayIdx}:${baseItemNoEmoji}`);
+        if (matched) return matched;
+      }
+    }
+
     return null;
   }
 
