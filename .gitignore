@@ -26,3 +26,6 @@ Thumbs.db
 
 # Telemetry / Local agents config
 /.telecodex/
+
+# Log files
+*.log

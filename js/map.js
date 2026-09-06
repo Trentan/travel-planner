@@ -339,7 +339,7 @@ function buildJourneyMap() {
     const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     const tileUrl = isDarkMode
       ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
 
     L.tileLayer(tileUrl, {
       attribution: '© OpenStreetMap contributors © CARTO',
@@ -486,12 +486,10 @@ function updateMapTiles() {
   const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
   const tileUrl = isDarkMode
     ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
 
   L.tileLayer(tileUrl, {
-    attribution: isDarkMode
-      ? '© OpenStreetMap contributors © CARTO'
-      : '© OpenStreetMap contributors',
+    attribution: '© OpenStreetMap contributors © CARTO',
     subdomains: 'abcd'
   }).addTo(mainMap);
 }
