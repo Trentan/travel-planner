@@ -336,6 +336,53 @@ async function run() {
     'calculateJourneyDuration should return null for unparseable dates'
   );
 
+  // 9. Empty string departure or arrival date
+  assert(
+    calculateJourneyDuration([{ departureDate: '', arrivalDate: '2026-06-10' }]) === null,
+    'calculateJourneyDuration should return null when departureDate is empty string'
+  );
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-06-10', arrivalDate: '' }]) === null,
+    'calculateJourneyDuration should return null when arrivalDate is empty string'
+  );
+
+  // 10. Zero duration (same departure and arrival date and time)
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-06-10', departureTime: '10:00', arrivalDate: '2026-06-10', arrivalTime: '10:00' }]) === 0,
+    'calculateJourneyDuration should return 0 for identical departure and arrival times'
+  );
+
+  // 11. Boundary floor tests for fractional hours
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-06-10', departureTime: '10:00', arrivalDate: '2026-06-10', arrivalTime: '15:59' }]) === 5,
+    'calculateJourneyDuration should floor 5h 59m duration to 5 hours'
+  );
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-06-10', departureTime: '10:00', arrivalDate: '2026-06-10', arrivalTime: '16:01' }]) === 6,
+    'calculateJourneyDuration should floor 6h 1m duration to 6 hours'
+  );
+
+  // 12. Mixed ISO and legacy date formats
+  assert(
+    calculateJourneyDuration([{ departureDate: '2026-06-10', departureTime: '10:00', arrivalDate: '10 Jun', arrivalTime: '16:00' }]) === 6,
+    'calculateJourneyDuration should support mixing ISO departure date and legacy arrival date'
+  );
+  assert(
+    calculateJourneyDuration([{ departureDate: '10 Jun', departureTime: '10:00', arrivalDate: '2026-06-10', arrivalTime: '16:00' }]) === 6,
+    'calculateJourneyDuration should support mixing legacy departure date and ISO arrival date'
+  );
+
+  // 13. 3-segment journey checking that only first and last segment dates/times are considered
+  const threeSegmentJourney = [
+    { departureDate: '2026-06-10', departureTime: '08:00', arrivalDate: '2026-06-10', arrivalTime: '12:00' },
+    { departureDate: '2026-06-10', departureTime: '14:00', arrivalDate: '2026-06-10', arrivalTime: '18:00' },
+    { departureDate: '2026-06-10', departureTime: '20:00', arrivalDate: '2026-06-11', arrivalTime: '08:00' }
+  ];
+  assert(
+    calculateJourneyDuration(threeSegmentJourney) === 24,
+    'calculateJourneyDuration should compute duration from first segment departure (Jun 10 08:00) to last segment arrival (Jun 11 08:00)'
+  );
+
   // parseCurrencyAmount edge cases
   const parseCurrencyAmount = utilsContext.parseCurrencyAmount;
   assert(parseCurrencyAmount(100) === 100, 'parseCurrencyAmount should handle positive integers');
