@@ -3952,38 +3952,206 @@ function sameTimelineDay(dayDate, targetDate) {
   return Math.floor(dayScore / 1440) === Math.floor(targetScore / 1440);
 }
 
+let _findLegForJourneyCityCache = null;
+let _findLegLastFingerprint = '';
+let _findLegLastJourneysRef = null;
+let _findLegLastAppDataRef = null;
+let _findLegLastJourneysLen = 0;
+let _findLegLastAppDataLen = 0;
+let _findLegLastDataVersion = -1;
+
+function clearLegForJourneyCityCache() {
+  _findLegForJourneyCityCache = null;
+  _findLegLastFingerprint = '';
+  _findLegLastJourneysRef = null;
+  _findLegLastAppDataRef = null;
+  _findLegLastJourneysLen = 0;
+  _findLegLastAppDataLen = 0;
+  _findLegLastDataVersion = -1;
+}
+
+function _getFindLegDataFingerprint(journeysSource, appDataSource) {
+  let jPart = '';
+  if (Array.isArray(journeysSource)) {
+    for (let i = 0; i < journeysSource.length; i++) {
+      const j = journeysSource[i];
+      if (!j) continue;
+      jPart += `${j.id || ''}:${j.journeyId || ''}:${j.fromCityId || ''}:${j.toCityId || ''}:${j.fromLocation || ''}:${j.toLocation || ''}:${j.legId || ''}:${j.departureDate || ''}:${j.arrivalDate || ''}:${j.dayDate || ''}:${j.departureTime || ''}:${j.arrivalTime || ''};`;
+    }
+  }
+
+  let aPart = '';
+  if (Array.isArray(appDataSource)) {
+    for (let i = 0; i < appDataSource.length; i++) {
+      const leg = appDataSource[i];
+      if (!leg) continue;
+      let dPart = '';
+      if (Array.isArray(leg.days)) {
+        for (let d = 0; d < leg.days.length; d++) {
+          dPart += `${leg.days[d]?.date || ''},`;
+        }
+      }
+      aPart += `${leg.id || ''}:${leg.label || ''}:${dPart};`;
+    }
+  }
+
+  return `${jPart}|${aPart}`;
+}
+
+function _buildFindLegForJourneyCityIndex(journeysSource, appDataSource) {
+  const legByIdMap = new Map();
+  const legByDayMap = new Map();
+
+  if (Array.isArray(appDataSource)) {
+    for (let i = 0; i < appDataSource.length; i++) {
+      const leg = appDataSource[i];
+      if (!leg) continue;
+      if (leg.id && !legByIdMap.has(leg.id)) {
+        legByIdMap.set(leg.id, leg);
+      }
+      if (Array.isArray(leg.days)) {
+        for (let d = 0; d < leg.days.length; d++) {
+          const day = leg.days[d];
+          if (day && day.date) {
+            const score = getTimelineScore(day.date, '', null);
+            if (score !== null) {
+              const dayKey = Math.floor(score / 1440);
+              if (!Number.isNaN(dayKey) && !legByDayMap.has(dayKey)) {
+                legByDayMap.set(dayKey, leg);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  const journeysByCityMap = new Map();
+  const addJourneyToKey = (key, j) => {
+    if (!key) return;
+    let list = journeysByCityMap.get(key);
+    if (!list) {
+      list = [];
+      journeysByCityMap.set(key, list);
+    }
+    if (!list.includes(j)) {
+      list.push(j);
+    }
+  };
+
+  if (Array.isArray(journeysSource)) {
+    for (let i = 0; i < journeysSource.length; i++) {
+      const j = journeysSource[i];
+      if (!j) continue;
+      if (j.fromCityId) addJourneyToKey(j.fromCityId, j);
+      if (j.toCityId) addJourneyToKey(j.toCityId, j);
+      if (j.fromLocation) addJourneyToKey(j.fromLocation, j);
+      if (j.toLocation) addJourneyToKey(j.toLocation, j);
+    }
+  }
+
+  return {
+    legByIdMap,
+    legByDayMap,
+    journeysByCityMap,
+    memo: new Map()
+  };
+}
+
 function findLegForJourneyCity(cityId, cityName) {
-  if (!Array.isArray(journeys)) return null;
+  const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+  const appDataSource = (typeof window !== 'undefined' && Array.isArray(window.appData))
+    ? window.appData
+    : (typeof appData !== 'undefined' && Array.isArray(appData) ? appData : []);
 
-  const matchingJourneys = journeys
-      .filter(j =>
-          j.fromCityId === cityId ||
-          j.toCityId === cityId ||
-          (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
-      )
-      .sort((a, b) => {
-        const aScore = getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime, Number.MAX_SAFE_INTEGER);
-        const bScore = getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime, Number.MAX_SAFE_INTEGER);
-        return aScore - bScore;
-      });
+  if (!Array.isArray(journeysSource) || journeysSource.length === 0) return null;
 
-  for (const journey of matchingJourneys) {
+  const currentJLen = journeysSource.length;
+  const currentALen = appDataSource.length;
+  const currentVersion = (typeof window !== 'undefined' && window._dataVersion) || 0;
+
+  if (
+    !_findLegForJourneyCityCache ||
+    _findLegLastJourneysRef !== journeysSource ||
+    _findLegLastAppDataRef !== appDataSource ||
+    _findLegLastJourneysLen !== currentJLen ||
+    _findLegLastAppDataLen !== currentALen ||
+    _findLegLastDataVersion !== currentVersion
+  ) {
+    _findLegLastJourneysRef = journeysSource;
+    _findLegLastAppDataRef = appDataSource;
+    _findLegLastJourneysLen = currentJLen;
+    _findLegLastAppDataLen = currentALen;
+    _findLegLastDataVersion = currentVersion;
+
+    const fp = _getFindLegDataFingerprint(journeysSource, appDataSource);
+    if (!_findLegForJourneyCityCache || _findLegLastFingerprint !== fp) {
+      _findLegLastFingerprint = fp;
+      _findLegForJourneyCityCache = _buildFindLegForJourneyCityIndex(journeysSource, appDataSource);
+    }
+  }
+
+  const memoKey = `id:${cityId || ''}|name:${cityName || ''}`;
+  if (_findLegForJourneyCityCache.memo.has(memoKey)) {
+    return _findLegForJourneyCityCache.memo.get(memoKey);
+  }
+
+  const candidatesSet = new Set();
+  if (cityId && _findLegForJourneyCityCache.journeysByCityMap.has(cityId)) {
+    _findLegForJourneyCityCache.journeysByCityMap.get(cityId).forEach(j => candidatesSet.add(j));
+  }
+  if (cityName && _findLegForJourneyCityCache.journeysByCityMap.has(cityName)) {
+    _findLegForJourneyCityCache.journeysByCityMap.get(cityName).forEach(j => candidatesSet.add(j));
+  }
+
+  if (candidatesSet.size === 0) {
+    _findLegForJourneyCityCache.memo.set(memoKey, null);
+    return null;
+  }
+
+  const matchingJourneys = Array.from(candidatesSet)
+    .filter(j =>
+      (cityId && (j.fromCityId === cityId || j.toCityId === cityId)) ||
+      (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
+    )
+    .sort((a, b) => {
+      const aScore = getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime, Number.MAX_SAFE_INTEGER);
+      const bScore = getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime, Number.MAX_SAFE_INTEGER);
+      return aScore - bScore;
+    });
+
+  let result = null;
+  for (let i = 0; i < matchingJourneys.length; i++) {
+    const journey = matchingJourneys[i];
     if (journey.legId) {
-      const directLeg = appData.find(leg => leg.id === journey.legId);
-      if (directLeg) return directLeg;
+      const directLeg = _findLegForJourneyCityCache.legByIdMap.get(journey.legId);
+      if (directLeg) {
+        result = directLeg;
+        break;
+      }
     }
 
     const targetDate = journey.toCityId === cityId || journey.toLocation === cityName
         ? (journey.arrivalDate || journey.dayDate || journey.departureDate)
         : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
-    const dateMatchedLeg = appData.find(leg =>
-        (leg.days || []).some(day => sameTimelineDay(day.date, targetDate))
-    );
-    if (dateMatchedLeg) return dateMatchedLeg;
+    if (targetDate) {
+      const targetScore = getTimelineScore(targetDate, '', null);
+      if (targetScore !== null) {
+        const dayKey = Math.floor(targetScore / 1440);
+        const dateMatchedLeg = _findLegForJourneyCityCache.legByDayMap.get(dayKey);
+        if (dateMatchedLeg) {
+          result = dateMatchedLeg;
+          break;
+        }
+      }
+    }
   }
 
-  return null;
+  _findLegForJourneyCityCache.memo.set(memoKey, result);
+  return result;
 }
 
 // Active city filter - 'all' or city ID (access via window.currentCityFilter for cross-module access)
@@ -4176,6 +4344,7 @@ window.findItineraryPositionForDate = findItineraryPositionForDate;
 window.getCurrentTripPosition = getCurrentTripPosition;
 window.applyCurrentTripPositionForTab = applyCurrentTripPositionForTab;
 window.initializeItineraryPositionForToday = initializeItineraryPositionForToday;
+window.clearLegForJourneyCityCache = clearLegForJourneyCityCache;
 
 // Expand to show a city in the itinerary
 function expandToCity(cityId) {
