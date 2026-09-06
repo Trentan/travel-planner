@@ -3952,35 +3952,149 @@ function sameTimelineDay(dayDate, targetDate) {
   return Math.floor(dayScore / 1440) === Math.floor(targetScore / 1440);
 }
 
+let _cachedJourneysRef = null;
+let _cachedAppDataRef = null;
+let _cachedJourneysLen = 0;
+let _cachedAppDataLen = 0;
+let _journeysByCityMap = null;
+let _legByIdMap = null;
+let _legByDayKeyMap = null;
+
+function buildJourneyAndLegCaches() {
+  const currentJourneys = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+  const currentAppData = (typeof window !== 'undefined' && Array.isArray(window.appData))
+    ? window.appData
+    : (typeof appData !== 'undefined' && Array.isArray(appData) ? appData : []);
+
+  if (
+    _cachedJourneysRef === currentJourneys &&
+    _cachedAppDataRef === currentAppData &&
+    _cachedJourneysLen === currentJourneys.length &&
+    _cachedAppDataLen === currentAppData.length &&
+    _journeysByCityMap
+  ) {
+    return { currentJourneys, currentAppData };
+  }
+  _cachedJourneysRef = currentJourneys;
+  _cachedAppDataRef = currentAppData;
+  _cachedJourneysLen = currentJourneys.length;
+  _cachedAppDataLen = currentAppData.length;
+
+  _journeysByCityMap = new Map();
+  _legByIdMap = new Map();
+  _legByDayKeyMap = new Map();
+
+  if (Array.isArray(currentAppData)) {
+    for (let i = 0; i < currentAppData.length; i++) {
+      const leg = currentAppData[i];
+      if (leg && leg.id) _legByIdMap.set(leg.id, leg);
+      if (leg && Array.isArray(leg.days)) {
+        for (let d = 0; d < leg.days.length; d++) {
+          const day = leg.days[d];
+          if (day && day.date) {
+            const dayScore = getTimelineScore(day.date, '', null);
+            if (dayScore !== null) {
+              const dayKey = Math.floor(dayScore / 1440);
+              if (!_legByDayKeyMap.has(dayKey)) {
+                _legByDayKeyMap.set(dayKey, leg);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (Array.isArray(currentJourneys)) {
+    for (let i = 0; i < currentJourneys.length; i++) {
+      const j = currentJourneys[i];
+      if (!j) continue;
+      const dateVal = j.arrivalDate || j.departureDate || j.dayDate;
+      const timeVal = j.arrivalTime || j.departureTime;
+      const score = getTimelineScore(dateVal, timeVal, Number.MAX_SAFE_INTEGER);
+      const entry = { journey: j, score };
+
+      const keys = new Set();
+      if (j.fromCityId != null && j.fromCityId !== '') keys.add('id:' + j.fromCityId);
+      if (j.toCityId != null && j.toCityId !== '') keys.add('id:' + j.toCityId);
+      if (j.fromLocation) keys.add('name:' + j.fromLocation);
+      if (j.toLocation) keys.add('name:' + j.toLocation);
+
+      for (const key of keys) {
+        let list = _journeysByCityMap.get(key);
+        if (!list) {
+          list = [];
+          _journeysByCityMap.set(key, list);
+        }
+        list.push(entry);
+      }
+    }
+
+    for (const list of _journeysByCityMap.values()) {
+      list.sort((a, b) => a.score - b.score);
+    }
+  }
+
+  return { currentJourneys, currentAppData };
+}
+
 function findLegForJourneyCity(cityId, cityName) {
-  if (!Array.isArray(journeys)) return null;
+  const { currentJourneys } = buildJourneyAndLegCaches();
+  if (!Array.isArray(currentJourneys)) return null;
 
-  const matchingJourneys = journeys
-      .filter(j =>
-          j.fromCityId === cityId ||
-          j.toCityId === cityId ||
-          (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
-      )
-      .sort((a, b) => {
-        const aScore = getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime, Number.MAX_SAFE_INTEGER);
-        const bScore = getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime, Number.MAX_SAFE_INTEGER);
-        return aScore - bScore;
-      });
+  const hasCityId = cityId != null && cityId !== '';
+  const hasCityName = Boolean(cityName);
 
-  for (const journey of matchingJourneys) {
+  let matching = null;
+  if (hasCityId && !hasCityName) {
+    matching = _journeysByCityMap.get('id:' + cityId);
+  } else if (!hasCityId && hasCityName) {
+    matching = _journeysByCityMap.get('name:' + cityName);
+  } else if (hasCityId && hasCityName) {
+    const byId = _journeysByCityMap.get('id:' + cityId);
+    const byName = _journeysByCityMap.get('name:' + cityName);
+    if (byId && byName) {
+      const seen = new Set();
+      const combined = [];
+      for (let i = 0; i < byId.length; i++) {
+        seen.add(byId[i].journey);
+        combined.push(byId[i]);
+      }
+      for (let i = 0; i < byName.length; i++) {
+        if (!seen.has(byName[i].journey)) {
+          combined.push(byName[i]);
+        }
+      }
+      combined.sort((a, b) => a.score - b.score);
+      matching = combined;
+    } else {
+      matching = byId || byName;
+    }
+  }
+
+  if (!matching || matching.length === 0) return null;
+
+  for (let i = 0; i < matching.length; i++) {
+    const journey = matching[i].journey;
     if (journey.legId) {
-      const directLeg = appData.find(leg => leg.id === journey.legId);
+      const directLeg = _legByIdMap.get(journey.legId);
       if (directLeg) return directLeg;
     }
 
-    const targetDate = journey.toCityId === cityId || journey.toLocation === cityName
+    const targetDate = (journey.toCityId === cityId || journey.toLocation === cityName)
         ? (journey.arrivalDate || journey.dayDate || journey.departureDate)
         : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
-    const dateMatchedLeg = appData.find(leg =>
-        (leg.days || []).some(day => sameTimelineDay(day.date, targetDate))
-    );
-    if (dateMatchedLeg) return dateMatchedLeg;
+    if (targetDate) {
+      const targetScore = getTimelineScore(targetDate, '', null);
+      if (targetScore !== null) {
+        const targetKey = Math.floor(targetScore / 1440);
+        const dateMatchedLeg = _legByDayKeyMap.get(targetKey);
+        if (dateMatchedLeg) return dateMatchedLeg;
+      }
+    }
   }
 
   return null;
