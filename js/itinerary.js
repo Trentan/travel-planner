@@ -3953,34 +3953,67 @@ function sameTimelineDay(dayDate, targetDate) {
 }
 
 function findLegForJourneyCity(cityId, cityName) {
-  if (!Array.isArray(journeys)) return null;
+  if (!Array.isArray(journeys) || journeys.length === 0) return null;
 
-  const matchingJourneys = journeys
-      .filter(j =>
-          j.fromCityId === cityId ||
-          j.toCityId === cityId ||
-          (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
-      )
-      .sort((a, b) => {
-        const aScore = getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime, Number.MAX_SAFE_INTEGER);
-        const bScore = getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime, Number.MAX_SAFE_INTEGER);
-        return aScore - bScore;
-      });
+  const matching = [];
+  for (let i = 0; i < journeys.length; i++) {
+    const j = journeys[i];
+    if (
+      j.fromCityId === cityId ||
+      j.toCityId === cityId ||
+      (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
+    ) {
+      const score = getTimelineScore(
+        j.arrivalDate || j.departureDate || j.dayDate,
+        j.arrivalTime || j.departureTime,
+        Number.MAX_SAFE_INTEGER
+      );
+      matching.push({ journey: j, score });
+    }
+  }
 
-  for (const journey of matchingJourneys) {
+  if (matching.length === 0) return null;
+
+  matching.sort((a, b) => a.score - b.score);
+
+  for (let i = 0; i < matching.length; i++) {
+    const journey = matching[i].journey;
+
     if (journey.legId) {
-      const directLeg = appData.find(leg => leg.id === journey.legId);
-      if (directLeg) return directLeg;
+      if (Array.isArray(appData)) {
+        for (let l = 0; l < appData.length; l++) {
+          if (appData[l]?.id === journey.legId) return appData[l];
+        }
+      }
     }
 
     const targetDate = journey.toCityId === cityId || journey.toLocation === cityName
         ? (journey.arrivalDate || journey.dayDate || journey.departureDate)
         : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
-    const dateMatchedLeg = appData.find(leg =>
-        (leg.days || []).some(day => sameTimelineDay(day.date, targetDate))
-    );
-    if (dateMatchedLeg) return dateMatchedLeg;
+    if (targetDate) {
+      const targetScore = getTimelineScore(targetDate, '', null);
+      if (targetScore !== null && !Number.isNaN(targetScore)) {
+        const targetDayNum = Math.floor(targetScore / 1440);
+        if (Array.isArray(appData)) {
+          for (let l = 0; l < appData.length; l++) {
+            const leg = appData[l];
+            const days = leg?.days;
+            if (Array.isArray(days)) {
+              for (let d = 0; d < days.length; d++) {
+                const date = days[d]?.date;
+                if (date) {
+                  const score = getTimelineScore(date, '', null);
+                  if (score !== null && Math.floor(score / 1440) === targetDayNum) {
+                    return leg;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   return null;
