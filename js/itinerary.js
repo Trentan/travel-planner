@@ -1503,14 +1503,7 @@ function renderCompactActiveCityHeader(firstLeg) {
   `;
 }
 
-function buildCompactItinerary() {
-  const container = document.getElementById('itinerary');
-  if (!container) return;
-
-  container.innerHTML = '';
-
-  const mobileLegSequence = getCompactMobileLegSequence();
-
+function createCompactCitySwipeElement(mobileLegSequence) {
   const slidesHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCitySlide(entry, legIndex));
   const railHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCityChip(entry, legIndex));
 
@@ -1527,6 +1520,18 @@ function buildCompactItinerary() {
     slidesHtml: slidesHtml.join(''),
     ariaLabel: 'Itinerary city cards'
   });
+
+  return pagerRoot;
+}
+
+function buildCompactItinerary() {
+  const container = document.getElementById('itinerary');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  const mobileLegSequence = getCompactMobileLegSequence();
+  const pagerRoot = createCompactCitySwipeElement(mobileLegSequence);
 
   container.appendChild(pagerRoot);
   setupMobileSwipePagers(container);
