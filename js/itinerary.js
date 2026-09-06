@@ -3021,6 +3021,9 @@ function toggleActivitiesCardDetails(e, legId) {
 }
 
 function buildItinerary() {
+  if (typeof invalidateLegForJourneyCityCache === 'function') {
+    invalidateLegForJourneyCityCache();
+  }
   // Check window.isCompactView for cross-module access
   const isCompact = typeof window !== 'undefined' && window.isCompactView;
   const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (window.innerWidth <= 768);
@@ -3944,6 +3947,39 @@ function getLegElement(leg) {
   return document.getElementById('leg-' + leg.id);
 }
 
+let _legForCityCache = null;
+let _legForCityJourneysRef = null;
+let _legForCityJourneysLen = -1;
+let _legForCityAppDataRef = null;
+let _legForCityAppDataLen = -1;
+
+let _appDataIndexRef = null;
+let _appDataIndexLen = -1;
+let _appDataLegById = null;
+let _appDataLegByDayKey = null;
+
+let _journeyCityIndexRef = null;
+let _journeyCityIndexLen = -1;
+let _journeyCityIndexMap = null;
+
+function invalidateLegForJourneyCityCache() {
+  _legForCityCache = null;
+  _legForCityJourneysRef = null;
+  _legForCityJourneysLen = -1;
+  _legForCityAppDataRef = null;
+  _legForCityAppDataLen = -1;
+  _appDataIndexRef = null;
+  _appDataIndexLen = -1;
+  _appDataLegById = null;
+  _appDataLegByDayKey = null;
+  _journeyCityIndexRef = null;
+  _journeyCityIndexLen = -1;
+  _journeyCityIndexMap = null;
+}
+if (typeof window !== 'undefined') {
+  window.invalidateLegForJourneyCityCache = invalidateLegForJourneyCityCache;
+}
+
 function sameTimelineDay(dayDate, targetDate) {
   if (!dayDate || !targetDate) return false;
   const dayScore = getTimelineScore(dayDate, '', null);
@@ -3952,37 +3988,177 @@ function sameTimelineDay(dayDate, targetDate) {
   return Math.floor(dayScore / 1440) === Math.floor(targetScore / 1440);
 }
 
-function findLegForJourneyCity(cityId, cityName) {
-  if (!Array.isArray(journeys)) return null;
+function _getAppDataIndex(appDataSource) {
+  const len = appDataSource ? appDataSource.length : -1;
+  if (_appDataLegById && _appDataIndexRef === appDataSource && _appDataIndexLen === len) {
+    return { legById: _appDataLegById, legByDayKey: _appDataLegByDayKey };
+  }
 
-  const matchingJourneys = journeys
-      .filter(j =>
-          j.fromCityId === cityId ||
-          j.toCityId === cityId ||
-          (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
-      )
-      .sort((a, b) => {
-        const aScore = getTimelineScore(a.arrivalDate || a.departureDate || a.dayDate, a.arrivalTime || a.departureTime, Number.MAX_SAFE_INTEGER);
-        const bScore = getTimelineScore(b.arrivalDate || b.departureDate || b.dayDate, b.arrivalTime || b.departureTime, Number.MAX_SAFE_INTEGER);
-        return aScore - bScore;
-      });
+  _appDataIndexRef = appDataSource;
+  _appDataIndexLen = len;
+  _appDataLegById = new Map();
+  _appDataLegByDayKey = new Map();
 
-  for (const journey of matchingJourneys) {
-    if (journey.legId) {
-      const directLeg = appData.find(leg => leg.id === journey.legId);
-      if (directLeg) return directLeg;
+  if (Array.isArray(appDataSource)) {
+    for (let i = 0; i < appDataSource.length; i++) {
+      const leg = appDataSource[i];
+      if (!leg) continue;
+      if (leg.id && !_appDataLegById.has(leg.id)) {
+        _appDataLegById.set(leg.id, leg);
+      }
+      if (Array.isArray(leg.days)) {
+        for (let d = 0; d < leg.days.length; d++) {
+          const day = leg.days[d];
+          if (day && day.date) {
+            const score = getTimelineScore(day.date, '', null);
+            if (score !== null) {
+              const dayKey = Math.floor(score / 1440);
+              if (!_appDataLegByDayKey.has(dayKey)) {
+                _appDataLegByDayKey.set(dayKey, leg);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return { legById: _appDataLegById, legByDayKey: _appDataLegByDayKey };
+}
+
+function _getJourneyCityIndexMap(journeysSource) {
+  const len = journeysSource ? journeysSource.length : -1;
+  if (_journeyCityIndexMap && _journeyCityIndexRef === journeysSource && _journeyCityIndexLen === len) {
+    return _journeyCityIndexMap;
+  }
+
+  _journeyCityIndexRef = journeysSource;
+  _journeyCityIndexLen = len;
+  const map = new Map();
+
+  if (Array.isArray(journeysSource)) {
+    for (let i = 0; i < journeysSource.length; i++) {
+      const j = journeysSource[i];
+      if (!j) continue;
+      const dateVal = j.arrivalDate || j.departureDate || j.dayDate;
+      const timeVal = j.arrivalTime || j.departureTime;
+      const score = getTimelineScore(dateVal, timeVal, Number.MAX_SAFE_INTEGER);
+      const entry = { journey: j, score, index: i };
+
+      const keys = new Set();
+      if (j.fromCityId) keys.add(`id:${j.fromCityId}`);
+      if (j.toCityId) keys.add(`id:${j.toCityId}`);
+      if (j.fromLocation) keys.add(`name:${j.fromLocation}`);
+      if (j.toLocation) keys.add(`name:${j.toLocation}`);
+
+      for (const k of keys) {
+        let list = map.get(k);
+        if (!list) {
+          list = [];
+          map.set(k, list);
+        }
+        list.push(entry);
+      }
     }
 
-    const targetDate = journey.toCityId === cityId || journey.toLocation === cityName
+    map.forEach(list => {
+      list.sort((a, b) => a.score - b.score || a.index - b.index);
+    });
+  }
+
+  _journeyCityIndexMap = map;
+  return _journeyCityIndexMap;
+}
+
+function findLegForJourneyCity(cityId, cityName) {
+  const journeysSource = (typeof journeys !== 'undefined' && Array.isArray(journeys))
+    ? journeys
+    : ((typeof window !== 'undefined' && Array.isArray(window.journeys)) ? window.journeys : null);
+
+  if (!Array.isArray(journeysSource)) return null;
+
+  const appDataSource = (typeof appData !== 'undefined' && Array.isArray(appData))
+    ? appData
+    : ((typeof window !== 'undefined' && Array.isArray(window.appData)) ? window.appData : null);
+
+  const cacheKey = `${cityId || ''}|||${cityName || ''}`;
+
+  if (
+    _legForCityCache &&
+    _legForCityJourneysRef === journeysSource &&
+    _legForCityJourneysLen === journeysSource.length &&
+    _legForCityAppDataRef === appDataSource &&
+    _legForCityAppDataLen === (appDataSource ? appDataSource.length : -1)
+  ) {
+    if (_legForCityCache.has(cacheKey)) {
+      return _legForCityCache.get(cacheKey);
+    }
+  } else {
+    _legForCityCache = new Map();
+    _legForCityJourneysRef = journeysSource;
+    _legForCityJourneysLen = journeysSource.length;
+    _legForCityAppDataRef = appDataSource;
+    _legForCityAppDataLen = appDataSource ? appDataSource.length : -1;
+  }
+
+  const journeyMap = _getJourneyCityIndexMap(journeysSource);
+  const candidates = [];
+  const seen = new Set();
+
+  const addCandidatesFromKey = k => {
+    const list = journeyMap.get(k);
+    if (!list) return;
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i];
+      if (!seen.has(item.journey)) {
+        seen.add(item.journey);
+        candidates.push(item);
+      }
+    }
+  };
+
+  if (cityId) addCandidatesFromKey(`id:${cityId}`);
+  if (cityName) addCandidatesFromKey(`name:${cityName}`);
+
+  if (candidates.length === 0) {
+    _legForCityCache.set(cacheKey, null);
+    return null;
+  }
+
+  if (candidates.length > 1) {
+    candidates.sort((a, b) => a.score - b.score || a.index - b.index);
+  }
+
+  const { legById, legByDayKey } = _getAppDataIndex(appDataSource);
+
+  for (let i = 0; i < candidates.length; i++) {
+    const journey = candidates[i].journey;
+    if (journey.legId) {
+      const directLeg = legById.get(journey.legId);
+      if (directLeg) {
+        _legForCityCache.set(cacheKey, directLeg);
+        return directLeg;
+      }
+    }
+
+    const targetDate = (journey.toCityId === cityId || journey.toLocation === cityName)
         ? (journey.arrivalDate || journey.dayDate || journey.departureDate)
         : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
-    const dateMatchedLeg = appData.find(leg =>
-        (leg.days || []).some(day => sameTimelineDay(day.date, targetDate))
-    );
-    if (dateMatchedLeg) return dateMatchedLeg;
+    if (targetDate) {
+      const targetScore = getTimelineScore(targetDate, '', null);
+      if (targetScore !== null) {
+        const targetDayKey = Math.floor(targetScore / 1440);
+        const dateMatchedLeg = legByDayKey.get(targetDayKey);
+        if (dateMatchedLeg) {
+          _legForCityCache.set(cacheKey, dateMatchedLeg);
+          return dateMatchedLeg;
+        }
+      }
+    }
   }
 
+  _legForCityCache.set(cacheKey, null);
   return null;
 }
 

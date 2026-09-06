@@ -700,6 +700,9 @@ function reObserveLegs() {
 
 // Helper to rebuild the current active view
 function rebuildCurrentView() {
+  if (typeof window.invalidateLegForJourneyCityCache === 'function') {
+    window.invalidateLegForJourneyCityCache();
+  }
   const activeTab = document.querySelector('.app-tab-btn.active') || document.querySelector('.app-tabs-content .tab-pane.active');
   if (!activeTab) return;
 
