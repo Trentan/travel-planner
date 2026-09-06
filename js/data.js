@@ -3435,6 +3435,9 @@ function displayTimestampStatus() {
 }
 
 async function runSaveData(showTick = true) {
+    if (typeof invalidateFindLegCache === 'function') {
+      invalidateFindLegCache();
+    }
     const t = document.getElementById('mainTitle');
     const s = document.getElementById('mainSubtitle');
     if (t && t.innerText.trim()) titleData.title = t.innerText.trim();
@@ -3941,6 +3944,9 @@ function normalizeTripLegsData(legs) {
 }
 
 function normalizeTripJourneysData(items) {
+  if (typeof invalidateFindLegCache === 'function') {
+    invalidateFindLegCache();
+  }
   if (!Array.isArray(items)) return [];
   
   const flatItems = [];
