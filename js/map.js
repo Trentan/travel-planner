@@ -338,12 +338,16 @@ function buildJourneyMap() {
 
     const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     const tileUrl = isDarkMode
-      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+      ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+    const tileAttribution = isDarkMode
+      ? 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+      : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
     L.tileLayer(tileUrl, {
-      attribution: '© OpenStreetMap contributors © CARTO',
-      subdomains: 'abcd'
+      attribution: tileAttribution,
+      maxZoom: 19
     }).addTo(mainMap);
 
     if (window.ResizeObserver) {
@@ -485,12 +489,16 @@ function updateMapTiles() {
   // Add new tile layer based on current theme
   const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
   const tileUrl = isDarkMode
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+  const tileAttribution = isDarkMode
+    ? 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   L.tileLayer(tileUrl, {
-    attribution: '© OpenStreetMap contributors © CARTO',
-    subdomains: 'abcd'
+    attribution: tileAttribution,
+    maxZoom: 19
   }).addTo(mainMap);
 }
 
