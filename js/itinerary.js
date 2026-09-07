@@ -4072,8 +4072,10 @@ function findLegForJourneyCity(cityId, cityName) {
   if (!Array.isArray(appData) || appData.length === 0) return null;
 
   const matching = [];
-  for (let i = 0; i < journeys.length; i++) {
+  const jLen = journeys.length;
+  for (let i = 0; i < jLen; i++) {
     const j = journeys[i];
+    if (!j) continue;
     if (
       j.fromCityId === cityId ||
       j.toCityId === cityId ||
@@ -4088,18 +4090,22 @@ function findLegForJourneyCity(cityId, cityName) {
     }
   }
 
-  if (matching.length === 0) return null;
+  const mLen = matching.length;
+  if (mLen === 0) return null;
 
-  if (matching.length > 1) {
+  if (mLen > 1) {
     matching.sort((a, b) => a.score - b.score);
   }
 
-  for (let i = 0; i < matching.length; i++) {
+  const aLen = appData.length;
+  for (let i = 0; i < mLen; i++) {
     const journey = matching[i].journey;
 
     if (journey.legId) {
-      const directLeg = appData.find(leg => leg && leg.id === journey.legId);
-      if (directLeg) return directLeg;
+      for (let l = 0; l < aLen; l++) {
+        const leg = appData[l];
+        if (leg && leg.id === journey.legId) return leg;
+      }
     }
 
     const targetDate = (journey.toCityId === cityId || journey.toLocation === cityName)
@@ -4107,10 +4113,17 @@ function findLegForJourneyCity(cityId, cityName) {
         : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
     if (targetDate) {
-      const dateMatchedLeg = appData.find(leg =>
-        (leg && leg.days) ? leg.days.some(day => day && sameTimelineDay(day.date, targetDate)) : false
-      );
-      if (dateMatchedLeg) return dateMatchedLeg;
+      for (let l = 0; l < aLen; l++) {
+        const leg = appData[l];
+        if (leg && leg.days) {
+          const days = leg.days;
+          const dLen = days.length;
+          for (let d = 0; d < dLen; d++) {
+            const day = days[d];
+            if (day && sameTimelineDay(day.date, targetDate)) return leg;
+          }
+        }
+      }
     }
   }
 
