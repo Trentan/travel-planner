@@ -97,6 +97,7 @@
         <div class="app-menu-section-group">
           <div class="app-menu-section-header">🎨 View & Appearance</div>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripSummaryModal()"><span class="menu-icon">📅</span> View Trip Summary Table</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); toggleDualTimeDisplay()"><span class="menu-icon">🌐</span> Toggle Dual Timezone Display</button>
           <label id="themeToggleBtn" class="app-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
             <input id="themeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
             <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
@@ -385,6 +386,7 @@
           <div class="mobile-menu-section-grid">
             <button id="mobileEditToggleBtn" class="app-menu-btn mobile-menu-primary" onclick="event.preventDefault(); event.stopPropagation(); toggleEditMode(); closeMobileMenu(); syncMenuEditToggleLabels()">🔒 Lock: Read Only</button>
             <button class="app-menu-btn" onclick="closeMobileMenu(); openTripSummaryModal()">📅 Trip Summary</button>
+            <button class="app-menu-btn" onclick="closeMobileMenu(); toggleDualTimeDisplay()">🌐 Dual Timezone</button>
             <label id="mobileThemeToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
               <input id="mobileThemeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
               <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
@@ -1118,6 +1120,7 @@
 
 <script src="./js/default-data.js"></script>
 <script src="./js/utils.js"></script>
+<script src="./js/timezone.js"></script>
   <script src="./js/attachments.js"></script>
 <script src="./js/data.js"></script>
 <script src="./js/trip-library.js"></script>

@@ -10,9 +10,11 @@ const { run: runIosPwaNavVerify } = require('./ios-pwa-nav-verify');
 const { run: runPwaShortcutsOfflineTests } = require('./pwa-shortcuts-offline.test');
 const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 const { runCloudStorageXssTests } = require('./cloud-storage-xss.test');
+const { run: runTimezoneSuite } = require('./timezone-suite.test');
 
 async function run() {
   await runCloudStorageXssTests();
+  if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
   await runCoreSmoke();
   await runPwaShortcutsOfflineTests();
   await runAutoStaysSuite();
