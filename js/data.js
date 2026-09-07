@@ -1248,13 +1248,11 @@ function extractCitiesFromItinerary() {
     if (!existing) {
       const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === normalized.toLowerCase());
       let country = '';
-      let cityCode = '';
       let countryCode = '';
       let formattedName = dbMatch ? dbMatch.name : formatCityTitleCase(normalized);
 
       if (dbMatch) {
         country = getCountryName(dbMatch.countryCode);
-        cityCode = dbMatch.code;
         countryCode = dbMatch.countryCode;
       }
 
@@ -1262,7 +1260,6 @@ function extractCitiesFromItinerary() {
         id: 'city-' + formattedName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
         name: formattedName,
         country: country,
-        code: cityCode,
         countryCode: countryCode,
         dateFrom: sourceDate || '',
         dateTo: sourceDate || '',
@@ -1387,7 +1384,6 @@ function extractCitiesFromItinerary() {
       if (dbMatch) {
         city.countryCode = dbMatch.countryCode;
         city.country = getCountryName(dbMatch.countryCode);
-        if (!city.code) city.code = dbMatch.code;
       }
     }
   });
@@ -1428,7 +1424,7 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     // Update existing city
     if (country) existing.country = country;
     if (countryCode) existing.countryCode = countryCode;
-    if (cityCode) existing.code = cityCode;
+    if ('code' in existing) delete existing.code;
     if (lat !== null) existing.lat = lat;
     if (lng !== null) existing.lng = lng;
     if (dateFrom && dateFrom < existing.dateFrom) existing.dateFrom = dateFrom;
@@ -1436,24 +1432,22 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     return existing;
   }
 
-  // Look up city in databases (IATA lookup) - this works even for "Other" country
-  let code = cityCode;
+  // Look up city in databases
   let cCode = countryCode;
   let cName = country;
   let cityLat = lat;
   let cityLng = lng;
 
-  // First: look up city code from built-in database or user cities
+  // First: look up city from built-in database or user cities
   const dbMatch = ALL_CITIES.find(c =>
     c.name.toLowerCase() === normalizedName.toLowerCase() ||
-    (code && c.code && c.code.toUpperCase() === code.toUpperCase())
+    (cityCode && c.code && c.code.toUpperCase() === cityCode.toUpperCase())
   );
 
   let formattedName = dbMatch ? dbMatch.name : formatCityTitleCase(normalizedName);
 
   if (dbMatch) {
-    // City found in database - use its IATA code, country and coordinates
-    if (!code) code = dbMatch.code;
+    // City found in database - use its country and coordinates
     if (!cCode) cCode = dbMatch.countryCode;
     if ((cityLat === null || cityLat === undefined || cityLat === '') && dbMatch.lat !== undefined) cityLat = dbMatch.lat;
     if ((cityLng === null || cityLng === undefined || cityLng === '') && dbMatch.lng !== undefined) cityLng = dbMatch.lng;
@@ -1469,7 +1463,6 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
   const newCity = {
     id: 'city-' + formattedName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
     name: formattedName,
-    code: code || '',
     countryCode: cCode || '',
     country: cName || country,
     lat: cityLat,
@@ -1561,8 +1554,11 @@ function normalizeCityLocationData(city) {
     city.id = 'city-' + city.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
   }
 
+  if ('code' in city) {
+    delete city.code;
+  }
+
   if (dbMatch) {
-    if (!city.code && dbMatch.code) city.code = dbMatch.code;
     if (!city.icaoCode && (dbMatch.icaoCode || dbMatch.icao)) city.icaoCode = dbMatch.icaoCode || dbMatch.icao;
     if (!city.countryCode && dbMatch.countryCode) city.countryCode = dbMatch.countryCode;
     if (!city.country && dbMatch.countryCode) city.country = getCountryName(dbMatch.countryCode);
@@ -1634,17 +1630,16 @@ function applyCityLocation(city, location) {
     city.countryCode = location.countryCode;
     city.country = getCountryName(location.countryCode);
   }
-  if (location.code) city.code = location.code;
+  if ('code' in city) delete city.code;
   if (location.icaoCode) city.icaoCode = location.icaoCode;
 
-  if (!city.code || !city.icaoCode) {
+  if (!city.icaoCode) {
     const dbMatch = ALL_CITIES.find(c =>
       c.name.toLowerCase() === city.name.toLowerCase() &&
       (!city.countryCode || c.countryCode === city.countryCode)
     ) || ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
 
     if (dbMatch) {
-      if (!city.code && dbMatch.code) city.code = dbMatch.code;
       if (!city.icaoCode && (dbMatch.icaoCode || dbMatch.icao)) city.icaoCode = dbMatch.icaoCode || dbMatch.icao;
     }
   }
@@ -1663,49 +1658,30 @@ async function searchCityOnlineCandidates(cityName) {
     const data = await response.json();
     if (!Array.isArray(data)) return [];
 
-    const candidates = [];
-    const seenCountries = new Set();
-
-    data.forEach(item => {
-      const cCode = (item.address?.country_code || '').toUpperCase();
-      const cName = item.address?.country || getCountryName(cCode);
-      if (cCode && !seenCountries.has(cCode)) {
-        seenCountries.add(cCode);
-        candidates.push({
-          lat: parseFloat(item.lat),
-          lng: parseFloat(item.lon),
-          countryCode: cCode,
-          countryName: cName,
-          displayName: item.display_name
-        });
-      }
+    return data.map(item => {
+      const countryCode = (item.address?.country_code || '').toUpperCase();
+      return {
+        lat: parseFloat(item.lat),
+        lng: parseFloat(item.lon),
+        countryCode: countryCode,
+        countryName: item.address?.country || getCountryName(countryCode) || countryCode,
+        displayName: item.display_name
+      };
     });
-
-    return candidates;
   } catch (e) {
-    console.error('[Geocoding] Candidate search failed:', e);
+    console.warn(`[Online Search] Candidates fetch failed for ${cleanName}:`, e);
     return [];
   }
 }
 
-async function promptCityDisambiguation(cityId) {
+function promptCityDisambiguation(cityId, candidates) {
   const city = citiesData.find(c => c.id === cityId);
-  if (!city) return;
+  if (!city || !Array.isArray(candidates) || candidates.length === 0) return;
 
-  const candidates = await searchCityOnlineCandidates(city.name);
+  const existingModal = document.getElementById('city-disambiguation-modal');
+  if (existingModal) existingModal.remove();
 
-  if (candidates.length <= 1) {
-    const singleMatch = candidates[0];
-    if (singleMatch) {
-      selectCityDisambiguationChoice(cityId, singleMatch.countryCode, singleMatch.lat, singleMatch.lng);
-    }
-    return;
-  }
-
-  let overlay = document.getElementById('city-disambiguation-modal');
-  if (overlay) overlay.remove();
-
-  overlay = document.createElement('div');
+  const overlay = document.createElement('div');
   overlay.id = 'city-disambiguation-modal';
   overlay.className = 'modal-overlay';
   overlay.style.cssText = 'display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center;';
@@ -1713,11 +1689,10 @@ async function promptCityDisambiguation(cityId) {
   const choicesHtml = candidates.map(cand => {
     const flag = getCountryFlag(cand.countryCode);
     const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase() && c.countryCode === cand.countryCode);
-    const iataCode = dbMatch ? dbMatch.code : '';
     const icaoCode = dbMatch ? (dbMatch.icaoCode || dbMatch.icao || '') : '';
     
     return `
-      <button class="trip-start-choice" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.1rem; border: 1px solid #c8d6d0; border-radius: 0.75rem; background: #fff; text-align: left; cursor: pointer; margin-bottom: 0.65rem; width: 100%;" onclick="selectCityDisambiguationChoice('${cityId}', '${cand.countryCode}', ${cand.lat}, ${cand.lng}, '${iataCode}', '${icaoCode}')">
+      <button class="trip-start-choice" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.1rem; border: 1px solid #c8d6d0; border-radius: 0.75rem; background: #fff; text-align: left; cursor: pointer; margin-bottom: 0.65rem; width: 100%;" onclick="selectCityDisambiguationChoice('${cityId}', '${cand.countryCode}', ${cand.lat}, ${cand.lng}, '', '${icaoCode}')">
         <div>
           <strong style="font-size: 1.05rem; color: #162c3b;">${flag} ${city.name}, ${cand.countryName}</strong>
           <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: #60717b;">${cand.displayName}</p>
@@ -1752,7 +1727,7 @@ function selectCityDisambiguationChoice(cityId, countryCode, lat, lng, iataCode 
   city.country = getCountryName(countryCode);
   city.lat = lat;
   city.lng = lng;
-  if (iataCode) city.code = iataCode;
+  if ('code' in city) delete city.code;
   if (icaoCode) city.icaoCode = icaoCode;
 
   saveData(true);
@@ -1875,7 +1850,9 @@ function createCityDatalists() {
     .forEach(city => {
       const option = document.createElement('option');
       option.value = city.name;
-      option.textContent = `${city.code} - ${getCountryName(city.countryCode)}`;
+      const flag = city.countryCode ? getCountryFlag(city.countryCode) : '🌍';
+      const cName = getCountryName(city.countryCode);
+      option.textContent = cName ? `${flag} ${cName}` : flag;
       citiesList.appendChild(option);
     });
 
@@ -2327,8 +2304,9 @@ function setupCityAutocomplete() {
     );
 
     if (match && codeDisplay && codeInfo) {
-      const country = COUNTRY_DATA.find(c => c.code === match.countryCode);
-      codeInfo.textContent = `${match.code} — ${getCountryName(match.countryCode)}`;
+      const flag = getCountryFlag(match.countryCode);
+      const cName = getCountryName(match.countryCode);
+      codeInfo.textContent = `${flag} ${cName}`;
       codeDisplay.style.display = 'block';
 
       // Auto-select country if not already selected
@@ -2352,7 +2330,9 @@ function setupCityAutocomplete() {
     if (match && countrySelect) {
       countrySelect.value = match.countryCode;
       if (codeDisplay && codeInfo) {
-        codeInfo.textContent = `${match.code} — ${getCountryName(match.countryCode)}`;
+        const flag = getCountryFlag(match.countryCode);
+        const cName = getCountryName(match.countryCode);
+        codeInfo.textContent = `${flag} ${cName}`;
         codeDisplay.style.display = 'block';
       }
     }
@@ -2379,21 +2359,23 @@ function populateCityList() {
 
   const health = typeof auditCityHealth === 'function' ? auditCityHealth() : { totalIssues: 0 };
   const toolbar = document.createElement('div');
+  toolbar.className = 'manage-cities-toolbar';
   toolbar.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:0.5rem; flex-wrap:wrap; padding:0.75rem 1rem; background:#f0f7f4; border-bottom:1px solid #d0e5dc;';
   toolbar.innerHTML = `
     <div style="font-size:0.85rem; color:#176e67; font-weight:600;">
       🌍 Manage Cities (${citiesData.length} total ${health.totalIssues > 0 ? `· ⚠️ ${health.totalIssues} unmapped/missing flags` : '· ✅ All mapped'})
     </div>
     <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-      <button id="autoRepairAllCitiesBtn"
-              class="search-btn"
-              style="color: #fff; background: #176e67; border:none; cursor: pointer; border-radius: 0.4rem; padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;"
+      <button id="refetchAllCitiesBtn"
+              data-alias="autoRepairAllCitiesBtn"
+              class="search-btn refetch-all-cities-btn"
+              style="color: #fff; background: #176e67; border:none; cursor: pointer; border-radius: 0.4rem; padding: 0.4rem 0.85rem; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;"
               onclick="repairAllCityMetadata()"
               title="Auto-repair map coordinates and country flags for all cities">
-        ⚡ Auto-repair all locations & flags
+        🔄 Refetch All Flags & Coordinates
       </button>
       <button class="search-btn"
-              style="color: #2C3E50; background: #fff; border:1px solid #cbd5e1; cursor: pointer; border-radius: 0.4rem; padding: 0.35rem 0.75rem; font-size: 0.85rem; font-weight: 600;"
+              style="color: #2C3E50; background: #fff; border:1px solid #cbd5e1; cursor: pointer; border-radius: 0.4rem; padding: 0.4rem 0.75rem; font-size: 0.85rem; font-weight: 600;"
               onclick="openAllInGoogleMaps()"
               title="Open all mapped cities in Google Maps">
         🗺️ View All on Map
@@ -2407,7 +2389,6 @@ function populateCityList() {
 
   sortedCities.forEach(city => {
     const flag = getCityFlag(city.name);
-    const countryFlag = city.countryCode ? getCountryFlag(city.countryCode) : '';
     const isHome = isHomeCity(city.name);
     const homeBadge = isHome ? ' <span style="background: #27AE60; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">🏠 Home</span>' : '';
 
@@ -2420,8 +2401,6 @@ function populateCityList() {
       }
     }
 
-    // Build code display
-    const codeDisplay = city.code ? `<span class="city-code">${city.code}</span>` : '';
     const hasCoords = cityHasStoredCoords(city);
     const cityLat = hasCoords ? Number.parseFloat(city.lat) : null;
     const cityLng = hasCoords ? Number.parseFloat(city.lng) : null;
@@ -2447,15 +2426,6 @@ function populateCityList() {
       </button>
     ` : `<span class="city-location-status">📍 Mapped</span>`;
 
-    const refetchBtn = `
-      <button class="search-btn" 
-              style="color: #176e67; background: #e5f3ed; border: 1px solid #b2d8cd; cursor: pointer; border-radius: 0.4rem; padding: 0.25rem 0.5rem; font-size: 0.85rem;" 
-              onclick="refetchCityLocationAndFlag('${city.id}')" 
-              title="Refetch map coordinates, country, and flag for this city">
-        🔄 Refetch Location & Flag
-      </button>
-    `;
-
     const row = document.createElement('div');
     row.className = 'city-list-item';
     row.style.cssText = `display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid #eee; border-left: 4px solid ${cityColor}; background: white;`;
@@ -2466,7 +2436,6 @@ function populateCityList() {
           <div style="font-weight: 500; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
             <input class="city-rename-input" data-city-id="${city.id}" value="${escapeTripStartText(city.name)}" style="font: inherit; font-size: 1rem; font-weight: 700; border: 1px solid #c8d6d0; border-radius: 0.4rem; padding: 0.2rem 0.4rem; max-width: 180px;" title="Click to rename city">
             ${homeBadge}
-            <input class="city-iata-input" data-city-id="${city.id}" value="${escapeTripStartText(city.code || '')}" placeholder="IATA" maxlength="4" style="font-family: monospace; font-size: 0.82rem; font-weight: 700; width: 55px; border: 1px solid #c8d6d0; border-radius: 0.3rem; padding: 0.15rem 0.3rem; text-transform: uppercase;" title="IATA city/airport code (3 letters)">
             <input class="city-icao-input" data-city-id="${city.id}" value="${escapeTripStartText(city.icaoCode || city.icao || '')}" placeholder="ICAO" maxlength="4" style="font-family: monospace; font-size: 0.82rem; font-weight: 700; width: 60px; border: 1px solid #c8d6d0; border-radius: 0.3rem; padding: 0.15rem 0.3rem; text-transform: uppercase;" title="ICAO airport code (4 letters)">
           </div>
           <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 6px;">
@@ -2479,7 +2448,6 @@ function populateCityList() {
               return `<option value="${c.code}"${isSelected ? ' selected' : ''}>${c.flag} ${c.name}</option>`;
             }).join('')}
             </select>
-            ${refetchBtn}
             ${searchBtn}
             ${coordinateDisplay}
             ${resetLocationBtn}
@@ -2491,7 +2459,7 @@ function populateCityList() {
     container.appendChild(row);
   });
 
-  // Attach change handlers to country selects, rename inputs, and code inputs
+  // Attach change handlers to country selects, rename inputs, and ICAO inputs
   container.querySelectorAll('.country-select').forEach(select => {
     select.addEventListener('change', function() {
       const cityId = this.dataset.cityId;
@@ -2506,18 +2474,6 @@ function populateCityList() {
       const newName = this.value.trim();
       if (newName) {
         renameCityInDialog(cityId, newName);
-      }
-    });
-  });
-
-  container.querySelectorAll('.city-iata-input').forEach(input => {
-    input.addEventListener('change', function() {
-      const cityId = this.dataset.cityId;
-      const val = this.value.trim().toUpperCase();
-      const city = citiesData.find(c => c.id === cityId);
-      if (city) {
-        city.code = val;
-        saveData(false);
       }
     });
   });
@@ -2636,7 +2592,7 @@ async function refetchCityLocationAndFlag(cityId) {
   const match = ALL_CITIES.find(c => c.name.toLowerCase() === cityName.toLowerCase());
 
   if (match) {
-    city.code = match.code;
+    if ('code' in city) delete city.code;
     city.countryCode = match.countryCode;
     city.country = getCountryName(match.countryCode);
     city.lat = match.lat;
@@ -2709,9 +2665,13 @@ async function repairAllCityMetadata() {
   for (const city of citiesData) {
     let modified = false;
 
+    if ('code' in city) {
+      delete city.code;
+      modified = true;
+    }
+
     const match = city && city.name ? cityLookup.get(city.name.toLowerCase()) : null;
     if (match) {
-      if (!city.code) { city.code = match.code; modified = true; }
       if (!city.countryCode) { city.countryCode = match.countryCode; modified = true; }
       if (!city.country) { city.country = getCountryName(match.countryCode); modified = true; }
       if (!cityHasStoredCoords(city) && match.lat && match.lng) {
@@ -2733,12 +2693,26 @@ async function repairAllCityMetadata() {
     if (modified) repairedCount++;
   }
 
+  // Check for any unresolved cities (missing coordinates or missing country)
+  const unresolved = [];
+  for (const city of citiesData) {
+    if (!cityHasStoredCoords(city) || !city.countryCode) {
+      unresolved.push(city.name || 'Unnamed');
+    }
+  }
+
   saveData(true);
   populateCityList();
   if (typeof buildNav === 'function') buildNav();
   if (typeof buildItinerary === 'function') buildItinerary();
   if (typeof buildJourneyMap === 'function') buildJourneyMap();
-  showToast(`✨ Successfully checked & repaired ${repairedCount} city locations and flags!`);
+
+  if (unresolved.length > 0) {
+    const unresolvedNames = unresolved.slice(0, 4).join(', ') + (unresolved.length > 4 ? ` and ${unresolved.length - 4} more` : '');
+    showToast(`⚠️ Checked ${citiesData.length} destinations. ${unresolved.length} ${unresolved.length === 1 ? 'city needs' : 'cities need'} manual details: ${unresolvedNames}`, 7000);
+  } else {
+    showToast(`✨ Successfully checked & updated flags and coordinates for all cities!`);
+  }
 }
 
 async function addNewCityFromDialog() {
@@ -2809,13 +2783,10 @@ async function addNewCityFromDialog() {
     return;
   }
 
-  // Look up city code from databases
-  let cityCode = '';
   const dbMatch = ALL_CITIES.find(c =>
     c.name.toLowerCase() === name.toLowerCase()
   );
   if (dbMatch) {
-    cityCode = dbMatch.code;
     // Verify country matches
     if (!countryCode && dbMatch.countryCode) {
       countryCode = dbMatch.countryCode;
@@ -2824,15 +2795,7 @@ async function addNewCityFromDialog() {
     }
   }
 
-  // If city not in database and it looks like an IATA code (3 uppercase letters), add to user cities
-  if (!cityCode && name.length === 3 && /^[A-Z]{3}$/.test(name)) {
-    cityCode = name;
-    if (name && countryCode) {
-      addUserCity(cityCode, name, countryCode);
-    }
-  }
-
-  const newCity = addOrUpdateCity(name, countryName, '', '', cityCode, countryCode);
+  const newCity = addOrUpdateCity(name, countryName, '', '', '', countryCode);
   if (newCity) {
     if (typeof refreshJourneyCityDropdowns === 'function') {
       refreshJourneyCityDropdowns(newCity.name);
@@ -2894,13 +2857,13 @@ function populateCountrySelect() {
   setupCountrySelectHandler();
 }
 
-// Migration: Convert old city format to new ISO/ICAO/IATA standard format
+// Migration: Convert old city format to new ISO/ICAO standard format
 // Old: { id, name, country, dateFrom, dateTo }
-// New: { id, name, code, countryCode, country, dateFrom, dateTo, colour }
+// New: { id, name, countryCode, country, dateFrom, dateTo, colour }
 function migrateCitiesToISOFormat() {
   if (!citiesData || !Array.isArray(citiesData)) return;
 
-  const citiesNeedingMigration = citiesData.filter(city => !city.code || !city.countryCode);
+  const citiesNeedingMigration = citiesData.filter(city => !city.countryCode || 'code' in city);
   if (citiesNeedingMigration.length === 0) return;
 
   console.log(`[Migration] Converting ${citiesNeedingMigration.length} cities to ISO format...`);
@@ -2933,11 +2896,12 @@ function migrateCitiesToISOFormat() {
     const normalizedName = city.name?.trim();
     if (!normalizedName) return;
 
+    if ('code' in city) delete city.code;
+
     // Look up city in ALL city databases (built-in + extended)
     const dbMatch = allCitiesMap.get(normalizedName.toLowerCase());
 
     if (dbMatch) {
-      city.code = dbMatch.code;
       city.countryCode = dbMatch.countryCode;
       const countryMatch = dbMatch.countryCode ? countryByCodeMap.get(dbMatch.countryCode.toUpperCase()) : null;
       if (countryMatch) {
@@ -2953,16 +2917,6 @@ function migrateCitiesToISOFormat() {
         if (countryMatch) {
           city.countryCode = countryMatch.code;
           city.country = countryMatch.name;
-          // Generate a code from city name (first 3 letters or first letters of words)
-          const words = normalizedName.split(/\s+/);
-          if (words.length === 1) {
-            city.code = words[0].substring(0, 3).toUpperCase();
-          } else {
-            city.code = words.map(w => w[0]).join('').toUpperCase();
-            if (city.code.length < 3) {
-              city.code = normalizedName.substring(0, 3).toUpperCase();
-            }
-          }
         }
       }
 
@@ -2980,7 +2934,7 @@ function migrateCitiesToISOFormat() {
       city.colour = getRandomCityColor(usedColorsSet);
     }
 
-    console.log(`[Migration] City "${city.name}" → code: ${city.code || 'none'}, country: ${city.country || 'none'} (${city.countryCode || 'none'})`);
+    console.log(`[Migration] City "${city.name}" → country: ${city.country || 'none'} (${city.countryCode || 'none'})`);
   });
 
   // Update any cities that have custom codes in userCities
@@ -2997,7 +2951,7 @@ function migrateCitiesToISOFormat() {
       if (!userCity.name) return;
       const existingCity = citiesDataMap.get(userCity.name.toLowerCase());
       if (existingCity) {
-        existingCity.code = userCity.code;
+        if ('code' in existingCity) delete existingCity.code;
         existingCity.countryCode = userCity.countryCode;
       }
     });
@@ -4051,6 +4005,7 @@ function normalizeTripCitiesDateData(items) {
   if (!Array.isArray(items)) return [];
   items.forEach(item => {
     normalizeCityLocationData(item);
+    if ('code' in item) delete item.code;
     item.dateFrom = normalizeTripDateValue(item.dateFrom);
     item.dateTo = normalizeTripDateValue(item.dateTo);
   });
@@ -6911,6 +6866,7 @@ window.refetchCityLocationAndFlag = refetchCityLocationAndFlag;
 window.auditCityHealth = auditCityHealth;
 window.checkAndPromptCityAudit = checkAndPromptCityAudit;
 window.repairAllCityMetadata = repairAllCityMetadata;
+window.refetchAllCityMetadata = repairAllCityMetadata;
 window.dismissFileSetup = dismissFileSetup;
 window.startBlankTrip = startBlankTrip;
 window.onboardCreateNewTrip = onboardCreateNewTrip;

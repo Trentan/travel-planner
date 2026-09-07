@@ -321,6 +321,14 @@
     @apply max-h-100 overflow-y-auto;
   }
 
+  .manage-cities-toolbar {
+    @apply flex items-center justify-between gap-2 flex-wrap p-3 bg-[#f0f7f4] border-b border-[#d0e5dc] rounded-t-lg;
+  }
+
+  .refetch-all-cities-btn {
+    @apply transition-all duration-150 active:scale-[0.98] hover:brightness-110 shadow-xs;
+  }
+
   .city-add-section {
     @apply mt-6 pt-4 border-t border-border;
   }

@@ -195,7 +195,6 @@ function ensureBookingCity(name, sourceDate = '') {
   const newCity = {
     id: cityId,
     name: dbMatch?.name || cleaned,
-    code: dbMatch?.code || '',
     countryCode: dbMatch?.countryCode || '',
     country: dbMatch?.country || (typeof getCountryName === 'function' && dbMatch?.countryCode ? getCountryName(dbMatch.countryCode) : ''),
     dateFrom: sourceDate,

@@ -457,19 +457,33 @@ async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {
     assert(createdTrip.secondCity === 'Kyoto', 'Onboarding: should create additional cities');
     assert(createdTrip.starterFood >= 1 && createdTrip.starterActivities >= 1, 'Onboarding: should bundle editable starter food and activity ideas');
 
-    // Test city rename and refetch location/flag
+    // Test city management overhaul: batch refetch all, no IATA inputs, no per-row refetch buttons
     await page.evaluate(() => {
       window.openCityDialog();
     });
     await page.waitForFunction(() => document.getElementById('city-modal').style.display === 'flex');
+
+    const hasRefetchAllBtn = await page.evaluate(() => !!document.getElementById('refetchAllCitiesBtn'));
+    assert(hasRefetchAllBtn, 'City Management: #refetchAllCitiesBtn should exist in Manage Cities toolbar');
+
+    const iataInputCount = await page.evaluate(() => document.querySelectorAll('#city-modal .city-iata-input').length);
+    assert(iataInputCount === 0, 'City Management: .city-iata-input fields should be completely removed');
+
+    const perRowRefetchCount = await page.evaluate(() => {
+      const buttons = Array.from(document.querySelectorAll('#city-modal .city-list-item button'));
+      return buttons.filter(b => (b.textContent || '').includes('Refetch Location')).length;
+    });
+    assert(perRowRefetchCount === 0, 'City Management: per-row refetch buttons should be removed from city rows');
+
     const firstCityId = await page.evaluate(() => window.citiesData?.[0]?.id);
     if (firstCityId) {
       await page.evaluate((id) => window.renameCityInDialog(id, 'Osaka'), firstCityId);
-      await page.evaluate((id) => window.refetchCityLocationAndFlag(id), firstCityId);
+      await page.evaluate(() => window.refetchAllCityMetadata());
       const updatedCity = await page.evaluate((id) => window.citiesData.find(c => c.id === id), firstCityId);
       assert(updatedCity.name === 'Osaka', 'City Management: renameCityInDialog should rename city to Osaka');
-      assert(updatedCity.countryCode === 'JP', 'City Management: refetchCityLocationAndFlag should update country code to JP');
-      reporter.add('cities', 'city rename and refetch', 'renames city and refetches location & flag');
+      assert(updatedCity.countryCode === 'JP', 'City Management: batch refetch should update country code to JP');
+      assert(!updatedCity.code, 'City Management: legacy city.code should be removed from city storage');
+      reporter.add('cities', 'batch refetch and iata removal', 'verified #refetchAllCitiesBtn, zero IATA inputs, and legacy code removal');
     }
 
     assert(errors.length === 0, `Onboarding page errors: ${errors.join(' | ')}`);
