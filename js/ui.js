@@ -43,8 +43,19 @@ function dismissTimelineReminder(key) {
   }
 }
 
+function resetDismissedReminders() {
+  dismissedReminders.clear();
+  try {
+    localStorage.removeItem('travelApp_dismissedReminders_v1');
+  } catch (e) {}
+  if (typeof rebuildCurrentView === 'function') {
+    rebuildCurrentView();
+  }
+}
+
 window.isReminderDismissed = isReminderDismissed;
 window.dismissTimelineReminder = dismissTimelineReminder;
+window.resetDismissedReminders = resetDismissedReminders;
 
 function isMobileViewport() {
   return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
