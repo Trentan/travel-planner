@@ -9,11 +9,13 @@ const { run: runSharePresetsVerify } = require('./share-presets-verify');
 const { run: runIosPwaNavVerify } = require('./ios-pwa-nav-verify');
 const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 const { runCloudStorageXssTests } = require('./cloud-storage-xss.test');
+const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
 
 async function run() {
   await runCloudStorageXssTests();
   await runCoreSmoke();
   await runAutoStaysSuite();
+  await runScreenWakeLockSuite();
   await runCityNavRegression();
   await runItem15Suite();
   await runFileIoSuite();
