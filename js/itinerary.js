@@ -2219,6 +2219,99 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourney
     });
   }
 
+  // Smart Reminders
+  const showReminders = typeof window !== 'undefined' && window.showTimelineReminders !== false;
+  if (showReminders && typeof isReminderDismissed === 'function') {
+    // 1. Trip Commencement (Day 1)
+    const isFirstDayOfTrip = legIndex === 0 && dayIndex === 0;
+    const tripStartKey = `reminder-tripStart-${dayDate}`;
+    if (isFirstDayOfTrip && !isReminderDismissed(tripStartKey)) {
+      items.push({
+        type: 'smartReminder',
+        reminderType: 'tripStart',
+        reminderKey: tripStartKey,
+        icon: '🧳',
+        title: 'Trip starts today! Double-check packing checklist & essential travel docs',
+        actionText: 'Packing Checklist',
+        actionTab: 'packing',
+        startTime: '06:00',
+        sortValue: getDailyTimelineItemSortValue(dayDate, '06:00', -100)
+      });
+    }
+
+    // 2. Flight Departures
+    const hasFlightDeparture = dayJourneys.some(journey => {
+      const gid = journey.journeyId || journey.id;
+      const segments = (gid && journeysByJourneyId.get(gid)) || [journey];
+      return segments.some(segment => {
+        const depDate = normalizeDate(segment.departureDate || segment.dayDate || journey.departureDate || journey.dayDate || '');
+        const isDepartureDay = depDate && depDate === dayDate;
+        const type = String(segment.transportType || journey.transportType || '').toLowerCase();
+        const blob = [journey.provider, journey.journeyName, journey.notes, segment.fromLocation, segment.toLocation].filter(Boolean).join(' ').toLowerCase();
+        const isFlightType = type === 'flight' || type === 'plane' || /(flight|air|airline|airport|terminal|depart|arrive|eva|qantas|jetstar|emirates|lufthansa|scoot|thai airways)/i.test(blob);
+        return isDepartureDay && isFlightType;
+      });
+    });
+    const flightKey = `reminder-flight-${dayDate}`;
+    if (hasFlightDeparture && !isReminderDismissed(flightKey)) {
+      let flightDepTime = '07:00';
+      dayJourneys.forEach(journey => {
+        const depTime = journey.departureTime || '';
+        if (depTime && depTime < flightDepTime) flightDepTime = depTime;
+      });
+      items.push({
+        type: 'smartReminder',
+        reminderType: 'flight',
+        reminderKey: flightKey,
+        icon: '🛂',
+        title: 'Flight departure: Ensure passports/visas are packed and arrive 3h prior to international flights',
+        actionText: 'Flight & Passports',
+        actionTab: 'packing',
+        startTime: flightDepTime,
+        sortValue: getDailyTimelineItemSortValue(dayDate, flightDepTime, -50)
+      });
+    }
+
+    // 3. Stay Checkout
+    const stayDisplays = getStayDisplayForDay(day.date, day.to);
+    const hasStayCheckout = stayDisplays.some(s => s.type === 'checkout');
+    const checkoutKey = `reminder-checkout-${dayDate}`;
+    if (hasStayCheckout && !isReminderDismissed(checkoutKey)) {
+      const checkoutInfo = stayDisplays.find(s => s.type === 'checkout');
+      const checkoutTime = checkoutInfo?.startTime || '10:00';
+      items.push({
+        type: 'smartReminder',
+        reminderType: 'checkout',
+        reminderKey: checkoutKey,
+        icon: '🏨',
+        title: 'Hotel Check-out: Verify checkout deadline and luggage storage options',
+        actionText: 'View Stays',
+        actionTab: 'accom',
+        startTime: checkoutTime,
+        sortValue: getDailyTimelineItemSortValue(dayDate, checkoutTime, -20)
+      });
+    }
+
+    // 4. Destination Arrival
+    const hasArrival = items.some(i => i.type === 'arrivalBlock') || (day.from && day.to && day.from.toLowerCase() !== day.to.toLowerCase() && dayIndex > 0);
+    const arrivalKey = `reminder-arrival-${dayDate}`;
+    if (hasArrival && !isReminderDismissed(arrivalKey)) {
+      const arrivalItem = items.find(i => i.type === 'arrivalBlock');
+      const arrivalTime = arrivalItem?.startTime || '12:00';
+      items.push({
+        type: 'smartReminder',
+        reminderType: 'arrival',
+        reminderKey: arrivalKey,
+        icon: '🚇',
+        title: 'Arriving in destination: Access offline maps and local transit passes',
+        actionText: 'Offline Maps',
+        actionTab: 'map',
+        startTime: arrivalTime,
+        sortValue: getDailyTimelineItemSortValue(dayDate, arrivalTime, +15)
+      });
+    }
+  }
+
   return items.sort((a, b) => {
     if (a.sortValue !== b.sortValue) return a.sortValue - b.sortValue;
     return String(a.title || '').localeCompare(String(b.title || ''));
@@ -2379,7 +2472,7 @@ function applyTimelineTravelShading(items) {
   const arrival = items.find(item => item.type === 'arrivalBlock');
   const departure = items.find(item => item.type === 'departureBlock');
   return items.map(item => {
-    if (item.type === 'arrivalBlock' || item.type === 'departureBlock') return item;
+    if (item.type === 'arrivalBlock' || item.type === 'departureBlock' || item.type === 'smartReminder') return item;
     const shaded = { ...item };
     const hasTime = !!(item.startTime || '').trim();
     if (hasTime && arrival && item.sortValue < arrival.sortValue) {
@@ -2392,6 +2485,26 @@ function applyTimelineTravelShading(items) {
 }
 
 function renderDailyTimelineRow(item, compact = false) {
+  if (item.type === 'smartReminder') {
+    const timeStr = `<span class="daily-timeline-time daily-timeline-reminder-time">${escapeCompactText(item.startTime || 'Tip')}</span>`;
+    return `
+      <div class="daily-timeline-item daily-timeline-smart-reminder daily-timeline-reminder-${escapeCompactText(item.reminderType || 'general')}">
+        ${timeStr}
+        <div class="daily-timeline-marker daily-timeline-reminder-marker"><span>${item.icon || '💡'}</span></div>
+        <div class="daily-timeline-content daily-timeline-reminder-content flex items-center justify-between gap-3.5 flex-wrap sm:flex-nowrap">
+          <div class="daily-timeline-reminder-body min-w-0 flex-1">
+            <div class="daily-timeline-reminder-title font-semibold text-slate-800 dark:text-slate-100 text-xs sm:text-sm leading-snug">
+              ${escapeCompactText(item.title)}
+            </div>
+          </div>
+          <div class="daily-timeline-reminder-actions flex items-center gap-2 shrink-0">
+            ${item.actionTab ? `<button type="button" class="daily-timeline-reminder-action-btn" onclick="event.stopPropagation(); switchTab('${escapeCompactText(item.actionTab)}');">${escapeCompactText(item.actionText || 'View')}</button>` : ''}
+            <button type="button" class="daily-timeline-reminder-dismiss-btn" onclick="event.stopPropagation(); dismissTimelineReminder('${escapeCompactText(item.reminderKey)}');" title="Dismiss reminder" aria-label="Dismiss reminder">&times;</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
   if (item.type === 'arrivalBlock') {
     const timeStr = `<span class="daily-timeline-boundary-time">${escapeCompactText(item.startTime || '--:--')}</span>`;
     return `

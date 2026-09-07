@@ -102,6 +102,11 @@
             <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
             <span id="themeToggleLabel" class="app-menu-switch-label">🌓 Dark theme</span>
           </label>
+          <label id="showRemindersToggleBtn" class="app-menu-switch" role="switch" aria-checked="true" title="Toggle Timeline Tips & Smart Reminders">
+            <input id="showRemindersToggleInput" type="checkbox" onchange="toggleTimelineReminders(this.checked)" aria-label="Toggle Timeline Tips & Smart Reminders">
+            <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
+            <span id="showRemindersToggleLabel" class="app-menu-switch-label">💡 Smart Reminders</span>
+          </label>
           <button id="showMoneyToggleBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); toggleShowMoney()"><span class="menu-icon">💵</span> Hide Prices</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openRenameTripDialog()"><span class="menu-icon">✏️</span> Rename Active Trip</button>
         </div>
@@ -383,6 +388,11 @@
               <input id="mobileThemeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
               <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
               <span id="mobileThemeToggleLabel" class="app-menu-switch-label">🌓 Dark theme</span>
+            </label>
+            <label id="mobileShowRemindersToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="true" title="Toggle Timeline Tips & Smart Reminders">
+              <input id="mobileShowRemindersToggleInput" type="checkbox" onchange="toggleTimelineReminders(this.checked)" aria-label="Toggle Timeline Tips & Smart Reminders">
+              <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
+              <span id="mobileShowRemindersToggleLabel" class="app-menu-switch-label">💡 Smart Reminders</span>
             </label>
             <button id="mobileShowMoneyToggleBtn" class="app-menu-btn" onclick="closeMobileMenu(); toggleShowMoney()">💵 Hide Prices</button>
           </div>

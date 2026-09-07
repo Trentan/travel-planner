@@ -8228,6 +8228,142 @@ body.mobile-app-mode #readOnlyBanner {
   background: linear-gradient(180deg, rgba(13, 148, 136, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
 }
 
+/* Smart Reminders Styling */
+.daily-timeline-smart-reminder {
+  position: relative;
+}
+
+.daily-timeline-smart-reminder .daily-timeline-reminder-content {
+  border-radius: 0.85rem;
+  border: 1px solid rgba(14, 116, 144, 0.22);
+  background: linear-gradient(135deg, rgba(236, 254, 255, 0.95) 0%, rgba(240, 253, 250, 0.95) 100%);
+  padding: 0.65rem 0.85rem;
+  box-shadow: 0 2px 8px rgba(14, 116, 144, 0.06);
+}
+
+.daily-timeline-smart-reminder.daily-timeline-reminder-tripStart .daily-timeline-reminder-content {
+  border-color: rgba(13, 148, 136, 0.35);
+  background: linear-gradient(135deg, rgba(204, 251, 241, 0.9) 0%, rgba(240, 253, 250, 0.9) 100%);
+}
+
+.daily-timeline-smart-reminder.daily-timeline-reminder-flight .daily-timeline-reminder-content {
+  border-color: rgba(37, 99, 235, 0.35);
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(240, 249, 255, 0.95) 100%);
+}
+
+.daily-timeline-smart-reminder.daily-timeline-reminder-checkout .daily-timeline-reminder-content {
+  border-color: rgba(217, 119, 6, 0.35);
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(255, 251, 235, 0.95) 100%);
+}
+
+.daily-timeline-smart-reminder.daily-timeline-reminder-arrival .daily-timeline-reminder-content {
+  border-color: rgba(124, 58, 237, 0.35);
+  background: linear-gradient(135deg, rgba(245, 243, 255, 0.95) 0%, rgba(250, 245, 255, 0.95) 100%);
+}
+
+.daily-timeline-reminder-marker {
+  background: #ffffff;
+  border-color: rgba(14, 116, 144, 0.3);
+  font-size: 1.1rem;
+}
+
+.daily-timeline-reminder-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  color: #0f172a;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.15s ease-in-out;
+}
+
+.daily-timeline-reminder-action-btn:hover {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+.daily-timeline-reminder-dismiss-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.daily-timeline-reminder-dismiss-btn:hover {
+  background: rgba(100, 116, 139, 0.15);
+  color: #0f172a;
+}
+
+/* Dark mode overrides for Smart Reminders */
+:where([data-theme="dark"], [data-theme="dark"] *) .daily-timeline-reminder-content {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.92) 100%) !important;
+  border-color: rgba(45, 212, 191, 0.35) !important;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .daily-timeline-smart-reminder.daily-timeline-reminder-tripStart .daily-timeline-reminder-content {
+  border-color: rgba(45, 212, 191, 0.5) !important;
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .daily-timeline-smart-reminder.daily-timeline-reminder-flight .daily-timeline-reminder-content {
+  border-color: rgba(96, 165, 250, 0.5) !important;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .daily-timeline-smart-reminder.daily-timeline-reminder-checkout .daily-timeline-reminder-content {
+  border-color: rgba(251, 191, 36, 0.5) !important;
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .daily-timeline-smart-reminder.daily-timeline-reminder-arrival .daily-timeline-reminder-content {
+  border-color: rgba(167, 139, 250, 0.5) !important;
+  background: linear-gradient(135deg, rgba(88, 28, 135, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .daily-timeline-reminder-marker {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .daily-timeline-reminder-action-btn {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .daily-timeline-reminder-action-btn:hover {
+  background: #334155 !important;
+  border-color: #475569 !important;
+  color: #2dd4bf !important;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .daily-timeline-reminder-dismiss-btn {
+  color: #94a3b8 !important;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .daily-timeline-reminder-dismiss-btn:hover {
+  background: rgba(148, 163, 184, 0.2) !important;
+  color: #f8fafc !important;
+}
+
 
 
 

@@ -10,7 +10,41 @@ let isMobileMenuOpen = false;
 let lastViewportWasMobile = null;
 let itineraryDayViewMode = 'timeline';
 let showMoneyFigures = true;
+let showTimelineReminders = true;
 let currentTheme = 'light';
+let dismissedReminders = new Set();
+
+function loadDismissedReminders() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('travelApp_dismissedReminders_v1') || '[]');
+    if (Array.isArray(saved)) {
+      dismissedReminders = new Set(saved);
+    }
+  } catch (e) {
+    dismissedReminders = new Set();
+  }
+}
+
+function saveDismissedReminders() {
+  try {
+    localStorage.setItem('travelApp_dismissedReminders_v1', JSON.stringify(Array.from(dismissedReminders)));
+  } catch (e) {}
+}
+
+function isReminderDismissed(key) {
+  return dismissedReminders.has(key);
+}
+
+function dismissTimelineReminder(key) {
+  dismissedReminders.add(key);
+  saveDismissedReminders();
+  if (typeof rebuildCurrentView === 'function') {
+    rebuildCurrentView();
+  }
+}
+
+window.isReminderDismissed = isReminderDismissed;
+window.dismissTimelineReminder = dismissTimelineReminder;
 
 function isMobileViewport() {
   return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
@@ -235,6 +269,7 @@ function saveUiSettings() {
     isFunMode,
     itineraryDayViewMode,
     showMoneyFigures,
+    showTimelineReminders,
     theme: currentTheme
   }));
 }
@@ -311,11 +346,14 @@ function applyUiSettings() {
     savedSettings = null;
   }
 
+  loadDismissedReminders();
+
   if (savedSettings) {
     isFunMode = savedSettings.isFunMode === true;
     isEditMode = savedSettings.isEditMode !== false;
     itineraryDayViewMode = savedSettings.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
     showMoneyFigures = savedSettings.showMoneyFigures !== false;
+    showTimelineReminders = savedSettings.showTimelineReminders !== false;
     currentTheme = savedSettings.theme || 'light';
   }
 
@@ -329,6 +367,7 @@ function applyUiSettings() {
   window.isEditMode = isEditMode;
   window.itineraryDayViewMode = itineraryDayViewMode;
   window.showMoneyFigures = showMoneyFigures;
+  window.showTimelineReminders = showTimelineReminders;
 
   document.body.classList.toggle('fun-mode', isFunMode);
   document.body.classList.toggle('read-only-mode', !isEditMode);
@@ -338,9 +377,39 @@ function applyUiSettings() {
   syncModeToggleButtons();
   syncItineraryViewModeButtons();
   syncShowMoneyButtons();
+  syncShowTimelineRemindersButtons();
   setHeaderEditable(isEditMode);
   syncReadOnlyBanner();
 }
+
+function syncShowTimelineRemindersButtons() {
+  const toggleInput = document.getElementById('showRemindersToggleInput');
+  const mobileToggleInput = document.getElementById('mobileShowRemindersToggleInput');
+  const toggleBtn = document.getElementById('showRemindersToggleBtn');
+  const mobileToggleBtn = document.getElementById('mobileShowRemindersToggleBtn');
+
+  if (toggleInput) toggleInput.checked = showTimelineReminders;
+  if (mobileToggleInput) mobileToggleInput.checked = showTimelineReminders;
+
+  if (toggleBtn) {
+    toggleBtn.setAttribute('aria-checked', String(showTimelineReminders));
+  }
+  if (mobileToggleBtn) {
+    mobileToggleBtn.setAttribute('aria-checked', String(showTimelineReminders));
+  }
+}
+
+function toggleTimelineReminders(nextValue = null) {
+  showTimelineReminders = nextValue !== null ? !!nextValue : !showTimelineReminders;
+  window.showTimelineReminders = showTimelineReminders;
+  saveUiSettings();
+  syncShowTimelineRemindersButtons();
+  if (typeof rebuildCurrentView === 'function') {
+    rebuildCurrentView();
+  }
+}
+window.toggleTimelineReminders = toggleTimelineReminders;
+window.syncShowTimelineRemindersButtons = syncShowTimelineRemindersButtons;
 
 /**
  * Show or hide the read-only banner based on current isEditMode.
