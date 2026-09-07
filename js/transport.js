@@ -767,6 +767,9 @@ function renderTransportMobileFacts(segs, totalCost, notes = '') {
   const lastArr = formatJourneyDate(lastSeg.arrivalDate) || '';
   const lastArrTime = lastSeg.arrivalTime || '';
   const arrive = [lastArr, lastArrTime].filter(Boolean).join(' ');
+  const tzBadge = typeof formatTimezoneDeltaBadge === 'function'
+    ? formatTimezoneDeltaBadge(firstSeg.fromLocation, lastSeg.toLocation, firstSeg.departureDate || firstSeg.dayDate)
+    : '';
   const providerSet = Array.from(new Set(segs.map(seg => seg.provider).filter(Boolean)));
   const routeCodeSet = Array.from(new Set(segs.map(seg => seg.routeCode).filter(Boolean)));
   const bookingSet = Array.from(new Set(segs.map(seg => seg.bookingReference).filter(Boolean)));
@@ -792,6 +795,7 @@ return `
       ${renderTransportMobileLinkedFact('To', toValue, getMapSearchUrl(toLocation, toLocation))}
       ${renderTransportMobileFact('Depart', firstDep)}
       ${renderTransportMobileFact('Arrive', arrive)}
+      ${tzBadge ? renderTransportMobileFact('Timezone Shift', tzBadge) : ''}
       ${renderTransportMobileLinkedFact('From Details', fromDetail, getMapSearchUrl(getJourneyMapSearchQuery(fromDetail, fromLocation, firstSeg.transportType)), '', '', 'transport-mobile-fact--detail')}
       ${renderTransportMobileLinkedFact('To Details', toDetail, getMapSearchUrl(getJourneyMapSearchQuery(toDetail, toLocation, lastSeg.transportType)), '', '', 'transport-mobile-fact--detail')}
       ${renderTransportMobileFact('Carrier', providerLabel)}
@@ -1231,7 +1235,13 @@ function buildTransportTab(cityFilter = null) {
 
     const firstLoc = getLocationCodeDisplay(rep.fromLocation);
     const lastLoc = getLocationCodeDisplay(lastSeg.toLocation);
-    let routeDisplay = `${firstLoc} → ${lastLoc}`;
+    const tzBadge = typeof formatTimezoneDeltaBadge === 'function'
+      ? formatTimezoneDeltaBadge(rep.fromLocation, lastSeg.toLocation, rep.departureDate || rep.dayDate)
+      : '';
+    const tzBadgeHtml = tzBadge
+      ? ` <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 ml-1.5" title="Timezone Change">${escapeHtmlText(tzBadge)}</span>`
+      : '';
+    let routeDisplay = `${firstLoc} → ${lastLoc}${tzBadgeHtml}`;
     let desktopExpandControl = '';
     
     const isExpanded = isTransportGroupExpanded(gid);

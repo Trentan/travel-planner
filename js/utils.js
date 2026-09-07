@@ -8,6 +8,7 @@ const DEFAULT_CITIES = [
     "code": "SYD",
     "countryCode": "AU",
     "country": "Australia",
+    "timezone": "Australia/Sydney",
     "dateFrom": "",
     "dateTo": ""
   },
@@ -20,6 +21,7 @@ const DEFAULT_CITIES = [
     "code": "HND",
     "countryCode": "JP",
     "country": "Japan",
+    "timezone": "Asia/Tokyo",
     "dateFrom": "",
     "dateTo": ""
   },
@@ -32,6 +34,7 @@ const DEFAULT_CITIES = [
     "code": "LHR",
     "countryCode": "GB",
     "country": "United Kingdom",
+    "timezone": "Europe/London",
     "dateFrom": "",
     "dateTo": ""
   },
@@ -44,6 +47,7 @@ const DEFAULT_CITIES = [
     "code": "CDG",
     "countryCode": "FR",
     "country": "France",
+    "timezone": "Europe/Paris",
     "dateFrom": "",
     "dateTo": ""
   },
@@ -53,6 +57,10 @@ const DEFAULT_CITIES = [
     "lat": 25.2048,
     "lng": 55.2708,
     "colour": "#f1c40f",
+    "code": "DXB",
+    "countryCode": "AE",
+    "country": "UAE",
+    "timezone": "Asia/Dubai",
     "dateFrom": "",
     "dateTo": ""
   }

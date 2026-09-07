@@ -481,6 +481,16 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
   modal.className = 'modal-overlay';
   modal.style.display = 'flex';
 
+  // Dual timezone display in activity modal
+  let dualTimeNoticeHtml = '';
+  if (preferredStart && typeof convertLocalToHomeTime === 'function') {
+    const localCity = leg.label || '';
+    const homeConverted = convertLocalToHomeTime(preferredStart, leg.days[0]?.date || '', localCity);
+    if (homeConverted) {
+      dualTimeNoticeHtml = `<div class="p-2.5 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 rounded-lg text-xs font-semibold text-indigo-700 dark:text-indigo-300 mb-3 flex items-center justify-between"><span>Local Venue Time: ${html(preferredStart)}</span> <span>🏠 ${html(homeConverted)}</span></div>`;
+    }
+  }
+
   modal.innerHTML = `
     <div class="modal-content activity-assign-modal modal-lg">
       <div class="modal-header">
@@ -488,6 +498,7 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
         <button class="modal-close" type="button" id="activityAssignCloseBtn">&times;</button>
       </div>
       <div class="modal-body">
+        ${dualTimeNoticeHtml}
         <div class="activity-assign-layout">
           <!-- Left Panel -->
           <div class="activity-assign-summary activity-assign-summary-layout">

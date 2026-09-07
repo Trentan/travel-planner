@@ -2044,12 +2044,17 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourney
       
       const transportTypeLabel = isSameDaySegment ? 'Transport' : (isDepartureDay ? 'Depart' : 'Arrive');
 
+      const tzBadge = typeof formatTimezoneDeltaBadge === 'function'
+        ? formatTimezoneDeltaBadge(fromLoc, toLoc, depDate)
+        : '';
+      const metaParts = [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDateNote, tzBadge].filter(Boolean);
+
       items.push({
         type: 'transport',
         typeLabel: transportTypeLabel,
         icon: getTransportIcon(segment.transportType || journey.transportType),
         title: journey.journeyName || route || 'Transport',
-        meta: [journey.provider, journey.routeCode, journey.bookingReference ? `Ref ${journey.bookingReference}` : '', crossDateNote].filter(Boolean).join(' · '),
+        meta: metaParts.join(' · '),
         subLocations: formatJourneySubLocationText([segment]),
         cost: getJourneyDisplayCost(journey, journeysByJourneyId),
         status: journey.status || segment.status || 'planned',
@@ -2451,6 +2456,15 @@ function renderDailyTimelineRow(item, compact = false) {
   if (item.type === 'activity') {
     const parts = [];
     
+    // Dual timezone conversion if enabled and start time exists
+    if (typeof isDualTimeEnabled === 'function' && isDualTimeEnabled() && item.startTime) {
+      const localCity = item.cityName || (leg && leg.label) || '';
+      const homeTimeStr = typeof convertLocalToHomeTime === 'function' ? convertLocalToHomeTime(item.startTime, item.dateStr || '', localCity) : '';
+      if (homeTimeStr) {
+        parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800" title="Home Timezone Time">🏠 ${escapeCompactText(homeTimeStr)}</span>`);
+      }
+    }
+
     // 1. duration
     if (item.time) {
       parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">⏱️ ${escapeCompactText(item.time)}</span>`);
