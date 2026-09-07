@@ -9,8 +9,10 @@ const { run: runSharePresetsVerify } = require('./share-presets-verify');
 const { run: runIosPwaNavVerify } = require('./ios-pwa-nav-verify');
 const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 const { runCloudStorageXssTests } = require('./cloud-storage-xss.test');
+const { runTimezoneSuite } = require('./timezone-suite');
 
 async function run() {
+  await runTimezoneSuite();
   await runCloudStorageXssTests();
   await runCoreSmoke();
   await runAutoStaysSuite();

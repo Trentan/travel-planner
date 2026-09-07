@@ -2449,6 +2449,11 @@ function renderDailyTimelineRow(item, compact = false) {
   let badgeHtml = '';
   let activityMetaHtml = '';
   if (item.type === 'activity') {
+    const localTz = item.cityName ? (typeof getCityTimezone === 'function' ? getCityTimezone(item.cityName) : '') : '';
+    const homeTz = typeof getHomeTimezone === 'function' ? getHomeTimezone() : '';
+    const dualTimeText = (item.startTime && localTz && homeTz && localTz !== homeTz && typeof formatDualTimeDisplay === 'function')
+      ? formatDualTimeDisplay(item.startTime, item.date || '', localTz, homeTz)
+      : '';
     const parts = [];
     
     // 1. duration
@@ -2497,6 +2502,10 @@ function renderDailyTimelineRow(item, compact = false) {
         }
         parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="${getMapSearchUrl(sophisticatedLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">${escapeCompactText(cleanLoc)}</a></span>`);
       }
+    }
+
+    if (dualTimeText) {
+      parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/50">${escapeCompactText(dualTimeText)}</span>`);
     }
 
     if (parts.length > 0) {
@@ -2564,6 +2573,21 @@ function renderDailyTimelineRow(item, compact = false) {
     if (item.provider || item.routeCode) {
       const providerPart = [item.provider, item.routeCode].filter(Boolean).join(' ');
       parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">${escapeCompactText(providerPart)}</span>`);
+    }
+
+    // 1b. Timezone Transition Badge
+    if (item.journeyId) {
+      const j = (typeof window !== 'undefined' && Array.isArray(window.journeys)) ? window.journeys.find(x => x.id === item.journeyId || x.journeyId === item.journeyId) : null;
+      if (j && j.fromLocation && j.toLocation) {
+        const fromTz = typeof getCityTimezone === 'function' ? getCityTimezone(j.fromLocation) : '';
+        const toTz = typeof getCityTimezone === 'function' ? getCityTimezone(j.toLocation) : '';
+        const tzBadgeText = (typeof formatTimezoneDeltaBadge === 'function' && fromTz && toTz)
+          ? formatTimezoneDeltaBadge(fromTz, toTz, j.departureDate || j.dayDate || new Date())
+          : '';
+        if (tzBadgeText) {
+          parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/50">${escapeCompactText(tzBadgeText)}</span>`);
+        }
+      }
     }
     
     // 2. Cross date note

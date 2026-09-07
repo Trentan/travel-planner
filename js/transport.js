@@ -786,6 +786,13 @@ function renderTransportMobileFacts(segs, totalCost, notes = '') {
   const fromDetail = firstSeg.fromAddress || '';
   const toDetail = lastSeg.toAddress || '';
   const notesValue = String(notes || '').trim();
+
+  const fromTz = typeof getCityTimezone === 'function' ? getCityTimezone(fromLocation) : '';
+  const toTz = typeof getCityTimezone === 'function' ? getCityTimezone(toLocation) : '';
+  const tzBadgeText = (typeof formatTimezoneDeltaBadge === 'function' && fromTz && toTz)
+    ? formatTimezoneDeltaBadge(fromTz, toTz, firstSeg.departureDate || firstSeg.dayDate || new Date())
+    : '';
+
 return `
     <div class="transport-mobile-facts-grid">
       ${renderTransportMobileLinkedFact('From', fromValue, getMapSearchUrl(fromLocation, fromLocation))}
@@ -801,6 +808,7 @@ return `
     </div>` : ''}
       ${renderTransportMobileFact('Cost', formatCurrency(totalCost))}
       ${renderTransportMobileFact('Booking #', bookingLabel)}
+      ${tzBadgeText ? `<div class="transport-mobile-fact transport-mobile-fact--wide"><span class="transport-mobile-fact-label">Timezone Shift</span><span class="transport-mobile-fact-value text-amber-600 dark:text-amber-400 font-semibold">${escapeHtmlText(tzBadgeText)}</span></div>` : ''}
       ${notesValue ? renderTransportMobileFact('Notes', notesValue, 'transport-mobile-fact--wide transport-mobile-fact--notes') : ''}
     </div>
   `;
@@ -1252,6 +1260,12 @@ function buildTransportTab(cityFilter = null) {
     const fromCityName = (typeof getCityNameById === 'function' && rep.fromCityId) ? getCityNameById(rep.fromCityId) : '';
     const toCityName = (typeof getCityNameById === 'function' && lastSeg.toCityId) ? getCityNameById(lastSeg.toCityId) : '';
 
+    const fromTzDesktop = typeof getCityTimezone === 'function' ? getCityTimezone(rep.fromLocation || fromCityName) : '';
+    const toTzDesktop = typeof getCityTimezone === 'function' ? getCityTimezone(lastSeg.toLocation || toCityName) : '';
+    const tzBadgeDesktop = (typeof formatTimezoneDeltaBadge === 'function' && fromTzDesktop && toTzDesktop)
+      ? formatTimezoneDeltaBadge(fromTzDesktop, toTzDesktop, rep.departureDate || rep.dayDate || new Date())
+      : '';
+
     const cleanFromCity = (fromCityName || '').trim();
     const cleanFromLoc = (rep.fromLocation || '').trim();
     const cleanFromAddr = (rep.fromAddress || '').trim();
@@ -1314,6 +1328,7 @@ html += `
         <td class="px-3 py-3 w-8 align-middle text-center">${desktopExpandControl}</td>
         <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap" title="${escapeHtmlText(rep.journeyName || '')}">
           <div class="journey-name-main">${nameDisplay}</div>
+          ${tzBadgeDesktop ? `<div class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 whitespace-nowrap">${escapeHtmlText(tzBadgeDesktop)}</div>` : ''}
           ${isMultiLeg ? `<div class="text-[11px] text-slate-400 dark:text-slate-500 font-normal mt-0.5">${segs.length} legs</div>` : ''}
           </td>
         <td class="px-4 py-3 align-middle text-center text-xl">${icon}</td>

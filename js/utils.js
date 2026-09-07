@@ -8,6 +8,7 @@ const DEFAULT_CITIES = [
     "code": "SYD",
     "countryCode": "AU",
     "country": "Australia",
+    "timezone": "Australia/Sydney",
     "dateFrom": "",
     "dateTo": ""
   },
@@ -20,6 +21,7 @@ const DEFAULT_CITIES = [
     "code": "HND",
     "countryCode": "JP",
     "country": "Japan",
+    "timezone": "Asia/Tokyo",
     "dateFrom": "",
     "dateTo": ""
   },
@@ -32,6 +34,7 @@ const DEFAULT_CITIES = [
     "code": "LHR",
     "countryCode": "GB",
     "country": "United Kingdom",
+    "timezone": "Europe/London",
     "dateFrom": "",
     "dateTo": ""
   },
@@ -44,6 +47,7 @@ const DEFAULT_CITIES = [
     "code": "CDG",
     "countryCode": "FR",
     "country": "France",
+    "timezone": "Europe/Paris",
     "dateFrom": "",
     "dateTo": ""
   },
@@ -53,6 +57,7 @@ const DEFAULT_CITIES = [
     "lat": 25.2048,
     "lng": 55.2708,
     "colour": "#f1c40f",
+    "timezone": "Asia/Dubai",
     "dateFrom": "",
     "dateTo": ""
   }
@@ -742,6 +747,247 @@ function getDayTotal(day) {
 
   return formatCurrency(total, { showZero: false });
 }
+
+/* ==========================================================================
+   MODULE: Timezone Utilities (js/utils.js)
+   Responsibilities: IANA timezone offset calculations, cross-timezone deltas,
+   city timezone resolution, and dual timezone formatting using Intl.DateTimeFormat
+   ========================================================================== */
+
+const CITY_TIMEZONE_MAP = {
+  'sydney': 'Australia/Sydney',
+  'melbourne': 'Australia/Melbourne',
+  'brisbane': 'Australia/Brisbane',
+  'adelaide': 'Australia/Adelaide',
+  'perth': 'Australia/Perth',
+  'tokyo': 'Asia/Tokyo',
+  'osaka': 'Asia/Tokyo',
+  'kyoto': 'Asia/Tokyo',
+  'hiroshima': 'Asia/Tokyo',
+  'nara': 'Asia/Tokyo',
+  'kobe': 'Asia/Tokyo',
+  'nagoya': 'Asia/Tokyo',
+  'london': 'Europe/London',
+  'manchester': 'Europe/London',
+  'edinburgh': 'Europe/London',
+  'paris': 'Europe/Paris',
+  'nice': 'Europe/Paris',
+  'lyon': 'Europe/Paris',
+  'dubai': 'Asia/Dubai',
+  'bangkok': 'Asia/Bangkok',
+  'phuket': 'Asia/Bangkok',
+  'chiang mai': 'Asia/Bangkok',
+  'koh samui': 'Asia/Bangkok',
+  'singapore': 'Asia/Singapore',
+  'hong kong': 'Asia/Hong_Kong',
+  'taipei': 'Asia/Taipei',
+  'kuala lumpur': 'Asia/Kuala_Lumpur',
+  'seoul': 'Asia/Seoul',
+  'bali': 'Asia/Makassar',
+  'denpasar': 'Asia/Makassar',
+  'jakarta': 'Asia/Jakarta',
+  'hanoi': 'Asia/Bangkok',
+  'ho chi minh city': 'Asia/Bangkok',
+  'phnom penh': 'Asia/Bangkok',
+  'siem reap': 'Asia/Bangkok',
+  'yangon': 'Asia/Yangon',
+  'vienna': 'Europe/Vienna',
+  'innsbruck': 'Europe/Vienna',
+  'salzburg': 'Europe/Vienna',
+  'zurich': 'Europe/Zurich',
+  'geneva': 'Europe/Zurich',
+  'berlin': 'Europe/Berlin',
+  'frankfurt': 'Europe/Berlin',
+  'munich': 'Europe/Berlin',
+  'hamburg': 'Europe/Berlin',
+  'cologne': 'Europe/Berlin',
+  'dusseldorf': 'Europe/Berlin',
+  'stuttgart': 'Europe/Berlin',
+  'nuremberg': 'Europe/Berlin',
+  'dresden': 'Europe/Berlin',
+  'rome': 'Europe/Rome',
+  'milan': 'Europe/Rome',
+  'venice': 'Europe/Rome',
+  'verona': 'Europe/Rome',
+  'bolzano': 'Europe/Rome',
+  'florence': 'Europe/Rome',
+  'madrid': 'Europe/Madrid',
+  'barcelona': 'Europe/Madrid',
+  'amsterdam': 'Europe/Amsterdam',
+  'brussels': 'Europe/Brussels',
+  'copenhagen': 'Europe/Copenhagen',
+  'stockholm': 'Europe/Stockholm',
+  'oslo': 'Europe/Oslo',
+  'helsinki': 'Europe/Helsinki',
+  'athens': 'Europe/Athens',
+  'prague': 'Europe/Prague',
+  'budapest': 'Europe/Budapest',
+  'bratislava': 'Europe/Bratislava',
+  'warsaw': 'Europe/Warsaw',
+  'krakow': 'Europe/Warsaw',
+  'lisbon': 'Europe/Lisbon',
+  'istanbul': 'Europe/Istanbul',
+  'cairo': 'Africa/Cairo',
+  'new york': 'America/New_York',
+  'los angeles': 'America/Los_Angeles',
+  'san francisco': 'America/Los_Angeles',
+  'las vegas': 'America/Los_Angeles',
+  'chicago': 'America/Chicago',
+  'vancouver': 'America/Vancouver',
+  'toronto': 'America/Toronto',
+  'mexico city': 'America/Mexico_City',
+  'rio de janeiro': 'America/Sao_Paulo',
+  'buenos aires': 'America/Argentina/Buenos_Aires',
+  'auckland': 'Pacific/Auckland',
+  'honolulu': 'Pacific/Honolulu'
+};
+
+function getTimezoneOffsetMinutes(timezoneStr, date = new Date()) {
+  if (!timezoneStr) return 0;
+  try {
+    const dateObj = typeof date === 'string'
+      ? new Date(date.includes('T') ? date : `${date}T12:00:00Z`)
+      : (date instanceof Date ? date : new Date());
+
+    if (isNaN(dateObj.getTime())) return 0;
+
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezoneStr,
+      timeZoneName: 'shortOffset',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric'
+    });
+
+    const parts = formatter.formatToParts(dateObj);
+    const tzPart = parts.find(p => p.type === 'timeZoneName');
+    if (tzPart && tzPart.value) {
+      const match = tzPart.value.match(/(?:GMT|UTC)([+-])(\d{1,2})(?::?(\d{2}))?/);
+      if (match) {
+        const sign = match[1] === '-' ? -1 : 1;
+        const hours = parseInt(match[2], 10);
+        const mins = match[3] ? parseInt(match[3], 10) : 0;
+        return sign * (hours * 60 + mins);
+      }
+      if (tzPart.value === 'GMT' || tzPart.value === 'UTC') return 0;
+    }
+  } catch (e) {
+    console.warn(`[Timezone] Error resolving offset for ${timezoneStr}:`, e);
+  }
+  return 0;
+}
+
+function getTimezoneDeltaHours(fromTz, toTz, date = new Date()) {
+  if (!fromTz || !toTz || fromTz === toTz) return 0;
+  const fromOffset = getTimezoneOffsetMinutes(fromTz, date);
+  const toOffset = getTimezoneOffsetMinutes(toTz, date);
+  return (toOffset - fromOffset) / 60;
+}
+
+function formatTimezoneDeltaBadge(fromTz, toTz, date = new Date()) {
+  if (!fromTz || !toTz || fromTz === toTz) return '';
+  const deltaHours = getTimezoneDeltaHours(fromTz, toTz, date);
+  if (deltaHours === 0) return '';
+  const sign = deltaHours > 0 ? '+' : '';
+  const hrsText = Number.isInteger(deltaHours) ? `${deltaHours}` : deltaHours.toFixed(1);
+  return `🕐 ${sign}${hrsText} hr${Math.abs(deltaHours) === 1 ? '' : 's'} Timezone Change`;
+}
+
+function getCityTimezone(cityName) {
+  if (!cityName || cityName === 'Home' || cityName === 'In transit') {
+    return getHomeTimezone();
+  }
+
+  const cleanName = String(cityName)
+    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+    .replace(/[\u{2600}-\u{26FF}]/gu, '')
+    .replace(/[\u{2700}-\u{27BF}]/gu, '')
+    .replace(/\p{Emoji}/gu, '')
+    .replace(/\s*\([^)]*\)/gu, '')
+    .replace(/[^\w\s-]/gu, '')
+    .trim();
+
+  if (!cleanName) return getHomeTimezone();
+  const lower = cleanName.toLowerCase();
+
+  if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+    const activeCity = citiesData.find(c => c.name && c.name.toLowerCase() === lower);
+    if (activeCity && activeCity.timezone) return activeCity.timezone;
+  }
+
+  if (CITY_TIMEZONE_MAP[lower]) {
+    return CITY_TIMEZONE_MAP[lower];
+  }
+
+  if (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) {
+    const dbMatch = ALL_CITIES.find(c => c.name && c.name.toLowerCase() === lower);
+    if (dbMatch && dbMatch.timezone) return dbMatch.timezone;
+  }
+
+  return getHomeTimezone();
+}
+
+function getHomeTimezone() {
+  if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+    const homeCity = citiesData.find(c => c.name === 'Home' || (c.id && c.id.includes('home')));
+    if (homeCity && homeCity.timezone) return homeCity.timezone;
+  }
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  } catch (e) {
+    return 'UTC';
+  }
+}
+
+function convertTimeBetweenTimezones(timeStr, dateStr, fromTz, toTz) {
+  if (!timeStr || !fromTz || !toTz || fromTz === toTz) return null;
+  const match = String(timeStr).match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return null;
+  const hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  const dateIso = dateStr && String(dateStr).match(/^\d{4}-\d{2}-\d{2}$/) ? dateStr : '2026-06-15';
+
+  const fromOffset = getTimezoneOffsetMinutes(fromTz, dateIso);
+  const toOffset = getTimezoneOffsetMinutes(toTz, dateIso);
+  const diffMinutes = toOffset - fromOffset;
+
+  let totalMinutes = hours * 60 + minutes + diffMinutes;
+  let dayShift = 0;
+  while (totalMinutes < 0) {
+    totalMinutes += 1440;
+    dayShift -= 1;
+  }
+  while (totalMinutes >= 1440) {
+    totalMinutes -= 1440;
+    dayShift += 1;
+  }
+
+  const newH = Math.floor(totalMinutes / 60);
+  const newM = totalMinutes % 60;
+  const timeFormatted = `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`;
+
+  return {
+    time: timeFormatted,
+    dayShift: dayShift,
+    text: `${timeFormatted}${dayShift !== 0 ? (dayShift > 0 ? ' +1d' : ' -1d') : ''}`
+  };
+}
+
+function formatDualTimeDisplay(localTimeStr, localDateStr, localTz, homeTz = getHomeTimezone()) {
+  if (!localTimeStr || !localTz || !homeTz || localTz === homeTz) return '';
+  const converted = convertTimeBetweenTimezones(localTimeStr, localDateStr, localTz, homeTz);
+  if (!converted) return '';
+  return `🏡 Home: ${converted.text}`;
+}
+
+window.CITY_TIMEZONE_MAP = CITY_TIMEZONE_MAP;
+window.getTimezoneOffsetMinutes = getTimezoneOffsetMinutes;
+window.getTimezoneDeltaHours = getTimezoneDeltaHours;
+window.formatTimezoneDeltaBadge = formatTimezoneDeltaBadge;
+window.getCityTimezone = getCityTimezone;
+window.getHomeTimezone = getHomeTimezone;
+window.convertTimeBetweenTimezones = convertTimeBetweenTimezones;
+window.formatDualTimeDisplay = formatDualTimeDisplay;
 
 window.getMapSearchUrl = getMapSearchUrl;
 window.getDayTotal = getDayTotal;
