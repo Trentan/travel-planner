@@ -6522,6 +6522,56 @@ button.status-badge:focus-visible,
 
 
 /* ═══════════════════════════════════════════════════════════════
+   AMBIENT OFFLINE STATUS BANNER
+   ═══════════════════════════════════════════════════════════════ */
+
+.offline-banner {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(120%);
+  z-index: 9990;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.offline-banner.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.offline-banner-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #1e293b;
+  color: #f8fafc;
+  border: 1px solid #334155;
+  border-radius: 9999px;
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .offline-banner-pill {
+  background-color: #0f172a;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+
+.offline-banner-icon {
+  font-size: 0.9rem;
+  color: #f59e0b;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
    READ-ONLY MODE BANNER  (Issue #178)
    ═══════════════════════════════════════════════════════════════ */
 

@@ -561,6 +561,20 @@ async function run() {
   assert(updatedJid123Segs[0].fromLocation === 'Zurich' && updatedJid123Segs[0].toLocation === 'Bangkok', 'Updated segment should have new route');
   assert(transportContext.journeys.some(j => j.journeyId === 'jid_456'), 'Unrelated journeys should be preserved');
 
+  // Tests for PWA shortcuts in manifest.json
+  const fs = require('fs');
+  const manifestPath = path.join(__dirname, '..', 'manifest.json');
+  assert(fs.existsSync(manifestPath), 'manifest.json should exist');
+  const manifestData = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  assert(Array.isArray(manifestData.shortcuts), 'manifest.json should contain a shortcuts array');
+  assert(manifestData.shortcuts.length >= 2, 'manifest.json should contain at least 2 shortcuts');
+
+  const todayShortcut = manifestData.shortcuts.find(s => s.url.includes('shortcut=today'));
+  assert(todayShortcut && todayShortcut.name === "Today's Itinerary", 'manifest.json should contain "Today\'s Itinerary" shortcut');
+
+  const transportShortcut = manifestData.shortcuts.find(s => s.url.includes('shortcut=transport'));
+  assert(transportShortcut && transportShortcut.name === 'Transport Passes', 'manifest.json should contain "Transport Passes" shortcut');
+
   console.log('Core smoke checks passed');
 }
 

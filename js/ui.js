@@ -303,6 +303,38 @@ function toggleThemeMode(isDark) {
 window.toggleThemeMode = toggleThemeMode;
 window.applyTheme = applyTheme;
 
+function handleAppLaunchShortcut() {
+  if (typeof window === 'undefined' || !window.location) return;
+
+  const search = window.location.search || '';
+  const hash = window.location.hash || '';
+  let shortcut = '';
+
+  if (typeof URLSearchParams !== 'undefined') {
+    const urlParams = new URLSearchParams(search);
+    shortcut = urlParams.get('shortcut') || '';
+  } else if (search) {
+    const match = search.match(/[?&]shortcut=([^&]+)/);
+    if (match) shortcut = decodeURIComponent(match[1]);
+  }
+
+  if (shortcut === 'today' || hash === '#itinerary') {
+    const itineraryBtn = document.querySelector('.app-tab-btn[data-tab="itinerary"]');
+    if (itineraryBtn && typeof switchTab === 'function') {
+      switchTab('itinerary', itineraryBtn);
+    }
+    if (typeof applyCurrentTripPositionForTab === 'function') {
+      applyCurrentTripPositionForTab('itinerary');
+    }
+  } else if (shortcut === 'transport' || hash === '#transport') {
+    const transportBtn = document.querySelector('.app-tab-btn[data-tab="transport"]');
+    if (transportBtn && typeof switchTab === 'function') {
+      switchTab('transport', transportBtn);
+    }
+  }
+}
+window.handleAppLaunchShortcut = handleAppLaunchShortcut;
+
 function applyUiSettings() {
   let savedSettings = null;
   try {
@@ -340,6 +372,7 @@ function applyUiSettings() {
   syncShowMoneyButtons();
   setHeaderEditable(isEditMode);
   syncReadOnlyBanner();
+  handleAppLaunchShortcut();
 }
 
 /**
@@ -639,6 +672,29 @@ function toggleAllLegs() {
   document.querySelectorAll('.leg').forEach(l => l.classList.toggle('collapsed', !allLegsExpanded));
   document.getElementById('expandAllLegs').textContent = allLegsExpanded ? '▲ Collapse all legs' : '▼ Expand all legs';
 }
+
+function updateOfflineBannerStatus() {
+  const banner = document.getElementById('offlineBanner');
+  if (!banner) return;
+
+  const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+  if (isOffline) {
+    banner.hidden = false;
+    banner.classList.add('visible');
+  } else {
+    banner.classList.remove('visible');
+    setTimeout(() => {
+      if (typeof navigator !== 'undefined' && navigator.onLine !== false) {
+        banner.hidden = true;
+      }
+    }, 300);
+  }
+}
+window.updateOfflineBannerStatus = updateOfflineBannerStatus;
+
+window.addEventListener('offline', updateOfflineBannerStatus);
+window.addEventListener('online', updateOfflineBannerStatus);
+document.addEventListener('DOMContentLoaded', updateOfflineBannerStatus);
 
 window.addEventListener('resize', syncResponsiveUi);
 window.addEventListener('orientationchange', syncResponsiveUi);
