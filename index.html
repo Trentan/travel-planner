@@ -201,6 +201,9 @@
       <div class="section-header">
         <h3 class="section-header-title">🗓️ Itinerary</h3>
         <div class="section-header-actions">
+          <button id="wakeLockBtnItinerary" class="action-btn wake-lock-btn" onclick="toggleScreenWakeLock()" title="Keep screen awake during transit & boarding" aria-label="Toggle screen wake lock" aria-pressed="false">
+            <span class="wake-lock-icon">🔆</span> <span class="wake-lock-label">Keep Awake</span>
+          </button>
           <button class="action-btn" onclick="toggleAllDays()" id="expandAll">▼ Expand all days</button>
           <div class="itinerary-view-mode-control" role="group" aria-label="Itinerary day view">
             <button id="itineraryTimelineModeBtn" class="itinerary-view-mode-btn is-active" type="button" onclick="setItineraryDayViewMode('timeline')" title="Timeline View" aria-label="Timeline View"><span class="view-mode-icon">⏳</span> <span class="view-mode-text">Timeline</span></button>

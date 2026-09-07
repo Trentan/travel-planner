@@ -3038,6 +3038,7 @@ function buildItinerary() {
   if (!isMobile || isCompact) {
     if (isMobile) buildCompactItinerary();
     else buildCompactItineraryDesktop();
+    if (typeof syncWakeLockButtons === 'function') syncWakeLockButtons();
     return;
   }
 
@@ -3398,6 +3399,7 @@ ${(() => {
   });
   if (typeof renderActivityActionButtons === 'function') renderActivityActionButtons(container);
   if (typeof reObserveLegs === "function") reObserveLegs();
+  if (typeof syncWakeLockButtons === 'function') syncWakeLockButtons();
 }
 
 function renderActivityActionButtonsLegacy(root) {

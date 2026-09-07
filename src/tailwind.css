@@ -197,6 +197,22 @@
            active:translate-y-0 active:shadow-sm active:scale-[0.98];
   }
 
+  /* Screen Wake Lock toggle button */
+  .wake-lock-btn {
+    @apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl border border-border
+           bg-surface-card text-text-primary text-xs font-bold transition-all duration-200 cursor-pointer;
+  }
+
+  .wake-lock-btn:hover {
+    @apply bg-btn-hover-bg border-border-strong;
+  }
+
+  .wake-lock-btn.active,
+  .wake-lock-btn.is-active {
+    @apply bg-amber-100 text-amber-900 border-amber-300 shadow-sm
+           dark:bg-amber-950/80 dark:text-amber-200 dark:border-amber-700;
+  }
+
   /* Secondary action button */
   .action-btn-secondary {
     @apply bg-blue-600 text-white border-blue-600

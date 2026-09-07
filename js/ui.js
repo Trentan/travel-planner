@@ -1009,3 +1009,118 @@ function closeTripSummaryModal() {
   const modal = document.getElementById('trip-summary-modal');
   if (modal) modal.style.display = 'none';
 }
+
+// --- Screen Wake Lock Manager ---
+let isWakeLockActive = false;
+let wakeLockSentinel = null;
+
+async function requestWakeLock() {
+  if (typeof navigator === 'undefined' || !('wakeLock' in navigator) || !navigator.wakeLock) {
+    return false;
+  }
+  try {
+    wakeLockSentinel = await navigator.wakeLock.request('screen');
+    wakeLockSentinel.addEventListener('release', () => {
+      wakeLockSentinel = null;
+      syncWakeLockButtons();
+    });
+    return true;
+  } catch (err) {
+    console.warn('Screen Wake Lock request failed:', err);
+    wakeLockSentinel = null;
+    return false;
+  }
+}
+
+async function releaseWakeLock() {
+  if (wakeLockSentinel) {
+    try {
+      await wakeLockSentinel.release();
+    } catch (err) {
+      console.warn('Screen Wake Lock release failed:', err);
+    }
+    wakeLockSentinel = null;
+  }
+}
+
+async function toggleScreenWakeLock() {
+  isWakeLockActive = !isWakeLockActive;
+  if (isWakeLockActive) {
+    const success = await requestWakeLock();
+    if (!success) {
+      isWakeLockActive = false;
+    }
+  } else {
+    await releaseWakeLock();
+  }
+  syncWakeLockButtons();
+}
+
+async function handleWakeLockVisibilityChange() {
+  if (typeof document === 'undefined') return;
+  if (document.visibilityState === 'visible' && isWakeLockActive) {
+    if (!wakeLockSentinel) {
+      await requestWakeLock();
+      syncWakeLockButtons();
+    }
+  } else if (document.visibilityState === 'hidden') {
+    if (wakeLockSentinel) {
+      await releaseWakeLock();
+      syncWakeLockButtons();
+    }
+  }
+}
+
+function syncWakeLockButtons() {
+  if (typeof document === 'undefined') return;
+  const isSupported = typeof navigator !== 'undefined' && 'wakeLock' in navigator && !!navigator.wakeLock;
+  const buttons = document.querySelectorAll('.wake-lock-btn, #wakeLockBtnItinerary, #wakeLockBtnTransport');
+
+  buttons.forEach(btn => {
+    if (!isSupported) {
+      btn.hidden = true;
+      btn.disabled = true;
+      btn.title = 'Screen Wake Lock is not supported on this browser';
+      return;
+    }
+
+    btn.hidden = false;
+    btn.disabled = false;
+    btn.setAttribute('aria-pressed', String(isWakeLockActive));
+
+    const iconNode = btn.querySelector('.wake-lock-icon');
+    const labelNode = btn.querySelector('.wake-lock-label, .wake-lock-text');
+
+    if (isWakeLockActive) {
+      btn.classList.add('active', 'is-active');
+      if (iconNode) iconNode.textContent = '🔆';
+      if (labelNode) labelNode.textContent = 'Screen Awake';
+      btn.title = 'Screen timeout is temporarily disabled';
+    } else {
+      btn.classList.remove('active', 'is-active');
+      if (iconNode) iconNode.textContent = '🔆';
+      if (labelNode) labelNode.textContent = 'Keep Awake';
+      btn.title = 'Keep screen awake during transit & boarding';
+    }
+  });
+}
+
+function initWakeLock() {
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', handleWakeLockVisibilityChange);
+    syncWakeLockButtons();
+  }
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWakeLock);
+  } else {
+    initWakeLock();
+  }
+}
+
+window.toggleScreenWakeLock = toggleScreenWakeLock;
+window.syncWakeLockButtons = syncWakeLockButtons;
+window.requestWakeLock = requestWakeLock;
+window.releaseWakeLock = releaseWakeLock;

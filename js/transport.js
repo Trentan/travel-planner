@@ -1075,7 +1075,12 @@ function buildTransportTab(cityFilter = null) {
   let html = `
     <div class="section-header transport-header">
       <h3 class="section-header-title">✈️ Transport</h3>
-      ${isEditMode ? '<button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>' : ''}
+      <div class="section-header-actions">
+        <button id="wakeLockBtnTransport" class="action-btn wake-lock-btn" onclick="toggleScreenWakeLock()" title="Keep screen awake during transit & boarding" aria-label="Toggle screen wake lock" aria-pressed="false">
+          <span class="wake-lock-icon">🔆</span> <span class="wake-lock-label">Keep Awake</span>
+        </button>
+        ${isEditMode ? '<button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>' : ''}
+      </div>
     </div>
   `;
 
@@ -1395,6 +1400,7 @@ html += `
 
   html += '</tbody></table></div>';
   container.innerHTML = html;
+  if (typeof syncWakeLockButtons === 'function') syncWakeLockButtons();
 }
 
 function toggleJourneySegments(journeyId) {
