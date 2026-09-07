@@ -122,16 +122,20 @@ function splitMultiIssueFile(content) {
 }
 
 function createGitHubIssue(issueData, filePath) {
-  const { title, body, labels } = issueData;
+  const { title, body, labels, metadata } = issueData;
 
   console.log(`\n========================================`);
-  console.log(`Title : ${title}`);
-  console.log(`Labels: ${labels.join(', ')}`);
-  console.log(`Source: ${filePath || 'Inline'}`);
+  console.log(`Title    : ${title}`);
+  console.log(`Labels   : ${labels.join(', ')}`);
+  if (metadata && metadata.milestone) {
+    console.log(`Milestone: ${metadata.milestone}`);
+  }
+  console.log(`Source   : ${filePath || 'Inline'}`);
   console.log(`========================================`);
 
   if (isDryRun) {
-    console.log(`[DRY-RUN] Would execute: gh issue create --title "${title}" --label "${labels.join(',')}"`);
+    const milestoneArg = metadata && metadata.milestone ? ` --milestone "${metadata.milestone}"` : '';
+    console.log(`[DRY-RUN] Would execute: gh issue create --title "${title}" --label "${labels.join(',')}"${milestoneArg}`);
     return `https://github.com/example/issues/dry-run`;
   }
 
@@ -150,6 +154,10 @@ function createGitHubIssue(issueData, filePath) {
       '--label',
       labels.join(',')
     ];
+
+    if (metadata && metadata.milestone) {
+      ghArgs.push('--milestone', metadata.milestone);
+    }
 
     const result = execFileSync('gh', ghArgs, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'] });
     const issueUrl = result.trim();
