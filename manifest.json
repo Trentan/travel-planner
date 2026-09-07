@@ -24,5 +24,33 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today's Itinerary",
+      "short_name": "Today",
+      "description": "View today's itinerary schedule",
+      "url": "./index.html?shortcut=today#itinerary",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Transport Passes",
+      "short_name": "Transport",
+      "description": "View transport passes and tickets",
+      "url": "./index.html?shortcut=transport#transport",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }
