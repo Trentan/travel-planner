@@ -7,12 +7,14 @@ const { run: runItineraryExploratoryUx } = require('./itinerary-exploratory-ux')
 const { run: runBrowserSuite } = require('./browser-suite');
 const { run: runSharePresetsVerify } = require('./share-presets-verify');
 const { run: runIosPwaNavVerify } = require('./ios-pwa-nav-verify');
+const { run: runPwaShortcutsOfflineTests } = require('./pwa-shortcuts-offline.test');
 const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 const { runCloudStorageXssTests } = require('./cloud-storage-xss.test');
 
 async function run() {
   await runCloudStorageXssTests();
   await runCoreSmoke();
+  await runPwaShortcutsOfflineTests();
   await runAutoStaysSuite();
   await runCityNavRegression();
   await runItem15Suite();

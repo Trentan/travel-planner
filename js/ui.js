@@ -476,16 +476,19 @@ function toggleEditMode() {
 function switchTab(tabId, btnElement) {
   document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.app-tab-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('tab-' + tabId).classList.add('active');
-  btnElement.classList.add('active');
+  const pane = document.getElementById('tab-' + tabId);
+  if (pane) pane.classList.add('active');
+
+  const btn = btnElement || document.querySelector(`.app-tab-btn[data-tab="${tabId}"]`);
+  if (btn) btn.classList.add('active');
   closeMobileMenu();
 
   // Scroll selected tab into view on mobile
-  if (window.innerWidth <= 768) {
-    const tabsList = btnElement.closest('.app-tabs-list');
+  if (window.innerWidth <= 768 && btn) {
+    const tabsList = btn.closest('.app-tabs-list');
     if (tabsList) {
       tabsList.scrollTo({
-        left: Math.max(0, btnElement.offsetLeft - (tabsList.clientWidth - btnElement.offsetWidth) / 2),
+        left: Math.max(0, btn.offsetLeft - (tabsList.clientWidth - btn.offsetWidth) / 2),
         behavior: 'smooth'
       });
     }
@@ -1009,3 +1012,44 @@ function closeTripSummaryModal() {
   const modal = document.getElementById('trip-summary-modal');
   if (modal) modal.style.display = 'none';
 }
+
+// --- Ambient Offline Banner & PWA Shortcuts ---
+function updateOfflineStatus() {
+  const banner = document.getElementById('offlineBanner');
+  if (!banner) return;
+  const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+  if (isOffline) {
+    banner.style.display = 'flex';
+    banner.classList.add('is-offline');
+  } else {
+    banner.classList.remove('is-offline');
+    banner.style.display = 'none';
+  }
+}
+
+function initOfflineStatusListener() {
+  if (typeof window === 'undefined') return;
+  window.addEventListener('offline', updateOfflineStatus);
+  window.addEventListener('online', updateOfflineStatus);
+  updateOfflineStatus();
+}
+
+function handleAppPwaShortcuts() {
+  if (typeof window === 'undefined' || !window.location) return;
+  const params = new URLSearchParams(window.location.search || '');
+  const shortcut = params.get('shortcut');
+  const hash = (window.location.hash || '').toLowerCase();
+
+  if (shortcut === 'today' || hash === '#itinerary') {
+    if (typeof switchTab === 'function') switchTab('itinerary');
+    if (shortcut === 'today' && typeof applyCurrentTripPositionForTab === 'function') {
+      applyCurrentTripPositionForTab('itinerary');
+    }
+  } else if (shortcut === 'transport' || hash === '#transport') {
+    if (typeof switchTab === 'function') switchTab('transport');
+  }
+}
+
+window.updateOfflineStatus = updateOfflineStatus;
+window.initOfflineStatusListener = initOfflineStatusListener;
+window.handleAppPwaShortcuts = handleAppPwaShortcuts;
