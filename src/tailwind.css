@@ -197,6 +197,21 @@
            active:translate-y-0 active:shadow-sm active:scale-[0.98];
   }
 
+  /* Screen Wake Lock button */
+  .wake-lock-btn.is-active {
+    @apply bg-amber-500 text-white border-amber-600
+           hover:bg-amber-600 hover:border-amber-700 hover:text-white
+           active:bg-amber-700;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+  }
+
+  :where([data-theme="dark"], [data-theme="dark"] *) .wake-lock-btn.is-active {
+    background-color: #d97706 !important;
+    border-color: #f59e0b !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 12px rgba(217, 119, 6, 0.5) !important;
+  }
+
   /* Secondary action button */
   .action-btn-secondary {
     @apply bg-blue-600 text-white border-blue-600
@@ -1994,6 +2009,7 @@
     }
 
     body.mobile-app-mode #tab-itinerary .add-leg-action,
+    body.mobile-app-mode #tab-itinerary .wake-lock-btn,
     body.mobile-app-mode #tab-itinerary #expandAll {
       flex-shrink: 0;
       white-space: nowrap;

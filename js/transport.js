@@ -1079,7 +1079,12 @@ function buildTransportTab(cityFilter = null) {
   let html = `
     <div class="section-header transport-header">
       <h3 class="section-header-title">✈️ Transport</h3>
-      ${isEditMode ? '<button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>' : ''}
+      <div class="section-header-actions">
+        <button class="action-btn wake-lock-btn" id="wakeLockBtnTransport" onclick="toggleScreenWakeLock()" title="Keep screen awake during travel and transit" aria-pressed="false" style="display: none;">
+          <span class="wake-lock-icon">🔆</span> <span class="wake-lock-label">Screen Awake</span>
+        </button>
+        ${isEditMode ? '<button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>' : ''}
+      </div>
     </div>
   `;
 
@@ -1090,6 +1095,7 @@ function buildTransportTab(cityFilter = null) {
       <p class="empty-state-readonly-hint">🔒 <button class="empty-state-readonly-hint-link" onclick="toggleEditMode()">Unlock editing</button>&nbsp;to add journeys.</p>
     </div>`;
     container.innerHTML = html;
+    if (typeof updateWakeLockButtons === 'function') updateWakeLockButtons();
     return;
   }
 
@@ -1183,6 +1189,7 @@ function buildTransportTab(cityFilter = null) {
     });
     container.innerHTML = html;
     if (typeof setupMobileSwipePagers === 'function') setupMobileSwipePagers(container);
+    if (typeof updateWakeLockButtons === 'function') updateWakeLockButtons();
     return;
   }
 
@@ -1405,6 +1412,7 @@ html += `
 
   html += '</tbody></table></div>';
   container.innerHTML = html;
+  if (typeof updateWakeLockButtons === 'function') updateWakeLockButtons();
 }
 
 function toggleJourneySegments(journeyId) {

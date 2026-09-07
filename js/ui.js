@@ -380,6 +380,7 @@ function applyUiSettings() {
   syncShowTimelineRemindersButtons();
   setHeaderEditable(isEditMode);
   syncReadOnlyBanner();
+  if (typeof updateWakeLockButtons === 'function') updateWakeLockButtons();
 }
 
 function syncShowTimelineRemindersButtons() {
@@ -802,9 +803,9 @@ window.openAIDialog = openAIDialog;
 window.closeAIDialog = closeAIDialog;
 window.openGuideDialog = openGuideDialog;
 window.closeGuideDialog = closeGuideDialog;
-window.startTutorial = startTutorial;
-window.updateLegTip = updateLegTip;
-window.deleteLegTip = deleteLegTip;
+window.startTutorial = typeof startTutorial !== 'undefined' ? startTutorial : () => {};
+window.updateLegTip = typeof updateLegTip !== 'undefined' ? updateLegTip : () => {};
+window.deleteLegTip = typeof deleteLegTip !== 'undefined' ? deleteLegTip : () => {};
 window.toggleMode = toggleMode;
 window.toggleEditMode = toggleEditMode;
 window.setItineraryDayViewMode = setItineraryDayViewMode;
@@ -818,7 +819,7 @@ window.syncMobileMenuControls = syncMobileMenuControls;
 window.syncMobileMenuStatus = syncMobileMenuStatus;
 window.promptHardRestart = promptHardRestart;
 window.promptFactoryReset = promptFactoryReset;
-window.addLeg = addLeg;
+window.addLeg = typeof addLeg !== 'undefined' ? addLeg : () => {};
 window.openRenameTripDialog = openRenameTripDialog;
 window.closeRenameTripDialog = closeRenameTripDialog;
 window.saveRenameTripDialog = saveRenameTripDialog;
@@ -992,6 +993,109 @@ if (typeof document !== "undefined" && typeof document.addEventListener === "fun
     }
   });
 }
+
+// --- Screen Wake Lock State Management ---
+let wakeLockSentinel = null;
+let isWakeLockRequested = false;
+
+function isWakeLockSupported() {
+  return typeof navigator !== 'undefined' && 'wakeLock' in navigator && typeof navigator.wakeLock.request === 'function';
+}
+
+async function requestScreenWakeLock() {
+  if (!isWakeLockSupported()) return false;
+  try {
+    const sentinel = await navigator.wakeLock.request('screen');
+    wakeLockSentinel = sentinel;
+
+    sentinel.addEventListener('release', () => {
+      wakeLockSentinel = null;
+      updateWakeLockButtons();
+    });
+
+    updateWakeLockButtons();
+    return true;
+  } catch (err) {
+    console.warn('Screen Wake Lock request failed:', err);
+    wakeLockSentinel = null;
+    updateWakeLockButtons();
+    return false;
+  }
+}
+
+async function releaseScreenWakeLock() {
+  if (wakeLockSentinel) {
+    try {
+      await wakeLockSentinel.release();
+    } catch (err) {
+      console.warn('Error releasing Screen Wake Lock:', err);
+    }
+    wakeLockSentinel = null;
+  }
+  updateWakeLockButtons();
+}
+
+async function toggleScreenWakeLock() {
+  if (!isWakeLockSupported()) return;
+  if (isWakeLockRequested || wakeLockSentinel) {
+    isWakeLockRequested = false;
+    await releaseScreenWakeLock();
+  } else {
+    isWakeLockRequested = true;
+    await requestScreenWakeLock();
+  }
+}
+
+function updateWakeLockButtons() {
+  const supported = isWakeLockSupported();
+  const isActive = !!wakeLockSentinel;
+
+  const buttons = document.querySelectorAll('.wake-lock-btn');
+  buttons.forEach(btn => {
+    if (!supported) {
+      btn.style.display = 'none';
+      btn.disabled = true;
+      return;
+    }
+
+    btn.style.display = '';
+    btn.disabled = false;
+    btn.setAttribute('aria-pressed', String(isActive));
+
+    if (isActive) {
+      btn.classList.add('is-active');
+      btn.setAttribute('title', 'Keep screen awake during travel and transit (Active - screen timeout temporarily disabled)');
+      const label = btn.querySelector('.wake-lock-label');
+      if (label) label.textContent = 'Screen Awake (On)';
+    } else {
+      btn.classList.remove('is-active');
+      btn.setAttribute('title', 'Keep screen awake during travel and transit');
+      const label = btn.querySelector('.wake-lock-label');
+      if (label) label.textContent = 'Screen Awake';
+    }
+  });
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible') {
+      if (isWakeLockRequested && !wakeLockSentinel) {
+        await requestScreenWakeLock();
+      }
+    } else if (document.visibilityState === 'hidden') {
+      if (wakeLockSentinel) {
+        wakeLockSentinel = null;
+        updateWakeLockButtons();
+      }
+    }
+  });
+}
+
+window.isWakeLockSupported = isWakeLockSupported;
+window.requestScreenWakeLock = requestScreenWakeLock;
+window.releaseScreenWakeLock = releaseScreenWakeLock;
+window.toggleScreenWakeLock = toggleScreenWakeLock;
+window.updateWakeLockButtons = updateWakeLockButtons;
 
 window.openTripSummaryModal = openTripSummaryModal;
 window.closeTripSummaryModal = closeTripSummaryModal;

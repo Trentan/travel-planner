@@ -9,8 +9,9 @@ const { run: runSharePresetsVerify } = require('./share-presets-verify');
 const { run: runIosPwaNavVerify } = require('./ios-pwa-nav-verify');
 const { run: runPwaShortcutsOfflineTests } = require('./pwa-shortcuts-offline.test');
 const { run: runAutoStaysSuite } = require('./auto-stays-suite');
-const { runCloudStorageXssTests } = require('./cloud-storage-xss.test');
 const { run: runTimezoneSuite } = require('./timezone-suite.test');
+const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
+const { run: runSmartRemindersSuite } = require('./smart-reminders-suite');
 
 async function run() {
   await runCloudStorageXssTests();
@@ -18,6 +19,8 @@ async function run() {
   await runCoreSmoke();
   await runPwaShortcutsOfflineTests();
   await runAutoStaysSuite();
+  await runSmartRemindersSuite();
+  await runScreenWakeLockSuite();
   await runCityNavRegression();
   await runItem15Suite();
   await runFileIoSuite();

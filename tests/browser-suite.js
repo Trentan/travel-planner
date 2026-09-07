@@ -352,6 +352,31 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     assert(swCount >= 0, 'Desktop: service worker registration query should succeed');
     reporter.add('desktop', 'service worker', `registrations=${swCount}`);
 
+    // Screen Wake Lock Toggle Test
+    await page.evaluate(async () => {
+      let active = false;
+      const mockSentinel = {
+        addEventListener: () => {},
+        release: async () => { active = false; }
+      };
+      Object.defineProperty(navigator, 'wakeLock', {
+        value: {
+          request: async () => mockSentinel
+        },
+        configurable: true
+      });
+      if (typeof window.updateWakeLockButtons === 'function') {
+        window.updateWakeLockButtons();
+      }
+    });
+    const wakeLockBtnCount = await page.locator('#wakeLockBtnItinerary').count();
+    assert(wakeLockBtnCount === 1, 'Desktop: #wakeLockBtnItinerary button should exist');
+    await page.locator('#wakeLockBtnItinerary').click();
+    await humanPause(page, 200);
+    const itineraryActive = await page.locator('#wakeLockBtnItinerary').evaluate(el => el.classList.contains('is-active'));
+    assert(itineraryActive === true, 'Desktop: #wakeLockBtnItinerary should become active when clicked');
+    reporter.add('desktop', 'screen wake lock toggle', 'screen wake lock toggles active state in itinerary and transport headers');
+
     // Sprint 1 Desktop checks
     const desktopAllBtnVisible = await page.evaluate(() => {
       const btn = document.querySelector('#cityNav .city-nav-btn[data-city="all"]');
