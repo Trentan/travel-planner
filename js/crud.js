@@ -614,6 +614,7 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
                 </div>
               </div>
               <div class="activity-assign-schedule-hint activity-assign-schedule-hint-text">Suggested uses each day's best open slot. Fixed time calculates the end from duration when left blank.</div>
+              <div id="activityDualTimeNotice" class="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 p-2 rounded border border-amber-200 dark:border-amber-800/50 mt-2 font-medium" style="display:none;"></div>
             </div>
 
             <!-- Assignment Info & Remove Button -->
@@ -759,6 +760,30 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
     });
   }
 
+  const updateDualTimeNotice = () => {
+    const noticeEl = document.getElementById('activityDualTimeNotice');
+    if (!noticeEl) return;
+    const timeVal = startInput?.value || getSelectedTimeValue('activityStartHour', 'activityStartMinute', 'activityStartAmpm');
+    const cityName = leg?.label || leg?.city || '';
+    const localTz = typeof getCityTimezone === 'function' ? getCityTimezone(cityName) : '';
+    const homeTz = typeof getHomeTimezone === 'function' ? getHomeTimezone() : '';
+    const activeDayBtn = modal.querySelector('.activity-assign-day.is-current');
+    const dayIdx = activeDayBtn ? Number(activeDayBtn.getAttribute('data-day-index')) : activity?.assignedDayIdx;
+    const dateVal = leg?.days?.[dayIdx]?.date || '';
+
+    if (timeVal && localTz && homeTz && localTz !== homeTz) {
+      const dualText = typeof convertLocalToHomeTime === 'function'
+        ? convertLocalToHomeTime(timeVal, dateVal, localTz, homeTz)
+        : (typeof formatDualTimeDisplay === 'function' ? formatDualTimeDisplay(timeVal, dateVal, localTz, homeTz) : '');
+      if (dualText) {
+        noticeEl.textContent = `🏡 Home: ${dualText} (${localTz.split('/')[1] || localTz} local time)`;
+        noticeEl.style.display = 'block';
+        return;
+      }
+    }
+    noticeEl.style.display = 'none';
+  };
+
   const syncTimeAndDayFromMode = () => {
     const selectedMode = modeInputs.find(input => input.checked)?.value || 'suggested';
     let activeDayBtn = modal.querySelector('.activity-assign-day.is-current');
@@ -802,6 +827,7 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
   modeInputs.forEach(input => input.addEventListener('change', () => {
     syncScheduleControls();
     syncTimeAndDayFromMode();
+    updateDualTimeNotice();
   }));
 
   const updateEndTimeFromDuration = () => {
@@ -833,11 +859,13 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
           updateEndTimeFromDuration();
           updateInputsFromSelects();
         }
+        updateDualTimeNotice();
       });
     }
   });
 
   syncScheduleControls();
+  updateDualTimeNotice();
 
   const getFormData = () => {
     const category = document.getElementById('activityCategory').value;

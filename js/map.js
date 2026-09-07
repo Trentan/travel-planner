@@ -339,11 +339,11 @@ function buildJourneyMap() {
     const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     const tileUrl = isDarkMode
       ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
-      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+      : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
 
     const tileAttribution = isDarkMode
       ? 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
-      : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+      : 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom';
 
     L.tileLayer(tileUrl, {
       attribution: tileAttribution,
@@ -490,11 +490,11 @@ function updateMapTiles() {
   const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
   const tileUrl = isDarkMode
     ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
 
   const tileAttribution = isDarkMode
     ? 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
-    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+    : 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom';
 
   L.tileLayer(tileUrl, {
     attribution: tileAttribution,

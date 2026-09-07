@@ -1240,10 +1240,12 @@ function buildTransportTab(cityFilter = null) {
     const durationText = isMultiLeg ? calculateJourneyDuration(segs) : null;
     const durationDisplay = durationText !== null ? durationText : calculateDuration(rep.departureDate || rep.dayDate, rep.departureTime, lastSeg.arrivalDate, lastSeg.arrivalTime);
 
+    const fromLocVal = rep.fromLocation || ((typeof getCityNameById === 'function' && rep.fromCityId) ? getCityNameById(rep.fromCityId) : '');
+    const toLocVal = lastSeg.toLocation || ((typeof getCityNameById === 'function' && lastSeg.toCityId) ? getCityNameById(lastSeg.toCityId) : '');
     const firstLoc = getLocationCodeDisplay(rep.fromLocation);
     const lastLoc = getLocationCodeDisplay(lastSeg.toLocation);
     const tzBadge = typeof formatTimezoneDeltaBadge === 'function'
-      ? formatTimezoneDeltaBadge(rep.fromLocation, lastSeg.toLocation, rep.departureDate || rep.dayDate)
+      ? formatTimezoneDeltaBadge(fromLocVal, toLocVal, rep.departureDate || rep.dayDate)
       : '';
     const tzBadgeHtml = tzBadge
       ? ` <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 ml-1.5" title="Timezone Change">${escapeHtmlText(tzBadge)}</span>`

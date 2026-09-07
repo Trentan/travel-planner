@@ -1562,12 +1562,19 @@ function normalizeCityLocationData(city) {
     if (!city.icaoCode && (dbMatch.icaoCode || dbMatch.icao)) city.icaoCode = dbMatch.icaoCode || dbMatch.icao;
     if (!city.countryCode && dbMatch.countryCode) city.countryCode = dbMatch.countryCode;
     if (!city.country && dbMatch.countryCode) city.country = getCountryName(dbMatch.countryCode);
+    if (!city.timezone && (dbMatch.timezone || (typeof getCityTimezone === 'function' && getCityTimezone(city.name)))) {
+      city.timezone = dbMatch.timezone || getCityTimezone(city.name);
+    }
     if (!cityHasStoredCoords(city) && dbMatch.lat !== undefined && dbMatch.lng !== undefined) {
       city.lat = dbMatch.lat;
       city.lng = dbMatch.lng;
     }
   } else if (city.countryCode && !city.country) {
     city.country = getCountryName(city.countryCode);
+  }
+
+  if (!city.timezone && typeof getCityTimezone === 'function' && cityName) {
+    city.timezone = getCityTimezone(cityName);
   }
 
   if (city.lat !== undefined && city.lat !== null && city.lat !== '') {
