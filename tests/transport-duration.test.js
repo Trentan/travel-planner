@@ -133,6 +133,21 @@ async function run() {
     'omitted arrival time should default to 00:00 (12 hours total)'
   );
 
+  // 9. Mixed date formats & multi-day spans
+  assert(
+    calculateJourneyDuration([
+      { departureDate: '2026-06-15', departureTime: '10:00', arrivalDate: '16 Jun', arrivalTime: '16:00' }
+    ]) === 30,
+    'mixed ISO departure and legacy arrival date should return 30 hours'
+  );
+
+  assert(
+    calculateJourneyDuration([
+      { departureDate: '2026-06-15', departureTime: '09:00', arrivalDate: '2026-06-18', arrivalTime: '15:00' }
+    ]) === 78,
+    '3-day multi-day journey (78 hours total) should return 78 hours'
+  );
+
   console.log('✅ ALL CALCULATE JOURNEY DURATION UNIT TESTS PASSED CLEANLY!');
 }
 
