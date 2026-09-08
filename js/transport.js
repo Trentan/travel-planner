@@ -29,6 +29,85 @@ function getLocationDisplayWithCode(locationName) {
 }
 
 // Calculate total journey duration in hours
+// Helper: Parse time string (HH:MM) to minutes from midnight
+function parseTimeToMinutes(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return null;
+  const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return null;
+  return Number(match[1]) * 60 + Number(match[2]);
+}
+
+// Helper: Format buffer minutes into "Xh Ym", "Ym", or "-Xh Ym"
+function formatLayoverBufferText(bufferMinutes) {
+  if (bufferMinutes === null || bufferMinutes === undefined || Number.isNaN(bufferMinutes)) return '';
+  const isNegative = bufferMinutes < 0;
+  const absMins = Math.abs(bufferMinutes);
+  const hours = Math.floor(absMins / 60);
+  const mins = absMins % 60;
+  let text = '';
+  if (hours > 0 && mins > 0) {
+    text = `${hours}h ${mins}m`;
+  } else if (hours > 0) {
+    text = `${hours}h`;
+  } else {
+    text = `${mins}m`;
+  }
+  return isNegative ? `-${text}` : text;
+}
+
+// Helper: Determine layover warning status level
+// 'clash': < 0m (negative buffer / departure before arrival) -> Red alert
+// 'tight': < 90m for flights, < 20m for trains, < 15m for others -> Yellow advisory
+// 'ok': adequate buffer
+function getLayoverWarningStatus(bufferMinutes, transportType = 'other') {
+  if (bufferMinutes === null || bufferMinutes === undefined || Number.isNaN(bufferMinutes)) {
+    return 'ok';
+  }
+  if (bufferMinutes < 0) {
+    return 'clash';
+  }
+  const type = String(transportType || '').toLowerCase();
+  if (type === 'flight' || type === 'plane') {
+    if (bufferMinutes < 90) return 'tight';
+  } else if (type === 'train' || type === 'rail') {
+    if (bufferMinutes < 20) return 'tight';
+  } else {
+    if (bufferMinutes < 15) return 'tight';
+  }
+  return 'ok';
+}
+
+// Helper: Calculate buffer in minutes between two timeline items or transport legs
+function calculateLayoverBuffer(prevItem, nextItem) {
+  if (!prevItem || !nextItem) return null;
+
+  const prevTimeStr = prevItem.endTime || prevItem.startTime;
+  const nextTimeStr = nextItem.startTime;
+
+  if (!prevTimeStr || !nextTimeStr) return null;
+
+  if (typeof prevItem.sortValue === 'number' && typeof nextItem.sortValue === 'number') {
+    let prevEndScore = prevItem.sortValue;
+    if (prevItem.endTime && prevItem.startTime && prevItem.endTime !== prevItem.startTime) {
+      const startMins = parseTimeToMinutes(prevItem.startTime);
+      const endMins = parseTimeToMinutes(prevItem.endTime);
+      if (startMins !== null && endMins !== null) {
+        let dur = endMins - startMins;
+        if (dur < 0) dur += 1440;
+        prevEndScore += dur;
+      }
+    }
+    const nextStartScore = nextItem.sortValue;
+    return Math.round(nextStartScore - prevEndScore);
+  }
+
+  const prevMins = parseTimeToMinutes(prevTimeStr);
+  const nextMins = parseTimeToMinutes(nextTimeStr);
+  if (prevMins === null || nextMins === null) return null;
+
+  return nextMins - prevMins;
+}
+
 function calculateJourneyDuration(segments) {
   if (!segments || segments.length === 0) return null;
 

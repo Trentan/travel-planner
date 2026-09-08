@@ -1709,11 +1709,21 @@ function buildCompactItineraryDesktop() {
   const journeysByJourneyId = getJourneysGroupedByJourneyId();
   const stack = document.createElement('div');
   stack.className = 'compact-desktop-stack';
-  stack.innerHTML = appData.map((leg, legIndex) => `
-    <section class="compact-desktop-leg leg" id="leg-${escapeHtmlText(leg.id || `compact-${legIndex}`)}">
-      ${renderCompactLegCard(leg, legIndex, journeysByJourneyId)}
-    </section>
-  `).join('');
+
+  let stackHtml = '';
+  appData.forEach((leg, legIndex) => {
+    stackHtml += `
+      <section class="compact-desktop-leg leg" id="leg-${escapeHtmlText(leg.id || `compact-${legIndex}`)}">
+        ${renderCompactLegCard(leg, legIndex, journeysByJourneyId)}
+      </section>
+    `;
+    if (legIndex < appData.length - 1) {
+      const nextLeg = appData[legIndex + 1];
+      stackHtml += renderInterCityTransitConnector(leg, nextLeg, legIndex, journeysByJourneyId);
+    }
+  });
+
+  stack.innerHTML = stackHtml;
 
   container.appendChild(stack);
   setupCompactItineraryPagers(container);
@@ -2795,6 +2805,178 @@ function renderDailyTimelineRow(item, compact = false) {
   `;
 }
 
+let timelineConnectorSeq = 0;
+
+function toggleConnectorDetails(connectorId) {
+  const panel = document.getElementById(`${connectorId}-panel`);
+  const arrow = document.getElementById(`${connectorId}-arrow`);
+  if (!panel) return;
+  const isHidden = panel.classList.contains('hidden');
+  if (isHidden) {
+    panel.classList.remove('hidden');
+    if (arrow) arrow.style.transform = 'rotate(180deg)';
+  } else {
+    panel.classList.add('hidden');
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+  }
+}
+window.toggleConnectorDetails = toggleConnectorDetails;
+
+function renderTimelineConnector(prevItem, currentItem) {
+  if (!prevItem || !currentItem) return '';
+  if (prevItem.type === 'smartReminder' || currentItem.type === 'smartReminder') return '';
+  if (
+    prevItem.type === 'arrivalBlock' ||
+    prevItem.type === 'departureBlock' ||
+    currentItem.type === 'arrivalBlock' ||
+    currentItem.type === 'departureBlock'
+  ) {
+    return `
+      <div class="timeline-transit-connector timeline-transit-connector-simple">
+        <div class="connector-line-v"></div>
+      </div>
+    `;
+  }
+  if (prevItem.journeyId && currentItem.journeyId && prevItem.journeyId === currentItem.journeyId) {
+    return `
+      <div class="timeline-transit-connector timeline-transit-connector-simple">
+        <div class="connector-line-v"></div>
+      </div>
+    `;
+  }
+
+  const bufferMins = typeof calculateLayoverBuffer === 'function'
+    ? calculateLayoverBuffer(prevItem, currentItem)
+    : null;
+
+  if (bufferMins === null || bufferMins === undefined || Number.isNaN(bufferMins)) {
+    return `
+      <div class="timeline-transit-connector timeline-transit-connector-simple">
+        <div class="connector-line-v"></div>
+      </div>
+    `;
+  }
+
+  const prevIsTransport = prevItem.type === 'transport';
+  const nextIsTransport = currentItem.type === 'transport';
+  const transportType = nextIsTransport ? (currentItem.transportType || currentItem.provider) : (prevIsTransport ? (prevItem.transportType || prevItem.provider) : 'other');
+
+  let icon = '🚶';
+  const modeSource = nextIsTransport ? currentItem : (prevIsTransport ? prevItem : null);
+  if (modeSource && modeSource.icon) {
+    icon = modeSource.icon;
+  } else if (transportType && typeof getTransportIcon === 'function') {
+    icon = getTransportIcon(transportType);
+  }
+
+  const status = typeof getLayoverWarningStatus === 'function' ? getLayoverWarningStatus(bufferMins, transportType) : 'ok';
+  const bufferText = typeof formatLayoverBufferText === 'function' ? formatLayoverBufferText(bufferMins) : `${bufferMins}m`;
+
+  let warningBadge = '';
+  let warningClass = 'connector-status-ok';
+
+  if (status === 'clash') {
+    warningClass = 'connector-status-clash';
+    warningBadge = `<span class="layover-warning-chip layover-warning-clash">🚨 Schedule Clash (${bufferText})</span>`;
+  } else if (status === 'tight') {
+    warningClass = 'connector-status-tight';
+    const isFlight = /(flight|air|plane|airport)/i.test(String(transportType || ''));
+    const isTrain = /(train|rail|metro)/i.test(String(transportType || ''));
+    const label = isFlight ? 'Tight Layover' : (isTrain ? 'Tight Transfer' : 'Tight Connection');
+    warningBadge = `<span class="layover-warning-chip layover-warning-tight">⚠️ ${label}: ${bufferText}</span>`;
+  } else {
+    warningBadge = `<span class="layover-buffer-chip">⏱️ ${bufferText} buffer</span>`;
+  }
+
+  const carrier = modeSource?.provider || currentItem.provider || prevItem.provider || '';
+  const code = modeSource?.routeCode || currentItem.routeCode || prevItem.routeCode || '';
+  const bookingRef = modeSource?.bookingRef || currentItem.bookingRef || prevItem.bookingRef || '';
+  const subLocations = modeSource?.subLocations || currentItem.subLocations || prevItem.subLocations || '';
+  const notes = modeSource?.notes || currentItem.notes || prevItem.notes || '';
+
+  const detailParts = [];
+  if (carrier) detailParts.push(`Carrier: <strong>${escapeCompactText(carrier)}</strong>`);
+  if (code) detailParts.push(`Flight/Train #: <strong>${escapeCompactText(code)}</strong>`);
+  if (bookingRef) detailParts.push(`Ref #: <strong>${escapeCompactText(bookingRef)}</strong>`);
+  if (subLocations) detailParts.push(`Terminal/Platform: <strong>${escapeCompactText(subLocations)}</strong>`);
+  if (notes) detailParts.push(`Notes: 💬 <em>${escapeCompactText(notes)}</em>`);
+
+  const hasDetails = detailParts.length > 0;
+  const connectorId = `timeline-connector-${++timelineConnectorSeq}`;
+
+  return `
+    <div class="timeline-transit-connector ${warningClass}">
+      <div class="connector-line-v"></div>
+      <div class="connector-badge-wrap ${hasDetails ? 'is-expandable' : ''}" ${hasDetails ? `onclick="event.stopPropagation(); toggleConnectorDetails('${connectorId}')" title="Toggle transit details"` : ''}>
+        <span class="connector-icon">${icon}</span>
+        ${warningBadge}
+        ${hasDetails ? `<span class="connector-expand-arrow" id="${connectorId}-arrow">▼</span>` : ''}
+      </div>
+      ${hasDetails ? `
+        <div class="connector-details-panel hidden" id="${connectorId}-panel">
+          <div class="connector-details-content">
+            ${detailParts.map(part => `<div class="connector-detail-line">${part}</div>`).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function renderInterCityTransitConnector(leg, nextLeg, legIndex, journeysByJourneyIdMap) {
+  if (!leg || !nextLeg) return '';
+  const lastDay = leg.days?.[leg.days.length - 1];
+  const firstDayNext = nextLeg.days?.[0];
+  if (!lastDay || !firstDayNext) return '';
+
+  const journeys = typeof getDayJourneys === 'function' ? getDayJourneys(lastDay.date, lastDay.from, lastDay.to, leg.id) : [];
+  const nextJourneys = typeof getDayJourneys === 'function' ? getDayJourneys(firstDayNext.date, firstDayNext.from, firstDayNext.to, nextLeg.id) : [];
+  const transitionJourneys = [...journeys, ...nextJourneys].filter((j, idx, self) => j && self.findIndex(s => (s.id || s.journeyId) === (j.id || j.journeyId)) === idx);
+
+  const repJourney = transitionJourneys[0];
+  const modeIcon = repJourney && typeof getTransportIcon === 'function' ? getTransportIcon(repJourney.transportType) : '✈️';
+  const fromCity = cleanCityNavLabel(leg.label || lastDay.to || lastDay.from || 'City 1');
+  const toCity = cleanCityNavLabel(nextLeg.label || firstDayNext.from || firstDayNext.to || 'City 2');
+
+  let bufferText = '';
+  if (repJourney && repJourney.arrivalTime && repJourney.departureTime && typeof parseTimeToMinutes === 'function' && typeof formatLayoverBufferText === 'function') {
+    const depMins = parseTimeToMinutes(repJourney.departureTime);
+    const arrMins = parseTimeToMinutes(repJourney.arrivalTime);
+    if (depMins !== null && arrMins !== null) {
+      let dur = arrMins - depMins;
+      if (dur < 0) dur += 1440;
+      bufferText = formatLayoverBufferText(dur);
+    }
+  }
+
+  const provider = repJourney?.provider || '';
+  const code = repJourney?.routeCode || '';
+
+  return `
+    <div class="inter-city-transit-connector">
+      <div class="intercity-connector-line"></div>
+      <div class="intercity-connector-card">
+        <div class="intercity-card-header flex items-center justify-between gap-2">
+          <div class="intercity-route-title font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+            <span>${modeIcon}</span>
+            <span>${escapeCompactText(fromCity)}</span>
+            <span class="text-slate-400">➔</span>
+            <span>${escapeCompactText(toCity)}</span>
+          </div>
+          ${bufferText ? `<span class="intercity-duration-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-mono text-xs font-semibold px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-600">⏱️ ${escapeCompactText(bufferText)}</span>` : ''}
+        </div>
+        ${(provider || code) ? `
+          <div class="intercity-card-sub text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+            ${provider ? `<span>${escapeCompactText(provider)}</span>` : ''}
+            ${code ? `<span class="font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-[11px]">${escapeCompactText(code)}</span>` : ''}
+          </div>
+        ` : ''}
+      </div>
+      <div class="intercity-connector-line"></div>
+    </div>
+  `;
+}
+
 function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
   const journeysByJourneyId = options.journeysByJourneyId || getJourneysGroupedByJourneyId();
   const items = applyTimelineTravelShading(buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourneyId));
@@ -2811,7 +2993,15 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
       ${scheduled.length ? `
         <div class="timeline-section-label">Scheduled</div>
         <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
-          ${scheduled.map(item => renderDailyTimelineRow(item, compact)).join('')}
+          ${scheduled.map((item, idx) => {
+            const rowHtml = renderDailyTimelineRow(item, compact);
+            if (idx < scheduled.length - 1) {
+              const nextItem = scheduled[idx + 1];
+              const connectorHtml = renderTimelineConnector(item, nextItem);
+              return rowHtml + connectorHtml;
+            }
+            return rowHtml;
+          }).join('')}
         </div>
       ` : '<div class="timeline-empty">No timed entries yet. Add start times to build the day timeline.</div>'}
       ${anytime.length ? `
