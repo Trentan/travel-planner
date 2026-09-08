@@ -74,13 +74,13 @@ async function runTripLibraryXssTests() {
   const xssPayload = '<img src=x onerror=alert("xss")><script>alert("xss")</script>';
   const mockTrips = [
     {
-      id: "trip_xss_1",
+      id: `trip_xss_'"><script>alert("xss_id")</script>`,
       title: `Malicious Trip ${xssPayload}`,
       subtitle: `Subtitle ${xssPayload}`,
       flags: `🚩${xssPayload}`,
       dateRange: `2025 ${xssPayload}`,
-      legCount: 3,
-      stayCount: 2,
+      legCount: `3${xssPayload}`,
+      stayCount: `2${xssPayload}`,
       updatedAt: "2025-01-01T00:00:00Z"
     }
   ];
@@ -92,7 +92,7 @@ async function runTripLibraryXssTests() {
     location: { hostname: 'localhost', origin: 'http://localhost:3000', href: 'http://localhost:3000/', protocol: 'http:' },
     addEventListener() {},
     getAllTripsFromIndexedDB: async () => mockTrips,
-    getActiveTripId: () => 'trip_xss_1',
+    getActiveTripId: () => mockTrips[0].id,
     isGoogleDriveConnected: () => false,
     __gdriveCloudFiles: [],
     getGDriveFileMap: () => ({})
