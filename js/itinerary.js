@@ -1540,6 +1540,15 @@ function createCompactCitySwipeElement(mobileLegSequence, journeysByJourneyId) {
   return pagerRoot;
 }
 
+function attachCompactItineraryHandlers(container) {
+  setupMobileSwipePagers(container);
+  setupCompactItineraryPagers(container);
+  setupCompactCityNavSync(container);
+  if (typeof syncItineraryMobileHeightContainment === 'function') {
+    syncItineraryMobileHeightContainment(container);
+  }
+}
+
 function buildCompactItinerary() {
   const container = document.getElementById('itinerary');
   if (!container) return;
@@ -1551,12 +1560,7 @@ function buildCompactItinerary() {
   const pagerRoot = createCompactCitySwipeElement(mobileLegSequence, journeysByJourneyId);
 
   container.appendChild(pagerRoot);
-  setupMobileSwipePagers(container);
-  setupCompactItineraryPagers(container);
-  setupCompactCityNavSync(container);
-  if (typeof syncItineraryMobileHeightContainment === 'function') {
-    syncItineraryMobileHeightContainment(container);
-  }
+  attachCompactItineraryHandlers(container);
 }
 
 function getLegFlightButtonTimeLabel(leg, journeysByJourneyIdMap) {
@@ -1717,170 +1721,6 @@ function buildCompactItineraryDesktop() {
 
   container.appendChild(stack);
   setupCompactItineraryPagers(container);
-}
-
-function buildCompactItineraryLegacy() {
-  const container = document.getElementById('itinerary');
-  container.innerHTML = '';
-
-  const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-    ? window.journeys
-    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-  const journeysByJourneyId = new Map();
-  journeysSource.forEach(seg => {
-    if (seg && seg.journeyId) {
-      if (!journeysByJourneyId.has(seg.journeyId)) {
-        journeysByJourneyId.set(seg.journeyId, []);
-      }
-      journeysByJourneyId.get(seg.journeyId).push(seg);
-    }
-  });
-  journeysByJourneyId.forEach(list => {
-    list.sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-  });
-
-  appData.forEach((leg, legIndex) => {
-    const section = document.createElement('div');
-    section.className = 'leg';
-    section.id = 'leg-' + leg.id;
-
-    const daysCount = leg.days.length;
-    const nightLabel = getLegNightSummary(leg).label;
-
-    let html = `
-    <div class="leg-header" style="background:${leg.colour}; cursor:default;">
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div>
-          <h2 style="margin:0; font-size:14px; cursor:default;">${getLegHeaderLabelWithFlag(leg.label)}</h2>
-          <span style="font-size:11px; opacity:0.85;">${daysCount} days &bull; ${nightLabel}</span>
-        </div>
-      </div>
-    </div>`;
-
-    // Food list
-    if (leg.cityFood && leg.cityFood.length > 0) {
-      html += `
-      <div class="compact-food-block" style="padding:4px 8px; font-size:10px; border-bottom:1px solid rgba(0,0,0,0.06);">
-        <span style="font-weight:600; color:var(--text-secondary); margin-right:4px;">Must-Eats:</span>
-        <div style="display:inline-flex; flex-wrap:wrap; gap:4px 10px;">
-          ${leg.cityFood.map((f, i) => `
-            <label style="display:inline-flex; align-items:flex-start; gap:4px; cursor:pointer; vertical-align:top;">
-              <input type="checkbox" ${f.done ? 'checked' : ''}
-                onchange="toggleFoodCompleted(event, ${legIndex}, ${i})"
-                style="width:12px; height:12px; accent-color:#27AE60; margin-top:1px;">
-              <span style="line-height:1.3; ${f.done ? 'text-decoration:line-through; opacity:0.65;' : ''}">${renderCompactEmojiLine({ emoji: '🍽️', text: f.text, done: f.done })}</span>
-            </label>
-          `).join('')}
-        </div>
-      </div>`;
-    }
-
-    leg.days.forEach((day, dayIdx) => {
-      {
-      const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
-      const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
-      const dayStayInfo = getStayDisplayForDay(day.date, day.to);
-      const transportLines = dayJourneys.map(j => {
-        const icon = getTransportIcon(j.transportType);
-        const journeyLabel = stripCompactLeadingEmoji(j.provider || j.journeyName || j.notes || `${j.fromLocation}→${j.toLocation}`);
-        const segs = (j.journeyId && journeysByJourneyId.get(j.journeyId)) || [];
-        const duration = formatCompactJourneyDuration(segs);
-        const details = formatJourneySubLocationText(segs.length > 0 ? segs : [j]);
-        return renderCompactEmojiLine({ emoji: icon, text: [journeyLabel, details].filter(Boolean).join(' | '), duration });
-      }).join('');
-      const accomLines = dayStayInfo.map(info => renderCompactEmojiLine({
-        emoji: '🏨',
-        text: info.propertyName || 'Accommodation'
-      })).join('');
-      const activityLines = (day.activityItems || []).map((item, itemIdx) => {
-        const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
-        const emoji = getActivityItemEmoji(item, legIndex, dayIdx);
-        return `
-          <div style="display:flex; align-items:flex-start; gap:6px; ${doneStyle}">
-            <input type="checkbox" ${item.done ? 'checked' : ''}
-              onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
-              style="width:12px; height:12px; accent-color:#27AE60; margin-top:1px;">
-            <div style="min-width:0;">${renderCompactEmojiLine({ emoji, text: item.text, duration: item.time || '1 hr', done: item.done })}</div>
-          </div>`;
-        }).join('');
-
-        html += `<div class="compact-day-card" style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
-      <div class="compact-day-top" style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
-        <span class="compact-day-label" style="font-weight:600;">${day.day} ${dayDateLabel}</span>
-        <span class="compact-day-route" style="font-size:10px;">${escapeHtmlText(day.from)} &rarr; ${escapeHtmlText(day.to)}</span>
-        <span class="compact-day-desc" style="font-size:9px; color:#666; flex:1;">${day.desc || ''}</span>
-      </div>
-      <div class="compact-day-grid" style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px; margin-top:5px; font-size:10px;">
-        ${renderCompactBlock('Transport', transportLines)}
-        ${renderCompactBlock('Accom', accomLines)}
-        ${renderCompactBlock('Activities', activityLines, true)}
-      </div>
-      </div></div>`;
-        return;
-      }
-      html += `<div style="margin:0; border-top:1px solid rgba(0,0,0,0.08);">
-      <div style="display:flex; gap:6px; align-items:center; font-size:11px; padding:4px 0;">
-        <span style="font-weight:600;">${day.day} ${dayDateLabel}</span>
-        <span style="font-size:10px;">${escapeHtmlText(day.from)} &rarr; ${escapeHtmlText(day.to)}</span>
-        <span style="font-size:9px; color:#666; flex:1;">${day.desc || ''}</span>
-      </div>
-
-      <div style="display:flex; gap:8px; margin-top:4px; font-size:10px;">`;
-
-      // Display transport from journeys
-      const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
-      if (dayJourneys.length > 0) {
-        html += '<div style="flex:1;"><strong>Transport</strong> ';
-        html += dayJourneys.map(j => {
-          const status = normalizeItemStatus(j.status);
-          const icon = getTransportIcon(j.transportType);
-          const journeyLabel = stripCompactLeadingEmoji(j.notes || `${j.fromLocation}→${j.toLocation}`);
-          const segs = (j.journeyId && journeysByJourneyId.get(j.journeyId)) || [];
-          const duration = j.isMultiLeg && typeof calculateJourneyDuration === 'function' && segs.length > 0
-              ? `${calculateJourneyDuration(segs)}h`
-              : '';
-          const details = formatJourneySubLocationText(segs.length > 0 ? segs : [j]);
-          return `${renderCompactEmojiLine({ emoji: icon, text: [journeyLabel, details].filter(Boolean).join(' | '), duration })} ${renderStatusBadge(status)}`;
-        }).join(', ');
-        html += '</div>';
-      }
-
-
-      // Display stay info derived from stays[] based on date matching
-      const dayStayInfo = getStayDisplayForDay(day.date, day.to);
-      if (dayStayInfo.length > 0) {
-        html += '<div style="flex:1;">';
-        html += dayStayInfo.map(info => {
-          const icon = info.type === 'checkin' ? '🏨' : info.type === 'checkout' ? '🚪' : '🏨';
-          const label = info.type === 'checkin' ? 'Check-in' : info.type === 'checkout' ? 'Check-out' : 'Staying';
-          return `<span style="margin-right:12px;">${renderCompactEmojiLine({ emoji: icon, text: `${label}: ${info.propertyName}` })}</span>`;
-        }).join('');
-        html += '</div>';
-      }
-
-      html += '</div>';
-
-      if ((day.activityItems?.length || 0) > 0) {
-        html += '<div style="margin-top:3px; font-size:10px;"><strong>Target</strong> ';
-        html += day.activityItems.map((item, itemIdx) => {
-          const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
-          return `<span style="margin-right:12px; ${doneStyle}">
-            <input type="checkbox" ${item.done ? 'checked' : ''}
-              onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
-              style="width:12px; height:12px; accent-color:#27AE60; margin-right:4px;">
-            ${renderCompactEmojiLine({ emoji: '📌', text: item.text, duration: item.time || '1 hr', done: item.done })}
-          </span>`;
-        }).join('');
-        html += '</div>';
-      }
-
-      html += '</div></div>';
-    });
-
-    html += '</div>';
-    section.innerHTML = html;
-    container.appendChild(section);
-  });
 }
 
 // Parse "8 Jun" style dates to ISO for comparisons.
