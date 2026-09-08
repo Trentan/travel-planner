@@ -4082,45 +4082,152 @@ function sameTimelineDay(dayDate, targetDate) {
   return Math.floor(dayScore / 1440) === Math.floor(targetScore / 1440);
 }
 
-function findLegForJourneyCity(cityId, cityName) {
-  if (!Array.isArray(journeys) || journeys.length === 0) return null;
-  if (!Array.isArray(appData) || appData.length === 0) return null;
+// Indexed map cache for findLegForJourneyCity
+let _journeyCityCache = null;
+let _journeySourceRef = null;
+let _journeyLength = -1;
+let _journeyFirstId = null;
+let _journeyLastId = null;
 
-  const matching = [];
-  const jLen = journeys.length;
-  for (let i = 0; i < jLen; i++) {
-    const j = journeys[i];
+let _legCache = null;
+let _appDataSourceRef = null;
+let _appDataLength = -1;
+let _appDataFirstId = null;
+let _appDataLastId = null;
+
+function buildJourneyCityIndex(journeysSource) {
+  const cityMap = new Map();
+  const getList = key => {
+    let list = cityMap.get(key);
+    if (!list) {
+      list = [];
+      cityMap.set(key, list);
+    }
+    return list;
+  };
+
+  const len = journeysSource.length;
+  for (let i = 0; i < len; i++) {
+    const j = journeysSource[i];
     if (!j) continue;
-    if (
-      j.fromCityId === cityId ||
-      j.toCityId === cityId ||
-      (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
-    ) {
-      const score = getTimelineScore(
-        j.arrivalDate || j.departureDate || j.dayDate,
-        j.arrivalTime || j.departureTime,
-        Number.MAX_SAFE_INTEGER
-      );
-      matching.push({ journey: j, score });
+    const score = getTimelineScore(
+      j.arrivalDate || j.departureDate || j.dayDate,
+      j.arrivalTime || j.departureTime,
+      Number.MAX_SAFE_INTEGER
+    );
+    const item = { journey: j, score };
+
+    const keys = new Set();
+    if (j.fromCityId) keys.add(j.fromCityId);
+    if (j.toCityId) keys.add(j.toCityId);
+    if (j.fromLocation) keys.add(j.fromLocation);
+    if (j.toLocation) keys.add(j.toLocation);
+
+    for (const key of keys) {
+      getList(key).push(item);
     }
   }
 
-  const mLen = matching.length;
-  if (mLen === 0) return null;
-
-  if (mLen > 1) {
-    matching.sort((a, b) => a.score - b.score);
+  for (const list of cityMap.values()) {
+    if (list.length > 1) {
+      list.sort((a, b) => a.score - b.score);
+    }
   }
 
-  const aLen = appData.length;
+  return cityMap;
+}
+
+function buildLegIndex(appDataSource) {
+  const legById = new Map();
+  const legByDayDate = new Map();
+
+  const aLen = appDataSource.length;
+  for (let l = 0; l < aLen; l++) {
+    const leg = appDataSource[l];
+    if (!leg) continue;
+    if (leg.id && !legById.has(leg.id)) {
+      legById.set(leg.id, leg);
+    }
+    if (leg.days) {
+      const days = leg.days;
+      const dLen = days.length;
+      for (let d = 0; d < dLen; d++) {
+        const day = days[d];
+        if (day && day.date) {
+          const dayScore = getTimelineScore(day.date, '', null);
+          if (dayScore !== null && dayScore !== Number.MAX_SAFE_INTEGER) {
+            const dayNum = Math.floor(dayScore / 1440);
+            if (!legByDayDate.has(dayNum)) {
+              legByDayDate.set(dayNum, leg);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return { legById, legByDayDate };
+}
+
+function findLegForJourneyCity(cityId, cityName) {
+  const jSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
+  if (!Array.isArray(jSource) || jSource.length === 0) return null;
+
+  const aSource = (typeof window !== 'undefined' && Array.isArray(window.appData))
+    ? window.appData
+    : (typeof appData !== 'undefined' && Array.isArray(appData) ? appData : []);
+  if (!Array.isArray(aSource) || aSource.length === 0) return null;
+
+  const jFirst = jSource[0]?.id || jSource[0]?.journeyId;
+  const jLast = jSource[jSource.length - 1]?.id || jSource[jSource.length - 1]?.journeyId;
+  if (_journeySourceRef !== jSource || _journeyLength !== jSource.length || _journeyFirstId !== jFirst || _journeyLastId !== jLast) {
+    _journeySourceRef = jSource;
+    _journeyLength = jSource.length;
+    _journeyFirstId = jFirst;
+    _journeyLastId = jLast;
+    _journeyCityCache = buildJourneyCityIndex(jSource);
+  }
+
+  let matching = null;
+  if (cityId && _journeyCityCache.has(cityId)) {
+    matching = _journeyCityCache.get(cityId);
+  }
+  if (cityName && _journeyCityCache.has(cityName)) {
+    const nameMatching = _journeyCityCache.get(cityName);
+    if (!matching) {
+      matching = nameMatching;
+    } else if (nameMatching && nameMatching !== matching) {
+      const set = new Set(matching);
+      for (let i = 0; i < nameMatching.length; i++) {
+        set.add(nameMatching[i]);
+      }
+      matching = Array.from(set).sort((a, b) => a.score - b.score);
+    }
+  }
+
+  if (!matching || matching.length === 0) return null;
+
+  const aFirst = aSource[0]?.id;
+  const aLast = aSource[aSource.length - 1]?.id;
+  if (_appDataSourceRef !== aSource || _appDataLength !== aSource.length || _appDataFirstId !== aFirst || _appDataLastId !== aLast) {
+    _appDataSourceRef = aSource;
+    _appDataLength = aSource.length;
+    _appDataFirstId = aFirst;
+    _appDataLastId = aLast;
+    _legCache = buildLegIndex(aSource);
+  }
+
+  const { legById, legByDayDate } = _legCache;
+  const mLen = matching.length;
+
   for (let i = 0; i < mLen; i++) {
     const journey = matching[i].journey;
 
     if (journey.legId) {
-      for (let l = 0; l < aLen; l++) {
-        const leg = appData[l];
-        if (leg && leg.id === journey.legId) return leg;
-      }
+      const leg = legById.get(journey.legId);
+      if (leg) return leg;
     }
 
     const targetDate = (journey.toCityId === cityId || journey.toLocation === cityName)
@@ -4128,16 +4235,11 @@ function findLegForJourneyCity(cityId, cityName) {
         : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
     if (targetDate) {
-      for (let l = 0; l < aLen; l++) {
-        const leg = appData[l];
-        if (leg && leg.days) {
-          const days = leg.days;
-          const dLen = days.length;
-          for (let d = 0; d < dLen; d++) {
-            const day = days[d];
-            if (day && sameTimelineDay(day.date, targetDate)) return leg;
-          }
-        }
+      const targetScore = getTimelineScore(targetDate, '', null);
+      if (targetScore !== null && targetScore !== Number.MAX_SAFE_INTEGER) {
+        const targetDayNum = Math.floor(targetScore / 1440);
+        const leg = legByDayDate.get(targetDayNum);
+        if (leg) return leg;
       }
     }
   }
