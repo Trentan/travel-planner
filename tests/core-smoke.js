@@ -561,6 +561,33 @@ async function run() {
   assert(updatedJid123Segs[0].fromLocation === 'Zurich' && updatedJid123Segs[0].toLocation === 'Bangkok', 'Updated segment should have new route');
   assert(transportContext.journeys.some(j => j.journeyId === 'jid_456'), 'Unrelated journeys should be preserved');
 
+  // Tests for renderTransportCarrierMobile refactored configuration object pattern
+  const { renderTransportCarrierMobile } = transportContext;
+  assert(typeof renderTransportCarrierMobile === 'function', 'renderTransportCarrierMobile should be exported on transportContext');
+
+  // Test passing configuration object
+  const objectOutput = renderTransportCarrierMobile({
+    provider: 'Qantas',
+    routeCode: 'QF1',
+    bookingReference: 'ABCXYZ',
+    statusText: 'booked',
+    costValue: 1200,
+    journeyId: 'j_qf1',
+    isEditable: true
+  });
+  assert(objectOutput.includes('Qantas'), 'renderTransportCarrierMobile with object should include provider');
+  assert(objectOutput.includes('QF1'), 'renderTransportCarrierMobile with object should include route code');
+  assert(objectOutput.includes('ABCXYZ'), 'renderTransportCarrierMobile with object should include booking reference');
+  assert(objectOutput.includes('$1200'), 'renderTransportCarrierMobile with object should include formatted cost');
+
+  // Test positional parameters (legacy support)
+  const legacyOutput = renderTransportCarrierMobile('Qantas', 'QF1', 'ABCXYZ', 'booked', '', '#000', 1200, 'j_qf1', true);
+  assert(legacyOutput === objectOutput, 'renderTransportCarrierMobile with legacy positional parameters should produce identical HTML output to configuration object');
+
+  // Test default empty object
+  const emptyOutput = renderTransportCarrierMobile();
+  assert(typeof emptyOutput === 'string' && emptyOutput.includes('transport-carrier-meta'), 'renderTransportCarrierMobile with default params should return HTML structure without error');
+
   console.log('Core smoke checks passed');
 }
 

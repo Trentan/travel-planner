@@ -300,10 +300,12 @@
 
     let googleBannerHtml = '';
     if (isDriveConnected) {
+      const hasSafeAvatar = userProfile && isSafeUrl(userProfile.picture);
+      const safeDriveFolderUrl = isSafeUrl(driveFolderUrl) ? escapeHtml(driveFolderUrl) : '#';
       googleBannerHtml = `
         <div class="col-span-full mb-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-850 rounded-xl border border-blue-200/80 dark:border-slate-700 shadow-xs flex flex-wrap items-center justify-between gap-2.5">
           <div class="flex items-center gap-2.5 min-w-0">
-            ${userProfile && userProfile.picture ? `<img src="${escapeHtml(userProfile.picture)}" class="w-8 h-8 rounded-full border border-blue-300 dark:border-slate-600 shrink-0" alt="Avatar" referrerpolicy="no-referrer">` : `<div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">G</div>`}
+            ${hasSafeAvatar ? `<img src="${escapeHtml(userProfile.picture.trim())}" class="w-8 h-8 rounded-full border border-blue-300 dark:border-slate-600 shrink-0" alt="Avatar" referrerpolicy="no-referrer">` : `<div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">G</div>`}
             <div class="min-w-0">
               <div class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5 truncate">
                 <span class="truncate">${escapeHtml((userProfile && (userProfile.name || userProfile.email)) || 'Google Drive Connected')}</span>
@@ -316,7 +318,7 @@
             <button class="action-btn action-btn-secondary text-xs py-1 px-2.5 flex items-center gap-1 text-blue-600 dark:text-blue-400" onclick="window.syncAllTripsFromGoogleDrive();" title="Sync all trips from Google Drive">
               <span>🔄</span> <span>Sync All</span>
             </button>
-            <a href="${escapeHtml(driveFolderUrl)}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs py-1 px-2" title="Open Google Drive folder">
+            <a href="${safeDriveFolderUrl}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs py-1 px-2" title="Open Google Drive folder">
               <span>↗</span>
             </a>
           </div>
@@ -409,13 +411,13 @@
           <div>
             <div class="flex items-center justify-between gap-2 mb-1.5">
               <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/70">☁️ Google Drive File</span>
-              ${isActiveFile ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">● Active</span>` : `<span class="text-[11px] text-slate-400">🕒 ${modTime}</span>`}
+              ${isActiveFile ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">● Active</span>` : `<span class="text-[11px] text-slate-400">🕒 ${escapeHtml(modTime)}</span>`}
             </div>
             <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm truncate flex items-center gap-1.5">
               <span>📄</span>
               <span class="truncate">${safeFileName}</span>
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Size: ${sizeKb} • Modified: ${modTime}</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Size: ${escapeHtml(sizeKb)} • Modified: ${escapeHtml(modTime)}</p>
           </div>
           <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
             <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-xs flex-1" onclick="window.loadTripFromGoogleDrive('${safeFileIdJs}')">
@@ -471,7 +473,7 @@
               ? '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">☁️ Drive Synced</span>'
               : '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">⚡ Local Only</span>'
             }
-            <span class="updated-badge text-[10px]">Updated ${updatedDate}</span>
+            <span class="updated-badge text-[10px]">Updated ${escapeHtml(updatedDate)}</span>
           </div>
           <h3 class="trip-card-title">${escapeHtml(flags)} ${escapeHtml(title)}</h3>
           ${subtitle ? `<p class="trip-card-subtitle">${escapeHtml(subtitle)}</p>` : ''}
@@ -778,6 +780,20 @@
     const randomEmoji = funEmojis[Math.floor(Math.random() * funEmojis.length)];
     await window.selectTripEmoji(randomEmoji);
   };
+
+  function isSafeUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const trimmed = url.trim();
+    try {
+      const base = (typeof window !== 'undefined' && window.location && typeof window.location.href === 'string')
+        ? window.location.href
+        : 'http://localhost/';
+      const parsed = new URL(trimmed, base);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'data:';
+    } catch (e) {
+      return false;
+    }
+  }
 
   // Helper escape HTML string
   function escapeHtml(str) {
