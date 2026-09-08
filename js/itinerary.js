@@ -4126,47 +4126,140 @@ function sameTimelineDay(dayDate, targetDate) {
   return Math.floor(dayScore / 1440) === Math.floor(targetScore / 1440);
 }
 
+let _journeyCityCache = null;
+let _legCache = null;
+let _journeyCityCacheRef = null;
+let _legCacheRef = null;
+let _journeyCityCacheLength = -1;
+let _legCacheLength = -1;
+
+function invalidateLegForJourneyCityCaches() {
+  _journeyCityCache = null;
+  _legCache = null;
+  _journeyCityCacheRef = null;
+  _legCacheRef = null;
+  _journeyCityCacheLength = -1;
+  _legCacheLength = -1;
+}
+
+function _buildJourneyCityAndLegCaches(journeysArr, appDataArr) {
+  const journeyCityCache = new Map();
+  const jLen = journeysArr.length;
+  for (let i = 0; i < jLen; i++) {
+    const j = journeysArr[i];
+    if (!j) continue;
+    const score = getTimelineScore(
+      j.arrivalDate || j.departureDate || j.dayDate,
+      j.arrivalTime || j.departureTime,
+      Number.MAX_SAFE_INTEGER
+    );
+    const entry = { journey: j, score };
+
+    const keys = new Set();
+    if (j.fromCityId) keys.add(j.fromCityId);
+    if (j.toCityId) keys.add(j.toCityId);
+    if (j.fromLocation) keys.add(j.fromLocation);
+    if (j.toLocation) keys.add(j.toLocation);
+
+    keys.forEach(k => {
+      let list = journeyCityCache.get(k);
+      if (!list) {
+        list = [];
+        journeyCityCache.set(k, list);
+      }
+      list.push(entry);
+    });
+  }
+
+  journeyCityCache.forEach(list => {
+    if (list.length > 1) {
+      list.sort((a, b) => a.score - b.score);
+    }
+  });
+
+  const legById = new Map();
+  const legByDayKey = new Map();
+  const aLen = appDataArr.length;
+  for (let l = 0; l < aLen; l++) {
+    const leg = appDataArr[l];
+    if (!leg) continue;
+    if (leg.id) {
+      legById.set(leg.id, leg);
+    }
+    if (Array.isArray(leg.days)) {
+      const days = leg.days;
+      const dLen = days.length;
+      for (let d = 0; d < dLen; d++) {
+        const day = days[d];
+        if (day && day.date) {
+          const dayScore = getTimelineScore(day.date, '', null);
+          if (dayScore !== null) {
+            const k = Math.floor(dayScore / 1440);
+            if (!legByDayKey.has(k)) legByDayKey.set(k, leg);
+          }
+        }
+      }
+    }
+  }
+
+  _journeyCityCache = journeyCityCache;
+  _legCache = { byId: legById, byDayKey: legByDayKey };
+  _journeyCityCacheRef = journeysArr;
+  _legCacheRef = appDataArr;
+  _journeyCityCacheLength = jLen;
+  _legCacheLength = aLen;
+}
+
 function findLegForJourneyCity(cityId, cityName) {
   if (!Array.isArray(journeys) || journeys.length === 0) return null;
   if (!Array.isArray(appData) || appData.length === 0) return null;
 
-  const matching = [];
-  const jLen = journeys.length;
-  for (let i = 0; i < jLen; i++) {
-    const j = journeys[i];
-    if (!j) continue;
-    if (
-      j.fromCityId === cityId ||
-      j.toCityId === cityId ||
-      (cityName && (j.fromLocation === cityName || j.toLocation === cityName))
-    ) {
-      const score = getTimelineScore(
-        j.arrivalDate || j.departureDate || j.dayDate,
-        j.arrivalTime || j.departureTime,
-        Number.MAX_SAFE_INTEGER
-      );
-      matching.push({ journey: j, score });
+  if (
+    !_journeyCityCache ||
+    !_legCache ||
+    _journeyCityCacheRef !== journeys ||
+    _legCacheRef !== appData ||
+    _journeyCityCacheLength !== journeys.length ||
+    _legCacheLength !== appData.length
+  ) {
+    _buildJourneyCityAndLegCaches(journeys, appData);
+  }
+
+  const list1 = cityId ? _journeyCityCache.get(cityId) || null : null;
+  const list2 = cityName ? _journeyCityCache.get(cityName) || null : null;
+
+  if (!list1 && !list2) return null;
+
+  let matching;
+  if (list1 && !list2) {
+    matching = list1;
+  } else if (!list1 && list2) {
+    matching = list2;
+  } else if (list1 === list2) {
+    matching = list1;
+  } else {
+    const seen = new Set();
+    matching = [];
+    for (let i = 0; i < list1.length; i++) {
+      seen.add(list1[i].journey);
+      matching.push(list1[i]);
+    }
+    for (let i = 0; i < list2.length; i++) {
+      if (!seen.has(list2[i].journey)) {
+        matching.push(list2[i]);
+      }
+    }
+    if (matching.length > 1) {
+      matching.sort((a, b) => a.score - b.score);
     }
   }
 
   const mLen = matching.length;
-  if (mLen === 0) return null;
-
-  if (mLen > 1) {
-    matching.sort((a, b) => a.score - b.score);
-  }
-
-  const aLen = appData.length;
-  let legByDayKey = null;
-
   for (let i = 0; i < mLen; i++) {
     const journey = matching[i].journey;
 
-    if (journey.legId) {
-      for (let l = 0; l < aLen; l++) {
-        const leg = appData[l];
-        if (leg && leg.id === journey.legId) return leg;
-      }
+    if (journey.legId && _legCache.byId.has(journey.legId)) {
+      return _legCache.byId.get(journey.legId);
     }
 
     const targetDate = (journey.toCityId === cityId || journey.toLocation === cityName)
@@ -4177,30 +4270,8 @@ function findLegForJourneyCity(cityId, cityName) {
       const targetScore = getTimelineScore(targetDate, '', null);
       if (targetScore !== null) {
         const targetDayKey = Math.floor(targetScore / 1440);
-
-        if (!legByDayKey) {
-          legByDayKey = new Map();
-          for (let l = 0; l < aLen; l++) {
-            const leg = appData[l];
-            if (leg && leg.days) {
-              const days = leg.days;
-              const dLen = days.length;
-              for (let d = 0; d < dLen; d++) {
-                const day = days[d];
-                if (day && day.date) {
-                  const dayScore = getTimelineScore(day.date, '', null);
-                  if (dayScore !== null) {
-                    const k = Math.floor(dayScore / 1440);
-                    if (!legByDayKey.has(k)) legByDayKey.set(k, leg);
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        if (legByDayKey.has(targetDayKey)) {
-          return legByDayKey.get(targetDayKey);
+        if (_legCache.byDayKey.has(targetDayKey)) {
+          return _legCache.byDayKey.get(targetDayKey);
         }
       }
     }
