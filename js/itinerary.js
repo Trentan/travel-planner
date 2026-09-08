@@ -4128,14 +4128,21 @@ function findLegForJourneyCity(cityId, cityName) {
         : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
     if (targetDate) {
-      for (let l = 0; l < aLen; l++) {
-        const leg = appData[l];
-        if (leg && leg.days) {
-          const days = leg.days;
-          const dLen = days.length;
-          for (let d = 0; d < dLen; d++) {
-            const day = days[d];
-            if (day && sameTimelineDay(day.date, targetDate)) return leg;
+      const targetScore = getTimelineScore(targetDate, '', null);
+      if (targetScore !== null) {
+        const targetDayKey = Math.floor(targetScore / 1440);
+        for (let l = 0; l < aLen; l++) {
+          const leg = appData[l];
+          if (leg && leg.days) {
+            const days = leg.days;
+            const dLen = days.length;
+            for (let d = 0; d < dLen; d++) {
+              const day = days[d];
+              if (day && day.date) {
+                const dayScore = getTimelineScore(day.date, '', null);
+                if (dayScore !== null && Math.floor(dayScore / 1440) === targetDayKey) return leg;
+              }
+            }
           }
         }
       }
