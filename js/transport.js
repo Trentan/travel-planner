@@ -29,6 +29,155 @@ function getLocationDisplayWithCode(locationName) {
 }
 
 // Calculate total journey duration in hours
+// Helper: Parse date and time into Epoch timestamp
+function parseDateTimeToTs(dateStr, timeStr) {
+  if (!dateStr) return null;
+  const rawTime = String(timeStr || '').trim() || '00:00';
+  let dateNorm = dateStr;
+  if (typeof normalizeDate === 'function') {
+    dateNorm = normalizeDate(dateStr);
+  }
+  let isoCandidate = `${dateNorm}T${rawTime}:00`;
+  let dt = new Date(isoCandidate);
+  if (!Number.isNaN(dt.getTime())) return dt.getTime();
+
+  let fallback = new Date(`${dateStr} 2026 ${rawTime}`);
+  if (!Number.isNaN(fallback.getTime())) return fallback.getTime();
+  return null;
+}
+
+// Calculate layover/transfer buffer between two items or transport segments
+function calculateLayoverBuffer(itemA, itemB) {
+  if (!itemA || !itemB) return null;
+
+  let dateA = itemA.arrivalDate || itemA.departureDate || itemA.dayDate || itemA.dateStr || itemA.date || '';
+  let timeA = itemA.arrivalTime || itemA.endTime || itemA.departureTime || itemA.startTime || '';
+
+  let dateB = itemB.departureDate || itemB.dayDate || itemB.dateStr || itemB.date || '';
+  let timeB = itemB.departureTime || itemB.startTime || '';
+
+  if (!timeA || !timeB) return null;
+
+  let tsA = parseDateTimeToTs(dateA, timeA);
+  let tsB = parseDateTimeToTs(dateB, timeB);
+
+  if (tsA === null || tsB === null) {
+    let parseMins = (t) => {
+      const parts = String(t).match(/^(\d{1,2}):(\d{2})/);
+      return parts ? parseInt(parts[1]) * 60 + parseInt(parts[2]) : null;
+    };
+    let mA = parseMins(timeA);
+    let mB = parseMins(timeB);
+    if (mA === null || mB === null) return null;
+    let diffMins = mB - mA;
+    return evaluateLayoverBuffer(diffMins, itemA, itemB);
+  }
+
+  let bufferMinutes = Math.round((tsB - tsA) / (60 * 1000));
+  return evaluateLayoverBuffer(bufferMinutes, itemA, itemB);
+}
+
+// Evaluate warning thresholds and format layover buffer object
+function evaluateLayoverBuffer(bufferMinutes, itemA = {}, itemB = {}) {
+  const inferType = (item) => {
+    let t = String(item.transportType || item.type || '').toLowerCase();
+    if (t === 'plane' || t === 'flight') return 'flight';
+    if (t === 'train' || t === 'rail') return 'train';
+    if (t === 'bus') return 'bus';
+    if (t === 'ferry' || t === 'boat') return 'ferry';
+    if (t === 'walk' || t === 'walking') return 'walk';
+    if (t === 'car') return 'car';
+    let blob = [item.title, item.journeyName, item.provider, item.notes].filter(Boolean).join(' ').toLowerCase();
+    if (/(flight|air|airline|airport|terminal)/.test(blob)) return 'flight';
+    if (/(train|rail|bahn|renfe|trenitalia|metro)/.test(blob)) return 'train';
+    if (/(ferry|boat|catamaran)/.test(blob)) return 'ferry';
+    if (/(bus|coach)/.test(blob)) return 'bus';
+    return 'other';
+  };
+
+  const modeB = inferType(itemB);
+  const modeA = inferType(itemA);
+  const mode = (modeB !== 'other' ? modeB : modeA) || 'other';
+
+  const isFlight = mode === 'flight';
+  const tightThreshold = isFlight ? 90 : 20;
+  const criticalThreshold = isFlight ? 60 : 15;
+
+  let level = 'normal';
+  let isClash = false;
+
+  if (bufferMinutes < 0) {
+    level = 'alert';
+    isClash = true;
+  } else if (bufferMinutes < criticalThreshold) {
+    level = 'alert';
+  } else if (bufferMinutes < tightThreshold) {
+    level = 'advisory';
+  }
+
+  const formatMins = (mins) => {
+    const absMins = Math.abs(mins);
+    const hrs = Math.floor(absMins / 60);
+    const m = absMins % 60;
+    let str = hrs > 0 ? (m > 0 ? `${hrs}h ${m}m` : `${hrs}h`) : `${m}m`;
+    return mins < 0 ? `-${str}` : str;
+  };
+
+  const formattedBuffer = formatMins(bufferMinutes);
+
+  const iconMap = {
+    flight: '✈️',
+    train: '🚆',
+    ferry: '⛴️',
+    bus: '🚌',
+    car: '🚗',
+    walk: '🚶',
+    other: '🔄'
+  };
+  const modeIcon = iconMap[mode] || '🔄';
+
+  const modeLabel = isFlight ? 'flight' : (mode === 'train' ? 'train' : 'transfer');
+
+  let warningText = '';
+  let badgeText = '';
+
+  if (isClash) {
+    badgeText = `🔴 Schedule Clash (${formattedBuffer})`;
+    warningText = `🔴 Critical Clash: Departure is ${formattedBuffer} relative to arrival!`;
+  } else if (level === 'alert') {
+    badgeText = `🔴 Critical Layover: ${formattedBuffer}`;
+    warningText = `🔴 Dangerously Short Buffer: ${formattedBuffer} (< ${criticalThreshold}m required for ${modeLabel})`;
+  } else if (level === 'advisory') {
+    badgeText = `⚠️ Tight Connection: ${formattedBuffer}`;
+    warningText = `⚠️ Tight Connection: ${formattedBuffer} (< ${tightThreshold}m recommended for ${modeLabel})`;
+  } else {
+    badgeText = `⏱️ ${isFlight ? 'Layover' : 'Transfer'}: ${formattedBuffer}`;
+    warningText = `${isFlight ? 'Layover' : 'Transfer'} Buffer: ${formattedBuffer}`;
+  }
+
+  const carrier = [itemA.provider, itemB.provider].filter(Boolean).join(' → ') || itemB.provider || itemA.provider || '';
+  const routeCode = [itemA.routeCode, itemB.routeCode].filter(Boolean).join(' → ') || itemB.routeCode || itemA.routeCode || '';
+  const terminalPlatform = [itemA.toAddress || itemA.subLocations, itemB.fromAddress || itemB.subLocations].filter(Boolean).join(' → ') || itemB.fromAddress || itemA.toAddress || '';
+  const notes = [itemA.notes, itemB.notes].filter(Boolean).join(' | ');
+
+  return {
+    bufferMinutes,
+    formattedBuffer,
+    level,
+    isClash,
+    mode,
+    modeIcon,
+    badgeText,
+    warningText,
+    tightThreshold,
+    criticalThreshold,
+    carrier,
+    routeCode,
+    terminalPlatform,
+    notes
+  };
+}
+
 function calculateJourneyDuration(segments) {
   if (!segments || segments.length === 0) return null;
 
@@ -919,7 +1068,9 @@ function isTransportMobileCardLayout() {
 
 function renderTransportSegmentsDetailContent(segs) {
   const useCompactSegments = typeof window !== 'undefined' && (window.isCompactView || document.body.classList.contains('mobile-app-mode'));
-const detailRows = segs.map((seg, i) => {
+
+  const items = [];
+  segs.forEach((seg, i) => {
     const segDepDate = formatJourneyDate(seg.departureDate) || seg.dayDate || '—';
     const segDepTime = seg.departureTime || '';
     const segDep = segDepDate !== '—' && segDepTime ? segDepDate + ' ' + segDepTime : segDepDate;
@@ -927,7 +1078,7 @@ const detailRows = segs.map((seg, i) => {
     const segRoute = `${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}`;
 
     if (useCompactSegments) {
-      return `
+      items.push(`
         <div class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-700/50 rounded-lg p-3 shadow-sm text-sm">
           <div class="flex items-center justify-between mb-2">
             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Leg ${i + 1}</span>
@@ -956,40 +1107,72 @@ const detailRows = segs.map((seg, i) => {
           </div>
           ${seg.attachments && seg.attachments.length > 0 ? '<div class="journey-segment-attachments mt-1 flex flex-wrap gap-1">' + renderAttachmentsPillsHtml(seg.attachments) + '</div>' : ''}
         </div>
-      `;
+      `);
+      if (i < segs.length - 1) {
+        const bufferInfo = calculateLayoverBuffer(seg, segs[i + 1]);
+        if (bufferInfo) {
+          const levelClass = bufferInfo.level === 'alert'
+            ? 'is-warning-alert'
+            : (bufferInfo.level === 'advisory' ? 'is-warning-advisory' : 'is-normal');
+          items.push(`
+            <div class="transport-segment-connector ${levelClass} my-1.5 py-1.5 px-3 rounded-lg flex items-center justify-between text-xs">
+              <span class="font-bold flex items-center gap-1.5">
+                <span>${bufferInfo.modeIcon}</span>
+                <span>${escapeHtmlText(bufferInfo.badgeText)}</span>
+              </span>
+              ${bufferInfo.terminalPlatform ? `<span class="text-slate-500 font-medium">📍 ${escapeHtmlText(bufferInfo.terminalPlatform)}</span>` : ''}
+            </div>
+          `);
+        }
+      }
+    } else {
+      items.push(`
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+          <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">Leg ${i + 1}</td>
+          <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">
+            ${segRoute}
+            ${renderTransportSubLocationDetails(seg, 'text-xs mt-0.5 text-slate-500 font-normal')}
+          </td>
+          <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap font-medium">${segDep}</td>
+          <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
+          <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${seg.provider || '—'}</td>
+          <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 font-mono uppercase">${seg.routeCode || '—'}</td>
+          <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 font-mono uppercase">${seg.bookingReference || '—'}</td>
+          <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-800 dark:text-slate-200 font-medium text-right">${seg.cost ? formatCurrency(seg.cost) : '—'}</td>
+        </tr>
+      `);
+      if (i < segs.length - 1) {
+        const bufferInfo = calculateLayoverBuffer(seg, segs[i + 1]);
+        if (bufferInfo) {
+          const levelClass = bufferInfo.level === 'alert'
+            ? 'is-warning-alert'
+            : (bufferInfo.level === 'advisory' ? 'is-warning-advisory' : 'is-normal');
+          items.push(`
+            <tr class="transport-segment-connector-row ${levelClass}">
+              <td colspan="8" class="px-4 py-2 bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between gap-3 text-xs">
+                  <span class="inline-flex items-center gap-1.5 font-bold ${levelClass}">
+                    <span>${bufferInfo.modeIcon}</span>
+                    <span>${escapeHtmlText(bufferInfo.badgeText)}</span>
+                  </span>
+                  ${bufferInfo.terminalPlatform ? `<span class="text-slate-500 font-medium">📍 ${escapeHtmlText(bufferInfo.terminalPlatform)}</span>` : ''}
+                </div>
+              </td>
+            </tr>
+          `);
+        }
+      }
     }
-
-    return `
-      <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">Leg ${i + 1}</td>
-        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">
-          ${segRoute}
-          ${renderTransportSubLocationDetails(seg, 'text-xs mt-0.5 text-slate-500 font-normal')}
-        </td>
-        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap font-medium">${segDep}</td>
-        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
-        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${seg.provider || '—'}</td>
-        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 font-mono uppercase">${seg.routeCode || '—'}</td>
-        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 font-mono uppercase">${seg.bookingReference || '—'}</td>
-        <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-800 dark:text-slate-200 font-medium text-right">${seg.cost ? formatCurrency(seg.cost) : '—'}</td>
-      </tr>
-    `;
-  }).join('');
+  });
 
   return useCompactSegments
       ? `
       <div class="mt-2 bg-slate-50/50 dark:bg-slate-800/30 rounded-lg p-3">
         <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex justify-between items-center">
           <span>Journey Segments</span>
-          
-        </div>
-        <div class="hidden">
-          <span>Journey</span>
-          <span>Schedule</span>
-          <span>Carrier</span>
         </div>
         <div class="space-y-2">
-          ${detailRows}
+          ${items.join('')}
         </div>
       </div>
     `
@@ -997,7 +1180,6 @@ const detailRows = segs.map((seg, i) => {
       <div class="mt-2 bg-slate-50/50 dark:bg-slate-800/20 rounded-lg border border-slate-200/50 dark:border-slate-700/50 overflow-hidden">
         <div class="px-4 py-2 bg-slate-100/50 dark:bg-slate-800/50 border-b border-slate-200/50 dark:border-slate-700/50 text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider flex justify-between items-center">
           <span>Journey Segments</span>
-          
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse min-w-[800px]">
@@ -1014,7 +1196,7 @@ const detailRows = segs.map((seg, i) => {
               </tr>
             </thead>
             <tbody class="bg-white dark:bg-slate-900">
-              ${detailRows}
+              ${items.join('')}
             </tbody>
           </table>
         </div>
@@ -1921,6 +2103,8 @@ function saveJourneyFromModal() {
 }
 
 // Expose to window
+window.calculateLayoverBuffer = calculateLayoverBuffer;
+window.evaluateLayoverBuffer = evaluateLayoverBuffer;
 window.getLocationDisplayWithCode = getLocationDisplayWithCode;
 window.getLocationCodeDisplay = getLocationCodeDisplay;
 window.buildRouteChainWithCodes = buildRouteChainWithCodes;
