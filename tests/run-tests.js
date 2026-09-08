@@ -13,12 +13,18 @@ const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 const { run: runTimezoneSuite } = require('./timezone-suite.test');
 const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
 const { run: runSmartRemindersSuite } = require('./smart-reminders-suite');
-const { run: runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
+const { runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
+const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
+const { run: runTransportDurationSuite } = require('./transport-duration.test');
+const { run: runTransitConnectorsSuite } = require('./transit-connectors-layover.test');
 
 async function run() {
   await runCloudStorageXssTests();
+  if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();
   if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
   if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
+  if (typeof runTransportDurationSuite === 'function') await runTransportDurationSuite();
+  if (typeof runTransitConnectorsSuite === 'function') await runTransitConnectorsSuite();
   await runCoreSmoke();
   await runPwaShortcutsOfflineTests();
   await runAutoStaysSuite();

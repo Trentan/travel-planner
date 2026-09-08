@@ -2471,6 +2471,55 @@ function applyTimelineTravelShading(items) {
   });
 }
 
+function toggleTimelineConnectorDetails(connectorId) {
+  if (!connectorId) return;
+  const el = document.getElementById(connectorId);
+  if (!el) return;
+  el.classList.toggle('hidden');
+}
+window.toggleTimelineConnectorDetails = toggleTimelineConnectorDetails;
+
+function renderDailyTimelineConnectorRow(itemA, itemB, compact = false) {
+  if (!itemA || !itemB) return '';
+  const bufferInfo = typeof calculateLayoverBuffer === 'function'
+    ? calculateLayoverBuffer(itemA, itemB)
+    : null;
+  if (!bufferInfo) return '';
+
+  const levelClass = bufferInfo.level === 'alert'
+    ? 'is-warning-alert'
+    : (bufferInfo.level === 'advisory' ? 'is-warning-advisory' : 'is-normal');
+
+  const connectorId = `conn_${Math.random().toString(36).substr(2, 8)}`;
+  const hasDetails = Boolean(bufferInfo.carrier || bufferInfo.routeCode || bufferInfo.terminalPlatform || bufferInfo.notes);
+
+  const detailsHtml = hasDetails ? `
+    <div id="${connectorId}" class="timeline-connector-details hidden" onclick="event.stopPropagation();">
+      <div class="connector-detail-grid">
+        ${bufferInfo.carrier ? `<div><span class="connector-detail-label">Carrier:</span> <span class="connector-detail-val">${escapeCompactText(bufferInfo.carrier)}</span></div>` : ''}
+        ${bufferInfo.routeCode ? `<div><span class="connector-detail-label">Flight/Train Code:</span> <span class="connector-detail-val">${escapeCompactText(bufferInfo.routeCode)}</span></div>` : ''}
+        ${bufferInfo.terminalPlatform ? `<div><span class="connector-detail-label">Terminal / Platform:</span> <span class="connector-detail-val">${escapeCompactText(bufferInfo.terminalPlatform)}</span></div>` : ''}
+        ${bufferInfo.notes ? `<div class="span-2"><span class="connector-detail-label">Notes:</span> <span class="connector-detail-val">${escapeCompactText(bufferInfo.notes)}</span></div>` : ''}
+      </div>
+    </div>
+  ` : '';
+
+  return `
+    <div class="daily-timeline-connector ${levelClass} ${compact ? 'daily-timeline-connector-compact' : ''}">
+      <div class="timeline-connector-line"></div>
+      <div class="timeline-connector-badge-wrap">
+        <button type="button" class="timeline-connector-badge ${levelClass}" onclick="event.stopPropagation(); toggleTimelineConnectorDetails('${connectorId}')" title="${escapeCompactText(bufferInfo.warningText)}">
+          <span class="connector-mode-icon">${bufferInfo.modeIcon}</span>
+          <span class="connector-badge-text">${escapeCompactText(bufferInfo.badgeText)}</span>
+          ${hasDetails ? '<span class="connector-chevron">▾</span>' : ''}
+        </button>
+      </div>
+      ${detailsHtml}
+    </div>
+  `;
+}
+window.renderDailyTimelineConnectorRow = renderDailyTimelineConnectorRow;
+
 function renderDailyTimelineRow(item, compact = false) {
   if (item.type === 'smartReminder') {
     const timeStr = `<span class="daily-timeline-time daily-timeline-reminder-time">${escapeCompactText(item.startTime || 'Tip')}</span>`;
@@ -2787,13 +2836,26 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
   if (items.length === 0) return empty;
   const { scheduled, anytime } = getDailyTimelineBuckets(items);
   const mapAction = renderDailyTimelineMapAction(legIndex, dayIndex, items);
+
+  const scheduledRows = [];
+  scheduled.forEach((item, idx) => {
+    scheduledRows.push(renderDailyTimelineRow(item, compact));
+    if (idx < scheduled.length - 1) {
+      const nextItem = scheduled[idx + 1];
+      const connectorHtml = renderDailyTimelineConnectorRow(item, nextItem, compact);
+      if (connectorHtml) {
+        scheduledRows.push(connectorHtml);
+      }
+    }
+  });
+
   return `
     <div class="daily-timeline-shell ${compact ? 'daily-timeline-shell-compact' : ''}">
       ${mapAction ? `<div class="daily-timeline-heading-row"><span class="timeline-section-label">Day Timeline</span>${mapAction}</div>` : ''}
       ${scheduled.length ? `
         <div class="timeline-section-label">Scheduled</div>
         <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
-          ${scheduled.map(item => renderDailyTimelineRow(item, compact)).join('')}
+          ${scheduledRows.join('')}
         </div>
       ` : '<div class="timeline-empty">No timed entries yet. Add start times to build the day timeline.</div>'}
       ${anytime.length ? `
