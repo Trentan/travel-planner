@@ -8425,6 +8425,187 @@ body.mobile-app-mode #readOnlyBanner {
   color: #f8fafc !important;
 }
 
+/* Daily Timeline Transit Connectors & Layover Warnings */
+.daily-timeline-connector {
+  position: relative;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-block: 0.2rem;
+  padding-left: 8.1rem;
+  padding-right: 0.5rem;
+}
+
+.daily-timeline-compact .daily-timeline-connector {
+  padding-left: 6.4rem;
+}
+
+@media (max-width: 768px) {
+  .daily-timeline-connector,
+  .daily-timeline-compact .daily-timeline-connector {
+    padding-left: 2.75rem;
+  }
+}
+
+.timeline-connector-line {
+  position: absolute;
+  left: 10.25rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #cbd5e1;
+  z-index: 1;
+}
+
+.daily-timeline-compact .timeline-connector-line {
+  left: 8.12rem;
+}
+
+@media (max-width: 768px) {
+  .timeline-connector-line,
+  .daily-timeline-compact .timeline-connector-line {
+    left: 2.75rem;
+  }
+}
+
+.daily-timeline-connector.is-warning-advisory .timeline-connector-line {
+  background: #f59e0b;
+  width: 3px;
+}
+
+.daily-timeline-connector.is-warning-alert .timeline-connector-line {
+  background: #f43f5e;
+  width: 3px;
+}
+
+.timeline-connector-badge-wrap {
+  position: relative;
+  z-index: 2;
+  margin-block: 0.25rem;
+}
+
+.timeline-connector-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+
+.timeline-connector-badge.is-warning-advisory {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #b45309;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.18);
+}
+
+.timeline-connector-badge.is-warning-alert {
+  border-color: #f43f5e;
+  background: #fff1f2;
+  color: #be123c;
+  box-shadow: 0 2px 8px rgba(244, 63, 94, 0.22);
+}
+
+.timeline-connector-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+}
+
+.connector-chevron {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.timeline-connector-details {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 0.78rem;
+  color: #334155;
+}
+
+.connector-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem 0.75rem;
+}
+
+.connector-detail-grid .span-2 {
+  grid-column: 1 / -1;
+}
+
+.connector-detail-label {
+  font-weight: 700;
+  color: #64748b;
+}
+
+.connector-detail-val {
+  font-weight: 600;
+}
+
+/* Transport Segments Connectors */
+.transport-segment-connector {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.transport-segment-connector.is-warning-advisory,
+.transport-segment-connector-row.is-warning-advisory .is-warning-advisory {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.transport-segment-connector.is-warning-alert,
+.transport-segment-connector-row.is-warning-alert .is-warning-alert {
+  border-color: #fecdd3;
+  background: #fff1f2;
+  color: #be123c;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .timeline-connector-badge {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .timeline-connector-badge.is-warning-advisory {
+  background: rgba(120, 53, 15, 0.35);
+  border-color: rgba(245, 158, 11, 0.6);
+  color: #fcd34d;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .timeline-connector-badge.is-warning-alert {
+  background: rgba(136, 19, 55, 0.4);
+  border-color: rgba(244, 63, 94, 0.7);
+  color: #fda4af;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .timeline-connector-details {
+  background: #0f172a;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+:where([data-theme="dark"], [data-theme="dark"] *) .connector-detail-label {
+  color: #94a3b8;
+}
+
 
 
 
