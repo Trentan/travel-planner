@@ -148,12 +148,8 @@ function getJourneyDisplayCost(journey, journeysByJourneyId) {
 
   const gid = journey.journeyId || journey.id;
   if (gid) {
-    const matching = (journeysByJourneyId && journeysByJourneyId.has(gid))
-      ? journeysByJourneyId.get(gid)
-      : ((typeof window !== 'undefined' && Array.isArray(window.journeys))
-          ? window.journeys
-          : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []))
-          .filter(seg => (seg.journeyId || seg.id) === gid);
+    const mapToUse = journeysByJourneyId || getJourneysGroupedByJourneyId();
+    const matching = mapToUse.get(gid) || [];
     for (const seg of matching) {
       const segCost = parseFloat(seg.cost || '0');
       if (segCost > 0) {
@@ -1723,21 +1719,7 @@ function buildCompactItineraryLegacy() {
   const container = document.getElementById('itinerary');
   container.innerHTML = '';
 
-  const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-    ? window.journeys
-    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-  const journeysByJourneyId = new Map();
-  journeysSource.forEach(seg => {
-    if (seg && seg.journeyId) {
-      if (!journeysByJourneyId.has(seg.journeyId)) {
-        journeysByJourneyId.set(seg.journeyId, []);
-      }
-      journeysByJourneyId.get(seg.journeyId).push(seg);
-    }
-  });
-  journeysByJourneyId.forEach(list => {
-    list.sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-  });
+  const journeysByJourneyId = getJourneysGroupedByJourneyId();
 
   appData.forEach((leg, legIndex) => {
     const section = document.createElement('div');
