@@ -701,6 +701,17 @@ const CITY_DATABASE = [
 // Combine all city databases for lookups (built-in + extended + user-extensible)
 const ALL_CITIES = [...CITY_DATABASE, ...EXTENDED_CITY_DATABASE];
 
+// Pre-built Map index for O(1) lower-case city name lookups in ALL_CITIES
+const ALL_CITIES_NAME_MAP = new Map();
+ALL_CITIES.forEach(c => {
+  if (c && c.name) {
+    const key = c.name.toLowerCase();
+    if (!ALL_CITIES_NAME_MAP.has(key)) {
+      ALL_CITIES_NAME_MAP.set(key, c);
+    }
+  }
+});
+
 // User-extensible cities (persisted to localStorage)
 let userCities = []; // { code, name, countryCode }
 
@@ -2889,7 +2900,7 @@ async function refetchCityLocationAndFlag(cityId) {
   if (!city) return;
 
   const cityName = city.name;
-  const match = ALL_CITIES.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+  const match = getCityLocationDatabaseMatch(city) || ALL_CITIES_NAME_MAP.get(cityName.toLowerCase());
 
   if (match) {
     if ('code' in city) delete city.code;
@@ -3170,14 +3181,8 @@ function migrateCitiesToISOFormat() {
 
   const usedColorsSet = new Set(citiesData.map(c => c.colour).filter(Boolean));
 
-  // Build lookup maps to replace linear searches
-  const allCitiesMap = new Map();
-  ALL_CITIES.forEach(c => {
-    if (c.name) {
-      const key = c.name.toLowerCase();
-      if (!allCitiesMap.has(key)) allCitiesMap.set(key, c);
-    }
-  });
+  // Use global ALL_CITIES_NAME_MAP lookup map to replace linear searches
+  const allCitiesMap = ALL_CITIES_NAME_MAP;
 
   const countryByCodeMap = new Map();
   const countryByNameMap = new Map();
