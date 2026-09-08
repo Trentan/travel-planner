@@ -33,6 +33,7 @@ async function runBenchmark() {
       applyCityLocation,
       fetchAllMissingCityLocations,
       ALL_CITIES,
+      ALL_CITIES_HAS_COORDS_SET,
       citiesData
     };
   `;
@@ -80,8 +81,31 @@ async function runBenchmark() {
   const endMatch = process.hrtime.bigint();
   const matchMs = Number(endMatch - startMatch) / 1e6;
 
+  // 3. Benchmark missing cities local coords check (linear search vs Set lookup)
+  const startLinear = process.hrtime.bigint();
+  for (let i = 0; i < ITERATIONS; i++) {
+    const city = testCities[i % testCities.length];
+    const hadLocalCoords = !!engine.ALL_CITIES.find(c =>
+      c.name.toLowerCase() === city.name.toLowerCase() &&
+      c.lat !== undefined &&
+      c.lng !== undefined
+    );
+  }
+  const endLinear = process.hrtime.bigint();
+  const linearMs = Number(endLinear - startLinear) / 1e6;
+
+  const startSet = process.hrtime.bigint();
+  for (let i = 0; i < ITERATIONS; i++) {
+    const city = testCities[i % testCities.length];
+    const hadLocalCoords = engine.ALL_CITIES_HAS_COORDS_SET.has((city.name || '').toLowerCase());
+  }
+  const endSet = process.hrtime.bigint();
+  const setMs = Number(endSet - startSet) / 1e6;
+
   console.log(`resolveCityLocation (${ITERATIONS} calls): ${resolveMs.toFixed(2)} ms`);
   console.log(`getCityLocationDatabaseMatch (${ITERATIONS} calls): ${matchMs.toFixed(2)} ms`);
+  console.log(`localCoords linear lookup (${ITERATIONS} calls): ${linearMs.toFixed(2)} ms`);
+  console.log(`localCoords Set lookup (${ITERATIONS} calls): ${setMs.toFixed(2)} ms`);
 }
 
 runBenchmark().catch(console.error);
