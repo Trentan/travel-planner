@@ -2110,7 +2110,7 @@ async function fetchAllMissingCityLocations() {
     const city = missingCities[i];
     if (btn) btn.textContent = `Finding ${i + 1}/${missingCities.length}...`;
 
-    const hadLocalCoords = ALL_CITIES_HAS_COORDS_SET.has(city.name.toLowerCase());
+    const hadLocalCoords = ALL_CITIES_HAS_COORDS_SET.has((city.name || '').toLowerCase());
     const result = await resolveCityLocation(city);
     if (result && applyCityLocation(city, result)) foundCount++;
 
