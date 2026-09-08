@@ -996,17 +996,17 @@ function renderTransportScheduleMobile(firstDep, lastArr, lastArrTime, durationT
   `;
 }
 
-function renderTransportCarrierMobile(provider, routeCode, bookingReference, statusText, statusIcon, statusColor, costValue, journeyId, isEditable) {
-  const opts = (typeof provider === 'object' && provider !== null) ? provider : {
-    provider,
-    routeCode,
-    bookingReference,
-    statusText,
-    statusIcon,
-    statusColor,
-    costValue,
-    journeyId,
-    isEditable
+function renderTransportCarrierMobile(options = {}) {
+  const opts = (typeof options === 'object' && options !== null) ? options : {
+    provider: options,
+    routeCode: arguments[1],
+    bookingReference: arguments[2],
+    statusText: arguments[3],
+    statusIcon: arguments[4],
+    statusColor: arguments[5],
+    costValue: arguments[6],
+    journeyId: arguments[7],
+    isEditable: arguments[8]
   };
 
   const {
@@ -2126,6 +2126,7 @@ window.updateJourneyNotes = updateJourneyNotes;
 window.buildTransportTab = buildTransportTab;
 window.getDayJourneys = getDayJourneys;
 window.getTransportIcon = getTransportIcon;
+window.renderTransportCarrierMobile = renderTransportCarrierMobile;
 window.createJourneyFromTransportItem = createJourneyFromTransportItem;
 window.importJourneys = importJourneys;
 window.migrateJourneyCityIds = migrateJourneyCityIds;
