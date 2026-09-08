@@ -701,6 +701,31 @@ const CITY_DATABASE = [
 // Combine all city databases for lookups (built-in + extended + user-extensible)
 const ALL_CITIES = [...CITY_DATABASE, ...EXTENDED_CITY_DATABASE];
 
+// Precomputed lookup structures for ALL_CITIES (O(1) lookups)
+const LOCAL_COORDS_CITY_NAMES = new Set(
+  ALL_CITIES
+    .filter(c => c && c.lat !== undefined && c.lng !== undefined && c.name)
+    .map(c => c.name.toLowerCase())
+);
+
+const ALL_CITIES_BY_NAME = new Map();
+const ALL_CITIES_BY_CODE = new Map();
+ALL_CITIES.forEach(c => {
+  if (!c) return;
+  if (c.name) {
+    const nameKey = c.name.toLowerCase();
+    let list = ALL_CITIES_BY_NAME.get(nameKey);
+    if (!list) {
+      list = [];
+      ALL_CITIES_BY_NAME.set(nameKey, list);
+    }
+    list.push(c);
+  }
+  if (c.code) {
+    ALL_CITIES_BY_CODE.set(c.code.toUpperCase(), c);
+  }
+});
+
 // User-extensible cities (persisted to localStorage)
 let userCities = []; // { code, name, countryCode }
 
@@ -1738,25 +1763,22 @@ function getCityLocationDatabaseMatch(city) {
   const cityName = String(city.name || '').trim().toLowerCase();
   const cityCode = String(city.code || '').trim().toUpperCase();
   const targetCountryCode = String(city.countryCode || '').trim().toUpperCase();
+  const candidates = cityName ? (ALL_CITIES_BY_NAME.get(cityName) || []) : [];
 
   // 1. Exact match with target country code
-  if (targetCountryCode) {
-    const match = ALL_CITIES.find(candidate => {
-      const candidateName = String(candidate.name || '').trim().toLowerCase();
+  if (targetCountryCode && candidates.length > 0) {
+    const match = candidates.find(candidate => {
       const candidateCountry = String(candidate.countryCode || '').trim().toUpperCase();
-      return candidateName === cityName && candidateCountry === targetCountryCode;
+      return candidateCountry === targetCountryCode;
     });
     if (match) return match;
   }
 
   // 2. Exact match by name or airport code
-  const exact = ALL_CITIES.find(candidate => {
-    const candidateName = String(candidate.name || '').trim().toLowerCase();
-    const candidateCode = String(candidate.code || '').trim().toUpperCase();
-    return (cityName && candidateName === cityName) ||
-        (cityCode && candidateCode === cityCode);
-  });
-  if (exact) return exact;
+  if (candidates.length > 0) return candidates[0];
+  if (cityCode && ALL_CITIES_BY_CODE.has(cityCode)) {
+    return ALL_CITIES_BY_CODE.get(cityCode);
+  }
 
   // 3. Multilingual / alternate alias match
   const aliasMatch = getCityAliasMatch(cityName);
@@ -1832,15 +1854,16 @@ async function resolveCityLocation(city) {
   let dbMatch = null;
   const targetCountryCode = (city.countryCode || '').toUpperCase();
   const targetCountryName = (city.country || '').toLowerCase();
+  const candidates = ALL_CITIES_BY_NAME.get(city.name.toLowerCase()) || [];
 
-  if (targetCountryCode) {
-    dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase() && c.countryCode && c.countryCode.toUpperCase() === targetCountryCode);
+  if (targetCountryCode && candidates.length > 0) {
+    dbMatch = candidates.find(c => c.countryCode && c.countryCode.toUpperCase() === targetCountryCode);
   }
-  if (!dbMatch && targetCountryName) {
-    dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase() && c.countryCode && getCountryName(c.countryCode).toLowerCase() === targetCountryName);
+  if (!dbMatch && targetCountryName && candidates.length > 0) {
+    dbMatch = candidates.find(c => c.countryCode && getCountryName(c.countryCode).toLowerCase() === targetCountryName);
   }
-  if (!dbMatch) {
-    dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
+  if (!dbMatch && candidates.length > 0) {
+    dbMatch = candidates[0];
   }
 
   if (dbMatch && dbMatch.lat !== undefined && dbMatch.lng !== undefined) {
@@ -2063,18 +2086,12 @@ async function fetchAllMissingCityLocations() {
     btn.textContent = `Finding 0/${missingCities.length}...`;
   }
 
-  const localCoordsCityNames = new Set(
-    ALL_CITIES
-      .filter(c => c.lat !== undefined && c.lng !== undefined)
-      .map(c => c.name.toLowerCase())
-  );
-
   let foundCount = 0;
   for (let i = 0; i < missingCities.length; i++) {
     const city = missingCities[i];
     if (btn) btn.textContent = `Finding ${i + 1}/${missingCities.length}...`;
 
-    const hadLocalCoords = localCoordsCityNames.has(city.name.toLowerCase());
+    const hadLocalCoords = LOCAL_COORDS_CITY_NAMES.has(city.name.toLowerCase());
     const result = await resolveCityLocation(city);
     if (result && applyCityLocation(city, result)) foundCount++;
 
