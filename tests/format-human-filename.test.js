@@ -106,25 +106,63 @@ function runFormatHumanFilenameTests() {
     'Should fallback to My_Trip.json when title is empty string'
   );
 
-  // 6. Special character sanitization
+  // 6. Null and undefined tripRecord handling
+  assert(
+    formatHumanFilename(null) === 'My_Trip.json',
+    'Should fallback to My_Trip.json when tripRecord is null'
+  );
+
+  assert(
+    formatHumanFilename(undefined) === 'My_Trip.json',
+    'Should fallback to My_Trip.json when tripRecord is undefined'
+  );
+
+  // 7. Non-string title fields (numbers, booleans)
+  assert(
+    formatHumanFilename({ title: 2026 }) === '2026.json',
+    'Should handle numeric title fields'
+  );
+
+  assert(
+    formatHumanFilename({ title: true }) === 'true.json',
+    'Should handle boolean title fields'
+  );
+
+  // 8. Special character sanitization
   assert(
     formatHumanFilename({ title: 'Summer / Vacation: 2026! (Draft) & <Notes>' }) === 'Summer_Vacation_2026_Draft_Notes.json',
     'Should remove special characters / : ! ( ) & < >'
   );
 
-  // 7. Whitespace trimming and collapsing
+  assert(
+    formatHumanFilename({ title: 'Trip * With ? Bad " File | Names' }) === 'Trip_With_Bad_File_Names.json',
+    'Should sanitize Windows/Unix illegal filename characters (* ? " |)'
+  );
+
+  // 9. Whitespace trimming and collapsing
   assert(
     formatHumanFilename({ title: '   Tokyo    and   Kyoto   ' }) === 'Tokyo_and_Kyoto.json',
     'Should trim leading/trailing spaces and collapse multiple spaces into a single underscore'
   );
 
-  // 8. Hyphens and underscores preservation
+  // 10. Hyphens and underscores preservation
   assert(
     formatHumanFilename({ title: 'My-Trip_2026-v1_final' }) === 'My-Trip_2026-v1_final.json',
     'Should preserve hyphens and underscores in titles'
   );
 
-  // 9. Edge case: purely special characters result in cleanName being empty, falling back to 'Trip.json'
+  // 11. Unicode and Emoji handling
+  assert(
+    formatHumanFilename({ title: 'Paris 🗼 2026 ✨ Trip' }) === 'Paris_2026_Trip.json',
+    'Should strip emojis and keep ASCII alphanumeric characters'
+  );
+
+  assert(
+    formatHumanFilename({ title: 'Café & Réservation in Montréal' }) === 'Caf_Rservation_in_Montral.json',
+    'Should strip non-ASCII accented characters'
+  );
+
+  // 12. Pure special character title fallback
   assert(
     formatHumanFilename({ title: '!!!' }) === 'Trip.json',
     'Should fallback to Trip.json when title consists only of stripped special characters'
@@ -133,6 +171,11 @@ function runFormatHumanFilenameTests() {
   assert(
     formatHumanFilename({ title: ' @#$%^&*() ' }) === 'Trip.json',
     'Should fallback to Trip.json when title consists only of special characters and spaces'
+  );
+
+  assert(
+    formatHumanFilename({ title: '🗼✨🎉' }) === 'Trip.json',
+    'Should fallback to Trip.json when title consists only of emojis'
   );
 
   console.log('✅ ALL formatHumanFilename UNIT TESTS PASSED CLEANLY!');
