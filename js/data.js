@@ -1226,6 +1226,18 @@ async function createFileOnDisk() {
 function extractCitiesFromItinerary() {
   const cityMap = new Map();
 
+  // Pre-build lookup maps for ALL_CITIES to replace O(N) linear searches
+  const allCitiesByNameMap = new Map();
+  const allCitiesBySlugMap = new Map();
+  ALL_CITIES.forEach(c => {
+    if (c && c.name) {
+      const lower = c.name.toLowerCase();
+      if (!allCitiesByNameMap.has(lower)) allCitiesByNameMap.set(lower, c);
+      const slugKey = lower.replace(/-/g, '');
+      if (!allCitiesBySlugMap.has(slugKey)) allCitiesBySlugMap.set(slugKey, c);
+    }
+  });
+
   // Helper to add/update city
   const addCity = (cityName, sourceDate = null, source = 'itinerary') => {
     if (!cityName) return;
@@ -1248,7 +1260,7 @@ function extractCitiesFromItinerary() {
     let existing = cityMap.get(normalized);
 
     if (!existing) {
-      const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === normalized.toLowerCase());
+      const dbMatch = allCitiesByNameMap.get(normalized.toLowerCase());
       let country = '';
       let countryCode = '';
       let formattedName = dbMatch ? dbMatch.name : formatCityTitleCase(normalized);
@@ -1280,8 +1292,8 @@ function extractCitiesFromItinerary() {
     // Extract city slug from ID like city-vienna for cities not in built-in database
     const slug = cityId.replace('city-', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     // Check if this city exists in ALL_CITIES database
-    const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase().replace(/-/g, '') === slug.toLowerCase().replace(/-/g, '') ||
-                                         c.name.toLowerCase() === slug.toLowerCase());
+    const slugLower = slug.toLowerCase();
+    const dbMatch = allCitiesByNameMap.get(slugLower) || allCitiesBySlugMap.get(slugLower.replace(/-/g, ''));
     if (dbMatch) {
       addCity(dbMatch.name, sourceDate);
     } else {
@@ -1379,10 +1391,17 @@ function extractCitiesFromItinerary() {
   const result = Array.from(cityMap.values());
 
   // Final pass: look up country data for any remaining unknown cities
+  const allCitiesNameMap = new Map();
+  ALL_CITIES.forEach(c => {
+    if (c && c.name && !allCitiesNameMap.has(c.name.toLowerCase())) {
+      allCitiesNameMap.set(c.name.toLowerCase(), c);
+    }
+  });
+
   result.forEach(city => {
     normalizeCityLocationData(city);
     if (!city.country && !city.countryCode) {
-      const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
+      const dbMatch = allCitiesNameMap.get(city.name.toLowerCase());
       if (dbMatch) {
         city.countryCode = dbMatch.countryCode;
         city.country = getCountryName(dbMatch.countryCode);
@@ -3572,15 +3591,26 @@ async function initData() {
       citiesData = JSON.parse(savedCities);
       normalizeTripCitiesDateData(citiesData);
       // Migrate existing cities to include code if missing
+      const allCitiesNameMap = new Map();
+      ALL_CITIES.forEach(c => {
+        if (c && c.name && !allCitiesNameMap.has(c.name.toLowerCase())) {
+          allCitiesNameMap.set(c.name.toLowerCase(), c);
+        }
+      });
+      const countryByNameMap = new Map();
+      COUNTRY_DATA.forEach(c => {
+        if (c && c.name && !countryByNameMap.has(c.name.toLowerCase())) {
+          countryByNameMap.set(c.name.toLowerCase(), c);
+        }
+      });
+
       citiesData.forEach(city => {
         if (!city.code) {
-          const match = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
+          const match = allCitiesNameMap.get(city.name.toLowerCase());
           city.code = match ? match.code : '';
         }
         if (!city.countryCode && city.country) {
-          const countryMatch = COUNTRY_DATA.find(c =>
-            c.name.toLowerCase() === city.country.toLowerCase()
-          );
+          const countryMatch = countryByNameMap.get(city.country.toLowerCase());
           city.countryCode = countryMatch ? countryMatch.code : '';
         }
       });
