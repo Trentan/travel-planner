@@ -13,10 +13,12 @@ const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 const { run: runTimezoneSuite } = require('./timezone-suite.test');
 const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
 const { run: runSmartRemindersSuite } = require('./smart-reminders-suite');
+const { run: runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
 
 async function run() {
   await runCloudStorageXssTests();
   if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
+  if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
   await runCoreSmoke();
   await runPwaShortcutsOfflineTests();
   await runAutoStaysSuite();

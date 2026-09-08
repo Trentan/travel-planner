@@ -638,6 +638,7 @@ const CITY_DATABASE = [
   { code: 'ATH', icaoCode: 'LGAV', name: 'Athens', countryCode: 'GR', timezone: 'Europe/Athens', lat: 37.9838, lng: 23.7275 },
   { code: 'BCN', icaoCode: 'LEBL', name: 'Barcelona', countryCode: 'ES', timezone: 'Europe/Madrid', lat: 41.3851, lng: 2.1734 },
   { code: 'BKK', icaoCode: 'VTBS', name: 'Bangkok', countryCode: 'TH', timezone: 'Asia/Bangkok', lat: 13.7563, lng: 100.5018 },
+  { code: 'PEK', icaoCode: 'ZBAA', name: 'Beijing', countryCode: 'CN', timezone: 'Asia/Shanghai', lat: 39.9042, lng: 116.4074 },
   { code: 'BNE', icaoCode: 'YBBN', name: 'Brisbane', countryCode: 'AU', timezone: 'Australia/Brisbane', lat: -27.4698, lng: 153.0251 },
   { code: 'BRU', icaoCode: 'EBBR', name: 'Brussels', countryCode: 'BE', timezone: 'Europe/Brussels', lat: 50.8503, lng: 4.3517 },
   { code: 'BUD', icaoCode: 'LHBP', name: 'Budapest', countryCode: 'HU', timezone: 'Europe/Budapest', lat: 47.4979, lng: 19.0402 },
@@ -650,6 +651,7 @@ const CITY_DATABASE = [
   { code: 'DUB', icaoCode: 'EIDW', name: 'Dublin', countryCode: 'IE', timezone: 'Europe/Dublin', lat: 53.3498, lng: -6.2603 },
   { code: 'DUS', icaoCode: 'EDDL', name: 'Dusseldorf', countryCode: 'DE', timezone: 'Europe/Berlin', lat: 51.2277, lng: 6.7735 },
   { code: 'FCO', icaoCode: 'LIRF', name: 'Rome', countryCode: 'IT', timezone: 'Europe/Rome', lat: 41.9028, lng: 12.4964 },
+  { code: 'FLR', icaoCode: 'LIRQ', name: 'Florence', countryCode: 'IT', timezone: 'Europe/Rome', lat: 43.7696, lng: 11.2558 },
   { code: 'FRA', icaoCode: 'EDDF', name: 'Frankfurt', countryCode: 'DE', timezone: 'Europe/Berlin', lat: 50.1109, lng: 8.6821 },
   { code: 'GVA', icaoCode: 'LSGG', name: 'Geneva', countryCode: 'CH', timezone: 'Europe/Zurich', lat: 46.2044, lng: 6.1432 },
   { code: 'HAM', icaoCode: 'EDDH', name: 'Hamburg', countryCode: 'DE', timezone: 'Europe/Berlin', lat: 53.5511, lng: 9.9937 },
@@ -1517,12 +1519,227 @@ function cityHasStoredCoords(city) {
       Number.isFinite(lng);
 }
 
+// Multilingual and alternative city aliases dictionary (normalized lower-case keys)
+const CITY_ALIASES = {
+  // German / Central Europe
+  'muenchen': 'Munich',
+  'münchen': 'Munich',
+  'munchen': 'Munich',
+  'wien': 'Vienna',
+  'praha': 'Prague',
+  'warszawa': 'Warsaw',
+  'krakow': 'Krakow',
+  'kraków': 'Krakow',
+  'cracow': 'Krakow',
+  'budapest': 'Budapest',
+  'koln': 'Cologne',
+  'köln': 'Cologne',
+  'cologne': 'Cologne',
+  'zurich': 'Zurich',
+  'zürich': 'Zurich',
+  'geneve': 'Geneva',
+  'genève': 'Geneva',
+  'genf': 'Geneva',
+  'basel': 'Basel',
+  'bâle': 'Basel',
+
+  // Italy
+  'roma': 'Rome',
+  'firenze': 'Florence',
+  'florenz': 'Florence',
+  'venezia': 'Venice',
+  'venise': 'Venice',
+  'venedig': 'Venice',
+  'milano': 'Milan',
+  'mailand': 'Milan',
+  'napoli': 'Naples',
+  'neapel': 'Naples',
+  'torino': 'Turin',
+  'genova': 'Genoa',
+
+  // Spain & Portugal
+  'sevilla': 'Seville',
+  'lisboa': 'Lisbon',
+  'lissabon': 'Lisbon',
+  'porto': 'Porto',
+  'oporto': 'Porto',
+  'valencia': 'Valencia',
+  'valència': 'Valencia',
+
+  // France & Belgium
+  'bruxelles': 'Brussels',
+  'brussel': 'Brussels',
+  'anvers': 'Antwerp',
+  'antwerpen': 'Antwerp',
+
+  // Asia & Oceania
+  'peking': 'Beijing',
+  'beijing': 'Beijing',
+  'canton': 'Guangzhou',
+  'guangzhou': 'Guangzhou',
+  'saigon': 'Ho Chi Minh City',
+  'ho chi minh': 'Ho Chi Minh City',
+  'ho chi minh city': 'Ho Chi Minh City',
+  'hcmc': 'Ho Chi Minh City',
+  'bombay': 'Mumbai',
+  'mumbai': 'Mumbai',
+  'calcutta': 'Kolkata',
+  'kolkata': 'Kolkata',
+  'madras': 'Chennai',
+  'chennai': 'Chennai',
+  'tokio': 'Tokyo',
+  'krung thep': 'Bangkok',
+
+  // Americas & Eastern Europe
+  'new york city': 'New York',
+  'nyc': 'New York',
+  'sf': 'San Francisco',
+  'la': 'Los Angeles',
+  'montreal': 'Montreal',
+  'montréal': 'Montreal',
+  'sao paulo': 'Sao Paulo',
+  'são paulo': 'Sao Paulo',
+  'ciudad de mexico': 'Mexico City',
+  'cdmx': 'Mexico City',
+  'kyiv': 'Kyiv',
+  'kiev': 'Kyiv'
+};
+
+function stripDiacritics(str) {
+  return String(str || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function calculateLevenshteinDistance(a, b) {
+  const str1 = String(a || '');
+  const str2 = String(b || '');
+  if (str1 === str2) return 0;
+  if (!str1) return str2.length;
+  if (!str2) return str1.length;
+
+  const aLen = str1.length;
+  const bLen = str2.length;
+  const dp = [];
+
+  for (let i = 0; i <= bLen; i++) {
+    dp[i] = [i];
+  }
+  for (let j = 0; j <= aLen; j++) {
+    dp[0][j] = j;
+  }
+
+  for (let i = 1; i <= bLen; i++) {
+    for (let j = 1; j <= aLen; j++) {
+      if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+        dp[i][j] = dp[i - 1][j - 1];
+      } else {
+        dp[i][j] = Math.min(
+          dp[i - 1][j - 1] + 1, // substitution
+          dp[i][j - 1] + 1,     // insertion
+          dp[i - 1][j] + 1      // deletion
+        );
+      }
+    }
+  }
+  return dp[bLen][aLen];
+}
+
+function calculateSimilarityScore(str1, str2) {
+  const s1 = stripDiacritics(String(str1 || '').trim().toLowerCase());
+  const s2 = stripDiacritics(String(str2 || '').trim().toLowerCase());
+  if (s1 === s2) return 1.0;
+  const maxLen = Math.max(s1.length, s2.length);
+  if (maxLen === 0) return 1.0;
+  const dist = calculateLevenshteinDistance(s1, s2);
+  return Math.max(0, 1 - (dist / maxLen));
+}
+
+function getCityAliasMatch(cityName) {
+  if (!cityName) return null;
+  const norm = String(cityName).trim().toLowerCase();
+  const stripped = stripDiacritics(norm);
+  const targetName = CITY_ALIASES[norm] || CITY_ALIASES[stripped];
+  if (!targetName) return null;
+  const db = (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) ? ALL_CITIES : [];
+  return db.find(c => c.name.toLowerCase() === targetName.toLowerCase()) || null;
+}
+
+function findFuzzyCityCandidate(input, options = {}) {
+  const cleanInput = String(input || '')
+    .replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '')
+    .trim();
+  if (!cleanInput || cleanInput.length < 3) return null;
+
+  const normInput = cleanInput.toLowerCase();
+  const strippedInput = stripDiacritics(normInput);
+  const targetCountryCode = options.countryCode ? String(options.countryCode).toUpperCase() : '';
+
+  // Check alias dictionary first
+  const aliasCandidate = getCityAliasMatch(cleanInput);
+  if (aliasCandidate) {
+    if (!targetCountryCode || aliasCandidate.countryCode === targetCountryCode) {
+      return {
+        candidate: aliasCandidate,
+        score: 0.98,
+        distance: 0,
+        type: 'alias'
+      };
+    }
+  }
+
+  const db = (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) ? ALL_CITIES : [];
+  let best = null;
+
+  for (const candidate of db) {
+    if (!candidate || !candidate.name) continue;
+    const candNameLower = candidate.name.toLowerCase();
+    const candNameStripped = stripDiacritics(candNameLower);
+
+    // Exact match (including diacritics stripped)
+    if (candNameLower === normInput || candNameStripped === strippedInput) {
+      const isCountryMatch = targetCountryCode && candidate.countryCode === targetCountryCode;
+      return {
+        candidate,
+        score: isCountryMatch ? 1.0 : 0.99,
+        distance: 0,
+        type: 'exact'
+      };
+    }
+
+    const dist = calculateLevenshteinDistance(strippedInput, candNameStripped);
+    const maxLen = Math.max(strippedInput.length, candNameStripped.length);
+    let score = 1 - (dist / maxLen);
+
+    // Give bonus for matching country
+    if (targetCountryCode && candidate.countryCode === targetCountryCode) {
+      score += 0.05;
+    }
+
+    // Distance threshold: short names (<=4 chars) max dist 1, longer max dist 2 or 3
+    const maxAllowedDist = maxLen <= 4 ? 1 : (maxLen <= 8 ? 2 : 3);
+    if (dist <= maxAllowedDist && score >= 0.72) {
+      if (!best || score > best.score || (score === best.score && dist < best.distance)) {
+        best = {
+          candidate,
+          score,
+          distance: dist,
+          type: 'fuzzy'
+        };
+      }
+    }
+  }
+
+  return best;
+}
+
 function getCityLocationDatabaseMatch(city) {
   if (!city) return null;
   const cityName = String(city.name || '').trim().toLowerCase();
   const cityCode = String(city.code || '').trim().toUpperCase();
   const targetCountryCode = String(city.countryCode || '').trim().toUpperCase();
 
+  // 1. Exact match with target country code
   if (targetCountryCode) {
     const match = ALL_CITIES.find(candidate => {
       const candidateName = String(candidate.name || '').trim().toLowerCase();
@@ -1532,12 +1749,32 @@ function getCityLocationDatabaseMatch(city) {
     if (match) return match;
   }
 
-  return ALL_CITIES.find(candidate => {
+  // 2. Exact match by name or airport code
+  const exact = ALL_CITIES.find(candidate => {
     const candidateName = String(candidate.name || '').trim().toLowerCase();
     const candidateCode = String(candidate.code || '').trim().toUpperCase();
     return (cityName && candidateName === cityName) ||
         (cityCode && candidateCode === cityCode);
-  }) || null;
+  });
+  if (exact) return exact;
+
+  // 3. Multilingual / alternate alias match
+  const aliasMatch = getCityAliasMatch(cityName);
+  if (aliasMatch) {
+    if (!targetCountryCode || aliasMatch.countryCode === targetCountryCode) {
+      return aliasMatch;
+    }
+  }
+
+  // 4. Fuzzy Levenshtein match (typo tolerance)
+  if (cityName && cityName.length >= 3) {
+    const fuzzy = findFuzzyCityCandidate(cityName, { countryCode: targetCountryCode });
+    if (fuzzy && fuzzy.score >= 0.75) {
+      return fuzzy.candidate;
+    }
+  }
+
+  return null;
 }
 
 function normalizeCityLocationData(city) {
@@ -1751,6 +1988,40 @@ function selectCityDisambiguationChoice(cityId, countryCode, lat, lng, iataCode 
 window.searchCityOnlineCandidates = searchCityOnlineCandidates;
 window.promptCityDisambiguation = promptCityDisambiguation;
 window.selectCityDisambiguationChoice = selectCityDisambiguationChoice;
+window.CITY_ALIASES = CITY_ALIASES;
+window.stripDiacritics = stripDiacritics;
+window.calculateLevenshteinDistance = calculateLevenshteinDistance;
+window.calculateSimilarityScore = calculateSimilarityScore;
+window.getCityAliasMatch = getCityAliasMatch;
+window.findFuzzyCityCandidate = findFuzzyCityCandidate;
+window.getCityLocationDatabaseMatch = getCityLocationDatabaseMatch;
+
+function applySuggestedCityCorrection(cityId, canonicalName) {
+  const city = citiesData.find(c => c.id === cityId);
+  if (!city || !canonicalName) return;
+
+  renameCityInDialog(cityId, canonicalName);
+  const match = getCityLocationDatabaseMatch(city);
+  if (match) {
+    city.countryCode = match.countryCode;
+    city.country = getCountryName(match.countryCode);
+    if (match.lat !== undefined && match.lng !== undefined) {
+      city.lat = match.lat;
+      city.lng = match.lng;
+    }
+    if (match.icaoCode || match.icao) {
+      city.icaoCode = match.icaoCode || match.icao;
+    }
+    if ('code' in city) delete city.code;
+  }
+  saveData(true);
+  populateCityList();
+  if (typeof buildNav === 'function') buildNav();
+  if (typeof buildItinerary === 'function') buildItinerary();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  if (typeof showToast === 'function') showToast(`Updated city to "${canonicalName}"`);
+}
+window.applySuggestedCityCorrection = applySuggestedCityCorrection;
 
 async function triggerOnlineSearch(cityId) {
   const city = citiesData.find(c => c.id === cityId);
@@ -1763,7 +2034,7 @@ async function triggerOnlineSearch(cityId) {
     const candidates = await searchCityOnlineCandidates(city.name);
     if (candidates.length > 1) {
       if (btn) btn.disabled = false;
-      await promptCityDisambiguation(cityId);
+      await promptCityDisambiguation(cityId, candidates);
       return;
     }
   }
@@ -2433,6 +2704,20 @@ function populateCityList() {
       </button>
     ` : `<span class="city-location-status">📍 Mapped</span>`;
 
+    let suggestionPill = '';
+    if (!hasCoords || !city.countryCode) {
+      const fuzzy = typeof findFuzzyCityCandidate === 'function' ? findFuzzyCityCandidate(city.name) : null;
+      if (fuzzy && fuzzy.score >= 0.75 && fuzzy.candidate && fuzzy.candidate.name.toLowerCase() !== city.name.toLowerCase()) {
+        const candFlag = getCountryFlag(fuzzy.candidate.countryCode);
+        suggestionPill = `
+          <div class="city-candidate-suggestion" style="margin-top: 6px; font-size: 0.8rem; color: #176e67; background: #e8f5f1; border-radius: 4px; padding: 3px 8px; display: inline-flex; align-items: center; gap: 6px;">
+            <span>Did you mean <strong>${candFlag} ${escapeTripStartText(fuzzy.candidate.name)}</strong>?</span>
+            <button type="button" class="apply-suggestion-btn" style="background: #176e67; color: white; border: none; border-radius: 3px; padding: 2px 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer;" onclick="applySuggestedCityCorrection('${city.id}', '${escapeTripStartText(fuzzy.candidate.name)}')">Apply</button>
+          </div>
+        `;
+      }
+    }
+
     const row = document.createElement('div');
     row.className = 'city-list-item';
     row.style.cssText = `display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid #eee; border-left: 4px solid ${cityColor}; background: white;`;
@@ -2459,6 +2744,7 @@ function populateCityList() {
             ${coordinateDisplay}
             ${resetLocationBtn}
           </div>
+          ${suggestionPill}
         </div>
       </div>
       <button class="del-btn" title="Delete City" onclick="deleteCityFromDialog('${city.id}')">×</button>
@@ -2547,11 +2833,18 @@ function renameCityInDialog(cityId, newName) {
 
   city.name = newName;
 
-  const match = ALL_CITIES.find(c => c.name.toLowerCase() === newName.toLowerCase());
+  const match = getCityLocationDatabaseMatch({ name: newName });
   if (match) {
-    city.code = match.code;
+    if ('code' in city) delete city.code;
     city.countryCode = match.countryCode;
     city.country = getCountryName(match.countryCode);
+    if (!cityHasStoredCoords(city) && match.lat !== undefined && match.lng !== undefined) {
+      city.lat = match.lat;
+      city.lng = match.lng;
+    }
+    if (!city.icaoCode && (match.icaoCode || match.icao)) {
+      city.icaoCode = match.icaoCode || match.icao;
+    }
   }
 
   (appData || []).forEach(leg => {
@@ -2588,7 +2881,7 @@ function renameCityInDialog(cityId, newName) {
   if (typeof buildItinerary === 'function') buildItinerary();
   if (typeof buildTransportTab === 'function') buildTransportTab();
   if (typeof buildAccomTab === 'function') buildAccomTab();
-  showToast(`Renamed city to "${newName}"`);
+  if (typeof showToast === 'function') showToast(`Renamed city to "${newName}"`);
 }
 
 async function refetchCityLocationAndFlag(cityId) {

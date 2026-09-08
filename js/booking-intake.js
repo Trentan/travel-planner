@@ -179,6 +179,21 @@ function findCityByBookingName(name) {
     ));
     if (found) return found;
   }
+
+  // Check alias dictionary
+  if (typeof getCityAliasMatch === 'function') {
+    const aliasMatch = getCityAliasMatch(normalized);
+    if (aliasMatch) return aliasMatch;
+  }
+
+  // Check fuzzy matching for typos
+  if (typeof findFuzzyCityCandidate === 'function') {
+    const fuzzy = findFuzzyCityCandidate(normalized);
+    if (fuzzy && fuzzy.score >= 0.75 && fuzzy.candidate) {
+      return fuzzy.candidate;
+    }
+  }
+
   return null;
 }
 
