@@ -79,8 +79,8 @@ async function runTripLibraryXssTests() {
       subtitle: `Subtitle ${xssPayload}`,
       flags: `🚩${xssPayload}`,
       dateRange: `2025 ${xssPayload}`,
-      legCount: 3,
-      stayCount: 2,
+      legCount: `3 ${xssPayload}`,
+      stayCount: `2 ${xssPayload}`,
       updatedAt: "2025-01-01T00:00:00Z"
     }
   ];
