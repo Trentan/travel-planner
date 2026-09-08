@@ -1281,7 +1281,8 @@ function extractCitiesFromItinerary() {
     let existing = cityMap.get(normalized);
 
     if (!existing) {
-      const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === normalized.toLowerCase());
+      const nameMatches = ALL_CITIES_BY_NAME_MAP.get(normalized.toLowerCase());
+      const dbMatch = nameMatches ? nameMatches[0] : null;
       let country = '';
       let countryCode = '';
       let formattedName = dbMatch ? dbMatch.name : formatCityTitleCase(normalized);
@@ -1313,8 +1314,13 @@ function extractCitiesFromItinerary() {
     // Extract city slug from ID like city-vienna for cities not in built-in database
     const slug = cityId.replace('city-', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     // Check if this city exists in ALL_CITIES database
-    const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase().replace(/-/g, '') === slug.toLowerCase().replace(/-/g, '') ||
-                                         c.name.toLowerCase() === slug.toLowerCase());
+    const slugLower = slug.toLowerCase();
+    const nameMatches = ALL_CITIES_BY_NAME_MAP.get(slugLower);
+    let dbMatch = nameMatches ? nameMatches[0] : null;
+    if (!dbMatch) {
+      const slugClean = slugLower.replace(/-/g, '');
+      dbMatch = ALL_CITIES.find(c => c.name.toLowerCase().replace(/-/g, '') === slugClean);
+    }
     if (dbMatch) {
       addCity(dbMatch.name, sourceDate);
     } else {
@@ -1415,7 +1421,8 @@ function extractCitiesFromItinerary() {
   result.forEach(city => {
     normalizeCityLocationData(city);
     if (!city.country && !city.countryCode) {
-      const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
+      const nameMatches = ALL_CITIES_BY_NAME_MAP.get(city.name.toLowerCase());
+      const dbMatch = nameMatches ? nameMatches[0] : null;
       if (dbMatch) {
         city.countryCode = dbMatch.countryCode;
         city.country = getCountryName(dbMatch.countryCode);
@@ -1474,10 +1481,11 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
   let cityLng = lng;
 
   // First: look up city from built-in database or user cities
-  const dbMatch = ALL_CITIES.find(c =>
-    c.name.toLowerCase() === normalizedName.toLowerCase() ||
-    (cityCode && c.code && c.code.toUpperCase() === cityCode.toUpperCase())
-  );
+  const nameMatches = ALL_CITIES_BY_NAME_MAP.get(normalizedName.toLowerCase());
+  let dbMatch = nameMatches ? nameMatches[0] : null;
+  if (!dbMatch && cityCode) {
+    dbMatch = ALL_CITIES_BY_CODE_MAP.get(cityCode.toUpperCase()) || null;
+  }
 
   let formattedName = dbMatch ? dbMatch.name : formatCityTitleCase(normalizedName);
 
@@ -1974,7 +1982,7 @@ function promptCityDisambiguation(cityId, candidates) {
 
   const choicesHtml = candidates.map(cand => {
     const flag = getCountryFlag(cand.countryCode);
-    const dbMatch = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase() && c.countryCode === cand.countryCode);
+    const dbMatch = ALL_CITIES_BY_NAME_COUNTRY_MAP.get(`${city.name.toLowerCase()}|${cand.countryCode.toUpperCase()}`) || null;
     const icaoCode = dbMatch ? (dbMatch.icaoCode || dbMatch.icao || '') : '';
     
     return `
@@ -2613,9 +2621,8 @@ function setupCityAutocomplete() {
     }
 
     // Look up city in databases
-    const match = ALL_CITIES.find(c =>
-      c.name.toLowerCase() === value.toLowerCase()
-    );
+    const nameMatches = ALL_CITIES_BY_NAME_MAP.get(value.toLowerCase());
+    const match = nameMatches ? nameMatches[0] : null;
 
     if (match && codeDisplay && codeInfo) {
       const flag = getCountryFlag(match.countryCode);
@@ -2637,9 +2644,8 @@ function setupCityAutocomplete() {
     const value = this.value.trim();
     if (!value) return;
 
-    const match = ALL_CITIES.find(c =>
-      c.name.toLowerCase() === value.toLowerCase()
-    );
+    const nameMatches = ALL_CITIES_BY_NAME_MAP.get(value.toLowerCase());
+    const match = nameMatches ? nameMatches[0] : null;
 
     if (match && countrySelect) {
       countrySelect.value = match.countryCode;
@@ -2925,7 +2931,8 @@ async function refetchCityLocationAndFlag(cityId) {
   if (!city) return;
 
   const cityName = city.name;
-  const match = ALL_CITIES.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+  const nameMatches = ALL_CITIES_BY_NAME_MAP.get(cityName.toLowerCase());
+  const match = nameMatches ? nameMatches[0] : null;
 
   if (match) {
     if ('code' in city) delete city.code;
@@ -3119,9 +3126,8 @@ async function addNewCityFromDialog() {
     return;
   }
 
-  const dbMatch = ALL_CITIES.find(c =>
-    c.name.toLowerCase() === name.toLowerCase()
-  );
+  const nameMatches = ALL_CITIES_BY_NAME_MAP.get(name.toLowerCase());
+  const dbMatch = nameMatches ? nameMatches[0] : null;
   if (dbMatch) {
     // Verify country matches
     if (!countryCode && dbMatch.countryCode) {
@@ -3206,15 +3212,6 @@ function migrateCitiesToISOFormat() {
 
   const usedColorsSet = new Set(citiesData.map(c => c.colour).filter(Boolean));
 
-  // Build lookup maps to replace linear searches
-  const allCitiesMap = new Map();
-  ALL_CITIES.forEach(c => {
-    if (c.name) {
-      const key = c.name.toLowerCase();
-      if (!allCitiesMap.has(key)) allCitiesMap.set(key, c);
-    }
-  });
-
   const countryByCodeMap = new Map();
   const countryByNameMap = new Map();
   COUNTRY_DATA.forEach(c => {
@@ -3235,7 +3232,8 @@ function migrateCitiesToISOFormat() {
     if ('code' in city) delete city.code;
 
     // Look up city in ALL city databases (built-in + extended)
-    const dbMatch = allCitiesMap.get(normalizedName.toLowerCase());
+    const nameMatches = ALL_CITIES_BY_NAME_MAP.get(normalizedName.toLowerCase());
+    const dbMatch = nameMatches ? nameMatches[0] : null;
 
     if (dbMatch) {
       city.countryCode = dbMatch.countryCode;
@@ -3610,7 +3608,8 @@ async function initData() {
       // Migrate existing cities to include code if missing
       citiesData.forEach(city => {
         if (!city.code) {
-          const match = ALL_CITIES.find(c => c.name.toLowerCase() === city.name.toLowerCase());
+          const nameMatches = ALL_CITIES_BY_NAME_MAP.get(city.name.toLowerCase());
+          const match = nameMatches ? nameMatches[0] : null;
           city.code = match ? match.code : '';
         }
         if (!city.countryCode && city.country) {
