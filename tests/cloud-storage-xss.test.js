@@ -150,7 +150,20 @@ function runCloudStorageXssTests() {
   assert(!fileListHtml.includes("onclick=\"window.loadTripFromGoogleDrive('file'"), 'Cloud file list onclick must not use raw single-quoted string interpolation');
   assert(fileListHtml.includes('onclick="window.loadTripFromGoogleDrive(&quot;'), 'Cloud file list onclick arguments must be safely encoded with escapeJsParam');
 
-  console.log('✅ ALL GOOGLE DRIVE PROFILE XSS TESTS PASSED CLEANLY!');
+  // Test Case 4: OAuth Client ID Security - verify default Client ID resolution and custom Client ID overrides
+  const defaultClientId = '253620621116-u76e3v3e2qv6ffq9b58re4l4bbqs1e3g.apps.googleusercontent.com';
+  const legacyLocalClientId = '253620621116-cq4mtef5e2nvt0kc7pbcs4t1rdblg7q5.apps.googleusercontent.com';
+
+  assert(context.getGoogleClientId() === defaultClientId, 'getGoogleClientId() must return default PROD_CLIENT_ID on localhost when no custom ID is set');
+  assert(!cloudStorageSource.includes(legacyLocalClientId), 'cloud-storage.js source code must not contain hardcoded local Client ID');
+
+  context.setGoogleClientId('custom-test-client-id.apps.googleusercontent.com');
+  assert(context.getGoogleClientId() === 'custom-test-client-id.apps.googleusercontent.com', 'getGoogleClientId() must return custom Client ID when configured in localStorage');
+
+  context.setGoogleClientId(null);
+  assert(context.getGoogleClientId() === defaultClientId, 'getGoogleClientId() must revert to default Client ID when custom ID is cleared');
+
+  console.log('✅ ALL GOOGLE DRIVE PROFILE XSS & CLIENT ID SECURITY TESTS PASSED CLEANLY!');
 }
 
 if (require.main === module) {
