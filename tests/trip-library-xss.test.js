@@ -74,14 +74,14 @@ async function runTripLibraryXssTests() {
   const xssPayload = '<img src=x onerror=alert("xss")><script>alert("xss")</script>';
   const mockTrips = [
     {
-      id: "trip_xss_1",
+      id: `trip_xss_1_${xssPayload}`,
       title: `Malicious Trip ${xssPayload}`,
       subtitle: `Subtitle ${xssPayload}`,
       flags: `🚩${xssPayload}`,
       dateRange: `2025 ${xssPayload}`,
-      legCount: 3,
-      stayCount: 2,
-      updatedAt: "2025-01-01T00:00:00Z"
+      legCount: `<script>alert("legCountXSS")</script>`,
+      stayCount: `<script>alert("stayCountXSS")</script>`,
+      updatedAt: `<script>alert("updatedAtXSS")</script>`
     }
   ];
 
@@ -110,7 +110,13 @@ async function runTripLibraryXssTests() {
 
   assert(!gridHtml.includes('<script>alert("xss")</script>'), 'Trip gallery card HTML must not contain unescaped <script> tags from trip flags/title');
   assert(!gridHtml.includes('<img src=x onerror=alert("xss")>'), 'Trip gallery card HTML must not contain unescaped <img> tags from trip flags/title');
+  assert(!gridHtml.includes('<script>alert("legCountXSS")</script>'), 'Trip gallery card HTML must not contain unescaped legCount XSS payload');
+  assert(!gridHtml.includes('<script>alert("stayCountXSS")</script>'), 'Trip gallery card HTML must not contain unescaped stayCount XSS payload');
+  assert(!gridHtml.includes('<script>alert("updatedAtXSS")</script>'), 'Trip gallery card HTML must not contain unescaped updatedAt XSS payload');
   assert(gridHtml.includes('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;'), 'XSS payload in trip flags/title/subtitle/dates must be HTML entity escaped in trip gallery cards');
+  assert(gridHtml.includes('&lt;script&gt;alert(&quot;legCountXSS&quot;)&lt;/script&gt;'), 'XSS payload in legCount must be HTML entity escaped');
+  assert(gridHtml.includes('&lt;script&gt;alert(&quot;stayCountXSS&quot;)&lt;/script&gt;'), 'XSS payload in stayCount must be HTML entity escaped');
+  assert(gridHtml.includes('&lt;script&gt;alert(&quot;updatedAtXSS&quot;)&lt;/script&gt;'), 'XSS payload in updatedAt must be HTML entity escaped');
 
   // Test 2: Header Trip Switcher Dropdown Rendering
   await context.renderHeaderTripSwitcher();

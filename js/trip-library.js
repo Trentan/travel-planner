@@ -458,9 +458,12 @@
       const subtitle = trip.subtitle || (trip.data && trip.data.meta && trip.data.meta.subtitle) || '';
       const flags = trip.flags || '🌍';
       const dates = trip.dateRange || 'Flexible Dates';
-      const legCount = trip.legCount || 0;
-      const stayCount = trip.stayCount || 0;
-      const updatedDate = trip.updatedAt ? new Date(trip.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
+      const legCount = trip.legCount !== undefined && trip.legCount !== null ? trip.legCount : 0;
+      const stayCount = trip.stayCount !== undefined && trip.stayCount !== null ? trip.stayCount : 0;
+      const rawDate = trip.updatedAt ? new Date(trip.updatedAt) : null;
+      const updatedDate = (rawDate && !isNaN(rawDate.getTime()))
+        ? rawDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+        : (trip.updatedAt ? String(trip.updatedAt) : 'Recently');
 
         const safeTripIdJs = escapeHtml(escapeJs(trip.id));
       const card = document.createElement('div');
