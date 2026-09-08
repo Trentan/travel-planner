@@ -308,6 +308,21 @@
     @apply mb-2;
   }
 
+  .leg-reorder-item.dragging {
+    opacity: 0.4;
+    border-color: var(--color-accent-teal);
+  }
+
+  .leg-reorder-item.drag-over {
+    border-style: dashed;
+    border-color: var(--color-accent-teal);
+    background-color: rgba(8, 145, 178, 0.08);
+  }
+
+  :where([data-theme="dark"], [data-theme="dark"] *) .leg-reorder-item.drag-over {
+    background-color: rgba(34, 211, 238, 0.15);
+  }
+
   .stack-gap-4 {
     @apply flex flex-col gap-4;
   }
