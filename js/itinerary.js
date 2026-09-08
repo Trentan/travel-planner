@@ -4113,6 +4113,8 @@ function findLegForJourneyCity(cityId, cityName) {
   }
 
   const aLen = appData.length;
+  let legByDayKey = null;
+
   for (let i = 0; i < mLen; i++) {
     const journey = matching[i].journey;
 
@@ -4128,15 +4130,33 @@ function findLegForJourneyCity(cityId, cityName) {
         : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
     if (targetDate) {
-      for (let l = 0; l < aLen; l++) {
-        const leg = appData[l];
-        if (leg && leg.days) {
-          const days = leg.days;
-          const dLen = days.length;
-          for (let d = 0; d < dLen; d++) {
-            const day = days[d];
-            if (day && sameTimelineDay(day.date, targetDate)) return leg;
+      const targetScore = getTimelineScore(targetDate, '', null);
+      if (targetScore !== null) {
+        const targetDayKey = Math.floor(targetScore / 1440);
+
+        if (!legByDayKey) {
+          legByDayKey = new Map();
+          for (let l = 0; l < aLen; l++) {
+            const leg = appData[l];
+            if (leg && leg.days) {
+              const days = leg.days;
+              const dLen = days.length;
+              for (let d = 0; d < dLen; d++) {
+                const day = days[d];
+                if (day && day.date) {
+                  const dayScore = getTimelineScore(day.date, '', null);
+                  if (dayScore !== null) {
+                    const k = Math.floor(dayScore / 1440);
+                    if (!legByDayKey.has(k)) legByDayKey.set(k, leg);
+                  }
+                }
+              }
+            }
           }
+        }
+
+        if (legByDayKey.has(targetDayKey)) {
+          return legByDayKey.get(targetDayKey);
         }
       }
     }
