@@ -539,8 +539,9 @@
 
   // Sanitize trip title for human-readable filename (e.g. "Europe_Summer_2026.json")
   function formatHumanFilename(tripRecord) {
-    const rawTitle = tripRecord.title || (tripRecord.data && tripRecord.data.title) || (tripRecord.data && tripRecord.data.meta && tripRecord.data.meta.title) || 'My Trip';
-    const cleanName = rawTitle.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
+    const record = tripRecord || {};
+    const rawTitle = record.title || (record.data && record.data.title) || (record.data && record.data.meta && record.data.meta.title) || 'My Trip';
+    const cleanName = String(rawTitle).replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
     return `${cleanName || 'Trip'}.json`;
   }
   window.formatHumanFilename = formatHumanFilename;
