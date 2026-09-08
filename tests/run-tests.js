@@ -14,11 +14,13 @@ const { run: runTimezoneSuite } = require('./timezone-suite.test');
 const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
 const { run: runSmartRemindersSuite } = require('./smart-reminders-suite');
 const { run: runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
+const { run: runTransportDurationSuite } = require('./transport-duration.test');
 
 async function run() {
   await runCloudStorageXssTests();
   if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
   if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
+  if (typeof runTransportDurationSuite === 'function') await runTransportDurationSuite();
   await runCoreSmoke();
   await runPwaShortcutsOfflineTests();
   await runAutoStaysSuite();
