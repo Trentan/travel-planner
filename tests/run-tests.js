@@ -9,6 +9,7 @@ const { run: runSharePresetsVerify } = require('./share-presets-verify');
 const { run: runIosPwaNavVerify } = require('./ios-pwa-nav-verify');
 const { run: runPwaShortcutsOfflineTests } = require('./pwa-shortcuts-offline.test');
 const { runCloudStorageXssTests } = require('./cloud-storage-xss.test');
+const { runCloudStorageFilenameTests } = require('./cloud-storage-filename.test');
 const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 const { run: runTimezoneSuite } = require('./timezone-suite.test');
 const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
@@ -17,6 +18,7 @@ const { run: runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test')
 
 async function run() {
   await runCloudStorageXssTests();
+  if (typeof runCloudStorageFilenameTests === 'function') await runCloudStorageFilenameTests();
   if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
   if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
   await runCoreSmoke();
