@@ -1540,23 +1540,34 @@ function createCompactCitySwipeElement(mobileLegSequence, journeysByJourneyId) {
   return pagerRoot;
 }
 
-function buildCompactItinerary() {
-  const container = document.getElementById('itinerary');
-  if (!container) return;
-
-  container.innerHTML = '';
-
-  const journeysByJourneyId = getJourneysGroupedByJourneyId();
-  const mobileLegSequence = getCompactMobileLegSequence();
-  const pagerRoot = createCompactCitySwipeElement(mobileLegSequence, journeysByJourneyId);
-
-  container.appendChild(pagerRoot);
+function initCompactItineraryPagers(container) {
   setupMobileSwipePagers(container);
   setupCompactItineraryPagers(container);
   setupCompactCityNavSync(container);
   if (typeof syncItineraryMobileHeightContainment === 'function') {
     syncItineraryMobileHeightContainment(container);
   }
+}
+
+function buildCompactItinerary(targetContainer = 'itinerary') {
+  const container = typeof targetContainer === 'string'
+    ? document.getElementById(targetContainer)
+    : targetContainer;
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  const mobileLegSequence = getCompactMobileLegSequence();
+  if (!mobileLegSequence || mobileLegSequence.length === 0) {
+    container.innerHTML = '<div class="empty-state">No itinerary legs planned yet.</div>';
+    return;
+  }
+
+  const journeysByJourneyId = getJourneysGroupedByJourneyId();
+  const pagerRoot = createCompactCitySwipeElement(mobileLegSequence, journeysByJourneyId);
+
+  container.appendChild(pagerRoot);
+  initCompactItineraryPagers(container);
 }
 
 function getLegFlightButtonTimeLabel(leg, journeysByJourneyIdMap) {
