@@ -148,12 +148,8 @@ function getJourneyDisplayCost(journey, journeysByJourneyId) {
 
   const gid = journey.journeyId || journey.id;
   if (gid) {
-    const matching = (journeysByJourneyId && journeysByJourneyId.has(gid))
-      ? journeysByJourneyId.get(gid)
-      : ((typeof window !== 'undefined' && Array.isArray(window.journeys))
-          ? window.journeys
-          : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []))
-          .filter(seg => (seg.journeyId || seg.id) === gid);
+    const mapToUse = journeysByJourneyId || getJourneysGroupedByJourneyId();
+    const matching = mapToUse.get(gid) || [];
     for (const seg of matching) {
       const segCost = parseFloat(seg.cost || '0');
       if (segCost > 0) {
@@ -1723,21 +1719,7 @@ function buildCompactItineraryLegacy() {
   const container = document.getElementById('itinerary');
   container.innerHTML = '';
 
-  const journeysSource = (typeof window !== 'undefined' && Array.isArray(window.journeys))
-    ? window.journeys
-    : (typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : []);
-  const journeysByJourneyId = new Map();
-  journeysSource.forEach(seg => {
-    if (seg && seg.journeyId) {
-      if (!journeysByJourneyId.has(seg.journeyId)) {
-        journeysByJourneyId.set(seg.journeyId, []);
-      }
-      journeysByJourneyId.get(seg.journeyId).push(seg);
-    }
-  });
-  journeysByJourneyId.forEach(list => {
-    list.sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-  });
+  const journeysByJourneyId = getJourneysGroupedByJourneyId();
 
   appData.forEach((leg, legIndex) => {
     const section = document.createElement('div');
@@ -4175,6 +4157,8 @@ function findLegForJourneyCity(cityId, cityName) {
   }
 
   const aLen = appData.length;
+  let legByDayKey = null;
+
   for (let i = 0; i < mLen; i++) {
     const journey = matching[i].journey;
 
@@ -4190,15 +4174,33 @@ function findLegForJourneyCity(cityId, cityName) {
         : (journey.departureDate || journey.dayDate || journey.arrivalDate);
 
     if (targetDate) {
-      for (let l = 0; l < aLen; l++) {
-        const leg = appData[l];
-        if (leg && leg.days) {
-          const days = leg.days;
-          const dLen = days.length;
-          for (let d = 0; d < dLen; d++) {
-            const day = days[d];
-            if (day && sameTimelineDay(day.date, targetDate)) return leg;
+      const targetScore = getTimelineScore(targetDate, '', null);
+      if (targetScore !== null) {
+        const targetDayKey = Math.floor(targetScore / 1440);
+
+        if (!legByDayKey) {
+          legByDayKey = new Map();
+          for (let l = 0; l < aLen; l++) {
+            const leg = appData[l];
+            if (leg && leg.days) {
+              const days = leg.days;
+              const dLen = days.length;
+              for (let d = 0; d < dLen; d++) {
+                const day = days[d];
+                if (day && day.date) {
+                  const dayScore = getTimelineScore(day.date, '', null);
+                  if (dayScore !== null) {
+                    const k = Math.floor(dayScore / 1440);
+                    if (!legByDayKey.has(k)) legByDayKey.set(k, leg);
+                  }
+                }
+              }
+            }
           }
+        }
+
+        if (legByDayKey.has(targetDayKey)) {
+          return legByDayKey.get(targetDayKey);
         }
       }
     }
