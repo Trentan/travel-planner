@@ -206,8 +206,20 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     }
     await humanPause(page, 400);
     await page.locator('#existingCitySelect').selectOption({ index: 1 });
+
+    // Verify date clash prevention disables save button on overlapping dates
     await page.locator('#newLegStartDate').fill('2026-06-15');
     await page.locator('#newLegEndDate').fill('2026-06-18');
+    await humanPause(page, 200);
+    const isSaveDisabled = await page.locator('#legDialogSaveBtn').isDisabled();
+    const clashVisible = await page.locator('#legClashWarningBanner').isVisible();
+    assert(isSaveDisabled && clashVisible, 'Desktop: clashing leg dates must disable save button and display warning banner');
+    reporter.add('desktop', 'leg date clash prevention', 'disabled save button and displayed warning banner on overlap');
+
+    // Fill valid non-overlapping dates at end of trip
+    await page.locator('#newLegStartDate').fill('2026-07-09');
+    await page.locator('#newLegEndDate').fill('2026-07-12');
+    await humanPause(page, 200);
     await page.locator('#legDialogSaveBtn, button:has-text("Add Leg"), button:has-text("Save Leg")').first().click();
     await page.waitForSelector('#add-leg-modal', { state: 'hidden' });
     await humanPause(page, 500);

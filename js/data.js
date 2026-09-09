@@ -4354,6 +4354,7 @@ function addDaysToIsoDate(dateStr, days) {
   date.setDate(date.getDate() + days);
   return toLocalIsoDate(date);
 }
+if (typeof window !== 'undefined') window.addDaysToIsoDate = addDaysToIsoDate;
 
 function inferTransportTypeFromText(text) {
   const value = (text || '').toLowerCase();
