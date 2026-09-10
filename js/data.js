@@ -5681,7 +5681,10 @@ function buildExportDailyTimelineItems(leg, day, legIdx, dayIdx, journeysData = 
   });
 
   (day.activityItems || []).forEach((item, itemIdx) => {
-    const time = item.startTime ? `${item.startTime}${item.endTime ? `-${item.endTime}` : ''}` : 'Anytime';
+    let time = 'Anytime';
+    if (item.startTime) {
+      time = item.endTime ? `${item.startTime}-${item.endTime}` : item.startTime;
+    }
     timelineItems.push({
       sortValue: getExportTimelineScore(dayDate, item.startTime, 4000 + itemIdx),
       text: [time, `Activity: ${formatTextValue(item.text)}`, item.time ? `Duration ${formatTextValue(item.time)}` : '', item.cost ? formatSummaryMoney(item.cost) : ''].filter(Boolean).join(' | ')
