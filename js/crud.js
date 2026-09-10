@@ -2097,21 +2097,20 @@ function setLegDialogState(newState) {
   if (typeof window !== 'undefined') window.legDialogState = legDialogState;
 }
 
-function openLegEditorDialog() {
-  setLegDialogState({ mode: 'add', editLegIdx: null, stagedLegs: [], originalLegDates: {} });
-  openAddLegDialog();
+function openLegEditorDialog(initialTab = 'reorder') {
+  openAddLegDialog(initialTab);
 }
 
 function openLegEditorDirect(legIdx) {
-  openAddLegDialog();
+  openAddLegDialog('edit');
   const editSelect = document.getElementById('editLegSelect');
   if (editSelect) {
-    editSelect.value = legIdx;
+    editSelect.value = String(legIdx);
     onEditLegSelectionChange();
   }
 }
 
-function openAddLegDialog() {
+function openAddLegDialog(initialTab = 'reorder') {
   const modal = document.getElementById('add-leg-modal');
   if (modal) {
     const origDates = {};
@@ -2141,6 +2140,7 @@ function openAddLegDialog() {
     updateLegDialogUiMode();
     onLegTypeChange();
     renderLegReorderList();
+    switchLegModalTab(initialTab);
     validateLegEditorForm();
   }
 }
@@ -2755,6 +2755,7 @@ function resetLegDialogToAddNew() {
   updateLegDialogUiMode();
   onLegTypeChange();
   renderLegReorderList();
+  switchLegModalTab('edit');
   validateLegEditorForm();
 }
 
@@ -2937,7 +2938,9 @@ function renderLegReorderList() {
             <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">${dateRangeStr} • ${nightsStr}</div>
           </div>
         </div>
-        <div class="flex items-center gap-1 shrink-0">
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button type="button" class="px-2 py-0.5 text-xs rounded bg-teal-50 dark:bg-teal-950/50 hover:bg-teal-100 dark:hover:bg-teal-900/60 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-medium cursor-pointer"
+                  onclick="editLegDirectFromReorder(${idx})" title="Edit leg details">✏️ Edit</button>
           <button type="button" class="px-1.5 py-0.5 text-xs rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 ${idx === 0 ? 'opacity-30 cursor-not-allowed' : ''}"
                   onclick="moveLegInSequence(${idx}, ${idx - 1})" ${idx === 0 ? 'disabled' : ''} title="Move up">▲</button>
           <button type="button" class="px-1.5 py-0.5 text-xs rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 ${idx === legs.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}"
@@ -2989,6 +2992,54 @@ function moveLegInSequence(fromIdx, toIdx) {
   syncFormInputsFromStagedLeg();
   validateLegEditorForm();
   // Strictly isolated to modal state: no premature saveData() or live mutation
+}
+
+function switchLegModalTab(tabName) {
+  const reorderBtn = document.getElementById('legTabReorderBtn');
+  const editBtn = document.getElementById('legTabEditBtn');
+  const reorderSec = document.getElementById('legReorderSection');
+  const editSec = document.getElementById('legEditSection');
+  const modalTitle = document.getElementById('legDialogTitle');
+
+  const activeBtnClasses = 'flex-1 py-2 px-3 text-center font-semibold text-xs sm:text-sm rounded-lg transition-all shadow-sm bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 border border-slate-200/80 dark:border-slate-600 cursor-pointer';
+  const inactiveBtnClasses = 'flex-1 py-2 px-3 text-center font-semibold text-xs sm:text-sm rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent cursor-pointer';
+
+  if (tabName === 'reorder') {
+    if (reorderBtn) {
+      reorderBtn.className = activeBtnClasses;
+      reorderBtn.setAttribute('aria-selected', 'true');
+    }
+    if (editBtn) {
+      editBtn.className = inactiveBtnClasses;
+      editBtn.setAttribute('aria-selected', 'false');
+    }
+    if (reorderSec) reorderSec.style.display = 'block';
+    if (editSec) editSec.style.display = 'none';
+    if (modalTitle) modalTitle.textContent = 'Trip Route & Sequence';
+    renderLegReorderList();
+  } else {
+    if (editBtn) {
+      editBtn.className = activeBtnClasses;
+      editBtn.setAttribute('aria-selected', 'true');
+    }
+    if (reorderBtn) {
+      reorderBtn.className = inactiveBtnClasses;
+      reorderBtn.setAttribute('aria-selected', 'false');
+    }
+    if (reorderSec) reorderSec.style.display = 'none';
+    if (editSec) editSec.style.display = 'block';
+    if (modalTitle) modalTitle.textContent = (legDialogState && legDialogState.mode === 'edit') ? 'Edit Leg' : 'Add New Leg';
+    validateLegEditorForm();
+  }
+}
+
+function editLegDirectFromReorder(idx) {
+  switchLegModalTab('edit');
+  const editSelect = document.getElementById('editLegSelect');
+  if (editSelect) {
+    editSelect.value = String(idx);
+    onEditLegSelectionChange();
+  }
 }
 
 function cascadeStagedLegDates(fromIdx = 1) {
@@ -3443,6 +3494,22 @@ function confirmAddLeg() {
   }
 
   // --- SYNCHRONIZE JOURNEYS AND STAYS BASED ON LEG DATE SHIFTS ---
+  applyStagedLegsAndSync();
+
+  closeAddLegDialog();
+  if (typeof sortLegs === 'function') sortLegs();
+  if (typeof buildItinerary === 'function') buildItinerary();
+  if (typeof buildCityNav === 'function') buildCityNav();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  if (typeof saveData === 'function') saveData(false);
+  if (typeof syncAllLegDays === 'function') {
+    syncAllLegDays(true);
+  }
+}
+
+function applyStagedLegsAndSync() {
+  if (!legDialogState || !Array.isArray(legDialogState.stagedLegs)) return;
+
   const getDaysDiff = (d1, d2) => {
     if (!d1 || !d2) return 0;
     const t1 = new Date(`${d1}T00:00:00`).getTime();
@@ -3525,8 +3592,19 @@ function confirmAddLeg() {
   });
 
   // Commit stagedLegs to appData
-  appData.length = 0;
-  legDialogState.stagedLegs.forEach(leg => appData.push(leg));
+  if (Array.isArray(appData)) {
+    appData.length = 0;
+    legDialogState.stagedLegs.forEach(leg => appData.push(leg));
+  }
+}
+
+function confirmSaveLegSequence() {
+  const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
+  if (cascadeCheckbox && cascadeCheckbox.checked && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs.length > 0) {
+    cascadeStagedLegDates(0);
+  }
+
+  applyStagedLegsAndSync();
 
   closeAddLegDialog();
   if (typeof sortLegs === 'function') sortLegs();
@@ -3536,6 +3614,9 @@ function confirmAddLeg() {
   if (typeof saveData === 'function') saveData(false);
   if (typeof syncAllLegDays === 'function') {
     syncAllLegDays(true);
+  }
+  if (typeof showToast === 'function') {
+    showToast('Trip route sequence saved successfully!');
   }
 }
 
@@ -3979,5 +4060,6 @@ Object.assign(window, {
   renderLegReorderList, moveLegInSequence, cascadeStagedLegDates,
   onLegDateInputChange, onLegCascadeToggleChange, validateLegEditorForm,
   checkLegDateClash, resetLegDialogToAddNew, getLegDialogState, setLegDialogState,
-  openAddLegDialog, closeAddLegDialog, confirmAddLeg, onEditLegSelectionChange, deleteLegFromDialog
+  openAddLegDialog, closeAddLegDialog, confirmAddLeg, onEditLegSelectionChange, deleteLegFromDialog,
+  switchLegModalTab, editLegDirectFromReorder, confirmSaveLegSequence, applyStagedLegsAndSync
 });

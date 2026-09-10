@@ -194,6 +194,15 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     await page.waitForSelector('#add-leg-modal', { state: 'visible' });
     await humanPause(page, 400);
 
+    // Verify dedicated reorder tab and Save Sequence Order button
+    const saveSeqBtnCount = await page.locator('#saveLegSequenceBtn').count();
+    assert(saveSeqBtnCount === 1, 'Desktop: #saveLegSequenceBtn should exist in reorder sequence view');
+    reporter.add('desktop', 'leg sequence reorder view', 'dedicated reorder view with save sequence order button');
+
+    // Switch to Add / Edit Leg tab
+    await page.locator('#legTabEditBtn').click();
+    await humanPause(page, 300);
+
     // Verify reset state when toggling between edit and add leg
     if (await page.locator('#editLegSelect option').count() > 2) {
       await page.locator('#editLegSelect').selectOption({ index: 2 });
