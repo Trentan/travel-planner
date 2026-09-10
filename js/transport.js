@@ -560,6 +560,14 @@ function buildJourneyName(segments) {
   return `${startCity} → ${endCity} (via ${viaText})`;
 }
 
+// Calculate match score for a journey segment against current day/leg context
+function scoreJourneyForDay(journey, toLoc, legId, dayDate) {
+  if (!journey) return 0;
+  return (journey.toLocation === toLoc ? 2 : 0) +
+         (journey.legId === legId ? 2 : 0) +
+         (journey.departureDate === dayDate ? 1 : 0);
+}
+
 // Get journeys for a specific day (for itinerary view)
 function getDayJourneys(dayDate, fromLoc, toLoc, legId = '') {
   // Check window.journeys as fallback if local journeys is undefined
@@ -590,8 +598,8 @@ function getDayJourneys(dayDate, fromLoc, toLoc, legId = '') {
         results.push(j);
       } else {
         // If there's already a matching segment for this journey, let's see if this one is a better match for the current day/leg!
-        const currentScore = (existing.toLocation === toLoc ? 2 : 0) + (existing.legId === legId ? 2 : 0) + (existing.departureDate === dayDate ? 1 : 0);
-        const newScore = (j.toLocation === toLoc ? 2 : 0) + (j.legId === legId ? 2 : 0) + (j.departureDate === dayDate ? 1 : 0);
+        const currentScore = scoreJourneyForDay(existing, toLoc, legId, dayDate);
+        const newScore = scoreJourneyForDay(j, toLoc, legId, dayDate);
         if (newScore > currentScore) {
           const idx = results.indexOf(existing);
           if (idx !== -1) {
@@ -2102,6 +2110,7 @@ function saveJourneyFromModal() {
 // Expose to window
 window.calculateLayoverBuffer = calculateLayoverBuffer;
 window.evaluateLayoverBuffer = evaluateLayoverBuffer;
+window.scoreJourneyForDay = scoreJourneyForDay;
 window.getLocationDisplayWithCode = getLocationDisplayWithCode;
 window.getLocationCodeDisplay = getLocationCodeDisplay;
 window.buildRouteChainWithCodes = buildRouteChainWithCodes;
