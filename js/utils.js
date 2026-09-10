@@ -682,8 +682,6 @@ const DEFAULT_PACKING = [
   }
 ];
 
-function updateClocks() {}
-
 function getMapSearchUrl(query, city = '') {
   if (!query) return '';
   let fullQuery = query;

@@ -31,7 +31,7 @@ function loadDateHelpers() {
   const defaultPackingBlock = extractBetween(
     utilsJs,
     'const DEFAULT_PACKING =',
-    'function updateClocks'
+    'function getMapSearchUrl'
   );
 
   const packingMergeBlock = extractBetween(
