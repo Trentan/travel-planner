@@ -119,7 +119,14 @@ function evaluateLayoverBuffer(bufferMinutes, itemA = {}, itemB = {}) {
     const absMins = Math.abs(mins);
     const hrs = Math.floor(absMins / 60);
     const m = absMins % 60;
-    let str = hrs > 0 ? (m > 0 ? `${hrs}h ${m}m` : `${hrs}h`) : `${m}m`;
+    let str;
+    if (hrs > 0 && m > 0) {
+      str = `${hrs}h ${m}m`;
+    } else if (hrs > 0) {
+      str = `${hrs}h`;
+    } else {
+      str = `${m}m`;
+    }
     return mins < 0 ? `-${str}` : str;
   };
 
