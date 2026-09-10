@@ -19,6 +19,7 @@ const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
 const { run: runTransportDurationSuite } = require('./transport-duration.test');
 const { run: runTransitConnectorsSuite } = require('./transit-connectors-layover.test');
 const { runLegManagementWysiwygSuite } = require('./leg-management-wysiwyg.test');
+const { runCompactFoodQuestTitleTests } = require('./compact-food-quest-title.test');
 
 async function run() {
   await runCloudStorageXssTests();
@@ -29,6 +30,7 @@ async function run() {
   if (typeof runTransportDurationSuite === 'function') await runTransportDurationSuite();
   if (typeof runTransitConnectorsSuite === 'function') await runTransitConnectorsSuite();
   if (typeof runLegManagementWysiwygSuite === 'function') await runLegManagementWysiwygSuite();
+  if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
   await runCoreSmoke();
   await runPwaShortcutsOfflineTests();
   await runAutoStaysSuite();
