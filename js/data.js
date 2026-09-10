@@ -32,6 +32,32 @@ function getCountryFlagEmoji(countryCode) {
 }
 window.getCountryFlagEmoji = getCountryFlagEmoji;
 
+function deepClone(obj) {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) {
+    const len = obj.length;
+    const copy = new Array(len);
+    for (let i = 0; i < len; i++) {
+      copy[i] = deepClone(obj[i]);
+    }
+    return copy;
+  }
+  if (obj.constructor && obj.constructor.name !== 'Object') {
+    if (typeof structuredClone === 'function') {
+      try { return structuredClone(obj); } catch (e) {}
+    }
+    return JSON.parse(JSON.stringify(obj));
+  }
+  const copy = {};
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      copy[key] = deepClone(obj[key]);
+    }
+  }
+  return copy;
+}
+window.deepClone = deepClone;
+
 // Open IndexedDB
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -985,16 +1011,16 @@ function configureFileActionButtons() {
 
 function getCurrentAppData() {
   let journeysData = [];
-  if (typeof journeys !== 'undefined') journeysData = normalizeTripJourneysData(JSON.parse(JSON.stringify(journeys)));
+  if (typeof journeys !== 'undefined') journeysData = normalizeTripJourneysData(deepClone(journeys));
   let staysData = [];
-  if (typeof stays !== 'undefined') staysData = normalizeTripStaysData(JSON.parse(JSON.stringify(stays)));
+  if (typeof stays !== 'undefined') staysData = normalizeTripStaysData(deepClone(stays));
   let citiesDataToExport = [];
-  if (typeof citiesData !== 'undefined') citiesDataToExport = normalizeTripCitiesDateData(JSON.parse(JSON.stringify(citiesData)));
+  if (typeof citiesData !== 'undefined') citiesDataToExport = normalizeTripCitiesDateData(deepClone(citiesData));
   let userCitiesData = [];
   if (typeof userCities !== 'undefined') userCitiesData = userCities;
   let userCountriesData = [];
   if (typeof userCountries !== 'undefined') userCountriesData = userCountries;
-  const itineraryData = normalizeTripLegsData(JSON.parse(JSON.stringify(appData)));
+  const itineraryData = normalizeTripLegsData(deepClone(appData));
   return {
     meta: titleData,
     itinerary: itineraryData,
@@ -1010,7 +1036,7 @@ function getCurrentAppData() {
 }
 
 function cloneHistorySnapshot() {
-  return JSON.parse(JSON.stringify(getCurrentAppData()));
+  return deepClone(getCurrentAppData());
 }
 
 function getHistorySnapshotSignature(snapshot) {
@@ -1091,16 +1117,16 @@ function restoreHistorySnapshot(snapshot) {
   historyRestoreInProgress = true;
 
   try {
-    titleData = JSON.parse(JSON.stringify(snapshot.meta || titleData));
-    appData = normalizeTripLegsData(JSON.parse(JSON.stringify(snapshot.itinerary || [])));
+    titleData = deepClone(snapshot.meta || titleData);
+    appData = normalizeTripLegsData(deepClone(snapshot.itinerary || []));
     packingData = ensureDefaultPackingAreas(snapshot.packing || []);
-    leaveHomeData = JSON.parse(JSON.stringify(snapshot.leaveHome || []));
-    hotelCheckoutData = JSON.parse(JSON.stringify(snapshot.hotelCheckout || []));
-    journeys = normalizeTripJourneysData(JSON.parse(JSON.stringify(snapshot.journeys || [])));
-    stays = normalizeTripStaysData(JSON.parse(JSON.stringify(snapshot.stays || [])));
-    citiesData = normalizeTripCitiesDateData(JSON.parse(JSON.stringify(snapshot.cities || [])));
-    userCities = JSON.parse(JSON.stringify(snapshot.userCities || []));
-    userCountries = JSON.parse(JSON.stringify(snapshot.userCountries || []));
+    leaveHomeData = deepClone(snapshot.leaveHome || []);
+    hotelCheckoutData = deepClone(snapshot.hotelCheckout || []);
+    journeys = normalizeTripJourneysData(deepClone(snapshot.journeys || []));
+    stays = normalizeTripStaysData(deepClone(snapshot.stays || []));
+    citiesData = normalizeTripCitiesDateData(deepClone(snapshot.cities || []));
+    userCities = deepClone(snapshot.userCities || []);
+    userCountries = deepClone(snapshot.userCountries || []);
 
     window.journeys = journeys;
     window.stays = stays;
@@ -4819,7 +4845,7 @@ function getIntermediateJourneyCities(journeysData) {
 const SHARE_APP_URL = 'https://trentan.github.io/travel-planner/';
 
 function cloneExportValue(value) {
-  return JSON.parse(JSON.stringify(value ?? null));
+  return deepClone(value ?? null);
 }
 
 function getDownloadName(baseName, fallbackName, suffix, extension) {
