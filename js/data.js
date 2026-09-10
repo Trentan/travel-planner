@@ -4009,8 +4009,9 @@ function normalizeTripLegsData(legs) {
         const isPlaceholder = /^[-—]$/.test(text) || text === 'Explore local area' || text === 'Add item...' || text === 'New item...';
         if (isPlaceholder) return;
 
-        // Try to find a match in the suggested pool
+        // Try to find a match in the suggested pool (consolidated single-pass)
         let matchIdx = -1;
+
         // Priority 1: Match by ID if timeline item already has activityId
         if (item.activityId) {
           for (let i = 0; i < suggested.length; i++) {
@@ -4021,38 +4022,37 @@ function normalizeTripLegsData(legs) {
           }
         }
 
-        // Priority 2: Match by title and already assigned to this day
+        // Single pass for title-based priorities (Priority 2, 3, 4) if ID match failed
         if (matchIdx === -1) {
+          let p2Idx = -1;
+          let p3Idx = -1;
+          let p4Idx = -1;
+
           for (let i = 0; i < suggested.length; i++) {
             if (usedSuggestionIndices.has(i)) continue;
             const act = suggested[i];
-            if (act && act.assignedDayIdx === dayIdx && isItemMatchingActivity(text, act)) {
-              matchIdx = i;
-              break;
+            if (!act) continue;
+
+            const isSameDay = act.assignedDayIdx === dayIdx;
+            const isUnassigned = act.assignedDayIdx === null || act.assignedDayIdx === undefined;
+
+            if (isSameDay) {
+              if (isItemMatchingActivity(text, act)) {
+                p2Idx = i;
+                break; // Highest priority title match found!
+              }
+            } else if (p3Idx === -1 && isUnassigned) {
+              if (isItemMatchingActivity(text, act)) {
+                p3Idx = i;
+              }
+            } else if (p3Idx === -1 && p4Idx === -1) {
+              if (isItemMatchingActivity(text, act)) {
+                p4Idx = i;
+              }
             }
           }
-        }
-        // Priority 3: Match by title and unassigned (or assigned to another day - prefer unassigned)
-        if (matchIdx === -1) {
-          for (let i = 0; i < suggested.length; i++) {
-            if (usedSuggestionIndices.has(i)) continue;
-            const act = suggested[i];
-            if (act && (act.assignedDayIdx === null || act.assignedDayIdx === undefined) && isItemMatchingActivity(text, act)) {
-              matchIdx = i;
-              break;
-            }
-          }
-        }
-        // Priority 4: Match by title even if assigned to another day (e.g. duplicate or newly scheduled)
-        if (matchIdx === -1) {
-          for (let i = 0; i < suggested.length; i++) {
-            if (usedSuggestionIndices.has(i)) continue;
-            const act = suggested[i];
-            if (act && isItemMatchingActivity(text, act)) {
-              matchIdx = i;
-              break;
-            }
-          }
+
+          matchIdx = p2Idx !== -1 ? p2Idx : (p3Idx !== -1 ? p3Idx : p4Idx);
         }
 
         if (matchIdx !== -1) {
