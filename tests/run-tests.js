@@ -16,6 +16,7 @@ const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
 const { run: runSmartRemindersSuite } = require('./smart-reminders-suite');
 const { runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
 const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
+const { runParseCurrencyAmountTests } = require('./parse-currency-amount.test');
 const { run: runTransportDurationSuite } = require('./transport-duration.test');
 const { run: runTransitConnectorsSuite } = require('./transit-connectors-layover.test');
 const { runLegManagementWysiwygSuite } = require('./leg-management-wysiwyg.test');
@@ -24,6 +25,7 @@ async function run() {
   await runCloudStorageXssTests();
   await runTripLibraryXssTests();
   if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();
+  if (typeof runParseCurrencyAmountTests === 'function') await runParseCurrencyAmountTests();
   if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
   if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
   if (typeof runTransportDurationSuite === 'function') await runTransportDurationSuite();
