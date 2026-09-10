@@ -610,8 +610,17 @@ function findJourney(id) {
 }
 
 function findJourneySegments(journeyId) {
+  if (!journeyId) return [];
+  const directMatches = journeys.filter(j => j.journeyId === journeyId || j.id === journeyId);
+  if (directMatches.length === 0) return [];
+
+  const relatedJourneyIds = new Set(directMatches.map(j => j.journeyId).filter(Boolean));
+  if (relatedJourneyIds.size === 0) {
+    return directMatches.sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
+  }
+
   return journeys
-      .filter(j => j.journeyId === journeyId)
+      .filter(j => (j.journeyId && relatedJourneyIds.has(j.journeyId)) || j.id === journeyId)
       .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
 }
 
@@ -1618,10 +1627,19 @@ function toggleJourneyStatus(journeyId) { if (!window.isEditMode) return;
 let _pendingSegments = [];
 let _pendingJourneyId = null;
 let _pendingJourneyName = ''; // Track the name when editing
+let _pendingOriginalSegmentIds = [];
+let _pendingOriginalJourneyIds = [];
 
 function _syncJourneyModalActions() {
   const deleteBtn = document.getElementById('journeyDeleteBtn');
-  const isExistingJourney = _pendingJourneyId ? journeys.some(j => j.journeyId === _pendingJourneyId) : false;
+  const origSegIds = new Set(_pendingOriginalSegmentIds || []);
+  const origJntIds = new Set(_pendingOriginalJourneyIds || []);
+  if (_pendingJourneyId) origJntIds.add(_pendingJourneyId);
+
+  const isExistingJourney = journeys.some(j =>
+      (j.journeyId && origJntIds.has(j.journeyId)) ||
+      (j.id && (origSegIds.has(j.id) || origJntIds.has(j.id)))
+  );
   if (deleteBtn) deleteBtn.style.display = isExistingJourney ? 'inline-flex' : 'none';
 }
 
@@ -1638,6 +1656,8 @@ function editJourney(journeyId) {
 
   _pendingJourneyId = journeyId;
   _pendingJourneyName = segmentsCopy[0].journeyName || '';
+  _pendingOriginalSegmentIds = segs.map(s => s.id).filter(Boolean);
+  _pendingOriginalJourneyIds = Array.from(new Set(segs.map(s => s.journeyId).concat(journeyId).filter(Boolean)));
   _populateJourneyCityDropdowns();
 
   // Multi-leg: all segments go into array, first one loaded into form for editing
@@ -1828,6 +1848,8 @@ function openAddJourneyModal() {
     _pendingJourneyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
     _pendingSegments = [];
     _pendingJourneyName = ''; // Reset name
+    _pendingOriginalSegmentIds = [];
+    _pendingOriginalJourneyIds = [];
     _activeSegmentIndex = -1;
     
     if (typeof window._currentAttachments !== 'undefined') {
@@ -2028,24 +2050,30 @@ function closeJourneyModal() {
   _pendingSegments = [];
   _pendingJourneyId = null;
   _pendingJourneyName = '';
+  _pendingOriginalSegmentIds = [];
+  _pendingOriginalJourneyIds = [];
   _journeyFormDirty = false;
   _syncJourneyModalActions();
 }
 
 function deleteJourneyFromModal() {
-  if (!_pendingJourneyId) return;
+  if (!_pendingJourneyId && (!_pendingOriginalJourneyIds || _pendingOriginalJourneyIds.length === 0)) return;
   if (!confirm('Delete this journey?')) return;
-  const journeyId = _pendingJourneyId;
-  const hasGroup = journeys.some(j => j.journeyId === journeyId);
-  if (hasGroup) {
-    deleteJourneyGroup(journeyId);
-  } else {
-    const pendingIds = new Set(_pendingSegments.map(seg => seg.id).filter(Boolean));
-    journeys = journeys.filter(j => !pendingIds.has(j.id));
-    window.journeys = journeys;
-    persistJourneys();
-    if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
-  }
+
+  const origSegIds = new Set(_pendingOriginalSegmentIds || []);
+  const origJntIds = new Set(_pendingOriginalJourneyIds || []);
+  if (_pendingJourneyId) origJntIds.add(_pendingJourneyId);
+
+  journeys = journeys.filter(j => {
+    if (j.id && origSegIds.has(j.id)) return false;
+    if (j.journeyId && origJntIds.has(j.journeyId)) return false;
+    if (j.id && origJntIds.has(j.id)) return false;
+    return true;
+  });
+
+  window.journeys = journeys;
+  persistJourneys();
+  if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   closeJourneyModal();
 }
 
@@ -2085,8 +2113,17 @@ function saveJourneyFromModal() {
       seg.status = status; // Keep status in sync across all segments of the journey!
     });
 
-    // EDIT FIX: Remove old segments matching this journeyId or id before saving
-    journeys = journeys.filter(j => j.journeyId !== _pendingJourneyId && j.id !== _pendingJourneyId);
+    // EDIT FIX: Remove old segments matching this journey before saving
+    const origSegIds = new Set(_pendingOriginalSegmentIds || []);
+    const origJntIds = new Set(_pendingOriginalJourneyIds || []);
+    if (_pendingJourneyId) origJntIds.add(_pendingJourneyId);
+
+    journeys = journeys.filter(j => {
+      if (j.id && origSegIds.has(j.id)) return false;
+      if (j.journeyId && origJntIds.has(j.journeyId)) return false;
+      if (j.id && origJntIds.has(j.id)) return false;
+      return true;
+    });
 
     journeys.push(...finalSegments);
     window.journeys = journeys;

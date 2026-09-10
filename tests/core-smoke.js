@@ -561,6 +561,15 @@ async function run() {
   assert(updatedJid123Segs[0].fromLocation === 'Zurich' && updatedJid123Segs[0].toLocation === 'Bangkok', 'Updated segment should have new route');
   assert(transportContext.journeys.some(j => j.journeyId === 'jid_456'), 'Unrelated journeys should be preserved');
 
+  // Test editing legacy journey matched by item id
+  transportContext.journeys.push({ id: 'legacy_789', fromLocation: 'Tokyo', toLocation: 'Kyoto' });
+  transportContext.editJourney('legacy_789');
+  documentMock.getElementById('journeyFromCity').value = 'Tokyo';
+  documentMock.getElementById('journeyToCity').value = 'Osaka';
+  transportContext.saveJourneyFromModal();
+  assert(!transportContext.journeys.some(j => j.id === 'legacy_789'), 'Legacy journey with original id should be removed on save');
+  assert(transportContext.journeys.some(j => j.journeyId === 'legacy_789' && j.toLocation === 'Osaka'), 'Updated legacy journey should have new destination');
+
   // Tests for renderTransportCarrierMobile refactored configuration object pattern
   const { renderTransportCarrierMobile } = transportContext;
   assert(typeof renderTransportCarrierMobile === 'function', 'renderTransportCarrierMobile should be exported on transportContext');
