@@ -1864,7 +1864,7 @@ function normalizeCityLocationData(city) {
   return city;
 }
 
-async function resolveCityLocation(city) {
+function resolveCityLocationLocal(city) {
   if (!city || !city.name) return null;
 
   let dbMatch = null;
@@ -1887,6 +1887,9 @@ async function resolveCityLocation(city) {
       dbMatch = candidates[0];
     }
   }
+  if (!dbMatch) {
+    dbMatch = getCityLocationDatabaseMatch(city);
+  }
 
   if (dbMatch && dbMatch.lat !== undefined && dbMatch.lng !== undefined) {
     return {
@@ -1897,6 +1900,15 @@ async function resolveCityLocation(city) {
       icaoCode: dbMatch.icaoCode || dbMatch.icao || ''
     };
   }
+
+  return null;
+}
+
+async function resolveCityLocation(city) {
+  if (!city || !city.name) return null;
+
+  const localMatch = resolveCityLocationLocal(city);
+  if (localMatch) return localMatch;
 
   const onlineMatch = await searchCityOnline(city.name, city.countryCode || '', city.country || '');
   if (!onlineMatch) return null;
@@ -2114,15 +2126,44 @@ async function fetchAllMissingCityLocations() {
   }
 
   let foundCount = 0;
+  const onlineCities = [];
+
+  // Phase 1: Fast local resolution for cities matching local database/aliases
   for (let i = 0; i < missingCities.length; i++) {
     const city = missingCities[i];
-    if (btn) btn.textContent = `Finding ${i + 1}/${missingCities.length}...`;
+    const localResult = resolveCityLocationLocal(city);
+    if (localResult && applyCityLocation(city, localResult)) {
+      foundCount++;
+    } else {
+      onlineCities.push(city);
+    }
+    if (btn) {
+      btn.textContent = `Finding ${foundCount}/${missingCities.length}...`;
+    }
+  }
 
-    const hadLocalCoords = ALL_CITIES_HAS_COORDS_SET.has((city.name || '').toLowerCase());
-    const result = await resolveCityLocation(city);
-    if (result && applyCityLocation(city, result)) foundCount++;
+  // Phase 2: Sequential rate-limited geocoding for remaining online cities
+  for (let i = 0; i < onlineCities.length; i++) {
+    const city = onlineCities[i];
+    if (btn) {
+      btn.textContent = `Finding ${foundCount + 1}/${missingCities.length}...`;
+    }
 
-    if (!hadLocalCoords && i < missingCities.length - 1) {
+    const onlineMatch = await searchCityOnline(city.name, city.countryCode || '', city.country || '');
+    if (onlineMatch) {
+      const result = {
+        lat: onlineMatch.lat,
+        lng: onlineMatch.lng,
+        countryCode: onlineMatch.countryCode || city.countryCode || '',
+        code: '',
+        icaoCode: ''
+      };
+      if (applyCityLocation(city, result)) {
+        foundCount++;
+      }
+    }
+
+    if (i < onlineCities.length - 1) {
       await new Promise(resolve => setTimeout(resolve, 1100));
     }
   }
