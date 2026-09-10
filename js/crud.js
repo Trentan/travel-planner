@@ -2155,10 +2155,13 @@ function _populateAddLegCityDropdowns() {
   // Build options HTML with Home + cities
   let cityOptionsHtml = '';
   if (typeof citiesData !== 'undefined') {
-    [...citiesData].sort((a, b) => a.name.localeCompare(b.name)).forEach(city => {
-      const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '📍';
-      cityOptionsHtml += `<option value="${city.name}">${flag} ${city.name}</option>`;
-    });
+    cityOptionsHtml = [...citiesData]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(city => {
+        const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '📍';
+        return `<option value="${city.name}">${flag} ${city.name}</option>`;
+      })
+      .join('');
   }
 
   // Populate existingCitySelect: Home + cities
