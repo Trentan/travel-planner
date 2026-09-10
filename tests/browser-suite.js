@@ -194,6 +194,15 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     await page.waitForSelector('#add-leg-modal', { state: 'visible' });
     await humanPause(page, 400);
 
+    // Verify dedicated reorder tab and Save Sequence Order button
+    const saveSeqBtnCount = await page.locator('#saveLegSequenceBtn').count();
+    assert(saveSeqBtnCount === 1, 'Desktop: #saveLegSequenceBtn should exist in reorder sequence view');
+    reporter.add('desktop', 'leg sequence reorder view', 'dedicated reorder view with save sequence order button');
+
+    // Switch to Add / Edit Leg tab
+    await page.locator('#legTabEditBtn').click();
+    await humanPause(page, 300);
+
     // Verify reset state when toggling between edit and add leg
     if (await page.locator('#editLegSelect option').count() > 2) {
       await page.locator('#editLegSelect').selectOption({ index: 2 });
@@ -206,8 +215,20 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     }
     await humanPause(page, 400);
     await page.locator('#existingCitySelect').selectOption({ index: 1 });
+
+    // Verify date clash prevention disables save button on overlapping dates
     await page.locator('#newLegStartDate').fill('2026-06-15');
     await page.locator('#newLegEndDate').fill('2026-06-18');
+    await humanPause(page, 200);
+    const isSaveDisabled = await page.locator('#legDialogSaveBtn').isDisabled();
+    const clashVisible = await page.locator('#legClashWarningBanner').isVisible();
+    assert(isSaveDisabled && clashVisible, 'Desktop: clashing leg dates must disable save button and display warning banner');
+    reporter.add('desktop', 'leg date clash prevention', 'disabled save button and displayed warning banner on overlap');
+
+    // Fill valid non-overlapping dates at end of trip
+    await page.locator('#newLegStartDate').fill('2026-07-09');
+    await page.locator('#newLegEndDate').fill('2026-07-12');
+    await humanPause(page, 200);
     await page.locator('#legDialogSaveBtn, button:has-text("Add Leg"), button:has-text("Save Leg")').first().click();
     await page.waitForSelector('#add-leg-modal', { state: 'hidden' });
     await humanPause(page, 500);
@@ -369,13 +390,15 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
         window.updateWakeLockButtons();
       }
     });
+    await page.locator('#desktopActionsMenu summary').click();
+    await humanPause(page, 200);
     const wakeLockBtnCount = await page.locator('#wakeLockBtnItinerary').count();
-    assert(wakeLockBtnCount === 1, 'Desktop: #wakeLockBtnItinerary button should exist');
-    await page.locator('#wakeLockBtnItinerary').click();
+    assert(wakeLockBtnCount === 1, 'Desktop: #wakeLockBtnItinerary button should exist in actions menu');
+    await page.locator('#wakeLockBtnItinerary').evaluate(el => el.click());
     await humanPause(page, 200);
     const itineraryActive = await page.locator('#wakeLockBtnItinerary').evaluate(el => el.classList.contains('is-active'));
     assert(itineraryActive === true, 'Desktop: #wakeLockBtnItinerary should become active when clicked');
-    reporter.add('desktop', 'screen wake lock toggle', 'screen wake lock toggles active state in itinerary and transport headers');
+    reporter.add('desktop', 'screen wake lock toggle', 'screen wake lock toggles active state in actions menu');
 
     // Sprint 1 Desktop checks
     const desktopAllBtnVisible = await page.evaluate(() => {

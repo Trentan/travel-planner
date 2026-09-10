@@ -2083,25 +2083,53 @@ function openActivityAssignModal(legIdx, activityIdx) {
 }
 
 // Dialog functions for Add New Leg
-let legDialogState = { mode: 'add', editLegIdx: null };
+var legDialogState = (typeof window !== 'undefined' && window.legDialogState)
+  ? window.legDialogState
+  : { mode: 'add', editLegIdx: null, stagedLegs: [], originalLegDates: {} };
+if (typeof window !== 'undefined') window.legDialogState = legDialogState;
 
-function openLegEditorDialog() {
-  legDialogState = { mode: 'add', editLegIdx: null };
-  openAddLegDialog();
+function getLegDialogState() {
+  return (typeof window !== 'undefined' && window.legDialogState) ? window.legDialogState : legDialogState;
+}
+
+function setLegDialogState(newState) {
+  legDialogState = newState;
+  if (typeof window !== 'undefined') window.legDialogState = legDialogState;
+}
+
+function openLegEditorDialog(initialTab = 'reorder') {
+  openAddLegDialog(initialTab);
 }
 
 function openLegEditorDirect(legIdx) {
-  openAddLegDialog();
+  openAddLegDialog('edit');
   const editSelect = document.getElementById('editLegSelect');
   if (editSelect) {
-    editSelect.value = legIdx;
+    editSelect.value = String(legIdx);
     onEditLegSelectionChange();
   }
 }
 
-function openAddLegDialog() {
+function openAddLegDialog(initialTab = 'reorder') {
   const modal = document.getElementById('add-leg-modal');
   if (modal) {
+    const origDates = {};
+    (appData || []).forEach(leg => {
+      if (leg && leg.id && Array.isArray(leg.days) && leg.days.length > 0) {
+        origDates[leg.id] = {
+          startDate: leg.days[0].date,
+          endDate: leg.days[leg.days.length - 1].date
+        };
+      }
+    });
+
+    setLegDialogState({
+      mode: 'add',
+      editLegIdx: null,
+      stagedLegs: Array.isArray(appData) ? JSON.parse(JSON.stringify(appData)) : [],
+      originalLegDates: origDates
+    });
+
     _populateAddLegCityDropdowns();
     modal.style.display = 'flex';
     const editSelect = document.getElementById('editLegSelect');
@@ -2111,6 +2139,9 @@ function openAddLegDialog() {
     }
     updateLegDialogUiMode();
     onLegTypeChange();
+    renderLegReorderList();
+    switchLegModalTab(initialTab);
+    validateLegEditorForm();
   }
 }
 
@@ -2170,7 +2201,10 @@ function _populateAddLegCityDropdowns() {
       '<option value="ADD_NEW">➕ Add New Leg</option>',
       '<option value="" disabled>──────────</option>'
     ];
-    (appData || []).forEach((leg, idx) => {
+    const sourceLegs = (legDialogState && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs.length > 0)
+      ? legDialogState.stagedLegs
+      : (appData || []);
+    sourceLegs.forEach((leg, idx) => {
       const firstDay = leg?.days?.[0];
       const legDate = firstDay?.date || '';
       const label = `${idx + 1}. ${leg?.label || 'Untitled leg'}${legDate ? ` (${legDate})` : ''}`;
@@ -2684,7 +2718,8 @@ function syncAllLegDays(silent = false) {
 function resetLegDialogToAddNew() {
   const editLegSelect = document.getElementById('editLegSelect');
   if (editLegSelect) editLegSelect.value = 'ADD_NEW';
-  legDialogState = { mode: 'add', editLegIdx: null };
+  legDialogState.mode = 'add';
+  legDialogState.editLegIdx = null;
 
   const legTypeSelect = document.getElementById('legTypeSelect');
   const fromCitySelect = document.getElementById('fromCitySelect');
@@ -2707,12 +2742,21 @@ function resetLegDialogToAddNew() {
     countryOther.value = '';
     countryOther.style.display = 'none';
   }
-  if (dateFrom) dateFrom.value = '';
-  if (dateTo) dateTo.value = '';
+  if (dateFrom) {
+    dateFrom.value = '';
+    dateFrom.classList.remove('border-rose-500');
+  }
+  if (dateTo) {
+    dateTo.value = '';
+    dateTo.classList.remove('border-rose-500');
+  }
   if (dayNotesInput) dayNotesInput.value = '';
 
   updateLegDialogUiMode();
   onLegTypeChange();
+  renderLegReorderList();
+  switchLegModalTab('edit');
+  validateLegEditorForm();
 }
 
 function onEditLegSelectionChange() {
@@ -2727,9 +2771,13 @@ function onEditLegSelectionChange() {
     resetLegDialogToAddNew();
     return;
   }
-  const leg = appData?.[selected];
+  const sourceLegs = (legDialogState && Array.isArray(legDialogState.stagedLegs))
+    ? legDialogState.stagedLegs
+    : (appData || []);
+  const leg = sourceLegs?.[selected];
   if (!leg) return;
-  legDialogState = { mode: 'edit', editLegIdx: selected };
+  legDialogState.mode = 'edit';
+  legDialogState.editLegIdx = selected;
 
   const firstDay = leg.days?.[0] || {};
   const lastDay = leg.days?.[leg.days.length - 1] || firstDay;
@@ -2753,8 +2801,14 @@ function onEditLegSelectionChange() {
   if (toCitySelect && firstDay.to) toCitySelect.value = firstDay.to;
   if (existingCitySelect && firstDay.to) existingCitySelect.value = firstDay.to;
   if (newCityName) newCityName.value = '';
-  if (dateFrom) dateFrom.value = firstDay.date || '';
-  if (dateTo) dateTo.value = lastDay.date || '';
+  if (dateFrom) {
+    dateFrom.value = firstDay.date || '';
+    dateFrom.classList.remove('border-rose-500');
+  }
+  if (dateTo) {
+    dateTo.value = lastDay.date || '';
+    dateTo.classList.remove('border-rose-500');
+  }
   if (dayNotesInput) {
     dayNotesInput.value = (leg.days || [])
       .map(day => String(day?.desc || '').trim())
@@ -2762,6 +2816,24 @@ function onEditLegSelectionChange() {
   }
   updateLegDialogUiMode();
   onLegTypeChange();
+  renderLegReorderList();
+  validateLegEditorForm();
+}
+
+function syncFormInputsFromStagedLeg() {
+  if (legDialogState.mode !== 'edit' || !Number.isFinite(legDialogState.editLegIdx)) return;
+  const sourceLegs = (legDialogState && Array.isArray(legDialogState.stagedLegs))
+    ? legDialogState.stagedLegs
+    : (appData || []);
+  const leg = sourceLegs?.[legDialogState.editLegIdx];
+  if (!leg) return;
+
+  const firstDay = leg.days?.[0] || {};
+  const lastDay = leg.days?.[leg.days.length - 1] || firstDay;
+  const dateFrom = document.getElementById('newLegStartDate');
+  const dateTo = document.getElementById('newLegEndDate');
+  if (dateFrom && firstDay.date) dateFrom.value = firstDay.date;
+  if (dateTo && lastDay.date) dateTo.value = lastDay.date;
 }
 
 function deleteLegFromDialog() {
@@ -2792,7 +2864,7 @@ function onNewLegCountryChange() {
 function closeAddLegDialog() {
   const modal = document.getElementById('add-leg-modal');
   if (modal) modal.style.display = 'none';
-  legDialogState = { mode: 'add', editLegIdx: null };
+  setLegDialogState({ mode: 'add', editLegIdx: null, stagedLegs: [], originalLegDates: {} });
 
   // Clear form inputs
   const existingCitySelect = document.getElementById('existingCitySelect');
@@ -2803,6 +2875,7 @@ function closeAddLegDialog() {
   const toDate = document.getElementById('newLegEndDate');
   const editLegSelect = document.getElementById('editLegSelect');
   const dayNotesInput = document.getElementById('legDayNotesInput');
+  const warningBanner = document.getElementById('legClashWarningBanner');
 
   if (existingCitySelect) existingCitySelect.value = '';
   if (newCityName) newCityName.value = '';
@@ -2811,11 +2884,333 @@ function closeAddLegDialog() {
     countryOther.value = '';
     countryOther.style.display = 'none';
   }
-  if (fromDate) fromDate.value = '';
-  if (toDate) toDate.value = '';
+  if (fromDate) {
+    fromDate.value = '';
+    fromDate.classList.remove('border-rose-500');
+  }
+  if (toDate) {
+    toDate.value = '';
+    toDate.classList.remove('border-rose-500');
+  }
   if (editLegSelect) editLegSelect.value = '';
   if (dayNotesInput) dayNotesInput.value = '';
+  if (warningBanner) warningBanner.style.display = 'none';
   updateLegDialogUiMode();
+}
+
+function renderLegReorderList() {
+  const container = document.getElementById('legReorderList');
+  if (!container) return;
+
+  const legs = (legDialogState && Array.isArray(legDialogState.stagedLegs))
+    ? legDialogState.stagedLegs
+    : (appData || []);
+
+  if (!Array.isArray(legs) || legs.length === 0) {
+    container.innerHTML = `<div class="text-xs text-slate-500 italic p-2 text-center">No legs added yet</div>`;
+    return;
+  }
+
+  let html = '';
+  legs.forEach((leg, idx) => {
+    const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
+    const firstDay = leg.days?.[0]?.date || '';
+    const lastDay = leg.days?.[daysCount - 1]?.date || firstDay;
+    const dateRangeStr = firstDay
+      ? (firstDay === lastDay ? firstDay : `${firstDay} → ${lastDay}`)
+      : 'No dates';
+    const nightsStr = daysCount > 1 ? `${daysCount - 1} night${daysCount > 2 ? 's' : ''}` : (daysCount === 1 ? '1 day' : '0 days');
+    const isEditing = legDialogState.mode === 'edit' && legDialogState.editLegIdx === idx;
+
+    html += `
+      <div class="leg-reorder-item flex items-center justify-between gap-2 p-2 ${isEditing ? 'bg-teal-50 dark:bg-teal-950/40 border-teal-500 dark:border-teal-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'} rounded-lg border shadow-xs cursor-grab select-none hover:border-teal-500 dark:hover:border-teal-400 transition-colors"
+           draggable="true"
+           data-leg-index="${idx}"
+           ondragstart="handleLegDragStart(event, ${idx})"
+           ondragover="handleLegDragOver(event, ${idx})"
+           ondragleave="handleLegDragLeave(event)"
+           ondrop="handleLegDrop(event, ${idx})"
+           ondragend="handleLegDragEnd(event)">
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+          <span class="leg-drag-handle text-slate-400 dark:text-slate-500 text-sm font-mono cursor-grab px-1 touch-none" title="Drag to reorder">⋮⋮</span>
+          <div class="min-w-0 flex-1">
+            <div class="font-semibold text-xs text-slate-800 dark:text-slate-100 truncate">${idx + 1}. ${leg.label || 'Untitled leg'}${isEditing ? ' <span class="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">(Editing)</span>' : ''}</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">${dateRangeStr} • ${nightsStr}</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button type="button" class="px-2 py-0.5 text-xs rounded bg-teal-50 dark:bg-teal-950/50 hover:bg-teal-100 dark:hover:bg-teal-900/60 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-medium cursor-pointer"
+                  onclick="editLegDirectFromReorder(${idx})" title="Edit leg details">✏️ Edit</button>
+          <button type="button" class="px-1.5 py-0.5 text-xs rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 ${idx === 0 ? 'opacity-30 cursor-not-allowed' : ''}"
+                  onclick="moveLegInSequence(${idx}, ${idx - 1})" ${idx === 0 ? 'disabled' : ''} title="Move up">▲</button>
+          <button type="button" class="px-1.5 py-0.5 text-xs rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 ${idx === legs.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}"
+                  onclick="moveLegInSequence(${idx}, ${idx + 1})" ${idx === legs.length - 1 ? 'disabled' : ''} title="Move down">▼</button>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+  if (typeof setupMobileTouchLegReordering === 'function') {
+    setupMobileTouchLegReordering(container);
+  }
+}
+
+function moveLegInSequence(fromIdx, toIdx) {
+  const legState = getLegDialogState();
+  if (!legState || !Array.isArray(legState.stagedLegs)) return;
+  const legs = legState.stagedLegs;
+  if (fromIdx < 0 || fromIdx >= legs.length || toIdx < 0 || toIdx >= legs.length) return;
+  if (fromIdx === toIdx) return;
+
+  const [movedLeg] = legs.splice(fromIdx, 1);
+  legs.splice(toIdx, 0, movedLeg);
+
+  if (legState.mode === 'edit' && Number.isFinite(legState.editLegIdx)) {
+    if (legState.editLegIdx === fromIdx) {
+      legState.editLegIdx = toIdx;
+    } else if (fromIdx < legState.editLegIdx && toIdx >= legState.editLegIdx) {
+      legState.editLegIdx--;
+    } else if (fromIdx > legState.editLegIdx && toIdx <= legState.editLegIdx) {
+      legState.editLegIdx++;
+    }
+  }
+
+  const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
+  if (cascadeCheckbox && cascadeCheckbox.checked) {
+    cascadeStagedLegDates(1);
+  }
+
+  renderLegReorderList();
+  if (typeof _populateAddLegCityDropdowns === 'function') {
+    _populateAddLegCityDropdowns();
+  }
+  const editSelect = document.getElementById('editLegSelect');
+  if (editSelect && legState.mode === 'edit') {
+    editSelect.value = String(legState.editLegIdx);
+  }
+  syncFormInputsFromStagedLeg();
+  validateLegEditorForm();
+  // Strictly isolated to modal state: no premature saveData() or live mutation
+}
+
+function switchLegModalTab(tabName) {
+  const reorderBtn = document.getElementById('legTabReorderBtn');
+  const editBtn = document.getElementById('legTabEditBtn');
+  const reorderSec = document.getElementById('legReorderSection');
+  const editSec = document.getElementById('legEditSection');
+  const modalTitle = document.getElementById('legDialogTitle');
+
+  const activeBtnClasses = 'flex-1 py-2 px-3 text-center font-semibold text-xs sm:text-sm rounded-lg transition-all shadow-sm bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 border border-slate-200/80 dark:border-slate-600 cursor-pointer';
+  const inactiveBtnClasses = 'flex-1 py-2 px-3 text-center font-semibold text-xs sm:text-sm rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent cursor-pointer';
+
+  if (tabName === 'reorder') {
+    if (reorderBtn) {
+      reorderBtn.className = activeBtnClasses;
+      reorderBtn.setAttribute('aria-selected', 'true');
+    }
+    if (editBtn) {
+      editBtn.className = inactiveBtnClasses;
+      editBtn.setAttribute('aria-selected', 'false');
+    }
+    if (reorderSec) reorderSec.style.display = 'block';
+    if (editSec) editSec.style.display = 'none';
+    if (modalTitle) modalTitle.textContent = 'Trip Route & Sequence';
+    renderLegReorderList();
+  } else {
+    if (editBtn) {
+      editBtn.className = activeBtnClasses;
+      editBtn.setAttribute('aria-selected', 'true');
+    }
+    if (reorderBtn) {
+      reorderBtn.className = inactiveBtnClasses;
+      reorderBtn.setAttribute('aria-selected', 'false');
+    }
+    if (reorderSec) reorderSec.style.display = 'none';
+    if (editSec) editSec.style.display = 'block';
+    if (modalTitle) modalTitle.textContent = (legDialogState && legDialogState.mode === 'edit') ? 'Edit Leg' : 'Add New Leg';
+    validateLegEditorForm();
+  }
+}
+
+function editLegDirectFromReorder(idx) {
+  switchLegModalTab('edit');
+  const editSelect = document.getElementById('editLegSelect');
+  if (editSelect) {
+    editSelect.value = String(idx);
+    onEditLegSelectionChange();
+  }
+}
+
+function cascadeStagedLegDates(fromIdx = 1) {
+  const legState = getLegDialogState();
+  if (!legState || !Array.isArray(legState.stagedLegs) || legState.stagedLegs.length === 0) return;
+  const legs = legState.stagedLegs;
+
+  const start = Math.max(1, fromIdx);
+  for (let i = start; i < legs.length; i++) {
+    const prevLeg = legs[i - 1];
+    if (!prevLeg || !prevLeg.days || prevLeg.days.length === 0) continue;
+    const currentStart = prevLeg.days[prevLeg.days.length - 1].date;
+    const leg = legs[i];
+    const duration = Math.max(1, Array.isArray(leg.days) ? leg.days.length : 1);
+    const currentEnd = typeof addDaysToIsoDate === 'function' ? addDaysToIsoDate(currentStart, duration - 1) : currentStart;
+
+    if (!Array.isArray(leg.days) || leg.days.length === 0) {
+      leg.days = buildLegDaysWithNotes({
+        dateFrom: currentStart,
+        dateTo: currentEnd,
+        fromCity: leg.label || 'Home',
+        toCity: leg.label || 'Home',
+        legType: 'city',
+        dayNotes: []
+      });
+    } else {
+      leg.days.forEach((day, dIdx) => {
+        const dDate = typeof addDaysToIsoDate === 'function' ? addDaysToIsoDate(currentStart, dIdx) : currentStart;
+        day.date = dDate;
+        day.day = getWeekdayLabelForTripDate(dDate);
+      });
+    }
+  }
+}
+
+function onLegDateInputChange() {
+  const startDateInput = document.getElementById('newLegStartDate');
+  const endDateInput = document.getElementById('newLegEndDate');
+  const startDate = startDateInput?.value;
+  const endDate = endDateInput?.value;
+  const legState = getLegDialogState();
+
+  if (legState.mode === 'edit' && Number.isFinite(legState.editLegIdx) && Array.isArray(legState.stagedLegs)) {
+    const leg = legState.stagedLegs[legState.editLegIdx];
+    if (leg && startDate && endDate && startDate <= endDate) {
+      const dayNotes = parseLegDayNotes();
+      const firstDay = leg.days?.[0] || {};
+      const newDays = buildLegDaysWithNotes({
+        dateFrom: startDate,
+        dateTo: endDate,
+        fromCity: firstDay.from || leg.label || 'Home',
+        toCity: firstDay.to || leg.label || 'Home',
+        legType: 'city',
+        dayNotes: dayNotes
+      });
+      leg.days = newDays;
+
+      const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
+      if (cascadeCheckbox && cascadeCheckbox.checked) {
+        cascadeStagedLegDates(legState.editLegIdx + 1);
+      }
+      renderLegReorderList();
+    }
+  }
+  validateLegEditorForm();
+}
+
+function onLegCascadeToggleChange() {
+  const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
+  const legState = getLegDialogState();
+  if (cascadeCheckbox && cascadeCheckbox.checked && Array.isArray(legState.stagedLegs) && legState.stagedLegs.length > 1) {
+    cascadeStagedLegDates(1);
+    renderLegReorderList();
+    syncFormInputsFromStagedLeg();
+  }
+  validateLegEditorForm();
+}
+
+function checkLegDateClash(s1, e1, s2, e2) {
+  if (!s1 || !e1 || !s2 || !e2) return false;
+  if (s1 === s2 && e1 === e2) return true;
+  if (s1 < e2 && e1 > s2) {
+    if (e1 === s2 || e2 === s1) {
+      if (s1 === e1 && s2 === e2 && s1 === s2) return true;
+      return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+function validateLegEditorForm() {
+  const startDateInput = document.getElementById('newLegStartDate');
+  const endDateInput = document.getElementById('newLegEndDate');
+  const warningBanner = document.getElementById('legClashWarningBanner');
+  const warningMessage = document.getElementById('legClashWarningMessage');
+  const saveBtn = document.getElementById('legDialogSaveBtn');
+
+  if (!startDateInput || !endDateInput) return true;
+
+  const startDate = startDateInput.value;
+  const endDate = endDateInput.value;
+  const currentLegState = getLegDialogState();
+  const isEdit = currentLegState.mode === 'edit' && Number.isFinite(currentLegState.editLegIdx);
+  const currentEditingIdx = isEdit ? currentLegState.editLegIdx : null;
+  const stagedLegs = Array.isArray(currentLegState.stagedLegs) ? currentLegState.stagedLegs : (appData || []);
+
+  startDateInput.classList.remove('border-rose-500');
+  endDateInput.classList.remove('border-rose-500');
+
+  let clashText = '';
+
+  // 1. Inverted date range
+  if (startDate && endDate && startDate > endDate) {
+    clashText = `End date (${endDate}) cannot be earlier than start date (${startDate}).`;
+    endDateInput.classList.add('border-rose-500');
+  }
+
+  // 2. Overlapping date check
+  if (!clashText && startDate && endDate && Array.isArray(stagedLegs)) {
+    for (let i = 0; i < stagedLegs.length; i++) {
+      if (currentEditingIdx !== null && i === currentEditingIdx) continue;
+      const otherLeg = stagedLegs[i];
+      if (!otherLeg.days || otherLeg.days.length === 0) continue;
+
+      const otherStart = otherLeg.days[0].date;
+      const otherEnd = otherLeg.days[otherLeg.days.length - 1].date;
+
+      if (otherStart && otherEnd && checkLegDateClash(startDate, endDate, otherStart, otherEnd)) {
+        clashText = `Date range (${startDate} to ${endDate}) overlaps with Leg '${otherLeg.label || ('Leg ' + (i + 1))}' (${otherStart} to ${otherEnd}).`;
+        startDateInput.classList.add('border-rose-500');
+        endDateInput.classList.add('border-rose-500');
+        break;
+      }
+    }
+  }
+
+  // 3. Chronological inversion if auto-cascade is disabled
+  const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
+  const isCascadeEnabled = cascadeCheckbox ? cascadeCheckbox.checked : true;
+
+  if (!clashText && !isCascadeEnabled && Array.isArray(stagedLegs) && stagedLegs.length > 1) {
+    for (let i = 0; i < stagedLegs.length - 1; i++) {
+      const legA = stagedLegs[i];
+      const legB = stagedLegs[i + 1];
+      const startA = (currentEditingIdx === i && startDate) ? startDate : legA.days?.[0]?.date;
+      const startB = (currentEditingIdx === i + 1 && startDate) ? startDate : legB.days?.[0]?.date;
+
+      if (startA && startB && startA > startB) {
+        clashText = `Chronological inversion: Leg ${i + 1} (${legA.label || 'Leg ' + (i + 1)}) date (${startA}) is after Leg ${i + 2} (${legB.label || 'Leg ' + (i + 2)}) date (${startB}).`;
+        break;
+      }
+    }
+  }
+
+  if (clashText) {
+    if (warningMessage) warningMessage.textContent = clashText;
+    if (warningBanner) warningBanner.style.display = 'flex';
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+    return false;
+  } else {
+    if (warningBanner) warningBanner.style.display = 'none';
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+    return true;
+  }
 }
 
 function parseLegDayNotes() {
@@ -2981,122 +3376,247 @@ function adjustLegDays(legIdx, delta) {
 }
 
 function confirmAddLeg() {
+  if (!validateLegEditorForm()) {
+    return;
+  }
+
   const legType = document.getElementById('legTypeSelect')?.value || 'city';
   const dateFrom = document.getElementById('newLegStartDate')?.value;
   const dateTo = document.getElementById('newLegEndDate')?.value;
   const dayNotes = parseLegDayNotes();
 
-  // Check for date conflicts
-  if (dateFrom && dateTo) {
-    const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
-    const excludeIdx = isEdit ? legDialogState.editLegIdx : undefined;
-    const startConflict = checkDateConflict(dateFrom, excludeIdx);
-    if (startConflict) {
-      if (!confirm('Warning: Start date conflicts with ' + startConflict.legLabel + '. Do you want to proceed and handle the conflict later?')) {
+  const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
+
+  if (isEdit && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs[legDialogState.editLegIdx]) {
+    const target = legDialogState.stagedLegs[legDialogState.editLegIdx];
+    const existingCity = document.getElementById('existingCitySelect')?.value;
+    if (existingCity && existingCity !== 'Home') {
+      const flag = typeof getCityFlag === 'function' ? getCityFlag(existingCity) : '📍';
+      target.label = flag + ' ' + existingCity;
+    }
+    const firstDay = target.days?.[0] || {};
+    target.days = buildLegDaysWithNotes({
+      dateFrom: dateFrom || target.days?.[0]?.date,
+      dateTo: dateTo || target.days?.[target.days.length - 1]?.date,
+      fromCity: existingCity || firstDay.from || target.label,
+      toCity: existingCity || firstDay.to || target.label,
+      legType: legType,
+      dayNotes: dayNotes
+    });
+
+    const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
+    if (cascadeCheckbox && cascadeCheckbox.checked) {
+      cascadeStagedLegDates(legDialogState.editLegIdx);
+    }
+  } else {
+    // Adding a new leg
+    let label, fromCity, toCity;
+    if (legType === 'start') {
+      fromCity = 'Home';
+      toCity = document.getElementById('toCitySelect')?.value || 'Home';
+      const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
+      label = `${cleanCity} (Trip Start)`;
+    } else if (legType === 'return') {
+      fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
+      toCity = 'Home';
+      const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
+      label = `${cleanCity} (Trip Finish)`;
+    } else if (legType === 'travel') {
+      fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
+      toCity = document.getElementById('toCitySelect')?.value || '';
+      if (!toCity) {
+        alert('Please choose a destination city for this travel leg.');
         return;
       }
-    }
-  }
-
-  let label, fromCity, toCity;
-  if (legType === 'start') {
-    fromCity = 'Home';
-    toCity = document.getElementById('toCitySelect')?.value || 'Home';
-    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
-    label = `${cleanCity} (Trip Start)`;
-  } else if (legType === 'return') {
-    fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
-    toCity = 'Home';
-    const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
-    label = `${cleanCity} (Trip Finish)`;
-  } else if (legType === 'travel') {
-    fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
-    toCity = document.getElementById('toCitySelect')?.value || '';
-    if (!toCity) {
-      alert('Please choose a destination city for this travel leg.');
-      return;
-    }
-    label = `✈️ ${fromCity} to ${toCity}`;
-  } else {
-    // Regular city leg
-    const existingCity = document.getElementById('existingCitySelect')?.value;
-    const newCityName = document.getElementById('newLegCityName')?.value?.trim();
-
-    if (existingCity && existingCity !== 'Home') {
-      // Using existing city
-      const flag = typeof getCityFlag === 'function' ? getCityFlag(existingCity) : '📍';
-      label = flag + ' ' + existingCity;
-      fromCity = existingCity;
-      toCity = existingCity;
-    } else if (newCityName) {
-      // Creating new city - get country from dropdown or other input
-      const countrySelect = document.getElementById('newLegCityCountrySelect')?.value;
-      const countryOther = document.getElementById('newLegCityCountryOther')?.value?.trim();
-      let countryName = '';
-      let countryCode = '';
-
-      if (countrySelect && countrySelect !== 'OTHER') {
-        const countryMatch = COUNTRY_DATA.find(c => c.code === countrySelect);
-        if (countryMatch) {
-          countryName = countryMatch.name;
-          countryCode = countryMatch.code;
-        }
-      } else if (countryOther) {
-        countryName = countryOther;
-      }
-
-      // Add the new city
-      const newCity = addOrUpdateCity(newCityName, countryName, '', '', '', countryCode);
-      if (newCity && typeof buildCityNav === 'function') {
-        buildCityNav();
-      }
-
-      const flag = typeof getCityFlag === 'function' ? getCityFlag(newCityName) : '📍';
-      label = flag + ' ' + newCityName;
-      fromCity = newCityName;
-      toCity = newCityName;
+      label = `✈️ ${fromCity} to ${toCity}`;
     } else {
-      label = '📍 New City';
-      fromCity = 'Home';
-      toCity = 'Home';
+      const existingCity = document.getElementById('existingCitySelect')?.value;
+      const newCityName = document.getElementById('newLegCityName')?.value?.trim();
+
+      if (existingCity && existingCity !== 'Home') {
+        const flag = typeof getCityFlag === 'function' ? getCityFlag(existingCity) : '📍';
+        label = flag + ' ' + existingCity;
+        fromCity = existingCity;
+        toCity = existingCity;
+      } else if (newCityName) {
+        const countrySelect = document.getElementById('newLegCityCountrySelect')?.value;
+        const countryOther = document.getElementById('newLegCityCountryOther')?.value?.trim();
+        let countryName = '';
+        let countryCode = '';
+
+        if (countrySelect && countrySelect !== 'OTHER') {
+          const countryMatch = COUNTRY_DATA.find(c => c.code === countrySelect);
+          if (countryMatch) {
+            countryName = countryMatch.name;
+            countryCode = countryMatch.code;
+          }
+        } else if (countryOther) {
+          countryName = countryOther;
+        }
+
+        const newCity = addOrUpdateCity(newCityName, countryName, '', '', '', countryCode);
+        if (newCity && typeof buildCityNav === 'function') {
+          buildCityNav();
+        }
+
+        const flag = typeof getCityFlag === 'function' ? getCityFlag(newCityName) : '📍';
+        label = flag + ' ' + newCityName;
+        fromCity = newCityName;
+        toCity = newCityName;
+      } else {
+        label = '📍 New City';
+        fromCity = 'Home';
+        toCity = 'Home';
+      }
     }
+
+    const legPayload = {
+      id: 'leg_' + Date.now(),
+      label: label,
+      colour: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'),
+      cityFood: [{ text: "Local dish to try", done: false }],
+      cityRun: [{ title: "5km park loop", estTime: "1 hr", estCost: "0", assignedDayIdx: null }],
+      suggestedSights: [],
+      legTips: ["Add tip..."],
+      days: buildLegDaysWithNotes({
+        dateFrom,
+        dateTo,
+        fromCity,
+        toCity,
+        legType,
+        dayNotes
+      })
+    };
+    if (!Array.isArray(legDialogState.stagedLegs)) {
+      legDialogState.stagedLegs = [];
+    }
+    legDialogState.stagedLegs.push(legPayload);
   }
 
-  const legPayload = {
-    id: 'leg_' + Date.now(),
-    label: label,
-    colour: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'),
-    cityFood: [{ text: "Local dish to try", done: false }],
-    cityRun: [{ title: "5km park loop", estTime: "1 hr", estCost: "0", assignedDayIdx: null }],
-    suggestedSights: [],
-    legTips: ["Add tip..."],
-    days: buildLegDaysWithNotes({
-      dateFrom,
-      dateTo,
-      fromCity,
-      toCity,
-      legType,
-      dayNotes
-    })
-  };
+  // --- SYNCHRONIZE JOURNEYS AND STAYS BASED ON LEG DATE SHIFTS ---
+  applyStagedLegsAndSync();
 
-  const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
-  if (isEdit && appData[legDialogState.editLegIdx]) {
-    const target = appData[legDialogState.editLegIdx];
-    const preservedId = target.id;
-    target.label = legPayload.label;
-    target.colour = target.colour || legPayload.colour;
-    target.days = legPayload.days;
-    target.id = preservedId;
-  } else {
-    appData.push(legPayload);
-  }
   closeAddLegDialog();
-  sortLegs();
+  if (typeof sortLegs === 'function') sortLegs();
   if (typeof buildItinerary === 'function') buildItinerary();
   if (typeof buildCityNav === 'function') buildCityNav();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  if (typeof saveData === 'function') saveData(false);
   if (typeof syncAllLegDays === 'function') {
     syncAllLegDays(true);
+  }
+}
+
+function applyStagedLegsAndSync() {
+  if (!legDialogState || !Array.isArray(legDialogState.stagedLegs)) return;
+
+  const getDaysDiff = (d1, d2) => {
+    if (!d1 || !d2) return 0;
+    const t1 = new Date(`${d1}T00:00:00`).getTime();
+    const t2 = new Date(`${d2}T00:00:00`).getTime();
+    return Math.round((t2 - t1) / (1000 * 60 * 60 * 24));
+  };
+
+  const getBaseName = (name) => {
+    if (!name) return '';
+    let base = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(name) : name.replace(/[^\x00-\x7F]/g, '').trim();
+    base = base.replace(/\s*\(.*?\)$/, '');
+    let strippedNum = base.replace(/\s*\d+$/, '');
+    if (strippedNum.trim().length > 0) base = strippedNum;
+    return base.trim().toLowerCase();
+  };
+
+  // For each leg in stagedLegs, if it existed in originalLegDates, calculate deltaDays
+  legDialogState.stagedLegs.forEach(leg => {
+    if (!leg || !leg.id || !Array.isArray(leg.days) || leg.days.length === 0) return;
+    const original = legDialogState.originalLegDates?.[leg.id];
+    if (!original || !original.startDate) return;
+
+    const newStart = leg.days[0].date;
+    const deltaDays = getDaysDiff(original.startDate, newStart);
+    if (deltaDays === 0) return;
+
+    const baseCityName = getBaseName(leg.label);
+    const cityId = 'city-' + baseCityName.replace(/[^a-z0-9]/g, '-');
+
+    // 1. Remap Stays
+    if (typeof window !== 'undefined' && Array.isArray(window.stays)) {
+      window.stays.forEach(s => {
+        const matchesLeg = s._inferredLegId === leg.id ||
+          s.legId === leg.id ||
+          (!s._inferredLegId && !s.legId && (s.cityId === cityId || (s.city && getBaseName(s.city) === baseCityName)));
+        if (matchesLeg) {
+          if (s.checkIn && typeof addDaysToIsoDate === 'function') s.checkIn = addDaysToIsoDate(s.checkIn, deltaDays);
+          if (s.checkOut && typeof addDaysToIsoDate === 'function') s.checkOut = addDaysToIsoDate(s.checkOut, deltaDays);
+          if (s.startDate && typeof addDaysToIsoDate === 'function') s.startDate = addDaysToIsoDate(s.startDate, deltaDays);
+          if (s.endDate && typeof addDaysToIsoDate === 'function') s.endDate = addDaysToIsoDate(s.endDate, deltaDays);
+        }
+      });
+    }
+
+    // 2. Remap Journeys (departing journeys)
+    if (typeof window !== 'undefined' && Array.isArray(window.journeys)) {
+      window.journeys.forEach(j => {
+        const matchesLeg = j.legId === leg.id ||
+          j._inferredFromLegId === leg.id ||
+          (!j._inferredFromLegId && (j.fromCityId === cityId || (j.fromLocation && getBaseName(j.fromLocation) === baseCityName)));
+        if (matchesLeg) {
+          if (j.departureDate && typeof addDaysToIsoDate === 'function') j.departureDate = addDaysToIsoDate(j.departureDate, deltaDays);
+          if (j.arrivalDate && typeof addDaysToIsoDate === 'function') j.arrivalDate = addDaysToIsoDate(j.arrivalDate, deltaDays);
+          if (j.dayDate && typeof addDaysToIsoDate === 'function') j.dayDate = addDaysToIsoDate(j.dayDate, deltaDays);
+          if (j.startDate && typeof addDaysToIsoDate === 'function') j.startDate = addDaysToIsoDate(j.startDate, deltaDays);
+          if (j.endDate && typeof addDaysToIsoDate === 'function') j.endDate = addDaysToIsoDate(j.endDate, deltaDays);
+        }
+      });
+    }
+
+    // 3. Remap Activity Items inside the shifted leg's days
+    leg.days.forEach(day => {
+      if (Array.isArray(day.activityItems)) {
+        day.activityItems.forEach(act => {
+          act.startDate = day.date;
+          act.endDate = day.date;
+          act.assignedDate = day.date;
+        });
+      }
+    });
+    if (Array.isArray(leg.suggestedActivities)) {
+      leg.suggestedActivities.forEach(act => {
+        if (Number.isFinite(act.assignedDayIdx) && leg.days[act.assignedDayIdx]) {
+          act.assignedDate = leg.days[act.assignedDayIdx].date;
+          act.startDate = act.assignedDate;
+          act.endDate = act.assignedDate;
+        }
+      });
+    }
+  });
+
+  // Commit stagedLegs to appData
+  if (Array.isArray(appData)) {
+    appData.length = 0;
+    legDialogState.stagedLegs.forEach(leg => appData.push(leg));
+  }
+}
+
+function confirmSaveLegSequence() {
+  const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
+  if (cascadeCheckbox && cascadeCheckbox.checked && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs.length > 0) {
+    cascadeStagedLegDates(0);
+  }
+
+  applyStagedLegsAndSync();
+
+  closeAddLegDialog();
+  if (typeof sortLegs === 'function') sortLegs();
+  if (typeof buildItinerary === 'function') buildItinerary();
+  if (typeof buildCityNav === 'function') buildCityNav();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  if (typeof saveData === 'function') saveData(false);
+  if (typeof syncAllLegDays === 'function') {
+    syncAllLegDays(true);
+  }
+  if (typeof showToast === 'function') {
+    showToast('Trip route sequence saved successfully!');
   }
 }
 
@@ -3536,5 +4056,10 @@ function closeStayModal() { closeAddStayModal(); }
 Object.assign(window, {
   openAddStayModal, closeAddStayModal, saveStayFromModal, openEditStayModal,
   deleteStay, deleteStayFromModal, toggleStayStatus, updateStayField,
-  openStayModal, closeStayModal  // backward compat
+  openStayModal, closeStayModal, // backward compat
+  renderLegReorderList, moveLegInSequence, cascadeStagedLegDates,
+  onLegDateInputChange, onLegCascadeToggleChange, validateLegEditorForm,
+  checkLegDateClash, resetLegDialogToAddNew, getLegDialogState, setLegDialogState,
+  openAddLegDialog, closeAddLegDialog, confirmAddLeg, onEditLegSelectionChange, deleteLegFromDialog,
+  switchLegModalTab, editLegDirectFromReorder, confirmSaveLegSequence, applyStagedLegsAndSync
 });

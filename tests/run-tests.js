@@ -18,6 +18,7 @@ const { runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
 const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
 const { run: runTransportDurationSuite } = require('./transport-duration.test');
 const { run: runTransitConnectorsSuite } = require('./transit-connectors-layover.test');
+const { runLegManagementWysiwygSuite } = require('./leg-management-wysiwyg.test');
 
 async function run() {
   await runCloudStorageXssTests();
@@ -27,6 +28,7 @@ async function run() {
   if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
   if (typeof runTransportDurationSuite === 'function') await runTransportDurationSuite();
   if (typeof runTransitConnectorsSuite === 'function') await runTransitConnectorsSuite();
+  if (typeof runLegManagementWysiwygSuite === 'function') await runLegManagementWysiwygSuite();
   await runCoreSmoke();
   await runPwaShortcutsOfflineTests();
   await runAutoStaysSuite();
