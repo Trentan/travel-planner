@@ -98,6 +98,7 @@
           <div class="app-menu-section-header">🎨 View & Appearance</div>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripSummaryModal()"><span class="menu-icon">📅</span> View Trip Summary Table</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); toggleDualTimeDisplay()"><span class="menu-icon">🌐</span> Toggle Dual Timezone Display</button>
+          <button id="wakeLockBtnItinerary" class="app-menu-btn wake-lock-btn" onclick="closeDesktopActionsMenu(); toggleScreenWakeLock()" title="Keep screen awake during travel and transit" aria-pressed="false" style="display: none;"><span class="menu-icon wake-lock-icon">🔆</span> <span class="wake-lock-label">Screen Awake</span></button>
           <label id="themeToggleBtn" class="app-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
             <input id="themeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
             <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
@@ -213,9 +214,6 @@
       <div class="section-header">
         <h3 class="section-header-title">🗓️ Itinerary</h3>
         <div class="section-header-actions">
-          <button class="action-btn wake-lock-btn" id="wakeLockBtnItinerary" onclick="toggleScreenWakeLock()" title="Keep screen awake during travel and transit" aria-pressed="false" style="display: none;">
-            <span class="wake-lock-icon">🔆</span> <span class="wake-lock-label">Screen Awake</span>
-          </button>
           <button class="action-btn" onclick="toggleAllDays()" id="expandAll">▼ Expand all days</button>
           <div class="itinerary-view-mode-control" role="group" aria-label="Itinerary day view">
             <button id="itineraryTimelineModeBtn" class="itinerary-view-mode-btn is-active" type="button" onclick="setItineraryDayViewMode('timeline')" title="Timeline View" aria-label="Timeline View"><span class="view-mode-icon">⏳</span> <span class="view-mode-text">Timeline</span></button>
@@ -395,6 +393,7 @@
             <button id="mobileEditToggleBtn" class="app-menu-btn mobile-menu-primary" onclick="event.preventDefault(); event.stopPropagation(); toggleEditMode(); closeMobileMenu(); syncMenuEditToggleLabels()">🔒 Lock: Read Only</button>
             <button class="app-menu-btn" onclick="closeMobileMenu(); openTripSummaryModal()">📅 Trip Summary</button>
             <button class="app-menu-btn" onclick="closeMobileMenu(); toggleDualTimeDisplay()">🌐 Dual Timezone</button>
+            <button id="mobileWakeLockBtn" class="app-menu-btn wake-lock-btn" onclick="closeMobileMenu(); toggleScreenWakeLock()" title="Keep screen awake during travel and transit" aria-pressed="false" style="display: none;"><span class="menu-icon wake-lock-icon">🔆</span> <span class="wake-lock-label">Screen Awake</span></button>
             <label id="mobileThemeToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
               <input id="mobileThemeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
               <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>

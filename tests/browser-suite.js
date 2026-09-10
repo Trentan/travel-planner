@@ -381,13 +381,15 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
         window.updateWakeLockButtons();
       }
     });
+    await page.locator('#desktopActionsMenu summary').click();
+    await humanPause(page, 200);
     const wakeLockBtnCount = await page.locator('#wakeLockBtnItinerary').count();
-    assert(wakeLockBtnCount === 1, 'Desktop: #wakeLockBtnItinerary button should exist');
-    await page.locator('#wakeLockBtnItinerary').click();
+    assert(wakeLockBtnCount === 1, 'Desktop: #wakeLockBtnItinerary button should exist in actions menu');
+    await page.locator('#wakeLockBtnItinerary').evaluate(el => el.click());
     await humanPause(page, 200);
     const itineraryActive = await page.locator('#wakeLockBtnItinerary').evaluate(el => el.classList.contains('is-active'));
     assert(itineraryActive === true, 'Desktop: #wakeLockBtnItinerary should become active when clicked');
-    reporter.add('desktop', 'screen wake lock toggle', 'screen wake lock toggles active state in itinerary and transport headers');
+    reporter.add('desktop', 'screen wake lock toggle', 'screen wake lock toggles active state in actions menu');
 
     // Sprint 1 Desktop checks
     const desktopAllBtnVisible = await page.evaluate(() => {

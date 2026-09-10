@@ -1262,9 +1262,6 @@ function buildTransportTab(cityFilter = null) {
     <div class="section-header transport-header">
       <h3 class="section-header-title">✈️ Transport</h3>
       <div class="section-header-actions">
-        <button class="action-btn wake-lock-btn" id="wakeLockBtnTransport" onclick="toggleScreenWakeLock()" title="Keep screen awake during travel and transit" aria-pressed="false" style="display: none;">
-          <span class="wake-lock-icon">🔆</span> <span class="wake-lock-label">Screen Awake</span>
-        </button>
         ${isEditMode ? '<button class="action-btn" onclick="openAddJourneyModal()">+ Add Journey</button>' : ''}
       </div>
     </div>
