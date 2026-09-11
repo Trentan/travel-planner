@@ -238,22 +238,26 @@ function findBestBookingLeg(date, fromLocation = '', toLocation = '') {
 function detectBookingDuplicates(item) {
   const duplicates = [];
   const ref = (item.bookingReference || item.bookingRef || '').toLowerCase();
-  if (item.kind === 'journey' && Array.isArray(journeys)) {
-    const found = journeys.find(j => (
+  const currentJourneys = typeof journeys !== 'undefined' && Array.isArray(journeys) ? journeys : (typeof window !== 'undefined' && Array.isArray(window.journeys) ? window.journeys : []);
+  const currentStays = typeof stays !== 'undefined' && Array.isArray(stays) ? stays : (typeof window !== 'undefined' && Array.isArray(window.stays) ? window.stays : []);
+  const currentAppData = typeof appData !== 'undefined' && Array.isArray(appData) ? appData : (typeof window !== 'undefined' && Array.isArray(window.appData) ? window.appData : []);
+
+  if (item.kind === 'journey' && currentJourneys.length > 0) {
+    const found = currentJourneys.find(j => (
       (ref && String(j.bookingReference || '').toLowerCase() === ref) ||
       (j.departureDate === item.departureDate && cleanBookingPlace(j.fromLocation).toLowerCase() === cleanBookingPlace(item.fromLocation).toLowerCase() && cleanBookingPlace(j.toLocation).toLowerCase() === cleanBookingPlace(item.toLocation).toLowerCase())
     ));
     if (found) duplicates.push('Possible duplicate transport');
   }
-  if (item.kind === 'stay' && Array.isArray(stays)) {
-    const found = stays.find(stay => (
+  if (item.kind === 'stay' && currentStays.length > 0) {
+    const found = currentStays.find(stay => (
       (ref && String(stay.bookingRef || '').toLowerCase() === ref) ||
       (stay.checkIn === item.checkIn && stay.checkOut === item.checkOut && String(stay.propertyName || '').toLowerCase() === String(item.propertyName || '').toLowerCase())
     ));
     if (found) duplicates.push('Possible duplicate stay');
   }
-  if (item.kind === 'activity' && Array.isArray(appData)) {
-    const found = appData.some(leg => (leg.days || []).some(day => (
+  if (item.kind === 'activity' && currentAppData.length > 0) {
+    const found = currentAppData.some(leg => (leg.days || []).some(day => (
       (typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(day.date) : day.date) === item.date &&
       (day.activityItems || []).some(activity => String(activity.text || '').toLowerCase().includes(String(item.title || '').toLowerCase()))
     )));
@@ -262,21 +266,48 @@ function detectBookingDuplicates(item) {
   return duplicates;
 }
 
-function parseBookingConfirmationText(text, sourceName = 'Pasted text') {
+function splitBookingTextIntoSegments(text) {
+  const normalized = normalizeBookingWhitespace(text);
+  if (!normalized) return [];
+
+  // 1. Split by double newlines if multiple blocks contain route or flight indicators
+  const blocks = normalized.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+  if (blocks.length > 1) {
+    const journeyBlockCount = blocks.filter(b =>
+      (/\b(from\s+[A-Za-z].*to\s+[A-Za-z]|->|–|to\b)/i.test(b) &&
+       /\b(flight|train|rail|airline|depart|arrival|pnr|boarding|hotel|accommodation)\b/i.test(b))
+    ).length;
+
+    if (journeyBlockCount > 1) {
+      return blocks;
+    }
+  }
+
+  // 2. Split by explicit segment headers e.g. "Flight 1:", "Flight QF1", "Segment 1", "Leg 1"
+  const headerPattern = /(?:^|\n)(?=(?:flight\s*(?:#|\d+|[A-Z]{1,3}\d+)?\b|segment\s*\d+\b|leg\s*\d+\b|train\s*(?:#|\d+|[A-Z]{1,3}\d+)?\b))/gi;
+  const headerBlocks = normalized.split(headerPattern).map(b => b.trim()).filter(Boolean);
+  if (headerBlocks.length > 1) {
+    return headerBlocks;
+  }
+
+  return [normalized];
+}
+
+function parseSingleBookingConfirmationBlock(text, sourceName = 'Pasted text', fallbackRef = '', fallbackProvider = '') {
   const normalized = normalizeBookingWhitespace(text);
   if (!normalized) return [];
 
   const lower = normalized.toLowerCase();
   const dates = getBookingDateCandidates(normalized);
   const times = getBookingTimeCandidates(normalized);
-  const bookingRef = getBookingReference(normalized);
-  const provider = getProviderCandidate(normalized);
+  const bookingRef = getBookingReference(normalized) || fallbackRef;
+  const provider = getProviderCandidate(normalized, fallbackProvider);
   const route = getBookingRoute(normalized);
   const items = [];
 
   if (/\b(flight|airline|boarding|pnr|depart|arrival|train|rail|eurostar|station|bus|ferry)\b/i.test(normalized)) {
-    const routeCodeMatch = normalized.match(/\b(?:flight|train|service|route)\s*(?:no\.?|number|#|:)?\s*([A-Z]{1,3}\s?\d{1,5}[A-Z]?)\b/i)
-      || normalized.match(/\b([A-Z]{2,3}\s?\d{2,5}[A-Z]?)\b/);
+    const routeCodeMatch = normalized.match(/\b(?:flight|train|service|route)\s*(?:no\.?|number|#|:\s*|\d+[:.-]\s*)?([A-Z]{1,3}\s?\d{1,5}[A-Z]?)\b/i)
+      || normalized.match(/\b([A-Z]{1,3}\s?\d{2,5}[A-Z]?)\b/);
     const type = lower.includes('train') || lower.includes('rail') || lower.includes('eurostar')
       ? 'train'
       : lower.includes('bus')
@@ -285,7 +316,7 @@ function parseBookingConfirmationText(text, sourceName = 'Pasted text') {
           ? 'ferry'
           : 'flight';
     items.push({
-      id: `booking-preview-${Date.now()}-${items.length}`,
+      id: `booking-preview-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       kind: 'journey',
       sourceName,
       transportType: type,
@@ -314,7 +345,7 @@ function parseBookingConfirmationText(text, sourceName = 'Pasted text') {
     const checkOut = checkOutMatch ? parseBookingDate(checkOutMatch[1]) : (dates[1] || '');
     const city = cleanBookingPlace(locationMatch ? locationMatch[1] : route.toLocation || route.fromLocation);
     items.push({
-      id: `booking-preview-${Date.now()}-${items.length}`,
+      id: `booking-preview-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       kind: 'stay',
       sourceName,
       propertyName: String(Array.isArray(propertyMatch) ? propertyMatch[1] : (propertyMatch || 'Imported stay')).trim().slice(0, 90),
@@ -333,7 +364,7 @@ function parseBookingConfirmationText(text, sourceName = 'Pasted text') {
     const titleMatch = normalized.match(/\b(?:tour|activity|experience|reservation|ticket)\s*:?\s*([A-Za-z0-9][A-Za-z0-9\s.'&-]{3,90})(?:\n|$)/i);
     const locationMatch = normalized.match(/\b(?:location|venue|address)\s*:?\s*([A-Za-z][A-Za-z\s.'-]{2,60})(?:\n|$)/i);
     items.push({
-      id: `booking-preview-${Date.now()}-${items.length}`,
+      id: `booking-preview-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       kind: 'activity',
       sourceName,
       title: String(titleMatch?.[1] || 'Imported reservation').trim().slice(0, 90),
@@ -361,7 +392,37 @@ function parseBookingConfirmationText(text, sourceName = 'Pasted text') {
     });
   }
 
-  return items.map(item => ({
+  return items;
+}
+
+function parseBookingConfirmationText(text, sourceName = 'Pasted text') {
+  const normalized = normalizeBookingWhitespace(text);
+  if (!normalized) return [];
+
+  const segments = splitBookingTextIntoSegments(normalized);
+  if (segments.length <= 1) {
+    const items = parseSingleBookingConfirmationBlock(normalized, sourceName);
+    return items.map(item => ({
+      ...item,
+      duplicateWarnings: detectBookingDuplicates(item)
+    }));
+  }
+
+  const globalRef = getBookingReference(normalized);
+  const globalProvider = getProviderCandidate(normalized);
+
+  const allItems = [];
+  segments.forEach((segment, segIdx) => {
+    const segItems = parseSingleBookingConfirmationBlock(
+      segment,
+      `${sourceName} (${segIdx + 1})`,
+      globalRef,
+      globalProvider
+    );
+    allItems.push(...segItems);
+  });
+
+  return allItems.map(item => ({
     ...item,
     duplicateWarnings: detectBookingDuplicates(item)
   }));
@@ -595,4 +656,21 @@ if (typeof window !== 'undefined') {
   window.mergeBookingIntakePreview = mergeBookingIntakePreview;
   window.parseBookingConfirmationText = parseBookingConfirmationText;
   window.parseBookingDate = parseBookingDate;
+  window.cleanBookingPlace = cleanBookingPlace;
+  window.getBookingRoute = getBookingRoute;
+  window.splitBookingTextIntoSegments = splitBookingTextIntoSegments;
+  window.createJourneyFromBookingItem = createJourneyFromBookingItem;
+  window.createStayFromBookingItem = createStayFromBookingItem;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    parseBookingConfirmationText,
+    parseBookingDate,
+    getBookingRoute,
+    cleanBookingPlace,
+    splitBookingTextIntoSegments,
+    createJourneyFromBookingItem,
+    createStayFromBookingItem
+  };
 }
