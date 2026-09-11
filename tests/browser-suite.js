@@ -442,10 +442,25 @@ async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {
     await page.evaluate(() => {
       window.dismissFileSetup();
       window.openCreateNewTripWizard();
-      // Directly advance to step 1
-      window.tripStartStep = 1;
-      window.renderTripStart();
     });
+
+    // Verify Step 0 fork: City & Dates Only vs Import Existing Flights (Issue #215)
+    assert(await page.getByRole('button', { name: /City & Dates Only/i }).count() >= 1, 'Trip Builder Step 0: should offer City & Dates Only');
+    assert(await page.getByRole('button', { name: /Import Existing Flights/i }).count() >= 1, 'Trip Builder Step 0: should offer Import Existing Flights');
+    reporter.add('onboarding', 'dual-path fork', 'displays City & Dates Only and Import Existing Flights');
+
+    // Test Path B flight import entry & extraction preview
+    await page.getByRole('button', { name: /Import Existing Flights/i }).first().click();
+    await page.waitForSelector('#tripStartFlightRaw');
+    await page.evaluate(() => window.insertSampleFlightConfirmation());
+    await page.waitForSelector('.trip-flight-preview-item');
+    assert(await page.locator('.trip-flight-preview-item').count() >= 2, 'Trip Builder Path B: should extract preview flight cards');
+    reporter.add('onboarding', 'path b flight preview', 'extracts multi-city flight confirmations into preview cards');
+
+    // Return to Step 0 fork and choose Path A
+    await page.getByRole('button', { name: /Back/i }).click();
+    await page.waitForSelector('#trip-start-path-selection');
+    await page.getByRole('button', { name: /City & Dates Only/i }).first().click();
     
     // Step 1: Trip Name
     await page.waitForSelector('#tripStartName');
