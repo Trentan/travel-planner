@@ -6784,6 +6784,70 @@ body.read-only-mode .empty-state-readonly-hint {
 .trip-start-chip.is-selected { border-color: #176e67; background: #dcefe8; color: #125d56; font-weight: 750; }
 [data-theme="dark"] .trip-start-panel { border-color: #315159; background: linear-gradient(145deg, #152b33, #0f2028); color: #edf8f4; }.dark .trip-start-panel { border-color: #315159; background: linear-gradient(145deg, #152b33, #0f2028); color: #edf8f4; }[data-theme="dark"] .trip-start-intro, [data-theme="dark"] .trip-start-question p, [data-theme="dark"] .trip-start-quiet, [data-theme="dark"] .trip-start-number-row span { color: #abc1c7; }[data-theme="dark"] .trip-start-choice, [data-theme="dark"] .trip-start-input, [data-theme="dark"] .trip-start-number-row button, [data-theme="dark"] .trip-start-transport button { border-color: #3a5960; background: #1b343c; color: #e7f4f0; }[data-theme="dark"] .trip-start-choice--primary, [data-theme="dark"] .trip-start-transport button.is-selected { background: #1b4b49; border-color: #3c9d91; }[data-theme="dark"] .trip-start-question label, [data-theme="dark"] .trip-start-transport legend { color: #effbf7; }
 [data-theme="dark"] .trip-start-stop-nights, [data-theme="dark"] .trip-start-stop-row select { border-color: #3a5960; background: #1b343c; color: #e7f4f0; }
+
+/* Dual-Path Trip Builder & Upfront Flight Import (Issue #215) */
+.trip-builder-step-0 { display: flex; flex-direction: column; width: 100%; }
+.trip-path-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.25rem; }
+@media (max-width: 640px) {
+  .trip-path-grid { grid-template-columns: 1fr; gap: 0.85rem; }
+}
+.trip-path-card { display: flex; flex-direction: column; padding: 1.25rem; border: 1.5px solid #cbd5e1; border-radius: 1.15rem; background: rgba(255, 255, 255, 0.85); box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04); cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); text-align: left; }
+.trip-path-card:hover, .trip-path-card:focus-visible { transform: translateY(-3px); border-color: #0d9488; box-shadow: 0 10px 24px rgba(13, 148, 136, 0.14); outline: none; }
+.trip-path-card--flight { border-color: #cbd5e1; }
+.trip-path-card--flight:hover, .trip-path-card--flight:focus-visible { border-color: #0284c7; box-shadow: 0 10px 24px rgba(2, 132, 199, 0.14); }
+
+.trip-path-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+.trip-path-icon { font-size: 1.75rem; line-height: 1; }
+.trip-path-badge { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 0.25rem 0.6rem; border-radius: 999px; }
+.trip-path-badge--explorer { background: #ccfbf1; color: #0f766e; border: 1px solid #99f6e4; }
+.trip-path-badge--flight { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+
+.trip-path-title { font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0 0 0.4rem; font-family: inherit; }
+.trip-path-desc { font-size: 0.86rem; color: #475569; line-height: 1.45; margin: 0 0 1rem; flex-grow: 1; }
+.trip-path-features { list-style: none; padding: 0; margin: 0 0 1.25rem; font-size: 0.8rem; color: #64748b; line-height: 1.6; }
+.trip-path-features li { display: flex; align-items: center; gap: 0.35rem; }
+
+.trip-path-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; width: 100%; padding: 0.7rem 1rem; border-radius: 0.75rem; font-size: 0.9rem; font-weight: 700; border: none; cursor: pointer; transition: background-color 0.15s ease; }
+.trip-path-btn--primary { background: #0f766e; color: #ffffff; }
+.trip-path-btn--primary:hover { background: #115e59; }
+.trip-path-btn--flight { background: #0284c7; color: #ffffff; }
+.trip-path-btn--flight:hover { background: #0369a1; }
+
+.trip-start-textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.88rem !important; line-height: 1.5; resize: vertical; min-height: 8rem; }
+.trip-flight-quick-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.trip-flight-quick-btn { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.35rem 0.65rem; font-size: 0.78rem; font-weight: 600; color: #334155; cursor: pointer; transition: background 0.15s ease; }
+.trip-flight-quick-btn:hover { background: #e2e8f0; }
+.trip-flight-extract-btn { width: 100%; padding: 0.75rem 1rem; border: 1.5px dashed #0284c7; border-radius: 0.75rem; background: #f0f9ff; color: #0369a1; font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.15s ease; }
+.trip-flight-extract-btn:hover { background: #e0f2fe; border-color: #0369a1; }
+
+.trip-flight-preview-container { margin-top: 1.25rem; border: 1px solid #bfdbfe; border-radius: 0.85rem; background: #eff6ff; padding: 0.85rem; }
+.trip-flight-preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem; font-size: 0.85rem; color: #1e3a8a; }
+.trip-flight-count-badge { background: #dbeafe; color: #1d4ed8; font-weight: 700; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 999px; }
+.trip-flight-preview-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 14rem; overflow-y: auto; }
+.trip-flight-preview-item { display: flex; align-items: center; gap: 0.65rem; background: #ffffff; border: 1px solid #dbeafe; border-radius: 0.65rem; padding: 0.6rem 0.75rem; }
+.trip-flight-preview-icon { font-size: 1.25rem; }
+.trip-flight-preview-details { display: flex; flex-direction: column; flex-grow: 1; }
+.trip-flight-preview-title { font-weight: 700; font-size: 0.88rem; color: #0f172a; }
+.trip-flight-preview-meta { font-size: 0.78rem; color: #64748b; margin-top: 0.15rem; }
+
+/* Dark mode overrides */
+[data-theme="dark"] .trip-path-card, .dark .trip-path-card { background: #162631; border-color: #27404d; color: #e2e8f0; }
+[data-theme="dark"] .trip-path-card:hover, .dark .trip-path-card:hover { border-color: #14b8a6; box-shadow: 0 10px 24px rgba(20, 184, 166, 0.18); }
+[data-theme="dark"] .trip-path-card--flight:hover, .dark .trip-path-card--flight:hover { border-color: #38bdf8; box-shadow: 0 10px 24px rgba(56, 189, 248, 0.18); }
+[data-theme="dark"] .trip-path-title, .dark .trip-path-title { color: #f8fafc; }
+[data-theme="dark"] .trip-path-desc, .dark .trip-path-desc { color: #94a3b8; }
+[data-theme="dark"] .trip-path-features, .dark .trip-path-features { color: #64748b; }
+[data-theme="dark"] .trip-flight-quick-btn, .dark .trip-flight-quick-btn { background: #1e293b; border-color: #334155; color: #cbd5e1; }
+[data-theme="dark"] .trip-flight-quick-btn:hover, .dark .trip-flight-quick-btn:hover { background: #334155; }
+[data-theme="dark"] .trip-flight-extract-btn, .dark .trip-flight-extract-btn { background: #0c4a6e; border-color: #0284c7; color: #e0f2fe; }
+[data-theme="dark"] .trip-flight-extract-btn:hover, .dark .trip-flight-extract-btn:hover { background: #075985; }
+[data-theme="dark"] .trip-flight-preview-container, .dark .trip-flight-preview-container { background: #0f172a; border-color: #1e3a8a; }
+[data-theme="dark"] .trip-flight-preview-header, .dark .trip-flight-preview-header { color: #93c5fd; }
+[data-theme="dark"] .trip-flight-count-badge, .dark .trip-flight-count-badge { background: #1e293b; color: #60a5fa; }
+[data-theme="dark"] .trip-flight-preview-item, .dark .trip-flight-preview-item { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .trip-flight-preview-title, .dark .trip-flight-preview-title { color: #f1f5f9; }
+[data-theme="dark"] .trip-flight-preview-meta, .dark .trip-flight-preview-meta { color: #94a3b8; }
+
 .mobile-desktop-advisory { display: flex; align-items: flex-start; gap: .75rem; padding: .85rem 1rem; margin: .75rem 1rem; background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: .75rem; color: #0c4a6e; }
 .mobile-desktop-advisory-icon { font-size: 1.5rem; line-height: 1; }
 .mobile-desktop-advisory-content strong { display: block; font-size: .9rem; font-weight: 700; color: #0369a1; }
