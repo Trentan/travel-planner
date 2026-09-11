@@ -275,41 +275,66 @@ public class GoogleAuth extends Plugin {
     @PluginMethod
     public void refresh(PluginCall call) {
         try {
-            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
-            if (account == null) {
-                call.reject("User not logged in.");
-                return;
+            if (googleSignInClient == null) {
+                ensureClient(null, null);
             }
-
-            executor.execute(() -> {
-                try {
-                    String scopeStr = "oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata profile email";
-                    String authToken = null;
-                    try {
-                        Account androidAccount = account.getAccount();
-                        if (androidAccount != null) {
-                            authToken = GoogleAuthUtil.getToken(getContext(), androidAccount, scopeStr);
-                        } else if (account.getEmail() != null) {
-                            authToken = GoogleAuthUtil.getToken(getContext(), account.getEmail(), scopeStr);
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
+            if (account != null) {
+                resolveAuthWithAccount(call, account);
+            } else if (googleSignInClient != null) {
+                Task<GoogleSignInAccount> silentTask = googleSignInClient.silentSignIn();
+                if (silentTask.isSuccessful() && silentTask.getResult() != null) {
+                    resolveAuthWithAccount(call, silentTask.getResult());
+                } else {
+                    silentTask.addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            resolveAuthWithAccount(call, task.getResult());
+                        } else {
+                            call.reject("Silent sign-in failed or no remembered Google account.", "NO_ACCOUNT");
                         }
-                    } catch (Exception ignored) {}
-
-                    if (authToken == null || authToken.isEmpty()) {
-                        authToken = account.getIdToken();
-                    }
-
-                    JSObject auth = new JSObject();
-                    auth.put("idToken", account.getIdToken());
-                    auth.put(FIELD_ACCESS_TOKEN, authToken != null ? authToken : "");
-                    auth.put("refreshToken", "");
-                    call.resolve(auth);
-                } catch (Exception t) {
-                    call.reject("Failed refreshing token: " + t.getMessage(), t);
+                    });
                 }
-            });
+            } else {
+                call.reject("User not logged in.", "NO_ACCOUNT");
+            }
         } catch (Exception t) {
             call.reject("Refresh error: " + t.getMessage(), t);
         }
+    }
+
+    private void resolveAuthWithAccount(PluginCall call, GoogleSignInAccount account) {
+        executor.execute(() -> {
+            try {
+                String scopeStr = "oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata profile email";
+                String authToken = null;
+                try {
+                    Account androidAccount = account.getAccount();
+                    if (androidAccount != null) {
+                        authToken = GoogleAuthUtil.getToken(getContext(), androidAccount, scopeStr);
+                    } else if (account.getEmail() != null) {
+                        authToken = GoogleAuthUtil.getToken(getContext(), account.getEmail(), scopeStr);
+                    }
+                } catch (Exception ignored) {}
+
+                if (authToken == null || authToken.isEmpty()) {
+                    authToken = account.getIdToken();
+                }
+
+                JSObject auth = new JSObject();
+                auth.put("idToken", account.getIdToken());
+                auth.put(FIELD_ACCESS_TOKEN, authToken != null ? authToken : "");
+                auth.put(FIELD_TOKEN_EXPIRES, 3600 + (System.currentTimeMillis() / 1000));
+                auth.put(FIELD_TOKEN_EXPIRES_IN, 3600);
+                auth.put("refreshToken", "");
+                auth.put("email", account.getEmail());
+                auth.put("displayName", account.getDisplayName());
+                auth.put("name", account.getDisplayName());
+                auth.put("imageUrl", account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : "");
+                call.resolve(auth);
+            } catch (Exception t) {
+                call.reject("Failed refreshing token: " + t.getMessage(), t);
+            }
+        });
     }
 
     @PluginMethod

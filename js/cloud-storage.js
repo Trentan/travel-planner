@@ -36,13 +36,14 @@
     gdriveFolderId = localStorage.getItem('travelApp_gdrive_folder_id') || null;
     userProfile = JSON.parse(localStorage.getItem('travelApp_user_profile') || 'null');
 
-    // Unconditionally purge any legacy mock tokens or mock profile data across all platforms
-    if ((accessToken && accessToken.startsWith('token_')) || (userProfile && (userProfile.email === 'account@google.com' || userProfile.name.includes('Mobile App')))) {
+    // Purge fake mock tokens unless in automated test mode
+    if (!window.__mockGoogleDriveAPI && ((accessToken && accessToken.startsWith('token_') && accessToken !== 'token_mock_123') || (userProfile && userProfile.email === 'account@google.com'))) {
       accessToken = null;
       tokenExpiry = 0;
       gdriveFolderId = null;
       userProfile = null;
       localStorage.removeItem('travelApp_gdrive_connected');
+      localStorage.removeItem('travelApp_gdrive_approved');
       localStorage.removeItem('travelApp_gdrive_token');
       localStorage.removeItem('travelApp_gdrive_token_expiry');
       localStorage.removeItem('travelApp_gdrive_folder_id');
@@ -112,32 +113,95 @@
   }
   window.setGoogleClientId = setGoogleClientId;
 
-  // Check if Google Drive is connected & authorized
+  // Check if Google Drive authorization is remembered (persistent approval across sessions & app updates)
+  function isGoogleDriveApproved() {
+    if (window.__mockGoogleDriveAPI) return true;
+    return localStorage.getItem('travelApp_gdrive_approved') === 'true' || localStorage.getItem('travelApp_gdrive_connected') === 'true';
+  }
+  window.isGoogleDriveApproved = isGoogleDriveApproved;
+
+  // Check if active OAuth token is currently valid and unexpired
+  function isAccessTokenValid() {
+    if (window.__mockGoogleDriveAPI) return true;
+    if (!accessToken) return false;
+    if (accessToken.startsWith('token_')) return true;
+    return Date.now() < tokenExpiry;
+  }
+  window.isAccessTokenValid = isAccessTokenValid;
+
+  // Check if Google Drive is approved and connected
   function isGoogleDriveConnected() {
     if (window.__mockGoogleDriveAPI) return true;
-    const isConnectedFlag = localStorage.getItem('travelApp_gdrive_connected') === 'true';
-    return isConnectedFlag || (!!accessToken && (Date.now() < tokenExpiry || (accessToken && accessToken.startsWith('token_'))));
+    return isGoogleDriveApproved();
   }
   window.isGoogleDriveConnected = isGoogleDriveConnected;
 
-  // Ensure valid active Google OAuth access token (performs silent refresh if expired)
-  async function ensureValidAccessToken() {
-    if (accessToken && Date.now() < tokenExpiry) return accessToken;
-    const isConnectedFlag = localStorage.getItem('travelApp_gdrive_connected') === 'true';
-    if (!isConnectedFlag && !accessToken) return null;
+  // Check if user has approved Google Drive but the short-lived access token needs renewal
+  function needsTokenRenewal() {
+    if (window.__mockGoogleDriveAPI) return false;
+    return isGoogleDriveApproved() && !isAccessTokenValid();
+  }
+  window.needsTokenRenewal = needsTokenRenewal;
 
-    if (window.__mockGoogleDriveAPI || (accessToken && accessToken.startsWith('token_'))) {
+  // Ensure valid active Google OAuth access token (performs silent background refresh if expired)
+  async function ensureValidAccessToken() {
+    if (window.__mockGoogleDriveAPI) {
       return accessToken || 'token_mock_123';
     }
+    if (isAccessTokenValid()) {
+      return accessToken;
+    }
+    if (!isGoogleDriveApproved()) {
+      return null;
+    }
 
+    // 1. Native Platform (Capacitor Android): Call nativeAuthPlugin.refresh() in background
+    if (isNativePlatform()) {
+      const nativeAuthPlugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth;
+      if (nativeAuthPlugin && typeof nativeAuthPlugin.refresh === 'function') {
+        try {
+          console.log('[GoogleAuth Native] Performing silent background token refresh via native plugin...');
+          const authResult = await nativeAuthPlugin.refresh();
+          if (authResult && authResult.accessToken) {
+            accessToken = authResult.accessToken;
+            const expiresIn = parseInt(authResult.expires_in || authResult.expiresIn || '3600', 10);
+            tokenExpiry = Date.now() + (expiresIn * 1000) - 60000;
+            localStorage.setItem('travelApp_gdrive_connected', 'true');
+            localStorage.setItem('travelApp_gdrive_approved', 'true');
+            localStorage.setItem('travelApp_gdrive_token', accessToken);
+            localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
+            if (authResult.email || authResult.displayName) {
+              setUserProfile({
+                name: authResult.displayName || authResult.name || (userProfile && userProfile.name) || 'Google Traveler',
+                email: authResult.email || (userProfile && userProfile.email) || '',
+                picture: authResult.imageUrl || (userProfile && userProfile.picture) || ''
+              });
+            }
+            updateCloudSyncStatusPill();
+            updateCloudSyncModalState();
+            return accessToken;
+          }
+        } catch (nativeErr) {
+          console.warn('[GoogleAuth Native] Silent refresh did not succeed:', nativeErr);
+        }
+      }
+    }
+
+    // 2. Web GIS: Attempt background silent token acquisition
     try {
       console.log('[GoogleDrive Silent Token Refresh] Requesting silent background access token update...');
       const ok = await window.authenticateGoogleDrive(false);
-      if (ok) return accessToken;
+      if (ok && isAccessTokenValid()) {
+        return accessToken;
+      }
     } catch (err) {
       console.warn('Silent Google token refresh attempted:', err);
     }
-    return accessToken;
+
+    // Token requires renewal gesture on Web
+    updateCloudSyncStatusPill();
+    updateCloudSyncModalState();
+    return isAccessTokenValid() ? accessToken : null;
   }
   window.ensureValidAccessToken = ensureValidAccessToken;
 
@@ -207,6 +271,19 @@
 
   // Authenticate with Google Drive via Native GoogleAuth Plugin (Mobile) or Google Identity Services Token Client (Web)
   async function authenticateGoogleDrive(interactive = true) {
+    if (window.__mockGoogleDriveAPI) {
+      accessToken = 'token_mock_123';
+      tokenExpiry = Date.now() + 3600000;
+      setUserProfile({ name: 'Mock Traveler', email: 'mock@example.com', picture: '' });
+      localStorage.setItem('travelApp_gdrive_connected', 'true');
+      localStorage.setItem('travelApp_gdrive_approved', 'true');
+      localStorage.setItem('travelApp_gdrive_token', accessToken);
+      localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
+      updateCloudSyncStatusPill('☁️ Synced to Drive', 'connected');
+      updateCloudSyncModalState();
+      return true;
+    }
+
     const clientId = getGoogleClientId();
 
     const connectBtn = document.getElementById('gdriveConnectBtn');
@@ -238,15 +315,40 @@
       }
     };
 
-    if (interactive) setLoadingUI(true, 'Connecting...');
+    if (interactive) setLoadingUI(true, isGoogleDriveApproved() ? 'Resuming Sync...' : 'Connecting...');
 
     // 1. Check Native Android/iOS GoogleAuth Plugin
-    const isNative = window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform();
+    const isNative = isNativePlatform();
     const nativeAuthPlugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth;
 
-    if (isNative) {
-      if (nativeAuthPlugin && typeof nativeAuthPlugin.signIn === 'function') {
-        try {
+    if (isNative && nativeAuthPlugin) {
+      try {
+        // If not interactive, try native background silent refresh first
+        if (!interactive && typeof nativeAuthPlugin.refresh === 'function') {
+          console.log('[GoogleAuth Native] Background silent token refresh requested...');
+          const authResult = await nativeAuthPlugin.refresh();
+          if (authResult && authResult.accessToken) {
+            accessToken = authResult.accessToken;
+            const expiresIn = parseInt(authResult.expires_in || authResult.expiresIn || '3600', 10);
+            tokenExpiry = Date.now() + (expiresIn * 1000) - 60000;
+            localStorage.setItem('travelApp_gdrive_connected', 'true');
+            localStorage.setItem('travelApp_gdrive_approved', 'true');
+            localStorage.setItem('travelApp_gdrive_token', accessToken);
+            localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
+            if (authResult.email || authResult.displayName) {
+              setUserProfile({
+                name: authResult.displayName || authResult.name || (userProfile && userProfile.name) || 'Google Traveler',
+                email: authResult.email || (userProfile && userProfile.email) || '',
+                picture: authResult.imageUrl || (userProfile && userProfile.picture) || ''
+              });
+            }
+            updateCloudSyncStatusPill('☁️ Synced to Drive', 'connected');
+            updateCloudSyncModalState();
+            return true;
+          }
+        }
+
+        if (typeof nativeAuthPlugin.signIn === 'function') {
           console.log('[GoogleAuth Native] Initializing & launching native Android Google Account picker with client:', PROD_CLIENT_ID);
           if (typeof nativeAuthPlugin.initialize === 'function') {
             try {
@@ -276,6 +378,7 @@
             });
 
             localStorage.setItem('travelApp_gdrive_connected', 'true');
+            localStorage.setItem('travelApp_gdrive_approved', 'true');
             if (accessToken) {
               localStorage.setItem('travelApp_gdrive_token', accessToken);
               localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
@@ -296,26 +399,19 @@
 
             return true;
           }
-        } catch (nativeErr) {
-          console.error('[GoogleAuth Native] Native sign-in error:', nativeErr);
-          setLoadingUI(false);
-          if (String(nativeErr).toLowerCase().includes('cancel') || String(nativeErr).includes('12501')) {
-            return false;
-          }
-          if (typeof showToast === 'function') {
-            showToast(`⚠️ Google Sign-In: ${nativeErr?.message || nativeErr || 'Authentication failed'}`);
-          }
-          return false;
-        } finally {
-          setLoadingUI(false);
         }
-      } else {
-        console.error('[GoogleAuth Native] Native GoogleAuth plugin not available on device.');
+      } catch (nativeErr) {
+        console.error('[GoogleAuth Native] Native sign-in error:', nativeErr);
         setLoadingUI(false);
-        if (typeof showToast === 'function') {
-          showToast('⚠️ Google Sign-In is unavailable on this build.');
+        if (String(nativeErr).toLowerCase().includes('cancel') || String(nativeErr).includes('12501')) {
+          return false;
+        }
+        if (interactive && typeof showToast === 'function') {
+          showToast(`⚠️ Google Sign-In: ${nativeErr?.message || nativeErr || 'Authentication failed'}`);
         }
         return false;
+      } finally {
+        setLoadingUI(false);
       }
     }
 
@@ -323,9 +419,13 @@
     return new Promise((resolve, reject) => {
       const proceedOAuth = () => {
         try {
+          const userHint = (userProfile && userProfile.email) ? userProfile.email : undefined;
+          const isApproved = isGoogleDriveApproved();
+
           const client = google.accounts.oauth2.initTokenClient({
             client_id: clientId,
             scope: DRIVE_SCOPES,
+            hint: userHint,
             callback: async (response) => {
               if (response && response.access_token) {
                 accessToken = response.access_token;
@@ -333,10 +433,11 @@
                 tokenExpiry = Date.now() + (expiresIn * 1000) - 60000;
 
                 localStorage.setItem('travelApp_gdrive_connected', 'true');
+                localStorage.setItem('travelApp_gdrive_approved', 'true');
                 localStorage.setItem('travelApp_gdrive_token', accessToken);
                 localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
 
-                // Fetch User Profile from Google UserInfo API
+                // Fetch User Profile from Google UserInfo API if needed
                 try {
                   const userResp = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                     headers: { 'Authorization': `Bearer ${accessToken}` }
@@ -350,7 +451,7 @@
                     });
                   }
                 } catch (e) {
-                  setUserProfile({ name: 'Google Traveler', email: '', picture: '' });
+                  if (!userProfile) setUserProfile({ name: 'Google Traveler', email: userHint || '', picture: '' });
                 }
 
                 await ensureDriveFolder();
@@ -366,9 +467,17 @@
 
               if (response && response.error) {
                 console.error('Google OAuth Error:', response);
+                // If silent renewal prompt: '' failed with interaction_required, and user initiated interactively, fallback to account select
+                if (response.error === 'interaction_required' && interactive) {
+                  try {
+                    client.requestAccessToken({ prompt: 'select_account', hint: userHint });
+                    return;
+                  } catch (e) {}
+                }
+
                 if (String(response.error).includes('origin') || String(response.error).includes('mismatch')) {
                   showOriginMismatchNotice('origin_mismatch');
-                } else if (interactive) {
+                } else if (interactive && response.error !== 'interaction_required') {
                   alert(`Google OAuth Notice: ${response.error}`);
                 }
                 resolve(false);
@@ -379,14 +488,22 @@
               const errStr = JSON.stringify(err || {});
               if (errStr.includes('origin') || errStr.includes('mismatch') || errStr.includes('400')) {
                 showOriginMismatchNotice('origin_mismatch');
-              } else if (interactive) {
+              } else if (interactive && !errStr.includes('interaction_required')) {
                 showOriginMismatchNotice('origin_mismatch');
               }
               resolve(false);
             }
           });
 
-          client.requestAccessToken({ prompt: interactive ? undefined : '' });
+          // Request access token with optimal prompt strategy:
+          // If already approved, passing prompt: '' and hint skips account chooser & consent!
+          if (!interactive) {
+            client.requestAccessToken({ prompt: '', hint: userHint });
+          } else if (isApproved && userHint) {
+            client.requestAccessToken({ prompt: '', hint: userHint });
+          } else {
+            client.requestAccessToken({ prompt: undefined, hint: userHint });
+          }
         } catch (err) {
           console.error('Failed to launch Google OAuth Client:', err);
           showOriginMismatchNotice('origin_mismatch');
@@ -440,6 +557,7 @@
       accessToken = token;
       tokenExpiry = Date.now() + (expiresIn * 1000) - 60000;
       localStorage.setItem('travelApp_gdrive_connected', 'true');
+      localStorage.setItem('travelApp_gdrive_approved', 'true');
       localStorage.setItem('travelApp_gdrive_token', accessToken);
       localStorage.setItem('travelApp_gdrive_token_expiry', String(tokenExpiry));
 
@@ -477,6 +595,18 @@
   }
   window.processOAuthCallbackFromUrl = processOAuthCallbackFromUrl;
   window.authenticateGoogleDrive = authenticateGoogleDrive;
+
+  // 1-Tap Resume Google Cloud Sync helper
+  window.resumeGoogleCloudSync = async function() {
+    updateCloudSyncStatusPill('⏳ Resuming Sync...', 'syncing');
+    const ok = await window.authenticateGoogleDrive(true);
+    if (ok) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('✅ Cloud sync resumed successfully!');
+      }
+    }
+    return ok;
+  };
 
   function showOriginMismatchNotice(errorType) {
     const notice = document.getElementById('gdriveOriginMismatchNotice');
@@ -516,6 +646,7 @@
     gdriveFolderId = null;
     setUserProfile(null);
     localStorage.removeItem('travelApp_gdrive_connected');
+    localStorage.removeItem('travelApp_gdrive_approved');
     localStorage.removeItem('travelApp_gdrive_token');
     localStorage.removeItem('travelApp_gdrive_token_expiry');
     localStorage.removeItem('travelApp_gdrive_folder_id');
@@ -1210,14 +1341,20 @@
         if (statusText.includes('Synced') || statusText.includes('Loaded')) compactLabel = '☁️ Synced';
         else if (statusText.includes('Syncing') || statusText.includes('Creating') || statusText.includes('Loading') || statusText.includes('Deleting')) compactLabel = '⏳ Syncing...';
         else if (statusText.includes('Local')) compactLabel = '⚡ Local';
-        else if (statusText.includes('Failed') || statusText.includes('Required')) compactLabel = '⚠️ Sync Alert';
+        else if (statusText.includes('Resume') || statusText.includes('Required')) compactLabel = '⚡ Resume Sync';
+        else if (statusText.includes('Failed') || statusText.includes('Alert')) compactLabel = '⚠️ Sync Alert';
 
         pill.innerText = compactLabel;
         pill.title = statusText;
       } else {
         if (isGoogleDriveConnected()) {
-          pill.innerText = '☁️ Synced';
-          pill.title = `Google Drive / ${DRIVE_FOLDER_NAME} (Connected)`;
+          if (isAccessTokenValid()) {
+            pill.innerText = '☁️ Synced';
+            pill.title = `Google Drive / ${DRIVE_FOLDER_NAME} (Connected)`;
+          } else {
+            pill.innerText = '⚡ Resume Sync';
+            pill.title = `Approval remembered for ${userProfile?.email || 'Google'} • Tap to resume cloud sync`;
+          }
         } else {
           pill.innerText = '⚡ Local';
           pill.title = 'Saved locally on this device';
@@ -1227,7 +1364,11 @@
       if (stateClass) {
         pill.className = `cloud-status-pill ${stateClass}`;
       } else if (isGoogleDriveConnected()) {
-        pill.className = 'cloud-status-pill connected';
+        if (isAccessTokenValid()) {
+          pill.className = 'cloud-status-pill connected';
+        } else {
+          pill.className = 'cloud-status-pill warning';
+        }
       } else {
         pill.className = 'cloud-status-pill disconnected';
       }
@@ -1248,7 +1389,8 @@
   };
 
   function updateCloudSyncModalState(cloudFiles = null) {
-    const isConnected = isGoogleDriveConnected();
+    const isApproved = isGoogleDriveApproved();
+    const tokenValid = isAccessTokenValid();
     const profile = getUserProfile();
 
     const statusText = document.getElementById('gdriveModalStatusText');
@@ -1261,12 +1403,16 @@
     const folderUrl = getGoogleDriveFolderUrl();
 
     if (profileCard) {
-      if (isConnected && profile) {
+      if (isApproved && profile) {
         profileCard.style.display = 'flex';
         const hasPicture = isSafeUrl(profile.picture);
         const avatarHtml = hasPicture
           ? `<img src="${escapeHtml(profile.picture.trim())}" class="w-full h-full object-cover">`
           : (profile.name ? escapeHtml(profile.name.charAt(0).toUpperCase()) : '👤');
+
+        const badgeHtml = tokenValid
+          ? `<div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-0.5">🟢 Connected to Google Drive / ${DRIVE_FOLDER_NAME}</div>`
+          : `<div class="text-[11px] text-amber-600 dark:text-amber-400 font-medium pt-0.5 flex items-center gap-1.5"><span>🟡 Approval Remembered</span> • <button type="button" class="font-bold underline text-amber-700 dark:text-amber-300 hover:text-amber-800" onclick="window.resumeGoogleCloudSync()">Resume Sync (1-Tap)</button></div>`;
 
         profileCard.innerHTML = `
           <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
@@ -1275,7 +1421,7 @@
           <div class="flex-1 min-w-0">
             <div class="font-bold text-slate-800 dark:text-white truncate text-sm">${escapeHtml(profile.name || 'Signed In')}</div>
             <div class="text-xs text-slate-500 dark:text-slate-400 truncate">${escapeHtml(profile.email || '')}</div>
-            <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-0.5">🟢 Connected to Google Drive / ${DRIVE_FOLDER_NAME}</div>
+            ${badgeHtml}
           </div>
         `;
       } else {
@@ -1284,7 +1430,7 @@
     }
 
     if (folderLinkContainer) {
-      if (isConnected && isSafeUrl(folderUrl)) {
+      if (isApproved && isSafeUrl(folderUrl)) {
         folderLinkContainer.style.display = 'block';
         folderLinkContainer.innerHTML = `
           <a href="${escapeHtml(folderUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline bg-blue-50 dark:bg-blue-950/50 px-3.5 py-2 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors">
@@ -1298,12 +1444,16 @@
     }
 
     if (statusText) {
-      statusText.innerHTML = isConnected
-        ? `Your account is active. All trip itineraries automatically sync to <code>.json</code> files inside your <strong>Google Drive / ${DRIVE_FOLDER_NAME}</strong> folder.`
-        : `Sign in with Google to automatically back up and sync your itineraries into a dedicated <strong>Google Drive / ${DRIVE_FOLDER_NAME}</strong> folder across all your devices.`;
+      if (isApproved && tokenValid) {
+        statusText.innerHTML = `Your account is active. All trip itineraries automatically sync to <code>.json</code> files inside your <strong>Google Drive / ${DRIVE_FOLDER_NAME}</strong> folder.`;
+      } else if (isApproved && !tokenValid) {
+        statusText.innerHTML = `Google authorization is <strong>remembered</strong> for <strong>${escapeHtml(profile?.email || 'your account')}</strong>. Tap <strong>Resume Cloud Sync</strong> to instantly refresh your session.`;
+      } else {
+        statusText.innerHTML = `Sign in with Google to automatically back up and sync your itineraries into a dedicated <strong>Google Drive / ${DRIVE_FOLDER_NAME}</strong> folder across all your devices.`;
+      }
     }
 
-    if (fileListContainer && isConnected && Array.isArray(cloudFiles) && cloudFiles.length > 0) {
+    if (fileListContainer && isApproved && Array.isArray(cloudFiles) && cloudFiles.length > 0) {
       fileListContainer.style.display = 'block';
       const activeTripId = typeof window.getActiveTripId === 'function' ? window.getActiveTripId() : '';
       const fileMap = getGDriveFileMap();
@@ -1351,8 +1501,31 @@
       fileListContainer.style.display = 'none';
     }
 
-    if (connectBtn) connectBtn.style.display = isConnected ? 'none' : 'inline-flex';
-    if (disconnectBtn) disconnectBtn.style.display = isConnected ? 'inline-flex' : 'none';
+    if (connectBtn) {
+      if (isApproved && tokenValid) {
+        connectBtn.style.display = 'none';
+      } else if (isApproved && !tokenValid) {
+        connectBtn.style.display = 'inline-flex';
+        connectBtn.innerHTML = `
+          <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span>Resume Cloud Sync</span>
+        `;
+        connectBtn.title = 'Approval remembered • Tap to renew session with Google';
+        connectBtn.onclick = () => window.resumeGoogleCloudSync();
+      } else {
+        connectBtn.style.display = 'inline-flex';
+        connectBtn.innerHTML = `
+          <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span>Sign in with Google</span>
+        `;
+        connectBtn.title = 'Sign in with your Google Account';
+        connectBtn.onclick = () => window.authenticateGoogleDrive(true);
+      }
+    }
+
+    if (disconnectBtn) {
+      disconnectBtn.style.display = isApproved ? 'inline-flex' : 'none';
+    }
 
     const activeIdLabel = document.getElementById('gdriveActiveClientIdLabel');
     if (activeIdLabel) {
@@ -1411,9 +1584,13 @@
   // Initialize Cloud Sync & Background Heartbeat Loop on load
   window.addEventListener('DOMContentLoaded', () => {
     processOAuthCallbackFromUrl();
-    setTimeout(() => {
+    setTimeout(async () => {
       updateCloudSyncStatusPill();
       if (isGoogleDriveConnected()) {
+        // If native, silently refresh token on startup to ensure zero interruption across app updates
+        if (isNativePlatform() && !isAccessTokenValid()) {
+          await ensureValidAccessToken();
+        }
         window.syncAllTripsFromGoogleDrive();
         startBackgroundSyncLoop();
       }
