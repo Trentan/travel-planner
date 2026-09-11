@@ -11,8 +11,8 @@
       window.navigator.standalone === true ||
       (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
       (window.matchMedia && window.matchMedia('(display-mode: fullscreen)').matches) ||
-      !!window.Capacitor ||
-      !!window.isCapacitorNative
+      Boolean(window.Capacitor) ||
+      Boolean(window.isCapacitorNative)
     );
   }
 

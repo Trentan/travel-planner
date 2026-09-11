@@ -24,11 +24,11 @@ async function run() {
   const combinedCode = `
     const document = window.document;
     ${transportCode}
-    return { calculateJourneyDuration };
+    return { calculateJourneyDuration, scoreJourneyForDay, getDayJourneys };
   `;
 
   const evalFn = new Function('window', 'localStorage', combinedCode);
-  const { calculateJourneyDuration } = evalFn(windowMock, windowMock.localStorage);
+  const { calculateJourneyDuration, scoreJourneyForDay, getDayJourneys } = evalFn(windowMock, windowMock.localStorage);
 
   // 1. Edge cases: null, undefined, empty array
   assert(calculateJourneyDuration(null) === null, 'null segments should return null');
@@ -148,7 +148,37 @@ async function run() {
     '3-day multi-day journey (78 hours total) should return 78 hours'
   );
 
-  console.log('✅ ALL CALCULATE JOURNEY DURATION UNIT TESTS PASSED CLEANLY!');
+  // 10. scoreJourneyForDay unit tests
+  assert(scoreJourneyForDay(null, 'Paris', 'leg1', '2026-06-15') === 0, 'null journey score should be 0');
+  assert(scoreJourneyForDay({}, 'Paris', 'leg1', '2026-06-15') === 0, 'empty journey score should be 0');
+  assert(
+    scoreJourneyForDay({ toLocation: 'Paris', legId: 'leg1', departureDate: '2026-06-15' }, 'Paris', 'leg1', '2026-06-15') === 5,
+    'full match (toLocation, legId, departureDate) score should be 2 + 2 + 1 = 5'
+  );
+  assert(
+    scoreJourneyForDay({ toLocation: 'Paris', legId: 'leg2', departureDate: '2026-06-16' }, 'Paris', 'leg1', '2026-06-15') === 2,
+    'only toLocation match score should be 2'
+  );
+  assert(
+    scoreJourneyForDay({ toLocation: 'London', legId: 'leg1', departureDate: '2026-06-16' }, 'Paris', 'leg1', '2026-06-15') === 2,
+    'only legId match score should be 2'
+  );
+  assert(
+    scoreJourneyForDay({ toLocation: 'London', legId: 'leg2', departureDate: '2026-06-15' }, 'Paris', 'leg1', '2026-06-15') === 1,
+    'only departureDate match score should be 1'
+  );
+
+  // 11. getDayJourneys score-based selection tests
+  windowMock.journeys = [
+    { id: 'j1', journeyId: 'grp1', fromLocation: 'London', toLocation: 'Rome', legId: 'leg1', departureDate: '2026-06-15' },
+    { id: 'j2', journeyId: 'grp1', fromLocation: 'London', toLocation: 'Paris', legId: 'leg1', departureDate: '2026-06-15' }
+  ];
+
+  const res1 = getDayJourneys('2026-06-15', 'London', 'Paris', 'leg1');
+  assert(res1.length === 1, 'getDayJourneys should return 1 journey segment for grp1');
+  assert(res1[0].id === 'j2', 'j2 should be selected over j1 because j2 has matching toLocation (score 5 vs 3)');
+
+  console.log('✅ ALL CALCULATE JOURNEY DURATION AND SCORE LOGIC UNIT TESTS PASSED CLEANLY!');
 }
 
 if (require.main === module) {
