@@ -33,28 +33,15 @@ function getCountryFlagEmoji(countryCode) {
 window.getCountryFlagEmoji = getCountryFlagEmoji;
 
 function deepClone(obj) {
-  if (obj === null || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) {
-    const len = obj.length;
-    const copy = new Array(len);
-    for (let i = 0; i < len; i++) {
-      copy[i] = deepClone(obj[i]);
-    }
-    return copy;
-  }
-  if (obj.constructor && obj.constructor.name !== 'Object') {
-    if (typeof structuredClone === 'function') {
-      try { return structuredClone(obj); } catch (e) {}
-    }
-    return JSON.parse(JSON.stringify(obj));
-  }
-  const copy = {};
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      copy[key] = deepClone(obj[key]);
+  if (obj === null || obj === undefined) return obj;
+  if (typeof structuredClone === 'function') {
+    try {
+      return structuredClone(obj);
+    } catch (e) {
+      // Fallback to JSON clone if structuredClone fails
     }
   }
-  return copy;
+  return JSON.parse(JSON.stringify(obj));
 }
 window.deepClone = deepClone;
 
