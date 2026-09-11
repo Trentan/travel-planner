@@ -23,8 +23,6 @@
           // Pass isSilent = true so status pill does not flicker
           window.syncAllTripsFromGoogleDrive(true).then(() => {
             window.renderHeaderTripSwitcher();
-          }).catch(err => {
-            console.warn('Failed to sync trips from Google Drive in dropdown:', err);
           });
         }
       }

@@ -32,6 +32,70 @@ function getCountryFlagEmoji(countryCode) {
 }
 window.getCountryFlagEmoji = getCountryFlagEmoji;
 
+function deepClone(obj) {
+  if (obj === null || obj === undefined) return obj;
+  const type = typeof obj;
+  if (type === 'number') {
+    return Number.isFinite(obj) ? obj : null;
+  }
+  if (type === 'boolean' || type === 'string') {
+    return obj;
+  }
+  if (type === 'function' || type === 'symbol') {
+    return undefined;
+  }
+  if (obj instanceof Date) {
+    return obj.toJSON();
+  }
+  if (Array.isArray(obj)) {
+    const len = obj.length;
+    const copy = new Array(len);
+    for (let i = 0; i < len; i++) {
+      const item = obj[i];
+      const itemType = typeof item;
+      if (itemType === 'function' || itemType === 'symbol' || item === undefined) {
+        copy[i] = null;
+      } else if (itemType === 'number') {
+        copy[i] = Number.isFinite(item) ? item : null;
+      } else if (item instanceof Date) {
+        copy[i] = item.toJSON();
+      } else if (item !== null && typeof item === 'object') {
+        copy[i] = deepClone(item);
+      } else {
+        copy[i] = item;
+      }
+    }
+    return copy;
+  }
+  if (typeof obj === 'object') {
+    if (obj.constructor && obj.constructor.name !== 'Object') {
+      return JSON.parse(JSON.stringify(obj));
+    }
+    const copy = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const val = obj[key];
+        const valType = typeof val;
+        if (val === undefined || valType === 'function' || valType === 'symbol') {
+          continue;
+        }
+        if (valType === 'number') {
+          copy[key] = Number.isFinite(val) ? val : null;
+        } else if (val instanceof Date) {
+          copy[key] = val.toJSON();
+        } else if (val !== null && typeof val === 'object') {
+          copy[key] = deepClone(val);
+        } else {
+          copy[key] = val;
+        }
+      }
+    }
+    return copy;
+  }
+  return JSON.parse(JSON.stringify(obj));
+}
+window.deepClone = deepClone;
+
 // Open IndexedDB
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -985,16 +1049,16 @@ function configureFileActionButtons() {
 
 function getCurrentAppData() {
   let journeysData = [];
-  if (typeof journeys !== 'undefined') journeysData = normalizeTripJourneysData(JSON.parse(JSON.stringify(journeys)));
+  if (typeof journeys !== 'undefined') journeysData = normalizeTripJourneysData(deepClone(journeys));
   let staysData = [];
-  if (typeof stays !== 'undefined') staysData = normalizeTripStaysData(JSON.parse(JSON.stringify(stays)));
+  if (typeof stays !== 'undefined') staysData = normalizeTripStaysData(deepClone(stays));
   let citiesDataToExport = [];
-  if (typeof citiesData !== 'undefined') citiesDataToExport = normalizeTripCitiesDateData(JSON.parse(JSON.stringify(citiesData)));
+  if (typeof citiesData !== 'undefined') citiesDataToExport = normalizeTripCitiesDateData(deepClone(citiesData));
   let userCitiesData = [];
   if (typeof userCities !== 'undefined') userCitiesData = userCities;
   let userCountriesData = [];
   if (typeof userCountries !== 'undefined') userCountriesData = userCountries;
-  const itineraryData = normalizeTripLegsData(JSON.parse(JSON.stringify(appData)));
+  const itineraryData = normalizeTripLegsData(deepClone(appData));
   return {
     meta: titleData,
     itinerary: itineraryData,
@@ -1010,7 +1074,7 @@ function getCurrentAppData() {
 }
 
 function cloneHistorySnapshot() {
-  return JSON.parse(JSON.stringify(getCurrentAppData()));
+  return deepClone(getCurrentAppData());
 }
 
 function getHistorySnapshotSignature(snapshot) {
@@ -1091,16 +1155,16 @@ function restoreHistorySnapshot(snapshot) {
   historyRestoreInProgress = true;
 
   try {
-    titleData = JSON.parse(JSON.stringify(snapshot.meta || titleData));
-    appData = normalizeTripLegsData(JSON.parse(JSON.stringify(snapshot.itinerary || [])));
+    titleData = deepClone(snapshot.meta || titleData);
+    appData = normalizeTripLegsData(deepClone(snapshot.itinerary || []));
     packingData = ensureDefaultPackingAreas(snapshot.packing || []);
-    leaveHomeData = JSON.parse(JSON.stringify(snapshot.leaveHome || []));
-    hotelCheckoutData = JSON.parse(JSON.stringify(snapshot.hotelCheckout || []));
-    journeys = normalizeTripJourneysData(JSON.parse(JSON.stringify(snapshot.journeys || [])));
-    stays = normalizeTripStaysData(JSON.parse(JSON.stringify(snapshot.stays || [])));
-    citiesData = normalizeTripCitiesDateData(JSON.parse(JSON.stringify(snapshot.cities || [])));
-    userCities = JSON.parse(JSON.stringify(snapshot.userCities || []));
-    userCountries = JSON.parse(JSON.stringify(snapshot.userCountries || []));
+    leaveHomeData = deepClone(snapshot.leaveHome || []);
+    hotelCheckoutData = deepClone(snapshot.hotelCheckout || []);
+    journeys = normalizeTripJourneysData(deepClone(snapshot.journeys || []));
+    stays = normalizeTripStaysData(deepClone(snapshot.stays || []));
+    citiesData = normalizeTripCitiesDateData(deepClone(snapshot.cities || []));
+    userCities = deepClone(snapshot.userCities || []);
+    userCountries = deepClone(snapshot.userCountries || []);
 
     window.journeys = journeys;
     window.stays = stays;
@@ -1864,7 +1928,7 @@ function normalizeCityLocationData(city) {
   return city;
 }
 
-function resolveCityLocationLocal(city) {
+async function resolveCityLocation(city) {
   if (!city || !city.name) return null;
 
   let dbMatch = null;
@@ -1887,9 +1951,6 @@ function resolveCityLocationLocal(city) {
       dbMatch = candidates[0];
     }
   }
-  if (!dbMatch) {
-    dbMatch = getCityLocationDatabaseMatch(city);
-  }
 
   if (dbMatch && dbMatch.lat !== undefined && dbMatch.lng !== undefined) {
     return {
@@ -1900,15 +1961,6 @@ function resolveCityLocationLocal(city) {
       icaoCode: dbMatch.icaoCode || dbMatch.icao || ''
     };
   }
-
-  return null;
-}
-
-async function resolveCityLocation(city) {
-  if (!city || !city.name) return null;
-
-  const localMatch = resolveCityLocationLocal(city);
-  if (localMatch) return localMatch;
 
   const onlineMatch = await searchCityOnline(city.name, city.countryCode || '', city.country || '');
   if (!onlineMatch) return null;
@@ -2126,44 +2178,15 @@ async function fetchAllMissingCityLocations() {
   }
 
   let foundCount = 0;
-  const onlineCities = [];
-
-  // Phase 1: Fast local resolution for cities matching local database/aliases
   for (let i = 0; i < missingCities.length; i++) {
     const city = missingCities[i];
-    const localResult = resolveCityLocationLocal(city);
-    if (localResult && applyCityLocation(city, localResult)) {
-      foundCount++;
-    } else {
-      onlineCities.push(city);
-    }
-    if (btn) {
-      btn.textContent = `Finding ${foundCount}/${missingCities.length}...`;
-    }
-  }
+    if (btn) btn.textContent = `Finding ${i + 1}/${missingCities.length}...`;
 
-  // Phase 2: Sequential rate-limited geocoding for remaining online cities
-  for (let i = 0; i < onlineCities.length; i++) {
-    const city = onlineCities[i];
-    if (btn) {
-      btn.textContent = `Finding ${foundCount + 1}/${missingCities.length}...`;
-    }
+    const hadLocalCoords = ALL_CITIES_HAS_COORDS_SET.has((city.name || '').toLowerCase());
+    const result = await resolveCityLocation(city);
+    if (result && applyCityLocation(city, result)) foundCount++;
 
-    const onlineMatch = await searchCityOnline(city.name, city.countryCode || '', city.country || '');
-    if (onlineMatch) {
-      const result = {
-        lat: onlineMatch.lat,
-        lng: onlineMatch.lng,
-        countryCode: onlineMatch.countryCode || city.countryCode || '',
-        code: '',
-        icaoCode: ''
-      };
-      if (applyCityLocation(city, result)) {
-        foundCount++;
-      }
-    }
-
-    if (i < onlineCities.length - 1) {
+    if (!hadLocalCoords && i < missingCities.length - 1) {
       await new Promise(resolve => setTimeout(resolve, 1100));
     }
   }
@@ -4062,37 +4085,38 @@ function normalizeTripLegsData(legs) {
           }
         }
 
-        // Single pass for title-based priorities (Priority 2, 3, 4) if ID match failed
+        // Priority 2: Match by title and already assigned to this day
         if (matchIdx === -1) {
-          let p2Idx = -1;
-          let p3Idx = -1;
-          let p4Idx = -1;
-
           for (let i = 0; i < suggested.length; i++) {
             if (usedSuggestionIndices.has(i)) continue;
             const act = suggested[i];
-            if (!act) continue;
-
-            const isSameDay = act.assignedDayIdx === dayIdx;
-            const isUnassigned = act.assignedDayIdx === null || act.assignedDayIdx === undefined;
-
-            if (isSameDay) {
-              if (isItemMatchingActivity(text, act)) {
-                p2Idx = i;
-                break; // Highest priority title match found!
-              }
-            } else if (p3Idx === -1 && isUnassigned) {
-              if (isItemMatchingActivity(text, act)) {
-                p3Idx = i;
-              }
-            } else if (p3Idx === -1 && p4Idx === -1) {
-              if (isItemMatchingActivity(text, act)) {
-                p4Idx = i;
-              }
+            if (act && act.assignedDayIdx === dayIdx && isItemMatchingActivity(text, act)) {
+              matchIdx = i;
+              break;
             }
           }
-
-          matchIdx = p2Idx !== -1 ? p2Idx : (p3Idx !== -1 ? p3Idx : p4Idx);
+        }
+        // Priority 3: Match by title and unassigned (or assigned to another day - prefer unassigned)
+        if (matchIdx === -1) {
+          for (let i = 0; i < suggested.length; i++) {
+            if (usedSuggestionIndices.has(i)) continue;
+            const act = suggested[i];
+            if (act && (act.assignedDayIdx === null || act.assignedDayIdx === undefined) && isItemMatchingActivity(text, act)) {
+              matchIdx = i;
+              break;
+            }
+          }
+        }
+        // Priority 4: Match by title even if assigned to another day (e.g. duplicate or newly scheduled)
+        if (matchIdx === -1) {
+          for (let i = 0; i < suggested.length; i++) {
+            if (usedSuggestionIndices.has(i)) continue;
+            const act = suggested[i];
+            if (act && isItemMatchingActivity(text, act)) {
+              matchIdx = i;
+              break;
+            }
+          }
         }
 
         if (matchIdx !== -1) {
@@ -4859,7 +4883,7 @@ function getIntermediateJourneyCities(journeysData) {
 const SHARE_APP_URL = 'https://trentan.github.io/travel-planner/';
 
 function cloneExportValue(value) {
-  return JSON.parse(JSON.stringify(value ?? null));
+  return deepClone(value ?? null);
 }
 
 function getDownloadName(baseName, fallbackName, suffix, extension) {
@@ -5721,10 +5745,7 @@ function buildExportDailyTimelineItems(leg, day, legIdx, dayIdx, journeysData = 
   });
 
   (day.activityItems || []).forEach((item, itemIdx) => {
-    let time = 'Anytime';
-    if (item.startTime) {
-      time = item.endTime ? `${item.startTime}-${item.endTime}` : item.startTime;
-    }
+    const time = item.startTime ? `${item.startTime}${item.endTime ? `-${item.endTime}` : ''}` : 'Anytime';
     timelineItems.push({
       sortValue: getExportTimelineScore(dayDate, item.startTime, 4000 + itemIdx),
       text: [time, `Activity: ${formatTextValue(item.text)}`, item.time ? `Duration ${formatTextValue(item.time)}` : '', item.cost ? formatSummaryMoney(item.cost) : ''].filter(Boolean).join(' | ')
