@@ -7224,6 +7224,8 @@ async function createTripFromFlightBookings() {
     }
   });
   window.stays = stays;
+  window.citiesData = citiesData;
+  window.appData = appData;
 
   // Title and subtitle
   const totalNights = destinationStops.reduce((sum, s) => sum + s.nights, 0);
@@ -7974,6 +7976,7 @@ window.addTripStartStop = addTripStartStop;
 window.removeTripStartStop = removeTripStartStop;
 window.updateTripStartStop = updateTripStartStop;
 window.selectTripStartPath = selectTripStartPath;
+window.renderTripStart = renderTripStart;
 window.renderTripStartPathChoice = renderTripStartPathChoice;
 window.renderTripStartFlightImport = renderTripStartFlightImport;
 window.extractTripStartFlights = extractTripStartFlights;

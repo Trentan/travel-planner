@@ -25,11 +25,13 @@ const { run: runTransportDurationSuite } = require('./transport-duration.test');
 const { run: runTransitConnectorsSuite } = require('./transit-connectors-layover.test');
 const { runLegManagementWysiwygSuite } = require('./leg-management-wysiwyg.test');
 const { runGoogleAuthRenewalTests } = require('./google-auth-renewal.test');
+const { runDualPathWizardSuite } = require('./dual-path-wizard.test');
 
 async function run() {
   await runCloudStorageXssTests();
   await runTripLibraryXssTests();
   if (typeof runGoogleAuthRenewalTests === 'function') await runGoogleAuthRenewalTests();
+  if (typeof runDualPathWizardSuite === 'function') await runDualPathWizardSuite();
   if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();
   if (typeof runParseCurrencyAmountTests === 'function') await runParseCurrencyAmountTests();
   if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
