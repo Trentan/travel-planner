@@ -119,14 +119,7 @@ function evaluateLayoverBuffer(bufferMinutes, itemA = {}, itemB = {}) {
     const absMins = Math.abs(mins);
     const hrs = Math.floor(absMins / 60);
     const m = absMins % 60;
-    let str;
-    if (hrs > 0 && m > 0) {
-      str = `${hrs}h ${m}m`;
-    } else if (hrs > 0) {
-      str = `${hrs}h`;
-    } else {
-      str = `${m}m`;
-    }
+    let str = hrs > 0 ? (m > 0 ? `${hrs}h ${m}m` : `${hrs}h`) : `${m}m`;
     return mins < 0 ? `-${str}` : str;
   };
 
@@ -567,14 +560,6 @@ function buildJourneyName(segments) {
   return `${startCity} → ${endCity} (via ${viaText})`;
 }
 
-// Calculate match score for a journey segment against current day/leg context
-function scoreJourneyForDay(journey, toLoc, legId, dayDate) {
-  if (!journey) return 0;
-  return (journey.toLocation === toLoc ? 2 : 0) +
-         (journey.legId === legId ? 2 : 0) +
-         (journey.departureDate === dayDate ? 1 : 0);
-}
-
 // Get journeys for a specific day (for itinerary view)
 function getDayJourneys(dayDate, fromLoc, toLoc, legId = '') {
   // Check window.journeys as fallback if local journeys is undefined
@@ -605,8 +590,8 @@ function getDayJourneys(dayDate, fromLoc, toLoc, legId = '') {
         results.push(j);
       } else {
         // If there's already a matching segment for this journey, let's see if this one is a better match for the current day/leg!
-        const currentScore = scoreJourneyForDay(existing, toLoc, legId, dayDate);
-        const newScore = scoreJourneyForDay(j, toLoc, legId, dayDate);
+        const currentScore = (existing.toLocation === toLoc ? 2 : 0) + (existing.legId === legId ? 2 : 0) + (existing.departureDate === dayDate ? 1 : 0);
+        const newScore = (j.toLocation === toLoc ? 2 : 0) + (j.legId === legId ? 2 : 0) + (j.departureDate === dayDate ? 1 : 0);
         if (newScore > currentScore) {
           const idx = results.indexOf(existing);
           if (idx !== -1) {
@@ -625,17 +610,8 @@ function findJourney(id) {
 }
 
 function findJourneySegments(journeyId) {
-  if (!journeyId) return [];
-  const directMatches = journeys.filter(j => j.journeyId === journeyId || j.id === journeyId);
-  if (directMatches.length === 0) return [];
-
-  const relatedJourneyIds = new Set(directMatches.map(j => j.journeyId).filter(Boolean));
-  if (relatedJourneyIds.size === 0) {
-    return directMatches.sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
-  }
-
   return journeys
-      .filter(j => (j.journeyId && relatedJourneyIds.has(j.journeyId)) || j.id === journeyId)
+      .filter(j => j.journeyId === journeyId)
       .sort((a, b) => (a.segmentOrder || 1) - (b.segmentOrder || 1));
 }
 
@@ -1642,19 +1618,10 @@ function toggleJourneyStatus(journeyId) { if (!window.isEditMode) return;
 let _pendingSegments = [];
 let _pendingJourneyId = null;
 let _pendingJourneyName = ''; // Track the name when editing
-let _pendingOriginalSegmentIds = [];
-let _pendingOriginalJourneyIds = [];
 
 function _syncJourneyModalActions() {
   const deleteBtn = document.getElementById('journeyDeleteBtn');
-  const origSegIds = new Set(_pendingOriginalSegmentIds || []);
-  const origJntIds = new Set(_pendingOriginalJourneyIds || []);
-  if (_pendingJourneyId) origJntIds.add(_pendingJourneyId);
-
-  const isExistingJourney = journeys.some(j =>
-      (j.journeyId && origJntIds.has(j.journeyId)) ||
-      (j.id && (origSegIds.has(j.id) || origJntIds.has(j.id)))
-  );
+  const isExistingJourney = _pendingJourneyId ? journeys.some(j => j.journeyId === _pendingJourneyId) : false;
   if (deleteBtn) deleteBtn.style.display = isExistingJourney ? 'inline-flex' : 'none';
 }
 
@@ -1671,8 +1638,6 @@ function editJourney(journeyId) {
 
   _pendingJourneyId = journeyId;
   _pendingJourneyName = segmentsCopy[0].journeyName || '';
-  _pendingOriginalSegmentIds = segs.map(s => s.id).filter(Boolean);
-  _pendingOriginalJourneyIds = Array.from(new Set(segs.map(s => s.journeyId).concat(journeyId).filter(Boolean)));
   _populateJourneyCityDropdowns();
 
   // Multi-leg: all segments go into array, first one loaded into form for editing
@@ -1863,8 +1828,6 @@ function openAddJourneyModal() {
     _pendingJourneyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
     _pendingSegments = [];
     _pendingJourneyName = ''; // Reset name
-    _pendingOriginalSegmentIds = [];
-    _pendingOriginalJourneyIds = [];
     _activeSegmentIndex = -1;
     
     if (typeof window._currentAttachments !== 'undefined') {
@@ -2065,30 +2028,24 @@ function closeJourneyModal() {
   _pendingSegments = [];
   _pendingJourneyId = null;
   _pendingJourneyName = '';
-  _pendingOriginalSegmentIds = [];
-  _pendingOriginalJourneyIds = [];
   _journeyFormDirty = false;
   _syncJourneyModalActions();
 }
 
 function deleteJourneyFromModal() {
-  if (!_pendingJourneyId && (!_pendingOriginalJourneyIds || _pendingOriginalJourneyIds.length === 0)) return;
+  if (!_pendingJourneyId) return;
   if (!confirm('Delete this journey?')) return;
-
-  const origSegIds = new Set(_pendingOriginalSegmentIds || []);
-  const origJntIds = new Set(_pendingOriginalJourneyIds || []);
-  if (_pendingJourneyId) origJntIds.add(_pendingJourneyId);
-
-  journeys = journeys.filter(j => {
-    if (j.id && origSegIds.has(j.id)) return false;
-    if (j.journeyId && origJntIds.has(j.journeyId)) return false;
-    if (j.id && origJntIds.has(j.id)) return false;
-    return true;
-  });
-
-  window.journeys = journeys;
-  persistJourneys();
-  if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+  const journeyId = _pendingJourneyId;
+  const hasGroup = journeys.some(j => j.journeyId === journeyId);
+  if (hasGroup) {
+    deleteJourneyGroup(journeyId);
+  } else {
+    const pendingIds = new Set(_pendingSegments.map(seg => seg.id).filter(Boolean));
+    journeys = journeys.filter(j => !pendingIds.has(j.id));
+    window.journeys = journeys;
+    persistJourneys();
+    if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+  }
   closeJourneyModal();
 }
 
@@ -2128,17 +2085,8 @@ function saveJourneyFromModal() {
       seg.status = status; // Keep status in sync across all segments of the journey!
     });
 
-    // EDIT FIX: Remove old segments matching this journey before saving
-    const origSegIds = new Set(_pendingOriginalSegmentIds || []);
-    const origJntIds = new Set(_pendingOriginalJourneyIds || []);
-    if (_pendingJourneyId) origJntIds.add(_pendingJourneyId);
-
-    journeys = journeys.filter(j => {
-      if (j.id && origSegIds.has(j.id)) return false;
-      if (j.journeyId && origJntIds.has(j.journeyId)) return false;
-      if (j.id && origJntIds.has(j.id)) return false;
-      return true;
-    });
+    // EDIT FIX: Remove old segments matching this journeyId or id before saving
+    journeys = journeys.filter(j => j.journeyId !== _pendingJourneyId && j.id !== _pendingJourneyId);
 
     journeys.push(...finalSegments);
     window.journeys = journeys;
@@ -2154,7 +2102,6 @@ function saveJourneyFromModal() {
 // Expose to window
 window.calculateLayoverBuffer = calculateLayoverBuffer;
 window.evaluateLayoverBuffer = evaluateLayoverBuffer;
-window.scoreJourneyForDay = scoreJourneyForDay;
 window.getLocationDisplayWithCode = getLocationDisplayWithCode;
 window.getLocationCodeDisplay = getLocationCodeDisplay;
 window.buildRouteChainWithCodes = buildRouteChainWithCodes;

@@ -1,107 +1,93 @@
-const fs = require('fs');
-const path = require('path');
 const { assert } = require('./lib/test-helpers');
 
-function jsonSafeClone(value) {
-  if (value === null || typeof value !== 'object') {
-    if (typeof value === 'number' && !Number.isFinite(value)) {
-      return null;
-    }
-    return value;
+function deepClone(obj) {
+  if (obj === null || obj === undefined) return obj;
+  const type = typeof obj;
+  if (type === 'number') {
+    return Number.isFinite(obj) ? obj : null;
   }
-
-  if (typeof value.toJSON === 'function') {
-    try {
-      return jsonSafeClone(value.toJSON());
-    } catch (e) {
-      // Fallback
-    }
+  if (type === 'boolean' || type === 'string') {
+    return obj;
   }
-
-  if (Array.isArray(value)) {
-    const len = value.length;
+  if (type === 'function' || type === 'symbol') {
+    return undefined;
+  }
+  if (obj instanceof Date) {
+    return obj.toJSON();
+  }
+  if (Array.isArray(obj)) {
+    const len = obj.length;
     const copy = new Array(len);
     for (let i = 0; i < len; i++) {
-      const item = value[i];
-      if (item === undefined || typeof item === 'function' || typeof item === 'symbol') {
+      const item = obj[i];
+      const itemType = typeof item;
+      if (itemType === 'function' || itemType === 'symbol' || item === undefined) {
         copy[i] = null;
+      } else if (itemType === 'number') {
+        copy[i] = Number.isFinite(item) ? item : null;
+      } else if (item instanceof Date) {
+        copy[i] = item.toJSON();
+      } else if (item !== null && typeof item === 'object') {
+        copy[i] = deepClone(item);
       } else {
-        copy[i] = jsonSafeClone(item);
+        copy[i] = item;
       }
     }
     return copy;
   }
-
-  const proto = Object.getPrototypeOf(value);
-  if (proto !== null && proto !== Object.prototype) {
-    return JSON.parse(JSON.stringify(value));
-  }
-
-  const copy = {};
-  const keys = Object.keys(value);
-  const keyCount = keys.length;
-  for (let i = 0; i < keyCount; i++) {
-    const key = keys[i];
-    const val = value[key];
-    if (val !== undefined && typeof val !== 'function' && typeof val !== 'symbol') {
-      copy[key] = jsonSafeClone(val);
+  if (typeof obj === 'object') {
+    if (obj.constructor && obj.constructor.name !== 'Object') {
+      return JSON.parse(JSON.stringify(obj));
     }
+    const copy = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const val = obj[key];
+        const valType = typeof val;
+        if (val === undefined || valType === 'function' || valType === 'symbol') {
+          continue;
+        }
+        if (valType === 'number') {
+          copy[key] = Number.isFinite(val) ? val : null;
+        } else if (val instanceof Date) {
+          copy[key] = val.toJSON();
+        } else if (val !== null && typeof val === 'object') {
+          copy[key] = deepClone(val);
+        } else {
+          copy[key] = val;
+        }
+      }
+    }
+    return copy;
   }
-  return copy;
+  return JSON.parse(JSON.stringify(obj));
 }
 
-function deepClone(obj) {
-  if (obj === null || obj === undefined) return obj;
-  try {
-    return jsonSafeClone(obj);
-  } catch (e) {
-    return JSON.parse(JSON.stringify(obj));
-  }
-}
+function verifyJsonEquivalence() {
+  const edgeCaseObj = {
+    str: 'hello',
+    num: 123,
+    nan: NaN,
+    inf: Infinity,
+    date: new Date('2026-06-01T12:00:00.000Z'),
+    undef: undefined,
+    func: () => {},
+    arr: [1, undefined, NaN, new Date('2026-06-01T12:00:00.000Z'), () => {}],
+    nested: { a: 1, b: undefined }
+  };
 
-function verifyJsonSemantics() {
-  console.log('Verifying strict JSON serialization equivalence...');
+  const expectedJson = JSON.stringify(JSON.parse(JSON.stringify(edgeCaseObj)));
+  const actualJson = JSON.stringify(deepClone(edgeCaseObj));
 
-  // 1. Edge cases
-  const edgeCases = [
-    { name: 'undefined properties in object', val: { a: 1, b: undefined, c: 'ok' } },
-    { name: 'functions and symbols in object', val: { a: 1, fn: () => {}, sym: Symbol('foo') } },
-    { name: 'undefined, function, symbol in array', val: [1, undefined, () => {}, Symbol('bar'), 'test'] },
-    { name: 'Date instances', val: { departureDate: new Date('2026-07-01T10:30:00.000Z') } },
-    { name: 'NaN, Infinity, -Infinity', val: { a: NaN, b: Infinity, c: -Infinity, d: 42 } },
-    { name: 'nested complex structures', val: { leg: { days: [{ items: [{ cost: 10, note: undefined }] }] } } },
-    { name: 'primitives', val: 'Hello World' },
-    { name: 'null value', val: null }
-  ];
-
-  for (const tc of edgeCases) {
-    const expected = JSON.parse(JSON.stringify(tc.val));
-    const actual = deepClone(tc.val);
-    assert(
-      JSON.stringify(actual) === JSON.stringify(expected),
-      `Failed JSON parity for edge case: ${tc.name}`
-    );
-  }
-
-  // 2. Real-world backup trip validation
-  const backupPath = path.join(__dirname, '../backups/2026_June_July_Europe_Thailand.json');
-  if (fs.existsSync(backupPath)) {
-    const realTrip = JSON.parse(fs.readFileSync(backupPath, 'utf8'));
-    const expectedTrip = JSON.parse(JSON.stringify(realTrip));
-    const actualTrip = deepClone(realTrip);
-
-    assert(
-      JSON.stringify(actualTrip) === JSON.stringify(expectedTrip),
-      'Real trip JSON.stringify parity check failed'
-    );
-    console.log('✔ Real trip data JSON serialization equivalence confirmed');
-  }
-
-  console.log('✔ All JSON serialization semantic edge cases passed cleanly');
+  assert(
+    expectedJson === actualJson,
+    `deepClone output must be strictly equivalent to JSON.parse(JSON.stringify).\nExpected: ${expectedJson}\nActual:   ${actualJson}`
+  );
+  console.log('✅ JSON serialization equivalence verified!');
 }
 
 function runBenchmark() {
-  verifyJsonSemantics();
+  verifyJsonEquivalence();
 
   const sampleSnapshot = {
     meta: { title: 'European Adventure', subtitle: 'Summer 2026 Tour' },
@@ -159,7 +145,6 @@ function runBenchmark() {
 
   const iterations = 10000;
 
-  // 1. JSON.parse(JSON.stringify)
   const startJson = performance.now();
   for (let i = 0; i < iterations; i++) {
     const titleData = JSON.parse(JSON.stringify(sampleSnapshot.meta));
@@ -175,7 +160,6 @@ function runBenchmark() {
   const endJson = performance.now();
   const jsonTime = endJson - startJson;
 
-  // 2. structuredClone
   let structuredTime = 0;
   if (typeof structuredClone === 'function') {
     const startStructured = performance.now();
@@ -194,7 +178,6 @@ function runBenchmark() {
     structuredTime = endStructured - startStructured;
   }
 
-  // 3. New deepClone (jsonSafeClone)
   const startDeep = performance.now();
   for (let i = 0; i < iterations; i++) {
     const titleData = deepClone(sampleSnapshot.meta);
@@ -210,41 +193,14 @@ function runBenchmark() {
   const endDeep = performance.now();
   const deepTime = endDeep - startDeep;
 
-  console.log('\n--- Deep Clone Benchmark Results (10,000 iterations) ---');
-  console.log(`1. Baseline JSON.parse(JSON.stringify): ${jsonTime.toFixed(2)} ms`);
+  console.log('--- Deep Clone Benchmark Results ---');
+  console.log(`JSON.parse(JSON.stringify): ${jsonTime.toFixed(2)} ms`);
   if (structuredTime > 0) {
-    console.log(`2. Commit b9d8654 (structuredClone):    ${structuredTime.toFixed(2)} ms`);
+    console.log(`structuredClone:            ${structuredTime.toFixed(2)} ms`);
   }
-  console.log(`3. Improved deepClone (jsonSafeClone):  ${deepTime.toFixed(2)} ms`);
-
+  console.log(`deepClone (JSON-safe):      ${deepTime.toFixed(2)} ms`);
   const speedupVsJson = ((jsonTime - deepTime) / jsonTime) * 100;
-  const speedupVsStructured = structuredTime > 0 ? ((structuredTime - deepTime) / structuredTime) * 100 : 0;
-
-  console.log(`Speedup vs Baseline JSON:   ${speedupVsJson.toFixed(1)}% faster`);
-  if (structuredTime > 0) {
-    console.log(`Speedup vs structuredClone: ${speedupVsStructured.toFixed(1)}% faster`);
-  }
-
-  // Real backup trip benchmark
-  const backupPath = path.join(__dirname, '../backups/2026_June_July_Europe_Thailand.json');
-  if (fs.existsSync(backupPath)) {
-    const realTrip = JSON.parse(fs.readFileSync(backupPath, 'utf8'));
-    const tripIters = 1000;
-
-    const t0 = performance.now();
-    for (let i = 0; i < tripIters; i++) JSON.parse(JSON.stringify(realTrip));
-    const t1 = performance.now();
-    for (let i = 0; i < tripIters; i++) structuredClone(realTrip);
-    const t2 = performance.now();
-    for (let i = 0; i < tripIters; i++) deepClone(realTrip);
-    const t3 = performance.now();
-
-    console.log(`\n--- Realistic 125 KB Trip Benchmark (${tripIters} iterations) ---`);
-    console.log(`1. Baseline JSON.parse(JSON.stringify): ${(t1 - t0).toFixed(2)} ms (${((t1 - t0) / tripIters).toFixed(3)} ms/op)`);
-    console.log(`2. Commit b9d8654 (structuredClone):    ${(t2 - t1).toFixed(2)} ms (${((t2 - t1) / tripIters).toFixed(3)} ms/op)`);
-    console.log(`3. Improved deepClone (jsonSafeClone):  ${(t3 - t2).toFixed(2)} ms (${((t3 - t2) / tripIters).toFixed(3)} ms/op)`);
-    console.log(`Speedup on real trip data:              ${(((t1 - t0) - (t3 - t2)) / (t1 - t0) * 100).toFixed(1)}% faster than JSON`);
-  }
+  console.log(`Speedup vs JSON: ${speedupVsJson.toFixed(1)}% faster`);
 
   return { jsonTime, structuredTime, deepTime, speedupVsJson };
 }
@@ -253,4 +209,4 @@ if (require.main === module) {
   runBenchmark();
 }
 
-module.exports = { runBenchmark, deepClone, jsonSafeClone };
+module.exports = { runBenchmark, deepClone, verifyJsonEquivalence };

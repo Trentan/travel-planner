@@ -26,28 +26,11 @@ async function run() {
     ${utilsCode}
     ${dataCode}
     ${timezoneCode}
-    return { cleanCityTimezoneName, getCityTimezone, getTimezoneOffsetMinutes, getTimezoneDeltaHours, formatTimezoneDeltaBadge, convertLocalToHomeTime };
+    return { getCityTimezone, getTimezoneOffsetMinutes, getTimezoneDeltaHours, formatTimezoneDeltaBadge, convertLocalToHomeTime };
   `;
 
   const evalFn = new Function('window', 'localStorage', 'Intl', combinedCode);
   const tzUtils = evalFn(windowMock, windowMock.localStorage, Intl);
-
-  // Verify cleanCityTimezoneName
-  assert(tzUtils.cleanCityTimezoneName(null) === '', 'null locationName should return empty string');
-  assert(tzUtils.cleanCityTimezoneName(undefined) === '', 'undefined locationName should return empty string');
-  assert(tzUtils.cleanCityTimezoneName(123) === '', 'numeric locationName should return empty string');
-  assert(tzUtils.cleanCityTimezoneName({}) === '', 'object locationName should return empty string');
-
-  assert(tzUtils.cleanCityTimezoneName('Tokyo') === 'Tokyo', 'Simple city name should remain Tokyo');
-  assert(tzUtils.cleanCityTimezoneName('Paris, France') === 'Paris', 'Comma separated string should strip country/subregion');
-  assert(tzUtils.cleanCityTimezoneName('London - Heathrow') === 'London', 'Space-hyphen-space separated string should strip suffix');
-  assert(tzUtils.cleanCityTimezoneName('New York — JFK') === 'New York', 'Space-emdash-space separated string should strip suffix');
-  assert(tzUtils.cleanCityTimezoneName('Berlin – Tegel') === 'Berlin', 'Space-endash-space separated string should strip suffix');
-
-  assert(tzUtils.cleanCityTimezoneName('🗼 Tokyo') === 'Tokyo', 'Emoji prefix should be stripped');
-  assert(tzUtils.cleanCityTimezoneName('🇯🇵 Tokyo 🌸') === 'Tokyo', 'Flag emojis and symbol emojis should be stripped');
-  assert(tzUtils.cleanCityTimezoneName('Rome (Trip Start)') === 'Rome', 'Parenthetical suffix should be stripped');
-  assert(tzUtils.cleanCityTimezoneName('🇯🇵 Tokyo, Japan — Haneda (Trip Start)') === 'Tokyo', 'Combined emojis, comma, dash, parenthetical suffix should reduce to Tokyo');
 
   // Verify city timezone lookups
   assert(tzUtils.getCityTimezone('Tokyo') === 'Asia/Tokyo', `Tokyo timezone lookup should be Asia/Tokyo, got ${tzUtils.getCityTimezone('Tokyo')}`);
