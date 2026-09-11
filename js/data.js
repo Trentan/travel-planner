@@ -6510,8 +6510,22 @@ let tripStartAnswers = {
   pacing: 'balanced',
   interests: ['food', 'culture'],
   bookedItems: [],
-  notes: ''
+  notes: '',
+  planningPath: 'cities',
+  flightRawText: '',
+  extractedBookings: []
 };
+
+function selectTripStartPath(path) {
+  tripStartAnswers.planningPath = path;
+  if (path === 'cities') {
+    tripStartStep = 1;
+    renderTripStart();
+  } else if (path === 'flights') {
+    tripStartStep = 'flight_import';
+    renderTripStart();
+  }
+}
 
 async function selectTripStartSaveLocation(type) {
   captureTripStartAnswer();
@@ -6643,9 +6657,628 @@ function handleTripStartStopCityTyping(index, inputEl, countrySelectId) {
   }
 }
 
+function renderTripStartPathChoice() {
+  const container = document.getElementById('trip-start-content');
+  if (!container) return;
+
+  const back = `<button class="trip-start-back" type="button" onclick="previousTripStartStep()">Back</button>`;
+
+  container.innerHTML = `
+    <div id="trip-start-path-selection" class="trip-builder-step-0" data-step="0" data-testid="trip-builder-step-0">
+      <div class="trip-start-progress">
+        <span>Trip Builder</span>
+        <span>Choose Path</span>
+      </div>
+      <div class="trip-start-question">
+        <div class="trip-start-eyebrow">CHOOSE YOUR PLANNING PATH</div>
+        <h2 id="trip-start-title" style="margin-top: 0.35rem;">How would you like to build your trip?</h2>
+        <p class="trip-start-intro" style="margin-bottom: 1.5rem;">
+          Whether starting from scratch with flexible ideas or anchoring your route around confirmed flight bookings, Trenscends structures your itinerary effortlessly.
+        </p>
+
+        <div class="trip-path-grid">
+          <!-- Path A: City & Dates Explorer -->
+          <div class="trip-path-card" onclick="selectTripStartPath('cities')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectTripStartPath('cities')">
+            <div class="trip-path-header">
+              <span class="trip-path-icon">🗺️</span>
+              <span class="trip-path-badge trip-path-badge--explorer">Path A · Explorer</span>
+            </div>
+            <h3 class="trip-path-title">City & Dates Only</h3>
+            <p class="trip-path-desc">
+              Start with destinations, durations, and travel style. We’ll generate starter activities, pacing, and food recommendations.
+            </p>
+            <ul class="trip-path-features">
+              <li>✓ Flexible destinations & night counts</li>
+              <li>✓ Curated starter sights & dining ideas</li>
+              <li>✓ Customized travel pacing & party size</li>
+            </ul>
+            <button type="button" class="trip-path-btn trip-path-btn--primary" onclick="event.stopPropagation(); selectTripStartPath('cities')">
+              City & Dates Only <span aria-hidden="true">→</span>
+            </button>
+          </div>
+
+          <!-- Path B: Booked Flights First -->
+          <div class="trip-path-card trip-path-card--flight" onclick="selectTripStartPath('flights')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectTripStartPath('flights')">
+            <div class="trip-path-header">
+              <span class="trip-path-icon">✈️</span>
+              <span class="trip-path-badge trip-path-badge--flight">Path B · Transport First</span>
+            </div>
+            <h3 class="trip-path-title">Import Existing Flights</h3>
+            <p class="trip-path-desc">
+              Already booked? Paste your flight or transit confirmations upfront to auto-extract junctions, dates, and destination stops.
+            </p>
+            <ul class="trip-path-features">
+              <li>✓ Auto-extracts flight numbers & PNR codes</li>
+              <li>✓ Automatically computes stay nights</li>
+              <li>✓ Anchors itinerary skeleton around flights</li>
+            </ul>
+            <button type="button" class="trip-path-btn trip-path-btn--flight" onclick="event.stopPropagation(); selectTripStartPath('flights')">
+              Import Existing Flights <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="trip-start-actions" style="margin-top: 1.5rem;">
+        ${back}
+        <button class="trip-start-quiet" type="button" onclick="dismissTripStart()" style="margin: 0; width: auto;">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+
+function insertSampleFlightConfirmation() {
+  const sampleText = `Qantas Booking Reference: QF92B1
+Flight QF1 from Sydney to London
+Departure: 2026-06-01 14:00
+Arrival: 2026-06-02 06:30
+
+British Airways Booking Reference: BA44A2
+Flight BA304 from London to Paris
+Departure: 2026-06-06 09:15
+Arrival: 2026-06-06 11:30
+
+Air France Booking Reference: AF188X
+Flight AF218 from Paris to Sydney
+Departure: 2026-06-15 18:30
+Arrival: 2026-06-16 20:45`;
+
+  tripStartAnswers.flightRawText = sampleText;
+  const textarea = document.getElementById('tripStartFlightRaw');
+  if (textarea) textarea.value = sampleText;
+  extractTripStartFlights();
+}
+
+function extractTripStartFlights() {
+  const textEl = document.getElementById('tripStartFlightRaw');
+  const text = (textEl ? textEl.value : tripStartAnswers.flightRawText) || '';
+  if (!text.trim()) {
+    showToast('Paste flight confirmation text to extract details.');
+    return;
+  }
+  tripStartAnswers.flightRawText = text;
+  
+  const parseFn = typeof parseBookingConfirmationText === 'function'
+    ? parseBookingConfirmationText
+    : (typeof window !== 'undefined' && typeof window.parseBookingConfirmationText === 'function'
+      ? window.parseBookingConfirmationText
+      : null);
+
+  if (!parseFn) {
+    showToast('Booking parser is not available.');
+    return;
+  }
+
+  const items = parseFn(text, 'Imported Flight Confirmation');
+  tripStartAnswers.extractedBookings = items;
+  
+  const journeysCount = items.filter(i => i.kind === 'journey').length;
+  if (journeysCount > 0) {
+    showToast(`✓ Extracted ${journeysCount} flight/transit leg${journeysCount === 1 ? '' : 's'}!`);
+  } else {
+    showToast('No flight or transit details detected. Check your text and try again.');
+  }
+  renderTripStart();
+}
+
+async function handleTripStartFlightFileUpload(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    tripStartAnswers.flightRawText = [tripStartAnswers.flightRawText, text].filter(Boolean).join('\n\n');
+    const textarea = document.getElementById('tripStartFlightRaw');
+    if (textarea) textarea.value = tripStartAnswers.flightRawText;
+    extractTripStartFlights();
+  } catch (err) {
+    showToast('Could not read file. Please paste text directly.');
+  }
+}
+
+function renderTripStartFlightImport() {
+  const container = document.getElementById('trip-start-content');
+  if (!container) return;
+
+  const back = `<button class="trip-start-back" type="button" onclick="previousTripStartStep()">Back</button>`;
+  const extracted = tripStartAnswers.extractedBookings || [];
+  const journeyItems = extracted.filter(i => i.kind === 'journey');
+  const stayItems = extracted.filter(i => i.kind === 'stay');
+
+  const previewCardsHtml = extracted.length ? `
+    <div class="trip-flight-preview-container">
+      <div class="trip-flight-preview-header">
+        <strong>Extracted Bookings (${extracted.length})</strong>
+        <span class="trip-flight-count-badge">${journeyItems.length} Transport Leg${journeyItems.length === 1 ? '' : 's'}${stayItems.length ? `, ${stayItems.length} Stay${stayItems.length === 1 ? '' : 's'}` : ''}</span>
+      </div>
+      <div class="trip-flight-preview-list">
+        ${extracted.map((item, idx) => {
+          const isJourney = item.kind === 'journey';
+          const icon = isJourney ? (item.transportType === 'train' ? '🚆' : '✈️') : (item.kind === 'stay' ? '🏨' : '🎟️');
+          const title = isJourney ? `${item.fromLocation || 'Origin'} → ${item.toLocation || 'Destination'}` : (item.propertyName || item.title);
+          const metaParts = [];
+          if (isJourney) {
+            if (item.departureDate) metaParts.push(`Depart: ${item.departureDate}${item.departureTime ? ' ' + item.departureTime : ''}`);
+            if (item.arrivalDate && item.arrivalDate !== item.departureDate) metaParts.push(`Arrive: ${item.arrivalDate}${item.arrivalTime ? ' ' + item.arrivalTime : ''}`);
+            if (item.routeCode) metaParts.push(`Flight/Code: ${item.routeCode}`);
+            if (item.bookingReference) metaParts.push(`PNR: ${item.bookingReference}`);
+          } else if (item.kind === 'stay') {
+            if (item.checkIn) metaParts.push(`Check-in: ${item.checkIn}`);
+            if (item.checkOut) metaParts.push(`Check-out: ${item.checkOut}`);
+            if (item.city) metaParts.push(`City: ${item.city}`);
+          }
+          return `
+            <div class="trip-flight-preview-item">
+              <span class="trip-flight-preview-icon">${icon}</span>
+              <div class="trip-flight-preview-details">
+                <div class="trip-flight-preview-title">${escapeTripStartText(title)}</div>
+                <div class="trip-flight-preview-meta">${escapeTripStartText(metaParts.join(' · '))}</div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  const partyOptions = [
+    ['solo', '👤 Solo'],
+    ['couple', '👥 Couple'],
+    ['family', '👨‍👩‍👧 Family'],
+    ['friends', '🍻 Friends']
+  ];
+  const partyBtns = partyOptions.map(([val, label]) => `
+    <button type="button" class="trip-start-chip ${tripStartAnswers.party === val ? 'is-selected' : ''}" onclick="selectTripStartParty('${val}')">${label}</button>
+  `).join('');
+
+  const interestOptions = [
+    ['food', '🍽️ Food & Dining'],
+    ['culture', '🏛️ History & Culture'],
+    ['nature', '🌲 Nature & Outdoors'],
+    ['relaxation', '🏖️ Relaxation']
+  ];
+  const interestChips = interestOptions.map(([val, label]) => `
+    <button type="button" class="trip-start-chip ${tripStartAnswers.interests.includes(val) ? 'is-selected' : ''}" onclick="toggleTripStartInterest('${val}')">${label}</button>
+  `).join('');
+
+  container.innerHTML = `
+    <div class="trip-start-progress">
+      <span>Path B: Booked Flights First</span>
+      <span>Step 1 of 1</span>
+    </div>
+    <div class="trip-start-question">
+      <div class="trip-start-eyebrow">UPFRONT FLIGHT & TRANSIT INTAKE</div>
+      <h2 id="trip-start-title">Import your booked flights & transit</h2>
+      <p class="trip-start-intro">
+        Paste your flight tickets, booking confirmations, or e-tickets below. We'll automatically extract junctions, dates, and destination cities.
+      </p>
+
+      <label for="tripStartFlightName">Trip Name (Optional)</label>
+      <input id="tripStartFlightName" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Europe & Asia Explorer (or auto-generated)" value="${escapeTripStartText(tripStartAnswers.name)}" oninput="tripStartAnswers.name=this.value.trim()">
+
+      <label for="tripStartFlightOrigin" style="margin-top: 1rem;">Starting Home City (Optional)</label>
+      <input id="tripStartFlightOrigin" class="trip-start-input" maxlength="80" autocomplete="off" placeholder="e.g. Sydney or Brisbane (defaults to first departure)" value="${escapeTripStartText(tripStartAnswers.origin)}" oninput="tripStartAnswers.origin=this.value.trim()">
+
+      <label for="tripStartFlightRaw" style="margin-top: 1rem;">Paste Flight or Transit Confirmation Text</label>
+      <textarea id="tripStartFlightRaw" class="trip-start-input trip-start-textarea" rows="6" placeholder="Paste booking confirmation email, e-ticket, or flight itinerary text here...&#10;&#10;Example:&#10;Flight QF1 from Sydney to London&#10;Departure: 2026-06-01 14:00&#10;Arrival: 2026-06-02 06:30&#10;Booking reference: ABC123&#10;&#10;Flight BA304 from London to Paris&#10;Departure: 2026-06-06 09:15&#10;Arrival: 2026-06-06 11:30&#10;Booking reference: DEF456" oninput="tripStartAnswers.flightRawText=this.value">${escapeTripStartText(tripStartAnswers.flightRawText || '')}</textarea>
+
+      <div class="trip-flight-quick-bar">
+        <button type="button" class="trip-flight-quick-btn" onclick="insertSampleFlightConfirmation()">📋 Paste sample multi-city flights</button>
+        <button type="button" class="trip-flight-quick-btn" onclick="document.getElementById('tripStartFlightFileInput').click()">📂 Load text file</button>
+        <input type="file" id="tripStartFlightFileInput" accept=".txt,.json,.eml" style="display:none;" onchange="handleTripStartFlightFileUpload(event)">
+      </div>
+
+      <div style="margin-top: 1rem;">
+        <button type="button" class="trip-flight-extract-btn" onclick="extractTripStartFlights()">✦ Extract Flights & Preview Itinerary</button>
+      </div>
+
+      ${previewCardsHtml}
+
+      <label style="margin-top: 1.25rem;">Who is traveling?</label>
+      <div class="trip-start-chip-group">${partyBtns}</div>
+
+      <label style="margin-top: 1.25rem;">Travel interests for starter activities</label>
+      <div class="trip-start-chip-group">${interestChips}</div>
+    </div>
+
+    <div class="trip-start-actions">
+      ${back}
+      <button class="trip-start-primary" type="button" onclick="createTripFromFlightBookings()">
+        Create my trip from bookings <span aria-hidden="true">→</span>
+      </button>
+    </div>
+    <button class="trip-start-quiet" type="button" onclick="dismissTripStart()">Finish this later</button>
+  `;
+}
+
+async function createTripFromFlightBookings() {
+  const nameEl = document.getElementById('tripStartFlightName');
+  if (nameEl) tripStartAnswers.name = nameEl.value.trim();
+  const originEl = document.getElementById('tripStartFlightOrigin');
+  if (originEl) tripStartAnswers.origin = originEl.value.trim();
+
+  const textEl = document.getElementById('tripStartFlightRaw');
+  const text = (textEl ? textEl.value : tripStartAnswers.flightRawText) || '';
+  tripStartAnswers.flightRawText = text;
+
+  let items = tripStartAnswers.extractedBookings || [];
+  if (!items.length && text.trim()) {
+    const parseFn = typeof parseBookingConfirmationText === 'function' ? parseBookingConfirmationText : (typeof window !== 'undefined' ? window.parseBookingConfirmationText : null);
+    if (parseFn) {
+      items = parseFn(text, 'Imported Flight Confirmation');
+      tripStartAnswers.extractedBookings = items;
+    }
+  }
+
+  const journeyItems = items.filter(i => i.kind === 'journey' && (i.fromLocation || i.toLocation));
+  if (!journeyItems.length) {
+    showToast('Please paste valid flight confirmation text and extract flights first.');
+    return;
+  }
+
+  // Sort journeys chronologically by departureDate and departureTime
+  journeyItems.sort((a, b) => {
+    const dateA = a.departureDate || '';
+    const dateB = b.departureDate || '';
+    if (dateA !== dateB) return dateA.localeCompare(dateB);
+    return (a.departureTime || '').localeCompare(b.departureTime || '');
+  });
+
+  const originName = tripStartAnswers.origin || journeyItems[0].fromLocation || 'Home';
+  
+  // Find destination sequence:
+  // If the last flight heads back to originName, treat that as return travel
+  const hasReturnToOrigin = journeyItems.length > 1 &&
+    journeyItems[journeyItems.length - 1].toLocation.toLowerCase() === originName.toLowerCase();
+
+  const activeJourneys = hasReturnToOrigin ? journeyItems.slice(0, journeyItems.length - 1) : journeyItems;
+  const returnJourney = hasReturnToOrigin ? journeyItems[journeyItems.length - 1] : null;
+
+  // Build destination stops
+  const destinationStops = [];
+  for (let i = 0; i < activeJourneys.length; i++) {
+    const j = activeJourneys[i];
+    const destCity = j.toLocation;
+    const arrDate = j.arrivalDate || j.departureDate;
+    
+    // Departure from this city is the departure date of the next journey
+    let depDate = '';
+    if (i < activeJourneys.length - 1) {
+      depDate = activeJourneys[i + 1].departureDate;
+    } else if (returnJourney) {
+      depDate = returnJourney.departureDate;
+    }
+
+    let nights = 3;
+    if (arrDate && depDate) {
+      const d1 = new Date(`${arrDate}T12:00:00`);
+      const d2 = new Date(`${depDate}T12:00:00`);
+      const diffDays = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+      nights = Math.max(1, Math.min(60, diffDays));
+    }
+
+    destinationStops.push({
+      city: destCity,
+      dateFrom: arrDate,
+      dateTo: depDate || arrDate,
+      nights,
+      transport: j.transportType || 'flight',
+      incomingJourney: j
+    });
+  }
+
+  // Look up cities in ALL_CITIES / CITY_DATABASE
+  const cityByName = new Map();
+  if (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) {
+    for (let i = 0; i < ALL_CITIES.length; i++) {
+      const c = ALL_CITIES[i];
+      if (!c || !c.name) continue;
+      const lower = c.name.toLowerCase();
+      if (!cityByName.has(lower)) cityByName.set(lower, c);
+    }
+  }
+
+  citiesData = destinationStops.map((stop, index) => {
+    const cityNameLower = stop.city.toLowerCase();
+    const dbMatch = cityByName.get(cityNameLower) || (typeof findFuzzyCityCandidate === 'function' ? findFuzzyCityCandidate(cityNameLower)?.candidate : null) || null;
+    const countryCode = dbMatch?.countryCode || 'ZZ';
+    const cityId = `city-${Date.now()}-${index}`;
+    const city = {
+      id: cityId,
+      name: dbMatch ? dbMatch.name : stop.city,
+      code: dbMatch?.code || '',
+      icaoCode: dbMatch?.icaoCode || dbMatch?.icao || '',
+      countryCode,
+      country: typeof getCountryName === 'function' ? getCountryName(countryCode) : (dbMatch?.country || ''),
+      dateFrom: stop.dateFrom,
+      dateTo: stop.dateTo,
+      colour: CITY_COLORS[index % CITY_COLORS.length]
+    };
+    if (dbMatch && dbMatch.lat !== undefined && dbMatch.lng !== undefined) {
+      city.lat = dbMatch.lat;
+      city.lng = dbMatch.lng;
+    }
+    return city;
+  });
+
+  // Build starter activities helper
+  const starterContent = (cityId, cityName) => {
+    const foodItems = [
+      { text: `Find a local breakfast spot in ${cityName}`, done: false, cityId }
+    ];
+    if (tripStartAnswers.interests.includes('food')) {
+      foodItems.push({ text: `Sample iconic local specialty & street food in ${cityName}`, done: false, cityId });
+      foodItems.push({ text: `Explore ${cityName} central food market or night dining alley`, done: false, cityId });
+    }
+    const tips = [
+      { text: `Save your ${cityName} accommodation address & offline map access.`, cityId },
+      { text: `Check transit pass options and local currency requirements in ${cityName}.`, cityId }
+    ];
+    const activities = [
+      { id: `activity-${cityId}-walk`, title: `Explore ${cityName} historic center & neighborhood streets`, category: 'sight', estTime: '2 hrs', estCost: '0', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId }
+    ];
+    if (tripStartAnswers.interests.includes('culture')) {
+      activities.push({ id: `activity-${cityId}-culture`, title: `Visit top landmark museum / historic site in ${cityName}`, category: 'sight', estTime: '3 hrs', estCost: 'TBC', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId });
+    }
+    if (tripStartAnswers.interests.includes('nature')) {
+      activities.push({ id: `activity-${cityId}-nature`, title: `Stroll through ${cityName} central park or scenic viewpoint`, category: 'fitness', estTime: '2 hrs', estCost: '0', assignedDayIdx: null, assignedDate: '', startDate: '', endDate: '', startTime: '', endTime: '', cityId });
+    }
+    return { cityFood: foodItems, legTips: tips, suggestedActivities: activities };
+  };
+
+  // Build appData legs
+  appData = [];
+  const firstDepDate = journeyItems[0].departureDate || '';
+  appData.push({
+    id: `leg-start-${Date.now()}`,
+    label: `🏠 Start (${originName})`,
+    cityId: 'city-home',
+    colour: '#2C3E50',
+    cityFood: [],
+    suggestedActivities: [],
+    legTips: [],
+    days: [{
+      id: `day-start-${Date.now()}`,
+      date: firstDepDate,
+      day: 'Travel Day',
+      from: originName,
+      to: citiesData[0]?.name || '',
+      completed: false,
+      desc: `Depart from ${originName}`,
+      transportItems: [], accomItems: [], activityItems: []
+    }]
+  });
+
+  const destinationLegs = destinationStops.map((stop, index) => {
+    const city = citiesData[index];
+    const content = starterContent(city.id, city.name);
+    const startDateObj = new Date(`${stop.dateFrom}T12:00:00`);
+    const hasValidStart = !isNaN(startDateObj.getTime());
+    
+    const days = Array.from({ length: stop.nights }, (_, dayIdx) => {
+      const dayDate = hasValidStart
+        ? new Date(startDateObj.getTime() + dayIdx * 86400000).toISOString().slice(0, 10)
+        : '';
+      return {
+        id: `day-${Date.now()}-${index}-${dayIdx}`,
+        date: dayDate,
+        day: `Day ${dayIdx + 1}`,
+        from: city.name,
+        to: city.name,
+        completed: false,
+        desc: '',
+        transportItems: [], accomItems: [], activityItems: []
+      };
+    });
+    return {
+      id: `leg-${Date.now()}-${index}`,
+      label: city.name,
+      cityId: city.id,
+      colour: city.colour,
+      ...content,
+      days
+    };
+  });
+  appData.push(...destinationLegs);
+
+  if (returnJourney) {
+    const retDepDate = returnJourney.departureDate || '';
+    const lastCityName = citiesData[citiesData.length - 1]?.name || '';
+    appData.push({
+      id: `leg-return-${Date.now()}`,
+      label: `🏡 Return (${originName})`,
+      cityId: 'city-home',
+      colour: '#2C3E50',
+      cityFood: [],
+      suggestedActivities: [],
+      legTips: [],
+      days: [{
+        id: `day-return-${Date.now()}`,
+        date: retDepDate,
+        day: 'Return Travel',
+        from: lastCityName,
+        to: originName,
+        completed: false,
+        desc: `Return flight to ${originName}`,
+        transportItems: [], accomItems: [], activityItems: []
+      }]
+    });
+  }
+
+  // Populate journeys
+  journeys = journeyItems.map((j, idx) => {
+    let targetLegId = '';
+    if (idx < destinationLegs.length) {
+      targetLegId = destinationLegs[idx].id;
+    } else if (returnJourney && idx === journeyItems.length - 1) {
+      targetLegId = appData[appData.length - 1].id;
+    } else {
+      targetLegId = destinationLegs[destinationLegs.length - 1]?.id || '';
+    }
+
+    const fromCityMatch = citiesData.find(c => c.name.toLowerCase() === (j.fromLocation || '').toLowerCase());
+    const toCityMatch = citiesData.find(c => c.name.toLowerCase() === (j.toLocation || '').toLowerCase());
+
+    return {
+      id: `journey-${Date.now()}-${idx}`,
+      journeyId: `journey-${Date.now()}-${idx}`,
+      journeyName: `${j.fromLocation || 'Origin'} to ${j.toLocation || 'Destination'}`,
+      legId: targetLegId,
+      dayDate: j.departureDate || '',
+      fromLocation: j.fromLocation || '',
+      toLocation: j.toLocation || '',
+      fromCityId: fromCityMatch?.id || (idx === 0 ? 'city-home' : ''),
+      toCityId: toCityMatch?.id || (returnJourney && idx === journeyItems.length - 1 ? 'city-home' : ''),
+      departureDate: j.departureDate || '',
+      departureTime: j.departureTime || '',
+      arrivalDate: j.arrivalDate || j.departureDate || '',
+      arrivalTime: j.arrivalTime || '',
+      transportType: j.transportType || 'flight',
+      provider: j.provider || 'Airline',
+      routeCode: j.routeCode || '',
+      status: 'confirmed',
+      cost: j.cost || '0',
+      bookingReference: j.bookingReference || '',
+      isMultiLeg: false,
+      segmentOrder: idx + 1,
+      notes: j.notes || 'Imported booking confirmation',
+      fromAddress: '',
+      toAddress: '',
+      legs: [],
+      attachments: []
+    };
+  });
+  window.journeys = journeys;
+
+  // Populate stays
+  stays = destinationStops.map((stop, idx) => {
+    const city = citiesData[idx];
+    return {
+      id: `stay-${Date.now()}-${idx}`,
+      cityId: city.id,
+      cityName: city.name,
+      propertyName: `Accommodation in ${city.name}`,
+      checkIn: stop.dateFrom,
+      checkOut: stop.dateTo,
+      checkInTime: '14:00',
+      checkOutTime: '10:00',
+      nights: stop.nights,
+      status: 'confirmed',
+      provider: 'TBD',
+      bookingRef: '',
+      totalCost: 0,
+      notes: 'Reserved for flight dates',
+      location: '',
+      lat: '',
+      lng: '',
+      placeId: '',
+      attachments: []
+    };
+  });
+
+  // Include any extra hotel stays extracted from confirmation
+  const extractedStays = items.filter(i => i.kind === 'stay');
+  extractedStays.forEach((es, esIdx) => {
+    const cityMatch = citiesData.find(c => (es.city || '').toLowerCase().includes(c.name.toLowerCase()) || c.name.toLowerCase().includes((es.city || '').toLowerCase()));
+    if (cityMatch) {
+      stays.push({
+        id: `stay-extracted-${Date.now()}-${esIdx}`,
+        cityId: cityMatch.id,
+        cityName: cityMatch.name,
+        propertyName: es.propertyName || `Hotel in ${cityMatch.name}`,
+        checkIn: es.checkIn || cityMatch.dateFrom,
+        checkOut: es.checkOut || cityMatch.dateTo,
+        checkInTime: '14:00',
+        checkOutTime: '10:00',
+        nights: typeof calculateNights === 'function' ? calculateNights(es.checkIn, es.checkOut) : 3,
+        status: 'confirmed',
+        provider: es.provider || 'Hotel',
+        bookingRef: es.bookingRef || '',
+        totalCost: es.totalCost || 0,
+        notes: es.notes || '',
+        location: '',
+        lat: '',
+        lng: '',
+        placeId: '',
+        attachments: []
+      });
+    }
+  });
+  window.stays = stays;
+
+  // Title and subtitle
+  const totalNights = destinationStops.reduce((sum, s) => sum + s.nights, 0);
+  const titleText = tripStartAnswers.name || `${citiesData.map(c => c.name).join(' & ')} Journey`;
+  const subtitleText = `${citiesData.map(c => c.name).join(' → ')} · ${totalNights} nights · ${journeyItems.length} confirmed flights`;
+  titleData = { title: titleText, subtitle: subtitleText };
+
+  localStorage.setItem('travelApp_vibeProfile', JSON.stringify(tripStartAnswers));
+  const mainTitleEl = document.getElementById('mainTitle');
+  const mainSubtitleEl = document.getElementById('mainSubtitle');
+  if (mainTitleEl) mainTitleEl.innerText = titleData.title;
+  if (mainSubtitleEl) mainSubtitleEl.innerText = titleData.subtitle;
+
+  syncCurrentFileName(`${titleText.replace(/[^a-z0-9]+/gi, '_') || 'My_Trip'}.json`);
+  dismissTripStart();
+  saveData(true);
+
+  if (typeof buildNav === 'function') buildNav();
+  if (typeof buildItinerary === 'function') buildItinerary();
+  if (typeof buildTransportTab === 'function') buildTransportTab();
+  if (typeof buildAccomTab === 'function') buildAccomTab();
+
+  const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
+  if (!hasSeenSetup && !hasActiveFileHandle()) {
+    const setupModal = document.getElementById("file-setup-modal");
+    if (setupModal) setupModal.style.display = "flex";
+  } else {
+    if (isFSASupported()) {
+      try {
+        await createFileOnDisk();
+      } catch(e) {
+        console.warn('File save skipped or cancelled:', e);
+      }
+    } else {
+      exportJSON();
+    }
+  }
+
+  showToast(`✈️ Trip created! ${journeyItems.length} confirmed flights and ${citiesData.length} destinations scheduled.`);
+}
+
 function renderTripStart() {
   const container = document.getElementById('trip-start-content');
   if (!container) return;
+
+  if (tripStartStep === 'choose_path' || tripStartStep === 'builder_0') {
+    renderTripStartPathChoice();
+    return;
+  }
+
+  if (tripStartStep === 'flight_import') {
+    renderTripStartFlightImport();
+    return;
+  }
+
   const progress = `<div class="trip-start-progress"><span>Getting started</span><span>${tripStartStep} of 7</span></div>`;
   const back = tripStartStep ? `<button class="trip-start-back" type="button" onclick="previousTripStartStep()">Back</button>` : '';
 
@@ -6821,7 +7454,7 @@ function chooseTripStart(choice) {
       if (setupModal) setupModal.style.display = "flex";
       return;
     }
-    tripStartStep = 1;
+    tripStartStep = 'choose_path';
     renderTripStart();
     return;
   }
@@ -6887,11 +7520,32 @@ function nextTripStartStep() {
   if (tripStartStep === 1 && !tripStartAnswers.name) { showToast('Give your trip a name to continue.'); return; }
   if (tripStartStep === 2 && !tripStartAnswers.origin) { showToast('Tell us where you are leaving from to continue.'); return; }
   if (tripStartStep === 3 && !tripStartAnswers.city) { showToast('Choose your first city to continue.'); return; }
-  if (tripStartStep < 7) { tripStartStep++; renderTripStart(); return; }
+  if (typeof tripStartStep === 'number' && tripStartStep < 7) { tripStartStep++; renderTripStart(); return; }
   createTripFromStartAnswers();
 }
 
-function previousTripStartStep() { captureTripStartAnswer(); tripStartStep = Math.max(0, tripStartStep - 1); renderTripStart(); }
+function previousTripStartStep() {
+  captureTripStartAnswer();
+  if (tripStartStep === 'flight_import' || tripStartStep === 1) {
+    tripStartStep = 'choose_path';
+    renderTripStart();
+    return;
+  }
+  if (tripStartStep === 'choose_path' || tripStartStep === 'builder_0') {
+    const hasSeenTripStart = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_trip_start_seen") : null;
+    if (!hasSeenTripStart) {
+      tripStartStep = 0;
+      renderTripStart();
+    } else {
+      dismissTripStart();
+    }
+    return;
+  }
+  if (typeof tripStartStep === 'number') {
+    tripStartStep = Math.max(0, tripStartStep - 1);
+    renderTripStart();
+  }
+}
 function adjustTripStartNights(change) { captureTripStartAnswer(); tripStartAnswers.nights = Math.max(1, Math.min(60, Number(tripStartAnswers.nights) + change)); renderTripStart(); }
 function selectTripStartTransport(type) { captureTripStartAnswer(); tripStartAnswers.transport = type; renderTripStart(); }
 function selectTripStartReturnTransport(type) { captureTripStartAnswer(); tripStartAnswers.returnTransport = type; renderTripStart(); }
@@ -7261,7 +7915,7 @@ async function onboardCreateNewTrip() {
 function openCreateNewTripWizard() {
   if (typeof closeMobileMenu === 'function') closeMobileMenu();
   if (typeof closeDesktopActionsMenu === 'function') closeDesktopActionsMenu();
-  tripStartStep = 0;
+  tripStartStep = 'choose_path';
   const modal = document.getElementById("trip-start-modal");
   if (modal) modal.style.display = "flex";
   renderTripStart();
@@ -7319,6 +7973,13 @@ window.dismissTripStart = dismissTripStart;
 window.addTripStartStop = addTripStartStop;
 window.removeTripStartStop = removeTripStartStop;
 window.updateTripStartStop = updateTripStartStop;
+window.selectTripStartPath = selectTripStartPath;
+window.renderTripStartPathChoice = renderTripStartPathChoice;
+window.renderTripStartFlightImport = renderTripStartFlightImport;
+window.extractTripStartFlights = extractTripStartFlights;
+window.createTripFromFlightBookings = createTripFromFlightBookings;
+window.insertSampleFlightConfirmation = insertSampleFlightConfirmation;
+window.handleTripStartFlightFileUpload = handleTripStartFlightFileUpload;
 window.tripStartStep = tripStartStep;
 window.tripStartAnswers = tripStartAnswers;
 
