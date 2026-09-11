@@ -6862,7 +6862,7 @@ function renderTripStartFlightImport() {
 
   container.innerHTML = `
     <div class="trip-start-progress">
-      <span>Path B: Booked Flights First</span>
+      <span>Path B · Flights First</span>
       <span>Step 1 of 1</span>
     </div>
     <div class="trip-start-question">
