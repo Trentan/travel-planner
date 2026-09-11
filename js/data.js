@@ -1864,7 +1864,7 @@ function normalizeCityLocationData(city) {
   return city;
 }
 
-async function resolveCityLocation(city) {
+function resolveCityLocationLocal(city) {
   if (!city || !city.name) return null;
 
   let dbMatch = null;
@@ -1887,6 +1887,9 @@ async function resolveCityLocation(city) {
       dbMatch = candidates[0];
     }
   }
+  if (!dbMatch) {
+    dbMatch = getCityLocationDatabaseMatch(city);
+  }
 
   if (dbMatch && dbMatch.lat !== undefined && dbMatch.lng !== undefined) {
     return {
@@ -1897,6 +1900,15 @@ async function resolveCityLocation(city) {
       icaoCode: dbMatch.icaoCode || dbMatch.icao || ''
     };
   }
+
+  return null;
+}
+
+async function resolveCityLocation(city) {
+  if (!city || !city.name) return null;
+
+  const localMatch = resolveCityLocationLocal(city);
+  if (localMatch) return localMatch;
 
   const onlineMatch = await searchCityOnline(city.name, city.countryCode || '', city.country || '');
   if (!onlineMatch) return null;
@@ -2114,15 +2126,44 @@ async function fetchAllMissingCityLocations() {
   }
 
   let foundCount = 0;
+  const onlineCities = [];
+
+  // Phase 1: Fast local resolution for cities matching local database/aliases
   for (let i = 0; i < missingCities.length; i++) {
     const city = missingCities[i];
-    if (btn) btn.textContent = `Finding ${i + 1}/${missingCities.length}...`;
+    const localResult = resolveCityLocationLocal(city);
+    if (localResult && applyCityLocation(city, localResult)) {
+      foundCount++;
+    } else {
+      onlineCities.push(city);
+    }
+    if (btn) {
+      btn.textContent = `Finding ${foundCount}/${missingCities.length}...`;
+    }
+  }
 
-    const hadLocalCoords = ALL_CITIES_HAS_COORDS_SET.has((city.name || '').toLowerCase());
-    const result = await resolveCityLocation(city);
-    if (result && applyCityLocation(city, result)) foundCount++;
+  // Phase 2: Sequential rate-limited geocoding for remaining online cities
+  for (let i = 0; i < onlineCities.length; i++) {
+    const city = onlineCities[i];
+    if (btn) {
+      btn.textContent = `Finding ${foundCount + 1}/${missingCities.length}...`;
+    }
 
-    if (!hadLocalCoords && i < missingCities.length - 1) {
+    const onlineMatch = await searchCityOnline(city.name, city.countryCode || '', city.country || '');
+    if (onlineMatch) {
+      const result = {
+        lat: onlineMatch.lat,
+        lng: onlineMatch.lng,
+        countryCode: onlineMatch.countryCode || city.countryCode || '',
+        code: '',
+        icaoCode: ''
+      };
+      if (applyCityLocation(city, result)) {
+        foundCount++;
+      }
+    }
+
+    if (i < onlineCities.length - 1) {
       await new Promise(resolve => setTimeout(resolve, 1100));
     }
   }
@@ -4021,38 +4062,37 @@ function normalizeTripLegsData(legs) {
           }
         }
 
-        // Priority 2: Match by title and already assigned to this day
+        // Single pass for title-based priorities (Priority 2, 3, 4) if ID match failed
         if (matchIdx === -1) {
+          let p2Idx = -1;
+          let p3Idx = -1;
+          let p4Idx = -1;
+
           for (let i = 0; i < suggested.length; i++) {
             if (usedSuggestionIndices.has(i)) continue;
             const act = suggested[i];
-            if (act && act.assignedDayIdx === dayIdx && isItemMatchingActivity(text, act)) {
-              matchIdx = i;
-              break;
+            if (!act) continue;
+
+            const isSameDay = act.assignedDayIdx === dayIdx;
+            const isUnassigned = act.assignedDayIdx === null || act.assignedDayIdx === undefined;
+
+            if (isSameDay) {
+              if (isItemMatchingActivity(text, act)) {
+                p2Idx = i;
+                break; // Highest priority title match found!
+              }
+            } else if (p3Idx === -1 && isUnassigned) {
+              if (isItemMatchingActivity(text, act)) {
+                p3Idx = i;
+              }
+            } else if (p3Idx === -1 && p4Idx === -1) {
+              if (isItemMatchingActivity(text, act)) {
+                p4Idx = i;
+              }
             }
           }
-        }
-        // Priority 3: Match by title and unassigned (or assigned to another day - prefer unassigned)
-        if (matchIdx === -1) {
-          for (let i = 0; i < suggested.length; i++) {
-            if (usedSuggestionIndices.has(i)) continue;
-            const act = suggested[i];
-            if (act && (act.assignedDayIdx === null || act.assignedDayIdx === undefined) && isItemMatchingActivity(text, act)) {
-              matchIdx = i;
-              break;
-            }
-          }
-        }
-        // Priority 4: Match by title even if assigned to another day (e.g. duplicate or newly scheduled)
-        if (matchIdx === -1) {
-          for (let i = 0; i < suggested.length; i++) {
-            if (usedSuggestionIndices.has(i)) continue;
-            const act = suggested[i];
-            if (act && isItemMatchingActivity(text, act)) {
-              matchIdx = i;
-              break;
-            }
-          }
+
+          matchIdx = p2Idx !== -1 ? p2Idx : (p3Idx !== -1 ? p3Idx : p4Idx);
         }
 
         if (matchIdx !== -1) {
