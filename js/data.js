@@ -32,17 +32,63 @@ function getCountryFlagEmoji(countryCode) {
 }
 window.getCountryFlagEmoji = getCountryFlagEmoji;
 
-function deepClone(obj) {
-  if (obj === null || obj === undefined) return obj;
-  if (typeof structuredClone === 'function') {
+function jsonSafeClone(value) {
+  if (value === null || typeof value !== 'object') {
+    if (typeof value === 'number' && !Number.isFinite(value)) {
+      return null;
+    }
+    return value;
+  }
+
+  if (typeof value.toJSON === 'function') {
     try {
-      return structuredClone(obj);
+      return jsonSafeClone(value.toJSON());
     } catch (e) {
-      // Fallback to JSON clone if structuredClone fails
+      // Fallback
     }
   }
-  return JSON.parse(JSON.stringify(obj));
+
+  if (Array.isArray(value)) {
+    const len = value.length;
+    const copy = new Array(len);
+    for (let i = 0; i < len; i++) {
+      const item = value[i];
+      if (item === undefined || typeof item === 'function' || typeof item === 'symbol') {
+        copy[i] = null;
+      } else {
+        copy[i] = jsonSafeClone(item);
+      }
+    }
+    return copy;
+  }
+
+  const proto = Object.getPrototypeOf(value);
+  if (proto !== null && proto !== Object.prototype) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  const copy = {};
+  const keys = Object.keys(value);
+  const keyCount = keys.length;
+  for (let i = 0; i < keyCount; i++) {
+    const key = keys[i];
+    const val = value[key];
+    if (val !== undefined && typeof val !== 'function' && typeof val !== 'symbol') {
+      copy[key] = jsonSafeClone(val);
+    }
+  }
+  return copy;
 }
+
+function deepClone(obj) {
+  if (obj === null || obj === undefined) return obj;
+  try {
+    return jsonSafeClone(obj);
+  } catch (e) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+}
+window.jsonSafeClone = jsonSafeClone;
 window.deepClone = deepClone;
 
 // Open IndexedDB
