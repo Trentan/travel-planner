@@ -6,10 +6,141 @@
 // IndexedDB Storage Implementation
 let db = null;
 const DB_NAME = 'travelApp_v2026';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const STORE_NAME = 'appData';
 const TRIPS_STORE_NAME = 'trips';
+const SYNC_QUEUE_STORE_NAME = 'offlineSyncQueue';
 let activeTripId = localStorage.getItem('travelApp_active_trip_id') || 'trip_default';
+
+// Cross-Tab In-Memory Cache & BroadcastChannel Synchronization (Issue #296)
+let tripsCache = null;
+let lastCacheTime = 0;
+const CACHE_TTL_MS = 15000;
+
+let tripsBroadcastChannel = null;
+if (typeof window !== 'undefined' && typeof window.BroadcastChannel !== 'undefined') {
+  try {
+    tripsBroadcastChannel = new window.BroadcastChannel('travelApp_trips_sync');
+    tripsBroadcastChannel.onmessage = (event) => {
+      const msg = event.data;
+      if (!msg) return;
+      if (msg.type === 'TRIP_UPDATED' || msg.type === 'TRIP_DELETED' || msg.type === 'INVALIDATE_CACHE') {
+        tripsCache = null;
+        lastCacheTime = 0;
+        if (typeof window.renderHeaderTripSwitcher === 'function') {
+          window.renderHeaderTripSwitcher();
+        }
+      }
+    };
+  } catch (e) {
+    console.warn('Could not initialize BroadcastChannel for trips sync:', e);
+  }
+}
+
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'travelApp_trips_cache_invalidator' || e.key === 'travelApp_active_trip_id') {
+      tripsCache = null;
+      lastCacheTime = 0;
+      if (typeof window.renderHeaderTripSwitcher === 'function') {
+        window.renderHeaderTripSwitcher();
+      }
+    }
+  });
+}
+
+function broadcastTripsCacheInvalidation(type, payload = {}) {
+  tripsCache = null;
+  lastCacheTime = 0;
+  if (tripsBroadcastChannel) {
+    try {
+      tripsBroadcastChannel.postMessage({ type, ...payload, timestamp: Date.now() });
+    } catch (e) {}
+  }
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('travelApp_trips_cache_invalidator', Date.now().toString());
+    }
+  } catch (e) {}
+}
+window.broadcastTripsCacheInvalidation = broadcastTripsCacheInvalidation;
+
+// Storage Persistence & Quota Telemetry (Issues #288 & #301)
+async function isStoragePersisted() {
+  if (typeof navigator !== 'undefined' && navigator.storage && typeof navigator.storage.persisted === 'function') {
+    try {
+      return await navigator.storage.persisted();
+    } catch (e) {
+      console.warn('Failed to check storage persistence:', e);
+      return false;
+    }
+  }
+  return false;
+}
+window.isStoragePersisted = isStoragePersisted;
+
+async function requestStoragePersistence() {
+  if (typeof navigator !== 'undefined' && navigator.storage && typeof navigator.storage.persist === 'function') {
+    try {
+      const persisted = await navigator.storage.persist();
+      return persisted;
+    } catch (e) {
+      console.warn('Failed to request storage persistence:', e);
+      return false;
+    }
+  }
+  return false;
+}
+window.requestStoragePersistence = requestStoragePersistence;
+
+function formatBytes(bytes, decimals = 1) {
+  if (!bytes || bytes <= 0) return '0 B';
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+window.formatBytes = formatBytes;
+
+async function getStorageTelemetry() {
+  if (typeof navigator !== 'undefined' && navigator.storage && typeof navigator.storage.estimate === 'function') {
+    try {
+      const estimate = await Promise.race([
+        navigator.storage.estimate(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Storage estimate timeout')), 2500))
+      ]);
+      const usage = (estimate && estimate.usage) || 0;
+      const quota = (estimate && estimate.quota) || 0;
+      const percent = quota > 0 ? Math.min(100, Math.round((usage / quota) * 100)) : 0;
+      const persisted = await Promise.race([
+        isStoragePersisted(),
+        new Promise(resolve => setTimeout(() => resolve(false), 1500))
+      ]);
+      return {
+        supported: true,
+        usage,
+        quota,
+        usageFormatted: formatBytes(usage),
+        quotaFormatted: formatBytes(quota),
+        percent,
+        persisted
+      };
+    } catch (e) {
+      console.warn('Failed to get storage estimate:', e);
+    }
+  }
+  return {
+    supported: false,
+    usage: 0,
+    quota: 0,
+    usageFormatted: 'Active',
+    quotaFormatted: 'Local Device',
+    percent: 0,
+    persisted: false
+  };
+}
+window.getStorageTelemetry = getStorageTelemetry;
 
 function getActiveTripId() {
   return activeTripId || localStorage.getItem('travelApp_active_trip_id') || 'trip_default';
@@ -99,16 +230,44 @@ function openDB() {
       return;
     }
 
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      reject(new Error('IndexedDB not supported'));
+      return;
+    }
+
+    let settled = false;
+    const timeoutTimer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        console.warn('IndexedDB open timed out (possibly blocked by another open tab). Resolving with fallback.');
+        resolve(db || null);
+      }
+    }, 3500);
+
     const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutTimer);
       console.error('IndexedDB error:', request.error);
       reject(request.error);
     };
 
+    request.onblocked = () => {
+      console.warn('IndexedDB upgrade blocked by an open connection in another tab.');
+    };
+
     request.onsuccess = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutTimer);
       db = request.result;
-      console.log('IndexedDB opened successfully');
+      db.onversionchange = () => {
+        console.log('IndexedDB version changed elsewhere. Closing stale connection.');
+        db.close();
+        db = null;
+      };
       resolve(db);
     };
 
@@ -124,19 +283,27 @@ function openDB() {
         const tripsStore = upgradeDb.createObjectStore(TRIPS_STORE_NAME, { keyPath: 'id' });
         tripsStore.createIndex('updatedAt', 'updatedAt', { unique: false });
       }
+      if (!upgradeDb.objectStoreNames.contains(SYNC_QUEUE_STORE_NAME)) {
+        const queueStore = upgradeDb.createObjectStore(SYNC_QUEUE_STORE_NAME, { keyPath: 'id', autoIncrement: true });
+        queueStore.createIndex('tripId', 'tripId', { unique: false });
+        queueStore.createIndex('timestamp', 'timestamp', { unique: false });
+      }
     };
   });
 }
 
 // Multi-Trip IndexedDB Helpers
-function getAllTripsFromIndexedDB() {
-  return openDB().then(db => {
-    return new Promise((resolve, reject) => {
-      if (!db.objectStoreNames.contains(TRIPS_STORE_NAME)) {
-        resolve([]);
+function getAllTripsFromIndexedDB(forceRefresh = false) {
+  if (!forceRefresh && tripsCache && (Date.now() - lastCacheTime < CACHE_TTL_MS)) {
+    return Promise.resolve(jsonSafeClone(tripsCache));
+  }
+  return openDB().then(dbInstance => {
+    return new Promise((resolve) => {
+      if (!dbInstance || !dbInstance.objectStoreNames || !dbInstance.objectStoreNames.contains(TRIPS_STORE_NAME)) {
+        resolve(tripsCache || []);
         return;
       }
-      const transaction = db.transaction([TRIPS_STORE_NAME], 'readonly');
+      const transaction = dbInstance.transaction([TRIPS_STORE_NAME], 'readonly');
       const store = transaction.objectStore(TRIPS_STORE_NAME);
       const request = store.getAll();
 
@@ -144,14 +311,19 @@ function getAllTripsFromIndexedDB() {
         const trips = (request.result || []).sort((a, b) => {
           return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
         });
+        tripsCache = jsonSafeClone(trips);
+        lastCacheTime = Date.now();
         resolve(trips);
       };
 
       request.onerror = () => {
         console.error('Failed to load trips from IndexedDB:', request.error);
-        resolve([]);
+        resolve(tripsCache || []);
       };
     });
+  }).catch(err => {
+    console.warn('getAllTripsFromIndexedDB error fallback:', err);
+    return tripsCache || [];
   });
 }
 window.getAllTripsFromIndexedDB = getAllTripsFromIndexedDB;
@@ -163,7 +335,10 @@ function saveTripToIndexedDB(tripRecord) {
       const store = transaction.objectStore(TRIPS_STORE_NAME);
       const request = store.put(tripRecord);
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        broadcastTripsCacheInvalidation('TRIP_UPDATED', { tripId: tripRecord.id });
+        resolve();
+      };
       request.onerror = () => reject(request.error);
     });
   });
@@ -177,12 +352,118 @@ function deleteTripFromIndexedDB(tripId) {
       const store = transaction.objectStore(TRIPS_STORE_NAME);
       const request = store.delete(tripId);
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        broadcastTripsCacheInvalidation('TRIP_DELETED', { tripId });
+        resolve();
+      };
       request.onerror = () => reject(request.error);
     });
   });
 }
 window.deleteTripFromIndexedDB = deleteTripFromIndexedDB;
+
+// Persistent Offline Mutation Queue Helpers (Issue #297)
+function enqueueOfflineSyncMutation(mutation) {
+  if (!mutation || !mutation.tripId) return Promise.resolve(null);
+  return openDB().then(db => {
+    return new Promise((resolve, reject) => {
+      if (!db.objectStoreNames.contains(SYNC_QUEUE_STORE_NAME)) {
+        resolve(null);
+        return;
+      }
+      const transaction = db.transaction([SYNC_QUEUE_STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(SYNC_QUEUE_STORE_NAME);
+      
+      const record = {
+        tripId: mutation.tripId,
+        action: mutation.action || 'UPSERT',
+        data: mutation.data ? jsonSafeClone(mutation.data) : null,
+        timestamp: mutation.timestamp || Date.now(),
+        retryCount: mutation.retryCount || 0
+      };
+      
+      const req = store.add(record);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  });
+}
+window.enqueueOfflineSyncMutation = enqueueOfflineSyncMutation;
+
+function getOfflineSyncQueue() {
+  return openDB().then(db => {
+    return new Promise((resolve, reject) => {
+      if (!db.objectStoreNames.contains(SYNC_QUEUE_STORE_NAME)) {
+        resolve([]);
+        return;
+      }
+      const transaction = db.transaction([SYNC_QUEUE_STORE_NAME], 'readonly');
+      const store = transaction.objectStore(SYNC_QUEUE_STORE_NAME);
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const items = (request.result || []).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+        resolve(items);
+      };
+      request.onerror = () => resolve([]);
+    });
+  });
+}
+window.getOfflineSyncQueue = getOfflineSyncQueue;
+
+function removeOfflineSyncMutation(id) {
+  return openDB().then(db => {
+    return new Promise((resolve, reject) => {
+      if (!db.objectStoreNames.contains(SYNC_QUEUE_STORE_NAME)) {
+        resolve();
+        return;
+      }
+      const transaction = db.transaction([SYNC_QUEUE_STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(SYNC_QUEUE_STORE_NAME);
+      const request = store.delete(id);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  });
+}
+window.removeOfflineSyncMutation = removeOfflineSyncMutation;
+
+function clearOfflineSyncQueue() {
+  return openDB().then(db => {
+    return new Promise((resolve, reject) => {
+      if (!db.objectStoreNames.contains(SYNC_QUEUE_STORE_NAME)) {
+        resolve();
+        return;
+      }
+      const transaction = db.transaction([SYNC_QUEUE_STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(SYNC_QUEUE_STORE_NAME);
+      const request = store.clear();
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  });
+}
+window.clearOfflineSyncQueue = clearOfflineSyncQueue;
+
+function getOfflineSyncQueueCount() {
+  return openDB().then(db => {
+    return new Promise((resolve, reject) => {
+      if (!db.objectStoreNames.contains(SYNC_QUEUE_STORE_NAME)) {
+        resolve(0);
+        return;
+      }
+      const transaction = db.transaction([SYNC_QUEUE_STORE_NAME], 'readonly');
+      const store = transaction.objectStore(SYNC_QUEUE_STORE_NAME);
+      const request = store.count();
+
+      request.onsuccess = () => resolve(request.result || 0);
+      request.onerror = () => resolve(0);
+    });
+  });
+}
+window.getOfflineSyncQueueCount = getOfflineSyncQueueCount;
 
 function extractTripSummary(tripData, tripId) {
   const meta = tripData.meta || {};
@@ -5523,6 +5804,37 @@ async function checkUrlForImportedTrip() {
       expandedData = expandSharePayload(importedData);
     }
     
+    // Safety Snapshot before loading external imported trip (Issues #285 & #298)
+    try {
+      if (typeof getCurrentAppData === 'function') {
+        const currentData = getCurrentAppData();
+        const currentItinerary = (currentData && currentData.itinerary) || [];
+        const hasValidLegs = Array.isArray(currentItinerary) && currentItinerary.length > 0 &&
+          currentItinerary.some(leg => (leg.cityName && leg.cityName.trim() !== '') || (Array.isArray(leg.days) && leg.days.length > 0));
+        
+        if (hasValidLegs) {
+          const currentId = (typeof getActiveTripId === 'function') ? getActiveTripId() : 'trip_default';
+          if (typeof saveActiveTripToStore === 'function') {
+            await saveActiveTripToStore();
+          }
+          if (typeof localStorage !== 'undefined') {
+            try {
+              localStorage.setItem('travelApp_pre_hash_backup', JSON.stringify({
+                tripId: currentId,
+                data: currentData,
+                savedAt: new Date().toISOString()
+              }));
+            } catch (e) {}
+          }
+          if (typeof window.showToast === 'function') {
+            window.showToast('🛡️ Your previous trip was safely backed up to My Trips Gallery.');
+          }
+        }
+      }
+    } catch (snapshotErr) {
+      console.warn('Could not snapshot active trip before loading external hash:', snapshotErr);
+    }
+
     clearActiveFileHandle();
     setImportedJsonWithoutWriteAccess(true);
     await loadImportedPayload(expandedData, 'URL Shared Trip');

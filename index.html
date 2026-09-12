@@ -1313,7 +1313,11 @@
           <!-- Rendered dynamically by js/trip-library.js -->
         </div>
       </div>
-      <div class="modal-footer flex justify-end">
+      <div class="modal-footer flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div id="storageTelemetryBar" class="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400 w-full sm:w-auto">
+          <span id="storageQuotaText">💾 Storage: Checking...</span>
+          <button id="requestPersistStorageBtn" type="button" class="text-xs px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-teal-700 dark:text-teal-400 font-medium" onclick="window.requestPersistentStorageFromUI()" style="display: none;">Enable Persistent Storage</button>
+        </div>
         <button class="action-btn" onclick="closeTripLibraryModal()">Close</button>
       </div>
     </div>
