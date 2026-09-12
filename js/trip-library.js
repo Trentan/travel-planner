@@ -245,6 +245,54 @@
     modal.style.display = 'flex';
     modal.classList.add('active');
     await window.renderTripGalleryGrid();
+    if (typeof window.renderStorageTelemetry === 'function') {
+      window.renderStorageTelemetry();
+    }
+  };
+
+  window.renderStorageTelemetry = async function() {
+    const quotaText = document.getElementById('storageQuotaText');
+    const persistBtn = document.getElementById('requestPersistStorageBtn');
+    if (!quotaText) return;
+
+    if (typeof window.getStorageTelemetry === 'function') {
+      try {
+        const telemetry = await window.getStorageTelemetry();
+        if (telemetry && telemetry.supported) {
+          const persistStatus = telemetry.persisted ? '🟢 Persistent: Active' : '🟡 Persistent: Standard';
+          quotaText.innerHTML = `💾 <strong>Storage:</strong> ${escapeHtml(telemetry.usageFormatted)} used of ${escapeHtml(telemetry.quotaFormatted)} (${persistStatus})`;
+          if (persistBtn) {
+            persistBtn.style.display = telemetry.persisted ? 'none' : 'inline-block';
+          }
+        } else {
+          quotaText.innerText = '💾 Storage: Local Device Storage (Active)';
+          if (persistBtn) persistBtn.style.display = 'none';
+        }
+      } catch (err) {
+        quotaText.innerText = '💾 Storage: Local Device Storage (Active)';
+        if (persistBtn) persistBtn.style.display = 'none';
+      }
+    }
+  };
+
+  window.requestPersistentStorageFromUI = async function() {
+    if (typeof window.requestStoragePersistence === 'function') {
+      const granted = await window.requestStoragePersistence();
+      if (granted) {
+        if (typeof window.showToast === 'function') {
+          window.showToast('✅ Persistent storage granted! Your itineraries are safe from browser evictions.');
+        } else {
+          alert('Persistent storage granted!');
+        }
+      } else {
+        if (typeof window.showToast === 'function') {
+          window.showToast('ℹ️ Persistent storage was not granted by the browser.');
+        }
+      }
+      if (typeof window.renderStorageTelemetry === 'function') {
+        await window.renderStorageTelemetry();
+      }
+    }
   };
 
   window.closeTripLibraryModal = function() {
@@ -479,8 +527,11 @@
           <div class="trip-card-badges flex flex-wrap gap-1.5 items-center mb-1">
             ${isCurrent ? '<span class="active-badge">● Active Trip</span>' : ''}
             ${isDriveSynced
-              ? '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">☁️ Drive Synced</span>'
-              : '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">⚡ Local Only</span>'
+              ? '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">☁️ Synced to Drive</span>'
+              : (typeof navigator !== 'undefined' && navigator.onLine === false
+                  ? '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60">⚡ Offline</span>'
+                  : '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">● Saved to device</span>'
+                )
             }
             <span class="updated-badge text-[10px]">Updated ${escapeHtml(updatedDate)}</span>
           </div>

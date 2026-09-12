@@ -694,6 +694,21 @@
       return true;
     }
 
+    // Offline Mutation Queue Handling (Issue #297)
+    if (!window.__mockGoogleDriveAPI && typeof navigator !== 'undefined' && navigator.onLine === false) {
+      console.warn('[GoogleDrive Sync] Device is offline. Enqueuing mutation for later sync...');
+      if (typeof window.enqueueOfflineSyncMutation === 'function') {
+        await window.enqueueOfflineSyncMutation({
+          tripId: tripRecord.id,
+          action: 'UPSERT',
+          data: tripRecord
+        });
+      }
+      const queuedCount = typeof window.getOfflineSyncQueueCount === 'function' ? await window.getOfflineSyncQueueCount() : 1;
+      updateCloudSyncStatusPill(`⚡ Offline (${queuedCount} queued)`, 'warning');
+      return false;
+    }
+
     try {
       if (!isSilent) {
         updateCloudSyncStatusPill('⏳ Syncing to Google Drive...', 'syncing');
@@ -825,7 +840,19 @@
       return true;
     } catch (err) {
       console.error('Failed to upload trip to Google Drive:', err);
-      updateCloudSyncStatusPill('⚡ Local Only (Sync Failed)', 'error');
+      if (!window.__mockGoogleDriveAPI && typeof navigator !== 'undefined' && (navigator.onLine === false || (err && (err.name === 'TypeError' || err.message?.includes('network') || err.message?.includes('fetch'))))) {
+        if (typeof window.enqueueOfflineSyncMutation === 'function') {
+          await window.enqueueOfflineSyncMutation({
+            tripId: tripRecord.id,
+            action: 'UPSERT',
+            data: tripRecord
+          });
+        }
+        const queuedCount = typeof window.getOfflineSyncQueueCount === 'function' ? await window.getOfflineSyncQueueCount() : 1;
+        updateCloudSyncStatusPill(`⚡ Offline (${queuedCount} queued)`, 'warning');
+      } else {
+        updateCloudSyncStatusPill('⚡ Local Only (Sync Failed)', 'error');
+      }
       return false;
     }
   }
@@ -1018,6 +1045,19 @@
       return true;
     }
 
+    // Offline Mutation Queue Handling (Issue #297)
+    if (!window.__mockGoogleDriveAPI && typeof navigator !== 'undefined' && navigator.onLine === false) {
+      if (typeof window.enqueueOfflineSyncMutation === 'function') {
+        await window.enqueueOfflineSyncMutation({
+          tripId: fileId,
+          action: 'DELETE'
+        });
+      }
+      const queuedCount = typeof window.getOfflineSyncQueueCount === 'function' ? await window.getOfflineSyncQueueCount() : 1;
+      updateCloudSyncStatusPill(`⚡ Offline (${queuedCount} queued)`, 'warning');
+      return false;
+    }
+
     try {
       updateCloudSyncStatusPill('⏳ Deleting from Google Drive...', 'syncing');
       const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
@@ -1037,7 +1077,18 @@
       }
     } catch (err) {
       console.error('Failed to delete file from Google Drive:', err);
-      updateCloudSyncStatusPill('⚡ Deletion Failed', 'error');
+      if (!window.__mockGoogleDriveAPI && typeof navigator !== 'undefined' && (navigator.onLine === false || (err && (err.name === 'TypeError' || err.message?.includes('network') || err.message?.includes('fetch'))))) {
+        if (typeof window.enqueueOfflineSyncMutation === 'function') {
+          await window.enqueueOfflineSyncMutation({
+            tripId: fileId,
+            action: 'DELETE'
+          });
+        }
+        const queuedCount = typeof window.getOfflineSyncQueueCount === 'function' ? await window.getOfflineSyncQueueCount() : 1;
+        updateCloudSyncStatusPill(`⚡ Offline (${queuedCount} queued)`, 'warning');
+      } else {
+        updateCloudSyncStatusPill('⚡ Deletion Failed', 'error');
+      }
     }
     return false;
   };
@@ -1325,6 +1376,78 @@
     }
   };
 
+  // Persistent Offline Mutation Queue Flushing (Issue #297)
+  let isFlushingQueue = false;
+  async function flushOfflineSyncQueue() {
+    if (isFlushingQueue) return;
+    if (!isGoogleDriveConnected()) return;
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+    if (typeof window.getOfflineSyncQueue !== 'function') return;
+
+    isFlushingQueue = true;
+    try {
+      const queue = await window.getOfflineSyncQueue();
+      if (!queue || queue.length === 0) {
+        isFlushingQueue = false;
+        return;
+      }
+
+      console.log(`[GoogleDrive Sync] Flushing ${queue.length} offline queued sync mutations...`);
+      updateCloudSyncStatusPill(`⏳ Syncing (${queue.length} queued)...`, 'syncing');
+
+      for (const item of queue) {
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) break;
+
+        try {
+          if (item.action === 'DELETE') {
+            const success = await window.deleteTripFromGoogleDrive(item.tripId, null, true);
+            if (success) {
+              await window.removeOfflineSyncMutation(item.id);
+            }
+          } else {
+            // UPSERT
+            let tripData = item.data;
+            if (!tripData && typeof window.getAllTripsFromIndexedDB === 'function') {
+              const trips = await window.getAllTripsFromIndexedDB();
+              tripData = trips.find(t => t.id === item.tripId);
+            }
+            if (tripData) {
+              const success = await uploadTripToGoogleDrive(tripData, true);
+              if (success) {
+                await window.removeOfflineSyncMutation(item.id);
+              }
+            } else {
+              // Trip was deleted or not found
+              await window.removeOfflineSyncMutation(item.id);
+            }
+          }
+        } catch (itemErr) {
+          console.warn(`[GoogleDrive Sync] Error processing queued item ${item.id}:`, itemErr);
+          break;
+        }
+      }
+
+      const remainingCount = typeof window.getOfflineSyncQueueCount === 'function' ? await window.getOfflineSyncQueueCount() : 0;
+      if (remainingCount === 0) {
+        updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
+      } else {
+        updateCloudSyncStatusPill(`⚡ Offline (${remainingCount} queued)`, 'warning');
+      }
+    } catch (flushErr) {
+      console.error('[GoogleDrive Sync] Error flushing offline sync queue:', flushErr);
+    } finally {
+      isFlushingQueue = false;
+    }
+  }
+  window.flushOfflineSyncQueue = flushOfflineSyncQueue;
+
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('online', () => {
+      console.log('[GoogleDrive Sync] Reconnected online. Flushing sync queue...');
+      flushOfflineSyncQueue();
+    });
+  }
+
   // Update Status Pill UI Element across Desktop Header, Library Modal, and Mobile Sheet
   function updateCloudSyncStatusPill(statusText, stateClass) {
     const pills = [
@@ -1340,6 +1463,7 @@
         let compactLabel = statusText;
         if (statusText.includes('Synced') || statusText.includes('Loaded')) compactLabel = '☁️ Synced';
         else if (statusText.includes('Syncing') || statusText.includes('Creating') || statusText.includes('Loading') || statusText.includes('Deleting')) compactLabel = '⏳ Syncing...';
+        else if (statusText.includes('Offline')) compactLabel = statusText;
         else if (statusText.includes('Local')) compactLabel = '⚡ Local';
         else if (statusText.includes('Resume') || statusText.includes('Required')) compactLabel = '⚡ Resume Sync';
         else if (statusText.includes('Failed') || statusText.includes('Alert')) compactLabel = '⚠️ Sync Alert';
@@ -1591,8 +1715,11 @@
         if (isNativePlatform() && !isAccessTokenValid()) {
           await ensureValidAccessToken();
         }
+        await flushOfflineSyncQueue();
         window.syncAllTripsFromGoogleDrive();
         startBackgroundSyncLoop();
+      } else {
+        await flushOfflineSyncQueue();
       }
     }, 800);
   });
