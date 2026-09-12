@@ -220,6 +220,10 @@
       return 'mock_folder_id_123';
     }
 
+    if (!isAccessTokenValid()) {
+      return null;
+    }
+
     if (gdriveFolderId && !gdriveFolderId.startsWith('mock_')) return gdriveFolderId;
     if (gdriveFolderId && gdriveFolderId.startsWith('mock_')) {
       gdriveFolderId = null;
@@ -229,9 +233,10 @@
     try {
       // 1. Search for existing "TrenscendsTravelPlanner" folder
       const searchUrl = `https://www.googleapis.com/drive/v3/files?q=name='${DRIVE_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`;
-      const searchResp = await fetch(searchUrl, {
-        headers: { 'Authorization': `Bearer ${accessToken}` }
-      });
+      const searchResp = await Promise.race([
+        fetch(searchUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Folder search timeout')), 5000))
+      ]);
 
       if (searchResp.ok) {
         const searchData = await searchResp.json();
@@ -461,6 +466,7 @@
                 // Sync all trips: Push local trips & pull remote trips
                 await window.uploadAllLocalTripsToDrive();
                 await window.syncAllTripsFromGoogleDrive();
+                setLoadingUI(false);
                 resolve(true);
                 return;
               }
@@ -475,6 +481,7 @@
                   } catch (e) {}
                 }
 
+                setLoadingUI(false);
                 if (String(response.error).includes('origin') || String(response.error).includes('mismatch')) {
                   showOriginMismatchNotice('origin_mismatch');
                 } else if (interactive && response.error !== 'interaction_required') {
@@ -485,6 +492,7 @@
             },
             error_callback: (err) => {
               console.error('Google OAuth Popup Error:', err);
+              setLoadingUI(false);
               const errStr = JSON.stringify(err || {});
               if (errStr.includes('origin') || errStr.includes('mismatch') || errStr.includes('400')) {
                 showOriginMismatchNotice('origin_mismatch');
@@ -506,6 +514,7 @@
           }
         } catch (err) {
           console.error('Failed to launch Google OAuth Client:', err);
+          setLoadingUI(false);
           showOriginMismatchNotice('origin_mismatch');
           resolve(false);
         }
@@ -938,6 +947,12 @@
       return window.__gdriveCloudFiles;
     }
 
+    if (!isAccessTokenValid()) {
+      console.log('[GoogleDrive Sync] Access token invalid or expired. Not making unauthenticated API calls.');
+      if (!isSilent) updateCloudSyncStatusPill();
+      return [];
+    }
+
     try {
       if (!isSilent) updateCloudSyncStatusPill('⏳ Fetching Cloud Trips...', 'syncing');
       const folderId = await ensureDriveFolder();
@@ -946,9 +961,10 @@
         ? `'${folderId}' in parents and trashed=false`
         : `trashed=false and mimeType='application/json'`;
       const listUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,modifiedTime,size)&pageSize=50`;
-      const listResp = await fetch(listUrl, {
-        headers: { 'Authorization': `Bearer ${accessToken}` }
-      });
+      const listResp = await Promise.race([
+        fetch(listUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('List query timeout')), 6000))
+      ]);
 
       if (!listResp.ok) {
         console.warn('[GoogleDrive Sync] List query non-ok status:', listResp.status);
@@ -966,14 +982,15 @@
       for (const file of files) {
         if (!file.name) continue;
 
-        const downloadUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
-        const contentResp = await fetch(downloadUrl, {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-
-        if (!contentResp.ok) continue;
-
         try {
+          const downloadUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
+          const contentResp = await Promise.race([
+            fetch(downloadUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('File download timeout')), 5000))
+          ]);
+
+          if (!contentResp.ok) continue;
+
           const rawContent = await contentResp.json();
           if (rawContent) {
             const tripData = rawContent.data || rawContent;
@@ -1020,7 +1037,13 @@
       console.error('Failed to list cloud trips from Google Drive:', err);
       return [];
     } finally {
-      if (!isSilent) updateCloudSyncStatusPill(`☁️ Synced to Drive`, 'connected');
+      if (!isSilent) {
+        if (isAccessTokenValid()) {
+          updateCloudSyncStatusPill(`☁️ Synced to Drive`, 'connected');
+        } else {
+          updateCloudSyncStatusPill();
+        }
+      }
       updateCloudSyncModalState(window.__gdriveCloudFiles || []);
       if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
       if (typeof window.renderTripGalleryGrid === 'function') window.renderTripGalleryGrid();
@@ -1380,7 +1403,7 @@
   let isFlushingQueue = false;
   async function flushOfflineSyncQueue() {
     if (isFlushingQueue) return;
-    if (!isGoogleDriveConnected()) return;
+    if (!isGoogleDriveConnected() || !isAccessTokenValid()) return;
     if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
     if (typeof window.getOfflineSyncQueue !== 'function') return;
 

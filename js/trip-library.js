@@ -244,9 +244,16 @@
     modal.hidden = false;
     modal.style.display = 'flex';
     modal.classList.add('active');
-    await window.renderTripGalleryGrid();
+
+    // Immediately trigger telemetry without waiting for gallery
     if (typeof window.renderStorageTelemetry === 'function') {
       window.renderStorageTelemetry();
+    }
+
+    try {
+      await window.renderTripGalleryGrid();
+    } catch (err) {
+      console.error('Failed to render trip gallery grid:', err);
     }
   };
 
@@ -258,20 +265,23 @@
     if (typeof window.getStorageTelemetry === 'function') {
       try {
         const telemetry = await window.getStorageTelemetry();
-        if (telemetry && telemetry.supported) {
+        if (telemetry && telemetry.supported && telemetry.quota > 0) {
           const persistStatus = telemetry.persisted ? '🟢 Persistent: Active' : '🟡 Persistent: Standard';
           quotaText.innerHTML = `💾 <strong>Storage:</strong> ${escapeHtml(telemetry.usageFormatted)} used of ${escapeHtml(telemetry.quotaFormatted)} (${persistStatus})`;
           if (persistBtn) {
             persistBtn.style.display = telemetry.persisted ? 'none' : 'inline-block';
           }
         } else {
-          quotaText.innerText = '💾 Storage: Local Device Storage (Active)';
+          quotaText.innerText = '💾 Storage: Local Storage (Active)';
           if (persistBtn) persistBtn.style.display = 'none';
         }
       } catch (err) {
-        quotaText.innerText = '💾 Storage: Local Device Storage (Active)';
+        quotaText.innerText = '💾 Storage: Local Storage (Active)';
         if (persistBtn) persistBtn.style.display = 'none';
       }
+    } else {
+      quotaText.innerText = '💾 Storage: Local Storage (Active)';
+      if (persistBtn) persistBtn.style.display = 'none';
     }
   };
 

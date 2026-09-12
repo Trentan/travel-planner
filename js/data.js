@@ -106,11 +106,17 @@ window.formatBytes = formatBytes;
 async function getStorageTelemetry() {
   if (typeof navigator !== 'undefined' && navigator.storage && typeof navigator.storage.estimate === 'function') {
     try {
-      const estimate = await navigator.storage.estimate();
-      const usage = estimate.usage || 0;
-      const quota = estimate.quota || 0;
+      const estimate = await Promise.race([
+        navigator.storage.estimate(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Storage estimate timeout')), 2500))
+      ]);
+      const usage = (estimate && estimate.usage) || 0;
+      const quota = (estimate && estimate.quota) || 0;
       const percent = quota > 0 ? Math.min(100, Math.round((usage / quota) * 100)) : 0;
-      const persisted = await isStoragePersisted();
+      const persisted = await Promise.race([
+        isStoragePersisted(),
+        new Promise(resolve => setTimeout(() => resolve(false), 1500))
+      ]);
       return {
         supported: true,
         usage,
@@ -128,8 +134,8 @@ async function getStorageTelemetry() {
     supported: false,
     usage: 0,
     quota: 0,
-    usageFormatted: 'Unknown',
-    quotaFormatted: 'Unknown',
+    usageFormatted: 'Active',
+    quotaFormatted: 'Local Device',
     percent: 0,
     persisted: false
   };
@@ -224,16 +230,44 @@ function openDB() {
       return;
     }
 
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      reject(new Error('IndexedDB not supported'));
+      return;
+    }
+
+    let settled = false;
+    const timeoutTimer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        console.warn('IndexedDB open timed out (possibly blocked by another open tab). Resolving with fallback.');
+        resolve(db || null);
+      }
+    }, 3500);
+
     const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutTimer);
       console.error('IndexedDB error:', request.error);
       reject(request.error);
     };
 
+    request.onblocked = () => {
+      console.warn('IndexedDB upgrade blocked by an open connection in another tab.');
+    };
+
     request.onsuccess = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutTimer);
       db = request.result;
-      console.log('IndexedDB opened successfully');
+      db.onversionchange = () => {
+        console.log('IndexedDB version changed elsewhere. Closing stale connection.');
+        db.close();
+        db = null;
+      };
       resolve(db);
     };
 
@@ -263,13 +297,13 @@ function getAllTripsFromIndexedDB(forceRefresh = false) {
   if (!forceRefresh && tripsCache && (Date.now() - lastCacheTime < CACHE_TTL_MS)) {
     return Promise.resolve(jsonSafeClone(tripsCache));
   }
-  return openDB().then(db => {
-    return new Promise((resolve, reject) => {
-      if (!db.objectStoreNames.contains(TRIPS_STORE_NAME)) {
-        resolve([]);
+  return openDB().then(dbInstance => {
+    return new Promise((resolve) => {
+      if (!dbInstance || !dbInstance.objectStoreNames || !dbInstance.objectStoreNames.contains(TRIPS_STORE_NAME)) {
+        resolve(tripsCache || []);
         return;
       }
-      const transaction = db.transaction([TRIPS_STORE_NAME], 'readonly');
+      const transaction = dbInstance.transaction([TRIPS_STORE_NAME], 'readonly');
       const store = transaction.objectStore(TRIPS_STORE_NAME);
       const request = store.getAll();
 
@@ -284,9 +318,12 @@ function getAllTripsFromIndexedDB(forceRefresh = false) {
 
       request.onerror = () => {
         console.error('Failed to load trips from IndexedDB:', request.error);
-        resolve([]);
+        resolve(tripsCache || []);
       };
     });
+  }).catch(err => {
+    console.warn('getAllTripsFromIndexedDB error fallback:', err);
+    return tripsCache || [];
   });
 }
 window.getAllTripsFromIndexedDB = getAllTripsFromIndexedDB;
