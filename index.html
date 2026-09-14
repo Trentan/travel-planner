@@ -85,6 +85,7 @@
         <!-- 3. Export & Share -->
         <div class="app-menu-section-group">
           <div class="app-menu-section-header">📤 Export & Share</div>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); printItinerary()"><span class="menu-icon">🖨️</span> Print / Save to PDF</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openShareExportDialog()"><span class="menu-icon">🔗</span> Share Export Link</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItineraryCalendar()"><span class="menu-icon">📅</span> Export to Calendar (.ics)</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItinerarySummaryText()"><span class="menu-icon">📝</span> Export AI Summary</button>
@@ -211,6 +212,51 @@
 
   <div class="app-tabs-content">
     <div id="tab-itinerary" class="tab-pane active">
+      <!-- Printable Itinerary Cover & Summary Header (Revealed only during @media print) -->
+      <div id="printTripHeader" class="print-trip-header" aria-hidden="true">
+        <div class="print-trip-header-top">
+          <div class="print-trip-title-row">
+            <span class="print-trip-icon" id="printTripIcon">✈️</span>
+            <h1 id="printTripTitle" class="print-trip-title">My Trip</h1>
+          </div>
+          <p id="printTripSubtitle" class="print-trip-subtitle"></p>
+        </div>
+        <div class="print-trip-meta-grid" id="printTripMetaGrid">
+          <div class="print-meta-item">
+            <span class="print-meta-label">Dates</span>
+            <span class="print-meta-val" id="printTripDates">—</span>
+          </div>
+          <div class="print-meta-item">
+            <span class="print-meta-label">Duration</span>
+            <span class="print-meta-val" id="printTripDuration">—</span>
+          </div>
+          <div class="print-meta-item">
+            <span class="print-meta-label">Cities / Destinations</span>
+            <span class="print-meta-val" id="printTripDestinations">—</span>
+          </div>
+          <div class="print-meta-item">
+            <span class="print-meta-label">Total Stays</span>
+            <span class="print-meta-val" id="printTripStaysCount">—</span>
+          </div>
+        </div>
+        <div id="printAccomSummarySection" class="print-accom-summary-section">
+          <h2 class="print-section-heading">Accommodations &amp; Lodging Overview</h2>
+          <table class="print-accom-table" id="printAccomTable">
+            <thead>
+              <tr>
+                <th>City / Area</th>
+                <th>Accommodation</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Booking Ref</th>
+                <th>Location / Notes</th>
+              </tr>
+            </thead>
+            <tbody id="printAccomTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="section-header">
         <h3 class="section-header-title">🗓️ Itinerary</h3>
         <div class="section-header-actions">
@@ -219,11 +265,49 @@
             <button id="itineraryTimelineModeBtn" class="itinerary-view-mode-btn is-active" type="button" onclick="setItineraryDayViewMode('timeline')" title="Timeline View" aria-label="Timeline View"><span class="view-mode-icon">⏳</span> <span class="view-mode-text">Timeline</span></button>
             <button id="itineraryGroupedModeBtn" class="itinerary-view-mode-btn" type="button" onclick="setItineraryDayViewMode('grouped')" title="Grouped View" aria-label="Grouped View"><span class="view-mode-icon">📦</span> <span class="view-mode-text">Grouped</span></button>
           </div>
+          <!-- Desktop Split View Controls (Visible on screens >= 1024px) -->
+          <div class="desktop-split-view-controls" id="desktopSplitViewControls" role="group" aria-label="Desktop split view layout">
+            <button id="desktopSplitToggleBtn" class="action-btn desktop-split-btn is-active" type="button" onclick="toggleDesktopSplitMode('split')" title="Dual-pane split view (Itinerary &amp; Map)" aria-pressed="true">
+              <span class="split-icon">◨</span> <span class="split-label">Split View</span>
+            </button>
+            <button id="desktopFullWidthToggleBtn" class="action-btn desktop-full-btn" type="button" onclick="toggleDesktopSplitMode('full-itinerary')" title="Expand itinerary to full width" aria-pressed="false">
+              <span class="split-icon">⛶</span> <span class="split-label">Full Itinerary</span>
+            </button>
+          </div>
           <button class="action-btn add-city-action" onclick="openCityDialog()"><span class="add-city-label">🌍 City</span></button>
           <button class="action-btn add-leg-action" onclick="openLegEditorDialog()"><span class="add-leg-label">🧭 Legs</span></button>
         </div>
       </div>
-      <div id="itinerary"></div>
+
+      <div class="desktop-split-shell" id="desktopSplitShell">
+        <div class="desktop-split-left" id="desktopSplitLeft">
+          <div id="itinerary"></div>
+        </div>
+        <aside class="desktop-split-right" id="desktopSplitRight" aria-label="Interactive Map and Detail Drawer">
+          <div class="desktop-split-right-card">
+            <div class="desktop-split-right-header">
+              <div class="desktop-split-right-title">
+                <span class="split-map-icon">🗺️</span>
+                <span id="splitMapHeading" class="font-semibold text-slate-800 dark:text-slate-100 text-sm">Interactive Map</span>
+              </div>
+              <div class="desktop-split-right-actions flex items-center gap-1.5">
+                <a id="splitMapGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="action-btn split-action-btn text-xs py-1 px-2 text-teal-600 dark:text-teal-400 font-medium" style="display: none;" title="Open day stops in Google Maps">🗺️ Day in Maps ↗</a>
+                <button type="button" class="action-btn split-action-btn text-xs py-1 px-2" onclick="resetSplitMapView()" title="Fit full trip route on map">📍 Reset Route</button>
+                <button type="button" class="action-btn split-action-btn text-xs py-1 px-2" onclick="switchTab('map')" title="Open full map tab">⛶ Full Tab</button>
+              </div>
+            </div>
+            <div class="desktop-split-map-wrap" id="desktopSplitMapWrap">
+              <div id="desktop-split-map-view" class="desktop-split-map"></div>
+            </div>
+            <div class="desktop-split-drawer" id="desktopSplitDrawer">
+              <div class="desktop-split-drawer-placeholder" id="splitDrawerPlaceholder">
+                <p class="text-xs text-slate-500 dark:text-slate-400 m-0">💡 Select any activity, accommodation, or transit stop to focus the map and inspect details.</p>
+              </div>
+              <div class="desktop-split-drawer-content" id="splitDrawerContent" hidden></div>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
 
     <div id="tab-transport" class="tab-pane">
@@ -367,6 +451,10 @@
         <section class="mobile-menu-section" aria-labelledby="mobileMenuExportShare">
           <h3 id="mobileMenuExportShare" class="mobile-menu-section-title">📤 Export & Share</h3>
           <div class="mobile-menu-section-grid mobile-menu-section-grid-stacked">
+            <button class="app-menu-btn" onclick="closeMobileMenu(); printItinerary()">
+              <span class="app-menu-btn-title">🖨️ Print / Save to PDF</span>
+              <span class="app-menu-btn-subtitle">Clean A4/Letter printable itinerary &amp; lodging table</span>
+            </button>
             <button class="app-menu-btn" onclick="closeMobileMenu(); openShareExportDialog()">
               <span class="app-menu-btn-title">🔗 Share Export Link</span>
               <span class="app-menu-btn-subtitle">Create a shareable link or export package</span>

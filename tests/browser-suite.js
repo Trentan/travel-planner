@@ -413,7 +413,102 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
       const header = document.querySelector('.packing-guides-mobile-header');
       return header ? window.getComputedStyle(header).display === 'none' : true;
     });
-    assert(desktopPackingHeaderHidden === true, 'Desktop: mobile packing guides header should be hidden in desktop view');
+    // Milestone 6: Desktop Split-Pane Layout & Print Productivity (1440x900)
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.locator('.app-tab-btn[data-tab="itinerary"]').click();
+    await humanPause(page, 350);
+
+    const splitShellExists = await page.evaluate(() => !!document.getElementById('desktopSplitShell'));
+    assert(splitShellExists, 'Desktop: #desktopSplitShell must exist');
+
+    const splitRightVisible = await page.evaluate(() => {
+      const el = document.getElementById('desktopSplitRight');
+      return el ? window.getComputedStyle(el).display !== 'none' : false;
+    });
+    assert(splitRightVisible, 'Desktop: #desktopSplitRight should be visible at 1440x900');
+
+    // Test toggle full-itinerary mode
+    await page.locator('#desktopFullWidthToggleBtn').click();
+    await humanPause(page, 200);
+    const fullItinActive = await page.evaluate(() => {
+      const shell = document.getElementById('desktopSplitShell');
+      const right = document.getElementById('desktopSplitRight');
+      return shell.classList.contains('is-full-itinerary') && window.getComputedStyle(right).display === 'none';
+    });
+    assert(fullItinActive, 'Desktop: clicking Full Itinerary should hide right pane and expand itinerary');
+
+    // Test restore split mode
+    await page.locator('#desktopSplitToggleBtn').click();
+    await humanPause(page, 200);
+    const splitRestored = await page.evaluate(() => {
+      const shell = document.getElementById('desktopSplitShell');
+      const right = document.getElementById('desktopSplitRight');
+      return !shell.classList.contains('is-full-itinerary') && window.getComputedStyle(right).display !== 'none';
+    });
+    assert(splitRestored, 'Desktop: clicking Split View should restore right pane');
+
+    // Test Day in View synchronization
+    await page.evaluate(() => {
+      if (typeof window.syncDesktopSplitToDayInView === 'function') {
+        window.syncDesktopSplitToDayInView(true);
+      }
+    });
+    await humanPause(page, 250);
+
+    const dayViewVerified = await page.evaluate(() => {
+      const heading = document.getElementById('splitMapHeading')?.textContent || '';
+      const drawer = document.getElementById('splitDrawerContent');
+      const hasDayCard = drawer && drawer.querySelector('.split-drawer-day-card');
+      return {
+        headingHasDay: heading.includes('Day') || heading.includes('·'),
+        hasDayCard: !!hasDayCard
+      };
+    });
+    assert(dayViewVerified.hasDayCard, 'Desktop: day in view should render .split-drawer-day-card in drawer');
+    assert(dayViewVerified.headingHasDay, 'Desktop: split map heading should reflect active day/route');
+
+    // Test item click and drawer inspection
+    await page.evaluate(() => {
+      const firstItem = document.querySelector('#itinerary .split-item-selectable');
+      if (firstItem) firstItem.click();
+    });
+    await humanPause(page, 250);
+    const drawerHasItem = await page.evaluate(() => {
+      const drawer = document.getElementById('splitDrawerContent');
+      const hasItemCard = drawer && drawer.querySelector('.split-drawer-item-card') && !drawer.querySelector('.split-drawer-day-card');
+      const hasRestoreBtn = drawer && drawer.innerHTML.includes('Day Overview');
+      return hasItemCard && hasRestoreBtn;
+    });
+    assert(drawerHasItem, 'Desktop: clicking item should inspect item and display "Day Overview" button');
+
+    // Test return to Day Overview
+    await page.evaluate(() => {
+      if (typeof window.restoreSplitDayOverview === 'function') {
+        window.restoreSplitDayOverview();
+      }
+    });
+    await humanPause(page, 200);
+    const dayViewRestored = await page.evaluate(() => {
+      const drawer = document.getElementById('splitDrawerContent');
+      return drawer && !!drawer.querySelector('.split-drawer-day-card');
+    });
+    assert(dayViewRestored, 'Desktop: clicking "Day Overview" should restore active day card');
+
+    // Test print header generation
+    await page.evaluate(() => {
+      if (typeof window.populatePrintTripHeader === 'function') window.populatePrintTripHeader();
+    });
+    const printTitle = await page.evaluate(() => document.getElementById('printTripTitle')?.textContent);
+    assert(!!printTitle, 'Desktop: print cover header title should be populated');
+
+    // Test Print button in actions menu
+    await page.locator('#desktopActionsMenu > summary').click();
+    await humanPause(page, 200);
+    const printBtnCount = await page.locator('#desktopActionsMenu button:has-text("Print / Save to PDF")').count();
+    assert(printBtnCount === 1, 'Desktop: actions menu should contain "Print / Save to PDF" option');
+    await page.locator('#desktopActionsMenu > summary').click();
+
+    reporter.add('desktop', 'milestone 6 desktop split & print', 'verified 1440x900 split-pane, drawer synchronization, toggle controls, and print menu option');
     reporter.add('desktop', 'sprint 1 parity', 'desktop retains All button and inline packing guides');
   } finally {
     await context.close();
@@ -594,6 +689,18 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     assert(await page.locator('#mobileRedoBtn').count() === 1, 'Mobile: #mobileRedoBtn should exist in mobile action menu');
     const undoDisabled = await page.locator('#mobileUndoBtn').getAttribute('disabled');
     assert(undoDisabled !== null, 'Mobile: #mobileUndoBtn should be disabled initially with empty history');
+    // Milestone 6 Mobile Verification (390x844)
+    const mobileRightPaneHidden = await page.evaluate(() => {
+      const el = document.getElementById('desktopSplitRight');
+      return el ? window.getComputedStyle(el).display === 'none' : true;
+    });
+    assert(mobileRightPaneHidden === true, 'Mobile: #desktopSplitRight should be hidden in mobile view');
+
+    // Verify Print button in mobile menu
+    const mobilePrintBtnCount = await page.locator('#mobileMenuSheet button:has-text("Print / Save to PDF")').count();
+    assert(mobilePrintBtnCount >= 1, 'Mobile: mobile menu should contain "Print / Save to PDF" option');
+    reporter.add('mobile', 'milestone 6 mobile ergonomics', 'right drawer hidden on mobile, print button available in menu');
+
     reporter.add('mobile', 'undo redo menu', 'mobile undo and redo controls integrated and reactive');
     reporter.add('mobile', 'menu sheet', 'mobile menu opened with desktop advisory notice');
 

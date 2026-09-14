@@ -334,7 +334,7 @@ function buildJourneyMap() {
     container.innerHTML = '';
     container.classList.remove('map-placeholder');
 
-    mainMap = L.map(container, { trackResize: true });
+    mainMap = L.map(container, { trackResize: true }).setView([20, 0], 2);
 
     const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     const tileUrl = isDarkMode
@@ -475,18 +475,63 @@ function openAllInGoogleMaps() {
   window.open(url, '_blank');
 }
 
-// Update map tiles when theme changes
 function updateMapTiles() {
-  if (!mainMap) return;
+  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+  const tileUrl = isDarkMode
+    ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+    : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
 
-  // Remove existing tile layers
-  mainMap.eachLayer(layer => {
-    if (layer._url) {
-      mainMap.removeLayer(layer);
-    }
-  });
+  const tileAttribution = isDarkMode
+    ? 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+    : 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom';
 
-  // Add new tile layer based on current theme
+  if (mainMap) {
+    mainMap.eachLayer(layer => {
+      if (layer._url) mainMap.removeLayer(layer);
+    });
+    L.tileLayer(tileUrl, { attribution: tileAttribution, maxZoom: 19 }).addTo(mainMap);
+  }
+
+  if (desktopSplitMap) {
+    desktopSplitMap.eachLayer(layer => {
+      if (layer._url) desktopSplitMap.removeLayer(layer);
+    });
+    L.tileLayer(tileUrl, { attribution: tileAttribution, maxZoom: 19 }).addTo(desktopSplitMap);
+  }
+}
+
+// Desktop Split-Pane Map (Milestone 6 / Issues #286, #299)
+let desktopSplitMap = null;
+let splitMapMarkers = [];
+let splitMapPolylines = [];
+
+function buildDesktopSplitMap() {
+  if (typeof window === 'undefined' || typeof L === 'undefined') return;
+  const container = document.getElementById('desktop-split-map-view');
+  if (!container) return;
+
+  const shell = document.getElementById('desktopSplitShell');
+  if (shell && shell.classList.contains('is-full-itinerary')) return;
+  if (window.innerWidth < 1024) return;
+
+  if (desktopSplitMap) {
+    try {
+      desktopSplitMap.remove();
+    } catch (e) {}
+    desktopSplitMap = null;
+  }
+
+  container.innerHTML = '';
+  splitMapMarkers = [];
+  splitMapPolylines = [];
+
+  try {
+    desktopSplitMap = L.map(container, { trackResize: true, zoomControl: true }).setView([20, 0], 2);
+  } catch (err) {
+    console.warn('Failed to initialize desktop split map:', err);
+    return;
+  }
+
   const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
   const tileUrl = isDarkMode
     ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
@@ -499,7 +544,502 @@ function updateMapTiles() {
   L.tileLayer(tileUrl, {
     attribution: tileAttribution,
     maxZoom: 19
-  }).addTo(mainMap);
+  }).addTo(desktopSplitMap);
+
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => {
+      if (desktopSplitMap) desktopSplitMap.invalidateSize();
+    }).observe(container);
+  }
+
+  const pathStops = collectPathStops();
+  const travelSequence = buildTravelSequence(pathStops);
+  const { destinations } = buildMapDestinations(travelSequence);
+
+  if (destinations.length === 0) {
+    container.innerHTML = '<div class="p-4 text-xs text-center text-slate-500">No destinations mapped yet.</div>';
+    return;
+  }
+
+  // Draw Polylines on split map
+  const polylinePoints = [];
+  for (let i = 0; i < travelSequence.length - 1; i++) {
+    const fromStop = travelSequence[i];
+    const toStop = travelSequence[i + 1];
+    const fromCoords = getCityCoords(fromStop.name);
+    const toCoords = getCityCoords(toStop.name);
+    if (fromCoords && toCoords) {
+      if (i === 0) polylinePoints.push([fromCoords.lat, fromCoords.lng]);
+      polylinePoints.push([toCoords.lat, toCoords.lng]);
+
+      let matchedJourney = null;
+      if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
+        matchedJourney = journeys.find(j => {
+          const jFrom = getMapCityKey(j.fromLocation || j.from);
+          const jTo = getMapCityKey(j.toLocation || j.to);
+          const sFrom = getMapCityKey(fromStop.name);
+          const sTo = getMapCityKey(toStop.name);
+          return jFrom === sFrom && jTo === sTo;
+        });
+      }
+
+      let lineColor = '#0f766e';
+      let dashArray = '8, 8';
+      let weight = 3;
+
+      if (matchedJourney) {
+        const method = String(matchedJourney.transportType || '').toLowerCase();
+        if (method === 'flight') {
+          lineColor = '#3b82f6';
+          dashArray = '6, 6';
+        } else if (method === 'train') {
+          lineColor = '#16a34a';
+          dashArray = null;
+        } else if (method === 'bus') {
+          lineColor = '#ea580c';
+          dashArray = null;
+        } else {
+          lineColor = '#64748b';
+          dashArray = null;
+        }
+      }
+
+      const polyline = L.polyline([
+        [fromCoords.lat, fromCoords.lng],
+        [toCoords.lat, toCoords.lng]
+      ], {
+        color: lineColor,
+        weight: weight,
+        dashArray: dashArray,
+        opacity: 0.8
+      }).addTo(desktopSplitMap);
+
+      splitMapPolylines.push(polyline);
+    }
+  }
+
+  // Draw Markers on split map
+  destinations.forEach(d => {
+    const isTransit = d.isTransit;
+    const firstIndex = d.index;
+
+    const icon = L.divIcon({
+      className: `numbered-map-marker ${isTransit ? 'is-transit-marker' : ''}`,
+      html: `<div class="marker-dot" style="background-color: ${isTransit ? '#95a5a6' : d.color}; border-style: ${isTransit ? 'dashed' : 'solid'};"><span>${firstIndex}</span></div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+
+    const marker = L.marker([d.lat, d.lng], { icon: icon }).addTo(desktopSplitMap);
+    let popupText = `<b>${firstIndex}. ${d.name}</b>`;
+    if (marker && typeof marker.bindPopup === 'function') {
+      marker.bindPopup(popupText);
+    }
+
+    if (marker && typeof marker.on === 'function') {
+      marker.on('click', () => {
+        focusCityInItineraryList(d.name);
+        if (typeof renderSplitDrawerContent === 'function') {
+          renderSplitDrawerContent({
+            type: 'city',
+            title: d.name,
+            location: d.name,
+            color: d.color,
+            index: d.index,
+            isTransit: d.isTransit
+          });
+        }
+      });
+    }
+
+    splitMapMarkers.push({ id: d.id, name: d.name, marker: marker, lat: d.lat, lng: d.lng });
+  });
+
+  setTimeout(() => {
+    if (!desktopSplitMap) return;
+    desktopSplitMap.invalidateSize(false);
+    if (polylinePoints.length > 1) {
+      desktopSplitMap.fitBounds(L.polyline(polylinePoints).getBounds(), { padding: [30, 30], animate: false });
+    } else if (polylinePoints.length === 1) {
+      desktopSplitMap.setView(polylinePoints[0], 10, { animate: false });
+    } else {
+      desktopSplitMap.setView([20, 0], 2, { animate: false });
+    }
+  }, 100);
+}
+
+function focusStopOnSplitMap(targetLocation, itemData = null) {
+  if (!desktopSplitMap || splitMapMarkers.length === 0) return;
+  if (!targetLocation && itemData && itemData.location) targetLocation = itemData.location;
+
+  const title = String((itemData && (itemData.title || itemData.name || itemData.text)) || '').toLowerCase().trim();
+  const cleanTarget = String(targetLocation || '')
+    .replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '')
+    .toLowerCase()
+    .trim();
+
+  // 1. Try finding marker in splitMapMarkers
+  let entry = splitMapMarkers.find(m => {
+    if (itemData && itemData.activityId && m.id === `act-${itemData.activityId}`) return true;
+    if (itemData && itemData.id && m.id === itemData.id) return true;
+    const cleanName = String(m.name || '').toLowerCase().trim();
+    if (title && (cleanName.includes(title) || title.includes(cleanName))) return true;
+    if (cleanTarget && (cleanName.includes(cleanTarget) || cleanTarget.includes(cleanName))) return true;
+    return false;
+  });
+
+  let coords = null;
+  if (entry) {
+    coords = typeof entry.marker.getLatLng === 'function' ? entry.marker.getLatLng() : { lat: entry.lat, lng: entry.lng };
+  } else if (itemData && itemData.lat && itemData.lng && !isNaN(Number(itemData.lat))) {
+    coords = { lat: Number(itemData.lat), lng: Number(itemData.lng) };
+  } else if (cleanTarget) {
+    coords = getCityCoords(cleanTarget);
+  }
+
+  if (coords) {
+    const zoomLevel = entry && entry.id && (entry.id.startsWith('day-') || entry.id === 'city-center') ? 13 : 15;
+    if (typeof desktopSplitMap.flyTo === 'function') {
+      desktopSplitMap.flyTo([coords.lat, coords.lng], zoomLevel, { duration: 0.5 });
+    } else if (typeof desktopSplitMap.setView === 'function') {
+      desktopSplitMap.setView([coords.lat, coords.lng], zoomLevel);
+    }
+
+    if (entry && entry.marker) {
+      if (typeof entry.marker.openPopup === 'function') entry.marker.openPopup();
+      if (typeof entry.marker.getElement === 'function') {
+        const el = entry.marker.getElement();
+        if (el) {
+          el.classList.add('marker-flared');
+          setTimeout(() => el.classList.remove('marker-flared'), 2200);
+        }
+      }
+    }
+  }
+}
+
+function clearSplitMapLayers() {
+  if (!desktopSplitMap) return;
+  if (Array.isArray(splitMapMarkers)) {
+    splitMapMarkers.forEach(m => {
+      try {
+        if (m && m.marker && typeof desktopSplitMap.removeLayer === 'function') {
+          desktopSplitMap.removeLayer(m.marker);
+        }
+      } catch (e) {}
+    });
+  }
+  splitMapMarkers = [];
+
+  if (Array.isArray(splitMapPolylines)) {
+    splitMapPolylines.forEach(p => {
+      try {
+        if (p && typeof desktopSplitMap.removeLayer === 'function') {
+          desktopSplitMap.removeLayer(p);
+        }
+      } catch (e) {}
+    });
+  }
+  splitMapPolylines = [];
+}
+
+function getDeterministicActivityCoords(baseCoords, act, index, total) {
+  if (!baseCoords) return null;
+  if (act && act.lat !== undefined && act.lng !== undefined && act.lat !== null && !isNaN(Number(act.lat))) {
+    return { lat: Number(act.lat), lng: Number(act.lng) };
+  }
+  const actLoc = String((act && act.location) || '').trim();
+  if (actLoc) {
+    const direct = getCityCoords(actLoc);
+    if (direct) return direct;
+  }
+  if (actLoc && typeof ALL_CITIES !== 'undefined') {
+    const words = actLoc.split(/[\s,/·-]+/).filter(w => w.length > 2);
+    for (const w of words) {
+      const match = getCityCoords(w);
+      if (match) return match;
+    }
+  }
+
+  // Deterministically distribute around the base city coordinates in an urban radius (800m - 2.4km)
+  const count = Math.max(1, total || 1);
+  const angle = (index / count) * 2 * Math.PI + 0.35;
+  const str = String((act && (act.title || act.text || act.name)) || index);
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash + str.charCodeAt(i) * (i + 1)) % 100;
+  }
+  const jitter = 0.007 + (hash / 100) * 0.015;
+  const latCos = Math.max(0.2, Math.cos(baseCoords.lat * Math.PI / 180));
+  return {
+    lat: baseCoords.lat + jitter * Math.sin(angle),
+    lng: baseCoords.lng + (jitter * Math.cos(angle)) / latCos
+  };
+}
+
+function renderDesktopSplitDayMap(dayData, options = {}) {
+  if (typeof window === 'undefined' || window.innerWidth < 1024) return;
+  if (!dayData) return;
+
+  const container = document.getElementById('desktop-split-map-view');
+  if (!container) return;
+
+  if (!desktopSplitMap) {
+    buildDesktopSplitMap();
+  }
+  if (!desktopSplitMap) return;
+
+  // Invalidate size so Leaflet takes full vertical height
+  if (typeof desktopSplitMap.invalidateSize === 'function') {
+    desktopSplitMap.invalidateSize();
+    setTimeout(() => {
+      if (desktopSplitMap && typeof desktopSplitMap.invalidateSize === 'function') {
+        desktopSplitMap.invalidateSize();
+      }
+    }, 60);
+  }
+
+  clearSplitMapLayers();
+
+  const fromCity = String(dayData.from || '').trim();
+  const toCity = String(dayData.to || dayData.from || '').trim();
+  const cleanFrom = fromCity.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').replace(/\s*\(\d+\)$/, '').trim();
+  const cleanTo = toCity.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').replace(/\s*\(\d+\)$/, '').trim();
+  const isTravelDay = cleanFrom.toLowerCase() !== cleanTo.toLowerCase() && cleanFrom.length > 0 && cleanTo.length > 0;
+  const legColour = (dayData.leg && dayData.leg.colour) || '#0f766e';
+  const dayNumLabel = dayData.dayNumber ? `Day ${dayData.dayNumber}` : '';
+
+  const activities = Array.isArray(dayData.activities) ? dayData.activities : [];
+  const stays = Array.isArray(dayData.stays) ? dayData.stays : [];
+  const totalStops = (isTravelDay ? 2 : 1) + stays.length + activities.length;
+
+  // Update Split Map Header Title
+  const headingEl = document.getElementById('splitMapHeading');
+  if (headingEl) {
+    const stopsSuffix = totalStops > 1 ? ` · ${totalStops} stops` : '';
+    if (isTravelDay) {
+      headingEl.textContent = `✈️ ${cleanFrom} → ${cleanTo}${dayNumLabel ? ' · ' + dayNumLabel : ''}${stopsSuffix}`;
+    } else {
+      headingEl.textContent = `📍 ${cleanTo || cleanFrom}${dayNumLabel ? ' · ' + dayNumLabel : ''}${stopsSuffix}`;
+    }
+  }
+
+  // Update Split Map Header Google Maps multi-stop link
+  const gBtn = document.getElementById('splitMapGoogleMapsBtn');
+  if (gBtn) {
+    if (dayData.mapRoute && dayData.mapRoute.url) {
+      gBtn.href = dayData.mapRoute.url;
+      gBtn.style.display = 'inline-flex';
+    } else {
+      gBtn.style.display = 'none';
+    }
+  }
+
+  const points = [];
+  const routePoints = [];
+
+  const targetCity = cleanTo || cleanFrom || (dayData.leg && dayData.leg.label);
+  const cityCoords = getCityCoords(targetCity);
+  const fromCoords = isTravelDay ? getCityCoords(cleanFrom) : null;
+  const toCoords = isTravelDay ? getCityCoords(cleanTo) : cityCoords;
+
+  if (isTravelDay) {
+    if (fromCoords && toCoords) {
+      const fromIcon = L.divIcon({
+        className: 'numbered-map-marker is-departure-marker',
+        html: `<div class="marker-dot" style="background-color: ${legColour}; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span>🛫</span></div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+      const fromMarker = L.marker([fromCoords.lat, fromCoords.lng], { icon: fromIcon }).addTo(desktopSplitMap);
+      if (fromMarker && typeof fromMarker.bindPopup === 'function') {
+        fromMarker.bindPopup(`<b>🛫 Departure: ${cleanFrom}</b><br><span style="font-size:0.75rem; color:#64748b;">${dayData.date || ''}</span>`);
+      }
+      splitMapMarkers.push({ id: 'day-from', name: cleanFrom, marker: fromMarker, lat: fromCoords.lat, lng: fromCoords.lng });
+      points.push([fromCoords.lat, fromCoords.lng]);
+      routePoints.push([fromCoords.lat, fromCoords.lng]);
+
+      const toIcon = L.divIcon({
+        className: 'numbered-map-marker is-arrival-marker',
+        html: `<div class="marker-dot" style="background-color: #0f766e; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span>🛬</span></div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+      const toMarker = L.marker([toCoords.lat, toCoords.lng], { icon: toIcon }).addTo(desktopSplitMap);
+      if (toMarker && typeof toMarker.bindPopup === 'function') {
+        toMarker.bindPopup(`<b>🛬 Destination: ${cleanTo}</b><br><span style="font-size:0.75rem; color:#64748b;">${dayData.date || ''}</span>`);
+      }
+      splitMapMarkers.push({ id: 'day-to', name: cleanTo, marker: toMarker, lat: toCoords.lat, lng: toCoords.lng });
+      points.push([toCoords.lat, toCoords.lng]);
+      routePoints.push([toCoords.lat, toCoords.lng]);
+
+      const polyline = L.polyline([[fromCoords.lat, fromCoords.lng], [toCoords.lat, toCoords.lng]], {
+        color: '#3b82f6',
+        weight: 4,
+        dashArray: '8, 8',
+        opacity: 0.85
+      }).addTo(desktopSplitMap);
+      splitMapPolylines.push(polyline);
+    } else if (toCoords || fromCoords) {
+      const single = toCoords || fromCoords;
+      const name = toCoords ? cleanTo : cleanFrom;
+      const marker = L.marker([single.lat, single.lng]).addTo(desktopSplitMap);
+      splitMapMarkers.push({ id: 'day-city', name: name, marker: marker, lat: single.lat, lng: single.lng });
+      points.push([single.lat, single.lng]);
+      routePoints.push([single.lat, single.lng]);
+    }
+  } else if (cityCoords) {
+    const cityIcon = L.divIcon({
+      className: 'numbered-map-marker is-city-center-marker',
+      html: `<div class="marker-dot" style="background-color: ${legColour}; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span>📍</span></div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
+    });
+    const cityMarker = L.marker([cityCoords.lat, cityCoords.lng], { icon: cityIcon }).addTo(desktopSplitMap);
+    if (cityMarker && typeof cityMarker.bindPopup === 'function') {
+      cityMarker.bindPopup(`<b>📍 ${targetCity}</b><br><span style="font-size:0.75rem; color:#64748b;">${dayData.dayName || ''} ${dayData.date || ''}</span>`);
+    }
+    splitMapMarkers.push({ id: 'day-city', name: targetCity, marker: cityMarker, lat: cityCoords.lat, lng: cityCoords.lng });
+    points.push([cityCoords.lat, cityCoords.lng]);
+    routePoints.push([cityCoords.lat, cityCoords.lng]);
+  }
+
+  const baseCoords = toCoords || cityCoords || fromCoords;
+
+  // Stays
+  stays.forEach((stay, sIdx) => {
+    const stayName = stay.name || stay.propertyName || 'Accommodation';
+    const stayLoc = stay.location || stay.city || targetCity;
+    const directStayCoords = getCityCoords(stayLoc);
+    const stayCoords = directStayCoords || (baseCoords ? {
+      lat: baseCoords.lat + (sIdx === 0 ? 0.007 : -0.007),
+      lng: baseCoords.lng + (sIdx === 0 ? 0.007 : -0.007)
+    } : null);
+
+    if (stayCoords) {
+      const stayIcon = L.divIcon({
+        className: 'numbered-map-marker is-stay-marker',
+        html: `<div class="marker-dot" style="background-color: #be185d; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span>🏨</span></div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      });
+      const stayMarker = L.marker([stayCoords.lat, stayCoords.lng], { icon: stayIcon }).addTo(desktopSplitMap);
+      if (stayMarker && typeof stayMarker.bindPopup === 'function') {
+        stayMarker.bindPopup(`<b>🏨 ${stayName}</b><br><span style="font-size:0.75rem;">${stay.bookingRef ? '#' + stay.bookingRef : (stay.location || '')}</span>`);
+      }
+      if (stayMarker && typeof stayMarker.on === 'function') {
+        stayMarker.on('click', () => {
+          if (typeof selectSplitPaneItem === 'function') {
+            selectSplitPaneItem({
+              title: stayName,
+              type: 'stay',
+              location: stay.location || stay.city || targetCity,
+              bookingRef: stay.bookingRef || '',
+              cost: stay.cost || '',
+              notes: stay.notes || ''
+            });
+          }
+        });
+      }
+      splitMapMarkers.push({ id: `stay-${sIdx}`, name: stayName, marker: stayMarker, lat: stayCoords.lat, lng: stayCoords.lng });
+      points.push([stayCoords.lat, stayCoords.lng]);
+      routePoints.push([stayCoords.lat, stayCoords.lng]);
+    }
+  });
+
+  // Activities (reflect ALL activities!)
+  activities.forEach((act, aIdx) => {
+    const actTitle = act.title || act.text || 'Activity';
+    const actLoc = act.location || '';
+    const actCoords = getDeterministicActivityCoords(baseCoords, act, aIdx, activities.length);
+
+    if (actCoords) {
+      const numLabel = aIdx + 1;
+      const actIcon = L.divIcon({
+        className: 'numbered-map-marker is-activity-marker',
+        html: `<div class="marker-dot" style="background-color: #7c3aed; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span style="font-size: 11px; font-weight: 800; color: white;">${numLabel}</span></div>`,
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
+      });
+      const actMarker = L.marker([actCoords.lat, actCoords.lng], { icon: actIcon }).addTo(desktopSplitMap);
+      if (actMarker && typeof actMarker.bindPopup === 'function') {
+        const metaLine = [act.time || act.estTime, act.cost ? '$' + act.cost : ''].filter(Boolean).join(' · ');
+        actMarker.bindPopup(`<b>🎯 ${numLabel}. ${actTitle}</b><br><span style="font-size:0.75rem; color:#64748b;">${actLoc || targetCity}</span>${metaLine ? `<br><span style="font-size:0.75rem;">${metaLine}</span>` : ''}`);
+      }
+      if (actMarker && typeof actMarker.on === 'function') {
+        actMarker.on('click', () => {
+          if (typeof selectSplitPaneItem === 'function') {
+            selectSplitPaneItem({
+              title: actTitle,
+              type: 'activity',
+              location: actLoc || targetCity,
+              time: act.time || act.estTime || '',
+              cost: act.cost || act.estCost || '',
+              notes: act.notes || ''
+            });
+          }
+        });
+      }
+      splitMapMarkers.push({ id: `act-${act.activityId || aIdx}`, name: actTitle, marker: actMarker, lat: actCoords.lat, lng: actCoords.lng });
+      points.push([actCoords.lat, actCoords.lng]);
+      routePoints.push([actCoords.lat, actCoords.lng]);
+    }
+  });
+
+  // If there are multiple stops on this day route, draw the connecting route polyline
+  if (!isTravelDay && routePoints.length > 1) {
+    const dayPolyline = L.polyline(routePoints, {
+      color: '#0d9488',
+      weight: 3.5,
+      dashArray: '5, 7',
+      opacity: 0.8
+    }).addTo(desktopSplitMap);
+    splitMapPolylines.push(dayPolyline);
+  }
+
+  // Camera
+  if (points.length > 1) {
+    if (typeof desktopSplitMap.flyToBounds === 'function') {
+      desktopSplitMap.flyToBounds(points, { padding: [45, 45], maxZoom: 15, duration: 0.5 });
+    } else if (typeof desktopSplitMap.fitBounds === 'function') {
+      desktopSplitMap.fitBounds(points, { padding: [45, 45], maxZoom: 15 });
+    }
+  } else if (points.length === 1) {
+    if (typeof desktopSplitMap.flyTo === 'function') {
+      desktopSplitMap.flyTo(points[0], 13, { duration: 0.5 });
+    } else if (typeof desktopSplitMap.setView === 'function') {
+      desktopSplitMap.setView(points[0], 13);
+    }
+  }
+}
+
+function resetSplitMapView() {
+  if (typeof window !== 'undefined') {
+    window.__lastSplitDayKey = null;
+  }
+  buildDesktopSplitMap();
+  const headingEl = document.getElementById('splitMapHeading');
+  if (headingEl) {
+    headingEl.textContent = 'Interactive Map · Full Route';
+  }
+  if (typeof clearSplitDrawer === 'function') {
+    clearSplitDrawer();
+  }
+}
+
+function focusCityInItineraryList(cityName) {
+  if (!cityName) return;
+  const cleanTarget = String(cityName).toLowerCase().trim();
+  const legs = document.querySelectorAll('#itinerary .leg, #itinerary .compact-desktop-leg');
+  for (const legEl of legs) {
+    const text = (legEl.textContent || '').toLowerCase();
+    if (text.includes(cleanTarget)) {
+      legEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      legEl.classList.add('split-active-item');
+      setTimeout(() => legEl.classList.remove('split-active-item'), 2000);
+      break;
+    }
+  }
 }
 
 // Watch for tab switch and theme changes
@@ -518,6 +1058,11 @@ document.addEventListener('DOMContentLoaded', () => {
     observer.observe(mapTab, { attributes: true, attributeFilter: ['class'] });
   }
 
+  const itinTab = document.getElementById('tab-itinerary');
+  if (itinTab) {
+    observer.observe(itinTab, { attributes: true, attributeFilter: ['class'] });
+  }
+
   // Watch for theme changes on html element
   const htmlEl = document.documentElement;
   if (htmlEl) {
@@ -527,3 +1072,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.buildJourneyMap = buildJourneyMap;
 window.openAllInGoogleMaps = openAllInGoogleMaps;
+window.buildDesktopSplitMap = buildDesktopSplitMap;
+window.renderDesktopSplitDayMap = renderDesktopSplitDayMap;
+window.clearSplitMapLayers = clearSplitMapLayers;
+window.focusStopOnSplitMap = focusStopOnSplitMap;
+window.resetSplitMapView = resetSplitMapView;
+window.getDeterministicActivityCoords = getDeterministicActivityCoords;
+
+

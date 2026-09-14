@@ -225,7 +225,9 @@ function closeMobileMenu(event) {
     sheet.setAttribute('aria-hidden', 'true');
     sheet.setAttribute('inert', '');
   }
-  document.body.classList.remove('mobile-menu-open');
+  if (document.body && document.body.classList && typeof document.body.classList.remove === 'function') {
+    document.body.classList.remove('mobile-menu-open');
+  }
   updateStickyOffsets();
 }
 
@@ -578,16 +580,19 @@ function switchTab(tabId, btnElement) {
   if (['itinerary', 'transport', 'accom'].includes(tabId) && typeof applyCurrentTripPositionForTab === 'function') {
     applyCurrentTripPositionForTab(tabId);
   } else if (tabId === 'itinerary') {
-    buildItinerary();
+    if (typeof buildItinerary === 'function') buildItinerary();
   } else if (tabId === 'transport') {
-    buildTransportTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
+    if (typeof buildTransportTab === 'function') buildTransportTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
   } else if (tabId === 'accom') {
-    buildAccomTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
+    if (typeof buildAccomTab === 'function') buildAccomTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
   }
-  if (tabId === 'budget') buildBudgetTab();
-  if (tabId === 'packing') buildPackingTab();
-  if (tabId === 'map') buildJourneyMap();
-  if (tabId === 'guide') buildGuideSteps();
+  if (tabId === 'itinerary' && typeof window !== 'undefined' && window.innerWidth >= 1024 && typeof buildDesktopSplitMap === 'function') {
+    setTimeout(buildDesktopSplitMap, 60);
+  }
+  if (tabId === 'budget' && typeof buildBudgetTab === 'function') buildBudgetTab();
+  if (tabId === 'packing' && typeof buildPackingTab === 'function') buildPackingTab();
+  if (tabId === 'map' && typeof buildJourneyMap === 'function') buildJourneyMap();
+  if (tabId === 'guide' && typeof buildGuideSteps === 'function') buildGuideSteps();
 
   if (window.innerWidth <= 768) {
     requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
@@ -749,8 +754,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-document.getElementById('mainTitle').addEventListener('blur', function() { titleData.title = this.innerText; saveData(); trackUserEdit(); });
-document.getElementById('mainSubtitle').addEventListener('blur', function() { titleData.subtitle = this.innerText; saveData(); trackUserEdit(); });
+document.getElementById('mainTitle')?.addEventListener('blur', function() { titleData.title = this.innerText; saveData(); trackUserEdit(); });
+document.getElementById('mainSubtitle')?.addEventListener('blur', function() { titleData.subtitle = this.innerText; saveData(); trackUserEdit(); });
 
 function updateData(legIdx, key, val) { appData[legIdx][key] = val; saveData(); }
 
@@ -1237,3 +1242,686 @@ function handleAppPwaShortcuts() {
 window.updateOfflineStatus = updateOfflineStatus;
 window.initOfflineStatusListener = initOfflineStatusListener;
 window.handleAppPwaShortcuts = handleAppPwaShortcuts;
+
+// ==========================================================================
+// Desktop Split-Pane Layout & Interactions (Milestone 6 / Issues #286, #299)
+// ==========================================================================
+
+function getDesktopSplitMode() {
+  if (typeof localStorage !== 'undefined') {
+    const saved = localStorage.getItem('tp_desktop_split_mode');
+    if (saved === 'full-itinerary' || saved === 'split') return saved;
+  }
+  return 'split';
+}
+
+function toggleDesktopSplitMode(mode) {
+  const targetMode = mode === 'full-itinerary' ? 'full-itinerary' : 'split';
+  if (typeof localStorage !== 'undefined') {
+    try {
+      localStorage.setItem('tp_desktop_split_mode', targetMode);
+    } catch (e) {}
+  }
+
+  const shell = document.getElementById('desktopSplitShell');
+  const splitBtn = document.getElementById('desktopSplitToggleBtn');
+  const fullBtn = document.getElementById('desktopFullWidthToggleBtn');
+
+  if (shell) {
+    if (targetMode === 'full-itinerary') {
+      shell.classList.add('is-full-itinerary');
+    } else {
+      shell.classList.remove('is-full-itinerary');
+    }
+  }
+
+  if (splitBtn && fullBtn) {
+    if (targetMode === 'split') {
+      splitBtn.classList.add('is-active');
+      splitBtn.setAttribute('aria-pressed', 'true');
+      fullBtn.classList.remove('is-active');
+      fullBtn.setAttribute('aria-pressed', 'false');
+    } else {
+      splitBtn.classList.remove('is-active');
+      splitBtn.setAttribute('aria-pressed', 'false');
+      fullBtn.classList.add('is-active');
+      fullBtn.setAttribute('aria-pressed', 'true');
+    }
+  }
+
+  if (targetMode === 'split' && typeof window !== 'undefined' && window.innerWidth >= 1024 && typeof buildDesktopSplitMap === 'function') {
+    setTimeout(buildDesktopSplitMap, 60);
+  }
+}
+
+function toggleDesktopSplitView() {
+  const current = getDesktopSplitMode();
+  toggleDesktopSplitMode(current === 'split' ? 'full-itinerary' : 'split');
+}
+
+function initDesktopSplitLayout() {
+  const mode = getDesktopSplitMode();
+  toggleDesktopSplitMode(mode);
+
+  if (typeof window !== 'undefined' && !window.__desktopSplitListenersBound) {
+    window.__desktopSplitListenersBound = true;
+
+    let scrollRaf = null;
+    window.addEventListener('scroll', () => {
+      if (window.innerWidth < 1024) return;
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(() => {
+        syncDesktopSplitToDayInView(false);
+        scrollRaf = null;
+      });
+    }, { passive: true });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024 && getDesktopSplitMode() === 'split') {
+        syncDesktopSplitToDayInView(true);
+      }
+    });
+  }
+
+  if (typeof window !== 'undefined' && window.innerWidth >= 1024 && mode === 'split') {
+    setTimeout(() => syncDesktopSplitToDayInView(true), 120);
+  }
+}
+
+function findCurrentDesktopDayInView() {
+  if (typeof appData === 'undefined' || !Array.isArray(appData) || appData.length === 0) return null;
+
+  const legElements = Array.from(document.querySelectorAll('#itinerary .compact-desktop-leg, #itinerary .leg'));
+  let activeLegIndex = 0;
+  let activeDayIndex = 0;
+
+  if (legElements.length > 0) {
+    const targetY = 140; // below top navbar
+    for (let i = 0; i < legElements.length; i++) {
+      const rect = legElements[i].getBoundingClientRect();
+      if (rect.bottom > targetY) {
+        activeLegIndex = i;
+        break;
+      }
+    }
+
+    const activeLegEl = legElements[activeLegIndex];
+    if (activeLegEl) {
+      const pager = activeLegEl.querySelector('.compact-day-pager');
+      if (pager) {
+        activeDayIndex = Math.max(0, Number(pager.dataset.activeIndex || 0));
+      }
+    }
+  }
+
+  const safeLegIndex = Math.min(appData.length - 1, Math.max(0, activeLegIndex));
+  const leg = appData[safeLegIndex];
+  if (!leg || !Array.isArray(leg.days) || leg.days.length === 0) return null;
+
+  const safeDayIndex = Math.min(leg.days.length - 1, Math.max(0, activeDayIndex));
+  const day = leg.days[safeDayIndex];
+
+  let dayNumber = 1;
+  for (let i = 0; i < safeLegIndex; i++) {
+    dayNumber += (appData[i].days || []).length;
+  }
+  dayNumber += safeDayIndex;
+
+  const allStays = (typeof window !== 'undefined' && Array.isArray(window.stays))
+    ? window.stays
+    : ((typeof stays !== 'undefined' && Array.isArray(stays)) ? stays : []);
+  const dayStays = allStays.filter(s => {
+    if (!s) return false;
+    if (s.date && s.date === day.date) return true;
+    if (s.checkIn && s.checkOut && day.date >= s.checkIn && day.date < s.checkOut) return true;
+    return false;
+  });
+
+  const allJourneys = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : ((typeof journeys !== 'undefined' && Array.isArray(journeys)) ? journeys : []);
+  const dayJourneys = allJourneys.filter(j => {
+    if (!j) return false;
+    if (j.date && j.date === day.date) return true;
+    if (j.fromLocation && j.toLocation && day.from && day.to) {
+      const jFrom = String(j.fromLocation).toLowerCase();
+      const jTo = String(j.toLocation).toLowerCase();
+      const dFrom = String(day.from).toLowerCase();
+      const dTo = String(day.to).toLowerCase();
+      return (jFrom.includes(dFrom) || dFrom.includes(jFrom)) && (jTo.includes(dTo) || dTo.includes(jTo));
+    }
+    return false;
+  });
+
+  const activities = [];
+  if (Array.isArray(day.activityItems)) {
+    day.activityItems.forEach((item, itemIdx) => {
+      const matched = (typeof findAssignedSuggestedActivity === 'function')
+        ? findAssignedSuggestedActivity(safeLegIndex, safeDayIndex, item.text, item.activityId)
+        : null;
+      activities.push({
+        title: item.title || item.text || (matched && matched.title) || 'Activity',
+        location: item.location || (matched && matched.location) || '',
+        time: item.time || item.estTime || (matched && (matched.estTime || matched.time)) || '',
+        cost: item.cost || item.estCost || (matched && (matched.estCost || matched.cost)) || '',
+        notes: item.notes || (matched && matched.notes) || '',
+        done: !!item.done,
+        activityId: item.activityId || item.id || (matched && (matched.id || matched.activityId)) || `act-${itemIdx}`,
+        lat: item.lat || (matched && matched.lat),
+        lng: item.lng || (matched && matched.lng),
+        cityId: item.cityId || (matched && matched.cityId) || leg.id || '',
+        cityName: day.to || day.from || leg.label || ''
+      });
+    });
+  }
+  if (Array.isArray(leg.suggestedActivities)) {
+    leg.suggestedActivities
+      .filter(a => a.assignedDayIdx === safeDayIndex && !activities.some(act => (act.title || '').trim() === (a.title || a.text || '').trim()))
+      .forEach((a, aIdx) => activities.push({
+        title: a.title || a.text || 'Activity',
+        location: a.location || '',
+        time: a.estTime || a.time || '',
+        cost: a.estCost || a.cost || '',
+        notes: a.notes || '',
+        done: !!a.done,
+        activityId: a.id || a.activityId || `sug-${aIdx}`,
+        lat: a.lat,
+        lng: a.lng,
+        cityId: a.cityId || leg.id || '',
+        cityName: day.to || day.from || leg.label || ''
+      }));
+  }
+
+  let mapRoute = { stops: [], url: '' };
+  if (typeof getDailyTimelineMapRoute === 'function') {
+    try {
+      mapRoute = getDailyTimelineMapRoute(safeLegIndex, safeDayIndex);
+    } catch (e) {}
+  }
+
+  return {
+    legIndex: safeLegIndex,
+    dayIndex: safeDayIndex,
+    dayNumber,
+    leg,
+    day,
+    date: day.date,
+    dayName: day.day,
+    from: day.from || leg.label,
+    to: day.to || day.from || leg.label,
+    stays: dayStays,
+    journeys: dayJourneys,
+    activities: activities,
+    mapRoute: mapRoute
+  };
+}
+
+function syncDesktopSplitToDayInView(force = false) {
+  if (typeof window === 'undefined' || window.innerWidth < 1024) return;
+  if (typeof getDesktopSplitMode === 'function' && getDesktopSplitMode() === 'full-itinerary') return;
+
+  const dayData = findCurrentDesktopDayInView();
+  if (!dayData) return;
+
+  const dayKey = `${dayData.legIndex}-${dayData.dayIndex}`;
+  if (!force && dayKey === window.__lastSplitDayKey) return;
+  window.__lastSplitDayKey = dayKey;
+  window.__activeSplitDayData = dayData;
+
+  // 1. Update split map
+  if (typeof renderDesktopSplitDayMap === 'function') {
+    renderDesktopSplitDayMap(dayData);
+  }
+
+  // 2. Update split drawer (unless an individual item is currently inspected)
+  const drawerContent = document.getElementById('splitDrawerContent');
+  const isIndividualItemSelected = drawerContent && !drawerContent.hidden && drawerContent.querySelector('.split-drawer-item-card') && !drawerContent.querySelector('.split-drawer-day-card');
+  if (!isIndividualItemSelected || force) {
+    renderSplitDrawerForDay(dayData);
+  }
+}
+
+function renderSplitDrawerForDay(dayData) {
+  const drawer = document.getElementById('splitDrawerContent');
+  const placeholder = document.getElementById('splitDrawerPlaceholder');
+  if (!drawer || !placeholder) return;
+
+  if (!dayData) {
+    clearSplitDrawer();
+    return;
+  }
+
+  const fromCity = String(dayData.from || '').trim();
+  const toCity = String(dayData.to || dayData.from || '').trim();
+  const cleanFrom = fromCity.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').replace(/\s*\(\d+\)$/, '').trim();
+  const cleanTo = toCity.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').replace(/\s*\(\d+\)$/, '').trim();
+  const isTravelDay = cleanFrom.toLowerCase() !== cleanTo.toLowerCase() && cleanFrom.length > 0 && cleanTo.length > 0;
+  const dayNumber = dayData.dayNumber || 1;
+  const dayDateLabel = [dayData.dayName, dayData.date].filter(Boolean).join(', ');
+
+  const journeys = Array.isArray(dayData.journeys) ? dayData.journeys : [];
+  const stays = Array.isArray(dayData.stays) ? dayData.stays : [];
+  const activities = Array.isArray(dayData.activities) ? dayData.activities : [];
+
+  let journeyHtml = '';
+  if (journeys.length > 0) {
+    journeyHtml = `
+      <div class="split-day-section">
+        <div class="split-day-section-title">🛫 Transit / Journeys</div>
+        <div class="flex flex-col gap-1.5">
+          ${journeys.map(j => {
+            const label = j.journeyName || j.name || `${j.fromLocation || cleanFrom} → ${j.toLocation || cleanTo}`;
+            const meta = [j.routeCode || j.flightNumber, j.departureTime, j.provider].filter(Boolean).join(' · ');
+            return `
+              <div class="split-day-item-clickable" onclick="selectSplitPaneItem({ title: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(label) : label}', type: 'transport', transportType: '${j.transportType || 'flight'}', location: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(j.toLocation || cleanTo) : (j.toLocation || cleanTo)}', time: '${j.departureTime || ''}', cost: '${j.cost || ''}', notes: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(j.notes || '') : (j.notes || '')}', bookingRef: '${j.bookingReference || j.bookingRef || ''}' })">
+                <div class="flex flex-col min-w-0">
+                  <span class="font-semibold text-slate-800 dark:text-slate-200 truncate">${typeof escapeHtmlText === 'function' ? escapeHtmlText(label) : label}</span>
+                  ${meta ? `<span class="text-[11px] text-slate-500 truncate">${typeof escapeHtmlText === 'function' ? escapeHtmlText(meta) : meta}</span>` : ''}
+                </div>
+                <span class="text-xs text-teal-600 font-bold shrink-0">Inspect ↗</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  let stayHtml = '';
+  if (stays.length > 0) {
+    stayHtml = `
+      <div class="split-day-section">
+        <div class="split-day-section-title">🏨 Accommodation</div>
+        <div class="flex flex-col gap-1.5">
+          ${stays.map(s => {
+            const sName = s.name || s.propertyName || 'Accommodation';
+            const sLoc = s.location || s.city || cleanTo;
+            const sRef = s.bookingRef || '';
+            return `
+              <div class="split-day-item-clickable" onclick="selectSplitPaneItem({ title: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(sName) : sName}', type: 'stay', location: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(sLoc) : sLoc}', bookingRef: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(sRef) : sRef}', cost: '${s.cost || ''}', notes: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(s.notes || '') : (s.notes || '')}' })">
+                <div class="flex flex-col min-w-0">
+                  <span class="font-semibold text-slate-800 dark:text-slate-200 truncate">${typeof escapeHtmlText === 'function' ? escapeHtmlText(sName) : sName}</span>
+                  <span class="text-[11px] text-slate-500 truncate">${typeof escapeHtmlText === 'function' ? escapeHtmlText(sLoc) : sLoc}${sRef ? ' · #' + sRef : ''}</span>
+                </div>
+                <span class="text-xs text-rose-600 font-bold shrink-0">Inspect ↗</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  let activitiesHtml = '';
+  if (activities.length > 0) {
+    activitiesHtml = `
+      <div class="split-day-section">
+        <div class="split-day-section-title flex items-center justify-between">
+          <span>🎯 Activities (${activities.length})</span>
+        </div>
+        <div class="flex flex-col gap-1 max-h-44 overflow-y-auto pr-0.5">
+          ${activities.map(a => {
+            const title = a.title || a.text || 'Activity';
+            const cost = a.cost || a.estCost ? (typeof formatCurrency === 'function' ? formatCurrency(a.cost || a.estCost) : `$${a.cost || a.estCost}`) : '';
+            const duration = a.time || a.estTime || '';
+            return `
+              <div class="split-day-item-clickable" onclick="selectSplitPaneItem({ title: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title}', type: 'activity', location: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(a.location || cleanTo) : (a.location || cleanTo)}', time: '${duration}', cost: '${cost}', notes: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(a.notes || '') : (a.notes || '')}' })">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="text-xs ${a.done ? 'text-emerald-500' : 'text-slate-400'}">${a.done ? '✓' : '○'}</span>
+                  <span class="text-xs text-slate-700 dark:text-slate-300 truncate ${a.done ? 'line-through text-slate-400' : 'font-medium'}">${typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title}</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-[11px] text-slate-500 shrink-0">
+                  ${duration ? `<span>${duration}</span>` : ''}
+                  ${cost ? `<span class="font-semibold text-slate-700 dark:text-slate-300">${cost}</span>` : ''}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  } else {
+    activitiesHtml = `
+      <div class="split-day-section">
+        <div class="split-day-section-title">🎯 Activities</div>
+        <div class="text-xs text-slate-400 italic py-1">No activities scheduled yet for this day.</div>
+      </div>
+    `;
+  }
+
+  placeholder.hidden = true;
+  drawer.hidden = false;
+  drawer.innerHTML = `
+    <div class="split-drawer-item-card split-drawer-day-card">
+      <div class="split-day-header flex items-center justify-between gap-2">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="split-drawer-badge ${isTravelDay ? 'transport' : 'activity'}">
+            <span>${isTravelDay ? '✈️ Travel Day' : '📍 Day in City'}</span>
+          </span>
+          <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">${typeof escapeHtmlText === 'function' ? escapeHtmlText(dayDateLabel) : dayDateLabel}</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          ${dayData.mapRoute && dayData.mapRoute.url ? `
+            <a href="${dayData.mapRoute.url}" target="_blank" rel="noopener noreferrer" class="text-xs px-2 py-0.5 rounded font-semibold bg-teal-50 hover:bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:hover:bg-teal-900/50 dark:text-teal-300 transition-colors" title="View day route in Google Maps">
+              🗺️ Maps ↗
+            </a>
+          ` : ''}
+          <span class="text-xs px-2 py-0.5 rounded font-bold ${isTravelDay ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' : 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300'}">
+            Day ${dayNumber}
+          </span>
+        </div>
+      </div>
+
+      <h4 class="font-bold text-sm text-slate-900 dark:text-slate-100 leading-snug m-0">
+        ${isTravelDay ? `${typeof escapeHtmlText === 'function' ? escapeHtmlText(cleanFrom) : cleanFrom} → ${typeof escapeHtmlText === 'function' ? escapeHtmlText(cleanTo) : cleanTo}` : (typeof escapeHtmlText === 'function' ? escapeHtmlText(cleanTo || cleanFrom) : (cleanTo || cleanFrom))}
+      </h4>
+
+      ${journeyHtml}
+      ${stayHtml}
+      ${activitiesHtml}
+    </div>
+  `;
+}
+
+function restoreSplitDayOverview() {
+  if (window.__activeSplitDayData && typeof renderSplitDrawerForDay === 'function') {
+    renderSplitDrawerForDay(window.__activeSplitDayData);
+    if (typeof renderDesktopSplitDayMap === 'function') {
+      renderDesktopSplitDayMap(window.__activeSplitDayData);
+    }
+  }
+}
+
+function renderSplitDrawerContent(itemData) {
+  const drawer = document.getElementById('splitDrawerContent');
+  const placeholder = document.getElementById('splitDrawerPlaceholder');
+  if (!drawer || !placeholder) return;
+
+  if (!itemData) {
+    clearSplitDrawer();
+    return;
+  }
+
+  const type = String(itemData.type || 'activity').toLowerCase();
+  const title = itemData.title || itemData.name || itemData.text || 'Item Details';
+  const location = itemData.location || itemData.city || '';
+  const duration = itemData.duration || itemData.estTime || itemData.time || '';
+  const cost = itemData.cost || itemData.estCost ? (typeof formatCurrency === 'function' ? formatCurrency(itemData.cost || itemData.estCost) : `${itemData.cost || itemData.estCost}`) : '';
+  const notes = itemData.notes || '';
+  const bookingRef = itemData.bookingRef || '';
+  const provider = itemData.provider || '';
+
+  let badgeType = 'activity';
+  let badgeLabel = 'Activity';
+  let badgeIcon = '📍';
+
+  if (type === 'stay' || type === 'hotel' || type === 'accommodation' || type === 'checkin' || type === 'checkout') {
+    badgeType = 'stay';
+    badgeLabel = 'Stay';
+    badgeIcon = '🏨';
+  } else if (type === 'transport' || type === 'flight' || type === 'train' || type === 'bus' || type === 'journey') {
+    badgeType = 'transport';
+    badgeLabel = itemData.transportType ? (itemData.transportType.charAt(0).toUpperCase() + itemData.transportType.slice(1)) : 'Transport';
+    badgeIcon = typeof getTransportIcon === 'function' ? getTransportIcon(itemData.transportType) : '✈️';
+  } else if (type === 'city') {
+    badgeType = 'activity';
+    badgeLabel = itemData.isTransit ? 'Transit City' : 'Destination';
+    badgeIcon = '🏙️';
+  }
+
+  const mapsUrl = location ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}` : '';
+
+  placeholder.hidden = true;
+  drawer.hidden = false;
+  drawer.innerHTML = `
+    <div class="split-drawer-item-card">
+      <div class="flex items-center justify-between gap-2">
+        <span class="split-drawer-badge ${badgeType}">
+          <span>${badgeIcon}</span> <span>${typeof escapeHtmlText === 'function' ? escapeHtmlText(badgeLabel) : badgeLabel}</span>
+        </span>
+        <button type="button" class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer" onclick="clearSplitDrawer()" title="Clear selection">&times;</button>
+      </div>
+      <h4 class="font-bold text-sm text-slate-900 dark:text-slate-100 leading-snug m-0">${typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title}</h4>
+      ${location ? `
+        <div class="text-xs text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+          <span>📍</span>
+          <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 font-medium" title="Open in Google Maps">
+            ${typeof escapeHtmlText === 'function' ? escapeHtmlText(location) : location} ↗
+          </a>
+        </div>
+      ` : ''}
+      <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium flex-wrap">
+        ${duration ? `<span>⏱️ ${typeof escapeHtmlText === 'function' ? escapeHtmlText(duration) : duration}</span>` : ''}
+        ${cost ? `<span>💵 ${typeof escapeHtmlText === 'function' ? escapeHtmlText(cost) : cost}</span>` : ''}
+        ${provider ? `<span>🏷️ ${typeof escapeHtmlText === 'function' ? escapeHtmlText(provider) : provider}</span>` : ''}
+        ${bookingRef ? `<span>#️⃣ ${typeof escapeHtmlText === 'function' ? escapeHtmlText(bookingRef) : bookingRef}</span>` : ''}
+      </div>
+      ${notes ? `
+        <p class="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-2 rounded border border-slate-100 dark:border-slate-800/80 m-0">
+          💬 ${typeof escapeHtmlText === 'function' ? escapeHtmlText(notes) : notes}
+        </p>
+      ` : ''}
+      <div class="flex items-center gap-2 pt-1 flex-wrap">
+        <button type="button" class="action-btn text-xs py-1 px-2.5 font-semibold text-teal-700 dark:text-teal-300" onclick="restoreSplitDayOverview()" title="Return to Day Overview">← Day Overview</button>
+        ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="action-btn text-xs py-1 px-2.5">Open in Google Maps</a>` : ''}
+        <button type="button" class="action-btn text-xs py-1 px-2 text-slate-500" onclick="clearSplitDrawer()">Dismiss</button>
+      </div>
+    </div>
+  `;
+}
+
+function clearSplitDrawer() {
+  const drawer = document.getElementById('splitDrawerContent');
+  const placeholder = document.getElementById('splitDrawerPlaceholder');
+  if (drawer) {
+    drawer.hidden = true;
+    drawer.innerHTML = '';
+  }
+  if (placeholder) {
+    placeholder.hidden = false;
+  }
+}
+
+function selectSplitPaneItem(itemData, targetElement = null) {
+  if (!itemData) return;
+
+  document.querySelectorAll('.split-active-item').forEach(el => el.classList.remove('split-active-item'));
+  if (targetElement) {
+    targetElement.classList.add('split-active-item');
+  }
+
+  renderSplitDrawerContent(itemData);
+
+  const loc = itemData.location || itemData.city || itemData.name || itemData.title;
+  if (typeof focusStopOnSplitMap === 'function') {
+    focusStopOnSplitMap(loc, itemData);
+  }
+}
+
+function handleSplitItemClick(itemEl, event) {
+  if (!itemEl) return;
+  if (event && event.target && typeof event.target.closest === 'function') {
+    if (event.target.closest('input[type="checkbox"], button, a, .modal-close, select, [contenteditable="true"]')) {
+      return;
+    }
+  }
+
+  const itemData = {
+    title: itemEl.dataset.itemTitle || itemEl.querySelector('.daily-timeline-title, .compact-emoji-text, h4')?.textContent?.trim() || '',
+    type: itemEl.dataset.itemType || 'activity',
+    transportType: itemEl.dataset.itemTransportType || '',
+    location: itemEl.dataset.itemLocation || itemEl.querySelector('.daily-timeline-sub-locations, .transport-sub-location-detail')?.textContent?.trim() || '',
+    time: itemEl.dataset.itemTime || itemEl.querySelector('.daily-timeline-time, .compact-emoji-duration')?.textContent?.trim() || '',
+    cost: itemEl.dataset.itemCost || itemEl.querySelector('.compact-emoji-cost')?.textContent?.trim() || '',
+    notes: itemEl.dataset.itemNotes || '',
+    provider: itemEl.dataset.itemProvider || '',
+    bookingRef: itemEl.dataset.itemRef || ''
+  };
+
+  selectSplitPaneItem(itemData, itemEl);
+}
+
+window.handleSplitItemClick = handleSplitItemClick;
+
+// ==========================================================================
+// Distraction-Free Printable Itinerary (Milestone 6 / Issues #287, #300)
+// ==========================================================================
+
+function populatePrintTripHeader() {
+  const titleEl = document.getElementById('printTripTitle');
+  const subtitleEl = document.getElementById('printTripSubtitle');
+  const iconEl = document.getElementById('printTripIcon');
+  const datesEl = document.getElementById('printTripDates');
+  const durationEl = document.getElementById('printTripDuration');
+  const destsEl = document.getElementById('printTripDestinations');
+  const staysCountEl = document.getElementById('printTripStaysCount');
+  const tableBody = document.getElementById('printAccomTableBody');
+
+  if (!titleEl) return;
+
+  const currentTripName = document.getElementById('currentTripTitle')?.textContent?.trim() || 'My Trip';
+  const currentTripIcon = document.getElementById('currentTripIcon')?.textContent?.trim() || '✈️';
+  const currentSubtitle = document.getElementById('mainSubtitle')?.textContent?.trim() || '';
+
+  titleEl.textContent = currentTripName;
+  if (iconEl) iconEl.textContent = currentTripIcon;
+  if (subtitleEl) subtitleEl.textContent = currentSubtitle;
+
+  // Calculate dates & duration
+  let minDate = '';
+  let maxDate = '';
+  let totalDays = 0;
+  const destinationSet = new Set();
+
+  if (typeof appData !== 'undefined' && Array.isArray(appData)) {
+    appData.forEach(leg => {
+      if (leg.label) destinationSet.add(leg.label.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').trim());
+      (leg.days || []).forEach(d => {
+        totalDays++;
+        if (d.date) {
+          if (!minDate || d.date < minDate) minDate = d.date;
+          if (!maxDate || d.date > maxDate) maxDate = d.date;
+        }
+        if (d.from) destinationSet.add(d.from.trim());
+        if (d.to) destinationSet.add(d.to.trim());
+      });
+    });
+  }
+
+  if (datesEl) {
+    datesEl.textContent = minDate && maxDate ? `${minDate} to ${maxDate}` : (minDate || 'Dates not set');
+  }
+  if (durationEl) {
+    const nights = Math.max(0, totalDays - 1);
+    durationEl.textContent = `${totalDays} Day${totalDays !== 1 ? 's' : ''} (${nights} Night${nights !== 1 ? 's' : ''})`;
+  }
+  if (destsEl) {
+    destsEl.textContent = `${destinationSet.size} Destinations`;
+  }
+
+  // Populate accommodations table
+  const staysList = (typeof window !== 'undefined' && Array.isArray(window.stays))
+    ? window.stays
+    : ((typeof window !== 'undefined' && Array.isArray(window.staysData))
+      ? window.staysData
+      : ((typeof global !== 'undefined' && Array.isArray(global.staysData))
+        ? global.staysData
+        : ((typeof stays !== 'undefined' && Array.isArray(stays)) ? stays : [])));
+  if (staysCountEl) {
+    staysCountEl.textContent = `${staysList.length} Booked / Planned`;
+  }
+
+  if (tableBody) {
+    if (staysList.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #6b7280; padding: 8px;">No accommodations listed in this trip.</td></tr>`;
+    } else {
+      const cityList = (typeof window !== 'undefined' && Array.isArray(window.citiesData)) ? window.citiesData : [];
+      tableBody.innerHTML = staysList.map(s => {
+        const cityObj = cityList.find(c => c.id === s.cityId);
+        const cityName = cityObj ? cityObj.name : (s.city || '—');
+        const checkIn = s.checkIn ? (typeof formatDateShort === 'function' ? formatDateShort(s.checkIn) : s.checkIn) : '—';
+        const checkOut = s.checkOut ? (typeof formatDateShort === 'function' ? formatDateShort(s.checkOut) : s.checkOut) : '—';
+        const locInfo = [s.location, s.notes].filter(Boolean).join(' · ');
+
+        return `
+          <tr>
+            <td><strong>${typeof escapeHtmlText === 'function' ? escapeHtmlText(cityName) : cityName}</strong></td>
+            <td>${typeof escapeHtmlText === 'function' ? escapeHtmlText(s.name || s.propertyName || 'Accommodation') : (s.name || 'Accommodation')}</td>
+            <td>${typeof escapeHtmlText === 'function' ? escapeHtmlText(checkIn) : checkIn}</td>
+            <td>${typeof escapeHtmlText === 'function' ? escapeHtmlText(checkOut) : checkOut}</td>
+            <td><code>${typeof escapeHtmlText === 'function' ? escapeHtmlText(s.bookingRef || '—') : (s.bookingRef || '—')}</code></td>
+            <td>${typeof escapeHtmlText === 'function' ? escapeHtmlText(locInfo || '—') : (locInfo || '—')}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+  }
+}
+
+function printItinerary() {
+  populatePrintTripHeader();
+
+  // Switch to itinerary tab to ensure all itinerary HTML is present
+  if (typeof switchTab === 'function' && typeof document !== 'undefined' && document.getElementById('tab-itinerary')) {
+    switchTab('itinerary');
+  }
+
+  // Expand all days if helper exists
+  if (typeof toggleAllDays === 'function') {
+    const expandBtn = document.getElementById('expandAll');
+    if (expandBtn && expandBtn.textContent.includes('Expand')) {
+      toggleAllDays();
+    }
+  }
+
+  if (typeof window !== 'undefined' && typeof window.print === 'function') {
+    window.setTimeout(() => {
+      window.print();
+    }, 150);
+  }
+}
+
+// Global click delegation on itinerary items to sync right-hand map and detail drawer
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initDesktopSplitLayout();
+
+    const itineraryContainer = document.getElementById('itinerary');
+    if (itineraryContainer) {
+      itineraryContainer.addEventListener('click', (event) => {
+        if (event.target.closest('input[type="checkbox"], button, a, .modal-close, select, [contenteditable="true"]')) return;
+
+        const itemEl = event.target.closest('.split-item-selectable, .compact-activity-row, .compact-grouped-item, .daily-timeline-item');
+        if (itemEl) {
+          const itemData = {
+            title: itemEl.dataset.itemTitle || itemEl.querySelector('.daily-timeline-title, .compact-emoji-text, h4')?.textContent?.trim() || '',
+            type: itemEl.dataset.itemType || 'activity',
+            transportType: itemEl.dataset.itemTransportType || '',
+            location: itemEl.dataset.itemLocation || itemEl.querySelector('.daily-timeline-sub-locations, .transport-sub-location-detail')?.textContent?.trim() || '',
+            time: itemEl.dataset.itemTime || itemEl.querySelector('.daily-timeline-time, .compact-emoji-duration')?.textContent?.trim() || '',
+            cost: itemEl.dataset.itemCost || itemEl.querySelector('.compact-emoji-cost')?.textContent?.trim() || '',
+            notes: itemEl.dataset.itemNotes || '',
+            provider: itemEl.dataset.itemProvider || '',
+            bookingRef: itemEl.dataset.itemRef || ''
+          };
+          selectSplitPaneItem(itemData, itemEl);
+        }
+      });
+    }
+  });
+}
+
+window.getDesktopSplitMode = getDesktopSplitMode;
+window.toggleDesktopSplitMode = toggleDesktopSplitMode;
+window.toggleDesktopSplitView = toggleDesktopSplitView;
+window.initDesktopSplitLayout = initDesktopSplitLayout;
+window.renderSplitDrawerContent = renderSplitDrawerContent;
+window.renderSplitDrawerForDay = renderSplitDrawerForDay;
+window.restoreSplitDayOverview = restoreSplitDayOverview;
+window.findCurrentDesktopDayInView = findCurrentDesktopDayInView;
+window.syncDesktopSplitToDayInView = syncDesktopSplitToDayInView;
+window.clearSplitDrawer = clearSplitDrawer;
+window.selectSplitPaneItem = selectSplitPaneItem;
+window.populatePrintTripHeader = populatePrintTripHeader;
+window.printItinerary = printItinerary;
+

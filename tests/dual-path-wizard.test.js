@@ -57,7 +57,7 @@ function getMockOrExistingElem(id) {
 
 global.document = {
   body: prevDoc?.body || {
-    classList: { contains: () => false },
+    classList: { contains: () => false, add: () => {}, remove: () => {} },
     insertBefore: () => {},
     appendChild: () => {}
   },

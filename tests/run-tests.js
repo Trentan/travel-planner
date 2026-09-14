@@ -27,8 +27,10 @@ const { runLegManagementWysiwygSuite } = require('./leg-management-wysiwyg.test'
 const { runGoogleAuthRenewalTests } = require('./google-auth-renewal.test');
 const { runDualPathWizardSuite } = require('./dual-path-wizard.test');
 const { runStorageEngineSuite } = require('./storage-engine-suite');
+const { runDesktopSplitPrintUnitTests } = require('./desktop-split-print.test');
 
 async function run() {
+  if (typeof runDesktopSplitPrintUnitTests === 'function') await runDesktopSplitPrintUnitTests();
   await runCloudStorageXssTests();
   await runTripLibraryXssTests();
   if (typeof runStorageEngineSuite === 'function') await runStorageEngineSuite();

@@ -728,7 +728,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
       });
       const subLocsHtml = details ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(details)}</div>` : '';
       const notesHtml = (seg.notes || journey.notes) ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(seg.notes || journey.notes)}</div>` : '';
-      lines.push(`<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); editJourney('${journey.journeyId || journey.id}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`);
+      lines.push(`<div class="compact-grouped-item split-item-selectable" onclick="handleSplitItemClick(this, event); ${isEditMode ? `event.stopPropagation(); editJourney('${journey.journeyId || journey.id}');` : ''}" data-item-title="${escapeCompactText(label)}" data-item-type="transport" data-item-transport-type="${escapeCompactText(seg.transportType || journey.transportType || '')}" data-item-location="${escapeCompactText(details || fromLoc || '')}" data-item-time="${escapeCompactText(depTime || '')}" data-item-cost="${escapeCompactText(journey.cost || '')}" data-item-notes="${escapeCompactText(seg.notes || journey.notes || '')}">${mainLine}${subLocsHtml}${notesHtml}</div>`);
     });
     return lines;
   }).join('');
@@ -751,7 +751,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
     })() : '';
     const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
     const notesHtml = info.notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(info.notes)}</div>` : '';
-    return `<div class="compact-grouped-item" ${isEditMode ? `style="cursor: pointer;" onclick="event.stopPropagation(); openEditStayModal('${info.stayId}')"` : ''}>${mainLine}${subLocsHtml}${notesHtml}</div>`;
+    return `<div class="compact-grouped-item split-item-selectable" onclick="handleSplitItemClick(this, event); ${isEditMode ? `event.stopPropagation(); openEditStayModal('${info.stayId}');` : ''}" data-item-title="${escapeCompactText(info.propertyName)}" data-item-type="stay" data-item-location="${escapeCompactText(info.location || '')}" data-item-cost="${escapeCompactText(info.cost || '')}" data-item-notes="${escapeCompactText(info.notes || '')}">${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   if (!accomLines) {
@@ -791,7 +791,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
     const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(notes)}</div>` : '';
     const audioHtml = renderActivityAudioTourMeta(item);
     return `
-      <div class="compact-activity-row" style="${doneStyle}">
+      <div class="compact-activity-row split-item-selectable" onclick="handleSplitItemClick(this, event)" data-item-title="${escapeCompactText(split.title)}" data-item-type="activity" data-item-location="${escapeCompactText(locationVal)}" data-item-time="${escapeCompactText(item.time || '1 hr')}" data-item-cost="${escapeCompactText(item.cost || '')}" data-item-notes="${escapeCompactText(notes)}" style="${doneStyle}">
         <input
           type="checkbox"
           ${item.done ? 'checked' : ''}
@@ -1335,6 +1335,10 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
   if (typeof syncItineraryMobileHeightContainment === 'function') {
     syncItineraryMobileHeightContainment(pager.closest('#tab-itinerary') || document);
   }
+
+  if (typeof syncDesktopSplitToDayInView === 'function' && typeof window !== 'undefined' && window.innerWidth >= 1024) {
+    setTimeout(() => syncDesktopSplitToDayInView(true), 60);
+  }
 }
 
 function compactItineraryGoToDay(event, legId, dayIndex) {
@@ -1367,6 +1371,10 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
       const targetTop = window.scrollY + pagerRect.top - 60;
       window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
     }
+  }
+
+  if (typeof syncDesktopSplitToDayInView === 'function' && typeof window !== 'undefined' && window.innerWidth >= 1024) {
+    setTimeout(() => syncDesktopSplitToDayInView(true), 80);
   }
   return false;
 }
@@ -1713,6 +1721,9 @@ function buildCompactItineraryDesktop() {
 
   container.appendChild(stack);
   setupCompactItineraryPagers(container);
+  if (typeof window !== 'undefined' && window.innerWidth >= 1024 && typeof buildDesktopSplitMap === 'function') {
+    setTimeout(buildDesktopSplitMap, 60);
+  }
 }
 
 function buildCompactItineraryLegacy() {
@@ -2803,7 +2814,17 @@ function renderDailyTimelineRow(item, compact = false) {
   }
 
   return `
-    <div class="daily-timeline-item daily-timeline-item-${escapeCompactText(item.type)} ${item.done ? 'is-done' : ''} ${item.timelineShade ? `is-${item.timelineShade}` : ''}">
+    <div class="daily-timeline-item daily-timeline-item-${escapeCompactText(item.type)} split-item-selectable ${item.done ? 'is-done' : ''} ${item.timelineShade ? `is-${item.timelineShade}` : ''}"
+      onclick="handleSplitItemClick(this, event)"
+      data-item-title="${escapeCompactText(item.title || '')}"
+      data-item-type="${escapeCompactText(item.type || '')}"
+      data-item-transport-type="${escapeCompactText(item.transportType || '')}"
+      data-item-location="${escapeCompactText(item.location || item.subLocations || '')}"
+      data-item-time="${escapeCompactText(item.startTime || item.time || '')}"
+      data-item-cost="${escapeCompactText(item.cost || '')}"
+      data-item-notes="${escapeCompactText(item.notes || '')}"
+      data-item-provider="${escapeCompactText(item.provider || '')}"
+      data-item-ref="${escapeCompactText(item.bookingRef || '')}">
       <div class="${timeClass}"${timeOnClick}>${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
       <div class="${markerClass}"${markerOnClick}><span>${item.icon}</span></div>
       <div class="daily-timeline-content">
@@ -4212,7 +4233,9 @@ function findLegForJourneyCity(cityId, cityName) {
 // Active city filter - 'all' or city ID (access via window.currentCityFilter for cross-module access)
 function buildCityNav() {
   const nav = document.getElementById('cityNav');
-  const navList = nav.querySelector('.city-nav-list');
+  if (!nav) return;
+  const navList = nav.querySelector('.city-nav-list') || nav;
+  if (!navList) return;
   const filter = window.currentCityFilter || 'all';
   const currentTripPosition = typeof getCurrentTripPosition === 'function'
     ? getCurrentTripPosition()
@@ -4342,6 +4365,10 @@ function selectCityFilter(cityId, btn) {
         scrollToCity(cityId);
       }
     }
+  }
+
+  if (typeof syncDesktopSplitToDayInView === 'function' && typeof window !== 'undefined' && window.innerWidth >= 1024) {
+    setTimeout(() => syncDesktopSplitToDayInView(true), 120);
   }
 }
 
