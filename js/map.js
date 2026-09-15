@@ -844,7 +844,6 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
   }
 
   const points = [];
-  const routePoints = [];
 
   const targetCity = cleanTo || cleanFrom || (dayData.leg && dayData.leg.label);
   const cityCoords = getCityCoords(targetCity);
@@ -865,7 +864,6 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
       }
       splitMapMarkers.push({ id: 'day-from', name: cleanFrom, marker: fromMarker, lat: fromCoords.lat, lng: fromCoords.lng });
       points.push([fromCoords.lat, fromCoords.lng]);
-      routePoints.push([fromCoords.lat, fromCoords.lng]);
 
       const toIcon = L.divIcon({
         className: 'numbered-map-marker is-arrival-marker',
@@ -879,7 +877,6 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
       }
       splitMapMarkers.push({ id: 'day-to', name: cleanTo, marker: toMarker, lat: toCoords.lat, lng: toCoords.lng });
       points.push([toCoords.lat, toCoords.lng]);
-      routePoints.push([toCoords.lat, toCoords.lng]);
 
       const polyline = L.polyline([[fromCoords.lat, fromCoords.lng], [toCoords.lat, toCoords.lng]], {
         color: '#3b82f6',
@@ -894,7 +891,6 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
       const marker = L.marker([single.lat, single.lng]).addTo(desktopSplitMap);
       splitMapMarkers.push({ id: 'day-city', name: name, marker: marker, lat: single.lat, lng: single.lng });
       points.push([single.lat, single.lng]);
-      routePoints.push([single.lat, single.lng]);
     }
   } else if (cityCoords) {
     const cityIcon = L.divIcon({
@@ -909,20 +905,26 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
     }
     splitMapMarkers.push({ id: 'day-city', name: targetCity, marker: cityMarker, lat: cityCoords.lat, lng: cityCoords.lng });
     points.push([cityCoords.lat, cityCoords.lng]);
-    routePoints.push([cityCoords.lat, cityCoords.lng]);
   }
 
   const baseCoords = toCoords || cityCoords || fromCoords;
+  const stayCoordsList = [];
+  const activityCoordsList = [];
 
   // Stays
   stays.forEach((stay, sIdx) => {
     const stayName = stay.name || stay.propertyName || 'Accommodation';
     const stayLoc = stay.location || stay.city || targetCity;
-    let directStayCoords = getCityCoords(stayLoc);
-    if (directStayCoords && baseCoords) {
-      const dLat = Math.abs(directStayCoords.lat - baseCoords.lat);
-      const dLng = Math.abs(directStayCoords.lng - baseCoords.lng);
-      if (dLat >= 1.2 || dLng >= 1.5) directStayCoords = null;
+    let directStayCoords = null;
+    if (stay && stay.lat !== undefined && stay.lng !== undefined && stay.lat !== null && !isNaN(Number(stay.lat)) && !isNaN(Number(stay.lng))) {
+      directStayCoords = { lat: Number(stay.lat), lng: Number(stay.lng) };
+    } else {
+      directStayCoords = getCityCoords(stayLoc);
+      if (directStayCoords && baseCoords) {
+        const dLat = Math.abs(directStayCoords.lat - baseCoords.lat);
+        const dLng = Math.abs(directStayCoords.lng - baseCoords.lng);
+        if (dLat >= 1.2 || dLng >= 1.5) directStayCoords = null;
+      }
     }
     const stayCoords = directStayCoords || (baseCoords ? {
       lat: baseCoords.lat + (sIdx === 0 ? 0.007 : -0.007),
@@ -930,6 +932,7 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
     } : null);
 
     if (stayCoords) {
+      stayCoordsList.push({ ...stayCoords, name: stayName, stay });
       const stayIcon = L.divIcon({
         className: 'numbered-map-marker is-stay-marker',
         html: `<div class="marker-dot" style="background-color: #be185d; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><span>🏨</span></div>`,
@@ -938,7 +941,7 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
       });
       const stayMarker = L.marker([stayCoords.lat, stayCoords.lng], { icon: stayIcon }).addTo(desktopSplitMap);
       if (stayMarker && typeof stayMarker.bindPopup === 'function') {
-        stayMarker.bindPopup(`<b>🏨 ${stayName}</b><br><span style="font-size:0.75rem;">${stay.bookingRef ? '#' + stay.bookingRef : (stay.location || '')}</span>`);
+        stayMarker.bindPopup(`<b>🏨 ${stayName}</b><br><span style="font-size:0.75rem; color:#0f766e; font-weight:600;">🚩 Accommodation · Day Start & Return</span><br><span style="font-size:0.75rem;">${stay.bookingRef ? '#' + stay.bookingRef : (stay.location || '')}</span>`);
       }
       if (stayMarker && typeof stayMarker.on === 'function') {
         stayMarker.on('click', () => {
@@ -956,7 +959,6 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
       }
       splitMapMarkers.push({ id: `stay-${sIdx}`, name: stayName, marker: stayMarker, lat: stayCoords.lat, lng: stayCoords.lng });
       points.push([stayCoords.lat, stayCoords.lng]);
-      routePoints.push([stayCoords.lat, stayCoords.lng]);
     }
   });
 
@@ -967,6 +969,7 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
     const actCoords = getDeterministicActivityCoords(baseCoords, act, aIdx, activities.length);
 
     if (actCoords) {
+      activityCoordsList.push({ ...actCoords, title: actTitle });
       const numLabel = aIdx + 1;
       const actIcon = L.divIcon({
         className: 'numbered-map-marker is-activity-marker',
@@ -995,17 +998,71 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
       }
       splitMapMarkers.push({ id: `act-${act.activityId || aIdx}`, name: actTitle, marker: actMarker, lat: actCoords.lat, lng: actCoords.lng });
       points.push([actCoords.lat, actCoords.lng]);
-      routePoints.push([actCoords.lat, actCoords.lng]);
     }
   });
+
+  // Construct connecting itinerary route (starts and finishes at accommodation where staying the night)
+  const routePoints = [];
+
+  if (isTravelDay) {
+    if (fromCoords && toCoords) {
+      routePoints.push([fromCoords.lat, fromCoords.lng]);
+      if (stayCoordsList.length > 0) {
+        routePoints.push([stayCoordsList[0].lat, stayCoordsList[0].lng]);
+      }
+      activityCoordsList.forEach(act => routePoints.push([act.lat, act.lng]));
+      if (stayCoordsList.length > 0 && activityCoordsList.length > 0) {
+        routePoints.push([stayCoordsList[0].lat, stayCoordsList[0].lng]);
+      } else {
+        routePoints.push([toCoords.lat, toCoords.lng]);
+      }
+    } else if (toCoords || fromCoords) {
+      const single = toCoords || fromCoords;
+      routePoints.push([single.lat, single.lng]);
+      activityCoordsList.forEach(act => routePoints.push([act.lat, act.lng]));
+    }
+  } else {
+    // In-town city day:
+    const primaryStay = stayCoordsList[0] || null;
+    const overnightStay = stayCoordsList.find(s => !s.stay || !s.stay.checkOut || (dayData.date && dayData.date < s.stay.checkOut)) || primaryStay;
+
+    const hasOutbound = Array.isArray(dayData.journeys) && dayData.journeys.some(j => {
+      const fromLoc = String(j.fromLocation || '').toLowerCase();
+      const toLoc = String(j.toLocation || '').toLowerCase();
+      const target = String(targetCity).toLowerCase();
+      return fromLoc && toLoc && (fromLoc.includes(target) || target.includes(fromLoc)) && !toLoc.includes(target);
+    });
+
+    if (primaryStay) {
+      // 1. Start at accommodation!
+      routePoints.push([primaryStay.lat, primaryStay.lng]);
+
+      // 2. Visit each scheduled activity in order
+      activityCoordsList.forEach(act => routePoints.push([act.lat, act.lng]));
+
+      // 3. Return to accommodation for the night (unless departing to another city tonight)!
+      if (!hasOutbound && overnightStay && activityCoordsList.length > 0) {
+        routePoints.push([overnightStay.lat, overnightStay.lng]);
+      }
+    } else if (cityCoords) {
+      // Fallback if no specific hotel is entered yet
+      routePoints.push([cityCoords.lat, cityCoords.lng]);
+      activityCoordsList.forEach(act => routePoints.push([act.lat, act.lng]));
+      if (!hasOutbound && activityCoordsList.length > 0) {
+        routePoints.push([cityCoords.lat, cityCoords.lng]);
+      }
+    } else {
+      activityCoordsList.forEach(act => routePoints.push([act.lat, act.lng]));
+    }
+  }
 
   // If there are multiple stops on this day route, draw the connecting route polyline
   if (!isTravelDay && routePoints.length > 1) {
     const dayPolyline = L.polyline(routePoints, {
       color: '#0d9488',
       weight: 3.5,
-      dashArray: '5, 7',
-      opacity: 0.8
+      dashArray: '6, 8',
+      opacity: 0.85
     }).addTo(desktopSplitMap);
     splitMapPolylines.push(dayPolyline);
   }

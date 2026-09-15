@@ -1377,15 +1377,34 @@ function buildSplitDayData(legIndex, dayIndex) {
   }
   dayNumber += safeDayIndex;
 
+  const cleanToCity = String(day.to || day.from || leg.label || '').replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').replace(/\s*\(\d+\)$/, '').trim();
   const allStays = (typeof window !== 'undefined' && Array.isArray(window.stays))
     ? window.stays
     : ((typeof stays !== 'undefined' && Array.isArray(stays)) ? stays : []);
   const dayStays = allStays.filter(s => {
     if (!s) return false;
     if (s.date && s.date === day.date) return true;
-    if (s.checkIn && s.checkOut && day.date >= s.checkIn && day.date < s.checkOut) return true;
+    if (s.checkIn && s.checkOut && day.date >= s.checkIn && day.date <= s.checkOut) return true;
     return false;
   });
+
+  if (Array.isArray(day.accomItems)) {
+    day.accomItems.forEach(ai => {
+      if (ai && ai.text && ai.text !== '—' && !ai.text.startsWith('Add accom')) {
+        const alreadyHas = dayStays.some(s => (s.propertyName || s.name || '').toLowerCase() === ai.text.toLowerCase());
+        if (!alreadyHas) {
+          dayStays.push({
+            name: ai.text,
+            propertyName: ai.text,
+            location: ai.location || cleanToCity,
+            cost: ai.cost,
+            bookingRef: ai.bookingRef,
+            checkIn: day.date
+          });
+        }
+      }
+    });
+  }
 
   const allJourneys = (typeof window !== 'undefined' && Array.isArray(window.journeys))
     ? window.journeys

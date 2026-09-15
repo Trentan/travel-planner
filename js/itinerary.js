@@ -2397,14 +2397,23 @@ function addTimelineMapStop(stops, value) {
 
 function getTimelineStayAnchorStop(day, anchorType) {
   if (typeof getStayDisplayForDay !== 'function') return '';
-  const staysForDay = getStayDisplayForDay(day?.date, day?.to);
-  if (!Array.isArray(staysForDay) || staysForDay.length === 0) return '';
+  const cleanCity = String(day?.to || day?.from || '').replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').replace(/\s*\(\d+\)$/, '').trim();
+  const staysForDay = getStayDisplayForDay(day?.date, cleanCity) || getStayDisplayForDay(day?.date, day?.to);
+  if (!Array.isArray(staysForDay) || staysForDay.length === 0) {
+    if (Array.isArray(day?.accomItems)) {
+      const ai = day.accomItems.find(item => item && item.text && item.text !== '—' && !item.text.startsWith('Add accom'));
+      if (ai) return ai.location ? `${ai.location} (${cleanCity})` : ai.text;
+    }
+    return '';
+  }
   const desiredTypes = anchorType === 'start' ? ['staying', 'checkout'] : ['checkin', 'staying'];
-  const stay = staysForDay.find(info => desiredTypes.includes(info.type));
+  let stay = staysForDay.find(info => desiredTypes.includes(info.type));
+  if (!stay && anchorType === 'start') {
+    stay = staysForDay.find(info => info.type === 'checkin');
+  }
   if (!stay) return '';
   if (stay.location) {
     let loc = stay.location;
-    const cleanCity = String(day?.to || '').trim();
     if (cleanCity && !loc.toLowerCase().includes(cleanCity.toLowerCase())) {
       loc = `${loc} (${cleanCity})`;
     }
