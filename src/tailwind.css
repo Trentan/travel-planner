@@ -18,6 +18,11 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   /* Mobile theme tokens: single source for compact sizing - updated for better readability */
   body.mobile-app-mode {
     --m-control-h: 2.875rem;
