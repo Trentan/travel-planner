@@ -1306,12 +1306,45 @@ function initDesktopSplitLayout() {
   if (typeof window !== 'undefined' && !window.__desktopSplitListenersBound) {
     window.__desktopSplitListenersBound = true;
 
+    // Direct click synchronization: clicking anywhere on a day slide or card switches the split-map immediately
+    const itineraryEl = document.getElementById('itinerary');
+    if (itineraryEl) {
+      itineraryEl.addEventListener('click', (evt) => {
+        if (window.innerWidth < 1024) return;
+        if (evt.target && typeof evt.target.closest === 'function') {
+          if (evt.target.closest('input, button, a, select, [contenteditable="true"]')) return;
+          const slide = evt.target.closest('.compact-day-slide');
+          if (slide) {
+            const dayIdx = parseInt(slide.dataset.dayIndex, 10);
+            let legIdx = parseInt(slide.dataset.legIndex, 10);
+            if (isNaN(legIdx)) {
+              const legEl = slide.closest('.compact-desktop-leg, .leg');
+              if (legEl && legEl.id && typeof appData !== 'undefined' && Array.isArray(appData)) {
+                const legId = legEl.id.replace(/^leg-/, '');
+                legIdx = appData.findIndex(l => String(l.id) === String(legId));
+              }
+            }
+            if (!isNaN(dayIdx) && !isNaN(legIdx) && legIdx >= 0) {
+              window.__selectedDayContext = { legIndex: legIdx, dayIndex: dayIdx };
+              if (!evt.target.closest('.split-item-selectable, .compact-activity-row, .compact-grouped-item')) {
+                syncDesktopSplitToDayInView(true, window.__selectedDayContext);
+              }
+            }
+          }
+        }
+      });
+    }
+
     let scrollRaf = null;
     window.addEventListener('scroll', () => {
       if (window.innerWidth < 1024) return;
       if (scrollRaf) return;
       scrollRaf = requestAnimationFrame(() => {
-        syncDesktopSplitToDayInView(false);
+        const scrollContext = findDesktopDayFromScrollPosition();
+        if (scrollContext) {
+          window.__selectedDayContext = scrollContext;
+          syncDesktopSplitToDayInView(false, scrollContext);
+        }
         scrollRaf = null;
       });
     }, { passive: true });
@@ -1328,37 +1361,14 @@ function initDesktopSplitLayout() {
   }
 }
 
-function findCurrentDesktopDayInView() {
+function buildSplitDayData(legIndex, dayIndex) {
   if (typeof appData === 'undefined' || !Array.isArray(appData) || appData.length === 0) return null;
 
-  const legElements = Array.from(document.querySelectorAll('#itinerary .compact-desktop-leg, #itinerary .leg'));
-  let activeLegIndex = 0;
-  let activeDayIndex = 0;
-
-  if (legElements.length > 0) {
-    const targetY = 140; // below top navbar
-    for (let i = 0; i < legElements.length; i++) {
-      const rect = legElements[i].getBoundingClientRect();
-      if (rect.bottom > targetY) {
-        activeLegIndex = i;
-        break;
-      }
-    }
-
-    const activeLegEl = legElements[activeLegIndex];
-    if (activeLegEl) {
-      const pager = activeLegEl.querySelector('.compact-day-pager');
-      if (pager) {
-        activeDayIndex = Math.max(0, Number(pager.dataset.activeIndex || 0));
-      }
-    }
-  }
-
-  const safeLegIndex = Math.min(appData.length - 1, Math.max(0, activeLegIndex));
+  const safeLegIndex = Math.min(appData.length - 1, Math.max(0, legIndex));
   const leg = appData[safeLegIndex];
   if (!leg || !Array.isArray(leg.days) || leg.days.length === 0) return null;
 
-  const safeDayIndex = Math.min(leg.days.length - 1, Math.max(0, activeDayIndex));
+  const safeDayIndex = Math.min(leg.days.length - 1, Math.max(0, dayIndex));
   const day = leg.days[safeDayIndex];
 
   let dayNumber = 1;
@@ -1456,11 +1466,49 @@ function findCurrentDesktopDayInView() {
   };
 }
 
-function syncDesktopSplitToDayInView(force = false) {
+function findDesktopDayFromScrollPosition() {
+  if (typeof document === 'undefined') return null;
+  const legElements = Array.from(document.querySelectorAll('#itinerary .compact-desktop-leg, #itinerary .leg'));
+  if (legElements.length === 0) return null;
+
+  let activeLegIndex = 0;
+  let activeDayIndex = 0;
+  const targetY = 160;
+
+  for (let i = 0; i < legElements.length; i++) {
+    const rect = legElements[i].getBoundingClientRect();
+    if (rect.bottom > targetY) {
+      activeLegIndex = i;
+      break;
+    }
+  }
+
+  const activeLegEl = legElements[activeLegIndex];
+  if (activeLegEl) {
+    const pager = activeLegEl.querySelector('.compact-day-pager');
+    if (pager) {
+      activeDayIndex = Math.max(0, Number(pager.dataset.activeIndex || 0));
+    }
+  }
+
+  return { legIndex: activeLegIndex, dayIndex: activeDayIndex };
+}
+
+function findCurrentDesktopDayInView(preferredContext = null) {
+  if (typeof appData === 'undefined' || !Array.isArray(appData) || appData.length === 0) return null;
+
+  const context = preferredContext || window.__selectedDayContext || findDesktopDayFromScrollPosition();
+  const legIdx = context ? Math.max(0, Math.min(appData.length - 1, Number(context.legIndex) || 0)) : 0;
+  const dayIdx = context ? Math.max(0, Number(context.dayIndex) || 0) : 0;
+
+  return buildSplitDayData(legIdx, dayIdx);
+}
+
+function syncDesktopSplitToDayInView(force = false, preferredContext = null) {
   if (typeof window === 'undefined' || window.innerWidth < 1024) return;
   if (typeof getDesktopSplitMode === 'function' && getDesktopSplitMode() === 'full-itinerary') return;
 
-  const dayData = findCurrentDesktopDayInView();
+  const dayData = findCurrentDesktopDayInView(preferredContext);
   if (!dayData) return;
 
   const dayKey = `${dayData.legIndex}-${dayData.dayIndex}`;
@@ -1503,122 +1551,75 @@ function renderSplitDrawerForDay(dayData) {
   const stays = Array.isArray(dayData.stays) ? dayData.stays : [];
   const activities = Array.isArray(dayData.activities) ? dayData.activities : [];
 
-  let journeyHtml = '';
-  if (journeys.length > 0) {
-    journeyHtml = `
-      <div class="split-day-section">
-        <div class="split-day-section-title">🛫 Transit / Journeys</div>
-        <div class="flex flex-col gap-1.5">
-          ${journeys.map(j => {
-            const label = j.journeyName || j.name || `${j.fromLocation || cleanFrom} → ${j.toLocation || cleanTo}`;
-            const meta = [j.routeCode || j.flightNumber, j.departureTime, j.provider].filter(Boolean).join(' · ');
-            return `
-              <div class="split-day-item-clickable" onclick="selectSplitPaneItem({ title: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(label) : label}', type: 'transport', transportType: '${j.transportType || 'flight'}', location: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(j.toLocation || cleanTo) : (j.toLocation || cleanTo)}', time: '${j.departureTime || ''}', cost: '${j.cost || ''}', notes: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(j.notes || '') : (j.notes || '')}', bookingRef: '${j.bookingReference || j.bookingRef || ''}' })">
-                <div class="flex flex-col min-w-0">
-                  <span class="font-semibold text-slate-800 dark:text-slate-200 truncate">${typeof escapeHtmlText === 'function' ? escapeHtmlText(label) : label}</span>
-                  ${meta ? `<span class="text-[11px] text-slate-500 truncate">${typeof escapeHtmlText === 'function' ? escapeHtmlText(meta) : meta}</span>` : ''}
-                </div>
-                <span class="text-xs text-teal-600 font-bold shrink-0">Inspect ↗</span>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    `;
-  }
+  const pills = [];
 
-  let stayHtml = '';
-  if (stays.length > 0) {
-    stayHtml = `
-      <div class="split-day-section">
-        <div class="split-day-section-title">🏨 Accommodation</div>
-        <div class="flex flex-col gap-1.5">
-          ${stays.map(s => {
-            const sName = s.name || s.propertyName || 'Accommodation';
-            const sLoc = s.location || s.city || cleanTo;
-            const sRef = s.bookingRef || '';
-            return `
-              <div class="split-day-item-clickable" onclick="selectSplitPaneItem({ title: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(sName) : sName}', type: 'stay', location: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(sLoc) : sLoc}', bookingRef: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(sRef) : sRef}', cost: '${s.cost || ''}', notes: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(s.notes || '') : (s.notes || '')}' })">
-                <div class="flex flex-col min-w-0">
-                  <span class="font-semibold text-slate-800 dark:text-slate-200 truncate">${typeof escapeHtmlText === 'function' ? escapeHtmlText(sName) : sName}</span>
-                  <span class="text-[11px] text-slate-500 truncate">${typeof escapeHtmlText === 'function' ? escapeHtmlText(sLoc) : sLoc}${sRef ? ' · #' + sRef : ''}</span>
-                </div>
-                <span class="text-xs text-rose-600 font-bold shrink-0">Inspect ↗</span>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    `;
-  }
+  journeys.forEach(j => {
+    const label = j.journeyName || j.name || `${j.fromLocation || cleanFrom} → ${j.toLocation || cleanTo}`;
+    const tIcon = typeof getTransportIcon === 'function' ? getTransportIcon(j.transportType) : '✈️';
+    const time = j.departureTime ? ` (${j.departureTime})` : '';
+    pills.push(`
+      <span class="split-day-pill transport" title="${typeof escapeHtmlText === 'function' ? escapeHtmlText(label) : label}" onclick="selectSplitPaneItem({ title: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(label) : label}', type: 'transport', transportType: '${j.transportType || 'flight'}', location: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(j.toLocation || cleanTo) : (j.toLocation || cleanTo)}', time: '${j.departureTime || ''}', cost: '${j.cost || ''}', notes: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(j.notes || '') : (j.notes || '')}', bookingRef: '${j.bookingReference || j.bookingRef || ''}' })">
+        <span>${tIcon}</span> <span class="truncate">${typeof escapeHtmlText === 'function' ? escapeHtmlText(label) : label}${time}</span>
+      </span>
+    `);
+  });
 
-  let activitiesHtml = '';
-  if (activities.length > 0) {
-    activitiesHtml = `
-      <div class="split-day-section">
-        <div class="split-day-section-title flex items-center justify-between">
-          <span>🎯 Activities (${activities.length})</span>
-        </div>
-        <div class="flex flex-col gap-1 max-h-44 overflow-y-auto pr-0.5">
-          ${activities.map(a => {
-            const title = a.title || a.text || 'Activity';
-            const cost = a.cost || a.estCost ? (typeof formatCurrency === 'function' ? formatCurrency(a.cost || a.estCost) : `$${a.cost || a.estCost}`) : '';
-            const duration = a.time || a.estTime || '';
-            return `
-              <div class="split-day-item-clickable" onclick="selectSplitPaneItem({ title: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title}', type: 'activity', location: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(a.location || cleanTo) : (a.location || cleanTo)}', time: '${duration}', cost: '${cost}', notes: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(a.notes || '') : (a.notes || '')}' })">
-                <div class="flex items-center gap-2 min-w-0">
-                  <span class="text-xs ${a.done ? 'text-emerald-500' : 'text-slate-400'}">${a.done ? '✓' : '○'}</span>
-                  <span class="text-xs text-slate-700 dark:text-slate-300 truncate ${a.done ? 'line-through text-slate-400' : 'font-medium'}">${typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title}</span>
-                </div>
-                <div class="flex items-center gap-1.5 text-[11px] text-slate-500 shrink-0">
-                  ${duration ? `<span>${duration}</span>` : ''}
-                  ${cost ? `<span class="font-semibold text-slate-700 dark:text-slate-300">${cost}</span>` : ''}
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    `;
-  } else {
-    activitiesHtml = `
-      <div class="split-day-section">
-        <div class="split-day-section-title">🎯 Activities</div>
-        <div class="text-xs text-slate-400 italic py-1">No activities scheduled yet for this day.</div>
-      </div>
-    `;
-  }
+  stays.forEach(s => {
+    const sName = s.name || s.propertyName || 'Accommodation';
+    const sLoc = s.location || s.city || cleanTo;
+    pills.push(`
+      <span class="split-day-pill stay" title="${typeof escapeHtmlText === 'function' ? escapeHtmlText(sName) : sName}" onclick="selectSplitPaneItem({ title: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(sName) : sName}', type: 'stay', location: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(sLoc) : sLoc}', bookingRef: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(s.bookingRef || '') : (s.bookingRef || '')}', cost: '${s.cost || ''}', notes: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(s.notes || '') : (s.notes || '')}' })">
+        <span>🏨</span> <span class="truncate">${typeof escapeHtmlText === 'function' ? escapeHtmlText(sName) : sName}</span>
+      </span>
+    `);
+  });
+
+  activities.forEach((a, aIdx) => {
+    const title = a.title || a.text || 'Activity';
+    const cost = a.cost || a.estCost ? (typeof formatCurrency === 'function' ? formatCurrency(a.cost || a.estCost) : `$${a.cost || a.estCost}`) : '';
+    const duration = a.time || a.estTime || '';
+    pills.push(`
+      <span class="split-day-pill activity" title="${typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title}" onclick="selectSplitPaneItem({ title: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title}', type: 'activity', location: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(a.location || cleanTo) : (a.location || cleanTo)}', time: '${duration}', cost: '${cost}', notes: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(a.notes || '') : (a.notes || '')}', activityId: '${a.activityId || ''}' })">
+        <span>🎯 ${aIdx + 1}.</span> <span class="truncate ${a.done ? 'line-through opacity-70' : ''}">${typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title}</span>
+      </span>
+    `);
+  });
+
+  const cityTitle = isTravelDay
+    ? `${cleanFrom} → ${cleanTo}`
+    : (cleanTo || cleanFrom);
 
   placeholder.hidden = true;
   drawer.hidden = false;
   drawer.innerHTML = `
     <div class="split-drawer-item-card split-drawer-day-card">
       <div class="split-day-header flex items-center justify-between gap-2">
-        <div class="flex items-center gap-1.5 flex-wrap">
-          <span class="split-drawer-badge ${isTravelDay ? 'transport' : 'activity'}">
-            <span>${isTravelDay ? '✈️ Travel Day' : '📍 Day in City'}</span>
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span class="split-drawer-badge ${isTravelDay ? 'transport' : 'activity'} shrink-0">
+            <span>${isTravelDay ? '✈️ Day ' + dayNumber : '📍 Day ' + dayNumber}</span>
           </span>
-          <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">${typeof escapeHtmlText === 'function' ? escapeHtmlText(dayDateLabel) : dayDateLabel}</span>
+          <h4 class="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate m-0">
+            ${typeof escapeHtmlText === 'function' ? escapeHtmlText(cityTitle) : cityTitle}
+          </h4>
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate hidden sm:inline">
+            (${typeof escapeHtmlText === 'function' ? escapeHtmlText(dayDateLabel) : dayDateLabel})
+          </span>
         </div>
-        <div class="flex items-center gap-1.5">
+        <div class="flex items-center gap-1.5 shrink-0">
           ${dayData.mapRoute && dayData.mapRoute.url ? `
-            <a href="${dayData.mapRoute.url}" target="_blank" rel="noopener noreferrer" class="text-xs px-2 py-0.5 rounded font-semibold bg-teal-50 hover:bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:hover:bg-teal-900/50 dark:text-teal-300 transition-colors" title="View day route in Google Maps">
+            <a href="${dayData.mapRoute.url}" target="_blank" rel="noopener noreferrer" class="text-[11px] px-2 py-0.5 rounded font-semibold bg-teal-50 hover:bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:hover:bg-teal-900/50 dark:text-teal-300 transition-colors" title="View day route in Google Maps">
               🗺️ Maps ↗
             </a>
           ` : ''}
-          <span class="text-xs px-2 py-0.5 rounded font-bold ${isTravelDay ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' : 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300'}">
-            Day ${dayNumber}
+          <span class="text-[11px] px-1.5 py-0.5 rounded font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+            ${pills.length} item${pills.length === 1 ? '' : 's'}
           </span>
         </div>
       </div>
 
-      <h4 class="font-bold text-sm text-slate-900 dark:text-slate-100 leading-snug m-0">
-        ${isTravelDay ? `${typeof escapeHtmlText === 'function' ? escapeHtmlText(cleanFrom) : cleanFrom} → ${typeof escapeHtmlText === 'function' ? escapeHtmlText(cleanTo) : cleanTo}` : (typeof escapeHtmlText === 'function' ? escapeHtmlText(cleanTo || cleanFrom) : (cleanTo || cleanFrom))}
-      </h4>
-
-      ${journeyHtml}
-      ${stayHtml}
-      ${activitiesHtml}
+      <div class="split-day-pills-wrap">
+        ${pills.length > 0 ? pills.join('') : '<span class="text-xs text-slate-400 italic py-1">No activities or stops scheduled for this day</span>'}
+      </div>
     </div>
   `;
 }
@@ -1743,6 +1744,24 @@ function handleSplitItemClick(itemEl, event) {
   if (event && event.target && typeof event.target.closest === 'function') {
     if (event.target.closest('input[type="checkbox"], button, a, .modal-close, select, [contenteditable="true"]')) {
       return;
+    }
+  }
+
+  // 1. Direct day sync: ensure the map is centered on this day's locations first
+  const slideEl = itemEl.closest('.compact-day-slide');
+  if (slideEl) {
+    const dayIdx = parseInt(slideEl.dataset.dayIndex, 10);
+    let legIdx = parseInt(slideEl.dataset.legIndex, 10);
+    if (isNaN(legIdx)) {
+      const legEl = slideEl.closest('.compact-desktop-leg, .leg');
+      if (legEl && legEl.id && typeof appData !== 'undefined' && Array.isArray(appData)) {
+        const legId = legEl.id.replace(/^leg-/, '');
+        legIdx = appData.findIndex(l => String(l.id) === String(legId));
+      }
+    }
+    if (!isNaN(dayIdx) && !isNaN(legIdx) && legIdx >= 0) {
+      window.__selectedDayContext = { legIndex: legIdx, dayIndex: dayIdx };
+      syncDesktopSplitToDayInView(true, window.__selectedDayContext);
     }
   }
 
@@ -1922,6 +1941,8 @@ window.findCurrentDesktopDayInView = findCurrentDesktopDayInView;
 window.syncDesktopSplitToDayInView = syncDesktopSplitToDayInView;
 window.clearSplitDrawer = clearSplitDrawer;
 window.selectSplitPaneItem = selectSplitPaneItem;
+window.buildSplitDayData = buildSplitDayData;
+window.findDesktopDayFromScrollPosition = findDesktopDayFromScrollPosition;
 window.populatePrintTripHeader = populatePrintTripHeader;
 window.printItinerary = printItinerary;
 

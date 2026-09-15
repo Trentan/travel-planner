@@ -835,7 +835,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
   const isActive = dayIdx === 0;
 
   return `
-    <section class="compact-day-slide day-card ${isActive ? 'is-active open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
+    <section class="compact-day-slide day-card ${isActive ? 'is-active open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-leg-index="${legIndex}" data-leg-id="${escapeCompactText(leg.id)}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
       ${renderMobileSurfaceCard({
     cardClass: 'compact-day-surface',
     accentColor: leg.colour,
@@ -1336,8 +1336,17 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
     syncItineraryMobileHeightContainment(pager.closest('#tab-itinerary') || document);
   }
 
+  const legId = pager.dataset.legId;
+  let legIdx = -1;
+  if (typeof appData !== 'undefined' && Array.isArray(appData)) {
+    legIdx = appData.findIndex(l => String(l.id) === String(legId));
+  }
+  if (legIdx >= 0) {
+    window.__selectedDayContext = { legIndex: legIdx, dayIndex: safeIndex };
+  }
+
   if (typeof syncDesktopSplitToDayInView === 'function' && typeof window !== 'undefined' && window.innerWidth >= 1024) {
-    setTimeout(() => syncDesktopSplitToDayInView(true), 60);
+    syncDesktopSplitToDayInView(true, window.__selectedDayContext);
   }
 }
 
@@ -1347,34 +1356,42 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
     event.stopPropagation();
   }
 
-  const pager = Array.from(document.querySelectorAll('.compact-day-pager')).find(el => el.dataset.legId === String(legId));
-  if (!pager) return false;
-
   const nextIndex = Math.max(0, Number(dayIndex) || 0);
-  if (typeof pager.__compactScrollToIndex === 'function') {
-    pager.__compactScrollToIndex(nextIndex);
-  } else {
-    syncCompactDayPagerState(pager, nextIndex);
-    const carousel = pager.querySelector('.compact-day-carousel');
-    const slide = pager.querySelector(`.compact-day-slide[data-day-index="${nextIndex}"]`);
-    if (carousel && slide) {
-      carousel.scrollTo({
-        left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
-        behavior: 'smooth'
-      });
-    }
+  let legIndex = -1;
+  if (typeof appData !== 'undefined' && Array.isArray(appData)) {
+    legIndex = appData.findIndex(l => String(l.id) === String(legId));
+  }
+  if (legIndex >= 0) {
+    window.__selectedDayContext = { legIndex, dayIndex: nextIndex };
   }
 
-  if (typeof window !== 'undefined') {
-    const pagerRect = pager.getBoundingClientRect();
-    if (pagerRect.top < 60) {
-      const targetTop = window.scrollY + pagerRect.top - 60;
-      window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+  const pager = Array.from(document.querySelectorAll('.compact-day-pager')).find(el => el.dataset.legId === String(legId));
+  if (pager) {
+    if (typeof pager.__compactScrollToIndex === 'function') {
+      pager.__compactScrollToIndex(nextIndex);
+    } else {
+      syncCompactDayPagerState(pager, nextIndex);
+      const carousel = pager.querySelector('.compact-day-carousel');
+      const slide = pager.querySelector(`.compact-day-slide[data-day-index="${nextIndex}"]`);
+      if (carousel && slide) {
+        carousel.scrollTo({
+          left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
+          behavior: 'smooth'
+        });
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      const pagerRect = pager.getBoundingClientRect();
+      if (pagerRect.top < 60) {
+        const targetTop = window.scrollY + pagerRect.top - 60;
+        window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+      }
     }
   }
 
   if (typeof syncDesktopSplitToDayInView === 'function' && typeof window !== 'undefined' && window.innerWidth >= 1024) {
-    setTimeout(() => syncDesktopSplitToDayInView(true), 80);
+    syncDesktopSplitToDayInView(true, window.__selectedDayContext);
   }
   return false;
 }

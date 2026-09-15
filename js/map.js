@@ -751,13 +751,21 @@ function getDeterministicActivityCoords(baseCoords, act, index, total) {
   const actLoc = String((act && act.location) || '').trim();
   if (actLoc) {
     const direct = getCityCoords(actLoc);
-    if (direct) return direct;
+    if (direct) {
+      const dLat = Math.abs(direct.lat - baseCoords.lat);
+      const dLng = Math.abs(direct.lng - baseCoords.lng);
+      if (dLat < 1.2 && dLng < 1.5) return direct;
+    }
   }
   if (actLoc && typeof ALL_CITIES !== 'undefined') {
     const words = actLoc.split(/[\s,/·-]+/).filter(w => w.length > 2);
     for (const w of words) {
       const match = getCityCoords(w);
-      if (match) return match;
+      if (match) {
+        const dLat = Math.abs(match.lat - baseCoords.lat);
+        const dLng = Math.abs(match.lng - baseCoords.lng);
+        if (dLat < 1.2 && dLng < 1.5) return match;
+      }
     }
   }
 
@@ -910,7 +918,12 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
   stays.forEach((stay, sIdx) => {
     const stayName = stay.name || stay.propertyName || 'Accommodation';
     const stayLoc = stay.location || stay.city || targetCity;
-    const directStayCoords = getCityCoords(stayLoc);
+    let directStayCoords = getCityCoords(stayLoc);
+    if (directStayCoords && baseCoords) {
+      const dLat = Math.abs(directStayCoords.lat - baseCoords.lat);
+      const dLng = Math.abs(directStayCoords.lng - baseCoords.lng);
+      if (dLat >= 1.2 || dLng >= 1.5) directStayCoords = null;
+    }
     const stayCoords = directStayCoords || (baseCoords ? {
       lat: baseCoords.lat + (sIdx === 0 ? 0.007 : -0.007),
       lng: baseCoords.lng + (sIdx === 0 ? 0.007 : -0.007)
@@ -997,18 +1010,28 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
     splitMapPolylines.push(dayPolyline);
   }
 
-  // Camera
-  if (points.length > 1) {
+  // Camera: zoom in tightly to the locations needed
+  if (points.length === 0 && baseCoords) {
+    points.push([baseCoords.lat, baseCoords.lng]);
+  }
+
+  if (isTravelDay && points.length > 1) {
     if (typeof desktopSplitMap.flyToBounds === 'function') {
-      desktopSplitMap.flyToBounds(points, { padding: [45, 45], maxZoom: 15, duration: 0.5 });
+      desktopSplitMap.flyToBounds(points, { padding: [50, 50], maxZoom: 13, duration: 0.5 });
     } else if (typeof desktopSplitMap.fitBounds === 'function') {
-      desktopSplitMap.fitBounds(points, { padding: [45, 45], maxZoom: 15 });
+      desktopSplitMap.fitBounds(points, { padding: [50, 50], maxZoom: 13 });
+    }
+  } else if (points.length > 1) {
+    if (typeof desktopSplitMap.flyToBounds === 'function') {
+      desktopSplitMap.flyToBounds(points, { padding: [40, 40], maxZoom: 15, duration: 0.5 });
+    } else if (typeof desktopSplitMap.fitBounds === 'function') {
+      desktopSplitMap.fitBounds(points, { padding: [40, 40], maxZoom: 15 });
     }
   } else if (points.length === 1) {
     if (typeof desktopSplitMap.flyTo === 'function') {
-      desktopSplitMap.flyTo(points[0], 13, { duration: 0.5 });
+      desktopSplitMap.flyTo(points[0], 14, { duration: 0.5 });
     } else if (typeof desktopSplitMap.setView === 'function') {
-      desktopSplitMap.setView(points[0], 13);
+      desktopSplitMap.setView(points[0], 14);
     }
   }
 }
