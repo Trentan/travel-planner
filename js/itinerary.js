@@ -2397,7 +2397,7 @@ function addTimelineMapStop(stops, value) {
 
 function getTimelineStayAnchorStop(day, anchorType) {
   if (typeof getStayDisplayForDay !== 'function') return '';
-  const cleanCity = String(day?.to || day?.from || '').replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').replace(/\s*\(\d+\)$/, '').trim();
+  const cleanCity = String(day?.to || day?.from || '').replace(/^[\u{1F1E6}-\u{1F1FF}]{2}|^[📍🗺️✈️🏨🏠\s]+/u, '').replace(/\s*\(\d+\)$/, '').trim();
   const staysForDay = getStayDisplayForDay(day?.date, cleanCity) || getStayDisplayForDay(day?.date, day?.to);
   if (!Array.isArray(staysForDay) || staysForDay.length === 0) {
     if (Array.isArray(day?.accomItems)) {
@@ -2458,9 +2458,24 @@ function getDailyTimelineMapRouteFromItems(items, day = null) {
   addTimelineMapStop(stops, departureStop || getTimelineStayAnchorStop(day, 'end'));
 
   if (stops.length < 2) return { stops, url: '' };
+  const safeEncodeStop = (stop) => {
+    try {
+      return encodeURIComponent(stop);
+    } catch (e) {
+      try {
+        const wellFormed = typeof String.prototype.toWellFormed === 'function'
+          ? String(stop).toWellFormed()
+          : String(stop).replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
+        return encodeURIComponent(wellFormed);
+      } catch (e2) {
+        return encodeURIComponent(String(stop).replace(/[\uD800-\uDFFF]/g, ''));
+      }
+    }
+  };
+
   return {
     stops,
-    url: `https://www.google.com/maps/dir/${stops.map(stop => encodeURIComponent(stop)).join('/')}/`
+    url: `https://www.google.com/maps/dir/${stops.map(safeEncodeStop).join('/')}/`
   };
 }
 

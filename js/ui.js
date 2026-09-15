@@ -111,6 +111,8 @@ function updateStickyOffsets() {
     document.documentElement.style.setProperty('--app-menu-height', `${menuHeight}px`);
     document.documentElement.style.setProperty('--app-tabs-height', `${tabsHeight}px`);
     document.documentElement.style.setProperty('--app-city-height', `${cityHeight}px`);
+    const desktopStickyOffset = !isMobile ? (menuHeight + tabsHeight + cityHeight + 12) : 0;
+    document.documentElement.style.setProperty('--desktop-sticky-offset', `${desktopStickyOffset}px`);
   }
 }
 
@@ -1289,6 +1291,8 @@ function toggleDesktopSplitMode(mode) {
     }
   }
 
+  updateStickyOffsets();
+
   if (targetMode === 'split' && typeof window !== 'undefined' && window.innerWidth >= 1024 && typeof buildDesktopSplitMap === 'function') {
     setTimeout(buildDesktopSplitMap, 60);
   }
@@ -1308,9 +1312,9 @@ function initDesktopSplitLayout() {
 
     // Direct click synchronization: clicking anywhere on a day slide or card switches the split-map immediately
     const itineraryEl = document.getElementById('itinerary');
-    if (itineraryEl) {
+    if (itineraryEl && typeof itineraryEl.addEventListener === 'function') {
       itineraryEl.addEventListener('click', (evt) => {
-        if (window.innerWidth < 1024) return;
+        if (typeof window !== 'undefined' && window.innerWidth < 1024) return;
         if (evt.target && typeof evt.target.closest === 'function') {
           if (evt.target.closest('input, button, a, select, [contenteditable="true"]')) return;
           const slide = evt.target.closest('.compact-day-slide');
@@ -1335,25 +1339,27 @@ function initDesktopSplitLayout() {
       });
     }
 
-    let scrollRaf = null;
-    window.addEventListener('scroll', () => {
-      if (window.innerWidth < 1024) return;
-      if (scrollRaf) return;
-      scrollRaf = requestAnimationFrame(() => {
-        const scrollContext = findDesktopDayFromScrollPosition();
-        if (scrollContext) {
-          window.__selectedDayContext = scrollContext;
-          syncDesktopSplitToDayInView(false, scrollContext);
-        }
-        scrollRaf = null;
-      });
-    }, { passive: true });
+    if (typeof window.addEventListener === 'function') {
+      let scrollRaf = null;
+      window.addEventListener('scroll', () => {
+        if (window.innerWidth < 1024) return;
+        if (scrollRaf) return;
+        scrollRaf = requestAnimationFrame(() => {
+          const scrollContext = findDesktopDayFromScrollPosition();
+          if (scrollContext) {
+            window.__selectedDayContext = scrollContext;
+            syncDesktopSplitToDayInView(false, scrollContext);
+          }
+          scrollRaf = null;
+        });
+      }, { passive: true });
 
-    window.addEventListener('resize', () => {
-      if (window.innerWidth >= 1024 && getDesktopSplitMode() === 'split') {
-        syncDesktopSplitToDayInView(true);
-      }
-    });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024 && getDesktopSplitMode() === 'split') {
+          syncDesktopSplitToDayInView(true);
+        }
+      });
+    }
   }
 
   if (typeof window !== 'undefined' && window.innerWidth >= 1024 && mode === 'split') {
@@ -1487,22 +1493,84 @@ function buildSplitDayData(legIndex, dayIndex) {
 
 function findDesktopDayFromScrollPosition() {
   if (typeof document === 'undefined') return null;
-  const legElements = Array.from(document.querySelectorAll('#itinerary .compact-desktop-leg, #itinerary .leg'));
-  if (legElements.length === 0) return null;
 
-  let activeLegIndex = 0;
-  let activeDayIndex = 0;
-  const targetY = 160;
+  // 1. Calculate hit zone: bounded from the top bar of the map to the bottom of the day detail drawer
+  let zoneTop = 184;
+  let zoneBottom = typeof window !== 'undefined' ? (window.innerHeight - 16) : 884;
 
-  for (let i = 0; i < legElements.length; i++) {
-    const rect = legElements[i].getBoundingClientRect();
-    if (rect.bottom > targetY) {
-      activeLegIndex = i;
-      break;
+  const header = document.querySelector('.desktop-split-right-header');
+  const drawer = document.querySelector('.desktop-split-drawer');
+  if (header) {
+    const r = header.getBoundingClientRect();
+    if (r.height > 0) zoneTop = r.top;
+  }
+  if (drawer) {
+    const r = drawer.getBoundingClientRect();
+    if (r.height > 0) zoneBottom = r.bottom;
+  }
+
+  if (zoneBottom <= zoneTop) {
+    zoneBottom = zoneTop + 400;
+  }
+
+  // 2. Evaluate visible day cards/slides within the hit zone [zoneTop, zoneBottom]
+  const candidateSlides = Array.from(document.querySelectorAll(
+    '#itinerary .compact-day-slide.is-active, #itinerary .compact-day-slide.open, #itinerary .day-card.open, #itinerary .compact-day-slide, #itinerary .day-card'
+  ));
+
+  let bestDayCandidate = null;
+  let maxDayOverlap = -1;
+
+  for (const card of candidateSlides) {
+    const r = card.getBoundingClientRect();
+    if (r.height <= 0 || r.width <= 0) continue;
+
+    const overlap = Math.max(0, Math.min(r.bottom, zoneBottom) - Math.max(r.top, zoneTop));
+    if (overlap > maxDayOverlap) {
+      const dayIdxAttr = card.getAttribute('data-day-index');
+      let legIdxAttr = card.getAttribute('data-leg-index');
+      if (legIdxAttr === null || legIdxAttr === undefined || legIdxAttr === '') {
+        const legEl = card.closest('.compact-desktop-leg, .leg');
+        if (legEl && legEl.id && typeof appData !== 'undefined' && Array.isArray(appData)) {
+          const legId = legEl.id.replace(/^leg-/, '');
+          const foundIdx = appData.findIndex(l => String(l.id) === String(legId));
+          if (foundIdx >= 0) legIdxAttr = String(foundIdx);
+        }
+      }
+
+      if (dayIdxAttr !== null && legIdxAttr !== null) {
+        maxDayOverlap = overlap;
+        bestDayCandidate = {
+          legIndex: Math.max(0, Number(legIdxAttr) || 0),
+          dayIndex: Math.max(0, Number(dayIdxAttr) || 0)
+        };
+      }
     }
   }
 
-  const activeLegEl = legElements[activeLegIndex];
+  if (bestDayCandidate && maxDayOverlap > 30) {
+    return bestDayCandidate;
+  }
+
+  // 3. Evaluate leg elements within the hit zone [zoneTop, zoneBottom]
+  const legElements = Array.from(document.querySelectorAll('#itinerary .compact-desktop-leg, #itinerary .leg'));
+  if (legElements.length === 0) return null;
+
+  let bestLegIndex = 0;
+  let maxLegOverlap = -1;
+
+  for (let i = 0; i < legElements.length; i++) {
+    const r = legElements[i].getBoundingClientRect();
+    if (r.height <= 0) continue;
+    const overlap = Math.max(0, Math.min(r.bottom, zoneBottom) - Math.max(r.top, zoneTop));
+    if (overlap > maxLegOverlap) {
+      maxLegOverlap = overlap;
+      bestLegIndex = i;
+    }
+  }
+
+  let activeDayIndex = 0;
+  const activeLegEl = legElements[bestLegIndex];
   if (activeLegEl) {
     const pager = activeLegEl.querySelector('.compact-day-pager');
     if (pager) {
@@ -1510,7 +1578,7 @@ function findDesktopDayFromScrollPosition() {
     }
   }
 
-  return { legIndex: activeLegIndex, dayIndex: activeDayIndex };
+  return { legIndex: bestLegIndex, dayIndex: activeDayIndex };
 }
 
 function findCurrentDesktopDayInView(preferredContext = null) {
@@ -1560,8 +1628,8 @@ function renderSplitDrawerForDay(dayData) {
 
   const fromCity = String(dayData.from || '').trim();
   const toCity = String(dayData.to || dayData.from || '').trim();
-  const cleanFrom = fromCity.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').replace(/\s*\(\d+\)$/, '').trim();
-  const cleanTo = toCity.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').replace(/\s*\(\d+\)$/, '').trim();
+  const cleanFrom = fromCity.replace(/^[\u{1F1E6}-\u{1F1FF}]{2}|^[📍🗺️✈️🏨🏠\s]+/u, '').replace(/\s*\(\d+\)$/, '').trim();
+  const cleanTo = toCity.replace(/^[\u{1F1E6}-\u{1F1FF}]{2}|^[📍🗺️✈️🏨🏠\s]+/u, '').replace(/\s*\(\d+\)$/, '').trim();
   const isTravelDay = cleanFrom.toLowerCase() !== cleanTo.toLowerCase() && cleanFrom.length > 0 && cleanTo.length > 0;
   const dayNumber = dayData.dayNumber || 1;
   const dayDateLabel = [dayData.dayName, dayData.date].filter(Boolean).join(', ');
@@ -1920,12 +1988,12 @@ function printItinerary() {
 }
 
 // Global click delegation on itinerary items to sync right-hand map and detail drawer
-if (typeof document !== 'undefined') {
+if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
   document.addEventListener('DOMContentLoaded', () => {
     initDesktopSplitLayout();
 
     const itineraryContainer = document.getElementById('itinerary');
-    if (itineraryContainer) {
+    if (itineraryContainer && typeof itineraryContainer.addEventListener === 'function') {
       itineraryContainer.addEventListener('click', (event) => {
         if (event.target.closest('input[type="checkbox"], button, a, .modal-close, select, [contenteditable="true"]')) return;
 

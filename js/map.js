@@ -811,8 +811,8 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
 
   const fromCity = String(dayData.from || '').trim();
   const toCity = String(dayData.to || dayData.from || '').trim();
-  const cleanFrom = fromCity.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').replace(/\s*\(\d+\)$/, '').trim();
-  const cleanTo = toCity.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').replace(/\s*\(\d+\)$/, '').trim();
+  const cleanFrom = fromCity.replace(/^[\u{1F1E6}-\u{1F1FF}]{2}|^[📍🗺️✈️🏨🏠\s]+/u, '').replace(/\s*\(\d+\)$/, '').trim();
+  const cleanTo = toCity.replace(/^[\u{1F1E6}-\u{1F1FF}]{2}|^[📍🗺️✈️🏨🏠\s]+/u, '').replace(/\s*\(\d+\)$/, '').trim();
   const isTravelDay = cleanFrom.toLowerCase() !== cleanTo.toLowerCase() && cleanFrom.length > 0 && cleanTo.length > 0;
   const legColour = (dayData.leg && dayData.leg.colour) || '#0f766e';
   const dayNumLabel = dayData.dayNumber ? `Day ${dayData.dayNumber}` : '';
