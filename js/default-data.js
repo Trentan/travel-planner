@@ -2715,6 +2715,11 @@ var DEFAULT_TRIP_DATA = {
       "lat": 25.2048,
       "lng": 55.2708,
       "colour": "#f1c40f",
+      "code": "DXB",
+      "icaoCode": "OMDB",
+      "countryCode": "AE",
+      "country": "United Arab Emirates",
+      "timezone": "Asia/Dubai",
       "dateFrom": "",
       "dateTo": ""
     }

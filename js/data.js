@@ -869,7 +869,7 @@ const COUNTRY_DATA = [
   { code: 'TR', name: 'Turkey', flag: '🇹🇷' },
   { code: 'UG', name: 'Uganda', flag: '🇺🇬' },
   { code: 'UA', name: 'Ukraine', flag: '🇺🇦' },
-  { code: 'AE', name: 'UAE', flag: '🇦🇪' },
+  { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
   { code: 'US', name: 'United States', flag: '🇺🇸' },
   { code: 'UY', name: 'Uruguay', flag: '🇺🇾' },
@@ -974,6 +974,7 @@ const EXTENDED_CITY_DATABASE = [
 // Built-in city database with IATA & ICAO codes
 const CITY_DATABASE = [
   { code: 'ADL', icaoCode: 'YPAD', name: 'Adelaide', countryCode: 'AU', timezone: 'Australia/Adelaide', lat: -34.9285, lng: 138.6007 },
+  { code: 'AUH', icaoCode: 'OMAA', name: 'Abu Dhabi', countryCode: 'AE', timezone: 'Asia/Dubai', lat: 24.4539, lng: 54.3773 },
   { code: 'AMS', icaoCode: 'EHAM', name: 'Amsterdam', countryCode: 'NL', timezone: 'Europe/Amsterdam', lat: 52.3676, lng: 4.9041 },
   { code: 'ATH', icaoCode: 'LGAV', name: 'Athens', countryCode: 'GR', timezone: 'Europe/Athens', lat: 37.9838, lng: 23.7275 },
   { code: 'BCN', icaoCode: 'LEBL', name: 'Barcelona', countryCode: 'ES', timezone: 'Europe/Madrid', lat: 41.3851, lng: 2.1734 },
@@ -989,6 +990,7 @@ const CITY_DATABASE = [
   { code: 'CPH', icaoCode: 'EKCH', name: 'Copenhagen', countryCode: 'DK', timezone: 'Europe/Copenhagen', lat: 55.6761, lng: 12.5683 },
   { code: 'DRS', icaoCode: 'EDDC', name: 'Dresden', countryCode: 'DE', timezone: 'Europe/Berlin', lat: 51.0504, lng: 13.7373 },
   { code: 'DUB', icaoCode: 'EIDW', name: 'Dublin', countryCode: 'IE', timezone: 'Europe/Dublin', lat: 53.3498, lng: -6.2603 },
+  { code: 'DXB', icaoCode: 'OMDB', name: 'Dubai', countryCode: 'AE', timezone: 'Asia/Dubai', lat: 25.2048, lng: 55.2708 },
   { code: 'DUS', icaoCode: 'EDDL', name: 'Dusseldorf', countryCode: 'DE', timezone: 'Europe/Berlin', lat: 51.2277, lng: 6.7735 },
   { code: 'FCO', icaoCode: 'LIRF', name: 'Rome', countryCode: 'IT', timezone: 'Europe/Rome', lat: 41.9028, lng: 12.4964 },
   { code: 'FLR', icaoCode: 'LIRQ', name: 'Florence', countryCode: 'IT', timezone: 'Europe/Rome', lat: 43.7696, lng: 11.2558 },
@@ -1971,6 +1973,13 @@ const CITY_ALIASES = {
   'tokio': 'Tokyo',
   'krung thep': 'Bangkok',
 
+  // Middle East
+  'dubayy': 'Dubai',
+  'dxb': 'Dubai',
+  'abu dhabi': 'Abu Dhabi',
+  'abudhabi': 'Abu Dhabi',
+  'auh': 'Abu Dhabi',
+
   // Americas & Eastern Europe
   'new york city': 'New York',
   'nyc': 'New York',
@@ -2846,7 +2855,10 @@ const COUNTRY_FLAGS = {
   'Kuşadası': '🇹🇷',
   'Kusadasi': '🇹🇷',
   'Home': '🏠',
-  'Dubai': '🇦🇪'
+  'Dubai': '🇦🇪',
+  'Abu Dhabi': '🇦🇪',
+  'UAE': '🇦🇪',
+  'United Arab Emirates': '🇦🇪'
 };
 
 // City/country name -> ISO-2 code for flagcdn.com images
@@ -2869,6 +2881,9 @@ const CITY_TO_CODE = {
   'usa': 'us', 'unitedstates': 'us', 'newyork': 'us',
   'verona': 'it',
   'dubai': 'ae',
+  'abudhabi': 'ae',
+  'uae': 'ae',
+  'unitedarabemirates': 'ae',
   'portugal': 'pt', 'lisbon': 'pt',
   'turkey': 'tr', 'kusadasi': 'tr', 'kuşadası': 'tr'
 };
@@ -2896,7 +2911,9 @@ const COUNTRY_TO_CODE = {
   'USA': 'US',
   'United States': 'US',
   'Portugal': 'PT',
-  'Turkey': 'TR'
+  'Turkey': 'TR',
+  'UAE': 'AE',
+  'United Arab Emirates': 'AE'
 };
 
 // Get flag emoji for a city (based on city name or country)

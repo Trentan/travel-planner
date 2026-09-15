@@ -58,8 +58,9 @@ const DEFAULT_CITIES = [
     "lng": 55.2708,
     "colour": "#f1c40f",
     "code": "DXB",
+    "icaoCode": "OMDB",
     "countryCode": "AE",
-    "country": "UAE",
+    "country": "United Arab Emirates",
     "timezone": "Asia/Dubai",
     "dateFrom": "",
     "dateTo": ""
