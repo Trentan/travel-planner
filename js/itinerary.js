@@ -1416,7 +1416,7 @@ function renderCompactLegCard(leg, legIndex, journeysByJourneyIdMap) {
 
   return `
     <article class="compact-leg-card">
-      <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:pointer;" onclick="toggleLeg(this)">
+      <div class="leg-header compact-leg-header" style="background:${escapeHtmlText(leg.colour)}; cursor:pointer;" onclick="toggleLeg(this)">
         <div class="compact-leg-header-line">
           <span class="compact-leg-date">${escapeHtmlText(legDateRange || '-')}</span>
           <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
@@ -1469,7 +1469,7 @@ function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap) {
 
   const legCard = `
     <article class="compact-leg-card">
-      <div class="leg-header compact-leg-header" style="background:${leg.colour}; cursor:default;">
+      <div class="leg-header compact-leg-header" style="background:${escapeHtmlText(leg.colour)}; cursor:default;">
         <div class="compact-leg-header-line">
           <span class="compact-leg-date">${legDateRangeHtml}</span>
           <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
@@ -1529,7 +1529,7 @@ function renderCompactActiveCityHeader(firstLeg) {
   const displayLegLabel = getCompactLegDisplayLabel(firstLeg, 0, firstDay, lastDay, daysCount);
 
   return `
-    <div id="compactActiveCityHeader" class="active-city-sticky-header leg-header compact-leg-header" style="background:${firstLeg.colour || '#0ea5e9'}; cursor:default;">
+    <div id="compactActiveCityHeader" class="active-city-sticky-header leg-header compact-leg-header" style="background:${escapeHtmlText(firstLeg.colour || '#0ea5e9')}; cursor:default;">
       <div class="compact-leg-header-line">
         <span class="compact-leg-date">${legDateRangeHtml}</span>
         <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
@@ -1758,7 +1758,7 @@ function buildCompactItineraryLegacy() {
     const nightLabel = getLegNightSummary(leg).label;
 
     let html = `
-    <div class="leg-header" style="background:${leg.colour}; cursor:default;">
+    <div class="leg-header" style="background:${escapeHtmlText(leg.colour)}; cursor:default;">
       <div style="display:flex; align-items:center; justify-content:space-between;">
         <div>
           <h2 style="margin:0; font-size:14px; cursor:default;">${getLegHeaderLabelWithFlag(leg.label)}</h2>
@@ -3316,7 +3316,7 @@ function buildItinerary() {
     const section = document.createElement('div');
     section.className = 'leg';
     section.id = 'leg-' + leg.id;
-    section.style.borderLeft = `6px solid ${leg.colour}`;
+    section.style.borderLeft = `6px solid ${escapeHtmlText(leg.colour)}`;
 
     const daysCount = leg.days.length;
 
@@ -3383,7 +3383,7 @@ function buildItinerary() {
     const legCost = getLegTotalCost(leg);
 
     let html = `
-    <div class="leg-header" style="background:${leg.colour}" onclick="toggleLeg(this)">
+    <div class="leg-header" style="background:${escapeHtmlText(leg.colour)}" onclick="toggleLeg(this)">
       <div class="leg-header-top">
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; min-width:0;">
           <h2 contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateData(${legIndex}, 'label', this.innerText)">${getLegHeaderLabelWithFlag(leg.label)}</h2>
@@ -3481,7 +3481,7 @@ function buildItinerary() {
 
       html += `
       <div class="day-card group flex flex-col mb-4 overflow-hidden bg-white/90 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 rounded-xl shadow-sm transition-all duration-300 ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
-        <div class="day-bar flex items-center p-3 sm:p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors relative" style="border-left: 5px solid var(--leg-colour, ${leg.colour})" onclick="toggleCard(this)">
+        <div class="day-bar flex items-center p-3 sm:p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors relative" style="border-left: 5px solid var(--leg-colour, ${escapeHtmlText(leg.colour)})" onclick="toggleCard(this)">
           <div class="day-date w-16 sm:w-20 shrink-0 text-center flex flex-col items-center justify-center border-r border-slate-200 dark:border-slate-700 pr-3 sm:pr-4 mr-3 sm:mr-4"><span class="day-num text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">${dayDateLabel}</span><span class="day-name text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${day.day}</span></div>
           <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${cityHTML}</div>${stayingHeadingNote}<div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
           ${dayTotal ? `<div class="day-total-cost hidden sm:flex shrink-0 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-full border border-slate-200 dark:border-slate-600 shadow-inner mr-4" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron shrink-0 w-8 h-8 flex items-center justify-center text-slate-400 transition-transform duration-300 bg-slate-100 dark:bg-slate-700/50 rounded-full group-[.open]:rotate-180">▼</span>
