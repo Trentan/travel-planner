@@ -10,6 +10,7 @@ const { run: runIosPwaNavVerify } = require('./ios-pwa-nav-verify');
 const { run: runPwaShortcutsOfflineTests } = require('./pwa-shortcuts-offline.test');
 const { runCloudStorageXssTests } = require('./cloud-storage-xss.test');
 const { runTripLibraryXssTests } = require('./trip-library-xss.test');
+const { runTripSummaryXssTests } = require('./trip-summary-xss.test');
 const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 const { run: runTimezoneSuite } = require('./timezone-suite.test');
 const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
@@ -33,6 +34,7 @@ async function run() {
   if (typeof runDesktopSplitPrintUnitTests === 'function') await runDesktopSplitPrintUnitTests();
   await runCloudStorageXssTests();
   await runTripLibraryXssTests();
+  if (typeof runTripSummaryXssTests === 'function') await runTripSummaryXssTests();
   if (typeof runStorageEngineSuite === 'function') await runStorageEngineSuite();
   if (typeof runGoogleAuthRenewalTests === 'function') await runGoogleAuthRenewalTests();
   if (typeof runDualPathWizardSuite === 'function') await runDualPathWizardSuite();
