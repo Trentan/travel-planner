@@ -979,8 +979,8 @@
       // Fetch local trips to perform non-destructive 3-way conflict reconciliation
       const localTrips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
 
-      for (const file of files) {
-        if (!file.name) continue;
+      await Promise.all(files.map(async (file) => {
+        if (!file.name) return;
 
         try {
           const downloadUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
@@ -989,7 +989,7 @@
             new Promise((_, reject) => setTimeout(() => reject(new Error('File download timeout')), 5000))
           ]);
 
-          if (!contentResp.ok) continue;
+          if (!contentResp.ok) return;
 
           const rawContent = await contentResp.json();
           if (rawContent) {
@@ -1029,7 +1029,7 @@
         } catch (parseErr) {
           console.warn('Failed to parse remote trip file:', file.name, parseErr);
         }
-      }
+      }));
 
       setGDriveFileMap(fileMap);
       return window.__gdriveCloudFiles || files;
