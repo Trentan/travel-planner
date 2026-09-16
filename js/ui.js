@@ -1141,9 +1141,11 @@ function openTripSummaryModal() {
           ? formatDateStringForDisplay(day.date)
           : day.date;
       }
+      const safeDisplayDate = typeof escapeHtmlText === 'function' ? escapeHtmlText(displayDate) : displayDate;
       
       // City
-      const city = day.to || leg.city || 'Unknown City';
+      const rawCity = day.to || leg.city || 'Unknown City';
+      const safeCity = typeof escapeHtmlText === 'function' ? escapeHtmlText(rawCity) : rawCity;
 
       // Accom
       let accomStr = '<span class="text-slate-400 italic">None</span>';
@@ -1151,8 +1153,12 @@ function openTripSummaryModal() {
         const nightStays = stays.filter(s => s.checkIn <= day.date && s.checkOut > day.date);
         if (nightStays.length > 0) {
           accomStr = nightStays.map(s => {
-            let sStr = '<strong class="text-slate-800 dark:text-slate-200">' + (s.name || 'Stay') + '</strong>';
-            if (s.neighborhood) sStr += ' <span class="text-xs text-slate-500 block">' + s.neighborhood + '</span>';
+            const safeName = typeof escapeHtmlText === 'function' ? escapeHtmlText(s.name || 'Stay') : (s.name || 'Stay');
+            let sStr = '<strong class="text-slate-800 dark:text-slate-200">' + safeName + '</strong>';
+            if (s.neighborhood) {
+              const safeNeigh = typeof escapeHtmlText === 'function' ? escapeHtmlText(s.neighborhood) : s.neighborhood;
+              sStr += ' <span class="text-xs text-slate-500 block">' + safeNeigh + '</span>';
+            }
             return sStr;
           }).join('<br>');
         }
@@ -1165,10 +1171,11 @@ function openTripSummaryModal() {
         const dayJourneys = journeys.filter(j => j.dep && j.dep.startsWith(day.date));
         if (dayJourneys.length > 0) {
           eventsHtml += dayJourneys.map(j => {
-            const method = j.method || 'Transport';
+            const safeFrom = typeof escapeHtmlText === 'function' ? escapeHtmlText(j.from || '?') : (j.from || '?');
+            const safeTo = typeof escapeHtmlText === 'function' ? escapeHtmlText(j.to || '?') : (j.to || '?');
             return '<div class="mb-1 text-blue-600 dark:text-blue-400 text-sm flex items-center">' +
-                      '<span class="mr-1 text-lg">??</span>' +
-                      '<span>' + (j.from || '?') + ' &rarr; ' + (j.to || '?') + '</span>' +
+                      '<span class="mr-1 text-lg">✈️</span>' +
+                      '<span>' + safeFrom + ' &rarr; ' + safeTo + '</span>' +
                     '</div>';
           }).join('');
         }
@@ -1177,7 +1184,8 @@ function openTripSummaryModal() {
       if (day.sights && day.sights.length > 0) {
         eventsHtml += '<ul class="list-disc pl-4 text-sm text-slate-700 dark:text-slate-300 mt-1">';
         day.sights.forEach(sight => {
-          eventsHtml += '<li>' + (sight.name || sight.title || 'Activity') + '</li>';
+          const safeSightName = typeof escapeHtmlText === 'function' ? escapeHtmlText(sight.name || sight.title || 'Activity') : (sight.name || sight.title || 'Activity');
+          eventsHtml += '<li>' + safeSightName + '</li>';
         });
         eventsHtml += '</ul>';
       }
@@ -1188,8 +1196,8 @@ function openTripSummaryModal() {
 
       const row = document.createElement('tr');
       row.className = 'border-b border-slate-200 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors';
-      row.innerHTML = '<td class="px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap align-top">' + displayDate + '</td>' +
-        '<td class="px-4 py-3 text-sm font-semibold text-slate-800 dark:text-slate-100 align-top">' + city + '</td>' +
+      row.innerHTML = '<td class="px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap align-top">' + safeDisplayDate + '</td>' +
+        '<td class="px-4 py-3 text-sm font-semibold text-slate-800 dark:text-slate-100 align-top">' + safeCity + '</td>' +
         '<td class="px-4 py-3 text-sm align-top">' + accomStr + '</td>' +
         '<td class="px-4 py-3 text-sm align-top">' + eventsHtml + '</td>';
       tbody.appendChild(row);
