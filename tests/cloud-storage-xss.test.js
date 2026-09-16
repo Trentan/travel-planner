@@ -46,7 +46,8 @@ function createSimpleDom() {
     'gdriveActiveClientIdLabel',
     'headerCloudSyncStatusPill',
     'cloudSyncStatusPill',
-    'mobileCloudSyncStatusPill'
+    'mobileCloudSyncStatusPill',
+    'gdriveOriginMismatchNotice'
   ];
 
   for (const id of ids) {
@@ -149,6 +150,36 @@ function runCloudStorageXssTests() {
   assert(!fileListHtml.includes("<script>alert('xss-file')</script>"), 'Cloud file list must escape HTML tags in file names');
   assert(!fileListHtml.includes("onclick=\"window.loadTripFromGoogleDrive('file'"), 'Cloud file list onclick must not use raw single-quoted string interpolation');
   assert(fileListHtml.includes('onclick="window.loadTripFromGoogleDrive(&quot;'), 'Cloud file list onclick arguments must be safely encoded with escapeJsParam');
+
+  // Test Case 4: Origin mismatch notice with malicious location.origin payload
+  context.location = {
+    hostname: 'localhost',
+    origin: 'http://localhost:3000/<script>alert("xss-origin")</script>',
+    href: 'http://localhost:3000/',
+    protocol: 'http:'
+  };
+
+  context.showOriginMismatchNotice('origin_mismatch');
+
+  const noticeElem = document.getElementById('gdriveOriginMismatchNotice');
+  const noticeHtml = noticeElem.innerHTML;
+
+  assert(!noticeHtml.includes('<script>alert("xss-origin")</script>'), 'Origin mismatch notice must not render raw script tags from origin');
+  assert(noticeHtml.includes('&lt;script&gt;alert(&quot;xss-origin&quot;)&lt;/script&gt;'), 'Origin mismatch notice must HTML entity escape currentOrigin');
+
+  // Test Case 5: Unsafe javascript: protocol in location.origin
+  context.location = {
+    hostname: 'localhost',
+    origin: 'javascript:alert("xss-origin-js")',
+    href: 'http://localhost:3000/',
+    protocol: 'javascript:'
+  };
+
+  context.showOriginMismatchNotice('origin_mismatch');
+
+  const noticeHtml2 = noticeElem.innerHTML;
+  assert(!noticeHtml2.includes('javascript:alert'), 'Origin mismatch notice must fallback to Unknown Origin for unsafe protocols');
+  assert(noticeHtml2.includes('Unknown Origin'), 'Origin mismatch notice should display Unknown Origin when origin protocol is unsafe');
 
   console.log('✅ ALL GOOGLE DRIVE PROFILE XSS TESTS PASSED CLEANLY!');
 }
