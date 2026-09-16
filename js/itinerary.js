@@ -1050,7 +1050,7 @@ function setupCompactItineraryPagers(root = document) {
         ? getMobilePagerActiveIndex(pagerKey, Number(pager.dataset.activeIndex || 0))
         : Number(pager.dataset.activeIndex || 0);
 
-    const setActive = nextIndex => syncCompactDayPagerState(pager, nextIndex, {
+    const setActive = (nextIndex, isInitial = false) => syncCompactDayPagerState(pager, nextIndex, {
       chips,
       slides,
       total,
@@ -1058,7 +1058,8 @@ function setupCompactItineraryPagers(root = document) {
       positionLabel,
       counterLabel,
       progressFill,
-      pagerKey
+      pagerKey,
+      isInitialSetup: isInitial
     });
 
     const scrollToIndex = nextIndex => {
@@ -1228,7 +1229,7 @@ function setupCompactItineraryPagers(root = document) {
       pager.__compactObserver = observer;
     }
 
-    setActive(initialIndex);
+    setActive(initialIndex, true);
     const initialSlide = slides[initialIndex];
     if (carousel && initialSlide) {
       carousel.scrollLeft = Math.max(0, initialSlide.offsetLeft - carousel.offsetLeft);
@@ -1341,12 +1342,11 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
   if (typeof appData !== 'undefined' && Array.isArray(appData)) {
     legIdx = appData.findIndex(l => String(l.id) === String(legId));
   }
-  if (legIdx >= 0) {
+  if (!context.isInitialSetup && legIdx >= 0) {
     window.__selectedDayContext = { legIndex: legIdx, dayIndex: safeIndex };
-  }
-
-  if (typeof syncDesktopSplitToDayInView === 'function' && typeof window !== 'undefined' && window.innerWidth >= 1024) {
-    syncDesktopSplitToDayInView(true, window.__selectedDayContext);
+    if (typeof syncDesktopSplitToDayInView === 'function' && typeof window !== 'undefined' && window.innerWidth >= 1024) {
+      syncDesktopSplitToDayInView(true, window.__selectedDayContext);
+    }
   }
 }
 
