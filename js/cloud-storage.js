@@ -872,8 +872,8 @@
     if (!isGoogleDriveConnected() || typeof window.getAllTripsFromIndexedDB !== 'function') return;
     try {
       const trips = await window.getAllTripsFromIndexedDB();
-      for (const trip of trips) {
-        await uploadTripToGoogleDrive(trip);
+      if (Array.isArray(trips) && trips.length > 0) {
+        await Promise.all(trips.map(trip => uploadTripToGoogleDrive(trip)));
       }
     } catch (err) {
       console.warn('Failed to upload local trips to Google Drive:', err);
