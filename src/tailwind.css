@@ -136,6 +136,29 @@
   body.mobile-app-mode .tab-pane .section-header {
     margin-bottom: 0.25rem !important;
     padding-bottom: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+  }
+
+  body.mobile-app-mode .tab-pane .section-header::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary,
+  body.mobile-app-mode .desktop-split-shell,
+  body.mobile-app-mode .desktop-split-left,
+  body.mobile-app-mode #itinerary {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  body.mobile-app-mode .desktop-split-right {
+    display: none !important;
   }
 
   body.mobile-app-mode #tab-itinerary .compact-city-swipe-root,
@@ -3746,19 +3769,19 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-leg-header-line {
-    @apply grid grid-cols-[auto_1fr_auto_auto] items-center gap-2;
+    @apply grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-1.5 w-full max-w-full min-w-0;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-leg-date {
-    @apply text-white text-[0.72rem] font-extrabold whitespace-nowrap;
+    @apply text-white text-[0.72rem] font-extrabold whitespace-nowrap shrink-0;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-leg-label {
-    @apply m-0 text-white text-[1.02rem] font-black truncate;
+    @apply m-0 text-white text-[1.02rem] font-black truncate min-w-0;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-leg-night-count {
-    @apply text-white text-[0.75rem] font-bold whitespace-nowrap;
+    @apply text-white text-[0.75rem] font-bold whitespace-nowrap shrink-0;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-leg-body {
@@ -8754,11 +8777,16 @@ body.mobile-app-mode #readOnlyBanner {
 .desktop-split-shell {
   display: block;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .desktop-split-left {
   width: 100%;
+  max-width: 100%;
   min-width: 0;
+  box-sizing: border-box;
 }
 
 .desktop-split-right {
