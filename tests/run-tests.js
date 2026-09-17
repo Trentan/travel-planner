@@ -28,12 +28,14 @@ const { runGoogleAuthRenewalTests } = require('./google-auth-renewal.test');
 const { runDualPathWizardSuite } = require('./dual-path-wizard.test');
 const { runStorageEngineSuite } = require('./storage-engine-suite');
 const { runDesktopSplitPrintUnitTests } = require('./desktop-split-print.test');
+const { runUploadAllLocalTripsBenchmarkAndTest } = require('./upload-all-local-trips.test');
 
 async function run() {
   if (typeof runDesktopSplitPrintUnitTests === 'function') await runDesktopSplitPrintUnitTests();
   await runCloudStorageXssTests();
   await runTripLibraryXssTests();
   if (typeof runStorageEngineSuite === 'function') await runStorageEngineSuite();
+  if (typeof runUploadAllLocalTripsBenchmarkAndTest === 'function') await runUploadAllLocalTripsBenchmarkAndTest();
   if (typeof runGoogleAuthRenewalTests === 'function') await runGoogleAuthRenewalTests();
   if (typeof runDualPathWizardSuite === 'function') await runDualPathWizardSuite();
   if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();

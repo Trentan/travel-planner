@@ -762,8 +762,9 @@
         if (response.status === 404) {
           console.warn(`File ${existingFileId} not found in Google Drive. Re-creating "${fileName}"...`);
           existingFileId = null;
-          delete fileMap[tripRecord.id];
-          setGDriveFileMap(fileMap);
+          const currentMap = getGDriveFileMap();
+          delete currentMap[tripRecord.id];
+          setGDriveFileMap(currentMap);
         }
       }
 
@@ -779,8 +780,9 @@
             const checkData = await checkResp.json();
             if (checkData.files && checkData.files.length > 0) {
               existingFileId = checkData.files[0].id;
-              fileMap[tripRecord.id] = existingFileId;
-              setGDriveFileMap(fileMap);
+              const currentMap = getGDriveFileMap();
+              currentMap[tripRecord.id] = existingFileId;
+              setGDriveFileMap(currentMap);
 
               // PATCH existing duplicate file instead of creating another copy
               response = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingFileId}?uploadType=media`, {
@@ -841,8 +843,9 @@
 
       const result = await response.json();
       if (result && result.id) {
-        fileMap[tripRecord.id] = result.id;
-        setGDriveFileMap(fileMap);
+        const currentMap = getGDriveFileMap();
+        currentMap[tripRecord.id] = result.id;
+        setGDriveFileMap(currentMap);
       }
 
       updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
@@ -1031,7 +1034,9 @@
         }
       }));
 
-      setGDriveFileMap(fileMap);
+      const latestMap = getGDriveFileMap();
+      Object.assign(latestMap, fileMap);
+      setGDriveFileMap(latestMap);
       return window.__gdriveCloudFiles || files;
     } catch (err) {
       console.error('Failed to list cloud trips from Google Drive:', err);
