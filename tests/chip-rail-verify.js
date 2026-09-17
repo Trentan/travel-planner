@@ -1,47 +1,16 @@
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
 const { chromium, devices } = require('playwright');
+const { startStaticServer } = require('./lib/static-server');
 
 const PORT = 52980;
 
-function startStaticServer(rootDir, port = PORT) {
-  return new Promise((resolve, reject) => {
-    const server = http.createServer((req, res) => {
-      let filePath = path.join(rootDir, req.url === '/' ? '/index.html' : req.url);
-      const ext = path.extname(filePath).toLowerCase();
-      const contentTypes = {
-        '.html': 'text/html; charset=utf-8',
-        '.js': 'application/javascript; charset=utf-8',
-        '.css': 'text/css; charset=utf-8',
-        '.json': 'application/json; charset=utf-8',
-        '.png': 'image/png',
-        '.svg': 'image/svg+xml'
-      };
-      res.setHeader('Content-Type', contentTypes[ext] || 'application/octet-stream');
-      fs.readFile(filePath, (err, data) => {
-        if (err) {
-          res.writeHead(404);
-          res.end('Not found');
-        } else {
-          res.writeHead(200);
-          res.end(data);
-        }
-      });
-    });
-
-    server.listen(port, '127.0.0.1', () => {
-      console.log(`[server] start - http://127.0.0.1:${port}`);
-      resolve({ port, close: () => server.close() });
-    });
-
-    server.on('error', reject);
-  });
-}
-
 async function main() {
-  const server = await startStaticServer(path.resolve(__dirname, '..'));
-  const baseUrl = `http://127.0.0.1:${server.port}`;
+  const server = await startStaticServer(path.resolve(__dirname, '..'), PORT);
+  const baseUrl = server.baseUrl;
+  let browser = null;
+
+  try {
 
   console.log(`[verify] Starting chip rail verification at ${baseUrl}`);
 
@@ -54,7 +23,7 @@ async function main() {
 
   // Navigate to the app and wait for it to load
   await page.goto(baseUrl);
-  await page.waitForSelector('#cityNav .city-nav-btn');
+  await page.waitForSelector('#cityNav .city-nav-btn:not([data-city="all"])');
   await page.waitForTimeout(500);
 
   // Take initial screenshot
@@ -144,11 +113,17 @@ async function main() {
   } else if (railStyles) {
     console.log('[assert] NOTE: Rail overflowX =', railStyles.overflowX);
   }
-
-  process.exit(0);
+  } finally {
+    if (browser) await browser.close();
+    if (server) await server.close();
+  }
 }
 
-main().catch(err => {
-  console.error('[verify] Error:', err);
-  process.exit(1);
-});
+main()
+  .then(() => {
+    process.exit(0);
+  })
+  .catch(err => {
+    console.error('[verify] Error:', err);
+    process.exit(1);
+  });

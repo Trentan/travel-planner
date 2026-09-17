@@ -571,9 +571,20 @@ async function runLiveVerification() {
     if (context) await context.close();
     if (browser) await browser.close();
     if (serverInstance && typeof serverInstance.close === 'function') {
-      serverInstance.close();
+      await serverInstance.close();
     }
   }
 }
 
-runLiveVerification();
+if (require.main === module) {
+  runLiveVerification()
+    .then(() => {
+      process.exit(0);
+    })
+    .catch(err => {
+      console.error(err);
+      process.exit(1);
+    });
+} else {
+  module.exports = { runLiveVerification };
+}

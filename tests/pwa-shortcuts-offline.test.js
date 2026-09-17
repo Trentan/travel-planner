@@ -30,7 +30,8 @@ async function testManifestStructure(rootDir) {
 }
 
 async function testBrowserShortcutsAndOfflineBanner(rootDir) {
-  const { server, baseUrl: origin } = await startStaticServer(rootDir);
+  const serverInstance = await startStaticServer(rootDir);
+  const origin = serverInstance.baseUrl;
   let browser = null;
 
   try {
@@ -112,7 +113,7 @@ async function testBrowserShortcutsAndOfflineBanner(rootDir) {
 
   } finally {
     if (browser) await browser.close();
-    if (server) await new Promise(resolve => server.close(resolve));
+    if (serverInstance) await serverInstance.close();
   }
 }
 
@@ -124,10 +125,14 @@ async function run() {
 }
 
 if (require.main === module) {
-  run().catch(err => {
-    console.error('PWA shortcuts & offline banner test failed:', err);
-    process.exit(1);
-  });
+  run()
+    .then(() => {
+      process.exit(0);
+    })
+    .catch(err => {
+      console.error('PWA shortcuts & offline banner test failed:', err);
+      process.exit(1);
+    });
 }
 
 module.exports = { run };

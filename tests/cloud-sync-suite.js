@@ -111,8 +111,19 @@ async function runCloudSyncSuite() {
     process.exit(1);
   } finally {
     if (browserInstance) await browserInstance.close();
-    if (serverInstance && typeof serverInstance.close === 'function') serverInstance.close();
+    if (serverInstance && typeof serverInstance.close === 'function') await serverInstance.close();
   }
 }
 
-runCloudSyncSuite();
+if (require.main === module) {
+  runCloudSyncSuite()
+    .then(() => {
+      process.exit(0);
+    })
+    .catch(err => {
+      console.error('❌ GOOGLE DRIVE CLOUD SYNC SUITE FAILED:', err);
+      process.exit(1);
+    });
+} else {
+  module.exports = { runCloudSyncSuite };
+}
