@@ -2010,29 +2010,39 @@ function calculateLevenshteinDistance(a, b) {
 
   const aLen = str1.length;
   const bLen = str2.length;
-  const dp = [];
 
-  for (let i = 0; i <= bLen; i++) {
-    dp[i] = [i];
+  const str1Codes = new Int32Array(aLen);
+  for (let j = 0; j < aLen; j++) {
+    str1Codes[j] = str1.charCodeAt(j);
   }
+
+  let prev = new Int32Array(aLen + 1);
+  let curr = new Int32Array(aLen + 1);
+
   for (let j = 0; j <= aLen; j++) {
-    dp[0][j] = j;
+    prev[j] = j;
   }
 
   for (let i = 1; i <= bLen; i++) {
+    const char2 = str2.charCodeAt(i - 1);
+    curr[0] = i;
     for (let j = 1; j <= aLen; j++) {
-      if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-        dp[i][j] = dp[i - 1][j - 1];
+      if (char2 === str1Codes[j - 1]) {
+        curr[j] = prev[j - 1];
       } else {
-        dp[i][j] = Math.min(
-          dp[i - 1][j - 1] + 1, // substitution
-          dp[i][j - 1] + 1,     // insertion
-          dp[i - 1][j] + 1      // deletion
-        );
+        const sub = prev[j - 1];
+        const ins = curr[j - 1];
+        const del = prev[j];
+        let min = sub < ins ? sub : ins;
+        if (del < min) min = del;
+        curr[j] = min + 1;
       }
     }
+    const temp = prev;
+    prev = curr;
+    curr = temp;
   }
-  return dp[bLen][aLen];
+  return prev[aLen];
 }
 
 function calculateSimilarityScore(str1, str2) {
