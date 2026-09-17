@@ -104,14 +104,6 @@ function removeJourneyAttachment(index) {
   renderJourneyAttachmentsList();
 }
 
-function promptAddStayLink() {
-  const url = prompt('Enter URL (e.g. https://...):');
-  if (!url) return;
-  const label = prompt('Enter label (e.g. Airbnb Link, Receipt):') || 'Link';
-  window._currentAttachments.push({ id: generateAttachmentId(), type: 'link', name: label, value: url });
-  renderStayAttachmentsList();
-}
-
 async function handleStayImageUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
