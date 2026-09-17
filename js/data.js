@@ -1047,6 +1047,7 @@ const ALL_CITIES = [...CITY_DATABASE, ...EXTENDED_CITY_DATABASE];
 const ALL_CITIES_BY_NAME_MAP = new Map();
 const ALL_CITIES_BY_NAME_COUNTRY_MAP = new Map();
 const ALL_CITIES_BY_CODE_MAP = new Map();
+const ALL_CITIES_BY_CITY_ID_MAP = new Map();
 const ALL_CITIES_HAS_COORDS_SET = new Set();
 
 ALL_CITIES.forEach(c => {
@@ -1056,6 +1057,11 @@ ALL_CITIES.forEach(c => {
       ALL_CITIES_BY_NAME_MAP.set(lowerName, []);
     }
     ALL_CITIES_BY_NAME_MAP.get(lowerName).push(c);
+
+    const cityId = 'city-' + lowerName.replace(/[^a-z0-9]/g, '-');
+    if (!ALL_CITIES_BY_CITY_ID_MAP.has(cityId)) {
+      ALL_CITIES_BY_CITY_ID_MAP.set(cityId, c);
+    }
 
     if (c.countryCode) {
       const key = `${lowerName}|${c.countryCode.toUpperCase()}`;
@@ -1707,13 +1713,11 @@ function extractCitiesFromItinerary() {
         // First try to find existing city by ID
         let cityFound = false;
         // Check in ALL_CITIES (built-in + extended)
-        ALL_CITIES.forEach(dbCity => {
-          const idFromDb = 'city-' + dbCity.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-          if (idFromDb === s.cityId) {
-            addCity(dbCity.name, s.checkIn);
-            cityFound = true;
-          }
-        });
+        const dbCity = ALL_CITIES_BY_CITY_ID_MAP.get(s.cityId);
+        if (dbCity) {
+          addCity(dbCity.name, s.checkIn);
+          cityFound = true;
+        }
         // Check in userCities
         if (!cityFound) {
           userCities.forEach(uCity => {
