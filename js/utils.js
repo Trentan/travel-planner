@@ -138,32 +138,6 @@ function renderMobileStat(label, primary, secondary = '', extraClass = '') {
   `;
 }
 
-function renderMobileTripTracker({
-                                   label = 'Trip',
-                                   position = '',
-                                   behind = 0,
-                                   here = 1,
-                                   ahead = 0
-                                 }) {
-  const behindCount = Math.max(0, Number(behind) || 0);
-  const hereCount = Math.max(0, Number(here) || 0);
-  const aheadCount = Math.max(0, Number(ahead) || 0);
-  const total = Math.max(1, behindCount + hereCount + aheadCount);
-  return `
-    <div class="mobile-trip-tracker">
-      <div class="mobile-trip-tracker-top">
-        <span class="mobile-trip-tracker-label">${escapeHtmlText(label)}</span>
-        ${position ? `<span class="mobile-trip-tracker-position">${escapeHtmlText(position)}</span>` : ''}
-      </div>
-      <div class="mobile-trip-tracker-bar" aria-hidden="true">
-        <span class="mobile-trip-tracker-segment is-behind" style="width:${(behindCount / total) * 100}%"></span>
-        <span class="mobile-trip-tracker-segment is-here" style="width:${(hereCount / total) * 100}%"></span>
-        <span class="mobile-trip-tracker-segment is-ahead" style="width:${(aheadCount / total) * 100}%"></span>
-      </div>
-    </div>
-  `;
-}
-
 function getMobilePagerStateStore() {
   if (typeof window === 'undefined') return {};
   if (!window.__mobilePagerState) {
