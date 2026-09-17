@@ -763,8 +763,9 @@
         if (response.status === 404) {
           console.warn(`File ${existingFileId} not found in Google Drive. Re-creating "${fileName}"...`);
           existingFileId = null;
-          delete fileMap[tripRecord.id];
-          setGDriveFileMap(fileMap);
+          const currentMap = getGDriveFileMap();
+          delete currentMap[tripRecord.id];
+          setGDriveFileMap(currentMap);
         }
       }
 
@@ -780,8 +781,9 @@
             const checkData = await checkResp.json();
             if (checkData.files && checkData.files.length > 0) {
               existingFileId = checkData.files[0].id;
-              fileMap[tripRecord.id] = existingFileId;
-              setGDriveFileMap(fileMap);
+              const currentMap = getGDriveFileMap();
+              currentMap[tripRecord.id] = existingFileId;
+              setGDriveFileMap(currentMap);
 
               // PATCH existing duplicate file instead of creating another copy
               response = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingFileId}?uploadType=media`, {
@@ -842,8 +844,9 @@
 
       const result = await response.json();
       if (result && result.id) {
-        fileMap[tripRecord.id] = result.id;
-        setGDriveFileMap(fileMap);
+        const currentMap = getGDriveFileMap();
+        currentMap[tripRecord.id] = result.id;
+        setGDriveFileMap(currentMap);
       }
 
       updateCloudSyncStatusPill(`☁️ Synced to Drive / ${DRIVE_FOLDER_NAME}`, 'connected');
@@ -873,8 +876,8 @@
     if (!isGoogleDriveConnected() || typeof window.getAllTripsFromIndexedDB !== 'function') return;
     try {
       const trips = await window.getAllTripsFromIndexedDB();
-      for (const trip of trips) {
-        await uploadTripToGoogleDrive(trip);
+      if (Array.isArray(trips) && trips.length > 0) {
+        await Promise.all(trips.map(trip => uploadTripToGoogleDrive(trip)));
       }
     } catch (err) {
       console.warn('Failed to upload local trips to Google Drive:', err);
@@ -980,8 +983,8 @@
       // Fetch local trips to perform non-destructive 3-way conflict reconciliation
       const localTrips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
 
-      for (const file of files) {
-        if (!file.name) continue;
+      await Promise.all(files.map(async (file) => {
+        if (!file.name) return;
 
         try {
           const downloadUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
@@ -990,7 +993,7 @@
             new Promise((_, reject) => setTimeout(() => reject(new Error('File download timeout')), 5000))
           ]);
 
-          if (!contentResp.ok) continue;
+          if (!contentResp.ok) return;
 
           const rawContent = await contentResp.json();
           if (rawContent) {
@@ -1030,9 +1033,11 @@
         } catch (parseErr) {
           console.warn('Failed to parse remote trip file:', file.name, parseErr);
         }
-      }
+      }));
 
-      setGDriveFileMap(fileMap);
+      const latestMap = getGDriveFileMap();
+      Object.assign(latestMap, fileMap);
+      setGDriveFileMap(latestMap);
       return window.__gdriveCloudFiles || files;
     } catch (err) {
       console.error('Failed to list cloud trips from Google Drive:', err);
