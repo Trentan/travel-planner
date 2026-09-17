@@ -1048,6 +1048,7 @@ const ALL_CITIES_BY_NAME_MAP = new Map();
 const ALL_CITIES_BY_NAME_COUNTRY_MAP = new Map();
 const ALL_CITIES_BY_CODE_MAP = new Map();
 const ALL_CITIES_HAS_COORDS_SET = new Set();
+const ALL_CITIES_BY_CLEAN_NAME_MAP = new Map();
 
 ALL_CITIES.forEach(c => {
   if (c && c.name) {
@@ -1056,6 +1057,11 @@ ALL_CITIES.forEach(c => {
       ALL_CITIES_BY_NAME_MAP.set(lowerName, []);
     }
     ALL_CITIES_BY_NAME_MAP.get(lowerName).push(c);
+
+    const cleanName = lowerName.replace(/-/g, '');
+    if (!ALL_CITIES_BY_CLEAN_NAME_MAP.has(cleanName)) {
+      ALL_CITIES_BY_CLEAN_NAME_MAP.set(cleanName, c);
+    }
 
     if (c.countryCode) {
       const key = `${lowerName}|${c.countryCode.toUpperCase()}`;
@@ -1661,7 +1667,7 @@ function extractCitiesFromItinerary() {
     let dbMatch = nameMatches ? nameMatches[0] : null;
     if (!dbMatch) {
       const slugClean = slugLower.replace(/-/g, '');
-      dbMatch = ALL_CITIES.find(c => c.name.toLowerCase().replace(/-/g, '') === slugClean);
+      dbMatch = ALL_CITIES_BY_CLEAN_NAME_MAP.get(slugClean) || null;
     }
     if (dbMatch) {
       addCity(dbMatch.name, sourceDate);
