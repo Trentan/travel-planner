@@ -4856,62 +4856,6 @@ function calculateNightsBetween(checkIn, checkOut) {
   return Math.max(0, diffDays);
 }
 
-function buildDefaultStaysFromItinerary(legs) {
-  if (!Array.isArray(legs)) return [];
-
-  const staysByKey = new Map();
-
-  legs.forEach((leg, legIndex) => {
-    (leg.days || []).forEach((day, dayIndex) => {
-      const dayDate = normalizeTripDateValue(day.date);
-      const nextDate = addDaysToIsoDate(dayDate, 1);
-
-      (day.accomItems || []).forEach((item, itemIndex) => {
-        const propertyName = (item.text || '').trim();
-        // Skip placeholder / empty entries that are not real hotel records
-        const PLACEHOLDER_ACCOM = ['add accommodation...', 'add accommodation'];
-        if (!propertyName || PLACEHOLDER_ACCOM.includes(propertyName.toLowerCase())) return;
-
-        const cityId = item.cityId || (typeof getCityIdByName === 'function' ? getCityIdByName(day.to || day.from || '') : '');
-        const key = `${cityId}||${propertyName}||${item.provider || ''}||${item.bookingRef || ''}`;
-        const existing = staysByKey.get(key);
-        const itemCost = Number.parseFloat(item.cost) || 0;
-
-        if (!existing) {
-          staysByKey.set(key, {
-            id: `stay_default_${leg.id || legIndex}_${dayIndex}_${itemIndex}`,
-            cityId,
-            propertyName,
-            checkIn: dayDate,
-            checkOut: nextDate || dayDate,
-            nights: 0,
-            status: item.status || 'pending',
-            provider: item.provider || '',
-            bookingRef: item.bookingRef || '',
-            totalCost: itemCost.toString(),
-            notes: item.text || ''
-          });
-          return;
-        }
-
-        if (dayDate && (!existing.checkIn || dayDate < existing.checkIn)) existing.checkIn = dayDate;
-        if (nextDate && (!existing.checkOut || nextDate > existing.checkOut)) existing.checkOut = nextDate;
-        if (item.status === 'confirmed') existing.status = 'confirmed';
-        if (!existing.provider && item.provider) existing.provider = item.provider;
-        if (!existing.bookingRef && item.bookingRef) existing.bookingRef = item.bookingRef;
-        existing.totalCost = ((Number.parseFloat(existing.totalCost) || 0) + itemCost).toString();
-      });
-    });
-  });
-
-  return [...staysByKey.values()]
-    .map(stay => ({
-      ...stay,
-      nights: calculateNightsBetween(stay.checkIn, stay.checkOut)
-    }))
-    .sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
-}
-
 function seedDefaultDerivedTravelData() {
   // Not needed anymore since default data provides journeys and stays natively.
   return false;
