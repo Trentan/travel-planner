@@ -2916,6 +2916,14 @@ const COUNTRY_TO_CODE = {
   'United Arab Emirates': 'AE'
 };
 
+// Precomputed reverse map from flag emoji to country name for O(1) lookups
+const FLAG_TO_COUNTRY_MAP = new Map();
+for (const [cName, cFlag] of Object.entries(COUNTRY_FLAGS)) {
+  if (COUNTRY_TO_CODE[cName] && !FLAG_TO_COUNTRY_MAP.has(cFlag)) {
+    FLAG_TO_COUNTRY_MAP.set(cFlag, cName);
+  }
+}
+
 // Get flag emoji for a city (based on city name or country)
 function getCityFlag(cityName) {
   if (!cityName) return '📍';
@@ -2925,13 +2933,7 @@ function getCityFlag(cityName) {
   if (COUNTRY_FLAGS[cityName]) {
     // Direct city match - reverse lookup country
     const flag = COUNTRY_FLAGS[cityName];
-    // Find which country this flag belongs to
-    for (const [cName, cFlag] of Object.entries(COUNTRY_FLAGS)) {
-      if (cFlag === flag && COUNTRY_TO_CODE[cName]) {
-        country = cName;
-        break;
-      }
-    }
+    country = FLAG_TO_COUNTRY_MAP.get(flag) || null;
     // Return original emoji
     return flag;
   }
