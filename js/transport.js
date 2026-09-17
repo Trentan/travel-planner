@@ -1918,7 +1918,7 @@ function _updateSegmentList() {
   if (labelEl) {
     if (_activeSegmentIndex >= 0 && _activeSegmentIndex < totalSegments) {
       const seg = _pendingSegments[_activeSegmentIndex];
-      labelEl.innerHTML = `<span class="segment-index-badge">${_activeSegmentIndex + 1}</span> Editing: ${seg.fromLocation} → ${seg.toLocation}`;
+      labelEl.innerHTML = `<span class="segment-index-badge">${_activeSegmentIndex + 1}</span> Editing: ${escapeHtmlText(seg.fromLocation || '')} → ${escapeHtmlText(seg.toLocation || '')}`;
     } else {
       labelEl.innerHTML = `<span class="segment-index-badge">${totalSegments + 1}</span> Segment ${totalSegments + 1} — entering details`;
     }
@@ -1930,7 +1930,7 @@ function _updateSegmentList() {
 
     _pendingSegments.forEach((seg, i) => {
       const isActive = _activeSegmentIndex === i;
-      trackerHtml += `<div class="segment-pill ${isActive ? 'here' : 'behind'} is-clickable" onclick="editPendingSegment(${i})" title="${isActive ? 'Here now' : 'Behind you'}"><span class="pill-num">${i + 1}</span> ${seg.fromLocation} → ${seg.toLocation}</div>`;
+      trackerHtml += `<div class="segment-pill ${isActive ? 'here' : 'behind'} is-clickable" onclick="editPendingSegment(${i})" title="${isActive ? 'Here now' : 'Behind you'}"><span class="pill-num">${i + 1}</span> ${escapeHtmlText(seg.fromLocation || '')} → ${escapeHtmlText(seg.toLocation || '')}</div>`;
       if (i < totalSegments - 1) {
         trackerHtml += '<div class="segment-arrow">➔</div>';
       }
@@ -1950,14 +1950,14 @@ function _updateSegmentList() {
       const isCurrent = _activeSegmentIndex === i;
       const depString = `${formatJourneyDate(s.departureDate)} ${s.departureTime || ''}`.trim();
       const arrString = `${formatJourneyDate(s.arrivalDate)} ${s.arrivalTime || ''}`.trim();
-      const providerStr = `${s.provider} ${s.routeCode}`.trim();
+      const providerStr = `${s.provider || ''} ${s.routeCode || ''}`.trim();
 
       return `
       <div class="pending-segment-summary ${isCurrent ? 'is-current' : ''}">
-        <span>✓ Segment ${i + 1}: ${s.fromLocation} ➔ ${s.toLocation}</span>
+        <span>✓ Segment ${i + 1}: ${escapeHtmlText(s.fromLocation || '')} ➔ ${escapeHtmlText(s.toLocation || '')}</span>
         <span class="pending-segment-separator">&bull;</span>
-        <span>${depString} ➔ ${arrString}</span>
-        ${providerStr ? `<span class="pending-segment-separator">&bull;</span><span>${providerStr}</span>` : ''}
+        <span>${escapeHtmlText(depString)} ➔ ${escapeHtmlText(arrString)}</span>
+        ${providerStr ? `<span class="pending-segment-separator">&bull;</span><span>${escapeHtmlText(providerStr)}</span>` : ''}
         <button onclick="editPendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-edit" title="Edit leg">✎</button>
         <button onclick="removePendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-remove" title="Remove leg">&times;</button>
       </div>`;

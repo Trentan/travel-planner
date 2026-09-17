@@ -2924,6 +2924,7 @@ function renderLegReorderList() {
       : 'No dates';
     const nightsStr = daysCount > 1 ? `${daysCount - 1} night${daysCount > 2 ? 's' : ''}` : (daysCount === 1 ? '1 day' : '0 days');
     const isEditing = legDialogState.mode === 'edit' && legDialogState.editLegIdx === idx;
+    const safeLabel = typeof escapeHtmlText === 'function' ? escapeHtmlText(leg.label || 'Untitled leg') : (leg.label || 'Untitled leg');
 
     html += `
       <div class="leg-reorder-item flex items-center justify-between gap-2 p-2 ${isEditing ? 'bg-teal-50 dark:bg-teal-950/40 border-teal-500 dark:border-teal-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'} rounded-lg border shadow-xs cursor-grab select-none hover:border-teal-500 dark:hover:border-teal-400 transition-colors"
@@ -2937,7 +2938,7 @@ function renderLegReorderList() {
         <div class="flex items-center gap-2 min-w-0 flex-1">
           <span class="leg-drag-handle text-slate-400 dark:text-slate-500 text-sm font-mono cursor-grab px-1 touch-none" title="Drag to reorder">⋮⋮</span>
           <div class="min-w-0 flex-1">
-            <div class="font-semibold text-xs text-slate-800 dark:text-slate-100 truncate">${idx + 1}. ${leg.label || 'Untitled leg'}${isEditing ? ' <span class="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">(Editing)</span>' : ''}</div>
+            <div class="font-semibold text-xs text-slate-800 dark:text-slate-100 truncate">${idx + 1}. ${safeLabel}${isEditing ? ' <span class="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">(Editing)</span>' : ''}</div>
             <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">${dateRangeStr} • ${nightsStr}</div>
           </div>
         </div>

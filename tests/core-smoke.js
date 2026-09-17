@@ -597,6 +597,61 @@ async function run() {
   const emptyOutput = renderTransportCarrierMobile();
   assert(typeof emptyOutput === 'string' && emptyOutput.includes('transport-carrier-meta'), 'renderTransportCarrierMobile with default params should return HTML structure without error');
 
+  // XSS Escaping Test for Itinerary Leg Card Rendering
+  const itineraryJs = loadSource(path.join('js', 'itinerary.js'));
+  const win = { addEventListener: () => {} };
+  win.window = win;
+  const itineraryContext = createVmContext({
+    window: win,
+    addEventListener: () => {},
+    document: { getElementById: () => null, querySelectorAll: () => [] },
+    appData: [],
+    journeys: [],
+    stays: [],
+    citiesData: [],
+    escapeHtmlText: utilsContext.escapeHtmlText,
+    escapeCompactText: utilsContext.escapeHtmlText,
+    formatCurrency: v => '$' + v,
+    getLegNightSummary: () => ({ label: '1 night', isTransit: false, nights: 1 }),
+    getLegTotalCost: () => 0,
+    getLegHeaderLabelWithFlag: label => label,
+    getJourneysGroupedByJourneyId: () => new Map(),
+    isTipsCardExpanded: () => false,
+    isFoodQuestExpanded: () => false,
+    isActivitiesCardExpanded: () => false,
+    isEditMode: false
+  });
+  itineraryContext.window = itineraryContext;
+  runScriptInContext(itineraryJs, itineraryContext, 'js/itinerary.js');
+
+  const maliciousLeg = {
+    id: 'leg1',
+    colour: 'red";" onclick="alert(1)',
+    label: 'Malicious City',
+    days: []
+  };
+
+  const legCardHtml = itineraryContext.renderCompactLegCard(maliciousLeg, 0);
+  assert(
+    !legCardHtml.includes('style="background:red";" onclick="alert(1)"'),
+    'renderCompactLegCard should escape unescaped quotes/attributes in leg.colour'
+  );
+  assert(
+    legCardHtml.includes('style="background:red&quot;;&quot; onclick=&quot;alert(1)&quot;; cursor:pointer;"') ||
+    legCardHtml.includes('red&quot;'),
+    'renderCompactLegCard should contain HTML-escaped leg.colour'
+  );
+
+  const citySlideHtml = itineraryContext.renderCompactCitySlide({ leg: maliciousLeg, cityId: 'city1' }, 0);
+  assert(
+    !citySlideHtml.includes('style="background:red";" onclick="alert(1)"'),
+    'renderCompactCitySlide should escape unescaped quotes/attributes in leg.colour'
+  );
+  assert(
+    citySlideHtml.includes('red&quot;'),
+    'renderCompactCitySlide should contain HTML-escaped leg.colour'
+  );
+
   console.log('Core smoke checks passed');
 }
 
