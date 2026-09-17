@@ -652,6 +652,40 @@ async function run() {
     'renderCompactCitySlide should contain HTML-escaped leg.colour'
   );
 
+  // Tests for calcStayNights and setupStayNightsAutoCalc in js/crud.js
+  const crudJs = loadSource(path.join('js', 'crud.js'));
+  const stayElements = {
+    stayCheckIn: { value: '2026-06-01', onchange: null },
+    stayCheckOut: { value: '2026-06-05', onchange: null },
+    stayNights: { value: '' }
+  };
+  const crudContext = createVmContext({
+    window: {},
+    document: {
+      getElementById: (id) => stayElements[id] || null,
+      querySelectorAll: () => []
+    },
+    appData: [],
+    stays: [],
+    citiesData: []
+  });
+  crudContext.window = crudContext;
+  runScriptInContext(crudJs, crudContext, 'js/crud.js');
+
+  assert(typeof crudContext.calcStayNights === 'function', 'calcStayNights should be exposed on window context');
+  assert(typeof crudContext.setupStayNightsAutoCalc === 'function', 'setupStayNightsAutoCalc should be exposed on window context');
+
+  crudContext.setupStayNightsAutoCalc();
+  assert(stayElements.stayCheckIn.onchange === crudContext.calcStayNights, 'setupStayNightsAutoCalc should bind checkIn.onchange');
+  assert(stayElements.stayCheckOut.onchange === crudContext.calcStayNights, 'setupStayNightsAutoCalc should bind checkOut.onchange');
+
+  crudContext.calcStayNights();
+  assert(stayElements.stayNights.value === 4, `calcStayNights should calculate 4 nights between Jun 1 and Jun 5, got ${stayElements.stayNights.value}`);
+
+  stayElements.stayCheckOut.value = '2026-05-30';
+  crudContext.calcStayNights();
+  assert(stayElements.stayNights.value === 0, `calcStayNights should output 0 for invalid date range, got ${stayElements.stayNights.value}`);
+
   console.log('Core smoke checks passed');
 }
 

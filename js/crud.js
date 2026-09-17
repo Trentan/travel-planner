@@ -3770,6 +3770,29 @@ function _syncStayModalActions() {
   if (deleteBtn) deleteBtn.style.display = editingStayId ? 'inline-flex' : 'none';
 }
 
+function calcStayNights() {
+  const checkIn = document.getElementById('stayCheckIn');
+  const checkOut = document.getElementById('stayCheckOut');
+  const nights = document.getElementById('stayNights');
+
+  if (checkIn && checkOut && nights && checkIn.value && checkOut.value) {
+    const start = new Date(checkIn.value);
+    const end = new Date(checkOut.value);
+    const diff = Math.round((end - start) / (1000 * 60 * 60 * 24));
+    nights.value = diff > 0 ? diff : 0;
+  }
+}
+
+function setupStayNightsAutoCalc() {
+  const checkIn = document.getElementById('stayCheckIn');
+  const checkOut = document.getElementById('stayCheckOut');
+
+  if (checkIn && checkOut) {
+    checkIn.onchange = calcStayNights;
+    checkOut.onchange = calcStayNights;
+  }
+}
+
 function openAddStayModal(defaultCityId, defaultCheckIn) {
   const modal = document.getElementById('stay-modal');
   if (!modal) return;
@@ -3811,21 +3834,7 @@ function openAddStayModal(defaultCityId, defaultCheckIn) {
   document.getElementById('stayNotes').value = '';
 
   // Set up auto-calc for nights
-  const checkIn = document.getElementById('stayCheckIn');
-  const checkOut = document.getElementById('stayCheckOut');
-  const nights = document.getElementById('stayNights');
-
-  function calcNights() {
-    if (checkIn.value && checkOut.value) {
-      const start = new Date(checkIn.value);
-      const end = new Date(checkOut.value);
-      const diff = Math.round((end - start) / (1000 * 60 * 60 * 24));
-      nights.value = diff > 0 ? diff : 0;
-    }
-  }
-
-  checkIn.onchange = calcNights;
-  checkOut.onchange = calcNights;
+  setupStayNightsAutoCalc();
 
   _syncStayModalActions();
   modal.style.display = 'flex';
@@ -3876,21 +3885,7 @@ function openEditStayModal(stayId) {
   document.getElementById('stayNotes').value = stay.notes || '';
 
   // Set up auto-calc for nights
-  const checkIn = document.getElementById('stayCheckIn');
-  const checkOut = document.getElementById('stayCheckOut');
-  const nights = document.getElementById('stayNights');
-
-  function calcNights() {
-    if (checkIn.value && checkOut.value) {
-      const start = new Date(checkIn.value);
-      const end = new Date(checkOut.value);
-      const diff = Math.round((end - start) / (1000 * 60 * 60 * 24));
-      nights.value = diff > 0 ? diff : 0;
-    }
-  }
-
-  checkIn.onchange = calcNights;
-  checkOut.onchange = calcNights;
+  setupStayNightsAutoCalc();
 
   _syncStayModalActions();
   modal.style.display = 'flex';
@@ -4061,6 +4056,7 @@ Object.assign(window, {
   openAddStayModal, closeAddStayModal, saveStayFromModal, openEditStayModal,
   deleteStay, deleteStayFromModal, toggleStayStatus, updateStayField,
   openStayModal, closeStayModal, // backward compat
+  calcStayNights, setupStayNightsAutoCalc,
   renderLegReorderList, moveLegInSequence, cascadeStagedLegDates,
   onLegDateInputChange, onLegCascadeToggleChange, validateLegEditorForm,
   checkLegDateClash, resetLegDialogToAddNew, getLegDialogState, setLegDialogState,
