@@ -105,6 +105,20 @@ function escapeHtmlText(text) {
       .replace(/'/g, '&#39;');
 }
 
+function isSafeUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  try {
+    const base = (typeof window !== 'undefined' && window.location && typeof window.location.href === 'string')
+      ? window.location.href
+      : 'http://localhost/';
+    const parsed = new URL(trimmed, base);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'data:';
+  } catch (e) {
+    return false;
+  }
+}
+
 function parseCurrencyAmount(value) {
   const parsed = Number.parseFloat(String(value ?? '').replace(/[^0-9.-]/g, ''));
   return Number.isFinite(parsed) ? parsed : 0;
@@ -755,6 +769,7 @@ window.getDayTotal = getDayTotal;
 window.parseCurrencyAmount = parseCurrencyAmount;
 window.formatCurrency = formatCurrency;
 window.escapeHtmlText = escapeHtmlText;
+window.isSafeUrl = isSafeUrl;
 window.renderMobileStat = renderMobileStat;
 window.renderMobileSurfaceCard = renderMobileSurfaceCard;
 window.renderMobileSwipePager = renderMobileSwipePager;

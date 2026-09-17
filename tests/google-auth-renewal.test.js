@@ -85,8 +85,10 @@ function createDOMContext() {
 }
 
 function loadCloudStorage(context) {
+  const utilsCode = fs.readFileSync(path.resolve(__dirname, '../js/utils.js'), 'utf8');
   const code = fs.readFileSync(path.resolve(__dirname, '../js/cloud-storage.js'), 'utf8');
   vm.createContext(context);
+  vm.runInContext(utilsCode, context);
   vm.runInContext(code, context);
 }
 
