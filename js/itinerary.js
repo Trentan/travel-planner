@@ -4219,16 +4219,21 @@ function findLegForJourneyCity(cityId, cityName) {
   }
 
   const aLen = appData.length;
+  let legById = null;
   let legByDayKey = null;
 
   for (let i = 0; i < mLen; i++) {
     const journey = matching[i].journey;
 
     if (journey.legId) {
-      for (let l = 0; l < aLen; l++) {
-        const leg = appData[l];
-        if (leg && leg.id === journey.legId) return leg;
+      if (!legById) {
+        legById = new Map();
+        for (let l = 0; l < aLen; l++) {
+          const leg = appData[l];
+          if (leg && leg.id) legById.set(leg.id, leg);
+        }
       }
+      if (legById.has(journey.legId)) return legById.get(journey.legId);
     }
 
     const targetDate = (journey.toCityId === cityId || journey.toLocation === cityName)
