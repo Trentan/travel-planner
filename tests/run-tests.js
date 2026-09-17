@@ -11,6 +11,8 @@ const { run: runPwaShortcutsOfflineTests } = require('./pwa-shortcuts-offline.te
 const { runCloudStorageXssTests } = require('./cloud-storage-xss.test');
 const { runTripLibraryXssTests } = require('./trip-library-xss.test');
 const { runTripSummaryXssTests } = require('./trip-summary-xss.test');
+const { runTransportModalXssTests } = require('./transport-modal-xss.test');
+const { runLegReorderXssTests } = require('./leg-reorder-xss.test');
 const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 const { run: runTimezoneSuite } = require('./timezone-suite.test');
 const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
@@ -35,6 +37,8 @@ async function run() {
   await runCloudStorageXssTests();
   await runTripLibraryXssTests();
   if (typeof runTripSummaryXssTests === 'function') await runTripSummaryXssTests();
+  if (typeof runTransportModalXssTests === 'function') await runTransportModalXssTests();
+  if (typeof runLegReorderXssTests === 'function') await runLegReorderXssTests();
   if (typeof runStorageEngineSuite === 'function') await runStorageEngineSuite();
   if (typeof runGoogleAuthRenewalTests === 'function') await runGoogleAuthRenewalTests();
   if (typeof runDualPathWizardSuite === 'function') await runDualPathWizardSuite();
