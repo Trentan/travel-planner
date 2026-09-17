@@ -4789,64 +4789,6 @@ function stripCityLabel(cityName) {
     .trim();
 }
 
-function buildDefaultJourneysFromItinerary(legs) {
-  if (!Array.isArray(legs)) return [];
-
-  const PLACEHOLDER_TRANSPORT = ['add transport...', 'add transport'];
-  const journeysData = [];
-  legs.forEach((leg, legIndex) => {
-    (leg.days || []).forEach((day, dayIndex) => {
-      const dayDate = normalizeTripDateValue(day.date);
-      (day.transportItems || []).forEach((item, itemIndex) => {
-        // Skip placeholder entries
-        if (!item.text || PLACEHOLDER_TRANSPORT.includes(item.text.trim().toLowerCase())) return;
-
-        // Clean city names: strip emoji and parenthetical suffixes so they
-        // match the city nav labels used by the map and timeline boundary blocks.
-        const fromLocation = stripCityLabel(day.from || '');
-        const toLocation   = stripCityLabel(day.to   || '');
-
-        journeysData.push({
-          id: `journey_default_${leg.id || legIndex}_${dayIndex}_${itemIndex}`,
-          journeyId: `journey_default_group_${leg.id || legIndex}_${dayIndex}_${itemIndex}`,
-          journeyName: `${fromLocation} → ${toLocation}`,
-          legId: leg.id || `leg-${legIndex}`,
-          dayDate,
-          fromLocation,
-          toLocation,
-          fromAddress: item.fromLocation || '',
-          toAddress: item.toLocation || '',
-          fromCityId: typeof getCityIdByName === 'function' ? getCityIdByName(fromLocation) : '',
-          toCityId: typeof getCityIdByName === 'function' ? getCityIdByName(toLocation) : '',
-          departureDate: dayDate,
-          departureTime: item.departureTime || (item.text.match(/Dep\s+(\d{2}:\d{2})/) || [])[1] || '',
-          arrivalDate: (item.text.match(/Arr\s*\+(\d+)/) ? addDaysToIsoDate(dayDate, parseInt(item.text.match(/Arr\s*\+(\d+)/)[1], 10)) : dayDate),
-          arrivalTime: item.arrivalTime || (item.text.match(/Arr\s*(?:\+\d\s+)?(\d{2}:\d{2})/) || [])[1] || '',
-          transportType: inferTransportTypeFromText(item.text),
-          provider: item.provider || '',
-          routeCode: item.routeCode || '',
-          status: item.status === 'confirmed' ? 'booked' : 'planned',
-          cost: item.cost || '0',
-          bookingReference: item.bookingRef || '',
-          isMultiLeg: false,
-          segmentOrder: 1,
-          notes: item.text || '',
-          legs: [],
-          startDate: dayDate,
-          endDate: (item.text.match(/Arr\s*\+(\d+)/) ? addDaysToIsoDate(dayDate, parseInt(item.text.match(/Arr\s*\+(\d+)/)[1], 10)) : dayDate),
-          startTime: item.departureTime || (item.text.match(/Dep\s+(\d{2}:\d{2})/) || [])[1] || '',
-          endTime: item.arrivalTime || (item.text.match(/Arr\s*(?:\+\d\s+)?(\d{2}:\d{2})/) || [])[1] || '',
-          done: false,
-          _inferredToLegId: typeof getCityIdByName === 'function' ? getCityIdByName(toLocation) : '',
-          _inferredFromLegId: leg.id || `leg-${legIndex}`
-        });
-      });
-    });
-  });
-
-  return journeysData;
-}
-
 function calculateNightsBetween(checkIn, checkOut) {
   if (!checkIn || !checkOut) return 0;
   const start = new Date(`${checkIn}T00:00:00`);
