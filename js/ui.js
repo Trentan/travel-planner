@@ -65,10 +65,6 @@ function isSmallMobileViewport() {
   return window.matchMedia && window.matchMedia('(max-width: 379px)').matches;
 }
 
-function isTabletViewport() {
-  return window.matchMedia && window.matchMedia('(min-width: 481px) and (max-width: 900px)').matches;
-}
-
 function updateStickyOffsets() {
   const menuBar = document.querySelector('.app-menu-bar');
   const tabsNav = document.querySelector('.app-tabs-nav');
