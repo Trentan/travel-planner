@@ -176,15 +176,19 @@ async function runStorageEngineSuite() {
     return true;
   } finally {
     if (browserInstance) await browserInstance.close();
-    if (serverInstance) serverInstance.close();
+    if (serverInstance) await serverInstance.close();
   }
 }
 
 if (require.main === module) {
-  runStorageEngineSuite().catch(err => {
-    console.error('❌ Storage Engine suite failed:', err);
-    process.exit(1);
-  });
+  runStorageEngineSuite()
+    .then(() => {
+      process.exit(0);
+    })
+    .catch(err => {
+      console.error('❌ Storage Engine suite failed:', err);
+      process.exit(1);
+    });
 }
 
 module.exports = { runStorageEngineSuite };

@@ -1,4 +1,5 @@
 const { run: runCoreSmoke } = require('./core-smoke');
+const { stopAllServers } = require('./lib/static-server');
 const { run: runCityNavRegression } = require('./city-nav-regression');
 const { run: runItem15Suite } = require('./item15-suite');
 const { run: runFileIoSuite } = require('./file-io-robustness-suite');
@@ -34,48 +35,58 @@ const { runDesktopSplitPrintUnitTests } = require('./desktop-split-print.test');
 const { runUploadAllLocalTripsBenchmarkAndTest } = require('./upload-all-local-trips.test');
 
 async function run() {
-  if (typeof runDesktopSplitPrintUnitTests === 'function') await runDesktopSplitPrintUnitTests();
-  await runCloudStorageXssTests();
-  await runTripLibraryXssTests();
-  if (typeof runTripSummaryXssTests === 'function') await runTripSummaryXssTests();
-  if (typeof runTransportModalXssTests === 'function') await runTransportModalXssTests();
-  if (typeof runLegReorderXssTests === 'function') await runLegReorderXssTests();
-  if (typeof runStorageEngineSuite === 'function') await runStorageEngineSuite();
-  if (typeof runUploadAllLocalTripsBenchmarkAndTest === 'function') await runUploadAllLocalTripsBenchmarkAndTest();
-  if (typeof runGoogleAuthRenewalTests === 'function') await runGoogleAuthRenewalTests();
-  if (typeof runDualPathWizardSuite === 'function') await runDualPathWizardSuite();
-  if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();
-  if (typeof runParseCurrencyAmountTests === 'function') await runParseCurrencyAmountTests();
-  if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
-  if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
-  if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
-  if (typeof runFormatJourneySubLocationTests === 'function') await runFormatJourneySubLocationTests();
-  if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
-  if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
-  if (typeof runTransportDurationSuite === 'function') await runTransportDurationSuite();
-  if (typeof runTransitConnectorsSuite === 'function') await runTransitConnectorsSuite();
-  if (typeof runLegManagementWysiwygSuite === 'function') await runLegManagementWysiwygSuite();
-  await runCoreSmoke();
-  await runPwaShortcutsOfflineTests();
-  await runAutoStaysSuite();
-  await runSmartRemindersSuite();
-  await runScreenWakeLockSuite();
-  await runCityNavRegression();
-  await runItem15Suite();
-  await runFileIoSuite();
-  await runSuggestedSchedulingRegression();
-  await runItineraryExploratoryUx();
-  await runSharePresetsVerify();
-  await runIosPwaNavVerify();
-  await runBrowserSuite();
-  console.log('All travel planner tests passed');
+  try {
+    if (typeof runDesktopSplitPrintUnitTests === 'function') await runDesktopSplitPrintUnitTests();
+    await runCloudStorageXssTests();
+    await runTripLibraryXssTests();
+    if (typeof runTripSummaryXssTests === 'function') await runTripSummaryXssTests();
+    if (typeof runTransportModalXssTests === 'function') await runTransportModalXssTests();
+    if (typeof runLegReorderXssTests === 'function') await runLegReorderXssTests();
+    if (typeof runStorageEngineSuite === 'function') await runStorageEngineSuite();
+    if (typeof runUploadAllLocalTripsBenchmarkAndTest === 'function') await runUploadAllLocalTripsBenchmarkAndTest();
+    if (typeof runGoogleAuthRenewalTests === 'function') await runGoogleAuthRenewalTests();
+    if (typeof runDualPathWizardSuite === 'function') await runDualPathWizardSuite();
+    if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();
+    if (typeof runParseCurrencyAmountTests === 'function') await runParseCurrencyAmountTests();
+    if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
+    if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
+    if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
+    if (typeof runFormatJourneySubLocationTests === 'function') await runFormatJourneySubLocationTests();
+    if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
+    if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
+    if (typeof runTransportDurationSuite === 'function') await runTransportDurationSuite();
+    if (typeof runTransitConnectorsSuite === 'function') await runTransitConnectorsSuite();
+    if (typeof runLegManagementWysiwygSuite === 'function') await runLegManagementWysiwygSuite();
+    await runCoreSmoke();
+    await runPwaShortcutsOfflineTests();
+    await runAutoStaysSuite();
+    await runSmartRemindersSuite();
+    await runScreenWakeLockSuite();
+    await runCityNavRegression();
+    await runItem15Suite();
+    await runFileIoSuite();
+    await runSuggestedSchedulingRegression();
+    await runItineraryExploratoryUx();
+    await runSharePresetsVerify();
+    await runIosPwaNavVerify();
+    await runBrowserSuite();
+    console.log('All travel planner tests passed');
+  } finally {
+    if (typeof stopAllServers === 'function') {
+      await stopAllServers();
+    }
+  }
 }
 
 if (require.main === module) {
-  run().catch(error => {
-    console.error(error.message);
-    process.exitCode = 1;
-  });
+  run()
+    .then(() => {
+      process.exit(0);
+    })
+    .catch(error => {
+      console.error(error.stack || error.message);
+      process.exit(1);
+    });
 }
 
 module.exports = { run };

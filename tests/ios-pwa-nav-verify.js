@@ -5,7 +5,8 @@ const { startStaticServer } = require('./lib/static-server');
 
 async function run() {
   const rootDir = path.resolve(__dirname, '..');
-  const { server, baseUrl: origin } = await startStaticServer(rootDir);
+  const serverInstance = await startStaticServer(rootDir);
+  const origin = serverInstance.baseUrl;
   let browser = null;
 
   try {
@@ -98,15 +99,19 @@ async function run() {
 
   } finally {
     if (browser) await browser.close();
-    if (server) await new Promise(resolve => server.close(resolve));
+    if (serverInstance) await serverInstance.close();
   }
 }
 
 if (require.main === module) {
-  run().catch(err => {
-    console.error('iOS PWA Nav Verify test failed:', err);
-    process.exit(1);
-  });
+  run()
+    .then(() => {
+      process.exit(0);
+    })
+    .catch(err => {
+      console.error('iOS PWA Nav Verify test failed:', err);
+      process.exit(1);
+    });
 }
 
 module.exports = { run };

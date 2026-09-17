@@ -15,8 +15,11 @@ function contentType(filePath) {
   return 'application/octet-stream';
 }
 
+const activeServers = new Set();
+
 async function startStaticServer(rootDir, preferredPort = 0) {
   const root = path.resolve(rootDir);
+  const sockets = new Set();
 
   const server = http.createServer((req, res) => {
     try {
@@ -51,6 +54,12 @@ async function startStaticServer(rootDir, preferredPort = 0) {
     }
   });
 
+  // Track all sockets to immediately terminate keep-alive connections on close
+  server.on('connection', socket => {
+    sockets.add(socket);
+    socket.once('close', () => sockets.delete(socket));
+  });
+
   await new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(preferredPort, '127.0.0.1', resolve);
@@ -58,11 +67,64 @@ async function startStaticServer(rootDir, preferredPort = 0) {
 
   const address = server.address();
   const port = typeof address === 'object' && address ? address.port : preferredPort;
-  return {
+
+  const stop = () => new Promise(resolve => {
+    activeServers.delete(serverHandle);
+    for (const socket of sockets) {
+      try { socket.destroy(); } catch (e) {}
+    }
+    sockets.clear();
+
+    if (typeof server.closeAllConnections === 'function') {
+      try { server.closeAllConnections(); } catch (e) {}
+    }
+    if (typeof server.closeIdleConnections === 'function') {
+      try { server.closeIdleConnections(); } catch (e) {}
+    }
+
+    server.close(() => resolve());
+    // Safety fallback so server close never hangs the process
+    setTimeout(resolve, 500).unref();
+  });
+
+  // Override close directly on the http.Server instance as well
+  const origClose = server.close.bind(server);
+  server.close = function(cb) {
+    for (const socket of sockets) {
+      try { socket.destroy(); } catch (e) {}
+    }
+    sockets.clear();
+    if (typeof server.closeAllConnections === 'function') {
+      try { server.closeAllConnections(); } catch (e) {}
+    }
+    activeServers.delete(serverHandle);
+    return origClose(cb);
+  };
+
+  const serverHandle = {
     server,
     baseUrl: `http://127.0.0.1:${port}`,
-    close: () => new Promise(resolve => server.close(resolve))
+    port,
+    close: stop,
+    stop
   };
+
+  activeServers.add(serverHandle);
+  return serverHandle;
 }
 
-module.exports = { startStaticServer };
+async function stopAllServers() {
+  const handles = Array.from(activeServers);
+  activeServers.clear();
+  await Promise.all(handles.map(h => h.close().catch(() => {})));
+}
+
+// Clean up any remaining servers if the process terminates
+process.once('exit', () => {
+  for (const h of activeServers) {
+    try { h.server.close(); } catch (e) {}
+  }
+  activeServers.clear();
+});
+
+module.exports = { startStaticServer, stopAllServers };

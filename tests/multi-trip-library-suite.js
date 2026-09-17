@@ -187,8 +187,19 @@ async function runMultiTripLibrarySuite() {
     process.exit(1);
   } finally {
     if (browserInstance) await browserInstance.close();
-    if (serverInstance && typeof serverInstance.close === 'function') serverInstance.close();
+    if (serverInstance && typeof serverInstance.close === 'function') await serverInstance.close();
   }
 }
 
-runMultiTripLibrarySuite();
+if (require.main === module) {
+  runMultiTripLibrarySuite()
+    .then(() => {
+      process.exit(0);
+    })
+    .catch(err => {
+      console.error('❌ MULTI-TRIP LIBRARY SUITE FAILED:', err);
+      process.exit(1);
+    });
+} else {
+  module.exports = { runMultiTripLibrarySuite };
+}
