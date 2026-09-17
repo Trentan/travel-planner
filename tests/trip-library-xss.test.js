@@ -99,6 +99,9 @@ async function runTripLibraryXssTests() {
   });
   context.window = context;
 
+  const utilsSource = loadSource(path.join('js', 'utils.js'));
+  runScriptInContext(utilsSource, context, 'js/utils.js');
+
   const tripLibrarySource = loadSource(path.join('js', 'trip-library.js'));
   runScriptInContext(tripLibrarySource, context, 'js/trip-library.js');
 

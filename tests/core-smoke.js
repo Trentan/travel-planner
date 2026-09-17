@@ -133,6 +133,7 @@ return {
   runScriptInContext(bookingIntakeJs, bookingContext, 'js/booking-intake.js');
 
   const utilsContext = createVmContext({
+    URL,
     window: {},
     document: { getElementById: () => null, querySelectorAll: () => [] }
   });
@@ -382,6 +383,18 @@ async function run() {
     calculateJourneyDuration(threeSegmentJourney) === 24,
     'calculateJourneyDuration should compute duration from first segment departure (Jun 10 08:00) to last segment arrival (Jun 11 08:00)'
   );
+
+  // isSafeUrl tests
+  const isSafeUrl = utilsContext.isSafeUrl;
+  assert(typeof isSafeUrl === 'function', 'isSafeUrl should be exported on utilsContext');
+  assert(isSafeUrl('https://example.com/avatar.png') === true, 'isSafeUrl should accept valid https URLs');
+  assert(isSafeUrl('http://example.com/photo.jpg') === true, 'isSafeUrl should accept valid http URLs');
+  assert(isSafeUrl('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==') === true, 'isSafeUrl should accept data URIs');
+  assert(isSafeUrl('javascript:alert(1)') === false, 'isSafeUrl should reject javascript URIs');
+  assert(isSafeUrl('file:///etc/passwd') === false, 'isSafeUrl should reject file URIs');
+  assert(isSafeUrl(null) === false, 'isSafeUrl should return false for null');
+  assert(isSafeUrl(undefined) === false, 'isSafeUrl should return false for undefined');
+  assert(isSafeUrl('') === false, 'isSafeUrl should return false for empty string');
 
   // parseCurrencyAmount edge cases
   const parseCurrencyAmount = utilsContext.parseCurrencyAmount;
@@ -651,6 +664,40 @@ async function run() {
     citySlideHtml.includes('red&quot;'),
     'renderCompactCitySlide should contain HTML-escaped leg.colour'
   );
+
+  // Tests for calcStayNights and setupStayNightsAutoCalc in js/crud.js
+  const crudJs = loadSource(path.join('js', 'crud.js'));
+  const stayElements = {
+    stayCheckIn: { value: '2026-06-01', onchange: null },
+    stayCheckOut: { value: '2026-06-05', onchange: null },
+    stayNights: { value: '' }
+  };
+  const crudContext = createVmContext({
+    window: {},
+    document: {
+      getElementById: (id) => stayElements[id] || null,
+      querySelectorAll: () => []
+    },
+    appData: [],
+    stays: [],
+    citiesData: []
+  });
+  crudContext.window = crudContext;
+  runScriptInContext(crudJs, crudContext, 'js/crud.js');
+
+  assert(typeof crudContext.calcStayNights === 'function', 'calcStayNights should be exposed on window context');
+  assert(typeof crudContext.setupStayNightsAutoCalc === 'function', 'setupStayNightsAutoCalc should be exposed on window context');
+
+  crudContext.setupStayNightsAutoCalc();
+  assert(stayElements.stayCheckIn.onchange === crudContext.calcStayNights, 'setupStayNightsAutoCalc should bind checkIn.onchange');
+  assert(stayElements.stayCheckOut.onchange === crudContext.calcStayNights, 'setupStayNightsAutoCalc should bind checkOut.onchange');
+
+  crudContext.calcStayNights();
+  assert(stayElements.stayNights.value === 4, `calcStayNights should calculate 4 nights between Jun 1 and Jun 5, got ${stayElements.stayNights.value}`);
+
+  stayElements.stayCheckOut.value = '2026-05-30';
+  crudContext.calcStayNights();
+  assert(stayElements.stayNights.value === 0, `calcStayNights should output 0 for invalid date range, got ${stayElements.stayNights.value}`);
 
   console.log('Core smoke checks passed');
 }

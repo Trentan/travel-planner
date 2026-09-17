@@ -1701,20 +1701,6 @@
     updateCloudSyncModalState();
   };
 
-  function isSafeUrl(url) {
-    if (!url || typeof url !== 'string') return false;
-    const trimmed = url.trim();
-    try {
-      const base = (typeof window !== 'undefined' && window.location && typeof window.location.href === 'string')
-        ? window.location.href
-        : 'http://localhost/';
-      const parsed = new URL(trimmed, base);
-      return parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'data:';
-    } catch (e) {
-      return false;
-    }
-  }
-
   function escapeJsParam(val) {
     if (val === null || val === undefined) return "''";
     const jsonStr = JSON.stringify(String(val));

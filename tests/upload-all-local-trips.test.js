@@ -126,6 +126,9 @@ async function runUploadAllLocalTripsBenchmarkAndTest() {
   mockLocalStorage.setItem('travelApp_gdrive_token_expiry', String(Date.now() + 3600000));
   mockLocalStorage.setItem('travelApp_gdrive_folder_id', 'folder_123');
 
+  const utilsSource = loadSource(path.join('js', 'utils.js'));
+  runScriptInContext(utilsSource, context, 'js/utils.js');
+
   const cloudStorageSource = loadSource(path.join('js', 'cloud-storage.js'));
   runScriptInContext(cloudStorageSource, context, 'js/cloud-storage.js');
 
