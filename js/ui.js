@@ -65,10 +65,6 @@ function isSmallMobileViewport() {
   return window.matchMedia && window.matchMedia('(max-width: 379px)').matches;
 }
 
-function isTabletViewport() {
-  return window.matchMedia && window.matchMedia('(min-width: 481px) and (max-width: 900px)').matches;
-}
-
 function updateStickyOffsets() {
   const menuBar = document.querySelector('.app-menu-bar');
   const tabsNav = document.querySelector('.app-tabs-nav');
@@ -654,22 +650,6 @@ function openGuideDialog() {
 function closeGuideDialog() {
   const modal = document.getElementById('guide-modal');
   if (modal) modal.style.display = 'none';
-}
-
-function applyViewportDrivenMode() {
-  // Automatically set compact view based on viewport width (< 769px = compact)
-  const isMobile = isMobileViewport();
-  isCompactView = isMobile;
-  window.isCompactView = isCompactView;
-  document.body.classList.toggle('compact-view-mode', isCompactView);
-  // Rebuild current view to apply the correct layout
-  const activeTabBtn = document.querySelector('.app-tab-btn.active');
-  if (activeTabBtn && activeTabBtn.dataset.tab) {
-    switchTab(activeTabBtn.dataset.tab, activeTabBtn);
-  } else {
-    buildItinerary();
-    buildPackingTab();
-  }
 }
 
 function setItineraryDayViewMode(nextMode = 'timeline') {

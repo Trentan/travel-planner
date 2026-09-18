@@ -851,20 +851,6 @@
     await window.selectTripEmoji(randomEmoji);
   };
 
-  function isSafeUrl(url) {
-    if (!url || typeof url !== 'string') return false;
-    const trimmed = url.trim();
-    try {
-      const base = (typeof window !== 'undefined' && window.location && typeof window.location.href === 'string')
-        ? window.location.href
-        : 'http://localhost/';
-      const parsed = new URL(trimmed, base);
-      return parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'data:';
-    } catch (e) {
-      return false;
-    }
-  }
-
   // Helper escape HTML string
   function escapeHtml(str) {
     if (str === null || str === undefined) return '';
