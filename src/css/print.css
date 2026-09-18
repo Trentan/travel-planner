@@ -1,0 +1,270 @@
+/* ==========================================================================
+   Distraction-Free Printable Itinerary Stylesheet (Milestone 6 / Issues #287, #300)
+   ========================================================================== */
+
+/* Print Cover / Header hidden on screen */
+.print-trip-header {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm 14mm 10mm;
+  }
+
+  /* 1. Global Reset for Monochrome Print */
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10pt !important;
+    line-height: 1.35 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 2. Hide Non-Printable UI Chrome */
+  .app-menu-bar,
+  .app-tabs-nav,
+  .city-nav,
+  header,
+  .mobile-status-bar-overlay,
+  .mobile-menu-sheet,
+  .mobile-tabs-menu-btn,
+  #offlineBanner,
+  #readOnlyBanner,
+  #jsonWriteWarning,
+  .section-header,
+  .section-header-actions,
+  .desktop-split-view-controls,
+  .desktop-split-right,
+  .compact-day-rail,
+  .compact-day-header-chips,
+  .compact-food-block,
+  .daily-timeline-checkbox-wrapper,
+  .daily-timeline-reminder-actions,
+  .daily-timeline-reminder-dismiss-btn,
+  .daily-timeline-map-action,
+  .timeline-connector-btn,
+  .leg-chevron,
+  .audio-tour-chip,
+  .action-btn,
+  input[type="checkbox"],
+  button,
+  .modal,
+  dialog,
+  #tab-transport,
+  #tab-accom,
+  #tab-budget,
+  #tab-packing,
+  #tab-map {
+    display: none !important;
+  }
+
+  /* 3. Reveal and Format Print Cover & Summary */
+  .print-trip-header {
+    display: block !important;
+    padding-bottom: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    border-bottom: 2px solid #000000 !important;
+    page-break-after: avoid !important;
+  }
+
+  .print-trip-title-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .print-trip-title {
+    font-size: 20pt !important;
+    font-weight: 800 !important;
+    color: #000000 !important;
+    margin: 0 !important;
+  }
+
+  .print-trip-subtitle {
+    font-size: 11pt !important;
+    color: #4b5563 !important;
+    margin: 0.25rem 0 0.75rem 0 !important;
+  }
+
+  .print-trip-meta-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem !important;
+    padding: 0.5rem !important;
+    background: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 4px !important;
+  }
+
+  .print-meta-item {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .print-meta-label {
+    font-size: 8pt !important;
+    text-transform: uppercase !important;
+    font-weight: 700 !important;
+    color: #4b5563 !important;
+  }
+
+  .print-meta-val {
+    font-size: 10pt !important;
+    font-weight: 600 !important;
+    color: #000000 !important;
+  }
+
+  .print-section-heading {
+    font-size: 11pt !important;
+    font-weight: 700 !important;
+    margin: 0.75rem 0 0.4rem 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  .print-accom-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 1rem !important;
+    font-size: 9pt !important;
+  }
+
+  .print-accom-table th {
+    background: #f3f4f6 !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+    text-align: left !important;
+    padding: 4px 6px !important;
+    border: 1px solid #d1d5db !important;
+  }
+
+  .print-accom-table td {
+    padding: 4px 6px !important;
+    border: 1px solid #d1d5db !important;
+    color: #000000 !important;
+  }
+
+  /* 4. Full Unfolded Layout for Itinerary Days */
+  #tab-itinerary,
+  .app-tabs-content,
+  main,
+  .desktop-split-shell,
+  .desktop-split-left,
+  #itinerary,
+  .compact-desktop-stack {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .leg,
+  .compact-desktop-leg,
+  .compact-leg-card {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Page Break Before Each New Leg (except the first) */
+  .compact-desktop-leg:not(:first-child),
+  .leg:not(:first-child) {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+
+  .compact-leg-header {
+    background: #f3f4f6 !important;
+    color: #000000 !important;
+    border: 1px solid #9ca3af !important;
+    padding: 6px 10px !important;
+    border-radius: 4px !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .compact-leg-label {
+    color: #000000 !important;
+    font-size: 13pt !important;
+  }
+
+  .compact-leg-date {
+    color: #374151 !important;
+    font-size: 9.5pt !important;
+  }
+
+  .compact-leg-body,
+  .leg-content {
+    display: block !important;
+    padding: 0 !important;
+  }
+
+  .compact-day-pager {
+    display: block !important;
+  }
+
+  .compact-day-carousel {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Each Day Card Formatted cleanly with mid-card break avoidance */
+  .compact-day-slide,
+  .day-card {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    margin-top: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 4px !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  .compact-day-surface {
+    box-shadow: none !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  .daily-timeline-item,
+  .compact-grouped-item,
+  .compact-activity-row {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    border-bottom: 1px dotted #e5e7eb !important;
+    padding: 3px 0 !important;
+  }
+
+  a {
+    color: #000000 !important;
+    text-decoration: none !important;
+  }
+
+  /* Ensure text is high-contrast black */
+  * {
+    color: #000000 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+}
+
+
+
+
+
+
