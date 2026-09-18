@@ -462,6 +462,50 @@ function renderCompactTipsCard(leg, legIndex) {
   `;
 }
 
+function renderCompactDayNotes(leg, legIndex, day, dayIdx) {
+  const notes = typeof day.notes === 'string' ? day.notes.trim() : (Array.isArray(day.notes) ? day.notes.join('\n').trim() : '');
+  const hasNotes = notes.length > 0;
+
+  if (!hasNotes && !isEditMode) {
+    return '';
+  }
+
+  const noteId = `day-note-text-${legIndex}-${dayIdx}`;
+
+  if (!hasNotes && isEditMode) {
+    return `
+      <div class="compact-day-notes-wrapper mb-2.5 px-0.5">
+        <button type="button" class="inline-flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 font-medium py-1 px-2.5 rounded-lg border border-dashed border-amber-300 dark:border-amber-700/60 bg-amber-50/50 dark:bg-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors" onclick="event.stopPropagation(); addDayNote(${legIndex}, ${dayIdx});">
+          <span>📝</span> <span>+ Add Day Note / Tip</span>
+        </button>
+      </div>
+    `;
+  }
+
+  const actions = isEditMode
+    ? `<span class="compact-inline-actions inline-flex items-center gap-1 ml-auto">
+        <button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-edit text-xs p-1 hover:text-amber-900 dark:hover:text-amber-100" title="Edit Note" onclick="event.preventDefault(); event.stopPropagation(); focusCompactInlineEditable('#${noteId}');">&#9998;</button>
+        <button type="button" class="compact-inline-icon-btn compact-inline-icon-btn-remove text-xs p-1 hover:text-red-600 dark:hover:text-red-400" title="Delete Note" onclick="event.preventDefault(); event.stopPropagation(); if (confirm('Delete this day note?')) deleteDayNote(${legIndex}, ${dayIdx});">&#10005;</button>
+      </span>`
+    : '';
+
+  const body = isEditMode
+    ? `<div id="${noteId}" class="compact-day-note-text is-editable text-xs text-amber-900 dark:text-amber-200 mt-1 whitespace-pre-wrap outline-none focus:ring-1 focus:ring-amber-400 rounded px-1 py-0.5" contenteditable="true" onblur="updateDayNote(${legIndex}, ${dayIdx}, this.innerText)">${escapeCompactText(notes)}</div>`
+    : `<div class="compact-day-note-text text-xs text-amber-900 dark:text-amber-200 mt-1 whitespace-pre-wrap">${escapeCompactText(notes)}</div>`;
+
+  return `
+    <div class="compact-day-notes-card mb-2.5 p-2.5 bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/90 dark:border-amber-800/60 rounded-xl shadow-2xs split-item-selectable" onclick="handleSplitItemClick(this, event);" data-item-title="Day Note" data-item-type="note" data-item-notes="${escapeCompactText(notes)}">
+      <div class="flex items-center gap-1.5 text-xs font-semibold text-amber-800 dark:text-amber-300">
+        <span class="text-sm">📌</span>
+        <span>Day Note / Tip</span>
+        ${actions}
+      </div>
+      ${body}
+    </div>
+  `;
+}
+
+
 function renderCompactMobileLegInfoCluster(leg, legIndex) {
   const tips = Array.isArray(leg.legTips) ? leg.legTips : [];
   const foodItems = Array.isArray(leg.cityFood) ? leg.cityFood : [];
@@ -820,7 +864,9 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
           <section><h5>Activities</h5>${activityLines || '<div class="compact-day-empty">Nothing planned yet.</div>'}</section>
         </div>
       `, true);
+  const dayNotesHtml = renderCompactDayNotes(leg, legIndex, day, dayIdx);
   const details = `
+    ${dayNotesHtml}
     <div class="day-planner-shell day-planner-shell-${useGroupedView ? 'grouped' : 'timeline'}">
       <div class="day-view-panel day-view-panel-${useGroupedView ? 'grouped' : 'timeline'}">
         <div class="detail-block drop-zone" onclick="event.stopPropagation()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
