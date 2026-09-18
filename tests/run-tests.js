@@ -33,9 +33,11 @@ const { runDualPathWizardSuite } = require('./dual-path-wizard.test');
 const { runStorageEngineSuite } = require('./storage-engine-suite');
 const { runDesktopSplitPrintUnitTests } = require('./desktop-split-print.test');
 const { runUploadAllLocalTripsBenchmarkAndTest } = require('./upload-all-local-trips.test');
+const { runWeatherNotesSuite } = require('./weather-notes-test');
 
 async function run() {
   try {
+    if (typeof runWeatherNotesSuite === 'function') runWeatherNotesSuite();
     if (typeof runDesktopSplitPrintUnitTests === 'function') await runDesktopSplitPrintUnitTests();
     await runCloudStorageXssTests();
     await runTripLibraryXssTests();

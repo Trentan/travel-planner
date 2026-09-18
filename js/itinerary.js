@@ -890,7 +890,8 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
     title: `Day ${dayIdx + 1} · ${day.day || ''}`.trim(),
     subtitle: routeLabel,
     primaryAction: `
-      <span class="compact-day-header-chips">
+      <span class="compact-day-header-chips flex items-center gap-1.5 flex-wrap">
+        ${typeof renderDayWeatherBadgeHtml === 'function' ? renderDayWeatherBadgeHtml(day.date, toCity || fromCity || leg.label, leg) : ''}
         <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.72rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}</span>
         ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
       </span>
