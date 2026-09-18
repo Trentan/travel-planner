@@ -1047,6 +1047,8 @@ const ALL_CITIES = [...CITY_DATABASE, ...EXTENDED_CITY_DATABASE];
 const ALL_CITIES_BY_NAME_MAP = new Map();
 const ALL_CITIES_BY_NAME_COUNTRY_MAP = new Map();
 const ALL_CITIES_BY_CODE_MAP = new Map();
+const ALL_CITIES_BY_CITY_ID_MAP = new Map();
+const ALL_CITIES_BY_CLEAN_NAME_MAP = new Map();
 const ALL_CITIES_HAS_COORDS_SET = new Set();
 
 ALL_CITIES.forEach(c => {
@@ -1056,6 +1058,16 @@ ALL_CITIES.forEach(c => {
       ALL_CITIES_BY_NAME_MAP.set(lowerName, []);
     }
     ALL_CITIES_BY_NAME_MAP.get(lowerName).push(c);
+
+    const cityId = 'city-' + lowerName.replace(/[^a-z0-9]/g, '-');
+    if (!ALL_CITIES_BY_CITY_ID_MAP.has(cityId)) {
+      ALL_CITIES_BY_CITY_ID_MAP.set(cityId, c);
+    }
+
+    const cleanName = lowerName.replace(/-/g, '');
+    if (!ALL_CITIES_BY_CLEAN_NAME_MAP.has(cleanName)) {
+      ALL_CITIES_BY_CLEAN_NAME_MAP.set(cleanName, c);
+    }
 
     if (c.countryCode) {
       const key = `${lowerName}|${c.countryCode.toUpperCase()}`;
@@ -1661,7 +1673,7 @@ function extractCitiesFromItinerary() {
     let dbMatch = nameMatches ? nameMatches[0] : null;
     if (!dbMatch) {
       const slugClean = slugLower.replace(/-/g, '');
-      dbMatch = ALL_CITIES.find(c => c.name.toLowerCase().replace(/-/g, '') === slugClean);
+      dbMatch = ALL_CITIES_BY_CLEAN_NAME_MAP.get(slugClean) || null;
     }
     if (dbMatch) {
       addCity(dbMatch.name, sourceDate);
@@ -1707,13 +1719,11 @@ function extractCitiesFromItinerary() {
         // First try to find existing city by ID
         let cityFound = false;
         // Check in ALL_CITIES (built-in + extended)
-        ALL_CITIES.forEach(dbCity => {
-          const idFromDb = 'city-' + dbCity.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-          if (idFromDb === s.cityId) {
-            addCity(dbCity.name, s.checkIn);
-            cityFound = true;
-          }
-        });
+        const dbCity = ALL_CITIES_BY_CITY_ID_MAP.get(s.cityId);
+        if (dbCity) {
+          addCity(dbCity.name, s.checkIn);
+          cityFound = true;
+        }
         // Check in userCities
         if (!cityFound) {
           userCities.forEach(uCity => {
@@ -2010,29 +2020,39 @@ function calculateLevenshteinDistance(a, b) {
 
   const aLen = str1.length;
   const bLen = str2.length;
-  const dp = [];
 
-  for (let i = 0; i <= bLen; i++) {
-    dp[i] = [i];
+  const str1Codes = new Int32Array(aLen);
+  for (let j = 0; j < aLen; j++) {
+    str1Codes[j] = str1.charCodeAt(j);
   }
+
+  let prev = new Int32Array(aLen + 1);
+  let curr = new Int32Array(aLen + 1);
+
   for (let j = 0; j <= aLen; j++) {
-    dp[0][j] = j;
+    prev[j] = j;
   }
 
   for (let i = 1; i <= bLen; i++) {
+    const char2 = str2.charCodeAt(i - 1);
+    curr[0] = i;
     for (let j = 1; j <= aLen; j++) {
-      if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-        dp[i][j] = dp[i - 1][j - 1];
+      if (char2 === str1Codes[j - 1]) {
+        curr[j] = prev[j - 1];
       } else {
-        dp[i][j] = Math.min(
-          dp[i - 1][j - 1] + 1, // substitution
-          dp[i][j - 1] + 1,     // insertion
-          dp[i - 1][j] + 1      // deletion
-        );
+        const sub = prev[j - 1];
+        const ins = curr[j - 1];
+        const del = prev[j];
+        let min = sub < ins ? sub : ins;
+        if (del < min) min = del;
+        curr[j] = min + 1;
       }
     }
+    const temp = prev;
+    prev = curr;
+    curr = temp;
   }
-  return dp[bLen][aLen];
+  return prev[aLen];
 }
 
 function calculateSimilarityScore(str1, str2) {
@@ -2916,6 +2936,14 @@ const COUNTRY_TO_CODE = {
   'United Arab Emirates': 'AE'
 };
 
+// Precomputed reverse map from flag emoji to country name for O(1) lookups
+const FLAG_TO_COUNTRY_MAP = new Map();
+for (const [cName, cFlag] of Object.entries(COUNTRY_FLAGS)) {
+  if (COUNTRY_TO_CODE[cName] && !FLAG_TO_COUNTRY_MAP.has(cFlag)) {
+    FLAG_TO_COUNTRY_MAP.set(cFlag, cName);
+  }
+}
+
 // Get flag emoji for a city (based on city name or country)
 function getCityFlag(cityName) {
   if (!cityName) return '📍';
@@ -2925,13 +2953,7 @@ function getCityFlag(cityName) {
   if (COUNTRY_FLAGS[cityName]) {
     // Direct city match - reverse lookup country
     const flag = COUNTRY_FLAGS[cityName];
-    // Find which country this flag belongs to
-    for (const [cName, cFlag] of Object.entries(COUNTRY_FLAGS)) {
-      if (cFlag === flag && COUNTRY_TO_CODE[cName]) {
-        country = cName;
-        break;
-      }
-    }
+    country = FLAG_TO_COUNTRY_MAP.get(flag) || null;
     // Return original emoji
     return flag;
   }
