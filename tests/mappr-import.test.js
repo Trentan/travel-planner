@@ -28,6 +28,10 @@ async function runMapprImportTests() {
   assert.strictEqual(inferSpotCategory('Old Market Hall', 'Indoor farmers market and artisanal bazaar', '').category, 'sight');
   assert.strictEqual(inferSpotCategory('Old Market Hall', '', '').icon, '🛍️');
 
+  assert.strictEqual(inferSpotCategory('Urban House Coffee', '', '').type, 'food');
+  assert.strictEqual(inferSpotCategory('Bratislava Castle', '', '').type, 'sight');
+  assert.strictEqual(inferSpotCategory('Transit Advice', 'Buy 72 hour tourist travel pass at airport station', '').type, 'tip');
+
   console.log('✓ inferSpotCategory heuristics passed');
 
   // 2. parseMapprPayload Tests with Nuxt 3 dereferencing
@@ -90,11 +94,13 @@ async function runMapprImportTests() {
   assert.strictEqual(castle.website, 'https://bratislava-castle.sk');
   assert.strictEqual(castle.category, 'sight');
   assert.strictEqual(castle.icon, '🏛️');
+  assert.strictEqual(castle.type, 'sight');
 
   const cafe = parsedArray.spots.find(s => s.name === 'Cafe Mayer');
   assert(cafe, 'Should extract Cafe Mayer spot');
   assert.strictEqual(cafe.category, 'food');
   assert.strictEqual(cafe.icon, '☕');
+  assert.strictEqual(cafe.type, 'food');
 
   console.log('✓ parseMapprPayload with Nuxt 3 dereferenced array passed');
 

@@ -23,14 +23,17 @@
    */
   function inferSpotCategory(name, summary, whyGo) {
     const blob = ` ${name || ''} ${summary || ''} ${whyGo || ''} `.toLowerCase();
-    if (/\b(cafe|coffee|roaster|bakery|pastry|breakfast|brunch)\b/.test(blob)) return { category: 'food', icon: '☕', label: 'Cafe' };
-    if (/\b(restaurant|dinner|lunch|bistro|cuisine|eats|pizza|burger|tapas|trattoria|pasta|food)\b/.test(blob)) return { category: 'food', icon: '🍽️', label: 'Food & Drink' };
-    if (/\b(bar|pub|cocktail|brewery|wine|beer|nightlife)\b/.test(blob)) return { category: 'food', icon: '🍸', label: 'Bar & Drinks' };
-    if (/\b(museum|gallery|exhibition|art|sculpture|mural)\b/.test(blob)) return { category: 'sight', icon: '🎨', label: 'Art & Culture' };
-    if (/\b(church|basilica|cathedral|temple|monastery|palace|castle|fortress|monument|statue|historic|ruins)\b/.test(blob)) return { category: 'sight', icon: '🏛️', label: 'Landmark' };
-    if (/\b(park|garden|botanical|lake|river|waterfall|beach|nature|mountain|viewpoint|lookout|peak)\b/.test(blob)) return { category: 'run', icon: '🌿', label: 'Nature & Views' };
-    if (/\b(market|shopping|mall|boutique|store|bazaar)\b/.test(blob)) return { category: 'sight', icon: '🛍️', label: 'Shopping' };
-    return { category: 'sight', icon: '📍', label: 'Sightseeing' };
+    if (/\b(cafe|coffee|roaster|bakery|pastry|breakfast|brunch)\b/.test(blob)) return { category: 'food', icon: '☕', label: 'Cafe', type: 'food' };
+    if (/\b(restaurant|dinner|lunch|bistro|cuisine|eats|pizza|burger|tapas|trattoria|pasta|food)\b/.test(blob)) return { category: 'food', icon: '🍽️', label: 'Food & Drink', type: 'food' };
+    if (/\b(bar|pub|cocktail|brewery|wine|beer|nightlife)\b/.test(blob)) return { category: 'food', icon: '🍸', label: 'Bar & Drinks', type: 'food' };
+    if (/\b(tip|advice|pro tip|pass|ticket|transit|metro|discount|getting there|practical|rules|guide)\b/.test(blob) && !/\b(museum|castle|palace|church|park)\b/.test(blob)) {
+      return { category: 'tip', icon: '💡', label: 'Tip & Advice', type: 'tip' };
+    }
+    if (/\b(museum|gallery|exhibition|art|sculpture|mural)\b/.test(blob)) return { category: 'sight', icon: '🎨', label: 'Art & Culture', type: 'sight' };
+    if (/\b(church|basilica|cathedral|temple|monastery|palace|castle|fortress|monument|statue|historic|ruins)\b/.test(blob)) return { category: 'sight', icon: '🏛️', label: 'Landmark', type: 'sight' };
+    if (/\b(park|garden|botanical|lake|river|waterfall|beach|nature|mountain|viewpoint|lookout|peak)\b/.test(blob)) return { category: 'run', icon: '🌿', label: 'Nature & Views', type: 'sight' };
+    if (/\b(market|shopping|mall|boutique|store|bazaar)\b/.test(blob)) return { category: 'sight', icon: '🛍️', label: 'Shopping', type: 'sight' };
+    return { category: 'sight', icon: '📍', label: 'Sightseeing', type: 'sight' };
   }
 
   /**
@@ -107,7 +110,8 @@
                   website: typeof website === 'string' ? website.trim() : '',
                   category: catInfo.category,
                   icon: catInfo.icon,
-                  categoryLabel: catInfo.label
+                  categoryLabel: catInfo.label,
+                  type: catInfo.type || 'sight'
                 });
               }
             }
@@ -157,7 +161,8 @@
             website: spotUrl,
             category: catInfo.category,
             icon: catInfo.icon,
-            categoryLabel: catInfo.label
+            categoryLabel: catInfo.label,
+            type: catInfo.type || 'sight'
           });
         }
       }
@@ -379,6 +384,7 @@
     if (tbody && Array.isArray(spots)) {
       tbody.innerHTML = spots.map((spot, idx) => {
         const coordLabel = (spot.lat && spot.lng) ? `${spot.lat.toFixed(4)}, ${spot.lng.toFixed(4)}` : '';
+        const spotType = spot.type || (spot.category === 'food' ? 'food' : (spot.category === 'tip' ? 'tip' : 'sight'));
         return `
           <tr class="border-b border-slate-100 dark:border-slate-700/60 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
             <td class="p-2 text-center">
@@ -388,10 +394,14 @@
               <span class="mr-1">${spot.icon}</span> ${escapeHtml(spot.name)}
             </td>
             <td class="p-2 text-slate-500 dark:text-slate-400">
-              <span class="inline-block px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-750 text-[0.7rem] font-medium">${escapeHtml(spot.categoryLabel)}</span>
+              <select class="mappr-spot-type-select text-xs py-0.5 px-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200" data-spot-index="${idx}">
+                <option value="sight" ${spotType === 'sight' ? 'selected' : ''}>🏛️ Activity</option>
+                <option value="food" ${spotType === 'food' ? 'selected' : ''}>🍔 Food</option>
+                <option value="tip" ${spotType === 'tip' ? 'selected' : ''}>💡 Tip</option>
+              </select>
             </td>
-            <td class="p-2 text-slate-600 dark:text-slate-300 max-w-xs truncate" title="${escapeHtml(spot.summary)}">
-              ${escapeHtml(spot.summary || '—')}
+            <td class="p-2 text-slate-600 dark:text-slate-300 max-w-xs truncate" title="${escapeHtml(spot.summary || spot.tips || '')}">
+              ${escapeHtml(spot.summary || spot.tips || '—')}
             </td>
             <td class="p-2 font-mono text-slate-400 dark:text-slate-500 whitespace-nowrap">
               ${coordLabel ? `📍 ${coordLabel}` : '—'}
@@ -444,11 +454,16 @@
     const legIdx = parseInt(legSelect.value, 10);
     const leg = (typeof appData !== 'undefined' && Array.isArray(appData)) ? appData[legIdx] : null;
 
-    let options = '<option value="suggested" selected>★ Suggested Activities Pool (for Drag & Drop)</option>';
+    let options = `
+      <option value="auto" selected>✨ Auto-sort by Spot Type (Food → Food Quests, Tips → Tips, Sights → Suggested Activities)</option>
+      <option value="sights">🏛️ All as Suggested Activities (sights pool)</option>
+      <option value="food">🍔 All as Food Quests (cityFood)</option>
+      <option value="tips">💡 All as Tips (legTips)</option>
+    `;
     if (leg && Array.isArray(leg.days)) {
       leg.days.forEach((day, dIdx) => {
         const dateLabel = (typeof formatTripDateForDisplay === 'function') ? formatTripDateForDisplay(day.date) : day.date;
-        options += `<option value="day_${dIdx}">Day ${dIdx + 1} (${dateLabel})</option>`;
+        options += `<option value="day_${dIdx}">📅 Assign All to Day ${dIdx + 1} (${dateLabel})</option>`;
       });
     }
     destSelect.innerHTML = options;
@@ -464,7 +479,7 @@
     const legSelect = document.getElementById('mapprTargetLeg');
     const destSelect = document.getElementById('mapprTargetDestination');
     const legIdx = legSelect ? parseInt(legSelect.value, 10) : 0;
-    const destVal = destSelect ? destSelect.value : 'suggested';
+    const destVal = destSelect ? destSelect.value : 'auto';
 
     if (!appData || !appData[legIdx]) {
       alert('Selected trip leg not found.');
@@ -480,17 +495,48 @@
     }
 
     const targetLeg = appData[legIdx];
-    let importedCount = 0;
+    const legLabel = targetLeg.label || targetLeg.to || `Leg ${legIdx + 1}`;
+    let activitiesCount = 0;
+    let foodCount = 0;
+    let tipsCount = 0;
 
     selectedIndices.forEach(idx => {
       const spot = spots[idx];
       if (!spot) return;
 
+      const typeSelect = document.querySelector(`.mappr-spot-type-select[data-spot-index="${idx}"]`);
+      const rowType = typeSelect ? typeSelect.value : (spot.type || (spot.category === 'food' ? 'food' : (spot.category === 'tip' ? 'tip' : 'sight')));
+
       const actId = 'act_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
       const noteParts = [spot.summary, spot.tips ? `Tip: ${spot.tips}` : '', spot.whyGo ? `Why go: ${spot.whyGo}` : '', spot.website ? `Website: ${spot.website}` : ''].filter(Boolean);
       const notes = noteParts.join(' · ');
 
-      if (destVal === 'suggested') {
+      let effectiveDest = destVal;
+      if (destVal === 'auto') {
+        if (rowType === 'food') effectiveDest = 'food';
+        else if (rowType === 'tip') effectiveDest = 'tips';
+        else effectiveDest = 'sights';
+      }
+
+      if (effectiveDest === 'food') {
+        if (!Array.isArray(targetLeg.cityFood)) targetLeg.cityFood = [];
+        const foodDesc = spot.summary ? ` - ${spot.summary}` : '';
+        targetLeg.cityFood.push({
+          text: `${spot.icon || '🍽️'} ${spot.name}${foodDesc}`,
+          cost: '0',
+          done: false,
+          cityId: targetLeg.cityId || ''
+        });
+        foodCount++;
+      } else if (effectiveDest === 'tips') {
+        if (!Array.isArray(targetLeg.legTips)) targetLeg.legTips = [];
+        const tipText = spot.tips || (spot.summary ? `${spot.name}: ${spot.summary}` : spot.name);
+        targetLeg.legTips.push({
+          text: `💡 ${tipText}`,
+          cityId: targetLeg.cityId || ''
+        });
+        tipsCount++;
+      } else if (effectiveDest === 'sights' || effectiveDest === 'suggested') {
         if (!Array.isArray(targetLeg.sights)) targetLeg.sights = [];
         targetLeg.sights.push({
           id: actId,
@@ -502,12 +548,12 @@
           lng: spot.lng,
           link: spot.website || ''
         });
-        importedCount++;
-      } else if (destVal.startsWith('day_')) {
-        const dayIdx = parseInt(destVal.replace('day_', ''), 10);
+        activitiesCount++;
+      } else if (effectiveDest.startsWith('day_')) {
+        const dayIdx = parseInt(effectiveDest.replace('day_', ''), 10);
         if (targetLeg.days && targetLeg.days[dayIdx]) {
-          if (!Array.isArray(targetLeg.days[dayIdx].activities)) targetLeg.days[dayIdx].activities = [];
-          targetLeg.days[dayIdx].activities.push({
+          const targetDay = targetLeg.days[dayIdx];
+          const newActivity = {
             id: actId,
             time: '1 hr',
             title: `${spot.icon} ${spot.name}`,
@@ -519,8 +565,15 @@
             lng: spot.lng,
             link: spot.website || '',
             done: false
-          });
-          importedCount++;
+          };
+
+          if (Array.isArray(targetDay.activityItems)) {
+            targetDay.activityItems.push(newActivity);
+          } else {
+            if (!Array.isArray(targetDay.activities)) targetDay.activities = [];
+            targetDay.activities.push(newActivity);
+          }
+          activitiesCount++;
         }
       }
     });
@@ -534,10 +587,18 @@
       buildItinerary();
     }
 
+    const totalImported = activitiesCount + foodCount + tipsCount;
+    const parts = [];
+    if (activitiesCount > 0) parts.push(`${activitiesCount} Activities`);
+    if (foodCount > 0) parts.push(`${foodCount} Food Quests`);
+    if (tipsCount > 0) parts.push(`${tipsCount} Tips`);
+    const breakdown = parts.join(', ') || `${totalImported} items`;
+
+    const msg = `Successfully imported ${totalImported} spots into ${legLabel} (${breakdown})!`;
     if (typeof showToast === 'function') {
-      showToast(`Successfully imported ${importedCount} spots from Mappr!`);
+      showToast(msg);
     } else {
-      alert(`Successfully imported ${importedCount} spots from Mappr!`);
+      alert(msg);
     }
   }
 
