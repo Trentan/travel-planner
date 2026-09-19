@@ -1364,6 +1364,45 @@ function updateLegTip(legIdx, tipIdx, val) {
   else { appData[legIdx].legTips[tipIdx] = val; saveData(); }
 }
 
+function addDayNote(legIdx, dayIdx) {
+  if (!appData || !appData[legIdx]?.days?.[dayIdx]) return;
+  appData[legIdx].days[dayIdx].notes = 'Note: ';
+  saveData();
+  if (typeof rebuildItineraryPreservingScroll === 'function') {
+    rebuildItineraryPreservingScroll();
+  } else if (typeof buildItinerary === 'function') {
+    buildItinerary();
+  }
+  setTimeout(() => {
+    if (typeof focusCompactInlineEditable === 'function') {
+      focusCompactInlineEditable(`#day-note-text-${legIdx}-${dayIdx}`);
+    }
+  }, 60);
+}
+
+function updateDayNote(legIdx, dayIdx, val) {
+  if (!appData || !appData[legIdx]?.days?.[dayIdx]) return;
+  const cleaned = String(val || '').trim();
+  if (!cleaned || cleaned === 'Note:') {
+    delete appData[legIdx].days[dayIdx].notes;
+  } else {
+    appData[legIdx].days[dayIdx].notes = cleaned;
+  }
+  saveData();
+}
+
+function deleteDayNote(legIdx, dayIdx) {
+  if (!appData || !appData[legIdx]?.days?.[dayIdx]) return;
+  delete appData[legIdx].days[dayIdx].notes;
+  saveData();
+  if (typeof rebuildItineraryPreservingScroll === 'function') {
+    rebuildItineraryPreservingScroll();
+  } else if (typeof buildItinerary === 'function') {
+    buildItinerary();
+  }
+}
+
+
 function updateDayItemText(legIdx, dayIdx, category, itemIdx, text, fromTabs = false) {
   const item = appData[legIdx].days[dayIdx][category][itemIdx];
   const previousText = item.text;
@@ -2187,8 +2226,9 @@ function regenerateItineraryFromJourneys(linkedJourneys, legId) {
   // Merge notes from old days if they match by date
   newDays.forEach(nd => {
     const oldDay = leg.days.find(od => od.date === nd.date);
-    if (oldDay && oldDay.desc) {
-      nd.desc = oldDay.desc;
+    if (oldDay) {
+      if (oldDay.desc) nd.desc = oldDay.desc;
+      if (oldDay.notes) nd.notes = oldDay.notes;
     }
   });
 
@@ -2570,6 +2610,7 @@ function syncAllLegDays(silent = false) {
           if (oldDay.accomItems) nd.accomItems = oldDay.accomItems;
           if (oldDay.activityItems) nd.activityItems = oldDay.activityItems;
           if (oldDay.transportItems) nd.transportItems = oldDay.transportItems;
+          if (oldDay.notes) nd.notes = oldDay.notes;
         }
       });
     }

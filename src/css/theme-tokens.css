@@ -1,0 +1,242 @@
+
+/* Tailwind v4 Design Token System - mapped from existing CSS variables */
+@theme {
+  /* Primary Background Colors (Light Mode) */
+  --color-bg-primary: #f8fafb;
+  --color-bg-secondary: #f2f6fa;
+
+  /* Surface/Card Colors */
+  --color-surface-card: #ffffff;
+  --color-surface-input: #ffffff;
+
+  /* Text Colors (Light Mode) */
+  --color-text-primary: #0f172a;
+  --color-text-muted: #526173;
+  --color-text-light: #94a3b8;
+
+  /* Border Colors (Light Mode) */
+  --color-border: #dbe4ee;
+  --color-border-strong: #c3d1df;
+
+  /* Accent Colors */
+  --color-accent-teal: #0891b2;
+  --color-accent-teal-hover: #0e7490;
+  --color-accent-coral: #f43f5e;
+  --color-accent-coral-hover: #e11d48;
+  --color-accent-emphasis: rgb(8 145 178 / 0.28);
+
+  /* Status Colors */
+  --color-status-planned: #d97706;
+  --color-status-booked: #16a34a;
+  --color-status-confirmed: #059669;
+  --color-status-cancelled: #dc2626;
+
+  /* Button Colors */
+  --color-btn-secondary: #2C3E50;
+  --color-btn-secondary-hover: #243443;
+  --color-btn-success: #27AE60;
+  --color-btn-success-hover: #219150;
+  --color-btn-danger: #E74C3C;
+  --color-btn-danger-hover: #c93d30;
+  --color-btn-hover-bg: #f3f7fb;
+
+  /* Font Families */
+  --font-sans: "Twemoji Country Flags", 'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: "Twemoji Country Flags", 'Outfit', 'Playfair Display', Georgia, serif;
+  --font-mono: "Twemoji Country Flags", 'DM Mono', Fira Code, monospace;
+
+  /* Spacing Scale (aligned with existing --space-* vars) */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 0.75rem;   /* 12px */
+  --spacing-lg: 1rem;      /* 16px */
+  --spacing-xl: 1.5rem;    /* 24px */
+  --spacing-2xl: 2rem;     /* 32px */
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;   /* 6px */
+  --radius-md: 0.625rem;   /* 10px */
+  --radius-lg: 1rem;       /* 16px */
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-md: 0 6px 14px -8px rgb(15 23 42 / 0.2), 0 2px 6px -4px rgb(15 23 42 / 0.12);
+  --shadow-lg: 0 16px 28px -18px rgb(15 23 42 / 0.3), 0 8px 16px -10px rgb(15 23 42 / 0.2);
+}
+
+/* Dark mode CSS variable overrides (outside @theme block) */
+[data-theme="dark"] {
+  --color-bg-primary: #090d16;
+  --color-bg-secondary: #0f172a;
+  --color-surface-card: #1e293b;
+  --color-surface-input: #1e293b;
+  --color-text-primary: #f8fafc;
+  --color-text-muted: #cbd5e1;
+  --color-text-light: #94a3b8;
+  --color-border: #3b4b62;
+  --color-border-strong: #526680;
+  --color-accent-teal: #22d3ee;
+  --color-accent-teal-hover: #06b6d4;
+  --color-accent-coral: #fb7185;
+  --color-accent-coral-hover: #fda4af;
+  --color-accent-emphasis: rgb(34 211 238 / 0.32);
+  --color-status-planned: #fbbf24;
+  --color-status-booked: #34d399;
+  --color-status-confirmed: #10b981;
+  --color-status-cancelled: #f87171;
+  --color-btn-secondary: #3E526C;
+  --color-btn-secondary-hover: #4A5F7C;
+  --color-btn-success: #34D399;
+  --color-btn-success-hover: #10B981;
+  --color-btn-danger: #F87171;
+  --color-btn-danger-hover: #EF4444;
+  --color-btn-hover-bg: #0f172a;
+}
+
+/* Dark theme component overrides cluster */
+[data-theme="dark"] .app-menu-btn {
+  @apply text-white;
+}
+
+[data-theme="dark"] .app-menu-btn:hover {
+  @apply bg-white/10;
+}
+
+[data-theme="dark"] .save-status,
+[data-theme="dark"] .timestamp-status {
+  @apply text-white/80;
+}
+
+[data-theme="dark"] .app-menu-switch-track {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] .app-menu-switch-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"] .app-menu-actions-panel {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(15, 23, 42, 0.95);
+}
+
+[data-theme="dark"] .app-menu-section-header {
+  color: rgba(241, 245, 249, 0.6);
+}
+
+[data-theme="dark"] .app-menu-divider {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .mobile-menu-sheet-panel {
+  background: #0f172a;
+  border: 1px solid #334155;
+}
+
+[data-theme="dark"] .mobile-menu-sheet-header {
+  background: #0f172a;
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .mobile-menu-sheet .app-menu-btn {
+  @apply bg-slate-800 border-slate-700 text-slate-100;
+}
+
+[data-theme="dark"] .mobile-menu-sheet .app-menu-btn:hover {
+  @apply bg-slate-700 border-slate-600;
+}
+
+[data-theme="dark"] .mobile-menu-sheet .app-menu-btn:disabled {
+  @apply bg-slate-800 border-slate-700 text-slate-500;
+  opacity: 1;
+}
+
+[data-theme="dark"] .mobile-menu-sheet .app-menu-switch {
+  @apply bg-slate-800 border-slate-700;
+}
+
+[data-theme="dark"] .mobile-menu-sheet .app-menu-switch-label {
+  @apply text-slate-100;
+}
+
+[data-theme="dark"] .mobile-menu-sheet-header h2 {
+  @apply text-white;
+}
+
+[data-theme="dark"] .mobile-menu-sheet-header p {
+  @apply text-white/70;
+}
+
+[data-theme="dark"] .mobile-menu-trip-status {
+  border-color: rgba(36, 72, 93, 0.1);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.65) 0%, rgba(30, 41, 59, 0.75) 100%);
+}
+
+[data-theme="dark"] .mobile-menu-trip-value,
+[data-theme="dark"] .mobile-menu-trip-label,
+[data-theme="dark"] .mobile-menu-status-row span {
+  @apply text-white;
+}
+
+[data-theme="dark"] .mobile-menu-trip-label,
+[data-theme="dark"] .mobile-menu-section-title {
+  @apply text-white/70;
+}
+
+[data-theme="dark"] .daily-timeline-time,
+[data-theme="dark"] .daily-timeline-marker,
+[data-theme="dark"] .daily-timeline-content,
+[data-theme="dark"] .timeline-empty {
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+[data-theme="dark"] .daily-timeline-time {
+  background: rgba(15, 23, 42, 0.86);
+}
+
+[data-theme="dark"] .compact-day-chip-date {
+  @apply text-slate-300;
+}
+
+[data-theme="dark"] .compact-day-chip-route {
+  @apply text-slate-100;
+}
+
+[data-theme="dark"] .daily-timeline-marker {
+  background: rgba(15, 23, 42, 0.92);
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.55);
+}
+
+[data-theme="dark"] .daily-timeline-content,
+[data-theme="dark"] .timeline-empty {
+  background: rgba(15, 23, 42, 0.76);
+}
+
+[data-theme="dark"] .daily-timeline-item:hover .daily-timeline-time.is-clickable,
+[data-theme="dark"] .daily-timeline-time.is-clickable:hover,
+[data-theme="dark"] .daily-timeline-time.is-clickable:focus-visible {
+  border-color: rgba(94, 182, 206, 0.52);
+  background: rgba(30, 41, 59, 0.94);
+  color: rgba(226, 245, 252, 0.98);
+  box-shadow: 0 0 0 2px rgba(94, 182, 206, 0.22);
+}
+
+[data-theme="dark"] .daily-timeline-item:hover .daily-timeline-marker.is-clickable,
+[data-theme="dark"] .daily-timeline-marker.is-clickable:hover,
+[data-theme="dark"] .daily-timeline-marker.is-clickable:focus-visible {
+  border-color: rgba(94, 182, 206, 0.6);
+  color: rgba(226, 245, 252, 0.98);
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.62), 0 0 0 2px rgba(94, 182, 206, 0.3);
+}
+
+/* Inline action links */
+@layer components {
+  .inline-action-link {
+    @apply text-[0.8rem] text-[#3498DB] no-underline;
+  }
+
+  .inline-action-link:hover {
+    @apply underline;
+  }
+}
