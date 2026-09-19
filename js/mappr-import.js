@@ -7,6 +7,17 @@
 (function (window) {
   'use strict';
 
+  function escapeHtml(text) {
+    if (typeof escapeCompactText === 'function') return escapeCompactText(text);
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   /**
    * Infer activity category from spot name, summary, and why_go
    */
@@ -23,7 +34,7 @@
   }
 
   /**
-   * Parse Nuxt 3 flattened array payload or standard JSON
+   * Parse Nuxt 3 flattened array payload or standard JSON or HTML
    */
   function parseMapprPayload(rawInput) {
     if (!rawInput) return { spots: [], title: '', city: '' };
@@ -53,14 +64,10 @@
       try {
         data = JSON.parse(rawInput);
       } catch (e) {
-        // Not valid JSON
+        // Not valid JSON directly
       }
     } else if (Array.isArray(rawInput) || typeof rawInput === 'object') {
       data = rawInput;
-    }
-
-    if (!data) {
-      return { spots: [], title: title || 'Mappr Map', city };
     }
 
     // Nuxt 3 stores flat serialized array of pointers
@@ -74,10 +81,8 @@
 
       const spots = [];
 
-      // Scan items in array that look like map spot objects
       data.forEach(item => {
         if (item && typeof item === 'object' && !Array.isArray(item)) {
-          // Identify spots by characteristic properties
           if (item.name && (item.lat !== undefined || item.latitude !== undefined) && (item.lon !== undefined || item.lng !== undefined)) {
             const rawName = deref(item.name);
             if (typeof rawName === 'string' && rawName.trim().length > 0) {
@@ -90,7 +95,6 @@
               const website = deref(item.website) || '';
               const catInfo = inferSpotCategory(rawName, summary, whyGo);
 
-              // Avoid duplicates
               if (!spots.some(s => s.name.toLowerCase() === rawName.toLowerCase())) {
                 spots.push({
                   name: rawName.trim(),
@@ -109,7 +113,6 @@
             }
           }
 
-          // Look for map metadata (title / city)
           if (!title && item.title) {
             const rawTitle = deref(item.title);
             if (typeof rawTitle === 'string') title = rawTitle.trim();
@@ -121,7 +124,47 @@
         }
       });
 
-      return { spots, title: title || 'Mappr Curated Map', city };
+      if (spots.length > 0) {
+        return { spots, title: title || 'Mappr Curated Map', city };
+      }
+    }
+
+    // Markdown link fallback (e.g. from Jina Reader markdown or text extraction)
+    if (typeof rawInput === 'string' && rawInput.includes('/spots/')) {
+      const spots = [];
+      const titleMatch = rawInput.match(/Title:\s*([^\n|]+)/i);
+      if (titleMatch) title = titleMatch[1].trim();
+
+      const spotRegex = /\[([A-Z0-9][^\]\n]{2,80})\]\((https?:\/\/[^\s)]+\/spots\/[^)#\s]+)[^)]*\)/g;
+      let match;
+      while ((match = spotRegex.exec(rawInput)) !== null) {
+        const fullText = match[1].trim();
+        const spotUrl = match[2];
+        const parts = fullText.split(/(?<=[.!?])\s+|(?<=[a-z])\s+(?=[A-Z])/);
+        const name = parts[0] || fullText;
+        const summary = parts.slice(1).join(' ') || '';
+        const catInfo = inferSpotCategory(name, summary, '');
+
+        if (!spots.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+          spots.push({
+            name: name.trim(),
+            lat: null,
+            lng: null,
+            summary: summary.trim(),
+            tips: '',
+            whyGo: '',
+            formatted_address: '',
+            website: spotUrl,
+            category: catInfo.category,
+            icon: catInfo.icon,
+            categoryLabel: catInfo.label
+          });
+        }
+      }
+
+      if (spots.length > 0) {
+        return { spots, title: title || 'Mappr Curated Map', city };
+      }
     }
 
     return { spots: [], title: title || 'Mappr Map', city };
@@ -134,30 +177,60 @@
     const cleanUrl = String(mapUrl || '').trim();
     if (!cleanUrl) throw new Error('Please enter a valid Mappr map URL.');
 
-    // 1. Try direct fetch
+    // If user accidentally pasted HTML or JSON into URL field, parse it directly
+    if (cleanUrl.includes('<script') || cleanUrl.startsWith('{') || cleanUrl.startsWith('[')) {
+      return parseMapprPayload(cleanUrl);
+    }
+
+    // 1. Try Jina Reader with HTML format (bypasses Cloudflare bot block and provides full __NUXT_DATA__)
+    try {
+      const jinaUrl = 'https://r.jina.ai/' + cleanUrl;
+      const res = await fetch(jinaUrl, {
+        headers: { 'x-return-format': 'html' }
+      });
+      if (res.ok) {
+        const text = await res.text();
+        if (text && (text.includes('__NUXT_DATA__') || text.includes('spots') || text.includes('<html'))) {
+          const parsed = parseMapprPayload(text);
+          if (parsed && parsed.spots && parsed.spots.length > 0) {
+            return parsed;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[MapprImport] Jina reader fallback error:', err);
+    }
+
+    // 2. Try direct fetch
     try {
       const res = await fetch(cleanUrl, { mode: 'cors' });
       if (res.ok) {
         const text = await res.text();
-        return parseMapprPayload(text);
+        const parsed = parseMapprPayload(text);
+        if (parsed && parsed.spots && parsed.spots.length > 0) {
+          return parsed;
+        }
       }
     } catch (err) {
-      // Direct CORS blocked, proceed to fallback proxy
+      // Direct CORS blocked
     }
 
-    // 2. Try AllOrigins public CORS proxy
+    // 3. Try AllOrigins public CORS proxy
     try {
       const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(cleanUrl);
       const res = await fetch(proxyUrl);
       if (res.ok) {
         const text = await res.text();
-        return parseMapprPayload(text);
+        const parsed = parseMapprPayload(text);
+        if (parsed && parsed.spots && parsed.spots.length > 0) {
+          return parsed;
+        }
       }
     } catch (err) {
       // Proxy failed
     }
 
-    throw new Error('Could not fetch map URL directly due to browser CORS policies. Please paste the page HTML into the fallback box below.');
+    throw new Error('Could not automatically fetch map spots due to CORS/Cloudflare restrictions. Please open the link in your browser, copy the page source or text, and paste it into the box below.');
   }
 
   /**
@@ -166,59 +239,31 @@
   function openMapprImportModal() {
     let modal = document.getElementById('mappr-import-modal');
     if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'mappr-import-modal';
-      modal.className = 'modal mappr-modal';
-      modal.setAttribute('role', 'dialog');
-      modal.setAttribute('aria-modal', 'true');
-      modal.setAttribute('aria-labelledby', 'mapprModalTitle');
-      document.body.appendChild(modal);
+      console.warn('[MapprImport] #mappr-import-modal not found in DOM.');
+      return;
     }
 
-    modal.innerHTML = `
-      <div class="modal-overlay" onclick="closeMapprImportModal()"></div>
-      <div class="modal-content max-w-lg p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
-          <div class="flex items-center gap-2">
-            <span class="text-2xl">🗺️</span>
-            <h3 id="mapprModalTitle" class="text-lg font-bold text-slate-800 dark:text-slate-100">Import from Mappr.com</h3>
-          </div>
-          <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl font-bold p-1" onclick="closeMapprImportModal()">✕</button>
-        </div>
-
-        <div class="mt-4 space-y-4 text-sm text-slate-600 dark:text-slate-300">
-          <p>
-            Paste a curated map link from <a href="https://mappr.com/maps" target="_blank" class="text-teal-600 dark:text-teal-400 underline font-semibold">mappr.com/maps</a> to automatically import attractions, cafes, viewpoints, and photo spots into your trip.
-          </p>
-
-          <div>
-            <label for="mapprUrlInput" class="block font-semibold mb-1 text-slate-700 dark:text-slate-200">Mappr Map URL:</label>
-            <input type="url" id="mapprUrlInput" placeholder="https://mappr.com/maps/the-perfect-2-day-bratislava-itinerary-2c3978" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500">
-          </div>
-
-          <div id="mapprFetchStatus" class="hidden p-3 rounded-xl text-xs"></div>
-
-          <details class="text-xs text-slate-500 dark:text-slate-400">
-            <summary class="cursor-pointer hover:underline">Or paste raw page source / JSON</summary>
-            <div class="mt-2">
-              <textarea id="mapprRawInput" rows="4" placeholder="Paste full page HTML or Nuxt payload here if offline or CORS blocked..." class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl font-mono text-xs"></textarea>
-            </div>
-          </details>
-        </div>
-
-        <div class="mt-6 flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-700">
-          <button type="button" class="action-btn action-btn-secondary px-4 py-2 text-xs" onclick="closeMapprImportModal()">Cancel</button>
-          <button type="button" id="mapprFetchBtn" class="action-btn action-btn-primary px-5 py-2 text-xs font-semibold" onclick="handleMapprFetchSubmit()">Fetch Spots</button>
-        </div>
-      </div>
-    `;
+    const statusBox = document.getElementById('mapprFetchStatus');
+    if (statusBox) {
+      statusBox.className = 'hidden p-3 rounded-xl text-xs';
+      statusBox.textContent = '';
+    }
+    const urlInput = document.getElementById('mapprUrlInput');
+    if (urlInput) urlInput.value = '';
+    const rawInput = document.getElementById('mapprRawInput');
+    if (rawInput) rawInput.value = '';
 
     modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => urlInput?.focus());
   }
 
   function closeMapprImportModal() {
     const modal = document.getElementById('mappr-import-modal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }
   }
 
   /**
@@ -243,9 +288,12 @@
 
     if (statusBox) {
       statusBox.className = 'p-3 rounded-xl text-xs bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 block';
-      statusBox.textContent = 'Fetching and parsing map spots...';
+      statusBox.textContent = '⏳ Fetching and extracting map spots...';
     }
-    if (fetchBtn) fetchBtn.disabled = true;
+    if (fetchBtn) {
+      fetchBtn.disabled = true;
+      fetchBtn.textContent = 'Fetching...';
+    }
 
     try {
       let result = null;
@@ -256,18 +304,28 @@
       }
 
       if (!result || !Array.isArray(result.spots) || result.spots.length === 0) {
-        throw new Error('No spots could be extracted from this map. Please check the URL or paste the raw page HTML.');
+        throw new Error('No spots could be extracted from this map. Please check the URL or paste the raw page HTML into the fallback box.');
       }
 
-      closeMapprImportModal();
-      openMapprReviewModal(result.spots, result.title, result.city);
+      if (statusBox) {
+        statusBox.className = 'p-3 rounded-xl text-xs bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 block';
+        statusBox.textContent = `✓ Extracted ${result.spots.length} spots! Opening review...`;
+      }
+
+      setTimeout(() => {
+        closeMapprImportModal();
+        openMapprReviewModal(result.spots, result.title, result.city);
+      }, 400);
     } catch (err) {
       if (statusBox) {
         statusBox.className = 'p-3 rounded-xl text-xs bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 block';
         statusBox.textContent = err.message || 'Failed to extract spots.';
       }
     } finally {
-      if (fetchBtn) fetchBtn.disabled = false;
+      if (fetchBtn) {
+        fetchBtn.disabled = false;
+        fetchBtn.textContent = 'Fetch Spots';
+      }
     }
   }
 
@@ -284,128 +342,80 @@
       city = detectedCity || spotsOrResult.city;
     }
     closeMapprImportModal();
-    let modal = document.getElementById('mappr-review-modal');
+
+    const modal = document.getElementById('mappr-review-modal');
     if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'mappr-review-modal';
-      modal.className = 'modal mappr-review-modal';
-      modal.setAttribute('role', 'dialog');
-      modal.setAttribute('aria-modal', 'true');
-      modal.setAttribute('aria-labelledby', 'mapprReviewTitle');
-      document.body.appendChild(modal);
+      console.warn('[MapprImport] #mappr-review-modal not found in DOM.');
+      return;
     }
 
-    const legs = (typeof appData !== 'undefined' && Array.isArray(appData)) ? appData : [];
+    window._currentMapprSpots = spots || [];
 
-    // Pre-select matching leg if detected city matches
+    const titleEl = document.getElementById('mapprReviewTitle');
+    if (titleEl) titleEl.textContent = '🗺️ ' + (title || 'Mappr Curated Spots');
+
+    const subtitleEl = document.getElementById('mapprReviewSubtitle');
+    if (subtitleEl) subtitleEl.textContent = `Found ${spots ? spots.length : 0} spots. Select destination and items to merge into your itinerary.`;
+
+    const legs = (typeof appData !== 'undefined' && Array.isArray(appData)) ? appData : [];
     let matchedLegIdx = 0;
-    if (detectedCity && legs.length > 0) {
+    if (city && legs.length > 0) {
       const idx = legs.findIndex(l => {
         const name = (l.label || l.to || '').toLowerCase();
-        return name.includes(detectedCity.toLowerCase());
+        return name.includes(city.toLowerCase());
       });
       if (idx !== -1) matchedLegIdx = idx;
     }
 
-    const legOptionsHtml = legs.map((leg, idx) => {
-      const label = leg.label || leg.to || `Leg ${idx + 1}`;
-      return `<option value="${idx}" ${idx === matchedLegIdx ? 'selected' : ''}>${escapeCompactText(label)}</option>`;
-    }).join('');
+    const legSelect = document.getElementById('mapprTargetLeg');
+    if (legSelect) {
+      legSelect.innerHTML = legs.map((leg, idx) => {
+        const label = leg.label || leg.to || `Leg ${idx + 1}`;
+        return `<option value="${idx}" ${idx === matchedLegIdx ? 'selected' : ''}>${escapeHtml(label)}</option>`;
+      }).join('') || '<option value="0">Default Trip Leg</option>';
+    }
 
-    const spotsRowsHtml = spots.map((spot, idx) => {
-      const coordLabel = (spot.lat && spot.lng) ? `${spot.lat.toFixed(4)}, ${spot.lng.toFixed(4)}` : '';
-      return `
-        <tr class="border-b border-slate-100 dark:border-slate-700/60 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
-          <td class="p-2.5 text-center">
-            <input type="checkbox" class="mappr-spot-check rounded cursor-pointer" data-spot-index="${idx}" checked>
-          </td>
-          <td class="mappr-spot-name p-2.5 text-sm font-semibold text-slate-800 dark:text-slate-100 whitespace-nowrap">
-            <span class="mr-1">${spot.icon}</span> ${escapeCompactText(spot.name)}
-          </td>
-          <td class="p-2.5 text-xs text-slate-500 dark:text-slate-400">
-            <span class="inline-block px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-[0.7rem] font-medium">${spot.categoryLabel}</span>
-          </td>
-          <td class="p-2.5 text-xs text-slate-600 dark:text-slate-300 max-w-xs truncate" title="${escapeCompactText(spot.summary)}">
-            ${escapeCompactText(spot.summary || '—')}
-          </td>
-          <td class="p-2.5 text-xs font-mono text-slate-400 dark:text-slate-500 whitespace-nowrap">
-            ${coordLabel ? `📍 ${coordLabel}` : '—'}
-          </td>
-        </tr>
-      `;
-    }).join('');
+    const tbody = document.getElementById('mapprSpotsTableBody');
+    if (tbody && Array.isArray(spots)) {
+      tbody.innerHTML = spots.map((spot, idx) => {
+        const coordLabel = (spot.lat && spot.lng) ? `${spot.lat.toFixed(4)}, ${spot.lng.toFixed(4)}` : '';
+        return `
+          <tr class="border-b border-slate-100 dark:border-slate-700/60 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+            <td class="p-2 text-center">
+              <input type="checkbox" class="mappr-spot-check rounded cursor-pointer" data-spot-index="${idx}" checked>
+            </td>
+            <td class="mappr-spot-name p-2 font-semibold text-slate-800 dark:text-slate-100 whitespace-nowrap">
+              <span class="mr-1">${spot.icon}</span> ${escapeHtml(spot.name)}
+            </td>
+            <td class="p-2 text-slate-500 dark:text-slate-400">
+              <span class="inline-block px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-750 text-[0.7rem] font-medium">${escapeHtml(spot.categoryLabel)}</span>
+            </td>
+            <td class="p-2 text-slate-600 dark:text-slate-300 max-w-xs truncate" title="${escapeHtml(spot.summary)}">
+              ${escapeHtml(spot.summary || '—')}
+            </td>
+            <td class="p-2 font-mono text-slate-400 dark:text-slate-500 whitespace-nowrap">
+              ${coordLabel ? `📍 ${coordLabel}` : '—'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
 
-    modal.innerHTML = `
-      <div class="modal-overlay" onclick="closeMapprReviewModal()"></div>
-      <div class="modal-content max-w-3xl max-h-[85vh] flex flex-col p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700 shrink-0">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-2xl">🗺️</span>
-              <h3 id="mapprReviewTitle" class="text-lg font-bold text-slate-800 dark:text-slate-100">${escapeCompactText(mapTitle || 'Mappr Spots')}</h3>
-            </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Found ${spots.length} spots. Select destination and items to merge into your itinerary.</p>
-          </div>
-          <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl font-bold p-1" onclick="closeMapprReviewModal()">✕</button>
-        </div>
+    const counter = document.getElementById('mapprSelectedCount');
+    if (counter) counter.textContent = `${spots ? spots.length : 0} selected`;
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-3 border-b border-slate-200 dark:border-slate-700 shrink-0 text-sm">
-          <div>
-            <label for="mapprTargetLeg" class="block font-semibold text-xs text-slate-700 dark:text-slate-300 mb-1">Target Trip Leg / City:</label>
-            <select id="mapprTargetLeg" class="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-800 dark:text-slate-100" onchange="updateMapprDaysDropdown()">
-              ${legOptionsHtml || '<option value="0">Default Trip Leg</option>'}
-            </select>
-          </div>
-          <div>
-            <label for="mapprTargetDestination" class="block font-semibold text-xs text-slate-700 dark:text-slate-300 mb-1">Destination:</label>
-            <select id="mapprTargetDestination" class="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-800 dark:text-slate-100">
-              <option value="suggested" selected>★ Suggested Activities Pool (for Drag & Drop)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between py-2 shrink-0 text-xs">
-          <div class="flex items-center gap-2">
-            <button type="button" class="text-teal-600 dark:text-teal-400 font-semibold hover:underline" onclick="toggleAllMapprSpots(true)">Select All</button>
-            <span class="text-slate-300 dark:text-slate-600">|</span>
-            <button type="button" class="text-slate-500 hover:underline" onclick="toggleAllMapprSpots(false)">Deselect All</button>
-          </div>
-          <span id="mapprSelectedCount" class="font-medium text-slate-500 dark:text-slate-400">${spots.length} selected</span>
-        </div>
-
-        <div class="overflow-y-auto flex-1 border border-slate-200 dark:border-slate-700 rounded-xl">
-          <table class="w-full text-left border-collapse">
-            <thead class="bg-slate-50 dark:bg-slate-900 text-[0.72rem] text-slate-500 uppercase tracking-wider sticky top-0 border-b border-slate-200 dark:border-slate-700">
-              <tr>
-                <th class="p-2.5 w-10 text-center">Import</th>
-                <th class="p-2.5">Spot Name</th>
-                <th class="p-2.5">Category</th>
-                <th class="p-2.5">Summary</th>
-                <th class="p-2.5">Coordinates</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${spotsRowsHtml}
-            </tbody>
-          </table>
-        </div>
-
-        <div class="mt-4 flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-700 shrink-0">
-          <button type="button" class="action-btn action-btn-secondary px-4 py-2 text-xs" onclick="closeMapprReviewModal()">Cancel</button>
-          <button type="button" id="mapprImportConfirmBtn" class="action-btn action-btn-primary px-5 py-2 text-xs font-semibold" onclick="confirmMapprImport()">Import Spots</button>
-        </div>
-      </div>
-    `;
-
-    window._currentMapprSpots = spots;
     modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
     updateMapprDaysDropdown();
     setupSpotCheckListeners();
   }
 
   function closeMapprReviewModal() {
     const modal = document.getElementById('mappr-review-modal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }
   }
 
   function setupSpotCheckListeners() {
@@ -479,33 +489,35 @@
       const actId = 'act_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
       const noteParts = [spot.summary, spot.tips ? `Tip: ${spot.tips}` : '', spot.whyGo ? `Why go: ${spot.whyGo}` : '', spot.website ? `Website: ${spot.website}` : ''].filter(Boolean);
       const notes = noteParts.join(' · ');
-      const location = spot.formatted_address || (spot.lat && spot.lng ? `${spot.lat.toFixed(5)}, ${spot.lng.toFixed(5)}` : '');
 
       if (destVal === 'suggested') {
-        if (!targetLeg.suggestedActivities) targetLeg.suggestedActivities = [];
-        targetLeg.suggestedActivities.push({
+        if (!Array.isArray(targetLeg.sights)) targetLeg.sights = [];
+        targetLeg.sights.push({
           id: actId,
-          text: spot.name,
-          category: spot.category,
-          location: location,
+          name: spot.name,
+          category: spot.category || 'sight',
           notes: notes,
+          address: spot.formatted_address || '',
           lat: spot.lat,
           lng: spot.lng,
-          cost: '',
-          time: '1-2 hrs',
-          assignedDayIdx: null
+          link: spot.website || ''
         });
         importedCount++;
       } else if (destVal.startsWith('day_')) {
         const dayIdx = parseInt(destVal.replace('day_', ''), 10);
         if (targetLeg.days && targetLeg.days[dayIdx]) {
-          if (!targetLeg.days[dayIdx].activityItems) targetLeg.days[dayIdx].activityItems = [];
-          targetLeg.days[dayIdx].activityItems.push({
-            activityId: actId,
-            text: spot.name,
+          if (!Array.isArray(targetLeg.days[dayIdx].activities)) targetLeg.days[dayIdx].activities = [];
+          targetLeg.days[dayIdx].activities.push({
+            id: actId,
+            time: '1 hr',
+            title: `${spot.icon} ${spot.name}`,
+            category: spot.category || 'sight',
             cost: '',
-            location: location,
             notes: notes,
+            address: spot.formatted_address || '',
+            lat: spot.lat,
+            lng: spot.lng,
+            link: spot.website || '',
             done: false
           });
           importedCount++;
@@ -531,6 +543,7 @@
 
   // Export module
   const MapprImportModule = {
+    escapeHtml,
     inferSpotCategory,
     parseMapprPayload,
     fetchMapprMapUrl,
@@ -546,6 +559,7 @@
     window.openMapprImportModal = openMapprImportModal;
     window.closeMapprImportModal = closeMapprImportModal;
     window.handleMapprFetchSubmit = handleMapprFetchSubmit;
+    window.openMapprReviewModal = openMapprReviewModal;
     window.closeMapprReviewModal = closeMapprReviewModal;
     window.toggleAllMapprSpots = toggleAllMapprSpots;
     window.updateMapprDaysDropdown = updateMapprDaysDropdown;
