@@ -90,6 +90,11 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for the development workflow.
 
 The original private polish sprint was migrated into closed GitHub Issues with the `migrated` and `archive` labels. Active planning now happens in [GitHub Issues](https://github.com/Trentan/travel-planner/issues).
 
+## Feature Comparisons & Roadmap
+
+See [docs/tripmapper-comparison.md](./docs/tripmapper-comparison.md) for a comprehensive feature gap audit and architectural benchmark against commercial tools like TripMapper.co.
+
 ## License
 
 MIT. See [LICENSE](./LICENSE).
+
