@@ -57,7 +57,12 @@ async function run() {
 
   // Check 6-month validity rule logic presence
   assert(guideJs.includes('passportTargetDate'), 'guide.js must calculate target 6-month passport expiry');
-  console.log('✓ Issue #96 international readiness verified');
+
+  // Check packing.js integration
+  const packingJs = readFileSync(resolve('js/packing.js'), 'utf8');
+  assert(packingJs.includes('packing-guide-btn-readiness'), 'packing.js must include readiness guide button');
+  assert(packingJs.includes("activeGuidePanel === 'readiness'"), 'packing.js must support readiness guide panel');
+  console.log('✓ Issue #96 international readiness and packing guide integration verified');
 
   // 5. Verify index.html modal bindings and buttons
   console.log('5. Testing index.html UI Entry Points...');

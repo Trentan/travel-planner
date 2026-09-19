@@ -924,8 +924,11 @@ function toggleReadinessCheckItem(key) {
 }
 
 function renderReadinessChecklist() {
-  const container = document.getElementById('readinessChecklistMount');
-  if (!container) return;
+  const mounts = [
+    document.getElementById('readinessChecklistMount'),
+    document.getElementById('packingReadinessChecklistMount')
+  ].filter(Boolean);
+  if (mounts.length === 0) return;
 
   const escapeFn = typeof escapeHtmlText === 'function' ? escapeHtmlText : (s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'));
   const state = getReadinessChecklistState();
@@ -946,7 +949,7 @@ function renderReadinessChecklist() {
     `;
   }).join('');
 
-  container.innerHTML = `
+  const checklistHtml = `
     <div class="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col gap-3">
       <div class="flex items-center justify-between flex-wrap gap-2">
         <div class="font-semibold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
@@ -962,12 +965,13 @@ function renderReadinessChecklist() {
       </div>
     </div>
   `;
+
+  mounts.forEach(container => {
+    container.innerHTML = checklistHtml;
+  });
 }
 
-function renderReadinessGuide() {
-  const container = document.getElementById('readinessContainer');
-  if (!container) return;
-
+function buildReadinessGuideHtml(checklistMountId = 'readinessChecklistMount') {
   const escapeFn = typeof escapeHtmlText === 'function' ? escapeHtmlText : (s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'));
   const countries = getTripCountries();
   const { firstDate, lastDate, passportTargetDate } = getTripDatesRange();
@@ -1048,7 +1052,7 @@ function renderReadinessGuide() {
     `;
   }).join('');
 
-  container.innerHTML = `
+  return `
     <!-- Top Summary Banner -->
     <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-200 dark:border-blue-800/60 rounded-xl flex flex-col gap-2.5">
       <div class="flex items-center justify-between flex-wrap gap-2">
@@ -1072,7 +1076,7 @@ function renderReadinessGuide() {
     </div>
 
     <!-- Interactive Checklist Mount -->
-    <div id="readinessChecklistMount"></div>
+    <div id="${checklistMountId}"></div>
 
     <!-- Country Guidance Cards -->
     <div class="flex flex-col gap-4 mt-2">
@@ -1082,7 +1086,12 @@ function renderReadinessGuide() {
       ${countryCardsHtml}
     </div>
   `;
+}
 
+function renderReadinessGuide() {
+  const container = document.getElementById('readinessContainer');
+  if (!container) return;
+  container.innerHTML = buildReadinessGuideHtml('readinessChecklistMount');
   renderReadinessChecklist();
 }
 
@@ -1101,6 +1110,7 @@ window.dismissWelcomeTutorial = dismissWelcomeTutorial;
 window.switchGuideTab = switchGuideTab;
 window.openReadinessGuide = openReadinessGuide;
 window.renderReadinessGuide = renderReadinessGuide;
+window.buildReadinessGuideHtml = buildReadinessGuideHtml;
 window.renderReadinessChecklist = renderReadinessChecklist;
 window.toggleReadinessCheckItem = toggleReadinessCheckItem;
 window.getTripCountries = getTripCountries;
