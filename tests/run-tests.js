@@ -34,9 +34,11 @@ const { runStorageEngineSuite } = require('./storage-engine-suite');
 const { runDesktopSplitPrintUnitTests } = require('./desktop-split-print.test');
 const { runUploadAllLocalTripsBenchmarkAndTest } = require('./upload-all-local-trips.test');
 const { runWeatherNotesSuite } = require('./weather-notes-test');
+const { runMapprImportTests } = require('./mappr-import.test');
 
 async function run() {
   try {
+    if (typeof runMapprImportTests === 'function') await runMapprImportTests();
     if (typeof runWeatherNotesSuite === 'function') runWeatherNotesSuite();
     if (typeof runDesktopSplitPrintUnitTests === 'function') await runDesktopSplitPrintUnitTests();
     await runCloudStorageXssTests();
