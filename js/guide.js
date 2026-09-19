@@ -311,40 +311,103 @@ let tutorialActive = false;
 const TUTORIAL_STEPS = [
   {
     target: '#mainTitle',
-    mobileTarget: '.app-tabs-nav',   // desktop header is hidden on mobile
-    title: 'Your Trip Title',
-    text: 'On desktop, click the trip title at the top to rename it. On mobile, use the ☰ menu → "Rename Trip".',
-    position: 'bottom'
-  },
-  {
-    target: '.app-menu-right',
-    mobileTarget: '.mobile-menu-sheet-panel',  // hamburger button visible on mobile
-    title: 'View Modes & Tools',
-    text: 'Use Read Only, Cities, AI Builder, Guide, and more from the top menu. On mobile, tap the ☰ hamburger for the full menu.',
+    mobileTarget: '.app-tabs-nav',
+    title: '🧭 Trip Overview & Customization',
+    text: 'Welcome to Travel Planner! Click your trip title to rename your trip, or click the emoji icon to pick custom travel symbols.',
     position: 'bottom',
-      onEnterMobile: () => { if (typeof toggleMobileMenu === 'function' && !document.getElementById('mobileMenuSheet').classList.contains('open')) toggleMobileMenu(); },
-      onLeaveMobile: () => { if (typeof closeMobileMenu === 'function') closeMobileMenu(); }
+    onEnter: () => { if (typeof switchTab === 'function') switchTab('itinerary'); }
   },
   {
     target: '#cityNav',
     mobileTarget: '#cityNav',
-    title: 'City Filter Navigator',
-    text: 'Filter your view by city across all tabs. "All" shows everything, or select a specific city to see only its items.',
+    title: '🏙️ City Filter & Route Navigation',
+    text: 'Filter entire itinerary days, stays, and transit by city. Click "+ Add City" to dynamically add new destinations and auto-cascade trip dates.',
     position: 'bottom'
   },
   {
-    target: '.app-tabs-nav',
-    mobileTarget: '.app-tabs-nav',
-    title: 'Navigation Tabs',
-    text: 'Switch between Itinerary, Transport, Accommodation, Budget, Packing, and Map views.',
-    position: 'bottom'
+    target: '.itinerary-view-mode-controls',
+    mobileTarget: '.itinerary-view-mode-controls',
+    title: '🗓️ Timeline & Split-Screen View',
+    text: 'Switch between compact day cards and the chronological Daily Timeline. On desktop, toggle Split View to inspect day details side-by-side with full-screen efficiency.',
+    position: 'bottom',
+    onEnter: () => { if (typeof switchTab === 'function') switchTab('itinerary'); }
   },
   {
-    target: '#expandAll',
-    mobileTarget: '.app-tabs-nav',   // #expandAll may be off-screen on mobile
-    title: 'Expand/Collapse Days',
-    text: 'Quickly show or hide all day details for an overview of your trip. On mobile, day cards are swipeable — scroll sideways through days.',
-    position: 'top'
+    target: 'button[data-tab="transport"]',
+    mobileTarget: 'button[data-tab="transport"]',
+    title: '✈️ Transport Hub & Flight Alerts',
+    text: 'Manage flights, trains, and layover warnings. New: record live operational alerts (delays, gate changes, baggage belts) with real-time badges on your timeline!',
+    position: 'bottom',
+    onEnter: () => { if (typeof switchTab === 'function') switchTab('transport'); }
+  },
+  {
+    target: 'button[data-tab="accom"]',
+    mobileTarget: 'button[data-tab="accom"]',
+    title: '🏨 Stays & Receipts / Attachments',
+    text: 'Track accommodations and check-in times. New: attach PDFs, booking links, and ticket screenshots across stays, activities, and transit with instant image lightbox preview.',
+    position: 'bottom',
+    onEnter: () => { if (typeof switchTab === 'function') switchTab('accom'); }
+  },
+  {
+    target: '.packing-guide-btn-readiness, button[data-tab="packing"]',
+    mobileTarget: 'button[data-tab="packing"]',
+    title: '🌍 International Travel Readiness',
+    text: 'New: Click the highlighted [🌍 Travel Readiness] button in Packing to see country-by-country visa rules, 6-month passport target dates, power plugs, currencies, and pre-departure checklists!',
+    position: 'bottom',
+    onEnter: () => {
+      if (typeof switchTab === 'function') switchTab('packing');
+      if (typeof toggleGuidePanel === 'function') toggleGuidePanel('readiness');
+    },
+    onLeave: () => {
+      if (typeof collapseAllGuides === 'function') collapseAllGuides();
+    }
+  },
+  {
+    target: '.app-menu-right, .actions-menu-details',
+    mobileTarget: '.mobile-menu-btn',
+    title: '📥 Smart Booking Intake Parser',
+    text: 'Paste raw flight, train, or hotel reservation emails/texts into "Import Booking" in the menu to auto-extract routes, flight numbers, and dates directly into your itinerary.',
+    position: 'bottom',
+    onEnterMobile: () => {
+      if (typeof toggleMobileMenu === 'function' && !document.getElementById('mobileMenuSheet').classList.contains('open')) toggleMobileMenu();
+    },
+    onLeaveMobile: () => {
+      if (typeof closeMobileMenu === 'function') closeMobileMenu();
+    }
+  },
+  {
+    target: '.app-menu-right, .actions-menu-details',
+    mobileTarget: '.mobile-menu-btn',
+    title: '🗺️ Mappr Curated Map Import',
+    text: 'Import curated local maps from Mappr! Automatically categorize spots into food quests, sights, and insider tips attached to your chosen trip legs.',
+    position: 'bottom',
+    onEnterMobile: () => {
+      if (typeof toggleMobileMenu === 'function' && !document.getElementById('mobileMenuSheet').classList.contains('open')) toggleMobileMenu();
+    },
+    onLeaveMobile: () => {
+      if (typeof closeMobileMenu === 'function') closeMobileMenu();
+    }
+  },
+  {
+    target: '.cloud-status-pill, #cloudSyncStatusPill',
+    mobileTarget: '#mobileCloudSyncStatusPill',
+    title: '☁️ Cloud Hub & Google Drive Sync',
+    text: 'All changes save locally offline. Connect Google Drive for seamless cross-device cloud sync, trip version history, and pre-save safety backups.',
+    position: 'bottom',
+    onEnter: () => {
+      if (typeof switchTab === 'function') switchTab('itinerary');
+      if (typeof closeMobileMenu === 'function') closeMobileMenu();
+    }
+  },
+  {
+    target: '.app-menu-right, .actions-menu-details',
+    mobileTarget: '.mobile-menu-btn',
+    title: '📤 Share, PDF Print & AI Builder',
+    text: 'Print beautiful booklet-ready PDF itineraries, export calendar (.ics) events, share compressed lightweight URLs, or prompt the AI Builder to customize your trip!',
+    position: 'bottom',
+    onEnter: () => {
+      if (typeof switchTab === 'function') switchTab('itinerary');
+    }
   }
 ];
 
@@ -355,14 +418,11 @@ function isMobile() {
 /** Return the best visible DOM element for a tutorial step */
 function getTutorialTarget(step) {
   const primary = document.querySelector(step.target);
-  // Check if the primary element is actually visible
   if (primary && primary.offsetParent !== null) return primary;
 
-  // Fall back to mobile target
   const mobile = step.mobileTarget ? document.querySelector(step.mobileTarget) : null;
   if (mobile && mobile.offsetParent !== null) return mobile;
 
-  // Return whichever exists even if not displayed (for spotlight sizing)
   return primary || mobile || null;
 }
 
@@ -373,14 +433,17 @@ function startTutorial() {
 
   tutorialActive = true;
   currentTutorialStep = 0;
-  document.getElementById('tutorial-overlay').style.display = 'block';
-  document.getElementById('tutorial-progress').style.display = 'flex';
+  const overlay = document.getElementById('tutorial-overlay');
+  const progress = document.getElementById('tutorial-progress');
+  if (overlay) overlay.style.display = 'block';
+  if (progress) progress.style.display = 'flex';
 
   // Build progress dots
-  const progress = document.getElementById('tutorial-progress');
-  progress.innerHTML = TUTORIAL_STEPS.map((_, i) =>
-    `<div class="tutorial-dot ${i === 0 ? 'active' : ''}" data-step="${i}"></div>`
-  ).join('');
+  if (progress) {
+    progress.innerHTML = TUTORIAL_STEPS.map((_, i) =>
+      `<div class="tutorial-dot ${i === 0 ? 'active' : ''}" data-step="${i}"></div>`
+    ).join('');
+  }
 
   showTutorialStep(0);
 
@@ -395,6 +458,9 @@ function createTutorialOverlay() {
   overlay.innerHTML = `
     <div class="tutorial-spotlight" id="tutorial-spotlight"></div>
     <div class="tutorial-tooltip" id="tutorial-tooltip">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span id="tutorial-step-counter" style="font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: rgba(59, 130, 246, 0.15); color: #2563eb;">Step 1 of ${TUTORIAL_STEPS.length}</span>
+      </div>
       <h4 id="tutorial-title"></h4>
       <p id="tutorial-text"></p>
       <div class="tutorial-nav">
@@ -432,10 +498,26 @@ function createTutorialOverlay() {
 
 function showTutorialStep(index) {
   const step = TUTORIAL_STEPS[index];
+  if (!step) return;
+
+  if (typeof step.onEnter === 'function') {
+    step.onEnter();
+  }
+
   const target = getTutorialTarget(step);
-  if (target) { target.scrollIntoView({ behavior: 'instant', block: 'center' }); }
+  if (target) {
+    try {
+      target.scrollIntoView({ behavior: 'instant', block: 'center' });
+    } catch (e) {}
+  }
   const spotlight = document.getElementById('tutorial-spotlight');
   const tooltip   = document.getElementById('tutorial-tooltip');
+
+  // Update step counter
+  const counter = document.getElementById('tutorial-step-counter');
+  if (counter) {
+    counter.textContent = `Step ${index + 1} of ${TUTORIAL_STEPS.length}`;
+  }
 
   // Update content
   document.getElementById('tutorial-title').textContent = step.title;
@@ -445,20 +527,22 @@ function showTutorialStep(index) {
   document.getElementById('tutorial-prev').style.display =
     index === 0 ? 'none' : 'inline-block';
   document.getElementById('tutorial-next').textContent =
-    index === TUTORIAL_STEPS.length - 1 ? 'Done! ✓' : 'Next →';
+    index === TUTORIAL_STEPS.length - 1 ? 'Finish Tour! ✓' : 'Next →';
 
   // Progress dots
   document.querySelectorAll('.tutorial-dot').forEach((dot, i) => {
     dot.classList.toggle('active', i === index);
   });
 
-  // ── Mobile: bottom-sheet tooltip, no absolute positioning ──────────────
+  // Mobile layout
   if (isMobile()) {
     if (step.onEnterMobile) {
       step.onEnterMobile();
       setTimeout(() => {
         const t = getTutorialTarget(step);
-        if (t) t.scrollIntoView({ behavior: 'instant', block: 'center' });
+        if (t) {
+          try { t.scrollIntoView({ behavior: 'instant', block: 'center' }); } catch (e) {}
+        }
         applyMobileTutorialStyles(tooltip, spotlight, t);
       }, 350);
     } else {
@@ -467,13 +551,12 @@ function showTutorialStep(index) {
     return;
   }
 
-  // ── Desktop: spotlight + absolutely positioned tooltip ─────────────────
+  // Desktop layout
   applyDesktopTutorialStyles(tooltip, spotlight, target, step);
 }
 
 /** Mobile layout: fixed bottom sheet, spotlight if target visible */
 function applyMobileTutorialStyles(tooltip, spotlight, target) {
-  // Reset any desktop inline styles
   tooltip.style.position  = 'fixed';
   tooltip.style.bottom    = '0';
   tooltip.style.left      = '0';
@@ -485,7 +568,6 @@ function applyMobileTutorialStyles(tooltip, spotlight, target) {
   tooltip.style.borderRadius = '16px 16px 0 0';
   tooltip.style.boxSizing = 'border-box';
 
-  // Spotlight on the target if visible, otherwise hide it
   if (target && target.offsetParent !== null) {
     const rect = target.getBoundingClientRect();
     spotlight.style.display  = 'block';
@@ -500,7 +582,6 @@ function applyMobileTutorialStyles(tooltip, spotlight, target) {
 
 /** Desktop layout: spotlight + tooltip pinned above/below target */
 function applyDesktopTutorialStyles(tooltip, spotlight, target, step) {
-  // Reset mobile styles
   tooltip.style.bottom   = '';
   tooltip.style.right    = '';
   tooltip.style.width    = '';
@@ -510,7 +591,6 @@ function applyDesktopTutorialStyles(tooltip, spotlight, target, step) {
   tooltip.style.position = 'absolute';
 
   if (!target || target.offsetParent === null) {
-    // No visible target: centre the tooltip, hide spotlight
     spotlight.style.display = 'none';
     tooltip.style.top  = '50%';
     tooltip.style.left = '50%';
@@ -525,20 +605,18 @@ function applyDesktopTutorialStyles(tooltip, spotlight, target, step) {
   spotlight.style.width    = (rect.width  + 8) + 'px';
   spotlight.style.height   = (rect.height + 8) + 'px';
 
-  // Use a two-pass approach: set position, then clamp after layout
   const MARGIN = 12;
-  const tooltipW = 320; // design width — clamp conservatively
+  const tooltipW = 320;
 
   let top, left;
   if (step.position === 'bottom') {
     top  = rect.bottom + MARGIN;
     left = rect.left + (rect.width  - tooltipW) / 2;
   } else {
-    top  = rect.top - 200 - MARGIN; // approximate tooltip height
+    top  = rect.top - 200 - MARGIN;
     left = rect.left + (rect.width  - tooltipW) / 2;
   }
 
-  // Clamp to viewport with margin
   left = Math.max(MARGIN, Math.min(left, window.innerWidth  - tooltipW - MARGIN));
   top  = Math.max(MARGIN, Math.min(top,  window.innerHeight - 220        - MARGIN));
 
@@ -548,7 +626,10 @@ function applyDesktopTutorialStyles(tooltip, spotlight, target, step) {
 
 function nextTutorialStep() {
   const prev = TUTORIAL_STEPS[currentTutorialStep];
-  if (prev && isMobile() && prev.onLeaveMobile) prev.onLeaveMobile();
+  if (prev) {
+    if (typeof prev.onLeave === 'function') prev.onLeave();
+    if (isMobile() && typeof prev.onLeaveMobile === 'function') prev.onLeaveMobile();
+  }
   if (currentTutorialStep < TUTORIAL_STEPS.length - 1) {
     currentTutorialStep++;
     showTutorialStep(currentTutorialStep);
@@ -559,7 +640,10 @@ function nextTutorialStep() {
 
 function prevTutorialStep() {
   const prev = TUTORIAL_STEPS[currentTutorialStep];
-  if (prev && isMobile() && prev.onLeaveMobile) prev.onLeaveMobile();
+  if (prev) {
+    if (typeof prev.onLeave === 'function') prev.onLeave();
+    if (isMobile() && typeof prev.onLeaveMobile === 'function') prev.onLeaveMobile();
+  }
   if (currentTutorialStep > 0) {
     currentTutorialStep--;
     showTutorialStep(currentTutorialStep);
@@ -568,7 +652,10 @@ function prevTutorialStep() {
 
 function skipTutorial() {
   const prev = TUTORIAL_STEPS[currentTutorialStep];
-  if (prev && isMobile() && prev.onLeaveMobile) prev.onLeaveMobile();
+  if (prev) {
+    if (typeof prev.onLeave === 'function') prev.onLeave();
+    if (isMobile() && typeof prev.onLeaveMobile === 'function') prev.onLeaveMobile();
+  }
   endTutorial();
 }
 
@@ -580,7 +667,10 @@ function endTutorial() {
   if (progress) progress.style.display = 'none';
   document.removeEventListener('keydown', handleTutorialKey);
   localStorage.setItem('travelApp_tutorial_seen', 'true');
-  showToast('✅ Tutorial complete! Check the Guide tab for more details.');
+  if (typeof switchTab === 'function') switchTab('itinerary');
+  if (typeof collapseAllGuides === 'function') collapseAllGuides();
+  if (typeof closeMobileMenu === 'function') closeMobileMenu();
+  showToast('✅ Interactive tour complete! You are ready to plan.');
 }
 
 function handleTutorialKey(e) {

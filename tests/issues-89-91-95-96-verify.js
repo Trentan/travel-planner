@@ -28,7 +28,15 @@ async function run() {
   assert(guideJs.includes("id: 'split-view'"), 'GUIDE_STEPS must include split-view');
   assert(guideJs.includes("id: 'cloud-sync'"), 'GUIDE_STEPS must include cloud-sync');
   assert(guideJs.includes('switchGuideTab'), 'guide.js must include switchGuideTab');
-  console.log('✓ Issue #91 guide tutorials expansion verified');
+
+  // Verify interactive tour steps cover all new functionality
+  assert(guideJs.includes('Transport Hub & Flight Alerts'), 'TUTORIAL_STEPS must cover transport hub and alerts');
+  assert(guideJs.includes('Stays & Receipts / Attachments'), 'TUTORIAL_STEPS must cover stays and attachments');
+  assert(guideJs.includes('International Travel Readiness'), 'TUTORIAL_STEPS must cover international travel readiness');
+  assert(guideJs.includes('Smart Booking Intake Parser'), 'TUTORIAL_STEPS must cover smart booking intake');
+  assert(guideJs.includes('Mappr Curated Map Import'), 'TUTORIAL_STEPS must cover Mappr curated import');
+  assert(guideJs.includes('Cloud Hub & Google Drive Sync'), 'TUTORIAL_STEPS must cover cloud hub and sync');
+  console.log('✓ Issue #91 guide tutorials & interactive tour expansion verified');
 
   // 3. Verify Journey Operational Alerts & Badges (Issue #95)
   console.log('3. Testing Transport Operational Alerts & Badges (Issue #95)...');
