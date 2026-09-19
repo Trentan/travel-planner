@@ -350,6 +350,35 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     await page.evaluate(() => closeBookingIntakeDialog());
     reporter.add('desktop', 'booking intake', 'extracted and merged pasted confirmation');
 
+    // Mappr import verification (Issue #163)
+    await page.evaluate(() => window.openMapprImportModal());
+    await page.waitForSelector('#mappr-import-modal', { state: 'visible' });
+    const mockMapprPayload = [
+      'root',
+      'St. Martin Cathedral',
+      48.142,
+      17.105,
+      'Gothic cathedral',
+      'Coronation church',
+      'Historic landmark',
+      'Rudnayovo námestie 1',
+      'https://dom.farabratislava.sk',
+      { name: 1, lat: 2, lon: 3, summary: 4, tips: 5, why_go: 6, formatted_address: 7, website: 8 },
+      'Bratislava Sights',
+      'Bratislava',
+      { title: 10, city_name: 11 }
+    ];
+    await page.evaluate((data) => {
+      const parsed = window.MapprImportModule.parseMapprPayload(data);
+      window.MapprImportModule.openMapprReviewModal(parsed);
+    }, mockMapprPayload);
+    await page.waitForSelector('#mappr-review-modal', { state: 'visible' });
+    assert(await page.locator('.mappr-spot-name').count() > 0, 'Desktop: Mappr spots should render in review table');
+    await page.evaluate(() => window.MapprImportModule.closeMapprReviewModal());
+    await page.waitForSelector('#mappr-review-modal', { state: 'hidden' });
+    await humanPause(page, 200);
+    reporter.add('desktop', 'mappr import', 'opened import and review modals with parsed spots');
+
     const downloadPromise = page.waitForEvent('download');
     await page.locator('#desktopActionsMenu > summary').click();
     await humanPause(page, 250);
@@ -682,6 +711,11 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
     await humanPause(page, 400);
     assert(await page.getByRole('button', { name: /Import Booking/i }).count() > 0, 'Mobile: booking intake entry should be available from menu');
+    assert(await page.getByRole('button', { name: /Import Mappr Map/i }).count() > 0, 'Mobile: Mappr import entry should be available from menu');
+    await page.evaluate(() => window.openMapprImportModal());
+    await page.waitForSelector('#mappr-import-modal', { state: 'visible' });
+    await page.evaluate(() => window.closeMapprImportModal());
+    reporter.add('mobile', 'mappr import modal', 'opened and closed mappr import modal from mobile menu');
     assert(await page.locator('.mobile-desktop-advisory').count() === 1, 'Mobile: desktop recommendation advisory notice should be present in mobile menu');
 
     // Issue #210: Mobile Menu Undo & Redo buttons

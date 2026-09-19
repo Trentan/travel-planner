@@ -274,7 +274,16 @@
   /**
    * UI: Review and selection modal
    */
-  function openMapprReviewModal(spots, mapTitle, detectedCity) {
+  function openMapprReviewModal(spotsOrResult, mapTitle, detectedCity) {
+    let spots = spotsOrResult;
+    let title = mapTitle;
+    let city = detectedCity;
+    if (spotsOrResult && !Array.isArray(spotsOrResult) && Array.isArray(spotsOrResult.spots)) {
+      spots = spotsOrResult.spots;
+      title = mapTitle || spotsOrResult.title;
+      city = detectedCity || spotsOrResult.city;
+    }
+    closeMapprImportModal();
     let modal = document.getElementById('mappr-review-modal');
     if (!modal) {
       modal = document.createElement('div');
@@ -310,7 +319,7 @@
           <td class="p-2.5 text-center">
             <input type="checkbox" class="mappr-spot-check rounded cursor-pointer" data-spot-index="${idx}" checked>
           </td>
-          <td class="p-2.5 text-sm font-semibold text-slate-800 dark:text-slate-100 whitespace-nowrap">
+          <td class="mappr-spot-name p-2.5 text-sm font-semibold text-slate-800 dark:text-slate-100 whitespace-nowrap">
             <span class="mr-1">${spot.icon}</span> ${escapeCompactText(spot.name)}
           </td>
           <td class="p-2.5 text-xs text-slate-500 dark:text-slate-400">
