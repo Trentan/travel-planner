@@ -405,6 +405,10 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
   const activity = isEditing ? leg?.suggestedActivities?.[activityIdx] : null;
   if (isEditing && !activity) return;
 
+  window._currentActivityAttachments = (activity?.attachments && Array.isArray(activity.attachments))
+    ? [...activity.attachments]
+    : [];
+
   const originalMatchTexts = activity ? getSuggestedActivityMatchTexts(activity) : [];
 
   const existingModal = document.getElementById('activity-assign-modal');
@@ -622,6 +626,20 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
               <div class="activity-assign-current">Current assignment: <strong>${html(currentDayLabel)}</strong></div>
               ${hasCurrentAssignment ? `<button type="button" class="action-btn activity-assign-clear activity-assign-clear-spaced" id="activityAssignClearBtn">Move to Suggested Pool (Unassign)</button>` : ''}
             </div>
+
+            <!-- Attachments & Links -->
+            <div class="activity-assign-attachments-section p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700/80 mt-3">
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-200">📎 Receipts, Tickets & Links</label>
+                <span class="text-[11px] text-slate-400">PDFs, screenshots, confirmations</span>
+              </div>
+              <div id="activityAttachmentsList" class="attachments-list flex flex-col gap-1.5 mb-2"></div>
+              <div class="flex gap-2">
+                <button type="button" class="action-btn action-btn-secondary text-xs px-2 py-1" onclick="promptAddActivityLink()">📎 Add Link</button>
+                <button type="button" class="action-btn action-btn-secondary text-xs px-2 py-1" onclick="document.getElementById('activityImageUpload').click()">🖼️ Upload Image</button>
+                <input type="file" id="activityImageUpload" accept="image/*" style="display: none;" onchange="handleActivityImageUpload(event)">
+              </div>
+            </div>
           </div>
 
           <!-- Right Panel: Choose Day -->
@@ -646,6 +664,9 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
   `;
 
   document.body.appendChild(modal);
+  if (typeof renderActivityAttachmentsList === 'function') {
+    renderActivityAttachmentsList();
+  }
 
   const closeModal = () => modal.remove();
   document.getElementById('activityAssignCloseBtn').onclick = closeModal;
@@ -877,12 +898,13 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
     const status = document.getElementById('activityStatus').value || '';
     const bookingRef = document.getElementById('activityBookingRef').value.trim();
     const externalLink = document.getElementById('activityExternalLink')?.value.trim() || '';
+    const attachments = Array.isArray(window._currentActivityAttachments) ? [...window._currentActivityAttachments] : [];
     if (!title) {
       alert('Please enter a description');
       return null;
     }
     const fullTitle = location ? `${title} — ${location}` : title;
-    return { category, title: fullTitle, estTime, estCost, notes, location, status, bookingRef, externalLink };
+    return { category, title: fullTitle, estTime, estCost, notes, location, status, bookingRef, externalLink, attachments };
   };
 
   const showAssignDialogFeedback = (message) => {
@@ -940,6 +962,7 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
         target.status = formData.status;
         target.bookingRef = formData.bookingRef;
         target.externalLink = formData.externalLink;
+        target.attachments = formData.attachments;
         delete target.audioTitle;
         delete target.audioRef;
         delete target.audioUrl;
@@ -984,6 +1007,7 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
       target.status = formData.status;
       target.bookingRef = formData.bookingRef;
       target.externalLink = formData.externalLink;
+      target.attachments = formData.attachments;
       delete target.audioTitle;
       delete target.audioRef;
       delete target.audioUrl;
@@ -1036,6 +1060,7 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
       target.status = formData.status;
       target.bookingRef = formData.bookingRef;
       target.externalLink = formData.externalLink;
+      target.attachments = formData.attachments;
       delete target.audioTitle;
       delete target.audioRef;
       delete target.audioUrl;
@@ -1065,6 +1090,7 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
               item.status = formData.status;
               item.bookingRef = formData.bookingRef;
               item.externalLink = formData.externalLink;
+              item.attachments = formData.attachments ? [...formData.attachments] : [];
               delete item.audioTitle;
               delete item.audioRef;
               delete item.audioUrl;
@@ -3739,10 +3765,9 @@ function openAddStayModal(defaultCityId, defaultCheckIn) {
   if (!modal) return;
 
   editingStayId = null; // Reset editing state
-  if (typeof window._currentAttachments !== 'undefined') {
-    window._currentAttachments = [];
-    if (typeof renderStayAttachmentsList === 'function') renderStayAttachmentsList();
-  }
+  window._currentStayAttachments = [];
+  window._currentAttachments = window._currentStayAttachments;
+  if (typeof renderStayAttachmentsList === 'function') renderStayAttachmentsList();
 
   // Update modal title
   const title = modal.querySelector('h2');
@@ -3789,10 +3814,9 @@ function openEditStayModal(stayId) {
   if (!stay) return;
 
   editingStayId = stayId; // Set editing state
-  if (typeof window._currentAttachments !== 'undefined') {
-    window._currentAttachments = stay.attachments ? [...stay.attachments] : [];
-    if (typeof renderStayAttachmentsList === 'function') renderStayAttachmentsList();
-  }
+  window._currentStayAttachments = stay.attachments ? [...stay.attachments] : [];
+  window._currentAttachments = window._currentStayAttachments;
+  if (typeof renderStayAttachmentsList === 'function') renderStayAttachmentsList();
 
   // Update modal title
   const title = modal.querySelector('h2');

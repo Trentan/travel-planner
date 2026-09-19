@@ -69,12 +69,19 @@ function readImageFile(file) {
 }
 
 window._currentAttachments = [];
+window._currentJourneyAttachments = [];
+window._currentStayAttachments = [];
+window._currentActivityAttachments = [];
 
+// --- Journey Attachments ---
 function promptAddJourneyLink() {
   const url = prompt('Enter URL (e.g. https://...):');
   if (!url) return;
   const label = prompt('Enter label (e.g. Boarding Pass, Booking Link):') || 'Link';
-  window._currentAttachments.push({ id: generateAttachmentId(), type: 'link', name: label, value: url });
+  const item = { id: generateAttachmentId(), type: 'link', name: label, value: url };
+  if (!Array.isArray(window._currentJourneyAttachments)) window._currentJourneyAttachments = [];
+  window._currentJourneyAttachments.push(item);
+  window._currentAttachments = window._currentJourneyAttachments;
   renderJourneyAttachmentsList();
 }
 
@@ -84,7 +91,10 @@ async function handleJourneyImageUpload(event) {
   try {
     const base64 = await readImageFile(file);
     const label = prompt('Enter label (e.g. Ticket Screenshot):') || file.name;
-    window._currentAttachments.push({ id: generateAttachmentId(), type: 'image', name: label, value: base64 });
+    const item = { id: generateAttachmentId(), type: 'image', name: label, value: base64 };
+    if (!Array.isArray(window._currentJourneyAttachments)) window._currentJourneyAttachments = [];
+    window._currentJourneyAttachments.push(item);
+    window._currentAttachments = window._currentJourneyAttachments;
     renderJourneyAttachmentsList();
   } catch (e) {
     alert('Failed to read image.');
@@ -95,15 +105,32 @@ async function handleJourneyImageUpload(event) {
 function renderJourneyAttachmentsList() {
   const container = document.getElementById('journeyAttachmentsList');
   if (container) {
-    container.innerHTML = renderAttachmentsListHtml(window._currentAttachments, 'removeJourneyAttachment');
+    const list = window._currentJourneyAttachments || window._currentAttachments || [];
+    container.innerHTML = renderAttachmentsListHtml(list, 'removeJourneyAttachment');
   }
 }
 
 function removeJourneyAttachment(index) {
-  window._currentAttachments.splice(index, 1);
+  if (Array.isArray(window._currentJourneyAttachments)) {
+    window._currentJourneyAttachments.splice(index, 1);
+    window._currentAttachments = window._currentJourneyAttachments;
+  } else if (Array.isArray(window._currentAttachments)) {
+    window._currentAttachments.splice(index, 1);
+  }
   renderJourneyAttachmentsList();
 }
 
+// --- Stay Attachments ---
+function promptAddStayLink() {
+  const url = prompt('Enter URL (e.g. https://...):');
+  if (!url) return;
+  const label = prompt('Enter label (e.g. Booking confirmation, Hotel page):') || 'Link';
+  const item = { id: generateAttachmentId(), type: 'link', name: label, value: url };
+  if (!Array.isArray(window._currentStayAttachments)) window._currentStayAttachments = [];
+  window._currentStayAttachments.push(item);
+  window._currentAttachments = window._currentStayAttachments;
+  renderStayAttachmentsList();
+}
 
 async function handleStayImageUpload(event) {
   const file = event.target.files[0];
@@ -111,7 +138,10 @@ async function handleStayImageUpload(event) {
   try {
     const base64 = await readImageFile(file);
     const label = prompt('Enter label (e.g. Receipt Screenshot):') || file.name;
-    window._currentAttachments.push({ id: generateAttachmentId(), type: 'image', name: label, value: base64 });
+    const item = { id: generateAttachmentId(), type: 'image', name: label, value: base64 };
+    if (!Array.isArray(window._currentStayAttachments)) window._currentStayAttachments = [];
+    window._currentStayAttachments.push(item);
+    window._currentAttachments = window._currentStayAttachments;
     renderStayAttachmentsList();
   } catch (e) {
     alert('Failed to read image.');
@@ -122,11 +152,77 @@ async function handleStayImageUpload(event) {
 function renderStayAttachmentsList() {
   const container = document.getElementById('stayAttachmentsList');
   if (container) {
-    container.innerHTML = renderAttachmentsListHtml(window._currentAttachments, 'removeStayAttachment');
+    const list = window._currentStayAttachments || window._currentAttachments || [];
+    container.innerHTML = renderAttachmentsListHtml(list, 'removeStayAttachment');
   }
 }
 
 function removeStayAttachment(index) {
-  window._currentAttachments.splice(index, 1);
+  if (Array.isArray(window._currentStayAttachments)) {
+    window._currentStayAttachments.splice(index, 1);
+    window._currentAttachments = window._currentStayAttachments;
+  } else if (Array.isArray(window._currentAttachments)) {
+    window._currentAttachments.splice(index, 1);
+  }
   renderStayAttachmentsList();
 }
+
+// --- Activity Attachments ---
+function promptAddActivityLink() {
+  const url = prompt('Enter URL (e.g. https://...):');
+  if (!url) return;
+  const label = prompt('Enter label (e.g. Museum Ticket, Audio Guide, Map):') || 'Link';
+  const item = { id: generateAttachmentId(), type: 'link', name: label, value: url };
+  if (!Array.isArray(window._currentActivityAttachments)) window._currentActivityAttachments = [];
+  window._currentActivityAttachments.push(item);
+  renderActivityAttachmentsList();
+}
+
+async function handleActivityImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    const base64 = await readImageFile(file);
+    const label = prompt('Enter label (e.g. Ticket QR / Pass):') || file.name;
+    const item = { id: generateAttachmentId(), type: 'image', name: label, value: base64 };
+    if (!Array.isArray(window._currentActivityAttachments)) window._currentActivityAttachments = [];
+    window._currentActivityAttachments.push(item);
+    renderActivityAttachmentsList();
+  } catch (e) {
+    alert('Failed to read image.');
+  }
+  event.target.value = '';
+}
+
+function renderActivityAttachmentsList() {
+  const container = document.getElementById('activityAttachmentsList');
+  if (container) {
+    const list = window._currentActivityAttachments || [];
+    container.innerHTML = renderAttachmentsListHtml(list, 'removeActivityAttachment');
+  }
+}
+
+function removeActivityAttachment(index) {
+  if (Array.isArray(window._currentActivityAttachments)) {
+    window._currentActivityAttachments.splice(index, 1);
+  }
+  renderActivityAttachmentsList();
+}
+
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
+window.generateAttachmentId = generateAttachmentId;
+window.renderAttachmentsListHtml = renderAttachmentsListHtml;
+window.renderAttachmentsPillsHtml = renderAttachmentsPillsHtml;
+window.promptAddJourneyLink = promptAddJourneyLink;
+window.handleJourneyImageUpload = handleJourneyImageUpload;
+window.renderJourneyAttachmentsList = renderJourneyAttachmentsList;
+window.removeJourneyAttachment = removeJourneyAttachment;
+window.promptAddStayLink = promptAddStayLink;
+window.handleStayImageUpload = handleStayImageUpload;
+window.renderStayAttachmentsList = renderStayAttachmentsList;
+window.removeStayAttachment = removeStayAttachment;
+window.promptAddActivityLink = promptAddActivityLink;
+window.handleActivityImageUpload = handleActivityImageUpload;
+window.renderActivityAttachmentsList = renderActivityAttachmentsList;
+window.removeActivityAttachment = removeActivityAttachment;

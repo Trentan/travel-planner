@@ -833,6 +833,10 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
       notes = matched.notes;
     }
     const notesHtml = notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(notes)}</div>` : '';
+    const attList = item.attachments || (matched && matched.attachments) || [];
+    const attachmentsHtml = (attList && attList.length > 0 && typeof renderAttachmentsPillsHtml === 'function')
+      ? `<div class="activity-attachments-pills mt-1 flex flex-wrap gap-1">${renderAttachmentsPillsHtml(attList)}</div>`
+      : '';
     const audioHtml = renderActivityAudioTourMeta(item);
     return `
       <div class="compact-activity-row split-item-selectable" onclick="handleSplitItemClick(this, event)" data-item-title="${escapeCompactText(split.title)}" data-item-type="activity" data-item-location="${escapeCompactText(locationVal)}" data-item-time="${escapeCompactText(item.time || '1 hr')}" data-item-cost="${escapeCompactText(item.cost || '')}" data-item-notes="${escapeCompactText(notes)}" style="${doneStyle}">
@@ -851,6 +855,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
           })}
           ${subLocsHtml}
           ${notesHtml}
+          ${attachmentsHtml}
         </div>
       </div>
     `;
@@ -1975,7 +1980,9 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourney
         provider: journey.provider || '',
         routeCode: segment.routeCode || journey.routeCode || '',
         bookingRef: journey.bookingReference || '',
-        crossDateNote: crossDateNote || ''
+        crossDateNote: crossDateNote || '',
+        attachments: segment.attachments || journey.attachments || [],
+        alerts: segment.alerts || journey.alerts || []
       });
       const currentLegCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label || '')).toLowerCase();
       const isArrivalToCurrent = toLoc && currentLegCity && toLoc.toLowerCase() === currentLegCity;
@@ -2060,7 +2067,8 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourney
       notes: stayInfo.notes || '',
       provider: stayInfo.provider || '',
       bookingRef: stayInfo.bookingRef || '',
-      cityName: String(day.to).trim()
+      cityName: String(day.to).trim(),
+      attachments: stayInfo.attachments || (typeof stays !== 'undefined' && stays.find(s => s.id === stayInfo.stayId)?.attachments) || []
     });
   });
 
@@ -2112,7 +2120,8 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourney
       bookingRef: item.bookingRef || '',
       externalLink: item.externalLink || item.audioRef || item.audioUrl || '',
       time: item.time || '',
-      cityName: String((typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label || '') : '') || day.to || day.from || '').trim()
+      cityName: String((typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label || '') : '') || day.to || day.from || '').trim(),
+      attachments: item.attachments || (matched && matched.attachments) || []
     });
   });
 
@@ -2606,6 +2615,10 @@ function renderDailyTimelineRow(item, compact = false) {
       }
     }
 
+    if (item.attachments && item.attachments.length > 0 && typeof renderAttachmentsPillsHtml === 'function') {
+      parts.push(renderAttachmentsPillsHtml(item.attachments));
+    }
+
     if (parts.length > 0) {
       activityMetaHtml = `<div class="daily-timeline-meta" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 6px;">${parts.join('')}</div>`;
     }
@@ -2656,6 +2669,10 @@ function renderDailyTimelineRow(item, compact = false) {
         }
         parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="${getMapSearchUrl(sophisticatedLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">${escapeCompactText(cleanLoc)}</a></span>`);
       }
+    }
+
+    if (item.attachments && item.attachments.length > 0 && typeof renderAttachmentsPillsHtml === 'function') {
+      parts.push(renderAttachmentsPillsHtml(item.attachments));
     }
 
     if (parts.length > 0) {
@@ -2735,6 +2752,14 @@ function renderDailyTimelineRow(item, compact = false) {
           parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="${getMapSearchUrl(sophisticatedLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">${escapeCompactText(displayLabel)}</a></span>`);
         }
       });
+    }
+
+    if (item.alerts && item.alerts.length > 0 && typeof renderJourneyAlertBadgesHtml === 'function') {
+      parts.push(renderJourneyAlertBadgesHtml(item.alerts));
+    }
+
+    if (item.attachments && item.attachments.length > 0 && typeof renderAttachmentsPillsHtml === 'function') {
+      parts.push(renderAttachmentsPillsHtml(item.attachments));
     }
 
     if (parts.length > 0) {
