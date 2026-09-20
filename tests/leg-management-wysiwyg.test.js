@@ -49,6 +49,14 @@ createMockElement('editLegSelect');
 createMockElement('existingCitySelect');
 createMockElement('legTypeSelect', { value: 'city' });
 createMockElement('legDayNotesInput');
+createMockElement('legPlacementSelect', { value: 'before_return' });
+createMockElement('legPlacementGroup');
+createMockElement('legDurationNights', { value: '3' });
+createMockElement('newLegCityName');
+createMockElement('newLegCityCountrySelect');
+createMockElement('newLegCityCountryOther');
+createMockElement('newCityInlineGroup');
+createMockElement('toggleNewCityBtn');
 
 global.document = {
   body: {
@@ -313,14 +321,111 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(global.window.journeys[0].departureDate, '2026-06-13', 'Journey departureDate shifted +3 days');
   assert.strictEqual(global.window.journeys[0].arrivalDate, '2026-06-13', 'Journey arrivalDate shifted +3 days');
 
+  // 7. Test Issue #418: Intelligent Date Defaulting from Trip Timeline
+  console.log('  Testing intelligent date defaulting from trip timeline (Issue #418)...');
+  global.appData = [
+    {
+      id: 'leg_rome',
+      label: 'Rome',
+      days: [{ date: '2026-06-01' }, { date: '2026-06-02' }, { date: '2026-06-03' }]
+    },
+    {
+      id: 'leg_florence',
+      label: 'Florence',
+      days: [{ date: '2026-06-03' }, { date: '2026-06-04' }, { date: '2026-06-05' }, { date: '2026-06-06' }]
+    },
+    {
+      id: 'leg_return',
+      label: 'Brisbane (Trip Finish)',
+      days: [{ date: '2026-06-06' }, { date: '2026-06-07' }]
+    }
+  ];
+
+  openAddLegDialog('edit');
+  assert.strictEqual(getLegDialogState().mode, 'add', 'Default dialog mode is add');
+  assert.strictEqual(elements['newLegStartDate'].value, '2026-06-06', 'Commence date defaults to end date of preceding leg (Florence), not today');
+  assert.strictEqual(elements['legDurationNights'].value, 3, 'Default duration is 3 nights');
+  assert.strictEqual(elements['newLegEndDate'].value, '2026-06-09', 'End date auto-computed from duration (+3 days)');
+
+  // 8. Test Issue #418: Duration Stepper & Bidirectional Date Calculation
+  console.log('  Testing duration stepper & bidirectional date calculation (Issue #418)...');
+  // Step duration +1 night
+  stepLegDuration(1);
+  assert.strictEqual(elements['legDurationNights'].value, 4, 'Duration incremented to 4 nights');
+  assert.strictEqual(elements['newLegEndDate'].value, '2026-06-10', 'End date updated to +4 days');
+
+  // Step duration -2 nights
+  stepLegDuration(-2);
+  assert.strictEqual(elements['legDurationNights'].value, 2, 'Duration decremented to 2 nights');
+  assert.strictEqual(elements['newLegEndDate'].value, '2026-06-08', 'End date updated to +2 days');
+
+  // Change End Date manually -> Duration updates
+  elements['newLegEndDate'].value = '2026-06-12';
+  onLegEndDateChange();
+  assert.strictEqual(elements['legDurationNights'].value, 6, 'Duration recalculated to 6 nights on manual end date change');
+
+  // Change Start Date manually -> End date shifts preserving duration
+  elements['newLegStartDate'].value = '2026-06-08';
+  onLegStartDateChange();
+  assert.strictEqual(elements['newLegEndDate'].value, '2026-06-14', 'End date shifted to maintain 6 nights');
+
+  // 9. Test Issue #418: Auto-Extend Return Leg & Seamless Insertion
+  console.log('  Testing auto-extend return leg on insertion (Issue #418)...');
+  // Re-open fresh add leg dialog for Venice (3 nights, 2026-06-06 to 2026-06-09)
+  openAddLegDialog('edit');
+  elements['existingCitySelect'].value = 'Venice';
+  elements['legPlacementSelect'].value = 'before_return';
+  onLegPlacementChange();
+  elements['legDurationNights'].value = 3;
+  onLegDurationInputChange();
+
+  assert.strictEqual(elements['newLegStartDate'].value, '2026-06-06', 'Venice starts on 2026-06-06');
+  assert.strictEqual(elements['newLegEndDate'].value, '2026-06-09', 'Venice ends on 2026-06-09');
+
+  // Validate form passes without clash error against the return leg
+  const isValidOnAdd = validateLegEditorForm();
+  assert.strictEqual(isValidOnAdd, true, 'Form must be valid without clash warning for auto-extending return leg');
+  assert.strictEqual(elements['legDialogSaveBtn'].disabled, false, 'Save button must be enabled');
+
+  // Setup a return journey to verify cascading
+  global.window.journeys = [
+    {
+      id: 'journey_return',
+      legId: 'leg_return',
+      departureDate: '2026-06-06',
+      arrivalDate: '2026-06-07',
+      dayDate: '2026-06-06'
+    }
+  ];
+
+  confirmAddLeg();
+
+  // Verify Venice was inserted before Return
+  assert.strictEqual(global.appData.length, 4, 'appData now has 4 legs');
+  assert.strictEqual(global.appData[2].label.includes('Venice'), true, 'Venice inserted at index 2');
+  assert.strictEqual(global.appData[2].days[0].date, '2026-06-06', 'Venice start date is 2026-06-06');
+  assert.strictEqual(global.appData[2].days[global.appData[2].days.length - 1].date, '2026-06-09', 'Venice end date is 2026-06-09');
+
+  // Verify Return leg at index 3 was automatically extended forward by 3 days
+  const returnLeg = global.appData[3];
+  assert.strictEqual(returnLeg.id, 'leg_return', 'Return leg is now at index 3');
+  assert.strictEqual(returnLeg.days[0].date, '2026-06-09', 'Return leg start date auto-extended to 2026-06-09');
+  assert.strictEqual(returnLeg.days[returnLeg.days.length - 1].date, '2026-06-10', 'Return leg end date auto-extended to 2026-06-10');
+
+  // Verify return journey cascaded by +3 days
+  assert.strictEqual(global.window.journeys[0].departureDate, '2026-06-09', 'Return journey departureDate auto-shifted +3 days');
+  assert.strictEqual(global.window.journeys[0].arrivalDate, '2026-06-10', 'Return journey arrivalDate auto-shifted +3 days');
+
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }
 
 if (require.main === module) {
-  runLegManagementWysiwygSuite().catch(err => {
-    console.error(err);
-    process.exitCode = 1;
-  });
+  runLegManagementWysiwygSuite()
+    .then(() => process.exit(0))
+    .catch(err => {
+      console.error(err);
+      process.exit(1);
+    });
 }
 
 module.exports = { runLegManagementWysiwygSuite };
