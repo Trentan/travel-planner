@@ -965,10 +965,32 @@
         ? `'${folderId}' in parents and trashed=false`
         : `trashed=false and mimeType='application/json'`;
       const listUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,modifiedTime,size)&pageSize=50`;
-      const listResp = await Promise.race([
+      let listResp = await Promise.race([
         fetch(listUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('List query timeout')), 6000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('List query timeout')), 8000))
       ]);
+
+      // Retry once on 401 if token expired
+      if (listResp && listResp.status === 401) {
+        console.log('[GoogleDrive Sync] 401 Unauthorized, attempting access token renewal...');
+        await ensureValidAccessToken();
+        if (isAccessTokenValid()) {
+          listResp = await fetch(listUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+        }
+      }
+
+      // Recover from stale or deleted folder ID (HTTP 404 or 400 invalid parent)
+      if (listResp && (listResp.status === 404 || listResp.status === 400) && folderId) {
+        console.warn(`[GoogleDrive Sync] Folder ID ${folderId} returned HTTP ${listResp.status}. Clearing cached folder ID and recreating folder...`);
+        gdriveFolderId = null;
+        localStorage.removeItem('travelApp_gdrive_folder_id');
+        const refreshedFolderId = await ensureDriveFolder();
+        const retryQuery = refreshedFolderId
+          ? `'${refreshedFolderId}' in parents and trashed=false`
+          : `trashed=false and mimeType='application/json'`;
+        const retryListUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(retryQuery)}&fields=files(id,name,modifiedTime,size)&pageSize=50`;
+        listResp = await fetch(retryListUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+      }
 
       if (!listResp.ok) {
         console.warn('[GoogleDrive Sync] List query non-ok status:', listResp.status);
@@ -990,7 +1012,7 @@
           const downloadUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
           const contentResp = await Promise.race([
             fetch(downloadUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } }),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('File download timeout')), 5000))
+            new Promise((_, reject) => setTimeout(() => reject(new Error('File download timeout')), 12000))
           ]);
 
           if (!contentResp.ok) return;
@@ -1002,12 +1024,29 @@
             const tripTitle = (rawContent.data ? rawContent.title : tripMeta.title) || file.name.replace(/\.json$/i, '');
             const tripId = rawContent.id || tripMeta.id || ('trip_cloud_' + file.id);
 
-            const remoteTrip = {
-              id: tripId,
-              title: tripTitle,
-              subtitle: rawContent.subtitle || tripMeta.subtitle || '',
-              data: tripData
-            };
+            let remoteTrip;
+            if (typeof window.extractTripSummary === 'function') {
+              remoteTrip = window.extractTripSummary(tripData, tripId);
+              remoteTrip.title = tripTitle || remoteTrip.title;
+              if (rawContent.subtitle || tripMeta.subtitle) {
+                remoteTrip.subtitle = rawContent.subtitle || tripMeta.subtitle;
+              }
+              if (file.modifiedTime) {
+                remoteTrip.updatedAt = file.modifiedTime;
+              }
+            } else {
+              remoteTrip = {
+                id: tripId,
+                title: tripTitle,
+                subtitle: rawContent.subtitle || tripMeta.subtitle || '',
+                flags: rawContent.flags || (tripMeta.icon || '✈️'),
+                dateRange: rawContent.dateRange || (tripMeta.dates || 'Flexible Dates'),
+                legCount: Array.isArray(tripData.itinerary) ? tripData.itinerary.length : (Array.isArray(tripData.legs) ? tripData.legs.length : 0),
+                stayCount: Array.isArray(tripData.stays) ? tripData.stays.length : (Array.isArray(tripData.accommodations) ? tripData.accommodations.length : 0),
+                updatedAt: file.modifiedTime || rawContent.updatedAt || new Date().toISOString(),
+                data: tripData
+              };
+            }
 
             fileMap[remoteTrip.id] = file.id;
 
@@ -1345,9 +1384,12 @@
   // 60-Second Periodic Background Sync Loop
   let backgroundHeartbeatTimer = null;
   function startBackgroundSyncLoop() {
-    if (backgroundHeartbeatTimer) clearInterval(backgroundHeartbeatTimer);
-    backgroundHeartbeatTimer = setInterval(async () => {
-      if (isGoogleDriveConnected() && !document.hidden) {
+    const fnSetInterval = typeof setInterval === 'function' ? setInterval : (typeof window !== 'undefined' && typeof window.setInterval === 'function' ? window.setInterval.bind(window) : null);
+    const fnClearInterval = typeof clearInterval === 'function' ? clearInterval : (typeof window !== 'undefined' && typeof window.clearInterval === 'function' ? window.clearInterval.bind(window) : null);
+    if (!fnSetInterval) return;
+    if (backgroundHeartbeatTimer && fnClearInterval) fnClearInterval(backgroundHeartbeatTimer);
+    backgroundHeartbeatTimer = fnSetInterval(async () => {
+      if (isGoogleDriveConnected() && (typeof document === 'undefined' || !document.hidden)) {
         console.log('[GoogleDrive Heartbeat] Running silent 60s background cloud sync check...');
         await window.syncAllTripsFromGoogleDrive(true);
       }
@@ -1721,13 +1763,14 @@
   processOAuthCallbackFromUrl();
 
   // Initialize Cloud Sync & Background Heartbeat Loop on load
-  window.addEventListener('DOMContentLoaded', () => {
+  const initCloudStorage = () => {
     processOAuthCallbackFromUrl();
-    setTimeout(async () => {
+    const fnSetTimeout = typeof setTimeout === 'function' ? setTimeout : (typeof window !== 'undefined' && typeof window.setTimeout === 'function' ? window.setTimeout.bind(window) : null);
+    if (!fnSetTimeout) return;
+    fnSetTimeout(async () => {
       updateCloudSyncStatusPill();
       if (isGoogleDriveConnected()) {
-        // If native, silently refresh token on startup to ensure zero interruption across app updates
-        if (isNativePlatform() && !isAccessTokenValid()) {
+        if (!isAccessTokenValid()) {
           await ensureValidAccessToken();
         }
         await flushOfflineSyncQueue();
@@ -1737,6 +1780,14 @@
         await flushOfflineSyncQueue();
       }
     }, 800);
-  });
+  };
+
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    if (typeof document !== 'undefined' && (document.readyState === 'complete' || document.readyState === 'interactive')) {
+      initCloudStorage();
+    } else {
+      window.addEventListener('DOMContentLoaded', initCloudStorage);
+    }
+  }
 })();
 

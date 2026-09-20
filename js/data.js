@@ -303,23 +303,62 @@ function getAllTripsFromIndexedDB(forceRefresh = false) {
         resolve(tripsCache || []);
         return;
       }
-      const transaction = dbInstance.transaction([TRIPS_STORE_NAME], 'readonly');
-      const store = transaction.objectStore(TRIPS_STORE_NAME);
-      const request = store.getAll();
+      let settled = false;
+      const timeoutTimer = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          console.warn('getAllTripsFromIndexedDB timed out after 4000ms, resolving with cache fallback.');
+          resolve(tripsCache || []);
+        }
+      }, 4000);
 
-      request.onsuccess = () => {
-        const trips = (request.result || []).sort((a, b) => {
-          return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
-        });
-        tripsCache = jsonSafeClone(trips);
-        lastCacheTime = Date.now();
-        resolve(trips);
-      };
+      try {
+        const transaction = dbInstance.transaction([TRIPS_STORE_NAME], 'readonly');
+        const store = transaction.objectStore(TRIPS_STORE_NAME);
+        const request = store.getAll();
 
-      request.onerror = () => {
-        console.error('Failed to load trips from IndexedDB:', request.error);
+        transaction.onerror = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeoutTimer);
+          console.error('Failed transaction in getAllTripsFromIndexedDB:', transaction.error);
+          resolve(tripsCache || []);
+        };
+
+        transaction.onabort = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeoutTimer);
+          console.warn('Transaction aborted in getAllTripsFromIndexedDB');
+          resolve(tripsCache || []);
+        };
+
+        request.onsuccess = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeoutTimer);
+          const trips = (request.result || []).sort((a, b) => {
+            return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+          });
+          tripsCache = jsonSafeClone(trips);
+          lastCacheTime = Date.now();
+          resolve(trips);
+        };
+
+        request.onerror = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeoutTimer);
+          console.error('Failed to load trips from IndexedDB:', request.error);
+          resolve(tripsCache || []);
+        };
+      } catch (txErr) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeoutTimer);
+        console.error('Transaction creation error in getAllTripsFromIndexedDB:', txErr);
         resolve(tripsCache || []);
-      };
+      }
     });
   }).catch(err => {
     console.warn('getAllTripsFromIndexedDB error fallback:', err);
