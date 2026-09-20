@@ -1012,14 +1012,21 @@
           <div class="stack-gap-3">
             <div class="ai-form-group">
               <div class="flex items-center justify-between gap-2 mb-1">
-                <label class="m-0 font-medium text-xs text-slate-700 dark:text-slate-300">Select Leg to Edit</label>
+                <label class="m-0 font-medium text-xs text-slate-700 dark:text-slate-300">Mode / Select Leg</label>
                 <button type="button" class="text-xs text-teal-600 dark:text-teal-400 hover:underline font-semibold" onclick="resetLegDialogToAddNew()">
                   + Add a new leg
                 </button>
               </div>
               <select id="editLegSelect" class="form-control" onchange="onEditLegSelectionChange()">
-                <option value="">-- Choose a leg --</option>
+                <option value="ADD_NEW">➕ Add New Leg</option>
               </select>
+            </div>
+            <div id="legPlacementGroup" class="ai-form-group">
+              <label class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">Route Placement</label>
+              <select id="legPlacementSelect" class="form-control" onchange="onLegPlacementChange()">
+                <option value="before_return">Append before Return Home</option>
+              </select>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">Subsequent legs and return dates shift automatically.</span>
             </div>
             <div class="ai-form-group" style="display: none;">
               <label>Leg Type</label>
@@ -1048,20 +1055,40 @@
               <div class="ai-form-group">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <label class="m-0 font-medium text-xs text-slate-700 dark:text-slate-300">Destination City</label>
-                  <button type="button" class="text-xs text-teal-600 dark:text-teal-400 hover:underline font-semibold" onclick="closeAddLegDialog(); openCityDialog();">
-                    + Add / Manage Cities
+                  <button type="button" id="toggleNewCityBtn" class="text-xs text-teal-600 dark:text-teal-400 hover:underline font-semibold" onclick="toggleNewCityInline()">
+                    + Enter New City
                   </button>
                 </div>
-                <select id="existingCitySelect" class="form-control">
+                <select id="existingCitySelect" class="form-control" onchange="onExistingCitySelectChange()">
                   <option value="">-- Select a city --</option>
                 </select>
+                <div id="newCityInlineGroup" class="flex flex-col gap-2 mt-2 p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700" style="display: none;">
+                  <span class="text-[11px] font-semibold text-slate-600 dark:text-slate-300">Create New City</span>
+                  <input type="text" id="newLegCityName" class="form-control" placeholder="City name (e.g. Kyoto)">
+                  <select id="newLegCityCountrySelect" class="form-control" onchange="onNewLegCountryChange()">
+                    <option value="">Select country...</option>
+                  </select>
+                  <input type="text" id="newLegCityCountryOther" class="form-control" style="display: none;" placeholder="Country name">
+                </div>
               </div>
             </div>
-            <div class="ai-form-group">
-              <label id="datesLabel" class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">Dates in City</label>
-              <div class="row-gap-2">
-                <input type="date" id="newLegStartDate" class="form-control" oninput="onLegDateInputChange()" onchange="onLegDateInputChange()">
-                <input type="date" id="newLegEndDate" class="form-control" oninput="onLegDateInputChange()" onchange="onLegDateInputChange()">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div class="ai-form-group">
+                <label class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">Commences On</label>
+                <input type="date" id="newLegStartDate" class="form-control" oninput="onLegStartDateChange()" onchange="onLegStartDateChange()">
+              </div>
+              <div class="ai-form-group">
+                <label class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">Duration</label>
+                <div class="flex items-center gap-1">
+                  <button type="button" class="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 font-bold text-sm" onclick="stepLegDuration(-1)" title="Decrease nights">−</button>
+                  <input type="number" id="legDurationNights" min="1" max="90" value="3" class="form-control text-center font-bold" oninput="onLegDurationInputChange()" onchange="onLegDurationInputChange()">
+                  <button type="button" class="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 font-bold text-sm" onclick="stepLegDuration(1)" title="Increase nights">+</button>
+                </div>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 text-center block">nights</span>
+              </div>
+              <div class="ai-form-group">
+                <label id="datesLabel" class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">Ends On</label>
+                <input type="date" id="newLegEndDate" class="form-control" oninput="onLegEndDateChange()" onchange="onLegEndDateChange()">
               </div>
             </div>
             <div class="ai-form-group">

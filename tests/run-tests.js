@@ -37,9 +37,11 @@ const { runUploadAllLocalTripsBenchmarkAndTest } = require('./upload-all-local-t
 const { runWeatherNotesSuite } = require('./weather-notes-test');
 const { runMapprImportTests } = require('./mappr-import.test');
 const { runIssuesVerification } = require('./issues-89-91-95-96-verify');
+const { runTripDayMetricsTests } = require('./trip-day-metrics.test');
 
 async function run() {
   try {
+    if (typeof runTripDayMetricsTests === 'function') runTripDayMetricsTests();
     if (typeof runIssuesVerification === 'function') await runIssuesVerification();
     if (typeof runMapprImportTests === 'function') await runMapprImportTests();
     if (typeof runWeatherNotesSuite === 'function') runWeatherNotesSuite();

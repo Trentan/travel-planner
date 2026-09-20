@@ -286,6 +286,10 @@
       @apply text-[1.05rem] font-semibold text-white/90;
     }
 
+    #tab-itinerary .compact-leg-trip-days-badge {
+      @apply text-[0.82rem] px-2.5 py-0.5 rounded-full font-bold shadow-xs;
+    }
+
     #tab-itinerary .compact-leg-header-line .bg-slate-100 {
       @apply ml-auto shrink-0;
     }

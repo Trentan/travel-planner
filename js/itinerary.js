@@ -47,6 +47,76 @@ function escapeCompactText(text) {
       .replace(/'/g, '&#39;');
 }
 
+/**
+ * Calculates cumulative trip day metrics across sequential legs.
+ * @param {number|string|object} legRef - Leg index (0-based), leg ID, or leg object.
+ * @param {number} [dayIndex] - Day index within the leg (0-based).
+ * @param {Array} [data] - Optional itinerary array (defaults to appData).
+ * @returns {object}
+ */
+function getTripDayMetrics(legRef, dayIndex, data) {
+  const itinerary = Array.isArray(data) ? data : (typeof appData !== 'undefined' && Array.isArray(appData) ? appData : []);
+  let targetLegIndex = -1;
+
+  if (typeof legRef === 'number') {
+    targetLegIndex = legRef;
+  } else if (typeof legRef === 'string') {
+    targetLegIndex = itinerary.findIndex(l => String(l?.id) === String(legRef));
+  } else if (legRef && typeof legRef === 'object') {
+    targetLegIndex = itinerary.findIndex(l => l === legRef || (legRef.id && String(l?.id) === String(legRef.id)));
+  }
+
+  let totalTripDays = 0;
+  let priorDays = 0;
+  let targetLegDays = 0;
+
+  itinerary.forEach((leg, idx) => {
+    const daysCount = Array.isArray(leg?.days) ? leg.days.length : 0;
+    if (idx < targetLegIndex) {
+      priorDays += daysCount;
+    } else if (idx === targetLegIndex) {
+      targetLegDays = daysCount;
+    }
+    totalTripDays += daysCount;
+  });
+
+  const hasDays = targetLegDays > 0;
+  const legStartDay = hasDays ? priorDays + 1 : priorDays;
+  const legEndDay = priorDays + targetLegDays;
+
+  let legTripDayRange = '';
+  let legTripDayRangeShort = '';
+  if (hasDays) {
+    if (legStartDay === legEndDay) {
+      legTripDayRange = `Trip Day #${legStartDay}`;
+      legTripDayRangeShort = `#${legStartDay}`;
+    } else {
+      legTripDayRange = `Trip Days #${legStartDay}–#${legEndDay}`;
+      legTripDayRangeShort = `#${legStartDay}–#${legEndDay}`;
+    }
+  }
+
+  const hasDayIndex = dayIndex !== undefined && dayIndex !== null && !isNaN(Number(dayIndex));
+  const numericDayIndex = hasDayIndex ? Math.max(0, Number(dayIndex)) : null;
+  const isValidDay = numericDayIndex !== null && targetLegIndex >= 0 && targetLegIndex < itinerary.length && targetLegDays > 0 && numericDayIndex < targetLegDays;
+  const globalDayIndex = isValidDay ? priorDays + numericDayIndex + 1 : null;
+  const cityDayIndex = isValidDay ? numericDayIndex + 1 : null;
+
+  return {
+    totalTripDays,
+    globalDayIndex,
+    cityDayIndex,
+    cityTotalDays: targetLegDays,
+    legStartDay,
+    legEndDay,
+    legTripDayRange,
+    legTripDayRangeShort
+  };
+}
+if (typeof window !== 'undefined') {
+  window.getTripDayMetrics = getTripDayMetrics;
+}
+
 function getActivityStatusBadgeHtml(status, clickHandlerCall = '') {
   if (!status || status === 'none' || status === 'null') {
     return '';
@@ -884,6 +954,9 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
   `;
   const dayKey = `${day.day}-${day.date}`;
   const isActive = dayIdx === 0;
+  const metrics = getTripDayMetrics(leg.id || legIndex, dayIdx);
+  const tripDaySuffix = metrics.globalDayIndex ? ` (#${metrics.globalDayIndex})` : '';
+  const tripProgressSuffix = (metrics.globalDayIndex && metrics.totalTripDays) ? ` (#${metrics.globalDayIndex}/${metrics.totalTripDays})` : '';
 
   return `
     <section class="compact-day-slide day-card ${isActive ? 'is-active open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-leg-index="${legIndex}" data-leg-id="${escapeCompactText(leg.id)}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
@@ -892,12 +965,12 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
     accentColor: leg.colour,
     accentWidth: '6px',
     dateLabel: dayDateLabel,
-    title: `Day ${dayIdx + 1} · ${day.day || ''}`.trim(),
+    title: `Day ${dayIdx + 1}${tripDaySuffix} · ${day.day || ''}`.trim(),
     subtitle: routeLabel,
     primaryAction: `
       <span class="compact-day-header-chips flex items-center gap-1.5 flex-wrap">
         ${typeof renderDayWeatherBadgeHtml === 'function' ? renderDayWeatherBadgeHtml(day.date, toCity || fromCity || leg.label, leg) : ''}
-        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.72rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}</span>
+        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.72rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}${tripProgressSuffix}</span>
         ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
       </span>
     `,
@@ -935,7 +1008,9 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
     const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
     const slideId = getCompactDaySlideId(leg.id, dayIdx);
     const active = dayIdx === initialIndex;
-    const chipDate = `Day ${dayIdx + 1}, ${day.day} ${dayDateLabel}`;
+    const dayMetrics = getTripDayMetrics(leg.id || legIndex, dayIdx);
+    const dayTripSuffix = dayMetrics.globalDayIndex ? ` (#${dayMetrics.globalDayIndex})` : '';
+    const chipDate = `Day ${dayIdx + 1}${dayTripSuffix}, ${day.day} ${dayDateLabel}`;
     const dayJourneys = getDayJourneys(day.date, day.from, day.to, leg.id);
     const isTravelDay = String(day.from || '').trim().toLowerCase() !== String(day.to || '').trim().toLowerCase();
     const hasTravelJourney = Array.isArray(dayJourneys) && dayJourneys.some(j => {
@@ -1365,8 +1440,11 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
     chip.setAttribute('aria-current', active ? 'true' : 'false');
   });
 
-  if (positionLabel) positionLabel.textContent = `Day ${safeIndex + 1} of ${total}`;
-  if (counterLabel) counterLabel.textContent = `${safeIndex + 1}/${total}`;
+  const legId = pager.dataset.legId || '';
+  const metrics = getTripDayMetrics(legId, safeIndex);
+  const tripDayPositionSuffix = (metrics.globalDayIndex && metrics.totalTripDays) ? ` (#${metrics.globalDayIndex}/${metrics.totalTripDays})` : '';
+  if (positionLabel) positionLabel.textContent = `Day ${safeIndex + 1} of ${total}${tripDayPositionSuffix}`;
+  if (counterLabel) counterLabel.textContent = `${safeIndex + 1}/${total}${tripDayPositionSuffix}`;
   if (progressFill) progressFill.style.width = `${((safeIndex + 1) / total) * 100}%`;
   pager.dataset.activeIndex = String(safeIndex);
   if (pagerKey && typeof setMobilePagerActiveIndex === 'function') {
@@ -1389,7 +1467,6 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
     syncItineraryMobileHeightContainment(pager.closest('#tab-itinerary') || document);
   }
 
-  const legId = pager.dataset.legId;
   let legIdx = -1;
   if (typeof appData !== 'undefined' && Array.isArray(appData)) {
     legIdx = appData.findIndex(l => String(l.id) === String(legId));
@@ -1455,6 +1532,7 @@ function renderCompactLegCard(leg, legIndex, journeysByJourneyIdMap) {
   const legCost = getLegTotalCost(leg);
   const firstDay = leg.days && leg.days[0];
   const lastDay = leg.days && leg.days[daysCount - 1];
+  const metrics = getTripDayMetrics(leg.id || legIndex);
   const legDateRange = firstDay && lastDay
       ? (firstDay.date === lastDay.date ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : `${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date} - ${typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(lastDay.date) : lastDay.date}`)
       : (firstDay ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(firstDay.date) : firstDay.date) : '');
@@ -1474,6 +1552,7 @@ function renderCompactLegCard(leg, legIndex, journeysByJourneyIdMap) {
           <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
           <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
           <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
+          ${metrics.legTripDayRange ? `<span class="compact-leg-trip-days-badge bg-white/20 text-white font-semibold px-2.5 py-0.5 rounded-full text-[0.78rem] tracking-wide border border-white/30 whitespace-nowrap">${escapeHtmlText(metrics.legTripDayRange)}</span>` : ''}
           <span class="leg-chevron ml-auto" style="color: white; font-size: 1.2rem;">&#9660;</span>
         </div>
       </div>
@@ -1515,6 +1594,7 @@ function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap) {
   const legCost = getLegTotalCost(leg);
   const firstDay = leg.days && leg.days[0];
   const lastDay = leg.days && leg.days[daysCount - 1];
+  const metrics = getTripDayMetrics(leg.id || legIndex);
 
   const legDateRangeHtml = renderCompactLegDateRangeHtml(firstDay, lastDay);
   const displayLegLabel = getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
@@ -1527,6 +1607,7 @@ function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap) {
           <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
           <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
           <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
+          ${metrics.legTripDayRange ? `<span class="compact-leg-trip-days-badge hidden sm:inline-flex bg-white/20 text-white font-semibold px-2.5 py-0.5 rounded-full text-[0.72rem] tracking-wide border border-white/30 whitespace-nowrap">${escapeHtmlText(metrics.legTripDayRange)}</span>` : ''}
         </div>
       </div>
       <div class="compact-leg-body">
@@ -1550,6 +1631,7 @@ function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap) {
   const nightLabel = getLegNightSummary(leg).label;
   const firstDay = leg.days && leg.days[0];
   const lastDay = leg.days && leg.days[daysCount - 1];
+  const metrics = getTripDayMetrics(leg.id || legIndex);
 
   const displayLegLabel = getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
 
@@ -1558,12 +1640,13 @@ function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap) {
       : escapeHtmlText(firstDay ? firstDay.date : 'Trip');
 
   const flightTimeLabel = getLegFlightButtonTimeLabel(leg, journeysByJourneyId);
+  const routeDetail = [flightTimeLabel || nightLabel, metrics.legTripDayRangeShort].filter(Boolean).join(' · ');
 
   return `
     <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
       <span class="mobile-swipe-chip-eyebrow">${chipDateRangeHtml}</span>
       <span class="mobile-swipe-chip-title">${escapeHtmlText(displayLegLabel)}</span>
-      <span class="mobile-swipe-chip-route">${escapeHtmlText(flightTimeLabel || nightLabel)}</span>
+      <span class="mobile-swipe-chip-route">${escapeHtmlText(routeDetail)}</span>
     </button>
   `;
 }
@@ -1576,6 +1659,7 @@ function renderCompactActiveCityHeader(firstLeg) {
   const legCost = getLegTotalCost(firstLeg);
   const firstDay = firstLeg.days && firstLeg.days[0];
   const lastDay = firstLeg.days && firstLeg.days[daysCount - 1];
+  const metrics = getTripDayMetrics(firstLeg.id || 0);
 
   const legDateRangeHtml = renderCompactLegDateRangeHtml(firstDay, lastDay);
   const displayLegLabel = getCompactLegDisplayLabel(firstLeg, 0, firstDay, lastDay, daysCount);
@@ -1587,6 +1671,7 @@ function renderCompactActiveCityHeader(firstLeg) {
         <h2 class="compact-leg-label">${escapeHtmlText(displayLegLabel)}</h2>
         <span class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full text-[0.8rem] shadow-sm border border-slate-200 dark:border-slate-600">${formatCurrency(legCost)}</span>
         <span class="compact-leg-night-count">${escapeHtmlText(nightLabel)}</span>
+        ${metrics.legTripDayRange ? `<span class="compact-leg-trip-days-badge hidden sm:inline-flex bg-white/20 text-white font-semibold px-2.5 py-0.5 rounded-full text-[0.72rem] tracking-wide border border-white/30 whitespace-nowrap">${escapeHtmlText(metrics.legTripDayRange)}</span>` : ''}
       </div>
     </div>
   `;
@@ -3303,6 +3388,7 @@ function buildItinerary() {
     const subtitle = unassigned.length === 0 ? "All suggested activities assigned! 🎉" : `Remaining Ideas: ${unassigned.slice(0, 3).map(s => s.title.split('—')[0].trim()).join(', ')}${unassigned.length > 3 ? '...' : ''}`;
 
     const legCost = getLegTotalCost(leg);
+    const legMetrics = getTripDayMetrics(leg.id || legIndex);
 
     let html = `
     <div class="leg-header" style="background:${escapeHtmlText(leg.colour)}" onclick="toggleLeg(this)">
@@ -3310,6 +3396,7 @@ function buildItinerary() {
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; min-width:0;">
           <h2 contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateData(${legIndex}, 'label', this.innerText)">${getLegHeaderLabelWithFlag(leg.label)}</h2>
           <span style="opacity:0.8; font-size:0.9rem; font-family:'DM Mono', monospace;">${dateRange}</span>
+          ${legMetrics.legTripDayRange ? `<span class="leg-trip-days-badge bg-white/20 text-white font-semibold px-2.5 py-0.5 rounded-full text-xs tracking-wide border border-white/30 whitespace-nowrap">${escapeHtmlText(legMetrics.legTripDayRange)}</span>` : ''}
         </div>
         <div style="display:flex; align-items:center; gap:10px; margin-left:auto; flex-wrap:nowrap;">
           <div class="hidden sm:flex shrink-0 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-full shadow-sm border border-slate-200 dark:border-slate-700 mr-2" title="Leg estimated cost">${formatCurrency(legCost)}</div>
@@ -3401,10 +3488,12 @@ function buildItinerary() {
       const dayViewMode = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped' ? 'grouped' : 'timeline';
       const stayingHeadingNote = renderStayingHeadingNote(day.date, day.to);
 
+      const dayMetrics = getTripDayMetrics(leg.id || legIndex, dayIndex);
+
       html += `
       <div class="day-card group flex flex-col mb-4 overflow-hidden bg-white/90 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 rounded-xl shadow-sm transition-all duration-300 ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
         <div class="day-bar flex items-center p-3 sm:p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors relative" style="border-left: 5px solid var(--leg-colour, ${escapeHtmlText(leg.colour)})" onclick="toggleCard(this)">
-          <div class="day-date w-16 sm:w-20 shrink-0 text-center flex flex-col items-center justify-center border-r border-slate-200 dark:border-slate-700 pr-3 sm:pr-4 mr-3 sm:mr-4"><span class="day-num text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">${dayDateLabel}</span><span class="day-name text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${day.day}</span></div>
+          <div class="day-date w-16 sm:w-20 shrink-0 text-center flex flex-col items-center justify-center border-r border-slate-200 dark:border-slate-700 pr-3 sm:pr-4 mr-3 sm:mr-4"><span class="day-num text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">${dayDateLabel}</span><span class="day-name text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${day.day}</span>${dayMetrics.globalDayIndex ? `<span class="day-trip-num text-[0.7rem] font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/40 px-1.5 py-0.5 rounded mt-1 border border-teal-200 dark:border-teal-800" title="Trip Day ${dayMetrics.globalDayIndex} of ${dayMetrics.totalTripDays}">#${dayMetrics.globalDayIndex}</span>` : ''}</div>
           <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${cityHTML}</div>${stayingHeadingNote}<div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
           ${dayTotal ? `<div class="day-total-cost hidden sm:flex shrink-0 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-full border border-slate-200 dark:border-slate-600 shadow-inner mr-4" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron shrink-0 w-8 h-8 flex items-center justify-center text-slate-400 transition-transform duration-300 bg-slate-100 dark:bg-slate-700/50 rounded-full group-[.open]:rotate-180">▼</span>
         </div>
