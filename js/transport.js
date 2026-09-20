@@ -978,6 +978,16 @@ return `
     </div>` : ''}
       ${renderTransportMobileFact('Cost', formatCurrency(totalCost))}
       ${renderTransportMobileFact('Booking #', bookingLabel)}
+      ${(() => {
+        const allAlerts = (segs || []).flatMap(s => s.alerts || []);
+        const badges = typeof renderJourneyAlertBadgesHtml === 'function' ? renderJourneyAlertBadgesHtml(allAlerts) : '';
+        return badges ? `<div class="transport-mobile-fact transport-mobile-fact--wide"><span class="transport-mobile-fact-label">Alerts</span><span class="transport-mobile-fact-value flex flex-wrap gap-1">${badges}</span></div>` : '';
+      })()}
+      ${(() => {
+        const allAtts = (segs || []).flatMap(s => s.attachments || []);
+        const pills = typeof renderAttachmentsPillsHtml === 'function' ? renderAttachmentsPillsHtml(allAtts) : '';
+        return pills ? `<div class="transport-mobile-fact transport-mobile-fact--wide"><span class="transport-mobile-fact-label">Attachments</span><span class="transport-mobile-fact-value flex flex-wrap gap-1">${pills}</span></div>` : '';
+      })()}
       ${notesValue ? renderTransportMobileFact('Notes', notesValue, 'transport-mobile-fact--wide transport-mobile-fact--notes') : ''}
     </div>
   `;
@@ -1129,6 +1139,7 @@ function renderTransportSegmentsDetailContent(segs) {
             <span class="segment-notes-label">Notes:</span> 
             <span class="segment-notes-text">${escapeHtmlText(seg.notes || '')}</span>
           </div>
+          ${seg.alerts && seg.alerts.length > 0 && typeof renderJourneyAlertBadgesHtml === 'function' ? '<div class="journey-segment-alerts mt-1 flex flex-wrap gap-1">' + renderJourneyAlertBadgesHtml(seg.alerts) + '</div>' : ''}
           ${seg.attachments && seg.attachments.length > 0 ? '<div class="journey-segment-attachments mt-1 flex flex-wrap gap-1">' + renderAttachmentsPillsHtml(seg.attachments) + '</div>' : ''}
         </div>
       `);
@@ -1160,7 +1171,11 @@ function renderTransportSegmentsDetailContent(segs) {
           <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap font-medium">${segDep}</td>
           <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${segArr !== '—' ? segArr + ' ' + (seg.arrivalTime || '') : '—'}</td>
           <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">${seg.provider || '—'}</td>
-          <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 font-mono uppercase">${seg.routeCode || '—'}</td>
+          <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 font-mono uppercase">
+            <div>${escapeHtmlText(seg.routeCode || '—')}</div>
+            ${seg.alerts && seg.alerts.length > 0 && typeof renderJourneyAlertBadgesHtml === 'function' ? '<div class="mt-1 flex flex-wrap gap-1">' + renderJourneyAlertBadgesHtml(seg.alerts) + '</div>' : ''}
+            ${seg.attachments && seg.attachments.length > 0 && typeof renderAttachmentsPillsHtml === 'function' ? '<div class="mt-1 flex flex-wrap gap-1">' + renderAttachmentsPillsHtml(seg.attachments) + '</div>' : ''}
+          </td>
           <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 font-mono uppercase">${seg.bookingReference || '—'}</td>
           <td class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 text-sm text-slate-800 dark:text-slate-200 font-medium text-right">${seg.cost ? formatCurrency(seg.cost) : '—'}</td>
         </tr>
@@ -1568,7 +1583,19 @@ html += `
         </td>
         
         <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">
-          ${escapeHtmlText(rep.routeCode || '—')}
+          <div>${escapeHtmlText(rep.routeCode || '—')}</div>
+          ${(() => {
+            const allAlerts = (segs || []).flatMap(s => s.alerts || []);
+            const allAtts = (segs || []).flatMap(s => s.attachments || []);
+            let out = '';
+            if (allAlerts.length > 0 && typeof renderJourneyAlertBadgesHtml === 'function') {
+              out += `<div class="mt-1 flex flex-wrap gap-1">${renderJourneyAlertBadgesHtml(allAlerts)}</div>`;
+            }
+            if (allAtts.length > 0 && typeof renderAttachmentsPillsHtml === 'function') {
+              out += `<div class="mt-1 flex flex-wrap gap-1">${renderAttachmentsPillsHtml(allAtts)}</div>`;
+            }
+            return out;
+          })()}
         </td>
         
         <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">
@@ -1737,10 +1764,12 @@ function _loadSegmentIntoForm(seg) {
   document.getElementById('journeyToAddress').value = seg.toAddress || '';
   document.getElementById('journeyDateFrom').value = seg.departureDate || '';
   
-  if (typeof window._currentAttachments !== 'undefined') {
-    window._currentAttachments = seg.attachments ? [...seg.attachments] : [];
-    if (typeof renderJourneyAttachmentsList === 'function') renderJourneyAttachmentsList();
-  }
+  window._currentJourneyAttachments = seg.attachments ? [...seg.attachments] : [];
+  window._currentAttachments = window._currentJourneyAttachments;
+  if (typeof renderJourneyAttachmentsList === 'function') renderJourneyAttachmentsList();
+
+  window._currentJourneyAlerts = seg.alerts ? [...seg.alerts] : [];
+  if (typeof renderJourneyAlertsList === 'function') renderJourneyAlertsList();
 
   document.getElementById('journeyTimeFrom').value = seg.departureTime || '';
   document.getElementById('journeyDateTo').value = seg.arrivalDate || '';
@@ -1867,10 +1896,12 @@ function openAddJourneyModal() {
     _pendingOriginalJourneyIds = [];
     _activeSegmentIndex = -1;
     
-    if (typeof window._currentAttachments !== 'undefined') {
-      window._currentAttachments = [];
-      if (typeof renderJourneyAttachmentsList === 'function') renderJourneyAttachmentsList();
-    }
+    window._currentJourneyAttachments = [];
+    window._currentAttachments = window._currentJourneyAttachments;
+    if (typeof renderJourneyAttachmentsList === 'function') renderJourneyAttachmentsList();
+
+    window._currentJourneyAlerts = [];
+    if (typeof renderJourneyAlertsList === 'function') renderJourneyAlertsList();
 
     _populateJourneyCityDropdowns();
 
@@ -2055,7 +2086,8 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
     fromAddress: fromAddress,
     toAddress: toAddress,
     legs: [],
-    attachments: typeof window._currentAttachments !== 'undefined' ? [...window._currentAttachments] : []
+    attachments: typeof window._currentJourneyAttachments !== 'undefined' ? [...window._currentJourneyAttachments] : (typeof window._currentAttachments !== 'undefined' ? [...window._currentAttachments] : []),
+    alerts: typeof window._currentJourneyAlerts !== 'undefined' ? [...window._currentJourneyAlerts] : []
   };
 }
 
@@ -2157,6 +2189,119 @@ window.evaluateLayoverBuffer = evaluateLayoverBuffer;
 window.scoreJourneyForDay = scoreJourneyForDay;
 window.getLocationDisplayWithCode = getLocationDisplayWithCode;
 window.getLocationCodeDisplay = getLocationCodeDisplay;
+window._currentJourneyAlerts = [];
+
+function promptAddJourneyAlert() {
+  const message = prompt('Enter alert message (e.g. Delayed 45m, Gate changed to B22, Baggage Belt 4):');
+  if (!message || !message.trim()) return;
+
+  const severityInput = prompt('Enter severity ("warning", "critical", or "info"):', 'warning') || 'warning';
+  const cleanSeverity = ['warning', 'critical', 'info'].includes(severityInput.toLowerCase().trim())
+    ? severityInput.toLowerCase().trim()
+    : 'warning';
+
+  const typeInput = prompt('Enter alert type ("delay", "gate", "baggage", "status", "checkIn", or "custom"):', 'delay') || 'custom';
+  const cleanType = typeInput.toLowerCase().trim() || 'custom';
+
+  const alertItem = {
+    id: 'alt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+    type: cleanType,
+    severity: cleanSeverity,
+    message: message.trim(),
+    timestamp: new Date().toISOString(),
+    resolved: false
+  };
+
+  if (!Array.isArray(window._currentJourneyAlerts)) window._currentJourneyAlerts = [];
+  window._currentJourneyAlerts.push(alertItem);
+  renderJourneyAlertsList();
+}
+
+function renderJourneyAlertsListHtml(alerts) {
+  if (!alerts || !Array.isArray(alerts) || alerts.length === 0) {
+    return '<p class="text-xs text-slate-500 dark:text-slate-400">No operational alerts recorded for this leg.</p>';
+  }
+  return alerts.map((alt, idx) => {
+    const isResolved = !!alt.resolved;
+    const icon = isResolved ? '✅' : (alt.severity === 'critical' ? '🚨' : (alt.severity === 'warning' ? '⚠️' : 'ℹ️'));
+    const borderClass = isResolved
+      ? 'border-emerald-200 bg-emerald-50/50 dark:border-emerald-900/40 dark:bg-emerald-950/20'
+      : (alt.severity === 'critical'
+        ? 'border-red-300 bg-red-50 dark:border-red-900/50 dark:bg-red-950/30'
+        : (alt.severity === 'warning'
+          ? 'border-amber-300 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/30'
+          : 'border-blue-200 bg-blue-50 dark:border-blue-900/40 dark:bg-blue-950/20'));
+    const textClass = isResolved
+      ? 'line-through text-slate-400 dark:text-slate-500'
+      : (alt.severity === 'critical'
+        ? 'text-red-800 dark:text-red-200 font-semibold'
+        : (alt.severity === 'warning'
+          ? 'text-amber-800 dark:text-amber-200 font-medium'
+          : 'text-blue-800 dark:text-blue-200 font-medium'));
+
+    return `
+      <div class="flex items-center justify-between p-2 rounded border ${borderClass} text-xs gap-2">
+        <div class="flex items-center gap-1.5 min-w-0 flex-1">
+          <span>${icon}</span>
+          <span class="truncate ${textClass}">${escapeHtmlText(alt.message)}</span>
+          <span class="text-[10px] text-slate-400 uppercase tracking-wide">(${escapeHtmlText(alt.type || 'alert')})</span>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button type="button" class="text-[11px] px-1.5 py-0.5 rounded border ${isResolved ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200'}" onclick="toggleJourneyAlertResolved(${idx})">
+            ${isResolved ? 'Reopen' : 'Resolve'}
+          </button>
+          <button type="button" class="text-red-500 hover:text-red-700 px-1 font-bold" onclick="removeJourneyAlert(${idx})" title="Delete alert">✖</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderJourneyAlertsList() {
+  const container = document.getElementById('journeyAlertsList');
+  if (container) {
+    container.innerHTML = renderJourneyAlertsListHtml(window._currentJourneyAlerts || []);
+  }
+}
+
+function toggleJourneyAlertResolved(index) {
+  if (Array.isArray(window._currentJourneyAlerts) && window._currentJourneyAlerts[index]) {
+    window._currentJourneyAlerts[index].resolved = !window._currentJourneyAlerts[index].resolved;
+    renderJourneyAlertsList();
+  }
+}
+
+function removeJourneyAlert(index) {
+  if (Array.isArray(window._currentJourneyAlerts)) {
+    window._currentJourneyAlerts.splice(index, 1);
+    renderJourneyAlertsList();
+  }
+}
+
+function renderJourneyAlertBadgesHtml(alerts) {
+  if (!alerts || !Array.isArray(alerts) || alerts.length === 0) return '';
+  const active = alerts.filter(a => !a.resolved);
+  if (active.length === 0) {
+    return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800" title="All alerts resolved">✅ Normal</span>`;
+  }
+  return active.map(alt => {
+    const icon = alt.severity === 'critical' ? '🚨' : (alt.severity === 'warning' ? '⚠️' : 'ℹ️');
+    const badgeStyle = alt.severity === 'critical'
+      ? 'bg-red-100 text-red-800 border-red-300 dark:bg-red-950/50 dark:text-red-200 dark:border-red-800'
+      : (alt.severity === 'warning'
+        ? 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/50 dark:text-amber-200 dark:border-amber-800'
+        : 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950/50 dark:text-blue-200 dark:border-blue-800');
+    return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold border ${badgeStyle}" title="${escapeHtmlText(alt.message)}"><span>${icon}</span> <span>${escapeHtmlText(alt.message)}</span></span>`;
+  }).join(' ');
+}
+
+window.promptAddJourneyAlert = promptAddJourneyAlert;
+window.renderJourneyAlertsListHtml = renderJourneyAlertsListHtml;
+window.renderJourneyAlertsList = renderJourneyAlertsList;
+window.toggleJourneyAlertResolved = toggleJourneyAlertResolved;
+window.removeJourneyAlert = removeJourneyAlert;
+window.renderJourneyAlertBadgesHtml = renderJourneyAlertBadgesHtml;
+
 window.buildRouteChainWithCodes = buildRouteChainWithCodes;
 window.buildJourneyName = buildJourneyName;
 window.openAddJourneyModal = openAddJourneyModal;

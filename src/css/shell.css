@@ -803,6 +803,19 @@
     @apply bg-slate-800 text-white border-slate-800 dark:bg-cyan-600 dark:border-cyan-600;
   }
 
+  .packing-guide-btn.packing-guide-btn-readiness {
+    @apply border-indigo-300 dark:border-indigo-700/80 bg-indigo-50/90 dark:bg-indigo-950/50
+           text-indigo-700 dark:text-indigo-300 font-bold shadow-xs;
+  }
+
+  .packing-guide-btn.packing-guide-btn-readiness:hover {
+    @apply bg-indigo-100 dark:bg-indigo-900/60 border-indigo-400 dark:border-indigo-600 text-indigo-800 dark:text-indigo-200;
+  }
+
+  .packing-guide-btn.packing-guide-btn-readiness.active {
+    @apply bg-indigo-600 text-white border-indigo-600 dark:bg-indigo-600 dark:border-indigo-600 shadow-sm;
+  }
+
   .packing-guide-panel {
     @apply mt-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80
            bg-slate-50/75 dark:bg-slate-900/45 p-3 sm:p-4;

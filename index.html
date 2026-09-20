@@ -121,6 +121,7 @@
         <div class="app-menu-section-group">
           <div class="app-menu-section-header">⚙️ App & Maintenance</div>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openGuideDialog()"><span class="menu-icon">📖</span> User Guide & Help</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openReadinessGuide()"><span class="menu-icon">🌍</span> International Readiness</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); promptHardRestart()" title="Reload app and clear caches while preserving trip data"><span class="menu-icon">🔄</span> Hard Restart</button>
           <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="closeDesktopActionsMenu(); promptInstallApp()"><span class="menu-icon">⬇</span> Install App</button>
           <button class="app-menu-btn danger" onclick="closeDesktopActionsMenu(); promptFactoryReset()" title="Wipe ALL data and revert to default template"><span class="menu-icon">⚠️</span> Factory Reset (Wipe Data)</button>
@@ -506,6 +507,10 @@
               <span class="app-menu-btn-title">📖 User Guide & Help</span>
               <span class="app-menu-btn-subtitle">Interactive guide & tips</span>
             </button>
+            <button class="app-menu-btn" onclick="closeMobileMenu(); openReadinessGuide()">
+              <span class="app-menu-btn-title">🌍 International Readiness</span>
+              <span class="app-menu-btn-subtitle">Passports, visas, plugs & health</span>
+            </button>
             <button class="app-menu-btn" onclick="closeMobileMenu(); promptHardRestart()">
               <span class="app-menu-btn-title">🔄 Hard Restart</span>
               <span class="app-menu-btn-subtitle">Clean refresh (keeps trip data)</span>
@@ -812,16 +817,29 @@
   <div id="guide-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content modal-xl">
       <div class="modal-header">
-        <h2>📖 How to Use Travel Planner</h2>
+        <h2 id="guideModalTitle">📖 How to Use Travel Planner</h2>
         <button class="modal-close" onclick="closeGuideDialog()">&times;</button>
       </div>
       <div class="modal-body" style="overflow-y: auto;">
-        <div class="guide-container" id="guideContainer">
-          <div class="guide-actions" style="margin-bottom: 1.5rem;">
-            <button class="action-btn" id="tutorialBtn" onclick="startTutorial(); closeGuideDialog();">▶ Start Interactive Tutorial</button>
-            <button class="action-btn" onclick="resetTutorialSeen()">↺ Replay Tutorial</button>
+        <div class="guide-tabs-bar flex border-b border-slate-200 dark:border-slate-700 mb-4 gap-2">
+          <button id="guideTabBtnFeatures" type="button" class="px-4 py-2 text-sm font-semibold border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 focus:outline-none" onclick="switchGuideTab('features')">📖 Feature Guides & Tutorials</button>
+          <button id="guideTabBtnReadiness" type="button" class="px-4 py-2 text-sm font-semibold border-b-2 border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 focus:outline-none" onclick="switchGuideTab('readiness')">🌍 International Readiness</button>
+        </div>
+
+        <!-- Tab 1: Feature Guides -->
+        <div id="guideTabContentFeatures" class="guide-tab-panel">
+          <div class="guide-container" id="guideContainer">
+            <div class="guide-actions" style="margin-bottom: 1.5rem;">
+              <button class="action-btn" id="tutorialBtn" onclick="startTutorial(); closeGuideDialog();">▶ Start Interactive Tutorial</button>
+              <button class="action-btn" onclick="resetTutorialSeen()">↺ Replay Tutorial</button>
+            </div>
+            <div class="guide-steps" id="guideSteps"></div>
           </div>
-          <div class="guide-steps" id="guideSteps"></div>
+        </div>
+
+        <!-- Tab 2: International Readiness -->
+        <div id="guideTabContentReadiness" class="guide-tab-panel" style="display: none;">
+          <div id="readinessContainer" class="readiness-container flex flex-col gap-5"></div>
         </div>
       </div>
     </div>
@@ -1236,6 +1254,18 @@
                   </div>
                 </div>
 
+                <!-- Panel 4: Operational Alerts & Flight Status -->
+                <div class="journey-form-group-panel">
+                  <div class="ai-form-group span-2">
+                    <div class="flex items-center justify-between mb-1">
+                      <label>Operational Alerts & Flight Status</label>
+                      <span class="text-xs text-slate-400">Delays, gate changes, baggage belts</span>
+                    </div>
+                    <div id="journeyAlertsList" class="alerts-list flex flex-col gap-2 mb-2"></div>
+                    <button type="button" class="action-btn action-btn-secondary text-sm px-2 py-1" onclick="promptAddJourneyAlert()">⚠️ + Add Alert</button>
+                  </div>
+                </div>
+
               <div id="pendingSegmentsList" class="journey-pending-segments">
             </div>
           </div>
@@ -1336,6 +1366,19 @@
             <div class="ai-form-group span-2">
               <label for="stayNotes">Notes</label>
               <textarea id="stayNotes" class="form-control form-control--compact stay-notes-input" placeholder="Optional: address, phone, check-in instructions..."></textarea>
+            </div>
+          </div>
+
+          <!-- Group 5: Attachments & Links -->
+          <div class="stay-form-group-panel">
+            <div class="ai-form-group span-2">
+              <label>Attachments & Links</label>
+              <div id="stayAttachmentsList" class="attachments-list flex flex-col gap-2 mb-2"></div>
+              <div class="flex gap-2">
+                <button type="button" class="action-btn action-btn-secondary text-sm px-2 py-1" onclick="promptAddStayLink()">📎 Add Link</button>
+                <button type="button" class="action-btn action-btn-secondary text-sm px-2 py-1" onclick="document.getElementById('stayImageUpload').click()">🖼️ Upload Image</button>
+                <input type="file" id="stayImageUpload" accept="image/*" style="display: none;" onchange="handleStayImageUpload(event)">
+              </div>
             </div>
           </div>
         </div>

@@ -451,6 +451,39 @@ function renderPackingGuidePanel() {
     `;
   }
 
+  if (activeGuidePanel === 'readiness') {
+    const readinessHtml = typeof buildReadinessGuideHtml === 'function'
+      ? buildReadinessGuideHtml('packingReadinessChecklistMount')
+      : '<div class="p-4 text-sm text-slate-500">Readiness guide loading...</div>';
+
+    setTimeout(() => {
+      if (typeof renderReadinessChecklist === 'function') {
+        renderReadinessChecklist();
+      }
+    }, 0);
+
+    return `
+      <div class="packing-guide-panel guide-panel">
+        <div class="guide-panel-header flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-700">
+          <div>
+            <h4 class="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <span>🌍</span> Destination Travel Readiness & Rules
+            </h4>
+            <p class="guide-panel-subtitle text-xs text-slate-500 dark:text-slate-400">Entry requirements, 6-month passport validity, power plugs, currency & health advice</p>
+          </div>
+          <button type="button" class="action-btn text-xs px-2.5 py-1 shrink-0" onclick="openReadinessGuide()" title="Open as modal window">
+            ⛶ Open Modal View
+          </button>
+        </div>
+        <div class="guide-panel-content">
+          <div class="flex flex-col gap-4">
+            ${readinessHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   return '';
 }
 
@@ -472,6 +505,7 @@ function renderPackingGuidesShell() {
 
         <div class="packing-guides-toolbar-right">
           <div class="packing-guides-buttons">
+            <button type="button" class="packing-guide-btn packing-guide-btn-readiness ${isActiveGuide('readiness') ? 'active' : ''}" onclick="toggleGuidePanel('readiness')" title="View entry requirements, passport rules & destination checklist">🌍 Travel Readiness</button>
             <button type="button" class="packing-guide-btn ${isActiveGuide('leaveHome') ? 'active' : ''}" onclick="toggleGuidePanel('leaveHome')">Before Leaving Home</button>
             <button type="button" class="packing-guide-btn ${isActiveGuide('hotelCheckout') ? 'active' : ''}" onclick="toggleGuidePanel('hotelCheckout')">Hotel Checkout</button>
             <button type="button" class="packing-guide-btn ${isActiveGuide('sink') ? 'active' : ''}" onclick="toggleGuidePanel('sink')">Hotel Sink Washing</button>

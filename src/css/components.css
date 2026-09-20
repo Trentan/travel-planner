@@ -2312,11 +2312,17 @@
     body.mobile-app-mode .activity-assign-estimate-grid,
     body.mobile-app-mode .activity-assign-schedule-layout,
     body.mobile-app-mode .activity-assign-detail-grid,
-    body.mobile-app-mode .activity-assign-current-wrap {
+    body.mobile-app-mode .activity-assign-current-wrap,
+    body.mobile-app-mode .activity-assign-attachments-section {
       border: 1px solid rgba(203, 213, 225, 0.85);
       background: #fff;
       border-radius: 0.75rem;
       padding: 0.65rem;
+    }
+
+    [data-theme="dark"] body.mobile-app-mode .activity-assign-attachments-section {
+      border-color: rgba(148, 163, 184, 0.16);
+      background: var(--surface-card);
     }
 
     body.mobile-app-mode #activity-assign-modal .modal-header {
@@ -2373,6 +2379,10 @@
 
     body.mobile-app-mode .activity-assign-current-wrap {
       order: 6;
+    }
+
+    body.mobile-app-mode .activity-assign-attachments-section {
+      order: 7;
     }
 
     body.mobile-app-mode #activity-assign-modal .modal-body .ai-form-group > label {
