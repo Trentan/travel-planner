@@ -3362,18 +3362,22 @@ function validateLegEditorForm() {
     const placementVal = placementSelect?.value || 'before_return';
 
     let skipIndexStart = -1;
-    if (!isEdit && isCascadeEnabled) {
-      if (placementVal === 'before_return') {
-        const retIdx = stagedLegs.findIndex(l => {
-          const lbl = (l.label || '').toLowerCase();
-          return lbl.includes('return') || lbl.includes('trip finish');
-        });
-        if (retIdx >= 0) skipIndexStart = retIdx;
-      } else if (placementVal.startsWith('after_')) {
-        const afterIdx = Number(placementVal.replace('after_', ''));
-        if (Number.isFinite(afterIdx)) skipIndexStart = afterIdx + 1;
-      } else if (placementVal === 'start') {
-        skipIndexStart = 0;
+    if (isCascadeEnabled) {
+      if (isEdit && Number.isFinite(currentEditingIdx)) {
+        skipIndexStart = currentEditingIdx + 1;
+      } else if (!isEdit) {
+        if (placementVal === 'before_return') {
+          const retIdx = stagedLegs.findIndex(l => {
+            const lbl = (l.label || '').toLowerCase();
+            return lbl.includes('return') || lbl.includes('trip finish');
+          });
+          if (retIdx >= 0) skipIndexStart = retIdx;
+        } else if (placementVal.startsWith('after_')) {
+          const afterIdx = Number(placementVal.replace('after_', ''));
+          if (Number.isFinite(afterIdx)) skipIndexStart = afterIdx + 1;
+        } else if (placementVal === 'start') {
+          skipIndexStart = 0;
+        }
       }
     }
 
@@ -3574,6 +3578,18 @@ function adjustLegDays(legIdx, delta) {
 
   if (delta === 0) return;
 
+  // Capture original dates of all legs before mutation
+  const origDates = {};
+  appData.forEach((l, idx) => {
+    if (l && Array.isArray(l.days) && l.days.length > 0) {
+      if (!l.id) l.id = 'leg_' + (idx + 1);
+      origDates[l.id] = {
+        startDate: l.days[0].date,
+        endDate: l.days[l.days.length - 1].date
+      };
+    }
+  });
+
   if (delta > 0) {
     const lastDay = leg.days[leg.days.length - 1];
     const lastDate = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(lastDay.date) : lastDay.date;
@@ -3587,28 +3603,74 @@ function adjustLegDays(legIdx, delta) {
     const conflict = checkDateConflict(nextDate, legIdx);
     if (conflict) {
       const conflictDate = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(nextDate) : nextDate;
-      const proceed = confirm(
-        `Adding a day to ${leg.label} creates a date overlap on ${conflictDate} with ${conflict.legLabel}. Continue anyway?`
+      const confirmFn = typeof confirm === 'function' ? confirm : (typeof window !== 'undefined' && typeof window.confirm === 'function' ? window.confirm : () => true);
+      const proceed = confirmFn(
+        `Adding a day to ${leg.label} creates a date overlap on ${conflictDate} with ${conflict.legLabel}. Subsequent legs will be readjusted. Continue anyway?`
       );
       if (!proceed) return;
     }
 
-    leg.days.push(createLegDayTemplate(lastDay, nextDate));
+    for (let s = 0; s < delta; s++) {
+      const curLastDay = leg.days[leg.days.length - 1];
+      const curLastDate = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(curLastDay.date) : curLastDay.date;
+      const curNextDate = typeof addDaysToIsoDate === 'function' ? addDaysToIsoDate(curLastDate, 1) : '';
+      if (!curNextDate) break;
+      leg.days.push(createLegDayTemplate(curLastDay, curNextDate));
+    }
+
+    // Cascade all subsequent legs forward by delta days
+    for (let i = legIdx + 1; i < appData.length; i++) {
+      const nextLeg = appData[i];
+      if (!nextLeg || !Array.isArray(nextLeg.days)) continue;
+      nextLeg.days.forEach(day => {
+        if (day.date && typeof addDaysToIsoDate === 'function') {
+          day.date = addDaysToIsoDate(day.date, delta);
+          day.day = getWeekdayLabelForTripDate(day.date);
+        }
+      });
+    }
+
+    syncStaysAndJourneysFromDateChanges(origDates, appData);
     saveData();
-    sortLegs();
+    if (typeof sortLegs === 'function') sortLegs();
+    if (typeof buildItinerary === 'function') buildItinerary();
+    if (typeof buildCityNav === 'function') buildCityNav();
+    if (typeof buildJourneyMap === 'function') buildJourneyMap();
     return;
   }
 
-  if (leg.days.length === 1) {
-    const proceed = confirm(`Removing the only day from ${leg.label} will delete the entire leg. Continue?`);
+  // delta < 0
+  if (leg.days.length <= Math.abs(delta)) {
+    const confirmFn = typeof confirm === 'function' ? confirm : (typeof window !== 'undefined' && typeof window.confirm === 'function' ? window.confirm : () => true);
+    const proceed = confirmFn(`Removing the only day from ${leg.label} will delete the entire leg. Continue?`);
     if (!proceed) return;
     deleteLeg(legIdx);
     return;
   }
 
-  leg.days.pop();
+  const removeCount = Math.min(Math.abs(delta), leg.days.length - 1);
+  for (let s = 0; s < removeCount; s++) {
+    leg.days.pop();
+  }
+
+  // Cascade all subsequent legs backward by delta days (delta is negative)
+  for (let i = legIdx + 1; i < appData.length; i++) {
+    const nextLeg = appData[i];
+    if (!nextLeg || !Array.isArray(nextLeg.days)) continue;
+    nextLeg.days.forEach(day => {
+      if (day.date && typeof addDaysToIsoDate === 'function') {
+        day.date = addDaysToIsoDate(day.date, delta);
+        day.day = getWeekdayLabelForTripDate(day.date);
+      }
+    });
+  }
+
+  syncStaysAndJourneysFromDateChanges(origDates, appData);
   saveData();
-  buildItinerary();
+  if (typeof sortLegs === 'function') sortLegs();
+  if (typeof buildItinerary === 'function') buildItinerary();
+  if (typeof buildCityNav === 'function') buildCityNav();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
 }
 
 function confirmAddLeg() {
@@ -3642,7 +3704,7 @@ function confirmAddLeg() {
 
     const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
     if (cascadeCheckbox && cascadeCheckbox.checked) {
-      cascadeStagedLegDates(legDialogState.editLegIdx);
+      cascadeStagedLegDates(legDialogState.editLegIdx + 1);
     }
   } else {
     // Adding a new leg
@@ -3762,13 +3824,10 @@ function confirmAddLeg() {
   if (typeof buildCityNav === 'function') buildCityNav();
   if (typeof buildJourneyMap === 'function') buildJourneyMap();
   if (typeof saveData === 'function') saveData(false);
-  if (typeof syncAllLegDays === 'function') {
-    syncAllLegDays(true);
-  }
 }
 
-function applyStagedLegsAndSync() {
-  if (!legDialogState || !Array.isArray(legDialogState.stagedLegs)) return;
+function syncStaysAndJourneysFromDateChanges(origLegDates, targetLegs) {
+  if (!origLegDates || !Array.isArray(targetLegs)) return;
 
   const getDaysDiff = (d1, d2) => {
     if (!d1 || !d2) return 0;
@@ -3786,10 +3845,12 @@ function applyStagedLegsAndSync() {
     return base.trim().toLowerCase();
   };
 
-  // For each leg in stagedLegs, if it existed in originalLegDates, calculate deltaDays
-  legDialogState.stagedLegs.forEach(leg => {
+  const shiftedStays = new Set();
+  const shiftedJourneys = new Set();
+
+  targetLegs.forEach(leg => {
     if (!leg || !leg.id || !Array.isArray(leg.days) || leg.days.length === 0) return;
-    const original = legDialogState.originalLegDates?.[leg.id];
+    const original = origLegDates[leg.id];
     if (!original || !original.startDate) return;
 
     const newStart = leg.days[0].date;
@@ -3802,10 +3863,12 @@ function applyStagedLegsAndSync() {
     // 1. Remap Stays
     if (typeof window !== 'undefined' && Array.isArray(window.stays)) {
       window.stays.forEach(s => {
+        if (shiftedStays.has(s)) return;
         const matchesLeg = s._inferredLegId === leg.id ||
           s.legId === leg.id ||
           (!s._inferredLegId && !s.legId && (s.cityId === cityId || (s.city && getBaseName(s.city) === baseCityName)));
         if (matchesLeg) {
+          shiftedStays.add(s);
           if (s.checkIn && typeof addDaysToIsoDate === 'function') s.checkIn = addDaysToIsoDate(s.checkIn, deltaDays);
           if (s.checkOut && typeof addDaysToIsoDate === 'function') s.checkOut = addDaysToIsoDate(s.checkOut, deltaDays);
           if (s.startDate && typeof addDaysToIsoDate === 'function') s.startDate = addDaysToIsoDate(s.startDate, deltaDays);
@@ -3814,13 +3877,17 @@ function applyStagedLegsAndSync() {
       });
     }
 
-    // 2. Remap Journeys (departing journeys)
+    // 2. Remap Journeys (both departing journeys and inbound transition journeys)
     if (typeof window !== 'undefined' && Array.isArray(window.journeys)) {
       window.journeys.forEach(j => {
+        if (shiftedJourneys.has(j)) return;
         const matchesLeg = j.legId === leg.id ||
           j._inferredFromLegId === leg.id ||
-          (!j._inferredFromLegId && (j.fromCityId === cityId || (j.fromLocation && getBaseName(j.fromLocation) === baseCityName)));
+          j._inferredToLegId === leg.id ||
+          (!j._inferredFromLegId && (j.fromCityId === cityId || (j.fromLocation && getBaseName(j.fromLocation) === baseCityName))) ||
+          (!j._inferredToLegId && (j.toCityId === cityId || (j.toLocation && getBaseName(j.toLocation) === baseCityName)));
         if (matchesLeg) {
+          shiftedJourneys.add(j);
           if (j.departureDate && typeof addDaysToIsoDate === 'function') j.departureDate = addDaysToIsoDate(j.departureDate, deltaDays);
           if (j.arrivalDate && typeof addDaysToIsoDate === 'function') j.arrivalDate = addDaysToIsoDate(j.arrivalDate, deltaDays);
           if (j.dayDate && typeof addDaysToIsoDate === 'function') j.dayDate = addDaysToIsoDate(j.dayDate, deltaDays);
@@ -3850,6 +3917,12 @@ function applyStagedLegsAndSync() {
       });
     }
   });
+}
+
+function applyStagedLegsAndSync() {
+  if (!legDialogState || !Array.isArray(legDialogState.stagedLegs)) return;
+
+  syncStaysAndJourneysFromDateChanges(legDialogState.originalLegDates, legDialogState.stagedLegs);
 
   // Commit stagedLegs to appData
   if (Array.isArray(appData)) {
@@ -4317,5 +4390,6 @@ Object.assign(window, {
   openAddLegDialog, closeAddLegDialog, confirmAddLeg, onEditLegSelectionChange, deleteLegFromDialog,
   switchLegModalTab, editLegDirectFromReorder, confirmSaveLegSequence, applyStagedLegsAndSync,
   stepLegDuration, onLegDurationInputChange, onLegStartDateChange, onLegEndDateChange,
-  onLegPlacementChange, toggleNewCityInline, onExistingCitySelectChange, getPlacementDefaultDates
+  onLegPlacementChange, toggleNewCityInline, onExistingCitySelectChange, getPlacementDefaultDates,
+  syncStaysAndJourneysFromDateChanges
 });

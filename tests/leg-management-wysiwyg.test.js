@@ -416,6 +416,173 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(global.window.journeys[0].departureDate, '2026-06-09', 'Return journey departureDate auto-shifted +3 days');
   assert.strictEqual(global.window.journeys[0].arrivalDate, '2026-06-10', 'Return journey arrivalDate auto-shifted +3 days');
 
+  // 10. Test Issue #418: adjustLegDays (+ / −) Cascades Subsequent Legs & Remaps Stays/Journeys
+  console.log('  Testing adjustLegDays cascading subsequent legs forward/backward & remapping...');
+  global.appData = [
+    {
+      id: 'leg_rome',
+      label: '🇮🇹 Rome',
+      days: [
+        { date: '2026-06-01', day: 'Mon', desc: 'Arrive Rome', activityItems: [] },
+        { date: '2026-06-02', day: 'Tue', desc: 'Colosseum', activityItems: [] },
+        { date: '2026-06-03', day: 'Wed', desc: 'Vatican', activityItems: [] }
+      ]
+    },
+    {
+      id: 'leg_florence',
+      label: '🇮🇹 Florence',
+      days: [
+        { date: '2026-06-03', day: 'Wed', desc: 'Arrive Florence', activityItems: [] },
+        { date: '2026-06-04', day: 'Thu', desc: 'Uffizi Gallery', activityItems: [] },
+        { date: '2026-06-05', day: 'Fri', desc: 'Duomo', activityItems: [] }
+      ]
+    },
+    {
+      id: 'leg_venice',
+      label: '🇮🇹 Venice',
+      days: [
+        { date: '2026-06-05', day: 'Fri', desc: 'Arrive Venice', activityItems: [] },
+        { date: '2026-06-06', day: 'Sat', desc: 'Canals', activityItems: [] },
+        { date: '2026-06-07', day: 'Sun', desc: 'Piazza San Marco', activityItems: [] }
+      ]
+    },
+    {
+      id: 'leg_return_trip',
+      label: 'Home (Trip Finish)',
+      days: [
+        { date: '2026-06-07', day: 'Sun', desc: 'Flight to Hub', activityItems: [] },
+        { date: '2026-06-08', day: 'Mon', desc: 'Arrive Home', activityItems: [] }
+      ]
+    }
+  ];
+
+  global.window.stays = [
+    {
+      id: 'stay_florence_hotel',
+      _inferredLegId: 'leg_florence',
+      checkIn: '2026-06-03',
+      checkOut: '2026-06-05',
+      startDate: '2026-06-03',
+      endDate: '2026-06-05'
+    },
+    {
+      id: 'stay_venice_hotel',
+      _inferredLegId: 'leg_venice',
+      checkIn: '2026-06-05',
+      checkOut: '2026-06-07',
+      startDate: '2026-06-05',
+      endDate: '2026-06-07'
+    }
+  ];
+
+  global.window.journeys = [
+    {
+      id: 'journey_florence_to_venice',
+      _inferredFromLegId: 'leg_florence',
+      _inferredToLegId: 'leg_venice',
+      departureDate: '2026-06-05',
+      arrivalDate: '2026-06-05',
+      dayDate: '2026-06-05'
+    },
+    {
+      id: 'journey_finish',
+      _inferredFromLegId: 'leg_return_trip',
+      departureDate: '2026-06-07',
+      arrivalDate: '2026-06-08',
+      dayDate: '2026-06-07'
+    }
+  ];
+
+  // 10a. Add 1 day to Rome (adjustLegDays(0, 1))
+  adjustLegDays(0, 1);
+
+  // Verify Rome has 4 days, ending 2026-06-04
+  assert.strictEqual(global.appData[0].days.length, 4, 'Rome leg should now have 4 days');
+  assert.strictEqual(global.appData[0].days[3].date, '2026-06-04', 'Rome leg should end on 2026-06-04');
+
+  // Verify Florence cascaded forward by +1 day (2026-06-04 to 2026-06-06)
+  assert.strictEqual(global.appData[1].days[0].date, '2026-06-04', 'Florence start date cascaded +1 day to 2026-06-04');
+  assert.strictEqual(global.appData[1].days[2].date, '2026-06-06', 'Florence end date cascaded +1 day to 2026-06-06');
+
+  // Verify Venice cascaded forward by +1 day (2026-06-06 to 2026-06-08)
+  assert.strictEqual(global.appData[2].days[0].date, '2026-06-06', 'Venice start date cascaded +1 day to 2026-06-06');
+  assert.strictEqual(global.appData[2].days[2].date, '2026-06-08', 'Venice end date cascaded +1 day to 2026-06-08');
+
+  // Verify Return cascaded forward by +1 day (2026-06-08 to 2026-06-09)
+  assert.strictEqual(global.appData[3].days[0].date, '2026-06-08', 'Return start date cascaded +1 day to 2026-06-08');
+  assert.strictEqual(global.appData[3].days[1].date, '2026-06-09', 'Return end date cascaded +1 day to 2026-06-09');
+
+  // Verify Florence stay cascaded +1 day
+  assert.strictEqual(global.window.stays[0].checkIn, '2026-06-04', 'Florence stay checkIn cascaded +1 day');
+  assert.strictEqual(global.window.stays[0].checkOut, '2026-06-06', 'Florence stay checkOut cascaded +1 day');
+
+  // Verify Venice stay cascaded +1 day
+  assert.strictEqual(global.window.stays[1].checkIn, '2026-06-06', 'Venice stay checkIn cascaded +1 day');
+  assert.strictEqual(global.window.stays[1].checkOut, '2026-06-08', 'Venice stay checkOut cascaded +1 day');
+
+  // Verify Journeys cascaded +1 day
+  assert.strictEqual(global.window.journeys[0].departureDate, '2026-06-06', 'Inter-leg journey departureDate cascaded +1 day');
+  assert.strictEqual(global.window.journeys[1].departureDate, '2026-06-08', 'Return journey departureDate cascaded +1 day');
+
+  // 10b. Remove 1 day from Rome (adjustLegDays(0, -1))
+  adjustLegDays(0, -1);
+
+  // Verify Rome restored to 3 days (2026-06-01 to 2026-06-03)
+  assert.strictEqual(global.appData[0].days.length, 3, 'Rome leg restored to 3 days');
+  assert.strictEqual(global.appData[0].days[2].date, '2026-06-03', 'Rome leg restored end date to 2026-06-03');
+
+  // Verify Florence cascaded backward by -1 day (2026-06-03 to 2026-06-05)
+  assert.strictEqual(global.appData[1].days[0].date, '2026-06-03', 'Florence start date cascaded -1 day back to 2026-06-03');
+  assert.strictEqual(global.appData[1].days[2].date, '2026-06-05', 'Florence end date cascaded -1 day back to 2026-06-05');
+
+  // Verify Venice cascaded backward by -1 day (2026-06-05 to 2026-06-07)
+  assert.strictEqual(global.appData[2].days[0].date, '2026-06-05', 'Venice start date cascaded -1 day back to 2026-06-05');
+  assert.strictEqual(global.appData[2].days[2].date, '2026-06-07', 'Venice end date cascaded -1 day back to 2026-06-07');
+
+  // Verify Return cascaded backward by -1 day (2026-06-07 to 2026-06-08)
+  assert.strictEqual(global.appData[3].days[0].date, '2026-06-07', 'Return start date cascaded -1 day back to 2026-06-07');
+  assert.strictEqual(global.appData[3].days[1].date, '2026-06-08', 'Return end date cascaded -1 day back to 2026-06-08');
+
+  // Verify Florence stay cascaded -1 day back
+  assert.strictEqual(global.window.stays[0].checkIn, '2026-06-03', 'Florence stay checkIn restored to 2026-06-03');
+  assert.strictEqual(global.window.stays[0].checkOut, '2026-06-05', 'Florence stay checkOut restored to 2026-06-05');
+
+  // Verify Venice stay cascaded -1 day back
+  assert.strictEqual(global.window.stays[1].checkIn, '2026-06-05', 'Venice stay checkIn restored to 2026-06-05');
+  assert.strictEqual(global.window.stays[1].checkOut, '2026-06-07', 'Venice stay checkOut restored to 2026-06-07');
+
+  // Verify Journeys cascaded -1 day back
+  assert.strictEqual(global.window.journeys[0].departureDate, '2026-06-05', 'Inter-leg journey departureDate restored to 2026-06-05');
+  assert.strictEqual(global.window.journeys[1].departureDate, '2026-06-07', 'Return journey departureDate restored to 2026-06-07');
+
+  // 10c. Test Edit Leg Modal with auto-cascade on Leg 1 (Florence)
+  openAddLegDialog('edit');
+  switchLegModalTab('edit');
+  elements['editLegSelect'].value = '1';
+  onEditLegSelectionChange();
+
+  // Extend Florence duration from 2 nights (2026-06-03 to 2026-06-05) to 3 nights (2026-06-03 to 2026-06-06)
+  elements['legDurationNights'].value = 3;
+  onLegDurationInputChange();
+
+  assert.strictEqual(elements['newLegStartDate'].value, '2026-06-03', 'Florence starts 2026-06-03');
+  assert.strictEqual(elements['newLegEndDate'].value, '2026-06-06', 'Florence ends 2026-06-06');
+
+  // Verify validation passes without false clash against Venice when auto-cascade is on
+  const isValidEditWithCascade = validateLegEditorForm();
+  assert.strictEqual(isValidEditWithCascade, true, 'Form must be valid when editing leg with auto-cascade enabled');
+  assert.strictEqual(elements['legDialogSaveBtn'].disabled, false, 'Save button must be enabled for edited leg with cascade');
+
+  confirmAddLeg();
+  assert.strictEqual(global.appData[1].days.length, 4, 'Florence should now have 4 days');
+  assert.strictEqual(global.appData[1].days[3].date, '2026-06-06', 'Florence should now end on 2026-06-06');
+
+  // Verify subsequent legs (Venice, Return) cascaded forward +1 day
+  assert.strictEqual(global.appData[2].days[0].date, '2026-06-06', 'Venice start date cascaded to 2026-06-06');
+  assert.strictEqual(global.appData[2].days[2].date, '2026-06-08', 'Venice end date cascaded to 2026-06-08');
+  assert.strictEqual(global.appData[3].days[0].date, '2026-06-08', 'Return start date cascaded to 2026-06-08');
+  assert.strictEqual(global.appData[3].days[1].date, '2026-06-09', 'Return end date cascaded to 2026-06-09');
+
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }
 
