@@ -3694,7 +3694,11 @@ function buildNav() {
   buildCityNav();
 }
 
-const CITY_NAV_SKIP_NAMES = ['departure', 'arrival', 'in transit', 'between cities', 'tbc', 'return', 'home', ''];
+const CITY_NAV_SKIP_NAMES = [
+  'departure', 'arrival', 'in transit', 'between cities', 'tbc', 'return', 'home', '',
+  'start', 'return home', 'trip start', 'trip finish', 'trip return', 'home departure',
+  'departure from home', 'flight home', 'travel day'
+];
 
 function cleanCityNavLabel(value) {
   if (!value || typeof value !== 'string') return '';

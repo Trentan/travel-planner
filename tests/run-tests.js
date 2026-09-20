@@ -38,9 +38,11 @@ const { runWeatherNotesSuite } = require('./weather-notes-test');
 const { runMapprImportTests } = require('./mappr-import.test');
 const { runIssuesVerification } = require('./issues-89-91-95-96-verify');
 const { runTripDayMetricsTests } = require('./trip-day-metrics.test');
+const { runAiBuilderImportTests } = require('./ai-builder-import.test');
 
 async function run() {
   try {
+    if (typeof runAiBuilderImportTests === 'function') await runAiBuilderImportTests();
     if (typeof runTripDayMetricsTests === 'function') runTripDayMetricsTests();
     if (typeof runIssuesVerification === 'function') await runIssuesVerification();
     if (typeof runMapprImportTests === 'function') await runMapprImportTests();

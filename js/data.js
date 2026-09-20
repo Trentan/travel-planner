@@ -4445,11 +4445,18 @@ function normalizeTripLegsData(legs) {
 
     const suggested = leg.suggestedActivities;
 
-    // Guarantee unique IDs for all suggested activities
+    // Guarantee unique IDs and valid titles for all suggested activities
     suggested.forEach(act => {
-      if (act && !act.id) {
+      if (!act || typeof act !== 'object') return;
+      if (!act.id) {
         act.id = 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
       }
+      if (!act.title && act.name) act.title = act.name;
+      if (!act.title && act.notes) {
+        const noteTitle = act.notes.split('.')[0].trim();
+        if (noteTitle) act.title = noteTitle.length > 50 ? noteTitle.substring(0, 47) + '...' : noteTitle;
+      }
+      if (!act.cityId && leg.cityId) act.cityId = leg.cityId;
     });
 
     const usedSuggestionIndices = new Set();
@@ -4458,6 +4465,11 @@ function normalizeTripLegsData(legs) {
       day.date = normalizeTripDateValue(day.date);
       (day.activityItems || []).forEach(item => {
         if (!item || typeof item !== 'object') return;
+        // Fallback title / name / desc to text if text is missing or empty
+        if (!item.text && (item.title || item.name || item.desc)) {
+          item.text = String(item.title || item.name || item.desc).trim();
+        }
+        if (!item.cityId && leg.cityId) item.cityId = leg.cityId;
         item.startDate = normalizeTripDateValue(item.startDate || day.date);
         item.endDate = normalizeTripDateValue(item.endDate || item.startDate || day.date);
         if (item.startTime === undefined) item.startTime = '';
@@ -4517,6 +4529,12 @@ function normalizeTripLegsData(legs) {
           // Sync scheduling fields
           const act = suggested[matchIdx];
           item.activityId = act.id;
+          if (!act.title && (item.text || item.title)) {
+            act.title = item.text || item.title;
+          }
+          if (!item.text && act.title) {
+            item.text = act.title;
+          }
           act.assignedDayIdx = dayIdx;
           act.assignedDate = day.date || '';
           act.startDate = item.startDate || day.date || '';
@@ -4573,7 +4591,8 @@ function normalizeTripLegsData(legs) {
         } else {
           // No match found - create a new suggested activity entry!
           let category = 'sight';
-          if (/food|restaurant|eat|dinner|lunch|breakfast|cafe/i.test(text)) category = 'food';
+          if (item.category) category = item.category;
+          else if (/food|restaurant|eat|dinner|lunch|breakfast|cafe/i.test(text)) category = 'food';
           else if (/run|fitness|jog|workout|gym/i.test(text)) category = 'fitness';
           else if (/wellness|yoga|spa|massage/i.test(text)) category = 'wellness';
           else if (/event|meet|meeting|family|catchup|catch-up|appointment|reservation|date|hookup/i.test(text)) category = 'event';
@@ -4582,7 +4601,7 @@ function normalizeTripLegsData(legs) {
 
           const splitFn = typeof _splitActivityTitle === 'function' ? _splitActivityTitle : _localSplitActivityTitle;
           const splitItem = splitFn(text);
-          let cleanTitle = splitItem.title;
+          let cleanTitle = splitItem.title || text;
           const emojiPattern = /^[\u{1F300}-\u{1F9FF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\s*/gu;
           if (emojiPattern.test(cleanTitle)) {
             cleanTitle = cleanTitle.replace(emojiPattern, '').trim();
@@ -4595,12 +4614,13 @@ function normalizeTripLegsData(legs) {
 
           const newActivity = {
             id: 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36),
-            title: cleanTitle,
+            title: cleanTitle || text || 'Activity',
             category: category,
             estTime: item.time || '1 hr',
             estCost: item.cost || '0',
             notes: item.notes || '',
             location: resolvedLoc,
+            cityId: item.cityId || leg.cityId || '',
             status: item.status || '',
             bookingRef: item.bookingRef || '',
             externalLink: item.externalLink || item.audioRef || item.audioUrl || '',
@@ -4636,16 +4656,51 @@ function normalizeTripLegsData(legs) {
           }
           const existing = dedupedDayItems[existingIndex];
           if ((!existing.notes || existing.notes === '') && item.notes) existing.notes = item.notes;
-      if ((!existing.location || existing.location === '') && item.location) existing.location = item.location;
-      if ((!existing.time || existing.time === '1 hr') && item.time) existing.time = item.time;
-      if ((!existing.cost || existing.cost === '0') && item.cost) existing.cost = item.cost;
-      if ((!existing.externalLink || existing.externalLink === '') && (item.externalLink || item.audioRef || item.audioUrl)) existing.externalLink = item.externalLink || item.audioRef || item.audioUrl;
-      if ((existing.startTime || '') === '' && item.startTime) existing.startTime = item.startTime;
+          if ((!existing.location || existing.location === '') && item.location) existing.location = item.location;
+          if ((!existing.time || existing.time === '1 hr') && item.time) existing.time = item.time;
+          if ((!existing.cost || existing.cost === '0') && item.cost) existing.cost = item.cost;
+          if ((!existing.externalLink || existing.externalLink === '') && (item.externalLink || item.audioRef || item.audioUrl)) existing.externalLink = item.externalLink || item.audioRef || item.audioUrl;
+          if ((existing.startTime || '') === '' && item.startTime) existing.startTime = item.startTime;
           if ((existing.endTime || '') === '' && item.endTime) existing.endTime = item.endTime;
         });
         day.activityItems = dedupedDayItems;
       }
     });
+
+    // Normalize cityFood: ensure text, done, and cityId
+    if (Array.isArray(leg.cityFood)) {
+      leg.cityFood = leg.cityFood.map(food => {
+        if (typeof food === 'string') {
+          return { text: food, done: false, cityId: leg.cityId || '' };
+        }
+        if (food && typeof food === 'object') {
+          if (!food.text && (food.name || food.title)) {
+            const extra = [food.cuisine, food.area, food.recommended, food.notes].filter(Boolean).join(' · ');
+            food.text = extra ? `${food.name || food.title} (${extra})` : (food.name || food.title);
+          }
+          if (food.done === undefined) food.done = false;
+          if (!food.cityId && leg.cityId) food.cityId = leg.cityId;
+        }
+        return food;
+      });
+    }
+
+    // Normalize legTips: preserve strings and ensure text/cityId on objects
+    if (Array.isArray(leg.legTips)) {
+      leg.legTips = leg.legTips.map(tip => {
+        if (typeof tip === 'string') {
+          return tip;
+        }
+        if (tip && typeof tip === 'object') {
+          if (!tip.text) {
+            const parts = [tip.title, tip.note, tip.notes, tip.desc].filter(Boolean);
+            tip.text = parts.length ? parts.join(': ') : (tip.name || '');
+          }
+          if (!tip.cityId && leg.cityId) tip.cityId = leg.cityId;
+        }
+        return tip;
+      });
+    }
 
     (leg.suggestedActivities || []).forEach(activity => {
       if (!activity || typeof activity !== 'object') return;
@@ -4982,21 +5037,57 @@ async function factoryResetData(options = {}) {
 
 function migratePacking(data) {
   if (!Array.isArray(data) || data.length === 0) return null;
-  const isOldFormat = data[0].hasOwnProperty('title') && !data[0].hasOwnProperty('areaName');
-  if (!isOldFormat) return data;
-  const areas = [
-    { areaName: '🚶 Walk-on Gear (Wear onto plane)', areaColor: '#E67E22', categories: [] },
-    { areaName: '🧳 Carry-on Packed Bag (Main Luggage)', areaColor: '#2980B9', categories: [] },
-    { areaName: '🎒 Personal Item Bag (Under Seat)', areaColor: '#8E44AD', categories: [] }
-  ];
-  data.forEach(cat => {
-    const t = cat.title || '';
-    const entry = { title: t.replace(/^(🧳|🎒|🚶|💧)\s*/,'').replace(/^(Carry-On: |Personal Item: )/,''), items: cat.items || [] };
-    if (t.includes('Walk-on') || t.includes('Plane Outfit')) { areas[0].categories.push(entry); }
-    else if (t.includes('Personal Item') || t.includes('Flight Items') || t.includes('Tech') || t.includes('Essentials')) { areas[2].categories.push(entry); }
-    else { areas[1].categories.push(entry); }
+
+  const looseStrings = [];
+  const objectEntries = [];
+  data.forEach(item => {
+    if (typeof item === 'string' && item.trim()) {
+      looseStrings.push({ text: item.trim(), done: false });
+    } else if (item && typeof item === 'object') {
+      objectEntries.push(item);
+    }
   });
-  return areas.filter(a => a.categories.length > 0);
+
+  const hasAreas = objectEntries.some(e => e.areaName && Array.isArray(e.categories));
+  if (hasAreas) {
+    const resultAreas = objectEntries;
+    if (looseStrings.length > 0) {
+      const targetArea = resultAreas.find(a => String(a.areaName).includes('Carry-on')) || resultAreas[0];
+      if (targetArea) {
+        if (!Array.isArray(targetArea.categories)) targetArea.categories = [];
+        let targetCat = targetArea.categories.find(c => /essentials|clothes|general/i.test(c.title)) || targetArea.categories[0];
+        if (!targetCat) {
+          targetCat = { title: 'Trip Essentials', items: [] };
+          targetArea.categories.unshift(targetCat);
+        }
+        if (!Array.isArray(targetCat.items)) targetCat.items = [];
+        targetCat.items.push(...looseStrings);
+      }
+    }
+    return resultAreas;
+  }
+
+  const isOldFormat = objectEntries.length > 0 && objectEntries[0].hasOwnProperty('title') && !objectEntries[0].hasOwnProperty('areaName');
+  if (isOldFormat || looseStrings.length > 0) {
+    const areas = [
+      { areaName: '🚶 Walk-on Gear (Wear onto plane)', areaColor: '#E67E22', categories: [] },
+      { areaName: '🧳 Carry-on Packed Bag (Main Luggage)', areaColor: '#2980B9', categories: [] },
+      { areaName: '🎒 Personal Item Bag (Under Seat)', areaColor: '#8E44AD', categories: [] }
+    ];
+    if (looseStrings.length > 0) {
+      areas[1].categories.push({ title: 'Trip Essentials', items: looseStrings });
+    }
+    objectEntries.forEach(cat => {
+      const t = cat.title || '';
+      const entry = { title: t.replace(/^(🧳|🎒|🚶|💧)\s*/,'').replace(/^(Carry-On: |Personal Item: )/,''), items: cat.items || [] };
+      if (t.includes('Walk-on') || t.includes('Plane Outfit')) { areas[0].categories.push(entry); }
+      else if (t.includes('Personal Item') || t.includes('Flight Items') || t.includes('Tech') || t.includes('Essentials')) { areas[2].categories.push(entry); }
+      else { areas[1].categories.push(entry); }
+    });
+    return areas.filter(a => a.categories.length > 0);
+  }
+
+  return data;
 }
 
 function ensureDefaultPackingAreas(data) {
@@ -5021,7 +5112,11 @@ function ensureDefaultPackingAreas(data) {
 function getImportedDestinationCityNames(importedData) {
   const destinationNames = new Set();
   const cityIdToName = new Map();
-  const skipNames = new Set(['home', 'in transit', 'between cities', 'tbc', '', 'return', 'departure', 'arrival']);
+  const skipNames = new Set([
+    'home', 'in transit', 'between cities', 'tbc', '', 'return', 'departure', 'arrival',
+    'start', 'return home', 'trip start', 'trip finish', 'trip return', 'home departure',
+    'departure from home', 'flight home', 'travel day'
+  ]);
 
   const addName = (name) => {
     if (!name || typeof name !== 'string') return;
@@ -5064,9 +5159,16 @@ function getImportedDestinationCityNames(importedData) {
       const labelName = cleanLegLabel(leg.label);
       let labelMatchesDayCity = false;
 
+      if (leg.cityId && cityIdToName.has(leg.cityId)) {
+        addName(cityIdToName.get(leg.cityId));
+      }
+
       if (leg.id) {
-        const directCityName = cityIdToName.get(leg.id) || cityIdToName.get('city-' + leg.id);
-        if (directCityName && labelName && directCityName.toLowerCase() === labelName.toLowerCase()) {
+        const cleanSlug = leg.id.replace(/^leg-/, '');
+        const directCityName = cityIdToName.get(leg.id) || cityIdToName.get('city-' + leg.id) || cityIdToName.get('city-' + cleanSlug) || cityIdToName.get(cleanSlug);
+        if (directCityName) {
+          addName(directCityName);
+        } else if (directCityName && labelName && directCityName.toLowerCase() === labelName.toLowerCase()) {
           labelMatchesDayCity = (leg.days || []).some(day =>
             (day.to && labelName.toLowerCase() === day.to.toLowerCase()) ||
             (day.from && labelName.toLowerCase() === day.from.toLowerCase())
@@ -5100,7 +5202,11 @@ function normalizeImportedCities(importedData) {
 
   const destinationNames = getImportedDestinationCityNames(importedData);
   const allCitiesMarkedTransit = importedData.cities.length > 0 && importedData.cities.every(city => city && city.isTransit === true);
-  const skipNames = new Set(['home', 'in transit', 'between cities', 'tbc', '', 'return', 'departure', 'arrival']);
+  const skipNames = new Set([
+    'home', 'in transit', 'between cities', 'tbc', '', 'return', 'departure', 'arrival',
+    'start', 'return home', 'trip start', 'trip finish', 'trip return', 'home departure',
+    'departure from home', 'flight home', 'travel day'
+  ]);
   const seenCityIds = new Set();
   const seenCityNames = new Set();
 
@@ -6479,8 +6585,8 @@ async function loadImportedPayload(importedData, fileName) {
     stays = normalizeTripStaysData(importedData.stays);
     window.stays = stays;
     importedData.stays.forEach(stay => {
-      if (stay.city) {
-        stayCitiesToAdd.push(stay.city);
+      if (stay.city || stay.cityId) {
+        stayCitiesToAdd.push({ city: stay.city || '', cityId: stay.cityId || '' });
       }
     });
   } else {
@@ -6532,17 +6638,39 @@ async function loadImportedPayload(importedData, fileName) {
     createCityDatalists();
   }
 
-  stayCitiesToAdd.forEach(cityName => {
-    const existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
-    if (!existing) {
+  stayCitiesToAdd.forEach(stayInfo => {
+    const cityName = typeof stayInfo === 'string' ? stayInfo : (stayInfo?.city || '');
+    const cityId = typeof stayInfo === 'object' ? (stayInfo?.cityId || '') : '';
+
+    let existing = null;
+    if (cityId) {
+      existing = citiesData.find(c => c.id === cityId);
+    }
+    if (!existing && cityName) {
+      existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+    }
+    if (!existing && cityName) {
+      // Reconcile alias or prefix match (e.g. "Bali" and "Denpasar Bali")
+      const sLower = cityName.toLowerCase();
+      existing = citiesData.find(c => {
+        const cLower = (c.name || '').toLowerCase();
+        return cLower.includes(sLower) || sLower.includes(cLower);
+      });
+    }
+
+    if (!existing && cityName) {
       addOrUpdateCity(cityName);
-    } else if (existing.isTransit === true) {
+    } else if (existing && existing.isTransit === true) {
       delete existing.isTransit;
       if (existing.colour === '#95a5a6') existing.colour = getRandomCityColor();
     }
   });
 
-  var transitSkipList = ['departure', 'arrival', 'in transit', 'return', 'home'];
+  var transitSkipList = [
+    'departure', 'arrival', 'in transit', 'between cities', 'tbc', 'return', 'home',
+    'start', 'return home', 'trip start', 'trip finish', 'trip return', 'home departure',
+    'departure from home', 'flight home', 'travel day'
+  ];
   var legLabelCities = [];
   if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
     importedData.itinerary.forEach(leg => {
@@ -6557,7 +6685,20 @@ async function loadImportedPayload(importedData, fileName) {
         .replace(/[^\w\s-]/gu, '')
         .trim();
 
-      if (cityFromLabel && !transitSkipList.includes(cityFromLabel.toLowerCase())) {
+      const lowerCityFromLabel = cityFromLabel.toLowerCase();
+      const isSkip = transitSkipList.some(skip => lowerCityFromLabel === skip || lowerCityFromLabel.startsWith(skip) || lowerCityFromLabel.endsWith(skip));
+      const isStartOrReturnLeg = leg.id && (leg.id === 'leg-start' || leg.id === 'leg-return' || leg.id.startsWith('leg-start') || leg.id.startsWith('leg-return'));
+
+      // Also check if leg already maps to an existing city in citiesData
+      const legMatchesExistingCity = citiesData.some(c => {
+        if (leg.cityId && c.id === leg.cityId) return true;
+        if (leg.id && (c.id === leg.id || c.id === 'city-' + leg.id.replace(/^leg-/, ''))) return true;
+        const cNameLower = (c.name || '').toLowerCase();
+        if (cNameLower && (lowerCityFromLabel === cNameLower || lowerCityFromLabel.startsWith(cNameLower) || cNameLower.startsWith(lowerCityFromLabel))) return true;
+        return false;
+      });
+
+      if (cityFromLabel && !isSkip && !isStartOrReturnLeg && !legMatchesExistingCity) {
         let cityInDays = false;
         (leg.days || []).forEach(day => {
           if (day.from === cityFromLabel || day.to === cityFromLabel) cityInDays = true;

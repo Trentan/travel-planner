@@ -1,0 +1,1648 @@
+{
+  "meta": {
+    "title": "Bali 2026",
+    "subtitle": "Generated 1-city itinerary"
+  },
+  "itinerary": [
+    {
+      "id": "leg-start",
+      "label": "🏠 Start (Home Departure)",
+      "colour": "#2C3E50",
+      "cityFood": [],
+      "suggestedActivities": [
+        {
+          "id": "act-r2qclaha7-mu9oo2lh",
+          "title": "",
+          "category": "sight",
+          "estTime": "09:30",
+          "estCost": "0",
+          "notes": "Depart for Bali Ngurah Rai (DPS). Have passport, e-VoA, Love Bali QR, and SSHP QR code handy.",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-12-13",
+          "startDate": "2026-12-13",
+          "startTime": "",
+          "endDate": "2026-12-13",
+          "endTime": ""
+        }
+      ],
+      "legTips": [
+        {
+          "cityId": "city-bali",
+          "category": "reminder",
+          "title": "Electronic Visa on Arrival (e-VoA)",
+          "note": "Ensure Indonesian e-VoA (B1) is applied and approved via the official Molina immigration portal prior to departure."
+        },
+        {
+          "cityId": "city-bali",
+          "category": "reminder",
+          "title": "Bali Tourist Tax (Love Bali)",
+          "note": "Pre-pay the IDR 150,000 provincial tourist tax voucher via the Love Bali portal and download the QR code."
+        },
+        {
+          "cityId": "city-bali",
+          "category": "reminder",
+          "title": "SATUSEHAT Health Pass Reminder",
+          "note": "Fill out the online electronic health pass (SSHP) within 3 days prior to your arrival date."
+        }
+      ],
+      "days": [
+        {
+          "date": "2026-12-13",
+          "day": "Sun",
+          "from": "Home",
+          "to": "Denpasar (DPS)",
+          "completed": false,
+          "desc": "Departure flight on Virgin Australia to I Gusti Ngurah Rai International Airport (DPS), arrival, and transfer to Canggu/Seminyak.",
+          "activityItems": [
+            {
+              "id": "act-101",
+              "cityId": "city-bali",
+              "time": "09:30",
+              "title": "Virgin Australia Outbound Flight",
+              "category": "transport",
+              "notes": "Depart for Bali Ngurah Rai (DPS). Have passport, e-VoA, Love Bali QR, and SSHP QR code handy.",
+              "startDate": "2026-12-13",
+              "endDate": "2026-12-13",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-r2qclaha7-mu9oo2lh"
+            },
+            {
+              "id": "act-102",
+              "cityId": "city-bali",
+              "time": "15:00",
+              "title": "Airport Arrival & Hotel Check-in",
+              "category": "attraction",
+              "notes": "Clear e-gates/customs, meet private driver, and check in to accommodation.",
+              "startDate": "2026-12-13",
+              "endDate": "2026-12-13",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-cxsu2b9pc-mu9oo2mf"
+            },
+            {
+              "id": "act-103",
+              "cityId": "city-bali",
+              "time": "18:00",
+              "title": "Welcome Sunset Dinner at The Lawn",
+              "category": "food",
+              "notes": "Unwind with beachfront dinner and relaxed ocean breezes.",
+              "startDate": "2026-12-13",
+              "endDate": "2026-12-13",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-rttge4n8h-mu9oo2mf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-bali",
+      "label": "🌴 Bali Wellness, Diving & Fitness",
+      "colour": "#1ABC9C",
+      "cityFood": [
+        {
+          "cityId": "city-bali",
+          "name": "Crate Cafe",
+          "area": "Canggu",
+          "cuisine": "Brunch & Healthy Bowls",
+          "recommended": "Chia puddings, Brekkie boards, and cold brew"
+        },
+        {
+          "cityId": "city-bali",
+          "name": "Moana Fish Eatery",
+          "area": "Canggu",
+          "cuisine": "Polynesian Seafood",
+          "recommended": "Fresh tuna carpaccio and Maui coconut poke"
+        },
+        {
+          "cityId": "city-bali",
+          "name": "Sardine by K-Club",
+          "area": "Seminyak",
+          "cuisine": "Refined Seafood & Farm-to-Table",
+          "recommended": "Grilled catch of the day overlooking working rice paddies"
+        },
+        {
+          "cityId": "city-bali",
+          "name": "Warung Babi Guling Ibu Oka 3",
+          "area": "Ubud",
+          "cuisine": "Traditional Balinese",
+          "recommended": "Crispy pork skin, spiced lawar, and steamed rice"
+        }
+      ],
+      "suggestedActivities": [
+        {
+          "cityId": "city-bali",
+          "title": "Canggu Running Club Morning Social Run",
+          "category": "fitness",
+          "duration": "1.5 hours",
+          "notes": "Join local expat runners for a 5k-10k coastal community loop.",
+          "id": "act-98lw4p4ep-mu9oo2lh",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
+          "cityId": "city-bali",
+          "title": "Bodyworks Bali Full Body Massage",
+          "category": "wellness",
+          "duration": "2 hours",
+          "notes": "Iconic traditional Balinese massage and floral bath.",
+          "id": "act-83cd5cz46-mu9oo2lh",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
+          "cityId": "city-bali",
+          "title": "Nusa Penida Manta Point Scuba Diving",
+          "category": "attraction",
+          "duration": "Full Day",
+          "notes": "2-dive package spotting giant manta rays and drift diving Crystal Bay.",
+          "id": "act-peww5cdsh-mu9oo2lh",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
+          "cityId": "city-bali",
+          "title": "Pyramids of Chi Sound Healing & Meditation",
+          "category": "wellness",
+          "duration": "2 hours",
+          "notes": "Acoustic sound immersion using gongs, didgeridoos, and crystal bowls.",
+          "id": "act-k7umg1910-mu9oo2lh",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
+          "cityId": "city-bali",
+          "title": "Savaya Day Club Cliffside Session",
+          "category": "attraction",
+          "duration": "4 hours",
+          "notes": "World-class DJs and dramatic ocean cliffside views in Uluwatu.",
+          "id": "act-rgdlaqsx5-mu9oo2lh",
+          "assignedDate": "",
+          "startDate": "",
+          "endDate": "",
+          "startTime": "",
+          "endTime": ""
+        },
+        {
+          "id": "act-jo72r3c2o-mu9oo2li",
+          "title": "",
+          "category": "sight",
+          "estTime": "06:45",
+          "estCost": "0",
+          "notes": "Meet near Batu Bolong for an easy 6 km sunrise oceanfront run.",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-12-14",
+          "startDate": "2026-12-14",
+          "startTime": "",
+          "endDate": "2026-12-14",
+          "endTime": ""
+        },
+        {
+          "id": "act-swyosjx4r-mu9oo2li",
+          "title": "",
+          "category": "sight",
+          "estTime": "08:00",
+          "estCost": "0",
+          "notes": "High-energy strength and conditioning class followed by ice bath and sauna recovery.",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 1,
+          "assignedDate": "2026-12-15",
+          "startDate": "2026-12-15",
+          "startTime": "",
+          "endDate": "2026-12-15",
+          "endTime": ""
+        },
+        {
+          "id": "act-ek0v3nqpe-mu9oo2li",
+          "title": "",
+          "category": "sight",
+          "estTime": "07:00",
+          "estCost": "0",
+          "notes": "Speedboat out to Nusa Penida marine reserve with certified PADI dive operators.",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 2,
+          "assignedDate": "2026-12-16",
+          "startDate": "2026-12-16",
+          "startTime": "",
+          "endDate": "2026-12-16",
+          "endTime": ""
+        },
+        {
+          "id": "act-sk0wzzum7-mu9oo2li",
+          "title": "",
+          "category": "sight",
+          "estTime": "07:30",
+          "estCost": "0",
+          "notes": "Brisk morning trail walk above the valley between two rivers.",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 3,
+          "assignedDate": "2026-12-17",
+          "startDate": "2026-12-17",
+          "startTime": "",
+          "endDate": "2026-12-17",
+          "endTime": ""
+        },
+        {
+          "id": "act-buj7ocmv8-mu9oo2li",
+          "title": "",
+          "category": "sight",
+          "estTime": "08:00",
+          "estCost": "0",
+          "notes": "Dynamic movement practice to release tension and open hip flexibility.",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 4,
+          "assignedDate": "2026-12-18",
+          "startDate": "2026-12-18",
+          "startTime": "",
+          "endDate": "2026-12-18",
+          "endTime": ""
+        },
+        {
+          "id": "act-5zxqlxj6v-mu9oo2li",
+          "title": "",
+          "category": "sight",
+          "estTime": "07:00",
+          "estCost": "0",
+          "notes": "Low-tide sandy beach run with sprints and bodyweight mobility.",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 5,
+          "assignedDate": "2026-12-19",
+          "startDate": "2026-12-19",
+          "startTime": "",
+          "endDate": "2026-12-19",
+          "endTime": ""
+        },
+        {
+          "id": "act-fgpaa6dmf-mu9oo2li",
+          "title": "",
+          "category": "sight",
+          "estTime": "08:30",
+          "estCost": "0",
+          "notes": "Gentle restorative poses held for deep muscular and fascial release.",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 6,
+          "assignedDate": "2026-12-20",
+          "startDate": "2026-12-20",
+          "startTime": "",
+          "endDate": "2026-12-20",
+          "endTime": ""
+        }
+      ],
+      "legTips": [
+        {
+          "cityId": "city-bali",
+          "category": "safety",
+          "title": "No-Fly Time After Scuba Diving",
+          "note": "Allow a minimum 18-24 hour surface interval between your last ocean dive and flying out on Dec 21."
+        },
+        {
+          "cityId": "city-bali",
+          "category": "transport",
+          "title": "Ride Hailing Apps",
+          "note": "Download Grab and Gojek for scooters and car rides; keep small cash (IDR 20k-50k) for beach parking fees."
+        }
+      ],
+      "days": [
+        {
+          "date": "2026-12-14",
+          "day": "Mon",
+          "from": "Canggu",
+          "to": "Canggu",
+          "completed": false,
+          "desc": "Morning community run, recovery brunch, massage, and sunset beach club.",
+          "activityItems": [
+            {
+              "id": "act-201",
+              "cityId": "city-bali",
+              "time": "06:45",
+              "title": "Morning Run with Canggu Runners",
+              "category": "fitness",
+              "notes": "Meet near Batu Bolong for an easy 6 km sunrise oceanfront run.",
+              "startDate": "2026-12-14",
+              "endDate": "2026-12-14",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-jo72r3c2o-mu9oo2li"
+            },
+            {
+              "id": "act-202",
+              "cityId": "city-bali",
+              "time": "09:00",
+              "title": "Post-Run Breakfast at Crate Cafe",
+              "category": "food",
+              "notes": "Nutrient-packed smoothie bowls and flat whites.",
+              "startDate": "2026-12-14",
+              "endDate": "2026-12-14",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-hv640q984-mu9oo2mf"
+            },
+            {
+              "id": "act-203",
+              "cityId": "city-bali",
+              "time": "14:00",
+              "title": "Deep Tissue Recovery Massage at Spring Spa",
+              "category": "wellness",
+              "notes": "90-minute restorative massage focusing on leg and back tension.",
+              "startDate": "2026-12-14",
+              "endDate": "2026-12-14",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-rbn041ptp-mu9oo2mf"
+            },
+            {
+              "id": "act-204",
+              "cityId": "city-bali",
+              "time": "17:00",
+              "title": "Sunset Lounge at La Brisa Beach Club",
+              "category": "attraction",
+              "notes": "Echo Beach sunset drinks and wood-fired shared plates.",
+              "startDate": "2026-12-14",
+              "endDate": "2026-12-14",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-uqqpf5h4f-mu9oo2mf"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-15",
+          "day": "Tue",
+          "from": "Canggu",
+          "to": "Canggu / Seminyak",
+          "completed": false,
+          "desc": "Cross-training fitness session, mindful breathwork meditation, and healthy dining.",
+          "activityItems": [
+            {
+              "id": "act-301",
+              "cityId": "city-bali",
+              "time": "08:00",
+              "title": "Functional Fitness Class at Body Factory Bali",
+              "category": "fitness",
+              "notes": "High-energy strength and conditioning class followed by ice bath and sauna recovery.",
+              "startDate": "2026-12-15",
+              "endDate": "2026-12-15",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-swyosjx4r-mu9oo2li"
+            },
+            {
+              "id": "act-302",
+              "cityId": "city-bali",
+              "time": "11:30",
+              "title": "Lunch at Shady Shack",
+              "category": "food",
+              "notes": "Organic vegetarian bowls and fresh cold-pressed turmeric juices.",
+              "startDate": "2026-12-15",
+              "endDate": "2026-12-15",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-lvkblyuzt-mu9oo2mf"
+            },
+            {
+              "id": "act-303",
+              "cityId": "city-bali",
+              "time": "15:30",
+              "title": "Guided Breathwork & Guided Meditation at The Practice",
+              "category": "wellness",
+              "notes": "Traditional tantric Hatha breath awareness session.",
+              "startDate": "2026-12-15",
+              "endDate": "2026-12-15",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-nbmlpf1u5-mu9oo2mf"
+            },
+            {
+              "id": "act-304",
+              "cityId": "city-bali",
+              "time": "19:00",
+              "title": "Dinner at Mason",
+              "category": "food",
+              "notes": "Wood-fired artisanal meats and locally sourced organic produce.",
+              "startDate": "2026-12-15",
+              "endDate": "2026-12-15",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-6s7w0jaqo-mu9oo2mf"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-16",
+          "day": "Wed",
+          "from": "Canggu / Sanur",
+          "to": "Nusa Penida / Sanur",
+          "completed": false,
+          "desc": "Full-day scuba diving excursion to Nusa Penida and Manta Point.",
+          "activityItems": [
+            {
+              "id": "act-401",
+              "cityId": "city-bali",
+              "time": "07:00",
+              "title": "Sanur Harbor Transfer & Scuba Dive Boat Departure",
+              "category": "transport",
+              "notes": "Speedboat out to Nusa Penida marine reserve with certified PADI dive operators.",
+              "startDate": "2026-12-16",
+              "endDate": "2026-12-16",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-ek0v3nqpe-mu9oo2li"
+            },
+            {
+              "id": "act-402",
+              "cityId": "city-bali",
+              "time": "09:30",
+              "title": "Dive 1: Manta Point cleaning station",
+              "category": "attraction",
+              "notes": "Observe resident reef manta rays interacting at shallow cleaning stations.",
+              "startDate": "2026-12-16",
+              "endDate": "2026-12-16",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-ju40727f8-mu9oo2mf"
+            },
+            {
+              "id": "act-403",
+              "cityId": "city-bali",
+              "time": "12:00",
+              "title": "Dive 2: Crystal Bay or SD Point Drift Dive",
+              "category": "attraction",
+              "notes": "Vibrant coral garden drift dive with sea turtles and schools of reef fish.",
+              "startDate": "2026-12-16",
+              "endDate": "2026-12-16",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-aiv50c3z1-mu9oo2mf"
+            },
+            {
+              "id": "act-404",
+              "cityId": "city-bali",
+              "time": "18:30",
+              "title": "Fresh Grilled Fish Dinner at Jimbaran Bay",
+              "category": "food",
+              "notes": "Candlelight beach dining with fresh grilled snapper and sambal matah.",
+              "startDate": "2026-12-16",
+              "endDate": "2026-12-16",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-kie6vgis0-mu9oo2mf"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-17",
+          "day": "Thu",
+          "from": "South Bali",
+          "to": "Ubud Day Excursion",
+          "completed": false,
+          "desc": "Ubud rainforest meditation, sound baths, holistic spa, and lush jungle sights.",
+          "activityItems": [
+            {
+              "id": "act-501",
+              "cityId": "city-bali",
+              "time": "07:30",
+              "title": "Campuhan Ridge Nature Walk",
+              "category": "fitness",
+              "notes": "Brisk morning trail walk above the valley between two rivers.",
+              "startDate": "2026-12-17",
+              "endDate": "2026-12-17",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-sk0wzzum7-mu9oo2li"
+            },
+            {
+              "id": "act-502",
+              "cityId": "city-bali",
+              "time": "10:30",
+              "title": "Pyramids of Chi Ancient Sound Healing Session",
+              "category": "wellness",
+              "notes": "Immersive meditation inside resonant acoustic pyramid architecture.",
+              "startDate": "2026-12-17",
+              "endDate": "2026-12-17",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-cd58m4ph3-mu9oo2mf"
+            },
+            {
+              "id": "act-503",
+              "cityId": "city-bali",
+              "time": "13:30",
+              "title": "Nourishing Lunch at Alchemy Ubud",
+              "category": "food",
+              "notes": "Gourmet plant-based raw salads, poke bowls, and elixir tonics.",
+              "startDate": "2026-12-17",
+              "endDate": "2026-12-17",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-hzrtr5jrp-mu9oo2mf"
+            },
+            {
+              "id": "act-504",
+              "cityId": "city-bali",
+              "time": "15:30",
+              "title": "Traditional Balinese Boreh Scrub & Massage at Karsa Spa",
+              "category": "wellness",
+              "notes": "Herbal warming body wrap and full body deep tissue treatment.",
+              "startDate": "2026-12-17",
+              "endDate": "2026-12-17",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-hqeav2pfd-mu9oo2mf"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-18",
+          "day": "Fri",
+          "from": "Canggu",
+          "to": "Seminyak & Uluwatu",
+          "completed": false,
+          "desc": "Morning yoga, beach club vibes, and cliffside ocean sights.",
+          "activityItems": [
+            {
+              "id": "act-601",
+              "cityId": "city-bali",
+              "time": "08:00",
+              "title": "Vinyasa Flow Yoga Class at Samadi Bali",
+              "category": "wellness",
+              "notes": "Dynamic movement practice to release tension and open hip flexibility.",
+              "startDate": "2026-12-18",
+              "endDate": "2026-12-18",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-buj7ocmv8-mu9oo2li"
+            },
+            {
+              "id": "act-602",
+              "cityId": "city-bali",
+              "time": "12:00",
+              "title": "Uluwatu Clifftop Day Club at Savaya Bali",
+              "category": "attraction",
+              "notes": "Panoramic Indian Ocean views, luxury daybeds, and poolside DJ sets.",
+              "startDate": "2026-12-18",
+              "endDate": "2026-12-18",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-joeajuebr-mu9oo2mg"
+            },
+            {
+              "id": "act-603",
+              "cityId": "city-bali",
+              "time": "18:00",
+              "title": "Uluwatu Temple Sunset & Kecak Dance",
+              "category": "sight",
+              "notes": "Dramatic open-air cliff amphitheatre overlooking the sunset.",
+              "startDate": "2026-12-18",
+              "endDate": "2026-12-18",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-jzqg5euqf-mu9oo2mg"
+            },
+            {
+              "id": "act-604",
+              "cityId": "city-bali",
+              "time": "20:30",
+              "title": "Dinner at Mana Uluwatu",
+              "category": "food",
+              "notes": "Latin-infused oceanfront dining with fresh ceviche and cocktails.",
+              "startDate": "2026-12-18",
+              "endDate": "2026-12-18",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-sqjbsw6wq-mu9oo2mg"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-19",
+          "day": "Sat",
+          "from": "Canggu",
+          "to": "Padang Padang / Bingin",
+          "completed": false,
+          "desc": "Saturday beach run, coastal cliff walks, relaxation massage, and sunset dining.",
+          "activityItems": [
+            {
+              "id": "act-701",
+              "cityId": "city-bali",
+              "time": "07:00",
+              "title": "Coastal Interval Beach Run at Echo Beach",
+              "category": "fitness",
+              "notes": "Low-tide sandy beach run with sprints and bodyweight mobility.",
+              "startDate": "2026-12-19",
+              "endDate": "2026-12-19",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-5zxqlxj6v-mu9oo2li"
+            },
+            {
+              "id": "act-702",
+              "cityId": "city-bali",
+              "time": "11:00",
+              "title": "Sun & Swim at Bingin Beach",
+              "category": "attraction",
+              "notes": "Scenic limestone cliff stairs down to turquoise waters.",
+              "startDate": "2026-12-19",
+              "endDate": "2026-12-19",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-ed596bw6e-mu9oo2mg"
+            },
+            {
+              "id": "act-703",
+              "cityId": "city-bali",
+              "time": "15:00",
+              "title": "Reflexology & Scalp Treatment at AMO Spa",
+              "category": "wellness",
+              "notes": "Acupressure foot massage and oxygen treatment.",
+              "startDate": "2026-12-19",
+              "endDate": "2026-12-19",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-1wgkefiwy-mu9oo2mg"
+            },
+            {
+              "id": "act-704",
+              "cityId": "city-bali",
+              "time": "18:00",
+              "title": "Sunset Cocktails at Potato Head Beach Club",
+              "category": "attraction",
+              "notes": "Iconic zero-waste architectural beach club with curated music and beachfront infinity pool.",
+              "startDate": "2026-12-19",
+              "endDate": "2026-12-19",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-ebin75s7g-mu9oo2mg"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-20",
+          "day": "Sun",
+          "from": "Canggu / Seminyak",
+          "to": "Canggu",
+          "completed": false,
+          "desc": "Final day of wellness, shopping, hot/cold thermal therapy, and farewell dinner.",
+          "activityItems": [
+            {
+              "id": "act-801",
+              "cityId": "city-bali",
+              "time": "08:30",
+              "title": "Slow Yin Yoga & Meditation at Radiantly Alive",
+              "category": "wellness",
+              "notes": "Gentle restorative poses held for deep muscular and fascial release.",
+              "startDate": "2026-12-20",
+              "endDate": "2026-12-20",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-fgpaa6dmf-mu9oo2li"
+            },
+            {
+              "id": "act-802",
+              "cityId": "city-bali",
+              "time": "11:00",
+              "title": "Souvenir & Artisan Market Walk",
+              "category": "sight",
+              "notes": "Pick up locally carved handicrafts, organic coffee, and Balinese textiles.",
+              "startDate": "2026-12-20",
+              "endDate": "2026-12-20",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-4prktdspi-mu9oo2mg"
+            },
+            {
+              "id": "act-803",
+              "cityId": "city-bali",
+              "time": "15:00",
+              "title": "Contrast Therapy (Sauna & Ice Plunge) at The Istana",
+              "category": "wellness",
+              "notes": "Biohacking session featuring sensory deprivation tanks, cold plunges, and cliff views.",
+              "startDate": "2026-12-20",
+              "endDate": "2026-12-20",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-oe2fpudar-mu9oo2mg"
+            },
+            {
+              "id": "act-804",
+              "cityId": "city-bali",
+              "time": "19:30",
+              "title": "Farewell Balinese Tasting Feast at Merah Putih",
+              "category": "food",
+              "notes": "Modern Indonesian culinary dining under translucent cathedral columns.",
+              "startDate": "2026-12-20",
+              "endDate": "2026-12-20",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-gedjst7t7-mu9oo2mg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-return",
+      "label": "🛫 Return Home (Batik Air)",
+      "colour": "#2C3E50",
+      "cityFood": [],
+      "suggestedActivities": [
+        {
+          "id": "act-fn3dbk8mb-mu9oo2li",
+          "title": "",
+          "category": "sight",
+          "estTime": "09:00",
+          "estCost": "0",
+          "notes": "Quiet morning stroll along the coastline and tropical breakfast.",
+          "location": "",
+          "status": "",
+          "bookingRef": "",
+          "externalLink": "",
+          "assignedDayIdx": 0,
+          "assignedDate": "2026-12-21",
+          "startDate": "2026-12-21",
+          "startTime": "",
+          "endDate": "2026-12-21",
+          "endTime": ""
+        }
+      ],
+      "legTips": [
+        {
+          "cityId": "city-bali",
+          "category": "reminder",
+          "title": "DPS Departure Timing",
+          "note": "Arrive at I Gusti Ngurah Rai International Airport at least 3 hours prior to scheduled Batik Air departure."
+        },
+        {
+          "cityId": "city-bali",
+          "category": "customs",
+          "title": "Baggage Allowances",
+          "note": "Ensure diving gear, wetsuits, and liquids meet Batik Air international checked baggage requirements."
+        }
+      ],
+      "days": [
+        {
+          "date": "2026-12-21",
+          "day": "Mon",
+          "from": "Denpasar (DPS)",
+          "to": "Home",
+          "completed": false,
+          "desc": "Hotel check-out, transfer to DPS airport, and return flight on Batik Air.",
+          "activityItems": [
+            {
+              "id": "act-901",
+              "cityId": "city-bali",
+              "time": "09:00",
+              "title": "Final Morning Beach Walk & Breakfast",
+              "category": "wellness",
+              "notes": "Quiet morning stroll along the coastline and tropical breakfast.",
+              "startDate": "2026-12-21",
+              "endDate": "2026-12-21",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-fn3dbk8mb-mu9oo2li"
+            },
+            {
+              "id": "act-902",
+              "cityId": "city-bali",
+              "time": "11:00",
+              "title": "Hotel Check-out & Airport Transfer",
+              "category": "transport",
+              "notes": "Pack bags, complete hotel check-out, and meet private airport transfer driver.",
+              "startDate": "2026-12-21",
+              "endDate": "2026-12-21",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-wz847ya5r-mu9oo2mg"
+            },
+            {
+              "id": "act-903",
+              "cityId": "city-bali",
+              "time": "14:15",
+              "title": "Batik Air Return Flight",
+              "category": "transport",
+              "notes": "Batik Air flight home from DPS International Terminal.",
+              "startDate": "2026-12-21",
+              "endDate": "2026-12-21",
+              "startTime": "",
+              "endTime": "",
+              "activityId": "act-m2ntqthh1-mu9oo2mg"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "packing": [
+    "Passport (valid 6+ months from Dec 2026)",
+    "Printed/digital copies of e-VoA and Love Bali Tourist Tax QR code",
+    "SATUSEHAT Health Pass completed barcode",
+    "PADI/SSI Scuba certification card and dive logbook",
+    "Dive computer and mask",
+    "Running shoes, running socks, and hydration belt",
+    "Gym and fitness apparel",
+    "Yoga and breathable meditation clothing",
+    "Beach club swimwear and smart-casual linen shirts/dresses",
+    "Reef-safe sunscreen SPF 50+",
+    "Universal travel power adapter (Europlug Type C/F)",
+    "Mosquito repellent and basic first-aid (electrolyte packs, charcoal tablets)",
+    {
+      "areaName": "🚶 Walk-on Gear (Wear onto plane)",
+      "areaColor": "#E67E22",
+      "categories": [
+        {
+          "title": "Plane Outfit",
+          "items": [
+            {
+              "text": "Underwear",
+              "done": false
+            },
+            {
+              "text": "Jeans",
+              "done": false
+            },
+            {
+              "text": "Belt",
+              "done": false
+            },
+            {
+              "text": "Sports shoes",
+              "done": false
+            },
+            {
+              "text": "Socks",
+              "done": false
+            },
+            {
+              "text": "Activewear shirt",
+              "done": false
+            },
+            {
+              "text": "Hoodie",
+              "done": false
+            },
+            {
+              "text": "Sunglasses",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "areaName": "🧳 Carry-on Packed Bag (Main Luggage)",
+      "areaColor": "#2980B9",
+      "categories": [
+        {
+          "title": "Clothes",
+          "items": [
+            {
+              "text": "T-shirts, Tank Tops",
+              "done": false
+            },
+            {
+              "text": "Shorts, Skirts",
+              "done": false
+            },
+            {
+              "text": "Pants",
+              "done": false
+            },
+            {
+              "text": "Layers (hoodie, sweater)",
+              "done": false
+            },
+            {
+              "text": "Swim suit",
+              "done": false
+            },
+            {
+              "text": "Dress",
+              "done": false
+            },
+            {
+              "text": "Socks",
+              "done": false
+            },
+            {
+              "text": "Underwear",
+              "done": false
+            },
+            {
+              "text": "Bras",
+              "done": false
+            },
+            {
+              "text": "Pyjamas, Sleepwear",
+              "done": false
+            },
+            {
+              "text": "Formal Wear",
+              "done": false
+            },
+            {
+              "text": "Hat",
+              "done": false
+            },
+            {
+              "text": "Workout outfit",
+              "done": false
+            },
+            {
+              "text": "Other accessories / Earrings",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Shoes & Misc",
+          "items": [
+            {
+              "text": "Dress shoes",
+              "done": false
+            },
+            {
+              "text": "Sandals/Crocs",
+              "done": false
+            },
+            {
+              "text": "Mobile strap for running",
+              "done": false
+            },
+            {
+              "text": "Presents / Card",
+              "done": false
+            },
+            {
+              "text": "Reusable tote bag",
+              "done": false
+            },
+            {
+              "text": "Pillowcase for used clothes",
+              "done": false
+            },
+            {
+              "text": "Micro-fibre Towel",
+              "done": false
+            },
+            {
+              "text": "Foldable hangers",
+              "done": false
+            },
+            {
+              "text": "Laundry Sheets for washing",
+              "done": false
+            },
+            {
+              "text": "Raincoat/Umbrella",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Dry Toiletries",
+          "items": [
+            {
+              "text": "Floss",
+              "done": false
+            },
+            {
+              "text": "Toothbrush",
+              "done": false
+            },
+            {
+              "text": "Razor (Cartidge), Shaving",
+              "done": false
+            },
+            {
+              "text": "Bar of Soap",
+              "done": false
+            },
+            {
+              "text": "Cotton pad, q-tips",
+              "done": false
+            },
+            {
+              "text": "Nail clippers/tweezers",
+              "done": false
+            },
+            {
+              "text": "Personal Hygiene items (Pads)",
+              "done": false
+            },
+            {
+              "text": "Makeup",
+              "done": false
+            },
+            {
+              "text": "Hair clips, hair ties",
+              "done": false
+            },
+            {
+              "text": "Hair Brush/comb",
+              "done": false
+            },
+            {
+              "text": "Bandaids, Electrolyte packs",
+              "done": false
+            },
+            {
+              "text": "Body wipes",
+              "done": false
+            },
+            {
+              "text": "Panadol / Nurofen",
+              "done": false
+            },
+            {
+              "text": "Vitamins / Tablets",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "💧 1L Clear Bag (Liquids <100ml)",
+          "items": [
+            {
+              "text": "Clear 1 litre bag",
+              "done": false
+            },
+            {
+              "text": "Cologne/Perfume",
+              "done": false
+            },
+            {
+              "text": "Toothpaste",
+              "done": false
+            },
+            {
+              "text": "Face wash",
+              "done": false
+            },
+            {
+              "text": "Shampoo & Conditioner",
+              "done": false
+            },
+            {
+              "text": "Leave-in conditioner",
+              "done": false
+            },
+            {
+              "text": "Micellar Water/Makeup Remover",
+              "done": false
+            },
+            {
+              "text": "Sunscreen",
+              "done": false
+            },
+            {
+              "text": "Deodorant",
+              "done": false
+            },
+            {
+              "text": "Moisturiser",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "areaName": "🎒 Personal Item Bag (Under Seat)",
+      "areaColor": "#8E44AD",
+      "categories": [
+        {
+          "title": "Essentials",
+          "items": [
+            {
+              "text": "TRS Claim + Items",
+              "done": false
+            },
+            {
+              "text": "Passport + [Copy + Tracker]",
+              "done": false
+            },
+            {
+              "text": "Reservations + Itineraries + Insurance",
+              "done": false
+            },
+            {
+              "text": "Wallet/Purse + Local cash + Cards",
+              "done": false
+            },
+            {
+              "text": "Phone",
+              "done": false
+            },
+            {
+              "text": "Crossbody/Sling Bag",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Flight Items",
+          "items": [
+            {
+              "text": "Travel pillow / Foot sling",
+              "done": false
+            },
+            {
+              "text": "Phone holder (watch movies)",
+              "done": false
+            },
+            {
+              "text": "Compression socks, Slippers",
+              "done": false
+            },
+            {
+              "text": "Disposable Toothbrush kit",
+              "done": false
+            },
+            {
+              "text": "Eye mask, Eye Drops",
+              "done": false
+            },
+            {
+              "text": "Ear plugs, Breath Fresheners",
+              "done": false
+            },
+            {
+              "text": "Snacks, TravelCalm",
+              "done": false
+            },
+            {
+              "text": "Headphones/Airpods",
+              "done": false
+            },
+            {
+              "text": "Airfly/Bluetooth Adapter",
+              "done": false
+            },
+            {
+              "text": "Book/Kindle",
+              "done": false
+            },
+            {
+              "text": "Water bottle",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Tech",
+          "items": [
+            {
+              "text": "eSIM (Installed)",
+              "done": false
+            },
+            {
+              "text": "Mobile downloads (Movies, Shows)",
+              "done": false
+            },
+            {
+              "text": "Phone charger",
+              "done": false
+            },
+            {
+              "text": "Power cables, Cords",
+              "done": false
+            },
+            {
+              "text": "Power Adapter",
+              "done": false
+            },
+            {
+              "text": "Power bank",
+              "done": false
+            },
+            {
+              "text": "Pen",
+              "done": false
+            },
+            {
+              "text": "Laptop",
+              "done": false
+            },
+            {
+              "text": "Luggage Trackers",
+              "done": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "areaName": "📝 Trip Notes",
+      "areaColor": "#6C5CE7",
+      "categories": [
+        {
+          "title": "Notes",
+          "items": [
+            {
+              "text": "Booking reminders",
+              "done": false
+            },
+            {
+              "text": "Places to book",
+              "done": false
+            },
+            {
+              "text": "Trip ideas to follow up",
+              "done": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "leaveHome": [
+    {
+      "text": "Kitchen and bins",
+      "kind": "section"
+    },
+    {
+      "text": "Empty fridge and pantry perishables",
+      "done": false
+    },
+    {
+      "text": "Empty coffee and compost bins and leave outside",
+      "done": false
+    },
+    {
+      "text": "Empty bins",
+      "done": false,
+      "mergeKeys": [
+        "take out all rubbish and recycling"
+      ]
+    },
+    {
+      "text": "Pause or reschedule any regular deliveries",
+      "done": false
+    },
+    {
+      "text": "Check mailbox is empty or hold mail service",
+      "done": false
+    },
+    {
+      "text": "Home shutdown",
+      "kind": "section"
+    },
+    {
+      "text": "Turn power off everywhere not needed",
+      "done": false,
+      "mergeKeys": [
+        "switch off power points at the wall except fridge"
+      ]
+    },
+    {
+      "text": "Check all lights and fans off",
+      "done": false
+    },
+    {
+      "text": "Close and check all windows",
+      "done": false,
+      "mergeKeys": [
+        "lock all doors and windows"
+      ]
+    },
+    {
+      "text": "Blinds partial down",
+      "done": false,
+      "mergeKeys": [
+        "close blinds or curtains and secure loose outdoor items"
+      ]
+    },
+    {
+      "text": "Water off (including outdoor taps)",
+      "done": false,
+      "mergeKeys": [
+        "water off, including outdoor taps",
+        "turn off all taps and check for leaks"
+      ]
+    },
+    {
+      "text": "Turn off gas supply if applicable",
+      "done": false
+    },
+    {
+      "text": "Adjust thermostat to away or saver mode",
+      "done": false
+    },
+    {
+      "text": "Security and pets",
+      "kind": "section"
+    },
+    {
+      "text": "Check CCTV on",
+      "done": false
+    },
+    {
+      "text": "Dog door panel / lock",
+      "done": false
+    },
+    {
+      "text": "Automatic fish feeder",
+      "done": false,
+      "mergeKeys": [
+        "automatic fish feeder"
+      ]
+    },
+    {
+      "text": "Security system on",
+      "done": false,
+      "mergeKeys": [
+        "set security alarm / notify security company"
+      ]
+    },
+    {
+      "text": "Water plants or arrange plant care",
+      "done": false
+    },
+    {
+      "text": "Set up lights on timers if away long",
+      "done": false
+    },
+    {
+      "text": "Travel ready",
+      "kind": "section"
+    },
+    {
+      "text": "Setup international cards on smart devices (Apple Pay / Google Pay)",
+      "done": false
+    },
+    {
+      "text": "Setup default transport card on smart devices",
+      "done": false
+    },
+    {
+      "text": "Charge all devices including phones, tablets, and power banks",
+      "done": false
+    },
+    {
+      "text": "Download offline maps and confirmations",
+      "done": false
+    },
+    {
+      "text": "Notify emergency contact of travel plans",
+      "done": false
+    },
+    {
+      "text": "Pause gym membership or group activities",
+      "done": false
+    },
+    {
+      "text": "If taking dog",
+      "kind": "section"
+    },
+    {
+      "text": "Waste bags",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: waste bags"
+      ]
+    },
+    {
+      "text": "Water bowl",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: water bowl"
+      ]
+    },
+    {
+      "text": "Food",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: food"
+      ]
+    },
+    {
+      "text": "Toys",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: toys"
+      ]
+    },
+    {
+      "text": "Leash",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: leash"
+      ]
+    },
+    {
+      "text": "Treats",
+      "done": false,
+      "mergeKeys": [
+        "if taking dog: treats"
+      ]
+    },
+    {
+      "text": "Set security alarm",
+      "done": false
+    },
+    {
+      "text": "Charge all devices and power banks",
+      "done": false
+    },
+    {
+      "text": "Fill in SATUSEHAT Health Pass (3 days prior to departure)",
+      "done": false
+    },
+    {
+      "text": "Confirm Bali Tourist Tax (Love Bali IDR 150k) payment",
+      "done": false
+    },
+    {
+      "text": "Verify Indonesian e-VoA approval status",
+      "done": false
+    },
+    {
+      "text": "Hold mail / newspaper deliveries",
+      "done": false
+    },
+    {
+      "text": "Turn off water mains and unplug non-essential appliances",
+      "done": false
+    }
+  ],
+  "hotelCheckout": [
+    {
+      "text": "Room Sweep",
+      "kind": "section"
+    },
+    {
+      "text": "Check under the bed",
+      "done": false
+    },
+    {
+      "text": "Check the safe",
+      "done": false
+    },
+    {
+      "text": "Check all power outlets (chargers)",
+      "done": false
+    },
+    {
+      "text": "Check the bathroom (toiletries)",
+      "done": false
+    },
+    {
+      "text": "Check drawers and closets",
+      "done": false
+    },
+    {
+      "text": "Checkout",
+      "kind": "section"
+    },
+    {
+      "text": "Return room keys",
+      "done": false
+    },
+    {
+      "text": "Pay any incidentals/taxes",
+      "done": false
+    },
+    {
+      "text": "Get receipt (if needed)",
+      "done": false
+    }
+  ],
+  "journeys": [
+    {
+      "id": "journey-1",
+      "journeyId": "journey-outbound",
+      "journeyName": "Home to Bali",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromLocation": "Home City",
+      "toLocation": "Denpasar (DPS)",
+      "fromCityId": "city-home",
+      "toCityId": "city-bali",
+      "departureDate": "2026-12-13",
+      "departureTime": "09:30",
+      "arrivalDate": "2026-12-13",
+      "arrivalTime": "14:30",
+      "transportType": "flight",
+      "provider": "Virgin Australia",
+      "routeCode": "VA45",
+      "cost": 520,
+      "status": "confirmed",
+      "bookingReference": "VA-BALI26",
+      "dayDate": "2026-12-13",
+      "startDate": "2026-12-13",
+      "endDate": "2026-12-13",
+      "startTime": "09:30",
+      "endTime": "14:30",
+      "fromAddress": "",
+      "toAddress": "",
+      "notes": "",
+      "legId": "leg-start"
+    },
+    {
+      "id": "journey-2",
+      "journeyId": "journey-inbound",
+      "journeyName": "Bali to Home",
+      "isMultiLeg": false,
+      "segmentOrder": 1,
+      "fromLocation": "Denpasar (DPS)",
+      "toLocation": "Home City",
+      "fromCityId": "city-bali",
+      "toCityId": "city-home",
+      "departureDate": "2026-12-21",
+      "departureTime": "14:15",
+      "arrivalDate": "2026-12-21",
+      "arrivalTime": "21:45",
+      "transportType": "flight",
+      "provider": "Batik Air",
+      "routeCode": "OD171",
+      "cost": 480,
+      "status": "confirmed",
+      "bookingReference": "BTK-DPS26",
+      "dayDate": "2026-12-21",
+      "startDate": "2026-12-21",
+      "endDate": "2026-12-21",
+      "startTime": "14:15",
+      "endTime": "21:45",
+      "fromAddress": "",
+      "toAddress": "",
+      "notes": "",
+      "legId": "leg-return"
+    }
+  ],
+  "stays": [
+    {
+      "id": "stay-1",
+      "cityId": "city-bali",
+      "city": "Bali",
+      "propertyName": "COMO Uma Canggu & Luxury Eco Villa",
+      "checkIn": "2026-12-13",
+      "checkOut": "2026-12-21",
+      "nights": 8,
+      "status": "confirmed",
+      "provider": "Booking.com",
+      "bookingRef": "BKNG-9812457",
+      "totalCost": 1850,
+      "notes": "Steps away from the beach, on-site fitness facilities, wellness spa, and quiet work area.",
+      "checkInTime": "",
+      "checkOutTime": "",
+      "startDate": "2026-12-13",
+      "endDate": "2026-12-21",
+      "startTime": "",
+      "endTime": "",
+      "location": ""
+    }
+  ],
+  "cities": [
+    {
+      "id": "city-bali",
+      "name": "Denpasar Bali",
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "lat": -8.409518,
+      "lng": 115.188916,
+      "dateFrom": "2026-12-13",
+      "dateTo": "2026-12-21",
+      "colour": "#1ABC9C",
+      "timezone": "Asia/Makassar"
+    }
+  ]
+}

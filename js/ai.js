@@ -33,18 +33,19 @@ EXPECTED JSON SCHEMA:
       "id": "city-cityname",
       "name": "City Name",
       "country": "Country Name",
-      "countryCode": "ISO-3166-1 alpha-2 code",
-      "code": "IATA city or airport code where known",
-      "lat": 12.3456,
-      "lng": 123.4567,
+      "countryCode": "ISO-3166-1 alpha-2 code (e.g. ID, FR, JP)",
+      "code": "IATA city or airport code where known (e.g. DPS, CDG)",
+      "lat": -8.4095,
+      "lng": 115.1889,
       "dateFrom": "YYYY-MM-DD",
       "dateTo": "YYYY-MM-DD",
-      "colour": "#HEXCOLOR"
+      "colour": "#1ABC9C"
     }
   ],
   "itinerary": [
     {
       "id": "leg-start",
+      "cityId": "city-home",
       "label": "🏠 Start (Home City)",
       "colour": "#2C3E50",
       "cityFood": [],
@@ -55,10 +56,115 @@ EXPECTED JSON SCHEMA:
           "date": "YYYY-MM-DD",
           "day": "Mon",
           "from": "Home",
-          "to": "Departure City",
+          "to": "First City",
           "completed": false,
-          "desc": "Travel day",
-          "activityItems": []
+          "desc": "Departure flight and travel day",
+          "activityItems": [
+            {
+              "text": "Outbound Flight to First City",
+              "time": "09:30",
+              "cost": "0",
+              "done": false,
+              "category": "transport",
+              "notes": "Have passport, e-tickets, and travel documents ready.",
+              "location": "Airport",
+              "cityId": "city-home"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-cityname",
+      "cityId": "city-cityname",
+      "label": "🌴 City Name",
+      "colour": "#1ABC9C",
+      "cityFood": [
+        {
+          "text": "Restaurant or Cafe Name - signature dishes or specialties",
+          "done": false,
+          "cityId": "city-cityname"
+        }
+      ],
+      "suggestedActivities": [
+        {
+          "id": "act-cityname-1",
+          "title": "Suggested Activity or Highlight",
+          "category": "fitness",
+          "estTime": "1.5 hrs",
+          "estCost": "0",
+          "notes": "Brief notes on why this is recommended.",
+          "location": "Area or Neighborhood",
+          "cityId": "city-cityname"
+        }
+      ],
+      "legTips": [
+        {
+          "text": "Practical local tip (e.g. visa requirement, transport card, safety, local etiquette).",
+          "cityId": "city-cityname"
+        }
+      ],
+      "days": [
+        {
+          "date": "YYYY-MM-DD",
+          "day": "Tue",
+          "from": "City Name",
+          "to": "City Name",
+          "completed": false,
+          "desc": "Morning workout, cultural sights, and sunset dining",
+          "activityItems": [
+            {
+              "text": "Morning Run or Fitness Session",
+              "time": "07:00",
+              "cost": "0",
+              "done": false,
+              "category": "fitness",
+              "notes": "Scenic seaside or park loop.",
+              "location": "Neighborhood",
+              "cityId": "city-cityname"
+            },
+            {
+              "text": "Brunch at Local Cafe",
+              "time": "09:30",
+              "cost": "20",
+              "done": false,
+              "category": "food",
+              "notes": "Healthy bowls and local coffee.",
+              "location": "Cafe Address or Area",
+              "cityId": "city-cityname"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leg-return",
+      "cityId": "city-home",
+      "label": "🛫 Return Home",
+      "colour": "#2C3E50",
+      "cityFood": [],
+      "suggestedActivities": [],
+      "legTips": [],
+      "days": [
+        {
+          "date": "YYYY-MM-DD",
+          "day": "Sun",
+          "from": "Last City",
+          "to": "Home",
+          "completed": false,
+          "desc": "Check-out and flight home",
+          "activityItems": [
+            {
+              "text": "Return Flight Home",
+              "time": "14:15",
+              "cost": "0",
+              "done": false,
+              "category": "transport",
+              "notes": "Arrive at airport 3 hours before departure.",
+              "location": "Airport",
+              "cityId": "city-cityname"
+            }
+          ]
         }
       ]
     }
@@ -73,11 +179,11 @@ EXPECTED JSON SCHEMA:
       "fromLocation": "Home City",
       "toLocation": "First City",
       "fromCityId": "city-home",
-      "toCityId": "city-firstcity",
+      "toCityId": "city-cityname",
       "departureDate": "YYYY-MM-DD",
-      "departureTime": "HH:MM",
+      "departureTime": "09:30",
       "arrivalDate": "YYYY-MM-DD",
-      "arrivalTime": "HH:MM",
+      "arrivalTime": "14:30",
       "transportType": "flight",
       "provider": "Airline Name",
       "routeCode": "FL123",
@@ -99,41 +205,110 @@ EXPECTED JSON SCHEMA:
       "provider": "Booking.com",
       "bookingRef": "ABC123",
       "totalCost": 450,
-      "notes": "Near city center, late check-in available"
+      "notes": "Near city center, pool and gym"
     }
   ],
-  "packing": [],
+  "packing": [
+    {
+      "areaName": "🚶 Walk-on Gear (Wear onto plane)",
+      "areaColor": "#E67E22",
+      "categories": [
+        {
+          "title": "Plane Outfit",
+          "items": [
+            { "text": "Underwear", "done": false },
+            { "text": "Jeans / Comfortable Pants", "done": false },
+            { "text": "Sports shoes", "done": false },
+            { "text": "Socks", "done": false },
+            { "text": "Activewear shirt", "done": false },
+            { "text": "Hoodie / Layer", "done": false }
+          ]
+        }
+      ]
+    },
+    {
+      "areaName": "🧳 Carry-on Packed Bag (Main Luggage)",
+      "areaColor": "#2980B9",
+      "categories": [
+        {
+          "title": "Clothes",
+          "items": [
+            { "text": "T-shirts & Tank Tops", "done": false },
+            { "text": "Shorts & Pants", "done": false },
+            { "text": "Swimwear", "done": false },
+            { "text": "Underwear & Socks", "done": false },
+            { "text": "Workout outfit", "done": false }
+          ]
+        },
+        {
+          "title": "Toiletries",
+          "items": [
+            { "text": "Toothbrush & Toothpaste", "done": false },
+            { "text": "Deodorant", "done": false },
+            { "text": "Sunscreen", "done": false }
+          ]
+        }
+      ]
+    },
+    {
+      "areaName": "🎒 Personal Item Bag (Under Seat)",
+      "areaColor": "#8E44AD",
+      "categories": [
+        {
+          "title": "Essentials",
+          "items": [
+            { "text": "Passport", "done": false },
+            { "text": "Wallet & Cards", "done": false },
+            { "text": "Phone", "done": false },
+            { "text": "Headphones", "done": false },
+            { "text": "Phone charger & Power bank", "done": false },
+            { "text": "Universal Power Adapter", "done": false }
+          ]
+        }
+      ]
+    }
+  ],
   "leaveHome": [
-    {"text": "Lock all doors and windows", "done": false},
-    {"text": "Set security alarm", "done": false},
-    {"text": "Charge all devices", "done": false}
+    { "text": "Lock all doors and windows", "done": false },
+    { "text": "Set security alarm", "done": false },
+    { "text": "Charge all devices", "done": false }
   ]
 }
 
-INSTRUCTIONS FOR GENERATION:
+CRITICAL RULES FOR GENERATION:
 
-1. CITIES: Create cities array. ${cities.length ? `Use specified cities: ${cities.join(', ')}.` : 'Choose 3-5 logical cities in the requested regions.'} Auto-generate city IDs as "city-[lowercase-city-name]" and assign distinct colors from: #E74C3C, #3498DB, #27AE60, #F39C12, #9B59B6, #1ABC9C, #E91E63, #795548. Include country, countryCode, code, lat, and lng for every city whenever known so maps, weather, and city navigation work immediately after import.
+1. CITIES: Create the cities array. ${cities.length ? `Use specified cities: ${cities.join(', ')}.` : 'Choose 3-5 logical cities in the requested regions.'}
+   - Auto-generate city IDs as "city-[lowercase-city-name]" (e.g. "city-bali").
+   - City "name" must be the clean standard city name (e.g. "Bali", NOT "Denpasar Bali" or "Bali Wellness").
+   - Assign distinct colors from: #E74C3C, #3498DB, #27AE60, #F39C12, #9B59B6, #1ABC9C, #E91E63, #795548.
+   - Include country, countryCode, code, lat, and lng for every city whenever known.
 
-2. ITINERARY LEGS: Create these leg types in order:
-   - "leg-start": Departure from home
-   - One leg per city
-   - "leg-travel-X" between cities if multiple cities
-   - "leg-return": Return to home
+2. ITINERARY LEGS & CLEAN LABELS: Create legs in chronological order:
+   - "leg-start": Departure from home (cityId: "city-home", label: "🏠 Start (Home City)").
+   - One leg per destination city (id: "leg-[cityname]", cityId: "city-[cityname]").
+   - The leg "label" for each destination leg MUST BE "[Emoji] [City Name]" (e.g. "🌴 Bali" or "🇯🇵 Tokyo"). DO NOT append long itinerary descriptions or theme text (e.g. NEVER "🌴 Bali Wellness, Diving & Fitness"). Put themes/descriptions in day "desc".
+   - "leg-return": Return to home (cityId: "city-home", label: "🛫 Return Home").
 
-3. CITYID ASSIGNMENT: Every tip, food item, activity, and accommodation must include the cityId matching its city.
+3. DAYS & ACTIVITY ITEMS ("text" FIELD):
+   - Every day must have "date" (YYYY-MM-DD), "day" (Mon, Tue, etc.), "from", "to", "completed": false, "desc", and "activityItems".
+   - In "activityItems", each item MUST have the property "text" containing the activity name/title (e.g. "text": "Morning Run along Echo Beach"). NEVER use "title" instead of "text" for activityItems!
+   - Include "time", "cost", "category", "notes", "location", "done": false, and "cityId".
+   - Category must be one of: "fitness", "sight", "attraction", "wellness", "food", "transport".
 
-4. JOURNEYS & JUNCTIONS: Create transport entries matching fixed flight junctions (${junctions || 'Outbound, inter-city, and return travel'}). Use ISO date format (YYYY-MM-DD) for all dates.
+4. SUGGESTED ACTIVITIES & POOL:
+   - In each destination leg, include 3-5 suggestedActivities in the pool with "id", "title", "category", "estTime", "estCost", "notes", and "cityId".
 
-5. STAYS: Create accommodation entries matching the itinerary. Calculate nights from checkIn to checkOut dates.
+5. CITY FOOD & TIPS ("text" FIELD):
+   - In "cityFood", every item must have "text" (e.g. "text": "Crate Cafe - healthy breakfast bowls"), "done": false, and "cityId".
+   - In "legTips", every item must have "text" (e.g. "text": "Apply for e-VoA online before flying"), and "cityId". DO NOT use object with { title, note }; put the full tip in "text".
 
-6. ACTIVITIES: Include variety from these categories:
-   - "fitness" (runs, walks, gym)
-   - "sight" (museums, landmarks)
-   - "attraction" (tours, shows)
-   - "wellness" (spa, yoga)
-   - "food" (restaurants, markets)
+6. STAYS & JOURNEYS:
+   - In "stays", the "city" property MUST EXACTLY match the "name" in "cities" (e.g. "city": "Bali"), and "cityId" must match "id" in "cities" (e.g. "city-bali"). Calculate nights = checkOut - checkIn.
+   - In "journeys", provide flights matching the booked junctions. Set "fromCityId" and "toCityId".
 
-7. Match the pacing and budget to the user's preferences.
+7. PACKING & CHECKLIST:
+   - "packing" MUST strictly follow the 3-area nested structure with "areaName", "categories", and "items" (each item has "text" and "done": false). NEVER put loose strings directly into the "packing" array.
+   - "leaveHome" should include pre-trip tasks, visa reminders, tourist tax payments, and home security.
 
 8. Make the JSON valid, complete, and ready to import into the app without manual restructuring.
 
