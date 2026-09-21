@@ -709,15 +709,23 @@ function updateJourneyNotes(id, notes) {
 function deleteJourney(id) {
   journeys = journeys.filter(j => j.id !== id);
   window.journeys = journeys;
-  persistJourneys();
-  if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+  if (typeof rebuildItineraryAndDataMappings === 'function') {
+    rebuildItineraryAndDataMappings({ showToast: false });
+  } else {
+    persistJourneys();
+    if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+  }
 }
 
 function deleteJourneyGroup(journeyId) {
   journeys = journeys.filter(j => j.journeyId !== journeyId);
   window.journeys = journeys;
-  persistJourneys();
-  if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+  if (typeof rebuildItineraryAndDataMappings === 'function') {
+    rebuildItineraryAndDataMappings({ showToast: false });
+  } else {
+    persistJourneys();
+    if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+  }
 }
 
 // Sort journeys: by first segment departure date then time
@@ -1832,11 +1840,17 @@ function _populateJourneyCityDropdowns() {
   const currentFrom = fromSelect?.value;
   const currentTo = toSelect?.value;
 
-  let optionsHtml = '<option value="Home">🏠 Home</option>';
-  if (typeof citiesData !== 'undefined') {
+  const homeCityName = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : '';
+  const homeCodes = homeCityName && typeof getCityAirportCodesDisplay === 'function' ? getCityAirportCodesDisplay(homeCityName) : '';
+  const homeLabel = homeCityName ? `🏠 Home (${homeCityName}${homeCodes ? ' - ' + homeCodes : ''})` : '🏠 Home';
+
+  let optionsHtml = `<option value="Home">${homeLabel}</option>`;
+  if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
     [...citiesData].sort((a, b) => a.name.localeCompare(b.name)).forEach(city => {
       const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '📍';
-      optionsHtml += `<option value="${city.name}">${flag} ${city.name}</option>`;
+      const codes = typeof getCityAirportCodesDisplay === 'function' ? getCityAirportCodesDisplay(city.name) : (city.code || '');
+      const codeLabel = codes ? ` (${codes})` : '';
+      optionsHtml += `<option value="${city.name}">${flag} ${city.name}${codeLabel}</option>`;
     });
   }
   optionsHtml += `<option value="${JOURNEY_ADD_CITY_OPTION}">+ Add new city...</option>`;
@@ -2119,9 +2133,13 @@ function deleteJourneyFromModal() {
   });
 
   window.journeys = journeys;
-  persistJourneys();
-  if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
   closeJourneyModal();
+  if (typeof rebuildItineraryAndDataMappings === 'function') {
+    rebuildItineraryAndDataMappings({ showToast: false });
+  } else {
+    persistJourneys();
+    if (typeof rebuildCurrentView === 'function') rebuildCurrentView();
+  }
 }
 
 function saveJourneyFromModal() {
@@ -2174,9 +2192,13 @@ function saveJourneyFromModal() {
 
     journeys.push(...finalSegments);
     window.journeys = journeys;
-    persistJourneys();
     closeJourneyModal();
-    buildTransportTab();
+    if (typeof rebuildItineraryAndDataMappings === 'function') {
+      rebuildItineraryAndDataMappings({ showToast: false });
+    } else {
+      persistJourneys();
+      buildTransportTab();
+    }
   } catch (e) {
     console.error('[saveJourneyFromModal] Error:', e);
     alert('Error saving journey: ' + e.message);

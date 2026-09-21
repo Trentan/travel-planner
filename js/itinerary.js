@@ -3733,6 +3733,7 @@ function getCityByName(cityName) {
     .replace(/\s*\(trip start\)/gi, '')
     .replace(/\s*\(trip finish\)/gi, '')
     .replace(/\s*\(trip end\)/gi, '')
+    .replace(/\s*\([^)]*\)/g, '')
     .trim().toLowerCase();
   const target = normalize(cityName);
   return citiesData.find(c => normalize(c.name) === target) || null;

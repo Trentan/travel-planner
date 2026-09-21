@@ -23,10 +23,27 @@ function getCityCoords(cityName) {
     return null;
   }
 
-  // Extract airport code or stripped city if format "City (DPS)"
-  const parenMatch = clean.match(/^(.*?)\s*\(([A-Z]{3,4})\)$/i);
+  // Extract airport code or stripped city if format "City (DPS)" or "City (BNE / YBBN)"
+  const parenMatch = clean.match(/^(.*?)\s*\((.*?)\)$/);
   const strippedName = parenMatch ? parenMatch[1].trim() : clean;
-  const airportCode = parenMatch ? parenMatch[2].toUpperCase() : (clean.length === 3 ? clean.toUpperCase() : null);
+  let airportCode = null;
+  let icaoCode = null;
+  if (parenMatch) {
+    const inside = parenMatch[2].trim().toUpperCase();
+    if (inside.includes('/')) {
+      const parts = inside.split('/').map(s => s.trim());
+      airportCode = parts[0] || null;
+      icaoCode = parts[1] || null;
+    } else if (inside.length === 3) {
+      airportCode = inside;
+    } else if (inside.length === 4) {
+      icaoCode = inside;
+    }
+  } else if (clean.length === 3) {
+    airportCode = clean.toUpperCase();
+  } else if (clean.length === 4) {
+    icaoCode = clean.toUpperCase();
+  }
 
   // 0. Try dynamic runtime coordinates cache
   if (typeof window !== 'undefined' && window.__dynamicCityCoordsCache) {
@@ -67,6 +84,9 @@ function getCityCoords(cityName) {
     }
     if (!match && airportCode) {
       match = ALL_CITIES.find(c => c.code && c.code.toUpperCase() === airportCode);
+    }
+    if (!match && icaoCode) {
+      match = ALL_CITIES.find(c => (c.icaoCode || c.icao) && (c.icaoCode || c.icao).toUpperCase() === icaoCode);
     }
     if (match && hasCoords(match)) {
       return { lat: Number(match.lat), lng: Number(match.lng) };

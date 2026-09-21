@@ -1545,8 +1545,8 @@ function rebuildItineraryPreservingScroll(options = {}) {
   const scrollY = window.scrollY || 0;
   if (typeof captureMobilePagerStates === 'function') captureMobilePagerStates(document.getElementById('itinerary') || document);
   if (typeof captureCompactDayPagerStates === 'function') captureCompactDayPagerStates(document.getElementById('itinerary') || document);
-  buildItinerary();
-  requestAnimationFrame(() => {
+  if (typeof buildItinerary === 'function') buildItinerary();
+  const finishScroll = () => {
     if (typeof restoreCompactDayPagerScrollPositions === 'function') {
       restoreCompactDayPagerScrollPositions(document.getElementById('itinerary') || document);
     }
@@ -1555,10 +1555,15 @@ function rebuildItineraryPreservingScroll(options = {}) {
       focusItem.scrollIntoView({ block: 'center', inline: 'nearest' });
       focusItem.classList.add('is-schedule-focus');
       setTimeout(() => focusItem.classList.remove('is-schedule-focus'), 1200);
-    } else if (typeof window.scrollTo === 'function') {
+    } else if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
       window.scrollTo(scrollX, scrollY);
     }
-  });
+  };
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(finishScroll);
+  } else {
+    finishScroll();
+  }
 }
 
 function toggleFoodCompleted(e, legIdx, foodIdx) { e.stopPropagation(); if (typeof triggerHaptic === "function") triggerHaptic("success"); appData[legIdx].cityFood[foodIdx].done = e.target.checked; saveData(); rebuildItineraryPreservingScroll(); }
@@ -2115,6 +2120,10 @@ function _populateAddLegCityDropdowns() {
   const countrySelect = document.getElementById('newLegCityCountrySelect');
   const editLegSelect = document.getElementById('editLegSelect');
 
+  const homeCityName = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : '';
+  const homeCodes = homeCityName && typeof getCityAirportCodesDisplay === 'function' ? getCityAirportCodesDisplay(homeCityName) : '';
+  const homeOptionHtml = `<option value="Home">🏠 Home${homeCityName ? ` (${homeCityName}${homeCodes ? ' - ' + homeCodes : ''})` : ''}</option>`;
+
   // Build options HTML with Home + cities
   let cityOptionsHtml = '';
   if (typeof citiesData !== 'undefined') {
@@ -2122,8 +2131,10 @@ function _populateAddLegCityDropdowns() {
       .sort((a, b) => a.name.localeCompare(b.name))
       .map(city => {
         const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '📍';
-        const iata = city.code || (typeof getCityIataCode === 'function' ? getCityIataCode(city.name) : '');
-        const displayName = iata ? `${city.name} (${iata})` : city.name;
+        const codes = typeof getCityAirportCodesDisplay === 'function'
+          ? getCityAirportCodesDisplay(city.name)
+          : (city.code || (typeof getCityIataCode === 'function' ? getCityIataCode(city.name) : ''));
+        const displayName = codes ? `${city.name} (${codes})` : city.name;
         return `<option value="${city.name}">${flag} ${displayName}</option>`;
       })
       .join('');
@@ -2132,14 +2143,14 @@ function _populateAddLegCityDropdowns() {
   // Populate existingCitySelect: Home + cities
   if (existingSelect) {
     const currentValue = existingSelect.value;
-    existingSelect.innerHTML = '<option value="">-- Choose a city --</option><option value="Home">🏠 Home</option>' + cityOptionsHtml;
+    existingSelect.innerHTML = '<option value="">-- Choose a city --</option>' + homeOptionHtml + cityOptionsHtml;
     if (currentValue) existingSelect.value = currentValue;
   }
 
   // Populate fromCitySelect: Home + cities (for travel legs)
   if (fromSelect) {
     const currentValue = fromSelect.value;
-    fromSelect.innerHTML = '<option value="Home">🏠 Home</option>' + cityOptionsHtml;
+    fromSelect.innerHTML = homeOptionHtml + cityOptionsHtml;
     if (currentValue) fromSelect.value = currentValue;
   }
 
@@ -2778,6 +2789,93 @@ function syncAllLegDays(silent = false) {
     }
   }
 }
+
+// Comprehensive rebuild of itinerary, mappings, dates, airport codes, and views
+function rebuildItineraryAndDataMappings(options = {}) {
+  const showToastNotification = options.showToast !== false;
+
+  // 1. Normalize trip data mappings
+  if (typeof normalizeTripCitiesDateData === 'function' && typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+    citiesData = normalizeTripCitiesDateData(citiesData);
+  }
+  if (typeof normalizeTripLegsData === 'function' && typeof appData !== 'undefined' && Array.isArray(appData)) {
+    appData = normalizeTripLegsData(appData);
+  }
+  if (typeof normalizeTripJourneysData === 'function' && typeof journeys !== 'undefined' && Array.isArray(journeys)) {
+    journeys = normalizeTripJourneysData(journeys);
+  }
+  if (typeof normalizeTripStaysData === 'function' && typeof stays !== 'undefined' && Array.isArray(stays)) {
+    stays = normalizeTripStaysData(stays);
+  }
+
+  // 2. Ensure airport codes (IATA & ICAO) and countries are populated for all cities
+  if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+    citiesData.forEach(city => {
+      if (city && city.name) {
+        if (!city.code && typeof getCityIataCode === 'function') {
+          const iata = getCityIataCode(city.name);
+          if (iata) city.code = iata;
+        }
+        if (!city.icaoCode && typeof getCityIcaoCode === 'function') {
+          const icao = getCityIcaoCode(city.name);
+          if (icao) city.icaoCode = icao;
+        }
+      }
+    });
+  }
+
+  // 3. Sync all leg days with latest journeys and stays
+  if (typeof syncAllLegDays === 'function') {
+    syncAllLegDays(true); // silent sync
+  }
+
+  // 4. Persist data
+  if (typeof saveData === 'function') {
+    saveData(false);
+  }
+
+  // 5. Re-render UI components and dropdowns
+  if (typeof populateCityList === 'function') {
+    populateCityList();
+  }
+  if (typeof _populateAddLegCityDropdowns === 'function') {
+    _populateAddLegCityDropdowns();
+  }
+  if (typeof _populateJourneyCityDropdowns === 'function') {
+    _populateJourneyCityDropdowns();
+  }
+  if (typeof buildNav === 'function') {
+    buildNav();
+  }
+  if (typeof buildCityNav === 'function') {
+    buildCityNav();
+  }
+  if (typeof rebuildItineraryPreservingScroll === 'function') {
+    rebuildItineraryPreservingScroll();
+  } else if (typeof buildItinerary === 'function') {
+    buildItinerary();
+  }
+  if (typeof buildTransportTab === 'function') {
+    buildTransportTab();
+  }
+  if (typeof buildAccomTab === 'function') {
+    buildAccomTab();
+  }
+  if (typeof buildJourneyMap === 'function') {
+    buildJourneyMap();
+  }
+  if (typeof buildDesktopSplitMap === 'function') {
+    buildDesktopSplitMap();
+  }
+
+  if (showToastNotification && typeof showToast === 'function') {
+    showToast(options.message || 'Itinerary & mappings rebuilt successfully');
+  }
+
+  return true;
+}
+
+window.rebuildItineraryAndDataMappings = rebuildItineraryAndDataMappings;
 
 
 function resetLegDialogToAddNew() {
@@ -3997,18 +4095,22 @@ function confirmSaveLegSequence() {
   }
 
   applyStagedLegsAndSync();
-
   closeAddLegDialog();
-  if (typeof sortLegs === 'function') sortLegs();
-  if (typeof buildItinerary === 'function') buildItinerary();
-  if (typeof buildCityNav === 'function') buildCityNav();
-  if (typeof buildJourneyMap === 'function') buildJourneyMap();
-  if (typeof saveData === 'function') saveData(false);
-  if (typeof syncAllLegDays === 'function') {
-    syncAllLegDays(true);
-  }
-  if (typeof showToast === 'function') {
-    showToast('Trip route sequence saved successfully!');
+
+  if (typeof rebuildItineraryAndDataMappings === 'function') {
+    rebuildItineraryAndDataMappings({ showToast: true, message: 'Trip route sequence saved & itinerary rebuilt!' });
+  } else {
+    if (typeof sortLegs === 'function') sortLegs();
+    if (typeof buildItinerary === 'function') buildItinerary();
+    if (typeof buildCityNav === 'function') buildCityNav();
+    if (typeof buildJourneyMap === 'function') buildJourneyMap();
+    if (typeof saveData === 'function') saveData(false);
+    if (typeof syncAllLegDays === 'function') {
+      syncAllLegDays(true);
+    }
+    if (typeof showToast === 'function') {
+      showToast('Trip route sequence saved successfully!');
+    }
   }
 }
 
@@ -4376,21 +4478,9 @@ function saveStayFromModal() {
   }
 
   closeAddStayModal();
-  saveData();
-
-  // Rebuild current view
-  if (typeof rebuildCurrentView === 'function') {
-    rebuildCurrentView();
+  if (typeof rebuildItineraryAndDataMappings === 'function') {
+    rebuildItineraryAndDataMappings({ showToast: false });
   } else {
-    buildItinerary();
-  }
-}
-
-function deleteStay(id) {
-  if (!confirm('Delete this stay?')) return;
-  const idx = stays.findIndex(s => s.id === id);
-  if (idx > -1) {
-    stays.splice(idx, 1);
     saveData();
     if (typeof rebuildCurrentView === 'function') {
       rebuildCurrentView();
@@ -4400,13 +4490,44 @@ function deleteStay(id) {
   }
 }
 
+function deleteStay(id) {
+  if (!confirm('Delete this stay?')) return;
+  const idx = stays.findIndex(s => s.id === id);
+  if (idx > -1) {
+    stays.splice(idx, 1);
+    if (typeof rebuildItineraryAndDataMappings === 'function') {
+      rebuildItineraryAndDataMappings({ showToast: false });
+    } else {
+      saveData();
+      if (typeof rebuildCurrentView === 'function') {
+        rebuildCurrentView();
+      } else {
+        buildItinerary();
+      }
+    }
+  }
+}
+
 function deleteStayFromModal() {
   if (!editingStayId) return;
   if (!confirm('Delete this stay?')) return;
   const id = editingStayId;
   editingStayId = null;
-  deleteStay(id);
-  closeAddStayModal();
+  const idx = stays.findIndex(s => s.id === id);
+  if (idx > -1) {
+    stays.splice(idx, 1);
+    closeAddStayModal();
+    if (typeof rebuildItineraryAndDataMappings === 'function') {
+      rebuildItineraryAndDataMappings({ showToast: false });
+    } else {
+      saveData();
+      if (typeof rebuildCurrentView === 'function') {
+        rebuildCurrentView();
+      } else {
+        buildItinerary();
+      }
+    }
+  }
 }
 
 function toggleStayStatus(e, id) {

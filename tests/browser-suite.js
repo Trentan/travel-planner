@@ -654,7 +654,10 @@ async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {
     assert(hasRefetchAllBtn, 'City Management: #refetchAllCitiesBtn should exist in Manage Cities toolbar');
 
     const iataInputCount = await page.evaluate(() => document.querySelectorAll('#city-modal .city-iata-input').length);
-    assert(iataInputCount === 0, 'City Management: .city-iata-input fields should be completely removed');
+    assert(iataInputCount > 0, 'City Management: .city-iata-input fields should be displayed for cities');
+
+    const icaoInputCount = await page.evaluate(() => document.querySelectorAll('#city-modal .city-icao-input').length);
+    assert(icaoInputCount > 0, 'City Management: .city-icao-input fields should be displayed for cities');
 
     const perRowRefetchCount = await page.evaluate(() => {
       const buttons = Array.from(document.querySelectorAll('#city-modal .city-list-item button'));
@@ -669,8 +672,8 @@ async function runTripStartOnboardingChecks(baseUrl, reporter, launchOptions = {
       const updatedCity = await page.evaluate((id) => window.citiesData.find(c => c.id === id), firstCityId);
       assert(updatedCity.name === 'Osaka', 'City Management: renameCityInDialog should rename city to Osaka');
       assert(updatedCity.countryCode === 'JP', 'City Management: batch refetch should update country code to JP');
-      assert(!updatedCity.code, 'City Management: legacy city.code should be removed from city storage');
-      reporter.add('cities', 'batch refetch and iata removal', 'verified #refetchAllCitiesBtn, zero IATA inputs, and legacy code removal');
+      assert(updatedCity.code === 'KIX' || updatedCity.icaoCode === 'RJBB', 'City Management: IATA or ICAO code should be present for Osaka');
+      reporter.add('cities', 'batch refetch and airport codes', 'verified #refetchAllCitiesBtn, IATA/ICAO inputs, and airport code persistence');
     }
 
     assert(errors.length === 0, `Onboarding page errors: ${errors.join(' | ')}`);

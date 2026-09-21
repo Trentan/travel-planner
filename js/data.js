@@ -2279,11 +2279,13 @@ function normalizeCityLocationData(city) {
     city.id = 'city-' + city.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
   }
 
-  if ('code' in city) {
+  if (city.code && String(city.code).trim().length === 2 && !city.countryCode) {
+    city.countryCode = String(city.code).trim().toUpperCase();
     delete city.code;
   }
 
   if (dbMatch) {
+    if (!city.code && dbMatch.code) city.code = dbMatch.code;
     if (!city.icaoCode && (dbMatch.icaoCode || dbMatch.icao)) city.icaoCode = dbMatch.icaoCode || dbMatch.icao;
     if (!city.countryCode && dbMatch.countryCode) city.countryCode = dbMatch.countryCode;
     if (!city.country && dbMatch.countryCode) city.country = getCountryName(dbMatch.countryCode);
@@ -2296,6 +2298,15 @@ function normalizeCityLocationData(city) {
     }
   } else if (city.countryCode && !city.country) {
     city.country = getCountryName(city.countryCode);
+  }
+
+  if (!city.code && typeof getCityIataCode === 'function') {
+    const iata = getCityIataCode(cityName || city.name);
+    if (iata) city.code = iata;
+  }
+  if (!city.icaoCode && typeof getCityIcaoCode === 'function') {
+    const icao = getCityIcaoCode(cityName || city.name);
+    if (icao) city.icaoCode = icao;
   }
 
   if (!city.timezone && typeof getCityTimezone === 'function' && cityName) {
@@ -2382,10 +2393,10 @@ function applyCityLocation(city, location) {
     city.countryCode = location.countryCode;
     city.country = getCountryName(location.countryCode);
   }
-  if ('code' in city) delete city.code;
+  if (location.code && !city.code) city.code = location.code;
   if (location.icaoCode) city.icaoCode = location.icaoCode;
 
-  if (!city.icaoCode) {
+  if (!city.icaoCode || !city.code) {
     const cityNameLower = city.name.toLowerCase();
     let dbMatch = null;
     if (city.countryCode) {
@@ -2397,6 +2408,7 @@ function applyCityLocation(city, location) {
     }
 
     if (dbMatch) {
+      if (!city.code && dbMatch.code) city.code = dbMatch.code;
       if (!city.icaoCode && (dbMatch.icaoCode || dbMatch.icao)) city.icaoCode = dbMatch.icaoCode || dbMatch.icao;
     }
   }
@@ -2488,7 +2500,7 @@ function selectCityDisambiguationChoice(cityId, countryCode, lat, lng, iataCode 
   city.country = getCountryName(countryCode);
   city.lat = lat;
   city.lng = lng;
-  if ('code' in city) delete city.code;
+  if (iataCode) city.code = iataCode;
   if (icaoCode) city.icaoCode = icaoCode;
 
   saveData(true);
@@ -2526,10 +2538,12 @@ function applySuggestedCityCorrection(cityId, canonicalName) {
       city.lat = match.lat;
       city.lng = match.lng;
     }
+    if (match.code) {
+      city.code = match.code;
+    }
     if (match.icaoCode || match.icao) {
       city.icaoCode = match.icaoCode || match.icao;
     }
-    if ('code' in city) delete city.code;
   }
   saveData(true);
   populateCityList();
@@ -2975,10 +2989,17 @@ function setHomeCity(cityName) {
     titleData.homeCity = cleanTarget;
   }
 
-  if (typeof saveData === 'function') saveData(false);
-  if (typeof populateCityList === 'function') populateCityList();
-  if (typeof buildJourneyMap === 'function') buildJourneyMap();
-  if (typeof buildCityNav === 'function') buildCityNav();
+  if (typeof rebuildItineraryAndDataMappings === 'function') {
+    rebuildItineraryAndDataMappings({
+      showToast: true,
+      message: cleanTarget ? `Marked ${cleanTarget} as Home & rebuilt itinerary` : 'Unmarked Home & rebuilt itinerary'
+    });
+  } else {
+    if (typeof saveData === 'function') saveData(false);
+    if (typeof populateCityList === 'function') populateCityList();
+    if (typeof buildJourneyMap === 'function') buildJourneyMap();
+    if (typeof buildCityNav === 'function') buildCityNav();
+  }
   return true;
 }
 
@@ -3158,15 +3179,48 @@ function getCityIataCode(cityName) {
   if (!cityName || cityName === 'Home') return '';
   const cleanName = cityName.trim().toLowerCase();
   // Check citiesData first (user's trip cities)
-  if (typeof citiesData !== 'undefined') {
+  if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
     const city = citiesData.find(c => c.name && c.name.toLowerCase() === cleanName);
-    if (city && city.code) return city.code;
+    if (city && (city.code || city.iata)) return String(city.code || city.iata).toUpperCase();
   }
   // Fall back to built-in databases
   const nameMatches = typeof ALL_CITIES_BY_NAME_MAP !== 'undefined' ? ALL_CITIES_BY_NAME_MAP.get(cleanName) : null;
-  if (nameMatches && nameMatches[0] && nameMatches[0].code) return nameMatches[0].code;
+  if (nameMatches && nameMatches[0] && (nameMatches[0].code || nameMatches[0].iata)) {
+    return String(nameMatches[0].code || nameMatches[0].iata).toUpperCase();
+  }
   return '';
 }
+
+// Get ICAO airport code for a city name (returns '' if not found)
+function getCityIcaoCode(cityName) {
+  if (!cityName || cityName === 'Home') return '';
+  const cleanName = cityName.trim().toLowerCase();
+  // Check citiesData first (user's trip cities)
+  if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+    const city = citiesData.find(c => c.name && c.name.toLowerCase() === cleanName);
+    if (city && (city.icaoCode || city.icao)) return String(city.icaoCode || city.icao).toUpperCase();
+  }
+  // Fall back to built-in databases
+  const nameMatches = typeof ALL_CITIES_BY_NAME_MAP !== 'undefined' ? ALL_CITIES_BY_NAME_MAP.get(cleanName) : null;
+  if (nameMatches && nameMatches[0] && (nameMatches[0].icaoCode || nameMatches[0].icao)) {
+    return String(nameMatches[0].icaoCode || nameMatches[0].icao).toUpperCase();
+  }
+  return '';
+}
+
+// Get formatted airport codes display string (e.g. 'BNE / YBBN', 'BNE', or 'YBBN')
+function getCityAirportCodesDisplay(cityName) {
+  const iata = getCityIataCode(cityName);
+  const icao = getCityIcaoCode(cityName);
+  if (iata && icao) return `${iata} / ${icao}`;
+  if (iata) return iata;
+  if (icao) return icao;
+  return '';
+}
+
+window.getCityIataCode = getCityIataCode;
+window.getCityIcaoCode = getCityIcaoCode;
+window.getCityAirportCodesDisplay = getCityAirportCodesDisplay;
 
 // Set country for a city
 function setCityCountry(cityId, country) {
@@ -3593,9 +3647,14 @@ function populateCityList() {
         <span style="font-size: 1.5rem;">${flag}</span>
         <div style="flex: 1; min-width: 0;">
           <div style="font-weight: 500; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            <input class="city-rename-input" data-city-id="${city.id}" value="${escapeTripStartText(city.name)}" style="font: inherit; font-size: 1rem; font-weight: 700; border: 1px solid #c8d6d0; border-radius: 0.4rem; padding: 0.2rem 0.4rem; max-width: 180px;" title="Click to rename city">
+            <input class="city-rename-input" data-city-id="${city.id}" value="${escapeTripStartText(city.name)}" style="font: inherit; font-size: 1rem; font-weight: 700; border: 1px solid #c8d6d0; border-radius: 0.4rem; padding: 0.2rem 0.4rem; max-width: 170px;" title="Click to rename city">
             ${homeBadge}
-            <input class="city-icao-input" data-city-id="${city.id}" value="${escapeTripStartText(city.icaoCode || city.icao || '')}" placeholder="ICAO" maxlength="4" style="font-family: monospace; font-size: 0.82rem; font-weight: 700; width: 60px; border: 1px solid #c8d6d0; border-radius: 0.3rem; padding: 0.15rem 0.3rem; text-transform: uppercase;" title="ICAO airport code (4 letters)">
+            <div style="display: inline-flex; align-items: center; gap: 3px;">
+              <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;" title="IATA Airport Code (3 letters)">IATA:</span>
+              <input class="city-iata-input" data-city-id="${city.id}" value="${escapeTripStartText(city.code || city.iata || '')}" placeholder="IATA" maxlength="3" style="font-family: monospace; font-size: 0.82rem; font-weight: 700; width: 48px; border: 1px solid #c8d6d0; border-radius: 0.3rem; padding: 0.15rem 0.3rem; text-transform: uppercase;" title="IATA airport code (3 letters, e.g. BNE)">
+              <span style="font-size: 0.72rem; font-weight: 700; color: #64748b; margin-left: 2px;" title="ICAO Airport Code (4 letters)">ICAO:</span>
+              <input class="city-icao-input" data-city-id="${city.id}" value="${escapeTripStartText(city.icaoCode || city.icao || '')}" placeholder="ICAO" maxlength="4" style="font-family: monospace; font-size: 0.82rem; font-weight: 700; width: 56px; border: 1px solid #c8d6d0; border-radius: 0.3rem; padding: 0.15rem 0.3rem; text-transform: uppercase;" title="ICAO airport code (4 letters, e.g. YBBN)">
+            </div>
           </div>
           <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 6px;">
             <select class="country-select" data-city-id="${city.id}"
@@ -3619,7 +3678,7 @@ function populateCityList() {
     container.appendChild(row);
   });
 
-  // Attach change handlers to country selects, rename inputs, and ICAO inputs
+  // Attach change handlers to country selects, rename inputs, IATA inputs, and ICAO inputs
   container.querySelectorAll('.country-select').forEach(select => {
     select.addEventListener('change', function() {
       const cityId = this.dataset.cityId;
@@ -3638,6 +3697,21 @@ function populateCityList() {
     });
   });
 
+  container.querySelectorAll('.city-iata-input').forEach(input => {
+    input.addEventListener('change', function() {
+      const cityId = this.dataset.cityId;
+      const val = this.value.trim().toUpperCase();
+      const city = citiesData.find(c => c.id === cityId);
+      if (city) {
+        city.code = val;
+        saveData(false);
+        if (typeof rebuildItineraryAndDataMappings === 'function') {
+          rebuildItineraryAndDataMappings({ showToast: false });
+        }
+      }
+    });
+  });
+
   container.querySelectorAll('.city-icao-input').forEach(input => {
     input.addEventListener('change', function() {
       const cityId = this.dataset.cityId;
@@ -3646,6 +3720,9 @@ function populateCityList() {
       if (city) {
         city.icaoCode = val;
         saveData(false);
+        if (typeof rebuildItineraryAndDataMappings === 'function') {
+          rebuildItineraryAndDataMappings({ showToast: false });
+        }
       }
     });
   });
@@ -3681,19 +3758,23 @@ function deleteCityFromDialog(cityId) {
   }
 
   if (deleteCity(cityId)) {
-    saveData(false);
-    populateCityList(); // Refresh dialog
-    if (typeof buildCityNav === 'function') {
-      buildCityNav();
-    }
-    if (typeof buildItinerary === 'function') {
-      buildItinerary();
-    }
-    if (typeof buildJourneyMap === 'function') {
-      buildJourneyMap();
-    }
-    if (typeof buildDesktopSplitMap === 'function') {
-      buildDesktopSplitMap();
+    if (typeof rebuildItineraryAndDataMappings === 'function') {
+      rebuildItineraryAndDataMappings({ showToast: true, message: `Deleted city "${cityName}" & rebuilt itinerary` });
+    } else {
+      saveData(false);
+      populateCityList(); // Refresh dialog
+      if (typeof buildCityNav === 'function') {
+        buildCityNav();
+      }
+      if (typeof buildItinerary === 'function') {
+        buildItinerary();
+      }
+      if (typeof buildJourneyMap === 'function') {
+        buildJourneyMap();
+      }
+      if (typeof buildDesktopSplitMap === 'function') {
+        buildDesktopSplitMap();
+      }
     }
   }
 }
@@ -3708,7 +3789,7 @@ function renameCityInDialog(cityId, newName) {
 
   const match = getCityLocationDatabaseMatch({ name: newName });
   if (match) {
-    if ('code' in city) delete city.code;
+    if (match.code) city.code = match.code;
     city.countryCode = match.countryCode;
     city.country = getCountryName(match.countryCode);
     if (!cityHasStoredCoords(city) && match.lat !== undefined && match.lng !== undefined) {
@@ -3748,15 +3829,19 @@ function renameCityInDialog(cityId, newName) {
     }
   });
 
-  saveData(true);
-  populateCityList();
-  if (typeof buildNav === 'function') buildNav();
-  if (typeof buildItinerary === 'function') buildItinerary();
-  if (typeof buildTransportTab === 'function') buildTransportTab();
-  if (typeof buildAccomTab === 'function') buildAccomTab();
-  if (typeof buildJourneyMap === 'function') buildJourneyMap();
-  if (typeof buildDesktopSplitMap === 'function') buildDesktopSplitMap();
-  if (typeof showToast === 'function') showToast(`Renamed city to "${newName}"`);
+  if (typeof rebuildItineraryAndDataMappings === 'function') {
+    rebuildItineraryAndDataMappings({ showToast: true, message: `Renamed city to "${newName}" & rebuilt itinerary` });
+  } else {
+    saveData(true);
+    populateCityList();
+    if (typeof buildNav === 'function') buildNav();
+    if (typeof buildItinerary === 'function') buildItinerary();
+    if (typeof buildTransportTab === 'function') buildTransportTab();
+    if (typeof buildAccomTab === 'function') buildAccomTab();
+    if (typeof buildJourneyMap === 'function') buildJourneyMap();
+    if (typeof buildDesktopSplitMap === 'function') buildDesktopSplitMap();
+    if (typeof showToast === 'function') showToast(`Renamed city to "${newName}"`);
+  }
 }
 
 async function refetchCityLocationAndFlag(cityId) {
@@ -3768,7 +3853,8 @@ async function refetchCityLocationAndFlag(cityId) {
   const match = nameMatches ? nameMatches[0] : null;
 
   if (match) {
-    if ('code' in city) delete city.code;
+    if (match.code) city.code = match.code;
+    if (match.icaoCode || match.icao) city.icaoCode = match.icaoCode || match.icao;
     city.countryCode = match.countryCode;
     city.country = getCountryName(match.countryCode);
     city.lat = match.lat;
@@ -3841,13 +3927,16 @@ async function repairAllCityMetadata() {
   for (const city of citiesData) {
     let modified = false;
 
-    if ('code' in city) {
+    if (city.code && String(city.code).trim().length === 2 && !city.countryCode) {
+      city.countryCode = String(city.code).trim().toUpperCase();
       delete city.code;
       modified = true;
     }
 
     const match = city && city.name ? cityLookup.get(city.name.toLowerCase()) : null;
     if (match) {
+      if (!city.code && match.code) { city.code = match.code; modified = true; }
+      if (!city.icaoCode && (match.icaoCode || match.icao)) { city.icaoCode = match.icaoCode || match.icao; modified = true; }
       if (!city.countryCode) { city.countryCode = match.countryCode; modified = true; }
       if (!city.country) { city.country = getCountryName(match.countryCode); modified = true; }
       if (!cityHasStoredCoords(city) && match.lat && match.lng) {
@@ -4176,7 +4265,7 @@ function populateCountrySelect() {
 function migrateCitiesToISOFormat() {
   if (!citiesData || !Array.isArray(citiesData)) return;
 
-  const citiesNeedingMigration = citiesData.filter(city => !city.countryCode || 'code' in city);
+  const citiesNeedingMigration = citiesData.filter(city => !city.countryCode || (city.code && String(city.code).trim().length === 2));
   if (citiesNeedingMigration.length === 0) return;
 
   console.log(`[Migration] Converting ${citiesNeedingMigration.length} cities to ISO format...`);
@@ -4200,13 +4289,18 @@ function migrateCitiesToISOFormat() {
     const normalizedName = city.name?.trim();
     if (!normalizedName) return;
 
-    if ('code' in city) delete city.code;
+    if (city.code && String(city.code).trim().length === 2) {
+      if (!city.countryCode) city.countryCode = String(city.code).trim().toUpperCase();
+      delete city.code;
+    }
 
     // Look up city in ALL city databases (built-in + extended)
     const nameMatches = ALL_CITIES_BY_NAME_MAP.get(normalizedName.toLowerCase());
     const dbMatch = nameMatches ? nameMatches[0] : null;
 
     if (dbMatch) {
+      if (!city.code && dbMatch.code) city.code = dbMatch.code;
+      if (!city.icaoCode && (dbMatch.icaoCode || dbMatch.icao)) city.icaoCode = dbMatch.icaoCode || dbMatch.icao;
       city.countryCode = dbMatch.countryCode;
       const countryMatch = dbMatch.countryCode ? countryByCodeMap.get(dbMatch.countryCode.toUpperCase()) : null;
       if (countryMatch) {
@@ -4697,8 +4791,12 @@ function displayTimestampStatus() {
 async function runSaveData(showTick = true) {
     const t = document.getElementById('mainTitle');
     const s = document.getElementById('mainSubtitle');
-    if (t && t.innerText.trim()) titleData.title = t.innerText.trim();
-    if (s && s.innerText.trim()) titleData.subtitle = s.innerText.trim();
+    if (t && (t.innerText || t.textContent || t.value) && String(t.innerText || t.textContent || t.value).trim()) {
+      titleData.title = String(t.innerText || t.textContent || t.value).trim();
+    }
+    if (s && (s.innerText || s.textContent || s.value) && String(s.innerText || s.textContent || s.value).trim()) {
+      titleData.subtitle = String(s.innerText || s.textContent || s.value).trim();
+    }
 
     normalizeTripLegsData(appData);
     normalizeTripJourneysData(journeys);
@@ -5365,7 +5463,6 @@ function normalizeTripCitiesDateData(items) {
   if (!Array.isArray(items)) return [];
   items.forEach(item => {
     normalizeCityLocationData(item);
-    if ('code' in item) delete item.code;
     item.dateFrom = normalizeTripDateValue(item.dateFrom);
     item.dateTo = normalizeTripDateValue(item.dateTo);
   });

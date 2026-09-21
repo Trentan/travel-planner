@@ -76,6 +76,7 @@
           <div class="app-menu-section-header">🚗 Transport & Travel Tools</div>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openLegEditorDialog()"><span class="menu-icon">✈️</span> Transport & Transit</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCityDialog()"><span class="menu-icon">🌍</span> Cities & Locations</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); rebuildItineraryAndDataMappings({ showToast: true })"><span class="menu-icon">🔄</span> Rebuild Itinerary & Mappings</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openBookingIntakeDialog()"><span class="menu-icon">📥</span> Import Booking Intake</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openMapprImportModal()"><span class="menu-icon">🗺️</span> Import Mappr Map</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openAIDialog()"><span class="menu-icon">🤖</span> AI Builder</button>
@@ -278,6 +279,7 @@
           </div>
           <button class="action-btn add-city-action" onclick="openCityDialog()"><span class="add-city-label">🌍 City</span></button>
           <button class="action-btn add-leg-action" onclick="openLegEditorDialog()"><span class="add-leg-label">🧭 Legs</span></button>
+          <button class="action-btn rebuild-itinerary-action" id="rebuildItineraryBtn" onclick="rebuildItineraryAndDataMappings({ showToast: true })" title="Rebuild itinerary and synchronize all data mappings"><span class="rebuild-icon">🔄</span> <span class="rebuild-label">Rebuild</span></button>
         </div>
       </div>
 
@@ -1138,7 +1140,8 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="action-btn" onclick="rebuildItineraryAndDataMappings({ showToast: true }); closeCityDialog();" title="Rebuild itinerary and synchronize all data mappings"><span class="rebuild-icon">🔄</span> Rebuild Itinerary & Mappings</button>
         <button class="action-btn" onclick="closeCityDialog()">Close</button>
       </div>
     </div>
