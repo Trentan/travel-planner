@@ -2122,7 +2122,9 @@ function _populateAddLegCityDropdowns() {
       .sort((a, b) => a.name.localeCompare(b.name))
       .map(city => {
         const flag = typeof getCityFlag === 'function' ? getCityFlag(city.name) : '📍';
-        return `<option value="${city.name}">${flag} ${city.name}</option>`;
+        const iata = city.code || (typeof getCityIataCode === 'function' ? getCityIataCode(city.name) : '');
+        const displayName = iata ? `${city.name} (${iata})` : city.name;
+        return `<option value="${city.name}">${flag} ${displayName}</option>`;
       })
       .join('');
   }
@@ -2861,7 +2863,7 @@ function onEditLegSelectionChange() {
   const normalizedLabel = String(leg.label || '').toLowerCase();
   let legType = 'city';
   if (normalizedLabel.includes('start')) legType = 'start';
-  else if (normalizedLabel.includes('return')) legType = 'return';
+  else if (normalizedLabel.includes('return') || normalizedLabel.includes('finish')) legType = 'return';
   else if (firstDay.from && firstDay.to && firstDay.from !== firstDay.to) legType = 'travel';
 
   const legTypeSelect = document.getElementById('legTypeSelect');
@@ -2880,9 +2882,20 @@ function onEditLegSelectionChange() {
   if (newCityInline) newCityInline.style.display = 'none';
   if (toggleNewCityBtn) toggleNewCityBtn.textContent = '+ Enter New City';
 
-  if (fromCitySelect && firstDay.from) fromCitySelect.value = firstDay.from;
-  if (toCitySelect && firstDay.to) toCitySelect.value = firstDay.to;
-  if (existingCitySelect && firstDay.to) existingCitySelect.value = firstDay.to;
+  // Populate from/to dropdowns based on leg type (type-aware)
+  if (legType === 'start') {
+    if (fromCitySelect) fromCitySelect.value = 'Home';
+    if (toCitySelect && firstDay.to) toCitySelect.value = firstDay.to;
+  } else if (legType === 'return') {
+    if (fromCitySelect && firstDay.from) fromCitySelect.value = firstDay.from;
+    if (toCitySelect) toCitySelect.value = 'Home';
+  } else if (legType === 'travel') {
+    if (fromCitySelect && firstDay.from) fromCitySelect.value = firstDay.from;
+    if (toCitySelect && firstDay.to) toCitySelect.value = firstDay.to;
+  } else {
+    // city type
+    if (existingCitySelect && firstDay.to) existingCitySelect.value = firstDay.to;
+  }
   if (newCityName) newCityName.value = '';
   if (dateFrom) {
     dateFrom.value = firstDay.date || '';

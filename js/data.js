@@ -1863,7 +1863,7 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     // Update existing city
     if (country) existing.country = country;
     if (countryCode) existing.countryCode = countryCode;
-    if ('code' in existing) delete existing.code;
+    if (cityCode) existing.code = cityCode;
     if (lat !== null) existing.lat = lat;
     if (lng !== null) existing.lng = lng;
     if (dateFrom && dateFrom < existing.dateFrom) existing.dateFrom = dateFrom;
@@ -1908,9 +1908,11 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
   }
 
   // Create new city with ISO structure
+  const iataCode = cityCode || (dbMatch ? dbMatch.code : '') || '';
   const newCity = {
     id: 'city-' + formattedName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
     name: formattedName,
+    code: iataCode,
     countryCode: cCode || '',
     country: cName || country,
     lat: cityLat,
@@ -3099,6 +3101,21 @@ function getCityFlagHTML(cityName) {
   }
 
   return '<span class="city-flag">📍</span>';
+}
+
+// Get IATA airport code for a city name (returns '' if not found)
+function getCityIataCode(cityName) {
+  if (!cityName || cityName === 'Home') return '';
+  const cleanName = cityName.trim().toLowerCase();
+  // Check citiesData first (user's trip cities)
+  if (typeof citiesData !== 'undefined') {
+    const city = citiesData.find(c => c.name && c.name.toLowerCase() === cleanName);
+    if (city && city.code) return city.code;
+  }
+  // Fall back to built-in databases
+  const nameMatches = typeof ALL_CITIES_BY_NAME_MAP !== 'undefined' ? ALL_CITIES_BY_NAME_MAP.get(cleanName) : null;
+  if (nameMatches && nameMatches[0] && nameMatches[0].code) return nameMatches[0].code;
+  return '';
 }
 
 // Set country for a city
