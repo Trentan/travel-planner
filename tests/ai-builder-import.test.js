@@ -103,9 +103,9 @@ async function runAiBuilderImportTests() {
     document: mockDocument,
     localStorage: mockLocalStorage,
     console: {
-      log: () => {},
-      warn: () => {},
-      error: () => {}
+      log: console.log,
+      warn: console.warn,
+      error: console.error
     },
     alert: () => {},
     confirm: () => true,
@@ -297,6 +297,66 @@ async function runAiBuilderImportTests() {
   assert(mapRebuilt, 'buildJourneyMap should be called upon deleting a city');
   assert(splitMapRebuilt, 'buildDesktopSplitMap should be called upon deleting a city');
   console.log('  ✔ Deleting a city via dialog cleanly purges entity and triggers map rebuilds');
+
+  // Test Live Injection of random city with staged coordinates & name preservation
+  mapRebuilt = false;
+  splitMapRebuilt = false;
+  nameInput.value = 'Seminyak';
+  context.window.__stagedCityCoords = {
+    name: 'Seminyak',
+    lat: -8.6913,
+    lng: 115.1682,
+    countryCode: 'ID',
+    countryName: 'Indonesia'
+  };
+
+  await context.addNewCityFromDialog();
+  const citiesAfterSeminyak = context.getCurrentAppData().cities;
+  const seminyakCity = citiesAfterSeminyak.find(c => c.name === 'Seminyak');
+  assert(seminyakCity, 'City "Seminyak" must be added without being renamed or replaced by an alias');
+  assert(seminyakCity.name === 'Seminyak', 'City name must stay "Seminyak" (never renamed to alias)');
+  assert(seminyakCity.lat === -8.6913, 'Seminyak must retain its live staged latitude');
+  assert(seminyakCity.lng === 115.1682, 'Seminyak must retain its live staged longitude');
+  assert(seminyakCity.countryCode === 'ID', 'Seminyak must retain its country code');
+
+  // Verify added city is persisted in userCities
+  const userCities = (context.getUserCities && context.getUserCities()) || (context.window && context.window.userCities) || context.userCities || [];
+  const inUserCities = userCities.find(c => c.name === 'Seminyak');
+  assert(inUserCities, 'Seminyak must be added to userCities');
+  assert(inUserCities.lat === -8.6913, 'userCities entry must store latitude');
+  assert(inUserCities.lng === 115.1682, 'userCities entry must store longitude');
+
+  // Verify getCityCoords resolves Seminyak from map.js
+  const liveSeminyakCoords = context.getCityCoords('Seminyak');
+  assert(liveSeminyakCoords, 'getCityCoords must resolve coordinates for Seminyak');
+  assert(liveSeminyakCoords.lat === -8.6913, 'getCityCoords lat matches');
+  assert(liveSeminyakCoords.lng === 115.1682, 'getCityCoords lng matches');
+  console.log('  ✔ Live city injection preserves exact name, captures coordinates, and stores in userCities');
+
+  // Test autoResolveMissingTripCities for unmapped cities
+  mapRebuilt = false;
+  splitMapRebuilt = false;
+  const unmappedCity = context.addOrUpdateCity('Aitutaki', 'Cook Islands', '', '', '', 'CK');
+  delete unmappedCity.lat;
+  delete unmappedCity.lng;
+  assert(!context.cityHasStoredCoords(unmappedCity), 'Aitutaki initially has no stored coords');
+
+  // Mock searchCityOnline for Aitutaki
+  const mockSearchCityOnline = async (cityName) => {
+    if (cityName === 'Aitutaki') {
+      return { lat: -18.8572, lng: -159.7892, countryCode: 'CK', countryName: 'Cook Islands' };
+    }
+    return null;
+  };
+  context.searchCityOnline = mockSearchCityOnline;
+  if (context.window) context.window.searchCityOnline = mockSearchCityOnline;
+
+  await context.autoResolveMissingTripCities();
+  assert(context.cityHasStoredCoords(unmappedCity), 'Aitutaki must receive resolved coordinates');
+  assert(unmappedCity.lat === -18.8572, 'Aitutaki lat resolved');
+  assert(unmappedCity.lng === -159.7892, 'Aitutaki lng resolved');
+  assert(mapRebuilt, 'buildJourneyMap must be triggered upon auto-resolving missing cities');
+  console.log('  ✔ autoResolveMissingTripCities asynchronously identifies and injects coordinates for unmapped cities');
 
   console.log('✅ ALL AI BUILDER PROMPT & IMPORT HARDENING TESTS PASSED CLEANLY!\n');
 }

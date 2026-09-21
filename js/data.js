@@ -1130,6 +1130,11 @@ ALL_CITIES.forEach(c => {
 
 // User-extensible cities (persisted to localStorage)
 let userCities = []; // { code, name, countryCode }
+function getUserCities() { return userCities; }
+if (typeof window !== 'undefined') {
+  window.getUserCities = getUserCities;
+  window.userCities = userCities;
+}
 
 // User-extensible countries (persisted to localStorage)
 let userCountries = []; // { code, name, flag }
@@ -1879,10 +1884,18 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     dbMatch = ALL_CITIES_BY_CODE_MAP.get(cityCode.toUpperCase()) || null;
   }
 
-  let formattedName = dbMatch ? dbMatch.name : formatCityTitleCase(normalizedName);
+  let formattedName = formatCityTitleCase(normalizedName);
+
+  if ((cityLat === null || cityLat === undefined || cityLat === '') && typeof window !== 'undefined' && window.__dynamicCityCoordsCache) {
+    const cached = window.__dynamicCityCoordsCache.get(normalizedName.toLowerCase());
+    if (cached && cached.lat !== undefined && cached.lng !== undefined) {
+      cityLat = cached.lat;
+      cityLng = cached.lng;
+    }
+  }
 
   if (dbMatch) {
-    // City found in database - use its country and coordinates
+    // City found in database - use its country and coordinates if missing
     if (!cCode) cCode = dbMatch.countryCode;
     if ((cityLat === null || cityLat === undefined || cityLat === '') && dbMatch.lat !== undefined) cityLat = dbMatch.lat;
     if ((cityLng === null || cityLng === undefined || cityLng === '') && dbMatch.lng !== undefined) cityLng = dbMatch.lng;
@@ -1907,6 +1920,12 @@ function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cit
     colour: getRandomCityColor()
   };
   normalizeCityLocationData(newCity);
+  if (cityHasStoredCoords(newCity)) {
+    if (typeof window !== 'undefined') {
+      window.__dynamicCityCoordsCache = window.__dynamicCityCoordsCache || new Map();
+      window.__dynamicCityCoordsCache.set(formattedName.toLowerCase(), { lat: Number(newCity.lat), lng: Number(newCity.lng) });
+    }
+  }
   citiesData.push(newCity);
   return newCity;
 }
@@ -1945,11 +1964,11 @@ async function searchCityOnline(cityName, countryCode = '', countryName = '') {
 window.searchCityOnline = searchCityOnline;
 
 function cityHasStoredCoords(city) {
-  const lat = Number.parseFloat(city?.lat);
-  const lng = Number.parseFloat(city?.lng);
-  return city &&
-      Number.isFinite(lat) &&
-      Number.isFinite(lng);
+  if (!city) return false;
+  if (city.lat === null || city.lat === undefined || city.lng === null || city.lng === undefined) return false;
+  const lat = Number.parseFloat(city.lat);
+  const lng = Number.parseFloat(city.lng);
+  return Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0);
 }
 
 // Multilingual and alternative city aliases dictionary (normalized lower-case keys)
@@ -2392,11 +2411,15 @@ async function searchCityOnlineCandidates(cityName) {
 
     return data.map(item => {
       const countryCode = (item.address?.country_code || '').toUpperCase();
+      const rawName = item.address?.city || item.address?.town || item.address?.village || item.address?.municipality || item.address?.island || item.name || cleanName;
+      const region = item.address?.state || item.address?.county || item.address?.island || item.address?.province || '';
       return {
+        name: rawName,
         lat: parseFloat(item.lat),
         lng: parseFloat(item.lon),
         countryCode: countryCode,
         countryName: item.address?.country || getCountryName(countryCode) || countryCode,
+        region: region,
         displayName: item.display_name
       };
     });
@@ -2738,27 +2761,62 @@ function getAllCountries() {
   return [...builtinCountries, ...userCountries];
 }
 
-// Add a user-defined city to the extensible database
-function addUserCity(cityCode, cityName, countryCode) {
-  if (!cityCode || !cityName) return null;
+function addUserCity(cityCode, cityName, countryCode, lat = undefined, lng = undefined) {
+  if (!cityName) return null;
+  const nameTrimmed = cityName.trim();
+  const cCode = (cityCode || 'city-' + nameTrimmed.toLowerCase().replace(/[^a-z0-9]/g, '-')).toUpperCase();
+  const cCountry = (countryCode || '').toUpperCase();
 
   // Check for duplicate code or name
-  const existing = userCities.find(c =>
-    c.code.toUpperCase() === cityCode.toUpperCase() ||
-    c.name.toLowerCase() === cityName.toLowerCase()
+  let existing = userCities.find(c =>
+    (c.code && c.code.toUpperCase() === cCode) ||
+    c.name.toLowerCase() === nameTrimmed.toLowerCase()
   );
-  if (existing) return existing;
+  if (existing) {
+    if (lat !== undefined && lat !== null && !isNaN(Number(lat))) existing.lat = Number(lat);
+    if (lng !== undefined && lng !== null && !isNaN(Number(lng))) existing.lng = Number(lng);
+    if (cCountry && !existing.countryCode) existing.countryCode = cCountry;
+    localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
+    if (typeof window !== 'undefined' && window.__dynamicCityCoordsCache && cityHasStoredCoords(existing)) {
+      window.__dynamicCityCoordsCache.set(nameTrimmed.toLowerCase(), { lat: Number(existing.lat), lng: Number(existing.lng) });
+    }
+    return existing;
+  }
 
   const newCity = {
-    code: cityCode.toUpperCase(),
-    name: cityName.trim(),
-    countryCode: countryCode.toUpperCase()
+    code: cCode,
+    name: nameTrimmed,
+    countryCode: cCountry
   };
+  if (lat !== undefined && lat !== null && !isNaN(Number(lat))) newCity.lat = Number(lat);
+  if (lng !== undefined && lng !== null && !isNaN(Number(lng))) newCity.lng = Number(lng);
+
   userCities.push(newCity);
   localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
 
+  if (typeof window !== 'undefined') {
+    window.__dynamicCityCoordsCache = window.__dynamicCityCoordsCache || new Map();
+    if (cityHasStoredCoords(newCity)) {
+      window.__dynamicCityCoordsCache.set(nameTrimmed.toLowerCase(), { lat: Number(newCity.lat), lng: Number(newCity.lng) });
+    }
+  }
+
+  // Index into fast lookup maps
+  const lowerName = nameTrimmed.toLowerCase();
+  if (typeof ALL_CITIES_BY_NAME_MAP !== 'undefined') {
+    if (!ALL_CITIES_BY_NAME_MAP.has(lowerName)) {
+      ALL_CITIES_BY_NAME_MAP.set(lowerName, []);
+    }
+    ALL_CITIES_BY_NAME_MAP.get(lowerName).push(newCity);
+  }
+  if (typeof ALL_CITIES_BY_NAME_COUNTRY_MAP !== 'undefined' && newCity.countryCode) {
+    ALL_CITIES_BY_NAME_COUNTRY_MAP.set(`${lowerName}|${newCity.countryCode}`, newCity);
+  }
+
   // Refresh datalists
-  createCityDatalists();
+  if (typeof createCityDatalists === 'function') {
+    createCityDatalists();
+  }
 
   return newCity;
 }
@@ -3081,49 +3139,278 @@ function openCityDialog() {
   }
 }
 
-// Setup autocomplete behavior for city name input
+// Setup live autocomplete and candidate search for city name input
 function setupCityAutocomplete() {
   const nameInput = document.getElementById('newCityName');
   const countrySelect = document.getElementById('newCityCountrySelect');
+  const countryInput = document.getElementById('newCityCountry');
   const codeDisplay = document.getElementById('cityCodeDisplay');
   const codeInfo = document.getElementById('cityCodeInfo');
+  const resultsContainer = document.getElementById('cityLiveSearchResults');
 
   if (!nameInput) return;
 
-  function updateFromCityInput(val) {
-    const value = String(val || '').trim();
-    if (!value) {
-      if (codeDisplay) codeDisplay.style.display = 'none';
+  if (typeof window !== 'undefined') {
+    window.__dynamicCityCoordsCache = window.__dynamicCityCoordsCache || new Map();
+  }
+
+  let debounceTimer = null;
+  let activeIndex = -1;
+  let currentQuery = '';
+  let activeCandidates = [];
+
+  function hideDropdown() {
+    if (resultsContainer) {
+      resultsContainer.style.display = 'none';
+      resultsContainer.innerHTML = '';
+    }
+    activeIndex = -1;
+    activeCandidates = [];
+  }
+
+  function selectCandidate(candidate) {
+    if (!candidate) return;
+    nameInput.value = candidate.name;
+    if (candidate.countryCode && countrySelect) {
+      countrySelect.value = candidate.countryCode;
+    }
+    if (candidate.countryName && countryInput) {
+      countryInput.value = candidate.countryName;
+    }
+
+    if (typeof window !== 'undefined') {
+      window.__stagedCityCoords = {
+        name: candidate.name,
+        lat: candidate.lat,
+        lng: candidate.lng,
+        countryCode: candidate.countryCode || '',
+        countryName: candidate.countryName || ''
+      };
+      if (candidate.lat !== undefined && candidate.lng !== undefined && !isNaN(candidate.lat) && !isNaN(candidate.lng)) {
+        window.__dynamicCityCoordsCache.set(candidate.name.toLowerCase(), { lat: Number(candidate.lat), lng: Number(candidate.lng) });
+      }
+    }
+
+    if (codeDisplay && codeInfo) {
+      const flag = candidate.countryCode ? getCountryFlag(candidate.countryCode) : '📍';
+      const cName = candidate.countryName || (candidate.countryCode ? getCountryName(candidate.countryCode) : '');
+      const coordStr = (candidate.lat !== undefined && candidate.lng !== undefined && !isNaN(candidate.lat) && !isNaN(candidate.lng))
+        ? ` · 📍 ${candidate.lat.toFixed(4)}, ${candidate.lng.toFixed(4)}`
+        : '';
+      codeInfo.textContent = `${flag} ${cName}${coordStr} · Verified`;
+      codeDisplay.style.display = 'block';
+    }
+
+    hideDropdown();
+  }
+
+  function renderDropdown(candidates) {
+    if (!resultsContainer) return;
+    activeCandidates = candidates || [];
+    activeIndex = -1;
+
+    if (activeCandidates.length === 0) {
+      hideDropdown();
       return;
     }
 
-    // Look up city in databases and aliases
-    const nameMatches = ALL_CITIES_BY_NAME_MAP.get(value.toLowerCase());
-    const match = (nameMatches && nameMatches[0]) ||
-                  (typeof getCityLocationDatabaseMatch === 'function' ? getCityLocationDatabaseMatch({ name: value }) : null);
+    resultsContainer.innerHTML = '';
+    activeCandidates.forEach((cand, idx) => {
+      const item = document.createElement('div');
+      item.className = 'city-live-search-item';
+      item.setAttribute('role', 'option');
+      item.dataset.index = String(idx);
 
-    if (match && codeDisplay && codeInfo) {
-      const flag = match.countryCode ? getCountryFlag(match.countryCode) : '🌍';
-      const cName = match.countryCode ? getCountryName(match.countryCode) : (match.country || '');
-      codeInfo.textContent = `${flag} ${cName}`;
-      codeDisplay.style.display = 'block';
+      const flag = cand.countryCode ? getCountryFlag(cand.countryCode) : '📍';
+      const hasCoords = cand.lat !== undefined && cand.lng !== undefined && !isNaN(Number(cand.lat)) && !isNaN(Number(cand.lng));
+      const coordBadge = hasCoords ? `<span class="city-live-search-coords-pill">📍 ${Number(cand.lat).toFixed(2)}, ${Number(cand.lng).toFixed(2)}</span>` : '';
+      const sourceBadge = cand.source ? `<span class="city-live-search-badge-source">${cand.source}</span>` : '';
+      const sub = cand.region ? `${cand.region}, ${cand.countryName}` : cand.countryName;
 
-      // Auto-select country if not already selected
-      if (countrySelect && !countrySelect.value && match.countryCode) {
-        countrySelect.value = match.countryCode;
+      const safeName = typeof escapeHtmlText === 'function' ? escapeHtmlText(cand.name) : cand.name;
+      const safeSub = typeof escapeHtmlText === 'function' ? escapeHtmlText(sub || '') : (sub || '');
+
+      item.innerHTML = `
+        <span class="city-live-search-flag">${flag}</span>
+        <div class="city-live-search-details">
+          <div class="city-live-search-name">${safeName}${sourceBadge}</div>
+          <div class="city-live-search-sub">${safeSub}</div>
+        </div>
+        ${coordBadge}
+      `;
+
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        selectCandidate(cand);
+      });
+
+      resultsContainer.appendChild(item);
+    });
+
+    resultsContainer.style.display = 'block';
+  }
+
+  function updateHighlightedItem() {
+    if (!resultsContainer) return;
+    const items = resultsContainer.querySelectorAll('.city-live-search-item');
+    items.forEach((item, idx) => {
+      if (idx === activeIndex) {
+        item.classList.add('is-selected');
+        item.scrollIntoView({ block: 'nearest' });
+      } else {
+        item.classList.remove('is-selected');
       }
-    } else if (codeDisplay) {
-      codeDisplay.style.display = 'none';
+    });
+  }
+
+  async function searchCandidates(query) {
+    const clean = String(query || '').trim();
+    if (clean.length < 2) {
+      hideDropdown();
+      return;
+    }
+    currentQuery = clean;
+    const cleanLower = clean.toLowerCase();
+
+    // 1. Gather local matches (built-in, user cities, extended database)
+    const localCandidates = [];
+    const seenKeys = new Set();
+
+    function addCandidate(name, countryCode, lat, lng, source, region = '') {
+      if (!name) return;
+      const key = `${name.toLowerCase()}|${(countryCode || '').toUpperCase()}`;
+      if (seenKeys.has(key)) return;
+      seenKeys.add(key);
+      localCandidates.push({
+        name: formatCityTitleCase(name),
+        countryCode: (countryCode || '').toUpperCase(),
+        countryName: countryCode ? getCountryName(countryCode) : '',
+        lat: lat !== undefined && lat !== null && !isNaN(Number(lat)) ? Number(lat) : undefined,
+        lng: lng !== undefined && lng !== null && !isNaN(Number(lng)) ? Number(lng) : undefined,
+        region: region,
+        source: source
+      });
+    }
+
+    if (typeof userCities !== 'undefined' && Array.isArray(userCities)) {
+      userCities.forEach(uc => {
+        if (uc.name && uc.name.toLowerCase().includes(cleanLower)) {
+          addCandidate(uc.name, uc.countryCode, uc.lat, uc.lng, 'custom');
+        }
+      });
+    }
+
+    if (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) {
+      ALL_CITIES.forEach(c => {
+        if (c.name && (c.name.toLowerCase().startsWith(cleanLower) || (c.name.toLowerCase().includes(cleanLower) && cleanLower.length >= 4))) {
+          if (localCandidates.length < 8) {
+            addCandidate(c.name, c.countryCode, c.lat, c.lng, 'database');
+          }
+        }
+      });
+    }
+
+    if (typeof EXTENDED_CITY_DATABASE !== 'undefined') {
+      for (const [extName, extData] of Object.entries(EXTENDED_CITY_DATABASE)) {
+        if (extName.toLowerCase().startsWith(cleanLower) || (extName.toLowerCase().includes(cleanLower) && cleanLower.length >= 4)) {
+          if (localCandidates.length < 10) {
+            addCandidate(extName, extData.countryCode, extData.lat, extData.lng, 'database');
+          }
+        }
+      }
+    }
+
+    if (currentQuery === clean && localCandidates.length > 0) {
+      renderDropdown(localCandidates.slice(0, 6));
+    }
+
+    // 2. Fetch live online candidates via OpenStreetMap Nominatim
+    try {
+      const onlineResults = await searchCityOnlineCandidates(clean);
+      if (currentQuery !== clean) return;
+
+      const merged = [...localCandidates];
+      if (Array.isArray(onlineResults)) {
+        onlineResults.forEach(item => {
+          const existing = merged.find(m => m.name.toLowerCase() === item.name.toLowerCase() && (!m.countryCode || m.countryCode === item.countryCode));
+          if (existing) {
+            if (existing.lat === undefined && item.lat !== undefined) {
+              existing.lat = item.lat;
+              existing.lng = item.lng;
+            }
+            if (!existing.region && item.region) existing.region = item.region;
+          } else {
+            merged.push({
+              name: item.name,
+              countryCode: item.countryCode,
+              countryName: item.countryName || (item.countryCode ? getCountryName(item.countryCode) : ''),
+              region: item.region || '',
+              lat: item.lat,
+              lng: item.lng,
+              source: 'live'
+            });
+          }
+        });
+      }
+
+      if (currentQuery === clean) {
+        renderDropdown(merged.slice(0, 8));
+      }
+    } catch (e) {
+      console.warn('[setupCityAutocomplete] Online candidate fetch error:', e);
     }
   }
 
   nameInput.addEventListener('input', function() {
-    updateFromCityInput(this.value);
+    const val = this.value;
+    clearTimeout(debounceTimer);
+    if (!val || val.trim().length < 2) {
+      hideDropdown();
+      if (codeDisplay) codeDisplay.style.display = 'none';
+      if (typeof window !== 'undefined') window.__stagedCityCoords = null;
+      return;
+    }
+
+    debounceTimer = setTimeout(() => {
+      searchCandidates(val);
+    }, 200);
   });
 
-  // Also handle selection from datalist
-  nameInput.addEventListener('change', function() {
-    updateFromCityInput(this.value);
+  nameInput.addEventListener('keydown', function(e) {
+    if (!resultsContainer || resultsContainer.style.display === 'none') {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addNewCityFromDialog();
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, activeCandidates.length - 1);
+      updateHighlightedItem();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      updateHighlightedItem();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeIndex >= 0 && activeIndex < activeCandidates.length) {
+        selectCandidate(activeCandidates[activeIndex]);
+      } else if (activeCandidates.length > 0) {
+        selectCandidate(activeCandidates[0]);
+      } else {
+        addNewCityFromDialog();
+      }
+    } else if (e.key === 'Escape') {
+      hideDropdown();
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (resultsContainer && !resultsContainer.contains(e.target) && e.target !== nameInput) {
+      hideDropdown();
+    }
   });
 }
 
@@ -3602,6 +3889,29 @@ async function addNewCityFromDialog() {
     return;
   }
 
+  // Check staged coordinates from live autocomplete
+  const staged = (typeof window !== 'undefined' && window.__stagedCityCoords &&
+                 (window.__stagedCityCoords.name.toLowerCase() === name.toLowerCase() ||
+                  window.__stagedCityCoords.name.toLowerCase().includes(name.toLowerCase()) ||
+                  name.toLowerCase().includes(window.__stagedCityCoords.name.toLowerCase())))
+                 ? window.__stagedCityCoords : null;
+
+  let initialLat = staged ? staged.lat : null;
+  let initialLng = staged ? staged.lng : null;
+  if (staged && staged.countryCode && !countryCode) {
+    countryCode = staged.countryCode;
+    countryName = staged.countryName || (countryCode ? getCountryName(countryCode) : '');
+  }
+
+  // If still no coords, check dynamic cache
+  if ((initialLat === null || initialLng === null) && typeof window !== 'undefined' && window.__dynamicCityCoordsCache) {
+    const cached = window.__dynamicCityCoordsCache.get(name.toLowerCase());
+    if (cached && cached.lat !== undefined && cached.lng !== undefined) {
+      initialLat = cached.lat;
+      initialLng = cached.lng;
+    }
+  }
+
   const nameMatches = ALL_CITIES_BY_NAME_MAP.get(name.toLowerCase());
   const dbMatch = (nameMatches && nameMatches[0]) ||
                   (typeof getCityLocationDatabaseMatch === 'function' ? getCityLocationDatabaseMatch({ name }) : null);
@@ -3612,17 +3922,46 @@ async function addNewCityFromDialog() {
       const countryMatch = COUNTRY_DATA.find(c => c.code === countryCode);
       countryName = countryMatch ? countryMatch.name : (getCountryName(countryCode) || '');
     }
+    if ((initialLat === null || initialLng === null) && dbMatch.lat !== undefined && dbMatch.lng !== undefined) {
+      initialLat = dbMatch.lat;
+      initialLng = dbMatch.lng;
+    }
   }
 
-  const newCity = addOrUpdateCity(name, countryName, '', '', '', countryCode);
+  const newCity = addOrUpdateCity(name, countryName, '', '', '', countryCode, initialLat, initialLng);
   if (newCity) {
     if (typeof refreshJourneyCityDropdowns === 'function') {
       refreshJourneyCityDropdowns(newCity.name);
     }
 
     if (!cityHasStoredCoords(newCity)) {
-      const location = await resolveCityLocation(newCity);
-      if (location) applyCityLocation(newCity, location);
+      const addBtn = document.getElementById('addNewCityBtn') || document.querySelector('.city-add-stack button.action-btn');
+      const origBtnText = addBtn ? addBtn.textContent : '';
+      if (addBtn) {
+        addBtn.disabled = true;
+        addBtn.textContent = 'Locating on map...';
+      }
+      try {
+        const location = await resolveCityLocation(newCity);
+        if (location) applyCityLocation(newCity, location);
+      } finally {
+        if (addBtn) {
+          addBtn.disabled = false;
+          addBtn.textContent = origBtnText;
+        }
+      }
+    }
+
+    // Persist as user city so it is recognized across the entire app
+    addUserCity(newCity.id, newCity.name, newCity.countryCode, newCity.lat, newCity.lng);
+
+    if (cityHasStoredCoords(newCity) && typeof window !== 'undefined') {
+      window.__dynamicCityCoordsCache = window.__dynamicCityCoordsCache || new Map();
+      window.__dynamicCityCoordsCache.set(newCity.name.toLowerCase(), { lat: Number(newCity.lat), lng: Number(newCity.lng) });
+    }
+
+    if (typeof window !== 'undefined') {
+      window.__stagedCityCoords = null;
     }
 
     saveData(false);
@@ -3630,6 +3969,8 @@ async function addNewCityFromDialog() {
     if (countryInput) countryInput.value = '';
     if (countrySelect) countrySelect.value = '';
     if (codeInfo && codeInfo.parentElement && codeInfo.parentElement.style) codeInfo.parentElement.style.display = 'none';
+    const liveResults = document.getElementById('cityLiveSearchResults');
+    if (liveResults) { liveResults.style.display = 'none'; liveResults.innerHTML = ''; }
     populateCityList();
     if (typeof buildCityNav === 'function') {
       buildCityNav();
@@ -3643,8 +3984,81 @@ async function addNewCityFromDialog() {
     if (typeof buildDesktopSplitMap === 'function') {
       buildDesktopSplitMap();
     }
+    if (typeof showToast === 'function') {
+      const flag = newCity.countryCode ? getCountryFlag(newCity.countryCode) : '📍';
+      showToast(`Added ${newCity.name} ${flag} to trip destinations`);
+    }
   }
 }
+
+// Automatically resolves coordinates in the background for any trip cities missing location data
+async function autoResolveMissingTripCities() {
+  if (typeof citiesData === 'undefined' || !Array.isArray(citiesData) || citiesData.length === 0) return;
+  const unmapped = citiesData.filter(c => !cityHasStoredCoords(c));
+  if (unmapped.length === 0) return;
+
+  if (typeof window !== 'undefined') {
+    window.__dynamicCityCoordsCache = window.__dynamicCityCoordsCache || new Map();
+  }
+
+  let resolvedCount = 0;
+  for (const city of unmapped) {
+    if (cityHasStoredCoords(city)) continue;
+
+    // 1. Check dynamic cache
+    const cached = window.__dynamicCityCoordsCache?.get(city.name.toLowerCase());
+    if (cached && cityHasStoredCoords(cached)) {
+      city.lat = Number(cached.lat);
+      city.lng = Number(cached.lng);
+      resolvedCount++;
+      continue;
+    }
+
+    // 2. Check local database
+    const local = resolveCityLocationLocal(city);
+    if (local && cityHasStoredCoords(local)) {
+      city.lat = Number(local.lat);
+      city.lng = Number(local.lng);
+      if (!city.countryCode && local.countryCode) city.countryCode = local.countryCode;
+      if (!city.country && city.countryCode) city.country = getCountryName(city.countryCode);
+      window.__dynamicCityCoordsCache?.set(city.name.toLowerCase(), { lat: city.lat, lng: city.lng });
+      resolvedCount++;
+      continue;
+    }
+
+    // 3. Live online search
+    try {
+      const searchFn = (typeof window !== 'undefined' && typeof window.searchCityOnline === 'function') ? window.searchCityOnline : searchCityOnline;
+      const online = await searchFn(city.name, city.countryCode || '', city.country || '');
+      if (online && cityHasStoredCoords(online)) {
+        city.lat = Number(online.lat);
+        city.lng = Number(online.lng);
+        if (!city.countryCode && online.countryCode) city.countryCode = online.countryCode;
+        if (!city.country && city.countryCode) city.country = getCountryName(city.countryCode);
+        window.__dynamicCityCoordsCache?.set(city.name.toLowerCase(), { lat: city.lat, lng: city.lng });
+        addUserCity(city.id, city.name, city.countryCode, city.lat, city.lng);
+        resolvedCount++;
+      }
+    } catch (e) {
+      console.warn(`[Auto-resolve] Could not resolve ${city.name}:`, e);
+    }
+  }
+
+  if (resolvedCount > 0) {
+    try {
+      if (typeof saveData === 'function') saveData(false);
+      if (typeof buildJourneyMap === 'function') buildJourneyMap();
+      if (typeof buildDesktopSplitMap === 'function') buildDesktopSplitMap();
+      const modal = document.getElementById('city-modal');
+      if (modal && modal.style.display !== 'none' && typeof populateCityList === 'function') {
+        populateCityList();
+      }
+    } catch (err) {
+      console.warn('[Auto-resolve] Error updating map after resolution:', err);
+    }
+  }
+}
+window.autoResolveMissingTripCities = autoResolveMissingTripCities;
 
 // Update city country code from dropdown
 function updateCityCountryCode(cityId, countryCode) {
@@ -6797,6 +7211,9 @@ async function loadImportedPayload(importedData, fileName) {
   if (typeof buildJourneyMap === 'function') buildJourneyMap();
   if (typeof populateCityList === 'function') populateCityList();
   if (typeof checkAndPromptCityAudit === 'function') checkAndPromptCityAudit();
+  if (typeof autoResolveMissingTripCities === 'function') {
+    setTimeout(() => { autoResolveMissingTripCities(); }, 100);
+  }
 }
 
 async function importJSON(event) {

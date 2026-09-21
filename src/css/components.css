@@ -210,6 +210,125 @@
     @apply bg-[#f5f5f5] px-3 py-2 rounded text-[0.85rem] text-[#666];
   }
 
+  .city-search-input-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .city-live-search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 2500;
+    margin-top: 4px;
+    max-height: 240px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+
+  :where([data-theme="dark"], [data-theme="dark"] *) .city-live-search-dropdown {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  }
+
+  .city-live-search-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s ease;
+  }
+
+  :where([data-theme="dark"], [data-theme="dark"] *) .city-live-search-item {
+    border-bottom-color: #334155;
+  }
+
+  .city-live-search-item:last-child {
+    border-bottom: none;
+  }
+
+  .city-live-search-item:hover,
+  .city-live-search-item.is-selected {
+    background: #f0fdf4;
+  }
+
+  :where([data-theme="dark"], [data-theme="dark"] *) .city-live-search-item:hover,
+  :where([data-theme="dark"], [data-theme="dark"] *) .city-live-search-item.is-selected {
+    background: #1e3a34;
+  }
+
+  .city-live-search-flag {
+    font-size: 1.25rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .city-live-search-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .city-live-search-name {
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :where([data-theme="dark"], [data-theme="dark"] *) .city-live-search-name {
+    color: #f8fafc;
+  }
+
+  .city-live-search-sub {
+    font-size: 0.78rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :where([data-theme="dark"], [data-theme="dark"] *) .city-live-search-sub {
+    color: #94a3b8;
+  }
+
+  .city-live-search-coords-pill {
+    font-size: 0.72rem;
+    font-family: monospace;
+    color: #0d9488;
+    background: #ccfbf1;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.35rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  :where([data-theme="dark"], [data-theme="dark"] *) .city-live-search-coords-pill {
+    color: #2dd4bf;
+    background: #134e4a;
+  }
+
+  .city-live-search-badge-source {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    background: #e2e8f0;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    margin-left: 0.4rem;
+  }
+
   .modal-form-divider-tight {
     @apply mb-2;
   }

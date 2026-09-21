@@ -15,6 +15,15 @@ function getCityCoords(cityName) {
   const strippedName = parenMatch ? parenMatch[1].trim() : clean;
   const airportCode = parenMatch ? parenMatch[2].toUpperCase() : (clean.length === 3 ? clean.toUpperCase() : null);
 
+  // 0. Try dynamic runtime coordinates cache
+  if (typeof window !== 'undefined' && window.__dynamicCityCoordsCache) {
+    const cached = window.__dynamicCityCoordsCache.get(clean.toLowerCase()) ||
+                   window.__dynamicCityCoordsCache.get(strippedName.toLowerCase());
+    if (cached && hasCoords(cached)) {
+      return { lat: Number(cached.lat), lng: Number(cached.lng) };
+    }
+  }
+
   // 1. Try to find the city in citiesData (the source of truth)
   if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
     let city = citiesData.find(c => c.name && c.name.toLowerCase() === clean.toLowerCase());
@@ -26,6 +35,14 @@ function getCityCoords(cityName) {
     }
     if (city && hasCoords(city)) {
       return { lat: Number(city.lat), lng: Number(city.lng) };
+    }
+  }
+
+  // 1.5. Try userCities
+  if (typeof userCities !== 'undefined' && Array.isArray(userCities)) {
+    const uMatch = userCities.find(c => c.name && (c.name.toLowerCase() === clean.toLowerCase() || c.name.toLowerCase() === strippedName.toLowerCase()));
+    if (uMatch && hasCoords(uMatch)) {
+      return { lat: Number(uMatch.lat), lng: Number(uMatch.lng) };
     }
   }
 
@@ -478,8 +495,16 @@ function buildJourneyMap() {
     const travelSequence = buildTravelSequence(pathStops);
     const { destinations, unmatchedCities } = buildMapDestinations(travelSequence);
 
+    if (unmatchedCities && unmatchedCities.length > 0 && typeof autoResolveMissingTripCities === 'function') {
+      setTimeout(() => { autoResolveMissingTripCities(); }, 50);
+    }
+
     if (destinations.length === 0) {
-      container.innerHTML = '<div style="padding:2rem; text-align:center;">No recognized cities found in your trip. Try adding major city names to trip legs.</div>';
+      if (unmatchedCities && unmatchedCities.length > 0) {
+        container.innerHTML = '<div style="padding:2rem; text-align:center;">Locating trip cities on map... Please wait a moment.</div>';
+      } else {
+        container.innerHTML = '<div style="padding:2rem; text-align:center;">No recognized cities found in your trip. Try adding major city names to trip legs.</div>';
+      }
       return;
     }
 

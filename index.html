@@ -1120,7 +1120,10 @@
         <div class="city-add-section">
           <h4 class="city-add-heading">➕ Add New City</h4>
           <div class="city-add-stack">
-            <input type="text" id="newCityName" class="form-control city-add-input" list="cities-datalist" placeholder="City name (e.g., Bangkok)">
+            <div class="city-search-input-wrapper">
+              <input type="text" id="newCityName" class="form-control city-add-input" autocomplete="off" placeholder="City name (e.g., Bangkok, Aitutaki, Ubud)">
+              <div id="cityLiveSearchResults" class="city-live-search-dropdown" style="display: none;" role="listbox" aria-label="City search results"></div>
+            </div>
             <div class="row-gap-2">
               <select id="newCityCountrySelect" class="form-control city-add-input">
                 <option value="">Select country...</option>
