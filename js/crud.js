@@ -3687,19 +3687,65 @@ function confirmAddLeg() {
 
   if (isEdit && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs[legDialogState.editLegIdx]) {
     const target = legDialogState.stagedLegs[legDialogState.editLegIdx];
-    const existingCity = document.getElementById('existingCitySelect')?.value;
-    if (existingCity && existingCity !== 'Home') {
-      const flag = typeof getCityFlag === 'function' ? getCityFlag(existingCity) : '📍';
-      target.label = flag + ' ' + existingCity;
+
+    // --- Determine fromCity, toCity, and label based on legType (mirrors "add new" branch) ---
+    let fromCity, toCity;
+    if (legType === 'start') {
+      fromCity = 'Home';
+      toCity = document.getElementById('toCitySelect')?.value || 'Home';
+      const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
+      target.label = `${cleanCity} (Trip Start)`;
+    } else if (legType === 'return') {
+      fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
+      toCity = 'Home';
+      const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
+      target.label = `${cleanCity} (Trip Finish)`;
+    } else if (legType === 'travel') {
+      fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
+      toCity = document.getElementById('toCitySelect')?.value || '';
+      if (!toCity) {
+        alert('Please choose a destination city for this travel leg.');
+        return;
+      }
+      target.label = `✈️ ${fromCity} to ${toCity}`;
+    } else {
+      // legType === 'city'
+      const existingCity = document.getElementById('existingCitySelect')?.value;
+      if (existingCity && existingCity !== 'Home') {
+        const flag = typeof getCityFlag === 'function' ? getCityFlag(existingCity) : '📍';
+        target.label = flag + ' ' + existingCity;
+        fromCity = existingCity;
+        toCity = existingCity;
+      } else {
+        const firstDay = target.days?.[0] || {};
+        fromCity = firstDay.from || target.label;
+        toCity = firstDay.to || target.label;
+      }
     }
-    const firstDay = target.days?.[0] || {};
+
+    // --- Preserve existing day items before rebuilding days ---
+    const oldDays = target.days ? target.days.slice() : [];
+
     target.days = buildLegDaysWithNotes({
       dateFrom: dateFrom || target.days?.[0]?.date,
       dateTo: dateTo || target.days?.[target.days.length - 1]?.date,
-      fromCity: existingCity || firstDay.from || target.label,
-      toCity: existingCity || firstDay.to || target.label,
+      fromCity: fromCity,
+      toCity: toCity,
       legType: legType,
       dayNotes: dayNotes
+    });
+
+    // Merge back existing day items for matching dates
+    target.days.forEach(newDay => {
+      const oldDay = oldDays.find(od => od.date === newDay.date);
+      if (oldDay) {
+        if (oldDay.accomItems) newDay.accomItems = oldDay.accomItems;
+        if (oldDay.activityItems) newDay.activityItems = oldDay.activityItems;
+        if (oldDay.transportItems) newDay.transportItems = oldDay.transportItems;
+        if (oldDay.notes) newDay.notes = oldDay.notes;
+        if (typeof oldDay.completed !== 'undefined') newDay.completed = oldDay.completed;
+        if (oldDay.desc && !dayNotes?.[0]) newDay.desc = oldDay.desc;
+      }
     });
 
     const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
