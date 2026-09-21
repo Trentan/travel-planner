@@ -6,19 +6,55 @@ let mapPolylines = [];
 function getCityCoords(cityName) {
   if (!cityName) return null;
   const clean = cityName.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').trim();
-  
-  // Try to find the city in citiesData (the source of truth)
-  if (typeof citiesData !== 'undefined') {
-    const city = citiesData.find(c => c.name.toLowerCase() === clean.toLowerCase());
-    if (city && city.lat !== undefined && city.lng !== undefined && city.lat !== null) {
-      return { lat: city.lat, lng: city.lng };
+  if (!clean) return null;
+
+  const hasCoords = (c) => c && c.lat !== undefined && c.lng !== undefined && c.lat !== null && c.lng !== null && !isNaN(Number(c.lat)) && !isNaN(Number(c.lng));
+
+  // Extract airport code or stripped city if format "City (DPS)"
+  const parenMatch = clean.match(/^(.*?)\s*\(([A-Z]{3,4})\)$/i);
+  const strippedName = parenMatch ? parenMatch[1].trim() : clean;
+  const airportCode = parenMatch ? parenMatch[2].toUpperCase() : (clean.length === 3 ? clean.toUpperCase() : null);
+
+  // 1. Try to find the city in citiesData (the source of truth)
+  if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+    let city = citiesData.find(c => c.name && c.name.toLowerCase() === clean.toLowerCase());
+    if (!city && strippedName !== clean) {
+      city = citiesData.find(c => c.name && c.name.toLowerCase() === strippedName.toLowerCase());
+    }
+    if (!city && typeof getCityByName === 'function') {
+      city = getCityByName(clean) || getCityByName(strippedName);
+    }
+    if (city && hasCoords(city)) {
+      return { lat: Number(city.lat), lng: Number(city.lng) };
     }
   }
-  
-  // Fallback: Check built-in database (defined in data.js)
-  if (typeof ALL_CITIES !== 'undefined') {
-    const match = ALL_CITIES.find(c => c.name.toLowerCase() === clean.toLowerCase());
-    if (match && match.lat) return { lat: match.lat, lng: match.lng };
+
+  // 2. Try ALL_CITIES (built-in + extended databases)
+  if (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) {
+    let match = ALL_CITIES.find(c => c.name && c.name.toLowerCase() === clean.toLowerCase());
+    if (!match && strippedName !== clean) {
+      match = ALL_CITIES.find(c => c.name && c.name.toLowerCase() === strippedName.toLowerCase());
+    }
+    if (!match && airportCode) {
+      match = ALL_CITIES.find(c => c.code && c.code.toUpperCase() === airportCode);
+    }
+    if (match && hasCoords(match)) {
+      return { lat: Number(match.lat), lng: Number(match.lng) };
+    }
+  }
+
+  // 3. Try local database resolution and aliases (resolveCityLocationLocal)
+  if (typeof resolveCityLocationLocal === 'function') {
+    const loc = resolveCityLocationLocal(parenMatch ? { name: strippedName, code: airportCode } : { name: clean });
+    if (loc && hasCoords(loc)) {
+      return { lat: Number(loc.lat), lng: Number(loc.lng) };
+    }
+    if (strippedName !== clean) {
+      const loc2 = resolveCityLocationLocal({ name: strippedName });
+      if (loc2 && hasCoords(loc2)) {
+        return { lat: Number(loc2.lat), lng: Number(loc2.lng) };
+      }
+    }
   }
 
   return null;
@@ -46,10 +82,24 @@ function collectPathStops() {
     appData.forEach((leg, legIndex) => {
       const legBaseScore = typeof getLegDateScore === 'function' ? getLegDateScore(leg, legIndex) : legIndex * 10000;
 
-      const labelCity = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label ? leg.label.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').trim() : '');
-      const labelAlreadyInDayRoute = labelCity && (leg.days || []).some(day =>
-          (day.from && day.from.toLowerCase() === labelCity.toLowerCase()) ||
-          (day.to && day.to.toLowerCase() === labelCity.toLowerCase())
+      let legCity = '';
+      if (leg.cityId && typeof getCityNameById === 'function') {
+        legCity = getCityNameById(leg.cityId);
+      }
+      if (!legCity && typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+        const found = citiesData.find(c =>
+          (leg.cityId && c.id === leg.cityId) ||
+          (leg.id && (c.id === leg.id || c.id === 'city-' + leg.id.replace(/^leg-/, '')))
+        );
+        if (found) legCity = found.name;
+      }
+      if (!legCity) {
+        legCity = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label ? leg.label.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').trim() : '');
+      }
+
+      const labelAlreadyInDayRoute = legCity && (leg.days || []).some(day =>
+          (day.from && day.from.toLowerCase() === legCity.toLowerCase()) ||
+          (day.to && day.to.toLowerCase() === legCity.toLowerCase())
       );
 
       (leg.days || []).forEach((day, dayIndex) => {
@@ -59,8 +109,8 @@ function collectPathStops() {
           pathStops.push({ id: getMapCityId(day.from), name: day.from, score: dayScore, isTransit: false, color: leg.colour || '#3498DB' });
         }
 
-        if (labelCity && !labelAlreadyInDayRoute && dayIndex === 0) {
-           pathStops.push({ id: getMapCityId(labelCity), name: labelCity, score: dayScore + 0.5, isTransit: true, color: leg.colour || '#95a5a6' });
+        if (legCity && !labelAlreadyInDayRoute && dayIndex === 0) {
+           pathStops.push({ id: getMapCityId(legCity), name: legCity, score: dayScore + 0.5, isTransit: false, color: leg.colour || '#3498DB' });
         }
 
         if (day.to && (typeof shouldSkipCityNavName !== 'function' || !shouldSkipCityNavName(day.to))) {
@@ -146,11 +196,41 @@ function buildMapDestinations(travelSequence) {
   const citiesInOrder = typeof getCitiesInTravelOrder === 'function' ? getCitiesInTravelOrder() : [];
   const orderedCities = citiesInOrder.length > 0
       ? citiesInOrder
-      : Array.from(stopDataMap.values()).map(stop => ({ id: stop.id, name: stop.name, colour: stop.color, isTransit: stop.isTransit }));
+      : (typeof citiesData !== 'undefined' && Array.isArray(citiesData) && citiesData.length > 0
+          ? citiesData
+          : Array.from(stopDataMap.values()).map(stop => ({ id: stop.id, name: stop.name, colour: stop.color, isTransit: stop.isTransit })));
 
   orderedCities.forEach(city => {
     const key = getMapCityKey(city.name);
-    const stopInfo = stopDataMap.get(key);
+    let stopInfo = stopDataMap.get(key);
+
+    // If no direct key match, match by stop id, getCityByName, or substring/alias
+    if (!stopInfo) {
+      for (const [k, stop] of stopDataMap.entries()) {
+        if (stop.id === city.id ||
+            (typeof getCityByName === 'function' && getCityByName(stop.name)?.id === city.id) ||
+            k.includes(key) || key.includes(k)) {
+          stopInfo = stop;
+          break;
+        }
+      }
+    }
+
+    // If still no stopInfo, but city belongs to citiesData or active trip, create a synthetic stopInfo so it renders
+    if (!stopInfo) {
+      const isTripCity = typeof citiesData !== 'undefined' && Array.isArray(citiesData) &&
+        citiesData.some(c => c.id === city.id || (c.name && c.name.toLowerCase() === key));
+      if (isTripCity) {
+        stopInfo = {
+          id: city.id,
+          name: city.name,
+          color: city.colour || '#3498DB',
+          isTransit: city.isTransit === true,
+          visitIndexes: [destinations.length + 1]
+        };
+      }
+    }
+
     if (!stopInfo) return;
 
     const coords = getCityCoords(city.name);
@@ -170,6 +250,30 @@ function buildMapDestinations(travelSequence) {
       visitIndexes: stopInfo.visitIndexes
     });
   });
+
+  // Fallback: If destinations is empty but travelSequence has stops with coordinates, map them
+  if (destinations.length === 0 && travelSequence.length > 0) {
+    const seenKeys = new Set();
+    travelSequence.forEach((stop, idx) => {
+      const sName = (stop.name || '').trim();
+      const sKey = getMapCityKey(sName);
+      if (!sKey || seenKeys.has(sKey)) return;
+      const coords = getCityCoords(sName);
+      if (coords) {
+        seenKeys.add(sKey);
+        destinations.push({
+          id: stop.id || `dest-${idx}`,
+          name: sName,
+          lat: coords.lat,
+          lng: coords.lng,
+          color: stop.color || '#3498DB',
+          isTransit: stop.isTransit === true,
+          index: destinations.length + 1,
+          visitIndexes: [idx + 1]
+        });
+      }
+    });
+  }
 
   return { destinations, unmatchedCities };
 }
@@ -301,7 +405,10 @@ function drawMapMarkers(destinations) {
 /**
  * Adjusts the map view or bounds based on active filter or polyline bounds.
  */
-function adjustMapView(polylinePoints) {
+/**
+ * Adjusts the map view or bounds based on active filter or polyline bounds.
+ */
+function adjustMapView(polylinePoints, destinations = []) {
   if (!mainMap) return;
 
   if (window.currentCityFilter && window.currentCityFilter !== 'all') {
@@ -310,6 +417,14 @@ function adjustMapView(polylinePoints) {
     mainMap.fitBounds(L.polyline(polylinePoints).getBounds(), { padding: [50, 50], animate: false });
   } else if (polylinePoints.length === 1) {
     mainMap.setView(polylinePoints[0], 10, { animate: false });
+  } else if (destinations && destinations.length === 1) {
+    mainMap.setView([destinations[0].lat, destinations[0].lng], 10, { animate: false });
+  } else if (destinations && destinations.length > 1) {
+    mainMap.fitBounds(L.latLngBounds(destinations.map(d => [d.lat, d.lng])), { padding: [50, 50], animate: false });
+  } else if (mapMarkers.length === 1) {
+    mainMap.setView(mapMarkers[0].marker.getLatLng(), 10, { animate: false });
+  } else if (mapMarkers.length > 1) {
+    mainMap.fitBounds(L.latLngBounds(mapMarkers.map(m => m.marker.getLatLng())), { padding: [50, 50], animate: false });
   } else {
     mainMap.setView([20, 0], 2, { animate: false });
   }
@@ -378,7 +493,7 @@ function buildJourneyMap() {
       setTimeout(() => {
         if (!mainMap) return;
         mainMap.invalidateSize(false);
-        adjustMapView(polylinePoints);
+        adjustMapView(polylinePoints, destinations);
       }, 50);
     }
   }, 400);
@@ -662,6 +777,10 @@ function buildDesktopSplitMap() {
       desktopSplitMap.fitBounds(L.polyline(polylinePoints).getBounds(), { padding: [30, 30], animate: false });
     } else if (polylinePoints.length === 1) {
       desktopSplitMap.setView(polylinePoints[0], 10, { animate: false });
+    } else if (destinations.length === 1) {
+      desktopSplitMap.setView([destinations[0].lat, destinations[0].lng], 10, { animate: false });
+    } else if (destinations.length > 1) {
+      desktopSplitMap.fitBounds(L.latLngBounds(destinations.map(d => [d.lat, d.lng])), { padding: [30, 30], animate: false });
     } else {
       desktopSplitMap.setView([20, 0], 2, { animate: false });
     }

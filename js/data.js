@@ -930,21 +930,21 @@ const EXTENDED_CITY_DATABASE = [
 { code: 'TGD', name: 'Podgorica', countryCode: 'ME', timezone: 'Europe/Podgorica' },
 { code: 'PRN', name: 'Pristina', countryCode: 'XK', timezone: 'Europe/Pristina' },
 { code: 'SJJ', name: 'Sarajevo', countryCode: 'BA', timezone: 'Europe/Sarajevo' },
-{ code: 'SPU', name: 'Split', countryCode: 'HR', timezone: 'Europe/Zagreb' },
-{ code: 'DBV', name: 'Dubrovnik', countryCode: 'HR', timezone: 'Europe/Zagreb' },
-{ code: 'ZAG', name: 'Zagreb', countryCode: 'HR', timezone: 'Europe/Zagreb' },
-{ code: 'LJU', name: 'Ljubljana', countryCode: 'SI', timezone: 'Europe/Ljubljana' },
+{ code: 'SPU', name: 'Split', countryCode: 'HR', timezone: 'Europe/Zagreb', lat: 43.5081, lng: 16.4402 },
+{ code: 'DBV', name: 'Dubrovnik', countryCode: 'HR', timezone: 'Europe/Zagreb', lat: 42.6507, lng: 18.0944 },
+{ code: 'ZAG', name: 'Zagreb', countryCode: 'HR', timezone: 'Europe/Zagreb', lat: 45.8150, lng: 15.9819 },
+{ code: 'LJU', name: 'Ljubljana', countryCode: 'SI', timezone: 'Europe/Ljubljana', lat: 46.0569, lng: 14.5058 },
 { code: 'OTP', name: 'Bucharest', countryCode: 'RO', timezone: 'Europe/Bucharest' },
 { code: 'CLJ', name: 'Cluj-Napoca', countryCode: 'RO', timezone: 'Europe/Bucharest' },
 { code: 'TSR', name: 'Timisoara', countryCode: 'RO', timezone: 'Europe/Bucharest' },
-{ code: 'SOF', name: 'Sofia', countryCode: 'BG', timezone: 'Europe/Sofia' },
+{ code: 'SOF', name: 'Sofia', countryCode: 'BG', timezone: 'Europe/Sofia', lat: 42.6977, lng: 23.3219 },
 { code: 'VAR', name: 'Varna', countryCode: 'BG', timezone: 'Europe/Sofia' },
-{ code: 'TLL', name: 'Tallinn', countryCode: 'EE', timezone: 'Europe/Tallinn' },
-{ code: 'RIX', name: 'Riga', countryCode: 'LV', timezone: 'Europe/Riga' },
-{ code: 'VNO', name: 'Vilnius', countryCode: 'LT', timezone: 'Europe/Vilnius' },
-{ code: 'KRK', name: 'Krakow', countryCode: 'PL', timezone: 'Europe/Warsaw' },
+{ code: 'TLL', name: 'Tallinn', countryCode: 'EE', timezone: 'Europe/Tallinn', lat: 59.4370, lng: 24.7536 },
+{ code: 'RIX', name: 'Riga', countryCode: 'LV', timezone: 'Europe/Riga', lat: 56.9496, lng: 24.1052 },
+{ code: 'VNO', name: 'Vilnius', countryCode: 'LT', timezone: 'Europe/Vilnius', lat: 54.6872, lng: 25.2797 },
+{ code: 'KRK', name: 'Krakow', countryCode: 'PL', timezone: 'Europe/Warsaw', lat: 50.0647, lng: 19.9450 },
 { code: 'POZ', name: 'Poznan', countryCode: 'PL', timezone: 'Europe/Warsaw' },
-{ code: 'WAW', name: 'Warsaw', countryCode: 'PL', timezone: 'Europe/Warsaw' },
+{ code: 'WAW', name: 'Warsaw', countryCode: 'PL', timezone: 'Europe/Warsaw', lat: 52.2297, lng: 21.0122 },
 { code: 'BEG', name: 'Belgrade', countryCode: 'RS', timezone: 'Europe/Belgrade' },
 { code: 'SKG', name: 'Thessaloniki', countryCode: 'GR', timezone: 'Europe/Athens' },
 { code: 'HER', name: 'Heraklion', countryCode: 'GR', timezone: 'Europe/Athens' },
@@ -983,23 +983,23 @@ const EXTENDED_CITY_DATABASE = [
 { code: 'NBO', name: 'Nairobi', countryCode: 'KE', timezone: 'Africa/Nairobi' },
 { code: 'JNB', name: 'Johannesburg', countryCode: 'ZA', timezone: 'Africa/Johannesburg' },
 { code: 'CPT', name: 'Cape Town', countryCode: 'ZA', timezone: 'Africa/Johannesburg' },
-{ code: 'DPS', name: 'Denpasar Bali', countryCode: 'ID', timezone: 'Asia/Makassar' },
-{ code: 'CGK', name: 'Jakarta', countryCode: 'ID', timezone: 'Asia/Jakarta' },
-{ code: 'SUB', name: 'Surabaya', countryCode: 'ID', timezone: 'Asia/Jakarta' },
-{ code: 'RGN', name: 'Yangon', countryCode: 'MM', timezone: 'Asia/Yangon' },
-{ code: 'PNH', name: 'Phnom Penh', countryCode: 'KH', timezone: 'Asia/Phnom_Penh' },
-{ code: 'REP', name: 'Siem Reap', countryCode: 'KH', timezone: 'Asia/Phnom_Penh' },
+{ code: 'DPS', name: 'Denpasar Bali', countryCode: 'ID', timezone: 'Asia/Makassar', lat: -8.6705, lng: 115.2126 },
+{ code: 'CGK', name: 'Jakarta', countryCode: 'ID', timezone: 'Asia/Jakarta', lat: -6.2088, lng: 106.8456 },
+{ code: 'SUB', name: 'Surabaya', countryCode: 'ID', timezone: 'Asia/Jakarta', lat: -7.2575, lng: 112.7521 },
+{ code: 'RGN', name: 'Yangon', countryCode: 'MM', timezone: 'Asia/Yangon', lat: 16.8661, lng: 96.1951 },
+{ code: 'PNH', name: 'Phnom Penh', countryCode: 'KH', timezone: 'Asia/Phnom_Penh', lat: 11.5564, lng: 104.9282 },
+{ code: 'REP', name: 'Siem Reap', countryCode: 'KH', timezone: 'Asia/Phnom_Penh', lat: 13.3671, lng: 103.8448 },
 { code: 'VTE', name: 'Vientiane', countryCode: 'LA', timezone: 'Asia/Vientiane' },
-{ code: 'LPQ', name: 'Luang Prabang', countryCode: 'LA', timezone: 'Asia/Vientiane' },
-{ code: 'HAN', name: 'Hanoi', countryCode: 'VN', timezone: 'Asia/Ho_Chi_Minh' },
-{ code: 'SGN', name: 'Ho Chi Minh City', countryCode: 'VN', timezone: 'Asia/Ho_Chi_Minh' },
-{ code: 'DAD', name: 'Da Nang', countryCode: 'VN', timezone: 'Asia/Ho_Chi_Minh' },
+{ code: 'LPQ', name: 'Luang Prabang', countryCode: 'LA', timezone: 'Asia/Vientiane', lat: 19.8893, lng: 102.1334 },
+{ code: 'HAN', name: 'Hanoi', countryCode: 'VN', timezone: 'Asia/Ho_Chi_Minh', lat: 21.0285, lng: 105.8542 },
+{ code: 'SGN', name: 'Ho Chi Minh City', countryCode: 'VN', timezone: 'Asia/Ho_Chi_Minh', lat: 10.8231, lng: 106.6297 },
+{ code: 'DAD', name: 'Da Nang', countryCode: 'VN', timezone: 'Asia/Ho_Chi_Minh', lat: 16.0544, lng: 108.2022 },
 { code: 'CXR', name: 'Nha Trang', countryCode: 'VN', timezone: 'Asia/Ho_Chi_Minh' },
-{ code: 'CEB', name: 'Cebu', countryCode: 'PH', timezone: 'Asia/Manila' },
-{ code: 'MNL', name: 'Manila', countryCode: 'PH', timezone: 'Asia/Manila' },
+{ code: 'CEB', name: 'Cebu', countryCode: 'PH', timezone: 'Asia/Manila', lat: 10.3157, lng: 123.8854 },
+{ code: 'MNL', name: 'Manila', countryCode: 'PH', timezone: 'Asia/Manila', lat: 14.5995, lng: 120.9842 },
 { code: 'DMK', name: 'Bangkok Don Mueang', countryCode: 'TH', timezone: 'Asia/Bangkok' },
-{ code: 'CNX', name: 'Chiang Mai', countryCode: 'TH', timezone: 'Asia/Bangkok' },
-{ code: 'KBV', name: 'Krabi', countryCode: 'TH', timezone: 'Asia/Bangkok' },
+{ code: 'CNX', name: 'Chiang Mai', countryCode: 'TH', timezone: 'Asia/Bangkok', lat: 18.7883, lng: 98.9853 },
+{ code: 'KBV', name: 'Krabi', countryCode: 'TH', timezone: 'Asia/Bangkok', lat: 8.0863, lng: 98.9063 },
 { code: 'USM', name: 'Koh Samui', countryCode: 'TH', timezone: 'Asia/Bangkok', lat: 9.5120, lng: 100.0136 },
 { code: 'IST', name: 'Istanbul', countryCode: 'TR', timezone: 'Europe/Istanbul' },
 { code: 'TPE', name: 'Taipei', countryCode: 'TW', timezone: 'Asia/Taipei' },
@@ -1016,6 +1016,7 @@ const CITY_DATABASE = [
   { code: 'AUH', icaoCode: 'OMAA', name: 'Abu Dhabi', countryCode: 'AE', timezone: 'Asia/Dubai', lat: 24.4539, lng: 54.3773 },
   { code: 'AMS', icaoCode: 'EHAM', name: 'Amsterdam', countryCode: 'NL', timezone: 'Europe/Amsterdam', lat: 52.3676, lng: 4.9041 },
   { code: 'ATH', icaoCode: 'LGAV', name: 'Athens', countryCode: 'GR', timezone: 'Europe/Athens', lat: 37.9838, lng: 23.7275 },
+  { code: 'DPS', icaoCode: 'WADD', name: 'Bali', countryCode: 'ID', timezone: 'Asia/Makassar', lat: -8.4095, lng: 115.1889 },
   { code: 'BCN', icaoCode: 'LEBL', name: 'Barcelona', countryCode: 'ES', timezone: 'Europe/Madrid', lat: 41.3851, lng: 2.1734 },
   { code: 'BKK', icaoCode: 'VTBS', name: 'Bangkok', countryCode: 'TH', timezone: 'Asia/Bangkok', lat: 13.7563, lng: 100.5018 },
   { code: 'PEK', icaoCode: 'ZBAA', name: 'Beijing', countryCode: 'CN', timezone: 'Asia/Shanghai', lat: 39.9042, lng: 116.4074 },
@@ -2021,6 +2022,17 @@ const CITY_ALIASES = {
   'chennai': 'Chennai',
   'tokio': 'Tokyo',
   'krung thep': 'Bangkok',
+  'bali': 'Bali',
+  'denpasar': 'Denpasar Bali',
+  'denpasar bali': 'Denpasar Bali',
+  'dps': 'Bali',
+  'seminyak': 'Bali',
+  'canggu': 'Bali',
+  'ubud': 'Bali',
+  'kuta': 'Bali',
+  'sanur': 'Bali',
+  'uluwatu': 'Bali',
+  'nusa dua': 'Bali',
 
   // Middle East
   'dubayy': 'Dubai',
@@ -2230,7 +2242,13 @@ function normalizeCityLocationData(city) {
   const dbMatch = getCityLocationDatabaseMatch(city);
 
   if (cityName) {
-    city.name = dbMatch ? dbMatch.name : formatCityTitleCase(cityName);
+    if (!city.name) {
+      city.name = dbMatch ? dbMatch.name : formatCityTitleCase(cityName);
+    } else if (dbMatch && dbMatch.name && dbMatch.name.toLowerCase() === cityName.toLowerCase()) {
+      city.name = dbMatch.name;
+    } else {
+      city.name = formatCityTitleCase(cityName);
+    }
   }
 
   if (!city.id && cityName) {
@@ -3072,49 +3090,40 @@ function setupCityAutocomplete() {
 
   if (!nameInput) return;
 
-  nameInput.addEventListener('input', function() {
-    const value = this.value.trim();
+  function updateFromCityInput(val) {
+    const value = String(val || '').trim();
     if (!value) {
       if (codeDisplay) codeDisplay.style.display = 'none';
       return;
     }
 
-    // Look up city in databases
+    // Look up city in databases and aliases
     const nameMatches = ALL_CITIES_BY_NAME_MAP.get(value.toLowerCase());
-    const match = nameMatches ? nameMatches[0] : null;
+    const match = (nameMatches && nameMatches[0]) ||
+                  (typeof getCityLocationDatabaseMatch === 'function' ? getCityLocationDatabaseMatch({ name: value }) : null);
 
     if (match && codeDisplay && codeInfo) {
-      const flag = getCountryFlag(match.countryCode);
-      const cName = getCountryName(match.countryCode);
+      const flag = match.countryCode ? getCountryFlag(match.countryCode) : '🌍';
+      const cName = match.countryCode ? getCountryName(match.countryCode) : (match.country || '');
       codeInfo.textContent = `${flag} ${cName}`;
       codeDisplay.style.display = 'block';
 
       // Auto-select country if not already selected
-      if (countrySelect && !countrySelect.value) {
+      if (countrySelect && !countrySelect.value && match.countryCode) {
         countrySelect.value = match.countryCode;
       }
     } else if (codeDisplay) {
       codeDisplay.style.display = 'none';
     }
+  }
+
+  nameInput.addEventListener('input', function() {
+    updateFromCityInput(this.value);
   });
 
   // Also handle selection from datalist
   nameInput.addEventListener('change', function() {
-    const value = this.value.trim();
-    if (!value) return;
-
-    const nameMatches = ALL_CITIES_BY_NAME_MAP.get(value.toLowerCase());
-    const match = nameMatches ? nameMatches[0] : null;
-
-    if (match && countrySelect) {
-      countrySelect.value = match.countryCode;
-      if (codeDisplay && codeInfo) {
-        const flag = getCountryFlag(match.countryCode);
-        const cName = getCountryName(match.countryCode);
-        codeInfo.textContent = `${flag} ${cName}`;
-        codeDisplay.style.display = 'block';
-      }
-    }
+    updateFromCityInput(this.value);
   });
 }
 
@@ -3323,6 +3332,12 @@ function deleteCityFromDialog(cityId) {
     if (typeof buildItinerary === 'function') {
       buildItinerary();
     }
+    if (typeof buildJourneyMap === 'function') {
+      buildJourneyMap();
+    }
+    if (typeof buildDesktopSplitMap === 'function') {
+      buildDesktopSplitMap();
+    }
   }
 }
 
@@ -3382,6 +3397,8 @@ function renameCityInDialog(cityId, newName) {
   if (typeof buildItinerary === 'function') buildItinerary();
   if (typeof buildTransportTab === 'function') buildTransportTab();
   if (typeof buildAccomTab === 'function') buildAccomTab();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  if (typeof buildDesktopSplitMap === 'function') buildDesktopSplitMap();
   if (typeof showToast === 'function') showToast(`Renamed city to "${newName}"`);
 }
 
@@ -3586,13 +3603,14 @@ async function addNewCityFromDialog() {
   }
 
   const nameMatches = ALL_CITIES_BY_NAME_MAP.get(name.toLowerCase());
-  const dbMatch = nameMatches ? nameMatches[0] : null;
+  const dbMatch = (nameMatches && nameMatches[0]) ||
+                  (typeof getCityLocationDatabaseMatch === 'function' ? getCityLocationDatabaseMatch({ name }) : null);
   if (dbMatch) {
     // Verify country matches
     if (!countryCode && dbMatch.countryCode) {
       countryCode = dbMatch.countryCode;
       const countryMatch = COUNTRY_DATA.find(c => c.code === countryCode);
-      countryName = countryMatch ? countryMatch.name : '';
+      countryName = countryMatch ? countryMatch.name : (getCountryName(countryCode) || '');
     }
   }
 
@@ -3611,10 +3629,19 @@ async function addNewCityFromDialog() {
     nameInput.value = '';
     if (countryInput) countryInput.value = '';
     if (countrySelect) countrySelect.value = '';
-    if (codeInfo) codeInfo.parentElement.style.display = 'none';
+    if (codeInfo && codeInfo.parentElement && codeInfo.parentElement.style) codeInfo.parentElement.style.display = 'none';
     populateCityList();
     if (typeof buildCityNav === 'function') {
       buildCityNav();
+    }
+    if (typeof buildItinerary === 'function') {
+      buildItinerary();
+    }
+    if (typeof buildJourneyMap === 'function') {
+      buildJourneyMap();
+    }
+    if (typeof buildDesktopSplitMap === 'function') {
+      buildDesktopSplitMap();
     }
   }
 }
@@ -3639,6 +3666,7 @@ function updateCityCountryCode(cityId, countryCode) {
     if (typeof buildCityNav === 'function') buildCityNav();
     if (typeof buildItinerary === 'function') buildItinerary();
     if (typeof buildJourneyMap === 'function') buildJourneyMap();
+    if (typeof buildDesktopSplitMap === 'function') buildDesktopSplitMap();
   });
 }
 

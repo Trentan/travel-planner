@@ -107,17 +107,42 @@ async function runAiBuilderImportTests() {
       warn: () => {},
       error: () => {}
     },
-    alert: () => {}
+    alert: () => {},
+    confirm: () => true,
+    L: {
+      map: () => ({
+        setView: () => {},
+        fitBounds: () => {},
+        remove: () => {},
+        invalidateSize: () => {}
+      }),
+      tileLayer: () => ({ addTo: () => {} }),
+      polyline: () => ({
+        addTo: () => ({ bindPopup: () => {}, on: () => {} }),
+        bindPopup: () => {},
+        on: () => {},
+        getBounds: () => ({})
+      }),
+      divIcon: () => ({}),
+      marker: () => ({
+        addTo: () => ({ bindPopup: () => {}, on: () => {} }),
+        bindPopup: () => {},
+        on: () => {}
+      }),
+      latLngBounds: () => ({})
+    }
   });
 
   // Load scripts
   const defaultDataCode = loadSource('js/default-data.js');
   const utilsCode = loadSource('js/utils.js');
   const dataCode = loadSource('js/data.js');
+  const mapCode = loadSource('js/map.js');
 
   runScriptInContext(defaultDataCode, context, 'js/default-data.js');
   runScriptInContext(utilsCode, context, 'js/utils.js');
   runScriptInContext(dataCode, context, 'js/data.js');
+  runScriptInContext(mapCode, context, 'js/map.js');
 
   const loadImportedPayload = context.loadImportedPayload || context.window.loadImportedPayload;
   assert(typeof loadImportedPayload === 'function', 'loadImportedPayload should be defined');
@@ -137,6 +162,29 @@ async function runAiBuilderImportTests() {
 
   const baliCities = citiesData.filter(c => c.id === 'city-bali');
   assert(baliCities.length === 1, `Expected exactly 1 city with id 'city-bali', found ${baliCities.length}`);
+  assert(baliCities[0].countryCode === 'ID', 'Bali must have countryCode ID');
+  assert(baliCities[0].lat !== undefined && baliCities[0].lng !== undefined, 'Bali must have resolved coordinates');
+
+  // Verify map coordinate resolution & destinations
+  const getCityCoords = context.getCityCoords;
+  assert(typeof getCityCoords === 'function', 'getCityCoords should be defined');
+  const baliCoords = getCityCoords('Bali');
+  assert(baliCoords && baliCoords.lat && baliCoords.lng, 'getCityCoords("Bali") must resolve valid coordinates');
+  const dpsCoords = getCityCoords('Denpasar (DPS)');
+  assert(dpsCoords && dpsCoords.lat && dpsCoords.lng, 'getCityCoords("Denpasar (DPS)") must resolve valid coordinates');
+  const seminyakCoords = getCityCoords('Seminyak');
+  assert(seminyakCoords && seminyakCoords.lat && seminyakCoords.lng, 'getCityCoords("Seminyak") must resolve valid coordinates');
+
+  const collectPathStops = context.collectPathStops;
+  const buildTravelSequence = context.buildTravelSequence;
+  const buildMapDestinations = context.buildMapDestinations;
+  assert(typeof buildMapDestinations === 'function', 'buildMapDestinations should be defined');
+
+  const pathStops = collectPathStops();
+  const travelSequence = buildTravelSequence(pathStops);
+  const { destinations } = buildMapDestinations(travelSequence);
+  assert(Array.isArray(destinations) && destinations.length >= 1, `Expected at least 1 destination on map, found ${destinations.length}`);
+  assert(destinations.some(d => d.name === 'Bali' || d.id === 'city-bali'), 'Bali must be present in map destinations');
 
   const startCities = citiesData.filter(c => c.id === 'city-start' || String(c.name).toLowerCase() === 'start');
   assert(startCities.length === 0, 'Spurious transit city "Start" must NOT be created');
@@ -151,6 +199,7 @@ async function runAiBuilderImportTests() {
   const destinationCities = citiesData.filter(c => !c.isTransit);
   assert(destinationCities.length === 1, `Expected exactly 1 destination city, found ${destinationCities.length}`);
   console.log('  ✔ Phantom transit cities prevented and duplicate cities eliminated');
+  console.log('  ✔ Bali coordinates resolved and journey map destinations verified');
 
   // Verify day activity items have non-empty text
   let totalActivityItems = 0;
@@ -221,6 +270,33 @@ async function runAiBuilderImportTests() {
     assert(Array.isArray(area.categories), 'Packing area must have categories array');
   });
   console.log('  ✔ Packing data structure cleanly normalized into valid areas and categories');
+
+  // Verify city add and delete lifecycle via dialog
+  let mapRebuilt = false;
+  let splitMapRebuilt = false;
+  context.buildJourneyMap = () => { mapRebuilt = true; };
+  context.buildDesktopSplitMap = () => { splitMapRebuilt = true; };
+
+  const nameInput = context.document.getElementById('newCityName');
+  nameInput.value = 'Lombok';
+  await context.addNewCityFromDialog();
+
+  const currentCitiesAfterAdd = context.getCurrentAppData().cities;
+  const lombokCity = currentCitiesAfterAdd.find(c => c.name === 'Lombok');
+  assert(lombokCity, 'New city "Lombok" should be added to citiesData');
+  assert(mapRebuilt, 'buildJourneyMap should be called upon adding a city');
+  assert(splitMapRebuilt, 'buildDesktopSplitMap should be called upon adding a city');
+  console.log('  ✔ Adding a city via dialog successfully registers entity and triggers map rebuilds');
+
+  mapRebuilt = false;
+  splitMapRebuilt = false;
+  context.deleteCityFromDialog(lombokCity.id);
+
+  const currentCitiesAfterDelete = context.getCurrentAppData().cities;
+  assert(!currentCitiesAfterDelete.some(c => c.id === lombokCity.id), 'Deleted city must be removed from citiesData');
+  assert(mapRebuilt, 'buildJourneyMap should be called upon deleting a city');
+  assert(splitMapRebuilt, 'buildDesktopSplitMap should be called upon deleting a city');
+  console.log('  ✔ Deleting a city via dialog cleanly purges entity and triggers map rebuilds');
 
   console.log('✅ ALL AI BUILDER PROMPT & IMPORT HARDENING TESTS PASSED CLEANLY!\n');
 }
