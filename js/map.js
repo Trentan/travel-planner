@@ -10,6 +10,19 @@ function getCityCoords(cityName) {
 
   const hasCoords = (c) => c && c.lat !== undefined && c.lng !== undefined && c.lat !== null && c.lng !== null && !isNaN(Number(c.lat)) && !isNaN(Number(c.lng));
 
+  // Special handling for 'Home' - resolve to the user's home city instead of matching Rome
+  if (clean.toLowerCase() === 'home') {
+    if (typeof getHomeLocation === 'function') {
+      const home = getHomeLocation();
+      const realHomeCity = home.departure || home.return;
+      if (realHomeCity && realHomeCity.toLowerCase() !== 'home') {
+        const coords = getCityCoords(realHomeCity);
+        if (coords) return coords;
+      }
+    }
+    return null;
+  }
+
   // Extract airport code or stripped city if format "City (DPS)"
   const parenMatch = clean.match(/^(.*?)\s*\(([A-Z]{3,4})\)$/i);
   const strippedName = parenMatch ? parenMatch[1].trim() : clean;
@@ -218,6 +231,8 @@ function buildMapDestinations(travelSequence) {
           : Array.from(stopDataMap.values()).map(stop => ({ id: stop.id, name: stop.name, colour: stop.color, isTransit: stop.isTransit })));
 
   orderedCities.forEach(city => {
+    if (!city || !city.name) return;
+    if (String(city.name).trim().toLowerCase() === 'home') return;
     const key = getMapCityKey(city.name);
     let stopInfo = stopDataMap.get(key);
 
@@ -263,6 +278,7 @@ function buildMapDestinations(travelSequence) {
       lng: coords.lng,
       color: city.colour || stopInfo.color,
       isTransit: city.isTransit === true || stopInfo.isTransit,
+      isHome: typeof isHomeCity === 'function' ? isHomeCity(city.name) : false,
       index: destinations.length + 1,
       visitIndexes: stopInfo.visitIndexes
     });
@@ -397,11 +413,13 @@ function drawMapPolylines(travelSequence) {
 function drawMapMarkers(destinations) {
   destinations.forEach(d => {
     const isTransit = d.isTransit;
+    const isHome = d.isHome;
     const firstIndex = d.index;
+    const markerContent = isHome ? '🏠' : `<span>${firstIndex}</span>`;
 
     const icon = L.divIcon({
-      className: `numbered-map-marker ${isTransit ? 'is-transit-marker' : ''}`,
-      html: `<div class="marker-dot" style="background-color: ${isTransit ? '#95a5a6' : d.color}; border-style: ${isTransit ? 'dashed' : 'solid'};"><span>${firstIndex}</span></div>`,
+      className: `numbered-map-marker ${isTransit ? 'is-transit-marker' : ''} ${isHome ? 'is-home-marker' : ''}`,
+      html: `<div class="marker-dot" style="background-color: ${isTransit ? '#95a5a6' : d.color}; border-style: ${isTransit ? 'dashed' : 'solid'}; font-size: ${isHome ? '13px' : 'inherit'};">${markerContent}</div>`,
       iconSize: [30, 30],
       iconAnchor: [15, 15]
     });
@@ -409,6 +427,7 @@ function drawMapMarkers(destinations) {
     const marker = L.marker([d.lat, d.lng], { icon: icon }).addTo(mainMap);
 
     let popupText = `<b>${firstIndex}. ${d.name}</b>`;
+    if (isHome) popupText += ' <span style="font-size:0.8rem; color:#27AE60; font-weight:600;">(🏠 Home)</span>';
     if (isTransit) popupText += ' <span style="font-size:0.8rem; color:#666;">(Transit)</span>';
     if (Array.isArray(d.visitIndexes) && d.visitIndexes.length > 1) {
       popupText += `<br><span style="font-size:0.8rem; color:#666;">Route visits: ${d.visitIndexes.join(', ')}</span>`;
@@ -562,10 +581,11 @@ function updateMapLegend(destinations) {
   }
 
   legend.innerHTML = destinations.map(d => {
+    const homeTag = d.isHome ? ' <span style="font-size:0.75rem; color:#27AE60; font-weight:600;">🏠</span>' : '';
     return `
       <div class="legend-item" onclick="focusCityOnMap('${d.id}')" onmouseenter="highlightCityOnMap('${d.id}')" onmouseleave="unhighlightCityOnMap('${d.id}')">
-        <span class="legend-item-index" style="background:${d.color};">${d.index}</span>
-        <span class="legend-item-name">${d.name}</span>
+        <span class="legend-item-index" style="background:${d.color};">${d.isHome ? '🏠' : d.index}</span>
+        <span class="legend-item-name">${d.name}${homeTag}</span>
       </div>
     `;
   }).join('');

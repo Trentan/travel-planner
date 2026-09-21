@@ -2154,6 +2154,9 @@ function findFuzzyCityCandidate(input, options = {}) {
   if (!cleanInput || cleanInput.length < 3) return null;
 
   const normInput = cleanInput.toLowerCase();
+  // 'Home' is a system anchor, never fuzzy-match it to a real city (like Rome)
+  if (normInput === 'home') return null;
+
   const strippedInput = stripDiacritics(normInput);
   const targetCountryCode = options.countryCode ? String(options.countryCode).toUpperCase() : '';
 
@@ -2313,6 +2316,7 @@ function normalizeCityLocationData(city) {
 
 function resolveCityLocationLocal(city) {
   if (!city || !city.name) return null;
+  if (String(city.name).trim().toLowerCase() === 'home') return null;
 
   let dbMatch = null;
   const targetCountryCode = (city.countryCode || '').toUpperCase();
@@ -2906,33 +2910,79 @@ function deleteCity(cityId) {
 
 // Get home location (departure/arrival city)
 function getHomeLocation() {
-  // Find first day with 'Home' in from location
+  // 1. Explicitly configured home city in trip metadata
+  const explicitHome = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : '';
+  if (explicitHome) {
+    return {
+      departure: explicitHome,
+      return: explicitHome,
+      isExplicit: true
+    };
+  }
+
+  // 2. Infer from legs containing 'Home' or 'Start' / 'Finish' labels
   let homeDeparture = null;
   let homeReturn = null;
 
-  // Check all legs for Home references
   appData.forEach(leg => {
-    leg.days.forEach(day => {
-      if (day.from === 'Home') {
+    const lbl = String(leg.label || '').toLowerCase();
+    const cleanLbl = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : '';
+
+    (leg.days || []).forEach(day => {
+      if (day.from === 'Home' || String(day.from || '').toLowerCase() === 'home') {
         homeDeparture = day.to;
       }
-      if (day.to === 'Home') {
+      if (day.to === 'Home' || String(day.to || '').toLowerCase() === 'home') {
         homeReturn = day.from;
       }
     });
+
+    if (!homeDeparture && lbl.includes('start') && cleanLbl && !['start', 'trip start', 'home'].includes(cleanLbl.toLowerCase())) {
+      homeDeparture = cleanLbl;
+    }
+    if (!homeReturn && (lbl.includes('return') || lbl.includes('finish')) && cleanLbl && !['return', 'trip finish', 'trip return', 'home'].includes(cleanLbl.toLowerCase())) {
+      homeReturn = cleanLbl;
+    }
   });
 
   return {
     departure: homeDeparture,
-    return: homeReturn
+    return: homeReturn,
+    isExplicit: false
   };
 }
 
-// Check if a city is the home location (first departure or last return)
+// Check if a city is the home location (explicit or first departure / last return)
 function isHomeCity(cityName) {
+  if (!cityName) return false;
   const home = getHomeLocation();
-  return cityName === home.departure || cityName === home.return;
+  const cleanTarget = String(cityName).trim().toLowerCase();
+  if (home.departure && String(home.departure).trim().toLowerCase() === cleanTarget) return true;
+  if (home.return && String(home.return).trim().toLowerCase() === cleanTarget) return true;
+  return false;
 }
+
+// Explicitly set or toggle a city as Home
+function setHomeCity(cityName) {
+  if (typeof titleData === 'undefined' || !titleData) titleData = {};
+  const currentHome = titleData.homeCity ? String(titleData.homeCity).trim() : '';
+  const cleanTarget = String(cityName || '').trim();
+
+  if (!cleanTarget || (currentHome && currentHome.toLowerCase() === cleanTarget.toLowerCase())) {
+    // Unmark home if same city is clicked again
+    delete titleData.homeCity;
+  } else {
+    titleData.homeCity = cleanTarget;
+  }
+
+  if (typeof saveData === 'function') saveData(false);
+  if (typeof populateCityList === 'function') populateCityList();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  if (typeof buildCityNav === 'function') buildCityNav();
+  return true;
+}
+
+window.setHomeCity = setHomeCity;
 
 // Get city name by ID
 function getCityNameById(cityId) {
@@ -3482,7 +3532,10 @@ function populateCityList() {
   sortedCities.forEach(city => {
     const flag = getCityFlag(city.name);
     const isHome = isHomeCity(city.name);
-    const homeBadge = isHome ? ' <span style="background: #27AE60; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">🏠 Home</span>' : '';
+    const escapedCityName = escapeTripStartText(city.name).replace(/'/g, "\\'");
+    const homeBadge = isHome
+      ? `<button type="button" class="city-home-toggle-btn active" onclick="setHomeCity('${escapedCityName}')" title="Currently set as Home. Click to unmark." style="background: #27AE60; color: white; border: none; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">🏠 Home ✓</button>`
+      : `<button type="button" class="city-home-toggle-btn" onclick="setHomeCity('${escapedCityName}')" title="Set ${escapeTripStartText(city.name)} as your Home base" style="background: #f1f5f9; color: #64748b; border: 1px dashed #cbd5e1; padding: 2px 7px; border-radius: 12px; font-size: 0.73rem; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;" onmouseenter="this.style.background='#e2e8f0';this.style.color='#334155'" onmouseleave="this.style.background='#f1f5f9';this.style.color='#64748b'">🏠 Mark as Home</button>`;
 
     // Get city color from matching leg, or use city's stored color
     let cityColor = city.colour || '#2C3E50';
