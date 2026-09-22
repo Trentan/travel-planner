@@ -642,6 +642,20 @@ async function runLegManagementWysiwygSuite() {
   openAddLegDialog('edit');
   switchLegModalTab('edit');
 
+  // Populate mock options on city selects (innerHTML doesn't parse in mock env)
+  const mockCityOptions = [
+    { value: '', text: '-- Choose a city --' },
+    { value: 'Home', text: '🏠 Home (Brisbane - BNE)' },
+    { value: 'Bangkok', text: '📍 Bangkok (BKK)' },
+    { value: 'Brisbane', text: '📍 Brisbane (BNE)' },
+    { value: 'London', text: '📍 London (LHR)' },
+    { value: 'Taipei', text: '📍 Taipei (TPE)' },
+    { value: 'Vienna', text: '📍 Vienna (VIE)' }
+  ];
+  elements['fromCitySelect'].options = mockCityOptions.slice(1); // no placeholder
+  elements['toCitySelect'].options = [...mockCityOptions];
+  elements['existingCitySelect'].options = [...mockCityOptions];
+
   // Click / Select Leg 0 (Brisbane -> Taipei)
   elements['editLegSelect'].value = '0';
   onEditLegSelectionChange();

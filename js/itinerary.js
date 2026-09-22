@@ -3736,15 +3736,65 @@ function shouldSkipCityNavName(cityName) {
 }
 
 function getCityByName(cityName) {
-  if (!cityName || !Array.isArray(citiesData)) return null;
+  if (!cityName || !Array.isArray(citiesData) || citiesData.length === 0) return null;
+  const rawStr = String(cityName || '').trim();
   const normalize = (val) => String(val || '')
+    .replace(/[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '')
     .replace(/\s*\(trip start\)/gi, '')
     .replace(/\s*\(trip finish\)/gi, '')
     .replace(/\s*\(trip end\)/gi, '')
+    .replace(/\s*\(departure\)/gi, '')
+    .replace(/\s*\(return\)/gi, '')
     .replace(/\s*\([^)]*\)/g, '')
+    .replace(/[^\w\s-]/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim().toLowerCase();
-  const target = normalize(cityName);
-  return citiesData.find(c => normalize(c.name) === target) || null;
+
+  const target = normalize(rawStr);
+  if (!target) return null;
+
+  // 1. Match by exact city id
+  const byId = citiesData.find(c => c && (c.id === rawStr || c.id === `city-${target.replace(/\s+/g, '-')}`));
+  if (byId) return byId;
+
+  // 2. Exact normalized name match
+  const exact = citiesData.find(c => c && normalize(c.name) === target);
+  if (exact) return exact;
+
+  // 3. IATA or airport code match (e.g. "DPS" or "Denpasar (DPS)")
+  const codeInParens = (rawStr.match(/\(([A-Za-z]{3,4})\)/) || [])[1];
+  const searchCode = (codeInParens || (target.length <= 4 ? target : '')).toLowerCase();
+  if (searchCode) {
+    const codeMatch = citiesData.find(c => c && (
+      (c.code && c.code.toLowerCase() === searchCode) ||
+      (c.airportCode && c.airportCode.toLowerCase() === searchCode)
+    ));
+    if (codeMatch) return codeMatch;
+  }
+
+  // 4. Substring matching for targets >= 3 chars
+  if (target.length >= 3) {
+    const substringMatch = citiesData.find(c => {
+      if (!c || !c.name) return false;
+      const cNorm = normalize(c.name);
+      return cNorm && (cNorm.includes(target) || target.includes(cNorm));
+    });
+    if (substringMatch) return substringMatch;
+  }
+
+  // 5. Token matching (significant word tokens >= 3 chars)
+  const tokens = target.split(/[\s,/-]+/).filter(t => t.length >= 3);
+  for (const token of tokens) {
+    const tokenMatch = citiesData.find(c => {
+      if (!c || !c.name) return false;
+      const cNorm = normalize(c.name);
+      const cTokens = cNorm.split(/[\s,/-]+/).filter(ct => ct.length >= 3);
+      return cTokens.some(ct => ct === token || ct.startsWith(token) || token.startsWith(ct));
+    });
+    if (tokenMatch) return tokenMatch;
+  }
+
+  return null;
 }
 
 function getCityNameForNavId(cityId) {

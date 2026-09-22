@@ -19,32 +19,38 @@ function calculateExpectedStays() {
     const legId = String(leg.id || '');
     if (legId === 'departure' || legId === 'return' ||
         label.includes('(trip start)') || label.includes('(trip finish)') || label.includes('(trip end)') ||
+        label.includes('start') || label.includes('finish') || label.includes('departure') || label.includes('return') ||
         label.includes('(transit)') ||
         legId.endsWith('-start') || legId.endsWith('-finish')) {
       return;
     }
 
     leg.days.forEach((day, dayIndex) => {
-      const city = day.to;
+      const rawCity = day.to;
 
       // Skip placeholder/transit destinations
-      if (!city || skipList.includes(city)) {
+      if (!rawCity || skipList.includes(rawCity)) {
         return;
       }
 
-      // Count a night for each day you're at a city, except the day you leave
-      // Night count = number of days at destination where you don't leave
+      const cityObj = (typeof getCityByName === 'function' ? getCityByName(rawCity) : null) ||
+        (leg.cityId && typeof citiesData !== 'undefined' ? citiesData.find(c => c.id === leg.cityId) : null);
+      const canonicalCity = cityObj ? cityObj.name : rawCity;
 
       // Check if next day is leaving this city (different destination or skip list item)
       const nextDay = leg.days[dayIndex + 1];
-      const isLastDay = !nextDay || skipList.includes(nextDay.to) || nextDay.to !== city;
+      const nextRaw = nextDay ? nextDay.to : '';
+      const nextCityObj = nextDay ? ((typeof getCityByName === 'function' ? getCityByName(nextRaw) : null) ||
+        (leg.cityId && typeof citiesData !== 'undefined' ? citiesData.find(c => c.id === leg.cityId) : null)) : null;
+      const nextCanonical = nextCityObj ? nextCityObj.name : nextRaw;
+      const isLastDay = !nextDay || skipList.includes(nextRaw) || (nextCanonical !== canonicalCity);
 
       if (!isLastDay) {
         // Next day is same city, so tonight is a night here
-        if (!expectedStays[city]) {
-          expectedStays[city] = 0;
+        if (!expectedStays[canonicalCity]) {
+          expectedStays[canonicalCity] = 0;
         }
-        expectedStays[city]++;
+        expectedStays[canonicalCity]++;
       }
     });
   });
@@ -149,7 +155,10 @@ function shouldShowAutopopulateButton() {
  */
 function createStayFromItinerary(cityName, legId, startDate, nights) {
   // Find the city data
-  const city = citiesData.find(c => c.name === cityName);
+  const leg = (legId && typeof appData !== 'undefined' && Array.isArray(appData)) ? appData.find(l => l.id === legId) : null;
+  const city = (typeof getCityByName === 'function' ? getCityByName(cityName) : null) ||
+    (leg && leg.cityId && typeof citiesData !== 'undefined' ? citiesData.find(c => c.id === leg.cityId) : null) ||
+    (typeof citiesData !== 'undefined' && Array.isArray(citiesData) ? citiesData.find(c => c.name === cityName || (c.name && c.name.toLowerCase() === String(cityName || '').toLowerCase())) : null);
   if (!city) return null;
 
   // Calculate check-out date
@@ -169,7 +178,7 @@ function createStayFromItinerary(cityName, legId, startDate, nights) {
     nights: nights,
     status: 'pending',
     totalCost: '0',
-    notes: `Auto-generated from ${nights} nights in ${cityName}`
+    notes: `Auto-generated from ${nights} nights in ${city.name}`
   };
 }
 
@@ -186,57 +195,80 @@ function autopopulateStays() {
   const skipList = ['Home', 'In transit', 'Between cities', 'TBC', '', 'Return', 'Departure', 'Flight'];
 
   appData.forEach((leg, legIndex) => {
+    // Skip Trip Start / Trip Finish legs
+    const label = String(leg.label || '').toLowerCase();
+    const legId = String(leg.id || '');
+    if (legId === 'departure' || legId === 'return' ||
+        label.includes('(trip start)') || label.includes('(trip finish)') || label.includes('(trip end)') ||
+        label.includes('start') || label.includes('finish') || label.includes('departure') || label.includes('return') ||
+        label.includes('(transit)') ||
+        legId.endsWith('-start') || legId.endsWith('-finish')) {
+      return;
+    }
+
     let currentCity = null;
     let segmentStartDate = null;
-    let segmentNights = 0;
+    let segmentDays = 0;
 
     leg.days.forEach((day, dayIndex) => {
-      const city = day.to;
+      const rawCity = day.to;
 
       // Skip placeholder destinations
-      if (!city || skipList.includes(city)) {
+      if (!rawCity || skipList.includes(rawCity)) {
         return;
       }
 
+      const cityObj = (typeof getCityByName === 'function' ? getCityByName(rawCity) : null) ||
+        (leg.cityId && typeof citiesData !== 'undefined' ? citiesData.find(c => c.id === leg.cityId) : null);
+      const city = cityObj ? cityObj.name : rawCity;
+
       if (city !== currentCity) {
         // City changed - save previous segment if exists
-        if (segmentNights > 0 && currentCity && missing.missing[currentCity]) {
-          const stay = createStayFromItinerary(currentCity, leg.id, segmentStartDate, segmentNights);
+        const availableNights = currentCity ? (missing.missing[currentCity] || 0) : 0;
+        const stayNights = Math.min(Math.max(1, segmentDays > 1 ? segmentDays - 1 : 1), availableNights);
+        if (segmentDays > 0 && currentCity && stayNights > 0) {
+          const stay = createStayFromItinerary(currentCity, leg.id, segmentStartDate, stayNights);
           if (stay) {
             createdStays.push(stay);
             createdCount++;
+            missing.missing[currentCity] -= stayNights;
           }
         }
 
         // Start new segment
         currentCity = city;
         segmentStartDate = day.date;
-        segmentNights = 1;
+        segmentDays = 1;
       } else {
-        // Same city - add another night
-        segmentNights++;
+        // Same city - add another day
+        segmentDays++;
       }
     });
 
     // Handle end of leg
-    if (segmentNights > 0 && currentCity && missing.missing[currentCity]) {
-      const stay = createStayFromItinerary(currentCity, leg.id, segmentStartDate, segmentNights);
+    const availableNights = currentCity ? (missing.missing[currentCity] || 0) : 0;
+    const stayNights = Math.min(Math.max(1, segmentDays > 1 ? segmentDays - 1 : 1), availableNights);
+    if (segmentDays > 0 && currentCity && stayNights > 0) {
+      const stay = createStayFromItinerary(currentCity, leg.id, segmentStartDate, stayNights);
       if (stay) {
         createdStays.push(stay);
         createdCount++;
+        missing.missing[currentCity] -= stayNights;
       }
     }
   });
 
   // Add created stays to the stays array
   if (createdStays.length > 0) {
-    if (!window.stays) {
-      window.stays = [];
-    }
+    const targetStays = (typeof window !== 'undefined' && Array.isArray(window.stays))
+      ? window.stays
+      : ((typeof stays !== 'undefined' && Array.isArray(stays)) ? stays : []);
+    if (typeof window !== 'undefined') window.stays = targetStays;
+    if (typeof stays !== 'undefined') stays = targetStays;
 
     createdStays.forEach(stay => {
-      if (!stays.find(s => s.cityId === stay.cityId && s.checkIn === stay.checkIn)) {
-        stays.push(stay);
+      if (!targetStays.find(s => s.cityId === stay.cityId && s.checkIn === stay.checkIn)) {
+        targetStays.push(stay);
       }
     });
 

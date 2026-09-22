@@ -2154,10 +2154,10 @@ function _populateAddLegCityDropdowns() {
     if (currentValue) fromSelect.value = currentValue;
   }
 
-  // Populate toCitySelect: cities only (for travel legs)
+  // Populate toCitySelect: Home + cities (for travel & return legs)
   if (toSelect) {
     const currentValue = toSelect.value;
-    toSelect.innerHTML = '<option value="">-- Choose destination --</option>' + cityOptionsHtml;
+    toSelect.innerHTML = '<option value="">-- Choose destination --</option>' + homeOptionHtml + cityOptionsHtml;
     if (currentValue) toSelect.value = currentValue;
   }
 
@@ -2545,15 +2545,58 @@ function syncAllLegDays(silent = false) {
     return aTime.localeCompare(bTime);
   });
 
+  const homeCityName = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim().toLowerCase() : '';
+
+  function legMatchesLocation(leg, locationStr, isArrival = false) {
+    if (!leg || !locationStr) return false;
+    const locNorm = String(locationStr).trim().toLowerCase();
+    const isHomeLoc = locNorm === 'home' || locNorm === 'home city' || (homeCityName && locNorm === homeCityName);
+    const legLabelNorm = String(leg.label || '').toLowerCase();
+    const isStartLeg = leg.id === 'departure' || String(leg.id || '').endsWith('-start') || legLabelNorm.includes('(trip start)') || legLabelNorm.includes('start');
+    const isFinishLeg = leg.id === 'return' || String(leg.id || '').endsWith('-finish') || legLabelNorm.includes('(trip finish)') || legLabelNorm.includes('finish') || legLabelNorm.includes('return');
+
+    if (isHomeLoc) {
+      if (isArrival && isFinishLeg) return true;
+      if (!isArrival && isStartLeg) return true;
+      return false;
+    }
+
+    const cityObj = typeof getCityByName === 'function' ? getCityByName(locationStr) : null;
+    if (cityObj && leg.cityId && leg.cityId === cityObj.id) return true;
+
+    const legCityObj = typeof getCityByName === 'function' ? getCityByName(leg.label) : null;
+    if (cityObj && legCityObj && cityObj.id === legCityObj.id) return true;
+
+    const locBase = getBaseNameGlobal(locationStr);
+    const legBase = getBaseNameGlobal(leg.label);
+    if (locBase && legBase && (locBase === legBase || legBase.includes(locBase) || locBase.includes(legBase))) return true;
+
+    return false;
+  }
+
   let currentToIdx = 0;
   sortedJourneysForMapping.forEach(j => {
+    if (j.legId) {
+      const explicitLeg = appData.find(l => l.id === j.legId);
+      if (explicitLeg) {
+        j._inferredToLegId = explicitLeg.id;
+        return;
+      }
+    }
     if (!j.toLocation) return;
-    const toBase = getBaseNameGlobal(j.toLocation);
     let foundTo = -1;
     for (let i = currentToIdx; i < appData.length; i++) {
-      if (getBaseNameGlobal(appData[i].label) === toBase) {
+      if (legMatchesLocation(appData[i], j.toLocation, true)) {
         foundTo = i;
         break;
+      }
+    }
+    if (foundTo === -1) {
+      for (let i = 0; i < appData.length; i++) {
+        if (legMatchesLocation(appData[i], j.toLocation, true)) {
+          foundTo = i;
+          break;
+        }
       }
     }
     if (foundTo !== -1) {
@@ -2564,13 +2607,27 @@ function syncAllLegDays(silent = false) {
 
   let currentFromIdx = 0;
   sortedJourneysForMapping.forEach(j => {
+    if (j.legId) {
+      const explicitLeg = appData.find(l => l.id === j.legId);
+      if (explicitLeg) {
+        j._inferredFromLegId = explicitLeg.id;
+        return;
+      }
+    }
     if (!j.fromLocation) return;
-    const fromBase = getBaseNameGlobal(j.fromLocation);
     let foundFrom = -1;
     for (let i = currentFromIdx; i < appData.length; i++) {
-      if (getBaseNameGlobal(appData[i].label) === fromBase) {
+      if (legMatchesLocation(appData[i], j.fromLocation, false)) {
         foundFrom = i;
         break;
+      }
+    }
+    if (foundFrom === -1) {
+      for (let i = 0; i < appData.length; i++) {
+        if (legMatchesLocation(appData[i], j.fromLocation, false)) {
+          foundFrom = i;
+          break;
+        }
       }
     }
     if (foundFrom !== -1) {
@@ -2588,7 +2645,7 @@ function syncAllLegDays(silent = false) {
     const stayBase = getBaseNameGlobal(stayCity);
     let foundStay = -1;
     for (let i = currentStayIdx; i < appData.length; i++) {
-      if (getBaseNameGlobal(appData[i].label) === stayBase) {
+      if (appData[i].cityId === s.cityId || getBaseNameGlobal(appData[i].label) === stayBase || (typeof getCityByName === 'function' && getCityByName(appData[i].label)?.id === s.cityId)) {
         foundStay = i;
         break;
       }
@@ -2606,22 +2663,21 @@ function syncAllLegDays(silent = false) {
     const cityName = cleanCityName || rawCityName;
     
     const baseCityName = getBaseNameGlobal(rawCityName);
-    const cityId = 'city-' + baseCityName.replace(/[^a-z0-9]/g, '-');
+    const cityId = leg.cityId || ('city-' + baseCityName.replace(/[^a-z0-9]/g, '-'));
 
     const legStays = (window.stays || []).filter(s => 
       s._inferredLegId === leg.id || 
-      // Fallback if not inferred
       (!s._inferredLegId && (s.cityId === cityId || (s.city && getBaseNameGlobal(s.city) === baseCityName)))
     );
     
     // Ignore local intra-city transport by ensuring fromLocation !== toLocation
     const arrivingJourneys = (window.journeys || []).filter(j => 
-      (j._inferredToLegId === leg.id && (j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase())) ||
-      (!j._inferredToLegId && (j.legId === leg.id || !j.legId) && (j.toCityId === cityId || (j.toLocation && getBaseNameGlobal(j.toLocation) === baseCityName)) && (j.fromCityId !== j.toCityId))
+      (j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase()) &&
+      (j._inferredToLegId === leg.id || j.legId === leg.id || legMatchesLocation(leg, j.toLocation, true))
     );
     const departingJourneys = (window.journeys || []).filter(j => 
-      (j._inferredFromLegId === leg.id && (j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase())) ||
-      (!j._inferredFromLegId && (j.legId === leg.id || !j.legId) && (j.fromCityId === cityId || (j.fromLocation && getBaseNameGlobal(j.fromLocation) === baseCityName)) && (j.fromCityId !== j.toCityId))
+      (j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase()) &&
+      (j._inferredFromLegId === leg.id || j.legId === leg.id || legMatchesLocation(leg, j.fromLocation, false))
     );
     
     // Calculate precise date bounds based strictly on mapped items
@@ -2927,9 +2983,9 @@ function setSelectValueMatchingCity(selectEl, rawCityValue, fallbackVal = '') {
       selectEl.value = cleanOpt.value;
       return;
     }
-    const namedCity = typeof getCityByName === 'function' ? getCityByName(cleanRaw) : null;
-    if (namedCity) {
-      const cityOpt = options.find(opt => opt && typeof opt.value === 'string' && opt.value.toLowerCase() === namedCity.name.toLowerCase());
+    const namedFromRaw = typeof getCityByName === 'function' ? (getCityByName(raw) || getCityByName(cleanRaw)) : null;
+    if (namedFromRaw) {
+      const cityOpt = options.find(opt => opt && typeof opt.value === 'string' && opt.value.toLowerCase() === namedFromRaw.name.toLowerCase());
       if (cityOpt) {
         selectEl.value = cityOpt.value;
         return;
@@ -2942,19 +2998,11 @@ function setSelectValueMatchingCity(selectEl, rawCityValue, fallbackVal = '') {
     }
   }
 
-  // 4. If non-empty custom city not yet in select, dynamically append option so it is selected
-  if (cleanRaw) {
-    const newOpt = document.createElement('option');
-    newOpt.value = cleanRaw;
-    const flag = typeof getCityFlag === 'function' ? getCityFlag(cleanRaw) : '📍';
-    newOpt.textContent = `${flag} ${cleanRaw}`;
-    selectEl.appendChild(newOpt);
-    selectEl.value = cleanRaw;
-    return;
-  }
-
+  // Strictly only select valid pre-existing options or Home; NEVER dynamically append fake cities
   if (fallbackVal) {
     selectEl.value = fallbackVal;
+  } else {
+    selectEl.value = '';
   }
 }
 
@@ -3028,9 +3076,12 @@ function onEditLegSelectionChange() {
     resetLegDialogToAddNew();
     return;
   }
-  const sourceLegs = (legDialogState && Array.isArray(legDialogState.stagedLegs))
+  const sourceLegs = (legDialogState && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs.length > 0)
     ? legDialogState.stagedLegs
     : (appData || []);
+  if (legDialogState && (!Array.isArray(legDialogState.stagedLegs) || legDialogState.stagedLegs.length === 0)) {
+    legDialogState.stagedLegs = JSON.parse(JSON.stringify(sourceLegs));
+  }
   const leg = sourceLegs?.[selected];
   if (!leg) return;
   legDialogState.mode = 'edit';
@@ -3042,13 +3093,21 @@ function onEditLegSelectionChange() {
 
   // Extract already-entered city from and city to
   const rawFrom = firstDay.from || (leg.days || []).find(d => d && d.from)?.from || '';
-  const rawTo = firstDay.to || (leg.days || []).find(d => d && d.to)?.to || leg.label || '';
+  const rawTo = firstDay.to || (leg.days || []).find(d => d && d.to)?.to || '';
+
+  // Resolve valid city from leg properties
+  const legCityObj = (leg.cityId && typeof citiesData !== 'undefined' ? citiesData.find(c => c.id === leg.cityId) : null) ||
+    (leg.cityFood?.[0]?.cityId && typeof citiesData !== 'undefined' ? citiesData.find(c => c.id === leg.cityFood[0].cityId) : null) ||
+    (leg.suggestedActivities?.[0]?.cityId && typeof citiesData !== 'undefined' ? citiesData.find(c => c.id === leg.suggestedActivities[0].cityId) : null) ||
+    (leg.legTips?.[0]?.cityId && typeof citiesData !== 'undefined' ? citiesData.find(c => c.id === leg.legTips[0].cityId) : null) ||
+    (typeof getCityByName === 'function' ? (getCityByName(rawTo) || getCityByName(rawFrom) || getCityByName(leg.label)) : null);
+  const resolvedCityName = legCityObj ? legCityObj.name : '';
 
   let legType = 'city';
-  if (normalizedLabel.includes('start') || normalizedLabel.includes('departure')) legType = 'start';
-  else if (normalizedLabel.includes('return') || normalizedLabel.includes('finish')) legType = 'return';
+  if (normalizedLabel.includes('start') || normalizedLabel.includes('departure') || String(leg.id || '').endsWith('-start')) legType = 'start';
+  else if (normalizedLabel.includes('return') || normalizedLabel.includes('finish') || String(leg.id || '').endsWith('-finish')) legType = 'return';
   else if (normalizedLabel.startsWith('✈️') || normalizedLabel.includes(' to ') || normalizedLabel.includes('transit') || normalizedLabel.includes('travel')) legType = 'travel';
-  else if (rawFrom && rawTo && rawFrom !== rawTo && (leg.days || []).length === 1) legType = 'travel';
+  else if (rawFrom && rawTo && rawFrom !== rawTo && (leg.days || []).length === 1 && !resolvedCityName) legType = 'travel';
 
   const legTypeSelect = document.getElementById('legTypeSelect');
   if (legTypeSelect) legTypeSelect.value = legType;
@@ -3069,29 +3128,25 @@ function onEditLegSelectionChange() {
   // Populate city from and city to dropdowns if already entered
   if (legType === 'start') {
     setSelectValueMatchingCity(fromCitySelect, 'Home', 'Home');
-    setSelectValueMatchingCity(toCitySelect, rawTo || firstDay.to, '');
-    setSelectValueMatchingCity(existingCitySelect, rawTo || firstDay.to, '');
+    setSelectValueMatchingCity(toCitySelect, resolvedCityName || rawTo, '');
+    setSelectValueMatchingCity(existingCitySelect, resolvedCityName || rawTo, '');
   } else if (legType === 'return') {
-    setSelectValueMatchingCity(fromCitySelect, rawFrom || firstDay.from, 'Home');
+    setSelectValueMatchingCity(fromCitySelect, resolvedCityName || rawFrom, 'Home');
     setSelectValueMatchingCity(toCitySelect, 'Home', 'Home');
     setSelectValueMatchingCity(existingCitySelect, 'Home', 'Home');
+  } else if (legType === 'travel') {
+    setSelectValueMatchingCity(fromCitySelect, rawFrom || 'Home', 'Home');
+    setSelectValueMatchingCity(toCitySelect, resolvedCityName || rawTo, '');
+    setSelectValueMatchingCity(existingCitySelect, resolvedCityName || rawTo, '');
   } else {
-    // travel or city leg
-    setSelectValueMatchingCity(fromCitySelect, rawFrom || firstDay.from, 'Home');
-    setSelectValueMatchingCity(toCitySelect, rawTo || firstDay.to, '');
-    setSelectValueMatchingCity(existingCitySelect, rawTo || firstDay.to || rawFrom, '');
+    // standard destination city leg
+    setSelectValueMatchingCity(existingCitySelect, resolvedCityName || rawTo || rawFrom, '');
+    setSelectValueMatchingCity(fromCitySelect, resolvedCityName || rawFrom || 'Home', 'Home');
+    setSelectValueMatchingCity(toCitySelect, resolvedCityName || rawTo || '', '');
   }
 
-  // Ensure From and To dropdowns are displayed and visible when already entered
-  const routeSection = document.getElementById('routeSelectionGroup');
-  const citySection = document.getElementById('citySelectionGroup');
-  if (rawFrom || rawTo || legType === 'travel' || legType === 'start' || legType === 'return') {
-    if (routeSection) routeSection.style.display = 'block';
-    if (citySection) citySection.style.display = 'none';
-  } else {
-    if (routeSection) routeSection.style.display = 'none';
-    if (citySection) citySection.style.display = 'block';
-  }
+  // Ensure appropriate selection groups and labels are displayed for the leg type
+  onLegTypeChange();
 
   if (newCityName) newCityName.value = '';
   if (dateFrom) {
@@ -3907,21 +3962,22 @@ function confirmAddLeg() {
     let fromCity, toCity;
     const selectedFrom = document.getElementById('fromCitySelect')?.value;
     const selectedTo = document.getElementById('toCitySelect')?.value || document.getElementById('existingCitySelect')?.value;
+    const homeCityName = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
 
     if (legType === 'start') {
-      fromCity = 'Home';
-      toCity = selectedTo || 'Home';
-      const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
-      target.label = `${cleanCity} (Trip Start)`;
-      toCity = cleanCity;
+      fromCity = homeCityName;
+      const rawDest = selectedTo || 'Home';
+      const cleanDest = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(rawDest) : rawDest.replace(/[^\x00-\x7F]/g, '').trim()) || rawDest;
+      toCity = cleanDest;
+      target.label = `${homeCityName} (Trip Start)`;
     } else if (legType === 'return') {
-      fromCity = selectedFrom || 'Home';
-      toCity = 'Home';
-      const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
-      target.label = `${cleanCity} (Trip Finish)`;
-      fromCity = cleanCity;
+      const rawOrig = selectedFrom || 'Home';
+      const cleanOrig = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(rawOrig) : rawOrig.replace(/[^\x00-\x7F]/g, '').trim()) || rawOrig;
+      fromCity = cleanOrig;
+      toCity = homeCityName;
+      target.label = `${homeCityName} (Trip Finish)`;
     } else if (legType === 'travel') {
-      fromCity = selectedFrom || 'Home';
+      fromCity = selectedFrom || homeCityName;
       toCity = selectedTo || '';
       if (!toCity) {
         alert('Please choose a destination city for this travel leg.');
@@ -3931,11 +3987,15 @@ function confirmAddLeg() {
     } else {
       // legType === 'city'
       const existingCity = selectedTo;
-      if (existingCity && existingCity !== 'Home') {
-        const flag = typeof getCityFlag === 'function' ? getCityFlag(existingCity) : '📍';
-        target.label = flag + ' ' + existingCity;
-        fromCity = selectedFrom || existingCity;
-        toCity = existingCity;
+      const cityObj = (existingCity && existingCity !== 'Home') ? (typeof getCityByName === 'function' ? getCityByName(existingCity) : null) : null;
+      const validCityName = cityObj ? cityObj.name : ((existingCity && existingCity !== 'Home') ? existingCity : '');
+
+      if (validCityName) {
+        const flag = typeof getCityFlag === 'function' ? getCityFlag(validCityName) : '📍';
+        target.label = flag + ' ' + validCityName;
+        fromCity = validCityName;
+        toCity = validCityName;
+        if (cityObj) target.cityId = cityObj.id;
       } else {
         const firstDay = target.days?.[0] || {};
         fromCity = selectedFrom || firstDay.from || target.label;
@@ -3982,21 +4042,23 @@ function confirmAddLeg() {
     }
   } else {
     // Adding a new leg
-    let label, fromCity, toCity;
+    let label, fromCity, toCity, matchedCityObj;
+    const homeCityName = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
+
     if (legType === 'start') {
-      fromCity = 'Home';
-      toCity = document.getElementById('toCitySelect')?.value || 'Home';
-      const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
-      label = `${cleanCity} (Trip Start)`;
-      toCity = cleanCity;
+      fromCity = homeCityName;
+      const rawDest = document.getElementById('toCitySelect')?.value || 'Home';
+      const cleanDest = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(rawDest) : rawDest.replace(/[^\x00-\x7F]/g, '').trim()) || rawDest;
+      toCity = cleanDest;
+      label = `${homeCityName} (Trip Start)`;
     } else if (legType === 'return') {
-      fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
-      toCity = 'Home';
-      const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
-      label = `${cleanCity} (Trip Finish)`;
-      fromCity = cleanCity;
+      const rawOrig = document.getElementById('fromCitySelect')?.value || 'Home';
+      const cleanOrig = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(rawOrig) : rawOrig.replace(/[^\x00-\x7F]/g, '').trim()) || rawOrig;
+      fromCity = cleanOrig;
+      toCity = homeCityName;
+      label = `${homeCityName} (Trip Finish)`;
     } else if (legType === 'travel') {
-      fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
+      fromCity = document.getElementById('fromCitySelect')?.value || homeCityName;
       toCity = document.getElementById('toCitySelect')?.value || '';
       if (!toCity) {
         alert('Please choose a destination city for this travel leg.');
@@ -4032,11 +4094,15 @@ function confirmAddLeg() {
         label = flag + ' ' + newCityName;
         fromCity = newCityName;
         toCity = newCityName;
+        if (newCity) matchedCityObj = newCity;
       } else if (existingCity && existingCity !== 'Home') {
-        const flag = typeof getCityFlag === 'function' ? getCityFlag(existingCity) : '📍';
-        label = flag + ' ' + existingCity;
-        fromCity = existingCity;
-        toCity = existingCity;
+        const cityObj = typeof getCityByName === 'function' ? getCityByName(existingCity) : null;
+        const validCityName = cityObj ? cityObj.name : existingCity;
+        const flag = typeof getCityFlag === 'function' ? getCityFlag(validCityName) : '📍';
+        label = flag + ' ' + validCityName;
+        fromCity = validCityName;
+        toCity = validCityName;
+        if (cityObj) matchedCityObj = cityObj;
       } else {
         label = '📍 New City';
         fromCity = 'Home';
@@ -4061,6 +4127,9 @@ function confirmAddLeg() {
         dayNotes
       })
     };
+    if (matchedCityObj && matchedCityObj.id) {
+      legPayload.cityId = matchedCityObj.id;
+    }
     if (!Array.isArray(legDialogState.stagedLegs)) {
       legDialogState.stagedLegs = [];
     }
