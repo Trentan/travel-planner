@@ -2658,7 +2658,7 @@ function syncAllLegDays(silent = false) {
       (j._inferredFromLegId === leg.id || (!j._inferredFromLegId && (j.legId === leg.id || !j.legId) && legMatchesLocation(leg, j.fromLocation, false)))
     );
     
-    // Calculate precise date bounds based strictly on mapped items
+    // Calculate precise date bounds: prioritize configured leg days if already present
     let earliestDate = null;
     let latestDate = null;
 
@@ -2670,16 +2670,19 @@ function syncAllLegDays(silent = false) {
       if (!latestDate || normalized > latestDate) latestDate = normalized;
     };
 
-    legStays.forEach(s => {
-      considerDate(s.checkIn);
-      if (s.checkOut) considerDate(s.checkOut);
-    });
-    arrivingJourneys.forEach(j => considerDate(j.arrivalDate || j.dayDate));
-    departingJourneys.forEach(j => considerDate(j.departureDate || j.dayDate));
-
-    if (!earliestDate && leg.days && leg.days.length > 0) {
+    const hasExistingDays = Array.isArray(leg.days) && leg.days.length > 0;
+    if (hasExistingDays) {
+      // Retain the established leg date boundaries
       considerDate(leg.days[0].date);
       considerDate(leg.days[leg.days.length - 1].date);
+    } else {
+      // For newly generated transit legs or empty legs, infer from stays and journeys
+      legStays.forEach(s => {
+        considerDate(s.checkIn);
+        if (s.checkOut) considerDate(s.checkOut);
+      });
+      arrivingJourneys.forEach(j => considerDate(j.arrivalDate || j.dayDate));
+      departingJourneys.forEach(j => considerDate(j.departureDate || j.dayDate));
     }
 
     if (!earliestDate) return;
@@ -2715,7 +2718,7 @@ function syncAllLegDays(silent = false) {
         newDays[dayIndex].from = fromCity; // Sets "Paris -> Rome" travel indicator in header
         newDays[dayIndex].desc = `Arrive from ${fromCity}` + (j.provider ? ` via ${j.provider}` : '');
         changelog.push(`Updated arrival day (${formatShortDate(arrDate)}) in ${cityName} with travel from ${fromCity}`);
-      } else {
+      } else if (!hasExistingDays) {
         newDays.push({
           date: arrDate,
           day: new Date(arrDate).toLocaleDateString('en-US', { weekday: 'short' }),
@@ -2745,7 +2748,7 @@ function syncAllLegDays(silent = false) {
         newDays[dayIndex].to = toCity;
         newDays[dayIndex].desc = `Depart for ${toCity}` + (j.provider ? ` via ${j.provider}` : '');
         changelog.push(`Updated departure day (${formatShortDate(depDate)}) in ${cityName} with travel to ${toCity}`);
-      } else {
+      } else if (!hasExistingDays) {
         newDays.push({
           date: depDate,
           day: new Date(depDate).toLocaleDateString('en-US', { weekday: 'short' }),

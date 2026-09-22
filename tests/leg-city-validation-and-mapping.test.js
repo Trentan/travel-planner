@@ -402,4 +402,43 @@ vm.runInContext(`
 `, sandbox);
 console.log('✓ Test 6 Passed: Auto-populate stays accurately creates missing accommodation');
 
+// 7. Test Bali trip itinerary rebuild date preservation (No doubling of days)
+console.log('Test 7: Rebuilding itinerary preserves exact leg days without doubling (Bali test)...');
+const baliFixture = JSON.parse(fs.readFileSync('backups/test-fixtures/bali-2026.json', 'utf8'));
+sandbox._testBaliData = baliFixture;
+vm.runInContext(`
+  const baliData = _testBaliData;
+  appData = JSON.parse(JSON.stringify(baliData.itinerary));
+  window.journeys = JSON.parse(JSON.stringify(baliData.journeys || []));
+  window.stays = JSON.parse(JSON.stringify(baliData.stays || []));
+  citiesData = JSON.parse(JSON.stringify(baliData.cities || []));
+  titleData = JSON.parse(JSON.stringify(baliData.meta || {}));
+
+  const origLegStartDays = appData[0].days.length; // 1 day: 2026-12-13
+  const origLegBaliDays = appData[1].days.length;  // 7 days: 2026-12-14 to 2026-12-20
+  const origLegReturnDays = appData[2].days.length; // 1 day: 2026-12-21
+
+  if (origLegStartDays !== 1 || origLegBaliDays !== 7 || origLegReturnDays !== 1) {
+    throw new Error('Fixture day lengths mismatch: ' + [origLegStartDays, origLegBaliDays, origLegReturnDays].join(', '));
+  }
+
+  // Execute rebuild
+  rebuildItineraryAndDataMappings({ showToast: false });
+
+  if (appData[0].days.length !== origLegStartDays) {
+    throw new Error('Leg 0 days changed after rebuild! Expected ' + origLegStartDays + ', got ' + appData[0].days.length);
+  }
+  if (appData[1].days.length !== origLegBaliDays) {
+    throw new Error('Leg 1 (Bali) days doubled/changed after rebuild! Expected ' + origLegBaliDays + ', got ' + appData[1].days.length);
+  }
+  if (appData[2].days.length !== origLegReturnDays) {
+    throw new Error('Leg 2 days changed after rebuild! Expected ' + origLegReturnDays + ', got ' + appData[2].days.length);
+  }
+
+  if (appData[1].days[0].date !== '2026-12-14' || appData[1].days[appData[1].days.length - 1].date !== '2026-12-20') {
+    throw new Error('Leg 1 (Bali) date span corrupted! Got: ' + appData[1].days[0].date + ' to ' + appData[1].days[appData[1].days.length - 1].date);
+  }
+`, sandbox);
+console.log('✓ Test 7 Passed: Bali trip rebuild retains exact 7-day span and prevents doubled days');
+
 console.log('🎉 ALL LEG CITY VALIDATION, HOME MAPPING & AUTO-STAYS TESTS PASSED CLEANLY!');
