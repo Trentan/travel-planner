@@ -230,9 +230,13 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     await page.locator('#newLegEndDate').fill('2026-07-12');
     await humanPause(page, 200);
     await page.locator('#legDialogSaveBtn, button:has-text("Add Leg"), button:has-text("Save Leg")').first().click();
+    await humanPause(page, 300);
+    // User request: Save leg should not dismiss the dialog; close button or Cancel closes it
+    assert(await page.locator('#add-leg-modal').isVisible(), 'Desktop: saving leg should keep modal open for continued editing');
+    await page.locator('#add-leg-modal .modal-close, #add-leg-modal button:has-text("Cancel")').first().click();
     await page.waitForSelector('#add-leg-modal', { state: 'hidden' });
     await humanPause(page, 500);
-    reporter.add('desktop', 'add trip leg', 'opened modal, filled fields, saved leg');
+    reporter.add('desktop', 'add trip leg', 'opened modal, filled fields, saved leg, preserved open dialog, closed cleanly');
 
     await page.locator('.app-tab-btn[data-tab="accom"]').click();
     await humanPause(page, 350);

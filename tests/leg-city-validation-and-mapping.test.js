@@ -20,6 +20,7 @@ function createMockDom() {
       textContent: '',
       innerHTML: '',
       style: {},
+      dataset: {},
       options: [],
       parentNode: {
         replaceChild() {},
@@ -42,6 +43,8 @@ function createMockDom() {
       addEventListener() {},
       removeEventListener() {},
       dispatchEvent() { return true; },
+      querySelector() { return null; },
+      querySelectorAll() { return []; },
       appendChild(child) {
         if (!child) return;
         this.options.push(child);

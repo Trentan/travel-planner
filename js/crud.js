@@ -2479,9 +2479,17 @@ function autoGenerateMissingTransitLegs(legsList) {
   }
 
   // Numbering phase
+  function isTerminalLeg(leg) {
+    if (!leg) return false;
+    const lid = String(leg.id || '').toLowerCase();
+    const lbl = String(leg.label || '').toLowerCase();
+    return lid === 'departure' || lid === 'return' || lid.endsWith('-start') || lid.endsWith('-finish') ||
+      lbl.includes('departure') || lbl.includes('return') || lbl.includes('(trip start)') || lbl.includes('(trip finish)');
+  }
+
   const cityCounts = {};
   legsList.forEach(leg => {
-    if (leg.label && !leg.label.includes('Departure') && !leg.label.includes('Return')) {
+    if (leg.label && !isTerminalLeg(leg)) {
       const base = getBaseName(leg.label);
       cityCounts[base] = (cityCounts[base] || 0) + 1;
     }
@@ -2489,7 +2497,7 @@ function autoGenerateMissingTransitLegs(legsList) {
 
   const currentIndices = {};
   legsList.forEach(leg => {
-    if (leg.label && !leg.label.includes('Departure') && !leg.label.includes('Return')) {
+    if (leg.label && !isTerminalLeg(leg)) {
       const base = getBaseName(leg.label);
       if (cityCounts[base] > 1) {
         currentIndices[base] = (currentIndices[base] || 0) + 1;
@@ -2576,27 +2584,12 @@ function syncAllLegDays(silent = false) {
 
   let currentToIdx = 0;
   sortedJourneysForMapping.forEach(j => {
-    if (j.legId) {
-      const explicitLeg = appData.find(l => l.id === j.legId);
-      if (explicitLeg) {
-        j._inferredToLegId = explicitLeg.id;
-        return;
-      }
-    }
     if (!j.toLocation) return;
     let foundTo = -1;
     for (let i = currentToIdx; i < appData.length; i++) {
       if (legMatchesLocation(appData[i], j.toLocation, true)) {
         foundTo = i;
         break;
-      }
-    }
-    if (foundTo === -1) {
-      for (let i = 0; i < appData.length; i++) {
-        if (legMatchesLocation(appData[i], j.toLocation, true)) {
-          foundTo = i;
-          break;
-        }
       }
     }
     if (foundTo !== -1) {
@@ -2607,27 +2600,12 @@ function syncAllLegDays(silent = false) {
 
   let currentFromIdx = 0;
   sortedJourneysForMapping.forEach(j => {
-    if (j.legId) {
-      const explicitLeg = appData.find(l => l.id === j.legId);
-      if (explicitLeg) {
-        j._inferredFromLegId = explicitLeg.id;
-        return;
-      }
-    }
     if (!j.fromLocation) return;
     let foundFrom = -1;
     for (let i = currentFromIdx; i < appData.length; i++) {
       if (legMatchesLocation(appData[i], j.fromLocation, false)) {
         foundFrom = i;
         break;
-      }
-    }
-    if (foundFrom === -1) {
-      for (let i = 0; i < appData.length; i++) {
-        if (legMatchesLocation(appData[i], j.fromLocation, false)) {
-          foundFrom = i;
-          break;
-        }
       }
     }
     if (foundFrom !== -1) {
@@ -2673,11 +2651,11 @@ function syncAllLegDays(silent = false) {
     // Ignore local intra-city transport by ensuring fromLocation !== toLocation
     const arrivingJourneys = (window.journeys || []).filter(j => 
       (j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase()) &&
-      (j._inferredToLegId === leg.id || j.legId === leg.id || legMatchesLocation(leg, j.toLocation, true))
+      (j._inferredToLegId === leg.id || (!j._inferredToLegId && (j.legId === leg.id || !j.legId) && legMatchesLocation(leg, j.toLocation, true)))
     );
     const departingJourneys = (window.journeys || []).filter(j => 
       (j.fromLocation && j.toLocation && j.fromLocation.toLowerCase() !== j.toLocation.toLowerCase()) &&
-      (j._inferredFromLegId === leg.id || j.legId === leg.id || legMatchesLocation(leg, j.fromLocation, false))
+      (j._inferredFromLegId === leg.id || (!j._inferredFromLegId && (j.legId === leg.id || !j.legId) && legMatchesLocation(leg, j.fromLocation, false)))
     );
     
     // Calculate precise date bounds based strictly on mapped items
@@ -4163,12 +4141,41 @@ function confirmAddLeg() {
   // --- SYNCHRONIZE JOURNEYS AND STAYS BASED ON LEG DATE SHIFTS ---
   applyStagedLegsAndSync();
 
-  closeAddLegDialog();
+  // Keep dialog open for continued editing: re-sync state and rebuild mappings
+  if (legDialogState) {
+    const updatedOrigDates = {};
+    (appData || []).forEach(leg => {
+      if (leg && leg.id && Array.isArray(leg.days) && leg.days.length > 0) {
+        updatedOrigDates[leg.id] = {
+          startDate: leg.days[0].date,
+          endDate: leg.days[leg.days.length - 1].date
+        };
+      }
+    });
+    legDialogState.originalLegDates = updatedOrigDates;
+    legDialogState.stagedLegs = Array.isArray(appData) ? JSON.parse(JSON.stringify(appData)) : [];
+  }
+
   if (typeof sortLegs === 'function') sortLegs();
   if (typeof buildItinerary === 'function') buildItinerary();
   if (typeof buildCityNav === 'function') buildCityNav();
+  if (typeof buildTransportTab === 'function') buildTransportTab();
+  if (typeof buildAccomTab === 'function') buildAccomTab();
   if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  if (typeof buildDesktopSplitMap === 'function') buildDesktopSplitMap();
   if (typeof saveData === 'function') saveData(false);
+  if (typeof showToast === 'function') {
+    showToast('Leg saved!');
+  }
+
+  // Refresh dialog UI and dropdowns for continuing editing
+  if (typeof _populateAddLegCityDropdowns === 'function') {
+    _populateAddLegCityDropdowns();
+  }
+  if (typeof renderLegReorderList === 'function') {
+    renderLegReorderList();
+  }
+  validateLegEditorForm();
 }
 
 function syncStaysAndJourneysFromDateChanges(origLegDates, targetLegs) {
