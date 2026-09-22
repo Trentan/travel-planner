@@ -76,7 +76,6 @@
           <div class="app-menu-section-header">🚗 Transport & Travel Tools</div>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openLegEditorDialog()"><span class="menu-icon">✈️</span> Transport & Transit</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCityDialog()"><span class="menu-icon">🌍</span> Cities & Locations</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); rebuildItineraryAndDataMappings({ showToast: true })"><span class="menu-icon">🔄</span> Rebuild Itinerary & Mappings</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openBookingIntakeDialog()"><span class="menu-icon">📥</span> Import Booking Intake</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openMapprImportModal()"><span class="menu-icon">🗺️</span> Import Mappr Map</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openAIDialog()"><span class="menu-icon">🤖</span> AI Builder</button>
@@ -279,7 +278,6 @@
           </div>
           <button class="action-btn add-city-action" onclick="openCityDialog()"><span class="add-city-label">🌍 City</span></button>
           <button class="action-btn add-leg-action" onclick="openLegEditorDialog()"><span class="add-leg-label">🧭 Legs</span></button>
-          <button class="action-btn rebuild-itinerary-action" id="rebuildItineraryBtn" onclick="rebuildItineraryAndDataMappings({ showToast: true })" title="Rebuild itinerary and synchronize all data mappings"><span class="rebuild-icon">🔄</span> <span class="rebuild-label">Rebuild</span></button>
         </div>
       </div>
 
@@ -993,9 +991,14 @@
           <div id="legReorderList" class="leg-reorder-list flex flex-col gap-1.5 p-2 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 max-h-72 sm:max-h-80 overflow-y-auto">
           </div>
           <div class="modal-footer flex items-center justify-between gap-2 pt-3 border-t border-slate-200 dark:border-slate-800 mt-3">
-            <button type="button" class="action-btn text-xs sm:text-sm text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800 hover:bg-teal-50 dark:hover:bg-teal-950/40" onclick="switchLegModalTab('edit'); resetLegDialogToAddNew();">
-              + Add New Leg
-            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" class="action-btn text-xs sm:text-sm text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800 hover:bg-teal-50 dark:hover:bg-teal-950/40" onclick="switchLegModalTab('edit'); resetLegDialogToAddNew();">
+                + Add New Leg
+              </button>
+              <button type="button" id="rebuildLegsSequenceBtn" class="action-btn text-xs sm:text-sm text-slate-700 dark:text-slate-200" onclick="rebuildItineraryAndDataMappings({ showToast: true })" title="Rebuild itinerary and synchronize all data mappings">
+                <span class="rebuild-icon">🔄</span> Rebuild
+              </button>
+            </div>
             <div class="flex items-center gap-2">
               <button type="button" class="action-btn" onclick="closeAddLegDialog()">Cancel</button>
               <button type="button" id="saveLegSequenceBtn" class="action-btn action-btn-secondary font-semibold" onclick="confirmSaveLegSequence()">
@@ -1041,13 +1044,13 @@
             </div>
             <div id="routeSelectionGroup" style="display: none;">
               <div class="ai-form-group">
-                <label>From City</label>
+                <label class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">From City</label>
                 <select id="fromCitySelect" class="form-control">
                   <option value="Home">🏠 Home</option>
                 </select>
               </div>
               <div class="ai-form-group">
-                <label>To City</label>
+                <label class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">To City</label>
                 <select id="toCitySelect" class="form-control">
                   <option value="">-- Choose destination --</option>
                 </select>
@@ -1083,7 +1086,7 @@
                 <label class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">Duration</label>
                 <div class="flex items-center gap-1">
                   <button type="button" class="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 font-bold text-sm" onclick="stepLegDuration(-1)" title="Decrease nights">−</button>
-                  <input type="number" id="legDurationNights" min="1" max="90" value="3" class="form-control text-center font-bold" oninput="onLegDurationInputChange()" onchange="onLegDurationInputChange()">
+                  <input type="number" id="legDurationNights" min="0" max="90" value="3" class="form-control text-center font-bold" oninput="onLegDurationInputChange()" onchange="onLegDurationInputChange()">
                   <button type="button" class="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 font-bold text-sm" onclick="stepLegDuration(1)" title="Increase nights">+</button>
                 </div>
                 <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 text-center block">nights</span>
@@ -1099,7 +1102,12 @@
             </div>
           </div>
           <div class="modal-footer modal-footer-space-between modal-footer-wrap pt-3 border-t border-slate-200 dark:border-slate-800 mt-3">
-            <button id="legDialogDeleteBtn" class="action-btn action-btn-danger" onclick="deleteLegFromDialog()" style="display: none;">Delete Leg</button>
+            <div class="flex items-center gap-2">
+              <button id="legDialogDeleteBtn" class="action-btn action-btn-danger" onclick="deleteLegFromDialog()" style="display: none;">Delete Leg</button>
+              <button type="button" id="rebuildLegsEditBtn" class="action-btn text-xs sm:text-sm text-slate-700 dark:text-slate-200" onclick="rebuildItineraryAndDataMappings({ showToast: true })" title="Rebuild itinerary and synchronize all data mappings">
+                <span class="rebuild-icon">🔄</span> Rebuild
+              </button>
+            </div>
             <div class="journey-footer-actions ml-auto">
               <button class="action-btn" onclick="closeAddLegDialog()">Cancel</button>
               <button id="legDialogSaveBtn" class="action-btn action-btn-secondary font-semibold" onclick="confirmAddLeg()">Save Leg</button>
@@ -1140,8 +1148,7 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <button class="action-btn" onclick="rebuildItineraryAndDataMappings({ showToast: true }); closeCityDialog();" title="Rebuild itinerary and synchronize all data mappings"><span class="rebuild-icon">🔄</span> Rebuild Itinerary & Mappings</button>
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; align-items: center;">
         <button class="action-btn" onclick="closeCityDialog()">Close</button>
       </div>
     </div>

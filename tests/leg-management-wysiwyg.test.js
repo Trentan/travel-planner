@@ -1,4 +1,6 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 
 // Mock browser globals
 const store = {};
@@ -17,6 +19,7 @@ function createMockElement(id, initialProps = {}) {
   const el = {
     id,
     value: '',
+    options: [],
     style: {},
     classList: {
       classes: new Set(),
@@ -29,6 +32,10 @@ function createMockElement(id, initialProps = {}) {
     innerHTML: '',
     textContent: '',
     addEventListener() {},
+    appendChild(child) {
+      if (!this.options) this.options = [];
+      this.options.push(child);
+    },
     querySelectorAll() { return []; },
     ...initialProps
   };
@@ -47,6 +54,12 @@ createMockElement('legAutoCascadeCheckbox', { checked: true });
 createMockElement('legReorderList');
 createMockElement('editLegSelect');
 createMockElement('existingCitySelect');
+createMockElement('fromCitySelect');
+createMockElement('toCitySelect');
+createMockElement('routeSelectionGroup');
+createMockElement('citySelectionGroup');
+createMockElement('rebuildLegsSequenceBtn');
+createMockElement('rebuildLegsEditBtn');
 createMockElement('legTypeSelect', { value: 'city' });
 createMockElement('legDayNotesInput');
 createMockElement('legPlacementSelect', { value: 'before_return' });
@@ -582,6 +595,100 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(global.appData[2].days[2].date, '2026-06-08', 'Venice end date cascaded to 2026-06-08');
   assert.strictEqual(global.appData[3].days[0].date, '2026-06-08', 'Return start date cascaded to 2026-06-08');
   assert.strictEqual(global.appData[3].days[1].date, '2026-06-09', 'Return end date cascaded to 2026-06-09');
+
+  // 11. Test Rebuild button scoping to legs
+  console.log('  Testing Rebuild button scoping (Issue #419)...');
+  const indexHtml = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
+  assert.strictEqual(indexHtml.includes('id="rebuildItineraryBtn"'), false, 'Header rebuild button must be removed');
+  assert.strictEqual(indexHtml.includes('rebuildItineraryAndDataMappings({ showToast: true }); closeCityDialog();'), false, 'City dialog rebuild button must be removed');
+  assert.strictEqual(indexHtml.includes('closeDesktopActionsMenu(); rebuildItineraryAndDataMappings'), false, 'Desktop actions menu rebuild button must be removed');
+  assert.strictEqual(indexHtml.includes('id="rebuildLegsSequenceBtn"'), true, 'Legs reorder sequence view must include Rebuild button');
+  assert.strictEqual(indexHtml.includes('id="rebuildLegsEditBtn"'), true, 'Legs add/edit view must include Rebuild button');
+
+  // 12. Test populating City From and City To when clicking an existing leg
+  console.log('  Testing populating City From and City To on existing leg click...');
+  global.citiesData = [
+    { name: 'Taipei', code: 'TPE' },
+    { name: 'Vienna', code: 'VIE' },
+    { name: 'Bangkok', code: 'BKK' },
+    { name: 'London', code: 'LHR' },
+    { name: 'Brisbane', code: 'BNE' }
+  ];
+  global.titleData = { homeCity: 'Brisbane' };
+
+  global.appData = [
+    {
+      id: 'leg_0',
+      label: 'Brisbane (Trip Start)',
+      days: [{ date: '2026-06-08', day: 'Mon', from: 'Brisbane (Trip Start) (1)', to: 'Taipei', completed: false }]
+    },
+    {
+      id: 'leg_1',
+      label: '🇦🇹 Vienna',
+      days: [
+        { date: '2026-06-10', day: 'Wed', from: 'Bangkok', to: '🇦🇹 Vienna', completed: false },
+        { date: '2026-06-11', day: 'Thu', from: 'Vienna', to: 'Vienna', completed: false }
+      ]
+    },
+    {
+      id: 'leg_2',
+      label: '🇹🇭 Bangkok (2)',
+      days: [
+        { date: '2026-06-27', day: 'Sat', from: 'London', to: '🇹🇭 Bangkok (2)', completed: false }
+      ]
+    }
+  ];
+
+  openAddLegDialog('edit');
+  switchLegModalTab('edit');
+
+  // Click / Select Leg 0 (Brisbane -> Taipei)
+  elements['editLegSelect'].value = '0';
+  onEditLegSelectionChange();
+  assert.strictEqual(elements['fromCitySelect'].value, 'Home', 'Leg 0 fromCitySelect populated with Home/Brisbane');
+  assert.strictEqual(elements['toCitySelect'].value, 'Taipei', 'Leg 0 toCitySelect populated with Taipei');
+  assert.strictEqual(elements['routeSelectionGroup'].style.display, 'block', 'Route selection group shown with from/to fields');
+
+  // Click / Select Leg 1 (Bangkok -> Vienna)
+  elements['editLegSelect'].value = '1';
+  onEditLegSelectionChange();
+  assert.strictEqual(elements['fromCitySelect'].value, 'Bangkok', 'Leg 1 fromCitySelect populated with Bangkok');
+  assert.strictEqual(elements['toCitySelect'].value, 'Vienna', 'Leg 1 toCitySelect populated with Vienna');
+  assert.strictEqual(elements['existingCitySelect'].value, 'Vienna', 'Leg 1 existingCitySelect populated with Vienna');
+
+  // Click / Select Leg 2 (London -> Bangkok)
+  elements['editLegSelect'].value = '2';
+  onEditLegSelectionChange();
+  assert.strictEqual(elements['fromCitySelect'].value, 'London', 'Leg 2 fromCitySelect populated with London');
+  assert.strictEqual(elements['toCitySelect'].value, 'Bangkok', 'Leg 2 toCitySelect populated with Bangkok');
+
+  // 13. Test same-day legs support (startDate === endDate, 0 nights)
+  console.log('  Testing same-day legs support (startDate === endDate, 0 nights)...');
+  assert.strictEqual(indexHtml.includes('id="legDurationNights" min="0"'), true, 'Duration input allows 0 nights');
+
+  // End date change to same date recalculates duration to 0
+  elements['newLegStartDate'].value = '2026-06-10';
+  elements['newLegEndDate'].value = '2026-06-10';
+  onLegEndDateChange();
+  assert.strictEqual(elements['legDurationNights'].value, 0, 'Duration recalculated to 0 nights when startDate === endDate');
+
+  // Duration input set to 0 updates endDate to same as startDate
+  elements['legDurationNights'].value = 0;
+  onLegDurationInputChange();
+  assert.strictEqual(elements['newLegEndDate'].value, '2026-06-10', 'End date stays 2026-06-10 for 0 nights duration');
+
+  // Stepping duration -1 stops at 0, not below 0
+  stepLegDuration(-1);
+  assert.strictEqual(elements['legDurationNights'].value, 0, 'stepLegDuration does not drop below 0');
+
+  // Same-day leg date clash check with identical dates does not false-positive
+  assert.strictEqual(checkLegDateClash('2026-06-10', '2026-06-10', '2026-06-10', '2026-06-10'), false, 'Same-day legs on same date do NOT clash');
+  assert.strictEqual(checkLegDateClash('2026-06-10', '2026-06-10', '2026-06-10', '2026-06-12'), false, 'Same-day leg handover does NOT clash');
+
+  // Validation passes for same-day leg
+  const isSameDayValid = validateLegEditorForm();
+  assert.strictEqual(isSameDayValid, true, 'Validation passes for same-day leg');
+  assert.strictEqual(elements['legDialogSaveBtn'].disabled, false, 'Save button enabled for same-day leg');
 
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }
