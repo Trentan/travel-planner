@@ -278,20 +278,22 @@ EXPECTED JSON SCHEMA:
 CRITICAL RULES FOR GENERATION:
 
 1. CITIES: Create the cities array. ${cities.length ? `Use specified cities: ${cities.join(', ')}.` : 'Choose 3-5 logical cities in the requested regions.'}
-   - Auto-generate city IDs as "city-[lowercase-city-name]" (e.g. "city-bali").
-   - City "name" must be the clean standard city name (e.g. "Bali", NOT "Denpasar Bali" or "Bali Wellness").
+   - For multi-base regions or island hubs (e.g. Bali, Phuket, Hawaii), create separate entries for each major hub/area (e.g. "Canggu", "Ubud", "Uluwatu") rather than collapsing into a single generic region name.
+   - Auto-generate city IDs as "city-[lowercase-city-name]" (e.g. "city-canggu", "city-ubud").
+   - City "name" must be the clean standard city name (e.g. "Canggu", NOT "Canggu Bali").
    - Assign distinct colors from: #E74C3C, #3498DB, #27AE60, #F39C12, #9B59B6, #1ABC9C, #E91E63, #795548.
    - Include country, countryCode, code, lat, and lng for every city whenever known.
 
 2. ITINERARY LEGS & CLEAN LABELS: Create legs in chronological order:
    - "leg-start": Departure from home (cityId: "city-home", label: "🏠 Start (Home City)").
-   - One leg per destination city (id: "leg-[cityname]", cityId: "city-[cityname]").
-   - The leg "label" for each destination leg MUST BE "[Emoji] [City Name]" (e.g. "🌴 Bali" or "🇯🇵 Tokyo"). DO NOT append long itinerary descriptions or theme text (e.g. NEVER "🌴 Bali Wellness, Diving & Fitness"). Put themes/descriptions in day "desc".
+   - One leg per destination hub/city (id: "leg-[cityname]", cityId: "city-[cityname]").
+   - The leg "label" for each destination leg MUST BE "[Emoji] [City Name]" (e.g. "🌴 Canggu" or "🌿 Ubud"). DO NOT append long itinerary descriptions or theme text (e.g. NEVER "🌴 Bali Wellness, Diving & Fitness"). Put themes/descriptions in day "desc".
    - "leg-return": Return to home (cityId: "city-home", label: "🛫 Return Home").
 
 3. DAYS & ACTIVITY ITEMS ("text" FIELD):
    - Every day must have "date" (YYYY-MM-DD), "day" (Mon, Tue, etc.), "from", "to", "completed": false, "desc", and "activityItems".
    - In "activityItems", each item MUST have the property "text" containing the activity name/title (e.g. "text": "Morning Run along Echo Beach"). NEVER use "title" instead of "text" for activityItems!
+   - Every item MUST include a non-empty "location" specifying the venue name, area, or landmark (e.g. "location": "Echo Beach, Canggu", "location": "Pyramids of Chi, Ubud"). NEVER omit location or leave it as empty string ""!
    - Include "time", "cost", "category", "notes", "location", "done": false, and "cityId".
    - Category must be one of: "fitness", "sight", "attraction", "wellness", "food", "transport".
 

@@ -2602,7 +2602,8 @@ function syncAllLegDays(silent = false) {
   appData.forEach(leg => {
     const rawCityName = leg.label;
     if (!rawCityName) return;
-    const cityName = rawCityName;
+    const cleanCityName = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(rawCityName) : rawCityName.replace(/[^\x00-\x7F]/g, '').trim();
+    const cityName = cleanCityName || rawCityName;
     
     const baseCityName = getBaseNameGlobal(rawCityName);
     const cityId = 'city-' + baseCityName.replace(/[^a-z0-9]/g, '-');
@@ -2735,6 +2736,15 @@ function syncAllLegDays(silent = false) {
       newDays.forEach(nd => {
         const oldDay = leg.days.find(od => od.date === nd.date);
         if (oldDay) {
+          // Preserve custom day routing (from / to) and strip any inadvertent (Trip Start/Finish)
+          if (oldDay.from) {
+            const cleanFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(oldDay.from) : oldDay.from;
+            nd.from = cleanFrom || oldDay.from;
+          }
+          if (oldDay.to) {
+            const cleanTo = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(oldDay.to) : oldDay.to;
+            nd.to = cleanTo || oldDay.to;
+          }
           // Keep old notes if user had custom text, except if it was just an old travel generic string
           if (oldDay.desc && !nd.desc.startsWith('Depart for') && !nd.desc.startsWith('Arrive from') && !oldDay.desc.startsWith('Depart for') && !oldDay.desc.startsWith('Arrive from')) {
             nd.desc = oldDay.desc;
@@ -2743,6 +2753,7 @@ function syncAllLegDays(silent = false) {
           if (oldDay.activityItems) nd.activityItems = oldDay.activityItems;
           if (oldDay.transportItems) nd.transportItems = oldDay.transportItems;
           if (oldDay.notes) nd.notes = oldDay.notes;
+          if (typeof oldDay.completed !== 'undefined') nd.completed = oldDay.completed;
         }
       });
     }
@@ -3560,6 +3571,8 @@ function buildLegDaysWithNotes({ dateFrom, dateTo, fromCity, toCity, legType, da
   const normalizedTo = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue(dateTo) : dateTo;
   const validFrom = /^\d{4}-\d{2}-\d{2}$/.test(normalizedFrom || '');
   const validTo = /^\d{4}-\d{2}-\d{2}$/.test(normalizedTo || '');
+  const cleanFromCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity) || 'Home';
+  const cleanToCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity) || 'Home';
   const defaultFirstDesc = legType === 'start' ? 'Departure day' : (legType === 'return' ? 'Return home' : 'Travel and arrival day');
 
   if (!validFrom || !validTo) {
@@ -3567,8 +3580,8 @@ function buildLegDaysWithNotes({ dateFrom, dateTo, fromCity, toCity, legType, da
       {
         date: validFrom ? normalizedFrom : (typeof getTripStartDate === 'function' ? getTripStartDate() : '2026-06-08'),
         day: typeof getWeekdayLabelForTripDate === 'function' ? getWeekdayLabelForTripDate(validFrom ? normalizedFrom : '2026-06-08') : 'Mon',
-        from: fromCity || 'Home',
-        to: toCity || 'Home',
+        from: cleanFromCity,
+        to: cleanToCity,
         completed: false,
         desc: (dayNotes && dayNotes[0]) || defaultFirstDesc,
         transportItems: [{ text: "Add transport...", cost: "0" }],
@@ -3589,14 +3602,14 @@ function buildLegDaysWithNotes({ dateFrom, dateTo, fromCity, toCity, legType, da
     if (!desc) {
       if (isFirstDay) desc = defaultFirstDesc;
       else if (isLastDay && legType === 'city') desc = 'Final day and departure prep';
-      else desc = `Explore ${toCity || 'city'}`;
+      else desc = `Explore ${cleanToCity || 'city'}`;
     }
 
     days.push({
       date: cur,
       day: typeof getWeekdayLabelForTripDate === 'function' ? getWeekdayLabelForTripDate(cur) : 'Mon',
-      from: fromCity || 'Home',
-      to: toCity || 'Home',
+      from: (legType === 'start' && !isFirstDay) ? cleanToCity : cleanFromCity,
+      to: (legType === 'return' && !isLastDay) ? cleanFromCity : cleanToCity,
       completed: false,
       desc: desc,
       transportItems: isFirstDay ? [{ text: "Add transport...", cost: "0" }] : [],
@@ -3806,11 +3819,13 @@ function confirmAddLeg() {
       toCity = document.getElementById('toCitySelect')?.value || 'Home';
       const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
       target.label = `${cleanCity} (Trip Start)`;
+      toCity = cleanCity;
     } else if (legType === 'return') {
       fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
       toCity = 'Home';
       const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
       target.label = `${cleanCity} (Trip Finish)`;
+      fromCity = cleanCity;
     } else if (legType === 'travel') {
       fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
       toCity = document.getElementById('toCitySelect')?.value || '';
@@ -3850,6 +3865,14 @@ function confirmAddLeg() {
     target.days.forEach(newDay => {
       const oldDay = oldDays.find(od => od.date === newDay.date);
       if (oldDay) {
+        if (oldDay.from) {
+          const cleanFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(oldDay.from) : oldDay.from;
+          newDay.from = cleanFrom || oldDay.from;
+        }
+        if (oldDay.to) {
+          const cleanTo = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(oldDay.to) : oldDay.to;
+          newDay.to = cleanTo || oldDay.to;
+        }
         if (oldDay.accomItems) newDay.accomItems = oldDay.accomItems;
         if (oldDay.activityItems) newDay.activityItems = oldDay.activityItems;
         if (oldDay.transportItems) newDay.transportItems = oldDay.transportItems;
@@ -3871,11 +3894,13 @@ function confirmAddLeg() {
       toCity = document.getElementById('toCitySelect')?.value || 'Home';
       const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
       label = `${cleanCity} (Trip Start)`;
+      toCity = cleanCity;
     } else if (legType === 'return') {
       fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
       toCity = 'Home';
       const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity.replace(/[^\x00-\x7F]/g, '').trim()) || 'Home';
       label = `${cleanCity} (Trip Finish)`;
+      fromCity = cleanCity;
     } else if (legType === 'travel') {
       fromCity = document.getElementById('fromCitySelect')?.value || 'Home';
       toCity = document.getElementById('toCitySelect')?.value || '';

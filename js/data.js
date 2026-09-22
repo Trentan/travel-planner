@@ -5073,6 +5073,18 @@ function normalizeTripLegsData(legs) {
 
     (leg.days || []).forEach((day, dayIdx) => {
       day.date = normalizeTripDateValue(day.date);
+      if (day.from && /\(trip (start|finish|end)\)/i.test(day.from)) {
+        const cleanedFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(day.from) : day.from.replace(/\s*\(trip (start|finish|end)\)/i, '').trim();
+        if (cleanedFrom) day.from = cleanedFrom;
+      }
+      if (day.to && /\(trip (start|finish|end)\)/i.test(day.to)) {
+        const cleanedTo = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(day.to) : day.to.replace(/\s*\(trip (start|finish|end)\)/i, '').trim();
+        if (cleanedTo) day.to = cleanedTo;
+      }
+      if ((!Array.isArray(day.activityItems) || day.activityItems.length === 0) && Array.isArray(day.activities) && day.activities.length > 0) {
+        day.activityItems = day.activities;
+      }
+      if (!Array.isArray(day.activityItems)) day.activityItems = [];
       (day.activityItems || []).forEach(item => {
         if (!item || typeof item !== 'object') return;
         // Fallback title / name / desc to text if text is missing or empty
@@ -5084,6 +5096,18 @@ function normalizeTripLegsData(legs) {
         item.endDate = normalizeTripDateValue(item.endDate || item.startDate || day.date);
         if (item.startTime === undefined) item.startTime = '';
         if (item.endTime === undefined) item.endTime = '';
+        if (!item.location) {
+          const rawText = String(item.text || item.title || item.name || '').trim();
+          const splitLoc = typeof _localSplitActivityTitle === 'function' ? _localSplitActivityTitle(rawText).location : '';
+          if (splitLoc) {
+            item.location = splitLoc;
+          } else {
+            const venueMatch = rawText.match(/\b(?:at|near)\s+([A-Z0-9][A-Za-z0-9\s'&.-]+)$/i);
+            if (venueMatch && venueMatch[1] && !/^(the\s+local|a\s+local|the\s+area|local\s+area)\b/i.test(venueMatch[1].trim())) {
+              item.location = venueMatch[1].trim();
+            }
+          }
+        }
 
         // Skip placeholders
         const text = String(item.text || '').trim();

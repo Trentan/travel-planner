@@ -1019,7 +1019,13 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
       const type = String(j?.transportType || '').trim().toLowerCase();
       return (from && to && from !== to) || type === 'flight' || type === 'plane';
     });
-    let chipRoute = day.to || day.from || leg.label || 'City';
+    const cleanChipCity = (val) => {
+      const raw = String(val || '').trim();
+      if (!raw) return '';
+      return (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(raw) : raw).replace(/\s*\(trip (start|finish|end)\)/i, '').trim();
+    };
+    let rawRoute = day.to || day.from || leg.label || 'City';
+    let chipRoute = cleanChipCity(rawRoute) || 'City';
     if ((isTravelDay || hasTravelJourney) && Array.isArray(dayJourneys) && dayJourneys.length > 0) {
       const inferJourneyType = (journey) => {
         const type = String(journey?.transportType || '').toLowerCase();
@@ -1051,10 +1057,12 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
         }
       });
       const icon = getTransportIcon(bestType);
-      const cityLabel = String(day.to || bestJourney.toLocation || day.from || 'City').trim();
+      const rawCityLabel = String(day.to || bestJourney.toLocation || day.from || 'City').trim();
+      const cityLabel = cleanChipCity(rawCityLabel) || rawCityLabel;
       chipRoute = `${icon} ${cityLabel}`;
     } else if (isTravelDay || hasTravelJourney) {
-      chipRoute = String(day.to || day.from || leg.label || 'City').trim();
+      const rawCityLabel = String(day.to || day.from || leg.label || 'City').trim();
+      chipRoute = cleanChipCity(rawCityLabel) || rawCityLabel;
     }
     return `
       <button

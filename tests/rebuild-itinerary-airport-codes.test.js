@@ -10,6 +10,8 @@ async function runRebuildAndAirportCodesTests() {
   const dataCode = fs.readFileSync(path.join(__dirname, '../js/data.js'), 'utf8');
   const crudCode = fs.readFileSync(path.join(__dirname, '../js/crud.js'), 'utf8');
   const transportCode = fs.readFileSync(path.join(__dirname, '../js/transport.js'), 'utf8');
+  const itineraryCode = fs.readFileSync(path.join(__dirname, '../js/itinerary.js'), 'utf8');
+  const mapCode = fs.readFileSync(path.join(__dirname, '../js/map.js'), 'utf8');
 
   const elements = new Map();
   const getOrCreateMockEl = (id) => {
@@ -21,7 +23,7 @@ async function runRebuildAndAirportCodesTests() {
         textContent: '',
         innerHTML: '',
         style: {},
-        classList: { add: () => {}, remove: () => {}, contains: () => false },
+        classList: { add: () => {}, remove: () => {}, contains: () => false, toggle: () => false },
         querySelectorAll: () => [],
         querySelector: () => null,
         addEventListener: () => {},
@@ -47,7 +49,7 @@ async function runRebuildAndAirportCodesTests() {
         innerText: '',
         textContent: '',
         style: {},
-        classList: { add: () => {}, remove: () => {}, contains: () => false },
+        classList: { add: () => {}, remove: () => {}, contains: () => false, toggle: () => false },
         innerHTML: '',
         querySelectorAll: () => [],
         querySelector: () => null,
@@ -73,6 +75,8 @@ async function runRebuildAndAirportCodesTests() {
     indexedDB: null,
     document: documentMock,
     addEventListener: () => {},
+    confirm: () => true,
+    alert: () => {},
     journeys: [],
     stays: [],
     appData: [],
@@ -81,6 +85,8 @@ async function runRebuildAndAirportCodesTests() {
 
   const combinedCode = `
     const document = window.document;
+    const confirm = window.confirm;
+    const alert = window.alert;
     var isEditMode = false;
     window.isEditMode = false;
     ${utilsCode}
@@ -88,6 +94,8 @@ async function runRebuildAndAirportCodesTests() {
     ${dataCode}
     ${crudCode}
     ${transportCode}
+    ${itineraryCode}
+    ${mapCode}
     return {
       getCityIataCode,
       getCityIcaoCode,
@@ -97,6 +105,11 @@ async function runRebuildAndAirportCodesTests() {
       getHomeLocation,
       _populateAddLegCityDropdowns,
       _populateJourneyCityDropdowns,
+      cleanCityNavLabel,
+      normalizeTripLegsData,
+      getCityCoords,
+      getDeterministicActivityCoords,
+      syncAllLegDays,
       citiesData,
       appData,
       titleData: typeof titleData !== 'undefined' ? titleData : {}
@@ -173,6 +186,92 @@ async function runRebuildAndAirportCodesTests() {
   const existingCityEl = getOrCreateMockEl('existingCitySelect');
   assert(existingCityEl.innerHTML.includes('Brisbane (BNE / YBBN)'), 'existingCitySelect should include Brisbane (BNE / YBBN)');
   assert(existingCityEl.innerHTML.includes('Home (Brisbane'), 'existingCitySelect should display Home (Brisbane)');
+
+  // 7. Test cleanCityNavLabel strips trip lifecycle indicators
+  assert(scope.cleanCityNavLabel('Denpasar Bali (Trip Start)') === 'Denpasar Bali', 'cleanCityNavLabel should strip (Trip Start)');
+  assert(scope.cleanCityNavLabel('Brisbane (Trip Finish)') === 'Brisbane', 'cleanCityNavLabel should strip (Trip Finish)');
+  assert(scope.cleanCityNavLabel('Sydney (Trip End)') === 'Sydney', 'cleanCityNavLabel should strip (Trip End)');
+
+  // 8. Test normalizeTripLegsData cleans day routing & infers missing location from title
+  const rawLegs = [
+    {
+      id: 'leg-1',
+      label: 'Denpasar Bali (Trip Start)',
+      city: 'Denpasar Bali (Trip Start)',
+      days: [
+        {
+          dayNum: 1,
+          date: '2026-06-01',
+          from: 'Denpasar Bali (Trip Start)',
+          to: 'Denpasar Bali (Trip Start)',
+          activities: [
+            {
+              id: 'act-1',
+              time: '14:00',
+              title: 'Check-in and massage at Spring Spa',
+              notes: 'Relax after flight',
+              location: ''
+            },
+            {
+              id: 'act-2',
+              time: '19:00',
+              title: 'Dinner - Crate Cafe',
+              notes: 'Healthy dinner bowl',
+              location: ''
+            }
+          ]
+        }
+      ]
+    }
+  ];
+
+  const normalized = scope.normalizeTripLegsData(rawLegs);
+  const day1 = normalized[0].days[0];
+  assert(day1.from === 'Denpasar Bali', `day.from should be stripped of (Trip Start), got: ${day1.from}`);
+  assert(day1.to === 'Denpasar Bali', `day.to should be stripped of (Trip Start), got: ${day1.to}`);
+  assert(day1.activities[0].location === 'Spring Spa', `Inferred location from "at Spring Spa", got: ${day1.activities[0].location}`);
+  assert(day1.activities[1].location === 'Crate Cafe', `Inferred location from "Dinner - Crate Cafe", got: ${day1.activities[1].location}`);
+
+  // 9. Test getCityCoords strips (Trip Start) safely
+  const coords = scope.getCityCoords('Denpasar Bali (Trip Start)');
+  assert(coords && typeof coords.lat === 'number' && typeof coords.lng === 'number', 'getCityCoords should resolve for Denpasar Bali (Trip Start)');
+
+  // 10. Test getDeterministicActivityCoords resolves coords when act.location is empty but title has venue
+  const actCoords = scope.getDeterministicActivityCoords(
+    { title: 'Sunset dinner at Mason' },
+    'Denpasar Bali (Trip Start)'
+  );
+  assert(actCoords && typeof actCoords.lat === 'number' && typeof actCoords.lng === 'number', 'Deterministic coords should resolve using title venue fallback');
+
+  // 11. Test syncAllLegDays preserves intra-trip city separation
+  scope.tripData = {
+    trip: {
+      name: 'Bali Multi-Hub',
+      homeCity: 'Brisbane',
+      legs: [
+        {
+          id: 'leg-start',
+          label: 'Denpasar Bali (Trip Start)',
+          city: 'Denpasar Bali',
+          legType: 'start',
+          startDate: '2026-06-01',
+          endDate: '2026-06-03',
+          days: [
+            { dayNum: 1, date: '2026-06-01', from: 'Brisbane', to: 'Canggu', activities: [] },
+            { dayNum: 2, date: '2026-06-02', from: 'Canggu', to: 'Canggu', activities: [] },
+            { dayNum: 3, date: '2026-06-03', from: 'Canggu', to: 'Ubud', activities: [] }
+          ]
+        }
+      ]
+    }
+  };
+  scope.syncAllLegDays();
+  const syncedDays = scope.tripData.trip.legs[0].days;
+  assert(syncedDays[0].to === 'Canggu', `Day 1 destination preserved, got: ${syncedDays[0].to}`);
+  assert(syncedDays[1].from === 'Canggu', `Day 2 origin preserved, got: ${syncedDays[1].from}`);
+  assert(syncedDays[1].to === 'Canggu', `Day 2 destination preserved, got: ${syncedDays[1].to}`);
+  assert(syncedDays[2].from === 'Canggu', `Day 3 origin preserved, got: ${syncedDays[2].from}`);
+  assert(syncedDays[2].to === 'Ubud', `Day 3 destination preserved, got: ${syncedDays[2].to}`);
 
   console.log('✔ All rebuild itinerary and IATA/ICAO airport codes tests passed successfully!');
 }

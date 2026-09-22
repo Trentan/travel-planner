@@ -5,7 +5,10 @@ let mapPolylines = [];
 
 function getCityCoords(cityName) {
   if (!cityName) return null;
-  const clean = cityName.replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '').trim();
+  const clean = cityName
+    .replace(/^[📍🗺️✈️🏨🏠🇯🇵🇫🇷🇮🇹🇬🇧🇺🇸🇦🇺]+\s*/, '')
+    .replace(/\s*\(trip (start|finish|end)\)/i, '')
+    .trim();
   if (!clean) return null;
 
   const hasCoords = (c) => c && c.lat !== undefined && c.lng !== undefined && c.lat !== null && c.lng !== null && !isNaN(Number(c.lat)) && !isNaN(Number(c.lng));
@@ -932,7 +935,17 @@ function getDeterministicActivityCoords(baseCoords, act, index, total) {
   if (act && act.lat !== undefined && act.lng !== undefined && act.lat !== null && !isNaN(Number(act.lat))) {
     return { lat: Number(act.lat), lng: Number(act.lng) };
   }
-  const actLoc = String((act && act.location) || '').trim();
+  let actLoc = String((act && act.location) || '').trim();
+  if (!actLoc && act) {
+    const titleText = String(act.title || act.text || '').trim();
+    const venueMatch = titleText.match(/\b(?:at|near)\s+([A-Z0-9][A-Za-z0-9\s'&.-]+)$/i);
+    if (venueMatch && venueMatch[1]) {
+      const candidate = venueMatch[1].trim();
+      if (!/^(the\s+local|a\s+local|the\s+area|local\s+area)\b/i.test(candidate)) {
+        actLoc = candidate;
+      }
+    }
+  }
   if (actLoc) {
     const direct = getCityCoords(actLoc);
     if (direct) {
