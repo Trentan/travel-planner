@@ -31,7 +31,13 @@ function createMockDom() {
         classes: new Set(),
         add(c) { this.classes.add(c); },
         remove(c) { this.classes.delete(c); },
-        contains(c) { return this.classes.has(c); }
+        contains(c) { return this.classes.has(c); },
+        toggle(c, force) {
+          const shouldHave = typeof force === 'boolean' ? force : !this.classes.has(c);
+          if (shouldHave) this.classes.add(c);
+          else this.classes.delete(c);
+          return shouldHave;
+        }
       },
       cloneNode(deep) {
         const copy = createElement(this.tagName.toLowerCase());
@@ -40,6 +46,9 @@ function createMockDom() {
         copy.innerHTML = this.innerHTML;
         return copy;
       },
+      setAttribute(name, val) { this.dataset[name] = String(val); },
+      getAttribute(name) { return this.dataset[name] || null; },
+      removeAttribute(name) { delete this.dataset[name]; },
       addEventListener() {},
       removeEventListener() {},
       dispatchEvent() { return true; },
@@ -251,8 +260,32 @@ vm.runInContext(`
   if (legTypeVal !== 'city') {
     throw new Error('Expected legType to be "city", got: ' + legTypeVal);
   }
+
+  const helperCityVal = document.getElementById('legOriginHelperCity').textContent;
+  const helperDisplay = document.getElementById('legOriginHelperGroup').style.display;
+  if (helperDisplay !== 'flex' || helperCityVal !== 'Brisbane') {
+    throw new Error('Expected legOriginHelperCity to be "Brisbane" (from trip start) and visible, got: ' + helperCityVal + ', display: ' + helperDisplay);
+  }
+
+  // Test confirmAddLeg editing leg-bali
+  document.getElementById('newLegStartDate').value = '2026-12-14';
+  document.getElementById('newLegEndDate').value = '2026-12-16';
+  confirmAddLeg();
+
+  const editedLeg = appData[1];
+  if (!editedLeg || !editedLeg.days || editedLeg.days.length !== 3) {
+    throw new Error('Expected edited leg to have 3 days, got: ' + (editedLeg?.days?.length));
+  }
+  // Day 0 arrives from Brisbane (prior leg) to Denpasar Bali
+  if (editedLeg.days[0].from !== 'Brisbane' || editedLeg.days[0].to !== 'Denpasar Bali') {
+    throw new Error('Expected Day 0 to arrive from Brisbane to Denpasar Bali, got from: ' + editedLeg.days[0].from + ', to: ' + editedLeg.days[0].to);
+  }
+  // Day 1 & 2 stay in Denpasar Bali
+  if (editedLeg.days[1].from !== 'Denpasar Bali' || editedLeg.days[1].to !== 'Denpasar Bali') {
+    throw new Error('Expected Day 1 to stay in Denpasar Bali, got from: ' + editedLeg.days[1].from + ', to: ' + editedLeg.days[1].to);
+  }
 `, sandbox);
-console.log('✓ Test 3 Passed: onEditLegSelectionChange correctly populates valid city from, city to, and city selection');
+console.log('✓ Test 3 Passed: onEditLegSelectionChange correctly populates valid city from, city to, city selection, and origin helper');
 
 // 4. Test Home City (Brisbane) Mapping for Trip Start and Trip Finish
 console.log('Test 4: Home city mapping (Brisbane) for Trip Start and Trip Finish...');

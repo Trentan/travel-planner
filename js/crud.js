@@ -2368,6 +2368,73 @@ function regenerateItineraryFromJourneys(linkedJourneys, legId) {
   return true;
 }
 
+function isTerminalLeg(leg) {
+  if (!leg) return false;
+  const lid = String(leg.id || '').toLowerCase();
+  const lbl = String(leg.label || '').toLowerCase();
+  return lid === 'departure' || lid === 'return' || lid.endsWith('-start') || lid.endsWith('-finish') ||
+    lbl.includes('departure') || lbl.includes('return') || lbl.includes('(trip start)') || lbl.includes('(trip finish)');
+}
+
+function getLegBaseCityName(leg) {
+  if (!leg) return '';
+  if (leg.cityId && typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+    const cityObj = citiesData.find(c => c && c.id === leg.cityId);
+    if (cityObj && cityObj.name) return cityObj.name;
+  }
+  const cleanLbl = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : String(leg.label || '').replace(/[^\x00-\x7F]/g, '').trim();
+  const namedCity = typeof getCityByName === 'function' ? (getCityByName(cleanLbl) || getCityByName(leg.label)) : null;
+  if (namedCity && namedCity.name) return namedCity.name;
+  const lastDay = (leg.days && leg.days.length > 0) ? leg.days[leg.days.length - 1] : null;
+  if (lastDay && lastDay.to && lastDay.to !== 'Home') {
+    const cleanTo = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(lastDay.to) : lastDay.to;
+    return cleanTo || lastDay.to;
+  }
+  return cleanLbl || leg.label || '';
+}
+
+function getPriorLegCity(legs, targetIdx, fallbackHome = 'Home') {
+  if (!Array.isArray(legs) || targetIdx <= 0) return fallbackHome;
+  for (let i = targetIdx - 1; i >= 0; i--) {
+    const prev = legs[i];
+    if (!prev) continue;
+    if (isTerminalLeg(prev)) {
+      const lid = String(prev.id || '').toLowerCase();
+      const lbl = String(prev.label || '').toLowerCase();
+      if (lid.endsWith('-start') || lbl.includes('start') || lid === 'departure') {
+        const firstDay = (prev.days && prev.days.length > 0) ? prev.days[0] : null;
+        const lastDay = (prev.days && prev.days.length > 0) ? prev.days[prev.days.length - 1] : null;
+        if (firstDay && firstDay.from && firstDay.from !== 'Home') {
+          const cleanFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(firstDay.from) : firstDay.from;
+          return cleanFrom || firstDay.from;
+        }
+        if (lastDay && lastDay.from && lastDay.from !== 'Home') {
+          const cleanFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(lastDay.from) : lastDay.from;
+          return cleanFrom || lastDay.from;
+        }
+        return fallbackHome;
+      }
+      continue;
+    }
+    const cityName = getLegBaseCityName(prev);
+    if (cityName && cityName !== 'Home') return cityName;
+  }
+  return fallbackHome;
+}
+
+function updateLegOriginHelperUI(inferredOriginCity) {
+  const helperGroup = document.getElementById('legOriginHelperGroup');
+  const helperCity = document.getElementById('legOriginHelperCity');
+  const legType = document.getElementById('legTypeSelect')?.value || 'city';
+  if (!helperGroup || !helperCity) return;
+  if (legType === 'city' && inferredOriginCity) {
+    helperCity.textContent = inferredOriginCity;
+    helperGroup.style.display = 'flex';
+  } else {
+    helperGroup.style.display = 'none';
+  }
+}
+
 function autoGenerateMissingTransitLegs(legsList) {
   if (!window.journeys || window.journeys.length === 0) return 0;
   
@@ -2479,14 +2546,6 @@ function autoGenerateMissingTransitLegs(legsList) {
   }
 
   // Numbering phase
-  function isTerminalLeg(leg) {
-    if (!leg) return false;
-    const lid = String(leg.id || '').toLowerCase();
-    const lbl = String(leg.label || '').toLowerCase();
-    return lid === 'departure' || lid === 'return' || lid.endsWith('-start') || lid.endsWith('-finish') ||
-      lbl.includes('departure') || lbl.includes('return') || lbl.includes('(trip start)') || lbl.includes('(trip finish)');
-  }
-
   const cityCounts = {};
   legsList.forEach(leg => {
     if (leg.label && !isTerminalLeg(leg)) {
@@ -3121,13 +3180,21 @@ function onEditLegSelectionChange() {
     setSelectValueMatchingCity(existingCitySelect, resolvedCityName || rawTo, '');
   } else {
     // standard destination city leg
-    setSelectValueMatchingCity(existingCitySelect, resolvedCityName || rawTo || rawFrom, '');
-    setSelectValueMatchingCity(fromCitySelect, resolvedCityName || rawFrom || 'Home', 'Home');
-    setSelectValueMatchingCity(toCitySelect, resolvedCityName || rawTo || '', '');
+    const homeCityName = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
+    const inferredPriorCity = getPriorLegCity(sourceLegs, selected, homeCityName);
+    const destCity = resolvedCityName || rawTo || rawFrom;
+
+    setSelectValueMatchingCity(existingCitySelect, destCity, '');
+    setSelectValueMatchingCity(fromCitySelect, rawFrom || inferredPriorCity || destCity, 'Home');
+    setSelectValueMatchingCity(toCitySelect, destCity || '', '');
+    updateLegOriginHelperUI(inferredPriorCity);
   }
 
   // Ensure appropriate selection groups and labels are displayed for the leg type
   onLegTypeChange();
+  if (legType !== 'city') {
+    updateLegOriginHelperUI('');
+  }
 
   if (newCityName) newCityName.value = '';
   if (dateFrom) {
@@ -3971,15 +4038,17 @@ function confirmAddLeg() {
       const cityObj = (existingCity && existingCity !== 'Home') ? (typeof getCityByName === 'function' ? getCityByName(existingCity) : null) : null;
       const validCityName = cityObj ? cityObj.name : ((existingCity && existingCity !== 'Home') ? existingCity : '');
 
+      const inferredPriorCity = getPriorLegCity(legDialogState.stagedLegs, legDialogState.editLegIdx, homeCityName);
+
       if (validCityName) {
         const flag = typeof getCityFlag === 'function' ? getCityFlag(validCityName) : '📍';
         target.label = flag + ' ' + validCityName;
-        fromCity = validCityName;
+        fromCity = inferredPriorCity || validCityName;
         toCity = validCityName;
         if (cityObj) target.cityId = cityObj.id;
       } else {
         const firstDay = target.days?.[0] || {};
-        fromCity = selectedFrom || firstDay.from || target.label;
+        fromCity = selectedFrom || inferredPriorCity || firstDay.from || target.label;
         toCity = existingCity || firstDay.to || target.label;
       }
     }
@@ -4091,26 +4160,6 @@ function confirmAddLeg() {
       }
     }
 
-    const legPayload = {
-      id: 'leg_' + Date.now(),
-      label: label,
-      colour: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'),
-      cityFood: [{ text: "Local dish to try", done: false }],
-      cityRun: [{ title: "5km park loop", estTime: "1 hr", estCost: "0", assignedDayIdx: null }],
-      suggestedSights: [],
-      legTips: ["Add tip..."],
-      days: buildLegDaysWithNotes({
-        dateFrom,
-        dateTo,
-        fromCity,
-        toCity,
-        legType,
-        dayNotes
-      })
-    };
-    if (matchedCityObj && matchedCityObj.id) {
-      legPayload.cityId = matchedCityObj.id;
-    }
     if (!Array.isArray(legDialogState.stagedLegs)) {
       legDialogState.stagedLegs = [];
     }
@@ -4133,6 +4182,33 @@ function confirmAddLeg() {
     }
 
     insertionIdx = Math.max(0, Math.min(insertionIdx, legDialogState.stagedLegs.length));
+
+    if (legType === 'city') {
+      const inferredPriorCity = getPriorLegCity(legDialogState.stagedLegs, insertionIdx, homeCityName);
+      fromCity = inferredPriorCity || toCity || 'Home';
+    }
+
+    const legPayload = {
+      id: 'leg_' + Date.now(),
+      label: label,
+      colour: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'),
+      cityFood: [{ text: "Local dish to try", done: false }],
+      cityRun: [{ title: "5km park loop", estTime: "1 hr", estCost: "0", assignedDayIdx: null }],
+      suggestedSights: [],
+      legTips: ["Add tip..."],
+      days: buildLegDaysWithNotes({
+        dateFrom,
+        dateTo,
+        fromCity,
+        toCity,
+        legType,
+        dayNotes
+      })
+    };
+    if (matchedCityObj && matchedCityObj.id) {
+      legPayload.cityId = matchedCityObj.id;
+    }
+
     legDialogState.stagedLegs.splice(insertionIdx, 0, legPayload);
 
     const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
