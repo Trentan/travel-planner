@@ -3749,6 +3749,7 @@ function cleanCityNavLabel(value) {
       .replace(/[\u{2700}-\u{27BF}]/gu, '')
       .replace(/\p{Emoji}/gu, '')
       .replace(/\s*\([^)]*\)/gu, '')
+      .replace(/\s*<[^>]*>/gu, '')
       .replace(/[^\w\s-]/gu, '')
       .trim();
 }

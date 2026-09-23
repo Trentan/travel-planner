@@ -2185,9 +2185,24 @@ function _populateAddLegCityDropdowns() {
       : (appData || []);
     sourceLegs.forEach((leg, idx) => {
       const firstDay = leg?.days?.[0];
+      const lastDay = leg?.days?.[leg?.days?.length - 1] || firstDay;
       const legDate = firstDay?.date || '';
-      const label = `${idx + 1}. ${leg?.label || 'Untitled leg'}${legDate ? ` (${legDate})` : ''}`;
-      options.push(`<option value="${idx}">${label}</option>`);
+      const isTerminal = typeof isTerminalLeg === 'function' ? isTerminalLeg(leg) : (idx === 0 || idx === sourceLegs.length - 1);
+      const daysCount = Array.isArray(leg?.days) ? leg.days.length : 0;
+      const isSameDay = daysCount === 1 || (daysCount > 1 && firstDay?.date && lastDay?.date && firstDay.date === lastDay.date);
+      const isTransit = !isTerminal && (leg?.type === 'transit' || isSameDay || (leg?.label || '').toLowerCase().includes('transit'));
+
+      let baseLabel = (leg?.label || 'Untitled leg').trim();
+      if (isTransit) {
+        if (!/<transit>/i.test(baseLabel) && !/\(transit\)/i.test(baseLabel)) {
+          baseLabel = `${baseLabel} <Transit>`;
+        } else if (/\(transit\)/i.test(baseLabel)) {
+          baseLabel = baseLabel.replace(/\s*\(transit\)/i, ' <Transit>');
+        }
+      }
+      const rawLabel = `${idx + 1}. ${baseLabel}${legDate ? ` (${legDate})` : ''}`;
+      const safeLabel = typeof escapeHtmlText === 'function' ? escapeHtmlText(rawLabel) : rawLabel;
+      options.push(`<option value="${idx}">${safeLabel}</option>`);
     });
     editLegSelect.innerHTML = options.join('');
     if (currentValue && (currentValue === 'ADD_NEW' || Number.isFinite(Number(currentValue)))) {
@@ -2223,8 +2238,19 @@ function _populateLegPlacementDropdown() {
   }
 
   legs.forEach((leg, idx) => {
-    const cleanLbl = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label || `Leg ${idx + 1}`);
-    options.push(`<option value="after_${idx}">After ${idx + 1}. ${cleanLbl}</option>`);
+    const firstDay = leg?.days?.[0];
+    const lastDay = leg?.days?.[leg?.days?.length - 1] || firstDay;
+    const isTerminal = typeof isTerminalLeg === 'function' ? isTerminalLeg(leg) : (idx === 0 || idx === legs.length - 1);
+    const daysCount = Array.isArray(leg?.days) ? leg.days.length : 0;
+    const isSameDay = daysCount === 1 || (daysCount > 1 && firstDay?.date && lastDay?.date && firstDay.date === lastDay.date);
+    const isTransit = !isTerminal && (leg?.type === 'transit' || isSameDay || (leg?.label || '').toLowerCase().includes('transit'));
+
+    let cleanLbl = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label || `Leg ${idx + 1}`);
+    if (isTransit) {
+      cleanLbl = `${cleanLbl} <Transit>`;
+    }
+    const safeLbl = typeof escapeHtmlText === 'function' ? escapeHtmlText(cleanLbl) : cleanLbl;
+    options.push(`<option value="after_${idx}">After ${idx + 1}. ${safeLbl}</option>`);
   });
 
   if (returnIdx < 0 && legs.length > 0) {
@@ -3734,9 +3760,19 @@ function renderLegReorderList() {
       ? `${daysCount - 1} night${daysCount > 2 ? 's' : ''}`
       : (daysCount === 1 ? (leg.type === 'transit' ? '✈️ Transit (same day)' : '1 day') : '0 days');
     const isEditing = legDialogState.mode === 'edit' && legDialogState.editLegIdx === idx;
-    const safeLabel = typeof escapeHtmlText === 'function' ? escapeHtmlText(leg.label || 'Untitled leg') : (leg.label || 'Untitled leg');
+    const terminal = typeof isTerminalLeg === 'function' ? isTerminalLeg(leg) : (idx === 0 || idx === legs.length - 1);
+    const isSameDay = daysCount === 1 || (daysCount > 1 && firstDay && lastDay && firstDay === lastDay);
+    const isTransit = !terminal && (leg.type === 'transit' || isSameDay || (leg.label || '').toLowerCase().includes('transit'));
 
-    const terminal = typeof isTerminalLeg === 'function' && isTerminalLeg(leg);
+    let displayLabel = (leg.label || 'Untitled leg').trim();
+    if (isTransit) {
+      if (!/<transit>/i.test(displayLabel) && !/\(transit\)/i.test(displayLabel)) {
+        displayLabel = `${displayLabel} <Transit>`;
+      } else if (/\(transit\)/i.test(displayLabel)) {
+        displayLabel = displayLabel.replace(/\s*\(transit\)/i, ' <Transit>');
+      }
+    }
+    const safeLabel = typeof escapeHtmlText === 'function' ? escapeHtmlText(displayLabel) : displayLabel;
     const isFirst = idx === 0;
     const isLast = idx === legs.length - 1;
     const isLocked = terminal && (isFirst || isLast);

@@ -913,6 +913,23 @@ async function runLegManagementWysiwygSuite() {
   assert.ok(pagerHtml.includes('✈️ Brisbane'), 'Day 1 compact chip displays ✈️ Brisbane');
   assert.strictEqual(pagerHtml.includes('✈️ Denpasar Bali'), false, 'Day 1 compact chip does NOT display ✈️ Denpasar Bali');
 
+  // 14m. Test editLegSelect and legPlacementSelect includes <Transit> for transit destinations
+  console.log('  Testing editLegSelect and legPlacementSelect includes <Transit> for transit legs...');
+  const testTransitTrip = [
+    { id: 'leg-start', label: 'Brisbane (Trip Start)', type: 'start', days: [{ date: '2026-06-08' }] },
+    { id: 'leg-tpe', label: '🇹🇼 Taipei', type: 'transit', days: [{ date: '2026-06-09' }] },
+    { id: 'leg-vie', label: '🇦🇹 Vienna', type: 'city', days: [{ date: '2026-06-10' }, { date: '2026-06-11' }] },
+    { id: 'leg-ret', label: 'Brisbane (Trip Finish)', type: 'return', days: [{ date: '2026-06-12' }] }
+  ];
+  setLegDialogState({ mode: 'add', editLegIdx: null, stagedLegs: testTransitTrip, originalLegDates: {} });
+  _populateAddLegCityDropdowns();
+  const selectHtml = elements['editLegSelect'].innerHTML;
+  assert.ok(selectHtml.includes('Taipei &lt;Transit&gt; (2026-06-09)'), 'Taipei transit leg option includes <Transit> tag in editLegSelect');
+  assert.strictEqual(selectHtml.includes('Vienna &lt;Transit&gt;'), false, 'Vienna multi-day city stay does NOT have <Transit> tag');
+
+  const test14mPlacementHtml = elements['legPlacementSelect'].innerHTML;
+  assert.ok(test14mPlacementHtml.includes('Taipei &lt;Transit&gt;'), 'Placement dropdown includes <Transit> for transit legs');
+
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }
 
