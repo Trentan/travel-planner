@@ -5053,19 +5053,23 @@ function normalizeTripLegsData(legs) {
     if (!Array.isArray(leg.days)) leg.days = [];
     if (!Array.isArray(leg.suggestedActivities)) leg.suggestedActivities = [];
 
-    // Step 1: Infer and persist leg.type if not already set
-    if (!leg.type) {
-      const lid = String(leg.id || '').toLowerCase();
-      const lbl = String(leg.label || '').toLowerCase();
-      if (lid === 'departure' || lid.endsWith('-start') || lbl.includes('(trip start)') || (lbl.includes('start') && !lbl.includes('breakfast') && !lbl.includes('kickstart'))) {
-        leg.type = 'start';
-      } else if (lid === 'return' || lid.endsWith('-finish') || lbl.includes('(trip finish)') || lbl.includes('(trip end)') || (lbl.includes('return') && !lbl.includes('restaurant'))) {
-        leg.type = 'return';
-      } else if (lbl.startsWith('✈') || (lbl.includes(' to ') && !lbl.includes('things to do')) || lbl.includes('transit')) {
-        leg.type = 'transit';
-      } else {
-        leg.type = 'city';
-      }
+    // Step 1: Infer and persist leg.type: start/return for terminal legs, transit for same-day intermediate, city for multi-day
+    const lid = String(leg.id || '').toLowerCase();
+    const lbl = String(leg.label || '').toLowerCase();
+    const isExplicitStart = leg.type === 'start' || lid === 'departure' || lid.endsWith('-start') || lbl.includes('(trip start)') || (lbl.includes('start') && !lbl.includes('breakfast') && !lbl.includes('kickstart'));
+    const isExplicitReturn = leg.type === 'return' || lid === 'return' || lid.endsWith('-finish') || lbl.includes('(trip finish)') || lbl.includes('(trip end)') || (lbl.includes('return') && !lbl.includes('restaurant'));
+
+    const days = leg.days || [];
+    const isSameDay = days.length === 1 || (days.length > 0 && days[0].date && days[days.length - 1].date && days[0].date === days[days.length - 1].date);
+
+    if (isExplicitStart) {
+      leg.type = 'start';
+    } else if (isExplicitReturn) {
+      leg.type = 'return';
+    } else if (isSameDay || lbl.includes('transit') || leg.type === 'travel' || leg.type === 'transit') {
+      leg.type = 'transit';
+    } else {
+      leg.type = 'city';
     }
 
     const suggested = leg.suggestedActivities;

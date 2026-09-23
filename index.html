@@ -1039,11 +1039,12 @@
               </select>
               <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">Subsequent legs and return dates shift automatically.</span>
             </div>
-            <div class="ai-form-group">
+            <div class="ai-form-group" style="display: none;">
               <label class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">Leg Type</label>
               <select id="legTypeSelect" class="form-control" onchange="onLegTypeChange()">
                 <option value="start">🏠 Start (Departure from Home)</option>
                 <option value="city" selected>📍 City (Destination)</option>
+                <option value="transit">✈️ Transit (Same-day stop)</option>
                 <option value="travel">✈️ Travel (City to City)</option>
                 <option value="return">🏡 Return (Arrival at Home)</option>
               </select>
@@ -1099,7 +1100,7 @@
                   <input type="number" id="legDurationNights" min="0" max="90" value="3" class="form-control text-center font-bold" oninput="onLegDurationInputChange()" onchange="onLegDurationInputChange()">
                   <button type="button" class="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 font-bold text-sm" onclick="stepLegDuration(1)" title="Increase nights">+</button>
                 </div>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 text-center block">nights</span>
+                <span id="legDurationSubtext" class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 text-center block">3 nights</span>
               </div>
               <div class="ai-form-group">
                 <label id="datesLabel" class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">Ends On</label>

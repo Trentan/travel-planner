@@ -72,6 +72,7 @@ createMockElement('newCityInlineGroup');
 createMockElement('toggleNewCityBtn');
 createMockElement('legTerminalWarningBanner');
 createMockElement('legTerminalWarningMsg');
+createMockElement('legDurationSubtext');
 
 global.document = {
   body: {
@@ -779,6 +780,56 @@ async function runLegManagementWysiwygSuite() {
   onLegTypeChange();
   assert.strictEqual(elements['fromCitySelect'].disabled, false, 'fromCitySelect unlocked for city leg');
   assert.strictEqual(elements['toCitySelect'].disabled, false, 'toCitySelect unlocked for city leg');
+
+  // 14h. Test automatic transit vs city classification in confirmAddLeg
+  // Case 1: Same day leg (startDate === endDate, 0 nights) -> Automatically classified as 'transit' with '(Transit)' in label
+  elements['editLegSelect'].value = 'ADD_NEW';
+  elements['newLegStartDate'].value = '2026-06-20';
+  elements['newLegEndDate'].value = '2026-06-20';
+  elements['legDurationNights'].value = '0';
+  elements['existingCitySelect'].value = 'Doha';
+  elements['legPlacementSelect'].value = 'before_return';
+  setLegDialogState({ mode: 'add', editLegIdx: null, stagedLegs: JSON.parse(JSON.stringify(testTripLegs)), originalLegDates: {} });
+  confirmAddLeg();
+  const addedTransitLeg = legDialogState.stagedLegs.find(l => (l.label || '').includes('Doha'));
+  assert.ok(addedTransitLeg, 'Doha transit leg added to stagedLegs');
+  assert.strictEqual(addedTransitLeg.type, 'transit', 'Same-day leg automatically typed as transit');
+  assert.ok(addedTransitLeg.label.includes('(Transit)'), 'Transit leg has (Transit) suffix');
+
+  // Case 2: Multi-day leg (startDate < endDate, 2 nights) -> Automatically classified as 'city'
+  elements['newLegStartDate'].value = '2026-06-21';
+  elements['newLegEndDate'].value = '2026-06-23';
+  elements['legDurationNights'].value = '2';
+  elements['existingCitySelect'].value = 'Berlin';
+  confirmAddLeg();
+  const addedCityLeg = legDialogState.stagedLegs.find(l => (l.label || '').includes('Berlin'));
+  assert.ok(addedCityLeg, 'Berlin city leg added to stagedLegs');
+  assert.strictEqual(addedCityLeg.type, 'city', 'Multi-day leg automatically typed as city');
+  assert.strictEqual(addedCityLeg.label.includes('(Transit)'), false, 'City leg does NOT have (Transit) suffix');
+
+  // 14i. Test updateLegDurationSubtext
+  updateLegDurationSubtext(0);
+  assert.strictEqual(elements['legDurationSubtext'].textContent, '0 nights • ✈️ Transit (same-day stop)', '0 nights displays transit explanation');
+  updateLegDurationSubtext(1);
+  assert.strictEqual(elements['legDurationSubtext'].textContent, '1 night', '1 night displays singular');
+  updateLegDurationSubtext(4);
+  assert.strictEqual(elements['legDurationSubtext'].textContent, '4 nights', '4 nights displays plural');
+
+  // 14j. Test normalizeTripLegsData automatic inference
+  const sampleLegs = [
+    { label: 'Brisbane (Trip Start)', days: [{ date: '2026-06-10', from: 'Brisbane', to: 'Singapore' }] },
+    { label: '🇸🇬 Singapore', days: [{ date: '2026-06-11', from: 'Brisbane', to: 'Singapore' }] }, // single day -> transit
+    { label: '🇫🇷 Paris', days: [
+      { date: '2026-06-12', from: 'Singapore', to: 'Paris' },
+      { date: '2026-06-13', from: 'Paris', to: 'Paris' }
+    ] }, // multi-day -> city
+    { label: 'Brisbane (Trip Finish)', days: [{ date: '2026-06-14', from: 'Paris', to: 'Brisbane' }] }
+  ];
+  normalizeTripLegsData(sampleLegs);
+  assert.strictEqual(sampleLegs[0].type, 'start', 'First terminal leg typed as start');
+  assert.strictEqual(sampleLegs[1].type, 'transit', 'Single-day intermediate leg typed as transit');
+  assert.strictEqual(sampleLegs[2].type, 'city', 'Multi-day intermediate leg typed as city');
+  assert.strictEqual(sampleLegs[3].type, 'return', 'Final terminal leg typed as return');
 
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }
