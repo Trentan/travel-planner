@@ -2370,10 +2370,12 @@ function regenerateItineraryFromJourneys(linkedJourneys, legId) {
 
 function isTerminalLeg(leg) {
   if (!leg) return false;
+  // Prefer stored leg.type field (set by normalizeTripLegsData)
+  if (leg.type === 'start' || leg.type === 'return') return true;
   const lid = String(leg.id || '').toLowerCase();
   const lbl = String(leg.label || '').toLowerCase();
   return lid === 'departure' || lid === 'return' || lid.endsWith('-start') || lid.endsWith('-finish') ||
-    lbl.includes('departure') || lbl.includes('return') || lbl.includes('(trip start)') || lbl.includes('(trip finish)');
+    lbl.includes('(trip start)') || lbl.includes('(trip finish)');
 }
 
 function getLegBaseCityName(leg) {
@@ -2395,31 +2397,26 @@ function getLegBaseCityName(leg) {
 
 function getPriorLegCity(legs, targetIdx, fallbackHome = 'Home') {
   if (!Array.isArray(legs) || targetIdx <= 0) return fallbackHome;
+  // Use titleData.homeCity as the canonical home name if available
+  const homeCity = (typeof titleData !== 'undefined' && titleData && titleData.homeCity)
+    ? String(titleData.homeCity).trim()
+    : fallbackHome;
   for (let i = targetIdx - 1; i >= 0; i--) {
     const prev = legs[i];
     if (!prev) continue;
     if (isTerminalLeg(prev)) {
       const lid = String(prev.id || '').toLowerCase();
       const lbl = String(prev.label || '').toLowerCase();
-      if (lid.endsWith('-start') || lbl.includes('start') || lid === 'departure') {
-        const firstDay = (prev.days && prev.days.length > 0) ? prev.days[0] : null;
-        const lastDay = (prev.days && prev.days.length > 0) ? prev.days[prev.days.length - 1] : null;
-        if (firstDay && firstDay.from && firstDay.from !== 'Home') {
-          const cleanFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(firstDay.from) : firstDay.from;
-          return cleanFrom || firstDay.from;
-        }
-        if (lastDay && lastDay.from && lastDay.from !== 'Home') {
-          const cleanFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(lastDay.from) : lastDay.from;
-          return cleanFrom || lastDay.from;
-        }
-        return fallbackHome;
+      // For start-type legs, always return canonical home city (never read firstDay.from which may be corrupted)
+      if (prev.type === 'start' || lid.endsWith('-start') || lbl.includes('(trip start)') || lid === 'departure') {
+        return homeCity;
       }
       continue;
     }
     const cityName = getLegBaseCityName(prev);
     if (cityName && cityName !== 'Home') return cityName;
   }
-  return fallbackHome;
+  return homeCity;
 }
 
 function updateLegOriginHelperUI(inferredOriginCity) {

@@ -5053,6 +5053,21 @@ function normalizeTripLegsData(legs) {
     if (!Array.isArray(leg.days)) leg.days = [];
     if (!Array.isArray(leg.suggestedActivities)) leg.suggestedActivities = [];
 
+    // Step 1: Infer and persist leg.type if not already set
+    if (!leg.type) {
+      const lid = String(leg.id || '').toLowerCase();
+      const lbl = String(leg.label || '').toLowerCase();
+      if (lid === 'departure' || lid.endsWith('-start') || lbl.includes('(trip start)') || (lbl.includes('start') && !lbl.includes('breakfast') && !lbl.includes('kickstart'))) {
+        leg.type = 'start';
+      } else if (lid === 'return' || lid.endsWith('-finish') || lbl.includes('(trip finish)') || lbl.includes('(trip end)') || (lbl.includes('return') && !lbl.includes('restaurant'))) {
+        leg.type = 'return';
+      } else if (lbl.startsWith('✈') || (lbl.includes(' to ') && !lbl.includes('things to do')) || lbl.includes('transit')) {
+        leg.type = 'transit';
+      } else {
+        leg.type = 'city';
+      }
+    }
+
     const suggested = leg.suggestedActivities;
 
     // Guarantee unique IDs and valid titles for all suggested activities
@@ -5073,6 +5088,7 @@ function normalizeTripLegsData(legs) {
 
     (leg.days || []).forEach((day, dayIdx) => {
       day.date = normalizeTripDateValue(day.date);
+      // Strip (Trip Start/Finish/End) suffix from day.from and day.to
       if (day.from && /\(trip (start|finish|end)\)/i.test(day.from)) {
         const cleanedFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(day.from) : day.from.replace(/\s*\(trip (start|finish|end)\)/i, '').trim();
         if (cleanedFrom) day.from = cleanedFrom;
@@ -5081,6 +5097,11 @@ function normalizeTripLegsData(legs) {
         const cleanedTo = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(day.to) : day.to.replace(/\s*\(trip (start|finish|end)\)/i, '').trim();
         if (cleanedTo) day.to = cleanedTo;
       }
+      // Strip trailing numbered suffixes e.g. "Brisbane (1)" or "Bangkok (2)" injected by leg numbering
+      const _numSuffixRe = /\s*\(\d+\)$/;
+      if (day.from && _numSuffixRe.test(day.from)) day.from = day.from.replace(_numSuffixRe, '').trim();
+      if (day.to && _numSuffixRe.test(day.to)) day.to = day.to.replace(_numSuffixRe, '').trim();
+
       if ((!Array.isArray(day.activityItems) || day.activityItems.length === 0) && Array.isArray(day.activities) && day.activities.length > 0) {
         day.activityItems = day.activities;
       }
