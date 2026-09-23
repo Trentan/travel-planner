@@ -976,6 +976,12 @@
           </button>
         </div>
 
+        <!-- Missing Terminal Leg Warning Banner -->
+        <div id="legTerminalWarningBanner" class="p-2.5 mb-2 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-700 dark:text-amber-300 font-semibold flex items-center gap-2" style="display: none;" role="alert">
+          <span class="text-base shrink-0">⚠️</span>
+          <span id="legTerminalWarningMsg" class="flex-1 leading-snug"></span>
+        </div>
+
         <!-- 1. Dedicated Reorder Sequence View -->
         <div id="legReorderSection">
           <div class="flex items-center justify-between gap-2 mb-2.5 px-0.5">
@@ -995,8 +1001,8 @@
               <button type="button" class="action-btn text-xs sm:text-sm text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800 hover:bg-teal-50 dark:hover:bg-teal-950/40" onclick="switchLegModalTab('edit'); resetLegDialogToAddNew();">
                 + Add New Leg
               </button>
-              <button type="button" id="rebuildLegsSequenceBtn" class="action-btn text-xs sm:text-sm text-slate-700 dark:text-slate-200" onclick="rebuildItineraryAndDataMappings({ showToast: true })" title="Rebuild itinerary and synchronize all data mappings">
-                <span class="rebuild-icon">🔄</span> Rebuild
+              <button type="button" id="rebuildLegsSequenceBtn" class="action-btn text-xs sm:text-sm text-slate-700 dark:text-slate-200" onclick="if (typeof rebuildLegRouting === 'function') rebuildLegRouting(appData); if (typeof saveData === 'function') saveData(false); if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll(); if (typeof showToast === 'function') showToast('Leg routing rebuilt from sequence!');" title="Re-derive all travel directions from the leg order (non-destructive)">
+                <span class="rebuild-icon">🗺️</span> Fix Routing
               </button>
             </div>
             <div class="flex items-center gap-2">
@@ -1034,11 +1040,12 @@
               <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">Subsequent legs and return dates shift automatically.</span>
             </div>
             <div class="ai-form-group" style="display: none;">
-              <label>Leg Type</label>
+              <label class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">Leg Type</label>
               <select id="legTypeSelect" class="form-control" onchange="onLegTypeChange()">
                 <option value="start">🏠 Start (Departure from Home)</option>
-                <option value="travel">✈️ Travel (City to City)</option>
                 <option value="city" selected>📍 City (Destination)</option>
+                <option value="transit">✈️ Transit (Same-day stop)</option>
+                <option value="travel">✈️ Travel (City to City)</option>
                 <option value="return">🏡 Return (Arrival at Home)</option>
               </select>
             </div>
@@ -1093,7 +1100,7 @@
                   <input type="number" id="legDurationNights" min="0" max="90" value="3" class="form-control text-center font-bold" oninput="onLegDurationInputChange()" onchange="onLegDurationInputChange()">
                   <button type="button" class="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 font-bold text-sm" onclick="stepLegDuration(1)" title="Increase nights">+</button>
                 </div>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 text-center block">nights</span>
+                <span id="legDurationSubtext" class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 text-center block">3 nights</span>
               </div>
               <div class="ai-form-group">
                 <label id="datesLabel" class="text-xs text-slate-700 dark:text-slate-300 font-medium mb-1 block">Ends On</label>
@@ -1108,8 +1115,8 @@
           <div class="modal-footer modal-footer-space-between modal-footer-wrap pt-3 border-t border-slate-200 dark:border-slate-800 mt-3">
             <div class="flex items-center gap-2">
               <button id="legDialogDeleteBtn" class="action-btn action-btn-danger" onclick="deleteLegFromDialog()" style="display: none;">Delete Leg</button>
-              <button type="button" id="rebuildLegsEditBtn" class="action-btn text-xs sm:text-sm text-slate-700 dark:text-slate-200" onclick="rebuildItineraryAndDataMappings({ showToast: true })" title="Rebuild itinerary and synchronize all data mappings">
-                <span class="rebuild-icon">🔄</span> Rebuild
+              <button type="button" id="rebuildLegsEditBtn" class="action-btn text-xs sm:text-sm text-slate-700 dark:text-slate-200" onclick="if (typeof rebuildTripFromLegs === 'function') rebuildTripFromLegs({ showToast: true, forceRebuildDays: true, message: 'Days rebuilt from transport & stays!' }); else if (typeof rebuildItineraryAndDataMappings === 'function') rebuildItineraryAndDataMappings({ showToast: true, forceRebuild: true });" title="Force-rebuild all day cards from your saved transport and accommodation">
+                <span class="rebuild-icon">🔄</span> Sync from Transport
               </button>
             </div>
             <div class="journey-footer-actions ml-auto">

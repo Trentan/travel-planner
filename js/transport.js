@@ -2074,11 +2074,20 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
   const fromCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === fromLocation) : null;
   const toCity = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === toLocation) : null;
 
+  let resolvedLegId = '';
+  if (toLocation && typeof appData !== 'undefined' && Array.isArray(appData)) {
+    const matchedLeg = appData.find(leg => {
+      const baseName = typeof getLegBaseCityName === 'function' ? getLegBaseCityName(leg) : '';
+      return baseName && baseName.toLowerCase() === toLocation.toLowerCase();
+    });
+    if (matchedLeg) resolvedLegId = matchedLeg.id;
+  }
+
   return {
     id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
     journeyId: _pendingJourneyId,
     journeyName: '',
-    legId: '',
+    legId: resolvedLegId,
     dayDate: dateFrom,
     fromLocation: fromLocation,
     toLocation: toLocation,

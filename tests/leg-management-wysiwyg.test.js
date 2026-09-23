@@ -13,6 +13,7 @@ global.localStorage = {
 
 global.window = global;
 global.window.addEventListener = () => {};
+global.isEditMode = false;
 
 const elements = {};
 function createMockElement(id, initialProps = {}) {
@@ -70,6 +71,9 @@ createMockElement('newLegCityCountrySelect');
 createMockElement('newLegCityCountryOther');
 createMockElement('newCityInlineGroup');
 createMockElement('toggleNewCityBtn');
+createMockElement('legTerminalWarningBanner');
+createMockElement('legTerminalWarningMsg');
+createMockElement('legDurationSubtext');
 
 global.document = {
   body: {
@@ -99,6 +103,7 @@ require('../js/utils.js');
 require('../js/timezone.js');
 require('../js/data.js');
 require('../js/crud.js');
+require('../js/itinerary.js');
 
 async function runLegManagementWysiwygSuite() {
   console.log('Running Leg Management & WYSIWYG Drag-and-Drop test suite...');
@@ -703,6 +708,227 @@ async function runLegManagementWysiwygSuite() {
   const isSameDayValid = validateLegEditorForm();
   assert.strictEqual(isSameDayValid, true, 'Validation passes for same-day leg');
   assert.strictEqual(elements['legDialogSaveBtn'].disabled, false, 'Save button enabled for same-day leg');
+
+  // 14. Test Issue #428 Leg Management, Terminal Leg Enforcement & Rebuild
+  console.log('  Testing Issue #428 Leg Management, Terminal Leg Enforcement & Rebuild...');
+  
+  // 14a. Test isTerminalLeg prefers leg.type
+  assert.strictEqual(isTerminalLeg({ type: 'start' }), true, 'isTerminalLeg recognizes type: start');
+  assert.strictEqual(isTerminalLeg({ type: 'return' }), true, 'isTerminalLeg recognizes type: return');
+  assert.strictEqual(isTerminalLeg({ type: 'city' }), false, 'isTerminalLeg returns false for type: city');
+  assert.strictEqual(isTerminalLeg({ label: 'Brisbane (Trip Start)' }), true, 'isTerminalLeg recognizes legacy Trip Start label');
+
+  // 14b. Test enforceTerminalLegs ensures start and return terminal legs
+  const testTripLegs = [
+    { id: 'leg-paris', label: '🇫🇷 Paris', type: 'city', days: [
+      { date: '2026-06-12', from: 'Paris', to: 'Paris' },
+      { date: '2026-06-13', from: 'Paris', to: 'Paris' }
+    ]},
+    { id: 'leg-rome', label: '🇮🇹 Rome', type: 'city', days: [
+      { date: '2026-06-14', from: 'Rome', to: 'Rome' },
+      { date: '2026-06-15', from: 'Rome', to: 'Rome' }
+    ]}
+  ];
+  enforceTerminalLegs(testTripLegs);
+  assert.strictEqual(testTripLegs.length, 4, 'enforceTerminalLegs prepended start leg and appended return leg');
+  assert.strictEqual(testTripLegs[0].type, 'start', 'First leg is start type');
+  assert.strictEqual(testTripLegs[testTripLegs.length - 1].type, 'return', 'Last leg is return type');
+
+  // 14c. Test rebuildLegRouting establishes correct sequence-based routing
+  rebuildLegRouting(testTripLegs);
+  assert.strictEqual(testTripLegs[0].days[0].from, 'Brisbane', 'Start leg departs from Home (Brisbane)');
+  assert.strictEqual(testTripLegs[0].days[0].to, 'Paris', 'Start leg arrives at first destination (Paris)');
+  assert.strictEqual(testTripLegs[1].days[0].from, 'Brisbane', 'Paris day 1 arrives from Brisbane');
+  assert.strictEqual(testTripLegs[1].days[1].to, 'Rome', 'Paris day 2 departs for Rome');
+  assert.strictEqual(testTripLegs[2].days[0].from, 'Paris', 'Rome day 1 arrives from Paris');
+  assert.strictEqual(testTripLegs[2].days[1].to, 'Brisbane', 'Rome day 2 departs to Brisbane');
+  assert.strictEqual(testTripLegs[3].days[0].from, 'Rome', 'Return leg departs from Rome');
+  assert.strictEqual(testTripLegs[3].days[0].to, 'Brisbane', 'Return leg returns to Home (Brisbane)');
+
+  // 14d. Test renderLegReorderList locks terminal legs with padlock icon
+  setLegDialogState({ mode: 'add', editLegIdx: null, stagedLegs: testTripLegs, originalLegDates: {} });
+  renderLegReorderList();
+  assert.strictEqual(elements['legReorderList'].innerHTML.includes('🔒'), true, 'Reorder list renders 🔒 padlock for terminal legs');
+  assert.strictEqual(elements['legReorderList'].innerHTML.includes('draggable="false"'), true, 'Terminal legs have draggable=false');
+
+  // 14e. Test moveLegInSequence guards against moving terminal legs or moving into terminal positions
+  const originalOrder = testTripLegs.map(l => l.id);
+  moveLegInSequence(0, 1);
+  assert.strictEqual(testTripLegs[0].id, originalOrder[0], 'moveLegInSequence blocked moving start leg away from position 0');
+  moveLegInSequence(1, 0);
+  assert.strictEqual(testTripLegs[0].id, originalOrder[0], 'moveLegInSequence blocked moving regular leg into start leg position 0');
+  moveLegInSequence(testTripLegs.length - 1, testTripLegs.length - 2);
+  assert.strictEqual(testTripLegs[testTripLegs.length - 1].id, originalOrder[testTripLegs.length - 1], 'moveLegInSequence blocked moving return leg away from final position');
+
+  // 14f. Test _populateLegPlacementDropdown omits "At start of trip" when start leg exists
+  _populateLegPlacementDropdown();
+  const placementHtml = elements['legPlacementSelect'].innerHTML;
+  assert.strictEqual(placementHtml.includes('value="start"'), false, 'Placement dropdown excludes "At start of trip" when start leg is present');
+
+  // 14g. Test onLegTypeChange locks fromCitySelect to Home for start legs
+  elements['legTypeSelect'].value = 'start';
+  onLegTypeChange();
+  assert.strictEqual(elements['fromCitySelect'].disabled, true, 'fromCitySelect disabled/locked for start leg');
+  assert.strictEqual(elements['fromCitySelect'].value, 'Home', 'fromCitySelect pre-set to Home for start leg');
+
+  // Test onLegTypeChange locks toCitySelect to Home for return legs
+  elements['legTypeSelect'].value = 'return';
+  onLegTypeChange();
+  assert.strictEqual(elements['toCitySelect'].disabled, true, 'toCitySelect disabled/locked for return leg');
+  assert.strictEqual(elements['toCitySelect'].value, 'Home', 'toCitySelect pre-set to Home for return leg');
+
+  // Reset to city
+  elements['legTypeSelect'].value = 'city';
+  onLegTypeChange();
+  assert.strictEqual(elements['fromCitySelect'].disabled, false, 'fromCitySelect unlocked for city leg');
+  assert.strictEqual(elements['toCitySelect'].disabled, false, 'toCitySelect unlocked for city leg');
+
+  // 14h. Test automatic transit vs city classification in confirmAddLeg
+  // Case 1: Same day leg (startDate === endDate, 0 nights) -> Automatically classified as 'transit' with '(Transit)' in label
+  elements['editLegSelect'].value = 'ADD_NEW';
+  elements['newLegStartDate'].value = '2026-06-20';
+  elements['newLegEndDate'].value = '2026-06-20';
+  elements['legDurationNights'].value = '0';
+  elements['existingCitySelect'].value = 'Doha';
+  elements['legPlacementSelect'].value = 'before_return';
+  setLegDialogState({ mode: 'add', editLegIdx: null, stagedLegs: JSON.parse(JSON.stringify(testTripLegs)), originalLegDates: {} });
+  confirmAddLeg();
+  const addedTransitLeg = legDialogState.stagedLegs.find(l => (l.label || '').includes('Doha'));
+  assert.ok(addedTransitLeg, 'Doha transit leg added to stagedLegs');
+  assert.strictEqual(addedTransitLeg.type, 'transit', 'Same-day leg automatically typed as transit');
+  assert.ok(addedTransitLeg.label.includes('(Transit)'), 'Transit leg has (Transit) suffix');
+
+  // Case 2: Multi-day leg (startDate < endDate, 2 nights) -> Automatically classified as 'city'
+  elements['newLegStartDate'].value = '2026-06-21';
+  elements['newLegEndDate'].value = '2026-06-23';
+  elements['legDurationNights'].value = '2';
+  elements['existingCitySelect'].value = 'Berlin';
+  confirmAddLeg();
+  const addedCityLeg = legDialogState.stagedLegs.find(l => (l.label || '').includes('Berlin'));
+  assert.ok(addedCityLeg, 'Berlin city leg added to stagedLegs');
+  assert.strictEqual(addedCityLeg.type, 'city', 'Multi-day leg automatically typed as city');
+  assert.strictEqual(addedCityLeg.label.includes('(Transit)'), false, 'City leg does NOT have (Transit) suffix');
+
+  // 14i. Test updateLegDurationSubtext
+  updateLegDurationSubtext(0);
+  assert.strictEqual(elements['legDurationSubtext'].textContent, '0 nights • ✈️ Transit (same-day stop)', '0 nights displays transit explanation');
+  updateLegDurationSubtext(1);
+  assert.strictEqual(elements['legDurationSubtext'].textContent, '1 night', '1 night displays singular');
+  updateLegDurationSubtext(4);
+  assert.strictEqual(elements['legDurationSubtext'].textContent, '4 nights', '4 nights displays plural');
+
+  // 14j. Test normalizeTripLegsData automatic inference
+  const sampleLegs = [
+    { label: 'Brisbane (Trip Start)', days: [{ date: '2026-06-10', from: 'Brisbane', to: 'Singapore' }] },
+    { label: '🇸🇬 Singapore', days: [{ date: '2026-06-11', from: 'Brisbane', to: 'Singapore' }] }, // single day -> transit
+    { label: '🇫🇷 Paris', days: [
+      { date: '2026-06-12', from: 'Singapore', to: 'Paris' },
+      { date: '2026-06-13', from: 'Paris', to: 'Paris' }
+    ] }, // multi-day -> city
+    { label: 'Brisbane (Trip Finish)', days: [{ date: '2026-06-14', from: 'Paris', to: 'Brisbane' }] }
+  ];
+  normalizeTripLegsData(sampleLegs);
+  assert.strictEqual(sampleLegs[0].type, 'start', 'First terminal leg typed as start');
+  assert.strictEqual(sampleLegs[1].type, 'transit', 'Single-day intermediate leg typed as transit');
+  assert.strictEqual(sampleLegs[2].type, 'city', 'Multi-day intermediate leg typed as city');
+  assert.strictEqual(sampleLegs[3].type, 'return', 'Final terminal leg typed as return');
+
+  // 14k. Test rebuildTripFromLegs preserves destination city days during Sync from Transport (Issue #428)
+  console.log('  Testing rebuildTripFromLegs preserves destination city days during Sync from Transport (#428)...');
+  global.titleData = { homeCity: 'Melbourne', title: 'Bali 2026' };
+  global.journeys = [
+    { id: 'j-out', legId: 'leg-start', fromLocation: 'Melbourne', toLocation: 'Denpasar (DPS)', departureDate: '2026-12-13', arrivalDate: '2026-12-13' },
+    { id: 'j-ret', legId: 'leg-return', fromLocation: 'Denpasar (DPS)', toLocation: 'Melbourne', departureDate: '2026-12-21', arrivalDate: '2026-12-21' }
+  ];
+  global.stays = [
+    { id: 's-bali', city: 'Bali', checkIn: '2026-12-13', checkOut: '2026-12-21' }
+  ];
+  global.citiesData = [
+    { id: 'city-bali', name: 'Denpasar Bali', code: 'DPS' }
+  ];
+  global.appData = [
+    { id: 'leg-start', label: 'Melbourne (Trip Start)', type: 'start', days: [{ date: '2026-12-13', from: 'Melbourne', to: 'Denpasar' }] },
+    { id: 'leg-denpasar', label: 'Denpasar', type: 'city', days: [
+      { date: '2026-12-14', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-15', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-16', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-17', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-18', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-19', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-20', from: 'Denpasar', to: 'Denpasar' }
+    ]},
+    { id: 'leg-return', label: 'Melbourne (Trip Finish)', type: 'return', days: [{ date: '2026-12-21', from: 'Denpasar', to: 'Melbourne' }] }
+  ];
+  window.journeys = global.journeys;
+  window.stays = global.stays;
+
+  rebuildTripFromLegs({ showToast: false, forceRebuildDays: true });
+
+  const stLeg = global.appData.find(l => l.id === 'leg-start');
+  const denpasarLeg = global.appData.find(l => l.id === 'leg-denpasar');
+  const retLeg = global.appData.find(l => l.id === 'leg-return');
+
+  assert.strictEqual(stLeg.days.length, 1, 'Start leg has 1 departure day');
+  assert.ok(denpasarLeg.days.length >= 7, `Denpasar leg must maintain multi-day stay duration (actual: ${denpasarLeg.days.length})`);
+  assert.strictEqual(denpasarLeg.days[0].date, '2026-12-13', 'Denpasar stay begins on flight arrival / checkin date');
+  assert.strictEqual(denpasarLeg.days[denpasarLeg.days.length - 1].date, '2026-12-21', 'Denpasar stay ends on checkout / departure date');
+  assert.strictEqual(retLeg.days.length, 1, 'Return leg has 1 return day');
+
+  // 14l. Test return leg routing and buildLegDaysWithNotes sets destination to homeCity on all days (#428)
+  console.log('  Testing return leg routing and buildLegDaysWithNotes destination (#428)...');
+  const returnDays = buildLegDaysWithNotes({
+    dateFrom: '2026-12-21',
+    dateTo: '2026-12-22',
+    fromCity: 'Denpasar Bali',
+    toCity: 'Brisbane',
+    legType: 'return'
+  });
+  assert.strictEqual(returnDays.length, 2, 'Return leg spans 2 days');
+  assert.strictEqual(returnDays[0].from, 'Denpasar Bali', 'Day 1 departs from Denpasar Bali');
+  assert.strictEqual(returnDays[0].to, 'Brisbane', 'Day 1 destination is Brisbane (not Denpasar Bali)');
+  assert.strictEqual(returnDays[1].from, 'Denpasar Bali', 'Day 2 departs from Denpasar Bali');
+  assert.strictEqual(returnDays[1].to, 'Brisbane', 'Day 2 destination is Brisbane');
+
+  // Also test renderCompactDayPager for return leg day with DPS -> BNE flight
+  const mockReturnLeg = {
+    id: 'leg-ret-test',
+    label: 'Brisbane (Trip Finish)',
+    type: 'return',
+    colour: '#10b981',
+    days: returnDays
+  };
+  global.journeysByJourneyIdMap = new Map();
+  global.getDayJourneys = (date) => {
+    if (date === '2026-12-21') {
+      return [{
+        id: 'j-flight',
+        fromLocation: 'Denpasar Bali',
+        toLocation: 'Brisbane',
+        transportType: 'flight'
+      }];
+    }
+    return [];
+  };
+  const pagerHtml = renderCompactDayPager(mockReturnLeg, 0);
+  assert.ok(pagerHtml.includes('✈️ Brisbane'), 'Day 1 compact chip displays ✈️ Brisbane');
+  assert.strictEqual(pagerHtml.includes('✈️ Denpasar Bali'), false, 'Day 1 compact chip does NOT display ✈️ Denpasar Bali');
+
+  // 14m. Test editLegSelect and legPlacementSelect includes <Transit> for transit destinations
+  console.log('  Testing editLegSelect and legPlacementSelect includes <Transit> for transit legs...');
+  const testTransitTrip = [
+    { id: 'leg-start', label: 'Brisbane (Trip Start)', type: 'start', days: [{ date: '2026-06-08' }] },
+    { id: 'leg-tpe', label: '🇹🇼 Taipei', type: 'transit', days: [{ date: '2026-06-09' }] },
+    { id: 'leg-vie', label: '🇦🇹 Vienna', type: 'city', days: [{ date: '2026-06-10' }, { date: '2026-06-11' }] },
+    { id: 'leg-ret', label: 'Brisbane (Trip Finish)', type: 'return', days: [{ date: '2026-06-12' }] }
+  ];
+  setLegDialogState({ mode: 'add', editLegIdx: null, stagedLegs: testTransitTrip, originalLegDates: {} });
+  _populateAddLegCityDropdowns();
+  const selectHtml = elements['editLegSelect'].innerHTML;
+  assert.ok(selectHtml.includes('Taipei &lt;Transit&gt; (2026-06-09)'), 'Taipei transit leg option includes <Transit> tag in editLegSelect');
+  assert.strictEqual(selectHtml.includes('Vienna &lt;Transit&gt;'), false, 'Vienna multi-day city stay does NOT have <Transit> tag');
+
+  const test14mPlacementHtml = elements['legPlacementSelect'].innerHTML;
+  assert.ok(test14mPlacementHtml.includes('Taipei &lt;Transit&gt;'), 'Placement dropdown includes <Transit> for transit legs');
 
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }

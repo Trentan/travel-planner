@@ -2185,9 +2185,24 @@ function _populateAddLegCityDropdowns() {
       : (appData || []);
     sourceLegs.forEach((leg, idx) => {
       const firstDay = leg?.days?.[0];
+      const lastDay = leg?.days?.[leg?.days?.length - 1] || firstDay;
       const legDate = firstDay?.date || '';
-      const label = `${idx + 1}. ${leg?.label || 'Untitled leg'}${legDate ? ` (${legDate})` : ''}`;
-      options.push(`<option value="${idx}">${label}</option>`);
+      const isTerminal = typeof isTerminalLeg === 'function' ? isTerminalLeg(leg) : (idx === 0 || idx === sourceLegs.length - 1);
+      const daysCount = Array.isArray(leg?.days) ? leg.days.length : 0;
+      const isSameDay = daysCount === 1 || (daysCount > 1 && firstDay?.date && lastDay?.date && firstDay.date === lastDay.date);
+      const isTransit = !isTerminal && (leg?.type === 'transit' || isSameDay || (leg?.label || '').toLowerCase().includes('transit'));
+
+      let baseLabel = (leg?.label || 'Untitled leg').trim();
+      if (isTransit) {
+        if (!/<transit>/i.test(baseLabel) && !/\(transit\)/i.test(baseLabel)) {
+          baseLabel = `${baseLabel} <Transit>`;
+        } else if (/\(transit\)/i.test(baseLabel)) {
+          baseLabel = baseLabel.replace(/\s*\(transit\)/i, ' <Transit>');
+        }
+      }
+      const rawLabel = `${idx + 1}. ${baseLabel}${legDate ? ` (${legDate})` : ''}`;
+      const safeLabel = typeof escapeHtmlText === 'function' ? escapeHtmlText(rawLabel) : rawLabel;
+      options.push(`<option value="${idx}">${safeLabel}</option>`);
     });
     editLegSelect.innerHTML = options.join('');
     if (currentValue && (currentValue === 'ADD_NEW' || Number.isFinite(Number(currentValue)))) {
@@ -2223,8 +2238,19 @@ function _populateLegPlacementDropdown() {
   }
 
   legs.forEach((leg, idx) => {
-    const cleanLbl = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label || `Leg ${idx + 1}`);
-    options.push(`<option value="after_${idx}">After ${idx + 1}. ${cleanLbl}</option>`);
+    const firstDay = leg?.days?.[0];
+    const lastDay = leg?.days?.[leg?.days?.length - 1] || firstDay;
+    const isTerminal = typeof isTerminalLeg === 'function' ? isTerminalLeg(leg) : (idx === 0 || idx === legs.length - 1);
+    const daysCount = Array.isArray(leg?.days) ? leg.days.length : 0;
+    const isSameDay = daysCount === 1 || (daysCount > 1 && firstDay?.date && lastDay?.date && firstDay.date === lastDay.date);
+    const isTransit = !isTerminal && (leg?.type === 'transit' || isSameDay || (leg?.label || '').toLowerCase().includes('transit'));
+
+    let cleanLbl = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : (leg.label || `Leg ${idx + 1}`);
+    if (isTransit) {
+      cleanLbl = `${cleanLbl} <Transit>`;
+    }
+    const safeLbl = typeof escapeHtmlText === 'function' ? escapeHtmlText(cleanLbl) : cleanLbl;
+    options.push(`<option value="after_${idx}">After ${idx + 1}. ${safeLbl}</option>`);
   });
 
   if (returnIdx < 0 && legs.length > 0) {
@@ -2232,7 +2258,10 @@ function _populateLegPlacementDropdown() {
   } else {
     options.push(`<option value="end">At end of trip</option>`);
   }
-  options.push(`<option value="start">At start of trip</option>`);
+  const firstLeg = legs[0];
+  if (!firstLeg || !isTerminalLeg(firstLeg)) {
+    options.push(`<option value="start">At start of trip</option>`);
+  }
 
   const prevVal = placementSelect.value;
   placementSelect.innerHTML = options.join('');
@@ -2351,7 +2380,7 @@ function regenerateItineraryFromJourneys(linkedJourneys, legId) {
     dateTo,
     fromCity: first.fromLocation || '',
     toCity: last.toLocation || '',
-    legType: leg.label,
+    legType: leg.type || 'city',
     dayNotes: []
   });
   
@@ -2370,56 +2399,64 @@ function regenerateItineraryFromJourneys(linkedJourneys, legId) {
 
 function isTerminalLeg(leg) {
   if (!leg) return false;
+  // Prefer stored leg.type field (set by normalizeTripLegsData)
+  if (leg.type === 'start' || leg.type === 'return') return true;
   const lid = String(leg.id || '').toLowerCase();
   const lbl = String(leg.label || '').toLowerCase();
   return lid === 'departure' || lid === 'return' || lid.endsWith('-start') || lid.endsWith('-finish') ||
-    lbl.includes('departure') || lbl.includes('return') || lbl.includes('(trip start)') || lbl.includes('(trip finish)');
+    lbl.includes('(trip start)') || lbl.includes('(trip finish)');
 }
 
 function getLegBaseCityName(leg) {
   if (!leg) return '';
+  const homeCity = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
+  
+  if (leg.type === 'start' || (typeof isTerminalLeg === 'function' && isTerminalLeg(leg) && (String(leg.id || '').endsWith('-start') || String(leg.label || '').toLowerCase().includes('start')))) {
+    const cleanLbl = String(leg.label || '').replace(/\s*\(trip\s*start\)/i, '').replace(/[^\x00-\x7F]/g, '').trim();
+    return cleanLbl || homeCity;
+  }
+  if (leg.type === 'return' || (typeof isTerminalLeg === 'function' && isTerminalLeg(leg) && (String(leg.id || '').endsWith('-finish') || String(leg.label || '').toLowerCase().includes('finish') || String(leg.label || '').toLowerCase().includes('return')))) {
+    const cleanLbl = String(leg.label || '').replace(/\s*\(trip\s*(finish|end)\)/i, '').replace(/\s*return\s*home/i, '').replace(/[^\x00-\x7F]/g, '').trim();
+    return cleanLbl || homeCity;
+  }
+
   if (leg.cityId && typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
     const cityObj = citiesData.find(c => c && c.id === leg.cityId);
     if (cityObj && cityObj.name) return cityObj.name;
   }
-  const cleanLbl = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label) : String(leg.label || '').replace(/[^\x00-\x7F]/g, '').trim();
+
+  const cleanLbl = typeof cleanCityNavLabel === 'function'
+    ? cleanCityNavLabel(leg.label)
+    : String(leg.label || '').replace(/\s*\([^)]*\)/g, '').replace(/[^\x00-\x7F]/g, '').trim();
+
   const namedCity = typeof getCityByName === 'function' ? (getCityByName(cleanLbl) || getCityByName(leg.label)) : null;
   if (namedCity && namedCity.name) return namedCity.name;
-  const lastDay = (leg.days && leg.days.length > 0) ? leg.days[leg.days.length - 1] : null;
-  if (lastDay && lastDay.to && lastDay.to !== 'Home') {
-    const cleanTo = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(lastDay.to) : lastDay.to;
-    return cleanTo || lastDay.to;
-  }
+
   return cleanLbl || leg.label || '';
 }
 
 function getPriorLegCity(legs, targetIdx, fallbackHome = 'Home') {
   if (!Array.isArray(legs) || targetIdx <= 0) return fallbackHome;
+  // Use titleData.homeCity as the canonical home name if available
+  const homeCity = (typeof titleData !== 'undefined' && titleData && titleData.homeCity)
+    ? String(titleData.homeCity).trim()
+    : fallbackHome;
   for (let i = targetIdx - 1; i >= 0; i--) {
     const prev = legs[i];
     if (!prev) continue;
     if (isTerminalLeg(prev)) {
       const lid = String(prev.id || '').toLowerCase();
       const lbl = String(prev.label || '').toLowerCase();
-      if (lid.endsWith('-start') || lbl.includes('start') || lid === 'departure') {
-        const firstDay = (prev.days && prev.days.length > 0) ? prev.days[0] : null;
-        const lastDay = (prev.days && prev.days.length > 0) ? prev.days[prev.days.length - 1] : null;
-        if (firstDay && firstDay.from && firstDay.from !== 'Home') {
-          const cleanFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(firstDay.from) : firstDay.from;
-          return cleanFrom || firstDay.from;
-        }
-        if (lastDay && lastDay.from && lastDay.from !== 'Home') {
-          const cleanFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(lastDay.from) : lastDay.from;
-          return cleanFrom || lastDay.from;
-        }
-        return fallbackHome;
+      // For start-type legs, always return canonical home city (never read firstDay.from which may be corrupted)
+      if (prev.type === 'start' || lid.endsWith('-start') || lbl.includes('(trip start)') || lid === 'departure') {
+        return homeCity;
       }
       continue;
     }
     const cityName = getLegBaseCityName(prev);
     if (cityName && cityName !== 'Home') return cityName;
   }
-  return fallbackHome;
+  return homeCity;
 }
 
 function updateLegOriginHelperUI(inferredOriginCity) {
@@ -2427,13 +2464,126 @@ function updateLegOriginHelperUI(inferredOriginCity) {
   const helperCity = document.getElementById('legOriginHelperCity');
   const legType = document.getElementById('legTypeSelect')?.value || 'city';
   if (!helperGroup || !helperCity) return;
-  if (legType === 'city' && inferredOriginCity) {
+  if ((legType === 'city' || legType === 'transit') && inferredOriginCity) {
     helperCity.textContent = inferredOriginCity;
     helperGroup.style.display = 'flex';
   } else {
     helperGroup.style.display = 'none';
   }
 }
+
+/**
+ * Ensures appData[0] is a 'start' leg and appData[last] is a 'return' leg.
+ * If either is missing, adds a placeholder.
+ * Call from normalizeTripLegsData and before confirmSaveLegSequence.
+ */
+function enforceTerminalLegs(legs) {
+  if (!Array.isArray(legs) || legs.length === 0) return;
+  const homeCity = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
+  const tripStart = typeof getTripStartDate === 'function' ? getTripStartDate() : legs[0]?.days?.[0]?.date || '';
+  const tripEnd = legs[legs.length - 1]?.days?.slice(-1)?.[0]?.date || tripStart;
+  
+  const first = legs[0];
+  const startHome = (typeof getLegBaseCityName === 'function' ? getLegBaseCityName(first) : '') || homeCity;
+  if (first.type !== 'start' && !isTerminalLeg(first)) {
+    legs.unshift({
+      id: 'leg_start_' + Date.now(),
+      type: 'start',
+      label: `${homeCity} (Trip Start)`,
+      colour: '#2C3E50',
+      cityFood: [], cityRun: [], suggestedActivities: [], legTips: [],
+      days: [{ date: tripStart, day: typeof getWeekdayLabelForTripDate === 'function' ? getWeekdayLabelForTripDate(tripStart) : 'Mon',
+               from: homeCity, to: getLegBaseCityName(legs[1]) || homeCity,
+               completed: false, desc: 'Departure day', transportItems: [], accomItems: [], activityItems: [] }]
+    });
+  } else {
+    first.type = 'start';
+    if (first.days?.[0]) {
+      first.days[0].from = startHome;
+      if (legs.length > 1 && (!first.days[0].to || first.days[0].to === 'Home')) {
+        first.days[0].to = getLegBaseCityName(legs[1]) || homeCity;
+      }
+    }
+  }
+  
+  if (legs.length > 1) {
+    const last = legs[legs.length - 1];
+    const returnHome = (typeof getLegBaseCityName === 'function' ? getLegBaseCityName(last) : '') || homeCity;
+    if (last.type !== 'return' && !isTerminalLeg(last)) {
+      legs.push({
+        id: 'leg_return_' + Date.now(),
+        type: 'return',
+        label: `${homeCity} (Trip Finish)`,
+        colour: '#2C3E50',
+        cityFood: [], cityRun: [], suggestedActivities: [], legTips: [],
+        days: [{ date: tripEnd, day: typeof getWeekdayLabelForTripDate === 'function' ? getWeekdayLabelForTripDate(tripEnd) : 'Mon',
+                 from: getLegBaseCityName(legs[legs.length - 2]) || homeCity, to: homeCity,
+                 completed: false, desc: 'Return home', transportItems: [], accomItems: [], activityItems: [] }]
+      });
+    } else {
+      last.type = 'return';
+      if (last.days?.length > 0) {
+        last.days[last.days.length - 1].to = returnHome;
+        if (legs.length > 1 && (!last.days[0].from || last.days[0].from === 'Home')) {
+          last.days[0].from = getLegBaseCityName(legs[legs.length - 2]) || homeCity;
+        }
+      }
+    }
+  }
+}
+window.enforceTerminalLegs = enforceTerminalLegs;
+
+/**
+ * Rebuilds the from/to routing on every day card based on leg sequence.
+ * Does NOT touch dates, notes, or items — only the city routing direction.
+ * Call this after any leg reorder or when routing is known to be corrupt.
+ */
+function rebuildLegRouting(legs) {
+  if (!Array.isArray(legs) || legs.length === 0) return;
+  const homeCity = (typeof titleData !== 'undefined' && titleData && titleData.homeCity)
+    ? String(titleData.homeCity).trim()
+    : ((typeof getLegBaseCityName === 'function' && legs.length > 0) ? getLegBaseCityName(legs[0]) : '') || 'Home';
+  
+  legs.forEach((leg, i) => {
+    if (!Array.isArray(leg.days) || leg.days.length === 0) return;
+    
+    const prevCity = i > 0 ? (getLegBaseCityName(legs[i - 1]) || homeCity) : homeCity;
+    const thisCity = getLegBaseCityName(leg) || leg.label || homeCity;
+    const nextCity = i < legs.length - 1 ? (getLegBaseCityName(legs[i + 1]) || homeCity) : homeCity;
+    
+    const cleanCity = (c) => String(c || '').replace(/\s*\(trip\s*(start|finish|end)\)/i,'').replace(/\s*\(\d+\)$/,'').trim() || homeCity;
+    
+    leg.days.forEach((day, di) => {
+      const isFirst = di === 0;
+      const isLast = di === leg.days.length - 1;
+      
+      if (leg.type === 'start') {
+        day.from = cleanCity(homeCity);
+        day.to = cleanCity(nextCity);
+      } else if (leg.type === 'return') {
+        day.from = cleanCity(prevCity);
+        day.to = cleanCity(homeCity);
+      } else if (leg.type === 'transit') {
+        day.from = cleanCity(prevCity);
+        day.to = cleanCity(nextCity);
+      } else {
+        // city leg
+        if (isFirst) {
+          day.from = cleanCity(prevCity);
+          day.to = cleanCity(thisCity);
+        } else if (isLast && leg.days.length > 1) {
+          day.from = cleanCity(thisCity);
+          day.to = cleanCity(nextCity);
+        } else {
+          day.from = cleanCity(thisCity);
+          day.to = cleanCity(thisCity);
+        }
+      }
+    });
+  });
+}
+window.rebuildLegRouting = rebuildLegRouting;
+
 
 function autoGenerateMissingTransitLegs(legsList) {
   if (!window.journeys || window.journeys.length === 0) return 0;
@@ -2473,8 +2623,8 @@ function autoGenerateMissingTransitLegs(legsList) {
     const currentLeg = legsList[i];
     const nextLeg = legsList[i + 1];
     
-    if (currentLeg.label && currentLeg.label.includes('Departure')) { i++; continue; }
-    if (nextLeg.label && nextLeg.label.includes('Return')) break; 
+    if (isTerminalLeg(currentLeg) || (currentLeg.label && (currentLeg.label.includes('Departure') || currentLeg.label.includes('Start')))) { i++; continue; }
+    if (isTerminalLeg(nextLeg) || (nextLeg.label && (nextLeg.label.includes('Return') || nextLeg.label.includes('Finish')))) break; 
     
     const currentBase = getBaseName(currentLeg.label);
     const nextBase = getBaseName(nextLeg.label);
@@ -2572,7 +2722,7 @@ function autoGenerateMissingTransitLegs(legsList) {
   return legsAdded;
 }
 
-function syncAllLegDays(silent = false) {
+function syncAllLegDays(silent = false, forceRebuild = false) {
   if (!silent) {
     if (!confirm('This will autonomously recalculate day cards for all legs based on your saved journeys and stays. Proceed?')) {
       return;
@@ -2702,9 +2852,14 @@ function syncAllLegDays(silent = false) {
     const baseCityName = getBaseNameGlobal(rawCityName);
     const cityId = leg.cityId || ('city-' + baseCityName.replace(/[^a-z0-9]/g, '-'));
 
-    const legStays = (window.stays || []).filter(s => 
+    const isTerminal = (typeof isTerminalLeg === 'function' && isTerminalLeg(leg)) || leg.type === 'start' || leg.type === 'return';
+    const legStays = isTerminal ? [] : (window.stays || []).filter(s => 
       s._inferredLegId === leg.id || 
-      (!s._inferredLegId && (s.cityId === cityId || (s.city && getBaseNameGlobal(s.city) === baseCityName)))
+      (!s._inferredLegId && (
+        (s.cityId && leg.cityId && s.cityId === leg.cityId) ||
+        (s.cityId === cityId || (s.city && getBaseNameGlobal(s.city) === baseCityName)) ||
+        (s.city && legMatchesLocation(leg, s.city, false))
+      ))
     );
     
     // Ignore local intra-city transport by ensuring fromLocation !== toLocation
@@ -2729,19 +2884,48 @@ function syncAllLegDays(silent = false) {
       if (!latestDate || normalized > latestDate) latestDate = normalized;
     };
 
-    const hasExistingDays = Array.isArray(leg.days) && leg.days.length > 0;
+    const existingStart = (Array.isArray(leg.days) && leg.days.length > 0) ? leg.days[0].date : null;
+    const existingEnd = (Array.isArray(leg.days) && leg.days.length > 0) ? leg.days[leg.days.length - 1].date : null;
+
+    const hasExistingDays = !forceRebuild && Boolean(existingStart);
     if (hasExistingDays) {
       // Retain the established leg date boundaries
-      considerDate(leg.days[0].date);
-      considerDate(leg.days[leg.days.length - 1].date);
+      considerDate(existingStart);
+      considerDate(existingEnd);
     } else {
-      // For newly generated transit legs or empty legs, infer from stays and journeys
+      // For newly generated transit legs, empty legs, or when forceRebuild is requested:
       legStays.forEach(s => {
         considerDate(s.checkIn);
         if (s.checkOut) considerDate(s.checkOut);
       });
       arrivingJourneys.forEach(j => considerDate(j.arrivalDate || j.dayDate));
       departingJourneys.forEach(j => considerDate(j.departureDate || j.dayDate));
+
+      // Fallback 1: if no journeys or stays found for this leg, retain existing days' bounds
+      if (!earliestDate && existingStart) {
+        considerDate(existingStart);
+        considerDate(existingEnd);
+      } else if (earliestDate && existingEnd && (!latestDate || latestDate < existingEnd)) {
+        // If arriving journey established start date, but no departing journey/stay checkout was found,
+        // preserve the leg's established duration/end date rather than collapsing to a single day
+        if (departingJourneys.length === 0 && !legStays.some(s => s.checkOut)) {
+          considerDate(existingEnd);
+        }
+      }
+
+      // Fallback 2: For destination legs (city), check if next leg has an established start/departure date
+      const legIdx = appData.indexOf(leg);
+      if (leg.type === 'city' || (!leg.type && !isTerminalLeg(leg))) {
+        if ((!latestDate || latestDate === earliestDate) && legIdx >= 0 && legIdx < appData.length - 1) {
+          const nextLeg = appData[legIdx + 1];
+          if (nextLeg && Array.isArray(nextLeg.days) && nextLeg.days.length > 0 && nextLeg.days[0].date) {
+            const nextStart = nextLeg.days[0].date;
+            if (nextStart >= (earliestDate || '')) {
+              considerDate(nextStart);
+            }
+          }
+        }
+      }
     }
 
     if (!earliestDate) return;
@@ -2749,14 +2933,31 @@ function syncAllLegDays(silent = false) {
 
     let newDays = [];
     if (typeof buildLegDaysWithNotes === 'function') {
+      const legIdx = appData.indexOf(leg);
+      const prevLeg = legIdx > 0 ? appData[legIdx - 1] : null;
+      const nextLeg = legIdx < appData.length - 1 ? appData[legIdx + 1] : null;
+      const homeCity = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
+
+      const arrivalFromCity = prevLeg
+        ? (typeof getLegBaseCityName === 'function' ? getLegBaseCityName(prevLeg) : prevLeg.label) || homeCity
+        : homeCity;
+      const departureToCity = nextLeg
+        ? (typeof getLegBaseCityName === 'function' ? getLegBaseCityName(nextLeg) : nextLeg.label) || homeCity
+        : homeCity;
+
       newDays = buildLegDaysWithNotes({
         dateFrom: earliestDate,
         dateTo: latestDate,
-        fromCity: cityName,
-        toCity: cityName,
-        legType: 'city',
+        fromCity: (leg.type === 'start') ? homeCity : (arrivalFromCity || cityName),
+        toCity: (leg.type === 'return') ? homeCity : (departureToCity || cityName),
+        legType: leg.type || 'city',
         dayNotes: []
       });
+
+      // Update departure direction on last day of multi-day city stay
+      if (newDays.length > 1 && (!leg.type || leg.type === 'city')) {
+        newDays[newDays.length - 1].to = departureToCity;
+      }
     }
 
     const formatShortDate = (dStr) => {
@@ -2832,12 +3033,12 @@ function syncAllLegDays(silent = false) {
       newDays.forEach(nd => {
         const oldDay = leg.days.find(od => od.date === nd.date);
         if (oldDay) {
-          // Preserve custom day routing (from / to) and strip any inadvertent (Trip Start/Finish)
-          if (oldDay.from) {
+          // Preserve custom day routing (from / to) unless forceRebuild is active
+          if (oldDay.from && !forceRebuild) {
             const cleanFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(oldDay.from) : oldDay.from;
             nd.from = cleanFrom || oldDay.from;
           }
-          if (oldDay.to) {
+          if (oldDay.to && !forceRebuild) {
             const cleanTo = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(oldDay.to) : oldDay.to;
             nd.to = cleanTo || oldDay.to;
           }
@@ -2931,9 +3132,17 @@ function rebuildItineraryAndDataMappings(options = {}) {
     });
   }
 
+  // 2.5 Ensure terminal legs and routing are valid
+  if (typeof enforceTerminalLegs === 'function' && Array.isArray(appData)) {
+    enforceTerminalLegs(appData);
+  }
+  if (options.forceRebuild === true && typeof rebuildLegRouting === 'function' && Array.isArray(appData)) {
+    rebuildLegRouting(appData);
+  }
+
   // 3. Sync all leg days with latest journeys and stays
   if (typeof syncAllLegDays === 'function') {
-    syncAllLegDays(true); // silent sync
+    syncAllLegDays(true, options.forceRebuild === true); // silent sync
   }
 
   // 4. Persist data
@@ -2983,6 +3192,48 @@ function rebuildItineraryAndDataMappings(options = {}) {
 }
 
 window.rebuildItineraryAndDataMappings = rebuildItineraryAndDataMappings;
+
+/**
+ * Full trip rebuild pipeline. Fixes routing, re-syncs days from transport/stays,
+ * normalizes all data, and re-renders.
+ * @param {Object} options
+ * @param {boolean} options.showToast
+ * @param {string} options.message
+ * @param {boolean} options.forceRebuildDays - If true, forces day card rebuild from transport/stays
+ */
+function rebuildTripFromLegs(options = {}) {
+  const { showToast: doToast = true, message, forceRebuildDays = false } = options;
+  
+  if (typeof normalizeTripLegsData === 'function' && Array.isArray(appData)) appData = normalizeTripLegsData(appData);
+  if (typeof normalizeTripJourneysData === 'function' && typeof journeys !== 'undefined' && Array.isArray(journeys)) journeys = normalizeTripJourneysData(journeys);
+  if (typeof normalizeTripStaysData === 'function' && typeof stays !== 'undefined' && Array.isArray(stays)) stays = normalizeTripStaysData(stays);
+  
+  if (typeof enforceTerminalLegs === 'function' && Array.isArray(appData)) enforceTerminalLegs(appData);
+  if (typeof rebuildLegRouting === 'function' && Array.isArray(appData)) rebuildLegRouting(appData);
+  
+  if (typeof syncAllLegDays === 'function') syncAllLegDays(true, forceRebuildDays);
+  if (typeof rebuildLegRouting === 'function' && Array.isArray(appData)) rebuildLegRouting(appData);
+  
+  if (typeof migrateJourneyCityIds === 'function') migrateJourneyCityIds();
+  if (typeof sortLegs === 'function') sortLegs();
+  if (typeof saveData === 'function') saveData(false);
+  
+  if (typeof populateCityList === 'function') populateCityList();
+  if (typeof _populateAddLegCityDropdowns === 'function') _populateAddLegCityDropdowns();
+  if (typeof buildNav === 'function') buildNav();
+  if (typeof buildCityNav === 'function') buildCityNav();
+  if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
+  if (typeof buildTransportTab === 'function') buildTransportTab();
+  if (typeof buildAccomTab === 'function') buildAccomTab();
+  if (typeof buildJourneyMap === 'function') buildJourneyMap();
+  if (typeof buildDesktopSplitMap === 'function') buildDesktopSplitMap();
+  
+  if (doToast && typeof showToast === 'function') {
+    showToast(message || 'Trip route & itinerary rebuilt successfully!');
+  }
+  return true;
+}
+window.rebuildTripFromLegs = rebuildTripFromLegs;
 
 
 function setSelectValueMatchingCity(selectEl, rawCityValue, fallbackVal = '') {
@@ -3066,7 +3317,13 @@ function resetLegDialogToAddNew() {
   const durInput = document.getElementById('legDurationNights');
   const dayNotesInput = document.getElementById('legDayNotesInput');
 
-  if (legTypeSelect) legTypeSelect.value = 'city';
+  _populateLegPlacementDropdown();
+  const placementSelect = document.getElementById('legPlacementSelect');
+  const placementVal = placementSelect?.value || 'before_return';
+  const defaults = getPlacementDefaultDates(placementVal);
+
+  const isSameDay = defaults.startDate && defaults.endDate && defaults.startDate === defaults.endDate;
+  if (legTypeSelect) legTypeSelect.value = isSameDay ? 'transit' : 'city';
   if (fromCitySelect) fromCitySelect.value = 'Home';
   if (toCitySelect) toCitySelect.value = '';
   if (existingCitySelect) existingCitySelect.value = '';
@@ -3080,11 +3337,6 @@ function resetLegDialogToAddNew() {
   if (toggleNewCityBtn) toggleNewCityBtn.textContent = '+ Enter New City';
   if (dayNotesInput) dayNotesInput.value = '';
 
-  _populateLegPlacementDropdown();
-  const placementSelect = document.getElementById('legPlacementSelect');
-  const placementVal = placementSelect?.value || 'before_return';
-  const defaults = getPlacementDefaultDates(placementVal);
-
   if (dateFrom) {
     dateFrom.value = defaults.startDate;
     dateFrom.classList.remove('border-rose-500');
@@ -3096,6 +3348,7 @@ function resetLegDialogToAddNew() {
   if (durInput) {
     durInput.value = defaults.duration;
   }
+  updateLegDurationSubtext(defaults.duration);
 
   updateLegDialogUiMode();
   onLegTypeChange();
@@ -3143,11 +3396,17 @@ function onEditLegSelectionChange() {
     (typeof getCityByName === 'function' ? (getCityByName(rawTo) || getCityByName(rawFrom) || getCityByName(leg.label)) : null);
   const resolvedCityName = legCityObj ? legCityObj.name : '';
 
-  let legType = 'city';
-  if (normalizedLabel.includes('start') || normalizedLabel.includes('departure') || String(leg.id || '').endsWith('-start')) legType = 'start';
-  else if (normalizedLabel.includes('return') || normalizedLabel.includes('finish') || String(leg.id || '').endsWith('-finish')) legType = 'return';
-  else if (normalizedLabel.startsWith('✈️') || normalizedLabel.includes(' to ') || normalizedLabel.includes('transit') || normalizedLabel.includes('travel')) legType = 'travel';
-  else if (rawFrom && rawTo && rawFrom !== rawTo && (leg.days || []).length === 1 && !resolvedCityName) legType = 'travel';
+  let legType = leg.type;
+  if (!legType) {
+    if (normalizedLabel.includes('start') || normalizedLabel.includes('departure') || String(leg.id || '').endsWith('-start')) legType = 'start';
+    else if (normalizedLabel.includes('return') || normalizedLabel.includes('finish') || String(leg.id || '').endsWith('-finish')) legType = 'return';
+    else if (firstDay.date && lastDay.date && firstDay.date === lastDay.date) legType = 'transit';
+    else if (normalizedLabel.startsWith('✈️') || normalizedLabel.includes(' to ') || normalizedLabel.includes('transit') || normalizedLabel.includes('travel')) legType = 'transit';
+    else legType = 'city';
+  } else if (legType !== 'start' && legType !== 'return') {
+    if (firstDay.date && lastDay.date && firstDay.date === lastDay.date) legType = 'transit';
+    else if (firstDay.date && lastDay.date && firstDay.date < lastDay.date) legType = 'city';
+  }
 
   const legTypeSelect = document.getElementById('legTypeSelect');
   if (legTypeSelect) legTypeSelect.value = legType;
@@ -3179,7 +3438,7 @@ function onEditLegSelectionChange() {
     setSelectValueMatchingCity(toCitySelect, resolvedCityName || rawTo, '');
     setSelectValueMatchingCity(existingCitySelect, resolvedCityName || rawTo, '');
   } else {
-    // standard destination city leg
+    // standard destination city or transit stop
     const homeCityName = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
     const inferredPriorCity = getPriorLegCity(sourceLegs, selected, homeCityName);
     const destCity = resolvedCityName || rawTo || rawFrom;
@@ -3192,7 +3451,7 @@ function onEditLegSelectionChange() {
 
   // Ensure appropriate selection groups and labels are displayed for the leg type
   onLegTypeChange();
-  if (legType !== 'city') {
+  if (legType !== 'city' && legType !== 'transit') {
     updateLegOriginHelperUI('');
   }
 
@@ -3205,11 +3464,14 @@ function onEditLegSelectionChange() {
     dateTo.value = lastDay.date || '';
     dateTo.classList.remove('border-rose-500');
   }
+  const isSameDay = Boolean(firstDay.date && lastDay.date && firstDay.date === lastDay.date);
+  const daysCount = (leg.days || []).length;
+  const durVal = isSameDay ? 0 : Math.max(0, daysCount > 1 ? daysCount - 1 : 0);
   if (durInput) {
-    const isSameDay = Boolean(firstDay.date && lastDay.date && firstDay.date === lastDay.date);
-    const daysCount = (leg.days || []).length;
-    durInput.value = isSameDay ? 0 : Math.max(0, daysCount > 1 ? daysCount - 1 : 0);
+    durInput.value = durVal;
   }
+  updateLegDurationSubtext(durVal);
+
   if (dayNotesInput) {
     dayNotesInput.value = (leg.days || [])
       .map(day => String(day?.desc || '').trim())
@@ -3220,10 +3482,25 @@ function onEditLegSelectionChange() {
   validateLegEditorForm();
 }
 
+function updateLegDurationSubtext(nights) {
+  const subtext = document.getElementById('legDurationSubtext');
+  if (!subtext) return;
+  const n = Math.max(0, Number(nights) || 0);
+  if (n === 0) {
+    subtext.textContent = '0 nights • ✈️ Transit (same-day stop)';
+  } else if (n === 1) {
+    subtext.textContent = '1 night';
+  } else {
+    subtext.textContent = `${n} nights`;
+  }
+}
+window.updateLegDurationSubtext = updateLegDurationSubtext;
+
 function stepLegDuration(delta) {
   const durationInput = document.getElementById('legDurationNights');
   const current = Math.max(0, (Number(durationInput?.value) || 0) + delta);
   if (durationInput) durationInput.value = current;
+  updateLegDurationSubtext(current);
   onLegDurationInputChange();
 }
 
@@ -3239,6 +3516,15 @@ function onLegDurationInputChange() {
   if (start && typeof addDaysToIsoDate === 'function') {
     endDateInput.value = addDaysToIsoDate(start, dur);
   }
+  updateLegDurationSubtext(dur);
+
+  const legTypeSelect = document.getElementById('legTypeSelect');
+  const legState = getLegDialogState();
+  const isEditingTerminal = legState.mode === 'edit' && Number.isFinite(legState.editLegIdx) && legState.stagedLegs?.[legState.editLegIdx] && isTerminalLeg(legState.stagedLegs[legState.editLegIdx]);
+  if (!isEditingTerminal && legTypeSelect) {
+    legTypeSelect.value = dur === 0 ? 'transit' : 'city';
+  }
+
   onLegDateInputChange();
 }
 
@@ -3254,6 +3540,15 @@ function onLegStartDateChange() {
   if (start && typeof addDaysToIsoDate === 'function') {
     endDateInput.value = addDaysToIsoDate(start, dur);
   }
+  updateLegDurationSubtext(dur);
+
+  const legTypeSelect = document.getElementById('legTypeSelect');
+  const legState = getLegDialogState();
+  const isEditingTerminal = legState.mode === 'edit' && Number.isFinite(legState.editLegIdx) && legState.stagedLegs?.[legState.editLegIdx] && isTerminalLeg(legState.stagedLegs[legState.editLegIdx]);
+  if (!isEditingTerminal && legTypeSelect) {
+    legTypeSelect.value = dur === 0 ? 'transit' : 'city';
+  }
+
   onLegDateInputChange();
 }
 
@@ -3265,12 +3560,22 @@ function onLegEndDateChange() {
 
   const start = startDateInput.value;
   const end = endDateInput.value;
+  let diffDays = 0;
   if (start && end && end >= start) {
     const t1 = new Date(`${start}T00:00:00`).getTime();
     const t2 = new Date(`${end}T00:00:00`).getTime();
-    const diffDays = Math.max(0, Math.round((t2 - t1) / (1000 * 60 * 60 * 24)));
+    diffDays = Math.max(0, Math.round((t2 - t1) / (1000 * 60 * 60 * 24)));
     if (durationInput) durationInput.value = diffDays;
   }
+  updateLegDurationSubtext(diffDays);
+
+  const legTypeSelect = document.getElementById('legTypeSelect');
+  const legState = getLegDialogState();
+  const isEditingTerminal = legState.mode === 'edit' && Number.isFinite(legState.editLegIdx) && legState.stagedLegs?.[legState.editLegIdx] && isTerminalLeg(legState.stagedLegs[legState.editLegIdx]);
+  if (!isEditingTerminal && legTypeSelect) {
+    legTypeSelect.value = diffDays === 0 ? 'transit' : 'city';
+  }
+
   onLegDateInputChange();
 }
 
@@ -3284,11 +3589,12 @@ function onLegPlacementChange() {
   const endDateInput = document.getElementById('newLegEndDate');
   const durationInput = document.getElementById('legDurationNights');
 
-  const dur = Math.max(1, Number(durationInput?.value) || defaults.duration);
+  const dur = Math.max(0, Number(durationInput?.value) || defaults.duration);
   if (startDateInput) startDateInput.value = defaults.startDate;
   if (endDateInput && typeof addDaysToIsoDate === 'function') {
     endDateInput.value = addDaysToIsoDate(defaults.startDate, dur);
   }
+  updateLegDurationSubtext(dur);
   onLegDateInputChange();
 }
 
@@ -3405,6 +3711,8 @@ function closeAddLegDialog() {
   if (editLegSelect) editLegSelect.value = '';
   if (dayNotesInput) dayNotesInput.value = '';
   if (warningBanner) warningBanner.style.display = 'none';
+  const terminalBanner = document.getElementById('legTerminalWarningBanner');
+  if (terminalBanner) terminalBanner.style.display = 'none';
   updateLegDialogUiMode();
 }
 
@@ -3415,6 +3723,25 @@ function renderLegReorderList() {
   const legs = (legDialogState && Array.isArray(legDialogState.stagedLegs))
     ? legDialogState.stagedLegs
     : (appData || []);
+
+  const terminalBanner = document.getElementById('legTerminalWarningBanner');
+  const terminalMsg = document.getElementById('legTerminalWarningMsg');
+  if (terminalBanner && terminalMsg) {
+    let warning = '';
+    const hasStart = legs.length > 0 && (legs[0].type === 'start' || (typeof isTerminalLeg === 'function' && isTerminalLeg(legs[0])));
+    const hasReturn = legs.length > 1 && (legs[legs.length - 1].type === 'return' || (typeof isTerminalLeg === 'function' && isTerminalLeg(legs[legs.length - 1])));
+    if (!hasStart) {
+      warning = 'Trip start leg missing: First leg should depart from Home.';
+    } else if (!hasReturn && legs.length > 1) {
+      warning = 'Trip finish leg missing: Final leg should return to Home.';
+    }
+    if (warning) {
+      terminalMsg.textContent = warning;
+      terminalBanner.style.display = 'flex';
+    } else {
+      terminalBanner.style.display = 'none';
+    }
+  }
 
   if (!Array.isArray(legs) || legs.length === 0) {
     container.innerHTML = `<div class="text-xs text-slate-500 italic p-2 text-center">No legs added yet</div>`;
@@ -3429,21 +3756,38 @@ function renderLegReorderList() {
     const dateRangeStr = firstDay
       ? (firstDay === lastDay ? firstDay : `${firstDay} → ${lastDay}`)
       : 'No dates';
-    const nightsStr = daysCount > 1 ? `${daysCount - 1} night${daysCount > 2 ? 's' : ''}` : (daysCount === 1 ? '1 day' : '0 days');
+    const nightsStr = daysCount > 1
+      ? `${daysCount - 1} night${daysCount > 2 ? 's' : ''}`
+      : (daysCount === 1 ? (leg.type === 'transit' ? '✈️ Transit (same day)' : '1 day') : '0 days');
     const isEditing = legDialogState.mode === 'edit' && legDialogState.editLegIdx === idx;
-    const safeLabel = typeof escapeHtmlText === 'function' ? escapeHtmlText(leg.label || 'Untitled leg') : (leg.label || 'Untitled leg');
+    const terminal = typeof isTerminalLeg === 'function' ? isTerminalLeg(leg) : (idx === 0 || idx === legs.length - 1);
+    const isSameDay = daysCount === 1 || (daysCount > 1 && firstDay && lastDay && firstDay === lastDay);
+    const isTransit = !terminal && (leg.type === 'transit' || isSameDay || (leg.label || '').toLowerCase().includes('transit'));
+
+    let displayLabel = (leg.label || 'Untitled leg').trim();
+    if (isTransit) {
+      if (!/<transit>/i.test(displayLabel) && !/\(transit\)/i.test(displayLabel)) {
+        displayLabel = `${displayLabel} <Transit>`;
+      } else if (/\(transit\)/i.test(displayLabel)) {
+        displayLabel = displayLabel.replace(/\s*\(transit\)/i, ' <Transit>');
+      }
+    }
+    const safeLabel = typeof escapeHtmlText === 'function' ? escapeHtmlText(displayLabel) : displayLabel;
+    const isFirst = idx === 0;
+    const isLast = idx === legs.length - 1;
+    const isLocked = terminal && (isFirst || isLast);
 
     html += `
-      <div class="leg-reorder-item flex items-center justify-between gap-2 p-2 ${isEditing ? 'bg-teal-50 dark:bg-teal-950/40 border-teal-500 dark:border-teal-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'} rounded-lg border shadow-xs cursor-grab select-none hover:border-teal-500 dark:hover:border-teal-400 transition-colors"
-           draggable="true"
+      <div class="leg-reorder-item flex items-center justify-between gap-2 p-2 ${isEditing ? 'bg-teal-50 dark:bg-teal-950/40 border-teal-500 dark:border-teal-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'} rounded-lg border shadow-xs ${isLocked ? 'cursor-default' : 'cursor-grab'} select-none hover:border-teal-500 dark:hover:border-teal-400 transition-colors"
+           draggable="${!isLocked}"
            data-leg-index="${idx}"
-           ondragstart="handleLegDragStart(event, ${idx})"
+           ${isLocked ? '' : `ondragstart="handleLegDragStart(event, ${idx})"`}
            ondragover="handleLegDragOver(event, ${idx})"
            ondragleave="handleLegDragLeave(event)"
            ondrop="handleLegDrop(event, ${idx})"
-           ondragend="handleLegDragEnd(event)">
+           ${isLocked ? '' : `ondragend="handleLegDragEnd(event)"`}>
         <div class="flex items-center gap-2 min-w-0 flex-1">
-          <span class="leg-drag-handle text-slate-400 dark:text-slate-500 text-sm font-mono cursor-grab px-1 touch-none" title="Drag to reorder">⋮⋮</span>
+          <span class="leg-drag-handle ${isLocked ? 'opacity-40 cursor-default' : 'cursor-grab'} text-slate-400 dark:text-slate-500 text-sm font-mono px-1 touch-none" title="${isLocked ? 'Terminal leg — position is fixed' : 'Drag to reorder'}">${isLocked ? '🔒' : '⋮⋮'}</span>
           <div class="min-w-0 flex-1">
             <div class="font-semibold text-xs text-slate-800 dark:text-slate-100 truncate">${idx + 1}. ${safeLabel}${isEditing ? ' <span class="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">(Editing)</span>' : ''}</div>
             <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">${dateRangeStr} • ${nightsStr}</div>
@@ -3452,10 +3796,10 @@ function renderLegReorderList() {
         <div class="flex items-center gap-1.5 shrink-0">
           <button type="button" class="px-2 py-0.5 text-xs rounded bg-teal-50 dark:bg-teal-950/50 hover:bg-teal-100 dark:hover:bg-teal-900/60 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-medium cursor-pointer"
                   onclick="editLegDirectFromReorder(${idx})" title="Edit leg details">✏️ Edit</button>
-          <button type="button" class="px-1.5 py-0.5 text-xs rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 ${idx === 0 ? 'opacity-30 cursor-not-allowed' : ''}"
-                  onclick="moveLegInSequence(${idx}, ${idx - 1})" ${idx === 0 ? 'disabled' : ''} title="Move up">▲</button>
-          <button type="button" class="px-1.5 py-0.5 text-xs rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 ${idx === legs.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}"
-                  onclick="moveLegInSequence(${idx}, ${idx + 1})" ${idx === legs.length - 1 ? 'disabled' : ''} title="Move down">▼</button>
+          <button type="button" class="px-1.5 py-0.5 text-xs rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 ${(idx === 0 || isLocked) ? 'opacity-30 cursor-not-allowed' : ''}"
+                  onclick="moveLegInSequence(${idx}, ${idx - 1})" ${(idx === 0 || isLocked) ? 'disabled' : ''} title="Move up">▲</button>
+          <button type="button" class="px-1.5 py-0.5 text-xs rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 ${(idx === legs.length - 1 || isLocked) ? 'opacity-30 cursor-not-allowed' : ''}"
+                  onclick="moveLegInSequence(${idx}, ${idx + 1})" ${(idx === legs.length - 1 || isLocked) ? 'disabled' : ''} title="Move down">▼</button>
         </div>
       </div>
     `;
@@ -3473,6 +3817,22 @@ function moveLegInSequence(fromIdx, toIdx) {
   const legs = legState.stagedLegs;
   if (fromIdx < 0 || fromIdx >= legs.length || toIdx < 0 || toIdx >= legs.length) return;
   if (fromIdx === toIdx) return;
+
+  // Guard: prevent moving terminal legs
+  const movingLeg = legs[fromIdx];
+  if (typeof isTerminalLeg === 'function' && isTerminalLeg(movingLeg) && (fromIdx === 0 || fromIdx === legs.length - 1)) {
+    if (typeof showToast === 'function') showToast('Trip start and finish legs cannot be reordered.', 'warning');
+    return;
+  }
+  // Guard: prevent moving other legs into position 0 or last if those are terminal legs
+  if (toIdx === 0 && typeof isTerminalLeg === 'function' && isTerminalLeg(legs[0])) {
+    if (typeof showToast === 'function') showToast('Trip start leg must remain at position 1.', 'warning');
+    return;
+  }
+  if (toIdx === legs.length - 1 && typeof isTerminalLeg === 'function' && isTerminalLeg(legs[legs.length - 1])) {
+    if (typeof showToast === 'function') showToast('Trip finish leg must remain at the final position.', 'warning');
+    return;
+  }
 
   const [movedLeg] = legs.splice(fromIdx, 1);
   legs.splice(toIdx, 0, movedLeg);
@@ -3767,7 +4127,7 @@ function buildLegDaysWithNotes({ dateFrom, dateTo, fromCity, toCity, legType, da
   const validTo = /^\d{4}-\d{2}-\d{2}$/.test(normalizedTo || '');
   const cleanFromCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(fromCity) : fromCity) || 'Home';
   const cleanToCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(toCity) : toCity) || 'Home';
-  const defaultFirstDesc = legType === 'start' ? 'Departure day' : (legType === 'return' ? 'Return home' : 'Travel and arrival day');
+  const defaultFirstDesc = legType === 'start' ? 'Departure day' : (legType === 'return' ? 'Return home' : (legType === 'transit' ? `Transit stop in ${cleanToCity}` : 'Travel and arrival day'));
 
   if (!validFrom || !validTo) {
     return [
@@ -3796,14 +4156,15 @@ function buildLegDaysWithNotes({ dateFrom, dateTo, fromCity, toCity, legType, da
     if (!desc) {
       if (isFirstDay) desc = defaultFirstDesc;
       else if (isLastDay && legType === 'city') desc = 'Final day and departure prep';
+      else if (legType === 'transit') desc = `Transit stop in ${cleanToCity}`;
       else desc = `Explore ${cleanToCity || 'city'}`;
     }
 
     days.push({
       date: cur,
       day: typeof getWeekdayLabelForTripDate === 'function' ? getWeekdayLabelForTripDate(cur) : 'Mon',
-      from: ((legType === 'start' || legType === 'city') && !isFirstDay) ? cleanToCity : cleanFromCity,
-      to: (legType === 'return' && !isLastDay) ? cleanFromCity : cleanToCity,
+      from: ((legType === 'start' || legType === 'city' || legType === 'transit') && !isFirstDay) ? cleanToCity : cleanFromCity,
+      to: cleanToCity,
       completed: false,
       desc: desc,
       transportItems: isFirstDay ? [{ text: "Add transport...", cost: "0" }] : [],
@@ -3825,9 +4186,29 @@ function onLegTypeChange() {
   const routeSection = document.getElementById('routeSelectionGroup');
   const datesLabel = document.getElementById('datesLabel');
   const isRouteType = type === 'travel' || type === 'start' || type === 'return';
-  if (citySection) citySection.style.display = type === 'city' ? 'block' : 'none';
+  const isCityType = type === 'city' || type === 'transit';
+  if (citySection) citySection.style.display = isCityType ? 'block' : 'none';
   if (routeSection) routeSection.style.display = isRouteType ? 'block' : 'none';
-  if (datesLabel) datesLabel.textContent = isRouteType ? 'Journey Date Range' : 'Dates in City';
+  if (datesLabel) datesLabel.textContent = type === 'transit' ? 'Transit Date' : (isRouteType ? 'Journey Date Range' : 'Dates in City');
+
+  const fromCitySelect = document.getElementById('fromCitySelect');
+  const toCitySelect = document.getElementById('toCitySelect');
+  if (type === 'start') {
+    if (fromCitySelect) {
+      setSelectValueMatchingCity(fromCitySelect, 'Home', 'Home');
+      fromCitySelect.disabled = true;
+    }
+    if (toCitySelect) toCitySelect.disabled = false;
+  } else if (type === 'return') {
+    if (toCitySelect) {
+      setSelectValueMatchingCity(toCitySelect, 'Home', 'Home');
+      toCitySelect.disabled = true;
+    }
+    if (fromCitySelect) fromCitySelect.disabled = false;
+  } else {
+    if (fromCitySelect) fromCitySelect.disabled = false;
+    if (toCitySelect) toCitySelect.disabled = false;
+  }
 }
 
 function checkDateConflict(dateStr, excludeLegIdx) {
@@ -3996,15 +4377,26 @@ function confirmAddLeg() {
     return;
   }
 
-  const legType = document.getElementById('legTypeSelect')?.value || 'city';
   const dateFrom = document.getElementById('newLegStartDate')?.value;
   const dateTo = document.getElementById('newLegEndDate')?.value;
   const dayNotes = parseLegDayNotes();
+  const isSameDay = Boolean(dateFrom && dateTo && dateFrom === dateTo);
 
   const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
 
   if (isEdit && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs[legDialogState.editLegIdx]) {
     const target = legDialogState.stagedLegs[legDialogState.editLegIdx];
+
+    // Automatically infer legType: terminal start/return or transit (0 nights) or city (1+ nights)
+    let legType = 'city';
+    if (isTerminalLeg(target)) {
+      const lid = String(target.id || '').toLowerCase();
+      const lbl = String(target.label || '').toLowerCase();
+      legType = (target.type === 'return' || lid.endsWith('-finish') || lbl.includes('finish') || lbl.includes('return')) ? 'return' : 'start';
+    } else {
+      legType = isSameDay ? 'transit' : 'city';
+    }
+    target.type = legType;
 
     // --- Determine fromCity, toCity, and label based on legType (mirrors "add new" branch) ---
     let fromCity, toCity;
@@ -4033,23 +4425,27 @@ function confirmAddLeg() {
       }
       target.label = `✈️ ${fromCity} to ${toCity}`;
     } else {
-      // legType === 'city'
+      // legType === 'city' or 'transit'
       const existingCity = selectedTo;
       const cityObj = (existingCity && existingCity !== 'Home') ? (typeof getCityByName === 'function' ? getCityByName(existingCity) : null) : null;
-      const validCityName = cityObj ? cityObj.name : ((existingCity && existingCity !== 'Home') ? existingCity : '');
+      let validCityName = cityObj ? cityObj.name : ((existingCity && existingCity !== 'Home') ? existingCity : '');
+      if (!validCityName) {
+        validCityName = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(target.label) : String(target.label || '').replace(/\s*\([^)]*\)/g, '').replace(/[^\x00-\x7F]/g, '').trim();
+      }
 
       const inferredPriorCity = getPriorLegCity(legDialogState.stagedLegs, legDialogState.editLegIdx, homeCityName);
 
       if (validCityName) {
         const flag = typeof getCityFlag === 'function' ? getCityFlag(validCityName) : '📍';
-        target.label = flag + ' ' + validCityName;
+        target.label = legType === 'transit' ? `${flag} ${validCityName} (Transit)` : `${flag} ${validCityName}`;
         fromCity = inferredPriorCity || validCityName;
         toCity = validCityName;
         if (cityObj) target.cityId = cityObj.id;
       } else {
         const firstDay = target.days?.[0] || {};
-        fromCity = selectedFrom || inferredPriorCity || firstDay.from || target.label;
-        toCity = existingCity || firstDay.to || target.label;
+        const cleanVal = (val) => String(val || '').replace(/\s*\([^)]*\)/g, '').replace(/\s*\(\d+\)$/, '').trim();
+        fromCity = cleanVal(selectedFrom || inferredPriorCity || firstDay.from || target.label);
+        toCity = cleanVal(existingCity || firstDay.to || target.label);
       }
     }
 
@@ -4091,23 +4487,12 @@ function confirmAddLeg() {
       cascadeStagedLegDates(legDialogState.editLegIdx + 1);
     }
   } else {
-    // Adding a new leg
+    // Adding a new leg: automatically infer transit (0 nights) or city (1+ nights)
+    const legType = isSameDay ? 'transit' : 'city';
     let label, fromCity, toCity, matchedCityObj;
     const homeCityName = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
 
-    if (legType === 'start') {
-      fromCity = homeCityName;
-      const rawDest = document.getElementById('toCitySelect')?.value || 'Home';
-      const cleanDest = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(rawDest) : rawDest.replace(/[^\x00-\x7F]/g, '').trim()) || rawDest;
-      toCity = cleanDest;
-      label = `${homeCityName} (Trip Start)`;
-    } else if (legType === 'return') {
-      const rawOrig = document.getElementById('fromCitySelect')?.value || 'Home';
-      const cleanOrig = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(rawOrig) : rawOrig.replace(/[^\x00-\x7F]/g, '').trim()) || rawOrig;
-      fromCity = cleanOrig;
-      toCity = homeCityName;
-      label = `${homeCityName} (Trip Finish)`;
-    } else if (legType === 'travel') {
+    if (legType === 'travel') {
       fromCity = document.getElementById('fromCitySelect')?.value || homeCityName;
       toCity = document.getElementById('toCitySelect')?.value || '';
       if (!toCity) {
@@ -4141,7 +4526,7 @@ function confirmAddLeg() {
         }
 
         const flag = typeof getCityFlag === 'function' ? getCityFlag(newCityName) : '📍';
-        label = flag + ' ' + newCityName;
+        label = legType === 'transit' ? `${flag} ${newCityName} (Transit)` : `${flag} ${newCityName}`;
         fromCity = newCityName;
         toCity = newCityName;
         if (newCity) matchedCityObj = newCity;
@@ -4149,12 +4534,12 @@ function confirmAddLeg() {
         const cityObj = typeof getCityByName === 'function' ? getCityByName(existingCity) : null;
         const validCityName = cityObj ? cityObj.name : existingCity;
         const flag = typeof getCityFlag === 'function' ? getCityFlag(validCityName) : '📍';
-        label = flag + ' ' + validCityName;
+        label = legType === 'transit' ? `${flag} ${validCityName} (Transit)` : `${flag} ${validCityName}`;
         fromCity = validCityName;
         toCity = validCityName;
         if (cityObj) matchedCityObj = cityObj;
       } else {
-        label = '📍 New City';
+        label = legType === 'transit' ? '✈️ Transit Stop' : '📍 New City';
         fromCity = 'Home';
         toCity = 'Home';
       }
@@ -4183,13 +4568,14 @@ function confirmAddLeg() {
 
     insertionIdx = Math.max(0, Math.min(insertionIdx, legDialogState.stagedLegs.length));
 
-    if (legType === 'city') {
+    if (legType === 'city' || legType === 'transit') {
       const inferredPriorCity = getPriorLegCity(legDialogState.stagedLegs, insertionIdx, homeCityName);
       fromCity = inferredPriorCity || toCity || 'Home';
     }
 
     const legPayload = {
       id: 'leg_' + Date.now(),
+      type: legType,
       label: label,
       colour: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'),
       cityFood: [{ text: "Local dish to try", done: false }],
@@ -4363,6 +4749,22 @@ function applyStagedLegsAndSync() {
 }
 
 function confirmSaveLegSequence() {
+  const legs = legDialogState?.stagedLegs;
+  if (Array.isArray(legs) && legs.length > 0) {
+    const first = legs[0];
+    const last = legs[legs.length - 1];
+    if (typeof isTerminalLeg === 'function') {
+      if (!isTerminalLeg(first) || (first.type && first.type !== 'start')) {
+        const proceed = confirm(`Warning: The first leg (${first.label || 'Leg 1'}) is not a Trip Start leg. Continue anyway?`);
+        if (!proceed) return;
+      }
+      if (legs.length > 1 && (!isTerminalLeg(last) || (last.type && last.type !== 'return'))) {
+        const proceed = confirm(`Warning: The final leg (${last.label || 'Last Leg'}) is not a Trip Finish leg. Continue anyway?`);
+        if (!proceed) return;
+      }
+    }
+  }
+
   const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
   if (cascadeCheckbox && cascadeCheckbox.checked && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs.length > 0) {
     cascadeStagedLegDates(0);
@@ -4371,7 +4773,9 @@ function confirmSaveLegSequence() {
   applyStagedLegsAndSync();
   closeAddLegDialog();
 
-  if (typeof rebuildItineraryAndDataMappings === 'function') {
+  if (typeof rebuildTripFromLegs === 'function') {
+    rebuildTripFromLegs({ showToast: true, message: 'Trip route sequence saved & itinerary rebuilt!' });
+  } else if (typeof rebuildItineraryAndDataMappings === 'function') {
     rebuildItineraryAndDataMappings({ showToast: true, message: 'Trip route sequence saved & itinerary rebuilt!' });
   } else {
     if (typeof sortLegs === 'function') sortLegs();
@@ -4845,5 +5249,6 @@ Object.assign(window, {
   switchLegModalTab, editLegDirectFromReorder, confirmSaveLegSequence, applyStagedLegsAndSync,
   stepLegDuration, onLegDurationInputChange, onLegStartDateChange, onLegEndDateChange,
   onLegPlacementChange, toggleNewCityInline, onExistingCitySelectChange, getPlacementDefaultDates,
-  syncStaysAndJourneysFromDateChanges
+  syncStaysAndJourneysFromDateChanges, isTerminalLeg, enforceTerminalLegs, rebuildLegRouting, rebuildTripFromLegs,
+  buildLegDaysWithNotes, _populateLegPlacementDropdown
 });
