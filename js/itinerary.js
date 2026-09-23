@@ -735,14 +735,22 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
   const dayStayInfo = getStayDisplayForDay(day.date, day.to);
   const stayingHeadingNote = renderStayingHeadingNote(day.date, day.to, 'day-stay-heading-note-compact');
   const dayTotal = getDayTotal(day);
-  const fromCity = String(day.from || '').trim();
-  const toCity = String(day.to || '').trim();
-  const isTravelDay = fromCity && toCity && fromCity.toLowerCase() !== toCity.toLowerCase();
+  let fromCity = String(day.from || '').trim();
+  let toCity = String(day.to || '').trim();
   const hasTravelJourney = Array.isArray(dayJourneys) && dayJourneys.some(j => {
     const from = String(j?.fromLocation || '').trim().toLowerCase();
     const to = String(j?.toLocation || '').trim().toLowerCase();
     return from && to && from !== to;
   });
+  if (leg.type === 'return' && fromCity.toLowerCase() === toCity.toLowerCase()) {
+    const homeCity = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
+    toCity = homeCity;
+  }
+  if (hasTravelJourney && fromCity.toLowerCase() === toCity.toLowerCase() && Array.isArray(dayJourneys) && dayJourneys.length > 0) {
+    const journeyTo = dayJourneys.find(j => j?.toLocation && String(j.toLocation).trim().toLowerCase() !== fromCity.toLowerCase())?.toLocation;
+    if (journeyTo) toCity = String(journeyTo).trim();
+  }
+  const isTravelDay = fromCity && toCity && fromCity.toLowerCase() !== toCity.toLowerCase();
   const cityCore = toCity || fromCity || '';
   const typePriority = { flight: 5, plane: 5, train: 4, rail: 4, bus: 3, ferry: 2, boat: 2, car: 1 };
   const inferJourneyType = journey => {
@@ -770,7 +778,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
         bestScore = score;
       }
     });
-    return getTransportIcon(bestType);
+    return typeof getTransportIcon === 'function' ? getTransportIcon(bestType) : '✈️';
   };
   const normalizeCityText = value => String(value || '')
     .normalize('NFD')
@@ -865,7 +873,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
     })() : '';
     const subLocsHtml = stayLoc ? `<div class="daily-timeline-sub-locations timeline-sub-locations-indented">${renderJourneySubLocationTextHtml(stayLoc)}</div>` : '';
     const notesHtml = info.notes ? `<div class="daily-timeline-notes timeline-notes-indented">💬 ${escapeCompactText(info.notes)}</div>` : '';
-    return `<div class="compact-grouped-item split-item-selectable" onclick="handleSplitItemClick(this, event); ${isEditMode ? `event.stopPropagation(); openEditStayModal('${info.stayId}');` : ''}" data-item-title="${escapeCompactText(info.propertyName)}" data-item-type="stay" data-item-location="${escapeCompactText(info.location || '')}" data-item-cost="${escapeCompactText(info.cost || '')}" data-item-notes="${escapeCompactText(info.notes || '')}">${mainLine}${subLocsHtml}${notesHtml}</div>`;
+    return `<div class="compact-grouped-item split-item-selectable" onclick="handleSplitItemClick(this, event); ${(typeof isEditMode !== 'undefined' && isEditMode) ? `event.stopPropagation(); openEditStayModal('${info.stayId}');` : ''}" data-item-title="${escapeCompactText(info.propertyName)}" data-item-type="stay" data-item-location="${escapeCompactText(info.location || '')}" data-item-cost="${escapeCompactText(info.cost || '')}" data-item-notes="${escapeCompactText(info.notes || '')}">${mainLine}${subLocsHtml}${notesHtml}</div>`;
   }).join('');
 
   if (!accomLines) {
@@ -915,7 +923,7 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
           ${item.done ? 'checked' : ''}
           onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
         >
-        <div class="compact-activity-copy" ${isEditMode ? `style="display: flex; flex-direction: column; width: 100%; cursor: pointer;" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIdx}, ${itemIdx})"` : `style="display: flex; flex-direction: column; width: 100%;"`}>
+        <div class="compact-activity-copy" ${(typeof isEditMode !== 'undefined' && isEditMode) ? `style="display: flex; flex-direction: column; width: 100%; cursor: pointer;" onclick="event.stopPropagation(); openEditDayActivityModal(${legIndex}, ${dayIdx}, ${itemIdx})"` : `style="display: flex; flex-direction: column; width: 100%;"`}>
           ${renderCompactEmojiLine({
             emoji,
             text: split.title,
@@ -1056,12 +1064,26 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
           bestScore = score;
         }
       });
-      const icon = getTransportIcon(bestType);
-      const rawCityLabel = String(day.to || bestJourney.toLocation || day.from || 'City').trim();
+      const icon = typeof getTransportIcon === 'function' ? getTransportIcon(bestType) : '✈️';
+      let targetCity = '';
+      if (bestJourney && bestJourney.toLocation && cleanChipCity(bestJourney.toLocation) !== cleanChipCity(day.from)) {
+        targetCity = bestJourney.toLocation;
+      } else if (day.to && cleanChipCity(day.to) !== cleanChipCity(day.from)) {
+        targetCity = day.to;
+      } else {
+        targetCity = bestJourney?.toLocation || day.to || day.from || 'City';
+      }
+      const rawCityLabel = String(targetCity).trim();
       const cityLabel = cleanChipCity(rawCityLabel) || rawCityLabel;
       chipRoute = `${icon} ${cityLabel}`;
     } else if (isTravelDay || hasTravelJourney) {
-      const rawCityLabel = String(day.to || day.from || leg.label || 'City').trim();
+      let targetCity = day.to;
+      if (cleanChipCity(day.to) === cleanChipCity(day.from)) {
+        if (leg.type === 'return') {
+          targetCity = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? titleData.homeCity : day.to;
+        }
+      }
+      const rawCityLabel = String(targetCity || day.to || day.from || leg.label || 'City').trim();
       chipRoute = cleanChipCity(rawCityLabel) || rawCityLabel;
     }
     return `
@@ -4542,6 +4564,7 @@ window.toggleActivitiesCardDetails = toggleActivitiesCardDetails;
 window.compactItineraryGoToDay = compactItineraryGoToDay;
 window.captureCompactDayPagerStates = captureCompactDayPagerStates;
 window.restoreCompactDayPagerScrollPositions = restoreCompactDayPagerScrollPositions;
+window.renderCompactDayPager = renderCompactDayPager;
 window.findItineraryPositionForDate = findItineraryPositionForDate;
 window.getCurrentTripPosition = getCurrentTripPosition;
 window.applyCurrentTripPositionForTab = applyCurrentTripPositionForTab;

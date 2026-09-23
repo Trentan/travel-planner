@@ -3186,6 +3186,7 @@ function rebuildTripFromLegs(options = {}) {
   if (typeof rebuildLegRouting === 'function' && Array.isArray(appData)) rebuildLegRouting(appData);
   
   if (typeof syncAllLegDays === 'function') syncAllLegDays(true, forceRebuildDays);
+  if (typeof rebuildLegRouting === 'function' && Array.isArray(appData)) rebuildLegRouting(appData);
   
   if (typeof migrateJourneyCityIds === 'function') migrateJourneyCityIds();
   if (typeof sortLegs === 'function') sortLegs();
@@ -4127,7 +4128,7 @@ function buildLegDaysWithNotes({ dateFrom, dateTo, fromCity, toCity, legType, da
       date: cur,
       day: typeof getWeekdayLabelForTripDate === 'function' ? getWeekdayLabelForTripDate(cur) : 'Mon',
       from: ((legType === 'start' || legType === 'city' || legType === 'transit') && !isFirstDay) ? cleanToCity : cleanFromCity,
-      to: (legType === 'return' && !isLastDay) ? cleanFromCity : cleanToCity,
+      to: cleanToCity,
       completed: false,
       desc: desc,
       transportItems: isFirstDay ? [{ text: "Add transport...", cost: "0" }] : [],
@@ -5213,5 +5214,5 @@ Object.assign(window, {
   stepLegDuration, onLegDurationInputChange, onLegStartDateChange, onLegEndDateChange,
   onLegPlacementChange, toggleNewCityInline, onExistingCitySelectChange, getPlacementDefaultDates,
   syncStaysAndJourneysFromDateChanges, isTerminalLeg, enforceTerminalLegs, rebuildLegRouting, rebuildTripFromLegs,
-  _populateLegPlacementDropdown
+  buildLegDaysWithNotes, _populateLegPlacementDropdown
 });

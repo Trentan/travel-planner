@@ -13,6 +13,7 @@ global.localStorage = {
 
 global.window = global;
 global.window.addEventListener = () => {};
+global.isEditMode = false;
 
 const elements = {};
 function createMockElement(id, initialProps = {}) {
@@ -102,6 +103,7 @@ require('../js/utils.js');
 require('../js/timezone.js');
 require('../js/data.js');
 require('../js/crud.js');
+require('../js/itinerary.js');
 
 async function runLegManagementWysiwygSuite() {
   console.log('Running Leg Management & WYSIWYG Drag-and-Drop test suite...');
@@ -871,6 +873,45 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(denpasarLeg.days[0].date, '2026-12-13', 'Denpasar stay begins on flight arrival / checkin date');
   assert.strictEqual(denpasarLeg.days[denpasarLeg.days.length - 1].date, '2026-12-21', 'Denpasar stay ends on checkout / departure date');
   assert.strictEqual(retLeg.days.length, 1, 'Return leg has 1 return day');
+
+  // 14l. Test return leg routing and buildLegDaysWithNotes sets destination to homeCity on all days (#428)
+  console.log('  Testing return leg routing and buildLegDaysWithNotes destination (#428)...');
+  const returnDays = buildLegDaysWithNotes({
+    dateFrom: '2026-12-21',
+    dateTo: '2026-12-22',
+    fromCity: 'Denpasar Bali',
+    toCity: 'Brisbane',
+    legType: 'return'
+  });
+  assert.strictEqual(returnDays.length, 2, 'Return leg spans 2 days');
+  assert.strictEqual(returnDays[0].from, 'Denpasar Bali', 'Day 1 departs from Denpasar Bali');
+  assert.strictEqual(returnDays[0].to, 'Brisbane', 'Day 1 destination is Brisbane (not Denpasar Bali)');
+  assert.strictEqual(returnDays[1].from, 'Denpasar Bali', 'Day 2 departs from Denpasar Bali');
+  assert.strictEqual(returnDays[1].to, 'Brisbane', 'Day 2 destination is Brisbane');
+
+  // Also test renderCompactDayPager for return leg day with DPS -> BNE flight
+  const mockReturnLeg = {
+    id: 'leg-ret-test',
+    label: 'Brisbane (Trip Finish)',
+    type: 'return',
+    colour: '#10b981',
+    days: returnDays
+  };
+  global.journeysByJourneyIdMap = new Map();
+  global.getDayJourneys = (date) => {
+    if (date === '2026-12-21') {
+      return [{
+        id: 'j-flight',
+        fromLocation: 'Denpasar Bali',
+        toLocation: 'Brisbane',
+        transportType: 'flight'
+      }];
+    }
+    return [];
+  };
+  const pagerHtml = renderCompactDayPager(mockReturnLeg, 0);
+  assert.ok(pagerHtml.includes('✈️ Brisbane'), 'Day 1 compact chip displays ✈️ Brisbane');
+  assert.strictEqual(pagerHtml.includes('✈️ Denpasar Bali'), false, 'Day 1 compact chip does NOT display ✈️ Denpasar Bali');
 
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }
