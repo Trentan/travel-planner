@@ -22,6 +22,18 @@ GitHub Issues and Milestones are the active source of truth.
 - Delegate heavy codebase research or parallel execution to subagents (`research` / `self`) when context efficiency is needed.
 - Maintain full alignment with active GitHub issues and avoid drift.
 
+## Token Conservation & Test Execution Rules
+
+- **Launch-and-Inspect Tests (No Verbose Synchronous Waiting)**:
+  - NEVER run full test suites (`npm test`, Jest, Playwright) synchronously dumping unbounded stdout/stderr into context.
+  - Launch test runs into the background or pipe output to a log file (`npm test > test.log 2>&1`), checking only the final exit code or targeted failure lines.
+  - For targeted testing, run only the relevant single test file with silent/reporter flags (e.g., `npx jest path/to/file.test.js --silent`).
+- **Targeted Context Reading**:
+  - Never view entire multi-hundred line files with `view_file` when only inspecting small blocks. Always use `grep_search` first, then inspect targeted line slices (`StartLine`/`EndLine`).
+- **No Redundant Artifact Generation**:
+  - Skip planning mode / heavy artifact creation for straightforward fixes, isolated tasks, or one-off checks.
+
+
 ## Standard UI Viewports & Modes
 
 When testing UI changes, verify across desktop and mobile modes:
