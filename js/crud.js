@@ -2104,7 +2104,7 @@ function openAddLegDialog(initialTab = 'edit') {
     modal.style.display = 'flex';
     const editSelect = document.getElementById('editLegSelect');
     if (editSelect) {
-      editSelect.value = 'ADD_NEW';
+      editSelect.value = '';
       editSelect.onchange = onEditLegSelectionChange;
     }
     resetLegDialogToAddNew();
@@ -2177,8 +2177,7 @@ function _populateAddLegCityDropdowns() {
   if (editLegSelect) {
     const currentValue = editLegSelect.value;
     const options = [
-      '<option value="ADD_NEW">➕ Add New Leg</option>',
-      '<option value="" disabled>──────────</option>'
+      '<option value="">-- Select existing leg to edit --</option>'
     ];
     const sourceLegs = (legDialogState && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs.length > 0)
       ? legDialogState.stagedLegs
@@ -2205,10 +2204,10 @@ function _populateAddLegCityDropdowns() {
       options.push(`<option value="${idx}">${safeLabel}</option>`);
     });
     editLegSelect.innerHTML = options.join('');
-    if (currentValue && (currentValue === 'ADD_NEW' || Number.isFinite(Number(currentValue)))) {
+    if (currentValue && Number.isFinite(Number(currentValue))) {
       editLegSelect.value = currentValue;
     } else {
-      editLegSelect.value = 'ADD_NEW';
+      editLegSelect.value = '';
     }
   }
 
@@ -2324,10 +2323,25 @@ function updateLegDialogUiMode() {
   const title = document.getElementById('legDialogTitle') || document.querySelector('#add-leg-modal .modal-header h2');
   const saveBtn = document.getElementById('legDialogSaveBtn');
   const placementGroup = document.getElementById('legPlacementGroup');
+  const existingCitySelect = document.getElementById('existingCitySelect');
+  const toggleNewCityBtn = document.getElementById('toggleNewCityBtn');
+  const newCityInlineGroup = document.getElementById('newCityInlineGroup');
   const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
+
   if (title) title.textContent = isEdit ? 'Edit Trip Leg' : 'Add New Trip Leg';
   if (saveBtn) saveBtn.textContent = isEdit ? 'Save Leg' : 'Add Leg';
   if (placementGroup) placementGroup.style.display = isEdit ? 'none' : 'block';
+
+  if (existingCitySelect) {
+    existingCitySelect.disabled = isEdit;
+  }
+  if (toggleNewCityBtn) {
+    toggleNewCityBtn.style.display = isEdit ? 'none' : 'inline-block';
+  }
+  if (newCityInlineGroup && isEdit) {
+    newCityInlineGroup.style.display = 'none';
+  }
+
   _syncLegDialogActions();
 }
 
@@ -3299,7 +3313,7 @@ function setSelectValueMatchingCity(selectEl, rawCityValue, fallbackVal = '') {
 
 function resetLegDialogToAddNew() {
   const editLegSelect = document.getElementById('editLegSelect');
-  if (editLegSelect) editLegSelect.value = 'ADD_NEW';
+  if (editLegSelect) editLegSelect.value = '';
   legDialogState.mode = 'add';
   legDialogState.editLegIdx = null;
 
@@ -3334,7 +3348,7 @@ function resetLegDialogToAddNew() {
     countryOther.style.display = 'none';
   }
   if (newCityInline) newCityInline.style.display = 'none';
-  if (toggleNewCityBtn) toggleNewCityBtn.textContent = '+ Enter New City';
+  if (toggleNewCityBtn) toggleNewCityBtn.textContent = '+ Add a new city';
   if (dayNotesInput) dayNotesInput.value = '';
 
   if (dateFrom) {
@@ -3422,7 +3436,7 @@ function onEditLegSelectionChange() {
   const dayNotesInput = document.getElementById('legDayNotesInput');
 
   if (newCityInline) newCityInline.style.display = 'none';
-  if (toggleNewCityBtn) toggleNewCityBtn.textContent = '+ Enter New City';
+  if (toggleNewCityBtn) toggleNewCityBtn.textContent = '+ Add a new city';
 
   // Populate city from and city to dropdowns if already entered
   if (legType === 'start') {
@@ -3612,7 +3626,7 @@ function toggleNewCityInline() {
     if (nameInput) nameInput.focus();
   } else {
     inlineGroup.style.display = 'none';
-    if (toggleBtn) toggleBtn.textContent = '+ Enter New City';
+    if (toggleBtn) toggleBtn.textContent = '+ Add a new city';
     if (nameInput) nameInput.value = '';
   }
 }
@@ -3625,7 +3639,7 @@ function onExistingCitySelectChange() {
 
   if (existingSelect && existingSelect.value) {
     if (inlineGroup) inlineGroup.style.display = 'none';
-    if (toggleBtn) toggleBtn.textContent = '+ Enter New City';
+    if (toggleBtn) toggleBtn.textContent = '+ Add a new city';
     if (nameInput) nameInput.value = '';
   }
 }
@@ -3698,7 +3712,7 @@ function closeAddLegDialog() {
     countryOther.style.display = 'none';
   }
   if (newCityInline) newCityInline.style.display = 'none';
-  if (toggleNewCityBtn) toggleNewCityBtn.textContent = '+ Enter New City';
+  if (toggleNewCityBtn) toggleNewCityBtn.textContent = '+ Add a new city';
   if (fromDate) {
     fromDate.value = '';
     fromDate.classList.remove('border-rose-500');
@@ -3899,7 +3913,7 @@ function switchLegModalTab(tabName) {
     }
     if (reorderSec) reorderSec.style.display = 'none';
     if (editSec) editSec.style.display = 'block';
-    if (modalTitle) modalTitle.textContent = (legDialogState && legDialogState.mode === 'edit') ? 'Edit Leg' : 'Add New Leg';
+    if (modalTitle) modalTitle.textContent = (legDialogState && legDialogState.mode === 'edit') ? 'Edit Trip Leg' : 'Add New Trip Leg';
     validateLegEditorForm();
   }
 }
@@ -4478,7 +4492,7 @@ function confirmAddLeg() {
         if (oldDay.transportItems) newDay.transportItems = oldDay.transportItems;
         if (oldDay.notes) newDay.notes = oldDay.notes;
         if (typeof oldDay.completed !== 'undefined') newDay.completed = oldDay.completed;
-        if (oldDay.desc && !dayNotes?.[0]) newDay.desc = oldDay.desc;
+        if (oldDay.desc && (!dayNotes || dayNotes.length === 0)) newDay.desc = oldDay.desc;
       }
     });
 
