@@ -70,6 +70,8 @@ createMockElement('newLegCityCountrySelect');
 createMockElement('newLegCityCountryOther');
 createMockElement('newCityInlineGroup');
 createMockElement('toggleNewCityBtn');
+createMockElement('legTerminalWarningBanner');
+createMockElement('legTerminalWarningMsg');
 
 global.document = {
   body: {
@@ -703,6 +705,80 @@ async function runLegManagementWysiwygSuite() {
   const isSameDayValid = validateLegEditorForm();
   assert.strictEqual(isSameDayValid, true, 'Validation passes for same-day leg');
   assert.strictEqual(elements['legDialogSaveBtn'].disabled, false, 'Save button enabled for same-day leg');
+
+  // 14. Test Issue #428 Leg Management, Terminal Leg Enforcement & Rebuild
+  console.log('  Testing Issue #428 Leg Management, Terminal Leg Enforcement & Rebuild...');
+  
+  // 14a. Test isTerminalLeg prefers leg.type
+  assert.strictEqual(isTerminalLeg({ type: 'start' }), true, 'isTerminalLeg recognizes type: start');
+  assert.strictEqual(isTerminalLeg({ type: 'return' }), true, 'isTerminalLeg recognizes type: return');
+  assert.strictEqual(isTerminalLeg({ type: 'city' }), false, 'isTerminalLeg returns false for type: city');
+  assert.strictEqual(isTerminalLeg({ label: 'Brisbane (Trip Start)' }), true, 'isTerminalLeg recognizes legacy Trip Start label');
+
+  // 14b. Test enforceTerminalLegs ensures start and return terminal legs
+  const testTripLegs = [
+    { id: 'leg-paris', label: '🇫🇷 Paris', type: 'city', days: [
+      { date: '2026-06-12', from: 'Paris', to: 'Paris' },
+      { date: '2026-06-13', from: 'Paris', to: 'Paris' }
+    ]},
+    { id: 'leg-rome', label: '🇮🇹 Rome', type: 'city', days: [
+      { date: '2026-06-14', from: 'Rome', to: 'Rome' },
+      { date: '2026-06-15', from: 'Rome', to: 'Rome' }
+    ]}
+  ];
+  enforceTerminalLegs(testTripLegs);
+  assert.strictEqual(testTripLegs.length, 4, 'enforceTerminalLegs prepended start leg and appended return leg');
+  assert.strictEqual(testTripLegs[0].type, 'start', 'First leg is start type');
+  assert.strictEqual(testTripLegs[testTripLegs.length - 1].type, 'return', 'Last leg is return type');
+
+  // 14c. Test rebuildLegRouting establishes correct sequence-based routing
+  rebuildLegRouting(testTripLegs);
+  assert.strictEqual(testTripLegs[0].days[0].from, 'Brisbane', 'Start leg departs from Home (Brisbane)');
+  assert.strictEqual(testTripLegs[0].days[0].to, 'Paris', 'Start leg arrives at first destination (Paris)');
+  assert.strictEqual(testTripLegs[1].days[0].from, 'Brisbane', 'Paris day 1 arrives from Brisbane');
+  assert.strictEqual(testTripLegs[1].days[1].to, 'Rome', 'Paris day 2 departs for Rome');
+  assert.strictEqual(testTripLegs[2].days[0].from, 'Paris', 'Rome day 1 arrives from Paris');
+  assert.strictEqual(testTripLegs[2].days[1].to, 'Brisbane', 'Rome day 2 departs to Brisbane');
+  assert.strictEqual(testTripLegs[3].days[0].from, 'Rome', 'Return leg departs from Rome');
+  assert.strictEqual(testTripLegs[3].days[0].to, 'Brisbane', 'Return leg returns to Home (Brisbane)');
+
+  // 14d. Test renderLegReorderList locks terminal legs with padlock icon
+  setLegDialogState({ mode: 'add', editLegIdx: null, stagedLegs: testTripLegs, originalLegDates: {} });
+  renderLegReorderList();
+  assert.strictEqual(elements['legReorderList'].innerHTML.includes('🔒'), true, 'Reorder list renders 🔒 padlock for terminal legs');
+  assert.strictEqual(elements['legReorderList'].innerHTML.includes('draggable="false"'), true, 'Terminal legs have draggable=false');
+
+  // 14e. Test moveLegInSequence guards against moving terminal legs or moving into terminal positions
+  const originalOrder = testTripLegs.map(l => l.id);
+  moveLegInSequence(0, 1);
+  assert.strictEqual(testTripLegs[0].id, originalOrder[0], 'moveLegInSequence blocked moving start leg away from position 0');
+  moveLegInSequence(1, 0);
+  assert.strictEqual(testTripLegs[0].id, originalOrder[0], 'moveLegInSequence blocked moving regular leg into start leg position 0');
+  moveLegInSequence(testTripLegs.length - 1, testTripLegs.length - 2);
+  assert.strictEqual(testTripLegs[testTripLegs.length - 1].id, originalOrder[testTripLegs.length - 1], 'moveLegInSequence blocked moving return leg away from final position');
+
+  // 14f. Test _populateLegPlacementDropdown omits "At start of trip" when start leg exists
+  _populateLegPlacementDropdown();
+  const placementHtml = elements['legPlacementSelect'].innerHTML;
+  assert.strictEqual(placementHtml.includes('value="start"'), false, 'Placement dropdown excludes "At start of trip" when start leg is present');
+
+  // 14g. Test onLegTypeChange locks fromCitySelect to Home for start legs
+  elements['legTypeSelect'].value = 'start';
+  onLegTypeChange();
+  assert.strictEqual(elements['fromCitySelect'].disabled, true, 'fromCitySelect disabled/locked for start leg');
+  assert.strictEqual(elements['fromCitySelect'].value, 'Home', 'fromCitySelect pre-set to Home for start leg');
+
+  // Test onLegTypeChange locks toCitySelect to Home for return legs
+  elements['legTypeSelect'].value = 'return';
+  onLegTypeChange();
+  assert.strictEqual(elements['toCitySelect'].disabled, true, 'toCitySelect disabled/locked for return leg');
+  assert.strictEqual(elements['toCitySelect'].value, 'Home', 'toCitySelect pre-set to Home for return leg');
+
+  // Reset to city
+  elements['legTypeSelect'].value = 'city';
+  onLegTypeChange();
+  assert.strictEqual(elements['fromCitySelect'].disabled, false, 'fromCitySelect unlocked for city leg');
+  assert.strictEqual(elements['toCitySelect'].disabled, false, 'toCitySelect unlocked for city leg');
 
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }

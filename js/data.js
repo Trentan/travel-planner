@@ -5394,7 +5394,11 @@ function normalizeTripLegsData(legs) {
     });
     leg.suggestedActivities = deduped;
   });
+
   return legs;
+}
+if (typeof window !== 'undefined') {
+  window.normalizeTripLegsData = normalizeTripLegsData;
 }
 
 function normalizeTripJourneysData(items) {
