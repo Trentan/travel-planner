@@ -831,6 +831,47 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(sampleLegs[2].type, 'city', 'Multi-day intermediate leg typed as city');
   assert.strictEqual(sampleLegs[3].type, 'return', 'Final terminal leg typed as return');
 
+  // 14k. Test rebuildTripFromLegs preserves destination city days during Sync from Transport (Issue #428)
+  console.log('  Testing rebuildTripFromLegs preserves destination city days during Sync from Transport (#428)...');
+  global.titleData = { homeCity: 'Melbourne', title: 'Bali 2026' };
+  global.journeys = [
+    { id: 'j-out', legId: 'leg-start', fromLocation: 'Melbourne', toLocation: 'Denpasar (DPS)', departureDate: '2026-12-13', arrivalDate: '2026-12-13' },
+    { id: 'j-ret', legId: 'leg-return', fromLocation: 'Denpasar (DPS)', toLocation: 'Melbourne', departureDate: '2026-12-21', arrivalDate: '2026-12-21' }
+  ];
+  global.stays = [
+    { id: 's-bali', city: 'Bali', checkIn: '2026-12-13', checkOut: '2026-12-21' }
+  ];
+  global.citiesData = [
+    { id: 'city-bali', name: 'Denpasar Bali', code: 'DPS' }
+  ];
+  global.appData = [
+    { id: 'leg-start', label: 'Melbourne (Trip Start)', type: 'start', days: [{ date: '2026-12-13', from: 'Melbourne', to: 'Denpasar' }] },
+    { id: 'leg-denpasar', label: 'Denpasar', type: 'city', days: [
+      { date: '2026-12-14', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-15', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-16', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-17', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-18', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-19', from: 'Denpasar', to: 'Denpasar' },
+      { date: '2026-12-20', from: 'Denpasar', to: 'Denpasar' }
+    ]},
+    { id: 'leg-return', label: 'Melbourne (Trip Finish)', type: 'return', days: [{ date: '2026-12-21', from: 'Denpasar', to: 'Melbourne' }] }
+  ];
+  window.journeys = global.journeys;
+  window.stays = global.stays;
+
+  rebuildTripFromLegs({ showToast: false, forceRebuildDays: true });
+
+  const stLeg = global.appData.find(l => l.id === 'leg-start');
+  const denpasarLeg = global.appData.find(l => l.id === 'leg-denpasar');
+  const retLeg = global.appData.find(l => l.id === 'leg-return');
+
+  assert.strictEqual(stLeg.days.length, 1, 'Start leg has 1 departure day');
+  assert.ok(denpasarLeg.days.length >= 7, `Denpasar leg must maintain multi-day stay duration (actual: ${denpasarLeg.days.length})`);
+  assert.strictEqual(denpasarLeg.days[0].date, '2026-12-13', 'Denpasar stay begins on flight arrival / checkin date');
+  assert.strictEqual(denpasarLeg.days[denpasarLeg.days.length - 1].date, '2026-12-21', 'Denpasar stay ends on checkout / departure date');
+  assert.strictEqual(retLeg.days.length, 1, 'Return leg has 1 return day');
+
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }
 

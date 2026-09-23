@@ -2597,8 +2597,8 @@ function autoGenerateMissingTransitLegs(legsList) {
     const currentLeg = legsList[i];
     const nextLeg = legsList[i + 1];
     
-    if (currentLeg.label && currentLeg.label.includes('Departure')) { i++; continue; }
-    if (nextLeg.label && nextLeg.label.includes('Return')) break; 
+    if (isTerminalLeg(currentLeg) || (currentLeg.label && (currentLeg.label.includes('Departure') || currentLeg.label.includes('Start')))) { i++; continue; }
+    if (isTerminalLeg(nextLeg) || (nextLeg.label && (nextLeg.label.includes('Return') || nextLeg.label.includes('Finish')))) break; 
     
     const currentBase = getBaseName(currentLeg.label);
     const nextBase = getBaseName(nextLeg.label);
@@ -2826,9 +2826,14 @@ function syncAllLegDays(silent = false, forceRebuild = false) {
     const baseCityName = getBaseNameGlobal(rawCityName);
     const cityId = leg.cityId || ('city-' + baseCityName.replace(/[^a-z0-9]/g, '-'));
 
-    const legStays = (window.stays || []).filter(s => 
+    const isTerminal = (typeof isTerminalLeg === 'function' && isTerminalLeg(leg)) || leg.type === 'start' || leg.type === 'return';
+    const legStays = isTerminal ? [] : (window.stays || []).filter(s => 
       s._inferredLegId === leg.id || 
-      (!s._inferredLegId && (s.cityId === cityId || (s.city && getBaseNameGlobal(s.city) === baseCityName)))
+      (!s._inferredLegId && (
+        (s.cityId && leg.cityId && s.cityId === leg.cityId) ||
+        (s.cityId === cityId || (s.city && getBaseNameGlobal(s.city) === baseCityName)) ||
+        (s.city && legMatchesLocation(leg, s.city, false))
+      ))
     );
     
     // Ignore local intra-city transport by ensuring fromLocation !== toLocation
@@ -2853,11 +2858,14 @@ function syncAllLegDays(silent = false, forceRebuild = false) {
       if (!latestDate || normalized > latestDate) latestDate = normalized;
     };
 
-    const hasExistingDays = !forceRebuild && Array.isArray(leg.days) && leg.days.length > 0;
+    const existingStart = (Array.isArray(leg.days) && leg.days.length > 0) ? leg.days[0].date : null;
+    const existingEnd = (Array.isArray(leg.days) && leg.days.length > 0) ? leg.days[leg.days.length - 1].date : null;
+
+    const hasExistingDays = !forceRebuild && Boolean(existingStart);
     if (hasExistingDays) {
       // Retain the established leg date boundaries
-      considerDate(leg.days[0].date);
-      considerDate(leg.days[leg.days.length - 1].date);
+      considerDate(existingStart);
+      considerDate(existingEnd);
     } else {
       // For newly generated transit legs, empty legs, or when forceRebuild is requested:
       legStays.forEach(s => {
@@ -2867,10 +2875,30 @@ function syncAllLegDays(silent = false, forceRebuild = false) {
       arrivingJourneys.forEach(j => considerDate(j.arrivalDate || j.dayDate));
       departingJourneys.forEach(j => considerDate(j.departureDate || j.dayDate));
 
-      // Fallback: if no journeys or stays found for this leg, retain existing days' bounds
-      if (!earliestDate && Array.isArray(leg.days) && leg.days.length > 0) {
-        considerDate(leg.days[0].date);
-        considerDate(leg.days[leg.days.length - 1].date);
+      // Fallback 1: if no journeys or stays found for this leg, retain existing days' bounds
+      if (!earliestDate && existingStart) {
+        considerDate(existingStart);
+        considerDate(existingEnd);
+      } else if (earliestDate && existingEnd && (!latestDate || latestDate < existingEnd)) {
+        // If arriving journey established start date, but no departing journey/stay checkout was found,
+        // preserve the leg's established duration/end date rather than collapsing to a single day
+        if (departingJourneys.length === 0 && !legStays.some(s => s.checkOut)) {
+          considerDate(existingEnd);
+        }
+      }
+
+      // Fallback 2: For destination legs (city), check if next leg has an established start/departure date
+      const legIdx = appData.indexOf(leg);
+      if (leg.type === 'city' || (!leg.type && !isTerminalLeg(leg))) {
+        if ((!latestDate || latestDate === earliestDate) && legIdx >= 0 && legIdx < appData.length - 1) {
+          const nextLeg = appData[legIdx + 1];
+          if (nextLeg && Array.isArray(nextLeg.days) && nextLeg.days.length > 0 && nextLeg.days[0].date) {
+            const nextStart = nextLeg.days[0].date;
+            if (nextStart >= (earliestDate || '')) {
+              considerDate(nextStart);
+            }
+          }
+        }
       }
     }
 
@@ -3158,15 +3186,6 @@ function rebuildTripFromLegs(options = {}) {
   if (typeof rebuildLegRouting === 'function' && Array.isArray(appData)) rebuildLegRouting(appData);
   
   if (typeof syncAllLegDays === 'function') syncAllLegDays(true, forceRebuildDays);
-
-  if (Array.isArray(appData) && typeof window !== 'undefined' && Array.isArray(window.journeys)) {
-    appData.forEach(leg => {
-      const linked = window.journeys.filter(j => j && (j.legId === leg.id || j._inferredToLegId === leg.id));
-      if (linked.length > 0 && typeof regenerateItineraryFromJourneys === 'function') {
-        regenerateItineraryFromJourneys(linked, leg.id);
-      }
-    });
-  }
   
   if (typeof migrateJourneyCityIds === 'function') migrateJourneyCityIds();
   if (typeof sortLegs === 'function') sortLegs();
