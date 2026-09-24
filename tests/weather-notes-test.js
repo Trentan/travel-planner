@@ -36,10 +36,11 @@ function runWeatherNotesSuite() {
 
   console.log('Testing day notes functions in crud.js...');
   const crudCode = fs.readFileSync('js/crud.js', 'utf8');
+  const legEngineCode = fs.readFileSync('js/leg-engine.js', 'utf8');
   assert.ok(crudCode.includes('function addDayNote('), 'crud.js must define addDayNote');
   assert.ok(crudCode.includes('function updateDayNote('), 'crud.js must define updateDayNote');
   assert.ok(crudCode.includes('function deleteDayNote('), 'crud.js must define deleteDayNote');
-  assert.ok(crudCode.includes('if (oldDay.notes) nd.notes = oldDay.notes;'), 'crud.js must preserve day notes on rebuild');
+  assert.ok(legEngineCode.includes('if (oldDay.notes) nd.notes = oldDay.notes;'), 'leg-engine.js must preserve day notes on rebuild');
   console.log('✓ Day notes CRUD definitions verified.');
 
   console.log('Testing itinerary.js integration...');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-planner-v23';
+const CACHE_NAME = 'travel-planner-v24';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -9,6 +9,11 @@ const ASSETS = [
   './js/data.js',
   './js/packing.js',
   './js/dragdrop.js',
+  './js/leg-engine.js',
+  './js/leg-dialog.js',
+  './js/activity-scheduler.js',
+  './js/activity-modal.js',
+  './js/stays.js',
   './js/crud.js',
   './js/tabs.js',
   './js/ai.js',

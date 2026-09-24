@@ -76,7 +76,7 @@ createMockElement('legTerminalWarningBanner');
 createMockElement('legTerminalWarningMsg');
 createMockElement('legDurationSubtext');
 
-global.document = {
+const mockDocument = {
   body: {
     classList: { contains: () => false },
     insertBefore: () => {},
@@ -97,6 +97,7 @@ global.document = {
   },
   addEventListener: () => {}
 };
+global.document = mockDocument;
 
 // Require dependencies
 require('../js/default-data.js');
@@ -107,6 +108,8 @@ require('../js/crud.js');
 require('../js/itinerary.js');
 
 async function runLegManagementWysiwygSuite() {
+  global.document = mockDocument;
+  global.window = global;
   console.log('Running Leg Management & WYSIWYG Drag-and-Drop test suite...');
 
   // 0. Test checkDateConflict
