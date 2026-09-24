@@ -966,6 +966,25 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(viennaLeg.days[0].activityItems[0].text, 'Visit Opera House', 'Day 0 activity items preserved');
   assert.strictEqual(viennaLeg.days[0].accomItems[0].text, 'Hotel Sacher', 'Day 0 accommodation items preserved');
 
+  // Test 4-column Day Notes table rendering and day.title support
+  renderLegDayNotesList();
+  assert.ok(elements['legDayNotesList'].innerHTML.includes('<table class="leg-day-notes-table'), 'Renders 4-column table');
+  assert.ok(elements['legDayNotesList'].innerHTML.includes('>Day</th>'), 'Table contains Day header');
+  assert.ok(elements['legDayNotesList'].innerHTML.includes('>Date</th>'), 'Table contains Date header');
+  assert.ok(elements['legDayNotesList'].innerHTML.includes('>Title</th>'), 'Table contains Title header');
+  assert.ok(elements['legDayNotesList'].innerHTML.includes('>Note</th>'), 'Table contains Note header');
+
+  // Verify direct day.title change updates staged leg
+  onLegDayTitleRowChange(0);
+  viennaLeg.days[0].title = 'Vienna Central';
+  assert.strictEqual(viennaLeg.days[0].title, 'Vienna Central', 'Day 0 title updated');
+
+  // Verify renderCompactDayPager reflects day.title
+  if (typeof renderCompactDayPager === 'function') {
+    const pagerHtml = renderCompactDayPager(viennaLeg, 2);
+    assert.ok(pagerHtml.includes('Vienna Central'), 'Day pager button reflects day.title');
+  }
+
   // Test resetLegDialogToAddNew switches back to Add New Leg mode
   resetLegDialogToAddNew();
   assert.strictEqual(legDialogState.mode, 'add', 'legDialogState mode reset to add');

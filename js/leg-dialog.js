@@ -613,9 +613,11 @@ function renderLegDayNotesList() {
     let idx = 0;
     while (cur <= endDate) {
       const existingDesc = currentLeg?.days?.[idx]?.desc || '';
+      const existingTitle = currentLeg?.days?.[idx]?.title || currentLeg?.days?.[idx]?.to || '';
       days.push({
         date: cur,
         dayIdx: idx,
+        title: existingTitle,
         desc: existingDesc
       });
       if (typeof addDaysToIsoDate === 'function') {
@@ -632,6 +634,7 @@ function renderLegDayNotesList() {
       days.push({
         date: d.date || '',
         dayIdx: idx,
+        title: d.title || d.to || '',
         desc: d.desc || ''
       });
     });
@@ -640,47 +643,121 @@ function renderLegDayNotesList() {
     days.push({
       date: startDate || '',
       dayIdx: 0,
+      title: '',
       desc: ''
     });
   }
 
   // Preserve any in-progress edits in existing input elements
-  const existingInputs = container.querySelectorAll('.leg-day-note-row-input');
-  const inProgressValues = Array.from(existingInputs).map(inp => inp.value);
+  const existingNoteInputs = container.querySelectorAll('.leg-day-note-row-input');
+  const inProgressNotes = Array.from(existingNoteInputs).map(inp => inp.value);
 
-  // If hidden textarea has values and is newer, or if we have inProgressValues
+  const existingTitleInputs = container.querySelectorAll('.leg-day-title-row-input');
+  const inProgressTitles = Array.from(existingTitleInputs).map(inp => inp.value);
+
+  // If hidden textarea has values and is newer, or if we have inProgressNotes
   const hiddenTextarea = document.getElementById('legDayNotesInput');
   const textareaLines = (hiddenTextarea?.value || '').split(/\r?\n/);
 
-  let html = '';
+  let rowsHtml = '';
   days.forEach((day, idx) => {
-    let currentVal = inProgressValues[idx] !== undefined
-      ? inProgressValues[idx]
+    let currentNoteVal = inProgressNotes[idx] !== undefined
+      ? inProgressNotes[idx]
       : (textareaLines[idx] !== undefined ? textareaLines[idx] : (day.desc || ''));
 
-    // Safe escaping
-    const safeVal = typeof escapeHtmlText === 'function' ? escapeHtmlText(currentVal) : currentVal.replace(/"/g, '&quot;');
-    const dayDateStr = day.date ? ` • ${day.date}` : '';
-    const dayLabel = `Day ${idx + 1}${dayDateStr}`;
+    let currentTitleVal = inProgressTitles[idx] !== undefined
+      ? inProgressTitles[idx]
+      : (day.title || '');
 
-    html += `
-      <div class="leg-day-note-row flex items-center gap-2 p-1.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs focus-within:border-teal-500 dark:focus-within:border-teal-400 transition-colors">
-        <span class="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-300 w-24 sm:w-28 shrink-0 truncate select-none pl-1" title="${dayLabel}">
-          Day ${idx + 1}${dayDateStr}
-        </span>
-        <input type="text"
-               class="leg-day-note-row-input flex-1 min-w-0 bg-transparent text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none py-1"
-               data-day-index="${idx}"
-               placeholder="e.g. Arrive & Check In, Explore Old Town..."
-               value="${safeVal}"
-               oninput="onLegDayNoteRowInput(${idx})"
-               onchange="onLegDayNoteRowChange(${idx})">
-      </div>
+    const safeNoteVal = typeof escapeHtmlText === 'function' ? escapeHtmlText(currentNoteVal) : currentNoteVal.replace(/"/g, '&quot;');
+    const safeTitleVal = typeof escapeHtmlText === 'function' ? escapeHtmlText(currentTitleVal) : currentTitleVal.replace(/"/g, '&quot;');
+
+    let formattedDate = day.date || '—';
+    if (day.date) {
+      if (typeof formatTripDateForDisplay === 'function') {
+        const weekday = typeof getWeekdayLabelForTripDate === 'function' ? getWeekdayLabelForTripDate(day.date) : '';
+        const disp = formatTripDateForDisplay(day.date);
+        formattedDate = weekday ? `${weekday} ${disp}` : disp;
+      }
+    }
+
+    rowsHtml += `
+      <tr class="leg-day-table-row border-b border-slate-100 dark:border-slate-800/80 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+        <td class="py-1 px-1.5 align-middle text-center w-14 shrink-0">
+          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-300 font-mono">
+            Day ${idx + 1}
+          </span>
+        </td>
+        <td class="py-1 px-1.5 align-middle w-24 text-[11px] font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          ${escapeHtmlText(formattedDate)}
+        </td>
+        <td class="py-1 px-1.5 align-middle w-1/3">
+          <input type="text"
+                 class="leg-day-title-row-input w-full bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 focus:border-teal-500 dark:focus:border-teal-400 focus:outline-none transition-colors"
+                 data-day-index="${idx}"
+                 placeholder="City / Title..."
+                 value="${safeTitleVal}"
+                 oninput="onLegDayTitleRowInput(${idx})"
+                 onchange="onLegDayTitleRowChange(${idx})">
+        </td>
+        <td class="py-1 px-1.5 align-middle w-1/2">
+          <input type="text"
+                 class="leg-day-note-row-input w-full bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 focus:border-teal-500 dark:focus:border-teal-400 focus:outline-none transition-colors"
+                 data-day-index="${idx}"
+                 placeholder="Notes & highlights..."
+                 value="${safeNoteVal}"
+                 oninput="onLegDayNoteRowInput(${idx})"
+                 onchange="onLegDayNoteRowChange(${idx})">
+        </td>
+      </tr>
     `;
   });
 
-  container.innerHTML = html;
+  container.innerHTML = `
+    <table class="leg-day-notes-table w-full text-left">
+      <thead>
+        <tr class="bg-slate-100/90 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700 text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+          <th class="py-1.5 px-1.5 text-center w-14">Day</th>
+          <th class="py-1.5 px-1.5 w-24">Date</th>
+          <th class="py-1.5 px-1.5 w-1/3">Title</th>
+          <th class="py-1.5 px-1.5 w-1/2">Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+    </table>
+  `;
   syncHiddenDayNotesTextarea();
+}
+
+
+function onLegDayTitleRowInput(idx) {
+  // Title changes can update staged leg immediately
+  const legState = getLegDialogState();
+  if (legState.mode === 'edit' && Number.isFinite(legState.editLegIdx) && Array.isArray(legState.stagedLegs)) {
+    const leg = legState.stagedLegs[legState.editLegIdx];
+    if (leg && Array.isArray(leg.days) && leg.days[idx]) {
+      const titleInput = document.querySelector(`.leg-day-title-row-input[data-day-index="${idx}"]`);
+      if (titleInput) {
+        leg.days[idx].title = titleInput.value.trim();
+      }
+    }
+  }
+}
+
+
+function onLegDayTitleRowChange(idx) {
+  const legState = getLegDialogState();
+  if (legState.mode === 'edit' && Number.isFinite(legState.editLegIdx) && Array.isArray(legState.stagedLegs)) {
+    const leg = legState.stagedLegs[legState.editLegIdx];
+    if (leg && Array.isArray(leg.days) && leg.days[idx]) {
+      const titleInput = document.querySelector(`.leg-day-title-row-input[data-day-index="${idx}"]`);
+      if (titleInput) {
+        leg.days[idx].title = titleInput.value.trim();
+      }
+    }
+  }
 }
 
 
@@ -1493,6 +1570,7 @@ function confirmAddLeg() {
           const cleanTo = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(oldDay.to) : oldDay.to;
           newDay.to = cleanTo || oldDay.to;
         }
+        if (oldDay.title) newDay.title = oldDay.title;
         if (oldDay.accomItems) newDay.accomItems = oldDay.accomItems;
         if (oldDay.activityItems) newDay.activityItems = oldDay.activityItems;
         if (oldDay.transportItems) newDay.transportItems = oldDay.transportItems;
@@ -1501,6 +1579,16 @@ function confirmAddLeg() {
         if (oldDay.desc && (!dayNotes || dayNotes.length === 0)) newDay.desc = oldDay.desc;
       }
     });
+
+    const titleInputs = document.querySelectorAll('.leg-day-title-row-input');
+    if (titleInputs && titleInputs.length > 0) {
+      titleInputs.forEach((inp, tIdx) => {
+        if (target.days && target.days[tIdx]) {
+          const val = (inp.value || '').trim();
+          if (val) target.days[tIdx].title = val;
+        }
+      });
+    }
 
     const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
     if (cascadeCheckbox && cascadeCheckbox.checked) {
@@ -1613,6 +1701,16 @@ function confirmAddLeg() {
     };
     if (matchedCityObj && matchedCityObj.id) {
       legPayload.cityId = matchedCityObj.id;
+    }
+
+    const titleInputs = document.querySelectorAll('.leg-day-title-row-input');
+    if (titleInputs && titleInputs.length > 0) {
+      titleInputs.forEach((inp, tIdx) => {
+        if (legPayload.days && legPayload.days[tIdx]) {
+          const val = (inp.value || '').trim();
+          if (val) legPayload.days[tIdx].title = val;
+        }
+      });
     }
 
     legDialogState.stagedLegs.splice(insertionIdx, 0, legPayload);
@@ -1752,6 +1850,8 @@ const _legDialogExports = {
   onNewLegCountryChange,
   renderLegReorderList,
   renderLegDayNotesList,
+  onLegDayTitleRowInput,
+  onLegDayTitleRowChange,
   onLegDayNoteRowInput,
   onLegDayNoteRowChange,
   syncHiddenDayNotesTextarea,

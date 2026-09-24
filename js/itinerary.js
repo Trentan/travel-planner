@@ -814,9 +814,12 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
   const inboundIcon = pickBestIcon(inboundJourneys);
   const outboundIcon = pickBestIcon(outboundJourneys);
   const travelIcon = pickBestIcon(dayJourneys || []);
-  const routeLabel = (isTravelDay || hasTravelJourney)
+  let routeLabel = (isTravelDay || hasTravelJourney)
     ? `${fromCity}${travelIcon ? ` ${travelIcon}` : ''} -> ${toCity}`
     : `${inboundIcon ? `${inboundIcon} ` : ''}${cityCore}${outboundIcon ? ` ${outboundIcon}` : ''}`;
+  if (day.title) {
+    routeLabel = day.title;
+  }
   const slideId = getCompactDaySlideId(leg.id, dayIdx);
 
   const transportLines = dayJourneys.flatMap(journey => {
@@ -1083,8 +1086,11 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
           targetCity = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? titleData.homeCity : day.to;
         }
       }
-      const rawCityLabel = String(targetCity || day.to || day.from || leg.label || 'City').trim();
+      const rawCityLabel = String(day.title || targetCity || day.to || day.from || leg.label || 'City').trim();
       chipRoute = cleanChipCity(rawCityLabel) || rawCityLabel;
+    }
+    if (day.title) {
+      chipRoute = day.title;
     }
     return `
       <button
