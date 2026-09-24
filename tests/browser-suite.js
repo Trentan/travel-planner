@@ -194,14 +194,16 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     await page.waitForSelector('#add-leg-modal', { state: 'visible' });
     await humanPause(page, 400);
 
-    // Verify dedicated reorder tab and Save Sequence Order button
-    const saveSeqBtnCount = await page.locator('#saveLegSequenceBtn').count();
-    assert(saveSeqBtnCount === 1, 'Desktop: #saveLegSequenceBtn should exist in reorder sequence view');
-    reporter.add('desktop', 'leg sequence reorder view', 'dedicated reorder view with save sequence order button');
+    // Verify desktop combined sequence view and Save button
+    const saveSeqBtnCount = await page.locator('#saveLegSequenceBtn, #desktopLegDialogSaveBtn').count();
+    assert(saveSeqBtnCount >= 1, 'Desktop: sequence and leg save actions should exist');
+    reporter.add('desktop', 'leg sequence reorder view', 'combined sequence and editor view available on desktop');
 
-    // Switch to Add / Edit Leg tab
-    await page.locator('#legTabEditBtn').click();
-    await humanPause(page, 300);
+    // Switch to Add / Edit Leg tab if tabs are visible (mobile view), otherwise already in combined view
+    if (await page.locator('#legTabEditBtn').isVisible()) {
+      await page.locator('#legTabEditBtn').click();
+      await humanPause(page, 300);
+    }
 
     // Verify reset state when toggling between edit and add leg
     if (await page.locator('#editLegSelect option').count() > 2) {
@@ -229,7 +231,7 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     await page.locator('#newLegStartDate').fill('2026-07-09');
     await page.locator('#newLegEndDate').fill('2026-07-12');
     await humanPause(page, 200);
-    await page.locator('#legDialogSaveBtn, button:has-text("Add Leg"), button:has-text("Save Leg")').first().click();
+    await page.locator('#desktopLegDialogSaveBtn:visible, #legDialogSaveBtn:visible').first().click();
     await humanPause(page, 300);
     // User request: Save leg should not dismiss the dialog; close button or Cancel closes it
     assert(await page.locator('#add-leg-modal').isVisible(), 'Desktop: saving leg should keep modal open for continued editing');

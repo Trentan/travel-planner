@@ -310,8 +310,10 @@ function updateLegDialogUiMode() {
 
 function _syncLegDialogActions() {
   const deleteBtn = document.getElementById('legDialogDeleteBtn');
+  const desktopDeleteBtn = document.getElementById('desktopLegDialogDeleteBtn');
   const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
   if (deleteBtn) deleteBtn.style.display = isEdit ? 'inline-flex' : 'none';
+  if (desktopDeleteBtn) desktopDeleteBtn.style.display = isEdit ? 'inline-flex' : 'none';
 }
 
 
@@ -765,11 +767,38 @@ function deleteLegFromDialog() {
   const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
   if (!isEdit) return;
   const legIdx = legDialogState.editLegIdx;
-  const legLabel = appData?.[legIdx]?.label || `Leg ${legIdx + 1}`;
-  const confirmed = confirm(`Delete ${legLabel} and all its days? This cannot be undone.`);
+  const legs = legDialogState.stagedLegs || [];
+  const legToDelete = legs[legIdx] || appData?.[legIdx];
+  const legLabel = legToDelete?.label || `Leg ${legIdx + 1}`;
+  const confirmed = confirm(`Delete ${legLabel} and all its days?`);
   if (!confirmed) return;
-  deleteLeg(legIdx);
-  closeAddLegDialog();
+
+  if (Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs.length > 0) {
+    legDialogState.stagedLegs.splice(legIdx, 1);
+    const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
+    if (cascadeCheckbox && cascadeCheckbox.checked) {
+      cascadeStagedLegDates(legIdx);
+    }
+    if (typeof _populateAddLegCityDropdowns === 'function') {
+      _populateAddLegCityDropdowns();
+    }
+    renderLegReorderList();
+
+    // Select remaining leg or reset
+    if (legDialogState.stagedLegs.length > 0) {
+      const nextIdx = Math.min(legIdx, legDialogState.stagedLegs.length - 1);
+      const editSelect = document.getElementById('editLegSelect');
+      if (editSelect) {
+        editSelect.value = String(nextIdx);
+      }
+      onEditLegSelectionChange();
+    } else {
+      resetLegDialogToAddNew();
+    }
+  } else {
+    deleteLeg(legIdx);
+    closeAddLegDialog();
+  }
 }
 
 
@@ -896,22 +925,23 @@ function renderLegReorderList() {
     const isLocked = terminal && (isFirst || isLast);
 
     html += `
-      <div class="leg-reorder-item flex items-center justify-between gap-2 p-2 ${isEditing ? 'bg-teal-50 dark:bg-teal-950/40 border-teal-500 dark:border-teal-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'} rounded-lg border shadow-xs ${isLocked ? 'cursor-default' : 'cursor-grab'} select-none hover:border-teal-500 dark:hover:border-teal-400 transition-colors"
+      <div class="leg-reorder-item flex items-center justify-between gap-2 p-2 ${isEditing ? 'bg-teal-50 dark:bg-teal-950/40 border-teal-500 dark:border-teal-400 ring-2 ring-teal-500/30' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'} rounded-lg border shadow-xs cursor-pointer select-none hover:border-teal-500 dark:hover:border-teal-400 transition-all"
            draggable="${!isLocked}"
            data-leg-index="${idx}"
+           onclick="editLegDirectFromReorder(${idx})"
            ${isLocked ? '' : `ondragstart="handleLegDragStart(event, ${idx})"`}
            ondragover="handleLegDragOver(event, ${idx})"
            ondragleave="handleLegDragLeave(event)"
            ondrop="handleLegDrop(event, ${idx})"
            ${isLocked ? '' : `ondragend="handleLegDragEnd(event)"`}>
         <div class="flex items-center gap-2 min-w-0 flex-1">
-          <span class="leg-drag-handle ${isLocked ? 'opacity-40 cursor-default' : 'cursor-grab'} text-slate-400 dark:text-slate-500 text-sm font-mono px-1 touch-none" title="${isLocked ? 'Terminal leg — position is fixed' : 'Drag to reorder'}">${isLocked ? '🔒' : '⋮⋮'}</span>
+          <span class="leg-drag-handle ${isLocked ? 'opacity-40 cursor-default' : 'cursor-grab'} text-slate-400 dark:text-slate-500 text-sm font-mono px-1 touch-none" onclick="event.stopPropagation()" title="${isLocked ? 'Terminal leg — position is fixed' : 'Drag to reorder'}">${isLocked ? '🔒' : '⋮⋮'}</span>
           <div class="min-w-0 flex-1">
             <div class="font-semibold text-xs text-slate-800 dark:text-slate-100 truncate">${idx + 1}. ${safeLabel}${isEditing ? ' <span class="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">(Editing)</span>' : ''}</div>
             <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">${dateRangeStr} • ${nightsStr}</div>
           </div>
         </div>
-        <div class="flex items-center gap-1.5 shrink-0">
+        <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
           <button type="button" class="px-2 py-0.5 text-xs rounded bg-teal-50 dark:bg-teal-950/50 hover:bg-teal-100 dark:hover:bg-teal-900/60 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-medium cursor-pointer"
                   onclick="editLegDirectFromReorder(${idx})" title="Edit leg details">✏️ Edit</button>
           <button type="button" class="px-1.5 py-0.5 text-xs rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 ${(idx === 0 || isLocked) ? 'opacity-30 cursor-not-allowed' : ''}"
@@ -1091,6 +1121,7 @@ function validateLegEditorForm() {
   const warningBanner = doc ? doc.getElementById('legClashWarningBanner') : null;
   const warningMessage = doc ? doc.getElementById('legClashWarningMessage') : null;
   const saveBtn = doc ? doc.getElementById('legDialogSaveBtn') : null;
+  const desktopSaveBtn = doc ? doc.getElementById('desktopLegDialogSaveBtn') : null;
 
   if (!startDateInput || !endDateInput) return true;
 
@@ -1183,12 +1214,20 @@ function validateLegEditorForm() {
       saveBtn.disabled = true;
       saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
     }
+    if (desktopSaveBtn) {
+      desktopSaveBtn.disabled = true;
+      desktopSaveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    }
     return false;
   } else {
     if (warningBanner) warningBanner.style.display = 'none';
     if (saveBtn) {
       saveBtn.disabled = false;
       saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+    if (desktopSaveBtn) {
+      desktopSaveBtn.disabled = false;
+      desktopSaveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
     }
     return true;
   }

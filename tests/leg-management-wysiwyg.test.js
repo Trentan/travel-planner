@@ -75,6 +75,8 @@ createMockElement('toggleNewCityBtn');
 createMockElement('legTerminalWarningBanner');
 createMockElement('legTerminalWarningMsg');
 createMockElement('legDurationSubtext');
+createMockElement('desktopLegDialogDeleteBtn');
+createMockElement('desktopLegDialogSaveBtn');
 
 const mockDocument = {
   body: {
@@ -974,6 +976,26 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(elements['legPlacementGroup'].style.display, 'block', 'legPlacementGroup visible when Add New Leg is chosen');
   assert.strictEqual(elements['legDialogTitle'].textContent, 'Add New Trip Leg', 'Dialog title updated to Add New Trip Leg');
   assert.strictEqual(elements['legDialogSaveBtn'].textContent, 'Add Leg', 'Primary button updated to Add Leg');
+
+  // Test desktop delete button sync in edit vs add mode
+  elements['editLegSelect'].value = '2';
+  onEditLegSelectionChange();
+  assert.strictEqual(elements['desktopLegDialogDeleteBtn'].style.display, 'inline-flex', 'desktopLegDialogDeleteBtn visible in edit mode');
+  resetLegDialogToAddNew();
+  assert.strictEqual(elements['desktopLegDialogDeleteBtn'].style.display, 'none', 'desktopLegDialogDeleteBtn hidden in add mode');
+
+  // Test staging deletion without premature commit
+  elements['editLegSelect'].value = '2';
+  onEditLegSelectionChange();
+  const originalAppDataLength = appData.length;
+  const initialStagedLength = legDialogState.stagedLegs.length;
+  // Mock global.confirm to auto-approve
+  const oldConfirm = global.confirm;
+  global.confirm = () => true;
+  deleteLegFromDialog();
+  global.confirm = oldConfirm;
+  assert.strictEqual(legDialogState.stagedLegs.length, initialStagedLength - 1, 'Leg deleted from stagedLegs');
+  assert.strictEqual(appData.length, originalAppDataLength, 'appData remains untouched before save');
 
   // Test close and initial open state: legPlacementGroup should be hidden until Add New Leg is triggered
   closeAddLegDialog();

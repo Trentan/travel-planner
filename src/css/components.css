@@ -736,6 +736,44 @@
       margin-right: auto !important;
     }
 
+    /* Desktop Leg Modal combined sequence & editor split layout */
+    #add-leg-modal .modal-content {
+      max-width: min(1080px, 94vw);
+      width: min(1080px, 94vw);
+      max-height: 90vh;
+    }
+
+    #add-leg-modal .leg-modal-tabs {
+      display: none !important;
+    }
+
+    .leg-modal-body-layout {
+      display: grid !important;
+      grid-template-columns: minmax(320px, 1fr) minmax(380px, 1.25fr);
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    #legReorderSection,
+    #legEditSection {
+      display: flex !important;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    #legReorderSection .modal-footer,
+    #legEditSection .modal-footer {
+      display: none !important;
+    }
+
+    .desktop-leg-modal-footer {
+      display: flex !important;
+    }
+
+    #legReorderList {
+      max-height: calc(88vh - 220px) !important;
+    }
+
     #tab-transport .travel-data-table,
     #tab-accom .travel-data-table {
       min-width: 0;
