@@ -766,6 +766,11 @@
       display: none !important;
     }
 
+    #add-leg-modal #legSelectGroup,
+    #add-leg-modal .leg-select-group {
+      display: none !important;
+    }
+
     .desktop-leg-modal-footer {
       display: flex !important;
     }

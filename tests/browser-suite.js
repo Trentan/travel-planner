@@ -205,8 +205,17 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
       await humanPause(page, 300);
     }
 
-    // Verify reset state when toggling between edit and add leg
-    if (await page.locator('#editLegSelect option').count() > 2) {
+    // Verify selection and reset state
+    if (await page.locator('.leg-reorder-item').count() > 2) {
+      // On desktop, sequence list items drive selection
+      await page.locator('.leg-reorder-item').nth(1).click();
+      await humanPause(page, 250);
+      await page.evaluate(() => { if (typeof window.resetLegDialogToAddNew === 'function') window.resetLegDialogToAddNew(); });
+      await humanPause(page, 250);
+      const isAdding = await page.evaluate(() => window.legDialogState?.isAddingNewLeg);
+      assert(isAdding === true, 'Desktop: resetLegDialogToAddNew sets isAddingNewLeg to true');
+      reporter.add('desktop', 'leg editor state reset', 'resets back to ADD_NEW/empty state');
+    } else if (await page.locator('#editLegSelect:visible').count() > 0) {
       await page.locator('#editLegSelect').selectOption({ index: 2 });
       await humanPause(page, 250);
       await page.evaluate(() => { if (typeof window.resetLegDialogToAddNew === 'function') window.resetLegDialogToAddNew(); });
