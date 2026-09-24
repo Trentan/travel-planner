@@ -966,13 +966,19 @@ async function runLegManagementWysiwygSuite() {
   // Test resetLegDialogToAddNew switches back to Add New Leg mode
   resetLegDialogToAddNew();
   assert.strictEqual(legDialogState.mode, 'add', 'legDialogState mode reset to add');
+  assert.strictEqual(legDialogState.isAddingNewLeg, true, 'isAddingNewLeg is true after resetLegDialogToAddNew');
   assert.strictEqual(elements['editLegSelect'].value, '', 'editLegSelect reset to empty string');
   assert.strictEqual(elements['existingCitySelect'].disabled, false, 'existingCitySelect enabled in add mode');
   assert.strictEqual(elements['toggleNewCityBtn'].style.display, 'inline-block', 'toggleNewCityBtn visible in add mode');
   assert.strictEqual(elements['toggleNewCityBtn'].textContent, '+ Add a new city', 'toggleNewCityBtn button text is + Add a new city');
-  assert.strictEqual(elements['legPlacementGroup'].style.display, 'block', 'legPlacementGroup visible in add mode');
+  assert.strictEqual(elements['legPlacementGroup'].style.display, 'block', 'legPlacementGroup visible when Add New Leg is chosen');
   assert.strictEqual(elements['legDialogTitle'].textContent, 'Add New Trip Leg', 'Dialog title updated to Add New Trip Leg');
   assert.strictEqual(elements['legDialogSaveBtn'].textContent, 'Add Leg', 'Primary button updated to Add Leg');
+
+  // Test close and initial open state: legPlacementGroup should be hidden until Add New Leg is triggered
+  closeAddLegDialog();
+  assert.strictEqual(elements['legPlacementGroup'].style.display, 'none', 'legPlacementGroup hidden on modal close');
+  assert.strictEqual(legDialogState.isAddingNewLeg, false, 'isAddingNewLeg reset to false on close');
 
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }

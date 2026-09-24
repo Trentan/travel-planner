@@ -6,7 +6,7 @@
 // Dialog functions for Add New Leg
 var legDialogState = (typeof window !== 'undefined' && window.legDialogState)
   ? window.legDialogState
-  : { mode: 'add', editLegIdx: null, stagedLegs: [], originalLegDates: {} };
+  : { mode: 'add', isAddingNewLeg: false, editLegIdx: null, stagedLegs: [], originalLegDates: {} };
 if (typeof window !== 'undefined') window.legDialogState = legDialogState;
 
 
@@ -51,6 +51,7 @@ function openAddLegDialog(initialTab = 'edit') {
 
     setLegDialogState({
       mode: 'add',
+      isAddingNewLeg: false,
       editLegIdx: null,
       stagedLegs: Array.isArray(appData) ? JSON.parse(JSON.stringify(appData)) : [],
       originalLegDates: origDates
@@ -287,10 +288,11 @@ function updateLegDialogUiMode() {
   const toggleNewCityBtn = document.getElementById('toggleNewCityBtn');
   const newCityInlineGroup = document.getElementById('newCityInlineGroup');
   const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
+  const isAddingNew = Boolean(legDialogState.isAddingNewLeg && !isEdit);
 
   if (title) title.textContent = isEdit ? 'Edit Trip Leg' : 'Add New Trip Leg';
   if (saveBtn) saveBtn.textContent = isEdit ? 'Save Leg' : 'Add Leg';
-  if (placementGroup) placementGroup.style.display = isEdit ? 'none' : 'block';
+  if (placementGroup) placementGroup.style.display = isAddingNew ? 'block' : 'none';
 
   if (existingCitySelect) {
     existingCitySelect.disabled = isEdit;
@@ -398,6 +400,7 @@ function resetLegDialogToAddNew() {
   const editLegSelect = document.getElementById('editLegSelect');
   if (editLegSelect) editLegSelect.value = '';
   legDialogState.mode = 'add';
+  legDialogState.isAddingNewLeg = true;
   legDialogState.editLegIdx = null;
 
   const legTypeSelect = document.getElementById('legTypeSelect');
@@ -452,6 +455,9 @@ function resetLegDialogToAddNew() {
   renderLegReorderList();
   switchLegModalTab('edit');
   validateLegEditorForm();
+  if (existingCitySelect && typeof existingCitySelect.focus === 'function') {
+    existingCitySelect.focus();
+  }
 }
 
 
@@ -476,6 +482,7 @@ function onEditLegSelectionChange() {
   const leg = sourceLegs?.[selected];
   if (!leg) return;
   legDialogState.mode = 'edit';
+  legDialogState.isAddingNewLeg = false;
   legDialogState.editLegIdx = selected;
 
   const firstDay = leg.days?.[0] || {};
@@ -784,7 +791,7 @@ function onNewLegCountryChange() {
 function closeAddLegDialog() {
   const modal = document.getElementById('add-leg-modal');
   if (modal) modal.style.display = 'none';
-  setLegDialogState({ mode: 'add', editLegIdx: null, stagedLegs: [], originalLegDates: {} });
+  setLegDialogState({ mode: 'add', isAddingNewLeg: false, editLegIdx: null, stagedLegs: [], originalLegDates: {} });
 
   // Clear form inputs
   const existingCitySelect = document.getElementById('existingCitySelect');
