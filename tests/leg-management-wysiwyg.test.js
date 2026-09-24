@@ -77,6 +77,7 @@ createMockElement('legTerminalWarningMsg');
 createMockElement('legDurationSubtext');
 createMockElement('desktopLegDialogDeleteBtn');
 createMockElement('desktopLegDialogSaveBtn');
+createMockElement('legDayNotesList');
 
 const mockDocument = {
   body: {

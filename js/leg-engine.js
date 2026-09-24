@@ -944,6 +944,11 @@ function checkLegDateClash(s1, e1, s2, e2) {
 
 
 function parseLegDayNotes() {
+  const noteInputs = document.querySelectorAll('.leg-day-note-row-input');
+  if (noteInputs && noteInputs.length > 0) {
+    const list = Array.from(noteInputs).map(input => (input.value || '').trim());
+    return list;
+  }
   const raw = document.getElementById('legDayNotesInput')?.value || '';
   return raw
     .split(/\r?\n/)

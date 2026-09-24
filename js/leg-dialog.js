@@ -438,6 +438,7 @@ function resetLegDialogToAddNew() {
   if (newCityInline) newCityInline.style.display = 'none';
   if (toggleNewCityBtn) toggleNewCityBtn.textContent = '+ Add a new city';
   if (dayNotesInput) dayNotesInput.value = '';
+  renderLegDayNotesList();
 
   if (dateFrom) {
     dateFrom.value = defaults.startDate;
@@ -451,6 +452,7 @@ function resetLegDialogToAddNew() {
     durInput.value = defaults.duration;
   }
   updateLegDurationSubtext(defaults.duration);
+  renderLegDayNotesList();
 
   updateLegDialogUiMode();
   onLegTypeChange();
@@ -584,9 +586,132 @@ function onEditLegSelectionChange() {
       .map(day => String(day?.desc || '').trim())
       .join('\n');
   }
+  renderLegDayNotesList();
   updateLegDialogUiMode();
   renderLegReorderList();
   validateLegEditorForm();
+}
+
+
+function renderLegDayNotesList() {
+  const container = document.getElementById('legDayNotesList');
+  if (!container) return;
+
+  const startDateInput = document.getElementById('newLegStartDate');
+  const endDateInput = document.getElementById('newLegEndDate');
+  const startDate = startDateInput?.value;
+  const endDate = endDateInput?.value;
+
+  const legState = getLegDialogState();
+  const isEdit = legState.mode === 'edit' && Number.isFinite(legState.editLegIdx);
+  const currentLeg = isEdit && Array.isArray(legState.stagedLegs) ? legState.stagedLegs[legState.editLegIdx] : null;
+
+  // Derive day list from dates if valid, otherwise fallback to existing days on leg
+  const days = [];
+  if (startDate && endDate && startDate <= endDate) {
+    let cur = startDate;
+    let idx = 0;
+    while (cur <= endDate) {
+      const existingDesc = currentLeg?.days?.[idx]?.desc || '';
+      days.push({
+        date: cur,
+        dayIdx: idx,
+        desc: existingDesc
+      });
+      if (typeof addDaysToIsoDate === 'function') {
+        cur = addDaysToIsoDate(cur, 1);
+      } else {
+        const d = new Date(`${cur}T00:00:00`);
+        d.setDate(d.getDate() + 1);
+        cur = d.toISOString().split('T')[0];
+      }
+      idx++;
+    }
+  } else if (currentLeg && Array.isArray(currentLeg.days) && currentLeg.days.length > 0) {
+    currentLeg.days.forEach((d, idx) => {
+      days.push({
+        date: d.date || '',
+        dayIdx: idx,
+        desc: d.desc || ''
+      });
+    });
+  } else {
+    // Default 1 day fallback
+    days.push({
+      date: startDate || '',
+      dayIdx: 0,
+      desc: ''
+    });
+  }
+
+  // Preserve any in-progress edits in existing input elements
+  const existingInputs = container.querySelectorAll('.leg-day-note-row-input');
+  const inProgressValues = Array.from(existingInputs).map(inp => inp.value);
+
+  // If hidden textarea has values and is newer, or if we have inProgressValues
+  const hiddenTextarea = document.getElementById('legDayNotesInput');
+  const textareaLines = (hiddenTextarea?.value || '').split(/\r?\n/);
+
+  let html = '';
+  days.forEach((day, idx) => {
+    let currentVal = inProgressValues[idx] !== undefined
+      ? inProgressValues[idx]
+      : (textareaLines[idx] !== undefined ? textareaLines[idx] : (day.desc || ''));
+
+    // Safe escaping
+    const safeVal = typeof escapeHtmlText === 'function' ? escapeHtmlText(currentVal) : currentVal.replace(/"/g, '&quot;');
+    const dayDateStr = day.date ? ` • ${day.date}` : '';
+    const dayLabel = `Day ${idx + 1}${dayDateStr}`;
+
+    html += `
+      <div class="leg-day-note-row flex items-center gap-2 p-1.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs focus-within:border-teal-500 dark:focus-within:border-teal-400 transition-colors">
+        <span class="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-300 w-24 sm:w-28 shrink-0 truncate select-none pl-1" title="${dayLabel}">
+          Day ${idx + 1}${dayDateStr}
+        </span>
+        <input type="text"
+               class="leg-day-note-row-input flex-1 min-w-0 bg-transparent text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none py-1"
+               data-day-index="${idx}"
+               placeholder="e.g. Arrive & Check In, Explore Old Town..."
+               value="${safeVal}"
+               oninput="onLegDayNoteRowInput(${idx})"
+               onchange="onLegDayNoteRowChange(${idx})">
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+  syncHiddenDayNotesTextarea();
+}
+
+
+function onLegDayNoteRowInput(idx) {
+  syncHiddenDayNotesTextarea();
+}
+
+
+function onLegDayNoteRowChange(idx) {
+  syncHiddenDayNotesTextarea();
+  const legState = getLegDialogState();
+  if (legState.mode === 'edit' && Number.isFinite(legState.editLegIdx) && Array.isArray(legState.stagedLegs)) {
+    const leg = legState.stagedLegs[legState.editLegIdx];
+    if (leg && Array.isArray(leg.days) && leg.days[idx]) {
+      const rowInput = document.querySelector(`.leg-day-note-row-input[data-day-index="${idx}"]`);
+      if (rowInput) {
+        leg.days[idx].desc = rowInput.value.trim();
+      }
+    }
+  }
+}
+
+
+function syncHiddenDayNotesTextarea() {
+  const hiddenTextarea = document.getElementById('legDayNotesInput');
+  if (!hiddenTextarea) return;
+  const noteInputs = document.querySelectorAll('.leg-day-note-row-input');
+  if (noteInputs && noteInputs.length > 0) {
+    const lines = Array.from(noteInputs).map(inp => inp.value);
+    hiddenTextarea.value = lines.join('\n');
+  }
 }
 
 
@@ -1094,6 +1219,7 @@ function onLegDateInputChange() {
       renderLegReorderList();
     }
   }
+  renderLegDayNotesList();
   validateLegEditorForm();
 }
 
@@ -1625,6 +1751,10 @@ const _legDialogExports = {
   deleteLegFromDialog,
   onNewLegCountryChange,
   renderLegReorderList,
+  renderLegDayNotesList,
+  onLegDayNoteRowInput,
+  onLegDayNoteRowChange,
+  syncHiddenDayNotesTextarea,
   moveLegInSequence,
   switchLegModalTab,
   editLegDirectFromReorder,
