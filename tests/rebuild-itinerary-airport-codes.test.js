@@ -8,6 +8,8 @@ async function runRebuildAndAirportCodesTests() {
   const utilsCode = fs.readFileSync(path.join(__dirname, '../js/utils.js'), 'utf8');
   const timezoneCode = fs.readFileSync(path.join(__dirname, '../js/timezone.js'), 'utf8');
   const dataCode = fs.readFileSync(path.join(__dirname, '../js/data.js'), 'utf8');
+  const legEngineCode = fs.readFileSync(path.join(__dirname, '../js/leg-engine.js'), 'utf8');
+  const legDialogCode = fs.readFileSync(path.join(__dirname, '../js/leg-dialog.js'), 'utf8');
   const crudCode = fs.readFileSync(path.join(__dirname, '../js/crud.js'), 'utf8');
   const transportCode = fs.readFileSync(path.join(__dirname, '../js/transport.js'), 'utf8');
   const itineraryCode = fs.readFileSync(path.join(__dirname, '../js/itinerary.js'), 'utf8');
@@ -92,6 +94,8 @@ async function runRebuildAndAirportCodesTests() {
     ${utilsCode}
     ${timezoneCode}
     ${dataCode}
+    ${legEngineCode}
+    ${legDialogCode}
     ${crudCode}
     ${transportCode}
     ${itineraryCode}

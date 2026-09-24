@@ -210,8 +210,8 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
       await page.evaluate(() => { if (typeof window.resetLegDialogToAddNew === 'function') window.resetLegDialogToAddNew(); });
       await humanPause(page, 250);
       const resetVal = await page.locator('#editLegSelect').inputValue();
-      assert(resetVal === 'ADD_NEW', 'Desktop: switching to add leg should reset leg editor selection');
-      reporter.add('desktop', 'leg editor state reset', 'resets back to ADD_NEW state');
+      assert(resetVal === '' || resetVal === 'ADD_NEW', 'Desktop: switching to add leg should reset leg editor selection');
+      reporter.add('desktop', 'leg editor state reset', 'resets back to ADD_NEW/empty state');
     }
     await humanPause(page, 400);
     await page.locator('#existingCitySelect').selectOption({ index: 1 });

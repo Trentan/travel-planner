@@ -52,9 +52,9 @@ function loadDateHelpers() {
     '// Helper: Get compact code display for table cells'
   );
 
-  const crudJs = loadSource(path.join('js', 'crud.js'));
+  const schedulerJs = loadSource(path.join('js', 'activity-scheduler.js'));
   const parseActivityDurationBlock = extractBetween(
-    crudJs,
+    schedulerJs,
     'function parseActivityDurationMinutes(',
     'function addMinutesToTimeValue('
   );
@@ -665,8 +665,8 @@ async function run() {
     'renderCompactCitySlide should contain HTML-escaped leg.colour'
   );
 
-  // Tests for calcStayNights and setupStayNightsAutoCalc in js/crud.js
-  const crudJs = loadSource(path.join('js', 'crud.js'));
+  // Tests for calcStayNights and setupStayNightsAutoCalc in js/stays.js
+  const staysJs = loadSource(path.join('js', 'stays.js'));
   const stayElements = {
     stayCheckIn: { value: '2026-06-01', onchange: null },
     stayCheckOut: { value: '2026-06-05', onchange: null },
@@ -683,7 +683,7 @@ async function run() {
     citiesData: []
   });
   crudContext.window = crudContext;
-  runScriptInContext(crudJs, crudContext, 'js/crud.js');
+  runScriptInContext(staysJs, crudContext, 'js/stays.js');
 
   assert(typeof crudContext.calcStayNights === 'function', 'calcStayNights should be exposed on window context');
   assert(typeof crudContext.setupStayNightsAutoCalc === 'function', 'setupStayNightsAutoCalc should be exposed on window context');

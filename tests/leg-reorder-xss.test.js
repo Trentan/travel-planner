@@ -81,6 +81,12 @@ async function runLegReorderXssTests() {
   const utilsSource = loadSource(path.join('js', 'utils.js'));
   runScriptInContext(utilsSource, context, 'js/utils.js');
 
+  const legEngineSource = loadSource(path.join('js', 'leg-engine.js'));
+  runScriptInContext(legEngineSource, context, 'js/leg-engine.js');
+
+  const legDialogSource = loadSource(path.join('js', 'leg-dialog.js'));
+  runScriptInContext(legDialogSource, context, 'js/leg-dialog.js');
+
   const crudSource = loadSource(path.join('js', 'crud.js'));
   runScriptInContext(crudSource, context, 'js/crud.js');
 

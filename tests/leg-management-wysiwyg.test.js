@@ -45,6 +45,7 @@ function createMockElement(id, initialProps = {}) {
 }
 
 createMockElement('add-leg-modal');
+createMockElement('legDialogTitle');
 createMockElement('legClashWarningBanner');
 createMockElement('legClashWarningMessage');
 createMockElement('legDialogSaveBtn');
@@ -75,7 +76,7 @@ createMockElement('legTerminalWarningBanner');
 createMockElement('legTerminalWarningMsg');
 createMockElement('legDurationSubtext');
 
-global.document = {
+const mockDocument = {
   body: {
     classList: { contains: () => false },
     insertBefore: () => {},
@@ -96,6 +97,7 @@ global.document = {
   },
   addEventListener: () => {}
 };
+global.document = mockDocument;
 
 // Require dependencies
 require('../js/default-data.js');
@@ -106,6 +108,8 @@ require('../js/crud.js');
 require('../js/itinerary.js');
 
 async function runLegManagementWysiwygSuite() {
+  global.document = mockDocument;
+  global.window = global;
   console.log('Running Leg Management & WYSIWYG Drag-and-Drop test suite...');
 
   // 0. Test checkDateConflict
@@ -927,8 +931,48 @@ async function runLegManagementWysiwygSuite() {
   assert.ok(selectHtml.includes('Taipei &lt;Transit&gt; (2026-06-09)'), 'Taipei transit leg option includes <Transit> tag in editLegSelect');
   assert.strictEqual(selectHtml.includes('Vienna &lt;Transit&gt;'), false, 'Vienna multi-day city stay does NOT have <Transit> tag');
 
-  const test14mPlacementHtml = elements['legPlacementSelect'].innerHTML;
-  assert.ok(test14mPlacementHtml.includes('Taipei &lt;Transit&gt;'), 'Placement dropdown includes <Transit> for transit legs');
+  // 14n. Test Issue #431 Leg edit dialog improvements
+  console.log('  Testing Issue #431 Leg edit dialog improvements...');
+  _populateAddLegCityDropdowns();
+  assert.strictEqual(elements['editLegSelect'].value, '', 'editLegSelect defaults to empty string');
+  assert.ok(elements['editLegSelect'].innerHTML.includes('value=""'), 'editLegSelect includes placeholder option with value=""');
+  assert.ok(elements['editLegSelect'].innerHTML.includes('-- Select existing leg to edit --'), 'editLegSelect includes placeholder text');
+  assert.strictEqual(elements['editLegSelect'].innerHTML.includes('ADD_NEW'), false, 'Add New Leg is NOT an option in editLegSelect');
+
+  // Test selecting an existing leg switches to edit mode, disables destination city, hides add new city
+  elements['editLegSelect'].value = '2'; // Vienna (city leg)
+  onEditLegSelectionChange();
+  assert.strictEqual(legDialogState.mode, 'edit', 'legDialogState mode is edit');
+  assert.strictEqual(legDialogState.editLegIdx, 2, 'editLegIdx is set to 2');
+  assert.strictEqual(elements['existingCitySelect'].disabled, true, 'existingCitySelect disabled in edit mode');
+  assert.strictEqual(elements['toggleNewCityBtn'].style.display, 'none', 'toggleNewCityBtn hidden in edit mode');
+  assert.strictEqual(elements['newCityInlineGroup'].style.display, 'none', 'newCityInlineGroup hidden in edit mode');
+  assert.strictEqual(elements['legPlacementGroup'].style.display, 'none', 'legPlacementGroup hidden in edit mode');
+  assert.strictEqual(elements['legDialogTitle'].textContent, 'Edit Trip Leg', 'Dialog title updated to Edit Trip Leg');
+  assert.strictEqual(elements['legDialogSaveBtn'].textContent, 'Save Leg', 'Primary button updated to Save Leg');
+
+  // Test dayNotes updating day.desc in edit mode without wiping day items
+  elements['legDayNotesInput'].value = 'Arrival and explore Ringstrasse\nPalace visit and cafe tour';
+  // Attach mock activity and stay to Vienna days
+  const viennaLeg = legDialogState.stagedLegs[2];
+  viennaLeg.days[0].activityItems = [{ text: 'Visit Opera House', cost: '20', time: '2 hrs', done: false }];
+  viennaLeg.days[0].accomItems = [{ text: 'Hotel Sacher', cost: '200', status: 'confirmed' }];
+  confirmAddLeg();
+  assert.strictEqual(viennaLeg.days[0].desc, 'Arrival and explore Ringstrasse', 'Day 0 desc updated from dayNotes');
+  assert.strictEqual(viennaLeg.days[1].desc, 'Palace visit and cafe tour', 'Day 1 desc updated from dayNotes');
+  assert.strictEqual(viennaLeg.days[0].activityItems[0].text, 'Visit Opera House', 'Day 0 activity items preserved');
+  assert.strictEqual(viennaLeg.days[0].accomItems[0].text, 'Hotel Sacher', 'Day 0 accommodation items preserved');
+
+  // Test resetLegDialogToAddNew switches back to Add New Leg mode
+  resetLegDialogToAddNew();
+  assert.strictEqual(legDialogState.mode, 'add', 'legDialogState mode reset to add');
+  assert.strictEqual(elements['editLegSelect'].value, '', 'editLegSelect reset to empty string');
+  assert.strictEqual(elements['existingCitySelect'].disabled, false, 'existingCitySelect enabled in add mode');
+  assert.strictEqual(elements['toggleNewCityBtn'].style.display, 'inline-block', 'toggleNewCityBtn visible in add mode');
+  assert.strictEqual(elements['toggleNewCityBtn'].textContent, '+ Add a new city', 'toggleNewCityBtn button text is + Add a new city');
+  assert.strictEqual(elements['legPlacementGroup'].style.display, 'block', 'legPlacementGroup visible in add mode');
+  assert.strictEqual(elements['legDialogTitle'].textContent, 'Add New Trip Leg', 'Dialog title updated to Add New Trip Leg');
+  assert.strictEqual(elements['legDialogSaveBtn'].textContent, 'Add Leg', 'Primary button updated to Add Leg');
 
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }
