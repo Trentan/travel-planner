@@ -21,6 +21,7 @@ function createMockElement(id, initialProps = {}) {
     id,
     value: '',
     options: [],
+    children: [],
     style: {},
     classList: {
       classes: new Set(),
@@ -30,12 +31,31 @@ function createMockElement(id, initialProps = {}) {
     },
     checked: true,
     disabled: false,
-    innerHTML: '',
+    _innerHTML: '',
+    get innerHTML() {
+      if (this.children && this.children.length > 0) {
+        return this.children.map(c => `<option value="${c.value || ''}">${c.textContent || ''}</option>`).join('');
+      }
+      return this._innerHTML || '';
+    },
+    set innerHTML(val) {
+      this._innerHTML = val;
+      if (val === '') {
+        this.children = [];
+        this.options = [];
+      }
+    },
     textContent: '',
     addEventListener() {},
     appendChild(child) {
+      if (!this.children) this.children = [];
       if (!this.options) this.options = [];
+      this.children.push(child);
       this.options.push(child);
+    },
+    replaceChildren(...newChildren) {
+      this.children = [...newChildren];
+      this.options = [...newChildren];
     },
     querySelectorAll() { return []; },
     ...initialProps
@@ -233,6 +253,26 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(validHandover, true, 'validateLegEditorForm should pass for clean handover');
   assert.strictEqual(elements['legDialogSaveBtn'].disabled, false, 'Save button must be enabled for valid dates');
   assert.strictEqual(elements['legClashWarningBanner'].style.display, 'none', 'Warning banner must be hidden when valid');
+
+  // 3b. Test travel leg missing destination city validation
+  elements['legTypeSelect'].value = 'travel';
+  elements['toCitySelect'].value = '';
+  const invalidTravelLeg = validateLegEditorForm();
+  assert.strictEqual(invalidTravelLeg, false, 'validateLegEditorForm should return false when travel leg destination is missing');
+  assert.strictEqual(elements['legDialogSaveBtn'].disabled, true, 'Save button must be disabled for travel leg missing destination');
+  assert.ok(elements['toCitySelect'].classList.contains('border-rose-500'), 'toCitySelect should be highlighted with border-rose-500');
+  assert.strictEqual(elements['legClashWarningBanner'].style.display, 'flex', 'Warning banner must be displayed for missing travel destination');
+  assert.ok(elements['legClashWarningMessage'].textContent.includes('destination city'), 'Warning message must explain destination selection requirement');
+
+  // Provide destination city and re-validate
+  elements['toCitySelect'].value = 'Venice';
+  const validTravelLeg = validateLegEditorForm();
+  assert.strictEqual(validTravelLeg, true, 'validateLegEditorForm should pass when travel leg destination is selected');
+  assert.strictEqual(elements['legDialogSaveBtn'].disabled, false, 'Save button must be enabled when travel leg destination is selected');
+  assert.strictEqual(elements['toCitySelect'].classList.contains('border-rose-500'), false, 'border-rose-500 class must be removed when valid');
+
+  // Reset legTypeSelect back to city for subsequent tests
+  elements['legTypeSelect'].value = 'city';
 
   // 4. Test Modal Staging Isolation (cancelling does NOT mutate appData)
   console.log('  Testing modal containment & isolation on cancel...');
@@ -949,8 +989,8 @@ async function runLegManagementWysiwygSuite() {
   setLegDialogState({ mode: 'add', editLegIdx: null, stagedLegs: testTransitTrip, originalLegDates: {} });
   _populateAddLegCityDropdowns();
   const selectHtml = elements['editLegSelect'].innerHTML;
-  assert.ok(selectHtml.includes('Taipei &lt;Transit&gt; (2026-06-09)'), 'Taipei transit leg option includes <Transit> tag in editLegSelect');
-  assert.strictEqual(selectHtml.includes('Vienna &lt;Transit&gt;'), false, 'Vienna multi-day city stay does NOT have <Transit> tag');
+  assert.ok(selectHtml.includes('Taipei <Transit> (2026-06-09)'), 'Taipei transit leg option includes <Transit> tag in editLegSelect');
+  assert.strictEqual(selectHtml.includes('Vienna <Transit>'), false, 'Vienna multi-day city stay does NOT have <Transit> tag');
 
   // 14n. Test Issue #431 Leg edit dialog improvements
   console.log('  Testing Issue #431 Leg edit dialog improvements...');
