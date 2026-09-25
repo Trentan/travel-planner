@@ -4527,10 +4527,7 @@ function migrateLegCityIds() {
   });
 }
 
-async function initData() {
-  const previousSuppress = window.__suppressBackupTracking;
-  window.__suppressBackupTracking = true;
-  historyTrackingSuspended = true;
+function _initLoadJourneysAndStays() {
   // Load journeys first, before any rendering happens
   const savedJourneys = localStorage.getItem('travelApp_journeys_v1');
   if (savedJourneys) {
@@ -4567,7 +4564,9 @@ async function initData() {
     stays = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.stays));
     window.stays = stays;
   }
+}
 
+function _initLoadItineraryData() {
   const saved = localStorage.getItem('travelApp_v2026_template');
   if (saved) {
     try {
@@ -4624,7 +4623,7 @@ async function initData() {
           delete leg.suggestedSights;
         }
         leg.days.forEach(day => {
-          if(day.activityItems) {
+          if (day.activityItems) {
             day.activityItems.forEach(act => {
               if (act.time === undefined) act.time = "1 hr";
             });
@@ -4635,11 +4634,14 @@ async function initData() {
       console.error('[Itinerary] Failed to parse itinerary template:', e);
       appData = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.itinerary));
     }
+  } else {
+    appData = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.itinerary));
   }
-  else { appData = JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA.itinerary)); }
 
   appData = normalizeTripLegsData(appData);
+}
 
+function _initLoadChecklistsAndCities() {
   const savedPacking = localStorage.getItem('travelApp_packing_v3');
   if (savedPacking) {
     try {
@@ -4648,8 +4650,9 @@ async function initData() {
       console.error('[Packing] Failed to parse packing template:', e);
       packingData = typeof DEFAULT_PACKING !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_PACKING)) : [];
     }
+  } else {
+    packingData = typeof DEFAULT_PACKING !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_PACKING)) : [];
   }
-  else { packingData = typeof DEFAULT_PACKING !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_PACKING)) : []; }
 
   const savedLeaveHome = localStorage.getItem('travelApp_leavehome_v3');
   if (savedLeaveHome) {
@@ -4704,23 +4707,38 @@ async function initData() {
 
   // Create datalists for city and country selection
   createCityDatalists();
+}
 
+function _initLoadMetaAndUI() {
   const savedMeta = localStorage.getItem('travelApp_meta_template');
-if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title && parsed.title.trim()) titleData.title = parsed.title; if (parsed.subtitle && parsed.subtitle.trim()) titleData.subtitle = parsed.subtitle; } catch(e) { console.error('Meta load error:', e); } }
+  if (savedMeta) {
+    try {
+      const parsed = JSON.parse(savedMeta);
+      if (parsed.title && parsed.title.trim()) titleData.title = parsed.title;
+      if (parsed.subtitle && parsed.subtitle.trim()) titleData.subtitle = parsed.subtitle;
+    } catch (e) {
+      console.error('Meta load error:', e);
+    }
+  }
 
   const savedFile = localStorage.getItem('travelApp_filename_v2026');
   if (savedFile) { currentFileName = savedFile; }
   seedDefaultDerivedTravelData();
 
-  document.getElementById('mainTitle').innerText = titleData.title;
-  document.getElementById('mainSubtitle').innerText = titleData.subtitle;
+  const mainTitleEl = document.getElementById('mainTitle');
+  if (mainTitleEl) mainTitleEl.innerText = titleData.title;
+  const mainSubEl = document.getElementById('mainSubtitle');
+  if (mainSubEl) mainSubEl.innerText = titleData.subtitle;
+
   syncActiveFileDisplay();
   configureFileActionButtons();
   restorePersistedActiveFileHandle();
 
   // Display last export/import timestamp
   displayTimestampStatus();
+}
 
+function _initRunDataMigrations() {
   // Auto-extract cities if none exist
   if (!citiesData || citiesData.length === 0) {
     citiesData = extractCitiesFromItinerary();
@@ -4745,6 +4763,18 @@ if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title &&
   if (typeof initializeItineraryPositionForToday === 'function') {
     initializeItineraryPositionForToday();
   }
+}
+
+async function initData() {
+  const previousSuppress = window.__suppressBackupTracking;
+  window.__suppressBackupTracking = true;
+  historyTrackingSuspended = true;
+
+  _initLoadJourneysAndStays();
+  _initLoadItineraryData();
+  _initLoadChecklistsAndCities();
+  _initLoadMetaAndUI();
+  _initRunDataMigrations();
 
   try {
     await saveData(false);
@@ -4759,8 +4789,6 @@ if (savedMeta) { try { const parsed = JSON.parse(savedMeta); if (parsed.title &&
   if (typeof applyCurrentTripPositionForTab === 'function') {
     applyCurrentTripPositionForTab(activeTabId);
   }
-
-  // Journeys loaded at start of initData(), no additional init needed
 }
 
 function displayTimestampStatus() {
