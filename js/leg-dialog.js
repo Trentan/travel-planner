@@ -4,7 +4,7 @@
 // ============================================================================
 
 // Dialog functions for Add New Leg
-var legDialogState = (typeof window !== 'undefined' && window.legDialogState)
+let legDialogState = (typeof window !== 'undefined' && window.legDialogState)
   ? window.legDialogState
   : { mode: 'add', isAddingNewLeg: false, editLegIdx: null, stagedLegs: [], originalLegDates: {} };
 if (typeof window !== 'undefined') window.legDialogState = legDialogState;
