@@ -38,11 +38,13 @@ const { runWeatherNotesSuite } = require('./weather-notes-test');
 const { runMapprImportTests } = require('./mappr-import.test');
 const { runIssuesVerification } = require('./issues-89-91-95-96-verify');
 const { runTripDayMetricsTests } = require('./trip-day-metrics.test');
+const { runGetLegBaseCityNameTests } = require('./get-leg-base-city-name.test');
 const { runAiBuilderImportTests } = require('./ai-builder-import.test');
 const { runRebuildAndAirportCodesTests } = require('./rebuild-itinerary-airport-codes.test');
 
 async function run() {
   try {
+    if (typeof runGetLegBaseCityNameTests === 'function') runGetLegBaseCityNameTests();
     if (typeof runRebuildAndAirportCodesTests === 'function') await runRebuildAndAirportCodesTests();
     if (typeof runAiBuilderImportTests === 'function') await runAiBuilderImportTests();
     if (typeof runTripDayMetricsTests === 'function') runTripDayMetricsTests();
