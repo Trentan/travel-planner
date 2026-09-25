@@ -3980,17 +3980,7 @@ async function repairAllCityMetadata() {
   }
 }
 
-async function addNewCityFromDialog() {
-  const nameInput = document.getElementById('newCityName');
-  const countrySelect = document.getElementById('newCityCountrySelect');
-  const countryInput = document.getElementById('newCityCountry');
-  const codeInfo = document.getElementById('cityCodeInfo');
-  const customCountryDiv = document.getElementById('customCountryDiv');
-  const customCountryName = document.getElementById('customCountryName');
-  const customCountryCode = document.getElementById('customCountryCode');
-
-  const name = nameInput?.value?.trim();
-  let countryCode = countrySelect?.value;
+function _resolveCountryFromDialogInputs({ countryCode, countryInput, customCountryDiv, customCountryName, customCountryCode }) {
   let countryName = '';
 
   // Handle custom country entry when "Other" is selected
@@ -4000,7 +3990,7 @@ async function addNewCityFromDialog() {
 
     if (!enteredCountryName) {
       alert('Please enter a country name.');
-      return;
+      return null;
     }
 
     // If no code entered, generate a simple code from the name
@@ -4036,18 +4026,10 @@ async function addNewCityFromDialog() {
     countryName = match ? match.name : '';
   }
 
-  if (!name) {
-    alert('Please enter a city name.');
-    return;
-  }
+  return { countryCode, countryName };
+}
 
-  // Check if city already exists
-  const existing = citiesData.find(c => c.name.toLowerCase() === name.toLowerCase());
-  if (existing) {
-    alert(`City "${name}" already exists.`);
-    return;
-  }
-
+function _resolveCityInitialLocation(name, countryCode, countryName) {
   // Check staged coordinates from live autocomplete
   const staged = (typeof window !== 'undefined' && window.__stagedCityCoords &&
                  (window.__stagedCityCoords.name.toLowerCase() === name.toLowerCase() ||
@@ -4087,66 +4069,114 @@ async function addNewCityFromDialog() {
     }
   }
 
+  return { countryCode, countryName, initialLat, initialLng };
+}
+
+async function _ensureCityLocationAndPersist(newCity) {
+  if (typeof refreshJourneyCityDropdowns === 'function') {
+    refreshJourneyCityDropdowns(newCity.name);
+  }
+
+  if (!cityHasStoredCoords(newCity)) {
+    const addBtn = document.getElementById('addNewCityBtn') || document.querySelector('.city-add-stack button.action-btn');
+    const origBtnText = addBtn ? addBtn.textContent : '';
+    if (addBtn) {
+      addBtn.disabled = true;
+      addBtn.textContent = 'Locating on map...';
+    }
+    try {
+      const location = await resolveCityLocation(newCity);
+      if (location) applyCityLocation(newCity, location);
+    } finally {
+      if (addBtn) {
+        addBtn.disabled = false;
+        addBtn.textContent = origBtnText;
+      }
+    }
+  }
+
+  // Persist as user city so it is recognized across the entire app
+  addUserCity(newCity.id, newCity.name, newCity.countryCode, newCity.lat, newCity.lng);
+
+  if (cityHasStoredCoords(newCity) && typeof window !== 'undefined') {
+    window.__dynamicCityCoordsCache = window.__dynamicCityCoordsCache || new Map();
+    window.__dynamicCityCoordsCache.set(newCity.name.toLowerCase(), { lat: Number(newCity.lat), lng: Number(newCity.lng) });
+  }
+
+  if (typeof window !== 'undefined') {
+    window.__stagedCityCoords = null;
+  }
+
+  saveData(false);
+}
+
+function _resetCityDialogFormAndRefreshUI(nameInput, countryInput, countrySelect, codeInfo, newCity) {
+  nameInput.value = '';
+  if (countryInput) countryInput.value = '';
+  if (countrySelect) countrySelect.value = '';
+  if (codeInfo && codeInfo.parentElement && codeInfo.parentElement.style) codeInfo.parentElement.style.display = 'none';
+  const liveResults = document.getElementById('cityLiveSearchResults');
+  if (liveResults) { liveResults.style.display = 'none'; liveResults.innerHTML = ''; }
+  populateCityList();
+  if (typeof buildCityNav === 'function') {
+    buildCityNav();
+  }
+  if (typeof buildItinerary === 'function') {
+    buildItinerary();
+  }
+  if (typeof buildJourneyMap === 'function') {
+    buildJourneyMap();
+  }
+  if (typeof buildDesktopSplitMap === 'function') {
+    buildDesktopSplitMap();
+  }
+  if (typeof showToast === 'function') {
+    const flag = newCity.countryCode ? getCountryFlag(newCity.countryCode) : '📍';
+    showToast(`Added ${newCity.name} ${flag} to trip destinations`);
+  }
+}
+
+async function addNewCityFromDialog() {
+  const nameInput = document.getElementById('newCityName');
+  const countrySelect = document.getElementById('newCityCountrySelect');
+  const countryInput = document.getElementById('newCityCountry');
+  const codeInfo = document.getElementById('cityCodeInfo');
+  const customCountryDiv = document.getElementById('customCountryDiv');
+  const customCountryName = document.getElementById('customCountryName');
+  const customCountryCode = document.getElementById('customCountryCode');
+
+  const resolvedCountry = _resolveCountryFromDialogInputs({
+    countryCode: countrySelect?.value,
+    countryInput,
+    customCountryDiv,
+    customCountryName,
+    customCountryCode
+  });
+  if (!resolvedCountry) return;
+
+  const name = nameInput?.value?.trim();
+  if (!name) {
+    alert('Please enter a city name.');
+    return;
+  }
+
+  // Check if city already exists
+  const existing = citiesData.find(c => c.name.toLowerCase() === name.toLowerCase());
+  if (existing) {
+    alert(`City "${name}" already exists.`);
+    return;
+  }
+
+  const { countryCode, countryName, initialLat, initialLng } = _resolveCityInitialLocation(
+    name,
+    resolvedCountry.countryCode,
+    resolvedCountry.countryName
+  );
+
   const newCity = addOrUpdateCity(name, countryName, '', '', '', countryCode, initialLat, initialLng);
   if (newCity) {
-    if (typeof refreshJourneyCityDropdowns === 'function') {
-      refreshJourneyCityDropdowns(newCity.name);
-    }
-
-    if (!cityHasStoredCoords(newCity)) {
-      const addBtn = document.getElementById('addNewCityBtn') || document.querySelector('.city-add-stack button.action-btn');
-      const origBtnText = addBtn ? addBtn.textContent : '';
-      if (addBtn) {
-        addBtn.disabled = true;
-        addBtn.textContent = 'Locating on map...';
-      }
-      try {
-        const location = await resolveCityLocation(newCity);
-        if (location) applyCityLocation(newCity, location);
-      } finally {
-        if (addBtn) {
-          addBtn.disabled = false;
-          addBtn.textContent = origBtnText;
-        }
-      }
-    }
-
-    // Persist as user city so it is recognized across the entire app
-    addUserCity(newCity.id, newCity.name, newCity.countryCode, newCity.lat, newCity.lng);
-
-    if (cityHasStoredCoords(newCity) && typeof window !== 'undefined') {
-      window.__dynamicCityCoordsCache = window.__dynamicCityCoordsCache || new Map();
-      window.__dynamicCityCoordsCache.set(newCity.name.toLowerCase(), { lat: Number(newCity.lat), lng: Number(newCity.lng) });
-    }
-
-    if (typeof window !== 'undefined') {
-      window.__stagedCityCoords = null;
-    }
-
-    saveData(false);
-    nameInput.value = '';
-    if (countryInput) countryInput.value = '';
-    if (countrySelect) countrySelect.value = '';
-    if (codeInfo && codeInfo.parentElement && codeInfo.parentElement.style) codeInfo.parentElement.style.display = 'none';
-    const liveResults = document.getElementById('cityLiveSearchResults');
-    if (liveResults) { liveResults.style.display = 'none'; liveResults.innerHTML = ''; }
-    populateCityList();
-    if (typeof buildCityNav === 'function') {
-      buildCityNav();
-    }
-    if (typeof buildItinerary === 'function') {
-      buildItinerary();
-    }
-    if (typeof buildJourneyMap === 'function') {
-      buildJourneyMap();
-    }
-    if (typeof buildDesktopSplitMap === 'function') {
-      buildDesktopSplitMap();
-    }
-    if (typeof showToast === 'function') {
-      const flag = newCity.countryCode ? getCountryFlag(newCity.countryCode) : '📍';
-      showToast(`Added ${newCity.name} ${flag} to trip destinations`);
-    }
+    await _ensureCityLocationAndPersist(newCity);
+    _resetCityDialogFormAndRefreshUI(nameInput, countryInput, countrySelect, codeInfo, newCity);
   }
 }
 
