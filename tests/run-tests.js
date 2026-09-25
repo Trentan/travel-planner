@@ -21,6 +21,7 @@ const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
 const { run: runSmartRemindersSuite } = require('./smart-reminders-suite');
 const { runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
 const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
+const { runNormalizeItemStatusTests } = require('./normalize-item-status.test');
 const { runParseCurrencyAmountTests } = require('./parse-currency-amount.test');
 const { runFormatCurrencyTests } = require('./format-currency.test');
 const { runCompactFoodQuestTitleTests } = require('./compact-food-quest-title.test');
@@ -60,6 +61,7 @@ async function run() {
     if (typeof runUploadAllLocalTripsBenchmarkAndTest === 'function') await runUploadAllLocalTripsBenchmarkAndTest();
     if (typeof runGoogleAuthRenewalTests === 'function') await runGoogleAuthRenewalTests();
     if (typeof runDualPathWizardSuite === 'function') await runDualPathWizardSuite();
+    if (typeof runNormalizeItemStatusTests === 'function') await runNormalizeItemStatusTests();
     if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();
     if (typeof runParseCurrencyAmountTests === 'function') await runParseCurrencyAmountTests();
     if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
