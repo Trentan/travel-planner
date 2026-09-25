@@ -182,7 +182,14 @@ function saveStayFromModal() {
   }
 
   if (hasError) {
-    alert('Please fill in all mandatory stay fields (City, Property Name, Check-in, and Check-out dates).');
+    const errorMsg = 'Please fill in all mandatory stay fields (City, Property Name, Check-in, and Check-out dates).';
+    if (typeof showToast === 'function') {
+      showToast('⚠️ ' + errorMsg);
+    } else if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+      window.showToast('⚠️ ' + errorMsg);
+    } else if (typeof alert === 'function') {
+      alert(errorMsg);
+    }
     return;
   }
 
