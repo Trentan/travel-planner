@@ -128,8 +128,13 @@ function _populateAddLegCityDropdowns() {
     countrySelect.innerHTML = '<option value="">Select country...</option>' +
       COUNTRY_DATA
         .filter(c => c.code !== 'ZZ')
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(c => `<option value="${c.code}">${c.flag} ${c.name}</option>`)
+        .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+        .map(c => {
+          const code = typeof escapeHtmlText === 'function' ? escapeHtmlText(c.code) : String(c.code ?? '').replace(/"/g, '&quot;');
+          const flag = typeof escapeHtmlText === 'function' ? escapeHtmlText(c.flag) : String(c.flag ?? '');
+          const name = typeof escapeHtmlText === 'function' ? escapeHtmlText(c.name) : String(c.name ?? '');
+          return `<option value="${code}">${flag} ${name}</option>`;
+        })
         .join('') +
       '<option value="OTHER">✏️ Other...</option>';
     if (currentValue) countrySelect.value = currentValue;

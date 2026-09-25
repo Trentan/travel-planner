@@ -15,6 +15,7 @@ const { runTripLibraryGDriveSyncTests } = require('./trip-library-gdrive-sync.te
 const { runTripSummaryXssTests } = require('./trip-summary-xss.test');
 const { runTransportModalXssTests } = require('./transport-modal-xss.test');
 const { runLegReorderXssTests } = require('./leg-reorder-xss.test');
+const { runLegDialogCountryXssTests } = require('./leg-dialog-country-xss.test');
 const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 const { run: runTimezoneSuite } = require('./timezone-suite.test');
 const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
@@ -56,6 +57,7 @@ async function run() {
     if (typeof runTripSummaryXssTests === 'function') await runTripSummaryXssTests();
     if (typeof runTransportModalXssTests === 'function') await runTransportModalXssTests();
     if (typeof runLegReorderXssTests === 'function') await runLegReorderXssTests();
+    if (typeof runLegDialogCountryXssTests === 'function') await runLegDialogCountryXssTests();
     if (typeof runStorageEngineSuite === 'function') await runStorageEngineSuite();
     if (typeof runUploadAllLocalTripsBenchmarkAndTest === 'function') await runUploadAllLocalTripsBenchmarkAndTest();
     if (typeof runGoogleAuthRenewalTests === 'function') await runGoogleAuthRenewalTests();
