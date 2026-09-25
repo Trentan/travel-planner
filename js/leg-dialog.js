@@ -1501,7 +1501,21 @@ function validateLegEditorForm() {
   startDateInput.classList.remove('border-rose-500');
   endDateInput.classList.remove('border-rose-500');
 
+  const toCitySelect = doc ? doc.getElementById('toCitySelect') : null;
+  if (toCitySelect) {
+    toCitySelect.classList.remove('border-rose-500');
+  }
+
   let clashText = '';
+
+  const currentLegType = doc ? doc.getElementById('legTypeSelect')?.value : null;
+  if (currentLegType === 'travel') {
+    const toCityVal = toCitySelect?.value || '';
+    if (!toCityVal) {
+      clashText = 'Please choose a destination city for this travel leg.';
+      if (toCitySelect) toCitySelect.classList.add('border-rose-500');
+    }
+  }
 
   // 1. Inverted date range
   if (startDate && endDate && startDate > endDate) {
@@ -1689,7 +1703,16 @@ function confirmAddLeg() {
       fromCity = selectedFrom || homeCityName;
       toCity = selectedTo || '';
       if (!toCity) {
-        alert('Please choose a destination city for this travel leg.');
+        const warningBanner = document.getElementById('legClashWarningBanner');
+        const warningMessage = document.getElementById('legClashWarningMessage');
+        const toCitySelect = document.getElementById('toCitySelect');
+        if (warningMessage) warningMessage.textContent = 'Please choose a destination city for this travel leg.';
+        if (warningBanner) warningBanner.style.display = 'flex';
+        if (toCitySelect) {
+          toCitySelect.classList.add('border-rose-500');
+          if (typeof toCitySelect.focus === 'function') toCitySelect.focus();
+        }
+        if (typeof showToast === 'function') showToast('Please choose a destination city for this travel leg.', 'warning');
         return;
       }
       target.label = `✈️ ${fromCity} to ${toCity}`;
@@ -1776,7 +1799,16 @@ function confirmAddLeg() {
       fromCity = document.getElementById('fromCitySelect')?.value || homeCityName;
       toCity = document.getElementById('toCitySelect')?.value || '';
       if (!toCity) {
-        alert('Please choose a destination city for this travel leg.');
+        const warningBanner = document.getElementById('legClashWarningBanner');
+        const warningMessage = document.getElementById('legClashWarningMessage');
+        const toCitySelect = document.getElementById('toCitySelect');
+        if (warningMessage) warningMessage.textContent = 'Please choose a destination city for this travel leg.';
+        if (warningBanner) warningBanner.style.display = 'flex';
+        if (toCitySelect) {
+          toCitySelect.classList.add('border-rose-500');
+          if (typeof toCitySelect.focus === 'function') toCitySelect.focus();
+        }
+        if (typeof showToast === 'function') showToast('Please choose a destination city for this travel leg.', 'warning');
         return;
       }
       label = `✈️ ${fromCity} to ${toCity}`;

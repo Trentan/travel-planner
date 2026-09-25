@@ -234,6 +234,26 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(elements['legDialogSaveBtn'].disabled, false, 'Save button must be enabled for valid dates');
   assert.strictEqual(elements['legClashWarningBanner'].style.display, 'none', 'Warning banner must be hidden when valid');
 
+  // 3b. Test travel leg missing destination city validation
+  elements['legTypeSelect'].value = 'travel';
+  elements['toCitySelect'].value = '';
+  const invalidTravelLeg = validateLegEditorForm();
+  assert.strictEqual(invalidTravelLeg, false, 'validateLegEditorForm should return false when travel leg destination is missing');
+  assert.strictEqual(elements['legDialogSaveBtn'].disabled, true, 'Save button must be disabled for travel leg missing destination');
+  assert.ok(elements['toCitySelect'].classList.contains('border-rose-500'), 'toCitySelect should be highlighted with border-rose-500');
+  assert.strictEqual(elements['legClashWarningBanner'].style.display, 'flex', 'Warning banner must be displayed for missing travel destination');
+  assert.ok(elements['legClashWarningMessage'].textContent.includes('destination city'), 'Warning message must explain destination selection requirement');
+
+  // Provide destination city and re-validate
+  elements['toCitySelect'].value = 'Venice';
+  const validTravelLeg = validateLegEditorForm();
+  assert.strictEqual(validTravelLeg, true, 'validateLegEditorForm should pass when travel leg destination is selected');
+  assert.strictEqual(elements['legDialogSaveBtn'].disabled, false, 'Save button must be enabled when travel leg destination is selected');
+  assert.strictEqual(elements['toCitySelect'].classList.contains('border-rose-500'), false, 'border-rose-500 class must be removed when valid');
+
+  // Reset legTypeSelect back to city for subsequent tests
+  elements['legTypeSelect'].value = 'city';
+
   // 4. Test Modal Staging Isolation (cancelling does NOT mutate appData)
   console.log('  Testing modal containment & isolation on cancel...');
   global.appData = [
