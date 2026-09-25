@@ -573,10 +573,9 @@ function formatBudgetAmount(value) {
   return formatCurrency(value);
 }
 
-function buildBudgetTab() {
-  const container = document.getElementById('budget-table-container');
-  const kpiContainer = document.getElementById('budget-kpi-container');
-  let totalTrans = 0, totalAccom = 0, totalAct = 0; let legBreakdown = [];
+function calculateBudgetBreakdown() {
+  let totalTrans = 0, totalAccom = 0, totalAct = 0;
+  const legBreakdown = [];
 
   // Get journeys array (global from transport.js) or fallback to empty
   const journeysData = (typeof journeys !== 'undefined') ? journeys : [];
@@ -676,6 +675,12 @@ function buildBudgetTab() {
 
   const grandTotal = totalTrans + totalAccom + totalAct;
 
+  return { legBreakdown, totalTrans, totalAccom, totalAct, grandTotal };
+}
+
+function renderBudgetKPIs(kpiContainer, totals) {
+  if (!kpiContainer) return;
+  const { totalTrans, totalAccom, totalAct, grandTotal } = totals;
   kpiContainer.innerHTML = `
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       <div class="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-xl p-4 shadow-sm flex flex-col justify-center">
@@ -697,7 +702,10 @@ function buildBudgetTab() {
       </div>
     </div>
   `;
+}
 
+function renderBudgetTableAndBreakdown(container, legBreakdown) {
+  if (!container) return;
   const maxLegTotal = Math.max(...legBreakdown.map(l => l.total), 1);
   const mobileBreakdownHtml = legBreakdown.map(l => {
     const barWidth = Math.max(6, Math.round((l.total / maxLegTotal) * 100));
@@ -731,6 +739,16 @@ function buildBudgetTab() {
       ${mobileBreakdownHtml || '<div class="budget-mobile-empty">No budget items yet.</div>'}
     </div>`;
   container.innerHTML = html;
+}
+
+function buildBudgetTab() {
+  const container = document.getElementById('budget-table-container');
+  const kpiContainer = document.getElementById('budget-kpi-container');
+
+  const budgetTotals = calculateBudgetBreakdown();
+
+  renderBudgetKPIs(kpiContainer, budgetTotals);
+  renderBudgetTableAndBreakdown(container, budgetTotals.legBreakdown);
 }
 
 

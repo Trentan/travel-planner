@@ -764,7 +764,7 @@ function sortLegs() {
   buildItinerary();
 }
 
-// Navigation observer removed - leg-nav was deprecated in favor of city filter
+// Legacy navigation observer helper retained for backwards compatibility
 function reObserveLegs() {
   // No-op - kept for backwards compatibility
 }
