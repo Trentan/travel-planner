@@ -443,19 +443,31 @@ async function copyPrompt() {
       throw new Error('Clipboard API unavailable');
     }
 
-    alert('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+    if (typeof showToast === 'function') {
+      showToast('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+    } else if (typeof alert === 'function') {
+      alert('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+    }
     return true;
   } catch (error) {
     if (promptArea && typeof promptArea.select === 'function' && typeof document.execCommand === 'function') {
       promptArea.select();
       const copied = document.execCommand('copy');
       if (copied) {
-        alert('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+        if (typeof showToast === 'function') {
+          showToast('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+        } else if (typeof alert === 'function') {
+          alert('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+        }
         return true;
       }
     }
 
-    alert('Could not copy automatically. Select the prompt and copy it manually.');
+    if (typeof showToast === 'function') {
+      showToast('Could not copy automatically. Select the prompt and copy it manually.');
+    } else if (typeof alert === 'function') {
+      alert('Could not copy automatically. Select the prompt and copy it manually.');
+    }
     return false;
   }
 }

@@ -170,7 +170,7 @@ async function run() {
     utilsContext,
     parseActivityDurationMinutes
   } = loadDateHelpers();
-  const { context, document, alerts, clipboardWrites, execCommands } = aiHarness;
+  const { context, document, alerts, toasts, clipboardWrites, execCommands } = aiHarness;
 
   assert(dateHelpers.normalizeTripDateValue('7 Jun') === '2026-06-07', 'Date normalization should convert short dates to ISO');
   assert(dateHelpers.normalizeTripDateValue('2026-05-14') === '2026-05-14', 'Date normalization should preserve ISO dates');
@@ -261,7 +261,8 @@ async function run() {
   const copied = await context.copyPrompt();
   assert(copied === true, 'copyPrompt should succeed');
   assert(clipboardWrites[0] === promptText, 'copyPrompt should write the prompt to the clipboard');
-  assert(alerts.length >= 1, 'copyPrompt should notify the user');
+  assert(toasts.length >= 1 || alerts.length >= 1, 'copyPrompt should notify the user via showToast or alert');
+  assert(toasts.some(t => t.includes('Prompt copied to clipboard')), 'copyPrompt should trigger success toast message');
   assert(execCommands.length === 0, 'Clipboard API should avoid the execCommand fallback when available');
 
   const bookingItems = bookingContext.parseBookingConfirmationText(`
