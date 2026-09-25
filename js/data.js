@@ -1175,14 +1175,14 @@ let saveQueued = false;
 let saveQueuedShowTick = false;
 
 // Journeys data - make global so all modules can access
-var journeys = [];
+let journeys = [];
 window.journeys = journeys;
 
-var stays = [];
+let stays = [];
 window.stays = stays;
 
 // Current city filter - 'all' or city ID (global for cross-module access)
-var currentCityFilter = 'all';
+let currentCityFilter = 'all';
 window.currentCityFilter = currentCityFilter;
 
 function calculateDjb2Hash(str) {
@@ -7328,12 +7328,12 @@ async function loadImportedPayload(importedData, fileName) {
     }
   });
 
-  var transitSkipList = [
+  const transitSkipList = [
     'departure', 'arrival', 'in transit', 'between cities', 'tbc', 'return', 'home',
     'start', 'return home', 'trip start', 'trip finish', 'trip return', 'home departure',
     'departure from home', 'flight home', 'travel day'
   ];
-  var legLabelCities = [];
+  const legLabelCities = [];
   if (importedData.itinerary && Array.isArray(importedData.itinerary)) {
     importedData.itinerary.forEach(leg => {
       let label = leg.label || '';
@@ -7372,7 +7372,7 @@ async function loadImportedPayload(importedData, fileName) {
     });
   }
 
-  var allTransitCities = [...new Set([...transitCitiesToAdd, ...legLabelCities])];
+  const allTransitCities = [...new Set([...transitCitiesToAdd, ...legLabelCities])];
   allTransitCities.forEach(cityName => {
     let existing = citiesData.find(c => c.name.toLowerCase() === cityName.toLowerCase());
 
