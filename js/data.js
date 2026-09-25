@@ -3260,6 +3260,199 @@ function openCityDialog() {
   }
 }
 
+function _selectCityAutocompleteCandidate(candidate, elements) {
+  if (!candidate) return;
+  const { nameInput, countrySelect, countryInput, codeDisplay, codeInfo, hideDropdown } = elements;
+
+  if (nameInput) nameInput.value = candidate.name;
+  if (candidate.countryCode && countrySelect) {
+    countrySelect.value = candidate.countryCode;
+  }
+  if (candidate.countryName && countryInput) {
+    countryInput.value = candidate.countryName;
+  }
+
+  if (typeof window !== 'undefined') {
+    window.__stagedCityCoords = {
+      name: candidate.name,
+      lat: candidate.lat,
+      lng: candidate.lng,
+      countryCode: candidate.countryCode || '',
+      countryName: candidate.countryName || ''
+    };
+    if (candidate.lat !== undefined && candidate.lng !== undefined && !isNaN(candidate.lat) && !isNaN(candidate.lng)) {
+      window.__dynamicCityCoordsCache = window.__dynamicCityCoordsCache || new Map();
+      window.__dynamicCityCoordsCache.set(candidate.name.toLowerCase(), { lat: Number(candidate.lat), lng: Number(candidate.lng) });
+    }
+  }
+
+  if (codeDisplay && codeInfo) {
+    const flag = candidate.countryCode ? getCountryFlag(candidate.countryCode) : '📍';
+    const cName = candidate.countryName || (candidate.countryCode ? getCountryName(candidate.countryCode) : '');
+    const coordStr = (candidate.lat !== undefined && candidate.lng !== undefined && !isNaN(candidate.lat) && !isNaN(candidate.lng))
+      ? ` · 📍 ${candidate.lat.toFixed(4)}, ${candidate.lng.toFixed(4)}`
+      : '';
+    codeInfo.textContent = `${flag} ${cName}${coordStr} · Verified`;
+    codeDisplay.style.display = 'block';
+  }
+
+  if (typeof hideDropdown === 'function') hideDropdown();
+}
+
+function _renderCityAutocompleteDropdown(resultsContainer, candidates, selectCandidateCallback) {
+  if (!resultsContainer) return;
+  if (!candidates || candidates.length === 0) {
+    resultsContainer.style.display = 'none';
+    resultsContainer.innerHTML = '';
+    return;
+  }
+
+  resultsContainer.innerHTML = '';
+  candidates.forEach((cand, idx) => {
+    const item = document.createElement('div');
+    item.className = 'city-live-search-item';
+    item.setAttribute('role', 'option');
+    item.dataset.index = String(idx);
+
+    const flag = cand.countryCode ? getCountryFlag(cand.countryCode) : '📍';
+    const hasCoords = cand.lat !== undefined && cand.lng !== undefined && !isNaN(Number(cand.lat)) && !isNaN(Number(cand.lng));
+    const coordBadge = hasCoords ? `<span class="city-live-search-coords-pill">📍 ${Number(cand.lat).toFixed(2)}, ${Number(cand.lng).toFixed(2)}</span>` : '';
+    const sourceBadge = cand.source ? `<span class="city-live-search-badge-source">${cand.source}</span>` : '';
+    const sub = cand.region ? `${cand.region}, ${cand.countryName}` : cand.countryName;
+
+    const safeName = typeof escapeHtmlText === 'function' ? escapeHtmlText(cand.name) : cand.name;
+    const safeSub = typeof escapeHtmlText === 'function' ? escapeHtmlText(sub || '') : (sub || '');
+
+    item.innerHTML = `
+      <span class="city-live-search-flag">${flag}</span>
+      <div class="city-live-search-details">
+        <div class="city-live-search-name">${safeName}${sourceBadge}</div>
+        <div class="city-live-search-sub">${safeSub}</div>
+      </div>
+      ${coordBadge}
+    `;
+
+    item.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      if (typeof selectCandidateCallback === 'function') {
+        selectCandidateCallback(cand);
+      }
+    });
+
+    resultsContainer.appendChild(item);
+  });
+
+  resultsContainer.style.display = 'block';
+}
+
+function _updateCityAutocompleteHighlight(resultsContainer, activeIndex) {
+  if (!resultsContainer) return;
+  const items = resultsContainer.querySelectorAll('.city-live-search-item');
+  items.forEach((item, idx) => {
+    if (idx === activeIndex) {
+      item.classList.add('is-selected');
+      item.scrollIntoView({ block: 'nearest' });
+    } else {
+      item.classList.remove('is-selected');
+    }
+  });
+}
+
+function _gatherLocalCityCandidates(cleanLower) {
+  const localCandidates = [];
+  const seenKeys = new Set();
+
+  function addCandidate(name, countryCode, lat, lng, source, region = '') {
+    if (!name) return;
+    const key = `${name.toLowerCase()}|${(countryCode || '').toUpperCase()}`;
+    if (seenKeys.has(key)) return;
+    seenKeys.add(key);
+    localCandidates.push({
+      name: formatCityTitleCase(name),
+      countryCode: (countryCode || '').toUpperCase(),
+      countryName: countryCode ? getCountryName(countryCode) : '',
+      lat: lat !== undefined && lat !== null && !isNaN(Number(lat)) ? Number(lat) : undefined,
+      lng: lng !== undefined && lng !== null && !isNaN(Number(lng)) ? Number(lng) : undefined,
+      region: region,
+      source: source
+    });
+  }
+
+  if (typeof userCities !== 'undefined' && Array.isArray(userCities)) {
+    userCities.forEach(uc => {
+      if (uc.name && uc.name.toLowerCase().includes(cleanLower)) {
+        addCandidate(uc.name, uc.countryCode, uc.lat, uc.lng, 'custom');
+      }
+    });
+  }
+
+  if (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) {
+    ALL_CITIES.forEach(c => {
+      if (c.name && (c.name.toLowerCase().startsWith(cleanLower) || (c.name.toLowerCase().includes(cleanLower) && cleanLower.length >= 4))) {
+        if (localCandidates.length < 8) {
+          addCandidate(c.name, c.countryCode, c.lat, c.lng, 'database');
+        }
+      }
+    });
+  }
+
+  if (typeof EXTENDED_CITY_DATABASE !== 'undefined') {
+    for (const [extName, extData] of Object.entries(EXTENDED_CITY_DATABASE)) {
+      if (extName.toLowerCase().startsWith(cleanLower) || (extName.toLowerCase().includes(cleanLower) && cleanLower.length >= 4)) {
+        if (localCandidates.length < 10) {
+          addCandidate(extName, extData.countryCode, extData.lat, extData.lng, 'database');
+        }
+      }
+    }
+  }
+
+  return localCandidates;
+}
+
+async function _searchCityAutocompleteCandidates(clean, renderFn, isCurrentQuery) {
+  const cleanLower = clean.toLowerCase();
+  const localCandidates = _gatherLocalCityCandidates(cleanLower);
+
+  if (isCurrentQuery() && localCandidates.length > 0) {
+    renderFn(localCandidates.slice(0, 6));
+  }
+
+  try {
+    const onlineResults = await searchCityOnlineCandidates(clean);
+    if (!isCurrentQuery()) return;
+
+    const merged = [...localCandidates];
+    if (Array.isArray(onlineResults)) {
+      onlineResults.forEach(item => {
+        const existing = merged.find(m => m.name.toLowerCase() === item.name.toLowerCase() && (!m.countryCode || m.countryCode === item.countryCode));
+        if (existing) {
+          if (existing.lat === undefined && item.lat !== undefined) {
+            existing.lat = item.lat;
+            existing.lng = item.lng;
+          }
+          if (!existing.region && item.region) existing.region = item.region;
+        } else {
+          merged.push({
+            name: item.name,
+            countryCode: item.countryCode,
+            countryName: item.countryName || (item.countryCode ? getCountryName(item.countryCode) : ''),
+            region: item.region || '',
+            lat: item.lat,
+            lng: item.lng,
+            source: 'live'
+          });
+        }
+      });
+    }
+
+    if (isCurrentQuery()) {
+      renderFn(merged.slice(0, 8));
+    }
+  } catch (e) {
+    console.warn('[setupCityAutocomplete] Online candidate fetch error:', e);
+  }
+}
+
 // Setup live autocomplete and candidate search for city name input
 function setupCityAutocomplete() {
   const nameInput = document.getElementById('newCityName');
@@ -3290,98 +3483,28 @@ function setupCityAutocomplete() {
   }
 
   function selectCandidate(candidate) {
-    if (!candidate) return;
-    nameInput.value = candidate.name;
-    if (candidate.countryCode && countrySelect) {
-      countrySelect.value = candidate.countryCode;
-    }
-    if (candidate.countryName && countryInput) {
-      countryInput.value = candidate.countryName;
-    }
-
-    if (typeof window !== 'undefined') {
-      window.__stagedCityCoords = {
-        name: candidate.name,
-        lat: candidate.lat,
-        lng: candidate.lng,
-        countryCode: candidate.countryCode || '',
-        countryName: candidate.countryName || ''
-      };
-      if (candidate.lat !== undefined && candidate.lng !== undefined && !isNaN(candidate.lat) && !isNaN(candidate.lng)) {
-        window.__dynamicCityCoordsCache.set(candidate.name.toLowerCase(), { lat: Number(candidate.lat), lng: Number(candidate.lng) });
-      }
-    }
-
-    if (codeDisplay && codeInfo) {
-      const flag = candidate.countryCode ? getCountryFlag(candidate.countryCode) : '📍';
-      const cName = candidate.countryName || (candidate.countryCode ? getCountryName(candidate.countryCode) : '');
-      const coordStr = (candidate.lat !== undefined && candidate.lng !== undefined && !isNaN(candidate.lat) && !isNaN(candidate.lng))
-        ? ` · 📍 ${candidate.lat.toFixed(4)}, ${candidate.lng.toFixed(4)}`
-        : '';
-      codeInfo.textContent = `${flag} ${cName}${coordStr} · Verified`;
-      codeDisplay.style.display = 'block';
-    }
-
-    hideDropdown();
+    _selectCityAutocompleteCandidate(candidate, {
+      nameInput,
+      countrySelect,
+      countryInput,
+      codeDisplay,
+      codeInfo,
+      hideDropdown
+    });
   }
 
   function renderDropdown(candidates) {
-    if (!resultsContainer) return;
     activeCandidates = candidates || [];
     activeIndex = -1;
-
     if (activeCandidates.length === 0) {
       hideDropdown();
       return;
     }
-
-    resultsContainer.innerHTML = '';
-    activeCandidates.forEach((cand, idx) => {
-      const item = document.createElement('div');
-      item.className = 'city-live-search-item';
-      item.setAttribute('role', 'option');
-      item.dataset.index = String(idx);
-
-      const flag = cand.countryCode ? getCountryFlag(cand.countryCode) : '📍';
-      const hasCoords = cand.lat !== undefined && cand.lng !== undefined && !isNaN(Number(cand.lat)) && !isNaN(Number(cand.lng));
-      const coordBadge = hasCoords ? `<span class="city-live-search-coords-pill">📍 ${Number(cand.lat).toFixed(2)}, ${Number(cand.lng).toFixed(2)}</span>` : '';
-      const sourceBadge = cand.source ? `<span class="city-live-search-badge-source">${cand.source}</span>` : '';
-      const sub = cand.region ? `${cand.region}, ${cand.countryName}` : cand.countryName;
-
-      const safeName = typeof escapeHtmlText === 'function' ? escapeHtmlText(cand.name) : cand.name;
-      const safeSub = typeof escapeHtmlText === 'function' ? escapeHtmlText(sub || '') : (sub || '');
-
-      item.innerHTML = `
-        <span class="city-live-search-flag">${flag}</span>
-        <div class="city-live-search-details">
-          <div class="city-live-search-name">${safeName}${sourceBadge}</div>
-          <div class="city-live-search-sub">${safeSub}</div>
-        </div>
-        ${coordBadge}
-      `;
-
-      item.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        selectCandidate(cand);
-      });
-
-      resultsContainer.appendChild(item);
-    });
-
-    resultsContainer.style.display = 'block';
+    _renderCityAutocompleteDropdown(resultsContainer, activeCandidates, selectCandidate);
   }
 
   function updateHighlightedItem() {
-    if (!resultsContainer) return;
-    const items = resultsContainer.querySelectorAll('.city-live-search-item');
-    items.forEach((item, idx) => {
-      if (idx === activeIndex) {
-        item.classList.add('is-selected');
-        item.scrollIntoView({ block: 'nearest' });
-      } else {
-        item.classList.remove('is-selected');
-      }
-    });
+    _updateCityAutocompleteHighlight(resultsContainer, activeIndex);
   }
 
   async function searchCandidates(query) {
@@ -3391,95 +3514,7 @@ function setupCityAutocomplete() {
       return;
     }
     currentQuery = clean;
-    const cleanLower = clean.toLowerCase();
-
-    // 1. Gather local matches (built-in, user cities, extended database)
-    const localCandidates = [];
-    const seenKeys = new Set();
-
-    function addCandidate(name, countryCode, lat, lng, source, region = '') {
-      if (!name) return;
-      const key = `${name.toLowerCase()}|${(countryCode || '').toUpperCase()}`;
-      if (seenKeys.has(key)) return;
-      seenKeys.add(key);
-      localCandidates.push({
-        name: formatCityTitleCase(name),
-        countryCode: (countryCode || '').toUpperCase(),
-        countryName: countryCode ? getCountryName(countryCode) : '',
-        lat: lat !== undefined && lat !== null && !isNaN(Number(lat)) ? Number(lat) : undefined,
-        lng: lng !== undefined && lng !== null && !isNaN(Number(lng)) ? Number(lng) : undefined,
-        region: region,
-        source: source
-      });
-    }
-
-    if (typeof userCities !== 'undefined' && Array.isArray(userCities)) {
-      userCities.forEach(uc => {
-        if (uc.name && uc.name.toLowerCase().includes(cleanLower)) {
-          addCandidate(uc.name, uc.countryCode, uc.lat, uc.lng, 'custom');
-        }
-      });
-    }
-
-    if (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) {
-      ALL_CITIES.forEach(c => {
-        if (c.name && (c.name.toLowerCase().startsWith(cleanLower) || (c.name.toLowerCase().includes(cleanLower) && cleanLower.length >= 4))) {
-          if (localCandidates.length < 8) {
-            addCandidate(c.name, c.countryCode, c.lat, c.lng, 'database');
-          }
-        }
-      });
-    }
-
-    if (typeof EXTENDED_CITY_DATABASE !== 'undefined') {
-      for (const [extName, extData] of Object.entries(EXTENDED_CITY_DATABASE)) {
-        if (extName.toLowerCase().startsWith(cleanLower) || (extName.toLowerCase().includes(cleanLower) && cleanLower.length >= 4)) {
-          if (localCandidates.length < 10) {
-            addCandidate(extName, extData.countryCode, extData.lat, extData.lng, 'database');
-          }
-        }
-      }
-    }
-
-    if (currentQuery === clean && localCandidates.length > 0) {
-      renderDropdown(localCandidates.slice(0, 6));
-    }
-
-    // 2. Fetch live online candidates via OpenStreetMap Nominatim
-    try {
-      const onlineResults = await searchCityOnlineCandidates(clean);
-      if (currentQuery !== clean) return;
-
-      const merged = [...localCandidates];
-      if (Array.isArray(onlineResults)) {
-        onlineResults.forEach(item => {
-          const existing = merged.find(m => m.name.toLowerCase() === item.name.toLowerCase() && (!m.countryCode || m.countryCode === item.countryCode));
-          if (existing) {
-            if (existing.lat === undefined && item.lat !== undefined) {
-              existing.lat = item.lat;
-              existing.lng = item.lng;
-            }
-            if (!existing.region && item.region) existing.region = item.region;
-          } else {
-            merged.push({
-              name: item.name,
-              countryCode: item.countryCode,
-              countryName: item.countryName || (item.countryCode ? getCountryName(item.countryCode) : ''),
-              region: item.region || '',
-              lat: item.lat,
-              lng: item.lng,
-              source: 'live'
-            });
-          }
-        });
-      }
-
-      if (currentQuery === clean) {
-        renderDropdown(merged.slice(0, 8));
-      }
-    } catch (e) {
-      console.warn('[setupCityAutocomplete] Online candidate fetch error:', e);
-    }
+    await _searchCityAutocompleteCandidates(clean, renderDropdown, () => currentQuery === clean);
   }
 
   nameInput.addEventListener('input', function() {
