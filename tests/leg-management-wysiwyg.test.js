@@ -84,6 +84,8 @@ createMockElement('legEditorModeTitle');
 createMockElement('legEditorLegName');
 createMockElement('legOriginHelperCity');
 createMockElement('legDepartingHelperCity');
+createMockElement('legArrivingFromBox');
+createMockElement('legDepartingToBox');
 
 const mockDocument = {
   body: {
@@ -373,7 +375,9 @@ async function runLegManagementWysiwygSuite() {
   ];
 
   openAddLegDialog('edit');
-  assert.strictEqual(getLegDialogState().mode, 'add', 'Default dialog mode is add');
+  assert.strictEqual(getLegDialogState().mode, 'none', 'Default dialog mode is none on initial open');
+  resetLegDialogToAddNew();
+  assert.strictEqual(getLegDialogState().mode, 'add', 'Dialog mode becomes add after resetLegDialogToAddNew');
   assert.strictEqual(elements['newLegStartDate'].value, '2026-06-06', 'Commence date defaults to end date of preceding leg (Florence), not today');
   assert.strictEqual(elements['legDurationNights'].value, 3, 'Default duration is 3 nights');
   assert.strictEqual(elements['newLegEndDate'].value, '2026-06-09', 'End date auto-computed from duration (+3 days)');
@@ -1014,15 +1018,31 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(elements['legDialogSaveBtn'].textContent, 'Add Leg', 'Primary button updated to Add Leg');
   assert.strictEqual(elements['legEditorModeTitle'].textContent, 'Add New Leg', 'Mode title displays Add New Leg');
 
-  // Test empty prompt mode (desktop initial unselected state)
-  setLegDialogState({ mode: 'none', isAddingNewLeg: false, editLegIdx: null, stagedLegs: testTransitTrip, originalLegDates: {} });
-  updateLegDialogUiMode();
-  assert.strictEqual(elements['legEditorEmptyPrompt'].style.display, 'flex', 'Empty prompt visible when mode is none');
-  assert.strictEqual(elements['legEditorFormContent'].style.display, 'none', 'Form content hidden when mode is none');
+  // Test openAddLegDialog defaults to mode: none (empty prompt on right, no premature Add New Leg)
+  openAddLegDialog('edit');
+  assert.strictEqual(legDialogState.mode, 'none', 'openAddLegDialog initializes with mode: none');
+  assert.strictEqual(elements['legEditorEmptyPrompt'].style.display, 'flex', 'Empty prompt visible on initial openAddLegDialog');
+  assert.strictEqual(elements['legEditorFormContent'].style.display, 'none', 'Form content hidden on initial openAddLegDialog');
 
-  // Test desktop delete button sync in edit vs add mode
+  // Test selecting start leg (index 0): hides 'Arriving from' box, shows 'Departing to' box
+  elements['editLegSelect'].value = '0';
+  onEditLegSelectionChange();
+  assert.strictEqual(elements['legArrivingFromBox'].style.display, 'none', 'Start leg hides Arriving from box');
+  assert.strictEqual(elements['legDepartingToBox'].style.display, 'flex', 'Start leg shows Departing to box');
+
+  // Test selecting return leg (index 3): hides 'Departing to' box, shows 'Arriving from' box
+  elements['editLegSelect'].value = '3';
+  onEditLegSelectionChange();
+  assert.strictEqual(elements['legDepartingToBox'].style.display, 'none', 'Return leg hides Departing to box');
+  assert.strictEqual(elements['legArrivingFromBox'].style.display, 'flex', 'Return leg shows Arriving from box');
+
+  // Test selecting middle leg (index 2): shows both
   elements['editLegSelect'].value = '2';
   onEditLegSelectionChange();
+  assert.strictEqual(elements['legArrivingFromBox'].style.display, 'flex', 'Middle leg shows Arriving from box');
+  assert.strictEqual(elements['legDepartingToBox'].style.display, 'flex', 'Middle leg shows Departing to box');
+
+  // Test desktop delete button sync in edit vs add mode
   assert.strictEqual(elements['desktopLegDialogDeleteBtn'].style.display, 'inline-flex', 'desktopLegDialogDeleteBtn visible in edit mode');
   resetLegDialogToAddNew();
   assert.strictEqual(elements['desktopLegDialogDeleteBtn'].style.display, 'none', 'desktopLegDialogDeleteBtn hidden in add mode');

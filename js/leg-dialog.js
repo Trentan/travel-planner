@@ -50,7 +50,7 @@ function openAddLegDialog(initialTab = 'edit') {
     });
 
     setLegDialogState({
-      mode: 'add',
+      mode: 'none',
       isAddingNewLeg: false,
       editLegIdx: null,
       stagedLegs: Array.isArray(appData) ? JSON.parse(JSON.stringify(appData)) : [],
@@ -64,7 +64,8 @@ function openAddLegDialog(initialTab = 'edit') {
       editSelect.value = '';
       editSelect.onchange = onEditLegSelectionChange;
     }
-    resetLegDialogToAddNew();
+    updateLegDialogUiMode();
+    renderLegReorderList();
     switchLegModalTab(initialTab);
     validateLegEditorForm();
   }
@@ -360,15 +361,25 @@ function updateLegDialogUiMode() {
     : (appData || []);
   const homeCityName = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
 
+  const arrivingFromBox = document.getElementById('legArrivingFromBox');
+  const departingToBox = document.getElementById('legDepartingToBox');
+
   if (isEdit) {
     const leg = sourceLegs?.[legDialogState.editLegIdx];
-    if (leg && legNameEl) {
+    let isStartLeg = false;
+    let isReturnLeg = false;
+    if (leg) {
       const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
       const firstDay = leg.days?.[0];
       const lastDay = leg.days?.[daysCount - 1] || firstDay;
       const isTerminal = typeof isTerminalLeg === 'function' ? isTerminalLeg(leg) : false;
       const isSameDay = daysCount === 1 || (daysCount > 1 && firstDay?.date && lastDay?.date && firstDay.date === lastDay.date);
       const isTransit = !isTerminal && (leg.type === 'transit' || isSameDay || (leg.label || '').toLowerCase().includes('transit'));
+
+      const legId = String(leg.id || '').toLowerCase();
+      const legLabel = String(leg.label || '').toLowerCase();
+      isStartLeg = leg.type === 'start' || legDialogState.editLegIdx === 0 || legId.endsWith('-start') || legLabel.includes('(trip start)');
+      isReturnLeg = leg.type === 'return' || legDialogState.editLegIdx === sourceLegs.length - 1 || legId.endsWith('-finish') || legLabel.includes('(trip finish)') || legLabel.includes('(trip end)');
 
       let displayLabel = (leg.label || 'Untitled leg').trim();
       if (isTransit) {
@@ -378,8 +389,10 @@ function updateLegDialogUiMode() {
           displayLabel = displayLabel.replace(/\s*\(transit\)/i, ' <Transit>');
         }
       }
-      legNameEl.textContent = `Leg Name: ${legDialogState.editLegIdx + 1}. ${displayLabel}`;
-      legNameEl.style.display = 'inline';
+      if (legNameEl) {
+        legNameEl.textContent = `Leg Name: ${legDialogState.editLegIdx + 1}. ${displayLabel}`;
+        legNameEl.style.display = 'inline';
+      }
     }
 
     // Compute Arriving From & Departing To for edit leg
@@ -387,6 +400,10 @@ function updateLegDialogUiMode() {
     const nextCity = getNextLegCity(sourceLegs, legDialogState.editLegIdx, homeCityName);
     if (arrivingFromCity) arrivingFromCity.textContent = priorCity || homeCityName;
     if (departingToCity) departingToCity.textContent = nextCity || homeCityName;
+
+    // For start leg, do not show 'Arriving from: Home'. For return leg, do not show 'Departing to: Home'.
+    if (arrivingFromBox) arrivingFromBox.style.display = isStartLeg ? 'none' : 'flex';
+    if (departingToBox) departingToBox.style.display = isReturnLeg ? 'none' : 'flex';
   } else if (isAddingNew) {
     if (legNameEl) {
       legNameEl.textContent = '';
@@ -414,6 +431,15 @@ function updateLegDialogUiMode() {
     const nextCity = getNextLegCity(sourceLegs, insertionIdx - 1, homeCityName);
     if (arrivingFromCity) arrivingFromCity.textContent = priorCity || homeCityName;
     if (departingToCity) departingToCity.textContent = nextCity || homeCityName;
+
+    const isStartPlacement = placementVal === 'start' || (insertionIdx === 0 && sourceLegs.length === 0);
+    const isReturnPlacement = placementVal === 'end' && sourceLegs.length > 0 && typeof isTerminalLeg === 'function' && isTerminalLeg(sourceLegs[sourceLegs.length - 1]);
+    if (arrivingFromBox) arrivingFromBox.style.display = isStartPlacement ? 'none' : 'flex';
+    if (departingToBox) departingToBox.style.display = isReturnPlacement ? 'none' : 'flex';
+  } else {
+    // mode: 'none'
+    if (arrivingFromBox) arrivingFromBox.style.display = 'none';
+    if (departingToBox) departingToBox.style.display = 'none';
   }
 
   _syncLegDialogActions();
