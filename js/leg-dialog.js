@@ -137,12 +137,16 @@ function _populateAddLegCityDropdowns() {
 
   if (editLegSelect) {
     const currentValue = editLegSelect.value;
-    const options = [
-      '<option value="">-- Select existing leg to edit --</option>'
-    ];
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = '-- Select existing leg to edit --';
+
     const sourceLegs = (legDialogState && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs.length > 0)
       ? legDialogState.stagedLegs
       : (appData || []);
+
+    const newOptions = [defaultOpt];
+
     sourceLegs.forEach((leg, idx) => {
       const firstDay = leg?.days?.[0];
       const lastDay = leg?.days?.[leg?.days?.length - 1] || firstDay;
@@ -161,10 +165,19 @@ function _populateAddLegCityDropdowns() {
         }
       }
       const rawLabel = `${idx + 1}. ${baseLabel}${legDate ? ` (${legDate})` : ''}`;
-      const safeLabel = typeof escapeHtmlText === 'function' ? escapeHtmlText(rawLabel) : rawLabel;
-      options.push(`<option value="${idx}">${safeLabel}</option>`);
+      const opt = document.createElement('option');
+      opt.value = String(idx);
+      opt.textContent = rawLabel;
+      newOptions.push(opt);
     });
-    editLegSelect.innerHTML = options.join('');
+
+    if (typeof editLegSelect.replaceChildren === 'function') {
+      editLegSelect.replaceChildren(...newOptions);
+    } else {
+      editLegSelect.innerHTML = '';
+      newOptions.forEach(opt => editLegSelect.appendChild(opt));
+    }
+
     if (currentValue && Number.isFinite(Number(currentValue))) {
       editLegSelect.value = currentValue;
     } else {

@@ -21,6 +21,7 @@ function createMockElement(id, initialProps = {}) {
     id,
     value: '',
     options: [],
+    children: [],
     style: {},
     classList: {
       classes: new Set(),
@@ -30,12 +31,31 @@ function createMockElement(id, initialProps = {}) {
     },
     checked: true,
     disabled: false,
-    innerHTML: '',
+    _innerHTML: '',
+    get innerHTML() {
+      if (this.children && this.children.length > 0) {
+        return this.children.map(c => `<option value="${c.value || ''}">${c.textContent || ''}</option>`).join('');
+      }
+      return this._innerHTML || '';
+    },
+    set innerHTML(val) {
+      this._innerHTML = val;
+      if (val === '') {
+        this.children = [];
+        this.options = [];
+      }
+    },
     textContent: '',
     addEventListener() {},
     appendChild(child) {
+      if (!this.children) this.children = [];
       if (!this.options) this.options = [];
+      this.children.push(child);
       this.options.push(child);
+    },
+    replaceChildren(...newChildren) {
+      this.children = [...newChildren];
+      this.options = [...newChildren];
     },
     querySelectorAll() { return []; },
     ...initialProps
@@ -949,8 +969,8 @@ async function runLegManagementWysiwygSuite() {
   setLegDialogState({ mode: 'add', editLegIdx: null, stagedLegs: testTransitTrip, originalLegDates: {} });
   _populateAddLegCityDropdowns();
   const selectHtml = elements['editLegSelect'].innerHTML;
-  assert.ok(selectHtml.includes('Taipei &lt;Transit&gt; (2026-06-09)'), 'Taipei transit leg option includes <Transit> tag in editLegSelect');
-  assert.strictEqual(selectHtml.includes('Vienna &lt;Transit&gt;'), false, 'Vienna multi-day city stay does NOT have <Transit> tag');
+  assert.ok(selectHtml.includes('Taipei <Transit> (2026-06-09)'), 'Taipei transit leg option includes <Transit> tag in editLegSelect');
+  assert.strictEqual(selectHtml.includes('Vienna <Transit>'), false, 'Vienna multi-day city stay does NOT have <Transit> tag');
 
   // 14n. Test Issue #431 Leg edit dialog improvements
   console.log('  Testing Issue #431 Leg edit dialog improvements...');
