@@ -1479,6 +1479,62 @@ function buildSplitDayData(legIndex, dayIndex) {
   };
 }
 
+let _cachedSplitHeaderEl = null;
+let _cachedSplitDrawerEl = null;
+let _cachedCandidateSlides = null;
+let _cachedLegElements = null;
+let _cachedItineraryChildCount = -1;
+
+function invalidateDesktopSplitDomCache() {
+  _cachedSplitHeaderEl = null;
+  _cachedSplitDrawerEl = null;
+  _cachedCandidateSlides = null;
+  _cachedLegElements = null;
+  _cachedItineraryChildCount = -1;
+}
+window.invalidateDesktopSplitDomCache = invalidateDesktopSplitDomCache;
+
+function _getSplitHeaderEl() {
+  if (!_cachedSplitHeaderEl || !_cachedSplitHeaderEl.isConnected) {
+    _cachedSplitHeaderEl = document.querySelector('.desktop-split-right-header');
+  }
+  return _cachedSplitHeaderEl;
+}
+
+function _getSplitDrawerEl() {
+  if (!_cachedSplitDrawerEl || !_cachedSplitDrawerEl.isConnected) {
+    _cachedSplitDrawerEl = document.querySelector('.desktop-split-drawer');
+  }
+  return _cachedSplitDrawerEl;
+}
+
+function _checkItineraryDomChanged() {
+  const itineraryEl = document.getElementById('itinerary');
+  if (!itineraryEl) return true;
+  const currentChildCount = itineraryEl.childElementCount;
+  if (_cachedItineraryChildCount !== currentChildCount) {
+    _cachedItineraryChildCount = currentChildCount;
+    return true;
+  }
+  return false;
+}
+
+function _getCandidateSlides() {
+  if (!_cachedCandidateSlides || _cachedCandidateSlides.length === 0 || !_cachedCandidateSlides[0].isConnected || _cachedCandidateSlides.some(el => !el.isConnected)) {
+    _cachedCandidateSlides = Array.from(document.querySelectorAll(
+      '#itinerary .compact-day-slide.is-active, #itinerary .compact-day-slide.open, #itinerary .day-card.open, #itinerary .compact-day-slide, #itinerary .day-card'
+    ));
+  }
+  return _cachedCandidateSlides;
+}
+
+function _getLegElements() {
+  if (!_cachedLegElements || _cachedLegElements.length === 0 || !_cachedLegElements[0].isConnected || _cachedLegElements.some(el => !el.isConnected)) {
+    _cachedLegElements = Array.from(document.querySelectorAll('#itinerary .compact-desktop-leg, #itinerary .leg'));
+  }
+  return _cachedLegElements;
+}
+
 function findDesktopDayFromScrollPosition() {
   if (typeof document === 'undefined') return null;
 
@@ -1486,8 +1542,8 @@ function findDesktopDayFromScrollPosition() {
   let zoneTop = 184;
   let zoneBottom = typeof window !== 'undefined' ? (window.innerHeight - 16) : 884;
 
-  const header = document.querySelector('.desktop-split-right-header');
-  const drawer = document.querySelector('.desktop-split-drawer');
+  const header = _getSplitHeaderEl();
+  const drawer = _getSplitDrawerEl();
   if (header) {
     const r = header.getBoundingClientRect();
     if (r.height > 0) zoneTop = r.top;
@@ -1502,9 +1558,7 @@ function findDesktopDayFromScrollPosition() {
   }
 
   // 2. Evaluate visible day cards/slides within the hit zone [zoneTop, zoneBottom]
-  const candidateSlides = Array.from(document.querySelectorAll(
-    '#itinerary .compact-day-slide.is-active, #itinerary .compact-day-slide.open, #itinerary .day-card.open, #itinerary .compact-day-slide, #itinerary .day-card'
-  ));
+  const candidateSlides = _getCandidateSlides();
 
   let bestDayCandidate = null;
   let maxDayOverlap = -1;
@@ -1541,7 +1595,7 @@ function findDesktopDayFromScrollPosition() {
   }
 
   // 3. Evaluate leg elements within the hit zone [zoneTop, zoneBottom]
-  const legElements = Array.from(document.querySelectorAll('#itinerary .compact-desktop-leg, #itinerary .leg'));
+  const legElements = _getLegElements();
   if (legElements.length === 0) return null;
 
   let bestLegIndex = 0;
