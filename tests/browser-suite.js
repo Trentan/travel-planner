@@ -872,6 +872,57 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await page.waitForFunction(() => document.getElementById('city-modal').style.display === 'none');
     reporter.add('mobile', 'city nav add button', '+ Add City pill opens city dialog from cityNav');
 
+    // Verify Trip Legs Dialog on Mobile
+    await page.evaluate(() => openAddLegDialog());
+    await page.waitForFunction(() => document.getElementById('add-leg-modal').style.display === 'flex');
+    await humanPause(page, 250);
+
+    // Verify tabs are visible on mobile and initial tab is reorder
+    const legTabsVisible = await page.evaluate(() => {
+      const tabs = document.querySelector('#add-leg-modal .leg-modal-tabs');
+      return tabs ? window.getComputedStyle(tabs).display !== 'none' : false;
+    });
+    assert(legTabsVisible === true, 'Mobile: leg modal tabs should be visible');
+
+    const reorderActive = await page.evaluate(() => {
+      const reorderSec = document.getElementById('legReorderSection');
+      const editSec = document.getElementById('legEditSection');
+      return window.getComputedStyle(reorderSec).display !== 'none' && window.getComputedStyle(editSec).display === 'none';
+    });
+    assert(reorderActive === true, 'Mobile: reorder section should be active by default');
+
+    // Verify Save Sequence button is visible within viewport
+    const saveSequenceVisible = await page.evaluate(() => {
+      const btn = document.getElementById('saveLegSequenceBtn');
+      if (!btn) return false;
+      const rect = btn.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0 && rect.bottom <= window.innerHeight + 10;
+    });
+    assert(saveSequenceVisible === true, 'Mobile: Save Sequence button should be visible in viewport');
+
+    // Switch to Add / Edit tab on mobile
+    await page.locator('#legTabEditBtn').click();
+    await humanPause(page, 200);
+
+    const editTabActive = await page.evaluate(() => {
+      const editSec = document.getElementById('legEditSection');
+      const selectGroup = document.getElementById('legSelectGroup');
+      const emptyPrompt = document.getElementById('legEditorEmptyPrompt');
+      const isEditVisible = window.getComputedStyle(editSec).display !== 'none';
+      const isSelectVisible = window.getComputedStyle(selectGroup).display !== 'none';
+      const isEmptyHidden = window.getComputedStyle(emptyPrompt).display === 'none';
+      return isEditVisible && isSelectVisible && isEmptyHidden;
+    });
+    assert(editTabActive === true, 'Mobile: edit section should be active with selector dropdown and without empty prompt blocker');
+
+    // Verify leg editor save button exists and can be reached
+    const saveLegBtnExists = await page.locator('#legDialogSaveBtn').count();
+    assert(saveLegBtnExists === 1, 'Mobile: Save Leg button should exist in leg edit modal');
+
+    await page.evaluate(() => { if (typeof closeAddLegDialog === 'function') closeAddLegDialog(); });
+    await page.waitForFunction(() => document.getElementById('add-leg-modal').style.display === 'none');
+    reporter.add('mobile', 'leg modal tabs and layout', 'verified mobile leg dialog tabs, selector, and responsive layout');
+
     // Verify Packing Collapsible Container (#204)
     await page.locator('.app-tab-btn[data-tab="packing"]').click();
     await humanPause(page, 250);

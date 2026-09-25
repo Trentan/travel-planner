@@ -36,7 +36,7 @@ function openLegEditorDirect(legIdx) {
 }
 
 
-function openAddLegDialog(initialTab = 'edit') {
+function openAddLegDialog(initialTab) {
   const modal = document.getElementById('add-leg-modal');
   if (modal) {
     const origDates = {};
@@ -66,7 +66,9 @@ function openAddLegDialog(initialTab = 'edit') {
     }
     updateLegDialogUiMode();
     renderLegReorderList();
-    switchLegModalTab(initialTab);
+    const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (typeof window !== 'undefined' && window.innerWidth <= 768);
+    const targetTab = initialTab || (isMobile ? 'reorder' : 'edit');
+    switchLegModalTab(targetTab);
     validateLegEditorForm();
   }
 }
@@ -1391,12 +1393,34 @@ function switchLegModalTab(tabName) {
     if (reorderSec) reorderSec.style.display = 'none';
     if (editSec) editSec.style.display = 'block';
     if (modalTitle) modalTitle.textContent = (legDialogState && legDialogState.mode === 'edit') ? 'Edit Trip Leg' : 'Add New Trip Leg';
+
+    const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (typeof window !== 'undefined' && window.innerWidth <= 768);
+    if (isMobile && legDialogState && legDialogState.mode === 'none') {
+      const legs = (Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs.length > 0)
+        ? legDialogState.stagedLegs
+        : (appData || []);
+      if (legs.length > 0) {
+        const editSelect = document.getElementById('editLegSelect');
+        if (editSelect) {
+          editSelect.value = '0';
+        }
+        onEditLegSelectionChange();
+      } else {
+        resetLegDialogToAddNew();
+      }
+    }
+
     validateLegEditorForm();
   }
 }
 
 
 function editLegDirectFromReorder(idx) {
+  if (legDialogState) {
+    legDialogState.mode = 'edit';
+    legDialogState.isAddingNewLeg = false;
+    legDialogState.editLegIdx = idx;
+  }
   switchLegModalTab('edit');
   const editSelect = document.getElementById('editLegSelect');
   if (editSelect) {

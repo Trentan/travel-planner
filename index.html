@@ -21,7 +21,7 @@
   </script>
   <meta name="theme-color" content="#0f766e" id="metaThemeColor">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./dist/tailwind.css?v=11">
+  <link rel="stylesheet" href="./dist/tailwind.css?v=12">
   <!-- Leaflet.js for interactive maps -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -997,8 +997,8 @@
             </div>
             <div id="legReorderList" class="leg-reorder-list flex flex-col gap-1.5 p-2 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 max-h-72 sm:max-h-80 overflow-y-auto">
             </div>
-            <div class="modal-footer flex items-center justify-between gap-2 pt-3 border-t border-slate-200 dark:border-slate-800 mt-3">
-              <div class="flex items-center gap-2">
+            <div class="modal-footer flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-200 dark:border-slate-800 mt-3">
+              <div class="flex items-center gap-1.5 flex-wrap">
                 <button type="button" class="action-btn text-xs sm:text-sm text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800 hover:bg-teal-50 dark:hover:bg-teal-950/40" onclick="switchLegModalTab('edit'); resetLegDialogToAddNew();">
                   + Add New Leg
                 </button>
@@ -1006,10 +1006,10 @@
                   <span class="rebuild-icon">🗺️</span> Fix Routing
                 </button>
               </div>
-              <div class="flex items-center gap-2">
-                <button type="button" class="action-btn" onclick="closeAddLegDialog()">Cancel</button>
-                <button type="button" id="saveLegSequenceBtn" class="action-btn action-btn-secondary font-semibold" onclick="confirmSaveLegSequence()">
-                  Save Sequence Order
+              <div class="flex items-center gap-1.5 ml-auto">
+                <button type="button" class="action-btn text-xs sm:text-sm" onclick="closeAddLegDialog()">Cancel</button>
+                <button type="button" id="saveLegSequenceBtn" class="action-btn action-btn-secondary font-semibold text-xs sm:text-sm whitespace-nowrap" onclick="confirmSaveLegSequence()">
+                  Save Sequence
                 </button>
               </div>
             </div>
@@ -1027,7 +1027,7 @@
               <div class="text-3xl mb-2">🗺️</div>
               <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1.5 text-center">Select a Leg or Add New</h3>
               <p style="max-width: 100%; white-space: normal !important; word-break: normal !important;" class="text-xs text-slate-500 dark:text-slate-400 text-center mb-4 leading-relaxed mx-auto">
-                Click any leg from the route sequence on the left to edit its dates and itinerary notes, or add a brand new destination to your trip.
+                Select a leg from the route sequence or dropdown to edit its dates and itinerary notes, or add a brand new destination to your trip.
               </p>
               <button type="button" class="action-btn text-xs font-semibold text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800 hover:bg-teal-50 dark:hover:bg-teal-950/40" onclick="resetLegDialogToAddNew()">
                 + Add New Leg
