@@ -3343,22 +3343,42 @@ function setupCityAutocomplete() {
       item.dataset.index = String(idx);
 
       const flag = cand.countryCode ? getCountryFlag(cand.countryCode) : '📍';
+      const flagSpan = document.createElement('span');
+      flagSpan.className = 'city-live-search-flag';
+      flagSpan.textContent = flag;
+
+      const detailsDiv = document.createElement('div');
+      detailsDiv.className = 'city-live-search-details';
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'city-live-search-name';
+      nameDiv.textContent = cand.name || '';
+
+      if (cand.source) {
+        const sourceSpan = document.createElement('span');
+        sourceSpan.className = 'city-live-search-badge-source';
+        sourceSpan.textContent = cand.source;
+        nameDiv.appendChild(sourceSpan);
+      }
+
+      const sub = cand.region ? `${cand.region}, ${cand.countryName}` : (cand.countryName || '');
+      const subDiv = document.createElement('div');
+      subDiv.className = 'city-live-search-sub';
+      subDiv.textContent = sub;
+
+      detailsDiv.appendChild(nameDiv);
+      detailsDiv.appendChild(subDiv);
+
+      item.appendChild(flagSpan);
+      item.appendChild(detailsDiv);
+
       const hasCoords = cand.lat !== undefined && cand.lng !== undefined && !isNaN(Number(cand.lat)) && !isNaN(Number(cand.lng));
-      const coordBadge = hasCoords ? `<span class="city-live-search-coords-pill">📍 ${Number(cand.lat).toFixed(2)}, ${Number(cand.lng).toFixed(2)}</span>` : '';
-      const sourceBadge = cand.source ? `<span class="city-live-search-badge-source">${cand.source}</span>` : '';
-      const sub = cand.region ? `${cand.region}, ${cand.countryName}` : cand.countryName;
-
-      const safeName = typeof escapeHtmlText === 'function' ? escapeHtmlText(cand.name) : cand.name;
-      const safeSub = typeof escapeHtmlText === 'function' ? escapeHtmlText(sub || '') : (sub || '');
-
-      item.innerHTML = `
-        <span class="city-live-search-flag">${flag}</span>
-        <div class="city-live-search-details">
-          <div class="city-live-search-name">${safeName}${sourceBadge}</div>
-          <div class="city-live-search-sub">${safeSub}</div>
-        </div>
-        ${coordBadge}
-      `;
+      if (hasCoords) {
+        const coordSpan = document.createElement('span');
+        coordSpan.className = 'city-live-search-coords-pill';
+        coordSpan.textContent = `📍 ${Number(cand.lat).toFixed(2)}, ${Number(cand.lng).toFixed(2)}`;
+        item.appendChild(coordSpan);
+      }
 
       item.addEventListener('mousedown', (e) => {
         e.preventDefault();
@@ -3586,10 +3606,13 @@ function populateCityList() {
   sortedCities.forEach(city => {
     const flag = getCityFlag(city.name);
     const isHome = isHomeCity(city.name);
-    const escapedCityName = escapeTripStartText(city.name).replace(/'/g, "\\'");
+    const escapedCityId = escapeTripStartText(city.id);
+    const escapedCityName = escapeTripStartText(city.name);
+    const escapedCityCode = escapeTripStartText(city.code || city.iata || '');
+    const escapedCityIcao = escapeTripStartText(city.icaoCode || city.icao || '');
     const homeBadge = isHome
-      ? `<button type="button" class="city-home-toggle-btn active" onclick="setHomeCity('${escapedCityName}')" title="Currently set as Home. Click to unmark." style="background: #27AE60; color: white; border: none; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">🏠 Home ✓</button>`
-      : `<button type="button" class="city-home-toggle-btn" onclick="setHomeCity('${escapedCityName}')" title="Set ${escapeTripStartText(city.name)} as your Home base" style="background: #f1f5f9; color: #64748b; border: 1px dashed #cbd5e1; padding: 2px 7px; border-radius: 12px; font-size: 0.73rem; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;" onmouseenter="this.style.background='#e2e8f0';this.style.color='#334155'" onmouseleave="this.style.background='#f1f5f9';this.style.color='#64748b'">🏠 Mark as Home</button>`;
+      ? `<button type="button" class="city-home-toggle-btn active" data-city-name="${escapedCityName}" title="Currently set as Home. Click to unmark." style="background: #27AE60; color: white; border: none; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">🏠 Home ✓</button>`
+      : `<button type="button" class="city-home-toggle-btn" data-city-name="${escapedCityName}" title="Set ${escapedCityName} as your Home base" style="background: #f1f5f9; color: #64748b; border: 1px dashed #cbd5e1; padding: 2px 7px; border-radius: 12px; font-size: 0.73rem; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;" onmouseenter="this.style.background='#e2e8f0';this.style.color='#334155'" onmouseleave="this.style.background='#f1f5f9';this.style.color='#64748b'">🏠 Mark as Home</button>`;
 
     // Get city color from matching leg, or use city's stored color
     let cityColor = city.colour || '#2C3E50';
@@ -3607,20 +3630,19 @@ function populateCityList() {
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${cityLat},${cityLng}`)}`
       : '';
     const coordinateDisplay = hasCoords
-      ? `<a class="city-coordinates" href="${mapsUrl}" target="_blank" rel="noopener noreferrer" title="Open ${city.name} coordinates in Google Maps">${cityLat.toFixed(4)}, ${cityLng.toFixed(4)}</a>`
+      ? `<a class="city-coordinates" href="${mapsUrl}" target="_blank" rel="noopener noreferrer" title="Open ${escapedCityName} coordinates in Google Maps">${cityLat.toFixed(4)}, ${cityLng.toFixed(4)}</a>`
       : '';
     const resetLocationBtn = hasCoords ? `
       <button class="city-reset-location-btn"
               type="button"
-              title="Clear this city's saved map location"
-              onclick="resetCityLocation('${city.id}')">
+              data-city-id="${escapedCityId}"
+              title="Clear this city's saved map location">
         Reset
       </button>
     ` : '';
     const searchBtn = !hasCoords ? `
-      <button class="search-btn" data-search-btn="${city.id}" 
-              style="color: #3498DB; background: white; cursor: pointer;"
-              onclick="triggerOnlineSearch('${city.id}')">
+      <button class="search-btn" data-search-btn="${escapedCityId}" data-city-id="${escapedCityId}"
+              style="color: #3498DB; background: white; cursor: pointer;">
         🔍 Find on Map
       </button>
     ` : `<span class="city-location-status">📍 Mapped</span>`;
@@ -3630,10 +3652,11 @@ function populateCityList() {
       const fuzzy = typeof findFuzzyCityCandidate === 'function' ? findFuzzyCityCandidate(city.name) : null;
       if (fuzzy && fuzzy.score >= 0.75 && fuzzy.candidate && fuzzy.candidate.name.toLowerCase() !== city.name.toLowerCase()) {
         const candFlag = getCountryFlag(fuzzy.candidate.countryCode);
+        const escapedCandName = escapeTripStartText(fuzzy.candidate.name);
         suggestionPill = `
           <div class="city-candidate-suggestion" style="margin-top: 6px; font-size: 0.8rem; color: #176e67; background: #e8f5f1; border-radius: 4px; padding: 3px 8px; display: inline-flex; align-items: center; gap: 6px;">
-            <span>Did you mean <strong>${candFlag} ${escapeTripStartText(fuzzy.candidate.name)}</strong>?</span>
-            <button type="button" class="apply-suggestion-btn" style="background: #176e67; color: white; border: none; border-radius: 3px; padding: 2px 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer;" onclick="applySuggestedCityCorrection('${city.id}', '${escapeTripStartText(fuzzy.candidate.name)}')">Apply</button>
+            <span>Did you mean <strong>${escapeTripStartText(candFlag)} ${escapedCandName}</strong>?</span>
+            <button type="button" class="apply-suggestion-btn" data-city-id="${escapedCityId}" data-canonical-name="${escapedCandName}" style="background: #176e67; color: white; border: none; border-radius: 3px; padding: 2px 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">Apply</button>
           </div>
         `;
       }
@@ -3644,26 +3667,26 @@ function populateCityList() {
     row.style.cssText = `display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid #eee; border-left: 4px solid ${cityColor}; background: white;`;
     row.innerHTML = `
       <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
-        <span style="font-size: 1.5rem;">${flag}</span>
+        <span style="font-size: 1.5rem;">${escapeTripStartText(flag)}</span>
         <div style="flex: 1; min-width: 0;">
           <div style="font-weight: 500; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            <input class="city-rename-input" data-city-id="${city.id}" value="${escapeTripStartText(city.name)}" style="font: inherit; font-size: 1rem; font-weight: 700; border: 1px solid #c8d6d0; border-radius: 0.4rem; padding: 0.2rem 0.4rem; max-width: 170px;" title="Click to rename city">
+            <input class="city-rename-input" data-city-id="${escapedCityId}" value="${escapedCityName}" style="font: inherit; font-size: 1rem; font-weight: 700; border: 1px solid #c8d6d0; border-radius: 0.4rem; padding: 0.2rem 0.4rem; max-width: 170px;" title="Click to rename city">
             ${homeBadge}
             <div style="display: inline-flex; align-items: center; gap: 3px;">
               <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;" title="IATA Airport Code (3 letters)">IATA:</span>
-              <input class="city-iata-input" data-city-id="${city.id}" value="${escapeTripStartText(city.code || city.iata || '')}" placeholder="IATA" maxlength="3" style="font-family: monospace; font-size: 0.82rem; font-weight: 700; width: 48px; border: 1px solid #c8d6d0; border-radius: 0.3rem; padding: 0.15rem 0.3rem; text-transform: uppercase;" title="IATA airport code (3 letters, e.g. BNE)">
+              <input class="city-iata-input" data-city-id="${escapedCityId}" value="${escapedCityCode}" placeholder="IATA" maxlength="3" style="font-family: monospace; font-size: 0.82rem; font-weight: 700; width: 48px; border: 1px solid #c8d6d0; border-radius: 0.3rem; padding: 0.15rem 0.3rem; text-transform: uppercase;" title="IATA airport code (3 letters, e.g. BNE)">
               <span style="font-size: 0.72rem; font-weight: 700; color: #64748b; margin-left: 2px;" title="ICAO Airport Code (4 letters)">ICAO:</span>
-              <input class="city-icao-input" data-city-id="${city.id}" value="${escapeTripStartText(city.icaoCode || city.icao || '')}" placeholder="ICAO" maxlength="4" style="font-family: monospace; font-size: 0.82rem; font-weight: 700; width: 56px; border: 1px solid #c8d6d0; border-radius: 0.3rem; padding: 0.15rem 0.3rem; text-transform: uppercase;" title="ICAO airport code (4 letters, e.g. YBBN)">
+              <input class="city-icao-input" data-city-id="${escapedCityId}" value="${escapedCityIcao}" placeholder="ICAO" maxlength="4" style="font-family: monospace; font-size: 0.82rem; font-weight: 700; width: 56px; border: 1px solid #c8d6d0; border-radius: 0.3rem; padding: 0.15rem 0.3rem; text-transform: uppercase;" title="ICAO airport code (4 letters, e.g. YBBN)">
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 6px;">
-            <select class="country-select" data-city-id="${city.id}"
+            <select class="country-select" data-city-id="${escapedCityId}"
               style="min-width: 140px;">
               <option value="">Select country...</option>
               ${COUNTRY_DATA.map(c => {
               const cityCode = (city.countryCode || '').toUpperCase();
               const isSelected = c.code === cityCode;
-              return `<option value="${c.code}"${isSelected ? ' selected' : ''}>${c.flag} ${c.name}</option>`;
+              return `<option value="${escapeTripStartText(c.code)}"${isSelected ? ' selected' : ''}>${escapeTripStartText(c.flag)} ${escapeTripStartText(c.name)}</option>`;
             }).join('')}
             </select>
             ${searchBtn}
@@ -3673,7 +3696,7 @@ function populateCityList() {
           ${suggestionPill}
         </div>
       </div>
-      <button class="del-btn" title="Delete City" onclick="deleteCityFromDialog('${city.id}')">×</button>
+      <button class="del-btn" data-city-id="${escapedCityId}" title="Delete City">×</button>
     `;
     container.appendChild(row);
   });
@@ -3723,6 +3746,52 @@ function populateCityList() {
         if (typeof rebuildItineraryAndDataMappings === 'function') {
           rebuildItineraryAndDataMappings({ showToast: false });
         }
+      }
+    });
+  });
+
+  container.querySelectorAll('.city-home-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const cityName = this.dataset.cityName;
+      if (cityName) {
+        setHomeCity(cityName);
+      }
+    });
+  });
+
+  container.querySelectorAll('.city-reset-location-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const cityId = this.dataset.cityId;
+      if (cityId && typeof resetCityLocation === 'function') {
+        resetCityLocation(cityId);
+      }
+    });
+  });
+
+  container.querySelectorAll('.search-btn[data-search-btn]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const cityId = this.dataset.cityId;
+      if (cityId && typeof triggerOnlineSearch === 'function') {
+        triggerOnlineSearch(cityId);
+      }
+    });
+  });
+
+  container.querySelectorAll('.apply-suggestion-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const cityId = this.dataset.cityId;
+      const canonicalName = this.dataset.canonicalName;
+      if (cityId && canonicalName && typeof applySuggestedCityCorrection === 'function') {
+        applySuggestedCityCorrection(cityId, canonicalName);
+      }
+    });
+  });
+
+  container.querySelectorAll('.del-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const cityId = this.dataset.cityId;
+      if (cityId && typeof deleteCityFromDialog === 'function') {
+        deleteCityFromDialog(cityId);
       }
     });
   });

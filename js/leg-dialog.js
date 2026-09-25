@@ -128,8 +128,13 @@ function _populateAddLegCityDropdowns() {
     countrySelect.innerHTML = '<option value="">Select country...</option>' +
       COUNTRY_DATA
         .filter(c => c.code !== 'ZZ')
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(c => `<option value="${c.code}">${c.flag} ${c.name}</option>`)
+        .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+        .map(c => {
+          const code = typeof escapeHtmlText === 'function' ? escapeHtmlText(c.code) : String(c.code ?? '').replace(/"/g, '&quot;');
+          const flag = typeof escapeHtmlText === 'function' ? escapeHtmlText(c.flag) : String(c.flag ?? '');
+          const name = typeof escapeHtmlText === 'function' ? escapeHtmlText(c.name) : String(c.name ?? '');
+          return `<option value="${code}">${flag} ${name}</option>`;
+        })
         .join('') +
       '<option value="OTHER">✏️ Other...</option>';
     if (currentValue) countrySelect.value = currentValue;
@@ -137,12 +142,16 @@ function _populateAddLegCityDropdowns() {
 
   if (editLegSelect) {
     const currentValue = editLegSelect.value;
-    const options = [
-      '<option value="">-- Select existing leg to edit --</option>'
-    ];
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = '-- Select existing leg to edit --';
+
     const sourceLegs = (legDialogState && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs.length > 0)
       ? legDialogState.stagedLegs
       : (appData || []);
+
+    const newOptions = [defaultOpt];
+
     sourceLegs.forEach((leg, idx) => {
       const firstDay = leg?.days?.[0];
       const lastDay = leg?.days?.[leg?.days?.length - 1] || firstDay;
@@ -161,10 +170,19 @@ function _populateAddLegCityDropdowns() {
         }
       }
       const rawLabel = `${idx + 1}. ${baseLabel}${legDate ? ` (${legDate})` : ''}`;
-      const safeLabel = typeof escapeHtmlText === 'function' ? escapeHtmlText(rawLabel) : rawLabel;
-      options.push(`<option value="${idx}">${safeLabel}</option>`);
+      const opt = document.createElement('option');
+      opt.value = String(idx);
+      opt.textContent = rawLabel;
+      newOptions.push(opt);
     });
-    editLegSelect.innerHTML = options.join('');
+
+    if (typeof editLegSelect.replaceChildren === 'function') {
+      editLegSelect.replaceChildren(...newOptions);
+    } else {
+      editLegSelect.innerHTML = '';
+      newOptions.forEach(opt => editLegSelect.appendChild(opt));
+    }
+
     if (currentValue && Number.isFinite(Number(currentValue))) {
       editLegSelect.value = currentValue;
     } else {
@@ -1501,7 +1519,21 @@ function validateLegEditorForm() {
   startDateInput.classList.remove('border-rose-500');
   endDateInput.classList.remove('border-rose-500');
 
+  const toCitySelect = doc ? doc.getElementById('toCitySelect') : null;
+  if (toCitySelect) {
+    toCitySelect.classList.remove('border-rose-500');
+  }
+
   let clashText = '';
+
+  const currentLegType = doc ? doc.getElementById('legTypeSelect')?.value : null;
+  if (currentLegType === 'travel') {
+    const toCityVal = toCitySelect?.value || '';
+    if (!toCityVal) {
+      clashText = 'Please choose a destination city for this travel leg.';
+      if (toCitySelect) toCitySelect.classList.add('border-rose-500');
+    }
+  }
 
   // 1. Inverted date range
   if (startDate && endDate && startDate > endDate) {
@@ -1689,7 +1721,16 @@ function confirmAddLeg() {
       fromCity = selectedFrom || homeCityName;
       toCity = selectedTo || '';
       if (!toCity) {
-        alert('Please choose a destination city for this travel leg.');
+        const warningBanner = document.getElementById('legClashWarningBanner');
+        const warningMessage = document.getElementById('legClashWarningMessage');
+        const toCitySelect = document.getElementById('toCitySelect');
+        if (warningMessage) warningMessage.textContent = 'Please choose a destination city for this travel leg.';
+        if (warningBanner) warningBanner.style.display = 'flex';
+        if (toCitySelect) {
+          toCitySelect.classList.add('border-rose-500');
+          if (typeof toCitySelect.focus === 'function') toCitySelect.focus();
+        }
+        if (typeof showToast === 'function') showToast('Please choose a destination city for this travel leg.', 'warning');
         return;
       }
       target.label = `✈️ ${fromCity} to ${toCity}`;
@@ -1776,7 +1817,16 @@ function confirmAddLeg() {
       fromCity = document.getElementById('fromCitySelect')?.value || homeCityName;
       toCity = document.getElementById('toCitySelect')?.value || '';
       if (!toCity) {
-        alert('Please choose a destination city for this travel leg.');
+        const warningBanner = document.getElementById('legClashWarningBanner');
+        const warningMessage = document.getElementById('legClashWarningMessage');
+        const toCitySelect = document.getElementById('toCitySelect');
+        if (warningMessage) warningMessage.textContent = 'Please choose a destination city for this travel leg.';
+        if (warningBanner) warningBanner.style.display = 'flex';
+        if (toCitySelect) {
+          toCitySelect.classList.add('border-rose-500');
+          if (typeof toCitySelect.focus === 'function') toCitySelect.focus();
+        }
+        if (typeof showToast === 'function') showToast('Please choose a destination city for this travel leg.', 'warning');
         return;
       }
       label = `✈️ ${fromCity} to ${toCity}`;

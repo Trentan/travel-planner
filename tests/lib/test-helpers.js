@@ -64,6 +64,7 @@ function createDocument() {
 function createAiContext() {
   const document = createDocument();
   const alerts = [];
+  const toasts = [];
   const clipboardWrites = [];
   const execCommands = [];
 
@@ -85,6 +86,9 @@ function createAiContext() {
     alert: message => {
       alerts.push(message);
     },
+    showToast: message => {
+      toasts.push(message);
+    },
     console,
     setTimeout,
     clearTimeout,
@@ -92,7 +96,7 @@ function createAiContext() {
   };
   context.globalThis = context;
 
-  return { context, document: context.document, alerts, clipboardWrites, execCommands };
+  return { context, document: context.document, alerts, toasts, clipboardWrites, execCommands };
 }
 
 function createVmContext(extra = {}) {
