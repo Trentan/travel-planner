@@ -91,6 +91,7 @@ function getActivityLabel(category) {
 
 function stripLeadingActivityEmojiText(text) {
   return String(text || '')
+    .trim()
     .replace(/^(?:[\u{1F000}-\u{1FAFF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}]\uFE0F?(?:\u200D[\u{1F000}-\u{1FAFF}\u{2700}-\u{27BF}\u{2600}-\u{26FF}]\uFE0F?)*\s*)+/gu, '')
     .trim();
 }
@@ -758,3 +759,4 @@ window.setMobilePagerActiveIndex = setMobilePagerActiveIndex;
 window.resetMobilePagerActiveIndex = resetMobilePagerActiveIndex;
 window.captureMobilePagerStates = captureMobilePagerStates;
 window.scrollChildIntoHorizontalView = scrollChildIntoHorizontalView;
+window.stripLeadingActivityEmojiText = stripLeadingActivityEmojiText;
