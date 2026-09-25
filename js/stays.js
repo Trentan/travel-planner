@@ -80,11 +80,15 @@ function openAddStayModal(defaultCityId, defaultCheckIn) {
   modal.style.display = 'flex';
 }
 
+function _getStays() {
+  return (typeof window !== 'undefined' && Array.isArray(window.stays)) ? window.stays : stays;
+}
+
 function openEditStayModal(stayId) {
   const modal = document.getElementById('stay-modal');
   if (!modal) return;
 
-  const stay = stays.find(s => s.id === stayId);
+  const stay = _getStays().find(s => s.id === stayId);
   if (!stay) return;
 
   editingStayId = stayId; // Set editing state
@@ -186,9 +190,11 @@ function saveStayFromModal() {
     return;
   }
 
+  const currentStays = _getStays();
+
   if (editingStayId) {
     // Editing existing stay
-    const stay = stays.find(s => s.id === editingStayId);
+    const stay = currentStays.find(s => s.id === editingStayId);
     if (stay) {
       stay.cityId = cityId;
       stay.propertyName = propertyName;
@@ -225,7 +231,7 @@ function saveStayFromModal() {
       notes: notes,
       attachments: typeof window._currentAttachments !== 'undefined' ? [...window._currentAttachments] : []
     };
-    stays.push(stay);
+    currentStays.push(stay);
   }
 
   closeAddStayModal();
@@ -243,9 +249,10 @@ function saveStayFromModal() {
 
 function deleteStay(id) {
   if (!confirm('Delete this stay?')) return;
-  const idx = stays.findIndex(s => s.id === id);
+  const currentStays = _getStays();
+  const idx = currentStays.findIndex(s => s.id === id);
   if (idx > -1) {
-    stays.splice(idx, 1);
+    currentStays.splice(idx, 1);
     if (typeof rebuildItineraryAndDataMappings === 'function') {
       rebuildItineraryAndDataMappings({ showToast: false });
     } else {
@@ -264,9 +271,10 @@ function deleteStayFromModal() {
   if (!confirm('Delete this stay?')) return;
   const id = editingStayId;
   editingStayId = null;
-  const idx = stays.findIndex(s => s.id === id);
+  const currentStays = _getStays();
+  const idx = currentStays.findIndex(s => s.id === id);
   if (idx > -1) {
-    stays.splice(idx, 1);
+    currentStays.splice(idx, 1);
     closeAddStayModal();
     if (typeof rebuildItineraryAndDataMappings === 'function') {
       rebuildItineraryAndDataMappings({ showToast: false });
@@ -283,7 +291,7 @@ function deleteStayFromModal() {
 
 function toggleStayStatus(e, id) {
   if (e) e.stopPropagation();
-  const s = stays.find(s => s.id === id);
+  const s = _getStays().find(s => s.id === id);
   if (s) {
     const states = ['planned', 'booked', 'confirmed', 'cancelled'];
     if (s.status === 'pending') s.status = 'planned';
@@ -299,7 +307,7 @@ function toggleStayStatus(e, id) {
 }
 
 function updateStayField(id, field, value) {
-  const s = stays.find(s => s.id === id);
+  const s = _getStays().find(s => s.id === id);
   if (s) {
     s[field] = value;
     saveData();
