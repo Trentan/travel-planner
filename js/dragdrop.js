@@ -77,7 +77,18 @@ function handleLegDrop(e, targetIdx) {
 }
 
 function handleLegDragEnd(e) {
-  if (e.currentTarget) e.currentTarget.classList.remove('dragging');
+  if (e && e.currentTarget) {
+    e.currentTarget.classList.remove('dragging', 'drag-over');
+    const container = typeof e.currentTarget.closest === 'function'
+      ? e.currentTarget.closest('#legReorderList')
+      : null;
+    const parent = container || e.currentTarget.parentElement;
+    if (parent && typeof parent.querySelectorAll === 'function') {
+      parent.querySelectorAll('.leg-reorder-item').forEach(el => el.classList.remove('drag-over', 'dragging'));
+      draggedLegIndex = null;
+      return;
+    }
+  }
   document.querySelectorAll('.leg-reorder-item').forEach(el => el.classList.remove('drag-over', 'dragging'));
   draggedLegIndex = null;
 }

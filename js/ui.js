@@ -1479,6 +1479,23 @@ function buildSplitDayData(legIndex, dayIndex) {
   };
 }
 
+let _cachedSplitHeaderEl = null;
+let _cachedSplitDrawerEl = null;
+
+function _getSplitHeaderEl() {
+  if (!_cachedSplitHeaderEl || !_cachedSplitHeaderEl.isConnected) {
+    _cachedSplitHeaderEl = typeof document !== 'undefined' ? document.querySelector('.desktop-split-right-header') : null;
+  }
+  return _cachedSplitHeaderEl;
+}
+
+function _getSplitDrawerEl() {
+  if (!_cachedSplitDrawerEl || !_cachedSplitDrawerEl.isConnected) {
+    _cachedSplitDrawerEl = typeof document !== 'undefined' ? document.querySelector('.desktop-split-drawer') : null;
+  }
+  return _cachedSplitDrawerEl;
+}
+
 function findDesktopDayFromScrollPosition() {
   if (typeof document === 'undefined') return null;
 
@@ -1486,8 +1503,8 @@ function findDesktopDayFromScrollPosition() {
   let zoneTop = 184;
   let zoneBottom = typeof window !== 'undefined' ? (window.innerHeight - 16) : 884;
 
-  const header = document.querySelector('.desktop-split-right-header');
-  const drawer = document.querySelector('.desktop-split-drawer');
+  const header = _getSplitHeaderEl();
+  const drawer = _getSplitDrawerEl();
   if (header) {
     const r = header.getBoundingClientRect();
     if (r.height > 0) zoneTop = r.top;
