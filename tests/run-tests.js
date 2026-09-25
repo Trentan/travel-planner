@@ -24,6 +24,7 @@ const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
 const { runParseCurrencyAmountTests } = require('./parse-currency-amount.test');
 const { runFormatCurrencyTests } = require('./format-currency.test');
 const { runCompactFoodQuestTitleTests } = require('./compact-food-quest-title.test');
+const { runStripLeadingActivityEmojiTextTests } = require('./strip-leading-activity-emoji-text.test');
 const { run: runFormatCompactJourneyDurationSuite } = require('./format-compact-journey-duration.test');
 const { runFormatJourneySubLocationTests } = require('./format-journey-sub-location.test');
 const { run: runTransportDurationSuite } = require('./transport-duration.test');
@@ -64,6 +65,7 @@ async function run() {
     if (typeof runParseCurrencyAmountTests === 'function') await runParseCurrencyAmountTests();
     if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
+    if (typeof runStripLeadingActivityEmojiTextTests === 'function') await runStripLeadingActivityEmojiTextTests();
     if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
     if (typeof runFormatJourneySubLocationTests === 'function') await runFormatJourneySubLocationTests();
     if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
