@@ -78,6 +78,12 @@ createMockElement('legDurationSubtext');
 createMockElement('desktopLegDialogDeleteBtn');
 createMockElement('desktopLegDialogSaveBtn');
 createMockElement('legDayNotesList');
+createMockElement('legEditorEmptyPrompt');
+createMockElement('legEditorFormContent');
+createMockElement('legEditorModeTitle');
+createMockElement('legEditorLegName');
+createMockElement('legOriginHelperCity');
+createMockElement('legDepartingHelperCity');
 
 const mockDocument = {
   body: {
@@ -966,10 +972,10 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(viennaLeg.days[0].activityItems[0].text, 'Visit Opera House', 'Day 0 activity items preserved');
   assert.strictEqual(viennaLeg.days[0].accomItems[0].text, 'Hotel Sacher', 'Day 0 accommodation items preserved');
 
-  // Test 4-column Day Notes table rendering and day.title support
+  // Test 4-column Day Notes table rendering, simplified # column, and day.title support
   renderLegDayNotesList();
   assert.ok(elements['legDayNotesList'].innerHTML.includes('<table class="leg-day-notes-table'), 'Renders 4-column table');
-  assert.ok(elements['legDayNotesList'].innerHTML.includes('>Day</th>'), 'Table contains Day header');
+  assert.ok(elements['legDayNotesList'].innerHTML.includes('>#</th>'), 'Table contains # header');
   assert.ok(elements['legDayNotesList'].innerHTML.includes('>Date</th>'), 'Table contains Date header');
   assert.ok(elements['legDayNotesList'].innerHTML.includes('>Title</th>'), 'Table contains Title header');
   assert.ok(elements['legDayNotesList'].innerHTML.includes('>Note</th>'), 'Table contains Note header');
@@ -985,17 +991,34 @@ async function runLegManagementWysiwygSuite() {
     assert.ok(pagerHtml.includes('Vienna Central'), 'Day pager button reflects day.title');
   }
 
+  // Test mode header, leg name, and arriving from / departing to in edit mode
+  elements['editLegSelect'].value = '2'; // Vienna
+  onEditLegSelectionChange();
+  assert.strictEqual(elements['citySelectionGroup'].style.display, 'none', 'citySelectionGroup hidden in edit mode');
+  assert.strictEqual(elements['legEditorModeTitle'].textContent, 'Edit Leg', 'Mode title displays Edit Leg');
+  assert.ok(elements['legEditorLegName'].textContent.includes('Vienna'), 'Leg name contains Vienna');
+  assert.ok(elements['legOriginHelperCity'].textContent.length > 0, 'Arriving from city is computed');
+  assert.ok(elements['legDepartingHelperCity'].textContent.length > 0, 'Departing to city is computed');
+
   // Test resetLegDialogToAddNew switches back to Add New Leg mode
   resetLegDialogToAddNew();
   assert.strictEqual(legDialogState.mode, 'add', 'legDialogState mode reset to add');
   assert.strictEqual(legDialogState.isAddingNewLeg, true, 'isAddingNewLeg is true after resetLegDialogToAddNew');
   assert.strictEqual(elements['editLegSelect'].value, '', 'editLegSelect reset to empty string');
+  assert.strictEqual(elements['citySelectionGroup'].style.display, 'block', 'citySelectionGroup visible in add mode');
   assert.strictEqual(elements['existingCitySelect'].disabled, false, 'existingCitySelect enabled in add mode');
   assert.strictEqual(elements['toggleNewCityBtn'].style.display, 'inline-block', 'toggleNewCityBtn visible in add mode');
   assert.strictEqual(elements['toggleNewCityBtn'].textContent, '+ Add a new city', 'toggleNewCityBtn button text is + Add a new city');
   assert.strictEqual(elements['legPlacementGroup'].style.display, 'block', 'legPlacementGroup visible when Add New Leg is chosen');
   assert.strictEqual(elements['legDialogTitle'].textContent, 'Add New Trip Leg', 'Dialog title updated to Add New Trip Leg');
   assert.strictEqual(elements['legDialogSaveBtn'].textContent, 'Add Leg', 'Primary button updated to Add Leg');
+  assert.strictEqual(elements['legEditorModeTitle'].textContent, 'Add New Leg', 'Mode title displays Add New Leg');
+
+  // Test empty prompt mode (desktop initial unselected state)
+  setLegDialogState({ mode: 'none', isAddingNewLeg: false, editLegIdx: null, stagedLegs: testTransitTrip, originalLegDates: {} });
+  updateLegDialogUiMode();
+  assert.strictEqual(elements['legEditorEmptyPrompt'].style.display, 'flex', 'Empty prompt visible when mode is none');
+  assert.strictEqual(elements['legEditorFormContent'].style.display, 'none', 'Form content hidden when mode is none');
 
   // Test desktop delete button sync in edit vs add mode
   elements['editLegSelect'].value = '2';

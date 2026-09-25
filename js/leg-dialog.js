@@ -280,19 +280,65 @@ function getPlacementDefaultDates(placementVal = 'before_return') {
 }
 
 
+function getNextLegCity(legs, targetIdx, fallbackHome = 'Home') {
+  if (!Array.isArray(legs) || targetIdx < 0 || targetIdx >= legs.length - 1) return fallbackHome;
+  const homeCity = (typeof titleData !== 'undefined' && titleData && titleData.homeCity)
+    ? String(titleData.homeCity).trim()
+    : fallbackHome;
+  for (let i = targetIdx + 1; i < legs.length; i++) {
+    const nextLeg = legs[i];
+    if (!nextLeg) continue;
+    if (typeof isTerminalLeg === 'function' && isTerminalLeg(nextLeg)) {
+      const lid = String(nextLeg.id || '').toLowerCase();
+      const lbl = String(nextLeg.label || '').toLowerCase();
+      if (nextLeg.type === 'return' || lid.endsWith('-finish') || lbl.includes('(trip finish)') || lbl.includes('(trip end)') || lid === 'return') {
+        return homeCity;
+      }
+      continue;
+    }
+    const cityName = typeof getLegBaseCityName === 'function' ? getLegBaseCityName(nextLeg) : (nextLeg.days?.[0]?.to || nextLeg.days?.[0]?.from || nextLeg.label);
+    if (cityName && cityName !== 'Home') return cityName;
+  }
+  return homeCity;
+}
+
+
 function updateLegDialogUiMode() {
   const title = document.getElementById('legDialogTitle') || document.querySelector('#add-leg-modal .modal-header h2');
   const saveBtn = document.getElementById('legDialogSaveBtn');
   const placementGroup = document.getElementById('legPlacementGroup');
+  const citySelectionGroup = document.getElementById('citySelectionGroup');
   const existingCitySelect = document.getElementById('existingCitySelect');
   const toggleNewCityBtn = document.getElementById('toggleNewCityBtn');
   const newCityInlineGroup = document.getElementById('newCityInlineGroup');
-  const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
-  const isAddingNew = Boolean(legDialogState.isAddingNewLeg && !isEdit);
+  const emptyPrompt = document.getElementById('legEditorEmptyPrompt');
+  const formContent = document.getElementById('legEditorFormContent');
+  const modeTitle = document.getElementById('legEditorModeTitle');
+  const legNameEl = document.getElementById('legEditorLegName');
+  const arrivingFromCity = document.getElementById('legOriginHelperCity');
+  const departingToCity = document.getElementById('legDepartingHelperCity');
 
-  if (title) title.textContent = isEdit ? 'Edit Trip Leg' : 'Add New Trip Leg';
+  const isNone = legDialogState.mode === 'none';
+  const isEdit = legDialogState.mode === 'edit' && Number.isFinite(legDialogState.editLegIdx);
+  const isAddingNew = Boolean(legDialogState.isAddingNewLeg && !isEdit && !isNone);
+
+  // Toggle empty prompt vs form content
+  if (emptyPrompt) emptyPrompt.style.display = isNone ? 'flex' : 'none';
+  if (formContent) formContent.style.display = isNone ? 'none' : 'block';
+
+  if (title) {
+    if (isNone) title.textContent = 'Manage Trip Legs';
+    else title.textContent = isEdit ? 'Edit Trip Leg' : 'Add New Trip Leg';
+  }
   if (saveBtn) saveBtn.textContent = isEdit ? 'Save Leg' : 'Add Leg';
+
+  // Placement dropdown: only show when adding a new leg
   if (placementGroup) placementGroup.style.display = isAddingNew ? 'block' : 'none';
+
+  // Destination City dropdown: shown in Add mode, hidden in Edit mode per UI spec
+  if (citySelectionGroup) {
+    citySelectionGroup.style.display = isEdit ? 'none' : 'block';
+  }
 
   if (existingCitySelect) {
     existingCitySelect.disabled = isEdit;
@@ -302,6 +348,72 @@ function updateLegDialogUiMode() {
   }
   if (newCityInlineGroup && isEdit) {
     newCityInlineGroup.style.display = 'none';
+  }
+
+  // Header section mode title & leg name
+  if (modeTitle) {
+    modeTitle.textContent = isEdit ? 'Edit Leg' : 'Add New Leg';
+  }
+
+  const sourceLegs = (legDialogState && Array.isArray(legDialogState.stagedLegs))
+    ? legDialogState.stagedLegs
+    : (appData || []);
+  const homeCityName = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
+
+  if (isEdit) {
+    const leg = sourceLegs?.[legDialogState.editLegIdx];
+    if (leg && legNameEl) {
+      const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
+      const firstDay = leg.days?.[0];
+      const lastDay = leg.days?.[daysCount - 1] || firstDay;
+      const isTerminal = typeof isTerminalLeg === 'function' ? isTerminalLeg(leg) : false;
+      const isSameDay = daysCount === 1 || (daysCount > 1 && firstDay?.date && lastDay?.date && firstDay.date === lastDay.date);
+      const isTransit = !isTerminal && (leg.type === 'transit' || isSameDay || (leg.label || '').toLowerCase().includes('transit'));
+
+      let displayLabel = (leg.label || 'Untitled leg').trim();
+      if (isTransit) {
+        if (!/<transit>/i.test(displayLabel) && !/\(transit\)/i.test(displayLabel)) {
+          displayLabel = `${displayLabel} <Transit>`;
+        } else if (/\(transit\)/i.test(displayLabel)) {
+          displayLabel = displayLabel.replace(/\s*\(transit\)/i, ' <Transit>');
+        }
+      }
+      legNameEl.textContent = `Leg Name: ${legDialogState.editLegIdx + 1}. ${displayLabel}`;
+      legNameEl.style.display = 'inline';
+    }
+
+    // Compute Arriving From & Departing To for edit leg
+    const priorCity = getPriorLegCity(sourceLegs, legDialogState.editLegIdx, homeCityName);
+    const nextCity = getNextLegCity(sourceLegs, legDialogState.editLegIdx, homeCityName);
+    if (arrivingFromCity) arrivingFromCity.textContent = priorCity || homeCityName;
+    if (departingToCity) departingToCity.textContent = nextCity || homeCityName;
+  } else if (isAddingNew) {
+    if (legNameEl) {
+      legNameEl.textContent = '';
+      legNameEl.style.display = 'none';
+    }
+    // In Add mode, compute arriving from and departing to based on current placement
+    const placementSelect = document.getElementById('legPlacementSelect');
+    const placementVal = placementSelect?.value || 'before_return';
+    let insertionIdx = sourceLegs.length;
+    if (placementVal === 'before_return') {
+      const retIdx = sourceLegs.findIndex(l => {
+        const lbl = (l.label || '').toLowerCase();
+        return lbl.includes('return') || lbl.includes('trip finish');
+      });
+      if (retIdx >= 0) insertionIdx = retIdx;
+    } else if (placementVal.startsWith('after_')) {
+      const afterIdx = Number(placementVal.replace('after_', ''));
+      if (Number.isFinite(afterIdx)) insertionIdx = afterIdx + 1;
+    } else if (placementVal === 'start') {
+      insertionIdx = 0;
+    }
+    insertionIdx = Math.max(0, Math.min(insertionIdx, sourceLegs.length));
+
+    const priorCity = getPriorLegCity(sourceLegs, insertionIdx, homeCityName);
+    const nextCity = getNextLegCity(sourceLegs, insertionIdx - 1, homeCityName);
+    if (arrivingFromCity) arrivingFromCity.textContent = priorCity || homeCityName;
+    if (departingToCity) departingToCity.textContent = nextCity || homeCityName;
   }
 
   _syncLegDialogActions();
@@ -319,7 +431,7 @@ function _syncLegDialogActions() {
 
 function updateLegOriginHelperUI(inferredOriginCity) {
   const helperGroup = document.getElementById('legOriginHelperGroup');
-  const helperCity = document.getElementById('legOriginHelperCity');
+  const helperCity = document.getElementById('legacyLegOriginHelperCity') || document.getElementById('legOriginHelperCity');
   const legType = document.getElementById('legTypeSelect')?.value || 'city';
   if (!helperGroup || !helperCity) return;
   if ((legType === 'city' || legType === 'transit') && inferredOriginCity) {
@@ -683,9 +795,9 @@ function renderLegDayNotesList() {
 
     rowsHtml += `
       <tr class="leg-day-table-row border-b border-slate-100 dark:border-slate-800/80 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
-        <td class="py-1 px-1.5 align-middle text-center w-14 shrink-0">
+        <td class="py-1 px-1.5 align-middle text-center w-10 shrink-0">
           <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-300 font-mono">
-            Day ${idx + 1}
+            ${idx + 1}
           </span>
         </td>
         <td class="py-1 px-1.5 align-middle w-24 text-[11px] font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
@@ -717,7 +829,7 @@ function renderLegDayNotesList() {
     <table class="leg-day-notes-table w-full text-left">
       <thead>
         <tr class="bg-slate-100/90 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700 text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-          <th class="py-1.5 px-1.5 text-center w-14">Day</th>
+          <th class="py-1.5 px-1.5 text-center w-10">#</th>
           <th class="py-1.5 px-1.5 w-24">Date</th>
           <th class="py-1.5 px-1.5 w-1/3">Title</th>
           <th class="py-1.5 px-1.5 w-1/2">Note</th>
@@ -910,6 +1022,7 @@ function onLegPlacementChange() {
     endDateInput.value = addDaysToIsoDate(defaults.startDate, dur);
   }
   updateLegDurationSubtext(dur);
+  updateLegDialogUiMode();
   onLegDateInputChange();
 }
 
@@ -1831,6 +1944,7 @@ const _legDialogExports = {
   _populateAddLegCityDropdowns,
   _populateLegPlacementDropdown,
   getPlacementDefaultDates,
+  getNextLegCity,
   updateLegDialogUiMode,
   _syncLegDialogActions,
   updateLegOriginHelperUI,

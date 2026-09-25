@@ -1021,7 +1021,39 @@
               <span class="text-base shrink-0">⚠️</span>
               <span id="legClashWarningMessage" class="flex-1 leading-snug"></span>
             </div>
-            <div class="stack-gap-3">
+
+            <!-- Empty / Prompt Placeholder (desktop initial state when no leg selected) -->
+            <div id="legEditorEmptyPrompt" class="flex flex-col items-center justify-center text-center p-8 my-auto rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40">
+              <div class="text-3xl mb-2">🗺️</div>
+              <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">Select a Leg or Add New</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 max-w-xs mb-4">
+                Click any leg from the route sequence on the left to edit its dates and itinerary notes, or add a brand new destination to your trip.
+              </p>
+              <button type="button" class="action-btn text-xs font-semibold text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800 hover:bg-teal-50 dark:hover:bg-teal-950/40" onclick="resetLegDialogToAddNew()">
+                + Add New Leg
+              </button>
+            </div>
+
+            <!-- Leg Editor Form Container -->
+            <div id="legEditorFormContent" class="stack-gap-3">
+              <!-- Leg Header: Mode title, Leg Name, and Arriving/Departing Row -->
+              <div id="legEditorHeaderBlock" class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700/80">
+                <div class="flex items-center justify-between gap-2 mb-1.5">
+                  <h3 id="legEditorModeTitle" class="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-300 m-0">Edit Leg</h3>
+                  <span id="legEditorLegName" class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate"></span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-slate-200/80 dark:border-slate-700/60 text-xs">
+                  <div id="legArrivingFromBox" class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 min-w-0">
+                    <span class="shrink-0">🛫 <span class="font-medium text-[11px] text-slate-500 dark:text-slate-400">Arriving from:</span></span>
+                    <span id="legOriginHelperCity" class="font-semibold text-slate-800 dark:text-slate-100 truncate">Home</span>
+                  </div>
+                  <div id="legDepartingToBox" class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 min-w-0">
+                    <span class="shrink-0">🛫 <span class="font-medium text-[11px] text-slate-500 dark:text-slate-400">Departing to:</span></span>
+                    <span id="legDepartingHelperCity" class="font-semibold text-slate-800 dark:text-slate-100 truncate">Home</span>
+                  </div>
+                </div>
+              </div>
+
               <div id="legSelectGroup" class="ai-form-group leg-select-group">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <label class="m-0 font-medium text-xs text-slate-700 dark:text-slate-300">Mode / Select Leg</label>
@@ -1077,7 +1109,7 @@
                   </select>
                   <div id="legOriginHelperGroup" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1 font-medium" style="display: none;">
                     <span>🛫 Arriving from:</span>
-                    <span id="legOriginHelperCity" class="font-semibold text-slate-700 dark:text-slate-200">Home</span>
+                    <span id="legacyLegOriginHelperCity" class="font-semibold text-slate-700 dark:text-slate-200">Home</span>
                   </div>
                   <div id="newCityInlineGroup" class="flex flex-col gap-2 mt-2 p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700" style="display: none;">
                     <span class="text-[11px] font-semibold text-slate-600 dark:text-slate-300">Create New City</span>
@@ -1110,7 +1142,7 @@
               </div>
               <div class="ai-form-group">
                 <div class="flex items-center justify-between gap-2 mb-1">
-                  <label class="text-xs text-slate-700 dark:text-slate-300 font-medium block m-0">Day Notes</label>
+                  <label class="text-xs text-slate-700 dark:text-slate-300 font-medium block m-0">Leg Day Information</label>
                   <span class="text-[11px] text-slate-400">Notes & activity highlights for each day</span>
                 </div>
                 <div id="legDayNotesContainer" class="p-1 sm:p-2 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800">
