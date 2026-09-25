@@ -808,7 +808,10 @@
           <div id="aiOutputBox" class="ai-output-box" style="display: none;">
             <label for="aiPromptOutput" class="block font-bold text-sm text-slate-800 dark:text-slate-100 mb-1.5">Copy this prompt into your AI:</label>
             <textarea id="aiPromptOutput" aria-label="Generated AI prompt" readonly></textarea>
-            <button class="action-btn" onclick="copyPrompt()">📋 Copy Prompt to Clipboard</button>
+            <div class="flex items-center gap-2.5 flex-wrap mt-2">
+              <button class="action-btn" onclick="copyPrompt()">📋 Copy Prompt to Clipboard</button>
+              <span id="aiCopyStatus" class="text-xs font-semibold px-2.5 py-1 rounded-md" style="display: none;"></span>
+            </div>
           </div>
         </div>
       </div>

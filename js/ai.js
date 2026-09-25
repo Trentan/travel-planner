@@ -429,9 +429,37 @@ function generatePrompt() {
   return promptText;
 }
 
+function showAiCopyNotification(message, isError = false) {
+  const statusEl = document.getElementById('aiCopyStatus');
+  if (statusEl) {
+    statusEl.textContent = message;
+    statusEl.className = `text-xs font-semibold px-2.5 py-1 rounded-md transition-all ${
+      isError
+        ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200 border border-amber-300 dark:border-amber-700'
+        : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700'
+    }`;
+    statusEl.style.display = 'inline-block';
+
+    if (statusEl._hideTimer) clearTimeout(statusEl._hideTimer);
+    statusEl._hideTimer = setTimeout(() => {
+      statusEl.style.display = 'none';
+    }, 4000);
+  }
+
+  const toastFn = typeof window !== 'undefined' && typeof window.showToast === 'function'
+    ? window.showToast
+    : (typeof showToast === 'function' ? showToast : null);
+
+  if (toastFn) {
+    toastFn(message);
+  }
+}
+
 async function copyPrompt() {
   const promptArea = document.getElementById('aiPromptOutput');
   const promptText = promptArea ? promptArea.value : '';
+  const successMsg = '📋 Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.';
+  const failMsg = '⚠️ Could not copy automatically. Select the prompt and copy it manually.';
 
   try {
     if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
@@ -443,19 +471,19 @@ async function copyPrompt() {
       throw new Error('Clipboard API unavailable');
     }
 
-    alert('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+    showAiCopyNotification(successMsg, false);
     return true;
   } catch (error) {
     if (promptArea && typeof promptArea.select === 'function' && typeof document.execCommand === 'function') {
       promptArea.select();
       const copied = document.execCommand('copy');
       if (copied) {
-        alert('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+        showAiCopyNotification(successMsg, false);
         return true;
       }
     }
 
-    alert('Could not copy automatically. Select the prompt and copy it manually.');
+    showAiCopyNotification(failMsg, true);
     return false;
   }
 }
@@ -464,3 +492,4 @@ globalThis.buildAiPrompt = buildAiPrompt;
 globalThis.prefillAIDialogFields = prefillAIDialogFields;
 globalThis.generatePrompt = generatePrompt;
 globalThis.copyPrompt = copyPrompt;
+globalThis.showAiCopyNotification = showAiCopyNotification;

@@ -261,7 +261,8 @@ async function run() {
   const copied = await context.copyPrompt();
   assert(copied === true, 'copyPrompt should succeed');
   assert(clipboardWrites[0] === promptText, 'copyPrompt should write the prompt to the clipboard');
-  assert(alerts.length >= 1, 'copyPrompt should notify the user');
+  const statusEl = context.document.getElementById('aiCopyStatus');
+  assert(statusEl && statusEl.textContent.includes('copied'), 'copyPrompt should notify the user via status UI');
   assert(execCommands.length === 0, 'Clipboard API should avoid the execCommand fallback when available');
 
   const bookingItems = bookingContext.parseBookingConfirmationText(`
