@@ -3343,22 +3343,42 @@ function setupCityAutocomplete() {
       item.dataset.index = String(idx);
 
       const flag = cand.countryCode ? getCountryFlag(cand.countryCode) : '📍';
+      const flagSpan = document.createElement('span');
+      flagSpan.className = 'city-live-search-flag';
+      flagSpan.textContent = flag;
+
+      const detailsDiv = document.createElement('div');
+      detailsDiv.className = 'city-live-search-details';
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'city-live-search-name';
+      nameDiv.textContent = cand.name || '';
+
+      if (cand.source) {
+        const sourceSpan = document.createElement('span');
+        sourceSpan.className = 'city-live-search-badge-source';
+        sourceSpan.textContent = cand.source;
+        nameDiv.appendChild(sourceSpan);
+      }
+
+      const sub = cand.region ? `${cand.region}, ${cand.countryName}` : (cand.countryName || '');
+      const subDiv = document.createElement('div');
+      subDiv.className = 'city-live-search-sub';
+      subDiv.textContent = sub;
+
+      detailsDiv.appendChild(nameDiv);
+      detailsDiv.appendChild(subDiv);
+
+      item.appendChild(flagSpan);
+      item.appendChild(detailsDiv);
+
       const hasCoords = cand.lat !== undefined && cand.lng !== undefined && !isNaN(Number(cand.lat)) && !isNaN(Number(cand.lng));
-      const coordBadge = hasCoords ? `<span class="city-live-search-coords-pill">📍 ${Number(cand.lat).toFixed(2)}, ${Number(cand.lng).toFixed(2)}</span>` : '';
-      const sourceBadge = cand.source ? `<span class="city-live-search-badge-source">${cand.source}</span>` : '';
-      const sub = cand.region ? `${cand.region}, ${cand.countryName}` : cand.countryName;
-
-      const safeName = typeof escapeHtmlText === 'function' ? escapeHtmlText(cand.name) : cand.name;
-      const safeSub = typeof escapeHtmlText === 'function' ? escapeHtmlText(sub || '') : (sub || '');
-
-      item.innerHTML = `
-        <span class="city-live-search-flag">${flag}</span>
-        <div class="city-live-search-details">
-          <div class="city-live-search-name">${safeName}${sourceBadge}</div>
-          <div class="city-live-search-sub">${safeSub}</div>
-        </div>
-        ${coordBadge}
-      `;
+      if (hasCoords) {
+        const coordSpan = document.createElement('span');
+        coordSpan.className = 'city-live-search-coords-pill';
+        coordSpan.textContent = `📍 ${Number(cand.lat).toFixed(2)}, ${Number(cand.lng).toFixed(2)}`;
+        item.appendChild(coordSpan);
+      }
 
       item.addEventListener('mousedown', (e) => {
         e.preventDefault();
