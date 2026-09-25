@@ -58,6 +58,8 @@ createMockElement('editLegSelect');
 createMockElement('existingCitySelect');
 createMockElement('fromCitySelect');
 createMockElement('toCitySelect');
+createMockElement('fromCitySelectGroup');
+createMockElement('toCitySelectGroup');
 createMockElement('routeSelectionGroup');
 createMockElement('citySelectionGroup');
 createMockElement('rebuildLegsSequenceBtn');
@@ -782,23 +784,29 @@ async function runLegManagementWysiwygSuite() {
   const placementHtml = elements['legPlacementSelect'].innerHTML;
   assert.strictEqual(placementHtml.includes('value="start"'), false, 'Placement dropdown excludes "At start of trip" when start leg is present');
 
-  // 14g. Test onLegTypeChange locks fromCitySelect to Home for start legs
+  // 14g. Test onLegTypeChange locks fromCitySelect to Home for start legs and hides From City dropdown
   elements['legTypeSelect'].value = 'start';
   onLegTypeChange();
   assert.strictEqual(elements['fromCitySelect'].disabled, true, 'fromCitySelect disabled/locked for start leg');
   assert.strictEqual(elements['fromCitySelect'].value, 'Home', 'fromCitySelect pre-set to Home for start leg');
+  assert.strictEqual(elements['fromCitySelectGroup'].style.display, 'none', 'fromCitySelectGroup hidden for start leg');
+  assert.strictEqual(elements['toCitySelectGroup'].style.display, 'block', 'toCitySelectGroup visible for start leg');
 
-  // Test onLegTypeChange locks toCitySelect to Home for return legs
+  // Test onLegTypeChange locks toCitySelect to Home for return legs and hides To City dropdown
   elements['legTypeSelect'].value = 'return';
   onLegTypeChange();
   assert.strictEqual(elements['toCitySelect'].disabled, true, 'toCitySelect disabled/locked for return leg');
   assert.strictEqual(elements['toCitySelect'].value, 'Home', 'toCitySelect pre-set to Home for return leg');
+  assert.strictEqual(elements['toCitySelectGroup'].style.display, 'none', 'toCitySelectGroup hidden for return leg');
+  assert.strictEqual(elements['fromCitySelectGroup'].style.display, 'block', 'fromCitySelectGroup visible for return leg');
 
   // Reset to city
   elements['legTypeSelect'].value = 'city';
   onLegTypeChange();
   assert.strictEqual(elements['fromCitySelect'].disabled, false, 'fromCitySelect unlocked for city leg');
   assert.strictEqual(elements['toCitySelect'].disabled, false, 'toCitySelect unlocked for city leg');
+  assert.strictEqual(elements['fromCitySelectGroup'].style.display, 'block', 'fromCitySelectGroup visible for city leg');
+  assert.strictEqual(elements['toCitySelectGroup'].style.display, 'block', 'toCitySelectGroup visible for city leg');
 
   // 14h. Test automatic transit vs city classification in confirmAddLeg
   // Case 1: Same day leg (startDate === endDate, 0 nights) -> Automatically classified as 'transit' with '(Transit)' in label

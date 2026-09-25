@@ -1589,19 +1589,28 @@ function onLegTypeChange() {
 
   const fromCitySelect = document.getElementById('fromCitySelect');
   const toCitySelect = document.getElementById('toCitySelect');
+  const fromCityGroup = document.getElementById('fromCitySelectGroup') || (fromCitySelect ? fromCitySelect.closest('.ai-form-group') : null);
+  const toCityGroup = document.getElementById('toCitySelectGroup') || (toCitySelect ? toCitySelect.closest('.ai-form-group') : null);
+
   if (type === 'start') {
     if (fromCitySelect) {
       setSelectValueMatchingCity(fromCitySelect, 'Home', 'Home');
       fromCitySelect.disabled = true;
     }
+    if (fromCityGroup) fromCityGroup.style.display = 'none';
+    if (toCityGroup) toCityGroup.style.display = 'block';
     if (toCitySelect) toCitySelect.disabled = false;
   } else if (type === 'return') {
     if (toCitySelect) {
       setSelectValueMatchingCity(toCitySelect, 'Home', 'Home');
       toCitySelect.disabled = true;
     }
+    if (toCityGroup) toCityGroup.style.display = 'none';
+    if (fromCityGroup) fromCityGroup.style.display = 'block';
     if (fromCitySelect) fromCitySelect.disabled = false;
   } else {
+    if (fromCityGroup) fromCityGroup.style.display = 'block';
+    if (toCityGroup) toCityGroup.style.display = 'block';
     if (fromCitySelect) fromCitySelect.disabled = false;
     if (toCitySelect) toCitySelect.disabled = false;
   }

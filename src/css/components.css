@@ -740,8 +740,8 @@
     #add-leg-modal .modal-content {
       max-width: min(1080px, 94vw);
       width: min(1080px, 94vw);
-      height: auto;
-      max-height: min(840px, 90vh);
+      height: min(840px, 90vh);
+      max-height: 90vh;
     }
 
     #add-leg-modal .leg-modal-tabs {
@@ -753,6 +753,7 @@
       grid-template-columns: minmax(320px, 1fr) minmax(380px, 1.25fr);
       gap: 1.25rem;
       align-items: start;
+      height: 100%;
     }
 
     #legReorderSection,
@@ -760,6 +761,7 @@
       display: flex !important;
       flex-direction: column;
       min-width: 0;
+      height: 100%;
     }
 
     #legReorderSection .modal-footer,
