@@ -1,16 +1,27 @@
 const { performance } = require('perf_hooks');
 
-// Benchmark simulating downloading N files sequentially vs in parallel (using Promise.all)
-async function benchmarkDownloadLoop(numFiles = 10, simulatedLatencyMs = 30) {
+// Benchmark simulating downloading N files:
+// 1. Unbounded Promise.all (unthrottled)
+// 2. Bounded Concurrency Worker Pool (CONCURRENCY_LIMIT = 5)
+// 3. Sequential
+async function benchmarkDownloadLoop(numFiles = 20, simulatedLatencyMs = 30, concurrencyLimit = 5) {
   const files = Array.from({ length: numFiles }, (_, i) => ({
     id: `file_${i + 1}`,
     name: `Trip_${i + 1}.json`,
     modifiedTime: new Date().toISOString()
   }));
 
-  // Mock fetch simulating network request
+  // Track max active concurrent connections to measure connection pressure / queue saturation
+  let activeConnections = 0;
+  let maxActiveConnections = 0;
+
   const mockFetchFile = async (file) => {
+    activeConnections++;
+    if (activeConnections > maxActiveConnections) {
+      maxActiveConnections = activeConnections;
+    }
     await new Promise(resolve => setTimeout(resolve, simulatedLatencyMs));
+    activeConnections--;
     return {
       ok: true,
       json: async () => ({
@@ -21,7 +32,46 @@ async function benchmarkDownloadLoop(numFiles = 10, simulatedLatencyMs = 30) {
     };
   };
 
-  // --- Sequential Benchmark ---
+  // --- 1. Unbounded Parallel (Promise.all) ---
+  activeConnections = 0;
+  maxActiveConnections = 0;
+  const startUnbounded = performance.now();
+  const unboundedResults = await Promise.all(files.map(async (file) => {
+    if (!file.name) return null;
+    const resp = await mockFetchFile(file);
+    if (resp.ok) {
+      return await resp.json();
+    }
+    return null;
+  })).then(res => res.filter(Boolean));
+  const unboundedDuration = performance.now() - startUnbounded;
+  const unboundedMaxConnections = maxActiveConnections;
+
+  // --- 2. Bounded Concurrency (Worker Pool) ---
+  activeConnections = 0;
+  maxActiveConnections = 0;
+  const startBounded = performance.now();
+  const boundedResults = [];
+  let fileIndex = 0;
+  const workerCount = Math.min(concurrencyLimit, files.length);
+  const workers = Array.from({ length: workerCount }, async () => {
+    while (fileIndex < files.length) {
+      const file = files[fileIndex++];
+      if (!file || !file.name) continue;
+      const resp = await mockFetchFile(file);
+      if (resp.ok) {
+        const data = await resp.json();
+        boundedResults.push(data);
+      }
+    }
+  });
+  await Promise.all(workers);
+  const boundedDuration = performance.now() - startBounded;
+  const boundedMaxConnections = maxActiveConnections;
+
+  // --- 3. Sequential ---
+  activeConnections = 0;
+  maxActiveConnections = 0;
   const startSequential = performance.now();
   const sequentialResults = [];
   for (const file of files) {
@@ -32,29 +82,15 @@ async function benchmarkDownloadLoop(numFiles = 10, simulatedLatencyMs = 30) {
       sequentialResults.push(data);
     }
   }
-  const endSequential = performance.now();
-  const sequentialDuration = endSequential - startSequential;
+  const sequentialDuration = performance.now() - startSequential;
 
-  // --- Parallel Benchmark ---
-  const startParallel = performance.now();
-  const parallelResults = await Promise.all(files.map(async (file) => {
-    if (!file.name) return null;
-    const resp = await mockFetchFile(file);
-    if (resp.ok) {
-      return await resp.json();
-    }
-    return null;
-  })).then(res => res.filter(Boolean));
-  const endParallel = performance.now();
-  const parallelDuration = endParallel - startParallel;
+  console.log(`--- Google Drive File Download Benchmark (${numFiles} files, ${simulatedLatencyMs}ms network latency, concurrency limit ${concurrencyLimit}) ---`);
+  console.log(`Sequential execution time:        ${sequentialDuration.toFixed(2)} ms (Max peak concurrent requests: ${1})`);
+  console.log(`Unbounded Promise.all time:       ${unboundedDuration.toFixed(2)} ms (Max peak concurrent requests: ${unboundedMaxConnections})`);
+  console.log(`Bounded Concurrency (Pool) time:  ${boundedDuration.toFixed(2)} ms (Max peak concurrent requests: ${boundedMaxConnections})`);
+  console.log(`Results count match:              ${unboundedResults.length === boundedResults.length && boundedResults.length === sequentialResults.length ? 'YES' : 'NO'}`);
 
-  console.log(`--- Google Drive File Download Benchmark (${numFiles} files, ${simulatedLatencyMs}ms network latency) ---`);
-  console.log(`Sequential execution time: ${sequentialDuration.toFixed(2)} ms`);
-  console.log(`Parallel execution time:   ${parallelDuration.toFixed(2)} ms`);
-  console.log(`Speedup factor:            ${(sequentialDuration / parallelDuration).toFixed(2)}x faster`);
-  console.log(`Results count match:       ${sequentialResults.length === parallelResults.length ? 'YES' : 'NO'}`);
-
-  return { sequentialDuration, parallelDuration, numFiles };
+  return { sequentialDuration, unboundedDuration, boundedDuration, unboundedMaxConnections, boundedMaxConnections, numFiles };
 }
 
 if (require.main === module) {
