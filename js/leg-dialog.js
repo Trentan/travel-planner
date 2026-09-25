@@ -1658,10 +1658,13 @@ function confirmAddLeg() {
 
     // Automatically infer legType: terminal start/return or transit (0 nights) or city (1+ nights)
     let legType = 'city';
+    const selectedType = document.getElementById('legTypeSelect')?.value;
     if (isTerminalLeg(target)) {
       const lid = String(target.id || '').toLowerCase();
       const lbl = String(target.label || '').toLowerCase();
       legType = (target.type === 'return' || lid.endsWith('-finish') || lbl.includes('finish') || lbl.includes('return')) ? 'return' : 'start';
+    } else if (selectedType === 'travel' || target.type === 'travel') {
+      legType = 'travel';
     } else {
       legType = isSameDay ? 'transit' : 'city';
     }
@@ -1689,7 +1692,7 @@ function confirmAddLeg() {
       fromCity = selectedFrom || homeCityName;
       toCity = selectedTo || '';
       if (!toCity) {
-        alert('Please choose a destination city for this travel leg.');
+        if (typeof showToast === 'function') showToast('Please choose a destination city for this travel leg.', 'warning');
         return;
       }
       target.label = `✈️ ${fromCity} to ${toCity}`;
@@ -1768,7 +1771,8 @@ function confirmAddLeg() {
     }
   } else {
     // Adding a new leg: automatically infer transit (0 nights) or city (1+ nights)
-    const legType = isSameDay ? 'transit' : 'city';
+    const selectedType = document.getElementById('legTypeSelect')?.value;
+    const legType = selectedType === 'travel' ? 'travel' : (isSameDay ? 'transit' : 'city');
     let label, fromCity, toCity, matchedCityObj;
     const homeCityName = (typeof titleData !== 'undefined' && titleData && titleData.homeCity) ? String(titleData.homeCity).trim() : 'Home';
 
@@ -1776,7 +1780,7 @@ function confirmAddLeg() {
       fromCity = document.getElementById('fromCitySelect')?.value || homeCityName;
       toCity = document.getElementById('toCitySelect')?.value || '';
       if (!toCity) {
-        alert('Please choose a destination city for this travel leg.');
+        if (typeof showToast === 'function') showToast('Please choose a destination city for this travel leg.', 'warning');
         return;
       }
       label = `✈️ ${fromCity} to ${toCity}`;

@@ -1073,6 +1073,50 @@ async function runLegManagementWysiwygSuite() {
   assert.strictEqual(elements['legPlacementGroup'].style.display, 'none', 'legPlacementGroup hidden on modal close');
   assert.strictEqual(legDialogState.isAddingNewLeg, false, 'isAddingNewLeg reset to false on close');
 
+  // 14o. Test native alert replacement with showToast on missing destination for travel legs
+  console.log('  Testing showToast replaces alert on missing travel leg destination...');
+  let toastMsg = null;
+  let toastType = null;
+  let alertCalled = false;
+  global.showToast = (msg, type) => { toastMsg = msg; toastType = type; };
+  global.alert = () => { alertCalled = true; };
+
+  // Test travel leg in edit mode without destination city
+  setLegDialogState({
+    mode: 'edit',
+    editLegIdx: 0,
+    stagedLegs: [
+      { id: 'leg_travel_test', label: 'Travel Leg', type: 'travel', days: [{ date: '2026-07-01' }] }
+    ],
+    originalLegDates: {}
+  });
+  elements['toCitySelect'].value = '';
+  elements['existingCitySelect'].value = '';
+  confirmAddLeg();
+  assert.strictEqual(alertCalled, false, 'Native alert must not be called in edit mode');
+  assert.strictEqual(toastMsg, 'Please choose a destination city for this travel leg.', 'showToast received expected warning message in edit mode');
+  assert.strictEqual(toastType, 'warning', 'showToast received warning type in edit mode');
+
+  // Test travel leg in add mode without destination city
+  toastMsg = null;
+  toastType = null;
+  alertCalled = false;
+  setLegDialogState({
+    mode: 'add',
+    isAddingNewLeg: true,
+    editLegIdx: null,
+    stagedLegs: [],
+    originalLegDates: {}
+  });
+  elements['legTypeSelect'].value = 'travel';
+  elements['newLegStartDate'].value = '2026-07-01';
+  elements['newLegEndDate'].value = '2026-07-01';
+  elements['toCitySelect'].value = '';
+  confirmAddLeg();
+  assert.strictEqual(alertCalled, false, 'Native alert must not be called in add mode');
+  assert.strictEqual(toastMsg, 'Please choose a destination city for this travel leg.', 'showToast received expected warning message in add mode');
+  assert.strictEqual(toastType, 'warning', 'showToast received warning type in add mode');
+
   console.log('✅ ALL LEG MANAGEMENT & WYSIWYG DRAG-AND-DROP TESTS PASSED CLEANLY!');
 }
 
