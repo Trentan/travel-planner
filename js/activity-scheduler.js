@@ -528,8 +528,28 @@ function chooseBestScheduleGap(gaps, durationMinutes, preferredWindows) {
 
 function describeScheduleSuggestion(choice, intervals) {
   if (!choice) return 'No clean slot found';
-  const previous = intervals.filter(interval => interval.end <= choice.start).sort((a, b) => b.end - a.end)[0];
-  const next = intervals.filter(interval => interval.start >= choice.end).sort((a, b) => a.start - b.start)[0];
+  if (!Array.isArray(intervals) || intervals.length === 0) return `Best ${choice.windowLabel}`;
+
+  let previous = null;
+  let next = null;
+
+  for (let i = 0; i < intervals.length; i++) {
+    const interval = intervals[i];
+    if (!interval) continue;
+
+    if (interval.end <= choice.start) {
+      if (!previous || interval.end > previous.end) {
+        previous = interval;
+      }
+    }
+
+    if (interval.start >= choice.end) {
+      if (!next || interval.start < next.start) {
+        next = interval;
+      }
+    }
+  }
+
   if (previous?.label && next?.label) return `Fits between ${previous.label} and ${next.label}`;
   if (previous?.label) return `Best opening after ${previous.label}`;
   if (next?.label) return `Best opening before ${next.label}`;
