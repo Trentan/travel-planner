@@ -258,10 +258,13 @@ async function run() {
   assert(document.getElementById('aiOutputBox').style.display === 'block', 'Prompt output box should be shown');
   assert(document.getElementById('aiPromptOutput').value === promptText, 'Prompt textarea should receive the generated prompt');
 
+  let toastNotifyMsg = null;
+  context.showToast = msg => { toastNotifyMsg = msg; };
+
   const copied = await context.copyPrompt();
   assert(copied === true, 'copyPrompt should succeed');
   assert(clipboardWrites[0] === promptText, 'copyPrompt should write the prompt to the clipboard');
-  assert(alerts.length >= 1, 'copyPrompt should notify the user');
+  assert(toastNotifyMsg === 'Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.', 'copyPrompt should notify the user via showToast');
   assert(execCommands.length === 0, 'Clipboard API should avoid the execCommand fallback when available');
 
   const bookingItems = bookingContext.parseBookingConfirmationText(`

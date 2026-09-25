@@ -36,6 +36,31 @@ async function runAiBuilderImportTests() {
   assert(prompt.includes('cityId'), 'Prompt must emphasize cityId consistency');
   console.log('  ✔ buildAiPrompt schema & rules verification passed');
 
+  // Test copyPrompt in js/ai.js uses showToast without calling alert
+  let toastMessage = null;
+  let alertCalled = false;
+  let clipboardText = null;
+
+  contextAi.showToast = msg => { toastMessage = msg; };
+  contextAi.alert = () => { alertCalled = true; };
+  contextAi.navigator = {
+    clipboard: {
+      writeText: async text => { clipboardText = text; }
+    }
+  };
+
+  const promptOutputEl = { value: 'Test prompt text for AI' };
+  contextAi.document = {
+    getElementById: id => (id === 'aiPromptOutput' ? promptOutputEl : null)
+  };
+
+  const copyResult = await contextAi.copyPrompt();
+  assert(copyResult === true, 'copyPrompt should return true on success');
+  assert(clipboardText === 'Test prompt text for AI', 'copyPrompt should copy prompt text to clipboard');
+  assert(toastMessage === 'Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.', 'copyPrompt should trigger toast notification');
+  assert(alertCalled === false, 'copyPrompt should not call native alert');
+  console.log('  ✔ copyPrompt non-blocking toast verification passed');
+
   // 2. Test importing the Bali 2026 fixture
   const fixturePath = path.join(__dirname, '../backups/test-fixtures/bali-2026.json');
   assert(fs.existsSync(fixturePath), 'bali-2026.json test fixture must exist');

@@ -432,6 +432,13 @@ function generatePrompt() {
 async function copyPrompt() {
   const promptArea = document.getElementById('aiPromptOutput');
   const promptText = promptArea ? promptArea.value : '';
+  const notify = msg => {
+    if (typeof showToast === 'function') {
+      showToast(msg);
+    } else if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+      window.showToast(msg);
+    }
+  };
 
   try {
     if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
@@ -443,19 +450,19 @@ async function copyPrompt() {
       throw new Error('Clipboard API unavailable');
     }
 
-    alert('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+    notify('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
     return true;
   } catch (error) {
     if (promptArea && typeof promptArea.select === 'function' && typeof document.execCommand === 'function') {
       promptArea.select();
       const copied = document.execCommand('copy');
       if (copied) {
-        alert('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
+        notify('Prompt copied to clipboard! Paste this into an AI to generate your trip JSON.');
         return true;
       }
     }
 
-    alert('Could not copy automatically. Select the prompt and copy it manually.');
+    notify('Could not copy automatically. Select the prompt and copy it manually.');
     return false;
   }
 }
