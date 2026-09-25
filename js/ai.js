@@ -4,9 +4,7 @@ function getAiFieldValue(id, fallback) {
   return value || fallback;
 }
 
-function buildAiPrompt({ title, regions, dates, citiesInput, cities, junctions, vibe }) {
-  const cityCount = cities.length || 3;
-
+function _buildAiPromptHeader({ title, regions, dates, citiesInput, junctions, vibe }) {
   return `I am building a travel itinerary app and need a complete JSON dataset for an upcoming trip.
 
 TRIP DETAILS:
@@ -20,9 +18,11 @@ TRIP DETAILS:
 YOUR TASK:
 Generate a detailed daily itinerary tailored to my preferences. If specific cities are not specified above, select 3-5 logical destination cities within the requested regions/countries that fit the pre-booked flight junctions. Create the result as a downloadable .json file that I can save and import into the app.
 
-The downloadable file must contain one JSON object that exactly matches this structure. Do not wrap it in markdown, commentary, or code fences.
+The downloadable file must contain one JSON object that exactly matches this structure. Do not wrap it in markdown, commentary, or code fences.`;
+}
 
-EXPECTED JSON SCHEMA:
+function _getAiPromptSchema(title, cityCount) {
+  return `EXPECTED JSON SCHEMA:
 {
   "meta": {
     "title": "${title}",
@@ -273,11 +273,17 @@ EXPECTED JSON SCHEMA:
     { "text": "Set security alarm", "done": false },
     { "text": "Charge all devices", "done": false }
   ]
+}`;
 }
 
-CRITICAL RULES FOR GENERATION:
+function _getAiPromptRules(cities) {
+  const cityRuleText = cities.length
+    ? `Use specified cities: ${cities.join(', ')}.`
+    : 'Choose 3-5 logical cities in the requested regions.';
 
-1. CITIES: Create the cities array. ${cities.length ? `Use specified cities: ${cities.join(', ')}.` : 'Choose 3-5 logical cities in the requested regions.'}
+  return `CRITICAL RULES FOR GENERATION:
+
+1. CITIES: Create the cities array. ${cityRuleText}
    - For multi-base regions or island hubs (e.g. Bali, Phuket, Hawaii), create separate entries for each major hub/area (e.g. "Canggu", "Ubud", "Uluwatu") rather than collapsing into a single generic region name.
    - Auto-generate city IDs as "city-[lowercase-city-name]" (e.g. "city-canggu", "city-ubud").
    - City "name" must be the clean standard city name (e.g. "Canggu", NOT "Canggu Bali").
@@ -315,6 +321,15 @@ CRITICAL RULES FOR GENERATION:
 8. Make the JSON valid, complete, and ready to import into the app without manual restructuring.
 
 9. Deliver the final answer as an attached/downloadable .json file. If your interface cannot attach files, output only the raw JSON object so I can save it as a .json file.`;
+}
+
+function buildAiPrompt({ title, regions, dates, citiesInput, cities, junctions, vibe }) {
+  const cityCount = cities.length || 3;
+  const header = _buildAiPromptHeader({ title, regions, dates, citiesInput, junctions, vibe });
+  const schema = _getAiPromptSchema(title, cityCount);
+  const rules = _getAiPromptRules(cities);
+
+  return `${header}\n\n${schema}\n\n${rules}`;
 }
 
 function getAiTripTitlePrefill() {

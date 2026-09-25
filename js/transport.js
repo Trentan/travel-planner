@@ -577,20 +577,16 @@ function scoreJourneyForDay(journey, toLoc, legId, dayDate) {
 
 // Get journeys for a specific day (for itinerary view)
 function getDayJourneys(dayDate, fromLoc, toLoc, legId = '') {
-  // Check window.journeys as fallback if local journeys is undefined
-  if (typeof journeys === 'undefined') {
-    if (typeof window !== 'undefined' && Array.isArray(window.journeys)) {
-      var journeys = window.journeys;
-    } else {
-      return [];
-    }
-  }
-  if (!Array.isArray(journeys)) return [];
+  // Check window.journeys then fallback to local journeys
+  const activeJourneys = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : ((typeof journeys !== 'undefined' && Array.isArray(journeys)) ? journeys : null);
+  if (!activeJourneys || !Array.isArray(activeJourneys)) return [];
 
   const seen = new Set();
   const results = [];
 
-  journeys.forEach(j => {
+  activeJourneys.forEach(j => {
     const legMatch = legId && j.legId === legId;
     const depMatch = journeyDatesMatch(j.departureDate || j.dayDate, dayDate);
     const arrMatch = journeyDatesMatch(j.arrivalDate, dayDate);
