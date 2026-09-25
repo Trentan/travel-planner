@@ -429,21 +429,34 @@
   }
 
   function setupSpotCheckListeners() {
-    const checks = document.querySelectorAll('.mappr-spot-check');
-    const counter = document.getElementById('mapprSelectedCount');
-    checks.forEach(ch => {
-      ch.addEventListener('change', () => {
-        const count = document.querySelectorAll('.mappr-spot-check:checked').length;
-        if (counter) counter.textContent = `${count} selected`;
+    const container = document.getElementById('mapprSpotsTableBody');
+    if (container && !container._mapprSpotCheckListenerAttached) {
+      container._mapprSpotCheckListenerAttached = true;
+      container.addEventListener('change', (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains('mappr-spot-check')) {
+          const counter = document.getElementById('mapprSelectedCount');
+          if (counter) {
+            const count = container.querySelectorAll('.mappr-spot-check:checked').length;
+            counter.textContent = `${count} selected`;
+          }
+        }
       });
-    });
+    }
   }
 
   function toggleAllMapprSpots(selectAll) {
-    const checks = document.querySelectorAll('.mappr-spot-check');
-    checks.forEach(ch => { ch.checked = selectAll; });
-    const counter = document.getElementById('mapprSelectedCount');
-    if (counter) counter.textContent = `${selectAll ? checks.length : 0} selected`;
+    const container = document.getElementById('mapprSpotsTableBody');
+    if (container) {
+      const checks = container.querySelectorAll('.mappr-spot-check');
+      checks.forEach(ch => { ch.checked = selectAll; });
+      const counter = document.getElementById('mapprSelectedCount');
+      if (counter) counter.textContent = `${selectAll ? checks.length : 0} selected`;
+    } else {
+      const checks = document.querySelectorAll('.mappr-spot-check');
+      checks.forEach(ch => { ch.checked = selectAll; });
+      const counter = document.getElementById('mapprSelectedCount');
+      if (counter) counter.textContent = `${selectAll ? checks.length : 0} selected`;
+    }
   }
 
   function updateMapprDaysDropdown() {

@@ -877,7 +877,18 @@
     try {
       const trips = await window.getAllTripsFromIndexedDB();
       if (Array.isArray(trips) && trips.length > 0) {
-        await Promise.all(trips.map(trip => uploadTripToGoogleDrive(trip)));
+        const CONCURRENCY_LIMIT = 5;
+        let tripIndex = 0;
+        const workerCount = Math.min(CONCURRENCY_LIMIT, trips.length);
+        const workers = Array.from({ length: workerCount }, async () => {
+          while (tripIndex < trips.length) {
+            const trip = trips[tripIndex++];
+            if (trip) {
+              await uploadTripToGoogleDrive(trip);
+            }
+          }
+        });
+        await Promise.all(workers);
       }
     } catch (err) {
       console.warn('Failed to upload local trips to Google Drive:', err);
@@ -1005,74 +1016,81 @@
       // Fetch local trips to perform non-destructive 3-way conflict reconciliation
       const localTrips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
 
-      await Promise.all(files.map(async (file) => {
-        if (!file.name) return;
+      const CONCURRENCY_LIMIT = 5;
+      let fileIndex = 0;
+      const workerCount = Math.min(CONCURRENCY_LIMIT, files.length);
+      const workers = Array.from({ length: workerCount }, async () => {
+        while (fileIndex < files.length) {
+          const file = files[fileIndex++];
+          if (!file || !file.name) continue;
 
-        try {
-          const downloadUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
-          const contentResp = await Promise.race([
-            fetch(downloadUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } }),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('File download timeout')), 12000))
-          ]);
+          try {
+            const downloadUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
+            const contentResp = await Promise.race([
+              fetch(downloadUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } }),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('File download timeout')), 12000))
+            ]);
 
-          if (!contentResp.ok) return;
+            if (!contentResp.ok) continue;
 
-          const rawContent = await contentResp.json();
-          if (rawContent) {
-            const tripData = rawContent.data || rawContent;
-            const tripMeta = tripData.meta || rawContent.meta || {};
-            const tripTitle = (rawContent.data ? rawContent.title : tripMeta.title) || file.name.replace(/\.json$/i, '');
-            const tripId = rawContent.id || tripMeta.id || ('trip_cloud_' + file.id);
+            const rawContent = await contentResp.json();
+            if (rawContent) {
+              const tripData = rawContent.data || rawContent;
+              const tripMeta = tripData.meta || rawContent.meta || {};
+              const tripTitle = (rawContent.data ? rawContent.title : tripMeta.title) || file.name.replace(/\.json$/i, '');
+              const tripId = rawContent.id || tripMeta.id || ('trip_cloud_' + file.id);
 
-            let remoteTrip;
-            if (typeof window.extractTripSummary === 'function') {
-              remoteTrip = window.extractTripSummary(tripData, tripId);
-              remoteTrip.title = tripTitle || remoteTrip.title;
-              if (rawContent.subtitle || tripMeta.subtitle) {
-                remoteTrip.subtitle = rawContent.subtitle || tripMeta.subtitle;
+              let remoteTrip;
+              if (typeof window.extractTripSummary === 'function') {
+                remoteTrip = window.extractTripSummary(tripData, tripId);
+                remoteTrip.title = tripTitle || remoteTrip.title;
+                if (rawContent.subtitle || tripMeta.subtitle) {
+                  remoteTrip.subtitle = rawContent.subtitle || tripMeta.subtitle;
+                }
+                if (file.modifiedTime) {
+                  remoteTrip.updatedAt = file.modifiedTime;
+                }
+              } else {
+                remoteTrip = {
+                  id: tripId,
+                  title: tripTitle,
+                  subtitle: rawContent.subtitle || tripMeta.subtitle || '',
+                  flags: rawContent.flags || (tripMeta.icon || '✈️'),
+                  dateRange: rawContent.dateRange || (tripMeta.dates || 'Flexible Dates'),
+                  legCount: Array.isArray(tripData.itinerary) ? tripData.itinerary.length : (Array.isArray(tripData.legs) ? tripData.legs.length : 0),
+                  stayCount: Array.isArray(tripData.stays) ? tripData.stays.length : (Array.isArray(tripData.accommodations) ? tripData.accommodations.length : 0),
+                  updatedAt: file.modifiedTime || rawContent.updatedAt || new Date().toISOString(),
+                  data: tripData
+                };
               }
-              if (file.modifiedTime) {
-                remoteTrip.updatedAt = file.modifiedTime;
+
+              fileMap[remoteTrip.id] = file.id;
+
+              const localTrip = localTrips.find(t => t.id === remoteTrip.id);
+              const remoteTime = file.modifiedTime ? new Date(file.modifiedTime).getTime() : 0;
+              const localTime = localTrip && localTrip.updatedAt ? new Date(localTrip.updatedAt).getTime() : (localTrip && localTrip.lastSaved ? new Date(localTrip.lastSaved).getTime() : 0);
+
+              if (!localTrip) {
+                // 1. New remote trip found -> Safe import into local IndexedDB
+                if (typeof window.saveTripToIndexedDB === 'function') {
+                  await window.saveTripToIndexedDB(remoteTrip);
+                }
+              } else if (remoteTime > localTime + 3000) {
+                // 2. Remote file is newer -> Update local IndexedDB
+                if (typeof window.saveTripToIndexedDB === 'function') {
+                  await window.saveTripToIndexedDB(remoteTrip);
+                }
+              } else if (localTime > remoteTime + 3000) {
+                // 3. Local edits are newer -> Push local trip to Google Drive
+                await window.uploadTripToGoogleDrive(localTrip, true);
               }
-            } else {
-              remoteTrip = {
-                id: tripId,
-                title: tripTitle,
-                subtitle: rawContent.subtitle || tripMeta.subtitle || '',
-                flags: rawContent.flags || (tripMeta.icon || '✈️'),
-                dateRange: rawContent.dateRange || (tripMeta.dates || 'Flexible Dates'),
-                legCount: Array.isArray(tripData.itinerary) ? tripData.itinerary.length : (Array.isArray(tripData.legs) ? tripData.legs.length : 0),
-                stayCount: Array.isArray(tripData.stays) ? tripData.stays.length : (Array.isArray(tripData.accommodations) ? tripData.accommodations.length : 0),
-                updatedAt: file.modifiedTime || rawContent.updatedAt || new Date().toISOString(),
-                data: tripData
-              };
             }
-
-            fileMap[remoteTrip.id] = file.id;
-
-            const localTrip = localTrips.find(t => t.id === remoteTrip.id);
-            const remoteTime = file.modifiedTime ? new Date(file.modifiedTime).getTime() : 0;
-            const localTime = localTrip && localTrip.updatedAt ? new Date(localTrip.updatedAt).getTime() : (localTrip && localTrip.lastSaved ? new Date(localTrip.lastSaved).getTime() : 0);
-
-            if (!localTrip) {
-              // 1. New remote trip found -> Safe import into local IndexedDB
-              if (typeof window.saveTripToIndexedDB === 'function') {
-                await window.saveTripToIndexedDB(remoteTrip);
-              }
-            } else if (remoteTime > localTime + 3000) {
-              // 2. Remote file is newer -> Update local IndexedDB
-              if (typeof window.saveTripToIndexedDB === 'function') {
-                await window.saveTripToIndexedDB(remoteTrip);
-              }
-            } else if (localTime > remoteTime + 3000) {
-              // 3. Local edits are newer -> Push local trip to Google Drive
-              await window.uploadTripToGoogleDrive(localTrip, true);
-            }
+          } catch (parseErr) {
+            console.warn('Failed to parse remote trip file:', file.name, parseErr);
           }
-        } catch (parseErr) {
-          console.warn('Failed to parse remote trip file:', file.name, parseErr);
         }
-      }));
+      });
+      await Promise.all(workers);
 
       const latestMap = getGDriveFileMap();
       Object.assign(latestMap, fileMap);
