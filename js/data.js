@@ -4977,18 +4977,17 @@ function toLocalIsoDate(dateValue) {
 function normalizeTripLegsData(legs) {
   if (!Array.isArray(legs)) return [];
   
+  const _ACTIVITY_TITLE_SEP_REGEX = /\s+(?:—|–|-|\||@)\s+/;
   function _localSplitActivityTitle(title) {
     const raw = (title || '').trim();
     if (!raw) return { title: '', location: '' };
-    const separators = [' — ', ' – ', ' - ', ' | ', ' @ '];
-    for (const separator of separators) {
-      const separatorIdx = raw.indexOf(separator);
-      if (separatorIdx !== -1) {
-        return {
-          title: raw.slice(0, separatorIdx).trim(),
-          location: raw.slice(separatorIdx + separator.length).trim()
-        };
-      }
+    const match = _ACTIVITY_TITLE_SEP_REGEX.exec(raw);
+    if (match) {
+      const idx = match.index;
+      return {
+        title: raw.slice(0, idx).trim(),
+        location: raw.slice(idx + match[0].length).trim()
+      };
     }
     return { title: raw, location: '' };
   }
