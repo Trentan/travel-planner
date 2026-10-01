@@ -26,11 +26,57 @@ async function run() {
     ${utilsCode}
     ${dataCode}
     ${timezoneCode}
-    return { cleanCityTimezoneName, getCityTimezone, getTimezoneOffsetMinutes, getTimezoneDeltaHours, formatTimezoneDeltaBadge, convertLocalToHomeTime };
+    return { getClientBrowserTimezone, cleanCityTimezoneName, getCityTimezone, getTimezoneOffsetMinutes, getTimezoneDeltaHours, formatTimezoneDeltaBadge, convertLocalToHomeTime };
   `;
 
   const evalFn = new Function('window', 'localStorage', 'Intl', combinedCode);
   const tzUtils = evalFn(windowMock, windowMock.localStorage, Intl);
+
+  // Verify getClientBrowserTimezone
+  assert(typeof tzUtils.getClientBrowserTimezone === 'function', 'getClientBrowserTimezone should be exposed as a function');
+
+  // Case 1: Happy path with resolved timeZone
+  const mockIntlNy = {
+    DateTimeFormat: () => ({
+      resolvedOptions: () => ({ timeZone: 'America/New_York' })
+    })
+  };
+  const tzUtilsNy = evalFn(windowMock, windowMock.localStorage, mockIntlNy);
+  assert(tzUtilsNy.getClientBrowserTimezone() === 'America/New_York', `Expected America/New_York, got ${tzUtilsNy.getClientBrowserTimezone()}`);
+
+  const mockIntlTokyo = {
+    DateTimeFormat: () => ({
+      resolvedOptions: () => ({ timeZone: 'Asia/Tokyo' })
+    })
+  };
+  const tzUtilsTokyo = evalFn(windowMock, windowMock.localStorage, mockIntlTokyo);
+  assert(tzUtilsTokyo.getClientBrowserTimezone() === 'Asia/Tokyo', `Expected Asia/Tokyo, got ${tzUtilsTokyo.getClientBrowserTimezone()}`);
+
+  // Case 2: Fallback when resolved timeZone is empty string or undefined
+  const mockIntlEmpty = {
+    DateTimeFormat: () => ({
+      resolvedOptions: () => ({ timeZone: '' })
+    })
+  };
+  const tzUtilsEmpty = evalFn(windowMock, windowMock.localStorage, mockIntlEmpty);
+  assert(tzUtilsEmpty.getClientBrowserTimezone() === 'UTC', `Expected UTC fallback for empty string, got ${tzUtilsEmpty.getClientBrowserTimezone()}`);
+
+  const mockIntlUndefined = {
+    DateTimeFormat: () => ({
+      resolvedOptions: () => ({ timeZone: undefined })
+    })
+  };
+  const tzUtilsUndefined = evalFn(windowMock, windowMock.localStorage, mockIntlUndefined);
+  assert(tzUtilsUndefined.getClientBrowserTimezone() === 'UTC', `Expected UTC fallback for undefined timeZone, got ${tzUtilsUndefined.getClientBrowserTimezone()}`);
+
+  // Case 3: Error handling when Intl.DateTimeFormat or resolvedOptions throws
+  const mockIntlError = {
+    DateTimeFormat: () => {
+      throw new Error('Intl disabled in environment');
+    }
+  };
+  const tzUtilsError = evalFn(windowMock, windowMock.localStorage, mockIntlError);
+  assert(tzUtilsError.getClientBrowserTimezone() === 'UTC', `Expected UTC fallback when exception is thrown, got ${tzUtilsError.getClientBrowserTimezone()}`);
 
   // Verify cleanCityTimezoneName
   assert(tzUtils.cleanCityTimezoneName(null) === '', 'null locationName should return empty string');

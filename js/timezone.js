@@ -427,6 +427,7 @@ function convertLocalToHomeTime(timeStr, dateStr, localCityOrTz, homeCityOrTz) {
 }
 
 // Expose timezone helpers to window scope
+window.getClientBrowserTimezone = getClientBrowserTimezone;
 window.cleanCityTimezoneName = cleanCityTimezoneName;
 window.getCityTimezone = getCityTimezone;
 window.getHomeTimezone = getHomeTimezone;
