@@ -49,9 +49,11 @@ const { runTripDayMetricsTests } = require('./trip-day-metrics.test');
 const { runAiBuilderImportTests } = require('./ai-builder-import.test');
 const { runRebuildAndAirportCodesTests } = require('./rebuild-itinerary-airport-codes.test');
 const { runBudgetTabTests } = require('./budget-tab.test');
+const { runItineraryErrorPathTests } = require('./itinerary-error-path.test');
 
 async function run() {
   try {
+    if (typeof runItineraryErrorPathTests === 'function') await runItineraryErrorPathTests();
     if (typeof runBudgetTabTests === 'function') runBudgetTabTests();
     if (typeof runRebuildAndAirportCodesTests === 'function') await runRebuildAndAirportCodesTests();
     if (typeof runAiBuilderImportTests === 'function') await runAiBuilderImportTests();

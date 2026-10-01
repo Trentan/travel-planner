@@ -3321,6 +3321,27 @@ function toggleActivitiesCardDetails(e, legId) {
   requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
 }
 
+function showError(message) {
+  const container = typeof document !== 'undefined' ? document.getElementById('itinerary') : null;
+  if (container) {
+    const safeMsg = typeof escapeHtmlText === 'function' ? escapeHtmlText(message) : String(message || '');
+    container.innerHTML = `<div class="itinerary-error-state p-4 my-2 text-sm text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-300 rounded-lg border border-red-300 dark:border-red-800" role="alert">⚠️ ${safeMsg}</div>`;
+  }
+  if (typeof showToast === 'function') {
+    showToast(message, 'error');
+  }
+}
+
+async function generateItinerary() {
+  try {
+    await buildItinerary();
+  } catch (err) {
+    showError('Failed to generate itinerary');
+    console.error(err);
+    throw err;
+  }
+}
+
 function buildItinerary() {
   // Check window.isCompactView for cross-module access
   const isCompact = typeof window !== 'undefined' && window.isCompactView;
@@ -4576,6 +4597,8 @@ window.findItineraryPositionForDate = findItineraryPositionForDate;
 window.getCurrentTripPosition = getCurrentTripPosition;
 window.applyCurrentTripPositionForTab = applyCurrentTripPositionForTab;
 window.initializeItineraryPositionForToday = initializeItineraryPositionForToday;
+window.showError = showError;
+window.generateItinerary = generateItinerary;
 
 // Expand to show a city in the itinerary
 function expandToCity(cityId) {
