@@ -29,6 +29,11 @@ function createElement(initial = {}) {
     style: {},
     dataset: {},
     selected: false,
+    children: [],
+    appendChild(child) {
+      if (!this.children) this.children = [];
+      this.children.push(child);
+    },
     querySelector() { return null; },
     querySelectorAll() { return []; },
     select() {
@@ -45,9 +50,18 @@ function createDocument() {
     elements,
     getElementById(id) {
       if (!elements.has(id)) {
-        elements.set(id, createElement());
+        elements.set(id, createElement({ id }));
       }
       return elements.get(id);
+    },
+    createElement(tag) {
+      return createElement({ tagName: tag ? String(tag).toUpperCase() : 'DIV' });
+    },
+    createTextNode(text) {
+      return {
+        nodeType: 3,
+        textContent: text
+      };
     },
     querySelectorAll() {
       return [];
