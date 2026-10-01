@@ -26,6 +26,7 @@ const { runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
 const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
 const { runEscapeHtmlTextTests } = require('./escape-html-text.test');
 const { runGetActivityEmojiTests } = require('./get-activity-emoji.test');
+const { runGetDayTotalTests } = require('./get-day-total.test');
 const { runNormalizeItemStatusTests } = require('./normalize-item-status.test');
 const { runGetLegBaseCityNameTests } = require('./get-leg-base-city-name.test');
 const { runStripLeadingActivityEmojiTextTests } = require('./strip-leading-activity-emoji-text.test');
@@ -76,6 +77,7 @@ async function run() {
     if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();
     if (typeof runEscapeHtmlTextTests === 'function') await runEscapeHtmlTextTests();
     if (typeof runGetActivityEmojiTests === 'function') await runGetActivityEmojiTests();
+    if (typeof runGetDayTotalTests === 'function') await runGetDayTotalTests();
     if (typeof runNormalizeItemStatusTests === 'function') await runNormalizeItemStatusTests();
     if (typeof runGetLegBaseCityNameTests === 'function') await runGetLegBaseCityNameTests();
     if (typeof runStripLeadingActivityEmojiTextTests === 'function') await runStripLeadingActivityEmojiTextTests();
