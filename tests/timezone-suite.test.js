@@ -26,11 +26,46 @@ async function run() {
     ${utilsCode}
     ${dataCode}
     ${timezoneCode}
-    return { cleanCityTimezoneName, getCityTimezone, getTimezoneOffsetMinutes, getTimezoneDeltaHours, formatTimezoneDeltaBadge, convertLocalToHomeTime };
+    return { getClientBrowserTimezone, cleanCityTimezoneName, getCityTimezone, getTimezoneOffsetMinutes, getTimezoneDeltaHours, formatTimezoneDeltaBadge, convertLocalToHomeTime };
   `;
 
   const evalFn = new Function('window', 'localStorage', 'Intl', combinedCode);
   const tzUtils = evalFn(windowMock, windowMock.localStorage, Intl);
+
+  // Verify getClientBrowserTimezone
+  const normalTz = tzUtils.getClientBrowserTimezone();
+  assert(typeof normalTz === 'string' && normalTz.length > 0, 'getClientBrowserTimezone should return non-empty timezone string');
+
+  // Test custom mock Intl returning specific timezone
+  const mockIntlSuccess = {
+    DateTimeFormat: function() {
+      return {
+        resolvedOptions: () => ({ timeZone: 'Asia/Tokyo' })
+      };
+    }
+  };
+  const tzUtilsCustom = evalFn(windowMock, windowMock.localStorage, mockIntlSuccess);
+  assert(tzUtilsCustom.getClientBrowserTimezone() === 'Asia/Tokyo', 'getClientBrowserTimezone should return Asia/Tokyo from Intl mock');
+
+  // Test fallback path when resolvedOptions().timeZone is falsy
+  const mockIntlFalsy = {
+    DateTimeFormat: function() {
+      return {
+        resolvedOptions: () => ({ timeZone: undefined })
+      };
+    }
+  };
+  const tzUtilsFalsy = evalFn(windowMock, windowMock.localStorage, mockIntlFalsy);
+  assert(tzUtilsFalsy.getClientBrowserTimezone() === 'UTC', 'getClientBrowserTimezone should fallback to UTC when timeZone is undefined');
+
+  // Test error path when Intl.DateTimeFormat throws an exception
+  const mockIntlError = {
+    DateTimeFormat: function() {
+      throw new Error('Intl DateTimeFormat not supported');
+    }
+  };
+  const tzUtilsError = evalFn(windowMock, windowMock.localStorage, mockIntlError);
+  assert(tzUtilsError.getClientBrowserTimezone() === 'UTC', 'getClientBrowserTimezone should return UTC on exception in catch block');
 
   // Verify cleanCityTimezoneName
   assert(tzUtils.cleanCityTimezoneName(null) === '', 'null locationName should return empty string');
