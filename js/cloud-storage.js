@@ -1439,7 +1439,11 @@
 
       if (fullTrip) {
         console.log(`[Cloud AutoSync] Silent background auto-sync for active trip document "${fullTrip.title}"...`);
-        await window.uploadTripToGoogleDrive(fullTrip, true);
+        try {
+          await window.uploadTripToGoogleDrive(fullTrip, true);
+        } catch (err) {
+          console.warn('Auto-sync failed silently', err);
+        }
       }
     }, 3500);
   };
