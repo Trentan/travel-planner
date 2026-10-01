@@ -714,7 +714,7 @@ function deleteJourney(id) {
 }
 
 function deleteJourneyGroup(journeyId) {
-  journeys = journeys.filter(j => j.journeyId !== journeyId);
+  journeys = journeys.filter(j => j.journeyId !== journeyId && j.id !== journeyId);
   window.journeys = journeys;
   if (typeof rebuildItineraryAndDataMappings === 'function') {
     rebuildItineraryAndDataMappings({ showToast: false });
@@ -1689,6 +1689,27 @@ function _syncJourneyModalActions() {
   if (deleteBtn) deleteBtn.style.display = isExistingJourney ? 'inline-flex' : 'none';
 }
 
+// Remove previous journey segments matching original segment IDs or journey IDs before saving/deleting
+function _removeMatchingJourneySegments(origSegIdsList = [], origJntIdsList = [], pendingJourneyId = null) {
+  const origSegIds = new Set(origSegIdsList || []);
+  const origJntIds = new Set(origJntIdsList || []);
+  if (pendingJourneyId) origJntIds.add(pendingJourneyId);
+
+  if (origSegIds.size === 0 && origJntIds.size === 0) {
+    return journeys;
+  }
+
+  journeys = journeys.filter(j => {
+    if (j.id && origSegIds.has(j.id)) return false;
+    if (j.journeyId && origJntIds.has(j.journeyId)) return false;
+    if (j.id && origJntIds.has(j.id)) return false;
+    return true;
+  });
+
+  window.journeys = journeys;
+  return journeys;
+}
+
 // Load an existing journey into the modal
 function editJourney(journeyId) {
   const segs = findJourneySegments(journeyId);
@@ -2126,18 +2147,8 @@ function deleteJourneyFromModal() {
   if (!_pendingJourneyId && (!_pendingOriginalJourneyIds || _pendingOriginalJourneyIds.length === 0)) return;
   if (!confirm('Delete this journey?')) return;
 
-  const origSegIds = new Set(_pendingOriginalSegmentIds || []);
-  const origJntIds = new Set(_pendingOriginalJourneyIds || []);
-  if (_pendingJourneyId) origJntIds.add(_pendingJourneyId);
+  _removeMatchingJourneySegments(_pendingOriginalSegmentIds, _pendingOriginalJourneyIds, _pendingJourneyId);
 
-  journeys = journeys.filter(j => {
-    if (j.id && origSegIds.has(j.id)) return false;
-    if (j.journeyId && origJntIds.has(j.journeyId)) return false;
-    if (j.id && origJntIds.has(j.id)) return false;
-    return true;
-  });
-
-  window.journeys = journeys;
   closeJourneyModal();
   if (typeof rebuildItineraryAndDataMappings === 'function') {
     rebuildItineraryAndDataMappings({ showToast: false });
@@ -2183,17 +2194,8 @@ function saveJourneyFromModal() {
       seg.status = status; // Keep status in sync across all segments of the journey!
     });
 
-    // EDIT FIX: Remove old segments matching this journey before saving
-    const origSegIds = new Set(_pendingOriginalSegmentIds || []);
-    const origJntIds = new Set(_pendingOriginalJourneyIds || []);
-    if (_pendingJourneyId) origJntIds.add(_pendingJourneyId);
-
-    journeys = journeys.filter(j => {
-      if (j.id && origSegIds.has(j.id)) return false;
-      if (j.journeyId && origJntIds.has(j.journeyId)) return false;
-      if (j.id && origJntIds.has(j.id)) return false;
-      return true;
-    });
+    // Remove old segments matching this journey before saving updated segments
+    _removeMatchingJourneySegments(_pendingOriginalSegmentIds, _pendingOriginalJourneyIds, _pendingJourneyId);
 
     journeys.push(...finalSegments);
     window.journeys = journeys;
