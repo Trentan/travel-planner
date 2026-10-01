@@ -27,6 +27,7 @@ const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
 const { runEscapeHtmlTextTests } = require('./escape-html-text.test');
 const { runGetActivityEmojiTests } = require('./get-activity-emoji.test');
 const { runNormalizeItemStatusTests } = require('./normalize-item-status.test');
+const { runGetMobilePagerStateStoreTests } = require('./get-mobile-pager-state-store.test');
 const { runGetLegBaseCityNameTests } = require('./get-leg-base-city-name.test');
 const { runStripLeadingActivityEmojiTextTests } = require('./strip-leading-activity-emoji-text.test');
 const { runParseCurrencyAmountTests } = require('./parse-currency-amount.test');
@@ -77,6 +78,7 @@ async function run() {
     if (typeof runEscapeHtmlTextTests === 'function') await runEscapeHtmlTextTests();
     if (typeof runGetActivityEmojiTests === 'function') await runGetActivityEmojiTests();
     if (typeof runNormalizeItemStatusTests === 'function') await runNormalizeItemStatusTests();
+    if (typeof runGetMobilePagerStateStoreTests === 'function') await runGetMobilePagerStateStoreTests();
     if (typeof runGetLegBaseCityNameTests === 'function') await runGetLegBaseCityNameTests();
     if (typeof runStripLeadingActivityEmojiTextTests === 'function') await runStripLeadingActivityEmojiTextTests();
     if (typeof runParseCurrencyAmountTests === 'function') await runParseCurrencyAmountTests();

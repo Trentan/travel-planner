@@ -754,6 +754,7 @@ window.renderMobileStatusCostMeta = renderMobileStatusCostMeta;
 window.normalizeItemStatus = normalizeItemStatus;
 window.getStatusMeta = getStatusMeta;
 window.renderStatusBadge = renderStatusBadge;
+window.getMobilePagerStateStore = getMobilePagerStateStore;
 window.getMobilePagerActiveIndex = getMobilePagerActiveIndex;
 window.setMobilePagerActiveIndex = setMobilePagerActiveIndex;
 window.resetMobilePagerActiveIndex = resetMobilePagerActiveIndex;
