@@ -1408,7 +1408,6 @@
     if (backgroundHeartbeatTimer && fnClearInterval) fnClearInterval(backgroundHeartbeatTimer);
     backgroundHeartbeatTimer = fnSetInterval(async () => {
       if (isGoogleDriveConnected() && (typeof document === 'undefined' || !document.hidden)) {
-        console.log('[GoogleDrive Heartbeat] Running silent 60s background cloud sync check...');
         await window.syncAllTripsFromGoogleDrive(true);
       }
     }, 60000);
