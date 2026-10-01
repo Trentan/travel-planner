@@ -31,6 +31,7 @@ const { runGetLegBaseCityNameTests } = require('./get-leg-base-city-name.test');
 const { runStripLeadingActivityEmojiTextTests } = require('./strip-leading-activity-emoji-text.test');
 const { runParseCurrencyAmountTests } = require('./parse-currency-amount.test');
 const { runFormatCurrencyTests } = require('./format-currency.test');
+const { runMergeChecklistWithDefaultsTests } = require('./merge-checklist-with-defaults.test');
 const { runCompactFoodQuestTitleTests } = require('./compact-food-quest-title.test');
 const { run: runFormatCompactJourneyDurationSuite } = require('./format-compact-journey-duration.test');
 const { runFormatJourneySubLocationTests } = require('./format-journey-sub-location.test');
@@ -81,6 +82,7 @@ async function run() {
     if (typeof runStripLeadingActivityEmojiTextTests === 'function') await runStripLeadingActivityEmojiTextTests();
     if (typeof runParseCurrencyAmountTests === 'function') await runParseCurrencyAmountTests();
     if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
+    if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
     if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
     if (typeof runFormatJourneySubLocationTests === 'function') await runFormatJourneySubLocationTests();

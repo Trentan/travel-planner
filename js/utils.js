@@ -760,3 +760,6 @@ window.resetMobilePagerActiveIndex = resetMobilePagerActiveIndex;
 window.captureMobilePagerStates = captureMobilePagerStates;
 window.scrollChildIntoHorizontalView = scrollChildIntoHorizontalView;
 window.stripLeadingActivityEmojiText = stripLeadingActivityEmojiText;
+window.normalizeChecklistText = normalizeChecklistText;
+window.getChecklistItemKeys = getChecklistItemKeys;
+window.mergeChecklistWithDefaults = mergeChecklistWithDefaults;
