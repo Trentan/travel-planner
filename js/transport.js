@@ -1957,11 +1957,19 @@ function _updateSegmentList() {
 
   // Update label to show current status
   if (labelEl) {
+    labelEl.textContent = '';
+    const badgeSpan = document.createElement('span');
+    badgeSpan.className = 'segment-index-badge';
+
     if (_activeSegmentIndex >= 0 && _activeSegmentIndex < totalSegments) {
       const seg = _pendingSegments[_activeSegmentIndex];
-      labelEl.innerHTML = `<span class="segment-index-badge">${_activeSegmentIndex + 1}</span> Editing: ${escapeHtmlText(seg.fromLocation || '')} → ${escapeHtmlText(seg.toLocation || '')}`;
+      badgeSpan.textContent = String(_activeSegmentIndex + 1);
+      labelEl.appendChild(badgeSpan);
+      labelEl.appendChild(document.createTextNode(` Editing: ${seg.fromLocation || ''} → ${seg.toLocation || ''}`));
     } else {
-      labelEl.innerHTML = `<span class="segment-index-badge">${totalSegments + 1}</span> Segment ${totalSegments + 1} — entering details`;
+      badgeSpan.textContent = String(totalSegments + 1);
+      labelEl.appendChild(badgeSpan);
+      labelEl.appendChild(document.createTextNode(` Segment ${totalSegments + 1} — entering details`));
     }
   }
 
