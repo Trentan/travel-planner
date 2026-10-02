@@ -9,9 +9,10 @@ const {
 function createSimpleDom() {
   const elements = {};
 
-  function makeElement(id) {
+  function makeElement(id, tag = 'div') {
     return {
       id,
+      tagName: tag.toUpperCase(),
       style: {},
       hidden: false,
       children: [],
@@ -21,17 +22,31 @@ function createSimpleDom() {
       },
       _innerHTML: '',
       get innerHTML() {
+        if (this.children.length > 0) {
+          return this.children.map(child => {
+            if (child.nodeType === 3) {
+              return child.textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+            const className = child.className ? ` class="${child.className}"` : '';
+            return `<${child.tagName.toLowerCase()}${className}>${child.innerHTML}</${child.tagName.toLowerCase()}>`;
+          }).join('');
+        }
         return this._innerHTML;
       },
       set innerHTML(val) {
+        this.children = [];
         this._innerHTML = val;
       },
-      _innerText: '',
-      get innerText() {
-        return this._innerText;
+      _textContent: '',
+      get textContent() {
+        if (this.children.length > 0) {
+          return this.children.map(c => c.textContent || '').join('');
+        }
+        return this._textContent;
       },
-      set innerText(val) {
-        this._innerText = val;
+      set textContent(val) {
+        this.children = [];
+        this._textContent = val;
       },
       appendChild(child) {
         this.children.push(child);
@@ -47,7 +62,13 @@ function createSimpleDom() {
       return elements[id];
     },
     createElement(tag) {
-      return makeElement(`el_${Math.random()}`);
+      return makeElement(`el_${Math.random()}`, tag);
+    },
+    createTextNode(text) {
+      return {
+        nodeType: 3,
+        textContent: text
+      };
     },
     elements
   };

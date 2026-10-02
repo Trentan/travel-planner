@@ -370,6 +370,10 @@ window.getAllTripsFromIndexedDB = getAllTripsFromIndexedDB;
 function saveTripToIndexedDB(tripRecord) {
   return openDB().then(db => {
     return new Promise((resolve, reject) => {
+      if (!db || !db.objectStoreNames || !db.objectStoreNames.contains(TRIPS_STORE_NAME)) {
+        reject(new Error('IndexedDB not available'));
+        return;
+      }
       const transaction = db.transaction([TRIPS_STORE_NAME], 'readwrite');
       const store = transaction.objectStore(TRIPS_STORE_NAME);
       const request = store.put(tripRecord);
@@ -387,6 +391,10 @@ window.saveTripToIndexedDB = saveTripToIndexedDB;
 function deleteTripFromIndexedDB(tripId) {
   return openDB().then(db => {
     return new Promise((resolve, reject) => {
+      if (!db || !db.objectStoreNames || !db.objectStoreNames.contains(TRIPS_STORE_NAME)) {
+        resolve();
+        return;
+      }
       const transaction = db.transaction([TRIPS_STORE_NAME], 'readwrite');
       const store = transaction.objectStore(TRIPS_STORE_NAME);
       const request = store.delete(tripId);
@@ -612,6 +620,10 @@ window.deleteTripDocument = deleteTripDocument;
 function saveToIndexedDB(key, data) {
   return openDB().then(db => {
     return new Promise((resolve, reject) => {
+      if (!db || !db.objectStoreNames || !db.objectStoreNames.contains(STORE_NAME)) {
+        reject(new Error('IndexedDB not available'));
+        return;
+      }
       const transaction = db.transaction([STORE_NAME], 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
 
@@ -637,6 +649,10 @@ function saveToIndexedDB(key, data) {
 function loadFromIndexedDB(key) {
   return openDB().then(db => {
     return new Promise((resolve, reject) => {
+      if (!db || !db.objectStoreNames || !db.objectStoreNames.contains(STORE_NAME)) {
+        resolve(null);
+        return;
+      }
       const transaction = db.transaction([STORE_NAME], 'readonly');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.get(key);
@@ -661,6 +677,10 @@ function loadFromIndexedDB(key) {
 function deleteFromIndexedDB(key) {
   return openDB().then(db => {
     return new Promise((resolve, reject) => {
+      if (!db || !db.objectStoreNames || !db.objectStoreNames.contains(STORE_NAME)) {
+        resolve();
+        return;
+      }
       const transaction = db.transaction([STORE_NAME], 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.delete(key);
@@ -733,7 +753,7 @@ async function shouldUseIndexedDB() {
     const migrationStatus = await loadFromIndexedDB('_migration_complete');
     return migrationStatus !== null;
   } catch (e) {
-    console.error('Error checking IndexedDB status:', e);
+    console.warn('IndexedDB status check fallback to localStorage:', e);
     return false;
   }
 }
