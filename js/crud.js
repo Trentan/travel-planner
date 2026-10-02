@@ -358,7 +358,7 @@ function rebuildItineraryPreservingScroll(options = {}) {
     if (focusItem && focusItem.offsetParent !== null && typeof focusItem.scrollIntoView === 'function') {
       focusItem.scrollIntoView({ block: 'center', inline: 'nearest' });
       focusItem.classList.add('is-schedule-focus');
-      setTimeout(() => focusItem.classList.remove('is-schedule-focus'), 1200);
+      setTimeout(() => focusItem.classList.remove('is-schedule-focus'), 2500);
     } else if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
       window.scrollTo(scrollX, scrollY);
     }
