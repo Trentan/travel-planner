@@ -82,7 +82,7 @@ function runStripLeadingActivityEmojiTextTests() {
     'Should strip multiple leading emojis separated by spaces'
   );
 
-  // 4. Emojis with variation selectors (\uFE0F), ZWJ sequences, skin tones, and country flags
+  // 4. Emojis with variation selectors (\uFE0F), ZWJ sequences, skin tones, status indicators, and flags
   assert(
     stripLeadingActivityEmojiText('🧘‍♀️ Evening Yoga') === 'Evening Yoga',
     'Should strip ZWJ female person in lotus position emoji'
@@ -92,6 +92,10 @@ function runStripLeadingActivityEmojiTextTests() {
     'Should strip ZWJ female person in lotus position with skin tone modifier'
   );
   assert(
+    stripLeadingActivityEmojiText('🏃🏽‍♂️ Morning Jog') === 'Morning Jog',
+    'Should strip ZWJ man running emoji with skin tone modifier'
+  );
+  assert(
     stripLeadingActivityEmojiText('🇫🇷 Eiffel Tower') === 'Eiffel Tower',
     'Should strip regional indicator country flag emoji'
   );
@@ -99,8 +103,52 @@ function runStripLeadingActivityEmojiTextTests() {
     stripLeadingActivityEmojiText('🇯🇵 Tokyo Tower') === 'Tokyo Tower',
     'Should strip country flag emoji'
   );
+  assert(
+    stripLeadingActivityEmojiText('🏴󠁧󠁢󠁥󠁮󠁧󠁿 Big Ben') === 'Big Ben',
+    'Should strip subdivision flag emoji'
+  );
+  assert(
+    stripLeadingActivityEmojiText('✅ Done Task') === 'Done Task',
+    'Should strip heavy checkmark emoji'
+  );
+  assert(
+    stripLeadingActivityEmojiText('❌ Cancelled Booking') === 'Cancelled Booking',
+    'Should strip cross mark emoji'
+  );
 
-  // 5. Non-leading emojis (in middle or end of string) must be preserved
+  // 5. Punctuation or digits immediately following leading emoji
+  assert(
+    stripLeadingActivityEmojiText('🏛️: Louvre Museum') === ': Louvre Museum',
+    'Should strip leading emoji leaving colon attached to text'
+  );
+  assert(
+    stripLeadingActivityEmojiText('🏃- Morning Run') === '- Morning Run',
+    'Should strip leading emoji leaving hyphen attached to text'
+  );
+  assert(
+    stripLeadingActivityEmojiText('🍽️, Fine Dining') === ', Fine Dining',
+    'Should strip leading emoji leaving comma attached to text'
+  );
+  assert(
+    stripLeadingActivityEmojiText('🏛️123 Main St') === '123 Main St',
+    'Should strip leading emoji leaving digits attached'
+  );
+
+  // 6. Non-standard whitespace (tabs, newlines, non-breaking spaces)
+  assert(
+    stripLeadingActivityEmojiText('\n\t  🏛️  Louvre Museum  \n') === 'Louvre Museum',
+    'Should handle leading/trailing tabs and newlines around emoji and text'
+  );
+  assert(
+    stripLeadingActivityEmojiText('🏛️\nLouvre Museum') === 'Louvre Museum',
+    'Should strip leading emoji separated from text by newline'
+  );
+  assert(
+    stripLeadingActivityEmojiText('\u00A0🏛️\u00A0Louvre Museum\u00A0') === 'Louvre Museum',
+    'Should trim non-breaking space characters'
+  );
+
+  // 7. Non-leading emojis (in middle or end of string) or wrapped emojis must be preserved
   assert(
     stripLeadingActivityEmojiText('Visit 🏛️ Louvre') === 'Visit 🏛️ Louvre',
     'Should preserve emoji in middle of text'
@@ -113,8 +161,16 @@ function runStripLeadingActivityEmojiTextTests() {
     stripLeadingActivityEmojiText('Dinner 🍽️ and Drinks 🍷') === 'Dinner 🍽️ and Drinks 🍷',
     'Should preserve multiple emojis in middle/end of text'
   );
+  assert(
+    stripLeadingActivityEmojiText('(🏛️) Louvre') === '(🏛️) Louvre',
+    'Should preserve emoji wrapped in parenthesis at start'
+  );
+  assert(
+    stripLeadingActivityEmojiText('@🏛️ Louvre') === '@🏛️ Louvre',
+    'Should preserve emoji preceded by symbol at start'
+  );
 
-  // 6. Edge cases: emoji-only, whitespace, plain text, and non-emoji prefixes
+  // 8. Edge cases: emoji-only, whitespace, plain text, and numbers/punctuation
   assert(
     stripLeadingActivityEmojiText('🏛️') === '',
     'Should return empty string when input contains only an emoji'
@@ -136,7 +192,7 @@ function runStripLeadingActivityEmojiTextTests() {
     'Should not modify text starting with numbers/punctuation'
   );
 
-  // 7. Falsy and non-string inputs
+  // 9. Falsy, non-string primitives, and objects
   assert(
     stripLeadingActivityEmojiText('') === '',
     'Should return empty string for empty input'
@@ -160,6 +216,30 @@ function runStripLeadingActivityEmojiTextTests() {
   assert(
     stripLeadingActivityEmojiText(0) === '',
     'Should return empty string for 0 input'
+  );
+  assert(
+    stripLeadingActivityEmojiText(true) === 'true',
+    'Should stringify boolean true input'
+  );
+  assert(
+    stripLeadingActivityEmojiText(100) === '100',
+    'Should stringify positive number input'
+  );
+  assert(
+    stripLeadingActivityEmojiText(-5.5) === '-5.5',
+    'Should stringify negative float input'
+  );
+  assert(
+    stripLeadingActivityEmojiText({ toString: () => '🏛️ Louvre' }) === 'Louvre',
+    'Should stringify object with custom toString'
+  );
+  assert(
+    stripLeadingActivityEmojiText(['🏛️ Louvre']) === 'Louvre',
+    'Should stringify array input'
+  );
+  assert(
+    stripLeadingActivityEmojiText(NaN) === '',
+    'Should return empty string for NaN input'
   );
 
   console.log('✅ ALL stripLeadingActivityEmojiText UNIT TESTS PASSED CLEANLY!');

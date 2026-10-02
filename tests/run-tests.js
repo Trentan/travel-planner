@@ -51,9 +51,19 @@ const { runTripDayMetricsTests } = require('./trip-day-metrics.test');
 const { runAiBuilderImportTests } = require('./ai-builder-import.test');
 const { runRebuildAndAirportCodesTests } = require('./rebuild-itinerary-airport-codes.test');
 const { runBudgetTabTests } = require('./budget-tab.test');
+const { runGetDayTotalTests } = require('./get-day-total.test');
+const { runGetMapSearchUrlTests } = require('./get-map-search-url.test');
+const { runGetMobilePagerStateStoreTests } = require('./get-mobile-pager-state-store.test');
+const { runIsTerminalLegTests } = require('./is-terminal-leg.test');
+const { runDragdropTests } = require('./dragdrop.test');
+const { runTabsTests } = require('./tabs.test');
+const { runMergeChecklistWithDefaultsTests } = require('./merge-checklist-with-defaults.test');
+const { runEnforceTerminalLegsTests } = require('./enforce-terminal-legs.test');
 
 async function run() {
   try {
+    if (typeof runDragdropTests === 'function') runDragdropTests();
+    if (typeof runTabsTests === 'function') runTabsTests();
     if (typeof runBudgetTabTests === 'function') runBudgetTabTests();
     if (typeof runRebuildAndAirportCodesTests === 'function') await runRebuildAndAirportCodesTests();
     if (typeof runAiBuilderImportTests === 'function') await runAiBuilderImportTests();
@@ -82,9 +92,15 @@ async function run() {
     if (typeof runGetActivityEmojiTests === 'function') await runGetActivityEmojiTests();
     if (typeof runNormalizeItemStatusTests === 'function') await runNormalizeItemStatusTests();
     if (typeof runGetLegBaseCityNameTests === 'function') await runGetLegBaseCityNameTests();
+    if (typeof runIsTerminalLegTests === 'function') await runIsTerminalLegTests();
+    if (typeof runEnforceTerminalLegsTests === 'function') await runEnforceTerminalLegsTests();
+    if (typeof runGetMobilePagerStateStoreTests === 'function') await runGetMobilePagerStateStoreTests();
     if (typeof runStripLeadingActivityEmojiTextTests === 'function') await runStripLeadingActivityEmojiTextTests();
     if (typeof runParseCurrencyAmountTests === 'function') await runParseCurrencyAmountTests();
     if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
+    if (typeof runGetDayTotalTests === 'function') await runGetDayTotalTests();
+    if (typeof runGetMapSearchUrlTests === 'function') await runGetMapSearchUrlTests();
+    if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
     if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
     if (typeof runFormatJourneySubLocationTests === 'function') await runFormatJourneySubLocationTests();

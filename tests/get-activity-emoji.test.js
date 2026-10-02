@@ -46,10 +46,19 @@ function runGetActivityEmojiTests() {
   // 2. Fallback / Unknown / Edge cases - getActivityEmoji
   assert(getActivityEmoji('unknownCategory') === '📍', 'Unknown category should return fallback emoji 📍');
   assert(getActivityEmoji('') === '📍', 'Empty string category should return fallback emoji 📍');
+  assert(getActivityEmoji('   ') === '📍', 'Whitespace category should return fallback emoji 📍');
+  assert(getActivityEmoji('FITNESS') === '📍', 'Uppercase category should return fallback emoji 📍 (case-sensitive)');
+  assert(getActivityEmoji('Food') === '📍', 'Capitalized category should return fallback emoji 📍 (case-sensitive)');
   assert(getActivityEmoji(null) === '📍', 'null category should return fallback emoji 📍');
   assert(getActivityEmoji(undefined) === '📍', 'undefined category should return fallback emoji 📍');
   assert(getActivityEmoji(123) === '📍', 'Numeric category should return fallback emoji 📍');
+  assert(getActivityEmoji(true) === '📍', 'Boolean true category should return fallback emoji 📍');
+  assert(getActivityEmoji(false) === '📍', 'Boolean false category should return fallback emoji 📍');
+  assert(getActivityEmoji([]) === '📍', 'Array category should return fallback emoji 📍');
   assert(getActivityEmoji({}) === '📍', 'Object category should return fallback emoji 📍');
+  assert(getActivityEmoji('toString') === '📍', 'Built-in prototype method name should return fallback emoji 📍');
+  assert(getActivityEmoji('__proto__') === '📍', '__proto__ key should return fallback emoji 📍');
+  assert(getActivityEmoji('constructor') === '📍', 'constructor key should return fallback emoji 📍');
 
   // 3. Known activity categories - getActivityLabel
   assert(getActivityLabel('fitness') === 'Fitness', 'fitness should return "Fitness"');
