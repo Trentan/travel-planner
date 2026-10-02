@@ -6,6 +6,34 @@
 // Add Stay Modal Functions
 let editingStayId = null; // Track if we're editing an existing stay
 
+function _populateStayCitySelect(citySelect, selectedCityId) {
+  if (!citySelect) return;
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = '-- Select city --';
+
+  const options = [defaultOption];
+  const list = typeof citiesData !== 'undefined' && Array.isArray(citiesData) ? citiesData : [];
+
+  list.forEach(city => {
+    if (!city) return;
+    const option = document.createElement('option');
+    option.value = city.id || '';
+    option.textContent = (city.name || '') + (city.country ? ` (${city.country})` : '');
+    if (selectedCityId && city.id === selectedCityId) {
+      option.selected = true;
+    }
+    options.push(option);
+  });
+
+  if (typeof citySelect.replaceChildren === 'function') {
+    citySelect.replaceChildren(...options);
+  } else {
+    citySelect.textContent = '';
+    options.forEach(opt => citySelect.appendChild(opt));
+  }
+}
+
 function _syncStayModalActions() {
   const deleteBtn = document.getElementById('stayDeleteBtn');
   if (deleteBtn) deleteBtn.style.display = editingStayId ? 'inline-flex' : 'none';
@@ -50,13 +78,7 @@ function openAddStayModal(defaultCityId, defaultCheckIn) {
   // Populate city dropdown
   const citySelect = document.getElementById('stayCitySelect');
   if (citySelect) {
-    citySelect.innerHTML = '<option value="">-- Select city --</option>';
-    (citiesData || []).forEach(city => {
-      const option = document.createElement('option');
-      option.value = city.id;
-      option.textContent = city.name + (city.country ? ` (${city.country})` : '');
-      citySelect.appendChild(option);
-    });
+    _populateStayCitySelect(citySelect, defaultCityId);
   }
 
   // Clear form fields
@@ -103,14 +125,7 @@ function openEditStayModal(stayId) {
   // Populate city dropdown and select current
   const citySelect = document.getElementById('stayCitySelect');
   if (citySelect) {
-    citySelect.innerHTML = '<option value="">-- Select city --</option>';
-    (citiesData || []).forEach(city => {
-      const option = document.createElement('option');
-      option.value = city.id;
-      option.textContent = city.name + (city.country ? ` (${city.country})` : '');
-      if (city.id === stay.cityId) option.selected = true;
-      citySelect.appendChild(option);
-    });
+    _populateStayCitySelect(citySelect, stay.cityId);
   }
 
   // Populate form fields
@@ -329,6 +344,7 @@ function closeStayModal() { closeAddStayModal(); }
 // Global & CommonJS Export Bridge
 const _stayExports = {
   editingStayId: typeof editingStayId !== 'undefined' ? editingStayId : null,
+  _populateStayCitySelect,
   _syncStayModalActions,
   calcStayNights,
   setupStayNightsAutoCalc,

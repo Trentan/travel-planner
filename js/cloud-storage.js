@@ -1408,7 +1408,6 @@
     if (backgroundHeartbeatTimer && fnClearInterval) fnClearInterval(backgroundHeartbeatTimer);
     backgroundHeartbeatTimer = fnSetInterval(async () => {
       if (isGoogleDriveConnected() && (typeof document === 'undefined' || !document.hidden)) {
-        console.log('[GoogleDrive Heartbeat] Running silent 60s background cloud sync check...');
         await window.syncAllTripsFromGoogleDrive(true);
       }
     }, 60000);
@@ -1419,6 +1418,7 @@
     if (!isGoogleDriveConnected()) return;
 
     if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
+    const autoSyncDelay = (typeof window !== 'undefined' && window.__cloudAutoSyncDelayMs) || 3500;
     syncDebounceTimer = setTimeout(async () => {
       let fullTrip = null;
       if (typeof window.buildExportPayload === 'function') {
@@ -1439,9 +1439,13 @@
 
       if (fullTrip) {
         console.log(`[Cloud AutoSync] Silent background auto-sync for active trip document "${fullTrip.title}"...`);
-        await window.uploadTripToGoogleDrive(fullTrip, true);
+        try {
+          await window.uploadTripToGoogleDrive(fullTrip, true);
+        } catch (err) {
+          console.warn('Auto-sync failed silently', err);
+        }
       }
-    }, 3500);
+    }, autoSyncDelay);
   };
 
   // Select Local Directory Sync Folder (Google Drive Desktop / OneDrive / Local Folder)
