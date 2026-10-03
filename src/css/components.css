@@ -1711,6 +1711,67 @@
       margin-top: 1rem !important;
     }
 
+    /* Mobile Day Labeling card / stacked layout for Edit Leg Dialog (Issue #431) */
+    @media (max-width: 640px) {
+      .leg-day-notes-table {
+        display: block !important;
+        width: 100% !important;
+        table-layout: auto !important;
+      }
+      .leg-day-notes-table thead {
+        display: none !important;
+      }
+      .leg-day-notes-table tbody {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+      }
+      .leg-day-table-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.375rem !important;
+        padding: 0.625rem !important;
+        border-radius: 0.5rem !important;
+        border: 1px solid #e2e8f0 !important;
+        background-color: #f8fafc !important;
+      }
+      .dark .leg-day-table-row {
+        border-color: #334155 !important;
+        background-color: rgba(30, 41, 59, 0.6) !important;
+      }
+      .leg-day-desktop-num {
+        display: none !important;
+      }
+      .leg-day-mobile-header {
+        display: block !important;
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+        line-height: 1rem !important;
+        margin-bottom: 0.125rem !important;
+      }
+      .leg-day-cell-num {
+        display: block !important;
+        text-align: left !important;
+        width: 100% !important;
+        padding: 0 !important;
+      }
+      .leg-day-cell-date {
+        display: none !important;
+      }
+      .leg-day-cell-title,
+      .leg-day-cell-note {
+        display: block !important;
+        width: 100% !important;
+        padding: 0 !important;
+      }
+      .leg-day-title-row-input,
+      .leg-day-note-row-input {
+        width: 100% !important;
+        font-size: 0.75rem !important;
+      }
+    }
+
     body.mobile-app-mode .app-menu-bar,
     body.mobile-app-mode header {
       display: none !important;

@@ -352,13 +352,17 @@ function updateLegDialogUiMode() {
     else title.textContent = isEdit ? 'Edit Trip Leg' : 'Add New Trip Leg';
   }
   if (saveBtn) saveBtn.textContent = isEdit ? 'Save Leg' : 'Add Leg';
+  const desktopSaveBtn = document.getElementById('desktopLegDialogSaveBtn');
+  if (desktopSaveBtn) desktopSaveBtn.textContent = isEdit ? 'Save Leg' : 'Add Leg';
 
   // Placement dropdown: only show when adding a new leg
   if (placementGroup) placementGroup.style.display = isAddingNew ? 'block' : 'none';
 
-  // Destination City dropdown: shown in Add mode, hidden in Edit mode per UI spec
+  // Destination City dropdown: shown in Add mode and for city/transit in Edit mode (disabled in Edit mode per Issue #431)
+  const currentLegType = document.getElementById('legTypeSelect')?.value || 'city';
+  const isRoute = currentLegType === 'travel' || currentLegType === 'start' || currentLegType === 'return';
   if (citySelectionGroup) {
-    citySelectionGroup.style.display = isEdit ? 'none' : 'block';
+    citySelectionGroup.style.display = isRoute ? 'none' : 'block';
   }
 
   if (existingCitySelect) {
@@ -586,7 +590,10 @@ function resetLegDialogToAddNew() {
   if (legTypeSelect) legTypeSelect.value = isSameDay ? 'transit' : 'city';
   if (fromCitySelect) fromCitySelect.value = 'Home';
   if (toCitySelect) toCitySelect.value = '';
-  if (existingCitySelect) existingCitySelect.value = '';
+  if (existingCitySelect) {
+    existingCitySelect.value = '';
+    existingCitySelect.disabled = false;
+  }
   if (newCityName) newCityName.value = '';
   if (countrySelect) countrySelect.value = '';
   if (countryOther) {
@@ -594,7 +601,10 @@ function resetLegDialogToAddNew() {
     countryOther.style.display = 'none';
   }
   if (newCityInline) newCityInline.style.display = 'none';
-  if (toggleNewCityBtn) toggleNewCityBtn.textContent = '+ Add a new city';
+  if (toggleNewCityBtn) {
+    toggleNewCityBtn.textContent = '+ Add a new city';
+    toggleNewCityBtn.style.display = 'inline-block';
+  }
   if (dayNotesInput) dayNotesInput.value = '';
   renderLegDayNotesList();
 
@@ -770,8 +780,12 @@ function renderLegDayNotesList() {
     let cur = startDate;
     let idx = 0;
     while (cur <= endDate) {
+      const rawTitle = currentLeg?.days?.[idx]?.title || '';
+      const cleanCity = currentLeg?.days?.[idx]?.to || '';
+      const isDefaultCityTitle = rawTitle && cleanCity && rawTitle.toLowerCase() === cleanCity.toLowerCase();
+      const isDayX = rawTitle && /^day\s+\d+$/i.test(rawTitle.trim());
+      const existingTitle = (isDefaultCityTitle || isDayX) ? '' : rawTitle;
       const existingDesc = currentLeg?.days?.[idx]?.desc || '';
-      const existingTitle = currentLeg?.days?.[idx]?.title || currentLeg?.days?.[idx]?.to || '';
       days.push({
         date: cur,
         dayIdx: idx,
@@ -789,10 +803,15 @@ function renderLegDayNotesList() {
     }
   } else if (currentLeg && Array.isArray(currentLeg.days) && currentLeg.days.length > 0) {
     currentLeg.days.forEach((d, idx) => {
+      const rawTitle = d.title || '';
+      const cleanCity = d.to || '';
+      const isDefaultCityTitle = rawTitle && cleanCity && rawTitle.toLowerCase() === cleanCity.toLowerCase();
+      const isDayX = rawTitle && /^day\s+\d+$/i.test(rawTitle.trim());
+      const existingTitle = (isDefaultCityTitle || isDayX) ? '' : rawTitle;
       days.push({
         date: d.date || '',
         dayIdx: idx,
-        title: d.title || d.to || '',
+        title: existingTitle,
         desc: d.desc || ''
       });
     });
@@ -841,28 +860,31 @@ function renderLegDayNotesList() {
 
     rowsHtml += `
       <tr class="leg-day-table-row border-b border-slate-100 dark:border-slate-800/80 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
-        <td class="py-1 px-1.5 align-middle text-center w-10 shrink-0">
-          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-300 font-mono">
+        <td class="leg-day-cell-num py-1 px-1.5 align-middle text-center sm:w-10 shrink-0">
+          <span class="leg-day-desktop-num inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-300 font-mono">
             ${idx + 1}
           </span>
+          <span class="leg-day-mobile-header hidden font-semibold text-xs text-slate-700 dark:text-slate-200">
+            #${idx + 1} • ${escapeHtmlText(formattedDate)}
+          </span>
         </td>
-        <td class="py-1 px-1.5 align-middle w-24 text-[11px] font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+        <td class="leg-day-cell-date py-1 px-1.5 align-middle sm:w-24 text-[11px] font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
           ${escapeHtmlText(formattedDate)}
         </td>
-        <td class="py-1 px-1.5 align-middle w-1/3">
+        <td class="leg-day-cell-title py-1 px-1.5 align-middle sm:w-1/3">
           <input type="text"
                  class="leg-day-title-row-input w-full bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 focus:border-teal-500 dark:focus:border-teal-400 focus:outline-none transition-colors"
                  data-day-index="${idx}"
-                 placeholder="City / Title..."
+                 placeholder="Day Label (e.g. Arrival, Tour)..."
                  value="${safeTitleVal}"
                  oninput="onLegDayTitleRowInput(${idx})"
                  onchange="onLegDayTitleRowChange(${idx})">
         </td>
-        <td class="py-1 px-1.5 align-middle w-1/2">
+        <td class="leg-day-cell-note py-1 px-1.5 align-middle sm:w-1/2">
           <input type="text"
                  class="leg-day-note-row-input w-full bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 focus:border-teal-500 dark:focus:border-teal-400 focus:outline-none transition-colors"
                  data-day-index="${idx}"
-                 placeholder="Notes & highlights..."
+                 placeholder="Notes & activity highlights..."
                  value="${safeNoteVal}"
                  oninput="onLegDayNoteRowInput(${idx})"
                  onchange="onLegDayNoteRowChange(${idx})">
@@ -875,10 +897,10 @@ function renderLegDayNotesList() {
     <table class="leg-day-notes-table w-full text-left">
       <thead>
         <tr class="bg-slate-100/90 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700 text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-          <th class="py-1.5 px-1.5 text-center w-10">#</th>
-          <th class="py-1.5 px-1.5 w-24">Date</th>
-          <th class="py-1.5 px-1.5 w-1/3">Title</th>
-          <th class="py-1.5 px-1.5 w-1/2">Note</th>
+          <th class="py-1.5 px-1.5 text-center sm:w-10">#</th>
+          <th class="py-1.5 px-1.5 sm:w-24">Date</th>
+          <th class="py-1.5 px-1.5 sm:w-1/3">Day Label</th>
+          <th class="py-1.5 px-1.5 sm:w-1/2">Notes & Highlights</th>
         </tr>
       </thead>
       <tbody>
@@ -1798,7 +1820,17 @@ function confirmAddLeg() {
       titleInputs.forEach((inp, tIdx) => {
         if (target.days && target.days[tIdx]) {
           const val = (inp.value || '').trim();
-          if (val) target.days[tIdx].title = val;
+          target.days[tIdx].title = val;
+        }
+      });
+    }
+
+    const noteInputs = document.querySelectorAll('.leg-day-note-row-input');
+    if (noteInputs && noteInputs.length > 0) {
+      noteInputs.forEach((inp, nIdx) => {
+        if (target.days && target.days[nIdx]) {
+          const val = (inp.value || '').trim();
+          target.days[nIdx].desc = val;
         }
       });
     }
@@ -1931,6 +1963,16 @@ function confirmAddLeg() {
         if (legPayload.days && legPayload.days[tIdx]) {
           const val = (inp.value || '').trim();
           if (val) legPayload.days[tIdx].title = val;
+        }
+      });
+    }
+
+    const noteInputs = document.querySelectorAll('.leg-day-note-row-input');
+    if (noteInputs && noteInputs.length > 0) {
+      noteInputs.forEach((inp, nIdx) => {
+        if (legPayload.days && legPayload.days[nIdx]) {
+          const val = (inp.value || '').trim();
+          if (val) legPayload.days[nIdx].desc = val;
         }
       });
     }

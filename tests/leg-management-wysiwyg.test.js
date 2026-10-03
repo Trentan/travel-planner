@@ -1029,8 +1029,11 @@ async function runLegManagementWysiwygSuite() {
   assert.ok(elements['legDayNotesList'].innerHTML.includes('<table class="leg-day-notes-table'), 'Renders 4-column table');
   assert.ok(elements['legDayNotesList'].innerHTML.includes('>#</th>'), 'Table contains # header');
   assert.ok(elements['legDayNotesList'].innerHTML.includes('>Date</th>'), 'Table contains Date header');
-  assert.ok(elements['legDayNotesList'].innerHTML.includes('>Title</th>'), 'Table contains Title header');
-  assert.ok(elements['legDayNotesList'].innerHTML.includes('>Note</th>'), 'Table contains Note header');
+  assert.ok(elements['legDayNotesList'].innerHTML.includes('>Day Label</th>'), 'Table contains Day Label header');
+  assert.ok(elements['legDayNotesList'].innerHTML.includes('>Notes & Highlights</th>'), 'Table contains Notes & Highlights header');
+  assert.ok(elements['legDayNotesList'].innerHTML.includes('placeholder="Day Label (e.g. Arrival, Tour)..."'), 'Contains Day Label placeholder');
+  assert.ok(elements['legDayNotesList'].innerHTML.includes('placeholder="Notes & activity highlights..."'), 'Contains Notes placeholder');
+  assert.ok(elements['legDayNotesList'].innerHTML.includes('leg-day-mobile-header'), 'Contains mobile header element');
 
   // Verify direct day.title change updates staged leg
   onLegDayTitleRowChange(0);
@@ -1043,10 +1046,19 @@ async function runLegManagementWysiwygSuite() {
     assert.ok(pagerHtml.includes('Vienna Central'), 'Day pager button reflects day.title');
   }
 
+  // Verify getCustomDayTitle filters raw city or Day X
+  if (typeof getCustomDayTitle === 'function') {
+    assert.strictEqual(getCustomDayTitle({ title: 'Arrival Day', to: 'Taipei' }), 'Arrival Day', 'Custom day label recognized');
+    assert.strictEqual(getCustomDayTitle({ title: 'Taipei', to: 'Taipei' }), '', 'Raw city not considered custom day label');
+    assert.strictEqual(getCustomDayTitle({ title: 'Day 1', to: 'Taipei' }), '', 'Day X not considered custom day label');
+  }
+
   // Test mode header, leg name, and arriving from / departing to in edit mode
   elements['editLegSelect'].value = '2'; // Vienna
   onEditLegSelectionChange();
-  assert.strictEqual(elements['citySelectionGroup'].style.display, 'none', 'citySelectionGroup hidden in edit mode');
+  assert.strictEqual(elements['citySelectionGroup'].style.display, 'block', 'citySelectionGroup shown in edit mode per Issue #431');
+  assert.strictEqual(elements['existingCitySelect'].disabled, true, 'existingCitySelect disabled in edit mode');
+  assert.strictEqual(elements['toggleNewCityBtn'].style.display, 'none', 'toggleNewCityBtn hidden in edit mode');
   assert.strictEqual(elements['legEditorModeTitle'].textContent, 'Edit Leg', 'Mode title displays Edit Leg');
   assert.ok(elements['legEditorLegName'].textContent.includes('Vienna'), 'Leg name contains Vienna');
   assert.ok(elements['legOriginHelperCity'].textContent.length > 0, 'Arriving from city is computed');

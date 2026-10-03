@@ -727,6 +727,21 @@ function renderJourneySubLocationTextHtml(text) {
   `;
 }
 
+function getCustomDayTitle(day, targetCity = '') {
+  if (!day || !day.title) return '';
+  const title = String(day.title).trim();
+  if (!title) return '';
+  if (/^day\s*\d+$/i.test(title)) return '';
+  const city = String(targetCity || day.to || day.from || '').trim();
+  if (city && title.toLowerCase() === city.toLowerCase()) return '';
+  if (typeof cleanCityNavLabel === 'function') {
+    const cleanT = cleanCityNavLabel(title);
+    const cleanC = cleanCityNavLabel(city);
+    if (cleanT && cleanC && cleanT.toLowerCase() === cleanC.toLowerCase()) return '';
+  }
+  return title;
+}
+
 function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysByJourneyIdMap) {
   const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
   const useGroupedView = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped';
@@ -817,7 +832,14 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
   let routeLabel = (isTravelDay || hasTravelJourney)
     ? `${fromCity}${travelIcon ? ` ${travelIcon}` : ''} -> ${toCity}`
     : `${inboundIcon ? `${inboundIcon} ` : ''}${cityCore}${outboundIcon ? ` ${outboundIcon}` : ''}`;
-  if (day.title) {
+  const customDayTitle = getCustomDayTitle(day, cityCore || toCity);
+  if (customDayTitle) {
+    if (customDayTitle.toLowerCase().includes(String(cityCore || toCity || '').toLowerCase())) {
+      routeLabel = customDayTitle;
+    } else {
+      routeLabel = `${routeLabel} • ${customDayTitle}`;
+    }
+  } else if (day.title && !/^day\s*\d+$/i.test(String(day.title).trim())) {
     routeLabel = day.title;
   }
   const slideId = getCompactDaySlideId(leg.id, dayIdx);
@@ -3511,6 +3533,15 @@ function buildItinerary() {
 
     leg.days.forEach((day, dayIndex) => {
       const cityHTML = day.from === day.to ? `<span class="city-same">${day.from}</span>` : `${day.from} <span style="opacity:0.4">→</span> ${day.to}`;
+      const customDayTitle = getCustomDayTitle(day, day.to);
+      let dayHeadingHtml = cityHTML;
+      if (customDayTitle) {
+        if (customDayTitle.toLowerCase().includes(String(day.to || '').toLowerCase())) {
+          dayHeadingHtml = `<span class="day-custom-title font-semibold text-slate-800 dark:text-slate-200">${escapeHtmlText(customDayTitle)}</span>`;
+        } else {
+          dayHeadingHtml = `${cityHTML} <span class="day-title-separator text-slate-400 dark:text-slate-500 mx-1.5 font-normal">•</span> <span class="day-custom-title font-medium text-teal-700 dark:text-teal-300">${escapeHtmlText(customDayTitle)}</span>`;
+        }
+      }
       const dayTotal = getDayTotal(day);
 
       // Get journeys for this day
@@ -3530,7 +3561,7 @@ function buildItinerary() {
       <div class="day-card group flex flex-col mb-4 overflow-hidden bg-white/90 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 rounded-xl shadow-sm transition-all duration-300 ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
         <div class="day-bar flex items-center p-3 sm:p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors relative" style="border-left: 5px solid var(--leg-colour, ${escapeHtmlText(leg.colour)})" onclick="toggleCard(this)">
           <div class="day-date w-16 sm:w-20 shrink-0 text-center flex flex-col items-center justify-center border-r border-slate-200 dark:border-slate-700 pr-3 sm:pr-4 mr-3 sm:mr-4"><span class="day-num text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">${dayDateLabel}</span><span class="day-name text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${day.day}</span>${dayMetrics.globalDayIndex ? `<span class="day-trip-num text-[0.7rem] font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/40 px-1.5 py-0.5 rounded mt-1 border border-teal-200 dark:border-teal-800" title="Trip Day ${dayMetrics.globalDayIndex} of ${dayMetrics.totalTripDays}">#${dayMetrics.globalDayIndex}</span>` : ''}</div>
-          <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${cityHTML}</div>${stayingHeadingNote}<div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
+          <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${dayHeadingHtml}</div>${stayingHeadingNote}<div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
           ${dayTotal ? `<div class="day-total-cost hidden sm:flex shrink-0 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-full border border-slate-200 dark:border-slate-600 shadow-inner mr-4" title="Total estimated cost for the day">${dayTotal}</div>` : ''}<span class="day-chevron shrink-0 w-8 h-8 flex items-center justify-center text-slate-400 transition-transform duration-300 bg-slate-100 dark:bg-slate-700/50 rounded-full group-[.open]:rotate-180">▼</span>
         </div>
         <div class="day-detail hidden group-[.open]:block border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 p-4 sm:p-5"><div class="day-planner-shell day-planner-shell-${dayViewMode}">
@@ -4576,6 +4607,7 @@ window.findItineraryPositionForDate = findItineraryPositionForDate;
 window.getCurrentTripPosition = getCurrentTripPosition;
 window.applyCurrentTripPositionForTab = applyCurrentTripPositionForTab;
 window.initializeItineraryPositionForToday = initializeItineraryPositionForToday;
+window.getCustomDayTitle = getCustomDayTitle;
 
 // Expand to show a city in the itinerary
 function expandToCity(cityId) {
