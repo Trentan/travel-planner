@@ -64,6 +64,33 @@
     @apply border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400;
   }
 
+  :where([data-theme="dark"], [data-theme="dark"] *) .json-write-warning {
+    background-color: #3b2a0c !important;
+    border-bottom-color: #78350f !important;
+    color: #fef3c7 !important;
+  }
+
+  :where([data-theme="dark"], [data-theme="dark"] *) .json-write-warning-btn {
+    background-color: #1e293b !important;
+    border-color: #475569 !important;
+    color: #f1f5f9 !important;
+  }
+
+  :where([data-theme="dark"], [data-theme="dark"] *) .json-write-warning-btn-secondary {
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+  }
+
+  /* Tab-aware city nav: visible only on itinerary and accom */
+  body[data-active-tab="transport"] #cityNav,
+  body[data-active-tab="packing"] #cityNav,
+  body[data-active-tab="map"] #cityNav,
+  body[data-active-tab="budget"] #cityNav,
+  body[data-active-tab="guide"] #cityNav,
+  #cityNav.tab-hidden {
+    display: none !important;
+  }
+
   /* Danger action button */
   .action-btn-danger {
     @apply bg-rose-500 text-white border-rose-500
@@ -1788,17 +1815,16 @@
       bottom: 0 !important;
       top: auto !important;
       z-index: 320;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
+      display: flex !important;
+      align-items: stretch !important;
       border-top: 1px solid rgba(148, 163, 184, 0.32);
       border-bottom: none;
       background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      height: calc(4.15rem + env(safe-area-inset-bottom, 0px));
+      height: calc(3.65rem + env(safe-area-inset-bottom, 0px));
       padding-bottom: env(safe-area-inset-bottom, 0px);
-      padding-inline: 0.5rem;
+      padding-inline: 0.15rem;
       box-sizing: border-box;
       -webkit-transform: translateZ(0);
       transform: translateZ(0);
@@ -1807,12 +1833,27 @@
     body.mobile-app-mode .app-tabs-list {
       min-width: 0;
       width: 100%;
+      display: grid !important;
+      grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+      align-items: stretch !important;
+      gap: 1px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow-x: hidden !important;
     }
 
     body.mobile-app-mode .app-tabs-content {
       padding-top: 0.35rem !important;
       margin-top: 0 !important;
-      padding-bottom: calc(8.2rem + env(safe-area-inset-bottom, 0px));
+      padding-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    body.mobile-app-mode[data-active-tab="transport"] .app-tabs-content,
+    body.mobile-app-mode[data-active-tab="packing"] .app-tabs-content,
+    body.mobile-app-mode[data-active-tab="map"] .app-tabs-content,
+    body.mobile-app-mode[data-active-tab="budget"] .app-tabs-content,
+    body.mobile-app-mode[data-active-tab="guide"] .app-tabs-content {
+      padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)) !important;
     }
 
     [data-theme="dark"] body.mobile-app-mode .app-tabs-nav {
@@ -1826,7 +1867,7 @@
       left: 0;
       right: 0;
       top: auto !important;
-      bottom: calc(4.15rem + env(safe-area-inset-bottom, 0px)) !important;
+      bottom: calc(3.65rem + env(safe-area-inset-bottom, 0px)) !important;
       z-index: 321;
       border-top: 1px solid rgba(148, 163, 184, 0.26);
       border-bottom: 1px solid rgba(148, 163, 184, 0.26);
@@ -2154,15 +2195,70 @@
       font-size: var(--m-font-xs);
     }
 
-    body.mobile-app-mode .app-tab-btn {
-      padding: 0.65rem 0.8rem;
-      font-size: var(--m-font-sm);
-      gap: 0.4rem;
-      min-height: 2.75rem;
+    body.mobile-app-mode .app-tab-btn,
+    body.mobile-app-mode .mobile-tabs-menu-btn {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0.25rem 0.125rem !important;
+      min-width: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: unset !important;
+      text-align: center !important;
+      border: none !important;
+      border-bottom: none !important;
+      border-radius: 0.5rem !important;
+      background: transparent !important;
+      color: #64748b !important;
+      box-sizing: border-box !important;
+      transition: all 0.15s ease-in-out !important;
     }
 
     body.mobile-app-mode .tab-icon {
-      @apply text-[1.16rem];
+      font-size: 1.15rem !important;
+      line-height: 1.1 !important;
+    }
+
+    body.mobile-app-mode .tab-label {
+      font-size: 10px !important;
+      line-height: 1.1 !important;
+      font-weight: 500 !important;
+      max-width: 100% !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      margin-top: 1px !important;
+      display: block !important;
+    }
+
+    body.mobile-app-mode .app-tab-btn:hover,
+    body.mobile-app-mode .mobile-tabs-menu-btn:hover {
+      background: rgba(15, 23, 42, 0.04) !important;
+      color: #0f172a !important;
+    }
+
+    body.mobile-app-mode .app-tab-btn.active {
+      color: #0d9488 !important;
+      background: rgba(13, 148, 136, 0.08) !important;
+      font-weight: 600 !important;
+    }
+
+    [data-theme="dark"] body.mobile-app-mode .app-tab-btn,
+    [data-theme="dark"] body.mobile-app-mode .mobile-tabs-menu-btn {
+      color: #94a3b8 !important;
+    }
+
+    [data-theme="dark"] body.mobile-app-mode .app-tab-btn:hover,
+    [data-theme="dark"] body.mobile-app-mode .mobile-tabs-menu-btn:hover {
+      background: rgba(255, 255, 255, 0.05) !important;
+      color: #f8fafc !important;
+    }
+
+    [data-theme="dark"] body.mobile-app-mode .app-tab-btn.active {
+      color: #2dd4bf !important;
+      background: rgba(45, 212, 191, 0.12) !important;
     }
 
     body.mobile-app-mode .city-nav-btn {

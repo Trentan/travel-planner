@@ -161,6 +161,25 @@ function syncResponsiveUi() {
   isCompactView = mobile;
   document.body.classList.toggle('compact-view-mode', isCompactView);
   window.isCompactView = isCompactView;
+  const activeTabBtn = document.querySelector ? document.querySelector('.app-tab-btn.active') : null;
+  const activeTabId = (activeTabBtn && typeof activeTabBtn.getAttribute === 'function' ? activeTabBtn.getAttribute('data-tab') : '') || 'itinerary';
+  if (document.body && typeof document.body.getAttribute === 'function' && !document.body.getAttribute('data-active-tab')) {
+    if (typeof document.body.setAttribute === 'function') {
+      document.body.setAttribute('data-active-tab', activeTabId);
+    }
+  }
+  const cityNavEl = document.getElementById ? document.getElementById('cityNav') : null;
+  if (cityNavEl) {
+    if (typeof cityNavEl.getAttribute === 'function' && !cityNavEl.getAttribute('data-active-tab')) {
+      if (typeof cityNavEl.setAttribute === 'function') {
+        cityNavEl.setAttribute('data-active-tab', activeTabId);
+      }
+    }
+    if (cityNavEl.classList && typeof cityNavEl.classList.toggle === 'function') {
+      cityNavEl.classList.toggle('tab-hidden', !['itinerary', 'accom'].includes(activeTabId));
+    }
+  }
+
   updateStickyOffsets();
   syncMobileMenuControls();
   syncMobileMenuStatus();
@@ -555,6 +574,19 @@ function toggleEditMode() {
 }
 
 function switchTab(tabId, btnElement) {
+  if (document.body && typeof document.body.setAttribute === 'function') {
+    document.body.setAttribute('data-active-tab', tabId);
+  }
+  const cityNav = document.getElementById ? document.getElementById('cityNav') : null;
+  if (cityNav) {
+    if (typeof cityNav.setAttribute === 'function') {
+      cityNav.setAttribute('data-active-tab', tabId);
+    }
+    if (cityNav.classList && typeof cityNav.classList.toggle === 'function') {
+      cityNav.classList.toggle('tab-hidden', !['itinerary', 'accom'].includes(tabId));
+    }
+  }
+
   document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.app-tab-btn').forEach(el => el.classList.remove('active'));
   const pane = document.getElementById('tab-' + tabId);
@@ -591,6 +623,7 @@ function switchTab(tabId, btnElement) {
   if (tabId === 'packing' && typeof buildPackingTab === 'function') buildPackingTab();
   if (tabId === 'map' && typeof buildJourneyMap === 'function') buildJourneyMap();
   if (tabId === 'guide' && typeof buildGuideSteps === 'function') buildGuideSteps();
+  updateStickyOffsets();
 
   if (window.innerWidth <= 768) {
     requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }));

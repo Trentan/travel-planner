@@ -46,9 +46,136 @@
 }
 
 @media (max-width: 768px) {
-  .mobile-menu-btn,
-  .mobile-tabs-menu-btn {
+  .mobile-menu-btn {
     display: inline-flex !important;
+  }
+
+  .mobile-tabs-menu-btn {
+    display: flex !important;
+  }
+
+  /* Compact JSON write warning on mobile */
+  .json-write-warning {
+    padding: 0.35rem 0.65rem !important;
+    gap: 0.35rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .json-write-warning-text {
+    font-size: 0.75rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .json-write-warning-actions {
+    gap: 0.35rem !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .json-write-warning-btn {
+    min-height: 1.75rem !important;
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.72rem !important;
+    border-radius: 0.375rem !important;
+    line-height: 1.1 !important;
+  }
+
+  /* Modern Mobile Bottom Navigation with Micro-Labels */
+  .app-tabs-nav {
+    position: fixed !important;
+    left: 0;
+    right: 0;
+    bottom: 0 !important;
+    top: auto !important;
+    z-index: 320;
+    border-top: 1px solid rgba(148, 163, 184, 0.28);
+    border-bottom: none;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    height: calc(3.65rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-inline: 0.15rem;
+    box-sizing: border-box;
+    display: flex !important;
+    align-items: stretch !important;
+  }
+
+  .app-tabs-list {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    width: 100% !important;
+    height: 100% !important;
+    align-items: stretch !important;
+    gap: 1px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .app-tab-btn,
+  .mobile-tabs-menu-btn {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.25rem 0.125rem !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: unset !important;
+    text-align: center !important;
+    border: none !important;
+    border-bottom: none !important;
+    border-radius: 0.5rem !important;
+    background: transparent !important;
+    color: #64748b !important;
+    box-sizing: border-box !important;
+    transition: all 0.15s ease-in-out !important;
+  }
+
+  .app-tab-btn .tab-icon,
+  .mobile-tabs-menu-btn .tab-icon {
+    font-size: 1.15rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .app-tab-btn .tab-label,
+  .mobile-tabs-menu-btn .tab-label {
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+    font-weight: 500 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    margin-top: 1px !important;
+    display: block !important;
+  }
+
+  .app-tab-btn:hover,
+  .mobile-tabs-menu-btn:hover {
+    background: rgba(15, 23, 42, 0.04) !important;
+    color: #0f172a !important;
+  }
+
+  .app-tab-btn.active {
+    color: #0d9488 !important;
+    background: rgba(13, 148, 136, 0.08) !important;
+    font-weight: 600 !important;
+  }
+
+  /* Bottom Scroll Clearance */
+  .app-tabs-content {
+    padding-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  body[data-active-tab="transport"] .app-tabs-content,
+  body[data-active-tab="packing"] .app-tabs-content,
+  body[data-active-tab="map"] .app-tabs-content,
+  body[data-active-tab="budget"] .app-tabs-content,
+  body[data-active-tab="guide"] .app-tabs-content {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   /* Make accommodation, transport, activity items compact and fit evenly in their panels on mobile */

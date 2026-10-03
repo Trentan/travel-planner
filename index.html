@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
-<body>
+<body data-active-tab="itinerary">
 <div class="mobile-status-bar-overlay" aria-hidden="true"></div>
 
 <div class="app-menu-bar">
@@ -172,36 +172,37 @@
 </header>
 
 <main>
-<div class="app-tabs-nav">
+  <div class="app-tabs-nav">
     <div class="app-tabs-list hide-scrollbar">
       <button class="app-tab-btn active" data-tab="itinerary" onclick="switchTab('itinerary', this)" aria-label="Itinerary" title="Itinerary">
-        <span class="tab-icon text-lg md:text-base">🗓️</span>
-        <span class="tab-label hidden sm:inline">Itinerary</span>
+        <span class="tab-icon text-base sm:text-lg md:text-base">🗓️</span>
+        <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Itinerary</span>
       </button>
-      <button class="app-tab-btn" data-tab="transport" onclick="switchTab('transport', this)" aria-label="Transport" title="Transport">
-        <span class="tab-icon text-lg md:text-base">✈️</span>
-        <span class="tab-label hidden sm:inline">Transport</span>
+      <button class="app-tab-btn" data-tab="transport" onclick="switchTab('transport', this)" aria-label="Transit" title="Transit">
+        <span class="tab-icon text-base sm:text-lg md:text-base">✈️</span>
+        <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Transit</span>
       </button>
-      <button class="app-tab-btn" data-tab="accom" onclick="switchTab('accom', this)" aria-label="Accommodation" title="Accommodation">
-        <span class="tab-icon text-lg md:text-base">🏨</span>
-        <span class="tab-label hidden sm:inline">Accommodation</span>
+      <button class="app-tab-btn" data-tab="accom" onclick="switchTab('accom', this)" aria-label="Stays" title="Stays">
+        <span class="tab-icon text-base sm:text-lg md:text-base">🏨</span>
+        <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Stays</span>
       </button>
       <button class="app-tab-btn" data-tab="budget" onclick="switchTab('budget', this)" aria-label="Budget" title="Budget">
-        <span class="tab-icon text-lg md:text-base">💰</span>
-        <span class="tab-label hidden sm:inline">Budget</span>
+        <span class="tab-icon text-base sm:text-lg md:text-base">💰</span>
+        <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Budget</span>
       </button>
       <button class="app-tab-btn" data-tab="packing" onclick="switchTab('packing', this)" aria-label="Packing" title="Packing">
-        <span class="tab-icon text-lg md:text-base">🧳</span>
-        <span class="tab-label hidden sm:inline">Packing</span>
+        <span class="tab-icon text-base sm:text-lg md:text-base">🧳</span>
+        <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Packing</span>
       </button>
       <button class="app-tab-btn" data-tab="map" onclick="switchTab('map', this)" aria-label="Map" title="Map">
-        <span class="tab-icon text-lg md:text-base">🗺️</span>
-        <span class="tab-label hidden sm:inline">Map</span>
+        <span class="tab-icon text-base sm:text-lg md:text-base">🗺️</span>
+        <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Map</span>
+      </button>
+      <button class="mobile-tabs-menu-btn app-tab-btn" type="button" onclick="syncMenuEditToggleLabels(); toggleMobileMenu()" aria-label="Menu" title="Menu">
+        <span class="tab-icon text-base sm:text-lg md:text-base">☰</span>
+        <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Menu</span>
       </button>
     </div>
-    <button class="mobile-tabs-menu-btn" type="button" onclick="syncMenuEditToggleLabels(); toggleMobileMenu()" aria-label="Open menu">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-    </button>
   </div>
     <nav id="cityNav" class="city-nav transition-transform duration-300 translate-y-0">
     <div class="city-nav-list hide-scrollbar">

@@ -1043,7 +1043,7 @@
     }
 
     .app-tab-btn {
-      @apply px-3.5 py-3 text-[0.86rem];
+      @apply flex flex-col items-center justify-center py-1 px-1 min-w-0 text-center;
     }
 
     #tab-packing .packing-guides-shell {
