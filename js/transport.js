@@ -262,27 +262,117 @@ function getLocationCodeDisplay(locationName) {
 function getLocationCodeText(locationName) {
   if (!locationName) return '---';
 
-  const normalized = String(locationName).trim();
-  if (!normalized) return '---';
+  const raw = String(locationName).trim();
+  if (!raw) return '---';
 
-  const tripCity = typeof citiesData !== 'undefined'
-      ? citiesData.find(c => c.name && c.name.toLowerCase() === normalized.toLowerCase())
-      : null;
-  if (tripCity && tripCity.code) return tripCity.code.toUpperCase();
+  // 1. Explicit IATA code in parentheses: e.g. "Brisbane (BNE)", "(BNE)", "Denpasar (DPS / WADD)", "Home (Brisbane - BNE)"
+  const parenMatches = raw.match(/\(([^)]+)\)/g);
+  if (parenMatches) {
+    for (const pm of parenMatches) {
+      const inner = pm.slice(1, -1).trim();
+      const candidateCodes = inner.match(/\b([A-Za-z]{3})\b/g);
+      if (candidateCodes) {
+        for (const cc of candidateCodes) {
+          const upperCc = cc.toUpperCase();
+          const inAll = typeof ALL_CITIES_BY_CODE_MAP !== 'undefined' && ALL_CITIES_BY_CODE_MAP.has(upperCc);
+          const inDb = typeof CITY_DATABASE !== 'undefined' && Array.isArray(CITY_DATABASE) && CITY_DATABASE.some(c => (c.code || '').toUpperCase() === upperCc);
+          const inTrip = typeof citiesData !== 'undefined' && Array.isArray(citiesData) && citiesData.some(c => (c.code || c.iata || '').toUpperCase() === upperCc);
+          if (inAll || inDb || inTrip) {
+            return upperCc;
+          }
+        }
+        return candidateCodes[0].toUpperCase();
+      }
+    }
+  }
 
-  const dbCity = typeof CITY_DATABASE !== 'undefined'
-      ? CITY_DATABASE.find(c => c.name && c.name.toLowerCase() === normalized.toLowerCase())
-      : null;
-  if (dbCity && dbCity.code) return dbCity.code.toUpperCase();
+  // Remove leading emojis/symbols/flags/brackets
+  const clean = raw
+    .replace(/^[\p{Emoji}\p{Symbol}\s]+/u, '')
+    .replace(/\s*\(trip (start|finish|end)\)/i, '')
+    .trim() || raw;
+  const cleanLower = clean.toLowerCase();
 
-  return normalized.replace(/[^a-z0-9]/gi, '').substring(0, 3).toUpperCase() || '---';
+  // Handle 'Home' city resolution
+  if (cleanLower === 'home') {
+    if (typeof getHomeLocation === 'function') {
+      const home = getHomeLocation();
+      const realHomeCity = home && (home.departure || home.return);
+      if (realHomeCity && realHomeCity.toLowerCase() !== 'home') {
+        const homeCode = getLocationCodeText(realHomeCity);
+        if (homeCode && homeCode !== '---') return homeCode;
+      }
+    }
+  }
+
+  // 2. If locationName itself is already a 3-letter IATA code (e.g., BNE, VIE, DPS, TPE)
+  if (/^[A-Za-z]{3}$/.test(clean)) {
+    const codeUpper = clean.toUpperCase();
+    const inTrip = typeof citiesData !== 'undefined' && Array.isArray(citiesData) &&
+      citiesData.some(c => (c.code || c.iata || '').toUpperCase() === codeUpper);
+    const inAll = typeof ALL_CITIES_BY_CODE_MAP !== 'undefined' && ALL_CITIES_BY_CODE_MAP.has(codeUpper);
+    const inDb = typeof CITY_DATABASE !== 'undefined' && Array.isArray(CITY_DATABASE) && CITY_DATABASE.some(c => (c.code || '').toUpperCase() === codeUpper);
+    if (inTrip || inAll || inDb) {
+      return codeUpper;
+    }
+  }
+
+  // 3. Match a trip city in citiesData with city.code (length 3)
+  if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+    const tripCity = citiesData.find(c => c && c.name && (c.name.toLowerCase() === cleanLower || c.name.toLowerCase() === raw.toLowerCase()));
+    if (tripCity && (tripCity.code || tripCity.iata)) {
+      const c = String(tripCity.code || tripCity.iata).trim().toUpperCase();
+      if (c.length === 3) return c;
+    }
+  }
+
+  // 4. Call getCityIataCode(locationName)
+  if (typeof getCityIataCode === 'function') {
+    const iata = getCityIataCode(clean) || getCityIataCode(raw);
+    if (iata && iata.length === 3) return iata.toUpperCase();
+  }
+
+  // 5. Check ALL_CITIES (via ALL_CITIES_BY_NAME_MAP or ALL_CITIES_BY_CODE_MAP)
+  if (typeof ALL_CITIES_BY_NAME_MAP !== 'undefined') {
+    const matches = ALL_CITIES_BY_NAME_MAP.get(cleanLower) || ALL_CITIES_BY_NAME_MAP.get(raw.toLowerCase());
+    if (matches && matches.length > 0 && matches[0].code && matches[0].code.length === 3) {
+      return matches[0].code.toUpperCase();
+    }
+  }
+
+  // 6. Check CITY_ALIASES / database match
+  if (typeof getCityAliasMatch === 'function') {
+    const aliasMatch = getCityAliasMatch(clean) || getCityAliasMatch(raw);
+    if (aliasMatch && aliasMatch.code && aliasMatch.code.length === 3) {
+      return aliasMatch.code.toUpperCase();
+    }
+  }
+
+  // 7. Check CITY_DATABASE
+  if (typeof CITY_DATABASE !== 'undefined' && Array.isArray(CITY_DATABASE)) {
+    const dbCity = CITY_DATABASE.find(c => c && c.name && (c.name.toLowerCase() === cleanLower || c.name.toLowerCase() === raw.toLowerCase()));
+    if (dbCity && dbCity.code && dbCity.code.length === 3) {
+      return dbCity.code.toUpperCase();
+    }
+  }
+
+  // 8. If clean is 3 letters (even if uncatalogued code), return directly
+  if (/^[A-Za-z]{3}$/.test(clean)) {
+    return clean.toUpperCase();
+  }
+
+  // 9. Fallback to substring prefix as an absolute last resort
+  return clean.replace(/[^a-zA-Z0-9]/g, '').substring(0, 3).toUpperCase() || '---';
 }
 
 function getLocationCodeNameText(locationName) {
   const name = String(locationName || '').trim();
   if (!name) return '';
   const code = getLocationCodeText(name);
-  return code && code !== '---' ? `${code} - ${name}` : name;
+  if (!code || code === '---') return name;
+  if (name.toUpperCase() === code) return code;
+  if (name.includes(`(${code})`)) return name;
+  return `${code} - ${name}`;
 }
 
 function buildRouteCodeChain(segments) {

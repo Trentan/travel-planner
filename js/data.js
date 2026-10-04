@@ -1003,7 +1003,7 @@ const EXTENDED_CITY_DATABASE = [
 { code: 'NBO', name: 'Nairobi', countryCode: 'KE', timezone: 'Africa/Nairobi' },
 { code: 'JNB', name: 'Johannesburg', countryCode: 'ZA', timezone: 'Africa/Johannesburg' },
 { code: 'CPT', name: 'Cape Town', countryCode: 'ZA', timezone: 'Africa/Johannesburg' },
-{ code: 'DPS', name: 'Denpasar Bali', countryCode: 'ID', timezone: 'Asia/Makassar', lat: -8.6705, lng: 115.2126 },
+{ code: 'DPS', icaoCode: 'WADD', name: 'Denpasar', countryCode: 'ID', timezone: 'Asia/Makassar', lat: -8.6705, lng: 115.2126 },
 { code: 'CGK', name: 'Jakarta', countryCode: 'ID', timezone: 'Asia/Jakarta', lat: -6.2088, lng: 106.8456 },
 { code: 'SUB', name: 'Surabaya', countryCode: 'ID', timezone: 'Asia/Jakarta', lat: -7.2575, lng: 112.7521 },
 { code: 'RGN', name: 'Yangon', countryCode: 'MM', timezone: 'Asia/Yangon', lat: 16.8661, lng: 96.1951 },
@@ -1036,7 +1036,7 @@ const CITY_DATABASE = [
   { code: 'AUH', icaoCode: 'OMAA', name: 'Abu Dhabi', countryCode: 'AE', timezone: 'Asia/Dubai', lat: 24.4539, lng: 54.3773 },
   { code: 'AMS', icaoCode: 'EHAM', name: 'Amsterdam', countryCode: 'NL', timezone: 'Europe/Amsterdam', lat: 52.3676, lng: 4.9041 },
   { code: 'ATH', icaoCode: 'LGAV', name: 'Athens', countryCode: 'GR', timezone: 'Europe/Athens', lat: 37.9838, lng: 23.7275 },
-  { code: 'DPS', icaoCode: 'WADD', name: 'Bali', countryCode: 'ID', timezone: 'Asia/Makassar', lat: -8.4095, lng: 115.1889 },
+  { code: 'DPS', icaoCode: 'WADD', name: 'Denpasar', countryCode: 'ID', timezone: 'Asia/Makassar', lat: -8.6705, lng: 115.2126 },
   { code: 'BCN', icaoCode: 'LEBL', name: 'Barcelona', countryCode: 'ES', timezone: 'Europe/Madrid', lat: 41.3851, lng: 2.1734 },
   { code: 'BKK', icaoCode: 'VTBS', name: 'Bangkok', countryCode: 'TH', timezone: 'Asia/Bangkok', lat: 13.7563, lng: 100.5018 },
   { code: 'PEK', icaoCode: 'ZBAA', name: 'Beijing', countryCode: 'CN', timezone: 'Asia/Shanghai', lat: 39.9042, lng: 116.4074 },
@@ -2063,17 +2063,17 @@ const CITY_ALIASES = {
   'chennai': 'Chennai',
   'tokio': 'Tokyo',
   'krung thep': 'Bangkok',
-  'bali': 'Bali',
-  'denpasar': 'Denpasar Bali',
-  'denpasar bali': 'Denpasar Bali',
-  'dps': 'Bali',
-  'seminyak': 'Bali',
-  'canggu': 'Bali',
-  'ubud': 'Bali',
-  'kuta': 'Bali',
-  'sanur': 'Bali',
-  'uluwatu': 'Bali',
-  'nusa dua': 'Bali',
+  'bali': 'Denpasar',
+  'denpasar': 'Denpasar',
+  'denpasar bali': 'Denpasar',
+  'dps': 'Denpasar',
+  'seminyak': 'Denpasar',
+  'canggu': 'Denpasar',
+  'ubud': 'Denpasar',
+  'kuta': 'Denpasar',
+  'sanur': 'Denpasar',
+  'uluwatu': 'Denpasar',
+  'nusa dua': 'Denpasar',
 
   // Middle East
   'dubayy': 'Dubai',
@@ -2594,7 +2594,9 @@ async function triggerOnlineSearch(cityId) {
   if (result) {
     applyCityLocation(city, result);
     saveData(true);
-    populateCityList();
+    if (typeof populateCityList === 'function') populateCityList();
+    if (typeof buildNav === 'function') buildNav();
+    if (typeof buildItinerary === 'function') buildItinerary();
     if (typeof buildJourneyMap === 'function') buildJourneyMap();
   } else {
     alert(`Could not find coordinates for "${city.name}" online.`);
@@ -2785,12 +2787,22 @@ function getCountryName(countryCode) {
 // Get country flag by code
 function getCountryFlag(countryCode) {
   if (!countryCode) return '';
+  const code = String(countryCode).trim().toUpperCase();
   // First check built-in countries
-  const country = COUNTRY_DATA.find(c => c.code === countryCode.toUpperCase());
-  if (country) return country.flag;
+  if (typeof COUNTRY_DATA !== 'undefined' && Array.isArray(COUNTRY_DATA)) {
+    const country = COUNTRY_DATA.find(c => c && c.code === code);
+    if (country && country.flag) return country.flag;
+  }
   // Then check user countries
-  const userCountry = userCountries.find(c => c.code === countryCode.toUpperCase());
-  if (userCountry) return userCountry.flag;
+  if (typeof userCountries !== 'undefined' && Array.isArray(userCountries)) {
+    const userCountry = userCountries.find(c => c && c.code === code);
+    if (userCountry && userCountry.flag) return userCountry.flag;
+  }
+  // If valid 2-letter ISO code, dynamically produce Unicode regional indicator flag
+  if (code.length === 2 && /^[A-Z]{2}$/.test(code)) {
+    const emoji = typeof getCountryFlagEmoji === 'function' ? getCountryFlagEmoji(code) : '';
+    if (emoji) return emoji;
+  }
   return '🌐';
 }
 
@@ -3038,6 +3050,10 @@ const COUNTRY_FLAGS = {
   'Austria': '🇦🇹',
   'Bangkok': '🇹🇭',  // Thailand
   'Thailand': '🇹🇭',
+  'Indonesia': '🇮🇩',
+  'Denpasar': '🇮🇩',
+  'Denpasar Bali': '🇮🇩',
+  'Bali': '🇮🇩',
   'Bratislava': '🇸🇰', // Slovakia
   'Slovakia': '🇸🇰',
   'Brisbane': '🇦🇺',
@@ -3094,6 +3110,7 @@ const CITY_TO_CODE = {
   'australia': 'au', 'brisbane': 'au',
   'austria': 'at', 'vienna': 'at', 'innsbruck': 'at',
   'thailand': 'th', 'bangkok': 'th', 'kohsamui': 'th', 'samui': 'th',
+  'indonesia': 'id', 'denpasar': 'id', 'denpasarbali': 'id', 'bali': 'id',
   'slovakia': 'sk', 'bratislava': 'sk',
   'czechrepublic': 'cz', 'czechia': 'cz', 'prague': 'cz',
   'germany': 'de', 'munich': 'de', 'nuremberg': 'de',
@@ -3121,6 +3138,7 @@ const COUNTRY_TO_CODE = {
   'Australia': 'AU',
   'Austria': 'AT',
   'Thailand': 'TH',
+  'Indonesia': 'ID',
   'Slovakia': 'SK',
   'Czech Republic': 'CZ',
   'Czechia': 'CZ',
@@ -3155,26 +3173,59 @@ for (const [cName, cFlag] of Object.entries(COUNTRY_FLAGS)) {
 // Get flag emoji for a city (based on city name or country)
 function getCityFlag(cityName) {
   if (!cityName) return '📍';
+  const nameTrimmed = String(cityName).trim();
+  if (!nameTrimmed) return '📍';
 
-  // Get country from city mapping or direct match
-  let country = null;
-  if (COUNTRY_FLAGS[cityName]) {
-    // Direct city match - reverse lookup country
-    const flag = COUNTRY_FLAGS[cityName];
-    country = FLAG_TO_COUNTRY_MAP.get(flag) || null;
-    // Return original emoji
-    return flag;
+  // 1. If COUNTRY_FLAGS[cityName], return it
+  if (COUNTRY_FLAGS[nameTrimmed]) {
+    return COUNTRY_FLAGS[nameTrimmed];
+  }
+  const nameLower = nameTrimmed.toLowerCase();
+  const cfKey = Object.keys(COUNTRY_FLAGS).find(k => k.toLowerCase() === nameLower);
+  if (cfKey && COUNTRY_FLAGS[cfKey]) {
+    return COUNTRY_FLAGS[cfKey];
   }
 
-  // Check citiesData for country
-  const city = citiesData.find(c => c.name === cityName);
-  if (city && city.country) {
-    country = city.country;
-    if (COUNTRY_FLAGS[country]) {
-      return COUNTRY_FLAGS[country];
+  // 2 & 3. Check citiesData
+  if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+    const city = citiesData.find(c => c && c.name && (c.name.toLowerCase() === nameLower || c.name === nameTrimmed));
+    if (city) {
+      if (city.countryCode) {
+        const flag = getCountryFlag(city.countryCode) || (typeof getCountryFlagEmoji === 'function' ? getCountryFlagEmoji(city.countryCode) : '');
+        if (flag && flag !== '🌐') return flag;
+      }
+      if (city.country) {
+        if (COUNTRY_FLAGS[city.country]) {
+          return COUNTRY_FLAGS[city.country];
+        }
+        if (typeof COUNTRY_DATA !== 'undefined' && Array.isArray(COUNTRY_DATA)) {
+          const countryMatch = COUNTRY_DATA.find(c => c && c.name && c.name.toLowerCase() === city.country.toLowerCase());
+          if (countryMatch && countryMatch.flag && countryMatch.flag !== '🌐') {
+            return countryMatch.flag;
+          }
+        }
+      }
     }
   }
 
+  // 4. If not in citiesData: check ALL_CITIES_BY_NAME_MAP or getCityLocationDatabaseMatch
+  if (typeof ALL_CITIES_BY_NAME_MAP !== 'undefined') {
+    const nameMatches = ALL_CITIES_BY_NAME_MAP.get(nameLower);
+    if (nameMatches && nameMatches.length > 0 && nameMatches[0].countryCode) {
+      const flag = getCountryFlag(nameMatches[0].countryCode) || (typeof getCountryFlagEmoji === 'function' ? getCountryFlagEmoji(nameMatches[0].countryCode) : '');
+      if (flag && flag !== '🌐') return flag;
+    }
+  }
+
+  if (typeof getCityLocationDatabaseMatch === 'function') {
+    const dbMatch = getCityLocationDatabaseMatch({ name: nameTrimmed });
+    if (dbMatch && dbMatch.countryCode) {
+      const flag = getCountryFlag(dbMatch.countryCode) || (typeof getCountryFlagEmoji === 'function' ? getCountryFlagEmoji(dbMatch.countryCode) : '');
+      if (flag && flag !== '🌐') return flag;
+    }
+  }
+
+  // 5. Fallback to '📍'
   return '📍';
 }
 
@@ -3185,7 +3236,11 @@ function getCityFlagHTML(cityName) {
   const cityEntry = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === cityName) : null;
   const lookupCity = cityName.replace(/\s+/g, '').toLowerCase();
   const lookupCountry = cityEntry?.country?.replace(/\s+/g, '').toLowerCase();
-  const code = CITY_TO_CODE[lookupCity] || CITY_TO_CODE[lookupCountry];
+  let code = CITY_TO_CODE[lookupCity] || CITY_TO_CODE[lookupCountry];
+
+  if (!code && cityEntry?.countryCode && cityEntry.countryCode.length === 2) {
+    code = cityEntry.countryCode.toLowerCase();
+  }
 
   if (code) {
     return `<img src="https://flagcdn.com/w20/${code}.png" srcset="https://flagcdn.com/w40/${code}.png 2x" class="city-flag-img" alt="${cityName} flag" onerror="this.style.display='none'">`;
@@ -3197,34 +3252,92 @@ function getCityFlagHTML(cityName) {
 // Get IATA airport code for a city name (returns '' if not found)
 function getCityIataCode(cityName) {
   if (!cityName || cityName === 'Home') return '';
-  const cleanName = cityName.trim().toLowerCase();
+  const rawStr = String(cityName).trim();
+  if (!rawStr) return '';
+
+  // Extract explicit 3-letter IATA code if parenthesized: e.g. "Brisbane (BNE)" or "(BNE)"
+  const parenMatch = rawStr.match(/\(([A-Za-z]{3})(?:\s*\/.*)?\)/);
+  if (parenMatch) return parenMatch[1].toUpperCase();
+
+  const cleanName = rawStr.toLowerCase();
+
   // Check citiesData first (user's trip cities)
   if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
-    const city = citiesData.find(c => c.name && c.name.toLowerCase() === cleanName);
+    const city = citiesData.find(c => c && c.name && c.name.toLowerCase() === cleanName);
     if (city && (city.code || city.iata)) return String(city.code || city.iata).toUpperCase();
   }
-  // Fall back to built-in databases
-  const nameMatches = typeof ALL_CITIES_BY_NAME_MAP !== 'undefined' ? ALL_CITIES_BY_NAME_MAP.get(cleanName) : null;
-  if (nameMatches && nameMatches[0] && (nameMatches[0].code || nameMatches[0].iata)) {
-    return String(nameMatches[0].code || nameMatches[0].iata).toUpperCase();
+
+  // Fall back to built-in databases by name
+  if (typeof ALL_CITIES_BY_NAME_MAP !== 'undefined') {
+    const nameMatches = ALL_CITIES_BY_NAME_MAP.get(cleanName);
+    if (nameMatches && nameMatches[0] && (nameMatches[0].code || nameMatches[0].iata)) {
+      return String(nameMatches[0].code || nameMatches[0].iata).toUpperCase();
+    }
   }
+
+  // If already a valid 3-letter code
+  if (cleanName.length === 3 && typeof ALL_CITIES_BY_CODE_MAP !== 'undefined') {
+    const codeMatch = ALL_CITIES_BY_CODE_MAP.get(cleanName.toUpperCase());
+    if (codeMatch && codeMatch.code) return codeMatch.code.toUpperCase();
+  }
+
+  // Check aliases / database match
+  if (typeof getCityAliasMatch === 'function') {
+    const aliasMatch = getCityAliasMatch(cleanName);
+    if (aliasMatch && (aliasMatch.code || aliasMatch.iata)) {
+      return String(aliasMatch.code || aliasMatch.iata).toUpperCase();
+    }
+  }
+
+  // Check CITY_DATABASE
+  if (typeof CITY_DATABASE !== 'undefined' && Array.isArray(CITY_DATABASE)) {
+    const dbCity = CITY_DATABASE.find(c => c && c.name && c.name.toLowerCase() === cleanName);
+    if (dbCity && dbCity.code) return dbCity.code.toUpperCase();
+  }
+
   return '';
 }
 
 // Get ICAO airport code for a city name (returns '' if not found)
 function getCityIcaoCode(cityName) {
   if (!cityName || cityName === 'Home') return '';
-  const cleanName = cityName.trim().toLowerCase();
+  const rawStr = String(cityName).trim();
+  if (!rawStr) return '';
+
+  // Extract explicit 4-letter ICAO code if parenthesized: e.g. "Brisbane (BNE / YBBN)"
+  const parenIcaoMatch = rawStr.match(/\((?:[A-Za-z]{3}\s*\/\s*)?([A-Za-z]{4})\)/);
+  if (parenIcaoMatch) return parenIcaoMatch[1].toUpperCase();
+
+  const cleanName = rawStr.toLowerCase();
+
   // Check citiesData first (user's trip cities)
   if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
-    const city = citiesData.find(c => c.name && c.name.toLowerCase() === cleanName);
+    const city = citiesData.find(c => c && c.name && c.name.toLowerCase() === cleanName);
     if (city && (city.icaoCode || city.icao)) return String(city.icaoCode || city.icao).toUpperCase();
   }
+
   // Fall back to built-in databases
-  const nameMatches = typeof ALL_CITIES_BY_NAME_MAP !== 'undefined' ? ALL_CITIES_BY_NAME_MAP.get(cleanName) : null;
-  if (nameMatches && nameMatches[0] && (nameMatches[0].icaoCode || nameMatches[0].icao)) {
-    return String(nameMatches[0].icaoCode || nameMatches[0].icao).toUpperCase();
+  if (typeof ALL_CITIES_BY_NAME_MAP !== 'undefined') {
+    const nameMatches = ALL_CITIES_BY_NAME_MAP.get(cleanName);
+    if (nameMatches && nameMatches[0] && (nameMatches[0].icaoCode || nameMatches[0].icao)) {
+      return String(nameMatches[0].icaoCode || nameMatches[0].icao).toUpperCase();
+    }
   }
+
+  // Check aliases / database match
+  if (typeof getCityAliasMatch === 'function') {
+    const aliasMatch = getCityAliasMatch(cleanName);
+    if (aliasMatch && (aliasMatch.icaoCode || aliasMatch.icao)) {
+      return String(aliasMatch.icaoCode || aliasMatch.icao).toUpperCase();
+    }
+  }
+
+  // Check CITY_DATABASE
+  if (typeof CITY_DATABASE !== 'undefined' && Array.isArray(CITY_DATABASE)) {
+    const dbCity = CITY_DATABASE.find(c => c && c.name && c.name.toLowerCase() === cleanName);
+    if (dbCity && (dbCity.icaoCode || dbCity.icao)) return String(dbCity.icaoCode || dbCity.icao).toUpperCase();
+  }
+
   return '';
 }
 
@@ -3938,27 +4051,35 @@ async function refetchCityLocationAndFlag(cityId) {
   if (!city) return;
 
   const cityName = city.name;
-  const nameMatches = ALL_CITIES_BY_NAME_MAP.get(cityName.toLowerCase());
-  const match = nameMatches ? nameMatches[0] : null;
+  const nameMatches = typeof ALL_CITIES_BY_NAME_MAP !== 'undefined' ? ALL_CITIES_BY_NAME_MAP.get(cityName.toLowerCase()) : null;
+  const dbMatch = (nameMatches && nameMatches.length > 0 ? nameMatches[0] : null) || (typeof getCityLocationDatabaseMatch === 'function' ? getCityLocationDatabaseMatch(city) : null);
 
-  if (match) {
-    if (match.code) city.code = match.code;
-    if (match.icaoCode || match.icao) city.icaoCode = match.icaoCode || match.icao;
-    city.countryCode = match.countryCode;
-    city.country = getCountryName(match.countryCode);
-    city.lat = match.lat;
-    city.lng = match.lng;
+  if (dbMatch) {
+    if (dbMatch.code && !city.code) city.code = dbMatch.code;
+    if ((dbMatch.icaoCode || dbMatch.icao) && !city.icaoCode) city.icaoCode = dbMatch.icaoCode || dbMatch.icao;
+    if (dbMatch.countryCode) {
+      city.countryCode = dbMatch.countryCode.toUpperCase();
+      city.country = getCountryName(dbMatch.countryCode);
+    }
+    if (dbMatch.lat !== undefined && dbMatch.lng !== undefined) {
+      city.lat = dbMatch.lat;
+      city.lng = dbMatch.lng;
+    }
   } else if (typeof triggerOnlineSearch === 'function') {
     await triggerOnlineSearch(cityId);
     return;
   }
 
+  if (city.countryCode && !city.country) {
+    city.country = getCountryName(city.countryCode);
+  }
+
   saveData(true);
-  populateCityList();
+  if (typeof populateCityList === 'function') populateCityList();
   if (typeof buildNav === 'function') buildNav();
   if (typeof buildItinerary === 'function') buildItinerary();
   if (typeof buildJourneyMap === 'function') buildJourneyMap();
-  showToast(`Refetched location & flag for ${cityName}`);
+  if (typeof showToast === 'function') showToast(`Refetched location & flag for ${cityName}`);
 }
 
 function auditCityHealth() {
@@ -4022,17 +4143,21 @@ async function repairAllCityMetadata() {
       modified = true;
     }
 
-    const match = city && city.name ? cityLookup.get(city.name.toLowerCase()) : null;
+    const match = (city && city.name ? cityLookup.get(city.name.toLowerCase()) : null) ||
+                  (typeof getCityLocationDatabaseMatch === 'function' ? getCityLocationDatabaseMatch(city) : null);
     if (match) {
       if (!city.code && match.code) { city.code = match.code; modified = true; }
       if (!city.icaoCode && (match.icaoCode || match.icao)) { city.icaoCode = match.icaoCode || match.icao; modified = true; }
-      if (!city.countryCode) { city.countryCode = match.countryCode; modified = true; }
-      if (!city.country) { city.country = getCountryName(match.countryCode); modified = true; }
-      if (!cityHasStoredCoords(city) && match.lat && match.lng) {
+      if (!city.countryCode && match.countryCode) { city.countryCode = match.countryCode.toUpperCase(); modified = true; }
+      if (!city.country && (match.countryCode || city.countryCode)) { city.country = getCountryName(match.countryCode || city.countryCode); modified = true; }
+      if (!cityHasStoredCoords(city) && match.lat !== undefined && match.lng !== undefined) {
         city.lat = match.lat;
         city.lng = match.lng;
         modified = true;
       }
+    } else if (city.countryCode && !city.country) {
+      city.country = getCountryName(city.countryCode);
+      modified = true;
     }
 
     if (!cityHasStoredCoords(city) && typeof triggerOnlineSearch === 'function') {
