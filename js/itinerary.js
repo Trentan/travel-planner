@@ -3242,9 +3242,9 @@ function applyCurrentTripPositionForTab(tabId, dateValue = new Date()) {
       });
     }
   } else if (tabId === 'transport') {
-    buildTransportTab(cityFilter);
+    buildTransportTab('all');
   } else if (tabId === 'accom') {
-    buildAccomTab(cityFilter);
+    buildAccomTab('all');
   }
 
   const cityNavList = document.querySelector('#cityNav .city-nav-list');
@@ -4498,12 +4498,27 @@ function updateCityNavOverflowCue(nav, navList) {
 }
 
 function selectCityFilter(cityId, btn) {
+  // If tapping currently selected city chip, toggle back to 'all'
+  if (window.currentCityFilter === cityId && cityId !== 'all') {
+    cityId = 'all';
+    btn = document.querySelector('#cityNav .city-nav-btn[data-city="all"]') || null;
+  }
   window.currentCityFilter = cityId;
+  if (typeof currentCityFilter !== 'undefined') {
+    currentCityFilter = cityId;
+  }
 
   // Update button states
   const nav = document.getElementById('cityNav');
-  nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if (nav) {
+    nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
+    if (btn) {
+      btn.classList.add('active');
+    } else {
+      const activeBtn = nav.querySelector(`.city-nav-btn[data-city="${cityId}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+  }
 
   // Rebuild tabs that have city filtering
   const activeTab = document.querySelector('.app-tab-btn.active');
@@ -4512,9 +4527,9 @@ function selectCityFilter(cityId, btn) {
   if (cityId === 'all') {
     // Show all - rebuild normally
     if (tabType === 'transport' && typeof buildTransportTab === 'function') {
-      buildTransportTab();
+      buildTransportTab('all');
     } else if (tabType === 'accom' && typeof buildAccomTab === 'function') {
-      buildAccomTab();
+      buildAccomTab('all');
     } else if (tabType === 'itinerary') {
       if (typeof isMobileViewport === 'function' ? isMobileViewport() : window.innerWidth <= 768) {
         if (typeof resetMobilePagerActiveIndex === 'function') resetMobilePagerActiveIndex('compact-city-swipe');

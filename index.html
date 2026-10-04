@@ -171,6 +171,14 @@
   </div>
 </header>
 
+<nav id="cityNav" class="city-nav transition-transform duration-300 translate-y-0">
+  <div class="city-nav-list hide-scrollbar">
+    <button class="city-nav-btn active" data-city="all" onclick="selectCityFilter('all', this)">
+      <span>🏙️ All</span>
+    </button>
+  </div>
+</nav>
+
 <main>
   <div class="app-tabs-nav">
     <div class="app-tabs-list hide-scrollbar">
@@ -204,14 +212,6 @@
       </button>
     </div>
   </div>
-    <nav id="cityNav" class="city-nav transition-transform duration-300 translate-y-0">
-    <div class="city-nav-list hide-scrollbar">
-      <button class="city-nav-btn active" data-city="all" onclick="selectCityFilter('all', this)">
-        <span>🏙️ All</span>
-      </button>
-    </div>
-  </nav>
-
 
   <div class="app-tabs-content">
     <div id="tab-itinerary" class="tab-pane active">

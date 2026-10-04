@@ -140,17 +140,19 @@
   /* City Navigation */
   .city-nav {
     @apply bg-bg-primary/98 border-b border-border px-6 py-2.5
-           sticky z-150 shadow-sm backdrop-blur-md;
+           shadow-sm backdrop-blur-md;
     pointer-events: auto;
-    position: sticky;
-  }
-  .city-nav {
-    top: 48px;
+    position: relative;
   }
 
   .city-nav.city-nav-hidden,
   .city-nav.-translate-y-full {
     pointer-events: none;
+  }
+
+  body:not([data-active-tab="itinerary"]) #cityNav,
+  #cityNav.tab-hidden {
+    display: none !important;
   }
 
   .city-nav-list {
@@ -238,7 +240,9 @@
 
     .city-nav {
       display: block;
-      top: 104px;
+      position: relative;
+      top: auto;
+      z-index: 20;
     }
 
     .city-nav-list {

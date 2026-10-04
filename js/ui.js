@@ -83,23 +83,13 @@ function updateStickyOffsets() {
     tabsNav.style.top = '';
   }
 
-  const cityHeight = cityNav
+  const isCityNavVisible = cityNav && !cityNav.classList.contains('tab-hidden') && (typeof window !== 'undefined' && window.getComputedStyle ? window.getComputedStyle(cityNav).display !== 'none' : true);
+  const cityHeight = isCityNavVisible
     ? Math.ceil(cityNav.getBoundingClientRect().height || 0)
     : 0;
 
   if (cityNav) {
-    if (isMobile) {
-      cityNav.style.top = '';
-    } else {
-      const cityTop = Math.max(0, menuHeight + tabsHeight - 1);
-      cityNav.style.top = `${cityTop}px`;
-    }
-  }
-
-  if (!isMobile) {
-    document.body.style.paddingTop = `${menuHeight + tabsHeight + cityHeight}px`;
-  } else {
-    document.body.style.paddingTop = '';
+    cityNav.style.top = '';
   }
 
   // Set CSS custom properties on document root for fluid calculations
@@ -107,7 +97,7 @@ function updateStickyOffsets() {
     document.documentElement.style.setProperty('--app-menu-height', `${menuHeight}px`);
     document.documentElement.style.setProperty('--app-tabs-height', `${tabsHeight}px`);
     document.documentElement.style.setProperty('--app-city-height', `${cityHeight}px`);
-    const desktopStickyOffset = !isMobile ? (menuHeight + tabsHeight + cityHeight + 12) : 0;
+    const desktopStickyOffset = !isMobile ? (menuHeight + tabsHeight + 12) : 0;
     document.documentElement.style.setProperty('--desktop-sticky-offset', `${desktopStickyOffset}px`);
   }
 }
@@ -176,7 +166,7 @@ function syncResponsiveUi() {
       }
     }
     if (cityNavEl.classList && typeof cityNavEl.classList.toggle === 'function') {
-      cityNavEl.classList.toggle('tab-hidden', !['itinerary', 'accom'].includes(activeTabId));
+      cityNavEl.classList.toggle('tab-hidden', activeTabId !== 'itinerary');
     }
   }
 
@@ -568,8 +558,8 @@ function toggleEditMode() {
   const activeTabId = activeTabBtn ? activeTabBtn.getAttribute('data-tab') : '';
   const cityFilter = typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all';
   if (activeTabId === 'itinerary' && typeof buildItinerary === 'function') buildItinerary();
-  if (activeTabId === 'transport') buildTransportTab(cityFilter);
-  if (activeTabId === 'accom') buildAccomTab(cityFilter);
+  if (activeTabId === 'transport') buildTransportTab('all');
+  if (activeTabId === 'accom') buildAccomTab('all');
   if (activeTabId === 'packing') buildPackingTab();
 }
 
@@ -583,7 +573,7 @@ function switchTab(tabId, btnElement) {
       cityNav.setAttribute('data-active-tab', tabId);
     }
     if (cityNav.classList && typeof cityNav.classList.toggle === 'function') {
-      cityNav.classList.toggle('tab-hidden', !['itinerary', 'accom'].includes(tabId));
+      cityNav.classList.toggle('tab-hidden', tabId !== 'itinerary');
     }
   }
 
@@ -607,14 +597,16 @@ function switchTab(tabId, btnElement) {
     }
   }
 
-  if (['itinerary', 'transport', 'accom'].includes(tabId) && typeof applyCurrentTripPositionForTab === 'function') {
-    applyCurrentTripPositionForTab(tabId);
-  } else if (tabId === 'itinerary') {
-    if (typeof buildItinerary === 'function') buildItinerary();
+  if (tabId === 'itinerary') {
+    if (typeof applyCurrentTripPositionForTab === 'function') {
+      applyCurrentTripPositionForTab(tabId);
+    } else if (typeof buildItinerary === 'function') {
+      buildItinerary();
+    }
   } else if (tabId === 'transport') {
-    if (typeof buildTransportTab === 'function') buildTransportTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
+    if (typeof buildTransportTab === 'function') buildTransportTab('all');
   } else if (tabId === 'accom') {
-    if (typeof buildAccomTab === 'function') buildAccomTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
+    if (typeof buildAccomTab === 'function') buildAccomTab('all');
   }
   if (tabId === 'itinerary' && typeof window !== 'undefined' && window.innerWidth >= 1024 && typeof buildDesktopSplitMap === 'function') {
     setTimeout(buildDesktopSplitMap, 60);

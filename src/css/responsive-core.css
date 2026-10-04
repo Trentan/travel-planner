@@ -28,13 +28,6 @@
     z-index: 1250;
   }
 
-  .city-nav {
-    position: fixed !important;
-    left: 0;
-    right: 0;
-    z-index: 1200;
-  }
-
   .app-menu-bar,
   .app-menu-right {
     flex-wrap: nowrap;

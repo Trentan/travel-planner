@@ -139,6 +139,8 @@ function runTabsTests() {
     formatCurrency: (val, opts) => typeof opts === 'object' && opts.includeSymbol === false ? String(val) : `$${val}`,
     formatTripDateForDisplay: null,
     parseCost: val => parseFloat(val) || 0,
+    getCityFlag: city => city === 'Tokyo' ? '🇯🇵' : (city === 'Vienna' ? '🇦🇹' : ''),
+    getLocationCodeText: city => city === 'Tokyo' ? 'HND' : (city === 'Vienna' ? 'VIE' : '---'),
     getCityFlagHTML: city => `<span class="flag">${city}</span>`,
     renderStatusBadge: (status, opts) => `<span class="badge ${status}">${status}</span>`,
     renderMobileStatusCostMeta: () => '<div class="mobile-meta">Meta</div>',
@@ -164,6 +166,7 @@ function runTabsTests() {
     renderStayDateSummary,
     renderStayStatusCostSummary,
     isAccomMobileCardLayout,
+    getStayCityDisplay,
     renderStayMobileDetails,
     getFilteredAndSortedStays,
     renderAccomHeader,
@@ -252,6 +255,16 @@ function runTabsTests() {
   assert(renderStayStatusCostSummary(sampleStays[0], 'confirmed', '').includes('badge'), 'renderStayStatusCostSummary includes status badge');
 
   assert(renderStayMobileDetails(sampleStays[0], 'Tokyo').includes('Shinjuku, Tokyo'), 'renderStayMobileDetails includes facts grid');
+  assert.strictEqual(getStayCityDisplay('Tokyo', sampleStays[0]), '🇯🇵 HND - Tokyo', 'getStayCityDisplay formats with flag, code, and city name');
+  assert.strictEqual(getStayCityDisplay('Vienna', null), '🇦🇹 VIE - Vienna', 'getStayCityDisplay formats Vienna with code VIE');
+
+  const mobileDetailsHtml = renderStayMobileDetails(sampleStays[0], 'Tokyo');
+  const cityIndex = mobileDetailsHtml.indexOf('City');
+  const nightsIndex = mobileDetailsHtml.indexOf('Nights');
+  const checkInIndex = mobileDetailsHtml.indexOf('Check In');
+  assert(cityIndex < checkInIndex, 'City fact must appear before Check In in mobile facts grid');
+  assert(nightsIndex < checkInIndex, 'Nights fact must appear before Check In in mobile facts grid');
+  assert(cityIndex < nightsIndex, 'City fact must appear before Nights in mobile facts grid');
 
   // 6. Filtering & Sorting Stays
   const allStays = getFilteredAndSortedStays('all');

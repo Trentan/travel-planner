@@ -134,20 +134,51 @@ function isAccomMobileCardLayout() {
       : (typeof window !== 'undefined' && window.innerWidth <= 768);
 }
 
+function getStayCityDisplay(cityName, stay) {
+  if (!cityName || cityName === 'Unknown') return cityName || 'Unknown';
+  let city = null;
+  if (stay && stay.cityId && typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+    city = citiesData.find(c => c.id === stay.cityId);
+  }
+  let code = '';
+  if (typeof getLocationCodeText === 'function') {
+    const locCode = getLocationCodeText(cityName);
+    if (locCode && locCode !== '---') code = locCode;
+  }
+  if (!code && typeof getCityIataCode === 'function') {
+    const iata = getCityIataCode(cityName);
+    if (iata && iata !== '---') code = iata;
+  }
+  if (!code && city && city.code && city.code !== '---') {
+    code = city.code;
+  }
+  let flag = '';
+  if (typeof getCityFlag === 'function') {
+    const f = getCityFlag(cityName);
+    if (f && f !== '🏳️' && f !== '📍') flag = f;
+  }
+  const flagPrefix = flag ? `${flag} ` : '';
+  if (code && code !== '---') {
+    return `${flagPrefix}${code.toUpperCase()} - ${cityName}`;
+  }
+  return `${flagPrefix}${cityName}`;
+}
+
 function renderStayMobileDetails(stay, cityName) {
   const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
   const costValue = formatCurrency(stay.totalCost || '0');
   const locationUrl = stay.location ? getMapSearchUrl(stay.location, cityName) : '';
   const attachmentsHtml = stay.attachments && stay.attachments.length > 0 ? `<div class="stay-mobile-fact stay-mobile-fact--wide"><span class="stay-mobile-fact-label">Attachments & Links</span><div class="flex flex-wrap gap-1 mt-1">` + renderAttachmentsPillsHtml(stay.attachments) + `</div></div>` : '';
+  const cityDisplay = getStayCityDisplay(cityName, stay);
 
   return `
     <div class="stay-mobile-facts-grid">
+      ${renderStayMobileFact('City', cityDisplay)}
+      ${renderStayMobileFact('Nights', String(nights))}
       ${renderStayMobileFact('Check In', formatDateShort(stay.checkIn))}
       ${renderStayMobileFact('Check In Time', stay.checkInTime || '')}
       ${renderStayMobileFact('Check Out', formatDateShort(stay.checkOut))}
       ${renderStayMobileFact('Check Out Time', stay.checkOutTime || '')}
-      ${renderStayMobileFact('City', cityName)}
-      ${renderStayMobileFact('Nights', String(nights))}
       ${renderStayMobileLinkedFact('Location', stay.location || '', locationUrl, 'stay-mobile-fact--wide')}
       ${renderStayMobileFact('Property Name', stay.propertyName || '')}
       ${renderStayMobileFact('Provider', stay.provider || '')}
@@ -196,6 +227,7 @@ function renderAccomMobileView(sortedStays) {
     const city = (typeof citiesData !== 'undefined') ? citiesData.find(c => c.id === stay.cityId) : null;
     const cityName = city ? city.name : 'Unknown';
     const cityColor = city?.colour || '#2C3E50';
+    const cityDisplay = getStayCityDisplay(cityName, stay);
     const status = normalizeItemStatus(stay.status);
     const checkIn = formatDateShort(stay.checkIn);
     const checkOut = formatDateShort(stay.checkOut);
@@ -229,7 +261,7 @@ function renderAccomMobileView(sortedStays) {
     `);
     railHtml.push(`
       <button type="button" class="mobile-swipe-chip" data-role="mobile-swipe-chip" data-slide-index="${index}" aria-controls="stay-slide-${index}" aria-selected="${index === 0 ? 'true' : 'false'}">
-        <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(cityName)}</span>
+        <span class="mobile-swipe-chip-eyebrow">${escapeHtmlText(cityDisplay || cityName)}</span>
         <span class="mobile-swipe-chip-title">${escapeHtmlText(stay.propertyName || 'Stay')}</span>
         <span class="mobile-swipe-chip-route">${escapeHtmlText([checkIn, checkOut].filter(Boolean).join(' · '))}</span>
       </button>

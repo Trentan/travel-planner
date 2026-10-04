@@ -134,15 +134,15 @@ async function testInitialCurrentDaySelection() {
   app.context.__mobilePagerState['compact-city-swipe'] = 0;
   app.context.switchTab('transport', getTabButton('transport'));
   assert(
-    transportFilter === 'city-bratislava' && app.context.currentCityFilter === 'city-bratislava',
-    'Current-day tab switching: Transport should reapply today city filter'
+    transportFilter === 'all',
+    'Current-day tab switching: Transport should pass all to prevent city lock'
   );
 
   app.context.currentCityFilter = 'all';
   app.context.switchTab('accom', getTabButton('accom'));
   assert(
-    accomFilter === 'city-bratislava' && app.context.currentCityFilter === 'city-bratislava',
-    'Current-day tab switching: Accommodation should reapply today city filter'
+    accomFilter === 'all',
+    'Current-day tab switching: Accommodation should pass all to prevent city lock'
   );
 
   app.context.currentCityFilter = 'all';
