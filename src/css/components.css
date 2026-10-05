@@ -4145,21 +4145,17 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-surface .compact-day-counter-chip {
-    position: absolute;
-    top: 0.72rem;
-    right: 0.72rem;
-    z-index: 2;
+    position: static;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-surface .compact-day-header-chips {
-    position: absolute;
-    top: 0.72rem;
-    right: 0.72rem;
-    z-index: 2;
-    display: inline-flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.2rem;
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.22rem;
+    max-width: 9.75rem;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-surface .compact-day-header-chips .compact-day-counter-chip {
@@ -4167,7 +4163,7 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-surface .compact-day-header-chips .compact-day-amount-chip {
-    align-self: flex-end;
+    align-self: center;
   }
 
   .compact-day-amount-chip {
@@ -4184,11 +4180,18 @@
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-summary-row {
-    @apply flex items-center justify-between gap-1 pb-0 border-b border-slate-100;
+    @apply flex flex-wrap items-center justify-between gap-1.5 pb-1 border-b border-slate-100 dark:border-slate-800;
+  }
+
+  body.mobile-app-mode.compact-view-mode .compact-day-summary-row .day-stay-heading-note {
+    margin: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-summary-desc {
-    @apply text-[0.78rem] text-slate-600;
+    @apply text-[0.78rem] text-slate-600 dark:text-slate-300 min-w-0;
   }
 
   body.mobile-app-mode.compact-view-mode .compact-day-grid {

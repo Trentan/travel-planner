@@ -1001,17 +1001,16 @@ function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysBy
     title: `Day ${dayIdx + 1}${tripDaySuffix} · ${day.day || ''}`.trim(),
     subtitle: routeLabel,
     primaryAction: `
-      <span class="compact-day-header-chips flex items-center gap-1.5 flex-wrap">
+      <span class="compact-day-header-chips flex items-center justify-end gap-1 flex-wrap">
         ${typeof renderDayWeatherBadgeHtml === 'function' ? renderDayWeatherBadgeHtml(day.date, toCity || fromCity || leg.label, leg) : ''}
-        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.72rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}${tripProgressSuffix}</span>
         ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
+        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.7rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}${tripProgressSuffix}</span>
       </span>
     `,
     summary: `
           <div class="compact-day-summary-row">
             <span class="compact-day-summary-desc">${escapeCompactText(day.desc || 'No description yet')}</span>
             ${stayingHeadingNote}
-            <span class="compact-day-summary-meta flex items-center gap-1.5 shrink-0"></span>
           </div>
         `,
     details,
