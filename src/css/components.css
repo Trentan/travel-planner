@@ -1499,7 +1499,13 @@
   }
 
   .daily-timeline-title-row {
-    @apply flex items-baseline gap-2 min-w-0;
+    @apply flex items-baseline gap-2 min-w-0 flex-wrap;
+    row-gap: 0.25rem;
+  }
+
+  .daily-timeline-title-and-checkbox {
+    flex: 1 1 0%;
+    min-width: 0;
   }
 
   .daily-timeline-inline-check {
@@ -1512,7 +1518,8 @@
 
   .daily-timeline-title {
     @apply min-w-0 text-text-primary font-bold text-[1.15rem] leading-[1.3];
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
 
   .daily-timeline-meta {
@@ -1607,6 +1614,35 @@
   .daily-timeline-compact .daily-timeline-item {
     grid-template-columns: 6.4rem 2.2rem minmax(0, 1fr);
     gap: 0.62rem;
+  }
+
+  .daily-timeline-compact .daily-timeline-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 0.25rem;
+  }
+
+  .daily-timeline-compact .daily-timeline-type {
+    order: 1;
+  }
+
+  .daily-timeline-compact .daily-timeline-inline-check {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .daily-timeline-compact .daily-timeline-title-and-checkbox {
+    order: 3;
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .daily-timeline-compact .daily-timeline-title {
+    font-size: 0.95rem;
+    line-height: 1.25;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
 
   .daily-timeline-compact .daily-timeline-time {

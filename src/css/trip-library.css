@@ -860,6 +860,9 @@ body.mobile-app-mode #readOnlyBanner {
   background: linear-gradient(135deg, rgba(236, 254, 255, 0.95) 0%, rgba(240, 253, 250, 0.95) 100%);
   padding: 0.65rem 0.85rem;
   box-shadow: 0 2px 8px rgba(14, 116, 144, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
 .daily-timeline-smart-reminder.daily-timeline-reminder-tripStart .daily-timeline-reminder-content {
@@ -880,6 +883,34 @@ body.mobile-app-mode #readOnlyBanner {
 .daily-timeline-smart-reminder.daily-timeline-reminder-arrival .daily-timeline-reminder-content {
   border-color: rgba(124, 58, 237, 0.35);
   background: linear-gradient(135deg, rgba(245, 243, 255, 0.95) 0%, rgba(250, 245, 255, 0.95) 100%);
+}
+
+.daily-timeline-reminder-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.daily-timeline-reminder-title {
+  flex: 1 1 0%;
+  min-width: 0;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.daily-timeline-compact .daily-timeline-smart-reminder .daily-timeline-reminder-title {
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.daily-timeline-reminder-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.2rem;
 }
 
 .daily-timeline-reminder-marker {
@@ -917,6 +948,8 @@ body.mobile-app-mode #readOnlyBanner {
   justify-content: center;
   width: 1.5rem;
   height: 1.5rem;
+  margin-top: -0.15rem;
+  margin-right: -0.25rem;
   border: none;
   background: transparent;
   color: #64748b;

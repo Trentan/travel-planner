@@ -2628,16 +2628,18 @@ function renderDailyTimelineRow(item, compact = false) {
       <div class="daily-timeline-item daily-timeline-smart-reminder daily-timeline-reminder-${escapeCompactText(item.reminderType || 'general')}">
         ${timeStr}
         <div class="daily-timeline-marker daily-timeline-reminder-marker"><span>${item.icon || '💡'}</span></div>
-        <div class="daily-timeline-content daily-timeline-reminder-content flex items-center justify-between gap-3.5 flex-wrap sm:flex-nowrap">
-          <div class="daily-timeline-reminder-body min-w-0 flex-1">
-            <div class="daily-timeline-reminder-title font-semibold text-slate-800 dark:text-slate-100 text-xs sm:text-sm leading-snug">
+        <div class="daily-timeline-content daily-timeline-reminder-content flex flex-col gap-1.5">
+          <div class="daily-timeline-reminder-header flex items-start justify-between gap-2.5 w-full">
+            <div class="daily-timeline-reminder-title font-semibold text-slate-800 dark:text-slate-100 text-xs sm:text-sm leading-snug flex-1 min-w-0">
               ${escapeCompactText(item.title)}
             </div>
+            <button type="button" class="daily-timeline-reminder-dismiss-btn shrink-0" onclick="event.stopPropagation(); dismissTimelineReminder('${escapeCompactText(item.reminderKey)}');" title="Dismiss reminder" aria-label="Dismiss reminder">&times;</button>
           </div>
-          <div class="daily-timeline-reminder-actions flex items-center gap-2 shrink-0">
-            ${item.actionTab ? `<button type="button" class="daily-timeline-reminder-action-btn" onclick="event.stopPropagation(); switchTab('${escapeCompactText(item.actionTab)}');">${escapeCompactText(item.actionText || 'View')}</button>` : ''}
-            <button type="button" class="daily-timeline-reminder-dismiss-btn" onclick="event.stopPropagation(); dismissTimelineReminder('${escapeCompactText(item.reminderKey)}');" title="Dismiss reminder" aria-label="Dismiss reminder">&times;</button>
-          </div>
+          ${item.actionTab ? `
+            <div class="daily-timeline-reminder-actions flex items-center gap-2 pt-0.5">
+              <button type="button" class="daily-timeline-reminder-action-btn" onclick="event.stopPropagation(); switchTab('${escapeCompactText(item.actionTab)}');">${escapeCompactText(item.actionText || 'View')}</button>
+            </div>
+          ` : ''}
         </div>
       </div>
     `;
@@ -2936,7 +2938,7 @@ function renderDailyTimelineRow(item, compact = false) {
       <div class="daily-timeline-content">
         <div class="daily-timeline-title-row">
           <span class="daily-timeline-type px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${typeColorClasses}">${escapeCompactText(item.typeLabel || item.type)}</span>
-          <div class="daily-timeline-title-and-checkbox" style="display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <div class="daily-timeline-title-and-checkbox flex-1 min-w-0 flex items-center gap-2 flex-wrap">
             <span class="daily-timeline-title">${escapeCompactText(item.title)}</span>
             ${badgeHtml}
           </div>
