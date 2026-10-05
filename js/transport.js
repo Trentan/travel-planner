@@ -228,35 +228,41 @@ function calculateJourneyDuration(segments) {
 // Helper: Get compact code display for table cells
 // Returns just the code with full name as tooltip
 function getLocationCodeDisplay(locationName) {
-  if (!locationName || locationName === 'Home' || locationName === 'In transit') {
+  if (!locationName || locationName === 'In transit') {
     return locationName || '—';
   }
 
-  // First check trip cities (citiesData)
-  const city = typeof citiesData !== 'undefined'
-      ? citiesData.find(c => c.name === locationName)
-      : null;
+  const code = typeof getLocationCodeText === 'function'
+    ? getLocationCodeText(locationName)
+    : String(locationName).substring(0, 3).toUpperCase();
 
-  if (city && city.code) {
-    const countryFlag = city.countryCode ? getCountryFlag(city.countryCode) : '';
-    const tooltip = `${city.name}${city.country ? ', ' + city.country : ''}${countryFlag ? ' ' + countryFlag : ''}`;
-    return `<span class="city-code-compact" title="${tooltip}">${city.code}</span>`;
+  let cityObj = (typeof getCityByName === 'function') ? getCityByName(locationName) : null;
+  if (!cityObj && typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+    cityObj = citiesData.find(c => c && (c.name === locationName || c.code === code)) || null;
+  }
+  const dbCity = (!cityObj && typeof getCityLocationDatabaseMatch === 'function')
+    ? getCityLocationDatabaseMatch({ name: locationName, code })
+    : ((!cityObj && typeof CITY_DATABASE !== 'undefined')
+      ? CITY_DATABASE.find(c => c.name.toLowerCase() === String(locationName).toLowerCase() || c.code === code)
+      : null);
+
+  const resolved = cityObj || dbCity;
+  if (resolved) {
+    const countryCode = resolved.countryCode || '';
+    const countryFlag = countryCode && typeof getCountryFlag === 'function'
+      ? getCountryFlag(countryCode)
+      : (typeof getCityFlag === 'function' ? getCityFlag(resolved.name || locationName) : '');
+    const countryName = resolved.country || (countryCode && typeof getCountryName === 'function' ? getCountryName(countryCode) : countryCode) || '';
+    const displayCode = (code && code !== '---') ? code : (resolved.code || String(locationName).substring(0, 3).toUpperCase());
+    const tooltip = `${resolved.name || locationName}${countryName ? ', ' + countryName : ''}${countryFlag && countryFlag !== '📍' ? ' ' + countryFlag : ''}`;
+    return `<span class="city-code-compact" title="${tooltip}">${displayCode}</span>`;
   }
 
-  // Fall back to CITY_DATABASE lookup (for transit cities like London)
-  const dbCity = typeof CITY_DATABASE !== 'undefined'
-      ? CITY_DATABASE.find(c => c.name.toLowerCase() === locationName.toLowerCase())
-      : null;
-
-  if (dbCity) {
-    const countryFlag = dbCity.countryCode ? getCountryFlag(dbCity.countryCode) : '';
-    const countryName = typeof getCountryName === 'function' ? getCountryName(dbCity.countryCode) : dbCity.countryCode;
-    const tooltip = `${dbCity.name}, ${countryName}${countryFlag ? ' ' + countryFlag : ''}`;
-    return `<span class="city-code-compact" title="${tooltip}">${dbCity.code}</span>`;
+  if (code && code !== '---') {
+    return `<span class="city-code-compact" title="${String(locationName)}">${code}</span>`;
   }
 
-  // Last resort: generate 3-letter code
-  return locationName.substring(0, 3).toUpperCase();
+  return String(locationName).substring(0, 3).toUpperCase();
 }
 
 function getLocationCodeText(locationName) {

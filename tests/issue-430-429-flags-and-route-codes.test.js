@@ -101,6 +101,7 @@ const combinedCode = `
     getCountryFlagEmoji,
     getCityIataCode,
     getCityIcaoCode,
+    getLocationCodeDisplay,
     getLocationCodeText,
     getLocationCodeNameText,
     buildRouteCodeChain,
@@ -158,6 +159,8 @@ assert(scope.getCityFlag('Denpasar Bali') === '🇮🇩', `Expected 🇮🇩 for
 // Lookup via ALL_CITIES / database match
 assert(scope.getCityFlag('Taipei') === '🇹🇼', `Expected 🇹🇼 for Taipei, got ${scope.getCityFlag('Taipei')}`);
 assert(scope.getCityFlag('Vienna') === '🇦🇹', `Expected 🇦🇹 for Vienna, got ${scope.getCityFlag('Vienna')}`);
+assert(scope.getCityFlagHTML('Denpasar').includes('flagcdn.com/w20/id.png'), 'getCityFlagHTML("Denpasar") should render id.png flag');
+assert(scope.getCityFlagHTML('Taipei').includes('flagcdn.com/w20/tw.png'), 'getCityFlagHTML("Taipei") should render tw.png flag');
 
 // City in citiesData with countryCode only
 scope.citiesData.push({ id: 'city-test-1', name: 'TestCityID', countryCode: 'ID' });
@@ -203,6 +206,11 @@ assert(scope.getLocationCodeText('MyCustomTripCity') === 'MCC', 'Trip city code 
 assert(scope.getLocationCodeText('Unknownland') === 'UNK', `Fallback for Unknownland -> UNK, got ${scope.getLocationCodeText('Unknownland')}`);
 assert(scope.getLocationCodeText('') === '---', 'Empty location returns ---');
 assert(scope.getLocationCodeText(null) === '---', 'Null location returns ---');
+
+// Desktop getLocationCodeDisplay
+assert(scope.getLocationCodeDisplay('Brisbane (BNE)').includes('>BNE<'), 'getLocationCodeDisplay("Brisbane (BNE)") should render BNE');
+assert(scope.getLocationCodeDisplay('Denpasar (DPS)').includes('>DPS<'), 'getLocationCodeDisplay("Denpasar (DPS)") should render DPS');
+assert(scope.getLocationCodeDisplay('Taipei').includes('>TPE<'), 'getLocationCodeDisplay("Taipei") should render TPE');
 
 // ==========================================
 // 6. Issue #429: buildRouteCodeChain 3-char IATA ports

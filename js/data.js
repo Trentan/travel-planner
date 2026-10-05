@@ -1974,6 +1974,7 @@ async function searchCityOnline(cityName, countryCode = '', countryName = '') {
         lat: parseFloat(best.lat),
         lng: parseFloat(best.lon),
         countryCode: (best.address?.country_code || '').toUpperCase(),
+        countryName: best.address?.country || '',
         displayName: best.display_name
       };
     }
@@ -2399,6 +2400,7 @@ async function resolveCityLocation(city) {
     lat: onlineMatch.lat,
     lng: onlineMatch.lng,
     countryCode: onlineMatch.countryCode || city.countryCode || '',
+    countryName: onlineMatch.countryName || city.country || '',
     code: '',
     icaoCode: ''
   };
@@ -2411,7 +2413,12 @@ function applyCityLocation(city, location) {
   city.lng = location.lng;
   if (location.countryCode) {
     city.countryCode = location.countryCode;
-    city.country = getCountryName(location.countryCode);
+    const mappedName = getCountryName(location.countryCode);
+    city.country = (mappedName && mappedName !== location.countryCode)
+      ? mappedName
+      : (location.countryName || mappedName);
+  } else if (location.countryName && !city.country) {
+    city.country = location.countryName;
   }
   if (location.code && !city.code) city.code = location.code;
   if (location.icaoCode) city.icaoCode = location.icaoCode;
@@ -2607,7 +2614,7 @@ async function triggerOnlineSearch(cityId) {
 window.triggerOnlineSearch = triggerOnlineSearch;
 
 async function fetchAllMissingCityLocations() {
-  const missingCities = citiesData.filter(city => !cityHasStoredCoords(city));
+  const missingCities = citiesData.filter(city => !cityHasStoredCoords(city) || !city.countryCode);
   if (missingCities.length === 0) return;
 
   const btn = document.getElementById('fetchMissingCityLocationsBtn');
@@ -2646,6 +2653,7 @@ async function fetchAllMissingCityLocations() {
         lat: onlineMatch.lat,
         lng: onlineMatch.lng,
         countryCode: onlineMatch.countryCode || city.countryCode || '',
+        countryName: onlineMatch.countryName || city.country || '',
         code: '',
         icaoCode: ''
       };
@@ -2661,6 +2669,8 @@ async function fetchAllMissingCityLocations() {
 
   saveData(true);
   populateCityList();
+  if (typeof buildCityNav === 'function') buildCityNav();
+  if (typeof buildItinerary === 'function') buildItinerary();
   if (typeof buildJourneyMap === 'function') buildJourneyMap();
 
   if (foundCount < missingCities.length) {
@@ -3233,17 +3243,32 @@ function getCityFlag(cityName) {
 function getCityFlagHTML(cityName) {
   if (!cityName) return '<span class="city-flag">📍</span>';
 
-  const cityEntry = typeof citiesData !== 'undefined' ? citiesData.find(c => c.name === cityName) : null;
-  const lookupCity = cityName.replace(/\s+/g, '').toLowerCase();
+  const cleanStr = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(cityName) : String(cityName)).trim() || String(cityName).trim();
+  const lowerName = cleanStr.toLowerCase();
+  const cityEntry = typeof citiesData !== 'undefined' && Array.isArray(citiesData)
+    ? (citiesData.find(c => c && c.name && c.name.toLowerCase() === lowerName) || (typeof getCityByName === 'function' ? getCityByName(cleanStr) : null))
+    : null;
+  const lookupCity = lowerName.replace(/\s+/g, '');
   const lookupCountry = cityEntry?.country?.replace(/\s+/g, '').toLowerCase();
-  let code = CITY_TO_CODE[lookupCity] || CITY_TO_CODE[lookupCountry];
+  let code = CITY_TO_CODE[lookupCity] || (lookupCountry ? (CITY_TO_CODE[lookupCountry] || COUNTRY_TO_CODE[lookupCountry]) : '');
 
   if (!code && cityEntry?.countryCode && cityEntry.countryCode.length === 2) {
     code = cityEntry.countryCode.toLowerCase();
   }
+  if (!code && cityEntry?.country && Array.isArray(COUNTRY_DATA)) {
+    const countryObj = COUNTRY_DATA.find(cd => cd.name.toLowerCase() === cityEntry.country.trim().toLowerCase());
+    if (countryObj && countryObj.code) code = countryObj.code.toLowerCase();
+  }
+  if (!code && typeof ALL_CITIES_BY_NAME_MAP !== 'undefined') {
+    const aliasName = CITY_ALIASES[lowerName] ? CITY_ALIASES[lowerName].toLowerCase() : lowerName;
+    const dbMatch = ALL_CITIES_BY_NAME_MAP.get(aliasName) || (typeof getCityLocationDatabaseMatch === 'function' ? getCityLocationDatabaseMatch({ name: cleanStr }) : null);
+    if (dbMatch && dbMatch.countryCode && dbMatch.countryCode.length === 2) {
+      code = dbMatch.countryCode.toLowerCase();
+    }
+  }
 
   if (code) {
-    return `<img src="https://flagcdn.com/w20/${code}.png" srcset="https://flagcdn.com/w40/${code}.png 2x" class="city-flag-img" alt="${cityName} flag" onerror="this.style.display='none'">`;
+    return `<img src="https://flagcdn.com/w20/${code}.png" srcset="https://flagcdn.com/w40/${code}.png 2x" class="city-flag-img" alt="${cleanStr} flag" onerror="this.style.display='none'">`;
   }
 
   return '<span class="city-flag">📍</span>';
@@ -4364,10 +4389,10 @@ async function addNewCityFromDialog() {
   }
 }
 
-// Automatically resolves coordinates in the background for any trip cities missing location data
+// Automatically resolves coordinates and country flags in the background for any trip cities missing location or countryCode data
 async function autoResolveMissingTripCities() {
   if (typeof citiesData === 'undefined' || !Array.isArray(citiesData) || citiesData.length === 0) return;
-  const unmapped = citiesData.filter(c => !cityHasStoredCoords(c));
+  const unmapped = citiesData.filter(c => !cityHasStoredCoords(c) || !c.countryCode);
   if (unmapped.length === 0) return;
 
   if (typeof window !== 'undefined') {
@@ -4376,13 +4401,17 @@ async function autoResolveMissingTripCities() {
 
   let resolvedCount = 0;
   for (const city of unmapped) {
-    if (cityHasStoredCoords(city)) continue;
+    if (cityHasStoredCoords(city) && city.countryCode) continue;
 
     // 1. Check dynamic cache
     const cached = window.__dynamicCityCoordsCache?.get(city.name.toLowerCase());
-    if (cached && cityHasStoredCoords(cached)) {
-      city.lat = Number(cached.lat);
-      city.lng = Number(cached.lng);
+    if (cached && cityHasStoredCoords(cached) && (city.countryCode || cached.countryCode)) {
+      if (!cityHasStoredCoords(city)) {
+        city.lat = Number(cached.lat);
+        city.lng = Number(cached.lng);
+      }
+      if (!city.countryCode && cached.countryCode) city.countryCode = cached.countryCode;
+      if (!city.country && city.countryCode) city.country = getCountryName(city.countryCode);
       resolvedCount++;
       continue;
     }
@@ -4390,11 +4419,13 @@ async function autoResolveMissingTripCities() {
     // 2. Check local database
     const local = resolveCityLocationLocal(city);
     if (local && cityHasStoredCoords(local)) {
-      city.lat = Number(local.lat);
-      city.lng = Number(local.lng);
+      if (!cityHasStoredCoords(city)) {
+        city.lat = Number(local.lat);
+        city.lng = Number(local.lng);
+      }
       if (!city.countryCode && local.countryCode) city.countryCode = local.countryCode;
       if (!city.country && city.countryCode) city.country = getCountryName(city.countryCode);
-      window.__dynamicCityCoordsCache?.set(city.name.toLowerCase(), { lat: city.lat, lng: city.lng });
+      window.__dynamicCityCoordsCache?.set(city.name.toLowerCase(), { lat: city.lat, lng: city.lng, countryCode: city.countryCode || '' });
       resolvedCount++;
       continue;
     }
@@ -4404,11 +4435,16 @@ async function autoResolveMissingTripCities() {
       const searchFn = (typeof window !== 'undefined' && typeof window.searchCityOnline === 'function') ? window.searchCityOnline : searchCityOnline;
       const online = await searchFn(city.name, city.countryCode || '', city.country || '');
       if (online && cityHasStoredCoords(online)) {
-        city.lat = Number(online.lat);
-        city.lng = Number(online.lng);
+        if (!cityHasStoredCoords(city)) {
+          city.lat = Number(online.lat);
+          city.lng = Number(online.lng);
+        }
         if (!city.countryCode && online.countryCode) city.countryCode = online.countryCode;
-        if (!city.country && city.countryCode) city.country = getCountryName(city.countryCode);
-        window.__dynamicCityCoordsCache?.set(city.name.toLowerCase(), { lat: city.lat, lng: city.lng });
+        if (!city.country && city.countryCode) {
+          const mappedName = getCountryName(city.countryCode);
+          city.country = (mappedName && mappedName !== city.countryCode) ? mappedName : (online.countryName || mappedName);
+        }
+        window.__dynamicCityCoordsCache?.set(city.name.toLowerCase(), { lat: city.lat, lng: city.lng, countryCode: city.countryCode || '' });
         addUserCity(city.id, city.name, city.countryCode, city.lat, city.lng);
         resolvedCount++;
       }
@@ -4420,6 +4456,8 @@ async function autoResolveMissingTripCities() {
   if (resolvedCount > 0) {
     try {
       if (typeof saveData === 'function') saveData(false);
+      if (typeof buildCityNav === 'function') buildCityNav();
+      if (typeof buildItinerary === 'function') buildItinerary();
       if (typeof buildJourneyMap === 'function') buildJourneyMap();
       if (typeof buildDesktopSplitMap === 'function') buildDesktopSplitMap();
       const modal = document.getElementById('city-modal');

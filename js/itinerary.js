@@ -27,12 +27,14 @@ function stripCompactLeadingEmoji(text) {
 
 function getLegHeaderLabelWithFlag(label) {
   if (!label) return '';
-  const hasEmoji = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/u.test(label);
+  const hasLeadingPin = /^\s*📍\s*/u.test(label);
+  const strippedLabel = hasLeadingPin ? String(label).replace(/^\s*📍\s*/u, '').trim() : label;
+  const hasEmoji = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/u.test(strippedLabel);
   if (!hasEmoji) {
-    const cleanName = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(label) : label.trim();
+    const cleanName = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(strippedLabel) : strippedLabel.trim();
     const flag = typeof getCityFlag === 'function' ? getCityFlag(cleanName) : '📍';
     if (flag && flag !== '📍' && flag !== '🌐') {
-      return flag + ' ' + label;
+      return flag + ' ' + strippedLabel;
     }
   }
   return label;
