@@ -296,6 +296,7 @@ function setupMobileSwipePagers(root = document) {
 
     const total = slides.length;
     let suppressObserver = false;
+    let suppressTimer = 0;
     let scrollFrame = 0;
     const initialIndex = getMobilePagerActiveIndex(pagerKey, Number(pager.dataset.activeIndex || 0));
 
@@ -337,7 +338,19 @@ function setupMobileSwipePagers(root = document) {
       }
 
       if (typeof syncItineraryMobileHeightContainment === 'function') {
-        syncItineraryMobileHeightContainment(pager.closest('#tab-itinerary') || document);
+        syncItineraryMobileHeightContainment(pager.closest('.tab-pane') || document);
+      }
+
+      if (typeof window !== 'undefined' && window.innerWidth <= 768 && pager.closest('#tab-transport, #tab-accom')) {
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(() => {
+            const docEl = document.documentElement;
+            const maxScroll = Math.max(0, (docEl ? docEl.scrollHeight : 0) - window.innerHeight);
+            if (window.scrollY > maxScroll) {
+              window.scrollTo({ top: maxScroll, behavior: 'auto' });
+            }
+          });
+        }
       }
     };
 
@@ -345,9 +358,10 @@ function setupMobileSwipePagers(root = document) {
       const slide = slides[nextIndex];
       if (!slide) return;
       suppressObserver = true;
+      if (suppressTimer) window.clearTimeout(suppressTimer);
       scrollChildIntoHorizontalView(carousel, slide, { behavior: 'smooth', align: 'start' });
       setActive(nextIndex);
-      window.setTimeout(() => {
+      suppressTimer = window.setTimeout(() => {
         suppressObserver = false;
       }, 420);
     };

@@ -1996,14 +1996,38 @@
       box-sizing: border-box;
     }
 
-    body.mobile-app-mode #tab-accom {
+    body.mobile-app-mode #tab-accom,
+    body.mobile-app-mode #tab-transport {
       contain: layout paint style;
       overflow-anchor: none;
     }
 
-    body.mobile-app-mode .stay-swipe-pager {
+    body.mobile-app-mode .stay-swipe-pager,
+    body.mobile-app-mode .transport-swipe-pager {
       contain: content;
       overflow-anchor: none;
+    }
+
+    body.mobile-app-mode :is(#tab-transport, #tab-accom) .section-header {
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 40;
+      background: var(--color-bg-primary, #f8fafc);
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+    }
+
+    body.mobile-app-mode .transport-mobile-card {
+      padding: 0.65rem 0.75rem;
+      gap: 0.45rem;
+    }
+
+    body.mobile-app-mode .transport-mobile-card .transport-mobile-facts-grid {
+      gap: 0.32rem;
+    }
+
+    body.mobile-app-mode .transport-mobile-card .transport-mobile-fact {
+      padding: 0.35rem 0.5rem;
     }
 
     body.mobile-app-mode .day-card,

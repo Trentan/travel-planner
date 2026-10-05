@@ -1152,7 +1152,7 @@ function syncItineraryMobileHeightContainment(root = document) {
   const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : window.innerWidth <= 768;
 
   if (!isMobile) {
-    root.querySelectorAll('.compact-day-carousel, .compact-city-swipe-pager [data-role="mobile-swipe-carousel"]').forEach(el => {
+    root.querySelectorAll('.compact-day-carousel, [data-role="mobile-swipe-pager"] [data-role="mobile-swipe-carousel"]').forEach(el => {
       el.style.height = '';
       el.style.minHeight = '';
     });
@@ -1176,23 +1176,31 @@ function syncItineraryMobileHeightContainment(root = document) {
     }
   });
 
-  // 2. Constrain outer compact city swipe carousel to its active city slide's height
+  // 2. Constrain outer mobile swipe carousels (itinerary city, transport, stays) to their active slide's height
   const syncOuter = () => {
-    const cityPager = root.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]') || document.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]');
-    if (!cityPager) return;
-    const cityCarousel = cityPager.querySelector('[data-role="mobile-swipe-carousel"]');
-    if (!cityCarousel) return;
-
-    const activeIndex = Math.max(0, Number(cityPager.dataset.activeIndex || 0));
-    const slides = Array.from(cityPager.querySelectorAll('.compact-city-slide'));
-    const activeCitySlide = slides[activeIndex] || cityPager.querySelector('.compact-city-slide.is-active') || slides[0];
-    if (activeCitySlide) {
-      const card = activeCitySlide.querySelector('.compact-leg-card') || activeCitySlide;
-      const height = Math.max(card.offsetHeight, card.scrollHeight, activeCitySlide.offsetHeight, activeCitySlide.scrollHeight);
-      if (height > 0) {
-        cityCarousel.style.height = `${height + 8}px`;
-      }
+    const pagersSet = new Set();
+    if (root && typeof root.querySelectorAll === 'function') {
+      root.querySelectorAll('[data-role="mobile-swipe-pager"]').forEach(p => pagersSet.add(p));
     }
+    if (typeof document !== 'undefined' && document !== root && typeof document.querySelectorAll === 'function') {
+      document.querySelectorAll('[data-role="mobile-swipe-pager"]').forEach(p => pagersSet.add(p));
+    }
+
+    pagersSet.forEach(swipePager => {
+      const swipeCarousel = swipePager.querySelector('[data-role="mobile-swipe-carousel"]');
+      if (!swipeCarousel) return;
+
+      const activeIndex = Math.max(0, Number(swipePager.dataset.activeIndex || 0));
+      const slides = Array.from(swipePager.querySelectorAll('[data-role="mobile-swipe-slide"]'));
+      const activeSlide = slides[activeIndex] || swipePager.querySelector('[data-role="mobile-swipe-slide"].is-active') || slides[0];
+      if (activeSlide) {
+        const card = activeSlide.querySelector('.compact-leg-card, .mobile-surface-card') || activeSlide.firstElementChild || activeSlide;
+        const height = Math.max(card.offsetHeight || 0, card.scrollHeight || 0, activeSlide.offsetHeight || 0, activeSlide.scrollHeight || 0);
+        if (height > 0) {
+          swipeCarousel.style.height = `${height + 8}px`;
+        }
+      }
+    });
   };
 
   syncOuter();
