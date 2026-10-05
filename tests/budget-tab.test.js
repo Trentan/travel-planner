@@ -89,6 +89,8 @@ function runBudgetTabTests() {
   // 3. Test buildBudgetTab execution and DOM population
   buildBudgetTab();
   assert(elements['budget-kpi-container'].innerHTML.includes('$300'), 'KPI container should include grand total $300');
+  assert(elements['budget-kpi-container'].innerHTML.includes('budget-kpi-cards-grid'), 'KPI container should render compact budget-kpi-cards-grid wrapper (#498)');
+  assert(elements['budget-kpi-container'].innerHTML.includes('budget-kpi-card'), 'KPI container should render budget-kpi-card tiles (#498)');
   assert(elements['budget-table-container'].innerHTML.includes('Tokyo Leg'), 'Table container should include leg label Tokyo Leg');
 
   console.log('✔ All buildBudgetTab refactoring unit tests passed successfully!\n');

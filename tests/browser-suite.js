@@ -964,6 +964,52 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     assert(scrollBoundsPassed === true, 'Mobile: itinerary vertical scroll bounds should strictly conform to active day content (#214)');
     reporter.add('mobile', 'itinerary vertical scroll bounds', 'mobile itinerary vertical scrolling bounds to active day height (#214)');
 
+    // Verify Mobile Day Header Chips do not overlap Stay pill (#497)
+    const dayHeaderNoOverlap = await page.evaluate(() => {
+      const tokyoSlide = document.getElementById('city-slide-1');
+      const activeDay = tokyoSlide?.querySelector('.compact-day-slide.is-active');
+      const chips = activeDay?.querySelector('.compact-day-header-chips');
+      const stayNote = activeDay?.querySelector('.day-stay-heading-note');
+      if (!chips) return false;
+      const pos = window.getComputedStyle(chips).position;
+      if (pos === 'absolute') return false;
+      if (!stayNote) return true;
+      const cRect = chips.getBoundingClientRect();
+      const sRect = stayNote.getBoundingClientRect();
+      const overlapsVertically = cRect.bottom > sRect.top + 1 && sRect.bottom > cRect.top + 1;
+      const overlapsHorizontally = cRect.right > sRect.left + 1 && sRect.right > cRect.left + 1;
+      return !(overlapsVertically && overlapsHorizontally);
+    });
+    assert(dayHeaderNoOverlap === true, 'Mobile: day header chips should use static flex flow and never overlap stay note (#497)');
+    reporter.add('mobile', 'day header pill layout', 'mobile day header chips and stay badge do not overlap (#497)');
+
+    // Verify Transit Mobile Carousel Height Containment (#496)
+    await page.locator('.app-tab-btn[data-tab="transport"]').click();
+    await humanPause(page, 250);
+    const transitBoundsPassed = await page.evaluate(async () => {
+      const pager = document.querySelector('#tab-transport [data-role="mobile-swipe-pager"]');
+      const carousel = pager?.querySelector('[data-role="mobile-swipe-carousel"]');
+      const activeSlide = pager?.querySelector('[data-role="mobile-swipe-slide"].is-active');
+      if (!pager || !carousel || !activeSlide) return false;
+      const card = activeSlide.firstElementChild || activeSlide;
+      const diff = Math.abs(carousel.offsetHeight - card.offsetHeight);
+      return diff <= 20;
+    });
+    assert(transitBoundsPassed === true, 'Mobile: transit swipe carousel height should conform to active journey card (#496)');
+    reporter.add('mobile', 'transit vertical scroll bounds', 'mobile transit carousel conforms to active slide height (#496)');
+
+    // Verify Slim Mobile Budget Cards (#498)
+    await page.locator('.app-tab-btn[data-tab="budget"]').click();
+    await humanPause(page, 250);
+    const budgetSlimPassed = await page.evaluate(() => {
+      const kpiCard = document.querySelector('#tab-budget .budget-kpi-card');
+      const legRow = document.querySelector('#tab-budget .budget-mobile-row');
+      if (!kpiCard || !legRow) return false;
+      return kpiCard.getBoundingClientRect().height <= 65 && legRow.getBoundingClientRect().height <= 85;
+    });
+    assert(budgetSlimPassed === true, 'Mobile: budget KPI cards and leg breakdown rows should use slim mobile dimensions (#498)');
+    reporter.add('mobile', 'slim budget layout', 'mobile budget KPI tiles and leg rows are compact (#498)');
+
     await page.evaluate(() => toggleMobileMenu());
     await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
     const downloadPromise = page.waitForEvent('download');
