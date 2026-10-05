@@ -5348,7 +5348,6 @@ function normalizeTripLegsData(legs) {
           });
         }
       });
-      delete leg.cityRun;
     }
     if (Array.isArray(leg.suggestedSights) && leg.suggestedSights.length > 0) {
       leg.suggestedSights.forEach(s => {
@@ -5365,7 +5364,6 @@ function normalizeTripLegsData(legs) {
           });
         }
       });
-      delete leg.suggestedSights;
     }
 
     // Step 1: Infer and persist leg.type: start/return for terminal legs, transit for same-day intermediate, city for multi-day
