@@ -1427,6 +1427,8 @@ function buildSplitDayData(legIndex, dayIndex) {
             name: ai.text,
             propertyName: ai.text,
             location: ai.location || cleanToCity,
+            lat: ai.lat,
+            lng: ai.lng,
             cost: ai.cost,
             bookingRef: ai.bookingRef,
             checkIn: day.date
@@ -1442,6 +1444,7 @@ function buildSplitDayData(legIndex, dayIndex) {
   const dayJourneys = allJourneys.filter(j => {
     if (!j) return false;
     if (j.date && j.date === day.date) return true;
+    if (day.date && (j.departureDate === day.date || j.arrivalDate === day.date || j.dayDate === day.date || j.startDate === day.date)) return true;
     if (j.fromLocation && j.toLocation && day.from && day.to) {
       const jFrom = String(j.fromLocation).toLowerCase();
       const jTo = String(j.toLocation).toLowerCase();
@@ -1458,6 +1461,8 @@ function buildSplitDayData(legIndex, dayIndex) {
       const matched = (typeof findAssignedSuggestedActivity === 'function')
         ? findAssignedSuggestedActivity(safeLegIndex, safeDayIndex, item.text, item.activityId)
         : null;
+      const itemLat = item.lat !== undefined && item.lat !== null && item.lat !== '' ? item.lat : (matched && matched.lat);
+      const itemLng = item.lng !== undefined && item.lng !== null && item.lng !== '' ? item.lng : (matched && matched.lng);
       activities.push({
         title: item.title || item.text || (matched && matched.title) || 'Activity',
         location: item.location || (matched && matched.location) || '',
@@ -1466,8 +1471,8 @@ function buildSplitDayData(legIndex, dayIndex) {
         notes: item.notes || (matched && matched.notes) || '',
         done: !!item.done,
         activityId: item.activityId || item.id || (matched && (matched.id || matched.activityId)) || `act-${itemIdx}`,
-        lat: item.lat || (matched && matched.lat),
-        lng: item.lng || (matched && matched.lng),
+        lat: itemLat,
+        lng: itemLng,
         cityId: item.cityId || (matched && matched.cityId) || leg.id || '',
         cityName: day.to || day.from || leg.label || ''
       });

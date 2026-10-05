@@ -68,6 +68,8 @@ function _getAiPromptSchema(title, cityCount) {
               "category": "transport",
               "notes": "Have passport, e-tickets, and travel documents ready.",
               "location": "Airport",
+              "lat": -27.3842,
+              "lng": 153.1175,
               "cityId": "city-home"
             }
           ]
@@ -82,6 +84,9 @@ function _getAiPromptSchema(title, cityCount) {
       "cityFood": [
         {
           "text": "Restaurant or Cafe Name - signature dishes or specialties",
+          "location": "Venue Address or Neighborhood, City Name",
+          "lat": -8.6500,
+          "lng": 115.1300,
           "done": false,
           "cityId": "city-cityname"
         }
@@ -94,7 +99,9 @@ function _getAiPromptSchema(title, cityCount) {
           "estTime": "1.5 hrs",
           "estCost": "0",
           "notes": "Brief notes on why this is recommended.",
-          "location": "Area or Neighborhood",
+          "location": "Specific Venue or Landmark, Area, City Name",
+          "lat": -8.6543,
+          "lng": 115.1258,
           "cityId": "city-cityname"
         }
       ],
@@ -120,7 +127,9 @@ function _getAiPromptSchema(title, cityCount) {
               "done": false,
               "category": "fitness",
               "notes": "Scenic seaside or park loop.",
-              "location": "Neighborhood",
+              "location": "Specific Beach, Park, or Landmark, City Name",
+              "lat": -8.6543,
+              "lng": 115.1258,
               "cityId": "city-cityname"
             },
             {
@@ -130,7 +139,9 @@ function _getAiPromptSchema(title, cityCount) {
               "done": false,
               "category": "food",
               "notes": "Healthy bowls and local coffee.",
-              "location": "Cafe Address or Area",
+              "location": "Cafe Name & Street/Area, City Name",
+              "lat": -8.6512,
+              "lng": 115.1324,
               "cityId": "city-cityname"
             }
           ]
@@ -162,6 +173,8 @@ function _getAiPromptSchema(title, cityCount) {
               "category": "transport",
               "notes": "Arrive at airport 3 hours before departure.",
               "location": "Airport",
+              "lat": -8.7482,
+              "lng": 115.1672,
               "cityId": "city-cityname"
             }
           ]
@@ -180,6 +193,10 @@ function _getAiPromptSchema(title, cityCount) {
       "toLocation": "First City",
       "fromCityId": "city-home",
       "toCityId": "city-cityname",
+      "fromLat": -27.3842,
+      "fromLng": 153.1175,
+      "toLat": -8.7482,
+      "toLng": 115.1672,
       "departureDate": "YYYY-MM-DD",
       "departureTime": "09:30",
       "arrivalDate": "YYYY-MM-DD",
@@ -198,6 +215,9 @@ function _getAiPromptSchema(title, cityCount) {
       "cityId": "city-cityname",
       "city": "City Name",
       "propertyName": "Hotel Name",
+      "location": "Hotel Address or Neighborhood, City Name",
+      "lat": -8.6521,
+      "lng": 115.1310,
       "checkIn": "YYYY-MM-DD",
       "checkOut": "YYYY-MM-DD",
       "nights": 3,
@@ -288,7 +308,7 @@ function _getAiPromptRules(cities) {
    - Auto-generate city IDs as "city-[lowercase-city-name]" (e.g. "city-canggu", "city-ubud").
    - City "name" must be the clean standard city name (e.g. "Canggu", NOT "Canggu Bali").
    - Assign distinct colors from: #E74C3C, #3498DB, #27AE60, #F39C12, #9B59B6, #1ABC9C, #E91E63, #795548.
-   - Include country, countryCode, code, lat, and lng for every city whenever known.
+   - Include country, countryCode, code, and accurate decimal "lat" and "lng" coordinates for every city.
 
 2. ITINERARY LEGS & CLEAN LABELS: Create legs in chronological order:
    - "leg-start": Departure from home (cityId: "city-home", label: "🏠 Start (Home City)").
@@ -296,23 +316,24 @@ function _getAiPromptRules(cities) {
    - The leg "label" for each destination leg MUST BE "[Emoji] [City Name]" (e.g. "🌴 Canggu" or "🌿 Ubud"). DO NOT append long itinerary descriptions or theme text (e.g. NEVER "🌴 Bali Wellness, Diving & Fitness"). Put themes/descriptions in day "desc".
    - "leg-return": Return to home (cityId: "city-home", label: "🛫 Return Home").
 
-3. DAYS & ACTIVITY ITEMS ("text" FIELD):
+3. DAYS & ACTIVITY ITEMS ("text", "location", "lat", "lng" FIELDS):
    - Every day must have "date" (YYYY-MM-DD), "day" (Mon, Tue, etc.), "from", "to", "completed": false, "desc", and "activityItems".
    - In "activityItems", each item MUST have the property "text" containing the activity name/title (e.g. "text": "Morning Run along Echo Beach"). NEVER use "title" instead of "text" for activityItems!
-   - Every item MUST include a non-empty "location" specifying the venue name, area, or landmark (e.g. "location": "Echo Beach, Canggu", "location": "Pyramids of Chi, Ubud"). NEVER omit location or leave it as empty string ""!
-   - Include "time", "cost", "category", "notes", "location", "done": false, and "cityId".
+   - Every item MUST include a non-empty, mappable "location" specifying the actual venue name, area, or landmark (e.g. "location": "Echo Beach, Canggu", "location": "Pyramids of Chi, Ubud") AND actual (or close approximate) decimal "lat" and "lng" coordinates so every activity can be plotted at its true map position. NEVER omit location, lat, or lng, or leave location as empty string ""!
+   - Include "time", "cost", "category", "notes", "location", "lat", "lng", "done": false, and "cityId".
    - Category must be one of: "fitness", "sight", "attraction", "wellness", "food", "transport".
 
 4. SUGGESTED ACTIVITIES & POOL:
-   - In each destination leg, include 3-5 suggestedActivities in the pool with "id", "title", "category", "estTime", "estCost", "notes", and "cityId".
+   - In each destination leg, include 3-5 suggestedActivities in the pool with "id", "title", "category", "estTime", "estCost", "notes", "location", "lat", "lng", and "cityId".
+   - Always include a specific mappable "location" and actual (or close approximate) decimal "lat" and "lng" coordinates for every suggested activity.
 
 5. CITY FOOD & TIPS ("text" FIELD):
-   - In "cityFood", every item must have "text" (e.g. "text": "Crate Cafe - healthy breakfast bowls"), "done": false, and "cityId".
+   - In "cityFood", every item must have "text" (e.g. "text": "Crate Cafe - healthy breakfast bowls"), "location", "lat", "lng", "done": false, and "cityId".
    - In "legTips", every item must have "text" (e.g. "text": "Apply for e-VoA online before flying"), and "cityId". DO NOT use object with { title, note }; put the full tip in "text".
 
-6. STAYS & JOURNEYS:
-   - In "stays", the "city" property MUST EXACTLY match the "name" in "cities" (e.g. "city": "Bali"), and "cityId" must match "id" in "cities" (e.g. "city-bali"). Calculate nights = checkOut - checkIn.
-   - In "journeys", provide flights matching the booked junctions. Set "fromCityId" and "toCityId".
+6. STAYS & JOURNEYS (MAP COORDINATES & LOCATIONS):
+   - In "stays", the "city" property MUST EXACTLY match the "name" in "cities" (e.g. "city": "Bali"), and "cityId" must match "id" in "cities" (e.g. "city-bali"). Include a specific mappable "location" (hotel street address or neighborhood) and actual (or close approximate) decimal "lat" and "lng" coordinates for every accommodation stay. Calculate nights = checkOut - checkIn.
+   - In "journeys", provide flights/transport matching the booked junctions. Set "fromCityId", "toCityId", "fromLocation", "toLocation", and include actual (or close approximate) decimal coordinates "fromLat", "fromLng", "toLat", and "toLng" for the departure and arrival airports, stations, or cities.
 
 7. PACKING & CHECKLIST:
    - "packing" MUST strictly follow the 3-area nested structure with "areaName", "categories", and "items" (each item has "text" and "done": false). NEVER put loose strings directly into the "packing" array.

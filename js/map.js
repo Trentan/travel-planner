@@ -11,7 +11,7 @@ function getCityCoords(cityName) {
     .trim();
   if (!clean) return null;
 
-  const hasCoords = (c) => c && c.lat !== undefined && c.lng !== undefined && c.lat !== null && c.lng !== null && !isNaN(Number(c.lat)) && !isNaN(Number(c.lng));
+  const hasCoords = (c) => c && c.lat !== undefined && c.lng !== undefined && c.lat !== null && c.lng !== null && c.lat !== '' && c.lng !== '' && Number.isFinite(Number(c.lat)) && Number.isFinite(Number(c.lng)) && !(Number(c.lat) === 0 && Number(c.lng) === 0);
 
   // Special handling for 'Home' - resolve to the user's home city instead of matching Rome
   if (clean.toLowerCase() === 'home') {
@@ -79,13 +79,83 @@ function getCityCoords(cityName) {
     }
   }
 
-  // 2. Try ALL_CITIES (built-in + extended databases)
+  // 2. Try ALL_CITIES by city name
   if (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) {
     let match = ALL_CITIES.find(c => c.name && c.name.toLowerCase() === clean.toLowerCase());
     if (!match && strippedName !== clean) {
       match = ALL_CITIES.find(c => c.name && c.name.toLowerCase() === strippedName.toLowerCase());
     }
-    if (!match && airportCode) {
+    if (match && hasCoords(match)) {
+      return { lat: Number(match.lat), lng: Number(match.lng) };
+    }
+  }
+
+  // 3. Try item-level coordinates stored on journeys, stays, or itinerary activities
+  const cleanLower = clean.toLowerCase();
+  const strippedLower = strippedName.toLowerCase();
+  const matchesTarget = (val) => {
+    if (!val) return false;
+    const vLower = String(val).trim().toLowerCase();
+    return vLower === cleanLower || vLower === strippedLower;
+  };
+
+  const activeJourneys = (typeof window !== 'undefined' && Array.isArray(window.journeys))
+    ? window.journeys
+    : ((typeof journeys !== 'undefined' && Array.isArray(journeys)) ? journeys : []);
+  for (const j of activeJourneys) {
+    if (!j) continue;
+    if (matchesTarget(j.fromLocation || j.from)) {
+      const fCoords = { lat: j.fromLat !== undefined ? j.fromLat : j.lat, lng: j.fromLng !== undefined ? j.fromLng : j.lng };
+      if (hasCoords(fCoords)) return { lat: Number(fCoords.lat), lng: Number(fCoords.lng) };
+    }
+    if (matchesTarget(j.toLocation || j.to)) {
+      const tCoords = { lat: j.toLat, lng: j.toLng };
+      if (hasCoords(tCoords)) return { lat: Number(tCoords.lat), lng: Number(tCoords.lng) };
+    }
+  }
+
+  const activeStays = (typeof window !== 'undefined' && Array.isArray(window.stays))
+    ? window.stays
+    : ((typeof stays !== 'undefined' && Array.isArray(stays)) ? stays : []);
+  for (const s of activeStays) {
+    if (!s || !hasCoords(s)) continue;
+    if (matchesTarget(s.location) || matchesTarget(s.city) || matchesTarget(s.propertyName) || matchesTarget(s.name)) {
+      return { lat: Number(s.lat), lng: Number(s.lng) };
+    }
+  }
+
+  if (typeof appData !== 'undefined' && Array.isArray(appData)) {
+    for (const leg of appData) {
+      if (!leg) continue;
+      for (const act of (leg.suggestedActivities || [])) {
+        if (act && hasCoords(act) && (matchesTarget(act.location) || matchesTarget(act.title))) {
+          return { lat: Number(act.lat), lng: Number(act.lng) };
+        }
+      }
+      for (const food of (leg.cityFood || [])) {
+        if (food && hasCoords(food) && (matchesTarget(food.location) || matchesTarget(food.text))) {
+          return { lat: Number(food.lat), lng: Number(food.lng) };
+        }
+      }
+      for (const day of (leg.days || [])) {
+        for (const item of (day.activityItems || [])) {
+          if (item && hasCoords(item) && (matchesTarget(item.location) || matchesTarget(item.text) || matchesTarget(item.title))) {
+            return { lat: Number(item.lat), lng: Number(item.lng) };
+          }
+        }
+        for (const ai of (day.accomItems || [])) {
+          if (ai && hasCoords(ai) && (matchesTarget(ai.location) || matchesTarget(ai.text))) {
+            return { lat: Number(ai.lat), lng: Number(ai.lng) };
+          }
+        }
+      }
+    }
+  }
+
+  // 4. Try ALL_CITIES by airport / ICAO code
+  if (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) {
+    let match = null;
+    if (airportCode) {
       match = ALL_CITIES.find(c => c.code && c.code.toUpperCase() === airportCode);
     }
     if (!match && icaoCode) {
@@ -96,7 +166,7 @@ function getCityCoords(cityName) {
     }
   }
 
-  // 3. Try local database resolution and aliases (resolveCityLocationLocal)
+  // 5. Try local database resolution and aliases (resolveCityLocationLocal)
   if (typeof resolveCityLocationLocal === 'function') {
     const loc = resolveCityLocationLocal(parenMatch ? { name: strippedName, code: airportCode } : { name: clean });
     if (loc && hasCoords(loc)) {
@@ -344,24 +414,31 @@ function drawMapPolylines(travelSequence) {
     const fromStop = travelSequence[i];
     const toStop = travelSequence[i + 1];
 
-    const fromCoords = getCityCoords(fromStop.name);
-    const toCoords = getCityCoords(toStop.name);
+    // Find transport linking these two
+    let matchedJourney = null;
+    if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
+       matchedJourney = journeys.find(j => {
+         const jFrom = getMapCityKey(j.fromLocation || j.from);
+         const jTo = getMapCityKey(j.toLocation || j.to);
+         const sFrom = getMapCityKey(fromStop.name);
+         const sTo = getMapCityKey(toStop.name);
+         return (jFrom === sFrom && jTo === sTo) ||
+                (j.fromCityId && j.toCityId && j.fromCityId === fromStop.id && j.toCityId === toStop.id);
+       });
+    }
+
+    let fromCoords = getCityCoords(fromStop.name);
+    let toCoords = getCityCoords(toStop.name);
+    if (!fromCoords && matchedJourney && matchedJourney.fromLat !== undefined && matchedJourney.fromLng !== undefined && Number.isFinite(Number(matchedJourney.fromLat)) && Number.isFinite(Number(matchedJourney.fromLng))) {
+      fromCoords = { lat: Number(matchedJourney.fromLat), lng: Number(matchedJourney.fromLng) };
+    }
+    if (!toCoords && matchedJourney && matchedJourney.toLat !== undefined && matchedJourney.toLng !== undefined && Number.isFinite(Number(matchedJourney.toLat)) && Number.isFinite(Number(matchedJourney.toLng))) {
+      toCoords = { lat: Number(matchedJourney.toLat), lng: Number(matchedJourney.toLng) };
+    }
 
     if (fromCoords && toCoords) {
       if (i === 0) polylinePoints.push([fromCoords.lat, fromCoords.lng]);
       polylinePoints.push([toCoords.lat, toCoords.lng]);
-
-      // Find transport linking these two
-      let matchedJourney = null;
-      if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
-         matchedJourney = journeys.find(j => {
-           const jFrom = getMapCityKey(j.fromLocation || j.from);
-           const jTo = getMapCityKey(j.toLocation || j.to);
-           const sFrom = getMapCityKey(fromStop.name);
-           const sTo = getMapCityKey(toStop.name);
-           return jFrom === sFrom && jTo === sTo;
-         });
-      }
 
       let lineColor = '#FF6B6B'; // default
       let dashArray = '10, 10';
@@ -749,22 +826,31 @@ function buildDesktopSplitMap() {
   for (let i = 0; i < travelSequence.length - 1; i++) {
     const fromStop = travelSequence[i];
     const toStop = travelSequence[i + 1];
-    const fromCoords = getCityCoords(fromStop.name);
-    const toCoords = getCityCoords(toStop.name);
+
+    let matchedJourney = null;
+    if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
+      matchedJourney = journeys.find(j => {
+        const jFrom = getMapCityKey(j.fromLocation || j.from);
+        const jTo = getMapCityKey(j.toLocation || j.to);
+        const sFrom = getMapCityKey(fromStop.name);
+        const sTo = getMapCityKey(toStop.name);
+        return (jFrom === sFrom && jTo === sTo) ||
+               (j.fromCityId && j.toCityId && j.fromCityId === fromStop.id && j.toCityId === toStop.id);
+      });
+    }
+
+    let fromCoords = getCityCoords(fromStop.name);
+    let toCoords = getCityCoords(toStop.name);
+    if (!fromCoords && matchedJourney && matchedJourney.fromLat !== undefined && matchedJourney.fromLng !== undefined && Number.isFinite(Number(matchedJourney.fromLat)) && Number.isFinite(Number(matchedJourney.fromLng))) {
+      fromCoords = { lat: Number(matchedJourney.fromLat), lng: Number(matchedJourney.fromLng) };
+    }
+    if (!toCoords && matchedJourney && matchedJourney.toLat !== undefined && matchedJourney.toLng !== undefined && Number.isFinite(Number(matchedJourney.toLat)) && Number.isFinite(Number(matchedJourney.toLng))) {
+      toCoords = { lat: Number(matchedJourney.toLat), lng: Number(matchedJourney.toLng) };
+    }
+
     if (fromCoords && toCoords) {
       if (i === 0) polylinePoints.push([fromCoords.lat, fromCoords.lng]);
       polylinePoints.push([toCoords.lat, toCoords.lng]);
-
-      let matchedJourney = null;
-      if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
-        matchedJourney = journeys.find(j => {
-          const jFrom = getMapCityKey(j.fromLocation || j.from);
-          const jTo = getMapCityKey(j.toLocation || j.to);
-          const sFrom = getMapCityKey(fromStop.name);
-          const sTo = getMapCityKey(toStop.name);
-          return jFrom === sFrom && jTo === sTo;
-        });
-      }
 
       let lineColor = '#0f766e';
       let dashArray = '8, 8';
@@ -878,7 +964,7 @@ function focusStopOnSplitMap(targetLocation, itemData = null) {
   let coords = null;
   if (entry) {
     coords = typeof entry.marker.getLatLng === 'function' ? entry.marker.getLatLng() : { lat: entry.lat, lng: entry.lng };
-  } else if (itemData && itemData.lat && itemData.lng && !isNaN(Number(itemData.lat))) {
+  } else if (itemData && itemData.lat !== undefined && itemData.lng !== undefined && itemData.lat !== null && itemData.lat !== '' && Number.isFinite(Number(itemData.lat)) && Number.isFinite(Number(itemData.lng))) {
     coords = { lat: Number(itemData.lat), lng: Number(itemData.lng) };
   } else if (cleanTarget) {
     coords = getCityCoords(cleanTarget);
@@ -931,8 +1017,7 @@ function clearSplitMapLayers() {
 }
 
 function getDeterministicActivityCoords(baseCoords, act, index, total) {
-  if (!baseCoords) return null;
-  if (act && act.lat !== undefined && act.lng !== undefined && act.lat !== null && !isNaN(Number(act.lat))) {
+  if (act && act.lat !== undefined && act.lng !== undefined && act.lat !== null && act.lng !== null && act.lat !== '' && act.lng !== '' && Number.isFinite(Number(act.lat)) && Number.isFinite(Number(act.lng)) && !(Number(act.lat) === 0 && Number(act.lng) === 0)) {
     return { lat: Number(act.lat), lng: Number(act.lng) };
   }
   let actLoc = String((act && act.location) || '').trim();
@@ -949,11 +1034,13 @@ function getDeterministicActivityCoords(baseCoords, act, index, total) {
   if (actLoc) {
     const direct = getCityCoords(actLoc);
     if (direct) {
+      if (!baseCoords) return direct;
       const dLat = Math.abs(direct.lat - baseCoords.lat);
       const dLng = Math.abs(direct.lng - baseCoords.lng);
       if (dLat < 1.2 && dLng < 1.5) return direct;
     }
   }
+  if (!baseCoords) return null;
   if (actLoc && typeof ALL_CITIES !== 'undefined') {
     const words = actLoc.split(/[\s,/·-]+/).filter(w => w.length > 2);
     for (const w of words) {
@@ -1044,8 +1131,17 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
 
   const targetCity = cleanTo || cleanFrom || (dayData.leg && dayData.leg.label);
   const cityCoords = getCityCoords(targetCity);
-  const fromCoords = isTravelDay ? getCityCoords(cleanFrom) : null;
-  const toCoords = isTravelDay ? getCityCoords(cleanTo) : cityCoords;
+  const dayJourneys = Array.isArray(dayData.journeys) ? dayData.journeys : [];
+  const primaryJourney = dayJourneys[0] || null;
+  const journeyFromCoords = primaryJourney && primaryJourney.fromLat !== undefined && primaryJourney.fromLng !== undefined && Number.isFinite(Number(primaryJourney.fromLat)) && Number.isFinite(Number(primaryJourney.fromLng))
+    ? { lat: Number(primaryJourney.fromLat), lng: Number(primaryJourney.fromLng) }
+    : null;
+  const journeyToCoords = primaryJourney && primaryJourney.toLat !== undefined && primaryJourney.toLng !== undefined && Number.isFinite(Number(primaryJourney.toLat)) && Number.isFinite(Number(primaryJourney.toLng))
+    ? { lat: Number(primaryJourney.toLat), lng: Number(primaryJourney.toLng) }
+    : null;
+
+  const fromCoords = isTravelDay ? (journeyFromCoords || getCityCoords(cleanFrom)) : null;
+  const toCoords = isTravelDay ? (journeyToCoords || getCityCoords(cleanTo)) : (cityCoords || journeyToCoords);
 
   if (isTravelDay) {
     if (fromCoords && toCoords) {
@@ -1104,7 +1200,18 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
     points.push([cityCoords.lat, cityCoords.lng]);
   }
 
-  const baseCoords = toCoords || cityCoords || fromCoords;
+  let baseCoords = toCoords || cityCoords || fromCoords;
+  if (!baseCoords) {
+    const stayWithCoords = stays.find(s => s && s.lat !== undefined && s.lng !== undefined && s.lat !== null && s.lat !== '' && Number.isFinite(Number(s.lat)) && Number.isFinite(Number(s.lng)));
+    if (stayWithCoords) {
+      baseCoords = { lat: Number(stayWithCoords.lat), lng: Number(stayWithCoords.lng) };
+    } else {
+      const actWithCoords = activities.find(a => a && a.lat !== undefined && a.lng !== undefined && a.lat !== null && a.lat !== '' && Number.isFinite(Number(a.lat)) && Number.isFinite(Number(a.lng)));
+      if (actWithCoords) {
+        baseCoords = { lat: Number(actWithCoords.lat), lng: Number(actWithCoords.lng) };
+      }
+    }
+  }
   const stayCoordsList = [];
   const activityCoordsList = [];
 
@@ -1113,7 +1220,7 @@ function renderDesktopSplitDayMap(dayData, options = {}) {
     const stayName = stay.name || stay.propertyName || 'Accommodation';
     const stayLoc = stay.location || stay.city || targetCity;
     let directStayCoords = null;
-    if (stay && stay.lat !== undefined && stay.lng !== undefined && stay.lat !== null && !isNaN(Number(stay.lat)) && !isNaN(Number(stay.lng))) {
+    if (stay && stay.lat !== undefined && stay.lng !== undefined && stay.lat !== null && stay.lat !== '' && stay.lng !== '' && Number.isFinite(Number(stay.lat)) && Number.isFinite(Number(stay.lng))) {
       directStayCoords = { lat: Number(stay.lat), lng: Number(stay.lng) };
     } else {
       directStayCoords = getCityCoords(stayLoc);

@@ -34,7 +34,21 @@ async function runAiBuilderImportTests() {
   assert(prompt.includes('DO NOT append long itinerary descriptions or theme text'), 'Prompt rules must instruct clean leg labels');
   assert(prompt.includes('areaName'), 'Prompt schema must include nested packing area structure');
   assert(prompt.includes('cityId'), 'Prompt must emphasize cityId consistency');
-  console.log('  ✔ buildAiPrompt schema & rules verification passed');
+  assert(prompt.includes('"fromLat"') && prompt.includes('"fromLng"') && prompt.includes('"toLat"') && prompt.includes('"toLng"'), 'Prompt schema and rules must require fromLat/fromLng/toLat/toLng for journeys');
+  assert(prompt.includes('actual (or close approximate) decimal "lat" and "lng" coordinates'), 'Prompt rules must explicitly require lat/lng coordinates for map plotting');
+
+  // Parse the EXPECTED JSON SCHEMA block from the prompt and verify coordinate fields exist on all mappable entities
+  const schemaMatch = prompt.match(/EXPECTED JSON SCHEMA:\s*(\{[\s\S]*?\})\s*CRITICAL RULES FOR GENERATION:/);
+  assert(schemaMatch && schemaMatch[1], 'Should extract EXPECTED JSON SCHEMA JSON object from prompt');
+  const parsedSchema = JSON.parse(schemaMatch[1]);
+  assert(typeof parsedSchema.cities[0].lat === 'number' && typeof parsedSchema.cities[0].lng === 'number', 'Schema cities must include numeric lat/lng');
+  assert(typeof parsedSchema.itinerary[0].days[0].activityItems[0].lat === 'number' && typeof parsedSchema.itinerary[0].days[0].activityItems[0].lng === 'number', 'Schema start leg activityItems must include numeric lat/lng');
+  assert(typeof parsedSchema.itinerary[1].cityFood[0].lat === 'number' && typeof parsedSchema.itinerary[1].cityFood[0].lng === 'number', 'Schema cityFood must include numeric lat/lng');
+  assert(typeof parsedSchema.itinerary[1].suggestedActivities[0].lat === 'number' && typeof parsedSchema.itinerary[1].suggestedActivities[0].lng === 'number', 'Schema suggestedActivities must include numeric lat/lng');
+  assert(typeof parsedSchema.itinerary[1].days[0].activityItems[0].lat === 'number' && typeof parsedSchema.itinerary[1].days[0].activityItems[0].lng === 'number', 'Schema destination day activityItems must include numeric lat/lng');
+  assert(typeof parsedSchema.stays[0].lat === 'number' && typeof parsedSchema.stays[0].lng === 'number' && parsedSchema.stays[0].location, 'Schema stays must include location and numeric lat/lng');
+  assert(typeof parsedSchema.journeys[0].fromLat === 'number' && typeof parsedSchema.journeys[0].fromLng === 'number' && typeof parsedSchema.journeys[0].toLat === 'number' && typeof parsedSchema.journeys[0].toLng === 'number', 'Schema journeys must include numeric fromLat/fromLng/toLat/toLng');
+  console.log('  ✔ buildAiPrompt schema & rules verification passed (including map coordinates & locations)');
 
   // 2. Test importing the Bali 2026 fixture
   const fixturePath = path.join(__dirname, '../backups/test-fixtures/bali-2026.json');
@@ -357,6 +371,172 @@ async function runAiBuilderImportTests() {
   assert(unmappedCity.lng === -159.7892, 'Aitutaki lng resolved');
   assert(mapRebuilt, 'buildJourneyMap must be triggered upon auto-resolving missing cities');
   console.log('  ✔ autoResolveMissingTripCities asynchronously identifies and injects coordinates for unmapped cities');
+
+  // 3. Test AI Builder import with item-level lat/lng coordinates on activities, stays, cityFood, and journeys
+  const coordTripPayload = {
+    meta: { title: 'Canggu & Ubud Escape', subtitle: 'Generated 2-city itinerary' },
+    cities: [
+      {
+        id: 'city-canggu',
+        name: 'Canggu',
+        country: 'Indonesia',
+        countryCode: 'ID',
+        code: 'DPS',
+        lat: -8.6478,
+        lng: 115.1385,
+        dateFrom: '2026-12-13',
+        dateTo: '2026-12-16',
+        colour: '#1ABC9C'
+      }
+    ],
+    itinerary: [
+      {
+        id: 'leg-canggu',
+        cityId: 'city-canggu',
+        label: '🌴 Canggu',
+        colour: '#1ABC9C',
+        cityFood: [
+          {
+            text: 'Crate Cafe - Chia puddings and brekkie boards',
+            location: 'Jl. Canggu Padang Linjong No.49F, Canggu',
+            lat: -8.6432,
+            lng: 115.1341,
+            done: false,
+            cityId: 'city-canggu'
+          }
+        ],
+        suggestedActivities: [
+          {
+            id: 'act-canggu-surf',
+            title: 'Surf Session at Batu Bolong',
+            category: 'fitness',
+            estTime: '2 hrs',
+            estCost: '25',
+            notes: 'Longboard-friendly reef break.',
+            location: 'Batu Bolong Beach, Canggu',
+            lat: -8.6595,
+            lng: 115.1301,
+            cityId: 'city-canggu'
+          }
+        ],
+        legTips: [
+          { text: 'Use Gojek or Grab for short scooter rides around Canggu.', cityId: 'city-canggu' }
+        ],
+        days: [
+          {
+            date: '2026-12-14',
+            day: 'Mon',
+            from: 'Canggu',
+            to: 'Canggu',
+            completed: false,
+            desc: 'Beach run, surf, and sunset dinner',
+            activityItems: [
+              {
+                text: 'Morning Run along Echo Beach',
+                time: '07:00',
+                cost: '0',
+                done: false,
+                category: 'fitness',
+                notes: 'Coastal boardwalk loop.',
+                location: 'Echo Beach, Canggu',
+                lat: -8.6543,
+                lng: 115.1258,
+                cityId: 'city-canggu'
+              },
+              {
+                text: 'Surf Session at Batu Bolong',
+                time: '10:00',
+                cost: '25',
+                done: false,
+                category: 'fitness',
+                notes: 'Longboard-friendly reef break.',
+                location: 'Batu Bolong Beach, Canggu',
+                cityId: 'city-canggu'
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    stays: [
+      {
+        id: 'stay-como',
+        cityId: 'city-canggu',
+        city: 'Canggu',
+        propertyName: 'COMO Uma Canggu',
+        location: 'Jl. Pantai Batu Mejan, Echo Beach, Canggu',
+        lat: -8.6538,
+        lng: 115.1264,
+        checkIn: '2026-12-13',
+        checkOut: '2026-12-16',
+        nights: 3,
+        status: 'confirmed',
+        totalCost: 600
+      }
+    ],
+    journeys: [
+      {
+        id: 'journey-1',
+        journeyId: 'journey-outbound',
+        journeyName: 'Brisbane to Denpasar',
+        fromLocation: 'Brisbane Airport (BNE)',
+        toLocation: 'Ngurah Rai International Airport (DPS)',
+        fromCityId: 'city-home',
+        toCityId: 'city-canggu',
+        fromLat: -27.3842,
+        fromLng: 153.1175,
+        toLat: -8.7482,
+        toLng: 115.1672,
+        departureDate: '2026-12-13',
+        departureTime: '09:30',
+        arrivalDate: '2026-12-13',
+        arrivalTime: '14:30',
+        transportType: 'flight',
+        provider: 'Virgin Australia',
+        routeCode: 'VA43',
+        cost: 550,
+        status: 'confirmed'
+      }
+    ]
+  };
+
+  await loadImportedPayload(coordTripPayload, 'canggu-2026.json');
+  const importedState = context.getCurrentAppData();
+  const cangguLeg = importedState.itinerary.find(l => l.id === 'leg-canggu');
+  assert(cangguLeg, 'Canggu leg must exist after import');
+
+  const dayItems = cangguLeg.days[0].activityItems;
+  const echoRunItem = dayItems.find(i => i.text.includes('Echo Beach'));
+  const surfItem = dayItems.find(i => i.text.includes('Batu Bolong'));
+  assert(echoRunItem && echoRunItem.lat === -8.6543 && echoRunItem.lng === 115.1258, 'Activity item lat/lng must be preserved on import');
+  assert(surfItem && surfItem.lat === -8.6595 && surfItem.lng === 115.1301, 'Activity item must inherit lat/lng from matching suggestedActivity');
+
+  const echoSuggested = cangguLeg.suggestedActivities.find(a => a.title.includes('Echo Beach'));
+  assert(echoSuggested && echoSuggested.lat === -8.6543 && echoSuggested.lng === 115.1258, 'Auto-created suggestedActivity must preserve lat/lng from day activityItem');
+
+  const crateFood = cangguLeg.cityFood[0];
+  assert(crateFood && crateFood.lat === -8.6432 && crateFood.lng === 115.1341, 'cityFood item must preserve lat/lng on import');
+
+  const comoStay = (context.window.stays || context.stays || [])[0];
+  assert(comoStay && comoStay.lat === -8.6538 && comoStay.lng === 115.1264, 'Stay item must preserve lat/lng on import');
+  assert(comoStay.location === 'Jl. Pantai Batu Mejan, Echo Beach, Canggu', 'Stay item must preserve specific location on import');
+
+  const outboundJourney = (context.window.journeys || context.journeys || [])[0];
+  assert(outboundJourney && outboundJourney.fromLat === -27.3842 && outboundJourney.fromLng === 153.1175, 'Journey must preserve fromLat/fromLng on import');
+  assert(outboundJourney.toLat === -8.7482 && outboundJourney.toLng === 115.1672, 'Journey must preserve toLat/toLng on import');
+
+  // Verify map coordinate resolvers use item-level coordinates
+  const getDeterministicActivityCoords = context.getDeterministicActivityCoords;
+  const resolvedEchoCoords = getDeterministicActivityCoords({ lat: -8.6478, lng: 115.1385 }, echoRunItem, 0, 2);
+  assert(resolvedEchoCoords && resolvedEchoCoords.lat === -8.6543 && resolvedEchoCoords.lng === 115.1258, 'getDeterministicActivityCoords must return exact item lat/lng');
+  const resolvedWithoutBase = getDeterministicActivityCoords(null, echoRunItem, 0, 2);
+  assert(resolvedWithoutBase && resolvedWithoutBase.lat === -8.6543 && resolvedWithoutBase.lng === 115.1258, 'getDeterministicActivityCoords must return item lat/lng even when baseCoords is null');
+
+  const resolvedStayByLocation = context.getCityCoords('COMO Uma Canggu');
+  assert(resolvedStayByLocation && resolvedStayByLocation.lat === -8.6538 && resolvedStayByLocation.lng === 115.1264, 'getCityCoords must resolve stay coordinates by propertyName/location');
+  const resolvedJourneyEndpoint = context.getCityCoords('Ngurah Rai International Airport (DPS)');
+  assert(resolvedJourneyEndpoint && resolvedJourneyEndpoint.lat === -8.7482 && resolvedJourneyEndpoint.lng === 115.1672, 'getCityCoords must resolve journey endpoint coordinates');
+  console.log('  ✔ Imported item-level coordinates preserved and resolved for activities, stays, food, and journeys');
 
   console.log('✅ ALL AI BUILDER PROMPT & IMPORT HARDENING TESTS PASSED CLEANLY!\n');
 }

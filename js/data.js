@@ -5295,6 +5295,40 @@ function normalizeTripLegsData(legs) {
     if (!leg || typeof leg !== 'object') return;
     if (!Array.isArray(leg.days)) leg.days = [];
     if (!Array.isArray(leg.suggestedActivities)) leg.suggestedActivities = [];
+    if (Array.isArray(leg.cityRun) && leg.cityRun.length > 0) {
+      leg.cityRun.forEach(r => {
+        if (typeof r === 'string') {
+          leg.suggestedActivities.push({ title: r, category: 'fitness', estTime: '1 hr', estCost: '0', assignedDayIdx: null });
+        } else if (r && typeof r === 'object') {
+          leg.suggestedActivities.push({
+            ...r,
+            title: r.title || r.text || r.name || '',
+            category: r.category || 'fitness',
+            estTime: r.estTime || r.time || '1 hr',
+            estCost: r.estCost || r.cost || '0',
+            assignedDayIdx: r.assignedDayIdx !== undefined ? r.assignedDayIdx : null
+          });
+        }
+      });
+      delete leg.cityRun;
+    }
+    if (Array.isArray(leg.suggestedSights) && leg.suggestedSights.length > 0) {
+      leg.suggestedSights.forEach(s => {
+        if (typeof s === 'string') {
+          leg.suggestedActivities.push({ title: s, category: 'sight', estTime: '1 hr', estCost: '0', assignedDayIdx: null });
+        } else if (s && typeof s === 'object') {
+          leg.suggestedActivities.push({
+            ...s,
+            title: s.title || s.text || s.name || '',
+            category: s.category || 'sight',
+            estTime: s.estTime || s.time || '1 hr',
+            estCost: s.estCost || s.cost || '0',
+            assignedDayIdx: s.assignedDayIdx !== undefined ? s.assignedDayIdx : null
+          });
+        }
+      });
+      delete leg.suggestedSights;
+    }
 
     // Step 1: Infer and persist leg.type: start/return for terminal legs, transit for same-day intermediate, city for multi-day
     const lid = String(leg.id || '').toLowerCase();
@@ -5317,6 +5351,24 @@ function normalizeTripLegsData(legs) {
 
     const suggested = leg.suggestedActivities;
 
+    function _parseCoord(val) {
+      if (val === undefined || val === null || val === '') return undefined;
+      const num = Number.parseFloat(val);
+      return Number.isFinite(num) ? num : undefined;
+    }
+
+    function _normalizeEntityCoords(obj) {
+      if (!obj || typeof obj !== 'object') return;
+      const rawLat = obj.lat !== undefined ? obj.lat : (obj.latitude !== undefined ? obj.latitude : (obj.coords && obj.coords.lat));
+      const rawLng = obj.lng !== undefined ? obj.lng : (obj.longitude !== undefined ? obj.longitude : (obj.lon !== undefined ? obj.lon : (obj.coords && obj.coords.lng)));
+      const lat = _parseCoord(rawLat);
+      const lng = _parseCoord(rawLng);
+      if (lat !== undefined && lng !== undefined && !(lat === 0 && lng === 0)) {
+        obj.lat = lat;
+        obj.lng = lng;
+      }
+    }
+
     // Guarantee unique IDs and valid titles for all suggested activities
     suggested.forEach(act => {
       if (!act || typeof act !== 'object') return;
@@ -5329,6 +5381,7 @@ function normalizeTripLegsData(legs) {
         if (noteTitle) act.title = noteTitle.length > 50 ? noteTitle.substring(0, 47) + '...' : noteTitle;
       }
       if (!act.cityId && leg.cityId) act.cityId = leg.cityId;
+      _normalizeEntityCoords(act);
     });
 
     const usedSuggestionIndices = new Set();
@@ -5349,12 +5402,36 @@ function normalizeTripLegsData(legs) {
       if (day.from && _numSuffixRe.test(day.from)) day.from = day.from.replace(_numSuffixRe, '').trim();
       if (day.to && _numSuffixRe.test(day.to)) day.to = day.to.replace(_numSuffixRe, '').trim();
 
+      if (Array.isArray(day.accomItems)) {
+        day.accomItems.forEach(ai => _normalizeEntityCoords(ai));
+      }
+      if (Array.isArray(day.transportItems)) {
+        day.transportItems.forEach(ti => {
+          _normalizeEntityCoords(ti);
+          if (ti && typeof ti === 'object') {
+            const fLat = _parseCoord(ti.fromLat);
+            const fLng = _parseCoord(ti.fromLng);
+            if (fLat !== undefined && fLng !== undefined && !(fLat === 0 && fLng === 0)) {
+              ti.fromLat = fLat;
+              ti.fromLng = fLng;
+            }
+            const tLat = _parseCoord(ti.toLat);
+            const tLng = _parseCoord(ti.toLng);
+            if (tLat !== undefined && tLng !== undefined && !(tLat === 0 && tLng === 0)) {
+              ti.toLat = tLat;
+              ti.toLng = tLng;
+            }
+          }
+        });
+      }
+
       if ((!Array.isArray(day.activityItems) || day.activityItems.length === 0) && Array.isArray(day.activities) && day.activities.length > 0) {
         day.activityItems = day.activities;
       }
       if (!Array.isArray(day.activityItems)) day.activityItems = [];
       (day.activityItems || []).forEach(item => {
         if (!item || typeof item !== 'object') return;
+        _normalizeEntityCoords(item);
         // Fallback title / name / desc to text if text is missing or empty
         if (!item.text && (item.title || item.name || item.desc)) {
           item.text = String(item.title || item.name || item.desc).trim();
@@ -5469,6 +5546,15 @@ function normalizeTripLegsData(legs) {
             }
           }
 
+          // Bidirectional sync for coordinates (lat / lng)
+          if (item.lat !== undefined && item.lng !== undefined && (act.lat === undefined || act.lng === undefined)) {
+            act.lat = item.lat;
+            act.lng = item.lng;
+          } else if (act.lat !== undefined && act.lng !== undefined && (item.lat === undefined || item.lng === undefined)) {
+            item.lat = act.lat;
+            item.lng = act.lng;
+          }
+
           // Bidirectional sync for status
           if (item.status && !act.status) {
             act.status = item.status;
@@ -5533,6 +5619,10 @@ function normalizeTripLegsData(legs) {
             endDate: item.endDate || day.date || '',
             endTime: item.endTime || ''
           };
+          if (item.lat !== undefined && item.lng !== undefined) {
+            newActivity.lat = item.lat;
+            newActivity.lng = item.lng;
+          }
           suggested.push(newActivity);
           item.activityId = newActivity.id;
           usedSuggestionIndices.add(suggested.length - 1);
@@ -5559,6 +5649,10 @@ function normalizeTripLegsData(legs) {
           const existing = dedupedDayItems[existingIndex];
           if ((!existing.notes || existing.notes === '') && item.notes) existing.notes = item.notes;
           if ((!existing.location || existing.location === '') && item.location) existing.location = item.location;
+          if ((existing.lat === undefined || existing.lng === undefined) && item.lat !== undefined && item.lng !== undefined) {
+            existing.lat = item.lat;
+            existing.lng = item.lng;
+          }
           if ((!existing.time || existing.time === '1 hr') && item.time) existing.time = item.time;
           if ((!existing.cost || existing.cost === '0') && item.cost) existing.cost = item.cost;
           if ((!existing.externalLink || existing.externalLink === '') && (item.externalLink || item.audioRef || item.audioUrl)) existing.externalLink = item.externalLink || item.audioRef || item.audioUrl;
@@ -5569,7 +5663,7 @@ function normalizeTripLegsData(legs) {
       }
     });
 
-    // Normalize cityFood: ensure text, done, and cityId
+    // Normalize cityFood: ensure text, done, cityId, location, and coordinates
     if (Array.isArray(leg.cityFood)) {
       leg.cityFood = leg.cityFood.map(food => {
         if (typeof food === 'string') {
@@ -5580,6 +5674,8 @@ function normalizeTripLegsData(legs) {
             const extra = [food.cuisine, food.area, food.recommended, food.notes].filter(Boolean).join(' · ');
             food.text = extra ? `${food.name || food.title} (${extra})` : (food.name || food.title);
           }
+          if (!food.location && food.area) food.location = food.area;
+          _normalizeEntityCoords(food);
           if (food.done === undefined) food.done = false;
           if (!food.cityId && leg.cityId) food.cityId = leg.cityId;
         }
@@ -5611,6 +5707,7 @@ function normalizeTripLegsData(legs) {
       activity.endDate = normalizeTripDateValue(activity.endDate || activity.startDate || '');
       if (activity.startTime === undefined) activity.startTime = '';
       if (activity.endTime === undefined) activity.endTime = '';
+      _normalizeEntityCoords(activity);
     });
 
     // Deduplicate activities that share the same normalized title + assignment target.
@@ -5633,6 +5730,10 @@ function normalizeTripLegsData(legs) {
       // Keep richer fields when collapsing duplicates.
       if ((!existing.notes || existing.notes === '') && activity.notes) existing.notes = activity.notes;
       if ((!existing.location || existing.location === '') && activity.location) existing.location = activity.location;
+      if ((existing.lat === undefined || existing.lng === undefined) && activity.lat !== undefined && activity.lng !== undefined) {
+        existing.lat = activity.lat;
+        existing.lng = activity.lng;
+      }
       if ((!existing.estTime || existing.estTime === '1 hr') && activity.estTime) existing.estTime = activity.estTime;
       if ((!existing.estCost || existing.estCost === '0') && activity.estCost) existing.estCost = activity.estCost;
       if ((!existing.externalLink || existing.externalLink === '') && (activity.externalLink || activity.audioRef || activity.audioUrl)) existing.externalLink = activity.externalLink || activity.audioRef || activity.audioUrl;
@@ -5650,12 +5751,18 @@ if (typeof window !== 'undefined') {
 
 function normalizeTripJourneysData(items) {
   if (!Array.isArray(items)) return [];
-  
+
+  function _parseNum(val) {
+    if (val === undefined || val === null || val === '') return undefined;
+    const n = Number.parseFloat(val);
+    return Number.isFinite(n) ? n : undefined;
+  }
+
   const flatItems = [];
   items.forEach(item => {
     if (Array.isArray(item.legs) && item.legs.length > 0 && !item.transportType) {
       item.legs.forEach((leg, idx) => {
-        flatItems.push({
+        const flatLeg = {
           id: item.id ? `${item.id}_${idx}` : undefined,
           journeyId: item.journeyId || item.id,
           journeyName: item.journeyName || '',
@@ -5676,7 +5783,14 @@ function normalizeTripJourneysData(items) {
           status: leg.status || 'suggested',
           bookingReference: leg.bookingRef || leg.bookingReference || '',
           notes: leg.notes || ''
-        });
+        };
+        if (leg.fromLat !== undefined) flatLeg.fromLat = leg.fromLat;
+        if (leg.fromLng !== undefined) flatLeg.fromLng = leg.fromLng;
+        if (leg.toLat !== undefined) flatLeg.toLat = leg.toLat;
+        if (leg.toLng !== undefined) flatLeg.toLng = leg.toLng;
+        if (leg.lat !== undefined) flatLeg.lat = leg.lat;
+        if (leg.lng !== undefined) flatLeg.lng = leg.lng;
+        flatItems.push(flatLeg);
       });
     } else {
       flatItems.push(item);
@@ -5707,6 +5821,25 @@ function normalizeTripJourneysData(items) {
     item.fromAddress = item.fromAddress || '';
     item.toAddress = item.toAddress || '';
     item.notes = item.notes || '';
+
+    const fLat = _parseNum(item.fromLat !== undefined ? item.fromLat : (item.fromCoords && item.fromCoords.lat));
+    const fLng = _parseNum(item.fromLng !== undefined ? item.fromLng : (item.fromCoords && item.fromCoords.lng));
+    if (fLat !== undefined && fLng !== undefined && !(fLat === 0 && fLng === 0)) {
+      item.fromLat = fLat;
+      item.fromLng = fLng;
+    }
+    const tLat = _parseNum(item.toLat !== undefined ? item.toLat : (item.toCoords && item.toCoords.lat));
+    const tLng = _parseNum(item.toLng !== undefined ? item.toLng : (item.toCoords && item.toCoords.lng));
+    if (tLat !== undefined && tLng !== undefined && !(tLat === 0 && tLng === 0)) {
+      item.toLat = tLat;
+      item.toLng = tLng;
+    }
+    const jLat = _parseNum(item.lat !== undefined ? item.lat : item.latitude);
+    const jLng = _parseNum(item.lng !== undefined ? item.lng : (item.longitude !== undefined ? item.longitude : item.lon));
+    if (jLat !== undefined && jLng !== undefined && !(jLat === 0 && jLng === 0)) {
+      item.lat = jLat;
+      item.lng = jLng;
+    }
 
     const gid = item.journeyId || item.id;
     if (gid) {
@@ -5751,6 +5884,17 @@ function normalizeTripStaysData(items) {
     item.startTime = item.checkInTime || '';
     item.endTime = item.checkOutTime || '';
     item.location = item.location || item.address || '';
+
+    const rawLat = item.lat !== undefined ? item.lat : (item.latitude !== undefined ? item.latitude : (item.coords && item.coords.lat));
+    const rawLng = item.lng !== undefined ? item.lng : (item.longitude !== undefined ? item.longitude : (item.lon !== undefined ? item.lon : (item.coords && item.coords.lng)));
+    if (rawLat !== undefined && rawLat !== null && rawLat !== '' && rawLng !== undefined && rawLng !== null && rawLng !== '') {
+      const lat = Number.parseFloat(rawLat);
+      const lng = Number.parseFloat(rawLng);
+      if (Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0)) {
+        item.lat = lat;
+        item.lng = lng;
+      }
+    }
   });
   return items;
 }
