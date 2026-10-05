@@ -187,14 +187,18 @@
 
   body.mobile-app-mode #tab-itinerary .daily-timeline-content,
   body.mobile-app-mode #tab-itinerary .daily-timeline-compact .daily-timeline-content {
-    padding: 0 !important;
+    padding: 0.45rem 0.6rem !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .daily-timeline-smart-reminder .daily-timeline-reminder-content {
+    padding: 0.55rem 0.75rem !important;
   }
 
   body.mobile-app-mode #tab-itinerary .daily-timeline-content .daily-timeline-title,
   body.mobile-app-mode #tab-itinerary .daily-timeline-content .daily-timeline-meta,
   body.mobile-app-mode #tab-itinerary .daily-timeline-content .daily-timeline-notes,
   body.mobile-app-mode #tab-itinerary .daily-timeline-content .daily-timeline-sub-locations {
-    padding-inline: 0.4rem !important;
+    padding-inline: 0 !important;
   }
 
   body.mobile-app-mode #tab-budget .budget-desktop-table {

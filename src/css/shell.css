@@ -220,6 +220,10 @@
   }
 
   @media (min-width: 769px) {
+    body:not(.mobile-app-mode) {
+      padding-top: calc(var(--app-menu-height, 48px) + var(--app-tabs-height, 54px));
+    }
+
     .app-menu-bar {
       position: sticky;
       top: 0;
@@ -240,9 +244,9 @@
 
     .city-nav {
       display: block;
-      position: relative;
-      top: auto;
-      z-index: 20;
+      position: sticky;
+      top: calc(var(--app-menu-height, 48px) + var(--app-tabs-height, 54px) - 1px);
+      z-index: 150;
     }
 
     .city-nav-list {

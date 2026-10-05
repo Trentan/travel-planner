@@ -130,6 +130,21 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
     assert(await page.locator('#cityNav .city-nav-btn').count() > 0, 'Desktop: city nav should render');
     assert(await page.locator('#itinerary .leg').count() > 0, 'Desktop: itinerary should render');
 
+    const desktopHeaderAndCitySticky = await page.evaluate(async () => {
+      window.scrollTo(0, 0);
+      const tabsRect = document.querySelector('.app-tabs-nav').getBoundingClientRect();
+      const headerRect = document.querySelector('header').getBoundingClientRect();
+      const headerVisible = headerRect.top >= tabsRect.bottom - 2 && headerRect.height >= 80;
+      window.scrollTo(0, 500);
+      await new Promise(r => setTimeout(r, 60));
+      const tabsScrolled = document.querySelector('.app-tabs-nav').getBoundingClientRect();
+      const cityScrolled = document.querySelector('#cityNav').getBoundingClientRect();
+      const cityPos = window.getComputedStyle(document.querySelector('#cityNav')).position;
+      window.scrollTo(0, 0);
+      return headerVisible && cityPos === 'sticky' && Math.abs(cityScrolled.top - tabsScrolled.bottom) <= 4;
+    });
+    assert(desktopHeaderAndCitySticky === true, 'Desktop: trip header should be fully visible below tabs and #cityNav should stay sticky on scroll');
+
     await page.locator('.app-tab-btn[data-tab="itinerary"]').click();
     await humanPause(page, 350);
 
@@ -982,6 +997,14 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     });
     assert(dayHeaderNoOverlap === true, 'Mobile: day header chips should use static flex flow and never overlap stay note (#497)');
     reporter.add('mobile', 'day header pill layout', 'mobile day header chips and stay badge do not overlap (#497)');
+
+    const mobileTimelineBoxPadding = await page.evaluate(() => {
+      const item = document.querySelector('#tab-itinerary .daily-timeline-content');
+      if (!item) return false;
+      const cs = window.getComputedStyle(item);
+      return parseFloat(cs.paddingTop) >= 6 && parseFloat(cs.paddingLeft) >= 8;
+    });
+    assert(mobileTimelineBoxPadding === true, 'Mobile: timeline and reminder boxes should retain subtle inner padding (#497)');
 
     // Verify Transit Mobile Carousel Height Containment (#496)
     await page.locator('.app-tab-btn[data-tab="transport"]').click();

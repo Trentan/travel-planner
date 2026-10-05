@@ -931,7 +931,9 @@ body.mobile-app-mode #readOnlyBanner {
   font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: normal;
+  max-width: 100%;
+  text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.15s ease-in-out;
 }

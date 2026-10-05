@@ -89,7 +89,18 @@ function updateStickyOffsets() {
     : 0;
 
   if (cityNav) {
-    cityNav.style.top = '';
+    if (isMobile) {
+      cityNav.style.top = '';
+    } else {
+      const cityTop = Math.max(0, menuHeight + tabsHeight - 1);
+      cityNav.style.top = `${cityTop}px`;
+    }
+  }
+
+  if (!isMobile) {
+    document.body.style.paddingTop = `${menuHeight + tabsHeight}px`;
+  } else {
+    document.body.style.paddingTop = '';
   }
 
   // Set CSS custom properties on document root for fluid calculations
@@ -97,7 +108,7 @@ function updateStickyOffsets() {
     document.documentElement.style.setProperty('--app-menu-height', `${menuHeight}px`);
     document.documentElement.style.setProperty('--app-tabs-height', `${tabsHeight}px`);
     document.documentElement.style.setProperty('--app-city-height', `${cityHeight}px`);
-    const desktopStickyOffset = !isMobile ? (menuHeight + tabsHeight + 12) : 0;
+    const desktopStickyOffset = !isMobile ? (menuHeight + tabsHeight + cityHeight + 12) : 0;
     document.documentElement.style.setProperty('--desktop-sticky-offset', `${desktopStickyOffset}px`);
   }
 }
