@@ -714,23 +714,23 @@ function renderBudgetKPIs(kpiContainer, totals) {
   if (!kpiContainer) return;
   const { totalTrans, totalAccom, totalAct, grandTotal } = totals;
   kpiContainer.innerHTML = `
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-xl p-4 shadow-sm flex flex-col justify-center">
-        <h3 class="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Transport</h3>
-        <div class="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">${formatBudgetAmount(totalTrans)}</div>
+    <div class="budget-kpi-cards-grid grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-2.5 md:mb-6">
+      <div class="budget-kpi-card bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-xl px-3 py-1.5 md:p-4 shadow-sm flex flex-col justify-center">
+        <h3 class="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider leading-tight mb-0.5 md:mb-1">Transport</h3>
+        <div class="text-base md:text-2xl font-bold text-slate-800 dark:text-slate-100 leading-tight">${formatBudgetAmount(totalTrans)}</div>
       </div>
-      <div class="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-xl p-4 shadow-sm flex flex-col justify-center">
-        <h3 class="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Accommodation</h3>
-        <div class="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">${formatBudgetAmount(totalAccom)}</div>
+      <div class="budget-kpi-card bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-xl px-3 py-1.5 md:p-4 shadow-sm flex flex-col justify-center">
+        <h3 class="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider leading-tight mb-0.5 md:mb-1">Accommodation</h3>
+        <div class="text-base md:text-2xl font-bold text-slate-800 dark:text-slate-100 leading-tight">${formatBudgetAmount(totalAccom)}</div>
       </div>
-      <div class="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-xl p-4 shadow-sm flex flex-col justify-center">
-        <h3 class="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Activities</h3>
-        <div class="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">${formatBudgetAmount(totalAct)}</div>
+      <div class="budget-kpi-card bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-xl px-3 py-1.5 md:p-4 shadow-sm flex flex-col justify-center">
+        <h3 class="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider leading-tight mb-0.5 md:mb-1">Activities</h3>
+        <div class="text-base md:text-2xl font-bold text-slate-800 dark:text-slate-100 leading-tight">${formatBudgetAmount(totalAct)}</div>
       </div>
-      <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/50 rounded-xl p-4 shadow-sm flex flex-col justify-center relative overflow-hidden">
+      <div class="budget-kpi-card budget-kpi-card--total bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/50 rounded-xl px-3 py-1.5 md:p-4 shadow-sm flex flex-col justify-center relative overflow-hidden">
         <div class="absolute -right-4 -top-4 w-16 h-16 bg-indigo-100 dark:bg-indigo-800/40 rounded-full blur-xl"></div>
-        <h3 class="text-[10px] md:text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1 relative z-10">Grand Total</h3>
-        <div class="text-2xl md:text-3xl font-black text-indigo-700 dark:text-indigo-300 relative z-10">${formatBudgetAmount(grandTotal)}</div>
+        <h3 class="text-[10px] md:text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider leading-tight mb-0.5 md:mb-1 relative z-10">Grand Total</h3>
+        <div class="text-lg md:text-3xl font-black text-indigo-700 dark:text-indigo-300 leading-tight relative z-10">${formatBudgetAmount(grandTotal)}</div>
       </div>
     </div>
   `;

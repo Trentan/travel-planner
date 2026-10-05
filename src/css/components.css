@@ -4531,36 +4531,36 @@
   }
 
   .budget-mobile-breakdown-head {
-    @apply flex items-center justify-between gap-3 mb-2;
+    @apply flex items-center justify-between gap-2 mb-1;
   }
 
   .budget-mobile-breakdown-head h3 {
-    @apply m-0 text-sm font-extrabold text-slate-800;
+    @apply m-0 text-xs font-extrabold text-slate-800 dark:text-slate-100;
   }
 
   .budget-mobile-breakdown-head span {
-    @apply rounded-full border border-slate-200 bg-white px-2 py-1 text-[0.72rem] font-bold text-slate-500;
+    @apply rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-0.5 text-[0.68rem] font-bold text-slate-500 dark:text-slate-400;
   }
 
   .budget-mobile-row {
-    @apply rounded-xl border border-slate-200 bg-white p-3 shadow-sm;
+    @apply rounded-xl border border-slate-200 dark:border-slate-700/70 bg-white dark:bg-slate-900 px-2.5 py-1.5 shadow-sm;
     border-left: 4px solid var(--budget-accent, var(--color-accent-teal));
   }
 
   .budget-mobile-row-head {
-    @apply flex items-start justify-between gap-3;
+    @apply flex items-center justify-between gap-2;
   }
 
   .budget-mobile-row-head h3 {
-    @apply m-0 min-w-0 flex-1 text-[0.95rem] font-bold leading-snug text-slate-900;
+    @apply m-0 min-w-0 flex-1 text-[0.86rem] font-bold leading-tight text-slate-900 dark:text-slate-100;
   }
 
   .budget-mobile-row-head strong {
-    @apply shrink-0 text-right text-base font-black text-slate-900;
+    @apply shrink-0 text-right text-[0.92rem] font-black leading-tight text-slate-900 dark:text-slate-100;
   }
 
   .budget-mobile-meter {
-    @apply mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100;
+    @apply mt-1 h-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800;
   }
 
   .budget-mobile-meter span {
@@ -4569,19 +4569,19 @@
   }
 
   .budget-mobile-splits {
-    @apply mt-2 grid grid-cols-3 gap-1.5;
+    @apply mt-1 grid grid-cols-3 gap-1;
   }
 
   .budget-mobile-splits div {
-    @apply min-w-0 rounded-lg bg-slate-50 px-2 py-1.5;
+    @apply min-w-0 rounded-md bg-slate-50 dark:bg-slate-800/60 px-2 py-1 flex flex-col justify-center;
   }
 
   .budget-mobile-splits dt {
-    @apply text-[0.62rem] font-bold uppercase tracking-wide text-slate-500;
+    @apply text-[0.56rem] font-bold uppercase tracking-wide leading-none text-slate-500 dark:text-slate-400 truncate;
   }
 
   .budget-mobile-splits dd {
-    @apply m-0 mt-0.5 truncate text-[0.8rem] font-bold text-slate-800;
+    @apply m-0 mt-0.5 truncate text-[0.76rem] font-bold leading-tight text-slate-800 dark:text-slate-100;
   }
 
   .budget-mobile-empty {
