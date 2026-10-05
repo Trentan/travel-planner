@@ -92,7 +92,9 @@ function createMockDom() {
   return {
     document: {
       getElementById,
-      createElement
+      createElement,
+      querySelector: () => null,
+      querySelectorAll: () => []
     },
     window: {
       alert: () => {},
@@ -139,6 +141,9 @@ const scripts = [
   'js/data.js',
   'js/transport.js',
   'js/itinerary.js',
+  'js/leg-engine.js',
+  'js/leg-dialog.js',
+  'js/stays.js',
   'js/crud.js',
   'js/auto-stays.js'
 ];

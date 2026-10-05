@@ -1797,14 +1797,6 @@ function confirmAddLeg() {
     target.days.forEach(newDay => {
       const oldDay = oldDays.find(od => od.date === newDay.date);
       if (oldDay) {
-        if (oldDay.from) {
-          const cleanFrom = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(oldDay.from) : oldDay.from;
-          newDay.from = cleanFrom || oldDay.from;
-        }
-        if (oldDay.to) {
-          const cleanTo = typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(oldDay.to) : oldDay.to;
-          newDay.to = cleanTo || oldDay.to;
-        }
         if (oldDay.title) newDay.title = oldDay.title;
         if (oldDay.accomItems) newDay.accomItems = oldDay.accomItems;
         if (oldDay.activityItems) newDay.activityItems = oldDay.activityItems;
