@@ -552,6 +552,7 @@ async function run() {
     escapeHtmlText: s => s || '',
     renderStatusBadge: () => '',
     getStatusMeta: s => ({ color: '#000', label: s }),
+    renderMobileStatusCostMeta: opts => `<div class="status-cost-meta" data-status="${opts.status}">${opts.costValue}-${opts.bookingReference}</div>`,
     isEditMode: true,
     alert: msg => { throw new Error(msg); }
   });
@@ -610,6 +611,31 @@ async function run() {
   // Test default empty object
   const emptyOutput = renderTransportCarrierMobile();
   assert(typeof emptyOutput === 'string' && emptyOutput.includes('transport-carrier-meta'), 'renderTransportCarrierMobile with default params should return HTML structure without error');
+
+  // Tests for renderTransportStatusCostMobile refactored configuration object pattern
+  const { renderTransportStatusCostMobile } = transportContext;
+  assert(typeof renderTransportStatusCostMobile === 'function', 'renderTransportStatusCostMobile should be exported on transportContext');
+
+  // Test passing configuration object
+  const statusObjectOutput = renderTransportStatusCostMobile({
+    statusText: 'booked',
+    statusIcon: '✈️',
+    statusColor: '#000',
+    costValue: 1200,
+    bookingReference: 'ABCXYZ',
+    journeyId: 'j_qf1',
+    isEditable: true
+  });
+  assert(statusObjectOutput.includes('data-status="booked"'), 'renderTransportStatusCostMobile with object should process status');
+  assert(statusObjectOutput.includes('1200-ABCXYZ'), 'renderTransportStatusCostMobile with object should process cost and reference');
+
+  // Test positional parameters (legacy support)
+  const statusLegacyOutput = renderTransportStatusCostMobile('booked', '✈️', '#000', 1200, 'ABCXYZ', 'j_qf1', true);
+  assert(statusLegacyOutput === statusObjectOutput, 'renderTransportStatusCostMobile with legacy positional parameters should produce identical HTML output to configuration object');
+
+  // Test default empty object
+  const statusEmptyOutput = renderTransportStatusCostMobile();
+  assert(typeof statusEmptyOutput === 'string' && statusEmptyOutput.includes('status-cost-meta'), 'renderTransportStatusCostMobile with default params should return HTML structure without error');
 
   // XSS Escaping Test for Itinerary Leg Card Rendering
   const itineraryJs = loadSource(path.join('js', 'itinerary.js'));

@@ -1178,10 +1178,30 @@ function renderTransportCarrierMobile(options = {}) {
   `;
 }
 
-function renderTransportStatusCostMobile(statusText, statusIcon, statusColor, costValue, bookingReference, journeyId, isEditable) {
+function renderTransportStatusCostMobile(options = {}) {
+  const opts = (typeof options === 'object' && options !== null) ? options : {
+    statusText: options,
+    statusIcon: arguments[1],
+    statusColor: arguments[2],
+    costValue: arguments[3],
+    bookingReference: arguments[4],
+    journeyId: arguments[5],
+    isEditable: arguments[6]
+  };
+
+  const {
+    statusText = '',
+    statusIcon = '',
+    statusColor = '',
+    costValue = '',
+    bookingReference = '',
+    journeyId = '',
+    isEditable = false
+  } = opts;
+
   if (typeof renderMobileStatusCostMeta === 'function') {
     return renderMobileStatusCostMeta({
-      status: statusText.toLowerCase(),
+      status: String(statusText || '').toLowerCase(),
       costValue,
       bookingReference,
       statusOnClick: isEditable ? `toggleJourneyStatus('${journeyId}')` : '',
@@ -2455,6 +2475,7 @@ window.buildTransportTab = buildTransportTab;
 window.getDayJourneys = getDayJourneys;
 window.getTransportIcon = getTransportIcon;
 window.renderTransportCarrierMobile = renderTransportCarrierMobile;
+window.renderTransportStatusCostMobile = renderTransportStatusCostMobile;
 window.createJourneyFromTransportItem = createJourneyFromTransportItem;
 window.importJourneys = importJourneys;
 window.migrateJourneyCityIds = migrateJourneyCityIds;
