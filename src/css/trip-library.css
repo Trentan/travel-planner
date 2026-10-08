@@ -19,7 +19,7 @@
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   user-select: none;
 }
 
@@ -135,7 +135,7 @@
   border-radius: 12px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .trip-gallery-card:hover {
@@ -213,7 +213,7 @@
   font-weight: 600;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .trip-btn-primary {
@@ -700,7 +700,7 @@ body.mobile-app-mode #readOnlyBanner {
   border: 1px solid #e2e8f0;
   background: #f8fafc;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .booking-intake-card:hover {
@@ -935,7 +935,7 @@ body.mobile-app-mode #readOnlyBanner {
   max-width: 100%;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: all 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, color 0.15s ease-in-out, opacity 0.15s ease-in-out, box-shadow 0.15s ease-in-out, transform 0.15s ease-in-out;
 }
 
 .daily-timeline-reminder-action-btn:hover {
@@ -960,7 +960,7 @@ body.mobile-app-mode #readOnlyBanner {
   line-height: 1;
   border-radius: 9999px;
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, color 0.15s ease-in-out, opacity 0.15s ease-in-out, box-shadow 0.15s ease-in-out, transform 0.15s ease-in-out;
 }
 
 .daily-timeline-reminder-dismiss-btn:hover {
@@ -1090,7 +1090,7 @@ body.mobile-app-mode #readOnlyBanner {
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   border: 1px solid #cbd5e1;
   background: #ffffff;
   color: #334155;

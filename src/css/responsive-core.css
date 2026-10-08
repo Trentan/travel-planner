@@ -96,14 +96,23 @@
 
   .app-tabs-list {
     display: grid !important;
-    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    grid-auto-flow: column !important;
+    grid-auto-columns: 20% !important;
+    grid-template-columns: none !important;
     width: 100% !important;
     height: 100% !important;
     align-items: stretch !important;
     gap: 1px !important;
     padding: 0 !important;
     margin: 0 !important;
-    overflow-x: hidden !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x proximity !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .app-tabs-list::-webkit-scrollbar {
+    display: none !important;
   }
 
   .app-tab-btn,
@@ -116,7 +125,8 @@
     min-width: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    min-height: unset !important;
+    min-height: 2.75rem !important;
+    scroll-snap-align: start !important;
     text-align: center !important;
     border: none !important;
     border-bottom: none !important;
@@ -124,7 +134,7 @@
     background: transparent !important;
     color: #64748b !important;
     box-sizing: border-box !important;
-    transition: all 0.15s ease-in-out !important;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, transform 0.15s ease-in-out !important;
   }
 
   .app-tab-btn .tab-icon,
@@ -135,7 +145,7 @@
 
   .app-tab-btn .tab-label,
   .mobile-tabs-menu-btn .tab-label {
-    font-size: 10px !important;
+    font-size: 11px !important;
     line-height: 1.1 !important;
     font-weight: 500 !important;
     max-width: 100% !important;
@@ -304,7 +314,7 @@
   }
 
   .day-name {
-    font-size: 0.65rem !important; /* overrides text-xs sm:text-sm */
+    font-size: 0.75rem !important; /* overrides text-xs sm:text-sm */
   }
 
   .day-title {
@@ -317,13 +327,13 @@
   }
 
   .day-desc {
-    font-size: 0.72rem !important;
+    font-size: 0.75rem !important;
   }
 
   .day-chevron {
     width: 1.5rem !important;
     height: 1.5rem !important;
-    font-size: 0.7rem !important;
+    font-size: 0.75rem !important;
   }
 
   .day-detail {
@@ -360,7 +370,7 @@
 
   .detail-block h4 {
     margin-bottom: 0.35rem !important;
-    font-size: 0.7rem !important;
+    font-size: 0.75rem !important;
   }
 
   .item-list {
@@ -398,15 +408,15 @@
   }
 
   .daily-timeline-meta {
-    font-size: 0.72rem !important;
+    font-size: 0.75rem !important;
   }
 
   .daily-timeline-notes {
-    font-size: 0.72rem !important;
+    font-size: 0.75rem !important;
   }
 
   .daily-timeline-sub-locations {
-    font-size: 0.74rem !important;
+    font-size: 0.75rem !important;
   }
 
   .compact-day-slide {
@@ -433,8 +443,9 @@
   }
 
   .add-btn {
-    padding-block: 0.25rem !important;
-    font-size: 0.72rem !important;
+    min-height: 2.75rem !important;
+    padding-block: 0.625rem !important;
+    font-size: 0.75rem !important;
     margin-top: 0.35rem !important;
   }
 

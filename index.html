@@ -46,8 +46,8 @@
         <button class="trip-dropdown-item" onclick="closeTripDropdown(); openCloudSyncModal();">☁️ Cloud Sync (Google Drive)</button>
       </div>
     </div>
-    <span class="save-status" id="saveStatus"></span>
-    <span class="timestamp-status" id="timestampStatus"></span>
+    <span class="save-status" id="saveStatus" role="status" aria-live="polite"></span>
+    <span class="timestamp-status" id="timestampStatus" role="status" aria-live="polite"></span>
     <button id="headerCloudSyncStatusPill" class="cloud-status-pill disconnected" onclick="openCloudSyncModal()" title="View Google Drive Cloud Sync status">⚡ Local Only</button>
   </div>
   <div class="app-menu-right">
@@ -62,11 +62,11 @@
         <!-- 1. Files & Trips -->
         <div class="app-menu-section-group">
           <div class="app-menu-section-header">📁 Files & Trips</div>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripLibraryModal()"><span class="menu-icon">🖼️</span> My Trips Gallery</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCloudSyncModal()"><span class="menu-icon">☁️</span> Cloud Sync (Google Drive)</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCreateNewTripWizard()"><span class="menu-icon">✦</span> Create New Trip</button>
-          <button id="saveAsBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripFile()"><span class="menu-icon">💾</span> Save As JSON</button>
-          <button id="openFileBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openExistingTripFile()"><span class="menu-icon">📂</span> Open Local File</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripLibraryModal()"><span class="menu-icon" aria-hidden="true">🖼️</span> My Trips Gallery</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCloudSyncModal()"><span class="menu-icon" aria-hidden="true">☁️</span> Cloud Sync (Google Drive)</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCreateNewTripWizard()"><span class="menu-icon" aria-hidden="true">✦</span> Create New Trip</button>
+          <button id="saveAsBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripFile()"><span class="menu-icon" aria-hidden="true">💾</span> Save As JSON</button>
+          <button id="openFileBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openExistingTripFile()"><span class="menu-icon" aria-hidden="true">📂</span> Open Local File</button>
         </div>
 
         <div class="app-menu-divider" aria-hidden="true"></div>
@@ -74,11 +74,11 @@
         <!-- 2. Transport & Travel Tools -->
         <div class="app-menu-section-group">
           <div class="app-menu-section-header">🚗 Transport & Travel Tools</div>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openLegEditorDialog()"><span class="menu-icon">✈️</span> Transport & Transit</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCityDialog()"><span class="menu-icon">🌍</span> Cities & Locations</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openBookingIntakeDialog()"><span class="menu-icon">📥</span> Import Booking Intake</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openMapprImportModal()"><span class="menu-icon">🗺️</span> Import Mappr Map</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openAIDialog()"><span class="menu-icon">🤖</span> AI Builder</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openLegEditorDialog()"><span class="menu-icon" aria-hidden="true">✈️</span> Transport & Transit</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCityDialog()"><span class="menu-icon" aria-hidden="true">🌍</span> Cities & Locations</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openBookingIntakeDialog()"><span class="menu-icon" aria-hidden="true">📥</span> Import Booking Intake</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openMapprImportModal()"><span class="menu-icon" aria-hidden="true">🗺️</span> Import Mappr Map</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openAIDialog()"><span class="menu-icon" aria-hidden="true">🤖</span> AI Builder</button>
         </div>
 
         <div class="app-menu-divider" aria-hidden="true"></div>
@@ -86,11 +86,11 @@
         <!-- 3. Export & Share -->
         <div class="app-menu-section-group">
           <div class="app-menu-section-header">📤 Export & Share</div>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); printItinerary()"><span class="menu-icon">🖨️</span> Print / Save to PDF</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openShareExportDialog()"><span class="menu-icon">🔗</span> Share Export Link</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItineraryCalendar()"><span class="menu-icon">📅</span> Export to Calendar (.ics)</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItinerarySummaryText()"><span class="menu-icon">📝</span> Export AI Summary</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItineraryText()"><span class="menu-icon">📝</span> Export Full Itinerary Text</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); printItinerary()"><span class="menu-icon" aria-hidden="true">🖨️</span> Print / Save to PDF</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openShareExportDialog()"><span class="menu-icon" aria-hidden="true">🔗</span> Share Export Link</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItineraryCalendar()"><span class="menu-icon" aria-hidden="true">📅</span> Export to Calendar (.ics)</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItinerarySummaryText()"><span class="menu-icon" aria-hidden="true">📝</span> Export AI Summary</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); exportItineraryText()"><span class="menu-icon" aria-hidden="true">📝</span> Export Full Itinerary Text</button>
         </div>
 
         <div class="app-menu-divider" aria-hidden="true"></div>
@@ -98,8 +98,8 @@
         <!-- 4. View & Appearance -->
         <div class="app-menu-section-group">
           <div class="app-menu-section-header">🎨 View & Appearance</div>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripSummaryModal()"><span class="menu-icon">📅</span> View Trip Summary Table</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); toggleDualTimeDisplay()"><span class="menu-icon">🌐</span> Toggle Dual Timezone Display</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripSummaryModal()"><span class="menu-icon" aria-hidden="true">📅</span> View Trip Summary Table</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); toggleDualTimeDisplay()"><span class="menu-icon" aria-hidden="true">🌐</span> Toggle Dual Timezone Display</button>
           <button id="wakeLockBtnItinerary" class="app-menu-btn wake-lock-btn" onclick="closeDesktopActionsMenu(); toggleScreenWakeLock()" title="Keep screen awake during travel and transit" aria-pressed="false" style="display: none;"><span class="menu-icon wake-lock-icon">🔆</span> <span class="wake-lock-label">Screen Awake</span></button>
           <label id="themeToggleBtn" class="app-menu-switch" role="switch" aria-checked="false" title="Toggle Light or Dark theme">
             <input id="themeToggleInput" type="checkbox" onchange="toggleThemeMode(this.checked)" aria-label="Toggle Light or Dark theme">
@@ -111,8 +111,8 @@
             <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
             <span id="showRemindersToggleLabel" class="app-menu-switch-label">💡 Smart Reminders</span>
           </label>
-          <button id="showMoneyToggleBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); toggleShowMoney()"><span class="menu-icon">💵</span> Hide Prices</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openRenameTripDialog()"><span class="menu-icon">✏️</span> Rename Active Trip</button>
+          <button id="showMoneyToggleBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); toggleShowMoney()"><span class="menu-icon" aria-hidden="true">💵</span> Hide Prices</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openRenameTripDialog()"><span class="menu-icon" aria-hidden="true">✏️</span> Rename Active Trip</button>
         </div>
 
         <div class="app-menu-divider" aria-hidden="true"></div>
@@ -120,11 +120,11 @@
         <!-- 5. App & Maintenance -->
         <div class="app-menu-section-group">
           <div class="app-menu-section-header">⚙️ App & Maintenance</div>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openGuideDialog()"><span class="menu-icon">📖</span> User Guide & Help</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openReadinessGuide()"><span class="menu-icon">🌍</span> International Readiness</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); promptHardRestart()" title="Reload app and clear caches while preserving trip data"><span class="menu-icon">🔄</span> Hard Restart</button>
-          <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="closeDesktopActionsMenu(); promptInstallApp()"><span class="menu-icon">⬇</span> Install App</button>
-          <button class="app-menu-btn danger" onclick="closeDesktopActionsMenu(); promptFactoryReset()" title="Wipe ALL data and revert to default template"><span class="menu-icon">⚠️</span> Factory Reset (Wipe Data)</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openGuideDialog()"><span class="menu-icon" aria-hidden="true">📖</span> User Guide & Help</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openReadinessGuide()"><span class="menu-icon" aria-hidden="true">🌍</span> International Readiness</button>
+          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); promptHardRestart()" title="Reload app and clear caches while preserving trip data"><span class="menu-icon" aria-hidden="true">🔄</span> Hard Restart</button>
+          <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="closeDesktopActionsMenu(); promptInstallApp()"><span class="menu-icon" aria-hidden="true">⬇</span> Install App</button>
+          <button class="app-menu-btn danger" onclick="closeDesktopActionsMenu(); promptFactoryReset()" title="Wipe ALL data and revert to default template"><span class="menu-icon" aria-hidden="true">⚠️</span> Factory Reset (Wipe Data)</button>
         </div>
       </div>
     </details>
@@ -183,31 +183,31 @@
   <div class="app-tabs-nav">
     <div class="app-tabs-list hide-scrollbar">
       <button class="app-tab-btn active" data-tab="itinerary" onclick="switchTab('itinerary', this)" aria-label="Itinerary" title="Itinerary">
-        <span class="tab-icon text-base sm:text-lg md:text-base">🗓️</span>
+        <span class="tab-icon text-base sm:text-lg md:text-base" aria-hidden="true">🗓️</span>
         <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Itinerary</span>
       </button>
       <button class="app-tab-btn" data-tab="transport" onclick="switchTab('transport', this)" aria-label="Transit" title="Transit">
-        <span class="tab-icon text-base sm:text-lg md:text-base">✈️</span>
+        <span class="tab-icon text-base sm:text-lg md:text-base" aria-hidden="true">✈️</span>
         <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Transit</span>
       </button>
       <button class="app-tab-btn" data-tab="accom" onclick="switchTab('accom', this)" aria-label="Stays" title="Stays">
-        <span class="tab-icon text-base sm:text-lg md:text-base">🏨</span>
+        <span class="tab-icon text-base sm:text-lg md:text-base" aria-hidden="true">🏨</span>
         <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Stays</span>
       </button>
       <button class="app-tab-btn" data-tab="budget" onclick="switchTab('budget', this)" aria-label="Budget" title="Budget">
-        <span class="tab-icon text-base sm:text-lg md:text-base">💰</span>
+        <span class="tab-icon text-base sm:text-lg md:text-base" aria-hidden="true">💰</span>
         <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Budget</span>
       </button>
       <button class="app-tab-btn" data-tab="packing" onclick="switchTab('packing', this)" aria-label="Packing" title="Packing">
-        <span class="tab-icon text-base sm:text-lg md:text-base">🧳</span>
+        <span class="tab-icon text-base sm:text-lg md:text-base" aria-hidden="true">🧳</span>
         <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Packing</span>
       </button>
       <button class="app-tab-btn" data-tab="map" onclick="switchTab('map', this)" aria-label="Map" title="Map">
-        <span class="tab-icon text-base sm:text-lg md:text-base">🗺️</span>
+        <span class="tab-icon text-base sm:text-lg md:text-base" aria-hidden="true">🗺️</span>
         <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Map</span>
       </button>
       <button class="mobile-tabs-menu-btn app-tab-btn" type="button" onclick="syncMenuEditToggleLabels(); toggleMobileMenu()" aria-label="Menu" title="Menu">
-        <span class="tab-icon text-base sm:text-lg md:text-base">☰</span>
+        <span class="tab-icon text-base sm:text-lg md:text-base" aria-hidden="true">☰</span>
         <span class="tab-label text-[10px] md:text-sm font-medium leading-tight truncate block">Menu</span>
       </button>
     </div>
@@ -377,7 +377,7 @@
           <h2>Actions</h2>
           <p id="mobileMenuContext">Trip controls</p>
         </div>
-        <button class="modal-close" onclick="closeMobileMenu()">&times;</button>
+        <button class="modal-close" onclick="closeMobileMenu()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="mobile-menu-sheet-scroll-wrap">
         <div class="mobile-menu-trip-status p-3 bg-linear-to-br from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2" aria-label="Active trip status">
@@ -544,7 +544,7 @@
     <div class="modal-content modal-xl booking-intake-modal">
       <div class="modal-header">
         <h2>Import Booking</h2>
-        <button class="modal-close" onclick="closeBookingIntakeDialog()">&times;</button>
+        <button class="modal-close" onclick="closeBookingIntakeDialog()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body">
         <div class="booking-intake-grid">
@@ -586,7 +586,7 @@
     <div class="modal-content modal-lg">
       <div class="modal-header">
         <h2>🗺️ Import from Mappr.com</h2>
-        <button class="modal-close" onclick="closeMapprImportModal()">&times;</button>
+        <button class="modal-close" onclick="closeMapprImportModal()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body space-y-4">
         <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -622,7 +622,7 @@
           <h2 id="mapprReviewTitle">🗺️ Mappr Curated Spots</h2>
           <p id="mapprReviewSubtitle" class="text-xs text-slate-500 dark:text-slate-400 font-normal mt-0.5">Select destination and items to merge into your itinerary.</p>
         </div>
-        <button class="modal-close" onclick="closeMapprReviewModal()">&times;</button>
+        <button class="modal-close" onclick="closeMapprReviewModal()" aria-label="Close dialog">&times;</button>
       </div>
 
       <div class="p-4 border-b border-slate-200 dark:border-slate-700 shrink-0 bg-slate-50 dark:bg-slate-850/50">
@@ -675,7 +675,7 @@
     <div class="modal-content modal-lg">
       <div class="modal-header">
         <h2>🔗 Share Export</h2>
-        <button class="modal-close" onclick="closeShareExportDialog()">&times;</button>
+        <button class="modal-close" onclick="closeShareExportDialog()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body">
         <div class="share-options flex flex-col gap-5">
@@ -754,7 +754,7 @@
     <div class="modal-content modal-lg">
       <div class="modal-header">
         <h2>✏️ Rename Trip</h2>
-        <button class="modal-close" onclick="closeRenameTripDialog()">&times;</button>
+        <button class="modal-close" onclick="closeRenameTripDialog()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body">
         <div class="option-group">
@@ -777,7 +777,7 @@
     <div class="modal-content modal-lg">
       <div class="modal-header">
         <h2>🤖 AI Builder</h2>
-        <button class="modal-close" onclick="closeAIDialog()">&times;</button>
+        <button class="modal-close" onclick="closeAIDialog()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body">
         <div class="ai-container">
@@ -820,7 +820,7 @@
     <div class="modal-content modal-xl">
       <div class="modal-header">
         <h2 id="guideModalTitle">📖 How to Use Travel Planner</h2>
-        <button class="modal-close" onclick="closeGuideDialog()">&times;</button>
+        <button class="modal-close" onclick="closeGuideDialog()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body" style="overflow-y: auto;">
         <div class="guide-tabs-bar flex border-b border-slate-200 dark:border-slate-700 mb-4 gap-2">
@@ -851,7 +851,7 @@
     <div class="modal-content modal-md">
       <div class="modal-header">
         <h2>👋 Welcome to Travel Planner</h2>
-        <button class="modal-close" onclick="dismissWelcomeTutorial()">&times;</button>
+        <button class="modal-close" onclick="dismissWelcomeTutorial()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body" style="text-align: center; padding: 2rem 1rem;">
         <p style="margin-bottom: 1.5rem; font-size: 1.1rem; color: #475569;" class="dark:text-slate-300">
@@ -876,7 +876,7 @@
     <div class="modal-content modal-md">
       <div class="modal-header">
         <h2>💾 Where should we save your trip?</h2>
-        <button class="modal-close" onclick="dismissFileSetup()">&times;</button>
+        <button class="modal-close" onclick="dismissFileSetup()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body">
         <p class="mb-4 text-slate-700 dark:text-slate-300">
@@ -901,7 +901,7 @@
     <div class="modal-content modal-md">
       <div class="modal-header">
         <h2>🔄 Auto-Sync Results</h2>
-        <button class="modal-close" onclick="document.getElementById('sync-results-modal').style.display='none'">&times;</button>
+        <button class="modal-close" onclick="document.getElementById('sync-results-modal').style.display='none'" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body">
         <p class="text-slate-600 dark:text-slate-300 mb-4 font-medium" id="sync-results-summary"></p>
@@ -944,7 +944,7 @@
     <div class="modal-content modal-md">
       <div class="modal-header">
         <h2>🔄 Resync Data</h2>
-        <button class="modal-close" onclick="document.getElementById('resync-modal').style.display='none'">&times;</button>
+        <button class="modal-close" onclick="document.getElementById('resync-modal').style.display='none'" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body">
         <p class="text-slate-700 dark:text-slate-300 mb-4" style="line-height: 1.5;">
@@ -965,7 +965,7 @@
     <div class="modal-content modal-md">
       <div class="modal-header">
         <h2 id="legDialogTitle">Manage Trip Legs</h2>
-        <button class="modal-close" onclick="closeAddLegDialog()">&times;</button>
+        <button class="modal-close" onclick="closeAddLegDialog()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body">
         <!-- Segmented Tab Switcher -->
@@ -1191,7 +1191,7 @@
     <div class="modal-content modal-md">
       <div class="modal-header">
         <h2>🌍 Manage Cities</h2>
-        <button class="modal-close" onclick="closeCityDialog()">&times;</button>
+        <button class="modal-close" onclick="closeCityDialog()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body">
         <div id="cityListContainer" class="city-list-scroll">
@@ -1200,7 +1200,7 @@
           <h4 class="city-add-heading">➕ Add New City</h4>
           <div class="city-add-stack">
             <div class="city-search-input-wrapper">
-              <label for="newCityName"></label><input type="text" id="newCityName" class="form-control city-add-input" autocomplete="off" placeholder="City name (e.g., Bangkok, Aitutaki, Ubud)">
+              <label for="newCityName" class="sr-only">City name</label><input type="text" id="newCityName" aria-label="City name" class="form-control city-add-input" autocomplete="off" placeholder="City name (e.g., Bangkok, Aitutaki, Ubud)">
               <div id="cityLiveSearchResults" class="city-live-search-dropdown" style="display: none;" role="listbox" aria-label="City search results"></div>
             </div>
             <div class="row-gap-2">
@@ -1230,7 +1230,7 @@
 
       <div class="modal-header">
         <h2>✈️ Add journey</h2>
-        <button class="modal-close" onclick="closeJourneyModal()">&times;</button>
+        <button class="modal-close" onclick="closeJourneyModal()" aria-label="Close dialog">&times;</button>
       </div>
 
       <div class="modal-body modal-body-compact">
@@ -1396,7 +1396,7 @@
     <div class="modal-content modal-xl">
       <div class="modal-header">
         <h2>🏨 Add Stay</h2>
-        <button class="modal-close" onclick="closeAddStayModal()">&times;</button>
+        <button class="modal-close" onclick="closeAddStayModal()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body">
         <div class="modal-form-stack stay-form-grid">
@@ -1629,7 +1629,7 @@
     <div class="modal-content modal-lg">
       <div class="modal-header">
         <h2>🖼️ My Trips Gallery</h2>
-        <button class="modal-close" onclick="closeTripLibraryModal()">&times;</button>
+        <button class="modal-close" onclick="closeTripLibraryModal()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body space-y-3">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -1664,7 +1664,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>☁️ Google Drive Cloud Sync</h2>
-        <button class="modal-close" onclick="closeCloudSyncModal()">&times;</button>
+        <button class="modal-close" onclick="closeCloudSyncModal()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body space-y-4">
         <div id="gdriveOriginMismatchNotice" class="p-3.5 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 rounded-xl text-xs text-amber-800 dark:text-amber-200 space-y-2" style="display: none;">

@@ -36,7 +36,7 @@
   align-items: center;
   gap: 0.35rem;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 :where([data-theme="dark"], [data-theme="dark"] *) .desktop-split-btn,
@@ -223,7 +223,7 @@
   font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
   white-space: nowrap;
   max-width: 100%;
   overflow: hidden;
@@ -315,7 +315,7 @@
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 :where([data-theme="dark"], [data-theme="dark"] *) .split-day-item-clickable {
@@ -382,7 +382,7 @@
 /* Row Highlight in Itinerary Feed when clicked */
 .split-item-selectable {
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .split-item-selectable:hover {

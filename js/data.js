@@ -8776,6 +8776,32 @@ function renderTripStart() {
   const container = document.getElementById('trip-start-content');
   if (!container) return;
 
+  if (typeof window !== 'undefined' && !window.__tripStartViewportBound) {
+    window.__tripStartViewportBound = true;
+    const syncWizardViewport = () => {
+      const panel = document.querySelector('.trip-start-panel');
+      if (!panel) return;
+      const vvHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      if (vvHeight && vvHeight < window.innerHeight - 60) {
+        panel.style.maxHeight = `${Math.max(240, vvHeight - 24)}px`;
+        if (document.activeElement && panel.contains(document.activeElement) && typeof document.activeElement.scrollIntoView === 'function') {
+          document.activeElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      } else {
+        panel.style.maxHeight = '';
+      }
+    };
+    if (window.visualViewport && typeof window.visualViewport.addEventListener === 'function') {
+      window.visualViewport.addEventListener('resize', syncWizardViewport);
+    }
+    document.addEventListener('focusin', (e) => {
+      const panel = document.querySelector('.trip-start-panel');
+      if (panel && panel.contains(e.target)) {
+        setTimeout(syncWizardViewport, 120);
+      }
+    });
+  }
+
   if (tripStartStep === 'choose_path' || tripStartStep === 'builder_0') {
     renderTripStartPathChoice();
     return;

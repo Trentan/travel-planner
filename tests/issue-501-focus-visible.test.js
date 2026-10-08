@@ -42,8 +42,9 @@ async function runIssue501FocusVisibleTests() {
       const context = await browser.newContext({
         viewport: { width: mode.width, height: mode.height }
       });
-      const page = await context.newPage();
-      await page.goto(`${server.baseUrl}/index.html`, { waitUntil: 'networkidle' });
+      await context.route(/^https?:\/\/(?!127\.0\.0\.1|localhost)/, route => route.abort());
+    const page = await context.newPage();
+      await page.goto(`${server.baseUrl}/index.html`, { waitUntil: 'domcontentloaded' });
 
       // Inject elements to verify focus-visible ring / box-shadow on form controls, wizard cards, and header h1
       const focusCheck = await page.evaluate(() => {

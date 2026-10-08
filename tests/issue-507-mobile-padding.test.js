@@ -29,7 +29,7 @@ async function runIssue507MobilePaddingTests() {
     // Mobile viewport check (390x844)
     const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
     const mobilePage = await mobileContext.newPage();
-    await mobilePage.goto(`${server.baseUrl}/index.html`, { waitUntil: 'networkidle' });
+    await mobilePage.goto(`${server.baseUrl}/index.html`, { waitUntil: 'domcontentloaded' });
     await mobilePage.evaluate(() => {
       window.confirm = () => true;
       window.alert = () => {};
@@ -71,7 +71,7 @@ async function runIssue507MobilePaddingTests() {
     // Desktop viewport sanity check (1440x900)
     const desktopContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const desktopPage = await desktopContext.newPage();
-    await desktopPage.goto(`${server.baseUrl}/index.html`, { waitUntil: 'networkidle' });
+    await desktopPage.goto(`${server.baseUrl}/index.html`, { waitUntil: 'domcontentloaded' });
     const desktopOverflow = await desktopPage.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
     assert(!desktopOverflow, 'DESKTOP: Expected no horizontal scroll overflow');
     await desktopContext.close();

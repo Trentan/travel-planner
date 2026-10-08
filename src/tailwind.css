@@ -27,7 +27,7 @@
   /* Mobile theme tokens: single source for compact sizing - updated for better readability */
   body.mobile-app-mode {
     --m-control-h: 2.875rem;
-    --m-control-h-tight: 2.625rem;
+    --m-control-h-tight: 2.75rem;
     --m-control-px: 0.8rem;
     --m-control-py: 0.55rem;
     --m-control-radius: 0.6rem;
@@ -80,7 +80,7 @@
   font-weight: 600;
   padding: 0.25rem 0.625rem;
   border-radius: 9999px;
-  transition: all 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, opacity 0.2s ease-in-out;
   user-select: none;
 }
 

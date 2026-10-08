@@ -31,7 +31,7 @@
   .app-menu-btn {
     @apply px-2.5 py-1.5 rounded-md bg-transparent text-white
            border border-transparent cursor-pointer text-[0.8rem]
-           transition-all duration-200;
+           transition-[background-color,border-color,color,opacity,box-shadow,transform] duration-200;
     background: transparent;
   }
 
@@ -96,7 +96,7 @@
   }
 
   .app-menu-actions-panel {
-    @apply absolute right-0 mt-2 min-w-[270px] p-2.5 rounded-2xl border shadow-2xl backdrop-blur-md z-450 flex flex-col gap-1.5 transition-all duration-200;
+    @apply absolute right-0 mt-2 min-w-[270px] p-2.5 rounded-2xl border shadow-2xl backdrop-blur-md z-450 flex flex-col gap-1.5 transition-[background-color,border-color,color,opacity,box-shadow,transform] duration-200;
     @apply border-slate-200/80;
     background: rgba(255, 255, 255, 0.98);
   }
@@ -114,7 +114,7 @@
   }
 
   .app-menu-actions-panel .app-menu-btn {
-    @apply w-full justify-start text-left rounded-xl px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 transition-all duration-150;
+    @apply w-full justify-start text-left rounded-xl px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 transition-[background-color,border-color,color,opacity,box-shadow,transform] duration-150;
   }
 
   .app-menu-actions-panel .app-menu-btn:hover {
@@ -122,7 +122,7 @@
   }
 
   .app-menu-actions-panel .app-menu-switch {
-    @apply w-full justify-start rounded-xl px-2.5 py-1.5 text-xs font-medium cursor-pointer transition-all duration-150;
+    @apply w-full justify-start rounded-xl px-2.5 py-1.5 text-xs font-medium cursor-pointer transition-[background-color,border-color,color,opacity,box-shadow,transform] duration-150;
   }
 
   .app-menu-actions-panel .app-menu-switch:hover {
@@ -163,9 +163,10 @@
   }
 
   .city-nav-btn {
-    @apply inline-flex items-center gap-1.5 px-4 py-2 border border-border bg-white rounded-full
+    @apply inline-flex items-center gap-1.5 px-4 py-2.5 border border-border bg-white rounded-full
            text-[0.85rem] font-medium text-text-muted whitespace-nowrap
-           transition-all duration-200 shadow-sm cursor-pointer;
+           transition-colors duration-200 shadow-sm cursor-pointer;
+    min-height: 2.75rem;
     line-height: 1;
   }
 
@@ -428,7 +429,7 @@
   .app-tab-btn {
     @apply px-4 py-3.5 border-b-2 border-transparent -mb-0.5
            text-[0.95rem] font-medium text-text-muted cursor-pointer
-           transition-all duration-200 flex items-center gap-2
+           transition-[background-color,border-color,color,opacity,box-shadow,transform] duration-200 flex items-center gap-2
            whitespace-nowrap;
     background: none;
   }
@@ -987,7 +988,7 @@
 
   .marker-dot {
     @apply w-[30px] h-[30px] rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-md;
-    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: background-color 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
   .marker-flared {
