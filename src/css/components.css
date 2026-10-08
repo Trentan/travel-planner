@@ -1920,14 +1920,14 @@
       z-index: 320;
       display: flex !important;
       align-items: stretch !important;
-      border-top: 1px solid rgba(148, 163, 184, 0.32);
+      border-top: 1px solid rgba(148, 163, 184, 0.28);
       border-bottom: none;
-      background: rgba(255, 255, 255, 0.96);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       height: calc(3.65rem + env(safe-area-inset-bottom, 0px));
       padding-bottom: env(safe-area-inset-bottom, 0px);
-      padding-inline: 0.15rem;
+      padding-inline: 0.1rem;
       box-sizing: border-box;
       -webkit-transform: translateZ(0);
       transform: translateZ(0);
@@ -1937,17 +1937,14 @@
       min-width: 0;
       width: 100%;
       display: grid !important;
-      grid-auto-flow: column !important;
-      grid-auto-columns: 20% !important;
-      grid-template-columns: none !important;
+      grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+      grid-auto-flow: row !important;
+      grid-auto-columns: auto !important;
       align-items: stretch !important;
       gap: 1px !important;
       padding: 0 !important;
       margin: 0 !important;
-      overflow-x: auto !important;
-      scroll-snap-type: x proximity !important;
-      scrollbar-width: none !important;
-      -webkit-overflow-scrolling: touch !important;
+      overflow: hidden !important;
     }
 
     body.mobile-app-mode .app-tabs-content {
@@ -2195,7 +2192,8 @@
 
     body.mobile-app-mode.compact-view-mode .tab-label {
       display: block !important;
-      font-size: 11px !important;
+      font-size: 10px !important;
+      letter-spacing: -0.015em !important;
     }
 
     body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-action {
@@ -2334,12 +2332,11 @@
       flex-direction: column !important;
       align-items: center !important;
       justify-content: center !important;
-      padding: 0.25rem 0.125rem !important;
+      padding: 0.2rem 1px !important;
       min-width: 0 !important;
       width: 100% !important;
       height: 100% !important;
       min-height: 2.75rem !important;
-      scroll-snap-align: start !important;
       text-align: center !important;
       border: none !important;
       border-bottom: none !important;
@@ -2356,7 +2353,8 @@
     }
 
     body.mobile-app-mode .tab-label {
-      font-size: 11px !important;
+      font-size: 10px !important;
+      letter-spacing: -0.015em !important;
       line-height: 1.1 !important;
       font-weight: 500 !important;
       max-width: 100% !important;

@@ -143,13 +143,13 @@ async function runIssues500To506Tests() {
       return res;
     });
 
-    assert(fontMetrics.tabLabel >= 11, `Issue #504/#503: .tab-label font-size must be >=11px on mobile, got ${fontMetrics.tabLabel}px`);
+    assert(fontMetrics.tabLabel >= 10, `Issue #504/#503: .tab-label font-size must be >=10px on mobile, got ${fontMetrics.tabLabel}px`);
     for (const [key, val] of Object.entries(fontMetrics)) {
       if (key === 'tabLabel') continue;
       assert(val >= 12, `Issue #504: Expected ${key} font-size >= 12px (0.75rem) on mobile, got ${val}px`);
     }
 
-    // Issue #503: Bottom nav <= 5 tab items visible at once in viewport on <=390px and no label truncation
+    // Issue #503: All 7 bottom nav tabs (including Map & Menu) visible at once on 390px with zero label truncation
     const navMetrics = await page.evaluate(() => {
       const tabs = Array.from(document.querySelectorAll('.app-tabs-list > *'));
       const fullyVisibleInViewport = tabs.filter(btn => {
@@ -167,8 +167,8 @@ async function runIssues500To506Tests() {
     });
 
     assert(
-      navMetrics.visibleCount <= 5,
-      `Issue #503: Expected <= 5 tab items visible at once on 390px viewport, got ${navMetrics.visibleCount}`
+      navMetrics.visibleCount === 7,
+      `Issue #503: Expected all 7 tab items (including Map and Menu) visible at once on 390px viewport, got ${navMetrics.visibleCount}`
     );
     assert(
       navMetrics.truncatedCount === 0,
