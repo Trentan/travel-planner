@@ -2492,7 +2492,7 @@ function promptCityDisambiguation(cityId, candidates) {
     const icaoCode = dbMatch ? (dbMatch.icaoCode || dbMatch.icao || '') : '';
     
     return `
-      <button class="trip-start-choice" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.1rem; border: 1px solid #c8d6d0; border-radius: 0.75rem; background: #fff; text-align: left; cursor: pointer; margin-bottom: 0.65rem; width: 100%;" onclick="selectCityDisambiguationChoice('${cityId}', '${cand.countryCode}', ${cand.lat}, ${cand.lng}, '', '${icaoCode}')">
+      <button class="trip-start-choice" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.1rem; border: 1px solid #c8d6d0; border-radius: 0.75rem; background: #fff; text-align: left; cursor: pointer; margin-bottom: 0.65rem; width: 100%;" onclick="selectCityDisambiguationChoice({ cityId: '${cityId}', countryCode: '${cand.countryCode}', lat: ${cand.lat}, lng: ${cand.lng}, icaoCode: '${icaoCode}' })">
         <div>
           <strong style="font-size: 1.05rem; color: #162c3b;">${flag} ${city.name}, ${cand.countryName}</strong>
           <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: #60717b;">${cand.displayName}</p>
@@ -2519,7 +2519,19 @@ function promptCityDisambiguation(cityId, candidates) {
   document.body.appendChild(overlay);
 }
 
-function selectCityDisambiguationChoice(cityId, countryCode, lat, lng, iataCode = '', icaoCode = '') {
+function selectCityDisambiguationChoice(options = {}) {
+  let cityId, countryCode, lat, lng, iataCode, icaoCode;
+  if (typeof options === 'object' && options !== null && !Array.isArray(options)) {
+    ({ cityId, countryCode, lat, lng, iataCode = '', icaoCode = '' } = options);
+  } else {
+    cityId = arguments[0];
+    countryCode = arguments[1];
+    lat = arguments[2];
+    lng = arguments[3];
+    iataCode = arguments[4] || '';
+    icaoCode = arguments[5] || '';
+  }
+
   const city = citiesData.find(c => c.id === cityId);
   if (!city) return;
 

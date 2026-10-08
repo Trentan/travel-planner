@@ -25,6 +25,7 @@ const { run: runTimezoneSuite } = require('./timezone-suite.test');
 const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
 const { run: runSmartRemindersSuite } = require('./smart-reminders-suite');
 const { runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
+const { runCityDisambiguationTests } = require('./city-disambiguation.test');
 const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
 const { runEscapeHtmlTextTests } = require('./escape-html-text.test');
 const { runGetActivityEmojiTests } = require('./get-activity-emoji.test');
@@ -106,6 +107,7 @@ async function run() {
     if (typeof runFormatJourneySubLocationTests === 'function') await runFormatJourneySubLocationTests();
     if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
     if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
+    if (typeof runCityDisambiguationTests === 'function') await runCityDisambiguationTests();
     if (typeof runTransportDurationSuite === 'function') await runTransportDurationSuite();
     if (typeof runTransitConnectorsSuite === 'function') await runTransitConnectorsSuite();
     if (typeof runLegManagementWysiwygSuite === 'function') await runLegManagementWysiwygSuite();
