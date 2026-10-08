@@ -613,6 +613,15 @@
     @apply text-[0.9rem] opacity-80 font-light outline-none text-white m-0;
   }
 
+  .header-text h1:focus-visible,
+  .header-text p:focus-visible,
+  header h1:focus-visible,
+  header p:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.65);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
   .clock-widget {
     @apply bg-white/10 border border-white/10 rounded-lg px-4 py-2.5
            min-w-65 shadow-sm backdrop-blur-md;

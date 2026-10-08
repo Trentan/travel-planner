@@ -125,6 +125,8 @@ async function run() {
     await runIssue508TypographyTests();
     const { runIssue507MobilePaddingTests } = require('./issue-507-mobile-padding.test');
     await runIssue507MobilePaddingTests();
+    const { runIssue501FocusVisibleTests } = require('./issue-501-focus-visible.test');
+    await runIssue501FocusVisibleTests();
     await runBrowserSuite();
     console.log('All travel planner tests passed');
   } finally {
