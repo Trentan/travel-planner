@@ -121,6 +121,8 @@ async function run() {
     await runItineraryExploratoryUx();
     await runSharePresetsVerify();
     await runIosPwaNavVerify();
+    const { runIssue508TypographyTests } = require('./issue-508-typography.test');
+    await runIssue508TypographyTests();
     await runBrowserSuite();
     console.log('All travel planner tests passed');
   } finally {

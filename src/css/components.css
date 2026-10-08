@@ -956,6 +956,7 @@
 
   .section-header-title {
     @apply m-0 font-serif text-[1.38rem] font-bold text-text-primary tracking-tight;
+    text-wrap: balance;
   }
 
   .section-header-title.large {
@@ -1459,6 +1460,7 @@
            px-2.5 py-1.5 rounded-full border border-[rgba(36,72,93,0.14)]
            bg-white text-text-primary font-mono text-[0.82rem] font-bold
            whitespace-nowrap text-center;
+    font-variant-numeric: tabular-nums lining-nums;
   }
 
   .daily-timeline-time.is-clickable {
@@ -4522,6 +4524,15 @@
     @apply font-semibold;
   }
 
+  .budget-leg-total,
+  .budget-total,
+  .cost-item-amount,
+  .cost-item-actions,
+  .budget-kpi-card,
+  .budget-desktop-table td {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
   .budget-leg-total {
     @apply font-mono font-semibold;
   }
@@ -4540,6 +4551,7 @@
 
   .budget-mobile-breakdown-head span {
     @apply rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-0.5 text-[0.68rem] font-bold text-slate-500 dark:text-slate-400;
+    font-variant-numeric: tabular-nums lining-nums;
   }
 
   .budget-mobile-row {
@@ -4557,6 +4569,7 @@
 
   .budget-mobile-row-head strong {
     @apply shrink-0 text-right text-[0.92rem] font-black leading-tight text-slate-900 dark:text-slate-100;
+    font-variant-numeric: tabular-nums lining-nums;
   }
 
   .budget-mobile-meter {
@@ -4582,6 +4595,7 @@
 
   .budget-mobile-splits dd {
     @apply m-0 mt-0.5 truncate text-[0.76rem] font-bold leading-tight text-slate-800 dark:text-slate-100;
+    font-variant-numeric: tabular-nums lining-nums;
   }
 
   .budget-mobile-empty {
@@ -4806,6 +4820,13 @@
   .stay-mobile-fact-value,
   .stay-mobile-fact-link {
     @apply text-[0.88rem] font-medium text-slate-800 dark:text-slate-200 break-words;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  #tab-transport td,
+  #tab-accom td,
+  .mobile-status-cost-meta {
+    font-variant-numeric: tabular-nums lining-nums;
   }
 
   .location-map-icon {
