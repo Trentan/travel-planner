@@ -5954,18 +5954,6 @@ function addDaysToIsoDate(dateStr, days) {
 }
 if (typeof window !== 'undefined') window.addDaysToIsoDate = addDaysToIsoDate;
 
-function inferTransportTypeFromText(text) {
-  const value = (text || '').toLowerCase();
-  if (value.includes('flight') || value.includes('depart') || value.includes('arrive') || value.includes('✈')) return 'flight';
-  if (value.includes('train') || value.includes('rail') || value.includes('🚂')) return 'train';
-  if (value.includes('bus') || value.includes('🚌')) return 'bus';
-  if (value.includes('ferry') || value.includes('boat') || value.includes('⛴')) return 'ferry';
-  if (value.includes('car') || value.includes('drive') || value.includes('🚗')) return 'car';
-  if (value.includes('bike') || value.includes('bicycle') || value.includes('🚲')) return 'bike';
-  if (value.includes('walk') || value.includes('🚶')) return 'walk';
-  return 'other';
-}
-
 function stripCityLabel(cityName) {
   // Strip emoji, flag sequences, and parenthetical suffixes like (Trip Start)
   // This mirrors cleanCityNavLabel so map matching and departure blocks work correctly
