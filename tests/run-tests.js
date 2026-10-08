@@ -27,6 +27,7 @@ const { run: runSmartRemindersSuite } = require('./smart-reminders-suite');
 const { runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
 const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
 const { runEscapeHtmlTextTests } = require('./escape-html-text.test');
+const { runIsSafeUrlTests } = require('./is-safe-url.test');
 const { runGetActivityEmojiTests } = require('./get-activity-emoji.test');
 const { runNormalizeItemStatusTests } = require('./normalize-item-status.test');
 const { runGetLegBaseCityNameTests } = require('./get-leg-base-city-name.test');
@@ -89,6 +90,7 @@ async function run() {
     if (typeof runDualPathWizardSuite === 'function') await runDualPathWizardSuite();
     if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();
     if (typeof runEscapeHtmlTextTests === 'function') await runEscapeHtmlTextTests();
+    if (typeof runIsSafeUrlTests === 'function') await runIsSafeUrlTests();
     if (typeof runGetActivityEmojiTests === 'function') await runGetActivityEmojiTests();
     if (typeof runNormalizeItemStatusTests === 'function') await runNormalizeItemStatusTests();
     if (typeof runGetLegBaseCityNameTests === 'function') await runGetLegBaseCityNameTests();
