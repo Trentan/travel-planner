@@ -59,6 +59,7 @@ const { runDragdropTests } = require('./dragdrop.test');
 const { runTabsTests } = require('./tabs.test');
 const { runMergeChecklistWithDefaultsTests } = require('./merge-checklist-with-defaults.test');
 const { runEnforceTerminalLegsTests } = require('./enforce-terminal-legs.test');
+const { runBackupTests } = require('./backup.test');
 
 async function run() {
   try {
@@ -100,6 +101,7 @@ async function run() {
     if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
     if (typeof runGetDayTotalTests === 'function') await runGetDayTotalTests();
     if (typeof runGetMapSearchUrlTests === 'function') await runGetMapSearchUrlTests();
+    if (typeof runBackupTests === 'function') await runBackupTests();
     if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
     if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
