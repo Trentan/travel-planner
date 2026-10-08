@@ -290,24 +290,30 @@ function deleteDayNote(legIdx, dayIdx) {
 }
 
 
-function updateDayItemText(legIdx, dayIdx, category, itemIdx, text, fromTabs = false) {
-  const item = appData[legIdx].days[dayIdx][category][itemIdx];
+function updateDayItemText(legIdxOrOptions, dayIdx, category, itemIdx, text, fromTabs = false) {
+  const opts = (typeof legIdxOrOptions === 'object' && legIdxOrOptions !== null)
+    ? legIdxOrOptions
+    : { legIdx: legIdxOrOptions, dayIdx, category, itemIdx, text, fromTabs };
+
+  const { legIdx, dayIdx: dIdx, category: cat, itemIdx: iIdx, text: itemText, fromTabs: isFromTabs = false } = opts;
+
+  const item = appData[legIdx].days[dIdx][cat][iIdx];
   const previousText = item.text;
   
-  let newText = text;
-  if (category === 'activityItems') {
+  let newText = itemText;
+  if (cat === 'activityItems') {
     const split = typeof _splitActivityTitle === 'function' ? _splitActivityTitle(previousText) : { title: previousText, location: '' };
-    if (split.location && !text.includes(' — ')) {
-      newText = `${text} — ${split.location}`;
+    if (split.location && !itemText.includes(' — ')) {
+      newText = `${itemText} — ${split.location}`;
     }
   }
   
   item.text = newText;
-  if (category === 'activityItems') {
-    syncAssignedSuggestedActivityField(legIdx, dayIdx, previousText, 'title', newText, item.activityId);
+  if (cat === 'activityItems') {
+    syncAssignedSuggestedActivityField(legIdx, dIdx, previousText, 'title', newText, item.activityId);
   }
   saveData();
-  if(!fromTabs) {
+  if (!isFromTabs) {
     if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: newText });
     else buildItinerary();
   }

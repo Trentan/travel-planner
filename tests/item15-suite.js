@@ -274,12 +274,14 @@ async function testCrudSmoke() {
   assert(!state(context).itinerary[testLegIdx].legTips.some(item => item === 'Pack snacks'), 'CRUD smoke: deleteLegTip should remove tip');
 
   context.addDayItem(testLegIdx, 0, 'activityItems');
-  context.updateDayItemText(testLegIdx, 0, 'activityItems', 0, 'Walk the city');
+  context.updateDayItemText({ legIdx: testLegIdx, dayIdx: 0, category: 'activityItems', itemIdx: 0, text: 'Walk the city' });
   context.updateDayItemCost(testLegIdx, 0, 'activityItems', 0, '15');
-  assert(state(context).itinerary[testLegIdx].days[0].activityItems[0].text === 'Walk the city', 'CRUD smoke: updateDayItemText should edit day item');
+  assert(state(context).itinerary[testLegIdx].days[0].activityItems[0].text === 'Walk the city', 'CRUD smoke: updateDayItemText should edit day item via options object');
+  context.updateDayItemText(testLegIdx, 0, 'activityItems', 0, 'Walk the inner city');
+  assert(state(context).itinerary[testLegIdx].days[0].activityItems[0].text === 'Walk the inner city', 'CRUD smoke: updateDayItemText should edit day item via legacy positional arguments');
   assert(state(context).itinerary[testLegIdx].days[0].activityItems[0].cost === '15', 'CRUD smoke: updateDayItemCost should edit day item cost');
   context.deleteDayItem(testLegIdx, 0, 'activityItems', 0);
-  assert(!state(context).itinerary[testLegIdx].days[0].activityItems.some(item => item.text === 'Walk the city'), 'CRUD smoke: deleteDayItem should remove day item');
+  assert(!state(context).itinerary[testLegIdx].days[0].activityItems.some(item => item.text === 'Walk the inner city'), 'CRUD smoke: deleteDayItem should remove day item');
 
   const targetLegIdx = state(context).itinerary.findIndex(leg => leg.id === 'city-sydney-start' || leg.days?.[0]?.date === '2026-06-01');
   assert(targetLegIdx >= 0, 'CRUD smoke: should find the original start leg');
@@ -582,7 +584,7 @@ async function testItineraryEditPersistence() {
     'Itinerary UI: whole-day completion checkbox should not render even when old completed data exists'
   );
   tracker.expectSave('Activity checkbox', () => context.toggleActivityCompleted(event(true), legIdx, dayIdx, 0));
-  tracker.expectSave('Activity text edit', () => context.updateDayItemText(legIdx, dayIdx, 'activityItems', 0, 'Persistence museum'));
+  tracker.expectSave('Activity text edit', () => context.updateDayItemText({ legIdx, dayIdx, category: 'activityItems', itemIdx: 0, text: 'Persistence museum' }));
   tracker.expectSave('Activity cost edit', () => context.updateDayItemCost(legIdx, dayIdx, 'activityItems', 0, '18'));
   tracker.expectSave('Activity duration edit', () => context.updateDayItemTime(legIdx, dayIdx, 'activityItems', 0, '2 hr'));
   tracker.expectSave('Activity start time edit', () => context.updateDayItemScheduleTime(legIdx, dayIdx, 'activityItems', 0, 'startTime', '10:00'));
@@ -660,7 +662,7 @@ async function testItineraryEditPersistence() {
 
   tracker.expectSave('Transport day item add', () => context.addDayItem(legIdx, dayIdx, 'transportItems'));
   const transportIdx = state(context).itinerary[legIdx].days[dayIdx].transportItems.length - 1;
-  tracker.expectSave('Transport day item text edit', () => context.updateDayItemText(legIdx, dayIdx, 'transportItems', transportIdx, 'Persistence shuttle'));
+  tracker.expectSave('Transport day item text edit', () => context.updateDayItemText({ legIdx, dayIdx, category: 'transportItems', itemIdx: transportIdx, text: 'Persistence shuttle' }));
   tracker.expectSave('Transport day item cost edit', () => context.updateDayItemCost(legIdx, dayIdx, 'transportItems', transportIdx, '22'));
   tracker.expectSave('Transport booking status edit', () => context.toggleBookingStatus(event(false), legIdx, dayIdx, 'transportItems', transportIdx));
   tracker.expectSave('Transport booking ref edit', () => context.updateBookingRef(legIdx, dayIdx, 'transportItems', transportIdx, 'TRANS-1'));
@@ -668,7 +670,7 @@ async function testItineraryEditPersistence() {
 
   tracker.expectSave('Accommodation day item add', () => context.addDayItem(legIdx, dayIdx, 'accomItems'));
   const accomIdx = state(context).itinerary[legIdx].days[dayIdx].accomItems.length - 1;
-  tracker.expectSave('Accommodation day item text edit', () => context.updateDayItemText(legIdx, dayIdx, 'accomItems', accomIdx, 'Persistence inn'));
+  tracker.expectSave('Accommodation day item text edit', () => context.updateDayItemText({ legIdx, dayIdx, category: 'accomItems', itemIdx: accomIdx, text: 'Persistence inn' }));
   tracker.expectSave('Accommodation day item cost edit', () => context.updateDayItemCost(legIdx, dayIdx, 'accomItems', accomIdx, '120'));
   tracker.expectSave('Accommodation booking status edit', () => context.toggleBookingStatus(event(false), legIdx, dayIdx, 'accomItems', accomIdx));
   tracker.expectSave('Accommodation booking ref edit', () => context.updateBookingRef(legIdx, dayIdx, 'accomItems', accomIdx, 'ACCOM-1'));
@@ -735,7 +737,7 @@ async function testExportImport() {
   context.updateDayData(0, 0, 'desc', 'Changed for export');
   context.addDayItem(0, 0, 'activityItems');
   const activityIdx = state(context).itinerary[0].days[0].activityItems.length - 1;
-  context.updateDayItemText(0, 0, 'activityItems', activityIdx, 'Export checked activity');
+  context.updateDayItemText({ legIdx: 0, dayIdx: 0, category: 'activityItems', itemIdx: activityIdx, text: 'Export checked activity' });
   context.toggleActivityCompleted({ target: { checked: true }, stopPropagation() {} }, 0, 0, activityIdx);
   context.journeys.push({
     id: 'journey_export_sub_locations',
@@ -818,7 +820,7 @@ async function testShareExport() {
   assertBootClean(app, 'Share export');
 
   context.addDayItem(0, 0, 'activityItems');
-  context.updateDayItemText(0, 0, 'activityItems', 0, 'Secret dinner');
+  context.updateDayItemText({ legIdx: 0, dayIdx: 0, category: 'activityItems', itemIdx: 0, text: 'Secret dinner' });
   context.updateDayItemCost(0, 0, 'activityItems', 0, '88');
   const journey = context.createJourneyFromTransportItem(
     { text: 'Secret flight', cost: '900', status: 'booked', bookingRef: 'PNR-123' },

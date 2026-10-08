@@ -3704,7 +3704,7 @@ ${(() => {
                     <div style="display: flex; align-items: center; gap: 6px;">
                       <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-red-500 rounded" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button>
                       <input type="checkbox" class="activity-checkbox w-4 h-4 accent-emerald-500 cursor-pointer" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})">
-                      <span class="cost-item-text font-medium text-slate-700 dark:text-slate-200 outline-none" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${split.title}</span>
+                      <span class="cost-item-text font-medium text-slate-700 dark:text-slate-200 outline-none" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText({ legIdx: ${legIndex}, dayIdx: ${dayIndex}, category: 'activityItems', itemIdx: ${i}, text: this.innerText })">${split.title}</span>
                     </div>
                     ${locHtml}
                     ${notesHtml}
