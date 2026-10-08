@@ -98,7 +98,7 @@ function restorePackingToDefault() {
 }
 
 function isLeaveHomeSection(item) {
-  return item && item.kind === 'section';
+  return Boolean(item && item.kind === 'section');
 }
 
 function countLeaveHomeTasks() {

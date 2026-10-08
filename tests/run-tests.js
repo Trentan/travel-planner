@@ -59,9 +59,11 @@ const { runDragdropTests } = require('./dragdrop.test');
 const { runTabsTests } = require('./tabs.test');
 const { runMergeChecklistWithDefaultsTests } = require('./merge-checklist-with-defaults.test');
 const { runEnforceTerminalLegsTests } = require('./enforce-terminal-legs.test');
+const { runPackingTests } = require('./packing.test');
 
 async function run() {
   try {
+    if (typeof runPackingTests === 'function') runPackingTests();
     if (typeof runDragdropTests === 'function') runDragdropTests();
     if (typeof runTabsTests === 'function') runTabsTests();
     if (typeof runBudgetTabTests === 'function') runBudgetTabTests();
