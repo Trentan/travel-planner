@@ -342,28 +342,6 @@ function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
   `;
 }
 
-function renderCompactActivityItemForPanel(legIndex, dayIdx, itemIdx, item) {
-  const itemId = `compact-activity-${legIndex}-${dayIdx}-${itemIdx}`;
-  const done = !!item.done;
-  const emoji = getActivityItemEmoji(item, legIndex, dayIdx);
-
-  return `
-    <label class="compact-activity-item" for="${itemId}">
-      <input
-        id="${itemId}"
-        type="checkbox"
-        ${done ? 'checked' : ''}
-        onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
-      >
-      <span class="compact-activity-item-copy">${renderCompactEmojiLine({
-    emoji,
-    text: item.text,
-    done
-  })}</span>
-    </label>
-  `;
-}
-
 function getActivityItemEmoji(item, legIndex = null, dayIdx = null, fallback = '📌', matchedActivity = null) {
   if (!item) return fallback;
   if (item.category === 'audioTour' || /audio|podcast|self-guided|self guided/i.test(item.text || '') || item.audioTitle) {
