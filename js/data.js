@@ -7132,11 +7132,6 @@ function truncateText(value, maxLength = 180) {
   return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
 }
 
-function buildTextList(items, mapper) {
-  if (!Array.isArray(items) || items.length === 0) return '';
-  return items.map((item, idx) => mapper(item, idx)).filter(Boolean).join('\n');
-}
-
 function parseSummaryCost(value) {
   const normalized = String(value ?? '').replace(/[^0-9.-]/g, '').trim();
   const parsed = Number.parseFloat(normalized);
