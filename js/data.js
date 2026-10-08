@@ -7191,7 +7191,22 @@ function getExportTimelineScore(dateValue, timeValue = '', fallback = Number.MAX
   return Number.isNaN(date.getTime()) ? fallback : date.getTime() / 60000;
 }
 
-function buildExportDailyTimelineItems(leg, day, legIdx, dayIdx, journeysData = [], staysData = []) {
+function buildExportDailyTimelineItems(options = {}, argDay, argLegIdx, argDayIdx, argJourneysData, argStaysData) {
+  let leg, day, legIdx, dayIdx, journeysData, staysData;
+
+  if (options && typeof options === 'object' && ('leg' in options || 'day' in options)) {
+    ({ leg, day, legIdx, dayIdx, journeysData = [], staysData = [] } = options);
+  } else {
+    leg = options;
+    day = argDay;
+    legIdx = argLegIdx;
+    dayIdx = argDayIdx;
+    journeysData = argJourneysData || [];
+    staysData = argStaysData || [];
+  }
+
+  if (!day) return [];
+
   const dayDate = normalizeTripDateValue(day.date);
   const timelineItems = [];
   const normalizeName = value => String(value || '').trim().toLowerCase();
@@ -7312,7 +7327,7 @@ async function exportItineraryText() {
           ];
           if (day.desc) dayParts.push(`Desc: ${truncateText(day.desc, 90)}`);
           sections.push(`  - ${dayParts.join(' | ')}`);
-          const timelineItems = buildExportDailyTimelineItems(leg, day, legIdx, dayIdx, journeysData, staysData);
+          const timelineItems = buildExportDailyTimelineItems({ leg, day, legIdx, dayIdx, journeysData, staysData });
           if (timelineItems.length > 0) {
             sections.push('    Agenda:');
             timelineItems.forEach(item => {
@@ -7496,7 +7511,7 @@ async function exportItinerarySummaryText() {
         if (Array.isArray(day.activityItems) && day.activityItems.length > 0) summaryBits.push(`Activities ${day.activityItems.length}`);
         if (day.desc) summaryBits.push(`Note ${truncateText(day.desc, 60)}`);
         lines.push(`  ${formatTextValue(dayLabel)} | ${summaryBits.join(' | ') || 'No details'}`);
-        const timelineItems = buildExportDailyTimelineItems(leg, day, legIdx, dayIdx, journeysData, staysData);
+        const timelineItems = buildExportDailyTimelineItems({ leg, day, legIdx, dayIdx, journeysData, staysData });
         timelineItems.forEach(item => {
           lines.push(`    - ${item.text}`);
         });
