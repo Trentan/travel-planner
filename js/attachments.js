@@ -19,7 +19,7 @@ function closeLightbox() {
 }
 
 function generateAttachmentId() {
-  return 'att_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  return 'att_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
 }
 
 function renderAttachmentsListHtml(attachments, onRemoveCode) {

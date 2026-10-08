@@ -2600,7 +2600,7 @@ function renderDailyTimelineConnectorRow(itemA, itemB, compact = false) {
     ? 'is-warning-alert'
     : (bufferInfo.level === 'advisory' ? 'is-warning-advisory' : 'is-normal');
 
-  const connectorId = `conn_${Math.random().toString(36).substr(2, 8)}`;
+  const connectorId = `conn_${Math.random().toString(36).substring(2, 10)}`;
   const hasDetails = Boolean(bufferInfo.carrier || bufferInfo.routeCode || bufferInfo.terminalPlatform || bufferInfo.notes);
 
   const detailsHtml = hasDetails ? `

@@ -576,10 +576,10 @@ function migrateJourneyCityIds() {
 function createJourneyFromTransportItem(item, legId, dayDate, fromLoc, toLoc) {
   const fromCity = citiesData.find(c => c.name === fromLoc);
   const toCity = citiesData.find(c => c.name === toLoc);
-  const journeyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  const journeyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
 
   const journey = {
-    id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+    id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11),
     journeyId: journeyId,
     journeyName: fromLoc + ' → ' + toLoc,
     legId: legId,
@@ -2016,7 +2016,7 @@ function openAddJourneyModal() {
     const modal = document.getElementById('journey-modal');
     if (!modal) return;
 
-    _pendingJourneyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    _pendingJourneyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
     _pendingSegments = [];
     _pendingJourneyName = ''; // Reset name
     _pendingOriginalSegmentIds = [];
@@ -2205,7 +2205,7 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
   }
 
   return {
-    id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+    id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8),
     journeyId: _pendingJourneyId,
     journeyName: '',
     legId: resolvedLegId,
@@ -2337,7 +2337,7 @@ function promptAddJourneyAlert() {
   const cleanType = typeInput.toLowerCase().trim() || 'custom';
 
   const alertItem = {
-    id: 'alt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+    id: 'alt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8),
     type: cleanType,
     severity: cleanSeverity,
     message: message.trim(),
