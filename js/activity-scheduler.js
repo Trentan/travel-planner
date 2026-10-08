@@ -599,7 +599,7 @@ function assignSuggestedActivityToDay(sourceLegIdx, activityIdx, targetLegIdx, t
   }
 
   if (!activity.id) {
-    activity.id = 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+    activity.id = 'act-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36);
   }
   const activityId = activity.id;
 
@@ -709,7 +709,7 @@ function clearAssignedSuggestedActivityFromDay(sourceLegIdx, activityIdx, origin
   if (!activity) return false;
 
   if (!activity.id) {
-    activity.id = 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+    activity.id = 'act-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36);
   }
   const activityId = activity.id;
 
