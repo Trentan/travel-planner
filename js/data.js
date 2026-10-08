@@ -8032,20 +8032,6 @@ function selectTripStartPath(path) {
   }
 }
 
-async function selectTripStartSaveLocation(type) {
-  captureTripStartAnswer();
-  tripStartAnswers.saveLocationType = type;
-  if (type === 'disk' && typeof createFileOnDisk === 'function') {
-    try {
-      await createFileOnDisk();
-    } catch (e) {
-      console.warn('Disk storage setup skipped or cancelled:', e);
-    }
-  }
-  tripStartStep = 1;
-  renderTripStart();
-}
-
 function selectTripStartParty(party) {
   captureTripStartAnswer();
   tripStartAnswers.party = party;
