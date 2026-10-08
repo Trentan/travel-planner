@@ -1343,9 +1343,21 @@ function renderTransportSegmentsDetailContent(segs) {
     `;
 }
 
-function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, journeyId) {
+function renderTransportMobileDetails(options = {}) {
+  const opts = (typeof options === 'object' && options !== null && !Array.isArray(options)) ? options : {
+    segs: options,
+    rep: arguments[1],
+    totalCost: arguments[2],
+    statusText: arguments[3],
+    statusIcon: arguments[4],
+    statusColor: arguments[5],
+    journeyId: arguments[6]
+  };
+
+  const { segs = [], rep = null, totalCost = 0 } = opts;
+
   if (!segs || segs.length === 0) return '';
-return `
+  return `
     ${renderTransportMobileFacts(segs, totalCost, rep?.notes || '')}
     ${segs.length > 1 ? renderTransportSegmentsDetailContent(segs) : ''}
   `;
@@ -1470,7 +1482,15 @@ function buildTransportTab(cityFilter = null) {
         <button class="mobile-surface-card-button mobile-surface-card-button--danger transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">Delete</button>
       ` : '';
       const summary = '';
-      const details = renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, rep.id);
+      const details = renderTransportMobileDetails({
+        segs,
+        rep,
+        totalCost,
+        statusText,
+        statusIcon,
+        statusColor,
+        journeyId: rep.id
+      });
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'transport-mobile-card row-accent',
         accentColor: statusColor,
