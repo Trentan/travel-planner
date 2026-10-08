@@ -14,6 +14,7 @@ const { runCloudAutoSyncErrorTests } = require('./cloud-auto-sync-error.test');
 const { runTripLibraryXssTests } = require('./trip-library-xss.test');
 const { runTripLibraryGDriveSyncTests } = require('./trip-library-gdrive-sync.test');
 const { runTripSummaryXssTests } = require('./trip-summary-xss.test');
+const { runPrintAccomXssTests } = require('./print-accom-xss.test');
 const { runCityLiveSearchXssTests } = require('./city-live-search-xss.test');
 const { runCityListXssTests } = require('./city-list-xss.test');
 const { runLegDialogCountryXssTests } = require('./leg-dialog-country-xss.test');
@@ -77,6 +78,7 @@ async function run() {
     await runTripLibraryXssTests();
     if (typeof runTripLibraryGDriveSyncTests === 'function') await runTripLibraryGDriveSyncTests();
     if (typeof runTripSummaryXssTests === 'function') await runTripSummaryXssTests();
+    if (typeof runPrintAccomXssTests === 'function') await runPrintAccomXssTests();
     if (typeof runCityLiveSearchXssTests === 'function') await runCityLiveSearchXssTests();
     if (typeof runCityListXssTests === 'function') await runCityListXssTests();
     if (typeof runLegDialogCountryXssTests === 'function') await runLegDialogCountryXssTests();
