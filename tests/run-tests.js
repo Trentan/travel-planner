@@ -53,6 +53,7 @@ const { runRebuildAndAirportCodesTests } = require('./rebuild-itinerary-airport-
 const { runBudgetTabTests } = require('./budget-tab.test');
 const { runGetDayTotalTests } = require('./get-day-total.test');
 const { runGetMapSearchUrlTests } = require('./get-map-search-url.test');
+const { runActivitySchedulerTests } = require('./activity-scheduler.test');
 const { runGetMobilePagerStateStoreTests } = require('./get-mobile-pager-state-store.test');
 const { runIsTerminalLegTests } = require('./is-terminal-leg.test');
 const { runDragdropTests } = require('./dragdrop.test');
@@ -100,6 +101,7 @@ async function run() {
     if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
     if (typeof runGetDayTotalTests === 'function') await runGetDayTotalTests();
     if (typeof runGetMapSearchUrlTests === 'function') await runGetMapSearchUrlTests();
+    if (typeof runActivitySchedulerTests === 'function') runActivitySchedulerTests();
     if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
     if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
