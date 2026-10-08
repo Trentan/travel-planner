@@ -1872,7 +1872,21 @@ function getRandomCityColor(usedColorsSet = null) {
 }
 
 // Add or update a city with ISO/ICAO standards
-function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cityCode = '', countryCode = '', lat = null, lng = null) {
+function addOrUpdateCity(cityNameOrOptions, country = '', dateFrom = '', dateTo = '', cityCode = '', countryCode = '', lat = null, lng = null) {
+  let cityName = '';
+  if (typeof cityNameOrOptions === 'object' && cityNameOrOptions !== null) {
+    cityName = cityNameOrOptions.cityName || cityNameOrOptions.name || '';
+    country = cityNameOrOptions.country ?? country;
+    dateFrom = cityNameOrOptions.dateFrom ?? dateFrom;
+    dateTo = cityNameOrOptions.dateTo ?? dateTo;
+    cityCode = cityNameOrOptions.cityCode ?? cityNameOrOptions.code ?? cityCode;
+    countryCode = cityNameOrOptions.countryCode ?? countryCode;
+    lat = cityNameOrOptions.lat ?? lat;
+    lng = cityNameOrOptions.lng ?? lng;
+  } else {
+    cityName = cityNameOrOptions || '';
+  }
+
   if (!cityName) return null;
 
   const normalizedName = cityName.trim();
@@ -4326,7 +4340,7 @@ async function addNewCityFromDialog() {
     }
   }
 
-  const newCity = addOrUpdateCity(name, countryName, '', '', '', countryCode, initialLat, initialLng);
+  const newCity = addOrUpdateCity({ cityName: name, country: countryName, countryCode, lat: initialLat, lng: initialLng });
   if (newCity) {
     if (typeof refreshJourneyCityDropdowns === 'function') {
       refreshJourneyCityDropdowns(newCity.name);
@@ -7744,7 +7758,7 @@ async function loadImportedPayload(importedData, fileName) {
     }
 
     if (!existing && cityName) {
-      addOrUpdateCity(cityName);
+      addOrUpdateCity({ cityName });
     } else if (existing && existing.isTransit === true) {
       delete existing.isTransit;
       if (existing.colour === '#95a5a6') existing.colour = getRandomCityColor();

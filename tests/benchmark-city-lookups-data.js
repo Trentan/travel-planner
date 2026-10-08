@@ -57,7 +57,7 @@ async function runBenchmark() {
   for (let i = 0; i < ITERATIONS; i++) {
     engine.citiesData.length = 0; // Prevent citiesData growth
     const cityName = cityNames[i % cityNames.length];
-    engine.addOrUpdateCity(cityName, 'Japan', '2026-01-01', '2026-01-05');
+    engine.addOrUpdateCity({ cityName, country: 'Japan', dateFrom: '2026-01-01', dateTo: '2026-01-05' });
   }
   const endAdd = process.hrtime.bigint();
   const addMs = Number(endAdd - startAdd) / 1e6;

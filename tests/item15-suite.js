@@ -352,7 +352,7 @@ async function testCrudSmoke() {
     'CRUD smoke: final undo should leave packing where it started'
   );
 
-  const city = context.addOrUpdateCity('Tokyo');
+  const city = context.addOrUpdateCity({ cityName: 'Tokyo' });
   const journey = context.createJourneyFromTransportItem(
     { text: 'Flight to Tokyo', cost: '300', status: 'confirmed', bookingRef: 'ABC123' },
     state(context).itinerary[0].id,
