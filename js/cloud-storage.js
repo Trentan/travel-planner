@@ -644,10 +644,6 @@
   }
   window.showOriginMismatchNotice = showOriginMismatchNotice;
 
-  function completeSeamlessSignIn() {
-    return window.authenticateGoogleDrive(true);
-  }
-
   // Disconnect Google Drive & Sign Out
   window.disconnectGoogleDrive = function() {
     window.__mockGoogleDriveAPI = false;
