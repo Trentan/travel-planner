@@ -3575,7 +3575,7 @@ function setupCityAutocomplete() {
     const localCandidates = [];
     const seenKeys = new Set();
 
-    function addCandidate(name, countryCode, lat, lng, source, region = '') {
+    function addCandidate({ name, countryCode, lat, lng, source, region = '' } = {}) {
       if (!name) return;
       const key = `${name.toLowerCase()}|${(countryCode || '').toUpperCase()}`;
       if (seenKeys.has(key)) return;
@@ -3594,7 +3594,7 @@ function setupCityAutocomplete() {
     if (typeof userCities !== 'undefined' && Array.isArray(userCities)) {
       userCities.forEach(uc => {
         if (uc.name && uc.name.toLowerCase().includes(cleanLower)) {
-          addCandidate(uc.name, uc.countryCode, uc.lat, uc.lng, 'custom');
+          addCandidate({ name: uc.name, countryCode: uc.countryCode, lat: uc.lat, lng: uc.lng, source: 'custom' });
         }
       });
     }
@@ -3603,7 +3603,7 @@ function setupCityAutocomplete() {
       ALL_CITIES.forEach(c => {
         if (c.name && (c.name.toLowerCase().startsWith(cleanLower) || (c.name.toLowerCase().includes(cleanLower) && cleanLower.length >= 4))) {
           if (localCandidates.length < 8) {
-            addCandidate(c.name, c.countryCode, c.lat, c.lng, 'database');
+            addCandidate({ name: c.name, countryCode: c.countryCode, lat: c.lat, lng: c.lng, source: 'database' });
           }
         }
       });
@@ -3613,7 +3613,7 @@ function setupCityAutocomplete() {
       for (const [extName, extData] of Object.entries(EXTENDED_CITY_DATABASE)) {
         if (extName.toLowerCase().startsWith(cleanLower) || (extName.toLowerCase().includes(cleanLower) && cleanLower.length >= 4)) {
           if (localCandidates.length < 10) {
-            addCandidate(extName, extData.countryCode, extData.lat, extData.lng, 'database');
+            addCandidate({ name: extName, countryCode: extData.countryCode, lat: extData.lat, lng: extData.lng, source: 'database' });
           }
         }
       }
