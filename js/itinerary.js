@@ -744,7 +744,13 @@ function getCustomDayTitle(day, targetCity = '') {
   return title;
 }
 
-function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysByJourneyIdMap) {
+function renderCompactDaySlide(opts = {}) {
+  let leg, legIndex, day, dayIdx, totalDays, journeysByJourneyIdMap;
+  if (opts && typeof opts === 'object' && ('leg' in opts || 'day' in opts)) {
+    ({ leg, legIndex, day, dayIdx, totalDays, journeysByJourneyIdMap } = opts);
+  } else {
+    [leg, legIndex, day, dayIdx, totalDays, journeysByJourneyIdMap] = arguments;
+  }
   const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
   const useGroupedView = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped';
   const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
@@ -1134,7 +1140,14 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
     `;
   }).join('');
 
-  const slides = days.map((day, dayIdx) => renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysByJourneyId)).join('');
+  const slides = days.map((day, dayIdx) => renderCompactDaySlide({
+    leg,
+    legIndex,
+    day,
+    dayIdx,
+    totalDays,
+    journeysByJourneyIdMap: journeysByJourneyId
+  })).join('');
 
   return `
       <div class="compact-day-pager" data-leg-id="${escapeCompactText(leg.id)}" data-total-days="${totalDays}" data-pager-key="${escapeCompactText(pagerKey)}" data-active-index="${initialIndex}">
