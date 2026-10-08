@@ -578,7 +578,7 @@ async function loadTripFromStore(tripId) {
 window.loadTripFromStore = loadTripFromStore;
 
 async function createNewTripDocument(title = 'New Trip', subtitle = 'Click here to add subtitle') {
-  const newId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  const newId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
   let baseData = typeof DEFAULT_TRIP_DATA !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA)) : {};
   baseData.meta = { title, subtitle };
 
@@ -593,7 +593,7 @@ async function duplicateTripDocument(tripId) {
   const source = trips.find(t => t.id === tripId);
   if (!source || !source.data) return;
 
-  const newId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  const newId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
   const dupPayload = JSON.parse(JSON.stringify(source.data));
   dupPayload.meta = dupPayload.meta || {};
   dupPayload.meta.title = (dupPayload.meta.title || 'Trip') + ' (Copy)';
@@ -5409,7 +5409,7 @@ function normalizeTripLegsData(legs) {
     suggested.forEach(act => {
       if (!act || typeof act !== 'object') return;
       if (!act.id) {
-        act.id = 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+        act.id = 'act-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36);
       }
       if (!act.title && act.name) act.title = act.name;
       if (!act.title && act.notes) {
@@ -5637,7 +5637,7 @@ function normalizeTripLegsData(legs) {
           }
 
           const newActivity = {
-            id: 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36),
+            id: 'act-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36),
             title: cleanTitle || text || 'Activity',
             category: category,
             estTime: item.time || '1 hr',
@@ -5836,7 +5836,7 @@ function normalizeTripJourneysData(items) {
 
   items.forEach(item => {
     if (!item.id) {
-      item.id = 'journey-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+      item.id = 'journey-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36);
     }
     if (!item.journeyId) {
       item.journeyId = item.id;
@@ -5909,7 +5909,7 @@ function normalizeTripStaysData(items) {
   if (!Array.isArray(items)) return [];
   items.forEach(item => {
     if (!item.id) {
-      item.id = 'stay-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+      item.id = 'stay-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36);
     }
     item.checkIn = normalizeTripDateValue(item.checkIn || item.startDate);
     item.checkOut = normalizeTripDateValue(item.checkOut || item.endDate || item.checkIn);
@@ -7925,7 +7925,7 @@ async function importJSON(event) {
       } catch(err) {}
 
       // Assign a distinct trip ID for the imported file so it is saved as a document in My Trips Gallery
-      const importedTripId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+      const importedTripId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
       setActiveTripId(importedTripId);
 
       await loadImportedPayload(importedData, file.name);

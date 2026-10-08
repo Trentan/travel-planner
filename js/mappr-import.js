@@ -520,7 +520,7 @@
       const typeSelect = document.querySelector(`.mappr-spot-type-select[data-spot-index="${idx}"]`);
       const rowType = typeSelect ? typeSelect.value : (spot.type || (spot.category === 'food' ? 'food' : (spot.category === 'tip' ? 'tip' : 'sight')));
 
-      const actId = 'act_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+      const actId = 'act_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
       const noteParts = [spot.summary, spot.tips ? `Tip: ${spot.tips}` : '', spot.whyGo ? `Why go: ${spot.whyGo}` : '', spot.website ? `Website: ${spot.website}` : ''].filter(Boolean);
       const notes = noteParts.join(' · ');
 
