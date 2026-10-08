@@ -697,51 +697,6 @@ function deleteFromIndexedDB(key) {
   });
 }
 
-// Migrate data from localStorage to IndexedDB
-async function migrateFromLocalStorage() {
-  console.log('Checking for localStorage data to migrate...');
-
-  const migrations = [
-    { lsKey: 'travelApp_v2026_template', dbKey: 'itinerary' },
-    { lsKey: 'travelApp_packing_v3', dbKey: 'packing' },
-    { lsKey: 'travelApp_leavehome_v3', dbKey: 'leaveHome' },
-    { lsKey: 'travelApp_cities_v1', dbKey: 'cities' },
-    { lsKey: 'travelApp_meta_template', dbKey: 'meta' },
-    { lsKey: 'travelApp_filename_v2026', dbKey: 'filename' },
-    { lsKey: 'travelApp_journeys_v1', dbKey: 'journeys' },
-    { lsKey: 'travelApp_stays_v1', dbKey: 'stays' },
-    { lsKey: 'travelApp_userCities_v1', dbKey: 'userCities' },
-    { lsKey: 'travelApp_userCountries_v1', dbKey: 'userCountries' },
-    { lsKey: 'travelApp_last_export_v2026', dbKey: 'lastExport' },
-    { lsKey: 'travelApp_last_import_v2026', dbKey: 'lastImport' }
-  ];
-
-  let migratedCount = 0;
-
-  for (const { lsKey, dbKey } of migrations) {
-    const lsData = localStorage.getItem(lsKey);
-    if (lsData !== null) {
-      try {
-        const parsedData = JSON.parse(lsData);
-        await saveToIndexedDB(dbKey, parsedData);
-        console.log(`Migrated ${dbKey} from localStorage to IndexedDB`);
-        migratedCount++;
-        // Don't remove from localStorage yet - keep as fallback
-      } catch (e) {
-        console.error(`Failed to migrate ${dbKey}:`, e);
-      }
-    }
-  }
-
-  if (migratedCount > 0) {
-    console.log(`Successfully migrated ${migratedCount} data stores to IndexedDB`);
-    // Mark migration as complete
-    await saveToIndexedDB('_migration_complete', { version: DB_VERSION, date: new Date().toISOString() });
-  }
-
-  return migratedCount;
-}
-
 // Check if we should use IndexedDB (migration complete and DB available)
 async function shouldUseIndexedDB() {
   try {
