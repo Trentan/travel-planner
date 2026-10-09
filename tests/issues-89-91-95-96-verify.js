@@ -17,6 +17,17 @@ async function run() {
   // Test renderAttachmentsPillsHtml logic
   assert(attachmentsJs.includes('rel="noopener noreferrer"'), 'Link attachments should have noopener noreferrer');
   assert(attachmentsJs.includes('openLightbox'), 'Image attachments should bind openLightbox');
+
+  // Test generateAttachmentId contract and non-deprecated method usage
+  assert(!attachmentsJs.includes('.substr('), 'attachments.js must not contain deprecated String.prototype.substr()');
+  const mockWindow = {};
+  const generateAttachmentId = new Function('window', `${attachmentsJs}; return generateAttachmentId;`)(mockWindow);
+  const testId1 = generateAttachmentId();
+  const testId2 = generateAttachmentId();
+  assert(typeof testId1 === 'string', 'generateAttachmentId must return a string');
+  assert(testId1.startsWith('att_'), 'generateAttachmentId must start with att_');
+  assert(testId1 !== testId2, 'generateAttachmentId must produce unique values');
+  assert(/^att_\d+_[a-z0-9]{6}$/.test(testId1), 'generateAttachmentId output format must match att_<timestamp>_<6 random chars>');
   console.log('✓ Issue #89 attachments verified');
 
   // 2. Verify interactive guide steps and tutorials (Issue #91)
