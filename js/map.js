@@ -655,15 +655,6 @@ function renderMobileMapOverlayControls(hostContainer, mapInstance, destinations
   if (!isMobile) return;
 
   const safeText = val => (typeof escapeHtmlText === 'function' ? escapeHtmlText(String(val ?? '')) : String(val ?? '').replace(/[&<>"']/g, ''));
-  const rail = document.createElement('div');
-  rail.className = 'mobile-map-filter-rail hide-scrollbar';
-  const allBtn = `<button type="button" class="mobile-map-filter-pill active" data-map-city="all">🌍 All Trip</button>`;
-  const cityPills = (Array.isArray(destinations) ? destinations : []).map((dest, idx) => {
-    const label = safeText(dest.name || `Stop ${idx + 1}`);
-    const id = safeText(dest.id || dest.name || idx);
-    return `<button type="button" class="mobile-map-filter-pill" data-map-city="${id}" data-map-stop-idx="${idx}">${idx + 1}. ${label}</button>`;
-  }).join('');
-  rail.innerHTML = allBtn + cityPills;
 
   const strip = document.createElement('div');
   strip.className = 'mobile-map-card-strip hide-scrollbar';
@@ -693,47 +684,27 @@ function renderMobileMapOverlayControls(hostContainer, mapInstance, destinations
 
   const mapViewEl = hostContainer.querySelector('#journey-map-view') || hostContainer;
   if (mapViewEl && mapViewEl.parentElement) {
-    mapViewEl.parentElement.insertBefore(rail, mapViewEl);
     mapViewEl.insertAdjacentElement('afterend', strip);
   } else {
-    hostContainer.appendChild(rail);
     hostContainer.appendChild(strip);
   }
 
   const activateStopIndex = (idx, fly = true) => {
     const cards = Array.from(strip.querySelectorAll('.mobile-map-stop-card[data-map-stop-idx]'));
-    const pills = Array.from(rail.querySelectorAll('.mobile-map-filter-pill'));
     cards.forEach((c, i) => c.classList.toggle('active', i === idx));
-    pills.forEach(p => p.classList.toggle('active', Number(p.dataset.mapStopIdx) === idx));
     const dest = destinations[idx];
+    if (dest && typeof highlightCityNavByCityId === 'function') {
+      highlightCityNavByCityId(dest.id || dest.name);
+    }
     if (fly && dest && mapInstance && Number.isFinite(dest.lat) && Number.isFinite(dest.lng)) {
       if (typeof mapInstance.flyTo === 'function') {
         mapInstance.flyTo([dest.lat, dest.lng], 11, { duration: 0.45 });
       } else if (typeof mapInstance.setView === 'function') {
         mapInstance.setView([dest.lat, dest.lng], 11);
       }
-      focusCityOnMap(dest.id || dest.name);
+      focusCityOnMap(dest.id || dest.name, { skipFly: true });
     }
   };
-
-  rail.querySelectorAll('.mobile-map-filter-pill').forEach(pill => {
-    pill.addEventListener('click', () => {
-      const city = pill.dataset.mapCity;
-      if (city === 'all') {
-        rail.querySelectorAll('.mobile-map-filter-pill').forEach(p => p.classList.toggle('active', p === pill));
-        if (mapInstance && destinations.length > 1 && typeof L !== 'undefined') {
-          mapInstance.fitBounds(L.latLngBounds(destinations.map(d => [d.lat, d.lng])), { padding: [40, 40] });
-        }
-      } else {
-        const idx = Number(pill.dataset.mapStopIdx || 0);
-        activateStopIndex(idx, true);
-        const targetCard = strip.querySelector(`.mobile-map-stop-card[data-map-stop-idx="${idx}"]`);
-        if (targetCard && typeof targetCard.scrollIntoView === 'function') {
-          targetCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }
-      }
-    });
-  });
 
   strip.querySelectorAll('.mobile-map-stop-card[data-map-stop-idx]').forEach(card => {
     card.addEventListener('click', () => {
@@ -760,14 +731,52 @@ if (typeof window !== 'undefined') {
   window.renderMobileMapOverlayControls = renderMobileMapOverlayControls;
 }
 
-function focusCityOnMap(cityId) {
-  if (!mainMap || !mapMarkers.length) return;
-  
-  const entry = mapMarkers.find(m => m.id === cityId || m.name === cityId);
-  if (entry) {
-    mainMap.setView(entry.marker.getLatLng(), 12);
-    entry.marker.openPopup();
+function resetMapViewToAll() {
+  if (!mainMap || !Array.isArray(mapMarkers) || !mapMarkers.length) return;
+  if (typeof L !== 'undefined' && mapMarkers.length > 1) {
+    const latLngs = mapMarkers.map(m => m.marker?.getLatLng?.()).filter(Boolean);
+    if (latLngs.length > 1) {
+      mainMap.fitBounds(L.latLngBounds(latLngs), { padding: [40, 40] });
+    }
   }
+}
+
+function focusCityOnMap(cityId, opts = {}) {
+  if (!mainMap || !mapMarkers.length) return;
+  const cityName = typeof getCityNameById === 'function' ? String(getCityNameById(cityId) || '').trim() : '';
+  const needle = cityName.toLowerCase();
+
+  const entryIdx = mapMarkers.findIndex(m => {
+    if (m.id === cityId || m.name === cityId) return true;
+    const mName = String(m.name || '').toLowerCase();
+    return needle && (mName === needle || mName.includes(needle) || needle.includes(mName));
+  });
+  const entry = entryIdx >= 0 ? mapMarkers[entryIdx] : null;
+  if (entry && entry.marker) {
+    if (!opts.skipFly) {
+      if (typeof mainMap.flyTo === 'function') {
+        mainMap.flyTo(entry.marker.getLatLng(), 11, { duration: 0.45 });
+      } else {
+        mainMap.setView(entry.marker.getLatLng(), 12);
+      }
+    }
+    entry.marker.openPopup();
+    if (typeof document !== 'undefined') {
+      const strip = document.querySelector('#tab-map .mobile-map-card-strip');
+      if (strip) {
+        const cards = Array.from(strip.querySelectorAll('.mobile-map-stop-card[data-map-stop-idx]'));
+        cards.forEach((c, i) => c.classList.toggle('active', i === entryIdx));
+        const targetCard = cards[entryIdx];
+        if (targetCard && typeof targetCard.scrollIntoView === 'function') {
+          targetCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      }
+    }
+  }
+}
+if (typeof window !== 'undefined') {
+  window.resetMapViewToAll = resetMapViewToAll;
+  window.focusCityOnMap = focusCityOnMap;
 }
 
 function highlightCityOnMap(cityId) {

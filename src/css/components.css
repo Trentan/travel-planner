@@ -81,8 +81,8 @@
     color: #cbd5e1 !important;
   }
 
-  /* Tab-aware city nav: visible only on itinerary */
-  body:not([data-active-tab="itinerary"]) #cityNav,
+  /* Tab-aware city nav: visible across all trip tabs */
+  body[data-active-tab="guide"] #cityNav,
   #cityNav.tab-hidden {
     display: none !important;
   }

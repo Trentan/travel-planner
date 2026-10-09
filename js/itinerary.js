@@ -4584,7 +4584,7 @@ function buildCityNav() {
 
   // Keep the "All" button
   navList.innerHTML = `
-    <button class="city-nav-btn px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700 ${filter === 'all' ? 'active' : ''}" data-city="all" onclick="selectCityFilter('all', this)">
+    <button class="city-nav-btn px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700 ${filter === 'all' ? 'active' : ''}" data-city="all" onclick="selectCityFilter('all', this)">
       <span>🏙️ All</span>
     </button>
   `;
@@ -4603,11 +4603,11 @@ function buildCityNav() {
     const color = city.colour || (isTransit ? '#95a5a6' : '#2C3E50');
 
     if (isTransit) {
-      btn.className = 'city-nav-btn px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700 opacity-70' + (filter === city.id ? ' active' : '');
-      btn.style.borderLeft = `4px dashed ${color}`;
+      btn.className = 'city-nav-btn px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700 opacity-70' + (filter === city.id ? ' active' : '');
+      btn.style.borderLeft = `3px dashed ${color}`;
     } else {
-      btn.className = 'city-nav-btn px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700' + (filter === city.id ? ' active' : '');
-      btn.style.borderLeft = `4px solid ${color}`;
+      btn.className = 'city-nav-btn px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700' + (filter === city.id ? ' active' : '');
+      btn.style.borderLeft = `3px solid ${color}`;
     }
 
     const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">&#128205;</span>';
@@ -4620,7 +4620,7 @@ function buildCityNav() {
 
   // Append + Add City button at the end of the navigation list for 1-tap mobile addition
   const addCityBtn = document.createElement('button');
-  addCityBtn.className = 'city-nav-btn city-nav-add-btn px-3 py-1.5 rounded-full border border-dashed border-teal-500/70 dark:border-teal-400/70 bg-teal-50/60 dark:bg-teal-950/40 text-sm font-semibold text-teal-700 dark:text-teal-300 whitespace-nowrap transition-all hover:bg-teal-100 dark:hover:bg-teal-900/60 active:scale-95 flex items-center gap-1 shrink-0';
+  addCityBtn.className = 'city-nav-btn city-nav-add-btn px-2.5 py-1 rounded-full border border-dashed border-teal-500/70 dark:border-teal-400/70 bg-teal-50/60 dark:bg-teal-950/40 text-xs font-semibold text-teal-700 dark:text-teal-300 whitespace-nowrap transition-colors hover:bg-teal-100 dark:hover:bg-teal-900/60 active:scale-95 flex items-center gap-1 shrink-0';
   addCityBtn.setAttribute('title', 'Add a new city or destination');
   addCityBtn.onclick = () => {
     if (typeof openCityDialog === 'function') openCityDialog();
@@ -4629,6 +4629,9 @@ function buildCityNav() {
   navList.appendChild(addCityBtn);
 
   updateCityNavOverflowCue(nav, navList);
+  if (typeof updateCityNavPullHandle === 'function') {
+    updateCityNavPullHandle();
+  }
   if (!nav.dataset.overflowCueBound) {
     nav.dataset.overflowCueBound = '1';
     navList.addEventListener('scroll', () => updateCityNavOverflowCue(nav, navList), { passive: true });
@@ -4649,9 +4652,63 @@ function updateCityNavOverflowCue(nav, navList) {
   nav.classList.toggle('city-nav-at-end', atEnd);
 }
 
+function scrollMobileSwipePagerToCity(pagerSelector, cityId, rebuildAllFn) {
+  if (typeof document === 'undefined') return false;
+  let pager = document.querySelector(pagerSelector);
+  const findMatchingSlide = (root) => {
+    if (!root) return null;
+    const slides = Array.from(root.querySelectorAll('[data-role="mobile-swipe-slide"]'));
+    return slides.find(s =>
+      s.dataset.cityId === cityId ||
+      s.dataset.fromCityId === cityId ||
+      s.dataset.toCityId === cityId
+    ) || null;
+  };
+  let targetSlide = findMatchingSlide(pager);
+  if (!targetSlide && typeof rebuildAllFn === 'function') {
+    rebuildAllFn();
+    pager = document.querySelector(pagerSelector);
+    targetSlide = findMatchingSlide(pager);
+  }
+  if (!pager || !targetSlide) return false;
+  const idx = Number(targetSlide.dataset.slideIndex);
+  const chip = pager.querySelector(`[data-role="mobile-swipe-chip"][data-slide-index="${idx}"]`);
+  if (chip && typeof chip.click === 'function') {
+    chip.click();
+    return true;
+  }
+  return false;
+}
+
+function focusCityInBudgetTab(cityId, cityName) {
+  if (typeof document === 'undefined') return;
+  const budgetTab = document.getElementById('tab-budget');
+  if (!budgetTab) return;
+  const rows = Array.from(budgetTab.querySelectorAll('.budget-mobile-row, .budget-desktop-table tbody tr'));
+  rows.forEach(r => r.classList.remove('is-city-focused'));
+  if (!cityId || cityId === 'all') return;
+  const needle = String(cityName || cityId).trim().toLowerCase();
+  if (!needle) return;
+  const match = rows.find(r => {
+    const style = window.getComputedStyle ? window.getComputedStyle(r) : null;
+    if (style && style.display === 'none') return false;
+    return String(r.textContent || '').toLowerCase().includes(needle);
+  }) || rows.find(r => String(r.textContent || '').toLowerCase().includes(needle));
+  if (match) {
+    match.classList.add('is-city-focused');
+    if (typeof match.scrollIntoView === 'function') {
+      match.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+}
+
 function selectCityFilter(cityId, btn) {
-  // If tapping currently selected city chip, toggle back to 'all'
-  if (window.currentCityFilter === cityId && cityId !== 'all') {
+  const activeTab = document.querySelector('.app-tab-btn.active');
+  const tabType = activeTab ? activeTab.getAttribute('data-tab') : (document.body?.getAttribute?.('data-active-tab') || 'itinerary');
+  const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (typeof window !== 'undefined' && window.innerWidth <= 768);
+
+  // If tapping currently selected city chip on filterable tables/tabs, toggle back to 'all'
+  if (window.currentCityFilter === cityId && cityId !== 'all' && !(isMobile && (tabType === 'itinerary' || tabType === 'map'))) {
     cityId = 'all';
     btn = document.querySelector('#cityNav .city-nav-btn[data-city="all"]') || null;
   }
@@ -4671,10 +4728,9 @@ function selectCityFilter(cityId, btn) {
       if (activeBtn) activeBtn.classList.add('active');
     }
   }
-
-  // Rebuild tabs that have city filtering
-  const activeTab = document.querySelector('.app-tab-btn.active');
-  const tabType = activeTab ? activeTab.getAttribute('data-tab') : 'itinerary';
+  if (typeof updateCityNavPullHandle === 'function') {
+    updateCityNavPullHandle();
+  }
 
   if (cityId === 'all') {
     // Show all - rebuild normally
@@ -4682,8 +4738,13 @@ function selectCityFilter(cityId, btn) {
       buildTransportTab('all');
     } else if (tabType === 'accom' && typeof buildAccomTab === 'function') {
       buildAccomTab('all');
+    } else if (tabType === 'map') {
+      if (typeof resetMapViewToAll === 'function') resetMapViewToAll();
+      else if (typeof buildJourneyMap === 'function') buildJourneyMap();
+    } else if (tabType === 'budget') {
+      focusCityInBudgetTab('all', '');
     } else if (tabType === 'itinerary') {
-      if (typeof isMobileViewport === 'function' ? isMobileViewport() : window.innerWidth <= 768) {
+      if (isMobile) {
         if (typeof resetMobilePagerActiveIndex === 'function') resetMobilePagerActiveIndex('compact-city-swipe');
         buildItinerary();
       } else {
@@ -4691,24 +4752,35 @@ function selectCityFilter(cityId, btn) {
       }
     }
   } else {
-    // Filter by city
-    const cityName = getCityNameById ? getCityNameById(cityId) : cityId;
-    console.log(`[CityFilter] Selected: ${cityName} (${cityId})`);
+    // Filter or focus by city across active tab
+    const cityName = typeof getCityNameById === 'function' ? getCityNameById(cityId) : cityId;
 
-    // Rebuild with filtering
     if (tabType === 'transport' && typeof buildTransportTab === 'function') {
-      buildTransportTab(cityId);
+      if (isMobile) {
+        if (!scrollMobileSwipePagerToCity('#tab-transport .transport-swipe-pager', cityId, () => buildTransportTab('all'))) {
+          buildTransportTab(cityId);
+        }
+      } else {
+        buildTransportTab(cityId);
+      }
     } else if (tabType === 'accom' && typeof buildAccomTab === 'function') {
-      buildAccomTab(cityId);
+      if (isMobile) {
+        if (!scrollMobileSwipePagerToCity('#tab-accom .stay-swipe-pager', cityId, () => buildAccomTab('all'))) {
+          buildAccomTab(cityId);
+        }
+      } else {
+        buildAccomTab(cityId);
+      }
     } else if (tabType === 'map') {
       if (typeof focusCityOnMap === 'function') focusCityOnMap(cityId);
+    } else if (tabType === 'budget') {
+      focusCityInBudgetTab(cityId, cityName);
     } else if (tabType === 'itinerary') {
-      if (typeof isMobileViewport === 'function' ? isMobileViewport() : window.innerWidth <= 768) {
+      if (isMobile) {
         if (!scrollToCompactCitySlide(cityId, cityName)) {
           scrollToCity(cityId);
         }
       } else {
-        // Scroll to first leg with this city
         scrollToCity(cityId);
       }
     }

@@ -94,12 +94,29 @@ function runTask3BottomSheetAndDragTests() {
 }
 
 function runTask4MobileMapTests() {
+  const indexHtml = loadSource('index.html');
+  const uiJs = loadSource(path.join('js', 'ui.js'));
+  const itineraryJs = loadSource(path.join('js', 'itinerary.js'));
   const mapJs = loadSource(path.join('js', 'map.js'));
   const mobileFeaturesCss = loadSource(path.join('src', 'css', 'mobile-features.css'));
 
   assert(
-    mapJs.includes('mobile-map-filter-rail') && mapJs.includes('mobile-map-card-strip'),
-    'Task 4: js/map.js should render .mobile-map-filter-rail and .mobile-map-card-strip on mobile'
+    !indexHtml.includes('add-city-action') && indexHtml.includes('id="cityNavPullHandle"'),
+    'Task 4: index.html should remove redundant .add-city-action button and include #cityNavPullHandle inside #cityNav'
+  );
+  assert(
+    uiJs.includes('toggleCityNavDrawer') && uiJs.includes('setupCityNavPullGesture'),
+    'Task 4: js/ui.js should implement toggleCityNavDrawer and setupCityNavPullGesture for the pull-down cross-tab #cityNav drawer'
+  );
+  assert(
+    itineraryJs.includes('scrollMobileSwipePagerToCity') && itineraryJs.includes('focusCityInBudgetTab'),
+    'Task 4: selectCityFilter in js/itinerary.js should interact with Transit, Stays, Map, and Budget tabs'
+  );
+  assert(
+    mapJs.includes('mobile-map-card-strip') &&
+      mapJs.includes('highlightCityNavByCityId') &&
+      mapJs.includes('resetMapViewToAll'),
+    'Task 4: js/map.js should sync .mobile-map-card-strip with the unified top #cityNav scroll bar'
   );
   assert(
     mapJs.includes('renderMobileMapOverlayControls'),
@@ -107,8 +124,10 @@ function runTask4MobileMapTests() {
   );
   assert(
     mobileFeaturesCss.includes('.mobile-map-card-strip') &&
+      mobileFeaturesCss.includes('#cityNav.is-tucked') &&
+      mobileFeaturesCss.includes('min-height: 1.68rem !important') &&
       mobileFeaturesCss.includes('100dvh'),
-    'Task 4: mobile-features.css should expand #journey-map-view to full mobile viewport height and style .mobile-map-card-strip'
+    'Task 4: mobile-features.css should style slimmer #cityNav buttons, #cityNav.is-tucked pull-down drawer, and full-viewport mobile map'
   );
 }
 

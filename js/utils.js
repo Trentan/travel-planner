@@ -439,6 +439,9 @@ function highlightCityNavByCityId(cityId) {
   if (!btn) return;
   nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  if (typeof updateCityNavPullHandle === 'function') {
+    updateCityNavPullHandle();
+  }
 
   const navList = nav.querySelector('.city-nav-list');
   if (!navList) return;

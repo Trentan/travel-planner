@@ -177,8 +177,11 @@ function syncResponsiveUi() {
       }
     }
     if (cityNavEl.classList && typeof cityNavEl.classList.toggle === 'function') {
-      cityNavEl.classList.toggle('tab-hidden', activeTabId !== 'itinerary');
+      cityNavEl.classList.toggle('tab-hidden', activeTabId === 'guide');
     }
+  }
+  if (typeof updateCityNavPullHandle === 'function') {
+    updateCityNavPullHandle();
   }
 
   updateStickyOffsets();
@@ -586,9 +589,104 @@ if (typeof window !== 'undefined') {
   window.mobileTabScrollPositions = mobileTabScrollPositions;
 }
 
+function updateCityNavPullHandle() {
+  if (typeof document === 'undefined' || !document.getElementById) return;
+  const cityNav = document.getElementById('cityNav');
+  if (!cityNav) return;
+  const handle = document.getElementById('cityNavPullHandle') || (cityNav.querySelector ? cityNav.querySelector('.city-nav-pull-handle') : null);
+  const label = document.getElementById('cityNavPullLabel') || (handle && handle.querySelector ? handle.querySelector('.city-nav-pull-label') : null);
+  const isTucked = !!(cityNav.classList && cityNav.classList.contains && cityNav.classList.contains('is-tucked'));
+  if (handle && typeof handle.setAttribute === 'function') {
+    handle.setAttribute('aria-expanded', isTucked ? 'false' : 'true');
+  }
+  if (!label) return;
+  const activeBtn = cityNav.querySelector
+    ? (cityNav.querySelector('.city-nav-btn.active:not([data-city="all"])') ||
+       cityNav.querySelector('.city-nav-btn:not([data-city="all"]):not(.city-nav-add-btn)'))
+    : null;
+  const cityLine = activeBtn && activeBtn.querySelector ? (activeBtn.querySelector('.city-nav-city-line') || activeBtn) : activeBtn;
+  const rawCity = String(cityLine?.textContent || 'Cities').replace(/\s+/g, ' ').trim();
+  const cleanCity = rawCity || 'Cities';
+  label.textContent = isTucked ? `📍 ${cleanCity} · Pull for cities ▾` : `📍 ${cleanCity} · Hide cities ▴`;
+}
+
+function setCityNavDrawerExpanded(expanded, isManual = false) {
+  if (typeof document === 'undefined' || !document.getElementById) return;
+  const cityNav = document.getElementById('cityNav');
+  if (!cityNav || !cityNav.classList) return;
+  cityNav.classList.toggle('is-tucked', !expanded);
+  if (cityNav.dataset) {
+    if (isManual) {
+      cityNav.dataset.manualState = expanded ? 'expanded' : 'tucked';
+      cityNav.dataset.manualScrollY = String(Math.round((typeof window !== 'undefined' && window.scrollY) || 0));
+    } else {
+      delete cityNav.dataset.manualState;
+    }
+  }
+  updateCityNavPullHandle();
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(() => updateStickyOffsets());
+  } else {
+    updateStickyOffsets();
+  }
+}
+
+function toggleCityNavDrawer(event, forceExpanded) {
+  if (event && typeof event.stopPropagation === 'function') {
+    event.stopPropagation();
+  }
+  if (typeof document === 'undefined' || !document.getElementById) return;
+  const cityNav = document.getElementById('cityNav');
+  if (!cityNav || !cityNav.classList) return;
+  const nextExpanded = typeof forceExpanded === 'boolean'
+    ? forceExpanded
+    : cityNav.classList.contains('is-tucked');
+  setCityNavDrawerExpanded(nextExpanded, true);
+}
+
+function setupCityNavPullGesture() {
+  if (typeof document === 'undefined' || typeof window === 'undefined' || window.__cityNavPullGestureBound) return;
+  window.__cityNavPullGestureBound = true;
+  let startY = 0;
+  let startX = 0;
+  let activeInCityNav = false;
+
+  document.addEventListener('touchstart', (e) => {
+    if (!isMobileViewport()) return;
+    const target = e.target;
+    if (!target || typeof target.closest !== 'function') return;
+    const inNav = target.closest('#cityNav');
+    if (!inNav) {
+      activeInCityNav = false;
+      return;
+    }
+    const touch = e.touches && e.touches[0];
+    if (!touch) return;
+    activeInCityNav = true;
+    startY = touch.clientY;
+    startX = touch.clientX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    if (!activeInCityNav || !isMobileViewport()) return;
+    activeInCityNav = false;
+    const touch = e.changedTouches && e.changedTouches[0];
+    if (!touch) return;
+    const dy = touch.clientY - startY;
+    const dx = touch.clientX - startX;
+    if (Math.abs(dy) < 16 || Math.abs(dy) <= Math.abs(dx)) return;
+    if (dy > 16) {
+      setCityNavDrawerExpanded(true, true);
+    } else if (dy < -16) {
+      setCityNavDrawerExpanded(false, true);
+    }
+  }, { passive: true });
+}
+
 function setupMobileHeaderScrollCollapse() {
   if (typeof window === 'undefined' || window.__mobileHeaderScrollBound) return;
   window.__mobileHeaderScrollBound = true;
+  setupCityNavPullGesture();
   let lastScrollY = window.scrollY || 0;
   window.addEventListener('scroll', () => {
     if (!isMobileViewport()) {
@@ -597,15 +695,32 @@ function setupMobileHeaderScrollCollapse() {
     }
     const currentY = Math.max(0, window.scrollY || 0);
     const deltaY = currentY - lastScrollY;
-    if (currentY <= 80 || deltaY < -8) {
+    const cityNav = document.getElementById ? document.getElementById('cityNav') : null;
+    const manualScrollY = Number(cityNav?.dataset?.manualScrollY || 0);
+    const scrolledFarFromManual = Math.abs(currentY - manualScrollY) > 64;
+
+    if (currentY <= 36) {
       document.body?.classList?.remove('mobile-header-condensed');
-    } else if (deltaY > 12 && currentY > 80) {
+      const activeTab = document.body?.getAttribute?.('data-active-tab') || 'itinerary';
+      if ((activeTab === 'itinerary' || activeTab === 'map') && cityNav?.dataset?.manualState !== 'tucked') {
+        setCityNavDrawerExpanded(true, false);
+      }
+    } else if (deltaY > 12 && currentY > 64) {
       document.body?.classList?.add('mobile-header-condensed');
+      if (!cityNav?.dataset?.manualState || scrolledFarFromManual) {
+        setCityNavDrawerExpanded(false, false);
+      }
+    } else if (deltaY < -14 && currentY <= 80) {
+      document.body?.classList?.remove('mobile-header-condensed');
     }
     lastScrollY = currentY;
   }, { passive: true });
 }
 if (typeof window !== 'undefined') {
+  window.updateCityNavPullHandle = updateCityNavPullHandle;
+  window.setCityNavDrawerExpanded = setCityNavDrawerExpanded;
+  window.toggleCityNavDrawer = toggleCityNavDrawer;
+  window.setupCityNavPullGesture = setupCityNavPullGesture;
   window.setupMobileHeaderScrollCollapse = setupMobileHeaderScrollCollapse;
   setupMobileHeaderScrollCollapse();
 }
@@ -706,7 +821,13 @@ function switchTab(tabId, btnElement) {
         cityNav.setAttribute('data-active-tab', tabId);
       }
       if (cityNav.classList && typeof cityNav.classList.toggle === 'function') {
-        cityNav.classList.toggle('tab-hidden', tabId !== 'itinerary');
+        cityNav.classList.toggle('tab-hidden', tabId === 'guide');
+      }
+      if (typeof isMobileViewport === 'function' && isMobileViewport()) {
+        const defaultExpanded = (tabId === 'itinerary' || tabId === 'map');
+        setCityNavDrawerExpanded(defaultExpanded, false);
+      } else {
+        updateCityNavPullHandle();
       }
     }
 

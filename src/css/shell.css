@@ -150,7 +150,7 @@
     pointer-events: none;
   }
 
-  body:not([data-active-tab="itinerary"]) #cityNav,
+  body[data-active-tab="guide"] #cityNav,
   #cityNav.tab-hidden {
     display: none !important;
   }

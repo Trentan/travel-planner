@@ -171,12 +171,16 @@
   </div>
 </header>
 
-<nav id="cityNav" class="city-nav transition-transform duration-300 translate-y-0">
+<nav id="cityNav" class="city-nav transition-transform duration-300 translate-y-0" aria-label="Trip cities bar">
   <div class="city-nav-list hide-scrollbar">
     <button class="city-nav-btn active" data-city="all" onclick="selectCityFilter('all', this)">
       <span>🏙️ All</span>
     </button>
   </div>
+  <button type="button" id="cityNavPullHandle" class="city-nav-pull-handle" onclick="toggleCityNavDrawer(event)" aria-expanded="true" aria-label="Toggle cities bar">
+    <span class="city-nav-pull-pill" aria-hidden="true"></span>
+    <span class="city-nav-pull-label" id="cityNavPullLabel">📍 Cities ▴</span>
+  </button>
 </nav>
 
 <main>
@@ -277,7 +281,6 @@
               <span class="split-icon">⛶</span> <span class="split-label">Full Itinerary</span>
             </button>
           </div>
-          <button class="action-btn add-city-action" onclick="openCityDialog()"><span class="add-city-label">🌍 City</span></button>
           <button class="action-btn add-leg-action" onclick="openLegEditorDialog()"><span class="add-leg-label">🧭 Legs</span></button>
         </div>
       </div>
