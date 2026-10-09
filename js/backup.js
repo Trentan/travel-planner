@@ -3,7 +3,6 @@
 // Backup tracking variables
 let editCountSinceExport = 0;
 let lastExportTimestamp = null;
-const BACKUP_REMINDER_DAYS = 3;
 const BACKUP_REMINDER_EDITS = 10;
 
 function isFileBackedMode() {

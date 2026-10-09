@@ -576,10 +576,10 @@ function migrateJourneyCityIds() {
 function createJourneyFromTransportItem(item, legId, dayDate, fromLoc, toLoc) {
   const fromCity = citiesData.find(c => c.name === fromLoc);
   const toCity = citiesData.find(c => c.name === toLoc);
-  const journeyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  const journeyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
 
   const journey = {
-    id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+    id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11),
     journeyId: journeyId,
     journeyName: fromLoc + ' → ' + toLoc,
     legId: legId,
@@ -1178,10 +1178,30 @@ function renderTransportCarrierMobile(options = {}) {
   `;
 }
 
-function renderTransportStatusCostMobile(statusText, statusIcon, statusColor, costValue, bookingReference, journeyId, isEditable) {
+function renderTransportStatusCostMobile(options = {}) {
+  const opts = (typeof options === 'object' && options !== null) ? options : {
+    statusText: options,
+    statusIcon: arguments[1],
+    statusColor: arguments[2],
+    costValue: arguments[3],
+    bookingReference: arguments[4],
+    journeyId: arguments[5],
+    isEditable: arguments[6]
+  };
+
+  const {
+    statusText = '',
+    statusIcon = '',
+    statusColor = '',
+    costValue = '',
+    bookingReference = '',
+    journeyId = '',
+    isEditable = false
+  } = opts;
+
   if (typeof renderMobileStatusCostMeta === 'function') {
     return renderMobileStatusCostMeta({
-      status: statusText.toLowerCase(),
+      status: String(statusText || '').toLowerCase(),
       costValue,
       bookingReference,
       statusOnClick: isEditable ? `toggleJourneyStatus('${journeyId}')` : '',
@@ -1343,9 +1363,21 @@ function renderTransportSegmentsDetailContent(segs) {
     `;
 }
 
-function renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, journeyId) {
+function renderTransportMobileDetails(options = {}) {
+  const opts = (typeof options === 'object' && options !== null && !Array.isArray(options)) ? options : {
+    segs: options,
+    rep: arguments[1],
+    totalCost: arguments[2],
+    statusText: arguments[3],
+    statusIcon: arguments[4],
+    statusColor: arguments[5],
+    journeyId: arguments[6]
+  };
+
+  const { segs = [], rep = null, totalCost = 0 } = opts;
+
   if (!segs || segs.length === 0) return '';
-return `
+  return `
     ${renderTransportMobileFacts(segs, totalCost, rep?.notes || '')}
     ${segs.length > 1 ? renderTransportSegmentsDetailContent(segs) : ''}
   `;
@@ -1470,7 +1502,15 @@ function buildTransportTab(cityFilter = null) {
         <button class="mobile-surface-card-button mobile-surface-card-button--danger transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">Delete</button>
       ` : '';
       const summary = '';
-      const details = renderTransportMobileDetails(segs, rep, totalCost, statusText, statusIcon, statusColor, rep.id);
+      const details = renderTransportMobileDetails({
+        segs,
+        rep,
+        totalCost,
+        statusText,
+        statusIcon,
+        statusColor,
+        journeyId: rep.id
+      });
       const cardHtml = renderMobileSurfaceCard({
         cardClass: 'transport-mobile-card row-accent',
         accentColor: statusColor,
@@ -2016,7 +2056,7 @@ function openAddJourneyModal() {
     const modal = document.getElementById('journey-modal');
     if (!modal) return;
 
-    _pendingJourneyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    _pendingJourneyId = 'jid_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
     _pendingSegments = [];
     _pendingJourneyName = ''; // Reset name
     _pendingOriginalSegmentIds = [];
@@ -2205,7 +2245,7 @@ function _buildJourneyObject(fromLocation, toLocation, segmentOrder) {
   }
 
   return {
-    id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+    id: 'journey_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8),
     journeyId: _pendingJourneyId,
     journeyName: '',
     legId: resolvedLegId,
@@ -2337,7 +2377,7 @@ function promptAddJourneyAlert() {
   const cleanType = typeInput.toLowerCase().trim() || 'custom';
 
   const alertItem = {
-    id: 'alt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+    id: 'alt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8),
     type: cleanType,
     severity: cleanSeverity,
     message: message.trim(),
@@ -2455,6 +2495,7 @@ window.buildTransportTab = buildTransportTab;
 window.getDayJourneys = getDayJourneys;
 window.getTransportIcon = getTransportIcon;
 window.renderTransportCarrierMobile = renderTransportCarrierMobile;
+window.renderTransportStatusCostMobile = renderTransportStatusCostMobile;
 window.createJourneyFromTransportItem = createJourneyFromTransportItem;
 window.importJourneys = importJourneys;
 window.migrateJourneyCityIds = migrateJourneyCityIds;

@@ -26,6 +26,7 @@ const { run: runTimezoneSuite } = require('./timezone-suite.test');
 const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
 const { run: runSmartRemindersSuite } = require('./smart-reminders-suite');
 const { runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
+const { runCityDisambiguationTests } = require('./city-disambiguation.test');
 const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
 const { runEscapeHtmlTextTests } = require('./escape-html-text.test');
 const { runIsSafeUrlTests } = require('./is-safe-url.test');
@@ -56,6 +57,7 @@ const { runBudgetTabTests } = require('./budget-tab.test');
 const { runGetDayTotalTests } = require('./get-day-total.test');
 const { runGetMapSearchUrlTests } = require('./get-map-search-url.test');
 const { runActivitySchedulerTests } = require('./activity-scheduler.test');
+const { runAddOrUpdateCityTests } = require('./add-or-update-city.test');
 const { runGetMobilePagerStateStoreTests } = require('./get-mobile-pager-state-store.test');
 const { runIsTerminalLegTests } = require('./is-terminal-leg.test');
 const { runDragdropTests } = require('./dragdrop.test');
@@ -64,10 +66,12 @@ const { runMergeChecklistWithDefaultsTests } = require('./merge-checklist-with-d
 const { runEnforceTerminalLegsTests } = require('./enforce-terminal-legs.test');
 const { runBackupTests } = require('./backup.test');
 const { runPackingTests } = require('./packing.test');
+const { runBuildExportDailyTimelineItemsTests } = require('./build-export-daily-timeline-items.test');
 
 async function run() {
   try {
     if (typeof runPackingTests === 'function') runPackingTests();
+    if (typeof runBuildExportDailyTimelineItemsTests === 'function') runBuildExportDailyTimelineItemsTests();
     if (typeof runDragdropTests === 'function') runDragdropTests();
     if (typeof runTabsTests === 'function') runTabsTests();
     if (typeof runBudgetTabTests === 'function') runBudgetTabTests();
@@ -110,12 +114,14 @@ async function run() {
     if (typeof runGetMapSearchUrlTests === 'function') await runGetMapSearchUrlTests();
     if (typeof runActivitySchedulerTests === 'function') runActivitySchedulerTests();
     if (typeof runBackupTests === 'function') await runBackupTests();
+    if (typeof runAddOrUpdateCityTests === 'function') await runAddOrUpdateCityTests();
     if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
     if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
     if (typeof runFormatJourneySubLocationTests === 'function') await runFormatJourneySubLocationTests();
     if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
     if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
+    if (typeof runCityDisambiguationTests === 'function') await runCityDisambiguationTests();
     if (typeof runTransportDurationSuite === 'function') await runTransportDurationSuite();
     if (typeof runTransitConnectorsSuite === 'function') await runTransitConnectorsSuite();
     if (typeof runLegManagementWysiwygSuite === 'function') await runLegManagementWysiwygSuite();

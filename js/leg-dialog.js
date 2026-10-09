@@ -1881,7 +1881,7 @@ function confirmAddLeg() {
           countryName = countryOther;
         }
 
-        const newCity = (typeof addOrUpdateCity === 'function') ? addOrUpdateCity(newCityName, countryName, '', '', '', countryCode) : null;
+        const newCity = (typeof addOrUpdateCity === 'function') ? addOrUpdateCity({ cityName: newCityName, country: countryName, countryCode }) : null;
         if (newCity && typeof buildCityNav === 'function') {
           buildCityNav();
         }

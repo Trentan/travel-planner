@@ -578,7 +578,7 @@ async function loadTripFromStore(tripId) {
 window.loadTripFromStore = loadTripFromStore;
 
 async function createNewTripDocument(title = 'New Trip', subtitle = 'Click here to add subtitle') {
-  const newId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  const newId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
   let baseData = typeof DEFAULT_TRIP_DATA !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA)) : {};
   baseData.meta = { title, subtitle };
 
@@ -593,7 +593,7 @@ async function duplicateTripDocument(tripId) {
   const source = trips.find(t => t.id === tripId);
   if (!source || !source.data) return;
 
-  const newId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  const newId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
   const dupPayload = JSON.parse(JSON.stringify(source.data));
   dupPayload.meta = dupPayload.meta || {};
   dupPayload.meta.title = (dupPayload.meta.title || 'Trip') + ' (Copy)';
@@ -695,51 +695,6 @@ function deleteFromIndexedDB(key) {
       };
     });
   });
-}
-
-// Migrate data from localStorage to IndexedDB
-async function migrateFromLocalStorage() {
-  console.log('Checking for localStorage data to migrate...');
-
-  const migrations = [
-    { lsKey: 'travelApp_v2026_template', dbKey: 'itinerary' },
-    { lsKey: 'travelApp_packing_v3', dbKey: 'packing' },
-    { lsKey: 'travelApp_leavehome_v3', dbKey: 'leaveHome' },
-    { lsKey: 'travelApp_cities_v1', dbKey: 'cities' },
-    { lsKey: 'travelApp_meta_template', dbKey: 'meta' },
-    { lsKey: 'travelApp_filename_v2026', dbKey: 'filename' },
-    { lsKey: 'travelApp_journeys_v1', dbKey: 'journeys' },
-    { lsKey: 'travelApp_stays_v1', dbKey: 'stays' },
-    { lsKey: 'travelApp_userCities_v1', dbKey: 'userCities' },
-    { lsKey: 'travelApp_userCountries_v1', dbKey: 'userCountries' },
-    { lsKey: 'travelApp_last_export_v2026', dbKey: 'lastExport' },
-    { lsKey: 'travelApp_last_import_v2026', dbKey: 'lastImport' }
-  ];
-
-  let migratedCount = 0;
-
-  for (const { lsKey, dbKey } of migrations) {
-    const lsData = localStorage.getItem(lsKey);
-    if (lsData !== null) {
-      try {
-        const parsedData = JSON.parse(lsData);
-        await saveToIndexedDB(dbKey, parsedData);
-        console.log(`Migrated ${dbKey} from localStorage to IndexedDB`);
-        migratedCount++;
-        // Don't remove from localStorage yet - keep as fallback
-      } catch (e) {
-        console.error(`Failed to migrate ${dbKey}:`, e);
-      }
-    }
-  }
-
-  if (migratedCount > 0) {
-    console.log(`Successfully migrated ${migratedCount} data stores to IndexedDB`);
-    // Mark migration as complete
-    await saveToIndexedDB('_migration_complete', { version: DB_VERSION, date: new Date().toISOString() });
-  }
-
-  return migratedCount;
 }
 
 // Check if we should use IndexedDB (migration complete and DB available)
@@ -1872,7 +1827,21 @@ function getRandomCityColor(usedColorsSet = null) {
 }
 
 // Add or update a city with ISO/ICAO standards
-function addOrUpdateCity(cityName, country = '', dateFrom = '', dateTo = '', cityCode = '', countryCode = '', lat = null, lng = null) {
+function addOrUpdateCity(cityNameOrOptions, country = '', dateFrom = '', dateTo = '', cityCode = '', countryCode = '', lat = null, lng = null) {
+  let cityName = '';
+  if (typeof cityNameOrOptions === 'object' && cityNameOrOptions !== null) {
+    cityName = cityNameOrOptions.cityName || cityNameOrOptions.name || '';
+    country = cityNameOrOptions.country ?? country;
+    dateFrom = cityNameOrOptions.dateFrom ?? dateFrom;
+    dateTo = cityNameOrOptions.dateTo ?? dateTo;
+    cityCode = cityNameOrOptions.cityCode ?? cityNameOrOptions.code ?? cityCode;
+    countryCode = cityNameOrOptions.countryCode ?? countryCode;
+    lat = cityNameOrOptions.lat ?? lat;
+    lng = cityNameOrOptions.lng ?? lng;
+  } else {
+    cityName = cityNameOrOptions || '';
+  }
+
   if (!cityName) return null;
 
   const normalizedName = cityName.trim();
@@ -2492,7 +2461,7 @@ function promptCityDisambiguation(cityId, candidates) {
     const icaoCode = dbMatch ? (dbMatch.icaoCode || dbMatch.icao || '') : '';
     
     return `
-      <button class="trip-start-choice" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.1rem; border: 1px solid #c8d6d0; border-radius: 0.75rem; background: #fff; text-align: left; cursor: pointer; margin-bottom: 0.65rem; width: 100%;" onclick="selectCityDisambiguationChoice('${cityId}', '${cand.countryCode}', ${cand.lat}, ${cand.lng}, '', '${icaoCode}')">
+      <button class="trip-start-choice" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.1rem; border: 1px solid #c8d6d0; border-radius: 0.75rem; background: #fff; text-align: left; cursor: pointer; margin-bottom: 0.65rem; width: 100%;" onclick="selectCityDisambiguationChoice({ cityId: '${cityId}', countryCode: '${cand.countryCode}', lat: ${cand.lat}, lng: ${cand.lng}, icaoCode: '${icaoCode}' })">
         <div>
           <strong style="font-size: 1.05rem; color: #162c3b;">${flag} ${city.name}, ${cand.countryName}</strong>
           <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: #60717b;">${cand.displayName}</p>
@@ -2519,7 +2488,19 @@ function promptCityDisambiguation(cityId, candidates) {
   document.body.appendChild(overlay);
 }
 
-function selectCityDisambiguationChoice(cityId, countryCode, lat, lng, iataCode = '', icaoCode = '') {
+function selectCityDisambiguationChoice(options = {}) {
+  let cityId, countryCode, lat, lng, iataCode, icaoCode;
+  if (typeof options === 'object' && options !== null && !Array.isArray(options)) {
+    ({ cityId, countryCode, lat, lng, iataCode = '', icaoCode = '' } = options);
+  } else {
+    cityId = arguments[0];
+    countryCode = arguments[1];
+    lat = arguments[2];
+    lng = arguments[3];
+    iataCode = arguments[4] || '';
+    icaoCode = arguments[5] || '';
+  }
+
   const city = citiesData.find(c => c.id === cityId);
   if (!city) return;
 
@@ -3582,7 +3563,7 @@ function setupCityAutocomplete() {
     const localCandidates = [];
     const seenKeys = new Set();
 
-    function addCandidate(name, countryCode, lat, lng, source, region = '') {
+    function addCandidate({ name, countryCode, lat, lng, source, region = '' } = {}) {
       if (!name) return;
       const key = `${name.toLowerCase()}|${(countryCode || '').toUpperCase()}`;
       if (seenKeys.has(key)) return;
@@ -3601,7 +3582,7 @@ function setupCityAutocomplete() {
     if (typeof userCities !== 'undefined' && Array.isArray(userCities)) {
       userCities.forEach(uc => {
         if (uc.name && uc.name.toLowerCase().includes(cleanLower)) {
-          addCandidate(uc.name, uc.countryCode, uc.lat, uc.lng, 'custom');
+          addCandidate({ name: uc.name, countryCode: uc.countryCode, lat: uc.lat, lng: uc.lng, source: 'custom' });
         }
       });
     }
@@ -3610,7 +3591,7 @@ function setupCityAutocomplete() {
       ALL_CITIES.forEach(c => {
         if (c.name && (c.name.toLowerCase().startsWith(cleanLower) || (c.name.toLowerCase().includes(cleanLower) && cleanLower.length >= 4))) {
           if (localCandidates.length < 8) {
-            addCandidate(c.name, c.countryCode, c.lat, c.lng, 'database');
+            addCandidate({ name: c.name, countryCode: c.countryCode, lat: c.lat, lng: c.lng, source: 'database' });
           }
         }
       });
@@ -3620,7 +3601,7 @@ function setupCityAutocomplete() {
       for (const [extName, extData] of Object.entries(EXTENDED_CITY_DATABASE)) {
         if (extName.toLowerCase().startsWith(cleanLower) || (extName.toLowerCase().includes(cleanLower) && cleanLower.length >= 4)) {
           if (localCandidates.length < 10) {
-            addCandidate(extName, extData.countryCode, extData.lat, extData.lng, 'database');
+            addCandidate({ name: extName, countryCode: extData.countryCode, lat: extData.lat, lng: extData.lng, source: 'database' });
           }
         }
       }
@@ -4333,7 +4314,7 @@ async function addNewCityFromDialog() {
     }
   }
 
-  const newCity = addOrUpdateCity(name, countryName, '', '', '', countryCode, initialLat, initialLng);
+  const newCity = addOrUpdateCity({ cityName: name, country: countryName, countryCode, lat: initialLat, lng: initialLng });
   if (newCity) {
     if (typeof refreshJourneyCityDropdowns === 'function') {
       refreshJourneyCityDropdowns(newCity.name);
@@ -5416,7 +5397,7 @@ function normalizeTripLegsData(legs) {
     suggested.forEach(act => {
       if (!act || typeof act !== 'object') return;
       if (!act.id) {
-        act.id = 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+        act.id = 'act-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36);
       }
       if (!act.title && act.name) act.title = act.name;
       if (!act.title && act.notes) {
@@ -5644,7 +5625,7 @@ function normalizeTripLegsData(legs) {
           }
 
           const newActivity = {
-            id: 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36),
+            id: 'act-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36),
             title: cleanTitle || text || 'Activity',
             category: category,
             estTime: item.time || '1 hr',
@@ -5843,7 +5824,7 @@ function normalizeTripJourneysData(items) {
 
   items.forEach(item => {
     if (!item.id) {
-      item.id = 'journey-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+      item.id = 'journey-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36);
     }
     if (!item.journeyId) {
       item.journeyId = item.id;
@@ -5916,7 +5897,7 @@ function normalizeTripStaysData(items) {
   if (!Array.isArray(items)) return [];
   items.forEach(item => {
     if (!item.id) {
-      item.id = 'stay-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+      item.id = 'stay-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36);
     }
     item.checkIn = normalizeTripDateValue(item.checkIn || item.startDate);
     item.checkOut = normalizeTripDateValue(item.checkOut || item.endDate || item.checkIn);
@@ -5960,18 +5941,6 @@ function addDaysToIsoDate(dateStr, days) {
   return toLocalIsoDate(date);
 }
 if (typeof window !== 'undefined') window.addDaysToIsoDate = addDaysToIsoDate;
-
-function inferTransportTypeFromText(text) {
-  const value = (text || '').toLowerCase();
-  if (value.includes('flight') || value.includes('depart') || value.includes('arrive') || value.includes('✈')) return 'flight';
-  if (value.includes('train') || value.includes('rail') || value.includes('🚂')) return 'train';
-  if (value.includes('bus') || value.includes('🚌')) return 'bus';
-  if (value.includes('ferry') || value.includes('boat') || value.includes('⛴')) return 'ferry';
-  if (value.includes('car') || value.includes('drive') || value.includes('🚗')) return 'car';
-  if (value.includes('bike') || value.includes('bicycle') || value.includes('🚲')) return 'bike';
-  if (value.includes('walk') || value.includes('🚶')) return 'walk';
-  return 'other';
-}
 
 function stripCityLabel(cityName) {
   // Strip emoji, flag sequences, and parenthetical suffixes like (Trip Start)
@@ -7139,11 +7108,6 @@ function truncateText(value, maxLength = 180) {
   return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
 }
 
-function buildTextList(items, mapper) {
-  if (!Array.isArray(items) || items.length === 0) return '';
-  return items.map((item, idx) => mapper(item, idx)).filter(Boolean).join('\n');
-}
-
 function parseSummaryCost(value) {
   const normalized = String(value ?? '').replace(/[^0-9.-]/g, '').trim();
   const parsed = Number.parseFloat(normalized);
@@ -7198,7 +7162,22 @@ function getExportTimelineScore(dateValue, timeValue = '', fallback = Number.MAX
   return Number.isNaN(date.getTime()) ? fallback : date.getTime() / 60000;
 }
 
-function buildExportDailyTimelineItems(leg, day, legIdx, dayIdx, journeysData = [], staysData = []) {
+function buildExportDailyTimelineItems(options = {}, argDay, argLegIdx, argDayIdx, argJourneysData, argStaysData) {
+  let leg, day, legIdx, dayIdx, journeysData, staysData;
+
+  if (options && typeof options === 'object' && ('leg' in options || 'day' in options)) {
+    ({ leg, day, legIdx, dayIdx, journeysData = [], staysData = [] } = options);
+  } else {
+    leg = options;
+    day = argDay;
+    legIdx = argLegIdx;
+    dayIdx = argDayIdx;
+    journeysData = argJourneysData || [];
+    staysData = argStaysData || [];
+  }
+
+  if (!day) return [];
+
   const dayDate = normalizeTripDateValue(day.date);
   const timelineItems = [];
   const normalizeName = value => String(value || '').trim().toLowerCase();
@@ -7319,7 +7298,7 @@ async function exportItineraryText() {
           ];
           if (day.desc) dayParts.push(`Desc: ${truncateText(day.desc, 90)}`);
           sections.push(`  - ${dayParts.join(' | ')}`);
-          const timelineItems = buildExportDailyTimelineItems(leg, day, legIdx, dayIdx, journeysData, staysData);
+          const timelineItems = buildExportDailyTimelineItems({ leg, day, legIdx, dayIdx, journeysData, staysData });
           if (timelineItems.length > 0) {
             sections.push('    Agenda:');
             timelineItems.forEach(item => {
@@ -7503,7 +7482,7 @@ async function exportItinerarySummaryText() {
         if (Array.isArray(day.activityItems) && day.activityItems.length > 0) summaryBits.push(`Activities ${day.activityItems.length}`);
         if (day.desc) summaryBits.push(`Note ${truncateText(day.desc, 60)}`);
         lines.push(`  ${formatTextValue(dayLabel)} | ${summaryBits.join(' | ') || 'No details'}`);
-        const timelineItems = buildExportDailyTimelineItems(leg, day, legIdx, dayIdx, journeysData, staysData);
+        const timelineItems = buildExportDailyTimelineItems({ leg, day, legIdx, dayIdx, journeysData, staysData });
         timelineItems.forEach(item => {
           lines.push(`    - ${item.text}`);
         });
@@ -7751,7 +7730,7 @@ async function loadImportedPayload(importedData, fileName) {
     }
 
     if (!existing && cityName) {
-      addOrUpdateCity(cityName);
+      addOrUpdateCity({ cityName });
     } else if (existing && existing.isTransit === true) {
       delete existing.isTransit;
       if (existing.colour === '#95a5a6') existing.colour = getRandomCityColor();
@@ -7932,7 +7911,7 @@ async function importJSON(event) {
       } catch(err) {}
 
       // Assign a distinct trip ID for the imported file so it is saved as a document in My Trips Gallery
-      const importedTripId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+      const importedTripId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
       setActiveTripId(importedTripId);
 
       await loadImportedPayload(importedData, file.name);
@@ -8037,20 +8016,6 @@ function selectTripStartPath(path) {
     tripStartStep = 'flight_import';
     renderTripStart();
   }
-}
-
-async function selectTripStartSaveLocation(type) {
-  captureTripStartAnswer();
-  tripStartAnswers.saveLocationType = type;
-  if (type === 'disk' && typeof createFileOnDisk === 'function') {
-    try {
-      await createFileOnDisk();
-    } catch (e) {
-      console.warn('Disk storage setup skipped or cancelled:', e);
-    }
-  }
-  tripStartStep = 1;
-  renderTripStart();
 }
 
 function selectTripStartParty(party) {

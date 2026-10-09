@@ -342,28 +342,6 @@ function renderCompactFoodQuestItem(legIndex, item, itemIdx) {
   `;
 }
 
-function renderCompactActivityItemForPanel(legIndex, dayIdx, itemIdx, item) {
-  const itemId = `compact-activity-${legIndex}-${dayIdx}-${itemIdx}`;
-  const done = !!item.done;
-  const emoji = getActivityItemEmoji(item, legIndex, dayIdx);
-
-  return `
-    <label class="compact-activity-item" for="${itemId}">
-      <input
-        id="${itemId}"
-        type="checkbox"
-        ${done ? 'checked' : ''}
-        onchange="toggleActivityCompleted(event, ${legIndex}, ${dayIdx}, ${itemIdx})"
-      >
-      <span class="compact-activity-item-copy">${renderCompactEmojiLine({
-    emoji,
-    text: item.text,
-    done
-  })}</span>
-    </label>
-  `;
-}
-
 function getActivityItemEmoji(item, legIndex = null, dayIdx = null, fallback = '📌', matchedActivity = null) {
   if (!item) return fallback;
   if (item.category === 'audioTour' || /audio|podcast|self-guided|self guided/i.test(item.text || '') || item.audioTitle) {
@@ -744,7 +722,13 @@ function getCustomDayTitle(day, targetCity = '') {
   return title;
 }
 
-function renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysByJourneyIdMap) {
+function renderCompactDaySlide(opts = {}) {
+  let leg, legIndex, day, dayIdx, totalDays, journeysByJourneyIdMap;
+  if (opts && typeof opts === 'object' && ('leg' in opts || 'day' in opts)) {
+    ({ leg, legIndex, day, dayIdx, totalDays, journeysByJourneyIdMap } = opts);
+  } else {
+    [leg, legIndex, day, dayIdx, totalDays, journeysByJourneyIdMap] = arguments;
+  }
   const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
   const useGroupedView = typeof window !== 'undefined' && window.itineraryDayViewMode === 'grouped';
   const dayDateLabel = typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(day.date) : day.date;
@@ -1134,7 +1118,14 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
     `;
   }).join('');
 
-  const slides = days.map((day, dayIdx) => renderCompactDaySlide(leg, legIndex, day, dayIdx, totalDays, journeysByJourneyId)).join('');
+  const slides = days.map((day, dayIdx) => renderCompactDaySlide({
+    leg,
+    legIndex,
+    day,
+    dayIdx,
+    totalDays,
+    journeysByJourneyIdMap: journeysByJourneyId
+  })).join('');
 
   return `
       <div class="compact-day-pager" data-leg-id="${escapeCompactText(leg.id)}" data-total-days="${totalDays}" data-pager-key="${escapeCompactText(pagerKey)}" data-active-index="${initialIndex}">
@@ -2600,7 +2591,7 @@ function renderDailyTimelineConnectorRow(itemA, itemB, compact = false) {
     ? 'is-warning-alert'
     : (bufferInfo.level === 'advisory' ? 'is-warning-advisory' : 'is-normal');
 
-  const connectorId = `conn_${Math.random().toString(36).substr(2, 8)}`;
+  const connectorId = `conn_${Math.random().toString(36).substring(2, 10)}`;
   const hasDetails = Boolean(bufferInfo.carrier || bufferInfo.routeCode || bufferInfo.terminalPlatform || bufferInfo.notes);
 
   const detailsHtml = hasDetails ? `
@@ -3704,7 +3695,7 @@ ${(() => {
                     <div style="display: flex; align-items: center; gap: 6px;">
                       <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-red-500 rounded" title="Remove Activity" onclick="event.stopPropagation(); deleteDayItem(${legIndex}, ${dayIndex}, 'activityItems', ${i})">×</button>
                       <input type="checkbox" class="activity-checkbox w-4 h-4 accent-emerald-500 cursor-pointer" ${item.done ? 'checked' : ''} onchange="event.stopPropagation(); toggleActivityCompleted(event, ${legIndex}, ${dayIndex}, ${i})">
-                      <span class="cost-item-text font-medium text-slate-700 dark:text-slate-200 outline-none" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText(${legIndex}, ${dayIndex}, 'activityItems', ${i}, this.innerText)">${split.title}</span>
+                      <span class="cost-item-text font-medium text-slate-700 dark:text-slate-200 outline-none" style="${item.done ? 'text-decoration:line-through;opacity:0.6;' : ''}" contenteditable="${isEditMode}" onblur="updateDayItemText({ legIdx: ${legIndex}, dayIdx: ${dayIndex}, category: 'activityItems', itemIdx: ${i}, text: this.innerText })">${split.title}</span>
                     </div>
                     ${locHtml}
                     ${notesHtml}

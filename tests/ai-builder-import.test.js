@@ -350,7 +350,7 @@ async function runAiBuilderImportTests() {
   // Test autoResolveMissingTripCities for unmapped cities
   mapRebuilt = false;
   splitMapRebuilt = false;
-  const unmappedCity = context.addOrUpdateCity('Aitutaki', 'Cook Islands', '', '', '', 'CK');
+  const unmappedCity = context.addOrUpdateCity({ cityName: 'Aitutaki', country: 'Cook Islands', countryCode: 'CK' });
   delete unmappedCity.lat;
   delete unmappedCity.lng;
   assert(!context.cityHasStoredCoords(unmappedCity), 'Aitutaki initially has no stored coords');

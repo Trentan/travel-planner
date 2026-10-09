@@ -868,7 +868,7 @@ function openEditDayActivityModal(legIdx, dayIdx, itemIdx) {
       appData[legIdx].suggestedActivities = [];
     }
 
-    const newId = 'act-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+    const newId = 'act-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36);
     item.activityId = newId;
 
     appData[legIdx].suggestedActivities.push({
