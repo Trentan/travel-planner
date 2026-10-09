@@ -1289,6 +1289,21 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   [data-theme="dark"] .mobile-map-stop-meta {
     color: #94a3b8;
   }
+
+  body.mobile-app-mode #cityNav .city-nav-add-btn {
+    position: sticky;
+    right: 0;
+    z-index: 5;
+  }
+}
+
+::view-transition,
+::view-transition-group(*),
+::view-transition-image-pair(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  pointer-events: none !important;
+  animation-duration: 0.14s !important;
 }
 
 @keyframes mobileBottomSheetSlideUp {
@@ -1301,5 +1316,3 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     opacity: 1;
   }
 }
-
-
