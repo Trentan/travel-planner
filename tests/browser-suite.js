@@ -735,8 +735,14 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
       if (pwaModal) pwaModal.style.display = 'none';
     });
 
-    for (const tabId of ['transport', 'accom', 'budget', 'packing']) {
+    for (const tabId of ['transport', 'accom']) {
       await page.locator(`.app-tab-btn[data-tab="${tabId}"]`).click();
+      await humanPause(page, 250);
+    }
+    for (const secondaryTabId of ['budget', 'packing']) {
+      await page.evaluate(() => toggleMobileMenu());
+      await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
+      await page.locator(`.mobile-quick-tab-btn[data-mobile-quick-tab="${secondaryTabId}"]`).click();
       await humanPause(page, 250);
     }
 
@@ -939,7 +945,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     reporter.add('mobile', 'leg modal tabs and layout', 'verified mobile leg dialog tabs, selector, and responsive layout');
 
     // Verify Packing Collapsible Container (#204)
-    await page.locator('.app-tab-btn[data-tab="packing"]').click();
+    await page.evaluate(() => switchTab('packing'));
     await humanPause(page, 250);
     const packingHeaderVisible = await page.evaluate(() => {
       const header = document.querySelector('.packing-guides-mobile-header');
@@ -956,7 +962,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     assert(await page.locator('.packing-guides-shell.mobile-expanded').count() === 1, 'Mobile: packing guides should expand on tap (#204)');
     reporter.add('mobile', 'packing collapsible', 'packing guide header collapses/expands correctly on mobile');
 
-    // Verify Itinerary Vertical Scroll Bounds (#214)
+    // Verify Itinerary Continuous Vertical Timeline per City
     await page.locator('.app-tab-btn[data-tab="itinerary"]').click();
     await humanPause(page, 250);
     const scrollBoundsPassed = await page.evaluate(async () => {
@@ -973,11 +979,11 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
       const dayCarousel = tokyoSlide.querySelector('.compact-day-carousel');
       const cityCarousel = document.querySelector('.compact-city-swipe-pager [data-role="mobile-swipe-carousel"]');
       if (!activeDay || !dayCarousel || !cityCarousel) return false;
-      const dayDiff = Math.abs(dayCarousel.offsetHeight - (activeDay.querySelector('.compact-day-surface')?.offsetHeight || activeDay.offsetHeight));
-      return dayDiff <= 25 && cityCarousel.offsetHeight < 600;
+      return dayCarousel.classList.contains('mobile-city-vertical-timeline') &&
+        dayCarousel.offsetHeight >= activeDay.offsetHeight;
     });
-    assert(scrollBoundsPassed === true, 'Mobile: itinerary vertical scroll bounds should strictly conform to active day content (#214)');
-    reporter.add('mobile', 'itinerary vertical scroll bounds', 'mobile itinerary vertical scrolling bounds to active day height (#214)');
+    assert(scrollBoundsPassed === true, 'Mobile: itinerary should render continuous vertical timeline per city');
+    reporter.add('mobile', 'itinerary vertical scroll bounds', 'mobile itinerary renders continuous vertical timeline per city');
 
     // Verify Mobile Day Header Chips do not overlap Stay pill (#497)
     const dayHeaderNoOverlap = await page.evaluate(() => {
@@ -1022,7 +1028,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     reporter.add('mobile', 'transit vertical scroll bounds', 'mobile transit carousel conforms to active slide height (#496)');
 
     // Verify Slim Mobile Budget Cards (#498)
-    await page.locator('.app-tab-btn[data-tab="budget"]').click();
+    await page.evaluate(() => switchTab('budget'));
     await humanPause(page, 250);
     const budgetSlimPassed = await page.evaluate(() => {
       const kpiCard = document.querySelector('#tab-budget .budget-kpi-card');

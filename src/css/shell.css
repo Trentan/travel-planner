@@ -1134,7 +1134,9 @@
     }
 
     #tab-map #journey-map-view {
-      @apply h-[280px] min-h-[280px];
+      height: calc(100dvh - 11.5rem - env(safe-area-inset-bottom, 0px));
+      min-height: 440px;
+      border-radius: 0.9rem;
     }
 
     #tab-map .map-header,

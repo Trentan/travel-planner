@@ -632,6 +632,7 @@ function buildJourneyMap() {
 
     updateMapLegend(destinations);
     updateMapStats(destinations, unmatchedCities);
+    renderMobileMapOverlayControls(container.parentElement || container, mainMap, destinations);
 
     if (mainMap) {
       setTimeout(() => {
@@ -641,6 +642,122 @@ function buildJourneyMap() {
       }, 50);
     }
   }, 400);
+}
+
+function renderMobileMapOverlayControls(hostContainer, mapInstance, destinations = []) {
+  if (typeof document === 'undefined' || !hostContainer) return;
+  const existingRail = hostContainer.querySelector('.mobile-map-filter-rail');
+  if (existingRail) existingRail.remove();
+  const existingStrip = hostContainer.querySelector('.mobile-map-card-strip');
+  if (existingStrip) existingStrip.remove();
+
+  const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (typeof window !== 'undefined' && window.innerWidth <= 768);
+  if (!isMobile) return;
+
+  const safeText = val => (typeof escapeHtmlText === 'function' ? escapeHtmlText(String(val ?? '')) : String(val ?? '').replace(/[&<>"']/g, ''));
+  const rail = document.createElement('div');
+  rail.className = 'mobile-map-filter-rail hide-scrollbar';
+  const allBtn = `<button type="button" class="mobile-map-filter-pill active" data-map-city="all">🌍 All Trip</button>`;
+  const cityPills = (Array.isArray(destinations) ? destinations : []).map((dest, idx) => {
+    const label = safeText(dest.name || `Stop ${idx + 1}`);
+    const id = safeText(dest.id || dest.name || idx);
+    return `<button type="button" class="mobile-map-filter-pill" data-map-city="${id}" data-map-stop-idx="${idx}">${idx + 1}. ${label}</button>`;
+  }).join('');
+  rail.innerHTML = allBtn + cityPills;
+
+  const strip = document.createElement('div');
+  strip.className = 'mobile-map-card-strip hide-scrollbar';
+  if (!Array.isArray(destinations) || destinations.length === 0) {
+    strip.innerHTML = `
+      <div class="mobile-map-stop-card mobile-map-stop-card-empty">
+        <span class="mobile-map-stop-title">No pinned stops in this trip yet</span>
+      </div>
+    `;
+  } else {
+    strip.innerHTML = destinations.map((dest, idx) => {
+      const label = safeText(dest.name || `Stop ${idx + 1}`);
+      const id = safeText(dest.id || dest.name || idx);
+      const country = safeText(dest.country || '');
+      const colour = safeText(dest.colour || '#14b8a6');
+      return `
+        <button type="button" class="mobile-map-stop-card${idx === 0 ? ' active' : ''}" data-map-stop-idx="${idx}" data-map-city="${id}">
+          <span class="mobile-map-stop-badge" style="background:${colour};">${idx + 1}</span>
+          <span class="mobile-map-stop-body">
+            <span class="mobile-map-stop-title">${label}</span>
+            <span class="mobile-map-stop-meta">${country || 'Trip destination'}</span>
+          </span>
+        </button>
+      `;
+    }).join('');
+  }
+
+  const mapViewEl = hostContainer.querySelector('#journey-map-view') || hostContainer;
+  if (mapViewEl && mapViewEl.parentElement) {
+    mapViewEl.parentElement.insertBefore(rail, mapViewEl);
+    mapViewEl.insertAdjacentElement('afterend', strip);
+  } else {
+    hostContainer.appendChild(rail);
+    hostContainer.appendChild(strip);
+  }
+
+  const activateStopIndex = (idx, fly = true) => {
+    const cards = Array.from(strip.querySelectorAll('.mobile-map-stop-card[data-map-stop-idx]'));
+    const pills = Array.from(rail.querySelectorAll('.mobile-map-filter-pill'));
+    cards.forEach((c, i) => c.classList.toggle('active', i === idx));
+    pills.forEach(p => p.classList.toggle('active', Number(p.dataset.mapStopIdx) === idx));
+    const dest = destinations[idx];
+    if (fly && dest && mapInstance && Number.isFinite(dest.lat) && Number.isFinite(dest.lng)) {
+      if (typeof mapInstance.flyTo === 'function') {
+        mapInstance.flyTo([dest.lat, dest.lng], 11, { duration: 0.45 });
+      } else if (typeof mapInstance.setView === 'function') {
+        mapInstance.setView([dest.lat, dest.lng], 11);
+      }
+      focusCityOnMap(dest.id || dest.name);
+    }
+  };
+
+  rail.querySelectorAll('.mobile-map-filter-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const city = pill.dataset.mapCity;
+      if (city === 'all') {
+        rail.querySelectorAll('.mobile-map-filter-pill').forEach(p => p.classList.toggle('active', p === pill));
+        if (mapInstance && destinations.length > 1 && typeof L !== 'undefined') {
+          mapInstance.fitBounds(L.latLngBounds(destinations.map(d => [d.lat, d.lng])), { padding: [40, 40] });
+        }
+      } else {
+        const idx = Number(pill.dataset.mapStopIdx || 0);
+        activateStopIndex(idx, true);
+        const targetCard = strip.querySelector(`.mobile-map-stop-card[data-map-stop-idx="${idx}"]`);
+        if (targetCard && typeof targetCard.scrollIntoView === 'function') {
+          targetCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      }
+    });
+  });
+
+  strip.querySelectorAll('.mobile-map-stop-card[data-map-stop-idx]').forEach(card => {
+    card.addEventListener('click', () => {
+      const idx = Number(card.dataset.mapStopIdx || 0);
+      activateStopIndex(idx, true);
+    });
+  });
+
+  if (Array.isArray(mapMarkers)) {
+    mapMarkers.forEach((entry, idx) => {
+      if (entry && entry.marker && typeof entry.marker.on === 'function') {
+        entry.marker.on('click', () => {
+          activateStopIndex(idx, false);
+          const targetCard = strip.querySelector(`.mobile-map-stop-card[data-map-stop-idx="${idx}"]`);
+          if (targetCard && typeof targetCard.scrollIntoView === 'function') {
+            targetCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          }
+        });
+      }
+    });
+  }
+}
+if (typeof window !== 'undefined') {
+  window.renderMobileMapOverlayControls = renderMobileMapOverlayControls;
 }
 
 function focusCityOnMap(cityId) {

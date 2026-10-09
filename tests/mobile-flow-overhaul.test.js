@@ -72,15 +72,35 @@ function runTask3BottomSheetAndDragTests() {
   );
 }
 
+function runTask4MobileMapTests() {
+  const mapJs = loadSource(path.join('js', 'map.js'));
+  const mobileFeaturesCss = loadSource(path.join('src', 'css', 'mobile-features.css'));
+
+  assert(
+    mapJs.includes('mobile-map-filter-rail') && mapJs.includes('mobile-map-card-strip'),
+    'Task 4: js/map.js should render .mobile-map-filter-rail and .mobile-map-card-strip on mobile'
+  );
+  assert(
+    mapJs.includes('renderMobileMapOverlayControls'),
+    'Task 4: js/map.js should expose renderMobileMapOverlayControls for synced mobile map cards'
+  );
+  assert(
+    mobileFeaturesCss.includes('.mobile-map-card-strip') &&
+      mobileFeaturesCss.includes('100dvh'),
+    'Task 4: mobile-features.css should expand #journey-map-view to full mobile viewport height and style .mobile-map-card-strip'
+  );
+}
+
 function runAll() {
   runTask1ShellTests();
   runTask2VerticalTimelineTests();
   runTask3BottomSheetAndDragTests();
+  runTask4MobileMapTests();
 }
 
 if (require.main === module) {
   runAll();
-  console.log('Task 1-3 mobile flow overhaul tests passed');
+  console.log('Task 1-4 mobile flow overhaul tests passed');
 }
 
 module.exports = { runMobileFlowOverhaulTests: runAll };
