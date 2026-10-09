@@ -24,12 +24,12 @@ function renderStayDetailBlock(title, value, extraClass = '') {
   `;
 }
 
-function renderStayLocationDetails(stay, extraClass = '', showLabel = true) {
+function renderStayLocationDetails(stay, extraClass = '', showLabel = true, cityMap = null) {
   if (!stay || !stay.location) return '';
 
   let cityName = '';
-  if (stay.cityId && typeof citiesData !== 'undefined') {
-    const city = citiesData.find(c => c.id === stay.cityId);
+  if (stay.cityId) {
+    const city = cityMap ? cityMap.get(stay.cityId) : ((typeof citiesData !== 'undefined' && Array.isArray(citiesData)) ? citiesData.find(c => c.id === stay.cityId) : null);
     if (city) cityName = city.name;
   }
 
@@ -47,12 +47,12 @@ function renderStayLocationDetails(stay, extraClass = '', showLabel = true) {
   `;
 }
 
-function renderStayLocationSummary(stay, extraClass = '') {
+function renderStayLocationSummary(stay, extraClass = '', cityMap = null) {
   if (!stay || !stay.location) return '';
 
   let cityName = '';
-  if (stay.cityId && typeof citiesData !== 'undefined') {
-    const city = citiesData.find(c => c.id === stay.cityId);
+  if (stay.cityId) {
+    const city = cityMap ? cityMap.get(stay.cityId) : ((typeof citiesData !== 'undefined' && Array.isArray(citiesData)) ? citiesData.find(c => c.id === stay.cityId) : null);
     if (city) cityName = city.name;
   }
 
@@ -134,11 +134,15 @@ function isAccomMobileCardLayout() {
       : (typeof window !== 'undefined' && window.innerWidth <= 768);
 }
 
-function getStayCityDisplay(cityName, stay) {
+function getStayCityDisplay(cityName, stay, cityMap = null) {
   if (!cityName || cityName === 'Unknown') return cityName || 'Unknown';
   let city = null;
-  if (stay && stay.cityId && typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
-    city = citiesData.find(c => c.id === stay.cityId);
+  if (stay && stay.cityId) {
+    if (cityMap) {
+      city = cityMap.get(stay.cityId) || null;
+    } else if (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) {
+      city = citiesData.find(c => c.id === stay.cityId);
+    }
   }
   let code = '';
   if (typeof getLocationCodeText === 'function') {
@@ -164,12 +168,12 @@ function getStayCityDisplay(cityName, stay) {
   return `${flagPrefix}${cityName}`;
 }
 
-function renderStayMobileDetails(stay, cityName) {
+function renderStayMobileDetails(stay, cityName, cityMap = null) {
   const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
   const costValue = formatCurrency(stay.totalCost || '0');
   const locationUrl = stay.location ? getMapSearchUrl(stay.location, cityName) : '';
   const attachmentsHtml = stay.attachments && stay.attachments.length > 0 ? `<div class="stay-mobile-fact stay-mobile-fact--wide"><span class="stay-mobile-fact-label">Attachments & Links</span><div class="flex flex-wrap gap-1 mt-1">` + renderAttachmentsPillsHtml(stay.attachments) + `</div></div>` : '';
-  const cityDisplay = getStayCityDisplay(cityName, stay);
+  const cityDisplay = getStayCityDisplay(cityName, stay, cityMap);
 
   return `
     <div class="stay-mobile-facts-grid">
@@ -223,11 +227,15 @@ function renderAccomMobileView(sortedStays) {
   const slidesHtml = [];
   const railHtml = [];
 
+  const cityMap = (typeof citiesData !== 'undefined' && Array.isArray(citiesData))
+    ? new Map(citiesData.map(c => [c.id, c]))
+    : null;
+
   sortedStays.forEach((stay, index) => {
-    const city = (typeof citiesData !== 'undefined') ? citiesData.find(c => c.id === stay.cityId) : null;
+    const city = (stay.cityId && cityMap) ? cityMap.get(stay.cityId) : ((typeof citiesData !== 'undefined' && Array.isArray(citiesData)) ? citiesData.find(c => c.id === stay.cityId) : null);
     const cityName = city ? city.name : 'Unknown';
     const cityColor = city?.colour || '#2C3E50';
-    const cityDisplay = getStayCityDisplay(cityName, stay);
+    const cityDisplay = getStayCityDisplay(cityName, stay, cityMap);
     const status = normalizeItemStatus(stay.status);
     const checkIn = formatDateShort(stay.checkIn);
     const checkOut = formatDateShort(stay.checkOut);
@@ -240,7 +248,7 @@ function renderAccomMobileView(sortedStays) {
       <button class="mobile-surface-card-button stay-edit-btn" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit stay">Edit</button>
       <button class="mobile-surface-card-button mobile-surface-card-button--danger stay-del-btn" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete stay">Delete</button>
     ` : '';
-    const details = renderStayMobileDetails(stay, cityName);
+    const details = renderStayMobileDetails(stay, cityName, cityMap);
     const cardHtml = renderMobileSurfaceCard({
       cardClass: 'stay-mobile-card row-accent',
       accentColor: cityColor,
@@ -278,8 +286,8 @@ function renderAccomMobileView(sortedStays) {
   });
 }
 
-function renderAccomTableRow(stay) {
-  const city = (typeof citiesData !== 'undefined') ? citiesData.find(c => c.id === stay.cityId) : null;
+function renderAccomTableRow(stay, cityMap = null) {
+  const city = (stay.cityId && cityMap) ? cityMap.get(stay.cityId) : ((typeof citiesData !== 'undefined' && Array.isArray(citiesData)) ? citiesData.find(c => c.id === stay.cityId) : null);
   const cityName = city ? city.name : 'Unknown';
   const cityColor = city?.colour || '#2C3E50';
 
@@ -341,7 +349,10 @@ function renderAccomTableRow(stay) {
 }
 
 function renderAccomDesktopTable(sortedStays) {
-  const rows = sortedStays.map(renderAccomTableRow).join('');
+  const cityMap = (typeof citiesData !== 'undefined' && Array.isArray(citiesData))
+    ? new Map(citiesData.map(c => [c.id, c]))
+    : null;
+  const rows = sortedStays.map(stay => renderAccomTableRow(stay, cityMap)).join('');
   return `<div class="travel-data-table-shell stay-data-table-shell w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-sm mt-4">
     <table class="travel-data-table stay-data-table w-full text-left border-collapse">
       <thead>

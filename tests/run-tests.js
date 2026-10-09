@@ -14,6 +14,7 @@ const { runCloudAutoSyncErrorTests } = require('./cloud-auto-sync-error.test');
 const { runTripLibraryXssTests } = require('./trip-library-xss.test');
 const { runTripLibraryGDriveSyncTests } = require('./trip-library-gdrive-sync.test');
 const { runTripSummaryXssTests } = require('./trip-summary-xss.test');
+const { runPrintAccomXssTests } = require('./print-accom-xss.test');
 const { runCityLiveSearchXssTests } = require('./city-live-search-xss.test');
 const { runCityListXssTests } = require('./city-list-xss.test');
 const { runLegDialogCountryXssTests } = require('./leg-dialog-country-xss.test');
@@ -25,8 +26,10 @@ const { run: runTimezoneSuite } = require('./timezone-suite.test');
 const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
 const { run: runSmartRemindersSuite } = require('./smart-reminders-suite');
 const { runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
+const { runCityDisambiguationTests } = require('./city-disambiguation.test');
 const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
 const { runEscapeHtmlTextTests } = require('./escape-html-text.test');
+const { runIsSafeUrlTests } = require('./is-safe-url.test');
 const { runGetActivityEmojiTests } = require('./get-activity-emoji.test');
 const { runNormalizeItemStatusTests } = require('./normalize-item-status.test');
 const { runGetLegBaseCityNameTests } = require('./get-leg-base-city-name.test');
@@ -53,15 +56,22 @@ const { runRebuildAndAirportCodesTests } = require('./rebuild-itinerary-airport-
 const { runBudgetTabTests } = require('./budget-tab.test');
 const { runGetDayTotalTests } = require('./get-day-total.test');
 const { runGetMapSearchUrlTests } = require('./get-map-search-url.test');
+const { runActivitySchedulerTests } = require('./activity-scheduler.test');
+const { runAddOrUpdateCityTests } = require('./add-or-update-city.test');
 const { runGetMobilePagerStateStoreTests } = require('./get-mobile-pager-state-store.test');
 const { runIsTerminalLegTests } = require('./is-terminal-leg.test');
 const { runDragdropTests } = require('./dragdrop.test');
 const { runTabsTests } = require('./tabs.test');
 const { runMergeChecklistWithDefaultsTests } = require('./merge-checklist-with-defaults.test');
 const { runEnforceTerminalLegsTests } = require('./enforce-terminal-legs.test');
+const { runBackupTests } = require('./backup.test');
+const { runPackingTests } = require('./packing.test');
+const { runBuildExportDailyTimelineItemsTests } = require('./build-export-daily-timeline-items.test');
 
 async function run() {
   try {
+    if (typeof runPackingTests === 'function') runPackingTests();
+    if (typeof runBuildExportDailyTimelineItemsTests === 'function') runBuildExportDailyTimelineItemsTests();
     if (typeof runDragdropTests === 'function') runDragdropTests();
     if (typeof runTabsTests === 'function') runTabsTests();
     if (typeof runBudgetTabTests === 'function') runBudgetTabTests();
@@ -77,6 +87,7 @@ async function run() {
     await runTripLibraryXssTests();
     if (typeof runTripLibraryGDriveSyncTests === 'function') await runTripLibraryGDriveSyncTests();
     if (typeof runTripSummaryXssTests === 'function') await runTripSummaryXssTests();
+    if (typeof runPrintAccomXssTests === 'function') await runPrintAccomXssTests();
     if (typeof runCityLiveSearchXssTests === 'function') await runCityLiveSearchXssTests();
     if (typeof runCityListXssTests === 'function') await runCityListXssTests();
     if (typeof runLegDialogCountryXssTests === 'function') await runLegDialogCountryXssTests();
@@ -89,6 +100,7 @@ async function run() {
     if (typeof runDualPathWizardSuite === 'function') await runDualPathWizardSuite();
     if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();
     if (typeof runEscapeHtmlTextTests === 'function') await runEscapeHtmlTextTests();
+    if (typeof runIsSafeUrlTests === 'function') await runIsSafeUrlTests();
     if (typeof runGetActivityEmojiTests === 'function') await runGetActivityEmojiTests();
     if (typeof runNormalizeItemStatusTests === 'function') await runNormalizeItemStatusTests();
     if (typeof runGetLegBaseCityNameTests === 'function') await runGetLegBaseCityNameTests();
@@ -100,12 +112,16 @@ async function run() {
     if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
     if (typeof runGetDayTotalTests === 'function') await runGetDayTotalTests();
     if (typeof runGetMapSearchUrlTests === 'function') await runGetMapSearchUrlTests();
+    if (typeof runActivitySchedulerTests === 'function') runActivitySchedulerTests();
+    if (typeof runBackupTests === 'function') await runBackupTests();
+    if (typeof runAddOrUpdateCityTests === 'function') await runAddOrUpdateCityTests();
     if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
     if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
     if (typeof runFormatJourneySubLocationTests === 'function') await runFormatJourneySubLocationTests();
     if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
     if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
+    if (typeof runCityDisambiguationTests === 'function') await runCityDisambiguationTests();
     if (typeof runTransportDurationSuite === 'function') await runTransportDurationSuite();
     if (typeof runTransitConnectorsSuite === 'function') await runTransitConnectorsSuite();
     if (typeof runLegManagementWysiwygSuite === 'function') await runLegManagementWysiwygSuite();

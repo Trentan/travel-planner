@@ -1794,8 +1794,15 @@ function confirmAddLeg() {
     });
 
     // Merge back existing day items for matching dates
+    const oldDaysByDate = new Map();
+    oldDays.forEach(od => {
+      if (od && od.date && !oldDaysByDate.has(od.date)) {
+        oldDaysByDate.set(od.date, od);
+      }
+    });
+
     target.days.forEach(newDay => {
-      const oldDay = oldDays.find(od => od.date === newDay.date);
+      const oldDay = oldDaysByDate.get(newDay.date);
       if (oldDay) {
         if (oldDay.title) newDay.title = oldDay.title;
         if (oldDay.accomItems) newDay.accomItems = oldDay.accomItems;
@@ -1874,7 +1881,7 @@ function confirmAddLeg() {
           countryName = countryOther;
         }
 
-        const newCity = (typeof addOrUpdateCity === 'function') ? addOrUpdateCity(newCityName, countryName, '', '', '', countryCode) : null;
+        const newCity = (typeof addOrUpdateCity === 'function') ? addOrUpdateCity({ cityName: newCityName, country: countryName, countryCode }) : null;
         if (newCity && typeof buildCityNav === 'function') {
           buildCityNav();
         }

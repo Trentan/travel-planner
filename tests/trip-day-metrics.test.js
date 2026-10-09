@@ -120,7 +120,14 @@ function runTripDayMetricsTests() {
   assert.strictEqual(finalLegMetrics.globalDayIndex, 43);
 
   // Test 8: Verify rendered day chips and slides
-  const viennaSlideHtml = renderCompactDaySlide(viennaLeg, 3, viennaLeg.days[0], 0, 2, new Map());
+  const viennaSlideHtml = renderCompactDaySlide({
+    leg: viennaLeg,
+    legIndex: 3,
+    day: viennaLeg.days[0],
+    dayIdx: 0,
+    totalDays: 2,
+    journeysByJourneyIdMap: new Map()
+  });
   assert(viennaSlideHtml.includes('Day 1 (#4)'), 'Vienna day slide title should include (#4)');
   assert(viennaSlideHtml.includes('Day 1 of 2 (#4/43)'), 'Vienna counter chip should show Day 1 of 2 (#4/43)');
 

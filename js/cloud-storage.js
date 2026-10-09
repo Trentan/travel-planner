@@ -644,10 +644,6 @@
   }
   window.showOriginMismatchNotice = showOriginMismatchNotice;
 
-  function completeSeamlessSignIn() {
-    return window.authenticateGoogleDrive(true);
-  }
-
   // Disconnect Google Drive & Sign Out
   window.disconnectGoogleDrive = function() {
     window.__mockGoogleDriveAPI = false;
@@ -951,7 +947,7 @@
       console.log(`[GoogleDrive Sync] Simulated fetch of all trips from Google Drive / ${DRIVE_FOLDER_NAME}`);
       const localTrips = typeof window.getAllTripsFromIndexedDB === 'function' ? await window.getAllTripsFromIndexedDB() : [];
       window.__gdriveCloudFiles = localTrips.map(t => ({
-        id: t.id || ('gdrive_file_' + Math.random().toString(36).substr(2, 6)),
+        id: t.id || ('gdrive_file_' + Math.random().toString(36).substring(2, 8)),
         name: formatHumanFilename(t),
         modifiedTime: t.updatedAt || t.lastSaved || new Date().toISOString(),
         size: JSON.stringify(t).length

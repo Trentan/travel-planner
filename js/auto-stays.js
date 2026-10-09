@@ -167,7 +167,7 @@ function createStayFromItinerary(cityName, legId, startDate, nights) {
   checkOutDate.setDate(checkOutDate.getDate() + nights);
 
   // Create stay object
-  const stayId = 'stay-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  const stayId = 'stay-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
 
   return {
     id: stayId,
