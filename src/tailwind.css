@@ -155,7 +155,8 @@
     max-width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
   }
 
   body.mobile-app-mode .desktop-split-right {

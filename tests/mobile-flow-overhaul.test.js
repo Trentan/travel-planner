@@ -32,11 +32,31 @@ function runTask1ShellTests() {
 
 function runTask2VerticalTimelineTests() {
   const itineraryJs = loadSource(path.join('js', 'itinerary.js'));
+  const utilsJs = loadSource(path.join('js', 'utils.js'));
+  const tailwindCss = loadSource(path.join('src', 'tailwind.css'));
   const mobileFeaturesCss = loadSource(path.join('src', 'css', 'mobile-features.css'));
 
   assert(
     itineraryJs.includes('mobile-city-vertical-timeline'),
     'Task 2: js/itinerary.js should render .mobile-city-vertical-timeline for continuous vertical day flow'
+  );
+  assert(
+    utilsJs.includes('compact-day-header'),
+    'Task 2: renderMobileSurfaceCard in js/utils.js should include .compact-day-header so day headings stick while scrolling vertically'
+  );
+  assert(
+    tailwindCss.includes('overflow-x: clip !important;'),
+    'Task 2: src/tailwind.css should use overflow-x: clip !important so mobile itinerary wrappers do not break position: sticky on day headings'
+  );
+  assert(
+    itineraryJs.includes('mobile-vertical-days-banner') &&
+      itineraryJs.includes('mobile-day-scroll-bridge') &&
+      itineraryJs.includes('mobile-day-next-jump-chip'),
+    'Task 2: js/itinerary.js should render vertical day scroll signals (.mobile-vertical-days-banner, .mobile-day-scroll-bridge, .mobile-day-next-jump-chip)'
+  );
+  assert(
+    itineraryJs.includes('__citySwipeGestureBound'),
+    'Task 2: js/itinerary.js should support horizontal left/right swipe between cities alongside vertical day scroll'
   );
   assert(
     itineraryJs.includes('mobile-next-city-card') && itineraryJs.includes('compactItineraryGoToCityIndex'),
@@ -48,8 +68,9 @@ function runTask2VerticalTimelineTests() {
   );
   assert(
     mobileFeaturesCss.includes('.mobile-city-vertical-timeline') &&
-      mobileFeaturesCss.includes('flex-direction: column'),
-    'Task 2: mobile-features.css should stack days vertically inside .mobile-city-vertical-timeline'
+      mobileFeaturesCss.includes('flex-direction: column') &&
+      mobileFeaturesCss.includes('.mobile-day-scroll-bridge'),
+    'Task 2: mobile-features.css should stack days vertically inside .mobile-city-vertical-timeline and style vertical scroll signals'
   );
 }
 

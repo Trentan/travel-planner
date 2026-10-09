@@ -976,6 +976,23 @@ function renderCompactDaySlide(opts = {}) {
   const metrics = getTripDayMetrics(leg.id || legIndex, dayIdx);
   const tripDaySuffix = metrics.globalDayIndex ? ` (#${metrics.globalDayIndex})` : '';
   const tripProgressSuffix = (metrics.globalDayIndex && metrics.totalTripDays) ? ` (#${metrics.globalDayIndex}/${metrics.totalTripDays})` : '';
+  const nextDayObj = (Array.isArray(leg.days) && dayIdx + 1 < totalDays) ? leg.days[dayIdx + 1] : null;
+  const nextDayDateLabel = nextDayObj ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(nextDayObj.date) : (nextDayObj.date || '')) : '';
+  const nextDayJumpChipHtml = nextDayObj ? `
+    <button type="button" class="mobile-day-next-jump-chip" onclick="return compactItineraryGoToDay(event, '${escapeCompactText(leg.id)}', ${dayIdx + 1})" title="Jump to Day ${dayIdx + 2}">
+      ↓ Day ${dayIdx + 2}
+    </button>
+  ` : '';
+  const dayScrollBridgeHtml = nextDayObj ? `
+    <div class="mobile-day-scroll-bridge" data-next-day-index="${dayIdx + 1}">
+      <span class="mobile-day-scroll-bridge-line" aria-hidden="true"></span>
+      <button type="button" class="mobile-day-scroll-bridge-btn" onclick="return compactItineraryGoToDay(event, '${escapeCompactText(leg.id)}', ${dayIdx + 1})">
+        <span class="mobile-day-scroll-bridge-arrow" aria-hidden="true">↓</span>
+        <span>Continue scrolling to <strong>Day ${dayIdx + 2} of ${totalDays}</strong>${nextDayDateLabel ? ` · ${escapeCompactText(nextDayObj.day ? `${nextDayObj.day} ${nextDayDateLabel}` : nextDayDateLabel)}` : ''}</span>
+      </button>
+      <span class="mobile-day-scroll-bridge-line" aria-hidden="true"></span>
+    </div>
+  ` : '';
 
   return `
     <section class="compact-day-slide day-card ${isActive ? 'is-active open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-leg-index="${legIndex}" data-leg-id="${escapeCompactText(leg.id)}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
@@ -991,6 +1008,7 @@ function renderCompactDaySlide(opts = {}) {
         ${typeof renderDayWeatherBadgeHtml === 'function' ? renderDayWeatherBadgeHtml(day.date, toCity || fromCity || leg.label, leg) : ''}
         ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
         <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.7rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}${tripProgressSuffix}</span>
+        ${nextDayJumpChipHtml}
       </span>
     `,
     summary: `
@@ -1002,6 +1020,7 @@ function renderCompactDaySlide(opts = {}) {
     details,
     detailsOpen: true
   })}
+      ${dayScrollBridgeHtml}
     </section>
   `;
 }
@@ -1138,11 +1157,22 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
     </div>
   ` : '';
 
+  const cleanLegCityLabel = typeof cleanCityNavLabel === 'function'
+    ? cleanCityNavLabel(leg.label || 'this city')
+    : (leg.label || 'this city');
+  const verticalSignalBannerHtml = totalDays > 1 ? `
+    <div class="mobile-vertical-days-banner" role="note" aria-label="Vertical day scroll indicator">
+      <span class="mobile-vertical-days-badge">📅 ${totalDays} Days in ${escapeCompactText(cleanLegCityLabel || 'City')}</span>
+      <span class="mobile-vertical-days-cue">↕ Scroll down for each day</span>
+    </div>
+  ` : '';
+
   return `
       <div class="compact-day-pager" data-leg-id="${escapeCompactText(leg.id)}" data-total-days="${totalDays}" data-pager-key="${escapeCompactText(pagerKey)}" data-active-index="${initialIndex}">
         <div class="compact-day-rail" role="tablist" aria-label="Days for ${escapeCompactText(leg.label || 'this leg')}">
           ${chips}
         </div>
+        ${verticalSignalBannerHtml}
         <div class="compact-day-carousel mobile-city-vertical-timeline" data-leg-id="${escapeCompactText(leg.id)}">
           ${slides}
           ${nextCityCardHtml}
@@ -1636,7 +1666,39 @@ if (typeof window !== 'undefined') {
 }
 
 function setupMobileVerticalDayScrollSpy(root = document) {
-  if (typeof window === 'undefined' || !('IntersectionObserver' in window) || !root) return;
+  if (typeof window === 'undefined' || !root) return;
+  const cityPager = root.querySelector ? root.querySelector('.compact-city-swipe-pager') : null;
+  if (cityPager && !cityPager.__citySwipeGestureBound) {
+    cityPager.__citySwipeGestureBound = true;
+    let startX = 0;
+    let startY = 0;
+    let ignoreSwipe = false;
+    cityPager.addEventListener('touchstart', (e) => {
+      const t = e.touches && e.touches[0];
+      if (!t) return;
+      const target = e.target;
+      ignoreSwipe = Boolean(target && typeof target.closest === 'function' && target.closest('.compact-day-rail, .city-nav-list, input, textarea, select'));
+      startX = t.clientX;
+      startY = t.clientY;
+    }, { passive: true });
+    cityPager.addEventListener('touchend', (e) => {
+      if (ignoreSwipe) return;
+      const t = e.changedTouches && e.changedTouches[0];
+      if (!t) return;
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      if (Math.abs(dx) < 65 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
+      const slides = Array.from(cityPager.querySelectorAll('[data-role="mobile-swipe-slide"]'));
+      if (slides.length <= 1) return;
+      const currentIdx = Math.max(0, slides.findIndex(s => s.classList.contains('is-active')));
+      const nextIdx = dx < 0 ? currentIdx + 1 : currentIdx - 1;
+      if (nextIdx >= 0 && nextIdx < slides.length) {
+        compactItineraryGoToCityIndex(e, nextIdx);
+      }
+    }, { passive: true });
+  }
+
+  if (!('IntersectionObserver' in window)) return;
   const pagers = root.querySelectorAll('.compact-day-pager');
   pagers.forEach(pager => {
     const carousel = pager.querySelector('.compact-day-carousel.mobile-city-vertical-timeline');

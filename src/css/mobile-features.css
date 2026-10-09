@@ -1020,7 +1020,31 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
 /* ==========================================================================
    Mobile Flow Overhaul: Continuous Vertical Timeline per City (<= 768px)
    ========================================================================== */
+@media (min-width: 769px) {
+  .mobile-vertical-days-banner,
+  .mobile-day-next-jump-chip,
+  .mobile-day-scroll-bridge,
+  .mobile-next-city-card {
+    display: none !important;
+  }
+}
+
 @media (max-width: 768px) {
+  body.mobile-app-mode .compact-city-swipe-root,
+  body.mobile-app-mode .compact-city-swipe-pager,
+  body.mobile-app-mode #tab-itinerary .compact-leg-card,
+  body.mobile-app-mode .compact-leg-body,
+  body.mobile-app-mode .compact-day-pager,
+  body.mobile-app-mode #tab-itinerary .compact-day-surface {
+    overflow: visible !important;
+  }
+
+  body.mobile-app-mode.compact-view-mode .active-city-sticky-header {
+    position: relative !important;
+    top: auto !important;
+    z-index: 10;
+  }
+
   body.mobile-app-mode .compact-city-swipe-pager > [data-role="mobile-swipe-carousel"] {
     display: block !important;
     overflow: visible !important;
@@ -1033,6 +1057,7 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     display: none !important;
     width: 100% !important;
     max-width: 100% !important;
+    overflow: visible !important;
   }
 
   body.mobile-app-mode .compact-city-swipe-pager > [data-role="mobile-swipe-carousel"] > .compact-city-slide.is-active {
@@ -1042,7 +1067,7 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   body.mobile-app-mode .compact-day-carousel.mobile-city-vertical-timeline {
     display: flex !important;
     flex-direction: column !important;
-    gap: 0.85rem !important;
+    gap: 0.5rem !important;
     overflow: visible !important;
     height: auto !important;
     min-height: 0 !important;
@@ -1054,15 +1079,132 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     width: 100% !important;
     max-width: 100% !important;
     flex: none !important;
-    scroll-margin-top: 6.5rem;
+    overflow: visible !important;
+    scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--app-city-height, 3.1rem) + 0.35rem);
   }
 
   body.mobile-app-mode .compact-day-carousel.mobile-city-vertical-timeline .compact-day-header {
-    position: sticky;
-    top: calc(env(safe-area-inset-top, 0px) + 2.85rem);
-    z-index: 25;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    position: sticky !important;
+    top: calc(env(safe-area-inset-top, 0px) + var(--app-city-height, 3rem)) !important;
+    z-index: 95 !important;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    margin: -0.45rem -0.45rem 0.2rem -0.45rem;
+    padding: 0.5rem 0.65rem;
+    border-top-left-radius: 0.45rem;
+    border-top-right-radius: 0.45rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+    box-shadow: 0 4px 10px -2px rgba(15, 23, 42, 0.08);
+  }
+
+  [data-theme="dark"] body.mobile-app-mode .compact-day-carousel.mobile-city-vertical-timeline .compact-day-header {
+    background: rgba(15, 23, 42, 0.96);
+    border-bottom-color: rgba(71, 85, 105, 0.6);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.45);
+  }
+
+  .mobile-vertical-days-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.38rem 0.65rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.6rem;
+    background: rgba(13, 148, 136, 0.08);
+    border: 1px solid rgba(13, 148, 136, 0.22);
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #0f766e;
+  }
+
+  .mobile-vertical-days-badge {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .mobile-vertical-days-cue {
+    font-size: 0.7rem;
+    opacity: 0.9;
+    white-space: nowrap;
+  }
+
+  [data-theme="dark"] .mobile-vertical-days-banner {
+    background: rgba(20, 184, 166, 0.12);
+    border-color: rgba(45, 212, 191, 0.28);
+    color: #5eead4;
+  }
+
+  .mobile-day-next-jump-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.14rem 0.48rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(13, 148, 136, 0.35);
+    background: rgba(240, 253, 250, 0.95);
+    color: #0f766e;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  [data-theme="dark"] .mobile-day-next-jump-chip {
+    background: rgba(19, 78, 74, 0.65);
+    border-color: rgba(45, 212, 191, 0.4);
+    color: #5eead4;
+  }
+
+  .mobile-day-scroll-bridge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.25rem;
+    margin-top: 0.35rem;
+  }
+
+  .mobile-day-scroll-bridge-line {
+    flex: 1;
+    height: 1px;
+    border-top: 1px dashed rgba(148, 163, 184, 0.5);
+  }
+
+  .mobile-day-scroll-bridge-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.32rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(248, 250, 252, 0.95);
+    color: #334155;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  }
+
+  .mobile-day-scroll-bridge-arrow {
+    color: #0d9488;
+    font-weight: 800;
+  }
+
+  [data-theme="dark"] .mobile-day-scroll-bridge-line {
+    border-top-color: rgba(71, 85, 105, 0.6);
+  }
+
+  [data-theme="dark"] .mobile-day-scroll-bridge-btn {
+    background: rgba(30, 41, 59, 0.92);
+    border-color: rgba(71, 85, 105, 0.65);
+    color: #cbd5e1;
+  }
+
+  [data-theme="dark"] .mobile-day-scroll-bridge-arrow {
+    color: #2dd4bf;
   }
 
   .mobile-next-city-card {

@@ -978,12 +978,17 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
       const activeDay = tokyoSlide.querySelector('.compact-day-slide.is-active');
       const dayCarousel = tokyoSlide.querySelector('.compact-day-carousel');
       const cityCarousel = document.querySelector('.compact-city-swipe-pager [data-role="mobile-swipe-carousel"]');
-      if (!activeDay || !dayCarousel || !cityCarousel) return false;
-      return dayCarousel.classList.contains('mobile-city-vertical-timeline') &&
+      const dayHeader = activeDay ? activeDay.querySelector('.compact-day-header') : null;
+      const verticalBanner = tokyoSlide.querySelector('.mobile-vertical-days-banner');
+      const scrollBridge = tokyoSlide.querySelector('.mobile-day-scroll-bridge');
+      if (!activeDay || !dayCarousel || !cityCarousel || !dayHeader || !verticalBanner || !scrollBridge) return false;
+      const headerSticky = window.getComputedStyle(dayHeader).position === 'sticky';
+      return headerSticky &&
+        dayCarousel.classList.contains('mobile-city-vertical-timeline') &&
         dayCarousel.offsetHeight >= activeDay.offsetHeight;
     });
-    assert(scrollBoundsPassed === true, 'Mobile: itinerary should render continuous vertical timeline per city');
-    reporter.add('mobile', 'itinerary vertical scroll bounds', 'mobile itinerary renders continuous vertical timeline per city');
+    assert(scrollBoundsPassed === true, 'Mobile: itinerary should render continuous vertical timeline per city with sticky day headers and scroll signals');
+    reporter.add('mobile', 'itinerary vertical scroll bounds', 'mobile itinerary renders continuous vertical timeline per city with sticky day headers and scroll signals');
 
     // Verify Mobile Day Header Chips do not overlap Stay pill (#497)
     const dayHeaderNoOverlap = await page.evaluate(() => {
