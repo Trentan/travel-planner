@@ -53,14 +53,34 @@ function runTask2VerticalTimelineTests() {
   );
 }
 
+function runTask3BottomSheetAndDragTests() {
+  const uiJs = loadSource(path.join('js', 'ui.js'));
+  const dragdropJs = loadSource(path.join('js', 'dragdrop.js'));
+  const mobileFeaturesCss = loadSource(path.join('src', 'css', 'mobile-features.css'));
+
+  assert(
+    uiJs.includes('setupMobileBottomSheetGestures') && uiJs.includes('setupMobileKeyboardFocusScroll'),
+    'Task 3: js/ui.js should implement setupMobileBottomSheetGestures and setupMobileKeyboardFocusScroll'
+  );
+  assert(
+    dragdropJs.includes('passive: false') && dragdropJs.includes('e.preventDefault()'),
+    'Task 3: js/dragdrop.js should use { passive: false } and call e.preventDefault() during active touch leg reordering'
+  );
+  assert(
+    mobileFeaturesCss.includes('border-radius: 1.25rem 1.25rem 0 0'),
+    'Task 3: mobile-features.css should style mobile dialogs as bottom-anchored sheets'
+  );
+}
+
 function runAll() {
   runTask1ShellTests();
   runTask2VerticalTimelineTests();
+  runTask3BottomSheetAndDragTests();
 }
 
 if (require.main === module) {
   runAll();
-  console.log('Task 1-2 mobile flow overhaul tests passed');
+  console.log('Task 1-3 mobile flow overhaul tests passed');
 }
 
 module.exports = { runMobileFlowOverhaulTests: runAll };

@@ -109,6 +109,9 @@ function setupMobileTouchLegReordering(container) {
 
     item.addEventListener('touchmove', (e) => {
       if (touchDragLegIdx === null) return;
+      if (e && typeof e.preventDefault === 'function' && e.cancelable !== false) {
+        e.preventDefault();
+      }
       const touch = e.touches[0];
       const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
       const targetItem = targetElement ? targetElement.closest('.leg-reorder-item') : null;
@@ -117,7 +120,7 @@ function setupMobileTouchLegReordering(container) {
       if (targetItem) {
         targetItem.classList.add('drag-over');
       }
-    }, { passive: true });
+    }, { passive: false });
 
     item.addEventListener('touchend', (e) => {
       if (touchDragLegIdx === null) return;

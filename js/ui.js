@@ -610,6 +610,85 @@ if (typeof window !== 'undefined') {
   setupMobileHeaderScrollCollapse();
 }
 
+function setupMobileBottomSheetGestures() {
+  if (typeof document === 'undefined' || typeof window === 'undefined' || window.__mobileBottomSheetGesturesBound) return;
+  window.__mobileBottomSheetGesturesBound = true;
+
+  let activeSheetPanel = null;
+  let startY = 0;
+  let currentDeltaY = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    if (!isMobileViewport()) return;
+    const target = e.target;
+    if (!target || typeof target.closest !== 'function') return;
+    const header = target.closest('.modal-header, .mobile-menu-sheet-header');
+    if (!header) return;
+    const panel = header.closest('.modal-content, .modal-card, .modal-panel, .mobile-menu-sheet-panel');
+    if (!panel) return;
+    activeSheetPanel = panel;
+    startY = e.touches && e.touches[0] ? e.touches[0].clientY : 0;
+    currentDeltaY = 0;
+    activeSheetPanel.style.transition = 'none';
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!activeSheetPanel) return;
+    const touchY = e.touches && e.touches[0] ? e.touches[0].clientY : startY;
+    const deltaY = Math.max(0, touchY - startY);
+    currentDeltaY = deltaY;
+    if (deltaY > 0) {
+      activeSheetPanel.style.transform = `translateY(${Math.min(deltaY, 260)}px)`;
+    }
+  }, { passive: true });
+
+  const finishSheetGesture = () => {
+    if (!activeSheetPanel) return;
+    const panel = activeSheetPanel;
+    const deltaY = currentDeltaY;
+    activeSheetPanel = null;
+    currentDeltaY = 0;
+    panel.style.transition = 'transform 0.22s cubic-bezier(0.22, 1, 0.36, 1)';
+    panel.style.transform = '';
+    if (deltaY > 80) {
+      const closeBtn = panel.querySelector('.modal-close, [aria-label="Close dialog"]');
+      if (closeBtn && typeof closeBtn.click === 'function') {
+        closeBtn.click();
+      }
+    }
+  };
+
+  document.addEventListener('touchend', finishSheetGesture, { passive: true });
+  document.addEventListener('touchcancel', finishSheetGesture, { passive: true });
+}
+
+function setupMobileKeyboardFocusScroll() {
+  if (typeof document === 'undefined' || typeof window === 'undefined' || window.__mobileKeyboardFocusBound) return;
+  window.__mobileKeyboardFocusBound = true;
+
+  document.addEventListener('focusin', (e) => {
+    if (!isMobileViewport()) return;
+    const target = e.target;
+    if (!target || typeof target.closest !== 'function') return;
+    const tag = String(target.tagName || '').toLowerCase();
+    if (tag !== 'input' && tag !== 'textarea' && tag !== 'select') return;
+    const inModal = target.closest('.modal-overlay, .modal-backdrop, [role="dialog"]');
+    if (!inModal) return;
+    setTimeout(() => {
+      if (typeof target.scrollIntoView === 'function') {
+        target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    }, 150);
+  });
+}
+
+if (typeof window !== 'undefined') {
+  window.setupMobileBottomSheetGestures = setupMobileBottomSheetGestures;
+  window.setupMobileKeyboardFocusScroll = setupMobileKeyboardFocusScroll;
+  setupMobileBottomSheetGestures();
+  setupMobileKeyboardFocusScroll();
+}
+
 function switchTab(tabId, btnElement) {
   const prevTab = document.body?.getAttribute?.('data-active-tab') || 'itinerary';
   if (typeof window !== 'undefined' && window.innerWidth <= 768 && prevTab) {
