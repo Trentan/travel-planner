@@ -149,7 +149,7 @@ async function runIssues500To506Tests() {
       assert(val >= 12, `Issue #504: Expected ${key} font-size >= 12px (0.75rem) on mobile, got ${val}px`);
     }
 
-    // Issue #503: All 7 bottom nav tabs (including Map & Menu) visible at once on 390px with zero label truncation
+    // Mobile Flow Overhaul (#503 evolution): 5 primary bottom nav tabs visible at once on 390px with zero label truncation + 2 quick-switch tabs in More menu
     const navMetrics = await page.evaluate(() => {
       const tabs = Array.from(document.querySelectorAll('.app-tabs-list > *'));
       const fullyVisibleInViewport = tabs.filter(btn => {
@@ -160,15 +160,17 @@ async function runIssues500To506Tests() {
         const lbl = btn.querySelector('.tab-label');
         return lbl && lbl.scrollWidth > lbl.clientWidth + 1;
       });
+      const quickTabsCount = document.querySelectorAll('#mobileMenuSheet .mobile-quick-tab-btn').length;
       return {
         visibleCount: fullyVisibleInViewport.length,
-        truncatedCount: truncatedLabels.length
+        truncatedCount: truncatedLabels.length,
+        quickTabsCount
       };
     });
 
     assert(
-      navMetrics.visibleCount === 7,
-      `Issue #503: Expected all 7 tab items (including Map and Menu) visible at once on 390px viewport, got ${navMetrics.visibleCount}`
+      navMetrics.visibleCount === 5 && navMetrics.quickTabsCount === 2,
+      `Mobile bottom bar: Expected 5 primary tab items visible at once on 390px viewport and 2 quick-switch tabs in More sheet, got ${navMetrics.visibleCount} and ${navMetrics.quickTabsCount}`
     );
     assert(
       navMetrics.truncatedCount === 0,

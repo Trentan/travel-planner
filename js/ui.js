@@ -1002,55 +1002,14 @@ window.closeRenameTripDialog = closeRenameTripDialog;
 window.saveRenameTripDialog = saveRenameTripDialog;
 window.syncReadOnlyBanner = syncReadOnlyBanner;
 window.dismissReadOnlyBanner = dismissReadOnlyBanner;
-let lastScrollY = window.scrollY || 0;
-let cityNavEl = null;
-
 function initMobileScrollNav() {
-  window.addEventListener('scroll', () => {
-    if (!document.body.classList.contains('mobile-app-mode')) return;
-    
-    if (!cityNavEl) {
-      cityNavEl = document.getElementById('cityNav');
-      if (!cityNavEl) return;
-    }
-    
-    const currentScrollY = window.scrollY;
-    
-    // Only apply hide on scroll if we are scrolled past the initial top threshold
-    if (currentScrollY > 60) {
-      if (currentScrollY > lastScrollY + 5) {
-        // Scrolling down (with threshold)
-        cityNavEl.classList.add('city-nav-hidden');
-      } else if (currentScrollY < lastScrollY - 5) {
-        // Scrolling up
-        cityNavEl.classList.remove('city-nav-hidden');
-      }
-    } else {
-      cityNavEl.classList.remove('city-nav-hidden');
-    }
-    
-    cityNavLastScrollY = currentScrollY;
-  }, { passive: true });
+  const cityNav = document.getElementById('cityNav');
+  if (cityNav) {
+    cityNav.classList.remove('city-nav-hidden', '-translate-y-full');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initMobileScrollNav);
-
-
-// -- City Nav Scroll Behavior --
-let cityNavLastScrollY = window.scrollY;
-window.addEventListener('scroll', () => {
-  if (!isMobileViewport()) return;
-  const cityNav = document.getElementById('cityNav');
-  if (!cityNav) return;
-  const currentScrollY = window.scrollY;
-  // If scrolled down past 60px, hide the nav by translating it up
-  if (currentScrollY > cityNavLastScrollY && currentScrollY > 60) {
-    cityNav.classList.add('-translate-y-full');
-  } else {
-    cityNav.classList.remove('-translate-y-full');
-  }
-  cityNavLastScrollY = currentScrollY;
-}, { passive: true });
 
 // Close Actions menu on click away
 document.addEventListener('click', event => {
