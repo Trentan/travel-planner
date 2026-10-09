@@ -574,30 +574,93 @@ function toggleEditMode() {
   if (activeTabId === 'packing') buildPackingTab();
 }
 
+const mobileTabScrollPositions = {
+  itinerary: 0,
+  transport: 0,
+  accom: 0,
+  budget: 0,
+  packing: 0,
+  map: 0
+};
+if (typeof window !== 'undefined') {
+  window.mobileTabScrollPositions = mobileTabScrollPositions;
+}
+
+function setupMobileHeaderScrollCollapse() {
+  if (typeof window === 'undefined' || window.__mobileHeaderScrollBound) return;
+  window.__mobileHeaderScrollBound = true;
+  let lastScrollY = window.scrollY || 0;
+  window.addEventListener('scroll', () => {
+    if (!isMobileViewport()) {
+      document.body?.classList?.remove('mobile-header-condensed');
+      return;
+    }
+    const currentY = Math.max(0, window.scrollY || 0);
+    const deltaY = currentY - lastScrollY;
+    if (currentY <= 80 || deltaY < -8) {
+      document.body?.classList?.remove('mobile-header-condensed');
+    } else if (deltaY > 12 && currentY > 80) {
+      document.body?.classList?.add('mobile-header-condensed');
+    }
+    lastScrollY = currentY;
+  }, { passive: true });
+}
+if (typeof window !== 'undefined') {
+  window.setupMobileHeaderScrollCollapse = setupMobileHeaderScrollCollapse;
+  setupMobileHeaderScrollCollapse();
+}
+
 function switchTab(tabId, btnElement) {
-  if (document.body && typeof document.body.setAttribute === 'function') {
-    document.body.setAttribute('data-active-tab', tabId);
-  }
-  const cityNav = document.getElementById ? document.getElementById('cityNav') : null;
-  if (cityNav) {
-    if (typeof cityNav.setAttribute === 'function') {
-      cityNav.setAttribute('data-active-tab', tabId);
-    }
-    if (cityNav.classList && typeof cityNav.classList.toggle === 'function') {
-      cityNav.classList.toggle('tab-hidden', tabId !== 'itinerary');
-    }
+  const prevTab = document.body?.getAttribute?.('data-active-tab') || 'itinerary';
+  if (typeof window !== 'undefined' && window.innerWidth <= 768 && prevTab) {
+    mobileTabScrollPositions[prevTab] = Math.max(0, window.scrollY || 0);
   }
 
-  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.app-tab-btn').forEach(el => el.classList.remove('active'));
-  const pane = document.getElementById('tab-' + tabId);
-  if (pane) pane.classList.add('active');
+  const applySwitchState = () => {
+    if (document.body && typeof document.body.setAttribute === 'function') {
+      document.body.setAttribute('data-active-tab', tabId);
+      document.body.classList?.remove('mobile-header-condensed');
+    }
+    const cityNav = document.getElementById ? document.getElementById('cityNav') : null;
+    if (cityNav) {
+      if (typeof cityNav.setAttribute === 'function') {
+        cityNav.setAttribute('data-active-tab', tabId);
+      }
+      if (cityNav.classList && typeof cityNav.classList.toggle === 'function') {
+        cityNav.classList.toggle('tab-hidden', tabId !== 'itinerary');
+      }
+    }
 
-  const btn = btnElement || document.querySelector(`.app-tab-btn[data-tab="${tabId}"]`);
-  if (btn) btn.classList.add('active');
-  closeMobileMenu();
+    document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.app-tab-btn').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.mobile-quick-tab-btn').forEach(el => {
+      el.classList.toggle('active', el.getAttribute('data-mobile-quick-tab') === tabId);
+    });
+    const pane = document.getElementById('tab-' + tabId);
+    if (pane) pane.classList.add('active');
+
+    const btn = btnElement || document.querySelector(`.app-tab-btn[data-tab="${tabId}"]`);
+    if (btn) btn.classList.add('active');
+    if (tabId === 'budget' || tabId === 'packing') {
+      const moreBtn = document.querySelector('.mobile-tabs-menu-btn');
+      if (moreBtn) moreBtn.classList.add('active');
+    }
+    closeMobileMenu();
+  };
+
+  applySwitchState();
+  if (
+    typeof document !== 'undefined' &&
+    typeof document.startViewTransition === 'function' &&
+    !(typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches)
+  ) {
+    try {
+      document.startViewTransition(() => {});
+    } catch (_) {}
+  }
 
   // Scroll selected tab into view on mobile
+  const btn = btnElement || document.querySelector(`.app-tab-btn[data-tab="${tabId}"]`);
   if (window.innerWidth <= 768 && btn) {
     const tabsList = btn.closest('.app-tabs-list');
     if (tabsList) {
@@ -629,7 +692,8 @@ function switchTab(tabId, btnElement) {
   updateStickyOffsets();
 
   if (window.innerWidth <= 768) {
-    requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
+    const restoredY = Number.isFinite(mobileTabScrollPositions[tabId]) ? mobileTabScrollPositions[tabId] : 0;
+    requestAnimationFrame(() => window.scrollTo({ top: restoredY, left: 0, behavior: 'auto' }));
   }
 }
 
