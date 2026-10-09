@@ -2704,10 +2704,17 @@ function createCityDatalists() {
   citiesList.id = 'cities-datalist';
 
   const combinedCities = [...ALL_CITIES, ...userCities];
-  // Remove duplicates by name
-  const uniqueCities = combinedCities.filter((c, i, arr) =>
-    arr.findIndex(t => t.name.toLowerCase() === c.name.toLowerCase()) === i
-  );
+  // Remove duplicates by name in O(N) time using a Set
+  const seenCityNames = new Set();
+  const uniqueCities = combinedCities.filter(c => {
+    if (!c || !c.name) return false;
+    const lowerName = c.name.toLowerCase();
+    if (seenCityNames.has(lowerName)) {
+      return false;
+    }
+    seenCityNames.add(lowerName);
+    return true;
+  });
 
   uniqueCities
     .sort((a, b) => a.name.localeCompare(b.name))
