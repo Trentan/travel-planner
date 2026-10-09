@@ -1988,21 +1988,27 @@ function populatePrintTripHeader() {
       tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #6b7280; padding: 8px;">No accommodations listed in this trip.</td></tr>`;
     } else {
       const cityList = (typeof window !== 'undefined' && Array.isArray(window.citiesData)) ? window.citiesData : [];
+      const safeEscape = (str) => typeof escapeHtmlText === 'function'
+        ? escapeHtmlText(str)
+        : String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
       tableBody.innerHTML = staysList.map(s => {
         const cityObj = cityList.find(c => c.id === s.cityId);
         const cityName = cityObj ? cityObj.name : (s.city || '—');
+        const stayName = s.name || s.propertyName || 'Accommodation';
         const checkIn = s.checkIn ? (typeof formatDateShort === 'function' ? formatDateShort(s.checkIn) : s.checkIn) : '—';
         const checkOut = s.checkOut ? (typeof formatDateShort === 'function' ? formatDateShort(s.checkOut) : s.checkOut) : '—';
-        const locInfo = [s.location, s.notes].filter(Boolean).join(' · ');
+        const bookingRef = s.bookingRef || '—';
+        const locInfo = [s.location, s.notes].filter(Boolean).join(' · ') || '—';
 
         return `
           <tr>
-            <td><strong>${typeof escapeHtmlText === 'function' ? escapeHtmlText(cityName) : cityName}</strong></td>
-            <td>${typeof escapeHtmlText === 'function' ? escapeHtmlText(s.name || s.propertyName || 'Accommodation') : (s.name || 'Accommodation')}</td>
-            <td>${typeof escapeHtmlText === 'function' ? escapeHtmlText(checkIn) : checkIn}</td>
-            <td>${typeof escapeHtmlText === 'function' ? escapeHtmlText(checkOut) : checkOut}</td>
-            <td><code>${typeof escapeHtmlText === 'function' ? escapeHtmlText(s.bookingRef || '—') : (s.bookingRef || '—')}</code></td>
-            <td>${typeof escapeHtmlText === 'function' ? escapeHtmlText(locInfo || '—') : (locInfo || '—')}</td>
+            <td><strong>${safeEscape(cityName)}</strong></td>
+            <td>${safeEscape(stayName)}</td>
+            <td>${safeEscape(checkIn)}</td>
+            <td>${safeEscape(checkOut)}</td>
+            <td><code>${safeEscape(bookingRef)}</code></td>
+            <td>${safeEscape(locInfo)}</td>
           </tr>
         `;
       }).join('');

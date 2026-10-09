@@ -109,6 +109,7 @@ function escapeHtmlText(text) {
 function isSafeUrl(url) {
   if (!url || typeof url !== 'string') return false;
   const trimmed = url.trim();
+  if (!trimmed) return false;
   try {
     const base = (typeof window !== 'undefined' && window.location && typeof window.location.href === 'string')
       ? window.location.href
