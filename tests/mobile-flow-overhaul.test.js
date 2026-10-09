@@ -30,9 +30,37 @@ function runTask1ShellTests() {
   );
 }
 
-if (require.main === module) {
-  runTask1ShellTests();
-  console.log('Task 1 mobile shell tests passed');
+function runTask2VerticalTimelineTests() {
+  const itineraryJs = loadSource(path.join('js', 'itinerary.js'));
+  const mobileFeaturesCss = loadSource(path.join('src', 'css', 'mobile-features.css'));
+
+  assert(
+    itineraryJs.includes('mobile-city-vertical-timeline'),
+    'Task 2: js/itinerary.js should render .mobile-city-vertical-timeline for continuous vertical day flow'
+  );
+  assert(
+    itineraryJs.includes('mobile-next-city-card') && itineraryJs.includes('compactItineraryGoToCityIndex'),
+    'Task 2: js/itinerary.js should render a Next City footer card at the end of a city timeline'
+  );
+  assert(
+    itineraryJs.includes('setupMobileVerticalDayScrollSpy'),
+    'Task 2: js/itinerary.js should wire an IntersectionObserver scroll-spy for day chips'
+  );
+  assert(
+    mobileFeaturesCss.includes('.mobile-city-vertical-timeline') &&
+      mobileFeaturesCss.includes('flex-direction: column'),
+    'Task 2: mobile-features.css should stack days vertically inside .mobile-city-vertical-timeline'
+  );
 }
 
-module.exports = { runMobileFlowOverhaulTests: runTask1ShellTests };
+function runAll() {
+  runTask1ShellTests();
+  runTask2VerticalTimelineTests();
+}
+
+if (require.main === module) {
+  runAll();
+  console.log('Task 1-2 mobile flow overhaul tests passed');
+}
+
+module.exports = { runMobileFlowOverhaulTests: runAll };

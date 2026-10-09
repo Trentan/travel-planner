@@ -1016,3 +1016,101 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   color: #f8fafc;
   background: rgba(30, 41, 59, 0.8);
 }
+
+/* ==========================================================================
+   Mobile Flow Overhaul: Continuous Vertical Timeline per City (<= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  body.mobile-app-mode .compact-city-swipe-pager > [data-role="mobile-swipe-carousel"] {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    scroll-snap-type: none !important;
+  }
+
+  body.mobile-app-mode .compact-city-swipe-pager > [data-role="mobile-swipe-carousel"] > .compact-city-slide {
+    display: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  body.mobile-app-mode .compact-city-swipe-pager > [data-role="mobile-swipe-carousel"] > .compact-city-slide.is-active {
+    display: block !important;
+  }
+
+  body.mobile-app-mode .compact-day-carousel.mobile-city-vertical-timeline {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.85rem !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    scroll-snap-type: none !important;
+  }
+
+  body.mobile-app-mode .compact-day-carousel.mobile-city-vertical-timeline > .compact-day-slide {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    scroll-margin-top: 6.5rem;
+  }
+
+  body.mobile-app-mode .compact-day-carousel.mobile-city-vertical-timeline .compact-day-header {
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + 2.85rem);
+    z-index: 25;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .mobile-next-city-card {
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+    padding: 0 0.25rem;
+  }
+
+  .mobile-next-city-btn {
+    width: 100%;
+    min-height: 3.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.85rem;
+    border: 1px solid rgba(20, 184, 166, 0.35);
+    background: linear-gradient(135deg, rgba(240, 253, 250, 0.95), rgba(204, 251, 241, 0.65));
+    color: #0f766e;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+  }
+
+  .mobile-next-city-btn:active {
+    transform: scale(0.985);
+  }
+
+  .mobile-next-city-kicker {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.8;
+  }
+
+  .mobile-next-city-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  [data-theme="dark"] .mobile-next-city-btn {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+    border-color: rgba(45, 212, 191, 0.35);
+    color: #2dd4bf;
+  }
+}
+

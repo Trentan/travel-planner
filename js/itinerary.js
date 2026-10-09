@@ -1127,13 +1127,25 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
     journeysByJourneyIdMap: journeysByJourneyId
   })).join('');
 
+  const nextLeg = (typeof appData !== 'undefined' && Array.isArray(appData)) ? appData[legIndex + 1] : null;
+  const nextLegLabel = nextLeg ? (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(nextLeg.label || 'Next City') : (nextLeg.label || 'Next City')) : '';
+  const nextCityCardHtml = nextLeg ? `
+    <div class="mobile-next-city-card" data-next-leg-index="${legIndex + 1}">
+      <button type="button" class="mobile-next-city-btn" onclick="return compactItineraryGoToCityIndex(event, ${legIndex + 1})">
+        <span class="mobile-next-city-kicker">End of ${escapeCompactText(leg.label || 'this leg')}</span>
+        <span class="mobile-next-city-label">Next City: ${escapeCompactText(nextLegLabel)} →</span>
+      </button>
+    </div>
+  ` : '';
+
   return `
       <div class="compact-day-pager" data-leg-id="${escapeCompactText(leg.id)}" data-total-days="${totalDays}" data-pager-key="${escapeCompactText(pagerKey)}" data-active-index="${initialIndex}">
         <div class="compact-day-rail" role="tablist" aria-label="Days for ${escapeCompactText(leg.label || 'this leg')}">
           ${chips}
         </div>
-        <div class="compact-day-carousel" data-leg-id="${escapeCompactText(leg.id)}">
+        <div class="compact-day-carousel mobile-city-vertical-timeline" data-leg-id="${escapeCompactText(leg.id)}">
           ${slides}
+          ${nextCityCardHtml}
         </div>
       </div>
   `;
@@ -1151,11 +1163,16 @@ function syncItineraryMobileHeightContainment(root = document) {
     return;
   }
 
-  // 1. Constrain each compact day carousel to its active slide's height
+  // 1. Clear inline height on vertical city timelines; only constrain legacy non-vertical day carousels
   const dayPagers = root.querySelectorAll('.compact-day-pager');
   dayPagers.forEach(pager => {
     const carousel = pager.querySelector('.compact-day-carousel');
     if (!carousel) return;
+    if (carousel.classList.contains('mobile-city-vertical-timeline')) {
+      carousel.style.height = '';
+      carousel.style.minHeight = '';
+      return;
+    }
     const activeSlide = pager.querySelector('.compact-day-slide.is-active') || pager.querySelector('.compact-day-slide');
     if (activeSlide) {
       const surface = activeSlide.querySelector('.compact-day-surface');
@@ -1168,7 +1185,7 @@ function syncItineraryMobileHeightContainment(root = document) {
     }
   });
 
-  // 2. Constrain outer mobile swipe carousels (itinerary city, transport, stays) to their active slide's height
+  // 2. Constrain outer mobile swipe carousels (transport, stays) to their active slide's height
   const syncOuter = () => {
     const pagersSet = new Set();
     if (root && typeof root.querySelectorAll === 'function') {
@@ -1181,6 +1198,11 @@ function syncItineraryMobileHeightContainment(root = document) {
     pagersSet.forEach(swipePager => {
       const swipeCarousel = swipePager.querySelector('[data-role="mobile-swipe-carousel"]');
       if (!swipeCarousel) return;
+      if (swipePager.classList.contains('compact-city-swipe-pager') && swipePager.querySelector('.mobile-city-vertical-timeline')) {
+        swipeCarousel.style.height = '';
+        swipeCarousel.style.minHeight = '';
+        return;
+      }
 
       const activeIndex = Math.max(0, Number(swipePager.dataset.activeIndex || 0));
       const slides = Array.from(swipePager.querySelectorAll('[data-role="mobile-swipe-slide"]'));
@@ -1554,12 +1576,17 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
 
   const pager = Array.from(document.querySelectorAll('.compact-day-pager')).find(el => el.dataset.legId === String(legId));
   if (pager) {
-    if (typeof pager.__compactScrollToIndex === 'function') {
+    const carousel = pager.querySelector('.compact-day-carousel');
+    const slide = pager.querySelector(`.compact-day-slide[data-day-index="${nextIndex}"]`);
+    if (carousel && carousel.classList.contains('mobile-city-vertical-timeline')) {
+      syncCompactDayPagerState(pager, nextIndex);
+      if (slide && typeof slide.scrollIntoView === 'function') {
+        slide.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else if (typeof pager.__compactScrollToIndex === 'function') {
       pager.__compactScrollToIndex(nextIndex);
     } else {
       syncCompactDayPagerState(pager, nextIndex);
-      const carousel = pager.querySelector('.compact-day-carousel');
-      const slide = pager.querySelector(`.compact-day-slide[data-day-index="${nextIndex}"]`);
       if (carousel && slide) {
         carousel.scrollTo({
           left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
@@ -1568,7 +1595,7 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
       }
     }
 
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !(carousel && carousel.classList.contains('mobile-city-vertical-timeline'))) {
       const pagerRect = pager.getBoundingClientRect();
       if (pagerRect.top < 60) {
         const targetTop = window.scrollY + pagerRect.top - 60;
@@ -1581,6 +1608,66 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
     syncDesktopSplitToDayInView(true, window.__selectedDayContext);
   }
   return false;
+}
+
+function compactItineraryGoToCityIndex(event, targetLegIndex) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  const idx = Math.max(0, Number(targetLegIndex) || 0);
+  if (typeof setMobilePagerActiveIndex === 'function') {
+    setMobilePagerActiveIndex('compact-city-swipe', idx);
+  }
+  const cityChip = document.querySelector(`.compact-city-chip[data-slide-index="${idx}"]`);
+  if (cityChip && typeof cityChip.click === 'function') {
+    cityChip.click();
+  } else {
+    const slides = Array.from(document.querySelectorAll('.compact-city-swipe-pager [data-role="mobile-swipe-slide"]'));
+    slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+  }
+  if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  return false;
+}
+if (typeof window !== 'undefined') {
+  window.compactItineraryGoToCityIndex = compactItineraryGoToCityIndex;
+}
+
+function setupMobileVerticalDayScrollSpy(root = document) {
+  if (typeof window === 'undefined' || !('IntersectionObserver' in window) || !root) return;
+  const pagers = root.querySelectorAll('.compact-day-pager');
+  pagers.forEach(pager => {
+    const carousel = pager.querySelector('.compact-day-carousel.mobile-city-vertical-timeline');
+    if (!carousel) return;
+    const slides = Array.from(carousel.querySelectorAll('.compact-day-slide'));
+    if (slides.length <= 1) return;
+    if (pager.__verticalScrollSpyObserver && typeof pager.__verticalScrollSpyObserver.disconnect === 'function') {
+      pager.__verticalScrollSpyObserver.disconnect();
+    }
+    const observer = new IntersectionObserver(entries => {
+      const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : window.innerWidth <= 768;
+      if (!isMobile) return;
+      const visible = entries
+        .filter(e => e.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      const dayIdx = Number(visible.target.dataset.dayIndex || 0);
+      if (Number.isFinite(dayIdx) && Number(pager.dataset.activeIndex || 0) !== dayIdx) {
+        syncCompactDayPagerState(pager, dayIdx);
+      }
+    }, {
+      root: null,
+      rootMargin: '-20% 0px -60% 0px',
+      threshold: [0.15, 0.4]
+    });
+    slides.forEach(slide => observer.observe(slide));
+    pager.__verticalScrollSpyObserver = observer;
+  });
+}
+if (typeof window !== 'undefined') {
+  window.setupMobileVerticalDayScrollSpy = setupMobileVerticalDayScrollSpy;
 }
 
 function renderCompactLegCard(leg, legIndex, journeysByJourneyIdMap) {
@@ -1770,6 +1857,7 @@ function buildCompactItinerary() {
   setupMobileSwipePagers(container);
   setupCompactItineraryPagers(container);
   setupCompactCityNavSync(container);
+  setupMobileVerticalDayScrollSpy(container);
   if (typeof syncItineraryMobileHeightContainment === 'function') {
     syncItineraryMobileHeightContainment(container);
   }
