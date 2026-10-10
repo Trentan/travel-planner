@@ -1069,15 +1069,15 @@ return `
       ${renderTransportMobileFact('Depart', firstDep)}
       ${renderTransportMobileFact('Arrive', arrive)}
       ${tzBadge ? renderTransportMobileFact('Timezone Shift', tzBadge) : ''}
-      ${renderTransportMobileLinkedFact('From Details', fromDetail, getMapSearchUrl(getJourneyMapSearchQuery(fromDetail, fromLocation, firstSeg.transportType)), '', '', 'transport-mobile-fact--detail')}
-      ${renderTransportMobileLinkedFact('To Details', toDetail, getMapSearchUrl(getJourneyMapSearchQuery(toDetail, toLocation, lastSeg.transportType)), '', '', 'transport-mobile-fact--detail')}
+      ${fromDetail ? renderTransportMobileLinkedFact('From Details', fromDetail, getMapSearchUrl(getJourneyMapSearchQuery(fromDetail, fromLocation, firstSeg.transportType)), '', '', 'transport-mobile-fact--detail') : ''}
+      ${toDetail ? renderTransportMobileLinkedFact('To Details', toDetail, getMapSearchUrl(getJourneyMapSearchQuery(toDetail, toLocation, lastSeg.transportType)), '', '', 'transport-mobile-fact--detail') : ''}
       ${renderTransportMobileFact('Carrier', providerLabel)}
       ${routeCodeDisplay ? `<div class="transport-mobile-fact">
       <span class="transport-mobile-fact-label">Code</span>
       <span class="transport-mobile-fact-value">${routeCodeDisplay}</span>
     </div>` : ''}
       ${renderTransportMobileFact('Cost', formatCurrency(totalCost))}
-      ${renderTransportMobileFact('Booking #', bookingLabel)}
+      ${bookingLabel ? renderTransportMobileFact('Booking #', bookingLabel) : ''}
       ${(() => {
         const allAlerts = (segs || []).flatMap(s => s.alerts || []);
         const badges = typeof renderJourneyAlertBadgesHtml === 'function' ? renderJourneyAlertBadgesHtml(allAlerts) : '';
@@ -1232,8 +1232,9 @@ function renderTransportSegmentsDetailContent(segs) {
     const segRoute = `${getLocationCodeDisplay(seg.fromLocation)} → ${getLocationCodeDisplay(seg.toLocation)}`;
 
     if (useCompactSegments) {
+      const segParity = i % 2 === 0 ? 'even' : 'odd';
       items.push(`
-        <div class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-700/50 rounded-lg p-3 shadow-sm text-sm">
+        <div class="transport-segment-card transport-segment-card--${segParity} bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-700/50 rounded-lg p-3 shadow-sm text-sm">
           <div class="flex items-center justify-between mb-2">
             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Leg ${i + 1}</span>
             <span class="font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(seg.fromLocation || '—')} → ${escapeHtmlText(seg.toLocation || '—')}</span>

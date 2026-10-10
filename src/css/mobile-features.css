@@ -1550,13 +1550,20 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     font-weight: 700 !important;
   }
 
-  /* Full-width mobile layout - eliminate side gutters on itinerary & map tabs */
+  /* Full-width mobile layout - eliminate side gutters across all tabs */
   body.mobile-app-mode .app-tabs-content {
     margin-top: 0.35rem !important;
     padding-inline: 0.35rem !important;
   }
 
-  body.mobile-app-mode :is(#tab-itinerary, #tab-map) {
+  body.mobile-app-mode :is(
+    #tab-itinerary,
+    #tab-transport,
+    #tab-accom,
+    #tab-budget,
+    #tab-packing,
+    #tab-map
+  ) {
     margin-left: calc(-0.5rem - 0.35rem) !important;
     margin-right: calc(-0.5rem - 0.35rem) !important;
     width: calc(100% + 1rem + 0.7rem) !important;
@@ -1566,22 +1573,203 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   body.mobile-app-mode :is(
+    #tab-itinerary,
     #tab-transport,
     #tab-accom,
     #tab-budget,
     #tab-packing
-  ) {
-    padding-inline: 0 !important;
-    margin-inline: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  body.mobile-app-mode #tab-itinerary .section-header {
+  ) .section-header {
     padding-inline: 0.5rem !important;
     margin-inline: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
+  }
+
+  /* Map tab: hide redundant top title header & go full-bleed edge-to-edge */
+  body.mobile-app-mode #tab-map > .section-header {
+    display: none !important;
+  }
+
+  body.mobile-app-mode #tab-map .map-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  body.mobile-app-mode #tab-map #journey-map-view {
+    height: calc(100dvh - 8.5rem - env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 460px !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  body.mobile-app-mode #tab-map .leaflet-control-attribution {
+    font-size: 9px !important;
+    line-height: 1.15 !important;
+    max-width: 100vw !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    padding: 2px 6px !important;
+  }
+
+  body.mobile-app-mode #tab-map .mobile-map-card-strip {
+    padding: 0.45rem 0.5rem !important;
+  }
+
+  /* Transit & Stays tabs: full-width edge-to-edge cards, compact facts grid & alternating leg segments */
+  body.mobile-app-mode :is(#tab-transport, #tab-accom) [data-role="mobile-swipe-pager"],
+  body.mobile-app-mode :is(#tab-transport, #tab-accom) [data-role="mobile-swipe-carousel"],
+  body.mobile-app-mode :is(#tab-transport, #tab-accom) [data-role="mobile-swipe-slide"] {
+    padding-inline: 0 !important;
+    margin-inline: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  body.mobile-app-mode :is(.transport-mobile-card, .stay-mobile-card) {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    border-right: none !important;
+    border-left-width: 4px !important;
+    margin: 0 !important;
+    padding: 0.6rem 0.75rem !important;
+    box-sizing: border-box !important;
+  }
+
+  body.mobile-app-mode :is(.transport-mobile-facts-grid, .stay-mobile-facts-grid) {
+    gap: 0.35rem !important;
+  }
+
+  body.mobile-app-mode :is(.transport-mobile-fact, .stay-mobile-fact) {
+    padding: 0.35rem 0.55rem !important;
+    min-height: 0 !important;
+    border-radius: 0.45rem !important;
+  }
+
+  body.mobile-app-mode .transport-segment-card--even {
+    background: #ffffff !important;
+    border-color: rgba(226, 232, 240, 0.9) !important;
+  }
+
+  body.mobile-app-mode .transport-segment-card--odd {
+    background: #f1f5f9 !important;
+    border-color: rgba(203, 213, 225, 0.95) !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode .transport-segment-card--even {
+    background: rgba(30, 41, 59, 0.72) !important;
+    border-color: rgba(51, 65, 85, 0.75) !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode .transport-segment-card--odd {
+    background: rgba(15, 23, 42, 0.88) !important;
+    border-color: rgba(71, 85, 105, 0.85) !important;
+  }
+
+  /* Budget tab: full-width KPI grid & alternating full-bleed leg rows */
+  body.mobile-app-mode #tab-budget #budget-kpi-container {
+    padding-inline: 0.45rem !important;
+    box-sizing: border-box !important;
+  }
+
+  body.mobile-app-mode #tab-budget .budget-mobile-breakdown {
+    gap: 0 !important;
+    margin-top: 0.2rem !important;
+    width: 100% !important;
+  }
+
+  body.mobile-app-mode #tab-budget .budget-mobile-breakdown-head {
+    padding-inline: 0.6rem !important;
+    padding-bottom: 0.35rem !important;
+  }
+
+  body.mobile-app-mode #tab-budget .budget-mobile-row {
+    border-radius: 0 !important;
+    border-right: none !important;
+    border-left-width: 4px !important;
+    padding: 0.42rem 0.7rem !important;
+    margin: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  body.mobile-app-mode #tab-budget .budget-mobile-row--even {
+    background: #ffffff !important;
+  }
+
+  body.mobile-app-mode #tab-budget .budget-mobile-row--odd {
+    background: #f1f5f9 !important;
+  }
+
+  body.mobile-app-mode #tab-budget .budget-mobile-row--odd .budget-mobile-splits > div {
+    background: #ffffff !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode #tab-budget .budget-mobile-row--even {
+    background: rgba(30, 41, 59, 0.72) !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode #tab-budget .budget-mobile-row--odd {
+    background: rgba(15, 23, 42, 0.88) !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode #tab-budget .budget-mobile-row--odd .budget-mobile-splits > div {
+    background: rgba(30, 41, 59, 0.85) !important;
+  }
+
+  /* Packing tab: flatten nested summary container, full-bleed category cards & compact alternating checklist items */
+  body.mobile-app-mode #tab-packing #guides-container,
+  body.mobile-app-mode #tab-packing .packing-guides-shell {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding-inline: 0.45rem !important;
+    margin-inline: 0 !important;
+  }
+
+  body.mobile-app-mode #tab-packing .packing-area-heading {
+    padding-inline: 0.65rem !important;
+    margin-inline: 0 !important;
+  }
+
+  body.mobile-app-mode #tab-packing .packing-grid {
+    gap: 0.5rem !important;
+    padding-inline: 0 !important;
+  }
+
+  body.mobile-app-mode #tab-packing .packing-card {
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    padding: 0.5rem 0.75rem !important;
+    margin: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  body.mobile-app-mode #tab-packing .packing-item {
+    padding: 0.3rem 0.45rem !important;
+    min-height: 2.15rem !important;
+    border-radius: 0.35rem !important;
+    margin-bottom: 1px !important;
+  }
+
+  body.mobile-app-mode #tab-packing .packing-card .packing-item:nth-of-type(even) {
+    background: #f1f5f9 !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode #tab-packing .packing-card .packing-item:nth-of-type(even) {
+    background: rgba(30, 41, 59, 0.55) !important;
   }
 
   body.mobile-app-mode.compact-view-mode .active-city-sticky-header,

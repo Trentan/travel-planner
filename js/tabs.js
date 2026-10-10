@@ -174,21 +174,20 @@ function renderStayMobileDetails(stay, cityName, cityMap = null) {
   const locationUrl = stay.location ? getMapSearchUrl(stay.location, cityName) : '';
   const attachmentsHtml = stay.attachments && stay.attachments.length > 0 ? `<div class="stay-mobile-fact stay-mobile-fact--wide"><span class="stay-mobile-fact-label">Attachments & Links</span><div class="flex flex-wrap gap-1 mt-1">` + renderAttachmentsPillsHtml(stay.attachments) + `</div></div>` : '';
   const cityDisplay = getStayCityDisplay(cityName, stay, cityMap);
+  const checkInDisplay = [formatDateShort(stay.checkIn), stay.checkInTime].filter(Boolean).join(' · ');
+  const checkOutDisplay = [formatDateShort(stay.checkOut), stay.checkOutTime].filter(Boolean).join(' · ');
 
   return `
     <div class="stay-mobile-facts-grid">
       ${renderStayMobileFact('City', cityDisplay)}
       ${renderStayMobileFact('Nights', String(nights))}
-      ${renderStayMobileFact('Check In', formatDateShort(stay.checkIn))}
-      ${renderStayMobileFact('Check In Time', stay.checkInTime || '')}
-      ${renderStayMobileFact('Check Out', formatDateShort(stay.checkOut))}
-      ${renderStayMobileFact('Check Out Time', stay.checkOutTime || '')}
-      ${renderStayMobileLinkedFact('Location', stay.location || '', locationUrl, 'stay-mobile-fact--wide')}
-      ${renderStayMobileFact('Property Name', stay.propertyName || '')}
-      ${renderStayMobileFact('Provider', stay.provider || '')}
+      ${renderStayMobileFact('Check In', checkInDisplay)}
+      ${renderStayMobileFact('Check Out', checkOutDisplay)}
+      ${stay.location ? renderStayMobileLinkedFact('Location', stay.location, locationUrl, 'stay-mobile-fact--wide') : ''}
+      ${stay.provider ? renderStayMobileFact('Provider', stay.provider) : ''}
       ${renderStayMobileFact('Cost', costValue)}
-      ${renderStayMobileFact('Booking #', stay.bookingRef || '')}
-      ${renderStayMobileFact('Notes', stay.notes || '', 'stay-mobile-fact--wide')}
+      ${stay.bookingRef ? renderStayMobileFact('Booking #', stay.bookingRef) : ''}
+      ${stay.notes ? renderStayMobileFact('Notes', stay.notes, 'stay-mobile-fact--wide') : ''}
       ${attachmentsHtml}
     </div>
   `;
@@ -750,11 +749,12 @@ function renderBudgetKPIs(kpiContainer, totals) {
 function renderBudgetTableAndBreakdown(container, legBreakdown) {
   if (!container) return;
   const maxLegTotal = Math.max(...legBreakdown.map(l => l.total), 1);
-  const mobileBreakdownHtml = legBreakdown.map(l => {
+  const mobileBreakdownHtml = legBreakdown.map((l, idx) => {
     const barWidth = Math.max(6, Math.round((l.total / maxLegTotal) * 100));
     const accent = escapeHtml(l.colour || '#24485d');
+    const parity = idx % 2 === 0 ? 'even' : 'odd';
     return `
-      <article class="budget-mobile-row" style="--budget-accent:${accent};">
+      <article class="budget-mobile-row budget-mobile-row--${parity}" style="--budget-accent:${accent};">
         <div class="budget-mobile-row-head">
           <h3>${escapeHtml(l.label)}</h3>
           <strong>${formatBudgetAmount(l.total)}</strong>

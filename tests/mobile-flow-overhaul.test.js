@@ -156,17 +156,47 @@ function runTask5VisualPolishTests() {
   );
 }
 
+function runTask6CrossTabMobileOptimizationTests() {
+  const transportJs = loadSource(path.join('js', 'transport.js'));
+  const tabsJs = loadSource(path.join('js', 'tabs.js'));
+  const mobileFeaturesCss = loadSource(path.join('src', 'css', 'mobile-features.css'));
+
+  assert(
+    transportJs.includes('transport-segment-card--${segParity}'),
+    'Task 6: js/transport.js should attach alternating parity classes to compact transport segment cards'
+  );
+  assert(
+    tabsJs.includes('budget-mobile-row--${parity}') &&
+      tabsJs.includes('checkInDisplay') &&
+      tabsJs.includes('checkOutDisplay'),
+    'Task 6: js/tabs.js should combine Check In/Out dates with times on Stays cards and attach parity classes to mobile Budget leg rows'
+  );
+  assert(
+    mobileFeaturesCss.includes('#tab-transport') &&
+      mobileFeaturesCss.includes('#tab-accom') &&
+      mobileFeaturesCss.includes('#tab-budget') &&
+      mobileFeaturesCss.includes('#tab-packing') &&
+      mobileFeaturesCss.includes('.budget-mobile-row--even') &&
+      mobileFeaturesCss.includes('.budget-mobile-row--odd') &&
+      mobileFeaturesCss.includes('.transport-segment-card--odd') &&
+      mobileFeaturesCss.includes('#tab-packing .packing-card .packing-item:nth-of-type(even)'),
+    'Task 6: mobile-features.css should apply edge-to-edge full-width layout and alternating row shading across Transit, Stays, Budget, Packing, and Map tabs'
+  );
+}
+
 function runAll() {
   runTask1ShellTests();
   runTask2VerticalTimelineTests();
   runTask3BottomSheetAndDragTests();
   runTask4MobileMapTests();
   runTask5VisualPolishTests();
+  runTask6CrossTabMobileOptimizationTests();
 }
 
 if (require.main === module) {
   runAll();
-  console.log('Task 1-5 mobile flow overhaul tests passed');
+  console.log('Task 1-6 mobile flow overhaul tests passed');
 }
 
 module.exports = { runMobileFlowOverhaulTests: runAll };
+
