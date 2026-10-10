@@ -994,10 +994,12 @@ function renderCompactDaySlide(opts = {}) {
     </div>
   ` : '';
 
+  const dayParity = dayIdx % 2 === 0 ? 'even' : 'odd';
+
   return `
-    <section class="compact-day-slide day-card ${isActive ? 'is-active open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-leg-index="${legIndex}" data-leg-id="${escapeCompactText(leg.id)}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
+    <section class="compact-day-slide day-card compact-day-slide--${dayParity} ${isActive ? 'is-active open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-day-parity="${dayParity}" data-leg-index="${legIndex}" data-leg-id="${escapeCompactText(leg.id)}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
       ${renderMobileSurfaceCard({
-    cardClass: 'compact-day-surface',
+    cardClass: `compact-day-surface compact-day-surface--${dayParity}`,
     accentColor: leg.colour,
     accentWidth: '6px',
     dateLabel: dayDateLabel,

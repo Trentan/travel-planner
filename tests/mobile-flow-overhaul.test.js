@@ -131,16 +131,42 @@ function runTask4MobileMapTests() {
   );
 }
 
+function runTask5VisualPolishTests() {
+  const uiJs = loadSource(path.join('js', 'ui.js'));
+  const itineraryJs = loadSource(path.join('js', 'itinerary.js'));
+  const mobileFeaturesCss = loadSource(path.join('src', 'css', 'mobile-features.css'));
+
+  assert(
+    uiJs.includes('getCityFlagHTML(cleanCity)') &&
+      uiJs.includes("setCityNavDrawerExpanded(false, false)"),
+    'Task 5: js/ui.js should display the matching city flag/emoji in #cityNav pull handle and keep #cityNav tucked on mobile tab presentation'
+  );
+  assert(
+    itineraryJs.includes('compact-day-slide--${dayParity}') &&
+      itineraryJs.includes('compact-day-surface--${dayParity}'),
+    'Task 5: js/itinerary.js should attach day parity classes to compact day slides and surfaces'
+  );
+  assert(
+    mobileFeaturesCss.includes('.compact-day-slide--even .compact-day-surface') &&
+      mobileFeaturesCss.includes('.compact-day-slide--odd .compact-day-surface') &&
+      mobileFeaturesCss.includes('#tab-itinerary .compact-leg-card') &&
+      mobileFeaturesCss.includes('#tab-itinerary .compact-day-pager') &&
+      mobileFeaturesCss.includes('.city-nav-pull-handle .city-flag-img'),
+    'Task 5: mobile-features.css should style full-width mobile containers without nested panel insets, alternating day shading, and city flag icons in pull handle'
+  );
+}
+
 function runAll() {
   runTask1ShellTests();
   runTask2VerticalTimelineTests();
   runTask3BottomSheetAndDragTests();
   runTask4MobileMapTests();
+  runTask5VisualPolishTests();
 }
 
 if (require.main === module) {
   runAll();
-  console.log('Task 1-4 mobile flow overhaul tests passed');
+  console.log('Task 1-5 mobile flow overhaul tests passed');
 }
 
 module.exports = { runMobileFlowOverhaulTests: runAll };

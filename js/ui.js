@@ -604,10 +604,16 @@ function updateCityNavPullHandle() {
     ? (cityNav.querySelector('.city-nav-btn.active:not([data-city="all"])') ||
        cityNav.querySelector('.city-nav-btn:not([data-city="all"]):not(.city-nav-add-btn)'))
     : null;
-  const cityLine = activeBtn && activeBtn.querySelector ? (activeBtn.querySelector('.city-nav-city-line') || activeBtn) : activeBtn;
-  const rawCity = String(cityLine?.textContent || 'Cities').replace(/\s+/g, ' ').trim();
-  const cleanCity = rawCity || 'Cities';
-  label.textContent = isTucked ? `📍 ${cleanCity} · Pull for cities ▾` : `📍 ${cleanCity} · Hide cities ▴`;
+  const cityId = activeBtn ? activeBtn.getAttribute('data-city') : null;
+  const cityName = cityId && typeof getCityNameById === 'function' ? getCityNameById(cityId) : (cityId || '');
+  const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(cityName) : String(cityName)).trim() || 'Cities';
+  const flagHtml = (typeof getCityFlagHTML === 'function' && cleanCity !== 'Cities')
+    ? getCityFlagHTML(cleanCity)
+    : '<span class="city-flag">📍</span>';
+  const safeCityName = typeof escapeHtmlText === 'function' ? escapeHtmlText(cleanCity) : cleanCity;
+  label.innerHTML = isTucked
+    ? `${flagHtml} <span class="city-nav-pull-city-name">${safeCityName}</span> · Pull for cities ▾`
+    : `${flagHtml} <span class="city-nav-pull-city-name">${safeCityName}</span> · Hide cities ▴`;
 }
 
 function setCityNavDrawerExpanded(expanded, isManual = false) {
@@ -638,6 +644,21 @@ function toggleCityNavDrawer(event, forceExpanded) {
   if (typeof document === 'undefined' || !document.getElementById) return;
   const cityNav = document.getElementById('cityNav');
   if (!cityNav || !cityNav.classList) return;
+
+  // If clicking near the right edge on mobile (where + City button is pinned), open Add City dialog directly
+  if (
+    event &&
+    typeof event.clientX === 'number' &&
+    typeof window !== 'undefined' &&
+    window.innerWidth <= 768 &&
+    event.clientX >= window.innerWidth - 75
+  ) {
+    if (typeof openCityDialog === 'function') {
+      openCityDialog();
+      return;
+    }
+  }
+
   const nextExpanded = typeof forceExpanded === 'boolean'
     ? forceExpanded
     : cityNav.classList.contains('is-tucked');
@@ -701,10 +722,6 @@ function setupMobileHeaderScrollCollapse() {
 
     if (currentY <= 36) {
       document.body?.classList?.remove('mobile-header-condensed');
-      const activeTab = document.body?.getAttribute?.('data-active-tab') || 'itinerary';
-      if ((activeTab === 'itinerary' || activeTab === 'map') && cityNav?.dataset?.manualState !== 'tucked') {
-        setCityNavDrawerExpanded(true, false);
-      }
     } else if (deltaY > 12 && currentY > 64) {
       document.body?.classList?.add('mobile-header-condensed');
       if (!cityNav?.dataset?.manualState || scrolledFarFromManual) {
@@ -824,8 +841,7 @@ function switchTab(tabId, btnElement) {
         cityNav.classList.toggle('tab-hidden', tabId === 'guide');
       }
       if (typeof isMobileViewport === 'function' && isMobileViewport()) {
-        const defaultExpanded = (tabId === 'itinerary' || tabId === 'map');
-        setCityNavDrawerExpanded(defaultExpanded, false);
+        setCityNavDrawerExpanded(false, false);
       } else {
         updateCityNavPullHandle();
       }

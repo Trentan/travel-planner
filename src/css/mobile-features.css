@@ -1522,11 +1522,180 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     padding-bottom: 0 !important;
     margin: 0 !important;
     overflow: hidden !important;
-    pointer-events: none !important;
   }
 
   body.mobile-app-mode #cityNav.is-tucked .city-nav-pull-handle {
     min-height: 1.35rem;
+  }
+
+  body.mobile-app-mode #cityNav .city-nav-pull-handle .city-flag-img {
+    width: 15px !important;
+    height: auto !important;
+    vertical-align: middle !important;
+    display: inline-block !important;
+    border-radius: 2px !important;
+    margin-right: 3px !important;
+  }
+
+  body.mobile-app-mode #cityNav .city-nav-pull-handle .city-flag {
+    font-size: 0.82rem !important;
+    display: inline-flex !important;
+    vertical-align: middle !important;
+    margin-right: 2px !important;
+  }
+
+  body.mobile-app-mode #cityNav .city-nav-pull-city-name {
+    font-weight: 700 !important;
+  }
+
+  /* Full-width mobile layout - flatten redundant nested panels */
+  body.mobile-app-mode .app-tabs-content {
+    margin-top: 0.35rem !important;
+    padding-inline: 0.35rem !important;
+  }
+
+  body.mobile-app-mode :is(
+    #tab-itinerary,
+    #tab-transport,
+    #tab-accom,
+    #tab-budget,
+    #tab-packing,
+    #tab-map
+  ) {
+    padding-inline: 0 !important;
+    margin-inline: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .compact-leg-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .compact-leg-body {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    gap: 0.25rem !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .compact-day-pager {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  body.mobile-app-mode .compact-day-carousel.mobile-city-vertical-timeline {
+    padding: 0 !important;
+    margin: 0 !important;
+    gap: 0.65rem !important;
+  }
+
+  body.mobile-app-mode .compact-day-carousel.mobile-city-vertical-timeline > .compact-day-slide {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  body.mobile-app-mode .compact-day-slide .mobile-surface-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0.85rem !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  body.mobile-app-mode .day-planner-shell,
+  body.mobile-app-mode .day-view-panel,
+  body.mobile-app-mode .day-view-panel .detail-block {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding-inline: 0 !important;
+    margin-inline: 0 !important;
+  }
+
+  body.mobile-app-mode .mobile-surface-card {
+    padding: 0.65rem 0.65rem 0.75rem !important;
+  }
+
+  /* Alternating Day Shading in vertical timeline */
+  body.mobile-app-mode .compact-day-slide--even .compact-day-surface,
+  body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-surface {
+    background: #ffffff !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.05) !important;
+  }
+
+  body.mobile-app-mode .compact-day-slide--even .compact-day-header,
+  body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-header {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.88) !important;
+  }
+
+  body.mobile-app-mode .compact-day-slide--odd .compact-day-surface,
+  body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-surface {
+    background: #f1f5f9 !important;
+    border: 1px solid rgba(203, 213, 225, 0.95) !important;
+    box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.07) !important;
+  }
+
+  body.mobile-app-mode .compact-day-slide--odd .compact-day-header,
+  body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-header {
+    background: rgba(241, 245, 249, 0.98) !important;
+    border-bottom: 1px solid rgba(203, 213, 225, 0.9) !important;
+  }
+
+  body.mobile-app-mode .compact-day-slide--odd .compact-day-counter-chip,
+  body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-counter-chip {
+    background: rgba(226, 232, 240, 0.95) !important;
+    border-color: rgba(203, 213, 225, 0.95) !important;
+    color: #1e293b !important;
+  }
+
+  /* Dark mode alternating day shading */
+  [data-theme="dark"] body.mobile-app-mode .compact-day-slide--even .compact-day-surface,
+  [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-surface {
+    background: rgba(30, 41, 59, 0.72) !important;
+    border-color: rgba(51, 65, 85, 0.75) !important;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode .compact-day-slide--even .compact-day-header,
+  [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-header {
+    background: rgba(30, 41, 59, 0.98) !important;
+    border-bottom-color: rgba(71, 85, 105, 0.65) !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode .compact-day-slide--odd .compact-day-surface,
+  [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-surface {
+    background: rgba(15, 23, 42, 0.88) !important;
+    border-color: rgba(71, 85, 105, 0.8) !important;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.45) !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode .compact-day-slide--odd .compact-day-header,
+  [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-header {
+    background: rgba(15, 23, 42, 0.98) !important;
+    border-bottom-color: rgba(71, 85, 105, 0.8) !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode .compact-day-slide--odd .compact-day-counter-chip,
+  [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-counter-chip {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-color: rgba(71, 85, 105, 0.9) !important;
+    color: #f1f5f9 !important;
   }
 
   .budget-mobile-row.is-city-focused,
