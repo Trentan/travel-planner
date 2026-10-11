@@ -5393,6 +5393,19 @@ function normalizeTripLegsData(legs) {
       }
     }
 
+    function _parseClockTimeValue(val) {
+      const raw = String(val || '').trim();
+      const m = raw.match(/^([01]?\d|2[0-3]):([0-5]\d)(?:\s*([AaPp][Mm]))?$/);
+      if (!m) return '';
+      let h = parseInt(m[1], 10);
+      const min = m[2];
+      const ampm = m[3] ? m[3].toUpperCase() : '';
+      if (ampm === 'PM' && h < 12) h += 12;
+      else if (ampm === 'AM' && h === 12) h = 0;
+      if (h > 23) return '';
+      return `${String(h).padStart(2, '0')}:${min}`;
+    }
+
     // Guarantee unique IDs and valid titles for all suggested activities
     suggested.forEach(act => {
       if (!act || typeof act !== 'object') return;
@@ -5400,11 +5413,11 @@ function normalizeTripLegsData(legs) {
         act.id = 'act-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now().toString(36);
       }
       if (!act.title && act.name) act.title = act.name;
-      if (!act.title && act.notes) {
-        const noteTitle = act.notes.split('.')[0].trim();
-        if (noteTitle) act.title = noteTitle.length > 50 ? noteTitle.substring(0, 47) + '...' : noteTitle;
-      }
       if (!act.cityId && leg.cityId) act.cityId = leg.cityId;
+      if (!act.startTime) {
+        const parsedClock = _parseClockTimeValue(act.estTime || act.time);
+        if (parsedClock) act.startTime = parsedClock;
+      }
       _normalizeEntityCoords(act);
     });
 
@@ -5465,6 +5478,12 @@ function normalizeTripLegsData(legs) {
         item.endDate = normalizeTripDateValue(item.endDate || item.startDate || day.date);
         if (item.startTime === undefined) item.startTime = '';
         if (item.endTime === undefined) item.endTime = '';
+        if (!item.startTime && item.time) {
+          const clockFromTime = _parseClockTimeValue(item.time);
+          if (clockFromTime) {
+            item.startTime = clockFromTime;
+          }
+        }
         if (!item.location) {
           const rawText = String(item.text || item.title || item.name || '').trim();
           const splitLoc = typeof _localSplitActivityTitle === 'function' ? _localSplitActivityTitle(rawText).location : '';
@@ -5538,12 +5557,18 @@ function normalizeTripLegsData(legs) {
           if (!item.text && act.title) {
             item.text = act.title;
           }
+          if (!item.startTime && act.startTime) {
+            item.startTime = act.startTime;
+          }
+          if (!item.endTime && act.endTime) {
+            item.endTime = act.endTime;
+          }
           act.assignedDayIdx = dayIdx;
           act.assignedDate = day.date || '';
           act.startDate = item.startDate || day.date || '';
-          act.startTime = item.startTime || '';
+          act.startTime = item.startTime || act.startTime || '';
           act.endDate = item.endDate || day.date || '';
-          act.endTime = item.endTime || '';
+          act.endTime = item.endTime || act.endTime || '';
           if (item.cost && item.cost !== '0' && (!act.estCost || act.estCost === '0')) act.estCost = item.cost;
           if (item.time && item.time !== '1 hr' && (!act.estTime || act.estTime === '1 hr')) act.estTime = item.time;
           
@@ -5684,6 +5709,71 @@ function normalizeTripLegsData(legs) {
           if ((existing.endTime || '') === '' && item.endTime) existing.endTime = item.endTime;
         });
         day.activityItems = dedupedDayItems;
+      }
+    });
+
+    // Reverse-sync: ensure any suggestedActivities with a day assignment or date
+    // are present in their respective day.activityItems (e.g., if leg.days was rebuilt or shifted).
+    suggested.forEach((act, sIdx) => {
+      if (!act || typeof act !== 'object') return;
+      if (!act.title && act.notes) {
+        const noteTitle = act.notes.split('.')[0].trim();
+        if (noteTitle) act.title = noteTitle.length > 50 ? noteTitle.substring(0, 47) + '...' : noteTitle;
+      }
+      if (usedSuggestionIndices.has(sIdx)) return;
+
+      const normAssignedDate = normalizeTripDateValue(act.assignedDate || act.startDate || '');
+      let targetDayIdx = -1;
+      if (normAssignedDate && Array.isArray(leg.days)) {
+        targetDayIdx = leg.days.findIndex(d => d && normalizeTripDateValue(d.date) === normAssignedDate);
+      }
+      if (targetDayIdx === -1 && Number.isInteger(act.assignedDayIdx) && act.assignedDayIdx >= 0 && Array.isArray(leg.days) && act.assignedDayIdx < leg.days.length) {
+        targetDayIdx = act.assignedDayIdx;
+      }
+      if (targetDayIdx === -1 || !leg.days || !leg.days[targetDayIdx]) return;
+
+      const targetDay = leg.days[targetDayIdx];
+      if (!Array.isArray(targetDay.activityItems)) targetDay.activityItems = [];
+
+      const alreadyInDay = targetDay.activityItems.some(item => {
+        if (!item || typeof item !== 'object') return false;
+        if (act.id && item.activityId && item.activityId === act.id) return true;
+        return isItemMatchingActivity(String(item.text || item.title || '').trim(), act);
+      });
+
+      act.assignedDayIdx = targetDayIdx;
+      act.assignedDate = targetDay.date || normAssignedDate || '';
+
+      if (!alreadyInDay && act.title) {
+        targetDay.activityItems = targetDay.activityItems.filter(item => {
+          const t = String(item?.text || '').trim();
+          return !(/^[-—]$/.test(t) || t === 'Explore local area' || t === 'Add item...' || t === 'New item...');
+        });
+        const clockTime = _parseClockTimeValue(act.startTime || act.estTime || act.time);
+        const itemStartTime = act.startTime || clockTime || '';
+        const restoredItem = {
+          text: act.title,
+          time: act.estTime || act.time || '1 hr',
+          cost: act.estCost || act.cost || '0',
+          done: Boolean(act.done),
+          category: act.category || 'sight',
+          notes: act.notes || '',
+          location: act.location || '',
+          status: act.status || '',
+          bookingRef: act.bookingRef || '',
+          externalLink: act.externalLink || act.audioRef || act.audioUrl || '',
+          cityId: act.cityId || leg.cityId || '',
+          activityId: act.id,
+          startDate: targetDay.date || act.startDate || '',
+          startTime: itemStartTime,
+          endDate: targetDay.date || act.endDate || '',
+          endTime: act.endTime || ''
+        };
+        if (act.lat !== undefined && act.lng !== undefined) {
+          restoredItem.lat = act.lat;
+          restoredItem.lng = act.lng;
+        }
+        targetDay.activityItems.push(restoredItem);
       }
     });
 

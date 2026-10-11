@@ -1801,8 +1801,8 @@ function confirmAddLeg() {
       }
     });
 
-    target.days.forEach(newDay => {
-      const oldDay = oldDaysByDate.get(newDay.date);
+    target.days.forEach((newDay, dayIdx) => {
+      const oldDay = oldDaysByDate.get(newDay.date) || (oldDays.length === target.days.length ? oldDays[dayIdx] : null);
       if (oldDay) {
         if (oldDay.title) newDay.title = oldDay.title;
         if (oldDay.accomItems) newDay.accomItems = oldDay.accomItems;

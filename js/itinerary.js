@@ -896,15 +896,16 @@ function renderCompactDaySlide(opts = {}) {
 
   const activityLines = (day.activityItems || []).map((item, itemIdx) => {
     const doneStyle = item.done ? 'text-decoration:line-through; opacity:0.7;' : '';
+    const rawItemText = item.text || item.title || item.name || '';
     const matched = typeof findAssignedSuggestedActivity === 'function'
-      ? findAssignedSuggestedActivity(legIndex, dayIdx, item.text, item.activityId)
+      ? findAssignedSuggestedActivity(legIndex, dayIdx, rawItemText, item.activityId)
       : null;
     const emoji = getActivityItemEmoji(item, legIndex, dayIdx, '📍', matched);
     let locationVal = item.location || '';
     if (!locationVal && matched && matched.location) {
       locationVal = matched.location;
     }
-              const split = getActivityDisplayTitle(item.text);
+    const split = getActivityDisplayTitle(rawItemText || (matched && matched.title) || '');
     if (!locationVal) {
       locationVal = split.location;
     }
@@ -2099,8 +2100,12 @@ function getCompactMobileLegSequence() {
   const baseEntries = baseLegs.map((leg, idx) => {
     const firstDay = Array.isArray(leg.days) && leg.days[0] ? leg.days[0] : null;
     const cleanName = cleanCityNavLabel(leg.label || firstDay?.to || firstDay?.from || '');
-    const matchedCity = typeof getCityByName === 'function' ? getCityByName(cleanName) : null;
-    const fallbackId = String(leg.id || '').startsWith('city-') ? String(leg.id) : (leg.id ? `city-${leg.id}` : '');
+    const strippedLegId = String(leg.id || '').replace(/^(city|leg)-/, '');
+    const fallbackId = leg.cityId || (strippedLegId ? `city-${strippedLegId}` : '');
+    let matchedCity = typeof getCityByName === 'function' ? getCityByName(cleanName) : null;
+    if (!matchedCity && Array.isArray(citiesData)) {
+      matchedCity = citiesData.find(c => c && (c.id === leg.cityId || c.id === fallbackId)) || null;
+    }
     return {
       leg,
       score: getLegDateScore(leg, idx),
@@ -2425,16 +2430,57 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourney
     });
   });
 
+  if (Array.isArray(leg.suggestedActivities) && leg.suggestedActivities.length > 0) {
+    if (!Array.isArray(day.activityItems)) day.activityItems = [];
+    leg.suggestedActivities.forEach(act => {
+      if (!act || typeof act !== 'object') return;
+      const actDate = normalizeDate(act.assignedDate || act.startDate || '');
+      const matchesDay = (actDate && dayDate && actDate === dayDate) || (!actDate && act.assignedDayIdx === dayIndex);
+      if (!matchesDay) return;
+      const actTitle = String(act.title || act.name || '').trim();
+      if (!actTitle) return;
+      const exists = day.activityItems.some(it =>
+        it && ((act.id && it.activityId === act.id) || String(it.text || it.title || '').trim().toLowerCase() === actTitle.toLowerCase())
+      );
+      if (!exists) {
+        day.activityItems = day.activityItems.filter(it => {
+          const t = String(it?.text || it?.title || '').trim();
+          return !(/^[-—]$/.test(t) || t === 'Explore local area' || t === 'Add item...' || t === 'New item...');
+        });
+        const clockMatch = String(act.startTime || act.estTime || act.time || '').trim().match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
+        day.activityItems.push({
+          text: actTitle,
+          time: act.estTime || act.time || '1 hr',
+          cost: act.estCost || act.cost || '0',
+          done: Boolean(act.done),
+          category: act.category || 'sight',
+          notes: act.notes || '',
+          location: act.location || '',
+          status: act.status || '',
+          bookingRef: act.bookingRef || '',
+          externalLink: act.externalLink || act.audioRef || act.audioUrl || '',
+          cityId: act.cityId || leg.cityId || '',
+          activityId: act.id,
+          startDate: dayDate || act.startDate || '',
+          startTime: act.startTime || (clockMatch ? `${clockMatch[1].padStart(2, '0')}:${clockMatch[2]}` : ''),
+          endDate: dayDate || act.endDate || '',
+          endTime: act.endTime || ''
+        });
+      }
+    });
+  }
+
   (day.activityItems || []).forEach((item, itemIndex) => {
+    const rawItemText = item.text || item.title || item.name || '';
     const matched = typeof findAssignedSuggestedActivity === 'function'
-      ? findAssignedSuggestedActivity(legIndex, dayIndex, item.text, item.activityId)
+      ? findAssignedSuggestedActivity(legIndex, dayIndex, rawItemText, item.activityId)
       : null;
     const emoji = getActivityItemEmoji(item, legIndex, dayIndex, '📌', matched);
     let locationVal = item.location || '';
     if (!locationVal && matched && matched.location) {
       locationVal = matched.location;
     }
-    const split = getActivityDisplayTitle(item.text);
+    const split = getActivityDisplayTitle(rawItemText || (matched && matched.title) || '');
     if (!locationVal) {
       locationVal = split.location;
     }
@@ -2452,6 +2498,10 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourney
       notes = matched.notes;
     }
 
+    const clockTimeMatch = String(item.time || '').trim().match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
+    const resolvedStartTime = item.startTime || (matched && matched.startTime) || (clockTimeMatch ? `${clockTimeMatch[1].padStart(2, '0')}:${clockTimeMatch[2]}` : '');
+    const resolvedEndTime = item.endTime || (matched && matched.endTime) || '';
+
     items.push({
       type: 'activity',
       typeLabel: 'Activity',
@@ -2462,12 +2512,12 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourney
       cost: item.cost,
       notes: notes,
       done: !!item.done,
-      startTime: item.startTime || '',
-      endTime: item.endTime || '',
+      startTime: resolvedStartTime,
+      endTime: resolvedEndTime,
       legIndex,
       dayIndex,
       itemIndex,
-      sortValue: getDailyTimelineItemSortValue(dayDate, item.startTime, 4000 + itemIndex),
+      sortValue: getDailyTimelineItemSortValue(dayDate, resolvedStartTime, 4000 + itemIndex),
       actionHtml: '',
       status: item.status || '',
       bookingRef: item.bookingRef || '',
@@ -2922,8 +2972,11 @@ function renderDailyTimelineRow(item, compact = false) {
       }
     }
 
-    // 1. duration
-    if (item.time) {
+    // 1. duration (skip if item.time is identical to startTime clock value)
+    const timeTrim = String(item.time || '').trim();
+    const startTrim = String(item.startTime || '').trim();
+    const isDuplicateClockTime = timeTrim && (timeTrim === startTrim || `0${timeTrim}` === startTrim);
+    if (timeTrim && !isDuplicateClockTime) {
       parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">⏱️ ${escapeCompactText(item.time)}</span>`);
     }
     
@@ -4298,20 +4351,24 @@ function scrollToElementWithNavOffset(el) {
 }
 
 function findCompactCitySlideIndex(cityId, cityName) {
+  const cityIdNorm = String(cityId || '').trim().toLowerCase();
+  const citySlug = cityIdNorm.replace(/^(city|leg)-/, '');
+  const cityNameNorm = String(cityName || '').trim().toLowerCase();
+
   const domSlides = Array.from(document.querySelectorAll('.compact-city-swipe-pager .compact-city-slide[data-slide-index]'));
   if (domSlides.length > 0) {
-    const cityIdNorm = String(cityId || '').trim().toLowerCase();
-    const cityNameNorm = String(cityName || '').trim().toLowerCase();
     const exactLeg = domSlides.find(slide => {
       const legId = String(slide.dataset.legId || '').trim().toLowerCase();
-      return cityIdNorm && (legId === cityIdNorm || legId === cityIdNorm.replace(/^city-/, ''));
+      const legSlug = legId.replace(/^(city|leg)-/, '');
+      return cityIdNorm && (legId === cityIdNorm || (citySlug && legSlug === citySlug));
     });
     if (exactLeg) return Number(exactLeg.dataset.slideIndex || -1);
 
     const direct = domSlides.find(slide => {
       const sid = String(slide.dataset.cityId || '').trim().toLowerCase();
       const legId = String(slide.dataset.legId || '').trim().toLowerCase();
-      return (cityIdNorm && (sid === cityIdNorm || legId === cityIdNorm || legId === cityIdNorm.replace(/^city-/, '')))
+      const legSlug = legId.replace(/^(city|leg)-/, '');
+      return (cityIdNorm && (sid === cityIdNorm || legId === cityIdNorm || (citySlug && (sid.replace(/^(city|leg)-/, '') === citySlug || legSlug === citySlug))))
         || (cityNameNorm && legId.includes(cityNameNorm));
     });
     if (direct) return Number(direct.dataset.slideIndex || -1);
@@ -4319,27 +4376,26 @@ function findCompactCitySlideIndex(cityId, cityName) {
 
   if (!Array.isArray(appData) || appData.length === 0) return -1;
 
-  const normalizedCityId = String(cityId || '').trim().toLowerCase();
-  const normalizedCityName = String(cityName || '').trim().toLowerCase();
-
   for (let i = 0; i < appData.length; i++) {
     const leg = appData[i];
     if (!leg) continue;
 
     const legId = String(leg.id || '').trim().toLowerCase();
+    const legSlug = legId.replace(/^(city|leg)-/, '');
+    const legCityId = String(leg.cityId || '').trim().toLowerCase();
     const legLabel = cleanCityNavLabel(leg.label || '').toLowerCase();
 
-    if (normalizedCityId && (legId === normalizedCityId || legId === normalizedCityId.replace(/^city-/, ''))) {
+    if (cityIdNorm && (legId === cityIdNorm || legCityId === cityIdNorm || (citySlug && legSlug === citySlug))) {
       return i;
     }
 
-    if (normalizedCityName && legLabel === normalizedCityName) {
+    if (cityNameNorm && (legLabel === cityNameNorm || (citySlug && legLabel.includes(citySlug)))) {
       return i;
     }
 
-    if (normalizedCityName && Array.isArray(leg.days) && leg.days.some(day =>
-        (day.from && day.from.toLowerCase() === normalizedCityName) ||
-        (day.to && day.to.toLowerCase() === normalizedCityName)
+    if (cityNameNorm && Array.isArray(leg.days) && leg.days.some(day =>
+        (day.from && day.from.toLowerCase() === cityNameNorm) ||
+        (day.to && day.to.toLowerCase() === cityNameNorm)
     )) {
       return i;
     }
@@ -4356,12 +4412,19 @@ function resolveCityNavButtonForLeg(leg) {
 
   const legIdRaw = String(leg.id || '').trim();
   const legId = legIdRaw.toLowerCase();
-  const legIdAlt = legId.replace(/^city-/, '');
+  const legSlug = legId.replace(/^(city|leg)-/, '');
+  const legCityId = String(leg.cityId || '').trim().toLowerCase();
   const legLabel = cleanCityNavLabel(leg.label || '').toLowerCase();
 
   let btn = buttons.find(b => {
     const cityId = String(b.dataset.city || '').trim().toLowerCase();
-    return cityId && (cityId === legId || cityId === legIdAlt || `city-${cityId}` === legId);
+    const citySlug = cityId.replace(/^(city|leg)-/, '');
+    return cityId && (
+      cityId === legId ||
+      cityId === legCityId ||
+      (legSlug && citySlug === legSlug) ||
+      `city-${cityId}` === legId
+    );
   });
   if (btn) return btn;
 
@@ -4377,7 +4440,10 @@ function resolveCityNavButtonForLeg(leg) {
     btn = buttons.find(b => {
       const cityId = String(b.dataset.city || '').trim();
       const city = (Array.isArray(citiesData) ? citiesData.find(c => c.id === cityId) : null);
-      return city && cleanCityNavLabel(city.name || '').toLowerCase() === legLabel;
+      if (!city) return false;
+      const cName = cleanCityNavLabel(city.name || '').toLowerCase();
+      const cSlug = String(city.id || '').toLowerCase().replace(/^city-/, '');
+      return cName === legLabel || (cSlug && legLabel.includes(cSlug));
     });
     if (btn) return btn;
   }
@@ -4930,10 +4996,12 @@ function selectCityFilter(cityId, btn) {
 
 function scrollToCity(cityId) {
   const cityName = getCityNameById(cityId);
+  const citySlug = String(cityId || '').replace(/^(city|leg)-/, '');
 
   const candidateElementIds = [
     'leg-' + cityId,
-    'leg-' + cityId.replace(/^city-/, '')
+    'leg-' + citySlug,
+    'leg-leg-' + citySlug
   ];
 
   for (const elementId of candidateElementIds) {
@@ -4941,12 +5009,22 @@ function scrollToCity(cityId) {
     if (scrollToElementWithNavOffset(legEl)) return;
   }
 
+  for (let i = 0; i < (appData || []).length; i++) {
+    const leg = appData[i];
+    if (!leg) continue;
+    const legSlug = String(leg.id || '').replace(/^(city|leg)-/, '');
+    if (leg.cityId === cityId || (citySlug && legSlug === citySlug)) {
+      if (scrollToElementWithNavOffset(getLegElement(leg))) return;
+    }
+  }
+
   if (!cityName) return;
 
   // Match stopover legs where the city is the leg label but not the day destination.
   for (let i = 0; i < appData.length; i++) {
     const leg = appData[i];
-    if (cleanCityNavLabel(leg.label).toLowerCase() === cityName.toLowerCase()) {
+    const cleanLabel = cleanCityNavLabel(leg.label).toLowerCase();
+    if (cleanLabel === cityName.toLowerCase() || (citySlug && cleanLabel.includes(citySlug.toLowerCase()))) {
       if (scrollToElementWithNavOffset(getLegElement(leg))) return;
     }
   }

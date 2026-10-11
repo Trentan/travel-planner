@@ -215,9 +215,10 @@ async function runAiBuilderImportTests() {
   console.log('  ✔ Phantom transit cities prevented and duplicate cities eliminated');
   console.log('  ✔ Bali coordinates resolved and journey map destinations verified');
 
-  // Verify day activity items have non-empty text
+  // Verify day activity items have non-empty text and clock-format time normalized to startTime
   let totalActivityItems = 0;
   let missingTextCount = 0;
+  let missingStartTimeCount = 0;
   appData.forEach(leg => {
     (leg.days || []).forEach(day => {
       (day.activityItems || []).forEach(item => {
@@ -225,14 +226,18 @@ async function runAiBuilderImportTests() {
         if (!item.text || !item.text.trim()) {
           missingTextCount++;
         }
+        if (/^([01]?\d|2[0-3]):[0-5]\d$/.test(String(item.time || '').trim()) && !item.startTime) {
+          missingStartTimeCount++;
+        }
       });
     });
   });
   assert(totalActivityItems > 0, 'Should have day activity items');
   assert(missingTextCount === 0, `All day activityItems must have non-empty text, but ${missingTextCount} were blank`);
-  console.log(`  ✔ All ${totalActivityItems} day activity items normalized with valid text`);
+  assert(missingStartTimeCount === 0, `All clock-timed activityItems must have startTime populated, but ${missingStartTimeCount} were blank`);
+  console.log(`  ✔ All ${totalActivityItems} day activity items normalized with valid text and startTime`);
 
-  // Verify suggestedActivities have non-empty title
+  // Verify suggestedActivities have non-empty title (and did not overwrite blank titles with notes when matched by activityId)
   let totalSuggested = 0;
   let missingTitleCount = 0;
   appData.forEach(leg => {
@@ -245,7 +250,21 @@ async function runAiBuilderImportTests() {
   });
   assert(totalSuggested > 0, 'Should have suggested activities in pool');
   assert(missingTitleCount === 0, `All suggestedActivities must have non-empty title, but ${missingTitleCount} were blank`);
-  console.log(`  ✔ All ${totalSuggested} suggested activities normalized with valid titles`);
+  const baliLegAfterImport = appData.find(l => l.id === 'leg-bali');
+  const runAct = (baliLegAfterImport.suggestedActivities || []).find(a => a.id === 'act-jo72r3c2o-mu9oo2li');
+  assert(runAct && runAct.title === 'Morning Run with Canggu Runners', `Assigned activity should inherit title from day item, got "${runAct && runAct.title}"`);
+
+  // Verify reverse-sync: if a day's activityItems are cleared/rebuilt to placeholder, normalizeTripLegsData restores assigned suggestedActivities
+  const rebuiltLegClone = JSON.parse(JSON.stringify(baliLegAfterImport));
+  rebuiltLegClone.days.forEach(d => {
+    d.activityItems = [{ text: 'Explore local area', time: '1 hr', cost: '0', done: false }];
+  });
+  context.normalizeTripLegsData([rebuiltLegClone]);
+  rebuiltLegClone.days.forEach((d, dIdx) => {
+    const nonPlaceholders = (d.activityItems || []).filter(i => i.text && i.text !== 'Explore local area');
+    assert(nonPlaceholders.length === 4, `Day ${dIdx + 1} (${d.date}) must restore all 4 assigned activities from suggestedActivities, found ${nonPlaceholders.length}`);
+  });
+  console.log(`  ✔ All ${totalSuggested} suggested activities normalized with valid titles and bidirectional day sync`);
 
   // Verify cityFood items have valid text
   let foodCount = 0;

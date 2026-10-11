@@ -63,6 +63,7 @@ function _getAiPromptSchema(title, cityCount) {
             {
               "text": "Outbound Flight to First City",
               "time": "09:30",
+              "startTime": "09:30",
               "cost": "0",
               "done": false,
               "category": "transport",
@@ -123,6 +124,7 @@ function _getAiPromptSchema(title, cityCount) {
             {
               "text": "Morning Run or Fitness Session",
               "time": "07:00",
+              "startTime": "07:00",
               "cost": "0",
               "done": false,
               "category": "fitness",
@@ -135,6 +137,7 @@ function _getAiPromptSchema(title, cityCount) {
             {
               "text": "Brunch at Local Cafe",
               "time": "09:30",
+              "startTime": "09:30",
               "cost": "20",
               "done": false,
               "category": "food",
@@ -168,6 +171,7 @@ function _getAiPromptSchema(title, cityCount) {
             {
               "text": "Return Flight Home",
               "time": "14:15",
+              "startTime": "14:15",
               "cost": "0",
               "done": false,
               "category": "transport",

@@ -50,16 +50,24 @@ function regenerateItineraryFromJourneys(linkedJourneys, legId) {
     dayNotes: []
   });
   
-  // Merge notes from old days if they match by date
-  newDays.forEach(nd => {
-    const oldDay = leg.days.find(od => od.date === nd.date);
+  // Merge notes and items from old days if they match by date (with index fallback if dates shifted)
+  newDays.forEach((nd, idx) => {
+    const oldDay = leg.days.find(od => od.date === nd.date) || (leg.days.length === newDays.length ? leg.days[idx] : null);
     if (oldDay) {
+      if (oldDay.title) nd.title = oldDay.title;
       if (oldDay.desc) nd.desc = oldDay.desc;
       if (oldDay.notes) nd.notes = oldDay.notes;
+      if (Array.isArray(oldDay.activityItems) && oldDay.activityItems.length > 0) nd.activityItems = oldDay.activityItems;
+      if (Array.isArray(oldDay.accomItems) && oldDay.accomItems.length > 0) nd.accomItems = oldDay.accomItems;
+      if (Array.isArray(oldDay.transportItems) && oldDay.transportItems.length > 0) nd.transportItems = oldDay.transportItems;
+      if (typeof oldDay.completed !== 'undefined') nd.completed = oldDay.completed;
     }
   });
 
   leg.days = newDays;
+  if (typeof normalizeTripLegsData === 'function' && typeof appData !== 'undefined' && Array.isArray(appData)) {
+    normalizeTripLegsData(appData);
+  }
   return true;
 }
 
@@ -556,6 +564,24 @@ function syncAllLegDays(silent = false, forceRebuild = false) {
       arrivingJourneys.forEach(j => considerDate(j.arrivalDate || j.dayDate));
       departingJourneys.forEach(j => considerDate(j.departureDate || j.dayDate));
 
+      if (!isTerminal && Array.isArray(leg.days)) {
+        leg.days.forEach(d => {
+          if (!d || !d.date || !Array.isArray(d.activityItems)) return;
+          const hasRealActivity = d.activityItems.some(it => {
+            const t = String(it?.text || it?.title || '').trim();
+            return t && !(/^[-—]$/.test(t) || t === 'Explore local area' || t === 'Add item...' || t === 'New item...');
+          });
+          if (hasRealActivity) considerDate(d.date);
+        });
+      }
+      if (!isTerminal && Array.isArray(leg.suggestedActivities)) {
+        leg.suggestedActivities.forEach(act => {
+          if (act && (act.assignedDate || act.startDate)) {
+            considerDate(act.assignedDate || act.startDate);
+          }
+        });
+      }
+
       // Fallback 1: if no journeys or stays found for this leg, retain existing days' bounds
       if (!earliestDate && existingStart) {
         considerDate(existingStart);
@@ -724,6 +750,10 @@ function syncAllLegDays(silent = false, forceRebuild = false) {
 
     leg.days = newDays;
   });
+
+  if (typeof normalizeTripLegsData === 'function' && Array.isArray(appData)) {
+    normalizeTripLegsData(appData);
+  }
 
   if (changesMade > 0 || changelog.length > 0) {
     if (typeof saveData === 'function') saveData();

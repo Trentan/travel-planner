@@ -698,10 +698,12 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
         applyActivityScheduleFields(target, day, datedSchedule);
         target.assignedDate = target.startDate || getNormalizedDayDate(day);
 
+        let matchedDayItem = false;
         if (day?.activityItems?.length) {
           day.activityItems.forEach(item => {
-            const cleanItemText = getComparisonString(item.text);
-            if (previousClean.includes(cleanItemText)) {
+            const cleanItemText = getComparisonString(item.text || item.title || '');
+            if ((target.id && item.activityId === target.id) || previousClean.includes(cleanItemText)) {
+              matchedDayItem = true;
               item.text = getSuggestedActivityDayText(target);
               item.time = formData.estTime;
               item.cost = formData.estCost;
@@ -716,6 +718,12 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
               delete item.audioUrl;
               applyActivityScheduleFields(item, day, datedSchedule);
             }
+          });
+        }
+        if (!matchedDayItem && day && typeof assignSuggestedActivityToDay === 'function') {
+          assignSuggestedActivityToDay(legIdx, activityIdx, legIdx, target.assignedDayIdx, {
+            ...scheduleOpts,
+            originalMatchTexts
           });
         }
       } else {
