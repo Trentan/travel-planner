@@ -1435,17 +1435,19 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   body.mobile-app-mode #cityNav {
-    padding-top: 0.16rem !important;
-    padding-bottom: 0.08rem !important;
+    padding-top: 0.22rem !important;
+    padding-bottom: 0.22rem !important;
     padding-inline: 0.35rem !important;
   }
 
-  body.mobile-app-mode #cityNav .city-nav-list {
+  body.mobile-app-mode #cityNav .city-nav-list,
+  body.mobile-app-mode #cityNav.is-tucked .city-nav-list {
+    display: flex !important;
     gap: 0.32rem !important;
     padding: 0.08rem 0.2rem !important;
-    max-height: 2.3rem;
-    opacity: 1;
-    transition: max-height 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.16s ease, padding 0.2s ease;
+    max-height: none !important;
+    opacity: 1 !important;
+    overflow-x: auto !important;
   }
 
   body.mobile-app-mode #cityNav .city-nav-btn {
@@ -1456,6 +1458,25 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     gap: 0.22rem !important;
     border-radius: 9999px !important;
     box-shadow: none !important;
+  }
+
+  body.mobile-app-mode #cityNav .city-nav-btn[data-city="all"] {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  body.mobile-app-mode #cityNav .city-nav-btn.is-visited:not(.active) {
+    background: rgba(13, 148, 136, 0.12) !important;
+    border-color: rgba(13, 148, 136, 0.45) !important;
+    color: #0f766e !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode #cityNav .city-nav-btn.is-visited:not(.active) {
+    background: rgba(20, 184, 166, 0.18) !important;
+    border-color: rgba(45, 212, 191, 0.45) !important;
+    color: #5eead4 !important;
   }
 
   body.mobile-app-mode #cityNav .city-flag-img {
@@ -1478,56 +1499,7 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   body.mobile-app-mode #cityNav .city-nav-pull-handle {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    width: 100%;
-    min-height: 1.15rem;
-    padding: 0.06rem 0.45rem 0.1rem;
-    border: none;
-    background: transparent;
-    color: #0f766e;
-    font-size: 0.66rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    line-height: 1;
-    cursor: pointer;
-    touch-action: manipulation;
-  }
-
-  [data-theme="dark"] body.mobile-app-mode #cityNav .city-nav-pull-handle {
-    color: #5eead4;
-  }
-
-  body.mobile-app-mode #cityNav .city-nav-pull-pill {
-    width: 1.6rem;
-    height: 0.18rem;
-    border-radius: 9999px;
-    background: rgba(13, 148, 136, 0.35);
-    flex-shrink: 0;
-  }
-
-  [data-theme="dark"] body.mobile-app-mode #cityNav .city-nav-pull-pill {
-    background: rgba(94, 234, 212, 0.4);
-  }
-
-  body.mobile-app-mode #cityNav.is-tucked {
-    padding-top: 0.06rem !important;
-    padding-bottom: 0.08rem !important;
-  }
-
-  body.mobile-app-mode #cityNav.is-tucked .city-nav-list {
-    max-height: 0 !important;
-    opacity: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-  }
-
-  body.mobile-app-mode #cityNav.is-tucked .city-nav-pull-handle {
-    min-height: 1.35rem;
+    display: none !important;
   }
 
   body.mobile-app-mode #cityNav .city-nav-pull-handle .city-flag-img {
@@ -1539,15 +1511,19 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     margin-right: 3px !important;
   }
 
-  body.mobile-app-mode #cityNav .city-nav-pull-handle .city-flag {
-    font-size: 0.82rem !important;
-    display: inline-flex !important;
-    vertical-align: middle !important;
-    margin-right: 2px !important;
-  }
-
   body.mobile-app-mode #cityNav .city-nav-pull-city-name {
     font-weight: 700 !important;
+  }
+
+  body.mobile-app-mode #tab-budget .budget-mobile-row.is-city-dimmed {
+    opacity: 0.45;
+  }
+
+  body.mobile-app-mode #tab-budget .budget-mobile-row.is-city-focused {
+    outline: 2px solid #0d9488;
+    outline-offset: -2px;
+    z-index: 2;
+    position: relative;
   }
 
   /* Full-width mobile layout - eliminate side gutters across all tabs */

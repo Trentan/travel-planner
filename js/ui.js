@@ -616,18 +616,14 @@ function updateCityNavPullHandle() {
     : `${flagHtml} <span class="city-nav-pull-city-name">${safeCityName}</span> · Hide cities ▴`;
 }
 
-function setCityNavDrawerExpanded(expanded, isManual = false) {
+function setCityNavDrawerExpanded(expanded = true, isManual = false) {
   if (typeof document === 'undefined' || !document.getElementById) return;
   const cityNav = document.getElementById('cityNav');
   if (!cityNav || !cityNav.classList) return;
-  cityNav.classList.toggle('is-tucked', !expanded);
+  // Always keep #cityNav displayed on mobile (never tucked)
+  cityNav.classList.remove('is-tucked');
   if (cityNav.dataset) {
-    if (isManual) {
-      cityNav.dataset.manualState = expanded ? 'expanded' : 'tucked';
-      cityNav.dataset.manualScrollY = String(Math.round((typeof window !== 'undefined' && window.scrollY) || 0));
-    } else {
-      delete cityNav.dataset.manualState;
-    }
+    delete cityNav.dataset.manualState;
   }
   updateCityNavPullHandle();
   if (typeof requestAnimationFrame === 'function') {
@@ -659,49 +655,12 @@ function toggleCityNavDrawer(event, forceExpanded) {
     }
   }
 
-  const nextExpanded = typeof forceExpanded === 'boolean'
-    ? forceExpanded
-    : cityNav.classList.contains('is-tucked');
-  setCityNavDrawerExpanded(nextExpanded, true);
+  setCityNavDrawerExpanded(true, true);
 }
 
 function setupCityNavPullGesture() {
   if (typeof document === 'undefined' || typeof window === 'undefined' || window.__cityNavPullGestureBound) return;
   window.__cityNavPullGestureBound = true;
-  let startY = 0;
-  let startX = 0;
-  let activeInCityNav = false;
-
-  document.addEventListener('touchstart', (e) => {
-    if (!isMobileViewport()) return;
-    const target = e.target;
-    if (!target || typeof target.closest !== 'function') return;
-    const inNav = target.closest('#cityNav');
-    if (!inNav) {
-      activeInCityNav = false;
-      return;
-    }
-    const touch = e.touches && e.touches[0];
-    if (!touch) return;
-    activeInCityNav = true;
-    startY = touch.clientY;
-    startX = touch.clientX;
-  }, { passive: true });
-
-  document.addEventListener('touchend', (e) => {
-    if (!activeInCityNav || !isMobileViewport()) return;
-    activeInCityNav = false;
-    const touch = e.changedTouches && e.changedTouches[0];
-    if (!touch) return;
-    const dy = touch.clientY - startY;
-    const dx = touch.clientX - startX;
-    if (Math.abs(dy) < 16 || Math.abs(dy) <= Math.abs(dx)) return;
-    if (dy > 16) {
-      setCityNavDrawerExpanded(true, true);
-    } else if (dy < -16) {
-      setCityNavDrawerExpanded(false, true);
-    }
-  }, { passive: true });
 }
 
 function setupMobileHeaderScrollCollapse() {
@@ -716,17 +675,11 @@ function setupMobileHeaderScrollCollapse() {
     }
     const currentY = Math.max(0, window.scrollY || 0);
     const deltaY = currentY - lastScrollY;
-    const cityNav = document.getElementById ? document.getElementById('cityNav') : null;
-    const manualScrollY = Number(cityNav?.dataset?.manualScrollY || 0);
-    const scrolledFarFromManual = Math.abs(currentY - manualScrollY) > 64;
 
     if (currentY <= 36) {
       document.body?.classList?.remove('mobile-header-condensed');
     } else if (deltaY > 12 && currentY > 64) {
       document.body?.classList?.add('mobile-header-condensed');
-      if (!cityNav?.dataset?.manualState || scrolledFarFromManual) {
-        setCityNavDrawerExpanded(false, false);
-      }
     } else if (deltaY < -14 && currentY <= 80) {
       document.body?.classList?.remove('mobile-header-condensed');
     }
@@ -839,12 +792,9 @@ function switchTab(tabId, btnElement) {
       }
       if (cityNav.classList && typeof cityNav.classList.toggle === 'function') {
         cityNav.classList.toggle('tab-hidden', tabId === 'guide');
+        cityNav.classList.remove('is-tucked');
       }
-      if (typeof isMobileViewport === 'function' && isMobileViewport()) {
-        setCityNavDrawerExpanded(false, false);
-      } else {
-        updateCityNavPullHandle();
-      }
+      updateCityNavPullHandle();
     }
 
     document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));

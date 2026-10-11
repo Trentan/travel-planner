@@ -300,12 +300,14 @@ function setupMobileSwipePagers(root = document) {
     let suppressTimer = 0;
     let scrollFrame = 0;
     const initialIndex = getMobilePagerActiveIndex(pagerKey, Number(pager.dataset.activeIndex || 0));
+    let currentActiveIndex = initialIndex;
 
     // Visual dots removed per user request (top day chips act as indicator)
     const dots = [];
 
-    const setActive = nextIndex => {
+    const setActive = (nextIndex, options = {}) => {
       const safeIndex = Math.max(0, Math.min(total - 1, Number(nextIndex) || 0));
+      currentActiveIndex = safeIndex;
 
       slides.forEach((slide, idx) => {
         slide.classList.toggle('is-active', idx === safeIndex);
@@ -328,9 +330,25 @@ function setupMobileSwipePagers(root = document) {
       setMobilePagerActiveIndex(pagerKey, safeIndex);
 
       if (pager.dataset.syncCityNav === 'true') {
-        const activeSlide = slides[safeIndex];
-        const cityId = String(activeSlide?.dataset.cityId || '').trim();
-        if (cityId) highlightCityNavByCityId(cityId);
+        const isAllFilter = typeof window !== 'undefined' && window.currentCityFilter === 'all';
+        const isItineraryPager = pager.classList && pager.classList.contains('compact-city-swipe-pager');
+        if (!(options.isInitial && isAllFilter && !isItineraryPager && safeIndex === 0)) {
+          const activeSlide = slides[safeIndex];
+          if (activeSlide) {
+            highlightCityNavByCityId(
+              activeSlide.dataset.cityId,
+              activeSlide.dataset.toCityId,
+              activeSlide.dataset.fromCityId,
+              activeSlide.dataset.toLocation,
+              activeSlide.dataset.fromLocation,
+              activeSlide.dataset.legId
+            );
+          }
+        }
+      }
+
+      if (typeof pager.__syncCityByIndex === 'function') {
+        pager.__syncCityByIndex(safeIndex);
       }
 
       const activeChip = chips[safeIndex];
@@ -400,7 +418,9 @@ function setupMobileSwipePagers(root = document) {
           }
         });
 
-        setActive(bestIndex);
+        if (bestIndex !== currentActiveIndex) {
+          setActive(bestIndex);
+        }
       });
     };
 
@@ -414,7 +434,9 @@ function setupMobileSwipePagers(root = document) {
             .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (!visibleEntry) return;
         const nextIndex = Number(visibleEntry.target.dataset.dayIndex || visibleEntry.target.dataset.slideIndex || 0);
-        if (!Number.isNaN(nextIndex)) setActive(nextIndex);
+        if (!Number.isNaN(nextIndex) && nextIndex !== currentActiveIndex) {
+          setActive(nextIndex);
+        }
       }, {
         root: carousel,
         threshold: [0.15, 0.35, 0.6]
@@ -424,7 +446,7 @@ function setupMobileSwipePagers(root = document) {
       pager.__mobileSwipeObserver = observer;
     }
 
-    setActive(initialIndex);
+    setActive(initialIndex, { isInitial: true });
     const initialSlide = slides[initialIndex];
     if (carousel && initialSlide) {
       carousel.scrollLeft = Math.max(0, initialSlide.offsetLeft - carousel.offsetLeft);
@@ -432,13 +454,56 @@ function setupMobileSwipePagers(root = document) {
   });
 }
 
-function highlightCityNavByCityId(cityId) {
+function highlightCityNavByCityId(cityId, ...fallbackCandidates) {
   const nav = document.getElementById('cityNav');
-  if (!nav || !cityId) return;
-  const btn = nav.querySelector(`.city-nav-btn[data-city="${cityId}"]`);
+  if (!nav) return;
+  const candidates = [cityId, ...fallbackCandidates]
+    .map(c => String(c || '').trim())
+    .filter(Boolean);
+  if (candidates.length === 0) return;
+
+  if (candidates[0] === 'all') {
+    const allBtn = nav.querySelector('.city-nav-btn[data-city="all"]');
+    nav.querySelectorAll('.city-nav-btn').forEach(b => {
+      b.classList.toggle('active', b === allBtn);
+      b.classList.remove('is-visited');
+    });
+    const navList = nav.querySelector('.city-nav-list');
+    if (navList && allBtn) {
+      if (typeof scrollChildIntoHorizontalView === 'function') {
+        scrollChildIntoHorizontalView(navList, allBtn, { behavior: 'smooth', align: 'start' });
+      } else if (typeof navList.scrollTo === 'function') {
+        navList.scrollTo({ left: 0, behavior: 'smooth' });
+      }
+    }
+    return;
+  }
+
+  let btn = null;
+  for (const cand of candidates) {
+    const cleanCand = cand.replace(/^city-/, '');
+    btn = nav.querySelector(`.city-nav-btn[data-city="${cand}"]`) ||
+          nav.querySelector(`.city-nav-btn[data-city="city-${cleanCand}"]`) ||
+          nav.querySelector(`.city-nav-btn[data-city="${cleanCand}"]`);
+    if (btn) break;
+    if (typeof getCityByName === 'function') {
+      const matched = getCityByName(cand);
+      if (matched && matched.id) {
+        btn = nav.querySelector(`.city-nav-btn[data-city="${matched.id}"]`);
+        if (btn) break;
+      }
+    }
+  }
   if (!btn) return;
-  nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+
+  const allBtns = Array.from(nav.querySelectorAll('.city-nav-btn'));
+  const activeIdx = allBtns.indexOf(btn);
+  allBtns.forEach((b, idx) => {
+    const isAllOrAdd = b.dataset.city === 'all' || b.classList.contains('city-nav-add-btn');
+    b.classList.toggle('active', b === btn);
+    b.classList.toggle('is-visited', !isAllOrAdd && activeIdx > 0 && idx < activeIdx);
+  });
+
   if (typeof updateCityNavPullHandle === 'function') {
     updateCityNavPullHandle();
   }

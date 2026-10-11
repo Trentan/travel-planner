@@ -262,7 +262,7 @@ function renderAccomMobileView(sortedStays) {
       detailsOpen: true
     });
     slidesHtml.push(`
-      <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(stay.cityId || '')}">
+      <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(stay.cityId || '')}" data-to-location="${escapeHtmlText(cityName || '')}">
         ${cardHtml}
       </div>
     `);

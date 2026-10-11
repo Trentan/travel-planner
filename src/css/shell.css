@@ -1071,10 +1071,6 @@
       @apply mt-4;
     }
 
-    .city-nav-btn[data-city="all"] {
-      display: none !important;
-    }
-
     .app-tab-btn {
       @apply flex flex-col items-center justify-center py-1 px-1 min-w-0 text-center;
     }

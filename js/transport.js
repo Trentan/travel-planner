@@ -1526,7 +1526,7 @@ function buildTransportTab(cityFilter = null) {
         detailsOpen: true
       });
       slidesHtml.push(`
-        <div id="transport-slide-${index}" class="mobile-swipe-slide transport-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(rep.toCityId || rep.fromCityId || '')}" data-from-city-id="${escapeHtmlText(rep.fromCityId || '')}" data-to-city-id="${escapeHtmlText(rep.toCityId || '')}">
+        <div id="transport-slide-${index}" class="mobile-swipe-slide transport-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(rep.toCityId || rep.fromCityId || '')}" data-from-city-id="${escapeHtmlText(rep.fromCityId || '')}" data-to-city-id="${escapeHtmlText(rep.toCityId || '')}" data-from-location="${escapeHtmlText(rep.fromLocation || '')}" data-to-location="${escapeHtmlText(rep.toLocation || '')}">
           ${cardHtml}
         </div>
       `);

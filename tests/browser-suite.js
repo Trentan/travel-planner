@@ -876,15 +876,15 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
       if (pwaModal) pwaModal.style.display = 'none';
     });
 
-    // Verify + Add City button in cityNav and "All" button hidden on mobile (#209)
+    // Verify + Add City button and "All" button in mobile cityNav rail
     await page.locator('.app-tab-btn[data-tab="itinerary"]').click();
     await humanPause(page, 250);
-    const mobileAllBtnHidden = await page.evaluate(() => {
+    const mobileAllBtnVisible = await page.evaluate(() => {
       const btn = document.querySelector('#cityNav .city-nav-btn[data-city="all"]');
-      return btn ? window.getComputedStyle(btn).display === 'none' : true;
+      return btn ? window.getComputedStyle(btn).display !== 'none' : false;
     });
-    assert(mobileAllBtnHidden === true, 'Mobile: "All" button should be hidden in mobile cityNav rail (#209)');
-    reporter.add('mobile', 'city nav all button removal', 'mobile city rail excludes All button');
+    assert(mobileAllBtnVisible === true, 'Mobile: "All" button should be visible in mobile cityNav rail');
+    reporter.add('mobile', 'city nav all button visibility', 'mobile city rail includes All button');
 
     assert(await page.locator('.city-nav-add-btn').count() === 1, 'Mobile: + Add City button should be present in cityNav');
     await page.locator('.city-nav-add-btn').click({ force: true });

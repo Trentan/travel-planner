@@ -1658,6 +1658,10 @@ function compactItineraryGoToCityIndex(event, targetLegIndex) {
     const slides = Array.from(document.querySelectorAll('.compact-city-swipe-pager [data-role="mobile-swipe-slide"]'));
     slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
   }
+  const cityPager = document.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]');
+  if (cityPager && typeof cityPager.__syncCityByIndex === 'function') {
+    cityPager.__syncCityByIndex(idx);
+  }
   if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -1670,12 +1674,13 @@ if (typeof window !== 'undefined') {
 function setupMobileVerticalDayScrollSpy(root = document) {
   if (typeof window === 'undefined' || !root) return;
   const cityPager = root.querySelector ? root.querySelector('.compact-city-swipe-pager') : null;
-  if (cityPager && !cityPager.__citySwipeGestureBound) {
+  const swipeTarget = (root.querySelector ? root.querySelector('.compact-city-swipe-root') : null) || cityPager;
+  if (cityPager && swipeTarget && !cityPager.__citySwipeGestureBound) {
     cityPager.__citySwipeGestureBound = true;
     let startX = 0;
     let startY = 0;
     let ignoreSwipe = false;
-    cityPager.addEventListener('touchstart', (e) => {
+    swipeTarget.addEventListener('touchstart', (e) => {
       const t = e.touches && e.touches[0];
       if (!t) return;
       const target = e.target;
@@ -1683,13 +1688,13 @@ function setupMobileVerticalDayScrollSpy(root = document) {
       startX = t.clientX;
       startY = t.clientY;
     }, { passive: true });
-    cityPager.addEventListener('touchend', (e) => {
+    swipeTarget.addEventListener('touchend', (e) => {
       if (ignoreSwipe) return;
       const t = e.changedTouches && e.changedTouches[0];
       if (!t) return;
       const dx = t.clientX - startX;
       const dy = t.clientY - startY;
-      if (Math.abs(dx) < 65 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
+      if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
       const slides = Array.from(cityPager.querySelectorAll('[data-role="mobile-swipe-slide"]'));
       if (slides.length <= 1) return;
       const currentIdx = Math.max(0, slides.findIndex(s => s.classList.contains('is-active')));
@@ -1898,6 +1903,7 @@ function createCompactCitySwipeElement(mobileLegSequence, journeysByJourneyId) {
   pagerRoot.innerHTML = activeStickyHeaderHtml + renderMobileSwipePager({
     pagerClass: 'compact-city-swipe-pager',
     pagerKey: 'compact-city-swipe',
+    syncCityNav: true,
     positionPrefix: 'Trip',
     railHtml: railHtml.join(''),
     slidesHtml: slidesHtml.join(''),
@@ -2043,11 +2049,14 @@ function getCompactMobileLegSequence() {
   const baseLegs = Array.isArray(appData) ? appData : [];
   const baseEntries = baseLegs.map((leg, idx) => {
     const firstDay = Array.isArray(leg.days) && leg.days[0] ? leg.days[0] : null;
+    const cleanName = cleanCityNavLabel(leg.label || firstDay?.to || firstDay?.from || '');
+    const matchedCity = typeof getCityByName === 'function' ? getCityByName(cleanName) : null;
+    const fallbackId = String(leg.id || '').startsWith('city-') ? String(leg.id) : (leg.id ? `city-${leg.id}` : '');
     return {
       leg,
       score: getLegDateScore(leg, idx),
-      cityId: String(leg.id || '').startsWith('city-') ? String(leg.id) : '',
-      cityName: cleanCityNavLabel(leg.label || firstDay?.to || firstDay?.from || '')
+      cityId: (matchedCity && matchedCity.id) ? matchedCity.id : fallbackId,
+      cityName: (matchedCity && matchedCity.name) ? matchedCity.name : cleanName
     };
   });
   return baseEntries.sort((a, b) => a.score - b.score);
@@ -4244,6 +4253,12 @@ function findCompactCitySlideIndex(cityId, cityName) {
   if (domSlides.length > 0) {
     const cityIdNorm = String(cityId || '').trim().toLowerCase();
     const cityNameNorm = String(cityName || '').trim().toLowerCase();
+    const exactLeg = domSlides.find(slide => {
+      const legId = String(slide.dataset.legId || '').trim().toLowerCase();
+      return cityIdNorm && (legId === cityIdNorm || legId === cityIdNorm.replace(/^city-/, ''));
+    });
+    if (exactLeg) return Number(exactLeg.dataset.slideIndex || -1);
+
     const direct = domSlides.find(slide => {
       const sid = String(slide.dataset.cityId || '').trim().toLowerCase();
       const legId = String(slide.dataset.legId || '').trim().toLowerCase();
@@ -4301,13 +4316,32 @@ function resolveCityNavButtonForLeg(leg) {
   });
   if (btn) return btn;
 
+  if (typeof getCityByName === 'function' && legLabel) {
+    const matched = getCityByName(legLabel);
+    if (matched && matched.id) {
+      btn = buttons.find(b => b.dataset.city === matched.id);
+      if (btn) return btn;
+    }
+  }
+
   if (legLabel) {
     btn = buttons.find(b => {
       const cityId = String(b.dataset.city || '').trim();
       const city = (Array.isArray(citiesData) ? citiesData.find(c => c.id === cityId) : null);
       return city && cleanCityNavLabel(city.name || '').toLowerCase() === legLabel;
     });
+    if (btn) return btn;
   }
+
+  if (typeof getCityByName === 'function' && Array.isArray(leg.days) && leg.days[0]) {
+    const firstDay = leg.days[0];
+    const dayCity = getCityByName(firstDay.to || '') || getCityByName(firstDay.from || '');
+    if (dayCity && dayCity.id) {
+      btn = buttons.find(b => b.dataset.city === dayCity.id);
+      if (btn) return btn;
+    }
+  }
+
   return btn || null;
 }
 
@@ -4316,6 +4350,12 @@ function syncCityNavHighlightToLeg(leg) {
   if (!nav || !leg) return;
   const btn = resolveCityNavButtonForLeg(leg);
   if (!btn) return;
+
+  const cityId = btn.getAttribute('data-city');
+  if (cityId && typeof highlightCityNavByCityId === 'function') {
+    highlightCityNavByCityId(cityId);
+    return;
+  }
 
   nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -4353,7 +4393,7 @@ function setupCompactCityNavSync(root = document) {
     const targetLeg = appData.find(l => String(l.id || '') === slideLegId) || null;
     if (targetLeg) {
       syncCityNavHighlightToLeg(targetLeg);
-      const stickyHeader = root.querySelector('#compactActiveCityHeader');
+      const stickyHeader = root.querySelector('#compactActiveCityHeader') || document.getElementById('compactActiveCityHeader');
       const slideHeader = slide.querySelector('.compact-leg-header');
       if (stickyHeader && slideHeader) {
         stickyHeader.style.background = slideHeader.style.background || targetLeg.colour || '#0ea5e9';
@@ -4657,13 +4697,18 @@ function updateCityNavOverflowCue(nav, navList) {
 function scrollMobileSwipePagerToCity(pagerSelector, cityId, rebuildAllFn) {
   if (typeof document === 'undefined') return false;
   let pager = document.querySelector(pagerSelector);
+  const cityNameLower = String(typeof getCityNameById === 'function' ? getCityNameById(cityId) : '').trim().toLowerCase();
   const findMatchingSlide = (root) => {
     if (!root) return null;
     const slides = Array.from(root.querySelectorAll('[data-role="mobile-swipe-slide"]'));
     return slides.find(s =>
       s.dataset.cityId === cityId ||
+      s.dataset.toCityId === cityId ||
       s.dataset.fromCityId === cityId ||
-      s.dataset.toCityId === cityId
+      (cityNameLower && (
+        String(s.dataset.toLocation || '').trim().toLowerCase() === cityNameLower ||
+        String(s.dataset.fromLocation || '').trim().toLowerCase() === cityNameLower
+      ))
     ) || null;
   };
   let targetSlide = findMatchingSlide(pager);
@@ -4687,19 +4732,32 @@ function focusCityInBudgetTab(cityId, cityName) {
   const budgetTab = document.getElementById('tab-budget');
   if (!budgetTab) return;
   const rows = Array.from(budgetTab.querySelectorAll('.budget-mobile-row, .budget-desktop-table tbody tr'));
-  rows.forEach(r => r.classList.remove('is-city-focused'));
-  if (!cityId || cityId === 'all') return;
+  rows.forEach(r => {
+    r.classList.remove('is-city-focused', 'is-city-dimmed');
+  });
+  if (!cityId || cityId === 'all') {
+    if (typeof window !== 'undefined' && typeof window.scrollTo === 'function' && window.scrollY > 0) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    return;
+  }
   const needle = String(cityName || cityId).trim().toLowerCase();
   if (!needle) return;
-  const match = rows.find(r => {
-    const style = window.getComputedStyle ? window.getComputedStyle(r) : null;
-    if (style && style.display === 'none') return false;
-    return String(r.textContent || '').toLowerCase().includes(needle);
-  }) || rows.find(r => String(r.textContent || '').toLowerCase().includes(needle));
-  if (match) {
-    match.classList.add('is-city-focused');
-    if (typeof match.scrollIntoView === 'function') {
-      match.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const matches = rows.filter(r => String(r.textContent || '').toLowerCase().includes(needle));
+  if (matches.length > 0) {
+    rows.forEach(r => {
+      if (matches.includes(r)) {
+        r.classList.add('is-city-focused');
+      } else {
+        r.classList.add('is-city-dimmed');
+      }
+    });
+    const visibleMatch = matches.find(r => {
+      const style = window.getComputedStyle ? window.getComputedStyle(r) : null;
+      return !style || style.display !== 'none';
+    }) || matches[0];
+    if (visibleMatch && typeof visibleMatch.scrollIntoView === 'function') {
+      visibleMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
 }
@@ -4719,15 +4777,19 @@ function selectCityFilter(cityId, btn) {
     currentCityFilter = cityId;
   }
 
-  // Update button states
-  const nav = document.getElementById('cityNav');
-  if (nav) {
-    nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
-    if (btn) {
-      btn.classList.add('active');
-    } else {
-      const activeBtn = nav.querySelector(`.city-nav-btn[data-city="${cityId}"]`);
-      if (activeBtn) activeBtn.classList.add('active');
+  // Update button states and visited city progression
+  if (typeof highlightCityNavByCityId === 'function') {
+    highlightCityNavByCityId(cityId);
+  } else {
+    const nav = document.getElementById('cityNav');
+    if (nav) {
+      nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
+      if (btn) {
+        btn.classList.add('active');
+      } else {
+        const activeBtn = nav.querySelector(`.city-nav-btn[data-city="${cityId}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
+      }
     }
   }
   if (typeof updateCityNavPullHandle === 'function') {
@@ -4737,14 +4799,20 @@ function selectCityFilter(cityId, btn) {
   if (cityId === 'all') {
     // Show all - rebuild normally
     if (tabType === 'transport' && typeof buildTransportTab === 'function') {
+      if (typeof resetMobilePagerActiveIndex === 'function') resetMobilePagerActiveIndex('transport-swipe');
       buildTransportTab('all');
+      if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId('all');
     } else if (tabType === 'accom' && typeof buildAccomTab === 'function') {
+      if (typeof resetMobilePagerActiveIndex === 'function') resetMobilePagerActiveIndex('stay-swipe');
       buildAccomTab('all');
+      if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId('all');
     } else if (tabType === 'map') {
       if (typeof resetMapViewToAll === 'function') resetMapViewToAll();
       else if (typeof buildJourneyMap === 'function') buildJourneyMap();
+      if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId('all');
     } else if (tabType === 'budget') {
       focusCityInBudgetTab('all', '');
+      if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId('all');
     } else if (tabType === 'itinerary') {
       if (isMobile) {
         if (typeof resetMobilePagerActiveIndex === 'function') resetMobilePagerActiveIndex('compact-city-swipe');
@@ -4762,6 +4830,7 @@ function selectCityFilter(cityId, btn) {
         if (!scrollMobileSwipePagerToCity('#tab-transport .transport-swipe-pager', cityId, () => buildTransportTab('all'))) {
           buildTransportTab(cityId);
         }
+        if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(cityId, cityName);
       } else {
         buildTransportTab(cityId);
       }
@@ -4770,13 +4839,16 @@ function selectCityFilter(cityId, btn) {
         if (!scrollMobileSwipePagerToCity('#tab-accom .stay-swipe-pager', cityId, () => buildAccomTab('all'))) {
           buildAccomTab(cityId);
         }
+        if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(cityId, cityName);
       } else {
         buildAccomTab(cityId);
       }
     } else if (tabType === 'map') {
       if (typeof focusCityOnMap === 'function') focusCityOnMap(cityId);
+      if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(cityId, cityName);
     } else if (tabType === 'budget') {
       focusCityInBudgetTab(cityId, cityName);
+      if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(cityId, cityName);
     } else if (tabType === 'itinerary') {
       if (isMobile) {
         if (!scrollToCompactCitySlide(cityId, cityName)) {
