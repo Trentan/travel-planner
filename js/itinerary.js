@@ -1417,14 +1417,27 @@ function setupCompactItineraryPagers(root = document) {
     }, { passive: true });
 
 
+    const isMobileView = () => typeof isMobileViewport === 'function' ? isMobileViewport() : (typeof window !== 'undefined' && window.innerWidth <= 768);
+    const isVerticalTimeline = () => Boolean(isMobileView() && carousel.classList && carousel.classList.contains('mobile-city-vertical-timeline'));
+
     chips.forEach(chip => {
-      chip.addEventListener('click', () => {
+      chip.addEventListener('click', (evt) => {
+        if (isVerticalTimeline()) {
+          compactItineraryGoToDay(evt, pager.dataset.legId || '', Number(chip.dataset.dayIndex || 0));
+          return;
+        }
         scrollToIndex(Number(chip.dataset.dayIndex || 0));
       });
     });
 
+    setActive(initialIndex, true);
+    const initialSlide = slides[initialIndex];
+    if (carousel && initialSlide && !isVerticalTimeline()) {
+      carousel.scrollLeft = Math.max(0, initialSlide.offsetLeft - carousel.offsetLeft);
+    }
+
     const syncFromScroll = () => {
-      if (suppressObserver) return;
+      if (suppressObserver || isVerticalTimeline()) return;
       if (scrollFrame) cancelAnimationFrame(scrollFrame);
       scrollFrame = requestAnimationFrame(() => {
         const center = carousel.scrollLeft + carousel.clientWidth / 2;
@@ -1448,7 +1461,7 @@ function setupCompactItineraryPagers(root = document) {
 
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver(entries => {
-        if (suppressObserver) return;
+        if (suppressObserver || isVerticalTimeline()) return;
 
         const visibleEntry = entries
             .filter(entry => entry.isIntersecting)
@@ -1468,11 +1481,6 @@ function setupCompactItineraryPagers(root = document) {
       pager.__compactObserver = observer;
     }
 
-    setActive(initialIndex, true);
-    const initialSlide = slides[initialIndex];
-    if (carousel && initialSlide) {
-      carousel.scrollLeft = Math.max(0, initialSlide.offsetLeft - carousel.offsetLeft);
-    }
     if (typeof ResizeObserver !== 'undefined' && !pager.__heightResizeObserver) {
       const resizeObserver = new ResizeObserver(() => {
         if (typeof syncItineraryMobileHeightContainment === 'function') {
@@ -1487,6 +1495,7 @@ function setupCompactItineraryPagers(root = document) {
 
 function captureCompactDayPagerStates(root = document) {
   if (!root) return;
+  const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (typeof window !== 'undefined' && window.innerWidth <= 768);
   root.querySelectorAll('.compact-day-pager').forEach(pager => {
     const pagerKey = pager.dataset.pagerKey || '';
     if (!pagerKey || typeof setMobilePagerActiveIndex !== 'function') return;
@@ -1495,7 +1504,24 @@ function captureCompactDayPagerStates(root = document) {
     const slides = Array.from(pager.querySelectorAll('.compact-day-slide'));
     if (!carousel || slides.length === 0) return;
 
-    let bestIndex = Number(pager.dataset.activeIndex || 0);
+    const activeClassIdx = slides.findIndex(s => s.classList.contains('is-active'));
+    const activeDataIdx = Number(pager.dataset.activeIndex);
+    const fallbackIdx = Number.isFinite(activeDataIdx) && pager.dataset.activeIndex !== undefined
+      ? activeDataIdx
+      : (activeClassIdx >= 0 ? activeClassIdx : 0);
+
+    const isVerticalTimeline = Boolean(isMobile && carousel.classList && carousel.classList.contains('mobile-city-vertical-timeline'));
+    const hasHorizontalLayout = !isVerticalTimeline && (
+      carousel.scrollLeft > 0 ||
+      slides.some((s, i) => i > 0 && s.offsetLeft > slides[0].offsetLeft)
+    );
+
+    if (!hasHorizontalLayout) {
+      setMobilePagerActiveIndex(pagerKey, Math.max(0, Math.min(slides.length - 1, fallbackIdx)));
+      return;
+    }
+
+    let bestIndex = fallbackIdx;
     let bestDistance = Number.POSITIVE_INFINITY;
     slides.forEach((slide, index) => {
       const distance = Math.abs((slide.offsetLeft - carousel.offsetLeft) - carousel.scrollLeft);
@@ -1510,10 +1536,12 @@ function captureCompactDayPagerStates(root = document) {
 
 function restoreCompactDayPagerScrollPositions(root = document) {
   if (!root) return;
+  const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (typeof window !== 'undefined' && window.innerWidth <= 768);
   root.querySelectorAll('.compact-day-pager').forEach(pager => {
     const carousel = pager.querySelector('.compact-day-carousel');
     const slides = Array.from(pager.querySelectorAll('.compact-day-slide'));
     if (!carousel || slides.length === 0) return;
+    if (isMobile && carousel.classList && carousel.classList.contains('mobile-city-vertical-timeline')) return;
 
     const pagerKey = pager.dataset.pagerKey || '';
     const activeIndex = typeof getMobilePagerActiveIndex === 'function'
@@ -1565,12 +1593,13 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
 
   const activeChip = chips[safeIndex];
   if (rail && activeChip) {
+    const scrollBehavior = context.isInitialSetup ? 'auto' : 'smooth';
     if (typeof scrollChildIntoHorizontalView === 'function') {
-      scrollChildIntoHorizontalView(rail, activeChip, { behavior: 'smooth', align: 'center' });
+      scrollChildIntoHorizontalView(rail, activeChip, { behavior: scrollBehavior, align: 'center' });
     } else {
       rail.scrollTo({
         left: Math.max(0, activeChip.offsetLeft - rail.offsetLeft - (rail.clientWidth - activeChip.offsetWidth) / 2),
-        behavior: 'smooth'
+        behavior: scrollBehavior
       });
     }
   }
@@ -1606,11 +1635,13 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
     window.__selectedDayContext = { legIndex, dayIndex: nextIndex };
   }
 
+  const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (typeof window !== 'undefined' && window.innerWidth <= 768);
   const pager = Array.from(document.querySelectorAll('.compact-day-pager')).find(el => el.dataset.legId === String(legId));
   if (pager) {
     const carousel = pager.querySelector('.compact-day-carousel');
     const slide = pager.querySelector(`.compact-day-slide[data-day-index="${nextIndex}"]`);
-    if (carousel && carousel.classList.contains('mobile-city-vertical-timeline')) {
+    const isVertical = Boolean(isMobile && carousel && carousel.classList && carousel.classList.contains('mobile-city-vertical-timeline'));
+    if (isVertical) {
       syncCompactDayPagerState(pager, nextIndex);
       if (slide && typeof slide.scrollIntoView === 'function') {
         slide.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1627,7 +1658,7 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
       }
     }
 
-    if (typeof window !== 'undefined' && !(carousel && carousel.classList.contains('mobile-city-vertical-timeline'))) {
+    if (typeof window !== 'undefined' && !isVertical) {
       const pagerRect = pager.getBoundingClientRect();
       if (pagerRect.top < 60) {
         const targetTop = window.scrollY + pagerRect.top - 60;
@@ -1651,16 +1682,23 @@ function compactItineraryGoToCityIndex(event, targetLegIndex) {
   if (typeof setMobilePagerActiveIndex === 'function') {
     setMobilePagerActiveIndex('compact-city-swipe', idx);
   }
-  const cityChip = document.querySelector(`.compact-city-chip[data-slide-index="${idx}"]`);
-  if (cityChip && typeof cityChip.click === 'function') {
-    cityChip.click();
-  } else {
-    const slides = Array.from(document.querySelectorAll('.compact-city-swipe-pager [data-role="mobile-swipe-slide"]'));
-    slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
-  }
   const cityPager = document.querySelector('.compact-city-swipe-pager[data-role="mobile-swipe-pager"]');
-  if (cityPager && typeof cityPager.__syncCityByIndex === 'function') {
-    cityPager.__syncCityByIndex(idx);
+  if (cityPager) {
+    cityPager.dataset.activeIndex = String(idx);
+    if (typeof cityPager.__mobileSwipeSetActive === 'function') {
+      cityPager.__mobileSwipeSetActive(idx);
+    } else {
+      const slides = Array.from(cityPager.querySelectorAll('[data-role="mobile-swipe-slide"]'));
+      slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+    }
+    if (typeof cityPager.__syncCityByIndex === 'function') {
+      cityPager.__syncCityByIndex(idx);
+    }
+  } else {
+    const cityChip = document.querySelector(`.compact-city-chip[data-slide-index="${idx}"]`);
+    if (cityChip && typeof cityChip.click === 'function') {
+      cityChip.click();
+    }
   }
   if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1800,7 +1838,7 @@ function getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount) 
   return getLegHeaderLabelWithFlag(legLabel || routeLabel || `Leg ${legIndex + 1}`);
 }
 
-function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap) {
+function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap, activeCityIndex = 0) {
   const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
   const leg = entry.leg;
   const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
@@ -1832,13 +1870,13 @@ function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap) {
   `;
 
   return `
-    <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide ${legIndex === 0 ? 'is-active' : ''}" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(leg.id || '')}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
+    <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide ${legIndex === activeCityIndex ? 'is-active' : ''}" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(leg.id || '')}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
       ${legCard}
     </div>
   `;
 }
 
-function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap) {
+function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap, activeCityIndex = 0) {
   const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
   const leg = entry.leg;
   const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
@@ -1857,7 +1895,7 @@ function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap) {
   const routeDetail = [flightTimeLabel || nightLabel, metrics.legTripDayRangeShort].filter(Boolean).join(' · ');
 
   return `
-    <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === 0 ? 'true' : 'false'}">
+    <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === activeCityIndex ? 'true' : 'false'}">
       <span class="mobile-swipe-chip-eyebrow">${chipDateRangeHtml}</span>
       <span class="mobile-swipe-chip-title">${escapeHtmlText(displayLegLabel)}</span>
       <span class="mobile-swipe-chip-route">${escapeHtmlText(routeDetail)}</span>
@@ -1865,7 +1903,7 @@ function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap) {
   `;
 }
 
-function renderCompactActiveCityHeader(firstLeg) {
+function renderCompactActiveCityHeader(firstLeg, activeIndex = 0) {
   if (!firstLeg) return '';
 
   const daysCount = Array.isArray(firstLeg.days) ? firstLeg.days.length : 0;
@@ -1873,10 +1911,10 @@ function renderCompactActiveCityHeader(firstLeg) {
   const legCost = getLegTotalCost(firstLeg);
   const firstDay = firstLeg.days && firstLeg.days[0];
   const lastDay = firstLeg.days && firstLeg.days[daysCount - 1];
-  const metrics = getTripDayMetrics(firstLeg.id || 0);
+  const metrics = getTripDayMetrics(firstLeg.id || activeIndex);
 
   const legDateRangeHtml = renderCompactLegDateRangeHtml(firstDay, lastDay);
-  const displayLegLabel = getCompactLegDisplayLabel(firstLeg, 0, firstDay, lastDay, daysCount);
+  const displayLegLabel = getCompactLegDisplayLabel(firstLeg, activeIndex, firstDay, lastDay, daysCount);
 
   return `
     <div id="compactActiveCityHeader" class="active-city-sticky-header leg-header compact-leg-header" style="background:${escapeHtmlText(firstLeg.colour || '#0ea5e9')}; cursor:default;">
@@ -1892,11 +1930,15 @@ function renderCompactActiveCityHeader(firstLeg) {
 }
 
 function createCompactCitySwipeElement(mobileLegSequence, journeysByJourneyId) {
-  const slidesHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCitySlide(entry, legIndex, journeysByJourneyId));
-  const railHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCityChip(entry, legIndex, journeysByJourneyId));
+  const savedIndex = typeof getMobilePagerActiveIndex === 'function'
+    ? getMobilePagerActiveIndex('compact-city-swipe', 0)
+    : 0;
+  const activeCityIndex = Math.max(0, Math.min(Math.max(0, mobileLegSequence.length - 1), Number(savedIndex) || 0));
+  const slidesHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCitySlide(entry, legIndex, journeysByJourneyId, activeCityIndex));
+  const railHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCityChip(entry, legIndex, journeysByJourneyId, activeCityIndex));
 
-  const firstEntry = mobileLegSequence[0];
-  const activeStickyHeaderHtml = firstEntry ? renderCompactActiveCityHeader(firstEntry.leg) : '';
+  const activeEntry = mobileLegSequence[activeCityIndex] || mobileLegSequence[0];
+  const activeStickyHeaderHtml = activeEntry ? renderCompactActiveCityHeader(activeEntry.leg, activeCityIndex) : '';
 
   const pagerRoot = document.createElement('div');
   pagerRoot.className = 'compact-city-swipe-root';
@@ -2009,6 +2051,13 @@ function moveToAdjacentCityDayPager(currentPager, direction) {
   cityPager.dataset.activeIndex = String(nextCityIndex);
   if (typeof setMobilePagerActiveIndex === 'function') {
     setMobilePagerActiveIndex(cityPager.dataset.pagerKey || 'compact-city-swipe', nextCityIndex);
+  }
+
+  if (typeof cityPager.__mobileSwipeSetActive === 'function') {
+    cityPager.__mobileSwipeSetActive(nextCityIndex);
+  }
+  if (typeof cityPager.__syncCityByIndex === 'function') {
+    cityPager.__syncCityByIndex(nextCityIndex);
   }
 
   // Instantly synchronize active states for seamless transition
@@ -4383,6 +4432,10 @@ function setupCompactCityNavSync(root = document) {
 
   const syncByIndex = index => {
     const safe = Math.max(0, Math.min(slides.length - 1, Number(index) || 0));
+    pager.dataset.activeIndex = String(safe);
+    if (typeof setMobilePagerActiveIndex === 'function') {
+      setMobilePagerActiveIndex(pager.dataset.pagerKey || 'compact-city-swipe', safe);
+    }
     slides.forEach((s, idx) => {
       s.classList.toggle('is-active', idx === safe);
     });
@@ -4411,6 +4464,8 @@ function setupCompactCityNavSync(root = document) {
 
   let syncScrollFrame = 0;
   carousel.addEventListener('scroll', () => {
+    const hasHorizontalSlides = slides.some((s, i) => i > 0 && s.offsetLeft > slides[0].offsetLeft);
+    if (!hasHorizontalSlides) return;
     if (syncScrollFrame) cancelAnimationFrame(syncScrollFrame);
     syncScrollFrame = requestAnimationFrame(() => {
       const center = carousel.scrollLeft + carousel.clientWidth / 2;
@@ -4429,6 +4484,8 @@ function setupCompactCityNavSync(root = document) {
   }, { passive: true });
 
   const observer = new IntersectionObserver(entries => {
+    const hasHorizontalSlides = slides.some((s, i) => i > 0 && s.offsetLeft > slides[0].offsetLeft);
+    if (!hasHorizontalSlides) return;
     const visible = entries.filter(e => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
     if (!visible) return;
     const idx = Number(visible.target.dataset.slideIndex || 0);
@@ -4451,6 +4508,9 @@ function scrollToCompactCitySlide(cityId, cityName) {
   const slide = slides[slideIndex] || document.querySelector(`.compact-city-swipe-pager .compact-city-slide[data-slide-index="${slideIndex}"]`);
   if (!slide) return false;
 
+  if (typeof pager.__mobileSwipeSetActive === 'function') {
+    pager.__mobileSwipeSetActive(slideIndex);
+  }
   if (typeof pager.__syncCityByIndex === 'function') {
     pager.__syncCityByIndex(slideIndex);
   } else {
@@ -4470,13 +4530,16 @@ function scrollToCompactCitySlide(cityId, cityName) {
     }
   }
 
-  if (typeof scrollChildIntoHorizontalView === 'function') {
-    scrollChildIntoHorizontalView(carousel, slide, { behavior: 'smooth', align: 'start' });
-  } else if (carousel) {
-    carousel.scrollTo({
-      left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
-      behavior: 'smooth'
-    });
+  const hasHorizontalSlides = slides.some((s, i) => i > 0 && s.offsetLeft > slides[0].offsetLeft);
+  if (hasHorizontalSlides) {
+    if (typeof scrollChildIntoHorizontalView === 'function') {
+      scrollChildIntoHorizontalView(carousel, slide, { behavior: 'smooth', align: 'start' });
+    } else if (carousel) {
+      carousel.scrollTo({
+        left: Math.max(0, slide.offsetLeft - carousel.offsetLeft),
+        behavior: 'smooth'
+      });
+    }
   }
 
   pager.dataset.activeIndex = String(slideIndex);

@@ -192,7 +192,26 @@ function captureMobilePagerStates(root = document) {
     const slides = Array.from(pager.querySelectorAll('[data-role="mobile-swipe-slide"]'));
     if (!carousel || slides.length === 0) return;
 
-    let bestIndex = Number(pager.dataset.activeIndex || 0);
+    const activeClassIdx = slides.findIndex(s => s.classList.contains('is-active'));
+    const activeDataIdx = Number(pager.dataset.activeIndex);
+    const fallbackIdx = activeClassIdx >= 0
+      ? activeClassIdx
+      : (Number.isFinite(activeDataIdx) && pager.dataset.activeIndex !== undefined
+        ? activeDataIdx
+        : getMobilePagerActiveIndex(pagerKey, 0));
+
+    const isStackedCityPager = Boolean(pager.classList && pager.classList.contains('compact-city-swipe-pager'));
+    const hasHorizontalLayout = !isStackedCityPager && (
+      carousel.scrollLeft > 0 ||
+      slides.some((s, i) => i > 0 && s.offsetLeft > slides[0].offsetLeft)
+    );
+
+    if (!hasHorizontalLayout) {
+      setMobilePagerActiveIndex(pagerKey, Math.max(0, Math.min(slides.length - 1, fallbackIdx)));
+      return;
+    }
+
+    let bestIndex = fallbackIdx;
     let bestDistance = Number.POSITIVE_INFINITY;
     slides.forEach((slide, index) => {
       const distance = Math.abs((slide.offsetLeft - carousel.offsetLeft) - carousel.scrollLeft);
@@ -401,8 +420,18 @@ function setupMobileSwipePagers(root = document) {
     pager.__mobileSwipeScrollToIndex = scrollToIndex;
     pager.__mobileSwipeSetActive = setActive;
 
+    const isStackedCityPager = Boolean(pager.classList && pager.classList.contains('compact-city-swipe-pager'));
+
+    setActive(initialIndex, { isInitial: true });
+    const initialSlide = slides[initialIndex];
+    if (carousel && initialSlide && !isStackedCityPager) {
+      carousel.scrollLeft = Math.max(0, initialSlide.offsetLeft - carousel.offsetLeft);
+    }
+
     const syncFromScroll = () => {
       if (suppressObserver) return;
+      const hasHorizontalSlides = slides.some((s, i) => i > 0 && s.offsetLeft > slides[0].offsetLeft);
+      if (isStackedCityPager && !hasHorizontalSlides) return;
       if (scrollFrame) cancelAnimationFrame(scrollFrame);
       scrollFrame = requestAnimationFrame(() => {
         const center = carousel.scrollLeft + carousel.clientWidth / 2;
@@ -429,6 +458,8 @@ function setupMobileSwipePagers(root = document) {
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver(entries => {
         if (suppressObserver) return;
+        const hasHorizontalSlides = slides.some((s, i) => i > 0 && s.offsetLeft > slides[0].offsetLeft);
+        if (isStackedCityPager && !hasHorizontalSlides) return;
         const visibleEntry = entries
             .filter(entry => entry.isIntersecting)
             .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
@@ -444,12 +475,6 @@ function setupMobileSwipePagers(root = document) {
 
       slides.forEach(slide => observer.observe(slide));
       pager.__mobileSwipeObserver = observer;
-    }
-
-    setActive(initialIndex, { isInitial: true });
-    const initialSlide = slides[initialIndex];
-    if (carousel && initialSlide) {
-      carousel.scrollLeft = Math.max(0, initialSlide.offsetLeft - carousel.offsetLeft);
     }
   });
 }

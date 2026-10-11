@@ -187,6 +187,22 @@ function runTask6CrossTabMobileOptimizationTests() {
   );
 }
 
+function runTask7CheckboxCityPreservationTests() {
+  const utilsJs = loadSource(path.join('js', 'utils.js'));
+  const itineraryJs = loadSource(path.join('js', 'itinerary.js'));
+
+  assert(
+    utilsJs.includes('isStackedCityPager') &&
+      utilsJs.includes('hasHorizontalLayout'),
+    'Task 7: captureMobilePagerStates in js/utils.js should preserve the active city index for stacked .compact-city-swipe-pager slides instead of resetting to 0'
+  );
+  assert(
+    itineraryJs.includes('renderCompactCitySlide(entry, legIndex, journeysByJourneyId, activeCityIndex)') &&
+      itineraryJs.includes("getMobilePagerActiveIndex('compact-city-swipe', 0)"),
+    'Task 7: createCompactCitySwipeElement in js/itinerary.js should render the saved activeCityIndex slide and sticky header on rebuild'
+  );
+}
+
 function runAll() {
   runTask1ShellTests();
   runTask2VerticalTimelineTests();
@@ -194,12 +210,14 @@ function runAll() {
   runTask4MobileMapTests();
   runTask5VisualPolishTests();
   runTask6CrossTabMobileOptimizationTests();
+  runTask7CheckboxCityPreservationTests();
 }
 
 if (require.main === module) {
   runAll();
-  console.log('Task 1-6 mobile flow overhaul tests passed');
+  console.log('Task 1-7 mobile flow overhaul tests passed');
 }
 
 module.exports = { runMobileFlowOverhaulTests: runAll };
+
 
