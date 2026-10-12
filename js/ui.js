@@ -799,18 +799,11 @@ function switchTab(tabId, btnElement) {
 
     document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.app-tab-btn').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.mobile-quick-tab-btn').forEach(el => {
-      el.classList.toggle('active', el.getAttribute('data-mobile-quick-tab') === tabId);
-    });
     const pane = document.getElementById('tab-' + tabId);
     if (pane) pane.classList.add('active');
 
     const btn = btnElement || document.querySelector(`.app-tab-btn[data-tab="${tabId}"]`);
     if (btn) btn.classList.add('active');
-    if (tabId === 'budget' || tabId === 'packing') {
-      const moreBtn = document.querySelector('.mobile-tabs-menu-btn');
-      if (moreBtn) moreBtn.classList.add('active');
-    }
     closeMobileMenu();
   };
 

@@ -735,14 +735,8 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
       if (pwaModal) pwaModal.style.display = 'none';
     });
 
-    for (const tabId of ['transport', 'accom']) {
+    for (const tabId of ['transport', 'accom', 'budget', 'packing']) {
       await page.locator(`.app-tab-btn[data-tab="${tabId}"]`).click();
-      await humanPause(page, 250);
-    }
-    for (const secondaryTabId of ['budget', 'packing']) {
-      await page.evaluate(() => toggleMobileMenu());
-      await page.waitForFunction(() => document.body.classList.contains('mobile-menu-open'));
-      await page.locator(`.mobile-quick-tab-btn[data-mobile-quick-tab="${secondaryTabId}"]`).click();
       await humanPause(page, 250);
     }
 

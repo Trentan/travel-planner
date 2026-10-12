@@ -9,7 +9,8 @@
   }
 
   .mobile-menu-btn,
-  .mobile-tabs-menu-btn {
+  .mobile-tabs-menu-btn,
+  body:not(.mobile-app-mode) #tab-itinerary .open-map-action {
     display: none !important;
   }
 
@@ -96,20 +97,19 @@
 
   .app-tabs-list {
     display: grid !important;
-    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
     grid-auto-flow: row !important;
     grid-auto-columns: auto !important;
     width: 100% !important;
     height: 100% !important;
     align-items: stretch !important;
-    gap: 2px !important;
-    padding: 0 0.25rem !important;
+    gap: 1px !important;
+    padding: 0 0.15rem !important;
     margin: 0 !important;
     overflow: hidden !important;
   }
 
-  .app-tabs-nav .app-tab-btn[data-tab="budget"],
-  .app-tabs-nav .app-tab-btn[data-tab="packing"] {
+  .app-tabs-nav .app-tab-btn[data-tab="map"] {
     display: none !important;
   }
 
@@ -119,7 +119,7 @@
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 0.2rem 2px !important;
+    padding: 0.2rem 1px !important;
     min-width: 0 !important;
     width: 100% !important;
     height: 100% !important;
@@ -136,21 +136,21 @@
 
   .app-tab-btn .tab-icon,
   .mobile-tabs-menu-btn .tab-icon {
-    font-size: 1.2rem !important;
+    font-size: 1.15rem !important;
     line-height: 1.1 !important;
   }
 
   .app-tab-btn .tab-label,
   .mobile-tabs-menu-btn .tab-label {
-    font-size: 11px !important;
-    letter-spacing: -0.01em !important;
-    line-height: 1.15 !important;
+    font-size: 10px !important;
+    letter-spacing: -0.015em !important;
+    line-height: 1.1 !important;
     font-weight: 600 !important;
     max-width: 100% !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
-    margin-top: 2px !important;
+    margin-top: 1px !important;
     display: block !important;
   }
 

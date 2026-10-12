@@ -12,12 +12,14 @@ function runTask1ShellTests() {
     'Task 1: index.html viewport meta should include interactive-widget=resizes-content'
   );
   assert(
-    indexHtml.includes('mobile-menu-quick-tabs'),
-    'Task 1: #mobileMenuSheet should include .mobile-menu-quick-tabs for Budget and Packing quick access'
+    !indexHtml.includes('mobile-menu-quick-tabs') &&
+      indexHtml.includes('open-map-action'),
+    'Task 1: #mobileMenuSheet should remove .mobile-menu-quick-tabs and #tab-itinerary should include .open-map-action button next to Legs'
   );
   assert(
-    responsiveCss.includes('grid-template-columns: repeat(5, minmax(0, 1fr))'),
-    'Task 1: responsive-core.css should use a 5-column mobile bottom tab bar'
+    responsiveCss.includes('grid-template-columns: repeat(6, minmax(0, 1fr))') &&
+      responsiveCss.includes('.app-tabs-nav .app-tab-btn[data-tab="map"]'),
+    'Task 1: responsive-core.css should use a 6-column mobile bottom tab bar (Itinerary, Transit, Stays, Budget, Packing, Menu) and hide Map from bottom bar'
   );
   assert(
     componentsCss.includes('body.mobile-app-mode #cityNav') &&

@@ -979,6 +979,7 @@
   }
 
   #tab-itinerary #expandAll,
+  #tab-itinerary .open-map-action,
   #tab-itinerary .add-leg-action {
     @apply min-h-[2.4rem] h-[2.4rem] inline-flex items-center justify-center px-3.5 text-[0.84rem] font-semibold rounded-xl box-border;
   }
@@ -1937,18 +1938,17 @@
       min-width: 0;
       width: 100%;
       display: grid !important;
-      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+      grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
       grid-auto-flow: row !important;
       grid-auto-columns: auto !important;
       align-items: stretch !important;
-      gap: 2px !important;
-      padding: 0 0.25rem !important;
+      gap: 1px !important;
+      padding: 0 0.15rem !important;
       margin: 0 !important;
       overflow: hidden !important;
     }
 
-    body.mobile-app-mode .app-tabs-nav .app-tab-btn[data-tab="budget"],
-    body.mobile-app-mode .app-tabs-nav .app-tab-btn[data-tab="packing"] {
+    body.mobile-app-mode .app-tabs-nav .app-tab-btn[data-tab="map"] {
       display: none !important;
     }
 
@@ -2211,6 +2211,7 @@
       letter-spacing: -0.015em !important;
     }
 
+    body.mobile-app-mode.compact-view-mode #tab-itinerary .open-map-action,
     body.mobile-app-mode.compact-view-mode #tab-itinerary .add-leg-action {
       min-width: 0;
       white-space: nowrap;
@@ -2277,6 +2278,7 @@
       display: none !important;
     }
 
+    body.mobile-app-mode #tab-itinerary .open-map-action,
     body.mobile-app-mode #tab-itinerary .add-leg-action,
     body.mobile-app-mode #tab-itinerary .wake-lock-btn,
     body.mobile-app-mode #tab-itinerary #expandAll {
