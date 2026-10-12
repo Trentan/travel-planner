@@ -1710,7 +1710,39 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     box-shadow: none !important;
     border-radius: 0 !important;
     padding-inline: 0.45rem !important;
+    padding-block: 0.2rem !important;
     margin-inline: 0 !important;
+  }
+
+  body.mobile-app-mode #tab-packing .packing-progress-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0.3rem !important;
+  }
+
+  body.mobile-app-mode #tab-packing .packing-area-progress {
+    padding: 0.2rem 0.4rem !important;
+    min-height: 0 !important;
+    border-radius: 0.4rem !important;
+  }
+
+  body.mobile-app-mode #tab-packing .packing-area-progress-header {
+    line-height: 1.05 !important;
+    gap: 0.15rem !important;
+  }
+
+  body.mobile-app-mode #tab-packing .packing-area-progress-title {
+    font-size: 0.66rem !important;
+    line-height: 1.05 !important;
+  }
+
+  body.mobile-app-mode #tab-packing .packing-area-progress-info {
+    font-size: 0.6rem !important;
+    line-height: 1.05 !important;
+  }
+
+  body.mobile-app-mode #tab-packing .packing-area-progress-bar {
+    margin-top: 0.18rem !important;
+    height: 3px !important;
   }
 
   body.mobile-app-mode #tab-packing .packing-area-heading {

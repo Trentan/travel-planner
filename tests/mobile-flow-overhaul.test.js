@@ -184,8 +184,9 @@ function runTask6CrossTabMobileOptimizationTests() {
       mobileFeaturesCss.includes('.budget-mobile-row--even') &&
       mobileFeaturesCss.includes('.budget-mobile-row--odd') &&
       mobileFeaturesCss.includes('.transport-segment-card--odd') &&
-      mobileFeaturesCss.includes('#tab-packing .packing-card .packing-item:nth-of-type(even)'),
-    'Task 6: mobile-features.css should apply edge-to-edge full-width layout and alternating row shading across Transit, Stays, Budget, Packing, and Map tabs'
+      mobileFeaturesCss.includes('#tab-packing .packing-card .packing-item:nth-of-type(even)') &&
+      mobileFeaturesCss.includes('#tab-packing .packing-area-progress'),
+    'Task 6: mobile-features.css should apply edge-to-edge full-width layout, slim packing progress cards, and alternating row shading across Transit, Stays, Budget, Packing, and Map tabs'
   );
 }
 
