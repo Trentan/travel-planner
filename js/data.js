@@ -5358,7 +5358,7 @@ function normalizeTripLegsData(legs) {
     const lid = String(leg.id || '').toLowerCase();
     const lbl = String(leg.label || '').toLowerCase();
     const isExplicitStart = leg.type === 'start' || lid === 'departure' || lid.endsWith('-start') || lbl.includes('(trip start)') || (lbl.includes('start') && !lbl.includes('breakfast') && !lbl.includes('kickstart'));
-    const isExplicitReturn = leg.type === 'return' || lid === 'return' || lid.endsWith('-finish') || lbl.includes('(trip finish)') || lbl.includes('(trip end)') || (lbl.includes('return') && !lbl.includes('restaurant'));
+    const isExplicitReturn = leg.type === 'return' || lid === 'return' || lid.endsWith('-finish') || lid.endsWith('-end') || lbl.includes('(trip finish)') || lbl.includes('(trip end)') || (lbl.includes('return') && !lbl.includes('restaurant'));
 
     const days = leg.days || [];
     const isSameDay = days.length === 1 || (days.length > 0 && days[0].date && days[days.length - 1].date && days[0].date === days[days.length - 1].date);
@@ -5855,6 +5855,71 @@ function normalizeTripLegsData(legs) {
       if ((existing.endTime || '') === '' && activity.endTime) existing.endTime = activity.endTime;
     });
     leg.suggestedActivities = deduped;
+  });
+
+  // Self-healing pass: remove bogus auto-generated #808080 duplicate transit legs and clean up stale (1)/(2) label suffixes
+  const _extractBaseCity = (lbl) => {
+    if (!lbl) return '';
+    return String(lbl)
+      .replace(/[^\x00-\x7F]/g, '')
+      .replace(/\s*\(trip\s*(start|finish|end)\)/gi, '')
+      .replace(/\s*\((return|departure|transit)\)/gi, '')
+      .replace(/\s*return\s*home/gi, '')
+      .replace(/\s*\([^)]*\)/g, '')
+      .replace(/\s*\d+\s*$/, '')
+      .trim()
+      .toLowerCase();
+  };
+
+  const _isBogusAutoTransitLeg = (leg, idx) => {
+    if (!leg || typeof leg !== 'object') return false;
+    const lid = String(leg.id || '');
+    const col = String(leg.colour || '').toLowerCase();
+    if (!/^leg-\d+/.test(lid) || col !== '#808080') return false;
+    if (leg.type === 'start' || leg.type === 'return') return false;
+    if (Array.isArray(leg.cityFood) && leg.cityFood.length > 0) return false;
+    if (Array.isArray(leg.suggestedActivities) && leg.suggestedActivities.length > 0) return false;
+    const hasRealDayActivity = (leg.days || []).some(d =>
+      Array.isArray(d?.activityItems) && d.activityItems.some(it => {
+        const t = String(it?.text || it?.title || '').trim();
+        return t && !(/^[-—]$/.test(t) || t === 'Explore local area' || t === 'Add item...' || t === 'New item...');
+      })
+    );
+    if (hasRealDayActivity) return false;
+    const base = _extractBaseCity(leg.label);
+    if (!base) return false;
+    return legs.some((other, oIdx) => {
+      if (oIdx === idx || !other) return false;
+      const otherId = String(other.id || '');
+      const otherCol = String(other.colour || '').toLowerCase();
+      if (/^leg-\d+/.test(otherId) && otherCol === '#808080') return false;
+      return _extractBaseCity(other.label) === base;
+    });
+  };
+
+  for (let idx = legs.length - 1; idx >= 0; idx--) {
+    if (_isBogusAutoTransitLeg(legs[idx], idx)) {
+      legs.splice(idx, 1);
+    }
+  }
+
+  const _nonTerminalCityCounts = {};
+  legs.forEach(leg => {
+    if (!leg || !leg.label) return;
+    if (leg.type === 'start' || leg.type === 'return') {
+      leg.label = String(leg.label).replace(/\s*\(\d+\)\s*$/, '').trim();
+      return;
+    }
+    const base = _extractBaseCity(leg.label);
+    if (base) _nonTerminalCityCounts[base] = (_nonTerminalCityCounts[base] || 0) + 1;
+  });
+
+  legs.forEach(leg => {
+    if (!leg || !leg.label || leg.type === 'start' || leg.type === 'return') return;
+    const base = _extractBaseCity(leg.label);
+    if (base && (_nonTerminalCityCounts[base] || 0) <= 1 && /\s*\(\d+\)\s*$/.test(leg.label)) {
+      leg.label = String(leg.label).replace(/\s*\(\d+\)\s*$/, '').trim();
+    }
   });
 
   return legs;

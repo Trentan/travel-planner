@@ -1,11 +1,14 @@
 var DEFAULT_TRIP_DATA = {
   "meta": {
     "title": "🌏 New Trip Plan",
-    "subtitle": "Click here to add your trip subtitle/description"
+    "subtitle": "Click here to add your trip subtitle/description",
+    "homeCity": "Sydney"
   },
   "itinerary": [
     {
       "id": "city-sydney-start",
+      "type": "start",
+      "cityId": "city-sydney",
       "label": "Sydney (Trip Start)",
       "colour": "#34495e",
       "cityFood": [],
@@ -27,7 +30,7 @@ var DEFAULT_TRIP_DATA = {
           "startTime": "07:00",
           "endDate": "2026-06-01",
           "endTime": "08:00",
-          "cityId": "city-tokyo"
+          "cityId": "city-sydney"
         }
       ],
       "legTips": [
@@ -76,7 +79,7 @@ var DEFAULT_TRIP_DATA = {
               "startDate": "2026-06-01",
               "endDate": "2026-06-01",
               "activityId": "act-330tudrk3-mrsfaupr",
-              "cityId": "city-tokyo"
+              "cityId": "city-sydney"
             }
           ]
         }
@@ -84,6 +87,8 @@ var DEFAULT_TRIP_DATA = {
     },
     {
       "id": "city-tokyo",
+      "type": "city",
+      "cityId": "city-tokyo",
       "label": "🌸 Tokyo",
       "colour": "#e74c3c",
       "cityFood": [
@@ -691,7 +696,7 @@ var DEFAULT_TRIP_DATA = {
               "startDate": "2026-06-07",
               "endDate": "2026-06-07",
               "activityId": "act-s35mhrqzb-mrsfaupw",
-              "cityId": "city-london"
+              "cityId": "city-tokyo"
             }
           ]
         }
@@ -699,6 +704,8 @@ var DEFAULT_TRIP_DATA = {
     },
     {
       "id": "city-london",
+      "type": "city",
+      "cityId": "city-london",
       "label": "🏰 London",
       "colour": "#2980b9",
       "cityFood": [
@@ -1182,7 +1189,7 @@ var DEFAULT_TRIP_DATA = {
               "endDate": "2026-06-11",
               "location": "enjoy the Grand Terrace before boarding",
               "activityId": "act-n78h9dlu4-mrsfaupy",
-              "cityId": "city-paris"
+              "cityId": "city-london"
             }
           ]
         }
@@ -1190,6 +1197,8 @@ var DEFAULT_TRIP_DATA = {
     },
     {
       "id": "city-paris",
+      "type": "city",
+      "cityId": "city-paris",
       "label": "🥐 Paris",
       "colour": "#8e44ad",
       "cityFood": [
@@ -1627,7 +1636,7 @@ var DEFAULT_TRIP_DATA = {
               "startDate": "2026-06-14",
               "endDate": "2026-06-14",
               "activityId": "act-jgune9m91-mrsfauq0",
-              "cityId": "city-dubai"
+              "cityId": "city-paris"
             },
             {
               "text": "Transfer to Charles de Gaulle Airport",
@@ -1639,7 +1648,7 @@ var DEFAULT_TRIP_DATA = {
               "startDate": "2026-06-14",
               "endDate": "2026-06-14",
               "activityId": "act-55gu1kz5f-mrsfauq0",
-              "cityId": "city-dubai"
+              "cityId": "city-paris"
             }
           ]
         }
@@ -1647,6 +1656,8 @@ var DEFAULT_TRIP_DATA = {
     },
     {
       "id": "city-dubai",
+      "type": "city",
+      "cityId": "city-dubai",
       "label": "🐪 Dubai",
       "colour": "#f39c12",
       "cityFood": [],
@@ -1704,6 +1715,8 @@ var DEFAULT_TRIP_DATA = {
     },
     {
       "id": "city-sydney-end",
+      "type": "return",
+      "cityId": "city-sydney",
       "label": "🛬 Sydney (Return)",
       "colour": "#27ae60",
       "cityFood": [],
@@ -1720,10 +1733,10 @@ var DEFAULT_TRIP_DATA = {
           "bookingRef": "",
           "externalLink": "",
           "assignedDayIdx": 0,
-          "assignedDate": "2026-06-18",
-          "startDate": "2026-06-18",
+          "assignedDate": "2026-06-17",
+          "startDate": "2026-06-17",
           "startTime": "06:00",
-          "endDate": "2026-06-18",
+          "endDate": "2026-06-17",
           "endTime": "09:00",
           "cityId": "city-sydney"
         }

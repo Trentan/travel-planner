@@ -312,7 +312,7 @@ function getNextLegCity(legs, targetIdx, fallbackHome = 'Home') {
     if (typeof isTerminalLeg === 'function' && isTerminalLeg(nextLeg)) {
       const lid = String(nextLeg.id || '').toLowerCase();
       const lbl = String(nextLeg.label || '').toLowerCase();
-      if (nextLeg.type === 'return' || lid.endsWith('-finish') || lbl.includes('(trip finish)') || lbl.includes('(trip end)') || lid === 'return') {
+      if (nextLeg.type === 'return' || lid.endsWith('-finish') || lid.endsWith('-end') || lbl.includes('(trip finish)') || lbl.includes('(trip end)') || lbl.includes('(return)') || lid === 'return') {
         return homeCity;
       }
       continue;
@@ -1715,7 +1715,7 @@ function confirmAddLeg() {
     if (isTerminalLeg(target)) {
       const lid = String(target.id || '').toLowerCase();
       const lbl = String(target.label || '').toLowerCase();
-      legType = (target.type === 'return' || lid.endsWith('-finish') || lbl.includes('finish') || lbl.includes('return')) ? 'return' : 'start';
+      legType = (target.type === 'return' || lid.endsWith('-finish') || lid.endsWith('-end') || lbl.includes('finish') || lbl.includes('return') || lbl.includes('trip end')) ? 'return' : 'start';
     } else {
       legType = isSameDay ? 'transit' : 'city';
     }
@@ -2057,7 +2057,19 @@ function confirmSaveLegSequence() {
 
   const cascadeCheckbox = document.getElementById('legAutoCascadeCheckbox');
   if (cascadeCheckbox && cascadeCheckbox.checked && Array.isArray(legDialogState.stagedLegs) && legDialogState.stagedLegs.length > 0) {
-    cascadeStagedLegDates(0);
+    const orderChanged = !Array.isArray(appData) ||
+      appData.length !== legDialogState.stagedLegs.length ||
+      legDialogState.stagedLegs.some((l, idx) => !appData[idx] || String(l?.id || '') !== String(appData[idx]?.id || ''));
+    const hasInversion = legDialogState.stagedLegs.some((l, idx) => {
+      if (idx === 0) return false;
+      const prev = legDialogState.stagedLegs[idx - 1];
+      const prevEnd = prev?.days?.[prev.days.length - 1]?.date || '';
+      const curStart = l?.days?.[0]?.date || '';
+      return Boolean(prevEnd && curStart && prevEnd > curStart);
+    });
+    if (orderChanged || hasInversion) {
+      cascadeStagedLegDates(1);
+    }
   }
 
   applyStagedLegsAndSync();

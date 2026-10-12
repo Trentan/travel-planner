@@ -4296,7 +4296,8 @@ function getCitiesInTravelOrder() {
 
     (leg.days || []).forEach((day, dayIndex) => {
       const dayScore = getTimelineScore(day.date, '', legBaseScore + dayIndex * 10);
-      addCityOrderCandidate(orderMap, day.from, dayScore, 3, 1);
+      const fromScore = (legIndex === 0 && dayIndex === 0) ? dayScore - 1 : dayScore;
+      addCityOrderCandidate(orderMap, day.from, fromScore, 3, 1);
       addCityOrderCandidate(orderMap, day.to, dayScore + 1, 4, 1);
     });
   });
