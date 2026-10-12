@@ -1493,9 +1493,10 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   body.mobile-app-mode #cityNav .city-nav-add-btn {
-    position: sticky;
-    right: 0;
-    z-index: 5;
+    position: static !important;
+    right: auto !important;
+    flex-shrink: 0 !important;
+    margin-left: 0.15rem !important;
   }
 
   body.mobile-app-mode #cityNav .city-nav-pull-handle {

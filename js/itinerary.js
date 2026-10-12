@@ -4791,7 +4791,7 @@ function buildCityNav() {
 
   // Append + Add City button at the end of the navigation list for 1-tap mobile addition
   const addCityBtn = document.createElement('button');
-  addCityBtn.className = 'city-nav-btn city-nav-add-btn px-2.5 py-1 rounded-full border border-dashed border-teal-500/70 dark:border-teal-400/70 bg-teal-50/60 dark:bg-teal-950/40 text-xs font-semibold text-teal-700 dark:text-teal-300 whitespace-nowrap transition-colors hover:bg-teal-100 dark:hover:bg-teal-900/60 active:scale-95 flex items-center gap-1 shrink-0';
+  addCityBtn.className = 'city-nav-btn city-nav-add-btn px-2.5 py-1 rounded-full border border-dashed border-teal-500/80 dark:border-teal-400/80 bg-teal-50 dark:bg-teal-950 text-xs font-semibold text-teal-700 dark:text-teal-300 whitespace-nowrap transition-colors hover:bg-teal-100 dark:hover:bg-teal-900 active:scale-95 flex items-center gap-1 shrink-0';
   addCityBtn.setAttribute('title', 'Add a new city or destination');
   addCityBtn.onclick = () => {
     if (typeof openCityDialog === 'function') openCityDialog();
