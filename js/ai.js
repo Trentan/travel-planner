@@ -512,6 +512,7 @@ async function copyPrompt() {
   }
 }
 
+globalThis._getAiPromptSchema = _getAiPromptSchema;
 globalThis.buildAiPrompt = buildAiPrompt;
 globalThis.prefillAIDialogFields = prefillAIDialogFields;
 globalThis.generatePrompt = generatePrompt;
