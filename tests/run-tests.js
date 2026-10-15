@@ -59,6 +59,7 @@ const { runGetMapSearchUrlTests } = require('./get-map-search-url.test');
 const { runActivitySchedulerTests } = require('./activity-scheduler.test');
 const { runAddOrUpdateCityTests } = require('./add-or-update-city.test');
 const { runGetMobilePagerStateStoreTests } = require('./get-mobile-pager-state-store.test');
+const { runCalculateNightsBetweenTests } = require('./calculate-nights-between.test');
 const { runIsTerminalLegTests } = require('./is-terminal-leg.test');
 const { runDragdropTests } = require('./dragdrop.test');
 const { runTabsTests } = require('./tabs.test');
@@ -109,6 +110,7 @@ async function run() {
     if (typeof runIsTerminalLegTests === 'function') await runIsTerminalLegTests();
     if (typeof runEnforceTerminalLegsTests === 'function') await runEnforceTerminalLegsTests();
     if (typeof runGetMobilePagerStateStoreTests === 'function') await runGetMobilePagerStateStoreTests();
+    if (typeof runCalculateNightsBetweenTests === 'function') await runCalculateNightsBetweenTests();
     if (typeof runStripLeadingActivityEmojiTextTests === 'function') await runStripLeadingActivityEmojiTextTests();
     if (typeof runParseCurrencyAmountTests === 'function') await runParseCurrencyAmountTests();
     if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();

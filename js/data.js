@@ -6129,6 +6129,7 @@ function calculateNightsBetween(checkIn, checkOut) {
   const diffDays = Math.round((end - start) / (1000 * 60 * 60 * 24));
   return Math.max(0, diffDays);
 }
+window.calculateNightsBetween = calculateNightsBetween;
 
 function seedDefaultDerivedTravelData() {
   // Not needed anymore since default data provides journeys and stays natively.
