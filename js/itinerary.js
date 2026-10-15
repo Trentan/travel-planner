@@ -4078,48 +4078,78 @@ function getCityByName(cityName) {
   const target = normalize(rawStr);
   if (!target) return null;
 
-  // 1. Match by exact city id
-  const byId = citiesData.find(c => c && (c.id === rawStr || c.id === `city-${target.replace(/\s+/g, '-')}`));
-  if (byId) return byId;
-
-  // 2. Exact normalized name match
-  const exact = citiesData.find(c => c && normalize(c.name) === target);
-  if (exact) return exact;
-
-  // 3. IATA or airport code match (e.g. "DPS" or "Denpasar (DPS)")
+  const targetCityId = `city-${target.replace(/\s+/g, '-')}`;
   const codeInParens = (rawStr.match(/\(([A-Za-z]{3,4})\)/) || [])[1];
   const searchCode = (codeInParens || (target.length <= 4 ? target : '')).toLowerCase();
-  if (searchCode) {
-    const codeMatch = citiesData.find(c => c && (
-      (c.code && c.code.toLowerCase() === searchCode) ||
-      (c.airportCode && c.airportCode.toLowerCase() === searchCode)
-    ));
-    if (codeMatch) return codeMatch;
-  }
-
-  // 4. Substring matching for targets >= 3 chars
-  if (target.length >= 3) {
-    const substringMatch = citiesData.find(c => {
-      if (!c || !c.name) return false;
-      const cNorm = normalize(c.name);
-      return cNorm && (cNorm.includes(target) || target.includes(cNorm));
-    });
-    if (substringMatch) return substringMatch;
-  }
-
-  // 5. Token matching (significant word tokens >= 3 chars)
+  const targetHasMin3 = target.length >= 3;
   const tokens = target.split(/[\s,/-]+/).filter(t => t.length >= 3);
-  for (const token of tokens) {
-    const tokenMatch = citiesData.find(c => {
-      if (!c || !c.name) return false;
-      const cNorm = normalize(c.name);
+
+  let exactMatch = null;
+  let codeMatch = null;
+  let substringMatch = null;
+  let tokenMatch = null;
+  let bestTokenIndex = Number.MAX_SAFE_INTEGER;
+
+  for (let i = 0; i < citiesData.length; i++) {
+    const c = citiesData[i];
+    if (!c) continue;
+
+    // 1. Match by exact city id
+    if (c.id === rawStr || c.id === targetCityId) {
+      return c;
+    }
+
+    // If exact match already found, subsequent cities only need to be checked for ID match
+    if (exactMatch) continue;
+
+    const cName = c.name;
+    const cNorm = cName ? normalize(cName) : '';
+
+    // 2. Exact normalized name match
+    if (cNorm && cNorm === target) {
+      exactMatch = c;
+      continue;
+    }
+
+    // 3. IATA or airport code match
+    if (!codeMatch && searchCode) {
+      if ((c.code && c.code.toLowerCase() === searchCode) ||
+          (c.airportCode && c.airportCode.toLowerCase() === searchCode)) {
+        codeMatch = c;
+      }
+    }
+
+    // If code match already found, no need to check substring or token match
+    if (codeMatch) continue;
+
+    // 4. Substring matching for targets >= 3 chars
+    if (!substringMatch && targetHasMin3 && cNorm) {
+      if (cNorm.includes(target) || target.includes(cNorm)) {
+        substringMatch = c;
+      }
+    }
+
+    // If substring match already found, no need to check token match
+    if (substringMatch) continue;
+
+    // 5. Token matching
+    if (tokens.length > 0 && cNorm && bestTokenIndex > 0) {
       const cTokens = cNorm.split(/[\s,/-]+/).filter(ct => ct.length >= 3);
-      return cTokens.some(ct => ct === token || ct.startsWith(token) || token.startsWith(ct));
-    });
-    if (tokenMatch) return tokenMatch;
+      if (cTokens.length > 0) {
+        for (let j = 0; j < tokens.length; j++) {
+          if (j >= bestTokenIndex) break;
+          const token = tokens[j];
+          if (cTokens.some(ct => ct === token || ct.startsWith(token) || token.startsWith(ct))) {
+            tokenMatch = c;
+            bestTokenIndex = j;
+            break;
+          }
+        }
+      }
+    }
   }
 
-  return null;
+  return exactMatch || codeMatch || substringMatch || tokenMatch || null;
 }
 
 function getCityNameForNavId(cityId) {
