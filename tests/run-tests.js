@@ -57,6 +57,7 @@ const { runBudgetTabTests } = require('./budget-tab.test');
 const { runGetDayTotalTests } = require('./get-day-total.test');
 const { runGetMapSearchUrlTests } = require('./get-map-search-url.test');
 const { runActivitySchedulerTests } = require('./activity-scheduler.test');
+const { runParse24HourTo12HourPartsTests } = require('./parse-24-hour-to-12-hour-parts.test');
 const { runAddOrUpdateCityTests } = require('./add-or-update-city.test');
 const { runGetMobilePagerStateStoreTests } = require('./get-mobile-pager-state-store.test');
 const { runIsTerminalLegTests } = require('./is-terminal-leg.test');
@@ -115,6 +116,7 @@ async function run() {
     if (typeof runGetDayTotalTests === 'function') await runGetDayTotalTests();
     if (typeof runGetMapSearchUrlTests === 'function') await runGetMapSearchUrlTests();
     if (typeof runActivitySchedulerTests === 'function') runActivitySchedulerTests();
+    if (typeof runParse24HourTo12HourPartsTests === 'function') await runParse24HourTo12HourPartsTests();
     if (typeof runBackupTests === 'function') await runBackupTests();
     if (typeof runAddOrUpdateCityTests === 'function') await runAddOrUpdateCityTests();
     if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
