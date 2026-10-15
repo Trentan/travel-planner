@@ -19,6 +19,7 @@ const { runCityLiveSearchXssTests } = require('./city-live-search-xss.test');
 const { runCityListXssTests } = require('./city-list-xss.test');
 const { runLegDialogCountryXssTests } = require('./leg-dialog-country-xss.test');
 const { runTransportModalXssTests } = require('./transport-modal-xss.test');
+const { runActivityModalXssTests } = require('./activity-modal-xss.test');
 const { runLegReorderXssTests } = require('./leg-reorder-xss.test');
 const { runStaysCitySelectTests } = require('./stays-city-select.test');
 const { run: runAutoStaysSuite } = require('./auto-stays-suite');
@@ -94,6 +95,7 @@ async function run() {
     if (typeof runCityListXssTests === 'function') await runCityListXssTests();
     if (typeof runLegDialogCountryXssTests === 'function') await runLegDialogCountryXssTests();
     if (typeof runTransportModalXssTests === 'function') await runTransportModalXssTests();
+    if (typeof runActivityModalXssTests === 'function') await runActivityModalXssTests();
     if (typeof runLegReorderXssTests === 'function') await runLegReorderXssTests();
     if (typeof runStaysCitySelectTests === 'function') await runStaysCitySelectTests();
     if (typeof runStorageEngineSuite === 'function') await runStorageEngineSuite();
