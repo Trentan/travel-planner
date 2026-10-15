@@ -67,6 +67,7 @@ const { runEnforceTerminalLegsTests } = require('./enforce-terminal-legs.test');
 const { runBackupTests } = require('./backup.test');
 const { runPackingTests } = require('./packing.test');
 const { runBuildExportDailyTimelineItemsTests } = require('./build-export-daily-timeline-items.test');
+const { runStripCityLabelTests } = require('./strip-city-label.test');
 const { runMobileFlowOverhaulTests } = require('./mobile-flow-overhaul.test');
 
 async function run() {
@@ -106,6 +107,7 @@ async function run() {
     if (typeof runGetActivityEmojiTests === 'function') await runGetActivityEmojiTests();
     if (typeof runNormalizeItemStatusTests === 'function') await runNormalizeItemStatusTests();
     if (typeof runGetLegBaseCityNameTests === 'function') await runGetLegBaseCityNameTests();
+    if (typeof runStripCityLabelTests === 'function') await runStripCityLabelTests();
     if (typeof runIsTerminalLegTests === 'function') await runIsTerminalLegTests();
     if (typeof runEnforceTerminalLegsTests === 'function') await runEnforceTerminalLegsTests();
     if (typeof runGetMobilePagerStateStoreTests === 'function') await runGetMobilePagerStateStoreTests();

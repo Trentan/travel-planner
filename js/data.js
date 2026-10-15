@@ -6120,6 +6120,7 @@ function stripCityLabel(cityName) {
     .replace(/[^\w\s-]/gu, '')
     .trim();
 }
+if (typeof window !== 'undefined') window.stripCityLabel = stripCityLabel;
 
 function calculateNightsBetween(checkIn, checkOut) {
   if (!checkIn || !checkOut) return 0;
