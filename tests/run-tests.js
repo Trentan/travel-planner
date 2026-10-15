@@ -58,6 +58,7 @@ const { runGetDayTotalTests } = require('./get-day-total.test');
 const { runGetMapSearchUrlTests } = require('./get-map-search-url.test');
 const { runActivitySchedulerTests } = require('./activity-scheduler.test');
 const { runAddOrUpdateCityTests } = require('./add-or-update-city.test');
+const { runAddDaysToIsoDateTests } = require('./add-days-to-iso-date.test');
 const { runGetMobilePagerStateStoreTests } = require('./get-mobile-pager-state-store.test');
 const { runIsTerminalLegTests } = require('./is-terminal-leg.test');
 const { runDragdropTests } = require('./dragdrop.test');
@@ -117,6 +118,7 @@ async function run() {
     if (typeof runActivitySchedulerTests === 'function') runActivitySchedulerTests();
     if (typeof runBackupTests === 'function') await runBackupTests();
     if (typeof runAddOrUpdateCityTests === 'function') await runAddOrUpdateCityTests();
+    if (typeof runAddDaysToIsoDateTests === 'function') await runAddDaysToIsoDateTests();
     if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
     if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
