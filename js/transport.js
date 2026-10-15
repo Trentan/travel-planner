@@ -2148,27 +2148,60 @@ function _updateSegmentList() {
 
   // Build the Summary Lines at the bottom
   if (summaryContainer) {
+    summaryContainer.textContent = '';
     if (_pendingSegments.length === 0) {
-      summaryContainer.innerHTML = '';
       return;
     }
 
-    summaryContainer.innerHTML = _pendingSegments.map((s, i) => {
+    _pendingSegments.forEach((s, i) => {
       const isCurrent = _activeSegmentIndex === i;
       const depString = `${formatJourneyDate(s.departureDate)} ${s.departureTime || ''}`.trim();
       const arrString = `${formatJourneyDate(s.arrivalDate)} ${s.arrivalTime || ''}`.trim();
       const providerStr = `${s.provider || ''} ${s.routeCode || ''}`.trim();
 
-      return `
-      <div class="pending-segment-summary ${isCurrent ? 'is-current' : ''}">
-        <span>✓ Segment ${i + 1}: ${escapeHtmlText(s.fromLocation || '')} ➔ ${escapeHtmlText(s.toLocation || '')}</span>
-        <span class="pending-segment-separator">&bull;</span>
-        <span>${escapeHtmlText(depString)} ➔ ${escapeHtmlText(arrString)}</span>
-        ${providerStr ? `<span class="pending-segment-separator">&bull;</span><span>${escapeHtmlText(providerStr)}</span>` : ''}
-        <button onclick="editPendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-edit" title="Edit leg">✎</button>
-        <button onclick="removePendingSegment(${i})" class="pending-segment-icon-btn pending-segment-icon-btn-remove" title="Remove leg">&times;</button>
-      </div>`;
-    }).join('');
+      const itemDiv = document.createElement('div');
+      itemDiv.className = `pending-segment-summary ${isCurrent ? 'is-current' : ''}`;
+
+      const spanRoute = document.createElement('span');
+      spanRoute.appendChild(document.createTextNode(`✓ Segment ${i + 1}: ${s.fromLocation || ''} ➔ ${s.toLocation || ''}`));
+      itemDiv.appendChild(spanRoute);
+
+      const sep1 = document.createElement('span');
+      sep1.className = 'pending-segment-separator';
+      sep1.appendChild(document.createTextNode('•'));
+      itemDiv.appendChild(sep1);
+
+      const spanTimes = document.createElement('span');
+      spanTimes.appendChild(document.createTextNode(`${depString} ➔ ${arrString}`));
+      itemDiv.appendChild(spanTimes);
+
+      if (providerStr) {
+        const sep2 = document.createElement('span');
+        sep2.className = 'pending-segment-separator';
+        sep2.appendChild(document.createTextNode('•'));
+        itemDiv.appendChild(sep2);
+
+        const spanProvider = document.createElement('span');
+        spanProvider.appendChild(document.createTextNode(providerStr));
+        itemDiv.appendChild(spanProvider);
+      }
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'pending-segment-icon-btn pending-segment-icon-btn-edit';
+      editBtn.title = 'Edit leg';
+      editBtn.appendChild(document.createTextNode('✎'));
+      editBtn.onclick = function() { editPendingSegment(i); };
+      itemDiv.appendChild(editBtn);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'pending-segment-icon-btn pending-segment-icon-btn-remove';
+      removeBtn.title = 'Remove leg';
+      removeBtn.appendChild(document.createTextNode('×'));
+      removeBtn.onclick = function() { removePendingSegment(i); };
+      itemDiv.appendChild(removeBtn);
+
+      summaryContainer.appendChild(itemDiv);
+    });
   }
 }
 
