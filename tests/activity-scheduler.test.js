@@ -11,10 +11,12 @@ function runActivitySchedulerTests() {
   const getComparisonString = context.getComparisonString;
   const getSuggestedActivityDayText = context.getSuggestedActivityDayText;
   const getSuggestedActivityMatchTexts = context.getSuggestedActivityMatchTexts;
+  const timeValueToMinutes = context.timeValueToMinutes;
 
   assert(typeof getComparisonString === 'function', 'getComparisonString should be exported as a function');
   assert(typeof getSuggestedActivityDayText === 'function', 'getSuggestedActivityDayText should be exported as a function');
   assert(typeof getSuggestedActivityMatchTexts === 'function', 'getSuggestedActivityMatchTexts should be exported as a function');
+  assert(typeof timeValueToMinutes === 'function', 'timeValueToMinutes should be exported as a function');
 
   // ==========================================
   // 1. getComparisonString - Basic normalization
@@ -83,6 +85,59 @@ function runActivitySchedulerTests() {
     JSON.stringify(getSuggestedActivityMatchTexts({ title: '   ' })) === JSON.stringify([]),
     'Whitespace title activity should return empty array'
   );
+
+  // ==========================================
+  // 7. timeValueToMinutes - Valid 24-hour time strings
+  // ==========================================
+  assert(timeValueToMinutes('00:00') === 0, '00:00 should return 0 minutes');
+  assert(timeValueToMinutes('00:01') === 1, '00:01 should return 1 minute');
+  assert(timeValueToMinutes('09:30') === 570, '09:30 should return 570 minutes');
+  assert(timeValueToMinutes('12:00') === 720, '12:00 should return 720 minutes');
+  assert(timeValueToMinutes('14:15') === 855, '14:15 should return 855 minutes');
+  assert(timeValueToMinutes('23:59') === 1439, '23:59 should return 1439 minutes');
+
+  // ==========================================
+  // 8. timeValueToMinutes - Single digit hours & whitespace
+  // ==========================================
+  assert(timeValueToMinutes('0:00') === 0, '0:00 should return 0 minutes');
+  assert(timeValueToMinutes('9:05') === 545, '9:05 should return 545 minutes');
+  assert(timeValueToMinutes('1:30') === 90, '1:30 should return 90 minutes');
+  assert(timeValueToMinutes('  14:15  ') === 855, 'Should trim surrounding whitespace');
+  assert(timeValueToMinutes('\t08:00\n') === 480, 'Should trim tabs and newlines');
+
+  // ==========================================
+  // 9. timeValueToMinutes - Out of bounds hours or minutes
+  // ==========================================
+  assert(timeValueToMinutes('24:00') === null, '24:00 should return null (hours > 23)');
+  assert(timeValueToMinutes('25:30') === null, '25:30 should return null (hours > 23)');
+  assert(timeValueToMinutes('99:00') === null, '99:00 should return null (hours > 23)');
+  assert(timeValueToMinutes('12:60') === null, '12:60 should return null (minutes > 59)');
+  assert(timeValueToMinutes('09:99') === null, '09:99 should return null (minutes > 59)');
+
+  // ==========================================
+  // 10. timeValueToMinutes - Invalid time string formats
+  // ==========================================
+  assert(timeValueToMinutes('12') === null, '12 without minutes should return null');
+  assert(timeValueToMinutes('12:3') === null, '12:3 single digit minute should return null');
+  assert(timeValueToMinutes('12:345') === null, '12:345 three digit minute should return null');
+  assert(timeValueToMinutes('abc') === null, 'Non-time string should return null');
+  assert(timeValueToMinutes('12:3a') === null, 'Alphanumeric minute should return null');
+  assert(timeValueToMinutes('12.34') === null, 'Period delimiter should return null');
+  assert(timeValueToMinutes('12-34') === null, 'Hyphen delimiter should return null');
+  assert(timeValueToMinutes('9:00 AM') === null, '12-hour AM/PM format should return null');
+  assert(timeValueToMinutes('12:30 PM') === null, '12-hour AM/PM format should return null');
+
+  // ==========================================
+  // 11. timeValueToMinutes - Non-string / falsy / edge case inputs
+  // ==========================================
+  assert(timeValueToMinutes(null) === null, 'null input should return null');
+  assert(timeValueToMinutes(undefined) === null, 'undefined input should return null');
+  assert(timeValueToMinutes('') === null, 'Empty string should return null');
+  assert(timeValueToMinutes('   ') === null, 'Whitespace-only string should return null');
+  assert(timeValueToMinutes(false) === null, 'false input should return null');
+  assert(timeValueToMinutes(0) === null, 'numeric 0 should return null');
+  assert(timeValueToMinutes(NaN) === null, 'NaN should return null');
+  assert(timeValueToMinutes({ toString: () => '10:15' }) === 615, 'Object with toString returning time string should work');
 
   console.log('✅ ALL activity-scheduler UNIT TESTS PASSED CLEANLY!');
 }
