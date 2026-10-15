@@ -56,6 +56,7 @@ const { runRebuildAndAirportCodesTests } = require('./rebuild-itinerary-airport-
 const { runBudgetTabTests } = require('./budget-tab.test');
 const { runGetDayTotalTests } = require('./get-day-total.test');
 const { runGetMapSearchUrlTests } = require('./get-map-search-url.test');
+const { runGet24HourTimeFrom12HourPartsTests } = require('./get24hour-time.test');
 const { runActivitySchedulerTests } = require('./activity-scheduler.test');
 const { runAddOrUpdateCityTests } = require('./add-or-update-city.test');
 const { runGetMobilePagerStateStoreTests } = require('./get-mobile-pager-state-store.test');
@@ -114,6 +115,7 @@ async function run() {
     if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
     if (typeof runGetDayTotalTests === 'function') await runGetDayTotalTests();
     if (typeof runGetMapSearchUrlTests === 'function') await runGetMapSearchUrlTests();
+    if (typeof runGet24HourTimeFrom12HourPartsTests === 'function') await runGet24HourTimeFrom12HourPartsTests();
     if (typeof runActivitySchedulerTests === 'function') runActivitySchedulerTests();
     if (typeof runBackupTests === 'function') await runBackupTests();
     if (typeof runAddOrUpdateCityTests === 'function') await runAddOrUpdateCityTests();
