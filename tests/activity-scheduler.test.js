@@ -11,10 +11,12 @@ function runActivitySchedulerTests() {
   const getComparisonString = context.getComparisonString;
   const getSuggestedActivityDayText = context.getSuggestedActivityDayText;
   const getSuggestedActivityMatchTexts = context.getSuggestedActivityMatchTexts;
+  const minutesToTimeValue = context.minutesToTimeValue;
 
   assert(typeof getComparisonString === 'function', 'getComparisonString should be exported as a function');
   assert(typeof getSuggestedActivityDayText === 'function', 'getSuggestedActivityDayText should be exported as a function');
   assert(typeof getSuggestedActivityMatchTexts === 'function', 'getSuggestedActivityMatchTexts should be exported as a function');
+  assert(typeof minutesToTimeValue === 'function', 'minutesToTimeValue should be exported as a function');
 
   // ==========================================
   // 1. getComparisonString - Basic normalization
@@ -83,6 +85,38 @@ function runActivitySchedulerTests() {
     JSON.stringify(getSuggestedActivityMatchTexts({ title: '   ' })) === JSON.stringify([]),
     'Whitespace title activity should return empty array'
   );
+
+  // ==========================================
+  // 7. minutesToTimeValue tests
+  // ==========================================
+  // Happy path
+  assert(minutesToTimeValue(0) === '00:00', '0 minutes should return 00:00');
+  assert(minutesToTimeValue(30) === '00:30', '30 minutes should return 00:30');
+  assert(minutesToTimeValue(540) === '09:00', '540 minutes should return 09:00');
+  assert(minutesToTimeValue(815) === '13:35', '815 minutes should return 13:35');
+  assert(minutesToTimeValue(1439) === '23:59', '1439 minutes should return 23:59');
+
+  // String numeric inputs
+  assert(minutesToTimeValue('0') === '00:00', 'Numeric string "0" should return 00:00');
+  assert(minutesToTimeValue('540') === '09:00', 'Numeric string "540" should return 09:00');
+  assert(minutesToTimeValue('  815  ') === '13:35', 'Padded numeric string "  815  " should return 13:35');
+
+  // Decimal rounding
+  assert(minutesToTimeValue(540.4) === '09:00', '540.4 minutes should round down to 09:00');
+  assert(minutesToTimeValue(539.6) === '09:00', '539.6 minutes should round up to 09:00');
+
+  // Boundary clamping
+  assert(minutesToTimeValue(-10) === '00:00', 'Negative minutes should clamp to 00:00');
+  assert(minutesToTimeValue(1440) === '23:59', '1440 minutes (24 hours) should clamp to 23:59');
+  assert(minutesToTimeValue(2000) === '23:59', 'Minutes exceeding 24h should clamp to 23:59');
+
+  // Invalid or non-finite inputs
+  assert(minutesToTimeValue(null) === '00:00', 'null converts to number 0 and returns 00:00');
+  assert(minutesToTimeValue(undefined) === '', 'undefined should return empty string');
+  assert(minutesToTimeValue(NaN) === '', 'NaN should return empty string');
+  assert(minutesToTimeValue(Infinity) === '', 'Infinity should return empty string');
+  assert(minutesToTimeValue(-Infinity) === '', '-Infinity should return empty string');
+  assert(minutesToTimeValue('invalid') === '', 'Non-numeric string should return empty string');
 
   console.log('✅ ALL activity-scheduler UNIT TESTS PASSED CLEANLY!');
 }
