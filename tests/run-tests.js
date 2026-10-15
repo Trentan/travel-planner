@@ -66,6 +66,7 @@ const { runMergeChecklistWithDefaultsTests } = require('./merge-checklist-with-d
 const { runEnforceTerminalLegsTests } = require('./enforce-terminal-legs.test');
 const { runBackupTests } = require('./backup.test');
 const { runPackingTests } = require('./packing.test');
+const { runParse24HourTo12HourPartsTests } = require('./parse-24hour-to-12hour-parts.test');
 const { runBuildExportDailyTimelineItemsTests } = require('./build-export-daily-timeline-items.test');
 const { runMobileFlowOverhaulTests } = require('./mobile-flow-overhaul.test');
 
@@ -116,6 +117,7 @@ async function run() {
     if (typeof runGetMapSearchUrlTests === 'function') await runGetMapSearchUrlTests();
     if (typeof runActivitySchedulerTests === 'function') runActivitySchedulerTests();
     if (typeof runBackupTests === 'function') await runBackupTests();
+    if (typeof runParse24HourTo12HourPartsTests === 'function') await runParse24HourTo12HourPartsTests();
     if (typeof runAddOrUpdateCityTests === 'function') await runAddOrUpdateCityTests();
     if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
