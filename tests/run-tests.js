@@ -62,6 +62,7 @@ const { runGetMobilePagerStateStoreTests } = require('./get-mobile-pager-state-s
 const { runIsTerminalLegTests } = require('./is-terminal-leg.test');
 const { runDragdropTests } = require('./dragdrop.test');
 const { runTabsTests } = require('./tabs.test');
+const { runNormalizeChecklistTextTests } = require('./normalize-checklist-text.test');
 const { runMergeChecklistWithDefaultsTests } = require('./merge-checklist-with-defaults.test');
 const { runEnforceTerminalLegsTests } = require('./enforce-terminal-legs.test');
 const { runBackupTests } = require('./backup.test');
@@ -117,6 +118,7 @@ async function run() {
     if (typeof runActivitySchedulerTests === 'function') runActivitySchedulerTests();
     if (typeof runBackupTests === 'function') await runBackupTests();
     if (typeof runAddOrUpdateCityTests === 'function') await runAddOrUpdateCityTests();
+    if (typeof runNormalizeChecklistTextTests === 'function') await runNormalizeChecklistTextTests();
     if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
     if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
