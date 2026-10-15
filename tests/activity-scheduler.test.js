@@ -11,10 +11,12 @@ function runActivitySchedulerTests() {
   const getComparisonString = context.getComparisonString;
   const getSuggestedActivityDayText = context.getSuggestedActivityDayText;
   const getSuggestedActivityMatchTexts = context.getSuggestedActivityMatchTexts;
+  const activityLooksLikeMeal = context.activityLooksLikeMeal;
 
   assert(typeof getComparisonString === 'function', 'getComparisonString should be exported as a function');
   assert(typeof getSuggestedActivityDayText === 'function', 'getSuggestedActivityDayText should be exported as a function');
   assert(typeof getSuggestedActivityMatchTexts === 'function', 'getSuggestedActivityMatchTexts should be exported as a function');
+  assert(typeof activityLooksLikeMeal === 'function', 'activityLooksLikeMeal should be exported as a function');
 
   // ==========================================
   // 1. getComparisonString - Basic normalization
@@ -83,6 +85,34 @@ function runActivitySchedulerTests() {
     JSON.stringify(getSuggestedActivityMatchTexts({ title: '   ' })) === JSON.stringify([]),
     'Whitespace title activity should return empty array'
   );
+
+  // ==========================================
+  // 7. activityLooksLikeMeal tests
+  // ==========================================
+  const breakfastPattern = /\b(breakfast|coffee|cafe|bakery|brunch)\b/;
+  const lunchPattern = /\b(lunch|restaurant|food|market)\b/;
+  const dinnerPattern = /\b(dinner|supper|bar|drinks|night)\b/;
+
+  // Title matching
+  assert(activityLooksLikeMeal({ title: 'Morning Coffee' }, breakfastPattern) === true, 'Should match breakfast pattern on title');
+  assert(activityLooksLikeMeal({ title: 'DINNER AT BISTRO' }, dinnerPattern) === true, 'Should match dinner pattern on uppercase title');
+
+  // Text fallback matching when title is absent or empty
+  assert(activityLooksLikeMeal({ text: 'Quick Lunch' }, lunchPattern) === true, 'Should match lunch pattern on text fallback');
+  assert(activityLooksLikeMeal({ title: '', text: 'Croissant at Bakery' }, breakfastPattern) === true, 'Should fall back to text when title is empty');
+
+  // Category matching
+  assert(activityLooksLikeMeal({ title: 'Chez Paul', category: 'Restaurant' }, lunchPattern) === true, 'Should match meal pattern on category');
+  assert(activityLooksLikeMeal({ text: 'Nightcap', category: 'Bar' }, dinnerPattern) === true, 'Should match meal pattern on category with text');
+
+  // Non-matching activity
+  assert(activityLooksLikeMeal({ title: 'Louvre Museum Visit', category: 'Sightseeing' }, lunchPattern) === false, 'Should return false for non-meal activity');
+  assert(activityLooksLikeMeal({ title: 'Park Walk' }, breakfastPattern) === false, 'Should return false when title/category does not match pattern');
+
+  // Null, undefined, empty object inputs
+  assert(activityLooksLikeMeal(null, lunchPattern) === false, 'null activity should return false');
+  assert(activityLooksLikeMeal(undefined, dinnerPattern) === false, 'undefined activity should return false');
+  assert(activityLooksLikeMeal({}, breakfastPattern) === false, 'empty activity object should return false');
 
   console.log('✅ ALL activity-scheduler UNIT TESTS PASSED CLEANLY!');
 }
