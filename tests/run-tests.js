@@ -41,6 +41,7 @@ const { run: runFormatCompactJourneyDurationSuite } = require('./format-compact-
 const { runFormatJourneySubLocationTests } = require('./format-journey-sub-location.test');
 const { run: runTransportDurationSuite } = require('./transport-duration.test');
 const { run: runTransitConnectorsSuite } = require('./transit-connectors-layover.test');
+const { runCalculateLayoverBufferTests } = require('./calculate-layover-buffer.test');
 const { runLegManagementWysiwygSuite } = require('./leg-management-wysiwyg.test');
 const { runGoogleAuthRenewalTests } = require('./google-auth-renewal.test');
 const { runDualPathWizardSuite } = require('./dual-path-wizard.test');
@@ -126,6 +127,7 @@ async function run() {
     if (typeof runCityDisambiguationTests === 'function') await runCityDisambiguationTests();
     if (typeof runTransportDurationSuite === 'function') await runTransportDurationSuite();
     if (typeof runTransitConnectorsSuite === 'function') await runTransitConnectorsSuite();
+    if (typeof runCalculateLayoverBufferTests === 'function') await runCalculateLayoverBufferTests();
     if (typeof runLegManagementWysiwygSuite === 'function') await runLegManagementWysiwygSuite();
     await runCoreSmoke();
     await runPwaShortcutsOfflineTests();
