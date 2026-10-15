@@ -29,6 +29,7 @@ const { runCityFuzzyMatchingSuite } = require('./city-fuzzy-matching.test');
 const { runCityDisambiguationTests } = require('./city-disambiguation.test');
 const { runFormatHumanFilenameTests } = require('./format-human-filename.test');
 const { runEscapeHtmlTextTests } = require('./escape-html-text.test');
+const { runBookingIntakeEscapeTests } = require('./booking-intake-escape.test');
 const { runIsSafeUrlTests } = require('./is-safe-url.test');
 const { runGetActivityEmojiTests } = require('./get-activity-emoji.test');
 const { runNormalizeItemStatusTests } = require('./normalize-item-status.test');
@@ -102,6 +103,7 @@ async function run() {
     if (typeof runDualPathWizardSuite === 'function') await runDualPathWizardSuite();
     if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();
     if (typeof runEscapeHtmlTextTests === 'function') await runEscapeHtmlTextTests();
+    if (typeof runBookingIntakeEscapeTests === 'function') await runBookingIntakeEscapeTests();
     if (typeof runIsSafeUrlTests === 'function') await runIsSafeUrlTests();
     if (typeof runGetActivityEmojiTests === 'function') await runGetActivityEmojiTests();
     if (typeof runNormalizeItemStatusTests === 'function') await runNormalizeItemStatusTests();
