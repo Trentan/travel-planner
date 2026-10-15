@@ -8618,20 +8618,10 @@ async function createTripFromFlightBookings() {
     });
   }
 
-  // Look up cities in ALL_CITIES / CITY_DATABASE
-  const cityByName = new Map();
-  if (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) {
-    for (let i = 0; i < ALL_CITIES.length; i++) {
-      const c = ALL_CITIES[i];
-      if (!c || !c.name) continue;
-      const lower = c.name.toLowerCase();
-      if (!cityByName.has(lower)) cityByName.set(lower, c);
-    }
-  }
-
   citiesData = destinationStops.map((stop, index) => {
     const cityNameLower = stop.city.toLowerCase();
-    const dbMatch = cityByName.get(cityNameLower) || (typeof findFuzzyCityCandidate === 'function' ? findFuzzyCityCandidate(cityNameLower)?.candidate : null) || null;
+    const matches = typeof ALL_CITIES_BY_NAME_MAP !== 'undefined' ? ALL_CITIES_BY_NAME_MAP.get(cityNameLower) : null;
+    const dbMatch = (matches && matches.length > 0 ? matches[0] : null) || (typeof findFuzzyCityCandidate === 'function' ? findFuzzyCityCandidate(cityNameLower)?.candidate : null) || null;
     const countryCode = dbMatch?.countryCode || 'ZZ';
     const cityId = `city-${Date.now()}-${index}`;
     const city = {
