@@ -8,8 +8,13 @@
 (function() {
   'use strict';
 
-  const PROD_CLIENT_ID = '253620621116-u76e3v3e2qv6ffq9b58re4l4bbqs1e3g.apps.googleusercontent.com';
-  const LOCAL_CLIENT_ID = '253620621116-cq4mtef5e2nvt0kc7pbcs4t1rdblg7q5.apps.googleusercontent.com';
+  const PROD_CLIENT_ID = (typeof window !== 'undefined' && (window.GOOGLE_CLIENT_ID_PROD || window.GOOGLE_CLIENT_ID || (window.APP_CONFIG && window.APP_CONFIG.GOOGLE_CLIENT_ID))) ||
+                         (typeof process !== 'undefined' && process.env && (process.env.GOOGLE_CLIENT_ID_PROD || process.env.GOOGLE_CLIENT_ID)) ||
+                         '';
+  const LOCAL_CLIENT_ID = (typeof window !== 'undefined' && (window.GOOGLE_CLIENT_ID_LOCAL || window.GOOGLE_CLIENT_ID || (window.APP_CONFIG && window.APP_CONFIG.GOOGLE_CLIENT_ID))) ||
+                          (typeof process !== 'undefined' && process.env && (process.env.GOOGLE_CLIENT_ID_LOCAL || process.env.GOOGLE_CLIENT_ID)) ||
+                          PROD_CLIENT_ID ||
+                          '';
   const DRIVE_FOLDER_NAME = 'TrenscendsTravelPlanner';
   const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 
@@ -92,13 +97,29 @@
     const custom = localStorage.getItem('travelApp_gdrive_client_id');
     if (custom) return custom;
 
+    const windowClientId = typeof window !== 'undefined' && (
+      window.GOOGLE_CLIENT_ID ||
+      (window.APP_CONFIG && window.APP_CONFIG.GOOGLE_CLIENT_ID)
+    );
+    if (windowClientId) return windowClientId;
+
+    const envClientId = typeof process !== 'undefined' && process.env && (
+      process.env.GOOGLE_CLIENT_ID
+    );
+    if (envClientId) return envClientId;
+
     if (isNativePlatform()) {
-      return PROD_CLIENT_ID;
+      return (typeof window !== 'undefined' && window.GOOGLE_CLIENT_ID_PROD) ||
+             (typeof process !== 'undefined' && process.env && process.env.GOOGLE_CLIENT_ID_PROD) ||
+             PROD_CLIENT_ID;
     }
 
-    const host = window.location.hostname;
+    const host = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.hostname : '';
     if (host === 'localhost' || host === '127.0.0.1') {
-      return LOCAL_CLIENT_ID;
+      return (typeof window !== 'undefined' && window.GOOGLE_CLIENT_ID_LOCAL) ||
+             (typeof process !== 'undefined' && process.env && process.env.GOOGLE_CLIENT_ID_LOCAL) ||
+             LOCAL_CLIENT_ID ||
+             PROD_CLIENT_ID;
     }
     return PROD_CLIENT_ID;
   }
@@ -354,11 +375,11 @@
         }
 
         if (typeof nativeAuthPlugin.signIn === 'function') {
-          console.log('[GoogleAuth Native] Initializing & launching native Android Google Account picker with client:', PROD_CLIENT_ID);
+          console.log('[GoogleAuth Native] Initializing & launching native Android Google Account picker with client:', clientId);
           if (typeof nativeAuthPlugin.initialize === 'function') {
             try {
               await nativeAuthPlugin.initialize({
-                clientId: PROD_CLIENT_ID,
+                clientId: clientId,
                 scopes: ['profile', 'email', 'https://www.googleapis.com/auth/drive.file'],
                 grantOfflineAccess: false
               });

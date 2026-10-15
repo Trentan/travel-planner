@@ -10,6 +10,7 @@ const { run: runSharePresetsVerify } = require('./share-presets-verify');
 const { run: runIosPwaNavVerify } = require('./ios-pwa-nav-verify');
 const { run: runPwaShortcutsOfflineTests } = require('./pwa-shortcuts-offline.test');
 const { runCloudStorageXssTests } = require('./cloud-storage-xss.test');
+const { runCloudStorageClientIdTests } = require('./cloud-storage-client-id.test');
 const { runCloudAutoSyncErrorTests } = require('./cloud-auto-sync-error.test');
 const { runTripLibraryXssTests } = require('./trip-library-xss.test');
 const { runTripLibraryGDriveSyncTests } = require('./trip-library-gdrive-sync.test');
@@ -84,6 +85,7 @@ async function run() {
     if (typeof runMapprImportTests === 'function') await runMapprImportTests();
     if (typeof runWeatherNotesSuite === 'function') runWeatherNotesSuite();
     if (typeof runDesktopSplitPrintUnitTests === 'function') await runDesktopSplitPrintUnitTests();
+    if (typeof runCloudStorageClientIdTests === 'function') runCloudStorageClientIdTests();
     await runCloudStorageXssTests();
     if (typeof runCloudAutoSyncErrorTests === 'function') await runCloudAutoSyncErrorTests();
     await runTripLibraryXssTests();
