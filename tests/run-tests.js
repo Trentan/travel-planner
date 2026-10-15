@@ -33,6 +33,7 @@ const { runIsSafeUrlTests } = require('./is-safe-url.test');
 const { runGetActivityEmojiTests } = require('./get-activity-emoji.test');
 const { runNormalizeItemStatusTests } = require('./normalize-item-status.test');
 const { runGetLegBaseCityNameTests } = require('./get-leg-base-city-name.test');
+const { runGetPriorLegCityTests } = require('./get-prior-leg-city.test');
 const { runStripLeadingActivityEmojiTextTests } = require('./strip-leading-activity-emoji-text.test');
 const { runParseCurrencyAmountTests } = require('./parse-currency-amount.test');
 const { runFormatCurrencyTests } = require('./format-currency.test');
@@ -106,6 +107,7 @@ async function run() {
     if (typeof runGetActivityEmojiTests === 'function') await runGetActivityEmojiTests();
     if (typeof runNormalizeItemStatusTests === 'function') await runNormalizeItemStatusTests();
     if (typeof runGetLegBaseCityNameTests === 'function') await runGetLegBaseCityNameTests();
+    if (typeof runGetPriorLegCityTests === 'function') await runGetPriorLegCityTests();
     if (typeof runIsTerminalLegTests === 'function') await runIsTerminalLegTests();
     if (typeof runEnforceTerminalLegsTests === 'function') await runEnforceTerminalLegsTests();
     if (typeof runGetMobilePagerStateStoreTests === 'function') await runGetMobilePagerStateStoreTests();
