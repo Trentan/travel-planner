@@ -1324,6 +1324,48 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     border-radius: 0.5rem !important;
   }
 
+  /* Quick-tap time preset chips */
+  .quick-time-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    touch-action: manipulation;
+    min-height: 2rem;
+  }
+
+  .quick-time-chip:hover,
+  .quick-time-chip:focus-visible {
+    background: #0d9488;
+    color: #ffffff;
+    border-color: #0d9488;
+  }
+
+  .quick-time-chip:active {
+    transform: scale(0.97);
+  }
+
+  [data-theme="dark"] .quick-time-chip {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-color: #334155;
+  }
+
+  [data-theme="dark"] .quick-time-chip:hover,
+  [data-theme="dark"] .quick-time-chip:focus-visible {
+    background: #0d9488;
+    color: #ffffff;
+    border-color: #0d9488;
+  }
+
   body.mobile-app-mode .leg-reorder-item,
   body.mobile-app-mode .leg-reorder-handle,
   body.mobile-app-mode .drag-handle {

@@ -45,10 +45,18 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
   const titleSource = options.titleOverride !== undefined ? options.titleOverride : activity?.title;
   const defaults = _splitActivityTitle(titleSource || '');
 
+  const defaultDayIdx = (options.defaultDayIdx !== undefined && options.defaultDayIdx !== null)
+    ? Number(options.defaultDayIdx)
+    : (activity && activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined
+        ? Number(activity.assignedDayIdx)
+        : (options.defaultToFirstDay !== false && Array.isArray(leg.days) && leg.days.length > 0 ? 0 : null));
+
   const currentDayLabel = activity && activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined && leg.days[activity.assignedDayIdx]
     ? `Day ${leg.days[activity.assignedDayIdx].day} ${leg.days[activity.assignedDayIdx].date}`
-    : 'Unassigned';
-  const hasCurrentAssignment = activity && activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined;
+    : (defaultDayIdx !== null && leg.days[defaultDayIdx]
+        ? `Day ${leg.days[defaultDayIdx].day} ${leg.days[defaultDayIdx].date} (Pre-selected)`
+        : 'Unassigned');
+  const hasCurrentAssignment = (activity && activity.assignedDayIdx !== null && activity.assignedDayIdx !== undefined) || defaultDayIdx !== null;
 
   let preferredStart = activity?.startTime || '';
   let preferredEnd = activity?.endTime || '';
@@ -78,7 +86,7 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
   });
 
   const dayButtons = leg.days.map((day, dayIdx) => {
-    const isCurrent = activity && activity.assignedDayIdx === dayIdx;
+    const isCurrent = activity ? activity.assignedDayIdx === dayIdx : defaultDayIdx === dayIdx;
     const suggestion = daySuggestions[dayIdx];
     const plannedCount = Array.isArray(day.activityItems)
       ? day.activityItems.filter(item => !isPlaceholderActivityItem(item)).length
@@ -207,6 +215,13 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
                   <input type="radio" name="activityAssignScheduleMode" value="scheduled" ${preferredMode === 'scheduled' ? 'checked' : ''}>
                   <span>Fixed time</span>
                 </label>
+              </div>
+              <div class="activity-quick-time-presets mt-2 mb-2 flex flex-wrap gap-1.5" aria-label="Quick time presets">
+                <button type="button" class="quick-time-chip" data-time="09:00" data-label="Morning">🌅 Morning 09:00</button>
+                <button type="button" class="quick-time-chip" data-time="12:30" data-label="Lunch">🍽️ Lunch 12:30</button>
+                <button type="button" class="quick-time-chip" data-time="15:00" data-label="Afternoon">🏛️ Afternoon 15:00</button>
+                <button type="button" class="quick-time-chip" data-time="19:30" data-label="Evening">🌙 Evening 19:30</button>
+                <button type="button" class="quick-time-chip quick-time-chip--anytime" data-mode="anytime">⏰ Anytime</button>
               </div>
               <div class="activity-assign-time-row">
                 <input type="text" id="activityAssignStartTime" value="${html(preferredStart)}" style="width: 1px; height: 1px; opacity: 0.01; position: absolute; border: 0; padding: 0; z-index: -1; pointer-events: none;">
@@ -508,6 +523,35 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
         updateDualTimeNotice();
       });
     }
+  });
+
+  // Quick time preset chips handler
+  modal.querySelectorAll('.quick-time-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const targetMode = chip.getAttribute('data-mode');
+      if (targetMode === 'anytime') {
+        const anytimeInput = modeInputs.find(input => input.value === 'anytime');
+        if (anytimeInput) {
+          anytimeInput.checked = true;
+          syncScheduleControls();
+          syncTimeAndDayFromMode();
+          updateDualTimeNotice();
+        }
+        return;
+      }
+
+      const timeVal = chip.getAttribute('data-time');
+      if (timeVal) {
+        const scheduledInput = modeInputs.find(input => input.value === 'scheduled');
+        if (scheduledInput) scheduledInput.checked = true;
+        if (startInput) startInput.value = timeVal;
+        syncScheduleControls();
+        syncSelectsFromInputs();
+        updateEndTimeFromDuration();
+        updateInputsFromSelects();
+        updateDualTimeNotice();
+      }
+    });
   });
 
   syncScheduleControls();
