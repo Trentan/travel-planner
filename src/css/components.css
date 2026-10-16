@@ -1704,11 +1704,13 @@
 
     /* Mobile Leg Modal adjustments */
     #add-leg-modal .modal-content {
-      max-width: calc(100vw - 1rem) !important;
-      width: calc(100vw - 1rem) !important;
-      max-height: 94vh !important;
+      max-width: 100% !important;
+      width: 100% !important;
+      max-height: min(94dvh, calc(var(--vvh, 100dvh) - env(safe-area-inset-top, 0px) - 0.5rem)) !important;
       display: flex !important;
       flex-direction: column !important;
+      border-radius: 1.25rem 1.25rem 0 0 !important;
+      margin: auto 0 0 0 !important;
     }
 
     #add-leg-modal .leg-modal-tabs {
@@ -2693,10 +2695,11 @@
     }
 
     body.mobile-app-mode #journey-modal .modal-content {
-      width: calc(100vw - 0.75rem);
-      max-width: calc(100vw - 0.75rem);
-      max-height: 100% !important;
-      height: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      max-height: min(94dvh, calc(var(--vvh, 100dvh) - env(safe-area-inset-top, 0px) - 0.5rem)) !important;
+      border-radius: 1.25rem 1.25rem 0 0 !important;
+      margin: auto 0 0 0 !important;
     }
 
     body.mobile-app-mode #journey-modal .modal-body {
@@ -3058,13 +3061,13 @@
 
     body.mobile-app-mode #stay-modal .modal-content,
     body.mobile-app-mode #journey-modal .modal-content {
-      width: calc(100vw - 0.75rem);
-      max-width: calc(100vw - 0.75rem) !important;
-      max-height: 94vh;
-      height: min(94vh, 820px);
+      width: 100% !important;
+      max-width: 100% !important;
+      max-height: min(94dvh, calc(var(--vvh, 100dvh) - env(safe-area-inset-top, 0px) - 0.5rem)) !important;
       display: flex;
       flex-direction: column;
-      border-radius: 1rem 1rem 0.75rem 0.75rem;
+      border-radius: 1.25rem 1.25rem 0 0 !important;
+      margin: auto 0 0 0 !important;
       overflow: hidden;
     }
 

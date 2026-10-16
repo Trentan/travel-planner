@@ -1413,8 +1413,8 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer {
-    justify-content: flex-start !important;
-    padding: 0.5rem 0.85rem !important;
+    justify-content: center !important;
+    padding: 0.6rem 0.85rem !important;
   }
 
   body.mobile-app-mode .modal-header-save-btn {
@@ -1424,6 +1424,46 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     min-height: 2rem !important;
     border-radius: 9999px !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  /* Universal Mobile Modal Footer Hierarchy: Cancel Left, Save Right, Delete Centered */
+  body.mobile-app-mode .modal-footer {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  body.mobile-app-mode .modal-footer .action-btn-danger,
+  body.mobile-app-mode .modal-footer .activity-assign-delete-btn,
+  body.mobile-app-mode .modal-footer #stayDeleteBtn,
+  body.mobile-app-mode .modal-footer #journeyDeleteBtn,
+  body.mobile-app-mode .modal-footer #legDialogDeleteBtn {
+    width: 100% !important;
+    margin: 0.35rem auto 0 auto !important;
+    text-align: center !important;
+    justify-content: center !important;
+    display: flex !important;
+    color: #e11d48 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    min-height: 2.25rem !important;
+    order: 99 !important;
+    cursor: pointer;
+  }
+
+  body.mobile-app-mode .modal-footer .action-btn-danger:hover,
+  body.mobile-app-mode .modal-footer .activity-assign-delete-btn:hover,
+  body.mobile-app-mode .modal-footer #stayDeleteBtn:hover,
+  body.mobile-app-mode .modal-footer #journeyDeleteBtn:hover,
+  body.mobile-app-mode .modal-footer #legDialogDeleteBtn:hover {
+    background: rgba(244, 63, 94, 0.08) !important;
+    border-radius: 0.5rem !important;
   }
 
   /* Floating Undo Toast */
