@@ -2277,16 +2277,39 @@ body.mobile-app-mode .journey-card {
 
 /* Card Header alignment: single line title with ellipsis */
 body.mobile-app-mode .itinerary-card-title,
-body.mobile-app-mode .day-card-title {
+body.mobile-app-mode .day-card-title,
+body.mobile-app-mode .stay-card-title,
+body.mobile-app-mode .journey-card-title {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: var(--mob-font-section, 0.9375rem) !important;
+  font-weight: 600 !important;
+}
+
+/* 3-Tier Card Anatomy */
+body.mobile-app-mode .mobile-card-row-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.5rem !important;
+  min-width: 0;
+}
+
+body.mobile-app-mode .mobile-card-row-meta {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.35rem 0.6rem !important;
+  font-size: var(--mob-font-meta, 0.75rem) !important;
+  color: var(--text-secondary, #64748b) !important;
 }
 
 /* De-clutter redundant inline hover actions on touch devices */
 body.mobile-app-mode .itinerary-card .desktop-hover-actions,
-body.mobile-app-mode .itinerary-card .hover-actions-overlay {
+body.mobile-app-mode .itinerary-card .hover-actions-overlay,
+body.mobile-app-mode .itinerary-card .inline-edit-btn:not(.is-mobile-action) {
   display: none !important;
 }
 
@@ -2297,6 +2320,32 @@ body.mobile-app-mode .itinerary-badges {
   flex-wrap: wrap !important;
   align-items: center !important;
   gap: 0.375rem !important;
+}
+
+body.mobile-app-mode .status-badge,
+body.mobile-app-mode .badge-pill {
+  min-height: 1.5rem !important;
+  padding: 0.2rem 0.5rem !important;
+  font-size: var(--mob-font-meta, 0.75rem) !important;
+  margin: 0 !important;
+}
+
+/* Mobile Top Header Density & Toolbars */
+body.mobile-app-mode #mobileHeader,
+body.mobile-app-mode .mobile-header-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.5rem !important;
+  padding-inline: 0.75rem !important;
+}
+
+body.mobile-app-mode #mobileHeader .header-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--mob-font-title, 1.1875rem) !important;
 }
 
 /* Bottom Navigation ergonomics & safe area */
