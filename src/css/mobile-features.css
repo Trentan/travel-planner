@@ -2377,9 +2377,8 @@ body.mobile-app-mode #add-leg-modal #legReorderSection .flex.gap-2.mb-3 {
 body.mobile-app-mode #add-leg-modal #legReorderSection .modal-footer,
 body.mobile-app-mode #add-leg-modal #legEditSection .modal-footer {
   display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
   gap: 0.5rem !important;
   padding: 0.75rem 0.875rem !important;
 }
@@ -2387,12 +2386,14 @@ body.mobile-app-mode #add-leg-modal #legEditSection .modal-footer {
 body.mobile-app-mode #add-leg-modal .journey-footer-actions {
   display: flex !important;
   flex: 1 1 100% !important;
+  flex-direction: column !important;
   gap: 0.5rem !important;
+  width: 100% !important;
 }
 
 body.mobile-app-mode #add-leg-modal .journey-footer-actions button {
-  flex: 1 1 50% !important;
-  min-height: 2.75rem !important;
+  width: 100% !important;
+  min-height: 2.875rem !important;
 }
 
 /* Home Header Chrome Vertical Compression (Argon Reassessment) */

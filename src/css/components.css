@@ -3204,27 +3204,44 @@
       box-sizing: border-box;
     }
 
-    [data-theme="dark"] body.mobile-app-mode #stay-modal .modal-footer,
-    [data-theme="dark"] body.mobile-app-mode #journey-modal .modal-footer,
-    [data-theme="dark"] body.mobile-app-mode #add-leg-modal .modal-footer,
-    [data-theme="dark"] body.mobile-app-mode #trip-settings-modal .modal-footer {
+    /* Standardized Mobile Dialog Footers */
+    body.mobile-app-mode .modal-footer {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+      padding: 0.875rem 1rem calc(0.875rem + env(safe-area-inset-bottom, 0px));
+      background: #ffffff;
+      border-top: 1px solid rgba(203, 213, 225, 0.6);
+      box-sizing: border-box;
+    }
+
+    [data-theme="dark"] body.mobile-app-mode .modal-footer {
       background: var(--surface-card);
       border-top-color: rgba(148, 163, 184, 0.16);
     }
 
-    body.mobile-app-mode #stay-modal .modal-footer .action-btn,
-    body.mobile-app-mode #journey-modal .modal-footer .action-btn,
-    body.mobile-app-mode #add-leg-modal .modal-footer .action-btn,
-    body.mobile-app-mode #trip-settings-modal .modal-footer .action-btn,
+    /* In mobile dialogs, close cross (top-right) handles cancellation. Hide redundant Cancel/Close buttons in footer */
+    body.mobile-app-mode .modal-footer button[onclick*="close"],
+    body.mobile-app-mode .modal-footer button[data-action="cancel"],
+    body.mobile-app-mode .modal-footer .btn-cancel,
+    body.mobile-app-mode #stay-modal .modal-footer button[onclick*="closeAddStayModal"],
+    body.mobile-app-mode #journey-modal .modal-footer button[onclick*="closeJourneyModal"],
+    body.mobile-app-mode #add-leg-modal .modal-footer button[onclick*="closeAddLegDialog"],
+    body.mobile-app-mode #cloudSyncModal .modal-footer button[onclick*="closeCloudSyncModal"] {
+      display: none !important;
+    }
+
     body.mobile-app-mode .modal-footer button {
-      min-height: 2.875rem; /* 46px touch target standard */
+      width: 100%;
+      min-height: 3rem; /* 48px touch target */
       justify-content: center;
-      font-size: 0.875rem;
-      font-weight: 600;
+      font-size: 0.9375rem;
+      font-weight: 700;
       letter-spacing: -0.01em;
-      border-radius: 0.75rem; /* 12px */
+      border-radius: 0.75rem;
       margin: 0 !important;
-      padding: 0 1rem;
+      padding: 0 1.25rem;
       transition: transform 0.12s ease, opacity 0.15s ease;
     }
 
@@ -3232,62 +3249,63 @@
       transform: scale(0.98);
     }
 
-    /* Stay Modal Buttons: Standardized Order: Cancel (left) | Save (right) | Delete (isolated subtle/centered) */
-    body.mobile-app-mode #stay-modal .modal-footer button[onclick*="closeAddStayModal"] {
-      order: 1;
-      flex: 1 1 calc(50% - 0.35rem);
-    }
-    body.mobile-app-mode #stay-modal .modal-footer button[onclick*="saveStayFromModal"] {
+    /* 1. SAVE Buttons: Always Blue (#2563eb), full width / primary placement */
+    body.mobile-app-mode .modal-footer button[onclick*="save"],
+    body.mobile-app-mode .modal-footer button[onclick*="confirm"],
+    body.mobile-app-mode .modal-footer button[type="submit"],
+    body.mobile-app-mode .modal-footer .action-btn-secondary,
+    body.mobile-app-mode .modal-footer #staySaveBtn,
+    body.mobile-app-mode .modal-footer #journeySaveBtn,
+    body.mobile-app-mode .modal-footer #legDialogSaveBtn,
+    body.mobile-app-mode .modal-footer #desktopLegDialogSaveBtn,
+    body.mobile-app-mode .modal-footer button[onclick*="saveStayFromModal"],
+    body.mobile-app-mode .modal-footer button[onclick*="saveJourneyFromModal"] {
+      background-color: #2563eb !important;
+      border-color: #1d4ed8 !important;
+      color: #ffffff !important;
       order: 2;
-      flex: 1 1 calc(50% - 0.35rem);
-    }
-    body.mobile-app-mode #stay-modal .modal-footer #stayDeleteBtn {
-      order: 3;
-      flex: 1 1 100%;
-      background: rgba(244, 63, 94, 0.08) !important;
-      border: 1px solid rgba(244, 63, 94, 0.22) !important;
-      color: #e11d48 !important;
-      box-shadow: none !important;
-      min-height: 2.5rem !important;
-      height: 2.5rem !important;
-      margin-top: 0.25rem !important;
-      font-weight: 600;
-      font-size: 0.8125rem;
-      border-radius: 0.75rem;
     }
 
-    /* Journey Modal Buttons: Standardized Order: Segment (+), Cancel (left), Save (right), Delete */
-    body.mobile-app-mode #journey-modal .modal-footer button[onclick*="addSegmentToJourney"] {
+    /* 2. ADD Buttons: Always Green (Emerald #059669 / #10b981) */
+    body.mobile-app-mode button[onclick*="add"]:not(.modal-close),
+    body.mobile-app-mode button[onclick*="Add"]:not(.modal-close),
+    body.mobile-app-mode .modal-footer button[onclick*="addSegmentToJourney"],
+    body.mobile-app-mode .modal-footer button[onclick*="resetLegDialogToAddNew"],
+    body.mobile-app-mode .action-btn-add,
+    body.mobile-app-mode #add-leg-modal button[onclick*="resetLegDialogToAddNew"] {
+      background-color: #059669 !important;
+      border-color: #047857 !important;
+      color: #ffffff !important;
       order: 1;
-      flex: 1 1 100%;
-      min-height: 2.5rem;
-      border: 1px dashed rgba(8, 145, 178, 0.45) !important;
-      background: rgba(8, 145, 178, 0.06) !important;
-      color: #0891b2 !important;
-      font-size: 0.8125rem;
-      font-weight: 600;
     }
-    body.mobile-app-mode #journey-modal .modal-footer button[onclick*="closeJourneyModal"] {
-      order: 2;
-      flex: 1 1 calc(50% - 0.35rem);
+
+    /* 3. EDIT Buttons: Grey (#64748b / subtle surface) */
+    body.mobile-app-mode .action-btn-edit,
+    body.mobile-app-mode button[onclick*="edit"],
+    body.mobile-app-mode button[onclick*="Edit"] {
+      background-color: #64748b !important;
+      border-color: #475569 !important;
+      color: #ffffff !important;
     }
-    body.mobile-app-mode #journey-modal .modal-footer button[onclick*="saveJourneyFromModal"] {
+
+    /* 4. DELETE Action: Word only, subtle centered danger tone */
+    body.mobile-app-mode .modal-footer button[onclick*="delete"],
+    body.mobile-app-mode .modal-footer button[onclick*="Delete"],
+    body.mobile-app-mode .modal-footer #stayDeleteBtn,
+    body.mobile-app-mode .modal-footer #journeyDeleteBtn,
+    body.mobile-app-mode .modal-footer #legDialogDeleteBtn,
+    body.mobile-app-mode .modal-footer .action-btn-danger {
       order: 3;
-      flex: 1 1 calc(50% - 0.35rem);
-    }
-    body.mobile-app-mode #journey-modal .modal-footer #journeyDeleteBtn {
-      order: 4;
-      flex: 1 1 100%;
       background: rgba(244, 63, 94, 0.08) !important;
-      border: 1px solid rgba(244, 63, 94, 0.22) !important;
+      border: 1px solid rgba(244, 63, 94, 0.25) !important;
       color: #e11d48 !important;
       box-shadow: none !important;
-      min-height: 2.5rem !important;
-      height: 2.5rem !important;
-      margin-top: 0.25rem !important;
+      min-height: 2.6rem !important;
+      height: 2.6rem !important;
       font-weight: 600;
-      font-size: 0.8125rem;
+      font-size: 0.84375rem;
       border-radius: 0.75rem;
+      width: 100% !important;
     }
 
     body.mobile-app-mode .modal-close {
@@ -3298,6 +3316,44 @@
       align-items: center;
       justify-content: center;
       border-radius: 0.75rem;
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-primary, #0f172a) !important;
+      box-shadow: none !important;
+    }
+
+    [data-theme="dark"] body.mobile-app-mode .modal-close {
+      color: #f1f5f9 !important;
+    }
+
+    /* Standardized Full-Width Modal Primary Save Actions */
+    body.mobile-app-mode #add-leg-modal #legReorderSection .modal-footer,
+    body.mobile-app-mode #add-leg-modal #legEditSection .modal-footer {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      width: 100% !important;
+      gap: 0.5rem !important;
+    }
+
+    body.mobile-app-mode #add-leg-modal #saveLegSequenceBtn,
+    body.mobile-app-mode #add-leg-modal #legDialogSaveBtn,
+    body.mobile-app-mode #add-leg-modal .modal-footer button,
+    body.mobile-app-mode #add-leg-modal #legReorderSection .modal-footer button,
+    body.mobile-app-mode #add-leg-modal #legEditSection .modal-footer button {
+      width: 100% !important;
+      min-height: 3rem !important;
+    }
+
+    body.mobile-app-mode #add-leg-modal #saveLegSequenceBtn {
+      background-color: #2563eb !important;
+      border-color: #1d4ed8 !important;
+      color: #ffffff !important;
+    }
+
+    body.mobile-app-mode #add-leg-modal #legReorderSection .modal-footer > div:last-child {
+      width: 100% !important;
+      margin: 0 !important;
     }
 
     /* Mobile form controls: 16px font eliminates iOS zoom, standard 44px min-height */
