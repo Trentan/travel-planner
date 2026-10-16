@@ -1801,9 +1801,11 @@ function confirmAddLeg() {
       }
     });
 
+    const matchedOldDates = new Set();
     target.days.forEach((newDay, dayIdx) => {
       const oldDay = oldDaysByDate.get(newDay.date) || (oldDays.length === target.days.length ? oldDays[dayIdx] : null);
       if (oldDay) {
+        if (oldDay.date) matchedOldDates.add(oldDay.date);
         if (oldDay.title) newDay.title = oldDay.title;
         if (oldDay.accomItems) newDay.accomItems = oldDay.accomItems;
         if (oldDay.activityItems) newDay.activityItems = oldDay.activityItems;
@@ -1813,6 +1815,47 @@ function confirmAddLeg() {
         if (oldDay.desc && (!dayNotes || dayNotes.length === 0)) newDay.desc = oldDay.desc;
       }
     });
+
+    // Safe Date-Shift Resolution: Reconcile out-of-bounds activities from days that were removed or shifted out
+    const orphanedActivities = [];
+    oldDays.forEach(od => {
+      if (od && od.date && !matchedOldDates.has(od.date) && Array.isArray(od.activityItems)) {
+        od.activityItems.forEach(item => {
+          if (item && !isPlaceholderActivityItem(item)) {
+            orphanedActivities.push({ item, originalDate: od.date });
+          }
+        });
+      }
+    });
+
+    if (orphanedActivities.length > 0) {
+      if (!Array.isArray(target.suggestedActivities)) {
+        target.suggestedActivities = [];
+      }
+      orphanedActivities.forEach(({ item, originalDate }) => {
+        // Find if already exists in suggested pool
+        const exists = target.suggestedActivities.some(sa => sa && ((sa.id && sa.id === item.activityId) || sa.title === (item.text || item.title)));
+        if (!exists) {
+          target.suggestedActivities.push({
+            id: item.activityId || 'act_' + Date.now() + Math.random().toString(36).slice(2, 6),
+            title: item.text || item.title || 'Untitled Activity',
+            category: item.category || 'sight',
+            estTime: item.time || '1 hr',
+            estCost: item.cost || '0',
+            notes: (item.notes ? item.notes + ' · ' : '') + `Moved to pool (Date shifted from ${originalDate})`,
+            location: item.location || '',
+            status: item.status || 'planned',
+            bookingRef: item.bookingRef || '',
+            externalLink: item.externalLink || '',
+            assignedDayIdx: null,
+            assignedDate: ''
+          });
+        }
+      });
+      if (typeof showToast === 'function') {
+        showToast(`⚠️ Moved ${orphanedActivities.length} activity item${orphanedActivities.length === 1 ? '' : 's'} to Unscheduled Pool due to date shift.`);
+      }
+    }
 
     const titleInputs = document.querySelectorAll('.leg-day-title-row-input');
     if (titleInputs && titleInputs.length > 0) {
