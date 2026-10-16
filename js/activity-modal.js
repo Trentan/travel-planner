@@ -190,11 +190,21 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
 
             <div class="activity-assign-grid activity-assign-estimate-grid">
               <div class="ai-form-group">
-                <label>Estimated Time</label>
+                <div class="flex items-center justify-between">
+                  <label for="activityTime">Estimated Time</label>
+                  <span class="text-[10px] text-slate-400 font-medium">Quick duration</span>
+                </div>
                 <input type="text" id="activityTime" class="form-control form-control--compact" placeholder="e.g., 1 hr" value="${html(activity?.estTime || '1 hr')}">
+                <div class="activity-quick-duration-presets mt-1.5 flex flex-wrap gap-1" aria-label="Duration presets">
+                  <button type="button" class="quick-duration-chip" data-duration="30 min">30m</button>
+                  <button type="button" class="quick-duration-chip" data-duration="1 hr">1h</button>
+                  <button type="button" class="quick-duration-chip" data-duration="1.5 hrs">1.5h</button>
+                  <button type="button" class="quick-duration-chip" data-duration="2 hrs">2h</button>
+                  <button type="button" class="quick-duration-chip" data-duration="Half day">Half Day</button>
+                </div>
               </div>
               <div class="ai-form-group">
-                <label>Estimated Cost ($)</label>
+                <label for="activityCost">Estimated Cost ($)</label>
                 <input type="text" id="activityCost" class="form-control form-control--compact" placeholder="0" value="${html(activity?.estCost || '0')}">
               </div>
             </div>
@@ -550,6 +560,20 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
         updateEndTimeFromDuration();
         updateInputsFromSelects();
         updateDualTimeNotice();
+      }
+    });
+  });
+
+  // Quick duration preset chips handler
+  modal.querySelectorAll('.quick-duration-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const durationVal = chip.getAttribute('data-duration');
+      const timeInput = document.getElementById('activityTime');
+      if (timeInput && durationVal) {
+        timeInput.value = durationVal;
+        // If start time is already picked, update end time to match new duration
+        updateEndTimeFromDuration();
+        updateInputsFromSelects();
       }
     });
   });

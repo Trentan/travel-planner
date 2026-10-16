@@ -3058,10 +3058,12 @@ function renderDailyTimelineRow(item, compact = false) {
       parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-blue-50/50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-100/50 dark:border-blue-900/30 font-mono">Ref: ${escapeCompactText(item.bookingRef)}</span>`);
     }
 
-    // 5. location chip
+    // 5. location chip & Taxi Card
+    let stayAddress = '';
     if (item.subLocations) {
       const cleanLoc = String(item.subLocations).replace(/^Location:\s*/i, '').trim();
       if (cleanLoc) {
+        stayAddress = cleanLoc;
         let sophisticatedLoc = cleanLoc;
         let matchCity = item.cityName || '';
         if (!matchCity) {
@@ -3073,12 +3075,17 @@ function renderDailyTimelineRow(item, compact = false) {
           const countryName = cityObj && cityObj.country ? cityObj.country : '';
           if (countryName && !cleanLoc.toLowerCase().includes(countryName.toLowerCase())) {
             sophisticatedLoc = `${cleanLoc}, ${countryName}`;
+            stayAddress = sophisticatedLoc;
           }
         }
         parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="${getMapSearchUrl(sophisticatedLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">${escapeCompactText(cleanLoc)}</a></span>`);
-        parts.push(`<button type="button" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border-amber-200 dark:border-amber-800/50 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors" onclick="event.stopPropagation(); openDriverAddressCard({ title: '${escapeCompactText(item.title || item.name || 'Stay')}', address: '${escapeCompactText(cleanLoc)}', category: 'Hotel / Stay', bookingRef: '${escapeCompactText(item.bookingRef || '')}' });" title="Show large driver card for taxi / arrival">🚖 Taxi Card</button>`);
       }
     }
+    
+    // Always render Driver / Taxi Card for stays so mobile users can show address to drivers anytime
+    const taxiCardAddress = stayAddress || item.cityName || '';
+    const taxiCardTitle = item.title || item.name || 'Hotel Stay';
+    parts.push(`<button type="button" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border-amber-200 dark:border-amber-800/50 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors" onclick="event.stopPropagation(); openDriverAddressCard({ title: '${escapeCompactText(taxiCardTitle)}', address: '${escapeCompactText(taxiCardAddress)}', category: 'Hotel / Stay', bookingRef: '${escapeCompactText(item.bookingRef || '')}' });" title="Show large driver card for taxi / arrival">🚖 Taxi Card</button>`);
 
     if (item.attachments && item.attachments.length > 0 && typeof renderAttachmentsPillsHtml === 'function') {
       parts.push(renderAttachmentsPillsHtml(item.attachments));
@@ -4110,8 +4117,17 @@ function getCityByName(cityName) {
     if (codeMatch) return codeMatch;
   }
 
-  // 4. Substring matching for targets >= 3 chars
-  if (target.length >= 3) {
+  // 4. Check alias dictionary
+  if (typeof getCityAliasMatch === 'function') {
+    const aliasMatch = getCityAliasMatch(target);
+    if (aliasMatch) {
+      const cityInTrip = citiesData.find(c => c && c.id === aliasMatch.id || normalize(c.name) === normalize(aliasMatch.name));
+      if (cityInTrip) return cityInTrip;
+    }
+  }
+
+  // 5. Substring matching for targets >= 4 chars (avoiding 3-letter airport code collisions)
+  if (target.length >= 4) {
     const substringMatch = citiesData.find(c => {
       if (!c || !c.name) return false;
       const cNorm = normalize(c.name);
@@ -4120,13 +4136,13 @@ function getCityByName(cityName) {
     if (substringMatch) return substringMatch;
   }
 
-  // 5. Token matching (significant word tokens >= 3 chars)
-  const tokens = target.split(/[\s,/-]+/).filter(t => t.length >= 3);
+  // 6. Token matching (significant word tokens >= 4 chars)
+  const tokens = target.split(/[\s,/-]+/).filter(t => t.length >= 4);
   for (const token of tokens) {
     const tokenMatch = citiesData.find(c => {
       if (!c || !c.name) return false;
       const cNorm = normalize(c.name);
-      const cTokens = cNorm.split(/[\s,/-]+/).filter(ct => ct.length >= 3);
+      const cTokens = cNorm.split(/[\s,/-]+/).filter(ct => ct.length >= 4);
       return cTokens.some(ct => ct === token || ct.startsWith(token) || token.startsWith(ct));
     });
     if (tokenMatch) return tokenMatch;
