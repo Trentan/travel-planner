@@ -537,10 +537,17 @@
           } else if (retries >= 10) {
             clearInterval(checkInterval);
             // Fallback for Android WebViews & environments where GIS client is blocked:
-            const redirectUri = window.location.origin + window.location.pathname;
-            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(DRIVE_SCOPES)}&include_granted_scopes=true&prompt=select_account`;
-            if (interactive) {
+            const currentOrigin = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '';
+            const currentPathname = (typeof window !== 'undefined' && window.location && window.location.pathname) ? window.location.pathname : '';
+            const safeOriginCheck = typeof isSafeUrl === 'function' ? isSafeUrl(currentOrigin) : (currentOrigin.startsWith('http:') || currentOrigin.startsWith('https:'));
+            const isHttpProtocol = (typeof window !== 'undefined' && window.location && window.location.protocol && (window.location.protocol === 'http:' || window.location.protocol === 'https:'));
+
+            if (interactive && currentOrigin && safeOriginCheck && isHttpProtocol) {
+              const redirectUri = currentOrigin + currentPathname;
+              const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(DRIVE_SCOPES)}&include_granted_scopes=true&prompt=select_account`;
               window.location.href = authUrl;
+            } else if (interactive) {
+              console.warn('[GoogleDrive Auth] OAuth redirect suppressed: Invalid or unsafe origin:', currentOrigin);
             }
             resolve(false);
           }

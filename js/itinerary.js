@@ -3433,25 +3433,32 @@ let initialItineraryTarget = null;
 
 function findItineraryPositionForDate(legs, dateValue) {
   if (!Array.isArray(legs) || !dateValue) return null;
-  const targetDate = typeof normalizeTripDateValue === 'function'
-    ? normalizeTripDateValue(String(dateValue))
+  const normalizeFn = typeof normalizeTripDateValue === 'function' ? normalizeTripDateValue : null;
+  const targetDate = normalizeFn
+    ? normalizeFn(String(dateValue))
     : String(dateValue);
   if (!targetDate) return null;
 
-  let match = null;
-  legs.forEach((leg, legIndex) => {
-    (leg.days || []).forEach((day, dayIndex) => {
-      const dayDate = typeof normalizeTripDateValue === 'function'
-        ? normalizeTripDateValue(day.date || '')
+  for (let legIndex = legs.length - 1; legIndex >= 0; legIndex--) {
+    const leg = legs[legIndex];
+    if (!leg) continue;
+    const days = leg.days;
+    if (!Array.isArray(days)) continue;
+    for (let dayIndex = days.length - 1; dayIndex >= 0; dayIndex--) {
+      const day = days[dayIndex];
+      if (!day) continue;
+      const dayDate = normalizeFn
+        ? normalizeFn(day.date || '')
         : String(day.date || '');
       if (dayDate === targetDate) {
         // Arrival legs follow departure legs on shared travel dates, so the
         // later match best represents the city the traveler is up to.
-        match = { leg, legIndex, day, dayIndex, dayKey: `${day.day}-${day.date}` };
+        // Traversing backwards returns the last match in itinerary order immediately.
+        return { leg, legIndex, day, dayIndex, dayKey: `${day.day}-${day.date}` };
       }
-    });
-  });
-  return match;
+    }
+  }
+  return null;
 }
 
 function getCurrentTripPosition(dateValue = new Date()) {
