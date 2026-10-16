@@ -49,6 +49,7 @@ function createDOMContext() {
     Date,
     parseInt,
     JSON,
+    URL,
     setTimeout,
     clearTimeout,
     setInterval,
@@ -58,6 +59,9 @@ function createDOMContext() {
     document: {
       getElementById(id) {
         return getOrCreateElement(id);
+      },
+      querySelector(selector) {
+        return null;
       },
       createElement(tag) {
         return {
@@ -72,10 +76,12 @@ function createDOMContext() {
     },
     location: {
       hostname: 'localhost',
+      protocol: 'http:',
       origin: 'http://localhost:3000',
       pathname: '/',
       search: '',
-      hash: ''
+      hash: '',
+      href: 'http://localhost:3000/'
     },
     addEventListener() {}
   };
@@ -234,6 +240,55 @@ async function runGoogleAuthRenewalTests() {
     assert.strictEqual(headerPill.innerText, '⚡ Local', 'Pill text should be "⚡ Local" after disconnect');
     assert.ok(headerPill.className.includes('disconnected'), 'Pill should have disconnected class');
     console.log('✅ disconnectGoogleDrive() cleanup verified!');
+  }
+
+  // 6. Test OAuth Fallback Redirect URI Origin Validation
+  console.log('6. Testing OAuth fallback redirect URI origin validation...');
+  {
+    // Test 6a: Safe HTTP/HTTPS origin redirects properly
+    {
+      const { domContext } = createDOMContext();
+      domContext.location.origin = 'http://localhost:3000';
+      domContext.location.protocol = 'http:';
+      domContext.location.pathname = '/app/';
+      loadCloudStorage(domContext);
+
+      // Trigger GIS fallback by omitting window.google
+      const authPromise = domContext.authenticateGoogleDrive(true);
+      // Fast-forward interval checking (10 retries at 150ms = 1500ms)
+      await new Promise(r => setTimeout(r, 1800));
+      await authPromise;
+
+      assert.ok(
+        domContext.location.href && domContext.location.href.startsWith('https://accounts.google.com/o/oauth2/v2/auth'),
+        'Safe origin should trigger OAuth redirect'
+      );
+      assert.ok(
+        domContext.location.href.includes('redirect_uri=' + encodeURIComponent('http://localhost:3000/app/')),
+        'redirect_uri must be properly encoded and constructed from safe origin'
+      );
+    }
+
+    // Test 6b: Unsafe origin or non-HTTP protocol suppresses redirect
+    {
+      const { domContext } = createDOMContext();
+      domContext.location.origin = 'javascript:alert(1)';
+      domContext.location.protocol = 'javascript:';
+      domContext.location.pathname = '/';
+      domContext.location.href = 'http://localhost:3000/';
+      loadCloudStorage(domContext);
+
+      const authPromise = domContext.authenticateGoogleDrive(true);
+      await new Promise(r => setTimeout(r, 1800));
+      await authPromise;
+
+      assert.strictEqual(
+        domContext.location.href,
+        'http://localhost:3000/',
+        'Unsafe origin must suppress window.location.href redirect'
+      );
+    }
+    console.log('✅ OAuth fallback redirect URI origin validation verified!');
   }
 
   console.log('🎉 ALL GOOGLE AUTH RENEWAL & PERSISTENT APPROVAL TESTS PASSED CLEANLY!');
