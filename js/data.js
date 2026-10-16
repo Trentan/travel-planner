@@ -4136,16 +4136,6 @@ function checkAndPromptCityAudit(isSilent = false) {
 async function repairAllCityMetadata() {
   if (!Array.isArray(citiesData) || citiesData.length === 0) return;
 
-  const cityLookup = new Map();
-  for (const c of ALL_CITIES) {
-    if (c && c.name) {
-      const lowerName = c.name.toLowerCase();
-      if (!cityLookup.has(lowerName)) {
-        cityLookup.set(lowerName, c);
-      }
-    }
-  }
-
   let repairedCount = 0;
   for (const city of citiesData) {
     let modified = false;
@@ -4156,7 +4146,8 @@ async function repairAllCityMetadata() {
       modified = true;
     }
 
-    const match = (city && city.name ? cityLookup.get(city.name.toLowerCase()) : null) ||
+    const nameMatches = city && city.name ? ALL_CITIES_BY_NAME_MAP.get(city.name.toLowerCase()) : null;
+    const match = (nameMatches && nameMatches.length > 0 ? nameMatches[0] : null) ||
                   (typeof getCityLocationDatabaseMatch === 'function' ? getCityLocationDatabaseMatch(city) : null);
     if (match) {
       if (!city.code && match.code) { city.code = match.code; modified = true; }
@@ -8264,7 +8255,7 @@ function handleTripStartCityTyping(inputEl, countrySelectId, targetField, target
   tripStartAnswers[targetField] = typedName;
   if (!typedName) return;
 
-  const dbMatches = ALL_CITIES.filter(c => c.name.toLowerCase() === typedName.toLowerCase());
+  const dbMatches = ALL_CITIES_BY_NAME_MAP.get(typedName.toLowerCase()) || [];
   if (dbMatches.length === 1 && dbMatches[0].countryCode) {
     const matchedCode = dbMatches[0].countryCode;
     tripStartAnswers[targetCountryField] = matchedCode;
@@ -8278,7 +8269,7 @@ function handleTripStartStopCityTyping(index, inputEl, countrySelectId) {
   if (tripStartAnswers.stops[index]) {
     tripStartAnswers.stops[index].city = typedName;
     if (typedName) {
-      const dbMatches = ALL_CITIES.filter(c => c.name.toLowerCase() === typedName.toLowerCase());
+      const dbMatches = ALL_CITIES_BY_NAME_MAP.get(typedName.toLowerCase()) || [];
       if (dbMatches.length === 1 && dbMatches[0].countryCode) {
         const matchedCode = dbMatches[0].countryCode;
         tripStartAnswers.stops[index].countryCode = matchedCode;
@@ -8618,20 +8609,10 @@ async function createTripFromFlightBookings() {
     });
   }
 
-  // Look up cities in ALL_CITIES / CITY_DATABASE
-  const cityByName = new Map();
-  if (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) {
-    for (let i = 0; i < ALL_CITIES.length; i++) {
-      const c = ALL_CITIES[i];
-      if (!c || !c.name) continue;
-      const lower = c.name.toLowerCase();
-      if (!cityByName.has(lower)) cityByName.set(lower, c);
-    }
-  }
-
   citiesData = destinationStops.map((stop, index) => {
     const cityNameLower = stop.city.toLowerCase();
-    const dbMatch = cityByName.get(cityNameLower) || (typeof findFuzzyCityCandidate === 'function' ? findFuzzyCityCandidate(cityNameLower)?.candidate : null) || null;
+    const nameMatches = ALL_CITIES_BY_NAME_MAP.get(cityNameLower);
+    const dbMatch = (nameMatches && nameMatches.length > 0 ? nameMatches[0] : null) || (typeof findFuzzyCityCandidate === 'function' ? findFuzzyCityCandidate(cityNameLower)?.candidate : null) || null;
     const countryCode = dbMatch?.countryCode || 'ZZ';
     const cityId = `city-${Date.now()}-${index}`;
     const city = {
@@ -9275,25 +9256,6 @@ async function createTripFromStartAnswers() {
     return { cityFood: foodItems, legTips: tips, suggestedActivities: activities };
   };
 
-  const cityByExactKey = new Map();
-  const cityByName = new Map();
-  if (typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES)) {
-    for (let i = 0; i < ALL_CITIES.length; i++) {
-      const c = ALL_CITIES[i];
-      if (!c || !c.name) continue;
-      const lowerName = c.name.toLowerCase();
-      if (c.countryCode) {
-        const exactKey = `${lowerName}|${c.countryCode}`;
-        if (!cityByExactKey.has(exactKey)) {
-          cityByExactKey.set(exactKey, c);
-        }
-      }
-      if (!cityByName.has(lowerName)) {
-        cityByName.set(lowerName, c);
-      }
-    }
-  }
-
   citiesData = route.map((stop, index) => {
     const cityNameTrimmed = stop.city.trim();
     const cityNameLower = cityNameTrimmed.toLowerCase();
@@ -9301,10 +9263,11 @@ async function createTripFromStartAnswers() {
     
     let dbMatch = null;
     if (explicitCountryCode) {
-      dbMatch = cityByExactKey.get(`${cityNameLower}|${explicitCountryCode}`) || null;
+      dbMatch = ALL_CITIES_BY_NAME_COUNTRY_MAP.get(`${cityNameLower}|${explicitCountryCode.toUpperCase()}`) || null;
     }
     if (!dbMatch) {
-      dbMatch = cityByName.get(cityNameLower) || null;
+      const nameMatches = ALL_CITIES_BY_NAME_MAP.get(cityNameLower);
+      dbMatch = nameMatches && nameMatches.length > 0 ? nameMatches[0] : null;
     }
 
     const countryCode = explicitCountryCode || dbMatch?.countryCode || 'ZZ';
