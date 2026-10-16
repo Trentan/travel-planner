@@ -3134,103 +3134,123 @@
     }
 
     body.mobile-app-mode #stay-modal .modal-footer,
-    body.mobile-app-mode #journey-modal .modal-footer {
+    body.mobile-app-mode #journey-modal .modal-footer,
+    body.mobile-app-mode #add-leg-modal .modal-footer,
+    body.mobile-app-mode #trip-settings-modal .modal-footer {
       flex: 0 0 auto;
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.6rem;
-      padding: 0.8rem;
+      gap: 0.625rem;
+      padding: 0.875rem 1rem calc(0.875rem + env(safe-area-inset-bottom, 0px));
       background: #ffffff;
-      border-top: 1px solid rgba(203, 213, 225, 0.5);
+      border-top: 1px solid rgba(203, 213, 225, 0.6);
+      box-sizing: border-box;
     }
 
     [data-theme="dark"] body.mobile-app-mode #stay-modal .modal-footer,
-    [data-theme="dark"] body.mobile-app-mode #journey-modal .modal-footer {
+    [data-theme="dark"] body.mobile-app-mode #journey-modal .modal-footer,
+    [data-theme="dark"] body.mobile-app-mode #add-leg-modal .modal-footer,
+    [data-theme="dark"] body.mobile-app-mode #trip-settings-modal .modal-footer {
       background: var(--surface-card);
-      border-top-color: rgba(148, 163, 184, 0.12);
+      border-top-color: rgba(148, 163, 184, 0.16);
     }
 
     body.mobile-app-mode #stay-modal .modal-footer .action-btn,
-    body.mobile-app-mode #journey-modal .modal-footer .action-btn {
-      min-height: 2.75rem;
+    body.mobile-app-mode #journey-modal .modal-footer .action-btn,
+    body.mobile-app-mode #add-leg-modal .modal-footer .action-btn,
+    body.mobile-app-mode #trip-settings-modal .modal-footer .action-btn,
+    body.mobile-app-mode .modal-footer button {
+      min-height: 2.875rem; /* 46px touch target standard */
       justify-content: center;
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      border-radius: 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      border-radius: 0.75rem; /* 12px */
       margin: 0 !important;
+      padding: 0 1rem;
+      transition: transform 0.12s ease, opacity 0.15s ease;
     }
 
-    body.mobile-app-mode #stay-modal .modal-footer button,
-    body.mobile-app-mode #journey-modal .modal-footer button {
-      order: 10;
+    body.mobile-app-mode .modal-footer button:active {
+      transform: scale(0.98);
     }
 
-    /* Stay Modal Buttons (Mobile): Standardized Order: Cancel (left) | Save (right) */
+    /* Stay Modal Buttons: Standardized Order: Cancel (left) | Save (right) | Delete (isolated subtle/centered) */
     body.mobile-app-mode #stay-modal .modal-footer button[onclick*="closeAddStayModal"] {
       order: 1;
-      flex: 1 1 calc(50% - 0.3rem);
+      flex: 1 1 calc(50% - 0.35rem);
     }
     body.mobile-app-mode #stay-modal .modal-footer button[onclick*="saveStayFromModal"] {
       order: 2;
-      flex: 1 1 calc(50% - 0.3rem);
+      flex: 1 1 calc(50% - 0.35rem);
     }
     body.mobile-app-mode #stay-modal .modal-footer #stayDeleteBtn {
       order: 3;
       flex: 1 1 100%;
-      background: transparent !important;
-      border: none !important;
-      color: #f43f5e !important;
+      background: rgba(244, 63, 94, 0.08) !important;
+      border: 1px solid rgba(244, 63, 94, 0.22) !important;
+      color: #e11d48 !important;
       box-shadow: none !important;
-      min-height: 2.25rem !important;
-      height: 2.25rem !important;
+      min-height: 2.5rem !important;
+      height: 2.5rem !important;
       margin-top: 0.25rem !important;
-      font-weight: 700;
-      text-transform: uppercase;
-      font-size: 0.8rem;
+      font-weight: 600;
+      font-size: 0.8125rem;
+      border-radius: 0.75rem;
     }
 
-    /* Journey Modal Buttons (Mobile): Standardized Order: Segment (+), Cancel (left), Save (right) */
+    /* Journey Modal Buttons: Standardized Order: Segment (+), Cancel (left), Save (right), Delete */
     body.mobile-app-mode #journey-modal .modal-footer button[onclick*="addSegmentToJourney"] {
       order: 1;
       flex: 1 1 100%;
+      min-height: 2.5rem;
+      border: 1px dashed rgba(8, 145, 178, 0.45) !important;
+      background: rgba(8, 145, 178, 0.06) !important;
+      color: #0891b2 !important;
+      font-size: 0.8125rem;
+      font-weight: 600;
     }
     body.mobile-app-mode #journey-modal .modal-footer button[onclick*="closeJourneyModal"] {
       order: 2;
-      flex: 1 1 calc(50% - 0.3rem);
+      flex: 1 1 calc(50% - 0.35rem);
     }
     body.mobile-app-mode #journey-modal .modal-footer button[onclick*="saveJourneyFromModal"] {
       order: 3;
-      flex: 1 1 calc(50% - 0.3rem);
+      flex: 1 1 calc(50% - 0.35rem);
     }
     body.mobile-app-mode #journey-modal .modal-footer #journeyDeleteBtn {
       order: 4;
       flex: 1 1 100%;
-      background: transparent !important;
-      border: none !important;
-      color: #f43f5e !important;
+      background: rgba(244, 63, 94, 0.08) !important;
+      border: 1px solid rgba(244, 63, 94, 0.22) !important;
+      color: #e11d48 !important;
       box-shadow: none !important;
-      min-height: 2.25rem !important;
-      height: 2.25rem !important;
+      min-height: 2.5rem !important;
+      height: 2.5rem !important;
       margin-top: 0.25rem !important;
-      font-weight: 700;
-      text-transform: uppercase;
-      font-size: 0.8rem;
+      font-weight: 600;
+      font-size: 0.8125rem;
+      border-radius: 0.75rem;
     }
 
     body.mobile-app-mode .modal-close {
       min-width: 2.75rem;
       min-height: 2.75rem;
       font-size: 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.75rem;
     }
 
-    /* Mobile form controls: larger inputs for fat fingers */
+    /* Mobile form controls: 16px font eliminates iOS zoom, standard 44px min-height */
     body.mobile-app-mode .form-control {
       font-size: 1rem;
       padding: 0.625rem 0.75rem;
       min-height: 2.75rem;
+      border-radius: 0.625rem;
     }
 
     body.mobile-app-mode select.form-control {

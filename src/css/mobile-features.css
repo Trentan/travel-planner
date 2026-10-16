@@ -2242,14 +2242,74 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   animation-duration: 0.14s !important;
 }
 
-@keyframes mobileBottomSheetSlideUp {
-  from {
-    transform: translateY(24px);
-    opacity: 0.92;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+/* ==========================================================================
+   MOBILE APP MODE TYPOGRAPHY, BUTTON & LAYOUT STANDARDIZATION
+   ========================================================================== */
+
+/* Typography floor & elimination of cramped micro-fonts */
+body.mobile-app-mode [class*="text-[10px]"],
+body.mobile-app-mode [class*="text-[11px]"],
+body.mobile-app-mode .badge,
+body.mobile-app-mode .pill,
+body.mobile-app-mode .meta-label {
+  font-size: var(--mob-font-meta, 0.75rem) !important; /* 12px strict floor */
+  line-height: 1.25 !important;
+}
+
+body.mobile-app-mode label,
+body.mobile-app-mode .form-label,
+body.mobile-app-mode .input-label {
+  font-size: var(--mob-font-label, 0.84375rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Card Alignment, Padding & Clutter Reduction */
+body.mobile-app-mode .itinerary-card,
+body.mobile-app-mode .day-card,
+body.mobile-app-mode .stay-card,
+body.mobile-app-mode .journey-card {
+  padding: var(--mob-space-md, 14px) !important;
+  border-radius: var(--mob-radius-card, 14px) !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Card Header alignment: single line title with ellipsis */
+body.mobile-app-mode .itinerary-card-title,
+body.mobile-app-mode .day-card-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* De-clutter redundant inline hover actions on touch devices */
+body.mobile-app-mode .itinerary-card .desktop-hover-actions,
+body.mobile-app-mode .itinerary-card .hover-actions-overlay {
+  display: none !important;
+}
+
+/* Standardized Badge alignment inside cards */
+body.mobile-app-mode .card-badges,
+body.mobile-app-mode .itinerary-badges {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+}
+
+/* Bottom Navigation ergonomics & safe area */
+body.mobile-app-mode #mobile-bottom-nav {
+  height: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  box-sizing: border-box !important;
+}
+
+body.mobile-app-mode #mobile-bottom-nav button,
+body.mobile-app-mode #mobile-bottom-nav .nav-item {
+  min-height: 48px !important;
+  font-size: var(--mob-font-meta, 0.75rem) !important;
+  font-weight: 600 !important;
 }
 

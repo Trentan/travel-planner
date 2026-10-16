@@ -59,6 +59,26 @@
   --radius-lg: 1rem;       /* 16px */
   --radius-full: 9999px;
 
+  /* Mobile Design Tokens */
+  --mob-font-title: 1.1875rem;   /* 19px - Modal & Page Titles */
+  --mob-font-section: 0.9375rem; /* 15px - Card Titles & Section Headers */
+  --mob-font-input: 1rem;        /* 16px - Form Inputs (Prevents iOS zoom) */
+  --mob-font-label: 0.84375rem;  /* 13.5px - Form Labels & Buttons */
+  --mob-font-meta: 0.75rem;      /* 12px - Badges, Timestamps, Captions floor */
+
+  --mob-touch-target: 46px;
+  --mob-touch-target-sm: 38px;
+  --mob-icon-btn-size: 44px;
+  --mob-radius-card: 14px;
+  --mob-radius-btn: 12px;
+  --mob-radius-pill: 9999px;
+
+  --mob-space-xs: 6px;
+  --mob-space-sm: 10px;
+  --mob-space-md: 14px;
+  --mob-space-lg: 16px;
+  --mob-space-xl: 24px;
+
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.04);
   --shadow-md: 0 6px 14px -8px rgb(15 23 42 / 0.2), 0 2px 6px -4px rgb(15 23 42 / 0.12);
