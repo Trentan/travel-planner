@@ -1706,7 +1706,7 @@
     #add-leg-modal .modal-content {
       max-width: calc(100vw - 1rem) !important;
       width: calc(100vw - 1rem) !important;
-      max-height: 100% !important;
+      max-height: 94vh !important;
       display: flex !important;
       flex-direction: column !important;
     }
@@ -1723,20 +1723,21 @@
 
     #add-leg-modal .modal-body {
       flex: 1 1 auto !important;
-      max-height: calc(100vh - 8rem) !important;
+      max-height: calc(94vh - 7rem) !important;
       overflow-y: auto !important;
       padding: 0.75rem 0.75rem !important;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
     #add-leg-modal #legReorderList {
-      max-height: min(210px, calc(100vh - 28rem)) !important;
-      overflow-y: auto !important;
+      max-height: none !important;
+      overflow-y: visible !important;
     }
 
     #add-leg-modal #legDayNotesList {
-      max-height: 12rem !important;
-      overflow-y: auto !important;
+      max-height: none !important;
+      overflow-y: visible !important;
     }
 
     #add-leg-modal #legSelectGroup,
@@ -3143,12 +3144,12 @@
       order: 10;
     }
 
-    /* Stay Modal Buttons (Mobile) */
-    body.mobile-app-mode #stay-modal .modal-footer button[onclick*="saveStayFromModal"] {
+    /* Stay Modal Buttons (Mobile): Standardized Order: Cancel (left) | Save (right) */
+    body.mobile-app-mode #stay-modal .modal-footer button[onclick*="closeAddStayModal"] {
       order: 1;
       flex: 1 1 calc(50% - 0.3rem);
     }
-    body.mobile-app-mode #stay-modal .modal-footer button[onclick*="closeAddStayModal"] {
+    body.mobile-app-mode #stay-modal .modal-footer button[onclick*="saveStayFromModal"] {
       order: 2;
       flex: 1 1 calc(50% - 0.3rem);
     }
@@ -3167,16 +3168,16 @@
       font-size: 0.8rem;
     }
 
-    /* Journey Modal Buttons (Mobile) */
-    body.mobile-app-mode #journey-modal .modal-footer button[onclick*="saveJourneyFromModal"] {
+    /* Journey Modal Buttons (Mobile): Standardized Order: Segment (+), Cancel (left), Save (right) */
+    body.mobile-app-mode #journey-modal .modal-footer button[onclick*="addSegmentToJourney"] {
       order: 1;
       flex: 1 1 100%;
     }
-    body.mobile-app-mode #journey-modal .modal-footer button[onclick*="addSegmentToJourney"] {
+    body.mobile-app-mode #journey-modal .modal-footer button[onclick*="closeJourneyModal"] {
       order: 2;
       flex: 1 1 calc(50% - 0.3rem);
     }
-    body.mobile-app-mode #journey-modal .modal-footer button[onclick*="closeJourneyModal"] {
+    body.mobile-app-mode #journey-modal .modal-footer button[onclick*="saveJourneyFromModal"] {
       order: 3;
       flex: 1 1 calc(50% - 0.3rem);
     }
