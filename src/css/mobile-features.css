@@ -2362,3 +2362,48 @@ body.mobile-app-mode #mobile-bottom-nav .nav-item {
   font-weight: 600 !important;
 }
 
+/* Manage Trip Legs (#add-leg-modal) Mobile Standardized Footers */
+body.mobile-app-mode #add-leg-modal .modal-header .modal-close {
+  display: inline-flex !important;
+}
+
+body.mobile-app-mode #add-leg-modal .leg-utility-actions,
+body.mobile-app-mode #add-leg-modal #legReorderSection .flex.gap-2.mb-3 {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0.5rem !important;
+}
+
+body.mobile-app-mode #add-leg-modal #legReorderSection .modal-footer,
+body.mobile-app-mode #add-leg-modal #legEditSection .modal-footer {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.5rem !important;
+  padding: 0.75rem 0.875rem !important;
+}
+
+body.mobile-app-mode #add-leg-modal .journey-footer-actions {
+  display: flex !important;
+  flex: 1 1 100% !important;
+  gap: 0.5rem !important;
+}
+
+body.mobile-app-mode #add-leg-modal .journey-footer-actions button {
+  flex: 1 1 50% !important;
+  min-height: 2.75rem !important;
+}
+
+/* Home Header Chrome Vertical Compression (Argon Reassessment) */
+body.mobile-app-mode .city-nav-scroll,
+body.mobile-app-mode #cityNav {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+body.mobile-app-mode .itinerary-day-summary-row {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
