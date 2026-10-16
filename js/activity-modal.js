@@ -118,8 +118,13 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
   modal.innerHTML = `
     <div class="modal-content activity-assign-modal modal-lg">
       <div class="modal-header">
-        <h2>${isEditing ? '✎ Edit & Schedule Activity' : '➕ Add & Schedule Activity'}</h2>
-        <button class="modal-close" type="button" id="activityAssignCloseBtn">&times;</button>
+        <div class="modal-header-left">
+          <h2>${isEditing ? '✎ Edit & Schedule Activity' : '➕ Add & Schedule Activity'}</h2>
+        </div>
+        <div class="modal-header-actions">
+          <button class="action-btn action-btn-secondary modal-header-save-btn mobile-header-action" type="button" id="activityAssignTopSaveBtn">Save</button>
+          <button class="modal-close" type="button" id="activityAssignCloseBtn" aria-label="Close dialog">&times;</button>
+        </div>
       </div>
       <div class="modal-body">
         ${dualTimeNoticeHtml}
@@ -645,7 +650,7 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
     };
   }
 
-  document.getElementById('saveActivityBtn').onclick = () => {
+  const handleSaveActivity = () => {
     const formData = getFormData();
     if (!formData) return;
 
@@ -741,6 +746,11 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
     }
     closeModal();
   };
+
+  const bottomSaveBtn = document.getElementById('saveActivityBtn');
+  if (bottomSaveBtn) bottomSaveBtn.onclick = handleSaveActivity;
+  const topSaveBtn = document.getElementById('activityAssignTopSaveBtn');
+  if (topSaveBtn) topSaveBtn.onclick = handleSaveActivity;
 
   const deleteBtn = document.getElementById('activityAssignDeleteBtn');
   if (deleteBtn) {

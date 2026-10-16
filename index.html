@@ -968,8 +968,13 @@
   <div id="add-leg-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content modal-md">
       <div class="modal-header">
-        <h2 id="legDialogTitle">Manage Trip Legs</h2>
-        <button class="modal-close" onclick="closeAddLegDialog()" aria-label="Close dialog">&times;</button>
+        <div class="modal-header-left">
+          <h2 id="legDialogTitle">Manage Trip Legs</h2>
+        </div>
+        <div class="modal-header-actions">
+          <button id="legDialogTopSaveBtn" class="action-btn action-btn-secondary modal-header-save-btn mobile-header-action" type="button" onclick="confirmAddLeg()">Save</button>
+          <button class="modal-close" onclick="closeAddLegDialog()" aria-label="Close dialog">&times;</button>
+        </div>
       </div>
       <div class="modal-body">
         <!-- Segmented Tab Switcher -->

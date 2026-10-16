@@ -2637,20 +2637,18 @@
       min-width: 0;
     }
 
-    /* Mobile modals: full-width on small screens with readable text */
+    /* Mobile modals: full-width bottom sheet on small screens with keyboard safety */
     body.mobile-app-mode .modal-overlay {
-      padding-top: calc(1rem + env(safe-area-inset-top, 0px)) !important;
-      padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
-      align-items: center;
-      justify-content: center;
+      align-items: flex-end !important;
+      justify-content: center !important;
+      padding: 0 !important;
     }
 
     body.mobile-app-mode .modal-content {
-      max-width: calc(100vw - 0.75rem);
-      max-height: 100% !important;
-      height: auto !important;
-      border-radius: 1rem;
-      margin: 0.5rem auto;
+      max-width: 100% !important;
+      max-height: min(92dvh, calc(var(--vvh, 100dvh) - env(safe-area-inset-top, 0px) - 0.5rem)) !important;
+      border-radius: 1.25rem 1.25rem 0 0 !important;
+      margin: auto 0 0 0 !important;
     }
 
     body.mobile-app-mode .modal-header h2 {

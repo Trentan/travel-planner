@@ -2267,3 +2267,49 @@ window.findDesktopDayFromScrollPosition = findDesktopDayFromScrollPosition;
 window.populatePrintTripHeader = populatePrintTripHeader;
 window.printItinerary = printItinerary;
 
+// Global visualViewport binding for mobile keyboards & bottom sheet modals
+function initGlobalVisualViewportHandler() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  const syncViewportHeight = () => {
+    const vv = window.visualViewport;
+    const height = vv ? vv.height : window.innerHeight;
+    if (document.documentElement && document.documentElement.style && typeof document.documentElement.style.setProperty === 'function') {
+      document.documentElement.style.setProperty('--vvh', `${height}px`);
+    }
+  };
+
+  if (window.visualViewport && typeof window.visualViewport.addEventListener === 'function') {
+    window.visualViewport.addEventListener('resize', syncViewportHeight);
+    window.visualViewport.addEventListener('scroll', syncViewportHeight);
+  }
+  if (typeof window.addEventListener === 'function') {
+    window.addEventListener('resize', syncViewportHeight);
+  }
+  syncViewportHeight();
+
+  // Scroll active input into view smoothly when keyboard pops up inside a modal
+  if (typeof document.addEventListener === 'function') {
+    document.addEventListener('focusin', (e) => {
+      if (!isMobileViewport()) return;
+      const target = e.target;
+      if (!target || !['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
+      const modalContent = target.closest && typeof target.closest === 'function' ? target.closest('.modal-content, .modal-card, .trip-start-panel') : null;
+      if (!modalContent) return;
+
+      setTimeout(() => {
+        if (typeof target.scrollIntoView === 'function') {
+          target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+      }, 280);
+    });
+  }
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading' && typeof document.addEventListener === 'function') {
+    document.addEventListener('DOMContentLoaded', initGlobalVisualViewportHandler);
+  } else {
+    initGlobalVisualViewportHandler();
+  }
+}
+
