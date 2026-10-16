@@ -6121,6 +6121,11 @@ function calculateNightsBetween(checkIn, checkOut) {
   return Math.max(0, diffDays);
 }
 
+if (typeof window !== 'undefined') {
+  window.stripCityLabel = stripCityLabel;
+  window.calculateNightsBetween = calculateNightsBetween;
+}
+
 function seedDefaultDerivedTravelData() {
   // Not needed anymore since default data provides journeys and stays natively.
   return false;

@@ -416,7 +416,7 @@ const TRANSPORT_LABELS = {
 };
 
 function getTransportLabel(type) {
-  return TRANSPORT_LABELS[type] || TRANSPORT_LABELS.other;
+  return (type && Object.prototype.hasOwnProperty.call(TRANSPORT_LABELS, type)) ? TRANSPORT_LABELS[type] : TRANSPORT_LABELS.other;
 }
 
 // Initialize journeys from localStorage - called by data.js
@@ -2495,6 +2495,7 @@ window.updateJourneyNotes = updateJourneyNotes;
 window.buildTransportTab = buildTransportTab;
 window.getDayJourneys = getDayJourneys;
 window.getTransportIcon = getTransportIcon;
+window.getTransportLabel = getTransportLabel;
 window.renderTransportCarrierMobile = renderTransportCarrierMobile;
 window.renderTransportStatusCostMobile = renderTransportStatusCostMobile;
 window.createJourneyFromTransportItem = createJourneyFromTransportItem;
