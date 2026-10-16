@@ -11,10 +11,16 @@ function runActivitySchedulerTests() {
   const getComparisonString = context.getComparisonString;
   const getSuggestedActivityDayText = context.getSuggestedActivityDayText;
   const getSuggestedActivityMatchTexts = context.getSuggestedActivityMatchTexts;
+  const timeValueToMinutes = context.timeValueToMinutes;
+  const minutesToTimeValue = context.minutesToTimeValue;
+  const activityLooksLikeMeal = context.activityLooksLikeMeal;
 
   assert(typeof getComparisonString === 'function', 'getComparisonString should be exported as a function');
   assert(typeof getSuggestedActivityDayText === 'function', 'getSuggestedActivityDayText should be exported as a function');
   assert(typeof getSuggestedActivityMatchTexts === 'function', 'getSuggestedActivityMatchTexts should be exported as a function');
+  assert(typeof timeValueToMinutes === 'function', 'timeValueToMinutes should be exported as a function');
+  assert(typeof minutesToTimeValue === 'function', 'minutesToTimeValue should be exported as a function');
+  assert(typeof activityLooksLikeMeal === 'function', 'activityLooksLikeMeal should be exported as a function');
 
   // ==========================================
   // 1. getComparisonString - Basic normalization
@@ -83,6 +89,123 @@ function runActivitySchedulerTests() {
     JSON.stringify(getSuggestedActivityMatchTexts({ title: '   ' })) === JSON.stringify([]),
     'Whitespace title activity should return empty array'
   );
+
+  // ==========================================
+  // 7. timeValueToMinutes - Valid 24-hour time strings
+  // ==========================================
+  assert(timeValueToMinutes('00:00') === 0, '00:00 should return 0 minutes');
+  assert(timeValueToMinutes('00:01') === 1, '00:01 should return 1 minute');
+  assert(timeValueToMinutes('09:30') === 570, '09:30 should return 570 minutes');
+  assert(timeValueToMinutes('12:00') === 720, '12:00 should return 720 minutes');
+  assert(timeValueToMinutes('14:15') === 855, '14:15 should return 855 minutes');
+  assert(timeValueToMinutes('23:59') === 1439, '23:59 should return 1439 minutes');
+
+  // ==========================================
+  // 8. timeValueToMinutes - Single digit hours & whitespace
+  // ==========================================
+  assert(timeValueToMinutes('0:00') === 0, '0:00 should return 0 minutes');
+  assert(timeValueToMinutes('9:05') === 545, '9:05 should return 545 minutes');
+  assert(timeValueToMinutes('1:30') === 90, '1:30 should return 90 minutes');
+  assert(timeValueToMinutes('  14:15  ') === 855, 'Should trim surrounding whitespace');
+  assert(timeValueToMinutes('\t08:00\n') === 480, 'Should trim tabs and newlines');
+
+  // ==========================================
+  // 9. timeValueToMinutes - Out of bounds hours or minutes
+  // ==========================================
+  assert(timeValueToMinutes('24:00') === null, '24:00 should return null (hours > 23)');
+  assert(timeValueToMinutes('25:30') === null, '25:30 should return null (hours > 23)');
+  assert(timeValueToMinutes('99:00') === null, '99:00 should return null (hours > 23)');
+  assert(timeValueToMinutes('12:60') === null, '12:60 should return null (minutes > 59)');
+  assert(timeValueToMinutes('09:99') === null, '09:99 should return null (minutes > 59)');
+
+  // ==========================================
+  // 10. timeValueToMinutes - Invalid time string formats
+  // ==========================================
+  assert(timeValueToMinutes('12') === null, '12 without minutes should return null');
+  assert(timeValueToMinutes('12:3') === null, '12:3 single digit minute should return null');
+  assert(timeValueToMinutes('12:345') === null, '12:345 three digit minute should return null');
+  assert(timeValueToMinutes('abc') === null, 'Non-time string should return null');
+  assert(timeValueToMinutes('12:3a') === null, 'Alphanumeric minute should return null');
+  assert(timeValueToMinutes('12.34') === null, 'Period delimiter should return null');
+  assert(timeValueToMinutes('12-34') === null, 'Hyphen delimiter should return null');
+  assert(timeValueToMinutes('9:00 AM') === null, '12-hour AM/PM format should return null');
+  assert(timeValueToMinutes('12:30 PM') === null, '12-hour AM/PM format should return null');
+
+  // ==========================================
+  // 11. timeValueToMinutes - Non-string / falsy / edge case inputs
+  // ==========================================
+  assert(timeValueToMinutes(null) === null, 'null input should return null');
+  assert(timeValueToMinutes(undefined) === null, 'undefined input should return null');
+  assert(timeValueToMinutes('') === null, 'Empty string should return null');
+  assert(timeValueToMinutes('   ') === null, 'Whitespace-only string should return null');
+  assert(timeValueToMinutes(false) === null, 'false input should return null');
+  assert(timeValueToMinutes(0) === null, 'numeric 0 should return null');
+  assert(timeValueToMinutes(NaN) === null, 'NaN should return null');
+  assert(timeValueToMinutes({ toString: () => '10:15' }) === 615, 'Object with toString returning time string should work');
+
+  // ==========================================
+  // 12. minutesToTimeValue - Standard conversions
+  // ==========================================
+  assert(minutesToTimeValue(0) === '00:00', '0 minutes should return "00:00"');
+  assert(minutesToTimeValue(5) === '00:05', '5 minutes should return "00:05"');
+  assert(minutesToTimeValue(90) === '01:30', '90 minutes should return "01:30"');
+  assert(minutesToTimeValue(540) === '09:00', '540 minutes should return "09:00"');
+  assert(minutesToTimeValue(755) === '12:35', '755 minutes should return "12:35"');
+  assert(minutesToTimeValue(1439) === '23:59', '1439 minutes should return "23:59"');
+
+  // ==========================================
+  // 13. minutesToTimeValue - Rounding & numeric strings
+  // ==========================================
+  assert(minutesToTimeValue(90.4) === '01:30', '90.4 minutes should round down to "01:30"');
+  assert(minutesToTimeValue(90.6) === '01:31', '90.6 minutes should round up to "01:31"');
+  assert(minutesToTimeValue('90') === '01:30', 'String "90" should convert to "01:30"');
+  assert(minutesToTimeValue(' 540 ') === '09:00', 'String with whitespace " 540 " should convert to "09:00"');
+
+  // ==========================================
+  // 14. minutesToTimeValue - Clamping (<0 and >=1440)
+  // ==========================================
+  assert(minutesToTimeValue(-10) === '00:00', 'Negative minutes should clamp to "00:00"');
+  assert(minutesToTimeValue(1440) === '23:59', '1440 minutes (24h) should clamp to "23:59"');
+  assert(minutesToTimeValue(2000) === '23:59', 'Minutes exceeding 1439 should clamp to "23:59"');
+
+  // ==========================================
+  // 15. minutesToTimeValue - Invalid and non-finite inputs
+  // ==========================================
+  assert(minutesToTimeValue(null) === '00:00', 'null should convert to 0 and return "00:00"');
+  assert(minutesToTimeValue(undefined) === '', 'undefined should return empty string');
+  assert(minutesToTimeValue(NaN) === '', 'NaN should return empty string');
+  assert(minutesToTimeValue(Infinity) === '', 'Infinity should return empty string');
+  assert(minutesToTimeValue(-Infinity) === '', '-Infinity should return empty string');
+  assert(minutesToTimeValue('invalid') === '', 'Non-numeric string should return empty string');
+  assert(minutesToTimeValue({}) === '', 'Object should return empty string');
+
+  // ==========================================
+  // 16. activityLooksLikeMeal tests
+  // ==========================================
+  const breakfastPattern = /\b(breakfast|coffee|cafe|bakery|brunch)\b/;
+  const lunchPattern = /\b(lunch|restaurant|food|market)\b/;
+  const dinnerPattern = /\b(dinner|supper|bar|drinks|night)\b/;
+
+  // Title matching
+  assert(activityLooksLikeMeal({ title: 'Morning Coffee' }, breakfastPattern) === true, 'Should match breakfast pattern on title');
+  assert(activityLooksLikeMeal({ title: 'DINNER AT BISTRO' }, dinnerPattern) === true, 'Should match dinner pattern on uppercase title');
+
+  // Text fallback matching when title is absent or empty
+  assert(activityLooksLikeMeal({ text: 'Quick Lunch' }, lunchPattern) === true, 'Should match lunch pattern on text fallback');
+  assert(activityLooksLikeMeal({ title: '', text: 'Croissant at Bakery' }, breakfastPattern) === true, 'Should fall back to text when title is empty');
+
+  // Category matching
+  assert(activityLooksLikeMeal({ title: 'Chez Paul', category: 'Restaurant' }, lunchPattern) === true, 'Should match meal pattern on category');
+  assert(activityLooksLikeMeal({ text: 'Nightcap', category: 'Bar' }, dinnerPattern) === true, 'Should match meal pattern on category with text');
+
+  // Non-matching activity
+  assert(activityLooksLikeMeal({ title: 'Louvre Museum Visit', category: 'Sightseeing' }, lunchPattern) === false, 'Should return false for non-meal activity');
+  assert(activityLooksLikeMeal({ title: 'Park Walk' }, breakfastPattern) === false, 'Should return false when title/category does not match pattern');
+
+  // Null, undefined, empty object inputs
+  assert(activityLooksLikeMeal(null, lunchPattern) === false, 'null activity should return false');
+  assert(activityLooksLikeMeal(undefined, dinnerPattern) === false, 'undefined activity should return false');
+  assert(activityLooksLikeMeal({}, breakfastPattern) === false, 'empty activity object should return false');
 
   console.log('✅ ALL activity-scheduler UNIT TESTS PASSED CLEANLY!');
 }

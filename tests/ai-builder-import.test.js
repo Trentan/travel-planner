@@ -50,6 +50,51 @@ async function runAiBuilderImportTests() {
   assert(typeof parsedSchema.journeys[0].fromLat === 'number' && typeof parsedSchema.journeys[0].fromLng === 'number' && typeof parsedSchema.journeys[0].toLat === 'number' && typeof parsedSchema.journeys[0].toLng === 'number', 'Schema journeys must include numeric fromLat/fromLng/toLat/toLng');
   console.log('  ✔ buildAiPrompt schema & rules verification passed (including map coordinates & locations)');
 
+  // 1b. Test _buildAiPromptHeader directly in js/ai.js
+  const _buildAiPromptHeader = contextAi._buildAiPromptHeader;
+  assert(typeof _buildAiPromptHeader === 'function', '_buildAiPromptHeader should be a function');
+
+  // Test full arguments
+  const fullHeader = _buildAiPromptHeader({
+    title: 'Japan Adventure',
+    regions: 'Japan',
+    dates: '10-20 April 2026',
+    citiesInput: 'Tokyo, Kyoto, Osaka',
+    junctions: 'Flight to HND, train to Kansai',
+    vibe: 'Food, culture, bullet trains'
+  });
+  assert(fullHeader.includes('- Title: Japan Adventure'), 'Header must contain specified title');
+  assert(fullHeader.includes('- Target Regions / Countries: Japan'), 'Header must contain specified regions');
+  assert(fullHeader.includes('- Specific Cities: Tokyo, Kyoto, Osaka'), 'Header must contain specified citiesInput');
+  assert(fullHeader.includes('- Fixed Pre-booked Flights & Junctions: Flight to HND, train to Kansai'), 'Header must contain specified junctions');
+  assert(fullHeader.includes('- Dates & Duration: 10-20 April 2026'), 'Header must contain specified dates');
+  assert(fullHeader.includes('- Travel Vibe & Preferences: Food, culture, bullet trains'), 'Header must contain specified vibe');
+
+  // Test missing / falsy optional arguments fallbacks
+  const fallbackHeader = _buildAiPromptHeader({
+    title: 'Mystery Trip',
+    dates: '7 days',
+    vibe: 'Surprise me'
+  });
+  assert(fallbackHeader.includes('- Target Regions / Countries: Not specified (Choose logical countries based on vibe)'), 'Header must use fallback for missing regions');
+  assert(fallbackHeader.includes('- Specific Cities: None specified (AI should select 3-5 logical destination cities in the target region)'), 'Header must use fallback for missing citiesInput');
+  assert(fallbackHeader.includes('- Fixed Pre-booked Flights & Junctions: None (Flexible travel junctions)'), 'Header must use fallback for missing junctions');
+
+  // Test empty string optional arguments
+  const emptyStringHeader = _buildAiPromptHeader({
+    title: 'Europe 2026',
+    regions: 'France, Italy',
+    dates: '14 days',
+    citiesInput: '',
+    junctions: '',
+    vibe: 'Relaxed'
+  });
+  assert(emptyStringHeader.includes('- Target Regions / Countries: France, Italy'), 'Header must preserve regions');
+  assert(emptyStringHeader.includes('- Specific Cities: None specified (AI should select 3-5 logical destination cities in the target region)'), 'Header must fall back when citiesInput is empty string');
+  assert(emptyStringHeader.includes('- Fixed Pre-booked Flights & Junctions: None (Flexible travel junctions)'), 'Header must fall back when junctions is empty string');
+
+  console.log('  ✔ _buildAiPromptHeader unit tests passed (full options, fallbacks, empty strings)');
+
   // 2. Test importing the Bali 2026 fixture
   const fixturePath = path.join(__dirname, '../backups/test-fixtures/bali-2026.json');
   assert(fs.existsSync(fixturePath), 'bali-2026.json test fixture must exist');

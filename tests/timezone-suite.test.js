@@ -26,7 +26,7 @@ async function run() {
     ${utilsCode}
     ${dataCode}
     ${timezoneCode}
-    return { getClientBrowserTimezone, cleanCityTimezoneName, getCityTimezone, getTimezoneOffsetMinutes, getTimezoneDeltaHours, formatTimezoneDeltaBadge, convertLocalToHomeTime };
+    return { getClientBrowserTimezone, cleanCityTimezoneName, getCityTimezone, getTimezoneOffsetMinutes, getTimezoneDeltaHours, formatTimezoneDeltaBadge, convertLocalToHomeTime, setCitiesData: (list) => { citiesData = list; window.citiesData = list; } };
   `;
 
   const evalFn = new Function('window', 'localStorage', 'Intl', combinedCode);
@@ -112,12 +112,56 @@ async function run() {
   const bangkokOffset = tzUtils.getTimezoneOffsetMinutes('Asia/Bangkok', '2026-06-15');
   assert(bangkokOffset === 420, `Bangkok offset in June should be 420 minutes (+7 hrs), got ${bangkokOffset}`);
 
-  // Verify delta hours
+  // Comprehensive test suite for getTimezoneDeltaHours
+  // 1. Falsy/missing input handling
+  assert(tzUtils.getTimezoneDeltaHours(null, 'Tokyo') === 0, 'Null fromCity should return 0');
+  assert(tzUtils.getTimezoneDeltaHours('Tokyo', null) === 0, 'Null toCity should return 0');
+  assert(tzUtils.getTimezoneDeltaHours('', 'Tokyo') === 0, 'Empty string fromCity should return 0');
+  assert(tzUtils.getTimezoneDeltaHours('Tokyo', '') === 0, 'Empty string toCity should return 0');
+  assert(tzUtils.getTimezoneDeltaHours(undefined, undefined) === 0, 'Undefined cities should return 0');
+
+  // 2. Same city or identical timezone
+  assert(tzUtils.getTimezoneDeltaHours('Tokyo', 'Tokyo') === 0, 'Same city should return 0 delta');
+  assert(tzUtils.getTimezoneDeltaHours('Paris', 'Paris') === 0, 'Identical city names should return 0 delta');
+
+  // 3. Integer timezone deltas
   const londonToBangkokDelta = tzUtils.getTimezoneDeltaHours('London', 'Bangkok', '2026-06-15');
-  assert(londonToBangkokDelta === 6, `London to Bangkok delta should be +6 hours, got ${londonToBangkokDelta}`);
+  assert(londonToBangkokDelta === 6, `London to Bangkok delta in June should be +6 hours, got ${londonToBangkokDelta}`);
+
+  const bangkokToLondonDelta = tzUtils.getTimezoneDeltaHours('Bangkok', 'London', '2026-06-15');
+  assert(bangkokToLondonDelta === -6, `Bangkok to London delta in June should be -6 hours, got ${bangkokToLondonDelta}`);
 
   const tokyoToParisDelta = tzUtils.getTimezoneDeltaHours('Tokyo', 'Paris', '2026-06-15');
-  assert(tokyoToParisDelta === -7, `Tokyo to Paris delta should be -7 hours, got ${tokyoToParisDelta}`);
+  assert(tokyoToParisDelta === -7, `Tokyo to Paris delta in June should be -7 hours, got ${tokyoToParisDelta}`);
+
+  const nyToLondonDelta = tzUtils.getTimezoneDeltaHours('New York', 'London', '2026-06-15');
+  assert(nyToLondonDelta === 5, `New York to London delta in June should be +5 hours, got ${nyToLondonDelta}`);
+
+  // 4. Fractional / half-hour timezone deltas
+  const tokyoToAdelaideDelta = tzUtils.getTimezoneDeltaHours('Tokyo', 'Adelaide', '2026-06-15');
+  assert(tokyoToAdelaideDelta === 0.5, `Tokyo (UTC+9) to Adelaide (ACST UTC+9:30) in June should be +0.5 hours, got ${tokyoToAdelaideDelta}`);
+
+  const adelaideToTokyoDelta = tzUtils.getTimezoneDeltaHours('Adelaide', 'Tokyo', '2026-06-15');
+  assert(adelaideToTokyoDelta === -0.5, `Adelaide (ACST UTC+9:30) to Tokyo (UTC+9) in June should be -0.5 hours, got ${adelaideToTokyoDelta}`);
+
+  // 5. Seasonal DST differences across dates
+  const londonToSydneyJune = tzUtils.getTimezoneDeltaHours('London', 'Sydney', '2026-06-15');
+  assert(londonToSydneyJune === 9, `London (BST +1) to Sydney (AEST +10) in June should be +9 hours, got ${londonToSydneyJune}`);
+
+  const londonToSydneyJan = tzUtils.getTimezoneDeltaHours('London', 'Sydney', '2026-01-15');
+  assert(londonToSydneyJan === 11, `London (GMT +0) to Sydney (AEDT +11) in Jan should be +11 hours, got ${londonToSydneyJan}`);
+
+  // 6. Custom citiesData timezone support
+  tzUtils.setCitiesData([
+    { name: 'CustomCityAlpha', timezone: 'America/Los_Angeles' },
+    { name: 'CustomCityBeta', timezone: 'Asia/Tokyo' }
+  ]);
+  const customCityDelta = tzUtils.getTimezoneDeltaHours('CustomCityAlpha', 'CustomCityBeta', '2026-06-15');
+  assert(customCityDelta === 16, `CustomCityAlpha (LA PDT -7) to CustomCityBeta (Tokyo JST +9) in June should be +16 hours, got ${customCityDelta}`);
+
+  // 7. Default date parameter omitted
+  const defaultDateDelta = tzUtils.getTimezoneDeltaHours('London', 'Bangkok');
+  assert(typeof defaultDateDelta === 'number' && !isNaN(defaultDateDelta), `Default date input should produce a valid number delta, got ${defaultDateDelta}`);
 
   // Verify transition badges
   assert(tzUtils.formatTimezoneDeltaBadge('London', 'Bangkok', '2026-06-15') === '🕐 +6 hrs', `London to Bangkok badge should format as "🕐 +6 hrs", got ${tzUtils.formatTimezoneDeltaBadge('London', 'Bangkok', '2026-06-15')}`);

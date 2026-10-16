@@ -656,6 +656,7 @@ if (typeof window !== 'undefined') {
   window.mergeBookingIntakePreview = mergeBookingIntakePreview;
   window.parseBookingConfirmationText = parseBookingConfirmationText;
   window.parseBookingDate = parseBookingDate;
+  window.normalizeBookingWhitespace = normalizeBookingWhitespace;
   window.cleanBookingPlace = cleanBookingPlace;
   window.getBookingRoute = getBookingRoute;
   window.splitBookingTextIntoSegments = splitBookingTextIntoSegments;
@@ -667,6 +668,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     parseBookingConfirmationText,
     parseBookingDate,
+    normalizeBookingWhitespace,
     getBookingRoute,
     cleanBookingPlace,
     splitBookingTextIntoSegments,
