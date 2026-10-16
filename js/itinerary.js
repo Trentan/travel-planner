@@ -3196,7 +3196,12 @@ function renderDailyTimelineRow(item, compact = false) {
       data-item-cost="${escapeCompactText(item.cost || '')}"
       data-item-notes="${escapeCompactText(item.notes || '')}"
       data-item-provider="${escapeCompactText(item.provider || '')}"
-      data-item-ref="${escapeCompactText(item.bookingRef || '')}">
+      data-item-ref="${escapeCompactText(item.bookingRef || '')}"
+      data-leg-index="${item.legIndex !== undefined ? item.legIndex : ''}"
+      data-day-index="${item.dayIndex !== undefined ? item.dayIndex : ''}"
+      data-item-index="${item.itemIndex !== undefined ? item.itemIndex : ''}"
+      data-stay-id="${item.stayId || ''}"
+      data-journey-id="${item.journeyId || ''}">
       <div class="${timeClass}"${timeOnClick}>${escapeCompactText(formatTimelineTimeRange(item.startTime, item.endTime))}</div>
       <div class="${markerClass}"${markerOnClick}><span>${item.icon}</span></div>
       <div class="daily-timeline-content">

@@ -2019,6 +2019,16 @@ function renderSplitDrawerContent(itemData) {
       ` : ''}
       <div class="flex items-center gap-2 pt-1 flex-wrap">
         <button type="button" class="action-btn text-xs py-1 px-2.5 font-semibold text-teal-700 dark:text-teal-300" onclick="restoreSplitDayOverview()" title="Return to Day Overview">← Day Overview</button>
+        ${(itemData.legIndex !== undefined && itemData.dayIndex !== undefined && itemData.itemIndex !== undefined) ? `
+          <button type="button" class="action-btn text-xs py-1 px-2.5 font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800" onclick="if (typeof openEditDayActivityModal === 'function') openEditDayActivityModal(${itemData.legIndex}, ${itemData.dayIndex}, ${itemData.itemIndex});" title="Edit this activity">✏️ Edit</button>
+        ` : (itemData.stayId) ? `
+          <button type="button" class="action-btn text-xs py-1 px-2.5 font-semibold text-pink-700 dark:text-pink-300 bg-pink-50 dark:bg-pink-950/40 border border-pink-200 dark:border-pink-800" onclick="if (typeof openEditStayModal === 'function') openEditStayModal('${itemData.stayId}');" title="Edit this stay">✏️ Edit</button>
+        ` : (itemData.journeyId) ? `
+          <button type="button" class="action-btn text-xs py-1 px-2.5 font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800" onclick="if (typeof editJourney === 'function') editJourney('${itemData.journeyId}');" title="Edit this transit journey">✏️ Edit</button>
+        ` : ''}
+        ${location ? `
+          <button type="button" class="action-btn text-xs py-1 px-2 font-semibold text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800" onclick="openDriverAddressCard({ title: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title}', address: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(location) : location}', category: '${badgeLabel}', bookingRef: '${itemData.bookingRef || ''}' });" title="Open driver / taxi address card">🚖 Taxi Card</button>
+        ` : ''}
         ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="action-btn text-xs py-1 px-2.5">Open in Google Maps</a>` : ''}
         <button type="button" class="action-btn text-xs py-1 px-2 text-slate-500" onclick="clearSplitDrawer()">Dismiss</button>
       </div>
@@ -2089,7 +2099,12 @@ function handleSplitItemClick(itemEl, event) {
     cost: itemEl.dataset.itemCost || itemEl.querySelector('.compact-emoji-cost')?.textContent?.trim() || '',
     notes: itemEl.dataset.itemNotes || '',
     provider: itemEl.dataset.itemProvider || '',
-    bookingRef: itemEl.dataset.itemRef || ''
+    bookingRef: itemEl.dataset.itemRef || '',
+    legIndex: itemEl.dataset.legIndex !== undefined && itemEl.dataset.legIndex !== '' ? parseInt(itemEl.dataset.legIndex, 10) : undefined,
+    dayIndex: itemEl.dataset.dayIndex !== undefined && itemEl.dataset.dayIndex !== '' ? parseInt(itemEl.dataset.dayIndex, 10) : undefined,
+    itemIndex: itemEl.dataset.itemIndex !== undefined && itemEl.dataset.itemIndex !== '' ? parseInt(itemEl.dataset.itemIndex, 10) : undefined,
+    stayId: itemEl.dataset.stayId || '',
+    journeyId: itemEl.dataset.journeyId || ''
   };
 
   selectSplitPaneItem(itemData, itemEl);
@@ -2242,7 +2257,12 @@ if (typeof document !== 'undefined' && typeof document.addEventListener === 'fun
             cost: itemEl.dataset.itemCost || itemEl.querySelector('.compact-emoji-cost')?.textContent?.trim() || '',
             notes: itemEl.dataset.itemNotes || '',
             provider: itemEl.dataset.itemProvider || '',
-            bookingRef: itemEl.dataset.itemRef || ''
+            bookingRef: itemEl.dataset.itemRef || '',
+            legIndex: itemEl.dataset.legIndex !== undefined && itemEl.dataset.legIndex !== '' ? parseInt(itemEl.dataset.legIndex, 10) : undefined,
+            dayIndex: itemEl.dataset.dayIndex !== undefined && itemEl.dataset.dayIndex !== '' ? parseInt(itemEl.dataset.dayIndex, 10) : undefined,
+            itemIndex: itemEl.dataset.itemIndex !== undefined && itemEl.dataset.itemIndex !== '' ? parseInt(itemEl.dataset.itemIndex, 10) : undefined,
+            stayId: itemEl.dataset.stayId || '',
+            journeyId: itemEl.dataset.journeyId || ''
           };
           selectSplitPaneItem(itemData, itemEl);
         }
