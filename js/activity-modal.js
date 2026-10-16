@@ -799,9 +799,15 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
   const deleteBtn = document.getElementById('activityAssignDeleteBtn');
   if (deleteBtn) {
     deleteBtn.onclick = async () => {
-      if (confirm('Are you sure you want to delete this activity?')) {
+      // In mobile mode, delete immediately with Undo toast without modal confirm blockage
+      if (typeof isMobileViewport === 'function' && isMobileViewport()) {
         closeModal();
-        await deleteActivity(legIdx, activityIdx);
+        await deleteActivity(legIdx, activityIdx, { showUndo: true });
+      } else {
+        if (confirm('Are you sure you want to delete this activity?')) {
+          closeModal();
+          await deleteActivity(legIdx, activityIdx, { showUndo: true });
+        }
       }
     };
   }

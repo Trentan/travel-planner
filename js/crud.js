@@ -13,11 +13,13 @@ function deleteLeg(idx) {
 function deleteFood(legIdx, foodIdx) { appData[legIdx].cityFood.splice(foodIdx, 1); saveData(); buildItinerary(); }
 function deleteRun(legIdx, runIdx) { appData[legIdx].cityRun.splice(runIdx, 1); saveData(); buildItinerary(); }
 function deleteSight(legIdx, sightIdx) { appData[legIdx].suggestedSights.splice(sightIdx, 1); saveData(); buildItinerary(); }
-async function deleteActivity(legIdx, activityIdx) {
+async function deleteActivity(legIdx, activityIdx, options = {}) {
   const leg = appData[legIdx];
   const activity = leg?.suggestedActivities?.[activityIdx];
   if (!leg || !activity) return;
 
+  const activitySnapshot = JSON.parse(JSON.stringify(activity));
+  const activityTitle = activity.title || 'Activity';
   const activityId = activity.id;
 
   const isItemMatch = (item) => {
@@ -50,12 +52,16 @@ async function deleteActivity(legIdx, activityIdx) {
     return false;
   };
 
-  // Scan and clean matching items from all days on this leg (clears legacy duplicate leftovers)
+  // Capture matched day items for restoration
+  const removedDayItems = [];
   if (Array.isArray(leg.days)) {
-    leg.days.forEach(day => {
+    leg.days.forEach((day, dayIndex) => {
       if (day && Array.isArray(day.activityItems)) {
-        day.activityItems = day.activityItems.filter(item => {
-          if (isItemMatch(item)) return false;
+        day.activityItems = day.activityItems.filter((item, itemIndex) => {
+          if (isItemMatch(item)) {
+            removedDayItems.push({ dayIndex, item: JSON.parse(JSON.stringify(item)), itemIndex });
+            return false;
+          }
           return true;
         });
       }
@@ -67,6 +73,34 @@ async function deleteActivity(legIdx, activityIdx) {
   await saveData();
   if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll();
   else buildItinerary();
+
+  // Show Undo toast if not explicitly suppressed
+  if (options.showUndo !== false && typeof showToast === 'function') {
+    showToast(`Deleted "${activityTitle.length > 25 ? activityTitle.slice(0, 22) + '...' : activityTitle}"`, {
+      actionText: 'Undo',
+      duration: 6000,
+      onAction: async () => {
+        // Restore activity into leg.suggestedActivities
+        if (!Array.isArray(leg.suggestedActivities)) leg.suggestedActivities = [];
+        leg.suggestedActivities.splice(Math.min(activityIdx, leg.suggestedActivities.length), 0, activitySnapshot);
+
+        // Restore any assigned day items
+        removedDayItems.forEach(({ dayIndex, item, itemIndex }) => {
+          const targetDay = leg.days?.[dayIndex];
+          if (targetDay) {
+            if (!Array.isArray(targetDay.activityItems)) targetDay.activityItems = [];
+            targetDay.activityItems.splice(Math.min(itemIndex, targetDay.activityItems.length), 0, item);
+          }
+        });
+
+        invalidateSuggestedActivityIndex(legIdx);
+        await saveData();
+        if (typeof rebuildItineraryPreservingScroll === 'function') rebuildItineraryPreservingScroll({ focusText: activityTitle });
+        else buildItinerary();
+        showToast(`Restored "${activityTitle.length > 25 ? activityTitle.slice(0, 22) + '...' : activityTitle}"`);
+      }
+    });
+  }
 }
 function deleteLegTip(legIdx, tipIdx) { if (typeof triggerHaptic === "function") triggerHaptic("warning"); appData[legIdx].legTips.splice(tipIdx, 1); saveData(); buildItinerary(); }
 
