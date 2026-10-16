@@ -1419,6 +1419,51 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     transform: scale(0.95);
   }
 
+  /* Driver & Local Address Card (High Contrast Taxi Mode) */
+  .driver-card-headline {
+    font-size: 1.55rem;
+    line-height: 1.25;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  [data-theme="dark"] .driver-card-headline {
+    color: #f8fafc;
+  }
+
+  .driver-card-address-box {
+    background: #f8fafc;
+    border: 2px solid #cbd5e1;
+    border-radius: 0.75rem;
+    padding: 1rem 1.15rem;
+  }
+
+  [data-theme="dark"] .driver-card-address-box {
+    background: #090d16;
+    border-color: #334155;
+  }
+
+  .driver-card-address-text {
+    font-size: 1.35rem;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #1e293b;
+    word-break: break-word;
+  }
+
+  [data-theme="dark"] .driver-card-address-text {
+    color: #e2e8f0;
+  }
+
+  .driver-card-ref-box {
+    background: rgba(13, 148, 136, 0.08);
+    border: 1px dashed rgba(13, 148, 136, 0.4);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+  }
+
   body.mobile-app-mode .leg-reorder-item,
   body.mobile-app-mode .leg-reorder-handle,
   body.mobile-app-mode .drag-handle {

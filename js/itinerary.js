@@ -3076,6 +3076,7 @@ function renderDailyTimelineRow(item, compact = false) {
           }
         }
         parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="${getMapSearchUrl(sophisticatedLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">${escapeCompactText(cleanLoc)}</a></span>`);
+        parts.push(`<button type="button" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border-amber-200 dark:border-amber-800/50 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors" onclick="event.stopPropagation(); openDriverAddressCard({ title: '${escapeCompactText(item.title || item.name || 'Stay')}', address: '${escapeCompactText(cleanLoc)}', category: 'Hotel / Stay', bookingRef: '${escapeCompactText(item.bookingRef || '')}' });" title="Show large driver card for taxi / arrival">🚖 Taxi Card</button>`);
       }
     }
 

@@ -1720,6 +1720,42 @@
     </div>
   </div>
 
+  <!-- High-Contrast Local Language Driver & Address Card Modal -->
+  <div id="driver-address-modal" class="modal-overlay" style="display: none; z-index: 10001;" onclick="if(event.target === this) closeDriverAddressCard();">
+    <div class="modal-content modal-md driver-card-content">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <h2>🚖 Taxi / Local Address</h2>
+        </div>
+        <div class="modal-header-actions">
+          <button class="modal-close" type="button" onclick="closeDriverAddressCard()" aria-label="Close card">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body driver-card-body">
+        <div class="driver-card-venue-badge mb-2">
+          <span id="driverCardCategoryBadge" class="text-xs font-semibold px-2 py-0.5 rounded bg-teal-100 text-teal-800 dark:bg-teal-900/60 dark:text-teal-200">Hotel / Stay</span>
+        </div>
+        <h1 id="driverCardTitle" class="driver-card-headline">Grand Hotel</h1>
+        <div class="driver-card-address-box mt-3 mb-4">
+          <div class="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Local Address</div>
+          <div id="driverCardAddress" class="driver-card-address-text">Via del Corso 123, Rome</div>
+        </div>
+        <div id="driverCardRefBox" class="driver-card-ref-box mb-4" style="display: none;">
+          <span class="text-xs text-slate-400">Confirmation / Booking Ref:</span>
+          <span id="driverCardRef" class="font-mono font-bold text-sm text-slate-800 dark:text-slate-100 ml-1"></span>
+        </div>
+        <div class="driver-card-actions flex gap-2">
+          <button type="button" class="action-btn flex-1 py-2 text-sm font-semibold flex items-center justify-center gap-1.5" onclick="copyDriverCardAddress()">
+            <span>📋</span> <span id="driverCardCopyLabel">Copy Address</span>
+          </button>
+          <a id="driverCardMapLink" href="#" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary flex-1 py-2 text-sm font-semibold flex items-center justify-center gap-1.5 text-center">
+            <span>🗺️</span> <span>Open Maps</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Simplified Solid Notion Emoji Picker Popover -->
   <div id="tripEmojiPickerModal" class="modal-overlay" style="display: none; z-index: 9999; background: rgba(0,0,0,0.55);" onclick="if(event.target === this) window.closeTripEmojiPicker();">
     <div class="modal-container w-90 max-w-[94vw] mx-auto bg-[#222222] text-slate-100 rounded-xl p-3.5 shadow-2xl border border-slate-700 animate-in fade-in zoom-in-95 duration-150">

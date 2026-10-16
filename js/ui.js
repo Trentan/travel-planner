@@ -2313,3 +2313,88 @@ if (typeof document !== 'undefined') {
   }
 }
 
+// High-Contrast Driver & Local Address Card Controllers
+let currentDriverAddressText = '';
+
+function openDriverAddressCard(data = {}) {
+  const modal = document.getElementById('driver-address-modal');
+  if (!modal) return;
+
+  const titleEl = document.getElementById('driverCardTitle');
+  const addressEl = document.getElementById('driverCardAddress');
+  const refBox = document.getElementById('driverCardRefBox');
+  const refEl = document.getElementById('driverCardRef');
+  const badgeEl = document.getElementById('driverCardCategoryBadge');
+  const mapLink = document.getElementById('driverCardMapLink');
+  const copyLabel = document.getElementById('driverCardCopyLabel');
+
+  const title = data.title || data.propertyName || 'Destination';
+  const address = data.address || data.location || title;
+  const category = data.category || 'Hotel / Stay';
+  const bookingRef = data.bookingRef || '';
+
+  currentDriverAddressText = address;
+
+  if (titleEl) titleEl.textContent = title;
+  if (addressEl) addressEl.textContent = address;
+  if (badgeEl) badgeEl.textContent = category;
+
+  if (refBox && refEl) {
+    if (bookingRef) {
+      refEl.textContent = bookingRef;
+      refBox.style.display = 'block';
+    } else {
+      refBox.style.display = 'none';
+    }
+  }
+
+  if (mapLink) {
+    const mapQuery = typeof getMapSearchUrl === 'function' ? getMapSearchUrl(address) : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+    mapLink.href = mapQuery;
+  }
+
+  if (copyLabel) copyLabel.textContent = 'Copy Address';
+
+  modal.style.display = 'flex';
+  document.body.classList.add('modal-open');
+}
+
+function closeDriverAddressCard() {
+  const modal = document.getElementById('driver-address-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.classList.remove('modal-open');
+}
+
+async function copyDriverCardAddress() {
+  const copyLabel = document.getElementById('driverCardCopyLabel');
+  if (!currentDriverAddressText) return;
+
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(currentDriverAddressText);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = currentDriverAddressText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    if (copyLabel) copyLabel.textContent = '✓ Copied!';
+    if (typeof showToast === 'function') {
+      showToast('Address copied to clipboard!');
+    }
+    setTimeout(() => {
+      if (copyLabel) copyLabel.textContent = 'Copy Address';
+    }, 2000);
+  } catch (err) {
+    if (copyLabel) copyLabel.textContent = 'Failed';
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.openDriverAddressCard = openDriverAddressCard;
+  window.closeDriverAddressCard = closeDriverAddressCard;
+  window.copyDriverCardAddress = copyDriverCardAddress;
+}
+
