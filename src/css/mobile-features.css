@@ -2156,7 +2156,9 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   body.mobile-app-mode .compact-day-slide--even .compact-day-surface,
   body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-surface {
     background: #ffffff !important;
-    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    border-top: 1px solid rgba(226, 232, 240, 0.9) !important;
+    border-right: 1px solid rgba(226, 232, 240, 0.9) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
     box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.05) !important;
   }
 
@@ -2169,7 +2171,9 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   body.mobile-app-mode .compact-day-slide--odd .compact-day-surface,
   body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-surface {
     background: #f1f5f9 !important;
-    border: 1px solid rgba(203, 213, 225, 0.95) !important;
+    border-top: 1px solid rgba(203, 213, 225, 0.95) !important;
+    border-right: 1px solid rgba(203, 213, 225, 0.95) !important;
+    border-bottom: 1px solid rgba(203, 213, 225, 0.95) !important;
     box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.07) !important;
   }
 
@@ -2190,7 +2194,9 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide--even .compact-day-surface,
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-surface {
     background: rgba(30, 41, 59, 0.72) !important;
-    border-color: rgba(51, 65, 85, 0.75) !important;
+    border-top-color: rgba(51, 65, 85, 0.75) !important;
+    border-right-color: rgba(51, 65, 85, 0.75) !important;
+    border-bottom-color: rgba(51, 65, 85, 0.75) !important;
     box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3) !important;
   }
 
@@ -2203,7 +2209,9 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide--odd .compact-day-surface,
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-surface {
     background: rgba(15, 23, 42, 0.88) !important;
-    border-color: rgba(71, 85, 105, 0.8) !important;
+    border-top-color: rgba(71, 85, 105, 0.8) !important;
+    border-right-color: rgba(71, 85, 105, 0.8) !important;
+    border-bottom-color: rgba(71, 85, 105, 0.8) !important;
     box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.45) !important;
   }
 
