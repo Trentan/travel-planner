@@ -1831,6 +1831,8 @@ function _syncJourneyModalActions() {
       (j.id && (origSegIds.has(j.id) || origJntIds.has(j.id)))
   );
   if (deleteBtn) deleteBtn.style.display = isExistingJourney ? 'inline-flex' : 'none';
+  const footer = document.querySelector('#journey-modal .modal-footer');
+  if (footer) footer.classList.toggle('modal-has-delete', isExistingJourney);
 }
 
 // Remove previous journey segments matching original segment IDs or journey IDs before saving/deleting

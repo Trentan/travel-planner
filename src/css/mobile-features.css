@@ -1410,8 +1410,23 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #journeySaveBtn,
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #legDialogSaveBtn,
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #desktopLegDialogSaveBtn,
-  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer .activity-assign-footer-actions {
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #saveActivityBtn,
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer .activity-assign-footer-actions,
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer button[onclick*="save"],
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer button[onclick*="Save"],
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer button[onclick*="confirm"],
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer button[onclick*="Confirm"] {
     display: none !important;
+  }
+
+  /* Universal Mobile Modal Footer Hierarchy */
+  body.mobile-app-mode .modal-footer {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.35rem !important;
+    padding: 0.4rem 0.75rem calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer {
@@ -1422,6 +1437,8 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   /* When there are no visible buttons in footer (e.g. adding new stay/journey/activity), hide footer completely */
+  body.mobile-app-mode #stay-modal .modal-footer:not(.modal-has-delete),
+  body.mobile-app-mode #activity-assign-modal .modal-footer:not(:has(#activityAssignDeleteBtn)),
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer:not(:has(button:not([style*="display: none"]):not([style*="display:none"]):not(.hidden):not([hidden]))) {
     display: none !important;
   }
@@ -1436,16 +1453,6 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     background-color: #2563eb !important;
     border-color: #1d4ed8 !important;
     color: #ffffff !important;
-  }
-
-  /* Universal Mobile Modal Footer Hierarchy: Slim Centered Delete */
-  body.mobile-app-mode .modal-footer {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 0.35rem !important;
-    padding: 0.4rem 0.75rem calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   body.mobile-app-mode .modal-footer .action-btn-danger,
