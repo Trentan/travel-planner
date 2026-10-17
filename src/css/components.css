@@ -2043,35 +2043,35 @@
       overflow-anchor: none;
     }
 
-    /* Standardize all mobile tab section headers for uniform visual flow across tabs */
+    /* Standardize all mobile tab section headers: compact, tight whitespace, uniform flow */
     body.mobile-app-mode .section-header,
     body.mobile-app-mode :is(#tab-itinerary, #tab-transport, #tab-accom, #tab-budget, #tab-packing, #tab-map) .section-header {
       display: flex !important;
       align-items: center !important;
       justify-content: space-between !important;
-      min-height: 3.25rem !important;
-      padding: 0.5rem 0.75rem !important;
-      margin-bottom: 0.5rem !important;
+      min-height: 2.6rem !important;
+      padding: 0.25rem 0.75rem !important;
+      margin-bottom: 0.25rem !important;
       background: var(--color-bg-primary, #f8fafc);
       box-sizing: border-box !important;
     }
 
     body.mobile-app-mode .section-header-title,
     body.mobile-app-mode :is(#tab-itinerary, #tab-transport, #tab-accom, #tab-budget, #tab-packing, #tab-map) .section-header-title {
-      font-size: 1.35rem !important;
+      font-size: 1.25rem !important;
       font-weight: 700 !important;
-      line-height: 1.2 !important;
+      line-height: 1.15 !important;
       letter-spacing: -0.02em !important;
       margin: 0 !important;
       display: flex !important;
       align-items: center !important;
-      gap: 0.5rem !important;
+      gap: 0.45rem !important;
     }
 
     body.mobile-app-mode .section-header-actions {
       display: flex !important;
       align-items: center !important;
-      gap: 0.5rem !important;
+      gap: 0.35rem !important;
       flex-wrap: nowrap !important;
     }
 
