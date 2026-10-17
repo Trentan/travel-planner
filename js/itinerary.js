@@ -3023,6 +3023,13 @@ function renderDailyTimelineRow(item, compact = false) {
       }
     }
 
+    // Always render Driver / Taxi Card for activities with a title/location
+    const actTaxiTitle = item.title || item.name || 'Activity';
+    const actTaxiAddress = (item.subLocations ? String(item.subLocations).replace(/^Location:\s*/i, '').trim() : '') || item.cityName || '';
+    if (actTaxiTitle || actTaxiAddress) {
+      parts.push(`<button type="button" class="taxi-card-btn inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border cursor-pointer transition-colors" onclick="event.stopPropagation(); openDriverAddressCard({ title: '${escapeCompactText(actTaxiTitle)}', address: '${escapeCompactText(actTaxiAddress || actTaxiTitle)}', category: 'Activity / Sight', bookingRef: '${escapeCompactText(item.bookingRef || '')}' });" title="Show large driver card for taxi / arrival">🚖 Taxi Card</button>`);
+    }
+
     if (item.attachments && item.attachments.length > 0 && typeof renderAttachmentsPillsHtml === 'function') {
       parts.push(renderAttachmentsPillsHtml(item.attachments));
     }
@@ -3085,7 +3092,7 @@ function renderDailyTimelineRow(item, compact = false) {
     // Always render Driver / Taxi Card for stays so mobile users can show address to drivers anytime
     const taxiCardAddress = stayAddress || item.cityName || '';
     const taxiCardTitle = item.title || item.name || 'Hotel Stay';
-    parts.push(`<button type="button" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border-amber-200 dark:border-amber-800/50 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors" onclick="event.stopPropagation(); openDriverAddressCard({ title: '${escapeCompactText(taxiCardTitle)}', address: '${escapeCompactText(taxiCardAddress)}', category: 'Hotel / Stay', bookingRef: '${escapeCompactText(item.bookingRef || '')}' });" title="Show large driver card for taxi / arrival">🚖 Taxi Card</button>`);
+    parts.push(`<button type="button" class="taxi-card-btn inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border cursor-pointer transition-colors" onclick="event.stopPropagation(); openDriverAddressCard({ title: '${escapeCompactText(taxiCardTitle)}', address: '${escapeCompactText(taxiCardAddress)}', category: 'Hotel / Stay', bookingRef: '${escapeCompactText(item.bookingRef || '')}' });" title="Show large driver card for taxi / arrival">🚖 Taxi Card</button>`);
 
     if (item.attachments && item.attachments.length > 0 && typeof renderAttachmentsPillsHtml === 'function') {
       parts.push(renderAttachmentsPillsHtml(item.attachments));
@@ -3168,6 +3175,13 @@ function renderDailyTimelineRow(item, compact = false) {
           parts.push(`<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-slate-700/50">📍 <a href="${getMapSearchUrl(sophisticatedLoc)}" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-500 dark:text-slate-400" onclick="event.stopPropagation();">${escapeCompactText(displayLabel)}</a></span>`);
         }
       });
+    }
+
+    // Taxi Card for transport destination
+    const transitTaxiTitle = item.title || item.name || 'Transit Arrival';
+    const transitTaxiAddress = (item.subLocations ? String(item.subLocations).replace(/.*To:\s*/i, '').replace(/.*Location:\s*/i, '').trim() : '') || item.cityName || '';
+    if (transitTaxiTitle || transitTaxiAddress) {
+      parts.push(`<button type="button" class="taxi-card-btn inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border cursor-pointer transition-colors" onclick="event.stopPropagation(); openDriverAddressCard({ title: '${escapeCompactText(transitTaxiTitle)}', address: '${escapeCompactText(transitTaxiAddress || transitTaxiTitle)}', category: 'Transit / Arrival', bookingRef: '${escapeCompactText(item.bookingRef || '')}' });" title="Show large driver card for taxi / arrival">🚖 Taxi Card</button>`);
     }
 
     if (item.alerts && item.alerts.length > 0 && typeof renderJourneyAlertBadgesHtml === 'function') {

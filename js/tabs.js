@@ -245,7 +245,7 @@ function renderAccomMobileView(sortedStays) {
     });
     const stayTitle = stay.propertyName || 'Hotel Stay';
     const stayAddress = stay.location || cityName || '';
-    const taxiCardBtn = `<button class="mobile-surface-card-button" style="background:#fffbeb; color:#92400e; border-color:#fde68a;" onclick="event.stopPropagation(); openDriverAddressCard({ title: '${escapeHtmlText(stayTitle)}', address: '${escapeHtmlText(stayAddress)}', category: 'Hotel / Stay', bookingRef: '${escapeHtmlText(stay.bookingRef || '')}' });" title="Driver / Taxi Card" aria-label="Open Taxi Card">🚖 Taxi Card</button>`;
+    const taxiCardBtn = `<button class="mobile-surface-card-button taxi-card-btn" onclick="event.stopPropagation(); openDriverAddressCard({ title: '${escapeHtmlText(stayTitle)}', address: '${escapeHtmlText(stayAddress)}', category: 'Hotel / Stay', bookingRef: '${escapeHtmlText(stay.bookingRef || '')}' });" title="Driver / Taxi Card" aria-label="Open Taxi Card">🚖 Taxi Card</button>`;
     const actions = `
       ${taxiCardBtn}
       ${isEditMode ? `

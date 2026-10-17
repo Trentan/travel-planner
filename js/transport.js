@@ -1498,10 +1498,17 @@ function buildTransportTab(cityFilter = null) {
         className: 'transport-mobile-status-btn'
       });
       const meta = '';
-      const actions = isEditMode ? `
-        <button class="mobile-surface-card-button transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">Edit</button>
-        <button class="mobile-surface-card-button mobile-surface-card-button--danger transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">Delete</button>
-      ` : '';
+      const destTitle = rep.journeyName || (lastSeg.toLocation ? `Arrival: ${lastSeg.toLocation}` : (rep.toLocation || routeText));
+      const destAddress = lastSeg.toAddress || rep.toAddress || lastSeg.toLocation || rep.toLocation || '';
+      const transportRef = rep.bookingReference || rep.routeCode || '';
+      const taxiCardBtn = `<button class="mobile-surface-card-button taxi-card-btn" onclick="event.stopPropagation(); openDriverAddressCard({ title: '${escapeHtmlText(destTitle)}', address: '${escapeHtmlText(destAddress)}', category: 'Transit / Arrival', bookingRef: '${escapeHtmlText(transportRef)}' });" title="Driver / Taxi Card" aria-label="Open Taxi Card">🚖 Taxi Card</button>`;
+      const actions = `
+        ${taxiCardBtn}
+        ${isEditMode ? `
+          <button class="mobile-surface-card-button transport-edit-btn" onclick="event.stopPropagation(); editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">Edit</button>
+          <button class="mobile-surface-card-button mobile-surface-card-button--danger transport-del-btn" onclick="event.stopPropagation(); deleteJourneyGroup('${gid}')" title="Delete journey" aria-label="Delete journey">Delete</button>
+        ` : ''}
+      `;
       const summary = '';
       const details = renderTransportMobileDetails({
         segs,
@@ -1824,6 +1831,8 @@ function _syncJourneyModalActions() {
       (j.id && (origSegIds.has(j.id) || origJntIds.has(j.id)))
   );
   if (deleteBtn) deleteBtn.style.display = isExistingJourney ? 'inline-flex' : 'none';
+  const footer = document.querySelector('#journey-modal .modal-footer');
+  if (footer) footer.classList.toggle('modal-has-delete', isExistingJourney);
 }
 
 // Remove previous journey segments matching original segment IDs or journey IDs before saving/deleting

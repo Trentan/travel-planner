@@ -1405,14 +1405,42 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     border-color: #0d9488;
   }
 
-  /* Modal Theme Standards (Issue #500-506): Clean Bottom-Sheet Hierarchy */
+  /* Modal Theme Standards: Clean Top-Save & Slim Delete Hierarchy */
+  body.mobile-app-mode #stay-modal .modal-footer button[onclick*="save"],
+  body.mobile-app-mode #journey-modal .modal-footer button[onclick*="save"],
+  body.mobile-app-mode #add-leg-modal #legEditSection .modal-footer button[onclick*="save"],
+  body.mobile-app-mode #add-leg-modal #legEditSection .modal-footer #legDialogSaveBtn,
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #staySaveBtn,
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #journeySaveBtn,
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #legDialogSaveBtn,
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #desktopLegDialogSaveBtn,
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #saveActivityBtn,
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer .activity-assign-footer-actions {
     display: none !important;
   }
 
+  /* Universal Mobile Modal Footer Hierarchy */
+  body.mobile-app-mode .modal-footer {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.35rem !important;
+    padding: 0.4rem 0.75rem calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer {
     justify-content: center !important;
-    padding: 0.6rem 0.85rem !important;
+    padding: 0.35rem 0.75rem calc(0.35rem + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 0 !important;
+    border-top: none !important;
+  }
+
+  /* When there are no visible buttons in footer (e.g. adding new stay/journey/activity), hide footer completely */
+  body.mobile-app-mode #stay-modal .modal-footer:not(.modal-has-delete),
+  body.mobile-app-mode #activity-assign-modal .modal-footer:not(:has(#activityAssignDeleteBtn)),
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer:not(:has(button:not([style*="display: none"]):not([style*="display:none"]):not(.hidden):not([hidden]))) {
+    display: none !important;
   }
 
   body.mobile-app-mode .modal-header-save-btn {
@@ -1422,16 +1450,15 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     min-height: 2rem !important;
     border-radius: 9999px !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+    background-color: #2563eb !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+    order: 1 !important;
   }
 
-  /* Universal Mobile Modal Footer Hierarchy: Cancel Left, Save Right, Delete Centered */
-  body.mobile-app-mode .modal-footer {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 0.5rem !important;
-    padding: 0.75rem 1rem !important;
+  body.mobile-app-mode .modal-header-actions .modal-close,
+  body.mobile-app-mode .modal-header .modal-close {
+    order: 2 !important;
   }
 
   body.mobile-app-mode .modal-footer .action-btn-danger,
@@ -1440,19 +1467,27 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   body.mobile-app-mode .modal-footer #journeyDeleteBtn,
   body.mobile-app-mode .modal-footer #legDialogDeleteBtn {
     width: 100% !important;
-    margin: 0.35rem auto 0 auto !important;
+    margin: 0.15rem auto 0 auto !important;
     text-align: center !important;
     justify-content: center !important;
-    display: flex !important;
+    display: inline-flex;
     color: #e11d48 !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     font-size: 0.82rem !important;
     font-weight: 600 !important;
-    min-height: 2.25rem !important;
+    min-height: 2rem !important;
+    height: 2rem !important;
     order: 99 !important;
     cursor: pointer;
+  }
+
+  body.mobile-app-mode .modal-footer button[style*="display: none"],
+  body.mobile-app-mode .modal-footer button[style*="display:none"],
+  body.mobile-app-mode .modal-footer button.hidden,
+  body.mobile-app-mode .modal-footer [hidden] {
+    display: none !important;
   }
 
   body.mobile-app-mode .modal-footer .action-btn-danger:hover,
@@ -1842,7 +1877,7 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   body.mobile-app-mode #tab-map #journey-map-view {
-    height: calc(100dvh - 8.5rem - env(safe-area-inset-bottom, 0px)) !important;
+    height: calc(100dvh - 3.75rem - 3.65rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
     min-height: 460px !important;
     border-radius: 0 !important;
     border-left: none !important;
@@ -1851,14 +1886,21 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     margin: 0 !important;
   }
 
+  body.mobile-app-mode #tab-map .leaflet-bottom {
+    bottom: calc(0.5rem) !important;
+    z-index: 200 !important;
+  }
+
   body.mobile-app-mode #tab-map .leaflet-control-attribution {
     font-size: 9px !important;
     line-height: 1.15 !important;
-    max-width: 100vw !important;
+    max-width: calc(100vw - 1rem) !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     padding: 2px 6px !important;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.75) !important;
   }
 
   body.mobile-app-mode #tab-map .mobile-map-card-strip {
@@ -2149,7 +2191,9 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   body.mobile-app-mode .compact-day-slide--even .compact-day-surface,
   body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-surface {
     background: #ffffff !important;
-    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    border-top: 1px solid rgba(226, 232, 240, 0.9) !important;
+    border-right: 1px solid rgba(226, 232, 240, 0.9) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
     box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.05) !important;
   }
 
@@ -2162,7 +2206,9 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   body.mobile-app-mode .compact-day-slide--odd .compact-day-surface,
   body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-surface {
     background: #f1f5f9 !important;
-    border: 1px solid rgba(203, 213, 225, 0.95) !important;
+    border-top: 1px solid rgba(203, 213, 225, 0.95) !important;
+    border-right: 1px solid rgba(203, 213, 225, 0.95) !important;
+    border-bottom: 1px solid rgba(203, 213, 225, 0.95) !important;
     box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.07) !important;
   }
 
@@ -2183,7 +2229,9 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide--even .compact-day-surface,
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-surface {
     background: rgba(30, 41, 59, 0.72) !important;
-    border-color: rgba(51, 65, 85, 0.75) !important;
+    border-top-color: rgba(51, 65, 85, 0.75) !important;
+    border-right-color: rgba(51, 65, 85, 0.75) !important;
+    border-bottom-color: rgba(51, 65, 85, 0.75) !important;
     box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3) !important;
   }
 
@@ -2196,7 +2244,9 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide--odd .compact-day-surface,
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-surface {
     background: rgba(15, 23, 42, 0.88) !important;
-    border-color: rgba(71, 85, 105, 0.8) !important;
+    border-top-color: rgba(71, 85, 105, 0.8) !important;
+    border-right-color: rgba(71, 85, 105, 0.8) !important;
+    border-bottom-color: rgba(71, 85, 105, 0.8) !important;
     box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.45) !important;
   }
 
@@ -2277,16 +2327,39 @@ body.mobile-app-mode .journey-card {
 
 /* Card Header alignment: single line title with ellipsis */
 body.mobile-app-mode .itinerary-card-title,
-body.mobile-app-mode .day-card-title {
+body.mobile-app-mode .day-card-title,
+body.mobile-app-mode .stay-card-title,
+body.mobile-app-mode .journey-card-title {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: var(--mob-font-section, 0.9375rem) !important;
+  font-weight: 600 !important;
+}
+
+/* 3-Tier Card Anatomy */
+body.mobile-app-mode .mobile-card-row-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.5rem !important;
+  min-width: 0;
+}
+
+body.mobile-app-mode .mobile-card-row-meta {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.35rem 0.6rem !important;
+  font-size: var(--mob-font-meta, 0.75rem) !important;
+  color: var(--text-secondary, #64748b) !important;
 }
 
 /* De-clutter redundant inline hover actions on touch devices */
 body.mobile-app-mode .itinerary-card .desktop-hover-actions,
-body.mobile-app-mode .itinerary-card .hover-actions-overlay {
+body.mobile-app-mode .itinerary-card .hover-actions-overlay,
+body.mobile-app-mode .itinerary-card .inline-edit-btn:not(.is-mobile-action) {
   display: none !important;
 }
 
@@ -2297,6 +2370,32 @@ body.mobile-app-mode .itinerary-badges {
   flex-wrap: wrap !important;
   align-items: center !important;
   gap: 0.375rem !important;
+}
+
+body.mobile-app-mode .status-badge,
+body.mobile-app-mode .badge-pill {
+  min-height: 1.5rem !important;
+  padding: 0.2rem 0.5rem !important;
+  font-size: var(--mob-font-meta, 0.75rem) !important;
+  margin: 0 !important;
+}
+
+/* Mobile Top Header Density & Toolbars */
+body.mobile-app-mode #mobileHeader,
+body.mobile-app-mode .mobile-header-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.5rem !important;
+  padding-inline: 0.75rem !important;
+}
+
+body.mobile-app-mode #mobileHeader .header-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--mob-font-title, 1.1875rem) !important;
 }
 
 /* Bottom Navigation ergonomics & safe area */
@@ -2311,5 +2410,51 @@ body.mobile-app-mode #mobile-bottom-nav .nav-item {
   min-height: 48px !important;
   font-size: var(--mob-font-meta, 0.75rem) !important;
   font-weight: 600 !important;
+}
+
+/* Manage Trip Legs (#add-leg-modal) Mobile Standardized Footers */
+body.mobile-app-mode #add-leg-modal .modal-header .modal-close {
+  display: inline-flex !important;
+}
+
+body.mobile-app-mode #add-leg-modal .leg-utility-actions,
+body.mobile-app-mode #add-leg-modal #legReorderSection .flex.gap-2.mb-3 {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0.5rem !important;
+}
+
+body.mobile-app-mode #add-leg-modal #legReorderSection .modal-footer,
+body.mobile-app-mode #add-leg-modal #legEditSection .modal-footer {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0.5rem !important;
+  padding: 0.75rem 0.875rem !important;
+}
+
+body.mobile-app-mode #add-leg-modal .journey-footer-actions {
+  display: flex !important;
+  flex: 1 1 100% !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+}
+
+body.mobile-app-mode #add-leg-modal .journey-footer-actions button {
+  width: 100% !important;
+  min-height: 2.875rem !important;
+}
+
+/* Home Header Chrome Vertical Compression (Argon Reassessment) */
+body.mobile-app-mode .city-nav-scroll,
+body.mobile-app-mode #cityNav {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+body.mobile-app-mode .itinerary-day-summary-row {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
 }
 

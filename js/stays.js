@@ -37,6 +37,8 @@ function _populateStayCitySelect(citySelect, selectedCityId) {
 function _syncStayModalActions() {
   const deleteBtn = document.getElementById('stayDeleteBtn');
   if (deleteBtn) deleteBtn.style.display = editingStayId ? 'inline-flex' : 'none';
+  const footer = document.querySelector('#stay-modal .modal-footer');
+  if (footer) footer.classList.toggle('modal-has-delete', !!editingStayId);
 }
 
 function calcStayNights() {

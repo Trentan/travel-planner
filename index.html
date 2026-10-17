@@ -972,7 +972,7 @@
           <h2 id="legDialogTitle">Manage Trip Legs</h2>
         </div>
         <div class="modal-header-actions">
-          <button id="legDialogTopSaveBtn" class="action-btn action-btn-secondary modal-header-save-btn mobile-header-action" type="button" onclick="confirmAddLeg()">Save</button>
+          <button class="action-btn action-btn-secondary modal-header-save-btn mobile-header-action" type="button" id="legTopSaveBtn" onclick="confirmAddLeg()">Save</button>
           <button class="modal-close" onclick="closeAddLegDialog()" aria-label="Close dialog">&times;</button>
         </div>
       </div>
@@ -1238,8 +1238,13 @@
     <div class="modal-content modal-xl modal-surface">
 
       <div class="modal-header">
-        <h2>✈️ Add journey</h2>
-        <button class="modal-close" onclick="closeJourneyModal()" aria-label="Close dialog">&times;</button>
+        <div class="modal-header-left">
+          <h2>✈️ Add journey</h2>
+        </div>
+        <div class="modal-header-actions">
+          <button class="action-btn action-btn-secondary modal-header-save-btn mobile-header-action" type="button" id="journeyTopSaveBtn" onclick="saveJourneyFromModal()">Save</button>
+          <button class="modal-close" onclick="closeJourneyModal()" aria-label="Close dialog">&times;</button>
+        </div>
       </div>
 
       <div class="modal-body modal-body-compact">
@@ -1404,8 +1409,13 @@
   <div id="stay-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content modal-xl">
       <div class="modal-header">
-        <h2>🏨 Add Stay</h2>
-        <button class="modal-close" onclick="closeAddStayModal()" aria-label="Close dialog">&times;</button>
+        <div class="modal-header-left">
+          <h2>🏨 Add Stay</h2>
+        </div>
+        <div class="modal-header-actions">
+          <button class="action-btn action-btn-secondary modal-header-save-btn mobile-header-action" type="button" id="stayTopSaveBtn" onclick="saveStayFromModal()">Save</button>
+          <button class="modal-close" onclick="closeAddStayModal()" aria-label="Close dialog">&times;</button>
+        </div>
       </div>
       <div class="modal-body">
         <div class="modal-form-stack stay-form-grid">

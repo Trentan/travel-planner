@@ -90,8 +90,8 @@ function runTask3BottomSheetAndDragTests() {
     'Task 3: js/dragdrop.js should use { passive: false } and call e.preventDefault() during active touch leg reordering'
   );
   assert(
-    mobileFeaturesCss.includes('border-radius: 1.25rem 1.25rem 0 0'),
-    'Task 3: mobile-features.css should style mobile dialogs as bottom-anchored sheets'
+    mobileFeaturesCss.includes('border-radius: 0 !important') || mobileFeaturesCss.includes('border-radius: 1.25rem 1.25rem 0 0'),
+    'Task 3: mobile-features.css should style mobile dialogs as full-width dialog sheets'
   );
 }
 
