@@ -171,19 +171,30 @@ function findCityByBookingName(name) {
     typeof ALL_CITIES !== 'undefined' && Array.isArray(ALL_CITIES) ? ALL_CITIES : [],
     typeof CITY_DATABASE !== 'undefined' && Array.isArray(CITY_DATABASE) ? CITY_DATABASE : []
   ];
+  // Pass 1: Exact matches first
   for (const list of cityLists) {
-    const found = list.find(city => city.name && (
+    const exact = list.find(city => city.name && (
       city.name.toLowerCase() === normalized ||
-      normalized.includes(city.name.toLowerCase()) ||
-      city.name.toLowerCase().includes(normalized)
+      (city.code && city.code.toLowerCase() === normalized)
     ));
-    if (found) return found;
+    if (exact) return exact;
   }
 
-  // Check alias dictionary
+  // Pass 2: Alias dictionary match before substring matching
   if (typeof getCityAliasMatch === 'function') {
     const aliasMatch = getCityAliasMatch(normalized);
     if (aliasMatch) return aliasMatch;
+  }
+
+  // Pass 3: Substring matches (only for words with at least 4 characters to avoid IATA 3-letter false matches)
+  if (normalized.length >= 4) {
+    for (const list of cityLists) {
+      const found = list.find(city => city.name && (
+        normalized.includes(city.name.toLowerCase()) ||
+        city.name.toLowerCase().includes(normalized)
+      ));
+      if (found) return found;
+    }
   }
 
   // Check fuzzy matching for typos

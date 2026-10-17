@@ -680,26 +680,56 @@ function handleTutorialKey(e) {
   if (e.key === 'Escape')     skipTutorial();
 }
 
-function showToast(message) {
+function showToast(message, options = {}) {
+  const existing = document.getElementById('appGlobalToast');
+  if (existing) existing.remove();
+
   const toast = document.createElement('div');
-  toast.style.cssText = `
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #2C3E50;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    z-index: 10000;
-    animation: fadeIn 0.3s ease;
-    max-width: 90vw;
-    text-align: center;
-  `;
-  toast.textContent = message;
+  toast.id = 'appGlobalToast';
+  toast.className = 'app-undo-toast';
+  toast.setAttribute('role', 'alert');
+  toast.setAttribute('aria-live', 'polite');
+
+  const textSpan = document.createElement('span');
+  textSpan.className = 'app-undo-toast-message';
+  textSpan.textContent = message;
+  toast.appendChild(textSpan);
+
+  let timer = null;
+
+  if (options.actionText && typeof options.onAction === 'function') {
+    const actionBtn = document.createElement('button');
+    actionBtn.type = 'button';
+    actionBtn.className = 'app-undo-toast-action';
+    actionBtn.textContent = options.actionText;
+    actionBtn.onclick = (e) => {
+      e.stopPropagation();
+      clearTimeout(timer);
+      toast.remove();
+      options.onAction();
+    };
+    toast.appendChild(actionBtn);
+  }
+
   document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+  const duration = options.duration || 5000;
+  timer = setTimeout(() => {
+    if (toast.parentNode) {
+      toast.classList.add('fade-out');
+      setTimeout(() => toast.remove(), 250);
+    }
+  }, duration);
+
+  return {
+    dismiss: () => {
+      clearTimeout(timer);
+      if (toast.parentNode) toast.remove();
+    }
+  };
+}
+
+if (typeof window !== 'undefined') {
+  window.showToast = showToast;
 }
 
 function acceptWelcomeTutorial() {

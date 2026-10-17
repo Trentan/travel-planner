@@ -1269,32 +1269,297 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   body.mobile-app-mode .modal-overlay > .modal-card,
   body.mobile-app-mode .modal-backdrop > .modal-content,
   body.mobile-app-mode .modal-backdrop > .modal-card {
-    margin: auto 0 0 0 !important;
+    margin: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    max-height: 90dvh !important;
-    border-radius: 1.25rem 1.25rem 0 0 !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    height: var(--vvh, 100dvh) !important;
+    max-height: 100% !important;
+    max-height: 100dvh !important;
+    max-height: var(--vvh, 100dvh) !important;
+    border-radius: 0 !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
     padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px)) !important;
-    box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.28) !important;
+    box-shadow: none !important;
     animation: mobileBottomSheetSlideUp 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   body.mobile-app-mode .modal-header {
     position: relative;
-    padding-top: 1.1rem !important;
+    padding: 0.85rem 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem;
+    border-bottom: 1px solid rgba(203, 213, 225, 0.6);
   }
 
   body.mobile-app-mode .modal-header::before {
-    content: "";
-    position: absolute;
-    top: 0.4rem;
+    display: none !important;
+  }
+
+  .modal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  /* Mobile header action button - prominent in mobile mode */
+  .mobile-header-action {
+    display: none;
+  }
+
+  body.mobile-app-mode .mobile-header-action {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.85rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    min-height: 2.25rem !important;
+    border-radius: 0.5rem !important;
+  }
+
+  /* Quick-tap time preset chips */
+  .quick-time-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    touch-action: manipulation;
+    min-height: 2rem;
+  }
+
+  .quick-duration-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    touch-action: manipulation;
+    min-height: 1.65rem;
+  }
+
+  .quick-duration-chip:hover,
+  .quick-duration-chip:focus-visible {
+    background: #e0f2fe;
+    color: #0369a1;
+    border-color: #38bdf8;
+  }
+
+  .quick-duration-chip:active {
+    transform: scale(0.97);
+  }
+
+  .quick-time-chip:hover,
+  .quick-time-chip:focus-visible {
+    background: #0d9488;
+    color: #ffffff;
+    border-color: #0d9488;
+  }
+
+  .quick-time-chip:active {
+    transform: scale(0.97);
+  }
+
+  [data-theme="dark"] .quick-time-chip {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-color: #334155;
+  }
+
+  [data-theme="dark"] .quick-duration-chip {
+    background: #1e293b;
+    color: #cbd5e1;
+    border-color: #334155;
+  }
+
+  [data-theme="dark"] .quick-duration-chip:hover,
+  [data-theme="dark"] .quick-duration-chip:focus-visible {
+    background: #0369a1;
+    color: #ffffff;
+    border-color: #38bdf8;
+  }
+
+  [data-theme="dark"] .quick-time-chip:hover,
+  [data-theme="dark"] .quick-time-chip:focus-visible {
+    background: #0d9488;
+    color: #ffffff;
+    border-color: #0d9488;
+  }
+
+  /* Modal Theme Standards (Issue #500-506): Clean Bottom-Sheet Hierarchy */
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer .activity-assign-footer-actions {
+    display: none !important;
+  }
+
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer {
+    justify-content: center !important;
+    padding: 0.6rem 0.85rem !important;
+  }
+
+  body.mobile-app-mode .modal-header-save-btn {
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    padding: 0.35rem 0.85rem !important;
+    min-height: 2rem !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  /* Universal Mobile Modal Footer Hierarchy: Cancel Left, Save Right, Delete Centered */
+  body.mobile-app-mode .modal-footer {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  body.mobile-app-mode .modal-footer .action-btn-danger,
+  body.mobile-app-mode .modal-footer .activity-assign-delete-btn,
+  body.mobile-app-mode .modal-footer #stayDeleteBtn,
+  body.mobile-app-mode .modal-footer #journeyDeleteBtn,
+  body.mobile-app-mode .modal-footer #legDialogDeleteBtn {
+    width: 100% !important;
+    margin: 0.35rem auto 0 auto !important;
+    text-align: center !important;
+    justify-content: center !important;
+    display: flex !important;
+    color: #e11d48 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    min-height: 2.25rem !important;
+    order: 99 !important;
+    cursor: pointer;
+  }
+
+  body.mobile-app-mode .modal-footer .action-btn-danger:hover,
+  body.mobile-app-mode .modal-footer .activity-assign-delete-btn:hover,
+  body.mobile-app-mode .modal-footer #stayDeleteBtn:hover,
+  body.mobile-app-mode .modal-footer #journeyDeleteBtn:hover,
+  body.mobile-app-mode .modal-footer #legDialogDeleteBtn:hover {
+    background: rgba(244, 63, 94, 0.08) !important;
+    border-radius: 0.5rem !important;
+  }
+
+  /* Floating Undo Toast */
+  .app-undo-toast {
+    position: fixed;
+    bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
     left: 50%;
     transform: translateX(-50%);
-    width: 2.25rem;
-    height: 0.25rem;
+    background: #0f172a;
+    color: #f8fafc;
+    border: 1px solid #334155;
+    padding: 0.65rem 1.15rem;
     border-radius: 9999px;
-    background: rgba(148, 163, 184, 0.55);
-    pointer-events: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    z-index: 10000;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    max-width: calc(100vw - 2rem);
+    animation: mobileBottomSheetSlideUp 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .app-undo-toast.fade-out {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .app-undo-toast-message {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-undo-toast-action {
+    background: #0d9488;
+    color: #ffffff;
+    border: none;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    touch-action: manipulation;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+  }
+
+  .app-undo-toast-action:active {
+    transform: scale(0.95);
+  }
+
+  /* Driver & Local Address Card (High Contrast Taxi Mode) */
+  .driver-card-headline {
+    font-size: 1.55rem;
+    line-height: 1.25;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  [data-theme="dark"] .driver-card-headline {
+    color: #f8fafc;
+  }
+
+  .driver-card-address-box {
+    background: #f8fafc;
+    border: 2px solid #cbd5e1;
+    border-radius: 0.75rem;
+    padding: 1rem 1.15rem;
+  }
+
+  [data-theme="dark"] .driver-card-address-box {
+    background: #090d16;
+    border-color: #334155;
+  }
+
+  .driver-card-address-text {
+    font-size: 1.35rem;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #1e293b;
+    word-break: break-word;
+  }
+
+  [data-theme="dark"] .driver-card-address-text {
+    color: #e2e8f0;
+  }
+
+  .driver-card-ref-box {
+    background: rgba(13, 148, 136, 0.08);
+    border: 1px dashed rgba(13, 148, 136, 0.4);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
   }
 
   body.mobile-app-mode .leg-reorder-item,
@@ -1977,14 +2242,74 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   animation-duration: 0.14s !important;
 }
 
-@keyframes mobileBottomSheetSlideUp {
-  from {
-    transform: translateY(24px);
-    opacity: 0.92;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+/* ==========================================================================
+   MOBILE APP MODE TYPOGRAPHY, BUTTON & LAYOUT STANDARDIZATION
+   ========================================================================== */
+
+/* Typography floor & elimination of cramped micro-fonts */
+body.mobile-app-mode [class*="text-[10px]"],
+body.mobile-app-mode [class*="text-[11px]"],
+body.mobile-app-mode .badge,
+body.mobile-app-mode .pill,
+body.mobile-app-mode .meta-label {
+  font-size: var(--mob-font-meta, 0.75rem) !important; /* 12px strict floor */
+  line-height: 1.25 !important;
+}
+
+body.mobile-app-mode label,
+body.mobile-app-mode .form-label,
+body.mobile-app-mode .input-label {
+  font-size: var(--mob-font-label, 0.84375rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Card Alignment, Padding & Clutter Reduction */
+body.mobile-app-mode .itinerary-card,
+body.mobile-app-mode .day-card,
+body.mobile-app-mode .stay-card,
+body.mobile-app-mode .journey-card {
+  padding: var(--mob-space-md, 14px) !important;
+  border-radius: var(--mob-radius-card, 14px) !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Card Header alignment: single line title with ellipsis */
+body.mobile-app-mode .itinerary-card-title,
+body.mobile-app-mode .day-card-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* De-clutter redundant inline hover actions on touch devices */
+body.mobile-app-mode .itinerary-card .desktop-hover-actions,
+body.mobile-app-mode .itinerary-card .hover-actions-overlay {
+  display: none !important;
+}
+
+/* Standardized Badge alignment inside cards */
+body.mobile-app-mode .card-badges,
+body.mobile-app-mode .itinerary-badges {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+}
+
+/* Bottom Navigation ergonomics & safe area */
+body.mobile-app-mode #mobile-bottom-nav {
+  height: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  box-sizing: border-box !important;
+}
+
+body.mobile-app-mode #mobile-bottom-nav button,
+body.mobile-app-mode #mobile-bottom-nav .nav-item {
+  min-height: 48px !important;
+  font-size: var(--mob-font-meta, 0.75rem) !important;
+  font-weight: 600 !important;
 }
 

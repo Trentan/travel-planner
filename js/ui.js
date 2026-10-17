@@ -2019,6 +2019,16 @@ function renderSplitDrawerContent(itemData) {
       ` : ''}
       <div class="flex items-center gap-2 pt-1 flex-wrap">
         <button type="button" class="action-btn text-xs py-1 px-2.5 font-semibold text-teal-700 dark:text-teal-300" onclick="restoreSplitDayOverview()" title="Return to Day Overview">← Day Overview</button>
+        ${(itemData.legIndex !== undefined && itemData.dayIndex !== undefined && itemData.itemIndex !== undefined) ? `
+          <button type="button" class="action-btn text-xs py-1 px-2.5 font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800" onclick="if (typeof openEditDayActivityModal === 'function') openEditDayActivityModal(${itemData.legIndex}, ${itemData.dayIndex}, ${itemData.itemIndex});" title="Edit this activity">✏️ Edit</button>
+        ` : (itemData.stayId) ? `
+          <button type="button" class="action-btn text-xs py-1 px-2.5 font-semibold text-pink-700 dark:text-pink-300 bg-pink-50 dark:bg-pink-950/40 border border-pink-200 dark:border-pink-800" onclick="if (typeof openEditStayModal === 'function') openEditStayModal('${itemData.stayId}');" title="Edit this stay">✏️ Edit</button>
+        ` : (itemData.journeyId) ? `
+          <button type="button" class="action-btn text-xs py-1 px-2.5 font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800" onclick="if (typeof editJourney === 'function') editJourney('${itemData.journeyId}');" title="Edit this transit journey">✏️ Edit</button>
+        ` : ''}
+        ${location ? `
+          <button type="button" class="action-btn text-xs py-1 px-2 font-semibold text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800" onclick="openDriverAddressCard({ title: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(title) : title}', address: '${typeof escapeHtmlText === 'function' ? escapeHtmlText(location) : location}', category: '${badgeLabel}', bookingRef: '${itemData.bookingRef || ''}' });" title="Open driver / taxi address card">🚖 Taxi Card</button>
+        ` : ''}
         ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="action-btn text-xs py-1 px-2.5">Open in Google Maps</a>` : ''}
         <button type="button" class="action-btn text-xs py-1 px-2 text-slate-500" onclick="clearSplitDrawer()">Dismiss</button>
       </div>
@@ -2089,7 +2099,12 @@ function handleSplitItemClick(itemEl, event) {
     cost: itemEl.dataset.itemCost || itemEl.querySelector('.compact-emoji-cost')?.textContent?.trim() || '',
     notes: itemEl.dataset.itemNotes || '',
     provider: itemEl.dataset.itemProvider || '',
-    bookingRef: itemEl.dataset.itemRef || ''
+    bookingRef: itemEl.dataset.itemRef || '',
+    legIndex: itemEl.dataset.legIndex !== undefined && itemEl.dataset.legIndex !== '' ? parseInt(itemEl.dataset.legIndex, 10) : undefined,
+    dayIndex: itemEl.dataset.dayIndex !== undefined && itemEl.dataset.dayIndex !== '' ? parseInt(itemEl.dataset.dayIndex, 10) : undefined,
+    itemIndex: itemEl.dataset.itemIndex !== undefined && itemEl.dataset.itemIndex !== '' ? parseInt(itemEl.dataset.itemIndex, 10) : undefined,
+    stayId: itemEl.dataset.stayId || '',
+    journeyId: itemEl.dataset.journeyId || ''
   };
 
   selectSplitPaneItem(itemData, itemEl);
@@ -2242,7 +2257,12 @@ if (typeof document !== 'undefined' && typeof document.addEventListener === 'fun
             cost: itemEl.dataset.itemCost || itemEl.querySelector('.compact-emoji-cost')?.textContent?.trim() || '',
             notes: itemEl.dataset.itemNotes || '',
             provider: itemEl.dataset.itemProvider || '',
-            bookingRef: itemEl.dataset.itemRef || ''
+            bookingRef: itemEl.dataset.itemRef || '',
+            legIndex: itemEl.dataset.legIndex !== undefined && itemEl.dataset.legIndex !== '' ? parseInt(itemEl.dataset.legIndex, 10) : undefined,
+            dayIndex: itemEl.dataset.dayIndex !== undefined && itemEl.dataset.dayIndex !== '' ? parseInt(itemEl.dataset.dayIndex, 10) : undefined,
+            itemIndex: itemEl.dataset.itemIndex !== undefined && itemEl.dataset.itemIndex !== '' ? parseInt(itemEl.dataset.itemIndex, 10) : undefined,
+            stayId: itemEl.dataset.stayId || '',
+            journeyId: itemEl.dataset.journeyId || ''
           };
           selectSplitPaneItem(itemData, itemEl);
         }
@@ -2266,4 +2286,135 @@ window.buildSplitDayData = buildSplitDayData;
 window.findDesktopDayFromScrollPosition = findDesktopDayFromScrollPosition;
 window.populatePrintTripHeader = populatePrintTripHeader;
 window.printItinerary = printItinerary;
+
+// Global visualViewport binding for mobile keyboards & bottom sheet modals
+function initGlobalVisualViewportHandler() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  const syncViewportHeight = () => {
+    const vv = window.visualViewport;
+    const height = vv ? vv.height : window.innerHeight;
+    if (document.documentElement && document.documentElement.style && typeof document.documentElement.style.setProperty === 'function') {
+      document.documentElement.style.setProperty('--vvh', `${height}px`);
+    }
+  };
+
+  if (window.visualViewport && typeof window.visualViewport.addEventListener === 'function') {
+    window.visualViewport.addEventListener('resize', syncViewportHeight);
+    window.visualViewport.addEventListener('scroll', syncViewportHeight);
+  }
+  if (typeof window.addEventListener === 'function') {
+    window.addEventListener('resize', syncViewportHeight);
+  }
+  syncViewportHeight();
+
+  // Scroll active input into view smoothly when keyboard pops up inside a modal
+  if (typeof document.addEventListener === 'function') {
+    document.addEventListener('focusin', (e) => {
+      if (!isMobileViewport()) return;
+      const target = e.target;
+      if (!target || !['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
+      const modalContent = target.closest && typeof target.closest === 'function' ? target.closest('.modal-content, .modal-card, .trip-start-panel') : null;
+      if (!modalContent) return;
+
+      setTimeout(() => {
+        if (typeof target.scrollIntoView === 'function') {
+          target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+      }, 280);
+    });
+  }
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading' && typeof document.addEventListener === 'function') {
+    document.addEventListener('DOMContentLoaded', initGlobalVisualViewportHandler);
+  } else {
+    initGlobalVisualViewportHandler();
+  }
+}
+
+// High-Contrast Driver & Local Address Card Controllers
+let currentDriverAddressText = '';
+
+function openDriverAddressCard(data = {}) {
+  const modal = document.getElementById('driver-address-modal');
+  if (!modal) return;
+
+  const titleEl = document.getElementById('driverCardTitle');
+  const addressEl = document.getElementById('driverCardAddress');
+  const refBox = document.getElementById('driverCardRefBox');
+  const refEl = document.getElementById('driverCardRef');
+  const badgeEl = document.getElementById('driverCardCategoryBadge');
+  const mapLink = document.getElementById('driverCardMapLink');
+  const copyLabel = document.getElementById('driverCardCopyLabel');
+
+  const title = data.title || data.propertyName || 'Destination';
+  const address = data.address || data.location || title;
+  const category = data.category || 'Hotel / Stay';
+  const bookingRef = data.bookingRef || '';
+
+  currentDriverAddressText = address;
+
+  if (titleEl) titleEl.textContent = title;
+  if (addressEl) addressEl.textContent = address;
+  if (badgeEl) badgeEl.textContent = category;
+
+  if (refBox && refEl) {
+    if (bookingRef) {
+      refEl.textContent = bookingRef;
+      refBox.style.display = 'block';
+    } else {
+      refBox.style.display = 'none';
+    }
+  }
+
+  if (mapLink) {
+    const mapQuery = typeof getMapSearchUrl === 'function' ? getMapSearchUrl(address) : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+    mapLink.href = mapQuery;
+  }
+
+  if (copyLabel) copyLabel.textContent = 'Copy Address';
+
+  modal.style.display = 'flex';
+  document.body.classList.add('modal-open');
+}
+
+function closeDriverAddressCard() {
+  const modal = document.getElementById('driver-address-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.classList.remove('modal-open');
+}
+
+async function copyDriverCardAddress() {
+  const copyLabel = document.getElementById('driverCardCopyLabel');
+  if (!currentDriverAddressText) return;
+
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(currentDriverAddressText);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = currentDriverAddressText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    if (copyLabel) copyLabel.textContent = '✓ Copied!';
+    if (typeof showToast === 'function') {
+      showToast('Address copied to clipboard!');
+    }
+    setTimeout(() => {
+      if (copyLabel) copyLabel.textContent = 'Copy Address';
+    }, 2000);
+  } catch (err) {
+    if (copyLabel) copyLabel.textContent = 'Failed';
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.openDriverAddressCard = openDriverAddressCard;
+  window.closeDriverAddressCard = closeDriverAddressCard;
+  window.copyDriverCardAddress = copyDriverCardAddress;
+}
 

@@ -243,10 +243,16 @@ function renderAccomMobileView(sortedStays) {
       title: 'Change stay status',
       className: 'stay-status-badge stay-status-badge-clickable'
     });
-    const actions = isEditMode ? `
-      <button class="mobile-surface-card-button stay-edit-btn" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit stay">Edit</button>
-      <button class="mobile-surface-card-button mobile-surface-card-button--danger stay-del-btn" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete stay">Delete</button>
-    ` : '';
+    const stayTitle = stay.propertyName || 'Hotel Stay';
+    const stayAddress = stay.location || cityName || '';
+    const taxiCardBtn = `<button class="mobile-surface-card-button" style="background:#fffbeb; color:#92400e; border-color:#fde68a;" onclick="event.stopPropagation(); openDriverAddressCard({ title: '${escapeHtmlText(stayTitle)}', address: '${escapeHtmlText(stayAddress)}', category: 'Hotel / Stay', bookingRef: '${escapeHtmlText(stay.bookingRef || '')}' });" title="Driver / Taxi Card" aria-label="Open Taxi Card">🚖 Taxi Card</button>`;
+    const actions = `
+      ${taxiCardBtn}
+      ${isEditMode ? `
+        <button class="mobile-surface-card-button stay-edit-btn" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit stay">Edit</button>
+        <button class="mobile-surface-card-button mobile-surface-card-button--danger stay-del-btn" onclick="event.stopPropagation(); deleteStay('${stay.id}')" title="Delete Stay" aria-label="Delete stay">Delete</button>
+      ` : ''}
+    `;
     const details = renderStayMobileDetails(stay, cityName, cityMap);
     const cardHtml = renderMobileSurfaceCard({
       cardClass: 'stay-mobile-card row-accent',
