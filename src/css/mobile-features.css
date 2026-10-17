@@ -1406,16 +1406,16 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   /* Modal Theme Standards: Clean Top-Save & Slim Delete Hierarchy */
+  body.mobile-app-mode #stay-modal .modal-footer button[onclick*="save"],
+  body.mobile-app-mode #journey-modal .modal-footer button[onclick*="save"],
+  body.mobile-app-mode #add-leg-modal #legEditSection .modal-footer button[onclick*="save"],
+  body.mobile-app-mode #add-leg-modal #legEditSection .modal-footer #legDialogSaveBtn,
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #staySaveBtn,
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #journeySaveBtn,
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #legDialogSaveBtn,
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #desktopLegDialogSaveBtn,
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #saveActivityBtn,
-  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer .activity-assign-footer-actions,
-  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer button[onclick*="save"],
-  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer button[onclick*="Save"],
-  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer button[onclick*="confirm"],
-  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer button[onclick*="Confirm"] {
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer .activity-assign-footer-actions {
     display: none !important;
   }
 

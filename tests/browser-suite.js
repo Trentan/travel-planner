@@ -531,6 +531,10 @@ async function runDesktopChecks(baseUrl, reporter, launchOptions = {}) {
       const firstItem = document.querySelector('#itinerary .split-item-selectable');
       if (firstItem) firstItem.click();
     });
+    await page.waitForFunction(() => {
+      const drawer = document.getElementById('splitDrawerContent');
+      return drawer && drawer.querySelector('.split-drawer-item-card') && !drawer.querySelector('.split-drawer-day-card') && drawer.innerHTML.includes('Day Overview');
+    }, { timeout: 3000 }).catch(() => {});
     await humanPause(page, 250);
     const drawerHasItem = await page.evaluate(() => {
       const drawer = document.getElementById('splitDrawerContent');
@@ -825,7 +829,8 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await page.locator('#stayCheckOut').fill('2026-06-12');
     await page.locator('#stayProvider').fill('Airbnb');
     await page.locator('#stayTotalCost').fill('250');
-    await page.locator('#stay-modal button:has-text("Save Stay")').click();
+    const staySaveButton = page.locator('#stay-modal #stayTopSaveBtn, #stay-modal button:has-text("Save Stay")').filter({ visible: true }).first();
+    await staySaveButton.click();
     await page.waitForSelector('#stay-modal', { state: 'hidden' });
     await humanPause(page, 500);
     assert(await page.getByText('Mobile Watch Hotel', { exact: false }).count() > 0, 'Mobile: stay should appear after saving from modal');

@@ -1738,8 +1738,9 @@
     }
 
     #add-leg-modal #legReorderList {
-      max-height: none !important;
-      overflow-y: visible !important;
+      max-height: min(240px, calc(100dvh - 380px)) !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
     }
 
     #add-leg-modal #legDayNotesList {
