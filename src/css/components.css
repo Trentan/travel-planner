@@ -2043,13 +2043,36 @@
       overflow-anchor: none;
     }
 
-    body.mobile-app-mode :is(#tab-transport, #tab-accom) .section-header {
-      position: sticky;
-      top: env(safe-area-inset-top, 0px);
-      z-index: 40;
+    /* Standardize all mobile tab section headers for uniform visual flow across tabs */
+    body.mobile-app-mode .section-header,
+    body.mobile-app-mode :is(#tab-itinerary, #tab-transport, #tab-accom, #tab-budget, #tab-packing, #tab-map) .section-header {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      min-height: 3.25rem !important;
+      padding: 0.5rem 0.75rem !important;
+      margin-bottom: 0.5rem !important;
       background: var(--color-bg-primary, #f8fafc);
-      padding-top: 0.25rem;
-      padding-bottom: 0.25rem;
+      box-sizing: border-box !important;
+    }
+
+    body.mobile-app-mode .section-header-title,
+    body.mobile-app-mode :is(#tab-itinerary, #tab-transport, #tab-accom, #tab-budget, #tab-packing, #tab-map) .section-header-title {
+      font-size: 1.35rem !important;
+      font-weight: 700 !important;
+      line-height: 1.2 !important;
+      letter-spacing: -0.02em !important;
+      margin: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
+    }
+
+    body.mobile-app-mode .section-header-actions {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
+      flex-wrap: nowrap !important;
     }
 
     body.mobile-app-mode .transport-mobile-card {
@@ -3309,9 +3332,12 @@
     }
 
     body.mobile-app-mode .modal-close {
-      min-width: 2.75rem;
-      min-height: 2.75rem;
-      font-size: 1.25rem;
+      min-width: 3rem;
+      min-height: 3rem;
+      width: 3rem;
+      height: 3rem;
+      font-size: 1.85rem;
+      line-height: 1;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -3320,6 +3346,14 @@
       border: none !important;
       color: var(--text-primary, #0f172a) !important;
       box-shadow: none !important;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s ease, opacity 0.15s ease;
+    }
+
+    body.mobile-app-mode .modal-close:active {
+      transform: scale(0.92);
+      opacity: 0.7;
     }
 
     [data-theme="dark"] body.mobile-app-mode .modal-close {
