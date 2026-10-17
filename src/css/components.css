@@ -3331,6 +3331,13 @@
       width: 100% !important;
     }
 
+    body.mobile-app-mode .modal-footer button[style*="display: none"],
+    body.mobile-app-mode .modal-footer button[style*="display:none"],
+    body.mobile-app-mode .modal-footer button.hidden,
+    body.mobile-app-mode .modal-footer [hidden] {
+      display: none !important;
+    }
+
     body.mobile-app-mode .modal-close {
       min-width: 3rem;
       min-height: 3rem;
