@@ -3302,8 +3302,8 @@
     }
 
     /* 2. ADD Buttons: Always Green (Emerald #059669 / #10b981) */
-    body.mobile-app-mode button[onclick*="add"]:not(.modal-close):not(.taxi-card-btn):not([onclick*="openDriverAddressCard"]),
-    body.mobile-app-mode button[onclick*="Add"]:not(.modal-close):not(.taxi-card-btn):not([onclick*="openDriverAddressCard"]),
+    body.mobile-app-mode button[onclick*="add"]:not(.modal-close):not(.modal-header-save-btn):not(.taxi-card-btn):not([onclick*="openDriverAddressCard"]),
+    body.mobile-app-mode button[onclick*="Add"]:not(.modal-close):not(.modal-header-save-btn):not(.taxi-card-btn):not([onclick*="openDriverAddressCard"]),
     body.mobile-app-mode .modal-footer button[onclick*="addSegmentToJourney"],
     body.mobile-app-mode .modal-footer button[onclick*="resetLegDialogToAddNew"],
     body.mobile-app-mode .action-btn-add,
