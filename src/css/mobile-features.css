@@ -1405,14 +1405,25 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     border-color: #0d9488;
   }
 
-  /* Modal Theme Standards (Issue #500-506): Clean Bottom-Sheet Hierarchy */
+  /* Modal Theme Standards: Clean Top-Save & Slim Delete Hierarchy */
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #staySaveBtn,
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #journeySaveBtn,
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #legDialogSaveBtn,
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer #desktopLegDialogSaveBtn,
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer .activity-assign-footer-actions {
     display: none !important;
   }
 
   body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer {
     justify-content: center !important;
-    padding: 0.6rem 0.85rem !important;
+    padding: 0.35rem 0.75rem calc(0.35rem + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 0 !important;
+    border-top: none !important;
+  }
+
+  /* When there are no visible buttons in footer (e.g. adding new stay/journey/activity), hide footer completely */
+  body.mobile-app-mode .modal-content:has(.modal-header-save-btn) .modal-footer:not(:has(button:not([style*="display: none"]):not([style*="display:none"]):not(.hidden):not([hidden]))) {
+    display: none !important;
   }
 
   body.mobile-app-mode .modal-header-save-btn {
@@ -1422,16 +1433,19 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     min-height: 2rem !important;
     border-radius: 9999px !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+    background-color: #2563eb !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
   }
 
-  /* Universal Mobile Modal Footer Hierarchy: Cancel Left, Save Right, Delete Centered */
+  /* Universal Mobile Modal Footer Hierarchy: Slim Centered Delete */
   body.mobile-app-mode .modal-footer {
     display: flex !important;
     flex-wrap: wrap !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 0.5rem !important;
-    padding: 0.75rem 1rem !important;
+    gap: 0.35rem !important;
+    padding: 0.4rem 0.75rem calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   body.mobile-app-mode .modal-footer .action-btn-danger,
@@ -1440,7 +1454,7 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   body.mobile-app-mode .modal-footer #journeyDeleteBtn,
   body.mobile-app-mode .modal-footer #legDialogDeleteBtn {
     width: 100% !important;
-    margin: 0.35rem auto 0 auto !important;
+    margin: 0.15rem auto 0 auto !important;
     text-align: center !important;
     justify-content: center !important;
     display: inline-flex;
@@ -1450,7 +1464,8 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     box-shadow: none !important;
     font-size: 0.82rem !important;
     font-weight: 600 !important;
-    min-height: 2.25rem !important;
+    min-height: 2rem !important;
+    height: 2rem !important;
     order: 99 !important;
     cursor: pointer;
   }

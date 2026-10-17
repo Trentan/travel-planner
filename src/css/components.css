@@ -2517,12 +2517,24 @@
     }
 
     body.mobile-app-mode .mobile-menu-sheet {
-      padding-top: calc(1rem + env(safe-area-inset-top, 0px)) !important;
-      padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
+      padding: 0 !important;
+      align-items: stretch !important;
+      justify-content: stretch !important;
+      z-index: 1400 !important;
     }
 
     body.mobile-app-mode .mobile-menu-sheet-panel {
-      @apply p-3.5 rounded-t-[18px] rounded-b-xl;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 100% !important;
+      height: 100dvh !important;
+      height: var(--vvh, 100dvh) !important;
+      max-height: 100% !important;
+      max-height: 100dvh !important;
+      max-height: var(--vvh, 100dvh) !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
     body.mobile-app-mode .mobile-menu-section-title {
