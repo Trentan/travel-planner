@@ -52,7 +52,7 @@ async function run() {
   const tzUtilsTokyo = evalFn(windowMock, windowMock.localStorage, mockIntlTokyo);
   assert(tzUtilsTokyo.getClientBrowserTimezone() === 'Asia/Tokyo', `Expected Asia/Tokyo, got ${tzUtilsTokyo.getClientBrowserTimezone()}`);
 
-  // Case 2: Fallback when resolved timeZone is empty string or undefined
+  // Case 2: Fallback when resolved timeZone is empty string, undefined, or null
   const mockIntlEmpty = {
     DateTimeFormat: () => ({
       resolvedOptions: () => ({ timeZone: '' })
@@ -69,14 +69,39 @@ async function run() {
   const tzUtilsUndefined = evalFn(windowMock, windowMock.localStorage, mockIntlUndefined);
   assert(tzUtilsUndefined.getClientBrowserTimezone() === 'UTC', `Expected UTC fallback for undefined timeZone, got ${tzUtilsUndefined.getClientBrowserTimezone()}`);
 
-  // Case 3: Error handling when Intl.DateTimeFormat or resolvedOptions throws
+  const mockIntlNull = {
+    DateTimeFormat: () => ({
+      resolvedOptions: () => ({ timeZone: null })
+    })
+  };
+  const tzUtilsNull = evalFn(windowMock, windowMock.localStorage, mockIntlNull);
+  assert(tzUtilsNull.getClientBrowserTimezone() === 'UTC', `Expected UTC fallback for null timeZone, got ${tzUtilsNull.getClientBrowserTimezone()}`);
+
+  // Case 3: Error handling when Intl is undefined, DateTimeFormat is missing, or calls throw exceptions
+  const tzUtilsNoIntl = evalFn(windowMock, windowMock.localStorage, undefined);
+  assert(tzUtilsNoIntl.getClientBrowserTimezone() === 'UTC', `Expected UTC fallback when Intl is undefined, got ${tzUtilsNoIntl.getClientBrowserTimezone()}`);
+
+  const mockIntlNoDateTimeFormat = {};
+  const tzUtilsNoDateTimeFormat = evalFn(windowMock, windowMock.localStorage, mockIntlNoDateTimeFormat);
+  assert(tzUtilsNoDateTimeFormat.getClientBrowserTimezone() === 'UTC', `Expected UTC fallback when Intl.DateTimeFormat is missing, got ${tzUtilsNoDateTimeFormat.getClientBrowserTimezone()}`);
+
   const mockIntlError = {
     DateTimeFormat: () => {
       throw new Error('Intl disabled in environment');
     }
   };
   const tzUtilsError = evalFn(windowMock, windowMock.localStorage, mockIntlError);
-  assert(tzUtilsError.getClientBrowserTimezone() === 'UTC', `Expected UTC fallback when exception is thrown, got ${tzUtilsError.getClientBrowserTimezone()}`);
+  assert(tzUtilsError.getClientBrowserTimezone() === 'UTC', `Expected UTC fallback when DateTimeFormat throws exception, got ${tzUtilsError.getClientBrowserTimezone()}`);
+
+  const mockResolvedOptionsError = {
+    DateTimeFormat: () => ({
+      resolvedOptions: () => {
+        throw new Error('resolvedOptions failed');
+      }
+    })
+  };
+  const tzUtilsResolvedOptionsError = evalFn(windowMock, windowMock.localStorage, mockResolvedOptionsError);
+  assert(tzUtilsResolvedOptionsError.getClientBrowserTimezone() === 'UTC', `Expected UTC fallback when resolvedOptions throws exception, got ${tzUtilsResolvedOptionsError.getClientBrowserTimezone()}`);
 
   // Verify cleanCityTimezoneName
   assert(tzUtils.cleanCityTimezoneName(null) === '', 'null locationName should return empty string');
