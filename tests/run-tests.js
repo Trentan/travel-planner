@@ -85,9 +85,11 @@ const { runPackingTests } = require('./packing.test');
 const { runBuildExportDailyTimelineItemsTests } = require('./build-export-daily-timeline-items.test');
 const { runMobileFlowOverhaulTests } = require('./mobile-flow-overhaul.test');
 const { runFindItineraryPositionTests } = require('./find-itinerary-position.test');
+const { runExtractCitiesUserCitiesTests } = require('./extract-cities-user-cities.test');
 
 async function run() {
   try {
+    if (typeof runExtractCitiesUserCitiesTests === 'function') runExtractCitiesUserCitiesTests();
     if (typeof runFindItineraryPositionTests === 'function') runFindItineraryPositionTests();
     if (typeof runMobileFlowOverhaulTests === 'function') runMobileFlowOverhaulTests();
     if (typeof runPackingTests === 'function') runPackingTests();

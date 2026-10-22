@@ -1633,6 +1633,20 @@ async function createFileOnDisk() {
 function extractCitiesFromItinerary() {
   const cityMap = new Map();
 
+  // Pre-build O(1) lookup maps for userCities to avoid repeated linear scans
+  const userCitiesByNameMap = new Map();
+  const userCitiesByIdMap = new Map();
+  if (Array.isArray(userCities)) {
+    userCities.forEach(uCity => {
+      if (uCity && uCity.name) {
+        const lowerName = uCity.name.toLowerCase();
+        userCitiesByNameMap.set(lowerName, uCity);
+        const cityId = 'city-' + lowerName.replace(/[^a-z0-9]/g, '-');
+        userCitiesByIdMap.set(cityId, uCity);
+      }
+    });
+  }
+
   // Helper to add/update city
   const addCity = (cityName, sourceDate = null, source = 'itinerary') => {
     if (!cityName) return;
@@ -1699,11 +1713,11 @@ function extractCitiesFromItinerary() {
       addCity(dbMatch.name, sourceDate);
     } else {
       // Also check userCities
-      const userMatch = userCities.find(c => c.name.toLowerCase() === slug.toLowerCase());
+      const userMatch = userCitiesByNameMap.get(slugLower) || userCitiesByIdMap.get(cityId);
       if (userMatch) {
         // For user cities, try to look up the city for country info
         const countryMatch = COUNTRY_DATA.find(c => c.code === userMatch.countryCode);
-        addCity(cityId, sourceDate);
+        addCity(userMatch.name, sourceDate);
       } else {
         // Parse from stays propertyName which often has full city info like "ibis Styles Bangkok Sukhumvit..."
         citiesData.forEach(c => {
@@ -1746,13 +1760,11 @@ function extractCitiesFromItinerary() {
         }
         // Check in userCities
         if (!cityFound) {
-          userCities.forEach(uCity => {
-            const idFromUser = 'city-' + uCity.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-            if (idFromUser === s.cityId) {
-              addCity(uCity.name, s.checkIn);
-              cityFound = true;
-            }
-          });
+          const uCity = userCitiesByIdMap.get(s.cityId);
+          if (uCity) {
+            addCity(uCity.name, s.checkIn);
+            cityFound = true;
+          }
         }
         // Last resort: parse from cityId slug
         if (!cityFound) {
