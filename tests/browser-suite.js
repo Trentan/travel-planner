@@ -114,7 +114,7 @@ async function openApp(baseUrl, options = {}) {
   const context = await browser.newContext(contextOptions);
   const page = await context.newPage();
   const errors = await collectConsoleErrors(page);
-  await page.goto(`${baseUrl}/index.html`, { waitUntil: 'networkidle' });
+  await page.goto(`${baseUrl}/index.html`, { waitUntil: 'domcontentloaded' });
   await waitForAppReady(page);
   return { browser, context, page, errors };
 }

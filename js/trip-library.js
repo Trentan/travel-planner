@@ -603,17 +603,59 @@
     } catch (err) {
       console.error('Failed to render trip gallery grid:', err);
       const isDriveConnected = typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected();
-      grid.innerHTML = `
-        <div class="col-span-full p-6 text-center bg-rose-50 dark:bg-rose-950/40 rounded-2xl border border-rose-200 dark:border-rose-800 space-y-3">
-          <div class="text-3xl">⚠️</div>
-          <h4 class="font-bold text-rose-900 dark:text-rose-200 text-sm">Unable to Load Trips</h4>
-          <p class="text-xs text-rose-700 dark:text-rose-300 max-w-sm mx-auto">An error occurred while loading your saved itineraries (${escapeHtml(err && err.message ? err.message : 'Storage error')}).</p>
-          <div class="flex justify-center gap-2 pt-1">
-            <button class="action-btn action-btn-primary text-xs" onclick="window.renderTripGalleryGrid()">🔄 Retry</button>
-            ${isDriveConnected ? '<button class="action-btn action-btn-secondary text-xs" onclick="window.syncAllTripsFromGoogleDrive()">☁️ Sync Drive</button>' : ''}
-          </div>
-        </div>
-      `;
+
+      const rawMsg = (err && typeof err.message === 'string' && err.message.trim()) ? err.message.trim() : 'Storage error';
+
+      const errCard = document.createElement('div');
+      errCard.className = 'col-span-full p-6 text-center bg-rose-50 dark:bg-rose-950/40 rounded-2xl border border-rose-200 dark:border-rose-800 space-y-3';
+
+      const iconDiv = document.createElement('div');
+      iconDiv.className = 'text-3xl';
+      iconDiv.textContent = '⚠️';
+
+      const titleH4 = document.createElement('h4');
+      titleH4.className = 'font-bold text-rose-900 dark:text-rose-200 text-sm';
+      titleH4.textContent = 'Unable to Load Trips';
+
+      const msgP = document.createElement('p');
+      msgP.className = 'text-xs text-rose-700 dark:text-rose-300 max-w-sm mx-auto';
+      msgP.textContent = `An error occurred while loading your saved itineraries (${rawMsg}).`;
+
+      const btnGroup = document.createElement('div');
+      btnGroup.className = 'flex justify-center gap-2 pt-1';
+
+      const retryBtn = document.createElement('button');
+      retryBtn.className = 'action-btn action-btn-primary text-xs';
+      retryBtn.textContent = '🔄 Retry';
+      retryBtn.onclick = function() { window.renderTripGalleryGrid(); };
+      if (typeof retryBtn.setAttribute === 'function') {
+        retryBtn.setAttribute('onclick', 'window.renderTripGalleryGrid()');
+      }
+
+      btnGroup.appendChild(retryBtn);
+
+      if (isDriveConnected) {
+        const syncBtn = document.createElement('button');
+        syncBtn.className = 'action-btn action-btn-secondary text-xs';
+        syncBtn.textContent = '☁️ Sync Drive';
+        syncBtn.onclick = function() { window.syncAllTripsFromGoogleDrive(); };
+        if (typeof syncBtn.setAttribute === 'function') {
+          syncBtn.setAttribute('onclick', 'window.syncAllTripsFromGoogleDrive()');
+        }
+        btnGroup.appendChild(syncBtn);
+      }
+
+      errCard.appendChild(iconDiv);
+      errCard.appendChild(titleH4);
+      errCard.appendChild(msgP);
+      errCard.appendChild(btnGroup);
+
+      if (typeof grid.replaceChildren === 'function') {
+        grid.replaceChildren(errCard);
+      } else {
+        grid.innerHTML = '';
+        grid.appendChild(errCard);
+      }
     }
   };
 

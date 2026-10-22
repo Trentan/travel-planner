@@ -9,9 +9,10 @@ const {
 function createSimpleDom() {
   const elements = {};
 
-  function makeElement(id) {
+  function makeElement(id, tag = 'div') {
     return {
       id,
+      tagName: tag.toUpperCase(),
       style: {},
       hidden: false,
       children: [],
@@ -21,20 +22,47 @@ function createSimpleDom() {
       },
       _innerHTML: '',
       get innerHTML() {
+        if (this.children.length > 0) {
+          return this.children.map(c => {
+            const escape = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            if (c.nodeType === 3) return escape(c.textContent || '');
+            const tagName = (c.tagName || 'DIV').toLowerCase();
+            const inner = c.children && c.children.length > 0 ? c.innerHTML : escape(c.textContent || c._innerHTML || '');
+            return `<${tagName}>${inner}</${tagName}>`;
+          }).join('');
+        }
         return this._innerHTML;
       },
       set innerHTML(val) {
+        this.children = [];
         this._innerHTML = val;
+      },
+      _textContent: '',
+      get textContent() {
+        if (this.children.length > 0) {
+          return this.children.map(c => c.textContent || '').join('');
+        }
+        return this._textContent;
+      },
+      set textContent(val) {
+        this.children = [];
+        this._textContent = val;
       },
       _innerText: '',
       get innerText() {
-        return this._innerText;
+        return this.textContent;
       },
       set innerText(val) {
-        this._innerText = val;
+        this.textContent = val;
       },
       appendChild(child) {
         this.children.push(child);
+      },
+      replaceChildren(...newChildren) {
+        this.children = [...newChildren];
+      },
+      setAttribute(attr, val) {
+        this[attr] = val;
       }
     };
   }
@@ -47,7 +75,7 @@ function createSimpleDom() {
       return elements[id];
     },
     createElement(tag) {
-      return makeElement(`el_${Math.random()}`);
+      return makeElement(`el_${Math.random()}`, tag);
     },
     elements
   };
