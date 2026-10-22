@@ -22,6 +22,7 @@ const { runTransportModalXssTests } = require('./transport-modal-xss.test');
 const { runLegReorderXssTests } = require('./leg-reorder-xss.test');
 const { runStaysCitySelectTests } = require('./stays-city-select.test');
 const { runActivityModalXssTests } = require('./activity-modal-xss.test');
+const { runActivityModalHelpersTests } = require('./activity-modal-helpers.test');
 const { run: runAutoStaysSuite } = require('./auto-stays-suite');
 const { run: runTimezoneSuite } = require('./timezone-suite.test');
 const { run: runScreenWakeLockSuite } = require('./screen-wake-lock-suite');
@@ -115,6 +116,7 @@ async function run() {
     if (typeof runLegReorderXssTests === 'function') await runLegReorderXssTests();
     if (typeof runStaysCitySelectTests === 'function') await runStaysCitySelectTests();
     if (typeof runActivityModalXssTests === 'function') await runActivityModalXssTests();
+    if (typeof runActivityModalHelpersTests === 'function') runActivityModalHelpersTests();
     if (typeof runStorageEngineSuite === 'function') await runStorageEngineSuite();
     if (typeof runUploadAllLocalTripsBenchmarkAndTest === 'function') await runUploadAllLocalTripsBenchmarkAndTest();
     if (typeof runGoogleAuthRenewalTests === 'function') await runGoogleAuthRenewalTests();
