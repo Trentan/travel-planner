@@ -82,6 +82,7 @@ const { runMergeChecklistWithDefaultsTests } = require('./merge-checklist-with-d
 const { runEnforceTerminalLegsTests } = require('./enforce-terminal-legs.test');
 const { runBackupTests } = require('./backup.test');
 const { runPackingTests } = require('./packing.test');
+const { runReminderManagementTests } = require('./reminder-management.test');
 const { runBuildExportDailyTimelineItemsTests } = require('./build-export-daily-timeline-items.test');
 const { runMobileFlowOverhaulTests } = require('./mobile-flow-overhaul.test');
 const { runFindItineraryPositionTests } = require('./find-itinerary-position.test');
@@ -150,6 +151,7 @@ async function run() {
     if (typeof runAddDaysToIsoDateTests === 'function') runAddDaysToIsoDateTests();
     if (typeof runSplitActivityTitleTests === 'function') runSplitActivityTitleTests();
     if (typeof runBackupTests === 'function') await runBackupTests();
+    if (typeof runReminderManagementTests === 'function') await runReminderManagementTests();
     if (typeof runAddOrUpdateCityTests === 'function') await runAddOrUpdateCityTests();
     if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
