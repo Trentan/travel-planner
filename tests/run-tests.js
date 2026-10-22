@@ -87,11 +87,25 @@ const { runMobileFlowOverhaulTests } = require('./mobile-flow-overhaul.test');
 const { runFindItineraryPositionTests } = require('./find-itinerary-position.test');
 const { runCityStayCandidatesBenchmarkTests } = require('./benchmark-city-stay-candidates');
 const { runExtractCitiesUserCitiesTests } = require('./extract-cities-user-cities.test');
+const { runReminderManagementTests } = require('./reminder-management.test');
+const { runCloudStorageInitErrorTests } = require('./cloud-storage-init-error.test');
+const { runSyncResponsiveUiTests } = require('./sync-responsive-ui.test');
+const { runActivityModalHelpersTests } = require('./activity-modal-helpers.test');
+const { runLoadDismissedRemindersTests } = require('./load-dismissed-reminders.test');
+const { runUpdateStickyOffsetsTests } = require('./update-sticky-offsets.test');
+const { runViewportSizeTests } = require('./viewport-size.test');
 
 async function run() {
   try {
     if (typeof runCityStayCandidatesBenchmarkTests === 'function') runCityStayCandidatesBenchmarkTests();
     if (typeof runExtractCitiesUserCitiesTests === 'function') runExtractCitiesUserCitiesTests();
+    if (typeof runReminderManagementTests === 'function') runReminderManagementTests();
+    if (typeof runCloudStorageInitErrorTests === 'function') runCloudStorageInitErrorTests();
+    if (typeof runSyncResponsiveUiTests === 'function') runSyncResponsiveUiTests();
+    if (typeof runActivityModalHelpersTests === 'function') runActivityModalHelpersTests();
+    if (typeof runLoadDismissedRemindersTests === 'function') runLoadDismissedRemindersTests();
+    if (typeof runUpdateStickyOffsetsTests === 'function') runUpdateStickyOffsetsTests();
+    if (typeof runViewportSizeTests === 'function') runViewportSizeTests();
     if (typeof runFindItineraryPositionTests === 'function') runFindItineraryPositionTests();
     if (typeof runMobileFlowOverhaulTests === 'function') runMobileFlowOverhaulTests();
     if (typeof runPackingTests === 'function') runPackingTests();
