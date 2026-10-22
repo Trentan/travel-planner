@@ -11,6 +11,7 @@ const { run: runIosPwaNavVerify } = require('./ios-pwa-nav-verify');
 const { run: runPwaShortcutsOfflineTests } = require('./pwa-shortcuts-offline.test');
 const { runCloudStorageXssTests } = require('./cloud-storage-xss.test');
 const { runCloudAutoSyncErrorTests } = require('./cloud-auto-sync-error.test');
+const { runCloudStorageInitErrorTests } = require('./cloud-storage-init-error.test');
 const { runTripLibraryXssTests } = require('./trip-library-xss.test');
 const { runTripLibraryGDriveSyncTests } = require('./trip-library-gdrive-sync.test');
 const { runTripSummaryXssTests } = require('./trip-summary-xss.test');
@@ -104,6 +105,7 @@ async function run() {
     if (typeof runDesktopSplitPrintUnitTests === 'function') await runDesktopSplitPrintUnitTests();
     await runCloudStorageXssTests();
     if (typeof runCloudAutoSyncErrorTests === 'function') await runCloudAutoSyncErrorTests();
+    if (typeof runCloudStorageInitErrorTests === 'function') runCloudStorageInitErrorTests();
     await runTripLibraryXssTests();
     if (typeof runTripLibraryGDriveSyncTests === 'function') await runTripLibraryGDriveSyncTests();
     if (typeof runTripSummaryXssTests === 'function') await runTripSummaryXssTests();
