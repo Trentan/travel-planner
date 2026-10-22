@@ -142,6 +142,32 @@ function runTripSummaryXssTests() {
   assert(tbodyHtml.includes('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;'), 'XSS payload in city/stay/journey/sight must be entity-escaped');
   assert(tbodyHtml.includes('&lt;script&gt;alert(&quot;dateXSS&quot;)&lt;/script&gt;'), 'XSS payload in display date must be entity-escaped');
 
+  // Test fallback path when escapeHtmlText is NOT globally available
+  const fallbackDocument = createSimpleDom();
+  const fallbackContext = createVmContext({
+    URL,
+    document: fallbackDocument,
+    localStorage: mockLocalStorage,
+    location: { hostname: 'localhost', origin: 'http://localhost:3000', href: 'http://localhost:3000/', protocol: 'http:' },
+    addEventListener() {},
+    appData: mockLegs,
+    stays: mockStays,
+    journeys: mockJourneys
+  });
+  fallbackContext.window = fallbackContext;
+  // Intentionally load ui.js without js/utils.js so escapeHtmlText is undefined
+  const uiSourceOnly = loadSource(path.join('js', 'ui.js'));
+  runScriptInContext(uiSourceOnly, fallbackContext, 'js/ui.js');
+
+  fallbackContext.openTripSummaryModal();
+
+  const fallbackTbody = fallbackDocument.getElementById('tripSummaryTableBody');
+  const fallbackTbodyHtml = fallbackTbody.children.map(c => c.innerHTML).join('') || fallbackTbody.innerHTML;
+
+  assert(!fallbackTbodyHtml.includes('<script>'), 'Fallback path: Trip summary HTML must not contain raw unescaped <script> tags when escapeHtmlText is undefined');
+  assert(!fallbackTbodyHtml.includes('<img src=x onerror=alert(1)>'), 'Fallback path: Trip summary HTML must not contain raw unescaped <img> tags when escapeHtmlText is undefined');
+  assert(fallbackTbodyHtml.includes('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;'), 'Fallback path: XSS payload must be entity-escaped when escapeHtmlText is undefined');
+
   console.log('✅ ALL TRIP SUMMARY MODAL XSS TESTS PASSED CLEANLY!');
 }
 
