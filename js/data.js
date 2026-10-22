@@ -273,7 +273,6 @@ function openDB() {
 
     request.onupgradeneeded = (event) => {
       const upgradeDb = event.target.result;
-      console.log('Creating IndexedDB object stores...');
 
       if (!upgradeDb.objectStoreNames.contains(STORE_NAME)) {
         const store = upgradeDb.createObjectStore(STORE_NAME, { keyPath: 'key' });
