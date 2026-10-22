@@ -1626,25 +1626,77 @@
     if (profileCard) {
       if (isApproved && profile) {
         profileCard.style.display = 'flex';
+
+        const avatarContainer = document.createElement('div');
+        avatarContainer.className = 'w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0';
+
         const hasPicture = isSafeUrl(profile.picture);
-        const avatarHtml = hasPicture
-          ? `<img src="${escapeHtml(profile.picture.trim())}" class="w-full h-full object-cover">`
-          : (profile.name ? escapeHtml(profile.name.charAt(0).toUpperCase()) : '👤');
+        if (hasPicture) {
+          const img = document.createElement('img');
+          img.src = profile.picture.trim();
+          img.className = 'w-full h-full object-cover';
+          avatarContainer.appendChild(img);
+        } else {
+          avatarContainer.textContent = profile.name ? profile.name.charAt(0).toUpperCase() : '👤';
+        }
 
-        const badgeHtml = tokenValid
-          ? `<div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-0.5">🟢 Connected to Google Drive / ${DRIVE_FOLDER_NAME}</div>`
-          : `<div class="text-[11px] text-amber-600 dark:text-amber-400 font-medium pt-0.5 flex items-center gap-1.5"><span>🟡 Approval Remembered</span> • <button type="button" class="font-bold underline text-amber-700 dark:text-amber-300 hover:text-amber-800" onclick="window.resumeGoogleCloudSync()">Resume Sync (1-Tap)</button></div>`;
+        const infoContainer = document.createElement('div');
+        infoContainer.className = 'flex-1 min-w-0';
 
-        profileCard.innerHTML = `
-          <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
-            ${avatarHtml}
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="font-bold text-slate-800 dark:text-white truncate text-sm">${escapeHtml(profile.name || 'Signed In')}</div>
-            <div class="text-xs text-slate-500 dark:text-slate-400 truncate">${escapeHtml(profile.email || '')}</div>
-            ${badgeHtml}
-          </div>
-        `;
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'font-bold text-slate-800 dark:text-white truncate text-sm';
+        nameDiv.textContent = profile.name || 'Signed In';
+
+        const emailDiv = document.createElement('div');
+        emailDiv.className = 'text-xs text-slate-500 dark:text-slate-400 truncate';
+        emailDiv.textContent = profile.email || '';
+
+        const badgeDiv = document.createElement('div');
+        if (tokenValid) {
+          badgeDiv.className = 'text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-0.5';
+          badgeDiv.textContent = `🟢 Connected to Google Drive / ${DRIVE_FOLDER_NAME}`;
+        } else {
+          badgeDiv.className = 'text-[11px] text-amber-600 dark:text-amber-400 font-medium pt-0.5 flex items-center gap-1.5';
+
+          const labelSpan = document.createElement('span');
+          labelSpan.textContent = '🟡 Approval Remembered';
+
+          const dotText = document.createTextNode(' • ');
+
+          const resumeBtn = document.createElement('button');
+          resumeBtn.type = 'button';
+          resumeBtn.className = 'font-bold underline text-amber-700 dark:text-amber-300 hover:text-amber-800';
+          resumeBtn.textContent = 'Resume Sync (1-Tap)';
+          resumeBtn.onclick = () => {
+            if (typeof window.resumeGoogleCloudSync === 'function') {
+              window.resumeGoogleCloudSync();
+            }
+          };
+
+          if (typeof badgeDiv.replaceChildren === 'function') {
+            badgeDiv.replaceChildren(labelSpan, dotText, resumeBtn);
+          } else {
+            badgeDiv.appendChild(labelSpan);
+            badgeDiv.appendChild(dotText);
+            badgeDiv.appendChild(resumeBtn);
+          }
+        }
+
+        if (typeof infoContainer.replaceChildren === 'function') {
+          infoContainer.replaceChildren(nameDiv, emailDiv, badgeDiv);
+        } else {
+          infoContainer.appendChild(nameDiv);
+          infoContainer.appendChild(emailDiv);
+          infoContainer.appendChild(badgeDiv);
+        }
+
+        if (typeof profileCard.replaceChildren === 'function') {
+          profileCard.replaceChildren(avatarContainer, infoContainer);
+        } else {
+          profileCard.innerHTML = '';
+          profileCard.appendChild(avatarContainer);
+          profileCard.appendChild(infoContainer);
+        }
       } else {
         profileCard.style.display = 'none';
       }
