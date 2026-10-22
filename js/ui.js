@@ -19,6 +19,8 @@ function loadDismissedReminders() {
     const saved = JSON.parse(localStorage.getItem('travelApp_dismissedReminders_v1') || '[]');
     if (Array.isArray(saved)) {
       dismissedReminders = new Set(saved);
+    } else {
+      dismissedReminders = new Set();
     }
   } catch (e) {
     dismissedReminders = new Set();
@@ -53,6 +55,7 @@ function resetDismissedReminders() {
   }
 }
 
+window.loadDismissedReminders = loadDismissedReminders;
 window.isReminderDismissed = isReminderDismissed;
 window.dismissTimelineReminder = dismissTimelineReminder;
 window.resetDismissedReminders = resetDismissedReminders;
