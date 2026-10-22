@@ -4254,12 +4254,13 @@ function addMissingCityOrderCandidate(orderMap, cityName, score, sourceRank = 0,
   orderMap.set(city.id, { score, sourceRank, stayWeight });
 }
 
-function getCityStayCandidates() {
+function getCityStayCandidates(citiesMap) {
   const candidates = [];
 
   if (Array.isArray(stays)) {
+    const cityByIdMap = citiesMap || (Array.isArray(citiesData) ? new Map(citiesData.map(c => [c.id, c.name])) : null);
     stays.forEach(stay => {
-      const cityName = stay.city || getCityNameForNavId(stay.cityId);
+      const cityName = stay.city || (cityByIdMap && cityByIdMap.get(stay.cityId)) || getCityNameForNavId(stay.cityId);
       if (!cityName) return;
 
       const startScore = getTimelineScore(stay.checkIn, '', Number.MAX_SAFE_INTEGER);
