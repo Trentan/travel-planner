@@ -1322,6 +1322,10 @@ function openTripSummaryModal() {
   const tbody = document.getElementById('tripSummaryTableBody');
   tbody.innerHTML = '';
 
+  const safeEscape = (str) => typeof escapeHtmlText === 'function'
+    ? escapeHtmlText(str)
+    : String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
   if (!appData || appData.length === 0) {
     tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No trip data available.</td></tr>';
     modal.style.display = 'flex';
@@ -1339,11 +1343,11 @@ function openTripSummaryModal() {
           ? formatDateStringForDisplay(day.date)
           : day.date;
       }
-      const safeDisplayDate = typeof escapeHtmlText === 'function' ? escapeHtmlText(displayDate) : displayDate;
+      const safeDisplayDate = safeEscape(displayDate);
       
       // City
       const rawCity = day.to || leg.city || 'Unknown City';
-      const safeCity = typeof escapeHtmlText === 'function' ? escapeHtmlText(rawCity) : rawCity;
+      const safeCity = safeEscape(rawCity);
 
       // Accom
       let accomStr = '<span class="text-slate-400 italic">None</span>';
@@ -1351,10 +1355,10 @@ function openTripSummaryModal() {
         const nightStays = stays.filter(s => s.checkIn <= day.date && s.checkOut > day.date);
         if (nightStays.length > 0) {
           accomStr = nightStays.map(s => {
-            const safeName = typeof escapeHtmlText === 'function' ? escapeHtmlText(s.name || 'Stay') : (s.name || 'Stay');
+            const safeName = safeEscape(s.name || 'Stay');
             let sStr = '<strong class="text-slate-800 dark:text-slate-200">' + safeName + '</strong>';
             if (s.neighborhood) {
-              const safeNeigh = typeof escapeHtmlText === 'function' ? escapeHtmlText(s.neighborhood) : s.neighborhood;
+              const safeNeigh = safeEscape(s.neighborhood);
               sStr += ' <span class="text-xs text-slate-500 block">' + safeNeigh + '</span>';
             }
             return sStr;
@@ -1369,8 +1373,8 @@ function openTripSummaryModal() {
         const dayJourneys = journeys.filter(j => j.dep && j.dep.startsWith(day.date));
         if (dayJourneys.length > 0) {
           eventsHtml += dayJourneys.map(j => {
-            const safeFrom = typeof escapeHtmlText === 'function' ? escapeHtmlText(j.from || '?') : (j.from || '?');
-            const safeTo = typeof escapeHtmlText === 'function' ? escapeHtmlText(j.to || '?') : (j.to || '?');
+            const safeFrom = safeEscape(j.from || '?');
+            const safeTo = safeEscape(j.to || '?');
             return '<div class="mb-1 text-blue-600 dark:text-blue-400 text-sm flex items-center">' +
                       '<span class="mr-1 text-lg">✈️</span>' +
                       '<span>' + safeFrom + ' &rarr; ' + safeTo + '</span>' +
@@ -1382,7 +1386,7 @@ function openTripSummaryModal() {
       if (day.sights && day.sights.length > 0) {
         eventsHtml += '<ul class="list-disc pl-4 text-sm text-slate-700 dark:text-slate-300 mt-1">';
         day.sights.forEach(sight => {
-          const safeSightName = typeof escapeHtmlText === 'function' ? escapeHtmlText(sight.name || sight.title || 'Activity') : (sight.name || sight.title || 'Activity');
+          const safeSightName = safeEscape(sight.name || sight.title || 'Activity');
           eventsHtml += '<li>' + safeSightName + '</li>';
         });
         eventsHtml += '</ul>';
