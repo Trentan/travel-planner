@@ -18,10 +18,12 @@ function createDOMContext() {
   const mockLocalStorage = createMockLocalStorage();
   const elements = {};
 
-  function getOrCreateElement(id) {
+  function getOrCreateElement(id, tag = 'div') {
     if (!elements[id]) {
+      const children = [];
       elements[id] = {
         id,
+        tagName: tag.toUpperCase(),
         style: {},
         classList: {
           classes: new Set(),
@@ -29,11 +31,34 @@ function createDOMContext() {
           remove(c) { this.classes.delete(c); },
           contains(c) { return this.classes.has(c); }
         },
-        innerText: '',
-        innerHTML: '',
+        _innerText: '',
+        get innerText() { return this._innerText; },
+        set innerText(v) { this._innerText = v; },
+        _innerHTML: '',
+        get innerHTML() {
+          if (children.length > 0) {
+            return children.map(c => {
+              if (c.nodeType === 3) return c.textContent;
+              return `<${(c.tagName || 'div').toLowerCase()}>${c.innerHTML || c.textContent || ''}</${(c.tagName || 'div').toLowerCase()}>`;
+            }).join('');
+          }
+          return this._innerHTML;
+        },
+        set innerHTML(v) { children.length = 0; this._innerHTML = v; },
+        _textContent: '',
+        get textContent() {
+          if (children.length > 0) return children.map(c => c.textContent || '').join('');
+          return this._textContent;
+        },
+        set textContent(v) { children.length = 0; this._textContent = v; },
+        children,
+        appendChild(child) { children.push(child); },
+        replaceChildren(...newChildren) { children.length = 0; children.push(...newChildren); },
         title: '',
         disabled: false,
-        hidden: false
+        hidden: false,
+        addEventListener() {},
+        click() {}
       };
     }
     return elements[id];
@@ -64,13 +89,10 @@ function createDOMContext() {
         return null;
       },
       createElement(tag) {
-        return {
-          tagName: tag,
-          style: {},
-          classList: { add() {}, remove() {} },
-          addEventListener() {},
-          click() {}
-        };
+        return getOrCreateElement(`el_${Math.random()}`, tag);
+      },
+      createTextNode(text) {
+        return { nodeType: 3, textContent: text };
       },
       head: { appendChild() {} }
     },
