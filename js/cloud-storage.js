@@ -19,6 +19,17 @@
   let userProfile = null;
   let syncDebounceTimer = null;
 
+  // Helper to clear Google Drive state from localStorage
+  function clearGDriveLocalStorage() {
+    localStorage.removeItem('travelApp_gdrive_connected');
+    localStorage.removeItem('travelApp_gdrive_approved');
+    localStorage.removeItem('travelApp_gdrive_token');
+    localStorage.removeItem('travelApp_gdrive_token_expiry');
+    localStorage.removeItem('travelApp_gdrive_folder_id');
+    localStorage.removeItem('travelApp_gdrive_file_map');
+    localStorage.removeItem('travelApp_user_profile');
+  }
+
   // Helper to detect native platform execution (Capacitor Android/iOS, local file protocol, or mock)
   function isNativePlatform() {
     if (window.__mockGoogleDriveAPI) return true;
@@ -42,12 +53,7 @@
       tokenExpiry = 0;
       gdriveFolderId = null;
       userProfile = null;
-      localStorage.removeItem('travelApp_gdrive_connected');
-      localStorage.removeItem('travelApp_gdrive_approved');
-      localStorage.removeItem('travelApp_gdrive_token');
-      localStorage.removeItem('travelApp_gdrive_token_expiry');
-      localStorage.removeItem('travelApp_gdrive_folder_id');
-      localStorage.removeItem('travelApp_user_profile');
+      clearGDriveLocalStorage();
     }
   } catch (e) {
     userProfile = null;
@@ -658,12 +664,7 @@
     tokenExpiry = 0;
     gdriveFolderId = null;
     setUserProfile(null);
-    localStorage.removeItem('travelApp_gdrive_connected');
-    localStorage.removeItem('travelApp_gdrive_approved');
-    localStorage.removeItem('travelApp_gdrive_token');
-    localStorage.removeItem('travelApp_gdrive_token_expiry');
-    localStorage.removeItem('travelApp_gdrive_folder_id');
-    localStorage.removeItem('travelApp_gdrive_file_map');
+    clearGDriveLocalStorage();
     updateCloudSyncStatusPill();
     updateCloudSyncModalState();
   };
