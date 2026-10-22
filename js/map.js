@@ -195,6 +195,40 @@ function getMapCityId(cityName) {
   return 'city-' + String(cityName || '').toLowerCase().replace(/[^a-z0-9]/g, '-');
 }
 
+function buildMapJourneysLookupMap(journeysList) {
+  const map = new Map();
+  if (!journeysList || !Array.isArray(journeysList)) return map;
+  for (const j of journeysList) {
+    if (!j) continue;
+    const jFromKey = getMapCityKey(j.fromLocation || j.from);
+    const jToKey = getMapCityKey(j.toLocation || j.to);
+    if (jFromKey && jToKey) {
+      const nameKey = `${jFromKey}->${jToKey}`;
+      if (!map.has(nameKey)) map.set(nameKey, j);
+    }
+    if (j.fromCityId && j.toCityId) {
+      const idKey = `${j.fromCityId}->${j.toCityId}`;
+      if (!map.has(idKey)) map.set(idKey, j);
+    }
+  }
+  return map;
+}
+
+function findMapJourney(fromStop, toStop, journeysLookupMap) {
+  if (!journeysLookupMap || !fromStop || !toStop) return null;
+  const sFromKey = getMapCityKey(fromStop.name);
+  const sToKey = getMapCityKey(toStop.name);
+  if (sFromKey && sToKey) {
+    const nameMatch = journeysLookupMap.get(`${sFromKey}->${sToKey}`);
+    if (nameMatch) return nameMatch;
+  }
+  if (fromStop.id && toStop.id) {
+    const idMatch = journeysLookupMap.get(`${fromStop.id}->${toStop.id}`);
+    if (idMatch) return idMatch;
+  }
+  return null;
+}
+
 /**
  * Collects all path stops from trip legs (appData) and journeys.
  */
@@ -409,23 +443,16 @@ function buildMapDestinations(travelSequence) {
  */
 function drawMapPolylines(travelSequence) {
   const polylinePoints = [];
+  const journeysLookupMap = (typeof journeys !== 'undefined' && Array.isArray(journeys))
+    ? buildMapJourneysLookupMap(journeys)
+    : null;
 
   for (let i = 0; i < travelSequence.length - 1; i++) {
     const fromStop = travelSequence[i];
     const toStop = travelSequence[i + 1];
 
     // Find transport linking these two
-    let matchedJourney = null;
-    if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
-       matchedJourney = journeys.find(j => {
-         const jFrom = getMapCityKey(j.fromLocation || j.from);
-         const jTo = getMapCityKey(j.toLocation || j.to);
-         const sFrom = getMapCityKey(fromStop.name);
-         const sTo = getMapCityKey(toStop.name);
-         return (jFrom === sFrom && jTo === sTo) ||
-                (j.fromCityId && j.toCityId && j.fromCityId === fromStop.id && j.toCityId === toStop.id);
-       });
-    }
+    let matchedJourney = findMapJourney(fromStop, toStop, journeysLookupMap);
 
     let fromCoords = getCityCoords(fromStop.name);
     let toCoords = getCityCoords(toStop.name);
@@ -949,21 +976,15 @@ function buildDesktopSplitMap() {
 
   // Draw Polylines on split map
   const polylinePoints = [];
+  const journeysLookupMap = (typeof journeys !== 'undefined' && Array.isArray(journeys))
+    ? buildMapJourneysLookupMap(journeys)
+    : null;
+
   for (let i = 0; i < travelSequence.length - 1; i++) {
     const fromStop = travelSequence[i];
     const toStop = travelSequence[i + 1];
 
-    let matchedJourney = null;
-    if (typeof journeys !== 'undefined' && Array.isArray(journeys)) {
-      matchedJourney = journeys.find(j => {
-        const jFrom = getMapCityKey(j.fromLocation || j.from);
-        const jTo = getMapCityKey(j.toLocation || j.to);
-        const sFrom = getMapCityKey(fromStop.name);
-        const sTo = getMapCityKey(toStop.name);
-        return (jFrom === sFrom && jTo === sTo) ||
-               (j.fromCityId && j.toCityId && j.fromCityId === fromStop.id && j.toCityId === toStop.id);
-      });
-    }
+    let matchedJourney = findMapJourney(fromStop, toStop, journeysLookupMap);
 
     let fromCoords = getCityCoords(fromStop.name);
     let toCoords = getCityCoords(toStop.name);
