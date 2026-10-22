@@ -273,7 +273,6 @@ function openDB() {
 
     request.onupgradeneeded = (event) => {
       const upgradeDb = event.target.result;
-      console.log('Creating IndexedDB object stores...');
 
       if (!upgradeDb.objectStoreNames.contains(STORE_NAME)) {
         const store = upgradeDb.createObjectStore(STORE_NAME, { keyPath: 'key' });
@@ -7999,7 +7998,6 @@ async function loadImportedPayload(importedData, fileName) {
 async function importJSON(event) {
   const file = event.target.files[0];
   if (!file) {
-    console.log('No file selected');
     return;
   }
 
