@@ -387,11 +387,11 @@ function getActivityScheduleConflict(leg, day, activity, schedule) {
   if (start === null) return null;
   const durationMinutes = parseActivityDurationMinutes(activity?.estTime || activity?.time || '') || 60;
   const end = timeValueToMinutes(schedule?.endTime) ?? (start + durationMinutes);
-  const conflict = getDaySchedulingBusyIntervals(leg, day, activity)
-    .find(interval => start < interval.end && end > interval.start);
+  const busyIntervals = getDaySchedulingBusyIntervals(leg, day, activity);
+  const conflict = busyIntervals.find(interval => start < interval.end && end > interval.start);
   if (!conflict) return null;
 
-  const suggestion = suggestActivityTimeForDay(leg, day, activity);
+  const suggestion = suggestActivityTimeForDay(leg, day, activity, busyIntervals);
   const suggestionText = suggestion?.available
     ? `Suggested slot: ${suggestion.label}.`
     : 'No clean suggested slot is available on this day.';
@@ -556,11 +556,11 @@ function describeScheduleSuggestion(choice, intervals) {
   return `Best ${choice.windowLabel}`;
 }
 
-function suggestActivityTimeForDay(leg, day, activity) {
+function suggestActivityTimeForDay(leg, day, activity, precomputedBusyIntervals = null) {
   const durationMinutes = parseActivityDurationMinutes(activity?.estTime || activity?.time || '') || 60;
   const dayStart = 8 * 60;
   const dayEnd = 22 * 60;
-  const busyIntervals = getDaySchedulingBusyIntervals(leg, day, activity);
+  const busyIntervals = precomputedBusyIntervals || getDaySchedulingBusyIntervals(leg, day, activity);
   const mergedIntervals = mergeBusyIntervals(busyIntervals, dayStart, dayEnd, 15);
   const gaps = getAvailableGaps(mergedIntervals, dayStart, dayEnd);
   const choice = chooseBestScheduleGap(gaps, durationMinutes, getActivityPreferredWindows(activity));
