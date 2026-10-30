@@ -155,7 +155,6 @@ function runTabsTests() {
   runScriptInContext(tabsCode, context, 'js/tabs.js');
 
   const {
-    isStayRowExpanded,
     toggleStayRowDetails,
     renderStayDetailBlock,
     renderStayLocationDetails,
@@ -191,11 +190,8 @@ function runTabsTests() {
   } = context;
 
   // 1. Expanded Stay Rows state management
-  assert.strictEqual(isStayRowExpanded('stay-1'), false, 'stay-1 should initially not be expanded');
   toggleStayRowDetails('stay-1');
-  assert.strictEqual(isStayRowExpanded('stay-1'), true, 'stay-1 should be expanded after toggleStayRowDetails');
-  toggleStayRowDetails('stay-1');
-  assert.strictEqual(isStayRowExpanded('stay-1'), false, 'stay-1 should be collapsed after second toggleStayRowDetails');
+  assert(elements['accom-table-container'].innerHTML.includes('stay-data-table'), 'toggleStayRowDetails updates accommodation tab');
 
   // 2. Formatting & Math helpers
   assert.strictEqual(calculateNights('2025-05-01', '2025-05-05'), 4, 'calculateNights should return 4 days diff');

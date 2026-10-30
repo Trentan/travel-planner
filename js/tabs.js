@@ -2,10 +2,6 @@
 
 let expandedStayRows = new Set();
 
-function isStayRowExpanded(stayId) {
-  return expandedStayRows.has(stayId);
-}
-
 function toggleStayRowDetails(stayId) {
   if (expandedStayRows.has(stayId)) {
     expandedStayRows.delete(stayId);
