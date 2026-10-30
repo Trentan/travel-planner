@@ -19,7 +19,7 @@ jobs:
       github.event.pull_request.merged == true ||
       github.event.label.name == 'convert-to-issues' ||
       (github.event.action == 'opened' && (contains(github.head_ref, 'jules') || contains(github.head_ref, 'Jules')))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       issues: write
       pull-requests: write
