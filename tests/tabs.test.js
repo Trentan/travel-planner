@@ -164,7 +164,6 @@ function runTabsTests() {
     renderStayMobileLinkedFact,
     renderStayMobileSummary,
     renderStayDateSummary,
-    renderStayStatusCostSummary,
     isAccomMobileCardLayout,
     getStayCityDisplay,
     renderStayMobileDetails,
@@ -252,7 +251,6 @@ function runTabsTests() {
 
   assert(renderStayMobileSummary(sampleStays[0], 'confirmed', '', 'Tokyo').includes('Hotel Park') || renderStayMobileSummary(sampleStays[0], 'confirmed', '', 'Tokyo').includes('Tokyo'), 'renderStayMobileSummary includes details');
   assert(renderStayDateSummary(sampleStays[0], 'confirmed', '').includes('Out:'), 'renderStayDateSummary includes checkout label');
-  assert(renderStayStatusCostSummary(sampleStays[0], 'confirmed', '').includes('badge'), 'renderStayStatusCostSummary includes status badge');
 
   assert(renderStayMobileDetails(sampleStays[0], 'Tokyo').includes('Shinjuku, Tokyo'), 'renderStayMobileDetails includes facts grid');
   assert.strictEqual(getStayCityDisplay('Tokyo', sampleStays[0]), '🇯🇵 HND - Tokyo', 'getStayCityDisplay formats with flag, code, and city name');

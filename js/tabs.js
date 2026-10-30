@@ -103,31 +103,6 @@ function renderStayDateSummary(stay, status, statusIcon) {
   `;
 }
 
-function renderStayStatusCostSummary(stay, status, statusIcon) {
-  const normalizedStatus = normalizeItemStatus(status);
-  const mobileMeta = typeof renderMobileStatusCostMeta === 'function'
-      ? renderMobileStatusCostMeta({
-        status: normalizedStatus,
-        costValue: stay.totalCost || '0',
-        bookingReference: stay.bookingRef || '',
-        statusOnClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
-        costOnBlur: `updateStayField('${stay.id}', 'totalCost', this.innerText)`,
-        statusButtonTitle: 'Change status',
-        metaClass: 'stay-status-cost-meta mobile-status-cost-meta',
-        editableCost: isEditMode
-      })
-      : '';
-
-  return `
-    ${renderStatusBadge(normalizedStatus, {
-      onClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
-      title: 'Change stay status',
-      className: 'stay-status-badge stay-status-badge-clickable'
-    })}
-    ${mobileMeta}
-  `;
-}
-
 function isAccomMobileCardLayout() {
   return typeof isMobileViewport === 'function'
       ? isMobileViewport()
