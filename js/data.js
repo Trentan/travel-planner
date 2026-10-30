@@ -7282,16 +7282,6 @@ function formatSummaryMoney(value) {
   return `$${parsed.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')}`;
 }
 
-function buildExportDivider(label = '', width = 72) {
-  const clean = String(label || '').trim();
-  if (!clean) return '='.repeat(width);
-  const padded = ` ${clean} `;
-  if (padded.length >= width) return padded;
-  const left = Math.floor((width - padded.length) / 2);
-  const right = width - padded.length - left;
-  return `${'='.repeat(left)}${padded}${'='.repeat(right)}`;
-}
-
 function buildExportItemLine(item, fallbackLabel = 'Item') {
   const title = formatTextValue(item?.text || item?.title, fallbackLabel);
   const parts = [title];
