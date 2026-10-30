@@ -9204,7 +9204,6 @@ function previousTripStartStep() {
 }
 function adjustTripStartNights(change) { captureTripStartAnswer(); tripStartAnswers.nights = Math.max(1, Math.min(60, Number(tripStartAnswers.nights) + change)); renderTripStart(); }
 function selectTripStartTransport(type) { captureTripStartAnswer(); tripStartAnswers.transport = type; renderTripStart(); }
-function selectTripStartReturnTransport(type) { captureTripStartAnswer(); tripStartAnswers.returnTransport = type; renderTripStart(); }
 function addTripStartStop() { captureTripStartAnswer(); tripStartAnswers.stops.push({ city: '', nights: 2, transport: 'train' }); renderTripStart(); }
 function removeTripStartStop(index) { captureTripStartAnswer(); tripStartAnswers.stops.splice(index, 1); renderTripStart(); }
 function updateTripStartStop(index, field, value) {
