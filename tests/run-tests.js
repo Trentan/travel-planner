@@ -37,6 +37,7 @@ const { runGetLegBaseCityNameTests } = require('./get-leg-base-city-name.test');
 const { runStripLeadingActivityEmojiTextTests } = require('./strip-leading-activity-emoji-text.test');
 const { runParseCurrencyAmountTests } = require('./parse-currency-amount.test');
 const { runFormatCurrencyTests } = require('./format-currency.test');
+const { runFormatDateCompactTests } = require('./format-date-compact.test');
 const { runCompactFoodQuestTitleTests } = require('./compact-food-quest-title.test');
 const { run: runFormatCompactJourneyDurationSuite } = require('./format-compact-journey-duration.test');
 const { runFormatJourneySubLocationTests } = require('./format-journey-sub-location.test');
@@ -149,6 +150,7 @@ async function run() {
     if (typeof runStripLeadingActivityEmojiTextTests === 'function') await runStripLeadingActivityEmojiTextTests();
     if (typeof runParseCurrencyAmountTests === 'function') await runParseCurrencyAmountTests();
     if (typeof runFormatCurrencyTests === 'function') await runFormatCurrencyTests();
+    if (typeof runFormatDateCompactTests === 'function') await runFormatDateCompactTests();
     if (typeof runGetDayTotalTests === 'function') await runGetDayTotalTests();
     if (typeof runGetMapSearchUrlTests === 'function') await runGetMapSearchUrlTests();
     if (typeof runActivitySchedulerTests === 'function') runActivitySchedulerTests();
