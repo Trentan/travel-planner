@@ -194,6 +194,21 @@ async function run() {
   try { try { await windowContext.checkUrlForImportedTrip(); } catch(e) {} } catch(e) {}
   assert(replaceStateCalled === true, 'checkUrlForImportedTrip should cleanly invoke replaceState to clean URL');
 
+  // Verify non-trip hash fragment longer than 20 chars is ignored
+  replaceStateCalled = false;
+  let alertCalled = false;
+  windowContext.window.location = { search: '', hash: '#section-header-long-id-without-trip-prefix' };
+  windowContext.alert = () => { alertCalled = true; };
+  await windowContext.checkUrlForImportedTrip();
+  assert(replaceStateCalled === false, 'checkUrlForImportedTrip should ignore non-trip hashes even if > 20 chars');
+  assert(alertCalled === false, 'checkUrlForImportedTrip should not trigger alert for non-trip hashes');
+
+  // Verify trip= hash fragment is processed
+  replaceStateCalled = false;
+  windowContext.window.location = { search: '', hash: '#trip=invalid_corrupted_base64_string' };
+  try { await windowContext.checkUrlForImportedTrip(); } catch(e) {}
+  assert(replaceStateCalled === true, 'checkUrlForImportedTrip should process hash with trip= prefix');
+
   // Test Issue #201: Session-level backup reminder dismissal
   console.log('Testing backup reminder session dismissal...');
   const sessionStorageStore = {};

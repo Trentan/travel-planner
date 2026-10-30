@@ -60,52 +60,149 @@
     card.setAttribute('role', 'dialog');
     card.setAttribute('aria-label', isIOS ? 'Add to Home Screen prompt' : 'Play Store recommendation');
 
+    // Header section
+    const header = document.createElement('div');
+    header.className = 'pwa-prompt-header';
+
+    const titleGroup = document.createElement('div');
+    titleGroup.className = 'pwa-prompt-title-group';
+
+    const badge = document.createElement('span');
+    badge.className = isIOS ? 'pwa-prompt-badge' : 'pwa-prompt-badge pwa-badge-android';
+    badge.textContent = isIOS ? 'Web App' : 'Android App';
+
+    const title = document.createElement('h4');
+    title.className = 'pwa-prompt-title';
+    title.textContent = isIOS ? '📱 Add to Home Screen' : '🚀 Get the Mobile App';
+
+    titleGroup.appendChild(badge);
+    titleGroup.appendChild(title);
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'pwa-prompt-close-btn';
+    closeBtn.setAttribute('aria-label', 'Dismiss prompt');
+    closeBtn.textContent = '×';
+    closeBtn.addEventListener('click', () => dismissPwaPrompt(true));
+
+    header.appendChild(titleGroup);
+    header.appendChild(closeBtn);
+    card.appendChild(header);
+
+    // Body section
+    const body = document.createElement('p');
+    body.className = 'pwa-prompt-body';
     if (isIOS) {
-      card.innerHTML = `
-        <div class="pwa-prompt-header">
-          <div class="pwa-prompt-title-group">
-            <span class="pwa-prompt-badge">Web App</span>
-            <h4 class="pwa-prompt-title">📱 Add to Home Screen</h4>
-          </div>
-          <button type="button" class="pwa-prompt-close-btn" onclick="dismissPwaPrompt(true)" aria-label="Dismiss prompt">×</button>
-        </div>
-        <p class="pwa-prompt-body">
-          Save <strong>Travel Planner</strong> as an app on your iPhone for full-screen mode and quick access!
-        </p>
-        <div class="pwa-prompt-steps">
-          <div class="pwa-step">
-            <span class="pwa-step-badge">1</span>
-            <span>Tap the <strong>Share</strong> button <span class="pwa-share-icon" aria-hidden="true">⎋</span> in Safari's toolbar</span>
-          </div>
-          <div class="pwa-step">
-            <span class="pwa-step-badge">2</span>
-            <span>Scroll down and tap <strong>"Add to Home Screen ➕"</strong></span>
-          </div>
-        </div>
-        <div class="pwa-prompt-footer">
-          <button type="button" class="pwa-btn pwa-btn-primary" onclick="dismissPwaPrompt(true)">Got it!</button>
-          <button type="button" class="pwa-btn pwa-btn-ghost" onclick="dismissPwaPrompt(false)">Remind Later</button>
-        </div>
-      `;
+      body.appendChild(document.createTextNode('Save '));
+      const strongApp = document.createElement('strong');
+      strongApp.textContent = 'Travel Planner';
+      body.appendChild(strongApp);
+      body.appendChild(document.createTextNode(' as an app on your iPhone for full-screen mode and quick access!'));
     } else {
-      card.innerHTML = `
-        <div class="pwa-prompt-header">
-          <div class="pwa-prompt-title-group">
-            <span class="pwa-prompt-badge pwa-badge-android">Android App</span>
-            <h4 class="pwa-prompt-title">🚀 Get the Mobile App</h4>
-          </div>
-          <button type="button" class="pwa-prompt-close-btn" onclick="dismissPwaPrompt(true)" aria-label="Dismiss prompt">×</button>
-        </div>
-        <p class="pwa-prompt-body">
-          Install <strong>Travel Planner</strong> from Google Play for offline support and native app experience.
-        </p>
-        <div class="pwa-prompt-footer">
-          <a href="https://play.google.com/store/apps/details?id=com.trentan.travelplanner" target="_blank" rel="noopener" class="pwa-btn pwa-btn-primary pwa-btn-play" onclick="dismissPwaPrompt(true)">
-            <span>Get on Google Play</span>
-          </a>
-          <button type="button" class="pwa-btn pwa-btn-ghost" onclick="dismissPwaPrompt(false)">Keep Using Web</button>
-        </div>
-      `;
+      body.appendChild(document.createTextNode('Install '));
+      const strongApp = document.createElement('strong');
+      strongApp.textContent = 'Travel Planner';
+      body.appendChild(strongApp);
+      body.appendChild(document.createTextNode(' from Google Play for offline support and native app experience.'));
+    }
+    card.appendChild(body);
+
+    if (isIOS) {
+      // Steps section
+      const stepsContainer = document.createElement('div');
+      stepsContainer.className = 'pwa-prompt-steps';
+
+      // Step 1
+      const step1 = document.createElement('div');
+      step1.className = 'pwa-step';
+
+      const step1Badge = document.createElement('span');
+      step1Badge.className = 'pwa-step-badge';
+      step1Badge.textContent = '1';
+
+      const step1Text = document.createElement('span');
+      step1Text.appendChild(document.createTextNode('Tap the '));
+      const shareStrong = document.createElement('strong');
+      shareStrong.textContent = 'Share';
+      step1Text.appendChild(shareStrong);
+      step1Text.appendChild(document.createTextNode(' button '));
+
+      const shareIcon = document.createElement('span');
+      shareIcon.className = 'pwa-share-icon';
+      shareIcon.setAttribute('aria-hidden', 'true');
+      shareIcon.textContent = '⎋';
+      step1Text.appendChild(shareIcon);
+
+      step1Text.appendChild(document.createTextNode(' in Safari\'s toolbar'));
+
+      step1.appendChild(step1Badge);
+      step1.appendChild(step1Text);
+
+      // Step 2
+      const step2 = document.createElement('div');
+      step2.className = 'pwa-step';
+
+      const step2Badge = document.createElement('span');
+      step2Badge.className = 'pwa-step-badge';
+      step2Badge.textContent = '2';
+
+      const step2Text = document.createElement('span');
+      step2Text.appendChild(document.createTextNode('Scroll down and tap '));
+      const addStrong = document.createElement('strong');
+      addStrong.textContent = '"Add to Home Screen ➕"';
+      step2Text.appendChild(addStrong);
+
+      step2.appendChild(step2Badge);
+      step2.appendChild(step2Text);
+
+      stepsContainer.appendChild(step1);
+      stepsContainer.appendChild(step2);
+      card.appendChild(stepsContainer);
+
+      // Footer section
+      const footer = document.createElement('div');
+      footer.className = 'pwa-prompt-footer';
+
+      const primaryBtn = document.createElement('button');
+      primaryBtn.type = 'button';
+      primaryBtn.className = 'pwa-btn pwa-btn-primary';
+      primaryBtn.textContent = 'Got it!';
+      primaryBtn.addEventListener('click', () => dismissPwaPrompt(true));
+
+      const ghostBtn = document.createElement('button');
+      ghostBtn.type = 'button';
+      ghostBtn.className = 'pwa-btn pwa-btn-ghost';
+      ghostBtn.textContent = 'Remind Later';
+      ghostBtn.addEventListener('click', () => dismissPwaPrompt(false));
+
+      footer.appendChild(primaryBtn);
+      footer.appendChild(ghostBtn);
+      card.appendChild(footer);
+    } else {
+      // Android Footer section
+      const footer = document.createElement('div');
+      footer.className = 'pwa-prompt-footer';
+
+      const playLink = document.createElement('a');
+      playLink.href = 'https://play.google.com/store/apps/details?id=com.trentan.travelplanner';
+      playLink.target = '_blank';
+      playLink.rel = 'noopener';
+      playLink.className = 'pwa-btn pwa-btn-primary pwa-btn-play';
+      playLink.addEventListener('click', () => dismissPwaPrompt(true));
+
+      const playSpan = document.createElement('span');
+      playSpan.textContent = 'Get on Google Play';
+      playLink.appendChild(playSpan);
+
+      const ghostBtn = document.createElement('button');
+      ghostBtn.type = 'button';
+      ghostBtn.className = 'pwa-btn pwa-btn-ghost';
+      ghostBtn.textContent = 'Keep Using Web';
+      ghostBtn.addEventListener('click', () => dismissPwaPrompt(false));
+
+      footer.appendChild(playLink);
+      footer.appendChild(ghostBtn);
+      card.appendChild(footer);
     }
 
     document.body.appendChild(card);

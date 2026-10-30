@@ -715,7 +715,7 @@ function renderMobileMapOverlayControls(hostContainer, mapInstance, destinations
       const label = safeText(dest.name || `Stop ${idx + 1}`);
       const id = safeText(dest.id || dest.name || idx);
       const country = safeText(dest.country || '');
-      const colour = safeText(dest.colour || '#14b8a6');
+      const colour = safeText(dest.colour || dest.color || '#14b8a6');
       return `
         <button type="button" class="mobile-map-stop-card${idx === 0 ? ' active' : ''}" data-map-stop-idx="${idx}" data-map-city="${id}">
           <span class="mobile-map-stop-badge" style="background:${colour};">${idx + 1}</span>
@@ -847,43 +847,67 @@ function updateMapLegend(destinations) {
   const legend = document.getElementById('map-legend-container');
   if (!legend) return;
   
-  if (destinations.length === 0) {
+  if (!Array.isArray(destinations) || destinations.length === 0) {
     legend.innerHTML = '<div class="text-slate-400 text-xs">No cities mapped yet.</div>';
     return;
   }
 
+  const safeText = val => (typeof escapeHtmlText === 'function' ? escapeHtmlText(String(val ?? '')) : String(val ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'));
+
   legend.innerHTML = destinations.map(d => {
     const homeTag = d.isHome ? ' <span style="font-size:0.75rem; color:#27AE60; font-weight:600;">🏠</span>' : '';
+    const safeId = safeText(d.id || d.name || '');
+    const safeName = safeText(d.name || '');
+    const safeColor = safeText(d.color || d.colour || '#3498DB');
     return `
-      <div class="legend-item" onclick="focusCityOnMap('${d.id}')" onmouseenter="highlightCityOnMap('${d.id}')" onmouseleave="unhighlightCityOnMap('${d.id}')">
-        <span class="legend-item-index" style="background:${d.color};">${d.isHome ? '🏠' : d.index}</span>
-        <span class="legend-item-name">${d.name}${homeTag}</span>
+      <div class="legend-item" data-legend-city-id="${safeId}">
+        <span class="legend-item-index" style="background:${safeColor};">${d.isHome ? '🏠' : d.index}</span>
+        <span class="legend-item-name">${safeName}${homeTag}</span>
       </div>
     `;
   }).join('');
+
+  legend.querySelectorAll('.legend-item[data-legend-city-id]').forEach(item => {
+    const cityId = item.dataset.legendCityId;
+    item.addEventListener('click', () => {
+      if (typeof focusCityOnMap === 'function') focusCityOnMap(cityId);
+    });
+    item.addEventListener('mouseenter', () => {
+      if (typeof highlightCityOnMap === 'function') highlightCityOnMap(cityId);
+    });
+    item.addEventListener('mouseleave', () => {
+      if (typeof unhighlightCityOnMap === 'function') unhighlightCityOnMap(cityId);
+    });
+  });
 }
 
 function updateMapStats(destinations, unmatchedCities) {
   const stats = document.getElementById('journey-stats');
   if (!stats) return;
+
+  const safeText = val => (typeof escapeHtmlText === 'function' ? escapeHtmlText(String(val ?? '')) : String(val ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'));
   
+  const destCount = Array.isArray(destinations) ? destinations.length : 0;
+  const legCount = (typeof appData !== 'undefined' && Array.isArray(appData)) ? appData.length : 0;
+
   let html = `
     <div class="map-stats-grid">
       <div class="map-stat-card">
-        <div class="map-stat-value">${destinations.length}</div>
+        <div class="map-stat-value">${destCount}</div>
         <div class="map-stat-label">Mapped Cities</div>
       </div>
       <div class="map-stat-card">
-        <div class="map-stat-value">${appData.length}</div>
+        <div class="map-stat-value">${legCount}</div>
         <div class="map-stat-label">Trip Legs</div>
       </div>
     </div>
   `;
 
-  if (unmatchedCities.length > 0) {
+  if (Array.isArray(unmatchedCities) && unmatchedCities.length > 0) {
+    const safeUnmatched = unmatchedCities.map(c => safeText(c)).join(', ');
     html += `
       <div class="map-unmatched">
-        <strong>Unmapped:</strong> ${unmatchedCities.join(', ')}
+        <strong>Unmapped:</strong> ${safeUnmatched}
       </div>
     `;
   }
