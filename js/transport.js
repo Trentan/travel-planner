@@ -1010,26 +1010,6 @@ function renderJourneySubLocationDetails(segs, extraClass = '') {
   return renderTransportSubLocationParts(getJourneySubLocationParts(segs), extraClass);
 }
 
-function renderJourneySubLocationSummary(segs, extraClass = '') {
-  if (!Array.isArray(segs) || segs.length === 0) return '';
-  const firstSeg = segs[0];
-  const lastSeg = segs[segs.length - 1];
-  return renderTransportSubLocationPlainText([
-    {
-      label: 'From',
-      value: firstSeg.fromLocation || '',
-      city: firstSeg.fromLocation,
-      detail: firstSeg.fromAddress || ''
-    },
-    {
-      label: 'To',
-      value: lastSeg.toLocation || '',
-      city: lastSeg.toLocation,
-      detail: lastSeg.toAddress || ''
-    }
-  ], extraClass);
-}
-
 function renderTransportMobileFacts(segs, totalCost, notes = '') {
   if (!Array.isArray(segs) || segs.length === 0) return '';
   const firstSeg = segs[0];
