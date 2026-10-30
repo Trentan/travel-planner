@@ -133,7 +133,7 @@ function runTabsTests() {
     isEditMode: true,
     isPackingEditLocked: false,
     currentCityFilter: 'all',
-    escapeHtmlText: val => String(val || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+    escapeHtmlText: val => String(val || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'),
     getMapSearchUrl: (loc, city) => `https://maps.example.com/?q=${encodeURIComponent(loc + ' ' + city)}`,
     normalizeItemStatus: status => ['planned', 'booked', 'confirmed', 'cancelled'].includes(status) ? status : 'planned',
     formatCurrency: (val, opts) => typeof opts === 'object' && opts.includeSymbol === false ? String(val) : `$${val}`,
@@ -181,7 +181,6 @@ function runTabsTests() {
     getExclusiveDateRangeEnd,
     getStayOverlapDays,
     findBestStayLegIndex,
-    escapeHtml,
     buildPackingTab,
     formatBudgetAmount,
     calculateBudgetBreakdown,
@@ -236,8 +235,9 @@ function runTabsTests() {
   assert.strictEqual(findBestStayLegIndex(sampleStays[0], []), -1, 'findBestStayLegIndex returns -1 for empty legs');
 
   // 4. HTML Escape
-  assert.strictEqual(escapeHtml('Hello <World>'), 'Hello &lt;World&gt;', 'escapeHtml sanitizes HTML tags');
-  assert.strictEqual(escapeHtml(''), '', 'escapeHtml returns empty string for falsy input');
+  const escapeHtmlText = context.escapeHtmlText;
+  assert.strictEqual(escapeHtmlText('Hello <World>'), 'Hello &lt;World&gt;', 'escapeHtmlText sanitizes HTML tags');
+  assert.strictEqual(escapeHtmlText(''), '', 'escapeHtmlText returns empty string for falsy input');
 
   // 5. Small HTML Snippet Renderers
   assert(renderStayDetailBlock('Title', 'Val').includes('Title') && renderStayDetailBlock('Title', 'Val').includes('Val'), 'renderStayDetailBlock outputs title and value');
