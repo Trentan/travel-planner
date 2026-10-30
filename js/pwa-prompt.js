@@ -7,12 +7,15 @@
   const DISMISS_KEY = 'travelApp_pwa_prompt_dismissed_v1';
 
   function isStandaloneApp() {
+    if (typeof window === 'undefined') return false;
+    const nav = window.navigator || {};
     return (
-      window.navigator.standalone === true ||
+      nav.standalone === true ||
       (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
       (window.matchMedia && window.matchMedia('(display-mode: fullscreen)').matches) ||
       Boolean(window.Capacitor) ||
-      Boolean(window.isCapacitorNative)
+      Boolean(window.isCapacitorNative) ||
+      Boolean(window.AndroidBridge)
     );
   }
 
@@ -208,14 +211,27 @@
     document.body.appendChild(card);
   }
 
-  window.dismissPwaPrompt = dismissPwaPrompt;
-  window.initPwaPrompt = initPwaPrompt;
+  if (typeof window !== 'undefined') {
+    window.dismissPwaPrompt = dismissPwaPrompt;
+    window.initPwaPrompt = initPwaPrompt;
+    window.isStandaloneApp = isStandaloneApp;
+  }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      isStandaloneApp,
+      dismissPwaPrompt,
+      initPwaPrompt
+    };
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initPwaPrompt, 1200);
+      });
+    } else {
       setTimeout(initPwaPrompt, 1200);
-    });
-  } else {
-    setTimeout(initPwaPrompt, 1200);
+    }
   }
 })();

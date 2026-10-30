@@ -86,9 +86,35 @@ function runIsSafeUrlTests() {
   assert(isSafeUrlNoLocation('javascript:alert(1)') === false, 'javascript URI should return false without window.location');
   assert(isSafeUrlNoLocation('/relative/path') === true, 'relative path should fallback to http://localhost/ and return true');
 
-  // 7. Malformed URLs handling
+  // 7. Malformed URLs handling & URL parsing errors (TypeError thrown by new URL())
   assert(isSafeUrl('http://]') === false, 'malformed URL causing parse error should return false');
   assert(isSafeUrl('http://:') === false, 'malformed URL with invalid port should return false');
+  assert(isSafeUrl('http://[invalid-ipv6]') === false, 'malformed IPv6 host should return false');
+  assert(isSafeUrl('http://[:::1]') === false, 'invalid IPv6 syntax should return false');
+  assert(isSafeUrl('http://example.com:999999') === false, 'port out of range should return false');
+  assert(isSafeUrl('http://example.com:-1') === false, 'negative port should return false');
+  assert(isSafeUrl('http://example.com:abc') === false, 'non-numeric port should return false');
+  assert(isSafeUrl('http:// example.com') === false, 'space in host should return false');
+  assert(isSafeUrl('https://') === false, 'scheme with missing host should return false');
+  assert(isSafeUrl('http://[') === false, 'unclosed bracket host should return false');
+
+  // 8. Explicit TypeError catch block handling
+  const throwingUrlContext = createVmContext({
+    URL: class CustomURL {
+      constructor() {
+        throw new TypeError('Invalid URL parsing error mock');
+      }
+    },
+    document: documentMock,
+    location: { href: 'https://example.com/app/' }
+  });
+  throwingUrlContext.window = throwingUrlContext;
+  runScriptInContext(utilsSource, throwingUrlContext, 'js/utils.js');
+  const isSafeUrlThrowing = throwingUrlContext.window.isSafeUrl;
+  assert(
+    isSafeUrlThrowing('https://example.com') === false,
+    'isSafeUrl should catch TypeError from URL constructor and return false'
+  );
 
   console.log('✅ ALL isSafeUrl UNIT TESTS PASSED CLEANLY!');
 }
