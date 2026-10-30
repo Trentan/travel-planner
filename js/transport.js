@@ -875,11 +875,6 @@ function formatJourneyDate(dateStr) {
   } catch (e) { return dateStr; }
 }
 
-function formatJourneyTime(timeStr) {
-  if (!timeStr) return '';
-  return timeStr;
-}
-
 function calculateDuration(depDate, depTime, arrDate, arrTime) {
   if (!depDate || !arrDate) return '';
   if (depTime && arrTime) {

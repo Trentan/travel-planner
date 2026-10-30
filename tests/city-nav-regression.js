@@ -112,7 +112,7 @@ async function run() {
 
   const transportMappingBlock =
     transportJs.slice(0, transportJs.indexOf('function findJourney')) +
-    extractBetween(transportJs, 'function formatJourneyDate', 'function formatJourneyTime');
+    extractBetween(transportJs, 'function formatJourneyDate', 'function calculateDuration');
 
   const importedCities = normalizeFixtureCities(fixture, importedCityBlock);
   const importedCityNames = importedCities.map(city => city.name);

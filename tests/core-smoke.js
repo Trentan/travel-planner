@@ -62,7 +62,7 @@ function loadDateHelpers() {
   const journeyDateFormatBlock = extractBetween(
     transportJs,
     'function formatJourneyDate',
-    'function formatJourneyTime'
+    'function calculateDuration'
   );
 
   const journeyDisplayBlock = extractBetween(
