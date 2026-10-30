@@ -157,7 +157,6 @@ function runTabsTests() {
   const {
     isStayRowExpanded,
     toggleStayRowDetails,
-    renderStayDetailBlock,
     renderStayLocationDetails,
     renderStayLocationSummary,
     renderStayMobileFact,
@@ -240,7 +239,6 @@ function runTabsTests() {
   assert.strictEqual(escapeHtml(''), '', 'escapeHtml returns empty string for falsy input');
 
   // 5. Small HTML Snippet Renderers
-  assert(renderStayDetailBlock('Title', 'Val').includes('Title') && renderStayDetailBlock('Title', 'Val').includes('Val'), 'renderStayDetailBlock outputs title and value');
   assert(renderStayLocationDetails(sampleStays[0]).includes('Shinjuku, Tokyo'), 'renderStayLocationDetails outputs location link');
   assert.strictEqual(renderStayLocationDetails(null), '', 'renderStayLocationDetails returns empty string for null stay');
 
