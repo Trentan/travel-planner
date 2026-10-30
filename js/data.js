@@ -7074,8 +7074,6 @@ async function checkUrlForImportedTrip() {
     const hash = window.location.hash.slice(1);
     if (hash.startsWith('trip=')) {
       tripBase64 = hash.slice(5);
-    } else if (hash.length > 20) {
-      tripBase64 = hash;
     }
   }
   
