@@ -918,15 +918,6 @@ function toggleTransportGroupDetails(groupId) {
   buildTransportTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
 }
 
-function renderTransportDetailBlock(title, value, extraClass = '') {
-  return `
-    <div class="flex flex-col gap-1 p-2 bg-slate-50 dark:bg-slate-800/40 rounded border border-slate-100 dark:border-slate-800/60 ${extraClass}">
-      <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">${escapeHtmlText(title)}</span>
-      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(value || '—')}</span>
-    </div>
-  `;
-}
-
 function getTransportSubLocationParts(seg) {
   if (!seg) return [];
   return [
