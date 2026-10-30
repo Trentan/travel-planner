@@ -121,6 +121,18 @@ function isSafeUrl(url) {
   }
 }
 
+function formatDateCompact(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    const parts = d.toDateString().split(' ');
+    return `${parts[1]} ${parts[2]}`;
+  } catch (e) {
+    return '';
+  }
+}
+
 function parseCurrencyAmount(value) {
   const parsed = Number.parseFloat(String(value ?? '').replace(/[^0-9.-]/g, ''));
   return Number.isFinite(parsed) ? parsed : 0;
@@ -872,3 +884,4 @@ window.stripLeadingActivityEmojiText = stripLeadingActivityEmojiText;
 window.normalizeChecklistText = normalizeChecklistText;
 window.getChecklistItemKeys = getChecklistItemKeys;
 window.mergeChecklistWithDefaults = mergeChecklistWithDefaults;
+window.formatDateCompact = formatDateCompact;
