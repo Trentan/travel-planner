@@ -269,26 +269,6 @@ function parseCompactDateTime(dateStr, timeStr = '') {
   return null;
 }
 
-function formatCompactJourneyDuration(segments) {
-  if (!Array.isArray(segments) || segments.length === 0) return '';
-  const firstSeg = segments[0];
-  const lastSeg = segments[segments.length - 1];
-  const depDate = firstSeg.departureDate || firstSeg.dayDate;
-  const arrDate = lastSeg.arrivalDate || lastSeg.departureDate || lastSeg.dayDate;
-  const dep = parseCompactDateTime(depDate, firstSeg.departureTime);
-  const arr = parseCompactDateTime(arrDate, lastSeg.arrivalTime);
-  if (!dep || !arr) return '';
-
-  let diffMinutes = Math.round((arr.getTime() - dep.getTime()) / 60000);
-  if (diffMinutes < 0) diffMinutes += 24 * 60;
-  if (diffMinutes <= 0) return '';
-
-  const hours = Math.floor(diffMinutes / 60);
-  const minutes = diffMinutes % 60;
-  if (hours === 0) return `${minutes}m`;
-  return minutes > 0 ? `${hours}h${String(minutes).padStart(2, '0')}m` : `${hours}h`;
-}
-
 function renderCompactBlock(title, linesHtml, fullWidth = false) {
   if (!linesHtml) return '';
   return `

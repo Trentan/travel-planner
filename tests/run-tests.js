@@ -38,7 +38,6 @@ const { runStripLeadingActivityEmojiTextTests } = require('./strip-leading-activ
 const { runParseCurrencyAmountTests } = require('./parse-currency-amount.test');
 const { runFormatCurrencyTests } = require('./format-currency.test');
 const { runCompactFoodQuestTitleTests } = require('./compact-food-quest-title.test');
-const { run: runFormatCompactJourneyDurationSuite } = require('./format-compact-journey-duration.test');
 const { runFormatJourneySubLocationTests } = require('./format-journey-sub-location.test');
 const { run: runTransportDurationSuite } = require('./transport-duration.test');
 const { run: runTransitConnectorsSuite } = require('./transit-connectors-layover.test');
@@ -171,7 +170,6 @@ async function run() {
     if (typeof runAddOrUpdateCityTests === 'function') await runAddOrUpdateCityTests();
     if (typeof runMergeChecklistWithDefaultsTests === 'function') await runMergeChecklistWithDefaultsTests();
     if (typeof runCompactFoodQuestTitleTests === 'function') await runCompactFoodQuestTitleTests();
-    if (typeof runFormatCompactJourneyDurationSuite === 'function') await runFormatCompactJourneyDurationSuite();
     if (typeof runFormatJourneySubLocationTests === 'function') await runFormatJourneySubLocationTests();
     if (typeof runTimezoneSuite === 'function') await runTimezoneSuite();
     if (typeof runCityFuzzyMatchingSuite === 'function') await runCityFuzzyMatchingSuite();
