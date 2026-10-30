@@ -232,12 +232,6 @@ function getJourneyDisplayCost(journey, journeysByJourneyId) {
   return journey.cost;
 }
 
-function renderCompactMetaSuffix(value) {
-  const trimmed = String(value || '').trim();
-  if (!trimmed) return '';
-  return ` <span class="compact-meta-suffix">[${escapeCompactText(trimmed)}]</span>`;
-}
-
 function renderCompactEmojiLine({ emoji, text, duration = '', cost = '', done = false }) {
   const cleanText = escapeCompactText(stripCompactLeadingEmoji(text));
   const durationTrimmed = String(duration || '').trim();
