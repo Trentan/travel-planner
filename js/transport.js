@@ -1006,10 +1006,6 @@ function getJourneySubLocationParts(segs) {
   });
 }
 
-function renderJourneySubLocationDetails(segs, extraClass = '') {
-  return renderTransportSubLocationParts(getJourneySubLocationParts(segs), extraClass);
-}
-
 function renderJourneySubLocationSummary(segs, extraClass = '') {
   if (!Array.isArray(segs) || segs.length === 0) return '';
   const firstSeg = segs[0];
