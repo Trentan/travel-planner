@@ -7292,23 +7292,6 @@ function buildExportDivider(label = '', width = 72) {
   return `${'='.repeat(left)}${padded}${'='.repeat(right)}`;
 }
 
-function buildExportItemLine(item, fallbackLabel = 'Item') {
-  const title = formatTextValue(item?.text || item?.title, fallbackLabel);
-  const parts = [title];
-  const date = item?.date ? formatTextValue(item.date) : '';
-  const time = item?.time ? formatTextValue(item.time) : '';
-  const cost = item?.cost !== undefined && item?.cost !== null ? formatSummaryMoney(item.cost) : '';
-  const status = formatTextValue(item?.status, '');
-  if (date) parts.push(`Date ${date}`);
-  if (time) parts.push(`Time ${time}`);
-  if (cost) parts.push(`Cost ${cost}`);
-  if (status) parts.push(`Status ${status}`);
-  if (item?.bookingRef) parts.push(`Ref ${formatTextValue(item.bookingRef)}`);
-  if (item?.bookingReference) parts.push(`Ref ${formatTextValue(item.bookingReference)}`);
-  if (item?.notes) parts.push(`Notes ${truncateText(item.notes, 60)}`);
-  return `- ${parts.join(' | ')}`;
-}
-
 function getExportCityName(cityId) {
   if (!cityId || !Array.isArray(citiesData)) return '';
   const city = citiesData.find(c => c.id === cityId);
