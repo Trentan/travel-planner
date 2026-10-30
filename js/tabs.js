@@ -47,23 +47,6 @@ function renderStayLocationDetails(stay, extraClass = '', showLabel = true, city
   `;
 }
 
-function renderStayLocationSummary(stay, extraClass = '', cityMap = null) {
-  if (!stay || !stay.location) return '';
-
-  let cityName = '';
-  if (stay.cityId) {
-    const city = cityMap ? cityMap.get(stay.cityId) : ((typeof citiesData !== 'undefined' && Array.isArray(citiesData)) ? citiesData.find(c => c.id === stay.cityId) : null);
-    if (city) cityName = city.name;
-  }
-
-  return `
-    <div class="stay-card-location-summary ${extraClass}" title="${escapeHtmlText(stay.location)}">
-      <span class="stay-card-location-label">Location:</span>
-      <a href="${getMapSearchUrl(stay.location, cityName)}" target="_blank" rel="noopener noreferrer" class="stay-card-location-link" onclick="event.stopPropagation();" title="Open in Google Maps">${escapeHtmlText(stay.location)}</a>
-    </div>
-  `;
-}
-
 function renderStayMobileFact(label, value, extraClass = '') {
   return `
     <div class="stay-mobile-fact ${extraClass}">

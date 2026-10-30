@@ -159,7 +159,6 @@ function runTabsTests() {
     toggleStayRowDetails,
     renderStayDetailBlock,
     renderStayLocationDetails,
-    renderStayLocationSummary,
     renderStayMobileFact,
     renderStayMobileLinkedFact,
     renderStayMobileSummary,
@@ -243,9 +242,6 @@ function runTabsTests() {
   assert(renderStayDetailBlock('Title', 'Val').includes('Title') && renderStayDetailBlock('Title', 'Val').includes('Val'), 'renderStayDetailBlock outputs title and value');
   assert(renderStayLocationDetails(sampleStays[0]).includes('Shinjuku, Tokyo'), 'renderStayLocationDetails outputs location link');
   assert.strictEqual(renderStayLocationDetails(null), '', 'renderStayLocationDetails returns empty string for null stay');
-
-  assert(renderStayLocationSummary(sampleStays[0]).includes('Shinjuku, Tokyo'), 'renderStayLocationSummary outputs summary HTML');
-  assert.strictEqual(renderStayLocationSummary(null), '', 'renderStayLocationSummary returns empty for null stay');
 
   assert(renderStayMobileFact('Fact', 'Value').includes('Fact') && renderStayMobileFact('Fact', 'Value').includes('Value'), 'renderStayMobileFact renders label & value');
   assert(renderStayMobileLinkedFact('Label', 'Val', 'https://example.com').includes('https://example.com'), 'renderStayMobileLinkedFact includes href');
