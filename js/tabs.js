@@ -1,28 +1,7 @@
 // buildTransportTab is now defined in transport.js
 
-let expandedStayRows = new Set();
 
-function isStayRowExpanded(stayId) {
-  return expandedStayRows.has(stayId);
-}
 
-function toggleStayRowDetails(stayId) {
-  if (expandedStayRows.has(stayId)) {
-    expandedStayRows.delete(stayId);
-  } else {
-    expandedStayRows.add(stayId);
-  }
-  buildAccomTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
-}
-
-function renderStayDetailBlock(title, value, extraClass = '') {
-  return `
-    <div class="flex flex-col gap-1 p-2 bg-slate-50 dark:bg-slate-800/40 rounded border border-slate-100 dark:border-slate-800/60 ${extraClass}">
-      <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">${escapeHtmlText(title)}</span>
-      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(value || '—')}</span>
-    </div>
-  `;
-}
 
 function renderStayLocationDetails(stay, extraClass = '', showLabel = true, cityMap = null) {
   if (!stay || !stay.location) return '';
@@ -47,22 +26,6 @@ function renderStayLocationDetails(stay, extraClass = '', showLabel = true, city
   `;
 }
 
-function renderStayLocationSummary(stay, extraClass = '', cityMap = null) {
-  if (!stay || !stay.location) return '';
-
-  let cityName = '';
-  if (stay.cityId) {
-    const city = cityMap ? cityMap.get(stay.cityId) : ((typeof citiesData !== 'undefined' && Array.isArray(citiesData)) ? citiesData.find(c => c.id === stay.cityId) : null);
-    if (city) cityName = city.name;
-  }
-
-  return `
-    <div class="stay-card-location-summary ${extraClass}" title="${escapeHtmlText(stay.location)}">
-      <span class="stay-card-location-label">Location:</span>
-      <a href="${getMapSearchUrl(stay.location, cityName)}" target="_blank" rel="noopener noreferrer" class="stay-card-location-link" onclick="event.stopPropagation();" title="Open in Google Maps">${escapeHtmlText(stay.location)}</a>
-    </div>
-  `;
-}
 
 function renderStayMobileFact(label, value, extraClass = '') {
   return `
@@ -103,30 +66,6 @@ function renderStayDateSummary(stay, status, statusIcon) {
   `;
 }
 
-function renderStayStatusCostSummary(stay, status, statusIcon) {
-  const normalizedStatus = normalizeItemStatus(status);
-  const mobileMeta = typeof renderMobileStatusCostMeta === 'function'
-      ? renderMobileStatusCostMeta({
-        status: normalizedStatus,
-        costValue: stay.totalCost || '0',
-        bookingReference: stay.bookingRef || '',
-        statusOnClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
-        costOnBlur: `updateStayField('${stay.id}', 'totalCost', this.innerText)`,
-        statusButtonTitle: 'Change status',
-        metaClass: 'stay-status-cost-meta mobile-status-cost-meta',
-        editableCost: isEditMode
-      })
-      : '';
-
-  return `
-    ${renderStatusBadge(normalizedStatus, {
-      onClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
-      title: 'Change stay status',
-      className: 'stay-status-badge stay-status-badge-clickable'
-    })}
-    ${mobileMeta}
-  `;
-}
 
 function isAccomMobileCardLayout() {
   return typeof isMobileViewport === 'function'
@@ -315,7 +254,7 @@ function renderAccomTableRow(stay, cityMap = null) {
       <div class="flex items-center gap-1.5">${getCityFlagHTML(cityName)} <span class="ml-1">${cityName}</span></div>
     </td>
     <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium min-w-[200px]">
-      <span>${escapeHtml(stay.propertyName)}</span>
+      <span>${escapeHtmlText(stay.propertyName)}</span>
       <div class="md:hidden mt-2 border-t border-slate-100 dark:border-slate-800 pt-2">
         ${renderStayMobileSummary(stay, status, statusIcon, cityName)}
       </div>
@@ -472,13 +411,6 @@ function findBestStayLegIndex(stay, legs) {
   return bestIndex;
 }
 
-// Escape HTML to prevent XSS
-function escapeHtml(text) {
-  if (!text) return '';
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
 
 function buildPackingTab() {
   const canEdit = !window.isPackingEditLocked;
@@ -757,12 +689,12 @@ function renderBudgetTableAndBreakdown(container, legBreakdown) {
   const maxLegTotal = Math.max(...legBreakdown.map(l => l.total), 1);
   const mobileBreakdownHtml = legBreakdown.map((l, idx) => {
     const barWidth = Math.max(6, Math.round((l.total / maxLegTotal) * 100));
-    const accent = escapeHtml(l.colour || '#24485d');
+    const accent = escapeHtmlText(l.colour || '#24485d');
     const parity = idx % 2 === 0 ? 'even' : 'odd';
     return `
       <article class="budget-mobile-row budget-mobile-row--${parity}" style="--budget-accent:${accent};">
         <div class="budget-mobile-row-head">
-          <h3>${escapeHtml(l.label)}</h3>
+          <h3>${escapeHtmlText(l.label)}</h3>
           <strong>${formatBudgetAmount(l.total)}</strong>
         </div>
         <div class="budget-mobile-meter" aria-hidden="true"><span style="width:${barWidth}%;"></span></div>

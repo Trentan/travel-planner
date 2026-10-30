@@ -232,11 +232,6 @@ function getJourneyDisplayCost(journey, journeysByJourneyId) {
   return journey.cost;
 }
 
-function renderCompactMetaSuffix(value) {
-  const trimmed = String(value || '').trim();
-  if (!trimmed) return '';
-  return ` <span class="compact-meta-suffix">[${escapeCompactText(trimmed)}]</span>`;
-}
 
 function renderCompactEmojiLine({ emoji, text, duration = '', cost = '', done = false }) {
   const cleanText = escapeCompactText(stripCompactLeadingEmoji(text));
@@ -269,25 +264,6 @@ function parseCompactDateTime(dateStr, timeStr = '') {
   return null;
 }
 
-function formatCompactJourneyDuration(segments) {
-  if (!Array.isArray(segments) || segments.length === 0) return '';
-  const firstSeg = segments[0];
-  const lastSeg = segments[segments.length - 1];
-  const depDate = firstSeg.departureDate || firstSeg.dayDate;
-  const arrDate = lastSeg.arrivalDate || lastSeg.departureDate || lastSeg.dayDate;
-  const dep = parseCompactDateTime(depDate, firstSeg.departureTime);
-  const arr = parseCompactDateTime(arrDate, lastSeg.arrivalTime);
-  if (!dep || !arr) return '';
-
-  let diffMinutes = Math.round((arr.getTime() - dep.getTime()) / 60000);
-  if (diffMinutes < 0) diffMinutes += 24 * 60;
-  if (diffMinutes <= 0) return '';
-
-  const hours = Math.floor(diffMinutes / 60);
-  const minutes = diffMinutes % 60;
-  if (hours === 0) return `${minutes}m`;
-  return minutes > 0 ? `${hours}h${String(minutes).padStart(2, '0')}m` : `${hours}h`;
-}
 
 function renderCompactBlock(title, linesHtml, fullWidth = false) {
   if (!linesHtml) return '';
@@ -4025,19 +4001,6 @@ ${(() => {
   if (typeof reObserveLegs === "function") reObserveLegs();
 }
 
-function renderActivityActionButtonsLegacy(root) {
-  if (!root) return;
-  root.querySelectorAll('.activity-item button[onclick*="openActivityAssignModal"]').forEach(btn => {
-    const title = (btn.getAttribute('title') || btn.getAttribute('aria-label') || '').toLowerCase();
-    const isMove = title.includes('move');
-    const icon = isMove ? '›' : '📌';
-    const label = isMove ? 'Move to another day' : 'Add to day';
-    btn.textContent = icon;
-    btn.setAttribute('aria-label', label);
-    btn.setAttribute('title', label);
-    btn.classList.add('activity-action-btn');
-  });
-}
 
 function renderActivityActionButtons(root) {
   if (!root) return;
@@ -4682,13 +4645,6 @@ function getLegElement(leg) {
   return document.getElementById('leg-' + leg.id);
 }
 
-function sameTimelineDay(dayDate, targetDate) {
-  if (!dayDate || !targetDate) return false;
-  const dayScore = getTimelineScore(dayDate, '', null);
-  const targetScore = getTimelineScore(targetDate, '', null);
-  if (dayScore === null || targetScore === null) return false;
-  return Math.floor(dayScore / 1440) === Math.floor(targetScore / 1440);
-}
 
 function findLegForJourneyCity(cityId, cityName) {
   if (!Array.isArray(journeys) || journeys.length === 0) return null;

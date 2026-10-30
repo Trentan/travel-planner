@@ -7280,32 +7280,6 @@ function formatSummaryMoney(value) {
   return `$${parsed.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')}`;
 }
 
-function buildExportDivider(label = '', width = 72) {
-  const clean = String(label || '').trim();
-  if (!clean) return '='.repeat(width);
-  const padded = ` ${clean} `;
-  if (padded.length >= width) return padded;
-  const left = Math.floor((width - padded.length) / 2);
-  const right = width - padded.length - left;
-  return `${'='.repeat(left)}${padded}${'='.repeat(right)}`;
-}
-
-function buildExportItemLine(item, fallbackLabel = 'Item') {
-  const title = formatTextValue(item?.text || item?.title, fallbackLabel);
-  const parts = [title];
-  const date = item?.date ? formatTextValue(item.date) : '';
-  const time = item?.time ? formatTextValue(item.time) : '';
-  const cost = item?.cost !== undefined && item?.cost !== null ? formatSummaryMoney(item.cost) : '';
-  const status = formatTextValue(item?.status, '');
-  if (date) parts.push(`Date ${date}`);
-  if (time) parts.push(`Time ${time}`);
-  if (cost) parts.push(`Cost ${cost}`);
-  if (status) parts.push(`Status ${status}`);
-  if (item?.bookingRef) parts.push(`Ref ${formatTextValue(item.bookingRef)}`);
-  if (item?.bookingReference) parts.push(`Ref ${formatTextValue(item.bookingReference)}`);
-  if (item?.notes) parts.push(`Notes ${truncateText(item.notes, 60)}`);
-  return `- ${parts.join(' | ')}`;
-}
 
 function getExportCityName(cityId) {
   if (!cityId || !Array.isArray(citiesData)) return '';
@@ -9202,7 +9176,6 @@ function previousTripStartStep() {
 }
 function adjustTripStartNights(change) { captureTripStartAnswer(); tripStartAnswers.nights = Math.max(1, Math.min(60, Number(tripStartAnswers.nights) + change)); renderTripStart(); }
 function selectTripStartTransport(type) { captureTripStartAnswer(); tripStartAnswers.transport = type; renderTripStart(); }
-function selectTripStartReturnTransport(type) { captureTripStartAnswer(); tripStartAnswers.returnTransport = type; renderTripStart(); }
 function addTripStartStop() { captureTripStartAnswer(); tripStartAnswers.stops.push({ city: '', nights: 2, transport: 'train' }); renderTripStart(); }
 function removeTripStartStop(index) { captureTripStartAnswer(); tripStartAnswers.stops.splice(index, 1); renderTripStart(); }
 function updateTripStartStop(index, field, value) {
