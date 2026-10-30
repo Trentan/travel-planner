@@ -4025,20 +4025,6 @@ ${(() => {
   if (typeof reObserveLegs === "function") reObserveLegs();
 }
 
-function renderActivityActionButtonsLegacy(root) {
-  if (!root) return;
-  root.querySelectorAll('.activity-item button[onclick*="openActivityAssignModal"]').forEach(btn => {
-    const title = (btn.getAttribute('title') || btn.getAttribute('aria-label') || '').toLowerCase();
-    const isMove = title.includes('move');
-    const icon = isMove ? '›' : '📌';
-    const label = isMove ? 'Move to another day' : 'Add to day';
-    btn.textContent = icon;
-    btn.setAttribute('aria-label', label);
-    btn.setAttribute('title', label);
-    btn.classList.add('activity-action-btn');
-  });
-}
-
 function renderActivityActionButtons(root) {
   if (!root) return;
   root.querySelectorAll('.activity-item button[onclick*="openActivityAssignModal"]').forEach(btn => {
