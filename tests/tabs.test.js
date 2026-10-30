@@ -155,8 +155,6 @@ function runTabsTests() {
   runScriptInContext(tabsCode, context, 'js/tabs.js');
 
   const {
-    isStayRowExpanded,
-    toggleStayRowDetails,
     renderStayDetailBlock,
     renderStayLocationDetails,
     renderStayLocationSummary,
@@ -190,14 +188,7 @@ function runTabsTests() {
     buildBudgetTab
   } = context;
 
-  // 1. Expanded Stay Rows state management
-  assert.strictEqual(isStayRowExpanded('stay-1'), false, 'stay-1 should initially not be expanded');
-  toggleStayRowDetails('stay-1');
-  assert.strictEqual(isStayRowExpanded('stay-1'), true, 'stay-1 should be expanded after toggleStayRowDetails');
-  toggleStayRowDetails('stay-1');
-  assert.strictEqual(isStayRowExpanded('stay-1'), false, 'stay-1 should be collapsed after second toggleStayRowDetails');
-
-  // 2. Formatting & Math helpers
+  // 1. Formatting & Math helpers
   assert.strictEqual(calculateNights('2025-05-01', '2025-05-05'), 4, 'calculateNights should return 4 days diff');
   assert.strictEqual(calculateNights('2025-05-05', '2025-05-01'), 0, 'calculateNights should clamp negative to 0');
   assert.strictEqual(calculateNights('', '2025-05-01'), 0, 'calculateNights with falsy date returns 0');
@@ -216,7 +207,7 @@ function runTabsTests() {
   assert.strictEqual(exclusiveEnd.getDate(), 2, 'getExclusiveDateRangeEnd adds 1 day');
   assert.strictEqual(getExclusiveDateRangeEnd('invalid'), null, 'getExclusiveDateRangeEnd returns null for invalid date');
 
-  // 3. Stay Leg overlap logic
+  // 2. Stay Leg overlap logic
   const testLeg = {
     days: [
       { date: '2025-05-01' },
@@ -235,11 +226,11 @@ function runTabsTests() {
   assert.strictEqual(findBestStayLegIndex(null, [testLeg]), -1, 'findBestStayLegIndex returns -1 for null stay');
   assert.strictEqual(findBestStayLegIndex(sampleStays[0], []), -1, 'findBestStayLegIndex returns -1 for empty legs');
 
-  // 4. HTML Escape
+  // 3. HTML Escape
   assert.strictEqual(escapeHtml('Hello <World>'), 'Hello &lt;World&gt;', 'escapeHtml sanitizes HTML tags');
   assert.strictEqual(escapeHtml(''), '', 'escapeHtml returns empty string for falsy input');
 
-  // 5. Small HTML Snippet Renderers
+  // 4. Small HTML Snippet Renderers
   assert(renderStayDetailBlock('Title', 'Val').includes('Title') && renderStayDetailBlock('Title', 'Val').includes('Val'), 'renderStayDetailBlock outputs title and value');
   assert(renderStayLocationDetails(sampleStays[0]).includes('Shinjuku, Tokyo'), 'renderStayLocationDetails outputs location link');
   assert.strictEqual(renderStayLocationDetails(null), '', 'renderStayLocationDetails returns empty string for null stay');
@@ -266,19 +257,19 @@ function runTabsTests() {
   assert(nightsIndex < checkInIndex, 'Nights fact must appear before Check In in mobile facts grid');
   assert(cityIndex < nightsIndex, 'City fact must appear before Nights in mobile facts grid');
 
-  // 6. Filtering & Sorting Stays
+  // 5. Filtering & Sorting Stays
   const allStays = getFilteredAndSortedStays('all');
   assert.strictEqual(allStays.length, 2, 'getFilteredAndSortedStays("all") returns 2 stays');
   const filteredStays = getFilteredAndSortedStays('tokyo');
   assert.strictEqual(filteredStays.length, 1, 'getFilteredAndSortedStays("tokyo") returns 1 stay');
   assert.strictEqual(filteredStays[0].id, 'stay-1', 'Filtered stay is stay-1');
 
-  // 7. Accom Header & Empty State
+  // 6. Accom Header & Empty State
   assert(renderAccomHeader().includes('Accommodation'), 'renderAccomHeader includes title');
   assert(renderAccomHeader().includes('openAddStayModal'), 'renderAccomHeader includes Add Stay button when isEditMode=true');
   assert(renderAccomEmptyState().includes('No stays found.'), 'renderAccomEmptyState includes empty message');
 
-  // 8. Desktop & Mobile Table / View rendering
+  // 7. Desktop & Mobile Table / View rendering
   const tableRowHtml = renderAccomTableRow(sampleStays[0]);
   assert(tableRowHtml.includes('Hotel Park'), 'renderAccomTableRow includes property name');
   assert(tableRowHtml.includes('Shinjuku, Tokyo'), 'renderAccomTableRow includes location');
@@ -290,7 +281,7 @@ function runTabsTests() {
   const mobileViewHtml = renderAccomMobileView(sampleStays);
   assert(mobileViewHtml.includes('swipe-pager'), 'renderAccomMobileView renders mobile swipe pager');
 
-  // 9. Layout Detection & buildAccomTab
+  // 8. Layout Detection & buildAccomTab
   assert.strictEqual(isAccomMobileCardLayout(), false, 'isAccomMobileCardLayout returns false for 1024px width');
   context.window.innerWidth = 500;
   assert.strictEqual(isAccomMobileCardLayout(), true, 'isAccomMobileCardLayout returns true for 500px width');
@@ -305,12 +296,12 @@ function runTabsTests() {
   assert(elements['accom-table-container'].innerHTML.includes('No stays found.'), 'buildAccomTab populates container with empty state when no stays exist');
   context.stays = sampleStays; // reset
 
-  // 10. Packing Tab
+  // 9. Packing Tab
   buildPackingTab();
   assert(elements['guides-container'].innerHTML.includes('Hotel Sink Washing Guide'), 'buildPackingTab populates guides container');
   assert(elements['packing-areas-container'].innerHTML.includes('Walk-on Gear'), 'buildPackingTab populates packing areas container');
 
-  // 11. Budget Tab
+  // 10. Budget Tab
   assert.strictEqual(formatBudgetAmount('50'), '$50', 'formatBudgetAmount calls formatCurrency');
   const budgetData = calculateBudgetBreakdown();
   assert.strictEqual(budgetData.grandTotal, 870, 'calculateBudgetBreakdown totals stay cost (400+300) + journey cost (120) + activity cost (50)');

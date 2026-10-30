@@ -1,20 +1,5 @@
 // buildTransportTab is now defined in transport.js
 
-let expandedStayRows = new Set();
-
-function isStayRowExpanded(stayId) {
-  return expandedStayRows.has(stayId);
-}
-
-function toggleStayRowDetails(stayId) {
-  if (expandedStayRows.has(stayId)) {
-    expandedStayRows.delete(stayId);
-  } else {
-    expandedStayRows.add(stayId);
-  }
-  buildAccomTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
-}
-
 function renderStayDetailBlock(title, value, extraClass = '') {
   return `
     <div class="flex flex-col gap-1 p-2 bg-slate-50 dark:bg-slate-800/40 rounded border border-slate-100 dark:border-slate-800/60 ${extraClass}">
