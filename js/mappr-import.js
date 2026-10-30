@@ -7,7 +7,8 @@
 (function (window) {
   'use strict';
 
-  function escapeHtml(text) {
+  function escapeHtmlTextHelper(text) {
+    if (typeof escapeHtmlText === 'function') return escapeHtmlText(text);
     if (typeof escapeCompactText === 'function') return escapeCompactText(text);
     if (text === null || text === undefined) return '';
     return String(text)
@@ -376,7 +377,7 @@
     if (legSelect) {
       legSelect.innerHTML = legs.map((leg, idx) => {
         const label = leg.label || leg.to || `Leg ${idx + 1}`;
-        return `<option value="${idx}" ${idx === matchedLegIdx ? 'selected' : ''}>${escapeHtml(label)}</option>`;
+        return `<option value="${idx}" ${idx === matchedLegIdx ? 'selected' : ''}>${escapeHtmlTextHelper(label)}</option>`;
       }).join('') || '<option value="0">Default Trip Leg</option>';
     }
 
@@ -391,7 +392,7 @@
               <input type="checkbox" class="mappr-spot-check rounded cursor-pointer" data-spot-index="${idx}" checked>
             </td>
             <td class="mappr-spot-name p-2 font-semibold text-slate-800 dark:text-slate-100 whitespace-nowrap">
-              <span class="mr-1">${spot.icon}</span> ${escapeHtml(spot.name)}
+              <span class="mr-1">${spot.icon}</span> ${escapeHtmlTextHelper(spot.name)}
             </td>
             <td class="p-2 text-slate-500 dark:text-slate-400">
               <select class="mappr-spot-type-select text-xs py-0.5 px-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200" data-spot-index="${idx}">
@@ -400,8 +401,8 @@
                 <option value="tip" ${spotType === 'tip' ? 'selected' : ''}>💡 Tip</option>
               </select>
             </td>
-            <td class="p-2 text-slate-600 dark:text-slate-300 max-w-xs truncate" title="${escapeHtml(spot.summary || spot.tips || '')}">
-              ${escapeHtml(spot.summary || spot.tips || '—')}
+            <td class="p-2 text-slate-600 dark:text-slate-300 max-w-xs truncate" title="${escapeHtmlTextHelper(spot.summary || spot.tips || '')}">
+              ${escapeHtmlTextHelper(spot.summary || spot.tips || '—')}
             </td>
             <td class="p-2 font-mono text-slate-400 dark:text-slate-500 whitespace-nowrap">
               ${coordLabel ? `📍 ${coordLabel}` : '—'}
@@ -617,7 +618,8 @@
 
   // Export module
   const MapprImportModule = {
-    escapeHtml,
+    escapeHtmlText: escapeHtmlTextHelper,
+    escapeHtml: escapeHtmlTextHelper,
     inferSpotCategory,
     parseMapprPayload,
     fetchMapprMapUrl,
