@@ -875,10 +875,6 @@ function formatJourneyDate(dateStr) {
   } catch (e) { return dateStr; }
 }
 
-function formatJourneyTime(timeStr) {
-  if (!timeStr) return '';
-  return timeStr;
-}
 
 function calculateDuration(depDate, depTime, arrDate, arrTime) {
   if (!depDate || !arrDate) return '';
@@ -918,14 +914,6 @@ function toggleTransportGroupDetails(groupId) {
   buildTransportTab(typeof currentCityFilter !== 'undefined' ? currentCityFilter : 'all');
 }
 
-function renderTransportDetailBlock(title, value, extraClass = '') {
-  return `
-    <div class="flex flex-col gap-1 p-2 bg-slate-50 dark:bg-slate-800/40 rounded border border-slate-100 dark:border-slate-800/60 ${extraClass}">
-      <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">${escapeHtmlText(title)}</span>
-      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(value || '—')}</span>
-    </div>
-  `;
-}
 
 function getTransportSubLocationParts(seg) {
   if (!seg) return [];
@@ -1006,29 +994,6 @@ function getJourneySubLocationParts(segs) {
   });
 }
 
-function renderJourneySubLocationDetails(segs, extraClass = '') {
-  return renderTransportSubLocationParts(getJourneySubLocationParts(segs), extraClass);
-}
-
-function renderJourneySubLocationSummary(segs, extraClass = '') {
-  if (!Array.isArray(segs) || segs.length === 0) return '';
-  const firstSeg = segs[0];
-  const lastSeg = segs[segs.length - 1];
-  return renderTransportSubLocationPlainText([
-    {
-      label: 'From',
-      value: firstSeg.fromLocation || '',
-      city: firstSeg.fromLocation,
-      detail: firstSeg.fromAddress || ''
-    },
-    {
-      label: 'To',
-      value: lastSeg.toLocation || '',
-      city: lastSeg.toLocation,
-      detail: lastSeg.toAddress || ''
-    }
-  ], extraClass);
-}
 
 function renderTransportMobileFacts(segs, totalCost, notes = '') {
   if (!Array.isArray(segs) || segs.length === 0) return '';

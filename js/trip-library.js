@@ -191,11 +191,11 @@
       const elem = document.createElement('div');
       elem.className = `trip-dropdown-item group flex items-center justify-between py-2 px-2.5 rounded-lg my-0.5 ${isCurrent ? 'active bg-teal-50/90 dark:bg-teal-950/50 font-semibold border-l-2 border-teal-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800/60'}`;
 
-      const safeItemIdJs = escapeHtml(escapeJs(item.id));
-      const safeCloudFileIdJs = escapeHtml(escapeJs(item.cloudFileId));
-      const safeCloudFileIdUrl = escapeHtml(encodeURIComponent(item.cloudFileId || ''));
-      const safeTitleJs = escapeHtml(escapeJs(item.title));
-      const safeFilenameJs = escapeHtml(escapeJs(item.filename));
+      const safeItemIdJs = safeEscapeHtml(escapeJs(item.id));
+      const safeCloudFileIdJs = safeEscapeHtml(escapeJs(item.cloudFileId));
+      const safeCloudFileIdUrl = safeEscapeHtml(encodeURIComponent(item.cloudFileId || ''));
+      const safeTitleJs = safeEscapeHtml(escapeJs(item.title));
+      const safeFilenameJs = safeEscapeHtml(escapeJs(item.filename));
 
       const clickHandler = isCloudOnly
         ? `window.closeTripDropdown(); window.loadTripFromGoogleDrive('${safeCloudFileIdJs}');`
@@ -203,13 +203,13 @@
 
       elem.innerHTML = `
         <div class="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer" onclick="${clickHandler}">
-          <span class="trip-item-icon shrink-0 text-sm">${isCurrent ? '✓' : escapeHtml(item.flags)}</span>
+          <span class="trip-item-icon shrink-0 text-sm">${isCurrent ? '✓' : safeEscapeHtml(item.flags)}</span>
           <div class="trip-item-info min-w-0 flex-1">
             <div class="trip-item-title truncate text-xs flex items-center gap-1.5">
-              <span class="truncate ${isCurrent ? 'font-bold text-teal-900 dark:text-teal-200' : ''}">${escapeHtml(item.title)}</span>
+              <span class="truncate ${isCurrent ? 'font-bold text-teal-900 dark:text-teal-200' : ''}">${safeEscapeHtml(item.title)}</span>
               ${badgeHtml}
             </div>
-            <div class="trip-item-sub text-[10px] text-slate-400 dark:text-slate-500 truncate font-mono mt-0.5">${escapeHtml(item.filename)}</div>
+            <div class="trip-item-sub text-[10px] text-slate-400 dark:text-slate-500 truncate font-mono mt-0.5">${safeEscapeHtml(item.filename)}</div>
           </div>
         </div>
         <div class="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
@@ -272,7 +272,7 @@
         const telemetry = await window.getStorageTelemetry();
         if (telemetry && telemetry.supported && telemetry.quota > 0) {
           const persistStatus = telemetry.persisted ? '🟢 Persistent: Active' : '🟡 Persistent: Standard';
-          quotaText.innerHTML = `💾 <strong>Storage:</strong> ${escapeHtml(telemetry.usageFormatted)} used of ${escapeHtml(telemetry.quotaFormatted)} (${persistStatus})`;
+          quotaText.innerHTML = `💾 <strong>Storage:</strong> ${safeEscapeHtml(telemetry.usageFormatted)} used of ${safeEscapeHtml(telemetry.quotaFormatted)} (${persistStatus})`;
           if (persistBtn) {
             persistBtn.style.display = telemetry.persisted ? 'none' : 'inline-block';
           }
@@ -384,17 +384,17 @@
       let googleBannerHtml = '';
       if (isDriveConnected) {
         const hasSafeAvatar = userProfile && safeIsSafeUrl(userProfile.picture);
-        const safeDriveFolderUrl = safeIsSafeUrl(driveFolderUrl) ? escapeHtml(driveFolderUrl) : '#';
+        const safeDriveFolderUrl = safeIsSafeUrl(driveFolderUrl) ? safeEscapeHtml(driveFolderUrl) : '#';
         googleBannerHtml = `
           <div class="col-span-full mb-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-850 rounded-xl border border-blue-200/80 dark:border-slate-700 shadow-xs flex flex-wrap items-center justify-between gap-2.5">
             <div class="flex items-center gap-2.5 min-w-0">
-              ${hasSafeAvatar ? `<img src="${escapeHtml(userProfile.picture.trim())}" class="w-8 h-8 rounded-full border border-blue-300 dark:border-slate-600 shrink-0" alt="Avatar" referrerpolicy="no-referrer">` : `<div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">G</div>`}
+              ${hasSafeAvatar ? `<img src="${safeEscapeHtml(userProfile.picture.trim())}" class="w-8 h-8 rounded-full border border-blue-300 dark:border-slate-600 shrink-0" alt="Avatar" referrerpolicy="no-referrer">` : `<div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">G</div>`}
               <div class="min-w-0">
                 <div class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5 truncate">
-                  <span class="truncate">${escapeHtml((userProfile && (userProfile.name || userProfile.email)) || 'Google Drive Connected')}</span>
+                  <span class="truncate">${safeEscapeHtml((userProfile && (userProfile.name || userProfile.email)) || 'Google Drive Connected')}</span>
                   <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300">☁️ Cloud Synced</span>
                 </div>
-                <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">${escapeHtml((userProfile && userProfile.email) || 'Google Drive / TrenscendsTravelPlanner')}</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">${safeEscapeHtml((userProfile && userProfile.email) || 'Google Drive / TrenscendsTravelPlanner')}</div>
               </div>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
@@ -483,10 +483,10 @@
           const sizeKb = file.size ? `${(parseInt(file.size, 10) / 1024).toFixed(1)} KB` : 'JSON Document';
           const modTime = file.modifiedTime ? new Date(file.modifiedTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Synced';
           const isActiveFile = fileMap[activeTripId] === file.id;
-          const safeFileIdJs = escapeHtml(escapeJs(file.id));
-          const safeFileName = escapeHtml(file.name);
-          const safeFileNameJs = escapeHtml(escapeJs(file.name));
-          const safeFileIdUrl = escapeHtml(encodeURIComponent(file.id || ''));
+          const safeFileIdJs = safeEscapeHtml(escapeJs(file.id));
+          const safeFileName = safeEscapeHtml(file.name);
+          const safeFileNameJs = safeEscapeHtml(escapeJs(file.name));
+          const safeFileIdUrl = safeEscapeHtml(encodeURIComponent(file.id || ''));
 
           const card = document.createElement('div');
           card.className = `trip-gallery-card p-4 ${isActiveFile ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700' : 'bg-white dark:bg-slate-800/90 border-slate-200 dark:border-slate-700'} rounded-2xl border flex flex-col justify-between space-y-3`;
@@ -494,13 +494,13 @@
             <div>
               <div class="flex items-center justify-between gap-2 mb-1.5">
                 <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/70">☁️ Google Drive File</span>
-                ${isActiveFile ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">● Active</span>` : `<span class="text-[11px] text-slate-400">🕒 ${escapeHtml(modTime)}</span>`}
+                ${isActiveFile ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">● Active</span>` : `<span class="text-[11px] text-slate-400">🕒 ${safeEscapeHtml(modTime)}</span>`}
               </div>
               <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm truncate flex items-center gap-1.5">
                 <span>📄</span>
                 <span class="truncate">${safeFileName}</span>
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Size: ${escapeHtml(sizeKb)} • Modified: ${escapeHtml(modTime)}</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Size: ${safeEscapeHtml(sizeKb)} • Modified: ${safeEscapeHtml(modTime)}</p>
             </div>
             <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
               <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-xs flex-1" onclick="window.loadTripFromGoogleDrive('${safeFileIdJs}')">
@@ -555,7 +555,7 @@
           ? rawDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
           : (trip.updatedAt ? String(trip.updatedAt) : 'Recently');
 
-        const safeTripIdJs = escapeHtml(escapeJs(trip.id));
+        const safeTripIdJs = safeEscapeHtml(escapeJs(trip.id));
         const card = document.createElement('div');
         card.className = `trip-gallery-card ${isCurrent ? 'active-card' : ''}`;
         card.innerHTML = `
@@ -569,16 +569,16 @@
                     : '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">● Saved to device</span>'
                   )
               }
-              <span class="updated-badge text-[10px]">Updated ${escapeHtml(updatedDate)}</span>
+              <span class="updated-badge text-[10px]">Updated ${safeEscapeHtml(updatedDate)}</span>
             </div>
-            <h3 class="trip-card-title">${escapeHtml(flags)} ${escapeHtml(title)}</h3>
-            ${subtitle ? `<p class="trip-card-subtitle">${escapeHtml(subtitle)}</p>` : ''}
+            <h3 class="trip-card-title">${safeEscapeHtml(flags)} ${safeEscapeHtml(title)}</h3>
+            ${subtitle ? `<p class="trip-card-subtitle">${safeEscapeHtml(subtitle)}</p>` : ''}
           </div>
           <div class="trip-card-body">
             <div class="trip-card-stats">
-              <span class="stat-pill">📅 ${escapeHtml(dates)}</span>
-              <span class="stat-pill">📍 ${escapeHtml(legCount)} legs</span>
-              <span class="stat-pill">🏨 ${escapeHtml(stayCount)} stays</span>
+              <span class="stat-pill">📅 ${safeEscapeHtml(dates)}</span>
+              <span class="stat-pill">📍 ${safeEscapeHtml(legCount)} legs</span>
+              <span class="stat-pill">🏨 ${safeEscapeHtml(stayCount)} stays</span>
             </div>
           </div>
           <div class="trip-card-actions">
@@ -934,8 +934,10 @@
     await window.selectTripEmoji(randomEmoji);
   };
 
-  // Helper escape HTML string
-  function escapeHtml(str) {
+  // Helper escape HTML string with fallback to global escapeHtmlText
+  function safeEscapeHtml(str) {
+    if (typeof escapeHtmlText === 'function') return escapeHtmlText(str);
+    if (typeof window !== 'undefined' && typeof window.escapeHtmlText === 'function') return window.escapeHtmlText(str);
     if (str === null || str === undefined) return '';
     return String(str)
       .replace(/&/g, '&amp;')
