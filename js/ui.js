@@ -301,14 +301,16 @@ function syncItineraryViewModeButtons() {
 }
 
 function saveUiSettings() {
-  localStorage.setItem('travelApp_uiSettings_v1', JSON.stringify({
-    isEditMode,
-    isFunMode,
-    itineraryDayViewMode,
-    showMoneyFigures,
-    showTimelineReminders,
-    theme: currentTheme
-  }));
+  try {
+    localStorage.setItem('travelApp_uiSettings_v1', JSON.stringify({
+      isEditMode,
+      isFunMode,
+      itineraryDayViewMode,
+      showMoneyFigures,
+      showTimelineReminders,
+      theme: currentTheme
+    }));
+  } catch (e) {}
 }
 
 function setHeaderEditable(isEditable) {
