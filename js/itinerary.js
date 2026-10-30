@@ -4682,14 +4682,6 @@ function getLegElement(leg) {
   return document.getElementById('leg-' + leg.id);
 }
 
-function sameTimelineDay(dayDate, targetDate) {
-  if (!dayDate || !targetDate) return false;
-  const dayScore = getTimelineScore(dayDate, '', null);
-  const targetScore = getTimelineScore(targetDate, '', null);
-  if (dayScore === null || targetScore === null) return false;
-  return Math.floor(dayScore / 1440) === Math.floor(targetScore / 1440);
-}
-
 function findLegForJourneyCity(cityId, cityName) {
   if (!Array.isArray(journeys) || journeys.length === 0) return null;
   if (!Array.isArray(appData) || appData.length === 0) return null;
