@@ -94,9 +94,11 @@ const { runActivityModalHelpersTests } = require('./activity-modal-helpers.test'
 const { runLoadDismissedRemindersTests } = require('./load-dismissed-reminders.test');
 const { runUpdateStickyOffsetsTests } = require('./update-sticky-offsets.test');
 const { runViewportSizeTests } = require('./viewport-size.test');
+const { runPwaPromptTests } = require('./pwa-prompt.test');
 
 async function run() {
   try {
+    if (typeof runPwaPromptTests === 'function') runPwaPromptTests();
     if (typeof runCityStayCandidatesBenchmarkTests === 'function') runCityStayCandidatesBenchmarkTests();
     if (typeof runExtractCitiesUserCitiesTests === 'function') runExtractCitiesUserCitiesTests();
     if (typeof runReminderManagementTests === 'function') runReminderManagementTests();
