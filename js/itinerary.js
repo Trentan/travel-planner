@@ -986,7 +986,7 @@ function renderCompactDaySlide(opts = {}) {
       <span class="compact-day-header-chips flex items-center justify-end gap-1 flex-wrap">
         ${typeof renderDayWeatherBadgeHtml === 'function' ? renderDayWeatherBadgeHtml(day.date, toCity || fromCity || leg.label, leg) : ''}
         ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
-        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.7rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}${tripProgressSuffix}</span>
+        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.7rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}${tripProgressSuffix}</span>\n        <button type="button" class="compact-day-ai-copilot-chip bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/60 dark:hover:bg-teal-900 text-teal-700 dark:text-teal-300 font-medium px-2 py-0.5 rounded-full text-[0.7rem] border border-teal-200 dark:border-teal-800 whitespace-nowrap flex items-center gap-0.5" onclick="event.stopPropagation(); if (typeof openScopedAiCoPilot === 'function') openScopedAiCoPilot(${legIndex}, ${dayIdx});" title="Modify this day with AI">✨ AI</button>
         ${nextDayJumpChipHtml}
       </span>
     `,
@@ -3984,7 +3984,7 @@ ${(() => {
                   </div>
               `;
             }).join('')}
-            </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>` : ''}
+            </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>` : ''} <button type="button" class="add-btn" style="background: rgba(13, 148, 136, 0.1); color: #0d9488; border: 1px solid rgba(13, 148, 136, 0.3); margin-left: 0.35rem;" onclick="event.stopPropagation(); if (typeof openScopedAiCoPilot === 'function') openScopedAiCoPilot(${legIndex}, ${dayIndex});" title="Modify this day with AI Co-Pilot">✨ AI Co-Pilot</button>
           </div>
 
           </div></div>
