@@ -1141,7 +1141,8 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
     : (leg.label || 'this city');
   const verticalSignalBannerHtml = totalDays > 1 ? `
     <div class="mobile-vertical-days-banner" role="note" aria-label="Vertical day scroll indicator">
-      <span class="mobile-vertical-days-badge">📅 ${totalDays} Days in ${escapeCompactText(cleanLegCityLabel || 'City')}</span>
+      <button type="button" class="mobile-city-ai-btn bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 font-semibold px-2 py-0.5 rounded-full text-[0.7rem] border border-purple-200 dark:border-purple-800 whitespace-nowrap ml-auto flex items-center gap-1 shadow-xs cursor-pointer" onclick="event.stopPropagation(); if (typeof openScopedCityAiCoPilot === 'function') openScopedCityAiCoPilot(${legIndex});" title="Modify entire city stay with AI">✨ AI City Stay</button>
+        <span class="mobile-vertical-days-badge">📅 ${totalDays} Days in ${escapeCompactText(cleanLegCityLabel || 'City')}</span>
       <span class="mobile-vertical-days-cue">↕ Scroll down for each day</span>
     </div>
   ` : '';
@@ -3733,6 +3734,7 @@ function buildItinerary() {
         </div>
         <div style="display:flex; align-items:center; gap:10px; margin-left:auto; flex-wrap:nowrap;">
           <div class="hidden sm:flex shrink-0 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-full shadow-sm border border-slate-200 dark:border-slate-700 mr-2" title="Leg estimated cost">${formatCurrency(legCost)}</div>
+          <button type="button" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 font-semibold text-xs rounded-full border border-purple-200 dark:border-purple-800 shadow-xs mr-1 transition-all" onclick="event.stopPropagation(); if (typeof openScopedCityAiCoPilot === 'function') openScopedCityAiCoPilot(${legIndex});" title="Plan or rebalance entire city stay with AI">✨ AI City Stay</button>
           <span class="${badgeClass}">${nightLabel}</span>
           ${isEditMode ? `<button class="header-del-btn" title="Add a day to this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, 1)">+</button>` : ''}
           ${isEditMode ? `<button class="header-del-btn" title="Remove a day from this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, -1)">−</button>` : ''}

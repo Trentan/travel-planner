@@ -452,7 +452,7 @@ function prefillAIDialogFields() {
 
 function generatePrompt() {
   let promptText = '';
-  if (currentAiScope && currentAiScope.type === 'DAY') {
+  if (currentAiScope && (currentAiScope.type === 'DAY' || currentAiScope.type === 'CITY')) {
     const scopedInput = document.getElementById('aiScopedInstruction');
     const instruction = scopedInput ? scopedInput.value.trim() : '';
     promptText = buildScopedAiPrompt({
@@ -563,6 +563,17 @@ function updateAiModalScopeUi() {
     if (scopeQuickChips) scopeQuickChips.style.display = 'flex';
     if (formFullTrip) formFullTrip.style.display = 'none';
     if (formScoped) formScoped.style.display = 'block';
+  } else if (currentAiScope.type === 'CITY') {
+    const daysCount = Array.isArray(currentAiScope.cityDays) ? currentAiScope.cityDays.length : (currentAiScope.daysCount || 'multi-day');
+    scopeBadge.textContent = 'Modifying City Stay: ' + (currentAiScope.cityName || 'City') + ' (' + daysCount + ' Days)';
+    scopeBadge.className = 'px-2.5 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-800';
+    if (scopeNotice) {
+      scopeNotice.style.display = 'block';
+      scopeNotice.textContent = 'Targeting entire stay in ' + (currentAiScope.cityName || 'current city') + ' across all ' + daysCount + ' days. AI modifications will optimize the full multi-day pacing, food quests, and daily activities.';
+    }
+    if (scopeQuickChips) scopeQuickChips.style.display = 'flex';
+    if (formFullTrip) formFullTrip.style.display = 'none';
+    if (formScoped) formScoped.style.display = 'block';
   } else {
     scopeBadge.textContent = 'Full Trip Builder';
     scopeBadge.className = 'px-2.5 py-1 text-xs font-semibold rounded-full bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-200 border border-teal-300 dark:border-teal-800';
@@ -640,6 +651,57 @@ function parseAndValidateAiPayload(rawText, scope = { type: 'FULL_TRIP' }) {
 
   try {
     const parsed = JSON.parse(cleaned);
+
+    if (scope && scope.type === 'CITY') {
+      if (!parsed || (typeof parsed !== 'object')) {
+        return { valid: false, data: null, error: 'Expected JSON object for city stay modification.' };
+      }
+
+      const rawDays = Array.isArray(parsed.days) ? parsed.days : [];
+      if (rawDays.length === 0) {
+        return { valid: false, data: null, error: 'Missing "days" array in city modification response.' };
+      }
+
+      const normalizedDays = rawDays.map((d, idx) => {
+        const rawActivities = Array.isArray(d.activities) ? d.activities : (Array.isArray(d.activityItems) ? d.activityItems : []);
+        const normalizedActivities = rawActivities.map(act => {
+          if (typeof act === 'string') return { text: act, time: '09:00', cost: '0' };
+          return {
+            text: act.text || act.title || act.name || 'Activity',
+            time: act.time || act.startTime || '09:00',
+            cost: act.cost ? String(act.cost).replace(/[^0-9.]/g, '') : '0',
+            notes: act.notes || '',
+            category: act.category || 'sightseeing'
+          };
+        });
+
+        const matchedDate = d.date || (scope.cityDays && scope.cityDays[idx] ? scope.cityDays[idx].date : '');
+        return {
+          date: matchedDate,
+          desc: d.desc || d.description || '',
+          activities: normalizedActivities
+        };
+      });
+
+      const normalizedFood = Array.isArray(parsed.cityFood)
+        ? parsed.cityFood.map(f => (typeof f === 'string' ? { text: f } : { text: f.text || f.name || 'Food item' }))
+        : [];
+
+      const normalizedTips = Array.isArray(parsed.legTips)
+        ? parsed.legTips.map(t => (typeof t === 'string' ? { text: t } : { text: t.text || t.tip || 'Travel tip' }))
+        : [];
+
+      return {
+        valid: true,
+        data: {
+          city: parsed.city || scope.cityName || '',
+          days: normalizedDays,
+          cityFood: normalizedFood,
+          legTips: normalizedTips
+        },
+        error: null
+      };
+    }
 
     if (scope && scope.type === 'DAY') {
       let activities = [];
@@ -734,6 +796,54 @@ function computeAiDiffSummary(existingItems = [], newItems = []) {
 
 function buildScopedAiPrompt({ scope, instruction, existingActivities = [] }) {
   const cityName = scope.cityName || 'Destination City';
+
+  if (scope.type === 'CITY') {
+    const days = Array.isArray(scope.cityDays) ? scope.cityDays : [];
+    const daysContextStr = days.map((d, idx) => {
+      const acts = Array.isArray(d.activities) && d.activities.length > 0
+        ? d.activities.map(a => '    * ' + (a.time ? '[' + a.time + '] ' : '') + (a.text || a.title || 'Activity') + (a.cost ? ' ($' + a.cost + ')' : '')).join('\n')
+        : '    * (No activities planned yet)';
+      return '  - Day ' + (idx + 1) + ' (' + (d.date || 'Undated') + '):\n' + acts;
+    }).join('\n\n');
+
+    return 'I am updating the entire multi-day itinerary for a city stay in my travel plan.\n\n' +
+      'TARGET CITY CONTEXT: ' + cityName + '\n' +
+      'TOTAL STAY DURATION: ' + days.length + ' Days\n\n' +
+      'CURRENT MULTI-DAY SCHEDULE:\n' +
+      daysContextStr + '\n\n' +
+      'USER REQUEST / MODIFICATION:\n' +
+      (instruction || 'Re-architect and balance activities across all days for logical pacing, authentic food, and neighborhood clusters.') + '\n\n' +
+      'YOUR TASK:\n' +
+      'Generate an updated multi-day schedule for ' + cityName + ' covering all ' + days.length + ' days.\n' +
+      'Provide 2-4 key food quests for the city, 1-2 local transit/safety tips, and daily activity items.\n' +
+      'Return ONLY a valid JSON object matching the schema below without markdown code fences or conversational commentary.\n\n' +
+      'EXPECTED JSON SCHEMA:\n' +
+      '{\n' +
+      '  "city": "' + cityName + '",\n' +
+      '  "days": [\n' +
+      '    {\n' +
+      '      "date": "YYYY-MM-DD",\n' +
+      '      "desc": "Daily theme or focus area",\n' +
+      '      "activities": [\n' +
+      '        {\n' +
+      '          "text": "Name of activity",\n' +
+      '          "time": "HH:MM",\n' +
+      '          "cost": "0",\n' +
+      '          "notes": "Helpful tips, transit, or location",\n' +
+      '          "category": "sightseeing"\n' +
+      '        }\n' +
+      '      ]\n' +
+      '    }\n' +
+      '  ],\n' +
+      '  "cityFood": [\n' +
+      '    { "text": "Must-try dish and recommended spot or neighborhood" }\n' +
+      '  ],\n' +
+      '  "legTips": [\n' +
+      '    { "text": "Helpful city tip (e.g. transit pass or booking recommendation)" }\n' +
+      '  ]\n' +
+      '}';
+  }
+
   const dateStr = scope.date || 'Selected Day';
 
   const activityListStr = existingActivities.length > 0
@@ -764,6 +874,43 @@ function buildScopedAiPrompt({ scope, instruction, existingActivities = [] }) {
     '    }\n' +
     '  ]\n' +
     '}';
+}
+
+function openScopedCityAiCoPilot(legIndex) {
+  let cityName = 'Current City';
+  let cityDays = [];
+
+  if (typeof itineraryData !== 'undefined' && Array.isArray(itineraryData) && itineraryData[legIndex]) {
+    const leg = itineraryData[legIndex];
+    cityName = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label || leg.cityId || 'City') : (leg.label || 'City')).trim();
+    if (Array.isArray(leg.days)) {
+      cityDays = leg.days.map((day, idx) => ({
+        dayIndex: idx,
+        date: day.date || '',
+        activities: Array.isArray(day.activityItems) ? day.activityItems : []
+      }));
+    }
+  }
+
+  setAiScope({
+    type: 'CITY',
+    legIndex,
+    cityName,
+    cityDays
+  });
+
+  const modal = document.getElementById('ai-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    switchAiTab('generate');
+    const scopedInput = document.getElementById('aiScopedInstruction');
+    if (scopedInput) {
+      scopedInput.value = '';
+      scopedInput.focus();
+    }
+    const outputBox = document.getElementById('aiOutputBox');
+    if (outputBox) outputBox.style.display = 'none';
+  }
 }
 
 function openScopedAiCoPilot(legIndex, dayIndex) {
@@ -832,7 +979,24 @@ function previewPastedAiResponse() {
   if (previewBox) {
     previewBox.style.display = 'block';
 
-    if (currentAiScope.type === 'DAY') {
+    if (currentAiScope.type === 'CITY') {
+      const totalActivities = result.data.days.reduce((acc, d) => acc + (d.activities ? d.activities.length : 0), 0);
+      previewBox.innerHTML =
+        '<div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700 text-sm">' +
+          '<div class="font-bold text-slate-800 dark:text-slate-100 mb-2 flex items-center justify-between">' +
+            '<span>✨ Diff Preview for ' + currentAiScope.cityName + ' (' + result.data.days.length + ' Days)</span>' +
+            '<span class="text-xs px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200">' + totalActivities + ' activities, ' + result.data.cityFood.length + ' food quests</span>' +
+          '</div>' +
+          '<div class="flex flex-col gap-1.5 mb-3 text-xs">' +
+            result.data.days.map((d, i) => '<div class="text-slate-700 dark:text-slate-300"><strong>Day ' + (i + 1) + ' (' + (d.date || 'Date') + '):</strong> ' + (d.desc ? d.desc + ' — ' : '') + d.activities.map(a => a.text).join(', ') + '</div>').join('') +
+            (result.data.cityFood.length > 0 ? '<div class="text-amber-700 dark:text-amber-400 font-semibold mt-1">🍜 Food: ' + result.data.cityFood.map(f => f.text).join(' | ') + '</div>' : '') +
+          '</div>' +
+          '<div class="flex gap-2">' +
+            '<button type="button" class="action-btn action-btn-primary flex-1 text-xs py-1.5" onclick="applyAiParsedData()">Apply Entire City Stay</button>' +
+            '<button type="button" class="action-btn action-btn-secondary text-xs py-1.5" onclick="document.getElementById(\'aiDiffPreviewBox\').style.display=\'none\'">Discard</button>' +
+          '</div>' +
+        '</div>';
+    } else if (currentAiScope.type === 'DAY') {
       const diff = computeAiDiffSummary(currentAiScope.existingActivities || [], result.data.activities || []);
       const addedHtml = diff.added.length > 0 ? '<div class="text-emerald-700 dark:text-emerald-400 font-semibold">➕ ' + diff.added.length + ' Added: ' + diff.added.map(a => a.text).join(', ') + '</div>' : '';
       const modHtml = diff.modified.length > 0 ? '<div class="text-blue-700 dark:text-blue-400 font-semibold">🔄 ' + diff.modified.length + ' Updated: ' + diff.modified.map(a => a.text).join(', ') + '</div>' : '';
@@ -886,7 +1050,36 @@ async function applyAiParsedData() {
     triggerAppStateChange();
   }
 
-  if (currentAiScope.type === 'DAY') {
+  if (currentAiScope.type === 'CITY') {
+    const legIdx = currentAiScope.legIndex;
+    if (typeof itineraryData !== 'undefined' && Array.isArray(itineraryData) && itineraryData[legIdx]) {
+      const leg = itineraryData[legIdx];
+
+      if (Array.isArray(leg.days)) {
+        result.data.days.forEach((newDay, idx) => {
+          if (leg.days[idx]) {
+            leg.days[idx].activityItems = newDay.activities;
+            if (newDay.desc) leg.days[idx].desc = newDay.desc;
+          }
+        });
+      }
+
+      if (result.data.cityFood && result.data.cityFood.length > 0) {
+        leg.cityFood = result.data.cityFood;
+      }
+      if (result.data.legTips && result.data.legTips.length > 0) {
+        leg.legTips = result.data.legTips;
+      }
+
+      if (typeof saveData === 'function') await saveData(true);
+      if (typeof buildItinerary === 'function') buildItinerary();
+      if (typeof closeAIDialog === 'function') closeAIDialog();
+
+      if (typeof showToast === 'function') {
+        showToast('✨ Updated entire ' + currentAiScope.cityName + ' itinerary across all days!');
+      }
+    }
+  } else if (currentAiScope.type === 'DAY') {
     const legIdx = currentAiScope.legIndex;
     const dayIdx = currentAiScope.dayIndex;
     if (typeof itineraryData !== 'undefined' && Array.isArray(itineraryData) && itineraryData[legIdx]) {
@@ -938,6 +1131,7 @@ globalThis.parseAndValidateAiPayload = parseAndValidateAiPayload;
 globalThis.computeAiDiffSummary = computeAiDiffSummary;
 globalThis.buildScopedAiPrompt = buildScopedAiPrompt;
 globalThis.openScopedAiCoPilot = openScopedAiCoPilot;
+globalThis.openScopedCityAiCoPilot = openScopedCityAiCoPilot;
 globalThis.applyAiQuickChip = applyAiQuickChip;
 globalThis.previewPastedAiResponse = previewPastedAiResponse;
 globalThis.applyAiParsedData = applyAiParsedData;
