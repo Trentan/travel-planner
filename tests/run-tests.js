@@ -207,6 +207,8 @@ async function run() {
     await runIssue501FocusVisibleTests();
     const { runIssues500To506Tests } = require('./issues-500-506-mobile-ux-a11y.test');
     await runIssues500To506Tests();
+    const { runMobileNavBottomSheetTests } = require('./mobile-nav-bottom-sheet.test');
+    await runMobileNavBottomSheetTests();
     await runBrowserSuite();
     console.log('All travel planner tests passed');
   } finally {

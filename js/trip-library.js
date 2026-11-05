@@ -44,6 +44,204 @@
     if (dropdown) dropdown.hidden = true;
   };
 
+  // Mobile Bottom-Sheet Trip Switcher Handler (Issue #634)
+  window.handleTripSwitcherTap = function(event) {
+    if (event) {
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+    }
+    const isMobile = (typeof window.isMobileViewport === 'function' && window.isMobileViewport()) ||
+      (typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 768px)').matches);
+
+    if (isMobile) {
+      window.openTripBottomSheet();
+    } else {
+      window.toggleTripDropdown(event);
+    }
+  };
+
+  // Open Mobile Bottom-Sheet Trip Switcher
+  window.openTripBottomSheet = async function() {
+    const sheet = document.getElementById('tripBottomSheet');
+    if (!sheet) return;
+    sheet.classList.add('open');
+    sheet.setAttribute('aria-hidden', 'false');
+    sheet.removeAttribute('inert');
+    document.body.classList.add('trip-bottom-sheet-open');
+    await window.renderTripBottomSheet();
+    if (typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected()) {
+      if (typeof window.syncAllTripsFromGoogleDrive === 'function') {
+        window.syncAllTripsFromGoogleDrive(true).then(() => {
+          window.renderTripBottomSheet();
+        }).catch(err => {
+          console.warn('Failed to sync trips in bottom sheet:', err);
+        });
+      }
+    }
+  };
+
+  // Close Mobile Bottom-Sheet Trip Switcher
+  window.closeTripBottomSheet = function(event) {
+    if (event && typeof event.stopPropagation === 'function') {
+      event.stopPropagation();
+    }
+    const sheet = document.getElementById('tripBottomSheet');
+    if (!sheet) return;
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    sheet.setAttribute('inert', '');
+    document.body.classList.remove('trip-bottom-sheet-open');
+  };
+
+  // Render Mobile Bottom-Sheet Switcher with Top 3 Recent Trips
+  window.renderTripBottomSheet = async function() {
+    const listEl = document.getElementById('tripBottomSheetRecentList');
+    if (!listEl) return;
+    if (typeof window.getAllTripsFromIndexedDB !== 'function') return;
+
+    const trips = await window.getAllTripsFromIndexedDB();
+    const cloudFiles = window.__gdriveCloudFiles || [];
+    const activeTripId = window.getActiveTripId ? window.getActiveTripId() : 'trip_default';
+    const isDriveConnected = typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected();
+    const fileMap = typeof window.getGDriveFileMap === 'function' ? window.getGDriveFileMap() : {};
+
+    const cloudFileIdMap = new Map();
+    cloudFiles.forEach(cf => cloudFileIdMap.set(cf.id, cf));
+
+    const cloudFileNameMap = new Map();
+    cloudFiles.forEach(cf => cloudFileNameMap.set(cf.name.toLowerCase(), cf));
+
+    const unifiedList = [];
+    const matchedCloudFileIds = new Set();
+
+    trips.forEach(trip => {
+      const rawTitle = trip.title || (trip.data && trip.data.meta && trip.data.meta.title) || 'My Trip';
+      const cleanFilename = typeof window.formatHumanFilename === 'function'
+        ? window.formatHumanFilename(trip)
+        : `${rawTitle.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_')}.json`;
+
+      const mappedFileId = fileMap[trip.id];
+      let matchedCloudFile = null;
+
+      if (mappedFileId && cloudFileIdMap.has(mappedFileId)) {
+        matchedCloudFile = cloudFileIdMap.get(mappedFileId);
+      } else if (cloudFileNameMap.has(cleanFilename.toLowerCase())) {
+        matchedCloudFile = cloudFileNameMap.get(cleanFilename.toLowerCase());
+      }
+
+      if (matchedCloudFile) {
+        matchedCloudFileIds.add(matchedCloudFile.id);
+      }
+
+      unifiedList.push({
+        id: trip.id,
+        cloudFileId: matchedCloudFile ? matchedCloudFile.id : null,
+        title: rawTitle,
+        filename: matchedCloudFile ? matchedCloudFile.name : cleanFilename,
+        dateRange: trip.dateRange || (trip.data && trip.data.meta && trip.data.meta.dates) || 'Flexible dates',
+        flags: trip.flags || '✈️',
+        storageState: isDriveConnected ? (matchedCloudFile ? 'synced' : 'local_only') : 'local_only',
+        isCurrent: trip.id === activeTripId,
+        source: 'local'
+      });
+    });
+
+    if (isDriveConnected) {
+      cloudFiles.forEach(cf => {
+        if (!matchedCloudFileIds.has(cf.id)) {
+          unifiedList.push({
+            id: `cloud_${cf.id}`,
+            cloudFileId: cf.id,
+            title: cf.name.replace(/\.json$/i, '').replace(/_/g, ' '),
+            filename: cf.name,
+            dateRange: cf.modifiedTime ? new Date(cf.modifiedTime).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Google Drive File',
+            flags: '☁️',
+            storageState: 'cloud_only',
+            isCurrent: false,
+            source: 'cloud'
+          });
+        }
+      });
+    }
+
+    if (unifiedList.length === 0) {
+      const titleEl = document.getElementById('currentTripTitle');
+      const iconEl = document.getElementById('currentTripIcon');
+      const curTitle = (titleEl && titleEl.innerText) ? titleEl.innerText.trim() : 'My Trip';
+      const curEmoji = (iconEl && iconEl.innerText) ? iconEl.innerText.trim() : '✈️';
+      unifiedList.push({
+        id: activeTripId || 'trip_default',
+        cloudFileId: null,
+        title: curTitle,
+        filename: 'my_trip.json',
+        dateRange: 'Current Itinerary',
+        flags: curEmoji,
+        storageState: 'local_only',
+        isCurrent: true,
+        source: 'local'
+      });
+    }
+
+    listEl.innerHTML = '';
+    const topTrips = unifiedList.slice(0, 3);
+    if (topTrips.length === 0) {
+      listEl.innerHTML = '<div class="p-3 text-xs text-slate-500 italic text-center">No recent trips found.</div>';
+      return;
+    }
+
+    topTrips.forEach(item => {
+      const isCurrent = item.isCurrent;
+      const isCloudSynced = item.storageState === 'synced';
+      const isCloudOnly = item.storageState === 'cloud_only';
+
+      let badgeHtml = '';
+      if (isCloudSynced) {
+        badgeHtml = '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">☁️ Synced</span>';
+      } else if (isCloudOnly) {
+        badgeHtml = '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300">☁️ Remote</span>';
+      } else {
+        badgeHtml = '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">⚡ Local</span>';
+      }
+
+      const card = document.createElement('div');
+      card.className = `trip-bottom-sheet-item p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-all ${
+        isCurrent
+          ? 'bg-teal-50/90 dark:bg-teal-950/50 border-teal-500 shadow-xs ring-1 ring-teal-500/30'
+          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750'
+      }`;
+      card.onclick = () => {
+        window.closeTripBottomSheet();
+        if (isCloudOnly) {
+          if (typeof window.loadTripFromGoogleDrive === 'function') {
+            window.loadTripFromGoogleDrive(item.cloudFileId);
+          }
+        } else if (!isCurrent) {
+          if (typeof window.switchActiveTrip === 'function') {
+            window.switchActiveTrip(item.id);
+          }
+        }
+      };
+
+      const flagChar = item.flags ? item.flags.split(' ')[0] : '✈️';
+      card.innerHTML = `
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          <span class="text-2xl p-2 bg-slate-100 dark:bg-slate-700/60 rounded-xl shrink-0 select-none">${safeEscapeHtml(flagChar)}</span>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm truncate ${isCurrent ? 'text-teal-900 dark:text-teal-200' : 'text-slate-900 dark:text-slate-100'}">${safeEscapeHtml(item.title)}</span>
+              ${badgeHtml}
+            </div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1.5 truncate">
+              <span>📅 ${safeEscapeHtml(item.dateRange)}</span>
+            </div>
+          </div>
+        </div>
+        ${isCurrent ? '<span class="text-teal-600 dark:text-teal-400 font-bold text-base shrink-0 mr-1" aria-label="Active trip">✓</span>' : ''}
+      `;
+      listEl.appendChild(card);
+    });
+  };
+
   // Render Header Trip Switcher button and unified trips list
   window.renderHeaderTripSwitcher = async function() {
     const titleEl = document.getElementById('currentTripTitle');
@@ -87,6 +285,11 @@
 
     if (!recentListEl) return;
     recentListEl.innerHTML = '';
+    const bottomSheetEl = document.getElementById('tripBottomSheet');
+    const isSheetOpen = bottomSheetEl && bottomSheetEl.classList && typeof bottomSheetEl.classList.contains === 'function' && bottomSheetEl.classList.contains('open');
+    if (isSheetOpen && typeof window.renderTripBottomSheet === 'function') {
+      window.renderTripBottomSheet();
+    }
 
     // Render Top-Level Action Controls Header inside Dropdown Menu
     const actionControlsHeader = document.createElement('div');

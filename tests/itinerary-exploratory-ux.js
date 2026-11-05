@@ -22,6 +22,7 @@ async function loadApp(page, baseUrl) {
   const shouldIgnoreError = message => {
     const str = String(message || '');
     return str.includes('net::ERR_NAME_NOT_RESOLVED') ||
+           str.includes('net::ERR_NO_BUFFER_SPACE') ||
            str.includes('status of 404') ||
            str.includes('favicon.ico');
   };

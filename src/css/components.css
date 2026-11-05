@@ -1824,7 +1824,6 @@
       }
     }
 
-    body.mobile-app-mode .app-menu-bar,
     body.mobile-app-mode header {
       display: none !important;
     }
@@ -1985,7 +1984,7 @@
       position: sticky !important;
       left: 0;
       right: 0;
-      top: env(safe-area-inset-top, 0px) !important;
+      top: calc(52px + env(safe-area-inset-top, 0px)) !important;
       bottom: auto !important;
       z-index: 310;
       border-top: 1px solid rgba(148, 163, 184, 0.2);
@@ -2101,49 +2100,92 @@
       box-sizing: border-box;
     }
 
+    body.mobile-app-mode .app-menu-bar {
+      display: flex !important;
+      height: 52px !important;
+      min-height: 52px !important;
+      max-height: 52px !important;
+      padding: 0 0.75rem !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 300 !important;
+      background: linear-gradient(180deg, rgb(26 36 47) 0%, rgb(16 24 32) 100%) !important;
+      box-sizing: border-box !important;
+    }
+
     body.mobile-app-mode .app-menu-left {
       min-width: 0;
-      display: grid;
-      gap: 0.12rem;
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
+      flex: 1 !important;
     }
 
-    body.mobile-app-mode .file-badge {
-      width: 100%;
-      max-width: 100%;
+    body.mobile-app-mode .header-trip-switcher {
+      min-width: 0;
+      flex-shrink: 1;
     }
 
-    body.mobile-app-mode .file-badge-value {
-      display: block;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    body.mobile-app-mode .trip-switcher-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      max-width: 175px !important;
+      height: 36px !important;
+      padding: 0 0.6rem !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 0.65rem !important;
+      color: #ffffff !important;
+      font-size: 0.85rem !important;
+      font-weight: 600 !important;
+      white-space: nowrap !important;
+      cursor: pointer !important;
+    }
+
+    body.mobile-app-mode .trip-switcher-btn .trip-title {
+      max-width: 110px !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
     }
 
     body.mobile-app-mode .save-status,
-    body.mobile-app-mode .timestamp-status {
-      display: block;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 0.78rem;
+    body.mobile-app-mode .timestamp-status,
+    body.mobile-app-mode .file-badge {
+      display: none !important;
+    }
+
+    body.mobile-app-mode #headerCloudSyncStatusPill {
+      display: inline-flex !important;
+      font-size: 0.72rem !important;
+      padding: 0.2rem 0.5rem !important;
+      height: 28px !important;
+      border-radius: 9999px !important;
+      flex-shrink: 0 !important;
     }
 
     body.mobile-app-mode .app-menu-right {
       min-width: 0;
-      align-items: start;
+      display: flex !important;
+      align-items: center !important;
+      flex-shrink: 0 !important;
     }
 
     body.mobile-app-mode .mobile-menu-btn {
-      min-width: 2.75rem;
-      width: 2.75rem;
-      height: 2.75rem;
-      padding: 0;
-      justify-content: center;
-      font-size: 1.2rem;
-      line-height: 1;
-      border-radius: 0.5rem;
+      min-width: 2.25rem !important;
+      width: 2.25rem !important;
+      height: 2.25rem !important;
+      padding: 0 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 1.1rem !important;
+      border-radius: 0.5rem !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      color: #ffffff !important;
     }
 
     body.mobile-app-mode #editToggleBtn,
