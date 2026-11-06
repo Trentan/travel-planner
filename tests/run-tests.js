@@ -57,6 +57,8 @@ const { runMapprImportTests } = require('./mappr-import.test');
 const { runIssuesVerification } = require('./issues-89-91-95-96-verify');
 const { runTripDayMetricsTests } = require('./trip-day-metrics.test');
 const { runAiBuilderImportTests } = require('./ai-builder-import.test');
+const { runAiCopilotTests } = require('./ai-copilot.test');
+const { runAiCityScopeTests } = require('./ai-city-scope.test');
 const { runRebuildAndAirportCodesTests } = require('./rebuild-itinerary-airport-codes.test');
 const { runBudgetTabTests } = require('./budget-tab.test');
 const { runGetDayTotalTests } = require('./get-day-total.test');
@@ -119,6 +121,8 @@ async function run() {
     if (typeof runBudgetTabTests === 'function') runBudgetTabTests();
     if (typeof runRebuildAndAirportCodesTests === 'function') await runRebuildAndAirportCodesTests();
     if (typeof runAiBuilderImportTests === 'function') await runAiBuilderImportTests();
+    if (typeof runAiCopilotTests === 'function') runAiCopilotTests();
+    if (typeof runAiCityScopeTests === 'function') runAiCityScopeTests();
     if (typeof runTripDayMetricsTests === 'function') runTripDayMetricsTests();
     if (typeof runIssuesVerification === 'function') await runIssuesVerification();
     if (typeof runMapprImportTests === 'function') await runMapprImportTests();
