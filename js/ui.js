@@ -1077,6 +1077,7 @@ window.toggleMobileMenu = toggleMobileMenu;
 window.closeDesktopActionsMenu = closeDesktopActionsMenu;
 window.closeMobileMenu = closeMobileMenu;
 window.syncResponsiveUi = syncResponsiveUi;
+window.isMobileViewport = isMobileViewport;
 window.syncMobileMenuControls = syncMobileMenuControls;
 window.syncMobileMenuStatus = syncMobileMenuStatus;
 window.promptHardRestart = promptHardRestart;

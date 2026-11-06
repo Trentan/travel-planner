@@ -215,9 +215,10 @@ async function run() {
     classList: { add: () => {}, remove: () => {}, toggle: () => {}, contains: () => false }
   });
 
-  // Selecting 'build' should now redirect to show file-setup-modal
+  // Selecting 'build' should now directly advance to frictionless trip onboarding without blocking on file-setup-modal (#633)
   context.chooseTripStart('build');
-  assert(setupModalDisplayed === true, 'chooseTripStart("build") should show the file-setup-modal if storage setup not seen yet');
+  assert(setupModalDisplayed === false, 'chooseTripStart("build") must NOT show blocking file-setup-modal for first-time users (#633)');
+  assert((context.window ? context.window.tripStartStep : context.tripStartStep) === 'choose_path', 'chooseTripStart("build") should advance to choose_path directly');
 
   // Test 5: resync timeout threshold checking
   console.log('Testing resync appStateChange timeout threshold...');
