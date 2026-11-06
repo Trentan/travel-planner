@@ -986,7 +986,7 @@ function renderCompactDaySlide(opts = {}) {
       <span class="compact-day-header-chips flex items-center justify-end gap-1 flex-wrap">
         ${typeof renderDayWeatherBadgeHtml === 'function' ? renderDayWeatherBadgeHtml(day.date, toCity || fromCity || leg.label, leg) : ''}
         ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
-        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.7rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}${tripProgressSuffix}</span>
+        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.7rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}${tripProgressSuffix}</span>\n        <button type="button" class="compact-day-ai-copilot-chip bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/60 dark:hover:bg-teal-900 text-teal-700 dark:text-teal-300 font-medium px-2 py-0.5 rounded-full text-[0.7rem] border border-teal-200 dark:border-teal-800 whitespace-nowrap flex items-center gap-0.5" onclick="event.stopPropagation(); if (typeof openScopedAiCoPilot === 'function') openScopedAiCoPilot(${legIndex}, ${dayIdx});" title="Modify this day with AI">✨ AI</button>
         ${nextDayJumpChipHtml}
       </span>
     `,
@@ -1141,7 +1141,8 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
     : (leg.label || 'this city');
   const verticalSignalBannerHtml = totalDays > 1 ? `
     <div class="mobile-vertical-days-banner" role="note" aria-label="Vertical day scroll indicator">
-      <span class="mobile-vertical-days-badge">📅 ${totalDays} Days in ${escapeCompactText(cleanLegCityLabel || 'City')}</span>
+      <button type="button" class="mobile-city-ai-btn bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 font-semibold px-2 py-0.5 rounded-full text-[0.7rem] border border-purple-200 dark:border-purple-800 whitespace-nowrap ml-auto flex items-center gap-1 shadow-xs cursor-pointer" onclick="event.stopPropagation(); if (typeof openScopedCityAiCoPilot === 'function') openScopedCityAiCoPilot(${legIndex});" title="Modify entire city stay with AI">✨ AI City Stay</button>
+        <span class="mobile-vertical-days-badge">📅 ${totalDays} Days in ${escapeCompactText(cleanLegCityLabel || 'City')}</span>
       <span class="mobile-vertical-days-cue">↕ Scroll down for each day</span>
     </div>
   ` : '';
@@ -3733,6 +3734,7 @@ function buildItinerary() {
         </div>
         <div style="display:flex; align-items:center; gap:10px; margin-left:auto; flex-wrap:nowrap;">
           <div class="hidden sm:flex shrink-0 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-full shadow-sm border border-slate-200 dark:border-slate-700 mr-2" title="Leg estimated cost">${formatCurrency(legCost)}</div>
+          <button type="button" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 font-semibold text-xs rounded-full border border-purple-200 dark:border-purple-800 shadow-xs mr-1 transition-all" onclick="event.stopPropagation(); if (typeof openScopedCityAiCoPilot === 'function') openScopedCityAiCoPilot(${legIndex});" title="Plan or rebalance entire city stay with AI">✨ AI City Stay</button>
           <span class="${badgeClass}">${nightLabel}</span>
           ${isEditMode ? `<button class="header-del-btn" title="Add a day to this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, 1)">+</button>` : ''}
           ${isEditMode ? `<button class="header-del-btn" title="Remove a day from this leg" onclick="event.stopPropagation(); adjustLegDays(${legIndex}, -1)">−</button>` : ''}
@@ -3984,7 +3986,7 @@ ${(() => {
                   </div>
               `;
             }).join('')}
-            </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>` : ''}
+            </div>${isEditMode ? `<button class="add-btn" onclick="event.stopPropagation(); addDayItem(${legIndex}, ${dayIndex}, 'activityItems')">+ Add Activity</button>` : ''} <button type="button" class="add-btn" style="background: rgba(13, 148, 136, 0.1); color: #0d9488; border: 1px solid rgba(13, 148, 136, 0.3); margin-left: 0.35rem;" onclick="event.stopPropagation(); if (typeof openScopedAiCoPilot === 'function') openScopedAiCoPilot(${legIndex}, ${dayIndex});" title="Modify this day with AI Co-Pilot">✨ AI Co-Pilot</button>
           </div>
 
           </div></div>
