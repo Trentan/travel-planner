@@ -699,13 +699,20 @@ function deleteFromIndexedDB(key) {
 // Check if we should use IndexedDB (migration complete and DB available)
 async function shouldUseIndexedDB() {
   try {
-    if (!window.indexedDB) {
-      console.log('IndexedDB not supported, falling back to localStorage');
+    if (typeof window === 'undefined' || !window.indexedDB) {
       return false;
     }
+    const database = await openDB();
+    if (!database) return false;
 
+    // Ensure migration flag is set so subsequent checks are fast
     const migrationStatus = await loadFromIndexedDB('_migration_complete');
-    return migrationStatus !== null;
+    if (!migrationStatus) {
+      try {
+        await saveToIndexedDB('_migration_complete', { version: DB_VERSION, date: new Date().toISOString() });
+      } catch (err) {}
+    }
+    return true;
   } catch (e) {
     console.warn('IndexedDB status check fallback to localStorage:', e);
     return false;
@@ -7128,7 +7135,10 @@ async function checkUrlForImportedTrip() {
 
     clearActiveFileHandle();
     setImportedJsonWithoutWriteAccess(true);
+    const importedTripId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+    setActiveTripId(importedTripId);
     await loadImportedPayload(expandedData, 'URL Shared Trip');
+    await saveActiveTripToStore();
     
     alert('🌍 Shared Travel Planner itinerary loaded successfully!');
     if (window.history && typeof window.history.replaceState === 'function') {
@@ -8326,6 +8336,26 @@ function renderTripStartPathChoice() {
               Import Existing Flights <span aria-hidden="true">→</span>
             </button>
           </div>
+
+          <!-- Path C: Instant Blank Canvas -->
+          <div class="trip-path-card trip-path-card--blank" onclick="startBlankTrip()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')startBlankTrip()">
+            <div class="trip-path-header">
+              <span class="trip-path-icon">⚡</span>
+              <span class="trip-path-badge trip-path-badge--blank">Instant Canvas</span>
+            </div>
+            <h3 class="trip-path-title">Start Blank Trip</h3>
+            <p class="trip-path-desc">
+              Skip the questions. Start immediately with a clean blank itinerary and add your cities, stays, and activities directly.
+            </p>
+            <ul class="trip-path-features">
+              <li>✓ Zero wizard steps required</li>
+              <li>✓ Instant editable timeline</li>
+              <li>✓ Auto-saves to your local device</li>
+            </ul>
+            <button type="button" class="trip-path-btn trip-path-btn--blank" onclick="event.stopPropagation(); startBlankTrip()">
+              Start Blank Trip <span aria-hidden="true">→</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -8848,21 +8878,10 @@ async function createTripFromFlightBookings() {
   if (typeof buildTransportTab === 'function') buildTransportTab();
   if (typeof buildAccomTab === 'function') buildAccomTab();
 
-  const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
-  if (!hasSeenSetup && !hasActiveFileHandle()) {
-    const setupModal = document.getElementById("file-setup-modal");
-    if (setupModal) setupModal.style.display = "flex";
-  } else {
-    if (isFSASupported()) {
-      try {
-        await createFileOnDisk();
-      } catch(e) {
-        console.warn('File save skipped or cancelled:', e);
-      }
-    } else {
-      exportJSON();
-    }
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem("travelApp_file_setup_seen", "true");
   }
+  await saveData(true);
 
   showToast(`✈️ Trip created! ${journeyItems.length} confirmed flights and ${citiesData.length} destinations scheduled.`);
 }
@@ -9076,12 +9095,6 @@ function chooseTripStart(choice) {
   }
 
   if (choice === 'build') {
-    if (!isSetupConfigured) {
-      dismissTripStart();
-      const setupModal = document.getElementById("file-setup-modal");
-      if (setupModal) setupModal.style.display = "flex";
-      return;
-    }
     tripStartStep = 'choose_path';
     renderTripStart();
     return;
@@ -9093,10 +9106,6 @@ function chooseTripStart(choice) {
   dismissTripStart();
   if (choice === 'learn') {
     if (typeof openGuideDialog === 'function') openGuideDialog();
-    if (!isSetupConfigured) {
-      const setupModal = document.getElementById("file-setup-modal");
-      if (setupModal) setupModal.style.display = "flex";
-    }
     return;
   }
   if (choice === 'sample') {
@@ -9108,10 +9117,6 @@ function chooseTripStart(choice) {
     if (typeof buildTransportTab === 'function') buildTransportTab();
     if (typeof buildAccomTab === 'function') buildAccomTab();
     if (typeof buildTabs === 'function') buildTabs();
-    if (!isSetupConfigured) {
-      const setupModal = document.getElementById("file-setup-modal");
-      if (setupModal) setupModal.style.display = "flex";
-    }
   }
   localStorage.setItem('travelApp_trip_start_seen', 'true');
   showToast('Sample trip is ready — open any day to see how it is put together.');
@@ -9458,22 +9463,10 @@ async function createTripFromStartAnswers() {
   if (typeof buildTransportTab === 'function') buildTransportTab();
   if (typeof buildAccomTab === 'function') buildAccomTab();
 
-  // Prompt user to pick file location / save file!
-  const hasSeenSetup = typeof localStorage !== 'undefined' ? localStorage.getItem("travelApp_file_setup_seen") : null;
-  if (!hasSeenSetup && !hasActiveFileHandle()) {
-    const setupModal = document.getElementById("file-setup-modal");
-    if (setupModal) setupModal.style.display = "flex";
-  } else {
-    if (isFSASupported()) {
-      try {
-        await createFileOnDisk();
-      } catch(e) {
-        console.warn('File save skipped or cancelled:', e);
-      }
-    } else {
-      exportJSON();
-    }
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem("travelApp_file_setup_seen", "true");
   }
+  await saveData(true);
   
   showToast(`Your ${route.length}-city plan is created! Click 🤖 AI Builder anytime to enrich it.`);
 }
@@ -9494,18 +9487,33 @@ function startBlankTrip() {
   window.journeys = journeys;
   window.stays = stays;
   titleData = { title: "My New Trip", subtitle: "0 cities · Add a city or leg to start" };
+  const newTripId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+  if (typeof setActiveTripId === 'function') {
+    setActiveTripId(newTripId);
+  }
   const mainTitleEl = document.getElementById("mainTitle");
   if (mainTitleEl) mainTitleEl.innerText = titleData.title;
   const mainSubEl = document.getElementById("mainSubtitle");
   if (mainSubEl) mainSubEl.innerText = titleData.subtitle;
   syncCurrentFileName("New_Trip.json");
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem("travelApp_file_setup_seen", "true");
+    localStorage.setItem("travelApp_trip_start_seen", "true");
+  }
   saveData(true);
   dismissTripStart();
   if (typeof buildNav === "function") buildNav();
   if (typeof buildItinerary === "function") buildItinerary();
+  if (typeof buildCityNav === "function") buildCityNav();
   if (typeof buildTransportTab === "function") buildTransportTab();
   if (typeof buildAccomTab === "function") buildAccomTab();
   if (typeof buildTabs === "function") buildTabs();
+  if (typeof window.renderHeaderTripSwitcher === 'function') {
+    window.renderHeaderTripSwitcher();
+  }
+  if (typeof showToast === 'function') {
+    showToast('✨ Blank trip canvas ready! Auto-saved locally.');
+  }
 }
 
 async function onboardCreateNewTrip() {

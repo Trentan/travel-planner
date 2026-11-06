@@ -65,8 +65,8 @@
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripLibraryModal()"><span class="menu-icon" aria-hidden="true">🖼️</span> My Trips Gallery</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCloudSyncModal()"><span class="menu-icon" aria-hidden="true">☁️</span> Cloud Sync (Google Drive)</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openCreateNewTripWizard()"><span class="menu-icon" aria-hidden="true">✦</span> Create New Trip</button>
-          <button id="saveAsBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripFile()"><span class="menu-icon" aria-hidden="true">💾</span> Save As JSON</button>
-          <button id="openFileBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openExistingTripFile()"><span class="menu-icon" aria-hidden="true">📂</span> Open Local File</button>
+          <button id="saveAsBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openTripFile()"><span class="menu-icon" aria-hidden="true">💾</span> Backup / Save JSON</button>
+          <button id="openFileBtn" class="app-menu-btn" onclick="closeDesktopActionsMenu(); openExistingTripFile()"><span class="menu-icon" aria-hidden="true">📂</span> Open Backup File</button>
         </div>
 
         <div class="app-menu-divider" aria-hidden="true"></div>
@@ -122,9 +122,18 @@
           <div class="app-menu-section-header">⚙️ App & Maintenance</div>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openGuideDialog()"><span class="menu-icon" aria-hidden="true">📖</span> User Guide & Help</button>
           <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); openReadinessGuide()"><span class="menu-icon" aria-hidden="true">🌍</span> International Readiness</button>
-          <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); promptHardRestart()" title="Reload app and clear caches while preserving trip data"><span class="menu-icon" aria-hidden="true">🔄</span> Hard Restart</button>
           <button id="installAppBtn" class="app-menu-btn install-btn" hidden onclick="closeDesktopActionsMenu(); promptInstallApp()"><span class="menu-icon" aria-hidden="true">⬇</span> Install App</button>
-          <button class="app-menu-btn danger" onclick="closeDesktopActionsMenu(); promptFactoryReset()" title="Wipe ALL data and revert to default template"><span class="menu-icon" aria-hidden="true">⚠️</span> Factory Reset (Wipe Data)</button>
+
+          <div class="desktop-menu-advanced mt-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 p-2 text-xs">
+            <button type="button" class="cursor-pointer font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 select-none w-full text-left flex items-center justify-between bg-transparent border-none p-0" onclick="this.nextElementSibling.classList.toggle('hidden')">
+              <span>🔧 Advanced &amp; Diagnostics</span>
+              <span>▾</span>
+            </button>
+            <div class="mt-2 space-y-1 hidden">
+              <button class="app-menu-btn" onclick="closeDesktopActionsMenu(); promptHardRestart()" title="Reload app and clear caches while preserving trip data"><span class="menu-icon" aria-hidden="true">🔄</span> Hard Restart</button>
+              <button class="app-menu-btn danger text-rose-600 dark:text-rose-400" onclick="closeDesktopActionsMenu(); promptFactoryReset()" title="Wipe ALL data and revert to default template"><span class="menu-icon" aria-hidden="true">⚠️</span> Factory Reset (Wipe Data)</button>
+            </div>
+          </div>
         </div>
       </div>
     </details>
@@ -889,22 +898,22 @@
   <div id="file-setup-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content modal-md">
       <div class="modal-header">
-        <h2>💾 Where should we save your trip?</h2>
+        <h2>💾 Local Storage &amp; Backup</h2>
         <button class="modal-close" onclick="dismissFileSetup()" aria-label="Close dialog">&times;</button>
       </div>
       <div class="modal-body">
-        <p class="mb-4 text-slate-700 dark:text-slate-300">
-          This app runs entirely on your device. To ensure you don't lose your itinerary when you clear browser data, and to access it across devices, save it to a cloud drive (e.g., <strong>iCloud, Google Drive, OneDrive</strong>).
+        <p class="mb-4 text-slate-700 dark:text-slate-300 text-sm">
+          Your travel itineraries are saved automatically to your device's local database. You can also export backups anytime or connect Google Drive for multi-device sync.
         </p>
-        <div class="flex flex-col gap-3 mt-6">
-          <button class="action-btn w-full flex justify-center text-lg" onclick="onboardCreateNewTrip()">
-            📄 Create New Trip (Save As...)
+        <div class="flex flex-col gap-2.5 mt-5">
+          <button class="action-btn w-full flex justify-center text-sm font-semibold" onclick="onboardCreateNewTrip()">
+            💾 Backup Trip to File
           </button>
-          <button class="action-btn action-btn-secondary w-full flex justify-center" onclick="onboardOpenExistingTrip()">
-            📂 Open Existing Trip
+          <button class="action-btn action-btn-secondary w-full flex justify-center text-sm font-semibold" onclick="onboardOpenExistingTrip()">
+            📂 Open Backup File
           </button>
-          <button class="action-btn action-btn-secondary w-full flex justify-center" onclick="dismissFileSetup()" style="opacity: 0.8; font-size: 0.9rem;">
-            Try it out first (Not Recommended)
+          <button class="action-btn action-btn-secondary w-full flex justify-center text-sm" onclick="dismissFileSetup()">
+            Continue Planning
           </button>
         </div>
       </div>
