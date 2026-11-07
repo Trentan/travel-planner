@@ -388,7 +388,7 @@ function convertLocalToHomeTime(timeStr, dateStr, localCityOrTz, homeCityOrTz) {
 
   if (localTz === homeTz) return '';
 
-  const cleanDate = dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr.trim()) ? dateStr.trim() : '2026-06-15';
+  const cleanDate = dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr.trim()) ? dateStr.trim() : `${new Date().getFullYear()}-06-15`;
   const cleanTime = timeStr.trim();
 
   // Step 1: calculate offset of localTz on date
