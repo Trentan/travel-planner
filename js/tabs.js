@@ -448,7 +448,7 @@ function buildPackingTab() {
             if (isLeaveHomeSection(item)) {
               return `
                 <div class="packing-section-header mt-4 mb-2 px-2 flex justify-between items-center w-full group">
-                  <h4 contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
+                  <h4 contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${typeof escapeHtmlText === 'function' ? escapeHtmlText(item.text) : item.text}</h4>
                   ${canEdit ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
                 </div>
               `;
@@ -456,7 +456,7 @@ function buildPackingTab() {
             return `
             <div class="packing-item w-full">
               <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
-              <span contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+              <span contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${typeof escapeHtmlText === 'function' ? escapeHtmlText(item.text) : item.text}</span>
               ${canEdit ? `<button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
             </div>
             `;
@@ -514,19 +514,19 @@ function buildPackingTab() {
     areasHTML += `
       <div id="packing-area-${aIdx}" class="packing-area-section packing-area-spaced">
         <h2 class="packing-area-heading area-color-var border-color-var" style="color:${area.areaColor}; border-color:${area.areaColor};">
-          <span contenteditable="${canEdit}" onblur="updatePackingAreaName(${aIdx}, this.innerText)">${area.areaName}</span>
+          <span contenteditable="${canEdit}" onblur="updatePackingAreaName(${aIdx}, this.innerText)">${typeof escapeHtmlText === 'function' ? escapeHtmlText(area.areaName) : area.areaName}</span>
         </h2>
         <div class="packing-grid">
           ${area.categories.map((cat, cIdx) => `
             <div class="packing-card">
               <div class="packing-card-header">
-                <h3><span contenteditable="${canEdit}" onblur="updatePackingCat(${aIdx}, ${cIdx}, this.innerText)">${cat.title}</span></h3>
+                <h3><span contenteditable="${canEdit}" onblur="updatePackingCat(${aIdx}, ${cIdx}, this.innerText)">${typeof escapeHtmlText === 'function' ? escapeHtmlText(cat.title) : cat.title}</span></h3>
                 ${canEdit ? `<button class="del-btn" title="Delete Category Block" onclick="deletePackingCat(${aIdx}, ${cIdx})">&times;</button>` : ''}
               </div>
               ${cat.items.map((item, iIdx) => `
                 <div class="packing-item">
                   <input type="checkbox" ${item.done ? 'checked' : ''} onchange="togglePackingItem(event, ${aIdx}, ${cIdx}, ${iIdx})">
-                  <span contenteditable="${canEdit}" onblur="updatePackingItem(${aIdx}, ${cIdx}, ${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+                  <span contenteditable="${canEdit}" onblur="updatePackingItem(${aIdx}, ${cIdx}, ${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${typeof escapeHtmlText === 'function' ? escapeHtmlText(item.text) : item.text}</span>
                   ${canEdit ? `<button class="del-btn" title="Delete Item" onclick="deletePackingItem(${aIdx}, ${cIdx}, ${iIdx})">&times;</button>` : ''}
                 </div>
               `).join('')}
