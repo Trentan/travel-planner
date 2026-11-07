@@ -20,7 +20,28 @@ GitHub Issues and Milestones are the active source of truth.
 
 - Use AI tools and models purposefully (e.g., Anthropic Claude / Gemini 3.6 Flash / Pro depending on task complexity).
 - Delegate heavy codebase research or parallel execution to subagents (`research` / `self`) when context efficiency is needed.
+- Follow the two-layer workflow: **Superpowers** for planning and orchestration, **Ponytail** for coding and minimal implementation (see [Planning & Coding Philosophy](#planning--coding-philosophy-superpowers--ponytail-synergy)).
 - Maintain full alignment with active GitHub issues and avoid drift.
+
+## Planning & Coding Philosophy (Superpowers + Ponytail Synergy)
+
+Per [DietrichGebert/ponytail#49](https://github.com/DietrichGebert/ponytail/issues/49), **Superpowers** and **Ponytail** compose at different layers without conflict:
+
+1. **Planning & Workflow Layer (Superpowers Plugin)**:
+   - Superpowers structures the workflow: requirements exploration (`brainstorming`), step-by-step implementation plans (`writing-plans`), execution tracking (`executing-plans`, `subagent-driven-development`), and systematic debugging (`systematic-debugging`).
+   - For multi-step tasks, new features, or architectural adjustments, write unambiguous implementation plans detailing exact files, explicit interfaces, and concrete test assertions before touching code.
+   - For complex tasks, use `superpowers:subagent-driven-development` to dispatch fresh subagents per task.
+
+2. **Coding & Implementation Layer (Ponytail Plugin - Lazy Senior Dev Mode)**:
+   - Ponytail is the always-on bias governing how code itself is written: **the best code is the code never written**. Solve the entire task with the smallest, simplest working diff (YAGNI).
+   - **Scope Check**: Before writing code, inspect every place the change reaches (callers, tests, fixtures, config, exports).
+   - **Smallest Complete Change**:
+     - Reuse existing codebase helpers, components, and patterns first.
+     - Leverage standard platform / web APIs before adding dependencies.
+     - No premature abstractions, generic wrappers, boilerplate, or "for later" flexibility that nobody asked for.
+     - Fix root causes in shared code once, rather than patching symptoms.
+   - **Planning Pushback**: Ponytail actively questions proposed plans: *"Do you actually need this, or does X cover it?"* Prune unnecessary scope or redundant abstraction from plans before execution starts.
+   - **Review Gate**: Run `/ponytail-review` or apply Ponytail quality review criteria to gate all code changes and subagent outputs before committing or landing them.
 
 ## Token Conservation & Test Execution Rules
 
