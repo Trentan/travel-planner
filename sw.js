@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-planner-v26';
+const CACHE_NAME = 'travel-planner-v27';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -6,8 +6,13 @@ const ASSETS = [
   './icons/icon-512.png',
   './fonts/TwemojiCountryFlags.woff2',
   './dist/tailwind.css',
+  './js/default-data.js',
   './js/utils.js',
+  './js/timezone.js',
+  './js/attachments.js',
   './js/data.js',
+  './js/trip-library.js',
+  './js/cloud-storage.js',
   './js/packing.js',
   './js/dragdrop.js',
   './js/leg-engine.js',
@@ -19,13 +24,16 @@ const ASSETS = [
   './js/tabs.js',
   './js/ai.js',
   './js/guide.js',
+  './js/map.js',
   './js/ui.js',
+  './js/weather.js',
   './js/itinerary.js',
   './js/backup.js',
   './js/auto-stays.js',
   './js/transport.js',
   './js/booking-intake.js',
-  './js/map.js'
+  './js/mappr-import.js',
+  './js/pwa-prompt.js'
 ];
 
 self.addEventListener('install', (e) => {
@@ -46,6 +54,6 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then((response) => response || fetch(e.request))
+    caches.match(e.request, { ignoreSearch: true }).then((response) => response || fetch(e.request))
   );
 });

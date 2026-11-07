@@ -627,6 +627,11 @@ function buildJourneyMap() {
       mainMap = null;
     }
 
+    if (typeof window === 'undefined' || typeof L === 'undefined') {
+      container.innerHTML = '<div class="flex items-center justify-center h-full text-slate-500 text-sm p-4 text-center">🗺️ Map tiles are unavailable while offline. Route and itinerary details remain available in other tabs.</div>';
+      return;
+    }
+
     // Clear placeholder and recreate fresh map
     container.innerHTML = '';
     container.classList.remove('map-placeholder');
