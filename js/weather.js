@@ -178,6 +178,9 @@
     return `2026-${m}-${d}`;
   }
 
+  // In-flight request deduplication map (Issue #646)
+  const inFlightWeatherPromises = new Map();
+
   /**
    * Fetch weather forecast for coordinates from Open-Meteo
    */
@@ -190,23 +193,34 @@
       return cached.data;
     }
 
-    try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
-      const res = await fetch(url);
-      if (!res.ok) return null;
-      const data = await res.json();
-      if (data && data.daily) {
-        memoryWeatherCache[key] = {
-          timestamp: now,
-          data: data.daily
-        };
-        setLocalWeatherCache(memoryWeatherCache);
-        return data.daily;
-      }
-    } catch (err) {
-      // Network error or offline
+    if (inFlightWeatherPromises.has(key)) {
+      return inFlightWeatherPromises.get(key);
     }
-    return null;
+
+    const fetchPromise = (async () => {
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const data = await res.json();
+        if (data && data.daily) {
+          memoryWeatherCache[key] = {
+            timestamp: Date.now(),
+            data: data.daily
+          };
+          setLocalWeatherCache(memoryWeatherCache);
+          return data.daily;
+        }
+      } catch (err) {
+        // Network error or offline
+      } finally {
+        inFlightWeatherPromises.delete(key);
+      }
+      return null;
+    })();
+
+    inFlightWeatherPromises.set(key, fetchPromise);
+    return fetchPromise;
   }
 
   /**
