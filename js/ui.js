@@ -610,7 +610,9 @@ function updateCityNavPullHandle() {
        cityNav.querySelector('.city-nav-btn:not([data-city="all"]):not(.city-nav-add-btn)'))
     : null;
   const cityId = activeBtn ? activeBtn.getAttribute('data-city') : null;
-  const cityName = cityId && typeof getCityNameById === 'function' ? getCityNameById(cityId) : (cityId || '');
+  const cityName = (activeBtn && activeBtn.getAttribute('data-city-name'))
+    || (cityId && typeof getCityNameById === 'function' ? getCityNameById(cityId) : '')
+    || (cityId || '');
   const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(cityName) : String(cityName)).trim() || 'Cities';
   const flagHtml = (typeof getCityFlagHTML === 'function' && cleanCity !== 'Cities')
     ? getCityFlagHTML(cleanCity)
@@ -693,6 +695,7 @@ function setupMobileHeaderScrollCollapse() {
 }
 if (typeof window !== 'undefined') {
   window.updateCityNavPullHandle = updateCityNavPullHandle;
+  window.updateCityNavPullHandleLabel = updateCityNavPullHandle;
   window.setCityNavDrawerExpanded = setCityNavDrawerExpanded;
   window.toggleCityNavDrawer = toggleCityNavDrawer;
   window.setupCityNavPullGesture = setupCityNavPullGesture;

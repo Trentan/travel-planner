@@ -2,11 +2,190 @@ const fs = require('fs');
 const path = require('path');
 const { assert, createVmContext, loadSource, runScriptInContext } = require('./lib/test-helpers');
 
+function createMockDomElement(tag = 'div', attrs = {}) {
+  const classes = new Set();
+  const dataset = {};
+  const children = [];
+  const attributes = { ...attrs };
+
+  if (attrs.class || attrs.className) {
+    (attrs.class || attrs.className).split(/\s+/).filter(Boolean).forEach(c => classes.add(c));
+  }
+
+  const el = {
+    tagName: tag.toUpperCase(),
+    dataset,
+    style: {},
+    children,
+    id: attrs.id || '',
+    get className() {
+      return Array.from(classes).join(' ');
+    },
+    set className(val) {
+      classes.clear();
+      String(val || '').split(/\s+/).filter(Boolean).forEach(c => classes.add(c));
+    },
+    classList: {
+      add(...cs) { cs.forEach(c => classes.add(c)); },
+      remove(...cs) { cs.forEach(c => classes.delete(c)); },
+      toggle(c, force) {
+        if (force === undefined) {
+          if (classes.has(c)) classes.delete(c);
+          else classes.add(c);
+        } else if (force) {
+          classes.add(c);
+        } else {
+          classes.delete(c);
+        }
+      },
+      contains(c) { return classes.has(c); }
+    },
+    setAttribute(k, v) {
+      attributes[k] = String(v);
+      if (k === 'id') el.id = String(v);
+      if (k.startsWith('data-')) {
+        const camel = k.slice(5).replace(/-([a-z])/g, (_, g) => g.toUpperCase());
+        dataset[camel] = String(v);
+      }
+    },
+    getAttribute(k) {
+      return attributes[k] !== undefined ? attributes[k] : (k.startsWith('data-') ? dataset[k.slice(5).replace(/-([a-z])/g, (_, g) => g.toUpperCase())] : null);
+    },
+    hasAttribute(k) {
+      return attributes[k] !== undefined;
+    },
+    removeAttribute(k) {
+      delete attributes[k];
+    },
+    appendChild(child) {
+      children.push(child);
+      child.parentNode = el;
+      return child;
+    },
+    addEventListener() {},
+    removeEventListener() {},
+    querySelector(selector) {
+      return findMatchingNode(el, selector);
+    },
+    querySelectorAll(selector) {
+      return findAllMatchingNodes(el, selector);
+    },
+    getBoundingClientRect() {
+      return { top: 100, bottom: 200, left: 0, right: 100, width: 100, height: 100 };
+    },
+    scrollIntoView() { el._scrolledIntoView = true; },
+    scrollTo() {},
+    _innerHTML: '',
+    get innerHTML() { return el._innerHTML; },
+    set innerHTML(html) {
+      el._innerHTML = html;
+      children.length = 0;
+      const btnMatches = String(html).match(/<button[\s\S]*?<\/button>/gi) || [];
+      btnMatches.forEach(btnHtml => {
+        const btn = createMockDomElement('button');
+        const classMatch = btnHtml.match(/class=["']([^"']*)["']/i);
+        if (classMatch) btn.className = classMatch[1];
+        const dataCityMatch = btnHtml.match(/data-city=["']([^"']*)["']/i);
+        if (dataCityMatch) btn.setAttribute('data-city', dataCityMatch[1]);
+        btn.innerHTML = btnHtml.replace(/<button[^>]*>|<\/button>/gi, '');
+        el.appendChild(btn);
+      });
+    }
+  };
+  return el;
+}
+
+function matchesSelector(el, selector) {
+  if (!el || !selector) return false;
+  const parts = selector.split(',').map(s => s.trim());
+  return parts.some(part => {
+    if (part.startsWith('#') && !part.includes(' ') && !part.includes('.')) {
+      return el.id === part.slice(1);
+    }
+    if (part.startsWith('.') && !part.includes(' ') && !part.includes('[')) {
+      return el.classList.contains(part.slice(1));
+    }
+    const attrMatch = part.match(/^\[([^=\]]+)(?:="([^"]*)")?\]$/);
+    if (attrMatch) {
+      const attr = attrMatch[1];
+      const val = attrMatch[2];
+      if (val !== undefined) return el.getAttribute(attr) === val;
+      return el.hasAttribute(attr);
+    }
+    if (part.includes('.')) {
+      const subParts = part.split('.');
+      const tag = subParts[0];
+      const rest = subParts.slice(1).join('.');
+      if (tag && el.tagName !== tag.toUpperCase()) return false;
+      const cls = rest.split('[')[0];
+      if (cls && !el.classList.contains(cls)) return false;
+      if (rest.includes('[')) {
+        const subAttrMatch = rest.match(/\[([^=\]]+)(?:="([^"]*)")?\]/);
+        if (subAttrMatch) {
+          const attr = subAttrMatch[1];
+          const val = subAttrMatch[2];
+          if (val !== undefined) return el.getAttribute(attr) === val;
+          return el.hasAttribute(attr);
+        }
+      }
+      return true;
+    }
+    return false;
+  });
+}
+
+function findMatchingNode(root, selector) {
+  if (root !== selector && matchesSelector(root, selector)) return root;
+  for (const child of root.children || []) {
+    const res = findMatchingNode(child, selector);
+    if (res) return res;
+  }
+  return null;
+}
+
+function findAllMatchingNodes(root, selector) {
+  const list = [];
+  function search(node) {
+    if (matchesSelector(node, selector)) {
+      list.push(node);
+    }
+    for (const child of node.children || []) {
+      search(child);
+    }
+  }
+  for (const child of root.children || []) {
+    search(child);
+  }
+  return list;
+}
+
 function setupTestContext(extraGlobals = {}) {
+  const elementsById = new Map();
+
+  const getOrCreateElement = (id) => {
+    if (!elementsById.has(id)) {
+      elementsById.set(id, createMockDomElement('div', { id }));
+    }
+    return elementsById.get(id);
+  };
+
   const documentMock = {
-    getElementById: () => null,
-    querySelector: () => null,
-    querySelectorAll: () => [],
+    getElementById: (id) => getOrCreateElement(id),
+    querySelector: (sel) => {
+      for (const el of elementsById.values()) {
+        const match = findMatchingNode(el, sel);
+        if (match) return match;
+      }
+      return null;
+    },
+    querySelectorAll: (sel) => {
+      const results = [];
+      for (const el of elementsById.values()) {
+        results.push(...findAllMatchingNodes(el, sel));
+      }
+      return results;
+    },
+    createElement: (tag) => createMockDomElement(tag),
     addEventListener: () => {},
     removeEventListener: () => {},
     body: {
@@ -14,19 +193,23 @@ function setupTestContext(extraGlobals = {}) {
         contains: () => false,
         add: () => {},
         remove: () => {}
-      }
+      },
+      getAttribute: () => 'itinerary'
     }
   };
+
   const windowMock = {
     document: documentMock,
     addEventListener: () => {},
     removeEventListener: () => {},
     requestAnimationFrame: (cb) => { if (typeof cb === 'function') cb(); },
     cancelAnimationFrame: () => {},
-    scrollTo: () => {},
+    scrollTo: (coords) => { windowMock._lastScrollTo = coords; },
     setTimeout,
-    clearTimeout
+    clearTimeout,
+    currentCityFilter: 'all'
   };
+
   const context = createVmContext({
     document: documentMock,
     window: windowMock,
@@ -34,11 +217,19 @@ function setupTestContext(extraGlobals = {}) {
     removeEventListener: () => {},
     requestAnimationFrame: (cb) => { if (typeof cb === 'function') cb(); },
     cancelAnimationFrame: () => {},
-    scrollTo: () => {},
+    scrollTo: (coords) => { windowMock._lastScrollTo = coords; },
     appData: [],
     citiesData: [],
     journeys: [],
     stays: [],
+    currentCityFilter: 'all',
+    isEditMode: false,
+    getDayJourneys: () => [],
+    getDayTotal: () => 0,
+    localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+    formatCurrency: (v) => String(v || ''),
+    escapeHtmlText: (str) => String(str || ''),
+    escapeCompactText: (str) => String(str || ''),
     ...extraGlobals
   });
   context.window = context;
@@ -46,6 +237,8 @@ function setupTestContext(extraGlobals = {}) {
   context.addEventListener = () => {};
   context.removeEventListener = () => {};
 
+  const utilsCode = loadSource('js/utils.js');
+  runScriptInContext(utilsCode, context, 'js/utils.js');
   const itineraryCode = loadSource('js/itinerary.js');
   runScriptInContext(itineraryCode, context, 'js/itinerary.js');
   return context;
@@ -267,6 +460,161 @@ function runChronologicalLegNavigationTests() {
   const noIdSeq = getChronologicalLegSequence(noIdLegs);
   assert(noIdSeq.length === 1, 'Leg with missing id should be processed');
   assert(noIdSeq[0].legId === 'leg-0', `Missing id should generate fallback "leg-0", got "${noIdSeq[0].legId}"`);
+
+  // ---------------------------------------------------------------------------
+  // 7. buildCityNav() DOM Rendering with 1:1 Leg Sequence and Day-Trip Blips
+  // ---------------------------------------------------------------------------
+  {
+    const navContext = setupTestContext({
+      appData: legsWithDayTrips
+    });
+    const buildCityNav = navContext.buildCityNav || (navContext.window && navContext.window.buildCityNav);
+    assert(typeof buildCityNav === 'function', 'buildCityNav must be defined as a function');
+
+    const nav = navContext.document.getElementById('cityNav');
+    const navList = navContext.document.createElement('div');
+    navList.className = 'city-nav-list';
+    nav.appendChild(navList);
+
+    buildCityNav();
+
+    // Verify leading All button
+    const allBtn = navList.querySelector('[data-city="all"]');
+    assert(allBtn, 'buildCityNav must render a leading [data-city="all"] button');
+    assert(allBtn.classList.contains('active'), 'Leading [data-city="all"] button should be active by default');
+    assert(allBtn.innerHTML.includes('All'), 'Leading button text should include "All"');
+
+    // Verify 1:1 Leg buttons
+    const veronaBtn = navList.querySelector('[data-leg-id="leg-verona"]');
+    assert(veronaBtn, 'buildCityNav must render button for leg-verona');
+    assert(veronaBtn.getAttribute('data-city') === 'leg-verona', 'Verona button data-city must be leg-verona');
+    assert(veronaBtn.getAttribute('data-city-name') === 'Verona', 'Verona button data-city-name must be Verona');
+    assert(veronaBtn.innerHTML.includes('Verona'), 'Verona button innerHTML must include "Verona"');
+
+    const milanBtn = navList.querySelector('[data-leg-id="leg-milan"]');
+    assert(milanBtn, 'buildCityNav must render button for leg-milan');
+    assert(milanBtn.getAttribute('data-city') === 'leg-milan', 'Milan button data-city must be leg-milan');
+
+    // Verify Day-trip blip buttons
+    const blips = navList.querySelectorAll('[data-role="daytrip-blip"]');
+    assert(blips.length === 3, `Expected 3 day-trip blips in navList, got ${blips.length}`);
+
+    const veniceBlip = blips.find(b => b.getAttribute('data-city-name') === 'Venice');
+    assert(veniceBlip, 'Venice day-trip blip must be rendered');
+    assert(veniceBlip.getAttribute('data-parent-leg-id') === 'leg-verona', 'Venice blip parentLegId must be leg-verona');
+    assert(veniceBlip.getAttribute('data-day-index') === '1', 'Venice blip dayIndex must be 1');
+    assert(veniceBlip.innerHTML.includes('↳ Venice'), 'Venice blip must display "↳ Venice"');
+    assert(veniceBlip.className.includes('border-dashed'), 'Venice blip must have dashed border styling');
+
+    const comoBlip = blips.find(b => b.getAttribute('data-city-name') === 'Lake Como');
+    assert(comoBlip, 'Lake Como day-trip blip must be rendered');
+    assert(comoBlip.getAttribute('data-parent-leg-id') === 'leg-milan', 'Lake Como blip parentLegId must be leg-milan');
+    assert(comoBlip.getAttribute('data-day-index') === '0', 'Lake Como blip dayIndex must be 0');
+    assert(comoBlip.innerHTML.includes('↳ Lake Como'), 'Lake Como blip must display "↳ Lake Como"');
+
+    // Verify trailing Add City button
+    const addBtn = navList.querySelector('.city-nav-add-btn');
+    assert(addBtn, 'buildCityNav must render trailing .city-nav-add-btn');
+    assert(addBtn.innerHTML.includes('City'), 'Trailing button must contain "City"');
+  }
+
+  // ---------------------------------------------------------------------------
+  // 8. selectCityFilter() & switchCityFilter() Targeted Leg Selection
+  // ---------------------------------------------------------------------------
+  {
+    const navContext = setupTestContext({
+      appData: legsWithDayTrips
+    });
+    const buildCityNav = navContext.buildCityNav || (navContext.window && navContext.window.buildCityNav);
+    const selectCityFilter = navContext.selectCityFilter || (navContext.window && navContext.window.selectCityFilter);
+    const switchCityFilter = navContext.switchCityFilter || (navContext.window && navContext.window.switchCityFilter);
+
+    assert(typeof switchCityFilter === 'function', 'switchCityFilter must be exported to window');
+
+    const nav = navContext.document.getElementById('cityNav');
+    const navList = navContext.document.createElement('div');
+    navList.className = 'city-nav-list';
+    nav.appendChild(navList);
+
+    navContext.document.getElementById('leg-leg-verona');
+    navContext.document.getElementById('leg-leg-milan');
+
+    buildCityNav();
+
+    // Select Verona leg
+    const veronaBtn = navList.querySelector('[data-leg-id="leg-verona"]');
+    selectCityFilter('leg-verona', veronaBtn);
+
+    assert(navContext.window.currentCityFilter === 'leg-verona', 'currentCityFilter should be "leg-verona"');
+    assert(veronaBtn.classList.contains('active'), 'Verona button should have active class');
+    const allBtn = navList.querySelector('[data-city="all"]');
+    assert(!allBtn.classList.contains('active'), 'All button should no longer have active class');
+
+    // Switch to Milan leg via switchCityFilter
+    switchCityFilter('leg-milan');
+    assert(navContext.window.currentCityFilter === 'leg-milan', 'currentCityFilter should be "leg-milan" after switchCityFilter');
+    const milanBtn = navList.querySelector('[data-leg-id="leg-milan"]');
+    assert(milanBtn.classList.contains('active'), 'Milan button should now have active class');
+    assert(!veronaBtn.classList.contains('active'), 'Verona button should no longer have active class');
+
+    // Reset back to all
+    switchCityFilter('all');
+    assert(navContext.window.currentCityFilter === 'all', 'currentCityFilter should be "all" after resetting');
+    assert(allBtn.classList.contains('active'), 'All button should be active again');
+  }
+
+  // ---------------------------------------------------------------------------
+  // 9. Day-Trip Blip Clicking & Scrolling via scrollToDayCard
+  // ---------------------------------------------------------------------------
+  {
+    const navContext = setupTestContext({
+      appData: legsWithDayTrips
+    });
+    const scrollToDayCard = navContext.scrollToDayCard || (navContext.window && navContext.window.scrollToDayCard);
+    assert(typeof scrollToDayCard === 'function', 'scrollToDayCard must be exported to window');
+
+    const nav = navContext.document.getElementById('cityNav');
+    const navList = navContext.document.createElement('div');
+    navList.className = 'city-nav-list';
+    nav.appendChild(navList);
+
+    const blipBtn = navContext.document.createElement('button');
+    blipBtn.className = 'city-nav-btn city-nav-blip-btn';
+    blipBtn.setAttribute('data-role', 'daytrip-blip');
+    navList.appendChild(blipBtn);
+
+    navContext.document.getElementById('day-0-1');
+    scrollToDayCard('leg-verona', 0, 1, blipBtn);
+
+    assert(blipBtn.classList.contains('active'), 'blipBtn should receive active class on click');
+  }
+
+  // ---------------------------------------------------------------------------
+  // 10. Scrollspy / Active State Sync via updateCityNavActiveState
+  // ---------------------------------------------------------------------------
+  {
+    const navContext = setupTestContext({
+      appData: legsWithDayTrips
+    });
+    const buildCityNav = navContext.buildCityNav || (navContext.window && navContext.window.buildCityNav);
+    const updateCityNavActiveState = navContext.updateCityNavActiveState || (navContext.window && navContext.window.updateCityNavActiveState);
+    assert(typeof updateCityNavActiveState === 'function', 'updateCityNavActiveState must be exported to window');
+
+    const nav = navContext.document.getElementById('cityNav');
+    const navList = navContext.document.createElement('div');
+    navList.className = 'city-nav-list';
+    nav.appendChild(navList);
+
+    buildCityNav();
+
+    // Trigger updateCityNavActiveState for leg-milan
+    updateCityNavActiveState('leg-milan');
+
+    const milanBtn = navList.querySelector('[data-leg-id="leg-milan"]');
+    assert(milanBtn && milanBtn.classList.contains('active'), 'Milan button should be marked active by updateCityNavActiveState');
+    const allBtn = navList.querySelector('[data-city="all"]');
+    assert(!allBtn.classList.contains('active'), 'All button should not be active');
+  }
 
   console.log('✅ ALL 1:1 Chronological Leg Navigation unit tests passed cleanly!');
 }
