@@ -4503,11 +4503,14 @@ function getChronologicalLegSequence(customAppData) {
     const legId = leg.id || `leg-${legIndex}`;
     const displayLabel = formatLegNavLabel(leg, cityName, currentVisit, totalVisits);
     const flag = (typeof getCityFlagHTML === 'function') ? getCityFlagHTML(cityName) : '';
+    const cityObj = (typeof getCityByName === 'function') ? getCityByName(cityName) : null;
+    const cityId = leg.cityId || cityObj?.id || legId;
 
     // Main leg entry
     sequence.push({
       type: 'leg',
       legId,
+      cityId,
       legIndex,
       cityName,
       displayLabel,
@@ -5091,15 +5094,41 @@ function buildCityNav() {
     sequence.forEach(item => {
       if (item.type === 'leg') {
         const btn = document.createElement('button');
-        btn.setAttribute('data-city', item.legId);
+
+        const matchedCity = (typeof getCityByName === 'function') ? getCityByName(item.cityName) : null;
+        const cityEntityId = item.leg?.cityId || (matchedCity && matchedCity.id) || '';
+        const filterSlug = String(filter || '').replace(/^(city|leg)-/, '').toLowerCase();
+        const legSlug = String(item.legId || '').replace(/^(city|leg)-/, '').toLowerCase();
+
+        const isActive = filter === item.legId ||
+          (cityEntityId && filter === cityEntityId) ||
+          (filter && (
+            filter.toLowerCase() === String(item.cityName || '').toLowerCase() ||
+            (filterSlug && filterSlug === legSlug)
+          ));
+
+        const effectiveCityAttr = (cityEntityId && (filter === cityEntityId || !String(item.legId).startsWith('city-')))
+          ? cityEntityId
+          : item.legId;
+
+        btn.setAttribute('data-city', effectiveCityAttr);
         btn.setAttribute('data-leg-id', item.legId);
         btn.setAttribute('data-city-name', item.cityName);
+        if (cityEntityId) {
+          btn.setAttribute('data-canonical-city-id', cityEntityId);
+        }
 
-        const isActive = filter === item.legId || (filter && (filter === item.cityName || filter === item.leg?.cityId));
         btn.className = 'city-nav-btn px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700' + (isActive ? ' active' : '');
         btn.style.borderLeft = `3px solid ${item.colour || '#0ea5e9'}`;
 
-        const currentDayHtml = ((currentTripPosition?.leg?.id === item.legId) || (currentTripPosition?.cityId === item.legId)) && currentDayLabel
+        const isTodayTarget = currentTripPosition && (
+          currentTripPosition.leg?.id === item.legId ||
+          currentTripPosition.cityId === item.legId ||
+          (cityEntityId && currentTripPosition.cityId === cityEntityId) ||
+          (currentTripPosition.cityName && currentTripPosition.cityName.toLowerCase() === item.cityName.toLowerCase())
+        );
+
+        const currentDayHtml = isTodayTarget && currentDayLabel
           ? `<span class="city-nav-current-day">${safeEscape(currentDayLabel)}</span>`
           : '';
         const flagHtml = item.flag || (typeof getCityFlagHTML === 'function' ? getCityFlagHTML(item.cityName) : '');
