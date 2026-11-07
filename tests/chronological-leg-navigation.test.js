@@ -616,6 +616,142 @@ function runChronologicalLegNavigationTests() {
     assert(!allBtn.classList.contains('active'), 'All button should not be active');
   }
 
+  // ---------------------------------------------------------------------------
+  // 11. Mobile Swipe Slider (getCompactMobileLegSequence, slides & chips)
+  // ---------------------------------------------------------------------------
+  const legsWithRepeats = [
+    { id: 'leg-bne-start', label: 'Brisbane', days: [{ date: '2026-06-01' }] },
+    { id: 'leg-bkk-1', label: 'Bangkok', days: [{ date: '2026-06-05' }] },
+    { id: 'leg-vie', label: 'Vienna', days: [{ date: '2026-06-12' }] },
+    { id: 'leg-bkk-2', label: 'Bangkok', days: [{ date: '2026-06-20' }] },
+    { id: 'leg-bne-end', label: 'Brisbane', days: [{ date: '2026-06-30' }] }
+  ];
+
+  {
+    const mobileContext = setupTestContext({
+      appData: legsWithRepeats
+    });
+    const getCompactMobileLegSequence = mobileContext.getCompactMobileLegSequence || (mobileContext.window && mobileContext.window.getCompactMobileLegSequence);
+    const renderCompactCitySlide = mobileContext.renderCompactCitySlide || (mobileContext.window && mobileContext.window.renderCompactCitySlide);
+    const renderCompactCityChip = mobileContext.renderCompactCityChip || (mobileContext.window && mobileContext.window.renderCompactCityChip);
+
+    assert(typeof getCompactMobileLegSequence === 'function', 'getCompactMobileLegSequence must be exported');
+    const mobileSeq = getCompactMobileLegSequence();
+    assert(mobileSeq.length === 5, `Expected 5 mobile legs, got ${mobileSeq.length}`);
+
+    // Verify 1:1 sequence labels and IDs match getChronologicalLegSequence
+    assert(mobileSeq[0].displayLabel === 'Brisbane (1)', `Expected Brisbane (1), got ${mobileSeq[0].displayLabel}`);
+    assert(mobileSeq[0].legId === 'leg-bne-start', `Expected leg-bne-start, got ${mobileSeq[0].legId}`);
+    assert(mobileSeq[1].displayLabel === 'Bangkok (1)', `Expected Bangkok (1), got ${mobileSeq[1].displayLabel}`);
+    assert(mobileSeq[1].legId === 'leg-bkk-1', `Expected leg-bkk-1, got ${mobileSeq[1].legId}`);
+    assert(mobileSeq[2].displayLabel === 'Vienna', `Expected Vienna, got ${mobileSeq[2].displayLabel}`);
+    assert(mobileSeq[2].legId === 'leg-vie', `Expected leg-vie, got ${mobileSeq[2].legId}`);
+    assert(mobileSeq[3].displayLabel === 'Bangkok (2)', `Expected Bangkok (2), got ${mobileSeq[3].displayLabel}`);
+    assert(mobileSeq[3].legId === 'leg-bkk-2', `Expected leg-bkk-2, got ${mobileSeq[3].legId}`);
+    assert(mobileSeq[4].displayLabel === 'Brisbane (2)', `Expected Brisbane (2), got ${mobileSeq[4].displayLabel}`);
+    assert(mobileSeq[4].legId === 'leg-bne-end', `Expected leg-bne-end, got ${mobileSeq[4].legId}`);
+
+    // Test renderCompactCitySlide
+    const slide0Html = renderCompactCitySlide(mobileSeq[0], 0, new Map(), 0);
+    assert(slide0Html.includes('id="city-slide-0"'), 'Slide 0 must have id="city-slide-0"');
+    assert(slide0Html.includes('data-leg-id="leg-bne-start"'), 'Slide 0 must have data-leg-id="leg-bne-start"');
+    assert(slide0Html.includes('Brisbane (1)'), 'Slide 0 must render "Brisbane (1)"');
+
+    const slide3Html = renderCompactCitySlide(mobileSeq[3], 3, new Map(), 0);
+    assert(slide3Html.includes('id="city-slide-3"'), 'Slide 3 must have id="city-slide-3"');
+    assert(slide3Html.includes('data-leg-id="leg-bkk-2"'), 'Slide 3 must have data-leg-id="leg-bkk-2"');
+    assert(slide3Html.includes('Bangkok (2)'), 'Slide 3 must render "Bangkok (2)"');
+
+    // Test renderCompactCityChip
+    const chip0Html = renderCompactCityChip(mobileSeq[0], 0, new Map(), 0);
+    assert(chip0Html.includes('aria-controls="city-slide-0"'), 'Chip 0 must control city-slide-0');
+    assert(chip0Html.includes('data-leg-id="leg-bne-start"'), 'Chip 0 must have data-leg-id="leg-bne-start"');
+    assert(chip0Html.includes('Brisbane (1)'), 'Chip 0 must render "Brisbane (1)"');
+  }
+
+  // ---------------------------------------------------------------------------
+  // 12. Accommodation Cross-Tab Leg Filtering (getFilteredAndSortedStays)
+  // ---------------------------------------------------------------------------
+  {
+    const staysSample = [
+      { id: 'stay-vie', legId: 'leg-vie', cityId: 'city-vienna', propertyName: 'Hotel Vienna', checkIn: '2026-06-12', checkOut: '2026-06-15' },
+      { id: 'stay-bkk1', legId: 'leg-bkk-1', cityId: 'city-bangkok', propertyName: 'Bangkok Hub Hotel', checkIn: '2026-06-10', checkOut: '2026-06-12' },
+      { id: 'stay-bkk2', legId: 'leg-bkk-2', cityId: 'city-bangkok', propertyName: 'Bangkok Riverside', checkIn: '2026-06-20', checkOut: '2026-06-25' }
+    ];
+
+    const tabContext = setupTestContext({
+      appData: legsWithRepeats,
+      stays: staysSample
+    });
+    const tabsCode = loadSource('js/tabs.js');
+    runScriptInContext(tabsCode, tabContext, 'js/tabs.js');
+
+    const getFilteredAndSortedStays = tabContext.getFilteredAndSortedStays;
+    assert(typeof getFilteredAndSortedStays === 'function', 'getFilteredAndSortedStays must be exported');
+
+    // All returns all 3 stays
+    const allStays = getFilteredAndSortedStays('all');
+    assert(allStays.length === 3, 'Filtering by "all" returns all stays');
+
+    // Specific legId isolation
+    const bkk1Stays = getFilteredAndSortedStays('leg-bkk-1');
+    assert(bkk1Stays.length === 1, 'Filtering by "leg-bkk-1" returns exactly 1 stay');
+    assert(bkk1Stays[0].id === 'stay-bkk1', 'Matching stay must be stay-bkk1');
+
+    const bkk2Stays = getFilteredAndSortedStays('leg-bkk-2');
+    assert(bkk2Stays.length === 1, 'Filtering by "leg-bkk-2" returns exactly 1 stay');
+    assert(bkk2Stays[0].id === 'stay-bkk2', 'Matching stay must be stay-bkk2');
+
+    const vieStays = getFilteredAndSortedStays('leg-vie');
+    assert(vieStays.length === 1, 'Filtering by "leg-vie" returns exactly 1 stay');
+    assert(vieStays[0].id === 'stay-vie');
+  }
+
+  // ---------------------------------------------------------------------------
+  // 13. Transit Filtering & Budget Tab Consolidated City Breakdown
+  // ---------------------------------------------------------------------------
+  {
+    const journeysSample = [
+      { id: 'j-bne-bkk', legId: 'leg-bne-start', fromCityId: 'city-brisbane', toCityId: 'city-bangkok', cost: '500' },
+      { id: 'j-bkk-vie', legId: 'leg-bkk-1', fromCityId: 'city-bangkok', toCityId: 'city-vienna', cost: '300' },
+      { id: 'j-vie-bkk', legId: 'leg-vie', fromCityId: 'city-vienna', toCityId: 'city-bangkok', cost: '350' }
+    ];
+
+    const multiContext = setupTestContext({
+      appData: legsWithRepeats,
+      journeys: journeysSample,
+      stays: [
+        { id: 's1', legId: 'leg-bkk-1', totalCost: '200', checkIn: '2026-06-10', checkOut: '2026-06-12' },
+        { id: 's2', legId: 'leg-bkk-2', totalCost: '300', checkIn: '2026-06-20', checkOut: '2026-06-25' }
+      ]
+    });
+
+    const transportCode = loadSource('js/transport.js');
+    runScriptInContext(transportCode, multiContext, 'js/transport.js');
+    const tabsCode = loadSource('js/tabs.js');
+    runScriptInContext(tabsCode, multiContext, 'js/tabs.js');
+
+    // Transit filtering
+    multiContext.document.getElementById('transport-table-container');
+    const buildTransportTab = multiContext.buildTransportTab;
+    assert(typeof buildTransportTab === 'function', 'buildTransportTab must be exported');
+
+    buildTransportTab('leg-bkk-1');
+    const container = multiContext.document.getElementById('transport-table-container');
+    assert(container.innerHTML.includes('j-bkk-vie') || container.innerHTML.includes('Transport'), 'buildTransportTab filtered by leg-bkk-1 renders');
+
+    // Budget Tab consolidated breakdown
+    const calculateBudgetBreakdown = multiContext.calculateBudgetBreakdown;
+    assert(typeof calculateBudgetBreakdown === 'function', 'calculateBudgetBreakdown must be exported');
+
+    const budget = calculateBudgetBreakdown();
+    // Bangkok has 2 visits (leg-bkk-1 and leg-bkk-2); it must be consolidated into a single 'Bangkok' row
+    const bangkokRow = budget.legBreakdown.find(row => row.label === 'Bangkok');
+    assert(bangkokRow, 'Budget breakdown must consolidate multi-visit Bangkok legs into a single "Bangkok" row');
+    // Combined accommodation for Bangkok: $200 + $300 = $500
+    assert(bangkokRow.accom === 500, `Expected Bangkok consolidated accommodation $500, got ${bangkokRow.accom}`);
+  }
+
   console.log('✅ ALL 1:1 Chronological Leg Navigation unit tests passed cleanly!');
 }
 

@@ -136,7 +136,64 @@ function getFilteredAndSortedStays(cityFilter = null) {
   const staysData = (typeof stays !== 'undefined') ? stays : [];
   let filteredStays = staysData;
   if (cityFilter && cityFilter !== 'all') {
-    filteredStays = staysData.filter(s => s.cityId === cityFilter);
+    const filterStr = String(cityFilter).trim();
+    const filterLower = filterStr.toLowerCase();
+
+    // Look for matching leg in appData
+    const targetLeg = (typeof appData !== 'undefined' && Array.isArray(appData))
+      ? (appData.find(l => l && (String(l.id || '') === filterStr || String(l.cityId || '') === filterStr)) ||
+         appData.find(l => l && String(l.id || '').replace(/^leg-/, '') === filterStr.replace(/^leg-/, '')) ||
+         appData.find(l => l && (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(l.label || '').toLowerCase() === filterLower : false)))
+      : null;
+
+    let legStartDate = '';
+    let legEndDate = '';
+    if (targetLeg) {
+      if (Array.isArray(targetLeg.days) && targetLeg.days.length > 0) {
+        legStartDate = targetLeg.days[0]?.date || '';
+        legEndDate = targetLeg.days[targetLeg.days.length - 1]?.date || '';
+      }
+      if (!legStartDate && targetLeg.startDate) legStartDate = targetLeg.startDate;
+      if (!legEndDate && targetLeg.endDate) legEndDate = targetLeg.endDate;
+    }
+
+    filteredStays = staysData.filter(s => {
+      if (!s) return false;
+      // 1. Direct legId or inferred legId match
+      if (s.legId && (String(s.legId) === filterStr || (targetLeg && String(s.legId) === String(targetLeg.id)))) return true;
+      if (s._inferredLegId && (String(s._inferredLegId) === filterStr || (targetLeg && String(s._inferredLegId) === String(targetLeg.id)))) return true;
+
+      // 2. If targetLeg is resolved, check if stay checkIn falls within that leg's date range
+      if (targetLeg && legStartDate && s.checkIn) {
+        const sCheckIn = String(s.checkIn).slice(0, 10);
+        const sCheckOut = s.checkOut ? String(s.checkOut).slice(0, 10) : sCheckIn;
+        const maxEnd = legEndDate || legStartDate;
+        const dateOverlap = (sCheckIn <= maxEnd && sCheckOut > legStartDate) || (sCheckIn === maxEnd);
+        if (dateOverlap) {
+          if (s.legId && (String(s.legId) === filterStr || String(s.legId) === String(targetLeg.id))) return true;
+          if (s.cityId) {
+            const legCityId = targetLeg.cityId || targetLeg.id;
+            const legCleanName = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(targetLeg.label || '') : '').toLowerCase();
+            const stayCityName = (s.cityName || (typeof getCityNameById === 'function' ? getCityNameById(s.cityId) : '') || '').toLowerCase();
+            if (s.cityId === legCityId || s.cityId.replace(/^city-/, '') === String(legCityId).replace(/^(city|leg)-/, '')) return true;
+            if (legCleanName && stayCityName && legCleanName === stayCityName) return true;
+            return false;
+          }
+          return true;
+        }
+      }
+
+      // 3. Fallback: city ID or city name match
+      if (s.cityId && (String(s.cityId) === filterStr || String(s.cityId).toLowerCase() === filterLower)) return true;
+      if (s.cityId && targetLeg && targetLeg.cityId && String(s.cityId) === String(targetLeg.cityId)) return true;
+
+      const cName = s.cityName || (typeof getCityNameById === 'function' ? getCityNameById(s.cityId) : '');
+      if (cName && (cName.toLowerCase() === filterLower || (targetLeg && targetLeg.label && targetLeg.label.toLowerCase().includes(cName.toLowerCase())))) {
+        return true;
+      }
+
+      return false;
+    });
   }
   return filteredStays.slice().sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
 }
@@ -207,7 +264,7 @@ function renderAccomMobileView(sortedStays) {
       detailsOpen: true
     });
     slidesHtml.push(`
-      <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(stay.cityId || '')}" data-to-location="${escapeHtmlText(cityName || '')}">
+      <div id="stay-slide-${index}" class="mobile-swipe-slide stay-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-leg-id="${escapeHtmlText(stay.legId || stay._inferredLegId || '')}" data-city-id="${escapeHtmlText(stay.cityId || '')}" data-to-location="${escapeHtmlText(cityName || '')}">
         ${cardHtml}
       </div>
     `);
@@ -397,6 +454,15 @@ function getStayOverlapDays(stay, leg) {
 function findBestStayLegIndex(stay, legs) {
   if (!stay || !Array.isArray(legs) || legs.length === 0) return -1;
 
+  if (stay.legId) {
+    const directIdx = legs.findIndex(leg => leg && (leg.id === stay.legId || String(leg.id).replace(/^leg-/, '') === String(stay.legId).replace(/^leg-/, '')));
+    if (directIdx >= 0) return directIdx;
+  }
+  if (stay._inferredLegId) {
+    const inferredIdx = legs.findIndex(leg => leg && (leg.id === stay._inferredLegId || String(leg.id).replace(/^leg-/, '') === String(stay._inferredLegId).replace(/^leg-/, '')));
+    if (inferredIdx >= 0) return inferredIdx;
+  }
+
   let bestIndex = -1;
   let bestOverlap = 0;
 
@@ -578,6 +644,9 @@ function calculateBudgetBreakdown() {
     }
   });
 
+  const consolidatedLegs = [];
+  const cityIndexMap = new Map();
+
   appData.forEach((leg, legIndex) => {
     let legTrans = 0, legAccom = 0, legAct = 0;
     const legDestinations = [];
@@ -616,10 +685,43 @@ function calculateBudgetBreakdown() {
 
     const legTotal = legTrans + legAccom + legAct;
     if (legTotal > 0) {
-      const displayLabel = leg.label || (legDestinations.length > 0 ? legDestinations[legDestinations.length - 1] : 'Trip Leg');
-      legBreakdown.push({ label: displayLabel, colour: leg.colour, trans: legTrans, accom: legAccom, act: legAct, total: legTotal });
-      totalTrans += legTrans; totalAccom += legAccom; totalAct += legAct;
+      const rawLabel = leg.label || (legDestinations.length > 0 ? legDestinations[legDestinations.length - 1] : 'Trip Leg');
+      const cleanCity = (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(rawLabel) : '') ||
+                        (typeof getLegPrimaryCityName === 'function' ? getLegPrimaryCityName(leg) : '') ||
+                        rawLabel;
+      const groupKey = cleanCity.toLowerCase().trim();
+
+      if (cityIndexMap.has(groupKey)) {
+        const existingIdx = cityIndexMap.get(groupKey);
+        const existing = consolidatedLegs[existingIdx];
+        existing.trans += legTrans;
+        existing.accom += legAccom;
+        existing.act += legAct;
+        existing.total += legTotal;
+        existing.label = cleanCity;
+      } else {
+        const item = {
+          label: rawLabel,
+          colour: leg.colour,
+          trans: legTrans,
+          accom: legAccom,
+          act: legAct,
+          total: legTotal,
+          _cleanCity: cleanCity
+        };
+        cityIndexMap.set(groupKey, consolidatedLegs.length);
+        consolidatedLegs.push(item);
+      }
+
+      totalTrans += legTrans;
+      totalAccom += legAccom;
+      totalAct += legAct;
     }
+  });
+
+  consolidatedLegs.forEach(item => {
+    delete item._cleanCity;
+    legBreakdown.push(item);
   });
 
   const journeyGroups = journeysData.reduce((groups, journey) => {
