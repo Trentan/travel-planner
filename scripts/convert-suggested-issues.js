@@ -180,7 +180,8 @@ async function main() {
     }
 
     const content = fs.readFileSync(customFile, 'utf8');
-    const sections = splitMultiIssueFile(content);
+    const { metadata } = parseFrontmatter(content);
+    const sections = (metadata && metadata.title) ? [content] : splitMultiIssueFile(content);
 
     if (sections.length > 1) {
       console.log(`Detected multi-issue file with ${sections.length} suggestions.`);
