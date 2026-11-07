@@ -4284,6 +4284,224 @@ function getCityStayCandidates(citiesMap) {
   return candidates;
 }
 
+// Strip country flags and emojis while preserving text and parentheses
+function stripEmojiAndFlags(text) {
+  if (!text || typeof text !== 'string') return '';
+  return text
+    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+    .replace(/\p{Extended_Pictographic}/gu, '')
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '')
+    .trim();
+}
+
+// Extract primary city name from a leg, handling route indicators and fallbacks
+function getLegPrimaryCityName(leg) {
+  if (!leg) return '';
+  let raw = '';
+  if (typeof leg.label === 'string' && leg.label.trim()) {
+    raw = leg.label.trim();
+  } else if (leg.cityId) {
+    const cData = (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) ? citiesData : [];
+    const found = cData.find(c => c && (c.id === leg.cityId || c.id === `city-${leg.cityId}` || `city-${c.id}` === leg.cityId));
+    if (found && found.name) {
+      raw = found.name;
+    } else {
+      raw = String(leg.cityId).replace(/^(city|leg)-/, '');
+    }
+  } else if (Array.isArray(leg.days) && leg.days.length > 0 && leg.days[0]) {
+    raw = leg.days[0].to || leg.days[0].from || '';
+  }
+
+  // Strip flight route indicators (e.g. "BNE -> TPE", "Brisbane → Taipei", "BNE to TPE")
+  if (/(\s*(?:->|→|-->|=>|\bto\b)\s*)/i.test(raw)) {
+    const parts = raw.split(/\s*(?:->|→|-->|=>|\bto\b)\s*/i);
+    if (parts.length > 1 && parts[parts.length - 1].trim()) {
+      raw = parts[parts.length - 1].trim();
+    }
+  }
+
+  let cleaned = (typeof cleanCityNavLabel === 'function') ? cleanCityNavLabel(raw) : raw;
+  if (!cleaned && leg.cityId) {
+    const cData = (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) ? citiesData : [];
+    const found = cData.find(c => c && (c.id === leg.cityId || c.id === `city-${leg.cityId}` || `city-${c.id}` === leg.cityId));
+    if (found && found.name) {
+      cleaned = (typeof cleanCityNavLabel === 'function') ? cleanCityNavLabel(found.name) : found.name;
+    } else {
+      cleaned = String(leg.cityId).replace(/^(city|leg)-/, '');
+    }
+  }
+  if (!cleaned && Array.isArray(leg.days) && leg.days.length > 0 && leg.days[0]) {
+    const fallbackDayCity = leg.days[0].to || leg.days[0].from || '';
+    cleaned = (typeof cleanCityNavLabel === 'function') ? cleanCityNavLabel(fallbackDayCity) : fallbackDayCity;
+  }
+  return (cleaned || '').trim();
+}
+
+// Format navigation display label with visit numbering or preserved custom descriptors
+function formatLegNavLabel(leg, cityName, currentVisit, totalVisits) {
+  const cleanLabel = stripEmojiAndFlags(leg.label || '');
+  if (totalVisits > 1) {
+    const hasCustomDescriptor = cleanLabel && (
+      /\(\d+\)$/.test(cleanLabel) ||
+      /\([^)]+\)/.test(cleanLabel) ||
+      (cleanLabel.toLowerCase() !== cityName.toLowerCase() && cleanLabel.length > cityName.length)
+    );
+    if (hasCustomDescriptor) {
+      return cleanLabel;
+    }
+    return `${cityName} (${currentVisit})`;
+  } else {
+    // totalVisits === 1
+    const hasNonNumericCustomDescriptor = cleanLabel && (
+      /\([^\d)]+\)/.test(cleanLabel) ||
+      (cleanLabel.toLowerCase() !== cityName.toLowerCase() && cleanLabel.length > cityName.length)
+    );
+    if (hasNonNumericCustomDescriptor) {
+      return cleanLabel;
+    }
+    return cityName;
+  }
+}
+
+// Extract daytime excursion blips from a leg's days
+function extractDayTripBlips(leg, legIndex) {
+  if (!leg || !Array.isArray(leg.days) || leg.days.length === 0) return [];
+  const blips = [];
+  const seenForLeg = new Set();
+  const legId = leg.id || `leg-${legIndex}`;
+
+  leg.days.forEach((day, dayIndex) => {
+    if (!day) return;
+    let destinationCity = '';
+
+    // a) day.dayTrip (string, e.g. "Venice")
+    if (typeof day.dayTrip === 'string' && day.dayTrip.trim()) {
+      destinationCity = day.dayTrip.trim();
+    }
+
+    // b) day.isDayTrip === true (use day.to or day.title)
+    if (!destinationCity && day.isDayTrip) {
+      destinationCity = (day.to || day.title || '').trim();
+    }
+
+    // c) Any activity inside day.activities, day.items, or day.activityItems
+    if (!destinationCity) {
+      const activities = [
+        ...(Array.isArray(day.activityItems) ? day.activityItems : []),
+        ...(Array.isArray(day.activities) ? day.activities : []),
+        ...(Array.isArray(day.items) ? day.items : [])
+      ];
+
+      for (const act of activities) {
+        if (!act) continue;
+        const text = typeof act === 'string' ? act : (act.text || act.title || act.name || act.desc || '');
+        const dayTripMatch = text.match(/day\s*trip\s*(?:to\s*)?([a-zA-Z\s]+)/i);
+
+        if (dayTripMatch && dayTripMatch[1]) {
+          destinationCity = dayTripMatch[1].trim();
+          break;
+        } else if (act.category === 'daytrip' || act.isDayTrip) {
+          destinationCity = (act.cityName || act.to || act.destination || text).trim();
+          break;
+        }
+      }
+    }
+
+    if (destinationCity) {
+      const cleaned = (typeof cleanCityNavLabel === 'function')
+        ? cleanCityNavLabel(destinationCity)
+        : destinationCity;
+      const finalCity = cleaned || destinationCity;
+      const key = `${dayIndex}-${finalCity.toLowerCase()}`;
+      if (!seenForLeg.has(key)) {
+        seenForLeg.add(key);
+        blips.push({
+          type: 'daytrip-blip',
+          parentLegId: legId,
+          parentLegIndex: legIndex,
+          dayIndex,
+          cityName: finalCity,
+          displayLabel: `↳ ${finalCity}`,
+          colour: leg.colour || '#0ea5e9',
+          day
+        });
+      }
+    }
+  });
+
+  return blips;
+}
+
+/**
+ * Generates a 1:1 chronological leg sequence for itinerary navigation.
+ * Each overnight leg in appData maps to a distinct item in travel order,
+ * with repeat visits cleanly numbered and daytime excursions inserted as inline blips.
+ *
+ * @param {Array} [customAppData] - Optional itinerary array (defaults to global appData)
+ * @returns {Array<Object>} 1:1 sequence of leg and daytrip-blip navigation items
+ */
+function getChronologicalLegSequence(customAppData) {
+  const targetLegs = Array.isArray(customAppData)
+    ? customAppData
+    : ((typeof appData !== 'undefined' && Array.isArray(appData)) ? appData : []);
+
+  if (!Array.isArray(targetLegs) || targetLegs.length === 0) {
+    return [];
+  }
+
+  // 1. Count total overnight occurrences for each normalized city name
+  const cityVisitCounts = new Map();
+  targetLegs.forEach(leg => {
+    const cName = getLegPrimaryCityName(leg);
+    if (cName) {
+      const key = cName.toLowerCase();
+      cityVisitCounts.set(key, (cityVisitCounts.get(key) || 0) + 1);
+    }
+  });
+
+  // 2. Build 1:1 navigation sequence with visit numbering and inline day-trip blips
+  const visitTracker = new Map();
+  const sequence = [];
+
+  targetLegs.forEach((leg, legIndex) => {
+    const cityName = getLegPrimaryCityName(leg);
+    const key = cityName.toLowerCase();
+    const totalVisits = cityVisitCounts.get(key) || 1;
+    const currentVisit = (visitTracker.get(key) || 0) + 1;
+    visitTracker.set(key, currentVisit);
+
+    const legId = leg.id || `leg-${legIndex}`;
+    const displayLabel = formatLegNavLabel(leg, cityName, currentVisit, totalVisits);
+    const flag = (typeof getCityFlagHTML === 'function') ? getCityFlagHTML(cityName) : '';
+
+    // Main leg entry
+    sequence.push({
+      type: 'leg',
+      legId,
+      legIndex,
+      cityName,
+      displayLabel,
+      flag,
+      colour: leg.colour || '#0ea5e9',
+      isStart: legIndex === 0,
+      isFinish: legIndex === targetLegs.length - 1,
+      leg
+    });
+
+    // Inline daytime excursion blips immediately following parent leg
+    const dayTripBlips = extractDayTripBlips(leg, legIndex);
+    dayTripBlips.forEach(blip => {
+      sequence.push(blip);
+    });
+  });
+
+  return sequence;
+}
+
+if (typeof window !== 'undefined') {
+  window.getChronologicalLegSequence = getChronologicalLegSequence;
+}
+
 // Get cities in travel order based on trip legs
 function getCitiesInTravelOrder() {
   if (!Array.isArray(appData) || appData.length === 0) {
@@ -5065,6 +5283,7 @@ window.getCurrentTripPosition = getCurrentTripPosition;
 window.applyCurrentTripPositionForTab = applyCurrentTripPositionForTab;
 window.initializeItineraryPositionForToday = initializeItineraryPositionForToday;
 window.getCustomDayTitle = getCustomDayTitle;
+window.getChronologicalLegSequence = getChronologicalLegSequence;
 
 // Expand to show a city in the itinerary
 function expandToCity(cityId) {
