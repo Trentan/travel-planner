@@ -44,6 +44,204 @@
     if (dropdown) dropdown.hidden = true;
   };
 
+  // Mobile Bottom-Sheet Trip Switcher Handler (Issue #634)
+  window.handleTripSwitcherTap = function(event) {
+    if (event) {
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+    }
+    const isMobile = (typeof window.isMobileViewport === 'function' && window.isMobileViewport()) ||
+      (typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 768px)').matches);
+
+    if (isMobile) {
+      window.openTripBottomSheet();
+    } else {
+      window.toggleTripDropdown(event);
+    }
+  };
+
+  // Open Mobile Bottom-Sheet Trip Switcher
+  window.openTripBottomSheet = async function() {
+    const sheet = document.getElementById('tripBottomSheet');
+    if (!sheet) return;
+    sheet.classList.add('open');
+    sheet.setAttribute('aria-hidden', 'false');
+    sheet.removeAttribute('inert');
+    document.body.classList.add('trip-bottom-sheet-open');
+    await window.renderTripBottomSheet();
+    if (typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected()) {
+      if (typeof window.syncAllTripsFromGoogleDrive === 'function') {
+        window.syncAllTripsFromGoogleDrive(true).then(() => {
+          window.renderTripBottomSheet();
+        }).catch(err => {
+          console.warn('Failed to sync trips in bottom sheet:', err);
+        });
+      }
+    }
+  };
+
+  // Close Mobile Bottom-Sheet Trip Switcher
+  window.closeTripBottomSheet = function(event) {
+    if (event && typeof event.stopPropagation === 'function') {
+      event.stopPropagation();
+    }
+    const sheet = document.getElementById('tripBottomSheet');
+    if (!sheet) return;
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    sheet.setAttribute('inert', '');
+    document.body.classList.remove('trip-bottom-sheet-open');
+  };
+
+  // Render Mobile Bottom-Sheet Switcher with Top 3 Recent Trips
+  window.renderTripBottomSheet = async function() {
+    const listEl = document.getElementById('tripBottomSheetRecentList');
+    if (!listEl) return;
+    if (typeof window.getAllTripsFromIndexedDB !== 'function') return;
+
+    const trips = await window.getAllTripsFromIndexedDB();
+    const cloudFiles = window.__gdriveCloudFiles || [];
+    const activeTripId = window.getActiveTripId ? window.getActiveTripId() : 'trip_default';
+    const isDriveConnected = typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected();
+    const fileMap = typeof window.getGDriveFileMap === 'function' ? window.getGDriveFileMap() : {};
+
+    const cloudFileIdMap = new Map();
+    cloudFiles.forEach(cf => cloudFileIdMap.set(cf.id, cf));
+
+    const cloudFileNameMap = new Map();
+    cloudFiles.forEach(cf => cloudFileNameMap.set(cf.name.toLowerCase(), cf));
+
+    const unifiedList = [];
+    const matchedCloudFileIds = new Set();
+
+    trips.forEach(trip => {
+      const rawTitle = trip.title || (trip.data && trip.data.meta && trip.data.meta.title) || 'My Trip';
+      const cleanFilename = typeof window.formatHumanFilename === 'function'
+        ? window.formatHumanFilename(trip)
+        : `${rawTitle.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_')}.json`;
+
+      const mappedFileId = fileMap[trip.id];
+      let matchedCloudFile = null;
+
+      if (mappedFileId && cloudFileIdMap.has(mappedFileId)) {
+        matchedCloudFile = cloudFileIdMap.get(mappedFileId);
+      } else if (cloudFileNameMap.has(cleanFilename.toLowerCase())) {
+        matchedCloudFile = cloudFileNameMap.get(cleanFilename.toLowerCase());
+      }
+
+      if (matchedCloudFile) {
+        matchedCloudFileIds.add(matchedCloudFile.id);
+      }
+
+      unifiedList.push({
+        id: trip.id,
+        cloudFileId: matchedCloudFile ? matchedCloudFile.id : null,
+        title: rawTitle,
+        filename: matchedCloudFile ? matchedCloudFile.name : cleanFilename,
+        dateRange: trip.dateRange || (trip.data && trip.data.meta && trip.data.meta.dates) || 'Flexible dates',
+        flags: trip.flags || '✈️',
+        storageState: isDriveConnected ? (matchedCloudFile ? 'synced' : 'local_only') : 'local_only',
+        isCurrent: trip.id === activeTripId,
+        source: 'local'
+      });
+    });
+
+    if (isDriveConnected) {
+      cloudFiles.forEach(cf => {
+        if (!matchedCloudFileIds.has(cf.id)) {
+          unifiedList.push({
+            id: `cloud_${cf.id}`,
+            cloudFileId: cf.id,
+            title: cf.name.replace(/\.json$/i, '').replace(/_/g, ' '),
+            filename: cf.name,
+            dateRange: cf.modifiedTime ? new Date(cf.modifiedTime).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Google Drive File',
+            flags: '☁️',
+            storageState: 'cloud_only',
+            isCurrent: false,
+            source: 'cloud'
+          });
+        }
+      });
+    }
+
+    if (unifiedList.length === 0) {
+      const titleEl = document.getElementById('currentTripTitle');
+      const iconEl = document.getElementById('currentTripIcon');
+      const curTitle = (titleEl && titleEl.innerText) ? titleEl.innerText.trim() : 'My Trip';
+      const curEmoji = (iconEl && iconEl.innerText) ? iconEl.innerText.trim() : '✈️';
+      unifiedList.push({
+        id: activeTripId || 'trip_default',
+        cloudFileId: null,
+        title: curTitle,
+        filename: 'my_trip.json',
+        dateRange: 'Current Itinerary',
+        flags: curEmoji,
+        storageState: 'local_only',
+        isCurrent: true,
+        source: 'local'
+      });
+    }
+
+    listEl.innerHTML = '';
+    const topTrips = unifiedList.slice(0, 3);
+    if (topTrips.length === 0) {
+      listEl.innerHTML = '<div class="p-3 text-xs text-slate-500 italic text-center">No recent trips found.</div>';
+      return;
+    }
+
+    topTrips.forEach(item => {
+      const isCurrent = item.isCurrent;
+      const isCloudSynced = item.storageState === 'synced';
+      const isCloudOnly = item.storageState === 'cloud_only';
+
+      let badgeHtml = '';
+      if (isCloudSynced) {
+        badgeHtml = '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">☁️ Synced</span>';
+      } else if (isCloudOnly) {
+        badgeHtml = '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300">☁️ Remote</span>';
+      } else {
+        badgeHtml = '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">⚡ Local</span>';
+      }
+
+      const card = document.createElement('div');
+      card.className = `trip-bottom-sheet-item p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-all ${
+        isCurrent
+          ? 'bg-teal-50/90 dark:bg-teal-950/50 border-teal-500 shadow-xs ring-1 ring-teal-500/30'
+          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750'
+      }`;
+      card.onclick = () => {
+        window.closeTripBottomSheet();
+        if (isCloudOnly) {
+          if (typeof window.loadTripFromGoogleDrive === 'function') {
+            window.loadTripFromGoogleDrive(item.cloudFileId);
+          }
+        } else if (!isCurrent) {
+          if (typeof window.switchActiveTrip === 'function') {
+            window.switchActiveTrip(item.id);
+          }
+        }
+      };
+
+      const flagChar = item.flags ? item.flags.split(' ')[0] : '✈️';
+      card.innerHTML = `
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          <span class="text-2xl p-2 bg-slate-100 dark:bg-slate-700/60 rounded-xl shrink-0 select-none">${safeEscapeHtml(flagChar)}</span>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm truncate ${isCurrent ? 'text-teal-900 dark:text-teal-200' : 'text-slate-900 dark:text-slate-100'}">${safeEscapeHtml(item.title)}</span>
+              ${badgeHtml}
+            </div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1.5 truncate">
+              <span>📅 ${safeEscapeHtml(item.dateRange)}</span>
+            </div>
+          </div>
+        </div>
+        ${isCurrent ? '<span class="text-teal-600 dark:text-teal-400 font-bold text-base shrink-0 mr-1" aria-label="Active trip">✓</span>' : ''}
+      `;
+      listEl.appendChild(card);
+    });
+  };
+
   // Render Header Trip Switcher button and unified trips list
   window.renderHeaderTripSwitcher = async function() {
     const titleEl = document.getElementById('currentTripTitle');
@@ -87,6 +285,11 @@
 
     if (!recentListEl) return;
     recentListEl.innerHTML = '';
+    const bottomSheetEl = document.getElementById('tripBottomSheet');
+    const isSheetOpen = bottomSheetEl && bottomSheetEl.classList && typeof bottomSheetEl.classList.contains === 'function' && bottomSheetEl.classList.contains('open');
+    if (isSheetOpen && typeof window.renderTripBottomSheet === 'function') {
+      window.renderTripBottomSheet();
+    }
 
     // Render Top-Level Action Controls Header inside Dropdown Menu
     const actionControlsHeader = document.createElement('div');
@@ -350,12 +553,12 @@
     window.renderTripGalleryGrid();
   };
 
-  // Render Grid of Trip Cards in Library Modal
+  // Render Consolidated Grid of Trip Cards in Library Modal
   window.renderTripGalleryGrid = async function() {
     const grid = document.getElementById('tripGalleryGrid');
     if (!grid) return;
 
-    grid.innerHTML = '<div class="trip-loading p-4 text-center text-xs text-slate-500">Loading trips...</div>';
+    grid.innerHTML = '<div class="trip-loading p-8 text-center text-xs text-slate-500 font-medium">Loading your itineraries...</div>';
 
     const safeIsSafeUrl = (url) => {
       if (typeof window.isSafeUrl === 'function') return window.isSafeUrl(url);
@@ -365,237 +568,224 @@
     };
 
     try {
-      // Update cloud badge count if connected
-      const cloudFiles = window.__gdriveCloudFiles || [];
-      const badgeCount = document.getElementById('cloudFileBadgeCount');
-      if (badgeCount) {
-        if (cloudFiles.length > 0) {
-          badgeCount.innerText = String(cloudFiles.length);
-          badgeCount.style.display = 'inline-block';
-        } else {
-          badgeCount.style.display = 'none';
-        }
-      }
-
       const isDriveConnected = typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected();
-      const userProfile = typeof window.getUserProfile === 'function' ? window.getUserProfile() : null;
-      const driveFolderUrl = typeof window.getGoogleDriveFolderUrl === 'function' ? window.getGoogleDriveFolderUrl() : 'https://drive.google.com/drive/my-drive';
+      const cloudFiles = window.__gdriveCloudFiles || [];
+      const fileMap = typeof window.getGDriveFileMap === 'function'
+        ? window.getGDriveFileMap()
+        : (function() {
+            try { return JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}'); } catch(e) { return {}; }
+          })();
 
-      let googleBannerHtml = '';
-      if (isDriveConnected) {
-        const hasSafeAvatar = userProfile && safeIsSafeUrl(userProfile.picture);
-        const safeDriveFolderUrl = safeIsSafeUrl(driveFolderUrl) ? safeEscapeHtml(driveFolderUrl) : '#';
-        googleBannerHtml = `
-          <div class="col-span-full mb-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-850 rounded-xl border border-blue-200/80 dark:border-slate-700 shadow-xs flex flex-wrap items-center justify-between gap-2.5">
-            <div class="flex items-center gap-2.5 min-w-0">
-              ${hasSafeAvatar ? `<img src="${safeEscapeHtml(userProfile.picture.trim())}" class="w-8 h-8 rounded-full border border-blue-300 dark:border-slate-600 shrink-0" alt="Avatar" referrerpolicy="no-referrer">` : `<div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">G</div>`}
-              <div class="min-w-0">
-                <div class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5 truncate">
-                  <span class="truncate">${safeEscapeHtml((userProfile && (userProfile.name || userProfile.email)) || 'Google Drive Connected')}</span>
-                  <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300">☁️ Cloud Synced</span>
-                </div>
-                <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">${safeEscapeHtml((userProfile && userProfile.email) || 'Google Drive / TrenscendsTravelPlanner')}</div>
-              </div>
-            </div>
-            <div class="flex items-center gap-1.5 shrink-0">
-              <button class="action-btn action-btn-secondary text-xs py-1 px-2.5 flex items-center gap-1 text-blue-600 dark:text-blue-400" onclick="window.syncAllTripsFromGoogleDrive();" title="Sync all trips from Google Drive">
-                <span>🔄</span> <span>Sync All</span>
-              </button>
-              <a href="${safeDriveFolderUrl}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs py-1 px-2" title="Open Google Drive folder">
-                <span>↗</span>
-              </a>
-            </div>
-          </div>
-        `;
-      } else {
-        googleBannerHtml = `
-          <div class="col-span-full mb-3 p-3.5 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-slate-50 dark:from-slate-800 dark:to-slate-850 rounded-xl border border-blue-200/70 dark:border-slate-700 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-                <span>☁️</span> <span>Google Drive Cloud Sync</span>
-              </div>
-              <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Sign in to back up all your trips and edit seamlessly across your phone and PC.</div>
-            </div>
-            <button class="action-btn action-btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5 shrink-0 shadow-xs" onclick="window.authenticateGoogleDrive(true).then(ok => { if(ok) window.renderTripGalleryGrid(); })">
-              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24"><path fill="#ffffff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#ffffff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#ffffff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#ffffff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-              <span>Sign in with Google</span>
-            </button>
-          </div>
-        `;
-      }
-
-      if (currentTripLibraryTab === 'cloud') {
-        grid.innerHTML = googleBannerHtml;
-        if (!window.isGoogleDriveConnected || !window.isGoogleDriveConnected()) {
-          grid.innerHTML += `
-            <div class="col-span-full p-6 text-center bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700">
-              <div class="text-3xl mb-2">☁️</div>
-              <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm mb-1">Google Drive Not Connected</h4>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 max-w-sm mx-auto">Sign in with Google to automatically back up and view all your <code>.json</code> trip files from your <strong>Google Drive / TrenscendsTravelPlanner</strong> folder.</p>
-              <button class="action-btn action-btn-primary text-xs" onclick="window.authenticateGoogleDrive(true).then(ok => { if(ok) window.renderTripGalleryGrid(); })">🔑 Connect Google Drive</button>
-            </div>
-          `;
-          return;
-        }
-
-        if (cloudFiles.length === 0) {
-          grid.innerHTML += `
-            <div class="col-span-full p-6 text-center bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2">
-              <div class="text-3xl">📁</div>
-              <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm">No Cloud Trips Found</h4>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Click below to upload all your current trips or sync your Google Drive folder.</p>
-              <div class="flex justify-center gap-2 pt-1">
-                <button class="action-btn action-btn-secondary text-xs" onclick="window.syncAllTripsFromGoogleDrive()">🔄 Sync Drive Now</button>
-                <button class="action-btn action-btn-primary text-xs" onclick="window.uploadAllLocalTripsToDrive()">⬆️ Upload Local Trips</button>
-              </div>
-            </div>
-          `;
-          return;
-        }
-
-        grid.innerHTML += `
-          <div class="col-span-full mb-2 flex flex-wrap items-center justify-between gap-2 p-3 bg-blue-50/80 dark:bg-blue-950/40 rounded-xl border border-blue-200/70 dark:border-blue-800/70">
-            <span class="text-xs font-semibold text-blue-900 dark:text-blue-200 flex items-center gap-1">
-              <span>☁️ Drive Folder: <strong>Google Drive / TrenscendsTravelPlanner</strong></span>
-              <span class="text-[11px] opacity-80">(${cloudFiles.length} files)</span>
-            </span>
-            <div class="flex flex-wrap items-center gap-2">
-              <button class="action-btn action-btn-primary text-xs py-1 px-3 flex items-center gap-1" onclick="window.createNewTripInGoogleDrive()">
-                <span>➕</span>
-                <span>New Cloud Trip</span>
-              </button>
-              <button class="action-btn action-btn-secondary text-xs py-1 px-2.5 flex items-center gap-1" onclick="window.uploadLocalJsonFileToDrive()" title="Upload a local JSON trip file directly into Google Drive">
-                <span>📥</span>
-                <span>Upload JSON</span>
-              </button>
-              <button class="action-btn action-btn-secondary text-xs py-1 px-2.5 flex items-center gap-1" onclick="window.refreshGoogleDriveFolder()" title="Rescan Google Drive folder for newly pasted JSON files">
-                <span>🔄</span>
-                <span>Refresh Drive</span>
-              </button>
-            </div>
-          </div>
-        `;
-
-        const activeTripId = typeof window.getActiveTripId === 'function' ? window.getActiveTripId() : '';
-        const fileMap = typeof window.getGDriveFileMap === 'function' ? window.getGDriveFileMap() : {};
-
-        cloudFiles.forEach(file => {
-          const sizeKb = file.size ? `${(parseInt(file.size, 10) / 1024).toFixed(1)} KB` : 'JSON Document';
-          const modTime = file.modifiedTime ? new Date(file.modifiedTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Synced';
-          const isActiveFile = fileMap[activeTripId] === file.id;
-          const safeFileIdJs = safeEscapeHtml(escapeJs(file.id));
-          const safeFileName = safeEscapeHtml(file.name);
-          const safeFileNameJs = safeEscapeHtml(escapeJs(file.name));
-          const safeFileIdUrl = safeEscapeHtml(encodeURIComponent(file.id || ''));
-
-          const card = document.createElement('div');
-          card.className = `trip-gallery-card p-4 ${isActiveFile ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700' : 'bg-white dark:bg-slate-800/90 border-slate-200 dark:border-slate-700'} rounded-2xl border flex flex-col justify-between space-y-3`;
-          card.innerHTML = `
-            <div>
-              <div class="flex items-center justify-between gap-2 mb-1.5">
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/70">☁️ Google Drive File</span>
-                ${isActiveFile ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">● Active</span>` : `<span class="text-[11px] text-slate-400">🕒 ${safeEscapeHtml(modTime)}</span>`}
-              </div>
-              <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm truncate flex items-center gap-1.5">
-                <span>📄</span>
-                <span class="truncate">${safeFileName}</span>
-              </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Size: ${safeEscapeHtml(sizeKb)} • Modified: ${safeEscapeHtml(modTime)}</p>
-            </div>
-            <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
-              <button class="action-btn ${isActiveFile ? 'action-btn-primary' : 'action-btn-secondary'} text-xs flex-1" onclick="window.loadTripFromGoogleDrive('${safeFileIdJs}')">
-                ${isActiveFile ? '✓ Currently Open' : '📥 Load & Open'}
-              </button>
-              <a href="https://drive.google.com/file/d/${safeFileIdUrl}/view" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary text-xs" title="Open file in Google Drive">↗ Drive</a>
-              <button class="action-btn action-btn-danger text-xs px-2.5" onclick="window.deleteTripFromGoogleDrive('${safeFileIdJs}', '${safeFileNameJs}')" title="Delete file from Google Drive">🗑️</button>
-            </div>
-          `;
-          grid.appendChild(card);
-        });
-        return;
-      }
-
-      // Local Trips rendering
+      // Fetch local trips
       const trips = (typeof window.getAllTripsFromIndexedDB === 'function')
         ? await window.getAllTripsFromIndexedDB()
         : [];
-      const activeTripId = window.getActiveTripId ? window.getActiveTripId() : 'trip_default';
+      const activeTripId = typeof window.getActiveTripId === 'function'
+        ? window.getActiveTripId()
+        : 'trip_default';
 
-      grid.innerHTML = googleBannerHtml;
-      if (!trips || trips.length === 0) {
-        grid.innerHTML += `
-          <div class="trip-empty-state">
-            <p>No saved trips in your library.</p>
-            <button class="btn btn-primary" onclick="window.createNewTripFromLibrary()">✦ Create Your First Trip</button>
-          </div>
-        `;
-        return;
+      // Update sync pill text in modal header if present
+      const syncPill = document.getElementById('cloudSyncStatusPill');
+      const syncHint = document.getElementById('tripLibrarySyncHint');
+      if (syncPill) {
+        if (isDriveConnected) {
+          syncPill.className = 'cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full cursor-pointer shrink-0 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+          syncPill.innerHTML = '☁️ Google Drive Connected';
+          if (syncHint) syncHint.innerText = 'Itineraries sync across your devices automatically.';
+        } else {
+          syncPill.className = 'cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full cursor-pointer shrink-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700';
+          syncPill.innerHTML = '⚡ Local Storage';
+          if (syncHint) syncHint.innerText = 'Itineraries are saved safely to this device.';
+        }
       }
 
-      const fileMap = (function() {
-        try { return JSON.parse(localStorage.getItem('travelApp_gdrive_file_map') || '{}'); } catch(e) { return {}; }
-      })();
+      // Reconcile and unify Local Trips + Google Drive Cloud Files
+      const cloudFileIdMap = new Map();
+      cloudFiles.forEach(cf => cloudFileIdMap.set(cf.id, cf));
+
+      const cloudFileNameMap = new Map();
+      cloudFiles.forEach(cf => cloudFileNameMap.set(cf.name.toLowerCase(), cf));
+
+      const unifiedList = [];
+      const matchedCloudFileIds = new Set();
 
       trips.forEach(trip => {
         if (!trip) return;
-        const isCurrent = trip.id === activeTripId;
-        const isDriveSynced = !!fileMap[trip.id];
-        const title = trip.title || (trip.data && trip.data.meta && trip.data.meta.title) || 'Untitled Trip';
-        const subtitle = trip.subtitle || (trip.data && trip.data.meta && trip.data.meta.subtitle) || '';
-        const flags = trip.flags || (trip.data && trip.data.meta && trip.data.meta.icon) || '🌍';
-        const dates = trip.dateRange || (trip.data && trip.data.meta && trip.data.meta.dates) || 'Flexible Dates';
+        const rawTitle = trip.title || (trip.data && trip.data.meta && trip.data.meta.title) || 'Untitled Trip';
+        const cleanFilename = typeof window.formatHumanFilename === 'function'
+          ? window.formatHumanFilename(trip)
+          : `${rawTitle.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_')}.json`;
+
+        const mappedFileId = fileMap[trip.id];
+        let matchedCloudFile = null;
+
+        if (mappedFileId && cloudFileIdMap.has(mappedFileId)) {
+          matchedCloudFile = cloudFileIdMap.get(mappedFileId);
+        } else if (cloudFileNameMap.has(cleanFilename.toLowerCase())) {
+          matchedCloudFile = cloudFileNameMap.get(cleanFilename.toLowerCase());
+        }
+
+        if (matchedCloudFile) {
+          matchedCloudFileIds.add(matchedCloudFile.id);
+        }
+
         const legCount = (typeof trip.legCount !== 'undefined' && trip.legCount !== null)
           ? trip.legCount
           : (trip.data && Array.isArray(trip.data.itinerary) ? trip.data.itinerary.length : (trip.data && Array.isArray(trip.data.legs) ? trip.data.legs.length : 0));
         const stayCount = (typeof trip.stayCount !== 'undefined' && trip.stayCount !== null)
           ? trip.stayCount
           : (trip.data && Array.isArray(trip.data.stays) ? trip.data.stays.length : (trip.data && Array.isArray(trip.data.accommodations) ? trip.data.accommodations.length : 0));
+
         const rawDate = trip.updatedAt ? new Date(trip.updatedAt) : null;
         const updatedDate = (rawDate && !isNaN(rawDate.getTime()))
           ? rawDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
           : (trip.updatedAt ? String(trip.updatedAt) : 'Recently');
 
-        const safeTripIdJs = safeEscapeHtml(escapeJs(trip.id));
+        unifiedList.push({
+          id: trip.id,
+          cloudFileId: matchedCloudFile ? matchedCloudFile.id : null,
+          title: rawTitle,
+          subtitle: trip.subtitle || (trip.data && trip.data.meta && trip.data.meta.subtitle) || '',
+          flags: trip.flags || (trip.data && trip.data.meta && trip.data.meta.icon) || '🌍',
+          dates: trip.dateRange || (trip.data && trip.data.meta && trip.data.meta.dates) || 'Flexible Dates',
+          legCount,
+          stayCount,
+          updatedAt: updatedDate,
+          isCurrent: trip.id === activeTripId,
+          isDriveSynced: isDriveConnected && !!matchedCloudFile,
+          isCloudOnly: false
+        });
+      });
+
+      // Include remote-only Google Drive files if connected
+      if (isDriveConnected) {
+        cloudFiles.forEach(cf => {
+          if (!matchedCloudFileIds.has(cf.id)) {
+            const rawTitle = cf.name.replace(/\.json$/i, '').replace(/_/g, ' ');
+            unifiedList.push({
+              id: `cloud_${cf.id}`,
+              cloudFileId: cf.id,
+              title: rawTitle,
+              subtitle: 'Google Drive file',
+              flags: '☁️',
+              dates: cf.modifiedTime ? new Date(cf.modifiedTime).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Google Drive Itinerary',
+              legCount: 0,
+              stayCount: 0,
+              isCurrent: false,
+              isDriveSynced: true,
+              isCloudOnly: true,
+              updatedAt: cf.modifiedTime ? new Date(cf.modifiedTime).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently'
+            });
+          }
+        });
+      }
+
+      grid.innerHTML = '';
+
+      if (unifiedList.length === 0) {
+        const titleEl = document.getElementById('currentTripTitle') || document.getElementById('mainTitle');
+        const curTitle = (titleEl && titleEl.innerText) ? titleEl.innerText.trim() : 'My Trip';
+        const curIcon = document.getElementById('currentTripIcon') || document.getElementById('heroTripEmoji');
+        const curEmoji = (curIcon && curIcon.innerText) ? curIcon.innerText.trim() : '✈️';
+        const legCount = (typeof window.appData !== 'undefined' && Array.isArray(window.appData)) ? window.appData.length : 0;
+        let stayCount = 0;
+        if (typeof window.appData !== 'undefined' && Array.isArray(window.appData)) {
+          window.appData.forEach(leg => {
+            if (leg && Array.isArray(leg.stays)) stayCount += leg.stays.length;
+          });
+        }
+        unifiedList.push({
+          id: activeTripId || 'trip_default',
+          cloudFileId: null,
+          title: curTitle,
+          subtitle: '',
+          flags: curEmoji,
+          dates: 'Current Itinerary',
+          legCount,
+          stayCount,
+          isCurrent: true,
+          isDriveSynced: false,
+          isCloudOnly: false,
+          updatedAt: 'Recently'
+        });
+      }
+
+      unifiedList.forEach(item => {
+        const isCurrent = item.isCurrent;
+        const isCloudOnly = item.isCloudOnly;
+        const isDriveSynced = item.isDriveSynced;
+        const safeTripIdJs = safeEscapeHtml(escapeJs(item.id));
+        const safeCloudFileIdJs = safeEscapeHtml(escapeJs(item.cloudFileId));
+
         const card = document.createElement('div');
-        card.className = `trip-gallery-card ${isCurrent ? 'active-card' : ''}`;
+        card.className = `trip-gallery-card p-4 md:p-5 rounded-2xl border transition-all ${
+          isCurrent
+            ? 'active-card ring-2 ring-teal-500/40 bg-teal-50/40 dark:bg-teal-950/30 border-teal-500 shadow-sm'
+            : 'bg-white dark:bg-slate-800/90 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-xs'
+        }`;
+
+        const flagChar = item.flags ? item.flags.split(' ')[0] : '✈️';
+
+        const switchHandler = isCloudOnly
+          ? `window.closeTripLibraryModal(); window.loadTripFromGoogleDrive('${safeCloudFileIdJs}');`
+          : `window.switchActiveTrip('${safeTripIdJs}');`;
+
         card.innerHTML = `
-          <div class="trip-card-header">
-            <div class="trip-card-badges flex flex-wrap gap-1.5 items-center mb-1">
-              ${isCurrent ? '<span class="active-badge">● Active Trip</span>' : ''}
-              ${isDriveSynced
-                ? '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">☁️ Synced to Drive</span>'
-                : (typeof navigator !== 'undefined' && navigator.onLine === false
-                    ? '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60">⚡ Offline</span>'
-                    : '<span class="cloud-badge text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">● Saved to device</span>'
-                  )
+          <div class="flex items-start justify-between gap-3 mb-2">
+            <div class="flex items-start gap-3 min-w-0 flex-1">
+              <span class="text-3xl p-2.5 bg-slate-100 dark:bg-slate-700/60 rounded-2xl shrink-0 select-none">${safeEscapeHtml(flagChar)}</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="font-bold text-base md:text-lg text-slate-900 dark:text-slate-100 truncate">${safeEscapeHtml(item.title)}</h3>
+                  ${isCurrent ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 dark:bg-teal-900/60 dark:text-teal-300">● Active</span>' : ''}
+                  ${isDriveSynced ? '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">☁️ Synced</span>' : ''}
+                  ${isCloudOnly ? '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60">☁️ Remote File</span>' : ''}
+                </div>
+                ${item.subtitle ? `<p class="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">${safeEscapeHtml(item.subtitle)}</p>` : ''}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap text-xs text-slate-600 dark:text-slate-300 my-3 py-2 px-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl">
+            <span class="font-medium">📅 ${safeEscapeHtml(item.dates)}</span>
+            ${!isCloudOnly ? `
+              <span class="text-slate-300 dark:text-slate-600">•</span>
+              <span>📍 ${safeEscapeHtml(item.legCount)} legs</span>
+              <span class="text-slate-300 dark:text-slate-600">•</span>
+              <span>🏨 ${safeEscapeHtml(item.stayCount)} stays</span>
+            ` : ''}
+            ${item.updatedAt ? `
+              <span class="text-slate-300 dark:text-slate-600">•</span>
+              <span class="text-slate-500 dark:text-slate-400">🕒 Updated ${safeEscapeHtml(item.updatedAt)}</span>
+            ` : ''}
+          </div>
+
+          <div class="flex items-center justify-between gap-2 pt-2.5 border-t border-slate-100 dark:border-slate-700/60">
+            <div>
+              ${isCurrent
+                ? '<span class="text-xs font-bold text-teal-700 dark:text-teal-400 py-1.5 px-3 rounded-lg bg-teal-100/60 dark:bg-teal-900/40 inline-flex items-center gap-1">✓ Currently Open</span>'
+                : `<button class="action-btn action-btn-primary text-xs py-2 px-4 rounded-xl font-semibold shadow-xs" onclick="${switchHandler}">${isCloudOnly ? '📥 Load from Drive' : 'Open Itinerary'}</button>`
               }
-              <span class="updated-badge text-[10px]">Updated ${safeEscapeHtml(updatedDate)}</span>
             </div>
-            <h3 class="trip-card-title">${safeEscapeHtml(flags)} ${safeEscapeHtml(title)}</h3>
-            ${subtitle ? `<p class="trip-card-subtitle">${safeEscapeHtml(subtitle)}</p>` : ''}
-          </div>
-          <div class="trip-card-body">
-            <div class="trip-card-stats">
-              <span class="stat-pill">📅 ${safeEscapeHtml(dates)}</span>
-              <span class="stat-pill">📍 ${safeEscapeHtml(legCount)} legs</span>
-              <span class="stat-pill">🏨 ${safeEscapeHtml(stayCount)} stays</span>
+            <div class="flex items-center gap-1">
+              ${!isCloudOnly ? `
+                <button class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors" onclick="window.duplicateTripFromLibrary('${safeTripIdJs}')" title="Duplicate itinerary">
+                  <span>📋</span> <span class="hidden sm:inline">Duplicate</span>
+                </button>
+                <button class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors" onclick="window.exportTripFromLibrary('${safeTripIdJs}')" title="Export JSON backup">
+                  <span>📥</span> <span class="hidden sm:inline">Export</span>
+                </button>
+                ${!isCurrent && trips.length > 1 ? `
+                  <button class="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-medium transition-colors" onclick="window.deleteTripFromLibrary('${safeTripIdJs}')" title="Delete itinerary">
+                    <span>🗑️</span>
+                  </button>
+                ` : ''}
+              ` : `
+                <button class="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-medium transition-colors" onclick="window.deleteTripFromGoogleDrive('${safeCloudFileIdJs}', '${safeEscapeHtml(escapeJs(item.title))}')" title="Delete from Drive">
+                  <span>🗑️</span>
+                </button>
+              `}
             </div>
-          </div>
-          <div class="trip-card-actions">
-            ${isCurrent
-              ? `<button class="trip-btn trip-btn-active" disabled>Currently Open</button>`
-                : `<button class="trip-btn trip-btn-primary" onclick="window.switchActiveTrip('${safeTripIdJs}')">Switch to Trip</button>`
-            }
-            ${typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected()
-                ? `<button class="trip-btn trip-btn-secondary text-blue-600 dark:text-blue-400" onclick="window.uploadTripByIdToDrive('${safeTripIdJs}')" title="Upload this trip to Google Drive">☁️ Sync</button>`
-              : ''
-            }
-              <button class="trip-btn trip-btn-secondary" onclick="window.duplicateTripFromLibrary('${safeTripIdJs}')" title="Duplicate trip">📋 Duplicate</button>
-              <button class="trip-btn trip-btn-secondary" onclick="window.exportTripFromLibrary('${safeTripIdJs}')" title="Export JSON backup">📥 Export</button>
-            ${trips.length > 1
-                ? `<button class="trip-btn trip-btn-danger" onclick="window.deleteTripFromLibrary('${safeTripIdJs}')" title="Delete trip">🗑️</button>`
-              : ''
-            }
           </div>
         `;
         grid.appendChild(card);
@@ -603,7 +793,6 @@
     } catch (err) {
       console.error('Failed to render trip gallery grid:', err);
       const isDriveConnected = typeof window.isGoogleDriveConnected === 'function' && window.isGoogleDriveConnected();
-
       const rawMsg = (err && typeof err.message === 'string' && err.message.trim()) ? err.message.trim() : 'Storage error';
 
       const errCard = document.createElement('div');
