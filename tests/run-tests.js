@@ -48,6 +48,7 @@ const { run: runTransportDurationSuite } = require('./transport-duration.test');
 const { run: runTransitConnectorsSuite } = require('./transit-connectors-layover.test');
 const { runLegManagementWysiwygSuite } = require('./leg-management-wysiwyg.test');
 const { runGoogleAuthRenewalTests } = require('./google-auth-renewal.test');
+const { runAttachmentsXssTests } = require('./attachments-xss.test');
 const { runDualPathWizardSuite } = require('./dual-path-wizard.test');
 const { runStorageEngineSuite } = require('./storage-engine-suite');
 const { runDesktopSplitPrintUnitTests } = require('./desktop-split-print.test');
@@ -100,6 +101,7 @@ const { runActivityModalHelpersTests } = require('./activity-modal-helpers.test'
 const { runLoadDismissedRemindersTests } = require('./load-dismissed-reminders.test');
 const { runUpdateStickyOffsetsTests } = require('./update-sticky-offsets.test');
 const { runViewportSizeTests } = require('./viewport-size.test');
+const { runChronologicalLegNavigationTests } = require('./chronological-leg-navigation.test');
 
 async function run() {
   try {
@@ -112,6 +114,7 @@ async function run() {
     if (typeof runLoadDismissedRemindersTests === 'function') runLoadDismissedRemindersTests();
     if (typeof runUpdateStickyOffsetsTests === 'function') runUpdateStickyOffsetsTests();
     if (typeof runViewportSizeTests === 'function') runViewportSizeTests();
+    if (typeof runChronologicalLegNavigationTests === 'function') runChronologicalLegNavigationTests();
     if (typeof runFindItineraryPositionTests === 'function') runFindItineraryPositionTests();
     if (typeof runMobileFlowOverhaulTests === 'function') runMobileFlowOverhaulTests();
     if (typeof runPackingTests === 'function') runPackingTests();
@@ -149,6 +152,7 @@ async function run() {
     if (typeof runStorageEngineSuite === 'function') await runStorageEngineSuite();
     if (typeof runUploadAllLocalTripsBenchmarkAndTest === 'function') await runUploadAllLocalTripsBenchmarkAndTest();
     if (typeof runGoogleAuthRenewalTests === 'function') await runGoogleAuthRenewalTests();
+    if (typeof runAttachmentsXssTests === 'function') await runAttachmentsXssTests();
     if (typeof runDualPathWizardSuite === 'function') await runDualPathWizardSuite();
     if (typeof runFormatHumanFilenameTests === 'function') await runFormatHumanFilenameTests();
     if (typeof runEscapeHtmlTextTests === 'function') await runEscapeHtmlTextTests();

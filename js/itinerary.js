@@ -1818,7 +1818,7 @@ function getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount) 
 
 function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap, activeCityIndex = 0) {
   const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
-  const leg = entry.leg;
+  const leg = entry.leg || entry;
   const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
   const nightLabel = getLegNightSummary(leg).label;
   const legCost = getLegTotalCost(leg);
@@ -1827,7 +1827,7 @@ function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap, activeC
   const metrics = getTripDayMetrics(leg.id || legIndex);
 
   const legDateRangeHtml = renderCompactLegDateRangeHtml(firstDay, lastDay);
-  const displayLegLabel = getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
+  const displayLegLabel = entry.displayLabel || getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
 
   const legCard = `
     <article class="compact-leg-card">
@@ -1847,8 +1847,9 @@ function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap, activeC
     </article>
   `;
 
+  const legId = entry.legId || leg.id || `leg-${legIndex}`;
   return `
-    <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide ${legIndex === activeCityIndex ? 'is-active' : ''}" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(leg.id || '')}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
+    <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide ${legIndex === activeCityIndex ? 'is-active' : ''}" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(legId)}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
       ${legCard}
     </div>
   `;
@@ -1856,14 +1857,14 @@ function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap, activeC
 
 function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap, activeCityIndex = 0) {
   const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
-  const leg = entry.leg;
+  const leg = entry.leg || entry;
   const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
   const nightLabel = getLegNightSummary(leg).label;
   const firstDay = leg.days && leg.days[0];
   const lastDay = leg.days && leg.days[daysCount - 1];
   const metrics = getTripDayMetrics(leg.id || legIndex);
 
-  const displayLegLabel = getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
+  const displayLegLabel = entry.displayLabel || getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
 
   const chipDateRangeHtml = firstDay && lastDay && firstDay.date !== lastDay.date
       ? `${escapeHtmlText(firstDay.date)} &rarr; ${escapeHtmlText(lastDay.date)}`
@@ -1871,9 +1872,10 @@ function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap, activeCi
 
   const flightTimeLabel = getLegFlightButtonTimeLabel(leg, journeysByJourneyId);
   const routeDetail = [flightTimeLabel || nightLabel, metrics.legTripDayRangeShort].filter(Boolean).join(' · ');
+  const legId = entry.legId || leg.id || `leg-${legIndex}`;
 
   return `
-    <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === activeCityIndex ? 'true' : 'false'}">
+    <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(legId)}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === activeCityIndex ? 'true' : 'false'}">
       <span class="mobile-swipe-chip-eyebrow">${chipDateRangeHtml}</span>
       <span class="mobile-swipe-chip-title">${escapeHtmlText(displayLegLabel)}</span>
       <span class="mobile-swipe-chip-route">${escapeHtmlText(routeDetail)}</span>
@@ -1881,8 +1883,9 @@ function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap, activeCi
   `;
 }
 
-function renderCompactActiveCityHeader(firstLeg, activeIndex = 0) {
-  if (!firstLeg) return '';
+function renderCompactActiveCityHeader(firstLegOrEntry, activeIndex = 0) {
+  if (!firstLegOrEntry) return '';
+  const firstLeg = firstLegOrEntry.leg || firstLegOrEntry;
 
   const daysCount = Array.isArray(firstLeg.days) ? firstLeg.days.length : 0;
   const nightLabel = getLegNightSummary(firstLeg).label;
@@ -1892,7 +1895,7 @@ function renderCompactActiveCityHeader(firstLeg, activeIndex = 0) {
   const metrics = getTripDayMetrics(firstLeg.id || activeIndex);
 
   const legDateRangeHtml = renderCompactLegDateRangeHtml(firstDay, lastDay);
-  const displayLegLabel = getCompactLegDisplayLabel(firstLeg, activeIndex, firstDay, lastDay, daysCount);
+  const displayLegLabel = firstLegOrEntry.displayLabel || getCompactLegDisplayLabel(firstLeg, activeIndex, firstDay, lastDay, daysCount);
 
   return `
     <div id="compactActiveCityHeader" class="active-city-sticky-header leg-header compact-leg-header" style="background:${escapeHtmlText(firstLeg.colour || '#0ea5e9')}; cursor:default;">
@@ -1916,7 +1919,7 @@ function createCompactCitySwipeElement(mobileLegSequence, journeysByJourneyId) {
   const railHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCityChip(entry, legIndex, journeysByJourneyId, activeCityIndex));
 
   const activeEntry = mobileLegSequence[activeCityIndex] || mobileLegSequence[0];
-  const activeStickyHeaderHtml = activeEntry ? renderCompactActiveCityHeader(activeEntry.leg, activeCityIndex) : '';
+  const activeStickyHeaderHtml = activeEntry ? renderCompactActiveCityHeader(activeEntry, activeCityIndex) : '';
 
   const pagerRoot = document.createElement('div');
   pagerRoot.className = 'compact-city-swipe-root';
@@ -2052,8 +2055,11 @@ function moveToAdjacentCityDayPager(currentPager, direction) {
   if (progressFill) {
     progressFill.style.width = `${((nextCityIndex + 1) / citySlides.length) * 100}%`;
   }
+  const nextCitySlideLegId = nextCitySlide?.dataset.legId || '';
   const nextCitySlideId = nextCitySlide?.dataset.cityId || '';
-  if (nextCitySlideId && typeof highlightCityNavByCityId === 'function') {
+  if (nextCitySlideLegId && typeof updateCityNavActiveState === 'function') {
+    updateCityNavActiveState(nextCitySlideLegId);
+  } else if (nextCitySlideId && typeof highlightCityNavByCityId === 'function') {
     highlightCityNavByCityId(nextCitySlideId);
   }
 
@@ -2073,6 +2079,23 @@ function moveToAdjacentCityDayPager(currentPager, direction) {
 }
 
 function getCompactMobileLegSequence() {
+  const chronoSeq = (typeof getChronologicalLegSequence === 'function')
+    ? getChronologicalLegSequence()
+    : [];
+
+  const legsOnly = chronoSeq.filter(item => item && item.type === 'leg');
+  if (legsOnly.length > 0) {
+    return legsOnly.map(item => ({
+      leg: item.leg,
+      legId: item.legId,
+      cityId: item.cityId,
+      cityName: item.cityName,
+      displayLabel: item.displayLabel,
+      flag: item.flag,
+      colour: item.colour
+    }));
+  }
+
   const baseLegs = Array.isArray(appData) ? appData : [];
   const baseEntries = baseLegs.map((leg, idx) => {
     const firstDay = Array.isArray(leg.days) && leg.days[0] ? leg.days[0] : null;
@@ -2083,14 +2106,47 @@ function getCompactMobileLegSequence() {
     if (!matchedCity && Array.isArray(citiesData)) {
       matchedCity = citiesData.find(c => c && (c.id === leg.cityId || c.id === fallbackId)) || null;
     }
+    const legId = leg.id || `leg-${idx}`;
     return {
       leg,
+      legId,
       score: getLegDateScore(leg, idx),
       cityId: (matchedCity && matchedCity.id) ? matchedCity.id : fallbackId,
-      cityName: (matchedCity && matchedCity.name) ? matchedCity.name : cleanName
+      cityName: (matchedCity && matchedCity.name) ? matchedCity.name : cleanName,
+      displayLabel: cleanName,
+      colour: leg.colour || '#0ea5e9'
     };
   });
   return baseEntries.sort((a, b) => a.score - b.score);
+}
+
+function setupDesktopCityNavScrollSpy(container) {
+  if (typeof window === 'undefined' || !('IntersectionObserver' in window) || !container) return;
+  const legSections = Array.from(container.querySelectorAll('.compact-desktop-leg.leg[id]'));
+  if (legSections.length === 0) return;
+
+  if (window.__desktopCityNavObserver && typeof window.__desktopCityNavObserver.disconnect === 'function') {
+    window.__desktopCityNavObserver.disconnect();
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+    if (!isDesktop) return;
+    const intersecting = entries.filter(e => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+    if (intersecting.length > 0) {
+      const topEntry = intersecting[0];
+      const legId = topEntry.target.id.replace(/^leg-/, '');
+      if (legId && typeof updateCityNavActiveState === 'function') {
+        updateCityNavActiveState(legId);
+      }
+    }
+  }, {
+    rootMargin: '-10% 0px -70% 0px',
+    threshold: [0, 0.2, 0.5]
+  });
+
+  legSections.forEach(section => observer.observe(section));
+  window.__desktopCityNavObserver = observer;
 }
 
 function buildCompactItineraryDesktop() {
@@ -2125,13 +2181,14 @@ function buildCompactItineraryDesktop() {
 
   container.appendChild(stack);
   setupCompactItineraryPagers(container);
+  setupDesktopCityNavScrollSpy(container);
   if (typeof window !== 'undefined' && window.innerWidth >= 1024 && typeof buildDesktopSplitMap === 'function') {
     setTimeout(buildDesktopSplitMap, 60);
   }
 }
 
 // Parse "8 Jun" style dates to ISO for comparisons.
-function normalizeDate(dateStr, year = 2026) {
+function normalizeDate(dateStr, year = (new Date().getFullYear())) {
   if (typeof normalizeTripDateValue === 'function') return normalizeTripDateValue(dateStr, year);
   if (!dateStr) return '';
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
@@ -3835,7 +3892,7 @@ function buildItinerary() {
       const dayMetrics = getTripDayMetrics(leg.id || legIndex, dayIndex);
 
       html += `
-      <div class="day-card group flex flex-col mb-4 overflow-hidden bg-white/90 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 rounded-xl shadow-sm transition-all duration-300 ${openClass}" data-day-key="${escapeCompactText(dayKey)}">
+      <div id="day-${legIndex}-${dayIndex}" class="day-card group flex flex-col mb-4 overflow-hidden bg-white/90 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 rounded-xl shadow-sm transition-all duration-300 ${openClass}" data-day-key="${escapeCompactText(dayKey)}" data-day-index="${dayIndex}" data-leg-index="${legIndex}" data-leg-id="${escapeCompactText(leg.id)}">
         <div class="day-bar flex items-center p-3 sm:p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors relative" style="border-left: 5px solid var(--leg-colour, ${escapeHtmlText(leg.colour)})" onclick="toggleCard(this)">
           <div class="day-date w-16 sm:w-20 shrink-0 text-center flex flex-col items-center justify-center border-r border-slate-200 dark:border-slate-700 pr-3 sm:pr-4 mr-3 sm:mr-4"><span class="day-num text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">${dayDateLabel}</span><span class="day-name text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${day.day}</span>${dayMetrics.globalDayIndex ? `<span class="day-trip-num text-[0.7rem] font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/40 px-1.5 py-0.5 rounded mt-1 border border-teal-200 dark:border-teal-800" title="Trip Day ${dayMetrics.globalDayIndex} of ${dayMetrics.totalTripDays}">#${dayMetrics.globalDayIndex}</span>` : ''}</div>
           <div class="day-title flex-1 min-w-0 pr-4"><div class="day-cities text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">${dayHeadingHtml}</div>${stayingHeadingNote}<div class="day-desc text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate outline-none" contenteditable="${isEditMode}" onclick="event.stopPropagation()" onblur="updateDayData(${legIndex}, ${dayIndex}, 'desc', this.innerText)">${day.desc}</div></div>
@@ -4284,6 +4341,227 @@ function getCityStayCandidates(citiesMap) {
   return candidates;
 }
 
+// Strip country flags and emojis while preserving text and parentheses
+function stripEmojiAndFlags(text) {
+  if (!text || typeof text !== 'string') return '';
+  return text
+    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+    .replace(/\p{Extended_Pictographic}/gu, '')
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '')
+    .trim();
+}
+
+// Extract primary city name from a leg, handling route indicators and fallbacks
+function getLegPrimaryCityName(leg) {
+  if (!leg) return '';
+  let raw = '';
+  if (typeof leg.label === 'string' && leg.label.trim()) {
+    raw = leg.label.trim();
+  } else if (leg.cityId) {
+    const cData = (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) ? citiesData : [];
+    const found = cData.find(c => c && (c.id === leg.cityId || c.id === `city-${leg.cityId}` || `city-${c.id}` === leg.cityId));
+    if (found && found.name) {
+      raw = found.name;
+    } else {
+      raw = String(leg.cityId).replace(/^(city|leg)-/, '');
+    }
+  } else if (Array.isArray(leg.days) && leg.days.length > 0 && leg.days[0]) {
+    raw = leg.days[0].to || leg.days[0].from || '';
+  }
+
+  // Strip flight route indicators (e.g. "BNE -> TPE", "Brisbane → Taipei", "BNE to TPE")
+  if (/(\s*(?:->|→|-->|=>|\bto\b)\s*)/i.test(raw)) {
+    const parts = raw.split(/\s*(?:->|→|-->|=>|\bto\b)\s*/i);
+    if (parts.length > 1 && parts[parts.length - 1].trim()) {
+      raw = parts[parts.length - 1].trim();
+    }
+  }
+
+  let cleaned = (typeof cleanCityNavLabel === 'function') ? cleanCityNavLabel(raw) : raw;
+  if (!cleaned && leg.cityId) {
+    const cData = (typeof citiesData !== 'undefined' && Array.isArray(citiesData)) ? citiesData : [];
+    const found = cData.find(c => c && (c.id === leg.cityId || c.id === `city-${leg.cityId}` || `city-${c.id}` === leg.cityId));
+    if (found && found.name) {
+      cleaned = (typeof cleanCityNavLabel === 'function') ? cleanCityNavLabel(found.name) : found.name;
+    } else {
+      cleaned = String(leg.cityId).replace(/^(city|leg)-/, '');
+    }
+  }
+  if (!cleaned && Array.isArray(leg.days) && leg.days.length > 0 && leg.days[0]) {
+    const fallbackDayCity = leg.days[0].to || leg.days[0].from || '';
+    cleaned = (typeof cleanCityNavLabel === 'function') ? cleanCityNavLabel(fallbackDayCity) : fallbackDayCity;
+  }
+  return (cleaned || '').trim();
+}
+
+// Format navigation display label with visit numbering or preserved custom descriptors
+function formatLegNavLabel(leg, cityName, currentVisit, totalVisits) {
+  const cleanLabel = stripEmojiAndFlags(leg.label || '');
+  if (totalVisits > 1) {
+    const hasCustomDescriptor = cleanLabel && (
+      /\(\d+\)$/.test(cleanLabel) ||
+      /\([^)]+\)/.test(cleanLabel) ||
+      (cleanLabel.toLowerCase() !== cityName.toLowerCase() && cleanLabel.length > cityName.length)
+    );
+    if (hasCustomDescriptor) {
+      return cleanLabel;
+    }
+    return `${cityName} (${currentVisit})`;
+  } else {
+    // totalVisits === 1
+    const hasNonNumericCustomDescriptor = cleanLabel && (
+      /\([^\d)]+\)/.test(cleanLabel) ||
+      (cleanLabel.toLowerCase() !== cityName.toLowerCase() && cleanLabel.length > cityName.length)
+    );
+    if (hasNonNumericCustomDescriptor) {
+      return cleanLabel;
+    }
+    return cityName;
+  }
+}
+
+// Extract daytime excursion blips from a leg's days
+function extractDayTripBlips(leg, legIndex) {
+  if (!leg || !Array.isArray(leg.days) || leg.days.length === 0) return [];
+  const blips = [];
+  const seenForLeg = new Set();
+  const legId = leg.id || `leg-${legIndex}`;
+
+  leg.days.forEach((day, dayIndex) => {
+    if (!day) return;
+    let destinationCity = '';
+
+    // a) day.dayTrip (string, e.g. "Venice")
+    if (typeof day.dayTrip === 'string' && day.dayTrip.trim()) {
+      destinationCity = day.dayTrip.trim();
+    }
+
+    // b) day.isDayTrip === true (use day.to or day.title)
+    if (!destinationCity && day.isDayTrip) {
+      destinationCity = (day.to || day.title || '').trim();
+    }
+
+    // c) Any activity inside day.activities, day.items, or day.activityItems
+    if (!destinationCity) {
+      const activities = [
+        ...(Array.isArray(day.activityItems) ? day.activityItems : []),
+        ...(Array.isArray(day.activities) ? day.activities : []),
+        ...(Array.isArray(day.items) ? day.items : [])
+      ];
+
+      for (const act of activities) {
+        if (!act) continue;
+        const text = typeof act === 'string' ? act : (act.text || act.title || act.name || act.desc || '');
+        const dayTripMatch = text.match(/day\s*trip\s*(?:to\s*)?([a-zA-Z\s]+)/i);
+
+        if (dayTripMatch && dayTripMatch[1]) {
+          destinationCity = dayTripMatch[1].trim();
+          break;
+        } else if (act.category === 'daytrip' || act.isDayTrip) {
+          destinationCity = (act.cityName || act.to || act.destination || text).trim();
+          break;
+        }
+      }
+    }
+
+    if (destinationCity) {
+      const cleaned = (typeof cleanCityNavLabel === 'function')
+        ? cleanCityNavLabel(destinationCity)
+        : destinationCity;
+      const finalCity = cleaned || destinationCity;
+      const key = `${dayIndex}-${finalCity.toLowerCase()}`;
+      if (!seenForLeg.has(key)) {
+        seenForLeg.add(key);
+        blips.push({
+          type: 'daytrip-blip',
+          parentLegId: legId,
+          parentLegIndex: legIndex,
+          dayIndex,
+          cityName: finalCity,
+          displayLabel: `↳ ${finalCity}`,
+          colour: leg.colour || '#0ea5e9',
+          day
+        });
+      }
+    }
+  });
+
+  return blips;
+}
+
+/**
+ * Generates a 1:1 chronological leg sequence for itinerary navigation.
+ * Each overnight leg in appData maps to a distinct item in travel order,
+ * with repeat visits cleanly numbered and daytime excursions inserted as inline blips.
+ *
+ * @param {Array} [customAppData] - Optional itinerary array (defaults to global appData)
+ * @returns {Array<Object>} 1:1 sequence of leg and daytrip-blip navigation items
+ */
+function getChronologicalLegSequence(customAppData) {
+  const targetLegs = Array.isArray(customAppData)
+    ? customAppData
+    : ((typeof appData !== 'undefined' && Array.isArray(appData)) ? appData : []);
+
+  if (!Array.isArray(targetLegs) || targetLegs.length === 0) {
+    return [];
+  }
+
+  // 1. Count total overnight occurrences for each normalized city name
+  const cityVisitCounts = new Map();
+  targetLegs.forEach(leg => {
+    const cName = getLegPrimaryCityName(leg);
+    if (cName) {
+      const key = cName.toLowerCase();
+      cityVisitCounts.set(key, (cityVisitCounts.get(key) || 0) + 1);
+    }
+  });
+
+  // 2. Build 1:1 navigation sequence with visit numbering and inline day-trip blips
+  const visitTracker = new Map();
+  const sequence = [];
+
+  targetLegs.forEach((leg, legIndex) => {
+    const cityName = getLegPrimaryCityName(leg);
+    const key = cityName.toLowerCase();
+    const totalVisits = cityVisitCounts.get(key) || 1;
+    const currentVisit = (visitTracker.get(key) || 0) + 1;
+    visitTracker.set(key, currentVisit);
+
+    const legId = leg.id || `leg-${legIndex}`;
+    const displayLabel = formatLegNavLabel(leg, cityName, currentVisit, totalVisits);
+    const flag = (typeof getCityFlagHTML === 'function') ? getCityFlagHTML(cityName) : '';
+    const cityObj = (typeof getCityByName === 'function') ? getCityByName(cityName) : null;
+    const cityId = leg.cityId || cityObj?.id || legId;
+
+    // Main leg entry
+    sequence.push({
+      type: 'leg',
+      legId,
+      cityId,
+      legIndex,
+      cityName,
+      displayLabel,
+      flag,
+      colour: leg.colour || '#0ea5e9',
+      isStart: legIndex === 0,
+      isFinish: legIndex === targetLegs.length - 1,
+      leg
+    });
+
+    // Inline daytime excursion blips immediately following parent leg
+    const dayTripBlips = extractDayTripBlips(leg, legIndex);
+    dayTripBlips.forEach(blip => {
+      sequence.push(blip);
+    });
+  });
+
+  return sequence;
+}
+
+if (typeof window !== 'undefined') {
+  window.getChronologicalLegSequence = getChronologicalLegSequence;
+}
+
 // Get cities in travel order based on trip legs
 function getCitiesInTravelOrder() {
   if (!Array.isArray(appData) || appData.length === 0) {
@@ -4417,7 +4695,7 @@ function findCompactCitySlideIndex(cityId, cityName) {
 function resolveCityNavButtonForLeg(leg) {
   const nav = document.getElementById('cityNav');
   if (!nav || !leg) return null;
-  const buttons = Array.from(nav.querySelectorAll('.city-nav-btn[data-city]'));
+  const buttons = Array.from(nav.querySelectorAll('.city-nav-btn[data-city], .city-nav-btn[data-leg-id]'));
   if (buttons.length === 0) return null;
 
   const legIdRaw = String(leg.id || '').trim();
@@ -4426,7 +4704,12 @@ function resolveCityNavButtonForLeg(leg) {
   const legCityId = String(leg.cityId || '').trim().toLowerCase();
   const legLabel = cleanCityNavLabel(leg.label || '').toLowerCase();
 
-  let btn = buttons.find(b => {
+  // 1. Direct match on data-leg-id
+  let btn = buttons.find(b => String(b.dataset.legId || '').toLowerCase() === legId);
+  if (btn) return btn;
+
+  // 2. Direct match on data-city
+  btn = buttons.find(b => {
     const cityId = String(b.dataset.city || '').trim().toLowerCase();
     const citySlug = cityId.replace(/^(city|leg)-/, '');
     return cityId && (
@@ -4441,7 +4724,7 @@ function resolveCityNavButtonForLeg(leg) {
   if (typeof getCityByName === 'function' && legLabel) {
     const matched = getCityByName(legLabel);
     if (matched && matched.id) {
-      btn = buttons.find(b => b.dataset.city === matched.id);
+      btn = buttons.find(b => b.dataset.city === matched.id || b.dataset.legId === matched.id);
       if (btn) return btn;
     }
   }
@@ -4462,7 +4745,7 @@ function resolveCityNavButtonForLeg(leg) {
     const firstDay = leg.days[0];
     const dayCity = getCityByName(firstDay.to || '') || getCityByName(firstDay.from || '');
     if (dayCity && dayCity.id) {
-      btn = buttons.find(b => b.dataset.city === dayCity.id);
+      btn = buttons.find(b => b.dataset.city === dayCity.id || b.dataset.legId === dayCity.id);
       if (btn) return btn;
     }
   }
@@ -4470,20 +4753,83 @@ function resolveCityNavButtonForLeg(leg) {
   return btn || null;
 }
 
+function updateCityNavActiveState(activeLegId = null) {
+  const nav = document.getElementById('cityNav');
+  if (!nav) return;
+
+  if (!activeLegId) {
+    const navHeight = (document.querySelector('.app-tabs-nav')?.offsetHeight || 56) +
+                      (document.querySelector('.city-nav')?.offsetHeight || 56) + 30;
+    const legElements = Array.from(document.querySelectorAll('.compact-desktop-leg.leg, .itinerary-timeline .leg, [id^="leg-"]'))
+      .filter(el => el.id && el.id.startsWith('leg-'));
+
+    if (legElements.length > 0) {
+      for (let i = 0; i < legElements.length; i++) {
+        const el = legElements[i];
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom >= navHeight) {
+          activeLegId = el.id.replace(/^leg-/, '');
+          break;
+        }
+      }
+      if (!activeLegId && legElements.length > 0) {
+        activeLegId = legElements[0].id.replace(/^leg-/, '');
+      }
+    }
+  }
+
+  if (!activeLegId) return;
+
+  const btn = nav.querySelector(`.city-nav-btn[data-leg-id="${activeLegId}"]`) ||
+              nav.querySelector(`.city-nav-btn[data-city="${activeLegId}"]`);
+  if (!btn) return;
+
+  const allBtns = Array.from(nav.querySelectorAll('.city-nav-btn'));
+  const activeIdx = allBtns.indexOf(btn);
+  allBtns.forEach((b, idx) => {
+    const isAllOrAdd = b.dataset.city === 'all' || b.classList.contains('city-nav-add-btn');
+    b.classList.toggle('active', b === btn);
+    b.classList.toggle('is-visited', !isAllOrAdd && activeIdx > 0 && idx < activeIdx);
+  });
+
+  if (typeof updateCityNavPullHandle === 'function') {
+    updateCityNavPullHandle();
+  }
+
+  const navList = nav.querySelector('.city-nav-list');
+  if (navList) {
+    if (typeof scrollChildIntoHorizontalView === 'function') {
+      scrollChildIntoHorizontalView(navList, btn, { behavior: 'smooth', align: 'center' });
+    } else {
+      navList.scrollTo({
+        left: Math.max(0, btn.offsetLeft - navList.offsetLeft - (navList.clientWidth - btn.offsetWidth) / 2),
+        behavior: 'smooth'
+      });
+    }
+  }
+}
+
 function syncCityNavHighlightToLeg(leg) {
   const nav = document.getElementById('cityNav');
   if (!nav || !leg) return;
-  const btn = resolveCityNavButtonForLeg(leg);
+  const legId = String(leg.id || '');
+  let btn = legId ? (nav.querySelector(`.city-nav-btn[data-leg-id="${legId}"]`) || nav.querySelector(`.city-nav-btn[data-city="${legId}"]`)) : null;
+  if (!btn) {
+    btn = resolveCityNavButtonForLeg(leg);
+  }
   if (!btn) return;
 
-  const cityId = btn.getAttribute('data-city');
-  if (cityId && typeof highlightCityNavByCityId === 'function') {
-    highlightCityNavByCityId(cityId);
-    return;
-  }
+  const allBtns = Array.from(nav.querySelectorAll('.city-nav-btn'));
+  const activeIdx = allBtns.indexOf(btn);
+  allBtns.forEach((b, idx) => {
+    const isAllOrAdd = b.dataset.city === 'all' || b.classList.contains('city-nav-add-btn');
+    b.classList.toggle('active', b === btn);
+    b.classList.toggle('is-visited', !isAllOrAdd && activeIdx > 0 && idx < activeIdx);
+  });
 
-  nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if (typeof updateCityNavPullHandle === 'function') {
+    updateCityNavPullHandle();
+  }
 
   const navList = nav.querySelector('.city-nav-list');
   if (!navList) return;
@@ -4528,6 +4874,8 @@ function setupCompactCityNavSync(root = document) {
         stickyHeader.style.background = slideHeader.style.background || targetLeg.colour || '#0ea5e9';
         stickyHeader.innerHTML = slideHeader.innerHTML;
       }
+    } else if (slideLegId) {
+      updateCityNavActiveState(slideLegId);
     }
     if (typeof syncItineraryMobileHeightContainment === 'function') {
       syncItineraryMobileHeightContainment(root);
@@ -4742,6 +5090,7 @@ function buildCityNav() {
   if (!nav) return;
   const navList = nav.querySelector('.city-nav-list') || nav;
   if (!navList) return;
+  const safeEscape = (typeof escapeHtmlText === 'function') ? escapeHtmlText : (str => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
   const filter = window.currentCityFilter || 'all';
   const currentTripPosition = typeof getCurrentTripPosition === 'function'
     ? getCurrentTripPosition()
@@ -4756,43 +5105,104 @@ function buildCityNav() {
       ].filter(Boolean).join(' · ')
     : '';
 
-  // Keep the "All" button
+  // Leading button: 🏙️ All
   navList.innerHTML = `
     <button class="city-nav-btn px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700 ${filter === 'all' ? 'active' : ''}" data-city="all" onclick="selectCityFilter('all', this)">
       <span>🏙️ All</span>
     </button>
   `;
 
-  // Get cities in travel order (by leg appearance) and exclude transit cities from the UI
-  const citiesInOrder = getCitiesInTravelOrder().filter(c => !c.isTransit && !c.name.includes('Cruise Ship') && !c.name.includes('Start') && !c.name.includes('Return Home'));
+  // Obtain the 1:1 chronological sequence
+  const sequence = typeof getChronologicalLegSequence === 'function'
+    ? getChronologicalLegSequence()
+    : [];
 
-  // Add all city buttons - transit cities get different styling
-  citiesInOrder.forEach(city => {
-    const btn = document.createElement('button');
-    btn.setAttribute('data-city', city.id);
-    btn.onclick = () => selectCityFilter(city.id, btn);
+  if (sequence.length > 0) {
+    sequence.forEach(item => {
+      if (item.type === 'leg') {
+        const btn = document.createElement('button');
 
-    // Transit cities get different styling (gray, dashed)
-    const isTransit = city.isTransit === true; // Explicit check
-    const color = city.colour || (isTransit ? '#95a5a6' : '#2C3E50');
+        const matchedCity = (typeof getCityByName === 'function') ? getCityByName(item.cityName) : null;
+        const cityEntityId = item.leg?.cityId || (matchedCity && matchedCity.id) || '';
+        const filterSlug = String(filter || '').replace(/^(city|leg)-/, '').toLowerCase();
+        const legSlug = String(item.legId || '').replace(/^(city|leg)-/, '').toLowerCase();
 
-    if (isTransit) {
-      btn.className = 'city-nav-btn px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700 opacity-70' + (filter === city.id ? ' active' : '');
-      btn.style.borderLeft = `3px dashed ${color}`;
-    } else {
+        const isActive = filter === item.legId ||
+          (cityEntityId && filter === cityEntityId) ||
+          (filter && (
+            filter.toLowerCase() === String(item.cityName || '').toLowerCase() ||
+            (filterSlug && filterSlug === legSlug)
+          ));
+
+        const effectiveCityAttr = (cityEntityId && (filter === cityEntityId || !String(item.legId).startsWith('city-')))
+          ? cityEntityId
+          : item.legId;
+
+        btn.setAttribute('data-city', effectiveCityAttr);
+        btn.setAttribute('data-leg-id', item.legId);
+        btn.setAttribute('data-city-name', item.cityName);
+        if (cityEntityId) {
+          btn.setAttribute('data-canonical-city-id', cityEntityId);
+        }
+
+        btn.className = 'city-nav-btn px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700' + (isActive ? ' active' : '');
+        btn.style.borderLeft = `3px solid ${item.colour || '#0ea5e9'}`;
+
+        const isTodayTarget = currentTripPosition && (
+          currentTripPosition.leg?.id === item.legId ||
+          currentTripPosition.cityId === item.legId ||
+          (cityEntityId && currentTripPosition.cityId === cityEntityId) ||
+          (currentTripPosition.cityName && currentTripPosition.cityName.toLowerCase() === item.cityName.toLowerCase())
+        );
+
+        const currentDayHtml = isTodayTarget && currentDayLabel
+          ? `<span class="city-nav-current-day">${safeEscape(currentDayLabel)}</span>`
+          : '';
+        const flagHtml = item.flag || (typeof getCityFlagHTML === 'function' ? getCityFlagHTML(item.cityName) : '');
+        const flagPrefix = flagHtml ? `${flagHtml} ` : '';
+        btn.innerHTML = `<span class="city-nav-content"><span class="city-nav-city-line">${flagPrefix}${safeEscape(item.displayLabel)}</span>${currentDayHtml}</span>`;
+
+        btn.onclick = () => selectCityFilter(item.legId, btn);
+        navList.appendChild(btn);
+      } else if (item.type === 'daytrip-blip') {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-role', 'daytrip-blip');
+        btn.setAttribute('data-parent-leg-id', item.parentLegId);
+        btn.setAttribute('data-parent-leg-index', item.parentLegIndex !== undefined ? item.parentLegIndex : '');
+        btn.setAttribute('data-day-index', item.dayIndex);
+        btn.setAttribute('data-city-name', item.cityName);
+        btn.setAttribute('title', `Day trip to ${item.cityName}`);
+
+        btn.className = 'city-nav-btn city-nav-blip-btn px-2 py-0.5 rounded-full border border-dashed border-teal-400/80 dark:border-teal-500/80 bg-teal-50/50 dark:bg-teal-950/40 text-[0.7rem] font-normal text-teal-800 dark:text-teal-200 whitespace-nowrap transition-colors hover:bg-teal-100 dark:hover:bg-teal-900/60 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700';
+
+        btn.innerHTML = `<span class="city-nav-content"><span class="city-nav-city-line">↳ ${safeEscape(item.cityName)}</span></span>`;
+        btn.onclick = () => scrollToDayCard(item.parentLegId, item.parentLegIndex, item.dayIndex, btn);
+        navList.appendChild(btn);
+      }
+    });
+  } else {
+    // Fallback if no legs exist yet but citiesData exists
+    const citiesInOrder = typeof getCitiesInTravelOrder === 'function'
+      ? getCitiesInTravelOrder().filter(c => !c.isTransit && !c.name.includes('Cruise Ship') && !c.name.includes('Start') && !c.name.includes('Return Home'))
+      : [];
+
+    citiesInOrder.forEach(city => {
+      const btn = document.createElement('button');
+      btn.setAttribute('data-city', city.id);
+      btn.setAttribute('data-city-name', city.name);
+      btn.onclick = () => selectCityFilter(city.id, btn);
+
+      const color = city.colour || '#2C3E50';
       btn.className = 'city-nav-btn px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 [&.active]:bg-teal-600 [&.active]:text-white [&.active]:border-teal-600 dark:[&.active]:bg-teal-700' + (filter === city.id ? ' active' : '');
       btn.style.borderLeft = `3px solid ${color}`;
-    }
 
-    const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">&#128205;</span>';
-    const currentDayHtml = currentTripPosition?.cityId === city.id && currentDayLabel
-      ? `<span class="city-nav-current-day">${escapeHtmlText(currentDayLabel)}</span>`
-      : '';
-    btn.innerHTML = `<span class="city-nav-content"><span class="city-nav-city-line">${flagHtml} ${city.name}</span>${currentDayHtml}</span>`;
-    navList.appendChild(btn);
-  });
+      const flagHtml = typeof getCityFlagHTML === 'function' ? getCityFlagHTML(city.name) : '<span class="city-flag">&#128205;</span>';
+      btn.innerHTML = `<span class="city-nav-content"><span class="city-nav-city-line">${flagHtml} ${city.name}</span></span>`;
+      navList.appendChild(btn);
+    });
+  }
 
-  // Append + Add City button at the end of the navigation list for 1-tap mobile addition
+  // Trailing button: ➕ City
   const addCityBtn = document.createElement('button');
   addCityBtn.className = 'city-nav-btn city-nav-add-btn px-2.5 py-1 rounded-full border border-dashed border-teal-500/80 dark:border-teal-400/80 bg-teal-50 dark:bg-teal-950 text-xs font-semibold text-teal-700 dark:text-teal-300 whitespace-nowrap transition-colors hover:bg-teal-100 dark:hover:bg-teal-900 active:scale-95 flex items-center gap-1 shrink-0';
   addCityBtn.setAttribute('title', 'Add a new city or destination');
@@ -4810,6 +5220,59 @@ function buildCityNav() {
     nav.dataset.overflowCueBound = '1';
     navList.addEventListener('scroll', () => updateCityNavOverflowCue(nav, navList), { passive: true });
     window.addEventListener('resize', () => updateCityNavOverflowCue(nav, navList));
+  }
+}
+
+function scrollToDayCard(parentLegId, parentLegIndex, dayIndex, blipBtn) {
+  const nav = document.getElementById('cityNav');
+  if (nav) {
+    nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
+    if (blipBtn) blipBtn.classList.add('active');
+  }
+  if (typeof updateCityNavPullHandle === 'function') {
+    updateCityNavPullHandle();
+  }
+
+  const activeTab = document.querySelector('.app-tab-btn.active');
+  const tabType = activeTab ? activeTab.getAttribute('data-tab') : (document.body?.getAttribute?.('data-active-tab') || 'itinerary');
+  if (tabType !== 'itinerary') {
+    if (typeof switchTab === 'function') {
+      switchTab('itinerary');
+    }
+  }
+
+  const isMobile = typeof isMobileViewport === 'function' ? isMobileViewport() : (typeof window !== 'undefined' && window.innerWidth <= 768);
+
+  if (isMobile && typeof scrollToCompactCitySlide === 'function') {
+    scrollToCompactCitySlide(parentLegId);
+  }
+
+  if (typeof compactItineraryGoToDay === 'function') {
+    compactItineraryGoToDay(null, parentLegId, dayIndex);
+  }
+
+  const legEl = document.getElementById('leg-' + parentLegId) ||
+                document.getElementById(parentLegId) ||
+                document.querySelector(`[data-leg-id="${parentLegId}"]`);
+  if (legEl && legEl.classList.contains('collapsed')) {
+    legEl.classList.remove('collapsed');
+  }
+
+  const candidates = [
+    document.getElementById(`compact-day-${parentLegId}-${dayIndex}`),
+    document.getElementById(`day-${parentLegIndex}-${dayIndex}`),
+    document.querySelector(`#leg-${parentLegId} [data-day-index="${dayIndex}"]`),
+    document.querySelector(`[data-leg-id="${parentLegId}"][data-day-index="${dayIndex}"]`),
+    document.querySelector(`[data-leg-index="${parentLegIndex}"][data-day-index="${dayIndex}"]`),
+    legEl
+  ];
+  const targetDayEl = candidates.find(Boolean);
+  if (targetDayEl) {
+    if (typeof scrollToElementWithNavOffset === 'function') {
+      scrollToElementWithNavOffset(targetDayEl);
+    } else if (typeof targetDayEl.scrollIntoView === 'function') {
+      targetDayEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 }
 
@@ -4834,6 +5297,7 @@ function scrollMobileSwipePagerToCity(pagerSelector, cityId, rebuildAllFn) {
     if (!root) return null;
     const slides = Array.from(root.querySelectorAll('[data-role="mobile-swipe-slide"]'));
     return slides.find(s =>
+      s.dataset.legId === cityId ||
       s.dataset.cityId === cityId ||
       s.dataset.toCityId === cityId ||
       s.dataset.fromCityId === cityId ||
@@ -4894,6 +5358,15 @@ function focusCityInBudgetTab(cityId, cityName) {
   }
 }
 
+function switchCityFilter(targetId) {
+  const nav = document.getElementById('cityNav');
+  const btn = nav
+    ? (nav.querySelector(`.city-nav-btn[data-leg-id="${targetId}"]`) ||
+       nav.querySelector(`.city-nav-btn[data-city="${targetId}"]`))
+    : null;
+  return selectCityFilter(targetId, btn);
+}
+
 function selectCityFilter(cityId, btn) {
   const activeTab = document.querySelector('.app-tab-btn.active');
   const tabType = activeTab ? activeTab.getAttribute('data-tab') : (document.body?.getAttribute?.('data-active-tab') || 'itinerary');
@@ -4910,26 +5383,39 @@ function selectCityFilter(cityId, btn) {
   }
 
   // Update button states and visited city progression
-  if (typeof highlightCityNavByCityId === 'function') {
-    highlightCityNavByCityId(cityId);
-  } else {
-    const nav = document.getElementById('cityNav');
-    if (nav) {
-      nav.querySelectorAll('.city-nav-btn').forEach(b => b.classList.remove('active'));
-      if (btn) {
-        btn.classList.add('active');
+  const nav = document.getElementById('cityNav');
+  if (nav) {
+    const allBtns = Array.from(nav.querySelectorAll('.city-nav-btn'));
+    if (!btn) {
+      btn = nav.querySelector(`.city-nav-btn[data-leg-id="${cityId}"]`) ||
+            nav.querySelector(`.city-nav-btn[data-city="${cityId}"]`);
+    }
+    const activeIdx = btn ? allBtns.indexOf(btn) : -1;
+    allBtns.forEach((b, idx) => {
+      const isAllOrAdd = b.dataset.city === 'all' || b.classList.contains('city-nav-add-btn');
+      b.classList.toggle('active', b === btn);
+      b.classList.toggle('is-visited', !isAllOrAdd && activeIdx > 0 && idx < activeIdx);
+    });
+
+    const navList = nav.querySelector('.city-nav-list');
+    if (navList && btn) {
+      if (typeof scrollChildIntoHorizontalView === 'function') {
+        scrollChildIntoHorizontalView(navList, btn, { behavior: 'smooth', align: cityId === 'all' ? 'start' : 'center' });
       } else {
-        const activeBtn = nav.querySelector(`.city-nav-btn[data-city="${cityId}"]`);
-        if (activeBtn) activeBtn.classList.add('active');
+        navList.scrollTo({
+          left: cityId === 'all' ? 0 : Math.max(0, btn.offsetLeft - navList.offsetLeft - (navList.clientWidth - btn.offsetWidth) / 2),
+          behavior: 'smooth'
+        });
       }
     }
   }
+
   if (typeof updateCityNavPullHandle === 'function') {
     updateCityNavPullHandle();
   }
 
   if (cityId === 'all') {
-    // Show all - rebuild normally
+    // Show all - rebuild or reset view
     if (tabType === 'transport' && typeof buildTransportTab === 'function') {
       if (typeof resetMobilePagerActiveIndex === 'function') resetMobilePagerActiveIndex('transport-swipe');
       buildTransportTab('all');
@@ -4950,44 +5436,63 @@ function selectCityFilter(cityId, btn) {
         if (typeof resetMobilePagerActiveIndex === 'function') resetMobilePagerActiveIndex('compact-city-swipe');
         buildItinerary();
       } else {
+        if (typeof window !== 'undefined' && typeof window.scrollTo === 'function' && window.scrollY > 0) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
         buildItinerary();
       }
     }
   } else {
-    // Filter or focus by city across active tab
-    const cityName = typeof getCityNameById === 'function' ? getCityNameById(cityId) : cityId;
+    // Filter or focus by leg / city across active tab
+    const targetLeg = Array.isArray(appData)
+      ? (appData.find(l => String(l.id) === String(cityId)) ||
+         appData.find(l => cleanCityNavLabel(l.label || '').toLowerCase() === String(cityId).toLowerCase()))
+      : null;
+    const legId = targetLeg ? targetLeg.id : cityId;
+    const cityName = targetLeg
+      ? cleanCityNavLabel(targetLeg.label || (typeof getLegPrimaryCityName === 'function' ? getLegPrimaryCityName(targetLeg) : ''))
+      : (typeof getCityNameById === 'function' ? getCityNameById(cityId) : cityId);
 
     if (tabType === 'transport' && typeof buildTransportTab === 'function') {
+      const transportFilter = legId || cityName || cityId;
       if (isMobile) {
-        if (!scrollMobileSwipePagerToCity('#tab-transport .transport-swipe-pager', cityId, () => buildTransportTab('all'))) {
-          buildTransportTab(cityId);
+        if (!scrollMobileSwipePagerToCity('#tab-transport .transport-swipe-pager', transportFilter, () => buildTransportTab('all'))) {
+          buildTransportTab(transportFilter);
         }
-        if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(cityId, cityName);
+        if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(transportFilter, cityName);
       } else {
-        buildTransportTab(cityId);
+        buildTransportTab(transportFilter);
       }
     } else if (tabType === 'accom' && typeof buildAccomTab === 'function') {
+      const accomFilter = legId || cityName || cityId;
       if (isMobile) {
-        if (!scrollMobileSwipePagerToCity('#tab-accom .stay-swipe-pager', cityId, () => buildAccomTab('all'))) {
-          buildAccomTab(cityId);
+        if (!scrollMobileSwipePagerToCity('#tab-accom .stay-swipe-pager', accomFilter, () => buildAccomTab('all'))) {
+          buildAccomTab(accomFilter);
         }
-        if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(cityId, cityName);
+        if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(accomFilter, cityName);
       } else {
-        buildAccomTab(cityId);
+        buildAccomTab(accomFilter);
       }
     } else if (tabType === 'map') {
-      if (typeof focusCityOnMap === 'function') focusCityOnMap(cityId);
-      if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(cityId, cityName);
+      if (typeof focusCityOnMap === 'function') focusCityOnMap(cityName || cityId);
+      if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(cityName || cityId, cityName);
     } else if (tabType === 'budget') {
       focusCityInBudgetTab(cityId, cityName);
       if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(cityId, cityName);
     } else if (tabType === 'itinerary') {
       if (isMobile) {
-        if (!scrollToCompactCitySlide(cityId, cityName)) {
-          scrollToCity(cityId);
+        if (!scrollToCompactCitySlide(legId, cityName)) {
+          scrollToCity(legId);
         }
       } else {
-        scrollToCity(cityId);
+        const legEl = document.getElementById(`leg-${legId}`) ||
+                      document.getElementById(legId) ||
+                      document.querySelector(`[data-leg-id="${legId}"]`);
+        if (legEl && typeof scrollToElementWithNavOffset === 'function') {
+          scrollToElementWithNavOffset(legEl);
+        } else {
+          scrollToCity(legId);
+        }
       }
     }
   }
@@ -4998,11 +5503,12 @@ function selectCityFilter(cityId, btn) {
 }
 
 function scrollToCity(cityId) {
-  const cityName = getCityNameById(cityId);
+  const cityName = typeof getCityNameById === 'function' ? getCityNameById(cityId) : '';
   const citySlug = String(cityId || '').replace(/^(city|leg)-/, '');
 
   const candidateElementIds = [
     'leg-' + cityId,
+    cityId,
     'leg-' + citySlug,
     'leg-leg-' + citySlug
   ];
@@ -5011,6 +5517,9 @@ function scrollToCity(cityId) {
     const legEl = document.getElementById(elementId);
     if (scrollToElementWithNavOffset(legEl)) return;
   }
+
+  const directAttrEl = document.querySelector(`[data-leg-id="${cityId}"]`);
+  if (directAttrEl && scrollToElementWithNavOffset(directAttrEl)) return;
 
   for (let i = 0; i < (appData || []).length; i++) {
     const leg = appData[i];
@@ -5050,6 +5559,11 @@ function scrollToCity(cityId) {
 // Expose itinerary functions to window scope for HTML onclick handlers
 
 window.selectCityFilter = selectCityFilter;
+window.switchCityFilter = switchCityFilter;
+window.scrollToDayCard = scrollToDayCard;
+window.updateCityNavActiveState = updateCityNavActiveState;
+window.syncCityNavHighlightToLeg = syncCityNavHighlightToLeg;
+window.buildCityNav = buildCityNav;
 window.getStayDisplayForDay = getStayDisplayForDay;
 window.getDailyTimelineMapRoute = getDailyTimelineMapRoute;
 window.openDailyTimelineInMaps = openDailyTimelineInMaps;
@@ -5065,6 +5579,8 @@ window.getCurrentTripPosition = getCurrentTripPosition;
 window.applyCurrentTripPositionForTab = applyCurrentTripPositionForTab;
 window.initializeItineraryPositionForToday = initializeItineraryPositionForToday;
 window.getCustomDayTitle = getCustomDayTitle;
+window.getChronologicalLegSequence = getChronologicalLegSequence;
+window.getCompactMobileLegSequence = getCompactMobileLegSequence;
 
 // Expand to show a city in the itinerary
 function expandToCity(cityId) {

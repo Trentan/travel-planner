@@ -1,6 +1,8 @@
 // Attachments and Links Module
 
 function openLightbox(url) {
+  if (!url) return;
+  if (typeof isSafeUrl === 'function' && !isSafeUrl(url)) return;
   const lightbox = document.getElementById('image-lightbox');
   const img = document.getElementById('lightbox-img');
   if (lightbox && img) {
@@ -22,14 +24,27 @@ function generateAttachmentId() {
   return 'att_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
 }
 
+function sanitizeAttachmentUrl(url, type) {
+  if (!url || typeof url !== 'string') return '#';
+  const trimmed = url.trim();
+  const safeFn = typeof isSafeUrl === 'function' ? isSafeUrl : (u) => /^(https?:|\/|data:image\/)/i.test(u);
+  if (!safeFn(trimmed)) return '#';
+  if (type === 'image' && !/^(https?:|\/|data:image\/)/i.test(trimmed)) return '#';
+  return trimmed;
+}
+
 function renderAttachmentsListHtml(attachments, onRemoveCode) {
   if (!attachments || attachments.length === 0) return '<p class="text-xs text-slate-500">No attachments yet.</p>';
   return attachments.map((att, idx) => {
     const icon = att.type === 'link' ? '🔗' : '🖼️';
     const isImage = att.type === 'image';
+    const safeUrl = sanitizeAttachmentUrl(att.value, att.type);
+    const escapedName = typeof escapeHtmlText === 'function' ? escapeHtmlText(att.name) : String(att.name || '');
+    const escapedUrl = typeof escapeHtmlText === 'function' ? escapeHtmlText(safeUrl) : safeUrl;
+
     const linkStr = isImage
-      ? `<button type="button" class="text-blue-600 underline text-left" onclick="openLightbox('${att.value}')">${escapeHtmlText(att.name)}</button>`
-      : `<a href="${att.value}" target="_blank" class="text-blue-600 underline">${escapeHtmlText(att.name)}</a>`;
+      ? `<button type="button" class="text-blue-600 underline text-left" data-url="${escapedUrl}" onclick="openLightbox(this.getAttribute('data-url'))">${escapedName}</button>`
+      : `<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${escapedName}</a>`;
     return `
       <div class="flex justify-between items-center bg-slate-50 border border-slate-200 rounded px-2 py-1 text-sm">
         <div class="flex items-center gap-2 overflow-hidden whitespace-nowrap">
@@ -47,13 +62,17 @@ function renderAttachmentsPillsHtml(attachments) {
   return attachments.map(att => {
     const icon = att.type === 'link' ? '🔗' : '🖼️';
     const isImage = att.type === 'image';
+    const safeUrl = sanitizeAttachmentUrl(att.value, att.type);
+    const escapedName = typeof escapeHtmlText === 'function' ? escapeHtmlText(att.name) : String(att.name || '');
+    const escapedUrl = typeof escapeHtmlText === 'function' ? escapeHtmlText(safeUrl) : safeUrl;
+
     if (isImage) {
-      return `<button type="button" class="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 border border-slate-200 rounded text-xs text-slate-700 hover:bg-slate-200 transition-colors" onclick="event.stopPropagation(); openLightbox('${att.value}')" title="${escapeHtmlText(att.name)}">
-        <span>${icon}</span> <span class="max-w-[100px] truncate">${escapeHtmlText(att.name)}</span>
+      return `<button type="button" class="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 border border-slate-200 rounded text-xs text-slate-700 hover:bg-slate-200 transition-colors" data-url="${escapedUrl}" onclick="event.stopPropagation(); openLightbox(this.getAttribute('data-url'))" title="${escapedName}">
+        <span>${icon}</span> <span class="max-w-[100px] truncate">${escapedName}</span>
       </button>`;
     } else {
-      return `<a href="${att.value}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 border border-slate-200 rounded text-xs text-slate-700 hover:bg-slate-200 transition-colors" onclick="event.stopPropagation();" title="${escapeHtmlText(att.name)}">
-        <span>${icon}</span> <span class="max-w-[100px] truncate">${escapeHtmlText(att.name)}</span>
+      return `<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 border border-slate-200 rounded text-xs text-slate-700 hover:bg-slate-200 transition-colors" onclick="event.stopPropagation();" title="${escapedName}">
+        <span>${icon}</span> <span class="max-w-[100px] truncate">${escapedName}</span>
       </a>`;
     }
   }).join(' ');

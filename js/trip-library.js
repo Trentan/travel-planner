@@ -5,7 +5,7 @@
    ========================================================================== */
 
 (function() {
-  'use me strict';
+  'use strict';
 
   // Toggle Header Trip Dropdown Menu
   window.toggleTripDropdown = function(event) {

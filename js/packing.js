@@ -156,7 +156,7 @@ function renderHotelCheckoutItems() {
     if (isLeaveHomeSection(item)) {
       return `
         <div class="packing-section-header mt-4 mb-2 px-2 flex justify-between items-center w-full group">
-          <h4 contenteditable="${canEdit}" onblur="updateHotelCheckoutItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
+          <h4 contenteditable="${canEdit}" onblur="updateHotelCheckoutItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${typeof escapeHtmlText === 'function' ? escapeHtmlText(item.text) : item.text}</h4>
           ${canEdit ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteHotelCheckoutItem(${iIdx})">&times;</button>` : ''}
         </div>
       `;
@@ -165,7 +165,7 @@ function renderHotelCheckoutItems() {
     return `
       <div class="packing-item leave-home-item w-full">
         <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleHotelCheckoutItem(event, ${iIdx})">
-        <span contenteditable="${canEdit}" onblur="updateHotelCheckoutItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+        <span contenteditable="${canEdit}" onblur="updateHotelCheckoutItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${typeof escapeHtmlText === 'function' ? escapeHtmlText(item.text) : item.text}</span>
         ${canEdit ? `<button class="del-btn" title="Delete Item" onclick="deleteHotelCheckoutItem(${iIdx})">&times;</button>` : ''}
       </div>
     `;
@@ -321,7 +321,7 @@ function renderLeaveHomeItems() {
     if (isLeaveHomeSection(item)) {
       return `
         <div class="packing-section-header mt-4 mb-2 px-2 flex justify-between items-center w-full group">
-          <h4 contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${item.text}</h4>
+          <h4 contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="font-semibold text-slate-700 dark:text-slate-300 m-0" style="margin-bottom: 0;">${typeof escapeHtmlText === 'function' ? escapeHtmlText(item.text) : item.text}</h4>
           ${canEdit ? `<button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity" title="Delete Section" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
         </div>
       `;
@@ -330,7 +330,7 @@ function renderLeaveHomeItems() {
     return `
       <div class="packing-item leave-home-item">
         <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleLeaveHomeItem(event, ${iIdx})">
-        <span contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${item.text}</span>
+        <span contenteditable="${canEdit}" onblur="updateLeaveHomeItem(${iIdx}, this.innerText)" class="${item.done ? 'content-done' : ''}">${typeof escapeHtmlText === 'function' ? escapeHtmlText(item.text) : item.text}</span>
         ${canEdit ? `<button class="del-btn" title="Delete Item" onclick="deleteLeaveHomeItem(${iIdx})">&times;</button>` : ''}
       </div>
     `;

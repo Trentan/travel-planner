@@ -59,6 +59,8 @@ function runIsSafeUrlTests() {
   assert(isSafeUrl('  http://example.com  ') === true, 'trimmed http URL should return true');
 
   // 4. Disallowed / Unsafe URL protocols
+  assert(isSafeUrl('data:text/html,<script>alert(1)</script>') === false, 'html data URI should return false');
+  assert(isSafeUrl('data:text/html;base64,PHNjcmlwdD4=') === false, 'base64 html data URI should return false');
   assert(isSafeUrl('javascript:alert(1)') === false, 'javascript: URI should return false');
   assert(isSafeUrl('JAVASCRIPT:alert(1)') === false, 'uppercase JAVASCRIPT: URI should return false');
   assert(isSafeUrl('javascript:void(0)') === false, 'javascript:void(0) should return false');

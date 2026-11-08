@@ -139,6 +139,14 @@ function runPackingTests() {
   // isActiveGuide
   assert(isActiveGuide('leaveHome') === false, 'isActiveGuide should return false when no active guide panel');
 
+  // XSS escaping check (Issue #641)
+  const utilsSource = loadSource(path.join('js', 'utils.js'));
+  runScriptInContext(utilsSource, context, 'js/utils.js');
+  context.leaveHomeData.push({ text: '<img src=x onerror=alert(1)>', done: false });
+  const renderedLeaveHome = context.renderLeaveHomeItems();
+  assert(!renderedLeaveHome.includes('<img src=x onerror=alert(1)>'), 'renderLeaveHomeItems must escape HTML tags');
+  assert(renderedLeaveHome.includes('&lt;img src=x onerror=alert(1)&gt;'), 'renderLeaveHomeItems must encode HTML entities');
+
   console.log('✅ ALL js/packing.js UNIT TESTS PASSED CLEANLY!');
 }
 

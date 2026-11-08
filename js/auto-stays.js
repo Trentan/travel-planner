@@ -161,10 +161,19 @@ function createStayFromItinerary(cityName, legId, startDate, nights) {
     (typeof citiesData !== 'undefined' && Array.isArray(citiesData) ? citiesData.find(c => c.name === cityName || (c.name && c.name.toLowerCase() === String(cityName || '').toLowerCase())) : null);
   if (!city) return null;
 
-  // Calculate check-out date
-  const checkInDate = new Date(startDate);
-  const checkOutDate = new Date(checkInDate);
-  checkOutDate.setDate(checkOutDate.getDate() + nights);
+  // Calculate check-in and check-out dates safely without UTC-midnight timezone rollback (Issue #642)
+  const checkInIso = (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate.trim()))
+    ? startDate.trim()
+    : (typeof toLocalIsoDate === 'function' ? toLocalIsoDate(new Date(startDate)) : String(startDate || ''));
+
+  let checkOutIso = '';
+  if (typeof addDaysToIsoDate === 'function') {
+    checkOutIso = addDaysToIsoDate(checkInIso, nights);
+  } else {
+    const d = new Date(`${checkInIso}T12:00:00`);
+    d.setDate(d.getDate() + nights);
+    checkOutIso = typeof toLocalIsoDate === 'function' ? toLocalIsoDate(d) : d.toISOString().split('T')[0];
+  }
 
   // Create stay object
   const stayId = 'stay-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
@@ -173,8 +182,8 @@ function createStayFromItinerary(cityName, legId, startDate, nights) {
     id: stayId,
     cityId: city.id,
     propertyName: '', // User will need to fill this in
-    checkIn: typeof toLocalIsoDate === 'function' ? toLocalIsoDate(checkInDate) : checkInDate.toISOString().split('T')[0],
-    checkOut: typeof toLocalIsoDate === 'function' ? toLocalIsoDate(checkOutDate) : checkOutDate.toISOString().split('T')[0],
+    checkIn: checkInIso,
+    checkOut: checkOutIso,
     nights: nights,
     status: 'pending',
     totalCost: '0',

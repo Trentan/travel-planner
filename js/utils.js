@@ -115,7 +115,13 @@ function isSafeUrl(url) {
       ? window.location.href
       : 'http://localhost/';
     const parsed = new URL(trimmed, base);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'data:';
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return true;
+    }
+    if (parsed.protocol === 'data:') {
+      return /^data:(image\/(png|jpeg|jpg|webp|gif)|text\/plain)/i.test(trimmed);
+    }
+    return false;
   } catch (e) {
     return false;
   }
@@ -519,9 +525,11 @@ function highlightCityNavByCityId(cityId, ...fallbackCandidates) {
   let btn = null;
   for (const cand of candidates) {
     const cleanCand = cand.replace(/^city-/, '');
-    btn = nav.querySelector(`.city-nav-btn[data-city="${cand}"]`) ||
+    btn = nav.querySelector(`.city-nav-btn[data-leg-id="${cand}"]`) ||
+          nav.querySelector(`.city-nav-btn[data-city="${cand}"]`) ||
           nav.querySelector(`.city-nav-btn[data-city="city-${cleanCand}"]`) ||
-          nav.querySelector(`.city-nav-btn[data-city="${cleanCand}"]`);
+          nav.querySelector(`.city-nav-btn[data-city="${cleanCand}"]`) ||
+          nav.querySelector(`.city-nav-btn[data-city-name="${cand}"]`);
     if (btn) break;
     if (typeof getCityByName === 'function') {
       const matched = getCityByName(cand);

@@ -11,6 +11,7 @@ Build a reliable, polished travel planner app ready for production release. Qual
 3. Every change requires verification.
 4. Avoid unnecessary rewrites.
 5. Prefer simple maintainable solutions.
+6. Superpowers for planning, Ponytail for coding/minimal implementation (see AGENTS.md).
 
 ---
 
