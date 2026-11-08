@@ -4936,7 +4936,6 @@ function _initLoadChecklistsAndCities() {
           city.countryCode = countryMatch ? countryMatch.code : '';
         }
       });
-      saveData(false);
     } catch (e) {
       console.error('[Cities] Failed to parse saved cities:', e);
       citiesData = typeof DEFAULT_CITIES !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_CITIES)) : [];

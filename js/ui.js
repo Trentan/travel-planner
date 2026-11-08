@@ -75,35 +75,32 @@ function updateStickyOffsets() {
   if (!tabsNav) return;
 
   const isMobile = isMobileViewport();
+  // Batch all layout reads first before mutating styles
   const menuHeight = !isMobile && menuBar
     ? Math.ceil(menuBar.getBoundingClientRect().height || 0)
     : 0;
   const tabsHeight = Math.ceil(tabsNav.getBoundingClientRect().height || 0);
-
-  if (!isMobile) {
-    tabsNav.style.top = `${menuHeight}px`;
-  } else {
-    tabsNav.style.top = '';
-  }
-
   const isCityNavVisible = cityNav && !cityNav.classList.contains('tab-hidden') && (typeof window !== 'undefined' && window.getComputedStyle ? window.getComputedStyle(cityNav).display !== 'none' : true);
   const cityHeight = isCityNavVisible
     ? Math.ceil(cityNav.getBoundingClientRect().height || 0)
     : 0;
 
+  // Writes: skip if unchanged to prevent forced layout recalculations
+  const targetTabsTop = !isMobile ? `${menuHeight}px` : '';
+  if (tabsNav.style.top !== targetTabsTop) {
+    tabsNav.style.top = targetTabsTop;
+  }
+
   if (cityNav) {
-    if (isMobile) {
-      cityNav.style.top = '';
-    } else {
-      const cityTop = Math.max(0, menuHeight + tabsHeight - 1);
-      cityNav.style.top = `${cityTop}px`;
+    const targetCityTop = isMobile ? '' : `${Math.max(0, menuHeight + tabsHeight - 1)}px`;
+    if (cityNav.style.top !== targetCityTop) {
+      cityNav.style.top = targetCityTop;
     }
   }
 
-  if (!isMobile) {
-    document.body.style.paddingTop = `${menuHeight + tabsHeight}px`;
-  } else {
-    document.body.style.paddingTop = '';
+  const targetBodyPadding = !isMobile ? `${menuHeight + tabsHeight}px` : '';
+  if (document.body && document.body.style && document.body.style.paddingTop !== targetBodyPadding) {
+    document.body.style.paddingTop = targetBodyPadding;
   }
 
   // Set CSS custom properties on document root for fluid calculations
@@ -978,8 +975,23 @@ function toggleAllLegs() {
   document.getElementById('expandAllLegs').textContent = allLegsExpanded ? '▲ Collapse all legs' : '▼ Expand all legs';
 }
 
-window.addEventListener('resize', syncResponsiveUi);
-window.addEventListener('orientationchange', syncResponsiveUi);
+let responsiveResizeRafId = null;
+function handleResponsiveResizeThrottled() {
+  if (responsiveResizeRafId && typeof cancelAnimationFrame === 'function') {
+    cancelAnimationFrame(responsiveResizeRafId);
+  }
+  if (typeof requestAnimationFrame === 'function') {
+    responsiveResizeRafId = requestAnimationFrame(() => {
+      responsiveResizeRafId = null;
+      syncResponsiveUi();
+    });
+  } else {
+    syncResponsiveUi();
+  }
+}
+
+window.addEventListener('resize', handleResponsiveResizeThrottled, { passive: true });
+window.addEventListener('orientationchange', handleResponsiveResizeThrottled, { passive: true });
 document.addEventListener('DOMContentLoaded', syncResponsiveUi);
 window.addEventListener('load', syncResponsiveUi);
 
@@ -1573,11 +1585,22 @@ function initDesktopSplitLayout() {
         });
       }, { passive: true });
 
+      let splitResizeRafId = null;
       window.addEventListener('resize', () => {
         if (window.innerWidth >= 1024 && getDesktopSplitMode() === 'split') {
-          syncDesktopSplitToDayInView(true);
+          if (splitResizeRafId && typeof cancelAnimationFrame === 'function') {
+            cancelAnimationFrame(splitResizeRafId);
+          }
+          if (typeof requestAnimationFrame === 'function') {
+            splitResizeRafId = requestAnimationFrame(() => {
+              splitResizeRafId = null;
+              syncDesktopSplitToDayInView(true);
+            });
+          } else {
+            syncDesktopSplitToDayInView(true);
+          }
         }
-      });
+      }, { passive: true });
     }
   }
 

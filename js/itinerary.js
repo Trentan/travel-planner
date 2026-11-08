@@ -1239,11 +1239,22 @@ window.syncItineraryMobileHeightContainment = syncItineraryMobileHeightContainme
 
 if (typeof window !== 'undefined' && !window.__itineraryResizeBound) {
   window.__itineraryResizeBound = true;
+  let itineraryResizeRaf = null;
   window.addEventListener('resize', () => {
-    if (typeof syncItineraryMobileHeightContainment === 'function') {
+    if (itineraryResizeRaf && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(itineraryResizeRaf);
+    }
+    if (typeof requestAnimationFrame === 'function') {
+      itineraryResizeRaf = requestAnimationFrame(() => {
+        itineraryResizeRaf = null;
+        if (typeof syncItineraryMobileHeightContainment === 'function') {
+          syncItineraryMobileHeightContainment(document);
+        }
+      });
+    } else if (typeof syncItineraryMobileHeightContainment === 'function') {
       syncItineraryMobileHeightContainment(document);
     }
-  });
+  }, { passive: true });
 }
 
 function setupCompactItineraryPagers(root = document) {
@@ -1600,8 +1611,12 @@ function syncCompactDayPagerState(pager, nextIndex, context = {}) {
 
 function compactItineraryGoToDay(event, legId, dayIndex) {
   if (event) {
-    event.preventDefault();
-    event.stopPropagation();
+    if (event.cancelable && typeof event.preventDefault === 'function') {
+      event.preventDefault();
+    }
+    if (typeof event.stopPropagation === 'function') {
+      event.stopPropagation();
+    }
   }
 
   const nextIndex = Math.max(0, Number(dayIndex) || 0);
@@ -1653,8 +1668,12 @@ function compactItineraryGoToDay(event, legId, dayIndex) {
 
 function compactItineraryGoToCityIndex(event, targetLegIndex) {
   if (event) {
-    event.preventDefault();
-    event.stopPropagation();
+    if (event.cancelable && typeof event.preventDefault === 'function') {
+      event.preventDefault();
+    }
+    if (typeof event.stopPropagation === 'function') {
+      event.stopPropagation();
+    }
   }
   const idx = Math.max(0, Number(targetLegIndex) || 0);
   if (typeof setMobilePagerActiveIndex === 'function') {
@@ -5218,8 +5237,32 @@ function buildCityNav() {
   }
   if (!nav.dataset.overflowCueBound) {
     nav.dataset.overflowCueBound = '1';
-    navList.addEventListener('scroll', () => updateCityNavOverflowCue(nav, navList), { passive: true });
-    window.addEventListener('resize', () => updateCityNavOverflowCue(nav, navList));
+    let cueScrollRaf = null;
+    navList.addEventListener('scroll', () => {
+      if (cueScrollRaf) return;
+      if (typeof requestAnimationFrame === 'function') {
+        cueScrollRaf = requestAnimationFrame(() => {
+          cueScrollRaf = null;
+          updateCityNavOverflowCue(nav, navList);
+        });
+      } else {
+        updateCityNavOverflowCue(nav, navList);
+      }
+    }, { passive: true });
+    let cueResizeRaf = null;
+    window.addEventListener('resize', () => {
+      if (cueResizeRaf && typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(cueResizeRaf);
+      }
+      if (typeof requestAnimationFrame === 'function') {
+        cueResizeRaf = requestAnimationFrame(() => {
+          cueResizeRaf = null;
+          updateCityNavOverflowCue(nav, navList);
+        });
+      } else {
+        updateCityNavOverflowCue(nav, navList);
+      }
+    }, { passive: true });
   }
 }
 

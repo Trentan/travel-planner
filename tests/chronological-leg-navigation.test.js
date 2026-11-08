@@ -752,6 +752,28 @@ function runChronologicalLegNavigationTests() {
     assert(bangkokRow.accom === 500, `Expected Bangkok consolidated accommodation $500, got ${bangkokRow.accom}`);
   }
 
+  // 14. Passive / non-cancelable event safety (prevents 'Unable to preventDefault inside passive event listener')
+  {
+    const context = setupTestContext();
+    let stopPropagationCalled = false;
+    const passiveEvent = {
+      cancelable: false,
+      preventDefault: () => {
+        throw new Error('Unable to preventDefault inside passive event listener invocation');
+      },
+      stopPropagation: () => {
+        stopPropagationCalled = true;
+      }
+    };
+
+    context.compactItineraryGoToCityIndex(passiveEvent, 1);
+    assert(stopPropagationCalled === true, 'compactItineraryGoToCityIndex: stopPropagation called on passive event');
+
+    stopPropagationCalled = false;
+    context.compactItineraryGoToDay(passiveEvent, 'leg-1', 0);
+    assert(stopPropagationCalled === true, 'compactItineraryGoToDay: stopPropagation called on passive event');
+  }
+
   console.log('✅ ALL 1:1 Chronological Leg Navigation unit tests passed cleanly!');
 }
 
