@@ -100,6 +100,9 @@ function runFrictionlessPersistenceTests() {
   const utilsSource = loadSource(path.join('js', 'utils.js'));
   runScriptInContext(utilsSource, context, 'js/utils.js');
 
+  const storageSource = loadSource(path.join('js', 'storage-db.js'));
+  runScriptInContext(storageSource, context, 'js/storage-db.js');
+
   const dataSource = loadSource(path.join('js', 'data.js'));
   runScriptInContext(dataSource, context, 'js/data.js');
 

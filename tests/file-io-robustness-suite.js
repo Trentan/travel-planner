@@ -129,11 +129,13 @@ async function run() {
   
   // Load necessary sources
   const utilsJs = loadSource(path.join('js', 'utils.js'));
+  const storageDbJs = loadSource(path.join('js', 'storage-db.js'));
   const dataJs = loadSource(path.join('js', 'data.js'));
   const guideJs = loadSource(path.join('js', 'guide.js'));
   const cloudStorageJs = loadSource(path.join('js', 'cloud-storage.js'));
 
   runScriptInContext(utilsJs, context, 'js/utils.js');
+  runScriptInContext(storageDbJs, context, 'js/storage-db.js');
   runScriptInContext(dataJs, context, 'js/data.js');
   runScriptInContext(guideJs, context, 'js/guide.js');
   runScriptInContext(cloudStorageJs, context, 'js/cloud-storage.js');
