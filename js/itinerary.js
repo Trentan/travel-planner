@@ -1818,7 +1818,7 @@ function getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount) 
 
 function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap, activeCityIndex = 0) {
   const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
-  const leg = entry.leg;
+  const leg = entry.leg || entry;
   const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
   const nightLabel = getLegNightSummary(leg).label;
   const legCost = getLegTotalCost(leg);
@@ -1827,7 +1827,7 @@ function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap, activeC
   const metrics = getTripDayMetrics(leg.id || legIndex);
 
   const legDateRangeHtml = renderCompactLegDateRangeHtml(firstDay, lastDay);
-  const displayLegLabel = getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
+  const displayLegLabel = entry.displayLabel || getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
 
   const legCard = `
     <article class="compact-leg-card">
@@ -1847,8 +1847,9 @@ function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap, activeC
     </article>
   `;
 
+  const legId = entry.legId || leg.id || `leg-${legIndex}`;
   return `
-    <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide ${legIndex === activeCityIndex ? 'is-active' : ''}" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(leg.id || '')}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
+    <div id="city-slide-${legIndex}" class="mobile-swipe-slide compact-city-slide ${legIndex === activeCityIndex ? 'is-active' : ''}" data-role="mobile-swipe-slide" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(legId)}" data-city-id="${escapeHtmlText(entry.cityId || '')}">
       ${legCard}
     </div>
   `;
@@ -1856,14 +1857,14 @@ function renderCompactCitySlide(entry, legIndex, journeysByJourneyIdMap, activeC
 
 function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap, activeCityIndex = 0) {
   const journeysByJourneyId = journeysByJourneyIdMap || getJourneysGroupedByJourneyId();
-  const leg = entry.leg;
+  const leg = entry.leg || entry;
   const daysCount = Array.isArray(leg.days) ? leg.days.length : 0;
   const nightLabel = getLegNightSummary(leg).label;
   const firstDay = leg.days && leg.days[0];
   const lastDay = leg.days && leg.days[daysCount - 1];
   const metrics = getTripDayMetrics(leg.id || legIndex);
 
-  const displayLegLabel = getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
+  const displayLegLabel = entry.displayLabel || getCompactLegDisplayLabel(leg, legIndex, firstDay, lastDay, daysCount);
 
   const chipDateRangeHtml = firstDay && lastDay && firstDay.date !== lastDay.date
       ? `${escapeHtmlText(firstDay.date)} &rarr; ${escapeHtmlText(lastDay.date)}`
@@ -1871,9 +1872,10 @@ function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap, activeCi
 
   const flightTimeLabel = getLegFlightButtonTimeLabel(leg, journeysByJourneyId);
   const routeDetail = [flightTimeLabel || nightLabel, metrics.legTripDayRangeShort].filter(Boolean).join(' · ');
+  const legId = entry.legId || leg.id || `leg-${legIndex}`;
 
   return `
-    <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === activeCityIndex ? 'true' : 'false'}">
+    <button type="button" class="mobile-swipe-chip compact-city-chip" style="--day-chip-accent:${escapeHtmlText(leg.colour || '#0ea5e9')};" data-role="mobile-swipe-chip" data-slide-index="${legIndex}" data-leg-id="${escapeHtmlText(legId)}" aria-controls="city-slide-${legIndex}" aria-selected="${legIndex === activeCityIndex ? 'true' : 'false'}">
       <span class="mobile-swipe-chip-eyebrow">${chipDateRangeHtml}</span>
       <span class="mobile-swipe-chip-title">${escapeHtmlText(displayLegLabel)}</span>
       <span class="mobile-swipe-chip-route">${escapeHtmlText(routeDetail)}</span>
@@ -1881,8 +1883,9 @@ function renderCompactCityChip(entry, legIndex, journeysByJourneyIdMap, activeCi
   `;
 }
 
-function renderCompactActiveCityHeader(firstLeg, activeIndex = 0) {
-  if (!firstLeg) return '';
+function renderCompactActiveCityHeader(firstLegOrEntry, activeIndex = 0) {
+  if (!firstLegOrEntry) return '';
+  const firstLeg = firstLegOrEntry.leg || firstLegOrEntry;
 
   const daysCount = Array.isArray(firstLeg.days) ? firstLeg.days.length : 0;
   const nightLabel = getLegNightSummary(firstLeg).label;
@@ -1892,7 +1895,7 @@ function renderCompactActiveCityHeader(firstLeg, activeIndex = 0) {
   const metrics = getTripDayMetrics(firstLeg.id || activeIndex);
 
   const legDateRangeHtml = renderCompactLegDateRangeHtml(firstDay, lastDay);
-  const displayLegLabel = getCompactLegDisplayLabel(firstLeg, activeIndex, firstDay, lastDay, daysCount);
+  const displayLegLabel = firstLegOrEntry.displayLabel || getCompactLegDisplayLabel(firstLeg, activeIndex, firstDay, lastDay, daysCount);
 
   return `
     <div id="compactActiveCityHeader" class="active-city-sticky-header leg-header compact-leg-header" style="background:${escapeHtmlText(firstLeg.colour || '#0ea5e9')}; cursor:default;">
@@ -1916,7 +1919,7 @@ function createCompactCitySwipeElement(mobileLegSequence, journeysByJourneyId) {
   const railHtml = mobileLegSequence.map((entry, legIndex) => renderCompactCityChip(entry, legIndex, journeysByJourneyId, activeCityIndex));
 
   const activeEntry = mobileLegSequence[activeCityIndex] || mobileLegSequence[0];
-  const activeStickyHeaderHtml = activeEntry ? renderCompactActiveCityHeader(activeEntry.leg, activeCityIndex) : '';
+  const activeStickyHeaderHtml = activeEntry ? renderCompactActiveCityHeader(activeEntry, activeCityIndex) : '';
 
   const pagerRoot = document.createElement('div');
   pagerRoot.className = 'compact-city-swipe-root';
@@ -2052,8 +2055,11 @@ function moveToAdjacentCityDayPager(currentPager, direction) {
   if (progressFill) {
     progressFill.style.width = `${((nextCityIndex + 1) / citySlides.length) * 100}%`;
   }
+  const nextCitySlideLegId = nextCitySlide?.dataset.legId || '';
   const nextCitySlideId = nextCitySlide?.dataset.cityId || '';
-  if (nextCitySlideId && typeof highlightCityNavByCityId === 'function') {
+  if (nextCitySlideLegId && typeof updateCityNavActiveState === 'function') {
+    updateCityNavActiveState(nextCitySlideLegId);
+  } else if (nextCitySlideId && typeof highlightCityNavByCityId === 'function') {
     highlightCityNavByCityId(nextCitySlideId);
   }
 
@@ -2073,6 +2079,23 @@ function moveToAdjacentCityDayPager(currentPager, direction) {
 }
 
 function getCompactMobileLegSequence() {
+  const chronoSeq = (typeof getChronologicalLegSequence === 'function')
+    ? getChronologicalLegSequence()
+    : [];
+
+  const legsOnly = chronoSeq.filter(item => item && item.type === 'leg');
+  if (legsOnly.length > 0) {
+    return legsOnly.map(item => ({
+      leg: item.leg,
+      legId: item.legId,
+      cityId: item.cityId,
+      cityName: item.cityName,
+      displayLabel: item.displayLabel,
+      flag: item.flag,
+      colour: item.colour
+    }));
+  }
+
   const baseLegs = Array.isArray(appData) ? appData : [];
   const baseEntries = baseLegs.map((leg, idx) => {
     const firstDay = Array.isArray(leg.days) && leg.days[0] ? leg.days[0] : null;
@@ -2083,11 +2106,15 @@ function getCompactMobileLegSequence() {
     if (!matchedCity && Array.isArray(citiesData)) {
       matchedCity = citiesData.find(c => c && (c.id === leg.cityId || c.id === fallbackId)) || null;
     }
+    const legId = leg.id || `leg-${idx}`;
     return {
       leg,
+      legId,
       score: getLegDateScore(leg, idx),
       cityId: (matchedCity && matchedCity.id) ? matchedCity.id : fallbackId,
-      cityName: (matchedCity && matchedCity.name) ? matchedCity.name : cleanName
+      cityName: (matchedCity && matchedCity.name) ? matchedCity.name : cleanName,
+      displayLabel: cleanName,
+      colour: leg.colour || '#0ea5e9'
     };
   });
   return baseEntries.sort((a, b) => a.score - b.score);
@@ -5270,6 +5297,7 @@ function scrollMobileSwipePagerToCity(pagerSelector, cityId, rebuildAllFn) {
     if (!root) return null;
     const slides = Array.from(root.querySelectorAll('[data-role="mobile-swipe-slide"]'));
     return slides.find(s =>
+      s.dataset.legId === cityId ||
       s.dataset.cityId === cityId ||
       s.dataset.toCityId === cityId ||
       s.dataset.fromCityId === cityId ||
@@ -5426,22 +5454,24 @@ function selectCityFilter(cityId, btn) {
       : (typeof getCityNameById === 'function' ? getCityNameById(cityId) : cityId);
 
     if (tabType === 'transport' && typeof buildTransportTab === 'function') {
+      const transportFilter = legId || cityName || cityId;
       if (isMobile) {
-        if (!scrollMobileSwipePagerToCity('#tab-transport .transport-swipe-pager', cityName || cityId, () => buildTransportTab('all'))) {
-          buildTransportTab(cityName || cityId);
+        if (!scrollMobileSwipePagerToCity('#tab-transport .transport-swipe-pager', transportFilter, () => buildTransportTab('all'))) {
+          buildTransportTab(transportFilter);
         }
-        if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(cityName || cityId, cityName);
+        if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(transportFilter, cityName);
       } else {
-        buildTransportTab(cityName || cityId);
+        buildTransportTab(transportFilter);
       }
     } else if (tabType === 'accom' && typeof buildAccomTab === 'function') {
+      const accomFilter = legId || cityName || cityId;
       if (isMobile) {
-        if (!scrollMobileSwipePagerToCity('#tab-accom .stay-swipe-pager', cityName || cityId, () => buildAccomTab('all'))) {
-          buildAccomTab(cityName || cityId);
+        if (!scrollMobileSwipePagerToCity('#tab-accom .stay-swipe-pager', accomFilter, () => buildAccomTab('all'))) {
+          buildAccomTab(accomFilter);
         }
-        if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(cityName || cityId, cityName);
+        if (typeof highlightCityNavByCityId === 'function') highlightCityNavByCityId(accomFilter, cityName);
       } else {
-        buildAccomTab(cityName || cityId);
+        buildAccomTab(accomFilter);
       }
     } else if (tabType === 'map') {
       if (typeof focusCityOnMap === 'function') focusCityOnMap(cityName || cityId);
@@ -5550,6 +5580,7 @@ window.applyCurrentTripPositionForTab = applyCurrentTripPositionForTab;
 window.initializeItineraryPositionForToday = initializeItineraryPositionForToday;
 window.getCustomDayTitle = getCustomDayTitle;
 window.getChronologicalLegSequence = getChronologicalLegSequence;
+window.getCompactMobileLegSequence = getCompactMobileLegSequence;
 
 // Expand to show a city in the itinerary
 function expandToCity(cityId) {

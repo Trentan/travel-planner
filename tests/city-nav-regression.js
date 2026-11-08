@@ -63,7 +63,8 @@ function getFixtureCityNav(appData, citiesData, journeys, stays, cityNavBlock) {
 return {
   order: getCitiesInTravelOrder(),
   londonLeg: findLegForJourneyCity('city-london', 'London')?.id,
-  veronaLeg: appData.find(l => cleanCityNavLabel(l.label).toLowerCase() === 'verona')?.id
+  veronaLeg: appData.find(l => cleanCityNavLabel(l.label).toLowerCase() === 'verona')?.id,
+  chronologicalSequence: getChronologicalLegSequence(appData)
 };`
   )(appData, citiesData, journeys, stays);
 }
@@ -150,6 +151,30 @@ async function run() {
     'Repeated city visits should map to one best/longest-stay city nav entry'
   );
 
+  // 1:1 Chronological Leg Navigation Assertions
+  const chronoSeq = cityNav.chronologicalSequence;
+  assert(Array.isArray(chronoSeq), 'getChronologicalLegSequence should return an array');
+  assert(chronoSeq.length === 17, `Chronological sequence length should match 17 legs, got ${chronoSeq.length}`);
+
+  // Assert Brisbane (Trip Start) is leg 0 with isStart: true
+  assert(chronoSeq[0].displayLabel === 'Brisbane (Trip Start)', `Leg 0 displayLabel should be "Brisbane (Trip Start)", got "${chronoSeq[0].displayLabel}"`);
+  assert(chronoSeq[0].legIndex === 0, `Leg 0 legIndex should be 0, got ${chronoSeq[0].legIndex}`);
+  assert(chronoSeq[0].isStart === true, 'Leg 0 should have isStart: true');
+  assert(!chronoSeq[0].isFinish, 'Leg 0 should not have isFinish: true');
+
+  // Assert Brisbane (Trip Finish) is leg 16 with isFinish: true
+  assert(chronoSeq[16].displayLabel === 'Brisbane (Trip Finish)', `Leg 16 displayLabel should be "Brisbane (Trip Finish)", got "${chronoSeq[16].displayLabel}"`);
+  assert(chronoSeq[16].legIndex === 16, `Leg 16 legIndex should be 16, got ${chronoSeq[16].legIndex}`);
+  assert(chronoSeq[16].isFinish === true, 'Leg 16 should have isFinish: true');
+  assert(!chronoSeq[16].isStart, 'Leg 16 should not have isStart: true');
+
+  // Assert Bangkok appears at 3 distinct chronological visit positions (Bangkok (1), Bangkok (2), Bangkok (3))
+  const bangkokVisits = chronoSeq.filter(item => item.cityName === 'Bangkok');
+  assert(bangkokVisits.length === 3, `Bangkok should appear in 3 chronological legs, got ${bangkokVisits.length}`);
+  assert(bangkokVisits[0].displayLabel === 'Bangkok (1)' && bangkokVisits[0].legIndex === 2, `Bangkok visit 1 should be "Bangkok (1)" at index 2, got "${bangkokVisits[0].displayLabel}" at index ${bangkokVisits[0].legIndex}`);
+  assert(bangkokVisits[1].displayLabel === 'Bangkok (2)' && bangkokVisits[1].legIndex === 13, `Bangkok visit 2 should be "Bangkok (2)" at index 13, got "${bangkokVisits[1].displayLabel}" at index ${bangkokVisits[1].legIndex}`);
+  assert(bangkokVisits[2].displayLabel === 'Bangkok (3)' && bangkokVisits[2].legIndex === 15, `Bangkok visit 3 should be "Bangkok (3)" at index 15, got "${bangkokVisits[2].displayLabel}" at index ${bangkokVisits[2].legIndex}`);
+
   const journeyMapping = getFixtureJourneyMapping(
     fixture.itinerary,
     importedCities,
@@ -178,6 +203,8 @@ async function run() {
     firstFour: navNames.slice(0, 4),
     aroundVerona: navNames.slice(navNames.indexOf('Bolzano'), navNames.indexOf('Zurich') + 1),
     bangkokIndex: navNames.indexOf('Bangkok'),
+    chronologicalLegs: chronoSeq.length,
+    bangkokVisits: bangkokVisits.map(v => ({ legIndex: v.legIndex, label: v.displayLabel, legId: v.legId })),
     londonLeg: cityNav.londonLeg,
     veronaLeg: cityNav.veronaLeg,
     blankJourneyLegIds: journeyMapping.blankLegIds

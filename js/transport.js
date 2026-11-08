@@ -1390,9 +1390,33 @@ function buildTransportTab(cityFilter = null) {
 
   let toShow = getSortedJourneys();
   if (cityFilter && cityFilter !== 'all') {
-    toShow = toShow.filter(j =>
-        j.fromCityId === cityFilter || j.toCityId === cityFilter
-    );
+    const filterStr = String(cityFilter).trim();
+    const filterLower = filterStr.toLowerCase();
+
+    const targetLeg = (typeof appData !== 'undefined' && Array.isArray(appData))
+      ? (appData.find(l => l && (String(l.id || '') === filterStr || String(l.cityId || '') === filterStr)) ||
+         appData.find(l => l && String(l.id || '').replace(/^leg-/, '') === filterStr.replace(/^leg-/, '')) ||
+         appData.find(l => l && (typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(l.label || '').toLowerCase() === filterLower : false)))
+      : null;
+
+    toShow = toShow.filter(j => {
+      if (!j) return false;
+      // 1. Direct legId or inferred legId match
+      if (j.legId && (String(j.legId) === filterStr || (targetLeg && String(j.legId) === String(targetLeg.id)))) return true;
+      if (j._inferredFromLegId && (String(j._inferredFromLegId) === filterStr || (targetLeg && String(j._inferredFromLegId) === String(targetLeg.id)))) return true;
+      if (j._inferredToLegId && (String(j._inferredToLegId) === filterStr || (targetLeg && String(j._inferredToLegId) === String(targetLeg.id)))) return true;
+
+      // 2. City ID match
+      if (j.fromCityId === filterStr || j.toCityId === filterStr) return true;
+      if (targetLeg && targetLeg.cityId && (j.fromCityId === targetLeg.cityId || j.toCityId === targetLeg.cityId)) return true;
+
+      // 3. City name match
+      if (filterLower) {
+        if (String(j.fromLocation || '').trim().toLowerCase() === filterLower) return true;
+        if (String(j.toLocation || '').trim().toLowerCase() === filterLower) return true;
+      }
+      return false;
+    });
   }
 
   let html = `
@@ -1498,7 +1522,7 @@ function buildTransportTab(cityFilter = null) {
         detailsOpen: true
       });
       slidesHtml.push(`
-        <div id="transport-slide-${index}" class="mobile-swipe-slide transport-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-city-id="${escapeHtmlText(rep.toCityId || rep.fromCityId || '')}" data-from-city-id="${escapeHtmlText(rep.fromCityId || '')}" data-to-city-id="${escapeHtmlText(rep.toCityId || '')}" data-from-location="${escapeHtmlText(rep.fromLocation || '')}" data-to-location="${escapeHtmlText(rep.toLocation || '')}">
+        <div id="transport-slide-${index}" class="mobile-swipe-slide transport-swipe-slide" data-role="mobile-swipe-slide" data-slide-index="${index}" data-leg-id="${escapeHtmlText(rep.legId || '')}" data-city-id="${escapeHtmlText(rep.toCityId || rep.fromCityId || '')}" data-from-city-id="${escapeHtmlText(rep.fromCityId || '')}" data-to-city-id="${escapeHtmlText(rep.toCityId || '')}" data-from-location="${escapeHtmlText(rep.fromLocation || '')}" data-to-location="${escapeHtmlText(rep.toLocation || '')}">
           ${cardHtml}
         </div>
       `);
