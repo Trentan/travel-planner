@@ -5,6 +5,7 @@ const { assert } = require('./lib/test-helpers');
 async function run() {
   console.log('Running city fuzzy matching and alias resolution test suite...');
   const utilsCode = fs.readFileSync(path.join(__dirname, '../js/utils.js'), 'utf8');
+  const cityMatcherCode = fs.readFileSync(path.join(__dirname, '../js/city-matcher.js'), 'utf8');
   const dataCode = fs.readFileSync(path.join(__dirname, '../js/data.js'), 'utf8');
   const bookingIntakeCode = fs.readFileSync(path.join(__dirname, '../js/booking-intake.js'), 'utf8');
 
@@ -40,6 +41,7 @@ async function run() {
   const combinedCode = `
     const document = window.document;
     ${utilsCode}
+    ${cityMatcherCode}
     ${dataCode}
     ${bookingIntakeCode}
     return {

@@ -94,9 +94,11 @@ function createSandbox() {
 
   // Load utils.js and data.js into sandbox
   const utilsCode = fs.readFileSync(path.join(__dirname, '..', 'js/utils.js'), 'utf8');
+  const cityMatcherCode = fs.readFileSync(path.join(__dirname, '..', 'js/city-matcher.js'), 'utf8');
   const dataCode = fs.readFileSync(path.join(__dirname, '..', 'js/data.js'), 'utf8');
 
   vm.runInContext(utilsCode, sandbox, { filename: 'js/utils.js' });
+  vm.runInContext(cityMatcherCode, sandbox, { filename: 'js/city-matcher.js' });
   vm.runInContext(dataCode, sandbox, { filename: 'js/data.js' });
 
   return sandbox;

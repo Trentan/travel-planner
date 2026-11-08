@@ -971,6 +971,9 @@ function loadAppScripts(harness) {
   const scriptOrder = [
     ['js/default-data.js', 'js/default-data.js'],
     ['js/utils.js', 'js/utils.js'],
+    ['js/storage-db.js', 'js/storage-db.js'],
+    ['js/city-matcher.js', 'js/city-matcher.js'],
+    ['js/file-io.js', 'js/file-io.js'],
     ['js/data.js', 'js/data.js'],
     ['js/packing.js', 'js/packing.js'],
     ['js/dragdrop.js', 'js/dragdrop.js'],
@@ -988,7 +991,8 @@ function loadAppScripts(harness) {
     ['js/itinerary.js', 'js/itinerary.js'],
     ['js/backup.js', 'js/backup.js'],
     ['js/auto-stays.js', 'js/auto-stays.js'],
-    ['js/transport.js', 'js/transport.js']
+    ['js/transport.js', 'js/transport.js'],
+    ['js/trip-onboarding.js', 'js/trip-onboarding.js']
   ];
 
   scriptOrder.forEach(([relativePath, filename]) => {

@@ -873,6 +873,12 @@ window.getDayTotal = getDayTotal;
 window.parseCurrencyAmount = parseCurrencyAmount;
 window.formatCurrency = formatCurrency;
 window.escapeHtmlText = escapeHtmlText;
+
+function escapeTripStartText(value) {
+  return escapeHtmlText(value);
+}
+window.escapeTripStartText = escapeTripStartText;
+
 window.isSafeUrl = isSafeUrl;
 window.renderMobileStat = renderMobileStat;
 window.renderMobileSurfaceCard = renderMobileSurfaceCard;
@@ -893,3 +899,9 @@ window.normalizeChecklistText = normalizeChecklistText;
 window.getChecklistItemKeys = getChecklistItemKeys;
 window.mergeChecklistWithDefaults = mergeChecklistWithDefaults;
 window.formatDateCompact = formatDateCompact;
+
+function deepClone(obj) {
+  if (obj === null || typeof obj !== 'object') return obj;
+  return JSON.parse(JSON.stringify(obj));
+}
+if (typeof window !== 'undefined') window.deepClone = deepClone;

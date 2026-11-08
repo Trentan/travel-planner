@@ -195,11 +195,17 @@ async function runAiBuilderImportTests() {
   // Load scripts
   const defaultDataCode = loadSource('js/default-data.js');
   const utilsCode = loadSource('js/utils.js');
+  const storageDbCode = loadSource('js/storage-db.js');
+  const cityMatcherCode = loadSource('js/city-matcher.js');
+  const fileIoCode = loadSource('js/file-io.js');
   const dataCode = loadSource('js/data.js');
   const mapCode = loadSource('js/map.js');
 
   runScriptInContext(defaultDataCode, context, 'js/default-data.js');
   runScriptInContext(utilsCode, context, 'js/utils.js');
+  runScriptInContext(storageDbCode, context, 'js/storage-db.js');
+  runScriptInContext(cityMatcherCode, context, 'js/city-matcher.js');
+  runScriptInContext(fileIoCode, context, 'js/file-io.js');
   runScriptInContext(dataCode, context, 'js/data.js');
   runScriptInContext(mapCode, context, 'js/map.js');
 

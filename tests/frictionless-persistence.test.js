@@ -100,8 +100,17 @@ function runFrictionlessPersistenceTests() {
   const utilsSource = loadSource(path.join('js', 'utils.js'));
   runScriptInContext(utilsSource, context, 'js/utils.js');
 
+  const storageSource = loadSource(path.join('js', 'storage-db.js'));
+  const matcherSource = loadSource(path.join('js', 'city-matcher.js'));
+  runScriptInContext(storageSource, context, 'js/storage-db.js');
+  runScriptInContext(matcherSource, context, 'js/city-matcher.js');
+
+  const fileIoSource = loadSource(path.join('js', 'file-io.js'));
   const dataSource = loadSource(path.join('js', 'data.js'));
+  const onboardingSource = loadSource(path.join('js', 'trip-onboarding.js'));
+  runScriptInContext(fileIoSource, context, 'js/file-io.js');
   runScriptInContext(dataSource, context, 'js/data.js');
+  runScriptInContext(onboardingSource, context, 'js/trip-onboarding.js');
 
   // -------------------------------------------------------------
   // Test 1: First-time user 'build' choice advances without file-setup-modal
