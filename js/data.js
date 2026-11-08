@@ -5130,18 +5130,22 @@ async function runSaveData(showTick = true) {
     }
   }
 
-  // Always also save to localStorage as fallback
-  localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
-  localStorage.setItem('travelApp_v2026_template', JSON.stringify(appData));
-  localStorage.setItem('travelApp_packing_v3', JSON.stringify(packingData));
-  localStorage.setItem('travelApp_leavehome_v3', JSON.stringify(leaveHomeData));
-  localStorage.setItem('travelApp_hotelCheckout_v1', JSON.stringify(hotelCheckoutData));
-  localStorage.setItem('travelApp_stays_v1', JSON.stringify(stays));
-  localStorage.setItem('travelApp_cities_v1', JSON.stringify(citiesData));
-  localStorage.setItem('travelApp_journeys_v1', JSON.stringify(journeys));
-  localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
-  localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
-  localStorage.setItem('travelApp_filename_v2026', currentFileName);
+  // Always also save to localStorage as fallback (guarded against QuotaExceededError - Issue #643)
+  try {
+    localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
+    localStorage.setItem('travelApp_v2026_template', JSON.stringify(appData));
+    localStorage.setItem('travelApp_packing_v3', JSON.stringify(packingData));
+    localStorage.setItem('travelApp_leavehome_v3', JSON.stringify(leaveHomeData));
+    localStorage.setItem('travelApp_hotelCheckout_v1', JSON.stringify(hotelCheckoutData));
+    localStorage.setItem('travelApp_stays_v1', JSON.stringify(stays));
+    localStorage.setItem('travelApp_cities_v1', JSON.stringify(citiesData));
+    localStorage.setItem('travelApp_journeys_v1', JSON.stringify(journeys));
+    localStorage.setItem('travelApp_userCities_v1', JSON.stringify(userCities));
+    localStorage.setItem('travelApp_userCountries_v1', JSON.stringify(userCountries));
+    localStorage.setItem('travelApp_filename_v2026', currentFileName);
+  } catch (storageErr) {
+    console.warn('LocalStorage quota exceeded or restricted; skipping fallback serialization:', storageErr);
+  }
   const savedToFile = await saveFileToDisk();
   if (savedToFile) {
     setImportedJsonWithoutWriteAccess(false);
@@ -5204,7 +5208,7 @@ async function saveData(showTick = true) {
 
 const TRIP_DATE_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-function normalizeTripDateValue(dateStr, fallbackYear = 2026) {
+function normalizeTripDateValue(dateStr, fallbackYear = (new Date().getFullYear())) {
   if (!dateStr || typeof dateStr !== 'string') return '';
 
   const trimmed = dateStr.trim();

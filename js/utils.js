@@ -115,7 +115,13 @@ function isSafeUrl(url) {
       ? window.location.href
       : 'http://localhost/';
     const parsed = new URL(trimmed, base);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'data:';
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return true;
+    }
+    if (parsed.protocol === 'data:') {
+      return /^data:(image\/(png|jpeg|jpg|webp|gif)|text\/plain)/i.test(trimmed);
+    }
+    return false;
   } catch (e) {
     return false;
   }

@@ -495,9 +495,18 @@ async function handleBookingIntakeFile(event) {
     return;
   }
   try {
-    const text = await file.text();
+    const rawText = await file.text();
+    // Check if binary PDF / unparseable stream (Issue #653)
+    const isBinaryPdf = /\.pdf$/.test(lowerName) && (/^%PDF/i.test(rawText) || /[\x00-\x08\x0E-\x1F]/.test(rawText.slice(0, 500)));
+    if (isBinaryPdf) {
+      if (statusEl) {
+        statusEl.textContent = `${file.name} attached. Binary PDF text cannot be read directly—please copy and paste the booking text from your PDF reader.`;
+      }
+      return;
+    }
+    const cleanText = rawText.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
     const textEl = document.getElementById('bookingIntakeText');
-    if (textEl) textEl.value = [textEl.value.trim(), text.trim()].filter(Boolean).join('\n\n');
+    if (textEl) textEl.value = [textEl.value.trim(), cleanText.trim()].filter(Boolean).join('\n\n');
     if (statusEl) statusEl.textContent = `${file.name} loaded for local extraction.`;
   } catch (error) {
     if (statusEl) statusEl.textContent = `Could not read ${file.name}. Paste the confirmation text instead.`;
