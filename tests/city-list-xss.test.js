@@ -99,7 +99,9 @@ async function runCityListXssTests() {
   context.window = context;
 
   const utilsSource = loadSource(path.join('js', 'utils.js'));
+  const matcherSource = loadSource(path.join('js', 'city-matcher.js'));
   runScriptInContext(utilsSource, context, 'js/utils.js');
+  runScriptInContext(matcherSource, context, 'js/city-matcher.js');
 
   const dataSource = loadSource(path.join('js', 'data.js'));
   runScriptInContext(dataSource, context, 'js/data.js');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-planner-v28';
+const CACHE_NAME = 'travel-planner-v29';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -11,6 +11,7 @@ const ASSETS = [
   './js/timezone.js',
   './js/attachments.js',
   './js/storage-db.js',
+  './js/city-matcher.js',
   './js/data.js',
   './js/trip-library.js',
   './js/cloud-storage.js',

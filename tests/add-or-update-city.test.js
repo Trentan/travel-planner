@@ -24,9 +24,11 @@ function runAddOrUpdateCityTests() {
   context.window = context;
 
   const utilsCode = loadSource(path.join('js', 'utils.js'));
+  const cityMatcherCode = loadSource(path.join('js', 'city-matcher.js'));
   const dataCode = loadSource(path.join('js', 'data.js'));
 
   runScriptInContext(utilsCode, context, 'js/utils.js');
+  runScriptInContext(cityMatcherCode, context, 'js/city-matcher.js');
   runScriptInContext(dataCode, context, 'js/data.js');
 
   const { addOrUpdateCity } = context;
