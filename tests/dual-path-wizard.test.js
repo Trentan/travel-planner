@@ -108,6 +108,7 @@ global.hasActiveFileHandle = () => false;
 // Load booking-intake.js and data.js into runtime
 require('../js/booking-intake');
 require('../js/data');
+require('../js/trip-onboarding');
 
 async function runDualPathWizardSuite() {
   console.log('Running Dual-Path Wizard & Flight Intake Test Suite (Issue #215)...');

@@ -873,6 +873,12 @@ window.getDayTotal = getDayTotal;
 window.parseCurrencyAmount = parseCurrencyAmount;
 window.formatCurrency = formatCurrency;
 window.escapeHtmlText = escapeHtmlText;
+
+function escapeTripStartText(value) {
+  return escapeHtmlText(value);
+}
+window.escapeTripStartText = escapeTripStartText;
+
 window.isSafeUrl = isSafeUrl;
 window.renderMobileStat = renderMobileStat;
 window.renderMobileSurfaceCard = renderMobileSurfaceCard;

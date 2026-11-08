@@ -33,6 +33,7 @@ const ASSETS = [
   './js/auto-stays.js',
   './js/transport.js',
   './js/booking-intake.js',
+  './js/trip-onboarding.js',
   './js/mappr-import.js',
   './js/pwa-prompt.js'
 ];

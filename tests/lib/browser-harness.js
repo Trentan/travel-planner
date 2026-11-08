@@ -989,7 +989,8 @@ function loadAppScripts(harness) {
     ['js/itinerary.js', 'js/itinerary.js'],
     ['js/backup.js', 'js/backup.js'],
     ['js/auto-stays.js', 'js/auto-stays.js'],
-    ['js/transport.js', 'js/transport.js']
+    ['js/transport.js', 'js/transport.js'],
+    ['js/trip-onboarding.js', 'js/trip-onboarding.js']
   ];
 
   scriptOrder.forEach(([relativePath, filename]) => {

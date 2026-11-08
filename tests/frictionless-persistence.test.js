@@ -104,7 +104,9 @@ function runFrictionlessPersistenceTests() {
   runScriptInContext(storageSource, context, 'js/storage-db.js');
 
   const dataSource = loadSource(path.join('js', 'data.js'));
+  const onboardingSource = loadSource(path.join('js', 'trip-onboarding.js'));
   runScriptInContext(dataSource, context, 'js/data.js');
+  runScriptInContext(onboardingSource, context, 'js/trip-onboarding.js');
 
   // -------------------------------------------------------------
   // Test 1: First-time user 'build' choice advances without file-setup-modal
