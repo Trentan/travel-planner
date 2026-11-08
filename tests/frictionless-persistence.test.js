@@ -105,8 +105,10 @@ function runFrictionlessPersistenceTests() {
   runScriptInContext(storageSource, context, 'js/storage-db.js');
   runScriptInContext(matcherSource, context, 'js/city-matcher.js');
 
+  const fileIoSource = loadSource(path.join('js', 'file-io.js'));
   const dataSource = loadSource(path.join('js', 'data.js'));
   const onboardingSource = loadSource(path.join('js', 'trip-onboarding.js'));
+  runScriptInContext(fileIoSource, context, 'js/file-io.js');
   runScriptInContext(dataSource, context, 'js/data.js');
   runScriptInContext(onboardingSource, context, 'js/trip-onboarding.js');
 

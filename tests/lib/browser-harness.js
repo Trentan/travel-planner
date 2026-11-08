@@ -973,6 +973,7 @@ function loadAppScripts(harness) {
     ['js/utils.js', 'js/utils.js'],
     ['js/storage-db.js', 'js/storage-db.js'],
     ['js/city-matcher.js', 'js/city-matcher.js'],
+    ['js/file-io.js', 'js/file-io.js'],
     ['js/data.js', 'js/data.js'],
     ['js/packing.js', 'js/packing.js'],
     ['js/dragdrop.js', 'js/dragdrop.js'],

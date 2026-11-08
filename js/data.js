@@ -6,6 +6,7 @@
 if (typeof require === 'function' && typeof module !== 'undefined' && module.exports) {
   try {
     require('./city-matcher.js');
+    require('./file-io.js');
   } catch (_) {}
 }
 
@@ -121,13 +122,7 @@ const CITY_COLORS = [
   '#FF4081'  // Hot pink
 ];
 let titleData = { title: "✈ New Trip Plan", subtitle: "Click here to add your trip subtitle/description" };
-let currentFileName = "Default Template";
-let activeFileHandle = null;
-let activeFileHandleName = null;
-let pendingFileHandle = null;
-let fileWriteFailed = false;
-let importedJsonWithoutWriteAccess = localStorage.getItem('travelApp_json_write_warning') === 'true';
-const ACTIVE_FILE_HANDLE_DB_KEY = 'activeFileHandle';
+var currentFileName = "Default Template";
 let saveQueuePromise = null;
 let saveQueued = false;
 let saveQueuedShowTick = false;
@@ -193,194 +188,30 @@ function calculateDjb2Hash(str) {
 }
 window.calculateDjb2Hash = calculateDjb2Hash;
 
-function isFSASupported() {
-  return !!(window.isSecureContext && 'showOpenFilePicker' in window);
-}
+// Scope aliases from js/file-io.js (with resilient fallbacks for isolated test runners)
+var isFSASupported = (typeof window !== 'undefined' && window.isFSASupported) || (typeof global !== 'undefined' && global.isFSASupported) || (() => false);
+var hasActiveFileHandle = (typeof window !== 'undefined' && window.hasActiveFileHandle) || (typeof global !== 'undefined' && global.hasActiveFileHandle) || (() => false);
+var isSavingToFile = (typeof window !== 'undefined' && window.isSavingToFile) || (typeof global !== 'undefined' && global.isSavingToFile) || (() => false);
+var isJsonWriteWarningActive = (typeof window !== 'undefined' && window.isJsonWriteWarningActive) || (typeof global !== 'undefined' && global.isJsonWriteWarningActive) || (() => false);
+var syncJsonWriteWarning = (typeof window !== 'undefined' && window.syncJsonWriteWarning) || (typeof global !== 'undefined' && global.syncJsonWriteWarning) || (() => {});
+var setImportedJsonWithoutWriteAccess = (typeof window !== 'undefined' && window.setImportedJsonWithoutWriteAccess) || (typeof global !== 'undefined' && global.setImportedJsonWithoutWriteAccess) || (() => {});
+var getActiveFileHandle = (typeof window !== 'undefined' && window.getActiveFileHandle) || (typeof global !== 'undefined' && global.getActiveFileHandle) || (() => null);
+var getActiveFileHandleName = (typeof window !== 'undefined' && window.getActiveFileHandleName) || (typeof global !== 'undefined' && global.getActiveFileHandleName) || (() => 'Default Template');
+var setActiveFileHandle = (typeof window !== 'undefined' && window.setActiveFileHandle) || (typeof global !== 'undefined' && global.setActiveFileHandle) || (() => {});
+var clearActiveFileHandle = (typeof window !== 'undefined' && window.clearActiveFileHandle) || (typeof global !== 'undefined' && global.clearActiveFileHandle) || (() => {});
+var saveFileToDisk = (typeof window !== 'undefined' && window.saveFileToDisk) || (typeof global !== 'undefined' && global.saveFileToDisk) || (async () => false);
+var openTripFile = (typeof window !== 'undefined' && window.openTripFile) || (typeof global !== 'undefined' && global.openTripFile) || (() => {});
+var openExistingTripFile = (typeof window !== 'undefined' && window.openExistingTripFile) || (typeof global !== 'undefined' && global.openExistingTripFile) || (() => {});
+var createFileOnDisk = (typeof window !== 'undefined' && window.createFileOnDisk) || (typeof global !== 'undefined' && global.createFileOnDisk) || (async () => {});
+var exportJSON = (typeof window !== 'undefined' && window.exportJSON) || (typeof global !== 'undefined' && global.exportJSON) || (async () => {});
+var importJSON = (typeof window !== 'undefined' && window.importJSON) || (typeof global !== 'undefined' && global.importJSON) || (async () => {});
+var restorePersistedActiveFileHandle = (typeof window !== 'undefined' && window.restorePersistedActiveFileHandle) || (typeof global !== 'undefined' && global.restorePersistedActiveFileHandle) || (async () => null);
+var configureFileActionButtons = (typeof window !== 'undefined' && window.configureFileActionButtons) || (typeof global !== 'undefined' && global.configureFileActionButtons) || (() => {});
+var syncActiveFileDisplay = (typeof window !== 'undefined' && window.syncActiveFileDisplay) || (typeof global !== 'undefined' && global.syncActiveFileDisplay) || (() => {});
+var syncCurrentFileName = (typeof window !== 'undefined' && window.syncCurrentFileName) || (typeof global !== 'undefined' && global.syncCurrentFileName) || (() => {});
+var downloadTextFile = (typeof window !== 'undefined' && window.downloadTextFile) || (typeof global !== 'undefined' && global.downloadTextFile) || (() => {});
 
-function hasActiveFileHandle() {
-  return !!activeFileHandle;
-}
-
-function hasFileWriteFailed() {
-  return !!fileWriteFailed;
-}
-
-function isSavingToFile() {
-  return hasActiveFileHandle() || (!!localStorage.getItem('travelApp_file_handle_name') && !fileWriteFailed);
-}
-
-function isJsonWriteWarningActive() {
-  return importedJsonWithoutWriteAccess && !isSavingToFile();
-}
-
-function getJsonWriteWarningMessage() {
-  return 'JSON file not connected. Edits are saved in this browser only until you Save As or Export JSON.';
-}
-
-function ensureJsonWriteWarningElement() {
-  let warning = document.getElementById('jsonWriteWarning');
-  if (warning) return warning;
-
-  warning = document.createElement('div');
-  warning.id = 'jsonWriteWarning';
-  warning.className = 'json-write-warning';
-  warning.hidden = true;
-  const menuBar = document.querySelector('.app-menu-bar');
-  if (menuBar && menuBar.parentNode) {
-    menuBar.parentNode.insertBefore(warning, menuBar.nextSibling);
-  } else if (document.body) {
-    document.body.insertBefore(warning, document.body.firstChild);
-  }
-  return warning;
-}
-
-function syncJsonWriteWarning() {
-  const warning = ensureJsonWriteWarningElement();
-  const shouldShow = isJsonWriteWarningActive();
-  warning.hidden = !shouldShow;
-  if (!shouldShow) {
-    warning.innerHTML = '';
-    return;
-  }
-
-  const connectAction = isFSASupported()
-    ? '<button type="button" class="json-write-warning-btn" onclick="openTripFile()">Save As</button>'
-    : '';
-  warning.innerHTML = `
-    <span class="json-write-warning-text">${getJsonWriteWarningMessage()}</span>
-    <span class="json-write-warning-actions">
-      ${connectAction}
-      <button type="button" class="json-write-warning-btn json-write-warning-btn-secondary" onclick="exportJSON()">Export JSON</button>
-    </span>
-  `;
-}
-
-function setImportedJsonWithoutWriteAccess(active) {
-  importedJsonWithoutWriteAccess = !!active;
-  if (importedJsonWithoutWriteAccess) {
-    localStorage.setItem('travelApp_json_write_warning', 'true');
-  } else {
-    localStorage.removeItem('travelApp_json_write_warning');
-  }
-  syncJsonWriteWarning();
-  if (typeof window.syncMobileMenuStatus === 'function') window.syncMobileMenuStatus();
-}
-
-function getActiveFileHandle() {
-  return activeFileHandle;
-}
-window.getActiveFileHandle = getActiveFileHandle;
-
-function getActiveFileHandleName() {
-  return activeFileHandleName || currentFileName || 'Default Template';
-}
-
-function getFileConnectionStatusLabel() {
-  if (hasActiveFileHandle()) return 'Connected';
-  if (fileWriteFailed) return 'No access';
-  if (localStorage.getItem('travelApp_file_handle_name')) return 'Disconnected';
-  return '';
-}
-
-function syncActiveFileDisplay() {
-  const fileDisplay = document.getElementById('activeFileDisplay');
-  if (fileDisplay) {
-    const status = getFileConnectionStatusLabel();
-    const badgeText = status
-      ? `${getActiveFileHandleName()} · ${status}`
-      : getActiveFileHandleName();
-    fileDisplay.innerText = badgeText;
-    const badge = fileDisplay.closest('.file-badge');
-    if (badge) badge.title = badgeText;
-  }
-}
-
-function syncCurrentFileName(fileName) {
-  currentFileName = fileName || 'Default Template';
-  localStorage.setItem('travelApp_filename_v2026', currentFileName);
-  syncActiveFileDisplay();
-}
-
-function setActiveFileHandle(handle) {
-  activeFileHandle = handle || null;
-  activeFileHandleName = handle ? handle.name : null;
-  if (activeFileHandleName) {
-    importedJsonWithoutWriteAccess = false;
-    localStorage.removeItem('travelApp_json_write_warning');
-    fileWriteFailed = false;
-    syncCurrentFileName(activeFileHandleName);
-    localStorage.setItem('travelApp_file_handle_name', activeFileHandleName);
-    persistActiveFileHandle(handle);
-    if (typeof window.resetEditTracking === 'function') window.resetEditTracking();
-    if (typeof window.hideBackupReminder === 'function') window.hideBackupReminder();
-    syncActiveFileDisplay();
-    if (typeof window.updateExportIndicator === 'function') window.updateExportIndicator();
-    configureFileActionButtons();
-  } else {
-    localStorage.removeItem('travelApp_file_handle_name');
-    syncActiveFileDisplay();
-    if (typeof window.updateExportIndicator === 'function') window.updateExportIndicator();
-    configureFileActionButtons();
-  }
-  syncJsonWriteWarning();
-}
-
-function clearActiveFileHandle() {
-  activeFileHandle = null;
-  activeFileHandleName = null;
-  fileWriteFailed = false;
-  localStorage.removeItem('travelApp_file_handle_name');
-  deleteFromIndexedDB(ACTIVE_FILE_HANDLE_DB_KEY).catch(e => {
-    console.warn('Failed to clear persisted file handle:', e);
-  });
-  syncActiveFileDisplay();
-  configureFileActionButtons();
-}
-
-function persistActiveFileHandle(handle) {
-  if (!handle || !isFSASupported()) return Promise.resolve();
-  return saveToIndexedDB(ACTIVE_FILE_HANDLE_DB_KEY, handle).catch(e => {
-    console.warn('Failed to persist file handle:', e);
-  });
-}
-
-async function restorePersistedActiveFileHandle() {
-  if (!isFSASupported()) return null;
-
-  try {
-    const handle = await loadFromIndexedDB(ACTIVE_FILE_HANDLE_DB_KEY);
-    if (!handle) return null;
-    setActiveFileHandle(handle);
-    return handle;
-  } catch (e) {
-    console.warn('Failed to restore persisted file handle:', e);
-    return null;
-  }
-}
-
-async function ensureActiveFileHandle() {
-  if (activeFileHandle) return true;
-  if (!isFSASupported()) return false;
-  if (!localStorage.getItem('travelApp_file_handle_name')) return false;
-
-  const handle = await restorePersistedActiveFileHandle();
-  return !!handle;
-}
-
-function configureFileActionButtons() {
-  const saveAsVisible = isFSASupported();
-  ['saveAsBtn', 'mobileSaveAsBtn'].forEach(id => {
-    const button = document.getElementById(id);
-    if (button) button.style.display = saveAsVisible ? '' : 'none';
-  });
-
-  const openFileVisible = true;
-  ['openFileBtn', 'mobileOpenFileBtn'].forEach(id => {
-    const button = document.getElementById(id);
-    if (button) button.style.display = openFileVisible ? '' : 'none';
-  });
-}
-
+if (typeof window !== 'undefined') { window.getCurrentAppData = getCurrentAppData; window.buildExportPayload = buildExportPayload; window.loadImportedPayload = loadImportedPayload; }
 function getCurrentAppData() {
   let journeysData = [];
   if (typeof journeys !== 'undefined') journeysData = normalizeTripJourneysData(deepClone(journeys));
@@ -557,101 +388,7 @@ async function redoTripChange() {
   return true;
 }
 
-async function saveFileToDisk() {
-  if (!await ensureActiveFileHandle()) return false;
-
-  try {
-    const payloadStr = JSON.stringify(getCurrentAppData(), null, 2);
-    const writable = await activeFileHandle.createWritable();
-    await writable.write(payloadStr);
-    await writable.close();
-    fileWriteFailed = false;
-    localStorage.setItem('travelApp_file_handle_name', getActiveFileHandleName());
-    
-    // Store DJB2 hash of payload
-    try {
-      const hash = calculateDjb2Hash(payloadStr);
-      localStorage.setItem('travelApp_last_known_hash', String(hash));
-    } catch(err) {}
-
-    configureFileActionButtons();
-    const status = document.getElementById('saveStatus');
-    if (status) status.textContent = '✓ Saved to file';
-    syncActiveFileDisplay();
-    return true;
-  } catch (e) {
-    console.error('Failed to save to selected file:', e);
-    fileWriteFailed = true;
-    configureFileActionButtons();
-    syncActiveFileDisplay();
-    return false;
-  }
-}
-
-function openTripFile() {
-  if (isFSASupported()) {
-    createFileOnDisk();
-    return;
-  }
-
-  const input = document.getElementById('importFile');
-  if (input) input.click();
-}
-
-async function openExistingTripFile() {
-  if (isFSASupported()) {
-    try {
-      const [fileHandle] = await window.showOpenFilePicker({
-        types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
-      });
-
-      if (!fileHandle) return;
-
-      pendingFileHandle = fileHandle;
-      const file = await fileHandle.getFile();
-      importJSON({
-        target: {
-          files: [file],
-          value: ''
-        }
-      });
-    } catch (e) {
-      if (e && e.name === 'AbortError') return;
-      console.error('Failed to open file picker:', e);
-      alert('Could not open that file. Please try again or use Import JSON.');
-      pendingFileHandle = null;
-    }
-    return;
-  }
-
-  const input = document.getElementById('importFile');
-  if (input) input.click();
-}
-
-async function createFileOnDisk() {
-  if (!isFSASupported()) return;
-
-  try {
-    const suggestedName = currentFileName && currentFileName !== 'Default Template'
-      ? currentFileName.replace(/\.json$/i, '') + '.json'
-      : 'travel_planner_backup.json';
-
-    const fileHandle = await window.showSaveFilePicker({
-      suggestedName,
-      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
-    });
-
-    if (!fileHandle) return;
-
-    setActiveFileHandle(fileHandle);
-    await saveData(false);
-    if (typeof window.updateExportIndicator === 'function') window.updateExportIndicator();
-  } catch (e) {
-    if (e && e.name === 'AbortError') return;
-    console.error('Failed to create file:', e);
-    alert('Could not create a file location. You can still download a JSON copy.');
-  }
-}
+// saveFileToDisk & FSA methods extracted to js/file-io.js
 
 // Extract unique cities from itinerary data (including journeys, stays, and cityId references)
 function extractCitiesFromItinerary() {
@@ -4831,50 +4568,7 @@ function redactShareExportPayload(exportObj, options = {}) {
   return payload;
 }
 
-function downloadTextFile(content, downloadName, mimeType = 'text/plain') {
-  const downloadAnchorNode = document.createElement('a');
-  const canUseBlobUrl = typeof Blob === 'function'
-    && typeof URL !== 'undefined'
-    && typeof URL.createObjectURL === 'function';
-  let objectUrl = '';
-
-  if (canUseBlobUrl) {
-    const fileBlob = new Blob([content], { type: `${mimeType};charset=utf-8` });
-    objectUrl = URL.createObjectURL(fileBlob);
-    downloadAnchorNode.setAttribute('href', objectUrl);
-  } else {
-    downloadAnchorNode.setAttribute('href', `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`);
-  }
-
-  downloadAnchorNode.setAttribute('download', downloadName);
-  document.body.appendChild(downloadAnchorNode);
-  downloadAnchorNode.click();
-  downloadAnchorNode.remove();
-
-  if (objectUrl) {
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
-  }
-
-  return downloadAnchorNode;
-}
-
-async function exportJSON() {
-  const previousSuppress = window.__suppressBackupTracking;
-  window.__suppressBackupTracking = true;
-  try {
-    await saveData(false);
-  } finally {
-    window.__suppressBackupTracking = previousSuppress;
-  }
-  const exportObj = buildExportPayload();
-  const dlName = currentFileName === 'Default Template' ? 'travel_planner_backup.json' : currentFileName;
-  downloadTextFile(JSON.stringify(exportObj, null, 2), dlName, 'application/json');
-
-  // Record export timestamp
-  localStorage.setItem('travelApp_last_export_v2026', new Date().toISOString());
-  localStorage.setItem('travelApp_last_export_filename', dlName);
-  setImportedJsonWithoutWriteAccess(false);
-}
+// downloadTextFile & exportJSON extracted to js/file-io.js
 
 function applySharePreset(presetName) {
   const hideCosts = document.getElementById('shareHideCosts');
@@ -6223,94 +5917,7 @@ async function loadImportedPayload(importedData, fileName) {
   }
 }
 
-async function importJSON(event) {
-  const file = event.target.files[0];
-  if (!file) {
-    return;
-  }
-
-  if (!String(file.name || '').toLowerCase().endsWith('.json')) {
-    alert('Please select a .json file. The file you selected is not valid JSON.');
-    event.target.value = '';
-    pendingFileHandle = null;
-    return;
-  }
-
-  const fileHandleForThisImport = pendingFileHandle;
-  pendingFileHandle = null;
-
-  const reader = new FileReader();
-
-  reader.onerror = function() {
-    alert('Error reading file. Please try again with a valid JSON file.');
-    event.target.value = '';
-    pendingFileHandle = null;
-  };
-
-  reader.onload = async function(e) {
-    try {
-      const content = e.target.result;
-
-      if (!content || content.trim() === '') {
-        alert('The file is empty. Please select a file with data.');
-        event.target.value = '';
-        pendingFileHandle = null;
-        return;
-      }
-
-      let importedData;
-      try {
-        importedData = JSON.parse(content);
-      } catch (parseErr) {
-        const errorMsg = parseErr.message || 'Invalid JSON format';
-        alert(`Failed to parse JSON: ${errorMsg}\n\nPlease ensure your file is valid JSON. Common issues:\n• Missing quotes around keys\n• Trailing commas\n• Unmatched brackets`);
-        event.target.value = '';
-        return;
-      }
-
-      if (!importedData || typeof importedData !== 'object') {
-        alert('Invalid file format. Please select a JSON file exported from Travel Planner.');
-        event.target.value = '';
-        return;
-      }
-
-      if (fileHandleForThisImport) {
-        setActiveFileHandle(fileHandleForThisImport);
-      } else {
-        clearActiveFileHandle();
-        setImportedJsonWithoutWriteAccess(true);
-      }
-
-      // Store hash of imported content
-      try {
-        const hash = calculateDjb2Hash(content);
-        localStorage.setItem('travelApp_last_known_hash', String(hash));
-      } catch(err) {}
-
-      // Assign a distinct trip ID for the imported file so it is saved as a document in My Trips Gallery
-      const importedTripId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
-      setActiveTripId(importedTripId);
-
-      await loadImportedPayload(importedData, file.name);
-      await saveActiveTripToStore();
-
-      if (typeof window.renderHeaderTripSwitcher === 'function') {
-        window.renderHeaderTripSwitcher();
-      }
-      if (typeof window.renderTripGalleryGrid === 'function') {
-        window.renderTripGalleryGrid();
-      }
-
-      alert('Import successful! "' + (titleData.title || file.name) + '" added to your Trips Gallery.');
-    } catch (err) {
-      console.error('Import error:', err);
-      alert(`Import failed: ${err.message || 'Unknown error'}. Your current data remains safe.`);
-      event.target.value = '';
-    }
-  };
-
-  reader.readAsText(file);
-}
+// importJSON extracted to js/file-io.js
 
 // Expose data functions to window scope for HTML onclick handlers
 window.exportJSON = exportJSON;
@@ -6328,28 +5935,17 @@ window.openShareExportDialog = openShareExportDialog;
 window.closeShareExportDialog = closeShareExportDialog;
 window.hardRestartApp = hardRestartApp;
 window.factoryResetData = factoryResetData;
-window.importJSON = importJSON;
-window.openTripFile = openTripFile;
-window.openExistingTripFile = openExistingTripFile;
-window.saveFileToDisk = saveFileToDisk;
 window.getCurrentAppData = getCurrentAppData;
 window.undoTripChange = undoTripChange;
 window.redoTripChange = redoTripChange;
-window.hasActiveFileHandle = hasActiveFileHandle;
-window.hasFileWriteFailed = hasFileWriteFailed;
-window.isSavingToFile = isSavingToFile;
-window.isJsonWriteWarningActive = isJsonWriteWarningActive;
-window.setImportedJsonWithoutWriteAccess = setImportedJsonWithoutWriteAccess;
-window.syncJsonWriteWarning = syncJsonWriteWarning;
-window.getActiveFileHandleName = getActiveFileHandleName;
-window.setActiveFileHandle = setActiveFileHandle;
-window.clearActiveFileHandle = clearActiveFileHandle;
-window.isFSASupported = isFSASupported;
+
+
+
+
 window.addOrUpdateCity = addOrUpdateCity;
 window.saveData = saveData;
 window.createCityDatalists = createCityDatalists;
 
-window.addEventListener('DOMContentLoaded', syncJsonWriteWarning);
 window.updateCityCountryCode = updateCityCountryCode;
 window.populateCountrySelect = populateCountrySelect;
 window.setupCityAutocomplete = setupCityAutocomplete;
