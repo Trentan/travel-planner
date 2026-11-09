@@ -1,7 +1,7 @@
 var DEFAULT_TRIP_DATA = {
   "meta": {
     "title": "🌏 New Trip Plan",
-    "subtitle": "Click here to add your trip subtitle/description",
+    "subtitle": "",
     "homeCity": "Sydney"
   },
   "itinerary": [

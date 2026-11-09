@@ -819,7 +819,33 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await page.waitForSelector('#tab-itinerary .mobile-panel-add-btn:has-text("+ Add Tip")', { state: 'visible' });
     reporter.add('mobile', 'itinerary add actions', 'section-level add actions appear only when expanded');
 
-    await page.locator('.app-tab-btn[data-tab="accom"]').click();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const headerParity = {};
+    for (const tabId of ['itinerary', 'transport', 'budget', 'packing', 'accom']) {
+      await page.locator(`.app-tab-btn[data-tab="${tabId}"]`).click();
+      await humanPause(page, 180);
+      headerParity[tabId] = await page.evaluate((id) => {
+        const hdr = document.querySelector(`#tab-${id} .section-header`);
+        const title = hdr?.querySelector('.section-header-title');
+        const btns = Array.from(hdr?.querySelectorAll('.action-btn') || []).filter(b => getComputedStyle(b).display !== 'none');
+        return {
+          height: hdr?.getBoundingClientRect().height || 0,
+          titleSize: title ? parseFloat(getComputedStyle(title).fontSize) : 0,
+          titleTop: title?.getBoundingClientRect().top || 0,
+          btnHeights: btns.map(b => b.getBoundingClientRect().height)
+        };
+      }, tabId);
+    }
+    const refHdr = headerParity.itinerary;
+    for (const [tabId, m] of Object.entries(headerParity)) {
+      assert(Math.abs(m.height - refHdr.height) <= 1.5, `Mobile: ${tabId} header height (${m.height}px) should align with itinerary (${refHdr.height}px)`);
+      assert(Math.abs(m.titleSize - refHdr.titleSize) <= 0.5, `Mobile: ${tabId} heading size (${m.titleSize}px) should match itinerary (${refHdr.titleSize}px)`);
+      assert(Math.abs(m.titleTop - refHdr.titleTop) <= 1.5, `Mobile: ${tabId} heading top (${m.titleTop}px) should line up with itinerary (${refHdr.titleTop}px)`);
+      for (const h of m.btnHeights) {
+        assert(refHdr.btnHeights.some(rh => Math.abs(h - rh) <= 1.5), `Mobile: ${tabId} header button height (${h}px) should match itinerary pill buttons (${refHdr.btnHeights.join(',')}px)`);
+      }
+    }
+    reporter.add('mobile', 'cross-tab header alignment', 'all 5 tab headers and action pills align vertically with itinerary');
     await humanPause(page, 350);
     await page.locator('#tab-accom .action-btn:has-text("+ Add Stay")').click();
     await page.waitForSelector('#stay-modal', { state: 'visible' });

@@ -581,7 +581,7 @@ async function loadTripFromStore(tripId) {
 }
 window.loadTripFromStore = loadTripFromStore;
 
-async function createNewTripDocument(title = 'New Trip', subtitle = 'Click here to add subtitle') {
+async function createNewTripDocument(title = 'New Trip', subtitle = '') {
   const newId = 'trip_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
   let baseData = typeof DEFAULT_TRIP_DATA !== 'undefined' ? JSON.parse(JSON.stringify(DEFAULT_TRIP_DATA)) : {};
   baseData.meta = { title, subtitle };
@@ -614,7 +614,7 @@ async function deleteTripDocument(tripId) {
     if (remaining.length > 0) {
       await loadTripFromStore(remaining[0].id);
     } else {
-      await createNewTripDocument('My First Trip', 'Click here to add description');
+      await createNewTripDocument('My First Trip', '');
     }
   }
 }
