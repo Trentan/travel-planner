@@ -2296,12 +2296,11 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     gap: 0.1rem !important;
   }
 
-  body.mobile-app-mode #tab-itinerary .section-header-actions {
+  body.mobile-app-mode :is(#tab-itinerary, #tab-transport, #tab-packing) .section-header-actions {
     padding-block: 0.12rem !important;
   }
 
-  body.mobile-app-mode #tab-itinerary .itinerary-view-mode-btn::after,
-  body.mobile-app-mode #tab-itinerary .section-header-actions > button::after {
+  body.mobile-app-mode :is(#tab-itinerary, #tab-transport, #tab-accom, #tab-packing) .section-header button::after {
     content: '';
     position: absolute;
     inset: -7px -3px;

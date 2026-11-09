@@ -2144,7 +2144,10 @@
       align-items: center !important;
       justify-content: space-between !important;
       flex-wrap: nowrap !important;
-      min-height: 2rem !important;
+      gap: 0.5rem;
+      width: 100%;
+      overflow: hidden;
+      min-height: 2.27rem !important;
       padding: 0.04rem 0.65rem !important;
       margin-bottom: 0 !important;
       background: var(--color-bg-primary, #f8fafc);
@@ -2160,6 +2163,8 @@
       display: flex !important;
       align-items: center !important;
       gap: 0.45rem !important;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     body.mobile-app-mode .section-header-actions {
@@ -2167,6 +2172,17 @@
       align-items: center !important;
       gap: 0.35rem !important;
       flex-wrap: nowrap !important;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      padding-block: 0.12rem;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      flex-shrink: 1;
+      min-width: 0;
+    }
+
+    body.mobile-app-mode .section-header-actions::-webkit-scrollbar {
+      display: none;
     }
 
     body.mobile-app-mode .transport-mobile-card {
@@ -2289,32 +2305,6 @@
       white-space: nowrap;
     }
 
-    body.mobile-app-mode :is(#tab-itinerary, #tab-packing) .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-      width: 100%;
-      overflow: hidden;
-    }
-
-    body.mobile-app-mode :is(#tab-itinerary, #tab-packing) .section-header-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      overflow-x: auto;
-      overscroll-behavior-x: contain;
-      padding-block: 0.1rem;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-      flex-shrink: 1;
-      min-width: 0;
-    }
-
-    body.mobile-app-mode :is(#tab-itinerary, #tab-packing) .section-header-actions::-webkit-scrollbar {
-      display: none;
-    }
-
     body.mobile-app-mode .tab-pane .section-header-title {
       white-space: nowrap;
       margin: 0;
@@ -2351,7 +2341,7 @@
       display: none !important;
     }
 
-    body.mobile-app-mode #tab-itinerary .section-header-actions > .action-btn,
+    body.mobile-app-mode :is(#tab-itinerary, #tab-transport, #tab-accom, #tab-budget, #tab-packing) .section-header .action-btn,
     body.mobile-app-mode #tab-itinerary .open-map-action,
     body.mobile-app-mode #tab-itinerary .add-leg-action,
     body.mobile-app-mode #tab-itinerary .wake-lock-btn,
