@@ -182,6 +182,24 @@ async function run() {
     assert.ok(connectorHtml.includes('is-warning-alert')); // 45m flight layover < 60m is alert
     assert.ok(connectorHtml.includes('Critical Layover'));
     assert.ok(connectorHtml.includes('Lufthansa → Austrian'));
+
+    // Non-transport pairs (reminders, departure/arrival blocks, prep activities) must not render transit warnings
+    assert.strictEqual(
+      renderDailyTimelineConnectorRow(
+        { type: 'smartReminder', startTime: '06:00', title: 'Packing Checklist', dateStr: '2026-06-01' },
+        { type: 'activity', startTime: '07:00', endTime: '08:00', title: 'Arrive at Sydney Kingsford Smith Airport', dateStr: '2026-06-01' },
+        false
+      ),
+      ''
+    );
+    assert.strictEqual(
+      renderDailyTimelineConnectorRow(
+        { type: 'departureBlock', startTime: '10:15', title: 'Departed Sydney - Flight to Tokyo', dateStr: '2026-06-01' },
+        { type: 'transport', transportType: 'flight', startTime: '10:15', provider: 'Qantas', dateStr: '2026-06-01' },
+        false
+      ),
+      ''
+    );
   }
 
   console.log('✅ ALL TRANSIT CONNECTORS & LAYOVER WARNING TESTS PASSED CLEANLY!');

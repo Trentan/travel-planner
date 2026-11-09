@@ -2004,6 +2004,40 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     border-radius: 0.45rem !important;
   }
 
+  body.mobile-app-mode :is(.transport-mobile-card, .stay-mobile-card) .compact-day-header {
+    margin: -0.6rem -0.75rem 0.15rem;
+    padding: 0.65rem 0.75rem 0.55rem;
+    background: linear-gradient(135deg, rgba(14, 116, 144, 0.08), rgba(241, 245, 249, 0.75));
+    border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+  }
+
+  [data-theme="dark"] body.mobile-app-mode :is(.transport-mobile-card, .stay-mobile-card) .compact-day-header {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(30, 41, 59, 0.72));
+    border-bottom-color: rgba(71, 85, 105, 0.65);
+  }
+
+  body.mobile-app-mode :is(.transport-mobile-facts-grid, .stay-mobile-facts-grid) > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  body.mobile-app-mode.read-only-mode :is(.transport-mobile-fact, .stay-mobile-fact).is-empty-field {
+    display: none !important;
+  }
+
+  body.mobile-app-mode :is(.transport-mobile-fact, .stay-mobile-fact).is-empty-field {
+    border-style: dashed !important;
+    opacity: 0.76;
+  }
+
+  body.mobile-app-mode :is(.transport-mobile-fact, .stay-mobile-fact).is-empty-field :is(.transport-mobile-fact-value, .stay-mobile-fact-value) {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode .transport-status-check-hint {
+    color: #7dd3fc !important;
+  }
+
   body.mobile-app-mode .transport-segment-card--even {
     background: #ffffff !important;
     border-color: rgba(226, 232, 240, 0.9) !important;

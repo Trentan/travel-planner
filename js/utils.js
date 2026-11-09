@@ -254,6 +254,22 @@ function scrollChildIntoHorizontalView(container, child, { behavior = 'auto', al
   });
 }
 
+function renderMobileFactGridItems(items, wideClass) {
+  if (!Array.isArray(items) || items.length === 0) return '';
+  let col = 0;
+  return items.map((entry, idx) => {
+    if (!entry || typeof entry.render !== 'function') return '';
+    if (entry.wide) {
+      col = 0;
+      return entry.render(wideClass);
+    }
+    const next = items[idx + 1];
+    const spansFull = col === 0 && (!next || next.wide);
+    col = spansFull ? 0 : (col === 0 ? 1 : 0);
+    return entry.render(spansFull ? wideClass : '');
+  }).join('');
+}
+
 function renderMobileSurfaceCard({
                                    cardClass = '',
                                    accentColor = '',

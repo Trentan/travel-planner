@@ -2374,6 +2374,7 @@ function buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourney
 
       items.push({
         type: 'transport',
+        transportType: segment.transportType || journey.transportType || '',
         typeLabel: transportTypeLabel,
         icon: getTransportIcon(segment.transportType || journey.transportType),
         title: journey.journeyName || route || 'Transport',
@@ -2895,6 +2896,7 @@ window.toggleTimelineConnectorDetails = toggleTimelineConnectorDetails;
 
 function renderDailyTimelineConnectorRow(itemA, itemB, compact = false) {
   if (!itemA || !itemB) return '';
+  if (itemA.type !== 'transport' || itemB.type !== 'transport') return '';
   const bufferInfo = typeof calculateLayoverBuffer === 'function'
     ? calculateLayoverBuffer(itemA, itemB)
     : null;

@@ -997,6 +997,11 @@ function getJourneySubLocationParts(segs) {
 
 function renderTransportMobileFacts(segs, totalCost, notes = '') {
   if (!Array.isArray(segs) || segs.length === 0) return '';
+  const allowEmptyFields = typeof isEditMode !== 'undefined' && Boolean(isEditMode);
+  const cleanVal = (val) => {
+    const str = String(val || '').trim();
+    return (!str || str === '—' || str === '-' || str === '---') ? '' : str;
+  };
   const firstSeg = segs[0];
   const lastSeg = segs[segs.length - 1];
   const firstDepDate = formatJourneyDate(firstSeg.departureDate) || firstSeg.dayDate || '';
@@ -1017,7 +1022,7 @@ function renderTransportMobileFacts(segs, totalCost, notes = '') {
   if (firstSeg.transportType === 'flight' && routeCodeSet.length === 1 && routeCodeSet[0]) {
     const flightCode = routeCodeSet[0];
     const statusUrl = `https://www.google.com/search?q=flight+status+${encodeURIComponent(flightCode)}+${encodeURIComponent(firstDepDate)}`;
-    routeCodeDisplay = `<a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="hover:underline text-blue-600 dark:text-blue-400 flex flex-col items-start"><span class="font-mono uppercase">${escapeHtmlText(flightCode)}</span><span class="text-[10px] text-slate-600 dark:text-sky-300 font-sans mt-0.5 normal-case" style="line-height:1;">Check Status ↗</span></a>`;
+    routeCodeDisplay = `<a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="hover:underline text-blue-600 dark:text-blue-400 flex flex-col items-start"><span class="font-mono uppercase">${escapeHtmlText(flightCode)}</span><span class="transport-status-check-hint text-[10px] text-sky-700 dark:text-sky-300 font-sans mt-0.5 normal-case" style="line-height:1;">Check Status ↗</span></a>`;
   }
   const bookingLabel = bookingSet.length > 1 ? `${bookingSet.length} refs` : (bookingSet[0] || '');
   const fromLocation = firstSeg.fromLocation || '';
@@ -1027,33 +1032,106 @@ function renderTransportMobileFacts(segs, totalCost, notes = '') {
   const fromDetail = firstSeg.fromAddress || '';
   const toDetail = lastSeg.toAddress || '';
   const notesValue = String(notes || '').trim();
-return `
-    <div class="transport-mobile-facts-grid">
-      ${renderTransportMobileLinkedFact('From', fromValue, getMapSearchUrl(fromLocation, fromLocation))}
-      ${renderTransportMobileLinkedFact('To', toValue, getMapSearchUrl(toLocation, toLocation))}
-      ${renderTransportMobileFact('Depart', firstDep)}
-      ${renderTransportMobileFact('Arrive', arrive)}
-      ${tzBadge ? renderTransportMobileFact('Timezone Shift', tzBadge) : ''}
-      ${fromDetail ? renderTransportMobileLinkedFact('From Details', fromDetail, getMapSearchUrl(getJourneyMapSearchQuery(fromDetail, fromLocation, firstSeg.transportType)), '', '', 'transport-mobile-fact--detail') : ''}
-      ${toDetail ? renderTransportMobileLinkedFact('To Details', toDetail, getMapSearchUrl(getJourneyMapSearchQuery(toDetail, toLocation, lastSeg.transportType)), '', '', 'transport-mobile-fact--detail') : ''}
-      ${renderTransportMobileFact('Carrier', providerLabel)}
-      ${routeCodeDisplay ? `<div class="transport-mobile-fact">
+  const joinCls = (...parts) => parts.filter(Boolean).join(' ');
+  const factEntries = [];
+
+  if (cleanVal(fromValue) || allowEmptyFields) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderTransportMobileLinkedFact('From', cleanVal(fromValue), getMapSearchUrl(fromLocation, fromLocation), '', '', joinCls(w, cleanVal(fromValue) ? '' : 'is-empty-field'))
+    });
+  }
+  if (cleanVal(toValue) || allowEmptyFields) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderTransportMobileLinkedFact('To', cleanVal(toValue), getMapSearchUrl(toLocation, toLocation), '', '', joinCls(w, cleanVal(toValue) ? '' : 'is-empty-field'))
+    });
+  }
+  if (cleanVal(firstDep) || allowEmptyFields) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderTransportMobileFact('Depart', cleanVal(firstDep) || '—', joinCls(w, cleanVal(firstDep) ? '' : 'is-empty-field'))
+    });
+  }
+  if (cleanVal(arrive) || allowEmptyFields) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderTransportMobileFact('Arrive', cleanVal(arrive) || '—', joinCls(w, cleanVal(arrive) ? '' : 'is-empty-field'))
+    });
+  }
+  if (tzBadge) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderTransportMobileFact('Timezone Shift', tzBadge, w)
+    });
+  }
+  if (fromDetail) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderTransportMobileLinkedFact('From Details', fromDetail, getMapSearchUrl(getJourneyMapSearchQuery(fromDetail, fromLocation, firstSeg.transportType)), '', '', joinCls('transport-mobile-fact--detail', w))
+    });
+  }
+  if (toDetail) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderTransportMobileLinkedFact('To Details', toDetail, getMapSearchUrl(getJourneyMapSearchQuery(toDetail, toLocation, lastSeg.transportType)), '', '', joinCls('transport-mobile-fact--detail', w))
+    });
+  }
+  if (cleanVal(providerLabel) || allowEmptyFields) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderTransportMobileFact('Carrier', cleanVal(providerLabel) || '—', joinCls(w, cleanVal(providerLabel) ? '' : 'is-empty-field'))
+    });
+  }
+  if (routeCodeDisplay || allowEmptyFields) {
+    factEntries.push({
+      wide: false,
+      render: (w) => `<div class="${joinCls('transport-mobile-fact', w, routeCodeDisplay ? '' : 'is-empty-field')}">
       <span class="transport-mobile-fact-label">Code</span>
-      <span class="transport-mobile-fact-value">${routeCodeDisplay}</span>
-    </div>` : ''}
-      ${renderTransportMobileFact('Cost', formatCurrency(totalCost))}
-      ${bookingLabel ? renderTransportMobileFact('Booking #', bookingLabel) : ''}
-      ${(() => {
-        const allAlerts = (segs || []).flatMap(s => s.alerts || []);
-        const badges = typeof renderJourneyAlertBadgesHtml === 'function' ? renderJourneyAlertBadgesHtml(allAlerts) : '';
-        return badges ? `<div class="transport-mobile-fact transport-mobile-fact--wide"><span class="transport-mobile-fact-label">Alerts</span><span class="transport-mobile-fact-value flex flex-wrap gap-1">${badges}</span></div>` : '';
-      })()}
-      ${(() => {
-        const allAtts = (segs || []).flatMap(s => s.attachments || []);
-        const pills = typeof renderAttachmentsPillsHtml === 'function' ? renderAttachmentsPillsHtml(allAtts) : '';
-        return pills ? `<div class="transport-mobile-fact transport-mobile-fact--wide"><span class="transport-mobile-fact-label">Attachments</span><span class="transport-mobile-fact-value flex flex-wrap gap-1">${pills}</span></div>` : '';
-      })()}
-      ${notesValue ? renderTransportMobileFact('Notes', notesValue, 'transport-mobile-fact--wide transport-mobile-fact--notes') : ''}
+      <span class="transport-mobile-fact-value">${routeCodeDisplay || '—'}</span>
+    </div>`
+    });
+  }
+  factEntries.push({
+    wide: false,
+    render: (w) => renderTransportMobileFact('Cost', formatCurrency(totalCost), w)
+  });
+  if (cleanVal(bookingLabel) || allowEmptyFields) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderTransportMobileFact('Booking #', cleanVal(bookingLabel) || '—', joinCls(w, cleanVal(bookingLabel) ? '' : 'is-empty-field'))
+    });
+  }
+  const allAlerts = (segs || []).flatMap(s => s.alerts || []);
+  const alertBadges = typeof renderJourneyAlertBadgesHtml === 'function' ? renderJourneyAlertBadgesHtml(allAlerts) : '';
+  if (alertBadges) {
+    factEntries.push({
+      wide: true,
+      render: (w) => `<div class="${joinCls('transport-mobile-fact', w)}"><span class="transport-mobile-fact-label">Alerts</span><span class="transport-mobile-fact-value flex flex-wrap gap-1">${alertBadges}</span></div>`
+    });
+  }
+  const allAtts = (segs || []).flatMap(s => s.attachments || []);
+  const attPills = typeof renderAttachmentsPillsHtml === 'function' ? renderAttachmentsPillsHtml(allAtts) : '';
+  if (attPills) {
+    factEntries.push({
+      wide: true,
+      render: (w) => `<div class="${joinCls('transport-mobile-fact', w)}"><span class="transport-mobile-fact-label">Attachments</span><span class="transport-mobile-fact-value flex flex-wrap gap-1">${attPills}</span></div>`
+    });
+  }
+  if (notesValue || allowEmptyFields) {
+    factEntries.push({
+      wide: true,
+      render: (w) => renderTransportMobileFact('Notes', notesValue || '—', joinCls('transport-mobile-fact--notes', w, notesValue ? '' : 'is-empty-field'))
+    });
+  }
+
+  const gridHtml = typeof renderMobileFactGridItems === 'function'
+    ? renderMobileFactGridItems(factEntries, 'transport-mobile-fact--wide')
+    : factEntries.map(e => e.render(e.wide ? 'transport-mobile-fact--wide' : '')).join('');
+
+  return `
+    <div class="transport-mobile-facts-grid">
+      ${gridHtml}
     </div>
   `;
 }

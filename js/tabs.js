@@ -108,26 +108,90 @@ function getStayCityDisplay(cityName, stay, cityMap = null) {
 }
 
 function renderStayMobileDetails(stay, cityName, cityMap = null) {
+  const allowEmptyFields = typeof isEditMode !== 'undefined' && Boolean(isEditMode);
+  const cleanVal = (val) => {
+    const str = String(val || '').trim();
+    return (!str || str === '—' || str === '-' || str === '---') ? '' : str;
+  };
   const nights = stay.nights || calculateNights(stay.checkIn, stay.checkOut);
   const costValue = formatCurrency(stay.totalCost || '0');
   const locationUrl = stay.location ? getMapSearchUrl(stay.location, cityName) : '';
-  const attachmentsHtml = stay.attachments && stay.attachments.length > 0 ? `<div class="stay-mobile-fact stay-mobile-fact--wide"><span class="stay-mobile-fact-label">Attachments & Links</span><div class="flex flex-wrap gap-1 mt-1">` + renderAttachmentsPillsHtml(stay.attachments) + `</div></div>` : '';
   const cityDisplay = getStayCityDisplay(cityName, stay, cityMap);
   const checkInDisplay = [formatDateShort(stay.checkIn), stay.checkInTime].filter(Boolean).join(' · ');
   const checkOutDisplay = [formatDateShort(stay.checkOut), stay.checkOutTime].filter(Boolean).join(' · ');
+  const cleanIn = cleanVal(checkInDisplay);
+  const cleanOut = cleanVal(checkOutDisplay);
+  const cleanLoc = cleanVal(stay.location);
+  const cleanProv = cleanVal(stay.provider);
+  const cleanRef = cleanVal(stay.bookingRef);
+  const cleanNotes = cleanVal(stay.notes);
+  const joinCls = (...parts) => parts.filter(Boolean).join(' ');
+  const factEntries = [];
+
+  factEntries.push({
+    wide: false,
+    render: (w) => renderStayMobileFact('City', cityDisplay, w)
+  });
+  factEntries.push({
+    wide: false,
+    render: (w) => renderStayMobileFact('Nights', String(nights), w)
+  });
+  if (cleanIn || allowEmptyFields) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderStayMobileFact('Check In', cleanIn || '—', joinCls(w, cleanIn ? '' : 'is-empty-field'))
+    });
+  }
+  if (cleanOut || allowEmptyFields) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderStayMobileFact('Check Out', cleanOut || '—', joinCls(w, cleanOut ? '' : 'is-empty-field'))
+    });
+  }
+  if (cleanLoc || allowEmptyFields) {
+    factEntries.push({
+      wide: true,
+      render: (w) => cleanLoc
+        ? renderStayMobileLinkedFact('Location', cleanLoc, locationUrl, w)
+        : renderStayMobileFact('Location', '—', joinCls(w, 'is-empty-field'))
+    });
+  }
+  if (cleanProv || allowEmptyFields) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderStayMobileFact('Provider', cleanProv || '—', joinCls(w, cleanProv ? '' : 'is-empty-field'))
+    });
+  }
+  factEntries.push({
+    wide: false,
+    render: (w) => renderStayMobileFact('Cost', costValue, w)
+  });
+  if (cleanRef || allowEmptyFields) {
+    factEntries.push({
+      wide: false,
+      render: (w) => renderStayMobileFact('Booking #', cleanRef || '—', joinCls(w, cleanRef ? '' : 'is-empty-field'))
+    });
+  }
+  if (cleanNotes || allowEmptyFields) {
+    factEntries.push({
+      wide: true,
+      render: (w) => renderStayMobileFact('Notes', cleanNotes || '—', joinCls(w, cleanNotes ? '' : 'is-empty-field'))
+    });
+  }
+  if (stay.attachments && stay.attachments.length > 0) {
+    factEntries.push({
+      wide: true,
+      render: (w) => `<div class="${joinCls('stay-mobile-fact', w)}"><span class="stay-mobile-fact-label">Attachments & Links</span><div class="flex flex-wrap gap-1 mt-1">` + renderAttachmentsPillsHtml(stay.attachments) + `</div></div>`
+    });
+  }
+
+  const gridHtml = typeof renderMobileFactGridItems === 'function'
+    ? renderMobileFactGridItems(factEntries, 'stay-mobile-fact--wide')
+    : factEntries.map(e => e.render(e.wide ? 'stay-mobile-fact--wide' : '')).join('');
 
   return `
     <div class="stay-mobile-facts-grid">
-      ${renderStayMobileFact('City', cityDisplay)}
-      ${renderStayMobileFact('Nights', String(nights))}
-      ${renderStayMobileFact('Check In', checkInDisplay)}
-      ${renderStayMobileFact('Check Out', checkOutDisplay)}
-      ${stay.location ? renderStayMobileLinkedFact('Location', stay.location, locationUrl, 'stay-mobile-fact--wide') : ''}
-      ${stay.provider ? renderStayMobileFact('Provider', stay.provider) : ''}
-      ${renderStayMobileFact('Cost', costValue)}
-      ${stay.bookingRef ? renderStayMobileFact('Booking #', stay.bookingRef) : ''}
-      ${stay.notes ? renderStayMobileFact('Notes', stay.notes, 'stay-mobile-fact--wide') : ''}
-      ${attachmentsHtml}
+      ${gridHtml}
     </div>
   `;
 }
