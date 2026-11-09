@@ -7,7 +7,7 @@
   padding: 0.28rem 0.58rem !important;
   border: 1px solid color-mix(in srgb, var(--status-color, #64748b) 34%, transparent);
   border-radius: 9999px;
-  background: color-mix(in srgb, var(--status-color, #64748b) 12%, white);
+  background: color-mix(in srgb, var(--status-color, #64748b) 12%, var(--color-surface-card));
   color: var(--status-color, #64748b);
   font-size: 0.75rem !important;
   font-weight: 800;
@@ -15,6 +15,13 @@
   letter-spacing: 0;
   white-space: nowrap;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+[data-theme="dark"] .status-badge {
+  border-color: color-mix(in srgb, var(--status-color, #94a3b8) 48%, transparent);
+  background: color-mix(in srgb, var(--status-color, #64748b) 20%, var(--color-surface-card));
+  color: color-mix(in srgb, var(--status-color, #cbd5e1) 65%, white);
+  box-shadow: none;
 }
 
 button.status-badge,
@@ -27,7 +34,7 @@ button.status-badge:hover,
 .status-badge-clickable:hover {
   transform: translateY(-1px);
   border-color: var(--status-color, #64748b);
-  background: color-mix(in srgb, var(--status-color, #64748b) 18%, white);
+  background: color-mix(in srgb, var(--status-color, #64748b) 18%, var(--color-surface-card));
 }
 
 button.status-badge:focus-visible,
@@ -2361,7 +2368,7 @@ body.mobile-app-mode .mobile-card-row-meta {
   flex-wrap: wrap !important;
   gap: 0.35rem 0.6rem !important;
   font-size: var(--mob-font-meta, 0.75rem) !important;
-  color: var(--text-secondary, #64748b) !important;
+  color: var(--color-text-muted) !important;
 }
 
 /* De-clutter redundant inline hover actions on touch devices */
