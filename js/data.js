@@ -121,7 +121,7 @@ const CITY_COLORS = [
   '#FFC107', // Gold
   '#FF4081'  // Hot pink
 ];
-let titleData = { title: "✈ New Trip Plan", subtitle: "Click here to add your trip subtitle/description" };
+let titleData = { title: "✈ New Trip Plan", subtitle: "" };
 var currentFileName = "Default Template";
 let saveQueuePromise = null;
 let saveQueued = false;
@@ -337,7 +337,11 @@ function restoreHistorySnapshot(snapshot) {
     const title = document.getElementById('mainTitle');
     const subtitle = document.getElementById('mainSubtitle');
     if (title) title.innerText = titleData.title || '';
-    if (subtitle) subtitle.innerText = titleData.subtitle || '';
+    if (typeof syncMainSubtitleDisplay === 'function') {
+      titleData.subtitle = syncMainSubtitleDisplay(titleData.subtitle || '');
+    } else if (subtitle) {
+      subtitle.innerText = titleData.subtitle || '';
+    }
 
     if (typeof syncActiveFileDisplay === 'function') syncActiveFileDisplay();
     if (typeof buildNav === 'function') buildNav();
@@ -2932,7 +2936,7 @@ function _initLoadMetaAndUI() {
     try {
       const parsed = JSON.parse(savedMeta);
       if (parsed.title && parsed.title.trim()) titleData.title = parsed.title;
-      if (parsed.subtitle && parsed.subtitle.trim()) titleData.subtitle = parsed.subtitle;
+      if (parsed.subtitle && parsed.subtitle.trim() && !/^click here to add\b/i.test(parsed.subtitle.trim())) titleData.subtitle = parsed.subtitle;
     } catch (e) {
       console.error('Meta load error:', e);
     }
@@ -2945,7 +2949,11 @@ function _initLoadMetaAndUI() {
   const mainTitleEl = document.getElementById('mainTitle');
   if (mainTitleEl) mainTitleEl.innerText = titleData.title;
   const mainSubEl = document.getElementById('mainSubtitle');
-  if (mainSubEl) mainSubEl.innerText = titleData.subtitle;
+  if (typeof syncMainSubtitleDisplay === 'function') {
+    titleData.subtitle = syncMainSubtitleDisplay(titleData.subtitle);
+  } else if (mainSubEl) {
+    mainSubEl.innerText = titleData.subtitle;
+  }
 
   syncActiveFileDisplay();
   configureFileActionButtons();
@@ -4139,7 +4147,11 @@ function resetAppStateToDefaults() {
   const mainTitleEl = document.getElementById("mainTitle");
   if (mainTitleEl) mainTitleEl.innerText = titleData.title;
   const mainSubEl = document.getElementById("mainSubtitle");
-  if (mainSubEl) mainSubEl.innerText = titleData.subtitle;
+  if (typeof syncMainSubtitleDisplay === 'function') {
+    titleData.subtitle = syncMainSubtitleDisplay(titleData.subtitle);
+  } else if (mainSubEl) {
+    mainSubEl.innerText = titleData.subtitle;
+  }
   currentFileName = "Default Template";
   currentCityFilter = 'all';
 
@@ -5709,7 +5721,11 @@ async function loadImportedPayload(importedData, fileName) {
   const titleEl = document.getElementById('mainTitle');
   const subtitleEl = document.getElementById('mainSubtitle');
   if (titleEl) titleEl.innerText = titleData.title;
-  if (subtitleEl) subtitleEl.innerText = titleData.subtitle;
+  if (typeof syncMainSubtitleDisplay === 'function') {
+    titleData.subtitle = syncMainSubtitleDisplay(titleData.subtitle);
+  } else if (subtitleEl) {
+    subtitleEl.innerText = titleData.subtitle;
+  }
   localStorage.setItem('travelApp_meta_template', JSON.stringify(titleData));
 
   let transitCitiesToAdd = [];

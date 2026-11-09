@@ -833,34 +833,110 @@
 
     #tab-transport .travel-data-table,
     #tab-accom .travel-data-table {
-      min-width: 0;
-      max-width: 100%;
-      table-layout: fixed;
+      width: 100%;
+      min-width: 100%;
+      table-layout: auto;
     }
 
     #tab-transport .travel-data-table th,
+    #tab-accom .travel-data-table th {
+      white-space: nowrap;
+      padding: 0.65rem 0.6rem;
+    }
+
     #tab-transport .travel-data-table td,
-    #tab-accom .travel-data-table th,
     #tab-accom .travel-data-table td {
-      white-space: normal !important;
+      padding: 0.65rem 0.6rem;
+      overflow-wrap: break-word;
+      word-break: normal;
     }
 
-    #tab-transport .travel-data-table th:first-child,
-    #tab-transport .travel-data-table td:first-child {
-      width: 2.25rem;
+    #tab-transport .transport-data-table :is(th, td):is(:nth-child(1), :nth-child(3), :nth-child(4), :nth-child(7), :nth-child(8), :nth-child(9), :nth-child(11), :nth-child(12), :nth-child(13)),
+    #tab-accom .stay-data-table :is(th, td):is(:nth-child(1), :nth-child(4), :nth-child(5), :nth-child(6), :nth-child(7), :nth-child(8), :nth-child(10), :nth-child(11), :nth-child(12)) {
+      white-space: nowrap;
     }
 
-    #tab-transport .travel-data-table th:nth-child(3),
-    #tab-transport .travel-data-table td:nth-child(3) {
-      width: 3.25rem;
+    #tab-transport .transport-data-table td:nth-child(2) {
+      min-width: 6.5rem;
+      max-width: 10.5rem;
+      white-space: normal;
     }
 
-    #tab-transport .travel-data-table th:last-child,
-    #tab-transport .travel-data-table td:last-child,
-    #tab-accom .travel-data-table th:last-child,
-    #tab-accom .travel-data-table td:last-child {
-      width: 4.75rem;
-      white-space: nowrap !important;
+    #tab-transport .transport-data-table td:is(:nth-child(5), :nth-child(6)) {
+      min-width: 7.5rem;
+      max-width: 11rem;
+      white-space: normal;
+    }
+
+    #tab-transport .transport-data-table td:is(:nth-child(5), :nth-child(6)) > .flex > span:first-child {
+      white-space: nowrap;
+    }
+
+    #tab-transport .transport-data-table td:nth-child(10) {
+      min-width: 6.5rem;
+      max-width: 11rem;
+      white-space: normal;
+    }
+
+    #tab-accom .stay-data-table td:nth-child(2) {
+      min-width: 8.5rem;
+      max-width: 13.5rem;
+      white-space: normal;
+    }
+
+    #tab-accom .stay-data-table td:nth-child(3) {
+      min-width: 6.5rem;
+      max-width: 11.5rem;
+      white-space: normal;
+    }
+
+    #tab-accom .stay-data-table .transport-sub-location-detail,
+    #tab-accom .stay-data-table .transport-sub-location-value-link {
+      display: inline;
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
+
+    #tab-accom .stay-data-table td:nth-child(9) {
+      min-width: 7.5rem;
+      max-width: 13rem;
+      white-space: normal;
+    }
+
+    #tab-transport .travel-data-table > thead > tr > th:last-child,
+    #tab-transport .travel-data-table > tbody > tr:not(.journey-detail-row) > td:last-child,
+    #tab-accom .travel-data-table > thead > tr > th:last-child,
+    #tab-accom .travel-data-table > tbody > tr > td:last-child {
+      position: sticky;
+      right: 0;
+      z-index: 2;
+      white-space: nowrap;
+      background-color: #ffffff;
+    }
+
+    #tab-transport .travel-data-table > thead > tr > th:last-child,
+    #tab-accom .travel-data-table > thead > tr > th:last-child {
+      background-color: #f8fafc;
+    }
+
+    #tab-transport .travel-data-table > tbody > tr:not(.journey-detail-row):hover > td:last-child,
+    #tab-accom .travel-data-table > tbody > tr:hover > td:last-child {
+      background-color: #f8fafc;
+    }
+
+    :where([data-theme="dark"], [data-theme="dark"] *) #tab-transport .travel-data-table > tbody > tr:not(.journey-detail-row) > td:last-child,
+    :where([data-theme="dark"], [data-theme="dark"] *) #tab-accom .travel-data-table > tbody > tr > td:last-child {
+      background-color: #0f172a;
+    }
+
+    :where([data-theme="dark"], [data-theme="dark"] *) #tab-transport .travel-data-table > thead > tr > th:last-child,
+    :where([data-theme="dark"], [data-theme="dark"] *) #tab-accom .travel-data-table > thead > tr > th:last-child {
+      background-color: #1e293b;
+    }
+
+    :where([data-theme="dark"], [data-theme="dark"] *) #tab-transport .travel-data-table > tbody > tr:not(.journey-detail-row):hover > td:last-child,
+    :where([data-theme="dark"], [data-theme="dark"] *) #tab-accom .travel-data-table > tbody > tr:hover > td:last-child {
+      background-color: #162032;
     }
   }
 
@@ -869,8 +945,7 @@
     #tab-transport .travel-data-table td,
     #tab-accom .travel-data-table th,
     #tab-accom .travel-data-table td {
-      padding-left: 0.55rem !important;
-      padding-right: 0.55rem !important;
+      padding: 0.55rem 0.5rem !important;
     }
 
     #tab-transport .travel-data-table {
@@ -879,13 +954,6 @@
 
     #tab-accom .travel-data-table {
       font-size: 0.84rem;
-    }
-
-    #tab-transport .transport-data-table th:nth-child(11),
-    #tab-transport .transport-data-table td:nth-child(11),
-    #tab-accom .stay-data-table th:nth-child(9),
-    #tab-accom .stay-data-table td:nth-child(9) {
-      max-width: 11rem;
     }
   }
 
@@ -4910,7 +4978,7 @@
 
   .travel-data-table th,
   .travel-data-table td {
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 
   .pending-segment-summary {

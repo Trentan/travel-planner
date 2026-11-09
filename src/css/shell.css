@@ -318,21 +318,54 @@
     @media (min-width: 769px) {
       #tab-itinerary .compact-leg-body {
         @apply grid;
-        grid-template-columns: 25% minmax(0, 1fr) 25%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         align-items: start;
+      }
+      #tab-itinerary .compact-day-pager {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        min-width: 0;
       }
       #tab-itinerary .compact-tips-food-col {
         grid-column: 1;
-        grid-row: 1;
+        grid-row: 2;
+        min-width: 0;
       }
       #tab-itinerary .compact-activities-card {
-        grid-column: 3;
+        grid-column: 2;
+        grid-row: 2;
+        min-width: 0;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      #tab-itinerary .desktop-split-shell.is-full-itinerary .compact-leg-body {
+        grid-template-columns: 25% minmax(0, 1fr) 25%;
+      }
+      #tab-itinerary .desktop-split-shell.is-full-itinerary .compact-tips-food-col {
+        grid-column: 1;
         grid-row: 1;
       }
-      #tab-itinerary .compact-day-pager {
+      #tab-itinerary .desktop-split-shell.is-full-itinerary .compact-day-pager {
         grid-column: 2;
         grid-row: 1;
       }
+      #tab-itinerary .desktop-split-shell.is-full-itinerary .compact-activities-card {
+        grid-column: 3;
+        grid-row: 1;
+      }
+    }
+
+    body:not(.edit-mode-active) #mainSubtitle:empty::before {
+      content: attr(data-fallback);
+      opacity: 0.88;
+    }
+
+    body.edit-mode-active #mainSubtitle:empty:not(:focus)::before {
+      content: attr(data-placeholder);
+      opacity: 0.65;
+      font-style: italic;
+      pointer-events: none;
     }
 
     #tab-itinerary .compact-day-rail {
@@ -907,7 +940,24 @@
   }
 
   .packing-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr));
+    gap: 0.85rem;
+    align-items: start;
+  }
+
+  @media (min-width: 769px) {
+    .packing-grid > .packing-card:only-child {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.25rem 1.25rem;
+    }
+
+    .packing-grid > .packing-card:only-child > .packing-card-header,
+    .packing-grid > .packing-card:only-child > .add-btn {
+      grid-column: 1 / -1;
+      margin-bottom: 0.35rem;
+    }
   }
 
   .packing-card {

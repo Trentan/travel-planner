@@ -295,7 +295,7 @@ function renderAccomTableRow(stay, cityMap = null) {
   const status = normalizeItemStatus(stay.status);
   const statusIcon = '';
 
-  const editActionsHtml = isEditMode ? `<td class="px-4 py-3 align-middle text-center whitespace-nowrap">
+  const editActionsHtml = isEditMode ? `<td class="px-2 py-2.5 align-middle text-center whitespace-nowrap">
     <div class="inline-flex gap-2">
       <button class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors" onclick="event.stopPropagation(); openEditStayModal('${stay.id}')" title="Edit Stay" aria-label="Edit Stay">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
@@ -307,42 +307,42 @@ function renderAccomTableRow(stay, cityMap = null) {
   </td>` : '';
 
   return `<tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" style="border-left: 4px solid ${cityColor};">
-    <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">
+    <td class="px-2.5 py-2.5 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap">
       <div class="flex items-center gap-1.5">${getCityFlagHTML(cityName)} <span class="ml-1">${cityName}</span></div>
     </td>
-    <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium min-w-[200px]">
+    <td class="px-2.5 py-2.5 align-middle text-slate-800 dark:text-slate-200 font-medium min-w-[140px]">
       <span>${escapeHtmlText(stay.propertyName)}</span>
       <div class="md:hidden mt-2 border-t border-slate-100 dark:border-slate-800 pt-2">
         ${renderStayMobileSummary(stay, status, statusIcon, cityName)}
       </div>
     </td>
-    <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">
+    <td class="px-2.5 py-2.5 align-middle text-slate-600 dark:text-slate-300 text-sm">
       ${stay.location ? renderStayLocationDetails(stay, 'text-xs', false) : '—'}
     </td>
-    <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${escapeHtmlText(stay.provider || '—')}</td>
-    <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
+    <td class="px-2.5 py-2.5 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${escapeHtmlText(stay.provider || '—')}</td>
+    <td class="px-2.5 py-2.5 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
       ${formatDateShort(stay.checkIn)}
       <div class="md:hidden mt-1 text-slate-500">
         ${renderStayDateSummary(stay, status, statusIcon)}
       </div>
     </td>
-    <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${formatDateShort(stay.checkOut)}</td>
-    <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm text-center">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
-    <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">${escapeHtmlText(stay.bookingRef || '—')}</td>
+    <td class="px-2.5 py-2.5 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">${formatDateShort(stay.checkOut)}</td>
+    <td class="px-2.5 py-2.5 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm text-center">${stay.nights || calculateNights(stay.checkIn, stay.checkOut)}</td>
+    <td class="px-2.5 py-2.5 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">${escapeHtmlText(stay.bookingRef || '—')}</td>
 
     <!-- Notes -->
-    <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[250px] break-words" title="${escapeHtmlText(stay.notes || '')}">
+    <td class="px-2.5 py-2.5 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[200px]" title="${escapeHtmlText(stay.notes || '')}">
       ${escapeHtmlText(stay.notes || '—')}
       ${stay.attachments && stay.attachments.length > 0 ? '<div class="mt-2 flex flex-wrap gap-1">' + renderAttachmentsPillsHtml(stay.attachments) + '</div>' : ''}
     </td>
 
-    <td class="px-4 py-3 align-middle text-center">
+    <td class="px-2.5 py-2.5 align-middle text-center whitespace-nowrap">
       ${renderStatusBadge(status, {
         onClick: isEditMode ? `event.stopPropagation(); toggleStayStatus(event, '${stay.id}')` : '',
         title: 'Change stay status'
       })}
     </td>
-    <td class="px-4 py-3 align-middle text-right font-medium text-slate-800 dark:text-slate-200">
+    <td class="px-2.5 py-2.5 align-middle text-right font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">
       $<span>${formatCurrency(stay.totalCost || '0', { includeSymbol: false })}</span>
     </td>
     ${editActionsHtml}
@@ -358,18 +358,18 @@ function renderAccomDesktopTable(sortedStays) {
     <table class="travel-data-table stay-data-table w-full text-left border-collapse">
       <thead>
         <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/60 dark:border-slate-700/60">
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">City</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Property</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Location</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Provider</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Check-in</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Check-out</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Nights</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Booking Ref</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notes</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Status</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Cost</th>
-          ${isEditMode ? '<th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Actions</th>' : ''}
+          <th class="px-2.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">City</th>
+          <th class="px-2.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Property</th>
+          <th class="px-2.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Location</th>
+          <th class="px-2.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Provider</th>
+          <th class="px-2.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Check-in</th>
+          <th class="px-2.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Check-out</th>
+          <th class="px-2.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Nights</th>
+          <th class="px-2.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Booking Ref</th>
+          <th class="px-2.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notes</th>
+          <th class="px-2.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Status</th>
+          <th class="px-2.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Cost</th>
+          ${isEditMode ? '<th class="px-2 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Actions</th>' : ''}
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">${rows}</tbody>

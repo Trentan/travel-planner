@@ -886,7 +886,7 @@
     if (typeof window.openCreateNewTripWizard === 'function') {
       window.openCreateNewTripWizard();
     } else if (typeof window.createNewTripDocument === 'function') {
-      await window.createNewTripDocument('New Trip', 'Click here to add subtitle');
+      await window.createNewTripDocument('New Trip', '');
       await window.renderHeaderTripSwitcher();
     }
   };

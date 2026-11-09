@@ -310,12 +310,53 @@ function saveUiSettings() {
   } catch (e) {}
 }
 
+function normalizeTripSubtitleText(raw) {
+  const text = String(raw || '').trim();
+  return /^click here to add\b/i.test(text) ? '' : text;
+}
+window.normalizeTripSubtitleText = normalizeTripSubtitleText;
+
+function computeTripSubtitleFallback() {
+  const legs = (typeof appData !== 'undefined' && Array.isArray(appData)) ? appData : [];
+  if (legs.length === 0) return 'Trip overview & shared notes';
+  const names = [];
+  for (const leg of legs) {
+    const clean = typeof cleanCityNavLabel === 'function'
+      ? cleanCityNavLabel(leg.label || leg.subtitle || '')
+      : String(leg.label || '').replace(/\s*\(Trip (?:Start|Finish|Return)\)\s*/gi, '').trim();
+    if (clean && !names.includes(clean)) names.push(clean);
+  }
+  const totalDays = legs.reduce((n, l) => n + (Array.isArray(l?.days) ? l.days.length : 0), 0);
+  const routeSummary = names.length > 3
+    ? `${names[0]} → ${names[names.length - 1]} · ${names.length} stops`
+    : names.join(' → ');
+  return [routeSummary, totalDays > 0 ? `${totalDays} days` : ''].filter(Boolean).join(' · ') || 'Trip overview & shared notes';
+}
+
+function syncMainSubtitleDisplay(rawSubtitle = undefined) {
+  const subtitle = document.getElementById('mainSubtitle');
+  if (!subtitle) return '';
+  const cleaned = normalizeTripSubtitleText(rawSubtitle !== undefined ? rawSubtitle : (subtitle.innerText || subtitle.textContent || ''));
+  if (typeof titleData !== 'undefined' && titleData && /^click here to add\b/i.test(String(titleData.subtitle || '').trim())) {
+    titleData.subtitle = cleaned;
+  }
+  if ((subtitle.innerText || '') !== cleaned) subtitle.innerText = cleaned;
+  if (typeof subtitle.setAttribute === 'function') {
+    subtitle.setAttribute('data-fallback', computeTripSubtitleFallback());
+  }
+  return cleaned;
+}
+window.syncMainSubtitleDisplay = syncMainSubtitleDisplay;
+
 function setHeaderEditable(isEditable) {
   const title = document.getElementById('mainTitle');
   const subtitle = document.getElementById('mainSubtitle');
   const allowEdit = !!isEditable && !isMobileViewport();
   if (title) title.contentEditable = allowEdit;
-  if (subtitle) subtitle.contentEditable = allowEdit;
+  if (subtitle) {
+    subtitle.contentEditable = allowEdit;
+    syncMainSubtitleDisplay();
+  }
 }
 
 function applyTheme(theme = null) {
@@ -509,7 +550,7 @@ function openRenameTripDialog() {
   }
 
   titleInput.value = (title.innerText || '').trim();
-  subtitleInput.value = subtitle ? (subtitle.innerText || '').trim() : '';
+  subtitleInput.value = subtitle ? normalizeTripSubtitleText(subtitle.innerText || '') : '';
   dialog.style.display = 'flex';
   dialog.setAttribute('aria-hidden', 'false');
   requestAnimationFrame(() => titleInput.focus());
@@ -530,9 +571,9 @@ function saveRenameTripDialog() {
   if (!title || !titleInput || !subtitleInput) return;
 
   const nextTitle = titleInput.value.trim() || 'New Trip Plan';
-  const nextSubtitle = subtitleInput.value.trim();
+  const nextSubtitle = normalizeTripSubtitleText(subtitleInput.value);
   title.innerText = nextTitle;
-  if (subtitle) subtitle.innerText = nextSubtitle;
+  syncMainSubtitleDisplay(nextSubtitle);
   titleData.title = nextTitle;
   titleData.subtitle = nextSubtitle;
   saveData();
@@ -1025,7 +1066,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.getElementById('mainTitle')?.addEventListener('blur', function() { titleData.title = this.innerText; saveData(); trackUserEdit(); });
-document.getElementById('mainSubtitle')?.addEventListener('blur', function() { titleData.subtitle = this.innerText; saveData(); trackUserEdit(); });
+document.getElementById('mainSubtitle')?.addEventListener('blur', function() {
+  const cleaned = syncMainSubtitleDisplay(this.innerText);
+  titleData.subtitle = cleaned;
+  saveData();
+  trackUserEdit();
+});
 
 function updateData(legIdx, key, val) { appData[legIdx][key] = val; saveData(); }
 
@@ -1867,6 +1913,8 @@ function findCurrentDesktopDayInView(preferredContext = null) {
 function syncDesktopSplitToDayInView(force = false, preferredContext = null) {
   if (typeof window === 'undefined' || window.innerWidth < 1024) return;
   if (typeof getDesktopSplitMode === 'function' && getDesktopSplitMode() === 'full-itinerary') return;
+  const itinPane = typeof document !== 'undefined' && document.getElementById ? document.getElementById('tab-itinerary') : null;
+  if (itinPane && itinPane.classList && !itinPane.classList.contains('active')) return;
 
   const dayData = findCurrentDesktopDayInView(preferredContext);
   if (!dayData) return;

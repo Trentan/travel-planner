@@ -1552,20 +1552,19 @@ function buildTransportTab(cityFilter = null) {
     <table class="travel-data-table transport-data-table w-full text-left border-collapse">
       <thead>
         <tr class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/60 dark:border-slate-700/60">
-          <th class="px-3 py-3 w-8"></th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Journey</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Type</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Route</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Departs</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Arrives</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Duration</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Provider</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Code</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Booking Ref</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notes</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Status</th>
-          <th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Cost</th>
-          ${isEditMode ? '<th class="px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Actions</th>' : ''}
+          <th class="px-1.5 py-2.5 w-7"></th>
+          <th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Journey</th>
+          <th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Type</th>
+          <th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Route</th>
+          <th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Departs</th>
+          <th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Arrives</th>
+          <th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Duration</th>
+          <th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Provider</th>
+          <th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Booking Ref</th>
+          <th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notes</th>
+          <th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Status</th>
+          <th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Cost</th>
+          ${isEditMode ? '<th class="px-1.5 py-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Actions</th>' : ''}
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -1617,9 +1616,9 @@ function buildTransportTab(cityFilter = null) {
         </button>`;
       
       routeDisplay = `
-        <div class="transport-route-main flex items-center">
-          ${firstLoc} → ${lastLoc} 
-          <span class="text-[10px] text-slate-500 ml-1 font-normal uppercase tracking-wider">${viaText}</span>
+        <div class="transport-route-main flex flex-col items-start">
+          <span class="whitespace-nowrap">${firstLoc} → ${lastLoc}</span>
+          ${viaText ? `<span class="text-[10px] text-slate-500 font-normal uppercase tracking-wider">${viaText}</span>` : ''}
         </div>`;
     }
 
@@ -1633,20 +1632,12 @@ function buildTransportTab(cityFilter = null) {
     let fromDetailsHtml = '';
     if (cleanFromAddr) {
       fromDetailsHtml = `
-        <a href="${getMapSearchUrl(getJourneyMapSearchQuery(cleanFromAddr, cleanFromLoc, rep.transportType))}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 hover:underline text-slate-400 dark:text-slate-500 transition-colors inline-flex items-center gap-1 text-xs" title="Open in Google Maps" onclick="event.stopPropagation();">
-          <span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanFromCity || cleanFromLoc || '—')}</span>
-          <span>·</span>
-          <span>${escapeHtmlText(cleanFromAddr)}</span>
-        </a>
+        <a href="${getMapSearchUrl(getJourneyMapSearchQuery(cleanFromAddr, cleanFromLoc, rep.transportType))}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 hover:underline text-slate-400 dark:text-slate-500 transition-colors text-xs leading-snug" title="Open in Google Maps" onclick="event.stopPropagation();"><span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanFromCity || cleanFromLoc || '—')}</span> · <span>${escapeHtmlText(cleanFromAddr)}</span></a>
       `;
     } else {
       if (cleanFromCity && cleanFromLoc && cleanFromCity.toLowerCase() !== cleanFromLoc.toLowerCase()) {
         fromDetailsHtml = `
-          <div class="text-slate-400 dark:text-slate-500 inline-flex items-center gap-1 text-xs">
-            <span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanFromCity)}</span>
-            <span>·</span>
-            <span>${escapeHtmlText(cleanFromLoc)}</span>
-          </div>
+          <div class="text-slate-400 dark:text-slate-500 text-xs leading-snug"><span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanFromCity)}</span> · <span>${escapeHtmlText(cleanFromLoc)}</span></div>
         `;
       } else {
         fromDetailsHtml = `
@@ -1662,20 +1653,12 @@ function buildTransportTab(cityFilter = null) {
     let toDetailsHtml = '';
     if (cleanToAddr) {
       toDetailsHtml = `
-        <a href="${getMapSearchUrl(getJourneyMapSearchQuery(cleanToAddr, cleanToLoc, lastSeg.transportType))}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 hover:underline text-slate-400 dark:text-slate-500 transition-colors inline-flex items-center gap-1 text-xs" title="Open in Google Maps" onclick="event.stopPropagation();">
-          <span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanToCity || cleanToLoc || '—')}</span>
-          <span>·</span>
-          <span>${escapeHtmlText(cleanToAddr)}</span>
-        </a>
+        <a href="${getMapSearchUrl(getJourneyMapSearchQuery(cleanToAddr, cleanToLoc, lastSeg.transportType))}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 hover:underline text-slate-400 dark:text-slate-500 transition-colors text-xs leading-snug" title="Open in Google Maps" onclick="event.stopPropagation();"><span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanToCity || cleanToLoc || '—')}</span> · <span>${escapeHtmlText(cleanToAddr)}</span></a>
       `;
     } else {
       if (cleanToCity && cleanToLoc && cleanToCity.toLowerCase() !== cleanToLoc.toLowerCase()) {
         toDetailsHtml = `
-          <div class="text-slate-400 dark:text-slate-500 inline-flex items-center gap-1 text-xs">
-            <span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanToCity)}</span>
-            <span>·</span>
-            <span>${escapeHtmlText(cleanToLoc)}</span>
-          </div>
+          <div class="text-slate-400 dark:text-slate-500 text-xs leading-snug"><span class="font-medium text-slate-600 dark:text-slate-400">${escapeHtmlText(cleanToCity)}</span> · <span>${escapeHtmlText(cleanToLoc)}</span></div>
         `;
       } else {
         toDetailsHtml = `
@@ -1685,46 +1668,46 @@ function buildTransportTab(cityFilter = null) {
     }
 html += `
       <tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${isMultiLeg ? 'cursor-pointer' : ''}" data-group="${gid}" style="border-left: 4px solid ${statusColor};" ${isMultiLeg ? `onclick="toggleTransportGroupDetails('${gid}')"` : ''}>
-        <td class="px-3 py-3 w-8 align-middle text-center">${desktopExpandControl}</td>
-        <td class="px-4 py-3 align-middle text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap" title="${escapeHtmlText(rep.journeyName || '')}">
+        <td class="px-1.5 py-2.5 w-7 align-middle text-center">${desktopExpandControl}</td>
+        <td class="px-1.5 py-2.5 align-middle text-slate-800 dark:text-slate-200 font-medium" title="${escapeHtmlText(rep.journeyName || '')}">
           <div class="journey-name-main">${nameDisplay}</div>
           ${isMultiLeg ? `<div class="text-[11px] text-slate-400 dark:text-slate-500 font-normal mt-0.5">${segs.length} legs</div>` : ''}
           </td>
-        <td class="px-4 py-3 align-middle text-center text-xl">${icon}</td>
-        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">${routeDisplay}</td>
+        <td class="px-1.5 py-2.5 align-middle text-center text-xl">${icon}</td>
+        <td class="px-1.5 py-2.5 align-middle text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">${routeDisplay}</td>
         
-        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
+        <td class="px-1.5 py-2.5 align-middle text-slate-600 dark:text-slate-300 text-sm">
           <div class="flex flex-col">
-            <span class="block font-medium text-slate-800 dark:text-slate-200">${firstDep}</span>
+            <span class="block font-medium whitespace-nowrap text-slate-800 dark:text-slate-200">${firstDep}</span>
             <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               ${fromDetailsHtml}
             </div>
           </div>
         </td>
         
-        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
+        <td class="px-1.5 py-2.5 align-middle text-slate-600 dark:text-slate-300 text-sm">
           <div class="flex flex-col">
-            <span class="block font-medium text-slate-800 dark:text-slate-200">${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</span>
+            <span class="block font-medium whitespace-nowrap text-slate-800 dark:text-slate-200">${lastArr !== '—' ? lastArr + ' ' + lastArrTime : '—'}</span>
             <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               ${toDetailsHtml}
             </div>
           </div>
         </td>
         
-        <td class="px-4 py-3 align-middle text-center text-slate-600 dark:text-slate-300 text-sm font-medium whitespace-nowrap">
+        <td class="px-1.5 py-2.5 align-middle text-center text-slate-600 dark:text-slate-300 text-sm font-medium whitespace-nowrap">
           ${durationDisplay || '—'}
         </td>
         
-        <td class="px-4 py-3 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
-          <span class="font-medium">${escapeHtmlText(rep.provider || '—')}</span>
-        </td>
-        
-        <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">
-          <div>${escapeHtmlText(rep.routeCode || '—')}</div>
+        <td class="px-1.5 py-2.5 align-middle text-slate-600 dark:text-slate-300 whitespace-nowrap text-sm">
+          <div class="font-medium">${escapeHtmlText(rep.provider || '—')}</div>
           ${(() => {
+            const codeVal = String(rep.routeCode || '').trim();
             const allAlerts = (segs || []).flatMap(s => s.alerts || []);
             const allAtts = (segs || []).flatMap(s => s.attachments || []);
             let out = '';
+            if (codeVal) {
+              out += `<span class="inline-block mt-0.5 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-mono text-[11px] uppercase leading-tight">${escapeHtmlText(codeVal)}</span>`;
+            }
             if (allAlerts.length > 0 && typeof renderJourneyAlertBadgesHtml === 'function') {
               out += `<div class="mt-1 flex flex-wrap gap-1">${renderJourneyAlertBadgesHtml(allAlerts)}</div>`;
             }
@@ -1735,28 +1718,28 @@ html += `
           })()}
         </td>
         
-        <td class="px-4 py-3 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">
+        <td class="px-1.5 py-2.5 align-middle text-slate-500 dark:text-slate-400 font-mono text-sm uppercase whitespace-nowrap">
           ${escapeHtmlText(rep.bookingReference || '—')}
         </td>
         
         <!-- Notes -->
-        <td class="px-4 py-3 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[250px] break-words" title="${escapeHtmlText(rep.notes || '')}" onclick="event.stopPropagation()">
+        <td class="px-1.5 py-2.5 align-middle text-slate-400 dark:text-slate-500 text-xs max-w-[175px]" title="${escapeHtmlText(rep.notes || '')}" onclick="event.stopPropagation()">
           <span contenteditable="${window.isEditMode}" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1" onblur="updateJourneyNotes('${rep.id}', this.innerText); buildTransportTab();">${escapeHtmlText(rep.notes || '—')}</span>
         </td>
         
-        <td class="px-4 py-3 align-middle text-center">
+        <td class="px-1.5 py-2.5 align-middle text-center whitespace-nowrap">
           ${renderStatusBadge(rep.status, {
             onClick: window.isEditMode ? `event.stopPropagation(); toggleJourneyStatus('${rep.id}')` : '',
             title: 'Change transport status'
           })}
         </td>
         
-        <td class="px-4 py-3 align-middle text-right font-medium text-slate-800 dark:text-slate-200" onclick="event.stopPropagation()">
+        <td class="px-1.5 py-2.5 align-middle text-right font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap" onclick="event.stopPropagation()">
           $<span contenteditable="${window.isEditMode}" class="focus:outline-none focus:ring-1 focus:ring-slate-300 rounded px-1" onblur="updateJourneyCost('${rep.id}', this.innerText); buildTransportTab();">${formatCurrency(isMultiLeg ? totalCost : (rep.cost || '0'), { includeSymbol: false })}</span>
         </td>
         
-        ${isEditMode ? `<td class="px-4 py-3 align-middle text-center whitespace-nowrap" onclick="event.stopPropagation()">
-          <div class="inline-flex gap-2">
+        ${isEditMode ? `<td class="px-1.5 py-2.5 align-middle text-center whitespace-nowrap" onclick="event.stopPropagation()">
+          <div class="inline-flex gap-1">
             <button class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors" onclick="editJourney('${gid}')" title="Edit journey" aria-label="Edit journey">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
             </button>
@@ -1772,7 +1755,7 @@ html += `
 
       html += `
         <tr class="journey-detail-row ${isExpanded ? 'expanded' : ''}" data-group="${gid}" style="display:${isExpanded ? 'table-row' : 'none'};">
-          <td colspan="${isEditMode ? 14 : 13}">
+          <td colspan="${isEditMode ? 13 : 12}">
             ${detailRowContent}
           </td>
         </tr>`;
