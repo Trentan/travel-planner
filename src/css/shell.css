@@ -49,7 +49,7 @@
   }
 
   .app-menu-switch-track {
-    @apply w-9 h-5 rounded-full relative transition-colors;
+    @apply w-9 h-5 shrink-0 rounded-full relative transition-colors;
     @apply bg-slate-300;
   }
 
@@ -568,6 +568,12 @@
       padding: 0.68rem 0.72rem;
     }
 
+    [data-theme="dark"] body.mobile-app-mode .transport-mobile-card .grid > div,
+    [data-theme="dark"] body.mobile-app-mode .stay-mobile-card .grid > div {
+      border: 1px solid rgba(71, 85, 105, 0.55);
+      background: rgba(30, 41, 59, 0.55);
+    }
+
     body.mobile-app-mode .transport-mobile-card .mobile-surface-card-button,
     body.mobile-app-mode .stay-mobile-card .mobile-surface-card-button {
       min-height: 2.75rem;
@@ -578,11 +584,25 @@
       font-weight: 850;
     }
 
+    [data-theme="dark"] body.mobile-app-mode .transport-mobile-card .mobile-surface-card-button,
+    [data-theme="dark"] body.mobile-app-mode .stay-mobile-card .mobile-surface-card-button {
+      border-color: rgba(56, 189, 248, 0.28);
+      background: rgba(30, 41, 59, 0.92);
+      color: #7dd3fc;
+    }
+
     body.mobile-app-mode .transport-mobile-card .mobile-surface-card-button--danger,
     body.mobile-app-mode .stay-mobile-card .mobile-surface-card-button--danger {
       border-color: rgba(220, 38, 38, 0.16);
       background: rgba(254, 242, 242, 0.84);
       color: #b91c1c;
+    }
+
+    [data-theme="dark"] body.mobile-app-mode .transport-mobile-card .mobile-surface-card-button--danger,
+    [data-theme="dark"] body.mobile-app-mode .stay-mobile-card .mobile-surface-card-button--danger {
+      border-color: rgba(248, 113, 113, 0.35);
+      background: rgba(127, 29, 29, 0.38);
+      color: #fecaca;
     }
 
   /* Header */

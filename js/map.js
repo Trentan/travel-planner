@@ -2,6 +2,8 @@
 let mainMap = null;
 let mapMarkers = [];
 let mapPolylines = [];
+let mapResizeObserver = null;
+let desktopSplitMapResizeObserver = null;
 
 function getCityCoords(cityName) {
   if (!cityName) return null;
@@ -622,6 +624,11 @@ function buildJourneyMap() {
     // Abort if the user clicked away before the map could build
     if (!document.getElementById('tab-map').classList.contains('active')) return;
 
+    if (mapResizeObserver) {
+      mapResizeObserver.disconnect();
+      mapResizeObserver = null;
+    }
+
     if (mainMap) {
       mainMap.remove();
       mainMap = null;
@@ -636,7 +643,18 @@ function buildJourneyMap() {
     container.innerHTML = '';
     container.classList.remove('map-placeholder');
 
-    mainMap = L.map(container, { trackResize: true }).setView([20, 0], 2);
+    const isMobileMap = typeof isMobileViewport === 'function' ? isMobileViewport() : (typeof window !== 'undefined' && window.innerWidth <= 768);
+    const containerHeight = Math.max(container.clientHeight || (isMobileMap ? 560 : 420), 256);
+    const minFillZoom = isMobileMap
+      ? Math.max(1, Math.ceil(Math.log2(containerHeight / 256) * 4) / 4)
+      : 1;
+    mainMap = L.map(container, {
+      trackResize: true,
+      zoomSnap: isMobileMap ? 0.25 : 1,
+      minZoom: minFillZoom,
+      maxBounds: [[-85, -360], [85, 360]],
+      maxBoundsViscosity: 1.0
+    }).setView([20, 0], Math.max(2, minFillZoom));
 
     const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     const tileUrl = isDarkMode
@@ -653,9 +671,10 @@ function buildJourneyMap() {
     }).addTo(mainMap);
 
     if (window.ResizeObserver) {
-      new ResizeObserver(() => {
-        if (mainMap) mainMap.invalidateSize();
-      }).observe(container);
+      mapResizeObserver = new ResizeObserver(() => {
+        if (mainMap) mainMap.invalidateSize({ pan: false });
+      });
+      mapResizeObserver.observe(container);
     }
 
     mapMarkers = [];
@@ -688,7 +707,7 @@ function buildJourneyMap() {
     if (mainMap) {
       setTimeout(() => {
         if (!mainMap) return;
-        mainMap.invalidateSize(false);
+        mainMap.invalidateSize({ pan: false });
         adjustMapView(polylinePoints, destinations);
       }, 50);
     }
@@ -975,6 +994,11 @@ function buildDesktopSplitMap() {
   if (shell && shell.classList.contains('is-full-itinerary')) return;
   if (window.innerWidth < 1024) return;
 
+  if (desktopSplitMapResizeObserver) {
+    desktopSplitMapResizeObserver.disconnect();
+    desktopSplitMapResizeObserver = null;
+  }
+
   if (desktopSplitMap) {
     try {
       desktopSplitMap.remove();
@@ -1008,9 +1032,10 @@ function buildDesktopSplitMap() {
   }).addTo(desktopSplitMap);
 
   if (window.ResizeObserver) {
-    new ResizeObserver(() => {
-      if (desktopSplitMap) desktopSplitMap.invalidateSize();
-    }).observe(container);
+    desktopSplitMapResizeObserver = new ResizeObserver(() => {
+      if (desktopSplitMap) desktopSplitMap.invalidateSize({ pan: false });
+    });
+    desktopSplitMapResizeObserver.observe(container);
   }
 
   const pathStops = collectPathStops();

@@ -754,7 +754,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     await page.waitForSelector('#mappr-import-modal', { state: 'visible' });
     await page.evaluate(() => window.closeMapprImportModal());
     reporter.add('mobile', 'mappr import modal', 'opened and closed mappr import modal from mobile menu');
-    assert(await page.locator('.mobile-desktop-advisory').count() === 1, 'Mobile: desktop recommendation advisory notice should be present in mobile menu');
+    assert(await page.locator('.mobile-desktop-advisory').count() === 0, 'Mobile: discouraging desktop advisory banner should be removed from mobile menu (#661)');
 
     // Issue #210: Mobile Menu Undo & Redo buttons
     assert(await page.locator('#mobileUndoBtn').count() === 1, 'Mobile: #mobileUndoBtn should exist in mobile action menu');
@@ -774,7 +774,7 @@ async function runMobileChecks(baseUrl, reporter, launchOptions = {}) {
     reporter.add('mobile', 'milestone 6 mobile ergonomics', 'right drawer hidden on mobile, print button available in menu');
 
     reporter.add('mobile', 'undo redo menu', 'mobile undo and redo controls integrated and reactive');
-    reporter.add('mobile', 'menu sheet', 'mobile menu opened with desktop advisory notice');
+    reporter.add('mobile', 'menu sheet', 'mobile menu opened cleanly without desktop advisory banner');
 
     await page.evaluate(() => {
       if (window.isEditMode && typeof toggleEditMode === 'function') {

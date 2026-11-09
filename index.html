@@ -435,7 +435,7 @@
               <span class="text-2xl p-1 bg-white dark:bg-slate-800 rounded-lg shadow-xs border border-slate-200/60 dark:border-slate-700 select-none hover:scale-110 transition-transform shrink-0" id="mobileActiveTripEmoji" title="Switch active trip">✈️</span>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-sm text-slate-800 dark:text-slate-100 truncate flex items-center gap-1.5" id="mobileActiveTripTitle">My Trip <span class="text-xs text-slate-400 font-normal">▾</span></div>
-                <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate" id="mobileActiveTripFilename">my_trip.json</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 truncate" id="mobileActiveTripFilename">Ready to plan</div>
               </div>
             </div>
             <button id="mobileCloudSyncStatusPill" class="cloud-status-pill text-xs font-semibold px-2.5 py-1 rounded-full cursor-pointer shrink-0" onclick="openCloudSyncModal(); closeMobileMenu();">⚡ Local Only</button>
@@ -472,10 +472,10 @@
                 <span>📝</span> <span>Export AI Summary</span>
               </button>
               <button class="app-menu-btn" onclick="closeMobileMenu(); openTripFile()">
-                <span>💾</span> <span>Save / Backup JSON</span>
+                <span>💾</span> <span>Backup JSON</span>
               </button>
               <button class="app-menu-btn" onclick="closeMobileMenu(); exportItineraryCalendar()">
-                <span>📅</span> <span>Export Calendar (.ics)</span>
+                <span>📅</span> <span>Export Calendar</span>
               </button>
               <button class="app-menu-btn" onclick="closeMobileMenu(); exportItineraryText()">
                 <span>📝</span> <span>Export Full Text</span>
@@ -507,7 +507,7 @@
             <h3 id="mobileMenuSettings" class="mobile-menu-section-title">⚙️ Settings &amp; Appearance</h3>
             <div class="mobile-menu-section-grid">
               <button class="app-menu-btn" onclick="closeMobileMenu(); openCloudSyncModal()">
-                <span>☁️</span> <span>Cloud Sync Settings</span>
+                <span>☁️</span> <span>Cloud Sync</span>
               </button>
               <button id="mobileEditToggleBtn" class="app-menu-btn" onclick="event.preventDefault(); event.stopPropagation(); toggleEditMode(); closeMobileMenu(); syncMenuEditToggleLabels()">
                 <span>🔒</span> <span>Lock: Read Only</span>
@@ -520,7 +520,7 @@
               <label id="mobileShowRemindersToggleBtn" class="app-menu-switch mobile-menu-switch" role="switch" aria-checked="true" title="Toggle Timeline Tips & Smart Reminders">
                 <input id="mobileShowRemindersToggleInput" type="checkbox" onchange="toggleTimelineReminders(this.checked)" aria-label="Toggle Timeline Tips & Smart Reminders">
                 <span class="app-menu-switch-track" aria-hidden="true"><span class="app-menu-switch-thumb"></span></span>
-                <span id="mobileShowRemindersToggleLabel" class="app-menu-switch-label">💡 Smart Reminders</span>
+                <span id="mobileShowRemindersToggleLabel" class="app-menu-switch-label">💡 Reminders</span>
               </label>
             </div>
           </section>
@@ -550,14 +550,7 @@
             </div>
           </details>
 
-          <!-- Desktop Advisory Notice (at bottom of menu) -->
-          <div class="mobile-desktop-advisory mt-3" role="note">
-            <span class="mobile-desktop-advisory-icon" aria-hidden="true">💻</span>
-            <div class="mobile-desktop-advisory-content">
-              <strong>Best Experienced on Desktop PC</strong>
-              <p>Travel Planner works best on a desktop PC! Load &amp; manage your trip at <a href="https://trentan.github.io/travel-planner/" target="_blank" rel="noopener noreferrer">trentan.github.io/travel-planner</a></p>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
@@ -844,27 +837,27 @@
           <div id="aiFullTripFormFields" class="ai-container">
             <div class="ai-form-group">
               <label for="aiTripTitle">Trip Title</label>
-              <input type="text" id="aiTripTitle" placeholder="e.g., Europe Summer Getaway">
+              <input type="text" id="aiTripTitle" class="form-control" placeholder="e.g., Europe Summer Getaway">
             </div>
             <div class="ai-form-group">
               <label for="aiTripRegions">Regions / Countries of Interest (for new trips)</label>
-              <input type="text" id="aiTripRegions" placeholder="e.g., Southeast Asia (Thailand & Vietnam) or Southern Europe">
+              <input type="text" id="aiTripRegions" class="form-control" placeholder="e.g., Southeast Asia (Thailand & Vietnam) or Southern Europe">
             </div>
             <div class="ai-form-group">
               <label for="aiTripCities">Specific Cities (optional)</label>
-              <input type="text" id="aiTripCities" placeholder="e.g., London, Paris, Rome (Leave blank if you want AI to choose)">
+              <input type="text" id="aiTripCities" class="form-control" placeholder="e.g., London, Paris, Rome (Leave blank if you want AI to choose)">
             </div>
             <div class="ai-form-group">
               <label for="aiTripBookedJunctions">Pre-booked Flights & Fixed Junctions</label>
-              <input type="text" id="aiTripBookedJunctions" placeholder="e.g., Flight QF1 Brisbane to Bangkok 10 June, Flight TG21 return 24 June">
+              <input type="text" id="aiTripBookedJunctions" class="form-control" placeholder="e.g., Flight QF1 Brisbane to Bangkok 10 June, Flight TG21 return 24 June">
             </div>
             <div class="ai-form-group">
               <label for="aiTripDates">Trip Duration & Dates</label>
-              <input type="text" id="aiTripDates" placeholder="e.g., June 10-24, 2026 (14 nights total)">
+              <input type="text" id="aiTripDates" class="form-control" placeholder="e.g., June 10-24, 2026 (14 nights total)">
             </div>
             <div class="ai-form-group">
               <label for="aiTripVibe">Travel Vibe & Preferences</label>
-              <textarea id="aiTripVibe" placeholder="e.g., Relaxed pacing, great food, no early mornings. Enjoy walking and photography."></textarea>
+              <textarea id="aiTripVibe" rows="3" class="form-control" placeholder="e.g., Relaxed pacing, great food, no early mornings. Enjoy walking and photography."></textarea>
             </div>
           </div>
 
@@ -1654,13 +1647,17 @@
     const btn = document.getElementById('installAppBtn');
     const mobileBtn = document.getElementById('mobileInstallAppBtn');
     if (!btn) return;
-    btn.hidden = isStandaloneDisplayMode() || !deferredInstallPrompt;
-    if (mobileBtn) mobileBtn.hidden = btn.hidden;
+    const standalone = isStandaloneDisplayMode();
+    btn.hidden = standalone || !deferredInstallPrompt;
+    if (mobileBtn) mobileBtn.hidden = standalone;
     if (typeof syncResponsiveUi === 'function') syncResponsiveUi();
   }
 
   async function promptInstallApp() {
-    if (!deferredInstallPrompt) return;
+    if (!deferredInstallPrompt) {
+      if (typeof window.initPwaPrompt === 'function') window.initPwaPrompt({ force: true });
+      return;
+    }
     deferredInstallPrompt.prompt();
     try {
       await deferredInstallPrompt.userChoice;

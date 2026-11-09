@@ -34,15 +34,17 @@
     }
   }
 
-  function initPwaPrompt() {
+  function initPwaPrompt(options = {}) {
     if (isStandaloneApp()) return;
 
-    const dismissedState = localStorage.getItem(DISMISS_KEY);
-    if (dismissedState === 'permanent') return;
-    if (dismissedState) {
-      const timestamp = parseInt(dismissedState, 10);
-      if (!isNaN(timestamp) && Date.now() - timestamp < 7 * 86400 * 1000) {
-        return; // Suppress for 7 days if temporary "Remind Later"
+    if (!options || !options.force) {
+      const dismissedState = localStorage.getItem(DISMISS_KEY);
+      if (dismissedState === 'permanent') return;
+      if (dismissedState) {
+        const timestamp = parseInt(dismissedState, 10);
+        if (!isNaN(timestamp) && Date.now() - timestamp < 7 * 86400 * 1000) {
+          return; // Suppress for 7 days if temporary "Remind Later"
+        }
       }
     }
 
@@ -225,13 +227,5 @@
     };
   }
 
-  if (typeof document !== 'undefined') {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(initPwaPrompt, 1200);
-      });
-    } else {
-      setTimeout(initPwaPrompt, 1200);
-    }
-  }
+  // Startup auto-popup deferred; trigger manually via window.initPwaPrompt() or the Mobile Menu Install button
 })();

@@ -257,10 +257,28 @@
 
     // Update active trip title & icon in top header, hero section, and mobile action card
     const activeTrip = trips.find(t => t.id === activeTripId) || trips[0];
+    const liveLegs = Array.isArray(window.appData) ? window.appData : [];
+    const activeLegs = (activeTrip && activeTrip.data && (activeTrip.data.itinerary || activeTrip.data.legs)) || liveLegs;
+    const stopCount = (activeTrip && typeof activeTrip.legCount === 'number' && !liveLegs.length)
+      ? activeTrip.legCount
+      : activeLegs.length;
+    const firstDate = liveLegs[0]?.days?.[0]?.date || activeLegs[0]?.days?.[0]?.date || '';
+    const lastLeg = liveLegs[liveLegs.length - 1] || activeLegs[activeLegs.length - 1];
+    const lastDate = lastLeg?.days?.[lastLeg.days.length - 1]?.date || '';
+    const formatShortDate = typeof window.formatTripDateForDisplay === 'function' ? window.formatTripDateForDisplay : (d => d);
+    const derivedDateRange = firstDate && lastDate && firstDate !== lastDate
+      ? `${formatShortDate(firstDate)} – ${formatShortDate(lastDate)}`
+      : (firstDate ? formatShortDate(firstDate) : '');
+    const humanDates = derivedDateRange || activeTrip?.dateRange || activeTrip?.data?.meta?.dates || '';
+    const stopLabel = stopCount > 0 ? `${stopCount} ${stopCount === 1 ? 'stop' : 'stops'}` : 'Ready to plan';
+    const humanTripSummary = humanDates ? `${humanDates} · ${stopLabel}` : stopLabel;
+
+    const mobileFilenameEl = document.getElementById('mobileActiveTripFilename');
+    if (mobileFilenameEl) mobileFilenameEl.innerText = humanTripSummary;
+
     if (activeTrip) {
       const displayTitle = activeTrip.title || (activeTrip.data && activeTrip.data.meta && activeTrip.data.meta.title) || 'My Trip';
       const activeEmoji = activeTrip.flags || (activeTrip.data && activeTrip.data.meta && activeTrip.data.meta.icon) || '✈️';
-      const cleanFilename = typeof window.formatHumanFilename === 'function' ? window.formatHumanFilename(activeTrip) : 'my_trip.json';
 
       if (titleEl) titleEl.innerText = displayTitle;
 
@@ -278,9 +296,6 @@
 
       const mobileTitleEl = document.getElementById('mobileActiveTripTitle');
       if (mobileTitleEl) mobileTitleEl.innerText = displayTitle;
-
-      const mobileFilenameEl = document.getElementById('mobileActiveTripFilename');
-      if (mobileFilenameEl) mobileFilenameEl.innerText = cleanFilename;
     }
 
     if (!recentListEl) return;

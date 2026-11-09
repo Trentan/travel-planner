@@ -7,7 +7,7 @@
   padding: 0.28rem 0.58rem !important;
   border: 1px solid color-mix(in srgb, var(--status-color, #64748b) 34%, transparent);
   border-radius: 9999px;
-  background: color-mix(in srgb, var(--status-color, #64748b) 12%, white);
+  background: color-mix(in srgb, var(--status-color, #64748b) 12%, var(--color-surface-card));
   color: var(--status-color, #64748b);
   font-size: 0.75rem !important;
   font-weight: 800;
@@ -15,6 +15,13 @@
   letter-spacing: 0;
   white-space: nowrap;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+[data-theme="dark"] .status-badge {
+  border-color: color-mix(in srgb, var(--status-color, #94a3b8) 48%, transparent);
+  background: color-mix(in srgb, var(--status-color, #64748b) 20%, var(--color-surface-card));
+  color: color-mix(in srgb, var(--status-color, #cbd5e1) 65%, white);
+  box-shadow: none;
 }
 
 button.status-badge,
@@ -27,7 +34,7 @@ button.status-badge:hover,
 .status-badge-clickable:hover {
   transform: translateY(-1px);
   border-color: var(--status-color, #64748b);
-  background: color-mix(in srgb, var(--status-color, #64748b) 18%, white);
+  background: color-mix(in srgb, var(--status-color, #64748b) 18%, var(--color-surface-card));
 }
 
 button.status-badge:focus-visible,
@@ -268,15 +275,30 @@ body.read-only-mode .empty-state-readonly-hint {
 [data-theme="dark"] .trip-start-stop-nights, [data-theme="dark"] .trip-start-stop-row select { border-color: #3a5960; background: #1b343c; color: #e7f4f0; }
 
 /* Dual-Path Trip Builder & Upfront Flight Import (Issue #215) */
+.trip-start-panel.trip-start-panel--wide { width: min(94vw, 58rem); padding: 1.75rem 2rem; }
 .trip-builder-step-0 { display: flex; flex-direction: column; width: 100%; }
 .trip-path-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1.25rem; }
-@media (max-width: 640px) {
-  .trip-path-grid { grid-template-columns: 1fr; gap: 0.85rem; }
+@media (min-width: 769px) {
+  .trip-start-panel--wide .trip-path-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-@media (max-width: 480px) {
-  .trip-start-panel { padding: 1.25rem; }
-  .trip-path-grid { grid-template-columns: 1fr; gap: 0.75rem; }
-  .trip-path-card { padding: 0.95rem; }
+@media (max-width: 640px) {
+  .trip-start-overlay { padding: 0.5rem; }
+  .trip-start-panel.trip-start-panel--wide { width: 100%; max-height: calc(100dvh - env(keyboard-inset-height, 0px) - 1rem); padding: 0.65rem 0.8rem; border-radius: 1.15rem; }
+  .trip-start-panel--wide .trip-start-close { top: 0.25rem; right: 0.4rem; }
+  .trip-start-panel--wide .trip-start-progress { margin-bottom: 0.15rem; font-size: 0.72rem; padding-right: 2.2rem; }
+  .trip-start-panel--wide .trip-start-eyebrow,
+  .trip-start-panel--wide .trip-start-intro,
+  .trip-start-panel--wide .trip-path-features { display: none; }
+  .trip-start-panel--wide h2 { font-size: 1.14rem; line-height: 1.12; margin: 0 2.2rem 0.2rem 0 !important; }
+  .trip-path-grid { grid-template-columns: 1fr; gap: 0.4rem; margin-top: 0.2rem; }
+  .trip-path-card { padding: 0.48rem 0.72rem; border-radius: 0.82rem; }
+  .trip-path-header { margin-bottom: 0.12rem; }
+  .trip-path-icon { font-size: 1.05rem; }
+  .trip-path-badge { font-size: 0.68rem; padding: 0.12rem 0.48rem; }
+  .trip-path-title { font-size: 0.94rem; line-height: 1.2; margin-bottom: 0.08rem; }
+  .trip-path-desc { font-size: 0.75rem; line-height: 1.22; margin-bottom: 0.32rem; }
+  .trip-path-btn { min-height: 2.75rem; padding: 0.35rem 0.75rem; font-size: 0.84rem; }
+  .trip-start-panel--wide .trip-start-actions { margin-top: 0.25rem !important; min-height: 2.75rem; }
 }
 .trip-path-card { display: flex; flex-direction: column; padding: 1.25rem; border: 1.5px solid #cbd5e1; border-radius: 1.15rem; background: rgba(255, 255, 255, 0.85); box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04); cursor: pointer; transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1); text-align: left; }
 .trip-path-card:hover, .trip-path-card:focus-visible { transform: translateY(-3px); border-color: #0d9488; box-shadow: 0 10px 24px rgba(13, 148, 136, 0.14); }
@@ -345,15 +367,7 @@ body.read-only-mode .empty-state-readonly-hint {
 [data-theme="dark"] .trip-flight-preview-title, .dark .trip-flight-preview-title { color: #f1f5f9; }
 [data-theme="dark"] .trip-flight-preview-meta, .dark .trip-flight-preview-meta { color: #94a3b8; }
 
-.mobile-desktop-advisory { display: flex; align-items: flex-start; gap: .75rem; padding: .85rem 1rem; margin: .75rem 1rem; background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: .75rem; color: #0c4a6e; }
-.mobile-desktop-advisory-icon { font-size: 1.5rem; line-height: 1; }
-.mobile-desktop-advisory-content strong { display: block; font-size: .9rem; font-weight: 700; color: #0369a1; }
-.mobile-desktop-advisory-content p { margin: .25rem 0 0; font-size: .8rem; color: #334155; line-height: 1.35; }
-.mobile-desktop-advisory-content a { color: #0284c7; font-weight: 600; text-decoration: underline; }
-[data-theme="dark"] .mobile-desktop-advisory, .dark .mobile-desktop-advisory { background: linear-gradient(135deg, #0c2a38 0%, #064e3b 100%); border-color: #0e7490; color: #e0f2fe; }
-[data-theme="dark"] .mobile-desktop-advisory-content strong, .dark .mobile-desktop-advisory-content strong { color: #38bdf8; }
-[data-theme="dark"] .mobile-desktop-advisory-content p, .dark .mobile-desktop-advisory-content p { color: #cbd5e1; }
-[data-theme="dark"] .mobile-desktop-advisory-content a, .dark .mobile-desktop-advisory-content a { color: #7dd3fc; }
+
 
 .tutorial-overlay {
   position: fixed;
@@ -1051,6 +1065,7 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     position: relative !important;
     top: auto !important;
     z-index: 10;
+    margin-bottom: 0.1rem !important;
   }
 
   body.mobile-app-mode .compact-city-swipe-pager > [data-role="mobile-swipe-carousel"] {
@@ -1091,42 +1106,56 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--app-city-height, 3.1rem) + 0.35rem);
   }
 
+  body.mobile-app-mode .compact-city-swipe-pager > .mobile-swipe-progress,
+  body.mobile-app-mode .compact-day-pager > .mobile-swipe-progress {
+    display: none !important;
+  }
+
   body.mobile-app-mode .compact-day-carousel.mobile-city-vertical-timeline .compact-day-header {
     position: sticky !important;
-    top: calc(env(safe-area-inset-top, 0px) + var(--app-city-height, 3rem)) !important;
+    top: calc(env(safe-area-inset-top, 0px) + var(--app-city-height, 3rem) - 1px) !important;
     z-index: 95 !important;
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    margin: -0.65rem -0.75rem 0.35rem -0.75rem !important;
-    padding: 0.5rem 0.75rem !important;
-    width: calc(100% + 1.5rem) !important;
+    background: #ffffff;
+    margin: -0.26rem -0.58rem 0.02rem -0.58rem !important;
+    padding: 0.14rem 0.58rem !important;
+    width: calc(100% + 1.16rem) !important;
     border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.28);
-    box-shadow: 0 4px 10px -2px rgba(15, 23, 42, 0.08);
+    border-bottom: 1px solid #cbd5e1;
+    box-shadow: 0 3px 8px -2px rgba(15, 23, 42, 0.08);
     box-sizing: border-box !important;
   }
 
   [data-theme="dark"] body.mobile-app-mode .compact-day-carousel.mobile-city-vertical-timeline .compact-day-header {
-    background: rgba(15, 23, 42, 0.96);
-    border-bottom-color: rgba(71, 85, 105, 0.6);
-    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.45);
+    background: #1e293b;
+    border-bottom-color: #334155;
+    box-shadow: 0 3px 10px -2px rgba(0, 0, 0, 0.45);
   }
 
   .mobile-vertical-days-banner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
-    padding: 0.38rem 0.65rem;
-    margin-bottom: 0.25rem;
-    border-radius: 0.6rem;
+    gap: 0.35rem;
+    padding: 0.06rem 0.65rem !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    border-radius: 0 !important;
     background: rgba(13, 148, 136, 0.08);
     border: 1px solid rgba(13, 148, 136, 0.22);
     font-size: 0.74rem;
+    line-height: 1.2;
     font-weight: 600;
     color: #0f766e;
+  }
+
+  body.mobile-app-mode .mobile-city-ai-btn {
+    padding-block: 0.04rem !important;
+    line-height: 1.2 !important;
+  }
+
+  body.mobile-app-mode .daily-timeline-shell-compact {
+    gap: 0.18rem !important;
   }
 
   .mobile-vertical-days-badge {
@@ -1135,9 +1164,7 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   .mobile-vertical-days-cue {
-    font-size: 0.7rem;
-    opacity: 0.9;
-    white-space: nowrap;
+    display: none;
   }
 
   [data-theme="dark"] .mobile-vertical-days-banner {
@@ -1332,6 +1359,7 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
 
   /* Quick-tap time preset chips */
   .quick-time-chip {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
@@ -1349,11 +1377,12 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   .quick-duration-chip {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.2rem 0.55rem;
-    font-size: 0.72rem;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
     font-weight: 600;
     border-radius: 0.375rem;
     background: #f8fafc;
@@ -1362,7 +1391,28 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
     touch-action: manipulation;
-    min-height: 1.65rem;
+    min-height: 1.75rem;
+  }
+
+  body.mobile-app-mode .activity-quick-duration-presets {
+    row-gap: 0.45rem;
+    column-gap: 0.35rem;
+  }
+
+  body.mobile-app-mode .activity-quick-time-presets {
+    gap: 0.45rem;
+  }
+
+  body.mobile-app-mode .quick-time-chip::after {
+    content: '';
+    position: absolute;
+    inset: -6px -2px;
+  }
+
+  body.mobile-app-mode .quick-duration-chip::after {
+    content: '';
+    position: absolute;
+    inset: -8px -2px;
   }
 
   .quick-duration-chip:hover,
@@ -1612,11 +1662,6 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   /* Full-Viewport Mobile Map & Synced Stop Card Strip */
-  body.mobile-app-mode #tab-map #journey-map-view {
-    height: calc(100dvh - 11.5rem - env(safe-area-inset-bottom, 0px)) !important;
-    min-height: 440px !important;
-    border-radius: 0.9rem !important;
-  }
 
   .mobile-map-filter-rail {
     display: flex;
@@ -1743,8 +1788,8 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   body.mobile-app-mode #cityNav {
-    padding-top: 0.22rem !important;
-    padding-bottom: 0.22rem !important;
+    padding-top: 0.04rem !important;
+    padding-bottom: 0.04rem !important;
     padding-inline: 0.35rem !important;
   }
 
@@ -1752,20 +1797,27 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   body.mobile-app-mode #cityNav.is-tucked .city-nav-list {
     display: flex !important;
     gap: 0.32rem !important;
-    padding: 0.08rem 0.2rem !important;
+    padding: 0.44rem 0.2rem !important;
     max-height: none !important;
     opacity: 1 !important;
     overflow-x: auto !important;
   }
 
   body.mobile-app-mode #cityNav .city-nav-btn {
+    position: relative !important;
     min-height: 1.68rem !important;
     height: 1.68rem !important;
     padding: 0.14rem 0.52rem !important;
-    font-size: 0.72rem !important;
+    font-size: 0.75rem !important;
     gap: 0.22rem !important;
     border-radius: 9999px !important;
     box-shadow: none !important;
+  }
+
+  body.mobile-app-mode #cityNav .city-nav-btn::after {
+    content: '';
+    position: absolute;
+    inset: -9px -3px;
   }
 
   body.mobile-app-mode #cityNav .city-nav-btn[data-city="all"] {
@@ -1801,7 +1853,7 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   body.mobile-app-mode #cityNav .city-nav-add-btn {
-    position: static !important;
+    position: relative !important;
     right: auto !important;
     flex-shrink: 0 !important;
     margin-left: 0.15rem !important;
@@ -1837,7 +1889,7 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
 
   /* Full-width mobile layout - eliminate side gutters across all tabs */
   body.mobile-app-mode .app-tabs-content {
-    margin-top: 0.35rem !important;
+    margin-top: 0 !important;
     padding-inline: 0.35rem !important;
   }
 
@@ -1885,13 +1937,18 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   body.mobile-app-mode #tab-map #journey-map-view {
-    height: calc(100dvh - 3.75rem - 3.65rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
-    min-height: 460px !important;
+    height: calc(100dvh - var(--app-city-height, 2.85rem) - 3.65rem - 4.75rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 400px !important;
+    background: #f1f5f9 !important;
     border-radius: 0 !important;
     border-left: none !important;
     border-right: none !important;
     width: 100% !important;
     margin: 0 !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode #tab-map #journey-map-view {
+    background: #0f172a !important;
   }
 
   body.mobile-app-mode #tab-map .leaflet-bottom {
@@ -2031,29 +2088,33 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   body.mobile-app-mode #tab-packing .packing-progress-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 0.3rem !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.32rem !important;
   }
 
   body.mobile-app-mode #tab-packing .packing-area-progress {
-    padding: 0.2rem 0.4rem !important;
+    padding: 0.24rem 0.5rem !important;
     min-height: 0 !important;
-    border-radius: 0.4rem !important;
+    border-radius: 0.45rem !important;
   }
 
   body.mobile-app-mode #tab-packing .packing-area-progress-header {
-    line-height: 1.05 !important;
-    gap: 0.15rem !important;
+    line-height: 1.15 !important;
+    gap: 0.25rem !important;
   }
 
   body.mobile-app-mode #tab-packing .packing-area-progress-title {
-    font-size: 0.66rem !important;
-    line-height: 1.05 !important;
+    font-size: 0.75rem !important;
+    line-height: 1.15 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
   }
 
   body.mobile-app-mode #tab-packing .packing-area-progress-info {
-    font-size: 0.6rem !important;
-    line-height: 1.05 !important;
+    font-size: 0.75rem !important;
+    line-height: 1.15 !important;
+    white-space: nowrap !important;
   }
 
   body.mobile-app-mode #tab-packing .packing-area-progress-bar {
@@ -2138,7 +2199,7 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    gap: 0.25rem !important;
+    gap: 0.12rem !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
@@ -2177,7 +2238,8 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     border-left: none !important;
     border-right: none !important;
     margin: 0 !important;
-    padding: 0.65rem 0.75rem !important;
+    padding: 0.34rem 0.65rem 0.5rem !important;
+    gap: 0.2rem !important;
     box-sizing: border-box !important;
   }
 
@@ -2187,81 +2249,133 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    padding-inline: 0 !important;
+    padding: 0 !important;
     margin-inline: 0 !important;
   }
 
   body.mobile-app-mode .mobile-surface-card {
-    padding: 0.65rem 0.65rem 0.75rem !important;
+    padding: 0.26rem 0.58rem 0.5rem !important;
+  }
+
+  /* Invisible 44px touch targets for compact pills without vertical header bloat */
+  body.mobile-app-mode.compact-view-mode .compact-city-swipe-pager {
+    gap: 0.1rem !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .section-header-actions {
+    padding-block: 0.12rem !important;
+  }
+
+  body.mobile-app-mode #tab-itinerary .itinerary-view-mode-btn::after,
+  body.mobile-app-mode #tab-itinerary .section-header-actions > button::after {
+    content: '';
+    position: absolute;
+    inset: -7px -3px;
+  }
+
+  body.mobile-app-mode .compact-mobile-info-chip::after {
+    content: '';
+    position: absolute;
+    inset: -8px -2px;
+  }
+
+  body.mobile-app-mode .mobile-city-ai-btn,
+  body.mobile-app-mode .compact-day-ai-copilot-chip,
+  body.mobile-app-mode .mobile-day-next-jump-chip,
+  body.mobile-app-mode .timeline-map-action,
+  body.mobile-app-mode .timeline-inline-note-action,
+  body.mobile-app-mode .modal-header-save-btn {
+    position: relative;
+  }
+
+  body.mobile-app-mode .mobile-city-ai-btn::after,
+  body.mobile-app-mode .compact-day-ai-copilot-chip::after,
+  body.mobile-app-mode .mobile-day-next-jump-chip::after {
+    content: '';
+    position: absolute;
+    inset: -15px -4px;
+  }
+
+  body.mobile-app-mode .timeline-map-action::after,
+  body.mobile-app-mode .timeline-inline-note-action::after {
+    content: '';
+    position: absolute;
+    inset: -11px -3px;
+  }
+
+  body.mobile-app-mode .modal-header-save-btn::after {
+    content: '';
+    position: absolute;
+    inset: -7px -3px;
   }
 
   /* Alternating Day Shading in vertical timeline */
   body.mobile-app-mode .compact-day-slide--even .compact-day-surface,
   body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-surface {
     background: #ffffff !important;
-    border-top: 1px solid rgba(226, 232, 240, 0.9) !important;
-    border-right: 1px solid rgba(226, 232, 240, 0.9) !important;
-    border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
+    border-top: 1px solid #e2e8f0 !important;
+    border-right: 1px solid #e2e8f0 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
     box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.05) !important;
   }
 
   body.mobile-app-mode .compact-day-slide--even .compact-day-header,
   body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-header {
-    background: rgba(255, 255, 255, 0.98) !important;
-    border-bottom: 1px solid rgba(226, 232, 240, 0.88) !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
   }
 
   body.mobile-app-mode .compact-day-slide--odd .compact-day-surface,
   body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-surface {
     background: #f1f5f9 !important;
-    border-top: 1px solid rgba(203, 213, 225, 0.95) !important;
-    border-right: 1px solid rgba(203, 213, 225, 0.95) !important;
-    border-bottom: 1px solid rgba(203, 213, 225, 0.95) !important;
+    border-top: 1px solid #cbd5e1 !important;
+    border-right: 1px solid #cbd5e1 !important;
+    border-bottom: 1px solid #cbd5e1 !important;
     box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.07) !important;
   }
 
   body.mobile-app-mode .compact-day-slide--odd .compact-day-header,
   body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-header {
-    background: rgba(241, 245, 249, 0.98) !important;
-    border-bottom: 1px solid rgba(203, 213, 225, 0.9) !important;
+    background: #f1f5f9 !important;
+    border-bottom: 1px solid #cbd5e1 !important;
   }
 
   body.mobile-app-mode .compact-day-slide--odd .compact-day-counter-chip,
   body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-counter-chip {
-    background: rgba(226, 232, 240, 0.95) !important;
-    border-color: rgba(203, 213, 225, 0.95) !important;
+    background: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
     color: #1e293b !important;
   }
 
   /* Dark mode alternating day shading */
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide--even .compact-day-surface,
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-surface {
-    background: rgba(30, 41, 59, 0.72) !important;
-    border-top-color: rgba(51, 65, 85, 0.75) !important;
-    border-right-color: rgba(51, 65, 85, 0.75) !important;
-    border-bottom-color: rgba(51, 65, 85, 0.75) !important;
+    background: #1e293b !important;
+    border-top-color: #334155 !important;
+    border-right-color: #334155 !important;
+    border-bottom-color: #334155 !important;
     box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3) !important;
   }
 
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide--even .compact-day-header,
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(odd) .compact-day-header {
-    background: rgba(30, 41, 59, 0.98) !important;
-    border-bottom-color: rgba(71, 85, 105, 0.65) !important;
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
   }
 
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide--odd .compact-day-surface,
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-surface {
-    background: rgba(15, 23, 42, 0.88) !important;
-    border-top-color: rgba(71, 85, 105, 0.8) !important;
-    border-right-color: rgba(71, 85, 105, 0.8) !important;
-    border-bottom-color: rgba(71, 85, 105, 0.8) !important;
+    background: #0f172a !important;
+    border-top-color: #334155 !important;
+    border-right-color: #334155 !important;
+    border-bottom-color: #334155 !important;
     box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.45) !important;
   }
 
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide--odd .compact-day-header,
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide:nth-child(even) .compact-day-header {
-    background: rgba(15, 23, 42, 0.98) !important;
-    border-bottom-color: rgba(71, 85, 105, 0.8) !important;
+    background: #0f172a !important;
+    border-bottom-color: #334155 !important;
   }
 
   [data-theme="dark"] body.mobile-app-mode .compact-day-slide--odd .compact-day-counter-chip,
@@ -2280,6 +2394,15 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
 }
 
 @media (min-width: 769px) {
+  .compact-day-header {
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+  }
+
+  .compact-day-surface .compact-day-header > div:first-child {
+    flex: 1 1 12.5rem;
+  }
+
   #cityNav .city-nav-pull-handle {
     display: none !important;
   }
@@ -2361,7 +2484,7 @@ body.mobile-app-mode .mobile-card-row-meta {
   flex-wrap: wrap !important;
   gap: 0.35rem 0.6rem !important;
   font-size: var(--mob-font-meta, 0.75rem) !important;
-  color: var(--text-secondary, #64748b) !important;
+  color: var(--color-text-muted) !important;
 }
 
 /* De-clutter redundant inline hover actions on touch devices */
@@ -2455,14 +2578,29 @@ body.mobile-app-mode #add-leg-modal .journey-footer-actions button {
 }
 
 /* Home Header Chrome Vertical Compression (Argon Reassessment) */
-body.mobile-app-mode .city-nav-scroll,
-body.mobile-app-mode #cityNav {
-  padding-top: 0.25rem !important;
-  padding-bottom: 0.25rem !important;
+body.mobile-app-mode .city-nav-scroll {
+  padding-top: 0.04rem !important;
+  padding-bottom: 0.04rem !important;
 }
 
 body.mobile-app-mode .itinerary-day-summary-row {
   margin-top: 0.25rem !important;
   margin-bottom: 0.25rem !important;
+}
+
+/* Crisp single-line buttons in Mobile Menu Sheet */
+body.mobile-app-mode #mobileMenuSheet .app-menu-btn,
+body.mobile-app-mode #mobileMenuSheet .app-menu-switch {
+  font-size: 0.78rem !important;
+  padding-inline: 0.5rem !important;
+  gap: 0.3rem !important;
+  white-space: nowrap;
+}
+
+body.mobile-app-mode #mobileMenuSheet .app-menu-switch-label {
+  font-size: 0.78rem !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 

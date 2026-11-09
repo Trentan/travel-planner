@@ -1017,7 +1017,7 @@ function renderTransportMobileFacts(segs, totalCost, notes = '') {
   if (firstSeg.transportType === 'flight' && routeCodeSet.length === 1 && routeCodeSet[0]) {
     const flightCode = routeCodeSet[0];
     const statusUrl = `https://www.google.com/search?q=flight+status+${encodeURIComponent(flightCode)}+${encodeURIComponent(firstDepDate)}`;
-    routeCodeDisplay = `<a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="hover:underline text-blue-600 dark:text-blue-400 flex flex-col items-start"><span class="font-mono uppercase">${escapeHtmlText(flightCode)}</span><span class="text-[10px] text-slate-500 font-sans mt-0.5 normal-case" style="line-height:1;">Check Status ↗</span></a>`;
+    routeCodeDisplay = `<a href="${statusUrl}" target="_blank" rel="noopener noreferrer" class="hover:underline text-blue-600 dark:text-blue-400 flex flex-col items-start"><span class="font-mono uppercase">${escapeHtmlText(flightCode)}</span><span class="text-[10px] text-slate-600 dark:text-sky-300 font-sans mt-0.5 normal-case" style="line-height:1;">Check Status ↗</span></a>`;
   }
   const bookingLabel = bookingSet.length > 1 ? `${bookingSet.length} refs` : (bookingSet[0] || '');
   const fromLocation = firstSeg.fromLocation || '';
@@ -1204,14 +1204,14 @@ function renderTransportSegmentsDetailContent(segs) {
             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Leg ${i + 1}</span>
             <span class="font-medium text-slate-800 dark:text-slate-200">${escapeHtmlText(seg.fromLocation || '—')} → ${escapeHtmlText(seg.toLocation || '—')}</span>
           </div>
-          ${renderTransportSubLocationDetails(seg, 'text-xs text-slate-500 mb-2')}
-          <div class="grid grid-cols-2 gap-2 text-slate-600 dark:text-slate-400 mb-2">
+          ${renderTransportSubLocationDetails(seg, 'text-xs text-slate-600 dark:text-slate-300 mb-2')}
+          <div class="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-200 mb-2">
             <div>
-              <span class="block text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">Departs</span>
+              <span class="block text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Departs</span>
               <span class="font-medium">${escapeHtmlText(segDep)}</span>
             </div>
             <div>
-              <span class="block text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">Arrives</span>
+              <span class="block text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Arrives</span>
               <span>${segArr !== '—' ? escapeHtmlText(segArr + ' ' + (seg.arrivalTime || '')) : '—'}</span>
             </div>
           </div>
@@ -1241,7 +1241,7 @@ function renderTransportSegmentsDetailContent(segs) {
                 <span>${bufferInfo.modeIcon}</span>
                 <span>${escapeHtmlText(bufferInfo.badgeText)}</span>
               </span>
-              ${bufferInfo.terminalPlatform ? `<span class="text-slate-500 font-medium">📍 ${escapeHtmlText(bufferInfo.terminalPlatform)}</span>` : ''}
+              ${bufferInfo.terminalPlatform ? `<span class="text-slate-600 dark:text-slate-300 font-medium">📍 ${escapeHtmlText(bufferInfo.terminalPlatform)}</span>` : ''}
             </div>
           `);
         }
@@ -1280,7 +1280,7 @@ function renderTransportSegmentsDetailContent(segs) {
                     <span>${bufferInfo.modeIcon}</span>
                     <span>${escapeHtmlText(bufferInfo.badgeText)}</span>
                   </span>
-                  ${bufferInfo.terminalPlatform ? `<span class="text-slate-500 font-medium">📍 ${escapeHtmlText(bufferInfo.terminalPlatform)}</span>` : ''}
+                  ${bufferInfo.terminalPlatform ? `<span class="text-slate-600 dark:text-slate-300 font-medium">📍 ${escapeHtmlText(bufferInfo.terminalPlatform)}</span>` : ''}
                 </div>
               </td>
             </tr>

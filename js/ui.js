@@ -851,7 +851,16 @@ function switchTab(tabId, btnElement) {
   }
   if (tabId === 'budget' && typeof buildBudgetTab === 'function') buildBudgetTab();
   if (tabId === 'packing' && typeof buildPackingTab === 'function') buildPackingTab();
-  if (tabId === 'map' && typeof buildJourneyMap === 'function') buildJourneyMap();
+  if (tabId === 'map' && typeof buildJourneyMap === 'function') {
+    buildJourneyMap();
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => {
+        if (typeof mainMap !== 'undefined' && mainMap && typeof mainMap.invalidateSize === 'function') {
+          mainMap.invalidateSize({ pan: false });
+        }
+      });
+    }
+  }
   if (tabId === 'guide' && typeof buildGuideSteps === 'function') buildGuideSteps();
   updateStickyOffsets();
 
