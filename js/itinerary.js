@@ -984,7 +984,7 @@ function renderCompactDaySlide(opts = {}) {
     accentColor: leg.colour,
     accentWidth: '6px',
     dateLabel: day.day ? `${dayDateLabel} · ${day.day}` : dayDateLabel,
-    title: `Day ${dayIdx + 1}`,
+    title: `Day ${dayIdx + 1}${tripDaySuffix}`,
     subtitle: routeLabel,
     primaryAction: `
       <span class="compact-day-header-chips flex items-center justify-end gap-1 flex-wrap">
