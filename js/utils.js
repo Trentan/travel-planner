@@ -276,7 +276,7 @@ function renderMobileSurfaceCard({
       <div class="compact-day-header flex justify-between items-start gap-3">
         <div class="flex flex-col gap-0.5 min-w-0 flex-1">
           <div class="flex items-baseline gap-2 min-w-0 flex-nowrap">
-            ${dateLabel ? `<span class="compact-day-header-date text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${escapeHtmlText(dateLabel)}</span>` : ''}
+            ${dateLabel ? `<span class="compact-day-header-date text-xs font-semibold uppercase tracking-wider whitespace-nowrap text-slate-500 dark:text-slate-400">${escapeHtmlText(dateLabel)}</span>` : ''}
             ${title ? `<h3 class="compact-day-header-title text-base font-bold text-slate-800 dark:text-slate-100 truncate min-w-0 flex-1">${escapeHtmlText(title || '—')}</h3>` : ''}
           </div>
           ${subtitle ? `<span class="compact-day-header-subtitle text-xs font-medium text-slate-500 dark:text-slate-400 truncate block min-w-0">${escapeHtmlText(subtitle)}</span>` : ''}

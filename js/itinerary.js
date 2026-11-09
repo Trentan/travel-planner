@@ -492,21 +492,11 @@ function renderCompactDayNotes(leg, legIndex, day, dayIdx) {
   const notes = typeof day.notes === 'string' ? day.notes.trim() : (Array.isArray(day.notes) ? day.notes.join('\n').trim() : '');
   const hasNotes = notes.length > 0;
 
-  if (!hasNotes && !isEditMode) {
+  if (!hasNotes) {
     return '';
   }
 
   const noteId = `day-note-text-${legIndex}-${dayIdx}`;
-
-  if (!hasNotes && isEditMode) {
-    return `
-      <div class="compact-day-notes-wrapper mb-2.5 px-0.5">
-        <button type="button" class="inline-flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 font-medium py-1 px-2.5 rounded-lg border border-dashed border-amber-300 dark:border-amber-700/60 bg-amber-50/50 dark:bg-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors" onclick="event.stopPropagation(); addDayNote(${legIndex}, ${dayIdx});">
-          <span>📝</span> <span>+ Add Day Note / Tip</span>
-        </button>
-      </div>
-    `;
-  }
 
   const actions = isEditMode
     ? `<span class="compact-inline-actions inline-flex items-center gap-1 ml-auto">
@@ -804,6 +794,10 @@ function renderCompactDaySlide(opts = {}) {
   } else if (day.title && !/^day\s*\d+$/i.test(String(day.title).trim())) {
     routeLabel = day.title;
   }
+  const activeCityContext = String((typeof cleanCityNavLabel === 'function' ? cleanCityNavLabel(leg.label || '') : '') || cityCore || '').trim();
+  if (activeCityContext && !normalizeCityText(routeLabel).includes(normalizeCityText(activeCityContext))) {
+    routeLabel = `${activeCityContext} · ${routeLabel}`;
+  }
   const slideId = getCompactDaySlideId(leg.id, dayIdx);
 
   const transportLines = dayJourneys.flatMap(journey => {
@@ -957,7 +951,7 @@ function renderCompactDaySlide(opts = {}) {
   const nextDayDateLabel = nextDayObj ? (typeof formatTripDateForDisplay === 'function' ? formatTripDateForDisplay(nextDayObj.date) : (nextDayObj.date || '')) : '';
   const nextDayJumpChipHtml = nextDayObj ? `
     <button type="button" class="mobile-day-next-jump-chip" onclick="return compactItineraryGoToDay(event, '${escapeCompactText(leg.id)}', ${dayIdx + 1})" title="Jump to Day ${dayIdx + 2}">
-      ↓ Day ${dayIdx + 2}
+      ↓ D${dayIdx + 2}
     </button>
   ` : '';
   const dayScrollBridgeHtml = nextDayObj ? `
@@ -972,6 +966,16 @@ function renderCompactDaySlide(opts = {}) {
   ` : '';
 
   const dayParity = dayIdx % 2 === 0 ? 'even' : 'odd';
+  const compactCounterText = tripProgressSuffix
+    ? `#${metrics.globalDayIndex}/${metrics.totalTripDays}`
+    : `D${dayIdx + 1}/${totalDays}`;
+  const summaryDesc = String(day.desc || '').trim();
+  const summaryHtml = (summaryDesc || stayingHeadingNote) ? `
+          <div class="compact-day-summary-row">
+            ${summaryDesc ? `<span class="compact-day-summary-desc">${escapeCompactText(summaryDesc)}</span>` : ''}
+            ${stayingHeadingNote}
+          </div>
+        ` : '';
 
   return `
     <section class="compact-day-slide day-card compact-day-slide--${dayParity} ${isActive ? 'is-active open' : ''}" id="${slideId}" data-day-index="${dayIdx}" data-day-parity="${dayParity}" data-leg-index="${legIndex}" data-leg-id="${escapeCompactText(leg.id)}" data-day-key="${escapeCompactText(dayKey)}" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${legIndex}, ${dayIdx})">
@@ -979,23 +983,19 @@ function renderCompactDaySlide(opts = {}) {
     cardClass: `compact-day-surface compact-day-surface--${dayParity}`,
     accentColor: leg.colour,
     accentWidth: '6px',
-    dateLabel: dayDateLabel,
-    title: `Day ${dayIdx + 1}${tripDaySuffix} · ${day.day || ''}`.trim(),
+    dateLabel: day.day ? `${dayDateLabel} · ${day.day}` : dayDateLabel,
+    title: `Day ${dayIdx + 1}`,
     subtitle: routeLabel,
     primaryAction: `
       <span class="compact-day-header-chips flex items-center justify-end gap-1 flex-wrap">
         ${typeof renderDayWeatherBadgeHtml === 'function' ? renderDayWeatherBadgeHtml(day.date, toCity || fromCity || leg.label, leg) : ''}
         ${dayTotal ? `<span class="compact-day-amount-chip">${escapeCompactText(dayTotal)}</span>` : ''}
-        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-full text-[0.7rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap">Day ${dayIdx + 1} of ${totalDays}${tripProgressSuffix}</span>\n        <button type="button" class="compact-day-ai-copilot-chip bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/60 dark:hover:bg-teal-900 text-teal-700 dark:text-teal-300 font-medium px-2 py-0.5 rounded-full text-[0.7rem] border border-teal-200 dark:border-teal-800 whitespace-nowrap flex items-center gap-0.5" onclick="event.stopPropagation(); if (typeof openScopedAiCoPilot === 'function') openScopedAiCoPilot(${legIndex}, ${dayIdx});" title="Modify this day with AI">✨ AI</button>
+        <span class="compact-day-counter-chip bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-1.5 py-0.5 rounded-full text-[0.7rem] border border-slate-200 dark:border-slate-600 whitespace-nowrap" title="Day ${dayIdx + 1} of ${totalDays}${tripProgressSuffix}">${compactCounterText}</span>
+        <button type="button" class="compact-day-ai-copilot-chip bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/60 dark:hover:bg-teal-900 text-teal-700 dark:text-teal-300 font-medium px-2 py-0.5 rounded-full text-[0.7rem] border border-teal-200 dark:border-teal-800 whitespace-nowrap flex items-center gap-0.5" onclick="event.stopPropagation(); if (typeof openScopedAiCoPilot === 'function') openScopedAiCoPilot(${legIndex}, ${dayIdx});" title="Modify this day with AI">✨ AI</button>
         ${nextDayJumpChipHtml}
       </span>
     `,
-    summary: `
-          <div class="compact-day-summary-row">
-            <span class="compact-day-summary-desc">${escapeCompactText(day.desc || 'No description yet')}</span>
-            ${stayingHeadingNote}
-          </div>
-        `,
+    summary: summaryHtml,
     details,
     detailsOpen: true
   })}
@@ -1141,8 +1141,8 @@ function renderCompactDayPager(leg, legIndex, journeysByJourneyIdMap) {
     : (leg.label || 'this city');
   const verticalSignalBannerHtml = totalDays > 1 ? `
     <div class="mobile-vertical-days-banner" role="note" aria-label="Vertical day scroll indicator">
-      <button type="button" class="mobile-city-ai-btn bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 font-semibold px-2 py-0.5 rounded-full text-[0.7rem] border border-purple-200 dark:border-purple-800 whitespace-nowrap ml-auto flex items-center gap-1 shadow-xs cursor-pointer" onclick="event.stopPropagation(); if (typeof openScopedCityAiCoPilot === 'function') openScopedCityAiCoPilot(${legIndex});" title="Modify entire city stay with AI">✨ AI City Stay</button>
-        <span class="mobile-vertical-days-badge">📅 ${totalDays} Days in ${escapeCompactText(cleanLegCityLabel || 'City')}</span>
+      <span class="mobile-vertical-days-badge">📅 ${totalDays} Days in ${escapeCompactText(cleanLegCityLabel || 'City')}</span>
+      <button type="button" class="mobile-city-ai-btn bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 font-semibold px-2 py-0.5 rounded-full text-[0.7rem] border border-purple-200 dark:border-purple-800 whitespace-nowrap flex items-center gap-1 shadow-xs cursor-pointer" onclick="event.stopPropagation(); if (typeof openScopedCityAiCoPilot === 'function') openScopedCityAiCoPilot(${legIndex});" title="Modify entire city stay with AI">✨ AI City Stay</button>
       <span class="mobile-vertical-days-cue">↕ Scroll down for each day</span>
     </div>
   ` : '';
@@ -2863,7 +2863,7 @@ function renderDailyTimelineMapAction(legIndex, dayIndex, items) {
   return `
     <button type="button" class="timeline-map-action" onclick="event.stopPropagation(); openDailyTimelineInMaps(${legIndex}, ${dayIndex})" title="${escapeCompactText(route.stops.join(' -> '))}">
       <span class="location-map-icon">&#x1F5FA;&#xFE0F;</span>
-      <span>View day in Maps</span>
+      <span><span class="hidden sm:inline">View day in Maps</span><span class="sm:hidden">Maps</span></span>
       <small>${route.stops.length} stops</small>
     </button>
   `;
@@ -3302,12 +3302,27 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
   const journeysByJourneyId = options.journeysByJourneyId || getJourneysGroupedByJourneyId();
   const items = applyTimelineTravelShading(buildDailyTimelineItems(leg, legIndex, day, dayIndex, journeysByJourneyId));
   const compact = !!options.compact;
+  const dayNotesText = typeof day?.notes === 'string'
+    ? day.notes.trim()
+    : (Array.isArray(day?.notes) ? day.notes.join('\n').trim() : '');
+  const inlineNoteAction = (compact && typeof isEditMode !== 'undefined' && isEditMode && !dayNotesText)
+    ? `<button type="button" class="timeline-inline-note-action" onclick="event.stopPropagation(); addDayNote(${legIndex}, ${dayIndex});" title="Add Day Note / Tip">📝 + Note</button>`
+    : '';
   const empty = compact
     ? '<div class="compact-day-empty">No scheduled items yet.</div>'
     : '<div class="timeline-empty">No scheduled items yet. Add transport, stays, or activities to build the day.</div>';
-  if (items.length === 0) return empty;
+  if (items.length === 0) {
+    return inlineNoteAction
+      ? `<div class="daily-timeline-shell daily-timeline-shell-compact"><div class="daily-timeline-heading-row"><span class="timeline-section-label">Timeline</span>${inlineNoteAction}</div>${empty}</div>`
+      : empty;
+  }
   const { scheduled, anytime } = getDailyTimelineBuckets(items);
   const mapAction = renderDailyTimelineMapAction(legIndex, dayIndex, items);
+  const compactHeadingActions = [inlineNoteAction, mapAction].filter(Boolean).join('');
+  const compactHeadingHtml = (compact && compactHeadingActions)
+    ? `<div class="daily-timeline-heading-row"><span class="timeline-section-label">${scheduled.length ? 'Scheduled' : 'Day Timeline'}</span><div class="daily-timeline-heading-actions inline-flex items-center gap-1.5 flex-wrap justify-end">${compactHeadingActions}</div></div>`
+    : (!compact && mapAction ? `<div class="daily-timeline-heading-row"><span class="timeline-section-label">Day Timeline</span>${mapAction}</div>` : '');
+  const showSeparateScheduledLabel = scheduled.length > 0 && !(compact && compactHeadingActions);
 
   const scheduledRows = [];
   scheduled.forEach((item, idx) => {
@@ -3323,9 +3338,9 @@ function renderDailyTimeline(leg, legIndex, day, dayIndex, options = {}) {
 
   return `
     <div class="daily-timeline-shell ${compact ? 'daily-timeline-shell-compact' : ''}">
-      ${mapAction ? `<div class="daily-timeline-heading-row"><span class="timeline-section-label">Day Timeline</span>${mapAction}</div>` : ''}
+      ${compactHeadingHtml}
       ${scheduled.length ? `
-        <div class="timeline-section-label">Scheduled</div>
+        ${showSeparateScheduledLabel ? '<div class="timeline-section-label">Scheduled</div>' : ''}
         <div class="daily-timeline ${compact ? 'daily-timeline-compact' : ''}">
           ${scheduledRows.join('')}
         </div>

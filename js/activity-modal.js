@@ -142,7 +142,7 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
             <div class="activity-assign-grid activity-assign-primary-grid">
               <div class="ai-form-group">
                 <label>Category</label>
-                <select id="activityCategory" class="form-control form-control--compact">
+                <select id="activityCategory" class="form-control form-control--compact pr-8">
                   <option value="fitness" ${activity?.category === 'fitness' ? 'selected' : ''}>🏃 Fitness</option>
                   <option value="sight" ${!activity || activity.category === 'sight' ? 'selected' : ''}>🏛️ Sight</option>
                   <option value="attraction" ${activity?.category === 'attraction' ? 'selected' : ''}>🎢 Attraction</option>
@@ -155,7 +155,7 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
               </div>
               <div class="ai-form-group">
                 <label>Status</label>
-                <select id="activityStatus" class="form-control form-control--compact">
+                <select id="activityStatus" class="form-control form-control--compact pr-8">
                   <option value="" ${!activity || !activity.status ? 'selected' : ''}>-- No Status (None) --</option>
                   <option value="planned" ${activity?.status === 'planned' ? 'selected' : ''}>⏳ Planned</option>
                   <option value="booked" ${activity?.status === 'booked' ? 'selected' : ''}>✓ Booked</option>
@@ -231,7 +231,6 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
                 <button type="button" class="quick-time-chip" data-time="12:30" data-label="Lunch">🍽️ Lunch 12:30</button>
                 <button type="button" class="quick-time-chip" data-time="15:00" data-label="Afternoon">🏛️ Afternoon 15:00</button>
                 <button type="button" class="quick-time-chip" data-time="19:30" data-label="Evening">🌙 Evening 19:30</button>
-                <button type="button" class="quick-time-chip quick-time-chip--anytime" data-mode="anytime">⏰ Anytime</button>
               </div>
               <div class="activity-assign-time-row">
                 <input type="text" id="activityAssignStartTime" value="${html(preferredStart)}" style="width: 1px; height: 1px; opacity: 0.01; position: absolute; border: 0; padding: 0; z-index: -1; pointer-events: none;">
@@ -538,18 +537,6 @@ function openActivityModalUnified(legIdx, activityIdx = null, options = {}) {
   // Quick time preset chips handler
   modal.querySelectorAll('.quick-time-chip').forEach(chip => {
     chip.addEventListener('click', () => {
-      const targetMode = chip.getAttribute('data-mode');
-      if (targetMode === 'anytime') {
-        const anytimeInput = modeInputs.find(input => input.value === 'anytime');
-        if (anytimeInput) {
-          anytimeInput.checked = true;
-          syncScheduleControls();
-          syncTimeAndDayFromMode();
-          updateDualTimeNotice();
-        }
-        return;
-      }
-
       const timeVal = chip.getAttribute('data-time');
       if (timeVal) {
         const scheduledInput = modeInputs.find(input => input.value === 'scheduled');
