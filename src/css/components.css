@@ -2071,8 +2071,7 @@
     }
 
     /* Standardize all mobile tab section headers: compact, tight whitespace, uniform flow */
-    body.mobile-app-mode .section-header,
-    body.mobile-app-mode :is(#tab-itinerary, #tab-transport, #tab-accom, #tab-budget, #tab-packing, #tab-map) .section-header {
+    body.mobile-app-mode :is(#tab-itinerary, #tab-transport, #tab-accom, #tab-budget, #tab-packing) .section-header {
       display: flex !important;
       align-items: center !important;
       justify-content: space-between !important;
@@ -2084,8 +2083,7 @@
       box-sizing: border-box !important;
     }
 
-    body.mobile-app-mode .section-header-title,
-    body.mobile-app-mode :is(#tab-itinerary, #tab-transport, #tab-accom, #tab-budget, #tab-packing, #tab-map) .section-header-title {
+    body.mobile-app-mode :is(#tab-itinerary, #tab-transport, #tab-accom, #tab-budget, #tab-packing) .section-header-title {
       font-size: 1.25rem !important;
       font-weight: 700 !important;
       line-height: 1.15 !important;

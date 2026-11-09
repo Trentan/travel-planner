@@ -24,12 +24,22 @@ async function run() {
 
     await page.goto(`${origin}/index.html`, { waitUntil: 'domcontentloaded' });
     
-    // Wait for pwa prompt to initialize (init timer is 1200ms)
+    // Startup boot should NOT auto-popup #pwaPromptModal (#661); trigger manually via More -> Advanced -> Install App
+    await page.waitForTimeout(1500);
+    assert((await page.locator('#pwaPromptModal').count()) === 0, 'Startup boot must not auto-show #pwaPromptModal (#661)');
+
+    await page.evaluate(() => {
+      if (typeof dismissTripStart === 'function') dismissTripStart();
+      if (typeof toggleMobileMenu === 'function') toggleMobileMenu();
+      const adv = document.querySelector('#mobileMenuSheet details.mobile-menu-advanced');
+      if (adv) adv.open = true;
+    });
+    await page.click('#mobileInstallAppBtn');
     await page.waitForSelector('#pwaPromptModal', { state: 'visible', timeout: 5000 });
-    
+
     const iosTitle = await page.textContent('#pwaPromptModal .pwa-prompt-title');
     assert(iosTitle.includes('Add to Home Screen'), `iOS prompt title should contain "Add to Home Screen", got: "${iosTitle}"`);
-    
+
     const stepsText = await page.textContent('#pwaPromptModal .pwa-prompt-steps');
     assert(stepsText.includes('Share') && stepsText.includes('Add to Home Screen'), 'iOS prompt should include step-by-step instructions');
 
@@ -37,11 +47,12 @@ async function run() {
     await page.click('#pwaPromptModal .pwa-btn-primary');
     await page.waitForSelector('#pwaPromptModal', { state: 'hidden', timeout: 3000 });
 
-    // Reload page and verify prompt remains suppressed
+    // Reload page and verify non-forced initPwaPrompt remains suppressed
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1600);
+    await page.waitForTimeout(1400);
+    await page.evaluate(() => { if (typeof window.initPwaPrompt === 'function') window.initPwaPrompt(); });
     const hiddenCount = await page.locator('#pwaPromptModal').count();
-    assert(hiddenCount === 0, 'Dismissed PWA prompt should not reappear after page reload');
+    assert(hiddenCount === 0, 'Dismissed PWA prompt should remain suppressed on non-forced init after reload');
 
     await context.close();
 
@@ -56,6 +67,13 @@ async function run() {
     page = await context.newPage();
 
     await page.goto(`${origin}/index.html`, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      if (typeof dismissTripStart === 'function') dismissTripStart();
+      if (typeof toggleMobileMenu === 'function') toggleMobileMenu();
+      const adv = document.querySelector('#mobileMenuSheet details.mobile-menu-advanced');
+      if (adv) adv.open = true;
+    });
+    await page.click('#mobileInstallAppBtn');
     await page.waitForSelector('#pwaPromptModal', { state: 'visible', timeout: 5000 });
 
     const androidTitle = await page.textContent('#pwaPromptModal .pwa-prompt-title');

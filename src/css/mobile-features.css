@@ -275,15 +275,30 @@ body.read-only-mode .empty-state-readonly-hint {
 [data-theme="dark"] .trip-start-stop-nights, [data-theme="dark"] .trip-start-stop-row select { border-color: #3a5960; background: #1b343c; color: #e7f4f0; }
 
 /* Dual-Path Trip Builder & Upfront Flight Import (Issue #215) */
+.trip-start-panel.trip-start-panel--wide { width: min(94vw, 58rem); padding: 1.75rem 2rem; }
 .trip-builder-step-0 { display: flex; flex-direction: column; width: 100%; }
 .trip-path-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1.25rem; }
-@media (max-width: 640px) {
-  .trip-path-grid { grid-template-columns: 1fr; gap: 0.85rem; }
+@media (min-width: 769px) {
+  .trip-start-panel--wide .trip-path-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-@media (max-width: 480px) {
-  .trip-start-panel { padding: 1.25rem; }
-  .trip-path-grid { grid-template-columns: 1fr; gap: 0.75rem; }
-  .trip-path-card { padding: 0.95rem; }
+@media (max-width: 640px) {
+  .trip-start-overlay { padding: 0.5rem; }
+  .trip-start-panel.trip-start-panel--wide { width: 100%; max-height: calc(100dvh - env(keyboard-inset-height, 0px) - 1rem); padding: 0.65rem 0.8rem; border-radius: 1.15rem; }
+  .trip-start-panel--wide .trip-start-close { top: 0.25rem; right: 0.4rem; }
+  .trip-start-panel--wide .trip-start-progress { margin-bottom: 0.15rem; font-size: 0.72rem; padding-right: 2.2rem; }
+  .trip-start-panel--wide .trip-start-eyebrow,
+  .trip-start-panel--wide .trip-start-intro,
+  .trip-start-panel--wide .trip-path-features { display: none; }
+  .trip-start-panel--wide h2 { font-size: 1.14rem; line-height: 1.12; margin: 0 2.2rem 0.2rem 0 !important; }
+  .trip-path-grid { grid-template-columns: 1fr; gap: 0.4rem; margin-top: 0.2rem; }
+  .trip-path-card { padding: 0.48rem 0.72rem; border-radius: 0.82rem; }
+  .trip-path-header { margin-bottom: 0.12rem; }
+  .trip-path-icon { font-size: 1.05rem; }
+  .trip-path-badge { font-size: 0.68rem; padding: 0.12rem 0.48rem; }
+  .trip-path-title { font-size: 0.94rem; line-height: 1.2; margin-bottom: 0.08rem; }
+  .trip-path-desc { font-size: 0.75rem; line-height: 1.22; margin-bottom: 0.32rem; }
+  .trip-path-btn { min-height: 2.75rem; padding: 0.35rem 0.75rem; font-size: 0.84rem; }
+  .trip-start-panel--wide .trip-start-actions { margin-top: 0.25rem !important; min-height: 2.75rem; }
 }
 .trip-path-card { display: flex; flex-direction: column; padding: 1.25rem; border: 1.5px solid #cbd5e1; border-radius: 1.15rem; background: rgba(255, 255, 255, 0.85); box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04); cursor: pointer; transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1); text-align: left; }
 .trip-path-card:hover, .trip-path-card:focus-visible { transform: translateY(-3px); border-color: #0d9488; box-shadow: 0 10px 24px rgba(13, 148, 136, 0.14); }
@@ -352,15 +367,7 @@ body.read-only-mode .empty-state-readonly-hint {
 [data-theme="dark"] .trip-flight-preview-title, .dark .trip-flight-preview-title { color: #f1f5f9; }
 [data-theme="dark"] .trip-flight-preview-meta, .dark .trip-flight-preview-meta { color: #94a3b8; }
 
-.mobile-desktop-advisory { display: flex; align-items: flex-start; gap: .75rem; padding: .85rem 1rem; margin: .75rem 1rem; background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: .75rem; color: #0c4a6e; }
-.mobile-desktop-advisory-icon { font-size: 1.5rem; line-height: 1; }
-.mobile-desktop-advisory-content strong { display: block; font-size: .9rem; font-weight: 700; color: #0369a1; }
-.mobile-desktop-advisory-content p { margin: .25rem 0 0; font-size: .8rem; color: #334155; line-height: 1.35; }
-.mobile-desktop-advisory-content a { color: #0284c7; font-weight: 600; text-decoration: underline; }
-[data-theme="dark"] .mobile-desktop-advisory, .dark .mobile-desktop-advisory { background: linear-gradient(135deg, #0c2a38 0%, #064e3b 100%); border-color: #0e7490; color: #e0f2fe; }
-[data-theme="dark"] .mobile-desktop-advisory-content strong, .dark .mobile-desktop-advisory-content strong { color: #38bdf8; }
-[data-theme="dark"] .mobile-desktop-advisory-content p, .dark .mobile-desktop-advisory-content p { color: #cbd5e1; }
-[data-theme="dark"] .mobile-desktop-advisory-content a, .dark .mobile-desktop-advisory-content a { color: #7dd3fc; }
+
 
 .tutorial-overlay {
   position: fixed;
@@ -1655,11 +1662,6 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   /* Full-Viewport Mobile Map & Synced Stop Card Strip */
-  body.mobile-app-mode #tab-map #journey-map-view {
-    height: calc(100dvh - 11.5rem - env(safe-area-inset-bottom, 0px)) !important;
-    min-height: 440px !important;
-    border-radius: 0.9rem !important;
-  }
 
   .mobile-map-filter-rail {
     display: flex;
@@ -1935,13 +1937,18 @@ body.mobile-app-mode .trip-summary-table td:nth-child(4) {
   }
 
   body.mobile-app-mode #tab-map #journey-map-view {
-    height: calc(100dvh - 3.75rem - 3.65rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
-    min-height: 460px !important;
+    height: calc(100dvh - var(--app-city-height, 2.85rem) - 3.65rem - 4.75rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 400px !important;
+    background: #f1f5f9 !important;
     border-radius: 0 !important;
     border-left: none !important;
     border-right: none !important;
     width: 100% !important;
     margin: 0 !important;
+  }
+
+  [data-theme="dark"] body.mobile-app-mode #tab-map #journey-map-view {
+    background: #0f172a !important;
   }
 
   body.mobile-app-mode #tab-map .leaflet-bottom {
@@ -2579,5 +2586,21 @@ body.mobile-app-mode .city-nav-scroll {
 body.mobile-app-mode .itinerary-day-summary-row {
   margin-top: 0.25rem !important;
   margin-bottom: 0.25rem !important;
+}
+
+/* Crisp single-line buttons in Mobile Menu Sheet */
+body.mobile-app-mode #mobileMenuSheet .app-menu-btn,
+body.mobile-app-mode #mobileMenuSheet .app-menu-switch {
+  font-size: 0.78rem !important;
+  padding-inline: 0.5rem !important;
+  gap: 0.3rem !important;
+  white-space: nowrap;
+}
+
+body.mobile-app-mode #mobileMenuSheet .app-menu-switch-label {
+  font-size: 0.78rem !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 

@@ -176,6 +176,7 @@ function handleTripStartStopCityTyping(index, inputEl, countrySelectId) {
 function renderTripStartPathChoice() {
   const container = document.getElementById('trip-start-content');
   if (!container) return;
+  document.querySelector?.('.trip-start-panel')?.classList?.add('trip-start-panel--wide');
 
   const back = `<button class="trip-start-back" type="button" onclick="previousTripStartStep()">Back</button>`;
 
@@ -816,6 +817,8 @@ function renderTripStart() {
     renderTripStartPathChoice();
     return;
   }
+
+  document.querySelector?.('.trip-start-panel')?.classList?.remove('trip-start-panel--wide');
 
   if (tripStartStep === 'flight_import') {
     renderTripStartFlightImport();
