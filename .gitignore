@@ -9,6 +9,7 @@
 /test-results/
 /playwright-report/
 /tests/.gdrive_auth_profile/
+/docs/screenshots/
 
 # IDE & Editors
 .idea/*
