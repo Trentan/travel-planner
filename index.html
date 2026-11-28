@@ -471,8 +471,11 @@
               <button class="app-menu-btn" onclick="closeMobileMenu(); exportItinerarySummaryText()">
                 <span>📝</span> <span>Export AI Summary</span>
               </button>
-              <button class="app-menu-btn" onclick="closeMobileMenu(); openTripFile()">
+              <button class="app-menu-btn" onclick="closeMobileMenu(); exportJSON()">
                 <span>💾</span> <span>Backup JSON</span>
+              </button>
+              <button id="mobileOpenFileBtn" class="app-menu-btn" onclick="closeMobileMenu(); openExistingTripFile()">
+                <span>📂</span> <span>Open Backup JSON</span>
               </button>
               <button class="app-menu-btn" onclick="closeMobileMenu(); exportItineraryCalendar()">
                 <span>📅</span> <span>Export Calendar</span>

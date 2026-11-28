@@ -2322,9 +2322,14 @@ function printItinerary() {
     }
   }
 
-  if (typeof window !== 'undefined' && typeof window.print === 'function') {
+  if (typeof window !== 'undefined') {
     window.setTimeout(() => {
-      window.print();
+      if (window.AndroidNativeExport && typeof window.AndroidNativeExport.printPage === 'function') {
+        const jobTitle = (window.titleData && window.titleData.title) ? window.titleData.title : 'Travel Itinerary';
+        window.AndroidNativeExport.printPage(String(jobTitle));
+      } else if (typeof window.print === 'function') {
+        window.print();
+      }
     }, 150);
   }
 }

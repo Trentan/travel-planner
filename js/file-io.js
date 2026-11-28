@@ -200,7 +200,7 @@ async function ensureActiveFileHandle() {
 }
 
 function configureFileActionButtons() {
-  const saveAsVisible = isFSASupported();
+  const saveAsVisible = true;
   ['saveAsBtn', 'mobileSaveAsBtn'].forEach(id => {
     const button = document.getElementById(id);
     if (button) button.style.display = saveAsVisible ? '' : 'none';
@@ -248,12 +248,10 @@ async function saveFileToDisk() {
 
 function openTripFile() {
   if (isFSASupported()) {
-    createFileOnDisk();
-    return;
+    return createFileOnDisk();
   }
 
-  const input = document.getElementById('importFile');
-  if (input) input.click();
+  return exportJSON();
 }
 
 async function openExistingTripFile() {
@@ -314,6 +312,40 @@ async function createFileOnDisk() {
 
 
 function downloadTextFile(content, downloadName, mimeType = 'text/plain') {
+  if (typeof window !== 'undefined' && window.AndroidNativeExport && typeof window.AndroidNativeExport.saveFile === 'function') {
+    try {
+      window.AndroidNativeExport.saveFile(String(downloadName || 'export.txt'), String(content ?? ''), String(mimeType || 'text/plain'));
+      return null;
+    } catch (nativeErr) {
+      console.warn('Android native export failed, falling back to browser download:', nativeErr);
+    }
+  }
+
+  const isMobileTouch = typeof window !== 'undefined'
+    && typeof navigator !== 'undefined'
+    && !navigator.webdriver
+    && (window.matchMedia?.('(max-width: 768px)').matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || ''));
+
+  if (isMobileTouch && typeof navigator.share === 'function' && typeof File === 'function') {
+    try {
+      const shareFile = new File([content], downloadName, { type: mimeType });
+      if (typeof navigator.canShare !== 'function' || navigator.canShare({ files: [shareFile] })) {
+        navigator.share({ title: downloadName, files: [shareFile] }).catch(err => {
+          if (err && err.name === 'AbortError') return;
+          console.warn('Mobile share export failed, falling back to blob download:', err);
+          triggerBrowserBlobDownload(content, downloadName, mimeType);
+        });
+        return null;
+      }
+    } catch (shareErr) {
+      console.warn('Mobile share unavailable, falling back to blob download:', shareErr);
+    }
+  }
+
+  return triggerBrowserBlobDownload(content, downloadName, mimeType);
+}
+
+function triggerBrowserBlobDownload(content, downloadName, mimeType = 'text/plain') {
   const downloadAnchorNode = document.createElement('a');
   const canUseBlobUrl = typeof Blob === 'function'
     && typeof URL !== 'undefined'
@@ -334,7 +366,7 @@ function downloadTextFile(content, downloadName, mimeType = 'text/plain') {
   downloadAnchorNode.remove();
 
   if (objectUrl) {
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
   }
 
   return downloadAnchorNode;

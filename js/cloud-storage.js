@@ -397,8 +397,8 @@
 
             if (interactive) setLoadingUI(true, 'Syncing trips with Google Drive...');
             await ensureDriveFolder();
-            await uploadAllLocalTripsToDrive();
             await syncAllTripsFromGoogleDrive(false);
+            await uploadLocalOnlyTripsToDrive();
 
             setLoadingUI(false);
             updateCloudSyncStatusPill('☁️ Synced to Drive', 'connected');
@@ -469,9 +469,9 @@
                 updateCloudSyncStatusPill();
                 updateCloudSyncModalState();
 
-                // Sync all trips: Push local trips & pull remote trips
-                await window.uploadAllLocalTripsToDrive();
+                // Sync all trips: Pull remote trips first (so newer cloud data is never overwritten), then upload local-only trips
                 await window.syncAllTripsFromGoogleDrive();
+                await uploadLocalOnlyTripsToDrive();
                 setLoadingUI(false);
                 resolve(true);
                 return;
@@ -609,8 +609,8 @@
       updateCloudSyncModalState();
 
       if (typeof window.renderHeaderTripSwitcher === 'function') window.renderHeaderTripSwitcher();
-      await window.uploadAllLocalTripsToDrive();
       await window.syncAllTripsFromGoogleDrive();
+      await uploadLocalOnlyTripsToDrive();
       return true;
     }
     return false;
@@ -875,6 +875,38 @@
   }
   window.uploadTripToGoogleDrive = uploadTripToGoogleDrive;
 
+  // Upload only genuinely local-only trips that do not already exist on Google Drive
+  async function uploadLocalOnlyTripsToDrive() {
+    if (!isGoogleDriveConnected() || typeof window.getAllTripsFromIndexedDB !== 'function') return;
+    try {
+      const trips = await window.getAllTripsFromIndexedDB();
+      if (!Array.isArray(trips) || trips.length === 0) return;
+
+      const cloudFiles = Array.isArray(window.__gdriveCloudFiles) ? window.__gdriveCloudFiles : [];
+      const cloudFileIds = new Set(cloudFiles.map(f => f && f.id).filter(Boolean));
+      const cloudFileNames = new Set(cloudFiles.map(f => f && f.name ? String(f.name).toLowerCase() : '').filter(Boolean));
+      const fileMap = getGDriveFileMap();
+
+      const localOnlyTrips = trips.filter(trip => {
+        if (!trip || !trip.id) return false;
+        // Never overwrite Drive with an untouched boot template when cloud already has trips
+        if (trip.updatedAt === '1970-01-01T00:00:00.000Z' && cloudFiles.length > 0) return false;
+        const mappedId = fileMap[trip.id];
+        if (mappedId && cloudFileIds.has(mappedId)) return false;
+        const humanName = formatHumanFilename(trip).toLowerCase();
+        if (cloudFileNames.has(humanName)) return false;
+        return true;
+      });
+
+      for (const trip of localOnlyTrips) {
+        await uploadTripToGoogleDrive(trip, true);
+      }
+    } catch (err) {
+      console.warn('Failed to upload local-only trips to Google Drive:', err);
+    }
+  }
+  window.uploadLocalOnlyTripsToDrive = uploadLocalOnlyTripsToDrive;
+
   // Upload all local trips to Google Drive
   async function uploadAllLocalTripsToDrive() {
     if (!isGoogleDriveConnected() || typeof window.getAllTripsFromIndexedDB !== 'function') return;
@@ -1070,7 +1102,8 @@
 
               fileMap[remoteTrip.id] = file.id;
 
-              const localTrip = localTrips.find(t => t.id === remoteTrip.id);
+              const activeTripId = typeof window.getActiveTripId === 'function' ? window.getActiveTripId() : '';
+              const localTrip = localTrips.find(t => t.id === remoteTrip.id || (fileMap[t.id] && fileMap[t.id] === file.id));
               const remoteTime = file.modifiedTime ? new Date(file.modifiedTime).getTime() : 0;
               const localTime = localTrip && localTrip.updatedAt ? new Date(localTrip.updatedAt).getTime() : (localTrip && localTrip.lastSaved ? new Date(localTrip.lastSaved).getTime() : 0);
 
@@ -1080,11 +1113,27 @@
                   await window.saveTripToIndexedDB(remoteTrip);
                 }
               } else if (remoteTime > localTime + 3000) {
-                // 2. Remote file is newer -> Update local IndexedDB
+                // 2. Remote file is newer -> Update local IndexedDB and reload if active
                 if (typeof window.saveTripToIndexedDB === 'function') {
                   await window.saveTripToIndexedDB(remoteTrip);
                 }
-              } else if (localTime > remoteTime + 3000) {
+                if (remoteTrip.id === activeTripId && typeof window.loadImportedPayload === 'function') {
+                  const prevSuppressSync = window.__suppressCloudAutoSync;
+                  const prevSuppressBackup = window.__suppressBackupTracking;
+                  window.__suppressCloudAutoSync = true;
+                  window.__suppressBackupTracking = true;
+                  try {
+                    await window.loadImportedPayload(remoteTrip.data, `${remoteTrip.title || 'Trip'}.json`);
+                    if (typeof window.renderAll === 'function') window.renderAll();
+                  } finally {
+                    window.__suppressCloudAutoSync = prevSuppressSync;
+                    window.__suppressBackupTracking = prevSuppressBackup;
+                  }
+                  if (typeof window.showToast === 'function') {
+                    window.showToast(`☁️ Synced "${remoteTrip.title || 'Trip'}" from Google Drive`);
+                  }
+                }
+              } else if (localTime > remoteTime + 3000 && localTrip.updatedAt !== '1970-01-01T00:00:00.000Z') {
                 // 3. Local edits are newer -> Push local trip to Google Drive
                 await window.uploadTripToGoogleDrive(localTrip, true);
               }
@@ -1419,7 +1468,7 @@
 
   // Quiet Debounced Auto-Sync for active trip edits (runs 3.5s after user finishes editing)
   window.autoSyncActiveTripToCloud = function() {
-    if (!isGoogleDriveConnected()) return;
+    if (!isGoogleDriveConnected() || window.__suppressCloudAutoSync) return;
 
     if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
     const autoSyncDelay = (typeof window !== 'undefined' && window.__cloudAutoSyncDelayMs) || 3500;

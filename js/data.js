@@ -2992,7 +2992,9 @@ function _initRunDataMigrations() {
 
 async function initData() {
   const previousSuppress = window.__suppressBackupTracking;
+  const previousSuppressSync = window.__suppressCloudAutoSync;
   window.__suppressBackupTracking = true;
+  window.__suppressCloudAutoSync = true;
   historyTrackingSuspended = true;
 
   _initLoadJourneysAndStays();
@@ -3005,6 +3007,7 @@ async function initData() {
     await saveData(false);
   } finally {
     window.__suppressBackupTracking = previousSuppress;
+    window.__suppressCloudAutoSync = previousSuppressSync;
     historyTrackingSuspended = false;
   }
   resetHistoryState(cloneHistorySnapshot());
@@ -3096,7 +3099,7 @@ async function runSaveData(showTick = true) {
       if (typeof window.renderHeaderTripSwitcher === 'function') {
         window.renderHeaderTripSwitcher();
       }
-      if (typeof window.autoSyncActiveTripToCloud === 'function') {
+      if (!window.__suppressCloudAutoSync && typeof window.autoSyncActiveTripToCloud === 'function') {
         window.autoSyncActiveTripToCloud();
       }
     } catch (e) {

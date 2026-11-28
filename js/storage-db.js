@@ -516,7 +516,7 @@ function getOfflineSyncQueueCount() {
 }
 window.getOfflineSyncQueueCount = getOfflineSyncQueueCount;
 
-function extractTripSummary(tripData, tripId) {
+function extractTripSummary(tripData, tripId, updatedAtOverride = null) {
   const meta = tripData.meta || {};
   const itinerary = tripData.itinerary || [];
   const staysData = tripData.stays || [];
@@ -553,7 +553,7 @@ function extractTripSummary(tripData, tripId) {
     dateRange: dateRange,
     legCount: itinerary.length,
     stayCount: staysData.length,
-    updatedAt: new Date().toISOString(),
+    updatedAt: updatedAtOverride || new Date().toISOString(),
     data: tripData
   };
 }
@@ -563,7 +563,17 @@ async function saveActiveTripToStore() {
   if (typeof getCurrentAppData !== 'function') return;
   const currentData = getCurrentAppData();
   const currentId = getActiveTripId();
-  const summary = extractTripSummary(currentData, currentId);
+  let updatedAtOverride = null;
+  if (typeof window !== 'undefined' && window.__suppressCloudAutoSync) {
+    try {
+      const trips = await getAllTripsFromIndexedDB();
+      const existing = Array.isArray(trips) ? trips.find(t => t.id === currentId) : null;
+      updatedAtOverride = (existing && existing.updatedAt) ? existing.updatedAt : '1970-01-01T00:00:00.000Z';
+    } catch (e) {
+      updatedAtOverride = '1970-01-01T00:00:00.000Z';
+    }
+  }
+  const summary = extractTripSummary(currentData, currentId, updatedAtOverride);
   await saveTripToIndexedDB(summary);
 }
 window.saveActiveTripToStore = saveActiveTripToStore;

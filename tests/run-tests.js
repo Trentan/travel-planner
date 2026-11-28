@@ -96,6 +96,7 @@ const { runCityStayCandidatesBenchmarkTests } = require('./benchmark-city-stay-c
 const { runExtractCitiesUserCitiesTests } = require('./extract-cities-user-cities.test');
 const { runReminderManagementTests } = require('./reminder-management.test');
 const { runCloudStorageInitErrorTests } = require('./cloud-storage-init-error.test');
+const { runCloudSyncOverwriteAndMobileExportTests } = require('./cloud-sync-overwrite-and-mobile-export.test');
 const { runSyncResponsiveUiTests } = require('./sync-responsive-ui.test');
 const { runActivityModalHelpersTests } = require('./activity-modal-helpers.test');
 const { runLoadDismissedRemindersTests } = require('./load-dismissed-reminders.test');
@@ -109,6 +110,7 @@ async function run() {
     if (typeof runExtractCitiesUserCitiesTests === 'function') runExtractCitiesUserCitiesTests();
     if (typeof runReminderManagementTests === 'function') runReminderManagementTests();
     if (typeof runCloudStorageInitErrorTests === 'function') runCloudStorageInitErrorTests();
+    if (typeof runCloudSyncOverwriteAndMobileExportTests === 'function') await runCloudSyncOverwriteAndMobileExportTests();
     if (typeof runSyncResponsiveUiTests === 'function') runSyncResponsiveUiTests();
     if (typeof runActivityModalHelpersTests === 'function') runActivityModalHelpersTests();
     if (typeof runLoadDismissedRemindersTests === 'function') runLoadDismissedRemindersTests();

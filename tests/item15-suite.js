@@ -1060,8 +1060,9 @@ async function testFileSaveLoadAndBackup() {
   assertBootClean(reload, 'File save/load reload');
   assert(state(reload.context).meta.title === 'Local Save Test', 'File save/load: should restore from localStorage');
 
-  reload.context.openTripFile();
-  assert(reload.document.getElementById('importFile').selected === true || reload.document.lastClickedElement?.id === 'importFile', 'File save/load: openTripFile should click import input in fallback mode');
+  await reload.context.openTripFile();
+  await settle(reload);
+  assert(reload.document.getElementById('importFile').selected !== true, 'File save/load: openTripFile should export instead of clicking import input in fallback mode');
   reload.context.openExistingTripFile();
   assert(reload.document.getElementById('importFile').selected === true || reload.document.lastClickedElement?.id === 'importFile', 'File save/load: openExistingTripFile should click import input in fallback mode');
 
